@@ -111,8 +111,9 @@ export async function sellItems(context) {
   const limit = content.rarities.findIndex((rarity) => rarity.id === body.maxRarity);
   if (limit === -1) throw new ApiError(400, 'invalid_rarity', 'Wybierz rzadkość.');
   const rank = (item) => content.rarities.findIndex((rarity) => rarity.id === item.rarity);
-  // Upgraded items are not sold by the handful: too much went into them.
-  const sold = player.items.filter((item) => !item.equippedSlot && !(item.upgrade > 0) && rank(item) <= limit);
+  // Upgraded items, and those with a gem set in them, are not sold by the
+  // handful: too much went into them.
+  const sold = player.items.filter((item) => !item.equippedSlot && !(item.upgrade > 0) && !item.gem && rank(item) <= limit);
   let count = 0;
   if (sold.length > 0) {
     // One transaction: the gold is counted from the items still there, then

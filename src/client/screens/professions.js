@@ -7,11 +7,15 @@
 // way: the Systemowa Pracownia, the recipes, how many potions and the
 // brewing under way; and the Rzemieślnictwo screen: the Systemowy
 // Warsztat, the patterns by slot, the rarity, how many items, the order
-// under way and the parts' exchange. Each work can be done by the character or by the Awatar Systemu,
-// bought on the tab, which works beside the character in its own card.
-// Locked, or hidden in this deployment, the tab says so as before.
+// under way and the parts' exchange; the Górnictwo screen: the Systemowa
+// Kopalnia, the time, what a digging should bring and the digging under way;
+// and the Jubilerstwo screen: the Systemowa Szlifiernia with two tabs, the
+// jewellery by pattern and gem, and the gems set in the items worn. Each
+// work can be done by the character or by the Awatar Systemu, bought on the
+// tab, which works beside the character in its own card. Locked, or hidden
+// in this deployment, the tab says so as before.
 
-import { goldArt, herbSprite, itemSprite, placeArt, potionSprite, professionSprite } from '../art.js';
+import { goldArt, herbSprite, itemSprite, mineralSprite, placeArt, potionSprite, professionSprite } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatDecimal, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -20,26 +24,37 @@ import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, howItWorks, splitLead, systemPanel, toast, withButton } from '../ui.js';
-import { findMark, itemSummary } from './character.js';
+import { findMark, itemSummary, itemTitle } from './character.js';
 import { lockedScreen } from './locked.js';
 
 const HOME = '#/profesje';
 // The addresses of the professions with a screen.
-const SCREENS = { zielarstwo: 'herbalism', alchemia: 'alchemy', rzemieslnictwo: 'crafting' };
-const HASHES = { herbalism: `${HOME}/zielarstwo`, alchemy: `${HOME}/alchemia`, crafting: `${HOME}/rzemieslnictwo` };
+const SCREENS = { zielarstwo: 'herbalism', alchemia: 'alchemy', rzemieslnictwo: 'crafting', gornictwo: 'mining', jubilerstwo: 'jewelcrafting' };
+const HASHES = {
+  herbalism: `${HOME}/zielarstwo`,
+  alchemy: `${HOME}/alchemia`,
+  crafting: `${HOME}/rzemieslnictwo`,
+  mining: `${HOME}/gornictwo`,
+  jewelcrafting: `${HOME}/jubilerstwo`,
+};
 // The activity of each profession's work, and what its square says meanwhile.
 const WORK = {
   herbalism: { kind: 'herbs', busy: 'Zbiera zioła' },
   alchemy: { kind: 'potions', busy: 'Warzy mikstury' },
   crafting: { kind: 'items', busy: 'Wykonuje przedmioty' },
+  mining: { kind: 'minerals', busy: 'Kopie' },
+  jewelcrafting: { kind: 'jewels', busy: 'Pracuje w Szlifierni' },
 };
 // What the character or the Awatar Systemu is doing, by the activity's kind.
-const DOING = { herbs: 'zbiera zioła', potions: 'warzy mikstury', items: 'wykonuje przedmioty' };
-const FALLBACK_ICONS = { herbalism: 'leaf', alchemy: 'spirit', crafting: 'hammer' };
+const DOING = { herbs: 'zbiera zioła', potions: 'warzy mikstury', items: 'wykonuje przedmioty', minerals: 'kopie w Kopalni', jewels: 'pracuje w Szlifierni' };
+const FALLBACK_ICONS = { herbalism: 'leaf', alchemy: 'spirit', crafting: 'hammer', mining: 'ore', jewelcrafting: 'ring' };
 const HERB_CHOICE = 'wzrost.herb-choice';
 const WORKER_CHOICE = 'wzrost.worker-choice';
 const BREW_CHOICE = 'wzrost.brew-choice';
 const CRAFT_CHOICE = 'wzrost.craft-choice';
+const MINE_CHOICE = 'wzrost.mine-choice';
+const JEWEL_CHOICE = 'wzrost.jewel-choice';
+const SET_CHOICE = 'wzrost.set-choice';
 // The Stół rozbiórki, where parts are made.
 const TABLE = '#/oboz/craft-table';
 
@@ -62,6 +77,9 @@ function saveChoice(key, choice) {
 const herbIcon = (id) => herbSprite(id) ?? icon('leaf', { size: 24 });
 const potionIcon = (id) => potionSprite(id) ?? icon('flask', { size: 24 });
 const patternIcon = (id) => itemSprite({ base: id }) ?? icon('hammer', { size: 24 });
+const mineralIcon = (id) => mineralSprite(id) ?? icon('ore', { size: 24 });
+const jewelIcon = (id) => itemSprite({ base: id }) ?? icon('ring', { size: 24 });
+const percentText = (share) => `${formatNumber(Math.round(share * 100))}%`;
 
 // A work of `count` potions or items of `each` minutes in whole minutes, as
 // the server counts it (brewMinutes and orderMinutes in src/engine).
@@ -168,10 +186,15 @@ export function mountProfessions(container, { params, navigate }) {
   const choice = loadChoice(HERB_CHOICE); // { herbs: [ids], minutes }
   const brewChoice = loadChoice(BREW_CHOICE); // { recipe, count }
   const craftChoice = loadChoice(CRAFT_CHOICE); // { slot, pattern, rarity, count }
+  const mineChoice = loadChoice(MINE_CHOICE); // { minutes }
+  const jewelChoice = loadChoice(JEWEL_CHOICE); // { slot, pattern, rarity, count }
+  const setChoice = loadChoice(SET_CHOICE); // { item, gem }
   let lockedScreenShown = null;
   let shownState = null;
   // The Warsztat's tab: the workshop itself or its part exchange.
   let workshopTab = 'workshop';
+  // The Szlifiernia's tab: the jewellery or the setting of gems.
+  let jewelTab = 'craft';
   // The works under way on the screen, each with its countdown, bar, scene
   // and "Przewiń": the character's and the Awatar's.
   let timers = [];
@@ -214,6 +237,16 @@ export function mountProfessions(container, { params, navigate }) {
       renderCrafting(character);
       return;
     }
+    // Górnictwo and Jubilerstwo below their level lead back to the tab.
+    if (professionId === 'mining' || professionId === 'jewelcrafting') {
+      if (!character.professions[professionId]) {
+        location.replace(HOME);
+        return;
+      }
+      if (professionId === 'mining') renderMining(character);
+      else renderJewelcraft(character);
+      return;
+    }
     // The System's words over the squares, which the narrator points at.
     // Its first sentence, the rest under "Jak to działa?" (315 A).
     const [lead, rest] = splitLead(character.professions.intro ?? '');
@@ -228,14 +261,18 @@ export function mountProfessions(container, { params, navigate }) {
     );
   }
 
-  // Three squares: the first on top, the others below it.
+  // The squares in their rows (`rows`, data/professions.json): the
+  // gathering professions on top, each above the one that works with what it
+  // brings, and Rzemieślnictwo below; without rows the first on top and the
+  // others below it.
   function triangle(character) {
-    const [first, ...rest] = character.professions.list;
+    const { list, rows } = character.professions;
+    const byId = Object.fromEntries(list.map((profession) => [profession.id, profession]));
+    const layout = rows?.length > 0 ? rows : [[list[0].id], list.slice(1).map((profession) => profession.id)];
     return h(
       'div',
       { class: 'profession-triangle', 'data-guide': 'professions-list' },
-      h('div', { class: 'profession-row' }, square(first, character)),
-      h('div', { class: 'profession-row' }, rest.map((profession) => square(profession, character))),
+      layout.map((row) => h('div', { class: 'profession-row' }, row.filter((id) => byId[id]).map((id) => square(byId[id], character)))),
     );
   }
 
@@ -474,14 +511,17 @@ export function mountProfessions(container, { params, navigate }) {
     );
   }
 
-  // The place's picture dim behind its name and the System's words.
-  function placeCard(place) {
+  // The place's picture dim behind its name and the System's words, and how
+  // its work goes folded under "Jak to działa?" (`about`), as on the Salon
+  // Gier (the author: descriptions short, the rest folded).
+  function placeCard(place, about = null) {
     const art = placeArt(place.id);
     const card = h(
       'section',
       { class: `card place-card${art ? ' place-card--art' : ''}`, 'aria-label': place.name },
       h('h2', { class: 'card-title', text: place.name }),
       h('p', { class: 'region-description', text: place.description }),
+      about && howItWorks(null, about),
     );
     if (art) card.style.setProperty('--place-art', `url("${art}")`);
     return card;
@@ -1357,6 +1397,537 @@ export function mountProfessions(container, { params, navigate }) {
     );
   }
 
+  // A slider of `allowed` minutes with buttons for one step at a time, as
+  // for explorations, starting at `start` (an index), for a work's time;
+  // `onSet(minutes)` follows every move and `onChange` the end of one.
+  function minutesPicker(allowed, start, title, onSet, onChange) {
+    let index = start;
+    const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
+    const slider = h('input', {
+      type: 'range',
+      class: 'duration-slider',
+      min: 0,
+      max: allowed.length - 1,
+      step: 1,
+      value: index,
+      'aria-label': title,
+      onInput: () => set(Number(slider.value)),
+      onChange: () => onChange(),
+    });
+    const stepButton = (sign, label) =>
+      h('button', {
+        type: 'button',
+        class: 'button button--world duration-step',
+        'aria-label': label,
+        text: sign < 0 ? '−' : '+',
+        onClick: () => {
+          set(index + sign);
+          onChange();
+        },
+      });
+    const less = stepButton(-1, 'Krócej');
+    const more = stepButton(1, 'Dłużej');
+    function set(next) {
+      index = Math.min(allowed.length - 1, Math.max(0, next));
+      const minutes = allowed[index];
+      slider.value = String(index);
+      slider.setAttribute('aria-valuetext', formatMinutes(minutes));
+      slider.style.setProperty('--fill', `${(index / Math.max(1, allowed.length - 1)) * 100}%`);
+      value.textContent = formatMinutes(minutes);
+      less.disabled = index === 0;
+      more.disabled = index === allowed.length - 1;
+      onSet(minutes);
+    }
+    const element = h(
+      'div',
+      { class: 'duration-picker' },
+      h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, title), value),
+      h('div', { class: 'duration-row' }, less, slider, more),
+      h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: formatMinutes(allowed[0]) }), h('span', { text: formatMinutes(allowed.at(-1)) })),
+    );
+    return { element, start: () => set(index) };
+  }
+
+  // What the System still hides, as shadows: a row for each level that
+  // shows them, with its words (`unknown` names them: one, a few, many).
+  function shadows(hidden, art, unknown) {
+    const levels = [...new Set(hidden.map((each) => each.level))].sort((a, b) => a - b);
+    if (levels.length === 0) return null;
+    return h(
+      'ul',
+      { class: 'choice-rows mine-shadows' },
+      levels.map((level) => {
+        const group = hidden.filter((each) => each.level === level);
+        return h(
+          'li',
+          { class: 'choice-hidden', role: 'img', 'aria-label': `${countOf(group.length, ...unknown)}. ${group[0].hint}` },
+          h('span', { class: 'choice-shadows' }, group.map((each) => h('span', { class: 'choice-shadow' }, art(each.id)))),
+          h('span', { class: 'choice-meta', text: group[0].hint }),
+        );
+      }),
+    );
+  }
+
+  // Górnictwo: the works under way, the Systemowa Kopalnia with how digging
+  // goes folded under "Jak to działa?", the level and the form.
+  function renderMining(character) {
+    const { list, mining } = character.professions;
+    const profession = list.find((candidate) => candidate.id === mining.professionId);
+    fill(
+      container,
+      backHeading(profession.name, `poziom ${profession.level}`, HOME),
+      works(character, 'minerals', miningCard, 'Do Kopalni zejdzie po powrocie.'),
+      testTools(character, 'minerals', 'Tryb testowy: kopanie skończy się od razu, z tym samym wynikiem.'),
+      placeCard(mining.place, mining.about),
+      levelCard(profession, 'kopania'),
+      anyFree(character) && mineForm(character, mining),
+    );
+  }
+
+  // The time of a digging, what it should bring of each mineral known and
+  // of the veins' gold, the shadows the System still hides and the start.
+  function mineForm(character, mining) {
+    const who = workerPicker(character);
+    const known = mining.minerals.filter((mineral) => !mineral.hidden);
+    const allowed = mining.minutes;
+    let start = allowed.indexOf(mineChoice.minutes);
+    if (start === -1) start = Math.max(0, allowed.indexOf(60));
+    let minutes = allowed[start];
+    const yields = h('ul', { class: 'herb-found mine-yield', 'aria-label': 'Spodziewany urobek' });
+    const gold = h('p', { class: 'herb-estimate mine-gold' });
+    const remember = () => {
+      mineChoice.minutes = minutes;
+      saveChoice(MINE_CHOICE, mineChoice);
+    };
+    // A count to expect: its range, or the chance of one for a rare gem.
+    const expectedText = (expected) => {
+      if (expected < 1) return `szansa ok. ${percentText(expected)}`;
+      const low = Math.floor(expected * (1 - mining.spread));
+      const high = Math.ceil(expected * (1 + mining.spread));
+      return low === high ? formatNumber(low) : `${formatNumber(low)}–${formatNumber(high)}`;
+    };
+    const picker = minutesPicker(
+      allowed,
+      start,
+      'Czas kopania',
+      (chosen) => {
+        minutes = chosen;
+        const hours = minutes / 60;
+        fill(
+          yields,
+          known.map((mineral) =>
+            h(
+              'li',
+              { class: 'herb-found-row' },
+              h('span', { class: 'herb-art' }, mineralIcon(mineral.id)),
+              h('span', { class: 'herb-found-name', text: mineral.name }),
+              h('span', { class: 'herb-found-count', text: expectedText(mineral.perHour * hours) }),
+            ),
+          ),
+        );
+        fill(gold, goldArt(20), ` Żyły złota: średnio ${formatNumber(Math.round(mining.goldPerHour * hours))} złota.`);
+      },
+      remember,
+    );
+    picker.start();
+    const begin = h('button', {
+      type: 'button',
+      class: 'button button--system',
+      text: 'Zejdź do Kopalni',
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          remember();
+          await call('POST', '/api/professions/mine', { minutes, ...who.body() });
+          window.scrollTo(0, 0);
+        }),
+    });
+    return h(
+      'section',
+      { class: 'card gather-card', 'aria-labelledby': 'mine-title', 'data-guide': 'mining-form' },
+      h('h2', { class: 'section-title', id: 'mine-title', text: 'Kopanie' }),
+      who.element,
+      picker.element,
+      h('p', { class: 'duration-title', text: 'Spodziewany urobek' }),
+      yields,
+      gold,
+      shadows(
+        mining.minerals.filter((mineral) => mineral.hidden),
+        mineralIcon,
+        ['nieznany minerał', 'nieznane minerały', 'nieznanych minerałów'],
+      ),
+      begin,
+    );
+  }
+
+  // The digging under way, or its report waiting. Called back early, the
+  // character comes back with nothing, as from the Zagajnik.
+  function miningCard(activity, avatar) {
+    if (activityFinished(activity)) {
+      return systemPanel(`Kopanie zakończone: ${activity.placeName}, ${formatMinutes(activity.minutes)}.`, 'Raport czeka na odbiór.', claimButton(avatar));
+    }
+    const cancel = h('button', {
+      type: 'button',
+      class: 'button button--world',
+      text: 'Przerwij kopanie',
+      onClick: async (event) => {
+        const button = event.currentTarget;
+        const sure = await confirmAction({
+          title: 'Przerwać kopanie?',
+          text: avatar ? 'Awatar wróci od razu, bez urobku.' : 'Postać wróci od razu, bez urobku, złota i doświadczenia.',
+          confirmLabel: 'Przerwij',
+          danger: true,
+        });
+        if (sure) await withButton(button, () => call('POST', cancelPath(avatar)));
+      },
+    });
+    return workUnderWay(activity, `Kopanie w toku: ${activity.placeName}, ${formatMinutes(activity.minutes)}.`, 'Kopanie', cancel, avatar);
+  }
+
+  // Jubilerstwo: the works under way, two tabs (the jewellery and the
+  // setting of gems), the Systemowa Szlifiernia with how the chosen work
+  // goes folded under "Jak to działa?", the level and the tab's form.
+  function renderJewelcraft(character) {
+    const { list, jewelcrafting } = character.professions;
+    const profession = list.find((candidate) => candidate.id === jewelcrafting.professionId);
+    const setting = jewelTab === 'set';
+    const tab = (id, label) =>
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'segmented-option',
+          'aria-pressed': jewelTab === id,
+          // The narrator's Górnictwo chapter points at the Oprawianie tab.
+          'data-guide': `jewel-tab-${id}`,
+          onClick: () => {
+            jewelTab = id;
+            render();
+          },
+        },
+        label,
+      );
+    fill(
+      container,
+      backHeading(profession.name, `poziom ${profession.level}`, HOME),
+      works(character, 'jewels', jewelsCard, 'Praca w Szlifierni możliwa po powrocie.'),
+      testTools(character, 'jewels', 'Tryb testowy: praca skończy się od razu, z tym samym wynikiem.'),
+      h('div', { class: 'segmented workshop-tabs', role: 'group', 'aria-label': jewelcrafting.place.name }, tab('craft', 'Biżuteria'), tab('set', 'Oprawianie')),
+      placeCard(jewelcrafting.place, setting ? jewelcrafting.about.set : jewelcrafting.about.craft),
+      levelCard(profession, 'pracy'),
+      anyFree(character) && (setting ? setForm(character, jewelcrafting) : jewelForm(character, jewelcrafting)),
+    );
+  }
+
+  // The kinds of jewellery, the patterns of the kind chosen (those the
+  // System still hides are shadows), the gem, which sets the rarity, how
+  // many, what they take, the chance and the time, and the start.
+  function jewelForm(character, jewelcrafting) {
+    const who = workerPicker(character);
+    const known = (slot) => slot.patterns.filter((pattern) => !pattern.hidden);
+    const rarities = jewelcrafting.rarities.filter((rarity) => !rarity.hidden);
+    const next = jewelcrafting.rarities.find((rarity) => rarity.hidden);
+    let slot = jewelcrafting.slots.find((candidate) => candidate.id === jewelChoice.slot) ?? jewelcrafting.slots[0];
+    let pattern = known(slot).find((candidate) => candidate.id === jewelChoice.pattern) ?? known(slot)[0];
+    let rarity = rarities.find((candidate) => candidate.id === jewelChoice.rarity) ?? rarities[0];
+    let count = 1;
+    const free = Math.max(0, character.bagCapacity - character.bagUsed);
+
+    const slotRow = h('div', { class: 'segmented workshop-slots', role: 'group', 'aria-label': 'Rodzaj biżuterii' });
+    const list = choiceList('Wzory', { unknown: ['nieznany wzór', 'nieznane wzory', 'nieznanych wzorów'] });
+    const rarityRow = h('div', { class: 'workshop-rarities', role: 'group', 'aria-label': 'Kamień' });
+    const needs = h('p', { class: 'herb-estimate' });
+    const picker = h('div', { class: 'stack' });
+
+    const remember = () => {
+      jewelChoice.slot = slot.id;
+      jewelChoice.pattern = pattern.id;
+      jewelChoice.rarity = rarity.id;
+      jewelChoice.count = count;
+      saveChoice(JEWEL_CHOICE, jewelChoice);
+    };
+    function choose(change) {
+      change();
+      remember();
+      show();
+    }
+    // How many jewels the gems, the ore and the bag allow.
+    function affordable() {
+      const byGems = rarity.gem.have;
+      const byOre = Math.floor(rarity.ore.have / slot.ores);
+      return { byGems, byOre, most: Math.min(jewelcrafting.maxCount, byGems, byOre, free) };
+    }
+    const forWhom = (each) => ['każda klasa', each.classLevel && `od poz. klasy ${each.classLevel}`].filter(Boolean).join(' · ');
+
+    function show() {
+      fill(
+        slotRow,
+        jewelcrafting.slots.map((each) =>
+          h('button', {
+            type: 'button',
+            class: 'segmented-option',
+            'aria-pressed': each.id === slot.id,
+            text: each.name,
+            onClick: () =>
+              choose(() => {
+                slot = each;
+                pattern = known(each)[0];
+              }),
+          }),
+        ),
+      );
+      list.show(
+        { art: jewelIcon(pattern.id), name: pattern.name, meta: forWhom(pattern) },
+        known(slot).map((each) => ({ id: each.id, art: jewelIcon(each.id), name: each.name, meta: forWhom(each), on: each.id === pattern.id })),
+        slot.patterns.filter((each) => each.hidden).map((each) => ({ art: jewelIcon(each.id), level: each.level, hint: each.hint })),
+        (id) => choose(() => (pattern = known(slot).find((each) => each.id === id))),
+      );
+      fill(
+        rarityRow,
+        rarities.map((each) =>
+          h('button', {
+            type: 'button',
+            class: 'rarity-option',
+            'aria-pressed': each.id === rarity.id,
+            'aria-label': `${each.gem.name}: rzadkość ${each.name}`,
+            vars: { '--rarity': each.color },
+            text: each.gem.name,
+            onClick: () => choose(() => (rarity = each)),
+          }),
+        ),
+      );
+      needs.textContent = `Rzadkość: ${rarity.name}. Na sztukę: 1 × ${rarity.gem.name} (masz ${formatNumber(rarity.gem.have)}) i ${formatNumber(slot.ores)} × ${rarity.ore.name} (masz ${formatNumber(rarity.ore.have)}).`;
+      const plan = affordable();
+      if (plan.most === 0) {
+        fill(picker, shortage(plan));
+        return;
+      }
+      count = Math.min(plan.most, Math.max(1, jewelChoice.count ?? 1));
+      fill(picker, countPicker(plan));
+    }
+
+    // What one jewel still lacks, and where gems and ore come from.
+    function shortage({ byGems, byOre }) {
+      const lines = [];
+      if (byGems === 0) lines.push(`Brakuje kamienia: ${rarity.gem.name} (masz 0, potrzeba 1).`);
+      if (byOre === 0) lines.push(`Brakuje kruszcu: ${rarity.ore.name} (masz ${formatNumber(rarity.ore.have)}, potrzeba ${formatNumber(slot.ores)}).`);
+      if (free === 0) lines.push('Plecak jest pełny. Zrób w nim miejsce na biżuterię.');
+      return [
+        lines.map((text) => h('p', { class: 'herb-room herb-room--full', text })),
+        (byGems === 0 || byOre === 0) && h('p', { class: 'muted', text: 'Kamienie i kruszce wydobędziesz w Górnictwie.' }),
+        (byGems === 0 || byOre === 0) && h('a', { class: 'button button--world', href: HASHES.mining, text: 'Do Górnictwa' }),
+      ];
+    }
+
+    // A slider of the jewels with buttons for one at a time, what they take
+    // and how long, the chance, the room in the bag and the start.
+    function countPicker({ byGems, byOre, most }) {
+      const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
+      const estimate = h('p', { class: 'herb-estimate' });
+      const slider = h('input', {
+        type: 'range',
+        class: 'duration-slider',
+        min: 1,
+        max: most,
+        step: 1,
+        value: count,
+        'aria-label': 'Liczba sztuk',
+        onInput: () => set(Number(slider.value)),
+        onChange: () => remember(),
+      });
+      const stepButton = (sign, label) =>
+        h('button', {
+          type: 'button',
+          class: 'button button--world duration-step',
+          'aria-label': label,
+          text: sign < 0 ? '−' : '+',
+          onClick: () => {
+            set(count + sign);
+            remember();
+          },
+        });
+      const less = stepButton(-1, 'Mniej');
+      const more = stepButton(1, 'Więcej');
+      function set(nextCount) {
+        count = Math.min(most, Math.max(1, nextCount));
+        const label = countOf(count, 'sztuka', 'sztuki', 'sztuk');
+        slider.value = String(count);
+        slider.setAttribute('aria-valuetext', label);
+        slider.style.setProperty('--fill', `${most > 1 ? ((count - 1) / (most - 1)) * 100 : 100}%`);
+        value.textContent = label;
+        less.disabled = count === 1;
+        more.disabled = count === most;
+        const each = formatMinutes(workMinutes(1, rarity.itemMinutes));
+        const time = count === 1 ? `Czas wyrobu jednej sztuki: ${each}` : `Czas wyrobu: ${formatMinutes(workMinutes(count, rarity.itemMinutes))}, po ${each} na sztukę`;
+        estimate.textContent = `${time}. Zużyjesz: ${formatNumber(count)} × ${rarity.gem.name}, ${formatNumber(count * slot.ores)} × ${rarity.ore.name}.`;
+      }
+      set(count);
+      const start = h('button', {
+        type: 'button',
+        class: 'button button--system',
+        text: 'Zacznij wyrób',
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            remember();
+            await call('POST', '/api/professions/jewel', { baseId: pattern.id, rarity: rarity.id, count, ...who.body() });
+            window.scrollTo(0, 0);
+          }),
+      });
+      return [
+        h(
+          'div',
+          { class: 'duration-picker' },
+          h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, 'Liczba sztuk'), value),
+          h('div', { class: 'duration-row' }, less, slider, more),
+          h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: '1' }), h('span', { text: formatNumber(most) })),
+        ),
+        estimate,
+        h('p', {
+          class: 'muted',
+          text: rarity.chance >= 1 ? 'Każda sztuka tej rzadkości się uda.' : `Każda sztuka ma ${percentText(rarity.chance)} szans na powodzenie. Nieudana zabiera swój kamień, a kruszec wraca.`,
+        }),
+        h('p', { class: 'muted', text: `Biżuteria dostanie poziom postaci: ${formatNumber(character.level)}.` }),
+        free < Math.min(jewelcrafting.maxCount, byGems, byOre) && h('p', { class: 'herb-room', text: `Plecak ma miejsce tylko na ${countOf(free, 'sztukę', 'sztuki', 'sztuk')}.` }),
+        start,
+      ];
+    }
+
+    show();
+    return h(
+      'section',
+      { class: 'card gather-card', 'aria-labelledby': 'jewels-title', 'data-guide': 'jewel-patterns' },
+      h('h2', { class: 'section-title', id: 'jewels-title', text: 'Wzory' }),
+      who.element,
+      slotRow,
+      list.element,
+      h('h3', { class: 'workshop-subtitle', text: 'Kamień' }),
+      rarityRow,
+      next && h('p', { class: 'muted', text: `Następna rzadkość: ${next.name}, od ${next.level}. poziomu Jubilerstwa.` }),
+      needs,
+      picker,
+    );
+  }
+
+  // Setting a gem in an item worn: the item (and the gem in it now), the
+  // gem (those the System still hides are shadows), what the gem gives,
+  // the time, and the start; a gem already in the item is lost.
+  function setForm(character, jewelcrafting) {
+    const worn = state.content.slots.map((slot) => character.equipment[slot.id]).filter(Boolean);
+    const head = h('h2', { class: 'section-title', id: 'set-title', text: 'Oprawianie' });
+    const card = (...children) => h('section', { class: 'card gather-card', 'aria-labelledby': 'set-title', 'data-guide': 'jewel-setting' }, head, children);
+    if (worn.length === 0) return card(h('p', { class: 'muted', text: 'Załóż przedmiot, żeby oprawić w nim kamień.' }));
+    const gems = jewelcrafting.gems.filter((gem) => !gem.hidden);
+    const who = workerPicker(character);
+    let item = worn.find((candidate) => candidate.id === setChoice.item) ?? worn[0];
+    let gem = gems.find((candidate) => candidate.id === setChoice.gem) ?? gems.find((candidate) => candidate.have > 0) ?? gems[0];
+    const items = choiceList('Przedmiot', { unknown: ['przedmiot', 'przedmioty', 'przedmiotów'] });
+    const stones = choiceList('Kamienie', { unknown: ['nieznany kamień', 'nieznane kamienie', 'nieznanych kamieni'] });
+    const details = h('div', { class: 'stack' });
+    const remember = () => {
+      setChoice.item = item.id;
+      setChoice.gem = gem.id;
+      saveChoice(SET_CHOICE, setChoice);
+    };
+    const itemArt = (each) => itemSprite(each) ?? icon('ring', { size: 24 });
+    const gemNow = (each) => (each.gem ? `${each.gem.name} +${percentText(each.gem.bonus)}` : 'bez kamienia');
+    const gemMeta = (each) => `+${percentText(each.bonus)} · w plecaku: ${formatNumber(each.have)} · ${formatMinutes(each.minutes)}`;
+
+    function show() {
+      items.show(
+        { art: itemArt(item), name: itemTitle(item), meta: `${item.slotName} · ${gemNow(item)}` },
+        worn.map((each) => ({ id: each.id, art: itemArt(each), name: itemTitle(each), meta: `${each.slotName} · ${gemNow(each)}`, on: each.id === item.id })),
+        [],
+        (id) => {
+          item = worn.find((each) => each.id === id);
+          remember();
+          show();
+        },
+      );
+      stones.show(
+        { art: mineralIcon(gem.id), name: gem.name, meta: gemMeta(gem) },
+        gems.map((each) => ({ id: each.id, art: mineralIcon(each.id), name: each.name, meta: gemMeta(each), on: each.id === gem.id })),
+        jewelcrafting.gems.filter((each) => each.hidden).map((each) => ({ art: mineralIcon(each.id), level: each.level, hint: each.hint })),
+        (id) => {
+          gem = gems.find((each) => each.id === id);
+          remember();
+          show();
+        },
+      );
+      const same = item.gem?.id === gem.id;
+      const start = h('button', {
+        type: 'button',
+        class: 'button button--system',
+        text: 'Oprawiaj',
+        disabled: same || gem.have === 0,
+        onClick: async (event) => {
+          const button = event.currentTarget;
+          if (item.gem) {
+            const sure = await confirmAction({
+              title: 'Oprawić nowy kamień?',
+              text: `${item.gem.name} w przedmiocie ${itemTitle(item)} rozpadnie się, a jego miejsce zajmie ${gem.name}.`,
+              confirmLabel: 'Oprawiaj',
+              danger: true,
+            });
+            if (!sure) return;
+          }
+          await withButton(button, async () => {
+            remember();
+            await call('POST', '/api/professions/jewel', { set: true, itemId: item.id, gem: gem.id, ...who.body() });
+            window.scrollTo(0, 0);
+          });
+        },
+      });
+      fill(
+        details,
+        h('p', { class: 'herb-estimate', text: `Wszystkie liczby przedmiotu wzrosną o ${percentText(gem.bonus)}, każda co najmniej o 1.` }),
+        h('p', { class: 'herb-estimate', text: `Czas oprawiania: ${formatMinutes(gem.minutes)}. Zużyjesz: 1 × ${gem.name}.` }),
+        item.gem && !same && h('p', { class: 'herb-room herb-room--full', text: `Nowy kamień zniszczy obecny: ${gemNow(item)}.` }),
+        same && h('p', { class: 'herb-room', text: `${gem.name} już tkwi w tym przedmiocie.` }),
+        gem.have === 0 && h('p', { class: 'herb-room herb-room--full', text: `Brakuje kamienia: ${gem.name}. Wydobędziesz go w Górnictwie.` }),
+        gem.have === 0 && h('a', { class: 'button button--world', href: HASHES.mining, text: 'Do Górnictwa' }),
+        start,
+      );
+    }
+
+    show();
+    return card(who.element, h('p', { class: 'duration-title', text: 'Przedmiot' }), items.element, h('p', { class: 'duration-title', text: 'Kamień' }), stones.element, details);
+  }
+
+  // A work of the Szlifiernia under way, or its report waiting. Called back
+  // early, an order brings the jewels done, with their report, and a
+  // setting gives its gem back.
+  function jewelsCard(activity, avatar) {
+    const what = activity.set ? `${activity.set.gem} w przedmiocie ${activity.set.item}` : `${activity.count} × ${activity.base?.name ?? 'biżuteria'} (${activity.rarityName})`;
+    const work = activity.set ? 'Oprawianie' : 'Wyrób';
+    if (activityFinished(activity)) {
+      return systemPanel(`${activity.set ? 'Oprawianie zakończone' : 'Wyrób zakończony'}: ${what}.`, 'Raport czeka na odbiór.', claimButton(avatar));
+    }
+    const cancel = h('button', {
+      type: 'button',
+      class: 'button button--world',
+      text: activity.set ? 'Przerwij oprawianie' : 'Przerwij wyrób',
+      onClick: async (event) => {
+        const button = event.currentTarget;
+        const done = activity.set ? 0 : Math.min(activity.count, Math.floor((activity.count * (serverNow() - activity.startedAt)) / (activity.endsAt - activity.startedAt)));
+        const sure = await confirmAction({
+          title: activity.set ? 'Przerwać oprawianie?' : 'Przerwać wyrób?',
+          text: activity.set
+            ? 'Kamień wróci do plecaka.'
+            : done > 0
+              ? `Gotowa biżuteria (${formatNumber(done)}) zostanie, a kamienie i kruszec na resztę wrócą.`
+              : 'Żadna sztuka nie jest jeszcze gotowa. Kamienie i kruszec wrócą.',
+          confirmLabel: 'Przerwij',
+          danger: true,
+        });
+        if (!sure) return;
+        await withButton(button, async () => {
+          const { report } = await call('POST', cancelPath(avatar));
+          if (report) openReport(report);
+        });
+      },
+    });
+    return workUnderWay(activity, `${work} w toku: ${what}, ${formatMinutes(activity.minutes)}.`, work, cancel, avatar);
+  }
+
   function tick(now) {
     const character = state.character;
     if (!character?.professions) {
@@ -1495,11 +2066,76 @@ export function itemsReport(report, heading, findSheet) {
   ];
 }
 
+// The report of a digging, in the same way: the mine's line, the minerals
+// found, the veins of gold, the profession's levels, the XP and the System's
+// lines.
+export function mineralsReport(report, heading) {
+  return [
+    heading('Raport z kopania', `${report.placeName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
+    h(
+      'section',
+      { class: 'card report-summary', 'aria-label': 'Podsumowanie' },
+      h('p', { class: 'herb-line', text: report.line }),
+      h(
+        'ul',
+        { class: 'herb-found' },
+        report.minerals.map((mineral) =>
+          h(
+            'li',
+            { class: 'herb-found-row' },
+            h('span', { class: 'herb-art' }, mineralIcon(mineral.id)),
+            h('span', { class: 'herb-found-name', text: mineral.name }),
+            h('span', { class: 'herb-found-count', text: `×${formatNumber(mineral.count)}` }),
+          ),
+        ),
+      ),
+      h('p', { class: `herb-estimate mine-gold${report.gold > 0 ? ' herb-room--lucky' : ''}` }, report.gold > 0 && goldArt(20), report.gold > 0 ? ` ${report.veinsText}` : report.veinsText),
+      workSummary(report),
+    ),
+    report.system.length > 0 && systemPanel(...report.system),
+    h('a', { class: 'button button--system', href: HASHES.mining, text: 'Do Kopalni' }),
+  ];
+}
+
+// The report of a work of the Szlifiernia: the place's line, whether it was
+// stopped, and either the jewels made (each opens like a find, by
+// `findSheet`) and the failed ones, or the gem set with its item and the
+// gem it destroyed; then the profession's levels, the XP and the System's
+// lines.
+export function jewelsReport(report, heading, findSheet) {
+  const { set } = report;
+  const row = (item) => h('li', {}, h('button', { type: 'button', class: 'item-row', onClick: () => findSheet(item) }, itemSummary(item), findMark(item), icon('chevron', { size: 18 })));
+  return [
+    heading(set ? 'Raport z oprawiania' : 'Raport z wyrobu biżuterii', `${report.placeName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`),
+    h(
+      'section',
+      { class: 'card report-summary', 'aria-label': 'Podsumowanie' },
+      h('p', { class: 'herb-line', text: report.line }),
+      report.stopped && h('p', { class: 'muted', text: report.stopped }),
+      set && h('p', { class: 'herb-found-row' }, h('span', { class: 'herb-art' }, mineralIcon(set.gem.id)), h('span', { class: 'herb-estimate', text: set.text })),
+      set?.replaced && h('p', { class: 'herb-room herb-room--full', text: set.replaced }),
+      set?.item && h('ul', { class: 'item-list' }, row(set.item)),
+      !set && report.made && h('p', { class: 'herb-estimate', text: report.made }),
+      !set && report.items.length > 0 && h('ul', { class: 'item-list' }, report.items.map(row)),
+      !set && report.failedText && h('p', { class: 'herb-room herb-room--full', text: report.failedText }),
+      workSummary(report),
+    ),
+    report.system.length > 0 && systemPanel(...report.system),
+    h('a', { class: 'button button--system', href: HASHES.jewelcrafting, text: 'Do Szlifierni' }),
+  ];
+}
+
 // What a work's report brought, for the journal's row: "Żywokost ×13",
-// "Mniejsza mikstura leczenia ×12" or "Miecz ×3, nieudane: 1", after
-// "Awatar Systemu · " for the Awatar's work.
+// "Mniejsza mikstura leczenia ×12", "Miecz ×3, nieudane: 1", "Kwarc ×2,
+// 170 złota" or "Szmaragd → Wilczy Pierścień", after "Awatar Systemu · " for
+// the Awatar's work.
 export const workSummaryText = (summary) =>
   (summary.avatar ? 'Awatar Systemu · ' : '') +
-  [...(summary.herbs ?? summary.potions ?? summary.items ?? []).map((entry) => `${entry.name} ×${formatNumber(entry.count)}`), summary.failed > 0 && `nieudane: ${formatNumber(summary.failed)}`]
+  [
+    ...(summary.herbs ?? summary.potions ?? summary.items ?? summary.minerals ?? []).map((entry) => `${entry.name} ×${formatNumber(entry.count)}`),
+    summary.gold > 0 && `${formatNumber(summary.gold)} złota`,
+    summary.set && (summary.set.item ? `${summary.set.gem} → ${summary.set.item}` : `${summary.set.gem} wrócił do plecaka`),
+    summary.failed > 0 && `nieudane: ${formatNumber(summary.failed)}`,
+  ]
     .filter(Boolean)
     .join(', ');

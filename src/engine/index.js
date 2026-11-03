@@ -28,6 +28,8 @@ export * from './professions.js';
 export * from './brewing.js';
 export * from './potions.js';
 export * from './workshop.js';
+export * from './mining.js';
+export * from './jewelcraft.js';
 export * from './mail.js';
 export * from './gifts.js';
 export * from './encyclopedia.js';

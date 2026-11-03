@@ -13,8 +13,10 @@ import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { ApiError, json } from './http.js';
 import { finishGathering, requireProfessions } from './professions.js';
 import { finishCrafting } from './workshop.js';
+import { finishJewels } from './jewelcraft.js';
+import { finishMining } from './mining.js';
 
-const FINISH = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting };
+const FINISH = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels };
 
 // The purchase, only once and only with the gold for it, so two taps at
 // once pay once.
@@ -54,16 +56,16 @@ export async function claimAvatar(context) {
   return json(done ? { report: { id: done.id, createdAt: now, ...done.report }, character } : { character });
 }
 
-// Calling the Awatar back early, as the character: a gathering brings
-// nothing, and a brewing or an order in the Warsztat keeps what is done,
-// with its report.
+// Calling the Awatar back early, as the character: a gathering or a digging
+// brings nothing, and a brewing, an order in the Warsztat or of jewels keeps
+// what is done, with its report.
 export async function cancelAvatar(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
   const activity = avatarWork(player);
   if (activity.ends_at <= now) throw new ApiError(409, 'claim_first', content.avatar.texts.claimFirst[0]);
   const db = context.env.DB;
-  const stop = { potions: finishBrewing, items: finishCrafting }[activity.kind];
+  const stop = { potions: finishBrewing, items: finishCrafting, jewels: finishJewels }[activity.kind];
   const stopped = stop ? await stop(db, player, now, { stop: true, avatar: true }) : null;
   if (!stop) await db.prepare('DELETE FROM avatar_activities WHERE character_id = ? AND started_at = ?').bind(player.row.id, activity.started_at).run();
   return json({

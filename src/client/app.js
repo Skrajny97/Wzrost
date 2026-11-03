@@ -903,6 +903,7 @@ async function openTutorialTests() {
       row('Objaśnienie Profesji', 'Od 10. poziomu postaci. Poziomy profesji zostają.', repeatProfessionsTour, told && Boolean(state.character.professions)),
       row('Objaśnienie Rzemieślnictwa', 'Od 15. poziomu postaci. Poziomy profesji zostają.', repeatCraftingTour, told && Boolean(state.character.professions?.workshop)),
       row('Objaśnienie Osady', 'Od 20. poziomu postaci.', repeatSettlementTour, told && Boolean(state.character.settlementOpen)),
+      row('Objaśnienie Górnictwa i Jubilerstwa', 'Od 25. poziomu postaci. Poziomy profesji zostają.', repeatMiningTour, told && isUnlocked('mining')),
       row('Objaśnienie Ewolucji', 'Od 50. poziomu klasy, dopóki ewolucja nie jest wybrana.', repeatEvolutionTour, told && (state.character.evolution?.choices.length ?? 0) > 0),
       row('Objaśnienie Wież', 'Od 50. poziomu postaci.', repeatTowersTour, told && isUnlocked('towers')),
     ),
@@ -1163,6 +1164,23 @@ async function repeatTowersTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/towers-tour');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's Górnictwo and Jubilerstwo chapter from the start
+// (testing.js).
+async function repeatMiningTour() {
+  const sure = await confirmAction({
+    title: 'Objaśnienie Górnictwa i Jubilerstwa od nowa?',
+    text: 'Narrator objaśni Górnictwo i Jubilerstwo od początku.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/mining-tour');
   } catch (error) {
     toast(error.message);
   }

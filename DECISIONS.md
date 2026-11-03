@@ -3173,6 +3173,71 @@ Autor: „Trzeba zrobić animację jeszcze do koła fortuny wyświetlającą si�
    - Koło, strzałkę, los i bęben rysuje PixelLab w stylu budynku Salonu. Autor ocenia je po jednym, a gotowe animacje dostaje jako MP4.
 3. **Tło Salonu.** PixelLab rysuje wnętrze Salonu (192 × 96, w stylu Systemowej Szlifierni). Tło stoi przygaszone za kartą Szczęsnego, tak jak miejsca profesji za ich kartami, więc nie wydłuża ekranu.
 
+## Górnictwo i Jubilerstwo: rozdział narratora i sceny pracy (3.11.2026)
+
+1. **Rozdział narratora (557).** Sześć kwestii w brzmieniu autora (555, 557.3 poprawione przez autora), z nagraniami, które autor wybrał: 557.1 B, 557.2 A, 557.3 B, 557.4 B, 557.5 A i 557.6 B.
+   - Przychodzi od 25. poziomu postaci, po raporcie, który go przyniósł, i dopiero gdy nie czeka żaden inny rozdział, także Wież. Nie pojawia się na ekranach postaci.
+   - Karta, potem prowadzenie do zakładki Profesje. Stamtąd narrator sam otwiera Kopalnię i pokazuje kopanie, potem Szlifiernię: jej wzory i zakładkę „Oprawianie”. Kończy kartą w Szlifierni.
+   - (brakujący szczegół) Prowadzenie do Profesji wraca na każdym innym ekranie, więc rozdział przerwany w połowie (np. po odświeżeniu strony) toczy się dalej.
+   - „Pomiń objaśnienie” mówi: „Objaśnienie pominięte. Górnictwo i Jubilerstwo czekają w zakładce Profesje.”. Na wersji testowej „Testuj samouczki” zaczyna rozdział od nowa.
+2. **Sceny pracy (563 A, 564, 565).** Po odrzuceniu animacji 560 i 561 („niska rozdzielczosc i mala dokładność”) PixelLab narysował od nowa wybrane klatki (558 C, 559 G) w 256 × 256 i zanimował je w 9 klatkach, 8 na sekundę.
+   - Tło każdej klatki jest z pierwszej, więc ściany, belki i stół stoją w miejscu. Ruszają się tylko postać, kilof albo dłonie z kamieniem, iskry i światło latarni.
+   - Scena Szlifierni ma drugie podejście: w pierwszym dłonie puszczały tarczę w połowie pętli, a na stole wyrastała świeca, której nie ma w pierwszej klatce.
+   - W grze arkusz 256 px stoi w swojej wielkości (`scale: 1` w `data/animations.json`), więc zajmuje tyle miejsca co sceny 128 px pokazane dwa razy większe, ale jest dwa razy dokładniejszy.
+   - Wchodzą do gry po zatwierdzeniu przez autora. Szlifiernia: „565 OK”. Kopalnia (564) czeka na odpowiedź.
+   - PixelLab doładowany przez autora (563 A: „PixelLab doładowane”), więc obie sceny są z PixelLab, bez Retro Diffusion.
+
+## Górnictwo i Jubilerstwo: budowa (3.11.2026, odpowiedzi 531–539)
+
+Obie profesje otwierają się razem, od 25. poziomu postaci (531, 533). Na zakładce Profesje stoi pięć kwadratów w trzech rzędach: na górze zbierackie Zielarstwo i Górnictwo, pod nimi Alchemia i Jubilerstwo, które pracują na ich zbiorach, a na dole Rzemieślnictwo (`rows` w `data/professions.json`). Do 25. poziomu nowe kwadraty mają kłódkę i „od poz. 25”, jak kiedyś Rzemieślnictwo. W raporcie z awansem na 25. poziom System mówi: „Odblokowano Górnictwo. Systemowa Kopalnia czeka w zakładce Profesje.” i „Odblokowano Jubilerstwo. Systemowa Szlifiernia czeka w zakładce Profesje.” (szkic do poprawy przez autora, jak opisy miejsc, kamieni i zdania raportów).
+
+1. **Statystyki (534 A).** Każdy poziom Górnictwa daje +1 do Witalności i Wytrzymałości, a Jubilerstwa +1 do Woli i Percepcji. Na 100. poziomie dochodzi +51, jak w innych profesjach.
+2. **Kopanie.** Systemowa Kopalnia działa jak Zagajnik: suwak od 10 minut do 8 godzin co 10 minut, odpoczynek w czasie pracy, a przerwane kopanie nie daje nic.
+   - (brakujący szczegół) Postać kopie naraz wszystko, co System już jej odsłonił, bez wybierania, jak przy ziołach. Na godzinę na 1. poziomie: Kwarc 2, Agat 1, Ametyst 0,5, Szmaragd 0,25, Szafir 0,12, Rubin 0,06, Diament 0,03, srebrny kruszec 5, złoty 2,5 i gwiezdny 1,25. Każdy poziom Górnictwa dodaje 2%, jak w Zielarstwie, a losowość to ±15%. Każde kopanie daje co najmniej jedną sztukę.
+   - Każdy kamień jest dwa razy rzadszy od poprzedniego, a sztuka biżuterii o rzadkość wyżej trwa dwa razy dłużej. Godzina kopania starcza więc mniej więcej na godzinę wyrobu biżuterii każdej rzadkości (na 1. poziomie obu profesji).
+   - O urobku decyduje poziom Górnictwa w chwili odbioru raportu, jak w Zielarstwie.
+3. **Żyły złota (532 A).** Dają średnio połowę złota, które przynosi godzina wyprawy na poziomie postaci z początku kopania (`veins` w `data/professions.json`).
+   - Złoto z godziny wyprawy zmierzyłem w `tools/difficulty-sim.mjs` (gracz realistyczny, godzinne wyprawy w najnowszym miejscu poziomu, 200 wypraw na klasę): 25. poziom 340 zł, 30. 390, 35. 420, 40. 540, 45. 670, 50. 760, 60. 760, 70. 910, 80. 1040, 90. 1170, 100. 1390, 110. 1540, 125. 1790 i 150. 2140. Między tymi poziomami liczy się liniowo, a za 150. w proporcji do poziomu.
+   - Żyły dają więc ok. 170 zł na godzinę na 25. poziomie, 195 na 30., 270 na 40., 380 na 50., 520 na 80., 695 na 100. i 1070 na 150.
+   - `tools/simulate.mjs` daje na 25.–60. poziomie to samo (np. 342 zł/h na 25.), ale od 75. jego postać bez towarzyszy mdleje na każdej wyprawie, więc pomiar wziąłem z `tools/difficulty-sim.mjs`.
+   - (brakujący szczegół) Żył jest średnio 2 na godzinę, a każda daje połowę złota z godziny, ±50%. Krótkie kopanie bywa więc bez żyły, a raport mówi wtedy: „Tym razem bez żył złota.”.
+   - Awatar Systemu kopie także w czasie wyprawy postaci, a złoto i urobek trafiają do postaci.
+4. **Kamienie i kruszce w plecaku (533 A).**
+   - (brakujący szczegół) Nie zajmują miejsca w plecaku, jak materiały, więc nic nie przepada. Leżą w nowej zakładce plecaka „Minerały”, widocznej od otwarcia Górnictwa. Zakładki plecaka stoją wtedy po dwie w rzędzie.
+   - Karta kamienia mówi, jaką rzadkość daje biżuterii i o ile wzmacnia przedmiot, a karta kruszcu, na oprawy jakiej biżuterii idzie. Złomiarz kupuje je na sztuki (−, +, „wszystkie”), z premią Skupu złomu. Można je też wyrzucić.
+   - (brakujący szczegół) Ceny są jak u materiałów tych rzadkości: Kwarc 2 zł, Agat 4, Ametyst 8, Szmaragd 16, Szafir 32, Rubin 64 i Diament 128, a kruszce: srebrny 2, złoty 4 i gwiezdny 8. Sprzedaż całego urobku dodaje do złota z żył ok. 8% na 1. poziomie Górnictwa (postać na 25. poziomie), a przy wysokim Górnictwie 15–30%.
+   - (brakujący szczegół) Na razie kamieni i kruszców nie ma w Wymianie, na Targowisku ani w Prośbach Gildii.
+5. **Biżuteria (536 A, 537 A).** Zakładka „Biżuteria” w Systemowej Szlifierni: rodzaj (Pierścień, Amulet, Talizman), wzór, kamień i od 1 do 5 sztuk.
+   - Wzory odsłania poziom Jubilerstwa, jak w Warsztacie: pierwsza baza rodziny od 1. poziomu, Sygnet, Kaptorga i Otoczak od 10., Obrączka, Wisior i Kieł od 25., a Pierścień rodowy, Medalion i Bursztyn od 50.
+   - Rzadkość wyznacza kamień: sztuka bierze 1 kamień swojej rzadkości i kruszec tej rzadkości (srebrny do unikalnej, złoty do legendarnej, gwiezdny wyżej). Kamień szlifuje się od tego poziomu Jubilerstwa, od którego Górnictwo go znajduje.
+   - (brakujący szczegół) Kruszcu idą 2 sztuki na pierścień, a po 3 na amulet i talizman.
+   - Czas i szanse są jak w Warsztacie. Pospolita sztuka trwa 30 minut na 1. poziomie, każda rzadkość wyżej dwa razy dłużej, a każdy poziom skraca czas o 1%, najwyżej o połowę. Szansa powodzenia: pospolita 100%, rzadka 90%, unikalna 75%, epicka 55%, legendarna 35%, mityczna 20%, boska 10%, a każdy poziom dodaje 0,5 pkt proc., najwyżej do 95%.
+   - (brakujący szczegół) Nieudana sztuka zabiera swój kamień, a kruszec wraca, jak w Warsztacie części przepadają, a zasoby obozu wracają. Przerwany wyrób daje gotowe sztuki, a kamienie i kruszec na resztę wracają.
+   - Biżuteria ma poziom postaci z chwili zlecenia, a jej właściwości noszą nazwy poznanych stworów.
+   - (brakujący szczegół) Nie ma łutu szczęścia ani ulepszeń od ręki, które zna Warsztat, bo rzadkość ma wyznaczać kamień. Biżuterii nie liczą zadania „Wykonaj…” ani Próby Gildii, a jej rozebranie nie odsłania wzorów. Złomiarz płaci za nią jak za łup.
+   - Warsztat nie robił biżuterii (jego sloty to broń, pancerz, druga ręka, hełm, rękawice i buty), więc nic z niego nie przeszło. Walidator pilnuje, żeby żadnego slotu nie robiły obie profesje.
+6. **Oprawianie (538 A).** Zakładka „Oprawianie”: przedmiot, który postać nosi, i kamień.
+   - Kamień podnosi każdą liczbę przedmiotu o swój procent, liczony po ulepszeniu z Kowadła, a każdą co najmniej o 1. Dotyczy to obrażeń, pancerza, statystyki bazy i każdej właściwości. Kwarc daje 5%, Agat 10%, Ametyst 15%, Szmaragd 20%, Szafir 25%, Rubin 30%, a Diament 35%, równymi krokami.
+   - Karta przedmiotu pokazuje kamień, np. „Szmaragd: +20% do wszystkich liczb”, a liczby na karcie już go zawierają.
+   - Szybka symulacja (`tools/difficulty-sim.mjs` z kamieniem w każdym założonym przedmiocie, 4-godzinne wyprawy, 80 na klasę) nie każe zmieniać kroków. Gracz realistyczny z kamieniami i bez nich nie mdleje (poziomy 50–150), a jego XP na godzinę się nie zmienia. Gracz okazjonalny bez towarzyszy na 50. poziomie mdleje w 5,3% wypraw, z Kwarcem w 2,5%, a ze Szmaragdem w 0%. Na 75. mdleje w 80%, 79%, 59% i z Diamentem w 45%, a od 100. dalej w 78–100%.
+   - (brakujący szczegół) Oprawianie trwa 15 minut przy Kwarcu, a każda rzadkość wyżej dwa razy dłużej. Poziom skraca je jak wyrób, więc Diament na 80. poziomie trwa 8 godzin. Zawsze się udaje.
+   - Nowy kamień niszczy poprzedni: gra pyta przed startem, a raport mówi „Poprzedni kamień, Kwarc, rozpadł się przy oprawianiu.”. Tego samego kamienia nie da się oprawić drugi raz.
+   - (brakujący szczegół) Kamień schodzi z plecaka na początku pracy. Przerwane oprawianie oddaje kamień, bez raportu. Gdy przy odbiorze przedmiotu już nie ma, kamień wraca do plecaka, a raport to mówi.
+   - (brakujący szczegół) Ekran oprawia kamień w przedmiot, który postać nosi, a serwer przyjmuje też przedmiot z plecaka. Założony przedmiot czeka w czasie wyprawy, jak na Kowadle.
+   - (brakujący szczegół) Złomiarz nie dopłaca za kamień w przedmiocie. Kamień idzie razem z przedmiotem przy sprzedaży, w Wymianie i na Targowisku.
+   - (brakujący szczegół) Przedmiot z kamieniem jest chroniony jak ulepszony: „Sprzedaj zbędne” go nie sprzedaje, a przy pełnym plecaku po wyprawie złomiarz bierze go ostatni. Sprzedaż i rozbiórka z karty przedmiotu mówią, że kamień przepadnie.
+7. **Krótkie opisy.** Karty Kopalni i Szlifierni mają krótki opis miejsca, a zasady są zwinięte pod „Jak to działa?”, jak w Salonie Gier. Rozwinięte stoją na ciemnym tle, żeby dało się je czytać na obrazku miejsca.
+8. **Encyklopedia.** Nowa zakładka „Minerały” ma 10 wpisów: skąd je wziąć i do czego służą. Progi to 3, 6 i 10 odkryć, ze skrzyniami jak w innych zakładkach. Siedem zakładek stoi po trzy i cztery w rzędzie.
+9. **Sceny pracy.** Na początku obie profesje nie miały animacji oczekiwania (`workScene` zwracał null), a walidator przestał wymagać sceny dla każdej profesji. Sceny doszły później (zob. „Górnictwo i Jubilerstwo: rozdział narratora i sceny pracy”).
+10. (brakujący szczegół) **Dźwięk.** Raport z kopania z żyłą złota gra brzęk monet (`coin`), jak sprzedaż u złomiarza. Jubilerstwo nie ma jeszcze własnych dźwięków.
+11. **Narrator.** Rozdział narratora na 25. poziomie doszedł po zatwierdzeniu kwestii i nagrań (zob. „Górnictwo i Jubilerstwo: rozdział narratora i sceny pracy”).
+12. **Zapis.**
+    - Zasady liczą `src/engine/mining.js` i `src/engine/jewelcraft.js`, a kamień w przedmiocie `upgradedItem` w `src/engine/items.js`.
+    - Prace i sprzedaż obsługują `src/server/mining.js` (`POST /api/professions/mine`, `/api/minerals/sell` i `/api/minerals/discard`) oraz `src/server/jewelcraft.js` (`POST /api/professions/jewel`, a z `set: true` oprawianie).
+    - Migracja 0074 dodaje kolumnę `minerals`, a kamień w przedmiocie zapisuje się w jego danych (`gem`).
+    - Start i odbiór każdej pracy to jedna paczka zapisów, która przechodzi tylko wtedy, gdy postać i praca są takie, jak odczytane (`test/mining.test.js`).
+13. **Jeszcze nie ma:** zadań narratora z kamieniami i biżuterią, kamieni w Wymianie, na Targowisku i w Prośbach Gildii, scen pracy, dźwięków Jubilerstwa i rozdziału narratora.
+
 ## Wersja 0.1.11 (3.11.2026)
 
 1. **Co wchodzi do gry:**

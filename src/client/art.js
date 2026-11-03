@@ -276,7 +276,13 @@ export const SPRITES = {
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
     size: 48,
-    ids: ['herbalism', 'alchemy', 'crafting'],
+    ids: ['herbalism', 'alchemy', 'crafting', 'mining', 'jewelcrafting'],
+  },
+  // The gems and ores of Górnictwo (data/professions.json, minerals), 32×32,
+  // drawn in PixelLab (545).
+  minerals: {
+    size: 32,
+    ids: ['quartz', 'agate', 'amethyst', 'emerald', 'sapphire', 'ruby', 'diamond', 'silver-ore', 'gold-ore', 'star-ore'],
   },
   // The places where professions work, dim behind their cards, the
   // Ewolucja tab's spring behind its heading, and the Osada's rooms behind
@@ -284,7 +290,7 @@ export const SPRITES = {
   places: {
     width: 192,
     height: 96,
-    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall'],
+    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-mine', 'system-lapidary', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall'],
   },
   // The events at the end of an exploration (data/events.json): the people
   // met, 96×128, and the scenes behind them, 192×96, filled in as they are
@@ -463,6 +469,8 @@ export const campArt = (buildingId, tier) => (available.camp.has(`${buildingId}-
 // profession works.
 export const herbSprite = (id) => sprite('herbs', id, 'sprite--item');
 export const potionSprite = (id) => sprite('potions', id, 'sprite--item');
+// A gem or an ore of Górnictwo.
+export const mineralSprite = (id) => sprite('minerals', id, 'sprite--item');
 export const professionSprite = (id) => sprite('professions', id, 'sprite--profession');
 // Gold or a resource where a line icon stood: the resource's sprite, never
 // under 24 px, where its detail still reads (at 14 px in the camp's bubbles

@@ -1808,6 +1808,40 @@ describe('Time Points and the narrator', () => {
     assert.deepEqual(again.data.character.tutorial, before);
   });
 
+  test('the Górnictwo and Jubilerstwo chapter (557) comes after the Wieże, and test mode starts it again', async () => {
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once;
+    const lines = tutorial.lines.filter((line) => line.chapter === 'mining');
+    assert.deepEqual(
+      lines.map((line) => [line.id, line.kind]),
+      [
+        ['mining-welcome', 'card'],
+        ['mining-lead', 'lead'],
+        ['mining-dig', 'point'],
+        ['mining-jewels', 'point'],
+        ['mining-setting', 'point'],
+        ['mining-ending', 'card'],
+      ],
+    );
+    // The author's words, as approved (557, with 557.3 as the author wrote it).
+    assert.equal(lines[0].text[0], 'Dwudziesty piąty poziom postaci… System otworzył przed Tobą Górnictwo i Jubilerstwo.');
+    assert.equal(lines[2].text[0], 'W Kopalni wydobędziesz kamienie szlachetne i kruszce. Po drodze Twój kilof trafi też na żyły złota.');
+    assert.equal(lines.at(-1).text[0], 'Rzadsze kamienie leżą głębiej. Każdy nowy poziom Górnictwa odsłoni Ci kolejne.');
+    assert.ok(lines.every((line) => line.voice === `audio/narration/${line.id}.mp3`));
+    const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
+    assert.ok(at('mining-welcome') > at('towers-ending'));
+    assert.deepEqual(tutorial.chapters.mining, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Górnictwo i Jubilerstwo czekają w zakładce Profesje.' });
+    const chapter = lines.filter(kept).map((line) => line.id);
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    await see({ skip: true });
+    const before = (await see({ skip: true, chapter: 'skills' })).data.character.tutorial;
+    const read = (await see({ skip: true, chapter: 'mining' })).data.character.tutorial;
+    assert.deepEqual(read, [...before, ...chapter]);
+    const again = await call('POST', '/api/test/mining-tour', { cookie });
+    assert.equal(again.status, 200);
+    assert.deepEqual(again.data.character.tutorial, before);
+  });
+
   test('test mode starts the Społeczność chapter again', async () => {
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });
@@ -2604,7 +2638,13 @@ describe('Profesje', () => {
     assert.equal((await call('GET', '/api/character', { cookie })).data.character.professions, null);
     await (await db()).prepare('UPDATE characters SET level = 10').run();
     const { professions } = (await call('GET', '/api/character', { cookie })).data.character;
-    assert.deepEqual(professions.list.map(({ id, soon }) => [id, soon]), [['herbalism', false], ['alchemy', false], ['crafting', false]]);
+    assert.deepEqual(professions.list.map(({ id, soon, locked }) => [id, soon, locked]), [
+      ['herbalism', false, false],
+      ['alchemy', false, false],
+      ['crafting', false, true],
+      ['mining', false, true],
+      ['jewelcrafting', false, true],
+    ]);
     assert.equal(professions.workshop, null);
   });
 });

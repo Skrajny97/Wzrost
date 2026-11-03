@@ -1,5 +1,5 @@
 {
-  "$comment": "Profesje (src/engine/professions.js). Każda ma 100 poziomów: awans z poziomu L wymaga L × levelMinutes minut pracy. Każdy awans daje statPerLevel do obu statystyk profesji (stats), więc 1. poziom daje 0, a ostatni poziom dodaje jeszcze maxLevelBonus: nagrodę za opanowanie profesji (1 × 99 + 51 = 150). Praca daje postaci characterXpShare tego XP, co godzina wyprawy na jej poziomie, i nie daje XP klasy. soon: profesja widoczna w zakładce, ale jeszcze bez pracy. unlockLevel: poziom postaci, od którego profesja się otwiera, gdy później niż zakładka Profesje. intro: słowa Systemu na górze zakładki Profesje. Zbieractwo (gathering): postać zbiera zioła w jednym stałym miejscu (place), przez minutes.min–max minut co step. Na godzinę zbiera perHour sztuk zioła, a każdy poziom dodaje yieldPerLevel; losowość to ± spread. slots: od którego poziomu ile ziół naraz, a zbiór dzieli się po równo między wybrane zioła. Zioło zna się od swojego poziomu (level). stack: ile sztuk zioła mieści jedno miejsce plecaka; co się nie zmieści, przepada. price: tyle płaci złomiarz za sztukę (z premią Skupu złomu). genitive: nazwa w dopełniaczu, zioła do zadań narratora, a profesji do komunikatu o jej poziomie. texts: zdania raportu (report: jedno z wariantów) i komunikaty. Warzenie (brewing): postać warzy mikstury w jednym stałym miejscu (place), jeden przepis naraz. Mikstura trwa potionMinutes minut, każdy poziom profesji skraca ją o speedPerLevel, ale nie bardziej niż do fastest tego czasu; całe warzenie trwa najwyżej maxMinutes. Każda uwarzona mikstura ma bonusChance szans na jedną dodatkową. Złomiarz płaci za miksturę priceFactor razy tyle, co za jej zioła. potions: przepisy, każdy znany od swojego poziomu (level), z ziołami na jedną miksturę (herbs) i działaniem (effect: heal i mana to część maks. HP i many, speed to dodatek do szybkości ruchów). counted: nazwa po liczbie (1, 2–4, 5 i więcej) do zadań narratora. Mikstury też układają się w plecaku po stack sztuk. minutes: tyle minut działa mikstura wypita z plecaka (szybkość). potionUse: jak postać pije mikstury. Na wyprawę zabiera ich tyle, ile wybierze gracz, każdego rodzaju najwyżej tyle, ile walk ma wyprawa, i w walce pije każdego rodzaju najwyżej jedną: leczenia, gdy HP spadnie poniżej progu (healBelow, gracz wybiera z healBelowChoices), a many, gdy zabraknie jej na umiejętność. texts: wpisy w walce i raporcie, {potion} w bierniku (counted[0]). Wyrób (workshop): postać wykonuje przedmioty w jednym stałym miejscu (place), jeden wzór i jedną rzadkość naraz, od 1 do maxCount sztuk. Wzór to baza przedmiotu ze slotu, który ma parts: pierwszą bazę rodziny zna się od 1. poziomu, a późniejszą (classLevel w item-bases.json) od laterPatternLevel, ale nie wcześniej niż od jej poziomu klasy (baza od 25. poziomu klasy od 25. poziomu profesji). parts: ile części rzadkości przedmiotu bierze jedna sztuka w danym slocie. resources: na każdą część i każdy stopień rzadkości (pospolity 1, rzadki 2 i dalej) stone kamienia oraz extra drewna albo rudy żelaza dla rodzin z families. Przedmiot trwa itemMinutes minut, każda rzadkość wyżej rarityTime razy dłużej, a każdy poziom profesji skraca go o speedPerLevel czasu z 1. poziomu, ale nie bardziej niż do fastest. rarities: od którego poziomu jaka rzadkość i z jaką szansą powodzenia (chance); każdy poziom po 1. dodaje chancePerLevel, najwyżej do maxChance, a szansa 1 zostaje 1. Nieudany przedmiot zabiera swoje części, a zasoby wracają. texts: zdania raportu i komunikaty. exchange: wymiana części od ręki, bez pracy postaci: rate części jednej rzadkości za 1 część następnej (rzadkości z rarities.json, części z materials.json), counts sztuk jedną wymianą. Awatar Systemu (avatar): kupiony raz na zawsze za price złota wykonuje jedną pracę naraz obok postaci, z jej poziomami profesji, ziołami, przepisami i wzorami, tak samo wydajnie jak ona. Nie daje XP, poziomów profesji ani statystyk. description: opis na karcie zakupu; texts: komunikaty Awatara.",
+  "$comment": "Profesje (src/engine/professions.js). Każda ma 100 poziomów: awans z poziomu L wymaga L × levelMinutes minut pracy. Każdy awans daje statPerLevel do obu statystyk profesji (stats), więc 1. poziom daje 0, a ostatni poziom dodaje jeszcze maxLevelBonus: nagrodę za opanowanie profesji (1 × 99 + 51 = 150). Praca daje postaci characterXpShare tego XP, co godzina wyprawy na jej poziomie, i nie daje XP klasy. soon: profesja widoczna w zakładce, ale jeszcze bez pracy. unlockLevel: poziom postaci, od którego profesja się otwiera, gdy później niż zakładka Profesje. intro: słowa Systemu na górze zakładki Profesje. Zbieractwo (gathering): postać zbiera zioła w jednym stałym miejscu (place), przez minutes.min–max minut co step. Na godzinę zbiera perHour sztuk zioła, a każdy poziom dodaje yieldPerLevel; losowość to ± spread. slots: od którego poziomu ile ziół naraz, a zbiór dzieli się po równo między wybrane zioła. Zioło zna się od swojego poziomu (level). stack: ile sztuk zioła mieści jedno miejsce plecaka; co się nie zmieści, przepada. price: tyle płaci złomiarz za sztukę (z premią Skupu złomu). genitive: nazwa w dopełniaczu, zioła do zadań narratora, a profesji do komunikatu o jej poziomie. texts: zdania raportu (report: jedno z wariantów) i komunikaty. Warzenie (brewing): postać warzy mikstury w jednym stałym miejscu (place), jeden przepis naraz. Mikstura trwa potionMinutes minut, każdy poziom profesji skraca ją o speedPerLevel, ale nie bardziej niż do fastest tego czasu; całe warzenie trwa najwyżej maxMinutes. Każda uwarzona mikstura ma bonusChance szans na jedną dodatkową. Złomiarz płaci za miksturę priceFactor razy tyle, co za jej zioła. potions: przepisy, każdy znany od swojego poziomu (level), z ziołami na jedną miksturę (herbs) i działaniem (effect: heal i mana to część maks. HP i many, speed to dodatek do szybkości ruchów). counted: nazwa po liczbie (1, 2–4, 5 i więcej) do zadań narratora. Mikstury też układają się w plecaku po stack sztuk. minutes: tyle minut działa mikstura wypita z plecaka (szybkość). potionUse: jak postać pije mikstury. Na wyprawę zabiera ich tyle, ile wybierze gracz, każdego rodzaju najwyżej tyle, ile walk ma wyprawa, i w walce pije każdego rodzaju najwyżej jedną: leczenia, gdy HP spadnie poniżej progu (healBelow, gracz wybiera z healBelowChoices), a many, gdy zabraknie jej na umiejętność. texts: wpisy w walce i raporcie, {potion} w bierniku (counted[0]). Wyrób (workshop): postać wykonuje przedmioty w jednym stałym miejscu (place), jeden wzór i jedną rzadkość naraz, od 1 do maxCount sztuk. Wzór to baza przedmiotu ze slotu, który ma parts: pierwszą bazę rodziny zna się od 1. poziomu, a późniejszą (classLevel w item-bases.json) od laterPatternLevel, ale nie wcześniej niż od jej poziomu klasy (baza od 25. poziomu klasy od 25. poziomu profesji). parts: ile części rzadkości przedmiotu bierze jedna sztuka w danym slocie. resources: na każdą część i każdy stopień rzadkości (pospolity 1, rzadki 2 i dalej) stone kamienia oraz extra drewna albo rudy żelaza dla rodzin z families. Przedmiot trwa itemMinutes minut, każda rzadkość wyżej rarityTime razy dłużej, a każdy poziom profesji skraca go o speedPerLevel czasu z 1. poziomu, ale nie bardziej niż do fastest. rarities: od którego poziomu jaka rzadkość i z jaką szansą powodzenia (chance); każdy poziom po 1. dodaje chancePerLevel, najwyżej do maxChance, a szansa 1 zostaje 1. Nieudany przedmiot zabiera swoje części, a zasoby wracają. texts: zdania raportu i komunikaty. exchange: wymiana części od ręki, bez pracy postaci: rate części jednej rzadkości za 1 część następnej (rzadkości z rarities.json, części z materials.json), counts sztuk jedną wymianą. Awatar Systemu (avatar): kupiony raz na zawsze za price złota wykonuje jedną pracę naraz obok postaci, z jej poziomami profesji, ziołami, przepisami i wzorami, tak samo wydajnie jak ona. Nie daje XP, poziomów profesji ani statystyk. description: opis na karcie zakupu; texts: komunikaty Awatara. rows: rzędy kwadratów zakładki Profesje, od góry, zbierackie nad wytwórczymi. Górnictwo (mining, src/engine/mining.js): postać kopie w jednym stałym miejscu (place), przez minutes.min–max minut co step, i wydobywa naraz wszystkie minerały (minerals), które już zna: każdy z perHour sztuk na godzinę, a każdy poziom dodaje yieldPerLevel; losowość to ± spread, a kopanie daje co najmniej jedną sztukę. veins: żyły złota, średnio perHour na godzinę, każda warta (złoto z godziny ± spread) / perHour, a złoto z godziny to share złota, które daje godzina wyprawy na poziomie postaci z początku kopania (explorationGold: [poziom postaci, złoto na godzinę] z tools/difficulty-sim.mjs, gracz realistyczny, wyprawy godzinne; między poziomami liniowo, za ostatnim w proporcji do poziomu). about: opis pod „Jak to działa?” ({yield} i {share} w procentach). minerals: kamienie (kind gem), po jednym na rzadkość (rarity), i kruszce (kind ore) na oprawy biżuterii rzadkości z for; level to poziom Górnictwa, od którego się je kopie, i poziom Jubilerstwa, od którego się je szlifuje i oprawia; price płaci złomiarz za sztukę (z premią Skupu złomu); setBonus: o tyle kamień oprawiony w przedmiot podnosi wszystkie jego liczby, każdą co najmniej o 1. Minerały nie zajmują miejsca w plecaku. Jubilerstwo (jewelcrafting, src/engine/jewelcraft.js): wyrób biżuterii jak w Warsztacie, z bazami slotów z ores (tyle kruszcu bierze jedna sztuka), jedną rzadkość i jeden wzór naraz, od 1 do maxCount sztuk. Rzadkość wyznacza kamień tej rzadkości (jeden na sztukę), a kruszec ten, którego for ją obejmuje. Czas, wzory i szanse (chances) jak w Warsztacie. Nieudana sztuka zabiera swój kamień, a kruszec wraca. setting: oprawianie jednego kamienia w przedmiot postaci trwa minutes minut przy Kwarcu, każda rzadkość wyżej rarityTime razy dłużej, w tempie poziomu Jubilerstwa; nowy kamień niszczy poprzedni. about.craft i about.set: opisy pod „Jak to działa?”.",
   "rules": {
     "characterXpShare": 0.025,
     "stack": 20
@@ -53,8 +53,35 @@
       "statPerLevel": 1,
       "maxLevelBonus": 51,
       "description": "Wyrób ekwipunku z części."
+    },
+    {
+      "id": "mining",
+      "name": "Górnictwo",
+      "genitive": "Górnictwa",
+      "kind": "gathering",
+      "unlockLevel": 25,
+      "stats": ["vitality", "endurance"],
+      "maxLevel": 100,
+      "levelMinutes": 30,
+      "statPerLevel": 1,
+      "maxLevelBonus": 51,
+      "description": "Wydobycie kamieni szlachetnych, kruszców i złota w Systemowej Kopalni."
+    },
+    {
+      "id": "jewelcrafting",
+      "name": "Jubilerstwo",
+      "genitive": "Jubilerstwa",
+      "kind": "crafting",
+      "unlockLevel": 25,
+      "stats": ["will", "perception"],
+      "maxLevel": 100,
+      "levelMinutes": 30,
+      "statPerLevel": 1,
+      "maxLevelBonus": 51,
+      "description": "Wyrób biżuterii i oprawianie kamieni w Systemowej Szlifierni."
     }
   ],
+  "rows": [["herbalism", "mining"], ["alchemy", "jewelcrafting"], ["crafting"]],
   "gathering": {
     "profession": "herbalism",
     "place": {
@@ -180,6 +207,106 @@
       "lucky": ["Łut szczęścia! Przedmiot wyższej rzadkości: {item} ({rarity})."]
     }
   },
+  "mining": {
+    "profession": "mining",
+    "place": {
+      "id": "system-mine",
+      "name": "Systemowa Kopalnia",
+      "description": "Ścieżki schodzą głęboko pod puszczę, a w ścianach lśnią żyły kruszców. System odsłania kamienie dopiero wtedy, gdy uzna, że umiesz je wydobyć."
+    },
+    "minutes": { "min": 10, "step": 10, "max": 480 },
+    "yieldPerLevel": 0.02,
+    "spread": 0.15,
+    "veins": {
+      "share": 0.5,
+      "perHour": 2,
+      "spread": 0.5,
+      "explorationGold": [[25, 340], [30, 390], [35, 420], [40, 540], [45, 670], [50, 760], [60, 760], [70, 910], [80, 1040], [90, 1170], [100, 1390], [110, 1540], [125, 1790], [150, 2140]]
+    },
+    "about": [
+      "Kopiesz wszystko, co System już Ci odsłonił: kamienie szlachetne, po jednym na każdą rzadkość, i kruszce. Każdy poziom Górnictwa daje {yield}% więcej urobku.",
+      "Po drodze kilof trafia na żyły złota. Dają średnio {share}% złota, które przynosi godzina wyprawy na Twoim poziomie postaci.",
+      "Kamienie i kruszce nie zajmują miejsca w plecaku. Kupi je złomiarz, a w Jubilerstwie zrobisz z nich biżuterię."
+    ],
+    "texts": {
+      "report": [
+        "W Kopalni dudnią kilofy, a w koszu przybywa urobku.",
+        "Żyły kruszców biegną w głąb, jakby ktoś je tam wyrysował.",
+        "Błękitne linie Systemu prowadzą każde uderzenie kilofa."
+      ],
+      "found": ["Wydobyto: {minerals}."],
+      "veins": ["Żyły złota: {count}, razem +{gold} złota."],
+      "noVeins": ["Tym razem bez żył złota."],
+      "revealed": ["System odsłania nowy kamień: {mineral}"],
+      "revealedOre": ["System odsłania nowy kruszec: {mineral}"],
+      "hidden": ["Ukryte przez System do {level}. poziomu Górnictwa."],
+      "busy": ["Postać kopie w Kopalni. Poczekaj na koniec kopania."],
+      "claimFirst": ["Kopanie się skończyło. Najpierw odbierz raport."],
+      "pushTitle": ["Koniec kopania"],
+      "pushBody": ["Kopanie zakończone: {place}. Raport czeka na odbiór."]
+    }
+  },
+  "jewelcrafting": {
+    "profession": "jewelcrafting",
+    "place": {
+      "id": "system-lapidary",
+      "name": "Systemowa Szlifiernia",
+      "description": "Tarcze szlifierskie kręcą się tu same, a na stole czekają oprawy. Niektóre kamienie będą dla Ciebie dostępne dopiero, gdy System uzna, że sobie poradzisz."
+    },
+    "ores": { "ring": 2, "amulet": 3, "talisman": 3 },
+    "itemMinutes": 30,
+    "rarityTime": 2,
+    "speedPerLevel": 0.01,
+    "fastest": 0.5,
+    "maxCount": 5,
+    "laterPatternLevel": 10,
+    "chances": { "common": 1, "rare": 0.9, "unique": 0.75, "epic": 0.55, "legendary": 0.35, "mythic": 0.2, "divine": 0.1 },
+    "chancePerLevel": 0.005,
+    "maxChance": 0.95,
+    "setting": { "minutes": 15, "rarityTime": 2 },
+    "about": {
+      "craft": [
+        "Pierścień, amulet albo talizman ma rzadkość kamienia, z którego go zrobisz. Na oprawę potrzeba też kruszcu: srebrnego, złotego albo gwiezdnego.",
+        "Wyrób może się nie udać: wtedy kamień przepada, a kruszec wraca. Gotowa biżuteria ma Twój poziom postaci, a jej właściwości noszą nazwy poznanych stworów."
+      ],
+      "set": [
+        "W każdym przedmiocie może tkwić jeden kamień. Podnosi wszystkie liczby przedmiotu o tyle procent, ile podaje kamień: im rzadszy, tym więcej.",
+        "Nowy kamień niszczy poprzedni. Kamień oprawisz od tego poziomu Jubilerstwa, od którego Górnictwo go znajduje."
+      ]
+    },
+    "texts": {
+      "report": [
+        "Tarcza szlifierska śpiewa, a kamień nabiera blasku.",
+        "Oprawa obejmuje kamień, jakby czekała właśnie na niego.",
+        "Błękitne linie Systemu prowadzą każde cięcie i każdą oprawę."
+      ],
+      "made": ["Wykonano: {items}."],
+      "failed": ["Nie udało się: {items}. Kamienie przepadły, a kruszec wrócił."],
+      "stopped": ["Wyrób przerwany. Kamienie i kruszec na resztę wróciły."],
+      "set": ["{gem} tkwi teraz w przedmiocie: {item}."],
+      "replaced": ["Poprzedni kamień, {gem}, rozpadł się przy oprawianiu."],
+      "missing": ["Tego przedmiotu już nie ma. Kamień wrócił do plecaka: {gem}."],
+      "revealed": ["System odsłania nowe wzory: {patterns}"],
+      "gem": ["System pozwala już szlifować i oprawiać kamień: {gem}"],
+      "hidden": ["Ukryte przez System do {level}. poziomu Jubilerstwa."],
+      "busy": ["Postać pracuje w Szlifierni. Poczekaj na koniec pracy."],
+      "claimFirst": ["Praca w Szlifierni się skończyła. Najpierw odbierz raport."],
+      "pushTitle": ["Koniec pracy w Szlifierni"],
+      "pushBody": ["Praca zakończona: {place}. Raport czeka na odbiór."]
+    }
+  },
+  "minerals": [
+    { "id": "quartz", "kind": "gem", "name": "Kwarc", "genitive": "Kwarcu", "rarity": "common", "level": 1, "perHour": 2, "price": 2, "setBonus": 0.05, "description": "Mlecznobiały kryształ, najczęstszy w ścianach Kopalni." },
+    { "id": "agate", "kind": "gem", "name": "Agat", "genitive": "Agatu", "rarity": "rare", "level": 5, "perHour": 1, "price": 4, "setBonus": 0.1, "description": "Kamień w barwne pasy, jak słoje starego drzewa." },
+    { "id": "amethyst", "kind": "gem", "name": "Ametyst", "genitive": "Ametystu", "rarity": "unique", "level": 15, "perHour": 0.5, "price": 8, "setBonus": 0.15, "description": "Fioletowy kryształ, chłodny nawet w ciepłej dłoni." },
+    { "id": "emerald", "kind": "gem", "name": "Szmaragd", "genitive": "Szmaragdu", "rarity": "epic", "level": 25, "perHour": 0.25, "price": 16, "setBonus": 0.2, "description": "Zielony jak młode liście, rzadki i kruchy." },
+    { "id": "sapphire", "kind": "gem", "name": "Szafir", "genitive": "Szafiru", "rarity": "legendary", "level": 40, "perHour": 0.12, "price": 32, "setBonus": 0.25, "description": "Głęboko niebieski i twardy jak stal." },
+    { "id": "ruby", "kind": "gem", "name": "Rubin", "genitive": "Rubinu", "rarity": "mythic", "level": 60, "perHour": 0.06, "price": 64, "setBonus": 0.3, "description": "Czerwony jak żar, który nigdy nie gaśnie." },
+    { "id": "diamond", "kind": "gem", "name": "Diament", "genitive": "Diamentu", "rarity": "divine", "level": 80, "perHour": 0.03, "price": 128, "setBonus": 0.35, "description": "Najtwardszy kamień Kopalni. Lśni nawet w zupełnej ciemności." },
+    { "id": "silver-ore", "kind": "ore", "name": "Srebrny kruszec", "genitive": "Srebrnego kruszcu", "for": ["common", "rare", "unique"], "level": 1, "perHour": 5, "price": 2, "description": "Ruda srebra na oprawy biżuterii pospolitej, rzadkiej i unikalnej." },
+    { "id": "gold-ore", "kind": "ore", "name": "Złoty kruszec", "genitive": "Złotego kruszcu", "for": ["epic", "legendary"], "level": 25, "perHour": 2.5, "price": 4, "description": "Ruda złota na oprawy biżuterii epickiej i legendarnej." },
+    { "id": "star-ore", "kind": "ore", "name": "Gwiezdny kruszec", "genitive": "Gwiezdnego kruszcu", "for": ["mythic", "divine"], "level": 60, "perHour": 1.25, "price": 8, "description": "Ruda z odłamków gwiazd na oprawy biżuterii mitycznej i boskiej." }
+  ],
   "potionUse": {
     "healBelow": 0.4,
     "healBelowChoices": [0.2, 0.3, 0.4, 0.5, 0.6, 0.7],

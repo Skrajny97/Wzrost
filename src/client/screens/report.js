@@ -14,7 +14,7 @@ import { materialIcon } from '../craft-table.js';
 import { scrapperSheet } from '../scrapper.js';
 import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy } from './character.js';
 import { skipLines } from './party.js';
-import { herbsReport, itemsReport, potionsReport } from './professions.js';
+import { herbsReport, itemsReport, jewelsReport, mineralsReport, potionsReport } from './professions.js';
 
 // "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
 const materialsText = (materials) => materials.map((material) => (material.count > 1 ? `${material.label} ×${material.count}` : material.label)).join(', ');
@@ -81,15 +81,18 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       fill(container, heading('Raport z wyprawy'), h('p', { class: 'muted', text: 'Wczytywanie raportu…' }));
       return;
     }
-    // A gathering of herbs, a brewing of potions or an order in the Warsztat
-    // has no fights: its own short report.
-    const work = { herbs: herbsReport, potions: potionsReport, items: itemsReport }[report.kind];
+    // A gathering of herbs, a brewing of potions, an order in the Warsztat,
+    // a digging or a work of the Szlifiernia has no fights: its own short
+    // report.
+    const work = { herbs: herbsReport, potions: potionsReport, items: itemsReport, minerals: mineralsReport, jewels: jewelsReport }[report.kind];
     if (work) {
       fill(container, ...work(report, heading, findSheet));
       // The cauldron bubbles once over a finished brewing, and the hammer
       // strikes over an order of the Warsztat: the work that cracked after
       // the items that came out.
       if (report.kind === 'potions' && firstPlayback) playSound('brew');
+      // The veins' gold rings as the scrapper's coins do.
+      if (report.kind === 'minerals' && report.gold > 0 && firstPlayback) playSound('coin');
       if (report.kind === 'items' && firstPlayback) {
         const made = report.items.length > 0 || report.scrolls > 0;
         if (made) playSound('craft');

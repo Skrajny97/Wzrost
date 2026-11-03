@@ -1,0 +1,474 @@
+// Górnictwo and Jubilerstwo (534–539): digging gems, ores and the gold of
+// veins in the Systemowa Kopalnia, and in the Systemowa Szlifiernia making
+// jewellery of them and setting gems in items; in the engine and through the
+// API, both from character level 25.
+
+import assert from 'node:assert/strict';
+import { beforeEach, describe, test } from 'node:test';
+
+import {
+  bagOverflow,
+  craftJewels,
+  encyclopediaView,
+  explorationGold,
+  gemOf,
+  generateItem,
+  createRng,
+  heldDiscoveries,
+  itemProperties,
+  itemView,
+  jewelBases,
+  jewelChance,
+  jewelCost,
+  jewelMinutes,
+  jewelOrderMinutes,
+  jewelReport,
+  knownGems,
+  knownJewelPatterns,
+  knownMinerals,
+  mineMinerals,
+  mineralsPerHour,
+  miningMinutes,
+  miningReport,
+  notificationsDue,
+  oreOf,
+  professionStats,
+  setMinutes,
+  upgradedItem,
+  veinGoldPerHour,
+} from '../src/engine/index.js';
+import { content } from './helpers/content.js';
+import { useServer } from './helpers/server.js';
+
+const near = (actual, expected, share) => assert.ok(Math.abs(actual - expected) <= expected * share, `${actual} is not within ${share * 100}% of ${expected}`);
+
+describe('Górnictwo in the engine', () => {
+  test('both professions open at character level 25; Górnictwo raises Witalność and Wytrzymałość, Jubilerstwo Wola and Percepcja', () => {
+    assert.deepEqual(
+      ['mining', 'jewelcrafting'].map((id) => [content.professionsById[id].name, content.professionsById[id].unlockLevel, content.professionsById[id].stats]),
+      [
+        ['Górnictwo', 25, ['vitality', 'endurance']],
+        ['Jubilerstwo', 25, ['will', 'perception']],
+      ],
+    );
+    assert.deepEqual(professionStats({ mining: { level: 11, xp: 0 }, jewelcrafting: { level: 100, xp: 0 } }, content), {
+      wisdom: 0,
+      perception: 150,
+      intellect: 0,
+      strength: 0,
+      dexterity: 0,
+      vitality: 10,
+      endurance: 10,
+      will: 150,
+    });
+  });
+
+  test('the System shows Kwarc and the silver ore first, a gem for each rarity from the levels of 535 A, the gold ore at 25 and the star ore at 60', () => {
+    assert.deepEqual(knownMinerals(1, content).map((mineral) => mineral.id), ['quartz', 'silver-ore']);
+    assert.deepEqual(
+      content.minerals.filter((mineral) => mineral.kind === 'gem').map((gem) => [gem.name, gem.rarity, gem.level]),
+      [
+        ['Kwarc', 'common', 1],
+        ['Agat', 'rare', 5],
+        ['Ametyst', 'unique', 15],
+        ['Szmaragd', 'epic', 25],
+        ['Szafir', 'legendary', 40],
+        ['Rubin', 'mythic', 60],
+        ['Diament', 'divine', 80],
+      ],
+    );
+    assert.deepEqual(knownMinerals(25, content).map((mineral) => mineral.id), ['quartz', 'agate', 'amethyst', 'emerald', 'silver-ore', 'gold-ore']);
+    assert.equal(knownMinerals(80, content).length, 10);
+    assert.deepEqual(miningMinutes(content).slice(0, 2), [10, 20]);
+    assert.equal(miningMinutes(content).at(-1), 480);
+  });
+
+  test('each level digs 2% more, and a digging brings about the expected pieces, always at least one', () => {
+    const quartz = content.mineralsById.quartz;
+    assert.equal(mineralsPerHour(quartz, 1, content), 2);
+    assert.ok(Math.abs(mineralsPerHour(quartz, 51, content) - 4) < 1e-9);
+    let found = 0;
+    for (let index = 0; index < 400; index += 1) found += mineMinerals({ minutes: 60, level: 1, characterLevel: 25, seed: `q${index}` }, content).found.quartz ?? 0;
+    near(found / 400, 2, 0.1);
+    // Ten minutes at level 1 still bring something.
+    for (let index = 0; index < 50; index += 1) {
+      assert.ok(Object.keys(mineMinerals({ minutes: 10, level: 1, characterLevel: 25, seed: `s${index}` }, content).found).length > 0);
+    }
+    // The seed decides it all.
+    assert.deepEqual(mineMinerals({ minutes: 240, level: 30, characterLevel: 40, seed: 'x' }, content), mineMinerals({ minutes: 240, level: 30, characterLevel: 40, seed: 'x' }, content));
+  });
+
+  test('the veins give half the gold an hour of exploring gives at the character level (532 A): about 170 at 25', () => {
+    assert.equal(veinGoldPerHour(25, content), 170);
+    assert.equal(explorationGold(30, content), 390);
+    // Straight between two measured levels, and in proportion past the last.
+    assert.equal(explorationGold(27, content), 360);
+    assert.equal(explorationGold(300, content), 4280);
+    let gold = 0;
+    let veins = 0;
+    for (let index = 0; index < 300; index += 1) {
+      const mined = mineMinerals({ minutes: 120, level: 10, characterLevel: 50, seed: `g${index}` }, content);
+      gold += mined.gold;
+      veins += mined.veins;
+    }
+    near(gold / 300, veinGoldPerHour(50, content) * 2, 0.06);
+    near(veins / 300, 4, 0.1);
+  });
+
+  test('the report: the mine, the minerals, the veins, the levels and the minerals revealed', () => {
+    const mined = { found: { quartz: 3, 'silver-ore': 7 }, veins: 2, gold: 345 };
+    const before = { level: 4, xp: 100 };
+    const after = { level: 5, xp: 20 };
+    const report = miningReport(
+      { minutes: 120, startedAt: 0, endsAt: 7200000, seed: 's', mined, before, after, character: { level: 30 }, xp: 50, work: { level: 30, timePoints: 0, messages: [] } },
+      content,
+    );
+    assert.equal(report.kind, 'minerals');
+    assert.equal(report.placeName, 'Systemowa Kopalnia');
+    assert.equal(report.found, 'Wydobyto: 3 × Kwarc, 7 × Srebrny kruszec.');
+    assert.equal(report.veinsText, 'Żyły złota: 2, razem +345 złota.');
+    assert.deepEqual(report.revealed, ['agate']);
+    assert.deepEqual(report.system, [
+      'Osiągnięto poziom Górnictwa: 5',
+      'Zdobyto Witalność: +1',
+      'Zdobyto Wytrzymałość: +1',
+      'System odsłania nowy kamień: Agat',
+    ]);
+  });
+
+  test('the Encyklopedia counts the gems and ores held, in a tab of their own with its chests', () => {
+    const found = heldDiscoveries({ minerals: { quartz: 2, 'silver-ore': 1, nothing: 3 } }, content);
+    assert.deepEqual(found, { 'mineral:quartz': 1, 'mineral:silver-ore': 1 });
+    const { minerals } = encyclopediaView({ discovered: found, claimed: [], met: [] }, content);
+    assert.deepEqual([minerals.found, minerals.all], [2, 10]);
+    assert.deepEqual(
+      minerals.entries.slice(0, 2).map((entry) => [entry.name, entry.sources]),
+      [
+        ['Kwarc', ['Górnictwo: od 1. poziomu, w Kopalni.', 'Daje biżuterii rzadkość: pospolity. Oprawiony podnosi wszystkie liczby przedmiotu o 5%.']],
+        ['Srebrny kruszec', ['Górnictwo: od 1. poziomu, w Kopalni.', 'Idzie na oprawy biżuterii rzadkości: pospolity, rzadki, unikalny.']],
+      ],
+    );
+    assert.deepEqual(minerals.entries.at(-1).name, '???');
+    assert.deepEqual(minerals.chests.map((chest) => chest.need), [3, 6, 10]);
+  });
+
+  test('the end of a digging and of a work in the Szlifiernia come as phone notifications', () => {
+    const due = notificationsDue(
+      { level: 30, activity: { kind: 'minerals', endsAt: 1000 }, avatarActivity: { kind: 'jewels', endsAt: 2000 }, buildings: {}, queue: [] },
+      0,
+      3000,
+      content,
+    );
+    assert.deepEqual(
+      due.map(({ tag, url, title, body }) => [tag, url, title, body]),
+      [
+        ['minerals', '#/profesje/gornictwo', 'Koniec kopania', 'Kopanie zakończone: Systemowa Kopalnia. Raport czeka na odbiór.'],
+        ['avatar-jewels', '#/profesje/jubilerstwo', 'Praca Awatara Systemu zakończona', 'Praca zakończona: Systemowa Szlifiernia. Raport czeka na odbiór.'],
+      ],
+    );
+  });
+});
+
+describe('Jubilerstwo in the engine', () => {
+  test('rings, amulets and talismans, the first of each family at once and the later ones from 10, 25 and 50; the Warsztat makes none of them', () => {
+    assert.deepEqual(knownJewelPatterns(1, content).map((base) => base.id), ['amulet', 'ring', 'talisman']);
+    assert.equal(knownJewelPatterns(10, content).length, 6);
+    assert.ok(knownJewelPatterns(25, content).some((base) => base.id === 'band-ring'));
+    assert.equal(knownJewelPatterns(50, content).length, 12);
+    assert.ok(jewelBases(content).every((base) => !content.workshop.parts[base.slot]));
+  });
+
+  test('a gem gives the rarity and an ore of its tier sets it: silver up to unique, gold for epic and legendary, star above', () => {
+    assert.deepEqual(
+      content.rarities.map((rarity) => [rarity.id, gemOf(rarity.id, content).id, oreOf(rarity.id, content).id]),
+      [
+        ['common', 'quartz', 'silver-ore'],
+        ['rare', 'agate', 'silver-ore'],
+        ['unique', 'amethyst', 'silver-ore'],
+        ['epic', 'emerald', 'gold-ore'],
+        ['legendary', 'sapphire', 'gold-ore'],
+        ['mythic', 'ruby', 'star-ore'],
+        ['divine', 'diamond', 'star-ore'],
+      ],
+    );
+    assert.deepEqual(jewelCost(content.basesById.ring, 'epic', 2, content), { emerald: 2, 'gold-ore': 4 });
+    assert.deepEqual(jewelCost(content.basesById.medallion, 'common', 1, content), { quartz: 1, 'silver-ore': 3 });
+    assert.deepEqual(knownGems(24, content).map((gem) => gem.id), ['quartz', 'agate', 'amethyst']);
+  });
+
+  test('time and chance as in the Warsztat: 30 minutes for a common jewel, twice as long a rarity up, quicker with the level, and rarer ones may fail', () => {
+    assert.equal(jewelMinutes('common', 1, content), 30);
+    assert.equal(jewelMinutes('epic', 1, content), 240);
+    assert.equal(jewelMinutes('common', 51, content), 15);
+    assert.equal(jewelOrderMinutes(3, 'rare', 11, content), 162);
+    assert.equal(jewelChance('common', 1, content), 1);
+    assert.equal(jewelChance('rare', 5, content), 0.92);
+    assert.equal(jewelChance('divine', 100, content), 0.595);
+  });
+
+  test('jewels have the character level and affixes named by the creatures met, and some fail', () => {
+    const results = craftJewels({ baseId: 'amulet', rarityId: 'legendary', count: 20, level: 40, professionLevel: 40, met: ['wolf'], seed: 'j' }, content);
+    const made = results.filter((result) => result.made);
+    assert.ok(made.length > 0 && made.length < 20, String(made.length));
+    for (const { item } of made) {
+      assert.deepEqual([item.base, item.rarity, item.level, item.affixes.length], ['amulet', 'legendary', 40, 4]);
+      assert.ok(item.affixes.every((affix) => affix.monster === 'wolf'));
+    }
+  });
+
+  test('a set gem raises every number of the item by its percent, each by at least 1, and shows on its card', () => {
+    assert.deepEqual(
+      content.minerals.filter((mineral) => mineral.kind === 'gem').map((gem) => gem.setBonus),
+      [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35],
+    );
+    const item = generateItem({ baseId: 'sword', level: 30, rarityId: 'epic' }, createRng('i'), content);
+    const plain = upgradedItem(item, content);
+    const diamond = upgradedItem({ ...item, gem: 'diamond' }, content);
+    assert.equal(diamond.damage.min, plain.damage.min + Math.round(plain.damage.min * 0.35));
+    assert.equal(diamond.damage.max, plain.damage.max + Math.round(plain.damage.max * 0.35));
+    diamond.affixes.forEach((affix, index) => assert.equal(affix.value, plain.affixes[index].value + Math.max(1, Math.round(plain.affixes[index].value * 0.35))));
+    // A small number grows by 1 at least, and on top of an upgrade.
+    const ring = { base: 'ring', slot: 'ring', level: 1, rarity: 'common', affixes: [], implicit: { stat: 'perception', value: 2 } };
+    assert.equal(upgradedItem({ ...ring, gem: 'quartz' }, content).implicit.value, 3);
+    assert.equal(upgradedItem({ ...ring, upgrade: 5, gem: 'quartz' }, content).implicit.value, upgradedItem({ ...ring, upgrade: 5 }, content).implicit.value + 1);
+    assert.notDeepEqual(itemProperties({ ...item, gem: 'emerald' }, content), itemProperties(item, content));
+    assert.deepEqual(itemView({ ...item, gem: 'emerald' }, content).gem, { id: 'emerald', name: 'Szmaragd', bonus: 0.2, color: content.raritiesById.epic.color });
+    assert.equal(itemView(item, content).gem, undefined);
+    // A gem the game no longer has adds nothing.
+    assert.deepEqual(upgradedItem({ ...item, gem: 'nothing' }, content).damage, plain.damage);
+  });
+
+  test('an item with a gem is kept as an upgraded one when the bag overflows', () => {
+    const plain = { base: 'ring', slot: 'ring', level: 30, rarity: 'common', affixes: [] };
+    assert.deepEqual(bagOverflow([{ ...plain, id: 1, gem: 'quartz' }, { ...plain, id: 2 }], 1, 'warrior', content), [1]);
+  });
+
+  test('setting takes 15 minutes for Kwarc, twice as long a rarity up, quicker with the level', () => {
+    assert.deepEqual(['quartz', 'agate', 'emerald'].map((gem) => setMinutes(gem, 1, content)), [15, 30, 120]);
+    assert.equal(setMinutes('diamond', 80, content), 480);
+    assert.equal(setMinutes('quartz', 11, content), 14);
+  });
+
+  test('the report of a setting names the gem, the item and the gem it destroyed, or the gem that came back', () => {
+    const work = { level: 30, timePoints: 0, messages: [] };
+    const base = { minutes: 15, startedAt: 0, endsAt: 900000, seed: 's', before: { level: 1, xp: 0 }, after: { level: 1, xp: 15 }, character: { level: 30 }, xp: 5, work };
+    const item = { base: 'ring', slot: 'ring', level: 30, rarity: 'common', affixes: [], implicit: { stat: 'perception', value: 9 }, gem: 'agate' };
+    const set = jewelReport({ ...base, set: { gem: 'agate', item, replaced: 'quartz' } }, content);
+    assert.equal(set.kind, 'jewels');
+    assert.equal(set.set.text, 'Agat tkwi teraz w przedmiocie: Pierścień.');
+    assert.equal(set.set.replaced, 'Poprzedni kamień, Kwarc, rozpadł się przy oprawianiu.');
+    assert.equal(set.set.item.gem.name, 'Agat');
+    const missing = jewelReport({ ...base, set: { gem: 'agate', item: null, replaced: null } }, content);
+    assert.equal(missing.set.text, 'Tego przedmiotu już nie ma. Kamień wrócił do plecaka: Agat.');
+    assert.equal(missing.set.item, null);
+  });
+});
+
+describe('Górnictwo and Jubilerstwo through the API', () => {
+  const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'on' });
+  let cookie;
+
+  beforeEach(async () => {
+    ({ cookie } = await signUp('gornik'));
+    await call('POST', '/api/character', { cookie, body: { name: 'Gornik', classId: 'warrior', appearance: 'male' } });
+    await (await db()).prepare('UPDATE characters SET level = 25, xp = 0').run();
+  });
+
+  const set = async (sql, ...binds) => (await db()).prepare(`UPDATE characters SET ${sql}`).bind(...binds).run();
+  // Moves the current work `minutes` into the past.
+  const age = async (minutes, table = 'activities') =>
+    (await db()).prepare(`UPDATE ${table} SET started_at = started_at - ?, ends_at = ends_at - ?`).bind(minutes * 60000, minutes * 60000).run();
+  const character = async () => (await call('GET', '/api/character', { cookie })).data.character;
+  const mine = (body) => call('POST', '/api/professions/mine', { cookie, body });
+  const jewel = (body) => call('POST', '/api/professions/jewel', { cookie, body });
+  const claim = () => call('POST', '/api/hunts/claim', { cookie });
+  const minerals = (view) => Object.fromEntries(view.minerals.map((mineral) => [mineral.id, mineral.count]));
+
+  test('both open at level 25, their squares locked before it, with the System message', async () => {
+    await set('level = 24');
+    const before = await character();
+    assert.deepEqual(
+      before.professions.list.filter((profession) => ['mining', 'jewelcrafting'].includes(profession.id)).map((profession) => [profession.name, profession.locked, profession.unlockLevel]),
+      [
+        ['Górnictwo', true, 25],
+        ['Jubilerstwo', true, 25],
+      ],
+    );
+    assert.deepEqual(before.professions.rows, [['herbalism', 'mining'], ['alchemy', 'jewelcrafting'], ['crafting']]);
+    assert.equal(before.professions.mining, null);
+    const locked = await mine({ minutes: 60 });
+    assert.deepEqual([locked.status, locked.data.error.message], [403, 'Górnictwo odblokujesz na poziomie postaci 25.']);
+    assert.equal((await jewel({ baseId: 'ring', rarity: 'common', count: 1 })).status, 403);
+    await set('level = 25');
+    const { mining, jewelcrafting } = (await character()).professions;
+    assert.equal(mining.place.name, 'Systemowa Kopalnia');
+    assert.equal(mining.goldPerHour, 170);
+    assert.deepEqual(mining.minerals.filter((mineral) => !mineral.hidden).map((mineral) => mineral.name), ['Kwarc', 'Srebrny kruszec']);
+    assert.equal(mining.minerals.find((mineral) => mineral.id === 'agate').hint, 'Ukryte przez System do 5. poziomu Górnictwa.');
+    assert.equal(mining.about[0].includes('2% więcej urobku'), true);
+    assert.equal(jewelcrafting.place.name, 'Systemowa Szlifiernia');
+    assert.deepEqual(jewelcrafting.slots.map((slot) => [slot.name, slot.ores]), [
+      ['Pierścień', 2],
+      ['Amulet', 3],
+      ['Talizman', 3],
+    ]);
+    assert.deepEqual(jewelcrafting.gems.filter((gem) => !gem.hidden).map((gem) => [gem.name, gem.bonus, gem.minutes]), [['Kwarc', 0.05, 15]]);
+  });
+
+  test('a digging: the character rests, and the report brings minerals, the veins\' gold, XP and levels', async () => {
+    await set('hp = 1, gold = 0');
+    assert.equal((await mine({ minutes: 45 })).data.error.code, 'invalid_duration');
+    const started = await mine({ minutes: 480 });
+    assert.equal(started.status, 201);
+    const { activity } = started.data.character;
+    assert.deepEqual([activity.kind, activity.placeName, activity.profession], ['minerals', 'Systemowa Kopalnia', 'mining']);
+    assert.ok(started.data.character.regen, 'HP keeps coming back while digging');
+    const hunt = await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 1 } });
+    assert.deepEqual([hunt.status, hunt.data.error.message], [409, 'Postać kopie w Kopalni. Poczekaj na koniec kopania.']);
+    await age(480);
+    // The hours of digging pass for resting too.
+    await set('hp_at = hp_at - 9000000');
+    const claimed = await claim();
+    assert.equal(claimed.status, 200);
+    const { report, character: after } = claimed.data;
+    assert.equal(report.kind, 'minerals');
+    assert.ok(report.minerals.some((mineral) => mineral.id === 'quartz'));
+    assert.ok(report.gold > 0 && report.veins > 0);
+    assert.equal(after.gold, report.gold);
+    assert.deepEqual(minerals(after), Object.fromEntries(report.minerals.map((mineral) => [mineral.id, mineral.count])));
+    // Minerals take no room in the bag.
+    assert.equal(after.bagUsed, 0);
+    // 480 minutes of work: 30 + 60 + 90 + 120 + 150 to level 6.
+    assert.equal(report.profession.levelAfter, 6);
+    assert.equal(after.stats.find((stat) => stat.id === 'vitality').sources.professions, 5);
+    assert.equal(after.stats.find((stat) => stat.id === 'endurance').sources.professions, 5);
+    assert.ok(after.hp > 1);
+    const { data } = await call('GET', '/api/reports', { cookie });
+    assert.equal(data.reports[0].kind, 'minerals');
+    assert.equal(data.reports[0].gold, report.gold);
+    assert.equal((await claim()).status, 409);
+  });
+
+  test('calling back early gives nothing; Time Points skip a digging; minerals sell to the scrapper or go away', async () => {
+    await mine({ minutes: 60 });
+    assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).status, 200);
+    const back = await character();
+    assert.deepEqual([back.activity, back.minerals, back.professions.list.find((profession) => profession.id === 'mining').xp], [null, [], 0]);
+    await mine({ minutes: 10 });
+    const skipped = await call('POST', '/api/time/skip', { cookie, body: { target: 'activity' } });
+    assert.equal(skipped.data.spent, 10);
+    assert.equal((await claim()).data.report.kind, 'minerals');
+
+    await set(`gold = 0, minerals = '{"quartz":5,"silver-ore":3}'`);
+    const sold = await call('POST', '/api/minerals/sell', { cookie, body: { mineralId: 'quartz', count: 3 } });
+    assert.deepEqual(sold.data.sold, { count: 3, gold: 6 });
+    assert.deepEqual(minerals(sold.data.character), { quartz: 2, 'silver-ore': 3 });
+    assert.equal((await call('POST', '/api/minerals/sell', { cookie, body: { mineralId: 'quartz', count: 3 } })).data.error.code, 'invalid_count');
+    const thrown = await call('POST', '/api/minerals/discard', { cookie, body: { mineralId: 'silver-ore', count: 3 } });
+    assert.deepEqual(minerals(thrown.data.character), { quartz: 2 });
+    assert.equal((await call('POST', '/api/minerals/sell', { cookie, body: { mineralId: 'gold-ore', count: 1 } })).data.error.code, 'no_mineral');
+  });
+
+  test('an order of jewels takes the gems and the ore at once and brings the jewels at the character level; stopped early, the rest comes back', async () => {
+    await set(`minerals = '{"quartz":3,"silver-ore":5}'`);
+    assert.equal((await jewel({ baseId: 'signet-ring', rarity: 'common', count: 1 })).data.error.code, 'unknown_pattern');
+    assert.equal((await jewel({ baseId: 'ring', rarity: 'rare', count: 1 })).data.error.code, 'unknown_rarity');
+    assert.equal((await jewel({ baseId: 'ring', rarity: 'common', count: 3 })).data.error.code, 'no_minerals');
+    const started = await jewel({ baseId: 'ring', rarity: 'common', count: 2 });
+    assert.equal(started.status, 201);
+    assert.deepEqual(minerals(started.data.character), { quartz: 1, 'silver-ore': 1 });
+    assert.deepEqual([started.data.character.activity.kind, started.data.character.activity.minutes, started.data.character.activity.count], ['jewels', 60, 2]);
+    await age(60);
+    const { report, character: after } = (await claim()).data;
+    assert.equal(report.kind, 'jewels');
+    assert.deepEqual(report.items.map((item) => [item.base, item.rarity, item.level]), [
+      ['ring', 'common', 25],
+      ['ring', 'common', 25],
+    ]);
+    assert.equal(report.made, 'Wykonano: 2 × Pierścień.');
+    assert.equal(after.bag.length, 2);
+
+    // Stopped after the first of two: one ring, and the gem and the ore of the other back.
+    await set(`minerals = '{"quartz":2,"silver-ore":4}'`);
+    await jewel({ baseId: 'ring', rarity: 'common', count: 2 });
+    await age(35);
+    const stopped = await call('POST', '/api/hunts/cancel', { cookie });
+    assert.equal(stopped.data.report.items.length, 1);
+    assert.deepEqual(minerals(stopped.data.character), { quartz: 1, 'silver-ore': 2 });
+  });
+
+  test('a gem is set in a worn item at the end of the work, raising its numbers; a new gem destroys the old, and an item gone gives the gem back', async () => {
+    await set(`minerals = '{"quartz":3}'`);
+    // A sword worn and a ring in the bag.
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    const sword = generateItem({ baseId: 'sword', level: 25, rarityId: 'rare' }, createRng('sword'), content);
+    await database.prepare("INSERT INTO items (character_id, slot, data, created_at) VALUES (?, 'weapon', ?, 0)").bind(id, JSON.stringify(sword)).run();
+    await database.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, 0)').bind(id, JSON.stringify({ base: 'ring', slot: 'ring', level: 25, rarity: 'common', affixes: [], implicit: { stat: 'perception', value: 5 } })).run();
+    const { equipment } = await character();
+    const weapon = equipment.weapon;
+    assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'agate' })).data.error.code, 'locked');
+    const started = await jewel({ set: true, itemId: weapon.id, gem: 'quartz' });
+    assert.equal(started.status, 201);
+    assert.deepEqual(started.data.character.activity.set, { gem: 'Kwarc', item: weapon.name });
+    assert.equal(started.data.character.activity.minutes, 15);
+    await age(15);
+    const { report, character: after } = (await claim()).data;
+    assert.equal(report.set.text, `Kwarc tkwi teraz w przedmiocie: ${weapon.name}.`);
+    assert.equal(report.set.replaced, null);
+    const worn = after.equipment.weapon;
+    assert.deepEqual(worn.gem, { id: 'quartz', name: 'Kwarc', bonus: 0.05, color: '#9b9b9b' });
+    assert.notDeepEqual(worn.properties, weapon.properties);
+    assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz' })).data.error.code, 'same_gem');
+
+    // A new gem destroys the old one.
+    await set(`minerals = '{"quartz":1,"agate":1}', professions = '{"jewelcrafting":{"level":5,"xp":0}}'`);
+    await jewel({ set: true, itemId: weapon.id, gem: 'agate' });
+    await age(30);
+    const again = (await claim()).data;
+    assert.equal(again.report.set.replaced, 'Poprzedni kamień, Kwarc, rozpadł się przy oprawianiu.');
+    assert.equal(again.character.equipment.weapon.gem.id, 'agate');
+
+    // An item gone by the end gives its gem back, and called back early the gem comes back too.
+    await jewel({ set: true, itemId: weapon.id, gem: 'quartz' });
+    await (await db()).prepare('DELETE FROM items WHERE id = ?').bind(weapon.id).run();
+    await age(15);
+    const gone = (await claim()).data;
+    assert.equal(gone.report.set.text, 'Tego przedmiotu już nie ma. Kamień wrócił do plecaka: Kwarc.');
+    assert.deepEqual(minerals(gone.character), { quartz: 1 });
+    const ring = (await character()).bag[0];
+    assert.equal((await jewel({ set: true, itemId: ring.id, gem: 'quartz' })).status, 201);
+    assert.deepEqual(minerals(await character()), {});
+    assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).data.report, null);
+    assert.deepEqual(minerals(await character()), { quartz: 1 });
+  });
+
+  test('"Sprzedaj zbędne" keeps an item with a gem, as an upgraded one', async () => {
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    const ring = { base: 'ring', slot: 'ring', level: 25, rarity: 'common', affixes: [], implicit: { stat: 'perception', value: 5 } };
+    for (const data of [ring, { ...ring, gem: 'quartz' }]) {
+      await database.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, 0)').bind(id, JSON.stringify(data)).run();
+    }
+    const sold = await call('POST', '/api/items/sell', { cookie, body: { maxRarity: 'divine' } });
+    assert.equal(sold.data.sold.count, 1);
+    assert.deepEqual(sold.data.character.bag.map((item) => item.gem?.id ?? null), ['quartz']);
+  });
+
+  test('the Awatar Systemu digs while the character explores and brings the minerals and the gold, without XP or levels', async () => {
+    await set('gold = 10000');
+    await call('POST', '/api/avatar/buy', { cookie });
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 1 } })).status, 201);
+    const started = await mine({ minutes: 120, avatar: true });
+    assert.equal(started.status, 201);
+    assert.equal(started.data.character.professions.avatar.activity.kind, 'minerals');
+    await age(120, 'avatar_activities');
+    const claimed = await call('POST', '/api/avatar/claim', { cookie });
+    const { report, character: after } = claimed.data;
+    assert.equal(report.avatar, true);
+    assert.equal(report.summary.xp, 0);
+    assert.equal(after.gold, report.gold);
+    assert.equal(after.professions.list.find((profession) => profession.id === 'mining').level, 1);
+    assert.ok(after.minerals.length > 0);
+  });
+});

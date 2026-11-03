@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Profesje",
-  "description": "Profesje, ich poziomy i statystyki, zbieractwo w Systemowym Zagajniku, zioła, warzenie w Systemowej Pracowni i mikstury (src/engine/professions.js, src/engine/brewing.js).",
+  "description": "Profesje, ich poziomy i statystyki, zbieractwo w Systemowym Zagajniku, zioła, warzenie w Systemowej Pracowni i mikstury, Górnictwo w Systemowej Kopalni z minerałami i Jubilerstwo w Systemowej Szlifierni (src/engine/professions.js, src/engine/brewing.js, src/engine/mining.js, src/engine/jewelcraft.js).",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -15,7 +15,11 @@
     "potionUse",
     "herbs",
     "potions",
-    "texts"
+    "texts",
+    "rows",
+    "mining",
+    "jewelcrafting",
+    "minerals"
   ],
   "properties": {
     "$comment": {
@@ -127,6 +131,20 @@
             "type": "string",
             "minLength": 1
           }
+        }
+      }
+    },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Rzędy kwadratów zakładki Profesje, od góry: każda profesja raz.",
+      "items": {
+        "type": "array",
+        "minItems": 1,
+        "maxItems": 2,
+        "items": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -786,6 +804,607 @@
                 "minLength": 1
               }
             }
+          }
+        }
+      }
+    },
+    "mining": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Górnictwo: kopanie kamieni, kruszców i złota z żył w miejscu Systemu (src/engine/mining.js).",
+      "required": [
+        "profession",
+        "place",
+        "minutes",
+        "yieldPerLevel",
+        "spread",
+        "veins",
+        "about",
+        "texts"
+      ],
+      "properties": {
+        "profession": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Profesja zbieracka, która kopie."
+        },
+        "place": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "minutes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "min",
+            "step",
+            "max"
+          ],
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "step": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "yieldPerLevel": {
+          "type": "number",
+          "minimum": 0,
+          "description": "O jaką część więcej minerałów na godzinę daje każdy poziom profesji."
+        },
+        "spread": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Losowość urobku: ± tyle części."
+        },
+        "veins": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "share",
+            "perHour",
+            "spread",
+            "explorationGold"
+          ],
+          "properties": {
+            "share": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 1,
+              "description": "Jaką część złota z godziny wyprawy na poziomie postaci dają żyły złota na godzinę kopania (532 A: połowę)."
+            },
+            "perHour": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Ile żył złota na godzinę, średnio."
+            },
+            "spread": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Losowość złota jednej żyły: ± tyle części."
+            },
+            "explorationGold": {
+              "type": "array",
+              "minItems": 1,
+              "description": "[poziom postaci, złoto na godzinę wyprawy], rosnąco: pomiar tools/difficulty-sim.mjs.",
+              "items": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "number",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        "about": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "report",
+            "found",
+            "veins",
+            "noVeins",
+            "revealed",
+            "revealedOre",
+            "hidden",
+            "busy",
+            "claimFirst",
+            "pushTitle",
+            "pushBody"
+          ],
+          "properties": {
+            "report": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "found": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "veins": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "noVeins": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "revealed": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "revealedOre": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "hidden": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "busy": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "claimFirst": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pushTitle": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pushBody": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "jewelcrafting": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Jubilerstwo: wyrób biżuterii z kamieni i kruszców oraz oprawianie kamieni w przedmioty (src/engine/jewelcraft.js).",
+      "required": [
+        "profession",
+        "place",
+        "ores",
+        "itemMinutes",
+        "rarityTime",
+        "speedPerLevel",
+        "fastest",
+        "maxCount",
+        "laterPatternLevel",
+        "chances",
+        "chancePerLevel",
+        "maxChance",
+        "setting",
+        "about",
+        "texts"
+      ],
+      "properties": {
+        "profession": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Profesja wytwórcza, która robi biżuterię."
+        },
+        "place": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "name",
+            "description"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "ores": {
+          "type": "object",
+          "minProperties": 1,
+          "description": "Ile kruszcu bierze jedna sztuka, według miejsca (slots.json). Tylko te miejsca da się wykonać.",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "itemMinutes": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Ile minut trwa pospolita sztuka na 1. poziomie profesji."
+        },
+        "rarityTime": {
+          "type": "number",
+          "minimum": 1,
+          "description": "Ile razy dłużej trwa sztuka każdej rzadkości wyżej."
+        },
+        "speedPerLevel": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 0.1
+        },
+        "fastest": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "maxCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "laterPatternLevel": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "chances": {
+          "type": "object",
+          "description": "Szansa powodzenia sztuki każdej rzadkości (rarities.json) na 1. poziomie profesji.",
+          "additionalProperties": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          }
+        },
+        "chancePerLevel": {
+          "type": "number",
+          "minimum": 0
+        },
+        "maxChance": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1
+        },
+        "setting": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "minutes",
+            "rarityTime"
+          ],
+          "properties": {
+            "minutes": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Ile minut trwa oprawianie kamienia pospolitego na 1. poziomie profesji."
+            },
+            "rarityTime": {
+              "type": "number",
+              "minimum": 1,
+              "description": "Ile razy dłużej trwa oprawianie kamienia każdej rzadkości wyżej."
+            }
+          }
+        },
+        "about": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "craft",
+            "set"
+          ],
+          "properties": {
+            "craft": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "set": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "report",
+            "made",
+            "failed",
+            "stopped",
+            "set",
+            "replaced",
+            "missing",
+            "revealed",
+            "gem",
+            "hidden",
+            "busy",
+            "claimFirst",
+            "pushTitle",
+            "pushBody"
+          ],
+          "properties": {
+            "report": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "made": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "failed": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "stopped": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "set": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "replaced": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "missing": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "revealed": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "gem": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "hidden": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "busy": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "claimFirst": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pushTitle": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "pushBody": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "minerals": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Kamienie szlachetne (gem) i kruszce (ore) z Górnictwa.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "genitive",
+          "level",
+          "perHour",
+          "price",
+          "description"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "kind": {
+            "enum": [
+              "gem",
+              "ore"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "genitive": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rarity": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Kamień: rzadkość biżuterii, którą wyznacza (rarities.json)."
+          },
+          "for": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Kruszec: rzadkości biżuterii, na których oprawy idzie."
+          },
+          "level": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Poziom Górnictwa, od którego się go kopie, i Jubilerstwa, od którego się go szlifuje i oprawia."
+          },
+          "perHour": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "price": {
+            "type": "integer",
+            "minimum": 2
+          },
+          "setBonus": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1,
+            "description": "Kamień: o tyle oprawiony podnosi wszystkie liczby przedmiotu."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
           }
         }
       }

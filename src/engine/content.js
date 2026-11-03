@@ -191,6 +191,14 @@ export function buildContent(raw) {
     potionUse: raw.professions?.potionUse,
     // The gear Rzemieślnictwo makes (workshop.js).
     workshop: raw.professions?.workshop,
+    // Górnictwo with the gems and ores it digs (mining.js), Jubilerstwo,
+    // which makes jewellery of them and sets gems (jewelcraft.js), and the
+    // rows of the Profesje tab's squares.
+    mining: raw.professions?.mining,
+    jewelcrafting: raw.professions?.jewelcrafting,
+    minerals: raw.professions?.minerals ?? [],
+    mineralsById: byId(raw.professions?.minerals ?? []),
+    professionRows: raw.professions?.rows ?? [],
     // The events at the end of an exploration (events.js).
     events: raw.events ?? null,
     eventsById: byId(raw.events?.list ?? []),

@@ -298,7 +298,10 @@ describe('the Warsztat through the API', () => {
     const before = await character();
     const square = before.professions.list.find((profession) => profession.id === 'crafting');
     assert.deepEqual([square.locked, square.unlockLevel, square.soon], [true, 15, false]);
-    assert.ok(before.professions.list.filter((profession) => profession.id !== 'crafting').every((profession) => !profession.locked && profession.unlockLevel === 10));
+    // Zielarstwo and Alchemia open with the tab; Górnictwo and Jubilerstwo at 25.
+    const open = before.professions.list.filter((profession) => !['crafting', 'mining', 'jewelcrafting'].includes(profession.id));
+    assert.deepEqual(open.map((profession) => profession.id), ['herbalism', 'alchemy']);
+    assert.ok(open.every((profession) => !profession.locked && profession.unlockLevel === 10));
     assert.equal(before.professions.workshop, null);
     const order = await craft({ baseId: 'sword', rarity: 'common', count: 1 });
     assert.equal(order.status, 403);
@@ -480,7 +483,13 @@ describe('the Warsztat switched off', () => {
     await call('POST', '/api/character', { cookie, body: { name: 'Zamknieta', classId: 'warrior', appearance: 'female' } });
     await (await db()).prepare(`UPDATE characters SET level = 12, xp = 0, parts = '{"scraps":30}', resources = '{"stone":200,"iron-ore":40}'`).run();
     const { professions, quests } = (await call('GET', '/api/character', { cookie })).data.character;
-    assert.deepEqual(professions.list.map((profession) => [profession.id, profession.soon]), [['herbalism', false], ['alchemy', false], ['crafting', true]]);
+    assert.deepEqual(professions.list.map((profession) => [profession.id, profession.soon]), [
+      ['herbalism', false],
+      ['alchemy', false],
+      ['crafting', true],
+      ['mining', false],
+      ['jewelcrafting', false],
+    ]);
     assert.equal(professions.workshop, null);
     const order = await call('POST', '/api/professions/craft', { cookie, body: { baseId: 'sword', rarity: 'common', count: 1 } });
     assert.equal(order.status, 404);

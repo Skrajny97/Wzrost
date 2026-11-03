@@ -32,6 +32,7 @@
               "size": true,
               "frames": true,
               "fps": true,
+              "scale": { "type": "integer", "minimum": 1, "description": "Ile razy powiększyć klatkę, gdy nie dwa (sceny Kopalni i Szlifierni, rysowane w 256 pikselach, w swojej wielkości)." },
               "place": { "type": "string" },
               "moment": {
                 "type": "object",

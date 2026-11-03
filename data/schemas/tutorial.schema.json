@@ -222,7 +222,13 @@
               "towers-solo",
               "towers-floor",
               "towers-party",
-              "towers-ending"
+              "towers-ending",
+              "mining-welcome",
+              "mining-lead",
+              "mining-dig",
+              "mining-jewels",
+              "mining-setting",
+              "mining-ending"
             ]
           },
           "kind": {
@@ -339,7 +345,8 @@
               "crafting",
               "settlement",
               "evolution",
-              "towers"
+              "towers",
+              "mining"
             ],
             "description": "Część po wprowadzeniu, do której należy kwestia (chapters). Jej kwestie przychodzą dopiero po zakończeniu wprowadzenia, w swoim momencie gry."
           },

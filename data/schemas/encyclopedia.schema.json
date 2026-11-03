@@ -23,7 +23,7 @@
         "additionalProperties": false,
         "required": ["id", "name"],
         "properties": {
-          "id": { "type": "string", "enum": ["bestiary", "items", "potions", "herbs", "materials", "parts"] },
+          "id": { "type": "string", "enum": ["bestiary", "items", "potions", "herbs", "materials", "parts", "minerals"] },
           "name": { "type": "string" }
         }
       }
@@ -61,12 +61,13 @@
     "milestones": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["potions", "herbs", "materials", "parts"],
+      "required": ["potions", "herbs", "materials", "parts", "minerals"],
       "properties": {
         "potions": { "$ref": "#/definitions/counts" },
         "herbs": { "$ref": "#/definitions/counts" },
         "materials": { "$ref": "#/definitions/counts" },
-        "parts": { "$ref": "#/definitions/counts" }
+        "parts": { "$ref": "#/definitions/counts" },
+        "minerals": { "$ref": "#/definitions/counts" }
       }
     },
     "trophy": {

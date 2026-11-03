@@ -87,6 +87,8 @@ import { herbsOf, knownPotionsOf, potionKnown, potionsOf } from './professions-v
 import { trimReports } from './reports.js';
 import { leaveTrip, tripOf } from './trips.js';
 import { finishCrafting } from './workshop.js';
+import { finishJewels } from './jewelcraft.js';
+import { finishMining } from './mining.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
 const resourcePath = (id) => `$."${id}"`;
@@ -459,8 +461,9 @@ export async function cancelHunt(context) {
     throw new ApiError(409, 'claim_first', 'Wyprawa się skończyła. Odbierz raport.');
   }
   const db = context.env.DB;
-  // A brewing or an order in the Warsztat keeps what is done.
-  const stop = { potions: finishBrewing, items: finishCrafting }[activity.kind];
+  // A brewing, an order in the Warsztat or a work of the Szlifiernia keeps
+  // what is done.
+  const stop = { potions: finishBrewing, items: finishCrafting, jewels: finishJewels }[activity.kind];
   if (stop) {
     const stopped = await stop(db, player, context.now, { stop: true });
     return json({
@@ -505,14 +508,15 @@ export async function cancelHunt(context) {
 }
 
 // The report of the activity that ended: an exploration, a gathering of
-// herbs (professions.js), a brewing of potions (brewing.js) or an order of
-// items (workshop.js).
+// herbs (professions.js), a brewing of potions (brewing.js), an order of
+// items (workshop.js), a digging (mining.js) or a work of the Szlifiernia
+// (jewelcraft.js).
 export async function claimHunt(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
   // The option chosen in the event at the exploration's end, if one came.
   const body = (context.request.headers.get('Content-Type') ?? '').startsWith('application/json') ? await readJson(context.request) : {};
-  const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting }[player.activity?.kind];
+  const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels }[player.activity?.kind];
   const done = finish && player.activity.ends_at <= now ? await finish(context.env.DB, player, now) : await finishHunt(context.env.DB, player, now, { choice: body.choice });
   // A work whose recipe or pattern the game no longer has gave back what it
   // took and made no report.

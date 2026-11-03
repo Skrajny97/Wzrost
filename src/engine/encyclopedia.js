@@ -2,8 +2,9 @@
 // so far, in tabs and tiers, each entry with where to get it
 // (data/encyclopedia.json). Its record (`discovered`, characters.discovered)
 // keeps a key for what the character has held: "item:sword" with the best
-// rarity got (the rarity's index + 1), "potion:…", "herb:…", "part:…" and
-// "material:wolf-pelt:rare" for each grade of a material, each 1. A full
+// rarity got (the rarity's index + 1), "potion:…", "herb:…", "part:…",
+// "mineral:…" (Górnictwo's gems and ores) and "material:wolf-pelt:rare" for
+// each grade of a material, each 1. A full
 // set of items, or a count of discoveries reached, opens a chest once
 // (`claimed`, by the chest's id). A material held in the grade of its
 // species and the trophy's grades above it is a trophy: blows against its
@@ -23,8 +24,8 @@ const levels = (from, to) => (from === to ? `${from}` : `${from}–${to}`);
 
 // The keys of what a character holds now: its items, worn or in the bag
 // (each base with the best rarity among them), and its potions, herbs,
-// grades of materials and parts.
-export function heldDiscoveries({ items = [], potions = {}, herbs = {}, materials = {}, parts = {} }, content) {
+// grades of materials, parts and minerals.
+export function heldDiscoveries({ items = [], potions = {}, herbs = {}, materials = {}, parts = {}, minerals = {} }, content) {
   const found = {};
   for (const item of items) {
     if (!Object.hasOwn(content.basesById, item.base)) continue;
@@ -35,6 +36,7 @@ export function heldDiscoveries({ items = [], potions = {}, herbs = {}, material
     ['potion', potions, content.potionsById],
     ['herb', herbs, content.herbsById],
     ['part', parts, content.partsById],
+    ['mineral', minerals, content.mineralsById],
   ]) {
     for (const [id, count] of Object.entries(held)) if (count > 0 && Object.hasOwn(known, id)) found[`${kind}:${id}`] = 1;
   }
@@ -49,7 +51,7 @@ export function heldDiscoveries({ items = [], potions = {}, herbs = {}, material
 // potions, herbs and materials only what is over the pieces got in a trade.
 // `foreign` holds those pieces by key ("herb:comfrey": 2), used up first;
 // it comes back with what is still held of them.
-export function ownDiscoveries({ items = [], potions = {}, herbs = {}, materials = {}, parts = {} }, foreign, content) {
+export function ownDiscoveries({ items = [], potions = {}, herbs = {}, materials = {}, parts = {}, minerals = {} }, foreign, content) {
   const left = {};
   const own = (kind, held) =>
     Object.fromEntries(
@@ -66,6 +68,7 @@ export function ownDiscoveries({ items = [], potions = {}, herbs = {}, materials
       herbs: own('herb', herbs),
       materials: own('material', materials),
       parts,
+      minerals,
     },
     content,
   );
@@ -167,6 +170,7 @@ const TALLIES = {
   materials: (discovered, content) =>
     content.materials.filter((material) => content.rarities.some((rarity) => discovered[`material:${material.id}:${rarity.id}`])).length,
   parts: (discovered, content) => content.parts.filter((part) => discovered[`part:${part.id}`]).length,
+  minerals: (discovered, content) => content.minerals.filter((mineral) => discovered[`mineral:${mineral.id}`]).length,
 };
 
 // Every chest of the Encyklopedia: the item sets with the chest of their
@@ -340,6 +344,25 @@ function partEntry(part, discovered, content) {
   };
 }
 
+// A gem or an ore of Górnictwo: where it is dug from, and what a gem gives
+// jewellery and an item it is set in, or which jewellery an ore sets.
+function mineralEntry(mineral, discovered, content) {
+  const found = Boolean(discovered[`mineral:${mineral.id}`]);
+  const rarityNames = (ids) => ids.map((id) => content.raritiesById[id].name).join(', ');
+  return {
+    id: mineral.id,
+    found,
+    name: found ? mineral.name : text(content, 'unknown'),
+    rarity: mineral.rarity ?? mineral.for[0],
+    description: found ? mineral.description : null,
+    sources: [
+      text(content, 'mineralMine', { level: mineral.level }),
+      found && mineral.kind === 'gem' && text(content, 'mineralGem', { rarity: content.raritiesById[mineral.rarity].name, percent: Math.round(mineral.setBonus * 100) }),
+      found && mineral.kind === 'ore' && text(content, 'mineralOre', { rarities: rarityNames(mineral.for) }),
+    ].filter(Boolean),
+  };
+}
+
 // The tier a character is in on each tab, to unfold first: items by its
 // class level, potions and herbs by the level of their profession, and
 // materials by its level. None without `levels`.
@@ -395,6 +418,7 @@ export function encyclopediaView({ discovered, claimed, met, levels = null }, co
     .sort((a, b) => a.maxLevel - b.maxLevel)
     .map(({ entry, maxLevel }) => ({ ...entry, tier: levelTier(maxLevel, content) }));
   const parts = [...content.parts].sort((a, b) => rarityIndex(a.rarity, content) - rarityIndex(b.rarity, content)).map((part) => partEntry(part, discovered, content));
+  const minerals = [...content.minerals].sort((a, b) => a.level - b.level).map((mineral) => mineralEntry(mineral, discovered, content));
 
   const tabChests = (tab) => chests.filter((entry) => entry.tab === tab).map(chestView);
   return {
@@ -418,5 +442,6 @@ export function encyclopediaView({ discovered, claimed, met, levels = null }, co
       chests: tabChests('materials'),
     },
     parts: { ...count(parts), entries: parts, chests: tabChests('parts') },
+    minerals: { ...count(minerals), entries: minerals, chests: tabChests('minerals') },
   };
 }

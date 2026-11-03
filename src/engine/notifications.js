@@ -1,7 +1,8 @@
 // Phone notifications (src/server/push.js sends them): what a player hears
 // about from a stretch of time, after `from` up to `to`: the exploration,
-// gathering, brewing or order of items that ended, the camp builds that
-// ended and the stores that filled up, which stops their production. Each
+// gathering, brewing, order of items, digging or work in the Szlifiernia
+// that ended, the camp builds that ended and the stores that filled up,
+// which stops their production. Each
 // kind has its tag, and on the phone a newer notification takes the place of
 // an older one with the same tag, so the store's one names every store full
 // at `to`.
@@ -18,6 +19,8 @@ const WORKS = {
   herbs: { url: '#/profesje/zielarstwo', place: 'gathering' },
   potions: { url: '#/profesje/alchemia', place: 'brewing' },
   items: { url: '#/profesje/rzemieslnictwo', place: 'workshop' },
+  minerals: { url: '#/profesje/gornictwo', place: 'mining' },
+  jewels: { url: '#/profesje/jubilerstwo', place: 'jewelcrafting' },
 };
 
 // The notification of a work that ended, the character's or, with
@@ -52,8 +55,9 @@ export function notificationsDue({ level, activity, avatarActivity = null, build
       body: say(texts, 'pushHuntBody', 0, { area: area?.name ?? '' }),
     });
   }
-  // A gathering of herbs (professions.js), a brewing of potions (brewing.js)
-  // and an order of items (workshop.js), told the same way, and so the work
+  // A gathering of herbs (professions.js), a brewing of potions (brewing.js),
+  // an order of items (workshop.js), a digging (mining.js) and a work in the
+  // Szlifiernia (jewelcraft.js), told the same way, and so the work
   // of the Awatar Systemu (avatar.js), under its own title and tag.
   for (const work of [workNotice(activity, from, to, content), workNotice(avatarActivity, from, to, content, true)]) {
     if (work) due.push(work);

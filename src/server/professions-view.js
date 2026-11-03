@@ -13,12 +13,20 @@ import {
   craftableBases,
   fightKind,
   gatheringMinutes,
+  gemOf,
   herbSlots,
   herbsPerHour,
   isUnlocked,
   itemMinutes,
+  jewelBases,
+  jewelChance,
+  jewelMinutes,
+  jewelPatternLevel,
   materialView,
+  mineralsPerHour,
+  miningMinutes,
   mostPotions,
+  oreOf,
   parseStack,
   partSource,
   patternLevel,
@@ -30,7 +38,9 @@ import {
   professionUnlockLevel,
   professionXpToNext,
   scrollMinutes,
+  setMinutes,
   timedKind,
+  veinGoldPerHour,
 } from '../engine/index.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn } from './features.js';
@@ -40,6 +50,33 @@ import { say } from '../engine/text.js';
 // them.
 export const herbsOf = (row) => JSON.parse(row.herbs ?? '{}');
 export const potionsOf = (row) => JSON.parse(row.potions ?? '{}');
+// The gems and ores of Górnictwo, by id, which take no room in the bag.
+export const mineralsOf = (row) => JSON.parse(row.minerals ?? '{}');
+
+// A mineral's colour: a gem's rarity's, an ore's that of the first rarity
+// whose jewellery it sets.
+const mineralColor = (mineral) => content.raritiesById[mineral.rarity ?? mineral.for[0]].color;
+
+// The minerals in the bag, one entry for each, with the scrapper's price of
+// one at the camp's Skup złomu (sellBonus), as the herbs; a gem with the
+// rarity it gives jewellery and its bonus when set.
+export function bagMinerals(row, sellBonus) {
+  const minerals = mineralsOf(row);
+  return content.minerals
+    .filter((mineral) => (minerals[mineral.id] ?? 0) > 0)
+    .map((mineral) => ({
+      id: mineral.id,
+      kind: mineral.kind,
+      name: mineral.name,
+      description: mineral.description,
+      count: minerals[mineral.id],
+      price: mineral.price * (1 + sellBonus),
+      color: mineralColor(mineral),
+      ...(mineral.kind === 'gem'
+        ? { rarityName: content.raritiesById[mineral.rarity].name, bonus: mineral.setBonus }
+        : { rarityNames: mineral.for.map((id) => content.raritiesById[id].name) }),
+    }));
+}
 
 // A recipe's catalyst (proposal 3: "Wybrane mikstury biorą jeden materiał
 // stwora"): the material, and the grades of it the character has, each with
@@ -208,6 +245,97 @@ export function professionsView(row) {
       ),
     },
     workshop: craftingOn() && professionOpen(content.professionsById[workshop.profession], row.level, content) ? workshopView(crafter.level, row) : null,
+    // The squares' rows on the tab, gathering over crafting.
+    rows: content.professionRows,
+    // Górnictwo and Jubilerstwo, from their level (25 for both).
+    mining: professionOpen(content.professionsById[content.mining.profession], row.level, content)
+      ? miningView(professionState(professions, content.mining.profession).level, row)
+      : null,
+    jewelcrafting: professionOpen(content.professionsById[content.jewelcrafting.profession], row.level, content)
+      ? jewelView(professionState(professions, content.jewelcrafting.profession).level, row)
+      : null,
+  };
+}
+
+// The Systemowa Kopalnia at a level of Górnictwo: its place, the slider, the
+// gold of the veins an hour at the character's level, the words under "Jak
+// to działa?", and each mineral, known (with how many an hour and in the
+// bag) or hidden by the System.
+function miningView(level, row) {
+  const { mining } = content;
+  const minerals = mineralsOf(row);
+  const percent = (share) => String(Math.round(share * 100));
+  return {
+    professionId: mining.profession,
+    place: mining.place,
+    minutes: miningMinutes(content),
+    spread: mining.spread,
+    veinsPerHour: mining.veins.perHour,
+    goldPerHour: veinGoldPerHour(row.level, content),
+    about: mining.about.map((_, index) => say(mining, 'about', index, { yield: percent(mining.yieldPerLevel), share: percent(mining.veins.share) })),
+    minerals: content.minerals.map((mineral) =>
+      mineral.level <= level
+        ? {
+            id: mineral.id,
+            kind: mineral.kind,
+            name: mineral.name,
+            level: mineral.level,
+            color: mineralColor(mineral),
+            perHour: mineralsPerHour(mineral, level, content),
+            count: minerals[mineral.id] ?? 0,
+          }
+        : { id: mineral.id, kind: mineral.kind, level: mineral.level, hidden: true, hint: say(mining.texts, 'hidden', 0, { level: mineral.level }) },
+    ),
+  };
+}
+
+// The Systemowa Szlifiernia at a level of Jubilerstwo: its place and the
+// words under "Jak to działa?"; the slots with their patterns, known or
+// hidden; each rarity with its gem and ore (and how many the character has),
+// and, once its gem is known, the chance and the minutes of one jewel; and
+// the gems to set, with their bonus and the minutes of setting one, or the
+// level the System shows them at.
+function jewelView(level, row) {
+  const { jewelcrafting } = content;
+  const minerals = mineralsOf(row);
+  const hint = (from) => say(jewelcrafting.texts, 'hidden', 0, { level: from });
+  const bases = jewelBases(content);
+  const owned = (mineral) => ({ id: mineral.id, name: mineral.name, have: minerals[mineral.id] ?? 0 });
+  return {
+    professionId: jewelcrafting.profession,
+    place: jewelcrafting.place,
+    maxCount: jewelcrafting.maxCount,
+    about: jewelcrafting.about,
+    slots: Object.keys(jewelcrafting.ores).map((slotId) => ({
+      id: slotId,
+      name: content.slotsById[slotId].name,
+      ores: jewelcrafting.ores[slotId],
+      patterns: bases
+        .filter((base) => base.slot === slotId)
+        .map((base) => {
+          const from = jewelPatternLevel(base, content);
+          return from > level ? { id: base.id, level: from, hidden: true, hint: hint(from) } : { id: base.id, name: base.name, level: from, classLevel: base.classLevel ?? null };
+        }),
+    })),
+    rarities: content.rarities.map((rarity) => {
+      const gem = gemOf(rarity.id, content);
+      return {
+        id: rarity.id,
+        name: rarity.name,
+        color: rarity.color,
+        level: gem.level,
+        gem: owned(gem),
+        ore: owned(oreOf(rarity.id, content)),
+        ...(gem.level <= level ? { chance: jewelChance(rarity.id, level, content), itemMinutes: jewelMinutes(rarity.id, level, content) } : { hidden: true, hint: hint(gem.level) }),
+      };
+    }),
+    gems: content.minerals
+      .filter((mineral) => mineral.kind === 'gem')
+      .map((gem) =>
+        gem.level <= level
+          ? { id: gem.id, name: gem.name, color: mineralColor(gem), bonus: gem.setBonus, have: minerals[gem.id] ?? 0, minutes: setMinutes(gem.id, level, content) }
+          : { id: gem.id, level: gem.level, hidden: true, hint: hint(gem.level) },
+      ),
   };
 }
 
