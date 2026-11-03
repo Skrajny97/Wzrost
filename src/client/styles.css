@@ -10290,6 +10290,12 @@ a.profession-square:active {
   opacity: 0.55;
 }
 
+/* The pool of a stake just chosen is on its way: the old one waits dimmed. */
+.casino-pool--waiting {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 .market-pick {
   display: flex;
   align-items: center;

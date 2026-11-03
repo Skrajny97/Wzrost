@@ -4,17 +4,20 @@
 // The Loteria's tickets wait in their own table, one a character a day, and
 // the minute's cron draws each day gone by once (drawLotteries): the winner
 // gets the whole pot, the draw is written down, and the Globalny gets the
-// System's message about it. The Wheel's pool of the day is kept in the
-// character's Osada (`casino` in characters.settlement), drawn the first
-// time the character looks at the Salon that day. Every purchase and spin is
-// one batch whose first statement fails it unless the character is still as
-// read, so two taps never pay twice nor win twice.
+// System's message about it. The character's Wheel of the day (the basis
+// its pools are drawn from and the prizes won at each stake) is kept in its
+// Osada (`casino` in characters.settlement), from the first time the
+// character looks at the Salon that day; every stake's pool is drawn from it
+// again when asked. Every purchase and spin is one batch whose first
+// statement fails it unless the character is still as read, so two taps
+// never pay twice nor win twice.
 
 import {
   bagCapacity,
   campBonus,
   campLevels,
   casinoDay,
+  dayStakes,
   gendered,
   itemName,
   itemView,
@@ -29,8 +32,9 @@ import {
   tanneryPremium,
   ticketBlock,
   wheelChance,
-  wheelPrizes,
-  wheelToday,
+  wheelDay,
+  wheelPool,
+  wheelWon,
 } from '../engine/index.js';
 import { assertion, atomically, raced } from './atomic.js';
 import { bagPlaces, characterView, engineCharacter, loadPlayer, requirePlayer } from './characters.js';
@@ -60,16 +64,27 @@ function bonusesOf(player, stored, now) {
   };
 }
 
-// The character's pool of the day: the one kept in its Osada, or one drawn
-// now from the character and the day.
-const poolOf = (player, stored, now) =>
-  wheelToday(stored.casino, now, content) ?? wheelPrizes({ character: engineCharacter(player.row), seed: `${player.row.id}:casino`, ...bonusesOf(player, stored, now) }, now, content);
+// The character's own seed of the Wheel's pools.
+const seedOf = (row) => `${row.id}:casino`;
 
-// A new pool is kept in the Osada at once, as the Tablica's board is
-// (settlement.js), only over the Osada as read.
-async function keepPool(db, row, stored, pool) {
-  if (stored.casino?.day === pool.day) return;
-  await db.prepare('UPDATE characters SET settlement = ? WHERE id = ? AND settlement IS ?').bind(JSON.stringify({ ...stored, casino: pool }), row.id, row.settlement ?? null).run();
+// The character's Wheel of the day: the one kept in its Osada, or a new one
+// from the character as it is now.
+function wheelOf(player, stored, now) {
+  const { level, classId, classLevel } = engineCharacter(player.row);
+  return wheelDay(stored.casino, { level, classId, classLevel, ...bonusesOf(player, stored, now) }, now, content);
+}
+
+// A new Wheel of the day is kept in the Osada at once, as the Tablica's
+// board is (settlement.js), only over the Osada as read.
+async function keepWheel(db, row, stored, wheel) {
+  if (stored.casino?.day === wheel.day && stored.casino.basis) return;
+  await db.prepare('UPDATE characters SET settlement = ? WHERE id = ? AND settlement IS ?').bind(JSON.stringify({ ...stored, casino: wheel }), row.id, row.settlement ?? null).run();
+}
+
+// The stake asked for when it is one of the day's, or else the lowest.
+function stakeOf(wheel, asked) {
+  const stakes = dayStakes(wheel, content);
+  return stakes.includes(asked) ? asked : stakes[0];
 }
 
 // The bag's free places, for an item of the pool.
@@ -124,20 +139,21 @@ async function lotteryView(db, row, now) {
 }
 
 // The Salon for the page: its words, the Loteria and the Wheel with the
-// character's pool of the day.
-async function casinoView(db, player, stored, pool, now) {
+// day's stakes and the pool of the stake shown.
+async function casinoView(db, player, stored, wheel, stake, now) {
   const bonuses = bonusesOf(player, stored, now);
-  const { wheel, texts } = tuning();
+  const { wheel: tuned, texts } = tuning();
+  const pool = wheelPool(wheel, seedOf(player.row), stake, content);
   const left = prizesLeft(pool);
   return {
     texts,
     lottery: await lotteryView(db, player.row, now),
     wheel: {
-      name: wheel.name,
-      minStake: wheel.minStake,
-      maxStake: wheel.maxStake,
-      chancePerGold: wheel.chancePerGold,
-      prizeOver: wheel.prizeOver,
+      name: tuned.name,
+      step: tuned.step,
+      chance: wheelChance(content),
+      stakes: dayStakes(wheel, content),
+      stake,
       endsAt: casinoDay(now, content).endsAt,
       prizes: pool.prizes.map((prize, index) => prizeView(prize, pool.won.includes(index), bonuses)),
       left: left.length,
@@ -147,32 +163,39 @@ async function casinoView(db, player, stored, pool, now) {
   };
 }
 
-// What the Salon answers with: itself and the character, as they are now.
-async function respond(context, session, extra = {}, player = null) {
+// What the Salon answers with: itself, with the Wheel at the stake asked
+// for (stakeOf), and the character, as they are now.
+async function respond(context, session, asked, extra = {}, player = null) {
   const db = context.env.DB;
   const now = context.now;
   const current = player ?? (await loadPlayer(db, session.userId));
   const stored = settlementOf(current.row);
-  const pool = poolOf(current, stored, now);
-  await keepPool(db, current.row, stored, pool);
-  return json({ ...extra, casino: await casinoView(db, current, stored, pool, now), character: characterView(current, now) });
+  const wheel = wheelOf(current, stored, now);
+  await keepWheel(db, current.row, stored, wheel);
+  return json({ ...extra, casino: await casinoView(db, current, stored, wheel, stakeOf(wheel, asked), now), character: characterView(current, now) });
 }
 
-// GET /api/settlement/casino: the Salon Gier for the page.
+// GET /api/settlement/casino?stake=N: the Salon Gier for the page, with the
+// Wheel's pool at the stake N (the lowest when N is not one of the day's).
 export async function getCasino(context) {
   const { session, player } = await requirePlayer(context);
   requireOpen(player.row);
-  return respond(context, session, {}, player);
+  return respond(context, session, Number(new URL(context.request.url).searchParams.get('stake')), {}, player);
 }
 
-// POST /api/settlement/casino/ticket: today's ticket of the Loteria, one a
-// day, for its price, which goes to the pot. The relation with Szczęsny
-// grows with it. Also while the character is away, as a mug at the Karczma.
-// Never for a day already drawn (a ticket bought as midnight strikes).
+// POST /api/settlement/casino/ticket { stake }: today's ticket of the
+// Loteria, one a day, for its price, which goes to the pot (`stake` is only
+// the Wheel's shown, for the answer). The relation with Szczęsny grows with
+// it. Also while the character is away, as a mug at the Karczma. Never for a
+// day already drawn (a ticket bought as midnight strikes).
 export async function buyTicket(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
+  const asked = await readJson(context.request).then(
+    (body) => body?.stake,
+    () => null,
+  );
   const db = context.env.DB;
   const day = casinoDay(context.now, content).key;
   const has = await db.prepare('SELECT 1 AS ok FROM lottery_tickets WHERE day = ? AND character_id = ?').bind(day, row.id).first();
@@ -195,14 +218,14 @@ export async function buyTicket(context) {
     ],
     changed,
   );
-  return respond(context, session, { ticket: { day, gold: lottery.ticket } });
+  return respond(context, session, asked, { ticket: { day, gold: lottery.ticket } });
 }
 
-// POST /api/settlement/casino/spin { stake }: the Wheel at a stake of whole
-// gold. The stake goes whatever comes; a win takes one of the pool's
-// prizes left: an item to the bag, as one from the Wymiana, or materials,
-// as bought ones the Encyklopedia leaves out. Also while the character is
-// away: the bag stays at hand, as at the Targowisko.
+// POST /api/settlement/casino/spin { stake }: the Wheel at one of the day's
+// stakes. The stake goes whatever comes; a win takes one of the stake's
+// pool's prizes left: an item to the bag, as one from the Wymiana, or
+// materials, as bought ones the Encyklopedia leaves out. Also while the
+// character is away: the bag stays at hand, as at the Targowisko.
 export async function spinCasinoWheel(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -210,16 +233,18 @@ export async function spinCasinoWheel(context) {
   const body = await readJson(context.request);
   const now = context.now;
   const stored = settlementOf(row);
-  const pool = poolOf(player, stored, now);
+  const wheel = wheelOf(player, stored, now);
+  const stakes = dayStakes(wheel, content);
+  const stake = body.stake;
+  const pool = stakes.includes(stake) ? wheelPool(wheel, seedOf(row), stake, content) : { prizes: [], won: [] };
   const left = prizesLeft(pool);
   const itemLeft = left.some((index) => pool.prizes[index].kind === 'item');
-  const block = spinBlock(body.stake, { gold: row.gold, left: left.length, itemLeft, bagFree: bagFree(player, now) }, content);
+  const block = spinBlock(stake, { gold: row.gold, stakes, left: left.length, itemLeft, bagFree: bagFree(player, now) }, content);
   if (block) throw new ApiError(block.code === 'invalid_stake' ? 400 : 409, block.code, block.message);
-  const stake = body.stake;
   // The spin's own seed, which nobody knows before it.
-  const result = spinWheel(stake, left, newSeed(), content);
+  const result = spinWheel(left, newSeed(), content);
   const prize = result.win ? pool.prizes[result.prize] : null;
-  const next = { ...stored, casino: { ...pool, won: result.win ? [...pool.won, result.prize] : pool.won } };
+  const next = { ...stored, casino: result.win ? wheelWon(wheel, stake, result.prize) : wheel };
   const db = context.env.DB;
   const statements = [assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT gold FROM characters WHERE id = ?) >= ?', [row.id, row.version, row.id, stake])];
   if (prize?.kind === 'material') {
@@ -236,7 +261,7 @@ export async function spinCasinoWheel(context) {
   }
   await atomically(db, statements, changed);
   const bonuses = bonusesOf(player, stored, now);
-  return respond(context, session, { spin: { stake, chance: wheelChance(stake, content), win: result.win, prize: prize && prizeView(prize, true, bonuses) } });
+  return respond(context, session, stake, { spin: { stake, chance: wheelChance(content), win: result.win, prize: prize && prizeView(prize, true, bonuses) } });
 }
 
 // The draw of each day gone by with tickets, at the minute's cron, so at

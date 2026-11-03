@@ -3058,7 +3058,30 @@ Autor: „542 C skalowanie złota wraz z dostępnymi wygranymi, ale można nic n
    - Każda stawka ma własną dzienną pulę 5 nagród. Każda nagroda jest warta więcej niż stawka i najwyżej jej dwa razy tyle, więc średnio Koło oddaje mniej, niż bierze, a zarobić można tylko z dużym szczęściem.
    - Najwyższa stawka to najwyższa setka, przy której w puli zmieści się choć jeden przedmiot dla postaci („skalowanie złota wraz z dostępnymi wygranymi”).
    - Dzięki temu przedmioty są w puli na każdym poziomie, także po 100. Zastępuje to stawkę od 1 do 100 zł z szansą równą połowie stawki (525 A).
-2. **Kwestie narratora (543).** Kwestia o Loterii zostaje. Kwestia o Kole Fortuny ma nowe brzmienie, zgodne z 542 C, i czeka na zatwierdzenie autora.
+2. **Kwestie narratora (543).** Kwestia o Loterii zostaje. Kwestia o Kole Fortuny ma nowe brzmienie, zgodne z 542 C, i czeka na zatwierdzenie autora. Salon wchodzi do gry bez kwestii narratora, a rozdział o nim dojdzie po zatwierdzeniu i nagraniu obu kwestii.
+3. **Przedmioty w puli (brakujący szczegół).** Przedmiot w puli ma rzadkość od rzadkiej do legendarnej (`topItemRarity`), najrzadszą, którą złomiarz wycenia tej postaci powyżej stawki i najwyżej na dwie stawki. Przedmioty mityczne i boskie zostają dla łupów. Pierwsza nagroda puli jest przedmiotem zawsze, gdy jakiś pasuje, a każda kolejna z szansą 50%. Pula z przedmiotami ma ich więc zawsze co najmniej jeden, a średnio trzy.
+4. **Stawki rosną z poziomem.** Bez Skupu złomu:
+   - 25. poziom: od 100 do 300 zł;
+   - 30. poziom: do 400 zł;
+   - 50. poziom: do 700 zł;
+   - 100. poziom: do 1500 zł;
+   - 150. poziom przy pełnym Skupie złomu: do 4700 zł.
+
+   Od 101. poziomu, a przy Skupie złomu wcześniej, najniższe stawki mają w puli same materiały, bo każdy przedmiot na poziomie postaci jest wart więcej niż dwie stawki. Najwyższa stawka to najwyżej 10 000 zł (`maxSteps`).
+5. **Materiały w puli.** Materiałów jest tyle sztuk, ile najmniej trzeba, żeby w Garbarni były warte więcej niż stawka. Na przykład epicka skóra wilka u Obcego, bez Skupu złomu: 6 sztuk przy 100 zł i 18 przy 300 zł.
+6. **Ile Koło oddaje.** Średnia z 300 pul, policzona silnikiem gry:
+   - 25. poziom: nagroda warta średnio 1,6 stawki przy 100 i 200 zł, a 1,2 stawki przy 300 zł. Zakręcenie oddaje średnio 82%, 81% i 61% stawki.
+   - 50. poziom: 1,6 stawki przy 100 i 200 zł, a 1,1 przy 700 zł. Zakręcenie oddaje 81–82%, a przy 700 zł 54%.
+   - 150. poziom przy pełnym Skupie złomu: 1,35 stawki przy 100 zł (same materiały), a 1,01 przy 4700 zł. Zakręcenie oddaje 67% i 51%.
+
+   Koło zawsze zabiera więc z gry od ok. 18% do 49% stawek w złocie. Nagrody są jednak w użyciu warte więcej, niż płaci za nie złomiarz.
+7. **Dzień Koła (brakujący szczegół).** Przy pierwszym zajrzeniu danego dnia Koło zapamiętuje w Osadzie postać: poziom, klasę, poziom klasy, premię Skupu złomu i premię Garbarni. Do północy z tego zapisu biorą się stawki i pule wszystkich stawek. Awans w ciągu dnia nie zmienia więc ani stawek, ani nagród. Osada trzyma tylko ten zapis i wygrane miejsca każdej stawki, a pulę wybranej stawki silnik losuje od nowa za każdym razem tak samo. Pule wszystkich stawek nie zajmują więc miejsca w bazie.
+8. **Wygląd Salonu.** Autor: „Zadbaj o intuicyjne GUI jeśli chodzi o Salon Gier bo na screenach widzę znowu dużo scrollowania, opisy chowaj jak zawsze pod 'Jak to działa?'”.
+   - Salon ma dwie zakładki: „Loteria” i „Koło Fortuny”. Na początku otwiera się Loteria, a po kupnie dzisiejszego losu Koło Fortuny.
+   - Loteria pokazuje pulę i liczbę losów, przycisk „Kup los” i ostatnie losowanie w jednej linijce.
+   - Koło pokazuje „Stawka: 300 zł · szansa 50%”, przyciski „−” i „+” z suwakiem po stawkach dnia, przycisk „Zakręć Kołem” i pulę tej stawki z nagłówkiem „Pula przy stawce 300 zł: zostało 4 z 5”.
+   - Zasady obu gier są pod „Jak to działa?”.
+   - Po zmianie stawki pula nowej stawki przychodzi z serwera. Do tej chwili stara jest przygaszona, a przycisk „Zakręć Kołem” czeka.
 
 ## Chowańce: odpowiedzi autora 540 i 541 (3.11.2026)
 
@@ -3083,16 +3106,16 @@ Odpowiedzi autora na pytania z wpisu „Salon Gier w Osadzie: prośba autora”:
     - (brakujący szczegół) Los kupiony tuż przed północą, który dotarłby do bazy już po losowaniu tego dnia, nie przechodzi, a złoto zostaje u postaci. Los usuniętej postaci znika razem z nią i nie bierze udziału w losowaniu.
     - (brakujący szczegół) Wygrana trafia od razu do złota postaci, także odłożonej (Pięć postaci na koncie).
 4. **Komunikat Systemu w czacie (brakujący szczegół).** Każda wiadomość czatu w bazie ma konto i postać, więc komunikat stoi pod kontem i postacią zwycięzcy, ze znakiem `system` (migracja 0073). Czat pokazuje go jako „[ SYSTEM ]” w barwach Systemu, bez imienia, profilu i przycisków. Nikt go nie zgłosi ani nie ukryje, nie wycisza zwycięzcy i nie blokuje mu pisania, a kropkę czatu zapala wszystkim, także zwycięzcy. Moderacja może go usunąć. Usunięta postać zabiera go ze sobą, jak swoje wiadomości.
-5. **Koło Fortuny (525 A).** Stawka od 1 do 100 zł, w całych sztukach złota. Szansa na wygraną to połowa stawki w procentach: 100 zł daje 50%, 50 zł 25%, a 10 zł 5%. Przegrana stawka przepada. Stawkę wybiera się suwakiem z przyciskami „−” i „+”, jak u ducha ognia.
+5. **Koło Fortuny (525 A).** *Stawki i szansę zastąpiła odpowiedź 542 C: zob. „Salon Gier: odpowiedzi autora 542 i 543”.* Stawka od 1 do 100 zł, w całych sztukach złota. Szansa na wygraną to połowa stawki w procentach: 100 zł daje 50%, 50 zł 25%, a 10 zł 5%. Przegrana stawka przepada. Stawkę wybiera się suwakiem z przyciskami „−” i „+”, jak u ducha ognia.
     - (brakujący szczegół) Wygrana zabiera jedną z pozostałych nagród puli, każdą tak samo prawdopodobną. Każde zakręcenie ma własne ziarno serwera, więc wyniku nie da się przewidzieć.
     - (brakujący szczegół) Przedmiot z puli trafia do plecaka. Dopóki w puli czeka przedmiot, Koło nie kręci się przy pełnym plecaku. Same materiały nie zajmują miejsca.
     - (brakujący szczegół) Loteria i Koło działają także w czasie wyprawy i pracy w profesji, jak handel na Targowisku.
-6. **Pula nagród (526 A).** Każda postać ma własną pulę 5 nagród na dobę. Pula losuje się z postaci i doby przy pierwszym zajrzeniu do Salonu tego dnia i zostaje do północy (`casino` w `characters.settlement`), więc nie zmienia się po awansie w ciągu dnia. Salon pokazuje całą dzisiejszą pulę, a wygrane nagrody są przygaszone. Pusta pula czeka do północy.
+6. **Pula nagród (526 A).** *Po 542 C każda stawka ma własną pulę, a nagrody są warte więcej niż stawka: zob. „Salon Gier: odpowiedzi autora 542 i 543”.* Każda postać ma własną pulę 5 nagród na dobę. Pula losuje się z postaci i doby przy pierwszym zajrzeniu do Salonu tego dnia i zostaje do północy (`casino` w `characters.settlement`), więc nie zmienia się po awansie w ciągu dnia. Salon pokazuje całą dzisiejszą pulę, a wygrane nagrody są przygaszone. Pusta pula czeka do północy.
     - (brakujący szczegół) Każda nagroda to z szansą 50% przedmiot, a inaczej materiały.
     - (brakujący szczegół) Przedmiot jest dla klasy postaci, na jej poziomie, z baz do jej poziomu klasy. Jego rzadkość to najwyższa od rzadkiej w górę, przy której złomiarz płaci za niego tej postaci ponad 100 zł, ale nie więcej niż 200 zł (z premią Skupu złomu, jak podaje karta przedmiotu). Bez Skupu złomu to przedmiot epicki na 20.–25. poziomie, unikalny na 26.–50. i rzadki na 51.–100. Od 101. poziomu, a przy wysokim Skupie złomu wcześniej (przy pełnym od 51.), każdy przedmiot na poziomie postaci jest u złomiarza wart więcej niż 200 zł, więc pula ma same materiały.
     - (brakujący szczegół) Materiały są ze zwykłych stworów, bez trofeów elit i czempionów, jak w Garbarni i w zleceniach. Pochodzą z krain, które postać zna: z każdej krainy, w której klasa ma otwarty choć jeden region wewnętrzny, także od stworów jeszcze niespotkanych. Mają rzadkość epicką (3 na 4) albo legendarną (1 na 4), nigdy niższą niż rzadkość gatunku. Materiał jednego stwora jest w puli najwyżej raz. Sztuk jest tyle, ile najmniej trzeba, żeby w Garbarni były warte ponad 100 zł przy relacji postaci z Wszeborem: np. 6 epickich albo 3 legendarne u Obcego bez Skupu złomu, a 3 epickie albo 2 legendarne przy pełnym Skupie i u Przyjaciela.
     - (brakujący szczegół) Wygrane przedmioty i materiały liczą się jak towar z wymiany, więc Encyklopedia ich nie zalicza.
-7. **Wartość zakręcenia.** Wygrana kosztuje średnio tyle, ile stawka podzielona przez szansę, czyli zawsze 200 zł, przy każdej stawce. Żadna nagroda nie jest dla postaci warta więcej, ani u złomiarza, ani w Garbarni. Koło nigdy nie oddaje więc średnio więcej złota, niż bierze, i nie da się na nim zarabiać złota. Średnia z 400 pul na każdy poziom, policzona silnikiem gry (bez Skupu złomu, u Obcego):
+7. **Wartość zakręcenia.** *Liczby po 542 C: zob. „Salon Gier: odpowiedzi autora 542 i 543”, punkt 6.* Wygrana kosztuje średnio tyle, ile stawka podzielona przez szansę, czyli zawsze 200 zł, przy każdej stawce. Żadna nagroda nie jest dla postaci warta więcej, ani u złomiarza, ani w Garbarni. Koło nigdy nie oddaje więc średnio więcej złota, niż bierze, i nie da się na nim zarabiać złota. Średnia z 400 pul na każdy poziom, policzona silnikiem gry (bez Skupu złomu, u Obcego):
     - 20. poziom: nagroda warta średnio 132 zł, zakręcenie za 100 zł oddaje średnio 66 zł (−34 zł), za 10 zł 6,6 zł (−3,4 zł);
     - 30. poziom: 113 zł, czyli −44 zł za 100 zł (ze Skupem złomu 6 i u Stałego klienta 158 zł, czyli −21 zł);
     - 50. poziom: 153 zł, −24 zł;
