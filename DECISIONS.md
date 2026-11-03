@@ -3034,6 +3034,16 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.18 (3.11.2026)
+
+1. **Górnictwo i Jubilerstwo** od 25. poziomu postaci, obie naraz (zob. „Górnictwo i Jubilerstwo: odpowiedzi autora 534–539”, „Górnictwo i Jubilerstwo: budowa” oraz „Górnictwo i Jubilerstwo: rozdział narratora i sceny pracy”).
+   - Systemowa Kopalnia: kamienie szlachetne, kruszce i żyły złota.
+   - Systemowa Szlifiernia: biżuteria (pierścienie, amulety, talizmany) i oprawianie kamieni w noszone przedmioty.
+   - Zakładka „Minerały” w plecaku i w Encyklopedii.
+2. **Rozdział narratora** o obu profesjach, z nagraniami, które autor wybrał (557.1 B, 557.2 A, 557.3 B, 557.4 B, 557.5 A, 557.6 B).
+3. **Sceny pracy** Kopalni i Szlifierni w 256 px, zatwierdzone przez autora: „Kopalnia 564 jest okey”, „565 OK”.
+4. **Zapis:** migracja 0074 dodaje kolumnę `minerals`.
+
 ## Wersja 0.1.17 (3.11.2026)
 
 1. **Komputer: w prawej kolumnie sam czat.** Zadania od narratora nie stoją już nad czatem. Rozwijają się jako pergamin z twarzy narratora w górnym pasku, tak jak na telefonie, a kropka na twarzy pokazuje, że coś czeka do odebrania. Czat zajmuje całą wysokość kolumny, z zakładkami Globalny, Wymiana i Gildia. Uwaga testera przekazana przez autora: „nie uwazasz ze ta kratka z zadaniami powinna byc rozwijana/zwijana albo w innym miejscu typu na gorze obok encyklopedii a tam na boku po dlugosci chat z przelaczeniami”. Autor: „562 B”. Zmienia to układ z 505–508 A tylko w tej jednej kolumnie.
@@ -3184,7 +3194,7 @@ Autor: „Trzeba zrobić animację jeszcze do koła fortuny wyświetlającą si�
    - Tło każdej klatki jest z pierwszej, więc ściany, belki i stół stoją w miejscu. Ruszają się tylko postać, kilof albo dłonie z kamieniem, iskry i światło latarni.
    - Scena Szlifierni ma drugie podejście: w pierwszym dłonie puszczały tarczę w połowie pętli, a na stole wyrastała świeca, której nie ma w pierwszej klatce.
    - W grze arkusz 256 px stoi w swojej wielkości (`scale: 1` w `data/animations.json`), więc zajmuje tyle miejsca co sceny 128 px pokazane dwa razy większe, ale jest dwa razy dokładniejszy.
-   - Wchodzą do gry po zatwierdzeniu przez autora. Szlifiernia: „565 OK”. Kopalnia (564) czeka na odpowiedź.
+   - Autor zatwierdził obie: „Kopalnia 564 jest okey” i „565 OK”. Weszły do gry z wersją 0.1.18.
    - PixelLab doładowany przez autora (563 A: „PixelLab doładowane”), więc obie sceny są z PixelLab, bez Retro Diffusion.
 
 ## Górnictwo i Jubilerstwo: budowa (3.11.2026, odpowiedzi 531–539)
