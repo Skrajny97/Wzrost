@@ -3,15 +3,16 @@
   "name": "Rozstaje",
   "description": "Osada na skrzyżowaniu leśnych dróg, za puszczą. Ludzie stąd handlują ze wszystkimi, którzy wychodzą z lasu żywi.",
   "places": [
-    { "id": "board", "name": "Tablica zleceń", "x": 78, "y": 22, "resident": "headman" },
+    { "id": "board", "name": "Tablica zleceń", "x": 78, "y": 19, "resident": "headman" },
     { "id": "enchanter", "name": "Pracownia Zaklinaczki", "x": 21, "y": 23, "resident": "enchantress" },
     { "id": "hermitage", "name": "Chata Pustelnika", "x": 78, "y": 81, "resident": "hermit", "flip": true },
-    { "id": "stable", "name": "Stajnia", "x": 80, "y": 62, "resident": "groom" },
-    { "id": "tavern", "name": "Karczma", "x": 84, "y": 43, "resident": "innkeeper" },
+    { "id": "stable", "name": "Stajnia", "x": 80, "y": 64, "resident": "groom" },
+    { "id": "tavern", "name": "Karczma", "x": 84, "y": 48.5, "resident": "innkeeper" },
     { "id": "market", "name": "Targowisko", "x": 45.5, "y": 46, "resident": "merchant" },
     { "id": "tannery", "name": "Garbarnia", "x": 13, "y": 53, "resident": "tanner", "flip": true },
     { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist", "flip": true },
-    { "id": "forge", "name": "Kuźnia", "x": 56, "y": 31, "resident": "smith" }
+    { "id": "forge", "name": "Kuźnia", "x": 56, "y": 31, "resident": "smith" },
+    { "id": "casino", "name": "Salon Gier", "x": 83, "y": 33.5, "resident": "gamehost" }
   ],
   "torches": [
     { "x": 32, "y": 12.5 },
@@ -79,7 +80,8 @@
     { "id": "herbalist", "name": "Jagna", "title": "zielarka", "story": "Zbiera zioła od świtu i suszy je pod strzechą. Za dobre zioła potrafi solidnie zapłacić, a zaufanym zdradza rzadkie receptury.", "greetings": ["Zioła przynosisz? Pokaż, co masz w koszyku. Za dobre płacę więcej niż złomiarz.", "O, znowu ty. Rumianek mi się kończy, a mikstur nigdy dość.", "Siadaj przy piecu. Najpierw zioła, potem herbata.", "Tobie płacę jak swoim. Kiedyś pokażę ci, co warzę w tym kotle.", "Dla przyjaciół drzwi mojej chaty zawsze otwarte, a kocioł zawsze ciepły."] },
     { "id": "tanner", "name": "Wszebor", "title": "garbarz", "story": "Pół życia tropił zwierzynę w puszczy, a teraz wyprawia skóry dla łowców z Rozstajów. Skupuje wszystko, co zostaje ze stworów: skóry, łuski, pióra i kły, a komu brakuje materiałów do zlecenia, sprzedaje je ze swoich zapasów.", "greetings": ["Nie zatykaj nosa, do zapachu się przywyka. Masz coś ze stworów? Za porządny towar płacę więcej niż złomiarz.", "O, znowu ty. Wilcze skóry schodzą mi na pniu, więc przynoś, ile się da.", "Siadaj, byle nie przy kadzi. Odłożyłem dla ciebie kilka lepszych skór.", "Tobie pokażę skóry, których nie wystawiam dla byle kogo.", "Dla ciebie wyciągnę z zapasów nawet skórę niedźwiedzia. Bierz, co trzeba."] },
     { "id": "merchant", "name": "Gościwit", "title": "kupiec", "story": "Przyjechał z karawaną zza wielkiej rzeki i został, bo na Rozstajach spotykają się wszystkie drogi. Na jego straganie jest trochę wszystkiego, a o każdej rzeczy opowiada tak, jakby była skarbem.", "greetings": ["Patrz, wybieraj, ale nie dotykaj. I pamiętaj, by się spieszyć z decyzją. Dzisiejszego towaru może jutro już nie być.", "A, znajoma twarz! Mam coś, co ci się spodoba. Albo i nie, ale zobaczyć warto.", "Stały klient to skarb. Kto u mnie kupuje, ten wie, że nie oszukuję. Za bardzo.", "Tobie powiem, skąd mam towar. Innym nie mówię, bo zaraz pojechaliby tam beze mnie.", "Przyjacielu! Siadaj, napijemy się kwasu. O interesach pogadamy potem."] },
-    { "id": "smith", "name": "Żelisław", "title": "kowal", "story": "Kuje od świtu do zmroku i rzadko odkłada młot. Sprzedaje Zwoje ochronne do Kowadła i przekuwa przedmioty o stopień rzadkości wyżej: im lepiej kogoś zna, tym rzadsze przedmioty mu wykuwa. Należy do Bractwa Kowali, więc kto ma dobrą reputację Bractwa, płaci u niego mniej.", "greetings": ["Czego szukasz? Mów szybko, żelazo stygnie.", "A, znajoma twarz. Zwoje mam świeże, a palenisko gorące.", "Przynieś dobry materiał, a podniosę twój przedmiot o stopień.", "Zaufanym kuję staranniej. Pokaż, co dziś przynosisz.", "Dla przyjaciół wykuję nawet boski przedmiot. Co podnosimy?"] }
+    { "id": "smith", "name": "Żelisław", "title": "kowal", "story": "Kuje od świtu do zmroku i rzadko odkłada młot. Sprzedaje Zwoje ochronne do Kowadła i przekuwa przedmioty o stopień rzadkości wyżej: im lepiej kogoś zna, tym rzadsze przedmioty mu wykuwa. Należy do Bractwa Kowali, więc kto ma dobrą reputację Bractwa, płaci u niego mniej.", "greetings": ["Czego szukasz? Mów szybko, żelazo stygnie.", "A, znajoma twarz. Zwoje mam świeże, a palenisko gorące.", "Przynieś dobry materiał, a podniosę twój przedmiot o stopień.", "Zaufanym kuję staranniej. Pokaż, co dziś przynosisz.", "Dla przyjaciół wykuję nawet boski przedmiot. Co podnosimy?"] },
+    { "id": "gamehost", "name": "Szczęsny", "title": "gospodarz Salonu Gier", "story": "Mówią, że za młodu wygrał w kości całą karczmę, a tydzień później przegrał ją w karty. Dziś prowadzi Salon Gier na Rozstajach: sprzedaje losy na Loterię i kręci Kołem Fortuny dla każdego, kto się odważy.", "greetings": ["Wchodź śmiało, szczęście nie gryzie. Los na Loterię czy obrót Kołem?", "O, znowu ty. Koło kręci się dziś lekko, czuję to w kościach.", "Stałym gościom nalewam kwasu na koszt domu. To jak, gramy?", "Tobie zdradzę sekret: Koło lubi tych, którzy wracają.", "Dla przyjaciół Rozstajów zawsze trzymam najlepsze miejsce przy stole."] }
   ],
   "brotherhoods": [
     { "id": "herbalists", "name": "Bractwo Zielarzy", "goods": ["herb", "potion"] },
@@ -187,6 +189,47 @@
       { "id": "horse", "name": "Koń wierzchowy", "description": "Wytrwały gniadosz z Rozstajów. Idzie cały dzień bez postoju.", "shorter": 0.1, "gold": 30000, "level": 50 },
       { "id": "steed", "name": "Rumak", "description": "Najlepszy koń w stajni. Przeskoczy zwalony pień, a w lesie nie zna strachu.", "shorter": 0.15, "gold": 150000, "level": 100 }
     ]
+  },
+  "casino": {
+    "$comment": "Salon Gier (prośba autora z 3.11.2026, odpowiedzi 523–526; src/engine/casino.js): gospodarz (resident, id mieszkańca) prowadzi dwie gry, każdą na dobę zadań narratora (do północy czasu polskiego). Loteria (lottery, 524 A): los kosztuje ticket złota, jeden na postać na dobę, i daje relationGain punktów relacji z gospodarzem; pula to base złota od Systemu i ticket złota za każdy los; o północy System losuje jeden los dnia, a jego postać dostaje całą pulę. Bez losów nie ma losowania i nic nie przechodzi na kolejny dzień. Wynik pokazuje Salon i czat Globalny (texts.announce: {name} zwycięzcy, {gold} złota; [a|b] to forma dla kobiety i dla mężczyzny). Koło Fortuny (wheel, 525 A, 526 A i 542 C): stawka to step złota albo więcej, zawsze co step (autor: „100 złotych to start, ale można grać więcej co 100 złotych i zmienia to dostępną pulę”), a szansa wygranej zawsze chance; przegrana stawka przepada. Każda stawka ma dla każdej postaci własną pulę prizes nagród na dobę, losowaną z postaci, doby i stawki: każda nagroda jest warta tej postaci więcej niż stawka i najwyżej tyle, ile średnio kosztuje wygrana (stawka / chance), więc Koło nie oddaje średnio więcej złota, niż bierze („nigdy nie zarobisz więcej, chyba że masz farta dużo”). Pierwsza nagroda puli, gdy tylko pasuje, i każda inna z szansą itemChance jest przedmiotem klasy postaci na jej poziomie, w najrzadszej rzadkości od itemRarity do topItemRarity, za którą złomiarz płaci tej postaci (z premią Skupu złomu) tyle, ile wyżej; inaczej nagroda to materiały zwykłego stwora z krain, które postać już zna (bez trofeów elit i czempionów), w rzadkości z materialRarities (wagi losowania; nigdy niżej niż rzadkość gatunku), materiał jednego stwora najwyżej raz w puli, w najmniejszej liczbie sztuk wartej więcej niż stawka w Garbarni przy relacji postaci. Stawki idą do najwyższej, przy której pasuje jeszcze przedmiot (najwyżej maxSteps kroków), więc rosną z poziomem postaci („skalowanie złota wraz z dostępnymi wygranymi”). Postać, jej poziom i premie, z których losują się pule, Koło zapamiętuje przy pierwszym zajrzeniu danego dnia i trzyma do północy. Wygrana zabiera jedną z pozostałych nagród puli tej stawki, każdą równie prawdopodobną, a pusta pula czeka do północy. texts: słowa Salonu; {...} wstawia gra, win i loss to słowa gospodarza po wygranej i przegranej.",
+    "resident": "gamehost",
+    "relationGain": 10,
+    "lottery": { "name": "Loteria", "ticket": 50, "base": 100 },
+    "wheel": {
+      "name": "Koło Fortuny",
+      "step": 100,
+      "maxSteps": 100,
+      "chance": 0.5,
+      "prizes": 5,
+      "itemChance": 0.5,
+      "itemRarity": "rare",
+      "topItemRarity": "legendary",
+      "materialRarities": { "epic": 3, "legendary": 1 }
+    },
+    "texts": {
+      "lotteryAbout": "Los kosztuje {ticket} zł, a kupisz jeden na dobę. Pula to {base} zł od Systemu i {ticket} zł za każdy los. O północy System losuje jeden los, a jego właściciel zgarnia całą pulę.",
+      "lotteryToday": "Dziś w puli: {pot} zł. Kupione losy: {tickets}.",
+      "lotteryBuy": "Kup los ({ticket} zł)",
+      "lotteryHas": "Masz już los na dziś. Losowanie o północy.",
+      "lotteryBought": "Los kupiony. Losowanie o północy.",
+      "lotteryYesterday": "Wczorajsze losowanie:",
+      "lotteryEarlier": "Ostatnie losowanie ({date}):",
+      "lotteryMine": "To Twoja wygrana: złoto jest już w Twojej sakiewce.",
+      "lotteryNone": "Pierwsze losowanie Loterii odbędzie się o północy.",
+      "announce": "Loterię [wygrała|wygrał] {name}: {gold} zł.",
+      "wheelAbout": "Stawka to {step} zł albo więcej, setkami, a szansa na wygraną jest zawsze {chance}%. Przegrana stawka przepada, a wygrana zabiera jedną nagrodę z puli tej stawki.",
+      "wheelPoolAbout": "Każda stawka ma na dziś własną pulę. Im wyższa stawka, tym cenniejsze nagrody, a każda jest warta więcej niż stawka. Najwyższa stawka rośnie z poziomem postaci, a nowe pule przyjdą po północy.",
+      "wheelPool": "Pula przy stawce {stake} zł: zostało {left} z {all}",
+      "wheelStake": "Stawka: {stake} zł · szansa {chance}%",
+      "wheelSpin": "Zakręć Kołem ({stake} zł)",
+      "wheelEmpty": "Koło rozdało już dzisiejszą pulę przy tej stawce. Wybierz inną albo wróć po północy.",
+      "wheelWon": "Wygrana",
+      "wheelBag": "Przedmiot z puli trafi do plecaka, więc Koło ruszy, gdy w plecaku będzie wolne miejsce.",
+      "won": "Wygrana: {prize}.",
+      "lost": "Tym razem nic. Stawka przepada.",
+      "win": ["Koło wybrało ciebie! Bierz, póki szczęście patrzy.", "No proszę! Nagroda twoja.", "Takie obroty lubię najbardziej. Gratuluję!"],
+      "loss": ["Koło jest dziś kapryśne. Może następnym razem.", "Blisko było. Szczęście lubi upartych.", "Tym razem stawka zostaje u mnie."]
+    }
   },
   "tavern": {
     "resident": "innkeeper",

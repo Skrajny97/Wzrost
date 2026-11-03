@@ -52,6 +52,21 @@ test('the validator catches broken references and schema errors', () => {
     'camp.json: duch budowniczego skupuje nieznany zasób "clay"',
   ]);
 
+  // The Salon Gier: a chance under 100% (a prize is worth more than the
+  // stake and at most what a win costs), item rarities in order, rarities
+  // that exist, and the draw's words that name the winner and the gold.
+  const casino = structuredClone(loadData());
+  casino.settlement.casino.wheel.chance = 1;
+  casino.settlement.casino.wheel.topItemRarity = 'common';
+  casino.settlement.casino.wheel.materialRarities = { epic: 3, golden: 1 };
+  casino.settlement.casino.texts.announce = 'Loterię [wygrała|wygrał] {name}.';
+  assert.deepEqual(validateData(casino), [
+    'settlement.json: szansa Koła musi być mniejsza niż 100%, żeby nagroda mogła być warta więcej niż stawka',
+    'settlement.json: casino.wheel.topItemRarity nie może być niższa niż itemRarity',
+    'settlement.json: casino.wheel.materialRarities ma nieznaną rzadkość golden',
+    'settlement.json: casino.texts.announce nie ma {gold}',
+  ]);
+
   const broken = structuredClone(loadData());
   broken.rarities[0].color = 'grey';
   assert.match(validateData(broken)[0], /^rarities\.json\/0\/color: must match pattern/);

@@ -39,6 +39,7 @@ export * from './forge.js';
 export * from './companions.js';
 export * from './market.js';
 export * from './stable.js';
+export * from './casino.js';
 export * from './tannery.js';
 export * from './names.js';
 export * from './towers.js';

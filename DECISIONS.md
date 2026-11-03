@@ -3011,6 +3011,123 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Górnictwo i Jubilerstwo: odpowiedzi autora 534–539 (3.11.2026)
+
+Autor: „534 A”, „535 A, albo i więcej”, „536 A, ale biżuteria to też talizmany i amulety”, „537 A”, „538 A”, „539 A”.
+
+1. **Statystyki (534 A).** Każdy poziom Górnictwa daje +1 do Witalności i Wytrzymałości, a każdy poziom Jubilerstwa +1 do Woli i Percepcji. Każda statystyka gry ma teraz swoją profesję.
+2. **Kamienie (535 A).** Jest siedem kamieni, po jednym na rzadkość. Górnictwo znajduje je od tych samych poziomów, od których Rzemieślnictwo robi przedmioty tej rzadkości:
+   - Kwarc: pospolity, od 1. poziomu;
+   - Agat: rzadki, od 5.;
+   - Ametyst: unikalny, od 15.;
+   - Szmaragd: epicki, od 25.;
+   - Szafir: legendarny, od 40.;
+   - Rubin: mityczny, od 60.;
+   - Diament: boski, od 80.
+
+   Autor dopuszcza więcej kamieni („albo i więcej”). Mogą dojść później, np. przy nowych krainach.
+3. **Kruszce (536 A).** Biżuteria to pierścienie, amulety i talizmany. Każda potrzebuje kruszcu:
+   - srebrnego, od 1. poziomu Górnictwa: na rzadkość pospolitą, rzadką i unikalną;
+   - złotego, od 25.: na epicką i legendarną;
+   - gwiezdnego, od 60.: na mityczną i boską.
+4. **Wyrób biżuterii (537 A).** Jubilerstwo robi pierścienie, amulety i talizmany tak, jak Rzemieślnictwo robi resztę ekwipunku:
+   - wzory odsłania poziom profesji;
+   - rzadkość wyrobu wyznacza kamień tej rzadkości, a do tego potrzeba kruszcu i czasu pracy;
+   - wyrób może się nie udać;
+   - gotowa biżuteria ma poziom postaci i przyrostki od poznanych stworów.
+5. **Oprawianie (538 A).** W przedmiocie z dowolnego miejsca ekwipunku może tkwić jeden kamień:
+   - Kamień podnosi wszystkie statystyki przedmiotu o procent, tym większy, im rzadszy kamień (na start: Kwarc 5%, a Diament 35%; liczby sprawdzi symulacja).
+   - Nowy kamień niszczy poprzedni.
+   - Oprawianie to praca w Jubilerstwie. Kamień można oprawić od tego poziomu Jubilerstwa, od którego Górnictwo go znajduje.
+6. **Miejsca (539 A).** Górnictwo pracuje w Systemowej Kopalni (395 A), a Jubilerstwo w Systemowej Szlifierni.
+7. **Wcześniej ustalone:**
+   - obie profesje od 25. poziomu postaci (531) i razem w grze;
+   - żyły złota dają średnio połowę złota z wyprawy na tym samym poziomie postaci (532 A);
+   - kamienie i kruszce można trzymać albo sprzedać, w Plecaku, tak jak materiały (533 A, brakujący szczegół: bez nowego mieszkańca);
+   - Awatar Systemu pracuje w nich jak w innych profesjach;
+   - nowy rozdział narratora na 25. poziomie postaci (teksty do zatwierdzenia przed nagraniem).
+8. **Grafiki:** PixelLab rysuje szkice 7 kamieni, 3 kruszców, Systemowej Kopalni, Systemowej Szlifierni i ikon obu profesji. Autor ocenia je po jednym.
+
+## Salon Gier: odpowiedzi autora 542 i 543 (3.11.2026)
+
+Autor: „542 C skalowanie złota wraz z dostępnymi wygranymi, ale można nic nie trafić i stracić. Przez to nigdy nie zarobisz więcej, chyba że masz farta dużo. 100 złotych to start, ale można grać więcej co 100 złotych i zmienia to dostępną pulę.” oraz „543 Koło Fortuny zgodnie z tym co wyżej napisałem w 542 inaczej musi brzmieć”.
+
+1. **Koło Fortuny po 542 C (brakujący szczegół: najprostsze odczytanie):**
+   - Stawka wynosi 100 zł i więcej, zawsze setkami: 100, 200, 300 zł i dalej.
+   - Szansa na wygraną to zawsze 50%.
+   - Każda stawka ma własną dzienną pulę 5 nagród. Każda nagroda jest warta więcej niż stawka i najwyżej jej dwa razy tyle, więc średnio Koło oddaje mniej, niż bierze, a zarobić można tylko z dużym szczęściem.
+   - Najwyższa stawka to najwyższa setka, przy której w puli zmieści się choć jeden przedmiot dla postaci („skalowanie złota wraz z dostępnymi wygranymi”).
+   - Dzięki temu przedmioty są w puli na każdym poziomie, także po 100. Zastępuje to stawkę od 1 do 100 zł z szansą równą połowie stawki (525 A).
+2. **Kwestie narratora (543).** Kwestia o Loterii zostaje. Kwestia o Kole Fortuny ma nowe brzmienie, zgodne z 542 C, i czeka na zatwierdzenie autora. Salon wchodzi do gry bez kwestii narratora, a rozdział o nim dojdzie po zatwierdzeniu i nagraniu obu kwestii.
+3. **Przedmioty w puli (brakujący szczegół).** Przedmiot w puli ma rzadkość od rzadkiej do legendarnej (`topItemRarity`), najrzadszą, którą złomiarz wycenia tej postaci powyżej stawki i najwyżej na dwie stawki. Przedmioty mityczne i boskie zostają dla łupów. Pierwsza nagroda puli jest przedmiotem zawsze, gdy jakiś pasuje, a każda kolejna z szansą 50%. Pula z przedmiotami ma ich więc zawsze co najmniej jeden, a średnio trzy.
+4. **Stawki rosną z poziomem.** Bez Skupu złomu:
+   - 25. poziom: od 100 do 300 zł;
+   - 30. poziom: do 400 zł;
+   - 50. poziom: do 700 zł;
+   - 100. poziom: do 1500 zł;
+   - 150. poziom przy pełnym Skupie złomu: do 4700 zł.
+
+   Od 101. poziomu, a przy Skupie złomu wcześniej, najniższe stawki mają w puli same materiały, bo każdy przedmiot na poziomie postaci jest wart więcej niż dwie stawki. Najwyższa stawka to najwyżej 10 000 zł (`maxSteps`).
+5. **Materiały w puli.** Materiałów jest tyle sztuk, ile najmniej trzeba, żeby w Garbarni były warte więcej niż stawka. Na przykład epicka skóra wilka u Obcego, bez Skupu złomu: 6 sztuk przy 100 zł i 18 przy 300 zł.
+6. **Ile Koło oddaje.** Średnia z 300 pul, policzona silnikiem gry:
+   - 25. poziom: nagroda warta średnio 1,6 stawki przy 100 i 200 zł, a 1,2 stawki przy 300 zł. Zakręcenie oddaje średnio 82%, 81% i 61% stawki.
+   - 50. poziom: 1,6 stawki przy 100 i 200 zł, a 1,1 przy 700 zł. Zakręcenie oddaje 81–82%, a przy 700 zł 54%.
+   - 150. poziom przy pełnym Skupie złomu: 1,35 stawki przy 100 zł (same materiały), a 1,01 przy 4700 zł. Zakręcenie oddaje 67% i 51%.
+
+   Koło zawsze zabiera więc z gry od ok. 18% do 49% stawek w złocie. Nagrody są jednak w użyciu warte więcej, niż płaci za nie złomiarz.
+7. **Dzień Koła (brakujący szczegół).** Przy pierwszym zajrzeniu danego dnia Koło zapamiętuje w Osadzie postać: poziom, klasę, poziom klasy, premię Skupu złomu i premię Garbarni. Do północy z tego zapisu biorą się stawki i pule wszystkich stawek. Awans w ciągu dnia nie zmienia więc ani stawek, ani nagród. Osada trzyma tylko ten zapis i wygrane miejsca każdej stawki, a pulę wybranej stawki silnik losuje od nowa za każdym razem tak samo. Pule wszystkich stawek nie zajmują więc miejsca w bazie.
+8. **Wygląd Salonu.** Autor: „Zadbaj o intuicyjne GUI jeśli chodzi o Salon Gier bo na screenach widzę znowu dużo scrollowania, opisy chowaj jak zawsze pod 'Jak to działa?'”.
+   - Salon ma dwie zakładki: „Loteria” i „Koło Fortuny”. Na początku otwiera się Loteria, a po kupnie dzisiejszego losu Koło Fortuny.
+   - Loteria pokazuje pulę i liczbę losów, przycisk „Kup los” i ostatnie losowanie w jednej linijce.
+   - Koło pokazuje „Stawka: 300 zł · szansa 50%”, przyciski „−” i „+” z suwakiem po stawkach dnia, przycisk „Zakręć Kołem” i pulę tej stawki z nagłówkiem „Pula przy stawce 300 zł: zostało 4 z 5”.
+   - Zasady obu gier są pod „Jak to działa?”.
+   - Po zmianie stawki pula nowej stawki przychodzi z serwera. Do tej chwili stara jest przygaszona, a przycisk „Zakręć Kołem” czeka.
+
+## Chowańce: odpowiedzi autora 540 i 541 (3.11.2026)
+
+Autor: „Zatwierdzam 540.1, 540.2 i 540.3 udały się te animacje” i „541.1, 541.2, 541.3 A wszystko”.
+
+1. **Animacje zatwierdzone.** Wszystkie są z PixelLab, po 8 klatek:
+   - w scenie Walki (540): lis w kłusie, kruk w locie i błędny ognik;
+   - na portrecie (541): lis u stóp postaci, kruk na jej ramieniu i ognik przy ramieniu.
+2. **Film do rolki.** Autor: „Sklej te animacje chochlików w 10-sekundowy filmik na przyszłość dokleję do rolki jakiejś w przyszłości nic nie dawaj więcej”, a po pierwszej wersji: „Chowańce nie mają płynnego przejścia, najlepiej w tej samej klatce animacji to zrobić i dodać napisy „Lis” „Kruk” „Ognik” (…) zrobić z tego 9s albo nawet 8 bo za długie”. Film ma 8 s i jest jedną ciągłą sceną Walki: postać idzie bez przerwy, a zmienia się tylko chowaniec. Z każdym chowańcem zmienia się jego napis: stary znika, zanim pojawi się nowy.
+3. **Do gry** chowańce wchodzą razem z ich miejscem w scenie Walki, na portrecie i w Sklepie Systemu.
+
+## Salon Gier: budowa (3.11.2026, odpowiedzi 523–526, 528, 529)
+
+Odpowiedzi autora na pytania z wpisu „Salon Gier w Osadzie: prośba autora”: 523 OK, 524 A, 525 A, 526 A, a przy grafikach 528 H i 529 C. O planszy autor: „Możesz przesuwać budynki żeby Salon Gier zmieścić”.
+
+1. **Miejsce i gospodarz (523, 528 H, 529 C).** Salon Gier (`casino` w `data/settlement.json`) otwiera się z Osadą, od 20. poziomu postaci. Na planszy stoi po prawej stronie drogi, między Tablicą zleceń a Karczmą, obok Kuźni (x 83, y 33,5), wejściem do drogi, bez odbicia obrazka. Gospodarzem jest Szczęsny, „gospodarz Salonu Gier” (`gamehost`), z historią i pięcioma powitaniami, po jednym na stopień relacji, bez form męskich i żeńskich wobec gracza. Teksty to propozycja do poprawy przez autora. Grafiki są z PixelLab: budynek 528 H (`src/client/art/settlement/casino.png`) i popiersie 529 C (`src/client/art/residents/gamehost.png`). Na komputerze Salon ma w menu Osady ikonę kostki.
+2. **Przesunięte budynki.** Tablica zleceń przesunęła się z y 22 na 19, Karczma z y 43 na 48,5, a Stajnia z y 62 na 64. Każdy budynek dalej stoi na trawie i patrzy na drogę, a żadna nazwa nie zasłania budynku ani innej nazwy. Sprawdzone w przeglądarce na telefonie (390×844) i komputerze (1366×768). Pochodnie zostają na swoich miejscach.
+3. **Loteria (524 A).** Los kosztuje 50 zł, jeden na postać na dobę. Pula to 100 zł od Systemu i 50 zł za każdy los. O północy czasu polskiego (doba zadań dziennych narratora) System losuje jeden los dnia, a cała pula trafia do jego postaci. Wynik pokazuje Salon („Wczorajsze losowanie”) i czat Globalny, np. „Loterię wygrała Dobromira: 650 zł.” (dla postaci męskiej „wygrał”).
+    - (brakujący szczegół) Bez losów nie ma losowania i nic nie przechodzi na kolejny dzień. 100 zł od Systemu jest tylko w dniu, w którym ktoś kupił los.
+    - (brakujący szczegół) Losuje cron, który i tak działa co minutę, w pierwszej minucie po północy. Każdy dzień ma w bazie jeden zapis losowania, więc losowanie odbywa się raz. Zapis losowania, zapłata, komunikat w czacie i usunięcie losów dnia przechodzą razem albo wcale. Gdy w tej samej chwili coś się zmieni, losowanie powtarza się w następnej minucie. Ziarno losowania serwer bierze dopiero przy losowaniu, więc przed północą nikt nie zna zwycięzcy.
+    - (brakujący szczegół) Los daje 10 punktów relacji ze Szczęsnym, jak kufel w Karczmie, więc gospodarz wita inaczej z każdym stopniem. Koło Fortuny relacji nie daje. Salon nie daje reputacji żadnemu bractwu, bo autor żadnego nie wskazał.
+    - (brakujący szczegół) Los kupiony tuż przed północą, który dotarłby do bazy już po losowaniu tego dnia, nie przechodzi, a złoto zostaje u postaci. Los usuniętej postaci znika razem z nią i nie bierze udziału w losowaniu.
+    - (brakujący szczegół) Wygrana trafia od razu do złota postaci, także odłożonej (Pięć postaci na koncie).
+4. **Komunikat Systemu w czacie (brakujący szczegół).** Każda wiadomość czatu w bazie ma konto i postać, więc komunikat stoi pod kontem i postacią zwycięzcy, ze znakiem `system` (migracja 0073). Czat pokazuje go jako „[ SYSTEM ]” w barwach Systemu, bez imienia, profilu i przycisków. Nikt go nie zgłosi ani nie ukryje, nie wycisza zwycięzcy i nie blokuje mu pisania, a kropkę czatu zapala wszystkim, także zwycięzcy. Moderacja może go usunąć. Usunięta postać zabiera go ze sobą, jak swoje wiadomości.
+5. **Koło Fortuny (525 A).** *Stawki i szansę zastąpiła odpowiedź 542 C: zob. „Salon Gier: odpowiedzi autora 542 i 543”.* Stawka od 1 do 100 zł, w całych sztukach złota. Szansa na wygraną to połowa stawki w procentach: 100 zł daje 50%, 50 zł 25%, a 10 zł 5%. Przegrana stawka przepada. Stawkę wybiera się suwakiem z przyciskami „−” i „+”, jak u ducha ognia.
+    - (brakujący szczegół) Wygrana zabiera jedną z pozostałych nagród puli, każdą tak samo prawdopodobną. Każde zakręcenie ma własne ziarno serwera, więc wyniku nie da się przewidzieć.
+    - (brakujący szczegół) Przedmiot z puli trafia do plecaka. Dopóki w puli czeka przedmiot, Koło nie kręci się przy pełnym plecaku. Same materiały nie zajmują miejsca.
+    - (brakujący szczegół) Loteria i Koło działają także w czasie wyprawy i pracy w profesji, jak handel na Targowisku.
+6. **Pula nagród (526 A).** *Po 542 C każda stawka ma własną pulę, a nagrody są warte więcej niż stawka: zob. „Salon Gier: odpowiedzi autora 542 i 543”.* Każda postać ma własną pulę 5 nagród na dobę. Pula losuje się z postaci i doby przy pierwszym zajrzeniu do Salonu tego dnia i zostaje do północy (`casino` w `characters.settlement`), więc nie zmienia się po awansie w ciągu dnia. Salon pokazuje całą dzisiejszą pulę, a wygrane nagrody są przygaszone. Pusta pula czeka do północy.
+    - (brakujący szczegół) Każda nagroda to z szansą 50% przedmiot, a inaczej materiały.
+    - (brakujący szczegół) Przedmiot jest dla klasy postaci, na jej poziomie, z baz do jej poziomu klasy. Jego rzadkość to najwyższa od rzadkiej w górę, przy której złomiarz płaci za niego tej postaci ponad 100 zł, ale nie więcej niż 200 zł (z premią Skupu złomu, jak podaje karta przedmiotu). Bez Skupu złomu to przedmiot epicki na 20.–25. poziomie, unikalny na 26.–50. i rzadki na 51.–100. Od 101. poziomu, a przy wysokim Skupie złomu wcześniej (przy pełnym od 51.), każdy przedmiot na poziomie postaci jest u złomiarza wart więcej niż 200 zł, więc pula ma same materiały.
+    - (brakujący szczegół) Materiały są ze zwykłych stworów, bez trofeów elit i czempionów, jak w Garbarni i w zleceniach. Pochodzą z krain, które postać zna: z każdej krainy, w której klasa ma otwarty choć jeden region wewnętrzny, także od stworów jeszcze niespotkanych. Mają rzadkość epicką (3 na 4) albo legendarną (1 na 4), nigdy niższą niż rzadkość gatunku. Materiał jednego stwora jest w puli najwyżej raz. Sztuk jest tyle, ile najmniej trzeba, żeby w Garbarni były warte ponad 100 zł przy relacji postaci z Wszeborem: np. 6 epickich albo 3 legendarne u Obcego bez Skupu złomu, a 3 epickie albo 2 legendarne przy pełnym Skupie i u Przyjaciela.
+    - (brakujący szczegół) Wygrane przedmioty i materiały liczą się jak towar z wymiany, więc Encyklopedia ich nie zalicza.
+7. **Wartość zakręcenia.** *Liczby po 542 C: zob. „Salon Gier: odpowiedzi autora 542 i 543”, punkt 6.* Wygrana kosztuje średnio tyle, ile stawka podzielona przez szansę, czyli zawsze 200 zł, przy każdej stawce. Żadna nagroda nie jest dla postaci warta więcej, ani u złomiarza, ani w Garbarni. Koło nigdy nie oddaje więc średnio więcej złota, niż bierze, i nie da się na nim zarabiać złota. Średnia z 400 pul na każdy poziom, policzona silnikiem gry (bez Skupu złomu, u Obcego):
+    - 20. poziom: nagroda warta średnio 132 zł, zakręcenie za 100 zł oddaje średnio 66 zł (−34 zł), za 10 zł 6,6 zł (−3,4 zł);
+    - 30. poziom: 113 zł, czyli −44 zł za 100 zł (ze Skupem złomu 6 i u Stałego klienta 158 zł, czyli −21 zł);
+    - 50. poziom: 153 zł, −24 zł;
+    - 80. poziom: 133 zł, −34 zł (ze Skupem złomu od 3 same materiały, od −32 do −39 zł);
+    - 125. poziom: same materiały, 106 zł, −47 zł.
+    W złocie Koło oddaje więc od 53 do 84% stawek, a resztę zabiera z gry. Nagrody są w użyciu warte więcej niż u złomiarza: przedmiot na poziom postaci, a materiały do Kowadła, Kuźni i Zaklinaczki. Sześć epickich materiałów kosztowałoby w Garbarni u Przyjaciela ok. 580 zł.
+    - (do rozważenia, pytanie do autora) Przedmioty znikają z puli od ok. 100. poziomu, przy wysokim Skupie złomu wcześniej, bo wyżej każdy przedmiot jest wart więcej niż średni koszt wygranej. Żeby zostały też wyżej, Koło potrzebowałoby wyższej stawki albo nagród droższych niż 200 zł, a wtedy dałoby się na nim zarabiać złoto.
+8. **Sklep Play.** Sklep Play nazywa gry losowe o walutę z gry „symulowanym hazardem”, co zwykle podnosi kategorię wiekową w kwestionariuszu treści. Złoto jest tylko walutą z gry: nie sprzedajemy go za prawdziwe pieniądze ani za Punkty Systemu, a Punktów Systemu nie da się wymienić na złoto. Salon nie jest więc hazardem na prawdziwe pieniądze, ale przy zgłoszeniu gry do Sklepu Play trzeba zaznaczyć w kwestionariuszu treści symulowany hazard.
+9. **Narrator.** Rozdział narratora o Osadzie wskazuje na końcu dawne miejsca i nie ma w nim Salonu, bo każda kwestia czytana głosem czeka na zatwierdzenie autora i nagranie. Propozycje kwestii o Salonie autor dostanie w raporcie. Ekran Salonu ma już miejsca, które narrator może wskazać (`casino-lottery`, `casino-wheel`).
+10. **Zapis.** Zasady liczy `src/engine/casino.js`, a zakupy, zakręcenia i losowanie `src/server/casino.js` (`GET /api/settlement/casino`, `POST /api/settlement/casino/ticket` i `POST /api/settlement/casino/spin`). Stronę Salonu rysuje `src/client/casino.js`. Losy i losowania są w tabelach `lottery_tickets` i `lottery_draws` (migracja 0073). Każdy zakup i każde zakręcenie to jedna paczka zapisów, która przechodzi tylko wtedy, gdy postać jest taka jak odczytana. Dwa stuknięcia nie zapłacą więc dwa razy za jedno ani nie wygrają tej samej nagrody dwa razy (`test/casino.test.js`).
+11. **Jeszcze nie ma:** przycisku w „Testuj Osadę”, który losuje Loterię od razu. Na wersji testowej wynik przychodzi o północy, jak w grze.
+
 ## Odpowiedzi autora 415, 532 i 533 (3.11.2026)
 
 Autor: „415 A robimy, ale przypominam ze musisz chowańce zaanimowac w PixelLab i dać do sprawdzenia”, „532 A” i „533 A i wdrażamy zresztą dwie Profesje na raz”.
@@ -3147,7 +3264,7 @@ Autor: „W Osadzie dodamy nowy budynek Salon Gier w średniowiecznym klimacie /
 
 1. **Pytania do autora:** 523 (gospodarz Szczęsny), 524 (Loteria: jeden los na dobę, losowanie o północy, ogłoszenie na czacie), 525 (Koło Fortuny: szansa rośnie ze stawką), 526 (pula nagród Koła: własna, 5 na dobę) i 527 (Wieże: czempion co 25. piętro przy szóstej krainie).
 2. **Grafiki w PixelLab** (bez Retro Diffusion): budynek (528, osiem wersji A–H) i popiersie gospodarza (529, osiem wersji A–H). Autor dostał je pojedynczo, obok grafik z gry do porównania.
-3. Nic z Salonu Gier nie wchodzi do gry przed odpowiedziami autora.
+3. Nic z Salonu Gier nie wchodzi do gry przed odpowiedziami autora. *Odpowiedzi przyszły: zob. „Salon Gier: budowa”.*
 4. (do rozważenia) Sklep Play oznacza gry losowe o walutę z gry jako „symulowany hazard”, co zwykle podnosi kategorię wiekową. Złota nie sprzedajemy wtedy za prawdziwe pieniądze.
 
 ## Górnictwo wcześniej: prośba autora (3.11.2026)

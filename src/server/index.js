@@ -71,6 +71,7 @@ import {
   tutorialTests,
 } from './testing.js';
 import { buyScrolls, raiseAtForge } from './forge.js';
+import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
 import { buyFromHerbalist, buyMug, chooseReforged, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, upgradeCompanionItem } from './settlement.js';
 import { buyFromTanner, sellToTanner } from './tannery.js';
 import { skipWithTimePoints } from './time.js';
@@ -198,6 +199,10 @@ const routes = [
   ['POST', '/api/settlement/imbue', imbueAtEnchantress],
   ['POST', '/api/settlement/forge/scrolls', buyScrolls],
   ['POST', '/api/settlement/forge/raise', raiseAtForge],
+  // The Salon Gier: the Loteria and the Koło Fortuny (casino.js).
+  ['GET', '/api/settlement/casino', getCasino],
+  ['POST', '/api/settlement/casino/ticket', buyTicket],
+  ['POST', '/api/settlement/casino/spin', spinCasinoWheel],
   ['GET', '/api/test/settlement', settlementTests],
   ['POST', '/api/test/settlement', testSettlement],
   ['GET', '/api/chat', readChat],
@@ -352,13 +357,16 @@ export default {
   // characters whose names break the rules (characters.js). The scheduled
   // minute is the clock here, so each run takes the time since the one
   // before. Each job runs even when one before it fails (the code review:
-  // a failed rename stopped the Targowisko and the notifications).
+  // a failed rename stopped the Targowisko and the notifications). The
+  // Loteria of the Salon Gier draws each day gone by once, so at Polish
+  // midnight (casino.js).
   async scheduled(controller, env) {
     readFeatures(env);
     const jobs = [
       () => renameBlockedNames(env, controller.scheduledTime),
       // The Targowisko's offers that ended (market.js), where the Osada is.
       () => settlementOn() && settleMarket(env.DB, controller.scheduledTime),
+      () => settlementOn() && drawLotteries(env.DB, controller.scheduledTime),
       () => sendNotifications(env, controller.scheduledTime),
       // A code's rewards moved by the author's word (gift-codes.js).
       () => moveGiftRewards(env, controller.scheduledTime),

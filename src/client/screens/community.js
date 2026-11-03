@@ -484,6 +484,17 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
   function messageItem(message) {
     const time = new Date(message.createdAt);
     const today = time.toDateString() === new Date(serverNow()).toDateString();
+    const stamp = h('time', { class: 'chat-time', datetime: time.toISOString(), text: (today ? timeFormat : dateTimeFormat).format(time) });
+    // A message of the System (the Loteria's result, src/server/casino.js):
+    // its words under [ SYSTEM ], nobody's to open, report or hide.
+    if (message.system) {
+      return h(
+        'li',
+        { class: 'chat-message chat-message--system', 'data-id': String(message.id) },
+        h('div', { class: 'chat-head' }, h('span', { class: 'chat-system', text: '[ SYSTEM ]' }), stamp),
+        h('p', { class: 'chat-text', text: message.text }),
+      );
+    }
     return h(
       'li',
       { class: message.own ? 'chat-message chat-message--own' : 'chat-message', 'data-id': String(message.id) },
@@ -504,7 +515,7 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
         guildTag(message.guildTag),
         message.role && h('span', { class: `chat-role chat-role--${message.role}`, text: `(${message.role})` }),
         h('span', { class: 'chat-level', text: `poz. ${message.level}` }),
-        h('time', { class: 'chat-time', datetime: time.toISOString(), text: (today ? timeFormat : dateTimeFormat).format(time) }),
+        stamp,
       ),
       message.own
         ? h('p', { class: 'chat-text', text: message.text })
@@ -677,7 +688,7 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
         act('Ukryj wiadomości tej postaci', async () => {
           account.blocked = (await call('POST', '/api/chat/block', { messageId: message.id })).blocked;
           closeSheet();
-          drop(messages.filter((other) => other.name === message.name && !other.own).map((other) => other.id));
+          drop(messages.filter((other) => other.name === message.name && !other.own && !other.system).map((other) => other.id));
           render();
           toast(`Wiadomości postaci ${message.name} są ukryte. Pokażesz je nad czatem, w „Ukryte postacie”.`);
         }),

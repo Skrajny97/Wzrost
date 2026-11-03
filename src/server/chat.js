@@ -118,7 +118,12 @@ export function cleanText(raw) {
   return text.replace(WORD, (word) => (words.some((part) => word.toLowerCase().includes(part)) ? '*'.repeat([...word].length) : word));
 }
 
-const messageView = (row, userId, env) => ({
+// A message of the System (the Loteria's result in the Globalny,
+// casino.js) shows as the System's: its words and time only.
+const messageView = (row, userId, env) =>
+  row.system ? { id: row.id, system: true, text: row.text, createdAt: row.created_at, own: false } : playerMessageView(row, userId, env);
+
+const playerMessageView = (row, userId, env) => ({
   id: row.id,
   characterId: row.character_id,
   name: row.name,
@@ -231,10 +236,10 @@ export async function readChat(context) {
   const [messages, hidden, blocked, reports, conversations] = await db.batch([
     db
       .prepare(
-        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, u.login, u.google_sub, u.chat_moderator,
+        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, m.system, u.login, u.google_sub, u.chat_moderator,
                 c.cosmetics, ${guildTagSql('m.character_id')} AS guild_tag
          FROM chat_messages m JOIN users u ON u.id = m.user_id LEFT JOIN characters c ON c.id = m.character_id
-         WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)
+         WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND (m.system = 1 OR m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?))
          ORDER BY m.id DESC LIMIT ?`,
       )
       .bind(...binds, after, userId, content.chat.rules.page),
@@ -282,16 +287,11 @@ export async function latestChat(context) {
   const { session, character, db } = await requireChatter(context);
   // The guild's channel and the invitations to guilds (guilds.js).
   const guild = await guildOf(db, character.id);
+  // The System's messages light it for everyone, the winner too.
   const newest = `SELECT MAX(id) AS id FROM chat_messages
-         WHERE channel = ? AND hidden_at IS NULL AND user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)`;
+         WHERE channel = ? AND hidden_at IS NULL AND (system = 1 OR (user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)))`;
   const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites, activity] = await Promise.all([
-    db
-      .prepare(
-        `SELECT MAX(id) AS id FROM chat_messages
-         WHERE channel = ? AND hidden_at IS NULL AND user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)`,
-      )
-      .bind(content.chat.channels[0].id, session.userId, session.userId)
-      .first(),
+    db.prepare(newest).bind(content.chat.channels[0].id, session.userId, session.userId).first(),
     conversationsOf(db, session.userId, character.id).all(),
     friendNews(db, character.id, context.now),
     tradeNews(db, character.id, context.now),
@@ -402,7 +402,7 @@ export async function sendChat(context) {
     db
       .prepare(
         `INSERT INTO chat_messages (channel, user_id, character_id, recipient_id, name, level, class_id, text, items, created_at)
-         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id = ? AND created_at > ?)`,
+         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM chat_messages WHERE user_id = ? AND created_at > ? AND system = 0)`,
       )
       .bind(other ? PRIVATE : (guild ?? channel.id), userId, character.id, other?.id ?? null, character.name, character.level, character.class_id, text, items, now, userId, now - everySeconds * 1000),
     db
@@ -455,7 +455,7 @@ async function namedMessage(db, body, character = null) {
   const message = Number.isInteger(body.messageId)
     ? await db
         .prepare(
-          `SELECT m.id, m.channel, m.user_id, m.character_id, m.recipient_id, m.name, m.hidden_at, u.login, u.google_sub, u.chat_moderator
+          `SELECT m.id, m.channel, m.user_id, m.character_id, m.recipient_id, m.name, m.hidden_at, m.system, u.login, u.google_sub, u.chat_moderator
            FROM chat_messages m JOIN users u ON u.id = m.user_id WHERE m.id = ?`,
         )
         .bind(body.messageId)
@@ -474,6 +474,7 @@ async function namedMessage(db, body, character = null) {
 export async function reportChat(context) {
   const { session, character, db } = await requireChatter(context);
   const message = await namedMessage(db, await readJson(context.request), character);
+  if (message.system) throw new ApiError(400, 'system', 'Komunikatu Systemu nie zgłosisz.');
   if (message.user_id === session.userId) throw new ApiError(400, 'own', 'Własnej wiadomości nie zgłosisz.');
   await db.batch([
     db.prepare('INSERT OR IGNORE INTO chat_reports (message_id, user_id, created_at) VALUES (?, ?, ?)').bind(message.id, session.userId, context.now),
@@ -492,6 +493,7 @@ export async function reportChat(context) {
 export async function blockInChat(context) {
   const { session, character, db } = await requireChatter(context);
   const message = await namedMessage(db, await readJson(context.request), character);
+  if (message.system) throw new ApiError(400, 'system', 'Komunikatu Systemu nie ukryjesz.');
   if (message.user_id === session.userId) throw new ApiError(400, 'own', 'Siebie nie ukryjesz.');
   await db
     .prepare('INSERT OR IGNORE INTO chat_blocks (user_id, blocked_id, name, created_at) VALUES (?, ?, ?, ?)')
@@ -561,6 +563,8 @@ export async function moderateChat(context) {
     muteForever: () => mute(FOREVER),
   };
   if (!Object.hasOwn(actions, body.action)) throw new ApiError(400, 'invalid_action', 'Nieznana decyzja.');
+  // The System's message silences nobody: its account is the winner's.
+  if (message.system && body.action.startsWith('mute')) throw new ApiError(400, 'system', 'Komunikat Systemu nikogo nie wycisza.');
   await db.batch(actions[body.action]());
   return json({ ok: true });
 }
