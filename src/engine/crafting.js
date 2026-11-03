@@ -258,17 +258,21 @@ function append(queue, order, minutes, now) {
 // The extra parts of an order of `parts`, known from its start, shown when it ends.
 const bonusParts = (parts, table, rng) => (table.bonusChance > 0 ? countEvents(parts * table.bonusChance, rng) : 0);
 
-// Orders for whole stacks of materials, one order each, while the queue has
-// room. `state` is settled at `now`; `table` is craftTable(). A stack of a
-// rarity the table does not take yet stays. Returns the new state, the
-// number of stacks ordered and of those too rare.
-export function orderMaterials(state, keys, table, now, rng, content) {
+// Orders for stacks of materials, one order each, while the queue has
+// room: a whole stack, or as many of its pieces as `counts` gives for its
+// key (the author: "Powinna być mozliwosc przerobienia pojedynczej sztuki
+// danego materiału nie wszystkie danej jakości"). `state` is settled at
+// `now`; `table` is craftTable(). A stack of a rarity the table does not
+// take yet stays. Returns the new state, the number of stacks ordered and of
+// those too rare.
+export function orderMaterials(state, keys, table, now, rng, content, counts = {}) {
   const limit = content.balance.crafting.queueLimit;
   let { materials, queue } = state;
   let ordered = 0;
   let tooRare = 0;
   for (const key of keys) {
-    const count = materials[key] ?? 0;
+    const held = materials[key] ?? 0;
+    const count = Math.min(held, counts[key] ?? held);
     if (count <= 0) continue;
     const { rarityId } = parseStack(key);
     if (!craftTakes(table, rarityId, content)) {

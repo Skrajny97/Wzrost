@@ -6,7 +6,7 @@
 import { herbSprite, itemSprite, materialSprite, potionSprite, resourceArt } from '../art.js';
 import { bonusList } from '../bonuses.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
-import { MATERIALS_HINT, craft, materialIcon } from '../craft-table.js';
+import { MATERIALS_HINT, materialIcon, materialSheet, materialTitle } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { askGuildButton } from '../guild-requests.js';
 import { countOf, formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, saleGold, timeFormat } from '../format.js';
@@ -71,8 +71,9 @@ let gearHidden = false;
 // no room in it. Remembered while the page is open too.
 let bagTab = 'items';
 
-// "Rzadka skóra wilka" for a stack above its species' rarity.
-export const materialTitle = (material) => material.label.charAt(0).toUpperCase() + material.label.slice(1);
+// A material's name as a title, from the Stół rozbiórki's module (trade.js
+// takes it from here).
+export { materialTitle };
 
 // The pieces a need of materials of a rarity takes, as the server picks
 // them ({ key, materialId, label, count }): "1 × Futro rysia, 1 × Skóra węgorza".
@@ -339,83 +340,6 @@ export function mountCharacter(container) {
         ),
       ),
     ];
-  }
-
-  // A material's card: what it is and what the table makes of it, the
-  // whole stack to the table's queue from here (the author: "dodac przerób
-  // tak jak przedmioty z pozycji plecaka samego"), and selling as many as
-  // chosen to the scrapper (proposal 1: "Skup złomu kupuje materiały"), one
-  // to start with, as for herbs and potions, once the player confirms (the
-  // author: "delikatne, ale zeby trzeba bylo potwierdzic").
-  function materialSheet(material, start = 1) {
-    const description = state.content.materials?.find((candidate) => candidate.id === material.materialId)?.description;
-    const table = state.character.camp.buildings.find((building) => building.crafts);
-    const crafting = state.character.crafting;
-    const built = crafting?.pace > 0;
-    const full = Boolean(crafting) && crafting.queue.length >= crafting.limit;
-    const needs = crafting?.materials.find((one) => one.key === material.key)?.needs ?? null;
-    const art = materialSprite(material.materialId);
-    const title = h('h2', { class: 'item-title', vars: { '--rarity': material.color }, text: materialTitle(material) });
-    const meta = h('p', { class: 'item-meta', text: `${material.rarityName} · ${formatNumber(material.count)} szt.` });
-    let count = start;
-    const price = (amount) => saleGold(material.price, amount);
-    const value = h('output', { class: 'herb-count-value' });
-    const sell = h('button', { type: 'button', class: 'button button--system' });
-    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
-    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
-    const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(material.count) });
-    function set(next) {
-      count = Math.min(material.count, Math.max(1, next));
-      value.textContent = `${formatNumber(count)} szt.`;
-      sell.textContent = `Sprzedaj za ${formatNumber(price(count))} złota`;
-      less.disabled = count === 1;
-      more.disabled = count === material.count;
-    }
-    set(count);
-    sell.addEventListener('click', async (event) => {
-      const button = event.currentTarget;
-      const sure = await confirmAction({
-        title: 'Sprzedać materiał?',
-        text: `Złomiarz kupi: ${materialTitle(material)} ×${formatNumber(count)} za ${formatNumber(price(count))} złota. Stół rozbiórki zrobiłby z tego: ${material.part} ×${formatNumber(count)}.`,
-        confirmLabel: 'Sprzedaj',
-      });
-      // Not sold: back to the material's card as it was, once the
-      // confirmation's sheet has finished closing.
-      if (!sure) return afterSheet(() => materialSheet(material, count));
-      withButton(button, async () => {
-        const { sold } = await call('POST', '/api/materials/sell', { key: material.key, count });
-        closeSheet();
-        playSound('coin');
-        toast(`Złomiarz kupił ${formatNumber(sold.count)} szt. za ${formatNumber(sold.gold)} złota.`);
-      });
-    });
-    const process = built
-      ? h('button', {
-          type: 'button',
-          class: 'button button--world',
-          disabled: full || needs !== null,
-          text: `Przerób ×${formatNumber(material.count)}`,
-          onClick: (event) =>
-            withButton(event.currentTarget, async () => {
-              await craft({ keys: [material.key] });
-              closeSheet();
-            }),
-        })
-      : table && h('a', { class: 'button button--world', href: `#/oboz/${table.id}`, onClick: closeSheet, text: 'Zbuduj Stół rozbiórki' });
-    openSheet(
-      h(
-        'div',
-        { class: 'item-details' },
-        art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art', vars: { '--rarity': material.color } }, art), h('div', {}, title, meta)) : [title, meta],
-        description && h('p', { class: 'sheet-text', text: description }),
-        h('p', { class: 'sheet-text', text: `Stół rozbiórki zrobi z tego: ${material.part} ×${formatNumber(material.count)}.` }),
-        h('p', { class: 'sheet-text', text: `Złomiarz płaci ${formatDecimal(material.price)} złota za sztukę.` }),
-        built && needs !== null && h('p', { class: 'system-hint', text: `Ten materiał Stół rozbiórki przerobi od swojego poziomu ${needs}.` }),
-        built && needs === null && full && h('p', { class: 'system-hint', text: `Kolejka stołu jest pełna (${crafting.limit} zleceń). Poczekaj, aż skończy się pierwsze.` }),
-      ),
-      h('div', { class: 'herb-count' }, less, value, more, all),
-      h('div', { class: 'sheet-actions' }, process, sell),
-    );
   }
 
   function itemsGrid(bag) {
@@ -774,9 +698,13 @@ function salvageSection(item, busy) {
 // przedmioty i dać do rozbiórki"): the bag's items in a grid, a tap marks
 // one, and one call takes the marked ones apart. Items of a rarity the Stół
 // rozbiórki does not take yet stay dim. Each kind of part takes one place in
-// the table's queue; the parts and the time are as one by one. Back from
-// the question "Rozebrać?", the marks are still there.
-function salvageManySheet(marked = new Set()) {
+// the table's queue; the parts and the time are as one by one. In a sheet
+// from the bag, or `inline` on the table's own screen (the author:
+// "rozbieranie przedmiotów dostepne tez z pozycji stolu rozbiorki"); `back`
+// shows the sheet again after the question "Rozebrać?" was turned down,
+// with the marks still there. Returns the picker's nodes and the update of
+// its sum, to call once they are in place.
+export function salvagePicker(marked, { inline = false, back = null } = {}) {
   const { crafting } = state.character;
   const bag = state.character.bag.filter((item) => item.salvage);
   const takes = (item) => item.salvage.minutes !== null;
@@ -855,11 +783,19 @@ function salvageManySheet(marked = new Set()) {
       confirmLabel: 'Rozbierz',
     });
     if (!sure) {
-      salvageManySheet(marked);
+      back?.();
       return;
     }
     await withButton(button, async () => {
-      const { salvaged } = await call('POST', '/api/items/salvage', { ids: items.map((item) => item.id) });
+      // The marks go with the items, back if the table turns them down.
+      marked.clear();
+      let salvaged;
+      try {
+        ({ salvaged } = await call('POST', '/api/items/salvage', { ids: items.map((item) => item.id) }));
+      } catch (error) {
+        for (const item of items) marked.add(item.id);
+        throw error;
+      }
       playSound('build');
       const ready = Math.max(...salvaged.orders.map((order) => order.endsAt));
       toast(
@@ -870,14 +806,25 @@ function salvageManySheet(marked = new Set()) {
     });
   };
   const dim = bag.some((item) => !takes(item));
+  return {
+    nodes: [
+      h('ul', { class: 'bag-grid salvage-grid' }, bag.map(tile)),
+      dim && h('p', { class: 'muted', text: 'Przyciemnionych stół jeszcze nie bierze: ich rzadkość wymaga wyższego poziomu Stołu rozbiórki.' }),
+      h('div', { class: `salvage-bar${inline ? ' salvage-bar--inline' : ''}` }, summary, roomNote, takeApart),
+    ],
+    update,
+  };
+}
+
+// "Rozbierz kilka" in a sheet from the bag.
+function salvageManySheet(marked = new Set()) {
+  const picker = salvagePicker(marked, { back: () => salvageManySheet(marked) });
   openSheet(
     h('h2', { class: 'sheet-title', text: 'Rozbierz kilka' }),
     h('p', { class: 'sheet-text', text: 'Wybierz przedmioty, które Stół rozbiórki ma rozebrać. Ponowny wybór odznacza przedmiot.' }),
-    h('ul', { class: 'bag-grid salvage-grid' }, bag.map(tile)),
-    dim && h('p', { class: 'muted', text: 'Przyciemnionych stół jeszcze nie bierze: ich rzadkość wymaga wyższego poziomu Stołu rozbiórki.' }),
-    h('div', { class: 'salvage-bar' }, summary, roomNote, takeApart),
+    ...picker.nodes,
   );
-  update();
+  picker.update();
 }
 
 // The card of a character's item after an upgrade: open again with the

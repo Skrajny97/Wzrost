@@ -102,7 +102,9 @@ export async function sellMaterials(context) {
   return json({ sold: { count: body.count, gold }, character: characterView(await loadPlayer(db, session.userId), now) });
 }
 
-// Whole stacks of materials to the queue: { keys: ["wolf-pelt:common", …] },
+// Materials to the queue: whole stacks, { keys: ["wolf-pelt:common", …] };
+// as many pieces of one stack as chosen, { key, count } (the author:
+// "Powinna być mozliwosc przerobienia pojedynczej sztuki danego materiału");
 // or { all: true } for every stack, while the queue has room.
 export async function craftMaterials(context) {
   const { session, player } = await requirePlayer(context);
@@ -110,10 +112,16 @@ export async function craftMaterials(context) {
   const now = context.now;
   const table = tableOf(player, now);
   const settled = settleCrafting(craftingState(player.row), now);
-  const keys = body.all === true ? Object.keys(settled.materials) : Array.isArray(body.keys) ? body.keys.filter((key) => typeof key === 'string') : [];
+  const one = typeof body.key === 'string';
+  if (one) {
+    const have = knownStack(body.key, content) ? (settled.materials[body.key] ?? 0) : 0;
+    if (have === 0) throw new ApiError(404, 'no_materials', 'Nie masz tego materiału.');
+    if (!Number.isInteger(body.count) || body.count < 1 || body.count > have) throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${have} sztuk.`);
+  }
+  const keys = one ? [body.key] : body.all === true ? Object.keys(settled.materials) : Array.isArray(body.keys) ? body.keys.filter((key) => typeof key === 'string') : [];
   if (keys.length === 0) throw new ApiError(400, 'invalid_materials', 'Wybierz materiały do przeróbki.');
   checkRoom(settled.queue);
-  const { state, ordered, tooRare: rare } = orderMaterials(settled, keys, table, now, newRng(), content);
+  const { state, ordered, tooRare: rare } = orderMaterials(settled, keys, table, now, newRng(), content, one ? { [body.key]: body.count } : {});
   if (ordered === 0 && rare > 0) {
     const rarities = keys.filter((key) => settled.materials[key] > 0).map((key) => key.slice(key.lastIndexOf(':') + 1));
     throw tooRare(rarities.sort((a, b) => craftLevelFor(a, content) - craftLevelFor(b, content))[0]);

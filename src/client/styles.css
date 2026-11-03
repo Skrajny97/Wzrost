@@ -5026,6 +5026,80 @@ a.camp-level-button {
   opacity: 0.55;
 }
 
+/* The Stół rozbiórki's four tabs (craft-table.js), two by two. */
+.craft-tabs .segmented-option {
+  padding: 0 4px;
+}
+
+.craft-tabs .segmented-option:nth-child(2n + 1) {
+  border-left: 0;
+}
+
+.craft-tabs .segmented-option:nth-child(n + 3) {
+  border-top: 1px solid var(--system-line);
+}
+
+.craft-tab {
+  display: grid;
+  gap: 10px;
+}
+
+.craft-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* A material on the Materiały tab: its card opens from the row, and the
+   round tick at its end marks it. */
+.craft-row--pick {
+  padding: 4px 6px 4px 10px;
+}
+
+.craft-open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.craft-mark {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--system-line);
+  border-radius: 50%;
+  background: transparent;
+  color: transparent;
+}
+
+.craft-mark[aria-pressed='true'] {
+  border-color: var(--system);
+  background: var(--system);
+  color: var(--bg-deep);
+}
+
+.craft-mark:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.craft-actions {
+  display: grid;
+  gap: 10px;
+}
+
 .craft-art {
   display: flex;
   flex: none;
@@ -10704,6 +10778,15 @@ a.profession-square:active {
   padding: 12px var(--gutter) calc(20px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--bark-line);
   background: var(--surface);
+}
+
+/* The same on the Stół rozbiórki's Przedmioty tab, in the page's flow. */
+.salvage-bar--inline {
+  position: static;
+  margin: 0;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--line);
+  background: none;
 }
 
 /* The Zaklinaczka's hints on the affixes (settlement.js). */

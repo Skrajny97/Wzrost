@@ -3034,6 +3034,16 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Stół rozbiórki: liczba sztuk, zaznaczanie i zakładki (3.11.2026)
+
+Autor: „Dodajmy jeszcze opcje zaznaczania roznych materialow w Stole rozbiórki oraz to co w plecaku czyli rozbieranie przedmiotów dostepne tez z pozycji stolu rozbiorki”, „Trzeba tez zwinac te wszystkie opcje jakos w zakladki zeby nie trzeba bylo tyle scrollować” oraz „Powinna być mozliwosc przerobienia pojedynczej sztuki danego materiału nie wszystkie danej jakości, a to niemożliwe można albo przerobić wszystkie sztuki albo żadnej - do poprawy”.
+
+1. **Liczba sztuk.** Karta materiału, w plecaku i na Stole rozbiórki, ma jeden licznik dla przeróbki i dla sprzedaży. „Przerób N szt.” wysyła na stół tyle sztuk, ile wybrano, choćby jedną, a reszta zostaje. Licznik zaczyna od jednej sztuki, a „wszystkie” ustawia cały stos. Serwer przyjmuje `{ key, count }` i odrzuca liczbę spoza 1 do liczby posiadanych sztuk.
+2. **Zakładki.** Ekran Stołu rozbiórki ma cztery zakładki, dwie na dwie: Materiały, Przedmioty, Kolejka i Części, z liczbami w nazwach. (brakujący szczegół) Gra pamięta wybraną zakładkę i zaznaczenia, dopóki strona jest otwarta.
+3. **Zaznaczanie materiałów.** Na zakładce Materiały okrągły znacznik przy materiale go zaznacza, a „Przerób zaznaczone (N)” wysyła zaznaczone stosy w całości, każdy jako osobne zlecenie, jak „Przerób wszystko”. Gdy zaznaczonych jest więcej niż wolnych miejsc w kolejce, przycisk czeka, a gra mówi, ilu miejsc trzeba. Stuknięcie w sam materiał otwiera jego kartę z licznikiem sztuk.
+4. **Przedmioty z plecaka.** Zakładka Przedmioty pokazuje przedmioty z plecaka do rozbiórki tak samo jak „Rozbierz kilka” w plecaku: stuknięcie zaznacza przedmiot, a „Rozbierz (N)” rozbiera zaznaczone po potwierdzeniu.
+5. (brakujący szczegół) Gdy stół nie ma nic do zrobienia, panel mówi: „Stół czeka na materiały i przedmioty z plecaka. Zdobędziesz je na wyprawach.”
+
 ## Wersja 0.1.15 (3.11.2026)
 
 1. **Koło Fortuny:** przedmioty legendarne są tylko w puli najwyższej stawki postaci, a niższe stawki mają przedmioty najwyżej epickie albo same materiały (zob. „Koło Fortuny: przedmioty legendarne tylko przy najwyższej stawce”). Autor: „554 B”.
