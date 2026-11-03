@@ -2,7 +2,7 @@
 # evolution portraits, the walks' start frames, the creatures, materials and
 # busts, the places' circles, the lands and the Osada's buildings with PixelLab
 # (kinds evolutions-, walk-starts-, monsters-, materials-, residents-, areas-,
-# lands-, settlement-, pets- and pets-portrait-pixellab,
+# lands-, settlement-, pets-, pets-portrait-, gems-, places- and professions-pixellab,
 # "variants" are calls, of one to 64 versions each by size,
 # tools/generate-portraits-pixellab.mjs), or the
 # walks animated by PixelLab (kind walks-pixellab, tools/animate-walks.mjs),
@@ -37,6 +37,9 @@ on:
           - settlement-pixellab
           - pets-pixellab
           - pets-portrait-pixellab
+          - gems-pixellab
+          - places-pixellab
+          - professions-pixellab
           - pets-animate
           - materials
           - resources
@@ -129,7 +132,7 @@ jobs:
             node tools/animate-mounts-skeleton.mjs "${args[@]}"
             exit
           fi
-          if [ "$KIND" = "evolutions-pixellab" ] || [ "$KIND" = "walk-starts-pixellab" ] || [ "$KIND" = "monsters-pixellab" ] || [ "$KIND" = "materials-pixellab" ] || [ "$KIND" = "residents-pixellab" ] || [ "$KIND" = "areas-pixellab" ] || [ "$KIND" = "lands-pixellab" ] || [ "$KIND" = "settlement-pixellab" ] || [ "$KIND" = "pets-pixellab" ] || [ "$KIND" = "pets-portrait-pixellab" ]; then
+          if [ "$KIND" = "evolutions-pixellab" ] || [ "$KIND" = "walk-starts-pixellab" ] || [ "$KIND" = "monsters-pixellab" ] || [ "$KIND" = "materials-pixellab" ] || [ "$KIND" = "residents-pixellab" ] || [ "$KIND" = "areas-pixellab" ] || [ "$KIND" = "lands-pixellab" ] || [ "$KIND" = "settlement-pixellab" ] || [ "$KIND" = "pets-pixellab" ] || [ "$KIND" = "pets-portrait-pixellab" ] || [ "$KIND" = "gems-pixellab" ] || [ "$KIND" = "places-pixellab" ] || [ "$KIND" = "professions-pixellab" ]; then
             args=(--kind "${KIND%-pixellab}" --ids "$IDS" --calls "$VARIANTS" --max-cost "$MAX_COST")
             if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
             node tools/generate-portraits-pixellab.mjs "${args[@]}"
