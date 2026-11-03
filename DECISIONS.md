@@ -3184,7 +3184,8 @@ Autor: „Trzeba zrobić animację jeszcze do koła fortuny wyświetlającą si�
    - Tło każdej klatki jest z pierwszej, więc ściany, belki i stół stoją w miejscu. Ruszają się tylko postać, kilof albo dłonie z kamieniem, iskry i światło latarni.
    - Scena Szlifierni ma drugie podejście: w pierwszym dłonie puszczały tarczę w połowie pętli, a na stole wyrastała świeca, której nie ma w pierwszej klatce.
    - W grze arkusz 256 px stoi w swojej wielkości (`scale: 1` w `data/animations.json`), więc zajmuje tyle miejsca co sceny 128 px pokazane dwa razy większe, ale jest dwa razy dokładniejszy.
-   - Wchodzą do gry po zatwierdzeniu przez autora (564, 565).
+   - Wchodzą do gry po zatwierdzeniu przez autora. Szlifiernia: „565 OK”. Kopalnia (564) czeka na odpowiedź.
+   - PixelLab doładowany przez autora (563 A: „PixelLab doładowane”), więc obie sceny są z PixelLab, bez Retro Diffusion.
 
 ## Górnictwo i Jubilerstwo: budowa (3.11.2026, odpowiedzi 531–539)
 
