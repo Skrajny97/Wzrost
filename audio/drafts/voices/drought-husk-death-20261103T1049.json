@@ -1,0 +1,13 @@
+{
+  "id": "drought-husk-death",
+  "payload": {
+    "text": "a dried-up husk of a man gives a long rattling dry exhale and crumbles into dust with a crackle of clay, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/drought-husk-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/drought-husk-death-20261103T1049-1.mp3"
+  ],
+  "credits": 56
+}

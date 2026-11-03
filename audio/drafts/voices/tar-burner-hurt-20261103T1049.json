@@ -1,0 +1,13 @@
+{
+  "id": "tar-burner-hurt",
+  "payload": {
+    "text": "a wraith dripping with boiling tar groans in pain over a bubbling hiss of hot tar, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/tar-burner-hurt-20261103T1049-0.mp3",
+    "audio/drafts/voices/tar-burner-hurt-20261103T1049-1.mp3"
+  ],
+  "credits": 24
+}

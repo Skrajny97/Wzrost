@@ -1,0 +1,13 @@
+{
+  "id": "charred-pine-death",
+  "payload": {
+    "text": "a charred pine trunk cracks and crashes down with a deep wooden groan and a burst of crackling embers, no words, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/charred-pine-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/charred-pine-death-20261103T1049-1.mp3"
+  ],
+  "credits": 64
+}

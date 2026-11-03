@@ -1,0 +1,13 @@
+{
+  "id": "spark-swarm-hurt",
+  "payload": {
+    "text": "a swarm of fiery sparks crackles and screeches like a small bird of prey, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/spark-swarm-hurt-20261103T1049-0.mp3",
+    "audio/drafts/voices/spark-swarm-hurt-20261103T1049-1.mp3"
+  ],
+  "credits": 20
+}

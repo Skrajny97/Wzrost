@@ -1,0 +1,13 @@
+{
+  "id": "resin-golem-hurt",
+  "payload": {
+    "text": "a heavy golem of thick sticky resin groans in pain with a deep wet creak and a slow sticky squelch, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/resin-golem-hurt-20261103T1049-0.mp3",
+    "audio/drafts/voices/resin-golem-hurt-20261103T1049-1.mp3"
+  ],
+  "credits": 28
+}

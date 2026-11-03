@@ -1,0 +1,13 @@
+{
+  "id": "tar-moth-death",
+  "payload": {
+    "text": "the heavy wing beats of a giant moth stutter and stop, a last dusty flutter and a soft thud, no words, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/tar-moth-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/tar-moth-death-20261103T1049-1.mp3"
+  ],
+  "credits": 44
+}

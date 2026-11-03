@@ -1,0 +1,13 @@
+{
+  "id": "latawiec-death",
+  "payload": {
+    "text": "a wind demon lets out a long howling shriek torn away by a gust of wind, its leathery wings flapping weakly, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/latawiec-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/latawiec-death-20261103T1049-1.mp3"
+  ],
+  "credits": 56
+}

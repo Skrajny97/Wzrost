@@ -1,0 +1,13 @@
+{
+  "id": "barkborer-death",
+  "payload": {
+    "text": "a creature made of thousands of beetles breaks apart, the clicking swarm scatters with a dry crumble of rotten bark and fades, no words, close up, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/barkborer-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/barkborer-death-20261103T1049-1.mp3"
+  ],
+  "credits": 52
+}

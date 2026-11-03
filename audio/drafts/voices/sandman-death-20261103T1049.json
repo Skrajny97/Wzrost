@@ -1,0 +1,13 @@
+{
+  "id": "sandman-death",
+  "payload": {
+    "text": "a sand creature collapses with a long hollow groan into a rush of pouring dry sand that settles into silence, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/sandman-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/sandman-death-20261103T1049-1.mp3"
+  ],
+  "credits": 56
+}

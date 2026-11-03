@@ -1,0 +1,13 @@
+{
+  "id": "noon-wraith-death",
+  "payload": {
+    "text": "a ghostly noon wraith lets out a long shimmering wail that fades into the heat haze, a sickle falls with a metallic ring, no words, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/noon-wraith-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/noon-wraith-death-20261103T1049-1.mp3"
+  ],
+  "credits": 64
+}

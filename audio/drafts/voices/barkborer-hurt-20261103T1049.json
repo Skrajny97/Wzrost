@@ -1,0 +1,13 @@
+{
+  "id": "barkborer-hurt",
+  "payload": {
+    "text": "a swarm of thousands of bark beetles hisses and clicks in pain with a dry crackle of wood, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/barkborer-hurt-20261103T1049-0.mp3",
+    "audio/drafts/voices/barkborer-hurt-20261103T1049-1.mp3"
+  ],
+  "credits": 24
+}

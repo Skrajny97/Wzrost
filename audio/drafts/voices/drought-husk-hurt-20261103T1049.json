@@ -1,0 +1,13 @@
+{
+  "id": "drought-husk-hurt",
+  "payload": {
+    "text": "a dried-up husk of a man rasps in pain with a dry cracking croak, like parched clay splitting, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/drought-husk-hurt-20261103T1049-0.mp3",
+    "audio/drafts/voices/drought-husk-hurt-20261103T1049-1.mp3"
+  ],
+  "credits": 24
+}

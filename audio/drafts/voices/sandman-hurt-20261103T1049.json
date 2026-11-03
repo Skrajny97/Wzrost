@@ -1,0 +1,13 @@
+{
+  "id": "sandman-hurt",
+  "payload": {
+    "text": "a creature made of sand grunts in pain with a dry hollow rasp and a hiss of pouring sand, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/sandman-hurt-20261103T1049-0.mp3",
+    "audio/drafts/voices/sandman-hurt-20261103T1049-1.mp3"
+  ],
+  "credits": 24
+}

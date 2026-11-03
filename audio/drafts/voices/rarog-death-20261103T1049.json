@@ -1,0 +1,13 @@
+{
+  "id": "rarog-death",
+  "payload": {
+    "text": "a fiery falcon gives a long piercing scream that ends in a burst of roaring flames and a hiss of smoke, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/rarog-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/rarog-death-20261103T1049-1.mp3"
+  ],
+  "credits": 64
+}

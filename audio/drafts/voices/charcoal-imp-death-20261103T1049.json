@@ -1,0 +1,13 @@
+{
+  "id": "charcoal-imp-death",
+  "payload": {
+    "text": "a small imp of glowing coals gives a fading squeal as its embers crackle and go out with a soft hiss, no words, close up, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/charcoal-imp-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/charcoal-imp-death-20261103T1049-1.mp3"
+  ],
+  "credits": 44
+}

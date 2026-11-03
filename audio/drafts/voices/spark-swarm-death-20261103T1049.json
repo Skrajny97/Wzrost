@@ -1,0 +1,13 @@
+{
+  "id": "spark-swarm-death",
+  "payload": {
+    "text": "a swarm of fiery sparks gives a thin fading screech and scatters with crackles that die away, no words, close up, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/spark-swarm-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/spark-swarm-death-20261103T1049-1.mp3"
+  ],
+  "credits": 44
+}

@@ -1,0 +1,13 @@
+{
+  "id": "barrow-wight-death",
+  "payload": {
+    "text": "the ghost of an ancient warrior gives a long cold echoing moan that fades into a frosty wind, an old crown falls with a metal clink, no words, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/barrow-wight-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/barrow-wight-death-20261103T1049-1.mp3"
+  ],
+  "credits": 64
+}

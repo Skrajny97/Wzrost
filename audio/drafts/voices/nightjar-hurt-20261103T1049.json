@@ -1,0 +1,13 @@
+{
+  "id": "nightjar-hurt",
+  "payload": {
+    "text": "a demonic night bird gives a sharp churring shriek of pain with a flap of wings, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/nightjar-hurt-20261103T1049-0.mp3",
+    "audio/drafts/voices/nightjar-hurt-20261103T1049-1.mp3"
+  ],
+  "credits": 20
+}

@@ -1,0 +1,13 @@
+{
+  "id": "heather-mare-death",
+  "payload": {
+    "text": "a ghostly wraith lets out a fading breathy wail as a wooden mask cracks and dry twigs crumble, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/heather-mare-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/heather-mare-death-20261103T1049-1.mp3"
+  ],
+  "credits": 56
+}

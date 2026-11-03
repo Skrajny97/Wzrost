@@ -1,0 +1,13 @@
+{
+  "id": "resin-golem-death",
+  "payload": {
+    "text": "a huge golem of thick resin collapses with a deep creaking groan, cracking amber and a slow sticky splatter, no words, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/resin-golem-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/resin-golem-death-20261103T1049-1.mp3"
+  ],
+  "credits": 64
+}

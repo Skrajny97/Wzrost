@@ -1,0 +1,13 @@
+{
+  "id": "tar-moth-hurt",
+  "payload": {
+    "text": "a giant moth flutters heavily and gives a thin buzzing hiss of pain, dusty wing beats, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/tar-moth-hurt-20261103T1049-0.mp3",
+    "audio/drafts/voices/tar-moth-hurt-20261103T1049-1.mp3"
+  ],
+  "credits": 20
+}

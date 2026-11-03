@@ -1,0 +1,13 @@
+{
+  "id": "ash-wraith-death",
+  "payload": {
+    "text": "a wraith of ash gives a long fading breathy hiss and scatters into dust in a soft gust of wind, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/ash-wraith-death-20261103T1049-0.mp3",
+    "audio/drafts/voices/ash-wraith-death-20261103T1049-1.mp3"
+  ],
+  "credits": 56
+}

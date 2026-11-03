@@ -1,0 +1,13 @@
+{
+  "id": "rarog-hurt",
+  "payload": {
+    "text": "a fiery falcon made of flames gives a piercing screech of pain with a roar of fire, menacing, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/rarog-hurt-20261103T1049-0.mp3",
+    "audio/drafts/voices/rarog-hurt-20261103T1049-1.mp3"
+  ],
+  "credits": 28
+}
