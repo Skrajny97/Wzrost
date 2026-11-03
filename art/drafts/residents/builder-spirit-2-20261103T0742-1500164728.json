@@ -1,0 +1,17 @@
+{
+  "id": "builder-spirit-2",
+  "tool": "pixellab generate-image-v2",
+  "description": "a pale ghostly old stonemason, a semi-transparent misty grey-blue figure, a bald head with a long white moustache, a wooden mallet resting on his shoulder, a dusty stone-cutter's apron, a faint light from within, the whole head, both shoulders and the chest drawn complete, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted colours",
+  "style": "src/client/art/residents/hermit.png",
+  "references": [
+    {
+      "path": "art/references/residents/builder-spirit-b.png",
+      "usage": "the spirit chosen by the author: the same bald old stonemason with the long white moustache, the wooden mallet on his shoulder and the pale grey-blue ghostly look, drawn complete, with the whole head, both shoulders and the chest, nothing missing"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
