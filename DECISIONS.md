@@ -3011,6 +3011,41 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Wersja 0.1.9 (3.11.2026)
+
+1. **Co wchodzi do gry:**
+   - rozdział narratora o Wieżach z nagraniami wybranymi przez autora (515, 517; zob. „Rozdział narratora: Wieże”);
+   - przeniesienie nagrody kodu TIGER między dwiema postaciami jednego konta, na prośbę autora (zob. „Kod TIGER: przeniesienie na inną postać konta”);
+   - cena złomiarza przy wystawianiu na Targowisku (zob. „Targowisko: cena złomiarza przy wystawianiu”).
+2. **Sprawdzone:**
+   - pełne testy: 936 z 936;
+   - przejście wprowadzenia na telefonie, komputerze i dużym monitorze;
+   - w przeglądarce, na telefonie i komputerze: postać na 50. poziomie, która ma za sobą wszystkie wcześniejsze rozdziały, przechodzi rozdział Wież od powitania do zakończenia na ekranie Wież. Narrator wskazuje wejścia, Wieżę Solo, piętro i Wieżę Drużyn i gra nagrania, bez błędów strony.
+
+## Odpowiedzi autora 517, 518, 523–529 i Górnictwo (3.11.2026)
+
+Autor: „523 OK / 524 A / 525 A / 526 A / 527 A”, „517.1 B / 517.2 B / 517.3 B / 517.4 A / 517.5 B / 517.6 B / 517.7 A”, „518.1 B 518.2 C 518.3 B 518.4 D 518.5 C 528 H 529 C”, „Możesz przesuwać budynki żeby Salon Gier zmieścić” i „Górnictwo i Jubilerstwo od 25 poziomu, trzeba będzie przerobić Samouczek, musimy o tym pamiętać.”
+
+1. **Salon Gier (523–526, 528, 529).** Gospodarzem jest Szczęsny. Loteria i Koło Fortuny mają zasady z wariantów A pytań 524–526 (zob. „Salon Gier w Osadzie: prośba autora”). Budynek to wersja H, czyli okrągła drewniana chata z kołem fortuny. Popiersie gospodarza to wersja C. Na planszy Osady wolno przesunąć inne budynki, żeby Salon się zmieścił. Salon buduje pomocnik w osobnej kopii repozytorium.
+2. **Wieże (527 A).** Czempion czeka co 25. piętro, gdy wejdzie szósta kraina (Sosnowe Wydmy). Przy pięciu krainach zostaje co 15. piętro: co 25. piętro trafiałoby wtedy zawsze w ten sam region.
+3. **Sosnowe Wydmy (518).** Kręgi miejsc: Wrzosowe Wydmy B, Żywiczny Bór C, Lotne Piaski B, Smolne Doły D, Pogorzelisko C. Do kompletu grafik brakuje tylko materiału Kamyk z wiru (516.8).
+4. **Górnictwo i Jubilerstwo** otwierają się od 25. poziomu postaci (odpowiedź na 531). Wprowadzenie, czyli Samouczek, trzeba będzie przerobić dla nowych profesji. Pytania 530 (kolejność), 532 (złoto z żył) i 533 (kamienie przed Jubilerstwem) czekają na odpowiedź.
+
+## Kod TIGER: przeniesienie na inną postać konta (3.11.2026)
+
+Autor poprosił o przeniesienie nagrody kodu TIGER (500 Punktów Systemu) z postaci, która go odebrała, na inną postać tego samego konta: odjąć 500 PS pierwszej i dać je drugiej. Imion tych postaci nie zapisujemy w publicznym repozytorium.
+
+1. **Jak.** `data/gift-codes.json` ma listę `moves`: kod, liczba Punktów Systemu i obie postacie jako skrót SHA-256 imienia małymi literami, tylko z liter i cyfr. Dzięki temu spacja albo podkreślnik, których autor nie wpisał, nie mają znaczenia. Serwer co dziesięć minut, dopóki przeniesienie czeka, szuka pary wśród kont, które odebrały kod. Postać oddająca musi być tą, która odebrała kod, a biorąca musi być na tym samym koncie. Para musi być dokładnie jedna.
+2. **Raz.** W jednej paczce zmian serwer odejmuje punkty (najwyżej do zera), dodaje je drugiej postaci, przepisuje zapis kodu na nią i zapisuje przeniesienie w tabeli `gift_moves_done`. Drugi raz się więc nie zdarzy, a konto nadal nie odbierze kodu ponownie.
+3. (brakujący szczegół) Gdy pierwsza postać ma mniej niż 500 PS, traci tyle, ile ma, a druga i tak dostaje 500.
+
+## Targowisko: cena złomiarza przy wystawianiu (3.11.2026)
+
+Autor: „Niech przy wyborze czegoś do wystawienia na licytacji pokazuje za ile dany przedmiot idzie u złomiarza”.
+
+1. W „Wystaw na Targowisku” pod nazwą każdego przedmiotu i każdego zapasu stoi „U złomiarza: N zł”, a przy zapasach „za sztukę”. Ta sama cena jest na ekranie ceny po wyborze.
+2. To cena dla tej postaci, z premią Skupu złomu, taka sama jak w plecaku. Części Stołu rozbiórki złomiarz nie kupuje, więc przy nich ceny nie ma.
+
 ## Wersja 0.1.8 (3.11.2026)
 
 1. **Co wchodzi do gry:**
@@ -3056,7 +3091,7 @@ Autor: „W grze cierpi się na ciągły niedobór złota. Potrzebujemy w najbli
 
 1. **Kolejność się zmienia.** Dotąd Górnictwo i Jubilerstwo szły po Warowni (395). Teraz Górnictwo idzie wcześniej, a Jubilerstwo zostaje na później.
 2. Górnictwo daje kamienie szlachetne do późniejszego Jubilerstwa i złoto z żył złota.
-3. Pytania (poziom otwarcia, ile złota na godzinę, szanse na żyłę, kamienie) autor dostanie po bieżącym etapie, pozycja po pozycji.
+3. Pytania (poziom otwarcia, ile złota na godzinę, szanse na żyłę, kamienie) autor dostanie po bieżącym etapie, pozycja po pozycji. *Autor: Górnictwo i Jubilerstwo od 25. poziomu postaci; zob. „Odpowiedzi autora 517, 518, 523–529 i Górnictwo”.*
 4. **Liczby do pytań.** Wyprawa daje dziś ok. 25 złota na godzinę na 5. poziomie, 90 na 10., 190 na 20., 385 na 30. i 760 na 50. (`tools/simulate.mjs`, 3.11.2026). Awatar Systemu (10 000 złota) pracuje w profesjach także wtedy, gdy postać jest na wyprawie. Złoto z żył doda się więc u niego do złota z wypraw, a bez Awatara Górnictwo je zastępuje.
 
 ## Samouczek na komputerze: kwestie narratora (519, 3.11.2026)
@@ -3123,6 +3158,7 @@ Autor zapytał: „Czy do Wież robimy Samouczek? a może już mamy coś takiego
    - `towers-ending` (karta): „Wejść masz kilkanaście na dzień, nowe od północy. Wieże pomogą Ci też uzupełnić dawne wpisy Bestiariusza.”
 2. **Kiedy.** Od 50. poziomu postaci, po raporcie, który go przyniósł, i gdy nie czeka żaden wcześniejszy rozdział, jak przy pozostałych rozdziałach. Postać, która ma już ten poziom, zobaczy rozdział raz. Da się go pominąć: „Objaśnienie pominięte. Wieże czekają w zakładce Walka.”
 3. **Nagrania:** głos narratora z ElevenLabs, po dwie wersje każdej kwestii do odsłuchu u autora. Rozdział wchodzi do gry po wyborze nagrań.
+4. **Wybór nagrań (517)** i wejście do gry w 0.1.9. Autor: „517.1 B, 517.2 B, 517.3 B, 517.4 A, 517.5 B, 517.6 B, 517.7 A”. Każde nagranie kończy się 0,3 s po ostatnim słowie i ma tę samą głośność (−17,5 LUFS, środek kwestii rozdziałów w grze). Jak każda nagrana kwestia rozdziału, karta powitania czeka na pierwsze dotknięcie ekranu, bo przeglądarka nie gra dźwięku przed nim.
 
 ## Wersja 0.1.6 (3.11.2026)
 
