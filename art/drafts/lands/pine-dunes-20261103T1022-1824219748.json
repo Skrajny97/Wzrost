@@ -1,0 +1,12 @@
+{
+  "id": "pine-dunes",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, vast sand dunes overgrown with purple heather and old crooked pines, a dark pine forest on the horizon with thin smoke rising from tar kilns, far away a burnt stretch of black trunks, a pale hazy dusk sky, wide panorama for a dim background behind text, low contrast, muted palette of sandy ochres, dark pine greens and heather purples, no text, no border, no people, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}
