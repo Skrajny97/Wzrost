@@ -1,0 +1,13 @@
+{
+  "id": "bies-death",
+  "payload": {
+    "text": "a huge demon gives a long deep agonized roar that breaks into a hiss of smoke as an iron chain falls, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bies-death-20261103T0717-0.mp3",
+    "audio/drafts/voices/bies-death-20261103T0717-1.mp3"
+  ],
+  "credits": 56
+}

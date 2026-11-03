@@ -1,0 +1,13 @@
+{
+  "id": "mink-death",
+  "payload": {
+    "text": "a small weasel-like animal gives a thin fading squeak and falls silent, close up, dry, no music",
+    "duration_seconds": 0.9,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mink-death-20261103T0717-0.mp3",
+    "audio/drafts/voices/mink-death-20261103T0717-1.mp3"
+  ],
+  "credits": 36
+}

@@ -1,0 +1,13 @@
+{
+  "id": "klobuk-death",
+  "payload": {
+    "text": "a small fiery bird gives a fading screech as its flames go out with a long hiss of steam, close up, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/klobuk-death-20261103T0717-0.mp3",
+    "audio/drafts/voices/klobuk-death-20261103T0717-1.mp3"
+  ],
+  "credits": 44
+}

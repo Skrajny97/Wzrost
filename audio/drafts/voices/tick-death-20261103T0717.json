@@ -1,0 +1,13 @@
+{
+  "id": "tick-death",
+  "payload": {
+    "text": "a giant bloated tick bursts with a wet squelch while its legs twitch and scratch, close up, no music",
+    "duration_seconds": 1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/tick-death-20261103T0717-0.mp3",
+    "audio/drafts/voices/tick-death-20261103T0717-1.mp3"
+  ],
+  "credits": 40
+}

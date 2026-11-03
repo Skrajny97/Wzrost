@@ -1,0 +1,13 @@
+{
+  "id": "mamuna-death",
+  "payload": {
+    "text": "a swamp hag gives a long gurgling wail that sinks into bubbling water, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mamuna-death-20261103T0717-0.mp3",
+    "audio/drafts/voices/mamuna-death-20261103T0717-1.mp3"
+  ],
+  "credits": 56
+}

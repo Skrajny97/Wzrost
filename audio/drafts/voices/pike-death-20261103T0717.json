@@ -1,0 +1,13 @@
+{
+  "id": "pike-death",
+  "payload": {
+    "text": "a big fish flops weakly on wet ground with a few fading slaps, then silence, close up, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/pike-death-20261103T0717-0.mp3",
+    "audio/drafts/voices/pike-death-20261103T0717-1.mp3"
+  ],
+  "credits": 44
+}

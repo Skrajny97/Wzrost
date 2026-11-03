@@ -1,0 +1,13 @@
+{
+  "id": "night-heron-hurt",
+  "payload": {
+    "text": "a night heron gives a harsh croaking squawk of pain, video game bird hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/night-heron-hurt-20261103T0717-0.mp3",
+    "audio/drafts/voices/night-heron-hurt-20261103T0717-1.mp3"
+  ],
+  "credits": 20
+}

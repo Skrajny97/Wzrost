@@ -1,0 +1,13 @@
+{
+  "id": "bog-demon-hurt",
+  "payload": {
+    "text": "a swamp monster gurgles and roars through thick mud, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bog-demon-hurt-20261103T0717-0.mp3",
+    "audio/drafts/voices/bog-demon-hurt-20261103T0717-1.mp3"
+  ],
+  "credits": 24
+}

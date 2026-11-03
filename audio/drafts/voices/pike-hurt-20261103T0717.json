@@ -1,0 +1,13 @@
+{
+  "id": "pike-hurt",
+  "payload": {
+    "text": "a big fish thrashes with a wet slap and a splash as it is hit, video game creature hurt sound, close up, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/pike-hurt-20261103T0717-0.mp3",
+    "audio/drafts/voices/pike-hurt-20261103T0717-1.mp3"
+  ],
+  "credits": 24
+}

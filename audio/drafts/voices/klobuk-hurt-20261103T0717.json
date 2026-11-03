@@ -1,0 +1,13 @@
+{
+  "id": "klobuk-hurt",
+  "payload": {
+    "text": "a wet fiery bird screeches with a hiss of steam and crackling sparks, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/klobuk-hurt-20261103T0717-0.mp3",
+    "audio/drafts/voices/klobuk-hurt-20261103T0717-1.mp3"
+  ],
+  "credits": 20
+}

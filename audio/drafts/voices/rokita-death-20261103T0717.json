@@ -1,0 +1,13 @@
+{
+  "id": "rokita-death",
+  "payload": {
+    "text": "a devil lets out a long howling scream that echoes and ends in a burst of fire and a hiss of smoke, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/rokita-death-20261103T0717-0.mp3",
+    "audio/drafts/voices/rokita-death-20261103T0717-1.mp3"
+  ],
+  "credits": 64
+}

@@ -1,0 +1,13 @@
+{
+  "id": "tick-hurt",
+  "payload": {
+    "text": "a giant tick makes a wet chitinous click and an angry hiss, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/tick-hurt-20261103T0717-0.mp3",
+    "audio/drafts/voices/tick-hurt-20261103T0717-1.mp3"
+  ],
+  "credits": 20
+}

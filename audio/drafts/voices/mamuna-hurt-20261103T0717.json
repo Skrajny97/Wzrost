@@ -1,0 +1,13 @@
+{
+  "id": "mamuna-hurt",
+  "payload": {
+    "text": "a bog hag shrieks in pain with a wet rasping voice, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mamuna-hurt-20261103T0717-0.mp3",
+    "audio/drafts/voices/mamuna-hurt-20261103T0717-1.mp3"
+  ],
+  "credits": 24
+}

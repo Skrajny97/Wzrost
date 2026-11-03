@@ -1,0 +1,13 @@
+{
+  "id": "veles-serpent-hurt",
+  "payload": {
+    "text": "a giant serpent hisses loudly with a deep rumbling growl and splashing water, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/veles-serpent-hurt-20261103T0717-0.mp3",
+    "audio/drafts/voices/veles-serpent-hurt-20261103T0717-1.mp3"
+  ],
+  "credits": 28
+}

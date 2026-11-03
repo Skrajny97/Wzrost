@@ -1,0 +1,13 @@
+{
+  "id": "dragonfly-death",
+  "payload": {
+    "text": "the fast buzzing of a giant dragonfly's wings sputters out and it drops into water with a small splash, close up, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/dragonfly-death-20261103T0717-0.mp3",
+    "audio/drafts/voices/dragonfly-death-20261103T0717-1.mp3"
+  ],
+  "credits": 44
+}

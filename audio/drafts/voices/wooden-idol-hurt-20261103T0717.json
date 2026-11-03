@@ -1,0 +1,13 @@
+{
+  "id": "wooden-idol-hurt",
+  "payload": {
+    "text": "heavy old oak wood cracks with a deep creak and a hollow knock, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/wooden-idol-hurt-20261103T0717-0.mp3",
+    "audio/drafts/voices/wooden-idol-hurt-20261103T0717-1.mp3"
+  ],
+  "credits": 24
+}

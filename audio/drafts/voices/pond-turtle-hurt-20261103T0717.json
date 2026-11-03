@@ -1,0 +1,13 @@
+{
+  "id": "pond-turtle-hurt",
+  "payload": {
+    "text": "a big turtle gives a short harsh hiss of pain with a hollow knock on its shell, no words, video game creature hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/pond-turtle-hurt-20261103T0717-0.mp3",
+    "audio/drafts/voices/pond-turtle-hurt-20261103T0717-1.mp3"
+  ],
+  "credits": 24
+}

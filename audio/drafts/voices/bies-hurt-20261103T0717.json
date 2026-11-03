@@ -1,0 +1,13 @@
+{
+  "id": "bies-hurt",
+  "payload": {
+    "text": "a huge demon roars in pain with a deep bestial snarl and a rattle of an iron chain, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bies-hurt-20261103T0717-0.mp3",
+    "audio/drafts/voices/bies-hurt-20261103T0717-1.mp3"
+  ],
+  "credits": 28
+}

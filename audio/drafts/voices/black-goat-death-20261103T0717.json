@@ -1,0 +1,13 @@
+{
+  "id": "black-goat-death",
+  "payload": {
+    "text": "a demonic goat lets out a long eerie distorted bleat that fades into a whisper, no words, close up, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/black-goat-death-20261103T0717-0.mp3",
+    "audio/drafts/voices/black-goat-death-20261103T0717-1.mp3"
+  ],
+  "credits": 48
+}

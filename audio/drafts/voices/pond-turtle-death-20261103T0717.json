@@ -1,0 +1,13 @@
+{
+  "id": "pond-turtle-death",
+  "payload": {
+    "text": "a big turtle lets out a long low wheezing hiss as its heavy shell thuds onto wet mud, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/pond-turtle-death-20261103T0717-0.mp3",
+    "audio/drafts/voices/pond-turtle-death-20261103T0717-1.mp3"
+  ],
+  "credits": 44
+}

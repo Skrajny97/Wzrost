@@ -1,0 +1,13 @@
+{
+  "id": "veles-serpent-death",
+  "payload": {
+    "text": "a giant serpent's long deep hiss fades as its heavy body sinks into dark water with a slow splash, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/veles-serpent-death-20261103T0717-0.mp3",
+    "audio/drafts/voices/veles-serpent-death-20261103T0717-1.mp3"
+  ],
+  "credits": 56
+}
