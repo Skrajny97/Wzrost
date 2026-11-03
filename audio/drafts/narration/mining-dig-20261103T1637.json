@@ -1,0 +1,17 @@
+{
+  "id": "mining-dig",
+  "payload": {
+    "text": "W Kopalni wydobędziesz kamienie szlachetne i kruszce. Po drodze Twój kilof trafi też na żyły złota. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/mining-dig-20261103T1637-0.mp3",
+    "audio/drafts/narration/mining-dig-20261103T1637-1.mp3"
+  ],
+  "credits": 216
+}

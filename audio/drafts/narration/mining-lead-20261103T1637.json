@@ -1,0 +1,17 @@
+{
+  "id": "mining-lead",
+  "payload": {
+    "text": "Systemowa Kopalnia i Systemowa Szlifiernia czekają w zakładce Profesje. Zajrzyjmy tam. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/mining-lead-20261103T1637-0.mp3",
+    "audio/drafts/narration/mining-lead-20261103T1637-1.mp3"
+  ],
+  "credits": 190
+}

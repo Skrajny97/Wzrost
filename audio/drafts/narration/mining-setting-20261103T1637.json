@@ -1,0 +1,17 @@
+{
+  "id": "mining-setting",
+  "payload": {
+    "text": "Kamień możesz też oprawić w przedmiot, który nosisz. Wzmocni wszystkie jego liczby. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/mining-setting-20261103T1637-0.mp3",
+    "audio/drafts/narration/mining-setting-20261103T1637-1.mp3"
+  ],
+  "credits": 184
+}

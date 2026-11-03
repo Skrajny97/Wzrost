@@ -1,0 +1,17 @@
+{
+  "id": "mining-jewels",
+  "payload": {
+    "text": "W Szlifierni zrobisz z nich pierścienie, amulety i talizmany. Rzadkość biżuterii zależy od kamienia. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/mining-jewels-20261103T1637-0.mp3",
+    "audio/drafts/narration/mining-jewels-20261103T1637-1.mp3"
+  ],
+  "credits": 218
+}
