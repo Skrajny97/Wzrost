@@ -1,0 +1,12 @@
+{
+  "id": "scepter",
+  "tool": "pixellab generate-image-v2",
+  "description": "a royal mage scepter: a short golden rod topped with a crown-shaped head holding a glowing violet crystal, small runes along the rod, diagonal, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

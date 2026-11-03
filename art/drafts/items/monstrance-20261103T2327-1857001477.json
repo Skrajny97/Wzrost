@@ -1,0 +1,12 @@
+{
+  "id": "monstrance",
+  "tool": "pixellab generate-image-v2",
+  "description": "a golden monstrance on a short handle: a radiant sunburst of golden rays around a small round glass window with white light, diagonal, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

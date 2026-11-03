@@ -1,0 +1,12 @@
+{
+  "id": "riding-boots",
+  "tool": "pixellab generate-image-v2",
+  "description": "a pair of tall red leather riding boots with pointed toes, steel spurs and gold stitching, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

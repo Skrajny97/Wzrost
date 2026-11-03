@@ -1,0 +1,12 @@
+{
+  "id": "delia",
+  "tool": "pixellab generate-image-v2",
+  "description": "a delia: a long noble cloak of crimson velvet lined and collared with brown fur, gold clasps at the chest, glowing faint runes on the hem, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

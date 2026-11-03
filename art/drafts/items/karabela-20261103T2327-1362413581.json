@@ -1,0 +1,12 @@
+{
+  "id": "karabela",
+  "tool": "pixellab generate-image-v2",
+  "description": "an ornate polish noble sabre with a gently curved blade, a cross guard and an eagle-head pommel inlaid with gold, the hilt wrapped in red leather, diagonal, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

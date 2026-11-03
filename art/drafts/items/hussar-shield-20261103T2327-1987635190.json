@@ -1,0 +1,12 @@
+{
+  "id": "hussar-shield",
+  "tool": "pixellab generate-image-v2",
+  "description": "a polish hussar shield: a tall teardrop-shaped shield painted red with a white eagle, a polished steel rim and rivets, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

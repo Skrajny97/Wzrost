@@ -1,0 +1,12 @@
+{
+  "id": "turban",
+  "tool": "pixellab generate-image-v2",
+  "description": "a wrapped turban of deep blue silk with a jewelled brooch and a white heron feather at the front, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

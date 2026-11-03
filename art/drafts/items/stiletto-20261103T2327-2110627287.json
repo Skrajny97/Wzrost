@@ -1,0 +1,12 @@
+{
+  "id": "stiletto",
+  "tool": "pixellab generate-image-v2",
+  "description": "a stiletto: a very thin needle-like triangular steel blade, a small round guard and a black grip with silver wire, diagonal, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

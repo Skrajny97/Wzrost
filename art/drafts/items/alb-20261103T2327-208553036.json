@@ -1,0 +1,12 @@
+{
+  "id": "alb",
+  "tool": "pixellab generate-image-v2",
+  "description": "a long white priest's alb robe with golden embroidered hems and a gold cord belt, folded, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

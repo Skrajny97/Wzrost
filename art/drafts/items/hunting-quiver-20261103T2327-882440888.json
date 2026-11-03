@@ -1,0 +1,12 @@
+{
+  "id": "hunting-quiver",
+  "tool": "pixellab generate-image-v2",
+  "description": "a hunter's quiver of dark leather trimmed with wolf fur and a brass buckle, full of arrows with long grey and brown feathers, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

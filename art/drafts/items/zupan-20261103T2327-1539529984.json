@@ -1,0 +1,12 @@
+{
+  "id": "zupan",
+  "tool": "pixellab generate-image-v2",
+  "description": "a polish noble zupan: a long dark green silk coat with a row of small gold buttons down the front and a high collar, folded, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

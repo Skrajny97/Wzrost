@@ -1,0 +1,12 @@
+{
+  "id": "hussar-armor",
+  "tool": "pixellab generate-image-v2",
+  "description": "polish hussar armour: a polished steel breastplate with a brass cross, shoulder plates and a leopard pelt over one shoulder, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

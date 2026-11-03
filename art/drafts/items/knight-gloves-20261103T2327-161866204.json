@@ -1,0 +1,12 @@
+{
+  "id": "knight-gloves",
+  "tool": "pixellab generate-image-v2",
+  "description": "a pair of knight's gauntlets of articulated polished steel plates over dark leather, brass edges, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

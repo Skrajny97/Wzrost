@@ -1,0 +1,12 @@
+{
+  "id": "tatar-bow",
+  "tool": "pixellab generate-image-v2",
+  "description": "a short tatar composite bow strongly recurved at the tips, layered horn and sinew painted dark red with gold bands, a taut string, diagonal, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

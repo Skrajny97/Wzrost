@@ -1,0 +1,12 @@
+{
+  "id": "crystal-ball",
+  "tool": "pixellab generate-image-v2",
+  "description": "a fortune-telling crystal ball glowing with swirling blue mist inside, held in a dark bronze claw stand, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

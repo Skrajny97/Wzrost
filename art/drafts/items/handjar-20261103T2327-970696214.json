@@ -1,0 +1,12 @@
+{
+  "id": "handjar",
+  "tool": "pixellab generate-image-v2",
+  "description": "a handjar dagger with a long forward-curving single-edged blade, a bone grip with flared ears at the pommel and gold inlay, diagonal, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

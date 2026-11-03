@@ -1,0 +1,12 @@
+{
+  "id": "crown-ring",
+  "tool": "pixellab generate-image-v2",
+  "description": "a massive gold ring with a tiny crown on top set with a deep blue sapphire, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

@@ -1,0 +1,12 @@
+{
+  "id": "hussar-helmet",
+  "tool": "pixellab generate-image-v2",
+  "description": "a polish hussar helmet: a polished steel szyszak with a ridged dome, a long nose guard, plated neck guard and cheek plates, brass trim, single inventory item icon",
+  "style": "src/client/art/items/estoc.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}
