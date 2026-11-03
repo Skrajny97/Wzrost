@@ -3011,6 +3011,25 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Materiały tej samej rzadkości się sumują (481 B, 3.11.2026)
+
+Autor: „481 B”. Zmienia to zasadę z „Kowadło: „jeden materiał”, nie suma materiałów” (2.11.2026) i „5 sztuk jednego materiału” w Kuźni (339 A).
+
+1. **Gdzie.** Materiały różnych rodzajów, ale tej samej rzadkości, sumują się w trzech miejscach:
+   - na Kowadle od +5, także przy przedmiotach towarzyszy w Kwaterach;
+   - przy przekuciu na wyższą rzadkość w Kuźni;
+   - przy zaklęciu afiksu u Zaklinaczki.
+   Na +6 unikalnego przedmiotu wystarczą np. 1 Futro rysia i 1 Skóra węgorza. Liczby sztuk się nie zmieniają.
+2. **Które sztuki schodzą (brakujący szczegół).** Gra wybiera sama: najpierw z materiału, którego postać ma najwięcej, przy równej liczbie sztuk według identyfikatora materiału, potem z następnego, aż uzbiera się tyle, ile trzeba. Pojedyncze sztuki zostają więc najdłużej. Jak dotąd liczą się wszystkie materiały dokładnie tej rzadkości, także trofea i materiały, które wypadły o rzadkość wyżej. Wybór materiału z listy (Kowadło, Kuźnia, Zaklinaczka) znika.
+3. **Za mało razem.** Nic nie schodzi, a gra mówi, ile brakuje: „Brakuje 1 szt. materiałów tej samej rzadkości co przedmiot (unikalny).” (Kowadło, Kuźnia) albo „Brakuje 1 szt. materiałów o rzadkości „pospolity”.” (Zaklinaczka).
+4. **Co widać.**
+   - W koszcie stoi „Materiały (unikalny) 2 / 2”: wszystkie sztuki tej rzadkości i ile trzeba.
+   - Pod nim gra mówi, co weźmie: „Ulepszenie weźmie: 1 × Skóra węgorza, 1 × Futro rysia.”, „Kowal weźmie: …” albo „Zaklęcie weźmie: …”.
+   - Gdy sztuk jest za mało: „To ulepszenie bierze też 2 szt. materiałów tej samej rzadkości co przedmiot (dowolnych, sumują się).”, a po „Ulepsz”: „Brakuje: 1 szt. materiałów (unikalny): to ulepszenie bierze 2 szt.”. W Kuźni i u Zaklinaczki np. „Kowal bierze 5 szt. materiałów o rzadkości „rzadki” (dowolnych, sumują się).”
+   - „Poproś gildię” zaczyna od tylu sztuk, ile brakuje razem.
+5. **Bez zmian.** Prośby Gildii (proszą o jeden konkretny materiał), zaklęcie żywiołu (3 sztuki materiału swojego żywiołu, np. Iskry ognika) i katalizatory w Alchemii. Zlecenia na dowolne materiały jednej rzadkości sumowały się już wcześniej.
+6. **Dwa stuknięcia naraz.** Sztuki schodzą w tej samej transakcji co próba, jak dotąd. Gdy któregoś stosu ubyło w międzyczasie, próba nic nie bierze, a gra prosi o ponowienie, więc nic nie jest płacone dwa razy.
+
 ## Obóz: budowle na polanie, nie na drzewach (3.11.2026)
 
 Autor: „Teraz widze ze stół rozbiórki stoi na drzewach, weź ogólnie te plansze obozu i budynki ładnie popraw (i skoordynuj Samouczek)”.
@@ -3455,6 +3474,8 @@ Autor: „Rozumiem, że Wieże śmigają bez problemu? Możesz sie im przyjrzeć
 Do decyzji autora (pytania w porannym raporcie): czempioni na niskich piętrach dają boskie trofea w ok. 90% wejść, czyli ok. 13 dziennie (wyprawy: jeden czempion na 33–66 h); 16 stworów ostatnich regionów każdej krainy nigdy nie pojawia się w Wieżach, bo ich piętra to zawsze elita albo czempion; losowe elity na zwykłych piętrach (10%) nie są zapowiadane; raporty z Wież wypychają raporty wypraw z Dziennika (wspólne 50); skrzynie Bestiariusza bez progu poziomu.
 
 ## Kowadło: „jeden materiał”, nie suma materiałów (2.11.2026)
+
+*Zmienione 3.11.2026 (481 B): materiały tej samej rzadkości się sumują, zob. „Materiały tej samej rzadkości się sumują”.*
 
 Autor przysłał dwa zrzuty: w Plecaku kilka unikalnych (niebieskich) materiałów, a na karcie przedmiotu unikalnego +5 Kowadło pisze „Brakuje: 1 szt. materiału (unikalny)”. Tak działa ustalona zasada: ulepszenie od +6 bierze kilka sztuk **jednego** materiału o rzadkości przedmiotu (+6 dwie sztuki, +7 trzy i tak dalej), a różne materiały tej samej rzadkości się nie sumują. Dwa różne unikalne materiały po jednej sztuce nie wystarczą na +6. Teksty tego nie mówiły, więc teraz mówią:
 
