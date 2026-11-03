@@ -1,0 +1,15 @@
+{
+  "id": "raven-perch-portrait",
+  "payload": {
+    "first_frame": "art/references/pets/portrait/raven-perch.png",
+    "action": "perched in place, seen from the side and facing right, the wings folded, turning its head a little and ruffling its feathers, a calm seamless idle loop",
+    "frame_count": 8,
+    "seed": 1573392866,
+    "no_background": true
+  },
+  "usage": {
+    "type": "generations",
+    "generations": 1
+  },
+  "frames": 9
+}

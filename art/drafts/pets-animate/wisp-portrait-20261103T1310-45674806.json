@@ -1,0 +1,15 @@
+{
+  "id": "wisp-portrait",
+  "payload": {
+    "first_frame": "art/references/pets/portrait/wisp.png",
+    "action": "floating in place, bobbing gently up and down, the pale blue flame flickering and its flame tail swirling, a smooth seamless loop",
+    "frame_count": 8,
+    "seed": 45674806,
+    "no_background": true
+  },
+  "usage": {
+    "type": "generations",
+    "generations": 1
+  },
+  "frames": 9
+}

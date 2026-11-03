@@ -1,0 +1,15 @@
+{
+  "id": "fox-sit-portrait",
+  "payload": {
+    "first_frame": "art/references/pets/portrait/fox-sit.png",
+    "action": "sitting still in place, seen from the side and facing right, breathing slowly, the bushy tail swaying gently and the ears twitching, a calm seamless idle loop",
+    "frame_count": 8,
+    "seed": 1458295962,
+    "no_background": true
+  },
+  "usage": {
+    "type": "generations",
+    "generations": 1
+  },
+  "frames": 9
+}
