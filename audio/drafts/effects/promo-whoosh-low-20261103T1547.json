@@ -1,0 +1,14 @@
+{
+  "id": "promo-whoosh-low",
+  "payload": {
+    "text": "a soft, low and warm whoosh of air, like a heavy wool cloak swept past, deep and muffled, no high frequencies, no hiss, no sparkle, no metal, gentle, a short transition for a video, no music",
+    "duration_seconds": 0.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/promo-whoosh-low-20261103T1547-0.mp3",
+    "audio/drafts/effects/promo-whoosh-low-20261103T1547-1.mp3",
+    "audio/drafts/effects/promo-whoosh-low-20261103T1547-2.mp3"
+  ],
+  "credits": 48
+}

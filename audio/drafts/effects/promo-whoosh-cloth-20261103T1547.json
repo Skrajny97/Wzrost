@@ -1,0 +1,14 @@
+{
+  "id": "promo-whoosh-cloth",
+  "payload": {
+    "text": "a gentle low swoosh of a thick velvet curtain drawn quickly across a stage, soft, warm and muffled, no high pitch, no ringing, no sparkle, short, no music",
+    "duration_seconds": 0.9,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/promo-whoosh-cloth-20261103T1547-0.mp3",
+    "audio/drafts/effects/promo-whoosh-cloth-20261103T1547-1.mp3",
+    "audio/drafts/effects/promo-whoosh-cloth-20261103T1547-2.mp3"
+  ],
+  "credits": 54
+}
