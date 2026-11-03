@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.20 (3.11.2026)
+
+1. **Targowisko:** wystawiający wybiera suwakiem czas licytacji od 1 do 24 godzin, co godzinę (zob. „Targowisko: czas licytacji do wyboru”).
+
 ## Targowisko: czas licytacji do wyboru (3.11.2026)
 
 Autor: „Czas licytacji powinien moc byc do wyboru od 1h do 24h po godzinie suwak sie przesuwający”.
