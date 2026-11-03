@@ -1,0 +1,12 @@
+{
+  "id": "system-lapidary",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art interior of a small jeweller's workshop: a wooden workbench with a little grinding wheel, a magnifying lens on a stand, fine tools and trays of cut gemstones glinting, a candle, faint ice-blue glow from crystal shards on a shelf, wide panorama for a dim background behind text, low contrast, muted dark palette of browns with gem-coloured and ice-blue accents, no text, no border, no people, no animals",
+  "style": "src/client/art/places/system-grove.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}
