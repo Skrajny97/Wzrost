@@ -3173,6 +3173,19 @@ Autor: „Trzeba zrobić animację jeszcze do koła fortuny wyświetlającą si�
    - Koło, strzałkę, los i bęben rysuje PixelLab w stylu budynku Salonu. Autor ocenia je po jednym, a gotowe animacje dostaje jako MP4.
 3. **Tło Salonu.** PixelLab rysuje wnętrze Salonu (192 × 96, w stylu Systemowej Szlifierni). Tło stoi przygaszone za kartą Szczęsnego, tak jak miejsca profesji za ich kartami, więc nie wydłuża ekranu.
 
+## Górnictwo i Jubilerstwo: rozdział narratora i sceny pracy (3.11.2026)
+
+1. **Rozdział narratora (557).** Sześć kwestii w brzmieniu autora (555, 557.3 poprawione przez autora), z nagraniami, które autor wybrał: 557.1 B, 557.2 A, 557.3 B, 557.4 B, 557.5 A i 557.6 B.
+   - Przychodzi od 25. poziomu postaci, po raporcie, który go przyniósł, i dopiero gdy nie czeka żaden inny rozdział, także Wież. Nie pojawia się na ekranach postaci.
+   - Karta, potem prowadzenie do zakładki Profesje. Stamtąd narrator sam otwiera Kopalnię i pokazuje kopanie, potem Szlifiernię: jej wzory i zakładkę „Oprawianie”. Kończy kartą w Szlifierni.
+   - (brakujący szczegół) Prowadzenie do Profesji wraca na każdym innym ekranie, więc rozdział przerwany w połowie (np. po odświeżeniu strony) toczy się dalej.
+   - „Pomiń objaśnienie” mówi: „Objaśnienie pominięte. Górnictwo i Jubilerstwo czekają w zakładce Profesje.”. Na wersji testowej „Testuj samouczki” zaczyna rozdział od nowa.
+2. **Sceny pracy (563 A, 564, 565).** Po odrzuceniu animacji 560 i 561 („niska rozdzielczosc i mala dokładność”) PixelLab narysował od nowa wybrane klatki (558 C, 559 G) w 256 × 256 i zanimował je w 9 klatkach, 8 na sekundę.
+   - Tło każdej klatki jest z pierwszej, więc ściany, belki i stół stoją w miejscu. Ruszają się tylko postać, kilof albo dłonie z kamieniem, iskry i światło latarni.
+   - Scena Szlifierni ma drugie podejście: w pierwszym dłonie puszczały tarczę w połowie pętli, a na stole wyrastała świeca, której nie ma w pierwszej klatce.
+   - W grze arkusz 256 px stoi w swojej wielkości (`scale: 1` w `data/animations.json`), więc zajmuje tyle miejsca co sceny 128 px pokazane dwa razy większe, ale jest dwa razy dokładniejszy.
+   - Wchodzą do gry po zatwierdzeniu przez autora (564, 565).
+
 ## Górnictwo i Jubilerstwo: budowa (3.11.2026, odpowiedzi 531–539)
 
 Obie profesje otwierają się razem, od 25. poziomu postaci (531, 533). Na zakładce Profesje stoi pięć kwadratów w trzech rzędach: na górze zbierackie Zielarstwo i Górnictwo, pod nimi Alchemia i Jubilerstwo, które pracują na ich zbiorach, a na dole Rzemieślnictwo (`rows` w `data/professions.json`). Do 25. poziomu nowe kwadraty mają kłódkę i „od poz. 25”, jak kiedyś Rzemieślnictwo. W raporcie z awansem na 25. poziom System mówi: „Odblokowano Górnictwo. Systemowa Kopalnia czeka w zakładce Profesje.” i „Odblokowano Jubilerstwo. Systemowa Szlifiernia czeka w zakładce Profesje.” (szkic do poprawy przez autora, jak opisy miejsc, kamieni i zdania raportów).
@@ -3214,9 +3227,9 @@ Obie profesje otwierają się razem, od 25. poziomu postaci (531, 533). Na zakł
    - (brakujący szczegół) Przedmiot z kamieniem jest chroniony jak ulepszony: „Sprzedaj zbędne” go nie sprzedaje, a przy pełnym plecaku po wyprawie złomiarz bierze go ostatni. Sprzedaż i rozbiórka z karty przedmiotu mówią, że kamień przepadnie.
 7. **Krótkie opisy.** Karty Kopalni i Szlifierni mają krótki opis miejsca, a zasady są zwinięte pod „Jak to działa?”, jak w Salonie Gier. Rozwinięte stoją na ciemnym tle, żeby dało się je czytać na obrazku miejsca.
 8. **Encyklopedia.** Nowa zakładka „Minerały” ma 10 wpisów: skąd je wziąć i do czego służą. Progi to 3, 6 i 10 odkryć, ze skrzyniami jak w innych zakładkach. Siedem zakładek stoi po trzy i cztery w rzędzie.
-9. **Bez sceny pracy.** Obie profesje nie mają jeszcze animacji oczekiwania, więc karta pracy jest bez sceny (`workScene` zwraca null). Walidator nie wymaga już sceny dla każdej profesji.
+9. **Sceny pracy.** Na początku obie profesje nie miały animacji oczekiwania (`workScene` zwracał null), a walidator przestał wymagać sceny dla każdej profesji. Sceny doszły później (zob. „Górnictwo i Jubilerstwo: rozdział narratora i sceny pracy”).
 10. (brakujący szczegół) **Dźwięk.** Raport z kopania z żyłą złota gra brzęk monet (`coin`), jak sprzedaż u złomiarza. Jubilerstwo nie ma jeszcze własnych dźwięków.
-11. **Narrator.** Rozdziału narratora na 25. poziomie jeszcze nie ma: jego kwestie autor dostaje do zatwierdzenia przed nagraniem.
+11. **Narrator.** Rozdział narratora na 25. poziomie doszedł po zatwierdzeniu kwestii i nagrań (zob. „Górnictwo i Jubilerstwo: rozdział narratora i sceny pracy”).
 12. **Zapis.**
     - Zasady liczą `src/engine/mining.js` i `src/engine/jewelcraft.js`, a kamień w przedmiocie `upgradedItem` w `src/engine/items.js`.
     - Prace i sprzedaż obsługują `src/server/mining.js` (`POST /api/professions/mine`, `/api/minerals/sell` i `/api/minerals/discard`) oraz `src/server/jewelcraft.js` (`POST /api/professions/jewel`, a z `set: true` oprawianie).
