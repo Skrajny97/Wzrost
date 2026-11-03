@@ -32,6 +32,16 @@
       "start": "art/references/scenes/jewelcrafting-hd-b.png",
       "description": "a small hooded figure with a glowing ice-blue face grinding a gem at a jeweller's bench",
       "action": "pressing the gem against the turning grinding wheel in a smooth seamless loop, the wheel spinning, small sparks flying from it, the candle flame flickering, the bench and the wall staying still"
+    },
+    "jewelcrafting-hd-a2": {
+      "start": "art/references/scenes/jewelcrafting-hd-a.png",
+      "description": "a small hooded figure with a glowing ice-blue face grinding a gem at a jeweller's bench",
+      "action": "pressing the gem against the spinning grinding wheel in a smooth seamless loop: both glowing hands stay on the gem at the wheel the whole time, the wheel turns, bright sparks fly from the wheel in every frame, the figure barely moves, the bench with its ring, tools and gems and the stone wall stay still"
+    },
+    "jewelcrafting-hd-b2": {
+      "start": "art/references/scenes/jewelcrafting-hd-b.png",
+      "description": "a small hooded figure with a glowing ice-blue face grinding a gem at a jeweller's bench",
+      "action": "pressing the gem against the spinning grinding wheel in a smooth seamless loop: both glowing hands stay on the gem at the wheel the whole time, the wheel turns, bright sparks fly from the wheel in every frame, the figure barely moves, the bench with its ring, tools and gems and the stone wall stay still"
     }
   }
 }
