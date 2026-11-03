@@ -1,0 +1,18 @@
+{
+  "id": "settlement-market-offers",
+  "payload": {
+    "text": "Na Targowisku gracze licytują swoje towary. Licytacja trwa od godziny do doby, a przebity gracz od razu odzyskuje złoto. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/settlement-market-offers-20261103T1940-0.mp3",
+    "audio/drafts/narration/settlement-market-offers-20261103T1940-1.mp3",
+    "audio/drafts/narration/settlement-market-offers-20261103T1940-2.mp3"
+  ],
+  "credits": 387
+}
