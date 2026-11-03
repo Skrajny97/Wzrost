@@ -8,7 +8,7 @@
 // Tiers and lands fold under their headings: the character's own and those
 // with a chest to open start unfolded.
 
-import { herbSprite, itemSprite, materialSprite, potionSprite } from '../art.js';
+import { herbSprite, itemSprite, materialSprite, mineralSprite, potionSprite } from '../art.js';
 import { bestiaryReady, placeReady } from '../bestiary.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
@@ -38,6 +38,7 @@ const COUNTS = {
   herbs: (count) => countOf(count, 'zioło', 'zioła', 'ziół'),
   materials: (count) => countOf(count, 'materiał', 'materiały', 'materiałów'),
   parts: (count) => countOf(count, 'część', 'części', 'części'),
+  minerals: (count) => countOf(count, 'minerał', 'minerały', 'minerałów'),
 };
 
 // The picture of an entry, by tab.
@@ -47,6 +48,7 @@ const ART = {
   herbs: (entry) => herbSprite(entry.id) ?? icon('leaf', { size: 28 }),
   materials: (entry) => materialIcon(entry.id, 28),
   parts: (entry) => materialSprite(entry.id) ?? icon('hammer', { size: 28 }),
+  minerals: (entry) => mineralSprite(entry.id) ?? icon('ore', { size: 28 }),
 };
 
 export function mountEncyclopedia(container, { params }) {
@@ -78,7 +80,7 @@ export function mountEncyclopedia(container, { params }) {
     return new Set(
       [
         ready(book.items.tiers.flatMap((tier) => tier.sets)) && 'items',
-        ...['potions', 'herbs', 'materials', 'parts'].filter((kind) => ready(book[kind].chests)),
+        ...['potions', 'herbs', 'materials', 'parts', 'minerals'].filter((kind) => book[kind] && ready(book[kind].chests)),
         bestiaryReady(state.character, state.content) > 0 && 'bestiary',
       ].filter(Boolean),
     );
@@ -110,7 +112,15 @@ export function mountEncyclopedia(container, { params }) {
   function render() {
     if (!book) return;
     renderTabs();
-    const views = { bestiary: bestiaryTab, items: itemsTab, potions: () => tieredTab('potions'), herbs: () => tieredTab('herbs'), materials: materialsTab, parts: partsTab };
+    const views = {
+      bestiary: bestiaryTab,
+      items: itemsTab,
+      potions: () => tieredTab('potions'),
+      herbs: () => tieredTab('herbs'),
+      materials: materialsTab,
+      parts: () => flatTab('parts'),
+      minerals: () => flatTab('minerals'),
+    };
     fill(body, (views[tab] ?? itemsTab)());
   }
 
@@ -305,9 +315,10 @@ export function mountEncyclopedia(container, { params }) {
     ];
   }
 
-  function partsTab() {
-    const part = book.parts;
-    return [summary(part), countChests('parts', part.chests), h('ul', { class: 'bag-grid' }, part.entries.map((entry) => tile('parts', entry, entry.found ? rarityColor(entry.rarity) : null)))];
+  // A tab without tiers: the parts, and Górnictwo's gems and ores.
+  function flatTab(kind) {
+    const part = book[kind];
+    return [summary(part), countChests(kind, part.chests), h('ul', { class: 'bag-grid' }, part.entries.map((entry) => tile(kind, entry, entry.found ? rarityColor(entry.rarity) : null)))];
   }
 
   // The Bestiariusz of every land and its inner regions, as at the Walka.

@@ -1113,7 +1113,12 @@ describe('tutorial unlocks', () => {
     assert.deepEqual(unlockedFeatures(1, content), []);
     assert.deepEqual(unlockedFeatures(2, content), ['stats']);
     // Each step has its System message, and the towers open with the longest hunts.
-    assert.deepEqual(unlockMessages(25, content), [content.unlocksById.party.message, 'Odblokowano eksploracje do 1 godziny.']);
+    assert.deepEqual(unlockMessages(25, content), [
+      'Odblokowano Górnictwo. Systemowa Kopalnia czeka w zakładce Profesje.',
+      'Odblokowano Jubilerstwo. Systemowa Szlifiernia czeka w zakładce Profesje.',
+      content.unlocksById.party.message,
+      'Odblokowano eksploracje do 1 godziny.',
+    ]);
     assert.deepEqual(unlockMessages(10, content), ['Odblokowano Profesje. Zajrzyj do zakładki Profesje.']);
     // Rzemieślnictwo's message only where the game has it on.
     assert.deepEqual(unlockMessages(15, content), []);

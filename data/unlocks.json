@@ -43,6 +43,18 @@
     "message": "Odblokowano Rzemieślnictwo. Systemowy Warsztat czeka w zakładce Profesje."
   },
   {
+    "id": "mining",
+    "name": "Górnictwo",
+    "level": 25,
+    "message": "Odblokowano Górnictwo. Systemowa Kopalnia czeka w zakładce Profesje."
+  },
+  {
+    "id": "jewelcrafting",
+    "name": "Jubilerstwo",
+    "level": 25,
+    "message": "Odblokowano Jubilerstwo. Systemowa Szlifiernia czeka w zakładce Profesje."
+  },
+  {
     "id": "settlement",
     "name": "Osada",
     "level": 20,

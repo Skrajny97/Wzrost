@@ -158,7 +158,14 @@ test('every sprite on the list has its file at its size, and every class has its
     herbs: data('professions').herbs.map((herb) => herb.id),
     potions: data('professions').potions.map((potion) => potion.id),
     professions: data('professions').professions.map((profession) => profession.id),
-    places: [...['gathering', 'brewing', 'workshop'].map((work) => data('professions')[work].place.id), data('evolutions').place, ...data('towers').towers.map((tower) => tower.place), data('guilds').place],
+    // Górnictwo's gems and ores.
+    minerals: data('professions').minerals.map((mineral) => mineral.id),
+    places: [
+      ...['gathering', 'brewing', 'workshop', 'mining', 'jewelcrafting'].map((work) => data('professions')[work].place.id),
+      data('evolutions').place,
+      ...data('towers').towers.map((tower) => tower.place),
+      data('guilds').place,
+    ],
     events: data('events').list.map((event) => event.art),
     'event-scenes': data('events').list.map((event) => event.scene),
     // The camp's resources in place of their line icons.

@@ -9,7 +9,7 @@ import { workSummaryText } from './professions.js';
 
 const RESULT_NAMES = { success: 'sukces', fainted: 'omdlenie', escaped: 'odwrót' };
 // A profession's work, by the kind of its report, and its chip.
-const WORK_CHIPS = { herbs: 'zbieranie', potions: 'warzenie', items: 'wyrób' };
+const WORK_CHIPS = { herbs: 'zbieranie', potions: 'warzenie', items: 'wyrób', minerals: 'kopanie', jewels: 'szlifiernia' };
 
 // The reports by day, under "Dziś", "Wczoraj" or the date, and a filter of
 // their kinds, remembered on this device (the author: 317 A).

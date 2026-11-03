@@ -1,12 +1,13 @@
 {
-  "$comment": "Encyklopedia (DECISIONS.md, „Encyklopedia”): wszystko, co postać już zdobyła, w zakładkach i tierach, ze wskazówką, skąd to wziąć. Przedmioty mają zestawy: w każdym tierze jeden na klasę i jeden z dodatkami dla wszystkich. Mikstury, zioła, materiały i części mają progi odkryć (milestones). Pełny zestaw albo próg otwiera skrzynię: zestaw ze skrzynią swojego tieru, kolejne progi z kolejnymi skrzyniami (chests). Materiał zdobyty w stopniu swojego gatunku i w trophy.grades - 1 wyższych to trofeum: obrażenia przeciw jego stworowi rosną o trophy.damage.",
+  "$comment": "Encyklopedia (DECISIONS.md, „Encyklopedia”): wszystko, co postać już zdobyła, w zakładkach i tierach, ze wskazówką, skąd to wziąć. Przedmioty mają zestawy: w każdym tierze jeden na klasę i jeden z dodatkami dla wszystkich. Mikstury, zioła, materiały, części i minerały Górnictwa mają progi odkryć (milestones). Pełny zestaw albo próg otwiera skrzynię: zestaw ze skrzynią swojego tieru, kolejne progi z kolejnymi skrzyniami (chests). Materiał zdobyty w stopniu swojego gatunku i w trophy.grades - 1 wyższych to trofeum: obrażenia przeciw jego stworowi rosną o trophy.damage.",
   "tabs": [
     { "id": "bestiary", "name": "Bestiariusz" },
     { "id": "items", "name": "Przedmioty" },
     { "id": "potions", "name": "Mikstury" },
     { "id": "herbs", "name": "Zioła" },
     { "id": "materials", "name": "Materiały" },
-    { "id": "parts", "name": "Części" }
+    { "id": "parts", "name": "Części" },
+    { "id": "minerals", "name": "Minerały" }
   ],
   "tiers": [
     { "name": "Tier I", "classLevel": 1, "upTo": 25 },
@@ -24,7 +25,8 @@
     "potions": [4, 8, 12, 16],
     "herbs": [3, 6, 9, 13],
     "materials": [10, 25, 50, 88],
-    "parts": [3, 5, 7]
+    "parts": [3, 5, 7],
+    "minerals": [3, 6, 10]
   },
   "trophy": { "grades": 3, "damage": 0.05 },
   "texts": {
@@ -53,6 +55,9 @@
     "partTable": ["Stół rozbiórki: z materiałów i przedmiotów tej samej rzadkości."],
     "partExchange": ["Wymiana w Warsztacie: {rate} × {part} za sztukę."],
     "partShop": ["Lada złomiarza: od {level}. poziomu Skupu złomu."],
+    "mineralMine": ["Górnictwo: od {level}. poziomu, w Kopalni."],
+    "mineralGem": ["Daje biżuterii rzadkość: {rarity}. Oprawiony podnosi wszystkie liczby przedmiotu o {percent}%."],
+    "mineralOre": ["Idzie na oprawy biżuterii rzadkości: {rarities}."],
     "unknown": ["???"]
   }
 }

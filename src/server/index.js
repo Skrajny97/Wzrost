@@ -49,6 +49,8 @@ import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, get
 import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
 import { discardHerbs, sellHerbs, startGathering } from './professions.js';
+import { discardMinerals, sellMinerals, startMining } from './mining.js';
+import { startJewelcraft } from './jewelcraft.js';
 import { pushKey, sendNotifications, subscribePush, testPush, unsubscribePush } from './push.js';
 import { claimAllQuests, claimQuest, openChest, rerollQuests } from './quests.js';
 import { getReport, listReports } from './reports.js';
@@ -156,6 +158,10 @@ const routes = [
   ['POST', '/api/professions/brew', startBrewing],
   ['POST', '/api/professions/craft', startCrafting],
   ['POST', '/api/professions/exchange', exchangeParts],
+  ['POST', '/api/professions/mine', startMining],
+  ['POST', '/api/professions/jewel', startJewelcraft],
+  ['POST', '/api/minerals/sell', sellMinerals],
+  ['POST', '/api/minerals/discard', discardMinerals],
   ['POST', '/api/avatar/buy', buyAvatar],
   ['POST', '/api/avatar/claim', claimAvatar],
   ['POST', '/api/avatar/cancel', cancelAvatar],

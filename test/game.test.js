@@ -2581,7 +2581,13 @@ describe('Profesje', () => {
     assert.equal((await call('GET', '/api/character', { cookie })).data.character.professions, null);
     await (await db()).prepare('UPDATE characters SET level = 10').run();
     const { professions } = (await call('GET', '/api/character', { cookie })).data.character;
-    assert.deepEqual(professions.list.map(({ id, soon }) => [id, soon]), [['herbalism', false], ['alchemy', false], ['crafting', false]]);
+    assert.deepEqual(professions.list.map(({ id, soon, locked }) => [id, soon, locked]), [
+      ['herbalism', false, false],
+      ['alchemy', false, false],
+      ['crafting', false, true],
+      ['mining', false, true],
+      ['jewelcrafting', false, true],
+    ]);
     assert.equal(professions.workshop, null);
   });
 });

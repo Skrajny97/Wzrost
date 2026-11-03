@@ -591,8 +591,10 @@ function checkReferences(data) {
     }
   }
 
-  // Waiting scenes: files that exist, a scene for each profession, the
-  // lands of regions, and the light of the day from midnight on.
+  // Waiting scenes: files that exist, scenes of professions that exist (a
+  // profession may wait for its own: Górnictwo and Jubilerstwo work without
+  // one, and src/client/scenes.js shows none), the lands of regions, and the
+  // light of the day from midnight on.
   const animations = data.animations;
   const sceneFiles = [
     ...Object.values(animations.work).map((sheet) => sheet.file),
@@ -603,9 +605,6 @@ function checkReferences(data) {
   ];
   for (const file of sceneFiles) {
     if (!existsSync(new URL(file, CLIENT_DIR))) errors.push(`animations.json: brak pliku src/client/${file}`);
-  }
-  for (const profession of data.professions.professions) {
-    if (!animations.work[profession.id]) errors.push(`animations.json: brak sceny pracy dla ${profession.id}`);
   }
   for (const id of Object.keys(animations.work)) {
     if (!data.professions.professions.some((profession) => profession.id === id)) errors.push(`animations.json: nieznana profesja ${id}`);
@@ -931,6 +930,69 @@ function checkProfessions(data, { stats }) {
   }
   errors.push(...checkBrewing(data.professions, ids, new Set(data.effects.map((effect) => effect.id)), new Set(data.materials.materials.map((material) => material.id))));
   errors.push(...checkWorkshop(data, ids));
+  errors.push(...checkMinerals(data, ids));
+  return errors;
+}
+
+// The tab's rows: every profession once. Górnictwo: a gathering profession,
+// a slider in whole steps, the measured gold of explorations rising with the
+// level. The minerals: one gem for each rarity, in the order of
+// rarities.json, each rarer one from a higher level and with a higher bonus
+// when set; ores for rarities that exist, each rarity's jewellery with
+// exactly one ore, open no later than its gem; all within the profession's
+// levels, and something to mine from level 1. Jubilerstwo: a crafting
+// profession, slots that exist and the Warsztat does not make, a chance for
+// each rarity.
+function checkMinerals(data, ids) {
+  const errors = [];
+  const { professions, rows, mining, jewelcrafting, minerals } = data.professions;
+  const placed = rows.flat();
+  if (placed.length !== professions.length || new Set(placed).size !== placed.length || !placed.every((id) => ids.has(id))) {
+    errors.push('professions.json: rows musi mieć każdą profesję dokładnie raz');
+  }
+  uniqueIds(errors, 'professions (minerały)', minerals);
+  const miner = professions.find((profession) => profession.id === mining.profession);
+  if (!miner || miner.kind !== 'gathering') errors.push(`professions.json: mining.profession "${mining.profession}" nie jest profesją zbieracką`);
+  const jeweller = professions.find((profession) => profession.id === jewelcrafting.profession);
+  if (!jeweller || jeweller.kind !== 'crafting') errors.push(`professions.json: jewelcrafting.profession "${jewelcrafting.profession}" nie jest profesją wytwórczą`);
+  const { minutes, veins } = mining;
+  if (minutes.max < minutes.min || (minutes.max - minutes.min) % minutes.step !== 0) errors.push('professions.json: mining.minutes.max musi wypadać na kroku suwaka od min');
+  veins.explorationGold.forEach(([level, gold], index) => {
+    const [before, goldBefore] = veins.explorationGold[index - 1] ?? [0, 0];
+    if (level <= before || gold < goldBefore) errors.push('professions.json: mining.veins.explorationGold musi rosnąć z poziomem');
+  });
+  const rarities = data.rarities.map((rarity) => rarity.id);
+  const gems = minerals.filter((mineral) => mineral.kind === 'gem');
+  const ores = minerals.filter((mineral) => mineral.kind === 'ore');
+  if (gems.map((gem) => gem.rarity).join() !== rarities.join()) errors.push('professions.json: minerals musi mieć jeden kamień na każdą rzadkość, w kolejności z rarities.json');
+  gems.forEach((gem, index) => {
+    if (gem.for) errors.push(`professions.json: kamień ${gem.id} nie ma for`);
+    if (!(gem.setBonus > 0)) errors.push(`professions.json: kamień ${gem.id} potrzebuje setBonus`);
+    const before = gems[index - 1];
+    if (before && (gem.level <= before.level || gem.setBonus <= before.setBonus)) errors.push(`professions.json: kamień ${gem.id} musi mieć wyższy poziom i setBonus niż ${before.id}`);
+  });
+  for (const ore of ores) {
+    if (ore.rarity || ore.setBonus) errors.push(`professions.json: kruszec ${ore.id} nie ma rarity ani setBonus`);
+    if (!ore.for) errors.push(`professions.json: kruszec ${ore.id} potrzebuje for`);
+    for (const rarity of ore.for ?? []) if (!rarities.includes(rarity)) errors.push(`professions.json: kruszec ${ore.id} ma nieznaną rzadkość "${rarity}"`);
+  }
+  for (const rarity of rarities) {
+    const own = ores.filter((ore) => ore.for?.includes(rarity));
+    const gem = gems.find((one) => one.rarity === rarity);
+    if (own.length !== 1) errors.push(`professions.json: biżuteria rzadkości ${rarity} potrzebuje dokładnie jednego kruszcu`);
+    else if (gem && own[0].level > gem.level) errors.push(`professions.json: kruszec ${own[0].id} otwiera się później niż kamień ${gem.id}`);
+  }
+  for (const mineral of minerals) {
+    if (miner && mineral.level > miner.maxLevel) errors.push(`professions.json: minerał ${mineral.id} wymaga poziomu ponad profesję`);
+  }
+  if (!minerals.some((mineral) => mineral.level === 1)) errors.push('professions.json: żadnego minerału nie kopie się od 1. poziomu');
+  const slots = new Set(data.slots.map((slot) => slot.id));
+  for (const slot of Object.keys(jewelcrafting.ores)) {
+    if (!slots.has(slot)) errors.push(`professions.json: jewelcrafting.ores ma nieznany slot "${slot}"`);
+    if (data.professions.workshop.parts[slot]) errors.push(`professions.json: slot ${slot} robi i Warsztat, i Jubilerstwo`);
+  }
+  if (Object.keys(jewelcrafting.chances).join() !== rarities.join()) errors.push('professions.json: jewelcrafting.chances musi mieć każdą rzadkość raz, w kolejności z rarities.json');
+  if (jeweller && jewelcrafting.laterPatternLevel > jeweller.maxLevel) errors.push('professions.json: jewelcrafting.laterPatternLevel przekracza poziomy profesji');
   return errors;
 }
 
@@ -987,7 +1049,7 @@ function checkWorkshop(data, ids) {
 const ENCYCLOPEDIA_TEXTS = [
   'accessories', 'tierItems', 'tierItemsFirst', 'tierLevels', 'itemDrop', 'itemDropAny', 'itemClasses', 'itemClass', 'itemAnyClass',
   'itemOtherClasses', 'itemWear', 'itemPattern', 'itemBest', 'potionRecipe', 'potionHerbs', 'potionCatalyst', 'herbGather', 'herbEvent',
-  'materialDrop', 'materialGrades', 'trophyNeeds', 'trophyWon', 'partTable', 'partExchange', 'partShop', 'unknown',
+  'materialDrop', 'materialGrades', 'trophyNeeds', 'trophyWon', 'partTable', 'partExchange', 'partShop', 'mineralMine', 'mineralGem', 'mineralOre', 'unknown',
 ];
 
 function checkEncyclopedia(data) {
@@ -1002,7 +1064,13 @@ function checkEncyclopedia(data) {
   for (const base of data['item-bases']) {
     if (!tierLevels.has(base.classLevel ?? 1)) errors.push(`encyclopedia.json: baza ${base.id} (poziom klasy ${base.classLevel ?? 1}) nie ma swojego tieru`);
   }
-  const totals = { potions: data.professions.potions.length, herbs: data.professions.herbs.length, materials: data.materials.materials.length, parts: data.materials.parts.length };
+  const totals = {
+    potions: data.professions.potions.length,
+    herbs: data.professions.herbs.length,
+    materials: data.materials.materials.length,
+    parts: data.materials.parts.length,
+    minerals: data.professions.minerals.length,
+  };
   for (const [tab, counts] of Object.entries(milestones)) {
     counts.forEach((count, index) => {
       if (index > 0 && count <= counts[index - 1]) errors.push(`encyclopedia.json: progi ${tab} muszą rosnąć`);

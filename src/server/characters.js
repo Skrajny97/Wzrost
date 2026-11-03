@@ -92,7 +92,7 @@ import { marketRemoval } from './market.js';
 import { championOf } from './guild-fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { partyRemoval } from './parties.js';
-import { bagHerbs, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
+import { bagHerbs, bagMinerals, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
 import { tradeBlockOf, tradesEnded } from './trades.js';
@@ -211,7 +211,7 @@ export async function settleDiscoveries(db, player, now) {
   const { row } = player;
   const { materials, parts } = settleCrafting(craftingState(row), now);
   const stored = JSON.parse(row.foreign_stacks ?? '{}');
-  const holdings = { items: player.items, potions: JSON.parse(row.potions ?? '{}'), herbs: JSON.parse(row.herbs ?? '{}'), materials, parts };
+  const holdings = { items: player.items, potions: JSON.parse(row.potions ?? '{}'), herbs: JSON.parse(row.herbs ?? '{}'), materials, parts, minerals: JSON.parse(row.minerals ?? '{}') };
   const { found, foreign } = ownDiscoveries(holdings, stored, content);
   // The trade pieces used up meanwhile are written down as gone.
   if (Object.keys(stored).some((key) => foreign[key] !== stored[key])) {
@@ -239,9 +239,9 @@ export const buildQueue = (row) => JSON.parse(row.build_queue ?? '[]');
 
 const path = (id) => `$."${id}"`;
 
-// Gathering herbs, brewing potions and making items are no fights: the
-// character rests meanwhile, as at home.
-export const restsDuring = (activity) => !activity || ['herbs', 'potions', 'items'].includes(activity.kind);
+// Gathering herbs, brewing potions, making items, digging and the work of
+// the Szlifiernia are no fights: the character rests meanwhile, as at home.
+export const restsDuring = (activity) => !activity || ['herbs', 'potions', 'items', 'minerals', 'jewels'].includes(activity.kind);
 
 // A character's buffs (potions.js). A speed potion drunk while its time
 // still passed everywhere keeps what it had left.
@@ -487,7 +487,9 @@ export function requireIdle(player, now) {
   const activity = player.activity;
   if (!activity) return;
   // A profession's work says so in its own words.
-  const texts = { herbs: content.professionTexts, potions: content.brewing?.texts, items: content.workshop?.texts }[activity.kind];
+  const texts = { herbs: content.professionTexts, potions: content.brewing?.texts, items: content.workshop?.texts, minerals: content.mining?.texts, jewels: content.jewelcrafting?.texts }[
+    activity.kind
+  ];
   throw activity.ends_at <= now
     ? new ApiError(409, 'claim_first', texts ? texts.claimFirst[0] : 'Wyprawa się skończyła. Najpierw odbierz raport.')
     : new ApiError(409, 'busy', texts ? texts.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
@@ -850,7 +852,9 @@ function craftingView(row, levels, now) {
 // Where an activity takes place. region_id holds the inner region, or a whole
 // region for an activity started before inner regions; a gathering, its
 // place and the herbs chosen; a brewing, its place, the potion and how many;
-// an order of items, its place, the pattern, the rarity and how many.
+// an order of items, its place, the pattern, the rarity and how many; a
+// digging, its place; a work of the Szlifiernia, its place and the jewels
+// ordered, or the gem set and the item's id.
 function activityPlace(activity, level) {
   if (activity.kind === 'herbs') {
     const herbs = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content.herbsById[id]);
@@ -871,6 +875,18 @@ function activityPlace(activity, level) {
       rarityName: content.raritiesById[rarity]?.name ?? '',
       count: count ?? 0,
       ...(scroll && { scroll: true }),
+    };
+  }
+  if (activity.kind === 'minerals') return { profession: content.mining.profession, placeName: content.mining.place.name };
+  if (activity.kind === 'jewels') {
+    const { base: baseId, rarity, count, set, gem, itemName } = JSON.parse(activity.options ?? '{}');
+    const base = content.basesById[baseId];
+    return {
+      profession: content.jewelcrafting.profession,
+      placeName: content.jewelcrafting.place.name,
+      ...(set
+        ? { set: { gem: content.mineralsById[gem]?.name ?? '', item: itemName ?? '' } }
+        : { base: base ? { id: base.id, name: base.name } : null, rarityName: content.raritiesById[rarity]?.name ?? '', count: count ?? 0 }),
     };
   }
   const area = areaFor(activity.region_id, level, content);
@@ -1097,6 +1113,8 @@ export function characterView(player, now) {
     // The herbs and the potions in the bag, which take its places by the stack.
     herbs: bagHerbs(row, sellBonus),
     potions: bagPotions(row, sellBonus),
+    // The gems and ores of Górnictwo, which take no room in it.
+    minerals: bagMinerals(row, sellBonus),
     herbStack: content.professionRules.stack,
     bagUsed: bagPlaces(player),
     bagCapacity: bagCapacity(levels, content),

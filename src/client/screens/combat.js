@@ -400,6 +400,18 @@ export function mountCombat(container, { params, navigate }) {
         h('a', { class: 'button button--system', href: '#/profesje/rzemieslnictwo', text: 'Do Rzemieślnictwa' }),
       );
     }
+    if (activity.kind === 'minerals') {
+      return systemPanel(
+        activityFinished(activity) ? 'Kopanie zakończone. Raport czeka w Górnictwie.' : `Postać kopie w miejscu: ${activity.placeName}.`,
+        h('a', { class: 'button button--system', href: '#/profesje/gornictwo', text: 'Do Górnictwa' }),
+      );
+    }
+    if (activity.kind === 'jewels') {
+      return systemPanel(
+        activityFinished(activity) ? 'Praca w Szlifierni zakończona. Raport czeka w Jubilerstwie.' : `Postać pracuje w miejscu: ${activity.placeName}.`,
+        h('a', { class: 'button button--system', href: '#/profesje/jubilerstwo', text: 'Do Jubilerstwa' }),
+      );
+    }
     preloadReportMusic();
     if (activityFinished(activity)) {
       const claim = h('button', {

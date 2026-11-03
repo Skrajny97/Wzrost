@@ -396,6 +396,19 @@ button {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* With Górnictwo's minerals, four tabs: two rows of two. */
+.bag-tabs--four {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.bag-tabs--four .segmented-option:nth-child(3) {
+  border-left: 0;
+}
+
+.bag-tabs--four .segmented-option:nth-child(n + 3) {
+  border-top: 1px solid var(--system-line);
+}
+
 .bag-tabs .segmented-option {
   padding: 0 4px;
   letter-spacing: 0.04em;
@@ -3046,6 +3059,21 @@ img.area-art {
 .item-classes,
 .item-price {
   color: var(--text-muted);
+}
+
+/* The gem set in an item (Jubilerstwo), in its rarity's colour, with its
+   picture small beside it. */
+.item-gem {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: var(--rarity, var(--text));
+}
+
+.item-gem .sprite {
+  width: 20px;
+  height: 20px;
+  image-rendering: pixelated;
 }
 
 .threat-note {
@@ -7658,6 +7686,19 @@ a.profession-square:active {
   pointer-events: none;
 }
 
+/* A place's "Jak to działa?" open: its lines on a dark ground over the
+   place's picture, each apart from the next. */
+.place-card .how-more[open] {
+  margin-inline: -8px;
+  padding: 6px 8px 8px;
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.82);
+}
+
+.place-card .how-more > p + p {
+  margin-top: 6px;
+}
+
 .place-card--art::after {
   content: '';
   position: absolute;
@@ -7894,8 +7935,21 @@ a.profession-square:active {
 }
 
 .slot--herb .sprite--item,
-.slot--potion .sprite--item {
+.slot--potion .sprite--item,
+.slot--mineral .sprite--item {
   image-rendering: pixelated;
+}
+
+/* Górnictwo: the shadows of the minerals the System still hides, under
+   what a digging should bring, and the veins' gold with its coin. */
+.mine-shadows {
+  margin-top: 4px;
+}
+
+.mine-gold {
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 /* A gathering's report: the grove's line and the herbs found. */
@@ -7934,7 +7988,9 @@ a.profession-square:active {
 }
 
 .chip--potions,
-.chip--items {
+.chip--items,
+.chip--minerals,
+.chip--jewels {
   border-color: var(--system-line);
   color: var(--system);
 }
@@ -9475,7 +9531,16 @@ a.profession-square:active {
    what is not got yet), the item sets with their chests, the chests of the
    counts, and the lines of where to get an entry. */
 .encyclopedia-tabs {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+/* Seven tabs: three above, four below (Górnictwo's minerals came last). */
+.encyclopedia-tabs .segmented-option {
+  grid-column: span 3;
+}
+
+.encyclopedia-tabs .segmented-option:nth-child(-n + 3) {
+  grid-column: span 4;
 }
 
 .encyclopedia-tabs .segmented-option {
@@ -9496,7 +9561,7 @@ a.profession-square:active {
   background: var(--gold);
 }
 
-.encyclopedia-tabs .segmented-option:nth-child(3n + 1) {
+.encyclopedia-tabs .segmented-option:nth-child(4) {
   border-left: 0;
 }
 

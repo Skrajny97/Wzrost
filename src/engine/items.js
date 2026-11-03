@@ -242,13 +242,19 @@ export function propertyName(stat, content) {
   return content.statsById[stat].name;
 }
 
+// The numbers of an item as it works: upgraded on the Kowadło, then raised
+// by the gem set in it.
+export function upgradedItem(item, content) {
+  return withGemBonus(upgradeNumbers(item, content), content);
+}
+
 // The numbers of an upgraded item: each level of upgrade adds bonusPerLevel
 // of every base number (damage, armor, stats), rounded, and at least
 // minGainPerLevel to a weapon's damage and to anything else's armor. An item
 // without armor of its own, like a talisman, gets that armor from the
 // upgrade alone (the author: "może dawać chociaż +1 do pancerza przy każdym
 // ulepszeniu"), so no level of upgrade leaves the numbers as they were.
-export function upgradedItem(item, content) {
+function upgradeNumbers(item, content) {
   const level = item.upgrade ?? 0;
   if (!level) return item;
   const { bonusPerLevel, minGainPerLevel } = content.balance.upgrades;
@@ -264,6 +270,32 @@ export function upgradedItem(item, content) {
   }
   if (item.implicit) upgraded.implicit = { ...item.implicit, value: scale(item.implicit.value) };
   return upgraded;
+}
+
+// A gem set in an item (Jubilerstwo, jewelcraft.js) raises every number of it
+// by the gem's setBonus (538 A: "Kamień podnosi wszystkie statystyki
+// przedmiotu o procent"), each by at least 1, as an upgrade adds at least
+// something: the damage, the armor, the implicit stat and every affix. A gem
+// the game no longer has adds nothing.
+function withGemBonus(item, content) {
+  const bonus = item.gem ? content.mineralsById[item.gem]?.setBonus : 0;
+  if (!bonus) return item;
+  const raise = (value) => (value > 0 ? value + Math.max(1, Math.round(value * bonus)) : value);
+  const raised = { ...item, affixes: item.affixes.map((affix) => ({ ...affix, value: raise(affix.value) })) };
+  if (item.damage) {
+    const min = raise(item.damage.min);
+    raised.damage = { min, max: Math.max(min, raise(item.damage.max)) };
+  }
+  if (item.armor) raised.armor = raise(item.armor);
+  if (item.implicit) raised.implicit = { ...item.implicit, value: raise(item.implicit.value) };
+  return raised;
+}
+
+// A gem as an item's card shows it: its name, its bonus and the colour of
+// its rarity; null for none, or for a gem the game no longer has.
+export function gemView(gemId, content) {
+  const gem = gemId ? content.mineralsById[gemId] : null;
+  return gem ? { id: gem.id, name: gem.name, bonus: gem.setBonus, color: content.raritiesById[gem.rarity].color } : null;
 }
 
 export const maxUpgrade = (content) => content.balance.upgrades.chances.length;
@@ -428,6 +460,8 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     // null when it asks for none.
     classLevel: classLevel > 1 ? classLevel : null,
     price: sellPrice(item, content, sellBonus),
+    // The gem set in it in Jubilerstwo, which its numbers above include.
+    ...(gemView(item.gem, content) ? { gem: gemView(item.gem, content) } : {}),
     // Got in a Wymiana, or from another character through the Skrzynia
     // Konta: worn from its own level on (src/server/inventory.js).
     ...(item.traded ? { traded: true } : {}),

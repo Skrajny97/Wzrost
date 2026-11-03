@@ -3,7 +3,7 @@
 // The item card also upgrades the item on the camp's Kowadło and takes a bag
 // item apart on the Stół rozbiórki.
 
-import { herbSprite, itemSprite, materialSprite, potionSprite, resourceArt } from '../art.js';
+import { herbSprite, itemSprite, materialSprite, mineralSprite, potionSprite, resourceArt } from '../art.js';
 import { bonusList } from '../bonuses.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
 import { MATERIALS_HINT, craft, materialIcon } from '../craft-table.js';
@@ -228,7 +228,12 @@ export function mountCharacter(container) {
     // na 3: Przedmioty, Materiały, Części").
     const parts = state.character.crafting.parts.filter((part) => part.count > 0);
     const partCount = parts.reduce((sum, part) => sum + part.count, 0);
-    const grids = { items: () => itemsGrid(bag), materials: () => materialsGrid(materials), parts: () => partsGrid(parts) };
+    // The gems and ores of Górnictwo have their own tab once it opens, or
+    // while the character has some.
+    const minerals = state.character.minerals ?? [];
+    const mineralCount = minerals.reduce((sum, mineral) => sum + mineral.count, 0);
+    const showMinerals = mineralCount > 0 || Boolean(state.character.professions?.mining);
+    const grids = { items: () => itemsGrid(bag), materials: () => materialsGrid(materials), parts: () => partsGrid(parts), minerals: () => mineralsGrid(minerals) };
     return h(
       'section',
       { class: 'bag', 'aria-labelledby': 'bag-title' },
@@ -240,12 +245,13 @@ export function mountCharacter(container) {
       bagActions(bag),
       h(
         'div',
-        { class: 'segmented bag-tabs', role: 'group', 'aria-label': 'Zawartość plecaka' },
+        { class: `segmented bag-tabs${showMinerals ? ' bag-tabs--four' : ''}`, role: 'group', 'aria-label': 'Zawartość plecaka' },
         tab('items', 'Przedmioty'),
         tab('materials', stacked > 0 ? `Materiały (${formatNumber(stacked)})` : 'Materiały'),
         tab('parts', partCount > 0 ? `Części (${formatNumber(partCount)})` : 'Części'),
+        showMinerals && tab('minerals', mineralCount > 0 ? `Minerały (${formatNumber(mineralCount)})` : 'Minerały'),
       ),
-      (grids[bagTab] ?? grids.items)(),
+      (grids[bagTab === 'minerals' && !showMinerals ? 'items' : bagTab] ?? grids.items)(),
     );
   }
 
@@ -308,6 +314,104 @@ export function mountCharacter(container) {
         h('p', { class: 'sheet-text', text: 'Z części Warsztat wykonuje przedmioty, a przy wymianie 10 części daje 1 część rzadszą.' }),
       ),
       workshop && h('a', { class: 'button button--world', href: '#/profesje/rzemieslnictwo', onClick: closeSheet, text: 'Do Warsztatu' }),
+    );
+  }
+
+  // The gems and ores of Górnictwo, a slot for each, outside the bag's room
+  // too, framed in their rarity's colour.
+  function mineralsGrid(minerals) {
+    if (minerals.length === 0) return h('p', { class: 'muted', text: 'Nie masz jeszcze kamieni ani kruszców. Wydobędziesz je w Górnictwie.' });
+    return [
+      h('p', { class: 'bag-note', text: 'Kamienie i kruszce nie zajmują miejsca w plecaku.' }),
+      h(
+        'ul',
+        { class: 'bag-grid' },
+        minerals.map((mineral) =>
+          h(
+            'li',
+            {},
+            h(
+              'button',
+              {
+                type: 'button',
+                class: 'slot slot--bag slot--mineral',
+                vars: { '--rarity': mineral.color },
+                'aria-label': `${mineral.name}, ${formatNumber(mineral.count)} szt.`,
+                onClick: () => mineralSheet(mineral),
+              },
+              mineralSprite(mineral.id) ?? icon('ore', { size: 24 }),
+              h('span', { class: 'slot-level', text: formatNumber(mineral.count) }),
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  // A mineral's card: what it is, what a gem gives set in an item or which
+  // jewellery an ore sets, and selling as many as chosen to the scrapper or
+  // throwing them away, once the player confirms, as for herbs (533 A).
+  function mineralSheet(mineral) {
+    let count = 1;
+    const price = (amount) => saleGold(mineral.price, amount);
+    const value = h('output', { class: 'herb-count-value' });
+    const sell = h('button', { type: 'button', class: 'button button--system' });
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
+    const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(mineral.count) });
+    function set(next) {
+      count = Math.min(mineral.count, Math.max(1, next));
+      value.textContent = `${formatNumber(count)} szt.`;
+      sell.textContent = `Sprzedaj za ${formatNumber(price(count))} złota`;
+      less.disabled = count === 1;
+      more.disabled = count === mineral.count;
+    }
+    set(count);
+    const act = (path, done) => async (event) =>
+      withButton(event.currentTarget, async () => {
+        const result = await call('POST', `/api/minerals/${path}`, { mineralId: mineral.id, count });
+        closeSheet();
+        done?.(result);
+      });
+    sell.addEventListener('click', async (event) => {
+      const button = event.currentTarget;
+      const sure = await confirmAction({
+        title: 'Sprzedać minerał?',
+        text: `Złomiarz kupi: ${mineral.name} ×${formatNumber(count)} za ${formatNumber(price(count))} złota.`,
+        confirmLabel: 'Sprzedaj',
+      });
+      if (!sure) return;
+      await act('sell', ({ sold }) => {
+        playSound('coin');
+        toast(`Złomiarz kupił ${formatNumber(sold.count)} szt. za ${formatNumber(sold.gold)} złota.`);
+      })({ currentTarget: button });
+    });
+    const discard = async (event) => {
+      const button = event.currentTarget;
+      const sure = await confirmAction({ title: 'Wyrzucić minerał?', text: `${mineral.name}: ${formatNumber(count)} szt. zniknie na zawsze.`, confirmLabel: 'Wyrzuć', danger: true });
+      if (sure) await act('discard')({ currentTarget: button });
+    };
+    const art = mineralSprite(mineral.id);
+    const title = h('h2', { class: 'item-title', vars: { '--rarity': mineral.color }, text: mineral.name });
+    const kind = mineral.kind === 'gem' ? `Kamień szlachetny · ${mineral.rarityName}` : 'Kruszec';
+    const meta = h('p', { class: 'item-meta', text: `${kind} · ${formatNumber(mineral.count)} szt.` });
+    const use =
+      mineral.kind === 'gem'
+        ? `Daje biżuterii rzadkość: ${mineral.rarityName}. Oprawiony w przedmiot podnosi wszystkie jego liczby o ${formatNumber(Math.round(mineral.bonus * 100))}%.`
+        : `Idzie na oprawy biżuterii rzadkości: ${mineral.rarityNames.join(', ')}.`;
+    const jeweller = state.character.professions?.jewelcrafting;
+    openSheet(
+      h(
+        'div',
+        { class: 'item-details' },
+        art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art', vars: { '--rarity': mineral.color } }, art), h('div', {}, title, meta)) : [title, meta],
+        h('p', { class: 'sheet-text', text: mineral.description }),
+        h('p', { class: 'sheet-text', text: use }),
+        h('p', { class: 'sheet-text', text: `Złomiarz płaci ${formatDecimal(mineral.price)} złota za sztukę.` }),
+      ),
+      h('div', { class: 'herb-count' }, less, value, more, all),
+      jeweller && h('a', { class: 'button button--world', href: '#/profesje/jubilerstwo', onClick: closeSheet, text: 'Do Szlifierni' }),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: 'Wyrzuć' }), sell),
     );
   }
 
@@ -1129,6 +1233,8 @@ export function itemDetails(item, { small = false } = {}) {
       'ul',
       { class: 'item-properties' },
       item.properties.map((line) => h('li', { text: line })),
+      // The gem set in it in Jubilerstwo, which the numbers above include.
+      item.gem && h('li', { class: 'item-gem', vars: { '--rarity': item.gem.color } }, mineralSprite(item.gem.id), ` ${item.gem.name}: +${formatNumber(Math.round(item.gem.bonus * 100))}% do wszystkich liczb`),
       item.classNames && h('li', { class: 'item-classes', text: `${item.classNames.length > 1 ? 'Dla klas' : 'Dla klasy'}: ${item.classNames.join(', ')}` }),
       item.classLevel && h('li', { class: 'item-classes', text: `Od poziomu klasy ${item.classLevel}` }),
       item.price !== undefined && h('li', { class: 'item-price', text: `U złomiarza: ${formatNumber(item.price)} złota` }),
