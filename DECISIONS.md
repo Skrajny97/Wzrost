@@ -3022,7 +3022,7 @@ Autor: „447 A / 448 A / 451 A / 452 A / 457 A / 460 A”, a do tego: „Do ewo
 ## Wersja 0.1.3 (3.11.2026)
 
 1. **Co wchodzi do gry:** druga ewolucja klas na 100. poziomie klasy (zob. niżej „Druga ewolucja klas”), z portretami, chodami i jazdą wierzchem wszystkich 30 dalszych postaci i z siedmioma odcieniami skóry każdej.
-2. **Sprawdzone:** testy na tym komputerze (wszystkie ukończone przed wdrożeniem, 584, przeszły; pełny zestaw sprawdza też GitHub przed wdrożeniem); nowa postać przeszła wprowadzenie od pierwszej karty do pierwszej wyprawy na telefonie, komputerze i dużym monitorze; w przeglądarce, w trybie testowym, Strzelczyni na 100. poziomie klasy przyjęła ewolucję „Strzelczyni Wyborowa” (karta w zakładce Ewolucja, potwierdzenie, ceremonia, ekran Walki) bez błędów strony. Każda z 30 dalszych postaci ma swój portret, chód i jazdę na listach grafik, z odcieniami skóry.
+2. **Sprawdzone:** pełne testy na tym komputerze, 897 z 897 (skończyły się chwilę po wypchnięciu; do wypchnięcia przeszło 584 ukończonych, a GitHub puszcza pełny zestaw przed wdrożeniem); nowa postać przeszła wprowadzenie od pierwszej karty do pierwszej wyprawy na telefonie, komputerze i dużym monitorze; w przeglądarce, w trybie testowym, Strzelczyni na 100. poziomie klasy przyjęła ewolucję „Strzelczyni Wyborowa” (karta w zakładce Ewolucja, potwierdzenie, ceremonia, ekran Walki) bez błędów strony. Każda z 30 dalszych postaci ma swój portret, chód i jazdę na listach grafik, z odcieniami skóry.
 3. **Teksty robocze:** zdania fabularne pod nazwami 30 umiejętności i nowe zdania zakładki Ewolucja autor może jeszcze zmienić.
 4. **Pytanie do autora (498):** czy Bastion ma zostać tak obronny (punkt 13 niżej).
 
