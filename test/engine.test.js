@@ -65,6 +65,7 @@ import {
   craftPace,
   craftTable,
   createRng,
+  rollRarity,
   damageScale,
   earnedPoints,
   estimateThreat,
@@ -642,6 +643,37 @@ describe('hunts', () => {
     assert.equal(pace(1).toughChance, 0);
     assert.ok(pace(30).toughChance < pace(120).toughChance && pace(120).toughChance < pace(240).toughChance);
     assert.ok(pace(15).eliteChance < pace(240).eliteChance);
+  });
+
+  test('a longer exploration finds unique and rarer items a little more often, at most a tenth more at four hours (482 B)', () => {
+    const tuning = content.balance.hunt;
+    const raised = (from) => content.rarities.slice(content.rarities.findIndex((rarity) => rarity.id === from)).map((rarity) => rarity.id);
+    assert.deepEqual(raised(tuning.uniqueLengthFrom), ['unique', 'epic', 'legendary', 'mythic', 'divine']);
+    // The draw: the same weights up to half an hour, the rarer ones x1.1 at
+    // four hours; common and rare items never gain.
+    const share = (unique) => {
+      const rng = createRng('rzadkie');
+      let count = 0;
+      for (let i = 0; i < 40000; i++) if (raised('unique').includes(rollRarity(rng, content, 1, unique))) count += 1;
+      return count / 40000;
+    };
+    const base = share(1);
+    const long = share(1.1);
+    assert.ok(long > base * 1.04 && long < base * 1.14, `${base} → ${long}`);
+    // The factor by length: 1 to half an hour, then the same step at each
+    // doubling, 1.1 at four hours and never more.
+    const factor = (minutes) => {
+      const pairs = tuning.uniqueLengthFactorByMinutes;
+      if (minutes <= pairs[0][0]) return pairs[0][1];
+      for (let i = 1; i < pairs.length; i++) {
+        const [m0, v0] = pairs[i - 1];
+        const [m1, v1] = pairs[i];
+        if (minutes <= m1) return v0 + ((v1 - v0) * Math.log(minutes / m0)) / Math.log(m1 / m0);
+      }
+      return pairs.at(-1)[1];
+    };
+    assert.deepEqual([factor(5), factor(30), factor(240), factor(480)], [1, 1, 1.1, 1.1]);
+    assert.ok(Math.abs(factor(60) - (1 + 0.1 / 3)) < 1e-9 && Math.abs(factor(120) - (1 + 0.2 / 3)) < 1e-9);
   });
 
   test('a longer exploration pays off more: from half an hour on, the elite, the champion and finds come more often in an hour', () => {

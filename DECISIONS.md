@@ -3011,6 +3011,12 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Rzadsze przedmioty na dłuższych wyprawach (482 B, 3.11.2026)
+
+1. **Przedmioty z wyprawy** (znaleziska i skrzynia elity) wypadają w rzadkości unikalnej i rzadszych trochę częściej, im dłuższa wyprawa: do pół godziny bez zmian, potem o tyle samo przy każdym podwojeniu czasu, aż do wag razy 1,1 przy 4 godzinach (`uniqueLengthFactorByMinutes`, od rzadkości `uniqueLengthFrom` w `data/balance.json`). Pospolite i rzadkie nie zyskują.
+2. **Ile to daje:** przy 4 godzinach przedmiot jest unikalny albo rzadszy w ok. 8,7% przypadków zamiast 8,0%, czyli o ok. 9% częściej (najwyżej +10%, jak chciał autor); godzina +3%, 2 godziny +6%. Razem z większą liczbą znalezisk i elit na długich wyprawach (0.0.98) długa wyprawa daje wyraźnie więcej rzadkich przedmiotów na godzinę.
+3. Skrzynia czempiona ma swoją rzadkość i premii nie dostaje; Wieże też nie.
+
 ## Odpowiedzi autora 439–497 (3.11.2026)
 
 Autor: „479.5 A / 439 A / 440 OK … 446 OK / 447 OK tylko popraw sprite'a bo piksele są zbędne lewy górny róg / 448 OK, tylko ucięty ogon / 449 OK / 450 OK / 451 OK, tylko zrób go bardziej czarnego / 452 OK, ale sprite totalnie ucięty musi być bardziej majestatyczny / 453 OK / 454 Ok / 455 zmień nazwę na Wielki Kleszcz / 456 OK / 457 B / 458 OK / 459 OK / 460 materiał do dokończenia bo ucięty / 461 OK / 462 OK / 463 OK, ale ryś był w Rysiej Grani, wiec out, nie moga sie potwory powtarzać / 464 OK / 465 B tylko zrób je bardziej abstrakcyjne groźne / 466 OK / 467 A / 468 OK / 469 OK / 470 OK / 471 B / 472 A / 476 i 477 wybrałeś sam i zatwierdzam / 478 B max 20% / 481 B / 482 B ale max +10% / 483 A / 484 A / 485 A / 486 A / 487 B / 488 A / 489 A / 490 A … 497 A”.

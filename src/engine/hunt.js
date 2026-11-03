@@ -462,7 +462,10 @@ export function simulateHunt(
   const filled = new Set(equipped.map((item) => item.slot));
   const otherClass = content.balance.items.otherClass;
   const otherClassShare = character.level >= otherClass.fromLevel ? otherClass.share : 0;
-  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare };
+  // A longer exploration finds unique and rarer items a little more often
+  // (482 B, at most +10% at four hours).
+  const uniqueBonus = byMinutes(tuning.uniqueLengthFactorByMinutes, minutes);
+  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare, uniqueBonus };
   const hpStart = me.hp;
   let result = 'success';
   let endedAt = durationMs; // a faint or an escape ends the exploration early
