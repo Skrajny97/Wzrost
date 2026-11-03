@@ -283,7 +283,8 @@ const BEATS = {
     place: '.camp-button, #nav-main > .nav-item[href="#/oboz"]',
     when: (hash, read) => read.has('character') && !read.has('camp') && !freePoints() && !hash.startsWith('#/oboz'),
   },
-  camp: { place: mark('camp-stock'), when: onBoard },
+  // The resources over the board, on a computer in the top bar (505 A).
+  camp: { place: `${mark('camp-stock')}, .gold-stock--wood, .gold-stock--stone, .gold-stock--iron-ore`, when: onBoard },
   'camp-sawmill': { place: mark('plot-sawmill'), survey: '.camp-board', when: (hash) => onBoard(hash) && !campStarted() },
   'camp-quarry': { place: `${mark('plot-quarry')}, ${mark('plot-mine')}`, when: (hash) => onBoard(hash) && !campStarted() },
   'camp-lake': { place: mark('plot-midas-lake'), when: (hash) => onBoard(hash) && !campStarted() },

@@ -3011,6 +3011,42 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Wersja 0.1.7 (3.11.2026)
+
+1. **Co wchodzi do gry:** górny pasek i menu na komputerze według odpowiedzi 505–508 (zob. „Górny pasek i menu na komputerze: odpowiedzi autora 505–508”). Telefon bez zmian, poza mniejszymi podpisami placów na wąskiej planszy obozu.
+2. **Sprawdzone:**
+   - pełne testy: 927 z 928. Nie przeszedł tylko test czasu oszacowania zagrożenia. Na tym komputerze nie przechodzi on też na kodzie 0.1.6, który jest w grze, bo maszyna jest obciążona; GitHub i tak puszcza pełne testy przed wdrożeniem;
+   - przejście wprowadzenia na telefonie, komputerze i dużym monitorze (pierwsza wyprawa po 11 krokach);
+   - obchód narratora po obozie na komputerze (1366 × 768) i telefonie (390 × 844): kwestia o zasobach wskazuje na komputerze górny pasek, a cały obchód kończy się budową Ogniska;
+   - plansza obozu z Osadą tak, jak widzi ją gracz: 295 × 524 px na 1366 × 768, 313 × 556 px na 1280 × 800 i 470 × 834 px na 1920 × 1080, za każdym razem cała w oknie i bez przewijania na boki.
+
+## Górny pasek i menu na komputerze: odpowiedzi autora 505–508 (3.11.2026)
+
+Autor: „506 A / 505 A / 507 A / 508 A” (pytania w „Uwagi gracza o układzie na komputerze”), potem „505-508 też już pisałem że OK”. Wszystko tylko w układzie komputera; telefon bez zmian.
+
+1. **Zasoby w górnym pasku (505 A).** Obok złota i Punktów Systemu stoją na stałe drewno, kamień, ruda żelaza i Punkty Czasu, z tymi samymi obrazkami co w liście pod złotem, a liczby zmieniają się na bieżąco jak złoto. Należą do przycisku złota: kliknięcie dalej rozwija listę zasobów. Na telefonie zasoby zostają w liście pod złotem.
+    - (brakujący szczegół) Liczby zasobów są jasne, a Punktów Czasu bursztynowe, jak w liście. Mysz nad klepsydrą mówi, kiedy przyjdzie następny Punkt Czasu.
+    - (brakujący szczegół) Na ekranie węższym niż 1280 px zasoby stoją dwa nad dwoma, jak złoto nad Punktami Systemu.
+    - (brakujący szczegół) Górny pasek ma dwie linie na ekranach do 2199 px szerokości: w jednej linii z zasobami paski HP, many i XP byłyby za wąskie na swoje liczby. Jedna linia zostaje od 2200 px.
+2. **Plansza Obozu na wysokość ekranu (506 A).** Plansza maleje równo, w tych samych proporcjach, tak że od jej górnej krawędzi do dołu ekranu mieści się cała, i przelicza się przy zmianie okna. Nie maleje poniżej 288 px szerokości (plansza najwęższego telefonu).
+    - (brakujący szczegół) Rząd drewna, kamienia i rudy nad planszą znika na komputerze, bo te same liczby są w górnym pasku. Dzięki temu dłuższa plansza z Osadą (wersja 0.1.6) mieści się cała na 1366 × 768. Kwestia narratora „Na tej polanie ktoś już kiedyś obozował…” wskazuje na komputerze zasoby w górnym pasku.
+    - (brakujący szczegół) Podpisy placów maleją razem z wąską planszą (od 12 do 10 px), żeby sąsiednie nazwy, np. Kowadło i Kamieniołom, na siebie nie wchodziły. Na zwykłym telefonie zostają jak były.
+3. **Menu rozwijane jak Postać (507 A).** Gdy otwarta jest Walka, Profesje, Osada albo Społeczność, pod jej pozycją w menu stoją skróty do jej części, z ikonami, jak zakładki pod Postacią. Skrót części, która jest na ekranie, jest podświetlony.
+    - Walka: Eksploracja i Wieże. Profesje: Zielarstwo, Alchemia i Rzemieślnictwo. Osada: jej miejsca w kolejności z planszy. Społeczność: Czat, Znajomi, Ranking, Gildia i Drużyna.
+    - Część, której gra jeszcze nie otwiera, ma kłódkę i poziom („poz. 50” przy Wieżach) i nie da się jej kliknąć, tak jak jej przycisku na ekranie.
+    - (brakujący szczegół) Złota kropka przy skrócie mówi, skąd kropka na pozycji. Przy miejscach Osady kropki nie ma, bo gra liczy jedną kropkę Osady naraz.
+    - (brakujący szczegół) Ikony są z tych, które gra już ma. Części Społeczności mają własne adresy (#/spolecznosc/czat, /znajomi, /ranking, /druzyna).
+4. **Obóz w menu (508 A).** Obóz jest zwykłą pozycją menu, z namiotem, a przycisku „OBÓZ” w górnym pasku już nie ma. Pozycja odlicza trwającą budowę i ma złotą kropkę przy pełnym magazynie. We wprowadzeniu narrator wskazuje na komputerze tę pozycję, a na telefonie namiot.
+    - (brakujący szczegół) Obóz stoi trzeci, pod Walką, bo tam nie zepchnie go w dół rozwinięta lista Osady. Klawisze idą za menu: 1 Postać, 2 Walka, 3 Obóz, 4 Profesje, 5 Osada, 6 Społeczność.
+5. **Poprawka przy okazji.** Społeczność nie otwierała się postaci zrobionej przed wprowadzeniem narratora (bez listy jego kwestii): ekran rzucał błąd. Teraz otwiera się jak u innych.
+
+## Materiały Sosnowych Wydm: wybory autora (516, 3.11.2026)
+
+Autor: „516.1 C, 516.2 C, 516.3 D, 516.4 B, 516.5 C, 516.7 C, 516.9 D, 516.11 C, 516.12 C, 516.13 D, 516.14 A, 516.15 D, 516.16 D, 516.17 D”. Wszystkie z PixelLab (`materials-pixellab`, 32 × 32, styl jak Szczurzy ogon).
+
+1. Wybrane: Szklisty piasek C, Wieczny wrzos C, Pióro lelka D, Grudka bursztynu B, Toczona kora C, Proch suchotnika C, Brązowy pierścień D, Żarzący węgielek C, Błona latawca C, Zwęglona szczapa D, Popiół zgliszcz A, Wieczna iskra D, Sierp południcy D, Pióro raroga D.
+2. Ćmi pył (516.6), Kamyk z wiru (516.8) i Dziegieć (516.10) PixelLab rysuje jeszcze raz, bo za pierwszym razem ich nie oddał.
+
 ## Rozdział narratora: Wieże (515, 3.11.2026)
 
 Autor zapytał: „Czy do Wież robimy Samouczek? a może już mamy coś takiego?”. Były tylko komunikat Systemu na 50. poziomie postaci i wstęp na ekranie Wież pod „Jak to działa?”, bez rozdziału narratora. Autor: „515 wszystko OK”.
