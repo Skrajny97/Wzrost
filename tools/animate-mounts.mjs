@@ -7,7 +7,9 @@
 // each frame as a PNG of its own (-1, -2…):
 //   node tools/animate-mounts.mjs --ids pony,horse --variants 2 --max-cost 1 [--dry-run]
 // The Sklep Systemu's pets move the same way, from their own list (kind
-// pets-animate: --config art/pets.json --group pets --out art/drafts/pets-animate).
+// pets-animate: --config art/pets.json --group pets --out art/drafts/pets-animate),
+// and the professions' work scenes with their backgrounds (kind scenes-animate:
+// --config art/scenes.json --group scenes --out art/drafts/scenes-animate).
 // The run stops before its animations could cost more than --max-cost
 // dollars (one is a few generations of PixelLab, at most JOB_USD).
 
@@ -78,7 +80,9 @@ async function animate(id, seed) {
     action: mount.action ?? config.action,
     frame_count: mount.frames ?? config.frames,
     seed,
-    no_background: true,
+    // A scene keeps its own background (noBackground: false in the config,
+    // e.g. the professions' work scenes); a mount or a pet is cut out.
+    no_background: mount.noBackground ?? config.noBackground ?? true,
   };
   let job;
   for (let attempt = 0; ; attempt++) {
