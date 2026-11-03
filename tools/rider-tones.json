@@ -32,7 +32,7 @@
   "necromancer-female": { "add": ["d0c3a7", "dfcfb8", "c0b79e", "baa895", "aa9b80", "9d9175", "8d826d", "826e60"], "only": [[33, 14, 42, 29], [39, 45, 51, 55]] },
   "necromancer-male": { "add": ["c7bfa6", "a39475", "bca982", "bfb594", "91856d", "7b694f", "cec7ba", "867862", "665d53", "5b5644", "4b423c", "ae9f81"], "only": [[33, 14, 42, 29], [39, 45, 51, 55]] },
   "phantom-female": { "only": [[29, 14, 38, 29]] },
-  "phantom-male": { "only": [[29, 14, 38, 29]] },
+  "phantom-male": { "only": [[29, 14, 38, 29]], "span": [0.5, 1] },
   "thunder-lord-female": { "add": ["ca9d65", "b08048", "9d6f48", "855e3b"], "only": [[31, 18, 38, 30], [38, 46, 49, 56]] },
   "thunder-lord-male": { "only": [[30, 15, 39, 27], [27, 19, 30, 24]] },
   "winter-lord-female": { "only": [[28, 19, 39, 31], [41, 45, 51, 55]] },

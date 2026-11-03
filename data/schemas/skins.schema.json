@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Kolory skóry",
-  "description": "Odcienie skóry portretu postaci, do wyboru przy tworzeniu postaci i w Ustawieniach. Odcień bez ramp to portret taki, jak go narysowano; pozostałe przemalowują skórę od cienia (pierwszy kolor) przez środek po światło (tools/skin-tones.py robi z nich pliki). swatch: kolor kropki odcienia na ekranie. default: odcień nowej postaci.",
+  "description": "Odcienie skóry portretu postaci, do wyboru przy tworzeniu postaci i w Ustawieniach. Każdy odcień przemalowuje narysowaną skórę od cienia (pierwszy kolor) przez środek po światło, także Jasna (autor: „567 A”); odcień bez ramp byłby portretem takim, jak go narysowano (tools/skin-tones.py i pozostałe narzędzia odcieni robią z nich pliki). swatch: kolor kropki odcienia na ekranie. default: odcień nowej postaci.",
   "type": "object",
   "additionalProperties": false,
   "required": ["default", "skins"],

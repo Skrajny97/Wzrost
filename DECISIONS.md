@@ -3034,6 +3034,21 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.21 (3.11.2026)
+
+1. **Odcień „Jasna” wszędzie tą samą jasną skórą** (567 A): każdy wygląd, na portrecie, w chodzie i na wierzchowcu (zob. „Odpowiedzi autora 567 i 568”).
+
+## Odpowiedzi autora 567 i 568 (3.11.2026)
+
+Autor: „567 A” i „568 A”.
+
+1. **„Jasna” jak pozostałe odcienie (567 A).** Jasna jest teraz przekolorowana rampą zwykłej skóry (`#a87458`, `#e2b090`, `#f6d6bc`, tą samą, co u Widma), jak pozostałe odcienie.
+   - Dotyczy wszystkich 70 wyglądów: portretu, chodu i jazdy, razem 210 nowych plików `-light`.
+   - Narysowany obrazek jest już tylko źródłem dla odcieni.
+   - W każdym wyglądzie Blada jest teraz jaśniejsza od Jasnej, a Jasna od Śniadej.
+2. (brakujący szczegół) **Widmo (mężczyzna) na wierzchowcu** ma skórę z jednego, jasnego koloru, więc jego odcienie biorą górną połowę rampy (`span` w `tools/rider-tones.json`). Inaczej nowa Jasna wychodziła u niego ciemniejsza od narysowanej.
+3. **Kwestia narratora o Targowisku (568 A)** dostaje nowe brzmienie: „Na Targowisku gracze licytują swoje towary. Licytacja trwa od godziny do doby, a przebity gracz od razu odzyskuje złoto.” Nagrane wersje czekają na wybór autora.
+
 ## Wersja 0.1.20 (3.11.2026)
 
 1. **Targowisko:** wystawiający wybiera suwakiem czas licytacji od 1 do 24 godzin, co godzinę (zob. „Targowisko: czas licytacji do wyboru”).

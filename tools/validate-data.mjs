@@ -572,11 +572,12 @@ function checkReferences(data) {
   if (evolutions.some((level, i) => i > 0 && level <= evolutions[i - 1])) errors.push('balance.json: classEvolutionLevels musi rosnąć');
   if (evolutions.at(-1) > data.balance.progression.maxLevel) errors.push('balance.json: ewolucja klasy powyżej maxLevel');
 
-  // Skin tones: the default among them, one tone that is the portrait as
-  // drawn, and a recoloured file for every portrait in every other tone.
+  // Skin tones: the default among them, every tone recoloured on its own
+  // ramp, Jasna too (the author: "567 A"), and a file for every portrait in
+  // every tone.
   const tones = uniqueIds(errors, 'skins', data.skins.skins);
   if (!tones.has(data.skins.default)) errors.push(`skins.json: nieznany odcień domyślny ${data.skins.default}`);
-  if (data.skins.skins.filter((tone) => !tone.ramp).length !== 1) errors.push('skins.json: dokładnie jeden odcień bez ramp (portret taki, jak narysowany)');
+  for (const tone of data.skins.skins.filter((candidate) => !candidate.ramp)) errors.push(`skins.json: odcień ${tone.id} nie ma rampy`);
   for (const tone of data.skins.skins.filter((candidate) => candidate.ramp)) {
     for (const cls of data.classes) {
       for (const look of data.appearances) {
