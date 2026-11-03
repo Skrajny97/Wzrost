@@ -217,7 +217,7 @@ export function mountParty(container) {
       // author: "ten taki długi tekst o Drużynie schowaj pod "Jak to
       // działa?"") with the first sentence in sight.
       own?.leader
-        ? howItWorks('Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i stuknij „Wyrusz”.', [
+        ? howItWorks('Wyprawę drużyny zaczynasz w Walce: wybierz miejsce, zaznacz „Z drużyną” i naciśnij „Wyrusz”.', [
             GOERS,
             spreadText(view.range.spread),
             'Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.',

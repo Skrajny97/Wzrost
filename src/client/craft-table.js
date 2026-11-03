@@ -175,7 +175,7 @@ export function craftTableSection(ticks) {
     built &&
       crafting.materials.length === 0 &&
       crafting.queue.length === 0 &&
-      systemPanel('Stół czeka na materiały. Rozbierać przedmioty możesz też z plecaka: dotknij przedmiotu i wybierz „Rozbierz”.'),
+      systemPanel('Stół czeka na materiały. Rozbierać przedmioty możesz też z plecaka: wybierz przedmiot, a potem „Rozbierz”.'),
     materialsCard(crafting, built, full),
     crafting.queue.length > 0 && queueCard(crafting, ticks),
     partsCard(crafting),

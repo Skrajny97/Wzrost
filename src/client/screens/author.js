@@ -81,7 +81,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
       'section',
       { class: 'card author-skills', 'aria-label': 'Podgląd umiejętności' },
       h('h2', { class: 'card-title', text: 'Podgląd umiejętności' }),
-      h('p', { class: 'muted', text: 'Stuknij umiejętność: krótka walka pokazowa postaci na poziomie 20, z umiejętnością na poziomie 10. Umiejętności ewolucji: postać na poziomie 60, umiejętność na poziomie 20.' }),
+      h('p', { class: 'muted', text: 'Wybierz umiejętność: krótka walka pokazowa postaci na poziomie 20, z umiejętnością na poziomie 10. Umiejętności ewolucji: postać na poziomie 60, umiejętność na poziomie 20.' }),
       classes.map((className) =>
         h(
           'div',

@@ -169,7 +169,7 @@ export function mountFriends(container) {
       view.friends.length === 0
         ? h('p', {
             class: 'muted',
-            text: 'Nie masz jeszcze znajomych. Dotknij imienia postaci na czacie albo w Rankingu i zaproś ją w jej karcie albo wpisz imię poniżej.',
+            text: 'Nie masz jeszcze znajomych. Wybierz imię postaci na czacie albo w Rankingu i zaproś ją w jej karcie albo wpisz imię poniżej.',
           })
         : h(
             'ul',
