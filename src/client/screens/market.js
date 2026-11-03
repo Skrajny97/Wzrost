@@ -350,6 +350,14 @@ export function mountMarket(holder) {
     );
   }
 
+  // What the scrapper pays for the goods, under their name while the player
+  // chooses what to put up (the author: "Niech przy wyborze czegoś do
+  // wystawienia na licytacji pokazuje za ile dany przedmiot idzie u
+  // złomiarza"); goods he does not buy, as parts, show nothing.
+  const scrapText = (price, each = false) =>
+    typeof price === 'number' ? `U złomiarza: ${formatDecimal(price)} zł${each ? ' za sztukę' : ''}` : null;
+  const pickWithScrap = (summary, text) => (text ? h('span', { class: 'market-pick-goods' }, summary, h('span', { class: 'muted market-scrap', text })) : summary);
+
   // "Wystaw": the goods first, then the count and the prices.
   function listSheet() {
     const { items, stacks } = market.sellable;
@@ -360,8 +368,20 @@ export function mountMarket(holder) {
       const bag = shown.filter((one) => one.kind === 'item');
       const others = shown.filter((one) => one.kind !== 'item');
       return [
-        bag.length > 0 && h('ul', { class: 'market-picks' }, bag.map(({ item }) => h('li', { class: 'market-pick' }, itemSummary(item), choose({ kind: 'item', itemId: item.id, name: item.name, count: 1 })))),
-        others.length > 0 && h('ul', { class: 'market-picks' }, others.map((stack) => h('li', { class: 'market-pick' }, stackLine(stack), choose(stack)))),
+        bag.length > 0 &&
+          h(
+            'ul',
+            { class: 'market-picks' },
+            bag.map(({ item }) =>
+              h('li', { class: 'market-pick' }, pickWithScrap(itemSummary(item), scrapText(item.price)), choose({ kind: 'item', itemId: item.id, name: item.name, count: 1, scrap: item.price })),
+            ),
+          ),
+        others.length > 0 &&
+          h(
+            'ul',
+            { class: 'market-picks' },
+            others.map((stack) => h('li', { class: 'market-pick' }, pickWithScrap(stackLine(stack), scrapText(stack.scrap, true)), choose(stack))),
+          ),
       ];
     };
     openSheet(
@@ -378,8 +398,10 @@ export function mountMarket(holder) {
     const count = goods.kind === 'item' ? null : numberField('market-count', `Ile sztuk (masz ${formatNumber(goods.count)})`, goods.count, 1, goods.count);
     const start = numberField('market-start', 'Cena wywoławcza (zł)', null, 1, maxPrice);
     const now = numberField('market-buy-now', '„Kup teraz” (zł, może zostać puste)', null, 1, maxPrice);
+    const scrap = scrapText(goods.scrap, goods.kind !== 'item');
     openSheet(
       h('h2', { class: 'sheet-title', text: goods.name }),
+      scrap && h('p', { class: 'muted market-scrap', text: scrap }),
       count && h('p', { class: 'sheet-text', text: 'Cena dotyczy wszystkich wystawionych sztuk razem.' }),
       count?.element,
       start.element,

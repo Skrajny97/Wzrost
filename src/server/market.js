@@ -18,6 +18,7 @@ import {
   bidBlock,
   bagStacks,
   buyCeiling,
+  campBonus,
   campLevels,
   createRng,
   itemName,
@@ -169,16 +170,22 @@ function knownGood(kind, key) {
   return Boolean(content.materialsById[materialId] && content.raritiesById[rarityId]);
 }
 
-// What the character can put up: the items in its bag and its stacks.
-function sellable(player) {
+// What the character can put up: the items in its bag and its stacks, each
+// with what the scrapper pays this character for it (`price` of an item,
+// `scrap` of one piece), with the Skup złomu's bonus, as in the bag (the
+// author: "Niech przy wyborze czegoś do wystawienia na licytacji pokazuje za
+// ile dany przedmiot idzie u złomiarza").
+function sellable(player, now) {
   const { row } = player;
+  const sellBonus = campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
   const stacks = { herb: herbsOf(row), potion: potionsOf(row), material: JSON.parse(row.materials ?? '{}'), part: JSON.parse(row.parts ?? '{}') };
+  const withBonus = (goods) => (typeof goods.scrap === 'number' ? { ...goods, scrap: goods.scrap * (1 + sellBonus) } : goods);
   return {
-    items: player.items.filter((item) => !item.equippedSlot).map((item) => ({ id: item.id, ...itemView(item, content) })),
+    items: player.items.filter((item) => !item.equippedSlot).map((item) => ({ id: item.id, ...itemView(item, content, { sellBonus }) })),
     stacks: STACKS.flatMap((kind) =>
       Object.entries(stacks[kind])
         .filter(([key, count]) => count > 0 && knownGood(kind, key))
-        .map(([key, count]) => goodsView(kind, key, count)),
+        .map(([key, count]) => withBonus(goodsView(kind, key, count))),
     ),
   };
 }
@@ -234,7 +241,7 @@ async function marketView(db, player, now) {
     offers: others.results.map((offer) => offerView(offer, row.id)),
     mine: mine.results.map((offer) => offerView(offer, row.id)),
     parcels: parcels.results.map((parcel) => ({ id: parcel.id, reason: parcel.reason, goods: goodsView(parcel.kind, parcel.good, parcel.count, parcel.item) })),
-    sellable: sellable(player),
+    sellable: sellable(player, now),
     trade: tradeView(stored.marketTrade, row.level, now, content, reputation),
     ...residentsView(player, stored, now),
   };

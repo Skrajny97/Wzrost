@@ -10227,6 +10227,19 @@ a.profession-square:active {
   flex: 1;
 }
 
+/* The goods with what the scrapper pays for them, under their name. */
+.market-pick-goods {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.market-scrap {
+  font-size: 13px;
+}
+
 .market-reason {
   flex: none;
   font-size: 13px;

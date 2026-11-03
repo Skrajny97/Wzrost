@@ -219,6 +219,24 @@ describe('the Targowisko through the API', () => {
     assert.deepEqual([sixth.data.market.mine.length, sixth.data.market.limit], [6, 6]);
   });
 
+  test('while choosing what to put up, each goods show what the scrapper pays this character, with the Skup złomu', async () => {
+    const herb = content.herbs[0];
+    await (await db()).prepare('UPDATE characters SET herbs = ? WHERE name = ?').bind(JSON.stringify({ [herb.id]: 3 }), 'Kramarka').run();
+    await inBag('Kramarka', amulet(30));
+    const plain = (await market('Kramarka')).sellable;
+    // A Skup złomu at level 5: the scrapper pays 50% more.
+    await (await db())
+      .prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'scrap-bench', 5, 0, 0 FROM characters WHERE name = 'Kramarka'")
+      .run();
+    const { sellable } = await market('Kramarka');
+    const bag = (await call('GET', '/api/character', { cookie: cookies.Kramarka })).data.character;
+    assert.equal(sellable.items[0].price, bag.bag[0].price);
+    assert.equal(sellable.items[0].price, Math.round(plain.items[0].price * 1.5));
+    const herbGoods = sellable.stacks.find((goods) => goods.kind === 'herb');
+    assert.equal(herbGoods.scrap, herb.price * 1.5);
+    assert.equal(herbGoods.scrap, bag.herbs.find((one) => one.id === herb.id).price);
+  });
+
   test('a bid holds the gold, the outbid get theirs back at once, and the winner and the seller collect after the end', async () => {
     const itemId = await inBag('Kramarka', amulet(30));
     await act('Kramarka', 'list', { kind: 'item', itemId, startPrice: 1000, buyNow: null });
