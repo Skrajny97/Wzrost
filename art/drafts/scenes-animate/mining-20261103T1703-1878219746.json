@@ -1,0 +1,15 @@
+{
+  "id": "mining",
+  "payload": {
+    "first_frame": "art/references/scenes/mining-start.png",
+    "action": "swinging the pickaxe in a smooth seamless loop: raising it over the shoulder and striking the gold vein in the rock wall, small sparks and stone chips flying at each strike, the lantern flickering softly, the tunnel and the wall staying still",
+    "frame_count": 8,
+    "seed": 1878219746,
+    "no_background": false
+  },
+  "usage": {
+    "type": "generations",
+    "generations": 2
+  },
+  "frames": 9
+}

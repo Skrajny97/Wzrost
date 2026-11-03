@@ -1,0 +1,15 @@
+{
+  "id": "jewelcrafting",
+  "payload": {
+    "first_frame": "art/references/scenes/jewelcrafting-start.png",
+    "action": "pressing the gem against the turning grinding wheel in a smooth seamless loop, the wheel spinning, small sparks flying from it, the candle flame flickering, the bench and the wall staying still",
+    "frame_count": 8,
+    "seed": 1311326717,
+    "no_background": false
+  },
+  "usage": {
+    "type": "generations",
+    "generations": 2
+  },
+  "frames": 9
+}
