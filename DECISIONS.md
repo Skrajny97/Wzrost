@@ -3025,6 +3025,17 @@ Autor: „uruchamiaj tyle pomocników ile chcesz”, „542 tak”, „543.2 A�
    - tła (`src/client/art/places`): Systemowa Kopalnia B, Systemowa Szlifiernia C.
 5. **Muzyka Salonu** gra po wejściu do Salonu Gier od 0.1.11 (zob. „Wersja 0.1.11”).
 
+## Salon Gier: animacje, tło i kwestia o Kole (3.11.2026)
+
+Autor: „Trzeba zrobić animację jeszcze do koła fortuny wyświetlającą się na ekranie i do kupowania losu, żeby nadać temu estetyki”, „543.2 Drugie zdanie poprawka - "Wyższa stawka to wyższe nagrody, ale i większy ból po przegranej"”, „548.1 A, 548.2 wygenerowałeś zanim podałem poprawki, więc bedziesz musiał jeszcze raz” oraz „Zrób też tło do Salonu Gier”.
+
+1. **Kwestie narratora.** O Loterii zostaje nagranie A (548.1 A). Kwestia o Kole ma nowe drugie zdanie: „Kołem Fortuny kręcisz za sto sztuk złota albo więcej, setkami. Wyższa stawka to wyższe nagrody, ale i większy ból po przegranej.” Nagrywam ją od nowa, a autor wybiera nagranie na słuch.
+2. **Animacje (brakujący szczegół: najprostsza postać).**
+   - Po „Zakręć Kołem” na ekranie pojawia się Koło Fortuny i kręci się, coraz wolniej. Ma 8 równych klinów, złotych i karmazynowych na zmianę, a nad nim stoi strzałka. Wygrana zatrzymuje je na złotym klinie, przegrana na karmazynowym, i dopiero wtedy pojawia się wynik.
+   - Po „Kup los” los leci do bębna Loterii, a bęben się zakręca.
+   - Koło, strzałkę, los i bęben rysuje PixelLab w stylu budynku Salonu. Autor ocenia je po jednym, a gotowe animacje dostaje jako MP4.
+3. **Tło Salonu.** PixelLab rysuje wnętrze Salonu (192 × 96, w stylu Systemowej Szlifierni). Tło stoi przygaszone za kartą Szczęsnego, tak jak miejsca profesji za ich kartami, więc nie wydłuża ekranu.
+
 ## Wersja 0.1.11 (3.11.2026)
 
 1. **Co wchodzi do gry:**
