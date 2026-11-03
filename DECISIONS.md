@@ -3011,6 +3011,13 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Poprawki chodu 479.5 i jeźdźców 480 (3.11.2026)
+
+1. **Strzelec Wyborowy (479.5).** W trzeciej klatce chodu nad górnym końcem łuku stała szara kreska (9 pikseli). Zniknęła z arkusza i z jego siedmiu odcieni skóry; reszta klatek bez zmian.
+2. **Pięciu jeźdźców (480.13, 480.17, 480.19, 480.28, 480.29)** narysowanych od nowa przez Retro Diffusion. Wzorem pozy nie jest już szary manekin, tylko zatwierdzony jeździec tej samej formy drugiej płci (Arcymagini, Druidka, Cudotwórczyni, Nekromanta, Widmo kobieta), który siedzi bokiem i trzyma wodze nisko obiema rękami (`art/references/riders/<id>-start.png`). Wygląd daje portret postaci. Z czterech wersji każdego wybrana ta, która najlepiej siedzi bokiem i ma spokojną twarz w profilu.
+3. Dalsza noga znika jak u jeźdźca-wzoru (pod szatą tylko dalsza stopa, u Widma cała noga). Odcienie skóry obejmują tylko twarz i dłonie; Arcymag i Nekromantka mają dopisane kolory swojej skóry, bo portret ich nie podpowiedział.
+4. Wszystko leży w gałęzi drugiej ewolucji i czeka na ocenę autora (filmy MP4 wysłane pojedynczo). Druga ewolucja wejdzie do gry, gdy zatwierdzone będą wszystkie chody i jazda.
+
 ## Zdarzenia częściej na dłuższych wyprawach (478, 3.11.2026)
 
 1. **Szansa na zdarzenie** po wyprawie zakończonej zgodnie z planem: do pół godziny jak dotąd (pół godziny 10%, krótsza proporcjonalnie mniej, 338 A), a dłużej rośnie o tyle samo przy każdym podwojeniu czasu: godzina 13,3%, 2 godziny 16,7%, 4 godziny 20% (`longChance` i `longChanceMinutes` w `data/events.json`). Więcej niż 20% nie ma.
