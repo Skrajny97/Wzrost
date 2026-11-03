@@ -1,0 +1,14 @@
+{
+  "id": "casino-wheel-spin",
+  "payload": {
+    "text": "a wooden wheel of fortune spinning fast and slowing down, a wooden ratchet clicking against its pegs, quick clicks at first, slower and slower until it stops, medieval tavern, close up, dry, no music",
+    "duration_seconds": 3.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/casino-wheel-spin-20261103T1512-0.mp3",
+    "audio/drafts/effects/casino-wheel-spin-20261103T1512-1.mp3",
+    "audio/drafts/effects/casino-wheel-spin-20261103T1512-2.mp3"
+  ],
+  "credits": 192
+}

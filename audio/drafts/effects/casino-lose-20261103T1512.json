@@ -1,0 +1,14 @@
+{
+  "id": "casino-lose",
+  "payload": {
+    "text": "a short disappointed sound: a dull wooden thunk and a soft descending lute pluck, medieval, close up, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/casino-lose-20261103T1512-0.mp3",
+    "audio/drafts/effects/casino-lose-20261103T1512-1.mp3",
+    "audio/drafts/effects/casino-lose-20261103T1512-2.mp3"
+  ],
+  "credits": 72
+}

@@ -1,0 +1,14 @@
+{
+  "id": "casino-win",
+  "payload": {
+    "text": "a short cheerful win: a handful of gold coins jingling with a bright small bell, medieval, close up, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/casino-win-20261103T1512-0.mp3",
+    "audio/drafts/effects/casino-win-20261103T1512-1.mp3",
+    "audio/drafts/effects/casino-win-20261103T1512-2.mp3"
+  ],
+  "credits": 90
+}

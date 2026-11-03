@@ -1,0 +1,14 @@
+{
+  "id": "promo-whoosh",
+  "payload": {
+    "text": "a soft magical whoosh with a light sparkle, a short transition swoosh for a video, no music",
+    "duration_seconds": 0.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/promo-whoosh-20261103T1512-0.mp3",
+    "audio/drafts/effects/promo-whoosh-20261103T1512-1.mp3",
+    "audio/drafts/effects/promo-whoosh-20261103T1512-2.mp3"
+  ],
+  "credits": 48
+}

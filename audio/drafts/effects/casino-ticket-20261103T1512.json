@@ -1,0 +1,14 @@
+{
+  "id": "casino-ticket",
+  "payload": {
+    "text": "a small parchment ticket dropped into a wooden barrel drum, then the drum turns once with a short wooden rumble and rattling papers inside, medieval, close up, dry, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/casino-ticket-20261103T1512-0.mp3",
+    "audio/drafts/effects/casino-ticket-20261103T1512-1.mp3",
+    "audio/drafts/effects/casino-ticket-20261103T1512-2.mp3"
+  ],
+  "credits": 120
+}
