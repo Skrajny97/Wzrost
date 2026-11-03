@@ -3011,6 +3011,19 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Wersja 0.1.4 (3.11.2026)
+
+1. **Co wchodzi do gry:** Czarne Bagno, kraina na poziomach 101–125 (zob. niżej „Czarne Bagno wchodzi do gry” i „Czarne Bagno: poziomy 101–125”).
+2. **Sprawdzone:** TESTS.
+
+## Czarne Bagno wchodzi do gry (3.11.2026)
+
+Autor: „439 A / 440 OK … 461 OK” z poprawkami grafik, a po poprawkach „447 A / 448 A / 451 A / 452 A / 457 A” i „460 A”.
+
+1. **Grafiki.** Wszystkie 17 stworów z materiałami, kręgi pięciu miejsc, kraina z tłem A (439 A) i panorama sceny Walki. Poprawki po ocenie autora: Ważka bez zbędnych pikseli w lewym górnym rogu (447), Szczupak z całym ogonem (448), czarniejszy Drewniany bożek (451), Wąż Welesa narysowany od nowa, cały i bardziej majestatyczny (452), nowy Róg biesa (457) i cały Warkocz mamuny (460). Wybory i poprawki zapisuje `picks.json` roboczego skryptu `install.py`.
+2. **Wielki Kleszcz (455).** Kleszcz nazywa się Wielki Kleszcz, w Bestiariuszu i w nazwach przedmiotów („… Wielkiego Kleszcza”). Brakujący szczegół: jego materiał to Pancerz wielkiego kleszcza zamiast Pancerzyka kleszcza, a opis Trzęsawiska mówi o wielkich kleszczach, żeby nazwy do siebie pasowały.
+3. **Dźwięki stworów.** Autor: „Też do wszystkich stworów trzeba wygenerować”. Stwory czterech pierwszych krain miały już odgłosy bólu i śmierci, brakowało ich tylko 17 stworom Czarnego Bagna. Mają je teraz z ElevenLabs (`voices` w `audio/prompts.json`), po dwie wersje grane na zmianę, przerobione `tools/build-drafts.py` jak pozostałe. Autor dostał film z odsłuchem (504) i przyjął wszystko poza dwoma nagraniami: „ważki śmierć do poprawy, bo to jakieś bąbelki wody a nie śmierć ważki” i „bóle Rokity o wiele bardziej groźne horrorowe”. Te dwa nagrałem od nowa (gasnące bzyczenie skrzydeł bez wody; groźny, piekielny ryk) i wysłałem do odsłuchu; wchodzą do gry od razu, bo zastępują odrzucone, a jeśli nie spodobają się autorowi, wymienię je w następnej wersji. Stwory kolejnych krain dostaną odgłosy razem z grafikami.
+
 ## Odpowiedzi autora 447–460 i dwie nowe prośby (3.11.2026)
 
 Autor: „447 A / 448 A / 451 A / 452 A / 457 A / 460 A”, a do tego: „Do ewolucji klas zdałoby się dodać jakiś efekt i transformację z jasnym światłem i zmianą postaci po wybraniu danej drogi. Wklej ewentualną animacje takiej ewolucji.” oraz „Zrobilibyśmy też opcję sprzedaży nadmiaru zasobów w Kamieniu Węgielnym. Niech przy Kamieniu czuwa duch budowniczego, który za zasoby płaci złotem”.
@@ -3307,10 +3320,10 @@ Autor: „Od 20:00 popracujesz nad kolejnymi krainami i regionami wewnętrznymi 
     - Czarny Ols: Żółw błotny (przód, bardzo gruby pancerz), Norka (środek, Krwawienie), Ważka (tył, dużo uniku);
     - Czarna Toń: Szczupak (przód, mocny cios i krytyki), Topik (środek, Zatrucie), Rybitwa (tył);
     - Zatopiona Gontyna: Drewniany bożek (przód, słaby na ogień), Wąż Welesa (środek, magia wody z Ugrzęźnięciem), Żerca (tył, „Gniew Peruna”, elektryczność);
-    - Trzęsawisko: Bagiennik (przód, Ugrzęźnięcie), Kleszcz (środek, Wysysanie i Zatrucie), Ślepowron (tył);
+    - Trzęsawisko: Bagiennik (przód, Ugrzęźnięcie), Wielki Kleszcz (środek, Wysysanie i Zatrucie; do 3.11.2026 „Kleszcz”), Ślepowron (tył);
     - Rokitowe Bezdno: Bies (przód, słaby na sakrum), Czarny kozioł (środek, słaby na sakrum), Kłobuk (tył, ogień z Oparzeniem, słaby na wodę);
     - elita Mamuna (środek, magia wody z Wysysaniem i Ugrzęźnięciem) i czempion Rokita (przód, „Piekielny ogień” z Oparzeniem, słaby na sakrum).
-   Materiały: od pospolitych (Skrzydło ważki, Pióro rybitwy, Pancerzyk kleszcza) po Warkocz mamuny (mityczny) i Cyrograf (boski).
+   Materiały: od pospolitych (Skrzydło ważki, Pióro rybitwy, Pancerz wielkiego kleszcza) po Warkocz mamuny (mityczny) i Cyrograf (boski).
 4. **Równowaga** (`tools/difficulty-sim.mjs`, 100–150 wypraw na wiersz, gracz „casual” z towarzyszami i „realistyczny”, na gałęzi z drugą ewolucją): po dostrojeniu nagród XP i złoto na godzinę u gracza realistycznego mieszczą się w ±2–4% zastępczej krainy z krzywej (stwory Starego Wyrobiska na tych poziomach), a omdleń brak. Gracz casual mdleje rzadziej niż w zastępczej krainie, najwięcej w Rokitowym Bezdnie (średnio ok. 13% w godzinę i 29% w cztery godziny). Mamuna wypada jak Kikimora, a Rokita trochę trudniej niż Król Błót na tych samych poziomach (casual wygrywa w 40–95% pojedynków, realistyczny prawie zawsze).
 5. **Narzędzie** `tools/difficulty-sim.mjs` na poziomach 100+ potrzebuje `nextFormOf` z drugiej ewolucji, więc bez niej model realistyczny na tych poziomach się wywraca; działa po scaleniu drugiej ewolucji.
 
