@@ -10290,6 +10290,152 @@ a.profession-square:active {
   opacity: 0.55;
 }
 
+/* The games on the screen (casino.js showOnScreen): over the page, dimmed,
+   the Wheel turning under its pointer, slower and slower, with a gold glow
+   for a win and a darker wheel for a loss; the ticket falling into the
+   Loteria's drum, which rocks with it. A tap ends it. */
+.casino-show {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: rgba(6, 9, 5, 0.7);
+  animation: casino-show-in 0.2s ease-out;
+  cursor: pointer;
+}
+.casino-show--out {
+  animation: casino-show-out 0.25s ease-in forwards;
+}
+@keyframes casino-show-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes casino-show-out {
+  to {
+    opacity: 0;
+  }
+}
+.casino-show-wheel {
+  position: relative;
+  width: 256px;
+  height: 256px;
+}
+.casino-show-disc {
+  display: block;
+  width: 256px;
+  height: 256px;
+  image-rendering: pixelated;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.1, 0.62, 0.12, 1);
+}
+.casino-show-pointer {
+  position: absolute;
+  z-index: 2;
+  left: calc(50% - 32px);
+  top: -44px;
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.6));
+}
+.casino-show-glow {
+  position: absolute;
+  inset: -36px;
+  border-radius: 50%;
+  opacity: 0;
+}
+.casino-show--win .casino-show-glow {
+  background: radial-gradient(circle, rgba(255, 215, 106, 0.6), rgba(255, 215, 106, 0) 68%);
+  animation: casino-glow 0.9s ease-out forwards;
+}
+@keyframes casino-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.75;
+    transform: scale(1.08);
+  }
+}
+.casino-show--loss .casino-show-disc {
+  filter: brightness(0.6) saturate(0.6);
+  transition: filter 0.35s;
+}
+.casino-show-lottery {
+  position: relative;
+  width: 256px;
+  height: 340px;
+}
+.casino-show-drum {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 256px;
+  height: 256px;
+  image-rendering: pixelated;
+  transform-origin: 50% 85%;
+}
+.casino-show-ticket {
+  position: absolute;
+  left: calc(50% - 48px);
+  top: 0;
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+  opacity: 0;
+}
+.casino-show-lottery--go .casino-show-ticket {
+  animation: casino-ticket 0.85s cubic-bezier(0.45, 0, 0.8, 0.4) forwards;
+}
+.casino-show-lottery--go .casino-show-drum {
+  animation: casino-drum 0.7s ease-in-out 0.8s;
+}
+.casino-show-lottery--done .casino-show-ticket {
+  animation: none;
+  opacity: 0;
+}
+.casino-show-lottery--done .casino-show-drum {
+  animation: none;
+}
+@keyframes casino-ticket {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px) rotate(-14deg);
+  }
+  18% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(150px) rotate(10deg) scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(170px) rotate(12deg) scale(0.55);
+  }
+}
+@keyframes casino-drum {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  55% {
+    transform: rotate(4deg);
+  }
+  80% {
+    transform: rotate(-2deg);
+  }
+}
+
 /* The pool of a stake just chosen is on its way: the old one waits dimmed. */
 .casino-pool--waiting {
   opacity: 0.45;

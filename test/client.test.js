@@ -140,6 +140,10 @@ test('every sprite on the list has its file at its size, and every class has its
     // Duch budowniczego at the Kamień węgielny has a bust like theirs.
     settlement: [...data('settlement').places.map((place) => place.id), ...(data('settlement').torches?.length ? ['torch', 'torch-off'] : [])],
     residents: [...data('settlement').residents.map((resident) => resident.id), ...(data('camp').cornerstone?.spirit ? [data('camp').cornerstone.spirit.art] : [])],
+    // The Salon Gier's games on the screen: the wheel and the drum, the
+    // ticket and the pointer.
+    salon: [data('settlement').casino.show.wheel.art, data('settlement').casino.show.lottery.drum],
+    'salon-small': [data('settlement').casino.show.lottery.ticket, data('settlement').casino.show.wheel.pointer],
     // The companions' busts, one for each class and look.
     companions: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     'companion-portraits': data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
@@ -158,7 +162,7 @@ test('every sprite on the list has its file at its size, and every class has its
     herbs: data('professions').herbs.map((herb) => herb.id),
     potions: data('professions').potions.map((potion) => potion.id),
     professions: data('professions').professions.map((profession) => profession.id),
-    places: [...['gathering', 'brewing', 'workshop'].map((work) => data('professions')[work].place.id), data('evolutions').place, ...data('towers').towers.map((tower) => tower.place), data('guilds').place],
+    places: [...['gathering', 'brewing', 'workshop'].map((work) => data('professions')[work].place.id), data('evolutions').place, ...data('towers').towers.map((tower) => tower.place), data('guilds').place, ...data('settlement').places.flatMap((place) => place.backdrop ?? [])],
     events: data('events').list.map((event) => event.art),
     'event-scenes': data('events').list.map((event) => event.scene),
     // The camp's resources in place of their line icons.

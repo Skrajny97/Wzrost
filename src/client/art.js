@@ -257,12 +257,13 @@ export const SPRITES = {
     size: 48,
     ids: ['herbalism', 'alchemy', 'crafting'],
   },
-  // The places where professions work, dim behind their cards, and the
-  // Ewolucja tab's spring behind its heading, 192×96.
+  // The places where professions work, dim behind their cards, the
+  // Ewolucja tab's spring behind its heading, and the Osada's rooms behind
+  // their residents' cards (the Salon Gier's), 192×96.
   places: {
     width: 192,
     height: 96,
-    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep'],
+    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall'],
   },
   // The events at the end of an exploration (data/events.json): the people
   // met, 96×128, and the scenes behind them, 192×96, filled in as they are
@@ -297,6 +298,17 @@ export const SPRITES = {
     height: 144,
     fit: true,
     ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist', 'forge', 'tannery', 'stable', 'casino', 'torch', 'torch-off'],
+  },
+  // The Salon Gier's games on the screen (data/settlement.json, casino.show;
+  // PixelLab, 550.1 C, 550.2 B): the Koło Fortuny and the Loteria's drum,
+  // 128×128, and the ticket and the pointer over the wheel, 64×64.
+  salon: {
+    size: 128,
+    ids: ['fortune-wheel', 'lottery-drum'],
+  },
+  'salon-small': {
+    size: 64,
+    ids: ['lottery-ticket', 'wheel-pointer'],
   },
   residents: {
     width: 96,
@@ -470,6 +482,8 @@ export const settlementTorchArt = (lit = true) => {
   const id = lit ? 'torch' : 'torch-off';
   return available.settlement.has(id) ? h('img', { src: `/art/settlement/${id}.png`, alt: '', class: 'sprite settlement-torch-art', decoding: 'async', draggable: 'false' }) : null;
 };
+// A picture of the Salon Gier's games, by its name, or null while there is none.
+export const salonArt = (id) => (available.salon.has(id) ? `/art/salon/${id}.png` : available['salon-small'].has(id) ? `/art/salon-small/${id}.png` : null);
 export const residentBust = (residentId) =>
   available.residents.has(residentId)
     ? h('img', { src: `/art/residents/${residentId}.png`, alt: '', width: 96, height: 128, class: 'sprite resident-bust', decoding: 'async', draggable: 'false' })
