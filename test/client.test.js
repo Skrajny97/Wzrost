@@ -65,9 +65,11 @@ test('index.html loads the entry module and the screens it needs exist', () => {
 
 test('every inner region has its picture', async () => {
   const { areaArtIds } = await import('../src/client/area-art.js');
+  const { SPRITES } = await import('../src/client/art.js');
   const regions = JSON.parse(readFileSync(new URL('../data/regions.json', import.meta.url), 'utf8'));
   const areas = regions.flatMap((region) => region.areas.map((area) => area.id));
-  assert.deepEqual(areas.filter((id) => !areaArtIds.includes(id)), []);
+  // Its drawn scene (art.js), or a vector one for a place still without it.
+  assert.deepEqual(areas.filter((id) => !SPRITES.areas.ids.includes(id) && !areaArtIds.includes(id)), []);
 });
 
 test('every building has its picture and a plot on the camp board, apart from the others', async () => {

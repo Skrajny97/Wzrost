@@ -373,6 +373,74 @@
     "giant-rat": {
       "hurt": { "files": ["audio/sfx/giant-rat-hurt-1.mp3", "audio/sfx/giant-rat-hurt-2.mp3"], "gain": 0.6 },
       "death": { "files": ["audio/sfx/giant-rat-death-1.mp3", "audio/sfx/giant-rat-death-2.mp3"], "gain": 0.7 }
+    },
+    "pond-turtle": {
+      "hurt": { "files": ["audio/sfx/pond-turtle-hurt-1.mp3", "audio/sfx/pond-turtle-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/pond-turtle-death-1.mp3", "audio/sfx/pond-turtle-death-2.mp3"], "gain": 0.7 }
+    },
+    "mink": {
+      "hurt": { "files": ["audio/sfx/mink-hurt-1.mp3", "audio/sfx/mink-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/mink-death-1.mp3", "audio/sfx/mink-death-2.mp3"], "gain": 0.7 }
+    },
+    "dragonfly": {
+      "hurt": { "files": ["audio/sfx/dragonfly-hurt-1.mp3", "audio/sfx/dragonfly-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/dragonfly-death-1.mp3", "audio/sfx/dragonfly-death-2.mp3"], "gain": 0.7 }
+    },
+    "pike": {
+      "hurt": { "files": ["audio/sfx/pike-hurt-1.mp3", "audio/sfx/pike-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/pike-death-1.mp3", "audio/sfx/pike-death-2.mp3"], "gain": 0.7 }
+    },
+    "water-spider": {
+      "hurt": { "files": ["audio/sfx/water-spider-hurt-1.mp3", "audio/sfx/water-spider-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/water-spider-death-1.mp3", "audio/sfx/water-spider-death-2.mp3"], "gain": 0.7 }
+    },
+    "black-tern": {
+      "hurt": { "files": ["audio/sfx/black-tern-hurt-1.mp3", "audio/sfx/black-tern-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/black-tern-death-1.mp3", "audio/sfx/black-tern-death-2.mp3"], "gain": 0.7 }
+    },
+    "wooden-idol": {
+      "hurt": { "files": ["audio/sfx/wooden-idol-hurt-1.mp3", "audio/sfx/wooden-idol-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/wooden-idol-death-1.mp3", "audio/sfx/wooden-idol-death-2.mp3"], "gain": 0.7 }
+    },
+    "veles-serpent": {
+      "hurt": { "files": ["audio/sfx/veles-serpent-hurt-1.mp3", "audio/sfx/veles-serpent-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/veles-serpent-death-1.mp3", "audio/sfx/veles-serpent-death-2.mp3"], "gain": 0.7 }
+    },
+    "pagan-priest": {
+      "hurt": { "files": ["audio/sfx/pagan-priest-hurt-1.mp3", "audio/sfx/pagan-priest-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/pagan-priest-death-1.mp3", "audio/sfx/pagan-priest-death-2.mp3"], "gain": 0.7 }
+    },
+    "bog-demon": {
+      "hurt": { "files": ["audio/sfx/bog-demon-hurt-1.mp3", "audio/sfx/bog-demon-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/bog-demon-death-1.mp3", "audio/sfx/bog-demon-death-2.mp3"], "gain": 0.7 }
+    },
+    "tick": {
+      "hurt": { "files": ["audio/sfx/tick-hurt-1.mp3", "audio/sfx/tick-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/tick-death-1.mp3", "audio/sfx/tick-death-2.mp3"], "gain": 0.7 }
+    },
+    "night-heron": {
+      "hurt": { "files": ["audio/sfx/night-heron-hurt-1.mp3", "audio/sfx/night-heron-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/night-heron-death-1.mp3", "audio/sfx/night-heron-death-2.mp3"], "gain": 0.7 }
+    },
+    "bies": {
+      "hurt": { "files": ["audio/sfx/bies-hurt-1.mp3", "audio/sfx/bies-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/bies-death-1.mp3", "audio/sfx/bies-death-2.mp3"], "gain": 0.7 }
+    },
+    "black-goat": {
+      "hurt": { "files": ["audio/sfx/black-goat-hurt-1.mp3", "audio/sfx/black-goat-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/black-goat-death-1.mp3", "audio/sfx/black-goat-death-2.mp3"], "gain": 0.7 }
+    },
+    "klobuk": {
+      "hurt": { "files": ["audio/sfx/klobuk-hurt-1.mp3", "audio/sfx/klobuk-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/klobuk-death-1.mp3", "audio/sfx/klobuk-death-2.mp3"], "gain": 0.7 }
+    },
+    "mamuna": {
+      "hurt": { "files": ["audio/sfx/mamuna-hurt-1.mp3", "audio/sfx/mamuna-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/mamuna-death-1.mp3", "audio/sfx/mamuna-death-2.mp3"], "gain": 0.7 }
+    },
+    "rokita": {
+      "hurt": { "files": ["audio/sfx/rokita-hurt-1.mp3", "audio/sfx/rokita-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/rokita-death-1.mp3", "audio/sfx/rokita-death-2.mp3"], "gain": 0.7 }
     }
   },
   "effects": {
