@@ -3011,6 +3011,17 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Odpowiedzi autora 415, 532 i 533 (3.11.2026)
+
+Autor: „415 A robimy, ale przypominam ze musisz chowańce zaanimowac w PixelLab i dać do sprawdzenia”, „532 A” i „533 A i wdrażamy zresztą dwie Profesje na raz”.
+
+1. **Błędny ognik (415 A).** To trzeci chowaniec, za 800 PS, obok lisa (413) i kruka (414). Wszystkie trzy rysuje i animuje PixelLab. Autor ogląda każdego jako film MP4, zanim wejdzie do gry.
+   - Szkice to klatka startowa ruchu w scenie Walki i poza do portretu: lis siedzi u stóp postaci, a kruk siedzi na jej ramieniu.
+   - Wygląd jest jak na zatwierdzonych makietach: lis i kruk jak stwory Wiatrołomów, a ognik jak płomień Błędnego ognika.
+2. **Złoto z żył (532 A).** Żyły złota w Górnictwie dają średnio połowę złota na godzinę, które daje wyprawa na tym samym poziomie postaci. Dziś to ok. 170 zł/h na 25. poziomie. Awatar Systemu może kopać w czasie wyprawy. Postać z Awatarem ma wtedy złota o połowę więcej niż z samej wyprawy.
+3. **Kamienie przed Jubilerstwem (533 A).** Kamienie z Górnictwa można trzymać albo sprzedać za złoto.
+4. **Obie profesje naraz.** Górnictwo i Jubilerstwo wchodzą do gry razem, od 25. poziomu postaci. Jubilerstwo nie czeka więc na później (zmienia to punkt 1 „Górnictwo wcześniej”).
+
 ## Wersja 0.1.10 (3.11.2026)
 
 1. **Co wchodzi do gry:** Sosnowe Wydmy, szósta kraina (poziomy 126–150), z grafikami i odgłosami wybranymi przez autora. W Wieżach czempion czeka od teraz co 25. piętro (527 A). Zob. „Sosnowe Wydmy”.
@@ -3143,7 +3154,7 @@ Autor: „W Osadzie dodamy nowy budynek Salon Gier w średniowiecznym klimacie /
 
 Autor: „W grze cierpi się na ciągły niedobór złota. Potrzebujemy w najbliższej przyszłości Profesji Górnictwo, które poza kopaniem kamieni szlachetnych do późniejszego Jubilerstwa bedzie też dawać złoto z natrafionych żył złota.”
 
-1. **Kolejność się zmienia.** Dotąd Górnictwo i Jubilerstwo szły po Warowni (395). Teraz Górnictwo idzie wcześniej, a Jubilerstwo zostaje na później.
+1. **Kolejność się zmienia.** Dotąd Górnictwo i Jubilerstwo szły po Warowni (395). Teraz Górnictwo idzie wcześniej, a Jubilerstwo zostaje na później. *Autor: obie profesje wchodzą razem (zob. „Odpowiedzi autora 415, 532 i 533”).*
 2. Górnictwo daje kamienie szlachetne do późniejszego Jubilerstwa i złoto z żył złota.
 3. Pytania (poziom otwarcia, ile złota na godzinę, szanse na żyłę, kamienie) autor dostanie po bieżącym etapie, pozycja po pozycji. *Autor: Górnictwo i Jubilerstwo od 25. poziomu postaci; zob. „Odpowiedzi autora 517, 518, 523–529 i Górnictwo”.*
 4. **Liczby do pytań.** Wyprawa daje dziś ok. 25 złota na godzinę na 5. poziomie, 90 na 10., 190 na 20., 385 na 30. i 760 na 50. (`tools/simulate.mjs`, 3.11.2026). Awatar Systemu (10 000 złota) pracuje w profesjach także wtedy, gdy postać jest na wyprawie. Złoto z żył doda się więc u niego do złota z wypraw, a bez Awatara Górnictwo je zastępuje.
