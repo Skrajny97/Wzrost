@@ -1,8 +1,9 @@
 // The author's preview of a skill's animation: a short recorded fight of a
 // character of its class, at level 20 with the skill at level 10 (an
-// evolution's skill: of the evolution, at level 60 with the skill at 20),
-// against foes that show the skill off. It is never part of the game: the
-// author's panel plays it to check how each skill looks.
+// evolution's skill: of the evolution, at level 60 with the skill at 20; a
+// second form's: at level 110 with the skill at 40), against foes that show
+// the skill off. It is never part of the game: the author's panel plays it
+// to check how each skill looks.
 
 import { simulateFight } from './combat.js';
 import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
@@ -13,8 +14,11 @@ import { autoDistribute } from './stats.js';
 
 const LEVEL = 20;
 const SKILL_LEVEL = 10;
-const EVOLVED_LEVEL = 60;
-const EVOLVED_SKILL_LEVEL = 20;
+// The character and the skill of each evolution stage, the first's first.
+const EVOLVED = [
+  { level: 60, skill: 20 },
+  { level: 110, skill: 40 },
+];
 // Kinds whose show needs a group of foes.
 const GROUP_KINDS = new Set(['sweep', 'whirl']);
 
@@ -49,7 +53,8 @@ export function skillDemo(skillId, content) {
   const skill = content.skillsById[skillId];
   const cls = content.classesById[skill.classId];
   const evolution = skill.evolution ? content.evolutionsById[skill.evolution] : null;
-  const level = evolution ? EVOLVED_LEVEL : LEVEL;
+  const evolved = evolution ? EVOLVED[Math.min(EVOLVED.length, evolution.stage ?? 1) - 1] : null;
+  const level = evolved ? evolved.level : LEVEL;
   const character = {
     classId: cls.id,
     level,
@@ -57,7 +62,7 @@ export function skillDemo(skillId, content) {
     points: {},
     position: cls.position,
     appearance: 'male',
-    skills: { [skillId]: evolution ? EVOLVED_SKILL_LEVEL : SKILL_LEVEL },
+    skills: { [skillId]: evolved ? evolved.skill : SKILL_LEVEL },
     ...(evolution && { evolution: evolution.id }),
   };
   character.points = autoDistribute(character, content);
@@ -65,11 +70,12 @@ export function skillDemo(skillId, content) {
   const bases = [cls.weapons[0], cls.offhands[0], ...cls.armor];
   const equipped = bases.map((baseId) => generateItem({ baseId, level: level - 4 }, gear, content));
   // A wound skill wakes below its mark, so the character starts just above
-  // it; a heal starts below it, a miracle near fainting.
+  // it; a heal starts below it (a song with no mark, Chór, wounded too), a
+  // miracle near fainting.
   const below = WOUND_KINDS.has(skill.kind)
     ? skill.params.below + 0.1
     : skill.kind === 'heal' || skill.params.regen
-      ? skill.params.below - 0.1
+      ? (skill.params.below ?? 0.8) - 0.1
       : skill.kind === 'miracle'
         ? 0.2
         : 1;

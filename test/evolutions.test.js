@@ -35,7 +35,7 @@ describe('class evolutions in the engine', () => {
   test('every class has an evolution for each of its paths, and a character chooses from those of its two, the main one first', () => {
     for (const cls of content.classes) {
       const paths = content.skills.filter((skill) => skill.classId === cls.id).map((skill) => skill.id);
-      assert.deepEqual(content.evolutions.filter((evolution) => evolution.classId === cls.id).map((evolution) => evolution.path), paths);
+      assert.deepEqual(content.evolutions.filter((evolution) => evolution.classId === cls.id && !evolution.from).map((evolution) => evolution.path), paths);
     }
     assert.deepEqual(evolutionChoices(ready(), content).map((evolution) => evolution.name), ['Barbarzyńca', 'Strażnik']);
     assert.deepEqual(evolutionChoices(warrior(50, { unyielding: 20, 'wide-sweep': 20 }), content).map((evolution) => evolution.id), ['guardian', 'gladiator']);

@@ -299,7 +299,8 @@ export function updateTopbar(now = serverNow()) {
 // face in the top bar.
 const pointsWaiting = () => (state.character?.freePoints ?? 0) > 0 && isUnlocked('stats');
 const skillsWaiting = () => Boolean(state.character?.skills?.ready) && isUnlocked('skills');
-const evolutionWaiting = () => (state.character?.evolution?.choices?.length ?? 0) > 0 && isUnlocked('evolution');
+// The evolutions to choose from, or the form the evolution grows into.
+const evolutionWaiting = () => ((state.character?.evolution?.choices?.length ?? 0) > 0 || Boolean(state.character?.evolution?.next)) && isUnlocked('evolution');
 const settlementWaiting = () => Boolean(state.character?.settlementWaiting) && isUnlocked('settlement');
 // While the character explores or works in a profession, the tab of that
 // activity counts its time down in the System's light, as the camp counts a

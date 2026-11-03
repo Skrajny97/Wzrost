@@ -214,10 +214,11 @@ export function playSound(name) {
 }
 
 // A skill's own recording (effects "skill-<id>" in data/sounds.json), or the
-// sound named `instead` while it has none.
-export function playSkill(skillId, instead) {
-  const name = `skill-${skillId}`;
-  const sound = recordings?.effects?.[name] ? name : instead;
+// sound named `instead` while it has none. `skillIds` may list the skills a
+// second form's skill stands in with (art.js artChain), best first.
+export function playSkill(skillIds, instead) {
+  const name = [skillIds].flat().map((id) => `skill-${id}`).find((each) => recordings?.effects?.[each]);
+  const sound = name ?? instead;
   if (sound) playSound(sound);
 }
 

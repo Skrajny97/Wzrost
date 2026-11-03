@@ -155,6 +155,8 @@ export function mountStats(container) {
   function evolutionHint(character, evolution) {
     const { need, level = evolution } = character.skills?.evolution ?? {};
     if (need === 'skill_points' && character.classLevel >= level) return 'KLASA CZEKA: ROZDAJ PUNKTY UMIEJĘTNOŚCI';
+    // The second form waits to be taken (class level 100).
+    if (need === 'evolve' && character.evolution?.current && character.classLevel >= level) return 'KLASA CZEKA: WYBIERZ EWOLUCJĘ';
     if (character.evolution?.current) return `EWOLUCJA: ${character.className.toUpperCase()}`;
     if (character.classLevel < evolution) return `PIERWSZA EWOLUCJA: POZ. KLASY ${evolution}`;
     if (need === 'second_path') return 'KLASA CZEKA: WYBIERZ ŚCIEŻKĘ POBOCZNĄ';

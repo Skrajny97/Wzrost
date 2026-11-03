@@ -56,6 +56,12 @@ export const SPRITES = {
       'barbarian-female', 'barbarian-male', 'gladiator-female', 'gladiator-male', 'storm-archer-female', 'storm-archer-male', 'hunter-female', 'hunter-male',
       'elementalist-female', 'elementalist-male', 'arcanist-female', 'arcanist-male', 'healer-female', 'healer-male', 'inquisitor-female', 'inquisitor-male',
       'poisoner-female', 'poisoner-male', 'night-dancer-female', 'night-dancer-male',
+      // The second forms at class level 100 (DECISIONS.md, „Druga ewolucja klas”).
+      'berserker-female', 'berserker-male', 'arena-champion-female', 'arena-champion-male', 'bastion-female', 'bastion-male', 'marksman-female',
+      'marksman-male', 'thunder-lord-female', 'thunder-lord-male', 'master-hunter-female', 'master-hunter-male', 'archmage-female', 'archmage-male',
+      'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
+      'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
+      'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
     ],
     faces: {
       'archer-female': 49, 'archer-male': 52, 'cleric-male': 49, 'shadow-male': 51, 'warrior-male': 50,
@@ -63,6 +69,11 @@ export const SPRITES = {
       'barbarian-female': 55, 'barbarian-male': 57, 'gladiator-female': 51, 'gladiator-male': 51, 'storm-archer-female': 46, 'storm-archer-male': 52, 'hunter-female': 51, 'hunter-male': 56,
       'elementalist-female': 53, 'arcanist-female': 47, 'arcanist-male': 52, 'healer-female': 46, 'healer-male': 45, 'inquisitor-female': 44, 'poisoner-female': 52, 'poisoner-male': 49,
       'night-dancer-female': 50, 'night-dancer-male': 47,
+      'berserker-female': 51, 'berserker-male': 50, 'arena-champion-female': 51, 'arena-champion-male': 52, 'bastion-female': 49, 'bastion-male': 46,
+      'marksman-female': 47, 'thunder-lord-female': 50, 'thunder-lord-male': 51, 'master-hunter-female': 52, 'master-hunter-male': 49,
+      'archmage-female': 49, 'archmage-male': 51, 'winter-lord-female': 51, 'winter-lord-male': 49, 'druid-female': 50, 'druid-male': 49,
+      'miracle-worker-female': 47, 'miracle-worker-male': 43, 'grand-inquisitor-female': 50, 'high-priest-female': 50, 'kingslayer-female': 55,
+      'kingslayer-male': 54, 'necromancer-female': 44, 'necromancer-male': 49, 'phantom-male': 45,
     },
     toned: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
     tonedEvolutions: [
@@ -70,6 +81,11 @@ export const SPRITES = {
       'barbarian-female', 'barbarian-male', 'gladiator-female', 'gladiator-male', 'storm-archer-female', 'storm-archer-male', 'hunter-female', 'hunter-male',
       'elementalist-female', 'elementalist-male', 'arcanist-female', 'arcanist-male', 'healer-female', 'healer-male', 'inquisitor-female', 'inquisitor-male',
       'poisoner-female', 'poisoner-male', 'night-dancer-female', 'night-dancer-male',
+      'berserker-female', 'berserker-male', 'arena-champion-female', 'arena-champion-male', 'bastion-female', 'bastion-male', 'marksman-female',
+      'marksman-male', 'thunder-lord-female', 'thunder-lord-male', 'master-hunter-female', 'master-hunter-male', 'archmage-female', 'archmage-male',
+      'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
+      'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
+      'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
     ],
   },
   items: {
@@ -140,6 +156,12 @@ export const SPRITES = {
       'barbarian-female', 'barbarian-male', 'gladiator-female', 'gladiator-male', 'storm-archer-female', 'storm-archer-male', 'hunter-female', 'hunter-male',
       'elementalist-female', 'elementalist-male', 'arcanist-female', 'arcanist-male', 'healer-female', 'healer-male', 'inquisitor-female', 'inquisitor-male',
       'poisoner-female', 'poisoner-male', 'night-dancer-female', 'night-dancer-male',
+      // The second forms at class level 100.
+      'berserker-female', 'berserker-male', 'arena-champion-female', 'arena-champion-male', 'bastion-female', 'bastion-male', 'marksman-female',
+      'marksman-male', 'thunder-lord-female', 'thunder-lord-male', 'master-hunter-female', 'master-hunter-male', 'archmage-female', 'archmage-male',
+      'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
+      'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
+      'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
     ],
   },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
@@ -329,6 +351,12 @@ export const SPRITES = {
       'barbarian-female', 'barbarian-male', 'gladiator-female', 'gladiator-male', 'storm-archer-female', 'storm-archer-male', 'hunter-female', 'hunter-male',
       'elementalist-female', 'elementalist-male', 'arcanist-female', 'arcanist-male', 'healer-female', 'healer-male', 'inquisitor-female', 'inquisitor-male',
       'poisoner-female', 'poisoner-male', 'night-dancer-female', 'night-dancer-male',
+      // The second forms at class level 100.
+      'berserker-female', 'berserker-male', 'arena-champion-female', 'arena-champion-male', 'bastion-female', 'bastion-male', 'marksman-female',
+      'marksman-male', 'thunder-lord-female', 'thunder-lord-male', 'master-hunter-female', 'master-hunter-male', 'archmage-female', 'archmage-male',
+      'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
+      'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
+      'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
     ],
   },
 };
@@ -349,12 +377,33 @@ function sprite(kind, id, className) {
   });
 }
 
+// The ids a second form's skill stands in with until it has its own art
+// (the server's evolutionArt): the skill itself first, then the skill it grew
+// from, or the first evolution's skill in its place. Any other skill: itself.
+export const artChain = (skillId) => [skillId, ...(state.content?.evolutionArt?.skills?.[skillId] ?? [])];
+
+// The first of `ids` with a sprite of `kind`.
+const firstSprite = (kind, ids, className) => {
+  for (const id of ids) {
+    const art = sprite(kind, id, className);
+    if (art) return art;
+  }
+  return null;
+};
+
 export const monsterSprite = (monsterId) => sprite('monsters', monsterId, 'sprite--monster');
-export const summonSprite = (skillId) => sprite('summons', skillId, 'sprite--summon');
+// The figure a summoning skill puts in fights: its own, else the creature
+// it calls (`figure`: a wolf, a bear, a skeleton, as the creatures are
+// drawn), else that of the skill it stands in with.
+export function summonSprite(skillId, figure) {
+  const [own, ...stand] = artChain(skillId);
+  return sprite('summons', own, 'sprite--summon') ?? (figure ? sprite('monsters', figure, 'sprite--summon') : null) ?? firstSprite('summons', stand, 'sprite--summon');
+}
 export const itemSprite = (item) => sprite('items', item.base, 'sprite--item');
 // A material, a part ("scraps") or the chest ("chest").
 export const materialSprite = (id) => sprite('materials', id, 'sprite--item');
-export const skillSprite = (id) => sprite('skills', id, 'sprite--skill');
+// A skill's icon, a second form's skill's stand-in until it has its own.
+export const skillSprite = (id) => firstSprite('skills', artChain(id), 'sprite--skill');
 export const areaSprite = (areaId) => sprite('areas', areaId, 'area-art');
 // The address of a land's background, or null while it has none.
 export const landArt = (regionId) => (available.lands.has(regionId) ? `/art/lands/${regionId}.png` : null);
@@ -450,13 +499,24 @@ function toneFile(id, skin) {
 
 const toned = new Set([...SPRITES.portraits.toned, ...SPRITES.portraits.tonedEvolutions]);
 
+// The ids a look is drawn under, best first: the evolution's, then for a
+// second form without its own art yet its first evolution's (the server's
+// evolutionArt), then the class's.
+export function lookIds(classId, appearance, evolution) {
+  const ids = [];
+  for (let id = evolution; id && ids.length < 4; id = state.content?.evolutionArt?.forms?.[id]) ids.push(`${id}-${appearance}`);
+  ids.push(`${classId}-${appearance}`);
+  return ids;
+}
+// The first of a look's ids that has art of `kind`, or null.
+const lookId = (kind, classId, appearance, evolution) => lookIds(classId, appearance, evolution).find((id) => available[kind].has(id)) ?? null;
+
 // A class's figure for a look, or its evolution's once it has one. `bust`
 // shows the head and shoulders at the image's own size, cut by the box it
 // sits in (the arena, the class cards).
 export function portraitSprite(classId, appearance, { bust = false, skin, evolution } = {}) {
-  const evolved = evolution ? `${evolution}-${appearance}` : null;
-  const id = evolved && available.portraits.has(evolved) ? evolved : `${classId}-${appearance}`;
-  if (!available.portraits.has(id)) return null;
+  const id = lookId('portraits', classId, appearance, evolution);
+  if (!id) return null;
   const file = toned.has(id) ? toneFile(id, skin) : id;
   const { width, height, faces } = SPRITES.portraits;
   const off = bust ? (faces[id] ?? width / 2) - width / 2 : 0;
@@ -476,9 +536,8 @@ export function portraitSprite(classId, appearance, { bust = false, skin, evolut
 // evolution's once it has one, as a path from the site's root like the
 // scenes' sheets (data/animations.json), or null for a look without one.
 export function walkerSheet(classId, appearance, skin, evolution) {
-  const evolved = evolution ? `${evolution}-${appearance}` : null;
-  const id = evolved && available.walkers.has(evolved) ? evolved : `${classId}-${appearance}`;
-  return available.walkers.has(id) ? `art/walkers/${toneFile(id, skin)}.png` : null;
+  const id = lookId('walkers', classId, appearance, evolution);
+  return id ? `art/walkers/${toneFile(id, skin)}.png` : null;
 }
 
 // The address of a frame's or a background's picture (the Sklep Systemu),
@@ -492,9 +551,8 @@ export const mountArt = (id) =>
 // The character riding, in its look and skin tone (or its evolution's), as a
 // path from the site's root, or null for a look without one.
 export function riderFile(classId, appearance, skin, evolution) {
-  const evolved = evolution ? `${evolution}-${appearance}` : null;
-  const id = evolved && available.riders.has(evolved) ? evolved : `${classId}-${appearance}`;
-  return available.riders.has(id) ? `art/riders/${toneFile(id, skin)}.png` : null;
+  const id = lookId('riders', classId, appearance, evolution);
+  return id ? `art/riders/${toneFile(id, skin)}.png` : null;
 }
 
 // The narrator's hooded face, for the quests in the top bar (quests.js).

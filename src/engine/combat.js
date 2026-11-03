@@ -43,6 +43,19 @@
 // damage. Their code and state are made only for a fight with an evolved
 // character, and only its blows draw random numbers of their own, so every
 // other fight stays as it was.
+//
+// The second forms ("Druga ewolucja klas") add to these: a stance may weaken
+// the other side's blows (a roar), harden the whole party's armour (a wall
+// of shields), raise the party's damage (a choir), hide its user from every
+// blow for a move (a vanishing) or repeat its blows (a shadow double); a
+// mark may challenge a foe to a duel or lock a foe as a sure target; a
+// summon may strike with its claws or a sword (`physical`), and a character
+// has one summon at a time; a shield may cover the whole party or slow its
+// attackers; a curse lays a poison on every foe that wears its armour away;
+// Harmonia żywiołów strengthens spells with every element used. Their
+// traits heal on a kill, block a share of blows, chill with every frost
+// spell, set spirits on fire, and raise a foe killed by poison as a
+// skeleton that fights on the character's side.
 
 import { cappedChance, reduction } from './formulas.js';
 import { ACTIVE_KINDS, START_KINDS, STANCE_KINDS, WOUND_KINDS } from './skills.js';
@@ -58,12 +71,15 @@ const SKILL_WORDS = { hit: 'skillHit', crit: 'skillCrit', dodge: 'skillDodge' };
 // The elements a summoned elemental chooses from: the one its foe is weakest
 // to.
 const ELEMENTAL = ['fire', 'frost', 'lightning'];
+// The id the skeleton raised by Żniwo goes under in the account, as a
+// summon's skill (its figure: the creature "skeleton").
+export const RISEN = 'risen';
 
-// The texts of a blow: its own words (a summon's, an echo's), a skill's own
-// blow names the skill, a sweep's blows name it as the attack, a counter has
-// its own words.
+// The texts of a blow: its own words (a summon's, an echo's; one for each
+// kind of blow where the blow may miss), a skill's own blow names the skill,
+// a sweep's blows name it as the attack, a counter has its own words.
 function wordsFor(kind, move) {
-  if (move.words) return move.words;
+  if (move.words) return typeof move.words === 'string' ? move.words : move.words[kind];
   if (move.counter) return kind === 'crit' ? 'counterCrit' : 'counter';
   return move.own ? SKILL_WORDS[kind] : kind;
 }
@@ -105,7 +121,11 @@ function blowOf(skill, extra) {
     stun: p.stun,
     stunChance: p.stunChance,
     stunLabel: p.stunLabel,
-    dot: p.dotEffect && skill.kind === 'strike' ? { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks: Math.round(p.dotTicks) } : undefined,
+    // Kruszący cios: the stun takes more than one move.
+    stunMoves: p.stunMoves,
+    // An effect over time from a skill's blow; a sweep's (Wir stali, Deszcz
+    // meteorów) on every foe it hits.
+    dot: p.dotEffect && (skill.kind === 'strike' || skill.kind === 'sweep') ? { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks: Math.round(p.dotTicks) } : undefined,
     // The evolutions' blows: damage split between elements, armour torn off
     // for good, a chill, more against a chilled or a nearly beaten foe, a
     // mark on a family of foes.
@@ -158,11 +178,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   if (skilled) {
     for (const unit of units) Object.assign(unit, { mana: unit.maxMana ?? 0, moves: 0, damageBonus: unit.damageBonus ?? 0, guard: null, shield: null, evade: null });
   }
-  // For evolutions: the unit's stances and summon, its riposte, whether it
-  // has struck yet and the bonus of its next blow (Krok cienia), and what
-  // the evolutions' skills left on it: a chill, a mark, a mark of death.
+  // For evolutions: the unit's stances and summon, its riposte, how many of
+  // its blows landed yet (Zimna krew, Sokole oko) and the bonus of its next
+  // blow (Krok cienia), and what the evolutions' skills left on it: a chill,
+  // a mark, a mark of death, a duel or a lock (focus), a sure critical blow
+  // after a vanishing (nextCrit) and the elements its spells used
+  // (Harmonia żywiołów).
   if (evolving) {
-    for (const unit of units) Object.assign(unit, { stances: [], summon: null, riposte: null, struck: false, nextBlow: 0, chilled: null, marked: null, doom: null });
+    for (const unit of units) {
+      Object.assign(unit, { stances: [], summon: null, riposte: null, struck: 0, nextBlow: 0, chilled: null, marked: null, doom: null, focus: null, nextCrit: null, harmony: null });
+    }
   }
   for (const unit of units) unit.next = unit.interval * (0.5 + 0.5 * rng.next());
   // An ambush (an event's, events.js): every enemy moves before the allies'
@@ -272,11 +297,22 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   // A miracle or a fern brew the moment the unit faints: it rises instead.
   const revived = (unit, t) => (evolving && miracle(unit, t)) || (Boolean(unit.potions?.revive) && drink(unit, 'revive', t));
 
+  // Owacja: every foe that falls heals each living one of the other side
+  // with the trait by a share of its HP.
+  const ovation = (fallen, t) => {
+    for (const unit of units) {
+      if (unit.side === fallen.side || unit.hp <= 0 || unit.feat?.kind !== 'spectacle' || !unit.feat.heal) continue;
+      const amount = heal(unit, unit.feat.heal * unit.maxHp);
+      if (amount > 0) log(() => ({ t, kind: 'drain', actor: unit.id, target: unit.id, amount, hp: unit.hp, text: say(texts, 'ovation', actions, { actor: unit.name, amount }) }));
+    }
+  };
+
   // A kill, unless the unit rises; a fallen summoner's summon goes with it.
   const fell = (unit, t, vars) => {
     if (revived(unit, t)) return false;
     if (unit.summon) unit.summon = null;
     log(() => ({ t, kind: 'kill', target: unit.id, hp: 0, text: say(texts, 'kill', actions, vars) }));
+    if (evolving) ovation(unit, t);
     return true;
   };
 
@@ -307,19 +343,34 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           armor: percent,
           turns,
           hp: unit.hp,
-          text: `${say(texts, 'skillHeal', actions, { ...vars, amount })} ${say(texts, 'guardArmor', actions, { armor: percent, turns })}${reflect}`,
+          text: `${say(texts, 'skillHeal', actions, { ...vars, amount })} ${say(texts, turns >= 5 ? 'guardArmorMany' : 'guardArmor', actions, { armor: percent, turns })}${reflect}`,
         }));
       } else {
         let text = say(texts, 'skillUse', actions, vars);
-        if (skill.kind === 'shield') {
+        // Boska ochrona: a shield over every member of the party, a share of
+        // each one's HP (bigger with Wielkie namaszczenie); the event names
+        // the others' shields for their cards.
+        let guarded;
+        if (skill.kind === 'shield' && p.party) {
+          const anointed = unit.feat?.kind === 'anointing' ? 1 + unit.feat.bonus : 1;
+          guarded = [];
+          for (const member of units) {
+            if (member.side !== unit.side || member.hp <= 0) continue;
+            member.shield = { points: Math.max(member.shield?.points ?? 0, Math.round(member.maxHp * p.guard * anointed)) };
+            if (member !== unit) guarded.push({ id: member.id, shield: member.shield.points });
+          }
+          text = say(texts, 'skillShieldParty', actions, { ...vars, percent: Math.round(p.guard * anointed * 100) });
+        } else if (skill.kind === 'shield') {
           // A share of the unit's mana at once makes the shield, each point
           // of mana `ratio` points of damage, more with the skill's level
           // (the author: "niech pobiera stałą wartość Many np.30% ale z
           // kazdym poziomem umiejetnosci daje z tego wiecej osłony").
+          // Lodowa zbroja slows those who strike it (`slow`).
           const taken = Math.min(unit.mana, Math.round((unit.maxMana ?? 0) * p.pool));
           unit.mana -= taken;
-          unit.shield = { points: Math.round(taken * p.ratio), reflect: p.reflect };
+          unit.shield = { points: Math.round(taken * p.ratio), reflect: p.reflect, ...(p.slow && { slow: p.slow }) };
           text = say(texts, 'skillShield', actions, { ...vars, shield: unit.shield.points, mana: taken }) + reflect;
+          if (p.slow) text += ` ${say(texts, 'skillShieldSlow', actions, { slow: Math.round(p.slow * 100) })}`;
         }
         if (skill.kind === 'evade') {
           const hits = Math.round(p.hits);
@@ -327,7 +378,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           text = say(texts, 'skillEvade', actions, { ...vars, hits, dodge: Math.round(p.dodge * 100), counter: Math.round(p.counter * 100) });
           if (p.blades) text += ` ${say(texts, 'skillEvadeBlades', actions, { blades: Math.round(p.blades * 100) })}`;
         }
-        log(() => ({ ...base, kind: 'skill', hp: unit.hp, shield: shieldLeft(unit), text }));
+        log(() => ({ ...base, kind: 'skill', hp: unit.hp, shield: shieldLeft(unit), ...(guarded?.length && { guarded }), text }));
       }
     }
   };
@@ -344,15 +395,69 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       damage(unit, amount, dot.source);
       dot.ticks -= 1;
       const vars = { target: unit.name, effect: dot.name, damage: amount };
-      log(() => ({ t, kind: 'tick', target: unit.id, effect: dot.name, element: dot.element, damage: amount, absorbed: absorbed || undefined, shield: shieldLeft(unit), left: dot.ticks, hp: unit.hp, text: say(texts, 'effectTick', actions, vars) }));
+      // Klątwa rozkładu: the armour wears away with every tick.
+      const decay = dot.decay && unit.hp > 0 ? Math.round(unit.armor * dot.decay) : 0;
+      if (decay) unit.armor -= decay;
+      log(() => ({
+        t,
+        kind: 'tick',
+        target: unit.id,
+        effect: dot.name,
+        element: dot.element,
+        damage: amount,
+        absorbed: absorbed || undefined,
+        shield: shieldLeft(unit),
+        left: dot.ticks,
+        hp: unit.hp,
+        text: say(texts, 'effectTick', actions, vars) + (decay ? ` ${say(texts, 'armorShred', actions, { percent: Math.round(dot.decay * 100) })}` : ''),
+      }));
       // A unit that rose (a fern brew, a miracle) may still wake a skill or
-      // drink.
-      if (unit.hp > 0 || !fell(unit, t, vars)) {
+      // drink; one that fell of poison may rise for its poisoner (Żniwo).
+      const down = unit.hp <= 0 && fell(unit, t, vars);
+      if (!down) {
         if (unit.skills.length > 0) wounded(unit, t);
         if (unit.potions?.heal) healPotion(unit, t);
-      }
+      } else if (evolving && dot.effect === 'poisoned') rise(unit, dot.source, t);
     }
     unit.dots = unit.dots.filter((dot) => dot.ticks > 0);
+  };
+
+  // Żniwo: a foe killed by the Nekromanta's poison rises as a skeleton that
+  // fights on its side to the end of the fight, as the Nekromanta's summon
+  // (a character has one at a time, so only while it has none): it stands
+  // before the Nekromanta, takes the foes' blows and strikes a random foe
+  // every move, as a summon does (summonActs).
+  const rise = (fallen, sourceId, t) => {
+    const source = units.find((unit) => unit.id === sourceId);
+    const feat = source?.feat;
+    if (feat?.kind !== 'toxins' || !feat.raise || source.hp <= 0 || source.summon) return;
+    const hp = Math.max(1, Math.round(source.maxHp * feat.raiseHp));
+    const name = feat.raiseName;
+    // The summon's blows go under the trait's name.
+    source.summon = {
+      skill: { id: RISEN, name: feat.name },
+      name,
+      hp,
+      until: Infinity,
+      power: feat.raisePower,
+      raw: ((source.weapon.min + source.weapon.max) / 2) * source.damageScale,
+      physical: true,
+      dot: null,
+    };
+    log(() => ({
+      t,
+      kind: 'summon',
+      state: 'up',
+      actor: source.id,
+      target: source.id,
+      skill: RISEN,
+      skillName: feat.name,
+      summon: name,
+      figure: 'skeleton',
+      summonHp: hp,
+      hp: source.hp,
+      text: say(texts, 'summonRisen', actions, { target: fallen.name, summon: name, hp }),
+    }));
   };
 
   // The opponent that needs the fewest expected hits, against its defence,
@@ -412,6 +517,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       active.ticks = Math.max(active.ticks, ticks);
       active.perTick = Math.max(active.perTick, perTick);
       if (dot.weaken) active.weaken = Math.max(active.weaken ?? 0, dot.weaken);
+      if (dot.decay) active.decay = Math.max(active.decay ?? 0, dot.decay);
     } else {
       target.dots.push({
         effect: effect.id,
@@ -422,6 +528,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         sourceLevel: actor.level,
         source: actor.id,
         ...(dot.weaken && { weaken: dot.weaken }),
+        // Klątwa rozkładu's wearing of armour (tickEffects).
+        ...(dot.decay && { decay: dot.decay }),
       });
     }
     log(() => ({ t, kind: 'effect', actor: actor.id, target: target.id, effect: effect.name, element: effect.element, hp: target.hp, text: say(texts, 'effectApplied', actions, { ...vars, effect: effect.name }) }));
@@ -441,6 +549,17 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
 
   const fallenFoes = (unit) => units.filter((other) => other.side !== unit.side && other.hp <= 0).length;
   const isChilled = (unit) => Boolean(unit.chilled) || unit.dots.some((dot) => dot.effect === 'chilled');
+  // The biggest share a stance of the living units `of` gives by `key`: a
+  // roar that weakens the other side (weaken), a wall of shields (wall), a
+  // choir (chorus).
+  const stanceShare = (key, of) => {
+    let most = 0;
+    for (const unit of units) {
+      if (unit.hp <= 0 || !of(unit)) continue;
+      for (const stance of unit.stances) if ((stance[key] ?? 0) > most) most = stance[key];
+    }
+    return most;
+  };
 
   // What the evolutions add to a blow or take from it: the attacker's trait
   // and stances, the weakness of a poisoned or chilled attacker, the
@@ -466,6 +585,22 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     if (target.marked && target.moves < target.marked.until) factor *= 1 + target.marked.bonus;
     if (move.chilledBonus && isChilled(target)) factor *= 1 + move.chilledBonus;
     if (move.executeBelow && target.hp < move.executeBelow * target.maxHp) factor *= 1 + move.executeBonus;
+    // Pojedynek and Namierzenie: more against the foe the unit marked, and,
+    // in a duel, less from it.
+    if (target.focus?.source === actor) factor *= 1 + target.focus.damage;
+    if (actor.focus?.source === target && actor.focus.guard) factor *= 1 - actor.focus.guard;
+    // Ryk berserkera weakens the other side's blows; Chór strengthens its
+    // own side's.
+    const roar = stanceShare('weaken', (unit) => unit.side !== actor.side);
+    if (roar) factor *= 1 - roar;
+    const chorus = stanceShare('chorus', (unit) => unit.side === actor.side);
+    if (chorus) factor *= 1 + chorus;
+    // Harmonia żywiołów: every element the unit's spells used before this
+    // move strengthens a spell; this one's count from its next move.
+    if (actor.harmony && category === 'magical') {
+      factor *= 1 + actor.harmony.bonus * actor.harmony.used.size;
+      for (const element of elements) if (element) actor.harmony.fresh.add(element);
+    }
     return factor;
   };
 
@@ -512,12 +647,25 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     if (decoy.hp > 0) return;
     owner.summon = null;
     log(() => ({ t, kind: 'summon', state: 'fell', actor: owner.id, target: owner.id, summon: decoy.name, summonHp: 0, hp: owner.hp, text: say(texts, 'summonFell', actions, { summon: decoy.name }) }));
-    if (!decoy.dot) return;
+    if (!decoy.burst || !decoy.dot) return;
     log(() => ({ t, kind: 'skill', actor: owner.id, skill: decoy.skill.id, skillName: decoy.skill.name, targets: foesOf(owner).map((unit) => unit.id), text: say(texts, 'summonBurst', actions, { summon: decoy.name }) }));
     for (const foe of foesOf(owner)) applyDot(owner, foe, decoy.dot, decoy.raw, t, { actor: owner.name, target: foe.name });
   };
 
   const foesOf = (unit) => units.filter((other) => other.side !== unit.side && other.hp > 0);
+
+  // A blow of the unit's own, plain or of a skill: not a counter, a dance's
+  // cut, a storm cloud's or a pet's strike, a summon's blow or a shadow's
+  // repeat. Only these wake a sure critical blow (Zniknięcie) and are
+  // repeated by a shadow double.
+  const ownBlow = (move) => !move.counter && !move.blade && !move.cloud && !move.pet && !move.summoned && !move.mirror;
+
+  // A blow that does not reach its target: it vanished (Zniknięcie) or its
+  // shield stopped it (Twierdza). Logged as a dodge, with its own words.
+  const missed = (actor, target, t, move, words) => {
+    const vars = { actor: actor.name, target: target.name, skill: move.skill?.name };
+    log(() => ({ t, kind: 'dodge', actor: actor.id, target: target.id, hp: target.hp, ...marksOf(move), ...(words === 'blocked' && { blocked: true }), text: say(texts, words, actions, vars) }));
+  };
 
   // One blow, plain or shaped by a skill (`move`): its power, the share of
   // armour it ignores, whether it can be dodged or always lands critically,
@@ -527,18 +675,29 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       summonTakes(actor, target, t, move);
       return;
     }
+    if (evolving && target.stances.some((stance) => stance.vanish)) {
+      missed(actor, target, t, move, 'vanished');
+      return;
+    }
+    if (evolving && target.feat?.block && rng.chance(target.feat.block)) {
+      missed(actor, target, t, move, 'blocked');
+      return;
+    }
     const weapon = actor.weapon;
     const category = move.category ?? weapon.category;
     const element = move.element ?? weapon.element;
     const attack = move.skill && !move.own ? move.skill.name : weapon.attackName;
     const vars = { actor: actor.name, target: target.name, attack, skill: move.skill?.name, ...move.vars };
     const marks = marksOf(move);
-    if (category === 'physical' && !move.undodgeable) {
+    // Namierzenie: the foe the unit locked on cannot dodge its blows.
+    const locked = evolving && target.focus?.source === actor && target.focus.sure;
+    if (category === 'physical' && !move.undodgeable && !locked) {
       const evading = target.evade && target.evade.hits > 0 ? target.evade : null;
       if (evading) evading.hits -= 1;
       const base = cappedChance(target.dodgeRating, actor.level, tuning.dodgeCap, balance);
-      // Taniec ostrzy and Riposta raise it above the cap.
-      const bonus = (evading ? evading.dodge : 0) + (evolving && target.riposte ? target.riposte.dodge : 0);
+      // Taniec ostrzy, Riposta and Widmowy krok raise it above the cap.
+      const bonus =
+        (evading ? evading.dodge : 0) + (evolving && target.riposte ? target.riposte.dodge : 0) + (evolving && target.feat?.kind === 'shadowStep' ? (target.feat.dodge ?? 0) : 0);
       const dodge = bonus ? Math.min(0.95, base + bonus) : base;
       if (rng.chance(dodge)) {
         log(() => ({ t, kind: 'dodge', actor: actor.id, target: target.id, hp: target.hp, ...marks, text: say(texts, wordsFor('dodge', move), actions, vars) }));
@@ -556,17 +715,25 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         return;
       }
     }
-    const raw = rng.float(weapon.min, weapon.max) * actor.damageScale * (move.power ?? 1) * (actor.damageBonus ? 1 + actor.damageBonus : 1);
+    // Zniknięcie: the unit's next own blow after vanishing is critical and
+    // stronger.
+    const vanished = evolving && actor.nextCrit && ownBlow(move) ? actor.nextCrit : null;
+    if (vanished) actor.nextCrit = null;
+    const raw = rng.float(weapon.min, weapon.max) * actor.damageScale * (move.power ?? 1) * (actor.damageBonus ? 1 + actor.damageBonus : 1) * (vanished ? 1 + vanished.power : 1);
     const feat = evolving ? actor.feat : null;
-    // Zimna krew: the first blow that lands is critical.
-    const sure = feat?.kind === 'coldBlood' && !actor.struck;
-    if (feat) actor.struck = true;
-    const critical = move.alwaysCrit || sure || rng.chance(Math.min(1, cappedChance(actor.critRating, target.level, tuning.critCap, balance) + (move.critBonus ?? 0)));
+    // Zimna krew: the first blow that lands is critical (Sokole oko: the
+    // first two).
+    const sure = feat?.kind === 'coldBlood' && actor.struck < (feat.sure ?? 1);
+    if (feat) actor.struck += 1;
+    const critical =
+      move.alwaysCrit || sure || Boolean(vanished) || rng.chance(Math.min(1, cappedChance(actor.critRating, target.level, tuning.critCap, balance) + (move.critBonus ?? 0)));
     const critFactor = critical ? tuning.critMultiplier * (feat?.critDamage ? 1 + feat.critDamage : 1) : 1;
     // A blow of several elements (Promień Żywiołów) is split between them
-    // evenly, each against its resistance and weakness.
+    // evenly, each against its resistance and weakness. Mur tarcz hardens
+    // the armour of the target's whole side.
     const spread = move.elements;
-    const defense = category === 'physical' ? target.armor * (1 - (move.armorIgnore ?? 0)) : (target.resist[element] ?? 0);
+    const wall = evolving && category === 'physical' ? stanceShare('wall', (unit) => unit.side === target.side) : 0;
+    const defense = category === 'physical' ? target.armor * (1 + wall) * (1 - (move.armorIgnore ?? 0)) : (target.resist[element] ?? 0);
     const weak = (element && target.weak?.[element]) || 0;
     const ward = category === 'magical' ? (target.ward ?? 0) : 0;
     // A trophy of the Encyklopedia: blows against its creature hit harder.
@@ -589,7 +756,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         amount = Math.max(1, Math.round(amount * evolved(actor, target, move, category, [element]) * shelter));
       }
     }
-    // Naelektryzowane groty: a spark of lightning on top of a blow.
+    // Naelektryzowane groty: a spark of lightning on top of a blow
+    // (Gromowe groty: and the one it struck slows down).
     let spark = 0;
     if (feat?.kind === 'charged' && !move.cloud && !move.counter && rng.chance(feat.chance)) {
       const resisted = reduction(target.resist[feat.element] ?? 0, actor.level, balance);
@@ -599,6 +767,12 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const absorbed = target.shield ? absorb(target, amount) : 0;
     amount -= absorbed;
     damage(target, amount, actor.id);
+    // A slow of 30% puts the next move off as a skill's slow does (1 / (1 -
+    // slow) times as late): the spark of Gromowe groty on its target, and
+    // Lodowa zbroja on the one who struck it.
+    const slowed = [];
+    if (spark && feat.slow && target.hp > 0) slowed.push([target, feat.slow]);
+    if (absorbed && target.shield?.slow && actor.hp > 0) slowed.push([actor, target.shield.slow]);
     // Millstone tears off a share of the target's armour for good.
     const shred = move.armorShred && target.hp > 0 ? Math.round(target.armor * move.armorShred) : 0;
     if (shred) target.armor -= shred;
@@ -620,14 +794,20 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         (shred ? ` ${say(texts, 'armorShred', actions, { percent: Math.round(move.armorShred * 100) })}` : '') +
         (absorbed ? ` ${say(texts, 'absorbed', actions, { absorbed })}` : ''),
     }));
+    for (const [unit, slow] of slowed) {
+      unit.next += (slow / (1 - slow)) * unit.interval;
+      log(() => ({ t, kind: 'slow', actor: actor.id, targets: [unit.id], text: say(texts, 'slowOne', actions, { target: unit.name }) }));
+    }
     // Wysysanie: the monster heals by a share of what the blow took.
     if (weapon.drain && !move.counter) {
       const healed = heal(actor, amount * weapon.drain);
       if (healed > 0) log(() => ({ t, kind: 'drain', actor: actor.id, target: actor.id, amount: healed, hp: actor.hp, text: say(texts, 'drain', actions, { actor: actor.name, amount: healed }) }));
     }
     if (evolving) {
-      // Krwawy szał: the frenzied heal by a share of what they dealt.
-      const steal = actor.stances.reduce((sum, stance) => sum + (stance.lifesteal ?? 0), 0);
+      // Krwawy szał: the frenzied heal by a share of what they dealt; so do
+      // those with Szał low on HP.
+      let steal = actor.stances.reduce((sum, stance) => sum + (stance.lifesteal ?? 0), 0);
+      if (feat?.kind === 'fury' && feat.lifesteal && actor.hp < feat.lifestealBelow * actor.maxHp) steal += feat.lifesteal;
       const healed = steal && actor.hp > 0 ? heal(actor, amount * steal) : 0;
       if (healed > 0) log(() => ({ t, kind: 'drain', actor: actor.id, target: actor.id, amount: healed, hp: actor.hp, text: say(texts, 'lifesteal', actions, { actor: actor.name, amount: healed }) }));
       if (!move.counter) throwBack(target, actor, amount, absorbed, t);
@@ -636,14 +816,22 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
 
     const dot = move.dot ?? weapon.dot;
     if (dot) applyDot(actor, target, dot, raw, t, vars);
+    // Święty ogień: a spirit struck with sacrum burns.
+    if (feat?.kind === 'zeal' && feat.burn && target.family === 'spirit' && (spread ?? [element]).includes(feat.element)) {
+      applyDot(actor, target, { effect: 'burning', chance: 1, power: feat.burn, ticks: Math.round(feat.burnTicks) }, raw, t, vars);
+    }
     if (weapon.slow && !move.counter) applySlow(actor, target, weapon.slow, t, vars);
     if (move.stun || (move.stunChance && rng.chance(move.stunChance))) {
-      target.next += target.interval;
-      log(() => ({ t, kind: 'stun', target: target.id, label: move.stunLabel, hp: target.hp, ...marks, text: say(texts, 'stun', actions, vars) }));
+      // Kruszący cios: a stun of more than one move.
+      const moves = Math.round(move.stunMoves ?? 1);
+      target.next += target.interval * moves;
+      log(() => ({ t, kind: 'stun', target: target.id, label: move.stunLabel, hp: target.hp, ...marks, text: say(texts, moves > 1 ? 'stunMoves' : 'stun', actions, { ...vars, moves }) }));
     }
     // Zamieć chills to the end of the fight (Zimowy oddech: the chilled
-    // strike weaker); Sąd marks a family of foes for a few of their moves.
-    if (move.chill && !target.chilled) {
+    // strike weaker; Wieczna zima: every frost spell chills); Sąd marks a
+    // family of foes for a few of their moves.
+    const chills = move.chill || (feat?.kind === 'winter' && feat.frostChills && category === 'magical' && (spread ?? [element]).includes('frost'));
+    if (chills && !target.chilled) {
       target.chilled = { weaken: feat?.kind === 'winter' ? feat.weaken : 0 };
       const effect = content.effectsById.chilled;
       log(() => ({ t, kind: 'effect', actor: actor.id, target: target.id, effect: effect.name, element: effect.element, hp: target.hp, text: say(texts, 'effectApplied', actions, { ...vars, effect: effect.name }) }));
@@ -663,6 +851,12 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     }
     if (target.skills.length > 0) wounded(target, t);
     if (target.potions?.heal) healPotion(target, t);
+    // Cień-sobowtór: the shadow repeats the unit's own blow that landed, at
+    // the same target, for a share of its power.
+    const double = evolving && ownBlow(move) && actor.hp > 0 && target.hp > 0 ? actor.stances.find((stance) => stance.mirror) : null;
+    if (double) {
+      strike(actor, target, t, { skill: double.skill, power: (move.power ?? 1) * double.power, category, element, undodgeable: move.undodgeable, mirror: true });
+    }
   };
 
   // The opponent standing furthest back, the quickest kill among equals.
@@ -692,11 +886,13 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     return pickTarget(actor, opponents);
   };
 
-  // Opiekun: a heal takes one bad effect off as well.
+  // Opiekun: a heal takes one bad effect off as well (Łaska: every one).
   const cleanse = (unit, actor, t) => {
-    const dot = unit.dots.shift();
-    if (!dot) return;
-    log(() => ({ t, kind: 'cleanse', actor: actor.id, target: unit.id, cleared: dot.name, hp: unit.hp, text: say(texts, 'cleansed', actions, { target: unit.name, effect: dot.name }) }));
+    for (let count = actor.feat?.cleanseAll ? unit.dots.length : 1; count > 0; count--) {
+      const dot = unit.dots.shift();
+      if (!dot) return;
+      log(() => ({ t, kind: 'cleanse', actor: actor.id, target: unit.id, cleared: dot.name, hp: unit.hp, text: say(texts, 'cleansed', actions, { target: unit.name, effect: dot.name }) }));
+    }
   };
 
   // A summon's move: the elemental strikes a random foe with the element it
@@ -706,6 +902,21 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const foes = foesOf(actor);
     if (!summon || foes.length === 0) return;
     const foe = rng.pick(foes);
+    // A wolf, an ent, a bear or a skeleton strikes with its claws, branches
+    // or sword: a physical blow, which may miss, the skeleton's with its
+    // poison (Wskrzeszenie).
+    if (summon.physical) {
+      strike(actor, foe, t, {
+        skill: summon.skill,
+        power: summon.power,
+        category: 'physical',
+        summoned: true,
+        ...(summon.dot && { dot: summon.dot }),
+        words: { hit: 'summonStrike', crit: 'summonStrike', dodge: 'summonMiss' },
+        vars: { summon: summon.name },
+      });
+      return;
+    }
     if (summon.dot) {
       log(() => ({ t, kind: 'skill', actor: actor.id, skill: summon.skill.id, skillName: summon.skill.name, targets: [foe.id], text: say(texts, 'summonSpit', actions, { summon: summon.name }) }));
       applyDot(actor, foe, summon.dot, summon.raw, t, { actor: actor.name, target: foe.name });
@@ -720,6 +931,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       power: summon.power,
       category: 'magical',
       element,
+      summoned: true,
       words: 'summonHit',
       vars: { summon: summon.name, element: content.elementsById[element].name },
     });
@@ -741,6 +953,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       // below its mark.
       if (p.opener && actor.moves > 0) continue;
       if (p.below !== undefined && skill.kind === 'strike' && !opponents.some((unit) => unit.hp < p.below * unit.maxHp)) continue;
+      // A character has one summon at a time: another summoning skill (the
+      // Druid's ent and bear) waits until the one standing falls or goes.
+      if (skill.kind === 'summon' && actor.summon) continue;
+      // A duel or a lock waits until the foe it marked falls.
+      if ((p.duel || p.lock) && opponents.some((unit) => unit.hp > 0 && unit.focus?.source === actor)) continue;
       if (!manaFor(actor, skill.mana, t)) continue;
       actor.mana -= skill.mana;
       skill.ready = actor.moves + skill.cooldown;
@@ -769,15 +986,21 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         if (evolving && p.hot) {
           const turns = Math.round(p.hotTurns);
           actor.stances.push({ skill, until: actor.moves + 1 + turns, regen: true, heal: p.hot * care });
-          log(() => ({ ...base, kind: 'skill', target: actor.id, text: say(texts, 'renewalHot', actions, { turns, hot: Math.round(p.hot * care * 100) }) }));
+          log(() => ({ ...base, kind: 'skill', target: actor.id, text: say(texts, turns >= 5 ? 'renewalHotMany' : 'renewalHot', actions, { turns, hot: Math.round(p.hot * care * 100) }) }));
         }
       } else if (skill.kind === 'strike') {
         const target = skillTarget(actor, opponents, p);
         strike(actor, target, t, blowOf(skill, { own: true }));
-        // Przebijający strzał goes on into the one behind; Ognisty wybuch
-        // burns the others.
-        const next = p.pierce && actor.hp > 0 ? behind(target, opponents) : null;
-        if (next) strike(actor, next, t, { skill, power: p.pierce, undodgeable: true, category: p.category, element: p.element });
+        // Przebijający strzał goes on into the one behind (Strzał w serce:
+        // the two behind, one after the other); Ognisty wybuch burns the
+        // others.
+        let from = target;
+        for (let pierced = 0; p.pierce && pierced < Math.round(p.pierces ?? 1) && actor.hp > 0; pierced++) {
+          const next = behind(from, opponents);
+          if (!next) break;
+          strike(actor, next, t, { skill, power: p.pierce, undodgeable: true, category: p.category, element: p.element });
+          from = next;
+        }
         if (p.splash) {
           for (const other of opponents) {
             if (other === target || other.hp <= 0 || actor.hp <= 0) continue;
@@ -792,6 +1015,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           if (foes.length === 0 || actor.hp <= 0) break;
           strike(actor, rng.pick(foes), t, blowOf(skill, { sweep: true }));
         }
+      } else if (skill.kind === 'mark' && (p.duel || p.lock)) {
+        // Pojedynek: the foe with the most HP is challenged, and to the end
+        // of the fight takes more from the challenger and deals it less;
+        // Namierzenie: the usual target takes more from the unit and cannot
+        // dodge its blows, until it falls.
+        const target = skillTarget(actor, opponents, p);
+        target.focus ={ source: actor, skill, damage: p.damage, guard: p.guard ?? 0, sure: Boolean(p.lock) };
+        const words = p.duel ? 'duel' : 'locked';
+        log(() => ({ ...base, kind: 'skill', targets: [target.id], text: say(texts, words, actions, { ...vars, target: target.name, damage: Math.round(p.damage * 100), guard: Math.round((p.guard ?? 0) * 100) }) }));
+        log(() => ({ t, kind: 'effect', actor: actor.id, target: target.id, effect: skill.name, hp: target.hp, text: say(texts, 'effectApplied', actions, { target: target.name, effect: skill.name }) }));
       } else if (skill.kind === 'mark') {
         // Znak śmierci: after a few of the marker's moves its foe takes an
         // echo of what it took meanwhile.
@@ -801,7 +1034,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         log(() => ({ ...base, kind: 'skill', targets: [target.id], text: say(texts, 'doomed', actions, { ...vars, target: target.name, turns, echo: Math.round(p.echo * 100) }) }));
         log(() => ({ t, kind: 'effect', actor: actor.id, target: target.id, effect: skill.name, hp: target.hp, text: say(texts, 'effectApplied', actions, { target: target.name, effect: skill.name }) }));
       } else if (skill.kind === 'summon') {
-        const hp = Math.max(1, Math.round(actor.maxHp * p.hp));
+        // Moc puszczy: summons with more HP and stronger blows.
+        const grove = evolving && actor.feat?.kind === 'arcana' ? actor.feat : null;
+        const hp = Math.max(1, Math.round(actor.maxHp * p.hp * (1 + (grove?.summonHp ?? 0))));
         const name = p.summonName;
         // The slime's poison: a share of the summoner's average blow a move.
         const raw = ((actor.weapon.min + actor.weapon.max) / 2) * actor.damageScale;
@@ -810,12 +1045,35 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           name,
           hp,
           until: actor.moves + Math.round(p.turns),
-          power: p.power,
+          power: p.power === undefined ? undefined : p.power * (1 + (grove?.summonPower ?? 0)),
           raw,
           dot: p.dotEffect ? { effect: p.dotEffect, chance: 1, power: p.dotPower, ticks: Math.round(p.dotTicks) } : null,
+          // A slime bursts when it falls; a wolf, an ent, a bear or a
+          // skeleton strikes with its body.
+          burst: Boolean(p.burst),
+          physical: Boolean(p.physical),
         };
-        log(() => ({ ...base, kind: 'summon', state: 'up', target: actor.id, summon: name, summonHp: hp, hp: actor.hp, text: say(texts, 'summonUp', actions, { ...vars, summon: name, hp }) }));
+        log(() => ({
+          ...base,
+          kind: 'summon',
+          state: 'up',
+          target: actor.id,
+          summon: name,
+          figure: p.summon,
+          summonHp: hp,
+          hp: actor.hp,
+          text: say(texts, 'summonUp', actions, { ...vars, summon: name, hp }),
+        }));
         summonActs(actor, t);
+      } else if (p.curse) {
+        // Klątwa rozkładu: no blow, a poison on every foe that wears its
+        // armour away, of the curser's average blow.
+        log(() => ({ ...base, kind: 'skill', targets: opponents.map((unit) => unit.id), text: say(texts, 'skillUse', actions, vars) }));
+        const raw = ((actor.weapon.min + actor.weapon.max) / 2) * actor.damageScale;
+        const dot = { effect: p.dotEffect, chance: p.dotChance ?? 1, power: p.dotPower, ticks: Math.round(p.dotTicks), decay: p.decay };
+        for (const target of opponents) {
+          if (target.hp > 0) applyDot(actor, target, dot, raw, t, { actor: actor.name, target: target.name });
+        }
       } else {
         // A sweep: every opponent, each hit on its own; a lone one takes the
         // stronger single blow.
@@ -843,10 +1101,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   };
 
   // The text that tells what a stance gives, with its numbers.
-  const stanceText = (unit, skill, turns) => {
+  // A second form's stance names its own words (`words`), with the
+  // stance's numbers as percents.
+  const stanceText = (unit, skill, turns, stance) => {
     const p = skill.params;
     const vars = { actor: unit.name, skill: skill.name, turns };
     const percent = (value) => Math.round(value * 100);
+    if (p.words) {
+      const values = Object.fromEntries(Object.entries(stance).filter(([, value]) => typeof value === 'number').map(([key, value]) => [key, percent(value)]));
+      return say(texts, p.words, actions, { ...values, ...vars });
+    }
     if (p.provoke) return say(texts, 'stanceProvoke', actions, { ...vars, reflect: percent(p.reflect) });
     if (p.cloud) return say(texts, 'stanceCloud', actions, vars);
     if (p.pet) return say(texts, 'stancePet', actions, vars);
@@ -881,16 +1145,25 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       if (foe.hp === 0) fell(foe, t, vars);
     }
     if (actor.feat?.kind === 'arcana') actor.mana = Math.min(actor.maxMana ?? 0, actor.mana + Math.round((actor.maxMana ?? 0) * actor.feat.regen));
+    // Harmonia żywiołów: the elements of the unit's last move count from now.
+    if (actor.harmony) {
+      for (const element of actor.harmony.fresh) actor.harmony.used.add(element);
+      actor.harmony.fresh.clear();
+    }
+    // Łaska heals more through a stance too; Wielkie namaszczenie makes a
+    // choir's bonus bigger.
+    const care = actor.feat?.kind === 'caretaker' ? 1 + actor.feat.heal : 1;
+    const anointed = actor.feat?.kind === 'anointing' ? 1 + actor.feat.bonus : 1;
     for (const skill of actor.skills) {
       if (!STANCE_KINDS.has(skill.kind) || actor.moves < skill.ready || actor.stances.some((stance) => stance.skill === skill)) continue;
       const p = skill.params;
       // Psalm waits for someone of the party below its mark.
-      if (p.regen && !units.some((unit) => unit.side === actor.side && unit.hp > 0 && unit.hp < p.below * unit.maxHp)) continue;
+      if (p.regen && p.below !== undefined && !units.some((unit) => unit.side === actor.side && unit.hp > 0 && unit.hp < p.below * unit.maxHp)) continue;
       if (!manaFor(actor, skill.mana, t)) continue;
       actor.mana -= skill.mana;
       skill.ready = actor.moves + skill.cooldown;
       const turns = Math.round(p.turns);
-      actor.stances.push({
+      const stance = {
         skill,
         until: actor.moves + turns,
         damage: p.damage,
@@ -901,25 +1174,38 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         cloud: p.cloud,
         pet: p.pet,
         regen: p.regen,
-        heal: p.heal,
+        heal: p.heal === undefined ? undefined : p.heal * care,
         power: p.power,
         category: p.category,
         element: p.element,
-      });
-      log(() => ({ t, kind: 'skill', actor: actor.id, target: actor.id, skill: skill.id, skillName: skill.name, text: stanceText(actor, skill, turns) }));
+        // The second forms' stances: a roar that weakens the other side, a
+        // wall of shields, a choir's damage, a vanishing, a shadow double,
+        // and the words of a cloud's every move (Stos).
+        weaken: p.weaken,
+        wall: p.wall,
+        chorus: p.chorus === undefined ? undefined : p.chorus * anointed,
+        vanish: p.vanish,
+        mirror: p.mirror,
+        tickWords: p.tickWords,
+      };
+      actor.stances.push(stance);
+      // Zniknięcie: the next own blow is critical and stronger.
+      if (p.vanish) actor.nextCrit = { power: p.power ?? 0 };
+      log(() => ({ t, kind: 'skill', actor: actor.id, target: actor.id, skill: skill.id, skillName: skill.name, text: stanceText(actor, skill, turns, stance) }));
     }
     for (const stance of actor.stances) {
       const { skill } = stance;
       if (stance.cloud) {
         const foes = foesOf(actor);
         if (foes.length === 0) continue;
-        log(() => ({ t, kind: 'skill', actor: actor.id, skill: skill.id, skillName: skill.name, targets: foes.map((unit) => unit.id), text: say(texts, 'cloudStrike', actions, { skill: skill.name }) }));
+        log(() => ({ t, kind: 'skill', actor: actor.id, skill: skill.id, skillName: skill.name, targets: foes.map((unit) => unit.id), text: say(texts, stance.tickWords ?? 'cloudStrike', actions, { skill: skill.name }) }));
         for (const foe of foes) {
           if (foe.hp > 0 && actor.hp > 0) strike(actor, foe, t, { skill, power: stance.power, category: stance.category, element: stance.element, sweep: true, cloud: true });
         }
       } else if (stance.pet) {
+        // A falcon pecks; Kula piorunów strikes with lightning.
         const foes = foesOf(actor);
-        if (foes.length > 0) strike(actor, rng.pick(foes), t, { skill, power: stance.power, undodgeable: true });
+        if (foes.length > 0) strike(actor, rng.pick(foes), t, { skill, power: stance.power, undodgeable: true, category: stance.category, element: stance.element, pet: true });
       } else if (stance.regen) {
         for (const member of units) {
           if (member.side !== actor.side || member.hp <= 0) continue;
@@ -933,8 +1219,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     if (actor.summon) summonActs(actor, t);
   };
 
-  // Skills that work from the start: a blessing, a coated blade and a
-  // riposte.
+  // Skills that work from the start: a blessing, a coated blade, a riposte
+  // and Harmonia żywiołów.
   for (const unit of skilled ? units : NO_SKILLS) {
     for (const skill of unit.skills) {
       if (!START_KINDS.has(skill.kind) || unit.mana < skill.mana) continue;
@@ -967,6 +1253,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         const ticks = Math.round(p.dotTicks);
         unit.riposte = { skill, dodge: p.dodge ?? 0, power: p.power, dot: { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks } };
         text = say(texts, 'skillRiposte', 0, { ...vars, dodge: Math.round((p.dodge ?? 0) * 100), power: Math.round(p.power * 100), ticks });
+      } else if (skill.kind === 'harmony') {
+        // Harmonia żywiołów: the elements the unit's spells used (evolved,
+        // evolutionMove).
+        unit.harmony = { bonus: p.bonus, used: new Set(), fresh: new Set() };
+        text = say(texts, 'skillHarmony', 0, { ...vars, bonus: Math.round(p.bonus * 100) });
       } else {
         const ticks = Math.round(p.dotTicks);
         unit.weapon = { ...unit.weapon, dot: { effect: p.dotEffect, chance: p.dotChance, power: p.dotPower, ticks, ...(p.weaken && { weaken: p.weaken }) } };

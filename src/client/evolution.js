@@ -1,9 +1,12 @@
 // Class evolutions (evolutions.js in the engine; DECISIONS.md, "Ewolucje:
-// budowa"): the cards of the two evolutions to choose from at class level 50
-// (in the Ewolucja tab), the choice for good, the ceremony with the
-// evolution's music and after it the free reset of the stat points, once.
-// On the test version "Testuj ewolucję" (in the settings) opens every
-// evolution of the class at any level and can undo the test.
+// budowa" and "Druga ewolucja klas"): the cards of the two evolutions to
+// choose from at class level 50 (in the Ewolucja tab), the choice for good,
+// the ceremony with the evolution's music and after it the free reset of the
+// stat points, once; at class level 100 the card of the one form the
+// evolution grows into, taken the same way, with the ceremony. On the test
+// version "Testuj ewolucję" (in the settings) opens every evolution of the
+// class, or the second form of the one the character has, at any level and
+// can undo the test.
 
 import { portraitSprite } from './art.js';
 import { h } from './dom.js';
@@ -27,12 +30,16 @@ export function evolutionCard(evolution, { onChoose = null, busy = false } = {})
   const t = texts();
   const { classId, appearance, skin } = state.character ?? {};
   const portrait = classId && portraitSprite(classId, appearance, { skin, evolution: evolution.id });
+  // A second form is taken, not chosen: its button says so.
+  const label = evolution.stage > 1 ? t.take : t.choose;
   return h(
     'article',
     { class: 'card evolution-card', 'aria-label': evolution.name },
     portrait && h('div', { class: 'evolution-portrait' }, portrait),
     h('h3', { class: 'evolution-name', text: evolution.name }),
+    evolution.description && h('p', { class: 'evolution-description', text: evolution.description }),
     evolution.pathName && h('p', { class: 'muted', text: `Ścieżka: ${evolution.pathName}` }),
+    evolution.fromName && h('p', { class: 'muted', text: filled(t.fromEvolution, { name: evolution.fromName }) }),
     h('p', { class: 'evolution-growth' }, h('strong', { text: `${t.growth}: ` }), evolution.growth.map((entry) => `${entry.name} +${entry.value}`).join(', ')),
     traitLine(evolution.trait),
     h('h4', { class: 'evolution-subtitle', text: `${t.skills} (na ${evolution.skillLevel}. poziomie)` }),
@@ -43,14 +50,20 @@ export function evolutionCard(evolution, { onChoose = null, busy = false } = {})
         h('li', {}, h('strong', { text: skill.name }), skill.from && h('span', { class: 'muted', text: ` · z: ${skill.from}` }), h('p', { class: 'skill-effect', text: skill.effect })),
       ),
     ),
-    onChoose && h('button', { type: 'button', class: 'button button--system', disabled: busy, text: `${t.choose}: ${evolution.name}`, onClick: (event) => onChoose(event.currentTarget, evolution) }),
+    onChoose && h('button', { type: 'button', class: 'button button--system', disabled: busy, text: `${label}: ${evolution.name}`, onClick: (event) => onChoose(event.currentTarget, evolution) }),
   );
 }
 
-// The choice for good, asked once more; the ceremony follows. `test`: the
-// test version's try.
+// The choice for good, asked once more; the ceremony follows. A second form
+// is asked about in its own words. `test`: the test version's try.
 export async function chooseEvolution(button, evolution, { test = false } = {}) {
-  const sure = await confirmAction({ title: filled(texts().ceremony, { name: evolution.name }), text: filled(texts().confirm, { name: evolution.name }), confirmLabel: 'Wybieram' });
+  const t = texts();
+  const next = evolution.stage > 1;
+  const sure = await confirmAction({
+    title: filled(t.ceremony, { name: evolution.name }),
+    text: filled(next ? t.nextConfirm : t.confirm, { name: evolution.name }),
+    confirmLabel: next ? t.accept : 'Wybieram',
+  });
   if (!sure) return;
   await withButton(button, async () => {
     const result = await call('POST', '/api/evolution', { evolutionId: evolution.id, test });
@@ -125,18 +138,19 @@ export function offerPointsReset() {
   );
 }
 
-// The character at the first evolution's class level at once, a test
-// evolution undone first (the author: "nie chce mi się przeklikiwać tego").
-function testLevelButton() {
+// The character at an evolution's class level at once (the author: "nie
+// chce mi się przeklikiwać tego"): the first's, a test evolution undone
+// first, or the second's (`second`), the first evolution kept.
+function testLevelButton({ second = false } = {}) {
   const t = texts();
-  const level = String(unlockInfo('evolution')?.classLevel ?? '');
+  const level = String(second ? (state.character.evolution?.nextLevel ?? '') : (unlockInfo('evolution')?.classLevel ?? ''));
   return h('button', {
     type: 'button',
     class: 'button button--system',
     text: filled(t.testLevel, { level }),
     onClick: (event) =>
       withButton(event.currentTarget, async () => {
-        await call('POST', '/api/evolution/test-level');
+        await call('POST', `/api/evolution/test-level${second ? `?level=${level}` : ''}`);
         closeSheet();
         toast(filled(t.testLevelDone, { level }));
       }),
@@ -144,43 +158,38 @@ function testLevelButton() {
 }
 
 // "Testuj ewolucję" on the test version: every evolution of the class to
-// try, or the way back from the one tried, and the class level of the
-// first evolution at once.
+// try, or the second form of the one the character has, the way back from
+// the one tried, and the class level of an evolution at once.
 export async function openEvolutionTests() {
   const t = texts();
   const character = state.character;
-  if (character.evolutionUndo) {
-    openSheet(
-      h('h2', { class: 'sheet-title', text: t.test }),
-      h('p', { class: 'sheet-text', text: `Ewolucja z testu: ${character.className}.` }),
-      h(
-        'div',
-        { class: 'sheet-actions' },
-        h('button', {
-          type: 'button',
-          class: 'button button--system',
-          text: t.undo,
-          onClick: (event) =>
-            withButton(event.currentTarget, async () => {
-              await call('POST', '/api/evolution/undo');
-              closeSheet();
-              toast(t.undone);
-            }),
-        }),
-        testLevelButton(),
-      ),
-    );
-    return;
-  }
-  if (character.evolution?.current) {
-    openSheet(h('h2', { class: 'sheet-title', text: t.test }), h('p', { class: 'sheet-text', text: `Postać przeszła już ewolucję: ${character.className}.` }));
-    return;
-  }
+  const current = character.evolution?.current;
   const { evolutions } = await call('GET', '/api/evolution/test');
+  const undo =
+    character.evolutionUndo &&
+    h('button', {
+      type: 'button',
+      class: 'button button--system',
+      text: t.undo,
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          await call('POST', '/api/evolution/undo');
+          closeSheet();
+          toast(t.undone);
+        }),
+    });
+  const said = !current ? t.testText : evolutions.length > 0 ? t.testNext : filled(t.testDone, { name: character.className });
   openSheet(
     h('h2', { class: 'sheet-title', text: t.test }),
-    h('p', { class: 'muted', text: t.testText }),
-    h('div', { class: 'sheet-actions' }, testLevelButton()),
+    character.evolutionUndo && h('p', { class: 'sheet-text', text: `Ewolucja z testu: ${character.className}.` }),
+    h('p', { class: 'muted', text: said }),
+    h(
+      'div',
+      { class: 'sheet-actions' },
+      undo,
+      (!current || character.evolutionUndo) && testLevelButton(),
+      current?.stage === 1 && testLevelButton({ second: true }),
+    ),
     evolutions.map((evolution) => evolutionCard(evolution, { onChoose: (button, chosen) => chooseEvolution(button, chosen, { test: true }) })),
   );
 }

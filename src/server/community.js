@@ -6,7 +6,7 @@
 // collects at most claimsPerDay a day, all waiting ones at once, and one not
 // collected goes after keepDays days.
 
-import { giftReward, highestProfession, isUnlocked, questPeriod } from '../engine/index.js';
+import { classNameOf, giftReward, highestProfession, isUnlocked, questPeriod } from '../engine/index.js';
 import { characterView, loadPlayer } from './characters.js';
 import { chatRole, requireChatter } from './chat.js';
 import { content } from './content.js';
@@ -44,7 +44,7 @@ export async function ranking(context) {
   const [rows, own] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.name, c.class_id, c.evolution, c.level, c.class_level, c.professions, u.login, u.google_sub, u.chat_moderator,
+        `SELECT c.id, c.name, c.class_id, c.evolution, c.appearance, c.level, c.class_level, c.professions, u.login, u.google_sub, u.chat_moderator,
                 c.cosmetics, ${guildTagSql('c.id')} AS guild_tag
          FROM characters c JOIN users u ON u.id = c.user_id
          WHERE c.${OWN_CHARACTERS}${where} ORDER BY ${order} LIMIT ?`,
@@ -62,7 +62,8 @@ export async function ranking(context) {
       guildTag: row.guild_tag ?? null,
       nameColor: nameColorOf(row.cosmetics),
       classId: row.class_id,
-      className: content.evolutionsById[row.evolution]?.name ?? content.classesById[row.class_id]?.name ?? row.class_id,
+      // The evolution's name, a woman's for a female character.
+      className: content.classesById[row.class_id] ? classNameOf({ classId: row.class_id, evolution: row.evolution, appearance: row.appearance }, content) : row.class_id,
       level: row.level,
       classLevel: row.class_level,
       profession: highestProfession(JSON.parse(row.professions ?? '{}'), content),

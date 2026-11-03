@@ -477,9 +477,14 @@ export const evolutionChangeCost = (paid, content) => content.settlement.hermit.
 // The next change of evolution after `changes` of them: the first free (the
 // author at E4: "tylko raz darmowo, a później baaaardzo baaaardzo drogo").
 export const evolutionChangePrice = (changes, content) => (changes > 0 ? evolutionChangeCost(changes - 1, content) : 0);
-// The evolutions a change can go to: the class's others.
-export const evolutionChanges = (character, content) =>
-  character.evolution ? content.evolutions.filter((evolution) => evolution.classId === character.classId && evolution.id !== character.evolution) : [];
+// The evolutions a change can go to: the class's others of the same stage.
+// A character with its second form changes its first evolution and gets
+// that one's second form with it.
+export function evolutionChanges(character, content) {
+  const current = character.evolution ? content.evolutionsById[character.evolution] : null;
+  if (!current) return [];
+  return content.evolutions.filter((evolution) => evolution.classId === character.classId && evolution.id !== current.id && (evolution.stage ?? 1) === (current.stage ?? 1));
+}
 export const statResetCost = (level, content) =>
   level >= content.settlement.hermit.statsFromLevel ? level * content.settlement.hermit.statsGoldPerLevel : null;
 
