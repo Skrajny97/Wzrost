@@ -213,7 +213,14 @@
               "evolution-lead",
               "evolution-choice",
               "evolution-points",
-              "evolution-ending"
+              "evolution-ending",
+              "towers-welcome",
+              "towers-lead",
+              "towers-entries",
+              "towers-solo",
+              "towers-floor",
+              "towers-party",
+              "towers-ending"
             ]
           },
           "kind": {
@@ -329,7 +336,8 @@
               "community",
               "crafting",
               "settlement",
-              "evolution"
+              "evolution",
+              "towers"
             ],
             "description": "Część po wprowadzeniu, do której należy kwestia (chapters). Jej kwestie przychodzą dopiero po zakończeniu wprowadzenia, w swoim momencie gry."
           },
