@@ -1,0 +1,12 @@
+{
+  "id": "star-ore",
+  "tool": "pixellab generate-image-v2",
+  "description": "a lump of star metal ore, a dark meteoric rock with glowing pale blue metallic veins and tiny star-like sparkles, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

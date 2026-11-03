@@ -1,0 +1,12 @@
+{
+  "id": "diamond",
+  "tool": "pixellab generate-image-v2",
+  "description": "a brilliant-cut diamond, colourless and sparkling with rainbow glints and white starburst highlights, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

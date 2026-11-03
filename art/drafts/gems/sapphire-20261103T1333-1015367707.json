@@ -1,0 +1,12 @@
+{
+  "id": "sapphire",
+  "tool": "pixellab generate-image-v2",
+  "description": "a cut sapphire gemstone, deep royal blue oval facets with bright highlights, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}
