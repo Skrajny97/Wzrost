@@ -7,8 +7,11 @@
     "references": [],
     "pixellab": {
       "style": "src/client/art/monsters/strzyga.png",
+      "styles": {
+        "drought-husk": "src/client/art/monsters/kikimora.png"
+      },
       "references": {
-        "drought-husk": [{ "path": "art/references/monsters/drought-husk-b.png", "usage": "the creature's look chosen by the author: the same gaunt cracked husk, face and colours, but drawn whole, standing on both legs and feet" }]
+        "drought-husk": [{ "path": "art/references/monsters/drought-husk-b.png", "usage": "the creature's look chosen by the author: the same gaunt cracked husk, its big skull-like head, face and colours, but drawn whole down to both feet, hunched so that it fills the whole picture" }]
       }
     },
     "prompts": {
@@ -126,7 +129,7 @@
       "resin-golem": "Zywicznik, a lumbering golem of dripping golden amber resin with insects and pine needles trapped inside, glowing faintly from within, heavy round fists, a featureless head with two dark holes, menacing, full body, three-quarter view",
       "barkborer": "Korojad, a writhing faceless humanoid made of thousands of black bark beetles, bored holes through its body, flakes of pine bark falling off, claw-like hands, eerie and menacing, full body",
       "tar-moth": "a huge menacing moth with tar-black wings covered in staring eye patterns, trailing grey poisonous dust, a furry body and long thin legs, wings spread, full body",
-      "drought-husk": "Suchotnik, a gaunt desiccated husk of a man standing on two thin bony legs with bare feet, the whole body from the head to the feet inside the picture, cracked skin like dry clay, empty eye sockets with a faint red glow, dust falling from its joints, long bony fingers, menacing, full body, three-quarter view",
+      "drought-husk": "Suchotnik, a desiccated husk of a man, hunched forward in a wide crouching stance, knees bent, both bony legs and bare feet visible, long arms hanging forward with clawed bony fingers, a big skull-like head with empty eye sockets glowing faintly red, cracked skin like dry clay, dust falling from its joints, a broad silhouette filling the whole picture from edge to edge like a large creature, few big readable shapes, menacing, full body, three-quarter view",
       "sand-whirl": "a menacing spinning column of sand and dust with a ring of jagged stone teeth inside it, small stones orbiting around, an abstract living whirlwind creature, full body",
       "barrow-wight": "Kurhannik, the ghost of an ancient warrior risen from a burial mound, a rusted bronze crown, bones showing through tattered grey robes, a pale cold blue glow, a curved bronze sword, menacing, full body",
       "tar-burner": "Smolarz, the ghost of an old tar burner made of dripping black tar, a smoking iron pot in his hands, burning orange eyes, a tattered leather apron, menacing, full body, three-quarter view",

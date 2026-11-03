@@ -5,7 +5,9 @@
 // prompt of a kind in art/prompts.json is drawn at the kind's size on a
 // transparent background, in the style of the kind's style image
 // (pixellab.style: an approved picture, for its pixel size, outline, shading
-// and detail, not its colours), with up to four references of its own
+// and detail, not its colours; pixellab.styles[id] for one prompt of its
+// own, e.g. a broad creature that fills its frame), with up to four
+// references of its own
 // (pixellab.references[id]): a path, used as the other half of a
 // man-and-woman pair so both wear the same (or as pixellab.usage says), or
 // {path, usage} with its own words, e.g. the approved portrait for the look
@@ -99,13 +101,14 @@ const promptOf = (id) => (typeof kind.prompts[id] === 'string' ? kind.prompts[id
 // full queue of jobs (429) waits and tries again.
 async function draw(id, seed) {
   const refs = settings.references?.[id] ?? [];
+  const style = settings.styles?.[id] ?? settings.style;
   const body = {
     description: promptOf(id),
     image_size: { width, height },
     seed,
     no_background: true,
-    ...(settings.style && {
-      style_image: reference(settings.style),
+    ...(style && {
+      style_image: reference(style),
       style_options: { color_palette: false, outline: true, detail: true, shading: true },
     }),
     ...(refs.length && {
@@ -144,7 +147,7 @@ const skipped = ids.length * calls - jobs.length;
 
 const before = await request('GET', '/balance');
 if (values['dry-run']) {
-  for (const id of jobs) lines.push(`| ${id} | do zrobienia (wzór: ${settings.style ?? 'brak'}, odniesienia: ${(settings.references?.[id] ?? []).length}) |`);
+  for (const id of jobs) lines.push(`| ${id} | do zrobienia (wzór: ${settings.styles?.[id] ?? settings.style ?? 'brak'}, odniesienia: ${(settings.references?.[id] ?? []).length}) |`);
 } else {
   const queue = [...jobs];
   async function worker() {
@@ -158,7 +161,7 @@ if (values['dry-run']) {
         images.forEach((image, index) => writeFileSync(`${outDir}/${id}-${stamp}-${seed}-${index}.png`, Buffer.from(image.base64, 'base64')));
         writeFileSync(
           `${outDir}/${id}-${stamp}-${seed}.json`,
-          `${JSON.stringify({ id, tool: 'pixellab generate-image-v2', description: promptOf(id), style: settings.style ?? null, references: refs, usage: state.usage ?? null, images: images.length }, null, 2)}\n`,
+          `${JSON.stringify({ id, tool: 'pixellab generate-image-v2', description: promptOf(id), style: settings.styles?.[id] ?? settings.style ?? null, references: refs, usage: state.usage ?? null, images: images.length }, null, 2)}\n`,
         );
         const usage = state.usage ? (state.usage.type === 'usd' ? `${Number(state.usage.usd).toFixed(3)} USD` : JSON.stringify(state.usage)) : '';
         lines.push(`| ${id} | ${images.length} obrazki ${usage} |`);
