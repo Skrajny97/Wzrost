@@ -3018,7 +3018,7 @@ Autor: „Zatwierdzam 540.1, 540.2 i 540.3 udały się te animacje” i „541.1
 1. **Animacje zatwierdzone.** Wszystkie są z PixelLab, po 8 klatek:
    - w scenie Walki (540): lis w kłusie, kruk w locie i błędny ognik;
    - na portrecie (541): lis u stóp postaci, kruk na jej ramieniu i ognik przy ramieniu.
-2. **Film do rolki.** Autor: „Sklej te animacje chochlików w 10-sekundowy filmik na przyszłość dokleję do rolki jakiejś w przyszłości nic nie dawaj więcej”. Trzy sceny z chowańcami tworzą jeden film MP4: 10 s, z płynnymi przejściami, bez napisów.
+2. **Film do rolki.** Autor: „Sklej te animacje chochlików w 10-sekundowy filmik na przyszłość dokleję do rolki jakiejś w przyszłości nic nie dawaj więcej”, a po pierwszej wersji: „Chowańce nie mają płynnego przejścia, najlepiej w tej samej klatce animacji to zrobić i dodać napisy „Lis” „Kruk” „Ognik” (…) zrobić z tego 9s albo nawet 8 bo za długie”. Film ma 8 s i jest jedną ciągłą sceną Walki: postać idzie bez przerwy, a zmienia się tylko chowaniec. Z każdym chowańcem zmienia się jego napis: stary znika, zanim pojawi się nowy.
 3. **Do gry** chowańce wchodzą razem z ich miejscem w scenie Walki, na portrecie i w Sklepie Systemu.
 
 ## Salon Gier: budowa (3.11.2026, odpowiedzi 523–526, 528, 529)
