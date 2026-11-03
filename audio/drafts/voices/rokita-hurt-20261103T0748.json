@@ -1,0 +1,14 @@
+{
+  "id": "rokita-hurt",
+  "payload": {
+    "text": "a devil gives a short terrifying snarl of pain, a deep distorted guttural roar with a hellish echo and a hiss, horror, menacing, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/rokita-hurt-20261103T0748-0.mp3",
+    "audio/drafts/voices/rokita-hurt-20261103T0748-1.mp3",
+    "audio/drafts/voices/rokita-hurt-20261103T0748-2.mp3"
+  ],
+  "credits": 42
+}

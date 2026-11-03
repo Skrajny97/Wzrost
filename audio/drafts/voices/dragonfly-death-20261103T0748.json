@@ -1,0 +1,14 @@
+{
+  "id": "dragonfly-death",
+  "payload": {
+    "text": "the fast buzzing of a giant dragonfly's wings stutters, slows down and dies away into silence as the insect falls, an insect wing buzz only, no water, no bubbles, no splash, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/dragonfly-death-20261103T0748-0.mp3",
+    "audio/drafts/voices/dragonfly-death-20261103T0748-1.mp3",
+    "audio/drafts/voices/dragonfly-death-20261103T0748-2.mp3"
+  ],
+  "credits": 66
+}
