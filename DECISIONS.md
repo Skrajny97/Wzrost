@@ -3011,6 +3011,18 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Samouczek na komputerze: kwestie narratora (519, 3.11.2026)
+
+Autor zapytał: „A jak wyglądają teraz kwestie Samouczków na PC... nie trzeba tego jakoś zmodyfikować?”. Narrator na komputerze wskazuje właściwe miejsca (przejście wprowadzenia na komputerze i dużym monitorze przed każdym wdrożeniem; w 0.1.7 Obóz w menu i zasoby w górnym pasku). Słowa trzech kwestii czytanych głosem pasowały jednak tylko do telefonu. Autor: „519.1 B)”, „519.2 B)”, „519.3 OK”.
+
+1. **Osobne kwestie na komputer**, nagrane osobno; na telefonie zostają dawne:
+   - `tap-region` (519.1 B): „Kliknij Wiatrołomy.” (telefon: „Stuknij Wiatrołomy.”);
+   - `tap-start` (519.2 B): „Suwak stoi na trzydziestu minutach. Kliknij „Wyrusz”.” (telefon: „… Stuknij „Wyrusz”.”);
+   - `wallet` (519.3 OK): „Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sam zobacz.”, dla postaci kobiecej „Sama zobacz.” (na komputerze zasoby i Punkty Czasu są w górnym pasku od 0.1.7).
+2. **Jak.** Kwestia w `data/tutorial.json` ma wersję `desktop` (tekst, nagranie i wersję kobiecą), a narrator wybiera ją w układzie komputera.
+3. **Wskazówki bez głosu** (brakujący szczegół): „Dotknij…” i „Stuknij…” na ekranach zmieniam na słowa pasujące do obu urządzeń: „Wybierz…” i „Naciśnij…” (np. „Wybierz pusty plac, żeby zobaczyć koszt budowy.”).
+4. Nagrania po dwie wersje do odsłuchu u autora; wejdą do gry razem z rozdziałem Wież.
+
 ## Wersja 0.1.7 (3.11.2026)
 
 1. **Co wchodzi do gry:** górny pasek i menu na komputerze według odpowiedzi 505–508 (zob. „Górny pasek i menu na komputerze: odpowiedzi autora 505–508”). Telefon bez zmian, poza mniejszymi podpisami placów na wąskiej planszy obozu.
