@@ -3011,6 +3011,12 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Wersja 0.1.2 (3.11.2026)
+
+1. **Co wchodzi do gry:** rzadsze przedmioty na dłuższych wyprawach (482 B, zob. niżej). Razem z tym idą notatki o odpowiedziach 439–497 i nowe opisy grafik Czarnego Bagna do poprawy (Szczupak, Wąż Welesa, Róg biesa, Warkocz mamuny), których gra jeszcze nie używa.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy na tym komputerze: 869 z 870. Nie przeszedł tylko test czasu szacowania zagrożenia (średnio poniżej 6 ms), bo komputer był obciążony innymi testami; ten sam pomiar bez tej zmiany wyszedł tak samo albo wolniej (8,5 ms wobec 5,0 ms w pierwszej rundzie). GitHub przed wdrożeniem uruchamia pełne testy jeszcze raz na osobnej maszynie. Przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków).
+
 ## Rzadsze przedmioty na dłuższych wyprawach (482 B, 3.11.2026)
 
 1. **Przedmioty z wyprawy** (znaleziska i skrzynia elity) wypadają w rzadkości unikalnej i rzadszych trochę częściej, im dłuższa wyprawa: do pół godziny bez zmian, potem o tyle samo przy każdym podwojeniu czasu, aż do wag razy 1,1 przy 4 godzinach (`uniqueLengthFactorByMinutes`, od rzadkości `uniqueLengthFrom` w `data/balance.json`). Pospolite i rzadkie nie zyskują.
