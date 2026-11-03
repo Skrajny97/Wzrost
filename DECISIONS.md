@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.16 (3.11.2026)
+
+1. **Stół rozbiórki:** karta materiału przerabia tyle sztuk, ile wybrano, choćby jedną, a ekran stołu ma zakładki Materiały, Przedmioty, Kolejka i Części, z zaznaczaniem kilku materiałów i rozbiórką przedmiotów z plecaka (zob. „Stół rozbiórki: liczba sztuk, zaznaczanie i zakładki”).
+
 ## Stół rozbiórki: liczba sztuk, zaznaczanie i zakładki (3.11.2026)
 
 Autor: „Dodajmy jeszcze opcje zaznaczania roznych materialow w Stole rozbiórki oraz to co w plecaku czyli rozbieranie przedmiotów dostepne tez z pozycji stolu rozbiorki”, „Trzeba tez zwinac te wszystkie opcje jakos w zakladki zeby nie trzeba bylo tyle scrollować” oraz „Powinna być mozliwosc przerobienia pojedynczej sztuki danego materiału nie wszystkie danej jakości, a to niemożliwe można albo przerobić wszystkie sztuki albo żadnej - do poprawy”.
