@@ -25,48 +25,51 @@ const RUST = '#a0522d';
 const HIDE = '#8c6a48';
 const HIDE_DARK = '#6e5238';
 
-// The board is 360 × 400; each plot's art box is 104 × 83, centred at x, y.
+// The board is 360 × 545; each plot's art box is 94 × 75, centred at x, y.
+// The board's ground keeps its trees, fence and palisade at the edges and
+// every plot on the open grass inside them, in all three looks (the author:
+// "Teraz widze ze stół rozbiórki stoi na drzewach, weź ogólnie te plansze
+// obozu i budynki ładnie popraw").
 export const BOARD_WIDTH = 360;
-export const BOARD_HEIGHT = 400;
-export const PLOT_WIDTH = 104;
-export const PLOT_HEIGHT = 83;
+export const BOARD_HEIGHT = 545;
+export const PLOT_WIDTH = 94;
+export const PLOT_HEIGHT = 75;
 
 // With the Osada the board grows taller, as the Osada's does (the author:
 // "253 A, ale bedzie trzeba chyba planszę obozu rozbudować, żeby gdzies te
 // Kwatery zmieścić"): a band of glade TALL_BAND high lies across it at
-// TALL_CUT, below the campfire's row, and all below it moves down. The
-// ground's pictures have the same band drawn in (camp-<look>-tall).
-const TALL_CUT = 268;
-const TALL_BAND = 164;
+// TALL_CUT, below the row of the Magazyn and the Kopalnia, and all below it
+// moves down. The ground's pictures have the same band drawn in
+// (board-tall/camp-<look>).
+const TALL_CUT = 370;
+const TALL_BAND = 94;
 export const boardHeight = (tall) => BOARD_HEIGHT + (tall ? TALL_BAND : 0);
 export const stretchY = (y, tall) => (tall && y > TALL_CUT ? y + TALL_BAND : y);
 // The y of every "x y" pair in an SVG path or point list.
 const stretchPoints = (points, tall) => (tall ? points.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (_, x, y) => `${x} ${stretchY(Number(y), tall)}`) : points);
 
-// In the left column, plots one above another stay 21 apart: a name hangs
-// 11 below its plot, and the narrator's ring stands 6 off the plot it lights.
+// Rows of plots 92 apart: a name hangs below its plot, and the narrator's
+// ring stands 6 off the plot it lights. The campfire is the middle of the
+// camp, the Kowadło above it, and the road out runs down from it to the gap
+// in the fence and the gate of the palisade.
 export const CAMP_PLOTS = {
-  // Its store's bubble stands at its side: in the plot's top right corner it
-  // went under "Rozwiń poziom obozu" in the board's corner.
-  sawmill: { x: 74, y: 48, bubble: 'side' },
-  // Staw Midasa, where the pond at the edge of the glade lay.
-  'midas-lake': { x: 70, y: 152 },
-  quarry: { x: 286, y: 86 },
-  mine: { x: 258, y: 318 },
-  campfire: { x: 180, y: 192 },
-  'loot-shed': { x: 70, y: 256 },
-  'scrap-bench': { x: 290, y: 214 },
-  anvil: { x: 180, y: 64 },
-  // A little to the right, so that its biggest look stays clear of the
-  // Magazyn's name above it.
-  'craft-table': { x: 124, y: 342 },
+  sawmill: { x: 88, y: 140 },
+  anvil: { x: 184, y: 132 },
+  quarry: { x: 280, y: 140 },
+  'midas-lake': { x: 86, y: 232 },
+  campfire: { x: 184, y: 246 },
+  'scrap-bench': { x: 282, y: 236 },
+  'loot-shed': { x: 88, y: 326 },
+  mine: { x: 278, y: 326 },
+  // Left of the road out, clear of the trees at the glade's lower edge.
+  'craft-table': { x: 118, y: 418 },
 };
 
 // The plots in the band of the taller board, for the Osada's buildings.
 const TALL_PLOTS = {
   // The Kwatery, where the companions hired in the Karczma sleep, below the
   // Magazyn.
-  quarters: { x: 96, y: 362 },
+  quarters: { x: 96, y: 418 },
 };
 
 // The plots on the board, the taller one with the Osada.
@@ -441,21 +444,32 @@ ${pole(16, 72, 16, 18, 2.2, PLANK)}${pole(84, 72, 84, 18, 2.2, PLANK)}${pole(50,
 const TREES = [
   [-6, 14, 26], [22, 4, 22], [50, -2, 24], [80, 8, 20], [112, -4, 24], [142, 6, 20], [172, -6, 24], [204, 4, 22],
   [234, -4, 22], [262, 8, 18], [318, -2, 26], [352, 10, 24], [-8, 52, 22], [-10, 92, 20], [-4, 138, 18],
-  [-12, 176, 22], [-8, 300, 22], [6, 396, 26], [38, 404, 20], [100, 410, 24], [366, 58, 22], [370, 104, 20],
-  [364, 150, 18], [372, 276, 22], [350, 404, 24], [312, 410, 18],
+  [-12, 176, 22], [-8, 445, 22], [6, 541, 26], [38, 549, 20], [100, 555, 24], [366, 58, 22], [370, 104, 20],
+  [364, 150, 18], [372, 276, 22], [350, 549, 24], [312, 555, 18],
 ];
 
 // Firs between the trees: [x, y, size]; boulders by the quarry and the mine: [x, y, radius].
-const FIRS = [[96, 24, 20], [250, 26, 18], [18, 116, 18], [16, 230, 20], [344, 128, 18], [348, 238, 20], [70, 396, 18], [330, 392, 20]];
-const BOULDERS = [[318, 38, 14], [342, 60, 10], [296, 30, 8], [244, 42, 9], [232, 362, 7], [336, 334, 8], [300, 372, 6]];
+const FIRS = [[96, 24, 20], [250, 26, 18], [18, 116, 18], [16, 230, 20], [344, 128, 18], [348, 238, 20], [70, 541, 18], [330, 537, 20]];
+const BOULDERS = [[318, 38, 14], [342, 60, 10], [296, 30, 8], [244, 42, 9], [232, 507, 7], [336, 479, 8], [300, 517, 6]];
 
 // The paths from the campfire to the plots: a dark edge and a lighter middle.
-// On the taller board the road out runs on down through the band, the paths
-// below it move down with their plots, and the Kopalnia's and the Kwatery's
-// leave the road instead of the campfire.
-const PATHS = 'M176 410 Q168 330 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M188 244 Q220 300 252 338 M180 176 Q174 138 180 96 M171 332 Q150 330 128 340';
-const TALL_PATHS =
-  'M176 574 Q168 494 180 262 M180 230 Q140 170 84 126 M180 226 Q236 160 284 118 M170 236 Q120 252 76 266 M192 232 Q242 236 286 244 M173 470 Q214 474 252 502 M180 176 Q174 138 180 96 M173 496 Q150 494 128 504 M175 368 Q140 366 106 374';
+// The road out runs from the fire down to the gap in the fence and the gate
+// of the palisade at the bottom; the paths below the band move down with
+// their plots on the taller board, and the Kwatery's and the Kamień
+// węgielny's leave the road in the band.
+const PATHS = [
+  'M182 545 Q174 480 184 280',
+  'M184 228 Q182 202 184 178',
+  'M168 236 Q134 206 116 182',
+  'M200 236 Q232 206 254 182',
+  'M162 252 Q134 246 124 240',
+  'M206 252 Q236 248 246 246',
+  'M180 330 Q152 330 128 336',
+  'M188 330 Q214 330 238 336',
+  'M180 424 Q164 424 150 428',
+  'M188 424 Q206 424 222 428',
+].join(' ');
+const TALL_PATHS = `${stretchPoints(PATHS, true)} M180 424 Q156 424 134 428 M188 424 Q212 424 230 428`;
 const paths = (edge, middle, extra = '', tall = false) => {
   const d = tall ? TALL_PATHS : PATHS;
   return `<g fill="none" stroke-linecap="round"${extra}><path d="${d}" stroke="${edge}" stroke-width="16"></path><path d="${d}" stroke="${middle}" stroke-width="10"></path></g>`;
@@ -469,11 +483,11 @@ const vectorBoard = (tall) => {
 <stop offset="0" stop-color="#2d3b24"></stop><stop offset="0.72" stop-color="#222e1c"></stop><stop offset="1" stop-color="#151d12"></stop>
 </radialGradient></defs>
 <rect width="360" height="${height}" fill="url(#camp-glade)"></rect>
-<path d="${stretchPoints('M212 400 Q236 300 300 286 Q340 280 360 296', tall)} V${height} Z" fill="#1b2417"></path>
+<path d="${stretchPoints('M212 545 Q236 445 300 431 Q340 425 360 441', tall)} V${height} Z" fill="#1b2417"></path>
 ${at(BOULDERS).map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.72}" fill="${STONE_DARK}" stroke="#2a3322" stroke-width="1"></ellipse><ellipse cx="${x - r * 0.2}" cy="${y - r * 0.28}" rx="${r * 0.55}" ry="${r * 0.3}" fill="${STONE}" opacity="0.7"></ellipse>`).join('')}
 ${paths('#2a2218', '#352b1f', '', tall)}
-${tufts(at([[128, 70], [232, 120], [140, 304], [326, 176], [36, 186], [212, 372], [118, 156], [252, 196], [150, 110], [40, 300], [320, 260]]))}
-<ellipse cx="128" cy="${stretchY(388, tall)}" rx="16" ry="5" fill="${WOOD}" stroke="${LINE}" stroke-width="0.6" opacity="0.8" transform="rotate(-12 128 ${stretchY(388, tall)})"></ellipse>
+${tufts(at([[128, 70], [232, 120], [140, 449], [326, 176], [36, 186], [212, 517], [118, 156], [252, 196], [150, 110], [40, 445], [320, 260]]))}
+<ellipse cx="128" cy="${stretchY(533, tall)}" rx="16" ry="5" fill="${WOOD}" stroke="${LINE}" stroke-width="0.6" opacity="0.8" transform="rotate(-12 128 ${stretchY(533, tall)})"></ellipse>
 <ellipse cx="330" cy="146" rx="7" ry="4" fill="${PLANK}" stroke="${LINE}" stroke-width="0.6" opacity="0.8"></ellipse>
 ${at(FIRS).map(([x, y, size]) => `<path d="M${x} ${y - size} L${x + size * 0.55} ${y + size * 0.2} L${x + size * 0.3} ${y + size * 0.2} L${x + size * 0.7} ${y + size * 0.9} L${x - size * 0.7} ${y + size * 0.9} L${x - size * 0.3} ${y + size * 0.2} L${x - size * 0.55} ${y + size * 0.2} Z" fill="#132013" stroke="#1d2a19" stroke-width="1"></path>`).join('')}
 ${at(TREES).map(([x, y, r]) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#101710"></circle><circle cx="${x - r * 0.25}" cy="${y - r * 0.25}" r="${r * 0.7}" fill="#162114"></circle><circle cx="${x - r * 0.4}" cy="${y - r * 0.4}" r="${r * 0.3}" fill="#1d2a19"></circle>`).join('')}

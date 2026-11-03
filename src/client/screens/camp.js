@@ -12,7 +12,7 @@
 
 import { materialSprite, resourceArt } from '../art.js';
 import { spiritPart, spiritSaleSheet } from '../builder-spirit.js';
-import { BOARD_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, cornerstoneArt, plotArt } from '../camp-art.js';
+import { BOARD_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, cornerstoneArt, plotArt, stretchY } from '../camp-art.js';
 import { craftTableSection, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -29,13 +29,15 @@ import { dayPart } from '../scenes.js';
 
 const CAMP = '#/oboz';
 const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
-// The Skrzynia Konta stands on the board beside the Magazyn, with a screen
-// of its own like a building's (screens/chest.js).
+// The Skrzynia Konta stands on the board by the road out, across it from the
+// Stół rozbiórki, with a screen of its own like a building's
+// (screens/chest.js). On the taller board it moves down with the plots below
+// the Osada's band.
 const CHEST = 'skrzynia-konta';
-const CHEST_SPOT = { x: 170, y: 274 };
-// The Kamień węgielny Warowni on the free place of the board with the Osada,
-// between the Skrzynia Konta and the Kopalnia (the author's "435 A").
-const CORNERSTONE_SPOT = { x: 262, y: 372 };
+const CHEST_SPOT = { x: 250, y: 418 };
+// The Kamień węgielny Warowni on the board with the Osada, in its band across
+// the road from the Kwatery (the author's "435 A").
+const CORNERSTONE_SPOT = { x: 266, y: 418 };
 // The pieces last picked on the fire spirit's slider, while its building's
 // screen stays open: a newly opened screen starts at one piece (the author:
 // "suwak był ustawiony na najniższą wartość").
@@ -355,7 +357,7 @@ function mountBoard(container, backHash) {
         href: hash,
         'aria-label': 'Skrzynia Konta',
         // Beside the Magazyn on either board, at the top of the taller one's band.
-        style: { left: `${(CHEST_SPOT.x / BOARD_WIDTH) * 100}%`, top: `${(CHEST_SPOT.y / boardHeight(tall())) * 100}%` },
+        style: { left: `${(CHEST_SPOT.x / BOARD_WIDTH) * 100}%`, top: `${(stretchY(CHEST_SPOT.y, tall()) / boardHeight(tall())) * 100}%` },
         onClick: (event) => openView(event, hash, HISTORY_KEY),
       },
       h('span', { class: 'camp-chest-art' }, materialSprite('chest')),

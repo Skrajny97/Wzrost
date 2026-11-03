@@ -3011,6 +3011,20 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Obóz: budowle na polanie, nie na drzewach (3.11.2026)
+
+Autor: „Teraz widze ze stół rozbiórki stoi na drzewach, weź ogólnie te plansze obozu i budynki ładnie popraw (i skoordynuj Samouczek)”.
+
+1. **Przyczyna.** Obrazki ziemi narysowano z „gęstym pierścieniem drzew dookoła”, więc polana była mniejsza niż miejsca budowli. We wszystkich trzech wyglądach obozu budowle z górnego i dolnego rzędu stały na drzewach, płocie albo palisadzie.
+2. **Dłuższa plansza.** Plansza bez Osady ma 360 × 545 (było 400), z Osadą 360 × 639 (było 564). Budowle stoją w rzędach co 92, z dala od brzegów. Miejsca budowli są trochę mniejsze, 94 × 75 zamiast 104 × 83, więc pola do stukania nie nachodzą na siebie.
+3. **Ziemia** (`src/client/art/board`, 320 × 480, i `board-tall`, 320 × 563):
+   - las (poziomy obozu 1–3): dawny obrazek, wydłużony o pas polany z jego wersji z Osadą;
+   - płot (4–7) i palisada z bramami (8–10): nowe szkice z Retro Diffusion (`camp-2-wide` i `camp-3-wide` w `art/prompts.json`, polana prawie na cały obrazek, płot i palisada przy samym brzegu), wydłużone przez powtórzenie środkowych rzędów z prostymi bokami. Dawne obrazki tych wyglądów miały drzewa w środku palisady.
+4. **Układ.** Ognisko stoi w środku, Kowadło nad nim. Po bokach, w rzędach: Tartak i Kamieniołom, Staw Midasa i Skup złomu, Magazyn i Kopalnia, a niżej Stół rozbiórki i Skrzynia Konta po obu stronach drogi wyjściowej. Z Osadą w jej pasie stoją Kwatery i Kamień węgielny. Droga wyjściowa biegnie od Ogniska do przerwy w płocie i bramy palisady na dole, a do każdej budowli prowadzi jej ścieżka, do wejścia. Obrócone budowle z „Obóz: budowle wejściem do ścieżek” zostają.
+5. **Samouczek.** Teksty narratora nie mówią, gdzie stoją budynki, a jego światło idzie za budynkami, więc tekstów nie trzeba zmieniać. Sprawdzone przejściem obchodu obozu w przeglądarce, na telefonie i na komputerze: narrator podświetla po kolei każdy budynek, za każdym razem cały na ekranie, i prowadzi do budowy Ogniska.
+6. **Zastępcza plansza w wektorach** (gdy brak obrazka) ma tę samą wysokość, a jej dolne drzewa i kamienie zeszły na dół.
+7. **Ocena autora:** nowe plansze idą do autora pojedynczo (514.1–514.3) przed wdrożeniem do gry.
+
 ## Wersja 0.1.5 (3.11.2026)
 
 1. **Co wchodzi do gry:**

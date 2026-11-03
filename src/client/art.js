@@ -194,17 +194,18 @@ export const SPRITES = {
   // and 8–10, 128×96 (camp-art.js keeps a vector drawing for a look without
   // one).
   // The camp board's ground, without paths (camp-art.js draws them): the
-  // glade at the camp's levels 1–3, 4–7 and 8–10, its palisade growing.
+  // glade at the camp's levels 1–3, 4–7 and 8–10, its fence and palisade
+  // growing, all of them at the picture's edges.
   board: {
     width: 320,
-    height: 352,
+    height: 480,
     ids: ['camp-1', 'camp-2', 'camp-3'],
   },
   // The same glades on the taller board the camp has with the Osada: a band
-  // of 144 rows drawn into their middle, below the campfire's row.
+  // of 83 rows more in their middle, below the Magazyn's row.
   'board-tall': {
     width: 320,
-    height: 496,
+    height: 563,
     ids: ['camp-1', 'camp-2', 'camp-3'],
   },
   // Each building cut to its outline, at most 128 × 96, and the Kamień

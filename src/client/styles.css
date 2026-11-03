@@ -4225,14 +4225,14 @@ img.area-art {
   font-size: 14px;
 }
 
-/* The board keeps the 360 × 400 shape of its picture; plots sit on it in
+/* The board keeps the 360 × 545 shape of its picture; plots sit on it in
    percent of its size (camp-art.js). */
 .camp-board {
   position: relative;
   width: 100%;
   max-width: 560px;
   margin: 0 auto;
-  aspect-ratio: 360 / 400;
+  aspect-ratio: 360 / 545;
   overflow: hidden;
   /* The corner button's letters count in its width (cqw). */
   container-type: inline-size;
@@ -4320,7 +4320,7 @@ a.camp-level-button {
 /* With the Osada the board is taller: a band of glade for the Kwatery
    (camp-art.js: boardHeight). */
 .camp-board--tall {
-  aspect-ratio: 360 / 564;
+  aspect-ratio: 360 / 639;
 }
 
 .camp-board-art {
