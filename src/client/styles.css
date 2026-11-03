@@ -12397,19 +12397,6 @@ a.profession-square:active {
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
 }
 
-.side .side-quests {
-  flex: 0 1 auto;
-  max-height: 55%;
-  overflow-y: auto;
-  border-radius: 4px;
-  color: #33281c;
-}
-
-.side .quests-page {
-  max-height: none;
-  overflow: visible;
-}
-
 .side-chat {
   display: flex;
   flex: 1 1 0;

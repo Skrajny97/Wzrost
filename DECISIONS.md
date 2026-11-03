@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.17 (3.11.2026)
+
+1. **Komputer: w prawej kolumnie sam czat.** Zadania od narratora nie stoją już nad czatem. Rozwijają się jako pergamin z twarzy narratora w górnym pasku, tak jak na telefonie, a kropka na twarzy pokazuje, że coś czeka do odebrania. Czat zajmuje całą wysokość kolumny, z zakładkami Globalny, Wymiana i Gildia. Uwaga testera przekazana przez autora: „nie uwazasz ze ta kratka z zadaniami powinna byc rozwijana/zwijana albo w innym miejscu typu na gorze obok encyklopedii a tam na boku po dlugosci chat z przelaczeniami”. Autor: „562 B”. Zmienia to układ z 505–508 A tylko w tej jednej kolumnie.
+
 ## Odpowiedzi autora 557 (nagrania), 558 i 559 (3.11.2026)
 
 Autor: „558 C”, „559 G”, „557.1 B”, „557.2 A”, „557.3 B”, „557.4 B”, „557.5 A” i „557.6 B”.
