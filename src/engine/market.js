@@ -44,8 +44,8 @@ export const sellerShare = (price, content) => price - Math.ceil(price * tuning(
 // Why an offer cannot be put up, or null: a kind the Targowisko takes, a
 // whole count the character holds, prices in whole gold, "Kup teraz" not
 // below the starting price, and a free place among the character's offers.
-export function listBlock({ kind, count, startPrice, buyNow }, held, open, limit, content) {
-  const { kinds, maxPrice } = tuning(content);
+export function listBlock({ kind, count, startPrice, buyNow, hours = null }, held, open, limit, content) {
+  const { kinds, maxPrice, minHours, hours: maxHours } = tuning(content);
   if (!kinds.includes(kind)) return { code: 'invalid_kind', message: 'Tego nie wystawisz na Targowisku.' };
   if (!Number.isInteger(count) || count < 1 || count > held) return { code: 'not_enough', message: 'Nie masz tylu.' };
   if (kind === 'item' && count !== 1) return { code: 'not_enough', message: 'Przedmiot wystawia się pojedynczo.' };
@@ -53,6 +53,12 @@ export function listBlock({ kind, count, startPrice, buyNow }, held, open, limit
   if (!price(startPrice)) return { code: 'invalid_price', message: 'Podaj cenę wywoławczą w złocie.' };
   if (buyNow !== null && buyNow !== undefined && (!price(buyNow) || buyNow < startPrice)) {
     return { code: 'invalid_price', message: 'Cena „Kup teraz” nie może być niższa od wywoławczej.' };
+  }
+  // The seller chooses the auction's length, a whole number of hours (the
+  // author: "Czas licytacji powinien moc byc do wyboru od 1h do 24h po
+  // godzinie").
+  if (hours !== null && (!Number.isInteger(hours) || hours < minHours || hours > maxHours)) {
+    return { code: 'invalid_hours', message: `Licytacja trwa od ${minHours} do ${maxHours} godzin.` };
   }
   if (open >= limit) return { code: 'too_many', message: `Masz już ${limit} ofert na Targowisku. Wystawisz więcej, gdy któraś się skończy.` };
   return null;

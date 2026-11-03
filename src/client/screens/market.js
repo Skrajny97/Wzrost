@@ -386,11 +386,53 @@ export function mountMarket(holder) {
     };
     openSheet(
       h('h2', { class: 'sheet-title', text: 'Wystaw na Targowisku' }),
-      h('p', { class: 'sheet-text', text: `Oferta trwa ${market.hours} godziny. Przy sprzedaży Targowisko bierze ${Math.round(market.fee * 100)}% ceny.` }),
+      h('p', { class: 'sheet-text', text: `Ofertę wystawisz na ${market.minHours}–${countOf(market.hours, 'godzinę', 'godziny', 'godzin')}. Przy sprzedaży Targowisko bierze ${Math.round(market.fee * 100)}% ceny.` }),
       goods.length === 0
         ? h('p', { class: 'muted', text: 'W plecaku nie ma nic do wystawienia. Założonych przedmiotów się nie wystawia.' })
         : filtered(goods, goodsCategory, filters.sellable, picks),
     );
+  }
+
+  // The auction's length, an hour a step from the shortest to the longest,
+  // which it starts at (the author: "Czas licytacji powinien moc byc do
+  // wyboru od 1h do 24h po godzinie suwak sie przesuwający").
+  function hoursPicker() {
+    const { minHours, hours: longest } = market;
+    let hours = longest;
+    const text = (value) => `${formatNumber(value)} h`;
+    const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
+    const slider = h('input', {
+      type: 'range',
+      class: 'duration-slider',
+      min: minHours,
+      max: longest,
+      step: 1,
+      value: hours,
+      'aria-label': 'Czas licytacji',
+      onInput: () => set(Number(slider.value)),
+    });
+    const stepButton = (sign, label) =>
+      h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': label, text: sign < 0 ? '−' : '+', onClick: () => set(hours + sign) });
+    const less = stepButton(-1, 'Krócej');
+    const more = stepButton(1, 'Dłużej');
+    function set(next) {
+      hours = Math.min(longest, Math.max(minHours, next));
+      slider.value = String(hours);
+      slider.setAttribute('aria-valuetext', countOf(hours, 'godzina', 'godziny', 'godzin'));
+      slider.style.setProperty('--fill', `${((hours - minHours) / Math.max(1, longest - minHours)) * 100}%`);
+      value.textContent = text(hours);
+      less.disabled = hours === minHours;
+      more.disabled = hours === longest;
+    }
+    set(hours);
+    const element = h(
+      'div',
+      { class: 'duration-picker' },
+      h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, 'Czas licytacji'), value),
+      h('div', { class: 'duration-row' }, less, slider, more),
+      h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: text(minHours) }), h('span', { text: text(longest) })),
+    );
+    return { element, read: () => hours };
   }
 
   function priceSheet(goods) {
@@ -398,6 +440,7 @@ export function mountMarket(holder) {
     const count = goods.kind === 'item' ? null : numberField('market-count', `Ile sztuk (masz ${formatNumber(goods.count)})`, goods.count, 1, goods.count);
     const start = numberField('market-start', 'Cena wywoławcza (zł)', null, 1, maxPrice);
     const now = numberField('market-buy-now', '„Kup teraz” (zł, może zostać puste)', null, 1, maxPrice);
+    const length = hoursPicker();
     const scrap = scrapText(goods.scrap, goods.kind !== 'item');
     openSheet(
       h('h2', { class: 'sheet-title', text: goods.name }),
@@ -406,6 +449,7 @@ export function mountMarket(holder) {
       count?.element,
       start.element,
       now.element,
+      length.element,
       h(
         'div',
         { class: 'sheet-actions' },
@@ -421,6 +465,7 @@ export function mountMarket(holder) {
               ...(goods.kind === 'item' ? { itemId: goods.itemId } : { key: goods.key, count: count.read() }),
               startPrice: start.read(),
               buyNow: now.read(true),
+              hours: length.read(),
             }),
             'Wystawione na Targowisku.',
           ),
@@ -623,7 +668,7 @@ export function mountMarket(holder) {
         h(
           'section',
           { class: 'card market-intro', 'data-guide': 'market-intro' },
-          howItWorks(`Licytacja trwa ${market.hours} godziny.`, [
+          howItWorks(`Licytacja trwa od ${countOf(market.minHours, 'godziny', 'godzin', 'godzin')} do ${market.hours} godzin, tyle, ile wybierze wystawiający.`, [
             `Przebity gracz od razu dostaje złoto z powrotem, a Targowisko bierze ${Math.round(market.fee * 100)}% ceny sprzedaży.`,
             `Handel daje reputację Kompanii Kupców, dziś ${market.trade.today} z ${market.trade.daily} pkt.${tradePace(market.trade)} Postacie z jednego konta nie kupują od siebie.`,
           ]),

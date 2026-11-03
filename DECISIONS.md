@@ -3034,6 +3034,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Targowisko: czas licytacji do wyboru (3.11.2026)
+
+Autor: „Czas licytacji powinien moc byc do wyboru od 1h do 24h po godzinie suwak sie przesuwający”.
+
+1. **Suwak.** Wystawiający wybiera suwakiem, ile trwa licytacja: od 1 do 24 godzin, co godzinę (`minHours` i `hours` w `data/settlement.json`). Suwak zaczyna na 24 godzinach, więc bez ruszania go oferta trwa dobę, jak dotąd.
+2. (brakujący szczegół) Prowizja, cena wywoławcza i „Kup teraz” się nie zmieniają, a krótsza licytacja nie kosztuje ani więcej, ani mniej.
+3. Serwer przyjmuje tylko całe godziny z tego zakresu (w innym razie `invalid_hours`).
+4. Kwestia narratora o Targowisku mówi jeszcze „Licytacja trwa dobę”. Nowa treść czeka na zatwierdzenie autora (568) i nagranie.
+
 ## Wersja 0.1.19 (3.11.2026)
 
 1. **Odcienie skóry Skrytobójcy na wierzchowcu:** jeździec Skrytobójcy (mężczyzny) dostał wszystkie siedem odcieni. Wcześniej miał je tylko z nazwy, bo pliki były takie jak narysowany (zob. „Odcienie skóry: sprawdzenie wszystkich wyglądów”).

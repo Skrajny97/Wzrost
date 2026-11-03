@@ -296,6 +296,7 @@
   },
   "market": {
     "hours": 24,
+    "minHours": 1,
     "fee": 0.01,
     "offers": 5,
     "brotherhood": "merchants",

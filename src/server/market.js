@@ -232,10 +232,11 @@ async function marketView(db, player, now) {
     db.prepare('SELECT * FROM market_parcels WHERE character_id = ? ORDER BY id').bind(row.id),
   ]);
   const day = questPeriod('daily', now, content).key;
-  const { fee, hours, reputation, maxPrice } = tuning();
+  const { fee, hours, minHours, reputation, maxPrice } = tuning();
   return {
     fee,
     hours,
+    minHours,
     maxPrice,
     limit: offerLimit(stored.reputation, content),
     offers: others.results.map((offer) => offerView(offer, row.id)),
@@ -265,8 +266,9 @@ export async function getMarket(context) {
   return respond(db, session, context.now);
 }
 
-// POST /api/market/list { kind, key or itemId, count, startPrice, buyNow }:
-// the goods leave the character and the offer opens for `hours`.
+// POST /api/market/list { kind, key or itemId, count, startPrice, buyNow, hours }:
+// the goods leave the character and the offer opens for the hours chosen
+// (from minHours to hours, the longest without a choice).
 export async function listOffer(context) {
   const { session, player, db } = await requireMarket(context);
   const { row } = player;
@@ -280,10 +282,11 @@ export async function listOffer(context) {
   const limit = offerLimit(settlementOf(row).reputation, content);
   const count = kind === 'item' ? 1 : body.count;
   const buyNow = body.buyNow === null || body.buyNow === undefined || body.buyNow === '' ? null : body.buyNow;
-  const block = listBlock({ kind, count, startPrice: body.startPrice, buyNow }, held, open, limit, content);
+  const hours = body.hours === null || body.hours === undefined ? tuning().hours : body.hours;
+  const block = listBlock({ kind, count, startPrice: body.startPrice, buyNow, hours }, held, open, limit, content);
   if (block) throw new ApiError(block.code === 'too_many' || block.code === 'not_enough' ? 409 : 400, block.code, block.message);
   const now = context.now;
-  const endsAt = now + tuning().hours * 3600000;
+  const endsAt = now + hours * 3600000;
   const data = item ? JSON.stringify(Object.fromEntries(Object.entries(item).filter(([field]) => field !== 'id' && field !== 'equippedSlot'))) : null;
   const still = item
     ? ['(SELECT COUNT(*) FROM items WHERE id = ? AND character_id = ? AND slot IS NULL) = 1', [item.id, row.id]]

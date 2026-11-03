@@ -64,6 +64,11 @@ describe('the Targowisko in the engine', () => {
     assert.equal(listBlock({ ...offer, buyNow: 9 }, 3, 0, 5, content).code, 'invalid_price');
     assert.equal(listBlock({ ...offer, buyNow: 10 }, 3, 0, 5, content), null);
     assert.equal(listBlock(offer, 3, 5, 5, content).code, 'too_many');
+    // The auction's length, chosen by the hour from 1 to 24 (the author:
+    // "Czas licytacji powinien moc byc do wyboru od 1h do 24h po godzinie").
+    assert.deepEqual([tuning.minHours, tuning.hours], [1, 24]);
+    for (const hours of [1, 7, 24]) assert.equal(listBlock({ ...offer, hours }, 3, 0, 5, content), null);
+    for (const hours of [0, 25, 2.5, '3']) assert.equal(listBlock({ ...offer, hours }, 3, 0, 5, content).code, 'invalid_hours');
   });
 
   test('a bid needs an open offer of another account, enough gold and the least raise; "Kup teraz" its price (241)', () => {
@@ -189,6 +194,20 @@ describe('the Targowisko through the API', () => {
     await player('Druga');
   });
 
+  test('the seller chooses how many hours the auction lasts, from 1 to 24', async () => {
+    const herb = content.herbs[0].id;
+    await (await db()).prepare('UPDATE characters SET herbs = ? WHERE name = ?').bind(JSON.stringify({ [herb]: 10 }), 'Kramarka').run();
+    for (const hours of [0, 25, 1.5]) {
+      const refused = await act('Kramarka', 'list', { kind: 'herb', key: herb, count: 1, startPrice: 20, hours });
+      assert.equal(refused.data.error.code, 'invalid_hours');
+    }
+    assert.deepEqual(JSON.parse((await row('Kramarka')).herbs), { [herb]: 10 });
+    const short = await act('Kramarka', 'list', { kind: 'herb', key: herb, count: 1, startPrice: 20, hours: 3 });
+    assert.equal(short.status, 200, JSON.stringify(short.data));
+    const stored = await (await db()).prepare('SELECT created_at, ends_at FROM market_offers').first();
+    assert.equal(stored.ends_at - stored.created_at, 3 * 3600000);
+  });
+
   test('putting up goods takes them off the character for 24 hours, up to the offers the Kompania Kupców allows', async () => {
     const herb = content.herbs[0].id;
     await (await db()).prepare('UPDATE characters SET herbs = ? WHERE name = ?').bind(JSON.stringify({ [herb]: 10 }), 'Kramarka').run();
@@ -200,6 +219,7 @@ describe('the Targowisko through the API', () => {
     assert.deepEqual([offer.own, offer.startPrice, offer.buyNow, offer.goods.kind, offer.goods.item.level], [true, 100, 300, 'item', 30]);
     const stored = await (await db()).prepare('SELECT created_at, ends_at FROM market_offers').first();
     assert.equal(stored.ends_at - stored.created_at, tuning.hours * 3600000);
+    assert.deepEqual([listed.data.market.minHours, listed.data.market.hours], [1, 24]);
     // A part of a stack; the rest stays.
     const herbs = await act('Kramarka', 'list', { kind: 'herb', key: herb, count: 4, startPrice: 20, buyNow: null });
     assert.equal(herbs.status, 200, JSON.stringify(herbs.data));
