@@ -1,0 +1,17 @@
+{
+  "id": "drought-husk",
+  "tool": "pixellab generate-image-v2",
+  "description": "Suchotnik, a desiccated husk of a man, hunched forward in a wide crouching stance, knees bent, both bony legs and bare feet visible, long arms hanging forward with clawed bony fingers, a big skull-like head with empty eye sockets glowing faintly red, cracked skin like dry clay, dust falling from its joints, a broad silhouette filling the whole picture from edge to edge like a large creature, few big readable shapes, menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/kikimora.png",
+  "references": [
+    {
+      "path": "art/references/monsters/drought-husk-b.png",
+      "usage": "the creature's look chosen by the author: the same gaunt cracked husk, its big skull-like head, face and colours, but drawn whole down to both feet, hunched so that it fills the whole picture"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}
