@@ -1,0 +1,12 @@
+{
+  "id": "shrine",
+  "tool": "pixellab generate-image-v2",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a stone stronghold at the edge of a forest, standing directly on bare ground with no ground tile, base or platform under it, the gate shrine: a small chapel of grey stone and dark timber with a little wooden shingle roof, a carved wooden figure inside, a candle with a bright steady flame, wildflowers and small offerings at its foot",
+  "style": "src/client/art/camp/quarters-3.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

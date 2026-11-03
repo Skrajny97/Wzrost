@@ -1,0 +1,12 @@
+{
+  "id": "watchtower",
+  "tool": "pixellab generate-image-v2",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a stone stronghold at the edge of a forest, made of grey hewn stone, heavy timber and iron, standing directly on bare ground with no ground tile, base or platform under it, the watchtower: a tall square stone tower over an arched gateway with an open oak gate, a wooden lookout platform with a peaked shingle roof at the top, a horn and a torch at the lookout, a red pennant on a pole",
+  "style": "src/client/art/camp/quarters-3.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
