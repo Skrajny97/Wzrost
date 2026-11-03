@@ -206,6 +206,12 @@
       "topItemRarity": "legendary",
       "materialRarities": { "epic": 3, "legendary": 1 }
     },
+    "show": {
+      "$comment": "Gry Salonu na ekranie (autor: „Trzeba zrobić animację jeszcze do koła fortuny wyświetlającą się na ekranie i do kupowania losu, żeby nadać temu estetyki”); grafiki z PixelLab (550.1 C, 550.2 B) w src/client/art/salon i salon-small. wheel: koło (art) pod strzałką (pointer) kręci się co najmniej turns razy przez seconds sekund, coraz wolniej, i staje na klinie wygranej albo przegranej; kliny (wedges, równe) idą na zmianę, a środek pierwszego klinu wygranej leży winAt stopni od góry obrazka, zgodnie ze wskazówkami zegara; pivot to środek koła w pikselach obrazka. lottery: los (ticket) wpada do bębna (drum), a bęben się kołysze, razem przez seconds sekund. sounds: nagrania z data/sounds.json (effects) na zakręcenie, wygraną, przegraną i los; bez nagrania gra cisza.",
+      "wheel": { "art": "fortune-wheel", "pointer": "wheel-pointer", "wedges": 8, "winAt": 22.5, "pivot": [64, 65.5], "turns": 5, "seconds": 3.2 },
+      "lottery": { "drum": "lottery-drum", "ticket": "lottery-ticket", "seconds": 1.9 },
+      "sounds": { "spin": "casino-spin", "win": "casino-win", "lose": "casino-lose", "ticket": "casino-ticket" }
+    },
     "texts": {
       "lotteryAbout": "Los kosztuje {ticket} zł, a kupisz jeden na dobę. Pula to {base} zł od Systemu i {ticket} zł za każdy los. O północy System losuje jeden los, a jego właściciel zgarnia całą pulę.",
       "lotteryToday": "Dziś w puli: {pot} zł. Kupione losy: {tickets}.",

@@ -147,6 +147,8 @@ async function casinoView(db, player, stored, wheel, stake, now) {
   const left = prizesLeft(pool);
   return {
     texts,
+    // The games on the screen: the Wheel turning, the ticket into the drum.
+    show: tuning().show,
     lottery: await lotteryView(db, player.row, now),
     wheel: {
       name: tuned.name,

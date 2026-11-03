@@ -315,6 +315,45 @@
             "materialRarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }, "description": "Rzadkości materiałów w puli z wagami losowania." }
           }
         },
+        "show": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wheel", "lottery", "sounds"],
+          "description": "Gry Salonu na ekranie: Koło Fortuny kręcące się pod strzałką i los wpadający do bębna Loterii.",
+          "properties": {
+            "$comment": { "type": "string" },
+            "wheel": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["art", "pointer", "wedges", "winAt", "pivot", "turns", "seconds"],
+              "properties": {
+                "art": { "type": "string" },
+                "pointer": { "type": "string" },
+                "wedges": { "type": "integer", "minimum": 2, "multipleOf": 2, "description": "Ile równych klinów ma koło; wygrana i przegrana na zmianę." },
+                "winAt": { "type": "number", "minimum": 0, "exclusiveMaximum": 360, "description": "Środek pierwszego klinu wygranej w stopniach od góry obrazka, zgodnie ze wskazówkami zegara." },
+                "pivot": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "Środek koła w pikselach obrazka." },
+                "turns": { "type": "integer", "minimum": 1 },
+                "seconds": { "type": "number", "exclusiveMinimum": 0, "maximum": 10 }
+              }
+            },
+            "lottery": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["drum", "ticket", "seconds"],
+              "properties": {
+                "drum": { "type": "string" },
+                "ticket": { "type": "string" },
+                "seconds": { "type": "number", "exclusiveMinimum": 0, "maximum": 10 }
+              }
+            },
+            "sounds": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["spin", "win", "lose", "ticket"],
+              "properties": { "spin": { "type": "string" }, "win": { "type": "string" }, "lose": { "type": "string" }, "ticket": { "type": "string" } }
+            }
+          }
+        },
         "texts": {
           "type": "object",
           "additionalProperties": false,
