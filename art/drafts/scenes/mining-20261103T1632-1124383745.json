@@ -1,0 +1,17 @@
+{
+  "id": "mining",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art scene with one single character: a small mysterious figure in a dark navy hooded cloak, its face a glowing ice-blue light, glowing ice-blue hands and feet, seen from the side facing right, raising a pickaxe over its shoulder to strike a rough dark rock wall of a mine tunnel with veins of gold ore and a few small sparkling gems in it, a small heap of broken stones at its feet, a lantern on a wooden beam, dark cave, the whole figure and the wall inside the frame",
+  "style": "art/references/scenes/crafting-0.png",
+  "references": [
+    {
+      "path": "art/references/scenes/crafting-0.png",
+      "usage": "the same small hooded figure: its dark navy cloak, its glowing ice-blue face, hands and feet, its size in the frame, the dark backdrop and the pixel style; only the work and the place are new"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
