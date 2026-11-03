@@ -3011,6 +3011,22 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Odpowiedzi autora 439–497 (3.11.2026)
+
+Autor: „479.5 A / 439 A / 440 OK … 446 OK / 447 OK tylko popraw sprite'a bo piksele są zbędne lewy górny róg / 448 OK, tylko ucięty ogon / 449 OK / 450 OK / 451 OK, tylko zrób go bardziej czarnego / 452 OK, ale sprite totalnie ucięty musi być bardziej majestatyczny / 453 OK / 454 Ok / 455 zmień nazwę na Wielki Kleszcz / 456 OK / 457 B / 458 OK / 459 OK / 460 materiał do dokończenia bo ucięty / 461 OK / 462 OK / 463 OK, ale ryś był w Rysiej Grani, wiec out, nie moga sie potwory powtarzać / 464 OK / 465 B tylko zrób je bardziej abstrakcyjne groźne / 466 OK / 467 A / 468 OK / 469 OK / 470 OK / 471 B / 472 A / 476 i 477 wybrałeś sam i zatwierdzam / 478 B max 20% / 481 B / 482 B ale max +10% / 483 A / 484 A / 485 A / 486 A / 487 B / 488 A / 489 A / 490 A … 497 A”.
+
+1. **Chody drugich form:** wszystkie zatwierdzone (479.5 A). Z jazdy czeka jeszcze ocena pięciu narysowanych od nowa jeźdźców (480.13, 480.17, 480.19, 480.28, 480.29).
+2. **Czarne Bagno (439–461) zatwierdzone** z tłem A i poprawkami grafik: Ważka (447) bez zbędnych pikseli w lewym górnym rogu, Szczupak (448) z całym ogonem, Drewniany bożek (451) czarniejszy, Wąż Welesa (452) od nowa, cały w obrazku i bardziej majestatyczny, Róg biesa (457 B) narysowany od nowa, Warkocz mamuny (460) cały. Kleszcz nazywa się **Wielki Kleszcz** (455).
+3. **Szumiący Bór (462–465):** trzy krainy zatwierdzone (462). „Atak na tył szyku” (463) bez rysia, bo ryś był już w Rysiej Grani, a stwory się nie powtarzają. „Zasadzka” (464) zatwierdzona. Całą listę stworów z grafikami proponuję ja (465 B), w bardziej abstrakcyjnym i groźnym stylu.
+4. **Trzecia ewolucja (466):** nazwy i cechy zatwierdzone; grafiki później.
+5. **Sklep Play:** najpierw bez płatności (467 A); lista do zbudowania (468), kroki po stronie autora (469) i zasady płatności (470) zatwierdzone; przygotowania później, nie od razu (471 B).
+6. **Komputer:** jedna gra z dwoma układami (472 A); 476 A i 477 A zatwierdzone.
+7. **Zdarzenia (478 B, najwyżej 20%):** zrobione w 0.1.1.
+8. **Kowadło (481 B):** materiały tej samej rzadkości się sumują, w Kowadle, Kuźni i u Zaklinaczki.
+9. **Rzadkie przedmioty na długich wyprawach (482 B, najwyżej +10%):** szansa na unikalne i rzadsze rośnie z długością wyprawy, najwyżej o 10% przy 4 godzinach.
+10. **Wieże:** trofeum czempiona tylko za pierwsze zwycięstwo na piętrze (483 A); stałe elity co 5. piętro tylko w co drugim okrążeniu regionów, żeby w Wieżach pojawiały się wszystkie stwory (484 A); zdanie o losowych elitach we wstępie Wież (485 A); raporty z Wież z osobnym limitem w Dzienniku (486 A); skrzynie Bestiariusza zostają bez progu poziomu (487 B); próba gildii „Wygraj w Wieżach” liczy piętra od poziomu postaci minus 10 (488 A); trudność Wieży Solo zostaje jako wyzwanie (489 A).
+11. **Angielski (490–497, wszystko A):** zasada „polski + angielski (beta)”; najpierw tylko na testowej, do gotowych poziomów 1–25; sprawdza Claude i wyrywkowo autor; najpierw tekst, nagrania po zatwierdzeniu; miejsca, przedmioty i stwory tłumaczone, istoty słowiańskie w transkrypcji, imiona bez zmian; osobny kanał czatu po angielsku; język z telefonu i przełącznik PL | EN; zadania dzienne od północy w Polsce, pokazane w czasie gracza.
+
 ## Poprawki chodu 479.5 i jeźdźców 480 (3.11.2026)
 
 1. **Strzelec Wyborowy (479.5).** W trzeciej klatce chodu nad górnym końcem łuku stała szara kreska (9 pikseli). Zniknęła z arkusza i z jego siedmiu odcieni skóry; reszta klatek bez zmian.
