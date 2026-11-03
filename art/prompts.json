@@ -113,7 +113,24 @@
       "mamuna": "mamuna, a Slavic bog demon woman, gaunt and tall with tangled black hair down to the ground, sagging grey skin, a ragged black dress dripping with swamp water, long clawed fingers reaching forward, pale glowing eyes, full body",
       "rokita": "Rokita, a Polish swamp devil, a tall thin devil with dark green-black skin, long curved horns, a pointed goatee, a long thin tail, an old-fashioned dark green nobleman coat with gold buttons and a black hat with a feather, one goat hoof, holding a willow staff burning with green fire, full body",
       "summon-elemental": "fire elemental summoned by a mage, a small humanoid figure of swirling orange and red flames around a dark glowing ember core, two bright yellow eyes, floating above a faint violet magic circle, full body, three-quarter view",
-      "summon-slime": "toxic slime, a wobbling blob of bright acid green ooze with two glowing yellow eyes, green drops dripping and bubbling, a small puddle of poison under it, full body, three-quarter view"
+      "summon-slime": "toxic slime, a wobbling blob of bright acid green ooze with two glowing yellow eyes, green drops dripping and bubbling, a small puddle of poison under it, full body, three-quarter view",
+      "sandman": "Piaskun, a menacing hulking creature made of pouring golden sand rising out of a dune, two dark hollow eye pits and a wide jagged crack for a mouth, long arms of streaming sand, abstract eerie silhouette, full body, three-quarter view",
+      "heather-mare": "Wrzosowa Mara, an eerie tall thin wraith woven from purple heather and dry twigs, a pale cracked wooden mask for a face with black empty eyes, long thorny fingers reaching forward, wisps of mist, menacing, full body",
+      "nightjar": "Lelek, a demonic nightjar bird with bark-patterned grey-brown feathers, an enormous gaping mouth with tiny needle teeth, glowing pale eyes, wide pointed wings spread as it swoops down, menacing, full body",
+      "resin-golem": "Zywicznik, a lumbering golem of dripping golden amber resin with insects and pine needles trapped inside, glowing faintly from within, heavy round fists, a featureless head with two dark holes, menacing, full body, three-quarter view",
+      "barkborer": "Korojad, a writhing faceless humanoid made of thousands of black bark beetles, bored holes through its body, flakes of pine bark falling off, claw-like hands, eerie and menacing, full body",
+      "tar-moth": "a huge menacing moth with tar-black wings covered in staring eye patterns, trailing grey poisonous dust, a furry body and long thin legs, wings spread, full body",
+      "drought-husk": "Suchotnik, a gaunt desiccated husk of a man with cracked skin like dry clay, empty eye sockets with a faint red glow, dust falling from its joints, long bony fingers, menacing, full body, three-quarter view",
+      "sand-whirl": "a menacing spinning column of sand and dust with a ring of jagged stone teeth inside it, small stones orbiting around, an abstract living whirlwind creature, full body",
+      "barrow-wight": "Kurhannik, the ghost of an ancient warrior risen from a burial mound, a rusted bronze crown, bones showing through tattered grey robes, a pale cold blue glow, a curved bronze sword, menacing, full body",
+      "tar-burner": "Smolarz, the ghost of an old tar burner made of dripping black tar, a smoking iron pot in his hands, burning orange eyes, a tattered leather apron, menacing, full body, three-quarter view",
+      "charcoal-imp": "Weglik, a small hunched imp made of glowing charcoal lumps with cracks of orange embers, a jagged burning grin, smoke rising from its head, sharp claws, menacing, full body",
+      "latawiec": "Latawiec, a Slavic wind demon, a gaunt grey winged creature with tattered membrane wings, long hooked claws, a skull-like face with glowing eyes, swooping down, menacing, full body",
+      "charred-pine": "Zweglak, a walking charred pine trunk on twisted root legs, deep cracks glowing with embers, burnt branches like claws, a hollow burning knot for a face, menacing, full body",
+      "ash-wraith": "Popielec, a tall thin wraith of grey ash, flakes drifting off its body, a hollow face with two small ember eyes, very long arms ending in ash claws, eerie and menacing, full body",
+      "spark-swarm": "Iskrzak, a swarm of glowing orange sparks forming the shape of a small fierce bird with a burning tail, an abstract fiery creature, menacing, full body",
+      "noon-wraith": "Poludnica, a Slavic noon demon, a tall pale woman in a long white linen dress, long loose white hair hiding her face, a curved iron sickle in her hand, heat shimmering around her, eerie and menacing, full body",
+      "rarog": "Rarog, a legendary Slavic fire falcon, a great bird made of living flame, wings of fire spread wide, burning golden eyes, sparks and embers trailing, majestic and menacing, full body"
     }
   },
   "portraits": {
@@ -368,7 +385,7 @@
       "bies-horn": "a single big curved black demon horn with a ridged base and a cracked tip, a clear bold silhouette, single inventory item icon",
       "black-fleece": "tuft of shaggy black goat fleece, single inventory item icon",
       "klobuk-feather": "black chicken feather with a tip burning with a small bright flame, single inventory item icon",
-      "mamuna-braid": "a long braid of black hair tied with a red thread, coiled so that the whole braid fits inside the picture with a margin, dripping with swamp water, single inventory item icon",
+      "mamuna-braid": "a thick black plait tied with a red thread at its end, curled into a loose ring that fits inside the picture with a margin, wet with drops of swamp water, single inventory item icon",
       "cyrograf": "rolled yellowed parchment pact with a red wax seal and a signature in blood, single inventory item icon"
     }
   },
@@ -1037,7 +1054,9 @@
       "tanner-1": "a wiry middle-aged tanner with a weathered face and a long moustache, a fur cap, a leather vest over a coarse shirt, a rolled fox pelt under his arm, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
       "tanner-2": "a stocky hunter and hide trader with a shaggy brown beard, a wolf-fur cloak over his shoulders, a skinning knife on his belt, a bundle of leather hides on his shoulder, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
       "groom-1": "a young stable master with a friendly grin, tousled straw-blond hair, a sheepskin vest over a linen shirt, holding a horse bridle, a wisp of hay on his shoulder, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
-      "groom-2": "a lean middle-aged horse keeper with a weathered kind face and a short grey beard, a felt hat, a long brown coat, a coiled lead rope in his hand, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours"
+      "groom-2": "a lean middle-aged horse keeper with a weathered kind face and a short grey beard, a felt hat, a long brown coat, a coiled lead rope in his hand, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+      "builder-spirit-1": "the ghost of an old master builder, a translucent pale blue glowing figure, a long wispy white beard, a leather apron with a mason's hammer and chisel, holding a wooden carpenter's square, kind tired eyes glowing softly, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted natural colours",
+      "builder-spirit-2": "a pale ghostly old stonemason, a semi-transparent misty grey-blue figure, a bald head with a long white moustache, a wooden mallet resting on his shoulder, a dusty stone-cutter's apron, a faint light from within, head and shoulders portrait, facing the viewer, three-quarter view, isolated figure on a plain background, slavic forest village fantasy, muted colours"
     }
   },
   "walks": {

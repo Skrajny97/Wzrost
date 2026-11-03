@@ -14,14 +14,16 @@
 // After the class's evolution (evolutions.js) its skills are the
 // evolution's two: they start at level 0, take the points back, grow to the
 // evolutions' own top level (a skill's maxLevel) and the class levels after
-// the evolution bring more points for them.
+// the evolution bring more points for them. The second form (class level
+// 100) does the same once more, with a higher top level.
 
 // Kinds used instead of a plain blow on the character's move, at the start of
 // a fight, and the moment its HP falls below the skill's mark; a stance
 // (evolutions) wakes at the start of the character's move, besides its blow,
-// and lasts a few of its moves.
+// and lasts a few of its moves. Harmonia żywiołów (harmony) works from the
+// start of a fight.
 export const ACTIVE_KINDS = new Set(['strike', 'sweep', 'heal', 'summon', 'mark', 'whirl']);
-export const START_KINDS = new Set(['buff', 'coat', 'riposte']);
+export const START_KINDS = new Set(['buff', 'coat', 'riposte', 'harmony']);
 export const WOUND_KINDS = new Set(['guard', 'shield', 'evade']);
 export const STANCE_KINDS = new Set(['stance']);
 
@@ -29,6 +31,15 @@ export const skillsOfClass = (classId, content) => content.skills.filter((skill)
 
 // The top level of a skill: an evolution's own, else that of the classes'.
 export const topLevel = (skill, content) => skill.maxLevel ?? content.balance.skills.maxLevel;
+
+// The stage of the character's evolution: 0 without one, 1 after the first,
+// 2 after its second form. An evolution the deployment has off counts as a
+// first one.
+export const evolutionStage = (character, content) => (character.evolution ? (content.evolutionsById[character.evolution]?.stage ?? 1) : 0);
+
+// The rules of each evolution stage's skills and points, the first one's
+// first (content.js).
+const stagesOf = (content) => content.evolutionStages ?? (content.evolutionRules ? [content.evolutionRules] : []);
 
 // The numbers of a skill at a level: a pair grows evenly from level 1 to the
 // top level, a single value stays.
@@ -50,12 +61,24 @@ export function skillParams(skill, level, content) {
 export function skillPoints(character, content) {
   const { unlockClassLevel, lastPointClassLevel, pointsPerClassLevel } = content.balance.skills;
   let earned = Math.max(0, Math.min(character.classLevel, lastPointClassLevel) - unlockClassLevel + 1) * pointsPerClassLevel;
-  // After the evolution the class levels up to its last point bring more
-  // (the author: 40 back and 50 of class levels 50–99, 45 + 45).
-  const rules = content.evolutionRules;
-  if (character.evolution && rules) earned += Math.max(0, Math.min(character.classLevel, rules.lastPointClassLevel) - lastPointClassLevel) * rules.pointsPerClassLevel;
+  // After each evolution the class levels up to its last point bring more
+  // (the author: 40 back and 50 of class levels 50–99, 45 + 45; after the
+  // second form 90 back and 100 of class levels 100–199, 95 + 95).
+  let last = lastPointClassLevel;
+  for (const rules of stagesOf(content).slice(0, evolutionStage(character, content))) {
+    earned += Math.max(0, Math.min(character.classLevel, rules.lastPointClassLevel) - last) * rules.pointsPerClassLevel;
+    last = rules.lastPointClassLevel;
+  }
   const spent = Object.values(character.skills ?? {}).reduce((sum, level) => sum + level, 0);
   return { earned, spent, free: Math.max(0, earned - spent) };
+}
+
+// Whether a Skill Point is left that a learned skill could take, counted
+// with the points the character has at class level `level` (an evolution
+// level ahead), so a report of several class levels cannot slip past it.
+export function pointsLeft(character, level, content) {
+  const { free } = skillPoints({ ...character, classLevel: Math.max(character.classLevel, level) }, content);
+  return free > 0 && Object.entries(character.skills ?? {}).some(([id, skillLevel]) => content.skillsById[id] && skillLevel < topLevel(content.skillsById[id], content));
 }
 
 // The skills of a milestone the character knows, in the order it learned them.
@@ -128,16 +151,18 @@ export function skillsBlock(character, content) {
 // to the first evolution, while the skills are not ready for it
 // (skillsBlock), and when they are, until the evolution is chosen (evolve).
 // After it, at the next evolution level while a Skill Point is left (the
-// author, E8). The class waits there (applyHunt); a class already past the
-// level waits for nothing.
+// author, E8), and then until the second form is taken (evolve); after the
+// second form, at the level after it while a point is left. The class
+// waits there (applyHunt); a class already past the level waits for
+// nothing.
 export function evolutionBlock(character, content) {
   const levels = content.balance.progression.classEvolutionLevels;
   if (character.evolution) {
-    const level = levels[1];
+    const current = content.evolutionsById[character.evolution];
+    const level = levels[current?.stage ?? 1];
     if (level === undefined || character.classLevel > level) return null;
-    const { free } = skillPoints({ ...character, classLevel: Math.max(character.classLevel, level) }, content);
-    const raisable = Object.entries(character.skills ?? {}).some(([id, skillLevel]) => content.skillsById[id] && skillLevel < topLevel(content.skillsById[id], content));
-    return free > 0 && raisable ? { code: 'skill_points', level } : null;
+    if (pointsLeft(character, level, content)) return { code: 'skill_points', level };
+    return current && content.evolutions.some((evolution) => evolution.from === current.id) ? { code: 'evolve', level } : null;
   }
   const level = levels[0];
   if (character.classLevel > level) return null;
@@ -226,15 +251,17 @@ export function skillsView(character, content) {
   const { paths, secondClassLevel } = content.balance.skills;
   const evolution = character.evolution ? content.evolutionsById[character.evolution] : null;
   const levels = [...new Set(skillsOfClass(character.classId, content).map((skill) => skill.classLevel))].sort((a, b) => a - b);
+  // The evolution's name over its skills, a woman's for a female character.
+  const evolutionName = evolution && ((character.appearance === 'female' && evolution.nameFemale) || evolution.name);
   const pools = evolution
-    ? // After the evolution: its two skills, the grown one of the path first.
+    ? // After the evolution: its two skills, the grown one first.
       [
         {
-          classLevel: content.balance.progression.classEvolutionLevels[0],
+          classLevel: content.balance.progression.classEvolutionLevels[(evolution.stage ?? 1) - 1],
           open: true,
           evolution: evolution.id,
           chosen: evolution.skills,
-          options: evolution.skills.map((id, index) => ({ ...skillView(content.skillsById[id], learned[id] ?? 0, content), state: index === 0 ? 'main' : 'second' })),
+          options: evolution.skills.map((id, index) => ({ ...skillView(content.skillsById[id], learned[id] ?? 0, content), path: evolutionName, state: index === 0 ? 'main' : 'second' })),
         },
       ]
     : levels.map((classLevel) => {
@@ -260,7 +287,7 @@ export function skillsView(character, content) {
   const block = evolutionBlock(character, content);
   return {
     unlockLevel: content.balance.skills.unlockClassLevel,
-    lastPointLevel: evolution ? content.evolutionRules.lastPointClassLevel : content.balance.skills.lastPointClassLevel,
+    lastPointLevel: evolution ? (stagesOf(content)[(evolution.stage ?? 1) - 1] ?? content.evolutionRules).lastPointClassLevel : content.balance.skills.lastPointClassLevel,
     secondLevel: secondClassLevel,
     paths,
     evolution: { level: block?.level ?? content.balance.progression.classEvolutionLevels[0], need: block?.code ?? null },

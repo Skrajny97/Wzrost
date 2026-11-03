@@ -230,7 +230,41 @@
       "mine-spirit-hurt": { "text": "an old ghostly man grunts angrily with a metallic lantern rattle, no words, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
       "mine-spirit-death": { "text": "an old ghostly man gives a long fading groan as a lantern clatters to the stone floor, no words, close up, no music", "seconds": 1.3 },
       "giant-rat-hurt": { "text": "a giant rat squeals sharply when hit, video game monster hurt sound, close up, dry, no music", "seconds": 0.5 },
-      "giant-rat-death": { "text": "a giant rat gives a last raspy squeal and falls with a soft thud, close up, dry, no music", "seconds": 0.9 }
+      "giant-rat-death": { "text": "a giant rat gives a last raspy squeal and falls with a soft thud, close up, dry, no music", "seconds": 0.9 },
+      "pond-turtle-hurt": { "text": "a big turtle gives a short harsh hiss of pain with a hollow knock on its shell, no words, video game creature hurt sound, close up, dry, no music", "seconds": 0.6 },
+      "pond-turtle-death": { "text": "a big turtle lets out a long low wheezing hiss as its heavy shell thuds onto wet mud, close up, dry, no music", "seconds": 1.1 },
+      "mink-hurt": { "text": "a mink gives a sharp angry squeal of pain, video game creature hurt sound, close up, dry, no music", "seconds": 0.5 },
+      "mink-death": { "text": "a small weasel-like animal gives a thin fading squeak and falls silent, close up, dry, no music", "seconds": 0.9 },
+      "dragonfly-hurt": { "text": "the wings of a giant dragonfly buzz in a sudden angry stutter as it is hit, video game creature hurt sound, close up, dry, no music", "seconds": 0.6 },
+      "dragonfly-death": { "text": "the fast buzzing of a giant dragonfly's wings sputters out and it drops into water with a small splash, close up, no music", "seconds": 1.1 },
+      "pike-hurt": { "text": "a big fish thrashes with a wet slap and a splash as it is hit, video game creature hurt sound, close up, no music", "seconds": 0.6 },
+      "pike-death": { "text": "a big fish flops weakly on wet ground with a few fading slaps, then silence, close up, no music", "seconds": 1.1 },
+      "water-spider-hurt": { "text": "a spider hisses with a wet bubbling pop, video game creature hurt sound, close up, dry, no music", "seconds": 0.5 },
+      "water-spider-death": { "text": "a spider's legs scratch and curl up with a fading wet hiss and one bubble bursting, close up, no music", "seconds": 1 },
+      "black-tern-hurt": { "text": "a tern gives a sharp harsh screech of pain, video game bird hurt sound, close up, dry, no music", "seconds": 0.5 },
+      "black-tern-death": { "text": "a seabird gives a falling broken cry and flutters down into water, close up, no music", "seconds": 1 },
+      "wooden-idol-hurt": { "text": "heavy old oak wood cracks with a deep creak and a hollow knock, no words, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
+      "wooden-idol-death": { "text": "a huge wooden statue groans, cracks and splits apart, then falls with a heavy wooden thud, close up, no music", "seconds": 1.3 },
+      "veles-serpent-hurt": { "text": "a giant serpent hisses loudly with a deep rumbling growl and splashing water, video game monster hurt sound, close up, no music", "seconds": 0.7 },
+      "veles-serpent-death": { "text": "a giant serpent's long deep hiss fades as its heavy body sinks into dark water with a slow splash, close up, no music", "seconds": 1.4 },
+      "pagan-priest-hurt": { "text": "an old ghostly man groans in pain with an echoing breath and a faint crackle of electricity, no words, video game monster hurt sound, close up, no music", "seconds": 0.6 },
+      "pagan-priest-death": { "text": "an old ghostly man's voice fades into a long echoing sigh with a last crackle of lightning, no words, close up, no music", "seconds": 1.3 },
+      "bog-demon-hurt": { "text": "a swamp monster gurgles and roars through thick mud, video game monster hurt sound, close up, no music", "seconds": 0.6 },
+      "bog-demon-death": { "text": "a swamp monster lets out a long bubbling gurgling roar as it sinks into deep mud, close up, no music", "seconds": 1.3 },
+      "tick-hurt": { "text": "a giant tick makes a wet chitinous click and an angry hiss, video game monster hurt sound, close up, dry, no music", "seconds": 0.5 },
+      "tick-death": { "text": "a giant bloated tick bursts with a wet squelch while its legs twitch and scratch, close up, no music", "seconds": 1 },
+      "night-heron-hurt": { "text": "a night heron gives a harsh croaking squawk of pain, video game bird hurt sound, close up, dry, no music", "seconds": 0.5 },
+      "night-heron-death": { "text": "a heron gives a last hoarse croak and flops down among reeds, close up, no music", "seconds": 1 },
+      "bies-hurt": { "text": "a huge demon roars in pain with a deep bestial snarl and a rattle of an iron chain, no words, video game monster hurt sound, close up, no music", "seconds": 0.7 },
+      "bies-death": { "text": "a huge demon gives a long deep agonized roar that breaks into a hiss of smoke as an iron chain falls, no words, close up, no music", "seconds": 1.4 },
+      "black-goat-hurt": { "text": "a demonic black goat bleats in pain with a deep distorted voice, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
+      "black-goat-death": { "text": "a demonic goat lets out a long eerie distorted bleat that fades into a whisper, no words, close up, no music", "seconds": 1.2 },
+      "klobuk-hurt": { "text": "a wet fiery bird screeches with a hiss of steam and crackling sparks, video game monster hurt sound, close up, no music", "seconds": 0.5 },
+      "klobuk-death": { "text": "a small fiery bird gives a fading screech as its flames go out with a long hiss of steam, close up, no music", "seconds": 1.1 },
+      "mamuna-hurt": { "text": "a bog hag shrieks in pain with a wet rasping voice, no words, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
+      "mamuna-death": { "text": "a swamp hag gives a long gurgling wail that sinks into bubbling water, no words, close up, no music", "seconds": 1.4 },
+      "rokita-hurt": { "text": "a devil gives a sharp angry snarl with a burst of crackling green fire, no words, video game boss hurt sound, close up, no music", "seconds": 0.7 },
+      "rokita-death": { "text": "a devil lets out a long howling scream that echoes and ends in a burst of fire and a hiss of smoke, no words, video game boss death sound, close up, no music", "seconds": 1.6 }
     }
   },
   "effects": {
@@ -461,7 +495,8 @@
         "influence": 0.8
       },
       "craft": { "text": "three hard blows of a heavy hammer on a thick block of iron, each blow a short dry heavy clank with a thud that stops at once, no ringing tail, no bell tone, no echo, close up, no music", "seconds": 2, "influence": 0.8 },
-      "craft-fail": { "text": "one very loud heavy hammer blow on metal at the very start, the loudest part of the sound, then the metal cracks and a few small broken pieces fall onto a stone floor, close up, no echo, no music", "seconds": 1.8, "influence": 0.8 }
+      "craft-fail": { "text": "one very loud heavy hammer blow on metal at the very start, the loudest part of the sound, then the metal cracks and a few small broken pieces fall onto a stone floor, close up, no echo, no music", "seconds": 1.8, "influence": 0.8 },
+      "evolution-transform": { "text": "a magical transformation: a soft shimmering swell of bells and airy wordless voices rising for one and a half seconds, then one bright radiant burst of light, then sparkling chimes slowly fading out, fantasy video game evolution, no drums, no speech, no music", "seconds": 4 }
     }
   },
   "ui": {

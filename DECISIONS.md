@@ -3011,6 +3011,83 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Odpowiedzi autora 447–460 i dwie nowe prośby (3.11.2026)
+
+Autor: „447 A / 448 A / 451 A / 452 A / 457 A / 460 A”, a do tego: „Do ewolucji klas zdałoby się dodać jakiś efekt i transformację z jasnym światłem i zmianą postaci po wybraniu danej drogi. Wklej ewentualną animacje takiej ewolucji.” oraz „Zrobilibyśmy też opcję sprzedaży nadmiaru zasobów w Kamieniu Węgielnym. Niech przy Kamieniu czuwa duch budowniczego, który za zasoby płaci złotem”.
+
+1. **Czarne Bagno: poprawki grafik zatwierdzone.** Ważka bez zbędnych pikseli (447), Szczupak z całym ogonem (448), czarniejszy Drewniany bożek (451), Wąż Welesa narysowany od nowa (452), nowy Róg biesa (457) i cały Warkocz mamuny (460). Kraina wchodzi do gry jako osobny etap, po pełnych testach i przejściu wprowadzenia.
+2. **Przemiana przy ewolucji.** Najpierw animacja próbna do oceny autora, jako MP4: postać w jasnym świetle zmienia się w nową. Po zatwierdzeniu przemiana wchodzi do ceremonii każdej ewolucji.
+3. **Duch budowniczego przy Kamieniu węgielnym.** Skupuje nadmiar zasobów Obozu za złoto. Najpierw rysunek ducha do oceny autora, potem kod. Ceny mają robić ze sprzedaży dodatek, a nie główne źródło złota; liczby trafią tutaj.
+
+## Wersja 0.1.3 (3.11.2026)
+
+1. **Co wchodzi do gry:** druga ewolucja klas na 100. poziomie klasy (zob. niżej „Druga ewolucja klas”), z portretami, chodami i jazdą wierzchem wszystkich 30 dalszych postaci i z siedmioma odcieniami skóry każdej.
+2. **Sprawdzone:** pełne testy na tym komputerze, 897 z 897 (skończyły się chwilę po wypchnięciu; do wypchnięcia przeszło 584 ukończonych, a GitHub puszcza pełny zestaw przed wdrożeniem); nowa postać przeszła wprowadzenie od pierwszej karty do pierwszej wyprawy na telefonie, komputerze i dużym monitorze; w przeglądarce, w trybie testowym, Strzelczyni na 100. poziomie klasy przyjęła ewolucję „Strzelczyni Wyborowa” (karta w zakładce Ewolucja, potwierdzenie, ceremonia, ekran Walki) bez błędów strony. Każda z 30 dalszych postaci ma swój portret, chód i jazdę na listach grafik, z odcieniami skóry.
+3. **Teksty robocze:** zdania fabularne pod nazwami 30 umiejętności i nowe zdania zakładki Ewolucja autor może jeszcze zmienić.
+4. **Pytanie do autora (498):** czy Bastion ma zostać tak obronny (punkt 13 niżej).
+
+## Druga ewolucja wchodzi do gry (3.11.2026)
+
+Autor: „To jak chcesz wdrażać ewolucje bez chodów i jazdy? nie moze tak być mistrzu” (2.11.2026), więc druga ewolucja czekała na komplet grafik. Teraz ma go cały:
+
+1. **Portrety** 30 dalszych postaci (obie płcie) zatwierdzone w rundach 396–410, z siedmioma odcieniami skóry.
+2. **Chody** wszystkich 30 zatwierdzone (437, poprawki 479.1–479.8 A).
+3. **Jazda wierzchem** wszystkich 30 zatwierdzona (480.1–480.30 A, w tym pięciu jeźdźców narysowanych od nowa), na kucyku, koniu i rumaku, z odcieniami skóry.
+4. Zasady drugiej ewolucji są niżej („Druga ewolucja klas”). Grafika zastępcza z punktu 11 jest już niepotrzebna: każda dalsza postać ma swój portret, chód i jazdę. Zdania fabularne pod nazwami 30 umiejętności i nowe zdania zakładki Ewolucja (punkt 14) wchodzą jako robocze; autor może je jeszcze zmienić.
+
+## Druga ewolucja klas (2.11.2026)
+
+Plan „Druga ewolucja, Warownia i dwie nowe profesje” (punkt 1: 382 A, 383 A, 384 A, 385 B) i opisy 396–410 zatwierdzone przez autora. Dane są w `data/evolutions.json` (ewolucje z `from`), zasady w `src/engine/evolutions.js`. Liczby to brakujące szczegóły, ustawione w symulacji (punkt 13).
+
+1. **Jedna dalsza postać.** Każda z 15 ewolucji ma na 100. poziomie klasy jedną dalszą postać, bez wyboru: Berserker, Czempion Areny, Bastion, Strzelec Wyborowy, Władca Piorunów, Mistrz Łowów, Arcymag Żywiołów, Pan Zimy, Druid, Cudotwórca, Wielki Inkwizytor, Arcykapłan, Królobójca, Nekromanta i Widmo. Każda ma nazwę męską i żeńską, zatwierdzony opis, mocniejszą cechę, większy przyrost statystyk i dwie umiejętności: pierwsza rozwija umiejętność pierwszej ewolucji, druga jest nowa.
+2. **Zakładka Ewolucja.** Przed 100. poziomem klasy pod kartą ewolucji stoi „Kolejna ewolucja czeka na 100. poziomie klasy.” Na 100. poziomie, dopóki zostają Punkty Umiejętności, System mówi „Przed kolejną ewolucją rozdaj wszystkie Punkty Umiejętności.” i daje przycisk do Umiejętności. Potem zakładka pokazuje komunikat Systemu (dla postaci kobiecej z „będziesz mogła”) i kartę dalszej postaci: portret, nazwę, opis, „Z ewolucji: …”, przyrost, cechę i umiejętności z liczbami na 95. poziomie, z przyciskiem „Przyjmij ewolucję: Berserker”. Postać i Ewolucja mają wtedy złotą kropkę.
+3. **Potwierdzenie i ceremonia.** Przycisk pyta jeszcze raz: „Ewolucja jest na stałe. Obie umiejętności ustąpią nowym, a ich punkty wrócą do rozdania. Przyjąć: Berserker?” i „Przyjmuję”. Potem jest ceremonia jak przy pierwszej ewolucji, z muzyką i zdaniem autora „Twoja nowa klasa to: …”. Narratora nie ma (385 B). W czasie wyprawy przycisk czeka, jak przy pierwszej ewolucji.
+4. **Czekanie na 100. poziomie.** Klasa z pierwszą ewolucją czeka na 100. poziomie, dopóki zostaje Punkt Umiejętności (E8), a potem, aż gracz przyjmie dalszą postać. Zdobyte XP klasy nie przepada. Postać, która przekroczyła już 100. poziom, przyjmuje ją w każdej chwili i nie czeka. Po drugiej ewolucji klasa czeka na 200. poziomie tylko na rozdanie punktów.
+5. **Umiejętności i punkty.** Obie umiejętności pierwszej ewolucji ustępują dwóm nowym na poziomie 0, a ich 90 punktów wraca. Poziomy klasy od 100. do 199. dają po punkcie, razem 190 na dwie umiejętności po 95 poziomów. Liczby nowej umiejętności na 1. poziomie odpowiadają mniej więcej liczbom umiejętności pierwszej ewolucji na 45. poziomie.
+6. **Statystyki.** Do 50. poziomu klasy rośnie przyrost klasy, od 51. do 100. przyrost pierwszej ewolucji, a od 101. przyrost dalszej postaci, o 2 punkty na poziom większy. HP i mana na poziom klasy liczą się tak samo w trzech odcinkach. Druid ma 4 HP i 5 many na poziom klasy.
+7. **Nazwy kobiece.** Dalsza postać ma nazwę męską i żeńską. Postać kobieca widzi nazwę żeńską w górnym pasku, na karcie postaci, w Umiejętnościach, na liście postaci, w Rankingu, u Pustelnika i na karcie ewolucji. Bastion i Widmo mają jedną nazwę. Pierwsze ewolucje zostają przy jednej nazwie.
+8. **Bez zerowania statystyk.** Po drugiej ewolucji nie ma darmowego zerowania punktów statystyk, bo ścieżka zostaje ta sama. Zerowanie po pierwszej ewolucji, jeśli jeszcze czeka, czeka dalej.
+9. **Pustelnik.** Postać z dalszą postacią zmienia u Pustelnika ścieżkę i dostaje dalszą postać innej ewolucji swojej klasy, np. Berserker zmienia się w Czempiona Areny albo Bastion. Umiejętności zaczynają od 0, a punkty wracają. Ceny i darmowe zerowanie statystyk są jak przy zmianie pierwszej ewolucji.
+10. **Testuj ewolucję.** Na wersji testowej postać z pierwszą ewolucją może wypróbować jej dalszą postać na dowolnym poziomie klasy. „Ustaw 100. poziom klasy” zostawia pierwszą ewolucję. „Cofnij ewolucję” wraca do stanu sprzed testu: do pierwszej ewolucji przyjętej na stałe albo do klasy, z umiejętnościami sprzed testu.
+11. **Grafika zastępcza.** Dopóki dalsza postać nie ma swojej grafiki, ma portret, chód i jazdę pierwszej ewolucji, w swoim kolorze skóry. Rozwinięta umiejętność ma ikonę, dźwięk i wygląd w walce umiejętności, z której wyrasta. Nowa ma te umiejętności pierwszej ewolucji, która stoi na tym samym miejscu, a gdy rozwinięta wyrasta właśnie z niej, tej drugiej: Boska ochrona ma Wielkie błogosławieństwo, a Przywołanie niedźwiedzia Lustro many. Przywołaniec bez obrazka pokazuje stwora z Bestiariusza (wilk, niedźwiedź, szkielet), a ent żywiołaka. Prawdziwa grafika potrzebuje tylko plików i ich id na listach w `src/client/art.js`, a dźwięk wpisu `skill-<id>` w `data/sounds.json`, bez zmian w kodzie.
+12. **Walka.**
+    - Kruszący cios ogłusza na dwa ruchy. Wir stali i Deszcz meteorów kładą swój efekt na każdego trafionego.
+    - Ryk berserkera osłabia ciosy wszystkich wrogów, Mur tarcz wzmacnia pancerz całej drużyny, a Chór dodaje jej obrażeń, każde przez kilka ruchów postaci. Chór nie czeka na rany.
+    - Pojedynek wyzywa wroga z największym HP, a Namierzenie zwykły cel. Oba trwają, aż ten wróg padnie, a potem umiejętność wybiera następnego.
+    - Strzał w serce trafia do dwóch wrogów w kolejnych rzędach za celem.
+    - Kula piorunów działa jak Sokół: co ruch razi losowego wroga i sama nie przyjmuje ciosów. Cień-sobowtór też nie przyjmuje ciosów, tylko powtarza każdy cios postaci, który trafił.
+    - Wilk, ent, niedźwiedź i szkielet wojownik stoją przed postacią i przyjmują ciosy jak Żywiołak, ale biją fizycznie i mogą chybić. Szkielet zatruwa i nie pęka jak Szlam.
+    - Postać ma naraz jednego przywołańca. Druga umiejętność przywołania Druida czeka, aż pierwszy padnie albo odejdzie.
+    - Żniwo: wróg zabity przez Zatrucie Nekromanty wstaje jako szkielet z 30% maks. HP postaci, bije za połowę jej ciosu i walczy do końca walki, jeśli postać nie ma już przywołańca. Żniwo nie daje odporności na truciznę, bo opis jej nie podaje.
+    - Klątwa rozkładu nie zadaje ciosu. Kładzie Zatrucie na wszystkich wrogów, a ich pancerz słabnie z każdym ruchem.
+    - Harmonia żywiołów działa od początku walki. Każdy żywioł użyty przez postać w zaklęciach wzmacnia jej zaklęcia od następnego ruchu. To jedyny nowy rodzaj umiejętności.
+    - Lodowa zbroja to osłona z many, jak Osłona many, poniżej 85% HP. Każdy, czyj cios zatrzyma, zwalnia.
+    - Boska ochrona raz na walkę, poniżej 75% HP, daje każdemu w drużynie osłonę z części jego maks. HP. Wielkie namaszczenie powiększa premie Chóru i Boskiej ochrony, bo Arcykapłan nie ma już Błogosławieństwa.
+    - Zniknięcie: przez ruch żaden cios nie trafia postaci, a jej następny cios jest krytyczny i silniejszy o 10–40%. Ta liczba jest dopisana, żeby umiejętność rosła z poziomem.
+    - Twierdza zatrzymuje tarczą 10% ciosów, także zaklęć, a odtwarzanie walki pokazuje „blok”.
+    - Gromowe groty spowalniają trafionego iskrą o 30%.
+    - Wieczna zima wychładza każdym zaklęciem mrozu.
+    - Święty ogień podpala trafionego sakrum ducha: przez 3 ruchy traci po 20% ciosu.
+    - Łaska zdejmuje wszystkie złe efekty i wzmacnia też leczenie Aury życia.
+    - Widmowy krok dodaje 5 pkt proc. uniku ponad zwykły limit.
+13. **Balans.** `tools/evolution-sim.mjs --second` porównuje pierwszą ewolucję z umiejętnościami po 45 z jej dalszą postacią na tym samym poziomie klasy. Wyprawa ma stałą liczbę walk, więc siła widać w bezpieczeństwie. W miejscu o 8 poziomów trudniejszym, na 4-godzinnych wyprawach postaci 90. poziomu, dalsze postacie mdleją w 0–12% wypraw, a pierwsze ewolucje w 0–81%. Dalsze postacie kończą wyprawy z 67–99% HP, a pierwsze ewolucje z 20–91%. Każda dalsza postać mdleje rzadziej albo kończy wyprawy z wyraźnie większym HP niż jej pierwsza ewolucja, co sprawdza test.
+    - Bastion zadaje o 35–45% mniej niż Strażnik z Wyzwaniem, ale przyjmuje o 40–45% mniej. Mdleje tak samo albo rzadziej (8% wobec 8% na 90. poziomie postaci, 7% wobec 11% na 100.) i kończy wyprawy z 82–84% HP zamiast 73–75%. Jego obrażenia to głównie odbicie Nieugiętego. To pytanie do autora, czy Bastion ma zostać tak obronny.
+    - Cudotwórca i Arcykapłan zadają mniej więcej tyle co przed ewolucją, ale prawie nie mdleją: 1–3% wypraw wobec 10–14%.
+14. **Teksty do oceny autora.** Zdania fabularne pod nazwami 30 umiejętności i nowe zdania zakładki Ewolucja są robocze.
+15. **Migracja bazy:** brak. Postać trzyma w `evolution` swoją najnowszą postać, a pierwsza ewolucja wynika z `from`.
+
+## Wersja 0.1.2 (3.11.2026)
+
+1. **Co wchodzi do gry:** rzadsze przedmioty na dłuższych wyprawach (482 B, zob. niżej). Razem z tym idą notatki o odpowiedziach 439–497 i nowe opisy grafik Czarnego Bagna do poprawy (Szczupak, Wąż Welesa, Róg biesa, Warkocz mamuny), których gra jeszcze nie używa.
+2. **Baza danych:** bez migracji.
+3. **Przed wdrożeniem:** pełne testy na tym komputerze: 869 z 870. Nie przeszedł tylko test czasu szacowania zagrożenia (średnio poniżej 6 ms), bo komputer był obciążony innymi testami; ten sam pomiar bez tej zmiany wyszedł tak samo albo wolniej (8,5 ms wobec 5,0 ms w pierwszej rundzie). GitHub przed wdrożeniem uruchamia pełne testy jeszcze raz na osobnej maszynie. Przejście wprowadzenia na telefonie, komputerze i dużym monitorze (po 11 kroków).
+
+## Rzadsze przedmioty na dłuższych wyprawach (482 B, 3.11.2026)
+
+1. **Przedmioty z wyprawy** (znaleziska i skrzynia elity) wypadają w rzadkości unikalnej i rzadszych trochę częściej, im dłuższa wyprawa: do pół godziny bez zmian, potem o tyle samo przy każdym podwojeniu czasu, aż do wag razy 1,1 przy 4 godzinach (`uniqueLengthFactorByMinutes`, od rzadkości `uniqueLengthFrom` w `data/balance.json`). Pospolite i rzadkie nie zyskują.
+2. **Ile to daje:** przy 4 godzinach przedmiot jest unikalny albo rzadszy w ok. 8,7% przypadków zamiast 8,0%, czyli o ok. 9% częściej (najwyżej +10%, jak chciał autor); godzina +3%, 2 godziny +6%. Razem z większą liczbą znalezisk i elit na długich wyprawach (0.0.98) długa wyprawa daje wyraźnie więcej rzadkich przedmiotów na godzinę.
+3. Skrzynia czempiona ma swoją rzadkość i premii nie dostaje; Wieże też nie.
+
 ## Odpowiedzi autora 439–497 (3.11.2026)
 
 Autor: „479.5 A / 439 A / 440 OK … 446 OK / 447 OK tylko popraw sprite'a bo piksele są zbędne lewy górny róg / 448 OK, tylko ucięty ogon / 449 OK / 450 OK / 451 OK, tylko zrób go bardziej czarnego / 452 OK, ale sprite totalnie ucięty musi być bardziej majestatyczny / 453 OK / 454 Ok / 455 zmień nazwę na Wielki Kleszcz / 456 OK / 457 B / 458 OK / 459 OK / 460 materiał do dokończenia bo ucięty / 461 OK / 462 OK / 463 OK, ale ryś był w Rysiej Grani, wiec out, nie moga sie potwory powtarzać / 464 OK / 465 B tylko zrób je bardziej abstrakcyjne groźne / 466 OK / 467 A / 468 OK / 469 OK / 470 OK / 471 B / 472 A / 476 i 477 wybrałeś sam i zatwierdzam / 478 B max 20% / 481 B / 482 B ale max +10% / 483 A / 484 A / 485 A / 486 A / 487 B / 488 A / 489 A / 490 A … 497 A”.

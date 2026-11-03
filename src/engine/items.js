@@ -91,8 +91,13 @@ export function affixValue(stat, share, tuning) {
   return Math.max(1, Math.round(share * perBudget));
 }
 
-export function rollRarity(rng, content, bonus = 1) {
-  return rng.weighted(content.rarities, (rarity) => rarity.dropWeight * (rarity.affixes > 0 ? bonus : 1)).id;
+// `bonus` raises every rarity with affixes (the elite's chest), `unique`
+// those from balance.hunt.uniqueLengthFrom up, unique and rarer, on a long
+// exploration (482 B: "max +10%").
+export function rollRarity(rng, content, bonus = 1, unique = 1) {
+  const from = content.rarities.findIndex((rarity) => rarity.id === content.balance.hunt.uniqueLengthFrom);
+  const raised = new Set(unique !== 1 && from >= 0 ? content.rarities.slice(from).map((rarity) => rarity.id) : []);
+  return rng.weighted(content.rarities, (rarity) => rarity.dropWeight * (rarity.affixes > 0 ? bonus : 1) * (raised.has(rarity.id) ? unique : 1)).id;
 }
 
 // A family holds the bases of one kind of item, a category in the game, as
@@ -135,7 +140,7 @@ export const canUse = (baseId, classId, content, classLevel) =>
 // the place whose creatures name the affixes (generateItem). With
 // `otherClassShare` that share of the items is for another class instead
 // (otherClassFamily), once the character has a weapon.
-export function randomItem(level, rng, content, { rarityBonus = 1, filled, classId, maxClassLevel = 1, rarityId, area, otherClassShare = 0 } = {}) {
+export function randomItem(level, rng, content, { rarityBonus = 1, uniqueBonus = 1, filled, classId, maxClassLevel = 1, rarityId, area, otherClassShare = 0 } = {}) {
   let family;
   let own = true;
   if (filled && classId && !filled.has('weapon')) {
@@ -152,7 +157,7 @@ export function randomItem(level, rng, content, { rarityBonus = 1, filled, class
   // Only a real choice draws, so loot without one stays as it was.
   const base = bases.length === 1 ? bases[0] : rng.pick(bases);
   if (own) filled?.add(base.slot);
-  return generateItem({ baseId: base.id, level, rarityId: rarityId ?? rollRarity(rng, content, rarityBonus), area }, rng, content);
+  return generateItem({ baseId: base.id, level, rarityId: rarityId ?? rollRarity(rng, content, rarityBonus, uniqueBonus), area }, rng, content);
 }
 
 // The family of an item for another class than `classId`: one of the other
