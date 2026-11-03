@@ -817,7 +817,14 @@
       "crafting-welcome": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Piętnasty poziom postaci… System otworzył przed Tobą Rzemieślnictwo." },
       "crafting-lead": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Systemowy Warsztat czeka w zakładce Profesje. Zajrzyjmy tam." },
       "crafting-patterns": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Tu wykonasz broń i pancerz według wzorów. Części do nich uzyskasz przy Stole rozbiórki albo kupisz u złomiarza." },
-      "crafting-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Każdy nowy poziom Rzemieślnictwa odsłoni Ci kolejne wzory. Zajrzyj tu też, gdy rozbierzesz na części wcześniej nierozbierany przedmiot." }
+      "crafting-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Każdy nowy poziom Rzemieślnictwa odsłoni Ci kolejne wzory. Zajrzyj tu też, gdy rozbierzesz na części wcześniej nierozbierany przedmiot." },
+      "towers-welcome": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Pięćdziesiąty poziom postaci… System otworzył przed Tobą Wieże." },
+      "towers-lead": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Wieże czekają w zakładce Walka. Zajrzyjmy tam." },
+      "towers-entries": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Każde wejście to jedna walka, z wynikiem od razu. Walczysz z pełnym HP, ale bez mikstur." },
+      "towers-solo": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Każde piętro to stwory jednego regionu, po kolei przez wszystkie krainy. Najwyżej wejdziesz na piętro swojego poziomu." },
+      "towers-floor": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Po drodze czekają elity i czempioni, a co dziesiąte piętro za pierwsze zwycięstwo daje skrzynię Wieży." },
+      "towers-party": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Do Wieży Drużyn wejdziesz z jednym albo dwoma wędrowcami. Wolne miejsce zajmie towarzysz z Kwater." },
+      "towers-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Wejść masz kilkanaście na dzień, nowe od północy. Wieże pomogą Ci też uzupełnić dawne wpisy Bestiariusza." }
     },
     "allLines": {
       "voice": "Narrator",
