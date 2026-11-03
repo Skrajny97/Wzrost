@@ -1,0 +1,30 @@
+{
+  "id": "mamuna-braid",
+  "payload": {
+    "prompt": "a thick black plait tied with a red thread at its end, curled into a loose ring that fits inside the picture with a margin, wet with drops of swamp water, single inventory item icon",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 32,
+    "height": 32,
+    "num_images": 4,
+    "seed": 522957597,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793687574,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 12.33,
+    "request_id": "eccaf087-9edc-47b9-b089-6fb075b3e3e6",
+    "outputs_retained_until": 1793773945,
+    "billing": {
+      "source": "balance",
+      "balance_left": 12.33,
+      "balance_charged": 0.72
+    }
+  }
+}
