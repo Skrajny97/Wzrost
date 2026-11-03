@@ -1,0 +1,30 @@
+{
+  "id": "pike",
+  "payload": {
+    "prompt": "big northern pike fish leaping from black water, a long olive-green body with pale spots, a flat duck-bill jaw full of needle teeth wide open, the whole fish from the snout to the tip of the forked tail inside the picture with a margin, nothing cut off, side view",
+    "prompt_style": "rd_pro__fantasy",
+    "width": 48,
+    "height": 48,
+    "num_images": 4,
+    "seed": 138923421,
+    "remove_bg": true,
+    "return_non_bg_removed": true,
+    "reference_images": 0
+  },
+  "result": {
+    "created_at": 1793686756,
+    "credit_cost": 4,
+    "balance_cost": 0.72,
+    "output_urls": [],
+    "model": "rd_pro",
+    "remaining_credits": 0,
+    "remaining_balance": 14.49,
+    "request_id": "90abe01d-33bb-4f4b-a68b-b6599f5bab1e",
+    "outputs_retained_until": 1793773114,
+    "billing": {
+      "source": "balance",
+      "balance_left": 14.49,
+      "balance_charged": 0.72
+    }
+  }
+}
