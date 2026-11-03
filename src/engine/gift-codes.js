@@ -46,3 +46,20 @@ export function withGiftResources(resources, rewards) {
   for (const [id, amount] of Object.entries(rewards.resources ?? {})) next[id] = (next[id] ?? 0) + amount;
   return next;
 }
+
+// The two characters of a code's rewards moved by the author's word
+// (content.giftMoves): `characters` are { id, userId, key } with the key of
+// each name worked out by the server (looseKey in src/server/gift-codes.js),
+// `used` the { userId, characterId, giftId } of the codes taken. The giving
+// character must be the one that took the code, and the receiving one on the
+// same account; anything else, or more than one such pair, moves nothing.
+export function giftMovePair(move, characters, used) {
+  const pairs = [];
+  for (const from of characters.filter((one) => one.key === move.from)) {
+    const took = used.some((one) => one.userId === from.userId && one.characterId === from.id && one.giftId === move.gift);
+    if (!took) continue;
+    for (const to of characters.filter((one) => one.key === move.to && one.userId === from.userId && one.id !== from.id)) pairs.push({ from, to });
+  }
+  if (pairs.length === 1) return pairs[0];
+  return { reason: pairs.length === 0 ? 'missing' : 'ambiguous' };
+}

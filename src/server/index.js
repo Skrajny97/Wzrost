@@ -8,7 +8,7 @@ import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { openEncyclopediaChest, readEncyclopedia } from './encyclopedia.js';
 import { decidePointsReset, takeEvolution, testClassLevel, testEvolutions, undoEvolution } from './evolutions.js';
-import { redeemGiftCode } from './gift-codes.js';
+import { moveGiftRewards, redeemGiftCode } from './gift-codes.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyParts, cancelBuilding, collectProduction, exchangeResources, sellToSpirit, startBuilding, tradeAtFire } from './camp.js';
 import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
@@ -360,6 +360,8 @@ export default {
       // The Targowisko's offers that ended (market.js), where the Osada is.
       () => settlementOn() && settleMarket(env.DB, controller.scheduledTime),
       () => sendNotifications(env, controller.scheduledTime),
+      // A code's rewards moved by the author's word (gift-codes.js).
+      () => moveGiftRewards(env, controller.scheduledTime),
     ];
     for (const job of jobs) {
       try {

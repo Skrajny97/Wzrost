@@ -6,8 +6,8 @@ import { beforeEach, describe, test } from 'node:test';
 
 import { createHash } from 'node:crypto';
 
-import { giftCodeOf, giftRewardsText, normalCode, withGiftResources } from '../src/engine/index.js';
-import { characterKey } from '../src/server/gift-codes.js';
+import { giftCodeOf, giftMovePair, giftRewardsText, normalCode, withGiftResources } from '../src/engine/index.js';
+import { characterKey, looseKey, moveGiftRewards } from '../src/server/gift-codes.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -80,6 +80,89 @@ describe('gift codes in the engine', () => {
   test('the rewards in words, and the resources added to what the character has', () => {
     assert.equal(giftRewardsText(tester.rewards, content), 'Punkty Systemu +100, Punkty Czasu +100, złoto +1000, drewno +100, kamień +100, ruda żelaza +100');
     assert.deepEqual(withGiftResources({ wood: 5 }, tester.rewards), { wood: 105, stone: 100, 'iron-ore': 100 });
+  });
+});
+
+describe('a code\'s rewards moved by the author\'s word', () => {
+  test('TIGER\'s 500 Punkty Systemu move once between two characters of one account, named by keys only', () => {
+    assert.equal(content.giftMoves.length, 1);
+    const [move] = content.giftMoves;
+    assert.deepEqual([move.id, move.gift, move.systemPoints], ['tiger-2026-11-move', 'tiger-2026-11', 500]);
+    assert.ok(content.giftCodes.some((gift) => gift.id === move.gift));
+    assert.match(move.from, /^[0-9a-f]{64}$/);
+    assert.match(move.to, /^[0-9a-f]{64}$/);
+  });
+
+  test('a name\'s loose key keeps only its letters and digits, in small letters', async () => {
+    assert.equal(await looseKey('Ala ma_Kota'), await looseKey('alamakota'));
+    assert.equal(await looseKey('  Żbik  '), await looseKey('żbik'));
+    assert.notEqual(await looseKey('Ala'), await looseKey('Ola'));
+    assert.equal(await looseKey('alamakota'), createHash('sha256').update('alamakota').digest('hex'));
+  });
+
+  test('the giving character must have taken the code, and the other one be on its account', () => {
+    const move = { id: 'm', gift: 'g', from: 'A', to: 'B', systemPoints: 500 };
+    const characters = [
+      { id: 1, userId: 7, key: 'A' },
+      { id: 2, userId: 7, key: 'B' },
+      { id: 3, userId: 8, key: 'B' },
+    ];
+    const pair = giftMovePair(move, characters, [{ userId: 7, characterId: 1, giftId: 'g' }]);
+    assert.deepEqual([pair.from.id, pair.to.id], [1, 2]);
+    // Another character of the account took the code: nothing moves.
+    assert.equal(giftMovePair(move, characters, [{ userId: 7, characterId: 2, giftId: 'g' }]).reason, 'missing');
+    assert.equal(giftMovePair(move, characters, [{ userId: 7, characterId: 1, giftId: 'other' }]).reason, 'missing');
+    // The receiver only on another account: nothing moves.
+    assert.equal(giftMovePair(move, characters.filter((one) => one.id !== 2), [{ userId: 7, characterId: 1, giftId: 'g' }]).reason, 'missing');
+    // Two receivers on the account: the author did not say which, nothing moves.
+    assert.equal(giftMovePair(move, [...characters, { id: 4, userId: 7, key: 'B' }], [{ userId: 7, characterId: 1, giftId: 'g' }]).reason, 'ambiguous');
+  });
+});
+
+describe('a code\'s rewards moved by the scheduled run', () => {
+  const { call, db, signUp } = useServer();
+  const minute = Date.parse('2026-11-04T10:00:00Z');
+
+  test('the points go from the character that took the code to the other one once, the code\'s record with them', async () => {
+    const { cookie } = await signUp('przenosiny');
+    assert.equal((await call('POST', '/api/character', { cookie, body: { name: 'Darczyńca Próbny', classId: 'archer', appearance: 'female' } })).status, 201);
+    const database = await db();
+    const idOf = async (name) => (await database.prepare('SELECT id, user_id FROM characters WHERE name = ?').bind(name).first());
+    const giver = await idOf('Darczyńca Próbny');
+    // As if it took TIGER: the code's record and its 500 points, plus 30 of its own.
+    await database.prepare('UPDATE characters SET system_points = 530 WHERE id = ?').bind(giver.id).run();
+    await database.prepare("INSERT INTO gift_codes_used (user_id, gift_id, character_id, used_at) VALUES (?, 'tiger-2026-11', ?, ?)").bind(giver.user_id, giver.id, minute).run();
+    assert.equal((await call('POST', '/api/character', { cookie, body: { name: 'Obdarowana', classId: 'mage', appearance: 'female' } })).status, 201);
+    const taker = await idOf('Obdarowana');
+    const points = async (id) => (await database.prepare('SELECT system_points FROM characters WHERE id = ?').bind(id).first()).system_points;
+    const before = await points(taker.id);
+    // The data's own move names nobody here and moves nothing.
+    assert.equal(await moveGiftRewards({ DB: database }, minute), 0);
+    const moves = [{ id: 'test-move', gift: 'tiger-2026-11', from: await looseKey('darczyńca_próbny'), to: await looseKey('OBDAROWANA'), systemPoints: 500 }];
+    // Only every ten minutes.
+    assert.equal(await moveGiftRewards({ DB: database }, minute + 5 * 60000, moves), 0);
+    assert.equal(await moveGiftRewards({ DB: database }, minute, moves), 1);
+    assert.deepEqual([await points(giver.id), await points(taker.id) - before], [30, 500]);
+    const record = await database.prepare("SELECT character_id FROM gift_codes_used WHERE gift_id = 'tiger-2026-11'").first();
+    assert.equal(record.character_id, taker.id);
+    // Once only.
+    assert.equal(await moveGiftRewards({ DB: database }, minute + 10 * 60000, moves), 0);
+    assert.deepEqual([await points(giver.id), await points(taker.id) - before], [30, 500]);
+    // The player sees it on the character's card.
+    assert.equal((await call('GET', '/api/character', { cookie })).data.character.name, 'Obdarowana');
+  });
+
+  test('a giver with fewer points than the move keeps none, never below none', async () => {
+    const { cookie } = await signUp('przenosiny2');
+    assert.equal((await call('POST', '/api/character', { cookie, body: { name: 'Wydawca', classId: 'archer', appearance: 'male' } })).status, 201);
+    const database = await db();
+    const giver = await database.prepare("SELECT id, user_id FROM characters WHERE name = 'Wydawca'").first();
+    await database.prepare('UPDATE characters SET system_points = 120 WHERE id = ?').bind(giver.id).run();
+    await database.prepare("INSERT INTO gift_codes_used (user_id, gift_id, character_id, used_at) VALUES (?, 'tiger-2026-11', ?, ?)").bind(giver.user_id, giver.id, minute).run();
+    assert.equal((await call('POST', '/api/character', { cookie, body: { name: 'Biorca', classId: 'mage', appearance: 'male' } })).status, 201);
+    const moves = [{ id: 'test-move-2', gift: 'tiger-2026-11', from: await looseKey('Wydawca'), to: await looseKey('Biorca'), systemPoints: 500 }];
+    assert.equal(await moveGiftRewards({ DB: database }, minute, moves), 1);
+    assert.equal((await database.prepare('SELECT system_points FROM characters WHERE id = ?').bind(giver.id).first()).system_points, 0);
   });
 });
 

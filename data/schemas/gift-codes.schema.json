@@ -31,6 +31,22 @@
         }
       }
     },
+    "moves": {
+      "type": "array",
+      "description": "Nagroda kodu przeniesiona na polecenie autora z jednej postaci konta na drugą, raz (moveGiftRewards w src/server/gift-codes.js).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "gift", "from", "to", "systemPoints"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Stałe id: serwer zapisuje je po przeniesieniu i nie robi go drugi raz." },
+          "gift": { "type": "string", "description": "Id kodu z codes, który odebrała postać from." },
+          "from": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Postać, która oddaje: SHA-256 jej imienia małymi literami, tylko z liter i cyfr (looseKey)." },
+          "to": { "type": "string", "pattern": "^[0-9a-f]{64}$", "description": "Postać tego samego konta, która dostaje, tak samo." },
+          "systemPoints": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
     "texts": {
       "type": "object",
       "additionalProperties": false,

@@ -4,7 +4,7 @@
 // written together with the rewards, only if the character is as read (its
 // version), so two taps give one gift and a code taken already gives none.
 
-import { giftCodeOf, giftRewardsText, withGiftResources } from '../engine/index.js';
+import { giftCodeOf, giftMovePair, giftRewardsText, withGiftResources } from '../engine/index.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { raced, sameVersion } from './atomic.js';
@@ -19,6 +19,53 @@ export async function characterKey(name) {
   const bytes = new TextEncoder().encode(String(name ?? '').normalize('NFC').trim().toLocaleLowerCase('pl'));
   const digest = await crypto.subtle.digest('SHA-256', bytes);
   return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+// The key of a name for a move by the author's word (content.giftMoves): the
+// SHA-256 of the name in small letters with its letters and digits only, so
+// a space or an underscore the author did not type does not matter. The
+// repository is public, so the data keeps this key instead of the name.
+export async function looseKey(name) {
+  const text = String(name ?? '').normalize('NFC').toLocaleLowerCase('pl').replace(/[^\p{L}\p{N}]/gu, '');
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+}
+
+// The scheduled run (index.js), every ten minutes while a move waits: each
+// move of content.giftMoves not made yet takes its Punkty Systemu from the
+// character that took the code (never below none) and gives them to the
+// other character of the same account, and the code's record goes with them.
+// The move is written to gift_moves_done in the same batch, so it is made
+// once; a move whose characters are not found waits for a later run. Only
+// the accounts that took the code are read. Returns the moves made. The
+// tests pass moves of their own, as the data's name no test character.
+export async function moveGiftRewards(env, now, moves = content.giftMoves ?? []) {
+  if (moves.length === 0 || new Date(now).getUTCMinutes() % 10 !== 0) return 0;
+  const db = env.DB;
+  const { results: done } = await db.prepare('SELECT id FROM gift_moves_done').all();
+  let moved = 0;
+  for (const move of moves.filter((one) => !done.some((row) => row.id === one.id))) {
+    const { results: usedRows } = await db.prepare('SELECT user_id, character_id, gift_id FROM gift_codes_used WHERE gift_id = ?').bind(move.gift).all();
+    if (usedRows.length === 0) continue;
+    const { results: rows } = await db
+      .prepare('SELECT id, user_id, name FROM characters WHERE user_id IN (SELECT user_id FROM gift_codes_used WHERE gift_id = ?)')
+      .bind(move.gift)
+      .all();
+    const characters = await Promise.all(rows.map(async (row) => ({ id: row.id, userId: row.user_id, key: await looseKey(row.name) })));
+    const used = usedRows.map((row) => ({ userId: row.user_id, characterId: row.character_id, giftId: row.gift_id }));
+    const pair = giftMovePair(move, characters, used);
+    if (!pair.from) continue;
+    await db.batch([
+      db.prepare('INSERT INTO gift_moves_done (id, done_at, from_character, to_character) VALUES (?, ?, ?, ?)').bind(move.id, now, pair.from.id, pair.to.id),
+      db.prepare('UPDATE characters SET system_points = MAX(system_points - ?, 0), version = version + 1 WHERE id = ?').bind(move.systemPoints, pair.from.id),
+      db.prepare('UPDATE characters SET system_points = system_points + ?, version = version + 1 WHERE id = ?').bind(move.systemPoints, pair.to.id),
+      db
+        .prepare('UPDATE gift_codes_used SET character_id = ? WHERE user_id = ? AND gift_id = ? AND character_id = ?')
+        .bind(pair.to.id, pair.from.userId, move.gift, pair.from.id),
+    ]);
+    moved += 1;
+  }
+  return moved;
 }
 
 // POST /api/gift-code { code }

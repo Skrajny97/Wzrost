@@ -1,5 +1,5 @@
 {
-  "$comment": "Kody podarunkowe (DECISIONS.md, „Kod podarunkowy”). Gracz wpisuje kod w Ustawieniach; wielkość liter, spacje i myślniki nie mają znaczenia. Każdy kod działa raz na konto, do chwili `until` (czas z przesunięciem, np. Warszawy). Nagrody idą do postaci: Punkty Systemu, Punkty Czasu, złoto i zasoby obozu po id z resources.json. Repozytorium jest publiczne, więc kod widać w tym pliku. Kod dla jednej postaci (`for`) ma zamiast jej imienia skrót SHA-256 imienia małymi literami; inne postacie go nie znają. Takie kody dodaje się tylko na polecenie autora (kod PC: za zaangażowanie).",
+  "$comment": "Kody podarunkowe (DECISIONS.md, „Kod podarunkowy”). Gracz wpisuje kod w Ustawieniach; wielkość liter, spacje i myślniki nie mają znaczenia. Każdy kod działa raz na konto, do chwili `until` (czas z przesunięciem, np. Warszawy). Nagrody idą do postaci: Punkty Systemu, Punkty Czasu, złoto i zasoby obozu po id z resources.json. Repozytorium jest publiczne, więc kod widać w tym pliku. Kod dla jednej postaci (`for`) ma zamiast jej imienia skrót SHA-256 imienia małymi literami; inne postacie go nie znają. Takie kody dodaje się tylko na polecenie autora (kod PC: za zaangażowanie). `moves`: nagroda kodu przeniesiona na polecenie autora z jednej postaci konta na drugą (raz; postacie po skrócie SHA-256 imienia bez spacji i znaków innych niż litery i cyfry, małymi literami; robi to serwer, src/server/gift-codes.js).",
   "codes": [
     {
       "id": "testers-2026-11",
@@ -19,6 +19,15 @@
       "for": "49097d632f6be096bcad4eb17c764e108612bd4d8211faafa3eebe2803896723",
       "until": "2026-11-17T00:00:00+01:00",
       "rewards": { "timePoints": 60 }
+    }
+  ],
+  "moves": [
+    {
+      "id": "tiger-2026-11-move",
+      "gift": "tiger-2026-11",
+      "from": "7051eb11b115ed4f5e3eed1ede72e31baa227fc4c7a32f2aac27e95fa264b970",
+      "to": "e7da9769f19118cab21a9bae79893df98543899b8af45126195c3a4bc34627f0",
+      "systemPoints": 500
     }
   ],
   "texts": {
