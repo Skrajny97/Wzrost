@@ -63,11 +63,19 @@ function jewelOrder(player, level, body) {
 // A setting: an item of the character's, worn or in the bag, and a gem the
 // level sets that is not in it already. A worn item waits while the
 // character explores, as the Kowadło does, since the exploration's report is
-// made with what it wears.
+// made with what it wears. One setting of an item at a time: of the
+// character's and the Awatar's, the later would break the earlier's gem
+// without asking (the code review of 3.11.2026).
 function settingOrder(player, level, body, now) {
   const item = player.items.find((candidate) => candidate.id === body.itemId);
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz tego przedmiotu.');
   if (item.equippedSlot) requireNotExploring(player, now);
+  const setting = [player.activity, player.avatarActivity].some((work) => {
+    if (work?.kind !== 'jewels') return false;
+    const options = JSON.parse(work.options ?? '{}');
+    return options.set === true && options.item === item.id;
+  });
+  if (setting) throw new ApiError(409, 'setting_under_way', 'W tym przedmiocie trwa już oprawianie kamienia.');
   const gem = typeof body.gem === 'string' ? content.mineralsById[body.gem] : undefined;
   if (!gem || gem.kind !== 'gem') throw new ApiError(400, 'unknown_gem', 'Nie ma takiego kamienia.');
   if (gem.level > level) throw new ApiError(403, 'locked', say(content.jewelcrafting.texts, 'hidden', 0, { level: gem.level }));
@@ -167,6 +175,13 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
     // An item gone by now (sold, taken apart, given away) gets no gem: the
     // gem comes back, and the report says so.
     const item = player.items.find((candidate) => candidate.id === options.item) ?? null;
+    // A worn item takes its gem only once the character is back from an
+    // exploration and its report is claimed, as that report is made with
+    // what it wears (the code review of 3.11.2026: the Awatar's setting
+    // claimed on the way changed the exploration's fights).
+    if (item?.equippedSlot && player.activity?.kind === 'hunt') {
+      throw new ApiError(409, 'item_worn_exploring', 'Kamień trafi do noszonego przedmiotu, gdy postać wróci z wyprawy i odbierze jej raport.');
+    }
     // The item as its row's data keeps it, without the row's id and slot.
     const data = item && Object.fromEntries(Object.entries(item).filter(([field]) => field !== 'id' && field !== 'equippedSlot'));
     return saveReport(item ? {} : taken, { set: { gem: gem.id, item: data && { ...data, gem: gem.id }, replaced: data?.gem ?? null } }, activity.minutes, item);

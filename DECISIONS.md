@@ -3034,6 +3034,30 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.28 (4.11.2026)
+
+1. **Poprawki z przeglądu kodu (576)** przy oprawianiu kamieni (zob. „Przegląd kodu (4.11.2026, w grze od 0.1.28)”).
+
+## Przegląd kodu (4.11.2026, w grze od 0.1.28)
+
+Autor: „576 koniecznie”.
+
+1. **Zakres:** zmiany z wersji 0.1.17–0.1.27 w silniku, na serwerze i na ekranach. Są to Górnictwo i Jubilerstwo, wzory z rozbiórki, minerały w handlu, zadania narratora, mikstury liczone w walkach, dźwięki Szlifierni i czas licytacji na Targowisku.
+2. **Poprawione:**
+    - **Oprawa przez Awatara w czasie wyprawy.** Awatar mógł oprawić kamień w noszony przedmiot, gdy postać była na wyprawie. Wystarczyło odebrać raport Awatara przed raportem wyprawy, a wszystkie walki tej wyprawy liczyły się już z kamieniem: w próbie 5 walk i ok. 51 tys. XP zamiast 2 walk i ok. 10 tys. Teraz raport Awatara z oprawą noszonego przedmiotu czeka, aż postać wróci i odbierze raport wyprawy, a gra mówi: „Kamień trafi do noszonego przedmiotu, gdy postać wróci z wyprawy i odbierze jej raport.”
+    - **Dwie oprawy jednego przedmiotu naraz.** Postać i Awatar mogli jednocześnie oprawiać ten sam przedmiot, a oprawa odebrana później niszczyła kamień pierwszej bez pytania. Teraz gra odrzuca drugą oprawę tego samego przedmiotu: „W tym przedmiocie trwa już oprawianie kamienia.”
+3. **Bez zmian (brakujący szczegół):** postać i Awatar sprawdzają wolne miejsca w plecaku osobno, więc dwa zlecenia naraz mogą razem przepełnić plecak, tak jak dotąd w Warsztacie. Przy następnej wyprawie złomiarz sprzedaje wtedy nadmiar od najsłabszych przedmiotów, jak przy każdym pełnym plecaku; przedmioty z kamieniem albo ulepszone zostają.
+4. **Sprawdzone bez zastrzeżeń:**
+    - mikstury w walkach: przeliczenie starych bonusów, dwie siły jednego rodzaju, zużycie przy raporcie, wyprawy Drużyny;
+    - kopanie i raport Kopalni;
+    - zlecenia biżuterii: dwa stuknięcia naraz dają jedno zlecenie, zwroty przy przerwaniu;
+    - premia kamienia;
+    - wzory z rozbiórki;
+    - minerały na Targowisku, w Wymianie i w Prośbach Gildii;
+    - zadania narratora;
+    - zakładka Minerały w Encyklopedii.
+5. Test: `test/mining.test.js` („one setting of an item at a time…”) sprawdza obie poprawki; bez nich nie przechodzi.
+
 ## Wersja 0.1.27 (3.11.2026)
 
 1. **Dźwięki Szlifierni (573)** (zob. „Dźwięki Szlifierni”).

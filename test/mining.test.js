@@ -610,6 +610,35 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.deepEqual(minerals(await character()), { quartz: 1 });
   });
 
+  test('one setting of an item at a time, and a worn item takes the Awatar\'s gem only after the exploration\'s report (the code review)', async () => {
+    await set(`minerals = '{"quartz":3}', gold = 10000`);
+    await call('POST', '/api/avatar/buy', { cookie });
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    const sword = generateItem({ baseId: 'sword', level: 25, rarityId: 'rare' }, createRng('sword'), content);
+    await database.prepare("INSERT INTO items (character_id, slot, data, created_at) VALUES (?, 'weapon', ?, 0)").bind(id, JSON.stringify(sword)).run();
+    const weapon = (await character()).equipment.weapon;
+    // While the character sets a gem in the sword, the Awatar sets none in
+    // it, and the other way round.
+    assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz' })).status, 201);
+    assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz', avatar: true })).data.error.code, 'setting_under_way');
+    assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).status, 200);
+    assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz', avatar: true })).status, 201);
+    assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz' })).data.error.code, 'setting_under_way');
+    // The character sets out and the Awatar's work ends on the way: the worn
+    // sword takes the gem only once the exploration's report is claimed.
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 1 } })).status, 201);
+    await age(15, 'avatar_activities');
+    const early = await call('POST', '/api/avatar/claim', { cookie });
+    assert.equal(early.data.error.code, 'item_worn_exploring');
+    assert.ok(!(await character()).equipment.weapon.gem);
+    await age(1);
+    assert.equal((await claim()).status, 200);
+    const later = (await call('POST', '/api/avatar/claim', { cookie })).data;
+    assert.equal(later.report.set.text, `Kwarc tkwi teraz w przedmiocie: ${weapon.name}.`);
+    assert.equal(later.character.equipment.weapon.gem.id, 'quartz');
+  });
+
   test('"Sprzedaj zbędne" keeps an item with a gem, as an upgraded one', async () => {
     const database = await db();
     const { id } = await database.prepare('SELECT id FROM characters').first();
