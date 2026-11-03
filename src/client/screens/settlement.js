@@ -9,7 +9,7 @@
 // Where the deployment has no Osada yet, or the character is below its
 // level, the tab says so as the other locked modules do.
 
-import { resourceArt, residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
+import { placeArt, resourceArt, residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatCountdown, formatDecimal, formatHours, formatMinutes, formatNumber, saleGold, tradePace } from '../format.js';
@@ -1014,11 +1014,14 @@ export function mountSettlement(container, { params = {} } = {}) {
   }
 
   // The resident of a place (question 76): the bust, who they are, their
-  // story and how they greet the character at its relation.
-  const residentCard = (resident) =>
-    h(
+  // story and how they greet the character at its relation; the place's
+  // room dim behind, where it has one (the Salon Gier's, 550.5 D), as the
+  // professions' places behind their cards.
+  const residentCard = (resident, backdrop) => {
+    const art = backdrop && placeArt(backdrop);
+    const card = h(
       'section',
-      { class: 'card settlement-resident', 'data-guide': 'resident-card' },
+      { class: `card settlement-resident${art ? ' place-card place-card--art' : ''}`, 'data-guide': 'resident-card' },
       h(
         'div',
         { class: 'settlement-resident-head' },
@@ -1033,6 +1036,9 @@ export function mountSettlement(container, { params = {} } = {}) {
       ),
       h('p', { class: 'settlement-greeting', text: `„${resident.greeting}”` }),
     );
+    if (art) card.style.setProperty('--place-art', `url("${art}")`);
+    return card;
+  };
 
   // Whether the Tablica has an order to deliver now, for its dot on the board.
   const deliverable = () =>
@@ -1127,7 +1133,7 @@ export function mountSettlement(container, { params = {} } = {}) {
         h('button', { type: 'button', class: 'button button--system back-button', onClick: () => leaveView(SETTLEMENT, 1, HISTORY_KEY) }, icon('back', { size: 20 }), 'Powrót'),
       ),
       place.soon && systemPanel(`${place.name} otworzy się w jednej z kolejnych aktualizacji gry.`),
-      resident && residentCard(resident),
+      resident && residentCard(resident, place.backdrop),
       !place.soon && resident && services(resident),
       place.id === 'board' && [boardCard(), brotherhoodsCard()],
       place.id === 'market' && !place.soon && marketPanel(),

@@ -11,6 +11,7 @@ import {
   addBuff,
   buffWindows,
   carryLimit,
+  claimWindows,
   createRng,
   drinkTimed,
   faintChances,
@@ -204,6 +205,25 @@ describe('potions in fights', () => {
     assert.deepEqual(Object.keys(buffWindows(both, 15)), ['speed', 'armor']);
   });
 
+  test('a claim covers the exploration with the potions at work then, drunk on the way too', () => {
+    const speed = content.potionsById['lesser-speed'];
+    const twice = drinkTimed(drinkTimed({}, speed), speed);
+    const window = { speed: { bonus: 0.15, ms: 30 * 60000 } };
+    // Alone: those at work as the report is claimed, from its start, and the
+    // exploration's length of them used up, whether drunk before it set out,
+    // on the way or after it came back (the author's 3.11.2026 report).
+    assert.deepEqual(claimWindows({}, twice, 30), { windows: window, spend: window });
+    assert.deepEqual(claimWindows({ buffs: { speed: { bonus: 0.15, ms: 10 * 60000 } }, spend: 'claim' }, twice, 30), { windows: window, spend: window });
+    assert.deepEqual(claimWindows({}, {}, 30), { windows: {}, spend: {} });
+    // A Drużyna's trip keeps the windows it set out with.
+    const kept = { speed: { bonus: 0.15, ms: 10 * 60000 } };
+    assert.deepEqual(claimWindows({ buffs: kept, spend: 'claim' }, twice, 30, true), { windows: kept, spend: kept });
+    assert.deepEqual(claimWindows({}, twice, 30, true), { windows: {}, spend: {} });
+    // One started before 0.0.74 had its time taken at its start.
+    assert.deepEqual(claimWindows({ buffs: kept }, twice, 30), { windows: kept, spend: {} });
+    assert.deepEqual(claimWindows({ speed: kept.speed }, twice, 30), { windows: kept, spend: {} });
+  });
+
   test('healing potions taken along lower the chance of fainting', () => {
     const { character, equipped } = typicalCharacter('shadow', 20, content);
     const input = { character, equipped, hp: 9999, areaId: 'mossy-boulders' };
@@ -304,6 +324,35 @@ describe('potions through the API', () => {
     const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
     assert.deepEqual(report.summary.potions, [`Mikstura szybkości działała w walkach: ${report.fights.length} z ${report.fights.length}.`]);
     assert.deepEqual(after.buffs, [{ kind: 'speed', ms: 30 * 60000, until: null, bonus: 0.15, label: 'Szybkość: ruchy w walkach +15%', potion: 'lesser-speed' }]);
+
+    // A potion drunk on the way, or after the exploration came back and
+    // before its report, works in its fights all the same, and the claim
+    // takes the exploration's 30 minutes off its time (the author: "Ten czas
+    // powinien schodzić dopiero po kliknięciu Odbierz raport i to w
+    // wysokości zadanej przed wyprawą, nawet jeśli mikstury zostały zażyte w
+    // czasie wyprawy lub na chwilę przed Odebraniem raportu").
+    // Several are drunk at once, as many as chosen, each adding its 30
+    // minutes, with no top (the author: "Niech nie bedzie maksymalnego limitu
+    // na trwanie bonusów typu z mikstur"); a healing potion goes one at a time.
+    await set(`buffs = '{}', potions = json_set(potions, '$."lesser-speed"', 5)`);
+    await hunt({});
+    const four = await call('POST', '/api/potions/drink', { cookie, body: { potionId: 'lesser-speed', count: 4 } });
+    assert.equal(four.data.text, 'Postać wypija 4 × Mniejsza mikstura szybkości. Ruchy w walkach szybsze o 15% przez 120 min wypraw.');
+    assert.equal(speedBuff(four.data.character).ms, 120 * 60000);
+    assert.equal(four.data.character.potions.find((potion) => potion.id === 'lesser-speed').count, 1);
+    assert.equal((await call('POST', '/api/potions/drink', { cookie, body: { potionId: 'lesser-speed', count: 2 } })).data.error.code, 'invalid_count');
+    await finish();
+    const onTheWay = (await call('POST', '/api/hunts/claim', { cookie })).data;
+    assert.deepEqual(onTheWay.report.summary.potions, [`Mikstura szybkości działała w walkach: ${onTheWay.report.fights.length} z ${onTheWay.report.fights.length}.`]);
+    assert.equal(speedBuff(onTheWay.character).ms, 90 * 60000);
+    await set(`buffs = '{}'`);
+    await hunt({});
+    await finish();
+    assert.equal((await drink('lesser-speed')).status, 200);
+    const before = (await call('POST', '/api/hunts/claim', { cookie })).data;
+    assert.deepEqual(before.report.summary.potions, [`Mikstura szybkości działała w walkach: ${before.report.fights.length} z ${before.report.fights.length}.`]);
+    assert.equal(speedBuff(before.character), undefined);
+    await set(`buffs = '{"speed":{"ms":1800000,"bonus":0.15}}'`);
 
     // One called back uses up nothing.
     await hunt({});

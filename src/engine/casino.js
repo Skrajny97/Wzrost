@@ -19,8 +19,10 @@
 // back more gold than it takes ("nigdy nie zarobisz więcej, chyba że masz
 // farta dużo"). The stakes go up to the highest at which an item prize,
 // itemRarity to topItemRarity, still fits ("skalowanie złota wraz z
-// dostępnymi wygranymi"). A win takes one of the stake's prizes left; an
-// empty pool waits for midnight.
+// dostępnymi wygranymi"); the rarest items wait at that top stake alone,
+// every lower one has items up to belowTopItemRarity (554 B: legendary items
+// only at the day's top stake). A win takes one of the stake's prizes left;
+// an empty pool waits for midnight.
 //
 // Stored state: the character's Wheel of the day in its Osada (`casino`:
 // { day, basis, won }, see wheelDay), from which every stake's pool is drawn
@@ -60,9 +62,15 @@ export function ticketBlock({ gold, has }, content) {
 // The chance of a win, the same at every stake (542 C).
 export const wheelChance = (content) => tuning(content).wheel.chance;
 
-// What a win at `stake` costs on average: the stake over its chance (at 50%,
-// twice the stake). No prize of the stake is worth more.
+// What a win at `stake` costs on average: the stake over its chance (at 10%,
+// ten stakes).
 export const winCost = (stake, content) => stake / wheelChance(content);
+
+// The most a prize of `stake` is worth: `worthCap` stakes (two, as when the
+// chance was 50%), and never more than a win costs, so a lower chance makes
+// the Wheel give back less instead of bigger prizes (the author: "Koło
+// fortuny proszę znerfić mocno i dać 10% szans").
+export const prizeCap = (stake, content) => Math.min(winCost(stake, content), stake * tuning(content).wheel.worthCap);
 
 // The ordinary creatures' materials of the lands the character knows: the
 // lands (krainy) with an inner region open to its class, each with the
@@ -93,12 +101,13 @@ export function prizeWorth(prize, { sellBonus = 0, tanneryPremium = 0 } = {}, co
 }
 
 // The rarity of an item prize at a stake and the character's level: the
-// rarest from itemRarity to topItemRarity worth more than the stake at the
-// character's scrapper and no more than a win costs; null when none is.
-export function itemPrizeRarity(level, sellBonus, stake, content) {
-  const { itemRarity, topItemRarity } = tuning(content).wheel;
-  const most = winCost(stake, content);
-  const fitting = content.rarities.slice(rarityIndex(itemRarity, content), rarityIndex(topItemRarity, content) + 1).filter((rarity) => {
+// rarest from itemRarity to `rarest` (topItemRarity unless given) worth more
+// than the stake at the character's scrapper and no more than the prize cap;
+// null when none is.
+export function itemPrizeRarity(level, sellBonus, stake, content, rarest = tuning(content).wheel.topItemRarity) {
+  const { itemRarity } = tuning(content).wheel;
+  const most = prizeCap(stake, content);
+  const fitting = content.rarities.slice(rarityIndex(itemRarity, content), rarityIndex(rarest, content) + 1).filter((rarity) => {
     const worth = sellPrice({ level, rarity: rarity.id }, content, sellBonus);
     return worth > stake && worth <= most;
   });
@@ -115,21 +124,31 @@ export function wheelStakes(level, sellBonus, content) {
   return Array.from({ length: top }, (_, index) => (index + 1) * step);
 }
 
+// The rarity of the item prizes in a stake's pool: up to topItemRarity at
+// the character's top stake, up to belowTopItemRarity at every lower one
+// (the author: "554 B", legendary items only at the day's top stake); null
+// when no item fits.
+export function stakeItemRarity(level, sellBonus, stake, content) {
+  const { topItemRarity, belowTopItemRarity } = tuning(content).wheel;
+  const top = wheelStakes(level, sellBonus, content).at(-1);
+  return itemPrizeRarity(level, sellBonus, stake, content, stake === top ? topItemRarity : belowTopItemRarity);
+}
+
 // A material prize: pieces of `material` at the grade drawn (never below
 // its species' own rarity), the fewest worth more than the stake to the
-// character; null when they would be worth more than a win costs.
+// character; null when they would be worth more than the prize cap.
 function materialPrize(material, gradeId, bonuses, stake, content) {
   const rarityId = rarityIndex(material.rarity, content) > rarityIndex(gradeId, content) ? material.rarity : gradeId;
   const key = stackKey(material.id, rarityId);
   const piece = prizeWorth({ kind: 'material', key, count: 1 }, bonuses, content);
   const count = Math.floor(stake / piece) + 1;
-  return count * piece <= winCost(stake, content) ? { kind: 'material', key, count } : null;
+  return count * piece <= prizeCap(stake, content) ? { kind: 'material', key, count } : null;
 }
 
 // The pool of a stake (526 A: "każda postać ma własną pulę 5 nagród na
 // dzień"; 542 C: every stake its own), drawn from the character's seed, the
 // day and the stake: the first prize an item of its class at its level, of
-// itemPrizeRarity, whenever one fits, so that a pool with items has at
+// stakeItemRarity, whenever one fits, so that a pool with items has at
 // least one, and every other an item at itemChance, or else very rare
 // materials of the lands it knows (materialRarities, by weight). `basis` is
 // the character as the day's Wheel keeps it (wheelDay).
@@ -137,7 +156,7 @@ export function wheelPrizes(basis, seed, stake, day, content) {
   const { wheel } = tuning(content);
   const rng = createRng(`${seed}:wheel:${day}:${stake}`);
   const bonuses = { sellBonus: basis.sellBonus, tanneryPremium: basis.tanneryPremium };
-  const itemRarity = itemPrizeRarity(basis.level, basis.sellBonus, stake, content);
+  const itemRarity = stakeItemRarity(basis.level, basis.sellBonus, stake, content);
   const materials = knownLandMaterials(basis, content);
   const grades = Object.entries(wheel.materialRarities).map(([id, weight]) => ({ id, weight }));
   const prizes = [];

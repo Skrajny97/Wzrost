@@ -1997,6 +1997,29 @@ describe('Stół rozbiórki', () => {
     assert.deepEqual([parts(view, 'shards'), parts(view, 'scraps'), view.crafting.queue[0].part], [3, 1, 'Odłamki']);
   });
 
+  test('as many pieces of a stack as chosen go on the table, and the rest stays', async () => {
+    await tableAt(1);
+    await stockMaterials({ 'wolf-pelt:common': 5 });
+    // One piece of five (the author: "Powinna być mozliwosc przerobienia
+    // pojedynczej sztuki danego materiału").
+    const { status, data } = await craft({ key: 'wolf-pelt:common', count: 1 });
+    assert.equal(status, 200);
+    const [order] = data.character.crafting.queue;
+    assert.deepEqual([order.count, order.parts], [1, 1]);
+    assert.deepEqual(
+      data.character.crafting.materials.map(({ key, count }) => [key, count]),
+      [['wolf-pelt:common', 4]],
+    );
+    // Then three more as a second order; never more than there are, nor none.
+    assert.equal((await craft({ key: 'wolf-pelt:common', count: 3 })).data.character.crafting.queue[1].parts, 3);
+    for (const count of [2, 0, 1.5, '1', undefined]) {
+      const wrong = await craft({ key: 'wolf-pelt:common', count });
+      assert.deepEqual([wrong.status, wrong.data.error.code], [400, 'invalid_count'], String(count));
+    }
+    assert.equal((await craft({ key: 'bear-hide:common', count: 1 })).data.error.code, 'no_materials');
+    assert.deepEqual((await character()).crafting.materials.map(({ count }) => count), [1]);
+  });
+
   test('"Przerób wszystko" takes every stack while the queue has room', async () => {
     await tableAt(5);
     await stockMaterials(Object.fromEntries(content.materials.map((material) => [`${material.id}:${material.rarity}`, 2])));

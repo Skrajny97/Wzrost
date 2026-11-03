@@ -45,7 +45,11 @@ export const SPRITES = {
   // `faces`: where the face is across, when not in the middle (a head turned
   // in three quarters), as tools/normalize-portraits.py prints it, or for a
   // figure with a bow or a staff at its head, the middle of the face's skin.
-  // Busts centre on the face; the whole figure stays centred. `toned`: the
+  // Busts centre on the face; the whole figure stays centred. `perches`: the
+  // top of the shoulder behind the head (left of the face), where a pet of
+  // the Sklep Systemu perches (the raven) or floats beside it (the wisp;
+  // cosmetics.js), picked by eye on each portrait; the barbarian's (45, 30)
+  // is the place in the film the author approved (541). `toned`: the
   // classes' portraits with a file for every skin tone (the class cards fetch
   // them ahead); `tonedEvolutions`: the evolutions' with theirs, recoloured
   // through masks made by hand (tools/evolution-tones.py).
@@ -78,6 +82,23 @@ export const SPRITES = {
       'archmage-female': 49, 'archmage-male': 51, 'winter-lord-female': 51, 'winter-lord-male': 49, 'druid-female': 50, 'druid-male': 49,
       'miracle-worker-female': 47, 'miracle-worker-male': 43, 'grand-inquisitor-female': 50, 'high-priest-female': 50, 'kingslayer-female': 55,
       'kingslayer-male': 54, 'necromancer-female': 44, 'necromancer-male': 49, 'phantom-male': 45,
+    },
+    perches: {
+      'warrior-female': [32, 38], 'warrior-male': [34, 40], 'archer-female': [34, 41], 'archer-male': [35, 36], 'mage-female': [34, 41],
+      'mage-male': [33, 44], 'cleric-female': [32, 40], 'cleric-male': [34, 41], 'shadow-female': [33, 39], 'shadow-male': [35, 36],
+      'guardian-female': [32, 35], 'guardian-male': [34, 36], 'sniper-female': [31, 37], 'sniper-male': [34, 34], 'ice-lord-female': [33, 33],
+      'ice-lord-male': [33, 29], 'priest-female': [33, 35], 'priest-male': [33, 37], 'assassin-female': [35, 31], 'assassin-male': [34, 30],
+      'barbarian-female': [44, 30], 'barbarian-male': [45, 30], 'gladiator-female': [33, 35], 'gladiator-male': [32, 34], 'storm-archer-female': [34, 38],
+      'storm-archer-male': [35, 31], 'hunter-female': [35, 31], 'hunter-male': [37, 33], 'elementalist-female': [35, 34], 'elementalist-male': [34, 32],
+      'arcanist-female': [33, 30], 'arcanist-male': [34, 37], 'healer-female': [32, 36], 'healer-male': [31, 34], 'inquisitor-female': [32, 31],
+      'inquisitor-male': [32, 31], 'poisoner-female': [34, 31], 'poisoner-male': [33, 30], 'night-dancer-female': [35, 37], 'night-dancer-male': [33, 32],
+      'berserker-female': [31, 33], 'berserker-male': [31, 33], 'arena-champion-female': [33, 39], 'arena-champion-male': [35, 37],
+      'bastion-female': [31, 31], 'bastion-male': [31, 31], 'marksman-female': [33, 29], 'marksman-male': [33, 28], 'thunder-lord-female': [37, 34],
+      'thunder-lord-male': [34, 29], 'master-hunter-female': [34, 30], 'master-hunter-male': [34, 29], 'archmage-female': [33, 31],
+      'archmage-male': [33, 31], 'winter-lord-female': [34, 36], 'winter-lord-male': [32, 29], 'druid-female': [34, 35], 'druid-male': [36, 36],
+      'miracle-worker-female': [33, 35], 'miracle-worker-male': [31, 34], 'grand-inquisitor-female': [34, 30], 'grand-inquisitor-male': [33, 29],
+      'high-priest-female': [34, 35], 'high-priest-male': [32, 35], 'kingslayer-female': [37, 33], 'kingslayer-male': [34, 30],
+      'necromancer-female': [30, 38], 'necromancer-male': [37, 32], 'phantom-female': [36, 35], 'phantom-male': [39, 42],
     },
     toned: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
     tonedEvolutions: [
@@ -263,12 +284,13 @@ export const SPRITES = {
     size: 32,
     ids: ['quartz', 'agate', 'amethyst', 'emerald', 'sapphire', 'ruby', 'diamond', 'silver-ore', 'gold-ore', 'star-ore'],
   },
-  // The places where professions work, dim behind their cards, and the
-  // Ewolucja tab's spring behind its heading, 192×96.
+  // The places where professions work, dim behind their cards, the
+  // Ewolucja tab's spring behind its heading, and the Osada's rooms behind
+  // their residents' cards (the Salon Gier's), 192×96.
   places: {
     width: 192,
     height: 96,
-    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-mine', 'system-lapidary', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep'],
+    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-mine', 'system-lapidary', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall'],
   },
   // The events at the end of an exploration (data/events.json): the people
   // met, 96×128, and the scenes behind them, 192×96, filled in as they are
@@ -303,6 +325,17 @@ export const SPRITES = {
     height: 144,
     fit: true,
     ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist', 'forge', 'tannery', 'stable', 'casino', 'torch', 'torch-off'],
+  },
+  // The Salon Gier's games on the screen (data/settlement.json, casino.show;
+  // PixelLab, 550.1 C, 550.2 B): the Koło Fortuny and the Loteria's drum,
+  // 128×128, and the ticket and the pointer over the wheel, 64×64.
+  salon: {
+    size: 128,
+    ids: ['fortune-wheel', 'lottery-drum'],
+  },
+  'salon-small': {
+    size: 64,
+    ids: ['lottery-ticket', 'wheel-pointer'],
   },
   residents: {
     width: 96,
@@ -478,6 +511,8 @@ export const settlementTorchArt = (lit = true) => {
   const id = lit ? 'torch' : 'torch-off';
   return available.settlement.has(id) ? h('img', { src: `/art/settlement/${id}.png`, alt: '', class: 'sprite settlement-torch-art', decoding: 'async', draggable: 'false' }) : null;
 };
+// A picture of the Salon Gier's games, by its name, or null while there is none.
+export const salonArt = (id) => (available.salon.has(id) ? `/art/salon/${id}.png` : available['salon-small'].has(id) ? `/art/salon-small/${id}.png` : null);
 export const residentBust = (residentId) =>
   available.residents.has(residentId)
     ? h('img', { src: `/art/residents/${residentId}.png`, alt: '', width: 96, height: 128, class: 'sprite resident-bust', decoding: 'async', draggable: 'false' })
@@ -549,6 +584,13 @@ export function portraitSprite(classId, appearance, { bust = false, skin, evolut
     decoding: 'async',
     draggable: 'false',
   });
+}
+
+// Where a pet perches on the portrait of a look (SPRITES.portraits.perches),
+// in the portrait's pixels: on the portrait shown, its evolution's or its
+// class's, or, for a look without one, about where most shoulders are.
+export function portraitPerch(classId, appearance, evolution) {
+  return SPRITES.portraits.perches[lookId('portraits', classId, appearance, evolution)] ?? [34, 34];
 }
 
 // The sheet of the character walking in its look and skin tone, or its

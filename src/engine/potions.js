@@ -8,8 +8,9 @@
 // exploration takes one along at most. A potion for a time is drunk from the
 // bag instead (speed, armour, damage, focus, the aconite oil on the blade,
 // the mistletoe ward) and works in the fights of its minutes, which pass only
-// on explorations; each one drunk adds its minutes to those left. Potions
-// not drunk stay in the bag.
+// on explorations; each one drunk adds its minutes to those left, and an
+// exploration uses up its length of them as its report is claimed, whenever
+// they were drunk (claimWindows). Potions not drunk stay in the bag.
 
 // The kinds of a potion that works by itself in fights and of a potion for a
 // time, as keys of its effect; a curse of an event (the god chased off, the
@@ -80,6 +81,24 @@ export function buffWindows(buffs, minutes) {
 // The windows an exploration keeps in its options: by kind, or a speed
 // potion's alone, as explorations started before the other kinds kept it.
 export const optionWindows = (options) => options?.buffs ?? (options?.speed ? { speed: options.speed } : {});
+
+// What of an exploration of `minutes` the potions for a time cover as its
+// report is claimed, and what of their time it uses up then (the author:
+// "Ten czas powinien schodzić dopiero po kliknięciu Odbierz raport i to w
+// wysokości zadanej przed wyprawą, nawet jeśli mikstury zostały zażyte w
+// czasie wyprawy lub na chwilę przed Odebraniem raportu"): those at work now
+// (`buffs`), drunk before it set out, on the way or after it came back, from
+// its start as far as their time goes. A Drużyna's trip (`fixed`) keeps the
+// windows it set out with, as its fights are the same for all who went, and
+// uses up those; one started before 0.0.74 had its time taken at its start,
+// so it keeps its windows and uses up nothing more.
+export function claimWindows(options, buffs, minutes, fixed = false) {
+  const kept = optionWindows(options);
+  if (options?.spend !== 'claim' && Object.keys(kept).length > 0) return { windows: kept, spend: {} };
+  if (fixed) return { windows: kept, spend: kept };
+  const windows = buffWindows(buffs, minutes);
+  return { windows, spend: windows };
+}
 
 // Buffs less the time an exploration's windows cover, as it starts.
 export function spendWindows(buffs, windows) {

@@ -140,6 +140,10 @@ test('every sprite on the list has its file at its size, and every class has its
     // Duch budowniczego at the Kamień węgielny has a bust like theirs.
     settlement: [...data('settlement').places.map((place) => place.id), ...(data('settlement').torches?.length ? ['torch', 'torch-off'] : [])],
     residents: [...data('settlement').residents.map((resident) => resident.id), ...(data('camp').cornerstone?.spirit ? [data('camp').cornerstone.spirit.art] : [])],
+    // The Salon Gier's games on the screen: the wheel and the drum, the
+    // ticket and the pointer.
+    salon: [data('settlement').casino.show.wheel.art, data('settlement').casino.show.lottery.drum],
+    'salon-small': [data('settlement').casino.show.lottery.ticket, data('settlement').casino.show.wheel.pointer],
     // The companions' busts, one for each class and look.
     companions: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     'companion-portraits': data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
@@ -165,6 +169,7 @@ test('every sprite on the list has its file at its size, and every class has its
       data('evolutions').place,
       ...data('towers').towers.map((tower) => tower.place),
       data('guilds').place,
+      ...data('settlement').places.flatMap((place) => place.backdrop ?? []),
     ],
     events: data('events').list.map((event) => event.art),
     'event-scenes': data('events').list.map((event) => event.scene),
@@ -217,6 +222,12 @@ test('every sprite on the list has its file at its size, and every class has its
   for (const [id, face] of Object.entries(SPRITES.portraits.faces)) {
     assert.ok(SPRITES.portraits.ids.includes(id), `faces: no portrait ${id}`);
     assert.ok(face > 24 && face < SPRITES.portraits.width - 24, `faces: ${id} at ${face}`);
+  }
+  // Every portrait has its shoulder where a pet of the Sklep Systemu perches,
+  // left of the face, in the upper half of the portrait.
+  assert.deepEqual(Object.keys(SPRITES.portraits.perches).sort(), [...SPRITES.portraits.ids].sort());
+  for (const [id, [x, y]] of Object.entries(SPRITES.portraits.perches)) {
+    assert.ok(x > 16 && x < (SPRITES.portraits.faces[id] ?? SPRITES.portraits.width / 2) && y > 16 && y < SPRITES.portraits.height / 2, `perches: ${id} at ${x}, ${y}`);
   }
 });
 

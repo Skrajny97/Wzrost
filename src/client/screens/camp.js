@@ -23,7 +23,7 @@ import { skipControl } from '../time.js';
 import { confirmAction, guided, meter, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { desktopLayout, onLayoutChange } from '../layout-mode.js';
 import { scrapperSheet } from '../scrapper.js';
-import { itemSheet, itemSummary } from './character.js';
+import { itemSheet, itemSummary, salvagePicker } from './character.js';
 import { mountChest } from './chest.js';
 import { mountQuarters } from '../companions.js';
 import { dayPart } from '../scenes.js';
@@ -565,7 +565,7 @@ function mountBuilding(container, id) {
       underway && constructionPanel(running, ticks),
       waitingNote(id),
       nextLevel(building),
-      building.crafts && craftTableSection(ticks),
+      building.crafts && craftTableSection(ticks, salvagePicker),
       building.upgrades && upgradeList(building),
       // The companions live in the Kwatery once they stand (the author: "Po
       // zwerbowaniu postac powinna [...] pojawić się w Kwaterach").

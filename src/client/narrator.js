@@ -389,6 +389,9 @@ const BEATS = {
   'settlement-tannery-relation': { place: mark('resident-card'), when: onPlace('tannery') },
   'settlement-stable-mounts': { place: mark('stable-mounts'), when: onPlace('stable') },
   'settlement-stable-party': { place: mark('stable-mounts'), when: onPlace('stable') },
+  // The Salon Gier (543.2 A): each game at its tab.
+  'settlement-casino-lottery': { place: mark('casino-tab-lottery'), when: onPlace('casino') },
+  'settlement-casino-wheel': { place: mark('casino-tab-wheel'), when: onPlace('casino') },
   'settlement-quarters': { place: mark('quarters-companions'), when: onQuarters },
   // The Ewolucja chapter, after all the others.
   'evolution-welcome': { when: evolutionDue },

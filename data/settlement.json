@@ -12,7 +12,7 @@
     { "id": "tannery", "name": "Garbarnia", "x": 13, "y": 53, "resident": "tanner", "flip": true },
     { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist", "flip": true },
     { "id": "forge", "name": "Kuźnia", "x": 56, "y": 31, "resident": "smith" },
-    { "id": "casino", "name": "Salon Gier", "x": 83, "y": 33.5, "resident": "gamehost" }
+    { "id": "casino", "name": "Salon Gier", "x": 83, "y": 33.5, "resident": "gamehost", "backdrop": "casino-hall" }
   ],
   "torches": [
     { "x": 32, "y": 12.5 },
@@ -191,7 +191,7 @@
     ]
   },
   "casino": {
-    "$comment": "Salon Gier (prośba autora z 3.11.2026, odpowiedzi 523–526; src/engine/casino.js): gospodarz (resident, id mieszkańca) prowadzi dwie gry, każdą na dobę zadań narratora (do północy czasu polskiego). Loteria (lottery, 524 A): los kosztuje ticket złota, jeden na postać na dobę, i daje relationGain punktów relacji z gospodarzem; pula to base złota od Systemu i ticket złota za każdy los; o północy System losuje jeden los dnia, a jego postać dostaje całą pulę. Bez losów nie ma losowania i nic nie przechodzi na kolejny dzień. Wynik pokazuje Salon i czat Globalny (texts.announce: {name} zwycięzcy, {gold} złota; [a|b] to forma dla kobiety i dla mężczyzny). Koło Fortuny (wheel, 525 A, 526 A i 542 C): stawka to step złota albo więcej, zawsze co step (autor: „100 złotych to start, ale można grać więcej co 100 złotych i zmienia to dostępną pulę”), a szansa wygranej zawsze chance; przegrana stawka przepada. Każda stawka ma dla każdej postaci własną pulę prizes nagród na dobę, losowaną z postaci, doby i stawki: każda nagroda jest warta tej postaci więcej niż stawka i najwyżej tyle, ile średnio kosztuje wygrana (stawka / chance), więc Koło nie oddaje średnio więcej złota, niż bierze („nigdy nie zarobisz więcej, chyba że masz farta dużo”). Pierwsza nagroda puli, gdy tylko pasuje, i każda inna z szansą itemChance jest przedmiotem klasy postaci na jej poziomie, w najrzadszej rzadkości od itemRarity do topItemRarity, za którą złomiarz płaci tej postaci (z premią Skupu złomu) tyle, ile wyżej; inaczej nagroda to materiały zwykłego stwora z krain, które postać już zna (bez trofeów elit i czempionów), w rzadkości z materialRarities (wagi losowania; nigdy niżej niż rzadkość gatunku), materiał jednego stwora najwyżej raz w puli, w najmniejszej liczbie sztuk wartej więcej niż stawka w Garbarni przy relacji postaci. Stawki idą do najwyższej, przy której pasuje jeszcze przedmiot (najwyżej maxSteps kroków), więc rosną z poziomem postaci („skalowanie złota wraz z dostępnymi wygranymi”). Postać, jej poziom i premie, z których losują się pule, Koło zapamiętuje przy pierwszym zajrzeniu danego dnia i trzyma do północy. Wygrana zabiera jedną z pozostałych nagród puli tej stawki, każdą równie prawdopodobną, a pusta pula czeka do północy. texts: słowa Salonu; {...} wstawia gra, win i loss to słowa gospodarza po wygranej i przegranej.",
+    "$comment": "Salon Gier (prośba autora z 3.11.2026, odpowiedzi 523–526; src/engine/casino.js): gospodarz (resident, id mieszkańca) prowadzi dwie gry, każdą na dobę zadań narratora (do północy czasu polskiego). Loteria (lottery, 524 A): los kosztuje ticket złota, jeden na postać na dobę, i daje relationGain punktów relacji z gospodarzem; pula to base złota od Systemu i ticket złota za każdy los; o północy System losuje jeden los dnia, a jego postać dostaje całą pulę. Bez losów nie ma losowania i nic nie przechodzi na kolejny dzień. Wynik pokazuje Salon i czat Globalny (texts.announce: {name} zwycięzcy, {gold} złota; [a|b] to forma dla kobiety i dla mężczyzny). Koło Fortuny (wheel, 525 A, 526 A i 542 C): stawka to step złota albo więcej, zawsze co step (autor: „100 złotych to start, ale można grać więcej co 100 złotych i zmienia to dostępną pulę”), a szansa wygranej zawsze chance; przegrana stawka przepada. Każda stawka ma dla każdej postaci własną pulę prizes nagród na dobę, losowaną z postaci, doby i stawki: każda nagroda jest warta tej postaci więcej niż stawka i najwyżej tyle, ile średnio kosztuje wygrana (stawka / chance), więc Koło nie oddaje średnio więcej złota, niż bierze („nigdy nie zarobisz więcej, chyba że masz farta dużo”). Pierwsza nagroda puli, gdy tylko pasuje, i każda inna z szansą itemChance jest przedmiotem klasy postaci na jej poziomie, w najrzadszej rzadkości od itemRarity do belowTopItemRarity, a przy najwyższej stawce postaci do topItemRarity (autor: „554 B”, legendarne przedmioty tylko przy najwyższej stawce dnia), za którą złomiarz płaci tej postaci (z premią Skupu złomu) tyle, ile wyżej; inaczej nagroda to materiały zwykłego stwora z krain, które postać już zna (bez trofeów elit i czempionów), w rzadkości z materialRarities (wagi losowania; nigdy niżej niż rzadkość gatunku), materiał jednego stwora najwyżej raz w puli, w najmniejszej liczbie sztuk wartej więcej niż stawka w Garbarni przy relacji postaci. Stawki idą do najwyższej, przy której pasuje jeszcze przedmiot (najwyżej maxSteps kroków), więc rosną z poziomem postaci („skalowanie złota wraz z dostępnymi wygranymi”). Postać, jej poziom i premie, z których losują się pule, Koło zapamiętuje przy pierwszym zajrzeniu danego dnia i trzyma do północy. Wygrana zabiera jedną z pozostałych nagród puli tej stawki, każdą równie prawdopodobną, a pusta pula czeka do północy. texts: słowa Salonu; {...} wstawia gra, win i loss to słowa gospodarza po wygranej i przegranej.",
     "resident": "gamehost",
     "relationGain": 10,
     "lottery": { "name": "Loteria", "ticket": 50, "base": 100 },
@@ -199,12 +199,20 @@
       "name": "Koło Fortuny",
       "step": 100,
       "maxSteps": 100,
-      "chance": 0.5,
+      "chance": 0.1,
+      "worthCap": 2,
       "prizes": 5,
       "itemChance": 0.5,
       "itemRarity": "rare",
       "topItemRarity": "legendary",
+      "belowTopItemRarity": "epic",
       "materialRarities": { "epic": 3, "legendary": 1 }
+    },
+    "show": {
+      "$comment": "Gry Salonu na ekranie (autor: „Trzeba zrobić animację jeszcze do koła fortuny wyświetlającą się na ekranie i do kupowania losu, żeby nadać temu estetyki”); grafiki z PixelLab (550.1 C, 550.2 B) w src/client/art/salon i salon-small. wheel: koło (art) pod strzałką (pointer) kręci się co najmniej turns razy przez seconds sekund, coraz wolniej, i staje na klinie wygranej albo przegranej; kliny (wedges, równe) idą na zmianę, a środek pierwszego klinu wygranej leży winAt stopni od góry obrazka, zgodnie ze wskazówkami zegara; pivot to środek koła w pikselach obrazka. lottery: los (ticket) wpada do bębna (drum), a bęben się kołysze, razem przez seconds sekund. sounds: nagrania z data/sounds.json (effects) na zakręcenie, wygraną, przegraną i los; bez nagrania gra cisza.",
+      "wheel": { "art": "fortune-wheel", "pointer": "wheel-pointer", "wedges": 8, "winAt": 22.5, "pivot": [64, 65.5], "turns": 5, "seconds": 3.2 },
+      "lottery": { "drum": "lottery-drum", "ticket": "lottery-ticket", "seconds": 1.9 },
+      "sounds": { "spin": "casino-spin", "win": "casino-win", "lose": "casino-lose", "ticket": "casino-ticket" }
     },
     "texts": {
       "lotteryAbout": "Los kosztuje {ticket} zł, a kupisz jeden na dobę. Pula to {base} zł od Systemu i {ticket} zł za każdy los. O północy System losuje jeden los, a jego właściciel zgarnia całą pulę.",
@@ -216,9 +224,10 @@
       "lotteryEarlier": "Ostatnie losowanie ({date}):",
       "lotteryMine": "To Twoja wygrana: złoto jest już w Twojej sakiewce.",
       "lotteryNone": "Pierwsze losowanie Loterii odbędzie się o północy.",
+      "lotteryPlayers": "Kto gra dziś ({tickets})",
       "announce": "Loterię [wygrała|wygrał] {name}: {gold} zł.",
       "wheelAbout": "Stawka to {step} zł albo więcej, setkami, a szansa na wygraną jest zawsze {chance}%. Przegrana stawka przepada, a wygrana zabiera jedną nagrodę z puli tej stawki.",
-      "wheelPoolAbout": "Każda stawka ma na dziś własną pulę. Im wyższa stawka, tym cenniejsze nagrody, a każda jest warta więcej niż stawka. Najwyższa stawka rośnie z poziomem postaci, a nowe pule przyjdą po północy.",
+      "wheelPoolAbout": "Każda stawka ma na dziś własną pulę. Im wyższa stawka, tym cenniejsze nagrody, a każda jest warta więcej niż stawka. Przedmioty legendarne czekają tylko w puli najwyższej stawki. Najwyższa stawka rośnie z poziomem postaci, a nowe pule przyjdą po północy.",
       "wheelPool": "Pula przy stawce {stake} zł: zostało {left} z {all}",
       "wheelStake": "Stawka: {stake} zł · szansa {chance}%",
       "wheelSpin": "Zakręć Kołem ({stake} zł)",
@@ -287,7 +296,7 @@
   },
   "market": {
     "hours": 24,
-    "fee": 0.05,
+    "fee": 0.01,
     "offers": 5,
     "brotherhood": "merchants",
     "minRaise": 0.05,

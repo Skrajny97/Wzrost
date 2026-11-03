@@ -3025,6 +3025,154 @@ Autor: „uruchamiaj tyle pomocników ile chcesz”, „542 tak”, „543.2 A�
    - tła (`src/client/art/places`): Systemowa Kopalnia B, Systemowa Szlifiernia C.
 5. **Muzyka Salonu** gra po wejściu do Salonu Gier od 0.1.11 (zob. „Wersja 0.1.11”).
 
+## Odpowiedzi autora 548, 549 i 550.1–550.2 (3.11.2026)
+
+Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty Salonu Gier tak jak wygląda w grze i nadchodzących animacji gier, zbyt statyczne to na razie jest w tym momencie, reszta super”, „548.1 A”, „548.2 A”, „Chowańce mają funkcje czysto estetyczną, wiec myśle, że łatwo będzie je wdrożyć”, „Do rolki mp4 możesz wygenerować też jakieś efekty dźwiękowe które będą pasowały w ElevenLabs na przykład i do samych gier w Loterii i Kole fortuny również”, „550.1 C”, „550.2 B”.
+
+1. **Kwestie narratora o Salonie:** o Loterii nagranie A, o Kole nagranie A (poprawione brzmienie). Wchodzą do gry razem z animacjami Salonu.
+2. **Grafiki:** Koło Fortuny C i bęben Loterii B (PixelLab). Los (550.3), strzałka (550.4) i tło Salonu (550.5) czekają na wybór.
+3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
+4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
+
+## Wersja 0.1.17 (3.11.2026)
+
+1. **Komputer: w prawej kolumnie sam czat.** Zadania od narratora nie stoją już nad czatem. Rozwijają się jako pergamin z twarzy narratora w górnym pasku, tak jak na telefonie, a kropka na twarzy pokazuje, że coś czeka do odebrania. Czat zajmuje całą wysokość kolumny, z zakładkami Globalny, Wymiana i Gildia. Uwaga testera przekazana przez autora: „nie uwazasz ze ta kratka z zadaniami powinna byc rozwijana/zwijana albo w innym miejscu typu na gorze obok encyklopedii a tam na boku po dlugosci chat z przelaczeniami”. Autor: „562 B”. Zmienia to układ z 505–508 A tylko w tej jednej kolumnie.
+
+## Odpowiedzi autora 557 (nagrania), 558 i 559 (3.11.2026)
+
+Autor: „558 C”, „559 G”, „557.1 B”, „557.2 A”, „557.3 B”, „557.4 B”, „557.5 A” i „557.6 B”.
+
+1. **Sceny pracy (PixelLab):** pierwsza klatka Kopalni to wersja C (ludek uderza kilofem w żyłę złota, lecą iskry), a Szlifierni wersja G (ludek szlifuje kamień na tarczy pod łukiem ciemnego muru). Obie leżą w `art/references/scenes/` i idą do animacji w PixelLab (`art/scenes.json`, rodzaj `scenes-animate`). Autor ocenia animacje jako MP4, zanim profesje wejdą do gry.
+2. **Nagrania narratora:** rozdział Górnictwa i Jubilerstwa dostaje nagrania 557.1 B, 557.2 A, 557.3 B, 557.4 B, 557.5 A i 557.6 B, przycięte 0,3 s po ostatnim słowie, w tej samej jakości co reszta kwestii (mono, 56 kb/s).
+
+## Wersja 0.1.16 (3.11.2026)
+
+1. **Stół rozbiórki:** karta materiału przerabia tyle sztuk, ile wybrano, choćby jedną, a ekran stołu ma zakładki Materiały, Przedmioty, Kolejka i Części, z zaznaczaniem kilku materiałów i rozbiórką przedmiotów z plecaka (zob. „Stół rozbiórki: liczba sztuk, zaznaczanie i zakładki”).
+
+## Stół rozbiórki: liczba sztuk, zaznaczanie i zakładki (3.11.2026)
+
+Autor: „Dodajmy jeszcze opcje zaznaczania roznych materialow w Stole rozbiórki oraz to co w plecaku czyli rozbieranie przedmiotów dostepne tez z pozycji stolu rozbiorki”, „Trzeba tez zwinac te wszystkie opcje jakos w zakladki zeby nie trzeba bylo tyle scrollować” oraz „Powinna być mozliwosc przerobienia pojedynczej sztuki danego materiału nie wszystkie danej jakości, a to niemożliwe można albo przerobić wszystkie sztuki albo żadnej - do poprawy”.
+
+1. **Liczba sztuk.** Karta materiału, w plecaku i na Stole rozbiórki, ma jeden licznik dla przeróbki i dla sprzedaży. „Przerób N szt.” wysyła na stół tyle sztuk, ile wybrano, choćby jedną, a reszta zostaje. Licznik zaczyna od jednej sztuki, a „wszystkie” ustawia cały stos. Serwer przyjmuje `{ key, count }` i odrzuca liczbę spoza 1 do liczby posiadanych sztuk.
+2. **Zakładki.** Ekran Stołu rozbiórki ma cztery zakładki, dwie na dwie: Materiały, Przedmioty, Kolejka i Części, z liczbami w nazwach. (brakujący szczegół) Gra pamięta wybraną zakładkę i zaznaczenia, dopóki strona jest otwarta.
+3. **Zaznaczanie materiałów.** Na zakładce Materiały okrągły znacznik przy materiale go zaznacza, a „Przerób zaznaczone (N)” wysyła zaznaczone stosy w całości, każdy jako osobne zlecenie, jak „Przerób wszystko”. Gdy zaznaczonych jest więcej niż wolnych miejsc w kolejce, przycisk czeka, a gra mówi, ilu miejsc trzeba. Stuknięcie w sam materiał otwiera jego kartę z licznikiem sztuk.
+4. **Przedmioty z plecaka.** Zakładka Przedmioty pokazuje przedmioty z plecaka do rozbiórki tak samo jak „Rozbierz kilka” w plecaku: stuknięcie zaznacza przedmiot, a „Rozbierz (N)” rozbiera zaznaczone po potwierdzeniu.
+5. (brakujący szczegół) Gdy stół nie ma nic do zrobienia, panel mówi: „Stół czeka na materiały i przedmioty z plecaka. Zdobędziesz je na wyprawach.”
+
+## Wersja 0.1.15 (3.11.2026)
+
+1. **Koło Fortuny:** przedmioty legendarne są tylko w puli najwyższej stawki postaci, a niższe stawki mają przedmioty najwyżej epickie albo same materiały (zob. „Koło Fortuny: przedmioty legendarne tylko przy najwyższej stawce”). Autor: „554 B”.
+
+## Odpowiedzi autora 554, 555 i 557 (3.11.2026)
+
+Autor: „554 B”, „555 Kopalnia: »Ścieżki schodzą głęboko pod puszczę, a w ścianach lśnią żyły kruszców. System odsłania kamienie dopiero wtedy, gdy uzna, że umiesz je wydobyć.« Reszta okey.” oraz „557.3 (Kopanie): »W Kopalni wydobędziesz kamienie szlachetne i kruszce. Po drodze Twój kilof trafi też na żyły złota.« - drobna poprawka”.
+
+1. **554 B:** przedmioty legendarne w Kole Fortuny tylko przy najwyższej stawce dnia (zob. niżej).
+2. **555:** opis Systemowej Kopalni w brzmieniu autora. Opis Systemowej Szlifierni i komunikaty o odblokowaniu Górnictwa i Jubilerstwa zostają takie, jak w propozycji.
+3. **557:** sześć kwestii rozdziału Górnictwa i Jubilerstwa idzie do nagrania, 557.3 w brzmieniu autora, reszta jak w propozycji. Autor wybiera nagrania na słuch, zanim rozdział wejdzie do gry razem z obiema profesjami.
+
+## Koło Fortuny: przedmioty legendarne tylko przy najwyższej stawce (3.11.2026)
+
+Autor: „554 B” (pytanie: przedmioty legendarne tylko przy najwyższej stawce dnia).
+
+1. **Przedmioty legendarne** czekają tylko w puli najwyższej stawki postaci. Pule niższych stawek mają przedmioty najwyżej epickie (nowe pole `belowTopItemRarity`). Najwyższa stawka liczy się jak dotąd: to najwyższa, przy której pasuje jeszcze przedmiot do legendarnego włącznie.
+2. **Stawka bez pasującego przedmiotu** ma w puli same materiały. Na 25. poziomie postaci: przy 100 zł przedmioty epickie, przy 200 zł same materiały, przy 300 zł przedmioty legendarne. Na 50. poziomie przedmioty legendarne są tylko przy 700 zł, a stawki od 400 do 600 zł mają same materiały.
+3. (brakujący szczegół) **Opis pul** w Salonie mówi o tym jednym zdaniem: „Przedmioty legendarne czekają tylko w puli najwyższej stawki.”
+4. (brakujący szczegół) **Dzisiejsze pule** liczą się od nowa przy każdym zajrzeniu, więc zasada działa od razu po wdrożeniu. Zmieniają się tylko pule niższych stawek, w których były przedmioty legendarne. Wygrane nagrody zostają u graczy, a wygrane miejsca w puli dalej się liczą.
+
+## Wersja 0.1.14 (3.11.2026)
+
+1. **Chowańce** w Sklepie Systemu: Lis i Kruk po 600 PS, Błędny ognik za 800 PS. Chowaniec idzie z postacią w scenie Walki, pieszo i wierzchem, i jest przy niej na portrecie (zob. „Chowańce w grze”). Autor: „553 zatwierdzam wszystko do gry”.
+
+## Chowańce w grze (3.11.2026, w grze od 0.1.14)
+
+Autor: „413 akcept”, „414 akcept”, „415 A”, „Zatwierdzam 540.1, 540.2 i 540.3” i „541.1, 541.2, 541.3 A wszystko” (zob. „Chowańce: odpowiedzi autora 540 i 541” niżej).
+
+1. **Sklep Systemu.** Nowa zakładka „Chowańce” (`pet` w `data/cosmetics.json`): Chowaniec: Lis i Chowaniec: Kruk po 600 PS oraz Chowaniec: Błędny ognik za 800 PS. Sześć zakładek stoi w dwóch rzędach po trzy: Ramki, Tła i Aury nad Śladami, Wierzchowcem i Chowańcami. Karta chowańca pokazuje go na portrecie własnej postaci, z założoną ramką, tłem i aurą. „Kup”, „Załóż” i „Zdejmij” działają jak przy innych kosmetykach. Postać ma przy sobie jednego chowańca naraz: założenie drugiego zdejmuje pierwszego.
+   - (brakujący szczegół) Chowaniec nie potrzebuje wierzchowca ze Stajni.
+   - (brakujący szczegół) Podgląd każdego przedmiotu na portrecie pokazuje też założonego chowańca, tak jak założoną ramkę, tło i aurę.
+   - Opisy chowańców, zdanie pod „Jak to działa?” i ceny autor zatwierdził razem z filmem z gry: „553 zatwierdzam wszystko do gry”.
+2. **Scena Walki.** Zatwierdzone animacje (8 klatek, 8 na sekundę, w skali chodu postaci) idą razem z postacią: lis kłusuje przed nią po ziemi, kruk leci przed nią na wysokości głowy, a ognik unosi się za nią. Pieszo stoją tak jak w zatwierdzonym filmie: lewy brzeg klatki lisa 92 px od lewego brzegu klatki chodu, z łapami na linii stóp postaci; kruk 96 px od niego i 6 px nad górą klatki chodu; ognik 26 px za nią i 2 px pod górą klatki, schowany za postacią.
+   - (brakujący szczegół) Konno lis idzie po ziemi przed pyskiem wierzchowca, kruk leci przed jeźdźcem na wysokości jego głowy, a ognik unosi się za wierzchowcem, na wysokości głowy i ramion jeźdźca. Miejsca liczą się od przodu albo tyłu pudełka jazdy (wierzchowiec z jeźdźcem) i od jego dołu albo góry, więc te same liczby pasują do Kuca, Konia wierzchowego, Rumaka i Tygrysa szablozębnego (sprawdzone na zrzutach). Przy tygrysie ognik leci za końcem jego długiego ogona, więc dalej od jeźdźca niż przy koniach.
+   - (brakujący szczegół) Przy figurze Systemu (wygląd bez chodu) chowaniec stoi tak samo względem jej pudełka.
+   - (brakujący szczegół) Aura nie świeci na chowańcu, a chowaniec nie zostawia śladów.
+3. **Portret.** Lis siedzi u stóp postaci, kruk na jej barku za głową, a ognik unosi się przy drugim ramieniu: w zakładce Postać, w podglądach w sklepie i na karcie postaci, którą widzą inni gracze, także w oknie ramki. Chowaniec jest przed postacią, a w zakładce Postać przygasa razem z nią, gdy widać sloty ekwipunku.
+   - (brakujący szczegół) Bark jest na każdym portrecie gdzie indziej, a stałe miejsce z filmu (zrobionego na portrecie barbarzyńcy) zasłaniało twarz drobniejszym postaciom. Każdy z 70 portretów ma więc wybrane na oko miejsce na barku za głową (`perches` w `src/client/art.js`). Kruk siada tam stopami, a ognik leci w tej samej odległości od tego miejsca co w filmie. Na portrecie barbarzyńcy oba są dokładnie tam, gdzie w filmie. Lis siedzi na każdym portrecie w tym samym miejscu u stóp, jak w filmie.
+4. **Przy wyłączonych animacjach** chowaniec stoi na pierwszej klatce, w scenie i na portrecie.
+5. **Bez migracji bazy.** Chowaniec to nowe miejsce w stanie kosmetyków postaci (`pet`), a karta postaci podaje go innym graczom.
+6. **Zapis.** Arkusze leżą bez zmian w `src/client/art/pets`: `fox-trot`, `raven-fly` i `wisp` po 8 klatek 64 × 64 oraz `fox-portrait`, `raven-portrait` i `wisp-portrait` po 8 klatek 32 × 32. Miejsca są w danych (`pet.foot`, `pet.ride` i `pet.portrait`), a pola opisują `$comment` w `data/cosmetics.json` i `data/schemas/cosmetics.schema.json`. Walidator sprawdza, że arkusze są i mają tyle klatek, ile podają dane. Scenę rysuje `src/client/scenes.js` (`companion`), a portret `src/client/cosmetics.js` (`petLayer`).
+7. **Sprawdzone w przeglądarce** na telefonie (390×844) i komputerze (1366×768): zakładka Chowańce, zakup przyciskiem, każdy chowaniec pieszo i na czterech wierzchowcach, przy figurze Systemu, na portrecie bez ramki i w Złotej ramce, na karcie postaci i przy wyłączonych animacjach, bez błędów strony i brakujących grafik. Wprowadzenie przechodzi (`tools/first-steps.cjs`).
+
+## Wersja 0.1.13 (3.11.2026)
+
+1. **Salon Gier na ekranie:** po „Kup los” los (550.3 D) wpada do bębna Loterii (550.2 B), a po zakręceniu Koło Fortuny (550.1 C) obraca się około 3 sekund pod strzałką (550.4 B) i staje na złotym klinie przy wygranej albo na karmazynowym przy przegranej (551: „Animacje do Salonu są okey”). Stuknięcie pomija animację, a przy wyłączonych „Animacjach” wynik jest od razu.
+2. **Dźwięki** Koła (552.1 A), wygranej (552.2 B), przegranej (552.3 B) i losu (552.4 B). Ich głośność jest wyrównana do reszty efektów gry (szczyt około −2 dB); przegrana B była nagrana bardzo cicho.
+3. **Tło Salonu** (550.5 D) stoi przygaszone za kartą Szczęsnego, jak miejsca profesji za swoimi kartami. Miejsce Osady może mieć takie tło w danych (`backdrop` w `data/settlement.json`).
+4. **Kwestie narratora** o Loterii (548.1 A) i o Kole (548.2 A): przy pierwszym wejściu do Salonu po rozdziale Osady narrator wskazuje zakładki obu gier.
+5. **Kto gra dziś w Loterii** (zob. „Loteria: kto gra dziś”).
+6. **Koło Fortuny: 10% szans** zamiast 50%, z nagrodami jak dotąd (zob. „Koło Fortuny: 10% szans”).
+
+## Koło Fortuny: 10% szans (3.11.2026)
+
+Autor: „Koło fortuny proszę znerfić mocno i dać 10% szans”, „Nastepnie sprawdzić balans tego koła fortuny” oraz „Potrzebny szybki nerf z wdrożeniem na main jeśli chodzi o koło fortuny”.
+
+1. **Szansa wygranej** to 10% przy każdej stawce (wcześniej 50%, 542 C).
+2. **Nagrody się nie zmieniają.** Dotąd nagroda była warta najwyżej tyle, ile średnio kosztuje wygrana (stawka podzielona przez szansę), czyli dwie stawki. Przy 10% ta reguła pozwoliłaby na nagrody warte dziesięć stawek, a to nie byłby nerf. Nowe pole `worthCap` trzyma górną granicę na dwóch stawkach, więc pule, stawki i przedmioty są takie jak dotąd, a Koło oddaje średnio najwyżej jedną piątą postawionego złota.
+3. **Dzisiejsze pule** zostają, bo nagrody liczą się tak samo; zmienia się tylko szansa przy następnych obrotach.
+4. **Balans** sprawdzam po wdrożeniu; wynik i propozycje trafią do autora.
+
+## Loteria: kto gra dziś (3.11.2026)
+
+Autor: „Dodaj do loterii możliwość dla gracza, żeby widzieć kto bierze w niej udział.”
+
+1. **Lista** stoi w zakładce Loterii pod dzisiejszą pulą, zwinięta pod nagłówkiem „Kto gra dziś (N)”. Pokazuje imiona postaci, które kupiły dziś los, w kolejności zakupu, ze skrótem gildii.
+2. **Stuknięcie imienia** otwiera kartę postaci, jak w czacie.
+3. (brakujący szczegół) Lista jest widoczna dla każdego, kto wejdzie do Salonu, także bez własnego losu, i znika o północy razem z losami po losowaniu.
+
+## Wersja 0.1.12 (3.11.2026)
+
+1. **Mikstury na czas** schodzą przy „Odbierz raport” także wtedy, gdy postać wypiła je w trakcie wyprawy albo tuż przed raportem, a „Wypij” w plecaku bierze wybraną liczbę sztuk (zob. „Mikstury na czas: czas schodzi przy »Odbierz raport«”).
+2. **Targowisko** bierze 1% ceny sprzedaży zamiast 5% (zob. „Targowisko: 1% ceny sprzedaży”).
+
+## Targowisko: 1% ceny sprzedaży (3.11.2026)
+
+Autor: „Niech Targowisko bierze 1% ceny sprzedaży.”
+
+1. **Prowizja** spada z 5% (239 A) do 1% ceny, za którą przedmiot się sprzedał. Liczy się ją jak dotąd w pełnych sztukach złota, w górę: przy cenie do 100 zł Targowisko bierze 1 zł, przy 101–200 zł 2 zł.
+2. **Oferty wystawione wcześniej** rozliczają się już po nowemu, bo prowizję liczy się przy sprzedaży.
+3. **Teksty w grze** („Przy sprzedaży Targowisko bierze 1% ceny”) biorą liczbę z danych, więc zmieniły się same.
+
+## Mikstury na czas: czas schodzi przy „Odbierz raport” (3.11.2026)
+
+Autor: „zbugowane są bonusy do szybkości źle pokazują raz wypije miksture w czasie wyprawy i mi nie zejdzie drugi raz wypije 4 na raz i mi wzrośnie o 30 minut czas użycia” oraz „chodzi o mniejszą miksture szybkości i im pdoobne, przyjrzyj się im. Ten czas powinien schodzić dopiero po kliknięciu Odbierz raport i to w wysokości zadanej przed wyprawą, nawet jeśli mikstury zostały zażyte w czasie wyprawy lub na chwilę przed Odebraniem raportu.”
+
+1. **Przyczyna.** Wyprawa ustalała przy wymarszu, ile czasu mikstur obejmie. Mikstura wypita w trakcie wyprawy albo po jej końcu, przed raportem, nie działała w jej walkach, a jej czas nie schodził przy raporcie. Na przykład cztery Mniejsze mikstury szybkości wypite w trakcie 30-minutowej wyprawy zostawiały po raporcie 120 minut zamiast 90.
+2. **Teraz.** Przy „Odbierz raport” wyprawa bierze mikstury działające w tej chwili: wypite przed wymarszem, w trakcie wyprawy i po powrocie. Ich bonus działa w walkach wyprawy od jej początku, a z ich czasu schodzi długość wyprawy wybrana przed wymarszem, najwyżej tyle, ile zostało. Do raportu czas stoi.
+3. **Wyprawa Drużyny.** Jej walki są wspólne dla wszystkich, którzy poszli, i ustala je wymarsz. Liczą się więc mikstury działające przy wymarszu i tylko ich czas schodzi przy raporcie. Mikstura wypita w trakcie takiej wyprawy działa od następnej, o czym mówi komunikat po wypiciu.
+4. **Odwołana wyprawa** nie zużywa czasu mikstur, jak dotąd.
+5. **Kilka naraz.** W oknie mikstury na czas „Wypij” bierze wybraną liczbę sztuk („Wypij 4 szt.”), a każda dodaje swoje minuty. Wcześniej przycisk wypijał jedną sztukę bez względu na liczbę wybraną do sprzedaży, więc „4 naraz” dawały tylko 30 minut. Miksturę leczenia pije się dalej po jednej.
+6. **Bez górnego limitu.** Autor: „Niech nie bedzie maksymalnego limitu na trwanie bonusów typu z mikstur, bo to też może powodowac błąd jesli jest taki limit.” Takiego limitu nie było i nie ma: każda wypita mikstura dodaje swoje minuty do pozostałych.
+
+## Odpowiedzi autora 550.3–550.5, 551 i 552 (3.11.2026)
+
+Autor: „550.3 D”, „550.4 B”, „550.5 D”, „552.1 A”, „552.2 B”, „552.3 B”, „552.4 B”, „552.5 żaden sie nie nadaje zbyt skrzeczące, wysokie, rażące i nieprzyjemne dla ucha” oraz „Animacje do Salonu są okey”.
+
+1. **Grafiki Salonu (PixelLab):** los Loterii D, strzałka nad Kołem B, tło Salonu D.
+2. **Animacje Salonu (551)** zostają takie jak na filmie.
+3. **Dźwięki Salonu (ElevenLabs):** kręcące się Koło A, wygrana B, przegrana B, los wpadający do bębna B.
+4. **Świst między scenami filmu (552.5):** żadna z trzech wersji. Nowe wersje D, E i F są niższe i miękkie, a autor wybrał „552.5 E”. Głębokie wersje (prawie sam bas) odpadły, bo na głośniku telefonu byłyby niemal niesłyszalne.
+
+## Salon Gier: animacje, tło i kwestia o Kole (3.11.2026)
+
+Autor: „Trzeba zrobić animację jeszcze do koła fortuny wyświetlającą się na ekranie i do kupowania losu, żeby nadać temu estetyki”, „543.2 Drugie zdanie poprawka - "Wyższa stawka to wyższe nagrody, ale i większy ból po przegranej"”, „548.1 A, 548.2 wygenerowałeś zanim podałem poprawki, więc bedziesz musiał jeszcze raz” oraz „Zrób też tło do Salonu Gier”.
+
+1. **Kwestie narratora.** O Loterii zostaje nagranie A (548.1 A). Kwestia o Kole ma nowe drugie zdanie: „Kołem Fortuny kręcisz za sto sztuk złota albo więcej, setkami. Wyższa stawka to wyższe nagrody, ale i większy ból po przegranej.” Nagrywam ją od nowa, a autor wybiera nagranie na słuch.
+2. **Animacje (brakujący szczegół: najprostsza postać).**
+   - Po „Zakręć Kołem” na ekranie pojawia się Koło Fortuny i kręci się, coraz wolniej. Ma 8 równych klinów, złotych i karmazynowych na zmianę, a nad nim stoi strzałka. Wygrana zatrzymuje je na złotym klinie, przegrana na karmazynowym, i dopiero wtedy pojawia się wynik.
+   - Po „Kup los” los leci do bębna Loterii, a bęben się zakręca.
+   - Koło, strzałkę, los i bęben rysuje PixelLab w stylu budynku Salonu. Autor ocenia je po jednym, a gotowe animacje dostaje jako MP4.
+3. **Tło Salonu.** PixelLab rysuje wnętrze Salonu (192 × 96, w stylu Systemowej Szlifierni). Tło stoi przygaszone za kartą Szczęsnego, tak jak miejsca profesji za ich kartami, więc nie wydłuża ekranu.
+
 ## Górnictwo i Jubilerstwo: budowa (3.11.2026, odpowiedzi 531–539)
 
 Obie profesje otwierają się razem, od 25. poziomu postaci (531, 533). Na zakładce Profesje stoi pięć kwadratów w trzech rzędach: na górze zbierackie Zielarstwo i Górnictwo, pod nimi Alchemia i Jubilerstwo, które pracują na ich zbiorach, a na dole Rzemieślnictwo (`rows` w `data/professions.json`). Do 25. poziomu nowe kwadraty mają kłódkę i „od poz. 25”, jak kiedyś Rzemieślnictwo. W raporcie z awansem na 25. poziom System mówi: „Odblokowano Górnictwo. Systemowa Kopalnia czeka w zakładce Profesje.” i „Odblokowano Jubilerstwo. Systemowa Szlifiernia czeka w zakładce Profesje.” (szkic do poprawy przez autora, jak opisy miejsc, kamieni i zdania raportów).

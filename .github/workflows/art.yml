@@ -2,12 +2,14 @@
 # evolution portraits, the walks' start frames, the creatures, materials and
 # busts, the places' circles, the lands and the Osada's buildings with PixelLab
 # (kinds evolutions-, walk-starts-, monsters-, materials-, residents-, areas-,
-# lands-, settlement-, pets-, pets-portrait-, gems-, places- and professions-pixellab,
+# lands-, settlement-, pets-, pets-portrait-, gems-, places-, professions-, salon-,
+# salon-small-, scenes- and scenes-hd-pixellab,
 # "variants" are calls, of one to 64 versions each by size,
 # tools/generate-portraits-pixellab.mjs), or the
 # walks animated by PixelLab (kind walks-pixellab, tools/animate-walks.mjs),
 # the mounts posed frame by frame (mounts-skeleton, tools/animate-mounts-skeleton.mjs),
 # the Sklep Systemu's pets animated by PixelLab (pets-animate, tools/animate-mounts.mjs),
+# the professions' work scenes animated with their backgrounds (scenes-animate),
 # and keeps them on the art-drafts branch for review. Run by hand from the
 # Actions tab or the API; it never deploys anything. Needs the
 # RETRO_DIFFUSION_API_KEY secret, and PIXELLAB_API_KEY for the walks.
@@ -40,7 +42,12 @@ on:
           - gems-pixellab
           - places-pixellab
           - professions-pixellab
+          - salon-pixellab
+          - salon-small-pixellab
+          - scenes-pixellab
+          - scenes-hd-pixellab
           - pets-animate
+          - scenes-animate
           - materials
           - resources
           - narrator
@@ -132,7 +139,7 @@ jobs:
             node tools/animate-mounts-skeleton.mjs "${args[@]}"
             exit
           fi
-          if [ "$KIND" = "evolutions-pixellab" ] || [ "$KIND" = "walk-starts-pixellab" ] || [ "$KIND" = "monsters-pixellab" ] || [ "$KIND" = "materials-pixellab" ] || [ "$KIND" = "residents-pixellab" ] || [ "$KIND" = "areas-pixellab" ] || [ "$KIND" = "lands-pixellab" ] || [ "$KIND" = "settlement-pixellab" ] || [ "$KIND" = "pets-pixellab" ] || [ "$KIND" = "pets-portrait-pixellab" ] || [ "$KIND" = "gems-pixellab" ] || [ "$KIND" = "places-pixellab" ] || [ "$KIND" = "professions-pixellab" ]; then
+          if [ "$KIND" = "evolutions-pixellab" ] || [ "$KIND" = "walk-starts-pixellab" ] || [ "$KIND" = "monsters-pixellab" ] || [ "$KIND" = "materials-pixellab" ] || [ "$KIND" = "residents-pixellab" ] || [ "$KIND" = "areas-pixellab" ] || [ "$KIND" = "lands-pixellab" ] || [ "$KIND" = "settlement-pixellab" ] || [ "$KIND" = "pets-pixellab" ] || [ "$KIND" = "pets-portrait-pixellab" ] || [ "$KIND" = "gems-pixellab" ] || [ "$KIND" = "places-pixellab" ] || [ "$KIND" = "professions-pixellab" ] || [ "$KIND" = "salon-pixellab" ] || [ "$KIND" = "salon-small-pixellab" ] || [ "$KIND" = "scenes-pixellab" ] || [ "$KIND" = "scenes-hd-pixellab" ]; then
             args=(--kind "${KIND%-pixellab}" --ids "$IDS" --calls "$VARIANTS" --max-cost "$MAX_COST")
             if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
             node tools/generate-portraits-pixellab.mjs "${args[@]}"
@@ -140,6 +147,12 @@ jobs:
           fi
           if [ "$KIND" = "pets-animate" ]; then
             args=(--config art/pets.json --group pets --out art/drafts/pets-animate --title "Animacje chowańców (PixelLab)" --label Chowaniec --ids "$IDS" --variants "$VARIANTS" --max-cost "$MAX_COST")
+            if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
+            node tools/animate-mounts.mjs "${args[@]}"
+            exit
+          fi
+          if [ "$KIND" = "scenes-animate" ]; then
+            args=(--config art/scenes.json --group scenes --out art/drafts/scenes-animate --title "Animacje scen pracy (PixelLab)" --label Scena --ids "$IDS" --variants "$VARIANTS" --max-cost "$MAX_COST")
             if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
             node tools/animate-mounts.mjs "${args[@]}"
             exit

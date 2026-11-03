@@ -5054,6 +5054,80 @@ a.camp-level-button {
   opacity: 0.55;
 }
 
+/* The Stół rozbiórki's four tabs (craft-table.js), two by two. */
+.craft-tabs .segmented-option {
+  padding: 0 4px;
+}
+
+.craft-tabs .segmented-option:nth-child(2n + 1) {
+  border-left: 0;
+}
+
+.craft-tabs .segmented-option:nth-child(n + 3) {
+  border-top: 1px solid var(--system-line);
+}
+
+.craft-tab {
+  display: grid;
+  gap: 10px;
+}
+
+.craft-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* A material on the Materiały tab: its card opens from the row, and the
+   round tick at its end marks it. */
+.craft-row--pick {
+  padding: 4px 6px 4px 10px;
+}
+
+.craft-open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.craft-mark {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--system-line);
+  border-radius: 50%;
+  background: transparent;
+  color: transparent;
+}
+
+.craft-mark[aria-pressed='true'] {
+  border-color: var(--system);
+  background: var(--system);
+  color: var(--bg-deep);
+}
+
+.craft-mark:disabled {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+.craft-actions {
+  display: grid;
+  gap: 10px;
+}
+
 .craft-art {
   display: flex;
   flex: none;
@@ -8217,6 +8291,12 @@ a.profession-square:active {
   background: var(--land, none) 0 0 / var(--land-width) var(--land-height) repeat-x, var(--bg-deep);
   image-rendering: pixelated;
   animation: scene-land var(--land-duration) linear infinite;
+  /* Where the figures stand, the bottom of each one's box over the scene's:
+     the System's figure, the character's own walking frame and the ride. A
+     pet keeps to its figure's box (scenes.js companion). */
+  --figure-bottom: 22px;
+  --walker-bottom: 28px;
+  --ride-bottom: 18px;
 }
 @keyframes scene-land {
   to {
@@ -8241,11 +8321,18 @@ a.profession-square:active {
   position: absolute;
   z-index: 2;
   left: calc(50% - var(--frame) / 2);
-  bottom: 22px;
+  bottom: var(--figure-bottom);
 }
 /* The character's own figure has less room under its feet in the frame. */
 .scene-walker--own {
-  bottom: 28px;
+  bottom: var(--walker-bottom);
+}
+/* A pet on the way (scenes.js companion): its frames beside the figure, at
+   the place its data gives against the figure's box; in front of the figure,
+   or behind it, put before it. */
+.scene-pet {
+  position: absolute;
+  z-index: 2;
 }
 /* The aura on the way (scenes.js lightWalker): the walking figure, or the
    rider with the mount, in its light, and its motes about it. */
@@ -8265,7 +8352,7 @@ a.profession-square:active {
 /* Riding: about the rider and the mount, in the ride's box. */
 .aura-motes.scene-aura-motes--ride {
   left: calc(50% - var(--ride-width) / 2);
-  bottom: 18px;
+  bottom: var(--ride-bottom);
   width: var(--ride-width);
   height: var(--ride-height);
 }
@@ -8308,7 +8395,7 @@ a.profession-square:active {
   position: absolute;
   z-index: 2;
   left: calc(50% - var(--ride-width) / 2);
-  bottom: 18px;
+  bottom: var(--ride-bottom);
   width: var(--ride-width);
   height: var(--ride-height);
 }
@@ -10326,6 +10413,17 @@ a.profession-square:active {
   color: var(--system);
 }
 
+/* Today's players of the Loteria, folded under their count: the names in
+   a wrapped row, each with its guild's tag. */
+.casino-player-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
 .casino-last,
 .casino-result {
   display: grid;
@@ -10353,6 +10451,152 @@ a.profession-square:active {
 
 .casino-prize--won {
   opacity: 0.55;
+}
+
+/* The games on the screen (casino.js showOnScreen): over the page, dimmed,
+   the Wheel turning under its pointer, slower and slower, with a gold glow
+   for a win and a darker wheel for a loss; the ticket falling into the
+   Loteria's drum, which rocks with it. A tap ends it. */
+.casino-show {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  background: rgba(6, 9, 5, 0.7);
+  animation: casino-show-in 0.2s ease-out;
+  cursor: pointer;
+}
+.casino-show--out {
+  animation: casino-show-out 0.25s ease-in forwards;
+}
+@keyframes casino-show-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes casino-show-out {
+  to {
+    opacity: 0;
+  }
+}
+.casino-show-wheel {
+  position: relative;
+  width: 256px;
+  height: 256px;
+}
+.casino-show-disc {
+  display: block;
+  width: 256px;
+  height: 256px;
+  image-rendering: pixelated;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.1, 0.62, 0.12, 1);
+}
+.casino-show-pointer {
+  position: absolute;
+  z-index: 2;
+  left: calc(50% - 32px);
+  top: -44px;
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.6));
+}
+.casino-show-glow {
+  position: absolute;
+  inset: -36px;
+  border-radius: 50%;
+  opacity: 0;
+}
+.casino-show--win .casino-show-glow {
+  background: radial-gradient(circle, rgba(255, 215, 106, 0.6), rgba(255, 215, 106, 0) 68%);
+  animation: casino-glow 0.9s ease-out forwards;
+}
+@keyframes casino-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.75;
+    transform: scale(1.08);
+  }
+}
+.casino-show--loss .casino-show-disc {
+  filter: brightness(0.6) saturate(0.6);
+  transition: filter 0.35s;
+}
+.casino-show-lottery {
+  position: relative;
+  width: 256px;
+  height: 340px;
+}
+.casino-show-drum {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 256px;
+  height: 256px;
+  image-rendering: pixelated;
+  transform-origin: 50% 85%;
+}
+.casino-show-ticket {
+  position: absolute;
+  left: calc(50% - 48px);
+  top: 0;
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+  opacity: 0;
+}
+.casino-show-lottery--go .casino-show-ticket {
+  animation: casino-ticket 0.85s cubic-bezier(0.45, 0, 0.8, 0.4) forwards;
+}
+.casino-show-lottery--go .casino-show-drum {
+  animation: casino-drum 0.7s ease-in-out 0.8s;
+}
+.casino-show-lottery--done .casino-show-ticket {
+  animation: none;
+  opacity: 0;
+}
+.casino-show-lottery--done .casino-show-drum {
+  animation: none;
+}
+@keyframes casino-ticket {
+  0% {
+    opacity: 0;
+    transform: translateY(-40px) rotate(-14deg);
+  }
+  18% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(150px) rotate(10deg) scale(0.7);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(170px) rotate(12deg) scale(0.55);
+  }
+}
+@keyframes casino-drum {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  55% {
+    transform: rotate(4deg);
+  }
+  80% {
+    transform: rotate(-2deg);
+  }
 }
 
 /* The pool of a stake just chosen is on its way: the old one waits dimmed. */
@@ -10599,6 +10843,15 @@ a.profession-square:active {
   padding: 12px var(--gutter) calc(20px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--bark-line);
   background: var(--surface);
+}
+
+/* The same on the Stół rozbiórki's Przedmioty tab, in the page's flow. */
+.salvage-bar--inline {
+  position: static;
+  margin: 0;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--line);
+  background: none;
 }
 
 /* The Zaklinaczka's hints on the affixes (settlement.js). */
@@ -11481,7 +11734,7 @@ a.profession-square:active {
   line-height: 1.2;
 }
 
-/* The Sklep Systemu (screens/shop.js): the Punkty Systemu, three tabs and a
+/* The Sklep Systemu (screens/shop.js): the Punkty Systemu, its tabs and a
    card for each cosmetic, its preview on the character's own portrait at
    the frames' own size, 120 × 160. */
 .shop-points {
@@ -11499,17 +11752,22 @@ a.profession-square:active {
   color: var(--system);
 }
 
-/* Five tabs in two rows: three over two, each row filling the width. */
+/* Six tabs in two rows, three over three, with a line between the rows and
+   none at the start of a row; narrower padding, so "Wierzchowiec" fits. */
 .shop-tabs {
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.shop-tabs > * {
-  grid-column: span 2;
+.shop-tabs .segmented-option {
+  padding: 0 4px;
+}
+
+.shop-tabs > :nth-child(3n + 1) {
+  border-left: 0;
 }
 
 .shop-tabs > :nth-child(n + 4) {
-  grid-column: span 3;
+  border-top: 1px solid var(--system-line);
 }
 
 .shop-items {
@@ -11717,6 +11975,44 @@ a.profession-square:active {
 .calm .aura-motes span {
   animation: none;
   opacity: 0.7;
+}
+
+/* A pet on the portrait (cosmetics.js petLayer): a box where the figure is
+   drawn (as .portrait-art .sprite--portrait: 4% down, the 96 × 128 figure
+   contained in the rest, at its bottom), and in it the pet at its place,
+   in percent of the figure, its frames played in steps. With the
+   animations off it stands on its first frame. */
+.portrait-pet-space {
+  position: absolute;
+  inset: 4% 0 0;
+  container-type: size;
+  pointer-events: none;
+}
+
+.portrait-pet-figure {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: min(100cqw, 75cqh);
+  height: min(100cqh, 133.3333cqw);
+  translate: -50% 0;
+}
+
+.portrait-pet {
+  position: absolute;
+  background: var(--sheet) 0 0 / var(--sheet-width) 100% no-repeat;
+  image-rendering: pixelated;
+  animation: portrait-pet var(--duration) steps(var(--frames)) infinite;
+}
+
+@keyframes portrait-pet {
+  to {
+    background-position: var(--sheet-end) 0;
+  }
+}
+
+.calm .portrait-pet {
+  animation: none;
 }
 
 /* The frame over the portrait art, under the slots and the eye, and its
@@ -12164,19 +12460,6 @@ a.profession-square:active {
     radial-gradient(100% 30% at 50% 100%, rgba(201, 161, 74, 0.05), transparent 70%),
     linear-gradient(180deg, #141a10 0%, var(--bg-deep) 50%, #0a0d08 100%);
   box-shadow: -10px 0 30px rgba(0, 0, 0, 0.3);
-}
-
-.side .side-quests {
-  flex: 0 1 auto;
-  max-height: 55%;
-  overflow-y: auto;
-  border-radius: 4px;
-  color: #33281c;
-}
-
-.side .quests-page {
-  max-height: none;
-  overflow: visible;
 }
 
 .side-chat {

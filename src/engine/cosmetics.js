@@ -5,15 +5,18 @@
 // bought it, as its Punkty Systemu are. A frame and a background dress the
 // portrait, a mount's look (mountSkin) changes the Stajnia's mount in the
 // Walka scene, never what the mount does, an aura lights the figure on the
-// portrait and in the Walka scene, and a trail (the author: "416 akcept",
-// "417 akcept", "418 akcept") leaves glowing footprints behind it there.
+// portrait and in the Walka scene, a trail (the author: "416 akcept",
+// "417 akcept", "418 akcept") leaves glowing footprints behind it there,
+// and a pet ("chowaniec": the fox, the raven and the will-o'-the-wisp; 413,
+// 414, "415 A") goes with the character in the Walka scene and keeps it
+// company on the portrait.
 //
 // Stored state (characters.cosmetics): {"owned": [ids], "frame": id,
-// "background": id, "mountSkin": id, "aura": id, "trail": id,
+// "background": id, "mountSkin": id, "aura": id, "trail": id, "pet": id,
 // "nameFromFrame": true}.
 
 // The places a cosmetic is worn in, one of each kind at a time.
-export const COSMETIC_KINDS = ['frame', 'background', 'mountSkin', 'aura', 'trail'];
+export const COSMETIC_KINDS = ['frame', 'background', 'mountSkin', 'aura', 'trail', 'pet'];
 
 const itemOf = (id, content) => (typeof id === 'string' ? (content.cosmeticsById?.[id] ?? null) : null);
 
@@ -32,6 +35,7 @@ export function cosmeticsOf(stored, content) {
     mountSkin: worn('mountSkin'),
     aura: worn('aura'),
     trail: worn('trail'),
+    pet: worn('pet'),
     nameFromFrame: stored?.nameFromFrame === true,
   };
 }

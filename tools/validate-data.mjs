@@ -1358,12 +1358,16 @@ function checkCasino(data) {
   if (!places.some((place) => place.resident === casino.resident)) errors.push(`settlement.json: gospodarz Salonu ${casino.resident} nie ma miejsca na planszy`);
   const { wheel, lottery, texts } = casino;
   // A prize is worth more than the stake and at most what a win costs on
-  // average (the stake over the chance), so the chance must stay under 100%.
+  // average (the stake over the chance), so the chance must stay under 100%;
+  // the prize cap in stakes no higher than that either.
   if (wheel.chance >= 1) errors.push('settlement.json: szansa Koła musi być mniejsza niż 100%, żeby nagroda mogła być warta więcej niż stawka');
+  else if (wheel.worthCap * wheel.chance > 1) errors.push('settlement.json: casino.wheel.worthCap nie może przekraczać 1 / chance, bo Koło oddawałoby średnio więcej, niż bierze');
   const rarities = data.rarities.map((rarity) => rarity.id);
   if (!rarities.includes(wheel.itemRarity)) errors.push(`settlement.json: casino.wheel.itemRarity to nieznana rzadkość ${wheel.itemRarity}`);
   if (!rarities.includes(wheel.topItemRarity)) errors.push(`settlement.json: casino.wheel.topItemRarity to nieznana rzadkość ${wheel.topItemRarity}`);
   else if (rarities.indexOf(wheel.topItemRarity) < rarities.indexOf(wheel.itemRarity)) errors.push('settlement.json: casino.wheel.topItemRarity nie może być niższa niż itemRarity');
+  if (!rarities.includes(wheel.belowTopItemRarity)) errors.push(`settlement.json: casino.wheel.belowTopItemRarity to nieznana rzadkość ${wheel.belowTopItemRarity}`);
+  else if (rarities.indexOf(wheel.belowTopItemRarity) < rarities.indexOf(wheel.itemRarity) || rarities.indexOf(wheel.belowTopItemRarity) > rarities.indexOf(wheel.topItemRarity)) errors.push('settlement.json: casino.wheel.belowTopItemRarity musi leżeć od itemRarity do topItemRarity');
   for (const id of Object.keys(wheel.materialRarities)) if (!rarities.includes(id)) errors.push(`settlement.json: casino.wheel.materialRarities ma nieznaną rzadkość ${id}`);
   if (lottery.base < 0 || lottery.ticket < 1) errors.push('settlement.json: casino.lottery potrzebuje ceny losu i bazy puli');
   const needs = { lotteryAbout: ['ticket', 'base'], lotteryToday: ['pot', 'tickets'], lotteryBuy: ['ticket'], lotteryEarlier: ['date'], announce: ['name', 'gold'], wheelAbout: ['step', 'chance'], wheelPool: ['stake', 'left', 'all'], wheelStake: ['stake', 'chance'], wheelSpin: ['stake'], won: ['prize'] };
@@ -1376,11 +1380,21 @@ function checkCasino(data) {
   return errors;
 }
 
+// The width and the height of a PNG file of the page (src/client), from its
+// header, or null when there is no such file.
+function pngSize(file) {
+  const url = new URL(file, CLIENT_DIR);
+  if (!existsSync(url)) return null;
+  const png = readFileSync(url);
+  return { width: png.readUInt32BE(16), height: png.readUInt32BE(20) };
+}
+
 // The Sklep Systemu (data/cosmetics.json): a frame's and a background's
 // picture is there (art/cosmetics; an aura and a trail are drawn by the game), a frame's window and the points of its
 // light lie inside its 120 × 160 picture, the light that needs points has
-// them, and a mount's look does not take the key of a Stajnia's mount, under
-// which its trot would stand in walk.mounts (animations.json).
+// them, a mount's look does not take the key of a Stajnia's mount, under
+// which its trot would stand in walk.mounts (animations.json), and a pet's
+// two sheets (art/pets) are there, each its frames side by side.
 function checkCosmetics(data) {
   const errors = [];
   const FRAME = { width: 120, height: 160 };
@@ -1394,6 +1408,19 @@ function checkCosmetics(data) {
       errors.push(`${where(item.id)}: brak obrazka src/client/art/cosmetics/${item.art}.png`);
     }
     if (item.kind === 'mountSkin' && (mounts.has(item.id) || mounts.has(item.art))) errors.push(`${where(item.id)} ma id albo obrazek wierzchowca ze Stajni`);
+    if (item.kind === 'pet') {
+      for (const key of ['walk', 'portrait']) {
+        const { file, size, frames } = item.pet[key];
+        const found = pngSize(file);
+        if (!found) errors.push(`${where(item.id)}: brak arkusza src/client/${file}`);
+        else if (found.width !== size * frames || found.height !== size) {
+          errors.push(`${where(item.id)}: arkusz ${file} ma ${found.width} × ${found.height}, a ${frames} klatek po ${size} × ${size} to ${size * frames} × ${size}`);
+        }
+      }
+      // Counted from the portrait's corner, the frame starts on the portrait.
+      const { anchor, x, y } = item.pet.portrait;
+      if (!anchor && !(x >= 0 && x < 96 && y >= 0 && y < 128)) errors.push(`${where(item.id)}: chowaniec poza portretem 96 × 128`);
+    }
     if (item.kind !== 'frame') continue;
     const [left, top, right, bottom] = item.window;
     if (!(left < right && top < bottom && inside([right, bottom]))) errors.push(`${where(item.id)}: okno ramki musi leżeć w obrazku ${FRAME.width} × ${FRAME.height}`);

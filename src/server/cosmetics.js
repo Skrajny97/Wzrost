@@ -1,8 +1,9 @@
 // The Sklep Systemu (data/cosmetics.json; cosmetics.js in the engine), from
-// the stall in the top bar: frames and backgrounds of the portrait and the
-// look of the Stajnia's mount, bought for Punkty Systemu, each for good and
-// for the character that bought it (characters.cosmetics), and worn or
-// taken off at will. With a frame worn, the character's name may show in
+// the stall in the top bar: frames and backgrounds of the portrait, the
+// look of the Stajnia's mount, auras, trails and pets (chowańce), bought
+// for Punkty Systemu, each for good and for the character that bought it
+// (characters.cosmetics), and worn or taken off at will, one of a kind at a
+// time. With a frame worn, the character's name may show in
 // the frame's colour wherever names show, as its guild's tag does
 // (nameColorOf beside guildTagSql).
 

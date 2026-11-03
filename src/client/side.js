@@ -1,11 +1,11 @@
-// The side column on a computer (474 A): the narrator's quests on top and
-// the chat under them, always in sight beside the game. On a phone it is
-// not there: the quests unroll from the narrator's face in the top bar and
-// the chat is in the Społeczność.
+// The side column on a computer (474 A): the chat the whole length of the
+// column, always in sight beside the game, its rooms in tabs on top. The
+// narrator's quests unroll from his face in the top bar, as on a phone (the
+// author: "562 B", after a tester's note that they took the column's top).
+// On a phone the column is not there and the chat is in the Społeczność.
 
 import { $, fill, h } from './dom.js';
 import { desktopLayout } from './layout-mode.js';
-import { mountQuestsPanel } from './quests.js';
 import { mountChat } from './screens/community.js';
 import { isUnlocked, state, unlockInfo } from './state.js';
 
@@ -13,7 +13,7 @@ import { isUnlocked, state, unlockInfo } from './state.js';
 const roomy = window.matchMedia('(min-width: 1280px)');
 roomy.addEventListener('change', () => updateSide());
 
-let shown = null; // { stopQuests, chat, chatBody, bar, scroller } while the column is there
+let shown = null; // { chat, chatBody, bar, scroller } while the column is there
 let measured = false;
 
 // The column starts under the top bar, whose height changes with what it
@@ -38,12 +38,11 @@ export function updateSide() {
   }
   measureTopbar();
   if (!shown) {
-    const quests = h('section', { class: 'side-quests narrator-sheet', 'aria-label': 'Zadania od narratora' });
     const bar = h('div', { class: 'side-chat-bar' });
     const chatBody = h('div', { class: 'side-chat-body' });
     const scroller = h('div', { class: 'side-chat-scroll' }, chatBody);
-    fill(side, quests, h('section', { class: 'side-chat', 'aria-label': 'Czat' }, h('h2', { class: 'side-title', text: 'Czat' }), bar, scroller));
-    shown = { stopQuests: mountQuestsPanel(quests), chat: null, chatBody, bar, scroller };
+    fill(side, h('section', { class: 'side-chat', 'aria-label': 'Czat' }, h('h2', { class: 'side-title', text: 'Czat' }), bar, scroller));
+    shown = { chat: null, chatBody, bar, scroller };
   }
   if (!shown.chat && isUnlocked('community')) {
     shown.chat = mountChat(shown.chatBody, { bar: shown.bar, id: 'side-chat', scroller: shown.scroller });
@@ -55,7 +54,6 @@ export function updateSide() {
 
 function hideSide() {
   if (!shown) return;
-  shown.stopQuests();
   shown.chat?.unmount();
   fill($('#side'));
   shown = null;

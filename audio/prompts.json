@@ -530,7 +530,14 @@
       },
       "craft": { "text": "three hard blows of a heavy hammer on a thick block of iron, each blow a short dry heavy clank with a thud that stops at once, no ringing tail, no bell tone, no echo, close up, no music", "seconds": 2, "influence": 0.8 },
       "craft-fail": { "text": "one very loud heavy hammer blow on metal at the very start, the loudest part of the sound, then the metal cracks and a few small broken pieces fall onto a stone floor, close up, no echo, no music", "seconds": 1.8, "influence": 0.8 },
-      "evolution-transform": { "text": "a magical transformation: a soft shimmering swell of bells and airy wordless voices rising for one and a half seconds, then one bright radiant burst of light, then sparkling chimes slowly fading out, fantasy video game evolution, no drums, no speech, no music", "seconds": 4 }
+      "evolution-transform": { "text": "a magical transformation: a soft shimmering swell of bells and airy wordless voices rising for one and a half seconds, then one bright radiant burst of light, then sparkling chimes slowly fading out, fantasy video game evolution, no drums, no speech, no music", "seconds": 4 },
+      "casino-wheel-spin": { "text": "a wooden wheel of fortune spinning fast and slowing down, a wooden ratchet clicking against its pegs, quick clicks at first, slower and slower until it stops, medieval tavern, close up, dry, no music", "seconds": 3.2 },
+      "casino-win": { "text": "a short cheerful win: a handful of gold coins jingling with a bright small bell, medieval, close up, no music", "seconds": 1.5 },
+      "casino-lose": { "text": "a short disappointed sound: a dull wooden thunk and a soft descending lute pluck, medieval, close up, no music", "seconds": 1.2 },
+      "casino-ticket": { "text": "a small parchment ticket dropped into a wooden barrel drum, then the drum turns once with a short wooden rumble and rattling papers inside, medieval, close up, dry, no music", "seconds": 2.0 },
+      "promo-whoosh": { "text": "a soft magical whoosh with a light sparkle, a short transition swoosh for a video, no music", "seconds": 0.8 },
+      "promo-whoosh-low": { "text": "a soft, low and warm whoosh of air, like a heavy wool cloak swept past, deep and muffled, no high frequencies, no hiss, no sparkle, no metal, gentle, a short transition for a video, no music", "seconds": 0.8 },
+      "promo-whoosh-cloth": { "text": "a gentle low swoosh of a thick velvet curtain drawn quickly across a stage, soft, warm and muffled, no high pitch, no ringing, no sparkle, short, no music", "seconds": 0.9 }
     }
   },
   "ui": {
@@ -864,7 +871,13 @@
       "wallet-desktop": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sam zobacz." },
       "wallet-desktop-female": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sama zobacz." },
       "casino-lottery": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Szczęsny co dzień sprzedaje losy na Loterię. O północy System wyciąga jeden z nich, a jego właściciel zgarnia całą pulę." },
-      "casino-wheel": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Kołem Fortuny kręcisz za sto sztuk złota albo więcej, setkami. Wyższa stawka to cenniejsze nagrody, ale przegrana stawka przepada." }
+      "casino-wheel": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Kołem Fortuny kręcisz za sto sztuk złota albo więcej, setkami. Wyższa stawka to wyższe nagrody, ale i większy ból po przegranej." },
+      "mining-welcome": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Dwudziesty piąty poziom postaci… System otworzył przed Tobą Górnictwo i Jubilerstwo." },
+      "mining-lead": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Systemowa Kopalnia i Systemowa Szlifiernia czekają w zakładce Profesje. Zajrzyjmy tam." },
+      "mining-dig": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "W Kopalni wydobędziesz kamienie szlachetne i kruszce. Po drodze Twój kilof trafi też na żyły złota." },
+      "mining-jewels": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "W Szlifierni zrobisz z nich pierścienie, amulety i talizmany. Rzadkość biżuterii zależy od kamienia." },
+      "mining-setting": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Kamień możesz też oprawić w przedmiot, który nosisz. Wzmocni wszystkie jego liczby." },
+      "mining-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Rzadsze kamienie leżą głębiej. Każdy nowy poziom Górnictwa odsłoni Ci kolejne." }
     },
     "allLines": {
       "voice": "Narrator",

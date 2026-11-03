@@ -1,0 +1,17 @@
+{
+  "$comment": "Sceny pracy w Systemowej Kopalni i Systemowej Szlifierni w ruchu (tools/animate-mounts.mjs --config art/scenes.json --group scenes, PixelLab animate-with-text-v3, rodzaj scenes-animate w „Grafiki (szkice)”). start: pierwsza klatka wybrana przez autora z art/drafts/scenes (rodzaj scenes-pixellab, pytania 558 i 559), 128 × 128 z własnym tłem, które zostaje (noBackground: false). Autor: „Systemowa Szlifiernia i Kopalnia musza być zanimowane z tym niebieskim ludkiem podobnie jak w Alchemii i Rzemieślnictwie itp.”",
+  "frames": 8,
+  "noBackground": false,
+  "scenes": {
+    "mining": {
+      "start": "art/references/scenes/mining-start.png",
+      "description": "a small hooded figure with a glowing ice-blue face mining in a dark tunnel",
+      "action": "swinging the pickaxe in a smooth seamless loop: raising it over the shoulder and striking the gold vein in the rock wall, small sparks and stone chips flying at each strike, the lantern flickering softly, the tunnel and the wall staying still"
+    },
+    "jewelcrafting": {
+      "start": "art/references/scenes/jewelcrafting-start.png",
+      "description": "a small hooded figure with a glowing ice-blue face grinding a gem at a jeweller's bench",
+      "action": "pressing the gem against the turning grinding wheel in a smooth seamless loop, the wheel spinning, small sparks flying from it, the candle flame flickering, the bench and the wall staying still"
+    }
+  }
+}

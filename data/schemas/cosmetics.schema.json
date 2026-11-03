@@ -30,13 +30,14 @@
             "pattern": "^[a-z0-9-]+$"
           },
           "kind": {
-            "description": "frame: ramka portretu, background: tło portretu, mountSkin: wygląd wierzchowca ze Stajni, aura: światło wokół postaci, trail: świecące ślady za postacią w scenie Walki.",
+            "description": "frame: ramka portretu, background: tło portretu, mountSkin: wygląd wierzchowca ze Stajni, aura: światło wokół postaci, trail: świecące ślady za postacią w scenie Walki, pet: chowaniec przy postaci w scenie Walki i na portrecie.",
             "enum": [
               "frame",
               "background",
               "mountSkin",
               "aura",
-              "trail"
+              "trail",
+              "pet"
             ]
           },
           "name": {
@@ -132,6 +133,99 @@
               "color": {
                 "type": "string",
                 "pattern": "^#[0-9a-f]{6}$"
+              }
+            }
+          },
+          "pet": {
+            "description": "Chowaniec: arkusz klatek w scenie Walki (walk), jego miejsce przy pudełku postaci, gdy idzie (foot) i gdy jedzie na wierzchowcu (ride), oraz arkusz i miejsce na portrecie (portrait).",
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "walk",
+              "foot",
+              "ride",
+              "portrait"
+            ],
+            "properties": {
+              "walk": {
+                "description": "Arkusz w scenie Walki, w skali 1: klatki po size × size pikseli w jednym rzędzie, przodem w prawo.",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "file",
+                  "size",
+                  "frames",
+                  "fps"
+                ],
+                "properties": {
+                  "file": {
+                    "$ref": "#/definitions/petFile"
+                  },
+                  "size": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "frames": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "fps": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              },
+              "foot": {
+                "$ref": "#/definitions/petPlace"
+              },
+              "ride": {
+                "$ref": "#/definitions/petPlace"
+              },
+              "portrait": {
+                "description": "Arkusz na portrecie (klatki po size × size pikseli portretu 96 × 128) i lewy górny róg klatki (x, y) w pikselach portretu: od lewego górnego rogu portretu, a z anchor shoulder od miejsca na barku za głową postaci (perches w src/client/art.js).",
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "file",
+                  "size",
+                  "frames",
+                  "fps",
+                  "x",
+                  "y"
+                ],
+                "properties": {
+                  "file": {
+                    "$ref": "#/definitions/petFile"
+                  },
+                  "size": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 96
+                  },
+                  "frames": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "fps": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "anchor": {
+                    "enum": [
+                      "shoulder"
+                    ]
+                  },
+                  "x": {
+                    "type": "integer",
+                    "minimum": -96,
+                    "maximum": 95
+                  },
+                  "y": {
+                    "type": "integer",
+                    "minimum": -128,
+                    "maximum": 127
+                  }
+                }
               }
             }
           }
@@ -240,6 +334,27 @@
                 ]
               }
             }
+          },
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "pet"
+                }
+              }
+            },
+            "then": {
+              "required": [
+                "pet"
+              ]
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "pet"
+                ]
+              }
+            }
           }
         ]
       }
@@ -268,6 +383,52 @@
     }
   },
   "definitions": {
+    "petFile": {
+      "description": "Arkusz chowańca w src/client/art/pets.",
+      "type": "string",
+      "pattern": "^art/pets/[a-z0-9-]+\\.png$"
+    },
+    "petPlace": {
+      "description": "Miejsce klatki chowańca w scenie Walki przy pudełku postaci (klatce jej chodu, figurze Systemu albo jeźdźcu z wierzchowcem): x pikseli od przodu (edge front, po prawej) albo tyłu pudełka (edge back) do lewego brzegu klatki, w prawo; dół klatki bottom pikseli nad dołem pudełka albo góra klatki top pikseli pod jego górą; behind: chowaniec za postacią.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "edge",
+        "x"
+      ],
+      "properties": {
+        "edge": {
+          "enum": [
+            "front",
+            "back"
+          ]
+        },
+        "x": {
+          "type": "integer"
+        },
+        "bottom": {
+          "type": "integer"
+        },
+        "top": {
+          "type": "integer"
+        },
+        "behind": {
+          "type": "boolean"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "bottom"
+          ]
+        },
+        {
+          "required": [
+            "top"
+          ]
+        }
+      ]
+    },
     "point": {
       "type": "array",
       "minItems": 2,

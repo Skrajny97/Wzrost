@@ -182,16 +182,17 @@ function tabButton(periodId, quests, id) {
       tabindex: tab === periodId ? '0' : '-1',
       onClick: () => {
         tab = periodId;
-        drawAll();
+        draw();
       },
     },
     quests[periodId].name,
   );
 }
 
-// The quests drawn into a place: the open parchment, or the side column on
-// a computer (side.js), each with its own ids (`id`) and its countdown;
-// the parchment closes with "Zwiń" (`fold`).
+// The quests drawn into the open parchment, with its ids (`id`) and its
+// countdown; it closes with "Zwiń" (`fold`). On a computer too it unrolls
+// from the narrator's face in the top bar, and the side column keeps the
+// chat alone (562 B).
 function drawPage(place, now = serverNow()) {
   const quests = state.character.quests;
   const period = quests[tab];
@@ -239,29 +240,6 @@ function drawPage(place, now = serverNow()) {
 // The page of the open parchment, drawn again on every change.
 function draw(now = serverNow()) {
   if (open) drawPage(open, now);
-}
-
-// The quests in the side column on a computer, while it is there.
-let panel = null; // { id, page, timer, endsAt, countdown }
-
-// The parchment and the side column both, after a change of tab.
-function drawAll() {
-  draw();
-  if (panel && state.character?.quests) drawPage(panel);
-}
-
-// The quests always in sight in the side column on a computer (474 A):
-// the parchment's page without the parchment. Returns its unmount.
-export function mountQuestsPanel(container) {
-  const page = h('div', { class: 'narrator-page quests-page quests-page--side' });
-  fill(container, page);
-  const place = { id: 'side-quests', page, timer: setInterval(() => tickPlace(place), 1000) };
-  panel = place;
-  if (state.character?.quests) drawPage(place);
-  return () => {
-    clearInterval(place.timer);
-    if (panel === place) panel = null;
-  };
 }
 
 function tickPlace(place) {
@@ -381,10 +359,8 @@ async function closeQuests() {
   if (open === current) open = null;
 }
 
-// An open parchment and the side column follow the character: progress,
-// rewards taken.
+// An open parchment follows the character: progress, rewards taken.
 onCharacterChange(() => {
   if (!state.character?.quests) return;
   if (open && !open.closing) draw();
-  if (panel) drawPage(panel);
 });

@@ -40,6 +40,7 @@ import { ApiError, json, readJson } from './http.js';
 import { addTo, insertWork, requireProfessions, takeFromBag, workGains } from './professions.js';
 import { herbsOf, potionKnown, potionsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
+import { tripOf } from './trips.js';
 import { say } from '../engine/text.js';
 
 // A brewing of `count` potions of the recipe chosen, from now on, by the
@@ -253,12 +254,16 @@ export async function sellPotions(context) {
 
 // "Wypij" in the bag: a healing potion gives HP back now, and a potion for a
 // time works in the fights of its next minutes on explorations, added to
-// those still left (potions.js). A mana potion, an antidote and the fern
-// brew work only by themselves in fights.
+// those still left (potions.js), as many at once as chosen, each adding its
+// minutes, with no top to the time (the author: "Niech nie bedzie
+// maksymalnego limitu na trwanie bonusów typu z mikstur"). A healing potion
+// is drunk one at a time. A mana potion, an antidote and the fern brew work
+// only by themselves in fights.
 export async function drinkPotion(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
-  const taken = potionCount(player, { potionId: body.potionId, count: 1 });
+  const chosen = typeof body.potionId === 'string' ? content.potionsById[body.potionId] : undefined;
+  const taken = potionCount(player, { potionId: body.potionId, count: chosen && timedKind(chosen) ? (body.count ?? 1) : 1 });
   const potion = content.potionsById[taken.id];
   const kind = timedKind(potion);
   if (!potion.effect.heal && !kind) {
@@ -280,12 +285,18 @@ export async function drinkPotion(context) {
     also = { sql: 'hp = ?, hp_at = ?', binds: [hp + healed, now] };
     text = say(texts, 'drunkHeal', 0, { potion: potion.counted[0], amount: healed });
   } else {
-    const buffs = drinkTimed(buffsOf(player.row, now), potion);
+    let buffs = buffsOf(player.row, now);
+    for (let i = 0; i < taken.count; i++) buffs = drinkTimed(buffs, potion);
     also = { sql: 'buffs = ?', binds: [JSON.stringify(buffs)] };
     // drunkSpeed, drunkArmor and so on: what the kind gives now and for how
-    // long.
+    // long; several at once by their count, as a report counts potions.
     const key = `drunk${kind[0].toUpperCase()}${kind.slice(1)}`;
-    text = say(texts, key, 0, { potion: potion.counted[0], bonus: Math.round(buffs[kind].bonus * 100), minutes: Math.round(buffLeft(buffs, kind) / 60000) });
+    const drunk = taken.count > 1 ? `${taken.count} × ${potion.name}` : potion.counted[0];
+    text = say(texts, key, 0, { potion: drunk, bonus: Math.round(buffs[kind].bonus * 100), minutes: Math.round(buffLeft(buffs, kind) / 60000) });
+    // On a Drużyna's trip the fights are the same for all who went, as it
+    // set out, so what is drunk on the way works from the next exploration
+    // (claimWindows in potions.js).
+    if (player.activity && tripOf(player.activity)) text = `${text} ${say(texts, 'drunkTrip', 0)}`;
   }
   const result = await takeFromBag(context.env.DB, player, 'potions', taken, 0, also);
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Mikstury zmieniły się w międzyczasie. Spróbuj ponownie.');

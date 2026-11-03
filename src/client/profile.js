@@ -1,8 +1,9 @@
 // Another player's character, from a tap on its name in the chat, the
 // Ranking or the Znajomi: its portrait, large, in the frame and on the
-// background it wears (the Sklep Systemu, cosmetics.js), its name in the
-// frame's colour when so chosen, levels, what it wears and the skills
-// it has learned (characterProfile in src/server/characters.js), with a
+// background it wears, with its aura and its pet (the Sklep Systemu,
+// cosmetics.js), its name in the frame's colour when so chosen, levels,
+// what it wears and the skills it has learned (characterProfile in
+// src/server/characters.js), with a
 // private message to it in the chat, a Wymiana (screens/trade.js) and what
 // the player can do with it as a friend (src/server/community.js), an
 // invitation to the player's guild for its leader and deputies
@@ -28,7 +29,7 @@ export async function openProfile(name, { onChange } = {}) {
     h(
       'div',
       { class: 'profile-head' },
-      portraitBox(profile, { frame: profile.frame, background: profile.background, aura: profile.aura }, 'profile-portrait'),
+      portraitBox(profile, { frame: profile.frame, background: profile.background, aura: profile.aura, pet: profile.pet }, 'profile-portrait'),
       h(
         'div',
         { class: 'profile-title' },

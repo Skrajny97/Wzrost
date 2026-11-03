@@ -40,6 +40,7 @@
           "x": { "type": "number", "minimum": 0, "maximum": 100 },
           "y": { "type": "number", "minimum": 0, "maximum": 100 },
           "resident": { "$ref": "#/definitions/id" },
+          "backdrop": { "$ref": "#/definitions/id", "description": "Wnętrze miejsca (src/client/art/places), przygaszone za kartą mieszkańca, tak jak miejsca profesji za swoimi kartami." },
           "soon": { "type": "boolean", "description": "Miejsce widać na planszy, ale otwiera się w kolejnej części." },
           "flip": { "type": "boolean", "description": "Obrazek budynku odbity w poziomie, żeby wejściem patrzył na główną drogę (autor: „zrób też rotate/odbicia lustrzane budynków tak by byly skierowane ich obrazki w stronę drogi głównej”)." }
         }
@@ -302,23 +303,64 @@
         "wheel": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["name", "step", "maxSteps", "chance", "prizes", "itemChance", "itemRarity", "topItemRarity", "materialRarities"],
+          "required": ["name", "step", "maxSteps", "chance", "worthCap", "prizes", "itemChance", "itemRarity", "topItemRarity", "belowTopItemRarity", "materialRarities"],
           "properties": {
             "name": { "type": "string", "minLength": 1 },
             "step": { "type": "integer", "minimum": 1, "description": "Najniższa stawka w złocie i krok, o który rośnie (542 C: 100 zł, setkami)." },
             "maxSteps": { "type": "integer", "minimum": 1, "description": "Najwyższa stawka to najwyżej tyle kroków." },
-            "chance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa wygranej, taka sama przy każdej stawce." },
+            "chance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa wygranej, taka sama przy każdej stawce (od 0.1.13 10%; autor: „Koło fortuny proszę znerfić mocno i dać 10% szans”)." },
+            "worthCap": { "type": "number", "exclusiveMinimum": 1, "description": "Nagroda jest warta najwyżej tyle stawek (2, jak przy dawnej szansie 50%), więc niższa szansa nie podnosi nagród. Nie więcej niż 1 / chance, żeby Koło nie oddawało średnio więcej, niż bierze." },
             "prizes": { "type": "integer", "minimum": 1, "description": "Ile nagród ma pula postaci na dobę przy każdej stawce." },
             "itemChance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa, że nagroda jest przedmiotem, gdy jakiś przedmiot się mieści." },
             "itemRarity": { "type": "string", "description": "Najniższa rzadkość przedmiotu w puli." },
-            "topItemRarity": { "type": "string", "description": "Najwyższa rzadkość przedmiotu w puli; najwyższa stawka to ta, przy której pasuje jeszcze przedmiot tej rzadkości." },
+            "topItemRarity": { "type": "string", "description": "Najwyższa rzadkość przedmiotu w puli, tylko przy najwyższej stawce postaci; najwyższa stawka to ta, przy której pasuje jeszcze przedmiot tej rzadkości." },
+            "belowTopItemRarity": { "type": "string", "description": "Najwyższa rzadkość przedmiotu w pulach niższych stawek niż najwyższa (554 B: legendarne przedmioty tylko przy najwyższej stawce dnia)." },
             "materialRarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }, "description": "Rzadkości materiałów w puli z wagami losowania." }
+          }
+        },
+        "show": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["wheel", "lottery", "sounds"],
+          "description": "Gry Salonu na ekranie: Koło Fortuny kręcące się pod strzałką i los wpadający do bębna Loterii.",
+          "properties": {
+            "$comment": { "type": "string" },
+            "wheel": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["art", "pointer", "wedges", "winAt", "pivot", "turns", "seconds"],
+              "properties": {
+                "art": { "type": "string" },
+                "pointer": { "type": "string" },
+                "wedges": { "type": "integer", "minimum": 2, "multipleOf": 2, "description": "Ile równych klinów ma koło; wygrana i przegrana na zmianę." },
+                "winAt": { "type": "number", "minimum": 0, "exclusiveMaximum": 360, "description": "Środek pierwszego klinu wygranej w stopniach od góry obrazka, zgodnie ze wskazówkami zegara." },
+                "pivot": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2, "description": "Środek koła w pikselach obrazka." },
+                "turns": { "type": "integer", "minimum": 1 },
+                "seconds": { "type": "number", "exclusiveMinimum": 0, "maximum": 10 }
+              }
+            },
+            "lottery": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["drum", "ticket", "seconds"],
+              "properties": {
+                "drum": { "type": "string" },
+                "ticket": { "type": "string" },
+                "seconds": { "type": "number", "exclusiveMinimum": 0, "maximum": 10 }
+              }
+            },
+            "sounds": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["spin", "win", "lose", "ticket"],
+              "properties": { "spin": { "type": "string" }, "win": { "type": "string" }, "lose": { "type": "string" }, "ticket": { "type": "string" } }
+            }
           }
         },
         "texts": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["lotteryAbout", "lotteryToday", "lotteryBuy", "lotteryHas", "lotteryBought", "lotteryYesterday", "lotteryEarlier", "lotteryMine", "lotteryNone", "announce", "wheelAbout", "wheelPool", "wheelPoolAbout", "wheelStake", "wheelSpin", "wheelEmpty", "wheelWon", "wheelBag", "won", "lost", "win", "loss"],
+          "required": ["lotteryAbout", "lotteryToday", "lotteryBuy", "lotteryHas", "lotteryBought", "lotteryYesterday", "lotteryEarlier", "lotteryMine", "lotteryNone", "lotteryPlayers", "announce", "wheelAbout", "wheelPool", "wheelPoolAbout", "wheelStake", "wheelSpin", "wheelEmpty", "wheelWon", "wheelBag", "won", "lost", "win", "loss"],
           "properties": {
             "lotteryAbout": { "type": "string", "minLength": 1 },
             "lotteryToday": { "type": "string", "minLength": 1 },
@@ -329,6 +371,7 @@
             "lotteryEarlier": { "type": "string", "minLength": 1 },
             "lotteryMine": { "type": "string", "minLength": 1 },
             "lotteryNone": { "type": "string", "minLength": 1 },
+            "lotteryPlayers": { "type": "string", "minLength": 1, "description": "Nagłówek zwiniętej listy graczy, którzy kupili dziś los; {tickets} to ich liczba." },
             "announce": { "type": "string", "minLength": 1, "description": "Komunikat Systemu w czacie i w Salonie po losowaniu: {name} zwycięzcy, {gold} złota, [a|b] forma dla kobiety i dla mężczyzny." },
             "wheelAbout": { "type": "string", "minLength": 1 },
             "wheelPool": { "type": "string", "minLength": 1 },

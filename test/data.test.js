@@ -67,9 +67,32 @@ test('the validator catches broken references and schema errors', () => {
   assert.deepEqual(validateData(casino), [
     'settlement.json: szansa Koła musi być mniejsza niż 100%, żeby nagroda mogła być warta więcej niż stawka',
     'settlement.json: casino.wheel.topItemRarity nie może być niższa niż itemRarity',
+    // The lower stakes' rarest (epic) is now above the top stake's.
+    'settlement.json: casino.wheel.belowTopItemRarity musi leżeć od itemRarity do topItemRarity',
     'settlement.json: casino.wheel.materialRarities ma nieznaną rzadkość golden',
     'settlement.json: casino.texts.announce nie ma {gold}',
   ]);
+
+  // A pet of the Sklep Systemu: its sheets are there, each its frames side by
+  // side, and a place on the portrait counted from its corner starts on it.
+  const pets = structuredClone(loadData());
+  const fox = pets.cosmetics.items.find((item) => item.id === 'fox');
+  fox.pet.walk.file = 'art/pets/nope.png';
+  fox.pet.portrait.frames = 7;
+  fox.pet.portrait.x = -5;
+  assert.deepEqual(validateData(pets), [
+    'cosmetics.json: fox: brak arkusza src/client/art/pets/nope.png',
+    'cosmetics.json: fox: arkusz art/pets/fox-portrait.png ma 256 × 32, a 7 klatek po 32 × 32 to 224 × 32',
+    'cosmetics.json: fox: chowaniec poza portretem 96 × 128',
+  ]);
+  // Its places in the Walka scene, walking and riding, each with a bottom or a top.
+  const placeless = structuredClone(loadData());
+  const raven = placeless.cosmetics.items.find((item) => item.id === 'raven');
+  delete raven.pet.ride;
+  raven.pet.foot.bottom = 0;
+  const placeErrors = validateData(placeless);
+  assert.ok(placeErrors.some((error) => /^cosmetics\.json\/items\/\d+\/pet: must have required property 'ride'/.test(error)), placeErrors.join('\n'));
+  assert.ok(placeErrors.some((error) => /^cosmetics\.json\/items\/\d+\/pet\/foot: must match exactly one schema in oneOf/.test(error)), placeErrors.join('\n'));
 
   const broken = structuredClone(loadData());
   broken.rarities[0].color = 'grey';

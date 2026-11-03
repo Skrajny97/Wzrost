@@ -7,15 +7,24 @@
 // the spin and the stake's pool of the day. The rules wait under "Jak to
 // działa?". The words are the data's (data/settlement.json, casino.texts).
 //
+// The games happen on the screen too (the author: "Trzeba zrobić animację
+// jeszcze do koła fortuny wyświetlającą się na ekranie i do kupowania losu,
+// żeby nadać temu estetyki"): the Wheel turns under its pointer and stops on
+// a gold wedge for a win, a crimson one for a loss, and a bought ticket
+// falls into the Loteria's drum (casino.show in the data).
+//
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, as the Targowisko's, so a redraw never asks the server
 // again.
 
+import { salonArt } from './art.js';
 import { h } from './dom.js';
 import { formatDecimal, formatNumber } from './format.js';
+import { motionOn } from './motion.js';
+import { openProfile } from './profile.js';
 import { playSound } from './sound.js';
 import { call, serverNow, state } from './state.js';
-import { howItWorks, systemPanel, toast, withButton } from './ui.js';
+import { guildTag, howItWorks, systemPanel, toast, withButton } from './ui.js';
 import { itemEntry, stackButton } from './screens/market.js';
 
 // One of the Salon's texts with its {…} filled in: numbers as the game
@@ -38,6 +47,98 @@ const prizeName = (prize) => (prize.kind === 'item' ? prize.name : `${prize.name
 // Szczęsny's words after a spin, one of the data's.
 const oneOf = (lines) => lines[Math.floor(Math.random() * lines.length)];
 
+// A game on the screen over the page, gone after `seconds` or at a tap:
+// `stage` is what it shows, `start` sets it going, `end` brings it to its
+// last look at once (a tap), `close` plays its ending. Resolves when it is
+// gone. With the game's animations off there is nothing to show.
+function showOnScreen(stage, { start, end, close, seconds }) {
+  return new Promise((resolve) => {
+    const layer = h('div', { class: 'casino-show', role: 'presentation' }, stage);
+    document.body.append(layer);
+    let over = false;
+    const finish = () => {
+      if (over) return;
+      over = true;
+      end();
+      close(layer);
+      setTimeout(() => {
+        layer.classList.add('casino-show--out');
+        setTimeout(() => {
+          layer.remove();
+          resolve();
+        }, 250);
+      }, 900);
+    };
+    layer.addEventListener('click', finish);
+    // Two frames, so the start look is painted before it moves.
+    requestAnimationFrame(() => requestAnimationFrame(() => start()));
+    setTimeout(finish, seconds * 1000 + 150);
+  });
+}
+
+// The Koło Fortuny on the screen: the wheel under its pointer turns `turns`
+// times and more, slower and slower, and stops on a win's wedge for a win,
+// a loss's for a loss, somewhere inside it.
+function wheelShow(win, show) {
+  const { wheel, sounds } = show;
+  const wedge = 360 / wheel.wedges;
+  const which = Math.floor(Math.random() * (wheel.wedges / 2));
+  const centre = wheel.winAt + (win ? 0 : wedge) + which * 2 * wedge + (Math.random() - 0.5) * wedge * 0.6;
+  // Turned by this much clockwise, the wheel has that point under the pointer.
+  const angle = wheel.turns * 360 + (360 - (((centre % 360) + 360) % 360));
+  const disc = h('img', { class: 'casino-show-disc', src: salonArt(wheel.art), alt: '', draggable: 'false' });
+  const [x, y] = wheel.pivot;
+  disc.style.transformOrigin = `${(x / 128) * 100}% ${(y / 128) * 100}%`;
+  disc.style.transitionDuration = `${wheel.seconds}s`;
+  const stage = h(
+    'div',
+    { class: 'casino-show-wheel' },
+    h('div', { class: 'casino-show-glow' }),
+    disc,
+    h('img', { class: 'casino-show-pointer', src: salonArt(wheel.pointer), alt: '', draggable: 'false' }),
+  );
+  return showOnScreen(stage, {
+    seconds: wheel.seconds,
+    start: () => {
+      playSound(sounds.spin);
+      disc.style.transform = `rotate(${angle}deg)`;
+    },
+    end: () => {
+      disc.style.transition = 'none';
+      disc.style.transform = `rotate(${angle}deg)`;
+    },
+    close: (layer) => {
+      layer.classList.add(win ? 'casino-show--win' : 'casino-show--loss');
+      playSound(win ? sounds.win : sounds.lose);
+    },
+  });
+}
+
+// The Loteria on the screen: the ticket bought falls into the drum, which
+// rocks with it.
+function ticketShow(show) {
+  const { lottery, sounds } = show;
+  const stage = h(
+    'div',
+    { class: 'casino-show-lottery' },
+    h('img', { class: 'casino-show-drum', src: salonArt(lottery.drum), alt: '', draggable: 'false' }),
+    h('img', { class: 'casino-show-ticket', src: salonArt(lottery.ticket), alt: '', draggable: 'false' }),
+  );
+  return showOnScreen(stage, {
+    seconds: lottery.seconds,
+    start: () => {
+      playSound(sounds.ticket);
+      stage.classList.add('casino-show-lottery--go');
+    },
+    end: () => stage.classList.add('casino-show-lottery--done'),
+    close: () => {},
+  });
+}
+
+// Whether the games may play on the screen: the animations on, and their
+// pictures there.
+const showable = (show) => Boolean(show) && motionOn() && Boolean(salonArt(show.wheel.art));
+
 export function mountCasino(holder) {
   let casino = null;
   let failure = null;
@@ -55,6 +156,8 @@ export function mountCasino(holder) {
   // The last spin, for its words over the pool: { win, text, words }.
   let result = null;
   const opened = new Set();
+  // Whether today's players are unfolded, kept while the panel redraws.
+  let playersOpen = false;
 
   // The Salon as an answer brings it.
   function take(answer) {
@@ -130,6 +233,40 @@ export function mountCasino(holder) {
 
   // The last draw in a line: the System's words of it, and the character's
   // own win.
+  // Who plays today (the author: "Dodaj do loterii możliwość dla gracza,
+  // żeby widzieć kto bierze w niej udział"): folded under their count, in
+  // the order the tickets were bought, each name with its guild's tag and
+  // opening the character's card, as in the chat.
+  function players() {
+    const { texts, lottery } = casino;
+    if (lottery.players.length === 0) return null;
+    const fold = h(
+      'details',
+      {
+        class: 'how-more casino-players',
+        'data-guide': 'casino-players',
+        open: playersOpen,
+        onToggle: () => {
+          playersOpen = fold.open;
+        },
+      },
+      h('summary', { class: 'how-toggle', text: say(texts.lotteryPlayers, { tickets: lottery.players.length }) }),
+      h(
+        'ul',
+        { class: 'casino-player-list' },
+        lottery.players.map((player) =>
+          h(
+            'li',
+            {},
+            h('button', { type: 'button', class: 'link-button', text: player.name, onClick: () => openProfile(player.name) }),
+            player.guildTag && [' ', guildTag(player.guildTag)],
+          ),
+        ),
+      ),
+    );
+    return fold;
+  }
+
   function lastDraw() {
     const { texts } = casino;
     const { last } = casino.lottery;
@@ -160,10 +297,13 @@ export function mountCasino(holder) {
             disabled: short,
             onClick: (event) =>
               withButton(event.currentTarget, async () => {
-                apply(await call('POST', '/api/settlement/casino/ticket', { stake }));
+                const answer = await call('POST', '/api/settlement/casino/ticket', { stake });
+                if (showable(casino.show)) await ticketShow(casino.show);
+                apply(answer);
                 toast(texts.lotteryBought);
               }),
           }),
+      players(),
       lastDraw(),
       howItWorks(null, say(texts.lotteryAbout, { ticket: lottery.ticket, base: lottery.base })),
     );
@@ -237,7 +377,9 @@ export function mountCasino(holder) {
                 const answer = await call('POST', '/api/settlement/casino/spin', { stake });
                 const { win, prize } = answer.spin;
                 result = { win, text: win ? say(texts.won, { prize: prizeName(prize) }) : texts.lost, words: oneOf(win ? texts.win : texts.loss) };
-                playSound(win ? 'chest' : 'tick');
+                // The Wheel turns on the screen first; without it, a sound alone.
+                if (showable(casino.show)) await wheelShow(win, casino.show);
+                else playSound(win ? 'chest' : 'tick');
                 toast(result.text);
                 apply(answer);
               }),

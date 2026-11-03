@@ -41,13 +41,15 @@ describe('the Targowisko in the engine', () => {
     assert.equal(offerLimit({ herbalists: points('friend') }, content), 5);
   });
 
-  test('the next bid is the starting price, then 5% more, at least a gold more; the seller gets all but 5% (238 A, 239 A)', () => {
+  test('the next bid is the starting price, then 5% more, at least a gold more; the seller gets all but 1% (238 A; the author: "Niech Targowisko bierze 1% ceny sprzedaży")', () => {
     assert.equal(minimumBid({ startPrice: 40, bid: null }, content), 40);
     assert.equal(minimumBid({ startPrice: 40, bid: 100 }, content), 105);
     assert.equal(minimumBid({ startPrice: 1, bid: 10 }, content), 11);
     assert.equal(minimumBid({ startPrice: 1, bid: 1 }, content), 2);
-    assert.equal(sellerShare(1000, content), 950);
-    assert.equal(sellerShare(101, content), 95);
+    assert.equal(sellerShare(1000, content), 990);
+    // The fee is a whole gold piece, rounded up.
+    assert.equal(sellerShare(101, content), 99);
+    assert.equal(sellerShare(100, content), 99);
   });
 
   test('an offer needs goods the character holds, whole prices, "Kup teraz" not below the start, and a free place', () => {
