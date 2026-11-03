@@ -6,6 +6,7 @@
 - Przed każdym dłuższym raportem przejrzyj wszystkie wiadomości autora od poprzedniego raportu. Nie pytaj o to, co autor już rozstrzygnął, i nie proponuj własnych wersji tekstów, które autor napisał.
 - Teksty czytane głosem, np. kwestie narratora, daj autorowi do zatwierdzenia przed nagraniem. Autor usuwa z nich naleciałości AI.
 - Nagrania autor sprawdza sam, na słuch: wrzucaj mu je w czacie albo na stronę odsłuchu. Nie pobieraj programów do rozpoznawania mowy ani innych modeli.
+- Nagrania przycinaj, zanim trafią do autora i do gry: koniec 0,3 s po ostatnim słowie, bez długich pauz. Sprawdź, że ostatnie słowo jest całe. Autor: „Poucinaj końcówki nagrań, jak zawsze, bo długie pauzy” (3.11.2026).
 - Nowe grafiki pokazuj autorowi do oceny pojedynczo, jedną po drugiej, zaraz po powstaniu, gdy autor nie śpi.
 - Każdą grafikę, także tła i plansze, rysuj w PixelLab. Retro Diffusion jest tylko awaryjny, gdy PixelLab czegoś nie umie albo nie działa, i raport mówi o tym wprost. Autor: „wszystko rob w PixelLab teraz, RetroDiffusion bedzie awaryjnie” (3.11.2026).
 - Animacje (chody, jazdę wierzchem, każdy ruch) wysyłaj autorowi jako MP4 (H.264, kilka pętli), nigdy jako GIF, bo GIF-y się u autora nie odtwarzają. Autor: „Ale Ty mi to miales w mp4 podać zebym mogl obejrzec znowu zapomniales ze nie działa gif xD” (2.11.2026).

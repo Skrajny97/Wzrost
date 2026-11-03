@@ -3011,6 +3011,54 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Wersja 0.1.8 (3.11.2026)
+
+1. **Co wchodzi do gry:**
+   - kwestie narratora na komputer z nagraniami (521 B, zob. „Kwestie narratora na komputer: nagrania (521)”);
+   - wskazówki na ekranach dla telefonu i komputera: „Wybierz…” i „Naciśnij…” zamiast „Dotknij…” i „Stuknij…” (519, punkt 3);
+   - Skrzynia Konta w nowym miejscu na planszy obozu (zob. „Skrzynia Konta na planszy obozu”).
+2. **Rozdział Wież** jest gotowy, ale wejdzie dopiero z nagraniami wybranymi przez autora (517).
+3. **Sprawdzone:**
+   - pełne testy: 929 z 929;
+   - przejście wprowadzenia na telefonie, komputerze i dużym monitorze (pierwsza wyprawa po 11 krokach);
+   - w przeglądarce: na komputerze narrator mówi „… Kliknij „Wyrusz”.” i gra nagrania `tap-region-desktop` i `tap-start-desktop`, a na telefonie „… Stuknij „Wyrusz”.” i dawne nagrania;
+   - Skrzynia Konta na obu planszach obozu (bez Osady i z Osadą) w trzech wyglądach (poziomy obozu 2, 5 i 9), na telefonie.
+
+## Kwestie narratora na komputer: nagrania (521, 3.11.2026)
+
+Autor: „Poucinaj końcówki nagrań, jak zawsze, bo długie pauzy ale wszystko B w 521”.
+
+1. **W grze są wersje B** czterech kwestii: `tap-region-desktop`, `tap-start-desktop`, `wallet-desktop` i `wallet-desktop-female` (`src/client/audio/narration/`).
+2. **Końcówki.** Każde nagranie kończy się 0,3 s po ostatnim słowie, z krótkim wyciszeniem. W szkicach po słowach było do 3 s ciszy.
+   - (brakujący szczegół) Koniec mowy liczę z poziomu dźwięku: koniec ostatniego odcinka głośniejszego niż −45 dB, trwającego co najmniej 150 ms. Dawny sposób szukał pierwszej ciszy w ostatnich 1,5 s według znaczników ElevenLabs. Przy „… Kliknij „Wyrusz”.” uciąłby słowo „Wyrusz”, bo przed nim jest krótka pauza.
+3. **Głośność.** Każda kwestia na komputer jest tak głośna jak jej wersja na telefon (−19,4 do −20,1 LUFS, jak reszta wprowadzenia). Szkice były o 2–3 dB głośniejsze.
+4. **517.** Filmy z nagraniami rozdziału Wież autor dostał jeszcze raz (pierwsze do niego nie dotarły), już z przyciętymi końcówkami.
+
+## Skrzynia Konta na planszy obozu (3.11.2026)
+
+Autor, ze zrzutem planszy obozu w pierwszym wyglądzie (poziomy obozu 1–3): „Tu gdzie Skrzynia Konta jest to brzydko wygląda jeszcze.”
+
+1. **Co było brzydkie.** W pierwszym wyglądzie las w prawym dolnym rogu wchodzi na polanę. Skrzynia stała na ciemnym skraju lasu, wśród krzaków i kamieni, a jej nazwa zasłaniała drzewa. Ścieżka do skrzyni kończyła się przed nią rozmytą plamą.
+2. **Teraz** skrzynia stoi trochę bardziej w lewo i wyżej, na otwartej trawie, we wszystkich trzech wyglądach obu plansz (z Osadą i bez). Jej ścieżka kończy się pod nią. Nazwa nie zasłania drogi wyjściowej ani nazw sąsiadów (Kopalnia, Kamień węgielny, Stół rozbiórki).
+
+## Salon Gier w Osadzie: prośba autora (3.11.2026, pytania 523–529)
+
+Autor: „W Osadzie dodamy nowy budynek Salon Gier w średniowiecznym klimacie / Dodamy tam minigre typu Loteria (baza 100 sztuk złota), by wziąć udział gracz musi wrzucić 50 złota i raz dziennie jest losowanie kto zgarnia pulę. Do tego druga gra na wzór ruletki gdzie gracz wrzuca do 100 złota i trafiając (50% szans) może wygrać coś z puli losowane codziennie (wartościowe przedmioty co najmniej droższe niz 100 złota lub bardzo rzadkie materiały) / Te dwie gry będą na start.”
+
+1. **Pytania do autora:** 523 (gospodarz Szczęsny), 524 (Loteria: jeden los na dobę, losowanie o północy, ogłoszenie na czacie), 525 (Koło Fortuny: szansa rośnie ze stawką), 526 (pula nagród Koła: własna, 5 na dobę) i 527 (Wieże: czempion co 25. piętro przy szóstej krainie).
+2. **Grafiki w PixelLab** (bez Retro Diffusion): budynek (528, osiem wersji A–H) i popiersie gospodarza (529, osiem wersji A–H). Autor dostał je pojedynczo, obok grafik z gry do porównania.
+3. Nic z Salonu Gier nie wchodzi do gry przed odpowiedziami autora.
+4. (do rozważenia) Sklep Play oznacza gry losowe o walutę z gry jako „symulowany hazard”, co zwykle podnosi kategorię wiekową. Złota nie sprzedajemy wtedy za prawdziwe pieniądze.
+
+## Górnictwo wcześniej: prośba autora (3.11.2026)
+
+Autor: „W grze cierpi się na ciągły niedobór złota. Potrzebujemy w najbliższej przyszłości Profesji Górnictwo, które poza kopaniem kamieni szlachetnych do późniejszego Jubilerstwa bedzie też dawać złoto z natrafionych żył złota.”
+
+1. **Kolejność się zmienia.** Dotąd Górnictwo i Jubilerstwo szły po Warowni (395). Teraz Górnictwo idzie wcześniej, a Jubilerstwo zostaje na później.
+2. Górnictwo daje kamienie szlachetne do późniejszego Jubilerstwa i złoto z żył złota.
+3. Pytania (poziom otwarcia, ile złota na godzinę, szanse na żyłę, kamienie) autor dostanie po bieżącym etapie, pozycja po pozycji.
+4. **Liczby do pytań.** Wyprawa daje dziś ok. 25 złota na godzinę na 5. poziomie, 90 na 10., 190 na 20., 385 na 30. i 760 na 50. (`tools/simulate.mjs`, 3.11.2026). Awatar Systemu (10 000 złota) pracuje w profesjach także wtedy, gdy postać jest na wyprawie. Złoto z żył doda się więc u niego do złota z wypraw, a bez Awatara Górnictwo je zastępuje.
+
 ## Samouczek na komputerze: kwestie narratora (519, 3.11.2026)
 
 Autor zapytał: „A jak wyglądają teraz kwestie Samouczków na PC... nie trzeba tego jakoś zmodyfikować?”. Narrator na komputerze wskazuje właściwe miejsca (przejście wprowadzenia na komputerze i dużym monitorze przed każdym wdrożeniem; w 0.1.7 Obóz w menu i zasoby w górnym pasku). Słowa trzech kwestii czytanych głosem pasowały jednak tylko do telefonu. Autor: „519.1 B)”, „519.2 B)”, „519.3 OK”.
@@ -3021,7 +3069,7 @@ Autor zapytał: „A jak wyglądają teraz kwestie Samouczków na PC... nie trze
    - `wallet` (519.3 OK): „Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sam zobacz.”, dla postaci kobiecej „Sama zobacz.” (na komputerze zasoby i Punkty Czasu są w górnym pasku od 0.1.7).
 2. **Jak.** Kwestia w `data/tutorial.json` ma wersję `desktop` (tekst, nagranie i wersję kobiecą), a narrator wybiera ją w układzie komputera.
 3. **Wskazówki bez głosu** (brakujący szczegół): „Dotknij…” i „Stuknij…” na ekranach zmieniam na słowa pasujące do obu urządzeń: „Wybierz…” i „Naciśnij…” (np. „Wybierz pusty plac, żeby zobaczyć koszt budowy.”).
-4. Nagrania po dwie wersje do odsłuchu u autora; wejdą do gry razem z rozdziałem Wież.
+4. Nagrania po dwie wersje do odsłuchu u autora; wejdą do gry razem z rozdziałem Wież. *Zmiana: weszły w 0.1.8, przed rozdziałem Wież, który czeka na wybór nagrań 517 (zob. „Kwestie narratora na komputer: nagrania (521)”).*
 
 ## Wersja 0.1.7 (3.11.2026)
 
