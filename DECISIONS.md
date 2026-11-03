@@ -3011,6 +3011,17 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Odpowiedzi autora 498–504 (3.11.2026)
+
+Autor: „501 B, ale do dorysowania bo brakuje sporo / 498 B / 499 ewolucja super / 502 miałeś używać PixelLab teraz jako głównego źródła obrazków również.. / 500.1 A / 500.2 A / 500.3 B / 500.4 B / 500.5 A / 500.6 B / 500.7 B ale nie ma nóg a ma być pełny kształt, całe ciało / 500.8 B / 500.9 A / 500.10 A / 500.11 A / 500.12 B / 500.13 B / 500.14 C brzydkie sprite'y / 500.15 A / 500.16 A / 500.17 C zbyt mało majestatyczny jak na czempiona / 503 A / 504 ważki śmierć do poprawy, bo to jakieś bąbelki wody a nie śmierć ważki wygenerowało się i bóle Rokity o wiele bardziej groźne horrorowe”.
+
+1. **Grafiki rysuje PixelLab (502).** Tak już postanowiono 2.11.2026 („Głównym narzędziem do grafik jest PixelLab”), a rysunki Sosnowych Wydm i ducha budowniczego poszły przez pomyłkę do Retro Diffusion. Od teraz stwory, materiały i popiersia też rysuje PixelLab (rodzaje `monsters-pixellab`, `materials-pixellab` i `residents-pixellab` w przebiegu „Grafiki (szkice)”). Retro Diffusion zostaje dla teł i tego, czego PixelLab nie zrobi. Doładowanie Retro Diffusion jest niepotrzebne.
+2. **Duch budowniczego (501 B).** Wybrany kamieniarz z pobijakiem, ale do dorysowania, bo brakuje mu sporej części postaci. PixelLab rysuje go od nowa w całości, z wybranym rysunkiem jako wzorem.
+3. **Bastion (498 B):** trochę więcej obrażeń kosztem części obrony.
+4. **Przemiana przy ewolucji (499, 503 A):** zatwierdzona, z dźwiękiem w wersji A.
+5. **Stwory Sosnowych Wydm (500):** Piaskun A, Wrzosowa Mara A, Lelek B, Żywicznik B, Korojad A, Smolna Ćma B, Piaskowy Wir B, Kurhannik A, Smolarz A, Węglik A, Latawiec B, Zwęglak B, Iskrzak A, Południca A. Od nowa, w PixelLab: Suchotnik (500.7 B, ale z nogami, cały), Popielec (500.14, brzydkie rysunki) i Raróg (500.17, za mało majestatyczny jak na czempiona).
+6. **Odgłosy Czarnego Bagna (504):** do nagrania od nowa śmierć Ważki (wyszły bąbelki wody) i ból Rokity, o wiele groźniejszy, jak z horroru. Reszta zostaje.
+
 ## Odpowiedzi autora 447–460 i dwie nowe prośby (3.11.2026)
 
 Autor: „447 A / 448 A / 451 A / 452 A / 457 A / 460 A”, a do tego: „Do ewolucji klas zdałoby się dodać jakiś efekt i transformację z jasnym światłem i zmianą postaci po wybraniu danej drogi. Wklej ewentualną animacje takiej ewolucji.” oraz „Zrobilibyśmy też opcję sprzedaży nadmiaru zasobów w Kamieniu Węgielnym. Niech przy Kamieniu czuwa duch budowniczego, który za zasoby płaci złotem”.

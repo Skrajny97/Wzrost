@@ -236,7 +236,7 @@
       "mink-hurt": { "text": "a mink gives a sharp angry squeal of pain, video game creature hurt sound, close up, dry, no music", "seconds": 0.5 },
       "mink-death": { "text": "a small weasel-like animal gives a thin fading squeak and falls silent, close up, dry, no music", "seconds": 0.9 },
       "dragonfly-hurt": { "text": "the wings of a giant dragonfly buzz in a sudden angry stutter as it is hit, video game creature hurt sound, close up, dry, no music", "seconds": 0.6 },
-      "dragonfly-death": { "text": "the fast buzzing of a giant dragonfly's wings sputters out and it drops into water with a small splash, close up, no music", "seconds": 1.1 },
+      "dragonfly-death": { "text": "the fast buzzing of a giant dragonfly's wings stutters, slows down and dies away into silence as the insect falls, an insect wing buzz only, no water, no bubbles, no splash, close up, dry, no music", "seconds": 1.1 },
       "pike-hurt": { "text": "a big fish thrashes with a wet slap and a splash as it is hit, video game creature hurt sound, close up, no music", "seconds": 0.6 },
       "pike-death": { "text": "a big fish flops weakly on wet ground with a few fading slaps, then silence, close up, no music", "seconds": 1.1 },
       "water-spider-hurt": { "text": "a spider hisses with a wet bubbling pop, video game creature hurt sound, close up, dry, no music", "seconds": 0.5 },
@@ -263,7 +263,7 @@
       "klobuk-death": { "text": "a small fiery bird gives a fading screech as its flames go out with a long hiss of steam, close up, no music", "seconds": 1.1 },
       "mamuna-hurt": { "text": "a bog hag shrieks in pain with a wet rasping voice, no words, video game monster hurt sound, close up, dry, no music", "seconds": 0.6 },
       "mamuna-death": { "text": "a swamp hag gives a long gurgling wail that sinks into bubbling water, no words, close up, no music", "seconds": 1.4 },
-      "rokita-hurt": { "text": "a devil gives a sharp angry snarl with a burst of crackling green fire, no words, video game boss hurt sound, close up, no music", "seconds": 0.7 },
+      "rokita-hurt": { "text": "a devil gives a short terrifying snarl of pain, a deep distorted guttural roar with a hellish echo and a hiss, horror, menacing, no words, video game boss hurt sound, close up, no music", "seconds": 0.7 },
       "rokita-death": { "text": "a devil lets out a long howling scream that echoes and ends in a burst of fire and a hiss of smoke, no words, video game boss death sound, close up, no music", "seconds": 1.6 }
     }
   },
