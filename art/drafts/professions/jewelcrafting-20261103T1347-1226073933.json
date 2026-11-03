@@ -1,0 +1,12 @@
+{
+  "id": "jewelcrafting",
+  "tool": "pixellab generate-image-v2",
+  "description": "a golden ring set with a cut red gemstone next to a small jeweller's loupe, fantasy RPG profession icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/professions/herbalism.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}
