@@ -871,7 +871,13 @@
       "wallet-desktop": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sam zobacz." },
       "wallet-desktop-female": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Przy okazji – w tym miejscu widzisz swój stan złota i Punktów Systemu, a tuż obok resztę zasobów wraz z Punktami Czasu. Sama zobacz." },
       "casino-lottery": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Szczęsny co dzień sprzedaje losy na Loterię. O północy System wyciąga jeden z nich, a jego właściciel zgarnia całą pulę." },
-      "casino-wheel": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Kołem Fortuny kręcisz za sto sztuk złota albo więcej, setkami. Wyższa stawka to wyższe nagrody, ale i większy ból po przegranej." }
+      "casino-wheel": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Kołem Fortuny kręcisz za sto sztuk złota albo więcej, setkami. Wyższa stawka to wyższe nagrody, ale i większy ból po przegranej." },
+      "mining-welcome": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Dwudziesty piąty poziom postaci… System otworzył przed Tobą Górnictwo i Jubilerstwo." },
+      "mining-lead": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Systemowa Kopalnia i Systemowa Szlifiernia czekają w zakładce Profesje. Zajrzyjmy tam." },
+      "mining-dig": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "W Kopalni wydobędziesz kamienie szlachetne i kruszce. Po drodze Twój kilof trafi też na żyły złota." },
+      "mining-jewels": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "W Szlifierni zrobisz z nich pierścienie, amulety i talizmany. Rzadkość biżuterii zależy od kamienia." },
+      "mining-setting": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Kamień możesz też oprawić w przedmiot, który nosisz. Wzmocni wszystkie jego liczby." },
+      "mining-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Rzadsze kamienie leżą głębiej. Każdy nowy poziom Górnictwa odsłoni Ci kolejne." }
     },
     "allLines": {
       "voice": "Narrator",
