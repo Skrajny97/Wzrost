@@ -1,0 +1,12 @@
+{
+  "id": "fortune-wheel",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art, a medieval wheel of fortune seen straight from the front, a perfectly round wooden wheel divided into 8 equal wedges alternating polished gold and deep crimson red, a dark iron rim with small brass studs, a round brass hub in the centre, no stand, no pointer, no text, no numbers, transparent background, centered, fills the frame",
+  "style": "src/client/art/settlement/casino.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
