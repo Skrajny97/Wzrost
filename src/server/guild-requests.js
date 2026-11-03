@@ -143,16 +143,19 @@ export async function requestsView(db, player, guild, now) {
   // A request taken back is gone from the card; only the wait for the next
   // one shows (the author: "Wycofane prośby powinny znikac i tylko pokazywać
   // czas przed kolejną prośbą").
-  const shown =
+  const kept =
     last && last.guild_id === guild.id && last.state !== 'cancelled' && (stateOf(last, now) === 'open' || last.created_at > now - openHours * HOUR) ? last : null;
-  const gifts = shown
+  const gifts = kept
     ? (
         await db
           .prepare('SELECT g.id, g.count, g.created_at, g.thanked_at, c.name, c.class_id FROM guild_gifts g LEFT JOIN characters c ON c.id = g.giver_id WHERE g.request_id = ? ORDER BY g.id')
-          .bind(shown.id)
+          .bind(kept.id)
           .all()
       ).results
     : [];
+  // So is a request filled once every gift is thanked for (the author:
+  // "spelnione prośby nie znikają"); until then its thanks wait on it.
+  const shown = kept && !(kept.state === 'filled' && gifts.every((gift) => gift.thanked_at !== null)) ? kept : null;
   const waiting = last && stateOf(last, now) === 'open' && last.guild_id === guild.id;
   const nextAt = last ? last.created_at + waitHours * HOUR : 0;
   return {

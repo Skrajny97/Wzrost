@@ -133,7 +133,14 @@ describe('the Prośby Gildii through the API', () => {
     assert.equal(thanked.data.mine.gifts[0].thanked, true);
     assert.equal((await as('mistrz', 'POST', '/api/guild/requests/thank', { giftId: filled.gifts[0].id })).data.error.code, 'thanked');
     assert.equal((await as('druh', 'POST', '/api/guild/requests/thank', { giftId: filled.gifts[1].id })).data.error.code, 'no_gift');
-    assert.equal((await as('mistrz', 'POST', '/api/guild/requests/thank', { giftId: filled.gifts[1].id })).status, 200);
+    // With every gift thanked for, the filled request is gone from the card
+    // and only the wait for the next one shows (the author: "spelnione
+    // prośby nie znikają").
+    const last = await as('mistrz', 'POST', '/api/guild/requests/thank', { giftId: filled.gifts[1].id });
+    assert.equal(last.status, 200);
+    assert.equal(last.data.mine, null);
+    assert.ok(last.data.nextAt > Date.now());
+    assert.equal((await as('mistrz', 'GET', '/api/guild/requests')).data.mine, null);
     assert.equal((await as('mistrz', 'GET', '/api/guild/todo')).data.todo.requests, false);
     const { ranking } = (await as('druh', 'GET', '/api/guild/requests')).data;
     assert.deepEqual(

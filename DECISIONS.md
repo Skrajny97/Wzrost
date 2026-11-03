@@ -3011,6 +3011,13 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Prośby Gildii: spełniona prośba znika (3.11.2026)
+
+Autor, ze zrzutem ekranu własnej prośby („Dane: 2 z 2. Spełniona.”, „Podziękowano”): „spelnione prośby nie znikają”.
+
+1. **Spełniona prośba znika z karty**, gdy prosząca postać podziękuje za każdy dar, tak jak wycofana (zob. „Prośby Gildii: wycofana prośba znika”). Zostaje tylko czas do kolejnej prośby.
+2. (brakujący szczegół) Dopóki któryś dar czeka na podziękowanie, spełniona prośba zostaje na karcie razem z przyciskami „Podziękuj”, bo podziękowania liczą się w Dobroczyńcach tygodnia. Dar bez podziękowania dalej zapala kropkę Próśb.
+
 ## Górnictwo i Jubilerstwo: odpowiedzi autora 534–539 (3.11.2026)
 
 Autor: „534 A”, „535 A, albo i więcej”, „536 A, ale biżuteria to też talizmany i amulety”, „537 A”, „538 A”, „539 A”.
