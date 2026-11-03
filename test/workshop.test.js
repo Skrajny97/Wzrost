@@ -732,10 +732,10 @@ describe('the Warsztat, step 2, through the API', () => {
     await build('craft-table', 1);
     const itemId = await addItem({ base: 'broadsword', slot: 'weapon', level: 15, rarity: 'common', affixes: [], damage: { min: 6, max: 10 } });
     const card = (await character()).bag.find((item) => item.id === itemId);
-    assert.equal(card.salvage.pattern, 'Pałasz');
+    assert.deepEqual([card.salvage.pattern, card.salvage.patternAt], ['Pałasz', 'w Warsztacie']);
     const { status, data } = await call('POST', `/api/items/${itemId}/salvage`, { cookie, body: {} });
     assert.equal(status, 200);
-    assert.equal(data.salvage.pattern, 'Pałasz');
+    assert.deepEqual([data.salvage.pattern, data.salvage.patternAt], ['Pałasz', 'w Warsztacie']);
     const broadsword = data.character.professions.workshop.slots[0].patterns.find((pattern) => pattern.id === 'broadsword');
     assert.equal(broadsword.learned, true);
     assert.equal(broadsword.parts, 7);

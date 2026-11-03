@@ -3034,6 +3034,32 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.23 (3.11.2026)
+
+1. **Rozebrana biżuteria odsłania swój wzór w Szlifierni**, jak przedmioty w Warsztacie (zob. „Jubilerstwo: wzory z rozbiórki biżuterii”).
+
+## Plan na noc 3/4.11: odpowiedzi autora 571–576 (3.11.2026)
+
+Autor: „571 koniecznie”, „572 koniecznie”, „573 koniecznie i możesz wstępnie wprowadzić na czuja, jutro poprawię najwyżej”, „574 można, bez ciśnienia”, „575 najmniejszy priorytet”, „576 koniecznie”.
+
+1. **571, kamienie i kruszce w handlu:** na Targowisku, w Wymianie i w Prośbach Gildii. Obowiązkowo.
+2. **572, zadania z Górnictwem i Jubilerstwem:** zadania narratora z kopaniem i biżuterią. Obowiązkowo.
+3. **573, dźwięki Jubilerstwa:** szlifowanie i oprawianie kamienia. Obowiązkowo. Wersje wybieram sam i od razu wprowadzam do gry, a rano autor poprawi wybór na słuch.
+4. **574, Warownia:** można, bez pośpiechu, po pozycjach obowiązkowych.
+5. **575, nowe przedmioty Tierów V i VI:** najniższy priorytet. Pytanie 570 (wyższe czy pośrednie Tiery) wciąż czeka na odpowiedź.
+6. **576, przegląd kodu na koniec nocy:** obowiązkowo.
+
+## Jubilerstwo: wzory z rozbiórki biżuterii (3.11.2026)
+
+Autor: „Rozbieranie przedmiotów jak pierścienie czy talizmany też powinny dawać dostępy do wyższych tierów jeśli chodzi o jubilerstwo tak jak w Rzemiośle jest.”
+
+1. **Jak w Warsztacie.** Rozebrana biżuteria późniejszego wzoru (Kaptorga, Sygnet, Otoczak i wyższe) od razu odsłania swój wzór w Szlifierni, także przed jego poziomem Jubilerstwa. Pierwsze wzory rodzin (Amulet, Pierścień i Talizman) są znane od początku, więc ich rozbiórka niczego nie odsłania.
+2. **Wzór zostaje na zawsze.** W Szlifierni ma dopisek „z rozbiórki”, jak w Warsztacie, a awans Jubilerstwa nie ogłasza go drugi raz.
+3. **Gra mówi, gdzie.** Karta w plecaku, potwierdzenie rozbiórki i komunikat po niej podają miejsce wzoru: „Rozbiórka odsłoni wzór w Szlifierni: Sygnet.” albo „… w Warsztacie: Pałasz.”. Przy rozbiórce kilku przedmiotów naraz wzory Warsztatu i Szlifierni stoją osobno (`patternAt` w tekstach obu w `data/professions.json`).
+4. (brakujący szczegół) Jak w Warsztacie, wzór odsłania się bez względu na to, skąd przedmiot pochodzi, i także przed otwarciem Jubilerstwa na 25. poziomie postaci.
+5. To zmienia wcześniejszy szczegół z „Górnictwo i Jubilerstwo: budowa” (pkt 5: „jej rozebranie nie odsłania wzorów”).
+6. **Zapis.** Wzór z rozbiórki liczą `jewelPatternFrom` i `knowsJewelPattern` w `src/engine/jewelcraft.js`, a serwer `taughtPattern` w `src/server/characters.js`. Wzory z rozbiórki obu profesji leżą na jednej liście postaci (`patterns`), bo Warsztat i Szlifiernia robią różne sloty. `test/mining.test.js` sprawdza rozbiórkę Sygnetu i jego wyrób przed 10. poziomem Jubilerstwa.
+
 ## Wersja 0.1.22 (3.11.2026)
 
 1. **Encyklopedia zgodna z Górnictwem i Jubilerstwem.** Minerały stoją w Tierach, a wpis biżuterii mówi, od którego poziomu Jubilerstwa Szlifiernia zna jej wzór (zob. „Encyklopedia: Górnictwo i Jubilerstwo”).
@@ -3292,7 +3318,7 @@ Obie profesje otwierają się razem, od 25. poziomu postaci (531, 533). Na zakł
    - Czas i szanse są jak w Warsztacie. Pospolita sztuka trwa 30 minut na 1. poziomie, każda rzadkość wyżej dwa razy dłużej, a każdy poziom skraca czas o 1%, najwyżej o połowę. Szansa powodzenia: pospolita 100%, rzadka 90%, unikalna 75%, epicka 55%, legendarna 35%, mityczna 20%, boska 10%, a każdy poziom dodaje 0,5 pkt proc., najwyżej do 95%.
    - (brakujący szczegół) Nieudana sztuka zabiera swój kamień, a kruszec wraca, jak w Warsztacie części przepadają, a zasoby obozu wracają. Przerwany wyrób daje gotowe sztuki, a kamienie i kruszec na resztę wracają.
    - Biżuteria ma poziom postaci z chwili zlecenia, a jej właściwości noszą nazwy poznanych stworów.
-   - (brakujący szczegół) Nie ma łutu szczęścia ani ulepszeń od ręki, które zna Warsztat, bo rzadkość ma wyznaczać kamień. Biżuterii nie liczą zadania „Wykonaj…” ani Próby Gildii, a jej rozebranie nie odsłania wzorów. Złomiarz płaci za nią jak za łup.
+   - (brakujący szczegół) Nie ma łutu szczęścia ani ulepszeń od ręki, które zna Warsztat, bo rzadkość ma wyznaczać kamień. Biżuterii nie liczą zadania „Wykonaj…” ani Próby Gildii, a jej rozebranie nie odsłania wzorów (od wersji 0.1.23 odsłania, zob. „Jubilerstwo: wzory z rozbiórki biżuterii”). Złomiarz płaci za nią jak za łup.
    - Warsztat nie robił biżuterii (jego sloty to broń, pancerz, druga ręka, hełm, rękawice i buty), więc nic z niego nie przeszło. Walidator pilnuje, żeby żadnego slotu nie robiły obie profesje.
 6. **Oprawianie (538 A).** Zakładka „Oprawianie”: przedmiot, który postać nosi, i kamień.
    - Kamień podnosi każdą liczbę przedmiotu o swój procent, liczony po ulepszeniu z Kowadła, a każdą co najmniej o 1. Dotyczy to obrażeń, pancerza, statystyki bazy i każdej właściwości. Kwarc daje 5%, Agat 10%, Ametyst 15%, Szmaragd 20%, Szafir 25%, Rubin 30%, a Diament 35%, równymi krokami.

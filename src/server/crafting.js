@@ -22,14 +22,12 @@ import {
   orderSalvage,
   orderSalvageMany,
   parseStack,
-  patternFrom,
   settleCrafting,
   saleGold,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, craftingState, loadPlayer, questsNow, requirePlayer } from './characters.js';
+import { characterView, craftingState, loadPlayer, questsNow, requirePlayer, taughtPattern } from './characters.js';
 import { toHex } from './encoding.js';
-import { craftingOn } from './features.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { testMode, testModeFor } from './test-mode.js';
@@ -143,8 +141,8 @@ export async function craftMaterials(context) {
 }
 
 // An item from the bag taken apart on the table: it goes now, and its parts
-// come when the order ends. With Rzemieślnictwo, an item of a pattern the
-// Warsztat does not show yet teaches it at once (patternFrom).
+// come when the order ends. An item of a pattern the Warsztat or the
+// Szlifiernia does not show yet teaches it at once (taughtPattern).
 export async function salvageItem(context) {
   const { session, player } = await requirePlayer(context);
   const item = player.items.find((candidate) => String(candidate.id) === context.params.id);
@@ -163,11 +161,11 @@ export async function salvageItem(context) {
   // goes only if that order was saved: two taps make one order.
   const quests = addQuestProgress(questsNow(player, now), { salvaged: 1 });
   const learned = JSON.parse(row.patterns ?? '[]');
-  const pattern = craftingOn() && patternFrom(item, learned, content);
+  const pattern = taughtPattern(item, learned);
   const [saved] = await db.batch([
     saveState(db, row, state, {
       quests,
-      ...(pattern && { patterns: [...learned, pattern] }),
+      ...(pattern && { patterns: [...learned, pattern.id] }),
       condition: ' AND EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ? AND slot IS NULL)',
       binds: [item.id, row.id],
     }),
@@ -184,7 +182,7 @@ export async function salvageItem(context) {
       part: content.partsById[order.partId].name,
       parts: order.parts,
       endsAt: order.endsAt,
-      ...(pattern && { pattern: content.basesById[pattern].name }),
+      ...(pattern && { pattern: pattern.name, patternAt: pattern.at }),
     },
     character: characterView(await loadPlayer(db, session.userId), now),
   });
@@ -225,16 +223,14 @@ export async function salvageItems(context) {
   const db = context.env.DB;
   const row = player.row;
   const quests = addQuestProgress(questsNow(player, now), { salvaged: items.length });
-  // With Rzemieślnictwo, every item of a pattern the Warsztat does not show
-  // yet teaches it, each pattern once.
+  // Every item of a pattern the Warsztat or the Szlifiernia does not show
+  // yet teaches it, each pattern once (taughtPattern).
   const learned = JSON.parse(row.patterns ?? '[]');
-  const patterns = craftingOn()
-    ? items.reduce((known, item) => {
-        const pattern = patternFrom(item, known, content);
-        return pattern ? [...known, pattern] : known;
-      }, learned)
-    : learned;
-  const taught = patterns.slice(learned.length);
+  const taught = items.reduce((list, item) => {
+    const pattern = taughtPattern(item, [...learned, ...list.map((one) => one.id)]);
+    return pattern ? [...list, pattern] : list;
+  }, []);
+  const patterns = [...learned, ...taught.map((one) => one.id)];
   const list = JSON.stringify(ids);
   const saved = `EXISTS (SELECT 1 FROM characters WHERE id = ? AND instr(crafting, ?) > 0)`;
   const marker = [row.id, `"id":"${orders[0].id}"`];
@@ -254,7 +250,7 @@ export async function salvageItems(context) {
     salvaged: {
       count: items.length,
       orders: orders.map((order) => ({ part: content.partsById[order.partId].name, parts: order.parts, endsAt: order.endsAt })),
-      patterns: taught.map((id) => content.basesById[id].name),
+      patterns: taught.map(({ name, at }) => ({ name, at })),
     },
     character: characterView(await loadPlayer(db, session.userId), now),
   });

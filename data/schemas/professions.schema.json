@@ -701,6 +701,7 @@
             "revealed",
             "rarity",
             "hidden",
+            "patternAt",
             "busy",
             "claimFirst",
             "pushTitle",
@@ -771,6 +772,15 @@
                 "type": "string",
                 "minLength": 1
               }
+            },
+            "patternAt": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": "Gdzie odsłania się wzór z rozbiórki przedmiotu, w miejscowniku: „w Warsztacie”, „w Szlifierni”."
             },
             "busy": {
               "type": "array",
@@ -1210,6 +1220,7 @@
             "revealed",
             "gem",
             "hidden",
+            "patternAt",
             "busy",
             "claimFirst",
             "pushTitle",
@@ -1295,6 +1306,15 @@
                 "type": "string",
                 "minLength": 1
               }
+            },
+            "patternAt": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": "Gdzie odsłania się wzór z rozbiórki przedmiotu, w miejscowniku: „w Warsztacie”, „w Szlifierni”."
             },
             "busy": {
               "type": "array",

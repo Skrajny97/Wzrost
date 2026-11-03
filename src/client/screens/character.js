@@ -757,6 +757,18 @@ const percent = (share) => `${formatDecimal(share * 100)}%`;
 
 // The Stół rozbiórki part of a bag item's card: the parts that taking it
 // apart gives and how long it takes, or that the table is still to be built.
+// The patterns items taken apart teach, by where they are used, each name
+// once: [["w Warsztacie", ["Pałasz"]], ["w Szlifierni", ["Sygnet", "Otoczak"]]].
+function patternsByPlace(patterns) {
+  const places = new Map();
+  for (const { name, at } of patterns) {
+    const names = places.get(at) ?? [];
+    if (!names.includes(name)) names.push(name);
+    places.set(at, names);
+  }
+  return [...places];
+}
+
 function salvageSection(item, busy) {
   const { salvage } = item;
   if (!salvage) return null;
@@ -771,7 +783,7 @@ function salvageSection(item, busy) {
     const sure = await confirmAction({
       title: 'Rozebrać przedmiot?',
       text: `${itemTitle(item)} zniknie, a stół zrobi z niego: ${salvage.part} ×${salvage.parts}, w ${formatMinutes(salvage.minutes)}.${
-        salvage.pattern ? ` System odsłoni Ci wzór w Warsztacie: ${salvage.pattern}.` : ''
+        salvage.pattern ? ` System odsłoni Ci wzór ${salvage.patternAt}: ${salvage.pattern}.` : ''
       }${item.gem ? ` Kamień w nim przepadnie: ${item.gem.name}.` : ''}`,
       confirmLabel: 'Rozbierz',
     });
@@ -782,7 +794,7 @@ function salvageSection(item, busy) {
       playSound('build');
       toast(
         `Na stole: ${order.name}. ${order.part} ×${order.parts} będą gotowe o ${timeFormat.format(new Date(order.endsAt))}.${
-          order.pattern ? ` Nowy wzór w Warsztacie: ${order.pattern}.` : ''
+          order.pattern ? ` Nowy wzór ${order.patternAt}: ${order.pattern}.` : ''
         }`,
       );
     });
@@ -794,7 +806,7 @@ function salvageSection(item, busy) {
     h('p', { class: 'anvil-step' }, 'Rozbiórka: ', h('span', { class: 'item-name', vars: { '--rarity': salvage.color }, text: `${salvage.part} ×${salvage.parts}` }), salvage.minutes !== null ? ` · ${formatMinutes(salvage.minutes)}` : ''),
     !built && h('p', { class: 'muted', text: 'Zbuduj w obozie Stół rozbiórki, żeby rozbierać przedmioty na części.' }),
     needs && h('p', { class: 'muted', text: `Ta rzadkość wymaga Stołu rozbiórki na poziomie ${needs}.` }),
-    salvage.pattern && h('p', { class: 'system-hint', text: `Rozbiórka odsłoni wzór w Warsztacie: ${salvage.pattern}.` }),
+    salvage.pattern && h('p', { class: 'system-hint', text: `Rozbiórka odsłoni wzór ${salvage.patternAt}: ${salvage.pattern}.` }),
     built && !needs && full && h('p', { class: 'muted', text: 'Kolejka stołu jest pełna. Poczekaj, aż skończy się pierwsze zlecenie.' }),
     h('button', { type: 'button', class: 'button button--world', disabled: busy || !built || Boolean(needs) || full, onClick: takeApart, text: 'Rozbierz' }),
   );
@@ -879,13 +891,13 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
     const items = chosen();
     const upgraded = items.filter((item) => item.upgrade > 0).length;
     const gems = items.filter((item) => item.gem).length;
-    const patterns = [...new Set(items.map((item) => item.salvage.pattern).filter(Boolean))];
+    const patterns = patternsByPlace(items.filter((item) => item.salvage.pattern).map((item) => ({ name: item.salvage.pattern, at: item.salvage.patternAt })));
     const sure = await confirmAction({
       title: 'Rozebrać przedmioty?',
       text: `${countOf(items.length, 'przedmiot', 'przedmioty', 'przedmiotów')} ${plural(items.length, 'zniknie', 'znikną', 'zniknie')} z plecaka, a stół zrobi z nich: ${partsOf(items)
         .map(([part, { count }]) => `${part} ×${formatNumber(count)}`)
         .join(', ')}, w ${formatMinutes(minutesOf(items))}.${upgraded > 0 ? ` Ulepszone wśród nich: ${formatNumber(upgraded)}.` : ''}${gems > 0 ? ` Z kamieniem wśród nich: ${formatNumber(gems)}.` : ''}${
-        patterns.length > 0 ? ` System odsłoni Ci wzory w Warsztacie: ${patterns.join(', ')}.` : ''
+        patterns.map(([at, names]) => ` System odsłoni Ci ${plural(names.length, 'wzór', 'wzory', 'wzory')} ${at}: ${names.join(', ')}.`).join('')
       }`,
       confirmLabel: 'Rozbierz',
     });
@@ -908,7 +920,9 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
       toast(
         `Na stole: ${countOf(salvaged.count, 'przedmiot', 'przedmioty', 'przedmiotów')}. ${salvaged.orders
           .map((order) => `${order.part} ×${formatNumber(order.parts)}`)
-          .join(', ')} będą gotowe o ${timeFormat.format(new Date(ready))}.${salvaged.patterns.length > 0 ? ` Nowe wzory w Warsztacie: ${salvaged.patterns.join(', ')}.` : ''}`,
+          .join(', ')} będą gotowe o ${timeFormat.format(new Date(ready))}.${patternsByPlace(salvaged.patterns)
+          .map(([at, names]) => ` ${plural(names.length, 'Nowy wzór', 'Nowe wzory', 'Nowe wzory')} ${at}: ${names.join(', ')}.`)
+          .join('')}`,
       );
     });
   };

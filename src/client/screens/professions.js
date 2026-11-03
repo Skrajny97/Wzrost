@@ -1656,7 +1656,9 @@ export function mountProfessions(container, { params, navigate }) {
       const byOre = Math.floor(rarity.ore.have / slot.ores);
       return { byGems, byOre, most: Math.min(jewelcrafting.maxCount, byGems, byOre, free) };
     }
-    const forWhom = (each) => ['każda klasa', each.classLevel && `od poz. klasy ${each.classLevel}`].filter(Boolean).join(' · ');
+    // For whom, from which class level, and whether the pattern came from a
+    // jewel taken apart, as in the Warsztat.
+    const forWhom = (each) => ['każda klasa', each.classLevel && `od poz. klasy ${each.classLevel}`, each.learned && 'z rozbiórki'].filter(Boolean).join(' · ');
 
     function show() {
       fill(

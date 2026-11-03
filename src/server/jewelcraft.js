@@ -16,8 +16,8 @@ import {
   itemName,
   jewelCost,
   jewelOrderMinutes,
-  jewelPatternLevel,
   jewelReport,
+  knowsJewelPattern,
   potionsDone,
   professionState,
   setMinutes,
@@ -37,13 +37,15 @@ import { trimReports } from './reports.js';
 const shareOf = (amounts, of, count) =>
   Object.fromEntries(Object.entries(amounts ?? {}).map(([id, amount]) => [id, Math.round((amount * of) / Math.max(1, count))]));
 
-// An order of jewels: a pattern the character knows, a gem it cuts, how many,
-// what they take, at the character's level, which is also the jewels' level,
-// and room for them in the bag.
+// An order of jewels: a pattern the character knows, by the level or from a
+// jewel taken apart, a gem it cuts, how many, what they take, at the
+// character's level, which is also the jewels' level, and room for them in
+// the bag.
 function jewelOrder(player, level, body) {
   const { jewelcrafting } = content;
   const base = typeof body.baseId === 'string' ? content.basesById[body.baseId] : undefined;
-  if (!base || !jewelcrafting.ores[base.slot] || jewelPatternLevel(base, content) > level) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
+  const learned = JSON.parse(player.row.patterns ?? '[]');
+  if (!base || !jewelcrafting.ores[base.slot] || !knowsJewelPattern(base, level, learned, content)) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
   const gem = typeof body.rarity === 'string' ? gemOf(body.rarity, content) : undefined;
   if (!gem || gem.level > level) throw new ApiError(400, 'unknown_rarity', 'Tego kamienia jeszcze nie szlifujesz.');
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > jewelcrafting.maxCount) {
@@ -199,7 +201,20 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
     const { character, after, xp, work, sets } = workGains(player, profession, before, minutes, avatar, now);
     const report = {
       ...jewelReport(
-        { ...made, minutes, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, stopped: stop, before, after, character, xp, work },
+        {
+          ...made,
+          learned: JSON.parse(player.row.patterns ?? '[]'),
+          minutes,
+          startedAt: activity.started_at,
+          endsAt: stop ? now : activity.ends_at,
+          seed: activity.seed,
+          stopped: stop,
+          before,
+          after,
+          character,
+          xp,
+          work,
+        },
         content,
       ),
       ...(avatar && { avatar: true }),

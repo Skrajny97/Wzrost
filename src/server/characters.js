@@ -25,6 +25,7 @@ import {
   craftTable,
   openedChests,
   patternFrom,
+  jewelPatternFrom,
   craftTakes,
   currentQuests,
   effectText,
@@ -82,6 +83,7 @@ import {
   nameColor,
 } from '../engine/index.js';
 import { mountView } from '../engine/stable.js';
+import { say } from '../engine/text.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
 import { content } from './content.js';
@@ -224,6 +226,19 @@ export async function settleDiscoveries(db, player, now) {
   const discovered = JSON.stringify(merged);
   const result = await db.prepare('UPDATE characters SET discovered = ? WHERE id = ? AND discovered = ?').bind(discovered, row.id, row.discovered ?? '{}').run();
   row.discovered = result.meta.changes === 1 ? discovered : (await db.prepare('SELECT discovered FROM characters WHERE id = ?').bind(row.id).first()).discovered;
+}
+
+// The pattern an item taken apart teaches, or null, with where it is used
+// ("w Szlifierni"): one the Warsztat does not show yet, with
+// Rzemieślnictwo (patternFrom), or one the Szlifiernia does not show yet,
+// with the professions (jewelPatternFrom). The character's `learned`
+// patterns hold both, as the two make different slots.
+export function taughtPattern(item, learned) {
+  const id = (craftingOn() && patternFrom(item, learned, content)) || (professionsOn() && jewelPatternFrom(item, learned, content)) || null;
+  if (!id) return null;
+  const base = content.basesById[id];
+  const texts = content.workshop.parts[base.slot] ? content.workshop.texts : content.jewelcrafting.texts;
+  return { id, name: base.name, at: say(texts, 'patternAt', 0) };
 }
 
 // The character as it is now, with the builds whose time has come started:
@@ -966,21 +981,21 @@ export function characterView(player, now) {
   const upgradeCap = campBonus(levels, 'upgradeCap', content);
   // What the Stół rozbiórki makes of an item taken apart and how long it
   // takes, or the table's level its rarity needs.
-  // With Rzemieślnictwo, also the pattern the item teaches (patternFrom).
+  // Also the pattern the item teaches, and where (taughtPattern).
   const table = craftTable(levels, content);
   const learned = JSON.parse(row.patterns ?? '[]');
   const salvage = (item) => {
     const { partId, count } = salvageYield(item, content);
     const part = content.partsById[partId];
     const takes = table.pace > 0 && craftTakes(table, item.rarity, content);
-    const pattern = craftingOn() && patternFrom(item, learned, content);
+    const pattern = taughtPattern(item, learned);
     return {
       part: part.name,
       color: content.raritiesById[part.rarity].color,
       parts: count,
       minutes: takes ? craftMinutes(item.rarity, count, table.pace, content) : null,
       needs: table.pace > 0 && !takes ? craftLevelFor(item.rarity, content) : null,
-      ...(pattern && { pattern: content.basesById[pattern].name }),
+      ...(pattern && { pattern: pattern.name, patternAt: pattern.at }),
     };
   };
   // The materials that pay for the Kowadło's upgrades from +5 on.

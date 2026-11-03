@@ -27,8 +27,23 @@ export const jewelBases = (content) => content.bases.filter((base) => content.je
 // not before the class level it asks for.
 export const jewelPatternLevel = (base, content) => (base.classLevel ? Math.max(content.jewelcrafting.laterPatternLevel, base.classLevel) : 1);
 
-// The patterns a level of Jubilerstwo knows.
-export const knownJewelPatterns = (level, content) => jewelBases(content).filter((base) => jewelPatternLevel(base, content) <= level);
+// Whether the character knows a jewel's pattern: by the profession's level,
+// or learned by taking such a jewel apart (`learned`, base ids, the same list
+// as the Warsztat's), as in the Warsztat (the author: "Rozbieranie
+// przedmiotów jak pierścienie czy talizmany też powinny dawać dostępy do
+// wyższych tierów jeśli chodzi o jubilerstwo tak jak w Rzemiośle jest").
+export const knowsJewelPattern = (base, level, learned, content) => jewelPatternLevel(base, content) <= level || learned.includes(base.id);
+
+// The patterns the character knows at a level of Jubilerstwo.
+export const knownJewelPatterns = (level, learned, content) => jewelBases(content).filter((base) => knowsJewelPattern(base, level, learned, content));
+
+// The pattern a jewel taken apart teaches, or null: its base's, if the
+// profession's first level does not show it already and the character has
+// not learned it yet (patternFrom in workshop.js for the Warsztat).
+export function jewelPatternFrom(item, learned, content) {
+  const base = content.basesById[item.base];
+  return base && content.jewelcrafting.ores[base.slot] && jewelPatternLevel(base, content) > 1 && !learned.includes(base.id) ? base.id : null;
+}
 
 // The gem that gives jewellery a rarity, and the ore its setting takes.
 export const gemOf = (rarityId, content) => content.minerals.find((mineral) => mineral.kind === 'gem' && mineral.rarity === rarityId);
@@ -102,13 +117,14 @@ export function setMinutes(gemId, level, content) {
 // and the character's XP; and then for an order of jewellery the jewels made
 // and those that failed, or for a gem set (`set`: the gem, the item after
 // it, or null when the item was gone and the gem came back, and the gem
-// that was in it before).
-export function jewelReport({ base, rarityId, results = [], set, minutes, startedAt, endsAt, seed, stopped, before, after, character, xp, work }, content) {
+// that was in it before). `learned`: the patterns the character learned by
+// taking jewels apart, which a new level does not reveal again.
+export function jewelReport({ base, rarityId, results = [], set, learned = [], minutes, startedAt, endsAt, seed, stopped, before, after, character, xp, work }, content) {
   const { jewelcrafting } = content;
   const texts = jewelcrafting.texts;
   const profession = content.professionsById[jewelcrafting.profession];
   const opened = (level) => level > before.level && level <= after.level;
-  const patterns = jewelBases(content).filter((candidate) => opened(jewelPatternLevel(candidate, content)));
+  const patterns = jewelBases(content).filter((candidate) => opened(jewelPatternLevel(candidate, content)) && !learned.includes(candidate.id));
   const gems = content.minerals.filter((mineral) => mineral.kind === 'gem' && opened(mineral.level));
   const report = {
     kind: 'jewels',

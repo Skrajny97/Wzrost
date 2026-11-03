@@ -22,6 +22,7 @@ import {
   jewelCost,
   jewelMinutes,
   jewelOrderMinutes,
+  jewelPatternFrom,
   jewelReport,
   knownGems,
   knownJewelPatterns,
@@ -223,11 +224,46 @@ describe('Górnictwo in the engine', () => {
 
 describe('Jubilerstwo in the engine', () => {
   test('rings, amulets and talismans, the first of each family at once and the later ones from 10, 25 and 50; the Warsztat makes none of them', () => {
-    assert.deepEqual(knownJewelPatterns(1, content).map((base) => base.id), ['amulet', 'ring', 'talisman']);
-    assert.equal(knownJewelPatterns(10, content).length, 6);
-    assert.ok(knownJewelPatterns(25, content).some((base) => base.id === 'band-ring'));
-    assert.equal(knownJewelPatterns(50, content).length, 12);
+    assert.deepEqual(knownJewelPatterns(1, [], content).map((base) => base.id), ['amulet', 'ring', 'talisman']);
+    assert.equal(knownJewelPatterns(10, [], content).length, 6);
+    assert.ok(knownJewelPatterns(25, [], content).some((base) => base.id === 'band-ring'));
+    assert.equal(knownJewelPatterns(50, [], content).length, 12);
     assert.ok(jewelBases(content).every((base) => !content.workshop.parts[base.slot]));
+  });
+
+  // The author: "Rozbieranie przedmiotów jak pierścienie czy talizmany też
+  // powinny dawać dostępy do wyższych tierów jeśli chodzi o jubilerstwo tak
+  // jak w Rzemiośle jest" (3.11.2026).
+  test('a jewel of a later pattern taken apart teaches it, as an item of the Warsztat does; a level does not reveal it again', () => {
+    const jewelOf = (base) => ({ base, slot: content.basesById[base].slot, level: 30, rarity: 'common', affixes: [] });
+    assert.equal(jewelPatternFrom(jewelOf('signet-ring'), [], content), 'signet-ring');
+    assert.equal(jewelPatternFrom(jewelOf('amber-charm'), [], content), 'amber-charm');
+    // The first of a family is known from the start, a pattern once learned stays, and the Warsztat's items are the Warsztat's.
+    assert.equal(jewelPatternFrom(jewelOf('ring'), [], content), null);
+    assert.equal(jewelPatternFrom(jewelOf('signet-ring'), ['signet-ring'], content), null);
+    assert.equal(jewelPatternFrom({ base: 'broadsword', slot: 'weapon', level: 30, rarity: 'common', affixes: [] }, [], content), null);
+    assert.deepEqual(knownJewelPatterns(1, ['signet-ring'], content).map((base) => base.id), ['amulet', 'ring', 'signet-ring', 'talisman']);
+    // At the 10th level the System reveals Kaptorga and Otoczak, not the Sygnet learned before.
+    const report = jewelReport(
+      {
+        base: content.basesById.ring,
+        rarityId: 'common',
+        results: [],
+        learned: ['signet-ring'],
+        minutes: 30,
+        startedAt: 0,
+        endsAt: 1,
+        seed: 'r',
+        stopped: false,
+        before: { level: 9, xp: 0 },
+        after: { level: 10, xp: 0 },
+        character: { level: 30 },
+        xp: 0,
+        work: { level: 30, timePoints: 0, messages: [] },
+      },
+      content,
+    );
+    assert.deepEqual(report.revealed, ['reliquary', 'holed-stone']);
   });
 
   test('a gem gives the rarity and an ore of its tier sets it: silver up to unique, gold for epic and legendary, star above', () => {
@@ -447,6 +483,42 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     const stopped = await call('POST', '/api/hunts/cancel', { cookie });
     assert.equal(stopped.data.report.items.length, 1);
     assert.deepEqual(minerals(stopped.data.character), { quartz: 1, 'silver-ore': 2 });
+  });
+
+  test('taking a Sygnet apart teaches its pattern in the Szlifiernia before the 10th level, and the card and the Warsztat say where', async () => {
+    const database = await db();
+    await database
+      .prepare(
+        "INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'craft-table', 1, 0, 1 FROM characters WHERE true ON CONFLICT (character_id, building_id) DO UPDATE SET level = excluded.level",
+      )
+      .run();
+    const addItem = async (item) =>
+      (await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(item)).run()).meta.last_row_id;
+    const signet = await addItem({ base: 'signet-ring', slot: 'ring', level: 25, rarity: 'common', affixes: [] });
+    const broadsword = await addItem({ base: 'broadsword', slot: 'weapon', level: 25, rarity: 'common', affixes: [], damage: { min: 6, max: 10 } });
+    const card = (id, view) => view.bag.find((item) => item.id === id).salvage;
+    const before = await character();
+    assert.deepEqual([card(signet, before).pattern, card(signet, before).patternAt], ['Sygnet', 'w Szlifierni']);
+    assert.deepEqual([card(broadsword, before).pattern, card(broadsword, before).patternAt], ['Pałasz', 'w Warsztacie']);
+    await set(`minerals = '{"quartz":1,"silver-ore":2}'`);
+    assert.equal((await jewel({ baseId: 'signet-ring', rarity: 'common', count: 1 })).data.error.code, 'unknown_pattern');
+
+    // Both at once: each pattern where it is used.
+    const { status, data } = await call('POST', '/api/items/salvage', { cookie, body: { ids: [signet, broadsword] } });
+    assert.equal(status, 200);
+    assert.deepEqual(data.salvaged.patterns, [
+      { name: 'Sygnet', at: 'w Szlifierni' },
+      { name: 'Pałasz', at: 'w Warsztacie' },
+    ]);
+    const slots = data.character.professions.jewelcrafting.slots;
+    const sygnet = slots.find((slot) => slot.id === 'ring').patterns.find((pattern) => pattern.id === 'signet-ring');
+    assert.deepEqual([sygnet.name, sygnet.learned, sygnet.hidden], ['Sygnet', true, undefined]);
+    assert.equal(slots.find((slot) => slot.id === 'amulet').patterns.find((pattern) => pattern.id === 'reliquary').hidden, true);
+    assert.equal((await jewel({ baseId: 'signet-ring', rarity: 'common', count: 1 })).status, 201);
+
+    // Another Sygnet teaches nothing new.
+    const again = await addItem({ base: 'signet-ring', slot: 'ring', level: 25, rarity: 'common', affixes: [] });
+    assert.equal(card(again, await character()).pattern, undefined);
   });
 
   test('a gem is set in a worn item at the end of the work, raising its numbers; a new gem destroys the old, and an item gone gives the gem back', async () => {

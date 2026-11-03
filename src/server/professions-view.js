@@ -294,10 +294,12 @@ function miningView(level, row) {
 // hidden; each rarity with its gem and ore (and how many the character has),
 // and, once its gem is known, the chance and the minutes of one jewel; and
 // the gems to set, with their bonus and the minutes of setting one, or the
-// level the System shows them at.
+// level the System shows them at. A pattern learned by taking a jewel apart
+// is known before its level (`learned`), as in the Warsztat.
 function jewelView(level, row) {
   const { jewelcrafting } = content;
   const minerals = mineralsOf(row);
+  const learned = JSON.parse(row.patterns ?? '[]');
   const hint = (from) => say(jewelcrafting.texts, 'hidden', 0, { level: from });
   const bases = jewelBases(content);
   const owned = (mineral) => ({ id: mineral.id, name: mineral.name, have: minerals[mineral.id] ?? 0 });
@@ -314,7 +316,9 @@ function jewelView(level, row) {
         .filter((base) => base.slot === slotId)
         .map((base) => {
           const from = jewelPatternLevel(base, content);
-          return from > level ? { id: base.id, level: from, hidden: true, hint: hint(from) } : { id: base.id, name: base.name, level: from, classLevel: base.classLevel ?? null };
+          const taught = from > level && learned.includes(base.id);
+          if (from > level && !taught) return { id: base.id, level: from, hidden: true, hint: hint(from) };
+          return { id: base.id, name: base.name, level: from, classLevel: base.classLevel ?? null, ...(taught && { learned: true }) };
         }),
     })),
     rarities: content.rarities.map((rarity) => {
