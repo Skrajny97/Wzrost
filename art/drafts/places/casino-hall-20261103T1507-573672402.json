@@ -1,0 +1,12 @@
+{
+  "id": "casino-hall",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art interior of a cosy medieval gambling hall in a village: wooden tables with dice and playing cards, a big wheel of fortune hanging on the back wall, lanterns and candles, a few gold coins on the tables, barrels, a warm golden glow, wide panorama for a dim background behind text, low contrast, muted dark palette of browns and gold with crimson accents, no text, no border, no people, no animals",
+  "style": "src/client/art/places/system-lapidary.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}
