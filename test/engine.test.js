@@ -56,8 +56,13 @@ import {
   campEffectText,
   campLevel,
   upgradeView,
+  upgradeMaterials,
   upgradedItem,
   rollUpgrade,
+  heldOfRarity,
+  piecesOfRarity,
+  rarityNeedView,
+  stacksOfRarity,
   canUse,
   computeStats,
   craftLevelFor,
@@ -1725,6 +1730,61 @@ describe('upgrades', () => {
     assert.equal(upgradeView({ ...mail, upgrade: 3 }, 3, content).next, null);
     assert.equal(upgradeView({ ...mail, upgrade: 10 }, 10, content).next, null);
     assert.equal(campBonus({ anvil: 4 }, 'upgradeCap', content), 4);
+  });
+
+  test('materials of one rarity add up (481 B), taken first from the material held most, on a tie by its id', () => {
+    const need = { rarity: 'unique', count: 2 };
+    // One Futro rysia and one Skóra węgorza make the two pieces +6 asks for.
+    assert.deepEqual(piecesOfRarity({ 'lynx-fur:unique': 1, 'eel-skin:unique': 1 }, need, content), { 'eel-skin:unique': 1, 'lynx-fur:unique': 1 });
+    // The most plentiful first, so the single rarer pieces stay; other
+    // rarities and keys the data does not know never count.
+    const held = { 'lynx-fur:unique': 1, 'spider-silk:unique': 4, 'wolf-pelt:unique': 2, 'wolf-pelt:common': 50, 'bogus:unique': 9, 'eel-skin:epic': 9 };
+    assert.deepEqual(stacksOfRarity(held, 'unique', content), [
+      ['spider-silk:unique', 4],
+      ['wolf-pelt:unique', 2],
+      ['lynx-fur:unique', 1],
+    ]);
+    assert.equal(heldOfRarity(held, 'unique', content), 7);
+    assert.deepEqual(piecesOfRarity(held, need, content), { 'spider-silk:unique': 2 });
+    assert.deepEqual(piecesOfRarity(held, { rarity: 'unique', count: 6 }, content), { 'spider-silk:unique': 4, 'wolf-pelt:unique': 2 });
+    assert.deepEqual(piecesOfRarity(held, { rarity: 'unique', count: 7 }, content), { 'spider-silk:unique': 4, 'wolf-pelt:unique': 2, 'lynx-fur:unique': 1 });
+    // Too few in all: nothing is taken.
+    assert.equal(piecesOfRarity(held, { rarity: 'unique', count: 8 }, content), null);
+    assert.equal(piecesOfRarity({}, need, content), null);
+    assert.equal(piecesOfRarity({ 'lynx-fur:unique': 1, 'eel-skin:rare': 5 }, need, content), null);
+    // Equal stacks go by the material's id.
+    assert.deepEqual(piecesOfRarity({ 'spider-silk:unique': 2, 'eel-skin:unique': 2, 'lynx-fur:unique': 2 }, { rarity: 'unique', count: 3 }, content), {
+      'eel-skin:unique': 2,
+      'lynx-fur:unique': 1,
+    });
+    // The page's view: all held, and the pieces with their names, or null.
+    assert.deepEqual(rarityNeedView({ 'lynx-fur:unique': 1, 'eel-skin:unique': 1 }, need, content), {
+      rarity: 'unique',
+      count: 2,
+      have: 2,
+      takes: [
+        { key: 'eel-skin:unique', materialId: 'eel-skin', label: 'skóra węgorza', count: 1 },
+        { key: 'lynx-fur:unique', materialId: 'lynx-fur', label: 'futro rysia', count: 1 },
+      ],
+    });
+    assert.deepEqual(rarityNeedView({ 'wolf-pelt:unique': 1 }, need, content), { rarity: 'unique', count: 2, have: 1, takes: null });
+  });
+
+  test('from +5 on the card shows the materials an upgrade takes, from all those of the item\'s rarity', () => {
+    const stock = { 'wolf-pelt:common': 1, 'fox-pelt:common': 1, 'wolf-pelt:rare': 9 };
+    assert.equal(upgradeView({ ...mail, upgrade: 3 }, 10, content, stock).next.materials, null);
+    assert.deepEqual(upgradeView({ ...mail, upgrade: 4 }, 10, content).next.materials, { rarity: 'common', count: 1 });
+    assert.deepEqual(upgradeView({ ...mail, upgrade: 5 }, 10, content, stock).next.materials, {
+      rarity: 'common',
+      count: 2,
+      have: 2,
+      takes: [
+        { key: 'fox-pelt:common', materialId: 'fox-pelt', label: 'skóra lisa', count: 1 },
+        { key: 'wolf-pelt:common', materialId: 'wolf-pelt', label: 'skóra wilka', count: 1 },
+      ],
+    });
+    assert.deepEqual(upgradeView({ ...mail, upgrade: 6 }, 10, content, stock).next.materials, { rarity: 'common', count: 3, have: 2, takes: null });
+    assert.equal(upgradeMaterials({ ...mail, upgrade: 9 }, 10, content).count, 6);
   });
 
   test('a full bag sells upgraded items last', () => {

@@ -145,7 +145,7 @@ Symulacja przyjmuje też opcje, np. `npm run simulate -- --levels 6,7 --minutes 
 | POST | `/api/items/:id/equip` | załóż przedmiot z plecaka; przedmiot z wymiany (`traded` w widoku przedmiotu) dopiero od jego poziomu (403 `trade_level`) |
 | POST | `/api/items/:id/unequip` | zdejmij przedmiot do plecaka |
 | POST | `/api/items/:id/discard` | wyrzuć przedmiot z plecaka |
-| POST | `/api/items/:id/upgrade` | Kowadło: jedna próba ulepszenia przedmiotu o poziom, za złoto i rudę żelaza; z `ward: true` od +7 Zwój ochronny zamienia rozpad w zwykłą porażkę i przepada (409 `no_scroll`) |
+| POST | `/api/items/:id/upgrade` | Kowadło: jedna próba ulepszenia przedmiotu o poziom, za złoto i rudę żelaza, a od +5 także za sztuki materiałów rzadkości przedmiotu, dowolnych, bo różne materiały tej rzadkości się sumują (409 `no_material`); z `ward: true` od +7 Zwój ochronny zamienia rozpad w zwykłą porażkę i przepada (409 `no_scroll`) |
 | POST | `/api/items/sell` | złomiarz: sprzedaj przedmioty z plecaka o rzadkości do `maxRarity` włącznie (cena z premią Skupu złomu) |
 | POST | `/api/items/:id/salvage` | rozbierz przedmiot z plecaka na Stole rozbiórki: znika od razu, a jego części przybędą, gdy skończy się zlecenie; zwraca `salvage`, a z Rzemieślnictwem także `pattern`, gdy rozbiórka odsłoniła wzór (409 `no_table`, `too_rare`, gdy stół nie bierze jeszcze tej rzadkości, `queue_full`, `equipped`) |
 | POST | `/api/craft/materials` | Stół rozbiórki: całe stosy materiałów do kolejki, `keys` (np. `["wolf-pelt:common"]`) albo `all: true`; zwraca `ordered` i `skipped`, czyli stosy za rzadkie na poziom stołu (409 `no_table`, `too_rare`, `queue_full`, `no_materials`) |

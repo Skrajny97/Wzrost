@@ -1346,7 +1346,7 @@ describe('upgrades on the Kowadło', () => {
     assert.equal((await upgrade()).data.error.code, 'not_enough');
   });
 
-  test('from +5 on a try takes a material of the item\'s rarity too: 1 at +5 and one more each level, the most plentiful stack unless one is chosen', async () => {
+  test('from +5 on a try takes materials of the item\'s rarity too: 1 at +5 and one more each level, the most plentiful first', async () => {
     await anvilAt(10);
     const at = (level) => db().then((database) => database.prepare("UPDATE items SET data = json_set(data, '$.upgrade', ?)").bind(level).run());
     const materials = async () => JSON.parse((await (await db()).prepare('SELECT materials FROM characters').first()).materials);
@@ -1354,26 +1354,91 @@ describe('upgrades on the Kowadło', () => {
     await stock(100000, { wood: 0, stone: 0, 'iron-ore': 1000 });
     assert.equal((await character()).bag[0].anvil.next.materials, null);
     await at(4);
-    assert.deepEqual((await character()).bag[0].anvil.next.materials, { rarity: 'common', count: 1 });
+    assert.deepEqual((await character()).bag[0].anvil.next.materials, { rarity: 'common', count: 1, have: 0, takes: null });
     const none = await upgrade();
     assert.equal(none.status, 409);
     assert.equal(none.data.error.code, 'no_material');
+    assert.equal(none.data.error.message, 'Brakuje 1 szt. materiałów tej samej rzadkości co przedmiot (pospolity).');
     // A rare material is not for a common item.
     await (await db()).prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ 'wolf-pelt:rare': 9, 'wolf-pelt:common': 1, 'fox-pelt:common': 3 })).run();
     const first = await upgrade();
     assert.equal(first.status, 200);
-    assert.deepEqual(first.data.upgrade.material, { key: 'fox-pelt:common', count: 1 });
+    assert.deepEqual(first.data.upgrade.materials, { 'fox-pelt:common': 1 });
     assert.deepEqual(await materials(), { 'wolf-pelt:rare': 9, 'wolf-pelt:common': 1, 'fox-pelt:common': 2 });
-    // At +6 two pieces, of the stack chosen; the last of a stack leaves no trace.
+    // At +6 two pieces; a material an older page names changes nothing, and
+    // the last of a stack leaves no trace.
     await at(5);
-    assert.deepEqual((await character()).bag[0].anvil.next.materials, { rarity: 'common', count: 2 });
-    const chosen = await call('POST', `/api/items/${itemId}/upgrade`, { cookie, body: { material: 'fox-pelt:common' } });
-    assert.deepEqual(chosen.data.upgrade.material, { key: 'fox-pelt:common', count: 2 });
+    assert.deepEqual((await character()).bag[0].anvil.next.materials.takes, [{ key: 'fox-pelt:common', materialId: 'fox-pelt', label: 'skóra lisa', count: 2 }]);
+    const second = await call('POST', `/api/items/${itemId}/upgrade`, { cookie, body: { material: 'wolf-pelt:common' } });
+    assert.deepEqual(second.data.upgrade.materials, { 'fox-pelt:common': 2 });
     assert.deepEqual(await materials(), { 'wolf-pelt:rare': 9, 'wolf-pelt:common': 1 });
     await at(5);
     assert.equal((await upgrade()).data.error.code, 'no_material');
-    // A failure takes the material as it takes the gold and the ore.
-    assert.ok(['success', 'failure'].includes(chosen.data.upgrade.result));
+    // A failure takes the materials as it takes the gold and the ore.
+    assert.ok(['success', 'failure'].includes(second.data.upgrade.result));
+  });
+
+  test('materials of the item\'s rarity add up (481 B): +6 takes one piece each of two materials, and too few in all take nothing', async () => {
+    await anvilAt(10);
+    const database = await db();
+    await database.prepare("UPDATE items SET data = json_set(data, '$.upgrade', 5, '$.rarity', 'unique')").run();
+    await stock(100000, { wood: 0, stone: 0, 'iron-ore': 1000 });
+    const materials = async () => JSON.parse((await database.prepare('SELECT materials FROM characters').first()).materials);
+    const setMaterials = (held) => database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify(held)).run();
+    // One unique piece and plenty of others is one short of two.
+    await setMaterials({ 'lynx-fur:unique': 1, 'wolf-pelt:common': 40, 'eel-skin:rare': 5 });
+    assert.deepEqual((await character()).bag[0].anvil.next.materials, { rarity: 'unique', count: 2, have: 1, takes: null });
+    const short = await upgrade();
+    assert.equal(short.status, 409);
+    assert.equal(short.data.error.code, 'no_material');
+    assert.equal(short.data.error.message, 'Brakuje 1 szt. materiałów tej samej rzadkości co przedmiot (unikalny).');
+    assert.deepEqual(await materials(), { 'lynx-fur:unique': 1, 'wolf-pelt:common': 40, 'eel-skin:rare': 5 });
+    assert.equal((await character()).gold, 100000);
+    // A Futro rysia and a Skóra węgorza are the two pieces +6 asks for.
+    await setMaterials({ 'lynx-fur:unique': 1, 'eel-skin:unique': 1, 'wolf-pelt:common': 40 });
+    assert.deepEqual(
+      (await character()).bag[0].anvil.next.materials.takes.map((one) => [one.key, one.count]),
+      [
+        ['eel-skin:unique', 1],
+        ['lynx-fur:unique', 1],
+      ],
+    );
+    const done = await upgrade();
+    assert.equal(done.status, 200, JSON.stringify(done.data));
+    assert.deepEqual(done.data.upgrade.materials, { 'eel-skin:unique': 1, 'lynx-fur:unique': 1 });
+    assert.deepEqual(await materials(), { 'wolf-pelt:common': 40 });
+    // The most plentiful material goes first, so a single piece stays.
+    await database.prepare("UPDATE items SET data = json_set(data, '$.upgrade', 6)").run();
+    await setMaterials({ 'spider-silk:unique': 2, 'lynx-fur:unique': 1, 'eel-skin:unique': 4 });
+    const third = await upgrade();
+    assert.equal(third.status, 200, JSON.stringify(third.data));
+    assert.deepEqual(third.data.upgrade.materials, { 'eel-skin:unique': 3 });
+    assert.deepEqual(await materials(), { 'spider-silk:unique': 2, 'lynx-fur:unique': 1, 'eel-skin:unique': 1 });
+  });
+
+  test('two items upgraded at once share the pieces two stacks hold: one try is paid, the other takes nothing', async () => {
+    await anvilAt(10);
+    const database = await db();
+    const mail = { base: 'chainmail', slot: 'chest', level: 5, rarity: 'common', affixes: [], armor: 15, upgrade: 5 };
+    const other = (await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(mail)).run()).meta.last_row_id;
+    await database.prepare("UPDATE items SET data = json_set(data, '$.upgrade', 5)").run();
+    await stock(100000, { wood: 0, stone: 0, 'iron-ore': 1000 });
+    // Enough for one try at +6, from two stacks.
+    await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ 'wolf-pelt:common': 1, 'fox-pelt:common': 1 })).run();
+    const taps = await Promise.all([upgrade(), call('POST', `/api/items/${other}/upgrade`, { cookie })]);
+    assert.deepEqual(
+      taps.map((tap) => tap.status).sort(),
+      [200, 409],
+    );
+    const made = taps.find((tap) => tap.status === 200).data;
+    assert.deepEqual(made.upgrade.materials, { 'fox-pelt:common': 1, 'wolf-pelt:common': 1 });
+    assert.ok(['item_changed', 'no_material'].includes(taps.find((tap) => tap.status === 409).data.error.code));
+    const row = await database.prepare('SELECT gold, materials FROM characters').first();
+    assert.equal(row.gold, 100000 - made.upgrade.cost.gold);
+    assert.deepEqual(JSON.parse(row.materials), {});
+    // Only the paid try is on an item.
+    const rolls = (await database.prepare("SELECT json_extract(data, '$.lastRoll') AS roll FROM items ORDER BY id").all()).results.map((one) => one.roll);
+    assert.equal(rolls.filter(Boolean).length, 1);
   });
 
   test('during an exploration a worn item waits, one in the bag is upgraded; the scrapper does not sell upgraded items by the handful', async () => {

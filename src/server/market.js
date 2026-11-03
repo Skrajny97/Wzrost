@@ -400,6 +400,24 @@ export function counted(column, adds) {
   return { sql, binds };
 }
 
+// Pieces taken off a JSON column of counts of the characters row, `taken`
+// by key (e.g. piecesOfRarity in the engine, from several stacks): `sql`
+// is the column after it, each stack less by its pieces and one left at 0
+// gone, and `enough` the condition that each stack still holds its
+// pieces, each with what its SQL needs bound in order. Nothing taken leaves
+// the column as it is.
+export function takenOff(column, taken) {
+  const entries = Object.entries(taken ?? {});
+  if (entries.length === 0) return { sql: column, binds: [], enough: '1', enoughBinds: [] };
+  const less = counted(`characters.${column}`, Object.fromEntries(entries.map(([key, count]) => [key, -count])));
+  return {
+    sql: `(SELECT COALESCE(json_group_object(key, value), '{}') FROM json_each(${less.sql}) WHERE value > 0)`,
+    binds: less.binds,
+    enough: entries.map(() => `COALESCE(json_extract(${column}, ?), 0) >= ?`).join(' AND '),
+    enoughBinds: entries.flatMap(([key, count]) => [jsonPath(key), count]),
+  };
+}
+
 // The goods got from other players count as a trade's for the Encyklopedia
 // (ownDiscoveries in the engine), as those of the Wymiana do.
 export function foreign(adds) {

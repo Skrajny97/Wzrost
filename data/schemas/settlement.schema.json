@@ -223,7 +223,7 @@
         "growth": { "type": "number", "minimum": 1 },
         "materials": {
           "type": "object",
-          "description": "Według rzadkości przedmiotu: rzadkość i liczba sztuk materiału stworów.",
+          "description": "Według rzadkości przedmiotu: rzadkość i liczba sztuk materiałów stworów; różne materiały tej rzadkości się sumują (481 B).",
           "additionalProperties": {
             "type": "object",
             "additionalProperties": false,

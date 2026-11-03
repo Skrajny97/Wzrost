@@ -1,18 +1,33 @@
 // The Kuźnia in the Osada (question 326 A; the engine's forge.js): Żelisław
 // of the Bractwo Kowali sells the Zwój ochronny for the Kowadło, a few a
 // day, and raises an item's rarity by one step, once per item, for gold
-// and pieces of one material of the item's rarity. Each trade grows the
-// relation with him and the Bractwo Kowali's reputation, up to his own
-// day's limit (tradePoints), as the Garbarnia's trade has its own.
+// and pieces of materials of the item's rarity, any of them added up
+// (481 B). Each trade grows the relation with him and the Bractwo Kowali's
+// reputation, up to his own day's limit (tradePoints), as the Garbarnia's
+// trade has its own.
 
-import { createRng, forgeDiscount, forgeTopRarity, itemName, knownStack, materialView, parseStack, questPeriod, raiseOffer, raiseRarity, scrollPrice, tradePoints, tradeView } from '../engine/index.js';
+import {
+  createRng,
+  forgeDiscount,
+  forgeTopRarity,
+  heldOfRarity,
+  itemName,
+  piecesOfRarity,
+  questPeriod,
+  raiseOffer,
+  raiseRarity,
+  rarityNeedView,
+  scrollPrice,
+  tradePoints,
+  tradeView,
+} from '../engine/index.js';
 import { characterView, loadPlayer, requirePlayer, requireUnworn, settlementBoard } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
+import { takenOff } from './market.js';
 import { requireOpen, settlementOf, settlementView } from './settlement.js';
 
-const jsonPath = (key) => `$."${key}"`;
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 const forge = () => content.settlement.forge;
 
@@ -45,13 +60,9 @@ export function forgeView(player, stored, now) {
     trade: tradeView(stored.forgeTrade, row.level, now, content, forge().reputation),
     items: player.items.map((item) => {
       const offer = raiseOffer(item, relation, reputation, content);
-      // The materials of the item's rarity the character has enough of, as the
-      // Zaklinaczka lists them.
-      const stacks = offer.gold
-        ? Object.entries(materials)
-            .filter(([key, count]) => knownStack(key, content) && parseStack(key).rarityId === offer.material && count >= offer.materials)
-            .map(([key, count]) => ({ key, label: materialView(key, count, content).label, count }))
-        : [];
+      // The pieces of the item's rarity the character holds in all and
+      // those the raise would take, as at the Zaklinaczka (rarityNeedView).
+      const need = offer.material && rarityNeedView(materials, { rarity: offer.material, count: offer.materials }, content);
       return {
         id: item.id,
         name: itemName(item, content),
@@ -62,7 +73,7 @@ export function forgeView(player, stored, now) {
         ...(offer.next && { nextName: content.raritiesById[offer.next].name }),
         ...(offer.material && { materialName: content.raritiesById[offer.material].name }),
         ...(offer.top && { topName: content.raritiesById[offer.top].name }),
-        stacks,
+        ...(need && { have: need.have, takes: need.takes }),
       };
     }),
   };
@@ -99,9 +110,10 @@ export async function buyScrolls(context) {
   return json({ bought: { count: body.count, gold, points }, settlement: osada(after, context.now), character: characterView(after, context.now) });
 }
 
-// POST /api/settlement/forge/raise { itemId, material }: one rarity up, once
-// per item, for gold and pieces of one material of the item's rarity (its
-// key "material:rarity"). A worn item waits for the return from an exploration.
+// POST /api/settlement/forge/raise { itemId }: one rarity up, once per item,
+// for gold and pieces of materials of the item's rarity, any of them added
+// up, the most plentiful material first (piecesOfRarity in the engine). A
+// worn item waits for the return from an exploration.
 export async function raiseAtForge(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -117,17 +129,17 @@ export async function raiseAtForge(context) {
   if (offer.reason === 'raised') throw new ApiError(409, 'raised', 'Ten przedmiot kowal już raz przekuł.');
   if (offer.reason === 'top') throw new ApiError(409, 'top', 'Wyżej tej rzadkości już nie ma.');
   if (offer.reason === 'relation') throw new ApiError(409, 'relation', `Na razie kowal przekuwa przedmioty najwyżej do rzadkości „${content.raritiesById[offer.top].name}”. Lepsza relacja z nim pozwoli iść wyżej.`);
-  const key = typeof body.material === 'string' ? body.material : '';
   const materials = JSON.parse(row.materials ?? '{}');
-  if (!knownStack(key, content) || parseStack(key).rarityId !== offer.material) {
-    throw new ApiError(400, 'invalid_material', `Wybierz materiał o rzadkości „${content.raritiesById[offer.material].name}”.`);
+  const taken = piecesOfRarity(materials, { rarity: offer.material, count: offer.materials }, content);
+  if (!taken) {
+    const short = offer.materials - heldOfRarity(materials, offer.material, content);
+    throw new ApiError(409, 'no_material', `Brakuje ${short} szt. materiałów tej samej rzadkości co przedmiot (${content.raritiesById[offer.material].name}).`);
   }
-  if ((materials[key] ?? 0) < offer.materials) throw new ApiError(409, 'no_material', `Potrzeba ${offer.materials} szt. tego materiału.`);
   if (row.gold < offer.gold) throw new ApiError(409, 'no_gold', 'Brakuje złota.');
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const raised = raiseRarity(item, createRng(roll), content);
   const { points, next } = grown(stored, offer.gold, row.level, context.now);
-  const path = jsonPath(key);
+  const pay = takenOff('materials', taken);
   const db = context.env.DB;
   // As at the Zaklinaczka: the item changes only if it and the character are
   // as seen here, and the payment only if this raise was saved.
@@ -140,13 +152,11 @@ export async function raiseAtForge(context) {
       .bind(raised.rarity, JSON.stringify(raised.affixes), roll, item.id, row.id, row.id, row.version),
     db
       .prepare(
-        `UPDATE characters SET gold = gold - ?, settlement = ?,
-           materials = CASE WHEN json_extract(materials, ?) > ? THEN json_set(materials, ?, json_extract(materials, ?) - ?) ELSE json_remove(materials, ?) END,
-           version = version + 1
-         WHERE id = ? AND version = ? AND gold >= ? AND COALESCE(json_extract(materials, ?), 0) >= ?
+        `UPDATE characters SET gold = gold - ?, settlement = ?, materials = ${pay.sql}, version = version + 1
+         WHERE id = ? AND version = ? AND gold >= ? AND ${pay.enough}
            AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
       )
-      .bind(offer.gold, JSON.stringify(next), path, offer.materials, path, path, offer.materials, path, row.id, row.version, offer.gold, path, offer.materials, item.id, roll),
+      .bind(offer.gold, JSON.stringify(next), ...pay.binds, row.id, row.version, offer.gold, ...pay.enoughBinds, item.id, roll),
   ]);
   const after = await loadPlayer(db, session.userId);
   const saved = after.items.find((candidate) => candidate.id === item.id);

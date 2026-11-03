@@ -74,6 +74,10 @@ let bagTab = 'items';
 // "Rzadka skóra wilka" for a stack above its species' rarity.
 export const materialTitle = (material) => material.label.charAt(0).toUpperCase() + material.label.slice(1);
 
+// The pieces a need of materials of a rarity takes, as the server picks
+// them ({ key, materialId, label, count }): "1 × Futro rysia, 1 × Skóra węgorza".
+export const piecesText = (takes) => takes.map((one) => `${formatNumber(one.count)} × ${materialTitle(one)}`).join(', ');
+
 // Why the gear cannot change now: the character is on an exploration, whose
 // report is made with what it wears (inventory.js). At a profession's work
 // the gear is at hand (the author: "W trakcie wykonywania Profesji.. w sumie
@@ -905,46 +909,29 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
   }
   const have = Object.fromEntries(walletEntries().map((entry) => [entry.id, entry]));
   const short = Object.entries(next.cost).some(([resource, amount]) => (have[resource]?.amount ?? 0) < amount);
-  // From +5 on a material of the item's rarity too (proposal 4: "Wyższe
-  // ulepszenia biorą też materiał rzadkości przedmiotu"): the stack with the
-  // most pieces, unless the player picks another one.
+  // From +5 on materials of the item's rarity too (proposal 4: "Wyższe
+  // ulepszenia biorą też materiał rzadkości przedmiotu"), any of them added
+  // up (481 B): the pieces held in all (`have`) and those the server takes,
+  // the most plentiful material first (`takes`, null while too few).
   const need = next.materials;
-  const stacks = need
-    ? (state.character.crafting?.materials ?? []).filter((material) => material.rarity === need.rarity && material.count >= need.count).sort((a, b) => b.count - a.count)
-    : [];
-  let chosen = stacks[0] ?? null;
-  const missing = short || Boolean(need && !chosen);
-  const paid = need ? 'złoto, rudę i materiał' : 'złoto i rudę';
+  const lacks = Boolean(need && !need.takes);
+  const missing = short || lacks;
+  const rarityName = need ? (state.content.rarities.find((rarity) => rarity.id === need.rarity)?.name ?? need.rarity) : '';
+  const paid = need ? 'złoto, rudę i materiały' : 'złoto i rudę';
   const risk =
     anvil.level === 0
       ? `Porażka zabiera tylko ${paid}.`
       : `Porażka zabiera ${paid}, a przedmiot spada do +${anvil.level - 1}${
           next.breakChance > 0 ? `. Z szansą ${percent(next.breakChance)} przedmiot rozpada się` : ''
         }.`;
-  const materialCost = () =>
+  const materialLine =
+    need &&
     h(
       'li',
-      { class: `cost${chosen ? '' : ' cost--missing'}` },
-      chosen ? materialIcon(chosen.materialId, 16) : icon('unknown', { size: 16 }),
-      h('span', { text: chosen ? materialTitle(chosen) : `Materiał: ${state.content.rarities.find((rarity) => rarity.id === need.rarity)?.name ?? need.rarity}` }),
-      h('strong', { text: `${formatNumber(chosen?.count ?? 0)} / ${formatNumber(need.count)}` }),
-    );
-  let materialLine = need ? materialCost() : null;
-  const picker =
-    stacks.length > 1 &&
-    h(
-      'select',
-      {
-        class: 'anvil-material',
-        'aria-label': 'Materiał do ulepszenia',
-        onChange: (event) => {
-          chosen = stacks.find((material) => material.key === event.currentTarget.value) ?? chosen;
-          const line = materialCost();
-          materialLine.replaceWith(line);
-          materialLine = line;
-        },
-      },
-      stacks.map((material) => h('option', { value: material.key, text: `${materialTitle(material)} (${formatNumber(material.count)} szt.)` })),
+      { class: `cost${lacks ? ' cost--missing' : ''}` },
+      lacks ? icon('unknown', { size: 16 }) : materialIcon(need.takes[0].materialId, 16),
+      h('span', { text: `Materiały (${rarityName})` }),
+      h('strong', { text: `${formatNumber(need.have)} / ${formatNumber(need.count)}` }),
     );
   // The scroll only where the item may break; the box starts empty, so a
   // scroll goes only when the player says so.
@@ -953,7 +940,7 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
     next.breakChance > 0 && scrolls > 0 ? h('input', { type: 'checkbox', class: 'avoid-rare-box', id: `ward-${item.id}`, 'aria-describedby': `ward-note-${item.id}` }) : null;
   const upgrade = (event) =>
     withButton(event.currentTarget, async () => {
-      const answer = await send({ ward: Boolean(ward?.checked), ...(chosen && { material: chosen.key }) });
+      const answer = await send({ ward: Boolean(ward?.checked) });
       const done = answer.upgrade;
       if (done.result === 'success') {
         playSound('done');
@@ -994,10 +981,12 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
       ),
       materialLine,
     ),
-    picker,
-    need && !chosen && h('p', { class: 'system-hint', text: `To ulepszenie bierze też ${formatNumber(need.count)} szt. jednego materiału tej samej rzadkości co przedmiot. Różne materiały się nie sumują.` }),
-    // One material of the item's rarity, from the guild (346 A).
-    need && !chosen && askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }),
+    // Which pieces go: the server's pick (481 B).
+    need && !lacks && h('p', { class: 'muted', text: `Ulepszenie weźmie: ${piecesText(need.takes)}.` }),
+    lacks && h('p', { class: 'system-hint', text: `To ulepszenie bierze też ${formatNumber(need.count)} szt. materiałów tej samej rzadkości co przedmiot (dowolnych, sumują się).` }),
+    // A material of the item's rarity, from the guild (346 A): what is
+    // missing in all, of whichever material is asked for.
+    lacks && askGuildButton({ kind: 'material', rarity: need.rarity, missing: need.count - need.have }),
     h('p', { class: 'muted', text: risk }),
     ward &&
       h(
@@ -1034,13 +1023,11 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
   // What the try lacks, said under "Ulepsz" instead of unfolding (the author:
   // "Niech Ulepsz jeśli chodzi o przedmiot nie otwiera się tylko pokazuje
   // czego brakuje jeśli nie da się ulepszyć").
-  const nearest = need && !chosen ? ((state.character.crafting?.materials ?? []).filter((material) => material.rarity === need.rarity).sort((a, b) => b.count - a.count)[0] ?? null) : null;
-  const rarityName = need ? (state.content.rarities.find((rarity) => rarity.id === need.rarity)?.name ?? need.rarity) : '';
-  const lacking = [...costShortfall(next.cost), need && !chosen && `${formatNumber(need.count - (nearest?.count ?? 0))} szt. jednego materiału (${rarityName}): to ulepszenie bierze ${formatNumber(need.count)} szt. tego samego materiału`].filter(Boolean);
+  const lacking = [...costShortfall(next.cost), lacks && `${formatNumber(need.count - need.have)} szt. materiałów (${rarityName}): to ulepszenie bierze ${formatNumber(need.count)} szt.`].filter(Boolean);
   const note = h('p', { class: 'region-warning', role: 'status', hidden: true });
-  // The material the try lacks, from the guild (346 A), under what is
+  // The materials the try lacks, from the guild (346 A), under what is
   // missing once "Ulepsz" says it.
-  const ask = need && !chosen ? askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }) : null;
+  const ask = lacks ? askGuildButton({ kind: 'material', rarity: need.rarity, missing: need.count - need.have }) : null;
   if (ask) ask.hidden = true;
   const folded = h(
     'div',
@@ -1053,7 +1040,9 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
       text: 'Ulepsz',
       onClick: () => {
         if (lacking.length > 0) {
-          note.textContent = `Brakuje: ${lacking.join(', ')}.`;
+          // One full stop, also after "szt.".
+          const said = lacking.join(', ');
+          note.textContent = `Brakuje: ${said}${said.endsWith('.') ? '' : '.'}`;
           note.hidden = false;
           if (ask) ask.hidden = false;
           return;

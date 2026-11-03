@@ -2,8 +2,9 @@
 // author: "Kowal i to i rzadkość, niech to Bractwo ma zastosowanie
 // jakieś"): he sells the Zwój ochronny for the Kowadło, a few a day, and
 // raises an item's rarity by one step, once per item, for gold and pieces
-// of one material of the item's rarity (339 A: of the new one, legendary
-// and rarer raises were out of reach). How far he goes follows the relation
+// of materials of the item's rarity (339 A: of the new one, legendary and
+// rarer raises were out of reach), any of them added up (481 B:
+// piecesOfRarity in crafting.js). How far he goes follows the relation
 // with him, and the Bractwo Kowali's reputation lowers his gold prices.
 // The numbers are in data/settlement.json (`forge`).
 
@@ -35,8 +36,8 @@ export const scrollPrice = (reputation, content) => Math.round(content.settlemen
 // What raising `item` takes, or why it cannot be raised: `reason` is
 // "raised" (once per item), "top" (no rarity above) or "relation" (above
 // what the relation lets the smith do; `top` names that rarity). It takes
-// gold and `materials` pieces of one material of the item's own rarity
-// (`material`), as the Kowadło does.
+// gold and `materials` pieces of materials of the item's own rarity
+// (`material`), any of them added up, as the Kowadło does.
 export function raiseOffer(item, relation, reputation, content) {
   const next = nextRarity(item, content);
   if (item.raised) return { reason: 'raised' };

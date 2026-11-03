@@ -117,17 +117,21 @@ describe('the Kuźnia through the API', () => {
     const id = meta.last_row_id;
     const raise = (body) => call('POST', '/api/settlement/forge/raise', { cookie, body: { itemId: id, ...body } });
     const offer = raiseOffer(sword, 0, 0, content);
-    assert.equal((await raise({})).data.error.code, 'invalid_material');
-    assert.equal((await raise({ material: `${content.materials[0].id}:unique` })).data.error.code, 'invalid_material');
-    assert.equal((await raise({ material })).data.error.code, 'no_material');
+    // Materials of another rarity are not for a rare item.
+    await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ [`${content.materials[0].id}:unique`]: 50 })).run();
+    const none = await raise({});
+    assert.equal(none.data.error.code, 'no_material');
+    assert.equal(none.data.error.message, `Brakuje ${offer.materials} szt. materiałów tej samej rzadkości co przedmiot (${content.raritiesById.rare.name}).`);
     await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ [material]: offer.materials })).run();
     const shown = (await call('GET', '/api/settlement', { cookie })).data.settlement.forge.items.find((item) => item.id === id);
     assert.equal(shown.gold, offer.gold);
+    assert.equal(shown.have, offer.materials);
     assert.deepEqual(
-      shown.stacks.map((stack) => stack.key),
-      [material],
+      shown.takes.map((one) => [one.key, one.count]),
+      [[material, offer.materials]],
     );
-    const raised = await raise({ material });
+    // A material named by an older page changes nothing.
+    const raised = await raise({ material: `${content.materials[0].id}:unique` });
     assert.equal(raised.status, 200);
     assert.equal(raised.data.raised.afterName, content.raritiesById.unique.name);
     // The rarities by id too, for their colours on the page.
@@ -141,7 +145,42 @@ describe('the Kuźnia through the API', () => {
     assert.equal(item.raised, true);
     assert.equal(item.affixes.length, sword.affixes.length + 1);
     await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ [`${content.materials[0].id}:epic`]: 50 })).run();
-    assert.equal((await raise({ material: `${content.materials[0].id}:epic` })).data.error.code, 'raised');
+    assert.equal((await raise({})).data.error.code, 'raised');
+  });
+
+  test('different materials of the item\'s rarity add up (481 B), the most plentiful going first, and too few in all raise nothing', async () => {
+    const database = await db();
+    const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(sword)).run();
+    const id = meta.last_row_id;
+    const raise = () => call('POST', '/api/settlement/forge/raise', { cookie, body: { itemId: id } });
+    const offer = raiseOffer(sword, 0, 0, content);
+    assert.equal(offer.materials, 5);
+    const stock = (materials) => database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify(materials)).run();
+    // Four rare pieces of three materials: one short.
+    await stock({ 'boar-tusk:rare': 2, 'crow-feather:rare': 1, 'wolf-pelt:rare': 1, 'wolf-pelt:common': 30 });
+    const short = await raise();
+    assert.equal(short.status, 409);
+    assert.equal(short.data.error.code, 'no_material');
+    assert.equal(short.data.error.message, `Brakuje 1 szt. materiałów tej samej rzadkości co przedmiot (${content.raritiesById.rare.name}).`);
+    let shown = (await call('GET', '/api/settlement', { cookie })).data.settlement.forge.items.find((item) => item.id === id);
+    assert.deepEqual([shown.have, shown.takes], [4, null]);
+    assert.equal(JSON.parse((await database.prepare('SELECT data FROM items WHERE id = ?').bind(id).first()).data).rarity, 'rare');
+    // One more of any of them makes five: the biggest stacks go, the last
+    // single piece stays.
+    await stock({ 'boar-tusk:rare': 3, 'crow-feather:rare': 2, 'wolf-pelt:rare': 1, 'wolf-pelt:common': 30 });
+    shown = (await call('GET', '/api/settlement', { cookie })).data.settlement.forge.items.find((item) => item.id === id);
+    assert.deepEqual(
+      shown.takes.map((one) => [one.key, one.label, one.count]),
+      [
+        ['boar-tusk:rare', 'kieł dzika', 3],
+        ['crow-feather:rare', 'pióro kruka', 2],
+      ],
+    );
+    const raised = await raise();
+    assert.equal(raised.status, 200, JSON.stringify(raised.data));
+    assert.equal(raised.data.raised.after, 'unique');
+    assert.equal(raised.data.character.gold, 100000 - offer.gold);
+    assert.deepEqual(JSON.parse((await database.prepare('SELECT materials FROM characters').first()).materials), { 'wolf-pelt:rare': 1, 'wolf-pelt:common': 30 });
   });
 
   test('a stranger gets his work only up to unikalny', async () => {
@@ -150,7 +189,7 @@ describe('the Kuźnia through the API', () => {
     const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(unique)).run();
     const uniqueMaterial = `${content.materials[0].id}:unique`;
     await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ [uniqueMaterial]: 20 })).run();
-    const raise = () => call('POST', '/api/settlement/forge/raise', { cookie, body: { itemId: meta.last_row_id, material: uniqueMaterial } });
+    const raise = () => call('POST', '/api/settlement/forge/raise', { cookie, body: { itemId: meta.last_row_id } });
     assert.equal((await raise()).data.error.code, 'relation');
     await database.prepare('UPDATE characters SET settlement = ?').bind(JSON.stringify({ relations: { [tuning.resident]: standings[1].points } })).run();
     const raised = await raise();

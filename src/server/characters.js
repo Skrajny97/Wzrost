@@ -967,7 +967,9 @@ export function characterView(player, now) {
       ...(pattern && { pattern: content.basesById[pattern].name }),
     };
   };
-  const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap }), salvage: salvage(item) });
+  // The materials that pay for the Kowadło's upgrades from +5 on.
+  const materials = JSON.parse(row.materials ?? '{}');
+  const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap, materials }), salvage: salvage(item) });
   // Whether a bag item would make the character stronger in place of what
   // its slot holds (preview.js), for the marks on the bag and on finds; null
   // for an item the class cannot wear.

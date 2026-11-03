@@ -60,6 +60,53 @@ export function addCounts(counts, more) {
   return sum;
 }
 
+// A character's stacks of the materials of one rarity, in the order a need
+// of that rarity takes them (piecesOfRarity): the material it holds the
+// most pieces of first, on a tie the one first by its id.
+export function stacksOfRarity(materials, rarityId, content) {
+  const byId = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+  return Object.entries(materials ?? {})
+    .filter(([key, count]) => count > 0 && knownStack(key, content) && parseStack(key).rarityId === rarityId)
+    .sort(([a, x], [b, y]) => y - x || byId(parseStack(a).materialId, parseStack(b).materialId));
+}
+
+// How many pieces of materials of one rarity the character holds in all.
+export const heldOfRarity = (materials, rarityId, content) => stacksOfRarity(materials, rarityId, content).reduce((sum, [, count]) => sum + count, 0);
+
+// The pieces a need of `count` materials of one rarity takes, by stack
+// key: the Kowadło's from +5 on (upgradeMaterials in items.js), the
+// Kuźnia's and the Zaklinaczka's zaklęcie afiksu. Any materials of that
+// rarity add up (the author: 481 B), and the pieces go first from the
+// material the character holds the most of (stacksOfRarity), so its single
+// rarer pieces stay. Null when all of them together are fewer.
+export function piecesOfRarity(materials, { rarity, count }, content) {
+  const taken = {};
+  let left = count;
+  for (const [key, held] of stacksOfRarity(materials, rarity, content)) {
+    if (left <= 0) break;
+    taken[key] = Math.min(held, left);
+    left -= taken[key];
+  }
+  return left > 0 ? null : taken;
+}
+
+// Such a need as the pages show it: the pieces of that rarity held in all
+// (`have`) and those it would take (`takes`: each stack's key, material,
+// name and pieces, as piecesOfRarity picks them), or null while too few.
+export function rarityNeedView(materials, need, content) {
+  const pieces = piecesOfRarity(materials, need, content);
+  return {
+    ...need,
+    have: heldOfRarity(materials, need.rarity, content),
+    takes:
+      pieces &&
+      Object.entries(pieces).map(([key, count]) => {
+        const { materialId, label } = materialView(key, count, content);
+        return { key, materialId, label, count };
+      }),
+  };
+}
+
 // The chances that a creature of `level` leaves its material one, two or
 // more rarities above its species' (the author: the second grade sometimes,
 // the third much more rarely at low levels, and higher grades later). The

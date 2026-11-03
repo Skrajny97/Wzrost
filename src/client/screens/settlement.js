@@ -22,7 +22,7 @@ import { companionCard } from '../companions.js';
 import { askGuildButton } from '../guild-requests.js';
 import { stableCard } from '../stable.js';
 import { tanneryCard } from '../tannery.js';
-import { itemSummary, materialTitle } from './character.js';
+import { itemSummary, piecesText } from './character.js';
 import { mountMarket, numberField, stackButton } from './market.js';
 
 // A rarity's colour in the game (data/rarities.json), as items show it.
@@ -218,65 +218,50 @@ export function mountSettlement(container, { params = {} } = {}) {
   };
   const pickMark = () => h('span', { class: 'trade-pick-mark', 'aria-hidden': 'true' }, icon('check', { size: 18 }));
 
-  // What a service takes, as the Kowadło shows it: gold and the material,
-  // each as had / needed, red while short, the stack nearest to enough when
-  // none is, and what is missing (a tester via the author: "Co masz ile ci
-  // czego brakuje", "Może żeby jakoś graficznie to przedstawić"). `need` is
-  // the material's count, rarity and the stacks of it that are enough, or
-  // null; `takes` begins the sentence on the material.
-  function costPart({ gold, need, material, title, takes }) {
+  // What a service takes, as the Kowadło shows it: gold and the materials,
+  // each as had / needed, red while short, and what is missing (a tester
+  // via the author: "Co masz ile ci czego brakuje", "Może żeby jakoś
+  // graficznie to przedstawić"). `need` is the materials' count and rarity
+  // with the pieces of that rarity held in all (`have`: any materials of it
+  // add up, 481 B) and those the server takes (`takes`, the most plentiful
+  // material first; null while too few), or null; `who` begins the sentence
+  // on them ("Kowal").
+  function costPart({ gold, need, title, who }) {
     const goldShort = Math.max(0, gold - state.character.gold);
     const chip = (art, label, have, wanted) =>
       h('li', { class: `cost${have < wanted ? ' cost--missing' : ''}` }, art, h('span', { text: label }), h('strong', { text: `${formatNumber(have)} / ${formatNumber(wanted)}` }));
-    const picked = need?.stacks.find((one) => one.key === material) ?? null;
-    // None of the rarity is enough: the stack of it with the most pieces.
-    const nearest = need && !picked ? ((state.character.crafting?.materials ?? []).filter((one) => one.rarity === need.rarity).sort((a, b) => b.count - a.count)[0] ?? null) : null;
-    const materialShort = need && !picked ? Math.max(0, need.count - (nearest?.count ?? 0)) : 0;
+    const materialShort = need && !need.takes ? Math.max(1, need.count - need.have) : 0;
     const materialChip =
-      need &&
-      (picked
-        ? chip(materialIcon(picked.key.slice(0, picked.key.lastIndexOf(':')), 16), materialTitle(picked), picked.count, need.count)
-        : chip(nearest ? materialIcon(nearest.materialId, 16) : icon('unknown', { size: 16 }), nearest ? materialTitle(nearest) : `Materiał: ${need.rarityName}`, nearest?.count ?? 0, need.count));
-    const missing = [goldShort > 0 && `${formatNumber(goldShort)} złota`, materialShort > 0 && `${formatNumber(materialShort)} szt. materiału`].filter(Boolean);
+      need && chip(need.takes ? materialIcon(need.takes[0].materialId, 16) : icon('unknown', { size: 16 }), `Materiały (${need.rarityName})`, need.have, need.count);
+    const missing = [goldShort > 0 && `${formatNumber(goldShort)} złota`, materialShort > 0 && `${formatNumber(materialShort)} szt. materiałów (${need.rarityName})`].filter(Boolean);
     return {
       goldShort,
-      // The material there to give, or none needed.
-      materialReady: !need || Boolean(picked),
+      // The materials there to give, or none needed.
+      materialReady: !need || Boolean(need.takes),
       element: [
         h('p', { class: 'field-label', text: title }),
         h('ul', { class: 'cost-list', 'aria-label': title }, chip(resourceArt('gold', 16), 'Złoto', state.character.gold, gold), materialChip),
-        need && h('p', { class: 'muted', text: `${takes} ${formatNumber(need.count)} szt. jednego materiału o rzadkości „${need.rarityName}”.` }),
+        // Which pieces go, the server's pick, or the rule while too few.
+        need &&
+          h('p', {
+            class: 'muted',
+            text: need.takes
+              ? `${who} weźmie: ${piecesText(need.takes)}.`
+              : `${who} bierze ${formatNumber(need.count)} szt. materiałów o rzadkości „${need.rarityName}” (dowolnych, sumują się).`,
+          }),
         missing.length > 0 && h('p', { class: 'region-warning', text: `Brakuje: ${missing.join(', ')}.` }),
         materialShort > 0 && h('p', { class: 'system-hint', text: 'Materiały tej rzadkości wypadają ze stworów na wyprawach. Kupisz je też na Targowisku.' }),
-        // One material of the rarity, from the guild (346 A).
-        materialShort > 0 && askGuildButton({ kind: 'material', rarity: need.rarity, need: need.count }),
+        // A material of the rarity, from the guild (346 A): what is missing
+        // in all, of whichever material is asked for.
+        materialShort > 0 && askGuildButton({ kind: 'material', rarity: need.rarity, missing: materialShort }),
       ],
     };
   }
 
-  // Which of the stacks that are enough to give, where more than one is.
-  const materialPicks = (label, stacks, material, choose) =>
-    stacks.length > 1 && [
-      h('p', { class: 'field-label', text: label }),
-      h(
-        'div',
-        { class: 'settlement-picks' },
-        stacks.map((one) =>
-          h(
-            'button',
-            { type: 'button', class: 'item-row trade-pick settlement-pick', 'aria-pressed': String(one.key === material), onClick: () => choose(one.key) },
-            h('span', { class: 'settlement-pick-art' }, materialIcon(one.key.slice(0, one.key.lastIndexOf(':')), 28)),
-            h('span', { class: 'settlement-pick-text', text: `${one.label} (${formatNumber(one.count)})` }),
-            pickMark(),
-          ),
-        ),
-      ),
-    ];
-
   // The Zaklinaczka's reforging in a sheet, a step at a time, in the game's
   // own rows (the author: "ekran wyboru przy afiksie powinien być
-  // ingameowy"): the item, then its affix and the material, then what the
-  // affix became, or the affixes she drew to keep one of.
+  // ingameowy"): the item, then its affix with what it takes, then what
+  // the affix became, or the affixes she drew to keep one of.
   // The zaklęcie żywiołu in a sheet (part III, question 101 A): a weapon or
   // a body armour, then its element, each with what it gives and costs.
   function imbueSheet() {
@@ -376,15 +361,13 @@ export function mountSettlement(container, { params = {} } = {}) {
       );
     }
 
-    function pickAffix(itemId, affix = null, stack = null) {
+    function pickAffix(itemId, affix = null) {
       const item = data.reforge.items.find((one) => one.id === itemId);
       if (!item) return pickItem();
-      const stacks = item.materials?.stacks ?? [];
       // An item with one affix has nothing to choose.
       let chosen = affix ?? (item.affixes.length === 1 ? 0 : null);
-      let material = stacks.some((one) => one.key === stack) ? stack : (stacks[0]?.key ?? null);
       const draw = () => {
-        const cost = costPart({ gold: item.gold, need: item.materials, material, title: 'Koszt zaklęcia', takes: 'Zaklęcie bierze' });
+        const cost = costPart({ gold: item.gold, need: item.materials, title: 'Koszt zaklęcia', who: 'Zaklęcie' });
         const ready = chosen !== null && cost.goldShort === 0 && cost.materialReady;
         fill(
           body,
@@ -423,11 +406,6 @@ export function mountSettlement(container, { params = {} } = {}) {
               );
             }),
           ),
-          // Which material to give, where more than one is enough.
-          materialPicks('Materiał do zaklęcia', stacks, material, (key) => {
-            material = key;
-            draw();
-          }),
           data.reforge.choices > 1 && h('p', { class: 'muted', text: `Zaklinaczka wylosuje ${data.reforge.choices} nowe afiksy, a Ty zatrzymasz jeden z nich.` }),
           h('button', {
             type: 'button',
@@ -436,10 +414,10 @@ export function mountSettlement(container, { params = {} } = {}) {
             disabled: !ready,
             onClick: (event) =>
               withButton(event.currentTarget, async () => {
-                const answer = await call('POST', '/api/settlement/reforge', { itemId, affix: chosen, material: item.materials ? material : undefined });
+                const answer = await call('POST', '/api/settlement/reforge', { itemId, affix: chosen });
                 await load();
-                if (answer.pending) choose(answer.pending, { affix: chosen, material });
-                else showResult(answer.result, { affix: chosen, material });
+                if (answer.pending) choose(answer.pending, { affix: chosen });
+                else showResult(answer.result, { affix: chosen });
               }),
           }),
         );
@@ -478,7 +456,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     }
 
     // What the affix became; the same affix can be reforged again at once.
-    function showResult(result, { affix = null, material = null } = {}) {
+    function showResult(result, { affix = null } = {}) {
       fill(
         body,
         h('p', { class: 'settlement-result-title', text: 'Zaklinaczka zaklęła afiks' }),
@@ -493,7 +471,7 @@ export function mountSettlement(container, { params = {} } = {}) {
         h(
           'div',
           { class: 'sheet-actions' },
-          h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij ponownie', onClick: () => pickAffix(result.itemId, affix, material) }),
+          h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij ponownie', onClick: () => pickAffix(result.itemId, affix) }),
           h('button', { type: 'button', class: 'button button--system', text: 'Gotowe', onClick: closeSheet }),
         ),
       );
@@ -862,8 +840,7 @@ export function mountSettlement(container, { params = {} } = {}) {
   }
 
   // The raise of an item's rarity in a sheet, as the Zaklinaczka's
-  // reforging: the item, then what it takes and the material, then what the
-  // item became.
+  // reforging: the item, then what it takes, then what the item became.
   function raiseSheet() {
     const body = h('div', { class: 'settlement-reforge' });
     openSheet(h('h2', { class: 'sheet-title', text: 'Przekucie na wyższą rzadkość' }), body);
@@ -883,20 +860,19 @@ export function mountSettlement(container, { params = {} } = {}) {
                 h(
                   'li',
                   {},
-                  h('button', { type: 'button', class: 'item-row', onClick: () => pickMaterial(item.id) }, itemHead(item), item.equipped && h('span', { class: 'chip', text: 'Założony' })),
+                  h('button', { type: 'button', class: 'item-row', onClick: () => raiseItem(item.id) }, itemHead(item), item.equipped && h('span', { class: 'chip', text: 'Założony' })),
                 ),
               ),
             ),
       );
     }
 
-    function pickMaterial(itemId, stack = null) {
+    function raiseItem(itemId) {
       const item = data.forge.items.find((one) => one.id === itemId && one.gold !== undefined);
       if (!item) return pickItem();
-      let material = item.stacks.some((one) => one.key === stack) ? stack : (item.stacks[0]?.key ?? null);
       const draw = () => {
-        const need = { count: item.materials, rarity: item.material, rarityName: item.materialName, stacks: item.stacks };
-        const cost = costPart({ gold: item.gold, need, material, title: 'Koszt przekucia', takes: 'Kowal bierze' });
+        const need = { count: item.materials, rarity: item.material, rarityName: item.materialName, have: item.have, takes: item.takes };
+        const cost = costPart({ gold: item.gold, need, title: 'Koszt przekucia', who: 'Kowal' });
         const ready = cost.goldShort === 0 && cost.materialReady;
         fill(
           body,
@@ -911,10 +887,6 @@ export function mountSettlement(container, { params = {} } = {}) {
           ),
           h('p', { class: 'muted', text: 'Afiksy urosną do wartości nowej rzadkości, a przedmiot dostanie jeden nowy afiks. Drugi raz kowal go nie przekuje.' }),
           cost.element,
-          materialPicks('Materiał do przekucia', item.stacks, material, (key) => {
-            material = key;
-            draw();
-          }),
           h('button', {
             type: 'button',
             class: 'button button--world',
@@ -922,7 +894,7 @@ export function mountSettlement(container, { params = {} } = {}) {
             disabled: !ready,
             onClick: (event) =>
               withButton(event.currentTarget, async () => {
-                const answer = await call('POST', '/api/settlement/forge/raise', { itemId, material });
+                const answer = await call('POST', '/api/settlement/forge/raise', { itemId });
                 apply(answer);
                 showResult(answer.raised);
               }),

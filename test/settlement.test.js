@@ -383,11 +383,16 @@ describe('the Osada in the engine', () => {
     assert.equal(Math.round(first.gold * content.settlement.reforge.growth), second.gold);
     assert.equal(reforgeBlock(common, 0, { gold: 1e9, materials: {}, times: 0 }, content).code, 'no_affixes');
     const need = first.materials;
-    const stack = `${content.materials.find((material) => material.rarity === need.rarity).id}:${need.rarity}`;
-    assert.equal(reforgeBlock(rare, 0, { gold: first.gold - 1, materials: { [stack]: need.count }, stack, times: 0 }, content).code, 'not_enough_gold');
-    assert.equal(reforgeBlock(rare, 0, { gold: first.gold, materials: { [stack]: need.count - 1 }, stack, times: 0 }, content).code, 'not_enough_materials');
-    assert.equal(reforgeBlock(rare, 0, { gold: first.gold, materials: { [stack]: need.count }, stack, times: 0 }, content), null);
-    assert.equal(reforgeBlock(rare, 5, { gold: first.gold, materials: { [stack]: need.count }, stack, times: 0 }, content).code, 'invalid_affix');
+    const [one, two] = content.materials.filter((material) => material.rarity === need.rarity).map((material) => `${material.id}:${need.rarity}`);
+    assert.equal(reforgeBlock(rare, 0, { gold: first.gold - 1, materials: { [one]: need.count }, times: 0 }, content).code, 'not_enough_gold');
+    const short = reforgeBlock(rare, 0, { gold: first.gold, materials: { [one]: need.count - 1 }, times: 0 }, content);
+    assert.equal(short.code, 'not_enough_materials');
+    assert.equal(short.message, `Brakuje 1 szt. materiałów o rzadkości „${content.raritiesById[need.rarity].name}”.`);
+    assert.equal(reforgeBlock(rare, 0, { gold: first.gold, materials: { [one]: need.count }, times: 0 }, content), null);
+    // Different materials of the rarity add up (481 B).
+    assert.equal(reforgeBlock(rare, 0, { gold: first.gold, materials: { [one]: need.count - 1, [two]: 1 }, times: 0 }, content), null);
+    assert.equal(reforgeBlock(rare, 0, { gold: first.gold, materials: { [one]: need.count - 2, [two]: 1 }, times: 0 }, content).code, 'not_enough_materials');
+    assert.equal(reforgeBlock(rare, 5, { gold: first.gold, materials: { [one]: need.count }, times: 0 }, content).code, 'invalid_affix');
   });
 
   test('from Zaufany a brotherhood\'s order may be special: more reputation and a Punkt Systemu for the same pay', () => {
@@ -676,10 +681,10 @@ describe('the Osada through the API', () => {
     const itemId = meta.last_row_id;
     const cost = reforgeCost(item, 0, content);
     const stack = `${content.materialsByMonster.wolf.id}:${cost.materials.rarity}`;
-    const missing = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0, material: stack } });
+    const missing = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0 } });
     assert.equal(missing.data.error.code, 'not_enough_materials');
     await set('materials = json_set(materials, ?, ?)', `$."${stack}"`, cost.materials.count);
-    const done = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0, material: stack } });
+    const done = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0 } });
     assert.equal(done.status, 200);
     assert.notEqual(done.data.item.affixes[0].id, item.affixes[0].id);
     assert.equal(done.data.item.reforged, 1);
@@ -692,6 +697,41 @@ describe('the Osada through the API', () => {
     assert.equal(JSON.parse(row.materials)[stack], undefined);
     // The next one costs more.
     assert.ok(reforgeCost({ ...item, reforged: 1 }, 1, content).gold > cost.gold);
+  });
+
+  test('at the Zaklinaczka different materials of the rarity add up (481 B), the most plentiful going first', async () => {
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    const item = generateItem({ baseId: 'sword', level: 20, rarityId: 'rare', area: content.areas[0] }, createRng('suma'), content);
+    const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, 0)').bind(id, JSON.stringify(item)).run();
+    const itemId = meta.last_row_id;
+    const cost = reforgeCost(item, 0, content);
+    const { rarity, count } = cost.materials;
+    assert.ok(count >= 3);
+    const wolf = `wolf-pelt:${rarity}`;
+    const fox = `fox-pelt:${rarity}`;
+    // Too few in all: one piece short, whatever the stacks.
+    await set('materials = ?', JSON.stringify({ [wolf]: count - 2, [fox]: 1, 'wolf-pelt:unique': 9 }));
+    const shown = (await view()).reforge.items.find((one) => one.id === itemId);
+    assert.deepEqual([shown.materials.have, shown.materials.takes], [count - 1, null]);
+    const short = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0 } });
+    assert.equal(short.status, 409);
+    assert.equal(short.data.error.code, 'not_enough_materials');
+    assert.equal(short.data.error.message, `Brakuje 1 szt. materiałów o rzadkości „${content.raritiesById[rarity].name}”.`);
+    // One more piece makes it; the materials of another rarity stay.
+    await set('materials = ?', JSON.stringify({ [wolf]: count - 1, [fox]: 1, 'wolf-pelt:unique': 9 }));
+    const ready = (await view()).reforge.items.find((one) => one.id === itemId);
+    assert.deepEqual(
+      ready.materials.takes.map((one) => [one.key, one.count]),
+      [
+        [wolf, count - 1],
+        [fox, 1],
+      ],
+    );
+    const done = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0 } });
+    assert.equal(done.status, 200, JSON.stringify(done.data));
+    assert.equal(done.data.character.gold, 100000 - cost.gold);
+    assert.deepEqual(JSON.parse((await database.prepare('SELECT materials FROM characters').first()).materials), { 'wolf-pelt:unique': 9 });
   });
 
   test('the Pustelnik changes the evolution, the first time free, then for more and more gold', async () => {
@@ -759,14 +799,14 @@ describe('the Osada through the API', () => {
     const cost = reforgeCost(item, 0, content);
     const stack = `${content.materialsByMonster.wolf.id}:${cost.materials.rarity}`;
     await set('materials = json_set(materials, ?, ?)', `$."${stack}"`, cost.materials.count * 2);
-    const done = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0, material: stack } });
+    const done = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0 } });
     assert.equal(done.status, 200);
     // Paid, but the item keeps its affix until the choice.
     assert.equal(done.data.item.affixes[0].id, item.affixes[0].id);
     assert.equal(done.data.pending.options.length, 3);
     assert.equal(done.data.result, null);
     assert.equal(done.data.character.gold, 100000 - cost.gold);
-    const again = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0, material: stack } });
+    const again = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0 } });
     assert.equal(again.data.error.code, 'choose_first');
     const view = await call('GET', '/api/settlement', { cookie });
     assert.deepEqual(view.data.settlement.reforge.pending.options, done.data.pending.options);

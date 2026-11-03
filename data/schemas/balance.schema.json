@@ -384,7 +384,7 @@
         "materialFrom": {
           "type": "integer",
           "minimum": 1,
-          "description": "Od tego ulepszenia (propozycja 4: „Kowadło od +5”) każde bierze też materiał rzadkości przedmiotu: 1 sztukę na tym poziomie i o jedną więcej na każdym kolejnym."
+          "description": "Od tego ulepszenia (propozycja 4: „Kowadło od +5”) każde bierze też materiały rzadkości przedmiotu: 1 sztukę na tym poziomie i o jedną więcej na każdym kolejnym. Różne materiały tej rzadkości się sumują (481 B)."
         },
         "sellRefund": {
           "type": "number",

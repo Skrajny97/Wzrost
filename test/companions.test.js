@@ -395,13 +395,26 @@ describe('companions through the API', () => {
     osada.companions[0].gear = osada.companions[0].gear.map((item) => (item.slot === 'weapon' ? { ...item, upgrade: 4 } : item));
     await database.prepare("UPDATE characters SET settlement = ?, materials = '{}'").bind(JSON.stringify(osada)).run();
     const rarity = (await storedItem('weapon')).rarity;
-    assert.deepEqual(placeOf(await settlement(), 'weapon').item.anvil.next.materials, { rarity, count: 1 });
+    assert.deepEqual(placeOf(await settlement(), 'weapon').item.anvil.next.materials, { rarity, count: 1, have: 0, takes: null });
     assert.equal((await upgrade(candidate.id, 'weapon')).data.error.code, 'no_material');
-    await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ [`wolf-pelt:${rarity}`]: 3 })).run();
+    await database.prepare('UPDATE characters SET materials = ?').bind(JSON.stringify({ [`wolf-pelt:${rarity}`]: 3, [`fox-pelt:${rarity}`]: 1 })).run();
+    // The card names the pieces the try takes, from the character's stock.
+    assert.deepEqual(
+      placeOf(await settlement(), 'weapon').item.anvil.next.materials.takes.map((one) => [one.key, one.count]),
+      [[`wolf-pelt:${rarity}`, 1]],
+    );
     const fifth = await upgrade(candidate.id, 'weapon');
     assert.equal(fifth.status, 200, JSON.stringify(fifth.data));
-    assert.deepEqual(fifth.data.upgrade.material, { key: `wolf-pelt:${rarity}`, count: 1 });
-    assert.deepEqual(JSON.parse((await database.prepare('SELECT materials FROM characters').first()).materials), { [`wolf-pelt:${rarity}`]: 2 });
+    assert.deepEqual(fifth.data.upgrade.materials, { [`wolf-pelt:${rarity}`]: 1 });
+    assert.deepEqual(JSON.parse((await database.prepare('SELECT materials FROM characters').first()).materials), { [`wolf-pelt:${rarity}`]: 2, [`fox-pelt:${rarity}`]: 1 });
+    // Materials of the rarity add up (481 B): at +6, two pieces of two.
+    const sixth = JSON.parse((await database.prepare('SELECT settlement FROM characters').first()).settlement);
+    sixth.companions[0].gear = sixth.companions[0].gear.map((item) => (item.slot === 'weapon' ? { ...item, upgrade: 5 } : item));
+    await database.prepare('UPDATE characters SET settlement = ?, materials = ?').bind(JSON.stringify(sixth), JSON.stringify({ [`wolf-pelt:${rarity}`]: 1, [`fox-pelt:${rarity}`]: 1 })).run();
+    const both = await upgrade(candidate.id, 'weapon');
+    assert.equal(both.status, 200, JSON.stringify(both.data));
+    assert.deepEqual(both.data.upgrade.materials, { [`fox-pelt:${rarity}`]: 1, [`wolf-pelt:${rarity}`]: 1 });
+    assert.deepEqual(JSON.parse((await database.prepare('SELECT materials FROM characters').first()).materials), {});
     // A place with nothing in it has nothing to upgrade.
     const empty = await upgrade(candidate.id, 'talisman');
     assert.deepEqual([empty.status, empty.data.error.code], [404, 'item_not_found']);

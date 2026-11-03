@@ -12,7 +12,7 @@
 // and the seed.
 
 import { knownPotions, potionPrice } from './brewing.js';
-import { knownStack, materialPrice, parseStack, stackKey } from './crafting.js';
+import { heldOfRarity, knownStack, materialPrice, parseStack, piecesOfRarity, stackKey } from './crafting.js';
 import { fireBuilding, fireTrade } from './fire.js';
 import { affixShare, affixValue, sellPrice } from './items.js';
 import { easyPlace } from './hunt.js';
@@ -404,7 +404,8 @@ export function rejectOrder(board, orderId, now, content) {
 // for its level and rarity, growth times more for each reforging of the
 // item before (`times`), and creatures' materials of a rarity for the
 // item's: common ones for rare and unique items, rare ones for epic and
-// legendary.
+// legendary; any materials of that rarity add up (481 B: piecesOfRarity
+// in crafting.js).
 export function reforgeCost(item, times, content) {
   const { goldPerLevel, growth, materials } = content.settlement.reforge;
   const rarity = content.raritiesById[item.rarity];
@@ -414,18 +415,16 @@ export function reforgeCost(item, times, content) {
   };
 }
 
-// Why an item's affix cannot be reforged now, or null. `stack` is the key
-// of the materials the player pays with.
-export function reforgeBlock(item, affixIndex, { gold, materials, stack, times }, content) {
+// Why an item's affix cannot be reforged now, or null. `materials` are the
+// character's, which pay for it.
+export function reforgeBlock(item, affixIndex, { gold, materials, times }, content) {
   if (!item || !(item.affixes?.length > 0)) return { code: 'no_affixes', message: 'Ten przedmiot nie ma afiksów do przekucia.' };
   if (!Number.isInteger(affixIndex) || !item.affixes[affixIndex]) return { code: 'invalid_affix', message: 'Wybierz afiks do przekucia.' };
   const cost = reforgeCost(item, times, content);
   if (gold < cost.gold) return { code: 'not_enough_gold', message: 'Brakuje złota na przekucie.' };
-  if (cost.materials) {
-    if (typeof stack !== 'string' || !stack.includes(':') || parseStack(stack).rarityId !== cost.materials.rarity) {
-      return { code: 'invalid_material', message: 'Zaklinaczka potrzebuje materiałów innej rzadkości.' };
-    }
-    if ((materials[stack] ?? 0) < cost.materials.count) return { code: 'not_enough_materials', message: 'Brakuje materiałów na przekucie.' };
+  if (cost.materials && !piecesOfRarity(materials, cost.materials, content)) {
+    const short = cost.materials.count - heldOfRarity(materials, cost.materials.rarity, content);
+    return { code: 'not_enough_materials', message: `Brakuje ${short} szt. materiałów o rzadkości „${content.raritiesById[cost.materials.rarity].name}”.` };
   }
   return null;
 }

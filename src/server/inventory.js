@@ -9,10 +9,10 @@ import {
   combatValues,
   createRng,
   valueChanges,
+  heldOfRarity,
   itemName,
-  knownStack,
   missingFor,
-  parseStack,
+  piecesOfRarity,
   rollUpgrade,
   sellPrice,
   upgradeView,
@@ -22,6 +22,7 @@ import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, r
 import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
+import { takenOff } from './market.js';
 
 // The scrapper's price for the stored `items`, summed in SQL over the items
 // still there, so an item sold twice at the same moment pays once. Each price
@@ -186,22 +187,13 @@ export async function previewItem(context) {
   });
 }
 
-// The stack of materials an upgrade from materialFrom on takes: the one the
-// player chose ({ material }), of the item's rarity with enough pieces, or
-// else the one with the most of them; null when none has enough.
-function upgradeStack(row, need, chosen) {
-  const fits = Object.entries(JSON.parse(row.materials ?? '{}')).filter(
-    ([key, count]) => knownStack(key, content) && parseStack(key).rarityId === need.rarity && count >= need.count,
-  );
-  return (fits.find(([key]) => key === chosen) ?? fits.sort((a, b) => b[1] - a[1])[0])?.[0] ?? null;
-}
-
 // What one try at upgrading `item` on the camp's Kowadło takes, checked
 // against what the character holds, or the error of what it lacks: the
 // Kowadło's next level (`view`) with its price in gold and iron ore, from
-// materialFrom on also the stack of a material of the item's rarity
-// (`stack`, `taken` pieces of it; the player's choice in `body.material`),
-// and a Zwój ochronny where the item may break and the player asked for it
+// materialFrom on also pieces of materials of the item's rarity, any of
+// them added up (481 B), the most plentiful material first (`taken`, by
+// key: piecesOfRarity in the engine; nothing below materialFrom), and a
+// Zwój ochronny where the item may break and the player asked for it
 // (`body.ward`). The same for an item a companion wears, paid by the
 // character (settlement.js).
 export function upgradePlan(player, item, body, now) {
@@ -223,31 +215,31 @@ export function upgradePlan(player, item, body, now) {
   const warded = body.ward === true && view.next.breakChance > 0;
   if (warded && player.row.scrolls < 1) throw new ApiError(409, 'no_scroll', 'Nie masz Zwoju ochronnego. Zrobisz go w Systemowym Warsztacie.');
   const need = view.next.materials;
-  const stack = need ? upgradeStack(player.row, need, body.material) : null;
-  if (need && !stack) {
-    throw new ApiError(409, 'no_material', `To ulepszenie bierze też ${need.count} szt. jednego materiału tej samej rzadkości co przedmiot (${content.raritiesById[need.rarity].name}).`);
+  const materials = JSON.parse(player.row.materials ?? '{}');
+  const taken = need ? piecesOfRarity(materials, need, content) : {};
+  if (!taken) {
+    const short = need.count - heldOfRarity(materials, need.rarity, content);
+    throw new ApiError(409, 'no_material', `Brakuje ${short} szt. materiałów tej samej rzadkości co przedmiot (${content.raritiesById[need.rarity].name}).`);
   }
-  return { view, cost, warded, stack, taken: stack ? need.count : 0 };
+  return { view, cost, warded, taken };
 }
 
 // A try's payment (upgradePlan) as the characters row's SQL: gold, iron ore,
-// the scroll and the material go (`set`, with its `binds`), and `enough`
-// holds (with `enoughBinds`) while they are all there. Without a material,
-// a path that is never there, which asks for 0.
-export function upgradePayment({ cost, warded, stack, taken }) {
+// the scroll and the materials go (`set`, with its `binds`), and `enough`
+// holds (with `enoughBinds`) while they are all there.
+export function upgradePayment({ cost, warded, taken }) {
   const ore = '$."iron-ore"';
-  const material = `$."${stack ?? 'none'}"`;
+  const materials = takenOff('materials', taken);
   return {
-    set: `gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?), scrolls = scrolls - ?,
-           materials = CASE WHEN ? = 0 THEN materials WHEN json_extract(materials, ?) > ? THEN json_set(materials, ?, json_extract(materials, ?) - ?) ELSE json_remove(materials, ?) END`,
-    binds: [cost.gold, ore, ore, cost['iron-ore'], warded ? 1 : 0, taken, material, taken, material, material, taken, material],
-    enough: `gold >= ? AND COALESCE(json_extract(resources, ?), 0) >= ? AND COALESCE(json_extract(materials, ?), 0) >= ? AND scrolls >= ?`,
-    enoughBinds: [cost.gold, ore, cost['iron-ore'], material, taken, warded ? 1 : 0],
+    set: `gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?), scrolls = scrolls - ?, materials = ${materials.sql}`,
+    binds: [cost.gold, ore, ore, cost['iron-ore'], warded ? 1 : 0, ...materials.binds],
+    enough: `gold >= ? AND COALESCE(json_extract(resources, ?), 0) >= ? AND scrolls >= ? AND ${materials.enough}`,
+    enoughBinds: [cost.gold, ore, cost['iron-ore'], warded ? 1 : 0, ...materials.enoughBinds],
   };
 }
 
 // One try at upgrading an item on the camp's Kowadło, paid in gold and iron
-// ore, from materialFrom on also in a material of the item's rarity, and
+// ore, from materialFrom on also in materials of the item's rarity, and
 // rolled with a fresh seed (rollUpgrade in the engine). A failure takes the
 // payment and a level, and from +7 on may break the item.
 export async function upgradeItem(context) {
@@ -257,7 +249,7 @@ export async function upgradeItem(context) {
   requireUnworn(player, item, context.now);
   const body = context.request.headers.get('Content-Type') ? await readJson(context.request) : {};
   const plan = upgradePlan(player, item, body, context.now);
-  const { view, cost, warded, stack, taken } = plan;
+  const { view, cost, warded, taken } = plan;
   const row = player.row;
   const pay = upgradePayment(plan);
 
@@ -302,7 +294,8 @@ export async function upgradeItem(context) {
       from: view.level,
       to: outcome.upgrade,
       cost,
-      ...(stack && { material: { key: stack, count: taken } }),
+      // The pieces of materials it took, by key.
+      ...(Object.keys(taken).length > 0 && { materials: taken }),
       ...(warded && { warded: true }),
       ...(outcome.saved && { saved: true }),
     },

@@ -50,8 +50,10 @@ import {
   orderGold,
   parseStack,
   pathResetCost,
+  piecesOfRarity,
   potionPrice,
   propertyName,
+  rarityNeedView,
   regenPerMinute,
   reforgeBlock,
   reforgeChoices,
@@ -98,7 +100,7 @@ import { ApiError, json, readJson } from './http.js';
 import { forgeView } from './forge.js';
 import { trialProgress } from './guild-trials.js';
 import { upgradePayment, upgradePlan } from './inventory.js';
-import { counted, foreign, testMarket } from './market.js';
+import { counted, foreign, takenOff, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
 import { stableView } from './stable.js';
 import { tanneryView } from './tannery.js';
@@ -496,9 +498,9 @@ function tavernView(row, stored, now) {
 // skills at its level, the gear it wears, its profession and story, and
 // how long it is still wounded. With `upgradeCap` (the Kowadło's level,
 // for a hired one) each item it wears has the Kowadło's part of its card,
-// and `roll`, the seed of its last try on the Kowadło, which the next try
-// names (upgradeCompanionItem).
-function companionView(companion, { upgradeCap } = {}) {
+// paid from the character's `materials` too, and `roll`, the seed of its
+// last try on the Kowadło, which the next try names (upgradeCompanionItem).
+function companionView(companion, { upgradeCap, materials } = {}) {
   const unit = companionCombatant(companion, {}, content);
   const female = companion.appearance === 'female';
   const { traits, professions, stories } = content.settlement.companions;
@@ -523,7 +525,7 @@ function companionView(companion, { upgradeCap } = {}) {
     // the item came from the character's bag.
     wear: COMPANION_SLOTS.map((slot) => {
       const worn = companion.gear.find((item) => item.slot === slot);
-      const shown = worn && { ...itemView(worn, content, { upgradeCap }), given: Boolean(worn.given), ...(upgradeCap !== undefined && { roll: worn.lastRoll ?? '' }) };
+      const shown = worn && { ...itemView(worn, content, { upgradeCap, materials }), given: Boolean(worn.given), ...(upgradeCap !== undefined && { roll: worn.lastRoll ?? '' }) };
       return { slot, slotName: content.slotsById[slot].name, item: shown || null };
     }),
     profession: professions.find((one) => one.id === companion.profession)?.name ?? null,
@@ -573,6 +575,7 @@ function companionsView(player, stored, now) {
   const rested = (stored.companions ?? []).some((companion) => companion.wounded) ? restedAt(player, now) : now;
   const { places, most } = placesOf(player, now);
   const upgradeCap = campBonus(campLevels(player.buildings, now, content), 'upgradeCap', content);
+  const materials = JSON.parse(row.materials ?? '{}');
   const hired = stored.companions ?? [];
   const points = innkeeperPoints(stored);
   const candidates = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, now, content, [
@@ -589,7 +592,7 @@ function companionsView(player, stored, now) {
     hired: hired.map((companion) => {
       const away = companionAway(player, companion);
       return {
-        ...companionView(companion, { upgradeCap }),
+        ...companionView(companion, { upgradeCap, materials }),
         // Wounded until the character rests to full HP, and when that is.
         ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
         gift: giftOf(companion, row, now),
@@ -654,8 +657,9 @@ function bondView(companion, now) {
 }
 
 // An item the Zaklinaczka can reforge: its affixes as the item card shows
-// them (with the Kowadło's upgrade) and the price, with the character's
-// stacks of the materials it takes, and which affixes matter to its class.
+// them (with the Kowadło's upgrade) and the price, with the pieces of the
+// materials' rarity the character holds in all and those it would take
+// (rarityNeedView), and which affixes matter to its class.
 function reforgeView(item, materials, classId) {
   const shown = upgradedItem(item, content);
   const cost = reforgeCost(item, item.reforged ?? 0, content);
@@ -668,13 +672,7 @@ function reforgeView(item, materials, classId) {
     affixes: shown.affixes.map((affix) => `${propertyName(affix.stat, content)}: +${affix.value}`),
     hints: affixHints(shown.affixes, classId),
     gold: cost.gold,
-    materials: need && {
-      ...need,
-      rarityName: content.raritiesById[need.rarity].name,
-      stacks: Object.entries(materials)
-        .filter(([key, count]) => parseStack(key).rarityId === need.rarity && count >= need.count)
-        .map(([key, count]) => ({ key, label: materialView(key, count, content).label, count })),
-    },
+    materials: need && { ...rarityNeedView(materials, need, content), rarityName: content.raritiesById[need.rarity].name },
   };
 }
 
@@ -961,7 +959,7 @@ export async function equipCompanion(context) {
   return json({ settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now), character: characterView(after, context.now) });
 }
 
-// { companionId, slot, roll, ward, material }: one try at upgrading the item
+// { companionId, slot, roll, ward }: one try at upgrading the item
 // a hired companion wears in `slot` on the camp's Kowadło (the author:
 // "niech tu będzie opcja kliknięcia w przedmiot i ulepszania go jak na
 // Kowadle"), by the same rules as the character's own items (inventory.js):
@@ -1018,7 +1016,8 @@ export async function upgradeCompanionItem(context) {
       from: plan.view.level,
       to: outcome.upgrade,
       cost: plan.cost,
-      ...(plan.stack && { material: { key: plan.stack, count: plan.taken } }),
+      // The pieces of materials it took, by key.
+      ...(Object.keys(plan.taken).length > 0 && { materials: plan.taken }),
       ...(plan.warded && { warded: true }),
       ...(outcome.saved && { saved: true }),
     },
@@ -1143,8 +1142,9 @@ export async function rejectSettlementOrder(context) {
   return json({ settlement: settlementView(player, next, board, context.now), character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
 }
 
-// { itemId, affix, material }: the Zaklinaczka draws one affix of an item
-// anew, for gold and creatures' materials (`material`: the stack paid with).
+// { itemId, affix }: the Zaklinaczka draws one affix of an item anew, for
+// gold and creatures' materials of a rarity, any of them added up, the most
+// plentiful material first (piecesOfRarity in the engine).
 // From a closer relation she draws two or three and the player keeps one
 // (chooseReforged); until then they wait in the Osada and no other affix
 // can be reforged. A worn item waits for the character at home, as at the
@@ -1161,7 +1161,7 @@ export async function reforgeAtEnchantress(context) {
   requireUnworn(player, item, context.now);
   const times = item.reforged ?? 0;
   const materials = JSON.parse(row.materials ?? '{}');
-  const block = reforgeBlock(item, body.affix, { gold: row.gold, materials, stack: body.material, times }, content);
+  const block = reforgeBlock(item, body.affix, { gold: row.gold, materials, times }, content);
   if (block) throw new ApiError(block.code.startsWith('invalid') || block.code === 'no_affixes' ? 400 : 409, block.code, block.message);
   const cost = reforgeCost(item, times, content);
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
@@ -1174,8 +1174,7 @@ export async function reforgeAtEnchantress(context) {
     relations: grow(stored.relations, content.settlement.reforge),
     ...(options.length > 1 && { pending: { itemId: item.id, affix: body.affix, options, roll, reforged: times + 1 } }),
   };
-  const stack = jsonPath(cost.materials ? body.material : 'none');
-  const taken = cost.materials ? cost.materials.count : 0;
+  const pay = takenOff('materials', cost.materials ? piecesOfRarity(materials, cost.materials, content) : {});
   const db = context.env.DB;
   // As at the Kowadło: the item changes only if it and the character are as
   // seen here, and the payment only if this roll was saved.
@@ -1189,12 +1188,10 @@ export async function reforgeAtEnchantress(context) {
       .bind(JSON.stringify(affixes), times + 1, roll, item.id, row.id, times, row.id, row.version),
     db
       .prepare(
-        `UPDATE characters SET gold = gold - ?, settlement = ?,
-           materials = CASE WHEN ? = 0 THEN materials WHEN json_extract(materials, ?) > ? THEN json_set(materials, ?, json_extract(materials, ?) - ?) ELSE json_remove(materials, ?) END,
-           version = version + 1
-         WHERE id = ? AND version = ? AND gold >= ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
+        `UPDATE characters SET gold = gold - ?, settlement = ?, materials = ${pay.sql}, version = version + 1
+         WHERE id = ? AND version = ? AND gold >= ? AND ${pay.enough} AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
       )
-      .bind(cost.gold, JSON.stringify(next), taken, stack, taken, stack, stack, taken, stack, row.id, row.version, cost.gold, item.id, roll),
+      .bind(cost.gold, JSON.stringify(next), ...pay.binds, row.id, row.version, cost.gold, ...pay.enoughBinds, item.id, roll),
   ]);
   const after = await loadPlayer(db, session.userId);
   const saved = after.items.find((candidate) => candidate.id === item.id);
