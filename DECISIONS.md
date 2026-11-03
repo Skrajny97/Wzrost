@@ -3025,6 +3025,15 @@ Autor: „uruchamiaj tyle pomocników ile chcesz”, „542 tak”, „543.2 A�
    - tła (`src/client/art/places`): Systemowa Kopalnia B, Systemowa Szlifiernia C.
 5. **Muzyka Salonu** gra po wejściu do Salonu Gier od 0.1.11 (zob. „Wersja 0.1.11”).
 
+## Odpowiedzi autora 548, 549 i 550.1–550.2 (3.11.2026)
+
+Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty Salonu Gier tak jak wygląda w grze i nadchodzących animacji gier, zbyt statyczne to na razie jest w tym momencie, reszta super”, „548.1 A”, „548.2 A”, „Chowańce mają funkcje czysto estetyczną, wiec myśle, że łatwo będzie je wdrożyć”, „Do rolki mp4 możesz wygenerować też jakieś efekty dźwiękowe które będą pasowały w ElevenLabs na przykład i do samych gier w Loterii i Kole fortuny również”, „550.1 C”, „550.2 B”.
+
+1. **Kwestie narratora o Salonie:** o Loterii nagranie A, o Kole nagranie A (poprawione brzmienie). Wchodzą do gry razem z animacjami Salonu.
+2. **Grafiki:** Koło Fortuny C i bęben Loterii B (PixelLab). Los (550.3), strzałka (550.4) i tło Salonu (550.5) czekają na wybór.
+3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
+4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
+
 ## Salon Gier: animacje, tło i kwestia o Kole (3.11.2026)
 
 Autor: „Trzeba zrobić animację jeszcze do koła fortuny wyświetlającą się na ekranie i do kupowania losu, żeby nadać temu estetyki”, „543.2 Drugie zdanie poprawka - "Wyższa stawka to wyższe nagrody, ale i większy ból po przegranej"”, „548.1 A, 548.2 wygenerowałeś zanim podałem poprawki, więc bedziesz musiał jeszcze raz” oraz „Zrób też tło do Salonu Gier”.

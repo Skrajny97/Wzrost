@@ -530,7 +530,12 @@
       },
       "craft": { "text": "three hard blows of a heavy hammer on a thick block of iron, each blow a short dry heavy clank with a thud that stops at once, no ringing tail, no bell tone, no echo, close up, no music", "seconds": 2, "influence": 0.8 },
       "craft-fail": { "text": "one very loud heavy hammer blow on metal at the very start, the loudest part of the sound, then the metal cracks and a few small broken pieces fall onto a stone floor, close up, no echo, no music", "seconds": 1.8, "influence": 0.8 },
-      "evolution-transform": { "text": "a magical transformation: a soft shimmering swell of bells and airy wordless voices rising for one and a half seconds, then one bright radiant burst of light, then sparkling chimes slowly fading out, fantasy video game evolution, no drums, no speech, no music", "seconds": 4 }
+      "evolution-transform": { "text": "a magical transformation: a soft shimmering swell of bells and airy wordless voices rising for one and a half seconds, then one bright radiant burst of light, then sparkling chimes slowly fading out, fantasy video game evolution, no drums, no speech, no music", "seconds": 4 },
+      "casino-wheel-spin": { "text": "a wooden wheel of fortune spinning fast and slowing down, a wooden ratchet clicking against its pegs, quick clicks at first, slower and slower until it stops, medieval tavern, close up, dry, no music", "seconds": 3.2 },
+      "casino-win": { "text": "a short cheerful win: a handful of gold coins jingling with a bright small bell, medieval, close up, no music", "seconds": 1.5 },
+      "casino-lose": { "text": "a short disappointed sound: a dull wooden thunk and a soft descending lute pluck, medieval, close up, no music", "seconds": 1.2 },
+      "casino-ticket": { "text": "a small parchment ticket dropped into a wooden barrel drum, then the drum turns once with a short wooden rumble and rattling papers inside, medieval, close up, dry, no music", "seconds": 2.0 },
+      "promo-whoosh": { "text": "a soft magical whoosh with a light sparkle, a short transition swoosh for a video, no music", "seconds": 0.8 }
     }
   },
   "ui": {
