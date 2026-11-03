@@ -3011,6 +3011,14 @@ Oraz: „Do Czarnego Bagna wroce później”.
 1. **Zatwierdzone:** 7 z 8 poprawionych chodów drugich form i 25 z 30 jeźdźców. Do poprawy zostają chód Strzelca Wyborowego (szare piksele na łuku) i pięciu jeźdźców; po poprawce wracają do autora jako MP4, pojedynczo. Druga ewolucja wchodzi do gry dopiero z kompletem zatwierdzonych chodów i jazdy.
 2. **Czarne Bagno** (439–461) czeka, aż autor do niego wróci.
 
+## Odpowiedzi autora 513, 514 i 500.7 (3.11.2026)
+
+Autor: „514 wszystko A”, „poprawiony film git” i „500.7 A”.
+
+1. **514 A:** nowe plansze obozu we wszystkich trzech wyglądach są przyjęte (zob. „Obóz: budowle na polanie, nie na drzewach”).
+2. **513 A:** poprawiony film promocyjny jest przyjęty: same nazwy klas w ewolucjach, każda nazwa sama, na środku, dłużej na ekranie.
+3. **500.7 A:** Suchotnik z PixelLab, pochylony i szeroki, wypełnia kadr jak inne stwory. Tym samym wszystkie 17 stworów Sosnowych Wydm (500.1–500.17) ma wybrane rysunki. Popielec (500.14 A) i Raróg (500.17 B) też pochodzą z PixelLab, reszta z Retro Diffusion. Następne są materiały, miejsca i kraina, rysowane w PixelLab, a tła w Retro Diffusion.
+
 ## Materiały tej samej rzadkości się sumują (481 B, 3.11.2026)
 
 Autor: „481 B”. Zmienia to zasadę z „Kowadło: „jeden materiał”, nie suma materiałów” (2.11.2026) i „5 sztuk jednego materiału” w Kuźni (339 A).
@@ -3042,7 +3050,7 @@ Autor: „Teraz widze ze stół rozbiórki stoi na drzewach, weź ogólnie te pl
 4. **Układ.** Ognisko stoi w środku, Kowadło nad nim. Po bokach, w rzędach: Tartak i Kamieniołom, Staw Midasa i Skup złomu, Magazyn i Kopalnia, a niżej Stół rozbiórki i Skrzynia Konta po obu stronach drogi wyjściowej. Z Osadą w jej pasie stoją Kwatery i Kamień węgielny. Droga wyjściowa biegnie od Ogniska do przerwy w płocie i bramy palisady na dole, a do każdej budowli prowadzi jej ścieżka, do wejścia. Obrócone budowle z „Obóz: budowle wejściem do ścieżek” zostają.
 5. **Samouczek.** Teksty narratora nie mówią, gdzie stoją budynki, a jego światło idzie za budynkami, więc tekstów nie trzeba zmieniać. Sprawdzone przejściem obchodu obozu w przeglądarce, na telefonie i na komputerze: narrator podświetla po kolei każdy budynek, za każdym razem cały na ekranie, i prowadzi do budowy Ogniska.
 6. **Zastępcza plansza w wektorach** (gdy brak obrazka) ma tę samą wysokość, a jej dolne drzewa i kamienie zeszły na dół.
-7. **Ocena autora:** nowe plansze idą do autora pojedynczo (514.1–514.3) przed wdrożeniem do gry.
+7. **Ocena autora:** nowe plansze poszły do autora pojedynczo (514.1–514.3) przed wdrożeniem do gry. Autor: „514 wszystko A”.
 
 ## Wersja 0.1.5 (3.11.2026)
 
