@@ -1,0 +1,14 @@
+{
+  "id": "fortress-wall-side",
+  "tool": "pixellab generate-image-v2",
+  "description": "top-down pixel art game map piece seen from above at a slight angle: one straight vertical section of a thick castle curtain wall of dark grey hewn stone blocks, the flat stone walkway on its top with square crenellated battlements running along both its left and right edges, the same stone, colours, outlines and pixel style as the reference wall, the section runs from the top edge of the picture to its bottom edge and repeats seamlessly, no towers, no gate, no grass, no trees, transparent background",
+  "style": "art/references/fortress-board/top-wall.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}
