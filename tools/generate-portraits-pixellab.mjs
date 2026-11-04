@@ -115,7 +115,9 @@ function inpainting(entry, seed) {
     inpainting_image: { image: png(entry.input), size },
     mask_image: { image: png(entry.mask), size },
     seed,
-    no_background: false,
+    // A building completed past the edges of its old frame comes on a
+    // transparent background (`transparent`), a board's piece on its own.
+    no_background: entry.transparent ?? false,
     crop_to_mask: true,
   };
 }
