@@ -301,15 +301,22 @@ describe('the Bestia Gildii through the API', () => {
     assert.deepEqual((await view('lowczyni')).chests, []);
   });
 
-  test('no attack on an exploration or before its report; a profession\'s work is no matter', async () => {
+  test('an attack also on an exploration and before its report, which comes out as before; a profession\'s work is no matter', async () => {
     assert.equal((await as('lowczyni', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
-    assert.equal((await attack('lowczyni')).data.error.code, 'busy');
+    // The author: "powinienem móc atakować po resecie". An attack changes
+    // nothing of the character, so its exploration's report comes out the same.
+    const version = async () => (await first("SELECT version FROM characters WHERE name = 'Łowczyni'")).version;
+    const before = await version();
+    assert.equal((await attack('lowczyni')).status, 200);
+    assert.equal(await version(), before);
     await run('UPDATE activities SET started_at = started_at - 300000, ends_at = ends_at - 300000');
-    assert.equal((await attack('lowczyni')).data.error.code, 'claim_first');
+    assert.equal((await attack('lowczyni')).status, 200);
     let claimed = await as('lowczyni', 'POST', '/api/hunts/claim');
     if (claimed.data.event) claimed = await as('lowczyni', 'POST', '/api/hunts/claim', { choice: claimed.data.event.options[0].id });
     assert.equal(claimed.status, 200);
     assert.equal((await attack('lowczyni')).status, 200);
+    assert.equal((await attack('lowczyni')).data.error.code, 'no_attacks');
+    await run('DELETE FROM guild_beast_hits');
     const gathering = await as('lowczyni', 'POST', '/api/professions/gather', { herbs: ['comfrey'], minutes: 60 });
     assert.equal(gathering.status, 201, JSON.stringify(gathering.data));
     assert.equal((await attack('lowczyni')).status, 200);

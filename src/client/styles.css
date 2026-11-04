@@ -1512,10 +1512,13 @@ a.segmented-option {
   white-space: nowrap;
 }
 
-/* At the top, over the top bar, so it hides neither the backpack's rows
-   nor the chat line, and taps go through it to what lies below (the author:
-   taking items apart one by one, "trzeba czekać aż powiadomienie zniknie").
-   As a popover it also sets aside the browser's own popover look. */
+/* Near the top, so it hides neither the backpack's rows nor the chat line,
+   and taps go through it to what lies below (the author: taking items apart
+   one by one, "trzeba czekać aż powiadomienie zniknie"). toast() in ui.js
+   moves it under the top bar's first row, over the HP and XP bars, so the
+   levels, the gold and the buttons stay in sight; this is its place while
+   no top bar shows. As a popover it also sets aside the browser's own
+   popover look. */
 .toast {
   position: fixed;
   top: calc(8px + env(safe-area-inset-top));
@@ -11186,10 +11189,6 @@ a.profession-square:active {
 .guild-beast-fallen,
 .guild-beast-opened {
   color: var(--accent);
-}
-
-.guild-beast-waiting {
-  color: var(--danger);
 }
 
 .guild-beast-subtitle,

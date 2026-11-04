@@ -196,6 +196,13 @@ let toastTimer = null;
 export function toast(message) {
   const element = $('#toast');
   element.textContent = message;
+  // Under the top bar's first row, over the HP and XP bars, so it hides
+  // neither the levels, the gold and the buttons beside them nor the bag's
+  // rows (players, through the author: "zasłaniające informacje o lvl,
+  // złocie"). Without the top bar in sight it keeps to the top (styles.css).
+  const row = document.querySelector('#topbar .topbar-row');
+  const bottom = row?.getBoundingClientRect().bottom ?? 0;
+  element.style.top = bottom > 0 ? `${Math.round(bottom + 4)}px` : '';
   element.hidden = false;
   if (element.showPopover) {
     if (element.matches(':popover-open')) element.hidePopover();

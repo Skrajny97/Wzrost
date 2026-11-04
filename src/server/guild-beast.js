@@ -6,9 +6,11 @@
 // drawn from the guild's and the week's seed, at the members' average level
 // then, with HP for their number then. A character in a guild attacks it
 // attacksPerDay times a Polish day, in whatever guild (a character that
-// changes its guild gets no fresh attacks), not on an exploration nor
-// before its report is claimed (as the Wieże: the report is made with the
-// character as it is then), but at a profession's work. An attack is one
+// changes its guild gets no fresh attacks), whatever it is doing: at a
+// profession's work, on an exploration and before its report is claimed
+// too (the author: "powinienem móc atakować po resecie"), since an attack
+// changes nothing of the character, so the report comes out the same, and
+// the gear it fights with is the one the exploration keeps. An attack is one
 // fight with the report at once; what the beast loses stays on its bar for
 // the whole guild, and the hit that brings it to 0 is written down with
 // who made it and when. No XP, gold or loot for an attack: whoever hit the
@@ -34,7 +36,7 @@ import {
   trophyBonuses,
 } from '../engine/index.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
-import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer } from './characters.js';
+import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { guildOf } from './guilds.js';
@@ -201,7 +203,6 @@ export async function attackGuildBeast(context) {
   const { row } = player;
   const db = context.env.DB;
   const now = context.now;
-  requireNotExploring(player, now);
   const guild = await guildOf(db, row.id);
   if (!guild) throw new ApiError(409, 'no_guild', errors().noGuild);
   const day = questPeriod('daily', now, content).key;

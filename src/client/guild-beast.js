@@ -3,9 +3,9 @@
 // the week with its sprite, name, level and region and its HP bar, shared
 // by the whole guild; "Atakuj" with the attacks left today, the last
 // attack's damage and the lines of its fight; the "Wkład tygodnia"; the
-// Skrzynie Bestii to open; and the rules under "Jak to działa?". While the
-// character is on an exploration, or its report waits, the beast waits
-// too. The card asks for the Bestia itself and takes its words from the
+// Skrzynie Bestii to open; and the rules under "Jak to działa?". The beast
+// is attacked whatever the character is doing, on an exploration too. The
+// card asks for the Bestia itself and takes its words from the
 // answer (data/guilds.json, beast.texts). mountGuildBeast(container) adds
 // the card to the container and gives { unmount() }, which takes it away.
 
@@ -14,7 +14,7 @@ import { monsterSprite } from './art.js';
 import { checkGuildTodo } from './chat-news.js';
 import { fill, h } from './dom.js';
 import { dateTimeFormat, formatNumber, plural } from './format.js';
-import { activityFinished, call, onCharacterChange, state } from './state.js';
+import { call, onCharacterChange } from './state.js';
 import { howItWorks, openSheet, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
@@ -48,12 +48,6 @@ export function mountGuildBeast(container) {
 
   // Why the beast waits: an exploration under way, or its report to claim
   // (the server's rule, as for the Wieże); null when the character may attack.
-  function waiting() {
-    const activity = state.character?.activity;
-    if (activity?.kind !== 'hunt') return null;
-    return activityFinished(activity) ? view.texts.claimFirst : view.texts.exploring;
-  }
-
   async function attack() {
     const answer = await call('POST', '/api/guild/beast/attack');
     checkGuildTodo({ now: true });
@@ -98,12 +92,11 @@ export function mountGuildBeast(container) {
   // The beast, its bar, and "Atakuj" with the attacks left today.
   function beastPart() {
     const { beast, attacks, texts } = view;
-    const reason = waiting();
     const button = h('button', {
       type: 'button',
       class: 'button button--system',
       text: texts.attack,
-      disabled: beast.fallen || attacks.left === 0 || Boolean(reason),
+      disabled: beast.fallen || attacks.left === 0,
       onClick: (event) => withButton(event.currentTarget, attack),
     });
     return [
@@ -124,7 +117,6 @@ export function mountGuildBeast(container) {
         : h('p', { class: 'muted', text: texts.until }),
       !beast.fallen && [
         h('p', { class: 'guild-beast-attacks', text: [filled(texts.attacksLeft, { left: attacks.left, perDay: attacks.perDay }), attacks.left === 0 && texts.newAttacks].filter(Boolean).join('. ') }),
-        reason && h('p', { class: 'guild-beast-waiting', text: reason }),
         button,
       ],
     ];

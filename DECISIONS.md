@@ -3048,6 +3048,27 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Powiadomienia pod pierwszym rzędem górnego paska (4.11.2026, w grze od 0.1.29)
+
+Uwagi graczy z czatu przekazane przez autora: „celne uwagi graczy”. Okienko powiadomienia u góry ekranu zasłaniało poziomy, złoto i przyciski górnego paska. Po zebraniu surowców trzeba było czekać, aż zniknie, albo stukać na ślepo. Gracze proponowali miejsce „lekko niżej, na średnio ważnym pasku HP/klasa”.
+
+1. Powiadomienie stoi teraz pod pierwszym rzędem górnego paska, nad paskami HP, many i XP, na telefonie i na komputerze. Poziomy, złoto, obóz, ustawienia i przycisk postaci zostają widoczne. Stuknięcia nadal przechodzą przez okienko do tego, co leży pod nim.
+2. Bez górnego paska na ekranie, np. przy logowaniu, powiadomienie zostaje u samej góry, jak dotąd.
+
+## Bestia Gildii: atak także w trakcie wyprawy (4.11.2026, w grze od 0.1.29)
+
+Autor, ze zrzutem ekranu Bestii, gdzie przy „Ataki na dziś: 3 z 3” gra kazała najpierw odebrać raport wyprawy: „Błąd mocny, powinienem móc atakować po resecie, wdróż to”.
+
+1. **Atak na Bestię działa zawsze**, gdy zostały ataki na dziś: także w trakcie wyprawy i przed odebraniem jej raportu, nie tylko przy pracy w profesji. Znika napis „Wyprawa się skończyła. Odbierz raport w Walce, a potem atakuj.” i „Postać jest na wyprawie. Bestia poczeka na jej powrót.”
+2. **Raport wyprawy bez zmian.** Atak niczego w postaci nie zmienia: nie daje XP, złota ani łupów i nie rusza HP. Raport wyprawy wychodzi więc taki sam, jak bez ataku. Postać walczy w ekwipunku, z którym poszła na wyprawę, bo w trakcie wyprawy i tak nie da się go zmienić.
+3. **Wieże bez zmian:** wejście do Wieży daje XP i łupy, więc dalej czeka na koniec wyprawy i odbiór raportu.
+
+## Wersja 0.1.29 (4.11.2026)
+
+1. **Powiadomienia pod pierwszym rzędem górnego paska** (zob. wyżej).
+2. **Atak na Bestię Gildii także w trakcie wyprawy** (zob. wyżej).
+3. **Test czasu szacowania zagrożenia** bierze najlepszą z pięciu rund (zob. „Warownia i Tier V: szkice do oceny”, punkt 5).
+
 ## Wersja 0.1.28 (4.11.2026)
 
 1. **Poprawki z przeglądu kodu (576)** przy oprawianiu kamieni (zob. „Przegląd kodu (4.11.2026, w grze od 0.1.28)”).
@@ -4888,7 +4909,7 @@ Autor: „344 A”.
 
 1. **Bestia tygodnia.** Co tydzień, od poniedziałku od północy czasu polskiego, gildia ma jedną bestię: czempiona jednego z regionów, wylosowanego dla gildii i tygodnia. Bestia przychodzi, gdy ktoś z gildii pierwszy raz na nią spojrzy albo ją zaatakuje. Jej poziom to zaokrąglony średni poziom postaci członków z tej chwili.
 2. **HP bestii (brakujący szczegół)** rośnie z liczbą członków: 12 typowych ataków jednej postaci (3 dziennie przez 4 dni) zbija mniej więcej jej część paska. Typowe obrażenia zmierzyła symulacja walk pięciu klas z czterema czempionami na poziomach od 5 do 200 (`data/guilds.json`, `beast`).
-3. **Ataki.** Postać w gildii atakuje 3 razy na dobę, od północy czasu polskiego, także przy pracy w profesji, ale nie w trakcie wyprawy ani przed odebraniem jej raportu, jak w Wieżach. Atak to jedna walka jak wejście do Wieży: sama, z pełnym HP, bez mikstur. Trofeum z Encyklopedii przeciw bestii i cecha jej regionu się liczą. Bestia zaczyna walkę z HP, które jej zostało, a atak zbija tyle, ile straciła. Atak nie daje XP, złota ani łupów.
+3. **Ataki.** Postać w gildii atakuje 3 razy na dobę, od północy czasu polskiego, także przy pracy w profesji, ale nie w trakcie wyprawy ani przed odebraniem jej raportu, jak w Wieżach. *Zmienione: zob. „Bestia Gildii: atak także w trakcie wyprawy”.* Atak to jedna walka jak wejście do Wieży: sama, z pełnym HP, bez mikstur. Trofeum z Encyklopedii przeciw bestii i cecha jej regionu się liczą. Bestia zaczyna walkę z HP, które jej zostało, a atak zbija tyle, ile straciła. Atak nie daje XP, złota ani łupów.
 4. **Skrzynia Bestii (brakujący szczegół).** Każda postać, która w tygodniu choć raz zaatakowała, otwiera jedną Skrzynię Bestii. Gdy bestia padnie, w skrzyni jest przedmiot klasy postaci na jej poziomie, w rzadkości czempiona, i 4 losowania materiału bestii. Gdy bestia przeżyje tydzień, są tylko materiały: 3, 2 albo 1 losowanie za zbite 75%, 50% albo 25% paska, a poniżej 25% nic. Skrzynię otwiera się od upadku bestii albo przez cały następny tydzień. Skrzynia z przedmiotem czeka zamknięta, gdy plecak jest pełny.
 5. **Porządki.** Bestie sprzed poprzedniego tygodnia znikają razem z atakami i skrzyniami, gdy przychodzi nowa bestia.
 6. **Bez linii w czacie**, bo czat nie ma linii Systemu.
