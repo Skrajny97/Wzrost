@@ -847,6 +847,10 @@ function patternsByPlace(patterns) {
   return [...places];
 }
 
+// The gem and the ore jewellery gives at once for Jubilerstwo when taken
+// apart (salvage.minerals), as words: "Złoty kruszec ×8, Ametyst ×1".
+const mineralsLine = (minerals) => (minerals ?? []).map((one) => `${one.name} ×${formatNumber(one.count)}`).join(', ');
+
 function salvageSection(item, busy) {
   const { salvage } = item;
   if (!salvage) return null;
@@ -861,8 +865,8 @@ function salvageSection(item, busy) {
     const sure = await confirmAction({
       title: 'Rozebrać przedmiot?',
       text: `${itemTitle(item)} zniknie, a stół zrobi z niego: ${salvage.part} ×${salvage.parts}, w ${formatMinutes(salvage.minutes)}.${
-        salvage.pattern ? ` System odsłoni Ci wzór ${salvage.patternAt}: ${salvage.pattern}.` : ''
-      }${item.gem ? ` Kamień w nim przepadnie: ${item.gem.name}.` : ''}`,
+        salvage.minerals ? ` Od razu dostaniesz do Jubilerstwa: ${mineralsLine(salvage.minerals)}.` : ''
+      }${salvage.pattern ? ` System odsłoni Ci wzór ${salvage.patternAt}: ${salvage.pattern}.` : ''}${item.gem ? ` Kamień w nim przepadnie: ${item.gem.name}.` : ''}`,
       confirmLabel: 'Rozbierz',
     });
     if (!sure) return;
@@ -872,8 +876,8 @@ function salvageSection(item, busy) {
       playSound('build');
       toast(
         `Na stole: ${order.name}. ${order.part} ×${order.parts} będą gotowe o ${timeFormat.format(new Date(order.endsAt))}.${
-          order.pattern ? ` Nowy wzór ${order.patternAt}: ${order.pattern}.` : ''
-        }`,
+          order.minerals ? ` Do Jubilerstwa: ${mineralsLine(order.minerals)}.` : ''
+        }${order.pattern ? ` Nowy wzór ${order.patternAt}: ${order.pattern}.` : ''}`,
       );
     });
   };
@@ -882,6 +886,7 @@ function salvageSection(item, busy) {
     { class: 'compare' },
     h('p', { class: 'compare-title', text: table?.name ?? 'Stół rozbiórki' }),
     h('p', { class: 'anvil-step' }, 'Rozbiórka: ', h('span', { class: 'item-name', vars: { '--rarity': salvage.color }, text: `${salvage.part} ×${salvage.parts}` }), salvage.minutes !== null ? ` · ${formatMinutes(salvage.minutes)}` : ''),
+    salvage.minerals && h('p', { class: 'anvil-step', text: `Do Jubilerstwa od razu: ${mineralsLine(salvage.minerals)}` }),
     !built && h('p', { class: 'muted', text: 'Zbuduj w obozie Stół rozbiórki, żeby rozbierać przedmioty na części.' }),
     needs && h('p', { class: 'muted', text: `Ta rzadkość wymaga Stołu rozbiórki na poziomie ${needs}.` }),
     salvage.pattern && h('p', { class: 'system-hint', text: `Rozbiórka odsłoni wzór ${salvage.patternAt}: ${salvage.pattern}.` }),
@@ -913,6 +918,12 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
     return [...parts];
   };
   const minutesOf = (items) => items.reduce((sum, item) => sum + item.salvage.minutes, 0);
+  // Jewellery's gem and ore, added up by mineral.
+  const mineralsOf = (items) => {
+    const minerals = new Map();
+    for (const { salvage } of items) for (const one of salvage.minerals ?? []) minerals.set(one.id, { ...one, count: (minerals.get(one.id)?.count ?? 0) + one.count });
+    return [...minerals.values()];
+  };
   const summary = h('p', { class: 'sheet-text', role: 'status' });
   const roomNote = h('p', { class: 'region-warning', hidden: true });
   const takeApart = h('button', { type: 'button', class: 'button button--world', onClick: (event) => go(event.currentTarget) });
@@ -930,6 +941,7 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
               h('span', { class: 'item-name', vars: { '--rarity': color }, text: `${part} ×${formatNumber(count)}` }),
             ]),
             `, w ${formatMinutes(minutesOf(items))}.`,
+            mineralsOf(items).length > 0 && ` Do Jubilerstwa od razu: ${mineralsLine(mineralsOf(items))}.`,
           ],
     );
     const tooMany = parts.length > room;
@@ -950,7 +962,13 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
         vars: { '--rarity': item.color },
         disabled: !takes(item),
         'aria-pressed': String(marked.has(item.id)),
-        'aria-label': [itemTitle(item), item.rarityName, item.slotName, `poziom ${item.level}`, `daje: ${item.salvage.part} ×${item.salvage.parts}`].join(', '),
+        'aria-label': [
+          itemTitle(item),
+          item.rarityName,
+          item.slotName,
+          `poziom ${item.level}`,
+          `daje: ${item.salvage.part} ×${item.salvage.parts}${item.salvage.minerals ? `, ${mineralsLine(item.salvage.minerals)}` : ''}`,
+        ].join(', '),
         onClick: () => {
           if (marked.has(item.id)) marked.delete(item.id);
           else marked.add(item.id);
@@ -974,7 +992,7 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
       title: 'Rozebrać przedmioty?',
       text: `${countOf(items.length, 'przedmiot', 'przedmioty', 'przedmiotów')} ${plural(items.length, 'zniknie', 'znikną', 'zniknie')} z plecaka, a stół zrobi z nich: ${partsOf(items)
         .map(([part, { count }]) => `${part} ×${formatNumber(count)}`)
-        .join(', ')}, w ${formatMinutes(minutesOf(items))}.${upgraded > 0 ? ` Ulepszone wśród nich: ${formatNumber(upgraded)}.` : ''}${gems > 0 ? ` Z kamieniem wśród nich: ${formatNumber(gems)}.` : ''}${
+        .join(', ')}, w ${formatMinutes(minutesOf(items))}.${mineralsOf(items).length > 0 ? ` Od razu dostaniesz do Jubilerstwa: ${mineralsLine(mineralsOf(items))}.` : ''}${upgraded > 0 ? ` Ulepszone wśród nich: ${formatNumber(upgraded)}.` : ''}${gems > 0 ? ` Z kamieniem wśród nich: ${formatNumber(gems)}.` : ''}${
         patterns.map(([at, names]) => ` System odsłoni Ci ${plural(names.length, 'wzór', 'wzory', 'wzory')} ${at}: ${names.join(', ')}.`).join('')
       }`,
       confirmLabel: 'Rozbierz',
@@ -998,7 +1016,7 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
       toast(
         `Na stole: ${countOf(salvaged.count, 'przedmiot', 'przedmioty', 'przedmiotów')}. ${salvaged.orders
           .map((order) => `${order.part} ×${formatNumber(order.parts)}`)
-          .join(', ')} będą gotowe o ${timeFormat.format(new Date(ready))}.${patternsByPlace(salvaged.patterns)
+          .join(', ')} będą gotowe o ${timeFormat.format(new Date(ready))}.${salvaged.minerals ? ` Do Jubilerstwa: ${mineralsLine(salvaged.minerals)}.` : ''}${patternsByPlace(salvaged.patterns)
           .map(([at, names]) => ` ${plural(names.length, 'Nowy wzór', 'Nowe wzory', 'Nowe wzory')} ${at}: ${names.join(', ')}.`)
           .join('')}`,
       );

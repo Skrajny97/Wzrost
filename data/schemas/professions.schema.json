@@ -1089,6 +1089,7 @@
         "chancePerLevel",
         "maxChance",
         "setting",
+        "salvage",
         "about",
         "texts"
       ],
@@ -1175,6 +1176,16 @@
           "type": "number",
           "exclusiveMinimum": 0,
           "maximum": 1
+        },
+        "salvage": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Rozbiórka biżuterii na Stole rozbiórki (autor 4.11.2026: „Niech wisiory amulety pierscienie itd. dają też z rozbiórki bardziej rzeczy do Jubilerstwa niż do Rzemieślnictwa”): części jest partsDivisor razy mniej niż z innego przedmiotu (co najmniej 1), kruszcu oprawy tyle sztuk, ile byłoby części, a od drugiej rzadkości dochodzi kamień o gemRarityDown rzadkość niżej. Kamień i kruszec przychodzą od razu, części po rozbiórce.",
+          "required": ["partsDivisor", "gemRarityDown"],
+          "properties": {
+            "partsDivisor": { "type": "integer", "minimum": 1 },
+            "gemRarityDown": { "type": "integer", "minimum": 1 }
+          }
         },
         "setting": {
           "type": "object",

@@ -24,6 +24,7 @@ import {
   parseStack,
   settleCrafting,
   saleGold,
+  salvageYield,
 } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, craftingState, loadPlayer, questsNow, requirePlayer, taughtPattern } from './characters.js';
@@ -57,12 +58,13 @@ const newId = () => toHex(crypto.getRandomValues(new Uint8Array(8)));
 const withIds = (before, state) => ({ ...state, queue: state.queue.map((order, index) => (index < before ? order : { id: newId(), ...order })) });
 
 // `quests`: the narrator's quests moved on by the order; `gold`: the
-// scrapper's payment. `condition` adds to the WHERE clause, with its own
-// `binds`.
-const saveState = (db, row, state, { quests, patterns, gold = 0, condition = '', binds = [] } = {}) =>
+// scrapper's payment; `minerals`: the character's minerals after jewellery
+// taken apart gave its gem and ore (salvageYield). `condition` adds to the
+// WHERE clause, with its own `binds`.
+const saveState = (db, row, state, { quests, patterns, gold = 0, minerals = null, condition = '', binds = [] } = {}) =>
   db
     .prepare(
-      `UPDATE characters SET materials = ?, parts = ?, crafting = ?${quests ? ', quests = ?' : ''}${patterns ? ', patterns = ?' : ''}${gold ? ', gold = gold + ?' : ''}, version = version + 1
+      `UPDATE characters SET materials = ?, parts = ?, crafting = ?${quests ? ', quests = ?' : ''}${patterns ? ', patterns = ?' : ''}${gold ? ', gold = gold + ?' : ''}${minerals ? ', minerals = ?' : ''}, version = version + 1
        WHERE id = ? AND version = ?${condition}`,
     )
     .bind(
@@ -72,12 +74,23 @@ const saveState = (db, row, state, { quests, patterns, gold = 0, condition = '',
       ...(quests ? [JSON.stringify(quests)] : []),
       ...(patterns ? [JSON.stringify(patterns)] : []),
       ...(gold ? [gold] : []),
+      ...(minerals ? [JSON.stringify(minerals)] : []),
       row.id,
       row.version,
       ...binds,
     );
 
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
+
+// The gem and the ore that jewellery taken apart gives at once, added to the
+// character's minerals, or null for other items (salvageYield).
+function withMinerals(row, items) {
+  const found = items.reduce((sum, item) => addCounts(sum, salvageYield(item, content).minerals ?? {}), {});
+  return Object.keys(found).length > 0 ? { found, minerals: addCounts(JSON.parse(row.minerals ?? '{}'), found) } : null;
+}
+
+// Minerals as the page lists them: name and count.
+export const mineralList = (minerals) => Object.entries(minerals ?? {}).map(([id, count]) => ({ id, name: content.mineralsById[id].name, count }));
 
 // The scrapper buys `count` pieces of a stack of materials ({ key, count }),
 // for their price with the camp's Skup złomu (proposal 1: "Skup złomu
@@ -162,10 +175,12 @@ export async function salvageItem(context) {
   const quests = addQuestProgress(questsNow(player, now), { salvaged: 1 });
   const learned = JSON.parse(row.patterns ?? '[]');
   const pattern = taughtPattern(item, learned);
+  const jewel = withMinerals(row, [item]);
   const [saved] = await db.batch([
     saveState(db, row, state, {
       quests,
       ...(pattern && { patterns: [...learned, pattern.id] }),
+      ...(jewel && { minerals: jewel.minerals }),
       condition: ' AND EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ? AND slot IS NULL)',
       binds: [item.id, row.id],
     }),
@@ -183,6 +198,7 @@ export async function salvageItem(context) {
       parts: order.parts,
       endsAt: order.endsAt,
       ...(pattern && { pattern: pattern.name, patternAt: pattern.at }),
+      ...(jewel && { minerals: mineralList(jewel.found) }),
     },
     character: characterView(await loadPlayer(db, session.userId), now),
   });
@@ -231,6 +247,7 @@ export async function salvageItems(context) {
     return pattern ? [...list, pattern] : list;
   }, []);
   const patterns = [...learned, ...taught.map((one) => one.id)];
+  const jewels = withMinerals(row, items);
   const list = JSON.stringify(ids);
   const saved = `EXISTS (SELECT 1 FROM characters WHERE id = ? AND instr(crafting, ?) > 0)`;
   const marker = [row.id, `"id":"${orders[0].id}"`];
@@ -238,6 +255,7 @@ export async function salvageItems(context) {
     saveState(db, row, state, {
       quests,
       ...(taught.length > 0 && { patterns }),
+      ...(jewels && { minerals: jewels.minerals }),
       condition: ' AND (SELECT COUNT(*) FROM items WHERE character_id = ? AND slot IS NULL AND id IN (SELECT value FROM json_each(?))) = ?',
       binds: [row.id, list, ids.length],
     }),
@@ -251,6 +269,7 @@ export async function salvageItems(context) {
       count: items.length,
       orders: orders.map((order) => ({ part: content.partsById[order.partId].name, parts: order.parts, endsAt: order.endsAt })),
       patterns: taught.map(({ name, at }) => ({ name, at })),
+      ...(jewels && { minerals: mineralList(jewels.found) }),
     },
     character: characterView(await loadPlayer(db, session.userId), now),
   });

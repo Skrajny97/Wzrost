@@ -273,6 +273,7 @@
     "chances": { "common": 1, "rare": 0.9, "unique": 0.75, "epic": 0.55, "legendary": 0.35, "mythic": 0.2, "divine": 0.1 },
     "chancePerLevel": 0.005,
     "maxChance": 0.95,
+    "salvage": { "partsDivisor": 3, "gemRarityDown": 1 },
     "setting": { "minutes": 15, "rarityTime": 2 },
     "about": {
       "craft": [

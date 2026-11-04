@@ -194,12 +194,32 @@ export function materialsText(found, content) {
 export function salvageYield(item, content) {
   const { salvageBase, salvageLevelStep } = content.balance.crafting;
   const upgrade = item.upgrade ?? 0;
-  return {
-    partId: content.partsByRarity[(item.crafted && content.partsByRarity[item.crafted.rarity] ? item.crafted.rarity : item.rarity)].id,
-    count: item.crafted
-      ? Math.floor(item.crafted.parts / 2) + Math.max(0, upgrade - item.crafted.upgrade)
-      : salvageBase + Math.floor(item.level / salvageLevelStep) + upgrade,
-  };
+  const partId = content.partsByRarity[item.crafted && content.partsByRarity[item.crafted.rarity] ? item.crafted.rarity : item.rarity].id;
+  const count = item.crafted
+    ? Math.floor(item.crafted.parts / 2) + Math.max(0, upgrade - item.crafted.upgrade)
+    : salvageBase + Math.floor(item.level / salvageLevelStep) + upgrade;
+  const jewel = jewelSalvage(item, count, content);
+  return jewel ? { partId, count: jewel.parts, minerals: jewel.minerals } : { partId, count };
+}
+
+// Jewellery, a base the Szlifiernia sets (a ring, an amulet, a talisman),
+// gives more for Jubilerstwo than for Rzemieślnictwo (the author: „Niech
+// wisiory amulety pierscienie itd. dają też z rozbiórki bardziej rzeczy do
+// Jubilerstwa niż do Rzemieślnictwa”): `partsDivisor` times fewer parts, at
+// least one, as many pieces of the ore of its rarity's setting as it would
+// have given parts, and from the second rarity on a gem `gemRarityDown`
+// rarities below its own (a gem of its own would let a jewel be made, taken
+// apart and made again for nothing but time). The minerals come at once.
+function jewelSalvage(item, count, content) {
+  const tuning = content.jewelcrafting?.salvage;
+  if (!tuning || !content.jewelcrafting.ores[item.slot]) return null;
+  const minerals = {};
+  const ore = content.minerals.find((mineral) => mineral.kind === 'ore' && mineral.for.includes(item.rarity));
+  if (ore) minerals[ore.id] = count;
+  const gemRarity = content.rarities[content.rarities.findIndex((rarity) => rarity.id === item.rarity) - tuning.gemRarityDown];
+  const gem = gemRarity && content.minerals.find((mineral) => mineral.kind === 'gem' && mineral.rarity === gemRarity.id);
+  if (gem) minerals[gem.id] = (minerals[gem.id] ?? 0) + 1;
+  return { parts: Math.max(1, Math.floor(count / tuning.partsDivisor)), minerals };
 }
 
 const tableBuilding = (content) => content.buildings.find((building) => building.effect.kind === 'craftSpeed');

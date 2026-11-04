@@ -3048,6 +3048,23 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Rozbiórka biżuterii dla Jubilerstwa (4.11.2026, w grze od 0.1.45)
+
+Autor: „Niech wisiory amulety pierscienie itd. dają też z rozbiórki bardziej rzeczy do Jubilerstwa niż do Rzemieślnictwa.”
+
+1. **Co daje biżuteria.** Biżuteria to wszystko, co oprawia Szlifiernia: pierścienie, amulety i talizmany. Rozebrana na Stole rozbiórki daje:
+    - **części:** trzy razy mniej niż inny przedmiot tego poziomu, rzadkości i ulepszenia, co najmniej jedną;
+    - **kruszec oprawy** swojej rzadkości (srebrny, złoty albo gwiezdny): tyle sztuk, ile byłoby części;
+    - **kamień o rzadkość niżej** niż ona sama, od rzadkich wzwyż (rzadki pierścień daje Kwarc, epicki amulet Ametyst). Kamień tej samej rzadkości pozwalałby za darmo robić i rozbierać biżuterię, aż wyjdą najlepsze właściwości. Pospolita biżuteria daje sam kruszec.
+2. **Przykłady.** Rzadki pierścień 30. poziomu: 1 Rzemień, 5 Srebrnego kruszcu i Kwarc (wcześniej 5 Rzemieni). Epicki amulet 40. poziomu z +2: 2 Odłamki, 8 Złotego kruszcu i Ametyst (wcześniej 8 Odłamków).
+3. **Kiedy.** Kamień i kruszec trafiają do Jubilerstwa od razu, jak wzór poznawany przy rozbiórce. Części przychodzą, gdy stół skończy. Karta przedmiotu, pytanie „Rozebrać?”, wybór kilku przedmiotów i komunikat po rozbiórce mówią, co przyjdzie do Jubilerstwa.
+4. **Liczby** stoją w `jewelcrafting.salvage` w `data/professions.json` (`partsDivisor`, `gemRarityDown`).
+
+## Wersja 0.1.45 (4.11.2026)
+
+1. **Rozbiórka biżuterii dla Jubilerstwa** (zob. wyżej).
+2. **Wpis „Co nowego?” do zatwierdzenia:** szkic 0.1.45 w `data/news.json`.
+
 ## Zwój utrwalenia i nowe ceny zwojów (4.11.2026, w grze od 0.1.44)
 
 Według odpowiedzi autora z 4.11.2026 (ceny zwojów, Warsztat od 10. poziomu profesji, 598 C i 599 B, zob. „Odpowiedzi autora 587 A, 597 A i o zwojach”):

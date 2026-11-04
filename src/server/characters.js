@@ -979,7 +979,7 @@ export function characterView(player, now) {
   const table = craftTable(levels, content);
   const learned = JSON.parse(row.patterns ?? '[]');
   const salvage = (item) => {
-    const { partId, count } = salvageYield(item, content);
+    const { partId, count, minerals } = salvageYield(item, content);
     const part = content.partsById[partId];
     const takes = table.pace > 0 && craftTakes(table, item.rarity, content);
     const pattern = taughtPattern(item, learned);
@@ -990,6 +990,8 @@ export function characterView(player, now) {
       minutes: takes ? craftMinutes(item.rarity, count, table.pace, content) : null,
       needs: table.pace > 0 && !takes ? craftLevelFor(item.rarity, content) : null,
       ...(pattern && { pattern: pattern.name, patternAt: pattern.at }),
+      // Jewellery's gem and ore for Jubilerstwo, given at once.
+      ...(minerals && { minerals: Object.entries(minerals).map(([id, mineralCount]) => ({ id, name: content.mineralsById[id].name, count: mineralCount })) }),
     };
   };
   // The materials that pay for the Kowadło's upgrades from +5 on.
