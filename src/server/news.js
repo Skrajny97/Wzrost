@@ -1,10 +1,10 @@
 // "Co nowego?" (the author's answers 594 A + C and 595 A): the entries the
 // author publishes in the Panel autora, each from a draft of data/news.json
 // (one a version, as the game's changes go out) or written there from
-// scratch, and nothing before "Opublikuj". A player's window after entering
-// the game shows each entry once: those published after the account was made
-// and after the newest one the account has seen (`news_seen`). The scroll in
-// the top bar lists the latest entries at any time.
+// scratch, and nothing before "Opublikuj". The scroll in the top bar lists
+// the latest entries at any time, with a dot while one waits that was
+// published after the account was made and after the newest one the account
+// has seen (`news_seen`); no window opens by itself (the author, 4.11.2026).
 
 import news from '../../data/news.json' with { type: 'json' };
 import { isAuthor } from './author.js';

@@ -50,6 +50,11 @@
       "id": "0.1.47",
       "title": "Wersja 0.1.47",
       "body": "- Za każdy nowy stopień Bractwa czeka nagroda: Punkty Systemu (1, 2, 3 albo 5) i upominek z towaru Bractwa. Odbiera się ją przyciskiem „Odbierz” w panelu „Akceptacja Bractw” w Osadzie.\n- Stopnie zdobyte wcześniej też dają nagrody, wszystkie naraz.\n- Narrator w Kuźni mówi teraz o obu zwojach."
+    },
+    {
+      "id": "0.1.48",
+      "title": "Wersja 0.1.48",
+      "body": "- Okienko „Co nowego?” nie otwiera się już samo po wejściu do gry.\n- Gdy pojawi się nowy wpis, ikona zwoju w górnym pasku dostaje żółtą kropkę. Kropka gaśnie po otwarciu listy."
     }
   ]
 }

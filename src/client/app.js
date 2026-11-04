@@ -41,7 +41,7 @@ import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
 import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
 import { narrate } from './narrator.js';
-import { showNewsIfAny } from './news.js';
+import { forgetNews, watchNews } from './news.js';
 import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn, unlockInfo } from './state.js';
@@ -309,19 +309,13 @@ function showConfirm() {
   emailUnsent = false;
 }
 
-// "Co nowego?" (news.js): its window, when it is due; a failed read waits for
-// the next page load.
-const askNews = () => showNewsIfAny().catch(() => {});
-
 function openGame() {
   show('game');
   buildTopbar(openSettings);
   route();
   // An older account without a confirmed e-mail is invited to confirm it,
-  // once the narrator is done (email.js), and the entries of "Co nowego?"
-  // the account has not seen open (news.js).
+  // once the narrator is done (email.js).
   setTimeout(inviteToConfirm, 1500);
-  setTimeout(askNews, 2500);
   clearInterval(ticker);
   ticker = setInterval(() => {
     const now = serverNow();
@@ -330,6 +324,8 @@ function openGame() {
     watchConstruction(now);
     watchCrafting(now);
     watchQuests(now);
+    // A new entry of "Co nowego?" lights the scroll's dot (news.js).
+    watchNews(now);
     checkChat();
     offerTrade();
     offerPointsReset();
@@ -450,10 +446,8 @@ onCharacterChange(() => {
   updateSide();
   current.screen.update?.();
   narrate();
-  // The narrator's lines read: the invitation may come once he is done, and
-  // the window of "Co nowego?" too.
+  // The narrator's lines read: the invitation may come once he is done.
   setTimeout(inviteToConfirm, 1500);
-  setTimeout(askNews, 2500);
 });
 
 // Coming back to the page after a new version of the game was deployed
@@ -1253,6 +1247,7 @@ function leaveGame() {
   state.user = null;
   state.character = null;
   state.freshReport = null;
+  forgetNews();
   // The narrator leaves with the character, and gives the screen back.
   narrate();
   enterAuth();

@@ -18,7 +18,7 @@ import { anyClaimable, showQuests } from './quests.js';
 import { SECTION_ICONS, SECTION_NEWS, sectionHash } from './screens/community.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
 import { meter, toast } from './ui.js';
-import { openNews } from './news.js';
+import { newsWaiting, openNews } from './news.js';
 import { desktopLayout } from './layout-mode.js';
 
 // A profession's work, by the kind of its activity: its screen, its name
@@ -140,7 +140,8 @@ export function buildTopbar(onSettings) {
 
   // The settings, with a dot for the author when players' bug reports wait.
   const settings = h('button', { type: 'button', class: 'icon-button', 'aria-label': 'Ustawienia', onClick: onSettings }, icon('gear'));
-  // "Co nowego?" beside them (594 C): the latest entries, never with a dot.
+  // "Co nowego?" beside them (594 C): the latest entries, with a yellow dot
+  // while an entry the account has not seen waits (news.js).
   const news = h('button', { type: 'button', class: 'icon-button news-button', 'aria-label': 'Co nowego?', onClick: () => openNews().catch((error) => toast(error.message)) }, icon('scroll'));
 
   const element = $('#topbar');
@@ -166,6 +167,7 @@ export function buildTopbar(onSettings) {
   );
   topbar = {
     settings,
+    news,
     level,
     classLevel,
     className,
@@ -277,6 +279,10 @@ export function updateTopbar(now = serverNow()) {
   const reports = state.user?.bugReports ?? 0;
   topbar.settings.classList.toggle('settings-button--ready', reports > 0);
   topbar.settings.setAttribute('aria-label', reports > 0 ? `Ustawienia, nowe zgłoszenia błędów: ${reports}` : 'Ustawienia');
+  // A dot on the scroll while a new entry of "Co nowego?" waits.
+  const unread = newsWaiting();
+  topbar.news.classList.toggle('news-button--ready', unread);
+  topbar.news.setAttribute('aria-label', unread ? 'Co nowego?, nowy wpis' : 'Co nowego?');
   // A dot when a chest of the Encyklopedia or a Bestiariusz waits.
   const chests = (character.encyclopedia?.ready ?? 0) + bestiaryReady(character, state.content);
   topbar.encyclopedia.classList.toggle('encyclopedia-button--ready', chests > 0);

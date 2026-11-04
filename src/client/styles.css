@@ -9582,12 +9582,15 @@ a.profession-square:active {
   outline-offset: 1px;
 }
 
-/* The settings' gear with a dot when bug reports wait for the author. */
-.settings-button--ready {
+/* The settings' gear with a dot when bug reports wait for the author, and
+   the scroll of "Co nowego?" while a new entry waits. */
+.settings-button--ready,
+.news-button--ready {
   position: relative;
 }
 
-.settings-button--ready::after {
+.settings-button--ready::after,
+.news-button--ready::after {
   content: '';
   position: absolute;
   top: 6px;

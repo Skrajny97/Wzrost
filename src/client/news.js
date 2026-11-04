@@ -1,13 +1,12 @@
 // "Co nowego?" (the author's answers 594 A + C and 595 A; src/server/news.js):
-// after entering the game the entries the account has not seen yet open once
-// in a sheet, as soon as nothing of the narrator's waits (the introduction
-// first, for a new player); the scroll in the top bar, without a dot, opens
-// the latest entries at any time. Only the entries the author published show.
+// the scroll in the top bar opens the latest entries, and while an entry the
+// account has not seen waits it has a yellow dot. No window opens by itself
+// (the author, 4.11.2026: „wyłączmy to wyświetlanie i dajmy tylko żółtą
+// kropkę jak wjedzie nowy wpis”). Only the entries the author published show.
 
 import { h } from './dom.js';
-import { narratorIdle } from './narrator.js';
 import { call, state } from './state.js';
-import { afterSheet, closeSheet, openSheet } from './ui.js';
+import { closeSheet, openSheet } from './ui.js';
 
 const dateFormat = new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'numeric', year: 'numeric' });
 
@@ -42,8 +41,11 @@ export const newsEntry = (entry) =>
     textOf(entry.body),
   );
 
-// The newest entry the account has seen, as the server last told it.
+// The newest entry the account has seen, as the server last told it, and
+// the newest one it has not seen yet (0 for none): the scroll's dot.
 let seenUpTo = 0;
+let unseenUpTo = 0;
+export const newsWaiting = () => unseenUpTo > seenUpTo;
 
 // The account has seen the entries up to the newest of these.
 function seen(entries) {
@@ -51,6 +53,30 @@ function seen(entries) {
   if (!newest || newest <= seenUpTo) return;
   seenUpTo = newest;
   call('POST', '/api/news/seen', { id: newest }).catch(() => {});
+}
+
+// Whether an entry waits that the account has not seen: one published after
+// the account was made and after the newest it has seen. A character plays
+// when it is asked, on entering the game and then every ten minutes
+// (app.js), so an entry published meanwhile lights the dot too.
+const EVERY = 10 * 60000;
+let checkedAt = -Infinity;
+export function watchNews(now) {
+  if (!state.character || now - checkedAt < EVERY) return;
+  checkedAt = now;
+  call('GET', '/api/news')
+    .then(({ entries, seen: before, since }) => {
+      seenUpTo = Math.max(seenUpTo, before);
+      unseenUpTo = Math.max(0, ...entries.filter((entry) => entry.id > before && entry.publishedAt > since).map((entry) => entry.id));
+    })
+    .catch(() => {});
+}
+
+// Leaving the game: the next account starts afresh.
+export function forgetNews() {
+  seenUpTo = 0;
+  unseenUpTo = 0;
+  checkedAt = -Infinity;
 }
 
 // The scroll in the top bar: the latest entries, newest first.
@@ -63,37 +89,4 @@ export async function openNews() {
     h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--system', text: 'Zamknij', onClick: closeSheet })),
   );
   seen(entries);
-}
-
-// The window after entering the game: once a page load, when a character
-// plays, the narrator has nothing to say and no other window is open, the
-// entries the account has not seen; app.js asks again on each screen.
-let asked = false;
-// A character from before the introduction (its `tutorial` null) has no
-// narrator waiting to speak.
-const quiet = () => state.character?.tutorial === null || narratorIdle();
-export async function showNewsIfAny() {
-  if (asked || !state.character || !quiet() || document.querySelector('dialog[open]')) return;
-  asked = true;
-  const { entries, seen: before, since } = await call('GET', '/api/news');
-  seenUpTo = Math.max(seenUpTo, before);
-  const unseen = entries.filter((entry) => entry.id > before && entry.publishedAt > since);
-  if (unseen.length === 0) return;
-  // Another window opened meanwhile: the next screen asks again.
-  if (document.querySelector('dialog[open]')) {
-    asked = false;
-    return;
-  }
-  openSheet(
-    h('h2', { class: 'sheet-title', text: 'Co nowego?' }),
-    h('p', { class: 'sheet-text muted', text: 'Od Twojej ostatniej wizyty:' }),
-    h('div', { class: 'news-entries' }, unseen.map(newsEntry)),
-    h(
-      'div',
-      { class: 'sheet-actions' },
-      entries.length > unseen.length && h('button', { type: 'button', class: 'button button--world', text: 'Wcześniejsze wpisy', onClick: () => openNews().catch(() => {}) }),
-      h('button', { type: 'button', class: 'button button--system', text: 'Zamknij', onClick: closeSheet }),
-    ),
-  );
-  afterSheet(() => seen(unseen));
 }

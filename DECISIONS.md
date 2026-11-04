@@ -3048,6 +3048,23 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## „Co nowego?” bez okienka, z kropką (4.11.2026, w grze od 0.1.48)
+
+Autor: „Jeśli ktoś sam kliknie Co nowego? ikonkę, niech powiadomienie samo nie wyświetla mu się na ekranie po parunastu sekundach (taki przypadek miałem). Może ogólnie wyłączmy to wyświetlanie i dajmy tylko żółtą kropkę jak wjedzie nowy wpis jednak.”
+
+1. **Bez okienka.** Po wejściu do gry „Co nowego?” nie otwiera się samo. To zastępuje okienko z odpowiedzi 594 A.
+2. **Żółta kropka na zwoju** w górnym pasku, dopóki czeka wpis opublikowany po założeniu konta i nowszy od ostatnio obejrzanego. Gaśnie po otwarciu listy. To zastępuje „bez kropki” z odpowiedzi 594 C.
+3. **Sprawdzanie (brakujący szczegół).** Gra pyta o nowe wpisy po wejściu i potem co 10 minut, więc wpis opublikowany w trakcie gry zapala kropkę najpóźniej po 10 minutach.
+
+## Odpowiedzi autora 608 i 609 (4.11.2026)
+
+Autor: „608 A 609 A”. Plac treningowy w wyglądach 2 i 3 wchodzi do Warowni w poprawionej wersji. PixelLab dorysował tylko to, co ucięła ramka 128 × 96: szczyty wież, końce murów i przedni róg placu z korytem (`art/inputs/fortress/`, inpaint-v3). Reszta grafiki jest bez zmian. Nad murem wyglądu 2 usunięte są dwa dorysowane kawałki koron drzew, które wisiały w powietrzu.
+
+## Wersja 0.1.48 (4.11.2026)
+
+1. **„Co nowego?” z kropką zamiast okienka** (zob. wyżej).
+2. **Wpis „Co nowego?” do zatwierdzenia:** szkic 0.1.48 w `data/news.json`.
+
 ## Nagrody za nowy stopień Bractwa (4.11.2026, w grze od 0.1.47)
 
 Odpowiedzi autora 593 A i B (zob. „Korzyści Bractw: odpowiedzi autora 589–593”).
@@ -3216,8 +3233,8 @@ Autor: „niech u Zielarki będą ikony danych przedmiotów przy ich nazwach”.
 
 Gracz zaproponował na czacie zakładkę „co nowego” w grze, bo nie chce szukać nowości na Facebooku. Autor: „tylko to co tam wyląduje muszę zatwierdzać.. nie wiem gdzie to "Co nowego?" zmieścić w sumie”, a po makietach: „594 A + C bez kropki (zachowanie dostępu do changelogów)”.
 
-1. **Okienko (A).** Po wejściu do gry okienko „Co nowego?” pokazuje raz każdy nowy wpis, którego gracz jeszcze nie widział.
-2. **Ikona (C).** Ikona zwoju w górnym pasku, obok Ustawień, otwiera listę wszystkich wpisów, także dawnych. Ikona nie ma kropki.
+1. **Okienko (A).** Po wejściu do gry okienko „Co nowego?” pokazuje raz każdy nowy wpis, którego gracz jeszcze nie widział. Od 0.1.48 tego okienka nie ma (zob. „„Co nowego?” bez okienka, z kropką”).
+2. **Ikona (C).** Ikona zwoju w górnym pasku, obok Ustawień, otwiera listę wszystkich wpisów, także dawnych. Ikona nie ma kropki. Od 0.1.48 ma żółtą kropkę, gdy czeka nowy wpis.
 3. **Tylko wpisy zatwierdzone przez autora.** Sposób zatwierdzania czeka na odpowiedź 595.
 
 ## Osada na komputerze bez przewijania (4.11.2026, w grze od 0.1.40)
