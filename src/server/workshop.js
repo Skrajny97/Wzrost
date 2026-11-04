@@ -35,6 +35,7 @@ import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { craftingOn } from './features.js';
+import { perkOf } from './perks.js';
 import { addTo, insertWork, requireProfessions, workGains } from './professions.js';
 import { trimReports } from './reports.js';
 import { say } from '../engine/text.js';
@@ -62,7 +63,7 @@ export async function startCrafting(context) {
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > workshop.maxCount) {
     throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${workshop.maxCount} sztuk.`);
   }
-  const order = body.scroll === true ? scrollOrder(level, body.count) : itemOrder(player.row, level, body);
+  const order = body.scroll === true ? scrollOrder(player.row, level, body.count) : itemOrder(player.row, level, body);
   const { cost } = order;
 
   const now = context.now;
@@ -147,26 +148,33 @@ export async function exchangeParts(context) {
 
 // An order of items: a pattern the character knows, a rarity of its level,
 // what they take at the character's level, which is also the items' level,
-// and room for them in the bag.
+// and room for them in the bag. The Bractwo Kowali shortens the work and
+// adds to the luck of a rarity up (590), the luck kept with the order.
 function itemOrder(row, level, body) {
   const base = typeof body.baseId === 'string' ? content.basesById[body.baseId] : undefined;
   const learned = JSON.parse(row.patterns ?? '[]');
   if (!base || !content.workshop.parts[base.slot] || !knowsPattern(base, level, learned, content)) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
   const rarity = craftRarities(level, content).find((candidate) => candidate.id === body.rarity);
   if (!rarity) throw new ApiError(400, 'unknown_rarity', 'Tej rzadkości jeszcze nie wykonasz.');
+  const luck = perkOf(row, 'workshopLuck');
   return {
     cost: craftCost(base, rarity.id, body.count, row.level, content),
-    minutes: orderMinutes(body.count, rarity.id, level, content),
+    minutes: orderMinutes(body.count, rarity.id, level, content, perkOf(row, 'workshopFaster')),
     room: true,
-    options: { base: base.id, rarity: rarity.id, level: row.level },
+    options: { base: base.id, rarity: rarity.id, level: row.level, ...(luck > 0 && { luck }) },
   };
 }
 
 // An order of Zwoje ochronne, from the scroll's level of the profession.
-function scrollOrder(level, count) {
+function scrollOrder(row, level, count) {
   const { scroll, texts } = content.workshop;
   if (level < scroll.level) throw new ApiError(403, 'locked', say(texts, 'hidden', 0, { level: scroll.level }));
-  return { cost: { ...scrollCost(count, content), resources: {} }, minutes: scrollOrderMinutes(count, level, content), room: false, options: { scroll: true } };
+  return {
+    cost: { ...scrollCost(count, content), resources: {} },
+    minutes: scrollOrderMinutes(count, level, content, perkOf(row, 'workshopFaster')),
+    room: false,
+    options: { scroll: true },
+  };
 }
 
 // The report of an order (claimHunt sends a finished one here), or with
@@ -193,7 +201,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
   const worked = stop ? Math.floor(elapsed / 60000) : activity.minutes;
   const results =
     done > 0 && !scroll
-      ? craftItems({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed }, content)
+      ? craftItems({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed, luck: options.luck ?? 0 }, content)
       : [];
   const made = results.filter((result) => result.made).map((result) => result.item);
   // Every scroll done comes out.

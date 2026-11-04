@@ -314,6 +314,9 @@ export function itemUpgradeCost(item, target, content) {
 
 export const upgradeChance = (target, content) => content.balance.upgrades.chances[target - 1];
 
+// A Kowadło price with `discount` of its gold off, at least one gold.
+const discounted = (cost, discount) => (discount > 0 ? { ...cost, gold: Math.max(1, Math.round(cost.gold * (1 - discount))) } : cost);
+
 // The materials an upgrade to `target` also takes from materialFrom on (the
 // author: "Wyższe ulepszenia biorą też materiał rzadkości przedmiotu"):
 // pieces of materials of the item's rarity, any of them added up (481 B:
@@ -347,7 +350,9 @@ export function rollUpgrade(item, rng, content, { warded = false } = {}) {
 // chances and the item's numbers after it. With the character's `stock` of
 // materials, the materials the next level takes come as the pages show
 // them: the pieces held and those it would take (rarityNeedView).
-export function upgradeView(item, cap, content, stock = null) {
+// `discount`: the share of the gold the Bractwo Kowali takes off (590), the
+// ore and the materials as they are.
+export function upgradeView(item, cap, content, stock = null, discount = 0) {
   const level = item.upgrade ?? 0;
   const max = maxUpgrade(content);
   const reach = Math.min(cap, max);
@@ -361,7 +366,7 @@ export function upgradeView(item, cap, content, stock = null) {
       target <= reach
         ? {
             level: target,
-            cost: itemUpgradeCost(item, target, content),
+            cost: discounted(itemUpgradeCost(item, target, content), discount),
             materials: need && stock ? rarityNeedView(stock, need, content) : need,
             chance: upgradeChance(target, content),
             breakChance: breakChance(level, content),
@@ -433,7 +438,7 @@ export function autoEquip(equipped, items, content, classId, classLevel) {
 // `upgradeCap`: the level of the camp's Kowadło, for the upgrade part of the
 // item card; left out where the card cannot upgrade (a report). `materials`:
 // the character's stock, which pays for the upgrades (upgradeView).
-export function itemView(item, content, { sellBonus = 0, upgradeCap, materials = null } = {}) {
+export function itemView(item, content, { sellBonus = 0, upgradeCap, materials = null, anvilDiscount = 0 } = {}) {
   const rarity = content.raritiesById[item.rarity];
   const classIds = baseClasses(item.base, content);
   const classLevel = baseClassLevel(item.base, content);
@@ -467,6 +472,6 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     // Konta: worn from its own level on (src/server/inventory.js).
     ...(item.traded ? { traded: true } : {}),
     ...(item.chest ? { chest: true } : {}),
-    ...(upgradeCap === undefined ? {} : { anvil: upgradeView(item, upgradeCap, content, materials) }),
+    ...(upgradeCap === undefined ? {} : { anvil: upgradeView(item, upgradeCap, content, materials, anvilDiscount) }),
   };
 }

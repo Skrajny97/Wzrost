@@ -38,14 +38,16 @@ export function minimumBid(offer, content) {
   return Math.max(offer.bid + 1, Math.ceil(offer.bid * (1 + tuning(content).minRaise)));
 }
 
-// What the seller gets of a price: all but the Targowisko's fee (239 A).
-export const sellerShare = (price, content) => price - Math.ceil(price * tuning(content).fee);
+// What the seller gets of a price: all but the Targowisko's fee (239 A), the
+// one kept with the offer when it was put up (lower with the Kompania Kupców,
+// 592) or the data's.
+export const sellerShare = (price, content, fee = tuning(content).fee) => price - Math.ceil(price * fee);
 
 // Why an offer cannot be put up, or null: a kind the Targowisko takes, a
 // whole count the character holds, prices in whole gold, "Kup teraz" not
 // below the starting price, and a free place among the character's offers.
-export function listBlock({ kind, count, startPrice, buyNow, hours = null }, held, open, limit, content) {
-  const { kinds, maxPrice, minHours, hours: maxHours } = tuning(content);
+export function listBlock({ kind, count, startPrice, buyNow, hours = null }, held, open, limit, content, maxHours = tuning(content).hours) {
+  const { kinds, maxPrice, minHours } = tuning(content);
   if (!kinds.includes(kind)) return { code: 'invalid_kind', message: 'Tego nie wystawisz na Targowisku.' };
   if (!Number.isInteger(count) || count < 1 || count > held) return { code: 'not_enough', message: 'Nie masz tylu.' };
   if (kind === 'item' && count !== 1) return { code: 'not_enough', message: 'Przedmiot wystawia się pojedynczo.' };
@@ -185,12 +187,14 @@ export function wandererDay(now, content) {
 // others): `items` items at the character's level, of the rarities drawn by
 // `rarities`, for its class, each `priceFactor` times what the scrapper pays.
 // `day` is his day, unless the test version calls him for another.
-export function wandererGoods(character, now, content, day = wandererDay(now, content)) {
+// `count` items, more with the Kompania Kupców (592): the first ones are the
+// same with any count.
+export function wandererGoods(character, now, content, day = wandererDay(now, content), count = tuning(content).wanderer.items) {
   if (now < day.startsAt || now >= day.endsAt) return { comes: day, goods: null };
   const { wanderer } = tuning(content);
   const rng = createRng(`market:wanderer:${day.key}:${character.seed}`);
   const rarities = Object.entries(wanderer.rarities).map(([id, weight]) => ({ id, weight }));
-  const goods = Array.from({ length: wanderer.items }, (_, index) => {
+  const goods = Array.from({ length: count }, (_, index) => {
     const item = randomItem(character.level, rng, content, { classId: character.classId, maxClassLevel: character.classLevel ?? 1, rarityId: rng.weighted(rarities).id });
     return { id: `${day.key}:${index}`, item, price: Math.round(sellPrice(item, content) * wanderer.priceFactor) };
   });

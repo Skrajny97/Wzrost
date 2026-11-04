@@ -23,6 +23,7 @@ import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { takenOff } from './market.js';
+import { perkOf } from './perks.js';
 
 // The scrapper's price for the stored `items`, summed in SQL over the items
 // still there, so an item sold twice at the same moment pays once. Each price
@@ -199,7 +200,8 @@ export async function previewItem(context) {
 // character (settlement.js).
 export function upgradePlan(player, item, body, now) {
   const cap = campBonus(campLevels(player.buildings, now, content), 'upgradeCap', content);
-  const view = upgradeView(item, cap, content);
+  // Less gold with the Bractwo Kowali (590), as the item card shows.
+  const view = upgradeView(item, cap, content, null, perkOf(player.row, 'anvilDiscount'));
   if (view.level >= view.max) throw new ApiError(409, 'max_upgrade', 'Ten przedmiot ma już najwyższe ulepszenie.');
   if (!view.next) {
     throw new ApiError(

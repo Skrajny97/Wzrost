@@ -3048,6 +3048,35 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Korzyści Bractw: odpowiedzi autora 589–593 (4.11.2026)
+
+Autor: „589, 590, 591, 592, 593 czy wszystkie opcje (i A i B i C w każdym przypadku) nie zaburzą balansu? Jeśli nie - wdrażaj, bo brzmi super.”
+
+1. **Balans.** Wchodzą wszystkie warianty A, B i C, z dwiema zmianami:
+    - **591 B o połowę.** Elity i czempioni trafiają się częściej o 5 / 10 / 15 / 20%, a nie o 10 / 20 / 30 / 40%. Ich szansę podnoszą już Strażnica Warowni i długość wyprawy, a razem z 591 A (więcej materiałów) pełne 40% dawałoby za dużo rzadkich materiałów naraz.
+    - **593 C odpada,** bo jest przeciwieństwem A i B. Za nowy stopień są Punkty Systemu (A) i upominek z towarem Bractwa (B).
+2. **Dlaczego reszta nie szkodzi.** Każda korzyść dotyczy jednej części gry i przychodzi dopiero po długim handlu z Bractwem: stopień Przyjaciel to 1400 punktów reputacji. Kupno u mieszkańców nadal kosztuje więcej, niż mieszkańcy płacą, więc na kupnie i odsprzedaży nie da się zarobić. Dlatego wyższa premia Garbarni (591 C) podnosi też cenę, za którą Wszebor sprzedaje. Ulepszony przedmiot oddaje przy sprzedaży połowę pełnej ceny ulepszeń, a z upustem Kowali (590 A) ulepszenia kosztują co najmniej 80% tej ceny.
+3. **Liczby** stoją w `brotherhoodPerks` w `data/settlement.json`, po jednej na każdy stopień. Na stopniu Obcy są takie jak dotąd.
+4. **Panel „Akceptacja Bractw”** pokazuje nowe korzyści przy stopniach, obok dotychczasowych.
+5. **Etapy.** Najpierw Kupcy i Kowale (0.1.42), potem Zielarze, Łowcy i nagrody za nowy stopień.
+
+## Korzyści Kupców i Kowali (4.11.2026, w grze od 0.1.42)
+
+1. **Niższa opłata Targowiska (592 A):** 0,8 / 0,6 / 0,4 / 0,2% ceny zamiast 1%.
+    - **Zapisana w ofercie (brakujący szczegół).** Opłata zapisuje się w ofercie przy wystawieniu, a wyższy stopień zdobyty w trakcie aukcji jej nie zmienia. Oferty wystawione przed 0.1.42 mają 1%.
+2. **Wędrowny handlarz (592 B)** wykłada 4 przedmioty od stopnia Stały klient i 5 od stopnia Przyjaciel. Pierwsze trzy są te same co bez Kompanii.
+3. **Dłuższe aukcje (592 C):** do 30 / 36 / 42 / 48 godzin.
+    - **Suwak (brakujący szczegół).** Suwak czasu licytacji zaczyna się jak dotąd na 24 godzinach, a dłuższy czas trzeba wybrać.
+4. **Kowadło taniej (590 A):** ulepszenie kosztuje 5 / 10 / 15 / 20% mniej złota, ale co najmniej 1 złoto. Ruda i materiały zostają bez zmian. Upust działa też przy ulepszaniu przedmiotów kompanów w Kwaterach.
+5. **Warsztat szybciej (590 B):** przedmioty i Zwoje ochronne powstają 5 / 10 / 15 / 20% krócej.
+6. **Rzadkość wyżej (590 C):** szansa na przedmiot o rzadkość wyżej rośnie o 1 / 2 / 3 / 4 punkty procentowe.
+    - **Zapisana w zamówieniu (brakujący szczegół).** Zamówienie zapisuje szansę przy złożeniu, jak oferta opłatę.
+7. **Także Awatar Systemu.** Zamówienia Awatara w Warsztacie dostają te same korzyści co zamówienia postaci.
+
+## Wersja 0.1.42 (4.11.2026)
+
+1. **Korzyści Kupców i Kowali** (zob. wyżej).
+
 ## Zasoby obozu w Wymianie między graczami (4.11.2026, w grze od 0.1.41)
 
 Gracz zapytał na czacie, czy w Wymianie dojdzie drewno, kamień i ruda, a autor: „Konieczne”.

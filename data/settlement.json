@@ -111,8 +111,29 @@
       "special": "Zlecenia specjalne: Punkt Systemu i dwa razy więcej reputacji",
       "quality": "Zlecenia jakościowe na materiały: dwa razy więcej reputacji",
       "market": "Na Targowisku naraz {offers} ofert",
-      "forge": "Kuźnia {discount}% taniej"
+      "forge": "Kuźnia {discount}% taniej",
+      "herbYield": "Zielarstwo zbiera {value}% więcej ziół",
+      "brewFaster": "Alchemia warzy {value}% krócej",
+      "potionFights": "Mikstury na czas działają o {value} {fights} dłużej",
+      "anvilDiscount": "Kowadło {value}% taniej",
+      "workshopFaster": "Warsztat pracuje {value}% krócej",
+      "workshopLuck": "Warsztat: szansa na przedmiot o rzadkość wyżej +{value} pkt proc.",
+      "materialDrops": "Ze stworów {value}% więcej materiałów",
+      "rareOdds": "Elity i czempioni {value}% częściej",
+      "tanneryPremium": "Garbarnia płaci o {value} pkt proc. więcej",
+      "marketFee": "Opłata Targowiska {value}%",
+      "wandererItems": "Wędrowny handlarz wykłada {value} {items}",
+      "auctionHours": "Aukcje do {value} godzin"
     }
+  },
+  "brotherhoodPerks": {
+    "$comment": "Korzyści stopni Bractw (odpowiedzi autora 589–593, 4.11.2026: „wszystkie opcje … jeśli nie zaburzą balansu”): każda liczba według stopnia reputacji Bractwa brotherhood (Obcy, Znajomy, Stały klient, Zaufany, Przyjaciel; byStanding), liczona w src/engine/settlement.js (brotherhoodPerk). anvilDiscount: o tyle mniej złota za ulepszenie na Kowadle; workshopFaster: o tyle krócej pracuje Warsztat; workshopLuck: o tyle więcej szansy, że Warsztat zrobi przedmiot o rzadkość wyżej, zapisane w zamówieniu przy złożeniu; marketFee: opłata Targowiska od sprzedaży, zapisana w ofercie przy wystawieniu; wandererItems: ile przedmiotów wykłada wędrowny handlarz; auctionHours: najdłuższa aukcja w godzinach. Na stopniu Obcy liczby są takie jak bez Bractw. Korzyści Zielarzy i Łowców dojdą w następnym etapie (słowa już są w brotherhoodsPanel.perks).",
+    "anvilDiscount": { "brotherhood": "smiths", "byStanding": [0, 0.05, 0.1, 0.15, 0.2] },
+    "workshopFaster": { "brotherhood": "smiths", "byStanding": [0, 0.05, 0.1, 0.15, 0.2] },
+    "workshopLuck": { "brotherhood": "smiths", "byStanding": [0, 0.01, 0.02, 0.03, 0.04] },
+    "marketFee": { "brotherhood": "merchants", "byStanding": [0.01, 0.008, 0.006, 0.004, 0.002] },
+    "wandererItems": { "brotherhood": "merchants", "byStanding": [3, 3, 4, 4, 5] },
+    "auctionHours": { "brotherhood": "merchants", "byStanding": [24, 30, 36, 42, 48] }
   },
   "orders": {
     "resident": "headman",

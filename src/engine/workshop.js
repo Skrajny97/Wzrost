@@ -62,10 +62,11 @@ const rarityStep = (rarityId, content) => content.rarities.findIndex((rarity) =>
 const pace = (level, content) => Math.max(content.workshop.fastest, 1 - content.workshop.speedPerLevel * (level - 1));
 
 // The minutes of one item of a rarity at a level: rarityTime times longer
-// for each rarity up, at the level's pace.
-export function itemMinutes(rarityId, level, content) {
+// for each rarity up, at the level's pace, and `faster` of them less with the
+// Bractwo Kowali (590).
+export function itemMinutes(rarityId, level, content, faster = 0) {
   const { itemMinutes: minutes, rarityTime } = content.workshop;
-  return minutes * rarityTime ** (rarityStep(rarityId, content) - 1) * pace(level, content);
+  return minutes * rarityTime ** (rarityStep(rarityId, content) - 1) * pace(level, content) * (1 - faster);
 }
 
 // Minutes rounded up to whole ones (and to a thousandth first, as
@@ -73,11 +74,12 @@ export function itemMinutes(rarityId, level, content) {
 const wholeMinutes = (minutes) => Math.ceil(Math.round(minutes * 1000) / 1000);
 
 // An order of `count` items in whole minutes.
-export const orderMinutes = (count, rarityId, level, content) => wholeMinutes(count * itemMinutes(rarityId, level, content));
+export const orderMinutes = (count, rarityId, level, content, faster = 0) => wholeMinutes(count * itemMinutes(rarityId, level, content, faster));
 
-// The minutes of one Zwój ochronny at a level, and of an order of `count`.
-export const scrollMinutes = (level, content) => content.workshop.scroll.minutes * pace(level, content);
-export const scrollOrderMinutes = (count, level, content) => wholeMinutes(count * scrollMinutes(level, content));
+// The minutes of one Zwój ochronny at a level, and of an order of `count`,
+// as faster with the Bractwo Kowali as the items.
+export const scrollMinutes = (level, content, faster = 0) => content.workshop.scroll.minutes * pace(level, content) * (1 - faster);
+export const scrollOrderMinutes = (count, level, content, faster = 0) => wholeMinutes(count * scrollMinutes(level, content, faster));
 
 // The parts one item of a base takes at an item level: those of its slot and
 // one more for every partsLevelStep levels, so the parts for an item always
@@ -158,17 +160,18 @@ export function craftUpgrades(level, content) {
 // The chances a made item comes out one rarity or two above the ordered one,
 // by luck alone (the author: "5% na poziom rzadkości wyższej niż oczekiwana,
 // 1% na dwa poziomy wyżej. Rośnie wraz z levelem Profesji co 20 lvli o 1%
-// obydwa wskaźniki").
-export function craftLuck(level, content) {
+// obydwa wskaźniki"), and `extra` on the one rarity up with the Bractwo
+// Kowali (590).
+export function craftLuck(level, content, extra = 0) {
   const { oneUp, twoUp, everyLevels, perStep } = content.workshop.luck;
   const bonus = perStep * Math.floor(level / everyLevels);
-  return { oneUp: oneUp + bonus, twoUp: twoUp + bonus };
+  return { oneUp: oneUp + bonus + extra, twoUp: twoUp + bonus };
 }
 
 // The rarity a made item comes out with: one draw for both chances of
 // craftLuck, never above the last rarity.
-function luckyRarity(rarityId, level, rng, content) {
-  const { oneUp, twoUp } = craftLuck(level, content);
+function luckyRarity(rarityId, level, rng, content, extra = 0) {
+  const { oneUp, twoUp } = craftLuck(level, content, extra);
   const roll = rng.next();
   const steps = roll < twoUp ? 2 : roll < twoUp + oneUp ? 1 : 0;
   const index = Math.min(content.rarities.length - 1, rarityStep(rarityId, content) - 1 + steps);
@@ -189,7 +192,9 @@ function rollCraftUpgrade(level, rng, content) {
 // upgraded or not. A made item keeps the parts it took, their rarity and the
 // upgrade it came with (`crafted`) for the scrapper's price and the Stół
 // rozbiórki. An order stopped early keeps the draws of the items it made.
-export function craftItems({ baseId, rarityId, count, level, professionLevel, met = [], seed }, content) {
+// `luck`: the Bractwo Kowali's extra chance of one rarity up, kept with the
+// order when it was given (590).
+export function craftItems({ baseId, rarityId, count, level, professionLevel, met = [], seed, luck = 0 }, content) {
   const rng = createRng(seed);
   const chance = craftChance(rarityId, professionLevel, content);
   const area = metNames(met, content);
@@ -201,7 +206,7 @@ export function craftItems({ baseId, rarityId, count, level, professionLevel, me
       results.push({ made });
       continue;
     }
-    const item = generateItem({ baseId, level, rarityId: luckyRarity(rarityId, professionLevel, rng, content), area }, rng, content);
+    const item = generateItem({ baseId, level, rarityId: luckyRarity(rarityId, professionLevel, rng, content, luck), area }, rng, content);
     const upgrade = rollCraftUpgrade(professionLevel, rng, content);
     results.push({ made, item: { ...item, ...(upgrade > 0 && { upgrade }), crafted: { parts, rarity: rarityId, upgrade } } });
   }

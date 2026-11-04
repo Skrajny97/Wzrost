@@ -390,19 +390,20 @@ export function mountMarket(holder) {
     };
     openSheet(
       h('h2', { class: 'sheet-title', text: 'Wystaw na Targowisku' }),
-      h('p', { class: 'sheet-text', text: `Ofertę wystawisz na ${market.minHours}–${countOf(market.hours, 'godzinę', 'godziny', 'godzin')}. Przy sprzedaży Targowisko bierze ${Math.round(market.fee * 100)}% ceny.` }),
+      h('p', { class: 'sheet-text', text: `Ofertę wystawisz na ${market.minHours}–${countOf(market.hours, 'godzinę', 'godziny', 'godzin')}. Przy sprzedaży Targowisko bierze ${formatDecimal(market.fee * 100)}% ceny.` }),
       goods.length === 0
         ? h('p', { class: 'muted', text: 'W plecaku nie ma nic do wystawienia. Założonych przedmiotów się nie wystawia.' })
         : filtered(goods, goodsCategory, filters.sellable, picks),
     );
   }
 
-  // The auction's length, an hour a step from the shortest to the longest,
-  // which it starts at (the author: "Czas licytacji powinien moc byc do
-  // wyboru od 1h do 24h po godzinie suwak sie przesuwający").
+  // The auction's length, an hour a step from the shortest to the longest
+  // (the author: "Czas licytacji powinien moc byc do wyboru od 1h do 24h po
+  // godzinie suwak sie przesuwający"). It starts at the usual longest, 24 h,
+  // also when the Kompania Kupców lets the character go on longer (592).
   function hoursPicker() {
     const { minHours, hours: longest } = market;
-    let hours = longest;
+    let hours = Math.min(longest, market.usualHours ?? longest);
     const text = (value) => `${formatNumber(value)} h`;
     const value = h('output', { class: 'duration-value', 'aria-live': 'off' });
     const slider = h('input', {
@@ -673,7 +674,7 @@ export function mountMarket(holder) {
           'section',
           { class: 'card market-intro', 'data-guide': 'market-intro' },
           howItWorks(`Licytacja trwa od ${countOf(market.minHours, 'godziny', 'godzin', 'godzin')} do ${market.hours} godzin, tyle, ile wybierze wystawiający.`, [
-            `Przebity gracz od razu dostaje złoto z powrotem, a Targowisko bierze ${Math.round(market.fee * 100)}% ceny sprzedaży.`,
+            `Przebity gracz od razu dostaje złoto z powrotem, a Targowisko bierze ${formatDecimal(market.fee * 100)}% ceny sprzedaży.`,
             `Handel daje reputację Kompanii Kupców, dziś ${market.trade.today} z ${market.trade.daily} pkt.${tradePace(market.trade)} Postacie z jednego konta nie kupują od siebie.`,
           ]),
         ),

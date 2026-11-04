@@ -12,6 +12,7 @@ import {
   addQuestProgress,
   bagCapacity,
   bagStacks,
+  brotherhoodPerk,
   brotherhoodPerks,
   campBonus,
   campLevels,
@@ -512,7 +513,7 @@ function tavernView(row, stored, now) {
 // for a hired one) each item it wears has the Kowadło's part of its card,
 // paid from the character's `materials` too, and `roll`, the seed of its
 // last try on the Kowadło, which the next try names (upgradeCompanionItem).
-function companionView(companion, { upgradeCap, materials } = {}) {
+function companionView(companion, { upgradeCap, materials, anvilDiscount = 0 } = {}) {
   const unit = companionCombatant(companion, {}, content);
   const female = companion.appearance === 'female';
   const { traits, professions, stories } = content.settlement.companions;
@@ -537,7 +538,7 @@ function companionView(companion, { upgradeCap, materials } = {}) {
     // the item came from the character's bag.
     wear: COMPANION_SLOTS.map((slot) => {
       const worn = companion.gear.find((item) => item.slot === slot);
-      const shown = worn && { ...itemView(worn, content, { upgradeCap, materials }), given: Boolean(worn.given), ...(upgradeCap !== undefined && { roll: worn.lastRoll ?? '' }) };
+      const shown = worn && { ...itemView(worn, content, { upgradeCap, materials, anvilDiscount }), given: Boolean(worn.given), ...(upgradeCap !== undefined && { roll: worn.lastRoll ?? '' }) };
       return { slot, slotName: content.slotsById[slot].name, item: shown || null };
     }),
     profession: professions.find((one) => one.id === companion.profession)?.name ?? null,
@@ -604,7 +605,7 @@ function companionsView(player, stored, now) {
     hired: hired.map((companion) => {
       const away = companionAway(player, companion);
       return {
-        ...companionView(companion, { upgradeCap, materials }),
+        ...companionView(companion, { upgradeCap, materials, anvilDiscount: brotherhoodPerk('anvilDiscount', stored.reputation, content) }),
         // Wounded until the character rests to full HP, and when that is.
         ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
         gift: giftOf(companion, row, now),

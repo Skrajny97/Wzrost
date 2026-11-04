@@ -37,8 +37,9 @@ export function standingOf(points, content) {
 // What a brotherhood's standing at `index` gives, in the words of the
 // Osada's panel (brotherhoodsPanel.perks): the Kuźnia's discount for the
 // Bractwo Kowali, the offers kept on the Targowisko for the Kompania
-// Kupców, and for a brotherhood that posts orders, quality orders for
-// materials and special orders from their standings.
+// Kupców, the perks of brotherhoodPerks, and for a brotherhood that posts
+// orders, quality orders for materials and special orders from their
+// standings.
 export function brotherhoodPerks(brotherhood, index, content) {
   const { forge, market, orders, standings, brotherhoodsPanel } = content.settlement;
   const words = brotherhoodsPanel.perks;
@@ -50,9 +51,48 @@ export function brotherhoodPerks(brotherhood, index, content) {
     if (discount > 0) perks.push(fill(words.forge, { discount: Math.round(discount * 100) }));
   }
   if (market?.brotherhood === brotherhood.id) perks.push(fill(words.market, { offers: market.offers + index }));
+  // The perks of the answers 589–593 (brotherhoodPerks in the data), each
+  // only where its number differs from the one without the brotherhood,
+  // before the orders'.
+  for (const [id, perk] of perkEntries(content)) {
+    if (perk.brotherhood !== brotherhood.id) continue;
+    const value = perkAt(perk, index);
+    if (value === perkAt(perk, 0)) continue;
+    perks.push(fill(words[id], { value: shownPerk(id, value), fights: pluralPl(value, ['walkę', 'walki', 'walk']), items: pluralPl(value, ['przedmiot', 'przedmioty', 'przedmiotów']) }));
+  }
   if (brotherhood.goods.includes('material') && index >= from(orders.quality.from)) perks.push(words.quality);
   if (brotherhood.goods.length > 0 && index >= from(orders.special.from)) perks.push(words.special);
   return perks;
+}
+
+// The perks of the brotherhoods' standings (data/settlement.json
+// brotherhoodPerks, the author's 589–593), without the data's own note.
+const perkEntries = (content) => Object.entries(content.settlement.brotherhoodPerks ?? {}).filter(([id]) => id !== '$comment');
+const perkAt = (perk, index) => perk.byStanding[Math.min(index, perk.byStanding.length - 1)];
+
+// A perk's number as the panel says it: shares in whole percents (the
+// Targowisko's fee to a tenth), counts as they are.
+function shownPerk(id, value) {
+  if (id === 'marketFee') return String(Math.round(value * 1000) / 10).replace('.', ',');
+  if (id === 'potionFights' || id === 'wandererItems' || id === 'auctionHours') return String(value);
+  return String(Math.round(value * 100));
+}
+
+// The Polish form of a count: one, two to four (not 12 to 14), five and more.
+function pluralPl(count, [one, few, many]) {
+  if (count === 1) return one;
+  const tens = count % 100;
+  return count % 10 >= 2 && count % 10 <= 4 && (tens < 12 || tens > 14) ? few : many;
+}
+
+// A perk of a brotherhood's standing (brotherhoodPerks in the data, the
+// author's 589–593): its number at the standing the character has with
+// that brotherhood, by the Osada's reputation (settlement.reputation). An
+// unknown perk is 0.
+export function brotherhoodPerk(perkId, reputation, content) {
+  const perk = content.settlement.brotherhoodPerks?.[perkId];
+  if (!perk || perkId === '$comment') return 0;
+  return perkAt(perk, standingOf(reputation?.[perk.brotherhood] ?? 0, content).index);
 }
 
 // Whether a brotherhood's standing has reached the one of `standingId`.

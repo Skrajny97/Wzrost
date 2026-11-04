@@ -44,6 +44,7 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn } from './features.js';
+import { perkOf } from './perks.js';
 import { say } from '../engine/text.js';
 
 // The herbs and the potions the character carries, by id, as the row keeps
@@ -351,9 +352,11 @@ function jewelView(level, row) {
 // (orderMinutes). A pattern learned by taking an item apart is known before
 // its level (`learned`). Then the upgrades a made item may come with, and
 // the Zwoje ochronne: what one takes, its minutes and those the character
-// has, or the level the System shows them at.
+// has, or the level the System shows them at. The minutes and the luck are
+// the character's own, with the Bractwo Kowali's perks (590).
 function workshopView(level, row) {
   const { workshop } = content;
+  const faster = perkOf(row, 'workshopFaster');
   const hint = (from) => say(workshop.texts, 'hidden', 0, { level: from });
   const bases = craftableBases(content);
   const learned = JSON.parse(row.patterns ?? '[]');
@@ -365,7 +368,7 @@ function workshopView(level, row) {
     maxCount: workshop.maxCount,
     upgrades: craftUpgrades(level, content),
     // The chances of an item one or two rarities above the ordered one.
-    luck: craftLuck(level, content),
+    luck: craftLuck(level, content, perkOf(row, 'workshopLuck')),
     upgradesFrom: workshop.upgrades[0].level,
     // Parts of a rarity for one of the next, at once (exchangeParts): each
     // part with the one it is had for.
@@ -380,7 +383,7 @@ function workshopView(level, row) {
       level: scroll.level,
       owned: row.scrolls,
       ...(scroll.level <= level
-        ? { part: { id: scrollPart.id, name: scrollPart.name }, parts: scroll.parts, minutes: scrollMinutes(level, content) }
+        ? { part: { id: scrollPart.id, name: scrollPart.name }, parts: scroll.parts, minutes: scrollMinutes(level, content, faster) }
         : { hidden: true, hint: hint(scroll.level) }),
     },
     // The slots in the order of the parts they take, the weapon first.
@@ -420,7 +423,7 @@ function workshopView(level, row) {
         step: content.rarities.findIndex((candidate) => candidate.id === rarity.id) + 1,
         part: { id: part.id, name: part.name },
         ...(rarity.level <= level
-          ? { chance: craftChance(rarity.id, level, content), itemMinutes: itemMinutes(rarity.id, level, content) }
+          ? { chance: craftChance(rarity.id, level, content), itemMinutes: itemMinutes(rarity.id, level, content, faster) }
           : { hidden: true, hint: hint(rarity.level) }),
       };
     }),

@@ -94,6 +94,7 @@ import { marketRemoval } from './market.js';
 import { championOf } from './guild-fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { partyRemoval } from './parties.js';
+import { perkOf } from './perks.js';
 import { bagHerbs, bagMinerals, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
@@ -991,7 +992,9 @@ export function characterView(player, now) {
   };
   // The materials that pay for the Kowadło's upgrades from +5 on.
   const materials = JSON.parse(row.materials ?? '{}');
-  const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap, materials }), salvage: salvage(item) });
+  // Less gold on the Kowadło with the Bractwo Kowali (590).
+  const anvilDiscount = perkOf(row, 'anvilDiscount');
+  const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap, materials, anvilDiscount }), salvage: salvage(item) });
   // Whether a bag item would make the character stronger in place of what
   // its slot holds (preview.js), for the marks on the bag and on finds; null
   // for an item the class cannot wear.

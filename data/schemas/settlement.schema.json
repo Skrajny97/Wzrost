@@ -6,6 +6,15 @@
   "additionalProperties": false,
   "required": ["name", "description", "places", "residents", "brotherhoods", "standings", "relationDiscount", "orders", "reforge", "hermit"],
   "definitions": {
+    "brotherhoodPerk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["brotherhood", "byStanding"],
+      "properties": {
+        "brotherhood": { "$ref": "#/definitions/id" },
+        "byStanding": { "type": "array", "minItems": 1, "items": { "type": "number", "minimum": 0 } }
+      }
+    },
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
     "goodKind": { "enum": ["herb", "potion", "material", "resource", "part", "craft"] },
     "perKind": {
@@ -92,14 +101,46 @@
         "perks": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["special", "quality", "market", "forge"],
+          "required": ["special", "quality", "market", "forge", "herbYield", "brewFaster", "potionFights", "anvilDiscount", "workshopFaster", "workshopLuck", "materialDrops", "rareOdds", "tanneryPremium", "marketFee", "wandererItems", "auctionHours"],
           "properties": {
             "special": { "type": "string", "minLength": 1 },
             "quality": { "type": "string", "minLength": 1 },
             "market": { "type": "string", "minLength": 1 },
-            "forge": { "type": "string", "minLength": 1 }
+            "forge": { "type": "string", "minLength": 1 },
+            "herbYield": { "type": "string", "minLength": 1 },
+            "brewFaster": { "type": "string", "minLength": 1 },
+            "potionFights": { "type": "string", "minLength": 1 },
+            "anvilDiscount": { "type": "string", "minLength": 1 },
+            "workshopFaster": { "type": "string", "minLength": 1 },
+            "workshopLuck": { "type": "string", "minLength": 1 },
+            "materialDrops": { "type": "string", "minLength": 1 },
+            "rareOdds": { "type": "string", "minLength": 1 },
+            "tanneryPremium": { "type": "string", "minLength": 1 },
+            "marketFee": { "type": "string", "minLength": 1 },
+            "wandererItems": { "type": "string", "minLength": 1 },
+            "auctionHours": { "type": "string", "minLength": 1 }
           }
         }
+      }
+    },
+    "brotherhoodPerks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["anvilDiscount", "workshopFaster", "workshopLuck", "marketFee", "wandererItems", "auctionHours"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "herbYield": { "$ref": "#/definitions/brotherhoodPerk" },
+        "brewFaster": { "$ref": "#/definitions/brotherhoodPerk" },
+        "potionFights": { "$ref": "#/definitions/brotherhoodPerk" },
+        "anvilDiscount": { "$ref": "#/definitions/brotherhoodPerk" },
+        "workshopFaster": { "$ref": "#/definitions/brotherhoodPerk" },
+        "workshopLuck": { "$ref": "#/definitions/brotherhoodPerk" },
+        "materialDrops": { "$ref": "#/definitions/brotherhoodPerk" },
+        "rareOdds": { "$ref": "#/definitions/brotherhoodPerk" },
+        "tanneryPremium": { "$ref": "#/definitions/brotherhoodPerk" },
+        "marketFee": { "$ref": "#/definitions/brotherhoodPerk" },
+        "wandererItems": { "$ref": "#/definitions/brotherhoodPerk" },
+        "auctionHours": { "$ref": "#/definitions/brotherhoodPerk" }
       }
     },
     "brotherhoods": {

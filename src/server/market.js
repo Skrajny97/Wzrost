@@ -17,6 +17,7 @@ import {
   bagCapacity,
   bidBlock,
   bagStacks,
+  brotherhoodPerk,
   buyCeiling,
   campBonus,
   campLevels,
@@ -127,7 +128,8 @@ const goodsParcel = (db, offer, characterId, reason, price, now) =>
     .prepare('INSERT INTO market_parcels (character_id, offer_id, kind, good, count, item, reason, price, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
     .bind(characterId, offer.id, offer.kind, offer.good, offer.count, offer.item, reason, price, now);
 
-// The seller's parcel of a sale's gold, without the Targowisko's fee; the
+// The seller's parcel of a sale's gold, without the Targowisko's fee, the
+// one the offer was put up with (lower with the Kompania Kupców, 592); the
 // test version's own offers have no seller to get it.
 const goldParcel = (db, offer, price, now) =>
   offer.seller_id === null
@@ -135,7 +137,7 @@ const goldParcel = (db, offer, price, now) =>
     : [
         db
           .prepare("INSERT INTO market_parcels (character_id, offer_id, kind, count, reason, price, created_at) VALUES (?, ?, 'gold', ?, 'sold', ?, ?)")
-          .bind(offer.seller_id, offer.id, sellerShare(price, content), price, now),
+          .bind(offer.seller_id, offer.id, sellerShare(price, content, offer.fee ?? tuning().fee), price, now),
       ];
 
 // The offers whose time ran out (questions 238 A, 239 A): a sold one gives
@@ -201,7 +203,7 @@ function sellable(player, now) {
 function wandererFor(row, stored, now) {
   const today = questPeriod('daily', now, content);
   const called = stored.market?.wandererCalled === today.key ? today : undefined;
-  return wandererGoods({ level: row.level, classId: row.class_id, classLevel: row.class_level, seed: row.id }, now, content, called);
+  return wandererGoods({ level: row.level, classId: row.class_id, classLevel: row.class_level, seed: row.id }, now, content, called, brotherhoodPerk('wandererItems', stored.reputation, content));
 }
 
 // The residents' offers (242 A): the merchant's goods of the day with what
@@ -238,10 +240,13 @@ async function marketView(db, player, now) {
     db.prepare('SELECT * FROM market_parcels WHERE character_id = ? ORDER BY id').bind(row.id),
   ]);
   const day = questPeriod('daily', now, content).key;
-  const { fee, hours, minHours, reputation, maxPrice } = tuning();
+  const { minHours, reputation, maxPrice } = tuning();
   return {
-    fee,
-    hours,
+    // The character's own fee and longest auction, by the Kompania Kupców
+    // (592), and the longest without it, which the hours start at.
+    fee: brotherhoodPerk('marketFee', stored.reputation, content),
+    hours: brotherhoodPerk('auctionHours', stored.reputation, content),
+    usualHours: tuning().hours,
     minHours,
     maxPrice,
     limit: offerLimit(stored.reputation, content),
@@ -285,11 +290,15 @@ export async function listOffer(context) {
   const key = typeof body.key === 'string' ? body.key : null;
   const held = kind === 'item' ? (item ? 1 : 0) : column && key && knownGood(kind, key) ? (JSON.parse(row[column] ?? '{}')[key] ?? 0) : 0;
   const open = (await db.prepare("SELECT COUNT(*) AS open FROM market_offers WHERE seller_id = ? AND state = 'open'").bind(row.id).first()).open;
-  const limit = offerLimit(settlementOf(row).reputation, content);
+  const { reputation } = settlementOf(row);
+  const limit = offerLimit(reputation, content);
   const count = kind === 'item' ? 1 : body.count;
   const buyNow = body.buyNow === null || body.buyNow === undefined || body.buyNow === '' ? null : body.buyNow;
   const hours = body.hours === null || body.hours === undefined ? tuning().hours : body.hours;
-  const block = listBlock({ kind, count, startPrice: body.startPrice, buyNow, hours }, held, open, limit, content);
+  // Longer auctions and a lower fee with the Kompania Kupców (592); the fee
+  // stays with the offer as it was put up.
+  const block = listBlock({ kind, count, startPrice: body.startPrice, buyNow, hours }, held, open, limit, content, brotherhoodPerk('auctionHours', reputation, content));
+  const fee = brotherhoodPerk('marketFee', reputation, content);
   if (block) throw new ApiError(block.code === 'too_many' || block.code === 'not_enough' ? 409 : 400, block.code, block.message);
   const now = context.now;
   const endsAt = now + hours * 3600000;
@@ -315,10 +324,10 @@ export async function listOffer(context) {
     db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(row.id),
     db
       .prepare(
-        `INSERT INTO market_offers (seller_id, seller_user_id, seller_name, kind, good, count, item, start_price, buy_now, created_at, ends_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO market_offers (seller_id, seller_user_id, seller_name, kind, good, count, item, start_price, buy_now, created_at, ends_at, fee)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
-      .bind(row.id, row.user_id, row.name, kind, item ? null : key, count, data, body.startPrice, buyNow, now, endsAt),
+      .bind(row.id, row.user_id, row.name, kind, item ? null : key, count, data, body.startPrice, buyNow, now, endsAt, fee),
   ]);
   return respond(db, session, now);
 }
