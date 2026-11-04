@@ -188,4 +188,11 @@ jobs:
           mkdir -p art/drafts && cp -r "$RUNNER_TEMP/drafts/." art/drafts/
           git add -f art/drafts
           git commit -m "Szkice grafik: $KIND ($IDS)" || exit 0
+          # A push cut off by GitHub (HTTP 408 on 4.11.2026) would lose drafts
+          # already paid for: it tries again, after 2, 4, 8 and 16 seconds.
+          for wait in 2 4 8 16; do
+            git push origin art-drafts && exit 0
+            echo "Zapis się nie udał, ponowienie za $wait s"
+            sleep "$wait"
+          done
           git push origin art-drafts
