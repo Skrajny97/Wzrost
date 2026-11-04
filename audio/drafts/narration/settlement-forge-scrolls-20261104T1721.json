@@ -1,0 +1,18 @@
+{
+  "id": "settlement-forge-scrolls",
+  "payload": {
+    "text": "Żelisław sprzedaje dwa rodzaje zwojów, każdego najwyżej trzy dziennie. Zwój ochronny chroni przedmiot przed rozpadem na Kowadle, a Zwój utrwalenia przed spadkiem ulepszenia. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/settlement-forge-scrolls-20261104T1721-0.mp3",
+    "audio/drafts/narration/settlement-forge-scrolls-20261104T1721-1.mp3",
+    "audio/drafts/narration/settlement-forge-scrolls-20261104T1721-2.mp3"
+  ],
+  "credits": 561
+}
