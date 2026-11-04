@@ -66,8 +66,9 @@ export const knownHerbs = (level, content) => content.herbs.filter((herb) => her
 // How many herbs the character gathers at once at a level.
 export const herbSlots = (level, content) => content.gathering.slots.findLast((slot) => slot.level <= level).herbs;
 
-// Herbs of one kind an hour at a level: more with each level.
-export const herbsPerHour = (herb, level, content) => herb.perHour * (1 + content.gathering.yieldPerLevel * (level - 1));
+// Herbs of one kind an hour at a level: more with each level, and `more`
+// more with the Bractwo Zielarzy (589 A, herbYield).
+export const herbsPerHour = (herb, level, content, more = 0) => herb.perHour * (1 + content.gathering.yieldPerLevel * (level - 1)) * (1 + more);
 
 // The slider's times: the shortest, then every step up to the longest.
 export function gatheringMinutes(content) {
@@ -78,22 +79,23 @@ export function gatheringMinutes(content) {
 // What a gathering of `minutes` should bring of each herb, the time shared
 // evenly among them: the expected count, and the lowest and highest the
 // spread allows.
-export function expectedHerbs(herbIds, minutes, level, content) {
+export function expectedHerbs(herbIds, minutes, level, content, more = 0) {
   const { spread } = content.gathering;
   return Object.fromEntries(
     herbIds.map((id) => {
-      const expected = (herbsPerHour(content.herbsById[id], level, content) * minutes) / 60 / herbIds.length;
+      const expected = (herbsPerHour(content.herbsById[id], level, content, more) * minutes) / 60 / herbIds.length;
       return [id, { expected, low: Math.floor(expected * (1 - spread)), high: Math.ceil(expected * (1 + spread)) }];
     }),
   );
 }
 
 // The herbs found, by id: each herb's expected count, ± the spread, made
-// whole with the seed. A gathering always brings at least one herb.
-export function gatherHerbs({ herbIds, minutes, level, seed }, content) {
+// whole with the seed. A gathering always brings at least one herb. `more`:
+// the Bractwo Zielarzy's share more, kept with the gathering when it began.
+export function gatherHerbs({ herbIds, minutes, level, seed, more = 0 }, content) {
   const rng = createRng(seed);
   const { spread } = content.gathering;
-  const expected = expectedHerbs(herbIds, minutes, level, content);
+  const expected = expectedHerbs(herbIds, minutes, level, content, more);
   const found = Object.fromEntries(herbIds.map((id) => [id, countEvents(expected[id].expected * rng.float(1 - spread, 1 + spread), rng)]));
   if (Object.values(found).every((count) => count === 0)) found[herbIds[0]] = 1;
   return found;

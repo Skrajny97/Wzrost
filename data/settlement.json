@@ -127,13 +127,19 @@
     }
   },
   "brotherhoodPerks": {
-    "$comment": "Korzyści stopni Bractw (odpowiedzi autora 589–593, 4.11.2026: „wszystkie opcje … jeśli nie zaburzą balansu”): każda liczba według stopnia reputacji Bractwa brotherhood (Obcy, Znajomy, Stały klient, Zaufany, Przyjaciel; byStanding), liczona w src/engine/settlement.js (brotherhoodPerk). anvilDiscount: o tyle mniej złota za ulepszenie na Kowadle; workshopFaster: o tyle krócej pracuje Warsztat; workshopLuck: o tyle więcej szansy, że Warsztat zrobi przedmiot o rzadkość wyżej, zapisane w zamówieniu przy złożeniu; marketFee: opłata Targowiska od sprzedaży, zapisana w ofercie przy wystawieniu; wandererItems: ile przedmiotów wykłada wędrowny handlarz; auctionHours: najdłuższa aukcja w godzinach. Na stopniu Obcy liczby są takie jak bez Bractw. Korzyści Zielarzy i Łowców dojdą w następnym etapie (słowa już są w brotherhoodsPanel.perks).",
+    "$comment": "Korzyści stopni Bractw (odpowiedzi autora 589–593, 4.11.2026: „wszystkie opcje … jeśli nie zaburzą balansu”): każda liczba według stopnia reputacji Bractwa brotherhood (Obcy, Znajomy, Stały klient, Zaufany, Przyjaciel; byStanding), liczona w src/engine/settlement.js (brotherhoodPerk). anvilDiscount: o tyle mniej złota za ulepszenie na Kowadle; workshopFaster: o tyle krócej pracuje Warsztat; workshopLuck: o tyle więcej szansy, że Warsztat zrobi przedmiot o rzadkość wyżej, zapisane w zamówieniu przy złożeniu; marketFee: opłata Targowiska od sprzedaży, zapisana w ofercie przy wystawieniu; wandererItems: ile przedmiotów wykłada wędrowny handlarz; auctionHours: najdłuższa aukcja w godzinach. herbYield: o tyle więcej ziół z Zielarstwa, zapisane w zbieraniu przy rozpoczęciu; brewFaster: o tyle krócej warzy Alchemia; potionFights: o tyle walk dłużej działa mikstura na czas wypita z plecaka; materialDrops: o tyle więcej materiałów ze stworów na wyprawach; rareOdds: o tyle częściej elity i czempioni (591 B o połowę, zob. DECISIONS.md); tanneryPremium: o tyle punktów procentowych więcej płaci Garbarnia, a najwyższa z tych liczb podnosi też najwyższą cenę materiałów (buyCeiling), więc i to, za ile Wszebor sprzedaje. Na stopniu Obcy liczby są takie jak bez Bractw.",
     "anvilDiscount": { "brotherhood": "smiths", "byStanding": [0, 0.05, 0.1, 0.15, 0.2] },
     "workshopFaster": { "brotherhood": "smiths", "byStanding": [0, 0.05, 0.1, 0.15, 0.2] },
     "workshopLuck": { "brotherhood": "smiths", "byStanding": [0, 0.01, 0.02, 0.03, 0.04] },
     "marketFee": { "brotherhood": "merchants", "byStanding": [0.01, 0.008, 0.006, 0.004, 0.002] },
     "wandererItems": { "brotherhood": "merchants", "byStanding": [3, 3, 4, 4, 5] },
-    "auctionHours": { "brotherhood": "merchants", "byStanding": [24, 30, 36, 42, 48] }
+    "auctionHours": { "brotherhood": "merchants", "byStanding": [24, 30, 36, 42, 48] },
+    "herbYield": { "brotherhood": "herbalists", "byStanding": [0, 0.05, 0.1, 0.15, 0.2] },
+    "brewFaster": { "brotherhood": "herbalists", "byStanding": [0, 0.05, 0.1, 0.15, 0.2] },
+    "potionFights": { "brotherhood": "herbalists", "byStanding": [0, 0, 1, 1, 2] },
+    "materialDrops": { "brotherhood": "hunters", "byStanding": [0, 0.05, 0.1, 0.15, 0.2] },
+    "rareOdds": { "brotherhood": "hunters", "byStanding": [0, 0.05, 0.1, 0.15, 0.2] },
+    "tanneryPremium": { "brotherhood": "hunters", "byStanding": [0, 0.02, 0.04, 0.06, 0.08] }
   },
   "orders": {
     "resident": "headman",

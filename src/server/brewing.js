@@ -40,6 +40,7 @@ import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, insertWork, requireProfessions, takeFromBag, workGains } from './professions.js';
 import { herbsOf, potionKnown, potionsOf } from './professions-view.js';
+import { perkOf } from './perks.js';
 import { trimReports } from './reports.js';
 import { tripOf } from './trips.js';
 import { say } from '../engine/text.js';
@@ -57,7 +58,9 @@ export async function startBrewing(context) {
   const potion = typeof body.recipe === 'string' ? content.potionsById[body.recipe] : undefined;
   if (!potion || potion.level > level) throw new ApiError(400, 'unknown_recipe', 'Tego przepisu jeszcze nie znasz.');
   const herbs = herbsOf(player.row);
-  let most = mostPotions(potion, level, herbs, content);
+  // The Bractwo Zielarzy brews faster (589 B), for the Awatar's work too.
+  const faster = perkOf(player.row, 'brewFaster');
+  let most = mostPotions(potion, level, herbs, content, faster);
   if (most === 0) throw new ApiError(409, 'no_herbs', 'Brakuje ziół na tę miksturę.');
   // A recipe with a catalyst (proposal 3: "Wybrane mikstury biorą jeden
   // materiał stwora") takes a piece of its material a potion, of the grade
@@ -75,7 +78,7 @@ export async function startBrewing(context) {
   const catalyst = catalystKey ? { key: catalystKey, count: body.count } : null;
 
   const now = context.now;
-  const minutes = brewMinutes(body.count, level, content);
+  const minutes = brewMinutes(body.count, level, content, faster);
   const used = potionHerbs(potion, body.count);
   const left = Object.fromEntries(Object.entries(herbs).map(([id, count]) => [id, count - (used[id] ?? 0)]).filter(([, count]) => count > 0));
   const { hp } = currentHp(player, now);
@@ -287,7 +290,9 @@ export async function drinkPotion(context) {
     text = say(texts, 'drunkHeal', 0, { potion: potion.counted[0], amount: healed });
   } else {
     let buffs = buffsOf(player.row, now);
-    for (let i = 0; i < taken.count; i++) buffs = drinkTimed(buffs, potion);
+    // The Bractwo Zielarzy: a potion for a time works longer (589 C).
+    const extra = perkOf(player.row, 'potionFights');
+    for (let i = 0; i < taken.count; i++) buffs = drinkTimed(buffs, potion, extra);
     also = { sql: 'buffs = ?', binds: [JSON.stringify(buffs)] };
     // drunkSpeed, drunkArmor and so on: what the kind gives now and for how
     // long; several at once by their count, as a report counts potions.

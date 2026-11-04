@@ -105,7 +105,10 @@ export function buyCeiling({ kind, key }, content) {
   if (kind === 'material') {
     const { materialId, rarityId } = parseStack(key);
     const base = materialPrice(rarityId, content);
-    const tanner = tannery && ordinaryMaterial(materialId, content) ? base * skup * (1 + Math.max(...tannery.premium)) : 0;
+    // The Garbarnia's best premium, with the Bractwo Łowców's top perk on it
+    // (591 C), so that nobody sells to Wszebor for more than he sells.
+    const hunters = Math.max(0, ...(content.settlement.brotherhoodPerks?.tanneryPremium?.byStanding ?? []));
+    const tanner = tannery && ordinaryMaterial(materialId, content) ? base * skup * (1 + Math.max(...tannery.premium) + hunters) : 0;
     return Math.max(base * skup, tanner, base * orders.pay.material, base * skup * orders.overScrap);
   }
   return orders.partGold * content.raritiesById[content.partsById[key].rarity].sell * orders.pay.part * weekly;

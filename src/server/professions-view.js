@@ -209,7 +209,7 @@ export function professionsView(row) {
               name: herb.name,
               description: herb.description,
               level: herb.level,
-              perHour: herbsPerHour(herb, gatherer.level, content),
+              perHour: herbsPerHour(herb, gatherer.level, content, perkOf(row, 'herbYield')),
               count: herbs[herb.id] ?? 0,
             }
           : { id: herb.id, level: herb.level, hidden: true, hint: say({ hidden }, 'hidden', 0, { level: herb.level }) },
@@ -227,7 +227,7 @@ export function professionsView(row) {
       place: brewing.place,
       // One potion's minutes at this level; a brewing of n takes n of them,
       // rounded up to a whole minute (brewMinutes).
-      potionMinutes: potionMinutes(brewer.level, content),
+      potionMinutes: potionMinutes(brewer.level, content, perkOf(row, 'brewFaster')),
       maxMinutes: brewing.maxMinutes,
       bonusChance: brewing.bonusChance,
       recipes: content.potions.map((potion) =>
@@ -240,7 +240,7 @@ export function professionsView(row) {
               herbs: Object.entries(potion.herbs).map(([id, need]) => ({ id, name: content.herbsById[id].name, need, have: herbs[id] ?? 0 })),
               catalyst: catalystView(potion, materials),
               count: potions[potion.id] ?? 0,
-              most: mostPotions(potion, brewer.level, herbs, content),
+              most: mostPotions(potion, brewer.level, herbs, content, perkOf(row, 'brewFaster')),
             }
           : { id: potion.id, level: potion.level, hidden: true, hint: say(brewing.texts, 'hidden', 0, { level: potion.level }) },
       ),

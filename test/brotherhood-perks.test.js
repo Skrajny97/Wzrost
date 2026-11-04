@@ -38,6 +38,12 @@ describe('the Bractwa perks in the engine', () => {
       marketFee: market.fee,
       wandererItems: market.wanderer.items,
       auctionHours: market.hours,
+      herbYield: 0,
+      brewFaster: 0,
+      potionFights: 0,
+      materialDrops: 0,
+      rareOdds: 0,
+      tanneryPremium: 0,
     });
   });
 

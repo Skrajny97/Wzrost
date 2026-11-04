@@ -16,22 +16,23 @@ import { say } from './text.js';
 export const knownPotions = (level, content) => content.potions.filter((potion) => potion.level <= level);
 
 // The minutes of one potion at a level: each level takes speedPerLevel of
-// the first level's time off, down to `fastest` of it.
-export function potionMinutes(level, content) {
+// the first level's time off, down to `fastest` of it, and the Bractwo
+// Zielarzy (589 B, brewFaster) `faster` of what is left.
+export function potionMinutes(level, content, faster = 0) {
   const { potionMinutes: minutes, speedPerLevel, fastest } = content.brewing;
-  return minutes * Math.max(fastest, 1 - speedPerLevel * (level - 1));
+  return minutes * Math.max(fastest, 1 - speedPerLevel * (level - 1)) * (1 - faster);
 }
 
 // A brewing of `count` potions in whole minutes, rounded up (and to a
 // thousandth first, so 10 × 9.9 stays 99).
-export const brewMinutes = (count, level, content) => Math.ceil(Math.round(count * potionMinutes(level, content) * 1000) / 1000);
+export const brewMinutes = (count, level, content, faster = 0) => Math.ceil(Math.round(count * potionMinutes(level, content, faster) * 1000) / 1000);
 
 // The most potions of a recipe brewed at once: as many as the longest
 // brewing allows and the herbs in the bag suffice for.
-export function mostPotions(potion, level, herbs, content) {
+export function mostPotions(potion, level, herbs, content, faster = 0) {
   const { maxMinutes } = content.brewing;
-  let count = Math.floor(maxMinutes / potionMinutes(level, content));
-  while (count > 0 && brewMinutes(count, level, content) > maxMinutes) count -= 1;
+  let count = Math.floor(maxMinutes / potionMinutes(level, content, faster));
+  while (count > 0 && brewMinutes(count, level, content, faster) > maxMinutes) count -= 1;
   for (const [id, need] of Object.entries(potion.herbs)) count = Math.min(count, Math.floor((herbs[id] ?? 0) / need));
   return count;
 }

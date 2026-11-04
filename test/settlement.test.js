@@ -77,21 +77,32 @@ describe('the Osada in the engine', () => {
     assert.equal(top.toNext, 0);
   });
 
-  test("what a brotherhood's standing gives, in the panel's words: the Kuźnia's discount, the Targowisko's offers, the perks of 590 and 592, quality and special orders", () => {
+  test("what a brotherhood's standing gives, in the panel's words: the Kuźnia's discount, the Targowisko's offers, the perks of 589–592, quality and special orders", () => {
     const of = (id) => content.settlement.brotherhoods.find((one) => one.id === id);
     const at = (id) => content.settlement.standings.findIndex((one) => one.id === id);
     // Obcy: the Targowisko's five offers alone.
     assert.deepEqual(brotherhoodPerks(of('smiths'), 0, content), []);
     assert.deepEqual(brotherhoodPerks(of('merchants'), 0, content), ['Na Targowisku naraz 5 ofert']);
     // Stały klient: the Kuźnia 10% cheaper with the Kowadło and the
-    // Warsztat's perks (590), the hunters' quality orders.
+    // Warsztat's perks (590), the herbalists' perks (589), the hunters'
+    // perks (591) before their quality orders.
     assert.deepEqual(brotherhoodPerks(of('smiths'), at('regular'), content), [
       'Kuźnia 10% taniej',
       'Kowadło 10% taniej',
       'Warsztat pracuje 10% krócej',
       'Warsztat: szansa na przedmiot o rzadkość wyżej +2 pkt proc.',
     ]);
-    assert.deepEqual(brotherhoodPerks(of('hunters'), at('regular'), content), ['Zlecenia jakościowe na materiały: dwa razy więcej reputacji']);
+    assert.deepEqual(brotherhoodPerks(of('herbalists'), at('regular'), content), [
+      'Zielarstwo zbiera 10% więcej ziół',
+      'Alchemia warzy 10% krócej',
+      'Mikstury na czas działają o 1 walkę dłużej',
+    ]);
+    assert.deepEqual(brotherhoodPerks(of('hunters'), at('regular'), content), [
+      'Ze stworów 10% więcej materiałów',
+      'Elity i czempioni 10% częściej',
+      'Garbarnia płaci o 4 pkt proc. więcej',
+      'Zlecenia jakościowe na materiały: dwa razy więcej reputacji',
+    ]);
     // Zaufany: special orders for every brotherhood that posts orders, never
     // the merchants, who post none.
     for (const id of ['herbalists', 'smiths', 'hunters']) assert.ok(brotherhoodPerks(of(id), at('trusted'), content).includes('Zlecenia specjalne: Punkt Systemu i dwa razy więcej reputacji'), id);

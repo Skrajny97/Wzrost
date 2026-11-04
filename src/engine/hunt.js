@@ -91,12 +91,13 @@ export const potionsPerKind = (minutes, content) => explorationPace(minutes, con
 // (rareSeekFactor times as often, the author: "niech zwiększa to szansę
 // dwukrotnie"), `rumor` times as often again after a rumor from the
 // Karczma about this place (settlement.js), and with those of `catchUp`
-// (rareCatchUp) met in at least rareCatchUpChance of the fights.
-export function withRareOdds(pace, { avoidRare = false, seekRare = false, catchUp = null, rumor = 1 }, content) {
+// (rareCatchUp) met in at least rareCatchUpChance of the fights. `more`:
+// the Bractwo Łowców's share more often (591 B, rareOdds).
+export function withRareOdds(pace, { avoidRare = false, seekRare = false, catchUp = null, rumor = 1, more = 0 }, content) {
   if (avoidRare) return { ...pace, eliteChance: 0, championChance: 0 };
-  if (!seekRare && !catchUp && rumor === 1) return pace;
+  if (!seekRare && !catchUp && rumor === 1 && !more) return pace;
   const { rareSeekFactor, rareCatchUpChance } = content.balance.hunt;
-  const factor = (seekRare ? rareSeekFactor : 1) * rumor;
+  const factor = (seekRare ? rareSeekFactor : 1) * rumor * (1 + more);
   const odds = (chance, unmet) => Math.min(1, Math.max(chance * factor, unmet ? rareCatchUpChance : 0));
   return { ...pace, eliteChance: odds(pace.eliteChance, catchUp?.elite), championChance: odds(pace.championChance, catchUp?.champion) };
 }
@@ -379,7 +380,7 @@ export function resourceBundle(area, total) {
 // alone, as explorations started before the other kinds kept it
 // (potions.js).
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [] },
+  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [] },
   content,
 ) {
   // A Drużyna's trip (src/server/trips.js) gives `roster`, its players in
@@ -390,6 +391,9 @@ export function simulateHunt(
   // miejsca - powinny być wspólne jedynie łupy, XP itp. osobne"). What the
   // member (`self`, its id) finds and earns comes from its own seed
   // (`lootSeed`) and its own character. Alone, one seed gives both, as ever.
+  // The Bractwo Łowców (591 A, B): the elite and the champion come `rareMore`
+  // more often (the trip's leader's, as its encounters), and the member's
+  // creatures leave `materialsMore` more materials.
   const rng = createRng(seed);
   const lootRng = lootSeed ? createRng(lootSeed) : rng;
   const tuning = content.balance.hunt;
@@ -442,7 +446,7 @@ export function simulateHunt(
   // character, those it has not met come far more often until the first
   // fight with them, and then as usual.
   let catchUp = first || avoidRare ? null : rareCatchUp(lead.level, area, met, content);
-  const odds = () => withRareOdds(explorationPace(minutes, content), { avoidRare: first || avoidRare, seekRare, catchUp, rumor }, content);
+  const odds = () => withRareOdds(explorationPace(minutes, content), { avoidRare: first || avoidRare, seekRare, catchUp, rumor, more: rareMore }, content);
   let pace = odds();
   if (first) pace = { ...pace, toughChance: 0 };
   const fightCount = pace.fights;
@@ -482,9 +486,10 @@ export function simulateHunt(
   const items = [];
   const resources = {}; // { wood: 12, … } found for the camp
   let materials = {}; // { "wolf-pelt:common": 2, … } from beaten creatures
-  // Tropiciel (an evolution's trait): more materials from creatures.
+  // Tropiciel (an evolution's trait), and the Bractwo Łowców: more materials
+  // from creatures.
   const tracker = evolutionOf(character, content)?.trait;
-  const moreMaterials = tracker?.kind === 'tracker' ? 1 + tracker.params.materials : 1;
+  const moreMaterials = (tracker?.kind === 'tracker' ? 1 + tracker.params.materials : 1) * (1 + materialsMore);
   const fights = [];
   const entries = [];
   let key = null;

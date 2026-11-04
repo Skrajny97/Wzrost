@@ -475,7 +475,16 @@ export async function partyHunt(context) {
       const setup = setups.get(member.row.id);
       return { ...shots.get(member.row.id), windows: setup.windows, trophies: setup.trophies, ...(member === player && { potions: setup.taken, healBelow: setup.healBelow }) };
     }),
-    encounter: { avoidRare: lead.avoidRare, seekRare: lead.seekRare, rumor: lead.rumor, tracked: lead.tracked, unknown: lead.unknown, met: JSON.parse(player.row.met ?? '[]') },
+    encounter: {
+      avoidRare: lead.avoidRare,
+      seekRare: lead.seekRare,
+      rumor: lead.rumor,
+      // The leader's Bractwo Łowców: the trip's elite and champion (591 B).
+      ...(lead.rareMore > 0 && { rareMore: lead.rareMore }),
+      tracked: lead.tracked,
+      unknown: lead.unknown,
+      met: JSON.parse(player.row.met ?? '[]'),
+    },
   };
   const trip = `json_extract(options, '$.party.trip') = ? AND json_extract(options, '$.party.id') = ?`;
   await db.batch(

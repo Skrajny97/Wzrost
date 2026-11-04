@@ -14,6 +14,7 @@
 
 import {
   bagCapacity,
+  brotherhoodPerk,
   campBonus,
   campLevels,
   casinoDay,
@@ -61,7 +62,7 @@ function bonusesOf(player, stored, now) {
   const { tannery } = content.settlement;
   return {
     sellBonus: campBonus(campLevels(player.buildings, now, content), 'sellPrice', content),
-    tanneryPremium: tannery ? tanneryPremium(stored.relations[tannery.resident] ?? 0, content) : 0,
+    tanneryPremium: tannery ? tanneryPremium(stored.relations[tannery.resident] ?? 0, content) + brotherhoodPerk('tanneryPremium', stored.reputation, content) : 0,
   };
 }
 

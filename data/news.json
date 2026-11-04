@@ -40,6 +40,11 @@
       "id": "0.1.45",
       "title": "Wersja 0.1.45",
       "body": "- Pierścienie, amulety i talizmany rozebrane na Stole rozbiórki dają teraz głównie rzeczy do Jubilerstwa: kruszec oprawy i, od rzadkich wzwyż, kamień o rzadkość niżej. Części do Warsztatu jest trzy razy mniej.\n- Kamień i kruszec przychodzą od razu, a części wtedy, gdy stół skończy."
+    },
+    {
+      "id": "0.1.46",
+      "title": "Wersja 0.1.46",
+      "body": "- Bractwo Zielarzy daje więcej: Zielarstwo zbiera do 20% więcej ziół, Alchemia warzy do 20% krócej, a mikstury na czas działają do 2 walk dłużej.\n- Bractwo Łowców daje więcej: do 20% więcej materiałów ze stworów, elity i czempioni do 20% częściej i do 8 pkt proc. wyższa cena w Garbarni.\n- Panel „Akceptacja Bractw” pokazuje te korzyści przy każdym stopniu."
     }
   ]
 }

@@ -3048,6 +3048,25 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Korzyści Zielarzy i Łowców (4.11.2026, w grze od 0.1.46)
+
+Odpowiedzi autora 589 i 591 (zob. „Korzyści Bractw: odpowiedzi autora 589–593”), liczby według stopni Znajomy / Stały klient / Zaufany / Przyjaciel:
+
+1. **Zielarstwo zbiera więcej (589 A):** 5 / 10 / 15 / 20% więcej ziół. Liczba zapisuje się w zbieraniu przy rozpoczęciu, jak szansa w zamówieniu Warsztatu. Karta Zielarstwa pokazuje zbiór na godzinę już z korzyścią.
+2. **Alchemia warzy krócej (589 B):** każda mikstura powstaje 5 / 10 / 15 / 20% krócej, więc w najdłuższym warzeniu mieści się ich więcej.
+3. **Mikstury na czas działają dłużej (589 C):** o 1 walkę od stopnia Stały klient i o 2 od stopnia Przyjaciel. Dodatkowe walki dochodzą w chwili wypicia z plecaka.
+4. **Więcej materiałów (591 A):** stwory na wyprawach zostawiają 5 / 10 / 15 / 20% więcej materiałów. Liczy się to razem z cechą Tropiciela (mnożą się).
+5. **Elity i czempioni częściej (591 B, o połowę):** 5 / 10 / 15 / 20% częściej, ale nie na Szybkim Polowaniu ani na wyprawie, która ich unika, jak przy plotce z Karczmy. Na wyprawie Drużyny liczy się korzyść przywódcy, bo spotkania są wspólne. Materiały liczą się osobno, dla każdego członka.
+6. **Garbarnia płaci więcej (591 C):** do premii za relację z Wszeborem dochodzi 2 / 4 / 6 / 8 punktów procentowych. Najwyższa z tych liczb wchodzi też do najwyższej ceny materiału (`buyCeiling`), od której Wszebor liczy swoje ceny sprzedaży. Dziś więcej płacą jednak zlecenia z Tablicy, więc jego ceny się nie zmieniają.
+7. **Także Awatar Systemu.** Zbieranie i warzenie Awatara dostają te same korzyści co praca postaci.
+8. **Zapisane przy starcie.** Wyprawa zapisuje korzyści Łowców przy wyruszeniu, a zbieranie korzyść Zielarzy przy rozpoczęciu. Raport wychodzi taki sam, kiedykolwiek się go odbierze.
+9. **Nagrody za nowy stopień (593 A i B)** dojdą w następnym etapie, z przyciskiem odbioru w panelu „Akceptacja Bractw”.
+
+## Wersja 0.1.46 (4.11.2026)
+
+1. **Korzyści Zielarzy i Łowców** (zob. wyżej).
+2. **Wpis „Co nowego?” do zatwierdzenia:** szkic 0.1.46 w `data/news.json`.
+
 ## Rozbiórka biżuterii dla Jubilerstwa (4.11.2026, w grze od 0.1.45)
 
 Autor: „Niech wisiory amulety pierscienie itd. dają też z rozbiórki bardziej rzeczy do Jubilerstwa niż do Rzemieślnictwa.”

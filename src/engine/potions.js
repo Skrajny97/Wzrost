@@ -68,10 +68,11 @@ export function addBuff(buffs, kind, fights, bonus) {
   return left > 0 ? { ...rest, [kind]: { fights: left, bonus: top } } : rest;
 }
 
-// Buffs after a strengthening potion drunk from the bag.
-export function drinkTimed(buffs, potion) {
+// Buffs after a strengthening potion drunk from the bag; `extra` fights more
+// with the Bractwo Zielarzy (589 C, potionFights).
+export function drinkTimed(buffs, potion, extra = 0) {
   const kind = timedKind(potion);
-  return addBuff(buffs, kind, potion.fights, potion.effect[kind]);
+  return addBuff(buffs, kind, potion.fights + extra, potion.effect[kind]);
 }
 
 // Buffs as a character's row keeps them, in fights. Those kept in time before

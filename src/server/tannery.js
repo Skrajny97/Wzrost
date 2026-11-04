@@ -8,6 +8,7 @@
 // exploration, as the scrapper's does.
 
 import {
+  brotherhoodPerk,
   campBonus,
   campLevels,
   materialPrice,
@@ -54,7 +55,8 @@ function goodView(key, count, bonus = 0) {
 // What Wszebor pays for a piece of a stack now: the scrapper's price with
 // the camp's Skup bonus, and his premium on top.
 function tanneryPrices(player, stored, now) {
-  const premium = tanneryPremium(stored.relations[tuning().resident] ?? 0, content);
+  // The relation with Wszebor's premium, and the Bractwo Łowców's (591 C).
+  const premium = tanneryPremium(stored.relations[tuning().resident] ?? 0, content) + brotherhoodPerk('tanneryPremium', stored.reputation, content);
   const bonus = campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
   return { premium, bonus, price: (key) => materialPrice(parseStack(key).rarityId, content) * (1 + bonus) * (1 + premium) };
 }

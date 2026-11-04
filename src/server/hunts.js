@@ -80,6 +80,7 @@ import { ApiError, json, readJson } from './http.js';
 import { eventDraftsOn, eventsOn, settlementOn } from './features.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { soldGold } from './inventory.js';
+import { perkOf } from './perks.js';
 import { finishGathering } from './professions.js';
 import { herbsOf, knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
@@ -341,6 +342,12 @@ export async function beginHunt(
   const stored = JSON.parse(player.row.settlement ?? '{}');
   const kept = settlementOn() ? stored : null;
   const rumor = !quick && !avoidRare ? rumorFactor(stored.rumor, area.id, now, content) : 1;
+  // The Bractwo Łowców (591 A, B), as at the start: more materials from the
+  // character's own creatures, and the elite and the champion more often (on
+  // a Drużyna's trip, its leader's, as its encounters), not on a Szybkie
+  // Polowanie nor on one avoiding them, as the rumor.
+  const materialsMore = perkOf(player.row, 'materialDrops');
+  const rareMore = !quick && !avoidRare ? perkOf(player.row, 'rareOdds') : 0;
   // The companions hired in the Osada who do not stay in the Kwatery go
   // along, as they are now (companions.js), so the report comes out the same
   // whenever claimed; a wounded one once the character has rested to full
@@ -374,6 +381,8 @@ export async function beginHunt(
     // with what set out after its taking (takenBefore in guild-trials.js).
     begun: now,
     ...(rumor > 1 && { rumor }),
+    ...(rareMore > 0 && { rareMore }),
+    ...(materialsMore > 0 && { materialsMore }),
     ...(party.length > 0 && { companions: party }),
     ...(crew && { party: crew }),
     ...(partners.length > 0 && { partners }),
@@ -442,7 +451,7 @@ export async function beginHunt(
     throw error;
   }
   // What it set out with, for the roster of a Drużyna's trip (parties.js).
-  return { windows, trophies, taken, healBelow: healBelow ?? content.potionUse.healBelow, tracked, unknown, rumor, avoidRare, seekRare };
+  return { windows, trophies, taken, healBelow: healBelow ?? content.potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare };
 }
 
 // Calling the character back early gives nothing and costs nothing. A
@@ -586,6 +595,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       avoidRare: trip ? trip.encounter.avoidRare === true : activity.avoid_rare === 1,
       seekRare: trip ? trip.encounter.seekRare === true : activity.seek_rare === 1,
       rumor: (trip ? trip.encounter.rumor : options.rumor) ?? 1,
+      rareMore: (trip ? trip.encounter.rareMore : options.rareMore) ?? 0,
+      materialsMore: options.materialsMore ?? 0,
       // A trip goes without companions; one that set out before 2.11.2026
       // keeps its leader's, so its fights stay the same for everyone.
       companions: (trip ? trip.companions : options.companions) ?? [],

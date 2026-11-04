@@ -30,6 +30,7 @@ import { assertion, raced } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { herbsOf } from './professions-view.js';
+import { perkOf } from './perks.js';
 import { trimReports } from './reports.js';
 
 // A JSON path for an id with a hyphen.
@@ -120,8 +121,10 @@ export async function startGathering(context) {
   const { hp } = currentHp(player, now);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const db = context.env.DB;
-  // `begun`: when it really began, for the Próby Gildii (takenBefore).
-  const options = JSON.stringify({ herbs: herbIds, begun: now });
+  // `begun`: when it really began, for the Próby Gildii (takenBefore);
+  // `more`: the Bractwo Zielarzy's share of herbs more (589 A), as now.
+  const more = perkOf(player.row, 'herbYield');
+  const options = JSON.stringify({ herbs: herbIds, begun: now, ...(more > 0 && { more }) });
   const ends = now + body.minutes * 60000;
   try {
     await db.batch(
@@ -159,7 +162,8 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
   const before = professionState(JSON.parse(row.professions ?? '{}'), profession.id);
   // Herbs the data no longer has are left out.
   const herbIds = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content.herbsById[id]);
-  const found = herbIds.length > 0 ? gatherHerbs({ herbIds, minutes: activity.minutes, level: before.level, seed: activity.seed }, content) : {};
+  const more = JSON.parse(activity.options ?? '{}').more ?? 0;
+  const found = herbIds.length > 0 ? gatherHerbs({ herbIds, minutes: activity.minutes, level: before.level, seed: activity.seed, more }, content) : {};
   const capacity = bagCapacity(campLevels(player.buildings, now, content), content);
   const { stored, lost } = storeStacks(herbsOf(row), found, capacity - bagPlaces(player), content);
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);
