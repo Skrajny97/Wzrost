@@ -3034,27 +3034,34 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.52 (4.11.2026)
+
+1. **Z towarzyszami też trudniej** (614 C, zob. „Trudniejsze wyprawy”, punkt 3).
+2. **Uwagi autora o Próbach Gildii** zapisane na później (zob. „Uwagi autora z wieczoru 4.11.2026”, punkt 3).
+3. **Wpis „Co nowego?” do zatwierdzenia:** szkic 0.1.52 w `data/news.json`.
+
 ## Wersja 0.1.51 (4.11.2026)
 
 1. **Trudniejsze wyprawy** (zob. niżej): odpowiedzi autora 611–613.
 2. **Wpis „Co nowego?” do zatwierdzenia:** szkic 0.1.51 w `data/news.json`.
 
-## Trudniejsze wyprawy (4.11.2026, w grze od 0.1.51)
+## Trudniejsze wyprawy (4.11.2026, w grze od 0.1.51, z towarzyszami od 0.1.52)
 
-Autor: „utrudniamy, nie przesadzamy, ale utrudniamy”, „robimy mid-high dla casuali trudność od zera przeglądając i mid dla graczy”, „Chcemy tez utrudnić niżej poniżej 30 lvlu”, a na pytania: „611 miedzy B a C, 612 C (musi byc motywacja do drużyny/towarzyszy) 613 C”.
+Autor: „utrudniamy, nie przesadzamy, ale utrudniamy”, „robimy mid-high dla casuali trudność od zera przeglądając i mid dla graczy”, „Chcemy tez utrudnić niżej poniżej 30 lvlu”, a na pytania: „611 miedzy B a C, 612 C (musi byc motywacja do drużyny/towarzyszy) 613 C” i „614 C”.
 
 1. **Jak było.** W symulacji 4-godzinna wyprawa (10 walk) w najnowszym miejscu na poziomach 10–60 prawie nigdy nie kończyła się omdleniem (0–1%), także na pierwszym poziomie miejsca. Gracz na 33. poziomie nie przegrał żadnej walki.
-2. **Cel (611 między B a C).** Taka wyprawa kończy się omdleniem u gracza okazjonalnego w ok. 20–25% przypadków, a u zaangażowanego w ok. 10–15%. Liczby z symulacji (`tools/difficulty-sim.mjs`, 20 klas, gra bez towarzyszy):
-    - **poziomy 11–28:** okazjonalny 17–27%, zaangażowany 7–18%, gracz, który wszystko ulepsza na Kowadle, 0–14%;
-    - **poziomy 30–60:** okazjonalny 19–30%, zaangażowany 4–15%, wszystko ulepsza 0%;
-    - **godzinna wyprawa:** na poziomach 11–25 okazjonalny 13–22%, zaangażowany 5–13%, na poziomach 31–45 okazjonalny 2–13%, zaangażowany 1–4%.
-3. **Towarzysze i drużyna bez dodatkowej siły stworów (612 C).** Cel dotyczy gry bez towarzyszy, jak opisywał wariant C. Z towarzyszami od 30. poziomu jest prawie tak jak dotąd: omdlenie w 0–3% wypraw u okazjonalnego i 0–1% u zaangażowanego. To ta motywacja do towarzyszy i drużyny, o którą chodziło autorowi.
+2. **Cel do 30. poziomu (611 między B a C).** Przed 30. poziomem gra się bez towarzyszy. Taka wyprawa kończy się omdleniem u gracza okazjonalnego w ok. 20–25% przypadków, a u zaangażowanego w ok. 10–15%. Liczby z symulacji (`tools/difficulty-sim.mjs`, 20 klas):
+    - **poziomy 11–29:** okazjonalny 17–27%, zaangażowany 7–18%, gracz, który wszystko ulepsza na Kowadle, 0–14%;
+    - **godzinna wyprawa, poziomy 11–25:** okazjonalny 13–22%, zaangażowany 5–13%.
+3. **Od 30. poziomu z towarzyszami (612 C, 614 C).** Stwory nie rosną za każdego towarzysza ani gracza obok, żeby była motywacja do drużyny i towarzyszy. W 0.1.51 cel z 611 dotyczył gry bez towarzyszy, a z towarzyszami od 30. poziomu było prawie jak dotąd (omdlenie w 0–3% wypraw u okazjonalnego, 0–1% u zaangażowanego). Autor wybrał 614 C, czyli wariant pośrodku: od 0.1.52 krzywa od 30. poziomu celuje w grę z towarzyszami.
+    - **Z towarzyszami, poziomy 30–100:** okazjonalny 9–21% (zwykle 10–16%), zaangażowany 2–8%, wszystko ulepsza 0–1%.
+    - **Bez towarzyszy w najnowszym miejscu:** okazjonalny 48–100%, zaangażowany 27–95%. Bez towarzyszy bezpieczniej jest więc o miejsce niżej, gdzie stwory są jak dawniej.
 4. **Od 10. poziomu (613 C).** Miejsca do 10. poziomu, czyli wprowadzenie i pierwsze wyprawy, są bez zmian. Trudniej jest od miejsca 11–15.
 5. **Tylko najnowsze miejsce, według poziomu postaci (brakujący szczegół).** Silniejsze są stwory miejsca, które sięga poziomu postaci, a ich siła zależy od jej poziomu: na pierwszym poziomie miejsca mniejsza, na ostatnim większa, żeby miejsce było równie trudne od wejścia do końca. Miejsce wyżej (otwiera się poziom przed swoim pierwszym poziomem) ma siłę swojego pierwszego poziomu. Niższe miejsca są jak dotąd, więc zawsze jest bezpieczniejszy wybór. Najpierw sprawdzona była jedna siła dla całego miejsca. Przy trudności z 611 w środku miejsca na jego pierwszym poziomie prawie każda wyprawa kończyła się omdleniem (91% na 11. poziomie, także godzinna), a na ostatnim było łatwo. Postać rośnie w ciągu pięciu poziomów miejsca tak bardzo, że jedna siła nie wystarcza.
 6. **Mechanika (brakujący szczegół).** `huntCurve` w `data/balance.json`: punkty [poziom postaci, mnożnik obrażeń, mnożnik HP] dla stworów najnowszego miejsca, także elity i czempiona. HP rośnie o 60% tego, o ile rosną obrażenia, w duchu „Wyzwania od pierwszej wyprawy”: stwory biją mocniej, a walki nie ciągną się dłużej. Punkty są policzone w symulacji na pierwszym, środkowym i ostatnim poziomie każdego miejsca, między nimi liniowo. W drużynie liczy się poziom prowadzącego.
-7. **Od 61. poziomu bez zmian (brakujący szczegół).** Tam gra bez towarzyszy już jest trudniejsza niż cel: od 61. poziomu okazjonalny bez towarzyszy mdleje w 27–65% wypraw, a od 66. zaangażowany w 10–20%. Stwory od 50. poziomu rosną według krzywej z odpowiedzi 438 B.
+7. **Od 96. poziomu bez zmian (brakujący szczegół).** Tam gra z towarzyszami już była tak trudna jak cel 614 C: okazjonalny z towarzyszami mdlał w 17–31% wypraw. Stwory od 50. poziomu rosną według krzywej z odpowiedzi 438 B. W 0.1.51 krzywa kończyła się na 60. poziomie, bo była liczona dla gry bez towarzyszy.
 8. **Gdzie (brakujący szczegół).** Wyprawy, także w drużynie, i „Zagrożenie” przed wyprawą, które liczy z tymi samymi stworami. Wieże, walki zdarzeń i Bestia Gildii są bez zmian. Nagrody bez zmian. Testy mikstur, zdarzeń, Ołtarza i Bractw liczą walki bez tej krzywej, bo sprawdzają co innego; krzywa ma własne testy (`test/hunt-strength.test.js`).
-9. **Pytanie 614** (czy z towarzyszami też ma być trudniej) czeka na autora.
+9. **Kalibracja od 30. poziomu (brakujący szczegół)** jest liczona dla gracza okazjonalnego i zaangażowanego z towarzyszami, ze średnią 9% omdleń, na pierwszym, środkowym i ostatnim poziomie każdego miejsca. Na 29. poziomie jest punkt pośredni, bo w symulacji towarzysze przychodzą na 30. poziomie.
 
 ## Wersja 0.1.50 (4.11.2026)
 
@@ -3098,7 +3105,7 @@ Autor: „W gildii też trzeba przepatrzec i pokminic nad GUI zeby dalo sie zwij
 
 1. **Budynki zasobów do 20. poziomu.** Autor: „Dodajmy też możliwość rozwijania budynków od zasobów do 20ego w Warowni z jedną jeszcze przemianą na 20tym. W przyszłości ten warunek i wszystko wymaksowane pozwoli zmienić Warownię w coś jeszcze większego”. Szczegóły (które budynki, koszty i czasy poziomów 11–20, czwarty wygląd na 20. poziomie) pójdą do autora jako pytania.
 2. **Trudniej, ale z umiarem.** Gracz na 33. poziomie napisał na czacie, że wyprawy w najtrudniejsze miejsce na najdłuższy czas zawsze się udają i nie przegrał żadnej walki. Autor: „utrudniamy, nie przesadzamy, ale utrudniamy”, potem „robimy mid-high dla casuali trudność od zera przeglądając i mid dla graczy” i „Chcemy tez utrudnić niżej poniżej 30 lvlu”. Krzywa idzie do przejrzenia od pierwszego poziomu: średnio-wysoka trudność dla grających od czasu do czasu, średnia dla grających dużo i dobrze wyposażonych. Liczby z symulacji walk idą do autora jako pytanie przed zmianą w grze.
-3. **Próby gildii.** Gracz napisał, że jego gildia miała już w środę 95 wykonanych prób przy ostatnim progu 56: „tu też coś musicie przemyśleć”. Propozycja wyższych progów albo dalszych nagród pójdzie do autora jako pytanie.
+3. **Próby gildii.** Gracz napisał, że jego gildia miała już w środę 95 wykonanych prób przy ostatnim progu 56: „tu też coś musicie przemyśleć”. Autor: „Do poprawy, bo jak Gildia się szybko rozwinie to przestanie być wyzwaniem sytuacja na cały tydzień. Do tego potrzebna jest nowa aktywnośc tez w Gildii.” Inny gracz zauważył na czacie, że próba liczy tylko to, co zrobione po jej wzięciu (mikstury uwarzone wcześniej się nie liczą). Autor odpisał, że tak miało być, bo naraz można mieć jedną próbę, „ale rzeczywiście moze to troche przerobię”. Propozycje (progi na cały tydzień, nowa aktywność Gildii, liczenie próby) pójdą do autora jako pytania.
 4. **„Włamanie” na wyższe wyprawy.** Gracz chce wyruszać tam, gdzie poziom jeszcze nie pozwala. Autor: „to włamanie ciekawa myśl”. Propozycja pójdzie do autora jako pytanie.
 5. **Poszukiwani.** Gracz zaproponował w Osadzie zakładkę z listami gończymi za elitarnymi stworami i wyjętymi spod prawa. Autor: „kolejny ciekawy pomysł w stylu "Wanted dead or alive" po polsku”. Propozycja pójdzie do autora jako pytanie.
 

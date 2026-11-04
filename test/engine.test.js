@@ -151,6 +151,10 @@ import {
 import { simulateMany, typicalCharacter } from '../tools/simulate.mjs';
 import { content, newCharacter } from './helpers/content.js';
 
+// The newest place's stronger creatures (balance.monsters.huntCurve,
+// hunt-strength.test.js) aside: these fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] } } };
+
 // A few level 1 common items of a class, like the first gear a character finds.
 const KITS = {
   warrior: ['sword', 'shield', 'chainmail', 'helmet'],
@@ -800,7 +804,7 @@ describe('hunts', () => {
     const per = (minutes) => {
       let xp = 0;
       for (let i = 0; i < 200; i++) {
-        xp += simulateHunt({ ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes, seed: `udział:${minutes}:${i}` }, content).xp;
+        xp += simulateHunt({ ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes, seed: `udział:${minutes}:${i}` }, calm).xp;
       }
       return (xp / 200 / minutes) * 60;
     };

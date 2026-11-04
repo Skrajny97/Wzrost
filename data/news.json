@@ -70,6 +70,11 @@
       "id": "0.1.51",
       "title": "Wersja 0.1.51: trudniejsze wyprawy",
       "body": "- Od 11. poziomu stwory w najnowszym miejscu są silniejsze. Długa wyprawa w najnowsze miejsce może się skończyć omdleniem.\n- Towarzysze i drużyna bardzo pomagają.\n- Niższe miejsca są takie jak wcześniej. Przed wyprawą sprawdź „Zagrożenie”."
+    },
+    {
+      "id": "0.1.52",
+      "title": "Wersja 0.1.52: trudniej także z towarzyszami",
+      "body": "- Od 30. poziomu najnowsze miejsce jest trudniejsze także z towarzyszami. Najdłuższa wyprawa czasem kończy się omdleniem.\n- Bez towarzyszy najnowsze miejsce jest teraz bardzo trudne. Bezpieczniej jest o miejsce niżej.\n- Przed wyprawą sprawdź „Zagrożenie”."
     }
   ]
 }

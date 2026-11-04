@@ -9,6 +9,10 @@ import { beforeEach, describe, test } from 'node:test';
 
 import { huntWait, simulateHunt } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
+
+// The newest place's stronger creatures (balance.monsters.huntCurve,
+// hunt-strength.test.js) aside: these fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] } } };
 import { useServer } from './helpers/server.js';
 
 describe('a party in the engine', () => {
@@ -16,8 +20,8 @@ describe('a party in the engine', () => {
     const character = newCharacter('warrior', { level: 30, classLevel: 30 });
     const partner = { id: 7, name: 'Druh', character: newCharacter('mage', { level: 30, classLevel: 30 }), equipped: [], hp: 400 };
     const base = { character, equipped: [], hp: 500, name: 'Lider', areaId: 'mossy-boulders', minutes: 60, seed: 'party' };
-    const alone = simulateHunt(base, content);
-    const together = simulateHunt({ ...base, partners: [partner] }, content);
+    const alone = simulateHunt(base, calm);
+    const together = simulateHunt({ ...base, partners: [partner] }, calm);
     const first = together.fights[0];
     assert.ok(first.allies.some((unit) => unit.id === 'p1' && unit.name === 'Druh' && unit.classId === 'mage'));
     assert.equal(together.partners[0].id, 7);
