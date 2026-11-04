@@ -7,13 +7,15 @@
 // poster's name, and "Wymień", or why it cannot be taken. The sheet of a new
 // offer picks the resource given and the one wanted from the game's own
 // buttons, each with its picture and the pieces held (as the list of
-// "Poproś gildię" does, guild-requests.js), and takes the two counts; with
-// the rules' sameCount the second one follows the first. The words come
-// with the answer (data/guilds.json, exchange.texts).
+// "Poproś gildię" does, guild-requests.js), or gold for one side (the
+// author: "Daj też mozliwość wymiany i wystawiania ofert w Gildii zasoby za
+// złoto"), and takes the two counts; with the rules' sameCount the second
+// one follows the first. The words come with the answer (data/guilds.json,
+// exchange.texts).
 // mountGuildExchange(container) adds the card to the container and gives
 // { unmount() }, which takes it away.
 
-import { resourceArt } from './art.js';
+import { goldArt, resourceArt } from './art.js';
 import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber } from './format.js';
 import { CLASS_ICONS } from './icons.js';
@@ -23,6 +25,8 @@ import { closeSheet, confirmAction, framedName, howItWorks, openSheet, toast, wi
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 const resourceName = (id) => state.content.resources.find((resource) => resource.id === id)?.name ?? id;
+// A side's picture: the resource's, or the gold coin.
+const goodArt = (id) => (id === 'gold' ? goldArt(24) : resourceArt(id, 24));
 // "Kamień × 50", as the answers name a side of an offer, never broken
 // before the count.
 const sideText = (side) => `${side.name} × ${formatNumber(side.count)}`;
@@ -32,7 +36,7 @@ function amount(side) {
   return h(
     'span',
     { class: 'guild-exchange-amount' },
-    h('span', { class: 'guild-goods-art', 'aria-hidden': 'true' }, resourceArt(side.resource, 24)),
+    h('span', { class: 'guild-goods-art', 'aria-hidden': 'true' }, goodArt(side.resource)),
     h('span', { text: sideText(side) }),
   );
 }
@@ -77,19 +81,37 @@ export function mountGuildExchange(container) {
       ),
     );
 
-  // The sheet of a new offer: the resource given and the one wanted, picked
-  // from the game's own buttons with the pieces held, and the two counts.
+  // The sheet of a new offer: the resource or the gold given and the one
+  // wanted, picked from the game's own buttons with what is held, and the
+  // two counts, each up to its own limit.
   function openPostSheet() {
     const { texts, rules, resources } = view;
-    const ids = rules.resources;
-    const held = (id) => resources[id] ?? 0;
+    const gold = rules.gold.id;
+    const ids = [...rules.resources, gold];
+    const held = (id) => (id === gold ? view.gold : (resources[id] ?? 0));
+    const nameOf = (id) => (id === gold ? rules.gold.name : resourceName(id));
+    const most = (id) => (id === gold ? rules.gold.most : rules.most);
+    const range = (id) => `1–${formatNumber(most(id))}`;
     // The resource held most is given first, another one wanted.
-    let give = ids.reduce((best, id) => (held(id) > held(best) ? id : best));
-    let want = ids.find((id) => id !== give);
-    const range = `1–${formatNumber(rules.most)}`;
-    const number = (id) => h('input', { type: 'number', id, class: 'trade-number', min: '1', max: String(rules.most), step: '1', inputmode: 'numeric', placeholder: range });
+    let give = rules.resources.reduce((best, id) => (held(id) > held(best) ? id : best));
+    let want = rules.resources.find((id) => id !== give);
+    const number = (id) => h('input', { type: 'number', id, class: 'trade-number', min: '1', step: '1', inputmode: 'numeric' });
     const giveCount = number('guild-offer-give');
     const wantCount = number('guild-offer-want');
+    const label = (input) => h('label', { for: input.id, class: 'trade-field-label' });
+    const giveLabel = label(giveCount);
+    const wantLabel = label(wantCount);
+    // Each field's limit and its label follow the side's pick.
+    const limits = () => {
+      for (const [input, labelled, id] of [
+        [giveCount, giveLabel, give],
+        [wantCount, wantLabel, want],
+      ]) {
+        input.max = String(most(id));
+        input.placeholder = range(id);
+        labelled.textContent = `${texts.count} (${range(id)})`;
+      }
+    };
     if (rules.sameCount) {
       wantCount.readOnly = true;
       giveCount.addEventListener('input', () => {
@@ -102,12 +124,13 @@ export function mountGuildExchange(container) {
       h(
         'button',
         { type: 'button', class: 'guild-ask-choice guild-exchange-choice', 'aria-pressed': String(id === picked), disabled, onClick: () => pick(id) },
-        h('span', { class: 'guild-goods-art', 'aria-hidden': 'true' }, resourceArt(id, 24)),
-        h('span', { class: 'guild-exchange-name', text: resourceName(id) }),
+        h('span', { class: 'guild-goods-art', 'aria-hidden': 'true' }, goodArt(id)),
+        h('span', { class: 'guild-exchange-name', text: nameOf(id) }),
         h('span', { class: 'guild-ask-have', text: filled(texts.have, { have: formatNumber(held(id)) }) }),
       );
-    // The resource wanted is another than the one given.
+    // The good wanted is another than the one given: never gold for gold.
     const draw = () => {
+      limits();
       fill(
         givePicker,
         ids.map((id) =>
@@ -141,14 +164,19 @@ export function mountGuildExchange(container) {
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           const [given, wanted] = [giveCount, wantCount].map((field) => Number(field.value));
-          if (![given, wanted].every((count) => Number.isInteger(count) && count >= 1 && count <= rules.most)) throw new Error(`${texts.count}: ${range}.`);
+          for (const [count, id] of [
+            [given, give],
+            [wanted, want],
+          ]) {
+            if (!(Number.isInteger(count) && count >= 1 && count <= most(id))) throw new Error(`${nameOf(id)}: ${texts.count.toLowerCase()} ${range(id)}.`);
+          }
           const answer = await call('POST', '/api/guild/exchange', { give: { resource: give, count: given }, want: { resource: want, count: wanted } });
           closeSheet();
           show(answer);
           toast(answer.text);
         }),
     });
-    const field = (input) => h('div', { class: 'trade-field' }, h('label', { for: input.id, class: 'trade-field-label', text: `${texts.count} (${range})` }), input);
+    const field = (input, labelled) => h('div', { class: 'trade-field' }, labelled, input);
     openSheet(
       h('h2', { class: 'sheet-title', text: texts.post }),
       h(
@@ -157,10 +185,10 @@ export function mountGuildExchange(container) {
         h('p', { class: 'sheet-text', text: texts.postLead }),
         h('p', { class: 'field-label', text: texts.give }),
         givePicker,
-        field(giveCount),
+        field(giveCount, giveLabel),
         h('p', { class: 'field-label', text: texts.want }),
         wantPicker,
-        field(wantCount),
+        field(wantCount, wantLabel),
         h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }), send),
       ),
     );

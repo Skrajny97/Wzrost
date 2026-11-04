@@ -855,6 +855,7 @@
       "additionalProperties": false,
       "required": [
         "most",
+        "gold",
         "sameCount",
         "offers",
         "openHours",
@@ -869,6 +870,17 @@
           "description": "Najwięcej sztuk po jednej stronie oferty.",
           "type": "integer",
           "minimum": 1
+        },
+        "gold": {
+          "description": "Złoto jako jedna strona oferty (4.11.2026): jego nazwa, dopełniacz w odpowiedziach gry i najwięcej złota po jednej stronie.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "genitive", "most"],
+          "properties": {
+            "name": { "type": "string", "minLength": 1 },
+            "genitive": { "type": "string", "minLength": 1 },
+            "most": { "type": "integer", "minimum": 1 }
+          }
         },
         "sameCount": {
           "description": "Czy po obu stronach oferty musi być tyle samo sztuk.",
@@ -991,6 +1003,7 @@
                 "invalidResource",
                 "sameResource",
                 "invalidCount",
+                "invalidGold",
                 "sameCount",
                 "notEnough",
                 "notHeld",

@@ -5,7 +5,10 @@
 // never one's own offer or one of one's account; up to 3 open offers;
 // withdrawing, running out of time, leaving the guild and being removed
 // give the pieces back; two takers at once make one exchange; the closed
-// offers stay with their taker, and those closed before last week go.
+// offers stay with their taker, and those closed before last week go. Gold
+// may stand on one side of an offer, never both (the author: "Daj też
+// mozliwość wymiany i wystawiania ofert w Gildii zasoby za złoto"): set
+// aside, paid and given back as the pieces are.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -31,6 +34,7 @@ describe('the Wymiana in the Gildia through the API', () => {
   const setResources = (name, value) => run('UPDATE characters SET resources = ? WHERE name = ?', JSON.stringify(value), name);
   // What the character holds of each resource.
   const held = async (name) => ({ ...NONE, ...JSON.parse((await first('SELECT resources FROM characters WHERE name = ?', name)).resources) });
+  const goldOf = async (name) => (await first('SELECT gold FROM characters WHERE name = ?', name)).gold;
 
   async function player(login, name, { level = 30 } = {}) {
     ({ cookie: cookies[login] } = await signUp(login));
@@ -53,7 +57,7 @@ describe('the Wymiana in the Gildia through the API', () => {
 
   test('an offer sets the pieces given aside at once, and the guild sees it', async () => {
     await setResources('Mistrz', { stone: 120, wood: 5 });
-    assert.equal((await post('mistrz', 'gold', 10, 'wood', 10)).data.error.code, 'invalid_resource');
+    assert.equal((await post('mistrz', 'clay', 10, 'wood', 10)).data.error.code, 'invalid_resource');
     assert.equal((await post('mistrz', 'stone', 10, 'stone', 10)).data.error.code, 'same_resource');
     assert.equal((await post('mistrz', 'stone', 0, 'wood', 10)).data.error.code, 'invalid_count');
     assert.equal((await post('mistrz', 'stone', 2.5, 'wood', 10)).data.error.code, 'invalid_count');
@@ -82,13 +86,79 @@ describe('the Wymiana in the Gildia through the API', () => {
       [['Mistrz', 'Kamień', 50, 'Drewno', 80, false, false, 100, true]],
     );
     assert.deepEqual(seen.mine, []);
-    assert.deepEqual(seen.rules, { most: rules.most, offers: rules.offers, openHours: rules.openHours, sameCount: rules.sameCount, resources: content.resources.map(({ id }) => id) });
+    assert.deepEqual(seen.rules, {
+      most: rules.most,
+      offers: rules.offers,
+      openHours: rules.openHours,
+      sameCount: rules.sameCount,
+      resources: content.resources.map(({ id }) => id),
+      gold: { id: 'gold', name: 'Złoto', most: rules.gold.most },
+    });
+    assert.equal(seen.gold, 5000);
     assert.ok(seen.texts.how.every((line) => !line.includes('{')));
     assert.equal(seen.texts.errors, undefined);
     // Only for the guild's members.
     await player('obcy', 'Obcy');
     assert.equal((await post('obcy', 'stone', 1, 'wood', 1)).data.error.code, 'no_guild');
     assert.equal((await as('obcy', 'GET', '/api/guild/exchange')).data.guild, null);
+  });
+
+  test('gold on one side: resources sold and bought for it, set aside, paid and given back like pieces', async () => {
+    await setResources('Mistrz', { stone: 50 });
+    await setResources('Druh', { wood: 100 });
+    await run("UPDATE characters SET gold = 5000 WHERE name = 'Mistrz'");
+    // Never gold for gold, and gold up to its own limit.
+    assert.equal((await post('mistrz', 'gold', 10, 'gold', 20)).data.error.code, 'same_resource');
+    assert.equal((await post('mistrz', 'stone', 10, 'gold', 0)).data.error.code, 'invalid_count');
+    const over = await post('mistrz', 'stone', 10, 'gold', rules.gold.most + 1);
+    assert.deepEqual([over.data.error.code, over.data.error.message], ['invalid_count', 'Wpisz od 1 do 100\u00a0000 złota.']);
+    assert.equal((await post('mistrz', 'stone', 10, 'gold', rules.gold.most)).status, 200);
+    await withdraw('mistrz', (await as('mistrz', 'GET', '/api/guild/exchange')).data.mine[0].id);
+    // 50 stone for 300 gold: the stone set aside, the gold paid by the taker.
+    const sold = await post('mistrz', 'stone', 50, 'gold', 300);
+    assert.equal(sold.data.text, 'Oferta wystawiona: Kamień\u00a0×\u00a050 za Złoto\u00a0×\u00a0300.');
+    const [offer] = sold.data.mine.filter((one) => one.state === 'open');
+    assert.deepEqual([offer.want.resource, offer.want.name, offer.want.count], ['gold', 'Złoto', 300]);
+    assert.deepEqual(await held('Mistrz'), NONE);
+    await run("UPDATE characters SET gold = 299 WHERE name = 'Druh'");
+    const seen = (await as('druh', 'GET', '/api/guild/exchange')).data.offers[0];
+    assert.deepEqual([seen.have, seen.missing, seen.canTake], [299, 1, false]);
+    const short = await take('druh', offer.id);
+    assert.deepEqual([short.data.error.code, short.data.error.message], ['not_enough', 'Brakuje: 1 złota.']);
+    await run("UPDATE characters SET gold = 1000 WHERE name = 'Druh'");
+    const taken = await take('druh', offer.id);
+    assert.equal(taken.status, 200, JSON.stringify(taken.data).slice(0, 300));
+    assert.equal(taken.data.text, 'Wymiana z postacią Mistrz: dostajesz Kamień\u00a0×\u00a050 za Złoto\u00a0×\u00a0300.');
+    assert.deepEqual([await goldOf('Druh'), await goldOf('Mistrz')], [700, 5300]);
+    assert.deepEqual(await held('Druh'), { ...NONE, wood: 100, stone: 50 });
+    assert.equal(taken.data.character.gold, 700);
+    // 1000 gold for 100 wood: the gold leaves at once.
+    const bought = await post('mistrz', 'gold', 1000, 'wood', 100);
+    assert.equal(bought.status, 200);
+    assert.equal(await goldOf('Mistrz'), 4300);
+    assert.equal(bought.data.character.gold, 4300);
+    assert.equal(bought.data.gold, 4300);
+    const tooMuch = await post('mistrz', 'gold', 4301, 'wood', 1);
+    assert.deepEqual([tooMuch.data.error.code, tooMuch.data.error.message], ['not_enough', 'Masz tylko 4300 złota.']);
+    const [buy] = bought.data.mine.filter((one) => one.state === 'open');
+    assert.equal((await take('druh', buy.id)).status, 200);
+    assert.deepEqual([await goldOf('Druh'), await goldOf('Mistrz')], [1700, 4300]);
+    assert.deepEqual(await held('Druh'), { ...NONE, stone: 50 });
+    assert.deepEqual(await held('Mistrz'), { ...NONE, wood: 100 });
+    // Withdrawn, run out of time or left behind: the gold comes back, once.
+    const back = (await post('mistrz', 'gold', 500, 'stone', 5)).data.mine.find((one) => one.state === 'open');
+    assert.equal(await goldOf('Mistrz'), 3800);
+    assert.equal((await withdraw('mistrz', back.id)).data.text, 'Oferta wycofana. Wraca: Złoto\u00a0×\u00a0500.');
+    assert.equal(await goldOf('Mistrz'), 4300);
+    const expiring = (await post('mistrz', 'gold', 200, 'stone', 5)).data.mine.find((one) => one.state === 'open');
+    await run('UPDATE guild_offers SET ends_at = ? WHERE id = ?', Date.now() - HOUR, expiring.id);
+    assert.equal((await as('mistrz', 'GET', '/api/guild/exchange')).data.character.gold, 4300);
+    assert.equal((await as('mistrz', 'GET', '/api/guild/exchange')).data.character, undefined);
+    assert.equal(await goldOf('Mistrz'), 4300);
+    await post('druh', 'gold', 700, 'wood', 7);
+    assert.equal(await goldOf('Druh'), 1000);
+    assert.equal((await as('druh', 'POST', '/api/guild/leave')).status, 200);
+    assert.equal(await goldOf('Druh'), 1700);
   });
 
   test('taking an offer swaps both sides in one go, and it closes with its taker', async () => {

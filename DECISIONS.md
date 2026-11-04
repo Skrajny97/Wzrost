@@ -3048,6 +3048,21 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Wymiana w Gildii: zasoby za złoto (4.11.2026, w grze od 0.1.36)
+
+Autor: „Daj też mozliwość wymiany i wystawiania ofert w Gildii zasoby za złoto”. Rozszerza „Wymianę zasobów w Gildii”; punkt 12 tamtej sekcji nie dotyczy już złota.
+
+1. **Złoto jako strona oferty.** „Dajesz” i „Chcesz” mają obok trzech zasobów czwarty przycisk „Złoto”. Oferta to zasób za zasób, zasób za złoto albo złoto za zasób, nigdy złoto za złoto.
+2. **Ile.** Od 1 do 1000 sztuk zasobu, jak dotąd, i od 1 do 100 000 złota (`exchange.gold.most`). To brakujący szczegół: duch ognia sprzedaje zasoby najwyżej po 10 złota za sztukę, więc 1000 sztuk to najwyżej 10 000 złota, a 100 000 zostawia zapas.
+3. **Złoto odłożone.** Dawane złoto od razu schodzi z sakiewki i czeka w ofercie. Wraca w całości tak jak sztuki zasobów: po wycofaniu, gdy minie czas oferty, po wyjściu z gildii i po usunięciu z niej.
+4. **Wymiana w całości.** Biorący płaci chciane złoto albo sztuki, a wszystko dzieje się w jednym kroku. Bez złota zamiast „Wymień” stoi, ile go brakuje, np. „Brakuje: 1 złota.”
+5. **Reszta zasad bez zmian:** najwyżej 3 otwarte oferty, każda do 48 godzin, a postacie jednego konta nie wymieniają się ze sobą. Przedmioty, materiały, zioła i mikstury zostają poza Wymianą w Gildii.
+6. **Okno oferty.** Przyciski stoją po dwa w rzędzie. Pole liczby pod złotem przyjmuje do 100 000, a pod zasobem do 1000.
+
+## Wersja 0.1.36 (4.11.2026)
+
+1. **Wymiana w Gildii: zasoby za złoto** (zob. wyżej).
+
 ## Odpowiedź autora 586 (4.11.2026)
 
 Autor: „586 nie 50/50 tylko 70/30 gdzie 70% to nic nietrafione na najniższej stawce i rośnie wraz ze stawką do 60/40 i szansą na lepsze przedmioty / Loteria zostaje bez zmian / lecisz”.
