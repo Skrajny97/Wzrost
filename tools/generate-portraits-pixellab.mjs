@@ -130,11 +130,14 @@ async function draw(id, seed) {
   const path = inpaint ? '/inpaint-v3' : '/generate-image-v2';
   const body = inpaint ? inpainting(entry, seed) : {
     description: promptOf(id),
-    image_size: { width, height },
+    // A prompt may have its own size ({prompt, width, height}), e.g. the
+    // pieces of the Warownia's walls beside the board's inpaintings.
+    image_size: { width: entry?.width ?? width, height: entry?.height ?? height },
     seed,
     // A kind drawn with its background (removeBackground: false, e.g. the
-    // places' circles and the lands) keeps it; every other is transparent.
-    no_background: kind.removeBackground !== false,
+    // places' circles and the lands) keeps it; every other is transparent,
+    // and so is a prompt marked `transparent`.
+    no_background: entry?.transparent ?? kind.removeBackground !== false,
     ...(style && {
       style_image: reference(style),
       style_options: { color_palette: false, outline: true, detail: true, shading: true },
