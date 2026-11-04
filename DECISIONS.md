@@ -3048,12 +3048,68 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Odpowiedzi autora 579 i 581 (4.11.2026)
+
+Autor: „579 A” i „581 B”.
+
+1. **Plansza Warowni (579 A).** Po przemianie plansza wydłuża się w dół o dwa pasy, jak przy Osadzie o jeden, a 7 nowych miejsc stoi w dwóch rzędach w obrębie murów. Na telefonie planszę trzeba będzie przewinąć.
+2. **Wyglądy budynków Warowni (581 B).** Każdy budynek ma trzy wyglądy jak w obozie: na poziomy 1–3, 4–7 i 8–10. Zbrojownia ma dwa poziomy, więc dwa wyglądy, a Strażnica pięć poziomów: wygląd na poziomy 1–2, 3–4 i 5.
+3. **Który wygląd wybrał autor (brakujący szczegół).** Wybrany szkic (578) to pierwszy wygląd. Kolejne rysuje PixelLab w tym samym stylu, większe i bogatsze, i trafiają do autora do oceny jeden po drugim.
+
+## Tier V w grze (4.11.2026, w grze od 0.1.31)
+
+Autor wybrał ikony 582.1–582.22 (zob. „Odpowiedzi autora 577, 578 i 582”).
+
+1. **22 nowe bazy od 75. poziomu klasy**, po jednej w każdej rodzinie, z ikonami wybranymi przez autora: Karabela, Halabarda, Kris, Łuk tatarski, Berło, Monstrancja, Tarcza husarska, Kołczan łowczy, Stilet, Kula wróżebna, Zawój, Hełm husarski, Żupan, Zbroja husarska, Delia, Korona wiary, Alba, Rękawice rycerskie, Buty jeździeckie, Kolia, Pierścień koronny i Róg tura. Każda należy do tych samych klas, co pozostałe bazy jej rodziny.
+2. **Korona wiary** (brakujący szczegół): tak nazywa się nakrycie Kleryka zamiast Tiary, bo autor chciał nazwy abstrakcyjnej. Na ikonie jest biała czasza z dwiema złotymi koronami i krzyżykiem.
+3. **Liczby.** Współczynnik to współczynnik pierwszej bazy rodziny razy 1,20 (Miecz 1,2, Karabela 1,44). Górna granica premii jest półtora raza większa niż w Tierze IV (Koncerz do 36, Karabela do 54).
+4. **Dolna granica premii (brakujący szczegół).** W propozycji dolna granica też rosła półtora raza (Kris 24–39). Wtedy najsłabszy Kris na niskim poziomie przedmiotu wychodził równy najlepszemu Jataganowi, a w niższych Tierach najsłabsza sztuka zawsze bije najlepszą sztukę Tieru niżej. Dlatego premia Tieru V zaczyna się o 1 powyżej najwyższej premii Tieru IV: Karabela 37–54 (Koncerz 23–36), Kris 27–39 (Jatagan 16–26), Tarcza husarska 127–189 (Tarcza herbowa 76–126), Kolia 17–24 (Medalion 10–16).
+5. **Skąd się biorą**, jak bazy Tieru IV od 50. poziomu:
+    - wypadają na wyprawach tam, gdzie zakres poziomów miejsca sięga 75. poziomu;
+    - w cotygodniowej skrzyni, na Targowisku i w Salonie Gier od 75. poziomu klasy;
+    - wzory zna Warsztat i Szlifiernia od 75. poziomu Rzemieślnictwa i Jubilerstwa.
+    Rodzina z pięcioma bazami nie wypada częściej niż z czterema, bo gra najpierw losuje rodzinę.
+6. **Encyklopedia.** Doszedł Tier V „od 75. poziomu klasy” z zestawami przedmiotów dla każdej klasy i Dodatkami. Pełny zestaw otwiera skrzynię: 2500 złota, 80 Punktów Czasu i 32 Punkty Systemu, czyli wyraźnie więcej niż w Tierze IV (1000, 40 i 16). Materiały stworów z poziomów 101–125 (i wyższych, póki nie ma Tieru VI) stoją teraz w Tierze V zakładki Materiały. Mikstury, zioła i minerały się nie przesuwają, bo ich poziomy kończą się na setnym.
+7. Stilet nie ma fioletowego odprysku z prawej strony głowni, o który prosił autor.
+
+## Staw Midasa: dwa razy więcej złota (4.11.2026, w grze od 0.1.31)
+
+Autor: „złoto jednak w Stawie Midasa trzeba zwiększyć dwukrotnie na wszystkich poziomach dodatkowo”.
+
+1. Staw Midasa odsącza 8 złota na godzinę na każdy swój poziom zamiast 4: na 1. poziomie 8, a na 10. poziomie 80 złota na godzinę.
+2. Magazyn mieści dalej 2 godziny produkcji, więc też dwa razy więcej złota. Koszty budowy się nie zmieniają.
+3. Drewno, kamień i ruda: zob. „Koszty obozu w proporcjach 45/30/25”.
+
+## Koszty obozu w proporcjach 45/30/25 (583 A, 4.11.2026, w grze od 0.1.31)
+
+Autor: „583 wariant A”. Gracze pisali przez autora, że drewna brakuje, a kamień i ruda się gromadzą.
+
+1. **Budynki obozu i Kwatery** kosztują teraz drewno, kamień i rudę w proporcjach 45%, 30% i 25%. Wcześniej budowy brały ok. 64% drewna, 23% kamienia i 13% rudy.
+2. **Ta sama suma.** Na każdym poziomie, na którym płaci się wszystkimi trzema zasobami, suma drewna, kamienia i rudy jest taka sama jak dotąd. Złoto się nie zmienia.
+3. **Pierwsze poziomy nie drożeją.** Kamień i ruda dochodzą od tych samych poziomów co dotąd, a drewna trzeba na nich mniej: Ognisko na 1. poziomie kosztuje 3 drewna zamiast 4, a Tartak 4 zamiast 6.
+4. **Przykład:** Tartak na 4. poziomie kosztował 41 drewna, 11 kamienia i 3 rudy, a teraz 25 drewna, 16 kamienia i 14 rudy. Na 10. poziomie kosztuje 1165 drewna, 776 kamienia i 647 rudy zamiast 1936, 510 i 141.
+5. **Skutek:** na 27. poziomie (Uroczysko Kamieni) następny poziom obozu zbiera się ok. 15 godzin wypraw zamiast 22, a zbędnego kamienia i rudy zostaje dużo mniej.
+6. **Zapis:** nowe podstawy kosztów w `data/buildings.json` (np. drewno Tartaku 3,61 zamiast 6), tak żeby każdy poziom dzielił tę samą sumę w tych proporcjach.
+
+## Kod PC dla dwóch kolejnych postaci (4.11.2026, w grze od 0.1.31)
+
+1. Na polecenie autora jednorazowy kod „PC” (60 Punktów Czasu) działa też dla dwóch kolejnych postaci, do 17.11 włącznie.
+2. Jak przy pierwszej postaci, dane trzymają tylko skróty SHA-256 ich imion, bo repozytorium jest publiczne (`data/gift-codes.json`).
+
+## Wersja 0.1.31 (4.11.2026)
+
+1. **Tier V: 22 przedmioty od 75. poziomu klasy** (zob. wyżej).
+2. **Staw Midasa: dwa razy więcej złota** (zob. wyżej).
+3. **Koszty obozu w proporcjach 45/30/25** (583 A, zob. wyżej).
+4. **Kod PC dla dwóch kolejnych postaci** (zob. wyżej).
+
 ## Odpowiedzi autora 577, 578 i 582 (4.11.2026)
 
 Autor: „578.1 żadna, klon nie może być w środku, chyba że go zanimujemy jakoś”, dalej 578.2–578.7: C, B, A, C, A, B; 582.1–582.22: C, B, A, A, C, A, H, A, B („bez tego fioletowego odprysku w prawym górnym rogu”), C, D, C, D, C, A, A („zmień nazwę na abstrakcyjna bo tiara inaczej wygląda”), B, D, A, C, C, D; 577: A, B, A.
 
 1. **Dźwięki Szlifierni (577).** Szlifowanie i oprawa zostają w wersjach A. Pęknięcie kamienia ma teraz wersję B: trzask, a po nim grzechot okruchów (w grze od 0.1.30, `jewel-fail-1` w `tools/build-drafts.py`).
-2. **Budynki Warowni (578).** Wybrane: Zbrojownia C, Sala trofeów B, Strażnica A, Ołtarz Systemu C, Szklarnia A, Kapliczka B. Plac treningowy dostanie nowe szkice bez świecącego klona Systemu w środku placu: klon może wrócić tylko ożywiony animacją. Warownia dalej czeka na odpowiedzi 579 (miejsce na planszy) i 581 (liczba wyglądów).
+2. **Budynki Warowni (578).** Wybrane: Zbrojownia C, Sala trofeów B, Strażnica A, Ołtarz Systemu C, Szklarnia A, Kapliczka B. Plac treningowy narysował PixelLab jeszcze raz, bez świecącego klona Systemu w środku placu (klon mógłby wrócić tylko ożywiony animacją), a autor wybrał „578.1 C z nowych”: plac otoczony kamiennym murem, z kukłami i stojakiem na broń. Przed wejściem do gry trzeba go przyciąć do płaskiego placu, bo stoi na podwyższeniu z ziemi. Warownia dalej czeka na odpowiedzi 579 (miejsce na planszy) i 581 (liczba wyglądów).
+    - Wybrane szkice na gałęzi `art-drafts`, w `art/drafts/fortress`: `training-yard-20261104T0725-959167058-0`, a z rundy z 3.11 (`20261103T2317`, litery A–D to końcówki -0 do -3) Zbrojownia -2, Sala trofeów -1, Strażnica -0, Ołtarz Systemu -2, Szklarnia -0, Kapliczka -1.
 3. **Ikony Tieru V (582).** Wybrane wersje: Karabela C, Halabarda B, Kris A, Łuk tatarski A, Berło C, Monstrancja A, Tarcza husarska H (ze skrzydłami), Kołczan łowczy A, Stilet B, Kula wróżebna C, Zawój D, Hełm husarski C, Żupan D, Zbroja husarska C, Delia A, nakrycie Kleryka A, Alba B, Rękawice rycerskie D, Buty jeździeckie A, Kolia C, Pierścień koronny C, Róg tura D.
     - Stilet B traci fioletowy odprysk w prawym górnym rogu ikony.
     - Kris zostaje zamiast Handżara: autor wybrał 582.3 A bez uwag do nazwy.

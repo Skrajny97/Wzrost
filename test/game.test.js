@@ -806,7 +806,7 @@ describe('camp', () => {
     // The Kwatery belong to the Osada: without it they are not in the camp.
     assert.equal((await build('quarters')).data.error.code, 'invalid_building');
     const campfire = start.camp.buildings.find((building) => building.id === 'campfire');
-    assert.deepEqual(campfire.next, { level: 1, effect: 'Odpoczynek między wyprawami szybszy o 10%', minutes: 1, cost: { gold: 5, wood: 4 } });
+    assert.deepEqual(campfire.next, { level: 1, effect: 'Odpoczynek między wyprawami szybszy o 10%', minutes: 1, cost: { gold: 5, wood: 3 } });
     assert.equal(campfire.production, null);
     assert.deepEqual(start.resources, { wood: 15, stone: 3, 'iron-ore': 0 });
     assert.equal(start.gold, 15);
@@ -889,7 +889,7 @@ describe('camp', () => {
     const running = started.data.character.camp.construction;
     assert.deepEqual([running.buildingId, running.name, running.level, running.endsAt - running.startedAt], ['campfire', 'Ognisko', 1, 60000]);
     assert.equal(started.data.character.gold, 95);
-    assert.deepEqual(started.data.character.resources, { wood: 16, stone: 5, 'iron-ore': 0 });
+    assert.deepEqual(started.data.character.resources, { wood: 17, stone: 5, 'iron-ore': 0 });
     // Until the end the building keeps its old level.
     const campfire = (view) => view.camp.buildings.find((building) => building.id === 'campfire');
     assert.equal(campfire(started.data.character).level, 0);
@@ -908,7 +908,7 @@ describe('camp', () => {
     const second = await build('campfire');
     assert.equal(second.status, 201);
     assert.equal(second.data.character.gold, 85);
-    assert.deepEqual(second.data.character.resources, { wood: 8, stone: 2, 'iron-ore': 0 });
+    assert.deepEqual(second.data.character.resources, { wood: 12, stone: 2, 'iron-ore': 0 });
     assert.equal(second.data.character.camp.construction.endsAt - second.data.character.camp.construction.startedAt, 2 * 60000);
   });
 
@@ -939,7 +939,7 @@ describe('camp', () => {
     assert.deepEqual([camp.underWay, camp.queueSize], [3, 3]);
     // Each was paid when it was queued: the Tartak twice and the Kamieniołom once.
     assert.equal(third.data.character.gold, 1000 - 8 - 8 - 16);
-    assert.deepEqual(third.data.character.resources, { wood: 200 - 6 - 8 - 11, stone: 100 - 3 - 3, 'iron-ore': 50 });
+    assert.deepEqual(third.data.character.resources, { wood: 200 - 4 - 5 - 7, stone: 100 - 4 - 5, 'iron-ore': 50 });
     // The Tartak's next level comes after the queue.
     assert.deepEqual([find(third.data.character, 'sawmill').next.level, find(third.data.character, 'sawmill').queued], [3, [2]]);
     // A fourth build does not fit, and a waiting one cannot be paid twice.
@@ -1071,7 +1071,7 @@ describe('camp', () => {
   });
 
   test('a production building fills its store, which the player collects', async () => {
-    await stock(200, { wood: 6 });
+    await stock(200, { wood: 4 });
     const built = await build('sawmill');
     const store = (view) => view.camp.buildings.find((building) => building.id === 'sawmill').production;
     // The store comes with the building.
@@ -1092,12 +1092,12 @@ describe('camp', () => {
     assert.equal(collected.data.character.gold, 200 - 8);
     assert.equal((await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'sawmill' } })).data.error.code, 'nothing_to_collect');
 
-    // An upgrade first collects the store: level 2 costs 16 gold, 11 wood and 3 stone.
-    await stock(192, { wood: 11, stone: 3 });
+    // An upgrade first collects the store: level 2 costs 16 gold, 7 wood and 5 stone.
+    await stock(192, { wood: 7, stone: 5 });
     await call('POST', '/api/test/skip-build', { cookie });
     const upgraded = await build('sawmill');
     assert.equal(upgraded.status, 201);
-    assert.deepEqual(upgraded.data.character.resources, { wood: 11 + 12 - 11, stone: 0, 'iron-ore': 0 });
+    assert.deepEqual(upgraded.data.character.resources, { wood: 7 + 12 - 7, stone: 0, 'iron-ore': 0 });
     assert.equal(upgraded.data.character.gold, 192 - 16);
     assert.deepEqual([store(upgraded.data.character).paused, store(upgraded.data.character).amount], [true, 0]);
   });
@@ -1223,26 +1223,28 @@ describe('camp', () => {
     assert.equal(built.data.character.gold, 500 - 10);
     await call('POST', '/api/test/skip-build', { cookie });
     const ready = lake(await character());
-    assert.deepEqual([ready.production.resource, ready.production.perHour, ready.production.capacity], ['gold', 4, 8]);
-    assert.equal(ready.effect, 'Odsącza 4 złota na godzinę, magazyn na 2\u00a0h produkcji');
+    // Twice the gold since 0.1.31 (the author: "złoto jednak w Stawie Midasa
+    // trzeba zwiększyć dwukrotnie na wszystkich poziomach").
+    assert.deepEqual([ready.production.resource, ready.production.perHour, ready.production.capacity], ['gold', 8, 16]);
+    assert.equal(ready.effect, 'Odsącza 8 złota na godzinę, magazyn na 2\u00a0h produkcji');
     // A full store goes to the gold, not to the resources.
     await call('POST', '/api/test/skip-build', { cookie });
     const collected = await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'midas-lake' } });
     assert.equal(collected.status, 200);
-    assert.deepEqual(collected.data.collected, { resource: 'gold', amount: 8 });
-    assert.equal(collected.data.character.gold, 490 + 8);
+    assert.deepEqual(collected.data.collected, { resource: 'gold', amount: 16 });
+    assert.equal(collected.data.character.gold, 490 + 16);
     assert.equal(collected.data.character.resources.gold, undefined);
     // An upgrade first collects the store, into the gold that pays for it:
-    // level 2 costs 20 gold, 15 wood and 8 stone.
+    // level 2 costs 20 gold, 9 wood and 6 stone.
     await call('POST', '/api/test/skip-build', { cookie });
     const upgraded = await build('midas-lake');
     assert.equal(upgraded.status, 201);
-    assert.equal(upgraded.data.character.gold, 498 + 8 - 20);
+    assert.equal(upgraded.data.character.gold, 506 + 16 - 20);
     assert.equal(upgraded.data.character.resources.gold, undefined);
   });
 
   test('two taps on "Zbierz" collect once', async () => {
-    await stock(200, { wood: 6 });
+    await stock(200, { wood: 4 });
     await build('sawmill');
     await finishBuilding();
     // Half an hour of 6 wood an hour: 3 wood, the store not full.

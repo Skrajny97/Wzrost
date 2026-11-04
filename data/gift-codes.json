@@ -19,6 +19,20 @@
       "for": "49097d632f6be096bcad4eb17c764e108612bd4d8211faafa3eebe2803896723",
       "until": "2026-11-17T00:00:00+01:00",
       "rewards": { "timePoints": 60 }
+    },
+    {
+      "id": "pc-2026-11-04-a",
+      "code": "PC",
+      "for": "4cde442d1f71b7caf3045b6837c736ac9693a4ed0ec4ff625a0ecb780c7d6470",
+      "until": "2026-11-18T00:00:00+01:00",
+      "rewards": { "timePoints": 60 }
+    },
+    {
+      "id": "pc-2026-11-04-b",
+      "code": "PC",
+      "for": "a28b957ec9724c15bc7823acc70d39be2d621aa956ec13a8205aff41b3f48d73",
+      "until": "2026-11-18T00:00:00+01:00",
+      "rewards": { "timePoints": 60 }
     }
   ],
   "moves": [

@@ -345,7 +345,7 @@ describe('items', () => {
       const before = content.bases
         .filter((other) => (other.family ?? other.id) === base.family && (other.classLevel ?? 1) < base.classLevel)
         .reduce((best, other) => ((other.classLevel ?? 1) > (best.classLevel ?? 1) ? other : best));
-      assert.ok([10, 25, 50].includes(base.classLevel), base.id);
+      assert.ok([10, 25, 50, 75].includes(base.classLevel), base.id);
       assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= first[key[base.kind]] * 1.2, base.id);
       for (const cls of content.classes) {
         assert.equal(canUse(base.id, cls.id, content), canUse(first.id, cls.id, content), `${base.id} for ${cls.id}`);
@@ -360,17 +360,20 @@ describe('items', () => {
     }
   });
 
-  test('every category has bases from class levels 10, 25 and 50, dropping from those levels', () => {
+  test('every category has bases from class levels 10, 25, 50 and 75, dropping from those levels', () => {
     const firsts = content.bases.filter((base) => !base.family);
     for (const first of firsts) {
       const levels = content.bases.filter((base) => base.family === first.id).map((base) => base.classLevel);
-      assert.deepEqual(levels, [10, 25, 50], first.id);
+      assert.deepEqual(levels, [10, 25, 50, 75], first.id);
     }
     assert.equal(canUse('saber', 'warrior', content, 24), false);
     assert.equal(canUse('saber', 'warrior', content, 25), true);
     assert.equal(canUse('estoc', 'warrior', content, 49), false);
     assert.equal(canUse('estoc', 'warrior', content, 50), true);
     assert.equal(canUse('estoc', 'mage', content, 50), false);
+    // Tier V (the author's 582): the Karabela from class level 75.
+    assert.equal(canUse('karabela', 'warrior', content, 74), false);
+    assert.equal(canUse('karabela', 'warrior', content, 75), true);
     const rng = createRng('trzecie-bazy');
     const swords = (maxClassLevel) => {
       const found = new Set();
@@ -1312,8 +1315,9 @@ describe('camp', () => {
   const campfire = content.buildingsById.campfire;
 
   test('each level costs more gold and resources and takes longer, from the first one on', () => {
-    assert.deepEqual(upgradeCost(campfire, 1), { gold: 5, wood: 4 });
-    assert.deepEqual(upgradeCost(campfire, 2), { gold: 10, wood: 8, stone: 3 });
+    // Wood, stone and ore in the shares 45/30/25 (DECISIONS.md, 583 A).
+    assert.deepEqual(upgradeCost(campfire, 1), { gold: 5, wood: 3 });
+    assert.deepEqual(upgradeCost(campfire, 2), { gold: 10, wood: 5, stone: 3 });
     assert.deepEqual(Object.keys(upgradeCost(campfire, 4)), ['gold', 'wood', 'stone', 'iron-ore']);
     const minutes = Array.from({ length: campfire.maxLevel }, (_, i) => upgradeMinutes(campfire, i + 1));
     assert.deepEqual(minutes.slice(0, 4), [1, 2, 5, 11]);

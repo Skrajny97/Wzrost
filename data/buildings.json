@@ -7,9 +7,9 @@
     "effect": { "kind": "production", "resource": "wood", "perLevel": 6, "storageHours": 2, "unit": "count", "text": "Wytwarza {value} drewna na godzinę, magazyn na {hours} produkcji" },
     "costs": [
       { "resource": "gold", "base": 8, "growth": 2.0 },
-      { "resource": "wood", "base": 6, "growth": 1.9 },
-      { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 2 },
-      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 4 }
+      { "resource": "wood", "base": 3.61, "growth": 1.9 },
+      { "resource": "stone", "base": 4.57, "growth": 1.9, "fromLevel": 2 },
+      { "resource": "iron-ore", "base": 13.75, "growth": 1.9, "fromLevel": 4 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -21,9 +21,9 @@
     "effect": { "kind": "production", "resource": "stone", "perLevel": 4, "storageHours": 2, "unit": "count", "text": "Wydobywa {value} kamienia na godzinę, magazyn na {hours} produkcji" },
     "costs": [
       { "resource": "gold", "base": 8, "growth": 2.0 },
-      { "resource": "wood", "base": 8, "growth": 1.9 },
-      { "resource": "stone", "base": 3, "growth": 1.9 },
-      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 3 }
+      { "resource": "wood", "base": 5.32, "growth": 1.9 },
+      { "resource": "stone", "base": 3.55, "growth": 1.9 },
+      { "resource": "iron-ore", "base": 10.68, "growth": 1.9, "fromLevel": 3 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -35,9 +35,9 @@
     "effect": { "kind": "production", "resource": "iron-ore", "perLevel": 3, "storageHours": 2, "unit": "count", "text": "Wydobywa {value} rudy żelaza na godzinę, magazyn na {hours} produkcji" },
     "costs": [
       { "resource": "gold", "base": 12, "growth": 2.0 },
-      { "resource": "wood", "base": 9, "growth": 1.9 },
-      { "resource": "stone", "base": 4, "growth": 1.9 },
-      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 3 }
+      { "resource": "wood", "base": 6.22, "growth": 1.9 },
+      { "resource": "stone", "base": 4.15, "growth": 1.9 },
+      { "resource": "iron-ore", "base": 12.48, "growth": 1.9, "fromLevel": 3 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -46,12 +46,12 @@
     "name": "Staw Midasa",
     "description": "Cichy staw, na którego dnie zalega złoto. Misa traperska sama odsącza je z mułu: niewiele, ale bez przerwy.",
     "maxLevel": 10,
-    "effect": { "kind": "production", "resource": "gold", "perLevel": 4, "storageHours": 2, "unit": "count", "text": "Odsącza {value} złota na godzinę, magazyn na {hours} produkcji" },
+    "effect": { "kind": "production", "resource": "gold", "perLevel": 8, "storageHours": 2, "unit": "count", "text": "Odsącza {value} złota na godzinę, magazyn na {hours} produkcji" },
     "costs": [
       { "resource": "gold", "base": 10, "growth": 2.0 },
-      { "resource": "wood", "base": 8, "growth": 1.9 },
-      { "resource": "stone", "base": 4, "growth": 1.9, "fromLevel": 2 },
-      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 3 }
+      { "resource": "wood", "base": 4.92, "growth": 1.9 },
+      { "resource": "stone", "base": 6.23, "growth": 1.9, "fromLevel": 2 },
+      { "resource": "iron-ore", "base": 9.87, "growth": 1.9, "fromLevel": 3 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -73,9 +73,9 @@
     },
     "costs": [
       { "resource": "gold", "base": 5, "growth": 2.0 },
-      { "resource": "wood", "base": 4, "growth": 1.9 },
-      { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 2 },
-      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 4 }
+      { "resource": "wood", "base": 2.71, "growth": 1.9 },
+      { "resource": "stone", "base": 3.43, "growth": 1.9, "fromLevel": 2 },
+      { "resource": "iron-ore", "base": 10.32, "growth": 1.9, "fromLevel": 4 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -87,9 +87,9 @@
     "effect": { "kind": "bagSlots", "perLevel": 5, "unit": "count", "text": "Plecak większy o {value} miejsc" },
     "costs": [
       { "resource": "gold", "base": 10, "growth": 2.0 },
-      { "resource": "wood", "base": 8, "growth": 1.9 },
-      { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 2 },
-      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 4 }
+      { "resource": "wood", "base": 4.51, "growth": 1.9 },
+      { "resource": "stone", "base": 5.71, "growth": 1.9, "fromLevel": 2 },
+      { "resource": "iron-ore", "base": 17.18, "growth": 1.9, "fromLevel": 4 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -110,9 +110,9 @@
     },
     "costs": [
       { "resource": "gold", "base": 12, "growth": 2.0 },
-      { "resource": "wood", "base": 4, "growth": 1.9 },
-      { "resource": "iron-ore", "base": 3, "growth": 1.9 },
-      { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 3 }
+      { "resource": "wood", "base": 3.52, "growth": 1.9 },
+      { "resource": "iron-ore", "base": 1.96, "growth": 1.9 },
+      { "resource": "stone", "base": 8.48, "growth": 1.9, "fromLevel": 3 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -124,9 +124,9 @@
     "effect": { "kind": "upgradeCap", "perLevel": 1, "unit": "count", "text": "Ulepszanie przedmiotów do +{value}" },
     "costs": [
       { "resource": "gold", "base": 15, "growth": 2.0 },
-      { "resource": "wood", "base": 6, "growth": 1.9 },
-      { "resource": "stone", "base": 4, "growth": 1.9 },
-      { "resource": "iron-ore", "base": 4, "growth": 1.9 }
+      { "resource": "wood", "base": 6.3, "growth": 1.9 },
+      { "resource": "stone", "base": 4.2, "growth": 1.9 },
+      { "resource": "iron-ore", "base": 3.5, "growth": 1.9 }
     ],
     "minutes": { "base": 1, "growth": 2.2 }
   },
@@ -153,9 +153,9 @@
     },
     "costs": [
       { "resource": "gold", "base": 3, "growth": 2.0 },
-      { "resource": "wood", "base": 3, "growth": 1.9 },
-      { "resource": "stone", "base": 3, "growth": 1.9, "fromLevel": 2 },
-      { "resource": "iron-ore", "base": 3, "growth": 1.9, "fromLevel": 4 }
+      { "resource": "wood", "base": 2.26, "growth": 1.9 },
+      { "resource": "stone", "base": 2.86, "growth": 1.9, "fromLevel": 2 },
+      { "resource": "iron-ore", "base": 8.6, "growth": 1.9, "fromLevel": 4 }
     ],
     "minutes": { "levels": [1, 10, 30, 60, 120, 240, 360, 600, 960, 1440] }
   },
@@ -169,9 +169,9 @@
     "effect": { "kind": "companionPlaces", "perLevel": 1, "unit": "count", "text": "Miejsca dla towarzyszy: {value}" },
     "costs": [
       { "resource": "gold", "base": 1280, "growth": 4 },
-      { "resource": "wood", "base": 715, "growth": 3.6 },
-      { "resource": "stone", "base": 188, "growth": 3.6 },
-      { "resource": "iron-ore", "base": 74, "growth": 3.6 }
+      { "resource": "wood", "base": 439.65, "growth": 3.6 },
+      { "resource": "stone", "base": 293.1, "growth": 3.6 },
+      { "resource": "iron-ore", "base": 244.25, "growth": 3.6 }
     ],
     "minutes": { "levels": [240, 1200] }
   }

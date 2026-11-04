@@ -96,9 +96,9 @@ describe('the Duch budowniczego in the engine', () => {
     assert.deepEqual(fresh, all);
     assert.ok(RESOURCES.every((id) => fresh[id] > 0));
     // All at their highest but the Tartak at 9: its tenth level, gold left out
-    // (DECISIONS.md: 1936 wood, 510 stone and 141 iron ore).
+    // (DECISIONS.md, 583 A: 1165 wood, 776 stone and 647 iron ore).
     const almost = { ...top(own), sawmill: { level: 9, startedAt: 0, endsAt: 1 } };
-    assert.deepEqual(campNeeds(own, almost, [], content), { wood: 1936, stone: 510, 'iron-ore': 141 });
+    assert.deepEqual(campNeeds(own, almost, [], content), { wood: 1165, stone: 776, 'iron-ore': 647 });
     const { gold, ...rest } = upgradeCost(sawmill, 10);
     assert.ok(gold > 0);
     assert.deepEqual(campNeeds(own, almost, [], content), rest);

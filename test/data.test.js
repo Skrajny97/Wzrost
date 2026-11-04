@@ -16,6 +16,14 @@ test('the validator catches broken references and schema errors', () => {
     'regions.json: windfalls-edge ma nieznanego potwora "dragon"',
   ]);
 
+  // A code repeats only for different single characters (the PC code for
+  // several players): not for the same one, and a code for everyone never.
+  const codes = structuredClone(loadData());
+  const pc = codes['gift-codes'].codes.find((gift) => gift.code === 'PC');
+  codes['gift-codes'].codes.push({ ...pc, id: 'pc-twice' }, { ...pc, id: 'pc-for-all', for: undefined });
+  codes['gift-codes'].codes.push({ ...codes['gift-codes'].codes.find((gift) => gift.code === 'TIGER'), id: 'tiger-twice' });
+  assert.deepEqual(validateData(codes), ['gift-codes.json: kod PC powtarza się', 'gift-codes.json: kod PC powtarza się', 'gift-codes.json: kod TIGER powtarza się']);
+
   // Inner regions follow one another without gaps.
   const gap = structuredClone(loadData());
   gap.regions[0].areas[1].minLevel = 7;

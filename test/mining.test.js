@@ -191,14 +191,17 @@ describe('Górnictwo in the engine', () => {
       ['Kaptorga', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
       ['Wisior', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
       ['Medalion', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
+      ['Kolia', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
       ['Pierścień', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
       ['Sygnet', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
       ['Obrączka', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
       ['Pierścień rodowy', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
+      ['Pierścień koronny', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
       ['Talizman', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
       ['Otoczak', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
       ['Kieł', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
       ['Bursztyn', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
+      ['Róg tura', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
     ]);
     // A jewel's card names the same Tier, and no Warsztat base says Szlifiernia.
     for (const base of jewelBases(content)) {

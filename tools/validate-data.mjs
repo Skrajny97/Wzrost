@@ -351,14 +351,18 @@ function checkReferences(data) {
   errors.push(...checkEvolutions(data, { classIds, effectIds, elements, stats }));
 
   // Gift codes: their own ids and codes, a date they end at, and camp
-  // resources there are.
+  // resources there are. A code repeats only for different single
+  // characters (`for`, as the PC code for several players): a code for
+  // everyone stands alone.
   {
     const codes = data['gift-codes'].codes;
     uniqueIds(errors, 'gift-codes', codes);
-    const typed = new Set();
+    const typed = new Map();
     for (const gift of codes) {
-      if (typed.has(gift.code)) errors.push(`gift-codes.json: kod ${gift.code} powtarza się`);
-      typed.add(gift.code);
+      const owners = typed.get(gift.code) ?? [];
+      const owner = gift.for ?? '';
+      if (owners.length > 0 && (owner === '' || owners.includes('') || owners.includes(owner))) errors.push(`gift-codes.json: kod ${gift.code} powtarza się`);
+      typed.set(gift.code, [...owners, owner]);
       if (Number.isNaN(Date.parse(gift.until))) errors.push(`gift-codes.json: ${gift.id} ma nieczytelną datę końca "${gift.until}"`);
       for (const id of Object.keys(gift.rewards.resources ?? {})) {
         if (!resources.has(id)) errors.push(`gift-codes.json: ${gift.id} daje nieznany zasób "${id}"`);

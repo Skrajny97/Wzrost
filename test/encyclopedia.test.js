@@ -44,9 +44,9 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(mergeDiscoveries({ 'item:sword': 2, 'herb:comfrey': 1 }, held), held);
   });
 
-  test('items come in four tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
+  test('items come in five tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
     const sets = itemSets(content);
-    assert.equal(sets.length, 24);
+    assert.equal(sets.length, 30);
     assert.deepEqual(
       sets.filter((set) => set.tier === 0).map((set) => [set.name, set.bases.length]),
       [
@@ -59,6 +59,8 @@ describe('the Encyklopedia in the engine', () => {
       ],
     );
     assert.deepEqual(sets.find((set) => set.id === 'items:2:warrior').bases.slice(0, 3), ['broadsword', 'war-axe', 'pavise']);
+    // Tier V (the author's 582), from class level 75.
+    assert.deepEqual(sets.find((set) => set.id === 'items:5:warrior').bases.slice(0, 3), ['karabela', 'halberd', 'hussar-shield']);
     const covered = new Set(sets.flatMap((set) => set.bases));
     assert.equal(covered.size, content.bases.length);
   });
