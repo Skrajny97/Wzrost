@@ -1,0 +1,14 @@
+{
+  "id": "training-yard-3-wide-white",
+  "tool": "pixellab inpaint-v3",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, the same training yard as in the picture, completed out to its ends where the mask is: the top of the back stone tower with its crenellations, the left and the right corner towers of the tall crenellated grey stone walls, the near corner tower and the near walls down to their foot on the ground, the dark green treetops behind the back walls, the same stone, earth, timber, colours, outlines and pixel style as in the picture, so that the whole yard is inside the picture with a plain background around it, nothing else around it, no people and no figures",
+  "style": "src/client/art/camp/quarters-3.png",
+  "input": "art/inputs/fortress/training-yard-3-wide-white.png",
+  "mask": "art/inputs/fortress/training-yard-3-wide-mask.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}
