@@ -3072,6 +3072,8 @@ Autor: „579 A” i „581 B”.
 1. **Plansza Warowni (579 A).** Po przemianie plansza wydłuża się w dół o dwa pasy, jak przy Osadzie o jeden, a 7 nowych miejsc stoi w dwóch rzędach w obrębie murów. Na telefonie planszę trzeba będzie przewinąć.
 2. **Wyglądy budynków Warowni (581 B).** Każdy budynek ma trzy wyglądy jak w obozie: na poziomy 1–3, 4–7 i 8–10. Zbrojownia ma dwa poziomy, więc dwa wyglądy, a Strażnica pięć poziomów: wygląd na poziomy 1–2, 3–4 i 5.
 3. **Który wygląd wybrał autor (brakujący szczegół).** Wybrany szkic (578) to pierwszy wygląd. Kolejne rysuje PixelLab w tym samym stylu, większe i bogatsze, i trafiają do autora do oceny jeden po drugim.
+4. **Dalsze wyglądy w PixelLab (brakujący szczegół).** Każdy z 13 dalszych wyglądów (Plac treningowy, Sala trofeów, Strażnica, Ołtarz Systemu, Szklarnia i Kapliczka po dwa, Zbrojownia jeden) PixelLab rysuje z opisu i z wybranym pierwszym wyglądem jako wzorem (`art/references/fortress/<id>-1.png`), żeby został ten sam kamień, belki, dach i kolory. Opisy są w `fortress` w `art/prompts.json`, jako `<id>-2` i `<id>-3`.
+5. **Plac treningowy bez bryły (brakujący szczegół).** Wybrany szkic 578.1 C stał na grubym płacie ziemi z brzegiem z boków. Budynki obozu stoją wprost na ziemi, więc brzeg jest ścięty: zostaje płaski plac z cienkim konturem.
 
 ## Tier V w grze (4.11.2026, w grze od 0.1.31)
 
