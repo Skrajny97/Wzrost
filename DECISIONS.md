@@ -3048,6 +3048,19 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Sortowanie w plecaku (4.11.2026, w grze od 0.1.38)
+
+Autor: „dodaj tez jakas opcje sortowania w plecaku”.
+
+1. **Przedmioty.** Nad przedmiotami stoi „Sortuj:” z czterema przyciskami: „Najnowsze” (jak dotąd, najnowsze na początku), „Rzadkość” (najrzadsze na początku, przy równej rzadkości wyższy poziom), „Poziom” (najwyższy na początku) i „Rodzaj” (po miejscu na postaci, jak w ekwipunku: głowa, amulet, zbroja… i najrzadsze w każdym).
+2. **Materiały.** Nad materiałami: „Kolejność” (jak dotąd: od pospolitych, po nazwie), „Rzadkość” (najrzadsze na początku) i „Liczba” (najwięcej sztuk na początku).
+3. **Zapamiętane (brakujący szczegół).** Wybór każdej zakładki zostaje na urządzeniu, także po zamknięciu gry. Zioła i mikstury stoją dalej przed przedmiotami.
+4. Rząd sortowania pokazuje się, gdy w zakładce są co najmniej dwie rzeczy. Części i minerały zostają w swojej kolejności.
+
+## Wersja 0.1.38 (4.11.2026)
+
+1. **Sortowanie w plecaku** (zob. wyżej).
+
 ## Linki admina w czacie (4.11.2026, w grze od 0.1.37)
 
 Autor: „Daj mi - adminowi możliwość dawania linków w czacie” oraz „i żebym mógł gdzies taki link podpisać jako Changelog - 1 na przykład i zeby to byl hiperlink”.

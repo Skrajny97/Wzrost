@@ -71,6 +71,45 @@ let gearHidden = false;
 // no room in it. Remembered while the page is open too.
 let bagTab = 'items';
 
+// How the bag's items and materials are sorted (the author: "dodaj tez
+// jakas opcje sortowania w plecaku"), each tab its own choice, kept on the
+// device: in the order the game gives them (items the newest first,
+// materials by rarity and name), the rarest first, the highest level first,
+// by the gear's slot, or the most pieces first.
+const BAG_SORTS = {
+  items: [
+    { id: 'order', label: 'Najnowsze' },
+    { id: 'rarity', label: 'Rzadkość' },
+    { id: 'level', label: 'Poziom' },
+    { id: 'slot', label: 'Rodzaj' },
+  ],
+  materials: [
+    { id: 'order', label: 'Kolejność' },
+    { id: 'rarity', label: 'Rzadkość' },
+    { id: 'count', label: 'Liczba' },
+  ],
+};
+const BAG_SORT_KEY = 'insight-bag-sort';
+let bagSorts = { items: 'order', materials: 'order' };
+try {
+  bagSorts = { ...bagSorts, ...JSON.parse(localStorage.getItem(BAG_SORT_KEY) ?? '{}') };
+} catch {
+  // Without storage the bag keeps the game's order.
+}
+function sortBag(kind, list) {
+  const sort = bagSorts[kind];
+  if (!BAG_SORTS[kind].some((one) => one.id === sort) || sort === 'order') return list;
+  const rarity = (entry) => state.content.rarities.findIndex((one) => one.id === entry.rarity);
+  const slot = (item) => state.content.slots.findIndex((one) => one.id === item.slot);
+  const by = {
+    rarity: (a, b) => rarity(b) - rarity(a) || (b.level ?? 0) - (a.level ?? 0),
+    level: (a, b) => b.level - a.level || rarity(b) - rarity(a),
+    slot: (a, b) => slot(a) - slot(b) || rarity(b) - rarity(a) || b.level - a.level,
+    count: (a, b) => b.count - a.count || rarity(b) - rarity(a),
+  }[sort];
+  return [...list].sort(by);
+}
+
 // A material's name as a title, from the Stół rozbiórki's module (trade.js
 // takes it from here).
 export { materialTitle };
@@ -234,7 +273,12 @@ export function mountCharacter(container) {
     const minerals = state.character.minerals ?? [];
     const mineralCount = minerals.reduce((sum, mineral) => sum + mineral.count, 0);
     const showMinerals = mineralCount > 0 || Boolean(state.character.professions?.mining);
-    const grids = { items: () => itemsGrid(bag), materials: () => materialsGrid(materials), parts: () => partsGrid(parts), minerals: () => mineralsGrid(minerals) };
+    const grids = {
+      items: () => [bag.length > 1 && sortRow('items'), itemsGrid(sortBag('items', bag))],
+      materials: () => [materials.length > 1 && sortRow('materials'), materialsGrid(sortBag('materials', materials))],
+      parts: () => partsGrid(parts),
+      minerals: () => mineralsGrid(minerals),
+    };
     return h(
       'section',
       { class: 'bag', 'aria-labelledby': 'bag-title' },
@@ -253,6 +297,40 @@ export function mountCharacter(container) {
         showMinerals && tab('minerals', mineralCount > 0 ? `Minerały (${formatNumber(mineralCount)})` : 'Minerały'),
       ),
       (grids[bagTab === 'minerals' && !showMinerals ? 'items' : bagTab] ?? grids.items)(),
+    );
+  }
+
+  // "Sortuj:" over a tab's grid: the game's own buttons, the choice kept on
+  // the device.
+  function sortRow(kind) {
+    return h(
+      'div',
+      { class: 'bag-sort' },
+      h('span', { class: 'bag-sort-label', text: 'Sortuj:' }),
+      h(
+        'div',
+        { class: `segmented bag-sort-options bag-sort-options--${BAG_SORTS[kind].length}`, role: 'group', 'aria-label': 'Sortowanie plecaka' },
+        BAG_SORTS[kind].map((one) =>
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'segmented-option',
+              'aria-pressed': bagSorts[kind] === one.id,
+              onClick: () => {
+                bagSorts = { ...bagSorts, [kind]: one.id };
+                try {
+                  localStorage.setItem(BAG_SORT_KEY, JSON.stringify(bagSorts));
+                } catch {
+                  // Kept while the page is open.
+                }
+                render();
+              },
+            },
+            one.label,
+          ),
+        ),
+      ),
     );
   }
 

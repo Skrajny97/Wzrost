@@ -414,6 +414,40 @@ button {
   letter-spacing: 0.04em;
 }
 
+/* "Sortuj:" over the bag's items or materials, its options in one row. */
+.bag-sort {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+}
+
+.bag-sort-label {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.bag-sort-options {
+  flex: 1;
+  min-width: 0;
+}
+
+.bag-sort-options--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.bag-sort-options--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.bag-sort-options .segmented-option {
+  min-height: 34px;
+  padding: 0 2px;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
 /* The Bestiariusz on an inner region's card, with its chest beside it (the
    quests' chest, styled for the dark card), and its list. */
 .bestiary-row {
