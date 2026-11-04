@@ -27,7 +27,7 @@ import { mountGuildTrials } from '../guild-trials.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, state } from '../state.js';
-import { confirmAction, framedName, guildTag, toast, withButton } from '../ui.js';
+import { confirmAction, foldPart, framedName, guildTag, toast, withButton } from '../ui.js';
 import { lockedScreen } from './locked.js';
 
 const PAGE = '#/gildia';
@@ -283,7 +283,8 @@ function mountGuild(container) {
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'guild-invite-title' },
-      h('h2', { class: 'card-title', id: 'guild-invite-title', text: 'Zaproś do gildii' }),
+      foldPart(
+        { key: 'guild-invite', title: 'Zaproś do gildii', card: true, id: 'guild-invite-title', open: false },
       h('p', { class: 'muted', text: 'Poniżej możesz zaprosić kogoś z listy znajomych lub dodać kogokolwiek ręcznie spoza niej.' }),
       friends.length > 0 &&
         h(
@@ -307,6 +308,7 @@ function mountGuild(container) {
         name,
         send,
       ),
+      ),
     );
   }
 
@@ -316,13 +318,15 @@ function mountGuild(container) {
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'guild-sent-title' },
-      h('h2', { class: 'card-title', id: 'guild-sent-title', text: 'Wysłane zaproszenia' }),
+      foldPart(
+        { key: 'guild-sent', title: `Wysłane zaproszenia (${guild.invited.length})`, card: true, id: 'guild-sent-title', open: false },
       h(
         'ul',
         { class: 'friends-list' },
         guild.invited.map((one) =>
           h('li', { class: 'friend' }, who(one), guild.role !== 'member' && h('div', { class: 'friend-actions' }, button('Cofnij', act('/api/guild/cancel', { characterId: one.id }, 'Zaproszenie cofnięte.')))),
         ),
+      ),
       ),
     );
   }

@@ -19,7 +19,7 @@ import { checkGuildTodo } from './chat-news.js';
 import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber, plural } from './format.js';
 import { call, onCharacterChange, state } from './state.js';
-import { howItWorks, openSheet, toast, withButton } from './ui.js';
+import { foldPart, howItWorks, openSheet, toast, withButton } from './ui.js';
 import { itemSheet } from './screens/character.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
@@ -225,16 +225,16 @@ export function mountGuildBeast(container) {
     );
   }
 
-  // The "Wkład tygodnia": who hit the beast, how much and how often.
+  // The "Wkład tygodnia": who hit the beast, how much and how often, folded
+  // under the number of them once someone has.
   function contributionPart() {
     const { contribution, own, texts } = view;
     const [one, few, many] = texts.attackForms;
-    return [
-      h('h3', { class: 'guild-beast-subtitle', text: texts.contribution }),
+    if (contribution.length === 0) return [h('h3', { class: 'guild-beast-subtitle', text: texts.contribution }), h('p', { class: 'muted', text: texts.noHits })];
+    return foldPart(
+      { key: 'guild-beast-contribution', title: texts.contribution, line: filled(texts.contributionLine, { count: formatNumber(contribution.length) }), open: false },
       own.hits > 0 && h('p', { class: 'guild-beast-own', text: filled(texts.own, { damage: formatNumber(own.damage) }) }),
-      contribution.length === 0
-        ? h('p', { class: 'muted', text: texts.noHits })
-        : h(
+      h(
             'ol',
             { class: 'guild-beast-ranking' },
             contribution.map((entry) =>
@@ -246,7 +246,7 @@ export function mountGuildBeast(container) {
               ),
             ),
           ),
-    ];
+    );
   }
 
   function render() {

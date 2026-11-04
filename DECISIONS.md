@@ -3034,6 +3034,26 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.50 (4.11.2026)
+
+1. **Zwijane części Gildii** (zob. niżej).
+2. **Wpis „Co nowego?” do zatwierdzenia:** szkic 0.1.50 w `data/news.json`.
+
+## Zwijane części Gildii (4.11.2026, w grze od 0.1.50)
+
+Autor: „W gildii też trzeba przepatrzec i pokminic nad GUI zeby dalo sie zwijać chociazby tablica prób i pewnie inne opcje, spróbuj to ogarnąć”.
+
+1. **Zwijana część (`foldPart` w `src/client/ui.js`).** Ma tytuł ze strzałką ▾ albo ▴, a pod nim kilka słów o tym, co jest w środku. Telefon pamięta, czy gracz ją zwinął. Bez zapamiętanego wyboru otwiera się tak, jak podaje lista niżej (brakujący szczegół).
+2. **Próby:**
+    - **Tablica prób** jest otwarta i zostaje na samej górze, jak chciał autor. Pod tytułem: „Do wzięcia: 9.”, a z wziętą próbą „Twoja próba: 0 z 8.”. Kropka świeci, gdy nie ma wziętej próby, a jest co wziąć.
+    - **Progi i skrzynie** pod paskiem gildii są zwinięte. Pasek zostaje na wierzchu, a pod tytułem widać następny próg. Gdy czeka skrzynia do otwarcia, część rozwija się sama i ma kropkę.
+    - **Wkład tygodnia** jest zwinięty, z liczbą członków z wykonaną próbą.
+3. **Bestia:** Wkład tygodnia jest zwinięty, z liczbą atakujących.
+4. **Prośby:** prośby członków są otwarte, z liczbą do spełnienia. Dobroczyńcy tygodnia są zwinięci, z ich liczbą.
+5. **Wymiana:** oferty członków są otwarte, z ich liczbą.
+6. **Gildia:** „Zaproś do gildii” i „Wysłane zaproszenia” są zwinięte. Lista członków była zwinięta już wcześniej.
+7. **Puste listy** się nie zwijają: zostaje tytuł i zdanie, że nic tam nie ma.
+
 ## Wersja 0.1.49 (4.11.2026)
 
 1. **Warownia w grze** (zob. „Warownia: mechanika” i „Plansza Warowni w grze”): przemiana Obozu przy Kamieniu węgielnym, kamienne mury i siedem nowych budynków. Przełącznik `FORTRESS` jest włączony.
@@ -3055,7 +3075,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 ## Uwagi autora z wieczoru 4.11.2026 (na później)
 
 1. **Budynki zasobów do 20. poziomu.** Autor: „Dodajmy też możliwość rozwijania budynków od zasobów do 20ego w Warowni z jedną jeszcze przemianą na 20tym. W przyszłości ten warunek i wszystko wymaksowane pozwoli zmienić Warownię w coś jeszcze większego”. Szczegóły (które budynki, koszty i czasy poziomów 11–20, czwarty wygląd na 20. poziomie) pójdą do autora jako pytania.
-2. **Trudniej, ale z umiarem.** Gracz na 33. poziomie napisał na czacie, że wyprawy w najtrudniejsze miejsce na najdłuższy czas zawsze się udają i nie przegrał żadnej walki. Autor: „utrudniamy, nie przesadzamy, ale utrudniamy”. Najpierw symulacja walk na poziomach ok. 25–50, potem umiarkowanie silniejsze stwory, bez zmian na samym początku gry.
+2. **Trudniej, ale z umiarem.** Gracz na 33. poziomie napisał na czacie, że wyprawy w najtrudniejsze miejsce na najdłuższy czas zawsze się udają i nie przegrał żadnej walki. Autor: „utrudniamy, nie przesadzamy, ale utrudniamy”, potem „robimy mid-high dla casuali trudność od zera przeglądając i mid dla graczy” i „Chcemy tez utrudnić niżej poniżej 30 lvlu”. Krzywa idzie do przejrzenia od pierwszego poziomu: średnio-wysoka trudność dla grających od czasu do czasu, średnia dla grających dużo i dobrze wyposażonych. Liczby z symulacji walk idą do autora jako pytanie przed zmianą w grze.
+3. **Próby gildii.** Gracz napisał, że jego gildia miała już w środę 95 wykonanych prób przy ostatnim progu 56: „tu też coś musicie przemyśleć”. Propozycja wyższych progów albo dalszych nagród pójdzie do autora jako pytanie.
+4. **„Włamanie” na wyższe wyprawy.** Gracz chce wyruszać tam, gdzie poziom jeszcze nie pozwala. Autor: „to włamanie ciekawa myśl”. Propozycja pójdzie do autora jako pytanie.
+5. **Poszukiwani.** Gracz zaproponował w Osadzie zakładkę z listami gończymi za elitarnymi stworami i wyjętymi spod prawa. Autor: „kolejny ciekawy pomysł w stylu "Wanted dead or alive" po polsku”. Propozycja pójdzie do autora jako pytanie.
 
 ## Warownia: mechanika (4.11.2026, w grze od 0.1.49)
 

@@ -19,7 +19,7 @@ import { dateTimeFormat, formatNumber, plural } from './format.js';
 import { CLASS_ICONS } from './icons.js';
 import { openProfile } from './profile.js';
 import { call, state } from './state.js';
-import { closeSheet, confirmAction, howItWorks, openSheet, toast, withButton } from './ui.js';
+import { closeSheet, confirmAction, foldPart, howItWorks, openSheet, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 const KINDS = ['material', 'herb', 'potion', 'mineral'];
@@ -349,14 +349,18 @@ export function mountGuildRequests(container) {
     );
   }
 
+  // The members' requests, folded under their number once there are some.
   function othersPart() {
     const { requests, texts } = view;
     const others = requests.filter((request) => !request.own);
+    if (others.length === 0) return h('div', { class: 'guild-part' }, subtitle(texts.others), h('p', { class: 'muted', text: texts.empty }));
     return h(
       'div',
       { class: 'guild-part' },
-      subtitle(texts.others),
-      others.length === 0 ? h('p', { class: 'muted', text: texts.empty }) : h('ul', { class: 'guild-requests-list' }, others.map(requestRow)),
+      foldPart(
+        { key: 'guild-requests-others', title: texts.others, line: filled(texts.othersLine, { count: formatNumber(others.length) }) },
+        h('ul', { class: 'guild-requests-list' }, others.map(requestRow)),
+      ),
     );
   }
 
@@ -364,14 +368,14 @@ export function mountGuildRequests(container) {
   // thanks they brought.
   function rankingPart() {
     const { ranking, texts } = view;
+    if (ranking.length === 0) return h('div', { class: 'guild-part' }, subtitle(texts.rankingTitle), h('p', { class: 'muted', text: texts.ranking }), h('p', { class: 'muted', text: texts.rankingEmpty }));
     return h(
       'div',
       { class: 'guild-part' },
-      subtitle(texts.rankingTitle),
-      h('p', { class: 'muted', text: texts.ranking }),
-      ranking.length === 0
-        ? h('p', { class: 'muted', text: texts.rankingEmpty })
-        : h(
+      foldPart(
+        { key: 'guild-requests-ranking', title: texts.rankingTitle, line: filled(texts.rankingLine, { count: formatNumber(ranking.length) }), open: false },
+        h('p', { class: 'muted', text: texts.ranking }),
+        h(
             'ol',
             { class: 'guild-ranking' },
             ranking.map((one) =>
@@ -383,6 +387,7 @@ export function mountGuildRequests(container) {
               ),
             ),
           ),
+      ),
     );
   }
 

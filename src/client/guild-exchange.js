@@ -21,7 +21,7 @@ import { dateTimeFormat, formatNumber } from './format.js';
 import { CLASS_ICONS } from './icons.js';
 import { openProfile } from './profile.js';
 import { call, state } from './state.js';
-import { closeSheet, confirmAction, framedName, howItWorks, openSheet, toast, withButton } from './ui.js';
+import { closeSheet, confirmAction, foldPart, framedName, howItWorks, openSheet, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 const resourceName = (id) => state.content.resources.find((resource) => resource.id === id)?.name ?? id;
@@ -258,14 +258,18 @@ export function mountGuildExchange(container) {
     return h('li', { class: 'guild-request guild-offer' }, h('div', { class: 'guild-request-head' }, who(offer.poster)), deal(offer, texts.gives, texts.wants), foot);
   }
 
+  // The members' offers, folded under their number once there are some.
   function othersPart() {
     const { offers, texts } = view;
     const others = offers.filter((offer) => !offer.own);
+    if (others.length === 0) return h('div', { class: 'guild-part' }, subtitle(texts.others), h('p', { class: 'muted', text: texts.empty }));
     return h(
       'div',
       { class: 'guild-part' },
-      subtitle(texts.others),
-      others.length === 0 ? h('p', { class: 'muted', text: texts.empty }) : h('ul', { class: 'guild-requests-list' }, others.map(offerRow)),
+      foldPart(
+        { key: 'guild-exchange-others', title: texts.others, line: filled(texts.othersLine, { count: formatNumber(others.length) }) },
+        h('ul', { class: 'guild-requests-list' }, others.map(offerRow)),
+      ),
     );
   }
 

@@ -16,7 +16,7 @@ import { fill, h, icon } from './dom.js';
 import { formatNumber, plural } from './format.js';
 import { SYSTEM_POINTS_ICON } from './icons.js';
 import { call } from './state.js';
-import { confirmAction, howItWorks, toast, withButton } from './ui.js';
+import { confirmAction, foldPart, howItWorks, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 
@@ -125,10 +125,13 @@ export function mountGuildTrials(container) {
     );
   }
 
-  // The guild's bar of the week, its thresholds with their chests.
+  // The guild's bar of the week, its thresholds with their chests folded
+  // under it: open while a chest waits to be opened, else as left.
   function barPart() {
     const { bar, texts } = view;
     const top = bar.thresholds.at(-1).need;
+    const next = bar.thresholds.find((threshold) => !threshold.reached);
+    const ready = bar.thresholds.some((threshold) => threshold.ready);
     return h(
       'div',
       { class: 'guild-part' },
@@ -141,10 +144,20 @@ export function mountGuildTrials(container) {
         kind: 'xp',
         marks: bar.thresholds.slice(0, -1).map((threshold) => threshold.need),
       }),
-      h(
-        'ol',
-        { class: 'guild-thresholds' },
-        bar.thresholds.map((threshold) => thresholdRow(bar, threshold)),
+      foldPart(
+        {
+          key: 'guild-trials-rewards',
+          title: texts.rewards,
+          line: next ? filled(texts.rewardsNext, { need: trials(next.need) }) : texts.rewardsAll,
+          open: false,
+          force: ready,
+          dot: ready,
+        },
+        h(
+          'ol',
+          { class: 'guild-thresholds' },
+          bar.thresholds.map((threshold) => thresholdRow(bar, threshold)),
+        ),
       ),
       !bar.contributed && h('p', { class: 'muted', text: texts.contribute }),
     );
@@ -206,14 +219,22 @@ export function mountGuildTrials(container) {
     });
   }
 
+  // The board folds under its title (the author: „zeby dalo sie zwijać
+  // chociazby tablica prób”), which says what is left to take or how far
+  // the taken trial is.
   function boardPart() {
     const { trials: board, taken, texts } = view;
+    const free = board.filter((trial) => trial.state === 'open').length;
+    const line = taken
+      ? filled(texts.boardTaken, { progress: formatNumber(taken.progress), count: formatNumber(taken.count) })
+      : filled(texts.boardOpen, { count: formatNumber(free) });
     return h(
       'div',
       { class: 'guild-part guild-board' },
-      subtitle(texts.board),
-      taken && h('p', { class: 'muted', text: texts.busy }),
-      h(
+      foldPart(
+        { key: 'guild-trials-board', title: texts.board, line, dot: !taken && free > 0 },
+        taken && h('p', { class: 'muted', text: texts.busy }),
+        h(
         'ul',
         { class: 'guild-trials-list' },
         board.map((trial) =>
@@ -244,20 +265,21 @@ export function mountGuildTrials(container) {
           ),
         ),
       ),
+      ),
     );
   }
 
   // The "Wkład tygodnia": who finished how many trials, the part over the
-  // cap marked.
+  // cap marked, folded under the number of them.
   function membersPart() {
     const { members, texts } = view;
+    if (members.length === 0) return h('div', { class: 'guild-part' }, subtitle(texts.members), h('p', { class: 'muted', text: texts.empty }));
     return h(
       'div',
       { class: 'guild-part' },
-      subtitle(texts.members),
-      members.length === 0
-        ? h('p', { class: 'muted', text: texts.empty })
-        : h(
+      foldPart(
+        { key: 'guild-trials-members', title: texts.members, line: filled(texts.membersLine, { count: formatNumber(members.length) }), open: false },
+        h(
             'ol',
             { class: 'guild-ranking' },
             members.map((member) =>
@@ -269,6 +291,7 @@ export function mountGuildTrials(container) {
               ),
             ),
           ),
+      ),
     );
   }
 

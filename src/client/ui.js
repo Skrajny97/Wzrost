@@ -30,6 +30,48 @@ export function howItWorks(lead, rest, { system = false } = {}) {
   );
 }
 
+// A part of a screen that folds under its title (the author, 4.11.2026: „W
+// gildii [...] zeby dalo sie zwijać chociazby tablica prób i pewnie inne
+// opcje”): its title with ▾ or ▴, under it `line`, a few words of what lies
+// inside, and `dot` when something there waits to be done. It opens as the
+// player left it last on this device (`key`), else as `open` says; `force`
+// opens it whatever was left, while something in it must be done. `card`
+// gives the title a card's heading (with `id` for its label).
+const FOLD_KEY = 'insight-fold-';
+export function foldPart({ key, title, line = null, open = true, force = false, dot = false, card = false, id = null, className = '' }, ...children) {
+  let left = null;
+  try {
+    left = localStorage.getItem(FOLD_KEY + key);
+  } catch {
+    // As `open` says, then.
+  }
+  const fold = h('details', { class: `fold-part${className ? ` ${className}` : ''}`, open: force || (left === null ? open : left === '1') });
+  const summary = h(
+    'summary',
+    {
+      class: 'fold-part-summary',
+      // Only the player's own taps are kept, not an opening forced by `force`.
+      onClick: () => {
+        try {
+          localStorage.setItem(FOLD_KEY + key, fold.open ? '0' : '1');
+        } catch {
+          // Kept while the page is open.
+        }
+      },
+    },
+    h(
+      'span',
+      { class: 'fold-part-head' },
+      card ? h('h2', { class: 'card-title', id, text: title }) : h('span', { class: 'fold-part-title', id, text: title }),
+      h('span', { class: 'fold-part-marker', 'aria-hidden': 'true' }),
+      dot && h('span', { class: 'fold-part-dot', role: 'img', 'aria-label': 'do zrobienia' }),
+    ),
+    line && h('span', { class: 'fold-part-line', text: line }),
+  );
+  fold.append(summary, ...children.flat().filter(Boolean));
+  return fold;
+}
+
 // A text's first sentence and the rest, for howItWorks.
 export function splitLead(text) {
   const cut = text.indexOf('. ');

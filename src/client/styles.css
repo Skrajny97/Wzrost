@@ -6841,6 +6841,63 @@ a.camp-level-button {
   font-size: 14px;
 }
 
+/* A part that folds under its title (ui.js: foldPart): the title as the
+   part's own heading with ▾ or ▴, a line of what lies inside under it. */
+.fold-part-summary {
+  display: grid;
+  gap: 2px;
+  padding: 4px 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.fold-part-summary::-webkit-details-marker {
+  display: none;
+}
+
+.fold-part-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fold-part-title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.fold-part-summary .card-title {
+  margin: 0;
+}
+
+.fold-part-marker::before {
+  content: '▾';
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.fold-part[open] > .fold-part-summary .fold-part-marker::before {
+  content: '▴';
+}
+
+.fold-part-line {
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.fold-part[open] > .fold-part-summary {
+  margin-bottom: 8px;
+}
+
+.fold-part-dot {
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--gold, #e0b84c);
+}
+
 /* The guild's members, folded under their count (screens/guild.js). */
 .guild-members-toggle {
   padding: 6px 0;
