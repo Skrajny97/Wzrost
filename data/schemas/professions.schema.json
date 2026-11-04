@@ -478,6 +478,7 @@
         "partsLevelStep",
         "upgrades",
         "scroll",
+        "steadyScroll",
         "exchange",
         "chancePerLevel",
         "maxChance",
@@ -639,6 +640,21 @@
           "additionalProperties": false,
           "required": ["id", "name", "level", "part", "parts", "minutes", "description"],
           "description": "Zwój ochronny do Kowadła: od poziomu profesji level, z parts sztuk części part, minutes minut na sztukę na 1. poziomie (maleje z poziomem jak wyrób). Zawsze się udaje.",
+          "properties": {
+            "id": { "type": "string", "minLength": 1 },
+            "name": { "type": "string", "minLength": 1 },
+            "level": { "type": "integer", "minimum": 1 },
+            "part": { "type": "string", "minLength": 1 },
+            "parts": { "type": "integer", "minimum": 1 },
+            "minutes": { "type": "number", "exclusiveMinimum": 0 },
+            "description": { "type": "string", "minLength": 1 }
+          }
+        },
+        "steadyScroll": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "name", "level", "part", "parts", "minutes", "description"],
+          "description": "Zwój utrwalenia do Kowadła (autor 4.11.2026, 599 B): po nieudanej próbie przedmiot nie traci poziomu ulepszenia. Od poziomu profesji level, z parts sztuk części part, minutes minut na sztukę na 1. poziomie, jak Zwój ochronny.",
           "properties": {
             "id": { "type": "string", "minLength": 1 },
             "name": { "type": "string", "minLength": 1 },

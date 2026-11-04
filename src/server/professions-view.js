@@ -360,8 +360,21 @@ function workshopView(level, row) {
   const hint = (from) => say(workshop.texts, 'hidden', 0, { level: from });
   const bases = craftableBases(content);
   const learned = JSON.parse(row.patterns ?? '[]');
-  const { scroll } = workshop;
-  const scrollPart = content.partsById[scroll.part];
+  // A scroll for the Kowadło as the Warsztat shows it: what one takes, its
+  // minutes and those the character has, or the level it opens at.
+  const scrollView = (scroll, owned) => {
+    const part = content.partsById[scroll.part];
+    return {
+      id: scroll.id,
+      name: scroll.name,
+      description: scroll.description,
+      level: scroll.level,
+      owned,
+      ...(scroll.level <= level
+        ? { part: { id: part.id, name: part.name }, parts: scroll.parts, minutes: scrollMinutes(level, content, faster, scroll) }
+        : { hidden: true, hint: hint(scroll.level) }),
+    };
+  };
   return {
     professionId: workshop.profession,
     place: workshop.place,
@@ -376,16 +389,9 @@ function workshopView(level, row) {
       ...workshop.exchange,
       parts: content.parts.map((part) => ({ id: part.id, from: partSource(part.id, content)?.partId })).filter((part) => part.from),
     },
-    scroll: {
-      id: scroll.id,
-      name: scroll.name,
-      description: scroll.description,
-      level: scroll.level,
-      owned: row.scrolls,
-      ...(scroll.level <= level
-        ? { part: { id: scrollPart.id, name: scrollPart.name }, parts: scroll.parts, minutes: scrollMinutes(level, content, faster) }
-        : { hidden: true, hint: hint(scroll.level) }),
-    },
+    scroll: scrollView(workshop.scroll, row.scrolls),
+    // The Zwój utrwalenia (the author's of 4.11.2026, 599 B).
+    steadyScroll: scrollView(workshop.steadyScroll, row.steady_scrolls ?? 0),
     // The slots in the order of the parts they take, the weapon first.
     slots: Object.keys(workshop.parts)
       .map((id) => content.slotsById[id])

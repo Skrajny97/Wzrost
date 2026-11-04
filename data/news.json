@@ -30,6 +30,11 @@
       "id": "0.1.43",
       "title": "Wersja 0.1.43",
       "body": "- Nowości z gry pokazują się teraz w okienku „Co nowego?” po wejściu do gry, każda raz.\n- Ikona zwoju w górnym pasku, obok Ustawień, otwiera także wcześniejsze wpisy."
+    },
+    {
+      "id": "0.1.44",
+      "title": "Wersja 0.1.44",
+      "body": "- Nowy Zwój utrwalenia: gdy ulepszenie na Kowadle się nie uda, przedmiot nie traci poziomu. Działa od +1 i można go użyć razem ze Zwojem ochronnym.\n- Kowal w Kuźni sprzedaje Zwój utrwalenia za 1000 złota, a Zwój ochronny za 2000 złota. Oba są tańsze z Bractwem Kowali.\n- W Warsztacie Zwój utrwalenia powstaje od 10. poziomu Rzemieślnictwa: 5 Okuć i 30 minut.\n- Oba zwoje mają ikony."
     }
   ]
 }

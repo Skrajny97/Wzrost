@@ -31,8 +31,9 @@ import { requireOpen, settlementOf, settlementView } from './settlement.js';
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 const forge = () => content.settlement.forge;
 
-// The Zwoje bought today, as kept in the Osada's JSON.
-const boughtToday = (stored, now) => (stored.forge?.day === questPeriod('daily', now, content).key ? stored.forge.scrolls : 0);
+// The Zwoje bought today, as kept in the Osada's JSON: the Zwoje ochronne,
+// or with `steady` the Zwoje utrwalenia.
+const boughtToday = (stored, now, steady = false) => (stored.forge?.day === questPeriod('daily', now, content).key ? (stored.forge[steady ? 'steady' : 'scrolls'] ?? 0) : 0);
 
 // The Osada after a trade at the Kuźnia, as the other places answer.
 function osada(after, now) {
@@ -52,6 +53,12 @@ export function forgeView(player, stored, now) {
   const day = questPeriod('daily', now, content).key;
   return {
     scroll: { price: scrollPrice(reputation, content), daily: forge().scroll.daily, left: Math.max(0, forge().scroll.daily - boughtToday(stored, now)), have: row.scrolls ?? 0 },
+    steadyScroll: {
+      price: scrollPrice(reputation, content, 'steadyScroll'),
+      daily: forge().steadyScroll.daily,
+      left: Math.max(0, forge().steadyScroll.daily - boughtToday(stored, now, true)),
+      have: row.steady_scrolls ?? 0,
+    },
     topName: content.raritiesById[forgeTopRarity(relation, content)].name,
     // Whether a better relation lets him go no higher.
     best: forgeTopRarity(relation, content) === forge().topRarity.at(-1),
@@ -86,28 +93,35 @@ function grown(stored, gold, level, now) {
   return { points, next: { ...stored, relations: add(stored.relations, forge().resident), reputation: add(stored.reputation, forge().brotherhood), forgeTrade: trade } };
 }
 
-// POST /api/settlement/forge/scrolls { count }: Zwoje ochronne, a few a day.
+// POST /api/settlement/forge/scrolls { count, kind }: Zwoje ochronne, or
+// with `kind` "steady" Zwoje utrwalenia, a few of each a day.
 export async function buyScrolls(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
   const stored = settlementOf(row);
-  const left = forge().scroll.daily - boughtToday(stored, context.now);
+  const steady = body.kind === 'steady';
+  const kind = steady ? 'steadyScroll' : 'scroll';
+  const left = forge()[kind].daily - boughtToday(stored, context.now, steady);
   if (!Number.isInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Podaj, ile zwojów kupić.');
   if (body.count > left) throw new ApiError(409, 'sold_out', left > 0 ? `Dziś kowal sprzeda jeszcze ${left}.` : 'Na dziś kowal nie ma już zwojów. Wróć jutro.');
   const reputation = stored.reputation?.[forge().brotherhood] ?? 0;
-  const gold = scrollPrice(reputation, content) * body.count;
+  const gold = scrollPrice(reputation, content, kind) * body.count;
   if (row.gold < gold) throw new ApiError(409, 'no_gold', 'Brakuje złota.');
   const { points, next } = grown(stored, gold, row.level, context.now);
   const day = questPeriod('daily', context.now, content).key;
-  const saved = { ...next, forge: { day, scrolls: boughtToday(stored, context.now) + body.count } };
-  const result = await context.env.DB.prepare('UPDATE characters SET gold = gold - ?, scrolls = scrolls + ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?')
+  // Today's count of each kind, the other kept as it was.
+  const counts = { scrolls: boughtToday(stored, context.now), steady: boughtToday(stored, context.now, true) };
+  counts[steady ? 'steady' : 'scrolls'] += body.count;
+  const saved = { ...next, forge: { day, ...counts } };
+  const column = steady ? 'steady_scrolls' : 'scrolls';
+  const result = await context.env.DB.prepare(`UPDATE characters SET gold = gold - ?, ${column} = ${column} + ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?`)
     .bind(gold, body.count, JSON.stringify(saved), row.id, row.version, gold)
     .run();
   if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(context.env.DB, session.userId);
-  return json({ bought: { count: body.count, gold, points }, settlement: osada(after, context.now), character: characterView(after, context.now) });
+  return json({ bought: { count: body.count, gold, points, kind: steady ? 'steady' : 'ward' }, settlement: osada(after, context.now), character: characterView(after, context.now) });
 }
 
 // POST /api/settlement/forge/raise { itemId }: one rarity up, once per item,

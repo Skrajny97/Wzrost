@@ -271,10 +271,11 @@ export const SPRITES = {
   // The coin of gold and the hourglass of Punkty Czasu where their line icons
   // stood, and the Encyclopedia's corner of the top bar, 32×32. Punkty
   // Systemu keep their line icon (the author: "tylko Punkty Systemu będą w
-  // takiej wyróżniającej formie jak do tej pory").
+  // takiej wyróżniającej formie jak do tej pory"). The Kowadło's two
+  // scrolls, the Zwój ochronny and the Zwój utrwalenia (598 C).
   icons: {
     size: 32,
-    ids: ['gold', 'time-points', 'encyclopedia'],
+    ids: ['gold', 'time-points', 'encyclopedia', 'ward-scroll', 'steady-scroll'],
   },
   // The professions' squares on the Profesje tab, 48×48.
   professions: {
@@ -499,6 +500,8 @@ function iconArt(id, size, fallback) {
 export const goldArt = (size) => iconArt('gold', size, 'coin');
 export const timePointsArt = (size) => iconArt('time-points', size, 'hourglass');
 export const encyclopediaArt = (size) => iconArt('encyclopedia', size, 'book');
+// A scroll of the Kowadło by its id (ward-scroll, steady-scroll).
+export const scrollArt = (id, size) => iconArt(id, size, 'scroll');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
 // The figure of an event and the address of its scene, or null while there
 // is none.

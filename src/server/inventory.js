@@ -217,6 +217,9 @@ export function upgradePlan(player, item, body, now) {
   // `ward`: a Zwój ochronny on the Kowadło, only where the item may break.
   const warded = body.ward === true && view.next.breakChance > 0;
   if (warded && player.row.scrolls < 1) throw new ApiError(409, 'no_scroll', 'Nie masz Zwoju ochronnego. Zrobisz go w Systemowym Warsztacie.');
+  // `steady`: a Zwój utrwalenia, only where a failure would take a level.
+  const steady = body.steady === true && view.level > 0;
+  if (steady && (player.row.steady_scrolls ?? 0) < 1) throw new ApiError(409, 'no_steady_scroll', 'Nie masz Zwoju utrwalenia. Zrobisz go w Systemowym Warsztacie albo kupisz u kowala w Kuźni.');
   const need = view.next.materials;
   const materials = JSON.parse(player.row.materials ?? '{}');
   const taken = need ? piecesOfRarity(materials, need, content) : {};
@@ -224,20 +227,20 @@ export function upgradePlan(player, item, body, now) {
     const short = need.count - heldOfRarity(materials, need.rarity, content);
     throw new ApiError(409, 'no_material', `Brakuje ${short} szt. materiałów tej samej rzadkości co przedmiot (${content.raritiesById[need.rarity].name}).`);
   }
-  return { view, cost, warded, taken };
+  return { view, cost, warded, steady, taken };
 }
 
 // A try's payment (upgradePlan) as the characters row's SQL: gold, iron ore,
 // the scroll and the materials go (`set`, with its `binds`), and `enough`
 // holds (with `enoughBinds`) while they are all there.
-export function upgradePayment({ cost, warded, taken }) {
+export function upgradePayment({ cost, warded, steady = false, taken }) {
   const ore = '$."iron-ore"';
   const materials = takenOff('materials', taken);
   return {
-    set: `gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?), scrolls = scrolls - ?, materials = ${materials.sql}`,
-    binds: [cost.gold, ore, ore, cost['iron-ore'], warded ? 1 : 0, ...materials.binds],
-    enough: `gold >= ? AND COALESCE(json_extract(resources, ?), 0) >= ? AND scrolls >= ? AND ${materials.enough}`,
-    enoughBinds: [cost.gold, ore, cost['iron-ore'], warded ? 1 : 0, ...materials.enoughBinds],
+    set: `gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?), scrolls = scrolls - ?, steady_scrolls = steady_scrolls - ?, materials = ${materials.sql}`,
+    binds: [cost.gold, ore, ore, cost['iron-ore'], warded ? 1 : 0, steady ? 1 : 0, ...materials.binds],
+    enough: `gold >= ? AND COALESCE(json_extract(resources, ?), 0) >= ? AND scrolls >= ? AND steady_scrolls >= ? AND ${materials.enough}`,
+    enoughBinds: [cost.gold, ore, cost['iron-ore'], warded ? 1 : 0, steady ? 1 : 0, ...materials.enoughBinds],
   };
 }
 
@@ -252,12 +255,12 @@ export async function upgradeItem(context) {
   requireUnworn(player, item, context.now);
   const body = context.request.headers.get('Content-Type') ? await readJson(context.request) : {};
   const plan = upgradePlan(player, item, body, context.now);
-  const { view, cost, warded, taken } = plan;
+  const { view, cost, warded, steady, taken } = plan;
   const row = player.row;
   const pay = upgradePayment(plan);
 
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const outcome = rollUpgrade(item, createRng(roll), content, { warded });
+  const outcome = rollUpgrade(item, createRng(roll), content, { warded, steady });
   const db = context.env.DB;
   // The item changes only if it is as seen here (its level and last roll) and
   // the price (and the scroll) is still there; the payment only if this roll
@@ -301,6 +304,8 @@ export async function upgradeItem(context) {
       ...(Object.keys(taken).length > 0 && { materials: taken }),
       ...(warded && { warded: true }),
       ...(outcome.saved && { saved: true }),
+      ...(steady && { steadied: true }),
+      ...(outcome.kept && { kept: true }),
     },
     character: characterView(await loadPlayer(db, session.userId), context.now),
   });

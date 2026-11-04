@@ -168,7 +168,16 @@
       "part": "shards",
       "parts": 2,
       "minutes": 60,
-      "description": "Zwój Systemu do Kowadła. Przy ulepszaniu od +7 wzwyż chroni przedmiot przed rozpadem, ale nie przed spadkiem ulepszenia."
+      "description": "Zwój Systemu do Kowadła. Przy ulepszaniu od +7 wzwyż chroni przedmiot przed rozpadem, ale nie przed spadkiem ulepszenia: przed nim chroni Zwój utrwalenia."
+    },
+    "steadyScroll": {
+      "id": "steady-scroll",
+      "name": "Zwój utrwalenia",
+      "level": 10,
+      "part": "fittings",
+      "parts": 5,
+      "minutes": 30,
+      "description": "Zwój Systemu do Kowadła. Gdy próba ulepszenia się nie uda, przedmiot nie traci poziomu ulepszenia. Przed rozpadem nie chroni: to robi Zwój ochronny."
     },
     "exchange": {
       "title": "Wymiana części",

@@ -63,7 +63,7 @@ export async function startCrafting(context) {
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > workshop.maxCount) {
     throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${workshop.maxCount} sztuk.`);
   }
-  const order = body.scroll === true ? scrollOrder(player.row, level, body.count) : itemOrder(player.row, level, body);
+  const order = body.scroll === true || body.scroll === 'steady' ? scrollOrder(player.row, level, body.count, body.scroll === 'steady') : itemOrder(player.row, level, body);
   const { cost } = order;
 
   const now = context.now;
@@ -165,15 +165,17 @@ function itemOrder(row, level, body) {
   };
 }
 
-// An order of Zwoje ochronne, from the scroll's level of the profession.
-function scrollOrder(row, level, count) {
-  const { scroll, texts } = content.workshop;
+// An order of Zwoje ochronne, or with `steady` of Zwoje utrwalenia, from the
+// scroll's level of the profession.
+function scrollOrder(row, level, count, steady = false) {
+  const { texts } = content.workshop;
+  const scroll = steady ? content.workshop.steadyScroll : content.workshop.scroll;
   if (level < scroll.level) throw new ApiError(403, 'locked', say(texts, 'hidden', 0, { level: scroll.level }));
   return {
-    cost: { ...scrollCost(count, content), resources: {} },
-    minutes: scrollOrderMinutes(count, level, content, perkOf(row, 'workshopFaster')),
+    cost: { ...scrollCost(count, content, scroll), resources: {} },
+    minutes: scrollOrderMinutes(count, level, content, perkOf(row, 'workshopFaster'), scroll),
     room: false,
-    options: { scroll: true },
+    options: { scroll: steady ? 'steady' : true },
   };
 }
 
@@ -193,8 +195,10 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
   const before = professionState(JSON.parse(row.professions ?? '{}'), profession.id);
   const options = JSON.parse(activity.options ?? '{}');
   const { scroll } = options;
+  // The scroll's column: the Zwoje utrwalenia's for an order of them.
+  const scrolls = scroll === 'steady' ? 'steady_scrolls' : 'scrolls';
   // A base the data no longer has makes nothing.
-  const base = scroll ? workshop.scroll : content.basesById[options.base];
+  const base = scroll ? (scroll === 'steady' ? workshop.steadyScroll : workshop.scroll) : content.basesById[options.base];
   const count = base ? options.count : 0;
   const elapsed = now - activity.started_at;
   const done = stop ? potionsDone(count, activity.minutes, elapsed) : count;
@@ -278,7 +282,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
       trimReports(db, row.id, 'items'),
       db
         .prepare(
-          `UPDATE characters SET quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${back.map((each) => each.sql).join('')}${scroll ? ', scrolls = scrolls + ?' : ''}, version = version + 1
+          `UPDATE characters SET quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${back.map((each) => each.sql).join('')}${scroll ? `, ${scrolls} = ${scrolls} + ?` : ''}, version = version + 1
            WHERE id = ? AND ${ongoing}`,
         )
         .bind(row.quests, quests, ...sets.binds, ...back.flatMap((each) => each.binds), ...(scroll ? [done] : []), row.id, row.id, activity.started_at),

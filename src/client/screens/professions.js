@@ -15,7 +15,7 @@
 // tab, which works beside the character in its own card. Locked, or hidden
 // in this deployment, the tab says so as before.
 
-import { goldArt, herbSprite, itemSprite, mineralSprite, placeArt, potionSprite, professionSprite } from '../art.js';
+import { goldArt, herbSprite, itemSprite, mineralSprite, placeArt, potionSprite, professionSprite, scrollArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatDecimal, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -422,6 +422,7 @@ export function mountProfessions(container, { params, navigate }) {
             levelCard(profession, 'wyrobu'),
             anyFree(character) && craftForm(character, workshop),
             anyFree(character) && scrollForm(character, workshop),
+            anyFree(character) && workshop.steadyScroll && scrollForm(character, workshop, 'steadyScroll'),
           ],
     );
   }
@@ -1318,18 +1319,20 @@ export function mountProfessions(container, { params, navigate }) {
     toast(`Wymieniono ${formatNumber(exchanged.given)} × ${name(exchanged.from)} na ${formatNumber(exchanged.count)} × ${name(exchanged.partId)}.`);
   }
 
-  // The Zwoje ochronne for the Kowadło: what they do and how many the
+  // A scroll for the Kowadło, the Zwoje ochronne or with `which`
+  // "steadyScroll" the Zwoje utrwalenia: what they do and how many the
   // character has, then, from the scroll's level, how many to make from the
   // parts there are, with their time, and the start; before it, the level
   // the System shows them at.
-  function scrollForm(character, workshop) {
-    const { scroll } = workshop;
+  function scrollForm(character, workshop, which = 'scroll') {
+    const scroll = workshop[which];
+    const titleId = `${scroll.id}-title`;
     const head = [
-      h('h2', { class: 'section-title', id: 'scroll-title', text: scroll.name }),
+      h('h2', { class: 'section-title forge-scroll-title', id: titleId }, scrollArt(scroll.id, 32), scroll.name),
       h('p', { class: 'muted', text: scroll.description }),
       h('p', { class: 'herb-estimate', text: `Masz: ${countOf(scroll.owned, 'zwój', 'zwoje', 'zwojów')}.` }),
     ];
-    const card = (...children) => h('section', { class: 'card gather-card', 'aria-labelledby': 'scroll-title' }, head, children);
+    const card = (...children) => h('section', { class: 'card gather-card', 'aria-labelledby': titleId }, head, children);
     if (scroll.hidden) return card(h('p', { class: 'system-hint', text: scroll.hint }));
     const have = character.crafting.parts.find((part) => part.id === scroll.part.id)?.count ?? 0;
     const most = Math.min(workshop.maxCount, Math.floor(have / scroll.parts));
@@ -1378,7 +1381,7 @@ export function mountProfessions(container, { params, navigate }) {
       text: 'Zrób zwoje',
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
-          await call('POST', '/api/professions/craft', { scroll: true, count, ...who.body() });
+          await call('POST', '/api/professions/craft', { scroll: which === 'steadyScroll' ? 'steady' : true, count, ...who.body() });
           window.scrollTo(0, 0);
         }),
     });

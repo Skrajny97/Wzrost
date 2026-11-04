@@ -874,7 +874,9 @@ function activityPlace(activity, level) {
   }
   if (activity.kind === 'items') {
     const { base: baseId, rarity, count, scroll } = JSON.parse(activity.options ?? '{}');
-    const base = scroll ? content.workshop.scroll : content.basesById[baseId];
+    // A scroll order names its scroll: the Zwój ochronny, or the Zwój
+    // utrwalenia for one of "steady".
+    const base = scroll ? (scroll === 'steady' ? content.workshop.steadyScroll : content.workshop.scroll) : content.basesById[baseId];
     return {
       profession: content.workshop.profession,
       placeName: content.workshop.place.name,
@@ -1135,6 +1137,7 @@ export function characterView(player, now) {
     crafting: craftingView(row, levels, now),
     // The Zwoje ochronne made in the Warsztat for the Kowadło.
     scrolls: row.scrolls,
+    steadyScrolls: row.steady_scrolls ?? 0,
     // The creatures met in fights, by id: the others are shadows on the
     // lists of an inner region's dangers.
     met: JSON.parse(row.met ?? '[]'),

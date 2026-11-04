@@ -9,7 +9,7 @@
 // Where the deployment has no Osada yet, or the character is below its
 // level, the tab says so as the other locked modules do.
 
-import { placeArt, resourceArt, residentBust, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
+import { placeArt, resourceArt, residentBust, scrollArt, settlementGround, settlementPlaceArt, settlementTorchArt } from '../art.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatCountdown, formatDecimal, formatHours, formatMinutes, formatNumber, saleGold, tradePace } from '../format.js';
@@ -900,13 +900,28 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
-  // The Kuźnia's Zwoje ochronne: as many as today's left and the gold allow.
-  function scrollSheet() {
-    const { scroll } = data.forge;
+  // The Kuźnia's two scrolls for the Kowadło: the Zwój ochronny (`scroll`)
+  // and the Zwój utrwalenia (`steadyScroll`, the author's of 4.11.2026), each
+  // with its plural name, the words of its card and its icon.
+  const SCROLLS = {
+    scroll: { kind: 'ward', icon: 'ward-scroll', name: 'Zwój ochronny', plural: 'Zwoje ochronne', does: 'Zwój ochronny chroni przedmiot przed rozpadem na Kowadle.' },
+    steadyScroll: {
+      kind: 'steady',
+      icon: 'steady-scroll',
+      name: 'Zwój utrwalenia',
+      plural: 'Zwoje utrwalenia',
+      does: 'Zwój utrwalenia chroni przed spadkiem ulepszenia na Kowadle: po nieudanej próbie przedmiot zostaje na swoim poziomie.',
+    },
+  };
+
+  // A scroll of the Kuźnia: as many as today's left and the gold allow.
+  function scrollSheet(which = 'scroll') {
+    const scroll = data.forge[which];
+    const words = SCROLLS[which];
     const most = Math.min(scroll.left, Math.floor(state.character.gold / scroll.price));
     const field = numberField('forge-scroll-count', 'Ile zwojów', 1, 1, Math.max(1, most));
     openSheet(
-      h('h2', { class: 'sheet-title', text: 'Zwoje ochronne' }),
+      h('h2', { class: 'sheet-title forge-scroll-title' }, scrollArt(words.icon, 32), words.plural),
       h('p', { class: 'sheet-text', text: `${formatNumber(scroll.price)} zł. za sztukę. Możesz kupić najwyżej ${formatNumber(most)}: tyle kowal ma dziś dla Ciebie i na tyle starczy złota.` }),
       field.element,
       h(
@@ -919,11 +934,11 @@ export function mountSettlement(container, { params = {} } = {}) {
           text: 'Kup',
           onClick: (event) =>
             withButton(event.currentTarget, async () => {
-              const answer = await call('POST', '/api/settlement/forge/scrolls', { count: field.read() });
+              const answer = await call('POST', '/api/settlement/forge/scrolls', { count: field.read(), kind: words.kind });
               closeSheet();
               apply(answer);
               const { count, gold, points } = answer.bought;
-              toast(`Kupione: Zwój ochronny ×${formatNumber(count)} za ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z Żelisławem i reputacja Bractwa Kowali +${points}.` : ''}`);
+              toast(`Kupione: ${words.name} ×${formatNumber(count)} za ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z Żelisławem i reputacja Bractwa Kowali +${points}.` : ''}`);
             }),
         }),
       ),
@@ -1018,28 +1033,36 @@ export function mountSettlement(container, { params = {} } = {}) {
   // Bractwo Kowali's reputation lowers his gold prices (the author: "Kowal i
   // to i rzadkość, niech to Bractwo ma zastosowanie jakieś").
   function forgeCard() {
-    const { scroll, topName, best, discount, trade, items } = data.forge;
-    const most = Math.min(scroll.left, Math.floor(state.character.gold / scroll.price));
+    const { topName, best, discount, trade, items } = data.forge;
     const raisable = items.some((item) => item.gold !== undefined);
-    return h(
-      'div',
-      { class: 'stack' },
-      h(
+    // A scroll's card; the Zwój utrwalenia's waits for a Kuźnia that sells it.
+    const scrollCard = (which, guide) => {
+      const scroll = data.forge[which];
+      if (!scroll) return null;
+      const words = SCROLLS[which];
+      const most = Math.min(scroll.left, Math.floor(state.character.gold / scroll.price));
+      return h(
         'section',
-        { class: 'card stack', 'data-guide': 'forge-scrolls' },
-        h('h2', { class: 'section-title', text: 'Zwoje ochronne' }),
+        { class: 'card stack', ...(guide && { 'data-guide': guide }) },
+        h('h2', { class: 'section-title forge-scroll-title' }, scrollArt(words.icon, 32), words.plural),
         h('p', {
           class: 'muted',
-          text: `Zwój ochronny chroni przedmiot przed rozpadem na Kowadle. ${formatNumber(scroll.price)} zł. za sztukę. Dziś kowal sprzeda jeszcze ${scroll.left} z ${scroll.daily}. Masz: ${formatNumber(scroll.have)}.`,
+          text: `${words.does} ${formatNumber(scroll.price)} zł. za sztukę. Dziś kowal sprzeda jeszcze ${scroll.left} z ${scroll.daily}. Masz: ${formatNumber(scroll.have)}.`,
         }),
         h('button', {
           type: 'button',
           class: 'button button--world',
           text: scroll.left === 0 ? 'Na dziś koniec zwojów' : most < 1 ? 'Brakuje złota' : 'Kup zwoje',
           disabled: most < 1,
-          onClick: scrollSheet,
+          onClick: () => scrollSheet(which),
         }),
-      ),
+      );
+    };
+    return h(
+      'div',
+      { class: 'stack' },
+      scrollCard('scroll', 'forge-scrolls'),
+      scrollCard('steadyScroll'),
       h(
         'section',
         { class: 'card stack', 'data-guide': 'forge-raise' },

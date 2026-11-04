@@ -337,10 +337,13 @@ export function breakChance(current, content) {
 // the payment and one level (none below +0), and from breakFrom on may break
 // the item instead. `warded`: a Zwój ochronny from the Warsztat lies on the
 // Kowadło, and a break is a failure (`saved`), with its lost level too.
-export function rollUpgrade(item, rng, content, { warded = false } = {}) {
+// `steady`: a Zwój utrwalenia lies there, and a failure keeps the level
+// (`kept`; the author's of 4.11.2026). The draws are the same either way.
+export function rollUpgrade(item, rng, content, { warded = false, steady = false } = {}) {
   const current = item.upgrade ?? 0;
   if (rng.chance(upgradeChance(current + 1, content))) return { result: 'success', upgrade: current + 1 };
-  const failure = { result: 'failure', upgrade: Math.max(0, current - 1) };
+  const kept = steady && current > 0;
+  const failure = { result: 'failure', upgrade: kept ? current : Math.max(0, current - 1), ...(kept && { kept: true }) };
   if (rng.chance(breakChance(current, content))) return warded ? { ...failure, saved: true } : { result: 'broken', upgrade: current };
   return failure;
 }

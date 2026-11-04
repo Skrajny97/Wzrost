@@ -30,8 +30,9 @@ export function forgeDiscount(reputation, content) {
   return discounts[Math.min(standingOf(reputation, content).index, discounts.length - 1)];
 }
 
-// A Zwój ochronny's price at the Bractwo's reputation.
-export const scrollPrice = (reputation, content) => Math.round(content.settlement.forge.scroll.gold * (1 - forgeDiscount(reputation, content)));
+// A scroll's price at the Bractwo's reputation: the Zwój ochronny's, or with
+// `kind` "steadyScroll" the Zwój utrwalenia's.
+export const scrollPrice = (reputation, content, kind = 'scroll') => Math.round(content.settlement.forge[kind].gold * (1 - forgeDiscount(reputation, content)));
 
 // What raising `item` takes, or why it cannot be raised: `reason` is
 // "raised" (once per item), "top" (no rarity above) or "relation" (above

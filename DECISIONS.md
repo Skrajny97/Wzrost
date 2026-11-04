@@ -3048,6 +3048,30 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Zwój utrwalenia i nowe ceny zwojów (4.11.2026, w grze od 0.1.44)
+
+Według odpowiedzi autora z 4.11.2026 (ceny zwojów, Warsztat od 10. poziomu profesji, 598 C i 599 B, zob. „Odpowiedzi autora 587 A, 597 A i o zwojach”):
+
+1. **Zwój utrwalenia.** Gdy próba ulepszenia na Kowadle się nie uda, przedmiot zostaje na swoim poziomie, zamiast spaść o jeden. Przed rozpadem nie chroni: to robi Zwój ochronny. Opisy obu zwojów mówią o tym nawzajem (`workshop.scroll` i `workshop.steadyScroll` w `data/professions.json`).
+2. **Oba zwoje naraz.** Na jedną próbę można położyć oba zwoje. Wtedy przedmiot ani się nie rozpada, ani nie traci poziomu: rozpad zamienia się w nieudaną próbę, a ta nie zabiera poziomu. Szansa powodzenia jest z zwojami i bez nich ta sama (to samo losowanie).
+3. **Kiedy działa.** Pole „Użyj Zwoju utrwalenia” stoi na Kowadle od +1, bo na +0 nieudana próba nic nie zabiera. Zwój przepada przy każdej próbie, na której leży, także udanej, tak jak Zwój ochronny. Działa także przy ulepszaniu przedmiotów towarzyszy. Kto nie ma zwoju, widzi na Kowadle, skąd go wziąć: z Warsztatu (od 10. poziomu Rzemieślnictwa) albo od kowala w Kuźni.
+4. **Kuźnia w Osadzie.** Kowal sprzedaje Zwój ochronny za 2000 złota (wcześniej 1000) i Zwój utrwalenia za 1000 złota, każdy do 3 sztuk dziennie, osobno. Oba tanieją z poważaniem Bractwa Kowali, tak jak dotąd Zwój ochronny: do 20% przy najwyższym stopniu (`forge.scroll`, `forge.steadyScroll` i `forge.discount` w `data/settlement.json`).
+5. **Warsztat (599 B).** Zwój utrwalenia powstaje od 10. poziomu Rzemieślnictwa z 5 Okuć, w 30 minut za sztukę. Z wyższym poziomem profesji i z korzyścią Bractwa Kowali powstaje szybciej, tak jak Zwój ochronny. Zwój ochronny w Warsztacie się nie zmienia: od 25. poziomu, 2 Odłamki i 60 minut.
+6. **Kowal i narrator.** Opis Żelisława w Kuźni wymienia teraz oba zwoje. Kwestia narratora o zwojach w Kuźni („Żelisław sprzedaje Zwoje ochronne, najwyżej trzy dziennie…”) zostaje bez zmian, bo jest nagrana. Nowa wersja z oboma zwojami czeka na zgodę autora (pytanie 601).
+7. **Ikony (598 C).** Oba zwoje mają ikony z PixelLab, w stylu materiałów: zwinięty poziomo zwój z pieczęcią i wstążkami. Zwój ochronny ma niebieską pieczęć i czerwone wstążki, a Zwój utrwalenia złotą pieczęć i złote wstążki (`src/client/art/icons/ward-scroll.png` i `steady-scroll.png`). Ikony stoją w Kuźni, w Warsztacie i przy polach zwojów na Kowadle.
+
+## Wersja 0.1.44 (4.11.2026)
+
+1. **Zwój utrwalenia i nowe ceny zwojów** (zob. wyżej).
+2. **Kwestia o Kole Fortuny** w nowym brzmieniu (587 A), wersja A (603 A).
+3. **Wpis „Co nowego?” do zatwierdzenia:** szkic 0.1.44 w `data/news.json`.
+
+## Odpowiedzi autora 602 i 603 oraz uwaga o rozbiórce biżuterii (4.11.2026)
+
+1. **603 A.** Do gry trafia wersja A kwestii o Kole Fortuny (od 0.1.44). Nagrania czytały po tekście „ [pauses] Tak.”, bo z samym `[pauses]` obie wersje z 16:03 kończyły się na ostatnim słowie, bez wybrzmienia. Słowo po pauzie jest odcięte: plik kończy się 0,3 s po tym, jak wygasa głos ostatniego słowa („przegranej”), przed słowem po pauzie (`ending` w `audio/prompts.json`).
+2. **602.** Autor: „przyjrzyj się tym planszom i zobacz, że są poucinane i mury i wszystko, musisz to albo ręcznie przerobić albo dac lepsze konkretne prompty dla PixelLab, bo jest tragedia”. Żadna z dwóch wersji nie wchodzi. Plansza Warowni powstanie od nowa z osobnych części narysowanych w PixelLab: muru tej samej grubości na każdym boku, wież w czterech rogach i bram u góry i u dołu, złożonych w kodzie na trawie dziedzińca.
+3. **Rozbiórka biżuterii.** Autor: „Niech wisiory amulety pierscienie itd. dają też z rozbiórki bardziej rzeczy do Jubilerstwa niż do Rzemieślnictwa.” Czeka na kolejny etap.
+
 ## „Co nowego?”: odpowiedź autora 595 i budowa (4.11.2026, w grze od 0.1.43)
 
 Autor: „595 A”, a potem: „595 A -> priorytet i daj mi changelogi od 0.1.39”.

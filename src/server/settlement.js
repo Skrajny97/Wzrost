@@ -1002,7 +1002,7 @@ export async function upgradeCompanionItem(context) {
   const plan = upgradePlan(player, item, body, context.now);
   const pay = upgradePayment(plan);
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const outcome = rollUpgrade(item, createRng(roll), content, { warded: plan.warded });
+  const outcome = rollUpgrade(item, createRng(roll), content, { warded: plan.warded, steady: plan.steady });
   const next = { ...stored, companions: hired.map((one) => (one === companion ? upgradedOnCompanion(one, body.slot, outcome, roll) : one)) };
   const saved = JSON.stringify(next);
   const db = context.env.DB;
@@ -1033,6 +1033,8 @@ export async function upgradeCompanionItem(context) {
       ...(Object.keys(plan.taken).length > 0 && { materials: plan.taken }),
       ...(plan.warded && { warded: true }),
       ...(outcome.saved && { saved: true }),
+      ...(plan.steady && { steadied: true }),
+      ...(outcome.kept && { kept: true }),
     },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),

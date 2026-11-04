@@ -3,7 +3,7 @@
 // The item card also upgrades the item on the camp's Kowadło and takes a bag
 // item apart on the Stół rozbiórki.
 
-import { herbSprite, itemSprite, materialSprite, mineralSprite, potionSprite, resourceArt } from '../art.js';
+import { herbSprite, itemSprite, materialSprite, mineralSprite, potionSprite, resourceArt, scrollArt } from '../art.js';
 import { bonusList } from '../bonuses.js';
 import { characterLook, portraitLayers } from '../cosmetics.js';
 import { MATERIALS_HINT, materialIcon, materialSheet, materialTitle } from '../craft-table.js';
@@ -1084,32 +1084,49 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
       h('span', { text: `Materiały (${rarityName})` }),
       h('strong', { text: `${formatNumber(need.have)} / ${formatNumber(need.count)}` }),
     );
-  // The scroll only where the item may break; the box starts empty, so a
-  // scroll goes only when the player says so.
+  // The Zwój ochronny only where the item may break, and the Zwój
+  // utrwalenia only where a failure would take a level (the author's of
+  // 4.11.2026); the boxes start empty, so a scroll goes only when the player
+  // says so.
   const scrolls = state.character.scrolls ?? 0;
   const ward =
     next.breakChance > 0 && scrolls > 0 ? h('input', { type: 'checkbox', class: 'avoid-rare-box', id: `ward-${item.id}`, 'aria-describedby': `ward-note-${item.id}` }) : null;
+  const steadyScrolls = state.character.steadyScrolls ?? 0;
+  const steady =
+    anvil.level > 0 && steadyScrolls > 0 ? h('input', { type: 'checkbox', class: 'avoid-rare-box', id: `steady-${item.id}`, 'aria-describedby': `steady-note-${item.id}` }) : null;
+  const failed = (done) => {
+    if (done.saved && done.kept) return `Nie udało się, ale zwoje uchroniły przedmiot: ${done.name} zostaje na +${done.to}.`;
+    if (done.saved) return `Nie udało się: ${done.name} spada do +${done.to}. Zwój ochronny uchronił przedmiot przed rozpadem.`;
+    if (done.kept) return `Nie udało się, ale Zwój utrwalenia utrzymał ${done.name} na +${done.to}.`;
+    return done.to < done.from ? `Nie udało się: ${done.name} spada do +${done.to}.` : `Nie udało się: ${done.name} zostaje na +0.`;
+  };
   const upgrade = (event) =>
     withButton(event.currentTarget, async () => {
-      const answer = await send({ ward: Boolean(ward?.checked) });
+      const answer = await send({ ward: Boolean(ward?.checked), steady: Boolean(steady?.checked) });
       const done = answer.upgrade;
       if (done.result === 'success') {
         playSound('done');
         toast(`Udało się: ${done.name} +${done.to}.`);
       } else {
         playSound('defeat');
-        toast(
-          done.result === 'broken'
-            ? `Przedmiot rozpadł się na kowadle: ${done.name} +${done.from}.`
-            : done.saved
-              ? `Nie udało się: ${done.name} spada do +${done.to}. Zwój ochronny uchronił przedmiot przed rozpadem.`
-              : done.to < done.from
-                ? `Nie udało się: ${done.name} spada do +${done.to}.`
-                : `Nie udało się: ${done.name} zostaje na +0.`,
-        );
+        toast(done.result === 'broken' ? `Przedmiot rozpadł się na kowadle: ${done.name} +${done.from}.` : failed(done));
       }
       reopen(done, answer);
     });
+  // Where a scroll comes from: the Systemowy Warsztat (from the level of the
+  // profession the scroll opens at), and the smith in the Osada's Kuźnia
+  // (326 A).
+  const where = (name, does, scroll) => {
+    const workshop = scroll?.hidden ? `w Systemowym Warsztacie od ${scroll.level}. poziomu Rzemieślnictwa` : 'w Systemowym Warsztacie';
+    return `${name} ${does} ${
+      !state.character.settlementOpen
+        ? `Zrobisz go ${workshop}.`
+        : state.character.professions?.workshop
+          ? `Zrobisz go ${workshop} albo kupisz u kowala w Kuźni w Osadzie.`
+          : 'Kupisz go u kowala w Kuźni w Osadzie.'
+    }`;
+  };
+  const canGet = Boolean(state.character.professions?.workshop || state.character.settlementOpen);
   const step = h('p', { class: 'anvil-step', tabindex: '-1', text: `Ulepszenie +${anvil.level} → +${next.level}` });
   const full = h(
     'div',
@@ -1144,24 +1161,24 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
         'label',
         { class: 'avoid-rare', for: `ward-${item.id}` },
         ward,
+        scrollArt('ward-scroll', 24),
         h('span', { text: `Użyj Zwoju ochronnego (masz ${formatNumber(scrolls)})` }),
       ),
     ward && h('p', { class: 'muted', id: `ward-note-${item.id}`, text: 'Zwój chroni przed rozpadem, ale nie przed spadkiem ulepszenia. Przepada przy tej próbie.' }),
-    // Where a Zwój ochronny comes from: the Systemowy Warsztat, and the
-    // smith in the Osada's Kuźnia (326 A).
-    next.breakChance > 0 &&
-      !ward &&
-      (state.character.professions?.workshop || state.character.settlementOpen) &&
-      h('p', {
-        class: 'system-hint',
-        text: `Zwój ochronny chroni przed rozpadem na Kowadle. ${
-          !state.character.settlementOpen
-            ? 'Zrobisz go w Systemowym Warsztacie.'
-            : state.character.professions?.workshop
-              ? 'Zrobisz go w Systemowym Warsztacie albo kupisz u kowala w Kuźni w Osadzie.'
-              : 'Kupisz go u kowala w Kuźni w Osadzie.'
-        }`,
-      }),
+    steady &&
+      h(
+        'label',
+        { class: 'avoid-rare', for: `steady-${item.id}` },
+        steady,
+        scrollArt('steady-scroll', 24),
+        h('span', { text: `Użyj Zwoju utrwalenia (masz ${formatNumber(steadyScrolls)})` }),
+      ),
+    steady && h('p', { class: 'muted', id: `steady-note-${item.id}`, text: 'Po nieudanej próbie przedmiot zostaje na swoim poziomie. Zwój przepada przy tej próbie.' }),
+    next.breakChance > 0 && !ward && canGet && h('p', { class: 'system-hint', text: where('Zwój ochronny', 'chroni przed rozpadem na Kowadle.', state.character.professions?.workshop?.scroll) }),
+    anvil.level > 0 &&
+      !steady &&
+      canGet &&
+      h('p', { class: 'system-hint', text: where('Zwój utrwalenia', 'chroni przed spadkiem ulepszenia na Kowadle.', state.character.professions?.workshop?.steadyScroll) }),
     h('button', {
       type: 'button',
       class: 'button button--system',

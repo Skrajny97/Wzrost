@@ -76,10 +76,11 @@ const wholeMinutes = (minutes) => Math.ceil(Math.round(minutes * 1000) / 1000);
 // An order of `count` items in whole minutes.
 export const orderMinutes = (count, rarityId, level, content, faster = 0) => wholeMinutes(count * itemMinutes(rarityId, level, content, faster));
 
-// The minutes of one Zwój ochronny at a level, and of an order of `count`,
-// as faster with the Bractwo Kowali as the items.
-export const scrollMinutes = (level, content, faster = 0) => content.workshop.scroll.minutes * pace(level, content) * (1 - faster);
-export const scrollOrderMinutes = (count, level, content, faster = 0) => wholeMinutes(count * scrollMinutes(level, content, faster));
+// The minutes of one scroll for the Kowadło at a level, and of an order of
+// `count`, as faster with the Bractwo Kowali as the items: the Zwój
+// ochronny, or the one given (`scroll`, e.g. the Zwój utrwalenia).
+export const scrollMinutes = (level, content, faster = 0, scroll = content.workshop.scroll) => scroll.minutes * pace(level, content) * (1 - faster);
+export const scrollOrderMinutes = (count, level, content, faster = 0, scroll = content.workshop.scroll) => wholeMinutes(count * scrollMinutes(level, content, faster, scroll));
 
 // The parts one item of a base takes at an item level: those of its slot and
 // one more for every partsLevelStep levels, so the parts for an item always
@@ -113,8 +114,9 @@ export function metNames(met, content) {
   return names.length > 0 ? { affixNames: { prefix: names.filter((name) => name.prefix), suffix: names } } : null;
 }
 
-// What Zwoje ochronne take: the scroll's parts for each.
-export const scrollCost = (count, content) => ({ parts: { [content.workshop.scroll.part]: content.workshop.scroll.parts * count } });
+// What scrolls take: the scroll's parts for each, the Zwój ochronny's or
+// the given one's.
+export const scrollCost = (count, content, scroll = content.workshop.scroll) => ({ parts: { [scroll.part]: scroll.parts * count } });
 
 // The parts' exchange (`exchange` of workshop): `rate` parts of a rarity
 // for one of the next, at once and without the character's work (the
