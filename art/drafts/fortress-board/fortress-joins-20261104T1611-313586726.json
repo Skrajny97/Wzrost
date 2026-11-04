@@ -1,0 +1,14 @@
+{
+  "id": "fortress-joins",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above at a slight angle, a thick wall of grey hewn stone blocks with crenellated battlements runs straight down where the mask is, the same wall as above and below it, joined seamlessly into one continuous wall, no wooden posts, no gaps, no steps, the same green grass on the inner side and the same dark green trees on the outer side, no buildings, no people",
+  "style": null,
+  "input": "art/inputs/fortress-board/joins.png",
+  "mask": "art/inputs/fortress-board/joins-mask.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 25
+  },
+  "images": 1
+}
