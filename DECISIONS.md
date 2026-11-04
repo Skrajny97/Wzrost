@@ -3048,6 +3048,34 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Nagrody za nowy stopień Bractwa (4.11.2026, w grze od 0.1.47)
+
+Odpowiedzi autora 593 A i B (zob. „Korzyści Bractw: odpowiedzi autora 589–593”).
+
+1. **Raz za każdy stopień, w każdym Bractwie osobno.** Za wejście na stopień Znajomy, Stały klient, Zaufany i Przyjaciel przychodzi nagroda. Odbiera się ją przyciskiem „Odbierz” w panelu „Akceptacja Bractw” na planszy Osady.
+    - **Stopnie sprzed 0.1.47 (brakujący szczegół)** też dają nagrody, wszystkie naraz przy pierwszym „Odbierz”.
+2. **Punkty Systemu (593 A):** 1 / 2 / 3 / 5, czyli 11 w każdym Bractwie i 44 za wszystkie cztery.
+3. **Upominek Bractwa (593 B)** z jego towaru, wart ok. 400 / 1000 / 2000 / 5000 złota (brakujący szczegół, liczby w `standingRewards` w `data/settlement.json`):
+    - **Zielarze:** po 15 / 25 / 20 / 20 sztuk każdego zioła, które stopień dokłada na półkę Jagny. Za stopień Znajomy to Babka i Dziurawiec.
+    - **Kowale:** 10 Rzemieni, 10 Okuć, 10 Odłamków i 14 Bursztynów.
+    - **Łowcy:** po 2 / 2 / 4 / 5 sztuk trzech najrzadszych materiałów, które stopień dokłada na półkę Wszebora.
+    - **Kupcy:** 400 / 1000 / 2000 / 5000 złota.
+4. **Zioła w plecaku.** Zioła z upominku zajmują miejsce w plecaku, jak kupione u Jagny. Gdy się nie mieszczą, nagroda czeka, aż zrobi się miejsce. Encyklopedia nie liczy ziół ani materiałów z upominku jako własnych znalezisk.
+5. **Kropka.** Czekająca nagroda zapala kropkę na zakładce Osady, a zwinięty panel „Akceptacja Bractw” pokazuje „Nagroda czeka”.
+6. **Każda postać osobno,** bo reputację w Osadzie ma postać, nie konto.
+
+## Odpowiedzi autora 606 i 607 (4.11.2026)
+
+1. **606 A.** Autor: „606 teraz jest dobrze, plansza warowni git”. Zatwierdzona plansza Warowni to `art/fortress/board.png` (320 × 729). Wejdzie do gry razem z Warownią.
+    - **Z czego.** Plansza powstaje w `tools/fortress-board-walls.py`. U góry i u dołu stoi zatwierdzony górny mur z PixelLab z dwiema wieżami i bramą. Boczne mury tej samej grubości są złożone z kamieni szczytu tej samej wieży, bo PixelLab rysował boczny mur tylko konturem. Trawa dziedzińca pochodzi z planszy 602 A (`art/inputs/fortress-board/court.png`).
+2. **607 A.** Od 0.1.47 w grze jest wersja A kwestii o zwojach w Kuźni, w nowym brzmieniu (601 B): „Żelisław sprzedaje dwa rodzaje zwojów, każdego najwyżej trzy dziennie. Zwój ochronny chroni przedmiot przed rozpadem na Kowadle, a Zwój utrwalenia przed spadkiem ulepszenia.”
+
+## Wersja 0.1.47 (4.11.2026)
+
+1. **Nagrody za nowy stopień Bractwa** (zob. wyżej).
+2. **Kwestia o zwojach w Kuźni** w nowym brzmieniu, wersja A (607 A).
+3. **Wpis „Co nowego?” do zatwierdzenia:** szkic 0.1.47 w `data/news.json`.
+
 ## Korzyści Zielarzy i Łowców (4.11.2026, w grze od 0.1.46)
 
 Odpowiedzi autora 589 i 591 (zob. „Korzyści Bractw: odpowiedzi autora 589–593”), liczby według stopni Znajomy / Stały klient / Zaufany / Przyjaciel:
@@ -3093,7 +3121,7 @@ Według odpowiedzi autora z 4.11.2026 (ceny zwojów, Warsztat od 10. poziomu pro
 3. **Kiedy działa.** Pole „Użyj Zwoju utrwalenia” stoi na Kowadle od +1, bo na +0 nieudana próba nic nie zabiera. Zwój przepada przy każdej próbie, na której leży, także udanej, tak jak Zwój ochronny. Działa także przy ulepszaniu przedmiotów towarzyszy. Kto nie ma zwoju, widzi na Kowadle, skąd go wziąć: z Warsztatu (od 10. poziomu Rzemieślnictwa) albo od kowala w Kuźni.
 4. **Kuźnia w Osadzie.** Kowal sprzedaje Zwój ochronny za 2000 złota (wcześniej 1000) i Zwój utrwalenia za 1000 złota, każdy do 3 sztuk dziennie, osobno. Oba tanieją z poważaniem Bractwa Kowali, tak jak dotąd Zwój ochronny: do 20% przy najwyższym stopniu (`forge.scroll`, `forge.steadyScroll` i `forge.discount` w `data/settlement.json`).
 5. **Warsztat (599 B).** Zwój utrwalenia powstaje od 10. poziomu Rzemieślnictwa z 5 Okuć, w 30 minut za sztukę. Z wyższym poziomem profesji i z korzyścią Bractwa Kowali powstaje szybciej, tak jak Zwój ochronny. Zwój ochronny w Warsztacie się nie zmienia: od 25. poziomu, 2 Odłamki i 60 minut.
-6. **Kowal i narrator.** Opis Żelisława w Kuźni wymienia teraz oba zwoje. Kwestia narratora o zwojach w Kuźni („Żelisław sprzedaje Zwoje ochronne, najwyżej trzy dziennie…”) zostaje bez zmian, bo jest nagrana. Nowa wersja z oboma zwojami czeka na zgodę autora (pytanie 601).
+6. **Kowal i narrator.** Opis Żelisława w Kuźni wymienia teraz oba zwoje. Kwestia narratora o zwojach w Kuźni („Żelisław sprzedaje Zwoje ochronne, najwyżej trzy dziennie…”) zostaje bez zmian, bo jest nagrana. Nowa wersja z oboma zwojami weszła w 0.1.47 (601 B, 607 A).
 7. **Ikony (598 C).** Oba zwoje mają ikony z PixelLab, w stylu materiałów: zwinięty poziomo zwój z pieczęcią i wstążkami. Zwój ochronny ma niebieską pieczęć i czerwone wstążki, a Zwój utrwalenia złotą pieczęć i złote wstążki (`src/client/art/icons/ward-scroll.png` i `steady-scroll.png`). Ikony stoją w Kuźni, w Warsztacie i przy polach zwojów na Kowadle.
 
 ## Wersja 0.1.44 (4.11.2026)

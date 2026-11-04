@@ -87,7 +87,7 @@
     "brotherhoodsPanel": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["title", "points", "toNext", "top", "now", "next", "none", "how", "perks"],
+      "required": ["title", "points", "toNext", "top", "now", "next", "none", "how", "perks", "reward", "claim", "claimed", "waiting", "systemPoints", "gold"],
       "properties": {
         "$comment": { "type": "string" },
         "title": { "type": "string", "minLength": 1 },
@@ -98,6 +98,12 @@
         "next": { "type": "string", "minLength": 1 },
         "none": { "type": "string", "minLength": 1 },
         "how": { "type": "string", "minLength": 1 },
+        "reward": { "type": "string", "minLength": 1 },
+        "claim": { "type": "string", "minLength": 1 },
+        "claimed": { "type": "string", "minLength": 1 },
+        "waiting": { "type": "string", "minLength": 1 },
+        "systemPoints": { "type": "string", "minLength": 1 },
+        "gold": { "type": "string", "minLength": 1 },
         "perks": {
           "type": "object",
           "additionalProperties": false,
@@ -119,6 +125,29 @@
             "marketFee": { "type": "string", "minLength": 1 },
             "wandererItems": { "type": "string", "minLength": 1 },
             "auctionHours": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "standingRewards": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["systemPoints", "gifts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "systemPoints": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 0 } },
+        "gifts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "herbs": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 0 } },
+              "materials": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 0 } },
+              "rarest": { "type": "integer", "minimum": 1 },
+              "gold": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 0 } },
+              "parts": { "type": "array", "minItems": 1, "items": { "type": "object", "additionalProperties": { "type": "integer", "minimum": 1 } } }
+            }
           }
         }
       }

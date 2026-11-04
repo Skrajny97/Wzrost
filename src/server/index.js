@@ -76,7 +76,7 @@ import {
 } from './testing.js';
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
-import { buyFromHerbalist, buyMug, chooseReforged, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, upgradeCompanionItem } from './settlement.js';
+import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, upgradeCompanionItem } from './settlement.js';
 import { buyFromTanner, sellToTanner } from './tannery.js';
 import { skipWithTimePoints } from './time.js';
 import { buyMount } from './stable.js';
@@ -186,6 +186,7 @@ const routes = [
   ['POST', '/api/camp/sell', sellToSpirit],
   ['GET', '/api/settlement', getSettlement],
   ['POST', '/api/settlement/deliver', deliverSettlementOrder],
+  ['POST', '/api/settlement/brotherhoods/reward', claimStandingReward],
   ['POST', '/api/settlement/reject', rejectSettlementOrder],
   ['POST', '/api/settlement/reforge', reforgeAtEnchantress],
   ['POST', '/api/settlement/reforge/choose', chooseReforged],

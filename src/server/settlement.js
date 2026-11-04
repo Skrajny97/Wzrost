@@ -67,6 +67,7 @@ import {
   rumorToday,
   spentPoints,
   standingOf,
+  standingRewardsDue,
   statResetCost,
   staying,
   talkWith,
@@ -154,6 +155,8 @@ export function settlementOf(row) {
     ...(stored.mount && { mount: stored.mount }),
     // The Koło Fortuny's pool of the day in the Salon Gier (casino.js).
     ...(stored.casino && { casino: stored.casino }),
+    // The last standing rewarded in each brotherhood (593 A and B).
+    ...(stored.rewarded && { rewarded: stored.rewarded }),
     ...(stored.test && { test: true }),
   };
 }
@@ -264,7 +267,8 @@ export function settlementView(player, stored, board, now) {
       const standing = standingOf(points, content);
       const now = brotherhoodPerks(brotherhood, standing.index, content);
       const next = standing.next ? brotherhoodPerks(brotherhood, standing.index + 1, content).filter((perk) => !now.includes(perk)) : [];
-      return { ...brotherhood, points, standing, perks: { now, next } };
+      const reward = rewardView(standingRewardsDue(brotherhood.id, points, stored.rewarded?.[brotherhood.id] ?? 0, content));
+      return { ...brotherhood, points, standing, perks: { now, next }, reward };
     }),
     brotherhoodsPanel: { ...content.settlement.brotherhoodsPanel, $comment: undefined },
     board: {
@@ -724,6 +728,68 @@ function pendingView(pending) {
 }
 
 // Saves a board drawn anew (new orders came) if the row is still as read.
+// The reward waiting for a brotherhood's new standings (593 A and B), as
+// the panel lists it: the standings' names and the goods with their names
+// and counts, Punkty Systemu and gold first; null when nothing waits.
+function rewardView(due) {
+  if (!due) return null;
+  const words = content.settlement.brotherhoodsPanel;
+  const material = (key) => materialView(key, 1, content);
+  return {
+    standings: due.standings.map((index) => content.settlement.standings[index].name),
+    goods: [
+      ...(due.systemPoints > 0 ? [{ kind: 'systemPoints', name: words.systemPoints, count: due.systemPoints }] : []),
+      ...(due.gold > 0 ? [{ kind: 'gold', name: words.gold, count: due.gold }] : []),
+      ...Object.entries(due.herbs).map(([id, count]) => ({ kind: 'herb', key: id, name: content.herbsById[id].name, count })),
+      ...Object.entries(due.parts).map(([id, count]) => ({ kind: 'part', key: id, name: content.partsById[id].name, count })),
+      ...Object.entries(due.materials).map(([key, count]) => ({ kind: 'material', key, name: material(key).name, color: material(key).color, count })),
+    ],
+  };
+}
+
+// { brotherhood }: "Odbierz" in the "Akceptacja Bractw" panel (593 A and
+// B): the Punkty Systemu and the gift of every standing of the brotherhood
+// reached and not rewarded yet, at once. Herbs take places in the bag, as
+// Jagna's do, and a gift that does not fit waits for room. What comes is
+// kept out of the Encyklopedia, as bought goods are.
+export async function claimStandingReward(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const brotherhood = content.settlement.brotherhoods.find((one) => one.id === body.brotherhood);
+  if (!brotherhood) throw new ApiError(404, 'no_brotherhood', 'Nie ma takiego Bractwa.');
+  const stored = settlementOf(row);
+  const due = standingRewardsDue(brotherhood.id, stored.reputation[brotherhood.id] ?? 0, stored.rewarded?.[brotherhood.id] ?? 0, content);
+  if (!due) throw new ApiError(409, 'no_reward', 'Nagroda za ten stopień jest już odebrana.');
+  if (Object.keys(due.herbs).length > 0) {
+    const held = JSON.parse(row.herbs ?? '{}');
+    const free = bagCapacity(campLevels(player.buildings, context.now, content), content) - bagPlaces(player);
+    if (bagStacks(addCounts(held, due.herbs), content) - bagStacks(held, content) > free) {
+      throw new ApiError(409, 'bag_full', 'Zioła od Bractwa nie zmieszczą się w plecaku. Zrób w nim miejsce.');
+    }
+  }
+  const next = { ...stored, rewarded: { ...stored.rewarded, [brotherhood.id]: due.standings.at(-1) } };
+  const herbs = counted('herbs', due.herbs);
+  const parts = counted('parts', due.parts);
+  const materials = counted('materials', due.materials);
+  const others = foreign({ herb: due.herbs, material: due.materials });
+  const result = await context.env.DB.prepare(
+    `UPDATE characters SET system_points = system_points + ?, gold = gold + ?, herbs = ${herbs.sql}, parts = ${parts.sql}, materials = ${materials.sql},
+       foreign_stacks = ${others.sql}, settlement = ?, version = version + 1
+     WHERE id = ? AND version = ?`,
+  )
+    .bind(due.systemPoints, due.gold, ...herbs.binds, ...parts.binds, ...materials.binds, ...others.binds, JSON.stringify(next), row.id, row.version)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(context.env.DB, session.userId);
+  return json({
+    reward: { brotherhood: brotherhood.name, ...rewardView(due) },
+    settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
+    character: characterView(after, context.now),
+  });
+}
+
 async function saveBoard(db, row, stored, board) {
   const next = JSON.stringify({ ...stored, board });
   if (next === (row.settlement ?? '{}')) return;

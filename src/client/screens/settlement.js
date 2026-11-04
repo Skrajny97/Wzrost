@@ -232,7 +232,30 @@ export function mountSettlement(container, { params = {} } = {}) {
     const perkList = (label, perks, muted) =>
       perks.length > 0 &&
       h('div', { class: `settlement-standing-perks${muted ? ' settlement-standing-perks--next' : ''}` }, h('p', { class: 'settlement-standing-label', text: label }), h('ul', {}, perks.map((perk) => h('li', { text: perk }))));
-    const row = ({ name, points, standing, perks }) => {
+    // The reward for the standings reached and not rewarded yet (593 A and
+    // B): what comes, and "Odbierz".
+    const goodsText = (goods) => goods.map((good) => `${good.name} ×${formatNumber(good.count)}`).join(', ');
+    const rewardBlock = (brotherhood) =>
+      brotherhood.reward &&
+      h(
+        'div',
+        { class: 'settlement-standing-reward' },
+        h('p', { class: 'settlement-standing-label', text: say(words.reward, { standings: brotherhood.reward.standings.join(', ') }) }),
+        h('ul', {}, brotherhood.reward.goods.map((good) => h('li', { text: `${good.name} ×${formatNumber(good.count)}` }))),
+        h('button', {
+          type: 'button',
+          class: 'button button--world',
+          text: words.claim,
+          onClick: (event) =>
+            withButton(event.currentTarget, async () => {
+              const answer = await call('POST', '/api/settlement/brotherhoods/reward', { brotherhood: brotherhood.id });
+              toast(say(words.claimed, { list: goodsText(answer.reward.goods) }));
+              apply(answer);
+            }),
+        }),
+      );
+    const row = (brotherhood) => {
+      const { name, points, standing, perks } = brotherhood;
       const floor = standing.points;
       const ceiling = standing.next?.points ?? floor;
       const share = standing.next ? Math.max(0, Math.min(1, (points - floor) / (ceiling - floor))) : 1;
@@ -245,6 +268,7 @@ export function mountSettlement(container, { params = {} } = {}) {
         h('p', { class: 'settlement-standing-head' }, h('strong', { text: name }), h('span', { class: 'chip settlement-standing-chip', text: standing.name })),
         h('div', { class: 'meter settlement-standing-meter' }, h('div', { class: 'meter-track', role: 'progressbar', 'aria-label': `${name}: reputacja`, 'aria-valuemin': floor, 'aria-valuemax': ceiling, 'aria-valuenow': points }, bar)),
         h('p', { class: 'muted settlement-standing-points', text: `${say(words.points, { points: formatNumber(points) })} · ${where}` }),
+        rewardBlock(brotherhood),
         perkList(words.now, perks.now, false),
         standing.next && perkList(say(words.next, { next: standing.next.name }), perks.next, true),
       );
@@ -269,6 +293,8 @@ export function mountSettlement(container, { params = {} } = {}) {
         { class: 'settlement-standings-summary' },
         h('span', { class: 'settlement-standings-title', text: words.title }),
         h('span', { class: 'settlement-standings-line', text: data.brotherhoods.map((one) => `${one.short ?? one.name}: ${one.standing.name}`).join(' · ') }),
+        data.brotherhoods.some((one) => one.reward) &&
+          h('span', { class: 'settlement-standings-waiting' }, h('span', { class: 'settlement-fold-dot', 'aria-hidden': 'true' }), words.waiting),
       ),
       h('ul', { class: 'settlement-standings-list' }, data.brotherhoods.map(row)),
       h('p', { class: 'muted settlement-standings-how', text: words.how }),

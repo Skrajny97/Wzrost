@@ -36,6 +36,7 @@ import {
   freePoints,
   gainedTimePoints,
   goodStock,
+  standingRewardsDue,
   ownDiscoveries,
   bagStacks,
   hoursToNext,
@@ -431,13 +432,15 @@ export function settlementBoard(row, stored, now) {
 }
 
 // Whether an order on the board, the week's included, can be delivered
-// now, or something waits at the Targowisko: the dot on the Osada tab. The
-// bag stays at hand while the character is away, so every order counts
-// then too.
+// now, something waits at the Targowisko or a brotherhood's reward for a
+// new standing waits (593 A and B): the dot on the Osada tab. The bag stays
+// at hand while the character is away, so every order counts then too.
 function settlementWaiting(row, items, now, parcels = 0) {
   if (!settlementOpen(row)) return false;
   if (parcels > 0) return true;
   const stored = JSON.parse(row.settlement ?? '{}');
+  const rewarded = stored.rewarded ?? {};
+  if (content.settlement.brotherhoods.some((one) => standingRewardsDue(one.id, stored.reputation?.[one.id] ?? 0, rewarded[one.id] ?? 0, content))) return true;
   const board = settlementBoard(row, { board: stored.board ?? null, reputation: stored.reputation ?? {} }, now);
   const goods = settlementGoods(row, items, now);
   const weekly = board.weekly && !board.weekly.done ? board.weekly.order : null;

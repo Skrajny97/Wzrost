@@ -10262,6 +10262,31 @@ a.profession-square:active {
   font-weight: 600;
 }
 
+/* The reward for a new standing (593 A and B): gold-edged, with "Odbierz". */
+.settlement-standing-reward {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0;
+  padding: 8px 10px;
+  border: 1px solid var(--gold, #e0b84c);
+  border-radius: 6px;
+  background: var(--bg-deep);
+  font-size: 14px;
+}
+
+.settlement-standing-reward ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.settlement-standings-waiting {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold, #e0b84c);
+  font-size: 13px;
+}
+
 .settlement-standings-how {
   margin: 4px 0 0;
   font-size: 13px;

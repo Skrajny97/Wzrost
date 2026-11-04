@@ -124,7 +124,13 @@
       "marketFee": "Opłata Targowiska {value}%",
       "wandererItems": "Wędrowny handlarz wykłada {value} {items}",
       "auctionHours": "Aukcje do {value} godzin"
-    }
+    },
+    "reward": "Nagroda za stopień {standings}:",
+    "claim": "Odbierz",
+    "claimed": "Odebrano od Bractwa: {list}.",
+    "waiting": "Nagroda czeka",
+    "systemPoints": "Punkty Systemu",
+    "gold": "Złoto"
   },
   "brotherhoodPerks": {
     "$comment": "Korzyści stopni Bractw (odpowiedzi autora 589–593, 4.11.2026: „wszystkie opcje … jeśli nie zaburzą balansu”): każda liczba według stopnia reputacji Bractwa brotherhood (Obcy, Znajomy, Stały klient, Zaufany, Przyjaciel; byStanding), liczona w src/engine/settlement.js (brotherhoodPerk). anvilDiscount: o tyle mniej złota za ulepszenie na Kowadle; workshopFaster: o tyle krócej pracuje Warsztat; workshopLuck: o tyle więcej szansy, że Warsztat zrobi przedmiot o rzadkość wyżej, zapisane w zamówieniu przy złożeniu; marketFee: opłata Targowiska od sprzedaży, zapisana w ofercie przy wystawieniu; wandererItems: ile przedmiotów wykłada wędrowny handlarz; auctionHours: najdłuższa aukcja w godzinach. herbYield: o tyle więcej ziół z Zielarstwa, zapisane w zbieraniu przy rozpoczęciu; brewFaster: o tyle krócej warzy Alchemia; potionFights: o tyle walk dłużej działa mikstura na czas wypita z plecaka; materialDrops: o tyle więcej materiałów ze stworów na wyprawach; rareOdds: o tyle częściej elity i czempioni (591 B o połowę, zob. DECISIONS.md); tanneryPremium: o tyle punktów procentowych więcej płaci Garbarnia, a najwyższa z tych liczb podnosi też najwyższą cenę materiałów (buyCeiling), więc i to, za ile Wszebor sprzedaje. Na stopniu Obcy liczby są takie jak bez Bractw.",
@@ -140,6 +146,16 @@
     "materialDrops": { "brotherhood": "hunters", "byStanding": [0, 0.05, 0.1, 0.15, 0.2] },
     "rareOdds": { "brotherhood": "hunters", "byStanding": [0, 0.05, 0.1, 0.15, 0.2] },
     "tanneryPremium": { "brotherhood": "hunters", "byStanding": [0, 0.02, 0.04, 0.06, 0.08] }
+  },
+  "standingRewards": {
+    "$comment": "Nagroda za wejście na nowy stopień Bractwa (odpowiedź autora 593 A i B, 4.11.2026): raz za każdy stopień, w każdym Bractwie osobno, odbierana przyciskiem „Odbierz” w panelu „Akceptacja Bractw”. Liczby według stopni Obcy, Znajomy, Stały klient, Zaufany, Przyjaciel. systemPoints: Punkty Systemu (593 A). gifts: upominek Bractwa (593 B), wart ok. 400 / 1000 / 2000 / 5000 złota: herbs to tyle sztuk każdego zioła, które stopień dokłada na półkę Jagny; materials to tyle sztuk każdego z rarest najrzadszych materiałów, które stopień dokłada na półkę Wszebora; parts to części Warsztatu; gold to złoto.",
+    "systemPoints": [0, 1, 2, 3, 5],
+    "gifts": {
+      "herbalists": { "herbs": [0, 15, 25, 20, 20] },
+      "smiths": { "parts": [{}, { "straps": 10 }, { "fittings": 10 }, { "shards": 10 }, { "amber": 14 }] },
+      "hunters": { "materials": [0, 2, 2, 4, 5], "rarest": 3 },
+      "merchants": { "gold": [0, 400, 1000, 2000, 5000] }
+    }
   },
   "orders": {
     "resident": "headman",
