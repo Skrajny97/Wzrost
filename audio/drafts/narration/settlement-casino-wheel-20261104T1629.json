@@ -1,0 +1,18 @@
+{
+  "id": "settlement-casino-wheel",
+  "payload": {
+    "text": "Kołem Fortuny kręcisz za setki sztuk złota. Im wyższa stawka, tym większa szansa na wygraną i na lepszą nagrodę, ale i większy ból po przegranej. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/settlement-casino-wheel-20261104T1629-0.mp3",
+    "audio/drafts/narration/settlement-casino-wheel-20261104T1629-1.mp3",
+    "audio/drafts/narration/settlement-casino-wheel-20261104T1629-2.mp3"
+  ],
+  "credits": 477
+}
