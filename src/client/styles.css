@@ -10456,6 +10456,46 @@ a.profession-square:active {
   opacity: 0.55;
 }
 
+/* The chances at the stake under it, in the System's letters; each prize's
+   tier as a chip over it, in the colours of the rarities it holds: slaba
+   plain, niezła blue, dobra violet, świetna gold. */
+.casino-odds {
+  text-align: center;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.casino-prize-tier {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.casino-tier--fair {
+  border-color: rgba(110, 160, 230, 0.6);
+  color: #8fb8ee;
+}
+
+.casino-tier--good {
+  border-color: rgba(168, 127, 214, 0.7);
+  color: #c4a4ec;
+}
+
+.casino-tier--great {
+  border-color: rgba(217, 180, 90, 0.75);
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.casino-resource {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
 /* The games on the screen (casino.js showOnScreen): over the page, dimmed,
    the Wheel turning under its pointer, slower and slower, with a gold glow
    for a win and a darker wheel for a loss; the ticket falling into the
@@ -10600,12 +10640,6 @@ a.profession-square:active {
   80% {
     transform: rotate(-2deg);
   }
-}
-
-/* The pool of a stake just chosen is on its way: the old one waits dimmed. */
-.casino-pool--waiting {
-  opacity: 0.45;
-  pointer-events: none;
 }
 
 .market-pick {

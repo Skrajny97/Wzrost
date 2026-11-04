@@ -64,20 +64,21 @@ test('the validator catches broken references and schema errors', () => {
     'camp.json: duch budowniczego skupuje nieznany zasób "clay"',
   ]);
 
-  // The Salon Gier: a chance under 100% (a prize is worth more than the
-  // stake and at most what a win costs), item rarities in order, rarities
-  // that exist, and the draw's words that name the winner and the gold.
+  // The Salon Gier: the Wheel's chances of nothing and of the tiers adding up
+  // to 1 at the lowest stake and at the highest, nothing no likelier at a
+  // higher stake (586), rarities that exist, ranges from the fewer pieces,
+  // and the draw's words that name the winner and the gold.
   const casino = structuredClone(loadData());
-  casino.settlement.casino.wheel.chance = 1;
-  casino.settlement.casino.wheel.topItemRarity = 'common';
-  casino.settlement.casino.wheel.materialRarities = { epic: 3, golden: 1 };
+  casino.settlement.casino.wheel.none = { low: 0.5, high: 0.65 };
+  casino.settlement.casino.wheel.goodRarity = 'golden';
+  casino.settlement.casino.wheel.weakMaterials = [4, 2];
   casino.settlement.casino.texts.announce = 'Loterię [wygrała|wygrał] {name}.';
   assert.deepEqual(validateData(casino), [
-    'settlement.json: szansa Koła musi być mniejsza niż 100%, żeby nagroda mogła być warta więcej niż stawka',
-    'settlement.json: casino.wheel.topItemRarity nie może być niższa niż itemRarity',
-    // The lower stakes' rarest (epic) is now above the top stake's.
-    'settlement.json: casino.wheel.belowTopItemRarity musi leżeć od itemRarity do topItemRarity',
-    'settlement.json: casino.wheel.materialRarities ma nieznaną rzadkość golden',
+    'settlement.json: casino.wheel: none.low i szanse progów (low) muszą dawać razem 1, a dają 0.8',
+    'settlement.json: casino.wheel: none.high i szanse progów (high) muszą dawać razem 1, a dają 1.05',
+    'settlement.json: casino.wheel.none.high nie może być większe niż none.low: wyższa stawka nie zmniejsza szansy na wygraną',
+    'settlement.json: casino.wheel.goodRarity to nieznana rzadkość golden',
+    'settlement.json: casino.wheel.weakMaterials: od nie może być więcej niż do',
     'settlement.json: casino.texts.announce nie ma {gold}',
   ]);
 

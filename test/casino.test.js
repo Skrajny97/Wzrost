@@ -1,13 +1,14 @@
 // The Salon Gier in the Osada (answers 523–526 and 542 C): Szczęsny's
 // Loteria, a ticket of 50 zł a character a day and the whole pot of 100 zł
 // and every ticket to one ticket drawn at Polish midnight, once a day, with
-// the System's message in the Globalny; and the Koło Fortuny, a stake of
-// 100 zł or more in hundreds, up to the highest with an item prize, a 10%
-// chance at any (the author: "Koło fortuny proszę znerfić mocno i dać 10%
-// szans"), and each character's own pool of five prizes a day at
-// every stake, items at its level or very rare materials of the lands it
-// knows, each worth more than the stake and no more than a win costs on
-// average.
+// the System's message in the Globalny; and the Koło Fortuny (the author on
+// 4.11.2026: "Ma jedną pulę codziennie losowaną niezależnie od stawki,
+// stawka zwiększa prawdopodobieństwo trafienia lepszych przedmiotów"), a
+// stake of 100 zł or more in hundreds, each character's one pool of fifteen
+// prizes a day, the same at every stake, 70% of the spins giving nothing at
+// the lowest stake and 60% at the highest (586), and a higher stake the
+// likelier to stop on a better prize; on average it gives back less than it
+// takes.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -20,26 +21,23 @@ import {
   createRng,
   dayStakes,
   generateItem,
-  itemPrizeRarity,
-  stakeItemRarity,
   knownLandMaterials,
   lotteryPot,
   lotteryWinner,
   parseStack,
   prizesLeft,
   prizeWorth,
+  sellPrice,
   spinBlock,
   spinExpectation,
   spinWheel,
   ticketBlock,
-  wheelChance,
   wheelDay,
+  wheelOdds,
   wheelPool,
   wheelPrizes,
   wheelStakes,
   wheelWon,
-  prizeCap,
-  winCost,
 } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -52,7 +50,23 @@ const character = (level, classLevel = level) => ({ level, classId: 'warrior', c
 describe('the Salon Gier in the engine', () => {
   test("the author's numbers and Szczęsny, the Salon's host, in a place of his own on the board", () => {
     assert.deepEqual([casino.lottery.ticket, casino.lottery.base], [50, 100]);
-    assert.deepEqual([casino.wheel.step, casino.wheel.chance, casino.wheel.worthCap, casino.wheel.prizes], [100, 0.1, 2, 5]);
+    // 586: "nie 50/50 tylko 70/30 gdzie 70% to nic nietrafione na
+    // najniższej stawce i rośnie wraz ze stawką do 60/40".
+    assert.deepEqual([casino.wheel.step, casino.wheel.none], [100, { low: 0.7, high: 0.6 }]);
+    // The author: "dominuje gówno (powiedzmy 10 z 15 przedmiotów - nawet
+    // zasoby), ze 3 okey przedmioty, 1 spoko i 1 super i duża szansa też na
+    // nic nie trafienie. Na maksymalnej stawce mogłoby być to 10 procent na
+    // jakieś legendarne przedmioty czy czasem i mityczne".
+    assert.deepEqual(
+      casino.wheel.tiers.map(({ id, count, high }) => [id, count, high]),
+      [
+        ['weak', 10, 0.11],
+        ['fair', 3, 0.11],
+        ['good', 1, 0.08],
+        ['great', 1, 0.1],
+      ],
+    );
+    assert.deepEqual([casino.wheel.greatRarity, casino.wheel.mythicRarity, casino.wheel.mythicChance], ['legendary', 'mythic', 0.1]);
     const host = content.settlement.residents.find((resident) => resident.id === casino.resident);
     assert.deepEqual([host.name, host.title], ['Szczęsny', 'gospodarz Salonu Gier']);
     assert.equal(host.greetings.length, content.settlement.standings.length);
@@ -85,32 +99,69 @@ describe('the Salon Gier in the engine', () => {
     for (const count of wins) assert.ok(Math.abs(count / 3000 - 1 / 3) < 0.04, String(wins));
   });
 
-  test('the chance is always 10%, a win costs ten stakes on average, and a prize is worth two stakes at most', () => {
-    assert.equal(wheelChance(content), 0.1);
-    assert.deepEqual([100, 300, 2500].map((stake) => winCost(stake, content)), [1000, 3000, 25000]);
-    // The prizes stay as they were at 50%, so the Wheel gives back at most a
-    // fifth of the stakes on average.
-    assert.deepEqual([100, 300, 2500].map((stake) => prizeCap(stake, content)), [200, 600, 5000]);
+  test('70% of the spins give nothing at the lowest stake, 60% at the top; nothing and the tiers go evenly from their chances at the lowest stake to those at the top', () => {
+    // At level 50 the stakes are 100 to 700 zł.
+    const stakes = wheelStakes(50, 0, content);
+    const chances = (stake) => {
+      const odds = wheelOdds(stake, stakes, content);
+      return [odds.none, ...odds.tiers.map((tier) => tier.chance)].map((chance) => Number(chance.toFixed(4)));
+    };
+    assert.deepEqual(chances(100), [0.7, 0.24, 0.048, 0.009, 0.003]);
+    assert.deepEqual(chances(400), [0.65, 0.175, 0.079, 0.0445, 0.0515]);
+    assert.deepEqual(chances(700), [0.6, 0.11, 0.11, 0.08, 0.1]);
+    assert.deepEqual(wheelOdds(400, stakes, content).tiers.map((tier) => tier.id), ['weak', 'fair', 'good', 'great']);
+    for (const stake of stakes) {
+      const odds = wheelOdds(stake, stakes, content);
+      assert.ok(Math.abs(odds.none + odds.tiers.reduce((sum, tier) => sum + tier.chance, 0) - 1) < 1e-9, String(stake));
+    }
+    // Nothing less likely at a higher stake, and the better tiers likelier.
+    const nothing = stakes.map((stake) => wheelOdds(stake, stakes, content).none);
+    assert.ok(nothing.every((chance, index) => index === 0 || chance < nothing[index - 1]));
+    for (const tier of ['fair', 'good', 'great']) {
+      const along = stakes.map((stake) => wheelOdds(stake, stakes, content).tiers.find((one) => one.id === tier).chance);
+      assert.ok(along.every((chance, index) => index === 0 || chance > along[index - 1]), tier);
+    }
+    // A single stake of the day is the top one.
+    assert.deepEqual(wheelOdds(100, [100], content), wheelOdds(700, stakes, content));
   });
 
-  test('a spin wins a tenth of the time and takes one of the prizes left, each as likely', () => {
-    const seen = new Map();
-    let wins = 0;
-    for (let i = 0; i < 10000; i += 1) {
-      const spin = spinWheel([1, 3, 4], `spin:${i}`, content);
-      assert.deepEqual(spinWheel([1, 3, 4], `spin:${i}`, content), spin);
+  test('a spin gives nothing at `none`, or else a tier at its chance and one of its prizes left, each as likely; a tier all won gives nothing', () => {
+    const prizes = [...Array(10).fill('weak'), ...Array(3).fill('fair'), 'good', 'great'].map((tier) => ({ tier }));
+    const pool = { prizes, won: [] };
+    const odds = wheelOdds(700, wheelStakes(50, 0, content), content);
+    const tiers = new Map();
+    const places = new Map();
+    let none = 0;
+    const spins = 20000;
+    for (let i = 0; i < spins; i += 1) {
+      const spin = spinWheel(pool, odds, `spin:${i}`);
+      assert.deepEqual(spinWheel(pool, odds, `spin:${i}`), spin);
       if (!spin.win) {
-        assert.equal(spin.prize, null);
+        assert.deepEqual([spin.tier, spin.prize], [null, null]);
+        none += 1;
         continue;
       }
-      wins += 1;
-      seen.set(spin.prize, (seen.get(spin.prize) ?? 0) + 1);
+      assert.equal(prizes[spin.prize].tier, spin.tier);
+      tiers.set(spin.tier, (tiers.get(spin.tier) ?? 0) + 1);
+      places.set(spin.prize, (places.get(spin.prize) ?? 0) + 1);
     }
-    assert.ok(Math.abs(wins / 10000 - 0.1) < 0.015, String(wins));
-    assert.deepEqual([...seen.keys()].sort(), [1, 3, 4]);
-    for (const count of seen.values()) assert.ok(Math.abs(count / wins - 1 / 3) < 0.05);
+    assert.ok(Math.abs(none / spins - 0.6) < 0.015, String(none));
+    for (const tier of odds.tiers) assert.ok(Math.abs((tiers.get(tier.id) ?? 0) / spins - tier.chance) < 0.012, `${tier.id} ${tiers.get(tier.id)}`);
+    // The weak prizes come about equally often.
+    for (let place = 0; place < 10; place += 1) assert.ok(Math.abs(places.get(place) / tiers.get('weak') - 0.1) < 0.03, String(place));
+    // The great prize won: a spin that stops on its tier gives nothing.
+    const gone = { prizes, won: [14] };
+    let empty = 0;
+    for (let i = 0; i < 2000; i += 1) {
+      const spin = spinWheel(gone, odds, `bez:${i}`);
+      if (spin.tier === 'great') {
+        assert.deepEqual([spin.win, spin.prize], [false, null]);
+        empty += 1;
+      } else if (spin.win) assert.notEqual(spin.prize, 14);
+    }
+    assert.ok(empty > 100 && empty < 300, String(empty));
     // Nothing left, nothing won.
-    assert.deepEqual(spinWheel([], 'pusto', content), { win: false, prize: null });
+    for (let i = 0; i < 50; i += 1) assert.equal(spinWheel({ prizes, won: prizes.map((_, index) => index) }, odds, `pusto:${i}`).win, false);
   });
 
   test("a spin needs one of the day's stakes, the gold, a prize left, and room in the bag for an item", () => {
@@ -126,60 +177,29 @@ describe('the Salon Gier in the engine', () => {
     assert.equal(spinBlock(100, { ...fine, itemLeft: false, bagFree: 0 }, content), null);
   });
 
-  test('an item prize is the rarest from rare to legendary worth more than the stake and at most twice it to the character', () => {
-    // At level 25 the scrapper pays 50, 100, 200 and 400 zł for a rare, a
-    // unique, an epic and a legendary item.
-    assert.deepEqual([100, 200, 300, 400].map((stake) => itemPrizeRarity(25, 0, stake, content)), ['epic', 'legendary', 'legendary', null]);
-    // At level 50: 100, 200, 400 and 800 zł.
-    assert.deepEqual([100, 200, 300, 400, 700, 800].map((stake) => itemPrizeRarity(50, 0, stake, content)), ['unique', 'epic', 'epic', 'legendary', 'legendary', null]);
-    // Never a mythic item: at level 25 one would be worth 800 zł.
-    assert.equal(itemPrizeRarity(25, 0, 700, content), null);
-    // Never a common one: from level 101 a rare item is worth more than a win
-    // at 100 zł costs, and that stake has only materials.
-    assert.equal(itemPrizeRarity(100, 0, 100, content), 'rare');
-    assert.equal(itemPrizeRarity(101, 0, 100, content), null);
-    assert.equal(itemPrizeRarity(101, 0, 200, content), 'rare');
-    // The Skup złomu raises what the scrapper pays, and the rarity comes down.
-    assert.equal(itemPrizeRarity(25, 1, 100, content), 'unique');
-  });
-
-  test("legendary items wait only in the pool of the character's top stake (554 B), every lower stake has items up to epic", () => {
-    // At level 25 the stakes are 100, 200 and 300 zł: an epic item fits at
-    // 100 zł, a legendary one (400 zł) at 200 and 300 zł, and 200 zł is not
-    // the top, so its pool has materials alone.
-    assert.deepEqual([100, 200, 300].map((stake) => stakeItemRarity(25, 0, stake, content)), ['epic', null, 'legendary']);
-    // At level 50, up to 700 zł: legendary items (800 zł) at the top alone.
-    assert.deepEqual([100, 200, 300, 400, 500, 600, 700].map((stake) => stakeItemRarity(50, 0, stake, content)), ['unique', 'epic', 'epic', null, null, null, 'legendary']);
-    for (const [level, bonus] of [[25, 0], [40, 0.3], [80, 0], [150, 1]]) {
-      const stakes = wheelStakes(level, bonus, content);
-      for (const stake of stakes.slice(0, -1)) assert.notEqual(stakeItemRarity(level, bonus, stake, content), 'legendary', `${level} ${stake}`);
-      assert.equal(stakeItemRarity(level, bonus, stakes.at(-1), content), 'legendary', String(level));
-      // The pools hold just that.
-      const basis = { ...character(level), sellBonus: bonus, tanneryPremium: 0 };
-      for (const stake of stakes) {
-        const rarities = new Set(wheelPrizes(basis, 'legendarne', stake, '2026-11-03', content).filter((prize) => prize.kind === 'item').map((prize) => prize.item.rarity));
-        if (stake === stakes.at(-1)) assert.deepEqual([...rarities], ['legendary']);
-        else assert.ok(!rarities.has('legendary'), `${level} ${stake}`);
-      }
-    }
-  });
-
-  test('the stakes go in hundreds from 100 zł to the highest with an item prize, so they grow with the level', () => {
+  test('the stakes go in hundreds from 100 zł, 100 more every 40 levels, to the last below a legendary item at the scrapper', () => {
     assert.deepEqual(wheelStakes(25, 0, content), [100, 200, 300]);
     assert.deepEqual(wheelStakes(30, 0, content), [100, 200, 300, 400]);
     assert.equal(wheelStakes(50, 0, content).at(-1), 700);
+    // The prizes grow with the level, and a spin at the lowest stake must
+    // still give back less than it takes: from level 80 the Wheel starts at
+    // 200 zł, from 120 at 300 zł.
+    assert.deepEqual([79, 80, 119, 120].map((level) => wheelStakes(level, 0, content)[0]), [100, 200, 200, 300]);
     assert.equal(wheelStakes(100, 0, content).at(-1), 1500);
     // With the Skup złomu at its top the scrapper pays twice as much.
     assert.equal(wheelStakes(150, 1, content).at(-1), 4700);
-    for (const [level, bonus] of [[25, 0], [50, 0.3], [150, 1]]) {
+    for (const [level, bonus] of [[25, 0], [50, 0.3], [80, 0], [150, 1]]) {
       const stakes = wheelStakes(level, bonus, content);
-      assert.deepEqual(stakes, stakes.map((_, index) => (index + 1) * 100));
-      assert.ok(itemPrizeRarity(level, bonus, stakes.at(-1), content));
-      assert.equal(itemPrizeRarity(level, bonus, stakes.at(-1) + 100, content), null);
+      assert.deepEqual(stakes, stakes.map((_, index) => stakes[0] + index * 100));
+      // The great prize is worth more than any stake.
+      const legendary = sellPrice({ level, rarity: 'legendary' }, content, bonus);
+      assert.ok(stakes.at(-1) < legendary && stakes.at(-1) + 100 >= legendary, String(level));
     }
-    // Before any item fits, the first stake alone; never past 100 steps.
+    // Before a legendary item is worth more than 100 zł, the first stake
+    // alone; never past 100 steps.
     assert.deepEqual(wheelStakes(5, 0, content), [100]);
-    assert.equal(wheelStakes(1000, 1, content).length, 100);
+    const top = wheelStakes(1000, 1, content);
+    assert.deepEqual([top[0], top.at(-1)], [2500, 10000]);
   });
 
   test('the lands the character knows: every ordinary creature of a land with an inner region open to its class', () => {
@@ -199,107 +219,113 @@ describe('the Salon Gier in the engine', () => {
     }
   });
 
-  test("every stake's pool: five prizes a day, from the character, the day and the stake, each worth more than the stake and no more than a win costs", () => {
+  test("the day's pool: fifteen prizes, ten weak, three fair, one good and one great, the best first, for the character's class and level and lands", () => {
     const bonusSets = [
       { sellBonus: 0, tanneryPremium: 0.1 },
-      { sellBonus: 0.5, tanneryPremium: 0.2 },
       { sellBonus: 1, tanneryPremium: 0.3 },
     ];
+    const index = (id) => content.rarities.findIndex((one) => one.id === id);
+    const kinds = {};
+    let mythic = 0;
+    let pools = 0;
     for (const level of [20, 30, 50, 80, 125]) {
       const lands = new Set(knownLandMaterials(character(level), content).map((material) => material.id));
       for (const bonuses of bonusSets) {
         const basis = { ...character(level), ...bonuses };
-        const stakes = wheelStakes(level, bonuses.sellBonus, content);
-        for (const stake of new Set([stakes[0], stakes[Math.floor(stakes.length / 2)], stakes.at(-1)])) {
-          const rarity = stakeItemRarity(level, bonuses.sellBonus, stake, content);
-          let items = 0;
-          for (let i = 0; i < 20; i += 1) {
-            const prizes = wheelPrizes(basis, `postac:${i}`, stake, '2026-11-03', content);
-            assert.equal(prizes.length, 5);
-            // A pool with items has at least one, first.
-            assert.equal(prizes[0].kind, rarity ? 'item' : 'material');
-            for (const prize of prizes) {
-              const worth = prizeWorth(prize, bonuses, content);
-              assert.ok(worth > stake && worth <= prizeCap(stake, content), `${level} ${stake} ${JSON.stringify(prize).slice(0, 80)} ${worth}`);
-              if (prize.kind === 'item') {
-                items += 1;
-                assert.equal(prize.item.level, level);
-                assert.equal(prize.item.rarity, rarity);
-                assert.ok(canUse(prize.item.base, 'warrior', content, level), prize.item.base);
-              } else {
-                const { materialId, rarityId } = parseStack(prize.key);
-                assert.ok(lands.has(materialId), materialId);
-                // A grade of materialRarities or the species' own, or one
-                // between that fits a low stake (0.1.33: materials five
-                // times dearer).
-                const index = (id) => content.rarities.findIndex((one) => one.id === id);
-                const own = index(content.materialsById[materialId].rarity);
-                const top = Math.max(...Object.keys(casino.wheel.materialRarities).map(index));
-                assert.ok(index(rarityId) >= own && index(rarityId) <= Math.max(own, top), prize.key);
-                assert.ok(rarityAt(rarityId) >= rarityAt(content.materialsById[materialId].rarity), prize.key);
-                assert.ok(Number.isInteger(prize.count) && prize.count >= 1);
-              }
+        for (let i = 0; i < 20; i += 1) {
+          const prizes = wheelPrizes(basis, `postac:${i}`, '2026-11-03', content);
+          pools += 1;
+          assert.deepEqual(
+            prizes.map((prize) => prize.tier),
+            ['great', 'good', 'fair', 'fair', 'fair', ...Array(10).fill('weak')],
+          );
+          const materials = [];
+          const resources = [];
+          for (const prize of prizes) {
+            kinds[`${prize.tier}:${prize.kind}`] = (kinds[`${prize.tier}:${prize.kind}`] ?? 0) + 1;
+            if (prize.kind === 'item') {
+              assert.equal(prize.item.level, level);
+              assert.ok(canUse(prize.item.base, 'warrior', content, level), prize.item.base);
+              const rarity = prize.item.rarity;
+              if (prize.tier === 'great') {
+                assert.ok(['legendary', 'mythic'].includes(rarity), rarity);
+                if (rarity === 'mythic') mythic += 1;
+              } else assert.equal(rarity, { good: 'epic', fair: rarity === 'unique' ? 'unique' : 'rare', weak: 'common' }[prize.tier], `${prize.tier} ${rarity}`);
+            } else if (prize.kind === 'material') {
+              const { materialId, rarityId } = parseStack(prize.key);
+              assert.ok(lands.has(materialId), materialId);
+              materials.push(materialId);
+              // A grade of its tier, of a species no rarer than that.
+              assert.ok((prize.tier === 'weak' ? ['common'] : ['rare', 'unique']).includes(rarityId), prize.key);
+              assert.ok(index(content.materialsById[materialId].rarity) <= index(rarityId), prize.key);
+              const [least, most] = prize.tier === 'weak' ? casino.wheel.weakMaterials : casino.wheel.fairMaterials;
+              assert.ok(Number.isInteger(prize.count) && prize.count >= least && prize.count <= most, `${prize.key} ${prize.count}`);
+            } else {
+              assert.equal(prize.kind, 'resource');
+              assert.equal(prize.tier, 'weak');
+              assert.ok(content.resourcesById[prize.key], prize.key);
+              assert.equal(prize.count, 5 * level);
+              resources.push(prize.key);
             }
-            // The Wheel gives back less than it takes.
-            assert.ok(spinExpectation(stake, prizes.map((prize) => prizeWorth(prize, bonuses, content)), content) <= 0);
           }
-          // The first prize and about half the others are items while one fits.
-          if (rarity) assert.ok(items > 20 + 20 && items < 20 + 60, `${level} ${stake}: ${items}`);
-          else assert.equal(items, 0);
+          // A camp resource comes once in a pool, and a creature's material
+          // too while the lands have one of their common ones left.
+          assert.equal(new Set(resources).size, resources.length, resources.join(', '));
+          if (new Set(materials).size < materials.length) {
+            const commons = [...lands].filter((id) => content.materialsById[id].rarity === 'common');
+            assert.ok(commons.every((id) => materials.includes(id)), materials.join(', '));
+          }
+          // A fresh pool gives back less than it takes at every stake.
+          const stakes = wheelStakes(level, bonuses.sellBonus, content);
+          for (const stake of stakes) {
+            const back = spinExpectation(stake, { prizes, won: [] }, wheelOdds(stake, stakes, content), (prize) => prizeWorth(prize, bonuses, content));
+            assert.ok(back < 0, `${level} ${stake} ${back}`);
+          }
         }
       }
     }
+    // Every kind of a weak prize, and a fair one now an item, now materials.
+    for (const kind of ['weak:resource', 'weak:material', 'weak:item', 'fair:item', 'fair:material']) assert.ok(kinds[kind] > 0, kind);
+    assert.deepEqual([kinds['good:item'], kinds['great:item']], [pools, pools]);
+    // A mythic item in about one pool of ten.
+    assert.ok(mythic > pools * 0.03 && mythic < pools * 0.2, `${mythic} of ${pools}`);
   });
 
-  test("a creature's material comes once in a pool", () => {
-    for (let i = 0; i < 200; i += 1) {
-      const prizes = wheelPrizes({ ...character(30), sellBonus: 0, tanneryPremium: 0 }, `raz:${i}`, 100 * (1 + (i % 4)), '2026-11-03', content);
-      const kinds = prizes.filter((prize) => prize.kind === 'material').map((prize) => parseStack(prize.key).materialId);
-      assert.equal(new Set(kinds).size, kinds.length, kinds.join(', '));
-    }
+  test('what a prize is worth to the character: an item at the scrapper, materials at the Garbarnia, resources at the Duch budowniczego', () => {
+    const item = { kind: 'item', tier: 'good', item: { level: 50, rarity: 'epic' } };
+    assert.equal(prizeWorth(item, {}, content), sellPrice(item.item, content, 0));
+    assert.equal(prizeWorth(item, { sellBonus: 0.5 }, content), sellPrice(item.item, content, 0.5));
+    // A rare piece at 20 zł at the scrapper, with the Skup złomu and the tanner's premium.
+    assert.equal(prizeWorth({ kind: 'material', key: 'wolf-pelt:rare', count: 2 }, {}, content), 40);
+    assert.ok(Math.abs(prizeWorth({ kind: 'material', key: 'wolf-pelt:rare', count: 2 }, { sellBonus: 0.5, tanneryPremium: 0.2 }, content) - 72) < 1e-9);
+    // The spirit pays 6 zł for 100 pieces of wood, 12 for as much ore.
+    assert.equal(prizeWorth({ kind: 'resource', key: 'wood', count: 250 }, { sellBonus: 1 }, content), 15);
+    assert.equal(prizeWorth({ kind: 'resource', key: 'iron-ore', count: 250 }, {}, content), 30);
   });
 
-  test('the same pool for the same character, day and stake; the day keeps the character as it was', () => {
+  test("the same pool for the same character and day at every stake; the day keeps the character as it was", () => {
     const basis = { ...character(30), sellBonus: 0, tanneryPremium: 0.1 };
-    const one = wheelPrizes(basis, '7:casino', 100, '2026-11-03', content);
-    assert.deepEqual(wheelPrizes(basis, '7:casino', 100, '2026-11-03', content), one);
-    assert.notDeepEqual(wheelPrizes(basis, '7:casino', 100, '2026-11-04', content), one);
-    assert.notDeepEqual(wheelPrizes(basis, '7:casino', 200, '2026-11-03', content), one);
-    assert.notDeepEqual(wheelPrizes(basis, '8:casino', 100, '2026-11-03', content), one);
+    const one = wheelPrizes(basis, '7:casino', '2026-11-03', content);
+    assert.deepEqual(wheelPrizes(basis, '7:casino', '2026-11-03', content), one);
+    assert.notDeepEqual(wheelPrizes(basis, '7:casino', '2026-11-04', content), one);
+    assert.notDeepEqual(wheelPrizes(basis, '8:casino', '2026-11-03', content), one);
     // The day's Wheel: the character at its first look, and nothing won.
     const wheel = wheelDay(null, basis, NOW, content);
-    assert.deepEqual(wheel, { day: '2026-11-03', basis, won: {} });
-    // Kept until midnight with the character as it was, the places won at
-    // each stake too: a level up changes neither the stakes nor the pools.
+    assert.deepEqual(wheel, { day: '2026-11-03', basis, won: [] });
+    // Kept until midnight with the character as it was, and the places won:
+    // a level up changes neither the stakes nor the pool.
     const grown = { ...basis, level: 60, classLevel: 60 };
-    const kept = wheelDay(JSON.parse(JSON.stringify(wheelWon(wheelWon(wheel, 100, 2), 100, 0))), grown, NOW + 3600000, content);
-    assert.deepEqual(kept, { day: '2026-11-03', basis, won: { 100: [2, 0] } });
+    const kept = wheelDay(JSON.parse(JSON.stringify(wheelWon(wheelWon(wheel, 2), 0))), grown, NOW + 3600000, content);
+    assert.deepEqual(kept, { day: '2026-11-03', basis, won: [2, 0] });
     assert.deepEqual(dayStakes(kept, content), [100, 200, 300, 400]);
-    assert.deepEqual(wheelPool(kept, '7:casino', 100, content), { prizes: one, won: [2, 0] });
-    assert.deepEqual(wheelPool(kept, '7:casino', 200, content).won, []);
-    assert.deepEqual(prizesLeft(wheelPool(kept, '7:casino', 100, content)), [1, 3, 4]);
+    assert.deepEqual(wheelPool(kept, '7:casino', content), { prizes: one, won: [2, 0] });
+    assert.deepEqual(prizesLeft(wheelPool(kept, '7:casino', content)), [1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+    // A day kept with a pool at each stake (up to 0.1.34) starts its one pool anew.
+    assert.deepEqual(wheelDay({ day: '2026-11-03', basis, won: { 100: [2, 0] } }, grown, NOW, content).won, []);
     // A new day starts from the character now.
     const next = wheelDay(kept, grown, NOW + 86400000, content);
-    assert.deepEqual(next, { day: '2026-11-04', basis: grown, won: {} });
+    assert.deepEqual(next, { day: '2026-11-04', basis: grown, won: [] });
     assert.equal(dayStakes(next, content).at(-1), 900);
-  });
-
-  test('materials are the fewest pieces worth more than the stake at the Garbarnia', () => {
-    for (const stake of [100, 300]) {
-      const prizes = wheelPrizes({ ...character(30), sellBonus: 0, tanneryPremium: 0.1 }, 'materialy', stake, '2026-11-03', content);
-      for (const prize of prizes.filter((one) => one.kind === 'material')) {
-        const piece = prizeWorth({ ...prize, count: 1 }, { tanneryPremium: 0.1 }, content);
-        assert.ok(piece * (prize.count - 1) <= stake);
-        assert.ok(piece * prize.count > stake);
-      }
-    }
-    // An epic piece is worth 80 zł at the scrapper (584 B: five times the 16
-    // zł of 0.1.32), 88 zł at the Garbarnia to a stranger: two pieces at 100
-    // zł, four at 300 zł; with the Skup złomu at its top and the best
-    // relation (208 zł a piece), one and two.
-    const pieces = (stake, bonuses) => Math.floor(stake / prizeWorth({ kind: 'material', key: 'wolf-pelt:epic', count: 1 }, bonuses, content)) + 1;
-    assert.deepEqual([pieces(100, { tanneryPremium: 0.1 }), pieces(300, { tanneryPremium: 0.1 })], [2, 4]);
-    assert.deepEqual([pieces(100, { sellBonus: 1, tanneryPremium: 0.3 }), pieces(300, { sellBonus: 1, tanneryPremium: 0.3 })], [1, 2]);
   });
 });
 
@@ -328,32 +354,52 @@ describe('the Salon Gier through the API', () => {
   const today = () => casinoDay(Date.now(), content);
   const all = async (sql) => (await (await db()).prepare(sql).all()).results;
 
-  test("the Salon opens with the Osada: the Loteria, and the Wheel with the day's stakes, each with its own pool, kept for the day", async () => {
+  test("the Salon opens with the Osada: the Loteria, and the Wheel with the day's stakes, their chances and the day's one pool, kept for the day", async () => {
     await set('level = 19');
     const locked = await call('GET', '/api/settlement/casino', { cookie });
     assert.deepEqual([locked.status, locked.data.error.code], [403, 'locked']);
     await set('level = 30');
     const view = await salon();
     assert.deepEqual(view.lottery, { name: 'Loteria', ticket: 50, base: 100, tickets: 0, pot: 100, players: [], mine: false, endsAt: today().endsAt, last: null });
-    assert.deepEqual([view.wheel.stakes, view.wheel.stake, view.wheel.step, view.wheel.chance, view.wheel.left], [[100, 200, 300, 400], 100, 100, 0.1, 5]);
-    assert.equal(view.wheel.prizes.length, 5);
-    assert.ok(view.wheel.prizes.every((prize) => !prize.won && prize.worth > 100 && prize.worth <= 200));
-    assert.equal(view.wheel.prizes[0].kind, 'item');
+    const { wheel } = view;
+    assert.deepEqual([wheel.stakes, wheel.stake, wheel.step, wheel.none, wheel.left], [[100, 200, 300, 400], 100, 100, { low: 0.7, high: 0.6 }, 15]);
+    assert.deepEqual(
+      wheel.tiers.map((tier) => [tier.id, tier.name, tier.count]),
+      [
+        ['weak', 'Słaba', 10],
+        ['fair', 'Niezła', 3],
+        ['good', 'Dobra', 1],
+        ['great', 'Świetna', 1],
+      ],
+    );
+    // The chances at each stake, the lowest's and the top's as in the data.
+    assert.equal(wheel.odds.length, 4);
+    assert.deepEqual([wheel.odds[0].none, ...wheel.odds[0].tiers.map((tier) => tier.chance)], [0.7, 0.24, 0.048, 0.009, 0.003]);
+    assert.deepEqual([wheel.odds[3].none, ...wheel.odds[3].tiers.map((tier) => tier.chance)].map((chance) => Number(chance.toFixed(4))), [0.6, 0.11, 0.11, 0.08, 0.1]);
+    assert.equal(wheel.prizes.length, 15);
+    assert.deepEqual(
+      wheel.prizes.map((prize) => prize.tier),
+      ['great', 'good', 'fair', 'fair', 'fair', ...Array(10).fill('weak')],
+    );
+    assert.ok(wheel.prizes.every((prize) => !prize.won && prize.worth >= 0 && prize.name));
+    assert.deepEqual([wheel.prizes[0].kind, wheel.prizes[1].kind, wheel.prizes[1].rarity], ['item', 'item', 'epic']);
+    for (const prize of wheel.prizes.filter((one) => one.kind === 'resource')) {
+      assert.deepEqual([prize.count, prize.name], [150, content.resourcesById[prize.key].name]);
+    }
     assert.equal(view.texts.announce, casino.texts.announce);
-    // Another stake, another pool, of prizes worth more.
+    // Another stake: the same pool, the stake shown.
     const higher = await salon(cookie, 300);
     assert.equal(higher.wheel.stake, 300);
-    assert.ok(higher.wheel.prizes.every((prize) => prize.worth > 300 && prize.worth <= 600));
+    assert.deepEqual(higher.wheel.prizes, wheel.prizes);
     // A stake that is not one of the day's shows the lowest.
     for (const asked of [250, 5000, 'abc']) assert.equal((await salon(cookie, asked)).wheel.stake, 100);
     // The day's Wheel is kept in the Osada with the character as it was:
-    // grown, it has the same stakes and pools until midnight.
+    // grown, it has the same stakes and pool until midnight.
     const kept = (await stored()).casino;
-    assert.deepEqual([kept.day, kept.basis.level, kept.basis.classId, kept.won], [today().key, 30, 'warrior', {}]);
+    assert.deepEqual([kept.day, kept.basis.level, kept.basis.classId, kept.won], [today().key, 30, 'warrior', []]);
     await set('level = 60, class_level = 60');
     const later = await salon();
-    assert.deepEqual([later.wheel.stakes, later.wheel.prizes], [view.wheel.stakes, view.wheel.prizes]);
-    assert.deepEqual((await salon(cookie, 300)).wheel.prizes, higher.wheel.prizes);
+    assert.deepEqual([later.wheel.stakes, later.wheel.prizes], [wheel.stakes, wheel.prizes]);
     // Szczęsny stands among the residents.
     const host = (await call('GET', '/api/settlement', { cookie })).data.settlement.residents.find((resident) => resident.id === casino.resident);
     assert.equal(host.greeting, host.greetings[0]);
@@ -454,58 +500,70 @@ describe('the Salon Gier through the API', () => {
     assert.deepEqual((await salon()).lottery.last, null);
   });
 
-  test("the Wheel: one of the day's stakes, gone whatever comes, and a win takes a prize of the stake's pool until it is empty", async () => {
+  test("the Wheel: one of the day's stakes, gone whatever comes, and a win takes a prize of the day's pool until it is empty", async () => {
     const before = await salon();
     assert.equal((await spin(0)).status, 400);
     for (const stake of [50, 150, 500, '100', null]) assert.equal((await spin(stake)).data.error.code, 'invalid_stake', String(stake));
-    await set('gold = 99');
-    assert.equal((await spin(100)).data.error.code, 'not_enough_gold');
-    await set('gold = 100000');
+    await set('gold = 399');
+    assert.equal((await spin(400)).data.error.code, 'not_enough_gold');
+    await set('gold = 1000000');
+    const start = await row();
     const items = (await all('SELECT COUNT(*) AS count FROM items WHERE slot IS NULL')).at(0).count;
+    const tiers = new Set(before.wheel.tiers.map((tier) => tier.id));
+    // At the top stake, where the best prizes come likeliest.
+    let view = before.wheel;
     let spins = 0;
     let wins = 0;
     let last = null;
-    while (spins < 200) {
-      const answer = await spin(100);
+    while (spins < 400) {
+      const answer = await spin(400);
       if (answer.status !== 200) {
         last = answer;
         break;
       }
       spins += 1;
-      assert.deepEqual([answer.data.spin.chance, answer.data.casino.wheel.stake], [0.1, 100]);
-      if (answer.data.spin.win) {
+      const { spin: result, casino: now } = answer.data;
+      assert.deepEqual([result.stake, now.wheel.stake], [400, 400]);
+      assert.ok(result.tier === null || tiers.has(result.tier), String(result.tier));
+      if (result.win) {
         wins += 1;
-        assert.equal(answer.data.casino.wheel.left, 5 - wins);
+        assert.equal(result.prize.tier, result.tier);
+        assert.equal(now.wheel.left, 15 - wins);
+      } else if (result.tier) {
+        // It stopped on a tier with nothing left in the pool.
+        assert.ok(view.prizes.every((prize) => prize.tier !== result.tier || prize.won), result.tier);
       }
+      view = now.wheel;
     }
-    assert.equal(wins, 5);
+    assert.equal(wins, 15);
     assert.deepEqual([last.status, last.data.error.code], [409, 'empty']);
     const after = await salon();
     assert.equal(after.wheel.left, 0);
     assert.ok(after.wheel.prizes.every((prize) => prize.won));
-    assert.equal((await row()).gold, 100000 - 100 * spins);
-    // The items in the bag as from a trade, the materials as bought ones:
-    // the Encyklopedia leaves both out.
+    const end = await row();
+    assert.equal(end.gold, 1000000 - 400 * spins);
+    // The items in the bag as from a trade, the materials as bought ones (the
+    // Encyklopedia leaves both out), the resources in the camp.
     const won = before.wheel.prizes;
     const wonItems = won.filter((prize) => prize.kind === 'item');
     const bag = await all('SELECT data FROM items WHERE slot IS NULL ORDER BY id');
     assert.equal(bag.length - items, wonItems.length);
     for (const { data } of bag.slice(items)) assert.equal(JSON.parse(data).traded, 1);
-    const { materials, foreign_stacks: foreignStacks } = await row();
-    const held = JSON.parse(materials);
-    const foreign = JSON.parse(foreignStacks);
+    const held = JSON.parse(end.materials);
+    const foreign = JSON.parse(end.foreign_stacks);
     const wanted = {};
     for (const prize of won.filter((one) => one.kind === 'material')) wanted[prize.key] = (wanted[prize.key] ?? 0) + prize.count;
     for (const [key, count] of Object.entries(wanted)) {
       assert.equal(held[key], count, key);
       assert.equal(foreign[`material:${key}`], count, key);
     }
-    // The other stakes keep their pools whole, and a spin at one pays it.
-    const other = await salon(cookie, 200);
-    assert.deepEqual([other.wheel.stake, other.wheel.left], [200, 5]);
-    const higher = await spin(200);
-    assert.deepEqual([higher.status, higher.data.casino.wheel.stake], [200, 200]);
-    assert.equal((await row()).gold, 100000 - 100 * spins - 200);
+    const resources = JSON.parse(end.resources);
+    const had = JSON.parse(start.resources ?? '{}');
+    const gained = {};
+    for (const prize of won.filter((one) => one.kind === 'resource')) gained[prize.key] = (gained[prize.key] ?? 0) + prize.count;
+    for (const [key, count] of Object.entries(gained)) assert.equal(resources[key], (had[key] ?? 0) + count, key);
+    // The pool is gone at every stake.
+    assert.equal((await spin(100)).data.error.code, 'empty');
   });
 
   test('two taps with the gold for one spin spin once, and taps at once never pay without a spin nor win a prize twice', async () => {
@@ -516,17 +574,14 @@ describe('the Salon Gier through the API', () => {
     assert.equal((await row()).gold, 0);
     // With gold for all: each spin that goes through pays its stake, once.
     await set('gold = 100000');
-    const more = await Promise.all([spin(100), spin(100), spin(200)]);
+    const more = await Promise.all([spin(100), spin(400), spin(400), spin(200)]);
     assert.ok(more.every((tap) => tap.status === 200 || tap.status === 409), JSON.stringify(more.map((tap) => tap.status)));
     const done = [...taps, ...more].filter((tap) => tap.status === 200);
     const paid = done.slice(1).reduce((sum, tap) => sum + tap.data.spin.stake, 0);
     assert.equal((await row()).gold, 100000 - paid);
     const { won } = (await stored()).casino;
-    for (const stake of [100, 200]) {
-      const places = won[stake] ?? [];
-      assert.equal(places.length, done.filter((tap) => tap.data.spin.stake === stake && tap.data.spin.win).length, String(stake));
-      assert.equal(new Set(places).size, places.length);
-    }
+    assert.equal(won.length, done.filter((tap) => tap.data.spin.win).length);
+    assert.equal(new Set(won).size, won.length);
   });
 
   test('a full bag waits while an item is in the pool; a new day brings a new Wheel', async () => {
@@ -539,19 +594,19 @@ describe('the Salon Gier through the API', () => {
     const full = await salon();
     assert.deepEqual([full.wheel.itemLeft, full.wheel.bagFree], [true, 0]);
     assert.equal((await spin(100)).data.error.code, 'bag_full');
-    // Only materials left: the Wheel turns with a full bag.
+    // No item left: the Wheel turns with a full bag.
     const itemPlaces = view.wheel.prizes.map((prize, index) => (prize.kind === 'item' ? index : null)).filter((index) => index !== null);
     const kept = (await stored()).casino;
-    await set('settlement = ?', JSON.stringify({ ...(await stored()), casino: { ...kept, won: { 100: itemPlaces } } }));
+    await set('settlement = ?', JSON.stringify({ ...(await stored()), casino: { ...kept, won: itemPlaces } }));
     assert.equal((await salon()).wheel.itemLeft, false);
     assert.equal((await spin(100)).status, 200);
     // The next day's Wheel is new, with nothing won, and the character as it is.
     await set('level = 60, class_level = 60');
-    await set('settlement = ?', JSON.stringify({ ...(await stored()), casino: { ...kept, day: '2026-01-01', won: { 100: [0, 1, 2, 3, 4] } } }));
+    await set('settlement = ?', JSON.stringify({ ...(await stored()), casino: { ...kept, day: '2026-01-01', won: view.wheel.prizes.map((_, index) => index) } }));
     const fresh = await salon();
-    assert.deepEqual([fresh.wheel.left, fresh.wheel.prizes.length, fresh.wheel.stakes.at(-1)], [5, 5, 900]);
+    assert.deepEqual([fresh.wheel.left, fresh.wheel.prizes.length, fresh.wheel.stakes.at(-1)], [15, 15, 900]);
     const next = (await stored()).casino;
-    assert.deepEqual([next.day, next.basis.level, next.won], [today().key, 60, {}]);
+    assert.deepEqual([next.day, next.basis.level, next.won], [today().key, 60, []]);
   });
 
   test('a character that goes takes its ticket along', async () => {

@@ -3048,6 +3048,36 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Odpowiedź autora 586 (4.11.2026)
+
+Autor: „586 nie 50/50 tylko 70/30 gdzie 70% to nic nietrafione na najniższej stawce i rośnie wraz ze stawką do 60/40 i szansą na lepsze przedmioty / Loteria zostaje bez zmian / lecisz”.
+
+## Koło Fortuny: jedna pula na dzień, a stawka zmienia szanse (4.11.2026, w grze od 0.1.35)
+
+Autor: „Koło fortuny zmieniamy. Ma jedną pulę codziennie losowaną niezależnie od stawki, stawka zwiększa prawdopodobieństwo trafienia lepszych przedmiotów. Czyli pula niezależna od stawki i dominuje gówno (powiedzmy 10 z 15 przedmiotów - nawet zasoby), ze 3 okey przedmioty, 1 spoko i 1 super i duża szansa też na nic nie trafienie. Na maksymalnej stawce mogłoby być to 10 procent na jakieś legendarne przedmioty czy czasem i mityczne”. Szanse według odpowiedzi 586 (zob. wyżej). Zastępuje „Koło Fortuny: 10% szans” i „Koło Fortuny: przedmioty legendarne tylko przy najwyższej stawce”. Loteria bez zmian.
+
+1. **Pula.** Jedna na dzień dla każdej postaci, ta sama przy każdej stawce. Ma 15 nagród w czterech rangach:
+   - 10 słabych: zasoby obozu (5 sztuk za poziom postaci), 2–4 sztuki pospolitego materiału z krain, które postać zna, albo pospolity przedmiot jej klasy na jej poziomie (wagi 4 : 3 : 3);
+   - 3 niezłe: rzadki albo unikalny przedmiot albo 1–2 sztuki materiału w tej rzadkości;
+   - 1 dobra: przedmiot epicki;
+   - 1 świetna: przedmiot legendarny, a z szansą 10% mityczny (mniej więcej raz na 10 dni).
+2. **Szanse (586).** Przy najniższej stawce 70% zakręceń nic nie daje, przy najwyższej 60%, a pomiędzy szansa zmienia się równo ze stawką. Resztę dzielą rangi:
+   - przy najniższej stawce: słaba 24%, niezła 4,8%, dobra 0,9%, świetna 0,3%;
+   - przy najwyższej stawce: słaba 11%, niezła 11%, dobra 8%, świetna 10%.
+3. **Wygrana nagroda znika z puli do północy.** Gdy Koło stanie na randze, w której nic już nie zostało, zakręcenie nic nie daje.
+4. **Stawki.** Idą co 100 złota. Najwyższa to, jak dotąd, ostatnia poniżej ceny, którą złomiarz płaci postaci za legendarny przedmiot na jej poziomie (z premią Skupu złomu). Najniższa rośnie o 100 co 40 poziomów: 100 złota do 79. poziomu, 200 od 80., 300 od 120. Autor przyjął to razem z odpowiedzią 586. Nagrody rosną z poziomem, a bez tego na 150. poziomie zakręcenie za 100 złota oddawałoby średnio więcej, niż kosztuje.
+5. **Opłacalność.** W złocie, które za nagrody płacą NPC (złomiarz, Garbarnia, Duch budowniczego), Koło oddaje średnio najwyżej ok. 32% stawki. Z najwyższym Skupem złomu i najlepszą relacją z garbarzem oddaje najwyżej ok. 47%. Nigdy nie oddaje więcej, niż bierze; pilnuje tego test.
+6. **Ekran.** Pod stawką widać szanse każdej rangi i szansę na „nic” przy tej stawce, a przy każdej nagrodzie jej rangę. Zasoby mają w puli swój obrazek i liczbę sztuk.
+7. **Brakujące szczegóły (najprostsze rozwiązania):**
+   - Przy 70/30 i 60/40 świetna nagroda ma przy najwyższej stawce 10%, jak w pierwszej wiadomości autora. Pozostałe rangi dzielą resztę w proporcjach z propozycji 586.
+   - W puli każdy zasób obozu jest najwyżej raz. Materiał stwora też, dopóki krainy postaci mają inny pospolity materiał. Przedmiot w kilku losowaniach dostaje podstawę, której w puli jeszcze nie ma.
+   - Wygrane zasoby trafiają do obozu tak jak zasoby z wypraw.
+   - Pule dnia zapisane przed tą wersją (osobne dla każdej stawki) losują się od nowa. Nagrody już wygrane zostają u postaci.
+
+## Wersja 0.1.35 (4.11.2026)
+
+1. **Nowe Koło Fortuny** (zob. wyżej).
+
 ## Kod PC dla dwóch postaci, które wymyśliły nowe Koło Fortuny (4.11.2026, w grze od 0.1.34)
 
 Autor poprosił o kod PC dla dwóch kolejnych postaci, których gracze wymyślili zmianę Koła Fortuny.

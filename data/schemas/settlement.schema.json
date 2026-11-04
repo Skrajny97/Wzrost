@@ -303,19 +303,49 @@
         "wheel": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["name", "step", "maxSteps", "chance", "worthCap", "prizes", "itemChance", "itemRarity", "topItemRarity", "belowTopItemRarity", "materialRarities"],
+          "required": ["name", "step", "maxSteps", "levelsPerStep", "topRarity", "none", "tiers", "weakKinds", "resourcePerLevel", "weakMaterials", "fairRarities", "fairMaterials", "goodRarity", "greatRarity", "mythicRarity", "mythicChance"],
           "properties": {
             "name": { "type": "string", "minLength": 1 },
             "step": { "type": "integer", "minimum": 1, "description": "Najniższa stawka w złocie i krok, o który rośnie (542 C: 100 zł, setkami)." },
             "maxSteps": { "type": "integer", "minimum": 1, "description": "Najwyższa stawka to najwyżej tyle kroków." },
-            "chance": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Szansa wygranej, taka sama przy każdej stawce (od 0.1.13 10%; autor: „Koło fortuny proszę znerfić mocno i dać 10% szans”)." },
-            "worthCap": { "type": "number", "exclusiveMinimum": 1, "description": "Nagroda jest warta najwyżej tyle stawek (2, jak przy dawnej szansie 50%), więc niższa szansa nie podnosi nagród. Nie więcej niż 1 / chance, żeby Koło nie oddawało średnio więcej, niż bierze." },
-            "prizes": { "type": "integer", "minimum": 1, "description": "Ile nagród ma pula postaci na dobę przy każdej stawce." },
-            "itemChance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa, że nagroda jest przedmiotem, gdy jakiś przedmiot się mieści." },
-            "itemRarity": { "type": "string", "description": "Najniższa rzadkość przedmiotu w puli." },
-            "topItemRarity": { "type": "string", "description": "Najwyższa rzadkość przedmiotu w puli, tylko przy najwyższej stawce postaci; najwyższa stawka to ta, przy której pasuje jeszcze przedmiot tej rzadkości." },
-            "belowTopItemRarity": { "type": "string", "description": "Najwyższa rzadkość przedmiotu w pulach niższych stawek niż najwyższa (554 B: legendarne przedmioty tylko przy najwyższej stawce dnia)." },
-            "materialRarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 }, "description": "Rzadkości materiałów w puli z wagami losowania." }
+            "levelsPerStep": { "type": "integer", "minimum": 1, "description": "Najniższa stawka to jeden step i o jeden więcej co tyle poziomów postaci (przy 40: od 80. poziomu 200 zł, od 120. 300 zł)." },
+            "topRarity": { "type": "string", "description": "Najwyższa stawka to ostatnia poniżej ceny, którą złomiarz płaci postaci za przedmiot tej rzadkości na jej poziomie." },
+            "none": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["low", "high"],
+              "description": "Szansa, że zakręcenie nic nie da: low przy najniższej stawce, high przy najwyższej, równo pomiędzy (586: „70% to nic nietrafione na najniższej stawce i rośnie wraz ze stawką do 60/40”).",
+              "properties": {
+                "low": { "type": "number", "minimum": 0, "exclusiveMaximum": 1 },
+                "high": { "type": "number", "minimum": 0, "exclusiveMaximum": 1 }
+              }
+            },
+            "tiers": {
+              "type": "array",
+              "minItems": 1,
+              "description": "Progi nagród od najsłabszego: count nagród w puli dnia i szansa zakręcenia od low przy najniższej stawce do high przy najwyższej. none i szanse progów sumują się do 1 przy każdej stawce.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["id", "name", "count", "low", "high"],
+                "properties": {
+                  "id": { "enum": ["weak", "fair", "good", "great"] },
+                  "name": { "type": "string", "minLength": 1 },
+                  "count": { "type": "integer", "minimum": 1 },
+                  "low": { "type": "number", "minimum": 0, "maximum": 1 },
+                  "high": { "type": "number", "minimum": 0, "maximum": 1 }
+                }
+              }
+            },
+            "weakKinds": { "type": "object", "additionalProperties": false, "required": ["resource", "material", "item"], "properties": { "resource": { "type": "number", "minimum": 0 }, "material": { "type": "number", "minimum": 0 }, "item": { "type": "number", "minimum": 0 } }, "description": "Wagi rodzajów słabej nagrody: zasoby obozu, pospolite materiały, pospolity przedmiot." },
+            "resourcePerLevel": { "type": "number", "exclusiveMinimum": 0, "description": "Sztuk zasobu w słabej nagrodzie za poziom postaci." },
+            "weakMaterials": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 2, "maxItems": 2, "description": "Od ilu do ilu sztuk pospolitego materiału w słabej nagrodzie." },
+            "fairRarities": { "type": "array", "items": { "type": "string" }, "minItems": 1, "description": "Rzadkości niezłej nagrody." },
+            "fairMaterials": { "type": "array", "items": { "type": "integer", "minimum": 1 }, "minItems": 2, "maxItems": 2, "description": "Od ilu do ilu sztuk materiału w niezłej nagrodzie." },
+            "goodRarity": { "type": "string", "description": "Rzadkość przedmiotu dobrej nagrody." },
+            "greatRarity": { "type": "string", "description": "Rzadkość przedmiotu świetnej nagrody." },
+            "mythicRarity": { "type": "string", "description": "Rzadkość przedmiotu świetnej nagrody z szansą mythicChance." },
+            "mythicChance": { "type": "number", "minimum": 0, "maximum": 1 }
           }
         },
         "show": {
@@ -360,7 +390,7 @@
         "texts": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["lotteryAbout", "lotteryToday", "lotteryBuy", "lotteryHas", "lotteryBought", "lotteryYesterday", "lotteryEarlier", "lotteryMine", "lotteryNone", "lotteryPlayers", "announce", "wheelAbout", "wheelPool", "wheelPoolAbout", "wheelStake", "wheelSpin", "wheelEmpty", "wheelWon", "wheelBag", "won", "lost", "win", "loss"],
+          "required": ["lotteryAbout", "lotteryToday", "lotteryBuy", "lotteryHas", "lotteryBought", "lotteryYesterday", "lotteryEarlier", "lotteryMine", "lotteryNone", "lotteryPlayers", "announce", "wheelAbout", "wheelPool", "wheelPoolAbout", "wheelStake", "wheelSpin", "wheelEmpty", "wheelOdds", "wheelGone", "wheelWon", "wheelBag", "won", "lost", "win", "loss"],
           "properties": {
             "lotteryAbout": { "type": "string", "minLength": 1 },
             "lotteryToday": { "type": "string", "minLength": 1 },
@@ -379,6 +409,8 @@
             "wheelStake": { "type": "string", "minLength": 1 },
             "wheelSpin": { "type": "string", "minLength": 1 },
             "wheelEmpty": { "type": "string", "minLength": 1 },
+            "wheelOdds": { "type": "string", "minLength": 1 },
+            "wheelGone": { "type": "string", "minLength": 1 },
             "wheelWon": { "type": "string", "minLength": 1 },
             "wheelBag": { "type": "string", "minLength": 1 },
             "won": { "type": "string", "minLength": 1 },

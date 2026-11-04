@@ -1365,20 +1365,23 @@ function checkCasino(data) {
   else if (host.greetings.length !== standings.length) errors.push(`settlement.json: gospodarz Salonu ${host.id} musi mieć powitanie na każdy stopień relacji`);
   if (!places.some((place) => place.resident === casino.resident)) errors.push(`settlement.json: gospodarz Salonu ${casino.resident} nie ma miejsca na planszy`);
   const { wheel, lottery, texts } = casino;
-  // A prize is worth more than the stake and at most what a win costs on
-  // average (the stake over the chance), so the chance must stay under 100%;
-  // the prize cap in stakes no higher than that either.
-  if (wheel.chance >= 1) errors.push('settlement.json: szansa Koła musi być mniejsza niż 100%, żeby nagroda mogła być warta więcej niż stawka');
-  else if (wheel.worthCap * wheel.chance > 1) errors.push('settlement.json: casino.wheel.worthCap nie może przekraczać 1 / chance, bo Koło oddawałoby średnio więcej, niż bierze');
+  // The Wheel's one pool of the day (4.11.2026): the four tiers once each,
+  // their chances with that of nothing adding up to 1 at the lowest stake
+  // and at the highest, no better chance of nothing at a higher stake (586),
+  // and known rarities.
   const rarities = data.rarities.map((rarity) => rarity.id);
-  if (!rarities.includes(wheel.itemRarity)) errors.push(`settlement.json: casino.wheel.itemRarity to nieznana rzadkość ${wheel.itemRarity}`);
-  if (!rarities.includes(wheel.topItemRarity)) errors.push(`settlement.json: casino.wheel.topItemRarity to nieznana rzadkość ${wheel.topItemRarity}`);
-  else if (rarities.indexOf(wheel.topItemRarity) < rarities.indexOf(wheel.itemRarity)) errors.push('settlement.json: casino.wheel.topItemRarity nie może być niższa niż itemRarity');
-  if (!rarities.includes(wheel.belowTopItemRarity)) errors.push(`settlement.json: casino.wheel.belowTopItemRarity to nieznana rzadkość ${wheel.belowTopItemRarity}`);
-  else if (rarities.indexOf(wheel.belowTopItemRarity) < rarities.indexOf(wheel.itemRarity) || rarities.indexOf(wheel.belowTopItemRarity) > rarities.indexOf(wheel.topItemRarity)) errors.push('settlement.json: casino.wheel.belowTopItemRarity musi leżeć od itemRarity do topItemRarity');
-  for (const id of Object.keys(wheel.materialRarities)) if (!rarities.includes(id)) errors.push(`settlement.json: casino.wheel.materialRarities ma nieznaną rzadkość ${id}`);
+  const tierIds = wheel.tiers.map((tier) => tier.id);
+  for (const id of ['weak', 'fair', 'good', 'great']) if (tierIds.filter((one) => one === id).length !== 1) errors.push(`settlement.json: casino.wheel.tiers potrzebuje progu ${id} dokładnie raz`);
+  for (const end of ['low', 'high']) {
+    const sum = wheel.none[end] + wheel.tiers.reduce((total, tier) => total + tier[end], 0);
+    if (Math.abs(sum - 1) > 1e-9) errors.push(`settlement.json: casino.wheel: none.${end} i szanse progów (${end}) muszą dawać razem 1, a dają ${sum}`);
+  }
+  if (wheel.none.high > wheel.none.low) errors.push('settlement.json: casino.wheel.none.high nie może być większe niż none.low: wyższa stawka nie zmniejsza szansy na wygraną');
+  for (const key of ['topRarity', 'goodRarity', 'greatRarity', 'mythicRarity']) if (!rarities.includes(wheel[key])) errors.push(`settlement.json: casino.wheel.${key} to nieznana rzadkość ${wheel[key]}`);
+  for (const id of wheel.fairRarities) if (!rarities.includes(id)) errors.push(`settlement.json: casino.wheel.fairRarities ma nieznaną rzadkość ${id}`);
+  for (const key of ['weakMaterials', 'fairMaterials']) if (wheel[key][0] > wheel[key][1]) errors.push(`settlement.json: casino.wheel.${key}: od nie może być więcej niż do`);
   if (lottery.base < 0 || lottery.ticket < 1) errors.push('settlement.json: casino.lottery potrzebuje ceny losu i bazy puli');
-  const needs = { lotteryAbout: ['ticket', 'base'], lotteryToday: ['pot', 'tickets'], lotteryBuy: ['ticket'], lotteryEarlier: ['date'], announce: ['name', 'gold'], wheelAbout: ['step', 'chance'], wheelPool: ['stake', 'left', 'all'], wheelStake: ['stake', 'chance'], wheelSpin: ['stake'], won: ['prize'] };
+  const needs = { lotteryAbout: ['ticket', 'base'], lotteryToday: ['pot', 'tickets'], lotteryBuy: ['ticket'], lotteryEarlier: ['date'], announce: ['name', 'gold'], wheelAbout: ['step', 'low', 'high'], wheelPool: ['left', 'all'], wheelStake: ['stake'], wheelOdds: ['great', 'good', 'fair', 'weak', 'none'], wheelSpin: ['stake'], won: ['prize'] };
   for (const [key, words] of Object.entries(needs)) {
     for (const word of words) if (!texts[key]?.includes(`{${word}}`)) errors.push(`settlement.json: casino.texts.${key} nie ma {${word}}`);
   }

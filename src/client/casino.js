@@ -4,7 +4,9 @@
 // znowu dużo scrollowania, opisy chowaj jak zawsze pod 'Jak to działa?'"):
 // the Loteria, with today's pot, the ticket of the day and the last draw,
 // and the Koło Fortuny, with the stake, stepping through the day's stakes,
-// the spin and the stake's pool of the day. The rules wait under "Jak to
+// the chances at the stake, the spin and the day's one pool, the same at
+// every stake (the author on 4.11.2026: "Ma jedną pulę codziennie losowaną
+// niezależnie od stawki"). The rules wait under "Jak to
 // działa?". The words are the data's (data/settlement.json, casino.texts).
 //
 // The games happen on the screen too (the author: "Trzeba zrobić animację
@@ -17,7 +19,7 @@
 // redraws itself, as the Targowisko's, so a redraw never asks the server
 // again.
 
-import { salonArt } from './art.js';
+import { resourceArt, salonArt } from './art.js';
 import { h } from './dom.js';
 import { formatDecimal, formatNumber } from './format.js';
 import { motionOn } from './motion.js';
@@ -148,8 +150,7 @@ export function mountCasino(holder) {
   // the Wheel once today's ticket is bought.
   let tab = null;
   // The stake chosen, kept while the panel redraws; at first the server's
-  // (the lowest). While the pool of a stake just chosen is on its way, the
-  // pool shown is still the old stake's, and the Wheel waits.
+  // (the lowest).
   let stake = null;
   // The newest answer's number, so an older one never draws over it.
   let asked = 0;
@@ -159,10 +160,11 @@ export function mountCasino(holder) {
   // Whether today's players are unfolded, kept while the panel redraws.
   let playersOpen = false;
 
-  // The Salon as an answer brings it.
+  // The Salon as an answer brings it; the stake chosen stays while it is
+  // still one of the day's.
   function take(answer) {
     casino = answer.casino;
-    stake = casino.wheel.stake;
+    if (!casino.wheel.stakes.includes(stake)) stake = casino.wheel.stake;
     tab ??= casino.lottery.mine ? 'wheel' : 'lottery';
   }
 
@@ -196,13 +198,12 @@ export function mountCasino(holder) {
     if (!gone) render();
   };
 
-  // Another stake: its pool comes from the server.
+  // Another stake: the pool stays, its chances change.
   function choose(next) {
     if (next === undefined || next === stake) return;
     stake = next;
     result = null;
     render();
-    load();
   }
 
   // The tabs: the Loteria and the Koło Fortuny.
@@ -309,32 +310,44 @@ export function mountCasino(holder) {
     );
   }
 
-  // A prize of the pool: an item with its card and the comparison with the
-  // one worn, or materials as the Targowisko shows a stack; one won is
-  // marked so.
+  // A prize of the pool with its tier: an item with its card and the
+  // comparison with the one worn, materials as the Targowisko shows a
+  // stack, or the camp's resources; one won is marked so.
+  const tierName = (id) => casino.wheel.tiers.find((tier) => tier.id === id)?.name ?? '';
   const prizeEntry = (prize, index) =>
     h(
       'li',
-      { class: `card market-offer casino-prize${prize.won ? ' casino-prize--won' : ''}` },
-      prize.kind === 'item' ? itemEntry(prize.item, `casino:${casino.wheel.stake}:${index}`, opened) : stackButton(prize),
-      prize.won && h('p', {}, h('span', { class: 'chip chip--success', text: casino.texts.wheelWon })),
+      { class: `card market-offer casino-prize casino-prize--${prize.tier}${prize.won ? ' casino-prize--won' : ''}` },
+      h('p', { class: 'casino-prize-tier' }, h('span', { class: `chip casino-tier casino-tier--${prize.tier}`, text: tierName(prize.tier) }), prize.won && h('span', { class: 'chip chip--success', text: casino.texts.wheelWon })),
+      prize.kind === 'item'
+        ? itemEntry(prize.item, `casino:${index}`, opened)
+        : prize.kind === 'resource'
+          ? h('p', { class: 'casino-resource' }, resourceArt(prize.key, 24), h('span', { text: prizeName(prize) }))
+          : stackButton(prize),
     );
 
-  // The Koło Fortuny (525 A, 526 A, 542 C): the stake and its chance, a
-  // step either way and a slider through the day's stakes, the spin, the
-  // last spin's words, the rules folded, and the stake's pool.
+  // The chances at a stake in a line: the tiers from the best, and nothing.
+  function oddsText(value) {
+    const { texts, wheel } = casino;
+    const odds = wheel.odds[Math.max(0, wheel.stakes.indexOf(value))];
+    const by = Object.fromEntries(odds.tiers.map((tier) => [tier.id, percent(tier.chance)]));
+    return say(texts.wheelOdds, { ...by, none: percent(odds.none) });
+  }
+
+  // The Koło Fortuny (525 A, 542 C, one pool since 4.11.2026): the stake and
+  // its chances, a step either way and a slider through the day's stakes,
+  // the spin, the last spin's words, the rules folded, and the day's pool.
   function wheelCard() {
     const { texts, wheel } = casino;
     const { stakes } = wheel;
     const gold = state.character.gold;
     const at = Math.max(0, stakes.indexOf(stake));
-    // The pool shown is the chosen stake's.
-    const ready = stake === wheel.stake;
-    const stakeText = (value) => say(texts.wheelStake, { stake: value, chance: percent(wheel.chance) });
+    const stakeText = (value) => say(texts.wheelStake, { stake: value });
     const fill = (index) => `${(index / Math.max(1, stakes.length - 1)) * 100}%`;
     const label = h('p', { class: 'casino-chance', text: stakeText(stake) });
-    // The slider names the stake under the finger and asks for its pool when
-    // let go.
+    const chances = h('p', { class: 'casino-odds', text: oddsText(stake) });
+    // The slider names the stake and its chances under the finger, and
+    // chooses the stake when let go.
     const slider = h('input', {
       type: 'range',
       class: 'duration-slider',
@@ -348,6 +361,7 @@ export function mountCasino(holder) {
       onInput: () => {
         const index = Number(slider.value);
         label.textContent = stakeText(stakes[index]);
+        chances.textContent = oddsText(stakes[index]);
         slider.style.setProperty('--fill', fill(index));
         slider.setAttribute('aria-valuetext', `${formatNumber(stakes[index])} zł`);
       },
@@ -365,18 +379,20 @@ export function mountCasino(holder) {
     const blocked = wheel.itemLeft && wheel.bagFree < 1;
     const short = gold < stake;
     const spin =
-      ready && wheel.left === 0
+      wheel.left === 0
         ? h('p', { class: 'muted', text: texts.wheelEmpty })
         : h('button', {
             type: 'button',
             class: 'button button--world',
             text: short ? 'Brakuje złota' : say(texts.wheelSpin, { stake }),
-            disabled: !ready || short || blocked,
+            disabled: short || blocked,
             onClick: (event) =>
               withButton(event.currentTarget, async () => {
                 const answer = await call('POST', '/api/settlement/casino/spin', { stake });
-                const { win, prize } = answer.spin;
-                result = { win, text: win ? say(texts.won, { prize: prizeName(prize) }) : texts.lost, words: oneOf(win ? texts.win : texts.loss) };
+                const { win, prize, tier } = answer.spin;
+                // A tier with nothing left in the pool: the Wheel stopped on a prize already won.
+                const lost = tier ? texts.wheelGone : texts.lost;
+                result = { win, text: win ? say(texts.won, { prize: prizeName(prize) }) : lost, words: oneOf(win ? texts.win : texts.loss) };
                 // The Wheel turns on the screen first; without it, a sound alone.
                 if (showable(casino.show)) await wheelShow(win, casino.show);
                 else playSound(win ? 'chest' : 'tick');
@@ -389,9 +405,10 @@ export function mountCasino(holder) {
         'section',
         { class: 'card stack casino-game', 'data-guide': 'casino-wheel' },
         label,
+        chances,
         // With one stake of the day there is nothing to step through.
         stakes.length > 1 && h('div', { class: 'duration-row' }, stepButton(-1, 'Mniejsza stawka'), slider, stepButton(1, 'Większa stawka')),
-        ready && wheel.left > 0 && blocked && h('p', { class: 'region-warning', text: texts.wheelBag }),
+        wheel.left > 0 && blocked && h('p', { class: 'region-warning', text: texts.wheelBag }),
         spin,
         result &&
           h(
@@ -400,10 +417,10 @@ export function mountCasino(holder) {
             h('p', { class: 'settlement-greeting', text: `„${result.words}”` }),
             h('p', { class: 'casino-result-text', text: result.text }),
           ),
-        howItWorks(null, [say(texts.wheelAbout, { step: wheel.step, chance: percent(wheel.chance) }), texts.wheelPoolAbout]),
+        howItWorks(null, [say(texts.wheelAbout, { step: wheel.step, low: percent(wheel.none.low), high: percent(wheel.none.high) }), texts.wheelPoolAbout]),
       ),
-      h('h3', { class: 'casino-pool-title', text: say(texts.wheelPool, { stake: wheel.stake, left: wheel.left, all: wheel.prizes.length }) }),
-      h('ul', { class: `stack market-list casino-pool${ready ? '' : ' casino-pool--waiting'}`, 'aria-busy': String(!ready) }, wheel.prizes.map(prizeEntry)),
+      h('h3', { class: 'casino-pool-title', text: say(texts.wheelPool, { left: wheel.left, all: wheel.prizes.length }) }),
+      h('ul', { class: 'stack market-list casino-pool' }, wheel.prizes.map(prizeEntry)),
     ];
   }
 

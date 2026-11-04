@@ -5,12 +5,12 @@
 // the minute's cron draws each day gone by once (drawLotteries): the winner
 // gets the whole pot, the draw is written down, and the Globalny gets the
 // System's message about it. The character's Wheel of the day (the basis
-// its pools are drawn from and the prizes won at each stake) is kept in its
-// Osada (`casino` in characters.settlement), from the first time the
-// character looks at the Salon that day; every stake's pool is drawn from it
-// again when asked. Every purchase and spin is one batch whose first
-// statement fails it unless the character is still as read, so two taps
-// never pay twice nor win twice.
+// its one pool is drawn from and the prizes won) is kept in its Osada
+// (`casino` in characters.settlement), from the first time the character
+// looks at the Salon that day; the pool is drawn from it again when asked.
+// Every purchase and spin is one batch whose first statement fails it
+// unless the character is still as read, so two taps never pay twice nor
+// win twice.
 
 import {
   bagCapacity,
@@ -31,8 +31,8 @@ import {
   spinWheel,
   tanneryPremium,
   ticketBlock,
-  wheelChance,
   wheelDay,
+  wheelOdds,
   wheelPool,
   wheelWon,
 } from '../engine/index.js';
@@ -91,17 +91,23 @@ function stakeOf(wheel, asked) {
 // The bag's free places, for an item of the pool.
 const bagFree = (player, now) => Math.max(0, bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player));
 
-// A prize as the Salon shows it: an item with its card (its price at the
-// character's scrapper), or materials as the Targowisko shows a stack;
-// `worth` is what it is worth to the character (prizeWorth).
+// A prize as the Salon shows it, with its tier: an item with its card (its
+// price at the character's scrapper), materials as the Targowisko shows a
+// stack, or the camp's resources; `worth` is what it is worth to the
+// character (prizeWorth).
 function prizeView(prize, won, bonuses) {
   const worth = Math.floor(prizeWorth(prize, bonuses, content));
+  const tier = prize.tier;
   if (prize.kind === 'item') {
-    return { kind: 'item', won, worth, name: itemName(prize.item, content), rarity: prize.item.rarity, level: prize.item.level, item: itemView(prize.item, content, { sellBonus: bonuses.sellBonus }) };
+    return { kind: 'item', tier, won, worth, name: itemName(prize.item, content), rarity: prize.item.rarity, level: prize.item.level, item: itemView(prize.item, content, { sellBonus: bonuses.sellBonus }) };
+  }
+  if (prize.kind === 'resource') {
+    return { kind: 'resource', tier, won, worth, key: prize.key, count: prize.count, name: content.resourcesById[prize.key].name };
   }
   const material = materialView(prize.key, prize.count, content);
   return {
     kind: 'material',
+    tier,
     won,
     worth,
     key: prize.key,
@@ -148,12 +154,14 @@ async function lotteryView(db, row, now) {
 }
 
 // The Salon for the page: its words, the Loteria and the Wheel with the
-// day's stakes and the pool of the stake shown.
+// day's stakes, the chances at each of them, the stake shown and the day's
+// pool.
 async function casinoView(db, player, stored, wheel, stake, now) {
   const bonuses = bonusesOf(player, stored, now);
   const { wheel: tuned, texts } = tuning();
-  const pool = wheelPool(wheel, seedOf(player.row), stake, content);
+  const pool = wheelPool(wheel, seedOf(player.row), content);
   const left = prizesLeft(pool);
+  const stakes = dayStakes(wheel, content);
   return {
     texts,
     // The games on the screen: the Wheel turning, the ticket into the drum.
@@ -162,8 +170,10 @@ async function casinoView(db, player, stored, wheel, stake, now) {
     wheel: {
       name: tuned.name,
       step: tuned.step,
-      chance: wheelChance(content),
-      stakes: dayStakes(wheel, content),
+      none: tuned.none,
+      tiers: tuned.tiers.map(({ id, name, count }) => ({ id, name, count })),
+      stakes,
+      odds: stakes.map((one) => wheelOdds(one, stakes, content)),
       stake,
       endsAt: casinoDay(now, content).endsAt,
       prizes: pool.prizes.map((prize, index) => prizeView(prize, pool.won.includes(index), bonuses)),
@@ -187,7 +197,7 @@ async function respond(context, session, asked, extra = {}, player = null) {
 }
 
 // GET /api/settlement/casino?stake=N: the Salon Gier for the page, with the
-// Wheel's pool at the stake N (the lowest when N is not one of the day's).
+// Wheel at the stake N (the lowest when N is not one of the day's).
 export async function getCasino(context) {
   const { session, player } = await requirePlayer(context);
   requireOpen(player.row);
@@ -233,10 +243,11 @@ export async function buyTicket(context) {
 }
 
 // POST /api/settlement/casino/spin { stake }: the Wheel at one of the day's
-// stakes. The stake goes whatever comes; a win takes one of the stake's
-// pool's prizes left: an item to the bag, as one from the Wymiana, or
-// materials, as bought ones the Encyklopedia leaves out. Also while the
-// character is away: the bag stays at hand, as at the Targowisko.
+// stakes, at its chances. The stake goes whatever comes; a win takes one of
+// the pool's prizes left: an item to the bag, as one from the Wymiana,
+// materials, as bought ones the Encyklopedia leaves out, or the camp's
+// resources. Also while the character is away: the bag stays at hand, as at
+// the Targowisko.
 export async function spinCasinoWheel(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -247,15 +258,15 @@ export async function spinCasinoWheel(context) {
   const wheel = wheelOf(player, stored, now);
   const stakes = dayStakes(wheel, content);
   const stake = body.stake;
-  const pool = stakes.includes(stake) ? wheelPool(wheel, seedOf(row), stake, content) : { prizes: [], won: [] };
+  const pool = wheelPool(wheel, seedOf(row), content);
   const left = prizesLeft(pool);
   const itemLeft = left.some((index) => pool.prizes[index].kind === 'item');
   const block = spinBlock(stake, { gold: row.gold, stakes, left: left.length, itemLeft, bagFree: bagFree(player, now) }, content);
   if (block) throw new ApiError(block.code === 'invalid_stake' ? 400 : 409, block.code, block.message);
   // The spin's own seed, which nobody knows before it.
-  const result = spinWheel(left, newSeed(), content);
+  const result = spinWheel(pool, wheelOdds(stake, stakes, content), newSeed());
   const prize = result.win ? pool.prizes[result.prize] : null;
-  const next = { ...stored, casino: result.win ? wheelWon(wheel, stake, result.prize) : wheel };
+  const next = { ...stored, casino: result.win ? wheelWon(wheel, result.prize) : wheel };
   const db = context.env.DB;
   const statements = [assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT gold FROM characters WHERE id = ?) >= ?', [row.id, row.version, row.id, stake])];
   if (prize?.kind === 'material') {
@@ -266,13 +277,19 @@ export async function spinCasinoWheel(context) {
         .prepare(`UPDATE characters SET gold = gold - ?, materials = ${materials.sql}, foreign_stacks = ${others.sql}, settlement = ?, version = version + 1 WHERE id = ?`)
         .bind(stake, ...materials.binds, ...others.binds, JSON.stringify(next), row.id),
     );
+  } else if (prize?.kind === 'resource') {
+    statements.push(
+      db
+        .prepare('UPDATE characters SET gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) + ?), settlement = ?, version = version + 1 WHERE id = ?')
+        .bind(stake, `$.${prize.key}`, `$.${prize.key}`, prize.count, JSON.stringify(next), row.id),
+    );
   } else {
     statements.push(db.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ?').bind(stake, JSON.stringify(next), row.id));
     if (prize) statements.push(db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)').bind(row.id, JSON.stringify({ ...prize.item, traded: 1 }), now));
   }
   await atomically(db, statements, changed);
   const bonuses = bonusesOf(player, stored, now);
-  return respond(context, session, stake, { spin: { stake, chance: wheelChance(content), win: result.win, prize: prize && prizeView(prize, true, bonuses) } });
+  return respond(context, session, stake, { spin: { stake, win: result.win, tier: result.tier, prize: prize && prizeView(prize, true, bonuses) } });
 }
 
 // The draw of each day gone by with tickets, at the minute's cron, so at
