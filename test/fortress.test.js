@@ -33,6 +33,10 @@ import {
   xpToNext,
 } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
+
+// The newest place's stronger creatures (balance.monsters.huntCurve,
+// hunt-strength.test.js) aside: these fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] } } };
 import { useServer } from './helpers/server.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 
@@ -164,7 +168,7 @@ describe('the Warownia', () => {
 
 describe('the Ołtarz Systemu in an exploration', () => {
   const settled = typicalCharacter('warrior', 43, content);
-  const explore = (blessing) => simulateHunt({ ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes: 240, seed: 'oltarz', blessing }, content);
+  const explore = (blessing) => simulateHunt({ ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes: 240, seed: 'oltarz', blessing }, calm);
 
   test('a blessing works in the first fights only, for its share more XP or gold (424 A, 580)', () => {
     const plain = explore(null);
@@ -187,7 +191,7 @@ describe('the Ołtarz Systemu in an exploration', () => {
 
   test('a blessing of luck makes rarer items more likely in its fights', () => {
     const rare = (blessing) =>
-      Array.from({ length: 40 }, (_, i) => simulateHunt({ ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes: 240, seed: `szczescie:${i}`, blessing }, content))
+      Array.from({ length: 40 }, (_, i) => simulateHunt({ ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes: 240, seed: `szczescie:${i}`, blessing }, calm))
         .flatMap((result) => result.items)
         .filter((item) => item.rarity !== content.rarities[0].id).length;
     assert.ok(rare({ kind: 'luck', bonus: 1, fights: 999 }) > rare(null));

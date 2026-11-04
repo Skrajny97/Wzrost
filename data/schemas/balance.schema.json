@@ -1205,6 +1205,16 @@
           "maximum": 1,
           "description": "Jaka część wzrostu z lateGame i endGame działa w walkach, w których postać jest sama: w Wieży Solo, w walkach zdarzeń i w atakach na Bestię Gildii (autor: 438.3 A, połowa krzywej)."
         },
+        "huntCurve": {
+          "type": "array",
+          "description": "Siła stworów najnowszego miejsca, czyli tego, które sięga poziomu postaci (albo wyższego), na wyprawach i w próbnych walkach szacowania zagrożenia (bez Wież, walk zdarzeń i Bestii Gildii): punkty [poziom postaci, mnożnik obrażeń, mnożnik HP] rosnąco po poziomie, między punktami liniowo, przed pierwszym bez zmian, za ostatnim jak w ostatnim. Niższe miejsca bez zmian. Towarzysze i drużyna nie wzmacniają stworów (autor: 611 między B a C, 612 C, 613 C).",
+          "items": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": { "type": "number", "minimum": 0 }
+          }
+        },
         "endGame": {
           "type": "object",
           "description": "Od fromLevel, po drugiej ewolucji klasy, gdy umiejętności i ekwipunek postaci dalej rosną, potwory rosną w siłę jeszcze raz, tak samo jak w lateGame: o damage więcej obrażeń i o hp więcej HP, rosnąco do pełnej wartości na toLevel i dalej (autor: „od 100ego być mid”).",

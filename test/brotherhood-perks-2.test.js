@@ -24,6 +24,10 @@ import {
   withRareOdds,
 } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
+
+// The newest place's stronger creatures (balance.monsters.huntCurve,
+// hunt-strength.test.js) aside: these fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] } } };
 import { useServer } from './helpers/server.js';
 
 const { standings } = content.settlement;
@@ -86,8 +90,8 @@ describe('the Bractwo Zielarzy and the Bractwo Łowców in the engine', () => {
     let more = 0;
     for (let index = 0; index < 20; index += 1) {
       const hunt = { character, equipped: [], name: 'Łowca', areaId: 'boar-thicket', minutes: 120, seed: `materials-${index}` };
-      plain += count(simulateHunt(hunt, content));
-      more += count(simulateHunt({ ...hunt, materialsMore: 0.2 }, content));
+      plain += count(simulateHunt(hunt, calm));
+      more += count(simulateHunt({ ...hunt, materialsMore: 0.2 }, calm));
     }
     assert.ok(more > plain, `${more} vs ${plain}`);
   });

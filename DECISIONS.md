@@ -3034,6 +3034,28 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.51 (4.11.2026)
+
+1. **Trudniejsze wyprawy** (zob. niżej): odpowiedzi autora 611–613.
+2. **Wpis „Co nowego?” do zatwierdzenia:** szkic 0.1.51 w `data/news.json`.
+
+## Trudniejsze wyprawy (4.11.2026, w grze od 0.1.51)
+
+Autor: „utrudniamy, nie przesadzamy, ale utrudniamy”, „robimy mid-high dla casuali trudność od zera przeglądając i mid dla graczy”, „Chcemy tez utrudnić niżej poniżej 30 lvlu”, a na pytania: „611 miedzy B a C, 612 C (musi byc motywacja do drużyny/towarzyszy) 613 C”.
+
+1. **Jak było.** W symulacji 4-godzinna wyprawa (10 walk) w najnowszym miejscu na poziomach 10–60 prawie nigdy nie kończyła się omdleniem (0–1%), także na pierwszym poziomie miejsca. Gracz na 33. poziomie nie przegrał żadnej walki.
+2. **Cel (611 między B a C).** Taka wyprawa kończy się omdleniem u gracza okazjonalnego w ok. 20–25% przypadków, a u zaangażowanego w ok. 10–15%. Liczby z symulacji (`tools/difficulty-sim.mjs`, 20 klas, gra bez towarzyszy):
+    - **poziomy 11–28:** okazjonalny 17–27%, zaangażowany 7–18%, gracz, który wszystko ulepsza na Kowadle, 0–14%;
+    - **poziomy 30–60:** okazjonalny 19–30%, zaangażowany 4–15%, wszystko ulepsza 0%;
+    - **godzinna wyprawa:** na poziomach 11–25 okazjonalny 13–22%, zaangażowany 5–13%, na poziomach 31–45 okazjonalny 2–13%, zaangażowany 1–4%.
+3. **Towarzysze i drużyna bez dodatkowej siły stworów (612 C).** Cel dotyczy gry bez towarzyszy, jak opisywał wariant C. Z towarzyszami od 30. poziomu jest prawie tak jak dotąd: omdlenie w 0–3% wypraw u okazjonalnego i 0–1% u zaangażowanego. To ta motywacja do towarzyszy i drużyny, o którą chodziło autorowi.
+4. **Od 10. poziomu (613 C).** Miejsca do 10. poziomu, czyli wprowadzenie i pierwsze wyprawy, są bez zmian. Trudniej jest od miejsca 11–15.
+5. **Tylko najnowsze miejsce, według poziomu postaci (brakujący szczegół).** Silniejsze są stwory miejsca, które sięga poziomu postaci, a ich siła zależy od jej poziomu: na pierwszym poziomie miejsca mniejsza, na ostatnim większa, żeby miejsce było równie trudne od wejścia do końca. Miejsce wyżej (otwiera się poziom przed swoim pierwszym poziomem) ma siłę swojego pierwszego poziomu. Niższe miejsca są jak dotąd, więc zawsze jest bezpieczniejszy wybór. Najpierw sprawdzona była jedna siła dla całego miejsca. Przy trudności z 611 w środku miejsca na jego pierwszym poziomie prawie każda wyprawa kończyła się omdleniem (91% na 11. poziomie, także godzinna), a na ostatnim było łatwo. Postać rośnie w ciągu pięciu poziomów miejsca tak bardzo, że jedna siła nie wystarcza.
+6. **Mechanika (brakujący szczegół).** `huntCurve` w `data/balance.json`: punkty [poziom postaci, mnożnik obrażeń, mnożnik HP] dla stworów najnowszego miejsca, także elity i czempiona. HP rośnie o 60% tego, o ile rosną obrażenia, w duchu „Wyzwania od pierwszej wyprawy”: stwory biją mocniej, a walki nie ciągną się dłużej. Punkty są policzone w symulacji na pierwszym, środkowym i ostatnim poziomie każdego miejsca, między nimi liniowo. W drużynie liczy się poziom prowadzącego.
+7. **Od 61. poziomu bez zmian (brakujący szczegół).** Tam gra bez towarzyszy już jest trudniejsza niż cel: od 61. poziomu okazjonalny bez towarzyszy mdleje w 27–65% wypraw, a od 66. zaangażowany w 10–20%. Stwory od 50. poziomu rosną według krzywej z odpowiedzi 438 B.
+8. **Gdzie (brakujący szczegół).** Wyprawy, także w drużynie, i „Zagrożenie” przed wyprawą, które liczy z tymi samymi stworami. Wieże, walki zdarzeń i Bestia Gildii są bez zmian. Nagrody bez zmian. Testy mikstur, zdarzeń, Ołtarza i Bractw liczą walki bez tej krzywej, bo sprawdzają co innego; krzywa ma własne testy (`test/hunt-strength.test.js`).
+9. **Pytanie 614** (czy z towarzyszami też ma być trudniej) czeka na autora.
+
 ## Wersja 0.1.50 (4.11.2026)
 
 1. **Zwijane części Gildii** (zob. niżej).

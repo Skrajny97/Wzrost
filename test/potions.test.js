@@ -28,6 +28,10 @@ import {
 } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
+
+// The newest place's stronger creatures (balance.monsters.huntCurve,
+// hunt-strength.test.js) aside: these fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] } } };
 import { useServer } from './helpers/server.js';
 
 const heal = { id: 'lesser-healing', accusative: 'Mniejszą miksturę leczenia', amount: 0.2, below: 0.4 };
@@ -249,10 +253,10 @@ describe('potions in fights', () => {
   test('healing potions taken along lower the chance of fainting', () => {
     const { character, equipped } = typicalCharacter('shadow', 20, content);
     const input = { character, equipped, hp: 9999, areaId: 'mossy-boulders' };
-    const samples = threatSamples(input, content);
-    const plain = faintChances(input, content, samples);
-    const none = faintChances({ ...input, healing: { count: 0, amount: 0.2, below: 0.4 } }, content, samples);
-    const healed = faintChances({ ...input, healing: { count: 5, amount: 0.2, below: 0.4 } }, content, samples);
+    const samples = threatSamples(input, calm);
+    const plain = faintChances(input, calm, samples);
+    const none = faintChances({ ...input, healing: { count: 0, amount: 0.2, below: 0.4 } }, calm, samples);
+    const healed = faintChances({ ...input, healing: { count: 5, amount: 0.2, below: 0.4 } }, calm, samples);
     assert.deepEqual(none, plain);
     for (const minutes of Object.keys(plain)) assert.ok(healed[minutes] <= plain[minutes] + 1e-12, `${minutes} min`);
     assert.ok(healed[60] < plain[60] * 0.8, `${healed[60]} vs ${plain[60]}`);

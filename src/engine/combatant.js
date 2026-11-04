@@ -108,12 +108,48 @@ function unarmed(level, content) {
   return { attackName, category: 'physical', strike: 'melee', sound: 'fist', scaling: 'strength', min, max: Math.max(min, Math.round(average * (1 + variance))) };
 }
 
+// How much harder the creatures of the newest place are for a character of
+// a level, as [damage, HP] multipliers (balance.monsters.huntCurve: points
+// [level, damage, hp] by the character's level, straight between two
+// points, none before the first and as the last past it). The author,
+// 4.11.2026: harder from the 10th level (613 C), between "średnio-wysoko
+// dla okazjonalnych, średnio dla zaangażowanych" and "mocno" (611), and no
+// stronger creatures for the companions or a party along (612 C: "musi byc
+// motywacja do drużyny/towarzyszy").
+export function huntStrength(level, curve = []) {
+  if (curve.length === 0 || level < curve[0][0]) return [1, 1];
+  const next = curve.findIndex(([at]) => at > level);
+  if (next === -1) return [curve.at(-1)[1], curve.at(-1)[2]];
+  const [fromLevel, fromDamage, fromHp] = curve[next - 1];
+  const [toLevel, toDamage, toHp] = curve[next];
+  const share = (level - fromLevel) / (toLevel - fromLevel);
+  return [fromDamage + (toDamage - fromDamage) * share, fromHp + (toHp - fromHp) * share];
+}
+
+// The strength of an exploration's creatures: in the place that holds the
+// character's level, all of them, the elite and the champion too, as
+// huntStrength says for its level, so that the place stays as hard from its
+// first level to its last; in a higher place (one opens a level before its
+// first, unlocks.js) as for its first level; a lower place as before. A
+// single multiplier for a whole place was tried: the characters grow so much
+// within a place's five levels that the place, as hard as the author asked
+// in its middle, cost the first fight almost always on its first level (91%
+// at the 11th) and little on its last.
+export function exploreStrength(area, level, content) {
+  if (area.maxLevel < level) return [1, 1];
+  return huntStrength(Math.max(level, area.minLevel), content.balance.monsters.huntCurve);
+}
+
 // `groupFactor` weakens each member of a group, so two or three monsters are
 // harder than one, but not two or three times harder.
 // `growth` is the share of the late and end game's growth the monster has:
 // a fight where the character stands alone (the Wieża Solo, an event's
 // fight) gives it balance.monsters.soloGrowth of it (the author: 438.3 A).
-export function monsterCombatant({ monsterId, level, id, name, position, side = 'enemy', groupFactor = 1, growth = 1 }, content) {
+// `strength`: the [damage, HP] multipliers of a creature met on an
+// exploration of the newest place (or in the danger estimate's sample
+// fights there), exploreStrength; the Wieże, the events' fights and the
+// Bestia Gildii keep their own measure.
+export function monsterCombatant({ monsterId, level, id, name, position, side = 'enemy', groupFactor = 1, growth = 1, strength = [1, 1] }, content) {
   const balance = content.balance;
   const monster = content.monstersById[monsterId];
   const stat = (key) => (monster.stats.base[key] ?? 0) + (monster.stats.growth[key] ?? 0) * (level - 1);
@@ -138,6 +174,7 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
   // keep growing, they grow on once more, the same way.
   const end = balance.monsters.endGame;
   const latest = midGameShare(level, end) * growth;
+  const [huntDamage, huntHp] = strength;
   const average =
     weaponDamage(hide, monster.attack.damageFactor, balance) *
     balance.monsters.damageMultiplier *
@@ -145,13 +182,14 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
     (1 + mid.damage * stronger) *
     (1 + coop.damage) *
     (1 + late.damage * later) *
-    (1 + end.damage * latest);
+    (1 + end.damage * latest) *
+    huntDamage;
   const resist = {};
   for (const [element, value] of Object.entries(monster.resistances ?? {})) {
     resist[element] = Math.round(value.base + value.perLevel * (level - 1));
   }
   const rawHp = balance.monsters.hpBase + balance.character.hpPerVitality * stat('vitality') + balance.monsters.hpPerLevel * level;
-  const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp) * (1 + late.hp * later) * (1 + end.hp * latest)));
+  const hpMax = Math.max(1, Math.round(rawHp * monster.hpFactor * groupFactor * (1 + mid.hp * stronger) * (1 + coop.hp) * (1 + late.hp * later) * (1 + end.hp * latest) * huntHp));
   return {
     id,
     side,

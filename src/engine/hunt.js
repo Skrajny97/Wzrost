@@ -22,7 +22,7 @@
 // easy for it, the elite and the champion it has not met yet come far more
 // often, until it meets them (rareCatchUp).
 
-import { combatantView, monsterCombatant, playerCombatant } from './combatant.js';
+import { combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { canUse, itemName, itemRank, itemView, randomItem } from './items.js';
@@ -341,8 +341,9 @@ export function championItemRarity(level, rng, content) {
 
 // Repeated monsters get numbers: "Wilk 1", "Wilk 2". `growth`: the share of
 // the late and end game's growth (monsterCombatant), less in a fight where
-// the character stands alone.
-export function encounterCombatants(encounter, content, { growth = 1 } = {}) {
+// the character stands alone. `strength`: the [damage, HP] multipliers of
+// the creatures of the newest place (exploreStrength in combatant.js).
+export function encounterCombatants(encounter, content, { growth = 1, strength = [1, 1] } = {}) {
   const counts = {};
   for (const member of encounter.members) counts[member.monsterId] = (counts[member.monsterId] ?? 0) + 1;
   const seen = {};
@@ -351,7 +352,7 @@ export function encounterCombatants(encounter, content, { growth = 1 } = {}) {
     seen[member.monsterId] = (seen[member.monsterId] ?? 0) + 1;
     const baseName = content.monstersById[member.monsterId].name;
     const name = counts[member.monsterId] > 1 ? `${baseName} ${seen[member.monsterId]}` : baseName;
-    return monsterCombatant({ ...member, id: `e${index}`, name, groupFactor, growth }, content);
+    return monsterCombatant({ ...member, id: `e${index}`, name, groupFactor, growth, strength }, content);
   });
 }
 
@@ -413,6 +414,8 @@ export function simulateHunt(
   // The trip's encounters follow its leader (its level and the creatures it
   // has met), the same for everyone.
   const lead = fighters[0].character;
+  // The newest place's creatures, stronger by the leader's level.
+  const strength = exploreStrength(area, lead.level, content);
   const durationMs = minutes * 60000;
   // The companions hired in the Osada (companions.js) go along, up to two
   // more members of the party, each with its own HP through the exploration
@@ -554,7 +557,7 @@ export function simulateHunt(
       if (!catchUp.elite && !catchUp.champion) catchUp = null;
       pace = odds();
     }
-    const enemies = encounterCombatants(encounter, content);
+    const enemies = encounterCombatants(encounter, content, { strength });
     // Each player as it fights now: its strengthening potions still working
     // (in their number of the first fights; a window kept in time, of an
     // exploration started before 0.1.26, while its time lasts), the potions

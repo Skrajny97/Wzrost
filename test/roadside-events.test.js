@@ -11,6 +11,10 @@ import { beforeEach, describe, test } from 'node:test';
 import { eventFor, eventView, knownHerbs, optionLock, resolveEvent, simulateHunt } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
+
+// The newest place's stronger creatures (balance.monsters.huntCurve,
+// hunt-strength.test.js) aside: these fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] } } };
 import { useServer } from './helpers/server.js';
 
 const beggar = content.eventsById['wandering-beggar'];
@@ -22,7 +26,7 @@ const herbalism = content.gathering.profession;
 describe('the roadside events in the engine', () => {
   const { character, equipped } = typicalCharacter('warrior', 30, content);
   const seed = 'droga';
-  const base = simulateHunt({ character, equipped, hp: 99999, name: 'Mira', areaId: 'lynx-ridge', minutes: 60, seed }, content);
+  const base = simulateHunt({ character, equipped, hp: 99999, name: 'Mira', areaId: 'lynx-ridge', minutes: 60, seed }, calm);
   const hunt = { ...base, resources: { wood: 20, stone: 10, 'iron-ore': 5 } };
   const resolve = (event, optionId, caseId = null, extra = {}) =>
     resolveEvent({ hunt, event, optionId, caseId, character, equipped, name: 'Mira', seed, purse: 1000, ...extra }, content);
