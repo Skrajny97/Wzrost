@@ -1,0 +1,17 @@
+{
+  "id": "system-altar-2",
+  "tool": "pixellab generate-image-v2",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a stone stronghold at the edge of a forest, standing directly on bare ground with no ground tile, base or platform under it, the System altar, a bigger stage: a taller black stone obelisk with several glowing light blue runes on a wider round dais of grey stone steps, four small black standing stones around it, five small light blue lights floating above it, candles on the steps",
+  "style": "src/client/art/camp/quarters-3.png",
+  "references": [
+    {
+      "path": "art/references/fortress/system-altar-1.png",
+      "usage": "the first, smallest stage of this same building, chosen by the author: keep its stone, timber, roof colours, outlines and pixel style, and draw the bigger, richer next stage of it"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

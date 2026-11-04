@@ -1,0 +1,17 @@
+{
+  "id": "armory-2",
+  "tool": "pixellab generate-image-v2",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a stone stronghold at the edge of a forest, made of grey hewn stone, heavy timber and iron, standing directly on bare ground with no ground tile, base or platform under it, the armoury, a grander stage: a large two-storey stone hall with a steep orange wooden shingle roof, stone corner pillars and iron-bound doors wide open, inside rows of wooden stands with full suits of shining armour and racks of swords, spears and halberds, red and blue shields and banners on the walls and over the entrance, a few weapon crates outside",
+  "style": "src/client/art/camp/quarters-3.png",
+  "references": [
+    {
+      "path": "art/references/fortress/armory-1.png",
+      "usage": "the first, smallest stage of this same building, chosen by the author: keep its stone, timber, roof colours, outlines and pixel style, and draw the bigger, richer next stage of it"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
