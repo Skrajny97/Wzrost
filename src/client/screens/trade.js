@@ -2,22 +2,22 @@
 // proposed on its sheet (profile.js) or in a row of the Znajomi while both
 // players are online and both characters at home. The other accepts the
 // proposal, both put their offers together (gold, items, herbs, potions,
-// materials and the minerals of Górnictwo), and the first confirmation
-// freezes both: the other side then only accepts the trade, when all of it
-// moves at once, or rejects it. Each confirmation asks first, with what goes
-// and what comes. While the screen is open and the page is in front, it asks
+// materials, the minerals of Górnictwo and the camp's resources), and the
+// first confirmation freezes both: the other side then only accepts the
+// trade, when all of it moves at once, or rejects it. Each confirmation asks
+// first, with what goes and what comes. While the screen is open and the page is in front, it asks
 // for the trade every two seconds. A proposal to this character opens a
 // sheet wherever the player is, once nothing else is on the screen
 // (offerTrade), and waits in the Społeczność too (tradeBanner).
 
-import { goldArt, herbSprite, mineralSprite, potionSprite } from '../art.js';
+import { goldArt, herbSprite, mineralSprite, potionSprite, resourceArt } from '../art.js';
 import { liveTrade, tradeSeen } from '../chat-news.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatNumber } from '../format.js';
 import { narratorIdle } from '../narrator.js';
 import { playSound } from '../sound.js';
-import { call, serverNow, state } from '../state.js';
+import { call, serverNow, state, walletEntries } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, toast, withButton } from '../ui.js';
 import { itemSummary, itemTitle, materialTitle } from './character.js';
 
@@ -102,12 +102,14 @@ export function tradeBanner() {
   return h('section', { class: 'card trade-banner', 'aria-label': 'Wymiana' }, icon('swap', { size: 22, className: 'trade-banner-icon' }), parts);
 }
 
-// The herbs, potions, materials and minerals of an offer, each with its name.
+// The herbs, potions, materials, minerals and camp resources of an offer,
+// each with its name.
 const stacksOf = (offer) => [
   ...offer.herbs.map((stack) => ({ ...stack, herb: true })),
   ...offer.potions,
   ...(offer.materials ?? []).map((stack) => ({ ...stack, name: materialTitle(stack), material: true })),
   ...(offer.minerals ?? []).map((stack) => ({ ...stack, mineral: true })),
+  ...(offer.resources ?? []).map((stack) => ({ ...stack, resource: true })),
 ];
 
 // What an offer holds, in words: "120 złota, Amulet Dębu, Żywokost ×5".
@@ -292,21 +294,23 @@ export function mountTrade(container, { backHash }) {
     ];
   }
 
-  // Herbs, potions, materials or minerals of an offer; a potion whose recipe
-  // the character does not know waits for it.
+  // Herbs, potions, materials, minerals or camp resources of an offer; a
+  // potion whose recipe the character does not know waits for it.
   function stackEntry(stack, mine) {
     const art = stack.material
       ? materialIcon(stack.materialId, 20)
-      : stack.mineral
-        ? (mineralSprite(stack.id) ?? icon('ore', { size: 20 }))
-        : ((stack.herb ? herbSprite(stack.id) : potionSprite(stack.id)) ?? icon(stack.herb ? 'leaf' : 'flask', { size: 20 }));
+      : stack.resource
+        ? resourceArt(stack.id, 20)
+        : stack.mineral
+          ? (mineralSprite(stack.id) ?? icon('ore', { size: 20 }))
+          : ((stack.herb ? herbSprite(stack.id) : potionSprite(stack.id)) ?? icon(stack.herb ? 'leaf' : 'flask', { size: 20 }));
     return h(
       'li',
       { class: 'trade-stack' },
       h('span', { class: 'potion-pick-art' }, art),
       h('span', { class: 'trade-stack-name', text: stack.name }),
       h('span', { class: 'trade-stack-count', text: `×${formatNumber(stack.count)}` }),
-      !mine && !stack.herb && !stack.material && !stack.mineral && !stack.known && h('p', { class: 'region-warning trade-note', text: 'Nie znasz jej receptury, więc jej nie użyjesz.' }),
+      !mine && !stack.herb && !stack.material && !stack.mineral && !stack.resource && !stack.known && h('p', { class: 'region-warning trade-note', text: 'Nie znasz jej receptury, więc jej nie użyjesz.' }),
     );
   }
 
@@ -324,9 +328,9 @@ export function mountTrade(container, { backHash }) {
     }
   }
 
-  // The player's offer in a sheet: gold, items from the bag (not those
-  // worn), herbs, potions, materials and minerals, saved at once for the
-  // other to see.
+  // The player's offer in a sheet: gold, the camp's resources, items from the
+  // bag (not those worn), herbs, potions, materials and minerals, saved at
+  // once for the other to see.
   function editOffer() {
     const character = state.character;
     const { maxItems } = state.content.community.trade;
@@ -357,6 +361,11 @@ export function mountTrade(container, { backHash }) {
     const owned = (character.crafting?.materials ?? []).map((material) => ({ id: material.key, name: materialTitle(material), count: material.count, materialId: material.materialId }));
     const materials = stackFields(owned, 'material', (entry) => materialIcon(entry.materialId, 20));
     const minerals = stackFields(character.minerals ?? [], 'mineral', (entry) => mineralSprite(entry.id) ?? icon('ore', { size: 20 }));
+    // The camp's resources the character has, by gold (state.js).
+    const stores = walletEntries(character)
+      .filter((entry) => entry.id !== 'gold' && entry.amount > 0)
+      .map((entry) => ({ id: entry.id, name: entry.name, count: entry.amount }));
+    const resources = stackFields(stores, 'resource', (entry) => resourceArt(entry.id, 20));
     const count = h('p', { class: 'muted' });
     const showCount = () => {
       count.textContent = `Wybrane: ${picked.size} z ${maxItems}.`;
@@ -388,7 +397,7 @@ export function mountTrade(container, { backHash }) {
       let offer;
       try {
         const kept = (fields) => Object.fromEntries(fields.map((entry) => [entry.id, entry.read()]).filter(([, value]) => value > 0));
-        offer = { gold: gold.read(), items: [...picked], herbs: kept(herbs), potions: kept(potions), materials: kept(materials), minerals: kept(minerals) };
+        offer = { gold: gold.read(), resources: kept(resources), items: [...picked], herbs: kept(herbs), potions: kept(potions), materials: kept(materials), minerals: kept(minerals) };
       } catch (error) {
         toast(error.message);
         return;
@@ -408,6 +417,7 @@ export function mountTrade(container, { backHash }) {
       h('h2', { class: 'sheet-title', text: 'Twoja oferta' }),
       h('p', { class: 'sheet-text', text: `Co dasz postaci ${view.other.name}? Zapisana oferta od razu pokaże się po drugiej stronie.` }),
       gold.element,
+      resources.length > 0 && section('Zasoby obozu', resources.map((entry) => entry.element)),
       section(
         'Przedmioty z plecaka',
         character.bag.length === 0 ? h('p', { class: 'muted', text: 'W plecaku nie ma przedmiotów. Założonych nie wymienisz.' }) : [count, h('ul', { class: 'item-list' }, items)],

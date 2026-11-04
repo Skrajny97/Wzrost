@@ -25,7 +25,7 @@ import { mountCasino } from '../casino.js';
 import { stableCard } from '../stable.js';
 import { tanneryCard } from '../tannery.js';
 import { itemSummary, piecesText } from './character.js';
-import { mountMarket, numberField, stackButton } from './market.js';
+import { mountMarket, numberField, stackArt, stackButton } from './market.js';
 
 // Whether "Akceptacja Bractw" over the board is open, kept on the device.
 const STANDINGS_KEY = 'insight-standings-open';
@@ -879,7 +879,14 @@ export function mountSettlement(container, { params = {} } = {}) {
               h(
                 'li',
                 { class: 'settlement-good' },
-                h('p', {}, h('strong', { text: `${good.name} × ${formatNumber(good.count)}` })),
+                // The herb's or the potion's icon by its name (the author: "niech
+                // u Zielarki będą ikony danych przedmiotów przy ich nazwach").
+                h(
+                  'p',
+                  { class: 'settlement-good-name' },
+                  h('span', { class: 'potion-pick-art' }, stackArt({ kind: good.kind, key: good.id })),
+                  h('strong', { text: `${good.name} × ${formatNumber(good.count)}` }),
+                ),
                 h('p', { class: 'muted', text: `${formatDecimal(good.price)} zł. za sztukę, u złomiarza ${formatDecimal(good.scrap)} zł.` }),
                 h('button', {
                   type: 'button',

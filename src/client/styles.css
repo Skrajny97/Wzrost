@@ -10404,6 +10404,14 @@ a.profession-square:active {
   margin: 0;
 }
 
+/* A sold stack's icon by its name (Jagna's herbs and potions, Wszebor's
+   materials). */
+.settlement-good-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .settlement-companion-list {
   margin: 0;
   padding-left: 18px;

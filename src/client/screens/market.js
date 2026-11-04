@@ -38,7 +38,7 @@ function left(at) {
 }
 
 // A stack's picture by its kind.
-function stackArt(goods, size = 24) {
+export function stackArt(goods, size = 24) {
   if (goods.kind === 'herb') return herbSprite(goods.key) ?? icon('leaf', { size });
   if (goods.kind === 'potion') return potionSprite(goods.key) ?? icon('flask', { size });
   if (goods.kind === 'material') return materialIcon(goods.material.materialId, size);

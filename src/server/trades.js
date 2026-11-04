@@ -1,6 +1,6 @@
 // The Wymiana (DECISIONS.md, "Wymiana"): two characters whose players are
 // both online trade items from their bags, herbs, potions, materials, the
-// gems and ores of Górnictwo and gold. One
+// gems and ores of Górnictwo, the camp's resources and gold. One
 // proposes it on the other's sheet or in the Znajomi, and the other accepts
 // or turns it down. Both then put their offers together; once one confirms,
 // neither offer changes any more, and the other confirms too, when all of it
@@ -33,12 +33,14 @@ const onlineSince = (now) => now - rules().onlineSeconds * 1000;
 const playedOnline = (row, now) => row?.role === 'player' && (row.seen_at ?? 0) >= onlineSince(now);
 const path = (id) => `$."${id}"`;
 
-// Materials (keys "materialId:rarityId") and minerals take no places in the
-// bag.
-const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, materials: {}, minerals: {} });
+// Materials (keys "materialId:rarityId"), minerals and the camp's resources
+// (wood, stone, ore: the author's "Konieczne", 4.11.2026) take no places in
+// the bag.
+const emptyOffer = () => ({ gold: 0, items: [], herbs: {}, potions: {}, materials: {}, minerals: {}, resources: {} });
 // The stacks an offer holds, each kept in the characters' column of its name.
-const STACKS = ['herbs', 'potions', 'materials', 'minerals'];
-// A stack's key in the Encyklopedia's record of goods got in a trade.
+const STACKS = ['herbs', 'potions', 'materials', 'minerals', 'resources'];
+// A stack's key in the Encyklopedia's record of goods got in a trade; the
+// camp's resources are in no Encyklopedia, so none is kept for them.
 const FOREIGN = { herbs: 'herb', potions: 'potion', materials: 'material', minerals: 'mineral' };
 const offerOf = (raw) => ({ ...emptyOffer(), ...JSON.parse(raw || '{}') });
 const sideOf = (trade, characterId) => (trade.from_id === characterId ? 'from' : 'to');
@@ -136,6 +138,9 @@ async function tradeView(db, trade, character, now) {
         const rarity = mineral.rarity ?? mineral.for[0];
         return { id, name: mineral.name, rarity, color: content.raritiesById[rarity].color, count };
       }),
+    resources: Object.entries(offer.resources)
+      .filter(([id]) => Object.hasOwn(content.resourcesById, id))
+      .map(([id, count]) => ({ id, name: content.resourcesById[id].name, count })),
   });
   const { proposalSeconds, idleMinutes } = rules();
   return {
@@ -235,7 +240,8 @@ export async function answerTrade(context) {
 }
 
 // An offer as kept: gold, items from the bag (not worn), herbs, potions,
-// materials and minerals the character has, none of them more than it has.
+// materials, minerals and the camp's resources the character has, none of
+// them more than it has.
 function cleanOffer(raw, player) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
   const offer = emptyOffer();
@@ -258,6 +264,7 @@ function cleanOffer(raw, player) {
     ['potions', potionsOf(player.row), named(content.potionsById)],
     ['materials', JSON.parse(player.row.materials ?? '{}'), (key) => (knownStack(key, content) ? materialView(key, 0, content).label : null)],
     ['minerals', mineralsOf(player.row), named(content.mineralsById)],
+    ['resources', JSON.parse(player.row.resources ?? '{}'), named(content.resourcesById)],
   ]) {
     const asked = raw[kind] ?? {};
     if (!asked || typeof asked !== 'object' || Array.isArray(asked)) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
@@ -373,7 +380,7 @@ function exchange(db, trade, now, sides) {
     // (ownDiscoveries in the engine).
     let foreign = 'foreign_stacks';
     const got = [];
-    for (const kind of STACKS) {
+    for (const kind of STACKS.filter((one) => FOREIGN[one])) {
       for (const [stack, count] of Object.entries(taker.offer[kind])) {
         foreign = `json_set(${foreign}, ?, COALESCE(json_extract(foreign_stacks, ?), 0) + ?)`;
         got.push(path(`${FOREIGN[kind]}:${stack}`), path(`${FOREIGN[kind]}:${stack}`), count);

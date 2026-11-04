@@ -10,7 +10,7 @@ import { h } from './dom.js';
 import { countOf, formatDecimal, formatNumber, saleGold, tradePace } from './format.js';
 import { call, state } from './state.js';
 import { closeSheet, openSheet, toast, withButton } from './ui.js';
-import { numberField, stackButton } from './screens/market.js';
+import { numberField, stackArt, stackButton } from './screens/market.js';
 
 const TABS = [
   ['buy', 'Kup'],
@@ -146,7 +146,8 @@ function sale(view, apply) {
             h(
               'li',
               { class: 'settlement-good' },
-              h('p', {}, h('strong', { text: `${good.name} × ${formatNumber(good.count)}` })),
+              // The material's icon by its name, as at Jagna's.
+              h('p', { class: 'settlement-good-name' }, h('span', { class: 'potion-pick-art' }, stackArt(good)), h('strong', { text: `${good.name} × ${formatNumber(good.count)}` })),
               h('p', { class: 'muted', text: `${formatDecimal(good.price)} zł. za sztukę, u złomiarza ${formatDecimal(good.scrap)} zł.` }),
               h('button', { type: 'button', class: 'button button--world button--small', text: 'Sprzedaj', onClick: () => sellSheet(good, apply) }),
             ),

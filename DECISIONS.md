@@ -3048,6 +3048,26 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Zasoby obozu w Wymianie między graczami (4.11.2026, w grze od 0.1.41)
+
+Gracz zapytał na czacie, czy w Wymianie dojdzie drewno, kamień i ruda, a autor: „Konieczne”.
+
+1. **Co.** Oferta w Wymianie ma też drewno, kamień i rudę żelaza, obok złota, przedmiotów, ziół, mikstur, materiałów i minerałów. W oknie „Twoja oferta” stoją pod złotem, w części „Zasoby obozu”. Każdego zasobu można dać tyle sztuk, ile postać ma.
+2. **Zasady jak dotąd.** Oboje gracze są w grze i obie strony zatwierdzają. Wszystko przechodzi naraz albo nic, a postacie jednego konta nie wymieniają się ze sobą. Zasoby nie zajmują miejsca w plecaku.
+3. **Encyklopedia (brakujący szczegół).** Zasobów obozu nie ma w Encyklopedii, więc Wymiana nie zapisuje ich jako zdobytych od innych.
+
+## Ikony w skupie Jagny i Wszebora (4.11.2026, w grze od 0.1.41)
+
+Autor: „niech u Zielarki będą ikony danych przedmiotów przy ich nazwach”.
+
+1. **U Jagny.** W zakładce „Sprzedaj” przy nazwie każdego zioła i każdej mikstury stoi jej ikona, jak w zakładce „Kup” i na Targowisku.
+2. **U Wszebora (brakujący szczegół).** W Garbarni zakładka „Sprzedaj” tak samo pokazuje ikony materiałów.
+
+## Wersja 0.1.41 (4.11.2026)
+
+1. **Zasoby obozu w Wymianie między graczami** (zob. wyżej).
+2. **Ikony w skupie Jagny i Wszebora** (zob. wyżej).
+
 ## „Co nowego?” w grze: odpowiedź autora 594 (4.11.2026)
 
 Gracz zaproponował na czacie zakładkę „co nowego” w grze, bo nie chce szukać nowości na Facebooku. Autor: „tylko to co tam wyląduje muszę zatwierdzać.. nie wiem gdzie to "Co nowego?" zmieścić w sumie”, a po makietach: „594 A + C bez kropki (zachowanie dostępu do changelogów)”.

@@ -178,6 +178,45 @@ describe('Wymiana', () => {
     assert.equal(ala.discovered['mineral:quartz'], undefined);
   });
 
+  // The author's "Konieczne" (4.11.2026, after a player's question on the
+  // chat): the camp's wood, stone and ore in the Wymiana too, as in the
+  // Gildia's Wymiana.
+  test('the camp resources go in a trade too, and stay out of the Encyklopedia record', async () => {
+    const stock = (name, resources) => db().then((database) => database.prepare('UPDATE characters SET resources = ? WHERE name = ?').bind(JSON.stringify(resources), name).run());
+    const held = async (name) => {
+      const found = await (await db()).prepare('SELECT resources, foreign_stacks FROM characters WHERE name = ?').bind(name).first();
+      return { resources: JSON.parse(found.resources), foreign: JSON.parse(found.foreign_stacks) };
+    };
+    await stock('Ala', { wood: 120, stone: 5, 'iron-ore': 0 });
+    await stock('Ola', { wood: 0, stone: 40, 'iron-ore': 15 });
+    const id = await opened();
+    assert.equal((await trade(players.ala, 'offer', { id, offer: { resources: { stone: 6 } } })).data.error.code, 'not_enough');
+    assert.equal((await trade(players.ala, 'offer', { id, offer: { resources: { gold: 1 } } })).data.error.code, 'invalid_offer');
+    assert.equal((await trade(players.ala, 'offer', { id, offer: { resources: { wood: 1.5 } } })).data.error.code, 'invalid_offer');
+    await trade(players.ala, 'offer', { id, offer: { resources: { wood: 100 } } });
+    const offered = await trade(players.ola, 'offer', { id, offer: { resources: { stone: 30, 'iron-ore': 15 } } });
+    assert.deepEqual(
+      offered.data.trade.theirs.resources.map((stack) => [stack.id, stack.name, stack.count]),
+      [['wood', 'Drewno', 100]],
+    );
+    assert.deepEqual(
+      offered.data.trade.mine.resources.map((stack) => [stack.id, stack.count]),
+      [
+        ['stone', 30],
+        ['iron-ore', 15],
+      ],
+    );
+    const locked = await trade(players.ola, 'confirm', { id, version: offered.data.trade.version });
+    const done = await trade(players.ala, 'confirm', { id, version: locked.data.trade.version });
+    assert.equal(done.data.trade.state, 'done', JSON.stringify(done.data));
+    const ala = await held('Ala');
+    const ola = await held('Ola');
+    assert.deepEqual(ala.resources, { wood: 20, stone: 35, 'iron-ore': 15 });
+    assert.deepEqual(ola.resources, { wood: 100, stone: 10 });
+    assert.equal(Object.keys(ala.foreign).filter((key) => key.startsWith('resource:')).length, 0);
+    assert.equal(Object.keys(ola.foreign).filter((key) => key.startsWith('resource:')).length, 0);
+  });
+
   test('a confirmation is for the offers as seen, and a trade that lost its items moves nothing', async () => {
     const given = await inBag('Ala', amulet(3));
     const id = await opened();
