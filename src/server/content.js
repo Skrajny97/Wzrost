@@ -236,6 +236,10 @@ export function publicContent() {
     chat: {
       channels: content.chat.channels,
       maxLength: content.chat.rules.maxLength,
+      // The admin's messages with links (chat.js, cleanText) and its window
+      // "Dodaj link".
+      linkMaxLength: content.chat.rules.linkMaxLength,
+      link: content.chat.texts.link,
       itemsMax: content.chat.rules.items,
       pollSeconds: content.chat.rules.pollSeconds,
       rules: content.chat.texts.rules,

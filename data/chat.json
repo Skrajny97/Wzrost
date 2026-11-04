@@ -1,11 +1,12 @@
 {
-  "$comment": "Czat w zakładce Społeczność (src/server/chat.js). channels: kanały czatu, Globalny i Wymiana, a obok nich prywatne rozmowy dwóch postaci; w kanale z items wiadomość może pokazać przedmioty z plecaka piszącego (najwyżej rules.items), jak były w chwili wysłania. rules: najdłuższa wiadomość w znakach, co ile sekund wolno pisać, ile ostatnich wiadomości kanału zostaje (zgłoszone zostają do decyzji autora), ile ostatnich wiadomości zostaje w prywatnej rozmowie, ile rozmów najwyżej pokazują zakładki, ile wiadomości przychodzi naraz, po ilu zgłoszeniach od różnych graczy wiadomość znika do sprawdzenia i co ile sekund otwarty czat pyta o nowe (najczęściej i najrzadziej, gdy długo nic nie przychodzi). words: początki albo części słów, które czat zamienia na gwiazdki (wielkość liter bez znaczenia). texts.rules: zasady, które gracz akceptuje przed pierwszą wiadomością. Słowa words służą też filtrowi imion postaci (src/engine/names.js): imię z takim słowem, także zapisanym cyframi, podobnymi literami, z podwojonymi literami albo z odstępami, nie przechodzi, a postać, która już je nosi, musi zmienić nazwę (names: teksty tego okna). Od chwili renameAt System sam nadaje nową nazwę postaci, która wciąż nosi takie imię (co godzinę, z listy generated według wyglądu postaci), a gracz dostaje słowa renamed. Każda postać może też raz zmienić nazwę w Ustawieniach (change, once; po zmianie used i locked); zmiana wymuszona przez filtr się do tego nie liczy.",
+  "$comment": "Czat w zakładce Społeczność (src/server/chat.js). channels: kanały czatu, Globalny i Wymiana, a obok nich prywatne rozmowy dwóch postaci; w kanale z items wiadomość może pokazać przedmioty z plecaka piszącego (najwyżej rules.items), jak były w chwili wysłania. rules: najdłuższa wiadomość w znakach, co ile sekund wolno pisać, ile ostatnich wiadomości kanału zostaje (zgłoszone zostają do decyzji autora), ile ostatnich wiadomości zostaje w prywatnej rozmowie, ile rozmów najwyżej pokazują zakładki, ile wiadomości przychodzi naraz (linkMaxLength: najdłuższa wiadomość admina z linkami, razem z adresami; do maxLength liczy się wtedy tylko to, co widać, czyli podpis zamiast adresu), po ilu zgłoszeniach od różnych graczy wiadomość znika do sprawdzenia i co ile sekund otwarty czat pyta o nowe (najczęściej i najrzadziej, gdy długo nic nie przychodzi). words: początki albo części słów, które czat zamienia na gwiazdki (wielkość liter bez znaczenia). texts.rules: zasady, które gracz akceptuje przed pierwszą wiadomością. texts.link: okno „Dodaj link”, które widzi tylko admin (autor: „Daj mi - adminowi możliwość dawania linków w czacie” i „żebym mógł gdzies taki link podpisać jako Changelog - 1”); link w wiadomości to [podpis](adres) albo sam adres, czat pokazuje podpis jako link. Słowa words służą też filtrowi imion postaci (src/engine/names.js): imię z takim słowem, także zapisanym cyframi, podobnymi literami, z podwojonymi literami albo z odstępami, nie przechodzi, a postać, która już je nosi, musi zmienić nazwę (names: teksty tego okna). Od chwili renameAt System sam nadaje nową nazwę postaci, która wciąż nosi takie imię (co godzinę, z listy generated według wyglądu postaci), a gracz dostaje słowa renamed. Każda postać może też raz zmienić nazwę w Ustawieniach (change, once; po zmianie used i locked); zmiana wymuszona przez filtr się do tego nie liczy.",
   "channels": [
     { "id": "global", "name": "Globalny" },
     { "id": "trade", "name": "Wymiana", "items": true }
   ],
   "rules": {
     "maxLength": 200,
+    "linkMaxLength": 1000,
     "everySeconds": 3,
     "keep": 300,
     "privateKeep": 100,
@@ -35,6 +36,16 @@
     }
   },
   "texts": {
+    "link": {
+      "button": "Dodaj link",
+      "title": "Link w wiadomości",
+      "lead": "Podpis pokaże się w czacie jako link do adresu. Linki wysyła tylko admin.",
+      "label": "Podpis",
+      "url": "Adres",
+      "insert": "Wstaw",
+      "noLabel": "Wpisz podpis linku.",
+      "invalid": "Adres musi zaczynać się od https:// albo http:// i nie może mieć spacji."
+    },
     "rules": [
       "Czat widzą wszyscy gracze. Pisz z szacunkiem: bez wulgaryzmów, obrażania, gróźb, treści dla dorosłych, spamu i linków.",
       "Prywatną rozmowę widzicie tylko Wy dwoje, ale zgłoszoną wiadomość przeczyta też moderacja.",

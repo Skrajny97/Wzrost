@@ -6,7 +6,10 @@
 // words. A character closes a private conversation until a newer message
 // comes. The open chat asks every few seconds for the messages after the
 // last one it has. A player writes once they accept the rules, once every few seconds,
-// with no links and with rude words masked. As the Play Store asks of
+// with no links and with rude words masked; only the admin writes links,
+// bare or with a label, "[Changelog - 1](https://…)", which the chat shows
+// as the label (the author: "Daj mi - adminowi możliwość dawania linków w
+// czacie" and "żebym mógł gdzies taki link podpisać jako Changelog - 1"). As the Play Store asks of
 // content made by players, every message can be reported, a player can
 // hide the messages of another, a message reported by a few players goes
 // down until the moderation looks at it, and the moderation takes messages
@@ -39,6 +42,9 @@ const INVISIBLE = /[​-‏‪-‮⁠-⁤﻿]/g;
 const CONTROL = /[\u0000-\u001f\u007f-\u009f]/g;
 const LINK = /https?:\/\/|www\.|[\p{L}\p{N}-]+\.(?:pl|com|net|org|eu|io|gg|me|tv|ly|xyz|ru|info|app|dev|link|site|online|shop|club|fun)(?![\p{L}\p{N}])/iu;
 const WORD = /[\p{L}\p{N}_]+/gu;
+// An admin's link: a label in square brackets with its address in round
+// ones, or a bare address; http(s) only, the address without spaces.
+export const ADMIN_LINK = /\[([^[\]]{1,80})\]\((https?:\/\/[^\s()]{1,500})\)|(https?:\/\/[^\s()]{1,500})/giu;
 
 const untilFormat = new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
@@ -106,16 +112,35 @@ export const chatRole = (env, row) =>
   isAuthor(env, { login: row.login, google: row.google_sub !== null }) ? 'admin' : row.chat_moderator === 1 ? 'moderator' : null;
 
 // The message as it is kept: one line of visible signs, within the length,
-// without links, with the words of data/chat.json turned into stars.
-export function cleanText(raw) {
+// without links, with the words of data/chat.json turned into stars. The
+// admin's (`admin`) may hold links (ADMIN_LINK): a labelled one counts as
+// its label towards the length, the whole message stays within
+// linkMaxLength signs, and the addresses keep their letters, stars only in
+// the words around them and in the labels.
+export function cleanText(raw, { admin = false } = {}) {
   if (typeof raw !== 'string') throw new ApiError(400, 'empty', 'Napisz wiadomość.');
   const text = raw.normalize('NFC').replace(INVISIBLE, '').replace(CONTROL, ' ').replace(/\s+/g, ' ').trim();
   if (!text) throw new ApiError(400, 'empty', 'Napisz wiadomość.');
-  const { maxLength } = content.chat.rules;
-  if ([...text].length > maxLength) throw new ApiError(400, 'too_long', `Wiadomość może mieć najwyżej ${maxLength} znaków.`);
-  if (LINK.test(text)) throw new ApiError(400, 'link', 'Linki w czacie są niedozwolone.');
+  const { maxLength, linkMaxLength } = content.chat.rules;
+  const shown = admin ? text.replace(ADMIN_LINK, (whole, label) => label ?? whole) : text;
+  if ([...shown].length > maxLength || [...text].length > linkMaxLength) throw new ApiError(400, 'too_long', `Wiadomość może mieć najwyżej ${maxLength} znaków.`);
   const words = content.chat.words;
-  return text.replace(WORD, (word) => (words.some((part) => word.toLowerCase().includes(part)) ? '*'.repeat([...word].length) : word));
+  const masked = (part) => part.replace(WORD, (word) => (words.some((bad) => word.toLowerCase().includes(bad)) ? '*'.repeat([...word].length) : word));
+  if (!admin) {
+    if (LINK.test(text)) throw new ApiError(400, 'link', 'Linki w czacie są niedozwolone.');
+    return masked(text);
+  }
+  // The admin's: the words between the links and the labels masked, the
+  // addresses as written.
+  let kept = '';
+  let at = 0;
+  for (const found of text.matchAll(ADMIN_LINK)) {
+    kept += masked(text.slice(at, found.index));
+    const [whole, label, address] = found;
+    kept += label === undefined ? whole : `[${masked(label)}](${address})`;
+    at = found.index + whole.length;
+  }
+  return kept + masked(text.slice(at));
 }
 
 // A message of the System (the Loteria's result in the Globalny,
@@ -391,7 +416,7 @@ export async function sendChat(context) {
   const { userId } = session;
   if (!account.chat_rules_at) throw new ApiError(403, 'rules', 'Najpierw zaakceptuj zasady czatu.');
   if (account.chat_muted_until > now) throw new ApiError(403, 'muted', mutedText(account.chat_muted_until));
-  const text = cleanText(body.text);
+  const text = cleanText(body.text, { admin: isAuthor(context.env, session.user) });
   if (other) await privateAllowed(db, userId, other);
   const offered = await offeredItems(db, channel, character.id, body.items);
   const items = offered && JSON.stringify(offered);

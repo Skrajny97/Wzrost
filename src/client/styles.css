@@ -6721,6 +6721,50 @@ a.camp-level-button {
   box-shadow: 0 0 0 1px var(--system);
 }
 
+/* The admin's links in a message: its label underlined in the System's
+   colour; the window "Dodaj link" with its two fields. */
+.chat-link {
+  color: var(--system);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  overflow-wrap: anywhere;
+}
+
+.chat-text--linked {
+  cursor: pointer;
+}
+
+.chat-link-sheet {
+  display: grid;
+  gap: 10px;
+}
+
+.chat-link-field {
+  display: grid;
+  gap: 4px;
+}
+
+.chat-link-field .field-label {
+  margin: 0;
+}
+
+.chat-link-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 8px 10px;
+  border: 1px solid var(--bark-line);
+  background: var(--bg-deep);
+  color: var(--text);
+  font-family: var(--font-system);
+  font-size: 16px;
+}
+
+.chat-link-input:focus {
+  outline: none;
+  border-color: var(--system);
+  box-shadow: 0 0 0 1px var(--system);
+}
+
 .chat-send {
   flex: none;
   width: auto;

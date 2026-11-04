@@ -97,6 +97,31 @@ describe('Czat', () => {
     assert.equal((await send(cookie, 'Hej')).data.error.code, 'no_character');
   });
 
+  test('only the admin writes links, bare or with a label, the label counting towards the length and the address kept whole', async () => {
+    const author = await admin();
+    // A player still writes none, not even in the admin's form.
+    assert.equal((await send(players.ala, '[Changelog - 1](https://insightrpg.com/zmiany)')).data.error.code, 'link');
+    const text = 'Nowości w grze: [Changelog - 1](https://claude.ai/artifact/9jPtkYkTJ67d3akFB8imGX) i https://insightrpg.com';
+    const sent = await send(author, text);
+    assert.equal(sent.status, 201, JSON.stringify(sent.data).slice(0, 200));
+    assert.deepEqual([sent.data.message.text, sent.data.message.role], [text, 'admin']);
+    assert.equal((await read(players.ala)).messages.at(-1).text, text);
+    // The label counts as what the chat shows, the whole message within
+    // linkMaxLength signs.
+    await age();
+    const { maxLength, linkMaxLength } = content.chat.rules;
+    const longAddress = `https://insightrpg.com/${'a'.repeat(400)}`;
+    assert.equal((await send(author, `${'b'.repeat(maxLength - 5)} [link](${longAddress})`)).status, 201);
+    await age();
+    assert.equal((await send(author, `${'b'.repeat(maxLength - 3)} [link](${longAddress})`)).data.error.code, 'too_long');
+    assert.equal((await send(author, `[link](https://insightrpg.com/${'a'.repeat(490)}) [link](https://insightrpg.com/${'a'.repeat(490)})`)).data.error.code, 'too_long');
+    assert.ok(linkMaxLength > maxLength);
+    // Rude words go to stars around the links and in the labels, the
+    // addresses keep their letters.
+    const masked = await send(author, 'KURWA [KURWA](https://insightrpg.com/kurwa)');
+    assert.equal(masked.data.message.text, '***** [*****](https://insightrpg.com/kurwa)');
+  });
+
   test('a player hides another one\'s messages and shows them again', async () => {
     const { message } = (await send(players.ola, 'Spam')).data;
     assert.equal((await call('POST', '/api/chat/block', { cookie: players.ola, body: { messageId: message.id } })).data.error.code, 'own');

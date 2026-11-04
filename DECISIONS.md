@@ -3048,6 +3048,21 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Linki admina w czacie (4.11.2026, w grze od 0.1.37)
+
+Autor: „Daj mi - adminowi możliwość dawania linków w czacie” oraz „i żebym mógł gdzies taki link podpisać jako Changelog - 1 na przykład i zeby to byl hiperlink”.
+
+1. **Tylko admin.** Linki w czacie wysyła tylko konto autora (admin). Gracze i moderatorzy dalej nie wyślą linku („Linki w czacie są niedozwolone.”).
+2. **Link z podpisem.** W wiadomości admina `[Changelog - 1](https://…)` pokazuje się jako podkreślony podpis „Changelog - 1”, który otwiera adres w nowej karcie. Sam adres `https://…` też jest linkiem. Działają tylko adresy `http://` i `https://`.
+3. **Przycisk „Dodaj link”.** Ikona ogniwa łańcucha stoi przy polu wiadomości tylko u admina. Otwiera okno z polami „Podpis” i „Adres”, a „Wstaw” dopisuje link na końcu wiadomości.
+4. **Długość (brakujący szczegół).** Do limitu 200 znaków liczy się to, co widać, czyli podpis zamiast adresu. Cała wiadomość admina razem z adresami ma najwyżej 1000 znaków (`linkMaxLength` w `data/chat.json`).
+5. **Gwiazdki.** Filtr wulgaryzmów działa w słowach wokół linków i w podpisach. Adres zostaje bez zmian.
+6. **Wszędzie w czacie.** Link działa w każdym kanale i w prywatnej rozmowie. Wiadomość admina z linkiem da się dalej zgłosić i ukryć: stuknięcie obok linku otwiera to samo okno co przy zwykłej wiadomości.
+
+## Wersja 0.1.37 (4.11.2026)
+
+1. **Linki admina w czacie** (zob. wyżej).
+
 ## Wymiana w Gildii: zasoby za złoto (4.11.2026, w grze od 0.1.36)
 
 Autor: „Daj też mozliwość wymiany i wystawiania ofert w Gildii zasoby za złoto”. Rozszerza „Wymianę zasobów w Gildii”; punkt 12 tamtej sekcji nie dotyczy już złota.

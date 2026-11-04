@@ -62,6 +62,32 @@ import { lockedScreen } from './locked.js';
 import { mountRanking } from './ranking.js';
 import { tradeBanner } from './trade.js';
 
+// The admin's links in a message (src/server/chat.js, ADMIN_LINK): a label
+// in square brackets with its address in round ones shows as the label, a
+// bare address as itself, each opening in a new card; only http(s).
+const LINKED = /\[([^[\]]{1,80})\]\((https?:\/\/[^\s()]{1,500})\)|(https?:\/\/[^\s()]{1,500})/giu;
+function linkedText(text) {
+  const parts = [];
+  let at = 0;
+  for (const found of text.matchAll(LINKED)) {
+    const [whole, label, labelled, bare] = found;
+    const address = labelled ?? bare;
+    let safe = null;
+    try {
+      const url = new URL(address);
+      if (url.protocol === 'https:' || url.protocol === 'http:') safe = url.href;
+    } catch {
+      safe = null;
+    }
+    if (found.index > at) parts.push(text.slice(at, found.index));
+    parts.push(safe ? h('a', { class: 'chat-link', href: safe, target: '_blank', rel: 'noopener noreferrer', text: label ?? bare }) : whole);
+    at = found.index + whole.length;
+  }
+  if (at < text.length) parts.push(text.slice(at));
+  return parts;
+}
+const hasLink = (message) => message.role === 'admin' && /https?:\/\//i.test(message.text);
+
 // The most messages the page keeps; older ones leave from the top.
 const SHOWN = 200;
 
@@ -264,10 +290,12 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
   const list = h('ol', { class: 'chat-list', 'aria-label': 'Wiadomości' });
   const empty = h('p', { class: 'muted chat-empty', text: 'Wczytywanie…' });
   const placeholder = () => (talk ? `Do postaci ${talk.name}…` : channel.items ? 'Napisz ofertę…' : 'Napisz wiadomość…');
+  // The admin writes links too, their addresses beyond the length shown.
+  const admin = Boolean(state.user?.author);
   const text = h('input', {
     type: 'text',
     id: `${id}-text`,
-    maxlength: String(chat.maxLength),
+    maxlength: String(admin ? chat.linkMaxLength : chat.maxLength),
     autocomplete: 'off',
     enterkeyhint: 'send',
     placeholder: placeholder(),
@@ -279,6 +307,47 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
     { type: 'button', class: 'icon-button chat-attach', 'aria-label': 'Pokaż przedmioty z plecaka', onClick: pickItems },
     icon('pouch', { size: 20 }),
   );
+  // "Dodaj link", the admin's alone: a label and an address, put into the
+  // message as [label](address).
+  const linkButton =
+    admin &&
+    h(
+      'button',
+      { type: 'button', class: 'icon-button chat-attach chat-link-add', 'aria-label': chat.link.button, title: chat.link.button, onClick: () => openLinkSheet() },
+      icon('link', { size: 20 }),
+    );
+  function openLinkSheet() {
+    const words = chat.link;
+    const label = h('input', { type: 'text', id: `${id}-link-label`, class: 'chat-link-input', maxlength: '80', autocomplete: 'off', placeholder: 'Changelog - 1' });
+    const address = h('input', { type: 'url', id: `${id}-link-url`, class: 'chat-link-input', maxlength: '500', autocomplete: 'off', inputmode: 'url', placeholder: 'https://' });
+    const field = (input, words) => h('div', { class: 'chat-link-field' }, h('label', { for: input.id, class: 'field-label', text: words }), input);
+    const insert = h('button', {
+      type: 'button',
+      class: 'button button--system',
+      text: words.insert,
+      onClick: () => {
+        const shown = label.value.replace(/[[\]]/g, '').trim();
+        const target = address.value.trim();
+        if (!shown) return toast(words.noLabel);
+        if (!/^https?:\/\/[^\s()]+$/i.test(target)) return toast(words.invalid);
+        text.value = `${text.value.trim()} [${shown}](${target})`.trim();
+        closeSheet();
+        text.focus();
+      },
+    });
+    openSheet(
+      h('h2', { class: 'sheet-title', text: words.title }),
+      h(
+        'div',
+        { class: 'chat-link-sheet' },
+        h('p', { class: 'sheet-text', text: words.lead }),
+        field(label, words.label),
+        field(address, words.url),
+        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }), insert),
+      ),
+    );
+    label.focus();
+  }
   const attachedList = h('ul', { class: 'chat-attached', 'aria-label': 'Przedmioty w wiadomości' });
   const form = h(
     'form',
@@ -290,7 +359,7 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
       },
     },
     attachedList,
-    h('div', { class: 'chat-form-row' }, attachButton, text, sendButton),
+    h('div', { class: 'chat-form-row' }, attachButton, linkButton, text, sendButton),
   );
 
   // The items picked for the next message, each with a × to leave it out;
@@ -517,9 +586,22 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
         h('span', { class: 'chat-level', text: `poz. ${message.level}` }),
         stamp,
       ),
-      message.own
-        ? h('p', { class: 'chat-text', text: message.text })
-        : h('button', { type: 'button', class: 'chat-text chat-text--button', text: message.text, onClick: () => actions(message) }),
+      // The admin's message with links: its words with the links to tap, and
+      // a tap beside them opens what can be done with it.
+      hasLink(message)
+        ? h(
+            'p',
+            {
+              class: 'chat-text chat-text--linked',
+              onClick: (event) => {
+                if (!message.own && !event.target.closest('a')) actions(message);
+              },
+            },
+            linkedText(message.text),
+          )
+        : message.own
+          ? h('p', { class: 'chat-text', text: message.text })
+          : h('button', { type: 'button', class: 'chat-text chat-text--button', text: message.text, onClick: () => actions(message) }),
       message.items?.length > 0 &&
         h(
           'ul',
@@ -666,7 +748,7 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
     };
     openSheet(
       h('h2', { class: 'sheet-title chat-sheet', text: message.name }),
-      h('p', { class: 'sheet-text chat-sheet-text', text: message.text }),
+      hasLink(message) ? h('p', { class: 'sheet-text chat-sheet-text' }, linkedText(message.text)) : h('p', { class: 'sheet-text chat-sheet-text', text: message.text }),
       h(
         'div',
         { class: 'chat-sheet-actions' },

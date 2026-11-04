@@ -21,6 +21,8 @@ export const ICONS = {
   leaf: [path('M5 19C5 10.5 10 5 19 5c0 9-5.5 14-14 14z'), path('M5 19l8-8')],
   house: [path('M3 11l9-7 9 7'), path('M5.5 9.5V20h13V9.5'), path('M10 20v-6h4v6')],
   book: [path('M4 5.5c3-1.2 6-1 8 .8 2-1.8 5-2 8-.8v13.4c-3-1.2-6-1-8 .8-2-1.8-5-2-8-.8z'), path('M12 6.3v14')],
+  // A link in the chat: two links of a chain.
+  link: [path('M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2'), path('M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2')],
   back: [path('M15 5l-7 7 7 7')],
   stats: [path('M5 20V11M12 20V4M19 20v-7')],
   skills: [path('M12 3l2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5z')],

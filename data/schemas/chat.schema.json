@@ -24,9 +24,10 @@
     "rules": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["maxLength", "everySeconds", "keep", "privateKeep", "items", "conversations", "page", "hideAfterReports", "pollSeconds"],
+      "required": ["maxLength", "linkMaxLength", "everySeconds", "keep", "privateKeep", "items", "conversations", "page", "hideAfterReports", "pollSeconds"],
       "properties": {
         "maxLength": { "type": "integer", "minimum": 1 },
+        "linkMaxLength": { "type": "integer", "minimum": 1, "description": "Najwięcej znaków wiadomości admina z linkami, razem z adresami (do maxLength liczy się tylko to, co widać: podpis zamiast adresu)." },
         "everySeconds": { "type": "integer", "minimum": 0 },
         "keep": { "type": "integer", "minimum": 1 },
         "privateKeep": { "type": "integer", "minimum": 1 },
@@ -79,8 +80,13 @@
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["rules"],
+      "required": ["rules", "link"],
       "properties": {
+        "link": {
+          "type": "object",
+          "required": ["button", "title", "lead", "label", "url", "insert", "noLabel", "invalid"],
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        },
         "rules": { "type": "array", "minItems": 1, "items": { "type": "string" } }
       }
     }
