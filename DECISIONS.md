@@ -3048,6 +3048,14 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Plansza Warowni: kamienne mury i dwa nowe pasy (4.11.2026, szkic)
+
+Brakujący szczegół z odpowiedzi 419: „Po przemianie plansza Obozu staje się Warownią: kamienne mury zamiast palisady”.
+
+1. **Podstawa.** Warownia stoi na wysokiej planszy obozu w trzecim wyglądzie, bo przemiana wymaga obozu na 10. poziomie. Pod pasem Osady dochodzą dwa pasy polany tej samej wysokości (`tools/fortress-board.py`), na sześć budynków Warowni po trzy w rzędzie. Siódmy stanie w dolnym rzędzie, po prawej stronie drogi.
+2. **Mury.** PixelLab domalowuje kamienne mury z basztami w rogach i kamienne bramy tylko w miejscu palisady i bram (maska, `inpaint-v3`, rodzaj `fortress-board` w `art/prompts.json`, `tool: inpaint` w `tools/generate-portraits-pixellab.mjs`). Reszta planszy zostaje jak w obozie. Szwy nowych pasów PixelLab domalowuje jako trawę. Plansza ma więcej niż 512 px wysokości, więc mury powstają w dwóch częściach: najpierw górna, potem dolna, która ciągnie wybraną górną.
+3. **Ocena.** Autor dostaje gotową planszę do oceny, zanim trafi ona do gry.
+
 ## Akceptacja Bractw na planszy Osady (4.11.2026, w grze od 0.1.39)
 
 Autor: „Niech przy wejściu do Osady wyświetla się gdzieś łatwo dostepny (zwijalny) poziom akceptacji przez Bractwa i musimy rozwinąć ten system by dawał więcej korzyści itp.”

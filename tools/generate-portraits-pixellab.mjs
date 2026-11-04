@@ -14,7 +14,10 @@
 // man-and-woman pair so both wear the same (or as pixellab.usage says), or
 // {path, usage} with its own words, e.g. the approved portrait for the look
 // and the grey mannequin of the walk for the pose (kind walk-starts, the start
-// frames of the walks). One call gives four versions. Run by the
+// frames of the walks). One call gives four versions. A prompt
+// {tool: 'inpaint', input, mask, prompt} redraws only the white of its mask
+// in its input picture instead (inpaint-v3), e.g. the Warownia's board (kind
+// fortress-board). Run by the
 // "Grafiki (szkice)" workflow (kinds evolutions-pixellab and
 // walk-starts-pixellab), which keeps the drafts on the art-drafts branch:
 //   node tools/generate-portraits-pixellab.mjs --kind evolutions --ids a,b [--calls 1] [--max-cost 1] [--dry-run]
@@ -99,12 +102,33 @@ const sizeOf = (path) => {
 const reference = (path) => ({ image: png(path), size: sizeOf(path) });
 const promptOf = (id) => (typeof kind.prompts[id] === 'string' ? kind.prompts[id] : kind.prompts[id].prompt);
 
+// An inpainting prompt ({tool: 'inpaint', input, mask, prompt}) redraws only
+// the white of its mask in its input picture and keeps the rest (inpaint-v3,
+// both at most 512 × 512 and of one size), e.g. the stone walls of the
+// Warownia's board in place of the camp's palisade.
+function inpainting(entry, seed) {
+  const size = sizeOf(entry.input);
+  const mask = sizeOf(entry.mask);
+  if (size.width !== mask.width || size.height !== mask.height) throw new Error(`maska ${entry.mask} ma inny rozmiar niż ${entry.input}`);
+  return {
+    description: entry.prompt,
+    inpainting_image: { image: png(entry.input), size },
+    mask_image: { image: png(entry.mask), size },
+    seed,
+    no_background: false,
+    crop_to_mask: true,
+  };
+}
+
 // One call: sent, then polled until PixelLab has drawn its four versions. A
 // full queue of jobs (429) waits and tries again.
 async function draw(id, seed) {
   const refs = settings.references?.[id] ?? [];
   const style = settings.styles?.[id] ?? settings.style;
-  const body = {
+  const entry = kind.prompts[id];
+  const inpaint = entry?.tool === 'inpaint';
+  const path = inpaint ? '/inpaint-v3' : '/generate-image-v2';
+  const body = inpaint ? inpainting(entry, seed) : {
     description: promptOf(id),
     image_size: { width, height },
     seed,
@@ -125,7 +149,7 @@ async function draw(id, seed) {
   let job;
   for (let attempt = 0; ; attempt++) {
     try {
-      job = await request('POST', '/generate-image-v2', body);
+      job = await request('POST', path, body);
       break;
     } catch (error) {
       if (error.status !== 429 || attempt >= 20) throw error;
@@ -136,7 +160,7 @@ async function draw(id, seed) {
     await wait(POLL_MS);
     const state = await request('GET', `/background-jobs/${job.background_job_id}`);
     if (state.status === 'failed') throw new Error(`rysowanie nie powiodło się: ${JSON.stringify(state.last_response ?? {}).slice(0, 300)}`);
-    if (state.status === 'completed') return { state, refs };
+    if (state.status === 'completed') return { state, refs, path };
   }
   throw new Error(`rysowanie trwa zbyt długo (zadanie ${job.background_job_id})`);
 }
@@ -151,7 +175,12 @@ const skipped = ids.length * calls - jobs.length;
 
 const before = await request('GET', '/balance');
 if (values['dry-run']) {
-  for (const id of jobs) lines.push(`| ${id} | do zrobienia (wzór: ${settings.styles?.[id] ?? settings.style ?? 'brak'}, odniesienia: ${(settings.references?.[id] ?? []).length}) |`);
+  for (const id of jobs)
+    lines.push(
+      kind.prompts[id].tool === 'inpaint'
+        ? `| ${id} | do zrobienia (domalowanie ${kind.prompts[id].input}, maska ${kind.prompts[id].mask}) |`
+        : `| ${id} | do zrobienia (wzór: ${settings.styles?.[id] ?? settings.style ?? 'brak'}, odniesienia: ${(settings.references?.[id] ?? []).length}) |`,
+    );
 } else {
   const queue = [...jobs];
   async function worker() {
@@ -159,13 +188,14 @@ if (values['dry-run']) {
       const id = queue.shift();
       const seed = randomInt(1, 2 ** 31);
       try {
-        const { state, refs } = await draw(id, seed);
+        const { state, refs, path } = await draw(id, seed);
         const result = state.last_response ?? {};
         const images = result.images ?? (result.image ? [result.image] : []);
-        images.forEach((image, index) => writeFileSync(`${outDir}/${id}-${stamp}-${seed}-${index}.png`, Buffer.from(image.base64, 'base64')));
+        // A picture may come as a data address (data:image/png;base64,…).
+        images.forEach((image, index) => writeFileSync(`${outDir}/${id}-${stamp}-${seed}-${index}.png`, Buffer.from(image.base64.replace(/^data:[^,]*,/, ''), 'base64')));
         writeFileSync(
           `${outDir}/${id}-${stamp}-${seed}.json`,
-          `${JSON.stringify({ id, tool: 'pixellab generate-image-v2', description: promptOf(id), style: settings.styles?.[id] ?? settings.style ?? null, references: refs, usage: state.usage ?? null, images: images.length }, null, 2)}\n`,
+          `${JSON.stringify({ id, tool: `pixellab ${path.slice(1)}`, description: promptOf(id), style: settings.styles?.[id] ?? settings.style ?? null, input: kind.prompts[id].input ?? null, mask: kind.prompts[id].mask ?? null, references: refs, usage: state.usage ?? null, images: images.length }, null, 2)}\n`,
         );
         const usage = state.usage ? (state.usage.type === 'usd' ? `${Number(state.usage.usd).toFixed(3)} USD` : JSON.stringify(state.usage)) : '';
         lines.push(`| ${id} | ${images.length} obrazki ${usage} |`);
