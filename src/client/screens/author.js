@@ -11,7 +11,7 @@ import { createArena } from '../arena.js';
 import { fill, h, icon } from '../dom.js';
 import { dateTimeFormat, formatNumber } from '../format.js';
 import { call, state } from '../state.js';
-import { systemPanel, withButton } from '../ui.js';
+import { confirmAction, systemPanel, withButton } from '../ui.js';
 
 export function mountAuthor(container, { backHash = '#/walka' }) {
   if (!state.user?.author) {
@@ -22,6 +22,10 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
   let error = null;
   let skills = null;
   let skillsOpen = false;
+  // "Co nowego?" (595 A): the drafts, a new entry and the published ones,
+  // read the first time the part opens.
+  let news = null;
+  let newsOpen = false;
   let arena = null;
   // Answers that come after the panel was left are dropped (the code
   // review: a skill's fight played on with sound on the next screen).
@@ -62,6 +66,84 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
       fill(preview);
     }
     render();
+  }
+
+  async function toggleNews() {
+    if (!newsOpen) news = await call('GET', '/api/author/news');
+    newsOpen = !newsOpen;
+    render();
+  }
+
+  function newsToggle() {
+    const drafts = news?.drafts.length ?? 0;
+    return h('button', {
+      type: 'button',
+      class: 'button button--system button--small author-news-toggle',
+      'aria-expanded': String(newsOpen),
+      text: newsOpen ? 'Zwiń „Co nowego?”' : 'Wpisy „Co nowego?”',
+      onClick: (event) => withButton(event.currentTarget, toggleNews),
+    }, !newsOpen && drafts > 0 && h('span', { class: 'author-news-count', text: ` (szkice: ${drafts})` }));
+  }
+
+  // A title and a text to correct, with the action under them: "Opublikuj"
+  // for a draft or a new entry, "Zapisz" and "Usuń" for a published one.
+  function newsForm(entry, { label, send, remove }) {
+    const { limits } = news;
+    const title = h('input', { type: 'text', class: 'author-news-title', maxlength: String(limits.title), value: entry.title ?? '', 'aria-label': 'Tytuł' });
+    const body = h('textarea', { class: 'author-news-body', rows: '7', maxlength: String(limits.body), 'aria-label': 'Treść' });
+    body.value = entry.body ?? '';
+    const act = (handler) => (event) =>
+      withButton(event.currentTarget, async () => {
+        news = await handler();
+        render();
+      });
+    return h(
+      'div',
+      { class: 'author-news-form' },
+      title,
+      body,
+      h(
+        'div',
+        { class: 'author-news-actions' },
+        h('button', { type: 'button', class: 'button button--system button--small', text: label, onClick: act(() => send({ title: title.value, body: body.value })) }),
+        remove && h('button', { type: 'button', class: 'button button--danger button--small', text: 'Usuń', onClick: act(remove) }),
+      ),
+    );
+  }
+
+  function newsPart() {
+    if (!newsOpen || !news) return null;
+    const post = (path, body) => call('POST', path, body);
+    return h(
+      'section',
+      { class: 'card stack author-news', 'aria-label': 'Co nowego?' },
+      h('h2', { class: 'card-title', text: 'Co nowego?' }),
+      h('p', { class: 'muted', text: 'Gracze widzą tylko opublikowane wpisy: raz w okienku po wejściu do gry i zawsze pod ikoną zwoju w górnym pasku. Wiersz zaczynający się od „- ” jest punktem listy.' }),
+      h('h3', { class: 'author-news-head', text: news.drafts.length > 0 ? `Szkice do zatwierdzenia: ${news.drafts.length}` : 'Szkice do zatwierdzenia' }),
+      news.drafts.length === 0
+        ? h('p', { class: 'muted', text: 'Wszystkie szkice są opublikowane.' })
+        : news.drafts.map((draft) => newsForm(draft, { label: 'Opublikuj', send: (written) => post('/api/author/news', { draft: draft.id, ...written }) })),
+      h('h3', { class: 'author-news-head', text: 'Nowy wpis' }),
+      newsForm({}, { label: 'Opublikuj', send: (written) => post('/api/author/news', written) }),
+      h('h3', { class: 'author-news-head', text: news.entries.length > 0 ? `Opublikowane: ${news.entries.length}` : 'Opublikowane' }),
+      news.entries.length === 0
+        ? h('p', { class: 'muted', text: 'Nic jeszcze nie jest opublikowane.' })
+        : news.entries.map((entry) =>
+            h(
+              'details',
+              { class: 'author-news-entry' },
+              h('summary', { text: `${entry.title} · ${dateTimeFormat.format(new Date(entry.publishedAt))}` }),
+              newsForm(entry, {
+                label: 'Zapisz poprawkę',
+                send: (written) => post('/api/author/news/edit', { id: entry.id, ...written }),
+                remove: async () => {
+                  const sure = await confirmAction({ title: 'Usunąć wpis?', text: `„${entry.title}” zniknie z gry. Szkic, z którego powstał, wróci do szkiców.`, confirmLabel: 'Usuń', danger: true });
+                  return sure ? post('/api/author/news/delete', { id: entry.id }) : news;
+                },
+              }),
+            ),
+          ),
+    );
   }
 
   function skillsToggle() {
@@ -116,7 +198,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
         h('div', { class: 'page-heading-text' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Panel autora' }), h('p', { class: 'page-subtitle', text: 'Zgłoszenia błędów, konta i postacie' })),
         h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
       ),
-      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [skillsToggle(), skillsPreview(), counts(panel.counts), bugs(panel.bugs), accounts(panel.accounts)],
+      error ? systemPanel(error) : panel === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : [newsToggle(), newsPart(), skillsToggle(), skillsPreview(), counts(panel.counts), bugs(panel.bugs), accounts(panel.accounts)],
       h('button', {
         type: 'button',
         class: 'button button--world',

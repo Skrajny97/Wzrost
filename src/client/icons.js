@@ -21,6 +21,8 @@ export const ICONS = {
   leaf: [path('M5 19C5 10.5 10 5 19 5c0 9-5.5 14-14 14z'), path('M5 19l8-8')],
   house: [path('M3 11l9-7 9 7'), path('M5.5 9.5V20h13V9.5'), path('M10 20v-6h4v6')],
   book: [path('M4 5.5c3-1.2 6-1 8 .8 2-1.8 5-2 8-.8v13.4c-3-1.2-6-1-8 .8-2-1.8-5-2-8-.8z'), path('M12 6.3v14')],
+  // "Co nowego?" in the top bar (594 C): a scroll with lines of writing.
+  scroll: [path('M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6'), path('M6 3a2 2 0 0 0-2 2v1h4V5a2 2 0 0 0-2-2z'), path('M8 9h8M8 13h8M8 17h5')],
   // A link in the chat: two links of a chain.
   link: [path('M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2'), path('M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2')],
   back: [path('M15 5l-7 7 7 7')],

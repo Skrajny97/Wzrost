@@ -17,7 +17,8 @@ import { SYSTEM_POINTS_ICON } from './icons.js';
 import { anyClaimable, showQuests } from './quests.js';
 import { SECTION_ICONS, SECTION_NEWS, sectionHash } from './screens/community.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
-import { meter } from './ui.js';
+import { meter, toast } from './ui.js';
+import { openNews } from './news.js';
 import { desktopLayout } from './layout-mode.js';
 
 // A profession's work, by the kind of its activity: its screen, its name
@@ -139,6 +140,8 @@ export function buildTopbar(onSettings) {
 
   // The settings, with a dot for the author when players' bug reports wait.
   const settings = h('button', { type: 'button', class: 'icon-button', 'aria-label': 'Ustawienia', onClick: onSettings }, icon('gear'));
+  // "Co nowego?" beside them (594 C): the latest entries, never with a dot.
+  const news = h('button', { type: 'button', class: 'icon-button news-button', 'aria-label': 'Co nowego?', onClick: () => openNews().catch((error) => toast(error.message)) }, icon('scroll'));
 
   const element = $('#topbar');
   fill(element,
@@ -152,6 +155,7 @@ export function buildTopbar(onSettings) {
         { class: 'topbar-right' },
         goldButton,
         camp,
+        news,
         settings,
       ),
     ),

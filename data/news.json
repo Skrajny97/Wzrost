@@ -1,0 +1,35 @@
+{
+  "$comment": "Szkice wpisów „Co nowego?” (594 A + C, 595 A): po każdej wersji szkic czeka w Panelu autora, a gracze widzą wpis dopiero po „Opublikuj”. Autor może szkic poprawić przed publikacją albo napisać własny wpis. W treści wiersz zaczynający się od „- ” jest punktem listy. limits: najdłuższy tytuł i treść w znakach, shown: ile ostatnich wpisów pokazuje lista pod ikoną zwoju.",
+  "limits": {
+    "title": 80,
+    "body": 3000,
+    "shown": 30
+  },
+  "drafts": [
+    {
+      "id": "0.1.39",
+      "title": "Wersja 0.1.39",
+      "body": "- W Osadzie nad planszą jest pasek „Akceptacja Bractw”. Zwinięty pokazuje stopień każdego Bractwa.\n- Rozwinięty pokazuje punkty, pasek do następnego stopnia oraz to, co daje obecny stopień i co doda następny."
+    },
+    {
+      "id": "0.1.40",
+      "title": "Wersja 0.1.40",
+      "body": "- Na komputerze cała plansza Osady mieści się na ekranie bez przewijania. Tytuł i pasek Bractw stoją obok niej."
+    },
+    {
+      "id": "0.1.41",
+      "title": "Wersja 0.1.41",
+      "body": "- W Wymianie między graczami można dawać drewno, kamień i rudę żelaza: w ofercie, pod złotem, jest część „Zasoby obozu”.\n- U Jagny i Wszebora w zakładce „Sprzedaj” przy nazwach stoją ikony ziół, mikstur i materiałów."
+    },
+    {
+      "id": "0.1.42",
+      "title": "Wersja 0.1.42",
+      "body": "- Bractwo Kowali daje więcej: Kowadło taniej (do 20% złota), Warsztat pracuje krócej (do 20%) i częściej robi przedmiot o rzadkość wyżej (do +4 pkt proc.).\n- Kompania Kupców daje więcej: niższą opłatę Targowiska (do 0,2%), aukcje do 48 godzin i do 5 przedmiotów u wędrownego handlarza.\n- Panel „Akceptacja Bractw” pokazuje nowe korzyści przy każdym stopniu."
+    },
+    {
+      "id": "0.1.43",
+      "title": "Wersja 0.1.43",
+      "body": "- Nowości z gry pokazują się teraz w okienku „Co nowego?” po wejściu do gry, każda raz.\n- Ikona zwoju w górnym pasku, obok Ustawień, otwiera także wcześniejsze wpisy."
+    }
+  ]
+}

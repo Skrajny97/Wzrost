@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Co nowego?",
+  "description": "Szkice wpisów „Co nowego?” (odpowiedzi autora 594 A + C i 595 A): po każdej wersji szkic czeka w Panelu autora, a gracze widzą wpis dopiero, gdy autor go opublikuje (src/server/news.js).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["drafts", "limits"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "body", "shown"],
+      "properties": {
+        "title": { "type": "integer", "minimum": 1, "description": "Najdłuższy tytuł wpisu w znakach." },
+        "body": { "type": "integer", "minimum": 1, "description": "Najdłuższa treść wpisu w znakach." },
+        "shown": { "type": "integer", "minimum": 1, "description": "Ile ostatnich wpisów pokazuje lista pod ikoną zwoju." }
+      }
+    },
+    "drafts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "body"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$", "description": "Wersja gry, której dotyczy szkic; opublikowany szkic gra pamięta po tym id." },
+          "title": { "type": "string", "minLength": 1 },
+          "body": { "type": "string", "minLength": 1, "description": "Treść: wiersze zaczynające się od „- ” są punktami listy." }
+        }
+      }
+    }
+  }
+}

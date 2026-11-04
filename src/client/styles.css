@@ -12952,3 +12952,94 @@ a.profession-square:active {
 :root[data-layout='desktop'] .camp-materials {
   display: none;
 }
+
+/* "Co nowego?" (594 A + C): the entries in the window after entering the
+   game and under the scroll in the top bar, each a card with its points. */
+.news-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.news-entry {
+  padding: 14px 16px;
+}
+
+.news-title {
+  margin: 0 0 8px;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.news-date {
+  color: var(--text-muted);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.news-points {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  line-height: 1.4;
+}
+
+.news-text {
+  margin: 0 0 6px;
+  line-height: 1.4;
+}
+
+/* The Panel autora's part of "Co nowego?": a form for each draft, a new
+   entry and each published one, folded. */
+.author-news {
+  gap: 12px;
+}
+
+.author-news-head {
+  margin: 8px 0 0;
+  font-size: 17px;
+}
+
+.author-news-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.author-news-title,
+.author-news-body {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--bark-line);
+  border-radius: 0;
+  background: var(--bg-deep);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.author-news-body {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.author-news-title:focus,
+.author-news-body:focus {
+  outline: 2px solid var(--gold);
+  outline-offset: 1px;
+}
+
+.author-news-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.author-news-entry summary {
+  cursor: pointer;
+  padding: 8px 0;
+}

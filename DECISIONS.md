@@ -3048,6 +3048,33 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## „Co nowego?”: odpowiedź autora 595 i budowa (4.11.2026, w grze od 0.1.43)
+
+Autor: „595 A”, a potem: „595 A -> priorytet i daj mi changelogi od 0.1.39”.
+
+1. **Szkice (595 A).** Po każdej wersji szkic wpisu stoi w `data/news.json` i czeka w Panelu autora, w części „Wpisy „Co nowego?””. Autor może go poprawić i stuknąć „Opublikuj”. Gracze widzą tylko wpisy opublikowane.
+2. **Własne wpisy.** W tym samym miejscu autor pisze nowy wpis od zera, poprawia opublikowane i je usuwa. Usunięty szkic wraca do szkiców.
+3. **Okienko po wejściu do gry (594 A).** Pokazuje raz każdy wpis, którego konto jeszcze nie widziało, gdy narrator nic nie mówi, więc nie przeszkadza we wprowadzeniu. Poprawka opublikowanego wpisu nie pokazuje go drugi raz.
+4. **Nowe konta (brakujący szczegół).** Okienko pomija wpisy sprzed założenia konta, a lista pod ikoną zwoju pokazuje je każdemu.
+5. **Ikona zwoju (594 C).** Stoi w górnym pasku obok Ustawień i otwiera 30 ostatnich wpisów. Nie ma kropki.
+6. **Treść.** Wiersz zaczynający się od „- ” jest punktem listy, a inny wiersz akapitem. Tytuł ma najwyżej 80 znaków, a treść 3000.
+7. **Pierwsze szkice:** wersje od 0.1.39 do 0.1.43, te same co changelogi dane autorowi w czacie.
+
+## Odpowiedzi autora 587 A, 597 A i o zwojach (4.11.2026)
+
+1. **587 A.** Nowa kwestia narratora o Kole Fortuny: „Kołem Fortuny kręcisz za setki sztuk złota. Im wyższa stawka, tym większa szansa na wygraną i na lepszą nagrodę, ale i większy ból po przegranej.” Nagranie powstaje od nowa, przycięte, do odsłuchu.
+2. **597 A i 600 C.** Mury Warowni są z ciemnego kamienia z drewnianą bramą. Dolną część PixelLab domalował w tym samym kamieniu (`art/inputs/fortress-board/walls-bottom.png`), a autor wybrał wersję C z pełnym dolnym murem i bramą. Łączenia w połowie planszy PixelLab domalowuje od nowa (`joins.png`).
+3. **Zwoje do Kowadła.** Autor zapytał, jak działa Zwój ochronny, i zaproponował tańszy zwój przed spadkiem ulepszenia, do zrobienia także w Rzemieślnictwie. Potem: „te zwoje chroniace przed rozpadem na Kowadle powinny byc drozsze niz sa aktualnie (pewnie z 2000) a te chroniace przed spadkiem na poziomie aktualnych (1000 i mniej wraz z Rozwojem Bractwa poważania)” i „Zwój utrwalenia w Warsztacie od 10. poziomu będzie okej”.
+    - **Zwój ochronny** u kowala będzie kosztował 2000 złota zamiast 1000.
+    - **Zwój utrwalenia (nowy)** chroni przed spadkiem ulepszenia. U kowala kosztuje 1000 złota, a w Warsztacie powstaje od 10. poziomu profesji Rzemieślnictwo (autor: „od 10. poziomu Profesji, dla precyzji”). Oba zwoje tanieją z Bractwem Kowali, jak dziś w Kuźni.
+    - **599 B:** w Warsztacie jeden Zwój utrwalenia to 5 Okuć i 30 minut.
+    - **598 C:** ikony obu zwojów to zwinięte poziomo zwoje z wstążkami.
+4. **Kolejność (autor):** najpierw „Co nowego?”, potem rolka promocyjna.
+
+## Wersja 0.1.43 (4.11.2026)
+
+1. **„Co nowego?”** (zob. wyżej).
+
 ## Korzyści Bractw: odpowiedzi autora 589–593 (4.11.2026)
 
 Autor: „589, 590, 591, 592, 593 czy wszystkie opcje (i A i B i C w każdym przypadku) nie zaburzą balansu? Jeśli nie - wdrażaj, bo brzmi super.”
