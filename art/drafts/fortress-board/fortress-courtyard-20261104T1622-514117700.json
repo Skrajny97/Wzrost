@@ -1,0 +1,14 @@
+{
+  "id": "fortress-courtyard",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above, one wide even courtyard of plain green grass inside stone fortress walls, the same grass texture and colour as at the top of the courtyard, a few small flowers and pebbles scattered evenly, seamless, no lines, no stripes, no bands, no paths, no trees, no bushes, no buildings, no people",
+  "style": null,
+  "input": "art/inputs/fortress-board/courtyard.png",
+  "mask": "art/inputs/fortress-board/courtyard-mask.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 25
+  },
+  "images": 1
+}
