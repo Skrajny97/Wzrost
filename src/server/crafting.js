@@ -27,7 +27,7 @@ import {
   salvageYield,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { characterView, craftingState, loadPlayer, questsNow, requirePlayer, taughtPattern } from './characters.js';
+import { characterView, craftingState, loadPlayer, questsNow, requireOffRack, requirePlayer, taughtPattern } from './characters.js';
 import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
@@ -161,6 +161,7 @@ export async function salvageItem(context) {
   const item = player.items.find((candidate) => String(candidate.id) === context.params.id);
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
+  requireOffRack(player, item);
   const now = context.now;
   const table = tableOf(player, now);
   if (!craftTakes(table, item.rarity, content)) throw tooRare(item.rarity);
@@ -217,6 +218,7 @@ export async function salvageItems(context) {
   const items = ids.map((id) => player.items.find((candidate) => candidate.id === id));
   if (items.includes(undefined)) throw new ApiError(404, 'item_not_found', 'Któregoś z tych przedmiotów nie masz już w plecaku.');
   if (items.some((item) => item.equippedSlot)) throw new ApiError(409, 'equipped', 'Założonych przedmiotów nie rozbierzesz. Najpierw je zdejmij.');
+  requireOffRack(player, ...items);
   const now = context.now;
   const table = tableOf(player, now);
   const rare = items.find((item) => !craftTakes(table, item.rarity, content));

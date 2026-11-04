@@ -102,6 +102,41 @@
         }
       }
     },
+    "fortress": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "description", "maxLevel", "costs", "minutes", "start", "building", "done"],
+      "description": "Przemiana Obozu w Warownię (419 A, 430 A): budowa w miejscu budowy obozu, gdy Obóz i każdy jego budynek mają najwyższy poziom. Po niej stoją budynki Warowni (buildings.json: fortress).",
+      "properties": {
+        "id": { "const": "fortress" },
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "maxLevel": { "const": 1 },
+        "costs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["resource", "base", "growth"],
+            "properties": {
+              "resource": { "type": "string", "minLength": 1 },
+              "base": { "type": "number", "exclusiveMinimum": 0 },
+              "growth": { "const": 1 }
+            }
+          }
+        },
+        "minutes": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["levels"],
+          "properties": { "levels": { "type": "array", "minItems": 1, "maxItems": 1, "items": { "type": "number", "minimum": 1 } } }
+        },
+        "start": { "type": "string", "minLength": 1, "description": "Przycisk przemiany." },
+        "building": { "type": "string", "minLength": 1, "description": "Zdanie w czasie przemiany." },
+        "done": { "type": "string", "minLength": 1, "description": "Zdanie po przemianie." }
+      }
+    },
     "queue": { "type": "integer", "minimum": 1, "maximum": 10, "description": "Ile budów obóz ma naraz, razem z trwającą; reszta czeka w kolejce." }
   }
 }

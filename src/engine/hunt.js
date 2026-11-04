@@ -120,10 +120,10 @@ export function rareCatchUp(characterLevel, area, met, content) {
 }
 
 // The champion is drawn only where it lives, so other places keep their draws.
-export function rollEncounter(area, rng, content, characterLevel, pace, tracked = [], unknown = []) {
+export function rollEncounter(area, rng, content, characterLevel, pace, tracked = [], unknown = [], scouted = null) {
   if (area.champion && rng.chance(pace.championChance)) return championEncounter(area, content);
   if (rng.chance(pace.eliteChance)) return eliteEncounter(area, content);
-  const weight = encounterWeight(tracked, unknown, content);
+  const weight = encounterWeight(tracked, unknown, content, scouted);
   const tough = toughEncountersFor(area, characterLevel);
   if (tough.length > 0 && rng.chance(pace.toughChance)) {
     return regularEncounter(rng.weighted(tough, weight), area, rng, content, { tough: true, characterLevel });
@@ -133,12 +133,14 @@ export function rollEncounter(area, rng, content, characterLevel, pace, tracked 
 
 // An encounter's weight: by half more (questTrackBonus) with a creature the
 // character tracks for its quests ("Trop przede wszystkim stwory z zadań"),
-// and by a tenth more (unknownTrackBonus) with one it has not met yet, while
-// it tracks those ("Trop nieznane stwory").
-const encounterWeight = (tracked, unknown, content) => (encounter) =>
+// by a tenth more (unknownTrackBonus) with one it has not met yet, while it
+// tracks those ("Trop nieznane stwory"), and by the Strażnica's share with
+// the creature it tracks (`scouted`: { id, bonus }, fortress.js).
+const encounterWeight = (tracked, unknown, content, scouted = null) => (encounter) =>
   encounter.weight *
   (encounter.monsters.some((id) => tracked.includes(id)) ? 1 + content.balance.hunt.questTrackBonus : 1) *
-  (encounter.monsters.some((id) => unknown.includes(id)) ? 1 + content.balance.hunt.unknownTrackBonus : 1);
+  (encounter.monsters.some((id) => unknown.includes(id)) ? 1 + content.balance.hunt.unknownTrackBonus : 1) *
+  (scouted && encounter.monsters.includes(scouted.id) ? 1 + scouted.bonus : 1);
 
 // The creatures of a place's encounters, plain and demanding, that the
 // character has not met (`met`: ids), for "Trop nieznane stwory".
@@ -380,7 +382,7 @@ export function resourceBundle(area, total) {
 // alone, as explorations started before the other kinds kept it
 // (potions.js).
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [] },
+  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null },
   content,
 ) {
   // A Drużyna's trip (src/server/trips.js) gives `roster`, its players in
@@ -508,6 +510,14 @@ export function simulateHunt(
     return items.length - 1;
   };
 
+  // The Warownia's Ołtarz Systemu (fortress.js): a blessing of `kind` for the
+  // exploration's first `blessing.fights` fights, its finds on the way among
+  // them: `bonus` more XP, gold or chance of rarer items.
+  const blessedWith = (kind, fightsDone) => Boolean(blessing) && blessing.kind === kind && fightsDone < blessing.fights;
+  const blessedLoot = (base, fightsDone) =>
+    blessedWith('luck', fightsDone) ? { ...base, rarityBonus: (base.rarityBonus ?? 1) * (1 + blessing.bonus) } : base;
+  const blessedBy = (kind, fightsDone) => (blessedWith(kind, fightsDone) ? 1 + blessing.bonus : 1);
+
   for (const [step, event] of timeline.entries()) {
     if (event.type === 'find') {
       // A find is gold, a treasure chest with an item of the place's level,
@@ -517,11 +527,11 @@ export function simulateHunt(
       const outcomes = Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest'));
       const outcome = lootRng.weighted(outcomes, ([, weight]) => weight)[0];
       if (outcome === 'gold') {
-        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5)));
+        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length)));
         gold += amount;
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findGold', step, { gold: amount }) });
       } else if (outcome === 'chest') {
-        const item = randomItem(findLevel, lootRng, content, loot);
+        const item = randomItem(findLevel, lootRng, content, blessedLoot(loot, fights.length));
         entries.push({ t: event.t, type: 'find', item: take(item), text: say(texts, 'findChest', step, { item: itemName(item, content) }) });
       } else if (outcome === 'resource') {
         const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * lootRng.float(0.5, 1.5));
@@ -538,7 +548,7 @@ export function simulateHunt(
       continue;
     }
 
-    const encounter = rollEncounter(area, rng, content, lead.level, pace, tracked, unknown);
+    const encounter = rollEncounter(area, rng, content, lead.level, pace, tracked, unknown, scouted);
     if (catchUp && (encounter.elite || encounter.champion)) {
       catchUp = { elite: catchUp.elite && !encounter.elite, champion: catchUp.champion && !encounter.champion };
       if (!catchUp.elite && !catchUp.champion) catchUp = null;
@@ -634,7 +644,7 @@ export function simulateHunt(
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
-        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus);
+        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1);
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * lootRng.float(0.5, 1.5) * goldFactor;
         const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials;
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, lootRng, content));
@@ -647,18 +657,18 @@ export function simulateHunt(
       // epic or rarer item.
       const chests = [];
       if (!filled.has('weapon')) {
-        const weapon = randomItem(enemies[0].level, lootRng, content, first ? { ...loot, rarityId: content.rarities[0].id } : loot);
+        const weapon = randomItem(enemies[0].level, lootRng, content, first ? { ...loot, rarityId: content.rarities[0].id } : blessedLoot(loot, fights.length - 1));
         chests.push([weapon, 'firstChest']);
       }
       if (encounter.elite) {
-        chests.push([randomItem(enemies[0].level, lootRng, content, { ...loot, rarityBonus: rewards.eliteRarityBonus }), 'eliteChest']);
+        chests.push([randomItem(enemies[0].level, lootRng, content, blessedLoot({ ...loot, rarityBonus: rewards.eliteRarityBonus }, fights.length - 1)), 'eliteChest']);
       }
       if (encounter.champion && lootRng.chance(rewards.championItemChance)) {
         const rarityId = championItemRarity(enemies[0].level, lootRng, content);
         chests.push([randomItem(enemies[0].level, lootRng, content, { ...loot, rarityId }), 'championChest']);
       }
       for (const [item] of chests) summary.chests.push(take(item));
-      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp);
+      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1));
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
       xp += summary.xp;
       reached = gainXp(reached.level, reached.xp, summary.xp, (level) => xpToNext(level, content), maxLevel);
@@ -725,6 +735,8 @@ export function simulateHunt(
     keyFight: key && { index: key.index },
     potionsUsed: me.potionsUsed,
     buffFights: me.buffFights,
+    // The fights the Ołtarz's blessing worked in.
+    blessingFights: blessing ? Math.min(fights.length, blessing.fights) : 0,
     // The companions at the end: their HP and whether they fell on the way;
     // the party's players too.
     ...(companions.length > 0 && {
@@ -744,22 +756,14 @@ export function simulateHunt(
 // (evolutionBlock); its XP adds up there until then. `evolutionGate: false`
 // lets the progression simulator measure a skill alone, past the level where
 // a player would need a second one.
-export function applyHunt(character, hunt, content, { evolutionGate = true } = {}) {
+export function applyHunt(character, hunt, content, { evolutionGate = true, faintShare = 1 } = {}) {
   const maxLevel = content.balance.progression.maxLevel;
-  const block = evolutionGate ? evolutionBlock(character, content) : null;
-  const waits = Boolean(block);
-  const evolution = block?.level ?? maxLevel;
   const next = gainXp(character.level, character.xp, hunt.xp, (level) => xpToNext(level, content), maxLevel);
-  const toNextClass = (level) => classXpToNext(level, content);
-  const nextClass = gainXp(character.classLevel, character.classXp, hunt.xp, toNextClass, waits ? evolution : maxLevel, waits);
-  // The class had XP for a level past its evolution level and waits instead.
-  const held = waits && gainXp(character.classLevel, character.classXp, hunt.xp, toNextClass, maxLevel).level > nextClass.level;
-  const penalty = hunt.result === 'fainted' ? faintPenalty(next.level, next.xp, content) : 0;
+  const { next: nextClass, wait } = classGain(character, hunt.xp, content, evolutionGate);
+  const penalty = hunt.result === 'fainted' ? faintPenalty(next.level, next.xp, content, faintShare) : 0;
 
   const messages = levelUpMessages(character, { level: next.level, classLevel: nextClass.level }, content);
-  const className = classNameOf(character, content);
-  const waitText = { second_path: 'classWaitsPath', skill_points: 'classWaitsPoints', evolve: 'classWaitsEvolution' }[block?.code];
-  if (held) messages.push(say(content.texts, waitText, 0, { className, level: evolution }));
+  if (wait) messages.push(wait);
   if (penalty > 0) messages.push(say(content.texts, 'faintPenalty', 0, { xp: penalty }));
   // Every level brings Time Points, and so do the time shards found.
   const time = content.balance.timePoints;
@@ -779,12 +783,39 @@ export function applyHunt(character, hunt, content, { evolutionGate = true } = {
   };
 }
 
+// The class's part of a gain of XP: up to its evolution level while it waits
+// there (evolutionBlock), its XP adding up, with the System line saying so
+// when it had XP for a level past it (`wait`).
+function classGain(character, xp, content, evolutionGate = true) {
+  const maxLevel = content.balance.progression.maxLevel;
+  const block = evolutionGate ? evolutionBlock(character, content) : null;
+  const waits = Boolean(block);
+  const evolution = block?.level ?? maxLevel;
+  const toNextClass = (level) => classXpToNext(level, content);
+  const next = gainXp(character.classLevel, character.classXp, xp, toNextClass, waits ? evolution : maxLevel, waits);
+  const held = waits && gainXp(character.classLevel, character.classXp, xp, toNextClass, maxLevel).level > next.level;
+  const waitText = { second_path: 'classWaitsPath', skill_points: 'classWaitsPoints', evolve: 'classWaitsEvolution' }[block?.code];
+  return { next, wait: held ? say(content.texts, waitText, 0, { className: classNameOf(character, content), level: evolution }) : null };
+}
+
+// Class XP alone, as the Warownia's Plac treningowy gives it (fortress.js):
+// the class's new levels with their Time Points and System lines, as after
+// an exploration, without the character's XP.
+export function applyClassXp(character, xp, content) {
+  const { next, wait } = classGain(character, xp, content);
+  const messages = levelUpMessages(character, { level: character.level, classLevel: next.level, heal: false }, content);
+  if (wait) messages.push(wait);
+  const classLevels = next.level - character.classLevel;
+  return { classLevel: next.level, classXp: next.xp, timePoints: content.balance.timePoints.perClassLevel * classLevels, levelled: classLevels > 0, messages };
+}
+
 // The System lines of new character and class levels, one gain to a line
 // (the author: "taki format będziemy stosować. Czytelniejszy."): the levels
 // reached, then the free points, Time Points and Skill Points of all of them
-// together, then the heal, and last what the new levels open. Before the
-// Stats screen opens, the line with the points says when they can be spent.
-export function levelUpMessages(character, { level, classLevel = character.classLevel }, content) {
+// together, then the heal (`heal`: not for the Plac treningowy's training,
+// which does not heal), and last what the new levels open. Before the Stats
+// screen opens, the line with the points says when they can be spent.
+export function levelUpMessages(character, { level, classLevel = character.classLevel, heal = true }, content) {
   const levels = level - character.level;
   const classLevels = classLevel - character.classLevel;
   if (levels <= 0 && classLevels <= 0) return [];
@@ -805,7 +836,7 @@ export function levelUpMessages(character, { level, classLevel = character.class
     say(texts, 'timePointsGained', 0, { time: time.perLevel * levels + time.perClassLevel * classLevels }),
   );
   if (skillGain > 0) messages.push(say(texts, 'skillPoints', 0, { points: skillGain }));
-  messages.push(say(texts, character.appearance === 'female' ? 'levelHealFemale' : 'levelHeal', 0, {}));
+  if (heal) messages.push(say(texts, character.appearance === 'female' ? 'levelHealFemale' : 'levelHeal', 0, {}));
   for (let at = character.level + 1; at <= level; at++) messages.push(...unlockMessages(at, content));
   for (let at = character.classLevel + 1; at <= classLevel; at++) messages.push(...classUnlockMessages(at, content));
   return messages;

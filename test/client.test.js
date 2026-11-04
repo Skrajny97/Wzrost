@@ -85,16 +85,33 @@ test('a camp building whose entrance faces away from its path is mirrored toward
   assert.ok(turned('sawmill', 0));
 });
 
+// Nothing of the Warownia goes into the game without its art (CLAUDE.md):
+// while one of its buildings lacks the picture of one of its looks (three,
+// or as many as its `looks` name), FORTRESS is on in no deployment.
+test("the Warownia's buildings wait for their pictures: FORTRESS stays off until they have them", async () => {
+  const { SPRITES } = await import('../src/client/art.js');
+  const all = JSON.parse(readFileSync(new URL('../data/buildings.json', import.meta.url), 'utf8'));
+  const looks = (building) => Math.max(...(building.looks ?? [1, 2, 3]));
+  const pictured = (building) => Array.from({ length: looks(building) }, (_, index) => `${building.id}-${index + 1}`).every((id) => SPRITES.camp.ids.includes(id));
+  const waiting = all.filter((building) => building.fortress && !pictured(building)).map((building) => building.id);
+  const config = readFileSync(new URL('../wrangler.jsonc', import.meta.url), 'utf8');
+  if (waiting.length > 0) assert.ok(!/"FORTRESS"\s*:\s*"on"/.test(config), `FORTRESS on without the pictures of ${waiting.join(', ')}`);
+});
+
 test('every building has its picture and a plot on the camp board, apart from the others', async () => {
   const art = await import('../src/client/camp-art.js');
-  const all = JSON.parse(readFileSync(new URL('../data/buildings.json', import.meta.url), 'utf8'));
+  const every = JSON.parse(readFileSync(new URL('../data/buildings.json', import.meta.url), 'utf8'));
+  // The camp's and the Osada's buildings have their drawings too, for a
+  // picture not loaded; the Warownia's have their pictures (the test above).
+  const all = every.filter((building) => !building.fortress);
   const buildings = all.map((building) => building.id);
   assert.deepEqual(buildings.filter((id) => !art.campArtIds.includes(id)), []);
   // The board without the Osada has the camp's own buildings; the taller one
-  // with it the Osada's too (the Kwatery).
-  for (const tall of [false, true]) {
+  // with it the Osada's too (the Kwatery), and the Warownia's board all of
+  // them with the Warownia's seven.
+  for (const tall of [false, true, 'fortress']) {
     const plots = art.campPlots(tall);
-    const on = all.filter((building) => tall || !building.settlement).map((building) => building.id);
+    const on = every.filter((building) => (tall || !building.settlement) && (tall === 'fortress' || !building.fortress)).map((building) => building.id);
     assert.deepEqual(on.filter((id) => !plots[id]), []);
     // Plots stay on the board and their pictures do not overlap.
     const boxes = on.map((id) => {
@@ -107,7 +124,7 @@ test('every building has its picture and a plot on the camp board, apart from th
     for (const [i, a] of boxes.entries()) {
       for (const b of boxes.slice(i + 1)) {
         const apart = a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top;
-        assert.ok(apart, `${a.id} overlaps ${b.id}${tall ? ' on the taller board' : ''}`);
+        assert.ok(apart, `${a.id} overlaps ${b.id}${tall === 'fortress' ? " on the Warownia's board" : tall ? ' on the taller board' : ''}`);
       }
     }
   }
@@ -154,6 +171,8 @@ test('every sprite on the list has its file at its size, and every class has its
     // The camp board's ground at the camp's three looks.
     board: ['camp-1', 'camp-2', 'camp-3'],
     'board-tall': ['camp-1', 'camp-2', 'camp-3'],
+    // The Warownia's board, with stone walls (606 A).
+    'board-fortress': ['fortress'],
     // The camp's buildings at their three looks.
     // The buildings' looks, and the Kamień węgielny Warowni (data/camp.json).
     camp: [...data('buildings').flatMap((building) => [1, 2, 3].map((tier) => `${building.id}-${tier}`)), ...(data('camp').cornerstone ? ['cornerstone-1'] : [])],

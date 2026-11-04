@@ -24,6 +24,7 @@ import {
   fireTrade,
   fireTradeBlock,
   fireUnitsMade,
+  fortressReady,
   missingFor,
   partPrice,
   plannedLevel,
@@ -40,6 +41,7 @@ import {
   upgradeCost,
 } from '../engine/index.js';
 import { content } from './content.js';
+import { fortressOn } from './features.js';
 import { buildQueue, buildingOpen, characterView, currentHp, gainSql, loadPlayer, requirePlayer, restsDuring, settlementOpen, walletOf } from './characters.js';
 import { ApiError, json, readJson } from './http.js';
 
@@ -53,7 +55,12 @@ export async function startBuilding(context) {
   return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) }, 201);
 }
 
-const atTop = (building) => new ApiError(409, 'max_level', building.id === content.camp.id ? 'Obóz ma już najwyższy poziom.' : 'Ten budynek ma już najwyższy poziom.');
+const atTop = (building) =>
+  new ApiError(
+    409,
+    'max_level',
+    building.id === content.camp.id ? 'Obóz ma już najwyższy poziom.' : building.id === content.camp.fortress?.id ? 'Obóz jest już Warownią.' : 'Ten budynek ma już najwyższy poziom.',
+  );
 const shortOf = (building) =>
   new ApiError(409, 'not_enough', building.id === content.camp.id ? 'Brakuje złota na rozwój obozu.' : 'Brakuje złota albo zasobów na tę budowę.');
 
@@ -64,8 +71,23 @@ const shortOf = (building) =>
 // building.
 export async function beginBuilding(db, player, buildingId, now) {
   const building = typeof buildingId === 'string' ? content.buildingsById[buildingId] : undefined;
-  // The Osada's buildings (Kwatery) once the character has the Osada.
-  if (!building || !buildingOpen(building, player.row)) throw new ApiError(400, 'invalid_building', 'Nie ma takiego budynku.');
+  const fortress = Boolean(building) && building.id === content.camp.fortress?.id;
+  // The Osada's buildings (Kwatery) once the character has the Osada, the
+  // Warownia's once the camp has turned into one, and the transformation
+  // itself where the Warownia is on.
+  if (!building || (fortress ? !fortressOn() : !buildingOpen(building, player.row, player.buildings, now))) {
+    throw new ApiError(400, 'invalid_building', 'Nie ma takiego budynku.');
+  }
+  // The transformation once every camp building and the Obóz stand at the
+  // top (fortress.js), once.
+  if (fortress) {
+    const stored = player.buildings[building.id];
+    if (stored && buildingLevel(stored, now) < building.maxLevel) throw new ApiError(409, 'fortress_building', 'Przemiana w Warownię już trwa.');
+    const open = content.buildings.filter((one) => !one.fortress && buildingOpen(one, player.row, player.buildings, now));
+    if (!stored && !fortressReady(player.buildings, now, open, content)) {
+      throw new ApiError(409, 'fortress_not_ready', 'Przemiana w Warownię zacznie się, gdy Obóz i wszystkie jego budynki dojdą do najwyższego poziomu.');
+    }
+  }
   const queue = buildQueue(player.row);
   if (buildsUnderWay(player.buildings, queue, now) > 0) {
     await queueBuilding(db, player, building, queue, now);
@@ -85,7 +107,7 @@ export async function beginBuilding(db, player, buildingId, now) {
   const endsAt = now + buildMinutes(building, target, campLevel(player.buildings, now, content), content) * 60000;
   // A production building stops during the upgrade: what its store holds goes
   // to the resources now, and it fills again from the end of the upgrade.
-  const producing = building.effect.kind === 'production';
+  const producing = building.effect?.kind === 'production';
   const gathered = producing ? collect(building, stored, now) : null;
   const changes = Object.fromEntries(resources.map((id) => [id, -cost[id]]));
   // A store of gold (Staw Midasa) pays part of the cost.

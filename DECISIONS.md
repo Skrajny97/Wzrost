@@ -3034,6 +3034,71 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.49 (4.11.2026)
+
+1. **Warownia w grze** (zob. „Warownia: mechanika” i „Plansza Warowni w grze”): przemiana Obozu przy Kamieniu węgielnym, kamienne mury i siedem nowych budynków. Przełącznik `FORTRESS` jest włączony.
+2. **Wpis „Co nowego?” do zatwierdzenia:** szkic 0.1.49 w `data/news.json`.
+
+## Plansza Warowni w grze (4.11.2026, w grze od 0.1.49)
+
+1. **Plansza (606 A).** Po przemianie plansza obozu staje się planszą Warowni z kamiennymi murami (`src/client/art/board-fortress/fortress.png`, 320 × 729). Pod pasem Osady dochodzą dwa pasy dziedzińca, razem 188 jednostek planszy (`FORTRESS_CUT` i `FORTRESS_BANDS` w `src/client/camp-art.js`). Wszystko pod pasem Osady przesuwa się w dół: Stół rozbiórki, Skrzynia Konta i droga do dolnej bramy.
+2. **Miejsca (579 A).** Dwa rzędy po trzy budynki, jak górne rzędy obozu: Plac treningowy, Ołtarz Systemu i Zbrojownia, a niżej Sala trofeów, Strażnica i Szklarnia.
+    - Ołtarz i Strażnica stoją na drodze od dolnej bramy, trochę wyżej niż budynki obok, żeby długie nazwy pod nimi się nie stykały.
+    - **Kapliczka (brakujący szczegół)** to kapliczka przy bramie, więc stoi w dolnym rzędzie, po prawej stronie drogi.
+3. **Skrzynia Konta (brakujący szczegół).** W Warowni stoi przy drodze, między Strażnicą a Kapliczką, bo jej dawne miejsce zajmuje Kapliczka.
+4. **Ścieżki (687).** Od drogi odchodzi ścieżka do każdego budynku obok niej i do Kapliczki. Sala trofeów (wyglądy 2 i 3), Szklarnia (1 i 2) i Kapliczka (1) są odbite w poziomie, żeby wejście patrzyło na ścieżkę.
+5. **Wyglądy (581 B).** Budynek ma trzy wyglądy: na poziomy 1–3, 4–7 i 8–10. Zbrojownia ma dwa (poziomy 1 i 2), a Strażnica trzy: na poziomy 1–2, 3–4 i 5 (`looks` w `data/buildings.json`). Obrazki są przycięte do obrysu (`src/client/art/camp/<id>-<wygląd>.png`). Plac treningowy w wyglądach 2 i 3 ma dorysowane brzegi (608 A, 609 A), więc obrazek budynku może mieć do 160 × 128 px.
+6. **Przed wejściem do gry** autor dostał zrzuty planszy z budynkami na najwyższych poziomach i zaraz po przemianie. Autor: „610 A”.
+7. **Na komputerze.** Autor: „Pamiętaj by dostosować jakoś ekran tego na PCty”. Plansza Warowni stoi tam w dwóch częściach obok siebie (`FORTRESS_HALVES` w `src/client/camp-art.js`): po lewej obóz z Osadą, po prawej pasy Warowni z dolną bramą. Obie mają wspólny pasek 12 jednostek, żeby napisy pod Kwaterami i Kamieniem węgielnym oraz szczyt Ołtarza Systemu były całe. Cała plansza mieści się na ekranie bez przewijania, także na 1366 × 768, a budynki są większe niż na jednej wąskiej planszy. Na telefonie zostaje jedna długa plansza.
+8. **Testy (brakujący szczegół).** Serwer testów ma `FORTRESS` wyłączony, jak `SETTLEMENT`, chyba że test go włącza. Dzięki temu dawne testy liczą się tak samo jak przed Warownią.
+
+## Uwagi autora z wieczoru 4.11.2026 (na później)
+
+1. **Budynki zasobów do 20. poziomu.** Autor: „Dodajmy też możliwość rozwijania budynków od zasobów do 20ego w Warowni z jedną jeszcze przemianą na 20tym. W przyszłości ten warunek i wszystko wymaksowane pozwoli zmienić Warownię w coś jeszcze większego”. Szczegóły (które budynki, koszty i czasy poziomów 11–20, czwarty wygląd na 20. poziomie) pójdą do autora jako pytania.
+2. **Trudniej, ale z umiarem.** Gracz na 33. poziomie napisał na czacie, że wyprawy w najtrudniejsze miejsce na najdłuższy czas zawsze się udają i nie przegrał żadnej walki. Autor: „utrudniamy, nie przesadzamy, ale utrudniamy”. Najpierw symulacja walk na poziomach ok. 25–50, potem umiarkowanie silniejsze stwory, bez zmian na samym początku gry.
+
+## Warownia: mechanika (4.11.2026, w grze od 0.1.49)
+
+Autor: „574 można, bez ciśnienia”. Opisy i liczby z 419–428 i 430 A. Do gry nic nie wejdzie bez grafik i odpowiedzi 579 i 581. Warownia weszła w 0.1.49, z grafikami wszystkich budynków (578, 585, 588, 608, 609) i planszą (606, 610).
+
+1. **Przełącznik.** Warownia działa tylko tam, gdzie `FORTRESS` jest „on”, jak kiedyś Osada (`SETTLEMENT`). Test klienta pilnuje, żeby żadne wdrożenie nie miało `FORTRESS` włączonego, dopóki choć jeden budynek Warowni nie ma obrazka każdego swojego wyglądu. Od 0.1.49 `FORTRESS` jest włączony w grze i na wersji testowej.
+2. **Przemiana (419 A, 430 A).** To budowa „Warownia” (`fortress` w `camp.json`) w miejscu budowy obozu. Rusza z okienka Kamienia węgielnego, gdy Obóz ma 10. poziom, a każdy jego budynek swój najwyższy. Kosztuje 120 000 złota, 10 000 drewna, 7 000 kamienia i 5 000 rudy i trwa 3 dni. Poziom Obozu jej nie przyspiesza, tak jak rozwoju samego Obozu.
+    - **Zasoby przemiany (brakujący szczegół):** decyzja 430 A mówi tylko „i zasoby”. Każdy zasób to około tygodnia produkcji Tartaku, Kamieniołomu albo Kopalni na 10. poziomie, bez zasobów z wypraw.
+    - Drugie stuknięcie w czasie przemiany: „Przemiana w Warownię już trwa.” Po niej: „Obóz jest już Warownią.”
+    - Duch budowniczego liczy w potrzebach Obozu także drewno, kamień i rudę przemiany, żeby nie odkupić tego, co jest na nią potrzebne.
+3. **Budynki (buildings.json: `fortress`).** Wszystkie siedem można stawiać od razu po przemianie. Wcześniej nie ma ich w obozie ani na liście budów.
+    - **Koszt (brakujący szczegół).** 1. poziom: 8 000 złota, 3 000 drewna, 1 500 kamienia i 1 500 rudy. To więcej niż 10. poziom któregokolwiek budynku obozu w każdym z czterech zasobów. Każdy następny poziom jest o 15% droższy. Pięć budynków z 10 poziomami, Strażnica i Zbrojownia kosztują razem około 880 000 złota, około 2,5 raza tyle co cały Obóz (347 000). Długim celem są budynki Warowni (430 A).
+    - **Czas (brakujący szczegół).** Bez przyspieszenia 1. poziom buduje się dobę, a każdy następny o 10% dłużej. Poziom Obozu przyspiesza te budowy jak budowy obozu. Obóz na 10. poziomie skraca je prawie o połowę, więc 1. poziom trwa około 13 godzin, a 10. około 30.
+4. **Kapliczka (427 A).** Przy odbiorze raportu wyprawy z omdleniem utrata XP jest mniejsza o 5% na poziom, czyli o połowę na 10. poziomie.
+5. **Sala trofeów (422 A).** Rodzina stworów poznana w całości (każdy jej stwór spotkany) zostaje zapisana wśród odkryć Encyklopedii jako `family:<id>`. Dlatego premia zostaje, gdy do rodziny dojdą nowe stwory. Premia +0,5% obrażeń na poziom Sali dodaje się do trofeów Encyklopedii na wyprawach, w Wieżach i przy bestii gildii.
+6. **Plac treningowy (420 A).** Przycisk „Trenuj” działa raz dziennie, licząc od północy czasu polskiego, jak zadania dzienne. Trening trwa godzinę na poziom placu i biegnie obok wyprawy albo profesji. XP klasy liczy się przy starcie: 25% tego, co daje godzina wyprawy na poziomie postaci, razy godziny treningu (`xpPerHour`). „Odbierz trening” daje je klasie, z nowymi poziomami klasy i Punktami Czasu, jak raport wyprawy, ale bez XP postaci.
+    - **Odbiór w czasie wyprawy (brakujący szczegół):** czeka, aż postać wróci i odbierze raport: „Trening odbierzesz, gdy postać wróci z wyprawy i odbierze jej raport.” Raport wyprawy liczy się z klasą z chwili odbioru, więc poziom klasy zdobyty w drodze liczyłby się w każdej jej walce (jak oprawa kamienia w 0.1.28).
+    - **Nowy trening** dopiero po odebraniu poprzedniego. Trening nie leczy, w przeciwieństwie do awansu z wyprawy, więc komunikat o awansie z treningu nie mówi o odnowionym HP i Manie.
+    - Stan treningu trzyma nowa kolumna `characters.fortress` (migracja 0078), w której zapiszą się też pozostałe budynki.
+7. **Ołtarz Systemu (424 A, 425 A, 580).** Raz dziennie, od północy, jedno z trzech błogosławieństw: +10% XP, +10% złota albo +10% szans na rzadsze przedmioty. Działa przez 4 walki wypraw na poziom ołtarza.
+    - Wyprawa zabiera błogosławieństwo ze startu. Działa ono na jej pierwsze walki i na znaleziska w drodze między nimi: XP i złoto z walk, złoto ze znalezisk oraz rzadkość przedmiotów ze skrzyń i znalezisk.
+    - Odbiór raportu zużywa tyle walk, w ilu błogosławieństwo działało, jeśli to wciąż to samo błogosławieństwo.
+    - **Brakujące szczegóły:** wybór następnego dnia zastępuje resztę poprzedniego. Na wyprawie Drużyny błogosławieństwo czeka, bo walki są tam wspólne dla wszystkich.
+8. **Strażnica (423 A).** Od 1. poziomu opcje wyprawy pokazują dla każdej długości szanse na co najmniej jedną elitę, co najmniej jednego czempiona (tam, gdzie żyje) i zdarzenie na końcu. Szanse są podane zwykłe i przy szukaniu rzadkich, z doganianiem w zbyt łatwym miejscu.
+    - Od 2. poziomu wyprawa może tropić jednego stwora z tego miejsca: spotyka go częściej o 40%, 60%, 80% i 100% na poziomach 2–5, tak jak stwory z zadań.
+    - Stwora wybiera się przy wyruszeniu, więc nic nie trzeba zapisywać.
+    - **Brakujący szczegół:** na wyprawie Drużyny tropienia nie ma, bo walki są tam wspólne.
+9. **Szklarnia (426 A).** Wybrane zioło znane z Zielarstwa rośnie bez przerwy: doba daje tyle, ile pół godziny zbierania w Systemowym Zagajniku na poziom Szklarni, przy obecnym poziomie Zielarstwa postaci. Zioło można zmienić w każdej chwili. Szklarnia nie daje XP Zielarstwa.
+    - **Magazyn (brakujący szczegół):** mieści dobę wzrostu i zioło, które właśnie rośnie, więc zbieranie raz dziennie niczego nie traci. Pełny przestaje rosnąć, jak magazyn Tartaku. „Zbierz” przenosi zioła do plecaka, tyle, ile się zmieści, a reszta zostaje w Szklarni.
+    - **Zmiana zioła (brakujący szczegół):** najpierw do plecaka idzie to, co urosło. Gdy plecak tego nie zmieści, zmiana czeka: „Plecak nie zmieści ziół ze Szklarni. Zrób miejsce, zanim zmienisz zioło.”
+10. **Zbrojownia (421 A).** 2 zestawy, na 2. poziomie 3. „Zapisz zestaw” zapamiętuje to, co postać ma na sobie, pod nazwą od gracza (do 24 znaków, bez nazwy: „Zestaw 1”, „Zestaw 2”…). „Załóż zestaw” zakłada go jednym stuknięciem tam, gdzie wolno ręcznie zmieniać ekwipunek, czyli poza wyprawą.
+    - Rzeczy z zapisanych zestawów, których postać akurat nie nosi, wiszą na stojakach: nie zajmują miejsca w plecaku i nie ma ich na jego liście. Złomiarz, Targowisko, Wymiana, zamówienia Osady i przepełniony plecak po wyprawie ich nie biorą.
+    - Rzeczy ze stojaka nie da się sprzedać, wyrzucić, rozebrać, włożyć do Skrzyni Konta, wystawić na Targowisku, dać w Wymianie ani towarzyszowi. Najpierw trzeba usunąć jej zestaw albo zapisać go bez niej. Rzecz, która pękła na Kowadle, znika też z zestawu.
+    - **Brakujące szczegóły:** zestaw zakłada dokładnie to, co zapisano. Reszta noszonych rzeczy schodzi na stojak, jeśli trzyma ją inny zestaw, a w przeciwnym razie do plecaka. Gdy plecak jej nie zmieści, zmiana czeka, ale tylko wtedy, gdy coś miałoby do niego trafić: przepełniony plecak nie blokuje zmiany między zestawami. Zdjęta rzecz z zestawu wraca na stojak nawet przy pełnym plecaku. „Usuń zestaw” zdejmuje jego rzeczy ze stojaka do plecaka, jeśli żaden inny zestaw ich nie trzyma, i też czeka na miejsce. Gdy przełącznik FORTRESS jest wyłączony, stojaków nie ma, a ich rzeczy są z powrotem w plecaku.
+11. **Ekrany (`src/client/fortress.js`).** Ekran budynku pokazuje jego część pod kartą następnego poziomu, jak Stół rozbiórki i Kowadło:
+    - Plac treningowy: „Trenuj”, pasek treningu i „Odbierz trening”.
+    - Ołtarz Systemu: trzy błogosławieństwa i to, które działa, z liczbą walk.
+    - Szklarnia: zioła znane z Zielarstwa, magazyn grządek i „Zbierz”.
+    - Zbrojownia: zestawy z ich rzeczami, „Załóż”, nazwa i „Zapisz to, co masz na sobie”, „Usuń zestaw”.
+    - Kamień węgielny: koszt i czas przemiany, „Rozpocznij przemianę w Warownię”, potem jej koniec.
+    - Opcje wyprawy: pod zagrożeniem wiersz Strażnicy z szansami, a od 2. poziomu wybór tropionego stwora (bez wyprawy Drużyny).
+    - Sprawdzone w przeglądarce na telefonie, a wprowadzenie nowej postaci przechodzi dalej na telefonie i komputerze. Plansza z miejscami budynków: zob. „Plansza Warowni w grze”.
+
 ## Warownia i Tier V: szkice do oceny (4.11.2026)
 
 Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.

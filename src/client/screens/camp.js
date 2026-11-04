@@ -12,7 +12,7 @@
 
 import { materialSprite, resourceArt } from '../art.js';
 import { spiritPart, spiritSaleSheet } from '../builder-spirit.js';
-import { BOARD_WIDTH, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, cornerstoneArt, plotArt, stretchY } from '../camp-art.js';
+import { BOARD_WIDTH, FORTRESS_HALVES, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, cornerstoneArt, fortressHalf, plotArt, stretchY } from '../camp-art.js';
 import { craftTableSection, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
@@ -23,6 +23,7 @@ import { skipControl } from '../time.js';
 import { confirmAction, guided, meter, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { desktopLayout, onLayoutChange } from '../layout-mode.js';
 import { scrapperSheet } from '../scrapper.js';
+import { blessingSection, fortressPart, gearSetsSection, greenhouseSection, trainingSection } from '../fortress.js';
 import { itemSheet, itemSummary, salvagePicker } from './character.js';
 import { mountChest } from './chest.js';
 import { mountQuarters } from '../companions.js';
@@ -39,6 +40,9 @@ const HISTORY_KEY = 'oboz'; // a building's screen lies one view below the board
 // wygląda jeszcze").
 const CHEST = 'skrzynia-konta';
 const CHEST_SPOT = { x: 238, y: 406 };
+// In the Warownia (camp-art.js) the Kapliczka stands there, so the chest
+// stands by the road between it and the Strażnica, in the board's units.
+const FORTRESS_CHEST_SPOT = { x: 206, y: 662 };
 // The Kamień węgielny Warowni on the board with the Osada, in its band across
 // the road from the Kwatery (the author's "435 A").
 const CORNERSTONE_SPOT = { x: 266, y: 418 };
@@ -65,8 +69,9 @@ export function mountCamp(container, { params, backHash = '#/walka' }) {
 // The camp's own level, which grows like a building but stands on no plot.
 const campOf = () => state.character.camp.level;
 // The taller board, with room for the Osada's buildings (the Kwatery), once
-// the character has the Osada.
-const tall = () => Boolean(state.character.settlementOpen);
+// the character has the Osada, and the Warownia's ("fortress", camp-art.js)
+// once the camp has turned into one.
+const tall = () => (state.character.camp.cornerstone?.fortress?.stands ? 'fortress' : Boolean(state.character.settlementOpen));
 
 // The Kamień węgielny Warowni's window: what it is and how many buildings
 // stand at their highest level, and the camp's level, out of all; below,
@@ -83,7 +88,10 @@ function cornerstoneSheet() {
       { class: 'cornerstone-rows' },
       stone.rows.map((row) => meter({ label: row.label, value: row.done, max: row.of, kind: 'cornerstone' }).element),
     ),
-    stone.ready && h('p', { class: 'system-hint', text: stone.ready }),
+    // Where the Warownia is in the game, its own part says what comes next.
+    stone.ready && !stone.fortress && h('p', { class: 'system-hint', text: stone.ready }),
+    // The camp's transformation into a Warownia (fortress.js).
+    stone.fortress && fortressPart(stone.fortress, cornerstoneSheet),
     stone.spirit && spiritPart(stone.spirit, (good) => spiritSaleSheet(stone.spirit, good, cornerstoneSheet)),
   );
 }
@@ -292,17 +300,7 @@ function mountBoard(container, backHash) {
       ),
       testTools(running),
       guided(materials(), 'camp-stock'),
-      h(
-        'div',
-        // The glade in the light of the hour in Poland, its palisade growing
-        // with the camp's level, taller once the character has the Osada.
-        { class: `camp-board camp-board--${dayPart()}${tall() ? ' camp-board--tall' : ''}`, role: 'group', 'aria-label': 'Plansza obozu' },
-        boardArt(campOf().level, tall()),
-        character.camp.buildings.map((building) => plot(building, running)),
-        chestLink(),
-        tall() && cornerstone(),
-        campLevelButton(running),
-      ),
+      campBoard(character, running),
       nothingBuilt &&
         h('p', { class: 'system-hint camp-hint', text: 'Wybierz pusty plac, żeby zobaczyć koszt budowy. Zasoby znajdziesz na eksploracjach.' }),
       running && constructionPanel(running, ticks),
@@ -312,21 +310,65 @@ function mountBoard(container, backHash) {
     tick(serverNow());
   }
 
+  // The glade in the light of the hour in Poland, its palisade growing with
+  // the camp's level, taller once the character has the Osada, with walls
+  // once it is a Warownia. On a computer the Warownia's board stands in two
+  // parts side by side (camp-art.js: FORTRESS_HALVES; the author: „Pamiętaj
+  // by dostosować jakoś ekran tego na PCty”), its buildings as big as the
+  // camp's were, with no scrolling.
+  const split = () => desktopLayout() && tall() === 'fortress';
+  function campBoard(character, running) {
+    if (!split()) {
+      return h(
+        'div',
+        { class: `camp-board camp-board--${dayPart()}${tall() ? ' camp-board--tall' : ''}${tall() === 'fortress' ? ' camp-board--fortress' : ''}`, role: 'group', 'aria-label': tall() === 'fortress' ? 'Plansza Warowni' : 'Plansza obozu' },
+        boardArt(campOf().level, tall()),
+        character.camp.buildings.map((building) => plot(building, running)),
+        chestLink(),
+        tall() && cornerstone(),
+        campLevelButton(running),
+      );
+    }
+    return h(
+      'div',
+      { class: 'camp-board-split', role: 'group', 'aria-label': 'Plansza Warowni' },
+      FORTRESS_HALVES.map((range, index) =>
+        h(
+          'div',
+          { class: `camp-board camp-board--${dayPart()} camp-board--part`, style: { aspectRatio: `${BOARD_WIDTH} / ${range[1] - range[0]}` } },
+          boardArt(campOf().level, tall(), range),
+          character.camp.buildings.filter((building) => fortressHalf(spotOf(building.id).y) === index).map((building) => plot(building, running, range)),
+          index === fortressHalf(FORTRESS_CHEST_SPOT.y) && chestLink(range),
+          index === fortressHalf(CORNERSTONE_SPOT.y) && cornerstone(range),
+          index === 0 && campLevelButton(running),
+        ),
+      ),
+    );
+  }
+
   // On a computer the board fits the screen's height, shrunk evenly (506 A;
   // the player: "muszę scrollować widok obozu po 20 lvl, jak się
   // wydłużył"): as wide as its shape allows in the room from its top down
   // to the screen's bottom, past the page's own margin there. styles.css
-  // keeps it between the narrowest phone's board and its usual width.
+  // keeps it between the narrowest phone's board and its usual width. The
+  // Warownia's two parts the same way, by the taller of them.
   function fitBoard() {
-    const board = container.querySelector('.camp-board');
+    const board = container.querySelector('.camp-board-split') ?? container.querySelector('.camp-board');
     if (!board || !desktopLayout()) return;
     const page = container.closest('.screen--game');
     const below = page ? parseFloat(getComputedStyle(page).paddingBottom) || 0 : 0;
     const room = window.innerHeight - (board.getBoundingClientRect().top + window.scrollY) - below;
+    if (board.classList.contains('camp-board-split')) {
+      const tallest = Math.max(...FORTRESS_HALVES.map(([from, to]) => to - from));
+      board.style.setProperty('--split-fit', `${Math.floor((2 * room * BOARD_WIDTH) / tallest + 16)}px`);
+      return;
+    }
     board.style.setProperty('--board-fit', `${Math.floor((room * BOARD_WIDTH) / boardHeight(tall()))}px`);
   }
   window.addEventListener('resize', fitBoard);
-  const stopLayout = onLayoutChange(fitBoard);
+  // Between a phone's and a computer's layout the Warownia's board changes
+  // its shape, so the board is drawn anew.
+  const stopLayout = onLayoutChange(() => (Boolean(container.querySelector('.camp-board-split')) === split() ? fitBoard() : render()));
   // The page's letters, loaded after the first look, may move the board.
   document.fonts?.ready.then(fitBoard);
 
@@ -371,8 +413,9 @@ function mountBoard(container, backHash) {
   }
 
   // The Skrzynia Konta: the chest's picture with its name, like a plot.
-  function chestLink() {
+  function chestLink(range = null) {
     const hash = `${CAMP}/${CHEST}`;
+    const [from, to] = range ?? [0, boardHeight(tall())];
     return h(
       'a',
       {
@@ -380,7 +423,10 @@ function mountBoard(container, backHash) {
         href: hash,
         'aria-label': 'Skrzynia Konta',
         // Beside the Magazyn on either board, at the top of the taller one's band.
-        style: { left: `${(CHEST_SPOT.x / BOARD_WIDTH) * 100}%`, top: `${(stretchY(CHEST_SPOT.y, tall()) / boardHeight(tall())) * 100}%` },
+        style: {
+          left: `${((tall() === 'fortress' ? FORTRESS_CHEST_SPOT : CHEST_SPOT).x / BOARD_WIDTH) * 100}%`,
+          top: `${(((tall() === 'fortress' ? FORTRESS_CHEST_SPOT.y : stretchY(CHEST_SPOT.y, tall())) - from) / (to - from)) * 100}%`,
+        },
         onClick: (event) => openView(event, hash, HISTORY_KEY),
       },
       h('span', { class: 'camp-chest-art' }, materialSprite('chest')),
@@ -390,15 +436,16 @@ function mountBoard(container, backHash) {
 
   // The Kamień węgielny Warowni, like a plot: a tap shows how far the camp
   // is from the Warownia.
-  function cornerstone() {
+  function cornerstone(range = null) {
     const stone = state.character.camp.cornerstone;
+    const [from, to] = range ?? [0, boardHeight(tall())];
     return h(
       'div',
       {
         class: 'camp-plot-wrap',
         style: {
           left: `${((CORNERSTONE_SPOT.x - PLOT_WIDTH / 2) / BOARD_WIDTH) * 100}%`,
-          top: `${((CORNERSTONE_SPOT.y - PLOT_HEIGHT / 2) / boardHeight(true)) * 100}%`,
+          top: `${((CORNERSTONE_SPOT.y - from - PLOT_HEIGHT / 2) / (to - from)) * 100}%`,
           width: `${(PLOT_WIDTH / BOARD_WIDTH) * 100}%`,
         },
       },
@@ -411,9 +458,13 @@ function mountBoard(container, backHash) {
     );
   }
 
-  function plot(building, running) {
-    const height = boardHeight(tall());
-    const spot = campPlots(tall())[building.id] ?? { x: BOARD_WIDTH / 2, y: height / 2 };
+  // A plot's place on the board in its units.
+  const spotOf = (id) => campPlots(tall())[id] ?? { x: BOARD_WIDTH / 2, y: boardHeight(tall()) / 2 };
+
+  // A plot on the board, or in the part of it `range` holds.
+  function plot(building, running, range = null) {
+    const [from, to] = range ?? [0, boardHeight(tall())];
+    const spot = spotOf(building.id);
     const underway = running?.buildingId === building.id;
     const waiting = !underway && building.queued.length > 0;
     const empty = building.level === 0;
@@ -443,7 +494,7 @@ function mountBoard(container, backHash) {
         class: 'camp-plot-wrap',
         style: {
           left: `${((spot.x - PLOT_WIDTH / 2) / BOARD_WIDTH) * 100}%`,
-          top: `${((spot.y - PLOT_HEIGHT / 2) / height) * 100}%`,
+          top: `${((spot.y - from - PLOT_HEIGHT / 2) / (to - from)) * 100}%`,
           width: `${(PLOT_WIDTH / BOARD_WIDTH) * 100}%`,
         },
       },
@@ -567,6 +618,11 @@ function mountBuilding(container, id) {
       nextLevel(building),
       building.crafts && craftTableSection(ticks, salvagePicker),
       building.upgrades && upgradeList(building),
+      // The Warownia's buildings (fortress.js).
+      building.training && trainingSection(building.training, ticks),
+      building.blessing && blessingSection(building.blessing),
+      building.greenhouse && greenhouseSection(building.greenhouse, ticks),
+      building.gearSets && gearSetsSection(building.gearSets),
       // The companions live in the Kwatery once they stand (the author: "Po
       // zwerbowaniu postac powinna [...] pojawić się w Kwaterach").
       id === 'quarters' && building.level > 0 && quartersPanel(),

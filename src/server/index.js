@@ -12,6 +12,16 @@ import { decidePointsReset, takeEvolution, testClassLevel, testEvolutions, undoE
 import { moveGiftRewards, redeemGiftCode } from './gift-codes.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
 import { buyParts, cancelBuilding, collectProduction, exchangeResources, sellToSpirit, startBuilding, tradeAtFire } from './camp.js';
+import {
+  chooseBlessing,
+  chooseGreenhouseHerb,
+  claimTraining,
+  clearGearSet,
+  collectGreenhouse,
+  saveGearSet,
+  startTraining,
+  wearGearSet,
+} from './fortress.js';
 import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendAllGifts, sendGift } from './community.js';
 import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
@@ -184,6 +194,14 @@ const routes = [
   ['POST', '/api/camp/exchange', exchangeResources],
   // The Duch budowniczego at the Kamień węgielny Warowni (camp.js).
   ['POST', '/api/camp/sell', sellToSpirit],
+  ['POST', '/api/fortress/training', startTraining],
+  ['POST', '/api/fortress/training/claim', claimTraining],
+  ['POST', '/api/fortress/blessing', chooseBlessing],
+  ['POST', '/api/fortress/greenhouse', chooseGreenhouseHerb],
+  ['POST', '/api/fortress/greenhouse/collect', collectGreenhouse],
+  ['POST', '/api/fortress/sets', saveGearSet],
+  ['POST', '/api/fortress/sets/wear', wearGearSet],
+  ['POST', '/api/fortress/sets/clear', clearGearSet],
   ['GET', '/api/settlement', getSettlement],
   ['POST', '/api/settlement/deliver', deliverSettlementOrder],
   ['POST', '/api/settlement/brotherhoods/reward', claimStandingReward],

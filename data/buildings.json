@@ -174,5 +174,118 @@
       { "resource": "iron-ore", "base": 244.25, "growth": 3.6 }
     ],
     "minutes": { "levels": [240, 1200] }
+  },
+  {
+    "id": "training-yard",
+    "name": "Plac treningowy",
+    "description": "Ubita ziemia, słomiane kukły i stojak z tępą bronią. System generuje Twojego klona, który trenuje za Ciebie. Raz dziennie daje XP klasy za trening, który odbywa się niezależnie, także w czasie wyprawy.",
+    "maxLevel": 10,
+    "fortress": true,
+    "effect": { "kind": "training", "perLevel": 1, "unit": "hours", "share": 0.25, "text": "Trening raz dziennie przez {value}, za XP klasy jak z 25% wyprawy tej samej długości" },
+    "costs": [
+      { "resource": "gold", "base": 8000, "growth": 1.15 },
+      { "resource": "wood", "base": 3000, "growth": 1.15 },
+      { "resource": "stone", "base": 1500, "growth": 1.15 },
+      { "resource": "iron-ore", "base": 1500, "growth": 1.15 }
+    ],
+    "minutes": { "base": 1440, "growth": 1.1 }
+  },
+  {
+    "id": "armory",
+    "name": "Zbrojownia",
+    "description": "Stojaki na zbroje i broń, każdy z tabliczką. Zapisane zestawy ekwipunku zakłada się jednym kliknięciem.",
+    "maxLevel": 2,
+    "fortress": true,
+    "looks": [1, 2],
+    "gearSets": { "name": "Zestaw {n}", "nameLength": 24 },
+    "effect": { "kind": "gearSets", "base": 1, "perLevel": 1, "unit": "count", "text": "Zapisane zestawy ekwipunku: {value}" },
+    "costs": [
+      { "resource": "gold", "base": 8000, "growth": 1.15 },
+      { "resource": "wood", "base": 3000, "growth": 1.15 },
+      { "resource": "stone", "base": 1500, "growth": 1.15 },
+      { "resource": "iron-ore", "base": 1500, "growth": 1.15 }
+    ],
+    "minutes": { "base": 1440, "growth": 1.1 }
+  },
+  {
+    "id": "trophy-hall",
+    "name": "Sala trofeów",
+    "description": "Łby, skóry i kły na ścianach długiej sali. Rodziny stworów poznane w Bestiariuszu dają premię do obrażeń przeciw nim.",
+    "maxLevel": 10,
+    "fortress": true,
+    "effect": { "kind": "trophyHall", "perLevel": 0.005, "unit": "percent", "text": "Obrażenia +{value} przeciw rodzinom stworów poznanym w całości w Bestiariuszu" },
+    "costs": [
+      { "resource": "gold", "base": 8000, "growth": 1.15 },
+      { "resource": "wood", "base": 3000, "growth": 1.15 },
+      { "resource": "stone", "base": 1500, "growth": 1.15 },
+      { "resource": "iron-ore", "base": 1500, "growth": 1.15 }
+    ],
+    "minutes": { "base": 1440, "growth": 1.1 }
+  },
+  {
+    "id": "watchtower",
+    "name": "Strażnica",
+    "description": "Wieża nad bramą, z której widać cały szlak. Przed wyprawą pokazuje szanse na elitę, czempiona i zdarzenie, a wyższe poziomy pozwalają tropić konkretnego stwora.",
+    "maxLevel": 5,
+    "fortress": true,
+    "looks": [1, 1, 2, 2, 3],
+    "effect": { "kind": "scouting", "perLevel": 0.2, "unit": "percent", "fromLevel": 2, "startText": "Szanse na elitę, czempiona i zdarzenie przed wyprawą", "text": "tropiony stwór częściej o {value}" },
+    "costs": [
+      { "resource": "gold", "base": 8000, "growth": 1.15 },
+      { "resource": "wood", "base": 3000, "growth": 1.15 },
+      { "resource": "stone", "base": 1500, "growth": 1.15 },
+      { "resource": "iron-ore", "base": 1500, "growth": 1.15 }
+    ],
+    "minutes": { "base": 1440, "growth": 1.1 }
+  },
+  {
+    "id": "system-altar",
+    "name": "Ołtarz Systemu",
+    "description": "Czarny kamień ze znakiem Systemu. Raz dziennie daje do wyboru jedno z trzech błogosławieństw na wyprawy.",
+    "maxLevel": 10,
+    "fortress": true,
+    "effect": { "kind": "blessing", "perLevel": 4, "unit": "fights", "bonus": 0.1, "text": "Błogosławieństwo raz dziennie na {value}: +10% XP, złota albo szans na rzadsze przedmioty" },
+    "blessings": [
+      { "id": "xp", "name": "+10% XP" },
+      { "id": "gold", "name": "+10% złota" },
+      { "id": "luck", "name": "+10% szans na rzadsze przedmioty" }
+    ],
+    "costs": [
+      { "resource": "gold", "base": 8000, "growth": 1.15 },
+      { "resource": "wood", "base": 3000, "growth": 1.15 },
+      { "resource": "stone", "base": 1500, "growth": 1.15 },
+      { "resource": "iron-ore", "base": 1500, "growth": 1.15 }
+    ],
+    "minutes": { "base": 1440, "growth": 1.1 }
+  },
+  {
+    "id": "greenhouse",
+    "name": "Szklarnia",
+    "description": "Szklany dach na drewnianych żebrach, a pod nim grządki. Szklarnia sama hoduje i zbiera zioła, które postać zna z Zielarstwa.",
+    "maxLevel": 10,
+    "fortress": true,
+    "effect": { "kind": "greenhouse", "perLevel": 0.5, "unit": "hours", "text": "Hoduje wybrane zioło: tyle, ile {value} zbierania w Systemowym Zagajniku na dobę" },
+    "costs": [
+      { "resource": "gold", "base": 8000, "growth": 1.15 },
+      { "resource": "wood", "base": 3000, "growth": 1.15 },
+      { "resource": "stone", "base": 1500, "growth": 1.15 },
+      { "resource": "iron-ore", "base": 1500, "growth": 1.15 }
+    ],
+    "minutes": { "base": 1440, "growth": 1.1 }
+  },
+  {
+    "id": "shrine",
+    "name": "Kapliczka",
+    "description": "Kapliczka przy bramie, ze świecą, która nie gaśnie. Po omdleniu na wyprawie postać traci mniej doświadczenia.",
+    "maxLevel": 10,
+    "fortress": true,
+    "effect": { "kind": "faintXp", "perLevel": 0.05, "unit": "percent", "text": "Po omdleniu postać traci o {value} mniej doświadczenia" },
+    "costs": [
+      { "resource": "gold", "base": 8000, "growth": 1.15 },
+      { "resource": "wood", "base": 3000, "growth": 1.15 },
+      { "resource": "stone", "base": 1500, "growth": 1.15 },
+      { "resource": "iron-ore", "base": 1500, "growth": 1.15 }
+    ],
+    "minutes": { "base": 1440, "growth": 1.1 }
   }
 ]

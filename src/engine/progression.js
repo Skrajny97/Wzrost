@@ -103,9 +103,10 @@ export function gainXp(level, xp, gained, toNext, maxLevel, hold = false) {
   return { level, xp: level >= maxLevel && !hold ? 0 : current, levels };
 }
 
-// Half of the XP needed for the current level, but never below the start of it.
-export function faintPenalty(level, xp, content) {
-  return Math.min(xp, Math.floor(content.balance.hunt.faintXpPenalty * xpToNext(level, content)));
+// Half of the XP needed for the current level, but never below the start of
+// it; `share` of it with the Warownia's Kapliczka (faintShare).
+export function faintPenalty(level, xp, content, share = 1) {
+  return Math.min(xp, Math.floor(share * content.balance.hunt.faintXpPenalty * xpToNext(level, content)));
 }
 
 export function monsterXp(monster, level, content) {

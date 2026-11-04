@@ -33,10 +33,9 @@ import {
   materialsText,
   materialView,
   questPeriod,
-  trophyBonuses,
 } from '../engine/index.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
-import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requirePlayer } from './characters.js';
+import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { guildOf } from './guilds.js';
@@ -212,7 +211,7 @@ export async function attackGuildBeast(context) {
   if ((await attacksOn(db, row, day).first()).count >= perDay) throw new ApiError(409, 'no_attacks', errors().noAttacks);
 
   // The Encyklopedia's trophy against the beast's creature counts.
-  const trophies = trophyBonuses(JSON.parse(row.discovered ?? '{}'), content, [beast.monster_id]);
+  const trophies = trophiesFor(player, now, [beast.monster_id]);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const fight = guildBeastFight({ character: engineCharacter(row), equipped: equippedItems(player), name: row.name, beast: engineBeast(beast), seed, trophies }, content);
   const [, , , before, , , after] = await atomically(

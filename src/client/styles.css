@@ -4394,6 +4394,30 @@ a.camp-level-button {
   aspect-ratio: 360 / 639;
 }
 
+/* The Warownia's board: two bands of the courtyard more for its buildings. */
+.camp-board--fortress {
+  aspect-ratio: 360 / 827;
+}
+
+/* On a computer the Warownia's board stands in two parts side by side
+   (screens/camp.js, camp-art.js: FORTRESS_HALVES), each part as wide as the
+   room allows for the taller of them, from the screen's height. */
+.camp-board-split {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  width: 100%;
+  max-width: min(1120px, max(576px, var(--split-fit, 1120px)));
+  margin: 0 auto;
+}
+
+:root[data-layout='desktop'] .camp-board-split > .camp-board {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: none;
+  margin: 0;
+}
+
 .camp-board-art {
   position: absolute;
   inset: 0;
@@ -13082,4 +13106,126 @@ a.profession-square:active {
 
 .avoid-rare .sprite--resource {
   flex: none;
+}
+
+/* The Warownia's buildings (fortress.js). */
+.fortress-part {
+  display: grid;
+  gap: 8px;
+}
+
+.fortress-part .card-title,
+.fortress-part p {
+  margin: 0;
+}
+
+.fortress-choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fortress-choices .button {
+  flex: 1 1 140px;
+  width: auto;
+}
+
+.fortress-herb {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fortress-herb--chosen,
+.fortress-choices [aria-pressed='true'] {
+  border-color: var(--system);
+  box-shadow: 0 0 0 1px var(--system);
+}
+
+.gear-sets {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gear-set {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--bark-line);
+}
+
+.gear-set-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.gear-set-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.gear-set-save {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.gear-set-save input {
+  min-width: 0;
+  min-height: 48px;
+  padding: 8px 10px;
+  border: 1px solid var(--bark-line);
+  border-radius: 0;
+  background: var(--bg-deep);
+  color: var(--text);
+  /* 16 px keeps iOS from zooming in on focus. */
+  font-family: var(--font-system);
+  font-size: 16px;
+}
+
+.gear-set-save input:focus {
+  outline: none;
+  border-color: var(--system);
+  box-shadow: 0 0 0 1px var(--system);
+}
+
+.fortress-transform {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.fortress-transform p,
+.fortress-subtitle {
+  margin: 0;
+}
+
+.fortress-subtitle {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.watch-chances {
+  margin: 0;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.hunt-scout {
+  display: grid;
+  gap: 8px;
+}
+
+.hunt-scout-title {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 14px;
 }

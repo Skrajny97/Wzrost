@@ -236,17 +236,31 @@ export const SPRITES = {
     height: 563,
     ids: ['camp-1', 'camp-2', 'camp-3'],
   },
+  // The Warownia's board (606 A): the taller board in its third look with
+  // stone walls in place of the palisade and two bands more below the
+  // Osada's, for the Warownia's buildings (tools/fortress-board-walls.py).
+  'board-fortress': {
+    width: 320,
+    height: 729,
+    ids: ['fortress'],
+  },
   // Each building cut to its outline, at most 128 × 96, and the Kamień
-  // węgielny Warowni on the board with the Osada.
+  // węgielny Warowni on the board with the Osada. The Warownia's buildings
+  // after them (578, 585, 588); the Plac treningowy's looks 2 and 3 were
+  // completed past their 128 × 96 frame by PixelLab (608 A, 609 A), so a
+  // picture may be up to 160 × 128.
   camp: {
-    width: 128,
-    height: 96,
+    width: 160,
+    height: 128,
     fit: true,
     ids: [
       'sawmill-1', 'sawmill-2', 'sawmill-3', 'quarry-1', 'quarry-2', 'quarry-3', 'mine-1', 'mine-2', 'mine-3',
       'midas-lake-1', 'midas-lake-2', 'midas-lake-3', 'campfire-1', 'campfire-2', 'campfire-3', 'loot-shed-1', 'loot-shed-2', 'loot-shed-3',
       'scrap-bench-1', 'scrap-bench-2', 'scrap-bench-3', 'anvil-1', 'anvil-2', 'anvil-3', 'craft-table-1', 'craft-table-2', 'craft-table-3',
       'quarters-1', 'quarters-2', 'quarters-3', 'cornerstone-1',
+      'training-yard-1', 'training-yard-2', 'training-yard-3', 'armory-1', 'armory-2', 'trophy-hall-1', 'trophy-hall-2', 'trophy-hall-3',
+      'watchtower-1', 'watchtower-2', 'watchtower-3', 'system-altar-1', 'system-altar-2', 'system-altar-3',
+      'greenhouse-1', 'greenhouse-2', 'greenhouse-3', 'shrine-1', 'shrine-2', 'shrine-3',
     ],
   },
   // The herbs of Zielarstwo, 32×32, filled in as they are approved.
@@ -464,6 +478,8 @@ export const landArt = (regionId) => (available.lands.has(regionId) ? `/art/land
 // The address of the camp board's ground and of a camp building's picture at
 // a look (1–3), or null while it has none.
 export const boardGround = (tier, tall = false) => {
+  // The Warownia stands only on a camp at its top level, on the walls' board.
+  if (tall === 'fortress') return available['board-fortress'].has('fortress') ? '/art/board-fortress/fortress.png' : null;
   const kind = tall ? 'board-tall' : 'board';
   return available[kind].has(`camp-${tier}`) ? `/art/${kind}/camp-${tier}.png` : null;
 };

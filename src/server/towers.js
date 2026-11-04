@@ -36,10 +36,21 @@ import {
   towerArea,
   towerFight,
   trialTowerFloor,
-  trophyBonuses,
 } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
-import { bagPlaces, characterView, engineCharacter, equippedItems, loadCharacter, loadPlayer, questsNow, requireNotExploring, requirePlayer } from './characters.js';
+import {
+  bagItems,
+  bagPlaces,
+  characterView,
+  engineCharacter,
+  equippedItems,
+  loadCharacter,
+  loadPlayer,
+  questsNow,
+  requireNotExploring,
+  requirePlayer,
+  trophiesFor,
+} from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
@@ -167,7 +178,7 @@ export async function enterTower(context) {
   const championTrophy = !beaten.includes(floor);
   const area = towerArea(floor, content);
   // The Encyklopedia's trophies for the creatures of the floor's region.
-  const trophies = trophyBonuses(JSON.parse(row.discovered ?? '{}'), content, areaDangers(area, content).map((danger) => danger.monsterId));
+  const trophies = trophiesFor(player, now, areaDangers(area, content).map((danger) => danger.monsterId));
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const hunt = towerFight({ character, equipped, name: row.name, floor, seed, partners: climbers.partners, companions: climbers.companions, trophies, chest, championTrophy }, content);
   const won = hunt.tower.won;
@@ -178,7 +189,7 @@ export async function enterTower(context) {
   // first (as after an exploration).
   const autoEquipped = autoEquip(equipped, hunt.items, content, row.class_id, row.class_level);
   const levels = campLevels(player.buildings, now, content);
-  const bag = player.items.filter((item) => !item.equippedSlot);
+  const bag = bagItems(player);
   const capacity = bagCapacity(levels, content) - (bagPlaces(player) - bag.length);
   const sellBonus = campBonus(levels, 'sellPrice', content);
   const toBag = hunt.items.map((_, index) => index).filter((index) => !autoEquipped.includes(index));

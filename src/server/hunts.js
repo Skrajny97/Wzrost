@@ -20,6 +20,10 @@ import {
   companionAfterHunt,
   companionGoes,
   campLevels,
+  faintShare,
+  scoutChances,
+  scoutedCreature,
+  scouting,
   carryLimit,
   countList,
   drawRumor,
@@ -47,7 +51,6 @@ import {
   rareCatchUp,
   rumorFactor,
   rumorToday,
-  trophyBonuses,
   sellPrice,
   resolveEvent,
   simulateHunt,
@@ -61,6 +64,7 @@ import { huntWait, mountStage } from '../engine/stable.js';
 import { finishBrewing } from './brewing.js';
 import { content } from './content.js';
 import {
+  bagItems,
   bagPlaces,
   buffsOf,
   characterView,
@@ -71,13 +75,16 @@ import {
   loadPlayer,
   questsNow,
   quickHuntsUsed,
+  blessingAfter,
+  blessingOf,
   requireIdlePlayer,
   requirePlayer,
+  trophiesFor,
 } from './characters.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
-import { eventDraftsOn, eventsOn, settlementOn } from './features.js';
+import { eventDraftsOn, eventsOn, fortressOn, settlementOn } from './features.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { soldGold } from './inventory.js';
 import { perkOf } from './perks.js';
@@ -206,6 +213,23 @@ export async function huntOptions(context) {
   // count too (healingFor).
   const met = JSON.parse(player.row.met ?? '[]');
   const healing = healingFor(player, params);
+  // The Warownia's Strażnica: the chances of an elite, a champion and an
+  // event for each length, plain and with the rare sought, and from its 2nd
+  // level the place's creatures to track (fortress.js).
+  const watch = fortressOn() ? scouting(campLevels(player.buildings, context.now, content), content) : null;
+  const rounded = (chances) => Object.fromEntries(Object.entries(chances).map(([key, value]) => [key, Math.round(value * 1000) / 1000]));
+  const scoutView = (place, threat, catchUp) => ({
+    chances: Object.fromEntries(Object.keys(threat).map((minutes) => [minutes, rounded(scoutChances(place, Number(minutes), content, { catchUp }, eventsOn()))])),
+    chancesSeeking: Object.fromEntries(
+      Object.keys(threat).map((minutes) => [minutes, rounded(scoutChances(place, Number(minutes), content, { catchUp, seekRare: true }, eventsOn()))]),
+    ),
+    ...(watch.track > 0 && {
+      scout: {
+        share: watch.track,
+        creatures: [...new Set([...place.encounters, ...(place.tough ?? [])].flatMap((encounter) => encounter.monsters))].map((id) => ({ id, name: content.monstersById[id].name })),
+      },
+    }),
+  });
   return json({
     hp,
     maxHp,
@@ -216,7 +240,7 @@ export async function huntOptions(context) {
       const threat = estimateThreat({ character, equipped, hp, areaId: id, catchUp, healing }, content, samples);
       const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true, healing }, content, samples);
       const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true, catchUp, healing }, content, samples);
-      return { id, threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat) };
+      return { id, threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat), ...(watch && scoutView(place, threat, catchUp)) };
     }),
   });
 }
@@ -289,7 +313,7 @@ export async function startHunt(context) {
 export async function beginHunt(
   db,
   player,
-  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow } = {},
+  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null } = {},
   now,
   { quick = false, flash = false, party: crew = null, partners = [], mount = null } = {},
 ) {
@@ -332,9 +356,15 @@ export async function beginHunt(
   const windows = buffWindows(buffs);
   const timed = Object.keys(windows).length > 0;
   const unknown = trackUnknown ? unknownCreatures(area, JSON.parse(player.row.met ?? '[]')) : [];
+  // The Warownia's Strażnica from its 2nd level: one creature of the place
+  // tracked (fortress.js); not on a Drużyna's trip.
+  const scouted = scout !== null && fortressOn() ? scoutedCreature(campLevels(player.buildings, now, content), area, scout, content) : null;
+  if (scout !== null && (!scouted || crew)) {
+    throw new ApiError(409, 'cannot_scout', 'Tropienie stwora wymaga Strażnicy Warowni na 2. poziomie i stwora z tego miejsca, a na wyprawie Drużyny go nie ma.');
+  }
   // The Encyklopedia's trophies for the creatures of this place, as at the
   // start: the report comes out the same whenever it is claimed.
-  const trophies = trophyBonuses(JSON.parse(player.row.discovered ?? '{}'), content, areaDangers(area, content).map((danger) => danger.monsterId));
+  const trophies = trophiesFor(player, now, areaDangers(area, content).map((danger) => danger.monsterId));
   // A rumor about this place, from the Karczma or from the beggar's song
   // (an event, also without the Osada; settlement.js): the exploration
   // meets its elite and champion rumor.factor times as often, and uses the
@@ -390,6 +420,10 @@ export async function beginHunt(
     ...(timed && { buffs: windows, spend: 'claim' }),
     ...(unknown.length > 0 && { unknown }),
     ...(Object.keys(trophies).length > 0 && { trophies }),
+    ...(scouted && { scouted }),
+    // The Ołtarz's blessing of the day, for this exploration's first fights;
+    // not on a Drużyna's trip, whose fights are one for all (fortress.js).
+    ...(!crew && blessingOf(player.row) && { blessing: blessingOf(player.row) }),
     ...(quick && { quick }),
     ...(flash && { flash }),
   };
@@ -611,6 +645,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       healBelow: options.healBelow,
       buffs: claimed.windows,
       trophies: options.trophies ?? {},
+      blessing: trip ? null : (options.blessing ?? null),
+      scouted: trip ? null : (options.scouted ?? null),
     },
     content,
   );
@@ -670,7 +706,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       content,
     );
   }
-  const applied = applyHunt(character, hunt, content);
+  // A faint costs less XP with the Warownia's Kapliczka (427 A).
+  const applied = applyHunt(character, hunt, content, { faintShare: faintShare(campLevels(player.buildings, now, content), content) });
   // The companions who went gain XP, one who fell is wounded, and an
   // event's reputation and rumor are kept (settlementAfterHunt); of an
   // older trip's, only in its leader's report.
@@ -689,7 +726,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // their stacks take, and an event's herbs (the Kwiat paproci) take theirs
   // first; what finds no place at all is lost, said after the event's words.
   const levels = campLevels(player.buildings, now, content);
-  const bag = player.items.filter((item) => !item.equippedSlot);
+  const bag = bagItems(player);
   const free = bagCapacity(levels, content) - (bagPlaces(player) - bag.length);
   const herbsBefore = herbsOf(row);
   const herbs = storeStacks(herbsBefore, hunt.herbs ?? {}, free, content);
@@ -787,6 +824,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const spentBuffs = claimed.spends && Object.values(hunt.buffFights ?? {}).some((count) => count > 0) ? spendFights(buffsOf(row, now), claimed.windows, hunt.buffFights) : null;
   const eventBuffs = reward?.buff ? addBuff(spentBuffs ?? buffsOf(row, now), reward.buff.kind, reward.buff.fights, reward.buff.bonus) : spentBuffs;
   const eventPoints = reward?.points ?? 0;
+  // The fights the Ołtarz's blessing worked in come off the day's blessing,
+  // if it is still the one the exploration set out with.
+  const fortressAfter = blessingAfter(row, options.blessing, hunt.blessingFights ?? 0);
   // An event's herbs that found their places.
   const storedHerbs = Object.entries(herbs.stored);
   const setHerbs = storedHerbs.length ? `, herbs = json_set(herbs, ${storedHerbs.map(() => '?, COALESCE(json_extract(herbs, ?), 0) + ?').join(', ')})` : '';
@@ -810,7 +850,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       db
         .prepare(
           `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setResources}${setMaterials}${setHerbs},
-             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${potionsChanged ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''}${eventBuffs ? ', buffs = ?' : ''}${eventPoints > 0 ? ', bonus_points = bonus_points + ?' : ''}${settlementAfter ? ', settlement = ?' : ''},
+             time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${potionsChanged ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''}${eventBuffs ? ', buffs = ?' : ''}${eventPoints > 0 ? ', bonus_points = bonus_points + ?' : ''}${settlementAfter ? ', settlement = ?' : ''}${fortressAfter ? ', fortress = ?' : ''},
              version = version + 1
            WHERE id = ?`,
         )
@@ -836,6 +876,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
           ...(eventBuffs ? [JSON.stringify(eventBuffs)] : []),
           ...(eventPoints > 0 ? [eventPoints] : []),
           ...(settlementAfter ? [settlementAfter] : []),
+          ...(fortressAfter ? [fortressAfter] : []),
           row.id,
         ),
       // The Próby Gildii's trial too (guild-trials.js), one taken before the

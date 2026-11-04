@@ -11,6 +11,22 @@ import {
   buildsUnderWay,
   campBonus,
   campLevels,
+  addBonuses,
+  blessingPlan,
+  gearSetCount,
+  gearSetIds,
+  greenhouseHours,
+  greenhouseStore,
+  knownHerbs,
+  professionState,
+  trainingPlan,
+  trainingXp,
+  familyDiscoveries,
+  keptFamilies,
+  trophyBonuses,
+  trophyHallBonuses,
+  fortressReady,
+  fortressStands,
   campNeeds,
   canUse,
   classNameOf,
@@ -88,7 +104,7 @@ import { say } from '../engine/text.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
 import { content } from './content.js';
-import { craftingOn, professionsOn, settlementOn } from './features.js';
+import { craftingOn, fortressOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
@@ -223,7 +239,8 @@ export async function settleDiscoveries(db, player, now) {
     const result = await db.prepare('UPDATE characters SET foreign_stacks = ? WHERE id = ? AND foreign_stacks = ?').bind(kept, row.id, row.foreign_stacks ?? '{}').run();
     if (result.meta.changes === 1) row.foreign_stacks = kept;
   }
-  const merged = mergeDiscoveries(JSON.parse(row.discovered ?? '{}'), found);
+  // The creature families known in full, for the Warownia's Sala trofeów.
+  const merged = mergeDiscoveries(JSON.parse(row.discovered ?? '{}'), { ...found, ...familyDiscoveries(JSON.parse(row.met ?? '[]'), content) });
   if (!merged) return;
   const discovered = JSON.stringify(merged);
   const result = await db.prepare('UPDATE characters SET discovered = ? WHERE id = ? AND discovered = ?').bind(discovered, row.id, row.discovered ?? '{}').run();
@@ -282,10 +299,34 @@ function activeBuffs(player, now) {
   return active;
 }
 
+// The Zbrojownia's saved gear sets (characters.fortress), null for one not
+// saved (421 A).
+export const gearSetsOf = (row) => JSON.parse(row.fortress ?? '{}').sets ?? [];
+
+// The ids of the items the Zbrojownia's sets keep, where the Warownia works
+// (with FORTRESS off its racks are gone and their items back in the bag).
+export const rackedIds = (row) => (fortressOn() ? gearSetIds(gearSetsOf(row)) : new Set());
+
+// The items in the bag: neither worn nor on the Zbrojownia's racks, where
+// the items of its sets hang while not worn.
+export function bagItems(player) {
+  const racked = rackedIds(player.row);
+  return player.items.filter((item) => !item.equippedSlot && !racked.has(item.id));
+}
+
+// An item on a rack leaves it only through the Zbrojownia: worn with its
+// set, or brought down to the bag by a change of the sets. It is not sold,
+// given, put away or taken apart from the rack.
+export function requireOffRack(player, ...items) {
+  const racked = rackedIds(player.row);
+  if (items.some((item) => item && !item.equippedSlot && racked.has(item.id))) {
+    throw new ApiError(409, 'on_rack', 'Ta rzecz wisi na stojaku w Zbrojowni. Usuń jej zestaw albo zapisz go bez niej.');
+  }
+}
+
 // The bag's places taken: one an item, and the herbs and the potions by the
 // stack.
-export const bagPlaces = (player) =>
-  player.items.filter((item) => !item.equippedSlot).length + bagStacks(herbsOf(player.row), content) + bagStacks(potionsOf(player.row), content);
+export const bagPlaces = (player) => bagItems(player).length + bagStacks(herbsOf(player.row), content) + bagStacks(potionsOf(player.row), content);
 
 // What adds a gathered store to the character: gold has its own column, the
 // other resources sit in the JSON of `resources`.
@@ -308,7 +349,7 @@ async function settleBuilds(db, player, now) {
     const { row } = player;
     const at = entry.startsAt;
     const building = content.buildingsById[entry.buildingId];
-    const producing = building?.effect.kind === 'production';
+    const producing = building?.effect?.kind === 'production';
     const gathered = producing ? collect(building, player.buildings[building.id], at) : null;
     const resting = restsDuring(player.activity);
     const hp = resting ? currentHp(player, at).hp : null;
@@ -407,10 +448,40 @@ const settlementTest = (row) => settlementOn() && JSON.parse(row.settlement ?? '
 export const settlementOpen = (row) =>
   settlementOn() && Boolean(content.settlement) && (row.level >= content.unlocksById.settlement.level || settlementTest(row));
 
+// The Ołtarz Systemu's blessing an exploration sets out with: the one of the
+// day with fights left (fortress.js), where the Warownia is on.
+export function blessingOf(row) {
+  const { blessing } = JSON.parse(row.fortress ?? '{}');
+  return fortressOn() && blessing?.left > 0 ? { day: blessing.day, kind: blessing.kind, bonus: blessing.bonus, fights: blessing.left } : null;
+}
+
+// The Warownia's state after an exploration's report: the fights its
+// blessing worked in come off the day's, while it is still the one it set
+// out with; null when nothing changes.
+export function blessingAfter(row, taken, used) {
+  if (!taken || used <= 0) return null;
+  const state = JSON.parse(row.fortress ?? '{}');
+  if (state.blessing?.day !== taken.day || state.blessing.kind !== taken.kind) return null;
+  return JSON.stringify({ ...state, blessing: { ...state.blessing, left: Math.max(0, state.blessing.left - used) } });
+}
+
+// The bonus to the damage dealt to each of the creatures `ids`: the
+// Encyklopedia's trophies and the Warownia's Sala trofeów (fortress.js).
+export function trophiesFor(player, now, ids) {
+  const discovered = JSON.parse(player.row.discovered ?? '{}');
+  const met = JSON.parse(player.row.met ?? '[]');
+  const hall = trophyHallBonuses(campLevels(player.buildings, now, content), met, keptFamilies(discovered), content, ids);
+  return addBonuses(trophyBonuses(discovered, content, ids), hall);
+}
+
 // A camp building of the Osada's (the Kwatery, `settlement` in
-// buildings.json) stands once the character has the Osada; the others
-// always.
-export const buildingOpen = (building, row) => !building.settlement || settlementOpen(row);
+// buildings.json) stands once the character has the Osada, and one of the
+// Warownia's (`fortress`) once the camp has turned into one, where the
+// Warownia is on (fortress.js); without `stored` and `now`, never. The
+// others always. (The Obóz's own `fortress` is its transformation, not this
+// mark.)
+export const buildingOpen = (building, row, stored = null, now = 0) =>
+  (!building.settlement || settlementOpen(row)) && (building.fortress !== true || (fortressOn() && Boolean(stored) && fortressStands(stored, now, content)));
 
 // What the character holds of the goods the Osada's orders ask for, by the
 // column each kind is kept in, the parts of the Stół rozbiórki's orders
@@ -420,7 +491,7 @@ export function settlementGoods(row, items, now) {
   const stocks = Object.fromEntries(['herbs', 'potions', 'materials', 'resources'].map((column) => [column, JSON.parse(row[column] ?? '{}')]));
   stocks.parts = settleCrafting(craftingState(row), now).parts;
   const crafted = {};
-  for (const item of items) if (item.crafted && !item.equippedSlot) crafted[item.base] = (crafted[item.base] ?? 0) + 1;
+  for (const item of bagItems({ row, items })) if (item.crafted) crafted[item.base] = (crafted[item.base] ?? 0) + 1;
   return { ...stocks, crafted };
 }
 
@@ -603,6 +674,99 @@ export function currentHp(player, now) {
   return { hp: Math.min(hp, combatant.maxHp), maxHp: combatant.maxHp, vitality: totals.vitality, combatant, rest };
 }
 
+// The training as the yard's screen shows it: what one gives now, whether
+// one may start, and the one of the day under way or done.
+function trainingView(player, levels, now) {
+  const plan = trainingPlan(levels, content);
+  if (!fortressOn() || !plan) return null;
+  const { training } = JSON.parse(player.row.fortress ?? '{}');
+  const day = questPeriod('daily', now, content);
+  const today = training?.day === day.key;
+  return {
+    hours: plan.hours,
+    xp: trainingXp(player.row.level, plan, content),
+    canStart: !today && (!training || training.claimed),
+    nextDayAt: today ? day.endsAt : null,
+    current: training && !training.claimed ? { startedAt: training.startedAt, endsAt: training.endsAt, xp: training.xp, done: training.endsAt <= now } : null,
+  };
+}
+
+// The Ołtarz's blessing as its screen shows it: the three to choose from,
+// for how many fights, and the one of the day with the fights left.
+function blessingView(player, levels, now, building) {
+  const plan = blessingPlan(levels, content);
+  if (!fortressOn() || !plan) return null;
+  const { blessing } = JSON.parse(player.row.fortress ?? '{}');
+  const today = blessing?.day === questPeriod('daily', now, content).key;
+  return {
+    fights: plan.fights,
+    choices: building.blessings,
+    canChoose: !today,
+    current: blessing?.left > 0 ? { kind: blessing.kind, left: blessing.left, today } : null,
+  };
+}
+
+// The Szklarnia as its screen shows it: the herbs it may grow (those known
+// from Zielarstwa), how much of the chosen one a day, and its store now.
+function greenhouseView(player, levels, now) {
+  const hours = greenhouseHours(levels, content);
+  if (!fortressOn() || hours <= 0) return null;
+  const herbalism = professionState(JSON.parse(player.row.professions ?? '{}'), content.gathering.profession).level;
+  const { greenhouse } = JSON.parse(player.row.fortress ?? '{}');
+  const store = greenhouseStore(levels, greenhouse, herbalism, now, content);
+  return {
+    hours,
+    herbs: knownHerbs(herbalism, content).map((herb) => ({ id: herb.id, name: herb.name })),
+    current: store && { herb: store.herb, name: content.herbsById[store.herb].name, perDay: store.perDay, limit: store.limit, capacity: store.capacity, amount: store.amount, since: store.since },
+  };
+}
+
+// The Zbrojownia's sets as its screen shows them: as many as the building
+// keeps, each with its name, the items of it still had (on a rack or worn)
+// and whether the character wears it now, all of it and nothing else.
+function gearSetsView(player, levels, building) {
+  const count = gearSetCount(levels, content);
+  if (!fortressOn() || count <= 0) return null;
+  const sets = gearSetsOf(player.row);
+  const byId = new Map(player.items.map((item) => [item.id, item]));
+  const worn = equippedItems(player);
+  return {
+    count,
+    nameLength: building.gearSets.nameLength,
+    sets: Array.from({ length: count }, (_, index) => {
+      const items = (sets[index]?.items ?? []).map((id) => byId.get(id)).filter(Boolean);
+      return {
+        index,
+        name: sets[index]?.name ?? null,
+        items: items.map((item) => ({ id: item.id, worn: Boolean(item.equippedSlot), ...itemView(item, content) })),
+        worn: items.length > 0 && items.length === worn.length && items.every((item) => item.equippedSlot),
+      };
+    }),
+  };
+}
+
+// The transformation into a Warownia as the Kamień węgielny's window shows
+// it: whether it may begin (every camp building and the Obóz at the top),
+// what it costs and takes, the build under way or waiting, and once done
+// that the Warownia stands.
+function fortressView(player, open, queue, now) {
+  const fortress = content.camp.fortress;
+  const stored = player.buildings[fortress.id];
+  const stands = fortressStands(player.buildings, now, content);
+  return {
+    id: fortress.id,
+    name: fortress.name,
+    description: fortress.description,
+    ready: fortressReady(player.buildings, now, open, content) && !queue.some((entry) => entry.buildingId === fortress.id),
+    cost: upgradeCost(fortress, 1),
+    minutes: buildMinutes(fortress, 1, campLevel(player.buildings, now, content), content),
+    building: stored && !stands ? { startedAt: stored.startedAt, endsAt: stored.endsAt } : null,
+    queued: queue.some((entry) => entry.buildingId === fortress.id),
+    stands,
+    texts: { start: fortress.start, building: fortress.building, done: fortress.done },
+  };
+}
+
 // The camp as the page shows it: its own level, and each building with its
 // level and, below its highest level, what the next one gives, costs and
 // takes in a camp of this level.
@@ -618,7 +782,10 @@ function campView(player, levels, now) {
   const queued = (id) => queue.filter((entry) => entry.buildingId === id).map((entry) => entry.level);
   // The Kamień węgielny Warowni: how many of the camp's buildings stand at
   // their highest level, and the camp's own level, out of all.
-  const open = content.buildings.filter((building) => buildingOpen(building, player.row));
+  // The Warownia's buildings, once they stand, count for the spirit but not
+  // for the stone's rows: the transformation needs the camp's alone.
+  const built = content.buildings.filter((building) => buildingOpen(building, player.row, player.buildings, now));
+  const open = built.filter((building) => !building.fortress);
   const finished = open.filter((building) => levels[building.id] >= building.maxLevel).length;
   return {
     cornerstone: {
@@ -630,7 +797,9 @@ function campView(player, levels, now) {
         { label: camp.cornerstone.camp, done: own, of: camp.maxLevel },
       ],
       ready: finished === open.length && own >= camp.maxLevel ? camp.cornerstone.ready : null,
-      spirit: spiritView(player, open, queue),
+      // The transformation into a Warownia, where it is on (fortress.js).
+      fortress: fortressOn() ? fortressView(player, open, queue, now) : null,
+      spirit: spiritView(player, built, queue),
     },
     level: {
       id: camp.id,
@@ -661,7 +830,7 @@ function campView(player, levels, now) {
     queue: queue.map((entry) => ({ ...entry, name: content.buildingsById[entry.buildingId]?.name ?? entry.buildingId })),
     queueSize: camp.queue,
     underWay: buildsUnderWay(player.buildings, queue, now),
-    buildings: content.buildings.filter((building) => buildingOpen(building, player.row)).map((building) => {
+    buildings: content.buildings.filter((building) => buildingOpen(building, player.row, player.buildings, now)).map((building) => {
       const level = levels[building.id];
       const planned = plannedLevel(building, player.buildings, queue);
       const next = planned < building.maxLevel ? planned + 1 : null;
@@ -701,6 +870,14 @@ function campView(player, levels, now) {
         trade: building.trade && level > 0 ? fireView(building, level, player.row, now) : null,
         shop: building.shop && level > 0 ? shopView(building, level, player.row, now) : null,
         exchange: building.exchange && level > 0 ? exchangeView(building, level) : null,
+        // The Warownia's Plac treningowy: the training of the day.
+        training: building.effect.kind === 'training' && level > 0 ? trainingView(player, levels, now) : null,
+        // The Szklarnia: its herb and store.
+        greenhouse: building.effect.kind === 'greenhouse' && level > 0 ? greenhouseView(player, levels, now) : null,
+        // The Zbrojownia: the saved gear sets.
+        gearSets: building.effect.kind === 'gearSets' && level > 0 ? gearSetsView(player, levels, building) : null,
+        // The Ołtarz Systemu: the blessing of the day.
+        blessing: building.effect.kind === 'blessing' && level > 0 ? blessingView(player, levels, now, building) : null,
       };
     }),
   };
@@ -716,7 +893,8 @@ function spiritView(player, open, queue) {
   const spirit = builderSpirit(content);
   if (!spirit) return null;
   const wallet = walletOf(player.row);
-  const needs = campNeeds(open, player.buildings, queue, content);
+  // With the Warownia in the game, what its transformation still needs too.
+  const needs = campNeeds(fortressOn() && content.camp.fortress ? [...open, content.camp.fortress] : open, player.buildings, queue, content);
   return {
     art: spirit.art,
     name: spirit.name,
@@ -1122,8 +1300,7 @@ export function characterView(player, now) {
         return [slot.id, item ? toItem(item) : null];
       }),
     ),
-    bag: items
-      .filter((item) => !item.equippedSlot)
+    bag: bagItems(player)
       .reverse()
       .map((item) => ({ ...toItem(item), verdict: verdict(item) })),
     // The herbs and the potions in the bag, which take its places by the stack.

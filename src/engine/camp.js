@@ -6,6 +6,8 @@
 // has once the last upgrade has ended, and for a production building the time
 // its store started filling. The server passes the time.
 
+import { countedForm } from './text.js';
+
 // The level a stored building has at `now`: an upgrade counts once it ends.
 export function buildingLevel(stored, now) {
   if (!stored) return 0;
@@ -106,7 +108,8 @@ export const buildSpeed = (level, content) => content.camp.effect.perLevel * (le
 // itself grows at its own pace, the buildings faster with each camp level.
 export function buildMinutes(building, level, camp, content) {
   const minutes = upgradeMinutes(building, level);
-  if (building.id === content.camp.id) return minutes;
+  // So does the transformation into a Warownia: 3 days (419 A).
+  if (building.id === content.camp.id || building.id === content.camp.fortress?.id) return minutes;
   return Math.max(1, Math.round(minutes / (1 + buildSpeed(camp, content))));
 }
 
@@ -152,9 +155,11 @@ export function restBonus(stored, since, now, content) {
 // for a production building "6 drewna na godzinę… na 1 h".
 export function effectText(building, level, content) {
   const { effect } = building;
-  const value = effect.perLevel * level;
-  const shown = effect.unit === 'percent' ? `${Math.round(value * 100)}%` : String(Math.round(value));
-  const text = effect.text.replace('{value}', shown).replace('{hours}', `${effect.storageHours * level}\u00a0h`);
+  // The Strażnica gives only its first effect below `fromLevel`.
+  if (effect.fromLevel && level < effect.fromLevel) return effect.startText;
+  const value = (effect.base ?? 0) + effect.perLevel * level;
+  const text = effect.text.replace('{value}', shownValue(value, effect.unit, content)).replace('{hours}', `${effect.storageHours * level}\u00a0h`);
+  if (effect.startText) return `${effect.startText}, ${text}`;
   // A building that exchanges resources (the Stół rozbiórki) adds its rate
   // at the level (the author: "Dopisz na górę info o możliwości wymiany
   // zasobów i rozwoju sytuacji wraz z lvlem").
@@ -167,6 +172,16 @@ export function effectText(building, level, content) {
   const cap = all ? 'Wszystkie rzadkości' : `Najwyższa rzadkość: ${content.raritiesById[effect.rarities[level - 1]].forms.f}`;
   const bonus = level >= effect.bonusFromLevel ? `, szansa na dodatkową część: ${Math.round((level - effect.bonusFromLevel + 1) * effect.bonusPerLevel * 100)}%` : '';
   return `${cap}, ${text.charAt(0).toLowerCase()}${text.slice(1)}${bonus}${rate}`;
+}
+
+// A value as the page shows it: a share with up to one decimal ("0,5%"),
+// hours ("1,5 h"), fights ("8 walk") or a count.
+function shownValue(value, unit, content) {
+  const decimal = (number) => String(Math.round(number * 10) / 10).replace('.', ',');
+  if (unit === 'percent') return `${decimal(value * 100)}%`;
+  if (unit === 'hours') return `${decimal(value)}\u00a0h`;
+  if (unit === 'fights') return `${value} ${countedForm(value, content.potionUse.fightForms)}`;
+  return String(Math.round(value));
 }
 
 const HOUR = 3600000;

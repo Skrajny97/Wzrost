@@ -40,5 +40,21 @@
       }
     }
   },
+  "fortress": {
+    "id": "fortress",
+    "name": "Warownia",
+    "description": "Kamienne mury w miejscu dawnej palisady. Budynki Warowni wzmacniają postać.",
+    "maxLevel": 1,
+    "costs": [
+      { "resource": "gold", "base": 120000, "growth": 1 },
+      { "resource": "wood", "base": 10000, "growth": 1 },
+      { "resource": "stone", "base": 7000, "growth": 1 },
+      { "resource": "iron-ore", "base": 5000, "growth": 1 }
+    ],
+    "minutes": { "levels": [4320] },
+    "start": "Rozpocznij przemianę w Warownię",
+    "building": "Przemiana w Warownię trwa. Gdy się skończy, w miejscu palisady staną kamienne mury.",
+    "done": "Obóz stał się Warownią. Wszystkie siedem budynków Warowni można stawiać od razu."
+  },
   "queue": 3
 }

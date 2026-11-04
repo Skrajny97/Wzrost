@@ -8,6 +8,7 @@ import {
   canUse,
   combatValues,
   createRng,
+  gearSetIds,
   valueChanges,
   heldOfRarity,
   itemName,
@@ -18,7 +19,21 @@ import {
   upgradeView,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, requireUnworn, walletOf } from './characters.js';
+import {
+  bagItems,
+  bagPlaces,
+  characterView,
+  engineCharacter,
+  equippedItems,
+  gearSetsOf,
+  loadPlayer,
+  rackedIds,
+  requireOffRack,
+  requireNotExploring,
+  requirePlayer,
+  requireUnworn,
+  walletOf,
+} from './characters.js';
 import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
@@ -73,7 +88,14 @@ export async function equipItem(context) {
     throw new ApiError(403, 'class_level', `Ten przedmiot założysz od poziomu klasy ${baseClassLevel(item.base, content)}.`);
   }
 
-  // Whatever was in the slot goes back to the bag first.
+  // Whatever was in the slot goes back to the bag first; an item taken from
+  // a Zbrojownia's rack frees no place there, so one the sets do not keep
+  // needs the room.
+  const racked = rackedIds(player.row);
+  const replaced = player.items.find((candidate) => candidate.equippedSlot === item.slot);
+  if (racked.has(item.id) && replaced && !racked.has(replaced.id)) {
+    if (bagPlaces(player) >= bagCapacity(campLevels(player.buildings, context.now, content), content)) throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
+  }
   const db = context.env.DB;
   await db.batch([
     db.prepare('UPDATE items SET slot = NULL WHERE character_id = ? AND slot = ?').bind(player.row.id, item.slot),
@@ -88,7 +110,8 @@ export async function unequipItem(context) {
   const item = findItem(player, context.params.id);
   if (!item.equippedSlot) throw new ApiError(409, 'not_equipped', 'Ten przedmiot nie jest założony.');
   const capacity = bagCapacity(campLevels(player.buildings, context.now, content), content);
-  if (bagPlaces(player) >= capacity) {
+  // An item of a saved set goes back onto the Zbrojownia's rack.
+  if (!gearSetIds(gearSetsOf(player.row)).has(item.id) && bagPlaces(player) >= capacity) {
     throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
   }
   await context.env.DB.prepare('UPDATE items SET slot = NULL WHERE id = ? AND character_id = ?')
@@ -101,6 +124,7 @@ export async function discardItem(context) {
   const { session, player } = await requirePlayer(context);
   const item = findItem(player, context.params.id);
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
+  requireOffRack(player, item);
   await context.env.DB.prepare('DELETE FROM items WHERE id = ? AND character_id = ?').bind(item.id, player.row.id).run();
   return respond(context, session);
 }
@@ -114,7 +138,7 @@ export async function sellItems(context) {
   const rank = (item) => content.rarities.findIndex((rarity) => rarity.id === item.rarity);
   // Upgraded items, and those with a gem set in them, are not sold by the
   // handful: too much went into them.
-  const sold = player.items.filter((item) => !item.equippedSlot && !(item.upgrade > 0) && !item.gem && rank(item) <= limit);
+  const sold = bagItems(player).filter((item) => !(item.upgrade > 0) && !item.gem && rank(item) <= limit);
   let count = 0;
   if (sold.length > 0) {
     // One transaction: the gold is counted from the items still there, then
@@ -145,6 +169,7 @@ export async function sellItem(context) {
   const { session, player } = await requirePlayer(context);
   const item = findItem(player, context.params.id);
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
+  requireOffRack(player, item);
   const db = context.env.DB;
   const bonus = sellBonusOf(player, context.now);
   const price = soldGold(player.row.id, [item], bonus);
@@ -258,9 +283,16 @@ export async function upgradeItem(context) {
   const { view, cost, warded, steady, taken } = plan;
   const row = player.row;
   const pay = upgradePayment(plan);
+  // A Zbrojownia's set forgets an item that breaks.
+  const sets = gearSetsOf(row);
+  const inSet = sets.some((set) => set?.items.includes(item.id));
 
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const outcome = rollUpgrade(item, createRng(roll), content, { warded, steady });
+  const forget =
+    outcome.result === 'broken' && inSet
+      ? JSON.stringify({ ...JSON.parse(row.fortress ?? '{}'), sets: sets.map((set) => set && { ...set, items: set.items.filter((id) => id !== item.id) }) })
+      : null;
   const db = context.env.DB;
   // The item changes only if it is as seen here (its level and last roll) and
   // the price (and the scroll) is still there; the payment only if this roll
@@ -276,8 +308,10 @@ export async function upgradeItem(context) {
       )
       .bind(outcome.upgrade, roll, item.id, row.id, view.level, item.lastRoll ?? '', row.id, ...pay.enoughBinds),
     db
-      .prepare(`UPDATE characters SET ${pay.set}, version = version + 1 WHERE id = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`)
-      .bind(...pay.binds, row.id, item.id, roll),
+      .prepare(
+        `UPDATE characters SET ${pay.set}${forget ? ', fortress = ?' : ''}, version = version + 1 WHERE id = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
+      )
+      .bind(...pay.binds, ...(forget ? [forget] : []), row.id, item.id, roll),
     // An upgrade that came off moves the Próby Gildii's trial on, only with
     // this roll saved (guild-trials.js).
     ...trialProgress(db, row.id, { upgrades: outcome.result === 'success' ? 1 : 0 }, context.now, {

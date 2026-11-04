@@ -33,7 +33,7 @@ import {
   saleGold,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf } from './characters.js';
+import { bagItems, buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
@@ -176,7 +176,7 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
 
   const made = brewPotions({ count: done, seed: activity.seed, extraChance: catalystChance(catalyst?.key, content) }, content);
   const capacity = bagCapacity(campLevels(player.buildings, now, content), content);
-  const taken = player.items.filter((item) => !item.equippedSlot).length + bagStacks(herbs, content) + bagStacks(potionsOf(row), content);
+  const taken = bagItems(player).length + bagStacks(herbs, content) + bagStacks(potionsOf(row), content);
   const { stored, lost } = storeStacks(potionsOf(row), { [potion.id]: made.count }, capacity - taken, content);
   const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);
   const report = {

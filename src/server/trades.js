@@ -15,7 +15,7 @@
 // worn is traded.
 
 import { bagCapacity, bagStacks, campLevels, isUnlocked, itemView, knownStack, materialView } from '../engine/index.js';
-import { characterView, loadPlayer } from './characters.js';
+import { bagItems, characterView, loadPlayer, requireOffRack } from './characters.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
@@ -256,6 +256,7 @@ function cleanOffer(raw, player) {
     const item = player.items.find((candidate) => candidate.id === id);
     if (!item) throw new ApiError(409, 'no_item', 'Tego przedmiotu nie ma już w plecaku.');
     if (item.equippedSlot) throw new ApiError(409, 'worn', 'Założonego przedmiotu nie wymienisz. Najpierw go zdejmij.');
+    requireOffRack(player, item);
   }
   offer.items = ids;
   const named = (table) => (id) => (Object.hasOwn(table, id) ? table[id].name : null);
@@ -319,7 +320,7 @@ function placesAfter(player, give, get) {
     for (const [id, count] of Object.entries(plus)) counts[id] = (counts[id] ?? 0) + count;
     return Object.fromEntries(Object.entries(counts).filter(([, count]) => count > 0));
   };
-  const items = player.items.filter((item) => !item.equippedSlot).length - give.items.length + get.items.length;
+  const items = bagItems(player).length - give.items.length + get.items.length;
   return items + bagStacks(merged(herbsOf(player.row), give.herbs, get.herbs), content) + bagStacks(merged(potionsOf(player.row), give.potions, get.potions), content);
 }
 

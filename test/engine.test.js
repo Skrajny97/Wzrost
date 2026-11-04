@@ -1410,6 +1410,14 @@ describe('camp', () => {
       'craft-table': 0,
       // The Osada's Kwatery count too: built only where the Osada is open.
       quarters: 0,
+      // And the Warownia's, built only after the transformation.
+      'training-yard': 0,
+      armory: 0,
+      'trophy-hall': 0,
+      watchtower: 0,
+      'system-altar': 0,
+      greenhouse: 0,
+      shrine: 0,
     });
     assert.equal(construction(stored, 4000).buildingId, 'campfire');
     assert.equal(construction(stored, 5000), null);

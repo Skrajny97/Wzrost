@@ -271,7 +271,8 @@ export function mountCombat(container, { params, navigate }) {
         const known = options[areaId];
         if (known && known.build === build && known.hp === hp && known.healing === healing) continue;
         const { areas } = await call('GET', `/api/hunts/options?area=${encodeURIComponent(areaId)}${healing}`);
-        options[areaId] = { build, hp, healing, threat: areas[0].threat, threatAvoiding: areas[0].threatAvoiding };
+        const [found] = areas;
+        options[areaId] = { build, hp, healing, threat: found.threat, threatAvoiding: found.threatAvoiding, chances: found.chances, chancesSeeking: found.chancesSeeking, scout: found.scout };
         showThreat?.();
       } while (loadAgain);
       failed = false;
@@ -592,6 +593,36 @@ export function mountCombat(container, { params, navigate }) {
 
     const threatValue = h('strong', {});
     const threatLine = h('p', { class: 'threat' }, 'Zagrożenie: ', threatValue);
+    // The Warownia's Strażnica: the chances of the length chosen under the
+    // threat, and from its 2nd level one of the place's creatures to track
+    // (fortress.js in the engine). Not on a Drużyna's trip, whose fights are
+    // shared.
+    const watchLine = h('p', { class: 'watch-chances', hidden: true });
+    let scouted = null;
+    let scoutShown = false;
+    const scoutBox = h('div', { class: 'hunt-scout', hidden: true });
+    const showScout = (scout) => {
+      if (scoutShown || !scout || first) return;
+      scoutShown = true;
+      const pick = (id) => {
+        scouted = id;
+        for (const button of scoutBox.querySelectorAll('button')) button.setAttribute('aria-pressed', String(button.dataset.id === (id ?? '')));
+        showSummary();
+      };
+      fill(
+        scoutBox,
+        h('p', { class: 'hunt-scout-title', text: `Strażnica: tropiony stwór, spotykany o ${Math.round(scout.share * 100)}% częściej` }),
+        h(
+          'div',
+          { class: 'fortress-choices' },
+          [{ id: '', name: 'Żaden' }, ...scout.creatures].map((creature) =>
+            h('button', { type: 'button', class: 'button button--world button--small', 'data-id': creature.id, 'aria-pressed': creature.id === '', text: creature.name, onClick: () => pick(creature.id || null) }),
+          ),
+        ),
+      );
+      scoutBox.hidden = false;
+    };
+    const percent = (share) => `${Math.round(share * 100)}%`;
     // The box by "Wyrusz" keeps the elite and the champion away and lowers
     // the threat; the one under it sends the character after them, twice as
     // often, and raises it. One unticks the other. The first exploration
@@ -699,6 +730,18 @@ export function mountCombat(container, { params, navigate }) {
       const threat = ratings?.[minutes];
       threatLine.className = `threat threat--${threat ?? 'unknown'}`;
       threatValue.textContent = threat ? THREAT_NAMES[threat] : '…';
+      const chances = !first && known ? (seeking() ? known.chancesSeeking : known.chances)?.[minutes] : null;
+      watchLine.hidden = !chances;
+      if (chances) {
+        watchLine.textContent = `Strażnica: ${[
+          !avoiding() && `elita ${percent(chances.elite)}`,
+          !avoiding() && chances.champion > 0 && `czempion ${percent(chances.champion)}`,
+          `zdarzenie ${percent(chances.event)}`,
+        ]
+          .filter(Boolean)
+          .join(', ')}.`;
+      }
+      showScout(known?.scout);
       showSummary();
     };
     // The folded "Opcje wyprawy" tells the length, the potions taken and
@@ -706,7 +749,7 @@ export function mountCombat(container, { params, navigate }) {
     const summary = h('span', { class: 'hunt-options-summary' });
     function showSummary() {
       const taken = Object.values(potions?.taken() ?? {}).reduce((sum, count) => sum + count, 0);
-      const ticked = [avoiding(), seeking(), tracking(), tracingUnknown()].filter(Boolean).length;
+      const ticked = [avoiding(), seeking(), tracking(), tracingUnknown(), Boolean(scouted)].filter(Boolean).length;
       summary.textContent = [
         formatMinutes(minutes),
         taken > 0 && countOf(taken, 'mikstura', 'mikstury', 'mikstur'),
@@ -829,6 +872,7 @@ export function mountCombat(container, { params, navigate }) {
             trackQuests: tracking(),
             trackUnknown: tracingUnknown(),
             ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
+            ...(scouted && !along && { scout: scouted }),
           });
           // Those who went, as the server says: one may have got busy meanwhile.
           if (along) toast(answer.went?.length > 0 ? `Drużyna wyrusza: ${answer.went.join(', ')}.` : 'Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.');
@@ -849,6 +893,7 @@ export function mountCombat(container, { params, navigate }) {
         trackQuests: tracking(),
         trackUnknown: tracingUnknown(),
         ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
+        ...(scouted && { scout: scouted }),
       }));
 
     const levelNote =
@@ -887,8 +932,9 @@ export function mountCombat(container, { params, navigate }) {
         // Everything the exploration is set up with in one frame, above the
         // threat it changes and "Wyrusz" (the author: not scattered over the
         // card). The narrator's first exploration has only its length.
-        first ? durations : huntOptions(summary, [durations, potions?.element, choices]),
+        first ? durations : huntOptions(summary, [durations, potions?.element, choices, scoutBox]),
         threatLine,
+        watchLine,
         party?.element,
         // Held in sight above the tabs while the card goes on below (the
         // author: 312 A); the narrator's first exploration keeps it plain.

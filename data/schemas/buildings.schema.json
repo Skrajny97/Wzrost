@@ -14,6 +14,20 @@
       "description": { "type": "string", "minLength": 1 },
       "maxLevel": { "type": "integer", "minimum": 1 },
       "settlement": { "type": "boolean", "description": "Budynek tylko tam, gdzie działa Osada (SETTLEMENT): bez niej nie ma go w obozie ani w Encyklopedii." },
+      "fortress": { "type": "boolean", "description": "Budynek Warowni: tylko tam, gdzie działa Warownia (FORTRESS), i dopiero po przemianie Obozu w Warownię (camp.json: fortress)." },
+      "gearSets": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "nameLength"],
+        "description": "Tylko Zbrojownia (gearSets): nazwa zestawu, któremu gracz nie nadał własnej ({n} to jego numer), i najdłuższa nazwa.",
+        "properties": { "name": { "type": "string", "pattern": "\\{n\\}" }, "nameLength": { "type": "integer", "minimum": 1 } }
+      },
+      "blessings": {
+        "type": "array",
+        "minItems": 1,
+        "description": "Tylko Ołtarz Systemu (blessing): błogosławieństwa do wyboru raz dziennie, xp, gold i luck (+bonus XP, złota albo szans na rzadsze przedmioty).",
+        "items": { "type": "object", "additionalProperties": false, "required": ["id", "name"], "properties": { "id": { "enum": ["xp", "gold", "luck"] }, "name": { "type": "string", "minLength": 1 } } }
+      },
       "looks": {
         "type": "array",
         "minItems": 1,
@@ -26,13 +40,18 @@
         "required": ["kind", "perLevel", "unit", "text"],
         "properties": {
           "kind": {
-            "enum": ["restSpeed", "bagSlots", "sellPrice", "production", "upgradeCap", "craftSpeed", "companionPlaces"],
-            "description": "restSpeed: szybszy odpoczynek między wyprawami (ułamek), bagSlots: miejsca w plecaku, sellPrice: wyższe ceny u złomiarza (ułamek), production: budynek wytwarza zasób (resource), upgradeCap: najwyższe ulepszenie przedmiotów (Kowadło), craftSpeed: szybsza przeróbka na Stole rozbiórki (ułamek), companionPlaces: miejsca dla towarzyszy zwerbowanych w Karczmie (Kwatery; towarzysz potrzebuje też stopnia relacji z karczmarzem). Bez budynku z craftSpeed nie ma przeróbki ani rozbiórki."
+            "enum": ["restSpeed", "bagSlots", "sellPrice", "production", "upgradeCap", "craftSpeed", "companionPlaces", "training", "gearSets", "trophyHall", "scouting", "blessing", "greenhouse", "faintXp"],
+            "description": "restSpeed: szybszy odpoczynek między wyprawami (ułamek), bagSlots: miejsca w plecaku, sellPrice: wyższe ceny u złomiarza (ułamek), production: budynek wytwarza zasób (resource), upgradeCap: najwyższe ulepszenie przedmiotów (Kowadło), craftSpeed: szybsza przeróbka na Stole rozbiórki (ułamek), companionPlaces: miejsca dla towarzyszy zwerbowanych w Karczmie (Kwatery; towarzysz potrzebuje też stopnia relacji z karczmarzem). Bez budynku z craftSpeed nie ma przeróbki ani rozbiórki. Warownia: training: codzienny trening klona (godziny na poziom), gearSets: zapisane zestawy ekwipunku, trophyHall: premia do obrażeń przeciw rodzinom stworów poznanym w całości (ułamek), scouting: szanse przed wyprawą i tropienie stwora (ułamek od fromLevel), blessing: codzienne błogosławieństwo na liczbę walk, greenhouse: godziny zbierania wybranego zioła na dobę, faintXp: mniejsza utrata XP po omdleniu (ułamek)."
           },
           "perLevel": { "type": "number", "exclusiveMinimum": 0, "description": "Premia za poziom; przy production zasób na godzinę za poziom." },
           "resource": { "type": "string", "minLength": 1, "description": "Tylko production: wytwarzany zasób (resources.json) albo złoto (gold)." },
           "storageHours": { "type": "number", "exclusiveMinimum": 0, "description": "Tylko production: na ile godzin produkcji starcza magazyn za każdy poziom. Pełny magazyn zatrzymuje produkcję." },
-          "unit": { "enum": ["percent", "count"], "description": "Jak pokazać wartość: percent mnoży ułamek przez 100 i dodaje %." },
+          "unit": { "enum": ["percent", "count", "hours", "fights"], "description": "Jak pokazać wartość: percent mnoży ułamek przez 100 i dodaje %, hours dodaje „h”, a fights podaje liczbę walk z odmianą (4 walki, 8 walk)." },
+          "base": { "type": "number", "minimum": 0, "description": "Wartość dodana do premii z poziomów (gearSets: zestaw na 1. poziomie ponad poziom)." },
+          "share": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Tylko training: jaką część XP klasy wyprawy tej samej długości daje trening." },
+          "fromLevel": { "type": "integer", "minimum": 2, "description": "Tylko scouting: od tego poziomu działa premia z text; niżej budynek daje tylko startText." },
+          "startText": { "type": "string", "minLength": 1, "description": "Tylko scouting: to, co budynek daje od 1. poziomu." },
+          "bonus": { "type": "number", "exclusiveMinimum": 0, "description": "Tylko blessing: siła błogosławieństwa (ułamek: +10% XP, złota albo szans na rzadsze przedmioty)." },
           "text": { "type": "string", "pattern": "\\{value\\}", "description": "Opis premii z miejscem na wartość: {value}, a przy production także {hours}." },
           "rarities": {
             "type": "array",

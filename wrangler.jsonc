@@ -60,7 +60,11 @@
     // "on" opens the Osada (src/server/settlement.js) from character level
     // 20: parts I–III, in the live game from version 0.0.68 (the author:
     // "Wdrażaj 0.0.68 z Osadą"). Its auctions settle with the cron below.
-    "SETTLEMENT": "on"
+    "SETTLEMENT": "on",
+    // "on" lets a camp at its top turn into the Warownia
+    // (src/server/fortress.js), with its seven buildings: in the live game
+    // from version 0.1.49, once every building had its pictures (606, 608–610).
+    "FORTRESS": "on"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain
@@ -111,7 +115,9 @@
         // The class evolutions, with "Testuj ewolucję" (TUTORIAL_TESTS).
         "EVOLUTIONS": "on",
         // The Osada (src/server/settlement.js), only here until it is ready.
-        "SETTLEMENT": "on"
+        "SETTLEMENT": "on",
+        // The Warownia (src/server/fortress.js), as in the game.
+        "FORTRESS": "on"
       },
       "triggers": {
         "crons": ["* * * * *"]

@@ -43,7 +43,7 @@ import {
   tradeView,
   wandererGoods,
 } from '../engine/index.js';
-import { bagPlaces, characterView, loadPlayer, requirePlayer } from './characters.js';
+import { bagItems, bagPlaces, characterView, loadPlayer, requireOffRack, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { assertion, atomically as atomicBatch, raced } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
@@ -189,7 +189,7 @@ function sellable(player, now) {
   const stacks = { herb: herbsOf(row), potion: potionsOf(row), material: JSON.parse(row.materials ?? '{}'), part: JSON.parse(row.parts ?? '{}'), mineral: mineralsOf(row) };
   const withBonus = (goods) => (typeof goods.scrap === 'number' ? { ...goods, scrap: goods.scrap * (1 + sellBonus) } : goods);
   return {
-    items: player.items.filter((item) => !item.equippedSlot).map((item) => ({ id: item.id, ...itemView(item, content, { sellBonus }) })),
+    items: bagItems(player).map((item) => ({ id: item.id, ...itemView(item, content, { sellBonus }) })),
     stacks: STACKS.flatMap((kind) =>
       Object.entries(stacks[kind])
         .filter(([key, count]) => count > 0 && knownGood(kind, key))
@@ -286,6 +286,7 @@ export async function listOffer(context) {
   const body = await readJson(context.request);
   const kind = body.kind;
   const item = kind === 'item' ? player.items.find((one) => one.id === Number(body.itemId) && !one.equippedSlot) : null;
+  requireOffRack(player, item);
   const column = COLUMNS[kind];
   const key = typeof body.key === 'string' ? body.key : null;
   const held = kind === 'item' ? (item ? 1 : 0) : column && key && knownGood(kind, key) ? (JSON.parse(row[column] ?? '{}')[key] ?? 0) : 0;

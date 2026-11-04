@@ -10,7 +10,7 @@
 // engine).
 
 import { bagCapacity, campLevels, canUse, itemView } from '../engine/index.js';
-import { bagPlaces, characterView, loadPlayer, requirePlayer } from './characters.js';
+import { bagPlaces, characterView, loadPlayer, requireOffRack, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
 
@@ -61,6 +61,7 @@ export async function putInChest(context) {
   const item = player.items.find((candidate) => candidate.id === body.itemId);
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
+  requireOffRack(player, item);
   const db = context.env.DB;
   const full = () => new ApiError(409, 'chest_full', `Skrzynia Konta mieści ${slots()} przedmiotów. Wyjmij coś, żeby włożyć nowy.`);
   const now = context.now;

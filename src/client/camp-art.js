@@ -43,8 +43,18 @@ export const PLOT_HEIGHT = 75;
 // (board-tall/camp-<look>).
 const TALL_CUT = 370;
 const TALL_BAND = 94;
-export const boardHeight = (tall) => BOARD_HEIGHT + (tall ? TALL_BAND : 0);
-export const stretchY = (y, tall) => (tall && y > TALL_CUT ? y + TALL_BAND : y);
+// Once the camp has turned into a Warownia the board is the Warownia's
+// (579 A, 606; `tall` is then "fortress"): stone walls in place of the
+// palisade, and two bands of the courtyard more below the Osada's, for the
+// Warownia's seven buildings. They lie at FORTRESS_CUT of the taller board,
+// and everything below moves down by FORTRESS_BANDS (board-fortress/fortress).
+const FORTRESS_CUT = 464;
+const FORTRESS_BANDS = 188;
+export const boardHeight = (tall) => BOARD_HEIGHT + (tall ? TALL_BAND : 0) + (tall === 'fortress' ? FORTRESS_BANDS : 0);
+export const stretchY = (y, tall) => {
+  const taller = tall && y > TALL_CUT ? y + TALL_BAND : y;
+  return tall === 'fortress' && taller > FORTRESS_CUT ? taller + FORTRESS_BANDS : taller;
+};
 // The y of every "x y" pair in an SVG path or point list.
 const stretchPoints = (points, tall) => (tall ? points.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (_, x, y) => `${x} ${stretchY(Number(y), tall)}`) : points);
 
@@ -72,9 +82,32 @@ const TALL_PLOTS = {
   quarters: { x: 96, y: 418 },
 };
 
-// The plots on the board, the taller one with the Osada.
+// The plots of the Warownia's buildings in its two bands, three in a row
+// like the camp's top rows: the Ołtarz Systemu in the middle of the
+// courtyard and the Strażnica over the road from the gate below it, both a
+// little higher than the buildings beside them so that the long names below
+// them stand apart; the Kapliczka, the shrine by the gate, right of the
+// road in the row by the bottom gate, the Skrzynia Konta between it and the
+// road (screens/camp.js).
+const FORTRESS_PLOTS = {
+  'training-yard': { x: 88, y: 516 },
+  'system-altar': { x: 184, y: 496 },
+  armory: { x: 280, y: 516 },
+  'trophy-hall': { x: 88, y: 608 },
+  watchtower: { x: 184, y: 588 },
+  greenhouse: { x: 280, y: 608 },
+  shrine: { x: 284, y: 702 },
+};
+
+// The plots on the board, the taller one with the Osada and the Warownia's.
 export const campPlots = (tall) =>
-  tall ? { ...Object.fromEntries(Object.entries(CAMP_PLOTS).map(([id, spot]) => [id, { ...spot, y: stretchY(spot.y, tall) }])), ...TALL_PLOTS } : CAMP_PLOTS;
+  tall
+    ? {
+        ...Object.fromEntries(Object.entries(CAMP_PLOTS).map(([id, spot]) => [id, { ...spot, y: stretchY(spot.y, tall) }])),
+        ...TALL_PLOTS,
+        ...(tall === 'fortress' && FORTRESS_PLOTS),
+      }
+    : CAMP_PLOTS;
 
 // The size of a building's drawing at a level.
 export const buildingTier = (level) => (level >= 8 ? 3 : level >= 4 ? 2 : 1);
@@ -467,12 +500,19 @@ const PATHS = [
   'M180 330 Q152 330 128 336',
   'M188 330 Q214 330 238 336',
   'M180 424 Q164 424 150 428',
-  // To the Skrzynia Konta (screens/camp.js), ending under the chest.
-  'M188 410 Q210 410 234 412',
 ].join(' ');
-const TALL_PATHS = `${stretchPoints(PATHS, true)} M180 424 Q156 424 134 428 M188 424 Q212 424 230 428`;
+// To the Skrzynia Konta (screens/camp.js), ending under the chest; in the
+// Warownia the chest stands by the road itself.
+const CHEST_PATH = ' M188 410 Q210 410 234 412';
+const TALL_PATHS = ' M180 424 Q156 424 134 428 M188 424 Q212 424 230 428';
+// In the Warownia the road from the gate runs on through the Strażnica's
+// gateway and past the Ołtarz Systemu, and a path leaves it for each
+// building beside them and for the Kapliczka.
+const FORTRESS_PATHS = ' M176 524 Q152 524 128 530 M192 524 Q216 524 240 530 M176 616 Q152 616 128 622 M192 616 Q216 616 240 622 M190 718 Q222 718 246 720';
+const boardPaths = (tall) =>
+  `${stretchPoints(PATHS, tall)}${tall === 'fortress' ? FORTRESS_PATHS : stretchPoints(CHEST_PATH, tall)}${tall ? TALL_PATHS : ''}`;
 const paths = (edge, middle, extra = '', tall = false) => {
-  const d = tall ? TALL_PATHS : PATHS;
+  const d = boardPaths(tall);
   return `<g fill="none" stroke-linecap="round"${extra}><path d="${d}" stroke="${edge}" stroke-width="16"></path><path d="${d}" stroke="${middle}" stroke-width="10"></path></g>`;
 };
 
@@ -527,8 +567,9 @@ const pictureBoard = (src, tall) => `<filter id="camp-ground" color-interpolatio
 ${paths('#3a2f1f', '#56462e', ' filter="url(#camp-path)" opacity="0.8"', tall)}`;
 
 // The glade at the camp's level: its palisade grows with the camp as a
-// building does, in three looks, on the taller board with the Osada.
-// Without its picture, the vector glade.
+// building does, in three looks, on the taller board with the Osada, and
+// the Warownia's walls once it stands. Without its picture, the vector
+// glade.
 function board(level, tall) {
   const src = boardGround(buildingTier(level), tall);
   return src ? pictureBoard(src, tall) : vectorBoard(tall);
@@ -578,6 +619,11 @@ const MIRRORED = {
   quarters: [1, 2],
   'craft-table': [2],
   'scrap-bench': [2],
+  // The Warownia's, by the paths from its road (FORTRESS_PATHS): the Sala
+  // trofeów left of it, the Szklarnia and the Kapliczka right of it.
+  'trophy-hall': [2, 3],
+  greenhouse: [1, 2],
+  shrine: [1],
 };
 export const mirrored = (buildingId, tier) => Boolean(MIRRORED[buildingId]?.includes(tier));
 
@@ -610,7 +656,21 @@ export function plotMarkup(buildingId, { level, building = false, tier: own }) {
   return `${campArt(buildingId, tier) ? '' : GROUND}${look(buildingId, tier)}${building ? SCAFFOLD : ''}`;
 }
 
-export const boardArt = (level = 1, tall = false) => svgElement(`0 0 ${BOARD_WIDTH} ${boardHeight(tall)}`, 'camp-board-art', board(level, tall));
+// `range` [from, to] shows only that part of the board's height, as the
+// Warownia's two parts side by side on a computer (FORTRESS_HALVES).
+export const boardArt = (level = 1, tall = false, range = null) =>
+  svgElement(range ? `0 ${range[0]} ${BOARD_WIDTH} ${range[1] - range[0]}` : `0 0 ${BOARD_WIDTH} ${boardHeight(tall)}`, 'camp-board-art', board(level, tall));
+
+// The Warownia's board on a computer (screens/camp.js) in two parts side by
+// side: the camp's and the Osada's, then the Warownia's own bands with the
+// bottom gate. They share a strip of 12 units, so that the names under the
+// Kwatery and the Kamień węgielny and the top of the Ołtarz Systemu stay
+// whole; a plot stands in the part that holds its middle.
+export const FORTRESS_HALVES = [
+  [0, 474],
+  [462, 827],
+];
+export const fortressHalf = (y) => (y < (FORTRESS_HALVES[0][1] + FORTRESS_HALVES[1][0]) / 2 ? 0 : 1);
 
 export const plotArt = (buildingId, state) => svgElement('0 0 100 80', 'camp-plot-art', plotMarkup(buildingId, state));
 

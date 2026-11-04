@@ -55,6 +55,11 @@
       "id": "0.1.48",
       "title": "Wersja 0.1.48",
       "body": "- Okienko „Co nowego?” nie otwiera się już samo po wejściu do gry.\n- Gdy pojawi się nowy wpis, ikona zwoju w górnym pasku dostaje żółtą kropkę. Kropka gaśnie po otwarciu listy."
+    },
+    {
+      "id": "0.1.49",
+      "title": "Wersja 0.1.49: Warownia",
+      "body": "- Obóz na 10. poziomie, z każdym budynkiem na najwyższym poziomie, można przemienić w Warownię. Przemianę zaczyna się przy Kamieniu węgielnym.\n- Warownia dostaje kamienne mury i siedem nowych budynków: Plac treningowy, Zbrojownię, Salę trofeów, Strażnicę, Ołtarz Systemu, Szklarnię i Kapliczkę.\n- Każdy z nich wzmacnia postać na swój sposób. Co daje, mówi jego ekran."
     }
   ]
 }

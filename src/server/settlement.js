@@ -84,7 +84,9 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import {
+  bagItems,
   bagPlaces,
+  requireOffRack,
   characterView,
   currentHp,
   engineCharacter,
@@ -588,7 +590,7 @@ const innkeeperPoints = (stored) => stored.relations[content.settlement.tavern.r
 // hired yet, each with its price at the standing with the innkeeper.
 function companionsView(player, stored, now) {
   const { row } = player;
-  const bag = player.items.filter((item) => !item.equippedSlot);
+  const bag = bagItems(player);
   const rested = (stored.companions ?? []).some((companion) => companion.wounded) ? restedAt(player, now) : now;
   const { places, most } = placesOf(player, now);
   const upgradeCap = campBonus(campLevels(player.buildings, now, content), 'upgradeCap', content);
@@ -893,7 +895,7 @@ export async function deliverSettlementOrder(context) {
 // go only if that payment was saved (its new Osada is unique to it).
 async function deliverCrafted(db, player, done, { settlement, quests, trial = () => [] }) {
   const { row } = player;
-  const ids = craftedFor(player.items, done.take.key, done.take.count, content).map((item) => item.id);
+  const ids = craftedFor(bagItems(player), done.take.key, done.take.count, content).map((item) => item.id);
   if (ids.length < done.take.count) throw new ApiError(409, 'not_enough', 'Brakuje Ci jeszcze tego, o co proszą.');
   const list = ids.map(() => '?').join(', ');
   const inBag = `(SELECT COUNT(*) FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${list})) = ?`;
@@ -1017,6 +1019,7 @@ export async function equipCompanion(context) {
   requireCompanionHome(player, companion, context.now);
   const item = player.items.find((one) => one.id === body.itemId && !one.equippedSlot);
   if (!item) throw new ApiError(404, 'item_not_found', 'Tego przedmiotu nie ma w plecaku.');
+  requireOffRack(player, item);
   const block = companionWearBlock(companion, item, content);
   if (block) throw new ApiError(403, block.code, block.message);
   const { id, equippedSlot, ...data } = item;

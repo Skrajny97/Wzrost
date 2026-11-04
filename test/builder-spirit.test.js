@@ -182,8 +182,9 @@ describe('the Duch budowniczego in the game', () => {
       shown.goods.map((one) => [one.have, one.gold, one.least]),
       RESOURCES.map((id) => [{ wood: 1000, stone: 40, 'iron-ore': 9 }[id], spirit.gold[id], spiritLeast(id, content)]),
     );
-    // A camp of the Osada with nothing built needs every level of every building, the Kwatery too.
-    const open = content.buildings;
+    // A camp of the Osada with nothing built needs every level of every building, the Kwatery too
+    // (the Warownia's come after the transformation).
+    const open = content.buildings.filter((building) => !building.fortress);
     const needs = campNeeds(open, {}, [], content);
     assert.deepEqual(Object.fromEntries(shown.goods.map((one) => [one.id, one.need])), needs);
     // With everything at its highest level the camp needs nothing more.

@@ -10,9 +10,10 @@ export function useServer(vars = {}) {
   // them, unless a test asks for them (events.test.js). The class evolutions
   // are on, as on the test version, unless a test turns them off. The Osada
   // is off unless a test opens it (SETTLEMENT), as before it came into the
-  // game: its companions and rumors would change the other tests' trips.
+  // game: its companions and rumors would change the other tests' trips. So
+  // is the Warownia (FORTRESS), on in the game from 0.1.49.
   const server = createTestHarness({
-    workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', ...vars } }],
+    workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ...vars } }],
   });
   before(() => server.listen());
   beforeEach(async () => {
