@@ -10164,6 +10164,15 @@ a.profession-square:active {
   padding: 10px 12px;
 }
 
+/* The board's page: its title, the Akceptacja Bractw and the board, 16 apart
+   as the page's own parts are (.screen-body); on a computer side by side. */
+.settlement-board-view,
+.settlement-board-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .settlement-standings-summary {
   display: grid;
   gap: 2px;
@@ -12903,6 +12912,29 @@ a.profession-square:active {
    narrowest phone. */
 :root[data-layout='desktop'] .camp-board {
   max-width: min(720px, max(288px, var(--board-fit, 720px)));
+}
+
+/* The Osada's board the same way (screens/settlement.js), with its title and
+   the Akceptacja Bractw beside it, so that it starts at the page's top (a
+   player: "wyświetlanie osady jakbyś mógł zrobić bez scrollowania na pc"). */
+:root[data-layout='desktop'] .settlement-board-view {
+  display: grid;
+  grid-template-columns: min(720px, max(288px, var(--board-fit, 720px))) minmax(0, 1fr);
+  column-gap: 20px;
+  align-items: start;
+}
+
+:root[data-layout='desktop'] .settlement-board-view > .settlement-map {
+  grid-column: 1;
+  grid-row: 1;
+  max-width: none;
+  margin: 0;
+}
+
+:root[data-layout='desktop'] .settlement-board-side {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
 }
 
 /* On a computer the camp's resources stand in the top bar (505 A), so the

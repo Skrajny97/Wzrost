@@ -3048,6 +3048,25 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## „Co nowego?” w grze: odpowiedź autora 594 (4.11.2026)
+
+Gracz zaproponował na czacie zakładkę „co nowego” w grze, bo nie chce szukać nowości na Facebooku. Autor: „tylko to co tam wyląduje muszę zatwierdzać.. nie wiem gdzie to "Co nowego?" zmieścić w sumie”, a po makietach: „594 A + C bez kropki (zachowanie dostępu do changelogów)”.
+
+1. **Okienko (A).** Po wejściu do gry okienko „Co nowego?” pokazuje raz każdy nowy wpis, którego gracz jeszcze nie widział.
+2. **Ikona (C).** Ikona zwoju w górnym pasku, obok Ustawień, otwiera listę wszystkich wpisów, także dawnych. Ikona nie ma kropki.
+3. **Tylko wpisy zatwierdzone przez autora.** Sposób zatwierdzania czeka na odpowiedź 595.
+
+## Osada na komputerze bez przewijania (4.11.2026, w grze od 0.1.40)
+
+Gracz napisał na czacie, a autor przekazał: „Jeszcze wyświetlanie osady jakbyś mógł zrobić bez scrollowania na pc, obóz już pokazuje ładnie”.
+
+1. **Plansza mieści się na ekranie.** Na komputerze plansza Osady zmniejsza się równo do wysokości ekranu, tak jak plansza obozu (506 A). Nie robi się jednak węższa niż na najwęższym telefonie.
+2. **Tytuł obok (brakujący szczegół).** Na komputerze tytuł Osady z opisem i pasek „Akceptacja Bractw” stoją po prawej stronie planszy, a nie nad nią. Inaczej na ekranie 1366 × 768 plansza zaczynałaby się zbyt nisko, żeby zmieścić się w całości. Na telefonie wszystko zostaje jak dotąd.
+
+## Wersja 0.1.40 (4.11.2026)
+
+1. **Osada na komputerze bez przewijania** (zob. wyżej).
+
 ## Plansza Warowni: kamienne mury i dwa nowe pasy (4.11.2026, szkic)
 
 Brakujący szczegół z odpowiedzi 419: „Po przemianie plansza Obozu staje się Warownią: kamienne mury zamiast palisady”.

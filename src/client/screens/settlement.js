@@ -14,6 +14,7 @@ import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatCountdown, formatDecimal, formatHours, formatMinutes, formatNumber, saleGold, tradePace } from '../format.js';
 import { leaveView, openView } from '../history.js';
+import { desktopLayout, onLayoutChange } from '../layout-mode.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
@@ -49,6 +50,12 @@ const SETTLEMENT = '#/osada';
 const HISTORY_KEY = 'osada'; // a place's screen lies one view below the board
 // The board's ground, in its pixels: a place's picture keeps its own size on it.
 const BOARD_WIDTH = 384;
+// Its shape, as styles.css draws it (.settlement-map, aspect-ratio 384 / 768).
+const MAP_SIZE = { width: BOARD_WIDTH, height: 768 };
+// On a computer: the room left beside the board for its title and the
+// Akceptacja Bractw, and the gap between (styles.css, .settlement-board-view).
+const SIDE_MIN = 220;
+const SIDE_GAP = 20;
 
 export function mountSettlement(container, { params = {} } = {}) {
   const placeId = params.place ?? null;
@@ -254,6 +261,7 @@ export function mountSettlement(container, { params = {} } = {}) {
           } catch {
             // Kept while the page is open.
           }
+          fitMap();
         },
       },
       h(
@@ -1168,18 +1176,47 @@ export function mountSettlement(container, { params = {} } = {}) {
     const part = dayPart();
     fill(
       container,
-      pageHeading(`Osada: ${data.name}`, data.description),
-      standingsPanel(),
       h(
         'div',
-        // The camp's light of the hour in Poland (scenes.js), as on its board.
-        { class: `settlement-map settlement-map--${part}`, role: 'group', 'aria-label': 'Plansza Osady' },
-        ground && h('img', { class: 'settlement-map-ground', src: ground, alt: '', decoding: 'async', draggable: 'false' }),
-        (data.torches ?? []).map((torch, index) => torchLight(torch, index, part !== 'day')),
-        data.places.map(placeLink),
+        { class: 'settlement-board-view' },
+        // On a computer the title and the Akceptacja Bractw stand beside the
+        // board (styles.css), on a phone above it.
+        h('div', { class: 'settlement-board-side' }, pageHeading(`Osada: ${data.name}`, data.description), standingsPanel()),
+        h(
+          'div',
+          // The camp's light of the hour in Poland (scenes.js), as on its board.
+          { class: `settlement-map settlement-map--${part}`, role: 'group', 'aria-label': 'Plansza Osady' },
+          ground && h('img', { class: 'settlement-map-ground', src: ground, alt: '', decoding: 'async', draggable: 'false' }),
+          (data.torches ?? []).map((torch, index) => torchLight(torch, index, part !== 'day')),
+          data.places.map(placeLink),
+        ),
       ),
     );
+    fitMap();
   }
+
+  // On a computer the board fits the screen's height, shrunk evenly, as the
+  // camp's does (screens/camp.js; a player: "wyświetlanie osady jakbyś mógł
+  // zrobić bez scrollowania na pc, obóz już pokazuje ładnie"): with the title
+  // and the Akceptacja Bractw beside it, as wide as its shape allows in the
+  // room from its top down to the screen's bottom, past its own margin and
+  // the page's, and leaving them SIDE_MIN beside it. styles.css keeps it
+  // between the narrowest phone's board and its usual width.
+  function fitMap() {
+    const view = container.querySelector('.settlement-board-view');
+    const map = view?.querySelector('.settlement-map');
+    if (!map || !desktopLayout()) return;
+    const page = container.closest('.screen--game');
+    const below = (page ? parseFloat(getComputedStyle(page).paddingBottom) || 0 : 0) + (parseFloat(getComputedStyle(map).marginBottom) || 0);
+    const room = window.innerHeight - (map.getBoundingClientRect().top + window.scrollY) - below;
+    const { width, height } = MAP_SIZE;
+    const beside = view.clientWidth - SIDE_GAP - SIDE_MIN;
+    view.style.setProperty('--board-fit', `${Math.floor(Math.min((room * width) / height, beside))}px`);
+  }
+  window.addEventListener('resize', fitMap);
+  const stopLayout = onLayoutChange(fitMap);
+  // The page's letters, loaded after the first look, may move the board.
+  document.fonts?.ready.then(() => !gone && fitMap());
 
   // A place's screen: its resident and what they do, the Tablica's orders
   // and the brotherhoods; a place of a later part says so.
@@ -1234,6 +1271,8 @@ export function mountSettlement(container, { params = {} } = {}) {
     unmount() {
       gone = true;
       clearTimeout(timer);
+      window.removeEventListener('resize', fitMap);
+      stopLayout();
       market?.unmount();
       casino?.unmount();
     },
