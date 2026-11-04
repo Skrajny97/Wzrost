@@ -1929,14 +1929,14 @@ describe('Stół rozbiórki', () => {
     assert.ok(report.entries.some((entry) => /skrzyni|skrzynk|kuferek/.test(entry.text)));
   });
 
-  test('the scrapper buys materials, 2 gold a piece times the rarity\'s factor, more with the Skup złomu', async () => {
+  test('the scrapper buys materials, 10 gold a piece times the rarity\'s factor (584 B), more with the Skup złomu', async () => {
     await stockMaterials({ 'wolf-pelt:common': 5, 'wolf-pelt:rare': 2 });
     await (await db()).prepare('UPDATE characters SET gold = 0').run();
     const sell = (body) => call('POST', '/api/materials/sell', { cookie, body });
     const stacks = (view) => view.crafting.materials.map((material) => [material.key, material.count, material.price]);
     assert.deepEqual(stacks(await character()), [
-      ['wolf-pelt:common', 5, 2],
-      ['wolf-pelt:rare', 2, 4],
+      ['wolf-pelt:common', 5, 10],
+      ['wolf-pelt:rare', 2, 20],
     ]);
     assert.equal((await sell({ key: 'wolf-pelt:rare', count: 3 })).data.error.code, 'invalid_count');
     assert.equal((await sell({ key: 'wolf-pelt:rare', count: 0 })).data.error.code, 'invalid_count');
@@ -1944,20 +1944,20 @@ describe('Stół rozbiórki', () => {
     assert.equal((await sell({ key: 'constructor:common', count: 1 })).data.error.code, 'no_materials');
     const sold = await sell({ key: 'wolf-pelt:common', count: 3 });
     assert.equal(sold.status, 200);
-    assert.deepEqual(sold.data.sold, { count: 3, gold: 6 });
-    assert.equal(sold.data.character.gold, 6);
+    assert.deepEqual(sold.data.sold, { count: 3, gold: 30 });
+    assert.equal(sold.data.character.gold, 30);
     // The Skup złomu at level 5 pays half as much again.
     await (await db())
       .prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'scrap-bench', 5, 0, 1 FROM characters")
       .run();
     assert.deepEqual(stacks(await character()), [
-      ['wolf-pelt:common', 2, 3],
-      ['wolf-pelt:rare', 2, 6],
+      ['wolf-pelt:common', 2, 15],
+      ['wolf-pelt:rare', 2, 30],
     ]);
     const more = await sell({ key: 'wolf-pelt:rare', count: 2 });
-    assert.deepEqual(more.data.sold, { count: 2, gold: 12 });
-    assert.equal(more.data.character.gold, 18);
-    assert.deepEqual(stacks(more.data.character), [['wolf-pelt:common', 2, 3]]);
+    assert.deepEqual(more.data.sold, { count: 2, gold: 60 });
+    assert.equal(more.data.character.gold, 90);
+    assert.deepEqual(stacks(more.data.character), [['wolf-pelt:common', 2, 15]]);
   });
 
   test('without the table nothing is made; with it, materials become parts in time, for free', async () => {

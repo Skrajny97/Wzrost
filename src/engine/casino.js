@@ -136,13 +136,19 @@ export function stakeItemRarity(level, sellBonus, stake, content) {
 
 // A material prize: pieces of `material` at the grade drawn (never below
 // its species' own rarity), the fewest worth more than the stake to the
-// character; null when they would be worth more than the prize cap.
+// character. When even one piece would be worth more than the prize cap
+// (materials five times dearer since 0.1.33, the author's 584 B), the
+// highest grade below it that fits, down to the species' own rarity; null
+// when none does.
 function materialPrize(material, gradeId, bonuses, stake, content) {
-  const rarityId = rarityIndex(material.rarity, content) > rarityIndex(gradeId, content) ? material.rarity : gradeId;
-  const key = stackKey(material.id, rarityId);
-  const piece = prizeWorth({ kind: 'material', key, count: 1 }, bonuses, content);
-  const count = Math.floor(stake / piece) + 1;
-  return count * piece <= prizeCap(stake, content) ? { kind: 'material', key, count } : null;
+  const own = rarityIndex(material.rarity, content);
+  for (let index = Math.max(own, rarityIndex(gradeId, content)); index >= own; index -= 1) {
+    const key = stackKey(material.id, content.rarities[index].id);
+    const piece = prizeWorth({ kind: 'material', key, count: 1 }, bonuses, content);
+    const count = Math.floor(stake / piece) + 1;
+    if (count * piece <= prizeCap(stake, content)) return { kind: 'material', key, count };
+  }
+  return null;
 }
 
 // The pool of a stake (526 A: "każda postać ma własną pulę 5 nagród na
@@ -170,7 +176,10 @@ export function wheelPrizes(basis, seed, stake, day, content) {
       const fresh = materials.filter((material) => !used.has(material.id));
       const material = rng.pick(fresh.length > 0 ? fresh : materials);
       used.add(material.id);
-      const prize = materialPrize(material, rng.weighted(grades).id, bonuses, stake, content);
+      // The material drawn, or when no grade of it fits the stake, the next
+      // of the lands' that does, in the data's order.
+      const grade = rng.weighted(grades).id;
+      const prize = [material, ...materials.filter((one) => one !== material)].reduce((found, one) => found ?? materialPrize(one, grade, bonuses, stake, content), null);
       if (prize) prizes.push(prize);
     }
   }

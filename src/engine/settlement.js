@@ -165,6 +165,14 @@ export function orderCeiling({ kind, key }, level, weekly, content) {
   return Math.max(1, Math.round(most * goodShare({ kind, key }, content)));
 }
 
+// The rules of material and resource orders: 2 since 0.1.33 (the author's
+// 584 B and C: materials five times dearer everywhere, resources asked for
+// three times as many for the same gold). An order of theirs drawn by older
+// rules, or by none (the material orders of 0.1.32 carried `scarce`), is
+// drawn anew.
+const ORDER_RULES = 2;
+const REDRAWN = ['material', 'resource'];
+
 // An order drawn from `seed`: a brotherhood, each as likely as another, so
 // each one's reputation grows at the same pace; one of its kinds of goods;
 // a good of that kind; the count for the character's level and the good's
@@ -215,9 +223,9 @@ export function drawOrder({ character, reputation = {}, seed, weekly = false }, 
     gold,
     reputation: (weekly ? orders.weekly.reputation : orders.reputation * (special ? orders.special.reputation : 1)) * (quality ? orders.quality.reputation : 1),
     story: rng.pick(orderStories(kind, good.key, content)),
-    // A few pieces, each paid alike (0.1.32): an older material order is
-    // drawn anew.
-    ...(kind === 'material' && { scarce: true }),
+    // The rules an order of materials or resources was drawn by, so one
+    // drawn before is drawn anew (ORDER_RULES).
+    ...(REDRAWN.includes(kind) && { rules: ORDER_RULES }),
     ...(weekly && { weekly: true }),
     ...(special && { special: true }),
   };
@@ -283,7 +291,7 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
 // drawn anew, the week's too (the author: "Zlecenia aktualne jeśli są z
 // tych dziwacznych - przelosuj każdemu").
 const outdated = (order, character, content) =>
-  (order.kind === 'material' && (!isAnyMaterial(order) || !order.scarce)) || order.count > orderCeiling(order, character.level, order.weekly === true, content);
+  (order.kind === 'material' && !isAnyMaterial(order)) || (REDRAWN.includes(order.kind) && (order.rules ?? 0) < ORDER_RULES) || order.count > orderCeiling(order, character.level, order.weekly === true, content);
 
 // An order hung before its sentence was rewritten takes the new sentence
 // closest to the old one (the most words alike from the start), so the

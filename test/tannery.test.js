@@ -165,7 +165,8 @@ describe('the Garbarnia through the API', () => {
   });
 
   test('he sells materials for gold straight to the materials, and the trade raises the relation as selling does', async () => {
-    await (await db()).prepare('UPDATE characters SET gold = 1000, materials = ?').bind('{}').run();
+    // Twenty commons at a stranger's price (67 zł each since 0.1.33, 584 B).
+    await (await db()).prepare('UPDATE characters SET gold = 10000, materials = ?').bind('{}').run();
     const { shop } = (await call('GET', '/api/settlement', { cookie })).data.settlement.tannery;
     assert.deepEqual(
       shop.goods.map((good) => good.key),
@@ -181,7 +182,7 @@ describe('the Garbarnia through the API', () => {
     assert.equal(bought.status, 200);
     assert.deepEqual(bought.data.bought, { name: 'Skóra wilka', count: 20, gold: good.price * 20, points: bought.data.bought.points });
     assert.ok(bought.data.bought.points > 0);
-    assert.equal(bought.data.character.gold, 1000 - good.price * 20);
+    assert.equal(bought.data.character.gold, 10000 - good.price * 20);
     const row = await (await db()).prepare('SELECT materials, foreign_stacks FROM characters').first();
     assert.equal(JSON.parse(row.materials)[hide], 20);
     // Bought, not found: the Encyklopedia leaves it out.

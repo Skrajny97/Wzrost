@@ -268,6 +268,16 @@ describe('the Osada in the engine', () => {
     }
   });
 
+  test('a unit of a resource pays far less than a piece of a material, as the camp makes so many (584 B and C)', () => {
+    const { pay, resourceGold, counts } = content.settlement.orders;
+    const unit = resourceGold * pay.resource;
+    const common = goodPrice({ kind: 'material', key: 'any:common' }, content) * pay.material;
+    assert.ok(common >= 30 * unit, `${common} against ${unit}`);
+    // Three times as many pieces as up to 0.1.32, for the same gold.
+    assert.deepEqual([counts.resource.min, counts.resource.max, counts.resource.perTenLevels], [30, 90, 15]);
+    assert.ok(Math.abs(unit * 3 - 3.2) < 0.01, `${unit}`);
+  });
+
   test('slow herbs, long potions and rare parts come in fewer pieces, and an order above today\'s ceiling is drawn anew', () => {
     const comfrey = { kind: 'herb', key: 'comfrey' };
     const fern = { kind: 'herb', key: 'fern-blossom' };
@@ -285,11 +295,15 @@ describe('the Osada in the engine', () => {
     const hung = (order) => settleBoard({ ...board, slots: [{ order }, ...board.slots.slice(1)] }, { character, seed: 'big' }, NOW, content).slots[0].order;
     assert.notEqual(hung(big).id, 77);
     assert.equal(hung({ ...big, count: orderCeiling(big, character.level, false, content) }).id, 77);
-    // A material order from before 0.1.32 is drawn anew, a few pieces paid
-    // alike; one drawn since stays.
+    // A material or resource order drawn by older rules (0.1.32's material
+    // ones carried `scarce`) is drawn anew; one drawn since stays.
     const materials = { ...big, kind: 'material', key: 'any:common', brotherhood: 'hunters', count: 2, story: content.settlement.orders.stories.material[0] };
     assert.notEqual(hung(materials).id, 77);
-    assert.equal(hung({ ...materials, scarce: true }).id, 77);
+    assert.notEqual(hung({ ...materials, scarce: true }).id, 77);
+    assert.equal(hung({ ...materials, rules: 2 }).id, 77);
+    const stone = { ...big, kind: 'resource', key: 'stone', brotherhood: 'smiths', count: 30, story: content.settlement.orders.stories.resource[0] };
+    assert.notEqual(hung(stone).id, 77);
+    assert.equal(hung({ ...stone, rules: 2 }).id, 77);
   });
 
   test('any materials of a rarity count from every stack of it, the biggest go first and the elements\' last', () => {

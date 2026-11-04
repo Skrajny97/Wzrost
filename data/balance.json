@@ -144,7 +144,7 @@
     "salvageBase": 2,
     "salvageLevelStep": 10,
     "queueLimit": 10,
-    "sellGold": 2
+    "sellGold": 10
   },
   "timePoints": {
     "start": 60,

@@ -229,8 +229,13 @@ describe('the Salon Gier in the engine', () => {
               } else {
                 const { materialId, rarityId } = parseStack(prize.key);
                 assert.ok(lands.has(materialId), materialId);
-                assert.ok(Object.keys(casino.wheel.materialRarities).includes(rarityId) || rarityId === content.materialsById[materialId].rarity, prize.key);
-                assert.ok(rarityAt(rarityId) >= rarityAt('epic'), prize.key);
+                // A grade of materialRarities or the species' own, or one
+                // between that fits a low stake (0.1.33: materials five
+                // times dearer).
+                const index = (id) => content.rarities.findIndex((one) => one.id === id);
+                const own = index(content.materialsById[materialId].rarity);
+                const top = Math.max(...Object.keys(casino.wheel.materialRarities).map(index));
+                assert.ok(index(rarityId) >= own && index(rarityId) <= Math.max(own, top), prize.key);
                 assert.ok(rarityAt(rarityId) >= rarityAt(content.materialsById[materialId].rarity), prize.key);
                 assert.ok(Number.isInteger(prize.count) && prize.count >= 1);
               }
@@ -288,12 +293,13 @@ describe('the Salon Gier in the engine', () => {
         assert.ok(piece * prize.count > stake);
       }
     }
-    // An epic piece is worth 16 zł at the scrapper, 17,6 zł at the Garbarnia
-    // to a stranger: six pieces at 100 zł, eighteen at 300 zł; with the Skup
-    // złomu at its top and the best relation, three and eight.
+    // An epic piece is worth 80 zł at the scrapper (584 B: five times the 16
+    // zł of 0.1.32), 88 zł at the Garbarnia to a stranger: two pieces at 100
+    // zł, four at 300 zł; with the Skup złomu at its top and the best
+    // relation (208 zł a piece), one and two.
     const pieces = (stake, bonuses) => Math.floor(stake / prizeWorth({ kind: 'material', key: 'wolf-pelt:epic', count: 1 }, bonuses, content)) + 1;
-    assert.deepEqual([pieces(100, { tanneryPremium: 0.1 }), pieces(300, { tanneryPremium: 0.1 })], [6, 18]);
-    assert.deepEqual([pieces(100, { sellBonus: 1, tanneryPremium: 0.3 }), pieces(300, { sellBonus: 1, tanneryPremium: 0.3 })], [3, 8]);
+    assert.deepEqual([pieces(100, { tanneryPremium: 0.1 }), pieces(300, { tanneryPremium: 0.1 })], [2, 4]);
+    assert.deepEqual([pieces(100, { sellBonus: 1, tanneryPremium: 0.3 }), pieces(300, { sellBonus: 1, tanneryPremium: 0.3 })], [1, 2]);
   });
 });
 

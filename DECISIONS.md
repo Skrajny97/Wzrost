@@ -3048,6 +3048,36 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Odpowiedzi autora 584 i 585 (4.11.2026)
+
+Autor: „585.1 B / 585.2 C / 585.3 A / 585.4 B / 585.5 B / 585.6 D / 585.7 D / 585.8 B / 585.9 B / 585.10 C / 585.11 D / 585.12 B / 585.13 C / 584 B i C”.
+
+1. **584 B i C:** materiały pięć razy droższe w całej grze, a zlecenia zasobów proszą o trzy razy więcej za to samo złoto (zob. „Materiały pięć razy droższe, zlecenia zasobów trzy razy większe”).
+2. **Dalsze wyglądy Warowni (585).** Wybrane szkice z `art/drafts/fortress` na gałęzi `art-drafts`, z przebiegu `20261104T0946` (litery A–D to pliki -0 do -3):
+    - Plac treningowy: wygląd 2 `training-yard-2-…-1042658456-1` (B), wygląd 3 `training-yard-3-…-755729800-2` (C);
+    - Zbrojownia: wygląd 2 `armory-2-…-45625087-0` (A);
+    - Sala trofeów: wygląd 2 `trophy-hall-2-…-1083184479-1` (B), wygląd 3 `trophy-hall-3-…-1023116953-1` (B);
+    - Strażnica: wygląd 2 `watchtower-2-…-1651609742-3` (D), wygląd 3 `watchtower-3-…-1809397881-3` (D);
+    - Ołtarz Systemu: wygląd 2 `system-altar-2-…-1155639754-1` (B), wygląd 3 `system-altar-3-…-1279884235-1` (B);
+    - Szklarnia: wygląd 2 `greenhouse-2-…-1337063550-2` (C), wygląd 3 `greenhouse-3-…-256381677-3` (D);
+    - Kapliczka: wygląd 2 `shrine-2-…-1473881118-1` (B), wygląd 3 `shrine-3-…-349571073-2` (C).
+3. **Grunt pod budynkami (brakujący szczegół).** Tam, gdzie szkic stoi na płacie ziemi z brzegiem albo ze ścieżką (Kapliczka 585.13 C, place Placu treningowego), brzeg jest ścięty jak przy 578.1 C, żeby budynek stał wprost na ziemi planszy.
+
+## Materiały pięć razy droższe, zlecenia zasobów trzy razy większe (584 B i C, w grze od 0.1.33)
+
+Autor: „584 B i C”, po „Nie rozumiesz - zasobów sie duzo samo generuje, materiałów - wcale, jest ich deficyt, mechanizm jest MOCNO zaburzony”.
+
+1. **Cena materiału.** Złomiarz płaci za materiał pospolity 10 złota zamiast 2 (`crafting.sellGold`), rzadki 20, unikalny 40, epicki 80, legendarny 160, ze Skupem złomu do dwóch razy tyle. Od tej ceny liczy się wszystko inne, więc wszędzie jest pięć razy drożej:
+    - Wszebor skupuje pospolity za 11–26 złota (po stopniu relacji i Skupie złomu), a sprzedaje za 67 złota obcemu i 61 przyjacielowi, rzadki za 134–121, unikalny za 254–241, a epicki za 481;
+    - Gościwit sprzedaje rzadki za 108–138 złota, unikalny za 216–276, a epicki za 432–552, mniej upust relacji;
+    - zlecenie Osady płaci za sztukę 40 złota (pospolity), 80, 160 albo 320 (epicki), dalej mniej, niż sprzedaje Wszebor i Gościwit, a więcej, niż Wszebor skupuje;
+    - na Targowisku aukcja materiałów zaczyna się od pięć razy wyższej ceny wywoławczej;
+    - w Salonie Gier nagroda z materiałów to mniej sztuk, bo każda jest warta więcej.
+2. **Koło Fortuny (brakujący szczegół).** Przy najniższych stawkach jedna epicka sztuka bywa teraz warta więcej, niż nagroda może być warta (dwie stawki). Wtedy nagroda to ten sam materiał w najwyższej rzadkości, która się mieści, ale nie niżej niż rzadkość gatunku. Gdy nie mieści się żadna, wchodzi następny materiał z krain postaci. Pula ma dalej pięć nagród.
+3. **Zlecenia zasobów.** Proszą o trzy razy więcej sztuk (`counts.resource`: 30–90 i 15 więcej na każde 10 poziomów, było 10–30 i 5) za to samo złoto (`pay.resource`: 0,2667 zamiast 0,8, czyli ok. 1,07 złota za sztukę zamiast 3,2). Na 30. poziomie to 75–135 sztuk za 80–144 złota. Pospolity materiał płaci w zleceniu ok. 37 razy więcej niż sztuka zasobu.
+4. **Stare zlecenia.** Zlecenia materiałów i zasobów, które już wiszą na tablicach, losują się od nowa przy następnym otwarciu Osady (`rules` w zleceniu). Zlecenie tygodnia też, chyba że jest już oddane.
+5. Zioła, mikstury, części, przedmioty Warsztatu, Kowadło, Zaklinaczka i Kowal kosztują tyle co dotąd, bo nie liczą się od ceny materiału.
+
 ## Zlecenia Osady: kilka materiałów, każda sztuka płatna tak samo (4.11.2026, w grze od 0.1.32)
 
 Autor: „Bez sensu ze zlecenia w osadzie czasem chca tylko 30 kamienia, a jednoczesnie 8 czy 17 różnych materialow z niskim wynagrodzeniem, gdzie materialy są o wiele bardziej rzadkie”, „Nie rozumiesz - zasobów sie duzo samo generuje, materiałów - wcale, jest ich deficyt, mechanizm jest MOCNO zaburzony” oraz „a jednocześnie istnieje Garbarnia więc trzeba z tym uważać”.
@@ -3060,6 +3090,10 @@ Autor: „Bez sensu ze zlecenia w osadzie czasem chca tylko 30 kamienia, a jedno
 6. **Stare zlecenia.** Zlecenia materiałów, które już wiszą na tablicach, losują się od nowa przy następnym otwarciu Osady, z nowymi liczbami i zapłatą (`scarce` w zleceniu). Zlecenie tygodnia też, chyba że jest już oddane.
 7. Zlecenia zasobów, ziół, mikstur, części i Warsztatu się nie zmieniają, tak samo relacja z sołtysem i Punkty Systemu za co trzecie zlecenie.
 8. **Pytanie 584.** Na 30. poziomie zlecenie na 35 sztuk kamienia daje dalej 112 złota, a na 1 materiał epicki 64. Więcej za materiały zlecenia nie zapłacą, dopóki Garbarnia i Gościwit sprzedają je tak tanio. Pytanie do autora, czy materiały mają zdrożeć wszędzie albo czy zlecenia zasobów mają prosić o więcej.
+
+## Wersja 0.1.33 (4.11.2026)
+
+1. **Materiały pięć razy droższe, zlecenia zasobów trzy razy większe** (584 B i C, zob. wyżej).
 
 ## Wersja 0.1.32 (4.11.2026)
 
