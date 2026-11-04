@@ -154,11 +154,11 @@
         "quality": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["from", "chance", "reward"],
+          "required": ["from", "chance", "reputation"],
           "properties": {
             "from": { "$ref": "#/definitions/id" },
             "chance": { "type": "number", "minimum": 0, "maximum": 1 },
-            "reward": { "type": "number", "minimum": 1 }
+            "reputation": { "type": "number", "minimum": 1 }
           }
         },
         "special": {

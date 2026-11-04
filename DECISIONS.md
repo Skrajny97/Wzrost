@@ -3048,6 +3048,23 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Zlecenia Osady: kilka materiałów, każda sztuka płatna tak samo (4.11.2026, w grze od 0.1.32)
+
+Autor: „Bez sensu ze zlecenia w osadzie czasem chca tylko 30 kamienia, a jednoczesnie 8 czy 17 różnych materialow z niskim wynagrodzeniem, gdzie materialy są o wiele bardziej rzadkie”, „Nie rozumiesz - zasobów sie duzo samo generuje, materiałów - wcale, jest ich deficyt, mechanizm jest MOCNO zaburzony” oraz „a jednocześnie istnieje Garbarnia więc trzeba z tym uważać”.
+
+1. **Pomiar.** Realistyczny gracz z towarzyszami znajduje w godzinę wypraw w najnowszym miejscu swojego poziomu ok. 1–2 materiałów, wszystkich rzadkości razem. Zasobów obóz daje w tym czasie ok. 80 na 12. poziomie i ponad 800 na 130. Zlecenie płaciło za materiał 1,6 ceny złomiarza, czyli za pospolity 3,2 złota, tyle co za sztukę zasobu (0,8 razy 4 złota). Na 30. poziomie 25–45 sztuk kamienia, zebranych w kilkanaście minut, dawało 80–144 złota, a 3–5 materiałów rzadkich, na które trzeba wielu godzin, tylko 19–32 złota.
+2. **Mniej sztuk.** Zlecenie materiałów prosi na każdym poziomie o 1–3 materiały pospolite, 1–2 rzadkie albo 1 unikalny lub epicki (`counts.material`: 1–3, bez wzrostu z poziomem, bo materiałów na godzinę z poziomem nie przybywa). Zlecenie tygodnia prosi o cztery razy tyle, np. 4–12 pospolitych.
+3. **Zapłata za sztukę.** Sztuka materiału kosztuje 4 ceny złomiarza (`pay.material`: 4, było 1,6): pospolity 8 złota, rzadki 16, unikalny 32, epicki 64. To 2,5 raza więcej, niż dotąd płaciło zwykłe zlecenie, a tyle, ile płaciło najlepsze, tygodnia i jakościowe. Zlecenie na 2 materiały pospolite daje 16 złota, a na 1 epicki 64.
+4. **Garbarnia.** Wszebor i Gościwit sprzedają materiał drożej, niż ktokolwiek w grze za niego płaci (`buyCeiling`). Dlatego sztuka płaci tyle samo w każdym zleceniu: gdyby zlecenie tygodnia albo jakościowe płaciło za nią więcej niż zwykłe, ich ceny musiałyby pójść w górę. Zostają więc jak dotąd: u Wszebora pospolity 13–14 złota, rzadki 25–27, unikalny 49–51, a epicki 97, u Gościwita rzadki co najmniej 20 złota, unikalny 40, a epicki 79. Materiał kupiony u nich zawsze kosztuje więcej, niż zlecenie za niego płaci. Zlecenie płaci za to więcej, niż Wszebor daje za materiał na swoim najlepszym stopniu, ze Skupem złomu na 10. poziomie (pospolity 5,2 złota). Sprawdza to test.
+5. **Zlecenie tygodnia i jakościowe.** Zlecenie tygodnia na materiały płaci cztery razy tyle co zwykłe, bo prosi o cztery razy więcej sztuk. Inne zlecenia tygodnia płacą jak dotąd pięć razy tyle. Daje dalej 50 punktów reputacji i 5 Punktów Systemu. Zlecenie jakościowe prosi, jak dotąd, o materiał rzadkości o jedną wyżej i o połowę mniej sztuk. Zamiast dwa razy więcej złota za sztukę daje dwa razy więcej reputacji (`quality.reputation`: 2), w zleceniu tygodnia 100 punktów zamiast 50.
+6. **Stare zlecenia.** Zlecenia materiałów, które już wiszą na tablicach, losują się od nowa przy następnym otwarciu Osady, z nowymi liczbami i zapłatą (`scarce` w zleceniu). Zlecenie tygodnia też, chyba że jest już oddane.
+7. Zlecenia zasobów, ziół, mikstur, części i Warsztatu się nie zmieniają, tak samo relacja z sołtysem i Punkty Systemu za co trzecie zlecenie.
+8. **Pytanie 584.** Na 30. poziomie zlecenie na 35 sztuk kamienia daje dalej 112 złota, a na 1 materiał epicki 64. Więcej za materiały zlecenia nie zapłacą, dopóki Garbarnia i Gościwit sprzedają je tak tanio. Pytanie do autora, czy materiały mają zdrożeć wszędzie albo czy zlecenia zasobów mają prosić o więcej.
+
+## Wersja 0.1.32 (4.11.2026)
+
+1. **Zlecenia Osady: kilka materiałów, każda sztuka płatna tak samo** (zob. wyżej).
+
 ## Odpowiedzi autora 579 i 581 (4.11.2026)
 
 Autor: „579 A” i „581 B”.

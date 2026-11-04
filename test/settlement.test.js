@@ -7,6 +7,7 @@ import { beforeEach, describe, test } from 'node:test';
 
 import {
   addQuestProgress,
+  buyCeiling,
   createRng,
   deliverBlock,
   drawRumor,
@@ -48,6 +49,7 @@ import {
   shopBuilding,
   standingOf,
   statResetCost,
+  tanneryStock,
 } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -214,9 +216,56 @@ describe('the Osada in the engine', () => {
       assert.ok(order.count >= 1 && order.count <= Math.max(1, Math.round(most * step)), `${order.key} ${order.count}`);
       seen[rarityId] = true;
     }
-    // The author's example: up to 32 common ones a week at level 28.
-    assert.equal((counts.material.max + counts.material.perTenLevels * 2) * weekly.count, 32);
+    // Up to 12 common ones a week at level 28, 3 in an order of a day: the
+    // author found 8 or 17 too many, as materials are much rarer than the
+    // camp's resources (4.11.2026).
+    assert.equal((counts.material.max + counts.material.perTenLevels * 2) * weekly.count, 12);
     assert.deepEqual(Object.keys(seen).sort(), Object.keys(anyMaterial).sort());
+  });
+
+  test('a material order asks for a few pieces at any level, each paid alike in every order, above the tanner and below the Garbarnia and Gościwit (4.11.2026)', () => {
+    const { pay, quality, reputation, weekly } = content.settlement.orders;
+    const { tannery, market, relationDiscount, standings } = content.settlement;
+    const all = Object.values(content.monstersById).filter((monster) => !monster.elite && !monster.champion).map((monster) => monster.id);
+    // The author: "a jednocześnie istnieje Garbarnia więc trzeba z tym
+    // uważać". The cheapest a piece of a rarity is sold for: by the tanner at
+    // his last standing, and by Gościwit on his cheapest day at his.
+    const sold = {};
+    for (const good of tanneryStock(standings.at(-1).points, content).goods) {
+      const rarityId = good.key.split(':')[1];
+      sold[rarityId] = Math.min(sold[rarityId] ?? Infinity, good.price);
+    }
+    for (const rarityId of market.merchant.materialRarities) {
+      const key = `${content.materials.find((material) => material.rarity === rarityId).id}:${rarityId}`;
+      const day = Math.ceil(buyCeiling({ kind: 'material', key }, content) * market.merchant.margin * market.merchant.swing[0]);
+      sold[rarityId] = Math.min(sold[rarityId] ?? Infinity, Math.ceil(day * (1 - Math.max(...relationDiscount))));
+    }
+    // What the tanner pays at his best, with the Skup złomu at its top.
+    const topBonus = content.buildings.filter((building) => building.effect.kind === 'sellPrice').reduce((sum, building) => sum + building.effect.perLevel * building.maxLevel, 0);
+    const hunters = standings.find((standing) => standing.id === quality.from).points;
+    for (const level of [20, 60, 100]) {
+      const at = { ...character, level, met: all };
+      const seen = { material: 0, quality: 0 };
+      for (let i = 0; i < 300; i++) {
+        for (const week of [false, true]) {
+          const order = drawOrder({ character: at, reputation: { hunters }, seed: `pay:${level}:${i}`, weekly: week }, content);
+          if (order.kind !== 'material') continue;
+          seen.material += 1;
+          assert.ok(order.count >= 1 && order.count <= 3 * (week ? weekly.count : 1), `${level} ${order.key} ${order.count}`);
+          const rarityId = order.key.slice(4);
+          const base = goodPrice(order, content);
+          assert.equal(order.gold, order.count * base * pay.material, `${level} ${order.key}`);
+          const piece = orderGold(order, topBonus, content) / order.count;
+          assert.ok(piece < sold[rarityId], `${level} ${order.key}: ${piece} ≥ ${sold[rarityId]}`);
+          assert.ok(piece > base * (1 + topBonus) * (1 + Math.max(...tannery.premium)), `${level} ${order.key}: ${piece}`);
+          // A quality order: more reputation, never more gold for a piece.
+          const plain = week ? weekly.reputation : reputation;
+          assert.ok([plain, plain * quality.reputation].includes(order.reputation), `${order.reputation}`);
+          if (order.reputation > plain) seen.quality += 1;
+        }
+      }
+      assert.ok(seen.material > 40 && seen.quality > 0, `${level}: ${JSON.stringify(seen)}`);
+    }
   });
 
   test('slow herbs, long potions and rare parts come in fewer pieces, and an order above today\'s ceiling is drawn anew', () => {
@@ -236,6 +285,11 @@ describe('the Osada in the engine', () => {
     const hung = (order) => settleBoard({ ...board, slots: [{ order }, ...board.slots.slice(1)] }, { character, seed: 'big' }, NOW, content).slots[0].order;
     assert.notEqual(hung(big).id, 77);
     assert.equal(hung({ ...big, count: orderCeiling(big, character.level, false, content) }).id, 77);
+    // A material order from before 0.1.32 is drawn anew, a few pieces paid
+    // alike; one drawn since stays.
+    const materials = { ...big, kind: 'material', key: 'any:common', brotherhood: 'hunters', count: 2, story: content.settlement.orders.stories.material[0] };
+    assert.notEqual(hung(materials).id, 77);
+    assert.equal(hung({ ...materials, scarce: true }).id, 77);
   });
 
   test('any materials of a rarity count from every stack of it, the biggest go first and the elements\' last', () => {
@@ -405,10 +459,12 @@ describe('the Osada in the engine', () => {
     const { orders } = content.settlement;
     const plainContent = { ...content, settlement: { ...content.settlement, orders: { ...orders, special: { ...orders.special, chance: 0 } } } };
     for (const order of special) {
-      assert.equal(order.reputation, orders.reputation * orders.special.reputation);
       const plain = drawOrder({ character, reputation, seed: `sp:${drawn.indexOf(order)}` }, plainContent);
       assert.equal(plain.special, undefined);
       assert.equal(order.gold, plain.gold);
+      // Twice the reputation of the same order, a quality one's too.
+      assert.equal(order.reputation, plain.reputation * orders.special.reputation);
+      assert.ok([orders.reputation, orders.reputation * orders.quality.reputation].includes(plain.reputation), `${plain.reputation}`);
     }
     // Never below the standing, never the week's.
     assert.ok(Array.from({ length: 100 }, (_, i) => drawOrder({ character, seed: `sp:${i}` }, content)).every((order) => !order.special));

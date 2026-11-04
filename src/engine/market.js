@@ -90,7 +90,8 @@ const topSellBonus = (content) =>
 // "Najwyższa cena skupu u dowolnego NPC musi być niższa od najniższej ceny
 // sprzedaży tego samego przedmiotu". The scrapper with the Skup złomu at its
 // top, Jagna at her top premium, the tanner at his for creatures' materials,
-// and the orders at their best (the week's, of a higher quality).
+// and the orders at their best (the week's; a material's piece pays the same
+// in every order, 4.11.2026).
 export function buyCeiling({ kind, key }, content) {
   const { orders, herbalist, tannery } = content.settlement;
   const skup = 1 + topSellBonus(content);
@@ -103,7 +104,7 @@ export function buyCeiling({ kind, key }, content) {
     const { materialId, rarityId } = parseStack(key);
     const base = materialPrice(rarityId, content);
     const tanner = tannery && ordinaryMaterial(materialId, content) ? base * skup * (1 + Math.max(...tannery.premium)) : 0;
-    return Math.max(base * skup, tanner, base * orders.pay.material * orders.quality.reward * weekly, base * skup * orders.overScrap);
+    return Math.max(base * skup, tanner, base * orders.pay.material, base * skup * orders.overScrap);
   }
   return orders.partGold * content.raritiesById[content.partsById[key].rarity].sell * orders.pay.part * weekly;
 }

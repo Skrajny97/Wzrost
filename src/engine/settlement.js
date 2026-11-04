@@ -184,17 +184,25 @@ export function drawOrder({ character, reputation = {}, seed, weekly = false }, 
   const tuning = orders.counts[kind];
   let count = rng.int(tuning.min, tuning.max) + tuning.perTenLevels * Math.floor(character.level / 10);
   let key = good.key;
-  let factor = 1;
+  let quality = false;
   if (kind === 'material' && reached(reputation[brotherhood.id] ?? 0, orders.quality.from, content) && rng.chance(orders.quality.chance)) {
     const better = finer(key, content);
     if (better !== key) {
       key = better;
-      factor = orders.quality.reward;
+      quality = true;
     }
   }
   if (weekly) count *= orders.weekly.count;
   count = Math.max(1, Math.round(count * goodShare({ kind, key }, content)));
-  const gold = Math.max(1, Math.round(count * goodPrice({ kind, key }, content, character.level) * orders.pay[kind] * factor * (weekly ? orders.weekly.reward / orders.weekly.count : 1)));
+  // A material pays the same for a piece in every order, the week's and a
+  // quality one too (the author, 4.11.2026: "Bez sensu ze zlecenia w osadzie
+  // czasem chca tylko 30 kamienia, a jednoczesnie 8 czy 17 różnych
+  // materialow z niskim wynagrodzeniem" and "a jednocześnie istnieje
+  // Garbarnia więc trzeba z tym uważać"): the Garbarnia and Gościwit sell
+  // above the most anyone pays (buyCeiling), so a piece paid more in one
+  // order would raise their prices. A quality order gives more reputation.
+  const rate = weekly && kind !== 'material' ? orders.weekly.reward / orders.weekly.count : 1;
+  const gold = Math.max(1, Math.round(count * goodPrice({ kind, key }, content, character.level) * orders.pay[kind] * rate));
   // From the special standing a brotherhood's order may be special
   // (question 82): more reputation and Punkty Systemu for the same goods
   // and gold, so it never pays for buying them.
@@ -205,8 +213,11 @@ export function drawOrder({ character, reputation = {}, seed, weekly = false }, 
     brotherhood: brotherhood.id,
     count,
     gold,
-    reputation: weekly ? orders.weekly.reputation : orders.reputation * (special ? orders.special.reputation : 1),
+    reputation: (weekly ? orders.weekly.reputation : orders.reputation * (special ? orders.special.reputation : 1)) * (quality ? orders.quality.reputation : 1),
     story: rng.pick(orderStories(kind, good.key, content)),
+    // A few pieces, each paid alike (0.1.32): an older material order is
+    // drawn anew.
+    ...(kind === 'material' && { scarce: true }),
     ...(weekly && { weekly: true }),
     ...(special && { special: true }),
   };
@@ -272,7 +283,7 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
 // drawn anew, the week's too (the author: "Zlecenia aktualne jeśli są z
 // tych dziwacznych - przelosuj każdemu").
 const outdated = (order, character, content) =>
-  (order.kind === 'material' && !isAnyMaterial(order)) || order.count > orderCeiling(order, character.level, order.weekly === true, content);
+  (order.kind === 'material' && (!isAnyMaterial(order) || !order.scarce)) || order.count > orderCeiling(order, character.level, order.weekly === true, content);
 
 // An order hung before its sentence was rewritten takes the new sentence
 // closest to the old one (the most words alike from the start), so the
