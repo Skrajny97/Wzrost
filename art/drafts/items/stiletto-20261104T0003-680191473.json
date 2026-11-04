@@ -1,0 +1,12 @@
+{
+  "id": "stiletto",
+  "tool": "pixellab generate-image-v2",
+  "description": "a stiletto: an extremely thin needle-like steel blade, thin as a knitting needle, a small round cross guard, a black grip wound with silver wire and a small violet gem in the pommel, diagonal, single inventory item icon",
+  "style": "src/client/art/items/star-staff.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

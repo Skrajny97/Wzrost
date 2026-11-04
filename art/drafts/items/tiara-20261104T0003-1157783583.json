@@ -1,0 +1,12 @@
+{
+  "id": "tiara",
+  "tool": "pixellab generate-image-v2",
+  "description": "a papal tiara: a tall rounded beehive-shaped white and silver crown circled by three golden crowns set with small gems, a small gold cross on top and two ribbons hanging from the back, single inventory item icon",
+  "style": "src/client/art/items/visored-helmet.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

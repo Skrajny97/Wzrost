@@ -1,0 +1,12 @@
+{
+  "id": "karabela",
+  "tool": "pixellab generate-image-v2",
+  "description": "a karabela: a polish noble sabre with a strongly curved crescent blade, no knuckle guard, a small cross guard and a pommel bent forward like an eagle's head, the gold hilt set with turquoise stones, diagonal, single inventory item icon",
+  "style": "src/client/art/items/yataghan.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}
