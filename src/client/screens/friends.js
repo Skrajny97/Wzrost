@@ -110,6 +110,8 @@ export function mountFriends(container) {
     const { waiting, claimedToday, claimsPerDay } = view.gifts;
     const left = Math.max(0, claimsPerDay - claimedToday);
     const ready = Math.min(waiting, left);
+    // The friends not given today's Upominek yet, for "Wyślij wszystkie".
+    const unsent = view.friends.filter((person) => !person.sentToday).length;
     return h(
       'section',
       { class: 'card friends-gifts', 'aria-labelledby': 'friends-gifts-title' },
@@ -125,7 +127,16 @@ export function mountFriends(container) {
       }),
       ready > 0 && button(`Odbierz upominki (${ready})`, claim, 'system', { class: 'button button--system' }),
       waiting > 0 && left === 0 && h('p', { class: 'muted', text: 'Kolejne odbierzesz od północy.' }),
+      unsent > 0 && button(`Wyślij wszystkie (${unsent})`, sendAll, 'world', { class: 'button button--world' }),
     );
+  }
+
+  // Today's Upominek to every friend not given one yet (the author: "Wyślij
+  // wszystkie w Upominkach tak jak Odbierz wszystkie").
+  async function sendAll() {
+    const answer = await call('POST', '/api/friends/gift-all');
+    show(answer);
+    toast(`Wysłano ${countOf(answer.sent, 'upominek', 'upominki', 'upominków')}.`);
   }
 
   async function claim() {

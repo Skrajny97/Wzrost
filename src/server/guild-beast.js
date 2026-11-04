@@ -302,13 +302,16 @@ export async function claimGuildBeastChest(context) {
   ]);
   const contents = [item && itemName(item, content), found.length > 0 && materialsText(materials, content)].filter(Boolean).join(', ');
   const after = await loadPlayer(db, session.userId);
+  // The item came last, so its id is the highest of the character's: the
+  // page finds it in the bag by it, for its card.
+  const itemId = item && Math.max(...after.items.map((one) => one.id));
   return json({
     chest: {
       week,
-      item: item && { name: itemName(item, content), rarity: item.rarity, color: content.raritiesById[item.rarity].color },
+      item: item && { id: itemId, name: itemName(item, content), rarity: item.rarity, color: content.raritiesById[item.rarity].color },
       materials: found.map(([key, count]) => {
         const view = materialView(key, count, content);
-        return { name: view.name, label: view.label, color: view.color, count };
+        return { key, materialId: view.materialId, name: view.name, label: view.label, color: view.color, rarityName: view.rarityName, count };
       }),
       text: filled(rules().texts.opened, { contents }),
     },

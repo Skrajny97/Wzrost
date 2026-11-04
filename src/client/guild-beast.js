@@ -3,19 +3,24 @@
 // the week with its sprite, name, level and region and its HP bar, shared
 // by the whole guild; "Atakuj" with the attacks left today, the last
 // attack's damage and the lines of its fight; the "Wkład tygodnia"; the
-// Skrzynie Bestii to open; and the rules under "Jak to działa?". The beast
+// Skrzynie Bestii to open, and what one held as icons to tap, which open
+// the item's and the materials' cards as in the bag (the author: "ikonki
+// przedmiotów do kliknięcia sprawdzenia po otworzeniu a nie same nazwy");
+// and the rules under "Jak to działa?". The beast
 // is attacked whatever the character is doing, on an exploration too. The
 // card asks for the Bestia itself and takes its words from the
 // answer (data/guilds.json, beast.texts). mountGuildBeast(container) adds
 // the card to the container and gives { unmount() }, which takes it away.
 
 import { createArena } from './arena.js';
-import { monsterSprite } from './art.js';
+import { itemSprite, monsterSprite } from './art.js';
+import { materialIcon, materialSheet, materialTitle } from './craft-table.js';
 import { checkGuildTodo } from './chat-news.js';
-import { fill, h } from './dom.js';
+import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber, plural } from './format.js';
-import { call, onCharacterChange } from './state.js';
+import { call, onCharacterChange, state } from './state.js';
 import { howItWorks, openSheet, toast, withButton } from './ui.js';
+import { itemSheet } from './screens/character.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 
@@ -33,7 +38,9 @@ const lastDay = (until) => dayFormat.format(new Date(until - 1));
 
 export function mountGuildBeast(container) {
   let view = null;
-  // The last attack's answer and the last chest's words, while the card stays.
+  // The last attack's answer and the last chest opened (its words, the item
+  // as the bag showed it then and the materials with the chest's counts),
+  // while the card stays.
   let last = null;
   let opened = null;
   let gone = false;
@@ -46,8 +53,6 @@ export function mountGuildBeast(container) {
     render();
   }
 
-  // Why the beast waits: an exploration under way, or its report to claim
-  // (the server's rule, as for the Wieże); null when the character may attack.
   async function attack() {
     const answer = await call('POST', '/api/guild/beast/attack');
     checkGuildTodo({ now: true });
@@ -71,9 +76,64 @@ export function mountGuildBeast(container) {
   async function claim(week) {
     const answer = await call('POST', '/api/guild/beast/claim', { week });
     checkGuildTodo({ now: true });
-    opened = answer.chest.text;
+    const { chest, character } = answer;
+    opened = { text: chest.text, item: chest.item && character.bag.find((one) => one.id === chest.item.id), materials: chest.materials };
     show(answer);
-    toast(answer.chest.text);
+    toast(chest.text);
+  }
+
+  // A tap on the chest's item or material: its card as the bag has it now,
+  // or the item's as worn once put on; a word when it is gone.
+  function openItem(id) {
+    const { bag, equipment } = state.character;
+    const inBag = bag.find((one) => one.id === id);
+    if (inBag) return itemSheet(inBag, { equipped: false });
+    const worn = Object.values(equipment).find((one) => one?.id === id);
+    if (worn) return itemSheet(worn, { equipped: true });
+    toast(view.texts.notInBag);
+  }
+
+  function openMaterial(key) {
+    const stack = state.character.crafting?.materials.find((one) => one.key === key);
+    if (stack) materialSheet(stack);
+    else toast(view.texts.notInBag);
+  }
+
+  // What the chest held, as the bag shows it, with the chest's counts.
+  function lootPart() {
+    const { item, materials } = opened;
+    return h(
+      'ul',
+      { class: 'bag-grid guild-beast-loot' },
+      item &&
+        h(
+          'li',
+          {},
+          h(
+            'button',
+            { type: 'button', class: 'slot slot--bag', vars: { '--rarity': item.color }, 'aria-label': `${item.name}, ${item.rarityName}`, onClick: () => openItem(item.id) },
+            itemSprite(item) ?? icon('sword', { size: 24 }),
+          ),
+        ),
+      materials.map((material) =>
+        h(
+          'li',
+          {},
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'slot slot--bag',
+              vars: { '--rarity': material.color },
+              'aria-label': `${materialTitle(material)}, ${material.rarityName}, ${formatNumber(material.count)}`,
+              onClick: () => openMaterial(material.key),
+            },
+            materialIcon(material.materialId),
+            h('span', { class: 'slot-level', text: formatNumber(material.count) }),
+          ),
+        ),
+      ),
+    );
   }
 
   const title = () => h('h2', { class: 'card-title', id: 'guild-beast-title', text: view.texts.title });
@@ -151,7 +211,8 @@ export function mountGuildBeast(container) {
       'div',
       { class: 'guild-beast-chests' },
       h('h3', { class: 'guild-beast-subtitle', text: texts.chestTitle }),
-      opened && h('p', { class: 'guild-beast-opened', text: opened }),
+      opened && h('p', { class: 'guild-beast-opened', text: opened.text }),
+      opened && lootPart(),
       chests.map((chest) =>
         h(
           'div',

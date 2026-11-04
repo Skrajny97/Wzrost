@@ -3048,6 +3048,41 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Odpowiedzi autora 577, 578 i 582 (4.11.2026)
+
+Autor: „578.1 żadna, klon nie może być w środku, chyba że go zanimujemy jakoś”, dalej 578.2–578.7: C, B, A, C, A, B; 582.1–582.22: C, B, A, A, C, A, H, A, B („bez tego fioletowego odprysku w prawym górnym rogu”), C, D, C, D, C, A, A („zmień nazwę na abstrakcyjna bo tiara inaczej wygląda”), B, D, A, C, C, D; 577: A, B, A.
+
+1. **Dźwięki Szlifierni (577).** Szlifowanie i oprawa zostają w wersjach A. Pęknięcie kamienia ma teraz wersję B: trzask, a po nim grzechot okruchów (w grze od 0.1.30, `jewel-fail-1` w `tools/build-drafts.py`).
+2. **Budynki Warowni (578).** Wybrane: Zbrojownia C, Sala trofeów B, Strażnica A, Ołtarz Systemu C, Szklarnia A, Kapliczka B. Plac treningowy dostanie nowe szkice bez świecącego klona Systemu w środku placu: klon może wrócić tylko ożywiony animacją. Warownia dalej czeka na odpowiedzi 579 (miejsce na planszy) i 581 (liczba wyglądów).
+3. **Ikony Tieru V (582).** Wybrane wersje: Karabela C, Halabarda B, Kris A, Łuk tatarski A, Berło C, Monstrancja A, Tarcza husarska H (ze skrzydłami), Kołczan łowczy A, Stilet B, Kula wróżebna C, Zawój D, Hełm husarski C, Żupan D, Zbroja husarska C, Delia A, nakrycie Kleryka A, Alba B, Rękawice rycerskie D, Buty jeździeckie A, Kolia C, Pierścień koronny C, Róg tura D.
+    - Stilet B traci fioletowy odprysk w prawym górnym rogu ikony.
+    - Kris zostaje zamiast Handżara: autor wybrał 582.3 A bez uwag do nazwy.
+    - Nakrycie Kleryka nie będzie Tiarą, bo prawdziwa tiara wygląda inaczej. Dostanie nazwę abstrakcyjną, nadaną przy wejściu Tieru V do gry.
+
+## Upominki: „Wyślij wszystkie” (4.11.2026, w grze od 0.1.30)
+
+Autor: „Powinna być funkcja Wyślij wszystkie w Upominkach tak jak Odbierz wszystkie”.
+
+1. **Przycisk „Wyślij wszystkie (N)”** stoi w karcie Upominków, pod „Odbierz upominki”, dopóki choć jeden znajomy nie dostał dziś Upominku. N mówi, ilu znajomych go jeszcze nie dostało.
+2. **Każdy Upominek osobno.** Dla każdego znajomego gra losuje Upominek na jego poziom, tak jak przy wysyłce ręcznej. Znajomi obdarowani już dziś są pomijani. Po wysyłce gra mówi np. „Wysłano 2 upominki.”, a przy każdym znajomym stoi „Wysłany”.
+3. **Nigdy dwa naraz.** Dwa stuknięcia albo wysyłka ręczna w tej samej chwili nie dają znajomemu dwóch Upominków jednego dnia: zapis odrzuca drugi (`INSERT OR IGNORE`, jak przy wysyłce ręcznej).
+4. `POST /api/friends/gift-all` (`sendAllGifts` w `src/server/community.js`), test w `test/community.test.js`.
+
+## Skrzynia Bestii: ikony łupu po otwarciu (4.11.2026, w grze od 0.1.30)
+
+Autor: „skrzynia bestii powinna pokazywać ikonki przedmiotów do kliknięcia sprawdzenja po otworzeniu a nie same nazwy”.
+
+1. **Łup jako kafelki plecaka.** Po otwarciu skrzyni pod zdaniem „Skrzynia Bestii otwarta. W środku: …” stoją przedmiot i materiały jak w plecaku: obrazek w ramce koloru rzadkości, a przy materiałach liczba sztuk ze skrzyni.
+2. **Stuknięcie otwiera kartę** jak w plecaku: przedmiotu z porównaniem do noszonego, sprzedażą i rozbiórką, a materiału z przeróbką i sprzedażą. Przedmiot założony w międzyczasie otwiera się jako noszony. Gdy rzeczy już nie ma, gra mówi: „Tego nie ma już w plecaku.”
+3. **Kafelki zostają**, dopóki karta Bestii jest na ekranie, aż do następnego ataku.
+4. Serwer podaje numer przedmiotu i klucze materiałów ze skrzyni (`claimGuildBeastChest` w `src/server/guild-beast.js`), a karta szuka ich w plecaku w chwili stuknięcia (`src/client/guild-beast.js`). Test w `test/guild-beast.test.js`.
+
+## Wersja 0.1.30 (4.11.2026)
+
+1. **Upominki: „Wyślij wszystkie”** (zob. wyżej).
+2. **Skrzynia Bestii: ikony łupu po otwarciu** (zob. wyżej).
+3. **Pęknięcie kamienia w Szlifierni w wersji B** (zob. „Odpowiedzi autora 577, 578 i 582”, punkt 1).
+
 ## Powiadomienia pod pierwszym rzędem górnego paska (4.11.2026, w grze od 0.1.29)
 
 Uwagi graczy z czatu przekazane przez autora: „celne uwagi graczy”. Okienko powiadomienia u góry ekranu zasłaniało poziomy, złoto i przyciski górnego paska. Po zebraniu surowców trzeba było czekać, aż zniknie, albo stukać na ślepo. Gracze proponowali miejsce „lekko niżej, na średnio ważnym pasku HP/klasa”.
@@ -3062,6 +3097,7 @@ Autor, ze zrzutem ekranu Bestii, gdzie przy „Ataki na dziś: 3 z 3” gra kaza
 1. **Atak na Bestię działa zawsze**, gdy zostały ataki na dziś: także w trakcie wyprawy i przed odebraniem jej raportu, nie tylko przy pracy w profesji. Znika napis „Wyprawa się skończyła. Odbierz raport w Walce, a potem atakuj.” i „Postać jest na wyprawie. Bestia poczeka na jej powrót.”
 2. **Raport wyprawy bez zmian.** Atak niczego w postaci nie zmienia: nie daje XP, złota ani łupów i nie rusza HP. Raport wyprawy wychodzi więc taki sam, jak bez ataku. Postać walczy w ekwipunku, z którym poszła na wyprawę, bo w trakcie wyprawy i tak nie da się go zmienić.
 3. **Wieże bez zmian:** wejście do Wieży daje XP i łupy, więc dalej czeka na koniec wyprawy i odbiór raportu.
+4. **Przekierowanie do raportu.** Autor potem: „aaa bo to czeka na raport z wyprawy chyba, to jednak nie błąd” i „ale powinno byc przekierowanie od razu”. Bestia od 0.1.29 nie czeka na raport, więc nie ma skąd przekierowywać. Wieże, które czekają, mają w komunikacie przycisk „Odbierz raport”, który prowadzi do Walki.
 
 ## Wersja 0.1.29 (4.11.2026)
 

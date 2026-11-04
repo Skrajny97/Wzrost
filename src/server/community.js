@@ -280,6 +280,37 @@ export async function sendGift(context) {
   return json({ ...(await friendsOf(db, character.id, context.now)), text: `${content.community.gift.name} wysłany: ${row.name} odbierze go w Znajomych.` });
 }
 
+// POST /api/friends/gift-all: today's Upominek to every friend not given
+// one today, each rolled for that friend's level now (the author: "Powinna
+// być funkcja Wyślij wszystkie w Upominkach tak jak Odbierz wszystkie").
+// INSERT OR IGNORE: one sent at the same moment by hand is not sent twice.
+export async function sendAllGifts(context) {
+  const { character, db } = await requireChatter(context);
+  const day = today(context.now);
+  const rows = (
+    await db
+      .prepare(
+        `SELECT o.id, o.level FROM friends f JOIN characters o ON o.id = CASE WHEN f.character_id = ? THEN f.friend_id ELSE f.character_id END
+         WHERE (f.character_id = ? OR f.friend_id = ?) AND f.accepted_at IS NOT NULL AND o.${OWN_CHARACTERS}
+           AND NOT EXISTS (SELECT 1 FROM gifts g WHERE g.sender_id = ? AND g.receiver_id = o.id AND g.day = ?)`,
+      )
+      .bind(character.id, character.id, character.id, character.id, day)
+      .all()
+  ).results;
+  if (rows.length === 0) throw new ApiError(409, 'sent', `Dziś każdy znajomy dostał już od Ciebie ${content.community.gift.name}. Kolejne jutro.`);
+  const results = await db.batch(
+    rows.map((row) => {
+      const [first, second] = crypto.getRandomValues(new Uint32Array(2));
+      const reward = giftReward(row.level, [first / 2 ** 32, second / 2 ** 32], content);
+      return db
+        .prepare('INSERT OR IGNORE INTO gifts (sender_id, receiver_id, day, created_at, reward) VALUES (?, ?, ?, ?, ?)')
+        .bind(character.id, row.id, day, context.now, JSON.stringify(reward));
+    }),
+  );
+  const sent = results.reduce((sum, result) => sum + result.meta.changes, 0);
+  return json({ ...(await friendsOf(db, character.id, context.now)), sent });
+}
+
 // POST /api/friends/claim: the waiting Upominki collected, as many as today
 // still allows, oldest first. One statement takes them and the next pays
 // what they hold, so two taps at once cannot take more.

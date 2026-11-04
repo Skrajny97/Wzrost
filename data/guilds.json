@@ -69,6 +69,7 @@
       "chestUntil": "Otworzysz ją do {until}.",
       "open": "Otwórz skrzynię",
       "opened": "Skrzynia Bestii otwarta. W środku: {contents}.",
+      "notInBag": "Tego nie ma już w plecaku.",
       "noGuild": "Na Bestię Gildii poluje cała gildia. Dołącz do gildii albo załóż własną.",
       "errors": {
         "locked": "Gildie odblokujesz na poziomie postaci {level}.",

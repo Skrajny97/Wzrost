@@ -168,6 +168,21 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
     assert.equal((await call('POST', '/api/friends/gift', { cookie: players.ala, body: { id } })).status, 200);
   });
 
+  test('"Wyślij wszystkie": today\'s Upominek to every friend not given one yet', async () => {
+    const accepted = await befriend(players.ala, players.ola, 'Ola');
+    players.ewa = await player('Ewa');
+    await befriend(players.ala, players.ewa, 'Ewa');
+    // One sent by hand already.
+    assert.equal((await call('POST', '/api/friends/gift', { cookie: players.ala, body: { id: accepted.data.friends[0].id } })).status, 200);
+    const all = await call('POST', '/api/friends/gift-all', { cookie: players.ala });
+    assert.equal(all.status, 200);
+    assert.equal(all.data.sent, 1);
+    assert.equal(all.data.friends.length, 2);
+    assert.ok(all.data.friends.every((friend) => friend.sentToday));
+    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM gifts').first()).count, 2);
+    assert.equal((await call('POST', '/api/friends/gift-all', { cookie: players.ala })).data.error.code, 'sent');
+  });
+
   test('collecting the Upominki pays all they hold, at most ten a day', async () => {
     const database = await db();
     const ola = await database.prepare("SELECT id, gold, time_points, resources FROM characters WHERE name = 'Ola'").first();

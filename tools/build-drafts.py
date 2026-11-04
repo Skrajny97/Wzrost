@@ -62,11 +62,11 @@ SOUNDS = {
     'chest-1': ('effects/chest-coins-20261025T1130-1.mp3', 'coins'),
     # The transformation at an evolution (evolution.js), the author's 503 A.
     'evolution-transform-1': ('effects/evolution-transform-20261103T0713-0.mp3', 'swell'),
-    # The Szlifiernia's reports (573, picked by their pictures: the whirr
-    # with one clink at its end, the snap first and the splinters after, two
-    # clicks and a ringing ping).
+    # The Szlifiernia's reports (573; the author's 577: A, B, A): the whirr
+    # with one clink at its end, the snap with a rattle after it, two clicks
+    # and a ringing ping.
     'jewel-1': ('effects/jewel-20261103T2227-3.mp3', 'jewel'),
-    'jewel-fail-1': ('effects/jewel-fail-20261103T2227-0.mp3', 'crack'),
+    'jewel-fail-1': ('effects/jewel-fail-20261103T2227-1.mp3', 'crack'),
     'gem-set-1': ('effects/gem-set-20261103T2227-1.mp3', 'jewel'),
 }
 # The takes kept from the newest draft of a voice that has more than two,

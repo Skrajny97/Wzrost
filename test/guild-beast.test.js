@@ -252,6 +252,14 @@ describe('the Bestia Gildii through the API', () => {
     assert.equal(opened.status, 200, JSON.stringify(opened.data).slice(0, 300));
     assert.ok(opened.data.chest.item.name);
     assert.ok(opened.data.chest.materials.length > 0);
+    // The page shows what the chest held as icons and finds each in the bag
+    // for its card: the item by its id, the materials by their keys.
+    const bagItem = opened.data.character.bag.find((one) => one.id === opened.data.chest.item.id);
+    assert.equal(bagItem?.name, opened.data.chest.item.name);
+    for (const material of opened.data.chest.materials) {
+      assert.ok(material.materialId && material.rarityName, JSON.stringify(material));
+      assert.ok(opened.data.character.crafting.materials.some((one) => one.key === material.key), material.key);
+    }
     assert.match(opened.data.chest.text, /Skrzynia Bestii otwarta/);
     assert.deepEqual(opened.data.chests, []);
     const item = JSON.parse((await first('SELECT data FROM items WHERE character_id = ? AND slot IS NULL', await characterId('Łowczyni'))).data);

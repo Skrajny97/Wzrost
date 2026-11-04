@@ -178,6 +178,7 @@
             "chestUntil",
             "open",
             "opened",
+            "notInBag",
             "noGuild",
             "errors"
           ],
