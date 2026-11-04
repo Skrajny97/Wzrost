@@ -1,0 +1,19 @@
+{
+  "id": "quarry-4",
+  "tool": "pixellab generate-image-v2",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a stone stronghold at the edge of a forest, made of grey hewn stone, heavy timber and iron, standing directly on bare ground with no ground tile, base or platform under it, the great quarry at its grandest: a deep terraced cut in white marble rock held by a grey stone retaining wall, a tall timber crane with an iron gear wheel lifting a white block, a stone ramp, wooden scaffolding and long rows of neatly stacked cut white stone blocks",
+  "style": "src/client/art/camp/quarters-3.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/camp/quarry-3.png",
+      "usage": "the previous, third stage of this same building in the camp, chosen by the author: keep its idea, colours, outlines and pixel style, and draw its fourth, grandest stage, rebuilt for the stronghold with grey hewn stone, heavy timber and iron"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

@@ -1,0 +1,19 @@
+{
+  "id": "sawmill-4",
+  "tool": "pixellab generate-image-v2",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a stone stronghold at the edge of a forest, made of grey hewn stone, heavy timber and iron, standing directly on bare ground with no ground tile, base or platform under it, the great sawmill at its grandest: a tall mill house on a grey hewn stone base with a heavy timber upper floor and a wooden shingle roof, a big wooden water wheel with iron rims driving a frame saw that cuts a huge log, iron-banded piles of logs and tall neat stacks of pale yellow planks, a small timber crane",
+  "style": "src/client/art/camp/quarters-3.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/camp/sawmill-3.png",
+      "usage": "the previous, third stage of this same building in the camp, chosen by the author: keep its idea, colours, outlines and pixel style, and draw its fourth, grandest stage, rebuilt for the stronghold with grey hewn stone, heavy timber and iron"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
