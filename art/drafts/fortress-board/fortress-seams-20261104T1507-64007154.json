@@ -1,0 +1,14 @@
+{
+  "id": "fortress-seams",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above, plain green grass of a courtyard with a few small flowers and pebbles, the same grass as around it, seamless, no trees, no bushes, no fences, no walls, no paths, no buildings, no people",
+  "style": null,
+  "input": "art/inputs/fortress-board/seams.png",
+  "mask": "art/inputs/fortress-board/seams-mask.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 15
+  },
+  "images": 1
+}
