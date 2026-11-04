@@ -1,0 +1,14 @@
+{
+  "id": "fortress-walls-bottom",
+  "tool": "pixellab inpaint-v3",
+  "description": "top-down pixel art game map seen from above at a slight angle, the edge of a medieval stone fortress around a green grass courtyard: a thick wall of grey hewn stone blocks with crenellated battlements runs where the mask is, the same wall as already drawn above continues down both sides, square grey stone towers with battlements at the two bottom corners, in the middle of the bottom wall a stone gatehouse with an arched gate of dark iron-bound oak and the dirt road leading out of it downwards, the same green grass inside and the same dark green trees outside as around, no buildings inside the walls, no people",
+  "style": null,
+  "input": "art/inputs/fortress-board/walls-bottom.png",
+  "mask": "art/inputs/fortress-board/walls-bottom-mask.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 25
+  },
+  "images": 1
+}
