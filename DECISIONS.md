@@ -3048,6 +3048,17 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Kod PC dla dwóch postaci, które wymyśliły nowe Koło Fortuny (4.11.2026, w grze od 0.1.34)
+
+Autor poprosił o kod PC dla dwóch kolejnych postaci, których gracze wymyślili zmianę Koła Fortuny.
+
+1. **Kod** jak u poprzednich: jednorazowy „PC” na 60 Punktów Czasu, do 17.11 włącznie (`pc-2026-11-04-c` i `pc-2026-11-04-d` w `data/gift-codes.json`).
+2. **Postacie** są tylko skrótami SHA-256 swoich nazw, jak przy wcześniejszych kodach dla wybranych postaci. Nazw nie ma w repozytorium.
+
+## Wersja 0.1.34 (4.11.2026)
+
+1. **Kod PC dla dwóch kolejnych postaci** (zob. wyżej).
+
 ## Odpowiedzi autora 584 i 585 (4.11.2026)
 
 Autor: „585.1 B / 585.2 C / 585.3 A / 585.4 B / 585.5 B / 585.6 D / 585.7 D / 585.8 B / 585.9 B / 585.10 C / 585.11 D / 585.12 B / 585.13 C / 584 B i C”.
