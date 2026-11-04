@@ -34,6 +34,27 @@ export function standingOf(points, content) {
   return { ...standings[index], index, next, toNext: next ? next.points - points : 0 };
 }
 
+// What a brotherhood's standing at `index` gives, in the words of the
+// Osada's panel (brotherhoodsPanel.perks): the Kuźnia's discount for the
+// Bractwo Kowali, the offers kept on the Targowisko for the Kompania
+// Kupców, and for a brotherhood that posts orders, quality orders for
+// materials and special orders from their standings.
+export function brotherhoodPerks(brotherhood, index, content) {
+  const { forge, market, orders, standings, brotherhoodsPanel } = content.settlement;
+  const words = brotherhoodsPanel.perks;
+  const fill = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
+  const from = (id) => standings.findIndex((standing) => standing.id === id);
+  const perks = [];
+  if (forge?.brotherhood === brotherhood.id) {
+    const discount = forge.discount[Math.min(index, forge.discount.length - 1)];
+    if (discount > 0) perks.push(fill(words.forge, { discount: Math.round(discount * 100) }));
+  }
+  if (market?.brotherhood === brotherhood.id) perks.push(fill(words.market, { offers: market.offers + index }));
+  if (brotherhood.goods.includes('material') && index >= from(orders.quality.from)) perks.push(words.quality);
+  if (brotherhood.goods.length > 0 && index >= from(orders.special.from)) perks.push(words.special);
+  return perks;
+}
+
 // Whether a brotherhood's standing has reached the one of `standingId`.
 const reached = (points, standingId, content) =>
   standingOf(points, content).index >= content.settlement.standings.findIndex((standing) => standing.id === standingId);

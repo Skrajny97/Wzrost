@@ -84,10 +84,10 @@
     { "id": "gamehost", "name": "Szczęsny", "title": "gospodarz Salonu Gier", "story": "Mówią, że za młodu wygrał w kości całą karczmę, a tydzień później przegrał ją w karty. Dziś prowadzi Salon Gier na Rozstajach: sprzedaje losy na Loterię i kręci Kołem Fortuny dla każdego, kto się odważy.", "greetings": ["Wchodź śmiało, szczęście nie gryzie. Los na Loterię czy obrót Kołem?", "O, znowu ty. Koło kręci się dziś lekko, czuję to w kościach.", "Stałym gościom nalewam kwasu na koszt domu. To jak, gramy?", "Tobie zdradzę sekret: Koło lubi tych, którzy wracają.", "Dla przyjaciół Rozstajów zawsze trzymam najlepsze miejsce przy stole."] }
   ],
   "brotherhoods": [
-    { "id": "herbalists", "name": "Bractwo Zielarzy", "goods": ["herb", "potion"] },
-    { "id": "smiths", "name": "Bractwo Kowali", "goods": ["part", "resource", "craft"] },
-    { "id": "hunters", "name": "Bractwo Łowców", "goods": ["material"] },
-    { "id": "merchants", "name": "Kompania Kupców", "goods": [] }
+    { "id": "herbalists", "name": "Bractwo Zielarzy", "short": "Zielarze", "goods": ["herb", "potion"] },
+    { "id": "smiths", "name": "Bractwo Kowali", "short": "Kowale", "goods": ["part", "resource", "craft"] },
+    { "id": "hunters", "name": "Bractwo Łowców", "short": "Łowcy", "goods": ["material"] },
+    { "id": "merchants", "name": "Kompania Kupców", "short": "Kupcy", "goods": [] }
   ],
   "relationDiscount": [0, 0.025, 0.05, 0.075, 0.1],
   "standings": [
@@ -97,6 +97,23 @@
     { "id": "trusted", "name": "Zaufany", "points": 700 },
     { "id": "friend", "name": "Przyjaciel", "points": 1400 }
   ],
+  "brotherhoodsPanel": {
+    "$comment": "Zwijany pasek „Akceptacja Bractw” na planszy Osady (autor 4.11.2026: „Niech przy wejściu do Osady wyświetla się gdzieś łatwo dostepny (zwijalny) poziom akceptacji przez Bractwa”): stopień każdego Bractwa, pasek do następnego, co stopień daje teraz i co doda następny (perks; {…} wypełnia gra z liczb Kuźni, Targowiska i zleceń).",
+    "title": "Akceptacja Bractw",
+    "points": "{points} pkt",
+    "toNext": "{toNext} pkt do stopnia {next}",
+    "top": "Najwyższy stopień",
+    "now": "Teraz:",
+    "next": "Na stopniu {next}:",
+    "none": "Zlecenia z Tablicy i handel podnoszą reputację.",
+    "how": "Reputację Bractwa dają zlecenia z Tablicy zleceń i handel z jego mieszkańcami. Wyższy stopień daje więcej.",
+    "perks": {
+      "special": "Zlecenia specjalne: Punkt Systemu i dwa razy więcej reputacji",
+      "quality": "Zlecenia jakościowe na materiały: dwa razy więcej reputacji",
+      "market": "Na Targowisku naraz {offers} ofert",
+      "forge": "Kuźnia {discount}% taniej"
+    }
+  },
   "orders": {
     "resident": "headman",
     "open": 3,

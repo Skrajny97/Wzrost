@@ -12,6 +12,7 @@ import {
   addQuestProgress,
   bagCapacity,
   bagStacks,
+  brotherhoodPerks,
   campBonus,
   campLevels,
   classNameOf,
@@ -255,7 +256,16 @@ export function settlementView(player, stored, board, now) {
       const standing = standingOf(stored.relations[resident.id] ?? 0, content);
       return { ...resident, service: serviceOf(resident.id), standing, greeting: resident.greetings[Math.min(standing.index, resident.greetings.length - 1)] };
     }),
-    brotherhoods: brotherhoods.map((brotherhood) => ({ ...brotherhood, standing: standingOf(stored.reputation[brotherhood.id] ?? 0, content) })),
+    // Each brotherhood's standing, its points, and what the standing gives
+    // now and what the next one adds (the panel on the board).
+    brotherhoods: brotherhoods.map((brotherhood) => {
+      const points = stored.reputation[brotherhood.id] ?? 0;
+      const standing = standingOf(points, content);
+      const now = brotherhoodPerks(brotherhood, standing.index, content);
+      const next = standing.next ? brotherhoodPerks(brotherhood, standing.index + 1, content).filter((perk) => !now.includes(perk)) : [];
+      return { ...brotherhood, points, standing, perks: { now, next } };
+    }),
+    brotherhoodsPanel: { ...content.settlement.brotherhoodsPanel, $comment: undefined },
     board: {
       slots: board.slots.map((slot) => (slot.order ? { order: orderView(slot.order, stocks, sellBonus) } : { readyAt: slot.readyAt })),
       weekly: board.weekly?.order && !board.weekly.done ? orderView({ ...board.weekly.order, id: 'weekly' }, stocks, sellBonus) : null,

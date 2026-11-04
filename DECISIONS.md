@@ -3048,6 +3048,28 @@ Autor: „574 można, bez ciśnienia” i „575 najmniejszy priorytet”.
     - **Tarcza husarska także ze złotymi skrzydłami.** Biały orzeł na czerwieni wygląda jak godło Polski, więc obok szkiców z orłem są szkice ze skrzydłami.
 5. **Test czasu szacowania zagrożenia (brakujący szczegół).** Wdrożenie 0.1.28 do gry stanęło na teście czasu procesora: mierzył jedną rundę zaraz po rozgrzewce, ok. 5,7 ms na wolnym komputerze przy limicie 6 ms, a na wolnej maszynie GitHuba ponad limit. Teraz test bierze najlepszą z pięciu rund. To mierzy rozgrzany kod (ok. 2 ms, zob. „Nowa skala i eksploracje”, punkt 20), przechodzi także przy w pełni obciążonym komputerze i nadal nie przejdzie, gdy szacowanie zwolni trzykrotnie. Wdrożenie 0.1.28 poszło drugi raz, bez zmian w kodzie gry.
 
+## Akceptacja Bractw na planszy Osady (4.11.2026, w grze od 0.1.39)
+
+Autor: „Niech przy wejściu do Osady wyświetla się gdzieś łatwo dostepny (zwijalny) poziom akceptacji przez Bractwa i musimy rozwinąć ten system by dawał więcej korzyści itp.”
+
+1. **Zwijany pasek.** Nad planszą Osady stoi „Akceptacja Bractw”. Zwinięty pokazuje w jednym wierszu stopień każdego Bractwa (Zielarze, Kowale, Łowcy, Kupcy; krótkie nazwy to `short` w `data/settlement.json`).
+2. **Rozwinięty** pokazuje przy każdym Bractwie jego stopień, pasek do następnego stopnia, punkty i to, ile brakuje, a pod spodem to, co stopień daje teraz, i to, co doda następny.
+3. **Korzyści** gra liczy z tych samych liczb co Kuźnia, Targowisko i zlecenia: Kuźnia taniej (Kowale), oferty na Targowisku (Kupcy), zlecenia jakościowe na materiały (Łowcy, od Stałego klienta) i zlecenia specjalne (Bractwa ze zleceniami, od Zaufanego). Słowa są w `brotherhoodsPanel`.
+4. **Zapamiętane (brakujący szczegół).** Zwinięcie albo rozwinięcie zostaje na urządzeniu. Na początku pasek jest zwinięty.
+5. **Więcej korzyści** z Bractw czeka na odpowiedzi 589–593.
+
+## Odpowiedź autora 587 (4.11.2026)
+
+Autor: „587 B”. Kwestia narratora o Kole Fortuny („Kołem Fortuny kręcisz za sto sztuk złota albo więcej, setkami. Wyższa stawka to wyższe nagrody, ale i większy ból po przegranej.”) zmieni brzmienie, bo od 0.1.35 pula jest ta sama przy każdej stawce, wyższa stawka daje większą szansę na wygraną i na lepszą nagrodę, a od 80. poziomu najniższa stawka to 200 złota. Drugie zdanie napisał autor (543.2), więc nowe brzmienie też podaje autor; potem nagranie od nowa, przycięte, do odsłuchu. Do tego czasu zostaje obecne nagranie.
+
+## Odpowiedź autora 588 (4.11.2026)
+
+Autor: „588 zatwierdzam to po przycięciu gruntu”. Kapliczka w wyglądzie 3 wchodzi do Warowni w wersji z przyciętym gruntem: bez jasnej ziemi wokół drzewa i pasa ziemi przed budynkiem, z drzewem i klombem.
+
+## Wersja 0.1.39 (4.11.2026)
+
+1. **Akceptacja Bractw na planszy Osady** (zob. wyżej).
+
 ## Sortowanie w plecaku (4.11.2026, w grze od 0.1.38)
 
 Autor: „dodaj tez jakas opcje sortowania w plecaku”.

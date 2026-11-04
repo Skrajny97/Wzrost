@@ -7,6 +7,7 @@ import { beforeEach, describe, test } from 'node:test';
 
 import {
   addQuestProgress,
+  brotherhoodPerks,
   buyCeiling,
   createRng,
   deliverBlock,
@@ -74,6 +75,22 @@ describe('the Osada in the engine', () => {
     assert.equal(top.id, standings.at(-1).id);
     assert.equal(top.next, null);
     assert.equal(top.toNext, 0);
+  });
+
+  test("what a brotherhood's standing gives, in the panel's words: the Kuźnia's discount, the Targowisko's offers, quality and special orders", () => {
+    const of = (id) => content.settlement.brotherhoods.find((one) => one.id === id);
+    const at = (id) => content.settlement.standings.findIndex((one) => one.id === id);
+    // Obcy: the Targowisko's five offers alone.
+    assert.deepEqual(brotherhoodPerks(of('smiths'), 0, content), []);
+    assert.deepEqual(brotherhoodPerks(of('merchants'), 0, content), ['Na Targowisku naraz 5 ofert']);
+    // Stały klient: the Kuźnia 10% cheaper, the hunters' quality orders.
+    assert.deepEqual(brotherhoodPerks(of('smiths'), at('regular'), content), ['Kuźnia 10% taniej']);
+    assert.deepEqual(brotherhoodPerks(of('hunters'), at('regular'), content), ['Zlecenia jakościowe na materiały: dwa razy więcej reputacji']);
+    // Zaufany: special orders for every brotherhood that posts orders, never
+    // the merchants, who post none.
+    for (const id of ['herbalists', 'smiths', 'hunters']) assert.ok(brotherhoodPerks(of(id), at('trusted'), content).includes('Zlecenia specjalne: Punkt Systemu i dwa razy więcej reputacji'), id);
+    assert.deepEqual(brotherhoodPerks(of('merchants'), at('friend'), content), ['Na Targowisku naraz 9 ofert']);
+    assert.deepEqual(brotherhoodPerks(of('smiths'), at('friend'), content), ['Kuźnia 20% taniej', 'Zlecenia specjalne: Punkt Systemu i dwa razy więcej reputacji']);
   });
 
   test('the Karczma\'s rumor names an elite or a champion of an open place, the same all day, and doubles them there', () => {
@@ -550,6 +567,12 @@ describe('the Osada through the API', () => {
     assert.equal(done.data.settlement.board.slots[index].readyAt > 0, true);
     const brotherhood = done.data.settlement.brotherhoods.find((one) => one.id === order.brotherhood);
     assert.equal(brotherhood.standing.toNext, content.settlement.standings[1].points - order.reputation);
+    // The panel over the board: the points, what the standing gives now and
+    // what the next adds, in its words.
+    assert.equal(brotherhood.points, order.reputation);
+    assert.deepEqual(Object.keys(brotherhood.perks), ['now', 'next']);
+    assert.equal(done.data.settlement.brotherhoodsPanel.title, 'Akceptacja Bractw');
+    assert.equal(done.data.settlement.brotherhoodsPanel.$comment, undefined);
     const row = await (await db()).prepare(`SELECT ${column} AS stock FROM characters`).first();
     assert.equal(JSON.parse(row.stock)[heldKey(order)], 1);
     const again = await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } });

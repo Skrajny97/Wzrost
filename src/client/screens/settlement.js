@@ -26,6 +26,15 @@ import { tanneryCard } from '../tannery.js';
 import { itemSummary, piecesText } from './character.js';
 import { mountMarket, numberField, stackButton } from './market.js';
 
+// Whether "Akceptacja Bractw" over the board is open, kept on the device.
+const STANDINGS_KEY = 'insight-standings-open';
+let standingsOpen = false;
+try {
+  standingsOpen = localStorage.getItem(STANDINGS_KEY) === '1';
+} catch {
+  // Folded at first without storage.
+}
+
 // A rarity's colour in the game (data/rarities.json), as items show it.
 const rarityColor = (id) => state.content.rarities.find((rarity) => rarity.id === id)?.color;
 
@@ -201,6 +210,62 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
     const weekly = data.board.weekly ? orderCard({ ...data.board.weekly, weekly: true }) : data.board.weeklyDone && h('p', { class: 'muted', text: 'Zlecenie tygodnia oddane. Następne w poniedziałek.' });
     return h('section', { class: 'settlement-board' }, h('h2', { class: 'section-title', text: 'Tablica zleceń' }), slots, weekly);
+  }
+
+  // "Akceptacja Bractw" over the board (the author: "Niech przy wejściu do
+  // Osady wyświetla się gdzieś łatwo dostepny (zwijalny) poziom akceptacji
+  // przez Bractwa"): folded, each brotherhood's standing in one line;
+  // unfolded, its bar to the next standing with the points, what the
+  // standing gives now and what the next adds. Open or folded as the player
+  // left it, on this device.
+  function standingsPanel() {
+    const words = data.brotherhoodsPanel;
+    if (!words) return null;
+    const say = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
+    const perkList = (label, perks, muted) =>
+      perks.length > 0 &&
+      h('div', { class: `settlement-standing-perks${muted ? ' settlement-standing-perks--next' : ''}` }, h('p', { class: 'settlement-standing-label', text: label }), h('ul', {}, perks.map((perk) => h('li', { text: perk }))));
+    const row = ({ name, points, standing, perks }) => {
+      const floor = standing.points;
+      const ceiling = standing.next?.points ?? floor;
+      const share = standing.next ? Math.max(0, Math.min(1, (points - floor) / (ceiling - floor))) : 1;
+      const bar = h('div', { class: 'meter-fill' });
+      bar.style.width = `${share * 100}%`;
+      const where = standing.next ? say(words.toNext, { toNext: formatNumber(standing.toNext), next: standing.next.name }) : words.top;
+      return h(
+        'li',
+        { class: 'settlement-standing' },
+        h('p', { class: 'settlement-standing-head' }, h('strong', { text: name }), h('span', { class: 'chip settlement-standing-chip', text: standing.name })),
+        h('div', { class: 'meter settlement-standing-meter' }, h('div', { class: 'meter-track', role: 'progressbar', 'aria-label': `${name}: reputacja`, 'aria-valuemin': floor, 'aria-valuemax': ceiling, 'aria-valuenow': points }, bar)),
+        h('p', { class: 'muted settlement-standing-points', text: `${say(words.points, { points: formatNumber(points) })} · ${where}` }),
+        perkList(words.now, perks.now, false),
+        standing.next && perkList(say(words.next, { next: standing.next.name }), perks.next, true),
+      );
+    };
+    const fold = h(
+      'details',
+      {
+        class: 'card settlement-standings',
+        open: standingsOpen,
+        onToggle: () => {
+          standingsOpen = fold.open;
+          try {
+            localStorage.setItem(STANDINGS_KEY, standingsOpen ? '1' : '0');
+          } catch {
+            // Kept while the page is open.
+          }
+        },
+      },
+      h(
+        'summary',
+        { class: 'settlement-standings-summary' },
+        h('span', { class: 'settlement-standings-title', text: words.title }),
+        h('span', { class: 'settlement-standings-line', text: data.brotherhoods.map((one) => `${one.short ?? one.name}: ${one.standing.name}`).join(' · ') }),
+      ),
+      h('ul', { class: 'settlement-standings-list' }, data.brotherhoods.map(row)),
+      h('p', { class: 'muted settlement-standings-how', text: words.how }),
+    );
+    return fold;
   }
 
   const brotherhoodsCard = () =>
@@ -1104,6 +1169,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     fill(
       container,
       pageHeading(`Osada: ${data.name}`, data.description),
+      standingsPanel(),
       h(
         'div',
         // The camp's light of the hour in Poland (scenes.js), as on its board.

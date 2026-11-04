@@ -75,16 +75,44 @@
         }
       }
     },
+    "brotherhoodsPanel": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "points", "toNext", "top", "now", "next", "none", "how", "perks"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "title": { "type": "string", "minLength": 1 },
+        "points": { "type": "string", "minLength": 1 },
+        "toNext": { "type": "string", "minLength": 1 },
+        "top": { "type": "string", "minLength": 1 },
+        "now": { "type": "string", "minLength": 1 },
+        "next": { "type": "string", "minLength": 1 },
+        "none": { "type": "string", "minLength": 1 },
+        "how": { "type": "string", "minLength": 1 },
+        "perks": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["special", "quality", "market", "forge"],
+          "properties": {
+            "special": { "type": "string", "minLength": 1 },
+            "quality": { "type": "string", "minLength": 1 },
+            "market": { "type": "string", "minLength": 1 },
+            "forge": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
     "brotherhoods": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "name", "goods"],
+        "required": ["id", "name", "short", "goods"],
         "properties": {
           "id": { "$ref": "#/definitions/id" },
           "name": { "type": "string", "minLength": 1 },
+          "short": { "type": "string", "minLength": 1, "description": "Krótka nazwa w zwiniętym pasku „Akceptacja Bractw”." },
           "goods": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/definitions/goodKind" } }
         }
       }
