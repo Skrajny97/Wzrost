@@ -882,7 +882,8 @@
       "mining-setting": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Kamień możesz też oprawić w przedmiot, który nosisz. Wzmocni wszystkie jego liczby." },
       "mining-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Rzadsze kamienie leżą głębiej. Każdy nowy poziom Górnictwa odsłoni Ci kolejne." },
       "settlement-market-offers": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Na Targowisku gracze licytują swoje towary. Licytacja trwa od godziny do doby, a przebity gracz od razu odzyskuje złoto." },
-      "settlement-casino-wheel": { "text": "Kołem Fortuny kręcisz za setki sztuk złota. Im wyższa stawka, tym większa szansa na wygraną i na lepszą nagrodę, ale i większy ból po przegranej.", "ending": " [pauses] Tak." }
+      "settlement-casino-wheel": { "text": "Kołem Fortuny kręcisz za setki sztuk złota. Im wyższa stawka, tym większa szansa na wygraną i na lepszą nagrodę, ale i większy ból po przegranej.", "ending": " [pauses] Tak." },
+      "settlement-forge-scrolls": { "text": "Żelisław sprzedaje dwa rodzaje zwojów, każdego najwyżej trzy dziennie. Zwój ochronny chroni przedmiot przed rozpadem na Kowadle, a Zwój utrwalenia przed spadkiem ulepszenia.", "ending": " [pauses] Tak." }
     },
     "allLines": {
       "voice": "Narrator",
