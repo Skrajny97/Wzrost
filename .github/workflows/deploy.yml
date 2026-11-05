@@ -30,14 +30,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # The suite in four parts at once, on four runners (Node's --test-shard):
+  # whole, it took about 33 minutes on one runner (0.1.69, 5.11.2026), so the
+  # game waited over half an hour for every deploy (the author: "A czemu
+  # 0.1.69 dalej nie jest wdrożone na main?"). The first steps run beside
+  # them.
   test:
-    name: Testy
+    name: Testy ${{ matrix.shard }}/4
     runs-on: ubuntu-latest
-    # The whole suite takes about 15 minutes on GitHub's runner (0.0.74 was
-    # cut off at 15), and installing the browser for the first steps may take
-    # ten more (0.0.90 was cut off at 30, 2.11.2026, after 19 minutes of tests
-    # and 10 of the browser), so it gets 45.
-    timeout-minutes: 45
+    timeout-minutes: 30
+    strategy:
+      fail-fast: true
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v6
       # A working branch at the commit main has just tested (main merged in
@@ -56,14 +61,36 @@ jobs:
       - run: npm ci
         if: steps.main.outputs.same != 'true'
       - name: Walidacja danych gry
-        if: steps.main.outputs.same != 'true'
+        if: steps.main.outputs.same != 'true' && matrix.shard == 1
         run: npm run validate
-      - run: npm test
+      - name: Testy, część ${{ matrix.shard }} z 4
         if: steps.main.outputs.same != 'true'
-      # The beginning of the game walked in a browser, on a phone and on a
-      # computer, from the narrator's first card to the first exploration
-      # (the author: "pilnuj tego na przyszlosc nie może tak byc, poczatek
-      # jest najwazniejszy"). The game runs here as in the live one.
+        run: node --test --test-reporter=spec --test-shard=${{ matrix.shard }}/4 'test/**/*.test.js'
+
+  # The beginning of the game walked in a browser, on a phone and on a
+  # computer, from the narrator's first card to the first exploration
+  # (the author: "pilnuj tego na przyszlosc nie może tak byc, poczatek
+  # jest najwazniejszy"). The game runs here as in the live one. Installing
+  # the browser may take ten minutes (0.0.90, 2.11.2026), so it gets 30.
+  first-steps:
+    name: Pierwsze kroki nowej postaci
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - name: Czy main ma ten sam commit
+        id: main
+        if: github.ref != 'refs/heads/main'
+        run: |
+          git fetch --quiet --depth=1 origin main
+          if [ "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)" ]; then echo "same=true" >> "$GITHUB_OUTPUT"; fi
+      - uses: actions/setup-node@v6
+        if: steps.main.outputs.same != 'true'
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+        if: steps.main.outputs.same != 'true'
       - name: Pierwsze kroki nowej postaci
         if: steps.main.outputs.same != 'true'
         run: |
@@ -76,7 +103,7 @@ jobs:
 
   configuration:
     name: Sprawdzenie sekretów Cloudflare
-    needs: test
+    needs: [test, first-steps]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     outputs:
@@ -161,7 +188,7 @@ jobs:
   # nothing there touches the live game or its players.
   test-version:
     name: Wersja testowa
-    needs: test
+    needs: [test, first-steps]
     if: github.event_name == 'push' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15

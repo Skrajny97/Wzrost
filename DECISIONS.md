@@ -3036,7 +3036,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 
 ## Wersja 0.1.71 (5.11.2026)
 
-Towarzysze noszą też amulet i pierścień: zob. „Biżuteria towarzyszy”.
+Towarzysze noszą też amulet i pierścień: zob. „Biżuteria towarzyszy”. Wdrożenie do gry jest szybsze: zob. „Testy przed wdrożeniem w czterech częściach”.
+
+## Testy przed wdrożeniem w czterech częściach (5.11.2026, od 0.1.71)
+
+Autor: „A czemu 0.1.69 dalej nie jest wdrożone na main?”. Push do `main` czekał ponad pół godziny, bo cały zestaw testów szedł na jednej maszynie GitHuba (w 0.1.69: 33 minuty testów, potem 2 minuty pierwszych kroków).
+
+1. **Cztery części naraz.** Testy dzielą się na cztery części (`node --test --test-shard`), każda na osobnej maszynie. Pierwsze kroki nowej postaci idą obok nich, a nie po nich. Gra wdraża się, gdy przejdą wszystkie cztery części i pierwsze kroki. Spodziewany czas od pusha do gry: kilkanaście minut zamiast blisko 40.
+2. **Zasady bez zmian.** Każdy test nadal musi przejść przed wdrożeniem. Gałąź robocza na tym samym commicie co `main` dalej pomija powtórne testy, więc wersja testowa wdraża się od razu.
+
 
 ## Biżuteria towarzyszy (5.11.2026, w grze od 0.1.71)
 
