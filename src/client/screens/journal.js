@@ -149,7 +149,10 @@ export function mountJournal(container, { params }) {
                             : 'porażka'
                           : (RESULT_NAMES[report.result] ?? report.result),
                     }),
-                    ` +${formatNumber(report.xp)} XP · +${formatNumber(report.gold)} złota`,
+                    // After a faint the exploration brought nothing (651 C), and cost XP.
+                    report.forfeit
+                      ? ` −${formatNumber(report.penalty ?? 0)} XP · łupy przepadły`
+                      : ` +${formatNumber(report.xp)} XP · +${formatNumber(report.gold)} złota`,
                   ),
               WORK_CHIPS[report.kind] && h('span', { class: 'report-row-herbs', text: workSummaryText(report) }),
               report.bestFind && h('span', { class: 'item-name', vars: { '--rarity': report.bestFind.color }, text: report.bestFind.name }),

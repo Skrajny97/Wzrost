@@ -7,7 +7,7 @@
 // level, puts everyone at one standing and brings new orders at once.
 
 import {
-  COMPANION_SLOTS,
+  COMPANION_PLACES,
   addCounts,
   addQuestProgress,
   bagCapacity,
@@ -27,6 +27,7 @@ import {
   companionSkillLevel,
   companionStays,
   companionText,
+  companionPlace,
   companionWearBlock,
   deliverOrder,
   drawCandidates,
@@ -556,10 +557,11 @@ function companionView(companion, { upgradeCap, materials, anvilDiscount = 0 } =
     gear: companion.gear.map((item) => itemName(item, content)),
     // What it wears in each of its places (question 108 A), and whether
     // the item came from the character's bag.
-    wear: COMPANION_SLOTS.map((slot) => {
-      const worn = companion.gear.find((item) => item.slot === slot);
+    // Jewellery is one place, for an amulet, a ring or a talisman.
+    wear: COMPANION_PLACES.map((slot) => {
+      const worn = companion.gear.find((item) => companionPlace(item.slot) === slot);
       const shown = worn && { ...itemView(worn, content, { upgradeCap, materials, anvilDiscount }), given: Boolean(worn.given), ...(upgradeCap !== undefined && { roll: worn.lastRoll ?? '' }) };
-      return { slot, slotName: content.slotsById[slot].name, item: shown || null };
+      return { slot, slotName: content.slotsById[slot]?.name ?? content.settlement.companions.texts.jewelry, item: shown || null };
     }),
     profession: professions.find((one) => one.id === companion.profession)?.name ?? null,
     story: stories[companion.story % stories.length],
@@ -1055,7 +1057,7 @@ export async function equipCompanion(context) {
     db
       .prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND slot IS NULL AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ? AND settlement = ?)')
       .bind(item.id, row.id, row.id, row.version + 1, saved),
-    ...(off ? [backToBag(db, row, off, saved, context.now)] : []),
+    ...off.map((one) => backToBag(db, row, one, saved, context.now)),
   ]);
   if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(db, session.userId);
@@ -1084,7 +1086,8 @@ export async function upgradeCompanionItem(context) {
   const hired = stored.companions ?? [];
   const companion = hired.find((one) => one.id === body.companionId);
   if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
-  const item = COMPANION_SLOTS.includes(body.slot) ? companion.gear.find((one) => one.slot === body.slot) : null;
+  const place = companionPlace(body.slot);
+  const item = place ? companion.gear.find((one) => companionPlace(one.slot) === place) : null;
   if (!item) throw new ApiError(404, 'item_not_found', companionText('noItem', companion, content));
   const changedItem = () => new ApiError(409, 'item_changed', 'Przedmiot albo zapasy zmieniły się w międzyczasie. Spróbuj jeszcze raz.');
   if (typeof body.roll === 'string' && body.roll !== (item.lastRoll ?? '')) throw changedItem();

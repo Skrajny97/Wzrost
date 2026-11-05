@@ -282,7 +282,9 @@ describe('the Wyprawa Gildii through the API', () => {
     const invited = await as('lowczyni', 'POST', '/api/party/invite', { name: 'Tropiciel' });
     assert.equal(invited.status, 200, JSON.stringify(invited.data).slice(0, 300));
     await as('tropiciel', 'POST', '/api/party/accept', { partyId: invited.data.party.id });
-    const went = await as('lowczyni', 'POST', '/api/party/hunt', { areaId: 'mossy-boulders', minutes: 30 });
+    // In the first, safe place: a trip that faints counts no minutes
+    // (651 C), and a random one at level 40 without gear now and then does.
+    const went = await as('lowczyni', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 30 });
     assert.equal(went.status, 201, JSON.stringify(went.data).slice(0, 300));
     await as('lowczyni', 'POST', '/api/test/skip-time');
     for (const login of ['lowczyni', 'tropiciel']) assert.equal((await as(login, 'POST', '/api/hunts/claim')).status, 200);

@@ -264,30 +264,38 @@ export function partyRefusal(companions, content) {
   return gendered(going.length === 1 ? texts.partyOne : texts.partyMany, look).replace('{names}', going.map((companion) => companion.name).join(', '));
 }
 
-// The companion after a try at upgrading the item it wears in `slot` on the
-// Kowadło (rollUpgrade in items.js; the author: "niech tu będzie opcja
+// The companion after a try at upgrading the item it wears in `place` on
+// the Kowadło (rollUpgrade in items.js; the author: "niech tu będzie opcja
 // kliknięcia w przedmiot i ulepszania go jak na Kowadle"): the item at its
 // new level, with the try's seed (`roll`) as the character's items keep it,
 // or gone from its place when it broke.
-export function upgradedOnCompanion(companion, slot, outcome, roll) {
+export function upgradedOnCompanion(companion, place, outcome, roll) {
+  const worn = companion.gear.find((item) => companionPlace(item.slot) === companionPlace(place));
   const gear =
     outcome.result === 'broken'
-      ? companion.gear.filter((item) => item.slot !== slot)
-      : companion.gear.map((item) => (item.slot === slot ? { ...item, upgrade: outcome.upgrade, lastRoll: roll } : item));
+      ? companion.gear.filter((item) => item !== worn)
+      : companion.gear.map((item) => (item === worn ? { ...item, upgrade: outcome.upgrade, lastRoll: roll } : item));
   return { ...companion, gear };
 }
 
 // The places a companion wears items in (the design: "broń, pancerz,
-// talizman"; the author on 5.11.2026: "zmień by towarzysze mogli nosić
-// bizuterie ogolnie czyli amulety i pierscienie tez a nie sam talizman").
-export const COMPANION_SLOTS = ['weapon', 'chest', 'amulet', 'ring', 'talisman'];
+// talizman"): a weapon, armour and one piece of jewellery, an amulet, a
+// ring or a talisman (the author on 5.11.2026: "zmień by towarzysze mogli
+// nosić bizuterie ogolnie czyli amulety i pierscienie tez a nie sam
+// talizman", and then: "Towarzysz ma móc zakładać albo Amulet albo
+// Pierścień albo Talizman a nie wszystko na raz").
+export const COMPANION_PLACES = ['weapon', 'chest', 'jewelry'];
+const JEWELRY = ['amulet', 'ring', 'talisman'];
+
+// The companion's place for an item of `slot` (or the place itself), or null.
+export const companionPlace = (slot) => (JEWELRY.includes(slot) ? 'jewelry' : COMPANION_PLACES.includes(slot) ? slot : null);
 
 // Why the companion cannot wear `item` from the character's bag (question
 // 108 A: "gracz zakłada towarzyszowi przedmioty jego klasy z plecaka"), or
 // null: one of its places, its class, and its class level (its level) for
 // the item's Tier, wherever the item came from, as for the character.
 export function companionWearBlock(companion, item, content) {
-  if (!COMPANION_SLOTS.includes(item.slot)) return { code: 'wrong_slot', message: 'Towarzysz nosi tylko broń, pancerz i biżuterię: amulet, pierścień i talizman.' };
+  if (!companionPlace(item.slot)) return { code: 'wrong_slot', message: 'Towarzysz nosi tylko broń, pancerz i jedną sztukę biżuterii: amulet, pierścień albo talizman.' };
   if (!canUse(item.base, companion.classId, content)) return { code: 'wrong_class', message: 'Klasa towarzysza nie może używać tego przedmiotu.' };
   if (!canUse(item.base, companion.classId, content, companion.level)) {
     return { code: 'class_level', message: `Ten przedmiot towarzysz założy od poziomu ${baseClassLevel(item.base, content)}.` };
@@ -295,9 +303,11 @@ export function companionWearBlock(companion, item, content) {
   return null;
 }
 
-// The companion wearing `item` (marked as given) in its place, and the item
-// it wore there, which goes back to the bag (`off`, or null).
+// The companion wearing `item` (marked as given) in its place, and what it
+// wore there, which goes back to the bag (`off`): an amulet put on takes
+// the place of a ring or a talisman too.
 export function wearOnCompanion(companion, item) {
-  const off = companion.gear.find((worn) => worn.slot === item.slot) ?? null;
-  return { companion: { ...companion, gear: [...companion.gear.filter((worn) => worn !== off), { ...item, given: true }] }, off };
+  const place = companionPlace(item.slot);
+  const off = companion.gear.filter((worn) => companionPlace(worn.slot) === place);
+  return { companion: { ...companion, gear: [...companion.gear.filter((worn) => !off.includes(worn)), { ...item, given: true }] }, off };
 }

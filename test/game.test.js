@@ -4,7 +4,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
-import { classXpToNext, createRng, generateItem, itemName, meetingChances, notificationsDue, questPeriod, unknownCreatures, upgradeCost, xpToNext } from '../src/engine/index.js';
+import { classXpToNext, createRng, generateItem, itemName, meetingChances, notificationsDue, questPeriod, simulateHunt, unknownCreatures, upgradeCost, xpToNext } from '../src/engine/index.js';
+import { engineCharacter } from '../src/server/characters.js';
 import { skipTime } from '../src/server/testing.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -665,6 +666,79 @@ describe('hunts and reports', () => {
     assert.equal(cancel.data.character.activity, null);
     assert.equal(cancel.data.character.gold, supply.gold);
     assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).data.error.code, 'no_activity');
+  });
+
+  test('a faint loses everything the exploration brought, and costs XP (651 C)', async () => {
+    const database = await db();
+    // Not the very first exploration, which goes one way.
+    await database.prepare('UPDATE characters SET level = 6, class_level = 6, xp = 100').run();
+    await database.prepare("INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) SELECT id, 'earlier', 'hunt', 0, '{}', '{}' FROM characters").run();
+    const started = await call('POST', '/api/hunts', { cookie, body: { areaId: 'fox-ravines', minutes: 30 } });
+    assert.equal(started.status, 201, JSON.stringify(started.data).slice(0, 300));
+    // A seed whose exploration wins on the way and then faints, as the
+    // claim will run it.
+    const row = await database.prepare('SELECT * FROM characters').first();
+    const activity = await database.prepare('SELECT * FROM activities').first();
+    const options = JSON.parse(activity.options ?? '{}');
+    const run = (seed, hp) =>
+      simulateHunt(
+        {
+          character: engineCharacter(row),
+          equipped: [],
+          hp,
+          name: row.name,
+          areaId: 'fox-ravines',
+          minutes: 30,
+          seed,
+          first: false,
+          potions: options.potions ?? {},
+          healBelow: options.healBelow,
+          unknown: options.unknown ?? [],
+          met: JSON.parse(row.met ?? '[]'),
+        },
+        content,
+      );
+    let found = null;
+    for (let i = 0; i < 400 && !found; i++) {
+      for (const share of [1, 0.6, 0.35]) {
+        const hp = Math.max(1, Math.round(activity.hp_at_start * share));
+        const hunt = run(`faint:${i}`, hp);
+        if (hunt.result === 'fainted' && hunt.xp > 0 && hunt.gold > 0) {
+          found = { seed: `faint:${i}`, hp, hunt };
+          break;
+        }
+      }
+    }
+    assert.ok(found, 'a seed that wins on the way and then faints');
+    await database.prepare('UPDATE activities SET seed = ?, hp_at_start = ?, ends_at = ?').bind(found.seed, found.hp, Date.now() - 1).run();
+    const claimed = await call('POST', '/api/hunts/claim', { cookie });
+    assert.equal(claimed.status, 200, JSON.stringify(claimed.data).slice(0, 300));
+    const { report, character } = claimed.data;
+    assert.equal(report.result, 'fainted');
+    assert.equal(report.fights.length, found.hunt.fights.length);
+    assert.equal(report.summary.forfeit, content.texts.faintForfeit[0]);
+    assert.deepEqual(
+      [report.summary.xp, report.summary.classXp, report.summary.gold, report.summary.timePoints, report.summary.itemsFound, report.summary.bestFind],
+      [0, 0, 0, 0, 0, null],
+    );
+    assert.deepEqual([report.items, report.summary.materials, report.summary.resources], [[], [], {}]);
+    // Nothing of it reached the character: the gold, the camp's
+    // resources, the materials, the bag and the Time Points are as before;
+    // the penalty took its XP.
+    assert.ok(report.summary.penalty > 0);
+    assert.deepEqual([character.level, character.xp, character.classLevel], [6, 100 - report.summary.penalty, 6]);
+    assert.equal(character.gold, supply.gold);
+    assert.equal(character.timePoints, row.time_points);
+    assert.equal(character.bag.length, 0);
+    const after = await database.prepare('SELECT * FROM characters').first();
+    assert.deepEqual([after.resources, after.materials, after.class_xp], [row.resources, row.materials, row.class_xp]);
+    // The narrator's quests count neither its creatures nor its minutes.
+    const quests = Object.values(JSON.parse(after.quests)).flatMap((period) => period.quests);
+    assert.ok(quests.length > 0);
+    assert.ok(quests.every((quest) => quest.progress === 0), JSON.stringify(quests.filter((quest) => quest.progress > 0)));
+    // The Dziennik says so too.
+    const journal = (await call('GET', '/api/reports', { cookie })).data.reports[0];
+    assert.deepEqual([journal.forfeit, journal.xp, journal.gold, journal.penalty], [true, 0, 0, report.summary.penalty]);
   });
 
   test('an exploration can avoid the elite and the champion, or seek them, each with its own threat', async () => {

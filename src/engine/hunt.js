@@ -805,6 +805,30 @@ export function simulateHunt(
   };
 }
 
+// A faint loses the whole exploration (651 C; the author: „ma być 0
+// czegokolwiek + kara”): its XP, gold, resources, materials, items, herbs
+// and the Time Points of its finds, and a wanted poster's target beaten on
+// the way. The XP penalty comes on top of that (applyHunt). The fights stay
+// in the report as they went, without their chests; the potions drunk, the
+// blessing's fights and an event's price stay spent, and a companion who
+// fell is wounded as before.
+export function faintForfeit(hunt) {
+  if (hunt.result !== 'fainted') return hunt;
+  return {
+    ...hunt,
+    forfeit: true,
+    xp: 0,
+    gold: 0,
+    resources: {},
+    materials: {},
+    timePoints: 0,
+    items: [],
+    herbs: {},
+    fights: hunt.fights.map((fight) => ({ ...fight, chests: [] })),
+    ...(hunt.wanted && { wanted: { ...hunt.wanted, beaten: false } }),
+  };
+}
+
 // Applies the hunt's XP to the character. Solo, all of the combat contribution
 // is the player's, so class XP equals the XP from fights. Fainting costs only
 // character XP, never a level, and never class XP. The class waits at its
@@ -946,6 +970,9 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
     resultText: content.texts.result[hunt.result],
     ...(hunt.hard && { hard: true }),
     summary: {
+      // A faint loses all the exploration brought (faintForfeit), said in
+      // a line.
+      ...(hunt.forfeit && { forfeit: say(content.texts, 'faintForfeit', 0, {}) }),
       // Fights give the same XP to the character and the class (solo); the
       // fainting penalty takes only character XP.
       xp: hunt.xp,

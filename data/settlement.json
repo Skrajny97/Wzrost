@@ -639,7 +639,8 @@
       "noItem": "[Towarzyszka nie nosi|Towarzysz nie nosi] nic w tym miejscu.",
       "partyOne": "Najpierw zostaw [towarzyszkę|towarzysza] w kwaterze: {names}. Drużyna poluje bez towarzyszy z Kwater.",
       "partyMany": "Najpierw zostaw [towarzyszki|towarzyszy] w kwaterze: {names}. Drużyna poluje bez towarzyszy z Kwater.",
-      "toQuarters": "Przejdź do Kwater"
+      "toQuarters": "Przejdź do Kwater",
+      "jewelry": "Biżuteria"
     }
   },
   "wanted": {

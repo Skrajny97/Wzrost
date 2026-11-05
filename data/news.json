@@ -170,6 +170,11 @@
       "id": "0.1.72",
       "title": "Wersja 0.1.72: Zbieracz Systemu",
       "body": "- W Obozie, przy Skrzyni Konta, unosi się Zbieracz Systemu. Za 10 000 złota, raz na zawsze, sam zbiera zasoby z magazynów Obozu, gdy się zapełnią, także gdy Cię nie ma."
+    },
+    {
+      "id": "0.1.73",
+      "title": "Wersja 0.1.73: omdlenie i biżuteria towarzyszy",
+      "body": "- Omdlenie przekreśla wyprawę: przepada z niej wszystko, czyli XP, złoto, zasoby, materiały i przedmioty, a do tego przychodzi kara XP. Przed wyprawą sprawdź „Zagrożenie”.\n- Towarzysz nosi jedną sztukę biżuterii: amulet, pierścień albo talizman. Jeśli Twój nosił kilka, zostaje mu ta założona ostatnio, a reszta wróciła do Twojego plecaka."
     }
 ]
 }

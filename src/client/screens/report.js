@@ -306,13 +306,16 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
 
   function summaryCard(report) {
     const summary = report.summary;
+    // After a faint nothing of the exploration is left (651 C): its line
+    // says so, and the rows show only the penalty, the fights and the HP.
+    const lost = Boolean(summary.forfeit);
     const rows = [
-      ['XP postaci', `+${formatNumber(summary.xp)} XP`],
+      !lost && ['XP postaci', `+${formatNumber(summary.xp)} XP`],
       summary.penalty > 0 && ['Kara za omdlenie', `−${formatNumber(summary.penalty)} XP postaci`],
       // Reports from before the split have no classXp: the class got the same XP.
-      ['XP klasy', `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
-      ['Złoto', `+${formatNumber(summary.gold)}`],
-      resourcesRow(summary.resources),
+      !lost && ['XP klasy', `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
+      !lost && ['Złoto', `+${formatNumber(summary.gold)}`],
+      !lost && resourcesRow(summary.resources),
       summary.materials?.length > 0 && ['Materiały', capitalized(materialsText(summary.materials))],
       summary.timePoints > 0 && ['Punkty Czasu', `+${formatNumber(summary.timePoints)}`],
       // A Wieża's floor is one fight, and the tower keeps no HP (towers.js).
@@ -324,6 +327,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       'section',
       { class: 'card report-summary', 'aria-label': 'Podsumowanie', 'data-guide': 'report-summary' },
       h('p', { class: `result ${RESULT_CLASS[report.result] ?? ''}`, text: report.resultText }),
+      lost && h('p', { class: 'report-potions', text: summary.forfeit }),
       // A Trudna wyprawa (629 A).
       report.hard && h('p', { class: 'report-potions', text: 'Trudna wyprawa: silniejsze stwory, więcej XP i złota.' }),
       // The potions drunk and the fights a speed potion sped up.
@@ -332,29 +336,30 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         'dl',
         { class: 'status-list' },
         rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value }))),
-        h(
-          'div',
-          { class: 'status-row' },
-          h('dt', { text: 'Najlepsze znalezisko' }),
+        !lost &&
           h(
-            'dd',
-            {},
-            best
-              ? h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: 'link-button item-name',
-                    vars: { '--rarity': best.color },
-                    'aria-label': `${best.name}: pokaż przedmiot`,
-                    onClick: () => findSheet(best),
-                  },
-                  itemSprite(best),
-                  best.name,
-                )
-              : 'brak',
+            'div',
+            { class: 'status-row' },
+            h('dt', { text: 'Najlepsze znalezisko' }),
+            h(
+              'dd',
+              {},
+              best
+                ? h(
+                    'button',
+                    {
+                      type: 'button',
+                      class: 'link-button item-name',
+                      vars: { '--rarity': best.color },
+                      'aria-label': `${best.name}: pokaż przedmiot`,
+                      onClick: () => findSheet(best),
+                    },
+                    itemSprite(best),
+                    best.name,
+                  )
+                : 'brak',
+            ),
           ),
-        ),
       ),
     );
   }

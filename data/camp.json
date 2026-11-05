@@ -45,7 +45,7 @@
     "name": "Zbieracz Systemu",
     "price": 10000,
     "texts": {
-      "offer": "Zbiera za Ciebie zasoby z pełnych magazynów Obozu, więc nic nie przepada.",
+      "offer": "Zbiera za Ciebie zasoby z pełnych magazynów Obozu, dzięki czemu nic nie przepada nawet przy długiej nieobecności.",
       "bought": "Zbieracz Systemu zajmie się teraz magazynami Obozu.",
       "hint": "Zbieracz Systemu zbierze zasoby, gdy magazyn się zapełni.",
       "owned": "Masz już Zbieracza Systemu.",

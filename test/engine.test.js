@@ -90,6 +90,7 @@ import {
   nextHuntUnlock,
   huntingHours,
   huntReport,
+  faintForfeit,
   itemName,
   itemView,
   itemUpgradeCost,
@@ -750,6 +751,36 @@ describe('hunts', () => {
     assert.equal(result.result, 'fainted');
     assert.equal(result.fights.at(-1).won, false);
     assert.equal(result.hpEnd, Math.round(result.maxHp * content.balance.hunt.hpAfterFaint));
+  });
+
+  test('a faint loses everything the exploration brought, and the penalty comes on top (651 C)', () => {
+    const who = { ...newCharacter('warrior'), level: 6, classLevel: 6, xp: 100 };
+    let found = null;
+    for (let i = 0; i < 300 && !found; i++) {
+      const one = simulateHunt({ character: who, equipped: [], hp: 9999, name: 'Pech', areaId: 'fox-ravines', minutes: 240, seed: `strata:${i}` }, content);
+      if (one.result === 'fainted' && one.xp > 0 && one.gold > 0 && one.items.length > 0 && Object.keys(one.materials).length > 0) found = one;
+    }
+    assert.ok(found, 'an exploration that wins on the way and then faints');
+    const lost = faintForfeit({ ...found, wanted: { id: 'poster', met: true, beaten: true } });
+    assert.equal(lost.forfeit, true);
+    assert.deepEqual([lost.xp, lost.gold, lost.timePoints, lost.items, lost.resources, lost.materials, lost.herbs], [0, 0, 0, [], {}, {}, {}]);
+    assert.deepEqual(lost.wanted, { id: 'poster', met: true, beaten: false });
+    // The fights stay as they went, without their chests.
+    assert.equal(lost.fights.length, found.fights.length);
+    assert.ok(lost.fights.every((fight, index) => fight.chests.length === 0 && fight.won === found.fights[index].won));
+    // No level, no class XP, no Time Points; the penalty takes character XP.
+    const applied = applyHunt(who, lost, content);
+    assert.deepEqual([applied.level, applied.classLevel, applied.classXp, applied.timePoints, applied.levelled], [6, 6, who.classXp, 0, false]);
+    assert.ok(applied.penalty > 0);
+    assert.equal(applied.xp, 100 - applied.penalty);
+    const report = huntReport({ hunt: lost, applied, character: who, areaId: 'fox-ravines', startedAt: 0, endsAt: 1 }, content);
+    assert.equal(report.summary.forfeit, content.texts.faintForfeit[0]);
+    assert.deepEqual([report.summary.xp, report.summary.gold, report.summary.itemsFound, report.summary.bestFind, report.items], [0, 0, 0, null, []]);
+    assert.ok(report.fights.every((fight) => fight.chests === 0));
+    // An exploration that did not end in a faint keeps all it brought.
+    const kept = hunt({ minutes: 60 });
+    assert.notEqual(kept.result, 'fainted');
+    assert.equal(faintForfeit(kept), kept);
   });
 
   test('losing to the elite in a safe region wounds but does not faint', () => {

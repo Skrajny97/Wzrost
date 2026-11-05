@@ -5,6 +5,7 @@ import {
   addBuff,
   addQuestProgress,
   applyHunt,
+  faintForfeit,
   areaDangers,
   areaFor,
   areasOpened,
@@ -768,12 +769,16 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       content,
     );
   }
-  // A faint costs less XP with the Warownia's Kapliczka (427 A).
+  // A faint loses everything the exploration brought (faintForfeit, 651 C),
+  // and costs XP, less with the Warownia's Kapliczka (427 A).
+  hunt = faintForfeit(hunt);
   const applied = applyHunt(character, hunt, content, { faintShare: faintShare(campLevels(player.buildings, now, content), content) });
   // The companions who went gain XP, one who fell is wounded, and an
   // event's reputation and rumor are kept (settlementAfterHunt); of an
   // older trip's, only in its leader's report.
-  const settlementAfter = settlementAfterHunt(row, trip && trip.roster[0].id !== row.id ? { ...hunt, companions: [] } : hunt, kept, activity.minutes);
+  // A faint brings the companions no relation either (faintForfeit).
+  const credited = hunt.forfeit ? 0 : activity.minutes;
+  const settlementAfter = settlementAfterHunt(row, trip && trip.roster[0].id !== row.id ? { ...hunt, companions: [] } : hunt, kept, credited);
   // The potions taken along were set aside at the start (`reserved`): what
   // was not drunk comes back to the bag. An exploration started before that
   // takes the potions drunk from the bag, where they stayed.
@@ -834,6 +839,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
     minutes: report.minutes,
     result: report.result,
     resultText: report.resultText,
+    ...(hunt.forfeit && { forfeit: true }),
     xp: report.summary.xp,
     classXp: report.summary.classXp,
     penalty: report.summary.penalty,
@@ -869,10 +875,11 @@ export async function finishHunt(db, player, now, { choice } = {}) {
     ]),
   ];
   // The narrator's quests count the creatures beaten, the minutes and the
-  // inner regions the new class levels open. They are saved only as read,
-  // so a reward claimed meanwhile is not undone.
+  // inner regions the new class levels open; after a faint nothing
+  // (faintForfeit). They are saved only as read, so a reward claimed
+  // meanwhile is not undone.
   const opened = areasOpened(character.classLevel, applied.classLevel, content);
-  const progress = { kills: huntKills(hunt, content), minutes: activity.minutes, opened };
+  const progress = { kills: hunt.forfeit ? {} : huntKills(hunt, content), minutes: credited, opened };
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), progress));
   const setMaterials = left.length
     ? `, materials = json_set(materials, ${left.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})`
@@ -952,7 +959,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       // The Wyprawa Gildii's route (guild-expedition.js): the exploration's
       // minutes for the guild the character is in now, as the report is
       // claimed (621 A), whenever the exploration set out.
-      ...expeditionMinutes(db, row.id, activity.minutes, now),
+      ...expeditionMinutes(db, row.id, credited, now),
       // Bag items the scrapper bought: paid for above, while they were still there.
       ...(soldStored.length > 0
         ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${soldStored.map(() => '?').join(', ')})`).bind(row.id, ...soldStored)]

@@ -6,6 +6,7 @@
 // "Zostań w kwaterze".
 
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
 import {
@@ -307,7 +308,7 @@ describe('companions through the API', () => {
     assert.equal(JSON.parse((await database.prepare('SELECT herbs FROM characters').first()).herbs)[gift.key], gift.count);
   });
 
-  test('items of its class and any jewellery from the bag go on the companion, what it wore goes back, and it gives them back when dismissed (108 A)', async () => {
+  test('items of its class and one piece of jewellery from the bag go on the companion, what it wore goes back, and it gives them back when dismissed (108 A)', async () => {
     const [candidate] = (await settlement()).companions.candidates;
     await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
     const database = await db();
@@ -323,15 +324,16 @@ describe('companions through the API', () => {
     const weapon = await put(familyBase(cls.weapons.at(-1)));
     const talisman = await put(content.bases.find((base) => base.slot === 'talisman'));
     // The author: "zmień by towarzysze mogli nosić bizuterie ogolnie czyli
-    // amulety i pierscienie tez a nie sam talizman".
+    // amulety i pierscienie tez a nie sam talizman", and then "albo Amulet
+    // albo Pierścień albo Talizman a nie wszystko na raz".
     const amulet = await put(content.bases.find((base) => base.slot === 'amulet'));
     const ring = await put(content.bases.find((base) => base.slot === 'ring'));
     const wrong = await put(other);
     const bagCount = async () => (await database.prepare('SELECT COUNT(*) AS n FROM items WHERE slot IS NULL').first()).n;
     let hired = (await settlement()).companions.hired[0];
-    assert.deepEqual(hired.wear.map((place) => place.slot), ['weapon', 'chest', 'amulet', 'ring', 'talisman']);
-    assert.deepEqual(hired.wear.map((place) => place.slotName), ['Broń', 'Pancerz', 'Amulet', 'Pierścień', 'Talizman']);
-    assert.ok(hired.wear.slice(2).every((place) => place.item === null));
+    assert.deepEqual(hired.wear.map((place) => place.slot), ['weapon', 'chest', 'jewelry']);
+    assert.deepEqual(hired.wear.map((place) => place.slotName), ['Broń', 'Pancerz', 'Biżuteria']);
+    assert.equal(hired.wear[2].item, null);
     assert.ok([weapon, talisman, amulet, ring].every((id) => hired.wearable.includes(id)) && !hired.wearable.includes(wrong));
     assert.equal((await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: wrong } })).data.error.code, 'wrong_class');
     // The weapon takes the old one's place, and the old one goes to the bag.
@@ -342,14 +344,24 @@ describe('companions through the API', () => {
     hired = armed.data.settlement.companions.hired[0];
     assert.equal(hired.wear[0].item.given, true);
     assert.equal(await database.prepare('SELECT id FROM items WHERE id = ?').bind(weapon).first(), null);
-    // The talisman, the amulet and the ring fill empty places.
-    await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: talisman } });
-    await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: amulet } });
+    // The talisman fills the empty place of jewellery; the amulet takes its
+    // place, and the ring the amulet's, each going back to the bag.
+    const charmed = await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: talisman } });
+    assert.equal(charmed.status, 200);
+    assert.equal(await bagCount(), before - 1);
+    assert.equal(charmed.data.settlement.companions.hired[0].wear[2].item.slot, 'talisman');
+    const hung = await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: amulet } });
+    assert.equal(hung.data.settlement.companions.hired[0].wear[2].item.slot, 'amulet');
     const ringed = await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: ring } });
     assert.equal(ringed.status, 200);
-    assert.equal(await bagCount(), before - 3);
-    assert.ok(ringed.data.settlement.companions.hired[0].wear.every((place) => place.item));
-    // Dismissed, it gives back the four items from the bag and keeps its own armour.
+    assert.equal(await bagCount(), before - 1);
+    assert.deepEqual(
+      ringed.data.settlement.companions.hired[0].wear.map((place) => place.item?.slot),
+      ['weapon', 'chest', 'ring'],
+    );
+    const worn = JSON.parse((await database.prepare('SELECT settlement FROM characters').first()).settlement).companions[0].gear;
+    assert.deepEqual(worn.map((item) => item.slot).sort(), ['chest', 'ring', 'weapon']);
+    // Dismissed, it gives back the two items from the bag and keeps its own armour.
     const dismissed = await call('POST', '/api/settlement/dismiss', { cookie, body: { companionId: candidate.id } });
     assert.equal(dismissed.status, 200);
     assert.equal(await bagCount(), before + 1);
@@ -374,6 +386,43 @@ describe('companions through the API', () => {
   };
   const upgrade = (companionId, slot, body = {}) => call('POST', '/api/settlement/companion-upgrade', { cookie, body: { companionId, slot, ...body } });
   const placeOf = (view, slot) => view.companions.hired[0].wear.find((place) => place.slot === slot);
+
+  test('a companion who put on several pieces of jewellery keeps the last; the others go back to the bag (migration 0088)', async () => {
+    const candidate = await hireFirst();
+    const database = await db();
+    const rng = createRng('jewellery');
+    const piece = (slot) => ({ ...generateItem({ baseId: content.bases.find((base) => base.slot === slot).id, level: 5 }, rng, content), given: true });
+    const [talisman, amulet, ring] = ['talisman', 'amulet', 'ring'].map(piece);
+    const osada = await stored();
+    const [first] = osada.companions;
+    // Since 0.1.71 one could wear all three; another wears one, as now.
+    osada.companions = [
+      { ...first, gear: [...first.gear, talisman, amulet, ring] },
+      { ...first, id: 'second', gear: [...first.gear, { ...talisman }] },
+    ];
+    await database.prepare('UPDATE characters SET settlement = ?').bind(JSON.stringify(osada)).run();
+    const { version } = await database.prepare('SELECT version FROM characters').first();
+    const migrate = async () => {
+      const sql = readFileSync(new URL('../migrations/0088_companion_jewelry.sql', import.meta.url), 'utf8').replace(/^--.*$/gm, '');
+      for (const statement of sql.split(';').map((one) => one.trim()).filter(Boolean)) await database.prepare(statement).run();
+    };
+    await migrate();
+    const after = await stored();
+    assert.deepEqual(after.companions[0].gear, [...first.gear, ring]);
+    assert.deepEqual(after.companions[1], osada.companions[1]);
+    assert.deepEqual({ ...after, companions: null }, { ...osada, companions: null });
+    const bag = (await database.prepare('SELECT data FROM items WHERE slot IS NULL ORDER BY id').all()).results.map((row) => JSON.parse(row.data));
+    const { given: _t, ...plainTalisman } = talisman;
+    const { given: _a, ...plainAmulet } = amulet;
+    assert.deepEqual(bag.slice(-2), [plainTalisman, plainAmulet]);
+    assert.equal((await database.prepare('SELECT version FROM characters').first()).version, version + 1);
+    // The Kwatery show the ring in its place; a second run changes nothing.
+    assert.equal(placeOf(await settlement(), 'jewelry').item.slot, 'ring');
+    await migrate();
+    assert.deepEqual(await stored(), after);
+    assert.equal((await database.prepare('SELECT COUNT(*) AS n FROM items WHERE slot IS NULL').first()).n, bag.length);
+    assert.equal(candidate.id, first.id);
+  });
 
   test("an item the companion wears is upgraded as on the Kowadło, paid from the character's own gold, ore and materials", async () => {
     const candidate = await hireFirst();
