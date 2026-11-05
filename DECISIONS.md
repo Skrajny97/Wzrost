@@ -3034,6 +3034,20 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.57 (5.11.2026)
+
+Zadania miesięczne od narratora (prośba autora): zob. „Zadania miesięczne od narratora”.
+
+## Zadania miesięczne od narratora (5.11.2026, w grze od 0.1.57)
+
+Autor: „Zrobmy jeszcze zadania miesięczne od narratora może? Punkty Czasu +240, Punkty Systemu +50 i do tego +x złota zależne od poziomu, ale taka większa ilośc”.
+
+1. **Trzecia zakładka „Miesięczne”** w zadaniach od narratora, obok dziennych i tygodniowych. Miesiąc zaczyna się o północy przed jego pierwszym dniem, czasu polskiego.
+2. **Zadania.** Pięć zadań tych samych rodzajów co tygodniowe, bez otwierania regionów, z liczbami czterech tygodni, np. 3600–7200 minut wypraw zamiast 900–1800. Liczby zależą od poziomu postaci jak w tygodniowych (krzywa `weekly.curve`). Zadania wylosowane w trakcie miesiąca są na tyle dni, ile z niego zostało, i mówi o tym napis pod nimi, np. „Zadania są na 26 z 30 dni tego miesiąca.”
+3. **Nagrody.** Za każde zadanie cztery razy tyle co za tygodniowe. Skrzynia za wszystkie: +240 Punktów Czasu, +50 Punktów Systemu i złoto 1000 + 200 × poziom postaci, np. 11 000 na 50. poziomie (autor: „taka większa ilość”).
+4. **Przelosowanie** raz na miesiąc. Postęp liczą te same czynności co w zadaniach dziennych i tygodniowych, wszystkie naraz.
+5. Napisy o przelosowaniu każdego okresu („Zadania tego miesiąca są już przelosowane.”, „raz na miesiąc”) są w `data/quests.json`.
+
 ## Wersja 0.1.56 (5.11.2026)
 
 Sala prób (620 B, budynek 627.2 B), Poszukiwani (619 B) i siódmy próg Prób Gildii: zob. „Sala prób”, „Poszukiwani” i „Progi Prób Gildii do wszystkich prób”.
@@ -3076,7 +3090,7 @@ Autor: „Namieszane z tymi próbami, powinieneś wiecej progów zrobić, tak by
 Autor: „627.2 B”, „Uwaga zeby nie przesadzić z balansem jak te trofeum wlecą znowu się zrobi za łatwo”, „Namieszane z tymi próbami, powinieneś wiecej progów zrobić, tak by było policzone pod liczbę użytkowników jak wszyscy wykonają wszystkie to wtedy maksa się zdobywa.” i „Zrobmy jeszcze zadania miesięczne od narratora może? Punkty Czasu +240, Punkty Systemu +50 i do tego +x złota zależne od poziomu, ale taka większa ilośc”.
 
 1. **627.2 B, balans trofeów i progi Prób:** w grze od 0.1.56 (zob. „Sala prób”, „Poszukiwani”, punkt 6, i „Progi Prób Gildii do wszystkich prób”).
-2. **Zadania miesięczne od narratora:** następne po 0.1.56. Trzeci okres zadań obok dziennych i tygodniowych, ze skrzynią za komplet: +240 Punktów Czasu, +50 Punktów Systemu i złoto zależne od poziomu, większe niż w skrzyniach tygodniowych.
+2. **Zadania miesięczne od narratora:** w grze od 0.1.57 (zob. „Zadania miesięczne od narratora”).
 
 ## Odpowiedzi autora 621, 624–626 i samouczki (5.11.2026)
 

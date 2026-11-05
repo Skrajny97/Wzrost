@@ -1358,8 +1358,8 @@ export function characterView(player, now) {
     encyclopedia: { ready: readyChests(JSON.parse(row.discovered ?? '{}'), JSON.parse(row.encyclopedia ?? '[]'), content) },
     // The potions for a time still working (potions.js).
     buffs: activeBuffs(player, now),
-    // The narrator's daily and weekly quests (quests.js).
-    quests: questsView(questsNow(player, now), now, content, JSON.parse(row.met ?? '[]')),
+    // The narrator's daily, weekly and monthly quests (quests.js).
+    quests: questsView(questsNow(player, now), now, content, JSON.parse(row.met ?? '[]'), row.level),
     // The narrator's cards seen so far, or null for a character made before
     // the introduction (tutorial.js).
     tutorial: row.tutorial === null ? null : JSON.parse(row.tutorial),

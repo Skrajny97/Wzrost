@@ -1,6 +1,7 @@
-// The narrator's daily and weekly quests (data/quests.json). Days and weeks
-// follow the clock of quests.timeZone (Polish time): a day starts at
-// midnight, a week at the midnight between Sunday and Monday. A period's
+// The narrator's daily, weekly and monthly quests (data/quests.json). Days,
+// weeks and months follow the clock of quests.timeZone (Polish time): a day
+// starts at midnight, a week at the midnight between Sunday and Monday, a
+// month at the midnight before its first day. A period's
 // quests are drawn when it comes, from a seed of the character and the
 // period, so a period always gets the same ones: creatures of the newest
 // inner region open to the character's class (and of the one before it for
@@ -26,7 +27,7 @@ import { createRng } from './rng.js';
 import { countedForm } from './text.js';
 import { areasOpened, areaUnlocked } from './unlocks.js';
 
-export const QUEST_PERIODS = ['daily', 'weekly'];
+export const QUEST_PERIODS = ['daily', 'weekly', 'monthly'];
 
 // The zone's wall clock. Intl knows the zone's rules (summer time), so the
 // days turn at the zone's midnight all year.
@@ -77,6 +78,20 @@ function sinceMonday(ms, timeZone) {
 // a Sunday.
 export const weekDaysLeft = (now, content) => 7 - sinceMonday(now, content.quests.timeZone);
 
+// The day of the month on the zone's clock at `ms`, and how many days the
+// month has.
+function monthDay(ms, timeZone) {
+  const { year, month, day } = zoneClock(ms, timeZone);
+  return { day, length: new Date(Date.UTC(year, month, 0)).getUTCDate() };
+}
+
+// The days left of the month at `now`, today among them (all of them on its
+// first day, 1 on its last), and how many it has (`total`).
+export function monthDaysLeft(now, content) {
+  const { day, length } = monthDay(now, content.quests.timeZone);
+  return { days: length - day + 1, total: length };
+}
+
 // How much of the usual numbers a week's quests ask for: the share at the
 // character's level on the curve (quests.json, weekly.curve: points of a
 // level and a share, straight between them, the last one's beyond it),
@@ -94,6 +109,20 @@ export function weekShare(level, days, content) {
   return (share * Math.min(7, Math.max(1, days))) / 7;
 }
 
+// How much of the usual numbers a period's quests drawn at `now` ask for:
+// a week's by weekShare and the days left of it, a month's (its own numbers
+// are four weeks') by the week's share at the character's level and the
+// share of the month's days left (the author: „Zrobmy jeszcze zadania
+// miesięczne od narratora”), a day's all.
+export function periodShare(periodId, level, now, content) {
+  if (periodId === 'weekly') return weekShare(level, weekDaysLeft(now, content), content);
+  if (periodId === 'monthly') {
+    const { days, total } = monthDaysLeft(now, content);
+    return (weekShare(level, 7, content) * days) / total;
+  }
+  return 1;
+}
+
 // The last period of each kind worked out: every moment inside it has the
 // same one, so it is kept (the code review: a character view asked for the
 // period dozens of times, each with some time-zone arithmetic).
@@ -107,9 +136,10 @@ export function questPeriod(periodId, now, content) {
   const last = lastPeriods.get(id);
   if (last && last.startsAt <= now && now < last.endsAt) return { ...last };
   const weekly = periodId === 'weekly';
-  const back = weekly ? sinceMonday(now, timeZone) : 0;
+  const calendar = periodId === 'monthly' ? monthDay(now, timeZone) : null;
+  const back = weekly ? sinceMonday(now, timeZone) : calendar ? calendar.day - 1 : 0;
   const startsAt = zoneMidnight(now, timeZone, -back);
-  const endsAt = zoneMidnight(now, timeZone, (weekly ? 7 : 1) - back);
+  const endsAt = zoneMidnight(now, timeZone, (weekly ? 7 : calendar ? calendar.length : 1) - back);
   const { year, month, day } = zoneClock(startsAt, timeZone);
   const key = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   lastPeriods.set(id, { key, startsAt, endsAt });
@@ -255,10 +285,10 @@ const newQuest = (option, periodId, character, rng, content, share = 1) => ({
 
 // A period's quests, drawn from `seed` for the character as it is: no
 // option twice, in the order of the kinds; a week's by the character's
-// level and the `days` of it left.
-export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed, days = 7 }, content) {
+// level and the `days` of it left, or `share` given (periodShare).
+export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed, days = 7, share: given }, content) {
   const rng = createRng(seed);
-  const share = periodId === 'weekly' ? weekShare(character.level, days, content) : 1;
+  const share = given ?? (periodId === 'weekly' ? weekShare(character.level, days, content) : 1);
   let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions }, content);
   const drawn = [];
   while (drawn.length < content.quests.periods[periodId].count && options.length > 0) {
@@ -305,7 +335,7 @@ function healedPeriod(period, periodId, { character, hasTable, hasProfessions, h
       const rng = createRng(`${seed}:${periodId}:${period.period}:${index}`);
       const option = rng.weighted(options);
       options = options.filter((other) => other !== option);
-      return [newQuest(option, periodId, character, rng, content, periodId === 'weekly' ? weekShare(character.level, weekDaysLeft(now, content), content) : 1)];
+      return [newQuest(option, periodId, character, rng, content, periodShare(periodId, character.level, now, content))];
     }),
   };
 }
@@ -326,8 +356,21 @@ export function currentQuests(stored, { character, hasTable, hasProfessions, has
       }
       const weekly = periodId === 'weekly';
       const days = weekly ? weekDaysLeft(now, content) : 7;
-      const quests = drawQuests(periodId, { ...context, seed: `${seed}:${periodId}:${key}`, days }, content);
-      return [periodId, { period: key, quests, chest: false, ...(weekly && { scaled: true }), ...(days < 7 && { days }) }];
+      // A month drawn under way: the days left of it and how many it has.
+      const month = periodId === 'monthly' ? monthDaysLeft(now, content) : null;
+      const share = periodShare(periodId, character.level, now, content);
+      const quests = drawQuests(periodId, { ...context, seed: `${seed}:${periodId}:${key}`, days, share }, content);
+      return [
+        periodId,
+        {
+          period: key,
+          quests,
+          chest: false,
+          ...(weekly && { scaled: true }),
+          ...(weekly && days < 7 && { days }),
+          ...(month && month.days < month.total && { days: month.days, total: month.total }),
+        },
+      ];
     }),
   );
 }
@@ -373,7 +416,7 @@ export function rerolledQuests(quests, periodId, { character, hasTable, hasProfe
   );
   const fresh = options.filter((option) => !period.quests.some((quest) => replaced(quest) && same(option, quest)));
   let pool = fresh.length >= count ? fresh : options;
-  const share = periodId === 'weekly' ? weekShare(character.level, weekDaysLeft(now, content), content) : 1;
+  const share = periodShare(periodId, character.level, now, content);
   const rng = createRng(`${seed}:${periodId}:${period.period}:reroll`);
   return {
     ...quests,
@@ -497,19 +540,23 @@ export function questText(quest, content, met = null) {
     .replace('{herb}', quest.kind === 'gather' ? content.herbsById[quest.target].genitive : '');
 }
 
+// The gold in a period's chest for a character of `level` (the month's).
+export const chestGold = (chest, level) => (chest.gold ? Math.round(chest.gold.base + chest.gold.perLevel * level) : 0);
+
 // The quests as the page shows them: each period with its name, its end,
-// its quests (`index`: the place to claim it by) and its chest. A quest of a
-// kind or a creature no longer in the data is left out.
-export function questsView(quests, now, content, met = null) {
+// its quests (`index`: the place to claim it by) and its chest, its gold
+// for a character of `level`. A quest of a kind or a creature no longer in
+// the data is left out.
+export function questsView(quests, now, content, met = null, level = 1) {
   const known = (quest) =>
     content.quests.kinds.some((kind) => kind.id === quest.kind) &&
     (quest.kind !== 'kill' || Boolean(content.monstersById[quest.target])) &&
     (quest.kind !== 'gather' || Boolean(content.herbsById[quest.target])) &&
     (quest.kind !== 'brew' || Boolean(content.potionsById[quest.target]));
   return Object.fromEntries(
-    QUEST_PERIODS.map((periodId) => {
+    QUEST_PERIODS.filter((periodId) => quests[periodId]).map((periodId) => {
       const period = quests[periodId];
-      const { name, chest } = content.quests.periods[periodId];
+      const { name, chest, rerolled, rerollWhen } = content.quests.periods[periodId];
       return [
         periodId,
         {
@@ -532,12 +579,16 @@ export function questsView(quests, now, content, met = null) {
                 ]
               : [],
           ),
-          chest: { ...chest, ready: chestReady(period), opened: period.chest },
-          // Its quests drawn anew already this period.
+          chest: { ...chest, gold: chestGold(chest, level), ready: chestReady(period), opened: period.chest },
+          // Its quests drawn anew already this period, and the words for it.
           rerolled: Boolean(period.rerolled),
-          // A week drawn late: the days left of it then, and the words
-          // under its quests.
-          ...(period.days && { days: period.days, late: content.quests.periods[periodId].late?.replace('{days}', String(period.days)) ?? null }),
+          texts: { rerolled, rerollWhen },
+          // A week or a month drawn late: the days left of it then, and the
+          // words under its quests.
+          ...(period.days && {
+            days: period.days,
+            late: content.quests.periods[periodId].late?.replace('{days}', String(period.days)).replace('{total}', String(period.total ?? 7)) ?? null,
+          }),
         },
       ];
     }),

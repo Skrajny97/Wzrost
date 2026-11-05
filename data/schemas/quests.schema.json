@@ -25,13 +25,17 @@
       "additionalProperties": false,
       "required": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "properties": {
         "daily": {
           "$ref": "#/definitions/period"
         },
         "weekly": {
+          "$ref": "#/definitions/period"
+        },
+        "monthly": {
           "$ref": "#/definitions/period"
         }
       }
@@ -123,6 +127,9 @@
             "type": "integer",
             "minimum": 2,
             "description": "Rodzaj unlock: losuje się tylko postaciom z niższym poziomem klasy (nowym graczom)."
+          },
+          "monthly": {
+            "$ref": "#/definitions/kindPeriod"
           }
         },
         "anyOf": [
@@ -147,6 +154,7 @@
         "spread",
         "daily",
         "weekly",
+        "monthly",
         "resources"
       ],
       "properties": {
@@ -187,6 +195,9 @@
             "type": "number",
             "exclusiveMinimum": 0
           }
+        },
+        "monthly": {
+          "$ref": "#/definitions/amounts"
         }
       }
     },
@@ -230,7 +241,9 @@
       "required": [
         "name",
         "count",
-        "chest"
+        "chest",
+        "rerolled",
+        "rerollWhen"
       ],
       "properties": {
         "name": {
@@ -268,13 +281,32 @@
               "type": "string",
               "minLength": 1,
               "description": "Napis pod zadaniami okresu: co daje skrzynia."
+            },
+            "gold": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "base",
+                "perLevel"
+              ],
+              "description": "Złoto w skrzyni: base + perLevel × poziom postaci.",
+              "properties": {
+                "base": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "perLevel": {
+                  "type": "integer",
+                  "minimum": 0
+                }
+              }
             }
           }
         },
         "late": {
           "type": "string",
           "pattern": "\\{days\\}",
-          "description": "Napis pod zadaniami tygodnia wylosowanego w jego trakcie; {days}: dni, które zostały."
+          "description": "Napis pod zadaniami tygodnia albo miesiąca wylosowanymi w ich trakcie; {days}: dni, które zostały, {total}: dni miesiąca."
         },
         "curve": {
           "type": "array",
@@ -285,10 +317,27 @@
             "minItems": 2,
             "maxItems": 2,
             "items": [
-              { "type": "integer", "minimum": 1 },
-              { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 1
+              }
             ]
           }
+        },
+        "rerolled": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Napis, gdy zadania okresu są już przelosowane."
+        },
+        "rerollWhen": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Jak często można przelosować zadania okresu (do pytania przed przelosowaniem)."
         }
       }
     },

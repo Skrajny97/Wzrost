@@ -1,5 +1,5 @@
 {
-  "$comment": "Zadania dzienne i tygodniowe od narratora (src/engine/quests.js). Dzienne odnawiają się o północy, tygodniowe w nocy z niedzieli na poniedziałek, według zegara strefy timeZone. Każdy okres ma swoją liczbę zadań (count) i skrzynię za wykonanie wszystkich, z napisem pod zadaniami (chest.text), który podaje te same liczby co skrzynia. Rodzaje zadań (kinds) losują się bez powtórzeń: waga rodzaju (weight) dzieli się między jego warianty, np. różne stwory. Postęp liczy kod według id rodzaju: kill – stwory pokonane na wyprawach, killAny – wszystkie stwory pokonane na wyprawach, explore – minuty wypraw, unlock – regiony wewnętrzne, do których klasa otwiera dostęp nowymi poziomami (tylko dla nowych postaci: póki poziom klasy jest niższy niż untilClassLevel, najwyżej tyle, ile zamkniętych regionów otwiera się w zasięgu reach poziomów klasy, a od poziomu klasy fromClassLevel z listy most najwyżej count), process – materiały oddane do przeróbki na Stole rozbiórki, salvage – przedmioty oddane tam do rozebrania, gather – sztuki danego zioła zebrane w Zielarstwie (jedno ze znanych ziół, {herb} w dopełniaczu), gatherAny – wszystkie zebrane zioła, brew – mikstury danego przepisu uwarzone w Alchemii (jeden ze znanych przepisów; {noun} to nazwa mikstury po liczbie, counted z professions.json), brewAny – wszystkie uwarzone mikstury, make i makeAny – przedmioty wykonane w Rzemieślnictwie (liczą się tylko udane), mineAny – wszystkie minerały wydobyte w Górnictwie, jewelAny – sztuki biżuterii wykonane w Jubilerstwie (tylko udane). table: rodzaj tylko z postawionym Stołem rozbiórki. professions: rodzaj tylko z dostępnymi profesjami. crafting: rodzaj tylko tam, gdzie działa Rzemieślnictwo. profession: rodzaj tylko z otwartą tą profesją (Górnictwo i Jubilerstwo od 25. poziomu postaci). Rodzaj bez daily albo weekly nie trafia do tego okresu. rewardFactor: tyle razy większa nagroda za rzadszy rodzaj. Ile trzeba zrobić, losuje się z zakresu okresu (count, co step), a w kill i killAny z liczby walk (fights): tyle danych stworów (w killAny wszystkich), ile średnio przynosi tyle walk w najnowszym miejscu wypraw otwartym dla postaci. W tekście {count} to ta liczba, a {noun} rzeczownik w formie do niej (counted: 1, 2–4, 5 i więcej; w kill z monsters.json). Liczby zadań tygodnia (wylosowane z count i fights) mnożą się przez udział z krzywej weekly.curve: punkty [poziom postaci, udział], między nimi liniowo, za ostatnim jak ostatni; do 50. poziomu dużo mniej, potem coraz więcej (autor: „Niech curve tygodniowych zadań rośnie z czasem”, „do 50 lvla o wiele lżejsze i z czassem trudniej troche”). Zadania tygodnia wylosowane w jego trakcie (nowa postać albo pierwsze wejście w tygodniu w późniejszym dniu) biorą z tego tyle siódmych części, ile dni zostało do końca tygodnia, licząc dzień losowania (autor: „ustaw na robienie do końca czasu pozostałego”). Wynik zaokrągla się do kroku (step) i nie spada poniżej jednego kroku; nagrody zostają całe, a pod zadaniami tygodnia wylosowanego w trakcie stoi napis late ({days}: dni, które zostały). Zadań otwierania skrzyń dziennych nie ma (autor: „nie rób otwierania skrzynek zadań jako zadania”), a zapisane takie zadania losują się od nowa. Nagroda za zadanie losuje się z rewards.weights: złoto, zasób albo części, w ilości base + perLevel × poziom postaci, ± spread; zasób razy swój udział (resources), części według levels. levels: od którego poziomu postaci jaka część jest nagrodą i z jakimi wagami losuje się rzadkość przedmiotu ze skrzyni tygodniowej.",
+  "$comment": "Zadania dzienne, tygodniowe i miesięczne od narratora (src/engine/quests.js). Dzienne odnawiają się o północy, tygodniowe w nocy z niedzieli na poniedziałek, miesięczne w nocy przed pierwszym dniem miesiąca (autor: „Zrobmy jeszcze zadania miesięczne od narratora może? Punkty Czasu +240, Punkty Systemu +50 i do tego +x złota zależne od poziomu, ale taka większa ilośc”; liczby jak czterech tygodni, udział z krzywej tygodnia razy dni miesiąca, które zostały; skrzynia ze złotem gold.base + gold.perLevel × poziom postaci), według zegara strefy timeZone. Każdy okres ma swoją liczbę zadań (count) i skrzynię za wykonanie wszystkich, z napisem pod zadaniami (chest.text), który podaje te same liczby co skrzynia. Rodzaje zadań (kinds) losują się bez powtórzeń: waga rodzaju (weight) dzieli się między jego warianty, np. różne stwory. Postęp liczy kod według id rodzaju: kill – stwory pokonane na wyprawach, killAny – wszystkie stwory pokonane na wyprawach, explore – minuty wypraw, unlock – regiony wewnętrzne, do których klasa otwiera dostęp nowymi poziomami (tylko dla nowych postaci: póki poziom klasy jest niższy niż untilClassLevel, najwyżej tyle, ile zamkniętych regionów otwiera się w zasięgu reach poziomów klasy, a od poziomu klasy fromClassLevel z listy most najwyżej count), process – materiały oddane do przeróbki na Stole rozbiórki, salvage – przedmioty oddane tam do rozebrania, gather – sztuki danego zioła zebrane w Zielarstwie (jedno ze znanych ziół, {herb} w dopełniaczu), gatherAny – wszystkie zebrane zioła, brew – mikstury danego przepisu uwarzone w Alchemii (jeden ze znanych przepisów; {noun} to nazwa mikstury po liczbie, counted z professions.json), brewAny – wszystkie uwarzone mikstury, make i makeAny – przedmioty wykonane w Rzemieślnictwie (liczą się tylko udane), mineAny – wszystkie minerały wydobyte w Górnictwie, jewelAny – sztuki biżuterii wykonane w Jubilerstwie (tylko udane). table: rodzaj tylko z postawionym Stołem rozbiórki. professions: rodzaj tylko z dostępnymi profesjami. crafting: rodzaj tylko tam, gdzie działa Rzemieślnictwo. profession: rodzaj tylko z otwartą tą profesją (Górnictwo i Jubilerstwo od 25. poziomu postaci). Rodzaj bez daily albo weekly nie trafia do tego okresu. rewardFactor: tyle razy większa nagroda za rzadszy rodzaj. Ile trzeba zrobić, losuje się z zakresu okresu (count, co step), a w kill i killAny z liczby walk (fights): tyle danych stworów (w killAny wszystkich), ile średnio przynosi tyle walk w najnowszym miejscu wypraw otwartym dla postaci. W tekście {count} to ta liczba, a {noun} rzeczownik w formie do niej (counted: 1, 2–4, 5 i więcej; w kill z monsters.json). Liczby zadań tygodnia (wylosowane z count i fights) mnożą się przez udział z krzywej weekly.curve: punkty [poziom postaci, udział], między nimi liniowo, za ostatnim jak ostatni; do 50. poziomu dużo mniej, potem coraz więcej (autor: „Niech curve tygodniowych zadań rośnie z czasem”, „do 50 lvla o wiele lżejsze i z czassem trudniej troche”). Zadania tygodnia wylosowane w jego trakcie (nowa postać albo pierwsze wejście w tygodniu w późniejszym dniu) biorą z tego tyle siódmych części, ile dni zostało do końca tygodnia, licząc dzień losowania (autor: „ustaw na robienie do końca czasu pozostałego”). Wynik zaokrągla się do kroku (step) i nie spada poniżej jednego kroku; nagrody zostają całe, a pod zadaniami tygodnia wylosowanego w trakcie stoi napis late ({days}: dni, które zostały). Zadań otwierania skrzyń dziennych nie ma (autor: „nie rób otwierania skrzynek zadań jako zadania”), a zapisane takie zadania losują się od nowa. Nagroda za zadanie losuje się z rewards.weights: złoto, zasób albo części, w ilości base + perLevel × poziom postaci, ± spread; zasób razy swój udział (resources), części według levels. levels: od którego poziomu postaci jaka część jest nagrodą i z jakimi wagami losuje się rzadkość przedmiotu ze skrzyni tygodniowej.",
   "timeZone": "Europe/Warsaw",
   "periods": {
     "daily": {
@@ -10,7 +10,9 @@
         "systemPoints": 5,
         "item": false,
         "text": "Skrzynia dziennych zadań dostarcza +30 Punktów Czasu i +5 Punktów Systemu."
-      }
+      },
+      "rerolled": "Dzisiejsze zadania są już przelosowane.",
+      "rerollWhen": "raz na dzień"
     },
     "weekly": {
       "name": "Tygodniowe",
@@ -22,7 +24,23 @@
         "text": "Skrzynia tygodniowych zadań dostarcza losowy przedmiot, +120 Punktów Czasu i +20 Punktów Systemu."
       },
       "late": "Ten tydzień zaczął się dla Ciebie później, więc zadania są na {days} z 7 dni.",
+      "rerolled": "Zadania tego tygodnia są już przelosowane.",
+      "rerollWhen": "raz na tydzień",
       "curve": [[1, 0.3], [25, 0.35], [50, 0.5], [100, 0.75], [200, 1]]
+    },
+    "monthly": {
+      "name": "Miesięczne",
+      "count": 5,
+      "chest": {
+        "timePoints": 240,
+        "systemPoints": 50,
+        "item": false,
+        "gold": { "base": 1000, "perLevel": 200 },
+        "text": "Skrzynia miesięcznych zadań dostarcza złoto zależne od poziomu, +240 Punktów Czasu i +50 Punktów Systemu."
+      },
+      "late": "Zadania są na {days} z {total} dni tego miesiąca.",
+      "rerolled": "Zadania tego miesiąca są już przelosowane.",
+      "rerollWhen": "raz na miesiąc"
     }
   },
   "kinds": [
@@ -38,7 +56,8 @@
       "counted": ["stwora", "stwory", "stworów"],
       "weight": 1,
       "daily": { "fights": [5, 8] },
-      "weekly": { "fights": [120, 200] }
+      "weekly": { "fights": [120, 200] },
+      "monthly": { "fights": [480, 800] }
     },
     {
       "id": "explore",
@@ -46,7 +65,8 @@
       "counted": ["minutę", "minuty", "minut"],
       "weight": 1,
       "daily": { "count": [30, 90], "step": 15 },
-      "weekly": { "count": [900, 1800], "step": 60 }
+      "weekly": { "count": [900, 1800], "step": 60 },
+      "monthly": { "count": [3600, 7200], "step": 240 }
     },
     {
       "id": "unlock",
@@ -63,7 +83,8 @@
       "table": true,
       "weight": 1,
       "daily": { "count": [2, 4] },
-      "weekly": { "count": [30, 60], "step": 5 }
+      "weekly": { "count": [30, 60], "step": 5 },
+      "monthly": { "count": [120, 240], "step": 20 }
     },
     {
       "id": "salvage",
@@ -72,7 +93,8 @@
       "table": true,
       "weight": 1,
       "daily": { "count": [1, 2] },
-      "weekly": { "count": [15, 30], "step": 5 }
+      "weekly": { "count": [15, 30], "step": 5 },
+      "monthly": { "count": [60, 120], "step": 20 }
     },
     {
       "id": "gather",
@@ -88,7 +110,8 @@
       "counted": ["zioło", "zioła", "ziół"],
       "professions": true,
       "weight": 1,
-      "weekly": { "count": [150, 150] }
+      "weekly": { "count": [150, 150] },
+      "monthly": { "count": [600, 600] }
     },
     {
       "id": "brew",
@@ -103,7 +126,8 @@
       "counted": ["miksturę", "mikstury", "mikstur"],
       "professions": true,
       "weight": 1,
-      "weekly": { "count": [40, 40] }
+      "weekly": { "count": [40, 40] },
+      "monthly": { "count": [160, 160] }
     },
     {
       "id": "make",
@@ -123,7 +147,8 @@
       "crafting": true,
       "weight": 0.5,
       "rewardFactor": 2,
-      "weekly": { "count": [10, 10] }
+      "weekly": { "count": [10, 10] },
+      "monthly": { "count": [40, 40] }
     },
     {
       "id": "mineAny",
@@ -133,7 +158,8 @@
       "profession": "mining",
       "weight": 1,
       "daily": { "count": [12, 12] },
-      "weekly": { "count": [120, 120], "step": 10 }
+      "weekly": { "count": [120, 120], "step": 10 },
+      "monthly": { "count": [480, 480], "step": 40 }
     },
     {
       "id": "jewelAny",
@@ -144,7 +170,8 @@
       "weight": 0.5,
       "rewardFactor": 2,
       "daily": { "count": [2, 2] },
-      "weekly": { "count": [12, 12] }
+      "weekly": { "count": [12, 12] },
+      "monthly": { "count": [48, 48] }
     },
     {
       "id": "orders",
@@ -153,7 +180,8 @@
       "settlement": true,
       "weight": 1,
       "daily": { "count": [2, 2] },
-      "weekly": { "count": [12, 12] }
+      "weekly": { "count": [12, 12] },
+      "monthly": { "count": [48, 48] }
     }
   ],
   "rewards": {
@@ -168,6 +196,11 @@
       "gold": { "base": 40, "perLevel": 16 },
       "resource": { "base": 20, "perLevel": 8 },
       "part": { "base": 6, "perLevel": 0 }
+    },
+    "monthly": {
+      "gold": { "base": 160, "perLevel": 64 },
+      "resource": { "base": 80, "perLevel": 32 },
+      "part": { "base": 24, "perLevel": 0 }
     },
     "resources": { "wood": 1, "stone": 0.6, "iron-ore": 0.4 }
   },

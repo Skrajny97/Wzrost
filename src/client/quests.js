@@ -1,4 +1,4 @@
-// The narrator's daily and weekly quests (quests.js in the engine): a
+// The narrator's daily, weekly and monthly quests (quests.js in the engine): a
 // parchment that unrolls under his face in the top bar, with a tab for each
 // period on top, the time to its new quests, the quests with their rewards
 // and "Odbierz", the period's chest in the top right corner, and at the
@@ -13,7 +13,7 @@ import { call, onCharacterChange, serverNow, state } from './state.js';
 import { timePoints } from './time.js';
 import { confirmAction, toast, withButton } from './ui.js';
 
-const PERIODS = ['daily', 'weekly'];
+const PERIODS = ['daily', 'weekly', 'monthly'];
 
 let open = null; // { dialog, sheet, page, timer, endsAt, countdown, closing } while the parchment is out
 let tab = 'daily';
@@ -144,7 +144,7 @@ function questRow(periodId, quest) {
 
 // What the chest holds, in words.
 function chestText(chest) {
-  return [chest.item && 'przedmiot', timePoints(chest.timePoints), systemPoints(chest.systemPoints)].filter(Boolean).join(', ');
+  return [chest.item && 'przedmiot', chest.gold > 0 && `${formatNumber(chest.gold)} złota`, timePoints(chest.timePoints), systemPoints(chest.systemPoints)].filter(Boolean).join(', ');
 }
 
 function chestButton(periodId, period) {
@@ -264,18 +264,16 @@ export function watchQuests(now) {
   call('GET', '/api/character').catch((error) => toast(error.message));
 }
 
-// "Przelosuj zadania": the quests not done yet drawn anew, once a day for
-// the daily ones and once a week for the weekly ones (the author).
+// "Przelosuj zadania": the quests not done yet drawn anew, once a period (a
+// day, a week or a month; the author); the words are the period's.
 function rerollPart(periodId, period) {
-  if (period.rerolled) {
-    return h('p', { class: 'quests-note', text: periodId === 'daily' ? 'Dzisiejsze zadania są już przelosowane.' : 'Zadania tego tygodnia są już przelosowane.' });
-  }
+  if (period.rerolled) return h('p', { class: 'quests-note', text: period.texts.rerolled });
   if (period.chest.opened || !period.quests.some((quest) => !quest.done && !quest.claimed)) return null;
-  return h('button', { type: 'button', class: 'button quests-reroll', text: 'Przelosuj zadania', onClick: (event) => withButton(event.currentTarget, () => reroll(periodId)) });
+  return h('button', { type: 'button', class: 'button quests-reroll', text: 'Przelosuj zadania', onClick: (event) => withButton(event.currentTarget, () => reroll(periodId, period)) });
 }
 
-async function reroll(periodId) {
-  const when = periodId === 'daily' ? 'raz na dzień' : 'raz na tydzień';
+async function reroll(periodId, period) {
+  const when = period.texts.rerollWhen;
   const sure = await confirmAction({
     title: 'Przelosować zadania?',
     text: `Niewykonane zadania zmienią się na inne, a ich postęp przepadnie. Wykonane zostają. Przelosować możesz ${when}.`,
@@ -313,7 +311,8 @@ async function openChest(periodId, period) {
   // Coins spilling from the chest (data/sounds.json).
   playSound('chest');
   const item = chest.item ? `${chest.item.name}, ` : '';
-  toast(`Skrzynia otwarta: ${item}${timePoints(chest.timePoints)}, ${systemPoints(chest.systemPoints)}.`);
+  const gold = chest.gold > 0 ? `${formatNumber(chest.gold)} złota, ` : '';
+  toast(`Skrzynia otwarta: ${item}${gold}${timePoints(chest.timePoints)}, ${systemPoints(chest.systemPoints)}.`);
 }
 
 // Opens or closes the parchment of quests; it opens on the tab with

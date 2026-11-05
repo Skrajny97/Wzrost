@@ -90,6 +90,11 @@
       "id": "0.1.56",
       "title": "Wersja 0.1.56: Sala prób i Poszukiwani",
       "body": "- W Osadzie stoi Sala prób. Raz dziennie, za darmo, możesz podjąć próbę: trzy walki ze stworami następnego miejsca, w tym z jego elitą. Kto ją przejdzie, wejdzie tam na stałe, zanim pozwoli mu poziom klasy.\n- Na Tablicy zleceń sołtys wywiesza co dzień listy gończe: trzy za nazwanymi odmianami stworów i jeden za wyjętym spod prawa. Weź list, a na wyprawie w tym miejscu częściej spotkasz poszukiwanego.\n- Za pokonanie poszukiwanego sołtys płaci złotem i Punktami Czasu, a Bractwo Łowców okazuje przychylność. Stwór zostawia trofeum, a wyjęty spod prawa rzadki łup.\n- Próby Gildii mają siódmy próg: najwyższa skrzynia czeka, gdy wszyscy członkowie wykonają wszystkie próby tygodnia."
+    },
+    {
+      "id": "0.1.57",
+      "title": "Wersja 0.1.57: zadania miesięczne",
+      "body": "- Narrator ma zadania miesięczne: trzecia zakładka obok dziennych i tygodniowych.\n- Pięć zadań na cały miesiąc. Liczą się te same wyprawy i prace co w zadaniach dziennych i tygodniowych.\n- Skrzynia za wszystkie: +240 Punktów Czasu, +50 Punktów Systemu i złoto zależne od poziomu postaci.\n- Zadania tego miesiąca są na dni, które z niego zostały."
     }
 ]
 }

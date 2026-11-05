@@ -1,10 +1,10 @@
-// The narrator's daily and weekly quests (quests.js in the engine): a
+// The narrator's daily, weekly and monthly quests (quests.js in the engine): a
 // quest's reward is claimed once it is done, alone or with every other one
 // of its period ("Odbierz wszystkie"), and a period's chest opens once all
 // its quests are. Each saves only if the character is as read (its version),
 // so two taps give one reward.
 
-import { QUEST_PERIODS, bagCapacity, campLevels, chestItem, chestReady, createRng, itemName, questDone, rerolledQuests, withChest, withClaimed } from '../engine/index.js';
+import { QUEST_PERIODS, bagCapacity, campLevels, chestGold, chestItem, chestReady, createRng, itemName, questDone, rerolledQuests, withChest, withClaimed } from '../engine/index.js';
 import { content } from './content.js';
 import { bagPlaces, characterView, equippedItems, loadPlayer, questContext, questsNow, requirePlayer } from './characters.js';
 import { atomically, sameVersion } from './atomic.js';
@@ -56,7 +56,7 @@ async function saveClaims(context, session, player, quests, periodId, indexes) {
   return { rewards, character: characterView(await loadPlayer(db, session.userId), context.now) };
 }
 
-// { period: "daily" | "weekly", index }: the reward of a quest done.
+// { period: "daily" | "weekly" | "monthly", index }: the reward of a quest done.
 export async function claimQuest(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
@@ -84,8 +84,8 @@ export async function claimAllQuests(context) {
 }
 
 // { period }: the chest of a period whose quests are all done: Punkty Czasu,
-// Punkty Systemu and, in the weekly one, an item for the backpack, which
-// needs a free place there.
+// Punkty Systemu, in the weekly one an item for the backpack, which needs a
+// free place there, and in the monthly one gold by the character's level.
 export async function openChest(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
@@ -108,6 +108,7 @@ export async function openChest(context) {
     const rng = createRng(`${row.id}:${periodId}:${period.period}:chest`);
     item = chestItem({ level: row.level, classId: row.class_id, classLevel: row.class_level }, equippedItems(player).map((worn) => worn.slot), rng, content);
   }
+  const gold = chestGold(chest, row.level);
   const after = withChest(quests, periodId);
   // The batch holds only while the character is as read (atomic.js), so the
   // item comes only with the chest opened by this request (the code review:
@@ -115,8 +116,8 @@ export async function openChest(context) {
   const [, opened] = await atomically(db, [
     sameVersion(db, row),
     db
-      .prepare('UPDATE characters SET time_points = time_points + ?, system_points = system_points + ?, quests = ?, version = version + 1 WHERE id = ? AND version = ?')
-      .bind(chest.timePoints, chest.systemPoints, JSON.stringify(after), row.id, row.version),
+      .prepare('UPDATE characters SET gold = gold + ?, time_points = time_points + ?, system_points = system_points + ?, quests = ?, version = version + 1 WHERE id = ? AND version = ?')
+      .bind(gold, chest.timePoints, chest.systemPoints, JSON.stringify(after), row.id, row.version),
     // The item only with the chest opened above.
     ...(item
       ? [
@@ -129,6 +130,7 @@ export async function openChest(context) {
   if (opened.meta.changes !== 1) throw changed();
   return json({
     chest: {
+      gold,
       timePoints: chest.timePoints,
       systemPoints: chest.systemPoints,
       item: item && { name: itemName(item, content), rarity: item.rarity, color: content.raritiesById[item.rarity].color },
@@ -137,8 +139,8 @@ export async function openChest(context) {
   });
 }
 
-// { period }: the period's quests not done yet drawn anew, once a day for the
-// daily ones and once a week for the weekly ones (quests.js).
+// { period }: the period's quests not done yet drawn anew, once a period:
+// a day, a week or a month (quests.js).
 export async function rerollQuests(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
@@ -148,7 +150,7 @@ export async function rerollQuests(context) {
   const next = rerolledQuests(quests, periodId, questContext(player, now), now, content);
   if (!next) {
     throw quests[periodId].rerolled
-      ? new ApiError(409, 'rerolled', periodId === 'daily' ? 'Dzisiejsze zadania były już przelosowane.' : 'Zadania tego tygodnia były już przelosowane.')
+      ? new ApiError(409, 'rerolled', content.quests.periods[periodId].rerolled)
       : new ApiError(409, 'nothing_to_reroll', 'Nie ma zadań do przelosowania.');
   }
   const db = context.env.DB;

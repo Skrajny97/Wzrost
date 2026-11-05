@@ -138,6 +138,8 @@ import {
   questArea,
   questCreatures,
   questLevel,
+  monthDaysLeft,
+  periodShare,
   questPeriod,
   questText,
   questsStale,
@@ -2439,6 +2441,51 @@ describe('quests from the narrator', () => {
     assert.deepEqual([iso(spring.startsAt), iso(spring.endsAt)], ['2026-03-28T23:00:00.000Z', '2026-03-29T22:00:00.000Z']);
     // A week over the turn of a month.
     assert.equal(questPeriod('weekly', at('2026-11-01T12:00:00Z'), content).key, '2026-10-26');
+    // A month from the midnight before its first day to the one after its
+    // last, over the change of the clocks too (the author: „Zrobmy jeszcze
+    // zadania miesięczne od narratora”).
+    const october = questPeriod('monthly', at('2026-10-25T10:00:00Z'), content);
+    assert.deepEqual([october.key, iso(october.startsAt), iso(october.endsAt)], ['2026-10-01', '2026-09-30T22:00:00.000Z', '2026-10-31T23:00:00.000Z']);
+    assert.equal(questPeriod('monthly', at('2026-10-31T22:59:59Z'), content).key, '2026-10-01');
+    assert.equal(questPeriod('monthly', at('2026-10-31T23:00:00Z'), content).key, '2026-11-01');
+    const february = questPeriod('monthly', at('2026-02-15T12:00:00Z'), content);
+    assert.deepEqual([iso(february.startsAt), iso(february.endsAt)], ['2026-01-31T23:00:00.000Z', '2026-02-28T23:00:00.000Z']);
+    assert.deepEqual(monthDaysLeft(at('2026-10-25T10:00:00Z'), content), { days: 7, total: 31 });
+    assert.deepEqual(monthDaysLeft(at('2026-11-01T08:00:00Z'), content), { days: 30, total: 30 });
+  });
+
+  test('a month asks for four weeks of the week\'s numbers at the level, for the days left of it, and its chest holds gold by the level', () => {
+    const character = newCharacter('warrior', { level: 50, classLevel: 50 });
+    const context = { character, hasTable: true, seed: 'miesiąc' };
+    // Drawn on its first day: four weeks' worth at the level's share, of the
+    // kinds the week has.
+    const first = at('2026-11-01T08:00:00Z');
+    const drawn = currentQuests({}, context, first, content);
+    const whole = drawn.monthly;
+    assert.equal(whole.days, undefined);
+    assert.deepEqual(whole.quests.map((quest) => quest.kind).sort(), drawn.weekly.quests.map((quest) => quest.kind).sort());
+    const explore = content.quests.kinds.find((kind) => kind.id === 'explore');
+    for (const quest of whole.quests.filter((one) => one.kind === 'explore')) {
+      const [min, max] = explore.monthly.count;
+      assert.ok(quest.count >= min * weekShare(50, 7, content) - explore.monthly.step && quest.count <= max * weekShare(50, 7, content) + explore.monthly.step, String(quest.count));
+    }
+    assert.ok(Math.abs(periodShare('monthly', 50, first, content) - weekShare(50, 7, content)) < 1e-9);
+    // Drawn with 7 of 31 days left: that share of it, and the page says so.
+    const late = at('2026-10-25T10:00:00Z');
+    assert.ok(Math.abs(periodShare('monthly', 50, late, content) - (weekShare(50, 7, content) * 7) / 31) < 1e-9);
+    const october = currentQuests({}, context, late, content);
+    assert.deepEqual([october.monthly.days, october.monthly.total], [7, 31]);
+    const view = questsView(october, late, content, null, 50);
+    assert.equal(view.monthly.late, 'Zadania są na 7 z 31 dni tego miesiąca.');
+    assert.equal(view.monthly.name, 'Miesięczne');
+    assert.equal(view.monthly.chest.gold, 1000 + 200 * 50);
+    assert.equal(view.monthly.chest.timePoints, 240);
+    assert.equal(view.monthly.chest.systemPoints, 50);
+    assert.equal(view.weekly.chest.gold, 0);
+    assert.deepEqual(view.monthly.texts, { rerolled: 'Zadania tego miesiąca są już przelosowane.', rerollWhen: 'raz na miesiąc' });
+    // The month's rewards: four weeks'.
+    const rewards = content.quests.rewards;
+    assert.equal(rewards.monthly.gold.perLevel, rewards.weekly.gold.perLevel * 4);
   });
 
   test('a new character gets quests of the creatures of its place, of creatures of any kind and of the time explored', () => {
@@ -2897,10 +2944,11 @@ describe('quests from the narrator', () => {
     const draw = (seed) => currentQuests({}, { character: newCharacter('shadow'), hasTable: false, seed }, now, content);
     const quests = draw([...Array(20).keys()].find((seed) => draw(seed).daily.quests.some((quest) => quest.kind === 'explore')));
     const view = questsView(addQuestProgress(quests, { minutes: 240 }), now, content);
-    assert.deepEqual(Object.keys(view), ['daily', 'weekly']);
+    assert.deepEqual(Object.keys(view), ['daily', 'weekly', 'monthly']);
     assert.equal(view.daily.name, 'Dzienne');
     assert.equal(iso(view.daily.endsAt), '2026-10-25T23:00:00.000Z');
-    assert.deepEqual(view.weekly.chest, { ...content.quests.periods.weekly.chest, ready: false, opened: false });
+    assert.equal(iso(view.monthly.endsAt), '2026-10-31T23:00:00.000Z');
+    assert.deepEqual(view.weekly.chest, { ...content.quests.periods.weekly.chest, gold: 0, ready: false, opened: false });
     const explore = view.daily.quests.find((quest) => quest.kind === 'explore');
     assert.ok(explore.done && !explore.claimed && explore.progress === explore.count);
     assert.deepEqual(view.daily.quests.map((quest) => quest.index), [0, 1, 2, 3, 4]);
