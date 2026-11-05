@@ -3034,6 +3034,26 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.78 (5.11.2026)
+
+Do zgłoszenia błędu można dołączyć zrzut ekranu: zob. „Zgłoś błąd: zrzut ekranu”.
+
+## Zgłoś błąd: zrzut ekranu (5.11.2026, od 0.1.78)
+
+Autor: „daj opcje dołączania screena w zgłoś błąd”.
+
+1. **Przycisk.** W oknie „Zgłoś błąd”, pod opisem, jest „Dołącz zrzut ekranu”. Otwiera galerię telefonu, a na komputerze wybór pliku. Do zgłoszenia można dołączyć jeden obrazek. Po wyborze widać podgląd i przycisk „Usuń zrzut”, a pod spodem dopisek: „Nieobowiązkowy. Zobaczy go tylko autor gry.”
+2. **Zmniejszanie w telefonie.** Zanim zrzut wyjdzie z telefonu, gra zmniejsza go do 1600 px na dłuższym boku i zapisuje jako JPEG o jakości 0,8. Gdy plik ma ponad 700 KB, gra obniża jakość, a potem rozmiar. Zrzut ekranu telefonu 1170×2532 (PNG, 461 KB) idzie jako JPEG 739×1600 (119 KB).
+3. **Serwer.** Przyjmuje obrazek do 1 MB (D1 mieści w jednym polu najwyżej 2 MB). Rodzaj pliku rozpoznaje po pierwszych bajtach (JPEG, PNG albo WebP), a nie po tym, co podaje telefon. Inny plik odrzuca z komunikatem i wtedy nie zapisuje zgłoszenia. Zgłoszenie i zrzut zapisują się razem albo wcale.
+4. **Panel autora.** Zgłoszenie ze zrzutem ma pod opisem miniaturę. Stuknięcie powiększa zrzut na całą szerokość karty, a drugie go zmniejsza. Zrzut otwiera się w grze, a nie w nowej karcie, bo nowa karta otwarta z aplikacji na ekranie początkowym iPhone'a może nie mieć zalogowania. Zrzut widzi tylko konto autora (`GET /api/author/bugs/image?id=…`), a inne konta dostają „Nie znaleziono”.
+5. **Brakujące szczegóły:**
+    - zgłoszenie ze zrzutem idzie jako formularz (`multipart/form-data`). To wyjątek od zasady z „Etap 0 — konfiguracja”, punkt 7 (żądania zmieniające stan wysyłają JSON). Przed żądaniami z innych stron nadal chronią nagłówek Origin i ciasteczko SameSite=Lax, którego przeglądarka nie dołącza do formularza wysłanego z innej strony;
+    - limit 5 zgłoszeń na dobę obejmuje też zgłoszenia ze zrzutem;
+    - zgłoszenie oznaczone „Załatwione” zachowuje zrzut, a usunięte konto zabiera swoje zgłoszenia razem ze zrzutami;
+    - przeglądarka, która nie umie otworzyć obrazka, nie pokazuje przycisku. Zgłoszenie bez zrzutu działa jak dotąd.
+6. **Migracja bazy:** 0090 (tabela `bug_report_images`, jeden zrzut na zgłoszenie).
+7. **Sprawdzone:** wszystkie testy (1260), w tym nowe: zrzut PNG, JPEG i WebP zapisany z rodzajem z pierwszych bajtów, odrzucone SVG, GIF, ucięty PNG, plik ponad 1 MB i za duży formularz (bez zapisanego zgłoszenia), limit dzienny, zrzut tylko dla autora, usunięcie z kontem. W przeglądarce: okno zgłoszenia przed wyborem zrzutu i po nim oraz panel autora z miniaturami, zwiniętymi i rozwiniętymi, na dziewięciu szerokościach ekranu; prawdziwy zrzut z telefonu (1170×2532) przeszedł jako JPEG 119 KB. Na prawdziwym telefonie sprawdzi to dopiero pierwsze zgłoszenie autora na wersji testowej.
+
 ## Wersja 0.1.77 (5.11.2026)
 
 W Ustawieniach można wyłączyć objaśnienia narratora dla wszystkich postaci konta: zob. „Pomijanie objaśnień narratora w Ustawieniach”. Wiersz kamienia w karcie przedmiotu rozwija po stuknięciu, co kamień daje: zob. „Kamień w karcie przedmiotu: objaśnienie po stuknięciu”. Kruk i Błędny ognik nie zasłaniają tego, co postać trzyma na portrecie: zob. „Chowańce na portretach: Kruk i Błędny ognik obok tego, co postać trzyma”. Piesi obok jeźdźca są mniejsi: zob. „Piesi obok jeźdźca w skali 0,7 (659 B)”. Chody towarzyszy mają czarny obrys w każdej klatce: zob. „Czarny obrys w chodach towarzyszy (657 B)”. Narrator mówi o oprawionym kamieniu „wartości”: zob. punkt 4 sekcji „Kamień w karcie przedmiotu: objaśnienie po stuknięciu”.
