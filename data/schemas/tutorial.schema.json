@@ -14,6 +14,7 @@
     "showLabel",
     "skippedText",
     "firstSteps",
+    "skipSetting",
     "chapters",
     "lines"
   ],
@@ -75,6 +76,27 @@
         "buildingId": {
           "type": "string",
           "minLength": 1
+        }
+      }
+    },
+    "skipSetting": {
+      "type": "object",
+      "description": "Przełącznik „Pomijaj objaśnienia narratora” w Ustawieniach, ustawienie konta, nie postaci. Gdy jest włączony, nowa postać zaczyna jak po „Pomiń wprowadzenie” (bez pierwszej karty), a każda część (chapters) mija w swoim momencie jak po swoim przycisku pomijania.",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "hint"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Nazwa przełącznika."
+        },
+        "hint": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Jedno zdanie pod nazwą: co robi przełącznik."
         }
       }
     },

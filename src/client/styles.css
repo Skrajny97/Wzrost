@@ -1806,6 +1806,28 @@ a.segmented-option {
   line-height: 1.4;
 }
 
+/* Pomijaj objaśnienia narratora: the label with the switch beside it, and
+   under both, across the whole row, a line on what it does. */
+.status-row--hinted {
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 4px;
+}
+
+/* On a narrow phone the label wraps beside the switch, rather than the
+   switch dropping under it. */
+.status-row--hinted dt {
+  flex: 1 1 0;
+}
+
+.status-row--hinted .status-hint {
+  flex-basis: 100%;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  text-align: left;
+}
+
 .push-test {
   align-self: flex-start;
   color: var(--system);

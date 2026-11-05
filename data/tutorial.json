@@ -1,5 +1,5 @@
 {
-  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. Pierwsza karta (ask) pyta, czy przejść wprowadzenie: startLabel (z recommendedLabel pod spodem) idzie dalej, a skipLabel pomija całość. Ta karta jest od autora gry (speaker: author): podpisana authorLabel, bez postaci narratora i bez nagrania. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. once: lead, który po stuknięciu zostaje zapamiętany jak karta, bo stuknięcie nie zmienia ekranu (portfel pod złotem). Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest. chapter: kwestia z części po wprowadzeniu (chapters), która przychodzi w swoim momencie gry, np. Umiejętności na 10. poziomie klasy i Profesje na 10. poziomie postaci (Umiejętności zawsze pierwsze); jej skipLabel pomija tylko tę część, a skippedText mówi, co się stało. classes: osobny tekst dla każdej klasy (z własnym female i voice), gdy kwestia mówi o klasie postaci.",
+  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. Pierwsza karta (ask) pyta, czy przejść wprowadzenie: startLabel (z recommendedLabel pod spodem) idzie dalej, a skipLabel pomija całość. Ta karta jest od autora gry (speaker: author): podpisana authorLabel, bez postaci narratora i bez nagrania. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. once: lead, który po stuknięciu zostaje zapamiętany jak karta, bo stuknięcie nie zmienia ekranu (portfel pod złotem). Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest. chapter: kwestia z części po wprowadzeniu (chapters), która przychodzi w swoim momencie gry, np. Umiejętności na 10. poziomie klasy i Profesje na 10. poziomie postaci (Umiejętności zawsze pierwsze); jej skipLabel pomija tylko tę część, a skippedText mówi, co się stało. classes: osobny tekst dla każdej klasy (z własnym female i voice), gdy kwestia mówi o klasie postaci. skipSetting: przełącznik w Ustawieniach (label, a pod nim hint), ustawienie konta, nie postaci: gdy jest włączony, nowa postać zaczyna jak po skipLabel, bez pierwszej karty, a każda część (chapters) mija w swoim momencie jak po swoim skipLabel, z jej skippedText.",
   "skipLabel": "Pomiń wprowadzenie",
   "nextLabel": "Dalej",
   "startLabel": "Wprowadź mnie",
@@ -11,6 +11,10 @@
   "firstSteps": {
     "areaId": "windfalls-edge",
     "buildingId": "campfire"
+  },
+  "skipSetting": {
+    "label": "Pomijaj objaśnienia narratora",
+    "hint": "Narrator nie objaśnia nowych zakładek i miejsc, a nowa postać zaczyna bez wprowadzenia. Dotyczy wszystkich postaci na koncie."
   },
   "chapters": {
     "skills": {

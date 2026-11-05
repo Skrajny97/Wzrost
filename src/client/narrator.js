@@ -22,7 +22,9 @@
 // class level 50, the Wieże at character level 50 and the Górnictwo with
 // the Jubilerstwo at character level 25, each after all the earlier ones. A chapter's own "Pomiń"
 // passes only that chapter, and a line can be told for each class
-// (`classes`).
+// (`classes`). With "Pomijaj objaśnienia narratora" on in the settings (the
+// account's) nothing is told: each line due is passed with its part, as its
+// "Pomiń" would pass it.
 
 import { narratorSprite } from './art.js';
 import { aim } from './camera.js';
@@ -46,6 +48,9 @@ const onBoard = (hash) => hash === '#/oboz';
 const calm = () => !motionOn();
 const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once === true;
 const mark = (id) => `[data-guide="${id}"]`;
+// "Pomijaj objaśnienia narratora" in the settings, for all the account's
+// characters (src/server/tutorial.js).
+const skipsAll = () => Boolean(state.user?.skipTutorials);
 
 // The Umiejętności chapter: once the class reaches them, for a character
 // that has not learned one yet, after the report that brought it there. It
@@ -627,12 +632,21 @@ export function narrate(hash = place) {
   if (!line) {
     stopLight();
     aim([]);
-    const trip = tripTarget(passed);
+    // With "Pomijaj objaśnienia narratora" on, a chapter left halfway
+    // before it was turned on takes nobody anywhere: its next line goes
+    // when it comes due where the player goes.
+    const trip = skipsAll() ? null : tripTarget(passed);
     if (trip) {
       location.hash = trip;
       return;
     }
     release(readNow().has('ending') ? 0 : HOLD);
+    return;
+  }
+  // "Pomijaj objaśnienia narratora": the line's part goes before anything
+  // of it shows.
+  if (skipsAll()) {
+    passUntold(line);
     return;
   }
   // A line with a delay waits on its screen for a moment first.
@@ -674,12 +688,13 @@ let justPassed = null;
 const readNow = () => new Set([...state.character.tutorial, ...passedHere]);
 
 // The introduction is over, the Społeczność chapter is not halfway (it
-// waits for an inner region at its end), and nothing of the narrator's is on
-// the screen or due here, so another parchment may open (email.js).
+// waits for an inner region at its end, unless "Pomijaj objaśnienia
+// narratora" will pass that), and nothing of the narrator's is on the screen
+// or due here, so another parchment may open (email.js).
 export function narratorIdle() {
   if (!state.character?.tutorial || !state.content?.tutorial) return false;
   const read = readNow();
-  const halfway = read.has('community-welcome') && !read.has('community-ending');
+  const halfway = !skipsAll() && read.has('community-welcome') && !read.has('community-ending');
   return !scroll && !light && !pause && !surveying && read.has('ending') && !halfway && !nextLine();
 }
 
@@ -719,8 +734,11 @@ function markRead(id) {
   call('POST', '/api/tutorial', { card: id }).catch(() => {});
 }
 
-// The chapters' lines stay as they were, for their own moments.
+// The chapters' lines stay as they were, for their own moments. After the
+// ending (a late line, passed by "Pomijaj objaśnienia narratora") there are
+// no first steps left to play, and nothing to say about them.
 function skipAll() {
+  const over = readNow().has('ending');
   closeCard();
   stopLight();
   aim([]);
@@ -731,7 +749,7 @@ function skipAll() {
   // The server plays the first steps meanwhile (an exploration, its report
   // and the Ognisko), and the screen draws the character it sends back.
   call('POST', '/api/tutorial', { skip: true })
-    .then(() => toast(state.content.tutorial.skippedText))
+    .then(() => over || toast(state.content.tutorial.skippedText))
     .catch((error) => toast(error.message));
 }
 
@@ -759,6 +777,24 @@ function skipping(line) {
     return line === last ? null : { label: tutorial.chapters[line.chapter].skipLabel, pass: () => skipChapter(line.chapter) };
   }
   return line.id === 'ending' || readNow().has('ending') ? null : { label: tutorial.skipLabel, pass: skipAll };
+}
+
+// What "Pomijaj objaśnienia narratora" passes for a line due, its last one
+// too: the line's chapter, as "Pomiń objaśnienie" does, with its message,
+// or else the introduction, as "Pomiń wprowadzenie" does.
+function passUntold(line) {
+  if (line.chapter) skipChapter(line.chapter);
+  else skipAll();
+}
+
+// "Pomijaj objaśnienia narratora" turned on in the settings (app.js): the
+// line on the screen goes at once with its part, and so does a line that
+// waits for its moment here.
+export function passTold() {
+  if (!state.character?.tutorial || !state.content?.tutorial) return;
+  const line = scroll?.line ?? light?.line;
+  if (line) passUntold(line);
+  else narrate();
 }
 
 // A line as told to this character: its class's text for a line told per

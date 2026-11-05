@@ -33,7 +33,8 @@ export async function getSession(db, request, now) {
   const id = await sha256Hex(token);
   const row = await db
     .prepare(
-      `SELECT s.expires_at, u.id AS user_id, u.login, u.email, u.created_at, u.google_sub, u.email_confirmed_at, u.email_required, u.news_seen
+      `SELECT s.expires_at, u.id AS user_id, u.login, u.email, u.created_at, u.google_sub, u.email_confirmed_at, u.email_required, u.news_seen,
+         u.skip_tutorials
        FROM sessions s JOIN users u ON u.id = s.user_id
        WHERE s.id = ?`,
     )
@@ -56,7 +57,9 @@ export async function getSession(db, request, now) {
 }
 
 // The account as the page sees it. An account bound to Google counts as
-// confirmed: Google confirmed its owner (email.js).
+// confirmed: Google confirmed its owner (email.js). `skipTutorials`:
+// "Pomijaj objaśnienia narratora" in the settings, for all the account's
+// characters (tutorial.js).
 export function userView(row) {
   const google = row.google_sub !== null;
   return {
@@ -66,6 +69,7 @@ export function userView(row) {
     google,
     emailConfirmed: google || row.email_confirmed_at !== null,
     emailRequired: row.email_required === 1,
+    skipTutorials: row.skip_tutorials === 1,
   };
 }
 

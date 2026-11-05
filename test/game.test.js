@@ -1820,6 +1820,68 @@ describe('Time Points and the narrator', () => {
     assert.equal(view.camp.buildings.find((building) => building.id === 'campfire').level, 1);
   });
 
+  // A player on the chat: „Czy można wprowadzić opcję pominięcia instrukcji
+  // jak np. przy otwarciu osady? Aby każdą postacią nie trzeba było czytać
+  // tego samego”. The switch is the account's, for all its characters.
+  test('"Pomijaj objaśnienia narratora" is off at first and kept on the account, not the character', async () => {
+    const me = async (as = cookie) => (await call('GET', '/api/me', { cookie: as })).data.user;
+    const settings = (body, as = cookie) => call('POST', '/api/tutorial/settings', { cookie: as, body });
+    assert.equal((await me()).skipTutorials, false);
+    const on = await settings({ skip: true });
+    assert.equal(on.status, 200);
+    assert.deepEqual(on.data, { skip: true });
+    assert.equal((await me()).skipTutorials, true);
+    assert.equal(await (await db()).prepare('SELECT skip_tutorials FROM users').first('skip_tutorials'), 1);
+    // Signing in on another device brings it along.
+    assert.equal((await call('POST', '/api/auth/login', { body: { identifier: 'karol', password: 'tajnehaslo1' } })).data.user.skipTutorials, true);
+    // It reads nothing for the character: the page passes each part when it comes.
+    assert.deepEqual((await character()).tutorial, []);
+    // Only true or false, and only for one's own account.
+    assert.equal((await settings({ skip: 'tak' })).data.error.code, 'invalid_settings');
+    assert.equal((await settings({ skip: false }, null)).status, 401);
+    const other = await signUp('wera');
+    assert.equal((await me(other)).skipTutorials, false);
+    assert.deepEqual((await settings({ skip: false })).data, { skip: false });
+    assert.equal((await me()).skipTutorials, false);
+  });
+
+  test('with "Pomijaj objaśnienia narratora" on, a new character starts as after "Pomiń wprowadzenie"', async () => {
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    const intro = tutorial.lines.filter((line) => (line.kind === 'card' || line.kind === 'point' || line.once) && !line.chapter).map((line) => line.id);
+    const first = await character();
+    await call('POST', '/api/tutorial/settings', { cookie, body: { skip: true } });
+    const made = await newCharacter(cookie, 'mage', 'Wera');
+    assert.equal(made.status, 201);
+    const view = made.data.character;
+    // The introduction is read, its first card too, and no chapter is.
+    assert.deepEqual(view.tutorial, intro);
+    assert.ok(view.tutorial.includes('ask'));
+    // The first steps are played for the player, as by "Pomiń wprowadzenie":
+    // the first exploration of 30 minutes in Skraj Wiatrołomów, skipped with
+    // Time Points, its report claimed, the first weapon worn and the Ognisko
+    // built.
+    const reports = (await call('GET', '/api/reports', { cookie })).data.reports;
+    assert.equal(reports.length, 1);
+    assert.equal(reports[0].areaName, 'Skraj Wiatrołomów');
+    assert.equal(reports[0].minutes, 30);
+    assert.equal(view.activity, null);
+    assert.equal(view.timePoints, start - 30 + reports[0].timePoints);
+    assert.equal(view.level, reports[0].levelAfter);
+    assert.ok(view.equipment.weapon);
+    assert.equal(view.camp.buildings.find((building) => building.id === 'campfire').level, 1);
+    assert.equal(view.camp.construction, null);
+    assert.deepEqual((await character()).tutorial, intro);
+    // The character made before keeps its own introduction as it was.
+    const list = (await call('GET', '/api/characters', { cookie })).data.characters;
+    await call('POST', '/api/characters/choose', { cookie, body: { id: list.find((one) => one.name === first.name).id } });
+    assert.deepEqual((await character()).tutorial, []);
+    // Turned off, the next new character has the introduction again.
+    await call('POST', '/api/tutorial/settings', { cookie, body: { skip: false } });
+    const next = (await newCharacter(cookie, 'archer', 'Jaga')).data.character;
+    assert.deepEqual(next.tutorial, []);
+    assert.equal(next.level, 1);
+  });
+
   test('the narrator remembers the cards and pointers read, and "Pomiń wprowadzenie" marks them all', async () => {
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     assert.deepEqual((await see({ card: 'intro' })).data.character.tutorial, ['intro']);

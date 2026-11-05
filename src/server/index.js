@@ -96,7 +96,7 @@ import { buyFromTanner, sellToTanner } from './tannery.js';
 import { skipWithTimePoints } from './time.js';
 import { buyMount } from './stable.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
-import { seeTutorial } from './tutorial.js';
+import { seeTutorial, setTutorialSettings } from './tutorial.js';
 import { exchangeParts, startCrafting } from './workshop.js';
 
 const routes = [
@@ -339,6 +339,7 @@ const routes = [
   ['GET', '/api/reports/:id', getReport],
   ['POST', '/api/time/skip', skipWithTimePoints],
   ['POST', '/api/tutorial', seeTutorial],
+  ['POST', '/api/tutorial/settings', setTutorialSettings],
   ['GET', '/api/push/key', pushKey],
   ['POST', '/api/push/subscribe', subscribePush],
   ['POST', '/api/push/unsubscribe', unsubscribePush],

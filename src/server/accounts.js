@@ -105,7 +105,7 @@ export async function register({ request, env, now }) {
     if (!(error instanceof ApiError)) throw error;
     emailSent = false;
   }
-  const user = userView({ login, email, created_at: now, google_sub: null, email_confirmed_at: null, email_required: 1 });
+  const user = userView({ login, email, created_at: now, google_sub: null, email_confirmed_at: null, email_required: 1, skip_tutorials: 0 });
   return json({ user: { ...user, testMode: testModeFor(env, login), tutorialTests: tutorialTestsFor(env, login), author: false }, emailSent }, 201, {
     'Set-Cookie': sessionCookie(session.token, session.expiresAt, now),
   });
@@ -139,7 +139,7 @@ export async function login({ request, env, now }) {
     );
   }
 
-  const columns = 'id, login, email, password_hash, google_sub, created_at, email_confirmed_at, email_required';
+  const columns = 'id, login, email, password_hash, google_sub, created_at, email_confirmed_at, email_required, skip_tutorials';
   const query = identifier.includes('@') ? `SELECT ${columns} FROM users WHERE email = ?` : `SELECT ${columns} FROM users WHERE login = ?`;
   const user = await db.prepare(query).bind(identifier).first();
   if (!user || !(await verifyPassword(password, user.password_hash))) {

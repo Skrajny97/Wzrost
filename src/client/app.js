@@ -40,7 +40,7 @@ import { musicVolume, prefetchMusic, setMusicConfig, setMusicPlace, setMusicVolu
 import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
 import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
-import { narrate } from './narrator.js';
+import { narrate, passTold } from './narrator.js';
 import { forgetNews, watchNews } from './news.js';
 import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
@@ -729,6 +729,38 @@ function tradeRows() {
   return [h('div', { class: 'status-row' }, h('dt', { id: 'trade-label', text: 'Wymiana' }), h('dd', {}, toggle)), blocked];
 }
 
+// "Pomijaj objaśnienia narratora" (the account's, so for each of its
+// characters and on every device): the narrator passes each of its chapters
+// as their "Pomiń objaśnienie" does, and a new character starts as after
+// "Pomiń wprowadzenie" (narrator.js, src/server/tutorial.js). Turned on, it
+// passes at once what the narrator is telling now. The line under it says
+// what it does (data/tutorial.json, skipSetting).
+function tutorialsRow() {
+  const t = state.content.tutorial.skipSetting;
+  const toggle = h('button', { type: 'button', class: 'toggle', role: 'switch', 'aria-labelledby': 'tutorials-label', 'aria-describedby': 'tutorials-hint' });
+  const show = () => {
+    const on = Boolean(state.user.skipTutorials);
+    toggle.setAttribute('aria-checked', String(on));
+    toggle.textContent = on ? 'Włączone' : 'Wyłączone';
+  };
+  toggle.addEventListener('click', () =>
+    withButton(toggle, async () => {
+      const { skip } = await call('POST', '/api/tutorial/settings', { skip: !state.user.skipTutorials });
+      state.user = { ...state.user, skipTutorials: skip };
+      show();
+      if (skip) passTold();
+    }),
+  );
+  show();
+  return h(
+    'div',
+    { class: 'status-row status-row--hinted' },
+    h('dt', { id: 'tutorials-label', text: t.label }),
+    h('dd', {}, toggle),
+    h('dd', { class: 'status-hint', id: 'tutorials-hint', text: t.hint }),
+  );
+}
+
 // An account with test mode opens only with Google once linked, so the
 // player is asked first.
 async function confirmGoogleOnly(event) {
@@ -781,6 +813,7 @@ function openSettings() {
       volumeRow('music-volume', 'Muzyka', musicVolume(), setMusicVolume),
       volumeRow('effects-volume', 'Efekty dźwiękowe', effectsVolume(), setEffectsVolume, () => playSound('system')),
       h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: 'Głos narratora' }), h('dd', {}, voiceSwitch('voice-label'))),
+      tutorialsRow(),
       h('div', { class: 'status-row' }, h('dt', { id: 'motion-label', text: 'Animacje' }), h('dd', {}, motionSwitch('motion-label'))),
       pushRow(),
       tradeRows(),
@@ -915,6 +948,9 @@ async function openTutorialTests() {
   openSheet(
     h('h2', { class: 'sheet-title', text: 'Testuj samouczki' }),
     h('p', { class: 'sheet-text', text: 'Na wersji testowej każdy samouczek zaczniesz tu od początku.' }),
+    // With "Pomijaj objaśnienia narratora" on, the narrator passes them too.
+    state.user.skipTutorials &&
+      h('p', { class: 'sheet-text', text: `Przełącznik „${state.content.tutorial.skipSetting.label}” jest włączony, więc samouczki miną bez słowa. Wyłącz go w Ustawieniach, żeby je obejrzeć.` }),
     parked && backButton(parked),
     h(
       'ul',

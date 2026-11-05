@@ -128,6 +128,7 @@ import { bagHerbs, bagMinerals, bagPotions, herbsOf, potionsOf, professionsView 
 import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
 import { tradeBlockOf, tradesEnded } from './trades.js';
+import { skipIntroduction } from './tutorial.js';
 
 // 2 to 20 characters: letters and digits, spaces, hyphens, apostrophes and
 // underscores ("Justi_725"), from a letter to a letter or a digit. What a
@@ -1730,7 +1731,13 @@ export async function createCharacter(context) {
   const player = await loadPlayer(db, session.userId);
   if (!player) throw full();
   await settleQuests(db, player, now);
-  return json({ character: characterView(player, now) }, 201);
+  if (!session.user.skipTutorials) return json({ character: characterView(player, now) }, 201);
+  // "Pomijaj objaśnienia narratora" on the account (tutorial.js): the new
+  // character starts as after "Pomiń wprowadzenie", its first steps played.
+  // Should they fail, the character is made all the same, and the page
+  // passes the introduction itself (narrator.js).
+  await skipIntroduction(db, session.userId, now).catch((error) => console.error(error));
+  return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
 }
 
 const PARKED_TEXT = 'Najpierw wróć do swojej postaci w „Testuj samouczki”.';

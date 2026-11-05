@@ -8,7 +8,7 @@ import { $, fill, h, icon } from '../dom.js';
 import { countOf } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
 import { call, state } from '../state.js';
-import { skinSwatches, systemPanel, voiceSwitch } from '../ui.js';
+import { skinSwatches, systemPanel, toast, voiceSwitch } from '../ui.js';
 
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 const START_BADGES = { gentle: 'łagodniejszy start', hard: 'trudniejszy start' };
@@ -149,8 +149,12 @@ export function renderCreate(container, onCreated, counts = null) {
     submit.disabled = true;
     submit.textContent = 'Tworzenie postaci…';
     try {
-      await call('POST', '/api/character', { name: nameInput.value, classId: selected, appearance: look, skin });
+      const { character } = await call('POST', '/api/character', { name: nameInput.value, classId: selected, appearance: look, skin });
       onCreated();
+      // "Pomijaj objaśnienia narratora" on the account: the server skipped
+      // the introduction as "Pomiń wprowadzenie" does (tutorial.js), and the
+      // game says so in the same words.
+      if (character.tutorial?.includes('ending')) toast(state.content.tutorial.skippedText);
     } catch (failure) {
       error.textContent = failure.message;
       error.hidden = false;

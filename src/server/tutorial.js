@@ -3,7 +3,10 @@
 // is not shown again on another device. "Pomiń wprowadzenie" marks them all
 // as read and plays the first steps for the player, so that both ways start
 // the game the same. A chapter after the introduction (the Umiejętności) has
-// its own "Pomiń", which marks only its lines.
+// its own "Pomiń", which marks only its lines. "Pomijaj objaśnienia
+// narratora" in the settings is the account's (users.skip_tutorials): a new
+// character of the account starts as after "Pomiń wprowadzenie", and the
+// page passes each chapter as its "Pomiń" does (src/client/narrator.js).
 
 import { buildingLevel, construction, longestHunt, missingFor, upgradeCost } from '../engine/index.js';
 import { beginBuilding, completeBuilding } from './camp.js';
@@ -11,6 +14,7 @@ import { characterView, loadPlayer, requirePlayer, walletOf } from './characters
 import { content, firstSteps, tutorialChapters, tutorialLines, tutorialPart } from './content.js';
 import { beginHunt, finishHunt } from './hunts.js';
 import { ApiError, json, readJson } from './http.js';
+import { requireSession } from './sessions.js';
 import { spendTimePoints } from './time.js';
 
 export async function seeTutorial(context) {
@@ -22,12 +26,7 @@ export async function seeTutorial(context) {
   if (body.skip === true) {
     const chapter = body.chapter ?? null;
     if (chapter !== null && !tutorialChapters.includes(chapter)) throw new ApiError(400, 'invalid_chapter', 'Nie ma takiej części wprowadzenia.');
-    const read = JSON.parse(row.tutorial);
-    if (chapter === null && !read.includes('ending')) await playFirstSteps(db, session.userId, context.now);
-    // The part's lines are read, and the other parts' stay as they were.
-    const part = tutorialPart(chapter);
-    const kept = tutorialLines.filter((id) => part.includes(id) || read.includes(id));
-    await db.prepare('UPDATE characters SET tutorial = ? WHERE id = ?').bind(JSON.stringify(kept), row.id).run();
+    await skipPart(db, session.userId, row, chapter, context.now);
   } else {
     if (!tutorialLines.includes(body.card)) throw new ApiError(400, 'invalid_card', 'Nie ma takiej kwestii narratora.');
     // Added in the database, so two cards read at once are both kept.
@@ -40,6 +39,36 @@ export async function seeTutorial(context) {
       .run();
   }
   return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
+}
+
+// A part skipped (`chapter`, or null for the introduction): its lines are
+// read, and the other parts' stay as they were. The introduction skipped
+// before its ending has the first steps played for the player first.
+async function skipPart(db, userId, row, chapter, now) {
+  const read = JSON.parse(row.tutorial);
+  if (chapter === null && !read.includes('ending')) await playFirstSteps(db, userId, now);
+  const part = tutorialPart(chapter);
+  const kept = tutorialLines.filter((id) => part.includes(id) || read.includes(id));
+  await db.prepare('UPDATE characters SET tutorial = ? WHERE id = ?').bind(JSON.stringify(kept), row.id).run();
+}
+
+// A new character of an account with "Pomijaj objaśnienia narratora" on
+// (characters.js, createCharacter): its introduction is skipped as by
+// "Pomiń wprowadzenie", so its first card, which asks about it, never shows.
+export async function skipIntroduction(db, userId, now) {
+  const player = await loadPlayer(db, userId);
+  if (player && player.row.tutorial !== null) await skipPart(db, userId, player.row, null, now);
+}
+
+// POST /api/tutorial/settings {skip}: "Pomijaj objaśnienia narratora" on
+// the account, for all its characters, or off again. It changes nothing
+// read: a part passed stays passed, and those to come show again once off.
+export async function setTutorialSettings(context) {
+  const session = await requireSession(context);
+  const body = await readJson(context.request);
+  if (typeof body.skip !== 'boolean') throw new ApiError(400, 'invalid_settings', 'Nieprawidłowe ustawienie.');
+  await context.env.DB.prepare('UPDATE users SET skip_tutorials = ? WHERE id = ?').bind(body.skip ? 1 : 0, session.userId).run();
+  return json({ skip: body.skip });
 }
 
 // What the introduction has the player do (firstSteps), done for them when
