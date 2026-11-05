@@ -155,7 +155,7 @@ describe('Górnictwo in the engine', () => {
       [
         [
           'Kwarc',
-          ['Górnictwo: od 1. poziomu, w Kopalni.', 'Jubilerstwo: od 1. poziomu, w Szlifierni.', 'Daje biżuterii rzadkość: pospolity. Oprawiony podnosi wszystkie liczby przedmiotu o 5%.'],
+          ['Górnictwo: od 1. poziomu, w Kopalni.', 'Jubilerstwo: od 1. poziomu, w Szlifierni.', 'Daje biżuterii rzadkość: pospolity. Oprawiony podnosi wszystkie wartości przedmiotu o 5%.'],
         ],
         ['Srebrny kruszec', ['Górnictwo: od 1. poziomu, w Kopalni.', 'Jubilerstwo: od 1. poziomu, w Szlifierni.', 'Idzie na oprawy biżuterii rzadkości: pospolity, rzadki, unikalny.']],
       ],
@@ -350,7 +350,14 @@ describe('Jubilerstwo in the engine', () => {
     assert.equal(upgradedItem({ ...ring, gem: 'quartz' }, content).implicit.value, 3);
     assert.equal(upgradedItem({ ...ring, upgrade: 5, gem: 'quartz' }, content).implicit.value, upgradedItem({ ...ring, upgrade: 5 }, content).implicit.value + 1);
     assert.notDeepEqual(itemProperties({ ...item, gem: 'emerald' }, content), itemProperties(item, content));
-    assert.deepEqual(itemView({ ...item, gem: 'emerald' }, content).gem, { id: 'emerald', name: 'Szmaragd', bonus: 0.2, color: content.raritiesById.epic.color });
+    assert.deepEqual(itemView({ ...item, gem: 'emerald' }, content).gem, {
+      id: 'emerald',
+      name: 'Szmaragd',
+      bonus: 0.2,
+      color: content.raritiesById.epic.color,
+      line: 'Szmaragd: +20% do wszystkich wartości',
+      help: 'Kamień oprawiony w Szlifierni podnosi o 20% każdą wartość tego przedmiotu: obrażenia, pancerz i każdą cechę z listy, każdą co najmniej o 1. Wartości na tej karcie już to uwzględniają.',
+    });
     assert.equal(itemView(item, content).gem, undefined);
     // A gem the game no longer has adds nothing.
     assert.deepEqual(upgradedItem({ ...item, gem: 'nothing' }, content).damage, plain.damage);
@@ -590,7 +597,14 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.equal(report.set.text, `Kwarc tkwi teraz w przedmiocie: ${weapon.name}.`);
     assert.equal(report.set.replaced, null);
     const worn = after.equipment.weapon;
-    assert.deepEqual(worn.gem, { id: 'quartz', name: 'Kwarc', bonus: 0.05, color: '#9b9b9b' });
+    assert.deepEqual(worn.gem, {
+      id: 'quartz',
+      name: 'Kwarc',
+      bonus: 0.05,
+      color: '#9b9b9b',
+      line: 'Kwarc: +5% do wszystkich wartości',
+      help: 'Kamień oprawiony w Szlifierni podnosi o 5% każdą wartość tego przedmiotu: obrażenia, pancerz i każdą cechę z listy, każdą co najmniej o 1. Wartości na tej karcie już to uwzględniają.',
+    });
     assert.notDeepEqual(worn.properties, weapon.properties);
     assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz' })).data.error.code, 'same_gem');
 

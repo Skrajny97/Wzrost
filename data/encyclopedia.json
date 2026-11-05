@@ -60,7 +60,7 @@
     "partShop": ["Lada złomiarza: od {level}. poziomu Skupu złomu."],
     "mineralMine": ["Górnictwo: od {level}. poziomu, w Kopalni."],
     "mineralCraft": ["Jubilerstwo: od {level}. poziomu, w Szlifierni."],
-    "mineralGem": ["Daje biżuterii rzadkość: {rarity}. Oprawiony podnosi wszystkie liczby przedmiotu o {percent}%."],
+    "mineralGem": ["Daje biżuterii rzadkość: {rarity}. Oprawiony podnosi wszystkie wartości przedmiotu o {percent}%."],
     "mineralOre": ["Idzie na oprawy biżuterii rzadkości: {rarities}."],
     "unknown": ["???"]
   }

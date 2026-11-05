@@ -9,6 +9,7 @@
 
 import { rarityNeedView } from './crafting.js';
 import { budget, weaponDamage } from './formulas.js';
+import { say } from './text.js';
 
 // `affixIds` picks the affixes instead of rolling them (tests, simulations).
 // `area` is the inner region the item was found in: its creatures name the
@@ -293,10 +294,23 @@ function withGemBonus(item, content) {
 }
 
 // A gem as an item's card shows it: its name, its bonus and the colour of
-// its rarity; null for none, or for a gem the game no longer has.
+// its rarity, with its line on the card and what that line means, shown on a
+// tap (the author: "jak kliknę w ten kwarc to powinno mi pokazywać co to
+// znaczy", data/professions.json jewelcrafting.texts); null for none, or for
+// a gem the game no longer has.
 export function gemView(gemId, content) {
   const gem = gemId ? content.mineralsById[gemId] : null;
-  return gem ? { id: gem.id, name: gem.name, bonus: gem.setBonus, color: content.raritiesById[gem.rarity].color } : null;
+  if (!gem) return null;
+  const words = { gem: gem.name, percent: Math.round(gem.setBonus * 100) };
+  const texts = content.jewelcrafting.texts;
+  return {
+    id: gem.id,
+    name: gem.name,
+    bonus: gem.setBonus,
+    color: content.raritiesById[gem.rarity].color,
+    line: say(texts, 'gemLine', 0, words),
+    help: say(texts, 'gemHelp', 0, words),
+  };
 }
 
 export const maxUpgrade = (content) => content.balance.upgrades.chances.length;

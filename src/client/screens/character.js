@@ -1333,8 +1333,19 @@ export function itemDetails(item, { small = false } = {}) {
       'ul',
       { class: 'item-properties' },
       item.properties.map((line) => h('li', { text: line })),
-      // The gem set in it in Jubilerstwo, which the numbers above include.
-      item.gem && h('li', { class: 'item-gem', vars: { '--rarity': item.gem.color } }, mineralSprite(item.gem.id), ` ${item.gem.name}: +${formatNumber(Math.round(item.gem.bonus * 100))}% do wszystkich liczb`),
+      // The gem set in it in Jubilerstwo, which the values above include; a
+      // tap on its line folds out what it means (gemView in items.js).
+      item.gem &&
+        h(
+          'li',
+          { class: 'item-gem' },
+          h(
+            'details',
+            { class: 'item-gem-fold' },
+            h('summary', { class: 'item-gem-line', vars: { '--rarity': item.gem.color } }, mineralSprite(item.gem.id), ` ${item.gem.line}`),
+            h('p', { class: 'item-gem-help', text: item.gem.help }),
+          ),
+        ),
       item.classNames && h('li', { class: 'item-classes', text: `${item.classNames.length > 1 ? 'Dla klas' : 'Dla klasy'}: ${item.classNames.join(', ')}` }),
       item.classLevel && h('li', { class: 'item-classes', text: `Od poziomu klasy ${item.classLevel}` }),
       item.price !== undefined && h('li', { class: 'item-price', text: `U złomiarza: ${formatNumber(item.price)} złota` }),

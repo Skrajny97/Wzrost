@@ -3117,11 +3117,46 @@ img.area-art {
 
 /* The gem set in an item (Jubilerstwo), in its rarity's colour, with its
    picture small beside it. */
-.item-gem {
+/* The gem set in an item (character.js itemDetails): its line, which a tap
+   folds open to say what it means, with a small "?" that it can be tapped. */
+.item-gem-line {
   display: flex;
   align-items: center;
   gap: 2px;
   color: var(--rarity, var(--text));
+  cursor: pointer;
+  list-style: none;
+}
+
+.item-gem-line::-webkit-details-marker {
+  display: none;
+}
+
+.item-gem-line::after {
+  content: '?';
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+.item-gem-fold[open] .item-gem-line::after {
+  content: '×';
+}
+
+.item-gem-help {
+  margin: 4px 0 2px;
+  color: var(--text-muted, var(--text));
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .item-gem .sprite {
