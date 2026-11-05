@@ -38,10 +38,10 @@
 // (companionStays in the engine), also one of a character that was in a
 // party before this rule came.
 
-import { areaFor, areaOpenFor, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, mountView, partyFit, partyRange, partyRefusal } from '../engine/index.js';
+import { areaFor, areaOpenFor, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyRefusal } from '../engine/index.js';
 import { characterView, currentHp, earlyAreaOf, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
-import { cosmeticsOfRow, nameColorOf } from './cosmetics.js';
+import { nameColorOf, wayLook } from './cosmetics.js';
 import { settlementOn } from './features.js';
 import { guildTagSql } from './guilds.js';
 import { beginHunt } from './hunts.js';
@@ -395,28 +395,6 @@ export async function cancelPartyInvite(context) {
   return answer(db, player.row.id, context.now);
 }
 
-// How a member looks on the way, for the others' Walka scene (scenes.js,
-// 640 A: the party walks side by side): its class, look and skin tone, its
-// evolution's form, its Stajnia's mount and the looks it wears from the
-// Sklep Systemu, as it set out.
-function wayLook(row) {
-  const worn = cosmeticsOfRow(row);
-  const mount = settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content) : null;
-  return {
-    id: row.id,
-    name: row.name,
-    classId: row.class_id,
-    appearance: row.appearance,
-    skin: row.skin ?? content.defaultSkin,
-    evolution: content.evolutionsById[row.evolution] ? row.evolution : null,
-    mount: mount?.id ?? null,
-    mountSkin: worn.mountSkin,
-    aura: worn.aura,
-    trail: worn.trail,
-    pet: worn.pet,
-  };
-}
-
 // What a member brings into the others' fights: itself as it is now.
 function snapshot(member, now) {
   return { id: member.row.id, name: member.row.name, character: engineCharacter(member.row), equipped: equippedItems(member), hp: currentHp(member, now).hp };
@@ -492,8 +470,9 @@ export async function partyHunt(context) {
   const crew = {
     ...party_,
     names: actual.map((member) => member.row.name),
-    // How each looks on the way, for the others' Walka scene (640 A).
-    looks: actual.map((member) => wayLook(member.row)),
+    // How each looks on the way, for the others' Walka scene (640 A;
+    // cosmetics.js).
+    looks: actual.map((member) => ({ id: member.row.id, name: member.row.name, ...wayLook(member.row) })),
     seed: toHex(crypto.getRandomValues(new Uint8Array(16))),
     roster: actual.map((member) => {
       const setup = setups.get(member.row.id);

@@ -9,7 +9,8 @@
 // wears, until it takes the offer back. Another player takes it along on
 // one plain exploration (beginHunt in hunts.js, `mercenary`) and pays its
 // price for each hour of it at once; the mercenary fights beside it as a
-// member of a Drużyna would, with all it wears, in one companion's place.
+// member of a Drużyna would, with all it wears, in one companion's place,
+// and walks beside it on the way, in its own look (654 A).
 // Hired, it serves until that exploration ends (called back early, or
 // skipped, with it) and cannot take the offer back; then it claims its pay.
 // It gets nothing else and loses nothing: no XP, no loot, its HP as it
@@ -20,6 +21,7 @@ import { gendered } from '../engine/companions.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
 import { characterView, currentHp, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
+import { wayLook } from './cosmetics.js';
 import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
 
@@ -184,9 +186,11 @@ export async function listMercenaries(context) {
 // The hire of a mercenary with an exploration's start (beginHunt): `asked`
 // is { id, perHour } as the player saw it. Checks what can be checked now
 // and gives the fee, the mercenary as it fights (a partner: its character,
-// what it wears and its HP now) and the statements for the start's batch:
-// an assertion that it still waits, unhired, at that price, and its offer
-// turned into the service, until the exploration ends.
+// what it wears and its HP now), the mercenary as the exploration keeps it
+// (`view`: its name, its fee and its look on the way, for it walks beside
+// the character in the Walka scene, 654 A) and the statements for the
+// start's batch: an assertion that it still waits, unhired, at that price,
+// and its offer turned into the service, until the exploration ends.
 export async function hireMercenary(db, player, asked, { area, minutes, startsAt, endsAt, now, plain }) {
   const { row } = player;
   if (!plain) throw new ApiError(400, 'mercenary_plain_only', words().plainOnly);
@@ -210,7 +214,7 @@ export async function hireMercenary(db, player, asked, { area, minutes, startsAt
   return {
     fee,
     partner: { id: mercenary.row.id, name: mercenary.row.name, character: engineCharacter(mercenary.row), equipped: equippedItems(mercenary), hp: currentHp(mercenary, now).hp },
-    view: { id: mercenary.row.id, name: mercenary.row.name, gold: fee },
+    view: { id: mercenary.row.id, name: mercenary.row.name, gold: fee, look: wayLook(mercenary.row) },
     check: { sql: waiting, binds },
     statements: [
       assertion(db, `EXISTS (SELECT 1 FROM activities WHERE ${waiting})`, binds),

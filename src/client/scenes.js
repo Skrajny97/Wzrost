@@ -78,13 +78,19 @@ export function workScene(professionId, activity, { avatar = false } = {}) {
 // in its own look, on its own mount and with its own aura, trail and pet
 // (640 A; a player's idea via the author: "dostawić dane klasy w danym
 // odcieniu skóry i kolejności obok siebie w jakiejś odległości by sie nie
-// nakladaly"). The companions from the Kwatery who went walk in the same
-// line, after them (648).
+// nakladaly"). A mercenary from the Karczma walks so too, right behind the
+// character (654 A), and the companions from the Kwatery who went walk in
+// the same line, after them (648).
 export function walkScene(activity) {
   const walk = config()?.walk;
   if (!walk) return null;
   const stage = h('div', { class: `scene-walk scene--${dayPart()}` }, h('div', { class: 'scene-path' }));
-  const party = [state.character, ...(activity.party?.walkers ?? []).map(wayCharacter), ...(activity.companions ?? []).map(companionWalker)];
+  const party = [
+    state.character,
+    ...(activity.party?.walkers ?? []).map(wayCharacter),
+    ...(activity.mercenary?.walker ? [wayCharacter(activity.mercenary.walker)] : []),
+    ...(activity.companions ?? []).map(companionWalker),
+  ];
   const members = party.map((character, index) => member(walk, character, index, party.length));
   stage.append(...members);
   if (members.some((holder) => holder.querySelector('.scene-ride'))) stage.classList.add('scene-walk--riders');
@@ -102,7 +108,8 @@ export function walkScene(activity) {
 }
 
 // Another member of the trip as the scene draws a character, from its look on
-// the way (activity.party.walkers, parties.js).
+// the way (activity.party.walkers, parties.js), or the mercenary taken along
+// (activity.mercenary.walker, mercenaries.js).
 function wayCharacter(look) {
   return {
     classId: look.classId,
@@ -122,8 +129,8 @@ function companionWalker({ classId, appearance }) {
 }
 
 // One walker on the way, in a holder of its own with its light, its trail
-// and its pet. With others on the way (`count` over one: a Drużyna, the
-// companions) the holders stand in a line (styles.css,
+// and its pet. With others on the way (`count` over one: a Drużyna, a
+// mercenary, the companions) the holders stand in a line (styles.css,
 // .scene-member--party): the character in front, on the right, leading the
 // way, and each next one a step behind it to the left and a little further
 // away, so that they do not cover each other.

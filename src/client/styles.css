@@ -8701,10 +8701,10 @@ a.profession-square:active {
   --figure-bottom: 22px;
   --walker-bottom: 28px;
   --ride-bottom: 18px;
-  /* A Drużyna, or the companions from the Kwatery, on the way (scenes.js
-     member, 640 A, 648): the step between two walkers, a fifth of the scene
-     within 56-88 px (longer when one rides), and how much further away each
-     next one walks. */
+  /* A Drużyna, a mercenary or the companions from the Kwatery on the way
+     (scenes.js member, 640 A, 648, 654 A): the step between two walkers, a
+     fifth of the scene within 56-88 px (longer when one rides), and how much
+     further away each next one walks. */
   --party-step: clamp(56px, 20%, 88px);
   --party-lift: 8px;
 }
@@ -8741,10 +8741,11 @@ a.profession-square:active {
   bottom: var(--walker-bottom);
 }
 /* A walker on the way with its light, trail and pet (scenes.js member), in a
-   holder the size of the scene. In a Drużyna, or with companions, the holders
-   stand in a line: the character in front on the right, leading, and each
-   next one --slot steps to the left and --depth steps further away (higher,
-   and behind the one before: its z-index comes from scenes.js). */
+   holder the size of the scene. In a Drużyna, or with a mercenary or
+   companions, the holders stand in a line: the character in front on the
+   right, leading, and each next one --slot steps to the left and --depth
+   steps further away (higher, and behind the one before: its z-index comes
+   from scenes.js). */
 .scene-member {
   position: absolute;
   top: 0;

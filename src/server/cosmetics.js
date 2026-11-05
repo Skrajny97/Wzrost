@@ -23,6 +23,28 @@ export const cosmeticsOfRow = (row) => cosmeticsOf(JSON.parse(row.cosmetics ?? '
 // holds (from a list's query), or null.
 export const nameColorOf = (text) => nameColor(JSON.parse(text ?? '{}'), content);
 
+// How the character of a row looks on the way, for another player's Walka
+// scene (scenes.js): its class, look and skin tone, its evolution's form,
+// its Stajnia's mount and the looks it wears from the Sklep Systemu, as it
+// set out. The members of a Drużyna walk side by side (640 A, parties.js),
+// and a mercenary from the Karczma beside the one who took it along (654 A,
+// mercenaries.js).
+export function wayLook(row) {
+  const worn = cosmeticsOfRow(row);
+  const mount = settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content) : null;
+  return {
+    classId: row.class_id,
+    appearance: row.appearance,
+    skin: row.skin ?? content.defaultSkin,
+    evolution: content.evolutionsById[row.evolution] ? row.evolution : null,
+    mount: mount?.id ?? null,
+    mountSkin: worn.mountSkin,
+    aura: worn.aura,
+    trail: worn.trail,
+    pet: worn.pet,
+  };
+}
+
 const refuse = (block) => new ApiError(STATUS[block.code] ?? 409, block.code, block.message);
 
 // Saves the cosmetics only on the row as it was read (its version), with

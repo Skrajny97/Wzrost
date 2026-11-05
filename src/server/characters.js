@@ -1326,8 +1326,13 @@ function activityView(activity, level, now) {
       // A Trudna wyprawa (629 A, hunts.js).
       ...(options.hard && { hard: true }),
       // The mercenary from the Karczma it took along, and its fee
-      // (mercenaries.js).
-      ...(options.mercenary && { mercenary: { name: options.mercenary.name, gold: options.mercenary.gold } }),
+      // (mercenaries.js); and its look on the way, kept from its hire: it
+      // walks beside the character in the Walka scene, as a Drużyna's
+      // member does (654 A). One hired before that has none, and the scene
+      // goes without it.
+      ...(options.mercenary && {
+        mercenary: { name: options.mercenary.name, gold: options.mercenary.gold, ...(options.mercenary.look && { walker: options.mercenary.look }) },
+      }),
       // The creatures the exploration tracks for the quests (hunts.js).
       tracksQuests: activity.tracked !== null && activity.tracked !== undefined,
       finished: activity.ends_at <= now,

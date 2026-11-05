@@ -115,7 +115,8 @@ describe('mercenaries through the API', () => {
     const started = await as('zlecenie', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 120, mercenary: { id: one.id, perHour: 100000 } });
     assert.equal(started.status, 201, JSON.stringify(started.data).slice(0, 300));
     assert.equal((await row('Zleceniodawca')).gold, 300000);
-    assert.deepEqual(started.data.character.activity.mercenary, { name: 'Najemna', gold: 200000 });
+    const { name, gold } = started.data.character.activity.mercenary;
+    assert.deepEqual({ name, gold }, { name: 'Najemna', gold: 200000 });
   });
 
   test('while offered the character does nothing else and keeps its gear, until it takes the offer back', async () => {
@@ -174,7 +175,10 @@ describe('mercenaries through the API', () => {
     const started = await as('zlecenie', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 60, mercenary: { id, perHour: 300 } });
     assert.equal(started.status, 201, JSON.stringify(started.data).slice(0, 300));
     assert.equal((await row('Zleceniodawca')).gold, goldBefore - 300);
-    assert.deepEqual(started.data.character.activity.mercenary, { name: 'Najemna', gold: 300 });
+    // It walks beside the character on the way, in its own look (654 A); on
+    // foot, for the Osada and its Stajnia are off here.
+    const plain = { classId: 'warrior', appearance: 'female', skin: content.defaultSkin, evolution: null, mount: null, mountSkin: null, aura: null, trail: null, pet: null };
+    assert.deepEqual(started.data.character.activity.mercenary, { name: 'Najemna', gold: 300, walker: plain });
     const hunt = await activityOf('Zleceniodawca');
     const options = JSON.parse(hunt.options);
     assert.equal(options.partners[0].id, id);
@@ -339,5 +343,70 @@ describe('mercenaries through the API', () => {
     // Nothing paid, nothing hired.
     assert.equal((await row('Zleceniodawca')).gold, 10000);
     assert.equal(JSON.parse((await activityOf('Najemna')).options).hired, undefined);
+  });
+});
+
+// The mercenary walks beside the one who took it along on the Walka screen,
+// as a Drużyna's member does (654 A): in its own look, on its own mount and
+// with its own aura, trail and pet, as it was when hired. The companions who
+// went walk after it (scenes.js draws the line).
+describe('a mercenary on the way (654 A)', () => {
+  const { call, db, signUp } = useServer({ SETTLEMENT: 'on' });
+  const cookies = {};
+  const as = (login, method, path, body) => call(method, path, { cookie: cookies[login], body });
+  const update = async (sql, ...binds) => (await db()).prepare(sql).bind(...binds).run();
+  const activity = async (login) => (await as(login, 'GET', '/api/character')).data.character.activity;
+
+  beforeEach(async () => {
+    for (const [login, name, classId, appearance] of [
+      ['najemny', 'Najemny', 'archer', 'male'],
+      ['zlecenie', 'Zleceniodawca', 'warrior', 'female'],
+    ]) {
+      ({ cookie: cookies[login] } = await signUp(login));
+      await call('POST', '/api/character', { cookie: cookies[login], body: { name, classId, appearance } });
+    }
+    await update('UPDATE characters SET level = 50, class_level = 50, gold = 100000, tutorial = NULL');
+  });
+
+  test('a hired mercenary walks in its look from the hire, on its own mount, before the companions; without one nothing changes', async () => {
+    // The mercenary: an evolution, a darker skin, the Stajnia's horse in the
+    // Sklep Systemu's look, an aura, a trail and a pet.
+    const worn = { owned: ['sabertooth', 'aura-ember', 'trail-light', 'fox'], mountSkin: 'sabertooth', aura: 'aura-ember', trail: 'trail-light', pet: 'fox' };
+    await update("UPDATE characters SET evolution = 'sniper', skin = 'dark', settlement = ?, cosmetics = ? WHERE name = 'Najemny'", JSON.stringify({ mount: 2 }), JSON.stringify(worn));
+    const look = { classId: 'archer', appearance: 'male', skin: 'dark', evolution: 'sniper', mount: 'horse', mountSkin: 'sabertooth', aura: 'aura-ember', trail: 'trail-light', pet: 'fox' };
+    // The one who hires has two companions in the Kwatery.
+    await update("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'quarters', 2, 0, 0 FROM characters WHERE name = 'Zleceniodawca'");
+    const { candidates } = (await as('zlecenie', 'GET', '/api/settlement')).data.settlement.companions;
+    for (const candidate of candidates.slice(0, 2)) assert.equal((await as('zlecenie', 'POST', '/api/settlement/hire', { candidateId: candidate.id })).status, 200);
+    const [first, second] = candidates.map(({ name, classId, appearance }) => ({ name, classId, appearance }));
+
+    assert.equal((await as('najemny', 'POST', '/api/mercenary/offer', { hours: 4, perHour: 400 })).status, 200);
+    const { id } = await (await db()).prepare("SELECT id FROM characters WHERE name = 'Najemny'").first();
+    const started = await as('zlecenie', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 60, mercenary: { id, perHour: 400 } });
+    assert.equal(started.status, 201, JSON.stringify(started.data).slice(0, 300));
+    const hired = started.data.character.activity;
+    assert.deepEqual(hired.mercenary, { name: 'Najemny', gold: 400, walker: look });
+    // It takes one companion's place (633.3 A): the first goes, after it.
+    assert.deepEqual(hired.companions, [first]);
+    // The exploration keeps the look beside the name and the fee, no more.
+    const kept = await (await db()).prepare("SELECT options FROM activities WHERE kind = 'hunt'").first();
+    assert.deepEqual(JSON.parse(kept.options).mercenary, { id, name: 'Najemny', gold: 400, look });
+
+    // As it was hired: a skin tone changed meanwhile shows on its next service.
+    await update("UPDATE characters SET skin = 'pale' WHERE name = 'Najemny'");
+    assert.deepEqual((await activity('zlecenie')).mercenary.walker, look);
+    // An exploration that kept no look (hired before 654 A): the mercenary
+    // is named, and the scene goes without it.
+    await update("UPDATE activities SET options = json_remove(options, '$.mercenary.look') WHERE kind = 'hunt'");
+    assert.deepEqual((await activity('zlecenie')).mercenary, { name: 'Najemny', gold: 400 });
+
+    // Without a mercenary nothing changes: both companions go, nobody else.
+    assert.equal((await as('zlecenie', 'POST', '/api/hunts/cancel')).status, 200);
+    assert.equal((await as('zlecenie', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 60 })).status, 201);
+    const alone = await activity('zlecenie');
+    assert.equal(alone.kind, 'hunt');
+    assert.ok(!('mercenary' in alone));
+    assert.ok(!('party' in alone));
+    assert.deepEqual(alone.companions, [first, second]);
   });
 });
