@@ -166,6 +166,15 @@ describe('what comes due (engine)', () => {
     assert.deepEqual(notificationsDue(player({ buildings, queue }), t0 - 60000, t0, content), []);
   });
 
+  test('with the Zbieracz Systemu no store stands full, so the phone hears of none', () => {
+    const buildings = { sawmill: { level: 1, startedAt: t0 - 3 * HOUR, endsAt: t0 - 2 * HOUR, collectedAt: null } };
+    assert.equal(notificationsDue(player({ buildings }), t0 - 60000, t0, content).length, 1);
+    assert.deepEqual(notificationsDue(player({ buildings, collector: true }), t0 - 60000, t0, content), []);
+    // The end of a build still comes.
+    const built = { campfire: { level: 2, startedAt: t0 - HOUR, endsAt: t0 - 30000, collectedAt: null }, ...buildings };
+    assert.deepEqual(notificationsDue(player({ buildings: built, collector: true }), t0 - 60000, t0, content).map((one) => one.tag), ['build']);
+  });
+
   test('no store fills while its building is being built', () => {
     const buildings = { quarry: { level: 1, startedAt: t0 - HOUR, endsAt: t0 + HOUR, collectedAt: t0 + HOUR } };
     assert.deepEqual(notificationsDue(player({ buildings }), t0 - 60000, t0, content), []);

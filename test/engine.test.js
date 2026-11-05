@@ -39,7 +39,9 @@ import {
   effectText,
   missingFor,
   collect,
+  collectWithFills,
   production,
+  wholeFills,
   regenPerMinute,
   restBonus,
   upgradeChance,
@@ -1594,6 +1596,48 @@ describe('production', () => {
     // A full store stood still, so production starts again now.
     assert.equal(collect(sawmill, store, 10 * hour).collectedAt, 10 * hour);
     assert.equal(collect(sawmill, store, 1000), null);
+  });
+
+  // The Zbieracz Systemu (DECISIONS.md, „Zbieracz Systemu”).
+  test('the Zbieracz Systemu takes the whole fills of a store, and the next one goes on filling', () => {
+    // Level 3: 18 an hour, a store of 108, full in 6 hours.
+    const store = { level: 3, startedAt: 0, endsAt: hour, collectedAt: hour };
+    assert.equal(wholeFills(sawmill, store, hour + 6 * hour - 1), null);
+    assert.deepEqual(wholeFills(sawmill, store, hour + 6 * hour), { resource: 'wood', amount: 108, collectedAt: 7 * hour });
+    // Two and a half fills: two stores, and the half of the third stays in it.
+    const later = wholeFills(sawmill, store, hour + 15 * hour);
+    assert.deepEqual(later, { resource: 'wood', amount: 216, collectedAt: 13 * hour });
+    assert.deepEqual(production(sawmill, { ...store, collectedAt: later.collectedAt }, 16 * hour).amount, 54);
+    // The rest goes as "Zbierz" takes it, the unit on its way kept.
+    assert.deepEqual(collectWithFills(sawmill, store, 16 * hour + 20 * 60000, null), { resource: 'wood', amount: 216 + 60, collectedAt: 13 * hour + Math.round((60 / 18) * hour) });
+    assert.deepEqual(collectWithFills(sawmill, store, 2 * hour, null), collect(sawmill, store, 2 * hour));
+    assert.equal(collectWithFills(sawmill, store, hour, null), null);
+    // Integers all along, also over weeks at level 20 of the Warownia.
+    const top = { level: 20, startedAt: 0, endsAt: 0, collectedAt: 0 };
+    const weeks = wholeFills(sawmill, top, 3 * 7 * 24 * hour + 12345);
+    assert.deepEqual(weeks, { resource: 'wood', amount: 12 * 4800, collectedAt: 12 * 40 * hour });
+    // Gold of the Staw Midasa the same way.
+    assert.equal(wholeFills(content.buildingsById['midas-lake'], store, 7 * hour).resource, 'gold');
+    // Nothing while an upgrade keeps the building from producing, nor of a
+    // building that makes nothing or does not stand.
+    const upgrading = { level: 4, startedAt: 10 * hour, endsAt: 20 * hour, collectedAt: 20 * hour };
+    assert.equal(wholeFills(sawmill, upgrading, 19 * hour), null);
+    assert.equal(wholeFills(content.buildingsById.campfire, store, 30 * hour), null);
+    assert.equal(wholeFills(sawmill, undefined, 30 * hour), null);
+  });
+
+  test('a store that stood full before the Zbieracz Systemu came gives one fill as he comes, and fills again from then', () => {
+    const store = { level: 3, startedAt: 0, endsAt: 0, collectedAt: 0 };
+    // Full at 6 h, standing until the Zbieracz comes at 50 h: one store then,
+    // and from then on a store every 6 hours.
+    assert.deepEqual(wholeFills(sawmill, store, 50 * hour, 50 * hour), { resource: 'wood', amount: 108, collectedAt: 50 * hour });
+    assert.deepEqual(wholeFills(sawmill, store, 63 * hour, 50 * hour), { resource: 'wood', amount: 3 * 108, collectedAt: 62 * hour });
+    // A store not full yet as he comes fills on as it was.
+    assert.deepEqual(wholeFills(sawmill, store, 13 * hour, 4 * hour), { resource: 'wood', amount: 216, collectedAt: 12 * hour });
+    // Nothing before he comes.
+    assert.equal(wholeFills(sawmill, store, 40 * hour, 50 * hour), null);
+    // A build that begins takes the fills and the rest along.
+    assert.deepEqual(collectWithFills(sawmill, store, 53 * hour, 50 * hour), { resource: 'wood', amount: 108 + 54, collectedAt: 53 * hour });
   });
 });
 

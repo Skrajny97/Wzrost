@@ -11,7 +11,7 @@ import { openEncyclopediaChest, readEncyclopedia } from './encyclopedia.js';
 import { decidePointsReset, takeEvolution, testClassLevel, testEvolutions, undoEvolution } from './evolutions.js';
 import { moveGiftRewards, redeemGiftCode } from './gift-codes.js';
 import { discardPotions, drinkPotion, sellPotions, startBrewing } from './brewing.js';
-import { buyParts, cancelBuilding, collectProduction, exchangeResources, sellToSpirit, startBuilding, tradeAtFire } from './camp.js';
+import { buyCollector, buyParts, cancelBuilding, collectProduction, exchangeResources, sellToSpirit, startBuilding, tradeAtFire } from './camp.js';
 import {
   chooseBlessing,
   chooseGreenhouseHerb,
@@ -200,6 +200,8 @@ const routes = [
   ['POST', '/api/camp/exchange', exchangeResources],
   // The Duch budowniczego at the Kamień węgielny Warowni (camp.js).
   ['POST', '/api/camp/sell', sellToSpirit],
+  // The Zbieracz Systemu by the Skrzynia Konta (camp.js).
+  ['POST', '/api/camp/collector', buyCollector],
   ['POST', '/api/fortress/training', startTraining],
   ['POST', '/api/fortress/training/claim', claimTraining],
   ['POST', '/api/fortress/blessing', chooseBlessing],

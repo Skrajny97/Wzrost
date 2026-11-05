@@ -4494,6 +4494,65 @@ a.camp-level-button {
   white-space: nowrap;
 }
 
+/* The Zbieracz Systemu right beside the Skrzynia Konta (screens/camp.js),
+   as big as the chest and with no name under it (the author: „bez
+   opisu”), until he is bought: a spirit of the System with a faint glow of
+   his own, in the board's light of the hour. He bobs gently up and down
+   (the author: „Niech ten zbieracz lekko porusza sie w górę i w dół
+   zanimowany”), by a share of his own height, so as much on every board's
+   size; only his picture moves, not the button one taps. With the
+   animations off in the settings he stands still (the .calm rules). */
+.camp-collector {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  width: 9.5%;
+  padding: 0;
+  border: 0;
+  background: none;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.camp-collector-art {
+  display: block;
+  animation: collector-float 2.4s ease-in-out infinite;
+}
+
+.camp-collector-art .sprite {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 2px rgba(143, 227, 239, 0.55)) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+@keyframes collector-float {
+  50% {
+    transform: translateY(-7%);
+  }
+}
+
+.camp-board--dusk .camp-collector-art {
+  filter: brightness(0.88);
+}
+
+.camp-board--night .camp-collector-art {
+  filter: brightness(0.8);
+}
+
+/* His offer (screens/camp.js: collectorSheet): his icon beside his name. */
+.collector-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.collector-art .sprite {
+  width: 48px;
+  height: 48px;
+}
+
 /* Its screen (screens/chest.js): what lies in the chest, then the bag. */
 .chest-section {
   display: grid;
@@ -6431,6 +6490,7 @@ a.camp-level-button {
    Last in the file, so it wins over the rules it calms. */
 .calm .activity--done,
 .calm .camp-bubble--full,
+.calm .camp-collector-art,
 .calm .camp-fire-glow,
 .calm .camp-smoke,
 .calm .settlement-torch-glow,

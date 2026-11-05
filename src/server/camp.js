@@ -5,8 +5,10 @@
 // another (characters.js: settleBuilds). Production buildings fill a store
 // that the player collects, the Ognisko's fire spirit trades gold for
 // resources a few times a day, the scrap dealer at the Skup złomu sells
-// crafting parts, at the Stół rozbiórki one resource goes for another, and
-// the Duch budowniczego at the Kamień węgielny buys resources for gold.
+// crafting parts, at the Stół rozbiórki one resource goes for another, the
+// Duch budowniczego at the Kamień węgielny buys resources for gold, and the
+// Zbieracz Systemu, bought once by the Skrzynia Konta, collects the stores
+// as they fill.
 
 import {
   builderSpirit,
@@ -43,7 +45,20 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import { fortressOn } from './features.js';
-import { buildQueue, buildingOpen, characterView, currentHp, gainSql, loadPlayer, loadSettled, requirePlayer, restsDuring, settlementOpen, walletOf } from './characters.js';
+import {
+  buildQueue,
+  buildingOpen,
+  characterView,
+  currentHp,
+  loadPlayer,
+  loadSettled,
+  requirePlayer,
+  restsDuring,
+  settleCollector,
+  settlementOpen,
+  storeCollection,
+  walletOf,
+} from './characters.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 
@@ -481,32 +496,43 @@ export async function collectProduction(context) {
   const gathered = collect(building, stored, now);
   if (!gathered) throw new ApiError(409, 'nothing_to_collect', 'Magazyn jest jeszcze pusty.');
 
-  const row = player.row;
   const db = context.env.DB;
   // The resources come only if the store is still as seen here, and then the
-  // store moves on. Two taps at once compute the same new store, so the check
-  // is on the store before: the second tap finds it moved and gets nothing.
-  const seen = stored.collectedAt ?? stored.endsAt;
-  const gain = gainSql(gathered.resource, gathered.amount);
-  const [paid] = await db.batch([
-    db
-      .prepare(
-        `UPDATE characters SET ${gain.sql}, version = version + 1
-         WHERE id = ? AND EXISTS (
-           SELECT 1 FROM buildings WHERE character_id = ? AND building_id = ? AND COALESCE(collected_at, ends_at) = ? AND ends_at <= ?
-         )`,
-      )
-      .bind(...gain.values, row.id, row.id, building.id, seen, now),
-    db
-      .prepare(
-        `UPDATE buildings SET collected_at = ?
-         WHERE character_id = ? AND building_id = ? AND COALESCE(collected_at, ends_at) = ? AND ends_at <= ?`,
-      )
-      .bind(gathered.collectedAt, row.id, building.id, seen, now),
-  ]);
+  // store moves on (storeCollection): of two taps at once, the second finds
+  // it moved and gets nothing. With the Zbieracz Systemu the whole fills
+  // went to the resources as the request began (requirePlayer), so this is
+  // what the next fill holds so far.
+  const [paid] = await db.batch(storeCollection(db, player.row.id, building.id, stored.collectedAt ?? stored.endsAt, gathered, now));
   if (paid.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
   return json({
     collected: { resource: gathered.resource, amount: gathered.amount },
     character: characterView(await loadPlayer(db, session.userId), now),
   });
+}
+
+// The Zbieracz Systemu (the author: „Niech Zbieracz Systemu bedzie duchem
+// stojącym przy Skrzyni Konta bez opisu [...] po kliknięciu w niego
+// wyświetlać się będzie opcja zakupu za sporą ilość złota [...] i wtedy on
+// znika i automatycznie w grze toczy się zbieranie max zasobów gdy się
+// wygenerują”): bought once for good, as the Awatar Systemu (avatar.js),
+// only with the gold for it, so two taps at once pay once. The camp is open
+// from the start, so every player may buy him. From then on the game
+// collects the stores' whole fills whenever it loads the character
+// (characters.js: settleCollector), the stores full now at once.
+export async function buyCollector(context) {
+  const { session, player } = await requirePlayer(context);
+  const { price, texts } = content.camp.collector;
+  const { row } = player;
+  if (row.collector_at) throw new ApiError(409, 'owned', texts.owned);
+  if (row.gold < price) throw new ApiError(409, 'no_gold', texts.noGold);
+  const db = context.env.DB;
+  const now = context.now;
+  const bought = await db
+    .prepare('UPDATE characters SET gold = gold - ?, collector_at = ?, version = version + 1 WHERE id = ? AND collector_at IS NULL AND gold >= ?')
+    .bind(price, now, row.id, price)
+    .run();
+  if (bought.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
+  const after = await loadPlayer(db, session.userId);
+  await settleCollector(db, after, now);
+  return json({ character: characterView(after, now) });
 }

@@ -4,7 +4,7 @@
   "description": "Poziom samego obozu: od startLevel do maxLevel, za samo złoto, a każdy poziom ponad pierwszy przyspiesza budowy budynków.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["id", "name", "description", "startLevel", "maxLevel", "effect", "costs", "minutes", "evolution", "cornerstone", "queue"],
+  "required": ["id", "name", "description", "startLevel", "maxLevel", "effect", "costs", "minutes", "evolution", "cornerstone", "collector", "queue"],
   "properties": {
     "$comment": { "type": "string" },
     "id": { "const": "camp" },
@@ -98,6 +98,29 @@
                 "locked": { "type": "string", "minLength": 1, "description": "Odmowa bez Osady: bez niej kamienia nie ma." }
               }
             }
+          }
+        }
+      }
+    },
+    "collector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["art", "name", "price", "texts"],
+      "description": "Zbieracz Systemu: duch tuż obok Skrzyni Konta na planszy, bez podpisu (art, ikona 32 × 32 w src/client/art/camp), kupowany raz na zawsze za price złota. Potem znika z planszy, a gra sama zbiera całe zapełnienia magazynów budynków produkcyjnych.",
+      "properties": {
+        "art": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+        "name": { "type": "string", "minLength": 1 },
+        "price": { "type": "integer", "minimum": 1, "description": "Cena w złocie, płatna raz." },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["offer", "bought", "hint", "owned", "noGold"],
+          "properties": {
+            "offer": { "type": "string", "minLength": 1, "description": "Jedno zdanie w okienku zakupu: co robi Zbieracz." },
+            "bought": { "type": "string", "minLength": 1, "description": "Komunikat po zakupie." },
+            "hint": { "type": "string", "minLength": 1, "description": "Zdanie na ekranie budynku produkcyjnego, gdy postać ma Zbieracza." },
+            "owned": { "type": "string", "minLength": 1, "description": "Odmowa serwera: Zbieracz jest już kupiony." },
+            "noGold": { "type": "string", "minLength": 1, "description": "Odmowa serwera: za mało złota." }
           }
         }
       }

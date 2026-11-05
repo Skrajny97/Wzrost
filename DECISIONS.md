@@ -3034,6 +3034,31 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.72 (5.11.2026)
+
+Zbieracz Systemu przy Skrzyni Konta: zob. „Zbieracz Systemu”.
+
+## Zbieracz Systemu (5.11.2026, w grze od 0.1.72)
+
+Autor: „Stwórzmy też opcje automatycznego zbierania zasobów przy pełnym zapełnieniu magazynów w Obozie. Niech Zbieracz Systemu bedzie duchem stojącym przy Skrzyni Konta bez opisu (potrzebujemy tylko ikonki dla niego) po kliknięciu w niego wyświetlać się będzie opcja zakupu za sporą ilość złota (coś jak Awatar Systemu, może byc 10000) i wtedy on znika i automatycznie w grze toczy się zbieranie max zasobów gdy się wygenerują”. Ikona: „649 D”. O ruchu: „Niech ten zbieracz lekko porusza sie w górę i w dół zanimowany”.
+
+1. **Co robi.** Zbieracz Systemu zbiera magazyn budynku produkcyjnego w chwili, gdy ten się zapełni: Tartaku, Kamieniołomu, Kopalni i Stawu Midasa, także na poziomach 11–20 w Warowni. Produkcja nigdy nie stoi, więc nic nie przepada. Zebrane zasoby trafiają tam, gdzie po „Zbierz”: drewno, kamień i ruda do zasobów postaci, a złoto ze Stawu Midasa do złota.
+2. **Cena.** 10 000 złota, płatne raz, na zawsze, jak za Awatara Systemu (`collector.price` w `data/camp.json`). Nie ma progu poziomu, bo Obóz jest otwarty od początku gry. Przycisk „Kup” w okienku zakupu mówi, ile złota brakuje, np. „Brakuje: 5679 złota”, tak jak przycisk budowy.
+3. **Gdzie stoi.** Na planszy Obozu i Warowni, tuż obok Skrzyni Konta, po jej lewej stronie, między skrzynią a drogą. Ikona ma wielkość ikony skrzyni i nie ma podpisu, a czytnik ekranu mówi „Zbieracz Systemu”. Na planszy Warowni po prawej stronie skrzyni nie ma miejsca, bo zasłoniłyby go nazwy Szklarni i Skrzyni Konta, więc Zbieracz stoi po lewej na każdej planszy. Dotknięcie otwiera okienko: ikona z nazwą, zdanie o tym, co robi, cena ze złotą monetą i „Kup”.
+4. **Ikona i ruch.** Ikona to wersja D z PixelLab (649 D): duch z workiem, bez kiełka (`src/client/art/camp/collector-spirit.png`, 32 × 32, piksele ostre jak u ikony skrzyni). Duch lekko unosi się i opada w rytmie 2,4 sekundy, o 7% swojej wysokości, czyli na telefonie o 2–3 piksele, a na każdym ekranie tyle samo w stosunku do planszy. Rusza się tylko obrazek, a miejsce do stuknięcia stoi w miejscu. Ruch zatrzymuje przełącznik „Animacje” w Ustawieniach, jak inne animacje gry, a ustawienie telefonu o ograniczaniu ruchu niczego nie zmienia (zob. „Kamera narratora i przełącznik animacji”, punkt 1).
+5. **Po zakupie znika** z planszy, a komunikat mówi: „Zbieracz Systemu zajmie się teraz magazynami Obozu.” Na ekranie każdego budynku produkcyjnego pod magazynem stoi wtedy zdanie „Zbieracz Systemu zbierze zasoby, gdy magazyn się zapełni.”
+6. **Brakujące szczegóły:**
+   - Jeden Zbieracz na postać, jak Awatar Systemu: kupuje go postać, a nie konto, więc inna postać konta kupuje własnego.
+   - Zbieracz zbiera tylko całe zapełnienia magazynu. To, co powstało od ostatniego zapełnienia, zostaje w magazynie, a magazyn napełnia się dalej. Tę część zbiera jak dotąd „Zbierz” albo dymek nad budynkiem. Przykład: Tartak na 1. poziomie po 5 godzinach daje 2 × 12 drewna, a w magazynie zostaje 6.
+   - Zbieracz działa także pod nieobecność gracza. Gra zbiera zapełnienia, gdy następnym razem wczytuje postać, czyli przy każdym żądaniu gracza, także przy samym otwarciu gry. Gdy ekran gry jest otwarty, strona pyta serwer o postać sekundę po zapełnieniu się magazynu, więc zasoby rosną od razu.
+   - Magazyn pełny w chwili zakupu Zbieracz zbiera od razu, jak „Zbierz”, a magazyn napełnia się od nowa. Czas, w którym magazyn stał pełny przed zakupem, nic nie daje, bo produkcja wtedy stała.
+   - Budowa z kolejki, która ruszyła pod nieobecność gracza, zabiera magazyn w chwili swojego startu (zob. „Produkcja w obozie”, punkt 3). Ze Zbieraczem zabiera też całe zapełnienia zrobione do tej chwili, tak jakby Zbieracz zebrał je na bieżąco.
+   - Zbieracz nie dotyka budynków Warowni, które nie są budynkami zasobów. Szklarnia ma własne grządki z ziołami i zbiera się je jak dotąd. Zbieracz zbiera tylko budynki produkcyjne tego samego rodzaju co Tartak (`production` w `data/buildings.json`), także te, które dojdą.
+   - Zbieracz zbiera tylko przy żądaniach samego gracza. Magazynów nie zbiera karta postaci oglądana przez innego gracza ani żądania drugiej strony Wymiany czy członków Drużyny: zapełnienia czekają na żądanie samego gracza i niczego nie tracą.
+   - Ze Zbieraczem telefon nie dostaje powiadomienia „Pełny magazyn”, a złota kropka „pełny magazyn” przy przycisku Obozu się nie zapala, bo żaden magazyn nie stoi pełny.
+7. **Teksty** okienka i komunikatów to propozycja do poprawy przez autora (`collector.texts` w `data/camp.json`). Odmowy serwera: „Masz już Zbieracza Systemu.” i „Brakuje złota na Zbieracza Systemu.”
+8. **Serwer.** `POST /api/camp/collector` kupuje Zbieracza jednym zapisem, tylko gdy postać go nie ma i ma złoto, więc dwa stuknięcia naraz płacą raz. Postać w API ma `camp.collector` (nazwa, ikona, cena, teksty i `owned`). Zbieranie robi `settleCollector` w `src/server/characters.js` przy każdym wczytaniu postaci przez jej gracza, tymi samymi zapisami co „Zbierz”: zasoby przybywają tylko wtedy, gdy magazyn jest taki, jak go widziano, więc dwa żądania naraz zbierają każde zapełnienie raz. Rachunek zapełnień jest w silniku (`wholeFills` w `src/engine/camp.js`). Migracja `0087_collector.sql` dodaje kolumnę `characters.collector_at`, czyli chwilę zakupu.
+
 ## Sprawdzanie typów w kodzie, stopniowo (650 A, 5.11.2026)
 
 Autor zapytał, czy przydałaby się migracja na inny język albo przegląd kodu („daj znać”). Odpowiedź: przenosiny nie są potrzebne, bo gra działa na Cloudflare Workers, gdzie JavaScript jest językiem podstawowym, a pilnują jej testy i automatyczne przejście wprowadzenia. Zaproponowano sprawdzanie typów TypeScriptem w samych komentarzach (JSDoc), bez przepisywania kodu. Autor: „650 A”.

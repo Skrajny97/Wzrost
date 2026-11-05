@@ -193,7 +193,8 @@ async function notificationsByUser(db, from, to) {
       .prepare(`SELECT character_id, kind, region_id, ends_at FROM ${table} WHERE ends_at > ? AND ends_at <= ? AND character_id IN (SELECT id FROM characters WHERE ${subscribed})`)
       .bind(from, to);
   const [characters, activities, avatarActivities, buildings] = await db.batch([
-    db.prepare(`SELECT id, user_id, level, build_queue FROM characters WHERE ${subscribed}`),
+    // With the Zbieracz Systemu (collector_at) no store stands full.
+    db.prepare(`SELECT id, user_id, level, build_queue, collector_at FROM characters WHERE ${subscribed}`),
     ending('activities'),
     // The works of the Awatar Systemu (avatar.js).
     ending('avatar_activities'),
@@ -210,7 +211,7 @@ async function notificationsByUser(db, from, to) {
   const players = new Map(
     characters.results.map((row) => [
       row.id,
-      { userId: row.user_id, level: row.level, activity: null, avatarActivity: null, buildings: {}, queue: JSON.parse(row.build_queue ?? '[]') },
+      { userId: row.user_id, level: row.level, activity: null, avatarActivity: null, buildings: {}, queue: JSON.parse(row.build_queue ?? '[]'), collector: Boolean(row.collector_at) },
     ]),
   );
   for (const [rows, key] of [

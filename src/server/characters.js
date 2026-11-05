@@ -33,6 +33,7 @@ import {
   classNameOf,
   classXpToNext,
   collect,
+  collectWithFills,
   combatValues,
   extraValues,
   computeStats,
@@ -105,6 +106,7 @@ import {
   cosmeticsOf,
   nameColor,
   seatLevels,
+  wholeFills,
 } from '../engine/index.js';
 import { mountView } from '../engine/stable.js';
 import { say } from '../engine/text.js';
@@ -235,6 +237,14 @@ export async function requirePlayer(context) {
   const player = await loadPlayer(context.env.DB, session.userId);
   if (!player) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
   await settleBuilds(context.env.DB, player, context.now);
+  // The Zbieracz Systemu collects here, where every request of the player
+  // settles what time brought: so GET /api/character and every action see
+  // the stores collected, and the answers built from a character read again
+  // after the action too. loadPlayer itself has no time and reads also the
+  // other side of a Wymiana, and loadCharacter the members of a Drużyna:
+  // their stores wait for their own requests. After the builds, as a build
+  // that began meanwhile took its store along at its start.
+  await settleCollector(context.env.DB, player, context.now);
   await settleTimePoints(context.env.DB, player.row, context.now);
   await settleTable(context.env.DB, player, context.now);
   await settleQuests(context.env.DB, player, context.now);
@@ -359,12 +369,87 @@ export function gainSql(resource, amount) {
     : { sql: 'resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) + ?)', values: [path(resource), path(resource), amount] };
 }
 
+// The same gain on the row as read, so the answer shows it.
+function gainRow(row, { resource, amount }) {
+  if (resource === 'gold') {
+    row.gold += amount;
+    return;
+  }
+  const resources = JSON.parse(row.resources ?? '{}');
+  resources[resource] = (resources[resource] ?? 0) + amount;
+  row.resources = JSON.stringify(resources);
+}
+
+// The writes of a store collected, by "Zbierz" (camp.js: collectProduction)
+// or by the Zbieracz Systemu (settleCollector): the resources come only if
+// the store still starts where it was seen (`seen`), and then the store
+// moves on to `gathered.collectedAt`. Two requests at once compute the same
+// new store, so the check is on the store before: the second finds it moved
+// and gets nothing. For one db.batch.
+export function storeCollection(db, characterId, buildingId, seen, gathered, now) {
+  const gain = gainSql(gathered.resource, gathered.amount);
+  return [
+    db
+      .prepare(
+        `UPDATE characters SET ${gain.sql}, version = version + 1
+         WHERE id = ? AND EXISTS (
+           SELECT 1 FROM buildings WHERE character_id = ? AND building_id = ? AND COALESCE(collected_at, ends_at) = ? AND ends_at <= ?
+         )`,
+      )
+      .bind(...gain.values, characterId, characterId, buildingId, seen, now),
+    db
+      .prepare(
+        `UPDATE buildings SET collected_at = ?
+         WHERE character_id = ? AND building_id = ? AND COALESCE(collected_at, ends_at) = ? AND ends_at <= ?`,
+      )
+      .bind(gathered.collectedAt, characterId, buildingId, seen, now),
+  ];
+}
+
+// The Zbieracz Systemu (camp.js: buyCollector; DECISIONS.md, „Zbieracz
+// Systemu”): once the character has him, every production building's store
+// gives its whole fills since it started filling (wholeFills in the
+// engine), each as "Zbierz" takes a store, all in one batch, and the next
+// fill goes on filling. So production never stands, also while the player
+// is away: the fills wait for the next request. `player` shows what came.
+// A store another request collected meanwhile gives nothing here: the
+// character is read again, and what is left is collected from there.
+export async function settleCollector(db, player, now) {
+  for (let tries = 0; tries < 3; tries++) {
+    const { row } = player;
+    if (!row.collector_at) return;
+    const fills = content.buildings
+      .filter((building) => building.effect.kind === 'production')
+      .map((building) => {
+        const stored = player.buildings[building.id];
+        return { building, stored, gathered: wholeFills(building, stored, now, row.collector_at) };
+      })
+      .filter((fill) => fill.gathered);
+    if (fills.length === 0) return;
+    const results = await db.batch(fills.flatMap(({ building, stored, gathered }) => storeCollection(db, row.id, building.id, stored.collectedAt ?? stored.endsAt, gathered, now)));
+    let missed = false;
+    for (const [index, { building, stored, gathered }] of fills.entries()) {
+      if (results[2 * index].meta.changes !== 1) {
+        missed = true;
+        continue;
+      }
+      gainRow(row, gathered);
+      row.version += 1;
+      player.buildings[building.id] = { ...stored, collectedAt: gathered.collectedAt };
+    }
+    if (!missed) return;
+    Object.assign(player, await loadPlayer(db, row.user_id));
+  }
+}
+
 // The waiting builds whose time has come start, one after another, each as
 // if it had started at its own time, as a build started by hand does
 // (camp.js: beginBuilding): a production building's store goes to the
 // resources then, and the HP rested by then is saved. Each start saves only
 // if the character is as seen here; when another request moved first, the
-// character is read again and its queue goes on from there.
+// character is read again and its queue goes on from there. With the
+// Zbieracz Systemu the store gives the whole fills made by then as well
+// (settleCollector), as he would have collected them.
 async function settleBuilds(db, player, now) {
   for (let tries = 0; tries < 10; tries++) {
     const [entry, ...rest] = buildQueue(player.row);
@@ -373,7 +458,8 @@ async function settleBuilds(db, player, now) {
     const at = entry.startsAt;
     const building = content.buildingsById[entry.buildingId];
     const producing = building?.effect?.kind === 'production';
-    const gathered = producing ? collect(building, player.buildings[building.id], at) : null;
+    const stored = player.buildings[building?.id];
+    const gathered = !producing ? null : row.collector_at ? collectWithFills(building, stored, at, row.collector_at) : collect(building, stored, at);
     const resting = restsDuring(player.activity);
     const hp = resting ? currentHp(player, at).hp : null;
     const gain = gathered && gainSql(gathered.resource, gathered.amount);
@@ -420,12 +506,7 @@ async function settleBuilds(db, player, now) {
     }
     row.build_queue = JSON.stringify(rest);
     row.version += 1;
-    if (gathered?.resource === 'gold') row.gold += gathered.amount;
-    else if (gathered) {
-      const resources = JSON.parse(row.resources ?? '{}');
-      resources[gathered.resource] = (resources[gathered.resource] ?? 0) + gathered.amount;
-      row.resources = JSON.stringify(resources);
-    }
+    if (gathered) gainRow(row, gathered);
     if (resting) Object.assign(row, { hp, hp_at: at });
     if (building) {
       player.buildings[building.id] = { level: entry.level, startedAt: at, endsAt: entry.endsAt, collectedAt: producing ? entry.endsAt : null, ...(entry.cost && { cost: entry.cost }) };
@@ -886,6 +967,7 @@ function campView(player, levels, now) {
       fortress: fortressOn() ? fortressView(player, open, queue, now) : null,
       spirit: spiritView(player, built, queue, now),
     },
+    collector: collectorView(player.row),
     level: {
       id: camp.id,
       name: camp.name,
@@ -973,6 +1055,14 @@ function campView(player, levels, now) {
       };
     }),
   };
+}
+
+// The Zbieracz Systemu (camp.js: buyCollector): his icon, name, price and
+// words, and whether the character has him; the board shows him by the
+// Skrzynia Konta until he is bought.
+function collectorView(row) {
+  const { art, name, price, texts } = content.camp.collector;
+  return { art, name, price, owned: Boolean(row.collector_at), texts: { offer: texts.offer, bought: texts.bought, hint: texts.hint } };
 }
 
 // The Duch budowniczego at the Kamień węgielny Warowni (builder-spirit.js):

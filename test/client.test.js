@@ -174,11 +174,12 @@ test('every sprite on the list has its file at its size, and every class has its
     // The Warownia's board, with stone walls (606 A).
     'board-fortress': ['fortress'],
     // The camp's buildings at their three looks, a fourth for those that go
-    // on to level 20 in the Warownia (beyond, 618), and the Kamień węgielny
-    // Warowni (data/camp.json).
+    // on to level 20 in the Warownia (beyond, 618), the Kamień węgielny
+    // Warowni and the Zbieracz Systemu's icon (data/camp.json).
     camp: [
       ...data('buildings').flatMap((building) => [1, 2, 3, ...(building.beyond ? [4] : [])].map((tier) => `${building.id}-${tier}`)),
       ...(data('camp').cornerstone ? ['cornerstone-1'] : []),
+      data('camp').collector.art,
     ],
     // Zielarstwo's herbs, Alchemia's potions, the professions' squares, the
     // places they work in, the Ewolucja's spring and the Wieże.

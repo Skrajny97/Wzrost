@@ -138,8 +138,17 @@ export const storeAmount = (store, now = serverNow()) =>
 export const storeFullAt = (store) => store.since + (store.capacity / store.perHour) * 3600000;
 
 // A store that is full and stands, so the player has something to collect.
+// With the Zbieracz Systemu none stands: the server collects it as it fills.
 export const fullStores = (character = state.character, now = serverNow()) =>
-  character.camp.buildings.filter((building) => building.production && !building.production.paused && storeAmount(building.production, now) >= building.production.capacity);
+  character.camp.collector?.owned
+    ? []
+    : character.camp.buildings.filter((building) => building.production && !building.production.paused && storeAmount(building.production, now) >= building.production.capacity);
+
+// The Zbieracz Systemu's stores that filled since the server's last answer:
+// the next answer brings them collected (app.js: watchStores).
+export const filledForCollector = (character = state.character, now = serverNow()) =>
+  Boolean(character?.camp.collector?.owned) &&
+  character.camp.buildings.some((building) => building.production && !building.production.paused && now >= storeFullAt(building.production) + 1000);
 
 // A second of slack, so the page never asks for a report before the server has it.
 export const activityFinished = (activity, now = serverNow()) => Boolean(activity) && now >= activity.endsAt + 1000;

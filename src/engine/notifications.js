@@ -38,11 +38,12 @@ function workNotice(activity, from, to, content, avatar = false) {
   };
 }
 
-// `player`: { level, activity, avatarActivity, buildings, queue }: the
-// activity and the Awatar's work as { kind, areaId, endsAt } (or null), the
-// buildings and the build queue as the camp keeps them (camp.js). Gives
+// `player`: { level, activity, avatarActivity, buildings, queue, collector }:
+// the activity and the Awatar's work as { kind, areaId, endsAt } (or null),
+// the buildings and the build queue as the camp keeps them (camp.js), and
+// whether the character has the Zbieracz Systemu. Gives
 // [{ tag, url, at, title, body }], oldest first.
-export function notificationsDue({ level, activity, avatarActivity = null, buildings, queue }, from, to, content) {
+export function notificationsDue({ level, activity, avatarActivity = null, buildings, queue, collector = false }, from, to, content) {
   const { texts } = content;
   const due = [];
   if (activity?.kind === 'hunt' && within(activity.endsAt, from, to)) {
@@ -79,10 +80,14 @@ export function notificationsDue({ level, activity, avatarActivity = null, build
   }
 
   // A store stays full from its fullAt, unless an upgrade of its building
-  // from the queue has started: the upgrade takes the store along.
-  const full = content.buildings
-    .map((building) => ({ building, store: production(building, buildings[building.id], to) }))
-    .filter(({ building, store }) => store && store.fullAt <= to && !queue.some((build) => build.buildingId === building.id && build.startsAt <= to));
+  // from the queue has started: the upgrade takes the store along. With the
+  // Zbieracz Systemu no store stands full: he collects it as it fills
+  // (wholeFills in camp.js), so there is nothing to tell.
+  const full = collector
+    ? []
+    : content.buildings
+        .map((building) => ({ building, store: production(building, buildings[building.id], to) }))
+        .filter(({ building, store }) => store && store.fullAt <= to && !queue.some((build) => build.buildingId === building.id && build.startsAt <= to));
   const filled = full.filter(({ store }) => store.fullAt > from);
   if (filled.length > 0) {
     due.push({

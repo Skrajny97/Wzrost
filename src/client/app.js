@@ -44,7 +44,7 @@ import { narrate } from './narrator.js';
 import { forgetNews, watchNews } from './news.js';
 import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
-import { call, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn, unlockInfo } from './state.js';
+import { call, filledForCollector, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn, unlockInfo } from './state.js';
 import { offerPointsReset, openEvolutionTests } from './evolution.js';
 import { giftCodeRow } from './gift-code.js';
 import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, skinSwatches, toast, voiceSwitch, withButton } from './ui.js';
@@ -324,6 +324,7 @@ function openGame() {
     current?.screen.tick?.(now);
     watchConstruction(now);
     watchCrafting(now);
+    watchStores(now);
     watchQuests(now);
     // A new entry of "Co nowego?" lights the scroll's dot (news.js).
     watchNews(now);
@@ -350,6 +351,17 @@ function watchConstruction(now) {
       playSound('done');
     })
     .catch((error) => toast(error.message));
+}
+
+// With the Zbieracz Systemu, when a camp store fills the character is
+// fetched again: the server collects the store as it loads it, so the
+// resources and the store follow at once, with no message. Without a
+// connection it tries again every 30 seconds.
+let storesRetryAt = 0;
+function watchStores(now) {
+  if (now < storesRetryAt || !filledForCollector(state.character, now)) return;
+  storesRetryAt = now + 30000;
+  call('GET', '/api/character').catch(() => {});
 }
 
 // When an order on the Stół rozbiórki ends, the character is fetched

@@ -4,7 +4,8 @@
 // and a few more can wait in the queue.
 // A stored building is { level, startedAt, endsAt, collectedAt }: the level it
 // has once the last upgrade has ended, and for a production building the time
-// its store started filling. The server passes the time.
+// its store started filling. The server passes the time. The Zbieracz
+// Systemu, once bought, collects every store as it fills (wholeFills).
 
 import { countedForm } from './text.js';
 
@@ -217,4 +218,35 @@ export function collect(building, stored, now) {
   if (!store || store.amount < 1) return null;
   const collectedAt = store.amount >= store.capacity ? now : store.since + Math.round((store.amount / store.perHour) * HOUR);
   return { resource: store.resource, amount: store.amount, collectedAt };
+}
+
+// The Zbieracz Systemu (DECISIONS.md, „Zbieracz Systemu”), there since
+// `from` (without it, as if he had always been there), collects every store
+// the moment it fills, so production never stands: by `now` a store has
+// given its whole fills since it started filling, each a full store made in
+// the time from empty to full. What they give and the new start of
+// production, which keeps the part of the next fill made so far; null
+// before the first fill and while an upgrade keeps the building from
+// producing. A store that stood full before the Zbieracz came is collected
+// as he comes, and fills again from then: the time it stood brings nothing.
+export function wholeFills(building, stored, now, from = null) {
+  const store = production(building, stored, now);
+  if (!store || store.capacity <= 0 || stored.endsAt > now || (from !== null && now < from)) return null;
+  const fill = Math.round((store.capacity / store.perHour) * HOUR);
+  const stood = from !== null && store.since + fill <= from;
+  const start = stood ? from : store.since;
+  const later = Math.floor((now - start) / fill);
+  const fills = later + (stood ? 1 : 0);
+  if (fills < 1) return null;
+  return { resource: store.resource, amount: fills * store.capacity, collectedAt: start + later * fill };
+}
+
+// Collecting the store at `now` with the Zbieracz Systemu there since
+// `from`: his whole fills and what the next one holds so far, as a build
+// that begins takes the store along (characters.js: settleBuilds).
+export function collectWithFills(building, stored, now, from = null) {
+  const fills = wholeFills(building, stored, now, from);
+  if (!fills) return collect(building, stored, now);
+  const rest = collect(building, { ...stored, collectedAt: fills.collectedAt }, now);
+  return { resource: fills.resource, amount: fills.amount + (rest?.amount ?? 0), collectedAt: rest?.collectedAt ?? fills.collectedAt };
 }

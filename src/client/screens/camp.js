@@ -4,13 +4,14 @@
 // materials, one at a time, with a few more waiting in the queue; an upgrade
 // counts once its time has passed.
 // Production buildings fill a store the player collects, from a bubble on the
-// board or on the building's screen, at the Ognisko the fire spirit trades
-// gold for resources a few times a day, at the Skup złomu the scrap dealer
-// sells crafting parts, and with the Osada the Duch budowniczego at the
-// Kamień węgielny buys resources for gold. Opened with the camp button in
+// board or on the building's screen, or the Zbieracz Systemu, once bought by
+// the Skrzynia Konta, collects as it fills; at the Ognisko the fire spirit
+// trades gold for resources a few times a day, at the Skup złomu the scrap
+// dealer sells crafting parts, and with the Osada the Duch budowniczego at
+// the Kamień węgielny buys resources for gold. Opened with the camp button in
 // the top bar, on a computer with the camp's tab in the menu (508 A).
 
-import { materialSprite, resourceArt } from '../art.js';
+import { campIcon, goldArt, materialSprite, resourceArt } from '../art.js';
 import { spiritPart, spiritSaleSheet } from '../builder-spirit.js';
 import { BOARD_WIDTH, FORTRESS_HALVES, PLOT_HEIGHT, PLOT_WIDTH, boardArt, boardHeight, buildingTier, campPlots, cornerstoneArt, fortressHalf, plotArt, stretchY } from '../camp-art.js';
 import { craftTableSection, materialIcon } from '../craft-table.js';
@@ -20,7 +21,7 @@ import { leaveView, openView } from '../history.js';
 import { playSound } from '../sound.js';
 import { call, costShortfall, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
 import { skipControl } from '../time.js';
-import { confirmAction, guided, meter, openSheet, systemPanel, toast, withButton } from '../ui.js';
+import { closeSheet, confirmAction, guided, meter, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { desktopLayout, onLayoutChange } from '../layout-mode.js';
 import { scrapperSheet } from '../scrapper.js';
 import { blessingSection, fortressPart, gearSetsSection, greenhouseSection, trainingSection } from '../fortress.js';
@@ -43,6 +44,11 @@ const CHEST_SPOT = { x: 238, y: 406 };
 // In the Warownia (camp-art.js) the Kapliczka stands there, so the chest
 // stands by the road between it and the Strażnica, in the board's units.
 const FORTRESS_CHEST_SPOT = { x: 206, y: 662 };
+// The Zbieracz Systemu, until he is bought, stands right beside the chest,
+// as big as it, on its left, between it and the road, on every board: on
+// the Warownia's the names of the Szklarnia and of the chest leave no room
+// on its right. In the board's units.
+const COLLECTOR_GAP = 36;
 // The Kamień węgielny Warowni on the board with the Osada, in its band across
 // the road from the Kwatery (the author's "435 A").
 const CORNERSTONE_SPOT = { x: 266, y: 418 };
@@ -93,6 +99,34 @@ function cornerstoneSheet() {
     // The camp's transformation into a Warownia (fortress.js).
     stone.fortress && fortressPart(stone.fortress, cornerstoneSheet),
     stone.spirit && spiritPart(stone.spirit, (good) => spiritSaleSheet(stone.spirit, good, cornerstoneSheet)),
+  );
+}
+
+// The Zbieracz Systemu's offer (the author: „po kliknięciu w niego
+// wyświetlać się będzie opcja zakupu za sporą ilość złota”): his name, what
+// he does, his price and "Kup", or the gold missing, as a build's button
+// says it. Once bought he leaves the board, and the game collects the full
+// stores by itself (the server's settleCollector).
+function collectorSheet() {
+  const collector = state.character.camp.collector;
+  const lacking = costShortfall({ gold: collector.price });
+  openSheet(
+    h('div', { class: 'collector-head' }, h('span', { class: 'collector-art' }, campIcon(collector.art)), h('h2', { class: 'sheet-title', text: collector.name })),
+    h('p', { class: 'sheet-text', text: collector.texts.offer }),
+    h('p', { class: 'sheet-text avatar-price' }, goldArt(20), ` ${formatNumber(collector.price)} złota, jednorazowo i na zawsze`),
+    h('button', {
+      type: 'button',
+      class: 'button button--system',
+      text: lacking.length > 0 ? `Brakuje: ${lacking.join(', ')}` : 'Kup',
+      disabled: lacking.length > 0,
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          const { character } = await call('POST', '/api/camp/collector');
+          closeSheet();
+          playSound('chest');
+          toast(character.camp.collector.texts.bought);
+        }),
+    }),
   );
 }
 
@@ -355,6 +389,7 @@ function mountBoard(container, backHash) {
         boardArt(campOf().level, tall()),
         character.camp.buildings.map((building) => plot(building, running)),
         chestLink(),
+        collectorLink(),
         tall() && cornerstone(),
         campLevelButton(running),
       );
@@ -368,7 +403,7 @@ function mountBoard(container, backHash) {
           { class: `camp-board camp-board--${dayPart()} camp-board--part`, style: { aspectRatio: `${BOARD_WIDTH} / ${range[1] - range[0]}` } },
           boardArt(campOf().level, tall(), range),
           character.camp.buildings.filter((building) => fortressHalf(spotOf(building.id).y) === index).map((building) => plot(building, running, range)),
-          index === fortressHalf(FORTRESS_CHEST_SPOT.y) && chestLink(range),
+          index === fortressHalf(FORTRESS_CHEST_SPOT.y) && [chestLink(range), collectorLink(range)],
           index === fortressHalf(CORNERSTONE_SPOT.y) && cornerstone(range),
           index === 0 && campLevelButton(running),
         ),
@@ -461,6 +496,30 @@ function mountBoard(container, backHash) {
       },
       h('span', { class: 'camp-chest-art' }, materialSprite('chest')),
       h('span', { class: 'camp-plot-label' }, h('span', { text: 'Skrzynia Konta' })),
+    );
+  }
+
+  // The Zbieracz Systemu right beside the Skrzynia Konta, as big as the
+  // chest and with no name under it (the author: „bez opisu”), until he is
+  // bought: a tap shows his offer.
+  function collectorLink(range = null) {
+    const collector = state.character.camp.collector;
+    if (!collector || collector.owned) return null;
+    const [from, to] = range ?? [0, boardHeight(tall())];
+    const chest = tall() === 'fortress' ? FORTRESS_CHEST_SPOT : { x: CHEST_SPOT.x, y: stretchY(CHEST_SPOT.y, tall()) };
+    return h(
+      'button',
+      {
+        type: 'button',
+        class: 'camp-collector',
+        'aria-label': collector.name,
+        style: {
+          left: `${((chest.x - COLLECTOR_GAP) / BOARD_WIDTH) * 100}%`,
+          top: `${((chest.y - from) / (to - from)) * 100}%`,
+        },
+        onClick: () => collectorSheet(),
+      },
+      h('span', { class: 'camp-collector-art' }, campIcon(collector.art)),
     );
   }
 
@@ -720,9 +779,12 @@ function mountBuilding(container, id) {
   }
 
   // The store of a production building: how full it is, when it fills up,
-  // and "Zbierz".
+  // and "Zbierz"; with the Zbieracz Systemu, that he collects it as it fills
+  // (a full store waits only for the server's next answer, app.js:
+  // watchStores).
   function storeView(building) {
     const store = building.production;
+    const collector = state.character.camp.collector?.owned ? state.character.camp.collector : null;
     const amount = h('strong', {});
     const fillBar = h('div', { class: 'bar-fill bar-fill--gold' });
     const hint = h('p', { class: 'store-hint' });
@@ -750,6 +812,7 @@ function mountBuilding(container, id) {
         : held >= store.capacity
           ? 'Magazyn pełny: produkcja stoi do zebrania.'
           : `Pełny za ${formatCountdown(storeFullAt(store) - now)}.`;
+      hint.hidden = Boolean(collector) && !store.paused && held >= store.capacity;
       button.disabled = collecting || held < 1;
     });
     return h(
@@ -764,6 +827,7 @@ function mountBuilding(container, id) {
       ),
       h('div', { class: 'bar' }, fillBar),
       hint,
+      collector && h('p', { class: 'store-hint', text: collector.texts.hint }),
       button,
     );
   }

@@ -252,7 +252,8 @@ export const SPRITES = {
   // węgielny Warowni on the board with the Osada. The Warownia's buildings
   // after them (578, 585, 588); the Plac treningowy's looks 2 and 3 were
   // completed past their 128 × 96 frame by PixelLab (608 A, 609 A), so a
-  // picture may be up to 160 × 128.
+  // picture may be up to 160 × 128. Last, the Zbieracz Systemu's icon by the
+  // Skrzynia Konta, 32 × 32 (data/camp.json, collector.art).
   camp: {
     width: 160,
     height: 128,
@@ -265,6 +266,7 @@ export const SPRITES = {
       'training-yard-1', 'training-yard-2', 'training-yard-3', 'armory-1', 'armory-2', 'trophy-hall-1', 'trophy-hall-2', 'trophy-hall-3',
       'watchtower-1', 'watchtower-2', 'watchtower-3', 'system-altar-1', 'system-altar-2', 'system-altar-3',
       'greenhouse-1', 'greenhouse-2', 'greenhouse-3', 'shrine-1', 'shrine-2', 'shrine-3',
+      'collector-spirit',
     ],
   },
   // The herbs of Zielarstwo, 32×32, filled in as they are approved.
@@ -497,6 +499,10 @@ export const boardGround = (tier, tall = false) => {
   return available[kind].has(`camp-${tier}`) ? `/art/${kind}/camp-${tier}.png` : null;
 };
 export const campArt = (buildingId, tier) => (available.camp.has(`${buildingId}-${tier}`) ? `/art/camp/${buildingId}-${tier}.png` : null);
+// The Zbieracz Systemu's icon on the camp board, 32×32 (data/camp.json,
+// collector.art), or null while it has none.
+export const campIcon = (id) =>
+  available.camp.has(id) ? h('img', { src: `/art/camp/${id}.png`, alt: '', width: 32, height: 32, class: 'sprite camp-icon', decoding: 'async', draggable: 'false' }) : null;
 // A herb of Zielarstwo, a potion of Alchemia, a profession's square on the
 // Profesje tab, and the address of the background of a place where a
 // profession works.
