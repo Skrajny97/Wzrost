@@ -361,6 +361,19 @@ test("the narrator hears of the character's change once the page is where it goe
   assert.doesNotMatch(change, /narrate\(\);/);
 });
 
+// The narrator's line about the settings points at the gear by a class of
+// its own: on the author's account its label tells the bug reports waiting,
+// and a selector by the label found nothing there, so the line was passed
+// over unseen (664).
+test('the narrator finds the settings gear whatever its label says', () => {
+  const layout = readFileSync(join(CLIENT, 'layout.js'), 'utf8');
+  assert.match(layout, /const settings = h\('button', \{ type: 'button', class: 'icon-button settings-button', 'aria-label': 'Ustawienia'/);
+  assert.match(layout, /topbar\.settings\.setAttribute\('aria-label', reports > 0 \? `Ustawienia, nowe zgłoszenia błędów: \$\{reports\}` : 'Ustawienia'\);/);
+  const beats = /const BEATS = \{([\s\S]*?)\n\};/.exec(readFileSync(join(CLIENT, 'narrator.js'), 'utf8'))[1];
+  assert.match(beats, /\n {2}settings: \{ place: '\.topbar \.settings-button',/);
+  assert.doesNotMatch(beats, /aria-label="Ustawienia"/);
+});
+
 test('the page can be added to the home screen as an app', () => {
   const html = readFileSync(join(CLIENT, 'index.html'), 'utf8');
   assert.match(html, /<link rel="manifest" href="\/manifest\.webmanifest">/);

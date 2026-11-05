@@ -376,7 +376,8 @@ const BEATS = {
   // with the rest, Punkty Czasu among it, before the settings; a tap on the
   // gold unfolds the list, which stays in sight a moment before the next line.
   wallet: { place: '.topbar .gold', when: campDone },
-  settings: { place: '.topbar .icon-button[aria-label="Ustawienia"]', delay: 2500, when: campDone },
+  // The gear by its class: its label tells the author's bug reports (664).
+  settings: { place: '.topbar .settings-button', delay: 2500, when: campDone },
   quests: { place: mark('quests'), late: true, when: campDone },
   // The author: and the Encyklopedia. The book in the top bar opens it, and
   // there the narrator points at the class's first set, with the weapon of

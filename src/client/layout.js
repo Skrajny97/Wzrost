@@ -140,7 +140,9 @@ export function buildTopbar(onSettings) {
   const speed = h('a', { class: 'speed-chip', href: '#/postac', hidden: true }, icon('flask', { size: 16 }), speedTime);
 
   // The settings, with a dot for the author when players' bug reports wait.
-  const settings = h('button', { type: 'button', class: 'icon-button', 'aria-label': 'Ustawienia', onClick: onSettings }, icon('gear'));
+  // A class of its own, which the narrator points at: the label changes with
+  // the bug reports waiting for the author (664).
+  const settings = h('button', { type: 'button', class: 'icon-button settings-button', 'aria-label': 'Ustawienia', onClick: onSettings }, icon('gear'));
   // "Co nowego?" beside them (594 C): the latest entries, with a yellow dot
   // while an entry the account has not seen waits (news.js).
   const news = h('button', { type: 'button', class: 'icon-button news-button', 'aria-label': 'Co nowego?', onClick: () => openNews().catch((error) => toast(error.message)) }, icon('scroll'));
