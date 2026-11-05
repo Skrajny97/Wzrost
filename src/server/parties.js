@@ -38,8 +38,8 @@
 // (companionStays in the engine), also one of a character that was in a
 // party before this rule came.
 
-import { areaFor, areaUnlocked, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyRefusal } from '../engine/index.js';
-import { characterView, currentHp, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
+import { areaFor, areaOpenFor, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyRefusal } from '../engine/index.js';
+import { characterView, currentHp, earlyAreaOf, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
 import { settlementOn } from './features.js';
@@ -421,7 +421,7 @@ export async function partyHunt(context) {
   const area = typeof body.areaId === 'string' ? areaFor(body.areaId, player.row.level, content) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
   for (const member of [player, ...going]) {
-    if (!areaUnlocked(area, member.row.class_level, content)) {
+    if (!areaOpenFor(area, member.row.class_level, earlyAreaOf(member.row), content)) {
       throw new ApiError(403, 'party_area_locked', `${member.row.name} nie ma jeszcze otwartego miejsca ${area.name}. Drużyna idzie tylko tam, gdzie może każdy z was.`);
     }
     if (!huntDurations(member.row.level, content).includes(body.minutes)) {

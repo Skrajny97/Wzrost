@@ -40,7 +40,8 @@ import { say } from './text.js';
 import { classUnlockMessages, unlockMessages } from './unlocks.js';
 import { classNameOf, evolutionOf } from './evolutions.js';
 import { evolutionBlock, skillPoints } from './skills.js';
-import { companionCombatant } from './companions.js';
+import { companionCombatant, gendered } from './companions.js';
+import { wantedEncounter, wantedLootRarity, wantedOf, wantedStrength } from './wanted.js';
 
 // Value of [minutes, value] pairs at `minutes`, rising with the logarithm of
 // the time between pairs.
@@ -350,7 +351,8 @@ export function encounterCombatants(encounter, content, { growth = 1, strength =
   const groupFactor = content.balance.hunt.groupFactors[encounter.members.length - 1];
   return encounter.members.map((member, index) => {
     seen[member.monsterId] = (seen[member.monsterId] ?? 0) + 1;
-    const baseName = content.monstersById[member.monsterId].name;
+    // A wanted creature of the Osada's posters (wanted.js) has its own name.
+    const baseName = member.name ?? content.monstersById[member.monsterId].name;
     const name = counts[member.monsterId] > 1 ? `${baseName} ${seen[member.monsterId]}` : baseName;
     return monsterCombatant({ ...member, id: `e${index}`, name, groupFactor, growth, strength }, content);
   });
@@ -381,9 +383,10 @@ export function resourceBundle(area, total) {
 // the exploration's first `fights` fights (or, kept in time by one started
 // before 0.1.26, for its first `ms`), and `speed` the same for a speed potion
 // alone, as explorations started before the other kinds kept it
-// (potions.js).
+// (potions.js). `wanted`: the Osada's wanted poster the character set out
+// with (wanted.js), its target met in its place's explorations.
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null },
+  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null },
   content,
 ) {
   // A Drużyna's trip (src/server/trips.js) gives `roster`, its players in
@@ -521,6 +524,15 @@ export function simulateHunt(
     blessedWith('luck', fightsDone) ? { ...base, rarityBonus: (base.rarityBonus ?? 1) * (1 + blessing.bonus) } : base;
   const blessedBy = (kind, fightsDone) => (blessedWith(kind, fightsDone) ? 1 + blessing.bonus : 1);
 
+  // The Osada's wanted poster (wanted.js): in its place, each fight is the
+  // fight with its target by the rules' chance, once. Its own seed draws it,
+  // so an exploration that does not meet it goes as it would without it.
+  const rules = wantedOf(content);
+  const sought = rules && wanted && wanted.areaId === area.id && !first ? wanted : null;
+  const wantedRng = sought ? createRng(`${seed}:wanted`) : null;
+  const sighting = { met: false, beaten: false };
+  const told = (text) => (sought ? gendered(text, sought.female ? 'female' : 'male') : text);
+
   for (const [step, event] of timeline.entries()) {
     if (event.type === 'find') {
       // A find is gold, a treasure chest with an item of the place's level,
@@ -551,13 +563,15 @@ export function simulateHunt(
       continue;
     }
 
-    const encounter = rollEncounter(area, rng, content, lead.level, pace, tracked, unknown, scouted);
+    const meeting = Boolean(sought) && !sighting.met && wantedRng.chance(rules.chance);
+    if (meeting) sighting.met = true;
+    const encounter = meeting ? wantedEncounter(sought) : rollEncounter(area, rng, content, lead.level, pace, tracked, unknown, scouted);
     if (catchUp && (encounter.elite || encounter.champion)) {
       catchUp = { elite: catchUp.elite && !encounter.elite, champion: catchUp.champion && !encounter.champion };
       if (!catchUp.elite && !catchUp.champion) catchUp = null;
       pace = odds();
     }
-    const enemies = encounterCombatants(encounter, content, { strength });
+    const enemies = encounterCombatants(encounter, content, { strength: meeting ? wantedStrength(area, sought, strength, content) : strength });
     // Each player as it fights now: its strengthening potions still working
     // (in their number of the first fights; a window kept in time, of an
     // exploration started before 0.1.26, while its time lasts), the potions
@@ -607,6 +621,7 @@ export function simulateHunt(
       elite: encounter.elite,
       champion: encounter.champion ?? false,
       tough: encounter.tough ?? false,
+      ...(meeting && { wanted: true }),
       enemies: enemies.map((enemy) => ({ name: enemy.name, level: enemy.level, monsterId: enemy.monsterId })),
       won: fight.won,
       hpBefore,
@@ -623,17 +638,17 @@ export function simulateHunt(
     fights.push(summary);
 
     // The fight the report opens with: the one that ended the hunt, otherwise
-    // the champion, an elite fight, then a demanding one, otherwise the
-    // toughest group.
+    // the wanted's, the champion, an elite fight, then a demanding one,
+    // otherwise the toughest group.
     const score =
       fight.won !== true
         ? 4e9
-        : (encounter.champion ? 3e9 : encounter.elite ? 2e9 : encounter.tough ? 1e9 : 0) + enemies.reduce((sum, e) => sum + e.maxHp, 0);
+        : (meeting ? 3.5e9 : encounter.champion ? 3e9 : encounter.elite ? 2e9 : encounter.tough ? 1e9 : 0) + enemies.reduce((sum, e) => sum + e.maxHp, 0);
     if (!key || score > key.score) key = { score, index: summary.index };
 
     const enemyList = enemies.map((enemy) => `${enemy.name} (poz. ${enemy.level})`).join(', ');
     const start = encounter.champion ? 'championStart' : encounter.elite ? 'eliteStart' : encounter.tough ? 'toughStart' : 'fightStart';
-    const lines = [say(texts, start, step, { enemies: enemyList })];
+    const lines = [meeting ? told(say(rules.texts, 'meet', step, { enemies: enemyList })) : say(texts, start, step, { enemies: enemyList })];
     for (const mate of fighting.filter((one) => one.hp <= 0)) {
       mate.out = true;
       lines.push(say(texts, 'companionDown', step, { name: mate.unit.name }));
@@ -643,7 +658,8 @@ export function simulateHunt(
       let fightXp = 0;
       const goldBefore = fightGold;
       for (const enemy of enemies) {
-        const monster = content.monstersById[enemy.monsterId];
+        // The wanted pays as an elite.
+        const monster = meeting ? { ...content.monstersById[enemy.monsterId], elite: true } : content.monstersById[enemy.monsterId];
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
@@ -670,6 +686,11 @@ export function simulateHunt(
         const rarityId = championItemRarity(enemies[0].level, lootRng, content);
         chests.push([randomItem(enemies[0].level, lootRng, content, { ...loot, rarityId }), 'championChest']);
       }
+      // A beaten outlaw leaves a rarer item, and a variant its trophy.
+      const spoils = meeting && sought.kind === 'outlaw' ? randomItem(enemies[0].level, lootRng, content, { ...loot, rarityId: wantedLootRarity(lootRng, content) }) : null;
+      if (spoils) chests.push([spoils, null]);
+      const trophy = meeting && sought.trophy ? { [sought.trophy]: 1 } : null;
+      if (meeting) sighting.beaten = true;
       for (const [item] of chests) summary.chests.push(take(item));
       summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1));
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
@@ -687,14 +708,20 @@ export function simulateHunt(
       if (Object.keys(summary.materials).length > 0) {
         lines.push(say(texts, 'materials', step, { materials: materialsText(summary.materials, content) }));
       }
-      for (const [item, text] of chests) lines.push(say(texts, text, step, { item: itemName(item, content) }));
+      for (const [item, text] of chests) lines.push(text ? say(texts, text, step, { item: itemName(item, content) }) : say(rules.texts, 'loot', step, { item: itemName(item, content) }));
+      if (trophy) {
+        summary.materials = addCounts(summary.materials, trophy);
+        materials = addCounts(materials, trophy);
+        lines.push(say(rules.texts, 'trophy', step, { material: materialsText(trophy, content) }));
+      }
+      if (meeting) lines.push(told(say(rules.texts, 'won', step)));
       if (summary.recovered > 0) lines.push(say(texts, 'recover', step, { hp: summary.recovered }));
       entries.push({ t: event.t, type: 'fight', fight: summary.index, text: lines.join(' ') });
       continue;
     }
 
     if (fight.won === false) {
-      result = (encounter.elite || encounter.champion) && area.safe ? 'escaped' : 'fainted';
+      result = (encounter.elite || encounter.champion || meeting) && area.safe ? 'escaped' : 'fainted';
       for (const fighter of fighters) fighter.hp = Math.max(1, Math.round(fighter.unit.maxHp * tuning.hpAfterFaint));
       lines.push(say(texts, result === 'fainted' ? 'defeat' : 'escape', step, { target: me.unit.name }));
       endedAt = event.t;
@@ -740,6 +767,8 @@ export function simulateHunt(
     buffFights: me.buffFights,
     // The fights the Ołtarz's blessing worked in.
     blessingFights: blessing ? Math.min(fights.length, blessing.fights) : 0,
+    // The wanted poster's target: met on the way, and beaten.
+    ...(sought && { wanted: { id: sought.id, ...sighting } }),
     // The companions at the end: their HP and whether they fell on the way;
     // the party's players too.
     ...(companions.length > 0 && {
@@ -929,6 +958,8 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       tough: fight.tough,
       // The fight of an event at the exploration's end (events.js).
       ...(fight.event && { event: true }),
+      // The fight with a wanted poster's target (wanted.js).
+      ...(fight.wanted && { wanted: true }),
       won: fight.won,
       hpBefore: fight.hpBefore,
       hpAfter: fight.hpAfter,

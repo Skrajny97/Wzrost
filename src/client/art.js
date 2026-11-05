@@ -34,6 +34,8 @@ export const SPRITES = {
       // The Upiór of the haunted shrine and the leshy of the duel, events'
       // foes from 31.10.2026.
       'upior', 'leshy',
+      // The outlaws of the Osada's wanted posters (619 B, 622).
+      'bandit-chief', 'poacher', 'horse-thief', 'smuggler',
       // Czarne Bagno (101–125) from 3.11.2026.
       'pond-turtle', 'mink', 'dragonfly', 'pike', 'water-spider', 'black-tern', 'wooden-idol', 'veles-serpent', 'pagan-priest', 'bog-demon', 'tick', 'night-heron', 'bies', 'black-goat', 'klobuk', 'mamuna', 'rokita',
       // Sosnowe Wydmy (126–150) from 3.11.2026.
@@ -309,7 +311,7 @@ export const SPRITES = {
   places: {
     width: 192,
     height: 96,
-    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-mine', 'system-lapidary', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall'],
+    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-mine', 'system-lapidary', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall', 'trial-hall', 'wanted-board'],
   },
   // The events at the end of an exploration (data/events.json): the people
   // met, 96×128, and the scenes behind them, 192×96, filled in as they are
@@ -343,7 +345,7 @@ export const SPRITES = {
     width: 192,
     height: 144,
     fit: true,
-    ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist', 'forge', 'tannery', 'stable', 'casino', 'torch', 'torch-off'],
+    ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist', 'forge', 'tannery', 'stable', 'casino', 'trial-hall', 'torch', 'torch-off'],
   },
   // The Salon Gier's games on the screen (data/settlement.json, casino.show;
   // PixelLab, 550.1 C, 550.2 B): the Koło Fortuny and the Loteria's drum,

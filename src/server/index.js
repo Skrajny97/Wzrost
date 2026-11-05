@@ -86,7 +86,9 @@ import {
 } from './testing.js';
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
+import { enterTrialHall } from './trial-hall.js';
 import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, upgradeCompanionItem } from './settlement.js';
+import { claimWanted, dropWanted, takeWanted } from './wanted.js';
 import { buyFromTanner, sellToTanner } from './tannery.js';
 import { skipWithTimePoints } from './time.js';
 import { buyMount } from './stable.js';
@@ -210,6 +212,9 @@ const routes = [
   ['POST', '/api/settlement/reforge/choose', chooseReforged],
   ['POST', '/api/settlement/hermit', hermitService],
   ['POST', '/api/settlement/tavern', buyMug],
+  ['POST', '/api/settlement/wanted', takeWanted],
+  ['POST', '/api/settlement/wanted/drop', dropWanted],
+  ['POST', '/api/settlement/wanted/claim', claimWanted],
   ['POST', '/api/settlement/hire', hireCompanion],
   ['POST', '/api/settlement/stable', buyMount],
   ['GET', '/api/market', getMarket],
@@ -234,6 +239,7 @@ const routes = [
   ['POST', '/api/settlement/forge/raise', raiseAtForge],
   // The Salon Gier: the Loteria and the Koło Fortuny (casino.js).
   ['GET', '/api/settlement/casino', getCasino],
+  ['POST', '/api/settlement/trial-hall', enterTrialHall],
   ['POST', '/api/settlement/casino/ticket', buyTicket],
   ['POST', '/api/settlement/casino/spin', spinCasinoWheel],
   ['GET', '/api/test/settlement', settlementTests],

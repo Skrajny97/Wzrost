@@ -122,7 +122,10 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       // An entry to a Wieża (towers.js): its tower and floor, no length.
       report.tower
         ? heading(report.tower.name, `Piętro ${report.tower.floor} · ${report.areaName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)
-        : heading(
+        : // A trial of the Sala prób (trial-hall.js): its place, no length.
+          report.hall
+          ? heading('Sala prób', `${report.hall.areaName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)
+          : heading(
             report.flash ? 'Błyskawiczne polowanie' : report.quick ? 'Szybkie Polowanie' : 'Raport z wyprawy',
             `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
           ),
@@ -219,7 +222,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         fight.tough && h('span', { class: 'chip chip--tough', text: 'wymagająca' }),
         fight.event && h('span', { class: 'chip chip--event', text: 'zdarzenie' }),
       ),
-      h('p', { class: 'fight-meta', text: `${report.tower ? `Piętro ${report.tower.floor}` : formatOffset(fight.t)} · ${enemies}` }),
+      h('p', { class: 'fight-meta', text: `${report.tower ? `Piętro ${report.tower.floor}` : report.hall ? `${fight.index + 1}. walka` : formatOffset(fight.t)} · ${enemies}` }),
       h('p', { class: `fight-outcome fight-outcome--${String(fight.won)}`, text: outcome }),
     );
 
@@ -439,7 +442,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const list = h(
       'ol',
       { class: 'account', hidden: true, 'data-guide': 'report-account' },
-      report.entries.map((entry) => h('li', {}, !report.tower && h('span', { class: 'account-time', text: formatOffset(entry.t) }), h('span', { text: entry.text }))),
+      report.entries.map((entry) => h('li', {}, !report.tower && !report.hall && h('span', { class: 'account-time', text: formatOffset(entry.t) }), h('span', { text: entry.text }))),
     );
     const show = (open) => {
       list.hidden = !open;
@@ -488,6 +491,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     fill(
       actionBox,
       report.tower && h('a', { class: 'button button--system', href: '#/wieze', text: 'Wróć do Wież' }),
+      report.hall && h('a', { class: 'button button--system', href: '#/osada/trial-hall', text: 'Wróć do Sali prób' }),
       again,
       scrap,
       waiting && h('a', { class: 'button button--system', href: '#/walka', text: 'Kolejny raport czeka na odbiór' }),

@@ -87,7 +87,8 @@ const buildKey = (character) =>
 // "bardzo krótka", "krótka"… for a length, from the content.
 const lengthName = (minutes) => (state.content.lengths.find((length) => length.upTo === undefined || minutes <= length.upTo) ?? {}).name ?? '';
 
-const areaOpen = (area, character) => character.classLevel >= area.unlockClassLevel;
+// Open by the class level, or early in the Sala prób (trial-hall.js; 620 B).
+const areaOpen = (area, character) => character.classLevel >= area.unlockClassLevel || character.earlyArea === area.id;
 
 const chip = (text, className = '') => h('span', { class: `chip ${className}`.trim(), text });
 

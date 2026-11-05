@@ -8,7 +8,7 @@ import {
   areaDangers,
   areaFor,
   areasOpened,
-  areaUnlocked,
+  areaOpenFor,
   areaUnlockLevel,
   autoEquip,
   bagCapacity,
@@ -69,6 +69,7 @@ import {
   buffsOf,
   characterView,
   currentHp,
+  earlyAreaOf,
   engineCharacter,
   equippedItems,
   flashHuntsLeft,
@@ -95,6 +96,7 @@ import { leaveTrip, tripOf } from './trips.js';
 import { finishCrafting } from './workshop.js';
 import { finishJewels } from './jewelcraft.js';
 import { finishMining } from './mining.js';
+import { wantedAfterHunt, wantedGoing } from './wanted.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
 const resourcePath = (id) => `$."${id}"`;
@@ -116,7 +118,7 @@ export function restedNow(player, now) {
 // those who do not stay in the Kwatery, and none while the character is in
 // a Drużyna (companionGoes in the engine), a wounded one once the character
 // has rested to full HP; with the character, at most parties.size.
-function companionsGoing(player, now) {
+export function companionsGoing(player, now) {
   const rested = restedNow(player, now);
   const hired = JSON.parse(player.row.settlement ?? '{}').companions ?? [];
   return hired.filter((companion) => companionGoes(companion, { rested, inParty: player.inParty })).slice(0, content.balance.parties.size - 1);
@@ -199,12 +201,14 @@ export async function huntOptions(context) {
   const only = params.get('area') ?? params.get('region');
   const area = only !== null && areaFor(only, character.level, content);
   if (only !== null && !area) throw new ApiError(400, 'invalid_area', 'Nie ma takiego miejsca.');
-  if (area && !areaUnlocked(area, character.classLevel, content)) throw areaLocked(area);
+  // A place opened early in the Sala prób is open too (trial-hall.js).
+  const early = earlyAreaOf(player.row);
+  if (area && !areaOpenFor(area, character.classLevel, early, content)) throw areaLocked(area);
   const areas = area
     ? [area]
     : content.regions
         .map((region) => areaFor(region.id, character.level, content))
-        .filter((candidate) => areaUnlocked(candidate, character.classLevel, content));
+        .filter((candidate) => areaOpenFor(candidate, character.classLevel, early, content));
   // threatAvoiding and threatSeeking: the same exploration with the elite and
   // the champion avoided or sought, from the same sample fights; the first is
   // never above the threat without them, the second never below it. In a
@@ -321,7 +325,7 @@ export async function beginHunt(
   const id = areaId ?? regionId;
   const area = typeof id === 'string' ? areaFor(id, player.row.level, content) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
-  if (!areaUnlocked(area, player.row.class_level, content)) throw areaLocked(area);
+  if (!areaOpenFor(area, player.row.class_level, earlyAreaOf(player.row), content)) throw areaLocked(area);
   if (!durationsUpTo(content.balance.hunt.maxMinutes, content).includes(minutes)) {
     throw new ApiError(400, 'invalid_duration', 'Wybierz czas wyprawy.');
   }
@@ -385,6 +389,10 @@ export async function beginHunt(
   // who stay too. Not on a Szybkie Polowanie, nor on a Drużyna's trip.
   const healed = kept && restedNow(player, now) && (kept.companions ?? []).some((companion) => companion.wounded);
   const party = kept && !quick && !crew ? companionsGoing(player, now) : [];
+  // The sołtys's wanted poster in hand, for this place (wanted.js): its
+  // target may come on the way. Not on a Szybkie Polowanie, nor on a
+  // Drużyna's trip.
+  const sought = kept && !quick && !crew ? wantedGoing(player.row, kept, area) : null;
   const settlement =
     rumor > 1 || healed
       ? JSON.stringify({
@@ -421,6 +429,7 @@ export async function beginHunt(
     ...(unknown.length > 0 && { unknown }),
     ...(Object.keys(trophies).length > 0 && { trophies }),
     ...(scouted && { scouted }),
+    ...(sought && { wanted: sought }),
     // The Ołtarz's blessing of the day, for this exploration's first fights;
     // not on a Drużyna's trip, whose fights are one for all (fortress.js).
     ...(!crew && blessingOf(player.row) && { blessing: blessingOf(player.row) }),
@@ -570,9 +579,11 @@ function settlementAfterHunt(row, hunt, kept, minutes) {
   const reward = hunt.event?.reward;
   const went = hunt.companions?.length > 0;
   const heard = reward?.rumor && !kept ? reward.rumor : null;
-  if (!went && !reward?.reputation && !heard) return null;
   const stored = JSON.parse(row.settlement ?? '{}');
-  const next = { ...stored };
+  // The wanted poster in hand whose target fell (wanted.js).
+  const wanted = wantedAfterHunt(stored, hunt);
+  if (!went && !reward?.reputation && !heard && !wanted) return null;
+  const next = { ...stored, ...(wanted && { wanted }) };
   if (went) {
     next.companions = (stored.companions ?? []).map((companion) => {
       const one = hunt.companions.find((member) => member.id === companion.id);
@@ -647,6 +658,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       trophies: options.trophies ?? {},
       blessing: trip ? null : (options.blessing ?? null),
       scouted: trip ? null : (options.scouted ?? null),
+      wanted: trip ? null : (options.wanted ?? null),
     },
     content,
   );

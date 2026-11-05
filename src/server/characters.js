@@ -504,13 +504,16 @@ export function settlementBoard(row, stored, now) {
 }
 
 // Whether an order on the board, the week's included, can be delivered
-// now, something waits at the Targowisko or a brotherhood's reward for a
-// new standing waits (593 A and B): the dot on the Osada tab. The bag stays
+// now, something waits at the Targowisko, a brotherhood's reward for a
+// new standing (593 A and B) or a wanted poster's bounty waits: the dot on
+// the Osada tab. The bag stays
 // at hand while the character is away, so every order counts then too.
 function settlementWaiting(row, items, now, parcels = 0) {
   if (!settlementOpen(row)) return false;
   if (parcels > 0) return true;
   const stored = JSON.parse(row.settlement ?? '{}');
+  // A wanted poster's bounty waits at the sołtys's (wanted.js).
+  if (stored.wanted?.taken?.beaten) return true;
   const rewarded = stored.rewarded ?? {};
   if (content.settlement.brotherhoods.some((one) => standingRewardsDue(one.id, stored.reputation?.[one.id] ?? 0, rewarded[one.id] ?? 0, content))) return true;
   const board = settlementBoard(row, { board: stored.board ?? null, reputation: stored.reputation ?? {} }, now);
@@ -634,6 +637,16 @@ export function workOf(player, avatar) {
 // code review).
 const statPoints = (stored) =>
   Object.fromEntries(Object.entries(stored ?? {}).filter(([stat, value]) => Object.hasOwn(content.statsById, stat) && Number.isInteger(value)));
+
+// The place a character opened early in the Sala prób (trial-hall.js;
+// the author's 620 B), or null.
+export function earlyAreaOf(row) {
+  try {
+    return JSON.parse(row.trial_hall ?? '{}').early ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export function engineCharacter(row) {
   return {
@@ -1223,6 +1236,8 @@ export function characterView(player, now) {
     classLevel: row.class_level,
     classXp: row.class_xp,
     classXpToNext: classXpToNext(row.class_level, content),
+    // The place opened early in the Sala prób (trial-hall.js), or null.
+    earlyArea: earlyAreaOf(row),
     gold,
     systemPoints: row.system_points,
     // The Sklep Systemu (cosmetics.js): the cosmetics bought for Punkty

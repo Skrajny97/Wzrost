@@ -22,8 +22,10 @@ import { closeSheet, confirmAction, howItWorks, openSheet, pageHeading, systemPa
 import { companionCard } from '../companions.js';
 import { askGuildButton } from '../guild-requests.js';
 import { mountCasino } from '../casino.js';
+import { trialHallCards } from '../trial-hall.js';
 import { stableCard } from '../stable.js';
 import { tanneryCard } from '../tannery.js';
+import { wantedCard } from '../wanted.js';
 import { itemSummary, piecesText } from './character.js';
 import { mountMarket, numberField, stackArt, stackButton } from './market.js';
 
@@ -1169,9 +1171,11 @@ export function mountSettlement(container, { params = {} } = {}) {
     return card;
   };
 
-  // Whether the Tablica has an order to deliver now, for its dot on the board.
+  // Whether the Tablica has an order to deliver now, or a wanted poster's
+  // bounty waits (wanted.js), for its dot on the board.
   const deliverable = () =>
-    [...data.board.slots.map((slot) => slot.order), data.board.weekly].some((order) => order && order.have >= order.count);
+    [...data.board.slots.map((slot) => slot.order), data.board.weekly].some((order) => order && order.have >= order.count) ||
+    [data.wanted?.earlier, ...(data.wanted?.posters ?? [])].some((poster) => poster?.state === 'beaten');
 
   // A torch on the board, at its own size, standing on its spot: its flame
   // flickers and glows as the camp's fire does, more at dusk and at night
@@ -1294,12 +1298,15 @@ export function mountSettlement(container, { params = {} } = {}) {
       place.soon && systemPanel(`${place.name} otworzy się w jednej z kolejnych aktualizacji gry.`),
       resident && residentCard(resident, place.backdrop),
       !place.soon && resident && services(resident),
-      place.id === 'board' && [boardCard(), brotherhoodsCard()],
+      // Poszukiwani (619 B): the sołtys's wanted posters, under his orders.
+      place.id === 'board' && [boardCard(), wantedCard(data.wanted, apply), brotherhoodsCard()],
       place.id === 'market' && !place.soon && marketPanel(),
       // The Stajnia's mounts (327 A), under Mirosław's card.
       place.id === 'stable' && !place.soon && data.stable && stableCard(data.stable, apply),
       // The Salon Gier's Loteria and Koło Fortuny (523–526), under Szczęsny's.
       place.id === 'casino' && !place.soon && casinoPanel(),
+      // The Sala prób's trial of the day (620 B), its report at once.
+      place.id === 'trial-hall' && !place.soon && trialHallCards(data.trialHall, place, (hash) => (location.hash = hash)),
     );
   }
 

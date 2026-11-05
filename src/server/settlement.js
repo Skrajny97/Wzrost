@@ -82,6 +82,7 @@ import {
   xpToNext,
   saleGold,
 } from '../engine/index.js';
+import { trialHallView } from './trial-hall.js';
 import { content } from './content.js';
 import {
   bagItems,
@@ -102,6 +103,7 @@ import {
 import { toHex } from './encoding.js';
 import { evolutionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
+import { wantedView } from './wanted.js';
 import { forgeView } from './forge.js';
 import { trialProgress } from './guild-trials.js';
 import { upgradePayment, upgradePlan } from './inventory.js';
@@ -159,6 +161,9 @@ export function settlementOf(row) {
     ...(stored.casino && { casino: stored.casino }),
     // The last standing rewarded in each brotherhood (593 A and B).
     ...(stored.rewarded && { rewarded: stored.rewarded }),
+    // The sołtys's wanted posters: the day's done and the one in hand
+    // (wanted.js).
+    ...(stored.wanted && { wanted: stored.wanted }),
     ...(stored.test && { test: true }),
   };
 }
@@ -258,6 +263,8 @@ export function settlementView(player, stored, board, now) {
     description,
     places,
     torches,
+    // The Sala prób's trial of the day (trial-hall.js; 620 B).
+    trialHall: trialHallView(player.row, now),
     residents: residents.map((resident) => {
       const standing = standingOf(stored.relations[resident.id] ?? 0, content);
       return { ...resident, service: serviceOf(resident.id), standing, greeting: resident.greetings[Math.min(standing.index, resident.greetings.length - 1)] };
@@ -286,6 +293,8 @@ export function settlementView(player, stored, board, now) {
       pending: pendingView(pendingOf(stored, player.items)),
     },
     tavern: tavernView(player.row, stored, now),
+    // Poszukiwani: the sołtys's wanted posters of the day (wanted.js).
+    wanted: wantedView(player.row, stored, now),
     // The Stajnia's mounts and the character's (stable.js).
     stable: stableView(stored),
     // The parcels waiting at the Targowisko (market.js), for its dot.

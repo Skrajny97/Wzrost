@@ -12,7 +12,8 @@
     { "id": "tannery", "name": "Garbarnia", "x": 13, "y": 53, "resident": "tanner", "flip": true },
     { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist", "flip": true },
     { "id": "forge", "name": "Kuźnia", "x": 56, "y": 31, "resident": "smith" },
-    { "id": "casino", "name": "Salon Gier", "x": 83, "y": 33.5, "resident": "gamehost", "backdrop": "casino-hall" }
+    { "id": "casino", "name": "Salon Gier", "x": 83, "y": 33.5, "resident": "gamehost", "backdrop": "casino-hall" },
+    { "id": "trial-hall", "name": "Sala prób", "x": 14, "y": 39, "backdrop": "trial-hall" }
   ],
   "torches": [
     { "x": 32, "y": 12.5 },
@@ -312,6 +313,39 @@
       "loss": ["Koło jest dziś kapryśne. Może następnym razem.", "Blisko było. Szczęście lubi upartych.", "Tym razem stawka zostaje u mnie."]
     }
   },
+  "trialHall": {
+    "$comment": "Sala prób (autor: „jakieś miejsce w Osadzie \"Sala prób\", którego przejście odblokowuje dostęp do wyższej instancji niż dopuszczalna” i „620 B, ale taniej wejście albo i za darmo raz dziennie”; src/engine/trial-hall.js, src/server/trial-hall.js). Próba dotyczy następnego miejsca, którego poziom klasy jeszcze nie otwiera: dwa spotkania tego miejsca i jego elita, jedna walka po drugiej, stwory na pierwszym poziomie miejsca (elita o tyle wyżej co na wyprawie) i tak silne jak na wyprawie tam. HP nie wraca między walkami, mikstury lecznicze z plecaka działają jak na wyprawie, a gotowi towarzysze walczą obok. Wejście raz na dobę zadań narratora (do północy czasu polskiego), za darmo. Przejście trzech walk otwiera to miejsce dla postaci na stałe, o jedno miejsce wcześniej niż poziom klasy. Wygrana walka płaci jak walka wyprawy rewardMinutes minut na jej poziomie, razy rewardFactor. Próba nie zmienia HP postaci poza Salą. texts: słowa ekranu i raportu; {…} wypełnia gra.",
+    "rewardMinutes": 60,
+    "rewardFactor": 2,
+    "texts": {
+      "intro": "Kto przejdzie próbę, wejdzie do następnego miejsca wcześniej, niż pozwala mu poziom klasy.",
+      "rules": "Trzy walki ze stworami tego miejsca, jedna po drugiej: dwa zwykłe spotkania i elita miejsca. HP nie wraca między walkami, mikstury lecznicze z plecaka działają, a towarzysze walczą obok. Raz dziennie, za darmo.",
+      "target": "{area}, poz. {levels}",
+      "usual": "Zwykle to miejsce otwiera się na {level}. poziomie klasy.",
+      "after": "Po przejściu {area} otworzy się dla Ciebie na stałe.",
+      "passed": "{area} jest już dla Ciebie otwarte. Następna próba będzie, gdy poziom klasy otworzy to miejsce.",
+      "allOpen": "Wszystkie miejsca są już dla Ciebie otwarte. Sala prób nie ma teraz próby.",
+      "used": "Dzisiejsza próba za Tobą. Następna od północy.",
+      "start": "Podejmij próbę",
+      "fight": "{number}. walka",
+      "eliteFight": "{number}. walka: {name}",
+      "fightStart": [
+        "{number}. walka: {enemies}."
+      ],
+      "eliteStart": [
+        "{number}. walka, elita miejsca: {enemies}."
+      ],
+      "defeat": [
+        "Walka przegrana. {target} opuszcza Salę prób."
+      ],
+      "won": [
+        "Próba zdana. {area} otwiera się dla Ciebie na stałe."
+      ],
+      "lost": [
+        "Próba nie powiodła się. Następna jutro."
+      ]
+    }
+  },
   "tavern": {
     "resident": "innkeeper",
     "relationGain": 10,
@@ -605,6 +639,85 @@
       "partyOne": "Najpierw zostaw [towarzyszkę|towarzysza] w kwaterze: {names}. Drużyna poluje bez towarzyszy z Kwater.",
       "partyMany": "Najpierw zostaw [towarzyszki|towarzyszy] w kwaterze: {names}. Drużyna poluje bez towarzyszy z Kwater.",
       "toQuarters": "Przejdź do Kwater"
+    }
+  },
+  "wanted": {
+    "$comment": "Poszukiwani (619 B; src/engine/wanted.js, src/server/wanted.js): sołtys co dzień wywiesza listy gończe z najwyższych `places` miejsc otwartych dla postaci (także tego, które otworzyła Sala prób): `creatures` za nazwanymi odmianami stworów (po jednej na miejsce, `variants`) i jeden za wyjętym spod prawa (`outlaws`, przeciwnicy z events.json). Jeden list naraz. Na wyprawie w miejscu z listu każda walka z szansą `chance` jest walką z poszukiwanym, najwyżej raz na wyprawę (nie na Szybkim i Błyskawicznym polowaniu ani na wyprawie Drużyny). Poszukiwany ma poziom elity miejsca, a jego HP i obrażenia to HP i obrażenia elity razy `strength` [obrażenia, HP]; za walkę płaci jak elita. Pokonana odmiana zostawia trofeum: sztukę swojego materiału w pierwszej rzadkości, której postaci brakuje do trofeum Encyklopedii, ale nigdy w najrzadszej z nich (autor: „Uwaga zeby nie przesadzić z balansem jak te trofeum wlecą znowu się zrobi za łatwo”; gdy brakuje tylko najrzadszej albo trofeum już jest, w pierwszej), a wyjęty spod prawa przedmiot z rzadkością z `loot`. Nagroda u sołtysa: złoto `goldPerLevel` × pierwszy poziom miejsca w pełnych setkach (co najmniej sto), `timePoints` Punktów Czasu, `reputation` przychylności bractwa `brotherhood` i `relationGain` relacji z sołtysem.",
+    "resident": "headman",
+    "backdrop": "wanted-board",
+    "places": 4,
+    "creatures": 3,
+    "chance": 0.18,
+    "strength": [1.1, 1.2],
+    "goldPerLevel": 60,
+    "goldStep": 100,
+    "timePoints": 10,
+    "brotherhood": "hunters",
+    "reputation": 20,
+    "relationGain": 2,
+    "loot": { "unique": 70, "epic": 30 },
+    "variants": [
+      { "area": "windfalls-edge", "monster": "wolf", "name": "Wilk Samotnik" },
+      { "area": "fox-ravines", "monster": "fox", "name": "Stary Lis" },
+      { "area": "raven-hollows", "monster": "crow", "name": "Kruk Wróżbita" },
+      { "area": "viper-heaps", "monster": "viper", "name": "Czarna Żmija", "female": true },
+      { "area": "boar-thicket", "monster": "boar", "name": "Stary Odyniec" },
+      { "area": "mossy-boulders", "monster": "stoneling", "name": "Omszały Kamiennik" },
+      { "area": "spider-gully", "monster": "tarantula", "name": "Krwawa Tarantula", "female": true },
+      { "area": "lynx-ridge", "monster": "lynx", "name": "Srebrny Ryś" },
+      { "area": "wolf-circles", "monster": "alpha-wolf", "name": "Stary Basior" },
+      { "area": "glade-heart", "monster": "aurochs", "name": "Czarny Tur" },
+      { "area": "reed-beds", "monster": "reedling", "name": "Szepczący Trzcinownik" },
+      { "area": "beaver-dams", "monster": "beaver", "name": "Bóbr Olbrzym" },
+      { "area": "drowned-forest", "monster": "catfish", "name": "Sum Ludojad" },
+      { "area": "willow-isles", "monster": "wraith", "name": "Biała Zjawa", "female": true },
+      { "area": "old-riverbed", "monster": "drowner", "name": "Czarny Utopiec" },
+      { "area": "crane-meadows", "monster": "elk", "name": "Łoś Olbrzym" },
+      { "area": "leech-pools", "monster": "crayfish", "name": "Rak Pancernik" },
+      { "area": "sundew-field", "monster": "sundew", "name": "Krwawa Rosiczka", "female": true },
+      { "area": "smoldering-peat", "monster": "zmij", "name": "Żmij Ognisty" },
+      { "area": "old-diggings", "monster": "giant-rat", "name": "Szczurzy Król" },
+      { "area": "black-alder-carr", "monster": "pond-turtle", "name": "Pradawny Żółw" },
+      { "area": "black-tarn", "monster": "pike", "name": "Szczupak Jednooki" },
+      { "area": "sunken-shrine", "monster": "pagan-priest", "name": "Żerca Ofiarnik" },
+      { "area": "quaking-bog", "monster": "bog-demon", "name": "Bagiennik Topiciel" },
+      { "area": "rokita-deep", "monster": "black-goat", "name": "Czarny Kozioł Rokity" },
+      { "area": "heather-dunes", "monster": "heather-mare", "name": "Nocna Mara", "female": true },
+      { "area": "resin-pinewood", "monster": "resin-golem", "name": "Bursztynowy Żywicznik" },
+      { "area": "drifting-sands", "monster": "barrow-wight", "name": "Kurhannik Wódz" },
+      { "area": "tar-pits", "monster": "tar-burner", "name": "Smolarz Podpalacz" },
+      { "area": "burnt-forest", "monster": "ash-wraith", "name": "Popielec Żałobnik" }
+    ],
+    "outlaws": ["bandit-chief", "poacher", "horse-thief", "smuggler"],
+    "texts": {
+      "title": "Poszukiwani",
+      "intro": "Sołtys Bogumił wywiesza co dzień trzy listy gończe za stworami z miejsc, które masz otwarte, i jeden za wyjętym spod prawa. Weź list, a na wyprawie w tym miejscu częściej spotkasz poszukiwanego.",
+      "footer": "Za pokonanie poszukiwanego nagroda u sołtysa: złoto, Punkty Czasu i przychylność Bractwa Łowców. Stwór zostawia trofeum: swój materiał w rzadkości, której brakuje Ci w Encyklopedii do premii +5% obrażeń przeciw niemu. Wyjęty spod prawa zostawia rzadki łup. Jeden list naraz, nowe listy co dzień.",
+      "wanted": "[Poszukiwana|Poszukiwany]",
+      "outlaw": "Wyjęty spod prawa",
+      "place": "{area}, {levels}",
+      "trophyReward": "{gold} złota, trofeum",
+      "lootReward": "{gold} złota, rzadki łup",
+      "take": "Weź list",
+      "drop": "Porzuć list",
+      "claim": "Odbierz nagrodę",
+      "done": "Wypełniony",
+      "hunting": "Twój list. Szukaj [jej|go] na wyprawach: {area}.",
+      "beaten": "[Pokonana|Pokonany]! Nagroda czeka u sołtysa.",
+      "earlier": "List z poprzedniego dnia",
+      "one": "Masz już list gończy. Najpierw go wypełnij albo porzuć.",
+      "gone": "Tego listu nie ma już na tablicy.",
+      "notBeaten": "Nagroda czeka na pokonanie poszukiwanego.",
+      "claimFirst": "Najpierw odbierz nagrodę u sołtysa.",
+      "claimed": "Sołtys płaci {gold} złota i {time} Punktów Czasu. Bractwo Łowców: +{reputation} przychylności.",
+      "meet": [
+        "Ślady zgadzają się z listem gończym sołtysa. Przed Tobą {enemies}.",
+        "To [ta|ten] z listu gończego: {enemies}.",
+        "Ktoś tu dawno nie wracał żywy. Z listu gończego: {enemies}."
+      ],
+      "won": ["[Poszukiwana pokonana|Poszukiwany pokonany]. Nagroda czeka u sołtysa."],
+      "trophy": ["Trofeum: {material}."],
+      "loot": ["W jukach wyjętego spod prawa: {item}."]
     }
   }
 }

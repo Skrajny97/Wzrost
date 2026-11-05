@@ -13286,3 +13286,224 @@ a.profession-square:active {
   font-family: var(--font-system);
   font-size: 14px;
 }
+
+/* The Sala prób in the Osada (trial-hall.js; 620 B): the hall's banner over
+   its room, the place it tests for and its three fights in a row. */
+.trial-hall-banner {
+  min-height: 120px;
+  display: flex;
+  align-items: flex-end;
+}
+.trial-hall-banner p {
+  margin: 0;
+}
+.trial-hall-target .card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.trial-hall-fights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+  padding: 0;
+  list-style: none;
+}
+.trial-hall-fight {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg-deep);
+  font-size: 13px;
+  text-align: center;
+}
+.trial-hall-fight--elite {
+  border-color: var(--accent);
+}
+.trial-hall-fight-art .sprite {
+  width: 64px;
+  height: 64px;
+}
+
+/* Poszukiwani on the Tablica zleceń (619 B; wanted.js): the sołtys's board
+   in a banner, then the posters on parchment, two by two, as on the
+   mock-up 619. */
+.wanted-card {
+  gap: 12px;
+}
+
+.wanted-banner {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  min-height: 132px;
+  margin: -14px -14px 0;
+  padding: 12px 14px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--line);
+}
+
+.wanted-banner--art::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--place-art) center / cover no-repeat;
+  image-rendering: pixelated;
+}
+
+.wanted-banner--art::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(to top, rgba(13, 17, 11, 0.85), rgba(13, 17, 11, 0) 65%);
+}
+
+.wanted-banner-title {
+  margin: 0;
+  font-family: var(--font-world);
+  font-size: 28px;
+  color: #f3e6c4;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
+}
+
+.wanted-intro {
+  margin: 0;
+}
+
+.wanted-posters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 4px 2px;
+}
+
+.wanted-poster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px 10px;
+  border: 1px solid #b89c62;
+  background: #ead9ab;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.35);
+  color: #2c2216;
+  text-align: center;
+  transform: rotate(-0.6deg);
+}
+
+.wanted-poster:nth-child(even) {
+  transform: rotate(0.5deg);
+}
+
+.wanted-poster-earlier,
+.wanted-poster-label,
+.wanted-poster-place,
+.wanted-poster-reward,
+.wanted-poster-note {
+  margin: 0;
+}
+
+.wanted-poster-earlier {
+  font-size: 11px;
+  font-style: italic;
+  color: #5d4c33;
+}
+
+.wanted-poster-label {
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #8c2f1f;
+}
+
+.wanted-poster-art {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  background: #dccb98;
+}
+
+.wanted-poster-art img {
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+}
+
+.wanted-poster-name {
+  margin: 0;
+  font-family: var(--font-world);
+  font-size: 18px;
+  line-height: 1.15;
+  color: #2c2216;
+  overflow-wrap: anywhere;
+}
+
+.wanted-poster-place {
+  font-size: 13px;
+  color: #5d4c33;
+}
+
+.wanted-poster-reward {
+  font-size: 13px;
+  font-weight: 700;
+  color: #7a5418;
+}
+
+.wanted-poster-note {
+  font-size: 12px;
+  color: #4a3b26;
+}
+
+.wanted-poster-note--beaten {
+  font-weight: 700;
+  color: #2d6a1f;
+}
+
+.wanted-poster-stamp {
+  margin: 4px 0 0;
+  padding: 4px 10px;
+  border: 2px solid #8c2f1f;
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8c2f1f;
+  transform: rotate(-4deg);
+}
+
+.wanted-poster .wanted-poster-button {
+  margin-top: auto;
+  min-height: 40px;
+  padding: 8px;
+  border: 1px solid #6e5a36;
+  background: rgba(255, 255, 255, 0.2);
+  color: #2c2216;
+}
+
+.wanted-poster .wanted-poster-button.button--system {
+  border-style: dashed;
+  background: transparent;
+}
+
+.wanted-poster--done {
+  opacity: 0.75;
+}
+
+.wanted-poster--beaten {
+  border-color: #2d6a1f;
+}
+
+.wanted-footer {
+  margin: 0;
+}

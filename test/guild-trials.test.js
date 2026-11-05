@@ -142,10 +142,12 @@ describe('the Próby Gildii', () => {
       // There is always more on the board than the day lets finish.
       assert.ok(trialsOpen(day, content) > trialDayLimit(day, content), `day ${day}`);
     }
-    // Even a guild whose every member finishes all the days let reaches the
-    // last threshold only on Saturday.
+    // The last threshold is every member's whole week: even a guild whose
+    // every member finishes all the days let reaches it only on Sunday (the
+    // author: „jak wszyscy wykonają wszystkie to wtedy maksa się zdobywa”).
     const last = rules.steps.at(-1);
-    assert.ok(trialDayLimit(4, content) < last && trialDayLimit(5, content) >= last);
+    assert.equal(last, rules.cap);
+    assert.ok(trialDayLimit(5, content) < last && trialDayLimit(6, content) >= last);
     assert.deepEqual([0, 3, 6].map(joinShare), [1, 4 / 7, 1 / 7]);
   });
 

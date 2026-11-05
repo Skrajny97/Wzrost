@@ -3034,6 +3034,50 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.56 (5.11.2026)
+
+Sala prób (620 B, budynek 627.2 B), Poszukiwani (619 B) i siódmy próg Prób Gildii: zob. „Sala prób”, „Poszukiwani” i „Progi Prób Gildii do wszystkich prób”.
+
+## Sala prób (5.11.2026, w grze od 0.1.56)
+
+Autor: „jakieś miejsce w Osadzie "Sala prób", którego przejście odblokowuje dostęp do wyższej instancji niż dopuszczalna”, „620 B, ale taniej wejście albo i za darmo raz dziennie”, „625 zostaje” i „627.2 B”.
+
+1. **Co sprawdza.** Następne miejsce, którego poziom klasy jeszcze nie otwiera. Próba to trzy walki jedna po drugiej: dwa zwykłe spotkania tego miejsca i jego elita. Stwory mają pierwszy poziom miejsca (elita o tyle wyżej co na wyprawie) i są tak silne jak na wyprawie tam.
+2. **Walki.** HP nie wraca między walkami. Mikstury lecznicze z plecaka działają jak na wyprawie, a towarzysze gotowi do drogi walczą obok. Próba nie zmienia HP postaci poza Salą, chyba że da nowy poziom, który leczy do pełna.
+3. **Wejście (620 B: „za darmo raz dziennie”).** Raz na dobę zadań narratora, do północy czasu polskiego, za darmo. Nie w trakcie wyprawy ani przed odebraniem jej raportu.
+4. **Nagroda.** Zdana próba otwiera to miejsce dla postaci na stałe, o jedno miejsce wcześniej niż poziom klasy (kolumna `trial_hall`, pole `early`). Każda wygrana walka płaci jak walka godzinnej wyprawy na jej poziomie razy 2: XP, złoto i materiały. Przegrana próba nic nie kosztuje. Gdy poziom klasy dogoni otwarte miejsce, Sala sprawdza następne.
+5. **Raport** przychodzi od razu, jak z Wieży, i zostaje w Dzienniku. Stwory z walk trafiają do Bestiariusza, a zabite liczą się do zadań i Prób Gildii.
+6. **Na planszy Osady** budynek 627.2 B stoi po lewej stronie, między Pracownią Zaklinaczki a Garbarnią. Ekran Sali ma tło 625.
+
+## Poszukiwani (5.11.2026, w grze od 0.1.56)
+
+Autor: „kolejny ciekawy pomysł w stylu "Wanted dead or alive" po polsku”, „619 - wygląda fajnie tylko brakuje ikonki herszta”, „619 B”, „622.1 D, 622.2 B, 622.3 C, 622.4 C”, „626 zostaje” i „Uwaga zeby nie przesadzić z balansem jak te trofeum wlecą znowu się zrobi za łatwo”.
+
+1. **Listy dnia.** Sołtys Bogumił wywiesza co dzień, osobno dla każdej postaci, trzy listy gończe za nazwanymi odmianami stworów i jeden za wyjętym spod prawa. Listy są z czterech najwyższych miejsc otwartych dla klasy: odmiany z trzech różnych miejsc, a wyjęty spod prawa z jednego z tych czterech. Na każde z 30 miejsc przypada jedna odmiana jego własnego stwora, np. Stary Basior w Wilczych Kręgach i Czarny Tur w Sercu Uroczyska. Wyjęci spod prawa to Herszt zbójców, Kłusownik, Koniokrad i Przemytnik z grafikami 622.
+2. **Gdzie.** Karta „Poszukiwani” jest na Tablicy zleceń, pod zleceniami sołtysa, z tłem 626. Listy wiszą po dwa w rzędzie, jak na makiecie 619.
+3. **Jeden list naraz.** Wzięty list można porzucić, dopóki poszukiwany żyje. List zostaje u postaci także po północy, aż zostanie wypełniony albo porzucony.
+4. **Spotkanie.** Na wyprawie w miejscu z listu każda walka z szansą 18% jest walką z poszukiwanym, najwyżej raz na wyprawę. Nie na Szybkim i Błyskawicznym polowaniu, nie na wyprawie Drużyny i nie na pierwszej wyprawie postaci. Wyprawa, która go nie spotka, idzie dokładnie tak samo jak bez listu.
+5. **Siła.** Poszukiwany ma poziom elity miejsca, a jego HP i obrażenia to HP i obrażenia elity tego miejsca razy 1,2 i 1,1. Za walkę płaci jak elita. Przegrana z nim kończy wyprawę jak przegrana z elitą.
+6. **Trofeum, bez przesady z balansem.** Pokonana odmiana zostawia sztukę materiału swojego stwora w pierwszej rzadkości, której postaci brakuje do trofeum Encyklopedii (+5% obrażeń przeciw temu stworowi), ale nigdy w najrzadszej z trzech: list przybliża trofeum, a ostatnią sztukę trzeba znaleźć samemu. Gdy brakuje tylko najrzadszej albo trofeum już jest, list daje sztukę w pierwszej rzadkości. Wyjęty spod prawa zostawia przedmiot unikalny (70%) albo epicki (30%).
+7. **Nagroda u sołtysa.** Po pokonaniu poszukiwanego list czeka na „Odbierz nagrodę”: złoto 60 × pierwszy poziom miejsca w pełnych setkach (co najmniej 100), 10 Punktów Czasu, +20 przychylności Bractwa Łowców i +2 relacji z sołtysem. Na kafelku Osady i przy Tablicy zleceń świeci wtedy żółta kropka.
+8. Dane są w `data/settlement.json` (`wanted`), a wyjęci spod prawa w `data/events.json` (`foes`).
+
+## Progi Prób Gildii do wszystkich prób (5.11.2026, w grze od 0.1.56)
+
+Autor: „Namieszane z tymi próbami, powinieneś wiecej progów zrobić, tak by było policzone pod liczbę użytkowników jak wszyscy wykonają wszystkie to wtedy maksa się zdobywa.”
+
+1. Progów jest siedem: 2, 4, 6, 8, 10, 12 i 14 prób na członka. Ostatni równa się tygodniowemu limitowi 14 prób na członka, więc pasek kończy się dopiero wtedy, gdy wszyscy członkowie wykonają wszystkie próby, jakie mogą zaliczyć, czyli najwcześniej w niedzielę.
+2. Progi dalej rosną z liczbą aktywnych członków, a dołączający w tygodniu liczą się w części, jak dotąd.
+3. Siódmy próg daje największą skrzynię: złoto 60 + 24 × poziom postaci, 60 Punktów Czasu, 10 sztuk materiału i 10 Punktów Systemu. Punkty Systemu dają cztery ostatnie progi.
+4. Siódmy próg dochodzi już na tablicy tego tygodnia. Sześć wcześniejszych zostaje bez zmian, więc nic osiągniętego nie znika.
+
+## Uwagi autora 5.11.2026 rano, po 0.1.55
+
+Autor: „627.2 B”, „Uwaga zeby nie przesadzić z balansem jak te trofeum wlecą znowu się zrobi za łatwo”, „Namieszane z tymi próbami, powinieneś wiecej progów zrobić, tak by było policzone pod liczbę użytkowników jak wszyscy wykonają wszystkie to wtedy maksa się zdobywa.” i „Zrobmy jeszcze zadania miesięczne od narratora może? Punkty Czasu +240, Punkty Systemu +50 i do tego +x złota zależne od poziomu, ale taka większa ilośc”.
+
+1. **627.2 B, balans trofeów i progi Prób:** w grze od 0.1.56 (zob. „Sala prób”, „Poszukiwani”, punkt 6, i „Progi Prób Gildii do wszystkich prób”).
+2. **Zadania miesięczne od narratora:** następne po 0.1.56. Trzeci okres zadań obok dziennych i tygodniowych, ze skrzynią za komplet: +240 Punktów Czasu, +50 Punktów Systemu i złoto zależne od poziomu, większe niż w skrzyniach tygodniowych.
+
 ## Odpowiedzi autora 621, 624–626 i samouczki (5.11.2026)
 
 Autor: „625 zostaje”, „626 zostaje”, „624 akcept”, „621 A” oraz „Na koniec trzeba będzie zrewidować Samouczki - czy nie wychodzą jakieś kolizje i czy warto coś dodać”.

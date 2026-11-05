@@ -193,6 +193,7 @@ test('every sprite on the list has its file at its size, and every class has its
       ...data('towers').towers.map((tower) => tower.place),
       data('guilds').place,
       ...data('settlement').places.flatMap((place) => place.backdrop ?? []),
+      ...(data('settlement').wanted?.backdrop ? [data('settlement').wanted.backdrop] : []),
     ],
     events: data('events').list.map((event) => event.art),
     'event-scenes': data('events').list.map((event) => event.scene),
