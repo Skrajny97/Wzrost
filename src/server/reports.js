@@ -2,6 +2,7 @@
 // gatherings, of brewing, of the Warsztat and of the Wieże (`kind`: hunt,
 // herbs, potions, items or tower).
 
+import { gemView } from '../engine/index.js';
 import { requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { ApiError, json } from './http.js';
@@ -48,5 +49,12 @@ export async function getReport(context) {
     .bind(id, player.row.id)
     .first();
   if (!row) throw notFound;
-  return json({ report: { id: row.id, createdAt: row.created_at, ...JSON.parse(row.data) } });
+  const report = JSON.parse(row.data);
+  // A setting's item keeps its card as it was made, and the card opens when
+  // the item is no longer there as it was. Its gem is told as now (gemView):
+  // one set before 0.1.77 was kept without its line and what it means, which
+  // the card reads (the code review of 0.1.77).
+  const item = report.set?.item;
+  if (item?.gem) report.set = { ...report.set, item: { ...item, gem: gemView(item.gem.id, content) } };
+  return json({ report: { id: row.id, createdAt: row.created_at, ...report } });
 }

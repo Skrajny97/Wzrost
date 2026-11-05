@@ -630,6 +630,28 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.deepEqual(minerals(await character()), { quartz: 1 });
   });
 
+  // A setting's report keeps its item's card as it was made, and the card
+  // opens from the Dziennik when the item is no longer there as it was. One
+  // from before 0.1.77 has the gem without its line and what it means, which
+  // the card reads (the code review of 0.1.77: the line said "undefined").
+  test("an older setting's report shows the gem's line and what it means, as the item's card reads them", async () => {
+    await set(`minerals = '{"quartz":1}'`);
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    const sword = generateItem({ baseId: 'sword', level: 25, rarityId: 'rare' }, createRng('sword'), content);
+    await database.prepare("INSERT INTO items (character_id, slot, data, created_at) VALUES (?, 'weapon', ?, 0)").bind(id, JSON.stringify(sword)).run();
+    const weapon = (await character()).equipment.weapon;
+    assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz' })).status, 201);
+    await age(15);
+    const { report } = (await claim()).data;
+    const shown = report.set.item.gem;
+    assert.equal(shown.line, 'Kwarc: +5% do wszystkich wartości');
+    // As a report from before 0.1.77 keeps it.
+    await database.prepare("UPDATE reports SET data = json_remove(data, '$.set.item.gem.line', '$.set.item.gem.help') WHERE id = ?").bind(report.id).run();
+    const again = (await call('GET', `/api/reports/${report.id}`, { cookie })).data.report;
+    assert.deepEqual(again.set.item.gem, shown);
+  });
+
   test('one setting of an item at a time, and a worn item takes the Awatar\'s gem only after the exploration\'s report (the code review)', async () => {
     await set(`minerals = '{"quartz":3}', gold = 10000`);
     await call('POST', '/api/avatar/buy', { cookie });
