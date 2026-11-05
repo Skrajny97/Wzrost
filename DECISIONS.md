@@ -3034,6 +3034,18 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.74 (5.11.2026)
+
+Ranking bez „…” tam, gdzie lista niczego nie pomija: zob. „Ranking: „…” tylko przy pominiętych miejscach”.
+
+## Ranking: „…” tylko przy pominiętych miejscach (5.11.2026, od 0.1.74)
+
+Autor przesłał zrzut rozmowy graczy na czacie: „W Rankingu między miejscem 10, a 11 pojawiło się pole z "..." na środku” i „Pokaż całą listę jest na samym dole -> po 15tym miejscu, a te "..." są tak od czapy w środku”.
+
+1. **Przyczyna.** Ranking pokazuje pierwsze 10 miejsc i miejsce postaci z dwoma miejscami nad nim i dwoma pod nim (318 A). Od 13. miejsca w dół stawiał między nimi „…”, choć postać na 13. miejscu widzi miejsca od 11. do 15., więc lista niczego nie pomijała.
+2. **Teraz** „…” stoi tylko tam, gdzie lista pomija co najmniej dwa miejsca. Jedno pominięte miejsce gra pokazuje zamiast „…” (brakujący szczegół: wiersz „…” zajmuje tyle miejsca co ten jeden wiersz). Postać na 13. lub 14. miejscu widzi więc listę od 1. miejsca bez przerwy, a postać na 16. miejscu widzi miejsca 1–10, „…” i miejsca 14–18 (`rankingWindow` w `src/client/ranking-window.js`, sprawdza to `test/ranking-window.test.js`).
+3. **Bez zmian:** przycisk „Pokaż całą listę” pod listą pokazuje wszystkie miejsca.
+
 ## Wersja 0.1.73 (5.11.2026)
 
 Omdlenie przekreśla całą wyprawę: zob. „Omdlenie: nic z wyprawy i kara (651 C)”. Towarzysz nosi jedną sztukę biżuterii zamiast trzech: zob. „Biżuteria towarzyszy”, punkty 1 i 2. Nowe zdanie w okienku Zbieracza Systemu: zob. „Zbieracz Systemu”, punkt 7.

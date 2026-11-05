@@ -16,6 +16,7 @@ import { fill, h, icon } from '../dom.js';
 import { formatNumber } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
+import { rankingWindow } from '../ranking-window.js';
 import { call, state } from '../state.js';
 import { framedName, guildTag, howItWorks, withButton } from '../ui.js';
 
@@ -33,10 +34,6 @@ const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(va
 const professionLevel = (profession) =>
   profession && h('span', { class: 'ranking-profession' }, professionSprite(profession.id) ?? icon('leaf', { size: 14 }), formatNumber(profession.level));
 
-// The first places, then the character's own with two above and two
-// below; the whole hundred under a tap (the author: 318 A).
-const TOP = 10;
-const AROUND = 2;
 
 export function mountRanking(container) {
   const names = state.content.guildFame.tabs;
@@ -135,12 +132,8 @@ function mountCharacterRanking(container) {
     const { rows, place: own } = answer;
     place.textContent = own ? `Twoje miejsce: ${formatNumber(own)}.` : '';
     const mine = rows.findIndex((row) => row.own);
-    // The rows shown, with a gap (null) where some are left out.
-    const picked = whole || rows.length <= TOP + AROUND * 2 + 1
-      ? rows
-      : mine < TOP + AROUND
-        ? rows.slice(0, Math.max(TOP, mine + AROUND + 1))
-        : [...rows.slice(0, TOP), null, ...rows.slice(mine - AROUND, mine + AROUND + 1)];
+    // The rows shown, with a gap (null) only where places are left out.
+    const picked = rankingWindow(rows, mine, whole);
     const sorted = (id) => (id === by ? 'ranking-sorted' : undefined);
     // A column of its own order shows only there.
     const columns = ORDERS.filter((order) => !order.own || order.id === by);

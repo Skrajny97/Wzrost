@@ -175,6 +175,11 @@
       "id": "0.1.73",
       "title": "Wersja 0.1.73: omdlenie i biżuteria towarzyszy",
       "body": "- Omdlenie przekreśla wyprawę: przepada z niej wszystko, czyli XP, złoto, zasoby, materiały i przedmioty, a do tego przychodzi kara XP. Przed wyprawą sprawdź „Zagrożenie”.\n- Towarzysz nosi jedną sztukę biżuterii: amulet, pierścień albo talizman. Jeśli Twój nosił kilka, zostaje mu ta założona ostatnio, a reszta wróciła do Twojego plecaka."
+    },
+    {
+      "id": "0.1.74",
+      "title": "Wersja 0.1.74: Ranking bez zbędnych kropek",
+      "body": "- W Rankingu „…” stoi już tylko tam, gdzie lista naprawdę pomija miejsca. Gdy Twoje miejsce jest tuż pod pierwszą dziesiątką, lista idzie bez przerwy."
     }
 ]
 }
