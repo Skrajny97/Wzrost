@@ -297,8 +297,7 @@ const campDone = (hash, read) => read.has('camp') && (campStarted() || !affordab
 // which the camera takes in whole even if it has to draw back, `unfold`
 // opens what folds there first (the place's own fold, told by an "unfold"
 // event, and a "Jak to działa?" inside it), `delay` lets the screen be seen
-// first, and
-// `browse` has the fights' tabs take turns while the line is told.
+// first, and `browse` has the fights' tabs take turns while the line is told.
 // `sweep` has the camera ride, at the screen's own size, from place to
 // place in their order, each as the line tells its name (the text of the
 // element `sweep` names in it), and back to the first after the line; the

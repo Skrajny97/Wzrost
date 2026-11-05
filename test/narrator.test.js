@@ -1,9 +1,10 @@
 // The narrator's chapters on the page (src/client/narrator.js), on just
-// enough of a page for its cards (test/helpers/narrator-page.js): when each
-// comes, and that none holds up the others for good. The review of the
-// narrator's lines (664) found a chapter that waits for the character at
-// home, or for a free worker, keeping every later one away from a player who
-// sets out again straight from each report.
+// enough of a page for its cards and lit places
+// (test/helpers/narrator-page.js), after the review of the narrator's lines
+// (664): no chapter that waits for the character at home, or for a free
+// worker, keeps the later ones from a player who sets out again straight
+// from each report; a chapter a claimed report brings comes after the
+// report, not over it; and the System's words a line asks to read unfold.
 
 import assert from 'node:assert/strict';
 import { before, beforeEach, test } from 'node:test';
