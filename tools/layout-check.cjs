@@ -1,8 +1,9 @@
 // The game's screens on many screen sizes (the author, 5.11.2026: „robić
 // solidnie gui adaptation na przyszlosc na rozne rozdzielczości”): phones
 // from 320 to 430 px wide, a tablet and computers, with a character of big
-// numbers (level 146, almost a million gold) and a long name. On each
-// screen it looks for a page wider than the screen, text out of its frame
+// numbers (level 146, almost a million gold), a long name and orders on the
+// Stół rozbiórki's queue. On each screen, and on the tabs TABS opens, it
+// looks for a page wider than the screen, text out of its frame
 // and elements past the right edge, and lists text cut with "…" for a look.
 // Run against a dev server (npm run dev) from the repo folder whose local D1
 // the server uses, as tools/first-steps.cjs:
@@ -29,7 +30,27 @@ const SIZES = [
   { name: 'komputer 1366', width: 1366, height: 768, mobile: false },
   { name: 'komputer 1920', width: 1920, height: 1080, mobile: false },
 ];
-const SCREENS = ['#/postac', '#/postac/statystyki', '#/postac/umiejetnosci', '#/walka', '#/walka/windfalls', '#/profesje', '#/oboz', '#/osada', '#/osada/board', '#/osada/tavern', '#/spolecznosc', '#/gildia', '#/sklep', '#/encyklopedia', '#/dziennik'];
+const SCREENS = [
+  '#/postac',
+  '#/postac/statystyki',
+  '#/postac/umiejetnosci',
+  '#/walka',
+  '#/walka/windfalls',
+  '#/profesje',
+  '#/oboz',
+  '#/oboz/craft-table',
+  '#/osada',
+  '#/osada/board',
+  '#/osada/tavern',
+  '#/spolecznosc',
+  '#/gildia',
+  '#/sklep',
+  '#/encyklopedia',
+  '#/dziennik',
+];
+// Tabs opened on a screen after its first look, by the start of their
+// names: the Stół rozbiórki's queue, with "Usuń z kolejki" by each order.
+const TABS = { '#/oboz/craft-table': ['Kolejka'] };
 
 // What is wrong on the screen now, by the page itself.
 function audit() {
@@ -99,6 +120,12 @@ async function main() {
   await api('POST', '/api/auth/login', { identifier: login, password: 'pierwszekroki1' });
   if ((await api('POST', '/api/character', { name, classId: 'warrior', appearance: 'female' })) >= 400) throw new Error('Nie powstała postać.');
   sql(`UPDATE characters SET level = 146, class_level = 99, gold = 987654, system_points = 12345, time_points = 9876, tutorial = NULL WHERE name = '${name}'`);
+  // The Stół rozbiórki built, with long names and big numbers: three orders
+  // in its queue, one at work, and a stack left on the Materiały tab.
+  const materials = { 'tick-shell:common': 12345, 'black-stork-feather:rare': 9876, 'night-heron-plume:mythic': 1234, 'goblin-trinket:epic': 987 };
+  sql(`INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'craft-table', 10, 0, 1 FROM characters WHERE name = '${name}'`);
+  sql(`UPDATE characters SET materials = '${JSON.stringify(materials)}' WHERE name = '${name}'`);
+  if ((await api('POST', '/api/craft/materials', { keys: Object.keys(materials).slice(0, 3) })) >= 400) throw new Error('Stół nie przyjął materiałów.');
   const storage = await first.storageState();
   await first.close();
 
@@ -110,9 +137,7 @@ async function main() {
     view.on('pageerror', (error) => errors.push(error.message));
     await view.goto(`${BASE}/${SCREENS[0]}`);
     await view.waitForTimeout(2500);
-    for (const screen of SCREENS) {
-      await view.goto(`${BASE}/${screen}`);
-      await view.waitForTimeout(1500);
+    const check = async (screen) => {
       const found = await view.evaluate(audit);
       const bad = found.filter((one) => one.kind !== 'cut');
       const cut = found.filter((one) => one.kind === 'cut');
@@ -120,9 +145,19 @@ async function main() {
         problems += bad.length;
         console.log(`✖ ${size.name} ${screen}`);
         for (const one of bad) console.log(`    ${one.kind}: ${one.where} — ${one.text}`);
-        if (OUT) await view.screenshot({ path: path.join(OUT, `${size.width}-${screen.replace(/[#/]+/g, '-').replace(/^-/, '')}.png`) });
+        if (OUT) await view.screenshot({ path: path.join(OUT, `${size.width}-${screen.replace(/[^\p{L}\w]+/gu, '-').replace(/^-|-$/g, '')}.png`) });
       }
       for (const one of cut) console.log(`  … ${size.name} ${screen}: ${one.where} „${one.text}”`);
+    };
+    for (const screen of SCREENS) {
+      await view.goto(`${BASE}/${screen}`);
+      await view.waitForTimeout(1500);
+      await check(screen);
+      for (const tab of TABS[screen] ?? []) {
+        await view.locator('button.segmented-option', { hasText: tab }).first().click();
+        await view.waitForTimeout(500);
+        await check(`${screen} › ${tab}`);
+      }
     }
     if (errors.length > 0) {
       problems += errors.length;

@@ -80,6 +80,8 @@ import {
   salvageYield,
   settleBoard,
   settleCrafting,
+  orderCancellable,
+  tableBuilding,
   shopBought,
   shopLeft,
   shopOffer,
@@ -1032,6 +1034,8 @@ function craftingView(row, levels, now) {
     maxRarity: table.maxRarity < 0 ? null : content.rarities[table.maxRarity].id,
     bonusChance: table.bonusChance,
     limit: content.balance.crafting.queueLimit,
+    // The words of "Usuń z kolejki" and "Usuń wszystkie" (data/buildings.json).
+    texts: queueTexts(),
     materials: Object.entries(materials)
       .map(([key, count]) => {
         const view = materialView(key, count, content);
@@ -1071,9 +1075,21 @@ function craftingView(row, levels, now) {
         bonus: order.bonus ?? 0,
         startsAt: order.startsAt,
         endsAt: order.endsAt,
+        // "Usuń z kolejki" (cancelOrders in crafting.js): whether the order
+        // can leave the queue, and what it gave at once that would go back
+        // with it: jewellery's gems and ores, the patterns its items taught.
+        cancellable: orderCancellable(order),
+        minerals: Object.entries(order.minerals ?? {}).map(([id, count]) => ({ name: content.mineralsById[id]?.name ?? id, count })),
+        patterns: (order.patterns ?? []).map((id) => content.basesById[id]?.name).filter(Boolean),
       };
     }),
   };
+}
+
+// The words of the table's queue for the page, without the server's answers.
+function queueTexts() {
+  const { errors: _, ...texts } = tableBuilding(content)?.queue ?? {};
+  return texts;
 }
 
 // Where an activity takes place. region_id holds the inner region, or a whole

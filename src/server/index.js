@@ -34,7 +34,7 @@ import { getGuildTodo } from './guild-todo.js';
 import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } from './guild-exchange.js';
 import { donateToGuildSeat, getGuildSeat, preferGuildSeat } from './guild-seat.js';
 import { guildRanking } from './guild-fame.js';
-import { craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
+import { cancelOrders, craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
@@ -161,6 +161,7 @@ const routes = [
   ['POST', '/api/items/salvage', salvageItems],
   ['POST', '/api/items/:id/salvage', salvageItem],
   ['POST', '/api/craft/materials', craftMaterials],
+  ['POST', '/api/craft/cancel', cancelOrders],
   ['POST', '/api/materials/sell', sellMaterials],
   ['POST', '/api/quests/claim', claimQuest],
   ['POST', '/api/quests/claim-all', claimAllQuests],

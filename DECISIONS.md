@@ -3034,6 +3034,25 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Stół rozbiórki: usuwanie z kolejki (5.11.2026, w grze od 0.1.65)
+
+Gracz na czacie: „Czy można dodać opcję usuwania budynków/przedmiotów z kolejki? Kliknąłem przerób wszystko przez pomyłkę i teraz widzę że brakuje takiej opcji”. Autor: „nie wiem czy jest sens karania za takie pomyłki, może to ogarniemy?”.
+
+1. **Usuń z kolejki.** Każde zlecenie Stołu rozbiórki, którego stół jeszcze nie skończył, ma w zakładce Kolejka przycisk „Usuń z kolejki”. Gra najpierw pyta („Zostaw” albo „Usuń”) i mówi, co wróci. Bez kary, jak chciał autor: wraca wszystko, co zlecenie wzięło. Materiały wracają do materiałów postaci, a rozebrane przedmioty na koniec plecaka, takie same jak przed rozbiórką, z ulepszeniem i afiksami.
+2. **Zlecenie w toku** też można usunąć. Jego dotychczasowa praca przepada i nie daje części. Kolejne zlecenia ruszają wcześniej, każde trwa tyle samo co dotąd, a pierwsze z nich startuje od razu (`takeOffQueue` w `src/engine/crafting.js`).
+3. **Usuń wszystkie.** Pod kolejką, gdy można usunąć co najmniej dwa zlecenia, stoi „Usuń wszystkie”, też z pytaniem. Działa jak usunięcie każdego zlecenia naraz.
+4. **Pełny plecak (brakujący szczegół, najprościej).** Przedmiot nie wraca do pełnego plecaka. Gdy na przedmioty z usuwanych zleceń brakuje miejsca, nic nie wypada z kolejki, a gra mówi, ile miejsc potrzeba i ile jest wolnych. „Usuń wszystkie” też nie oddaje części rzeczy: wszystko albo nic, jak „Rozbierz kilka”. Pojedyncze zlecenia można dalej usuwać osobno.
+5. **Zadania i Próby Gildii (brakujący szczegół).** Liczą pracę stołu jak dotąd, od razu przy zleceniu. Usunięte zlecenie zabiera im dokładnie to, co im dało: zadaniom narratora z okresu, w którym je złożono (dzień, tydzień, miesiąc), i Próbie Gildii z tygodnia, w którym je złożono, jeśli wtedy już trwała. Zadanie i próba pamiętają, ile przyszło ponad ich liczbę (`over` w zadaniu, kolumna `extra` w `guild_trials`, migracja `0083_trial_extra.sql`), więc praca, która zostaje, liczy się w całości. Przykład: zadanie „Przerób na Stole rozbiórki 4 materiały.” ma 2 z 4, a przez pomyłkę na stół idzie 50 materiałów. Po usunięciu tych 50 zadanie ma znowu 2 z 4.
+6. **Próba wykonana przez pomyłkę** otwiera się znowu, gdy bez usuniętej pracy nie osiąga swojej liczby. Zlecenia czekające w kolejce, złożone, gdy była już wykonana, liczą się wtedy do niej, jak byłoby bez pomyłki. Pasek gildii liczy ją jak każdą niewykonaną, a skrzynie już odebrane zostają.
+7. **Nagroda już odebrana (brakujący szczegół).** Gdy za zadanie odebrano już nagrodę albo otwarto skrzynię jego okresu, a bez usuwanej pracy nie byłoby wykonane, zlecenie zostaje w kolejce i gra mówi dlaczego. Zlecenia, bez których zadanie i tak jest wykonane, można usunąć. Praca, za którą przyszła nagroda, zawsze zostaje wykonana.
+8. **Co jeszcze wraca (brakujące szczegóły).**
+    - Kamienie i kruszce, które rozbiórka biżuterii dała od razu, wracają razem z przedmiotem. Gdy postać już ich nie ma, przedmiot nie wraca, a zlecenie zostaje.
+    - Wzór, który odsłoniła rozbiórka, znów się ukrywa, chyba że w kolejce czeka inny przedmiot tego wzoru (wtedy on go odsłania).
+    - Sztuki materiału z wymiany znów liczą się jako z wymiany, więc Encyklopedia nie zalicza ich jako własnej zdobyczy.
+9. **Zlecenia sprzed 0.1.65.** Rozbiórka sprzed tej wersji nie trzyma przedmiotu, bo ten znikał od razu, więc nie da się jej usunąć: zamiast przycisku ma dopisek, a „Usuń wszystkie” ją zostawia. Przeróbkę materiałów sprzed tej wersji można usunąć, a zadania i Próby liczą ją od jej startu, bo nie pamięta chwili zlecenia.
+10. **API.** `POST /api/craft/cancel` z `{ id }` albo `{ all: true }`, zapisane tylko wtedy, gdy postać jest taka jak przy odczycie, więc dwa dotknięcia naraz oddają wszystko raz. Zlecenie skończone, już usunięte albo innej postaci nic nie zmienia. Teksty są w `data/buildings.json` (`queue` przy Stole rozbiórki), do poprawy przez autora.
+11. **Układ ekranu.** `tools/layout-check.cjs` sprawdza też ekran Stołu rozbiórki z trzema zleceniami (`#/oboz/craft-table`, z zakładką Kolejka) na dziewięciu rozmiarach ekranu.
+
 ## Wersja 0.1.64 (5.11.2026)
 
 Najemnicy: cena do 100 000 zł za godzinę wyprawy, wynajem prosto z Karczmy i trzy zakładki Karczmy: zob. „Najemnicy: cena do 100 000 zł, wynajem z Karczmy i zakładki”. Do tego górny pasek na telefonach (zrzut autora z iPhone'a): zob. „Górny pasek na telefonach”.

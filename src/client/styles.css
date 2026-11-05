@@ -5252,6 +5252,39 @@ a.camp-level-button {
   font-variant-numeric: tabular-nums;
 }
 
+/* An order's time and "Usuń z kolejki" (as the camp's "Anuluj" by a waiting
+   build) in one line; the button goes below, to the right, when they do not
+   fit. */
+.craft-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+}
+
+.craft-foot .craft-progress {
+  flex: 1 1 150px;
+}
+
+.craft-cancel {
+  flex: none;
+  min-height: 36px;
+  margin-left: auto;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-world);
+  font-size: 15px;
+}
+
+.craft-cancel:active:not(:disabled) {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
 /* Volume sliders in the settings */
 
 .status-row--volume {

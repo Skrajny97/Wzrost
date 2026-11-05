@@ -448,6 +448,10 @@ export function huntKills(hunt, content) {
   return kills;
 }
 
+// The kinds of quests the Stół rozbiórki's orders move on (orderWork in
+// crafting.js names its work by them).
+const TABLE_WORK = new Set(['process', 'salvage']);
+
 // What claimed explorations, gatherings, brewings and orders of items and
 // the table's orders add: creatures beaten (`kills` by id), `minutes`
 // explored, materials `processed`, items `salvaged`, herbs gathered (`herbs`
@@ -456,7 +460,9 @@ export function huntKills(hunt, content) {
 // those that came out), `minerals` dug in the Kopalnia (all of them),
 // `jewels` made in the Szlifiernia (only those that came out), inner
 // regions `opened` by new class levels and `orders` delivered in the
-// Osada. A quest stops at its count.
+// Osada. A quest stops at its count; one of the Stół rozbiórki's work keeps
+// what came over it (`over`), so an order taken off the table's queue takes
+// back exactly its own (takeQuestProgress).
 export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, minerals = 0, jewels = 0, opened = 0, orders = 0 }) {
   const total = (counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
   const gathered = total(herbs);
@@ -482,10 +488,56 @@ export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 
       periodId,
       {
         ...period,
-        quests: period.quests.map((quest) => ({ ...quest, progress: Math.min(quest.count, quest.progress + (gain[quest.kind]?.(quest) ?? 0)) })),
+        quests: period.quests.map((quest) => {
+          const reached = quest.progress + (gain[quest.kind]?.(quest) ?? 0);
+          const over = TABLE_WORK.has(quest.kind) ? reached - quest.count : 0;
+          return { ...quest, progress: Math.min(quest.count, reached), ...(over > 0 && { over: (quest.over ?? 0) + over }) };
+        }),
       },
     ]),
   );
+}
+
+// The quests after orders of the Stół rozbiórki left its queue (the author:
+// „nie wiem czy jest sens karania za takie pomyłki”; takeOffQueue in
+// crafting.js): `work` is what each had brought them ({ kind, pieces,
+// orderedAt }, orderWork). Each period gives back what was ordered in it,
+// from what its quest counted, the pieces over its count first, so the rest
+// still counts in full. A period gone since keeps what it had.
+export function takeQuestProgress(quests, work, content) {
+  return Object.fromEntries(
+    Object.entries(quests).map(([periodId, period]) => {
+      const taken = (kind) =>
+        QUEST_PERIODS.includes(periodId)
+          ? work.filter((one) => one.kind === kind && questPeriod(periodId, one.orderedAt, content).key === period.period).reduce((sum, one) => sum + one.pieces, 0)
+          : 0;
+      return [
+        periodId,
+        {
+          ...period,
+          quests: period.quests.map((quest) => {
+            const pieces = TABLE_WORK.has(quest.kind) ? taken(quest.kind) : 0;
+            if (pieces === 0) return quest;
+            const { over = 0, ...rest } = quest;
+            const total = Math.max(0, quest.progress + over - pieces);
+            return { ...rest, progress: Math.min(quest.count, total), ...(total > quest.count && { over: total - quest.count }) };
+          }),
+        },
+      ];
+    }),
+  );
+}
+
+// The first quest takeQuestProgress would leave undone though it has given
+// its reward already: claimed, or done when its period's chest was opened.
+// Then the work stays on the table, as it was paid for. Null when none.
+export function rewardedQuest(before, after) {
+  for (const [periodId, period] of Object.entries(after)) {
+    const was = before[periodId];
+    const quest = period.quests.find((one, index) => questDone(was.quests[index]) && !questDone(one) && (one.claimed || was.chest));
+    if (quest) return quest;
+  }
+  return null;
 }
 
 export const questDone = (quest) => quest.progress >= quest.count;

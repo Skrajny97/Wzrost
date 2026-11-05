@@ -155,6 +155,38 @@
       "rates": [10, 9, 8, 7, 6, 5, 4, 3, 2, 1],
       "levelText": "wymiana zasobów {rate} za 1"
     },
+    "queue": {
+      "cancel": "Usuń z kolejki",
+      "cancelAll": "Usuń wszystkie",
+      "old": "Rozbiórka sprzed wersji 0.1.65 dokończy się sama.",
+      "confirm": {
+        "title": "Usunąć z kolejki?",
+        "titleAll": "Usunąć wszystkie zlecenia?",
+        "back": "Do plecaka wróci: {what}.",
+        "backAll": "Zlecenia do usunięcia: {count}. Wszystko, co wzięły, wróci do plecaka.",
+        "running": "Stół już nad tym pracuje, więc ta praca przepadnie.",
+        "runningAll": "Praca nad pierwszym zleceniem przepadnie.",
+        "later": "Następne zlecenia ruszą wcześniej.",
+        "counted": "Zadania stracą to, co policzyły za tę pracę.",
+        "countedGuild": "Zadania i Próby Gildii stracą to, co policzyły za tę pracę.",
+        "minerals": "Oddasz kamienie i kruszce z rozbiórki: {minerals}.",
+        "pattern": "System znów ukryje wzór z rozbiórki: {patterns}.",
+        "patterns": "System znów ukryje wzory z rozbiórki: {patterns}.",
+        "kept": "Rozbiórki sprzed wersji 0.1.65 zostaną w kolejce.",
+        "yes": "Usuń",
+        "no": "Zostaw"
+      },
+      "done": "Z kolejki do plecaka: {what}.",
+      "doneAll": "Usunięto zlecenia: {count}. Wszystko z nich wróciło do plecaka.",
+      "errors": {
+        "gone": "Tego zlecenia nie ma już w kolejce.",
+        "empty": "W kolejce nie ma zleceń do usunięcia.",
+        "old": "Tej rozbiórki sprzed wersji 0.1.65 nie da się cofnąć, bo przedmiotu już nie ma. Dokończy się sama.",
+        "bagFull": "Plecak nie pomieści przedmiotów z kolejki (potrzebne miejsca: {need}, wolne: {free}). Zrób w nim miejsce.",
+        "minerals": "Brakuje kamieni i kruszców z rozbiórki: {minerals}. Bez nich przedmiot nie wróci do plecaka.",
+        "rewarded": "Za zadanie „{quest}” odebrano już nagrodę, a bez tej pracy nie byłoby wykonane. Usuń mniej zleceń albo poczekaj, aż stół je skończy."
+      }
+    },
     "costs": [
       { "resource": "gold", "base": 3, "growth": 2.0 },
       { "resource": "wood", "base": 2.26, "growth": 1.9 },

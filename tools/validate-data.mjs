@@ -471,6 +471,11 @@ function checkReferences(data) {
     if (!bonusFromLevel || !bonusPerLevel || bonusFromLevel > building.maxLevel) {
       errors.push(`buildings.json: ${building.id} potrzebuje bonusFromLevel (do maxLevel) i bonusPerLevel`);
     }
+    // Its queue's orders can be taken off it, in these words (crafting.js).
+    if (!building.queue) errors.push(`buildings.json: ${building.id} potrzebuje queue (teksty usuwania zleceń z kolejki)`);
+  }
+  if (data.buildings.some((building) => building.queue && building.effect.kind !== 'craftSpeed')) {
+    errors.push('buildings.json: queue (usuwanie zleceń z kolejki) ma tylko Stół rozbiórki (craftSpeed)');
   }
   // The camp's own levels: a time for each, each longer than the last.
   const campMinutes = data.camp.minutes.levels;

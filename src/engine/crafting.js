@@ -8,8 +8,9 @@
 //
 // Stored state: materials { "wolf-pelt:rare": 2 }, parts { scraps: 5 } and
 // the queue, a list of orders with their start and end. An order is done once
-// its end has passed, and its parts count from then on. The server passes
-// the time and the random seed.
+// its end has passed, and its parts count from then on. Until then it can
+// leave the queue with all it took given back (takeOffQueue). The server
+// passes the time and the random seed.
 
 import { campBonus } from './camp.js';
 import { countEvents } from './rng.js';
@@ -222,7 +223,8 @@ function jewelSalvage(item, count, content) {
   return { parts: Math.max(1, Math.floor(count / tuning.partsDivisor)), minerals };
 }
 
-const tableBuilding = (content) => content.buildings.find((building) => building.effect.kind === 'craftSpeed');
+// The Stół rozbiórki in the data: the building whose effect is craftSpeed.
+export const tableBuilding = (content) => content.buildings.find((building) => building.effect.kind === 'craftSpeed');
 
 // The table at the camp's levels: its level; its pace, 0 until it stands,
 // then 1 plus its bonus; the highest rarity it takes, as an index into the
@@ -270,9 +272,25 @@ export function settleCrafting({ materials, parts, queue }, now) {
 }
 
 // An order at the end of the queue: it starts when the one before it ends.
+// It keeps when it was ordered: the quests and the Próby Gildii count it
+// then, and an order taken off the queue takes it back from those periods
+// (takeOffQueue).
 function append(queue, order, minutes, now) {
   const startsAt = Math.max(now, queue.at(-1)?.endsAt ?? now);
-  return [...queue, { ...order, startsAt, endsAt: startsAt + minutes * 60000 }];
+  return [...queue, { ...order, orderedAt: now, startsAt, endsAt: startsAt + minutes * 60000 }];
+}
+
+// An item as the bag keeps it, without its place there (id, equippedSlot):
+// an order taking it apart keeps it, to give it back if it leaves the queue.
+const storedItem = ({ id: _id, equippedSlot: _slot, ...item }) => item;
+
+// The pieces of a stack an order takes that came from a trade: the
+// Encyklopedia counts only the rest as the character's own (ownDiscoveries
+// in encyclopedia.js, `foreign` by "material:<stack>"), and the character's
+// own pieces go first. They are marked as traded again if the order leaves
+// the queue.
+function tradedPieces(foreign, key, held, count) {
+  return Math.max(0, Math.min(foreign[`material:${key}`] ?? 0, held) - (held - count));
 }
 
 // The extra parts of an order of `parts`, known from its start, shown when it ends.
@@ -283,9 +301,10 @@ const bonusParts = (parts, table, rng) => (table.bonusChance > 0 ? countEvents(p
 // key (the author: "Powinna być mozliwosc przerobienia pojedynczej sztuki
 // danego materiału nie wszystkie danej jakości"). `state` is settled at
 // `now`; `table` is craftTable(). A stack of a rarity the table does not
-// take yet stays. Returns the new state, the number of stacks ordered and of
+// take yet stays. `foreign` is the character's record of pieces from trades
+// (tradedPieces). Returns the new state, the number of stacks ordered and of
 // those too rare.
-export function orderMaterials(state, keys, table, now, rng, content, counts = {}) {
+export function orderMaterials(state, keys, table, now, rng, content, counts = {}, foreign = {}) {
   const limit = content.balance.crafting.queueLimit;
   let { materials, queue } = state;
   let ordered = 0;
@@ -300,7 +319,16 @@ export function orderMaterials(state, keys, table, now, rng, content, counts = {
       continue;
     }
     if (queue.length >= limit) continue;
-    const order = { kind: 'material', key, count, partId: content.partsByRarity[rarityId].id, parts: count, bonus: bonusParts(count, table, rng) };
+    const traded = tradedPieces(foreign, key, held, count);
+    const order = {
+      kind: 'material',
+      key,
+      count,
+      partId: content.partsByRarity[rarityId].id,
+      parts: count,
+      bonus: bonusParts(count, table, rng),
+      ...(traded > 0 && { traded }),
+    };
     queue = append(queue, order, craftMinutes(rarityId, count, table.pace, content), now);
     materials = addCounts(materials, { [key]: -count });
     ordered += 1;
@@ -310,10 +338,21 @@ export function orderMaterials(state, keys, table, now, rng, content, counts = {
 
 // An order to take an item apart. `state` is settled at `now`; the caller
 // checks that the table takes the item's rarity and the queue has room, and
-// removes the item.
+// removes the item. The order keeps the item, and the minerals jewellery
+// gives at once (`minerals`), to give back and take back if it leaves the
+// queue.
 export function orderSalvage(state, item, name, table, now, rng, content) {
-  const { partId, count } = salvageYield(item, content);
-  const order = { kind: 'item', name, rarity: item.rarity, partId, parts: count, bonus: bonusParts(count, table, rng) };
+  const { partId, count, minerals } = salvageYield(item, content);
+  const order = {
+    kind: 'item',
+    name,
+    rarity: item.rarity,
+    partId,
+    parts: count,
+    bonus: bonusParts(count, table, rng),
+    items: [storedItem(item)],
+    ...(minerals && { minerals }),
+  };
   return { ...state, queue: append(state.queue, order, craftMinutes(item.rarity, count, table.pace, content), now) };
 }
 
@@ -323,26 +362,77 @@ export function orderSalvage(state, item, name, table, now, rng, content) {
 // the queue and not one each. The parts and the minutes are those of taking
 // the items apart one by one, added up. `entries` are { item, name }; an
 // order of one item keeps its name, one of more has `count` items and no
-// name. The caller checks as for orderSalvage, and room for every order.
+// name. Each order keeps its items and their minerals, as orderSalvage's.
+// The caller checks as for orderSalvage, and room for every order.
 export function orderSalvageMany(state, entries, table, now, rng, content) {
   const groups = new Map();
   for (const { item, name } of entries) {
-    const { partId, count } = salvageYield(item, content);
-    const group = groups.get(partId) ?? { name, rarity: item.rarity, items: 0, parts: 0, minutes: 0 };
+    const { partId, count, minerals } = salvageYield(item, content);
+    const group = groups.get(partId) ?? { name, rarity: item.rarity, items: [], parts: 0, minutes: 0, minerals: null };
     groups.set(partId, {
       ...group,
-      items: group.items + 1,
+      items: [...group.items, storedItem(item)],
       parts: group.parts + count,
       minutes: group.minutes + craftMinutes(item.rarity, count, table.pace, content),
+      minerals: minerals ? addCounts(group.minerals ?? {}, minerals) : group.minerals,
     });
   }
   let { queue } = state;
   for (const [partId, group] of groups) {
     const order =
-      group.items === 1
+      group.items.length === 1
         ? { kind: 'item', name: group.name, rarity: group.rarity, partId, parts: group.parts }
-        : { kind: 'item', count: group.items, rarity: content.partsById[partId].rarity, partId, parts: group.parts };
-    queue = append(queue, { ...order, bonus: bonusParts(group.parts, table, rng) }, group.minutes, now);
+        : { kind: 'item', count: group.items.length, rarity: content.partsById[partId].rarity, partId, parts: group.parts };
+    const kept = { items: group.items, ...(group.minerals && { minerals: group.minerals }) };
+    queue = append(queue, { ...order, bonus: bonusParts(group.parts, table, rng), ...kept }, group.minutes, now);
   }
   return { ...state, queue };
+}
+
+// Whether an order can leave the queue with all it took given back: one of
+// materials always; one taking items apart only from 0.1.65 on, when
+// orders began to keep their items (before, the item was gone at once).
+export const orderCancellable = (order) => order.kind === 'material' || Array.isArray(order.items);
+
+// What an order brought the narrator's quests and the Próby Gildii when it
+// was ordered, by their kind: the pieces of materials processed or the items
+// salvaged, and when. An order from before 0.1.65 does not know when it was
+// ordered: its start stands for it.
+export function orderWork(order) {
+  const pieces = order.kind === 'material' ? order.count : (order.items?.length ?? order.count ?? 1);
+  return { kind: order.kind === 'material' ? 'process' : 'salvage', pieces, orderedAt: order.orderedAt ?? order.startsAt };
+}
+
+// Orders taken off the queue ("Usuń z kolejki", "Usuń wszystkie"; the
+// author: „nie wiem czy jest sens karania za takie pomyłki”), `ids` of
+// orderCancellable ones in `state`, settled at `now`: their materials are
+// back with the character's, and the orders after them move up, each keeping
+// its length, so whichever comes first starts now when the one at work goes
+// (its work so far is lost). Also returns what goes back to the bag
+// (`items`), what they gave at once and now goes (`minerals` of jewellery,
+// `patterns` taught), the traded pieces of each stack (`traded`, by stack)
+// and the `work` the quests and the trials counted for every order of the
+// queue (orderWork), `cancelled` for those leaving.
+export function takeOffQueue(state, ids, now) {
+  const leaving = state.queue.filter((order) => ids.has(order.id));
+  const queue = [];
+  for (const order of state.queue) {
+    if (ids.has(order.id)) continue;
+    const startsAt = queue.length === 0 ? Math.min(order.startsAt, now) : queue.at(-1).endsAt;
+    queue.push({ ...order, startsAt, endsAt: startsAt + order.endsAt - order.startsAt });
+  }
+  const back = {};
+  const traded = {};
+  for (const order of leaving.filter((one) => one.kind === 'material')) {
+    back[order.key] = (back[order.key] ?? 0) + order.count;
+    if (order.traded) traded[order.key] = (traded[order.key] ?? 0) + order.traded;
+  }
+  return {
+    state: { ...state, materials: addCounts(state.materials, back), queue },
+    items: leaving.flatMap((order) => order.items ?? []),
+    minerals: leaving.reduce((sum, order) => addCounts(sum, order.minerals ?? {}), {}),
+    patterns: [...new Set(leaving.flatMap((order) => order.patterns ?? []))],
+    traded,
+    work: state.queue.map((order) => ({ ...orderWork(order), cancelled: ids.has(order.id) })),
+  };
 }

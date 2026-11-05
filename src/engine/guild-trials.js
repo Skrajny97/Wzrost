@@ -163,6 +163,36 @@ export function trialGains({ kills = {}, minutes = 0, processed = 0, salvaged = 
   return Object.fromEntries(Object.entries(gains).filter(([, gain]) => gain > 0));
 }
 
+// A trial of the Stół rozbiórki's work after orders left the table's queue
+// (the author: „nie wiem czy jest sens karania za takie pomyłki”;
+// takeOffQueue in crafting.js), so no trial keeps work never done. `row` is
+// the trial as kept ({ kind, week, count, progress, extra, state, takenAt,
+// doneAt }; `extra`: what came over its count as it was done); `work` lists
+// the queue's orders as orderWork gives them, `cancelled` for those leaving.
+// The trial gives back what the leaving orders of its kind and week brought
+// it: those ordered once it ran, and while it was not done yet. Done, it
+// opens again when the rest falls below its count, and then the orders still
+// waiting that came after it was done count, as they would have; only later
+// orders can, as the table works one after another. Null when nothing changes.
+export function trialAfterCancel(row, work, now, content) {
+  const own = work.filter((one) => one.kind === row.kind && one.orderedAt >= row.takenAt && questPeriod('weekly', one.orderedAt, content).key === row.week);
+  const counted = (one) => row.state !== 'done' || one.orderedAt <= row.doneAt;
+  const pieces = (list) => list.reduce((sum, one) => sum + one.pieces, 0);
+  const taken = pieces(own.filter((one) => one.cancelled && counted(one)));
+  if (taken === 0) return null;
+  let total = row.progress + row.extra - taken;
+  const reopened = row.state === 'done' && total < row.count;
+  if (reopened) total += pieces(own.filter((one) => !one.cancelled && !counted(one)));
+  total = Math.max(0, total);
+  const done = total >= row.count;
+  return {
+    progress: Math.min(row.count, total),
+    extra: Math.max(0, total - row.count),
+    state: done ? 'done' : 'active',
+    doneAt: !done ? null : reopened ? now : row.doneAt,
+  };
+}
+
 // The guild's finished trials of a week: each member's up to the cap (the
 // author: nobody does everything for the others) and up to `limit`, the
 // day's (trialDayLimit; the rest come onto the bar on the days after).
