@@ -33,6 +33,7 @@ import {
   questPeriod,
   trialDay,
 } from '../src/engine/index.js';
+import { CHESTS_SQL } from '../src/server/guild-expedition.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -239,7 +240,7 @@ describe('the Wyprawa Gildii through the API', () => {
       expedition.guardians.map((guardian) => [guardian.monsterId, guardian.level, guardian.state]),
       expeditionGuardians(expedition.land.id, content).map((guardian, index) => [guardian.monsterId, 45 + index, 'ahead']),
     );
-    assert.deepEqual(seen.attacks, { left: rules.attacksPerDay, perDay: rules.attacksPerDay });
+    assert.deepEqual(seen.attacks, { left: rules.attacksPerDay, perDay: rules.attacksPerDay, blocked: null });
     assert.equal(seen.contributor, false);
     assert.deepEqual(seen.contribution, []);
     assert.deepEqual(seen.chests, []);
@@ -491,5 +492,72 @@ describe('the Wyprawa Gildii through the API', () => {
     assert.equal(outside.chests.length, 1);
     assert.equal((await claim('lowczyni', previous.key, 1)).status, 200);
     assert.equal((await claim('lowczyni', previous.key, 1)).data.error.code, 'claimed');
+  });
+
+  test('a member who leaves and joins again in the same week is counted once on the route; one who joins later adds its share once', async () => {
+    const { expedition } = await view('lowczyni');
+    assert.equal(expedition.members, 2);
+    async function again(login, name) {
+      assert.equal((await as(login, 'POST', '/api/guild/leave')).status, 200);
+      await as('lowczyni', 'POST', '/api/guild/invite', { name });
+      assert.equal((await join(login, 'SF')).status, 200);
+    }
+    // Tropiciel, active when the route came, leaves and comes back twice:
+    // the stages and the guardians stay those of two members.
+    await again('tropiciel', 'Tropiciel');
+    await again('tropiciel', 'Tropiciel');
+    const same = (await view('lowczyni')).expedition;
+    assert.equal(same.members, 2);
+    assert.equal(same.need, expeditionStageMinutes(2, content));
+    // A new member adds its share of the week left, once, however often it comes back.
+    await player('nowa', 'Nowa');
+    await as('lowczyni', 'POST', '/api/guild/invite', { name: 'Nowa' });
+    assert.equal((await join('nowa', 'SF')).status, 200);
+    const share = joinShare(trialDay(Date.now(), content));
+    assert.ok(Math.abs((await view('lowczyni')).expedition.members - (2 + share)) < 1e-9);
+    await again('nowa', 'Nowa');
+    const later = (await view('lowczyni')).expedition;
+    assert.ok(Math.abs(later.members - (2 + share)) < 1e-9, `${later.members}`);
+    assert.equal(later.need, expeditionStageMinutes(2 + share, content));
+    const counted = JSON.parse((await first('SELECT counted FROM guild_expeditions')).counted);
+    assert.deepEqual(
+      counted.sort((a, b) => a - b),
+      [await idOf('Łowczyni'), await idOf('Tropiciel'), await idOf('Nowa')].sort((a, b) => a - b),
+    );
+  });
+
+  test('the chests are found from the character\'s own minutes of the two weeks, never from every guild\'s routes', async () => {
+    // Another guild with a fallen guardian of its own, where Łowczyni added nothing.
+    await player('obca', 'Obca');
+    await as('obca', 'POST', '/api/guild/found', { name: 'Obce Strony', tag: 'OS' });
+    await run('UPDATE users SET seen_at = ?', Date.now());
+    for (const login of ['lowczyni', 'obca']) await view(login);
+    const fall = async (tag) =>
+      run(
+        `INSERT INTO guild_expedition_guardians (expedition_id, stage, monster_id, area_id, level, members, need, max_hp, hp, created_at, fallen_at, fallen_by)
+         SELECT e.id, 1, 'wolf', 'windfalls-edge', 40, 1, 150, 100, 0, ?, ?, NULL FROM guild_expeditions e JOIN guilds g ON g.id = e.guild_id WHERE g.tag = ?`,
+        Date.now(),
+        Date.now(),
+        tag,
+      );
+    await fall('SF');
+    await fall('OS');
+    await setMinutes('Łowczyni', 30);
+    await setMinutes('Obca', 30, (await first("SELECT id FROM guilds WHERE tag = 'OS'")).id);
+    const own = await view('lowczyni');
+    assert.deepEqual(
+      own.chests.map((chest) => [chest.week, chest.stage]),
+      [[week(), 1]],
+    );
+    assert.equal((await view('obca')).chests.length, 1);
+    assert.deepEqual((await view('tropiciel')).chests, []);
+    // The query starts from the character's minutes (their index by
+    // character), so it reads only the routes of the guilds it added minutes in.
+    const current = questPeriod('weekly', Date.now(), content);
+    const previous = questPeriod('weekly', current.startsAt - 1, content);
+    const id = await idOf('Łowczyni');
+    const plan = (await (await db()).prepare(`EXPLAIN QUERY PLAN ${CHESTS_SQL}`).bind(id, previous.key, current.key, 0, id, 0).all()).results.map((step) => step.detail);
+    assert.match(plan[0], /guild_expedition_minutes_character/, JSON.stringify(plan));
+    assert.ok(!plan.some((step) => /guild_expeditions_week/.test(step)), JSON.stringify(plan));
   });
 });

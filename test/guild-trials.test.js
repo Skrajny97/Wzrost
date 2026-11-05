@@ -639,6 +639,44 @@ describe('the Próby Gildii through the API', () => {
     assert.equal(won, true, 'the floor is won');
     assert.equal(await progress(), 1);
   });
+
+  test('a member who leaves and joins again in the same week is counted once on the board; one who joins later adds its share once', async () => {
+    await run('UPDATE users SET seen_at = ?', Date.now());
+    const guildId = (await as('mistrz', 'GET', '/api/guild')).data.guild.id;
+    const members = async () => {
+      const { bar } = (await as('mistrz', 'GET', '/api/guild/trials')).data;
+      return bar.active + bar.joined;
+    };
+    assert.equal(await members(), 2);
+    async function again(login, name) {
+      assert.equal((await as(login, 'POST', '/api/guild/leave')).status, 200);
+      await as('mistrz', 'POST', '/api/guild/invite', { name });
+      assert.equal((await as(login, 'POST', '/api/guild/accept', { guildId })).status, 200);
+    }
+    // Druh, active when the board was drawn, leaves and comes back twice:
+    // the thresholds stay those of two members.
+    await again('druh', 'Druh');
+    await again('druh', 'Druh');
+    assert.equal(await members(), 2);
+    // A new member adds its share of the week left, once, however often it comes back.
+    await player('trzeci', 'Trzeci');
+    await as('mistrz', 'POST', '/api/guild/invite', { name: 'Trzeci' });
+    assert.equal((await as('trzeci', 'POST', '/api/guild/accept', { guildId })).status, 200);
+    const share = joinShare(today());
+    assert.ok(Math.abs((await members()) - (2 + share)) < 1e-9);
+    await again('trzeci', 'Trzeci');
+    assert.ok(Math.abs((await members()) - (2 + share)) < 1e-9);
+    const { bar } = (await as('mistrz', 'GET', '/api/guild/trials')).data;
+    assert.deepEqual(
+      bar.thresholds.map((threshold) => threshold.need),
+      rules.steps.map((step) => Math.ceil((2 + share) * step - 1e-9)),
+    );
+    const counted = JSON.parse((await first('SELECT counted FROM guild_trial_boards')).counted);
+    assert.deepEqual(
+      counted.sort((a, b) => a - b),
+      [await idOf('Mistrz'), await idOf('Druh'), await idOf('Trzeci')].sort((a, b) => a - b),
+    );
+  });
 });
 
 describe('the Próby Gildii and the Osada', () => {

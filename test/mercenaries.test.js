@@ -220,6 +220,61 @@ describe('mercenaries through the API', () => {
     assert.equal((await as('najemna', 'POST', '/api/mercenary/claim')).data.error.code, 'not_offering');
   });
 
+  test('offered, hired or with its pay waiting it is offered no attack on the Bestia or a guardian: no dot, and the cards say why', async () => {
+    const guilds = content.guilds;
+    // Najemna in a guild with a beast to hit and a guardian barring the way,
+    // on a route where it added minutes this week.
+    assert.equal((await as('najemna', 'POST', '/api/guild/found', { name: 'Wolni Ludzie', tag: 'WL' })).status, 200);
+    await (await db()).prepare('UPDATE users SET seen_at = ?').bind(Date.now()).run();
+    assert.equal((await as('najemna', 'GET', '/api/guild/beast')).status, 200);
+    const { expedition } = (await as('najemna', 'GET', '/api/guild/expedition')).data;
+    await (await db())
+      .prepare(
+        `INSERT INTO guild_expedition_minutes (guild_id, week, character_id, minutes, updated_at)
+         SELECT m.guild_id, ?, m.character_id, ?, ? FROM guild_members m JOIN characters c ON c.id = m.character_id WHERE c.name = ?`,
+      )
+      .bind(expedition.week, expedition.need, Date.now(), 'Najemna')
+      .run();
+    const dots = async () => {
+      const { todo } = (await as('najemna', 'GET', '/api/guild/todo')).data;
+      return { beast: todo.beast, expedition: todo.expedition };
+    };
+    const blocked = async () => [
+      (await as('najemna', 'GET', '/api/guild/beast')).data.attacks.blocked,
+      (await as('najemna', 'GET', '/api/guild/expedition')).data.attacks.blocked,
+    ];
+    assert.deepEqual(await dots(), { beast: true, expedition: true });
+    assert.deepEqual(await blocked(), [null, null]);
+    const route = (await as('najemna', 'GET', '/api/guild/expedition')).data;
+    assert.deepEqual([route.expedition.barred, route.contributor], [true, true]);
+
+    // Offered: no dot, and both cards say why instead of offering an attack.
+    const id = (await row('Najemna')).id;
+    assert.equal((await as('najemna', 'POST', '/api/mercenary/offer', { hours: 4, perHour: 300 })).status, 200);
+    const shut = [guilds.beast.texts.mercenary, guilds.expedition.texts.mercenary];
+    assert.deepEqual(await dots(), { beast: false, expedition: false });
+    assert.deepEqual(await blocked(), shut);
+    // Its attacks of the day are all still there.
+    assert.equal((await as('najemna', 'GET', '/api/guild/beast')).data.attacks.left, guilds.beast.attacksPerDay);
+    assert.equal((await as('najemna', 'POST', '/api/guild/beast/attack')).data.error.code, 'busy');
+    assert.equal((await as('najemna', 'POST', '/api/guild/expedition/attack')).data.error.code, 'busy');
+
+    // Hired, and then with its pay waiting: still none.
+    assert.equal((await as('zlecenie', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 60, mercenary: { id, perHour: 300 } })).status, 201);
+    assert.deepEqual(await dots(), { beast: false, expedition: false });
+    assert.deepEqual(await blocked(), shut);
+    await as('zlecenie', 'POST', '/api/test/skip-time');
+    assert.equal((await as('zlecenie', 'POST', '/api/hunts/claim')).status, 200);
+    assert.deepEqual(await dots(), { beast: false, expedition: false });
+    assert.equal((await as('najemna', 'POST', '/api/guild/beast/attack')).data.error.code, 'claim_first');
+
+    // Paid: its attacks are back.
+    assert.equal((await as('najemna', 'POST', '/api/mercenary/claim')).status, 200);
+    assert.deepEqual(await dots(), { beast: true, expedition: true });
+    assert.deepEqual(await blocked(), [null, null]);
+    assert.equal((await as('najemna', 'POST', '/api/guild/expedition/attack')).status, 200);
+  });
+
   test('called back early, the exploration ends the service at once and the pay waits', async () => {
     await as('najemna', 'POST', '/api/mercenary/offer', { hours: 8, perHour: 400 });
     const id = (await row('Najemna')).id;

@@ -35,7 +35,7 @@ import {
   questPeriod,
 } from '../engine/index.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
-import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
+import { attackBlocked, bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { guildOf } from './guilds.js';
@@ -138,11 +138,13 @@ function cardTexts() {
 
 // The Bestia for the card: the guild's beast of the week (none outside a
 // guild) with its monster, level, region and HP, and who felled it; the
-// attacks the character has left today; the "Wkład tygodnia", who hit it
-// with how much and how often, the most first (a character removed since
-// is left out; its damage stays off the bar); the character's own part;
-// the chests it may open; and the card's words.
-export async function beastView(db, row, now) {
+// attacks the character has left today, with the words of why it may not
+// attack at all while its `activity` is an offer or a service as a
+// mercenary (`attacks.blocked`, attackBlocked); the "Wkład tygodnia", who
+// hit it with how much and how often, the most first (a character removed
+// since is left out; its damage stays off the bar); the character's own
+// part; the chests it may open; and the card's words.
+export async function beastView(db, row, now, activity = null) {
   const guild = await guildOf(db, row.id);
   const { current } = weeksAround(now);
   const day = questPeriod('daily', now, content).key;
@@ -177,7 +179,7 @@ export async function beastView(db, row, now) {
       members: beast.members,
       endsAt: current.endsAt,
     },
-    attacks: { left: Math.max(0, rules().attacksPerDay - used.results[0].count), perDay: rules().attacksPerDay },
+    attacks: { left: Math.max(0, rules().attacksPerDay - used.results[0].count), perDay: rules().attacksPerDay, blocked: attackBlocked(activity, rules().texts.mercenary) },
     contribution,
     own: { damage: own?.damage ?? 0, hits: own?.hits ?? 0 },
     chests: (await chestsOf(db, row, now)).map(({ week, fallen, share, item, until }) => ({ week, fallen, share, item, until })),
@@ -188,7 +190,7 @@ export async function beastView(db, row, now) {
 // GET /api/guild/beast
 export async function getGuildBeast(context) {
   const { player } = await requireBeastPlayer(context);
-  return json(await beastView(context.env.DB, player.row, context.now));
+  return json(await beastView(context.env.DB, player.row, context.now, player.activity));
 }
 
 // POST /api/guild/beast/attack: one fight on the guild's beast. Saved only
@@ -248,7 +250,7 @@ export async function attackGuildBeast(context) {
       log: fight.log,
       fight: fight.replay,
     },
-    ...(await beastView(db, row, now)),
+    ...(await beastView(db, row, now, player.activity)),
   });
 }
 
@@ -318,6 +320,6 @@ export async function claimGuildBeastChest(context) {
       text: filled(rules().texts.opened, { contents }),
     },
     character: characterView(after, now),
-    ...(await beastView(db, after.row, now)),
+    ...(await beastView(db, after.row, now, after.activity)),
   });
 }

@@ -251,12 +251,30 @@ function guildIdOf(body) {
   return body.guildId;
 }
 
+// The statement that counts a character who has just joined a guild (at
+// `now`, its joined_at) among the members of the week on the guild's Próby
+// board or Wyprawa route (`table`) made already: its share of the week left
+// joins `joined` and its id `counted`, unless the week counts it already
+// (active when the board or route came, or joined before and left since), so
+// leaving and joining again raises the week's thresholds, stages and
+// guardians once at most.
+function weekJoin(db, table, guildId, characterId, now) {
+  return db
+    .prepare(
+      `UPDATE ${table} SET joined = joined + ?, counted = json_insert(counted, '$[#]', ?)
+       WHERE guild_id = ? AND week = ? AND EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ? AND joined_at = ?)
+         AND NOT EXISTS (SELECT 1 FROM json_each(${table}.counted) WHERE value = ?)`,
+    )
+    .bind(joinShare(trialDay(now, content)), characterId, guildId, questPeriod('weekly', now, content).key, characterId, guildId, now, characterId);
+}
+
 // POST /api/guild/accept { guildId }: joins the guild that invited this
 // character, while it has a place; the character's other invitations go.
 // Joined after the guild's board of the week was drawn, it raises the
 // week's thresholds of the Próby Gildii by its share of the week left, in
 // the same batch (the author's 615 A), and so the Wyprawa Gildii's route of
-// the week, made already, its stages and guardians to come (621 A).
+// the week, made already, its stages and guardians to come (621 A); not
+// again for a character the week counts already (weekJoin).
 export async function acceptGuildInvite(context) {
   const { player } = await requireGuildPlayer(context);
   const db = context.env.DB;
@@ -273,20 +291,10 @@ export async function acceptGuildInvite(context) {
            SELECT ?, ?, 'member', ? WHERE EXISTS (SELECT 1 FROM guilds WHERE id = ?) AND (SELECT COUNT(*) FROM guild_members WHERE guild_id = ?) < ?`,
         )
         .bind(player.row.id, invite.guild_id, context.now, invite.guild_id, invite.guild_id, rules().size),
-      db
-        .prepare(
-          `UPDATE guild_trial_boards SET joined = joined + ?
-           WHERE guild_id = ? AND week = ? AND EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ? AND joined_at = ?)`,
-        )
-        .bind(joinShare(trialDay(context.now, content)), invite.guild_id, questPeriod('weekly', context.now, content).key, player.row.id, invite.guild_id, context.now),
+      weekJoin(db, 'guild_trial_boards', invite.guild_id, player.row.id, context.now),
       // The Wyprawa Gildii's route of the week counts it in part too: its
       // next stages take more minutes and its next guardians more HP.
-      db
-        .prepare(
-          `UPDATE guild_expeditions SET joined = joined + ?
-           WHERE guild_id = ? AND week = ? AND EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ? AND joined_at = ?)`,
-        )
-        .bind(joinShare(trialDay(context.now, content)), invite.guild_id, questPeriod('weekly', context.now, content).key, player.row.id, invite.guild_id, context.now),
+      weekJoin(db, 'guild_expeditions', invite.guild_id, player.row.id, context.now),
     ]);
   } catch {
     throw new ApiError(409, 'in_guild', 'Najpierw opuść swoją gildię.');

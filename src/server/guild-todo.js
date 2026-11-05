@@ -5,7 +5,8 @@
 // zrobienia"): a trial to take while none is taken, or a trials' chest to
 // open; an attack on the Bestia Gildii left today while it lives, or its
 // chest to open; an attack left today on the Wyprawa's guardian barring the
-// way, for one who added minutes this week, or a guardian's chest to open;
+// way, for one who added minutes this week, or a guardian's chest to open
+// (no attack while the character offers itself or serves as a mercenary);
 // a gift to its request not thanked for yet. The page asks
 // for it about once a minute (src/client/chat-news.js) and after its
 // actions in the guild.
@@ -23,17 +24,20 @@ export async function getGuildTodo(context) {
   if (!guild) return json({ todo: null });
   const [trials, beast, expedition, requests] = await Promise.all([
     trialsView(db, player, guild, context.now),
-    beastView(db, player.row, context.now),
-    expeditionView(db, player.row, guild, context.now),
+    beastView(db, player.row, context.now, player.activity),
+    expeditionView(db, player.row, guild, context.now, player.activity),
     requestsView(db, player, guild, context.now),
   ]);
   const ready = (bar) => Boolean(bar?.thresholds.some((threshold) => threshold.ready));
+  // An attack it may make now: none while it offers itself or serves as a
+  // mercenary (attacks.blocked), as the attack would refuse.
+  const canAttack = (attacks) => attacks.left > 0 && !attacks.blocked;
   return json({
     todo: {
       // A chest to open: the trials themselves run without taking (617).
       trials: ready(trials.bar) || ready(trials.previous),
-      beast: Boolean(beast.beast && !beast.beast.fallen && beast.attacks.left > 0) || beast.chests.length > 0,
-      expedition: Boolean(expedition.expedition?.barred && expedition.contributor && expedition.attacks.left > 0) || expedition.chests.length > 0,
+      beast: Boolean(beast.beast && !beast.beast.fallen && canAttack(beast.attacks)) || beast.chests.length > 0,
+      expedition: Boolean(expedition.expedition?.barred && expedition.contributor && canAttack(expedition.attacks)) || expedition.chests.length > 0,
       requests: Boolean(requests.mine?.gifts.some((gift) => !gift.thanked)),
     },
   });

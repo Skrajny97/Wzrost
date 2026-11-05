@@ -221,11 +221,20 @@ export function mountGuildExpedition(container) {
     const hp =
       standing &&
       bar({ label: 'HP', value: guardian.hp, max: guardian.maxHp, text: `${formatNumber(guardian.hp)} / ${formatNumber(guardian.maxHp)}`, kind: 'hp', className: 'guild-beast-hp', name: `${guardian.name}: HP` });
+    // "Atakuj" shut, with the words of why, while the character offers
+    // itself or serves as a mercenary (attacks.blocked).
     const actions = standing
       ? contributor
         ? [
             h('p', { class: 'guild-beast-attacks', text: [filled(texts.attacksLeft, { left: attacks.left, perDay: attacks.perDay }), attacks.left === 0 && texts.newAttacks].filter(Boolean).join('. ') }),
-            h('button', { type: 'button', class: 'button button--system', text: texts.attack, disabled: attacks.left === 0, onClick: (event) => withButton(event.currentTarget, attack) }),
+            attacks.blocked && h('p', { class: 'muted', text: attacks.blocked }),
+            h('button', {
+              type: 'button',
+              class: 'button button--system',
+              text: texts.attack,
+              disabled: attacks.left === 0 || Boolean(attacks.blocked),
+              onClick: (event) => withButton(event.currentTarget, attack),
+            }),
           ]
         : h('p', { class: 'muted', text: texts.contributeFirst })
       : null;

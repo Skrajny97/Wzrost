@@ -149,14 +149,16 @@ export function mountGuildBeast(container) {
     );
   }
 
-  // The beast, its bar, and "Atakuj" with the attacks left today.
+  // The beast, its bar, and "Atakuj" with the attacks left today; shut, with
+  // the words of why, while the character offers itself or serves as a
+  // mercenary (attacks.blocked).
   function beastPart() {
     const { beast, attacks, texts } = view;
     const button = h('button', {
       type: 'button',
       class: 'button button--system',
       text: texts.attack,
-      disabled: beast.fallen || attacks.left === 0,
+      disabled: beast.fallen || attacks.left === 0 || Boolean(attacks.blocked),
       onClick: (event) => withButton(event.currentTarget, attack),
     });
     return [
@@ -177,6 +179,7 @@ export function mountGuildBeast(container) {
         : h('p', { class: 'muted', text: texts.until }),
       !beast.fallen && [
         h('p', { class: 'guild-beast-attacks', text: [filled(texts.attacksLeft, { left: attacks.left, perDay: attacks.perDay }), attacks.left === 0 && texts.newAttacks].filter(Boolean).join('. ') }),
+        attacks.blocked && h('p', { class: 'muted', text: attacks.blocked }),
         button,
       ],
     ];

@@ -165,7 +165,7 @@ describe('the Bestia Gildii through the API', () => {
     assert.equal(seen.beast.maxHp, guildBeast({ seed: `${await guildId()}:${seen.beast.week}`, levels: [40, 50] }, content).maxHp);
     assert.ok(content.monstersById[seen.beast.monsterId].champion);
     assert.equal(seen.beast.week, questPeriod('weekly', Date.now(), content).key);
-    assert.deepEqual(seen.attacks, { left: rules.attacksPerDay, perDay: rules.attacksPerDay });
+    assert.deepEqual(seen.attacks, { left: rules.attacksPerDay, perDay: rules.attacksPerDay, blocked: null });
     assert.deepEqual(seen.contribution, []);
     assert.deepEqual(seen.chests, []);
     assert.ok(seen.texts.rules.length > 0 && !seen.texts.rules.join(' ').includes('{'));

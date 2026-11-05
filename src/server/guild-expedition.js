@@ -39,7 +39,7 @@ import {
   questPeriod,
 } from '../engine/index.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
-import { bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
+import { attackBlocked, bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { guildOf } from './guilds.js';
@@ -92,7 +92,9 @@ const routeRow = (db, guildId, week) => db.prepare('SELECT * FROM guild_expediti
 
 // The guild's route of the week: the one kept, or one made now from the
 // members' character levels, with the members whose accounts were in the
-// game in the last activeDays days counted, at least one. Of two requests at
+// game in the last activeDays days counted, at least one, their ids kept
+// with it (`counted`), so one of them who leaves and joins again this week
+// adds no second share (acceptGuildInvite in guilds.js). Of two requests at
 // once, the first one's stays. A new route takes the rows of the weeks
 // before the last one away, of every guild: nothing of them shows or opens
 // any more (as the Bestia's beasts).
@@ -103,7 +105,10 @@ async function routeOf(db, guildId, now) {
   const [levels, active] = await db.batch([
     db.prepare('SELECT c.level FROM guild_members m JOIN characters c ON c.id = m.character_id WHERE m.guild_id = ?').bind(guildId),
     db
-      .prepare('SELECT COUNT(*) AS count FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id WHERE m.guild_id = ? AND u.seen_at >= ?')
+      .prepare(
+        `SELECT COUNT(*) AS count, json_group_array(m.character_id) AS ids
+         FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id WHERE m.guild_id = ? AND u.seen_at >= ?`,
+      )
       .bind(guildId, now - rules().activeDays * DAY),
   ]);
   const route = guildExpedition({ levels: levels.results.map((member) => member.level) }, content);
@@ -114,8 +119,8 @@ async function routeOf(db, guildId, now) {
     db.prepare('DELETE FROM guild_expedition_minutes WHERE week < ?').bind(previous.key),
     db.prepare('DELETE FROM guild_expedition_chests WHERE week < ?').bind(previous.key),
     db
-      .prepare('INSERT OR IGNORE INTO guild_expeditions (guild_id, week, land_id, level, guardians, active, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .bind(guildId, current.key, route.landId, route.level, JSON.stringify(route.guardians), Math.max(1, active.results[0].count), now),
+      .prepare('INSERT OR IGNORE INTO guild_expeditions (guild_id, week, land_id, level, guardians, active, counted, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(guildId, current.key, route.landId, route.level, JSON.stringify(route.guardians), Math.max(1, active.results[0].count), active.results[0].ids, now),
   ]);
   return routeRow(db, guildId, current.key).first();
 }
@@ -186,23 +191,27 @@ async function routeState(db, guild, row, now) {
   return { route, day, guardians: guardians.results, minutes: minutes.results, total, own, used: used.results[0].count, ...state };
 }
 
+// SQL of the guardians whose chests a character may open (chestsOf), with
+// the binds: the two weeks, the character's id and when it was made, twice.
+// It starts from the character's own minutes of those weeks (a row a guild
+// and week, by the index on the character), so it reads the routes of the
+// guilds it added minutes in and not those of every guild; it is run on
+// every look at the guild's dots (GET /api/guild/todo).
+export const CHESTS_SQL = `SELECT g.id, g.stage, g.monster_id, g.area_id, g.level, e.week
+  FROM guild_expedition_minutes m
+  JOIN guild_expeditions e ON e.guild_id = m.guild_id AND e.week = m.week
+  JOIN guild_expedition_guardians g ON g.expedition_id = e.id
+  WHERE m.character_id = ? AND m.week IN (?, ?) AND m.minutes > 0 AND m.updated_at >= ? AND g.hp <= 0
+    AND NOT EXISTS (SELECT 1 FROM guild_expedition_chests x WHERE x.character_id = ? AND x.week = e.week AND x.stage = g.stage AND x.claimed_at >= ?)
+  ORDER BY e.week, g.stage, g.id`;
+
 // The Skrzynie Wyprawy the character may open now: one for each guardian
 // fallen this week or the last one on the route of a guild where it added
 // minutes that week, once a week and stage whatever its guild (of two such
 // guilds, the first), this week's until the end of the next one.
 async function chestsOf(db, row, now) {
   const { current, previous, nextEndsAt } = weeksAround(now);
-  const { results } = await db
-    .prepare(
-      `SELECT g.id, g.stage, g.monster_id, g.area_id, g.level, e.week
-       FROM guild_expedition_guardians g JOIN guild_expeditions e ON e.id = g.expedition_id
-       WHERE e.week IN (?, ?) AND g.hp <= 0
-         AND EXISTS (SELECT 1 FROM guild_expedition_minutes m WHERE m.guild_id = e.guild_id AND m.week = e.week AND m.character_id = ? AND m.minutes > 0 AND m.updated_at >= ?)
-         AND NOT EXISTS (SELECT 1 FROM guild_expedition_chests x WHERE x.character_id = ? AND x.week = e.week AND x.stage = g.stage AND x.claimed_at >= ?)
-       ORDER BY e.week, g.stage, g.id`,
-    )
-    .bind(previous.key, current.key, row.id, row.created_at, row.id, row.created_at)
-    .all();
+  const { results } = await db.prepare(CHESTS_SQL).bind(row.id, previous.key, current.key, row.created_at, row.id, row.created_at).all();
   const seen = new Set();
   return results.flatMap((one) => {
     const key = `${one.week}:${one.stage}`;
@@ -247,9 +256,11 @@ const chestView = (chest) => ({ week: chest.week, stage: chest.stage, monsterId:
 // level, the stage now with its minutes walked and needed, the minutes kept
 // at a guardian, every stage's guardian (fallen, barring the way, or ahead
 // with the minutes to it), the attacks the character has left today and
-// whether it may attack (it added minutes this week), the "Wkład tygodnia"
-// (who added how many minutes, the most first), its chests, and the words.
-export async function expeditionView(db, row, guild, now) {
+// whether it may attack (it added minutes this week; `attacks.blocked`, the
+// words of why not, while its `activity` is an offer or a service as a
+// mercenary: attackBlocked), the "Wkład tygodnia" (who added how many
+// minutes, the most first), its chests, and the words.
+export async function expeditionView(db, row, guild, now, activity = null) {
   const chests = (await chestsOf(db, row, now)).map(chestView);
   if (!guild) return { expedition: null, chests, texts: tabTexts() };
   const state = await routeState(db, guild, row, now);
@@ -296,7 +307,7 @@ export async function expeditionView(db, row, guild, now) {
       guardians,
       placeName: area?.name ?? null,
     },
-    attacks: { left: Math.max(0, perDay - state.used), perDay },
+    attacks: { left: Math.max(0, perDay - state.used), perDay, blocked: attackBlocked(activity, words().mercenary) },
     contributor: state.own > 0,
     own: { minutes: state.own },
     contribution: state.minutes.filter((one) => one.name && one.minutes > 0).map((one) => ({ name: one.name, minutes: one.minutes, own: one.character_id === row.id })),
@@ -308,7 +319,7 @@ export async function expeditionView(db, row, guild, now) {
 // GET /api/guild/expedition
 export async function getGuildExpedition(context) {
   const { player, db } = await requireExpeditionPlayer(context);
-  return json(await expeditionView(db, player.row, await guildOf(db, player.row.id), context.now));
+  return json(await expeditionView(db, player.row, await guildOf(db, player.row.id), context.now, player.activity));
 }
 
 // The engine's guardian, for the Bestia's fight, from its row.
@@ -381,7 +392,7 @@ export async function attackGuildGuardian(context) {
       log: fight.log,
       fight: fight.replay,
     },
-    ...(await expeditionView(db, row, guild, now)),
+    ...(await expeditionView(db, row, guild, now, player.activity)),
   });
 }
 
@@ -456,6 +467,6 @@ export async function claimGuildExpeditionChest(context) {
       text: filled(words().opened, { contents }),
     },
     character: characterView(after, now),
-    ...(await expeditionView(db, after.row, await guildOf(db, after.row.id), now)),
+    ...(await expeditionView(db, after.row, await guildOf(db, after.row.id), now, after.activity)),
   });
 }

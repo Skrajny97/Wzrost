@@ -615,6 +615,12 @@ export function requireNotExploring(player, now) {
   if (['hunt', 'mercenary'].includes(player.activity?.kind)) requireIdle(player, now);
 }
 
+// Why the Gildia's fights (the Bestia, a guardian of the Wyprawa) are shut
+// to the character now, in `text`, or null: while its activity is an offer
+// or a service as a mercenary, as the attacks themselves refuse then, so
+// its pages offer no attack and its dots stay off.
+export const attackBlocked = (activity, text) => (activity?.kind === 'mercenary' ? text : null);
+
 // The character for a change of its stat points, skills or evolution (above).
 export async function requireBuildPlayer(context) {
   const found = await requirePlayer(context);
