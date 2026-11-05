@@ -3034,6 +3034,18 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.58 (5.11.2026)
+
+Tablica zleceń w dwóch zakładkach (prośba autora): zob. „Tablica zleceń w dwóch zakładkach”.
+
+## Tablica zleceń w dwóch zakładkach (5.11.2026, w grze od 0.1.58)
+
+Autor: „Podziel tablicę zleceń na dwie zakładki - zlecenia i poszukiwani bo za dużo scrollowania”.
+
+1. Pod kartą sołtysa są dwie zakładki: „Zlecenia” (zlecenia z tablicy, zlecenie tygodnia i Bractwa) i „Poszukiwani” (listy gończe).
+2. Na wejściu otwiera się „Zlecenia”. Wybrana zakładka zostaje, dopóki gracz nie wyjdzie z Osady.
+3. Żółta kropka na zakładce mówi, że czeka tam coś do oddania: zlecenie gotowe do oddania albo nagroda za pokonanego poszukiwanego.
+
 ## Wersja 0.1.57 (5.11.2026)
 
 Zadania miesięczne od narratora (prośba autora): zob. „Zadania miesięczne od narratora”.

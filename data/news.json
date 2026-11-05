@@ -95,6 +95,11 @@
       "id": "0.1.57",
       "title": "Wersja 0.1.57: zadania miesięczne",
       "body": "- Narrator ma zadania miesięczne: trzecia zakładka obok dziennych i tygodniowych.\n- Pięć zadań na cały miesiąc. Liczą się te same wyprawy i prace co w zadaniach dziennych i tygodniowych.\n- Skrzynia za wszystkie: +240 Punktów Czasu, +50 Punktów Systemu i złoto zależne od poziomu postaci.\n- Zadania tego miesiąca są na dni, które z niego zostały."
+    },
+    {
+      "id": "0.1.58",
+      "title": "Wersja 0.1.58: Tablica zleceń w zakładkach",
+      "body": "- Tablica zleceń ma dwie zakładki: Zlecenia i Poszukiwani. Jest mniej przewijania.\n- Żółta kropka na zakładce pokazuje, że czeka tam zlecenie do oddania albo nagroda do odebrania."
     }
 ]
 }

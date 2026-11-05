@@ -73,6 +73,10 @@ export function mountSettlement(container, { params = {} } = {}) {
   let herbalistTab = 'buy';
   // Wszebor's tab in the Garbarnia (tannery.js), as Jagna's.
   let tanneryTab = 'buy';
+  // The Tablica zleceń's tab: the sołtys's orders first, then Poszukiwani
+  // (the author: "Podziel tablicę zleceń na dwie zakładki - zlecenia i
+  // poszukiwani bo za dużo scrollowania"), kept while the screen redraws.
+  let boardTab = 'orders';
   // The Targowisko's panel, mounted once and kept while the screen redraws
   // itself, so that a redraw does not ask the server for it again.
   let market = null;
@@ -1172,10 +1176,41 @@ export function mountSettlement(container, { params = {} } = {}) {
   };
 
   // Whether the Tablica has an order to deliver now, or a wanted poster's
-  // bounty waits (wanted.js), for its dot on the board.
-  const deliverable = () =>
-    [...data.board.slots.map((slot) => slot.order), data.board.weekly].some((order) => order && order.have >= order.count) ||
-    [data.wanted?.earlier, ...(data.wanted?.posters ?? [])].some((poster) => poster?.state === 'beaten');
+  // bounty waits (wanted.js), for its dot on the board and on its tabs.
+  const ordersReady = () => [...data.board.slots.map((slot) => slot.order), data.board.weekly].some((order) => order && order.have >= order.count);
+  const bountyReady = () => [data.wanted?.earlier, ...(data.wanted?.posters ?? [])].some((poster) => poster?.state === 'beaten');
+  const deliverable = () => ordersReady() || bountyReady();
+
+  // The Tablica's two tabs: the sołtys's orders with the brotherhoods, and
+  // the wanted posters (619 B), each with a dot while something waits to be
+  // handed in there. Without the posters, the orders alone.
+  function boardTabs() {
+    const wanted = wantedCard(data.wanted, apply);
+    if (!wanted) return [boardCard(), brotherhoodsCard()];
+    const tab = (id, label, waiting) =>
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'chat-tab',
+          role: 'tab',
+          'data-guide': `board-tab-${id}`,
+          'aria-selected': String(boardTab === id),
+          onClick: () => {
+            boardTab = id;
+            render();
+          },
+        },
+        h('span', { class: 'chat-tab-name', text: label }),
+        waiting && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'do odebrania' }),
+      );
+    return h(
+      'div',
+      { class: 'stack' },
+      h('div', { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': 'Tablica zleceń' }, tab('orders', 'Zlecenia', ordersReady()), tab('wanted', 'Poszukiwani', bountyReady())),
+      boardTab === 'wanted' ? wanted : [boardCard(), brotherhoodsCard()],
+    );
+  }
 
   // A torch on the board, at its own size, standing on its spot: its flame
   // flickers and glows as the camp's fire does, more at dusk and at night
@@ -1298,8 +1333,8 @@ export function mountSettlement(container, { params = {} } = {}) {
       place.soon && systemPanel(`${place.name} otworzy się w jednej z kolejnych aktualizacji gry.`),
       resident && residentCard(resident, place.backdrop),
       !place.soon && resident && services(resident),
-      // Poszukiwani (619 B): the sołtys's wanted posters, under his orders.
-      place.id === 'board' && [boardCard(), wantedCard(data.wanted, apply), brotherhoodsCard()],
+      // The sołtys's orders and Poszukiwani (619 B), each in its tab.
+      place.id === 'board' && boardTabs(),
       place.id === 'market' && !place.soon && marketPanel(),
       // The Stajnia's mounts (327 A), under Mirosław's card.
       place.id === 'stable' && !place.soon && data.stable && stableCard(data.stable, apply),
