@@ -190,6 +190,11 @@
       "id": "0.1.76",
       "title": "Wersja 0.1.76: najemnik w drodze i równy szereg",
       "body": "- Najemnik z Karczmy idzie obok Twojej postaci na ekranie Walka, we własnym wyglądzie i na swoim wierzchowcu.\n- Towarzysze i najemnik idą równo z postacią, a gdy jedziesz wierzchem, idący pieszo są mniejsi i stąpają po tej samej ścieżce co kopyta.\n- Chody towarzyszy nie migają już szarymi plamkami na obrysie: każdą klatkę przejrzano piksel po pikselu."
+    },
+    {
+      "id": "0.1.77",
+      "title": "Wersja 0.1.77: objaśnienia do pominięcia",
+      "body": "- W Ustawieniach, pod „Głosem narratora”, jest przełącznik „Pomijaj objaśnienia narratora”. Działa dla wszystkich postaci na koncie: narrator nie objaśnia nowych zakładek i miejsc, a nowa postać zaczyna bez wprowadzenia.\n- Stuknij kamień w karcie przedmiotu, a zobaczysz, co daje. Kamień podnosi wszystkie wartości przedmiotu.\n- Kruk i Błędny ognik nie zasłaniają już tego, co Twoja postać trzyma na portrecie.\n- Gdy jedziesz wierzchem, idący pieszo obok są mniejsi, jak przy prawdziwym koniu.\n- Towarzysze w drodze mają czarny obrys w każdej klatce chodu."
     }
 ]
 }
