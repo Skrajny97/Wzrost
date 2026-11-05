@@ -1,0 +1,14 @@
+{
+  "id": "ferezja",
+  "tool": "pixellab generate-image-v2",
+  "description": "a ferezja: a long loose polish noble robe of deep emerald green silk brocade with long hanging sleeves, a plain standing collar, gold braided frog fastenings across the chest and a faintly glowing gold-embroidered hem, an empty garment with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/star-robe.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

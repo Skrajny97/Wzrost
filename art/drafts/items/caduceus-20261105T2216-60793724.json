@@ -1,0 +1,14 @@
+{
+  "id": "caduceus",
+  "tool": "pixellab generate-image-v2",
+  "description": "a caduceus: a short silver rod with two golden serpents winding up around it and facing each other at the top, a pair of white feathered wings spread above them around a small glowing pale blue orb, diagonal, single inventory item icon",
+  "style": "src/client/art/items/star-staff.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

@@ -1,0 +1,14 @@
+{
+  "id": "halo",
+  "tool": "pixellab generate-image-v2",
+  "description": "a radiant golden halo, a ring of golden light, hovering above a white silk hood with a short shoulder cape and a golden sun embroidered on the brow, soft golden rays around the ring, an empty hood with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/cowl.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

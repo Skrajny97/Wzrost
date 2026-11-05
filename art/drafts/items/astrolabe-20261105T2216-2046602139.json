@@ -1,0 +1,14 @@
+{
+  "id": "astrolabe",
+  "tool": "pixellab generate-image-v2",
+  "description": "a brass astrolabe: a round engraved brass disc with an openwork star map of curling pointers over its face, a long pointer across it and a ring at the top, faint blue starlight glowing through the openings, standing upright in a small dark bronze stand, single inventory item icon",
+  "style": "src/client/art/items/crystal-ball.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

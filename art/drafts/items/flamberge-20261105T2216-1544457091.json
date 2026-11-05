@@ -1,0 +1,14 @@
+{
+  "id": "flamberge",
+  "tool": "pixellab generate-image-v2",
+  "description": "a flamberge: a long two-handed sword with a wavy flame-shaped double-edged steel blade, a wide straight crossguard with two small side hooks just below it, a long black grip wound with gold wire and a round gold pommel, diagonal, single inventory item icon",
+  "style": "src/client/art/items/kris.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

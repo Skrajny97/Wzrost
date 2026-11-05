@@ -1,0 +1,14 @@
+{
+  "id": "processional-cross",
+  "tool": "pixellab generate-image-v2",
+  "description": "a processional cross: a silver cross with gilded trefoil ends on its arms and a glowing white gem at the crossing that radiates holy light, a gold knob below it, on a long gilded staff, diagonal, single inventory item icon",
+  "style": "src/client/art/items/crozier.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

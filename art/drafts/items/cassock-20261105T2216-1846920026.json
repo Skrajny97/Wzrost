@@ -1,0 +1,14 @@
+{
+  "id": "cassock",
+  "tool": "pixellab generate-image-v2",
+  "description": "a bishop's cassock: a long violet cassock with a short shoulder cape, a row of small crimson buttons from the collar to the hem, a wide violet silk sash with tassels and a gold pectoral cross on a chain, an empty garment with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/dalmatic.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

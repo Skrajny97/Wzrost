@@ -1,0 +1,14 @@
+{
+  "id": "sabatons",
+  "tool": "pixellab generate-image-v2",
+  "description": "a pair of steel sabatons: armoured plate shoes of overlapping steel lames with broad rounded bear-paw toes, gilded edges and small gold rivets, single inventory item icon",
+  "style": "src/client/art/items/laced-shoes.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

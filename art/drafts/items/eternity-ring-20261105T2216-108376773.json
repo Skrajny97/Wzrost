@@ -1,0 +1,14 @@
+{
+  "id": "eternity-ring",
+  "tool": "pixellab generate-image-v2",
+  "description": "an eternity ring: a slim gold band set all the way around with a continuous row of small sparkling gems in many colours, red, green, blue and white, single inventory item icon",
+  "style": "src/client/art/items/band-ring.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

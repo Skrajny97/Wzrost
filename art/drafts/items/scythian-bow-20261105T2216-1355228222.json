@@ -1,0 +1,14 @@
+{
+  "id": "scythian-bow",
+  "tool": "pixellab generate-image-v2",
+  "description": "a scythian bow: a short bow with a deep double curve, two rounded humps on either side of the grip like a cupid's bow and tips curling forward, its limbs covered in pale birch bark and banded with gold, gold-capped tips, a taut string, diagonal, single inventory item icon",
+  "style": "src/client/art/items/recurve-bow.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

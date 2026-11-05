@@ -1,0 +1,14 @@
+{
+  "id": "double-axe",
+  "tool": "pixellab generate-image-v2",
+  "description": "a great double-bladed battle axe: two broad symmetrical crescent steel blades on both sides of the head, a short spike on top, a dark wooden haft bound with iron bands and a leather-wrapped grip, diagonal, single inventory item icon",
+  "style": "src/client/art/items/axe.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

@@ -1,0 +1,14 @@
+{
+  "id": "jousting-shield",
+  "tool": "pixellab generate-image-v2",
+  "description": "a jousting shield: a curved heater shield with a round notch cut into one upper corner to rest a lance, painted in deep blue and gold quarters, with a polished steel rim, single inventory item icon",
+  "style": "src/client/art/items/heraldic-shield.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

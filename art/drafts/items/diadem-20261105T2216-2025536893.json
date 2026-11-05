@@ -1,0 +1,14 @@
+{
+  "id": "diadem",
+  "tool": "pixellab generate-image-v2",
+  "description": "a diadem: a slender silver circlet seen from the front, a thin band curving up to a point in the middle, set with a glowing red ruby between two small pearls, fine silver filigree along the band, an empty circlet with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/mask.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

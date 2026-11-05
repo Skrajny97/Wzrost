@@ -1,0 +1,14 @@
+{
+  "id": "cinquedea",
+  "tool": "pixellab generate-image-v2",
+  "description": "a cinquedea: a short broad dagger with a very wide triangular steel blade, broad as a palm at the hilt and tapering to a sharp point, three short grooves near the hilt, a gilded guard arched toward the blade and an ivory grip with gold rivets, diagonal, single inventory item icon",
+  "style": "src/client/art/items/kindjal.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

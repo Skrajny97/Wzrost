@@ -1,0 +1,14 @@
+{
+  "id": "lunula",
+  "tool": "pixellab generate-image-v2",
+  "description": "a lunula: a slavic crescent moon pendant of silver with its horns pointing up, decorated with fine granulation and three small hanging drops, on a braided leather cord with two small silver beads, single inventory item icon",
+  "style": "src/client/art/items/fang-charm.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

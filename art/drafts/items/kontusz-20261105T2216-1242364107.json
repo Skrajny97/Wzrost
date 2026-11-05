@@ -1,0 +1,14 @@
+{
+  "id": "kontusz",
+  "tool": "pixellab generate-image-v2",
+  "description": "a polish kontusz: a long deep blue noble coat with split sleeves thrown back over the shoulders and hanging down at the sides, showing a crimson lining, small gold loop fastenings down the front and a wide gold and silver striped silk sash at the waist, an empty garment with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/caftan.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

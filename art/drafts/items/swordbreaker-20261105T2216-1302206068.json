@@ -1,0 +1,14 @@
+{
+  "id": "swordbreaker",
+  "tool": "pixellab generate-image-v2",
+  "description": "a swordbreaker: a heavy parrying dagger with a thick straight steel blade whose back edge is cut into a row of deep comb-like slots to catch enemy blades, a straight brass crossguard and a dark leather grip with a round brass pommel, diagonal, single inventory item icon",
+  "style": "src/client/art/items/parrying-dagger.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

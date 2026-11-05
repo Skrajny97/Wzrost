@@ -1,0 +1,14 @@
+{
+  "id": "parade-quiver",
+  "tool": "pixellab generate-image-v2",
+  "description": "a parade quiver: a tall stiff quiver covered in crimson silk embroidered with gold thread and set with small turquoise stones, gold trim around the top, full of arrows with white swan feather fletching, single inventory item icon",
+  "style": "src/client/art/items/war-quiver.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}
