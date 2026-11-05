@@ -3034,6 +3034,35 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.70 (5.11.2026)
+
+Nowe i poprawione kwestie narratora z nagraniami wybranymi przez autora oraz poprawki samouczków: zob. „Samouczki: kwestie 641–647 i poprawki narratora”.
+
+## Samouczki: kwestie 641–647 i poprawki narratora (5.11.2026, w grze od 0.1.70)
+
+Przegląd samouczków znalazł kwestie, które nie pasowały już do gry, i nowe miejsca bez objaśnienia. Autor zatwierdził teksty („641 A”, „643 A”, „645 A”, „646 A”, 644 i 647 w swoim brzmieniu, „642 B tylko "Drużynę założysz od 10. poziomu" a nie zbierzesz”) i wybrał nagrania: „641 B, 642 A, 643 B, 644 B, 645 B, 646 A, 647 A”, a o 642 potem: „642 B jednak zatem”.
+
+1. **Zmienione kwestie.**
+    - Karczma, zakładka Towarzysze (641): „Tu szukają pracy przyszli towarzysze. Zwerbowany rusza z Tobą na wyprawy i rośnie w siłę razem z Tobą.” Słowo „najemnicy” myliło się z zakładką Najemnicy. Nagranie B.
+    - Społeczność, zakładki (642): „U góry przełączasz zakładki: Czat, Znajomi, Ranking i Gildia. Drużynę założysz od 10. poziomu.” Nagranie B.
+    - Kto już słyszał dawne brzmienie, nie usłyszy tych kwestii drugi raz.
+2. **Nowe kwestie przy pierwszym wejściu**, każda w swoim miejscu, z pierścieniem wokół niego:
+    - Karczma, zakładka Najemnicy (643), gdy otworzy się postaci (od 25. poziomu): „Tu wystawisz swoją postać do wynajęcia albo weźmiesz cudzą na swoją wyprawę. Płaci ten, kto najmuje, za każdą godzinę drogi.” Nagranie B.
+    - Tablica zleceń, zakładka Poszukiwani (644): „Sołtys rozwiesza tu też listy gończe. Weź list i wyrusz tam, gdzie widziano cel. Jeśli go spotkasz i pokonasz, nagroda jest Twoja.” Nagranie B.
+    - Sala prób (645): „Raz dziennie stoczysz tu trzy walki ze stworami z kolejnego miejsca. Zdrowie nie wraca między nimi, ale mikstury działają. Wygrasz, a to miejsce otworzy się dla Ciebie od razu.” Nagranie B.
+    - Gildia, zakładka Wyprawa (646), w gildii: „Każda minuta Twoich wypraw prowadzi gildię naprzód. Na końcu etapu czeka strażnik. Atakujesz go trzy razy dziennie, a gdy padnie, każdy, kto dołożył minut, dostaje skrzynię.” Nagranie A.
+    - Obóz po przemianie w Warownię (647), jako karta na środku ekranu: „Twój obóz stał się Warownią. Każda z jej siedmiu budowli coś daje: trening, błogosławieństwo, zioła albo lepsze tropienie. Zaglądaj tu codziennie.” Nagranie A.
+3. **Kto je usłyszy** (brakujący szczegół): każdy, kto jeszcze ich nie słyszał, także gracze, którzy dawno skończyli rozdział Osady, przy najbliższym wejściu w to miejsce. Przychodzą tylko wtedy, gdy nie czeka żaden inny rozdział.
+4. **Dwie nowe części objaśnień:** Gildia i Warownia, każda z „Pomiń objaśnienie”, jak pozostałe.
+5. **Obchód Osady.** Na końcu rozdziału Osady narrator obiecuje opowiedzieć o każdym miejscu przy pierwszym wejściu, a pierścień obejmuje teraz także Salon Gier i Salę prób.
+6. **Poprawki narratora** (bez nowych nagrań):
+    - rozdziały Rzemieślnictwa i Górnictwa czekają, aż postać albo jej Awatar Systemu będzie wolny, bo formularze Warsztatu, Kopalni i Szlifierni pokazują się tylko wtedy; wcześniej w czasie wyprawy rozdział gubił kwestie;
+    - kwestie miejsc Osady czekają na koniec każdego innego rozdziału, także Ewolucji, Wież i Górnictwa, zamiast wchodzić w jego środek;
+    - przy wolnym internecie kwestia nie przepada, gdy ekran rysuje się długo: po 2 sekundach ekran wraca do gracza, a narrator szuka miejsca jeszcze przez 8 sekund;
+    - kwestia o bractwach wskazuje panel „Akceptacja Bractw”, a nie Tablicę zleceń;
+    - kwestia o zwojach w Kuźni obejmuje jednym pierścieniem oba zwoje, ochronny i utrwalenia.
+7. **Sprawdzone w przeglądarce:** postać, która przeczytała wszystko poza nowymi kwestiami, odwiedza Karczmę, Tablicę zleceń, Salę prób, Kuźnię i Wyprawę Gildii. Każda kwestia pokazuje się na swoim miejscu i zostaje zapisana jako przeczytana.
+
 ## Wersja 0.1.69 (5.11.2026)
 
 Drużyna od 10. poziomu postaci: zob. „Drużyna od 10. poziomu (642 B)”. Drużyna idzie na ekranie Walka obok siebie: zob. „Drużyna w drodze obok siebie (640 A)”. Zakładki Gildii stoją w dwóch niższych rzędach: zob. „Zakładki Gildii w dwóch rzędach”.

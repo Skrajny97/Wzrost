@@ -155,6 +155,11 @@
       "id": "0.1.69",
       "title": "Wersja 0.1.69: Drużyna od 10. poziomu i wspólny marsz",
       "body": "- Drużynę założysz już od 10. poziomu postaci, a nie od 25.\n- Na wyprawie drużyny w Walce idziecie obok siebie: każdy w swoim wyglądzie, na swoim wierzchowcu, z aurą, śladami i chowańcem.\n- Zakładki Gildii stoją w dwóch niższych rzędach, więc jest więcej miejsca na nazwy."
+    },
+    {
+      "id": "0.1.70",
+      "title": "Wersja 0.1.70: nowe objaśnienia narratora",
+      "body": "- Narrator opowiada o Najemnikach w Karczmie, listach gończych na Tablicy zleceń, Sali prób, Wyprawie Gildii i Warowni, gdy wejdziesz tam pierwszy raz.\n- Przy wolnym internecie wskazówki narratora nie przepadają.\n- Objaśnienia Rzemieślnictwa i Górnictwa czekają, aż wrócisz z wyprawy."
     }
 ]
 }
