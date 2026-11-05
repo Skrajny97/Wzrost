@@ -288,6 +288,28 @@ describe('mercenaries through the API', () => {
     assert.equal(paid.data.paid, 800);
   });
 
+  test('"Odbierz raport" on an offer or a service answers with the Karczma\'s words; the pay waits there', async () => {
+    // The code review: POST /api/hunts/claim ran an exploration's claim on it
+    // and failed with a server error.
+    await as('najemna', 'POST', '/api/mercenary/offer', { hours: 1, perHour: 300 });
+    const waiting = await as('najemna', 'POST', '/api/hunts/claim');
+    assert.equal(waiting.status, 409);
+    assert.equal(waiting.data.error.code, 'busy');
+    assert.equal(waiting.data.error.message, rules.texts.busy);
+    // Hired, and the exploration called back: the service is over.
+    const id = (await row('Najemna')).id;
+    assert.equal((await as('zlecenie', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 60, mercenary: { id, perHour: 300 } })).status, 201);
+    assert.equal((await as('zlecenie', 'POST', '/api/hunts/cancel')).status, 200);
+    const ended = await as('najemna', 'POST', '/api/hunts/claim');
+    assert.equal(ended.status, 409, JSON.stringify(ended.data).slice(0, 300));
+    assert.equal(ended.data.error.code, 'claim_first');
+    assert.equal(ended.data.error.message, rules.texts.claimFirst);
+    // Nothing was taken: the pay is claimed in the Karczma.
+    const paid = await as('najemna', 'POST', '/api/mercenary/claim');
+    assert.equal(paid.status, 200, JSON.stringify(paid.data).slice(0, 300));
+    assert.equal(paid.data.paid, 300);
+  });
+
   test('an offer nobody took closes with nothing paid', async () => {
     await as('najemna', 'POST', '/api/mercenary/offer', { hours: 1, perHour: 300 });
     await as('najemna', 'POST', '/api/test/skip-time');

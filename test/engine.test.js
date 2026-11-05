@@ -2490,6 +2490,20 @@ describe('quests from the narrator', () => {
     // The month's rewards: four weeks'.
     const rewards = content.quests.rewards;
     assert.equal(rewards.monthly.gold.perLevel, rewards.weekly.gold.perLevel * 4);
+    // Drawn anew, a month asks for as much as it was drawn with, on its last
+    // day too (the code review: a thirtieth of the work for its whole
+    // chest); October, drawn with 7 of 31 days left, keeps that share.
+    assert.ok(Math.abs(whole.share - weekShare(50, 7, content)) < 1e-9);
+    assert.ok(Math.abs(october.monthly.share - (weekShare(50, 7, content) * 7) / 31) < 1e-9);
+    const lastDay = at('2026-11-30T08:00:00Z');
+    const kept = currentQuests(drawn, context, lastDay, content);
+    assert.deepEqual(kept.monthly, whole);
+    const anew = rerolledQuests(kept, 'monthly', context, lastDay, content).monthly;
+    assert.deepEqual(anew, rerolledQuests(drawn, 'monthly', context, first, content).monthly);
+    for (const quest of anew.quests.filter((one) => one.kind === 'explore')) {
+      const [min] = explore.monthly.count;
+      assert.ok(quest.count >= min * weekShare(50, 7, content) - explore.monthly.step, String(quest.count));
+    }
   });
 
   test('a new character gets quests of the creatures of its place, of creatures of any kind and of the time explored', () => {
@@ -2604,10 +2618,25 @@ describe('quests from the narrator', () => {
     assert.equal(rerolledQuests(next, 'daily', context, monday, content), null);
     const all = { ...drawn, weekly: { ...drawn.weekly, quests: drawn.weekly.quests.map((quest) => ({ ...quest, progress: quest.count })) } };
     assert.equal(rerolledQuests(all, 'weekly', context, monday, content), null);
-    // A week's on its last day: what can be done in it, a seventh of level
-    // 12's share (an hour of explorations at most).
-    const sunday = rerolledQuests(drawn, 'weekly', context, at('2026-11-01T08:00:00Z'), content).weekly;
-    assert.ok(sunday.quests.every((quest) => quest.count <= 60), JSON.stringify(sunday.quests));
+    // A week's drawn anew asks for as much as the week was drawn with, on
+    // its last day too (the code review: on a Sunday it asked for a
+    // seventh, for the whole chest). The week keeps its share; a day's
+    // quests are always whole.
+    assert.ok(Math.abs(drawn.weekly.share - weekShare(12, 7, content)) < 1e-9);
+    assert.equal(drawn.daily.share, undefined);
+    const sunday = at('2026-11-01T08:00:00Z');
+    const onMonday = rerolledQuests(drawn, 'weekly', context, monday, content).weekly;
+    assert.deepEqual(rerolledQuests(drawn, 'weekly', context, sunday, content).weekly, onMonday);
+    assert.ok(onMonday.quests.filter((quest) => quest.kind === 'explore').every((quest) => quest.count >= 240), JSON.stringify(onMonday.quests));
+    // A week drawn late keeps the share of the days it was drawn for: from
+    // a Thursday, four of seven.
+    const thursday = at('2026-10-29T08:00:00Z');
+    const late = currentQuests({}, context, thursday, content);
+    assert.ok(Math.abs(late.weekly.share - weekShare(12, 4, content)) < 1e-9);
+    assert.deepEqual(rerolledQuests(late, 'weekly', context, sunday, content).weekly, rerolledQuests(late, 'weekly', context, thursday, content).weekly);
+    // A week kept before its share was: the whole week at the level.
+    const { share: _share, ...older } = drawn.weekly;
+    assert.deepEqual(rerolledQuests({ ...drawn, weekly: older }, 'weekly', context, sunday, content).weekly.quests, onMonday.quests);
   });
 
   test('no quest asks to open the daily chest; a kept one is drawn anew, to be done in what is left of the week', () => {

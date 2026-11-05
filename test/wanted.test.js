@@ -11,12 +11,15 @@ import { beforeEach, describe, test } from 'node:test';
 import {
   areaUnlocked,
   autoDistribute,
+  canUse,
   createRng,
   encounterCombatants,
   exploreStrength,
+  generateItem,
   monsterCombatant,
   questPeriod,
   simulateHunt,
+  trialTarget,
   trophyGrades,
   wantedEncounter,
   wantedGold,
@@ -167,11 +170,18 @@ describe('the wanted posters', () => {
     assert.equal(diana.female, true);
   });
 
-  test('the Osada\'s record after an exploration: the poster in hand is beaten when its target fell', () => {
+  test('the Osada\'s record after an exploration: the poster in hand is beaten when its target fell; one not in hand is done for its day', () => {
     const stored = { wanted: { day: 'd', done: [], taken: { id: 'd:a:b', beaten: false } } };
     assert.deepEqual(wantedAfterHunt(stored, { wanted: { id: 'd:a:b', met: true, beaten: true } }), { day: 'd', done: [], taken: { id: 'd:a:b', beaten: true } });
     assert.equal(wantedAfterHunt(stored, { wanted: { id: 'd:a:b', met: true, beaten: false } }), null);
-    assert.equal(wantedAfterHunt(stored, { wanted: { id: 'd:x:y', met: true, beaten: true } }), null);
+    // Fallen though its poster was not in hand (the code review: given back
+    // on the way, it came back open for another try): done for its day,
+    // with no bounty, and the poster in hand stays as it was.
+    assert.deepEqual(wantedAfterHunt(stored, { wanted: { id: 'd:x:y', met: true, beaten: true } }), { day: 'd', done: ['d:x:y'], taken: { id: 'd:a:b', beaten: false } });
+    assert.deepEqual(wantedAfterHunt({ wanted: { day: 'd', done: ['d:q:r'], taken: null } }, { wanted: { id: 'd:x:y', met: true, beaten: true } }), { day: 'd', done: ['d:q:r', 'd:x:y'], taken: null });
+    // Once, and nothing to mark for a day gone by.
+    assert.equal(wantedAfterHunt({ wanted: { day: 'd', done: ['d:x:y'], taken: null } }, { wanted: { id: 'd:x:y', met: true, beaten: true } }), null);
+    assert.equal(wantedAfterHunt({ wanted: { day: 'e', done: [], taken: null } }, { wanted: { id: 'd:x:y', met: true, beaten: true } }), null);
     assert.equal(wantedAfterHunt({}, { wanted: { id: 'd:a:b', met: true, beaten: true } }), null);
   });
 });
@@ -183,6 +193,31 @@ describe('the wanted posters through the API', () => {
   const row = async () => (await db()).prepare('SELECT gold, time_points, settlement FROM characters').first();
   const wanted = async () => (await call('GET', '/api/settlement', { cookie })).data.settlement.wanted;
   const take = (posterId) => call('POST', '/api/settlement/wanted', { cookie, body: { posterId } });
+  const characterId = async () => (await (await db()).prepare('SELECT id FROM characters').first()).id;
+  const today = () => questPeriod('daily', Date.now(), content).key;
+  // The poster in hand with its target fallen, and its bounty claimed.
+  async function bounty(posterId) {
+    assert.equal((await take(posterId)).status, 200);
+    const stored = JSON.parse((await row()).settlement);
+    stored.wanted.taken.beaten = true;
+    await set('settlement = ?', JSON.stringify(stored));
+    const claimed = await call('POST', '/api/settlement/wanted/claim', { cookie });
+    assert.equal(claimed.status, 200, JSON.stringify(claimed.data).slice(0, 300));
+  }
+  // Strong enough for any target of these places: its points spent and a
+  // legendary item in every slot its class can fill.
+  async function arm() {
+    const shape = newCharacter('warrior', { level: 120, classLevel: 30 });
+    await set('level = 120, points = ?', JSON.stringify(autoDistribute(shape, content)));
+    const rng = createRng('arms');
+    for (const { id: slot } of content.slots) {
+      const base = content.bases.find((one) => one.slot === slot && !one.family && canUse(one.id, 'warrior', content));
+      if (!base) continue;
+      const item = generateItem({ baseId: base.id, level: 60, rarityId: 'legendary' }, rng, content);
+      await (await db()).prepare('DELETE FROM items WHERE slot = ?').bind(slot).run();
+      await (await db()).prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, ?, ?, 0 FROM characters').bind(slot, JSON.stringify(item)).run();
+    }
+  }
 
   beforeEach(async () => {
     ({ cookie } = await signUp('lowca'));
@@ -265,6 +300,96 @@ describe('the wanted posters through the API', () => {
     assert.equal(after.holding, false);
     assert.equal((await take(poster.id)).data.error.code, 'no_poster');
     assert.equal((await call('POST', '/api/settlement/wanted/claim', { cookie })).data.error.code, 'not_beaten');
+  });
+
+  test('an exploration that set out with the poster keeps it: it is not given back, nor another taken, until its report is claimed', async () => {
+    // The code review: given back on the way, the poster still brought its
+    // target and loot, and came back open to be taken for another try.
+    const view = await wanted();
+    const poster = view.posters.find((one) => one.kind === 'creature');
+    const other = view.posters.find((one) => one.id !== poster.id);
+    await take(poster.id);
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: poster.areaId, minutes: 60 } })).status, 201);
+    const dropped = await call('POST', '/api/settlement/wanted/drop', { cookie });
+    assert.equal(dropped.status, 409);
+    assert.equal(dropped.data.error.code, 'carried');
+    assert.equal(dropped.data.error.message, rules.texts.carried);
+    assert.equal((await wanted()).posters.find((one) => one.id === poster.id).state, 'taken');
+    // A poster given back on the way before 0.1.68: while that exploration
+    // goes on no other is taken; the one it set out with may be.
+    const stored = JSON.parse((await row()).settlement);
+    await set('settlement = ?', JSON.stringify({ ...stored, wanted: { ...stored.wanted, taken: null } }));
+    const another = await take(other.id);
+    assert.equal(another.status, 409);
+    assert.equal(another.data.error.code, 'carried');
+    assert.equal((await take(poster.id)).status, 200);
+    // Called back, the exploration lets it go.
+    assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).status, 200);
+    assert.equal((await call('POST', '/api/settlement/wanted/drop', { cookie })).status, 200);
+  });
+
+  test('a target beaten while its poster was not in hand fills the poster for its day all the same, with no bounty', async () => {
+    await arm();
+    const poster = (await wanted()).posters.find((one) => one.kind === 'outlaw');
+    await take(poster.id);
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: poster.areaId, minutes: 60 } })).status, 201);
+    // Given back on the way, as an exploration set out before 0.1.68 allows.
+    const stored = JSON.parse((await row()).settlement);
+    await set('settlement = ?', JSON.stringify({ ...stored, wanted: { ...stored.wanted, taken: null } }));
+    // Not the very first exploration, and a seed meeting the target at once.
+    await (await db()).prepare("INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) SELECT id, 'earlier', 'hunt', 0, '{}', '{}' FROM characters").run();
+    let seed = 0;
+    while (!createRng(`s${seed}:wanted`).chance(rules.chance)) seed += 1;
+    await (await db()).prepare('UPDATE activities SET seed = ?').bind(`s${seed}`).run();
+    await call('POST', '/api/test/skip-time', { cookie });
+    const claimed = await call('POST', '/api/hunts/claim', { cookie });
+    assert.equal(claimed.status, 200, JSON.stringify(claimed.data).slice(0, 300));
+    const fight = claimed.data.report.fights.find((one) => one.wanted);
+    assert.equal(fight?.won, true, 'the target met and beaten');
+    const after = await wanted();
+    assert.equal(after.posters.find((one) => one.id === poster.id).state, 'done');
+    assert.equal(after.holding, false);
+    assert.equal((await take(poster.id)).data.error.code, 'no_poster');
+    assert.equal((await call('POST', '/api/settlement/wanted/claim', { cookie })).data.error.code, 'not_beaten');
+    assert.deepEqual(JSON.parse((await row()).settlement).wanted.done, [poster.id]);
+  });
+
+  test('the day\'s posters are those of its first look: a place the Sala prób or the class level opens later that day hangs none', async () => {
+    // The code review: a place opened after the day's four bounties brought
+    // new posters the same day.
+    const ids = (await wanted()).posters.map((poster) => poster.id);
+    const kept = JSON.parse((await row()).settlement).wanted;
+    assert.equal(kept.day, today());
+    assert.deepEqual(kept.basis, { classLevel: 30, early: null });
+    const opened = trialTarget(30, null, content).area.id;
+    await set('trial_hall = ?, class_level = 40', JSON.stringify({ day: today(), early: opened }));
+    assert.deepEqual((await wanted()).posters.map((poster) => poster.id), ids);
+    // A poster those places would hang is not the day's.
+    const fresh = wantedPosters(40, today(), await characterId(), content, opened).find((poster) => !ids.includes(poster.id));
+    assert.ok(fresh);
+    assert.equal((await take(fresh.id)).data.error.code, 'no_poster');
+    // The day's four done, none is left that day.
+    for (const id of ids) await bounty(id);
+    const done = await wanted();
+    assert.ok(done.posters.every((poster) => poster.state === 'done'));
+    assert.deepEqual(done.posters.map((poster) => poster.id), ids);
+    // A record of another day: the day's posters come from the character as
+    // it is then.
+    const stored = JSON.parse((await row()).settlement);
+    await set('settlement = ?', JSON.stringify({ ...stored, wanted: { ...stored.wanted, day: '2020-01-01' } }));
+    const later = await wanted();
+    assert.deepEqual(later.posters.map((poster) => poster.id), wantedPosters(40, today(), await characterId(), content, opened).map((poster) => poster.id));
+    assert.deepEqual(JSON.parse((await row()).settlement).wanted.basis, { classLevel: 40, early: opened });
+  });
+
+  test('a record kept before 0.1.68, without the day\'s basis, keeps its poster in hand and those done', async () => {
+    const posters = wantedPosters(30, today(), await characterId(), content);
+    const taken = { ...posters[1], beaten: false };
+    await set('settlement = ?', JSON.stringify({ wanted: { day: today(), done: [posters[0].id], taken } }));
+    const view = await wanted();
+    assert.deepEqual(view.posters.map((poster) => poster.state), ['done', 'taken', 'open', 'open']);
+    assert.equal(view.holding, true);
+    assert.deepEqual(JSON.parse((await row()).settlement).wanted, { day: today(), basis: { classLevel: 30, early: null }, done: [posters[0].id], taken });
   });
 
   test('a poster of an earlier day stays in hand, apart from the day\'s', async () => {

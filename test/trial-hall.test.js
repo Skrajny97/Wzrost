@@ -8,7 +8,18 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { areaOpenFor, areaUnlockLevel, autoDistribute, questPeriod, trialEncounters, trialHallFights, trialTarget } from '../src/engine/index.js';
+import {
+  areaOpenFor,
+  areaUnlockLevel,
+  autoDistribute,
+  explorationPace,
+  lowLevelMultiplier,
+  monsterXp,
+  questPeriod,
+  trialEncounters,
+  trialHallFights,
+  trialTarget,
+} from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -65,6 +76,42 @@ describe('the Sala prób', () => {
     assert.equal(lost.result, 'escaped');
     assert.equal(lost.fights.length, 1);
     assert.equal(lost.xp, 0);
+  });
+
+  test('each won fight pays as an hour\'s exploration fight at its level, twice: the elite an elite\'s XP and gold, with the solo bonus', () => {
+    // DECISIONS.md, "Sala prób", point 4 (the code review: the elite paid as
+    // an ordinary creature, and no fight had the solo bonus).
+    const area = areaAt('raven-hollows');
+    const strong = newCharacter('warrior', { level: 60, classLevel: 50 });
+    strong.points = autoDistribute(strong, content);
+    const hall = content.settlement.trialHall;
+    const { rewards, hunt } = content.balance;
+    const pace = explorationPace(hall.rewardMinutes, content);
+    const trial = (game, seed = 'a') => trialHallFights({ character: strong, equipped: [], name: 'Mocarz', area, seed }, game);
+    const won = trial(content);
+    assert.equal(won.hall.won, true);
+    // The XP of each fight: its creatures' own, by their rank, as an hour's
+    // exploration fight gives it alone, twice.
+    for (const [index, encounter] of trialEncounters(area, 'a', content).entries()) {
+      const groupFactor = hunt.groupFactors[encounter.members.length - 1];
+      const base = encounter.members.reduce((sum, member) => sum + monsterXp(content.monstersById[member.monsterId], member.level, content) * groupFactor * lowLevelMultiplier(strong.level, member.level, content), 0);
+      assert.equal(won.fights[index].xp, Math.round(base * (1 + hunt.soloXpBonus) * pace.timeFactor * (1 + pace.lengthBonus) * hall.rewardFactor), `fight ${index + 1}`);
+    }
+    assert.equal(content.monstersById[area.elite].elite, true);
+    // The same trial with the elite paid as an ordinary creature: the same
+    // fights, the ordinary ones paid the same, the elite's by its ranks.
+    const plain = trial({ ...content, balance: { ...content.balance, rewards: { ...rewards, eliteXpMultiplier: 1, eliteGoldMultiplier: 1 } } });
+    assert.deepEqual(plain.fights.map((fight) => fight.hpAfter), won.fights.map((fight) => fight.hpAfter));
+    assert.deepEqual(plain.fights.slice(0, 2).map((fight) => [fight.xp, fight.gold]), won.fights.slice(0, 2).map((fight) => [fight.xp, fight.gold]));
+    assert.ok(Math.abs(won.fights[2].xp - plain.fights[2].xp * rewards.eliteXpMultiplier) <= rewards.eliteXpMultiplier, `${won.fights[2].xp} / ${plain.fights[2].xp}`);
+    assert.ok(Math.abs(won.fights[2].gold - plain.fights[2].gold * rewards.eliteGoldMultiplier) <= rewards.eliteGoldMultiplier, `${won.fights[2].gold} / ${plain.fights[2].gold}`);
+    // The materials twice an hour's exploration fight's too: over many
+    // trials about the hall's factor times those of a hall paying once.
+    const pieces = (game) =>
+      Array.from({ length: 150 }, (_, seed) => trial(game, `m${seed}`)).reduce((sum, one) => sum + Object.values(one.materials).reduce((total, count) => total + count, 0), 0);
+    const once = pieces({ ...content, settlement: { ...content.settlement, trialHall: { ...hall, rewardFactor: 1 } } });
+    const ratio = pieces(content) / once;
+    assert.ok(once > 30 && ratio > hall.rewardFactor * 0.8 && ratio < hall.rewardFactor * 1.2, `${ratio} of ${once}`);
   });
 
   test('the healing potions of the bag are drunk as on an exploration, and counted', () => {
@@ -151,5 +198,23 @@ describe('the Sala prób through the API', () => {
     const { report } = (await enter()).data;
     const left = JSON.parse((await row()).potions)[heal.id] ?? 0;
     assert.equal(left, 3 - (report.potionsUsed?.[heal.id] ?? 0));
+  });
+
+  test('a potion whose recipe the character does not know stays in the bag, as on an exploration', async () => {
+    // The code review: the trial drank a potion got in a Wymiana before its
+    // recipe, which no exploration takes along. A new Alchemia knows the
+    // weakest healing only.
+    const [known, ...stronger] = content.potions.filter((potion) => potion.effect.heal).sort((a, b) => a.level - b.level);
+    const unknown = stronger.at(-1);
+    assert.ok(unknown.level > 1);
+    await set('potions = ?', JSON.stringify({ [known.id]: 3, [unknown.id]: 3 }));
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5, potions: { [unknown.id]: 1 } } })).data.error.code, 'unknown_recipe');
+    const entered = await enter();
+    assert.equal(entered.status, 200, JSON.stringify(entered.data).slice(0, 300));
+    const { report } = entered.data;
+    assert.equal(report.potionsUsed?.[unknown.id], undefined);
+    const bag = JSON.parse((await row()).potions);
+    assert.equal(bag[unknown.id], 3);
+    assert.equal(bag[known.id] ?? 0, 3 - (report.potionsUsed?.[known.id] ?? 0));
   });
 });
