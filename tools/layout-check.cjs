@@ -3,7 +3,8 @@
 // from 320 to 430 px wide, a tablet and computers, with a character of big
 // numbers (level 146, almost a million gold, six-digit camp resources), a
 // long name, orders on the Stół rozbiórki's queue and a guild of its own
-// with a long name. On each screen, and on the tabs TABS opens, it
+// with a long name, and a companion hired in the Kwatery, with its five
+// places for items. On each screen, and on the tabs TABS opens, it
 // looks for a page wider than the screen, text out of its frame
 // and elements past the right edge, and lists text cut with "…" for a look.
 // Run against a dev server (npm run dev) from the repo folder whose local D1
@@ -40,6 +41,7 @@ const SCREENS = [
   '#/profesje',
   '#/oboz',
   '#/oboz/craft-table',
+  '#/oboz/quarters',
   '#/osada',
   '#/osada/board',
   '#/osada/tavern',
@@ -141,6 +143,11 @@ async function main() {
   sql(`INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'craft-table', 10, 0, 1 FROM characters WHERE name = '${name}'`);
   sql(`UPDATE characters SET materials = '${JSON.stringify(materials)}' WHERE name = '${name}'`);
   if ((await api('POST', '/api/craft/materials', { keys: Object.keys(materials).slice(0, 3) })) >= 400) throw new Error('Stół nie przyjął materiałów.');
+  // The Kwatery built, with a companion hired from the Karczma.
+  sql(`INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'quarters', 3, 0, 1 FROM characters WHERE name = '${name}'`);
+  const { settlement } = await page.evaluate(() => fetch('/api/settlement').then((response) => response.json()));
+  const candidate = settlement?.companions?.candidates?.[0];
+  if (!candidate || (await api('POST', '/api/settlement/hire', { candidateId: candidate.id })) >= 400) throw new Error('Nie udało się zwerbować towarzysza.');
   const storage = await first.storageState();
   await first.close();
 
