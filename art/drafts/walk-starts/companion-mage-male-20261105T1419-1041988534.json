@@ -1,0 +1,23 @@
+{
+  "id": "companion-mage-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a slavic mage for hire in his late thirties, long straight copper red hair tied back in a small bun, a neat short red goatee, sharp green eyes, a deep blue hooded robe down to the ankles with silver runes embroidered along the edge of the hood, the hood down on his shoulders, a pendant with a small glowing blue crystal, a wooden staff topped with a glowing blue crystal in his hand, soft leather boots, seen from the side, facing and walking to the right, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/companion-portraits/mage-male.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

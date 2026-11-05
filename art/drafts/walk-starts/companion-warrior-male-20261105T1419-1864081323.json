@@ -1,0 +1,23 @@
+{
+  "id": "companion-warrior-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a broad-shouldered slavic man warrior for hire in his forties, a shaved head and a thick fair beard braided in two, calm hazel eyes, a studded leather jerkin over a mail shirt, a wide belt, dark trousers and leather boots, a big axe resting on his shoulder, seen from the side, facing and walking to the right, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/companion-portraits/warrior-male.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
