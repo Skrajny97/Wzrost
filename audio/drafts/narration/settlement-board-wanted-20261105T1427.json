@@ -1,0 +1,17 @@
+{
+  "id": "settlement-board-wanted",
+  "payload": {
+    "text": "Sołtys rozwiesza tu też listy gończe. Weź list i wyrusz tam, gdzie widziano cel. Jeśli go spotkasz i pokonasz, nagroda jest Twoja. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/settlement-board-wanted-20261105T1427-0.mp3",
+    "audio/drafts/narration/settlement-board-wanted-20261105T1427-1.mp3"
+  ],
+  "credits": 288
+}

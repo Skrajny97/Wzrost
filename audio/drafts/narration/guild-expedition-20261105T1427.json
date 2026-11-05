@@ -1,0 +1,17 @@
+{
+  "id": "guild-expedition",
+  "payload": {
+    "text": "Każda minuta Twoich wypraw prowadzi gildię naprzód. Na końcu etapu czeka strażnik. Atakujesz go trzy razy dziennie, a gdy padnie, każdy, kto dołożył minut, dostaje skrzynię. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/guild-expedition-20261105T1427-0.mp3",
+    "audio/drafts/narration/guild-expedition-20261105T1427-1.mp3"
+  ],
+  "credits": 374
+}

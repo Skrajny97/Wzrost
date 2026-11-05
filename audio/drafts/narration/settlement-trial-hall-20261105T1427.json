@@ -1,0 +1,17 @@
+{
+  "id": "settlement-trial-hall",
+  "payload": {
+    "text": "Raz dziennie stoczysz tu trzy walki ze stworami z kolejnego miejsca. Zdrowie nie wraca między nimi, ale mikstury działają. Wygrasz, a to miejsce otworzy się dla Ciebie od razu. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/settlement-trial-hall-20261105T1427-0.mp3",
+    "audio/drafts/narration/settlement-trial-hall-20261105T1427-1.mp3"
+  ],
+  "credits": 380
+}

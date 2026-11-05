@@ -1,0 +1,17 @@
+{
+  "id": "settlement-tavern-mercenaries",
+  "payload": {
+    "text": "Tu wystawisz swoją postać do wynajęcia albo weźmiesz cudzą na swoją wyprawę. Płaci ten, kto najmuje, za każdą godzinę drogi. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/settlement-tavern-mercenaries-20261105T1427-0.mp3",
+    "audio/drafts/narration/settlement-tavern-mercenaries-20261105T1427-1.mp3"
+  ],
+  "credits": 276
+}

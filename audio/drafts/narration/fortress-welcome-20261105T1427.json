@@ -1,0 +1,17 @@
+{
+  "id": "fortress-welcome",
+  "payload": {
+    "text": "Twój obóz stał się Warownią. Każda z jej siedmiu budowli coś daje: trening, błogosławieństwo, zioła albo lepsze tropienie. Zaglądaj tu codziennie. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/fortress-welcome-20261105T1427-0.mp3",
+    "audio/drafts/narration/fortress-welcome-20261105T1427-1.mp3"
+  ],
+  "credits": 320
+}
