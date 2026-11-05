@@ -7,7 +7,7 @@
 
 import assert from 'node:assert/strict';
 import { before, beforeEach, test } from 'node:test';
-import { cards, intro, narratorPage, part } from './helpers/narrator-page.js';
+import { cards, intro, narratorPage, part, settled } from './helpers/narrator-page.js';
 
 const page = narratorPage();
 const { sent } = page;
@@ -82,6 +82,30 @@ test('Szybkie Polowanie is told once the character is home on an inner region, a
   // Its pointer looks for its place on this page: it goes with the character.
   state.character = null;
   narrator.narrate();
+});
+
+// "Odbierz raport" (screens/combat.js): the claim's answer brings the
+// character, at level 20 and home again, a moment before the page goes to
+// the report. The Osada's card came then, on the inner region being left,
+// and stayed over the report (664); now it comes after the report.
+test('a chapter the claim of a report brings begins after the report, not over it', async () => {
+  state.user = { skipTutorials: false };
+  const told = [...toldSoFar, 'community-ending', ...part('crafting')];
+  globalThis.location.hash = '#/walka/windfalls/windfalls-edge';
+  state.character = { ...character({ read: told, level: 19 }), activity: { kind: 'hunt', endsAt: Date.now() - 5000 } };
+  narrator.narrate('#/walka/windfalls/windfalls-edge');
+  assert.equal(cards().length, 0);
+  // The answer, as app.js hands it to the narrator, and then the page goes
+  // to the report.
+  state.character = character({ read: told, level: 20 });
+  narrator.narrateSoon();
+  globalThis.location.hash = '#/raport/1';
+  await settled();
+  assert.equal(cards().length, 0);
+  // "Powrót": the Osada's card, on the Walka tab.
+  narrator.narrate('#/walka');
+  assert.equal(cards().length, 1);
+  assert.match(cards()[0].textContent, /System otworzył przed Tobą Osadę/);
 });
 
 // The System's words over the Profesje show their first sentence and fold

@@ -41,7 +41,7 @@ import { musicVolume, prefetchMusic, setMusicConfig, setMusicPlace, setMusicVolu
 import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
 import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
-import { narrate, passTold } from './narrator.js';
+import { narrate, narrateSoon, passTold } from './narrator.js';
 import { forgetNews, watchNews } from './news.js';
 import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
@@ -472,7 +472,9 @@ onCharacterChange(() => {
   // The chat in the side column once the Społeczność opens.
   updateSide();
   current.screen.update?.();
-  narrate();
+  // A moment later, at the page's address then: a chapter the claim of a
+  // report brings begins after the report, not over it (664).
+  narrateSoon();
   // The narrator's lines read: the invitation may come once he is done.
   setTimeout(inviteToConfirm, 1500);
 });

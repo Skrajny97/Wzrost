@@ -616,6 +616,21 @@ document.addEventListener(
   true,
 );
 
+// After a change of the character (app.js): a moment later, at the address
+// the page is at then. An answer that opens a report ("Odbierz raport", an
+// event's choice, Szybkie Polowanie, a Wieża, the Sala prób, a profession's
+// work) brings the character a moment before the page goes to the report,
+// and a chapter due with it (a new level, the character free again) began
+// on the screen being left, its card staying over the report (664).
+let soon = null;
+export function narrateSoon() {
+  clearTimeout(soon);
+  soon = setTimeout(() => {
+    soon = null;
+    narrate(location.hash || place);
+  });
+}
+
 // Called after every screen is drawn and every change of the character.
 export function narrate(hash = place) {
   place = hash;

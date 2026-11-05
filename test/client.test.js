@@ -351,6 +351,16 @@ test("the narrator hears of the Gildia's tabs, also of the one the page opens on
   }
 });
 
+// A change of the character reaches the narrator a moment later, at the
+// page's address then: a chapter that the claim of a report brings begins
+// after the report, not over it (664; narrator.test.js).
+test("the narrator hears of the character's change once the page is where it goes", () => {
+  const app = readFileSync(join(CLIENT, 'app.js'), 'utf8');
+  const change = /\nonCharacterChange\(\(\) => \{([\s\S]*?)\n\}\);/.exec(app)[1];
+  assert.match(change, /narrateSoon\(\);/);
+  assert.doesNotMatch(change, /narrate\(\);/);
+});
+
 test('the page can be added to the home screen as an app', () => {
   const html = readFileSync(join(CLIENT, 'index.html'), 'utf8');
   assert.match(html, /<link rel="manifest" href="\/manifest\.webmanifest">/);
