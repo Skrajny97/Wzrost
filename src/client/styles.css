@@ -8703,13 +8703,22 @@ a.profession-square:active {
   --ride-bottom: 18px;
   /* A Drużyna, a mercenary or the companions from the Kwatery on the way
      (scenes.js member, 640 A, 648, 654 A): the step between two walkers, a
-     fifth of the scene within 56-88 px (longer when one rides), and how much
-     further away each next one walks. */
+     fifth of the scene within 56-88 px (longer when one rides). */
   --party-step: clamp(56px, 20%, 88px);
-  --party-lift: 8px;
 }
+/* When one of them rides, those on foot walk on the line of the hooves and
+   smaller, to the rider's chest (the author: "nierówno z postacią i są za
+   duży"): their frame stands on the ride's bottom, and the whole holder
+   (the figure with its light, trail and pet) is drawn at --afoot-scale
+   from the feet. */
 .scene-walk--riders {
   --party-step: clamp(72px, 26%, 120px);
+  --walker-bottom: var(--ride-bottom);
+  --afoot-scale: 0.8;
+}
+.scene-walk--riders .scene-member--afoot {
+  transform: scale(var(--afoot-scale));
+  transform-origin: 50% calc(100% - var(--walker-bottom));
 }
 @keyframes scene-land {
   to {
@@ -8742,10 +8751,10 @@ a.profession-square:active {
 }
 /* A walker on the way with its light, trail and pet (scenes.js member), in a
    holder the size of the scene. In a Drużyna, or with a mercenary or
-   companions, the holders stand in a line: the character in front on the
-   right, leading, and each next one --slot steps to the left and --depth
-   steps further away (higher, and behind the one before: its z-index comes
-   from scenes.js). */
+   companions, the holders stand in a line on one ground (the author:
+   "nierówno z postacią"): the character in front on the right, leading, and
+   each next one --slot steps to the left, behind the one before (its
+   z-index comes from scenes.js). */
 .scene-member {
   position: absolute;
   top: 0;
@@ -8756,7 +8765,6 @@ a.profession-square:active {
 }
 .scene-member--party {
   left: calc(var(--slot) * var(--party-step));
-  top: calc(-1 * var(--depth) * var(--party-lift));
 }
 /* A pet on the way (scenes.js companion): its frames beside the figure, at
    the place its data gives against the figure's box; in front of the figure,
@@ -8776,7 +8784,7 @@ a.profession-square:active {
   z-index: 3;
   inset: auto;
   left: calc(50% - 40px);
-  bottom: 30px;
+  bottom: calc(var(--walker-bottom) + 2px);
   width: 80px;
   height: 110px;
 }

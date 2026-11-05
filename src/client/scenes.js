@@ -132,16 +132,16 @@ function companionWalker({ classId, appearance }) {
 // and its pet. With others on the way (`count` over one: a Drużyna, a
 // mercenary, the companions) the holders stand in a line (styles.css,
 // .scene-member--party): the character in front, on the right, leading the
-// way, and each next one a step behind it to the left and a little further
-// away, so that they do not cover each other.
+// way, and each next one a step behind it to the left, on the same ground.
+// One on foot (.scene-member--afoot) walks smaller beside a rider.
 function member(walk, character, index, count) {
   const { classId, appearance, skin, evolution } = character ?? {};
   const own = character?.companion ? companionWalkerSheet(classId, appearance) : walkerSheet(classId, appearance, skin, evolution?.current?.id);
-  const figure = ride(walk, character) ?? (own ? frames({ ...walk.walker, file: own }, 'scene-walker scene-walker--own') : frames(walk.figure, 'scene-walker'));
-  const holder = h('div', { class: `scene-member${count > 1 ? ' scene-member--party' : ''}` }, figure);
+  const ridden = ride(walk, character);
+  const figure = ridden ?? (own ? frames({ ...walk.walker, file: own }, 'scene-walker scene-walker--own') : frames(walk.figure, 'scene-walker'));
+  const holder = h('div', { class: `scene-member${count > 1 ? ' scene-member--party' : ''}${ridden ? '' : ' scene-member--afoot'}` }, figure);
   if (count > 1) {
     holder.style.setProperty('--slot', String((count - 1) / 2 - index));
-    holder.style.setProperty('--depth', String(index));
     holder.style.zIndex = String(2 + count - index);
   }
   const worn = character?.cosmetics;
@@ -184,10 +184,10 @@ function lightWalker(holder, figure, { glow, spark, sparks }) {
 // each member of a Drużyna leaves its own.
 function footprints(holder, { color }, walk, riding) {
   holder.style.setProperty('--trail', color);
-  const bottom = riding ? 20 : 28;
+  const bottom = riding ? 'var(--ride-bottom) + 2px' : 'var(--walker-bottom)';
   const step = (offset, age = 0) => {
     const print = h('span', { class: `scene-step${offset % 2 ? ' scene-step--far' : ''}` });
-    print.style.bottom = `${bottom + (offset % 2 ? 4 : 0)}px`;
+    print.style.bottom = `calc(${bottom} + ${offset % 2 ? 4 : 0}px)`;
     print.style.setProperty('--away', `${-walk.pathSpeed * STEP_LIFE}px`);
     print.style.setProperty('--life', `${STEP_LIFE}s`);
     if (age) {
