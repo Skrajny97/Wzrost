@@ -752,8 +752,13 @@ export async function finishHunt(db, player, now, { choice } = {}) {
         purse: row.gold,
         rumor,
         // The companions who went fight the event's foes too (a trip goes
-        // without them).
+        // without them), and the potions, the strengthening ones still
+        // working and the trophies work there as on the way.
         companions: trip ? [] : (options.companions ?? []),
+        potions: options.potions ?? {},
+        healBelow: options.healBelow,
+        buffs: claimed.windows,
+        trophies: options.trophies ?? {},
       },
       content,
     );

@@ -346,6 +346,28 @@ export function championItemRarity(level, rng, content) {
 // the late and end game's growth (monsterCombatant), less in a fight where
 // the character stands alone. `strength`: the [damage, HP] multipliers of
 // the creatures of the newest place (exploreStrength in combatant.js).
+// A player as it fights now, on the way or in an event's fight (events.js):
+// its strengthening potions still working (`on`, each kind's bonus), the
+// potions it carries (`kit`, fightPotions) and its trophies. Focus raises
+// Intelekt and Mądrość, which the character's numbers grow from; the
+// aconite oil coats a blade that has no coat of its own yet.
+export function fightingPlayer({ unit, character, equipped, name, area, hp, on = {}, kit = {}, trophies = {} }, content) {
+  const base = on.focus ? playerCombatant({ character, equipped, hp, name, area, id: unit.id, statBoost: { intellect: on.focus, wisdom: on.focus } }, content) : unit;
+  const oil = on.poison ? content.potions.find((potion) => potion.effect.poison)?.dot : null;
+  return {
+    ...base,
+    hp,
+    ...(on.speed && { speed: base.speed * (1 + on.speed) }),
+    ...(on.armor && { armor: Math.round(base.armor * (1 + on.armor)) }),
+    // A curse takes off what a strength potion adds.
+    ...((on.damage || on.curse) && { damageBonus: (on.damage ?? 0) - (on.curse ?? 0) }),
+    ...(on.ward && { ward: on.ward }),
+    ...(on.poison && oil && !base.weapon.dot && { weapon: { ...base.weapon, dot: { ...oil, chance: on.poison } } }),
+    ...(Object.keys(kit).length > 0 && { potions: kit }),
+    ...(Object.keys(trophies).length > 0 && { trophies }),
+  };
+}
+
 export function encounterCombatants(encounter, content, { growth = 1, strength = [1, 1] } = {}) {
   const counts = {};
   for (const member of encounter.members) counts[member.monsterId] = (counts[member.monsterId] ?? 0) + 1;
@@ -521,8 +543,6 @@ export function simulateHunt(
   const fights = [];
   const entries = [];
   let key = null;
-  // The aconite oil coats a blade that has no coat of its own yet.
-  const oil = content.potions.find((potion) => potion.effect.poison)?.dot;
   // An item from a chest. A character without a weapon holds a found one at
   // once, for the rest of the exploration, when its class level lets it wear
   // it (the code review: it fought with a weapon it could not put on after).
@@ -603,22 +623,7 @@ export function simulateHunt(
         if (Number.isFinite(window.fights) ? fights.length < window.fights : event.t < window.ms) on[kind] = window.bonus;
       }
       for (const kind of Object.keys(on)) fighter.buffFights[kind] = (fighter.buffFights[kind] ?? 0) + 1;
-      // Focus raises Intelekt and Mądrość, which the character's numbers grow from.
-      const base = on.focus
-        ? playerCombatant({ character: fighter.character, equipped: fighter.worn, hp: fighter.hp, name: fighter.name, area, id: fighter.unit.id, statBoost: { intellect: on.focus, wisdom: on.focus } }, content)
-        : fighter.unit;
-      return {
-        ...base,
-        hp: fighter.hp,
-        ...(on.speed && { speed: base.speed * (1 + on.speed) }),
-        ...(on.armor && { armor: Math.round(base.armor * (1 + on.armor)) }),
-        // A curse takes off what a strength potion adds.
-        ...((on.damage || on.curse) && { damageBonus: (on.damage ?? 0) - (on.curse ?? 0) }),
-        ...(on.ward && { ward: on.ward }),
-        ...(on.poison && oil && !base.weapon.dot && { weapon: { ...base.weapon, dot: { ...oil, chance: on.poison } } }),
-        ...(Object.keys(kit).length > 0 && { potions: kit }),
-        ...(Object.keys(fighter.trophies).length > 0 && { trophies: fighter.trophies }),
-      };
+      return fightingPlayer({ unit: fighter.unit, character: fighter.character, equipped: fighter.worn, name: fighter.name, area, hp: fighter.hp, on, kit, trophies: fighter.trophies }, content);
     });
     const ally = players[fighters.indexOf(me)];
     const fighting = mates.filter((mate) => !mate.out);

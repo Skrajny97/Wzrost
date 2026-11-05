@@ -3036,7 +3036,7 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 
 ## Wersja 0.1.67 (5.11.2026)
 
-Towarzysze walczą w walce zdarzenia na końcu wyprawy: zob. „Towarzysze w walkach zdarzeń”. Całe napisy na wąskich telefonach i w menu na komputerze: zob. „Ucięte napisy na wąskich telefonach i w menu na komputerze”.
+Towarzysze, mikstury i trofea działają w walce zdarzenia na końcu wyprawy: zob. „Towarzysze w walkach zdarzeń”. Całe napisy na wąskich telefonach i w menu na komputerze: zob. „Ucięte napisy na wąskich telefonach i w menu na komputerze”.
 
 ## Towarzysze w walkach zdarzeń (5.11.2026, w grze od 0.1.67)
 
@@ -3047,6 +3047,7 @@ Autor: „Gdzie sprawdza się czy towarzysz idzie ze mną, dodaj przycisk, bo co
 3. **XP (brakujący szczegół).** Każdy walczący towarzysz bierze swoją część XP, jak na wyprawie (`xpCost`).
 4. **Drużyna.** Wyprawa Drużyny idzie bez towarzyszy, więc i walki jej zdarzeń.
 5. **Gdzie widać, czy towarzysz idzie.** Karta towarzysza w Kwaterach ma przycisk „Zostań w kwaterze” albo „Idź na wyprawy”, a Opcje wyprawy pokazują, kto idzie.
+6. **Mikstury i trofea.** Autor: „niech towarzysze i mikstury dzialaja tez na walkach ze zdarzeń”. W walce zdarzenia postać pije mikstury lecznicze, które zostały jej z zabranych na wyprawę, tak jak w drodze (poniżej progu z Opcji wyprawy). Mikstury wzmacniające działają, jeśli wyprawa nie zużyła jeszcze ich liczby walk, a ta walka się do niej wlicza. Działają też trofea. Wypite mikstury nie wracają do plecaka, jak po każdej walce (`fightingPlayer` w `src/engine/hunt.js`, wspólne dla walk w drodze i w zdarzeniu).
 
 ## Ucięte napisy na wąskich telefonach i w menu na komputerze (5.11.2026, w grze od 0.1.67)
 

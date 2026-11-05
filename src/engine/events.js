@@ -26,8 +26,9 @@
 import { simulateFight } from './combat.js';
 import { companionCombatant } from './companions.js';
 import { combatantView, playerCombatant } from './combatant.js';
-import { encounterCombatants } from './hunt.js';
+import { encounterCombatants, fightingPlayer } from './hunt.js';
 import { itemName, randomItem } from './items.js';
+import { fightPotions } from './potions.js';
 import { countList, knownHerbs, professionOpen, professionState } from './professions.js';
 import { monsterXp } from './progression.js';
 import { createRng } from './rng.js';
@@ -258,7 +259,25 @@ const resourceLoss = (lost, content) =>
 // rarities (told by its text, {item}); lost, the character faints (or, in a
 // safe place, only gets away) as after a lost fight on the way.
 export function resolveEvent(
-  { hunt, event, optionId, caseId = null, endingId = null, drafts = false, character, equipped, name, seed, purse = 0, rumor = null, companions = [] },
+  {
+    hunt,
+    event,
+    optionId,
+    caseId = null,
+    endingId = null,
+    drafts = false,
+    character,
+    equipped,
+    name,
+    seed,
+    purse = 0,
+    rumor = null,
+    companions = [],
+    potions = {},
+    healBelow,
+    buffs = {},
+    trophies = {},
+  },
   content,
 ) {
   // `optionId` is the option chosen, or the path of options to it when the
@@ -398,11 +417,32 @@ export function resolveEvent(
   });
   const growth = mates.length > 0 ? {} : { growth: content.balance.monsters.soloGrowth };
   const enemies = encounterCombatants({ members: outcome.foes.map((monsterId) => ({ monsterId, level: character.level })) }, content, growth);
+  // The potions the character still carries of those taken along, its
+  // strengthening potions still working (in their number of the first
+  // fights) and its trophies work in the event's fight as on the way (the
+  // author, 5.11.2026: "niech towarzysze i mikstury działają też na walkach
+  // ze zdarzeń").
+  const left = Object.fromEntries(
+    Object.entries(potions)
+      .map(([id, count]) => [id, count - (hunt.potionsUsed?.[id] ?? 0)])
+      .filter(([, count]) => count > 0),
+  );
+  const kit = fightPotions(left, healBelow ?? content.potionUse?.healBelow, content);
+  const on = {};
+  for (const [kind, window] of Object.entries(buffs)) {
+    if (Number.isFinite(window.fights) ? hunt.fights.length < window.fights : t < window.ms) on[kind] = window.bonus;
+  }
   const player = playerCombatant({ character, equipped, hp: hunt.hpEnd, name, area }, content);
-  const ally = { ...player, hp: hunt.hpEnd, ...(outcome.speedBonus && { speed: player.speed * (1 + outcome.speedBonus) }) };
+  const armed = fightingPlayer({ unit: player, character, equipped, name, area, hp: hunt.hpEnd, on, kit, trophies }, content);
+  const ally = { ...armed, ...(outcome.speedBonus && { speed: armed.speed * (1 + outcome.speedBonus) }) };
   const allies = [ally, ...mates.map((mate) => mate.unit)];
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait, ambush: outcome.ambush === true });
   const hpOf = (unit) => Math.max(0, fight.units.find((one) => one.id === unit.id).hp);
+  // The potions drunk in it, and the fights of the strengthening ones.
+  const potionsUsed = { ...(hunt.potionsUsed ?? {}) };
+  for (const id of fight.drunk) potionsUsed[id] = (potionsUsed[id] ?? 0) + 1;
+  const buffFights = { ...(hunt.buffFights ?? {}) };
+  for (const kind of Object.keys(on)) buffFights[kind] = (buffFights[kind] ?? 0) + 1;
   const companionsAfter = hunt.companions?.map((one) => {
     const mate = mates.find((candidate) => candidate.id === one.id);
     return mate ? { ...one, hpEnd: hpOf(mate.unit), fainted: hpOf(mate.unit) <= 0 } : one;
@@ -478,6 +518,8 @@ export function resolveEvent(
     gold: hunt.gold + summary.gold,
     items,
     hpEnd: hpNow,
+    potionsUsed,
+    buffFights,
     ...(companionsAfter && { companions: companionsAfter }),
     fights: [...hunt.fights, summary],
     entries: [...hunt.entries, tell(told), { t, type: 'fight', fight: index, text: lines.join(' ') }],

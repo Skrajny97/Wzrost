@@ -144,6 +144,20 @@ describe('events', () => {
     assert.ok(event(true).enemiesView[0].maxHp > event(false).enemiesView[0].maxHp);
   });
 
+  test('the potions still carried and the strengthening ones still working work in the event fight too (5.11.2026)', () => {
+    // At a fifth of its HP, with two healing potions taken along, one drunk on the way.
+    const low = { ...base, hpEnd: Math.round(base.maxHp * 0.2), potionsUsed: { 'lesser-healing': 1 }, buffFights: {} };
+    const event = (more) => resolveEvent({ hunt: low, event: woman, optionId: 'help', caseId: 'ambush', character, equipped, name: 'Mira', seed, ...more }, content);
+    assert.equal(event({ potions: { 'lesser-healing': 2 } }).potionsUsed['lesser-healing'], 2);
+    // None left of those taken along: none drunk.
+    assert.equal(event({ potions: { 'lesser-healing': 1 } }).potionsUsed['lesser-healing'], 1);
+    // A strength potion still working (in its number of the first fights)
+    // works in it, one used up on the way does not.
+    const working = event({ buffs: { damage: { fights: base.fights.length + 1, bonus: 0.1 } } });
+    assert.equal(working.buffFights.damage, 1);
+    assert.equal(event({ buffs: { damage: { fights: base.fights.length, bonus: 0.1 } } }).buffFights.damage, undefined);
+  });
+
   test('"Pomóż jej sprawnie": the bandits ambush the character at its level and pay like people', () => {
     const helped = resolve('help');
     const fight = helped.fights.at(-1);
