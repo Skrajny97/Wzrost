@@ -1,0 +1,14 @@
+{
+  "id": "grave-robber",
+  "tool": "pixellab generate-image-v2",
+  "description": "hunched grave robber in a tattered grey cloak, a heavy iron spade held in both hands, a dim lantern hanging from the belt, a lumpy sack of stolen trinkets on the back, a sunken pale face with a crooked nose, full body, three-quarter view",
+  "style": "src/client/art/monsters/bandit-crossbow.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

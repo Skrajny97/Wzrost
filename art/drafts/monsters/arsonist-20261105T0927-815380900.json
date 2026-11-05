@@ -1,0 +1,14 @@
+{
+  "id": "arsonist",
+  "tool": "pixellab generate-image-v2",
+  "description": "gaunt outlaw arsonist with wild red hair and a scruffy red beard, a soot-blackened tunic and a singed leather apron, a burning torch raised in one hand and a clay fire pot with a smoking fuse in the other, a wicked grin, full body, three-quarter view",
+  "style": "src/client/art/monsters/bandit-thug.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}
