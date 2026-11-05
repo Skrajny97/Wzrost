@@ -134,6 +134,29 @@ async function cancelBuild(entry) {
   toast(`Anulowano: ${entry.name}, poziom ${entry.level}. Koszt wrócił.`);
 }
 
+// "Przerwij budowę" by the build under way (the author: „Nie można anulować
+// aktualnie budowanego miejsca ze zwrotem kosztow zasobow a chcemy tego”):
+// after a question, the building goes back to the level it had, its cost and
+// that of its higher levels waiting in the queue come back.
+async function stopBuild(running) {
+  const later = state.character.camp.queue.filter((other) => other.buildingId === running.buildingId && other.level > running.level);
+  const cost = running.cost && Object.entries(running.cost).map(([id, amount]) => `${resourceName(id).toLowerCase()} ${formatNumber(amount)}`);
+  const sure = await confirmAction({
+    title: 'Przerwać budowę?',
+    text: [
+      `${running.name}, poziom ${running.level}: koszt wróci w całości${cost ? ` (${cost.join(', ')})` : ''}, a budynek zostanie na poziomie ${running.level - 1 > 0 ? running.level - 1 : 'pustego placu'}.`,
+      later.length > 0 && `Z kolejki wypadnie też ${later.map((other) => `poziom ${other.level}`).join(' i ')}, bo go potrzebuje, i jego koszt również wróci.`,
+    ]
+      .filter(Boolean)
+      .join(' '),
+    confirmLabel: 'Przerwij budowę',
+    cancelLabel: 'Buduj dalej',
+  });
+  if (!sure) return;
+  await call('POST', '/api/camp/cancel', { buildingId: running.buildingId, level: running.level });
+  toast(`Przerwano budowę: ${running.name}, poziom ${running.level}. Koszt wrócił.`);
+}
+
 const cancelButton = (entry) =>
   h('button', {
     type: 'button',
@@ -274,6 +297,13 @@ function constructionPanel(running, ticks) {
       'build-countdown',
     ),
     skipper.element,
+    h('button', {
+      type: 'button',
+      class: 'button button--world button--small build-stop',
+      text: 'Przerwij budowę',
+      'aria-label': `Przerwij budowę: ${running.name}, poziom ${running.level}`,
+      onClick: (event) => withButton(event.currentTarget, () => stopBuild(running)),
+    }),
   );
 }
 

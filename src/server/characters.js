@@ -852,6 +852,8 @@ function campView(player, levels, now) {
       level: running.level,
       startedAt: running.startedAt,
       endsAt: running.endsAt,
+      // What "Przerwij budowę" gives back.
+      cost: upgradeCost(content.buildingsById[running.buildingId], running.level),
     },
     // The builds waiting after it, each with the time it starts, and how
     // many builds the camp has at most, the one under way too.

@@ -3034,6 +3034,17 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Przerwanie budowy w toku (5.11.2026, w grze od 0.1.65)
+
+Autor: „Nie można anulować aktualnie budowanego miejsca ze zwrotem kosztow zasobow a chcemy tego.”
+
+1. **„Przerwij budowę”** stoi pod budową w toku, na planszy obozu i na ekranie budynku. Po pytaniu budowa się kończy, a jej koszt wraca w całości: złoto i zasoby.
+2. **Budynek wraca do poziomu sprzed budowy**, a budynek stawiany od zera do pustego placu. Czas budowy, który już minął, przepada.
+3. **Wyższe poziomy tego budynku czekające w kolejce** wypadają razem z nią, bo jej potrzebują, i ich koszt też wraca, jak przy „Anuluj” w kolejce.
+4. **Reszta kolejki rusza od razu:** następna budowa zaczyna się w chwili przerwania.
+5. **Budynek produkcyjny** (np. Tartak) oddał magazyn do zasobów na początku budowy, więc po przerwaniu napełnia się od nowa od tej chwili.
+6. **Także poziom samego Obozu i przemiana w Warownię** (brakujący szczegół): przerywa się je tak samo, ze zwrotem kosztu.
+
 ## Wersja 0.1.64 (5.11.2026)
 
 Najemnicy: cena do 100 000 zł za godzinę wyprawy, wynajem prosto z Karczmy i trzy zakładki Karczmy: zob. „Najemnicy: cena do 100 000 zł, wynajem z Karczmy i zakładki”. Do tego górny pasek na telefonach (zrzut autora z iPhone'a): zob. „Górny pasek na telefonach”.

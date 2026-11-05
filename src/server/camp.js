@@ -43,7 +43,8 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import { fortressOn } from './features.js';
-import { buildQueue, buildingOpen, characterView, currentHp, gainSql, loadPlayer, requirePlayer, restsDuring, settlementOpen, walletOf } from './characters.js';
+import { buildQueue, buildingOpen, characterView, currentHp, gainSql, loadPlayer, loadSettled, requirePlayer, restsDuring, settlementOpen, walletOf } from './characters.js';
+import { assertion, atomically, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
@@ -214,12 +215,15 @@ async function queueBuilding(db, player, building, queue, now) {
 
 // "Anuluj" by a waiting build: it leaves the queue with the higher levels of
 // the same building after it, their whole cost comes back, and the rest of
-// the queue comes sooner. Saved only if the character is as seen here.
+// the queue comes sooner. Saved only if the character is as seen here. The
+// build under way is called off the same way (stopBuilding).
 export async function cancelBuilding(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const queue = buildQueue(player.row);
   const level = Number(body.level);
+  const running = construction(player.buildings, context.now);
+  if (running && running.buildingId === body.buildingId && running.level === level) return stopBuilding(context, session, player, running, queue);
   if (!queue.some((entry) => entry.buildingId === body.buildingId && entry.level === level)) {
     throw new ApiError(409, 'not_queued', 'Tej budowy nie ma już w kolejce.');
   }
@@ -251,6 +255,62 @@ export async function cancelBuilding(context) {
     cancelled: cancelled.map((entry) => ({ buildingId: entry.buildingId, level: entry.level })),
     refund: back,
     character: characterView(await loadPlayer(context.env.DB, session.userId), now),
+  });
+}
+
+// "Przerwij budowę" by the build under way (the author, 5.11.2026: „Nie
+// można anulować aktualnie budowanego miejsca ze zwrotem kosztow zasobow a
+// chcemy tego”): the building goes back to the level it had, or to an empty
+// plot, its whole cost comes back with the higher levels of it waiting in
+// the queue, and the rest of the queue starts from now. A production
+// building, whose store went to the resources when the build began, fills
+// again from now. Saved only if the character and the build are as seen
+// here.
+async function stopBuilding(context, session, player, running, queue) {
+  const db = context.env.DB;
+  const now = context.now;
+  const row = player.row;
+  const building = content.buildingsById[running.buildingId];
+  const { cancelled, kept } = cancelFromQueue(queue, running.buildingId, running.level + 1);
+  const costs = [building ? upgradeCost(building, running.level) : {}, ...cancelled.map((entry) => entry.cost ?? (building ? upgradeCost(building, entry.level) : {}))];
+  const back = {};
+  for (const cost of costs) for (const [id, amount] of Object.entries(cost)) back[id] = (back[id] ?? 0) + amount;
+  const before = running.level - 1;
+  const producing = building?.effect?.kind === 'production';
+  const stored = { ...player.buildings };
+  if (before > 0) stored[running.buildingId] = { level: before, startedAt: running.startedAt, endsAt: running.startedAt, collectedAt: producing ? now : null };
+  else delete stored[running.buildingId];
+  const resources = Object.keys(back).filter((id) => id !== 'gold');
+  const give = resources.length
+    ? `, resources = json_set(resources, ${resources.map(() => '?, COALESCE(json_extract(resources, ?), 0) + ?').join(', ')})`
+    : '';
+  // While resting, the HP rested so far is saved, as when a build begins.
+  const resting = restsDuring(player.activity);
+  const where = [row.id, running.buildingId, running.level, running.endsAt];
+  await atomically(db, [
+    sameVersion(db, row),
+    assertion(db, 'EXISTS (SELECT 1 FROM buildings WHERE character_id = ? AND building_id = ? AND level = ? AND ends_at = ?)', where),
+    db
+      .prepare(`UPDATE characters SET gold = gold + ?${give}, build_queue = ?${resting ? ', hp = ?, hp_at = ?' : ''}, version = version + 1 WHERE id = ? AND version = ?`)
+      .bind(
+        back.gold ?? 0,
+        ...resources.flatMap((id) => [path(id), path(id), back[id]]),
+        JSON.stringify(replanQueue(stored, kept, now, content)),
+        ...(resting ? [currentHp(player, now).hp, now] : []),
+        row.id,
+        row.version,
+      ),
+    before > 0
+      ? db
+          .prepare('UPDATE buildings SET level = ?, ends_at = ?, collected_at = ? WHERE character_id = ? AND building_id = ? AND level = ? AND ends_at = ?')
+          .bind(before, running.startedAt, producing ? now : null, ...where)
+      : db.prepare('DELETE FROM buildings WHERE character_id = ? AND building_id = ? AND level = ? AND ends_at = ?').bind(...where),
+  ], () => new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.'));
+  return json({
+    cancelled: [{ buildingId: running.buildingId, level: running.level }, ...cancelled.map((entry) => ({ buildingId: entry.buildingId, level: entry.level }))],
+    refund: back,
+    // The next build waiting starts at once.
+    character: characterView(await loadSettled(db, session.userId, now), now),
   });
 }
 
