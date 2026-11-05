@@ -355,8 +355,10 @@ describe('items', () => {
       const before = content.bases
         .filter((other) => (other.family ?? other.id) === base.family && (other.classLevel ?? 1) < base.classLevel)
         .reduce((best, other) => ((other.classLevel ?? 1) > (best.classLevel ?? 1) ? other : best));
-      assert.ok([10, 25, 50, 75].includes(base.classLevel), base.id);
-      assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= first[key[base.kind]] * 1.2, base.id);
+      assert.ok([10, 25, 50, 75, 100].includes(base.classLevel), base.id);
+      // At most a quarter above the first base's (Tier VI: x1.25, rounded up
+      // to hundredths).
+      assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= Math.ceil(first[key[base.kind]] * 125 - 1e-9) / 100, base.id);
       for (const cls of content.classes) {
         assert.equal(canUse(base.id, cls.id, content), canUse(first.id, cls.id, content), `${base.id} for ${cls.id}`);
       }
@@ -370,11 +372,11 @@ describe('items', () => {
     }
   });
 
-  test('every category has bases from class levels 10, 25, 50 and 75, dropping from those levels', () => {
+  test('every category has bases from class levels 10, 25, 50, 75 and 100, dropping from those levels', () => {
     const firsts = content.bases.filter((base) => !base.family);
     for (const first of firsts) {
       const levels = content.bases.filter((base) => base.family === first.id).map((base) => base.classLevel);
-      assert.deepEqual(levels, [10, 25, 50, 75], first.id);
+      assert.deepEqual(levels, [10, 25, 50, 75, 100], first.id);
     }
     assert.equal(canUse('saber', 'warrior', content, 24), false);
     assert.equal(canUse('saber', 'warrior', content, 25), true);
@@ -384,6 +386,10 @@ describe('items', () => {
     // Tier V (the author's 582): the Karabela from class level 75.
     assert.equal(canUse('karabela', 'warrior', content, 74), false);
     assert.equal(canUse('karabela', 'warrior', content, 75), true);
+    // Tier VI (665): the Flamberg from class level 100.
+    assert.equal(canUse('flamberge', 'warrior', content, 99), false);
+    assert.equal(canUse('flamberge', 'warrior', content, 100), true);
+    assert.equal(canUse('flamberge', 'mage', content, 100), false);
     const rng = createRng('trzecie-bazy');
     const swords = (maxClassLevel) => {
       const found = new Set();
@@ -396,6 +402,59 @@ describe('items', () => {
     assert.deepEqual(swords(24), ['broadsword']);
     assert.deepEqual(swords(25), ['broadsword', 'saber']);
     assert.deepEqual(swords(50), ['broadsword', 'estoc', 'saber']);
+    // On an exploration the top level of the place, in the weekly chest, at
+    // the Targowisko and in the Salon Gier the class level: the Flamberg
+    // from 100 (Stare Wyrobisko, 96–100, reaches it).
+    assert.deepEqual(swords(99), ['broadsword', 'estoc', 'karabela', 'saber']);
+    assert.deepEqual(swords(100), ['broadsword', 'estoc', 'flamberge', 'karabela', 'saber']);
+  });
+
+  // The author's 570 A and 665: Tier VI from class level 100, one base in
+  // each family, by the rule of Tier V (DECISIONS.md, "Tier V w grze").
+  test('Tier V and VI follow the Tier rule: the first base\'s factor x1.20 and x1.25 rounded up to hundredths, the bonus up to half again the Tier below\'s and from one above its best', () => {
+    const key = { weapon: 'damageFactor', armor: 'armorFactor', implicit: 'statFactor' };
+    // Half again a whole number is whole or a half: a half goes to the even
+    // number, as Tier V did (Halabarda 58.5 to 58, Łuk tatarski 43.5 to 44).
+    const halfAgain = (max) => {
+      const down = Math.floor(max * 1.5);
+      return down === max * 1.5 || down % 2 === 0 ? down : down + 1;
+    };
+    const sixth = content.bases.filter((base) => base.classLevel === 100);
+    assert.deepEqual(
+      sixth.map((base) => base.name),
+      [
+        'Flamberg', 'Topór dwusieczny', 'Cinquedea', 'Łuk scytyjski', 'Kaduceusz', 'Krzyż procesyjny', 'Tarcza turniejowa', 'Kołczan paradny',
+        'Łamacz mieczy', 'Astrolabium', 'Diadem', 'Hełm garnczkowy', 'Kontusz', 'Zbroja gotycka', 'Ferezja', 'Aureola', 'Sutanna',
+        'Rękawice sokolnicze', 'Sabatony', 'Kamea', 'Pierścień wieczności', 'Lunula',
+      ],
+    );
+    for (const [classLevel, step] of [[75, 120], [100, 125]]) {
+      for (const base of content.bases.filter((one) => one.classLevel === classLevel)) {
+        const first = content.basesById[base.family];
+        const below = content.bases.find((one) => one.family === base.family && one.classLevel === classLevel - 25);
+        assert.equal(base[key[base.kind]], Math.ceil(first[key[base.kind]] * step - 1e-9) / 100, base.id);
+        assert.deepEqual(base.bonus, { min: below.bonus.max + 1, max: halfAgain(below.bonus.max) }, base.id);
+        assert.equal(base.slot, first.slot, base.id);
+      }
+    }
+    // Two of the author's: the Flamberg 1.2 x 1.25 = 1.5 and 55–81 (the
+    // Karabela's 54), the Cinquedea 0.85 x 1.25 = 1.0625, so 1.07, and
+    // 40–58 (the Kris's 39, half again 58.5).
+    assert.deepEqual([content.basesById.flamberge.damageFactor, content.basesById.flamberge.bonus], [1.5, { min: 55, max: 81 }]);
+    assert.deepEqual([content.basesById.cinquedea.damageFactor, content.basesById.cinquedea.bonus], [1.07, { min: 40, max: 58 }]);
+    // The weakest Tier VI piece beats the best of Tier V at the levels it
+    // drops at, and well past them.
+    const number = (item) => (item.damage ? (item.damage.min + item.damage.max) / 2 : item.armor ?? item.implicit.value);
+    const rng = createRng('szosty-tier');
+    const rolls = (baseId, level) => Array.from({ length: 24 }, () => number(generateItem({ baseId, level }, rng, content)));
+    for (const base of sixth) {
+      const fifth = content.bases.find((one) => one.family === base.family && one.classLevel === 75);
+      for (const level of [100, 150, 300]) {
+        const weakest = Math.min(...rolls(base.id, level));
+        const best = Math.max(...rolls(fifth.id, level));
+        assert.ok(weakest > best, `${base.id} at level ${level}: ${weakest} against ${fifth.id} ${best}`);
+      }
+    }
   });
 
   test('properties are described in Polish', () => {

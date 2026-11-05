@@ -44,9 +44,9 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(mergeDiscoveries({ 'item:sword': 2, 'herb:comfrey': 1 }, held), held);
   });
 
-  test('items come in five tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
+  test('items come in six tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
     const sets = itemSets(content);
-    assert.equal(sets.length, 30);
+    assert.equal(sets.length, 36);
     assert.deepEqual(
       sets.filter((set) => set.tier === 0).map((set) => [set.name, set.bases.length]),
       [
@@ -61,8 +61,58 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(sets.find((set) => set.id === 'items:2:warrior').bases.slice(0, 3), ['broadsword', 'war-axe', 'pavise']);
     // Tier V (the author's 582), from class level 75.
     assert.deepEqual(sets.find((set) => set.id === 'items:5:warrior').bases.slice(0, 3), ['karabela', 'halberd', 'hussar-shield']);
+    // Tier VI (665), from class level 100.
+    assert.deepEqual(sets.find((set) => set.id === 'items:6:warrior').bases.slice(0, 3), ['flamberge', 'double-axe', 'jousting-shield']);
     const covered = new Set(sets.flatMap((set) => set.bases));
     assert.equal(covered.size, content.bases.length);
+  });
+
+  // The author's 570 A and 665: Tier VI from class level 100, as Tier V came
+  // from 75 (DECISIONS.md, "Tier V w grze").
+  test('Tier VI: its items from class level 100 with a set for every class and the accessories, its chest, and the materials of creatures above level 125', () => {
+    const levels = { level: 130, classLevel: 100, professions: {} };
+    const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
+    const sixth = view.items.tiers.at(-1);
+    assert.deepEqual([sixth.name, sixth.range, sixth.current, sixth.entries.length], ['Tier VI', 'od 100. poziomu klasy', true, 22]);
+    assert.deepEqual(
+      sixth.sets.map((set) => [set.name, set.bases]),
+      [
+        ['Wojownik', ['flamberge', 'double-axe', 'jousting-shield', 'great-helm', 'gothic-armor']],
+        ['Łucznik', ['scythian-bow', 'parade-quiver', 'diadem', 'kontusz']],
+        ['Mag', ['caduceus', 'astrolabe', 'diadem', 'ferezja']],
+        ['Kleryk', ['processional-cross', 'jousting-shield', 'astrolabe', 'halo', 'cassock']],
+        ['Cień', ['cinquedea', 'swordbreaker', 'diadem', 'kontusz']],
+        ['Dodatki', ['falconry-gloves', 'sabatons', 'cameo', 'eternity-ring', 'lunula']],
+      ],
+    );
+    // A full set opens the sixth chest, more than Tier V's.
+    for (const set of sixth.sets) assert.deepEqual(set.chest, content.encyclopedia.chests[5], set.name);
+    assert.deepEqual(content.encyclopedia.chests.slice(4), [
+      { gold: 2500, timePoints: 80, systemPoints: 32 },
+      { gold: 6250, timePoints: 160, systemPoints: 64 },
+    ]);
+    const warrior = itemSets(content).find((set) => set.id === 'items:6:warrior');
+    const found = Object.fromEntries(warrior.bases.map((id) => [`item:${id}`, 1]));
+    assert.deepEqual(encyclopediaChest('items:6:warrior', found, [], content).chest, { gold: 6250, timePoints: 160, systemPoints: 64 });
+    // Where it comes from: explorations from Stare Wyrobisko (96–100), worn
+    // from class level 100, the Warsztat's and the Szlifiernia's patterns
+    // from level 100 of their professions.
+    assert.deepEqual(sixth.entries.find((entry) => entry.id === 'flamberge').sources, [
+      'Wyprawy: wypada od regionu Stare Wyrobisko (poz. 96–100).',
+      'Dla klasy: Wojownik.',
+      'Założysz od 100. poziomu klasy.',
+      'Warsztat: wzór od 100. poziomu Rzemieślnictwa.',
+    ]);
+    assert.ok(sixth.entries.find((entry) => entry.id === 'cameo').sources.includes('Szlifiernia: wzór od 100. poziomu Jubilerstwa.'));
+    // Materials by the highest level of their creature: up to 125 in Tier V,
+    // above it in Tier VI (Sosnowe Wydmy, and the creatures of Rokitowe
+    // Bezdno that come a level or two above its 125).
+    assert.deepEqual(view.materials.tiers.slice(-2).map((tier) => [tier.name, tier.range, tier.current]), [
+      ['Tier V', 'poziomy 101–125', false],
+      ['Tier VI', 'poziomy 126–150', true],
+    ]);
+    const tierOf = (materialId) => view.materials.tiers.find((tier) => tier.entries.some((entry) => entry.id === materialId)).name;
+    assert.deepEqual(['glassy-sand', 'rarog-feather', 'cyrograf', 'bog-lantern-eye', 'veles-scale'].map(tierOf), ['Tier VI', 'Tier VI', 'Tier VI', 'Tier V', 'Tier V']);
   });
 
   test('a full set opens the chest of its tier, a count of discoveries its own chest in turn, each once', () => {

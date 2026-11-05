@@ -195,16 +195,19 @@ describe('Górnictwo in the engine', () => {
       ['Wisior', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
       ['Medalion', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
       ['Kolia', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
+      ['Kamea', 'Tier VI', 'Dodatki', 'Szlifiernia: wzór od 100. poziomu Jubilerstwa.'],
       ['Pierścień', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
       ['Sygnet', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
       ['Obrączka', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
       ['Pierścień rodowy', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
       ['Pierścień koronny', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
+      ['Pierścień wieczności', 'Tier VI', 'Dodatki', 'Szlifiernia: wzór od 100. poziomu Jubilerstwa.'],
       ['Talizman', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
       ['Otoczak', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
       ['Kieł', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
       ['Bursztyn', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
       ['Róg tura', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
+      ['Lunula', 'Tier VI', 'Dodatki', 'Szlifiernia: wzór od 100. poziomu Jubilerstwa.'],
     ]);
     // A jewel's card names the same Tier, and no Warsztat base says Szlifiernia.
     for (const base of jewelBases(content)) {
@@ -253,11 +256,38 @@ describe('Górnictwo in the engine', () => {
 });
 
 describe('Jubilerstwo in the engine', () => {
-  test('rings, amulets and talismans, the first of each family at once and the later ones from 10, 25 and 50; the Warsztat makes none of them', () => {
+  test('rings, amulets and talismans, the first of each family at once and the later ones from 10, 25, 50, 75 and 100; the Warsztat makes none of them', () => {
     assert.deepEqual(knownJewelPatterns(1, [], content).map((base) => base.id), ['amulet', 'ring', 'talisman']);
     assert.equal(knownJewelPatterns(10, [], content).length, 6);
     assert.ok(knownJewelPatterns(25, [], content).some((base) => base.id === 'band-ring'));
     assert.equal(knownJewelPatterns(50, [], content).length, 12);
+    assert.equal(knownJewelPatterns(75, [], content).length, 15);
+    // Tier VI (665): the Kamea, the Pierścień wieczności and the Lunula at
+    // the 100th level, or earlier when taken apart.
+    assert.equal(knownJewelPatterns(99, [], content).length, 15);
+    const at100 = knownJewelPatterns(100, [], content).map((base) => base.id);
+    assert.deepEqual([at100.length, ['cameo', 'eternity-ring', 'lunula'].every((id) => at100.includes(id))], [18, true]);
+    assert.ok(knownJewelPatterns(99, ['lunula'], content).some((base) => base.id === 'lunula'));
+    const report = jewelReport(
+      {
+        base: content.basesById.ring,
+        rarityId: 'common',
+        results: [],
+        learned: [],
+        minutes: 30,
+        startedAt: 0,
+        endsAt: 1,
+        seed: 'r',
+        stopped: false,
+        before: { level: 99, xp: 0 },
+        after: { level: 100, xp: 0 },
+        character: { level: 130 },
+        xp: 0,
+        work: { level: 130, timePoints: 0, messages: [] },
+      },
+      content,
+    );
+    assert.deepEqual(report.revealed, ['cameo', 'eternity-ring', 'lunula']);
     assert.ok(jewelBases(content).every((base) => !content.workshop.parts[base.slot]));
   });
 

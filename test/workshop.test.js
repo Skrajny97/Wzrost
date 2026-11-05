@@ -66,8 +66,16 @@ describe('the Warsztat in the engine', () => {
     const at50 = knownPatterns(50, [], content).map((pattern) => pattern.id);
     assert.equal(at50.length, 76);
     assert.ok(at50.includes('estoc') && at50.includes('greaves') && !at50.includes('family-ring'));
+    // Tier V at 75 and Tier VI (665) at the 100th level, the profession's last.
+    assert.equal(knownPatterns(74, [], content).length, 76);
+    const at75 = knownPatterns(75, [], content).map((pattern) => pattern.id);
+    assert.ok(at75.length === 95 && at75.includes('karabela') && !at75.includes('flamberge'));
+    assert.equal(knownPatterns(99, [], content).length, 95);
+    const at100 = knownPatterns(100, [], content).map((pattern) => pattern.id);
+    assert.ok(at100.length === 114 && at100.includes('flamberge') && at100.includes('sabatons') && !at100.includes('cameo'));
     // Taking one apart teaches it earlier.
     assert.ok(knownPatterns(10, ['estoc'], content).some((pattern) => pattern.id === 'estoc'));
+    assert.ok(knownPatterns(50, ['gothic-armor'], content).some((pattern) => pattern.id === 'gothic-armor'));
   });
 
   test('the rarities open with the level: rare at 5, unique at 15 and divine at 80', () => {
@@ -226,6 +234,14 @@ describe('the Warsztat in the engine', () => {
     assert.ok(report.system.includes(`Zdobyto Siłę: +${6 * content.professionsById[content.workshop.profession].statPerLevel}`), report.system.join(' | '));
     assert.ok(report.system.some((line) => line.startsWith('System odsłania nowe wzory: Pałasz, Czekan, Kordelas')));
     assert.ok(report.system.includes('System pozwala już wykonywać przedmioty rzadkości: rzadki'));
+    // At the 100th level the System reveals Tier VI (665), the Warsztat's 19.
+    const last = workshopReport(
+      { base: base('axe'), rarityId: 'common', results: [], minutes: 30, startedAt: 0, endsAt: 1, seed: 'r', stopped: false, before: { level: 99, xp: 0 }, after: { level: 100, xp: 0 }, character, xp: 0, work },
+      content,
+    );
+    assert.equal(last.revealed.length, 19);
+    assert.ok(last.revealed.includes('flamberge') && last.revealed.includes('cassock') && !last.revealed.includes('cameo'));
+    assert.ok(last.system.some((line) => line.startsWith('System odsłania nowe wzory: Flamberg, Topór dwusieczny, Cinquedea')), last.system.join(' | '));
   });
 
   test('narrator quests ask for items only where Rzemieślnictwo works, count the ones made and pay twice as much', () => {
