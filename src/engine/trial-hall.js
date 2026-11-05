@@ -57,11 +57,14 @@ export function trialEncounters(area, seed, content) {
 
 // A trial: the fights in order until one is lost. Each won fight pays as a
 // fight of an exploration of the hall's rewardMinutes at its level, times
-// rewardFactor (the proposal 620: „łupy i XP lepsze”): XP, gold and the
-// creatures' materials; the companions take their shares of the XP as on an
-// exploration. `potions`: the character's potions by id, its bag; the
-// healing ones are drunk below `healBelow`, one at a time, as on an
-// exploration. Returns a hunt for applyHunt and huntReport, with `hall`.
+// rewardFactor (the proposal 620: „łupy i XP lepsze”; DECISIONS.md, "Sala
+// prób", point 4): XP, gold and the creatures' materials, the elite an
+// elite's XP and gold, with the solo bonus of an exploration's fight; the
+// companions take their shares of the XP as on an exploration. `potions`:
+// the potions by id the character may drink, those of its bag whose recipes
+// it knows; the healing ones are drunk below `healBelow`, one at a time, as
+// on an exploration. Returns a hunt for applyHunt and huntReport, with
+// `hall`.
 export function trialHallFights({ character, equipped, name, area, seed, potions = {}, healBelow, companions = [], trophies = {} }, content) {
   const hall = trialHallOf(content);
   const rng = createRng(`${seed}:fights`);
@@ -112,12 +115,15 @@ export function trialHallFights({ character, equipped, name, area, seed, potions
     let fightMaterials = {};
     if (fight.won === true) {
       for (const enemy of enemies) {
+        // The creature's own rank, as on an exploration (the code review:
+        // the elite paid as an ordinary creature).
         const monster = content.monstersById[enemy.monsterId];
-        fightXp += monsterXp({ ...monster, elite: false, champion: false }, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(character.level, enemy.level, content);
-        fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * enemy.groupFactor * lengthed;
-        fightMaterials = addCounts(fightMaterials, materialDrops(enemy.monsterId, enemy.level, enemy.groupFactor * pace.timeFactor, rng, content));
+        const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
+        fightXp += monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(character.level, enemy.level, content);
+        fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * rank * enemy.groupFactor * lengthed;
+        fightMaterials = addCounts(fightMaterials, materialDrops(enemy.monsterId, enemy.level, enemy.groupFactor * pace.timeFactor * hall.rewardFactor, rng, content));
       }
-      fightXp = Math.round(fightXp * lengthed * partyXp * hall.rewardFactor);
+      fightXp = Math.round(fightXp * (1 + content.balance.hunt.soloXpBonus) * lengthed * partyXp * hall.rewardFactor);
       fightGold = Math.round(fightGold * hall.rewardFactor);
       xp += fightXp;
       gold += fightGold;

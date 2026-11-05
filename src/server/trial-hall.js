@@ -31,7 +31,7 @@ import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json } from './http.js';
 import { companionsGoing } from './hunts.js';
-import { potionsOf } from './professions-view.js';
+import { knownPotionsOf, potionsOf } from './professions-view.js';
 import { requireOpen } from './settlement.js';
 
 const path = (key) => `$."${key}"`;
@@ -108,7 +108,10 @@ export async function enterTrialHall(context) {
   const companions = companionsGoing(player, now);
   const trophies = trophiesFor(player, now, areaDangers(area, content).map((danger) => danger.monsterId));
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const hunt = trialHallFights({ character, equipped, name: row.name, area, seed, potions: potionsOf(row), companions, trophies }, content);
+  // Only the potions whose recipes the character knows are drunk, as on an
+  // exploration (potionKnown; the code review: one got in a Wymiana before
+  // its recipe was drunk here).
+  const hunt = trialHallFights({ character, equipped, name: row.name, area, seed, potions: knownPotionsOf(row), companions, trophies }, content);
   const applied = applyHunt(character, hunt, content);
   const won = hunt.hall.won;
 
