@@ -294,7 +294,9 @@ const campDone = (hash, read) => read.has('camp') && (campStarted() || !affordab
 // leaves the lit places to the player until the moment passes, `above` puts
 // the narrator above the first of them, `whole` lights them all in one ring,
 // which the camera takes in whole even if it has to draw back, `unfold`
-// opens what folds there first, `delay` lets the screen be seen first, and
+// opens what folds there first (the place's own fold, told by an "unfold"
+// event, and a "Jak to działa?" inside it), `delay` lets the screen be seen
+// first, and
 // `browse` has the fights' tabs take turns while the line is told.
 // `sweep` has the camera ride, at the screen's own size, from place to
 // place in their order, each as the line tells its name (the text of the
@@ -401,7 +403,9 @@ const BEATS = {
   // The Profesje chapter, after the Umiejętności.
   'professions-welcome': { when: professionsDue },
   'professions-lead': { place: '.nav-item[href="#/profesje"]', when: (hash, read) => professionsTour(hash, read) && !onProfessions(hash) },
-  'professions-intro': { place: mark('professions-intro'), when: professionsHere },
+  // The line asks to read the System's words, most of them folded under
+  // "Jak to działa?" (315 A): they unfold (664).
+  'professions-intro': { place: mark('professions-intro'), unfold: true, when: professionsHere },
   'professions-list': { place: mark('professions-list'), when: professionsHere },
   'professions-ending': { when: professionsHere },
   // The Społeczność chapter, after the Profesje.
@@ -1125,7 +1129,12 @@ function startLight(line) {
   // Then the narrator steps in and the parchment unrolls, slowly.
   const before = lastSpot?.hash === place && performance.now() - lastSpot.at < 3000 && !calm() ? lastSpot.line : null;
   lastSpot = null;
-  if (beat.unfold) for (const element of places(line)) element.dispatchEvent(new Event('unfold'));
+  if (beat.unfold) {
+    for (const element of places(line)) {
+      element.dispatchEvent(new Event('unfold'));
+      for (const fold of element.querySelectorAll('details.how-more:not([open])')) fold.open = true;
+    }
+  }
   // A sweep starts on the first place.
   const shot = aim(beat.sweep ? places(line).slice(0, 1) : places(line), { zoom: !beat.free && !beat.sweep, travel: Boolean(before), keep: beat.above ? 0 : note.height() + 20, above: Boolean(beat.sweep), whole: beat.whole });
   light.slide = before && { from: before, start: shot.start, duration: Math.max(shot.duration, 700) };

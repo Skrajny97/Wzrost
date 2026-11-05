@@ -84,6 +84,28 @@ test('Szybkie Polowanie is told once the character is home on an inner region, a
   narrator.narrate();
 });
 
+// The System's words over the Profesje show their first sentence and fold
+// the rest under "Jak to działa?" (315 A), while the narrator asks to read
+// them, and no tap reaches a place he points at: they unfold for him (664).
+test('the System words the narrator asks to read in the Profesje unfold', () => {
+  state.user = { skipTutorials: false };
+  const panel = globalThis.document.createElement('section');
+  panel.dataset.guide = 'professions-intro';
+  const fold = globalThis.document.createElement('details');
+  fold.className = 'how-more';
+  panel.append(fold);
+  globalThis.document.body.append(panel);
+  page.places.set('[data-guide="professions-intro"]', [panel]);
+  state.character = { ...character({ read: [...intro, 'professions-welcome'], level: 10 }), professions: { avatar: { owned: false, activity: null } } };
+  narrator.narrate('#/profesje');
+  assert.equal(fold.open, true);
+  // The light goes with the character, and the panel with the screen.
+  state.character = null;
+  narrator.narrate();
+  page.places.clear();
+  panel.remove();
+});
+
 test('the Rzemieślnictwo waiting for a free worker does not begin in the middle of the Osada', () => {
   state.user = { skipTutorials: false };
   // The Osada began while the character was away; back home, its lead to

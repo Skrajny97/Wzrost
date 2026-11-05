@@ -95,26 +95,82 @@ class FakeNode {
   querySelector(selector) {
     return this.find((node) => node.classList.contains(selector.slice(1)))[0] ?? null;
   }
+  // A lit place, as the narrator measures and opens it: simple selectors
+  // only (see `matches`), a box in the middle of a phone's screen.
+  querySelectorAll(selector) {
+    return this.find((node) => node.matches(selector));
+  }
+  matches(selector) {
+    return selector.split(',').some((one) => matchesOne(this, one.trim()));
+  }
+  closest(selector) {
+    for (let node = this; node instanceof FakeNode; node = node.parentNode) if (node.matches(selector)) return node;
+    return null;
+  }
+  contains(other) {
+    for (let node = other; node; node = node.parentNode) if (node === this) return true;
+    return false;
+  }
+  get children() {
+    return this.childNodes.filter((node) => node instanceof FakeNode);
+  }
+  getBoundingClientRect() {
+    return { top: 300, bottom: 400, left: 20, right: 370, width: 350, height: 100 };
+  }
+  getClientRects() {
+    return [this.getBoundingClientRect()];
+  }
+  dispatchEvent(event) {
+    for (const listener of this.listeners[event.type] ?? []) listener(event);
+    return true;
+  }
 }
+
+// One simple selector: a tag, ".class"es, "[attribute]" or
+// '[attribute="value"]' (also data-*), and ":not([attribute])".
+function matchesOne(node, selector) {
+  const not = /:not\(\[([\w-]+)\]\)$/.exec(selector);
+  if (not) return !has(node, not[1]) && matchesOne(node, selector.slice(0, not.index));
+  const parts = selector.match(/^[\w-]+|\.[\w-]+|\[[^\]]+\]/g) ?? [];
+  if (parts.join('') !== selector) return false;
+  return parts.every((one) => {
+    if (one.startsWith('.')) return node.classList.contains(one.slice(1));
+    if (one.startsWith('[')) {
+      const [, name, value] = /^\[([\w-]+)(?:="([^"]*)")?\]$/.exec(one);
+      return value === undefined ? has(node, name) : attribute(node, name) === value;
+    }
+    return node.tagName === one.toUpperCase();
+  });
+}
+// A data-* attribute set either way: by h() as an attribute, or in `dataset`.
+const attribute = (node, name) =>
+  (name.startsWith('data-') ? node.dataset[name.slice(5).replace(/-(\w)/g, (_, letter) => letter.toUpperCase())] : undefined) ?? node.getAttribute(name);
+const has = (node, name) => (name === 'open' ? Boolean(node.open) : attribute(node, name) !== null);
 
 const STORED = { 'insight.motion': 'off', 'insight.narratorVoice': 'off' };
 
 // The page for the test file, with the first inner region, where Szybkie
 // Polowanie waits: `page.state` and `page.narrator` once `page.ready` has
 // come (the test runner does not wait for one top-level `before` before it
-// starts the next), `page.sent` with the requests and `page.toastBox` with
-// the message.
+// starts the next), `page.sent` with the requests, `page.toastBox` with the
+// message, and in `page.places` the elements the narrator finds for a
+// place's selector (none unless a test puts them there). The game's screen
+// is empty, so the camera stays where it is.
 export function narratorPage() {
-  const page = { sent: [], toastBox: new FakeNode('div'), state: null, narrator: null };
+  const page = { sent: [], toastBox: new FakeNode('div'), screen: new FakeNode('main'), places: new Map(), state: null, narrator: null };
   let opened;
   page.ready = new Promise((resolve) => (opened = resolve));
   const saved = {};
   before(async () => {
-    for (const name of ['document', 'window', 'Node', 'localStorage', 'fetch', 'location']) saved[name] = globalThis[name];
+    const globals = ['document', 'window', 'Node', 'localStorage', 'fetch', 'location', 'getComputedStyle', 'requestAnimationFrame', 'cancelAnimationFrame'];
+    for (const name of globals) saved[name] = globalThis[name];
     globalThis.Node = FakeNode;
     globalThis.location = { hash: '#/walka' };
     globalThis.localStorage = { getItem: (key) => STORED[key] ?? null, setItem() {}, removeItem() {} };
     globalThis.window = { innerWidth: 390, innerHeight: 844, scrollX: 0, scrollY: 0, addEventListener() {}, matchMedia: () => ({ matches: false, addEventListener() {} }) };
+    globalThis.getComputedStyle = () => ({ overflow: 'hidden' });
+    globalThis.requestAnimationFrame = (step) => setTimeout(step, 16);
+    globalThis.cancelAnimationFrame = (frame) => clearTimeout(frame);
     globalThis.document = {
       body: new FakeNode('body'),
       documentElement: new FakeNode('html'),
@@ -122,9 +178,10 @@ export function narratorPage() {
       createElementNS: (namespace, tag) => new FakeNode(tag),
       addEventListener() {},
       removeEventListener() {},
-      getElementById: (id) => (id === 'toast' ? page.toastBox : null),
+      getElementById: (id) => ({ toast: page.toastBox, screen: page.screen })[id] ?? null,
       querySelector: (selector) => (selector === '#toast' ? page.toastBox : null),
-      querySelectorAll: () => [],
+      querySelectorAll: (selector) => page.places.get(selector) ?? [],
+      elementsFromPoint: () => [],
     };
     // The server answers with the character as the page now has it: its lines
     // read the way the request asks (game.test.js checks the server does so).
