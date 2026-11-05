@@ -165,6 +165,11 @@
       "id": "0.1.71",
       "title": "Wersja 0.1.71: biżuteria dla towarzyszy",
       "body": "- Towarzysze noszą teraz amulet i pierścień, a nie tylko talizman. Założysz je w Obozie, w Kwaterach, przyciskiem „Załóż z plecaka”."
+    },
+    {
+      "id": "0.1.72",
+      "title": "Wersja 0.1.72: Zbieracz Systemu",
+      "body": "- W Obozie, przy Skrzyni Konta, unosi się Zbieracz Systemu. Za 10 000 złota, raz na zawsze, sam zbiera zasoby z magazynów Obozu, gdy się zapełnią, także gdy Cię nie ma."
     }
 ]
 }
