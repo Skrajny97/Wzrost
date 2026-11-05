@@ -78,14 +78,17 @@ const professionsHere = (hash, read) => onProfessions(hash) && professionsTour(h
 // report that brought it there, and only when the Umiejętności and the
 // Profesje chapters are not waiting. Not on the character's screens either.
 // It leads to the Społeczność tab, points at its tabs and at the chat's
-// rules. Then the narrator itself opens the inner region the player hunts
-// in and points there at Szybkie Polowanie, under "Wyrusz", with nothing to
-// tap but "Dalej". While the character is away it waits, and goes there
-// from the Walka tab once the character is back.
+// rules, and ends there. Its Szybkie Polowanie, under "Wyrusz", is then told
+// as a place's line, as the Osada's are, so that a character always away
+// does not hold up the chapters after it (664): right after the rules the
+// narrator itself opens the inner region the player hunts in and points
+// there, with nothing to tap but "Dalej". While the character is away the
+// line waits, and goes there from the Walka tab once the character is back
+// and no chapter waits.
 const onCommunity = (hash) => hash === '#/spolecznosc';
 const professionsWaiting = (read) => Boolean(state.character.professions) && !read.has('professions-ending');
 const communityDue = (hash, read) =>
-  isUnlocked('community') && !onReport(hash) && !onCharacter(hash) && !skillsWaiting(read) && !professionsWaiting(read) && !read.has('community-ending');
+  isUnlocked('community') && !onReport(hash) && !onCharacter(hash) && !skillsWaiting(read) && !professionsWaiting(read) && !read.has('community-rules');
 const communityTour = (hash, read) => communityDue(hash, read) && read.has('community-welcome');
 const communityHere = (hash, read) => onCommunity(hash) && communityTour(hash, read);
 // An inner region the class has opened, while the character is at home: its
@@ -95,7 +98,11 @@ function onOpenArea(hash) {
   const area = state.content.regions.find((region) => region.id === regionId)?.areas.find((candidate) => candidate.id === areaId);
   return Boolean(area && state.character.quickHunts) && !state.character.activity && state.character.classLevel >= area.unlockClassLevel;
 }
-const quickHuntHere = (hash, read) => onOpenArea(hash) && communityTour(hash, read) && read.has('community-rules');
+// Szybkie Polowanie's line, with the character at home and nothing else to
+// tell.
+const quickHuntDue = (read) =>
+  read.has('community-rules') && !read.has('community-ending') && Boolean(state.character.quickHunts) && !state.character.activity && noChapterWaits(read);
+const quickHuntHere = (hash, read) => onOpenArea(hash) && quickHuntDue(read);
 
 // The Rzemieślnictwo chapter: once the Warsztat opens (character level 15,
 // where the game has Rzemieślnictwo), after the report that brought it there
@@ -103,7 +110,7 @@ const quickHuntHere = (hash, read) => onOpenArea(hash) && communityTour(hash, re
 // either. It leads to the Profesje tab, from where the narrator itself opens
 // the Warsztat, points at its patterns and ends there.
 const onWorkshop = (hash) => hash === '#/profesje/rzemieslnictwo';
-const communityWaiting = (read) => isUnlocked('community') && !read.has('community-ending');
+const communityWaiting = (read) => isUnlocked('community') && !read.has('community-rules');
 // The Warsztat's, the Kopalnia's and the Szlifiernia's forms show only while
 // someone can take the work (professions.js): the character, or its Awatar
 // Systemu. Till then their chapters wait for it, rather than pass their
@@ -118,6 +125,7 @@ const craftingDue = (hash, read) =>
   !skillsWaiting(read) &&
   !professionsWaiting(read) &&
   !communityWaiting(read) &&
+  (read.has('crafting-welcome') || !laterHalfway(read)) &&
   !read.has('crafting-ending');
 const craftingTour = (hash, read) => craftingDue(hash, read) && read.has('crafting-welcome');
 const craftingHere = (hash, read) => onWorkshop(hash) && craftingTour(hash, read);
@@ -129,7 +137,17 @@ const craftingTrip = (hash, read) => (hash === '#/profesje' && craftingTour(hash
 // the Osada tab and points there at the Tablica zleceń, then at the
 // Zaklinaczka's and the Pustelnik's places.
 const onSettlement = (hash) => hash === '#/osada';
-const craftingWaiting = (read) => Boolean(state.character.professions?.workshop) && !read.has('crafting-ending');
+// A Rzemieślnictwo not begun yet waits only while it could begin: with a
+// free worker and no later chapter told halfway. Meanwhile it holds up none
+// of the chapters after it (664: a character always away never let them
+// come), and it does not cut short one of them begun meanwhile.
+const craftingWaiting = (read) =>
+  Boolean(state.character.professions?.workshop) && !read.has('crafting-ending') && (read.has('crafting-welcome') || (workerFree() && !laterHalfway(read)));
+const laterHalfway = (read) =>
+  (read.has('settlement-welcome') && settlementWaiting(read)) ||
+  (read.has('evolution-welcome') && evolutionWaiting(read)) ||
+  (read.has('towers-welcome') && towersWaiting(read)) ||
+  (read.has('mining-welcome') && miningWaiting(read));
 const settlementDue = (hash, read) =>
   Boolean(state.character.settlementOpen) &&
   !onReport(hash) &&
@@ -146,16 +164,7 @@ const settlementHere = (hash, read) => onSettlement(hash) && settlementTour(hash
 // krok po kroku"): the Karczma, the Zaklinaczka, the Pustelnik, the
 // Zielarka, the Targowisko, the Kuźnia, the Garbarnia, the Stajnia, and
 // the camp's Kwatery once they stand.
-const placesDue = (read) =>
-  Boolean(state.character.settlementOpen) &&
-  !skillsWaiting(read) &&
-  !professionsWaiting(read) &&
-  !communityWaiting(read) &&
-  !craftingWaiting(read) &&
-  !evolutionWaiting(read) &&
-  !towersWaiting(read) &&
-  !miningWaiting(read) &&
-  read.has('settlement-ending');
+const placesDue = (read) => Boolean(state.character.settlementOpen) && read.has('settlement-ending') && noChapterWaits(read);
 // A place's screen, also at one of its tabs (the Karczma's, settlement.js).
 const onPlace = (placeId) => (hash, read) => (hash === `#/osada/${placeId}` || hash.startsWith(`#/osada/${placeId}/`)) && placesDue(read);
 const onQuarters = (hash, read) =>
@@ -215,12 +224,12 @@ const towersTrip = (hash, read) => (hash === '#/walka' && towersTour(hash, read)
 const onMine = (hash) => hash === '#/profesje/gornictwo';
 const onLapidary = (hash) => hash === '#/profesje/jubilerstwo';
 const towersWaiting = (read) => isUnlocked('towers') && !read.has('towers-ending');
-const miningWaiting = (read) => isUnlocked('mining') && !read.has('mining-ending');
-// After the introduction, with no chapter waiting: a line of its own place
-// told on the place's first visit, as the Osada's are (641-647): the
-// Wyprawa Gildii and the Warownia.
-const quietDue = (read) =>
-  read.has('ending') &&
+// As the Rzemieślnictwo's: not begun yet, it holds nothing up while the
+// worker is busy (664).
+const miningWaiting = (read) => isUnlocked('mining') && !read.has('mining-ending') && (read.has('mining-welcome') || workerFree());
+// No chapter waits: only then a line of a single place comes (the Osada's,
+// Szybkie Polowanie's, the Wyprawa Gildii's and the Warownia's).
+const noChapterWaits = (read) =>
   !skillsWaiting(read) &&
   !professionsWaiting(read) &&
   !communityWaiting(read) &&
@@ -229,6 +238,10 @@ const quietDue = (read) =>
   !evolutionWaiting(read) &&
   !towersWaiting(read) &&
   !miningWaiting(read);
+// After the introduction, with no chapter waiting: a line of its own place
+// told on the place's first visit, as the Osada's are (641-647): the
+// Wyprawa Gildii and the Warownia.
+const quietDue = (read) => read.has('ending') && noChapterWaits(read);
 const miningDue = (hash, read) =>
   isUnlocked('mining') &&
   workerFree() &&
@@ -250,13 +263,7 @@ const mineTrip = (hash, read) => (hash === '#/profesje' && miningTour(hash, read
 const lapidaryTrip = (hash, read) => ((hash === '#/profesje' || onMine(hash)) && miningTour(hash, read) && read.has('mining-dig') ? '#/profesje/jubilerstwo' : null);
 // From the chat only right after its rules, so a later visit stays there.
 const quickHuntTrip = (hash, read, passed) =>
-  ((onCommunity(hash) && passed === 'community-rules') || hash.startsWith('#/walka')) &&
-  communityTour(hash, read) &&
-  read.has('community-rules') &&
-  Boolean(state.character.quickHunts) &&
-  !state.character.activity
-    ? huntingGround()
-    : null;
+  ((onCommunity(hash) && passed === 'community-rules') || hash.startsWith('#/walka')) && quickHuntDue(read) ? huntingGround() : null;
 
 // The inner region the player hunts in now: of the open ones the character
 // has reached, the one with the highest level.
@@ -687,14 +694,16 @@ const passedHere = new Set();
 let justPassed = null;
 const readNow = () => new Set([...state.character.tutorial, ...passedHere]);
 
-// The introduction is over, the Społeczność chapter is not halfway (it
-// waits for an inner region at its end, unless "Pomijaj objaśnienia
-// narratora" will pass that), and nothing of the narrator's is on the screen
-// or due here, so another parchment may open (email.js).
+// The introduction is over, the Społeczność chapter is not halfway (up to
+// its rules, or with the character at home its Szybkie Polowanie, where the
+// narrator takes the player, unless "Pomijaj objaśnienia narratora" will
+// pass that; with the character away that line holds nothing up, 664), and
+// nothing of the narrator's is on the screen or due here, so another
+// parchment may open (email.js).
 export function narratorIdle() {
   if (!state.character?.tutorial || !state.content?.tutorial) return false;
   const read = readNow();
-  const halfway = !skipsAll() && read.has('community-welcome') && !read.has('community-ending');
+  const halfway = !skipsAll() && read.has('community-welcome') && (!read.has('community-rules') || quickHuntDue(read));
   return !scroll && !light && !pause && !surveying && read.has('ending') && !halfway && !nextLine();
 }
 

@@ -9,140 +9,16 @@
 // introduction) is in game.test.js.
 
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { after, before, beforeEach, test } from 'node:test';
+import { before, beforeEach, test } from 'node:test';
+import { button, cards, intro, narratorPage, part, settled, tutorial } from './helpers/narrator-page.js';
 
-const data = (name) => JSON.parse(readFileSync(new URL(`../data/${name}.json`, import.meta.url), 'utf8'));
-const tutorial = { ...data('tutorial'), $comment: undefined, startTimePoints: 60 };
-const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once === true;
-const intro = tutorial.lines.filter((line) => kept(line) && !line.chapter).map((line) => line.id);
-const part = (chapter) => tutorial.lines.filter((line) => kept(line) && line.chapter === chapter).map((line) => line.id);
-
-class FakeNode {
-  constructor(tag) {
-    this.tagName = tag.toUpperCase();
-    this.childNodes = [];
-    this.parentNode = null;
-    this.attributes = {};
-    this.dataset = {};
-    this.className = '';
-    this.style = { setProperty() {} };
-    this.listeners = {};
-    this.open = false;
-    const names = () => this.className.split(' ').filter(Boolean);
-    this.classList = {
-      add: (...more) => (this.className = [...new Set([...names(), ...more])].join(' ')),
-      remove: (...less) => (this.className = names().filter((name) => !less.includes(name)).join(' ')),
-      toggle: (name, on = !names().includes(name)) => (on ? this.classList.add(name) : this.classList.remove(name)),
-      contains: (name) => names().includes(name),
-    };
-  }
-  append(...nodes) {
-    for (const node of nodes) {
-      if (node instanceof FakeNode) {
-        node.parentNode?.removeChild(node);
-        node.parentNode = this;
-      }
-      this.childNodes.push(node);
-    }
-  }
-  removeChild(node) {
-    this.childNodes = this.childNodes.filter((child) => child !== node);
-    node.parentNode = null;
-  }
-  remove() {
-    this.parentNode?.removeChild(this);
-  }
-  replaceChildren(...nodes) {
-    for (const child of this.childNodes) if (child instanceof FakeNode) child.parentNode = null;
-    this.childNodes = [];
-    this.append(...nodes);
-  }
-  get isConnected() {
-    let node = this;
-    while (node.parentNode) node = node.parentNode;
-    return node === globalThis.document?.body;
-  }
-  setAttribute(name, value) {
-    this.attributes[name] = String(value);
-  }
-  getAttribute(name) {
-    return this.attributes[name] ?? null;
-  }
-  addEventListener(type, listener) {
-    (this.listeners[type] ??= []).push(listener);
-  }
-  removeEventListener() {}
-  showModal() {
-    this.open = true;
-  }
-  close() {
-    this.open = false;
-  }
-  focus() {}
-  click() {
-    for (const listener of this.listeners.click ?? []) listener({ currentTarget: this, target: this, preventDefault() {}, stopPropagation() {} });
-  }
-  get textContent() {
-    return this.childNodes.map((node) => (typeof node === 'string' ? node : node.textContent)).join('');
-  }
-  set textContent(text) {
-    this.childNodes = [String(text)];
-  }
-  // The elements below this one that `match`, in order.
-  find(match) {
-    return this.childNodes.flatMap((node) => (typeof node === 'string' ? [] : [...(match(node) ? [node] : []), ...node.find(match)]));
-  }
-  // Only ".class", which is all the narrator asks a card for.
-  querySelector(selector) {
-    return this.find((node) => node.classList.contains(selector.slice(1)))[0] ?? null;
-  }
-}
-
-// The animations and the narrator's voice off, as one may set them: the
-// parchment shows at once, and no line waits for the first touch of the page.
-const STORED = { 'insight.motion': 'off', 'insight.narratorVoice': 'off' };
-const toastBox = new FakeNode('div');
-const sent = [];
-const saved = {};
+const page = narratorPage();
+const { sent, toastBox } = page;
 let narrator;
 let state;
-
 before(async () => {
-  for (const name of ['document', 'window', 'Node', 'localStorage', 'fetch', 'location']) saved[name] = globalThis[name];
-  globalThis.Node = FakeNode;
-  globalThis.location = { hash: '#/walka' };
-  globalThis.localStorage = { getItem: (key) => STORED[key] ?? null, setItem() {}, removeItem() {} };
-  globalThis.window = { innerWidth: 390, innerHeight: 844, scrollX: 0, scrollY: 0, addEventListener() {}, matchMedia: () => ({ matches: false, addEventListener() {} }) };
-  globalThis.document = {
-    body: new FakeNode('body'),
-    documentElement: new FakeNode('html'),
-    createElement: (tag) => new FakeNode(tag),
-    createElementNS: (namespace, tag) => new FakeNode(tag),
-    addEventListener() {},
-    removeEventListener() {},
-    getElementById: (id) => (id === 'toast' ? toastBox : null),
-    querySelector: (selector) => (selector === '#toast' ? toastBox : null),
-    querySelectorAll: () => [],
-  };
-  // The server answers with the character as the page now has it: its lines
-  // read the way the request asks (game.test.js checks the server does so).
-  globalThis.fetch = async (path, options) => {
-    sent.push({ method: options.method, path, body: options.body ? JSON.parse(options.body) : null });
-    return new Response(JSON.stringify({ character: { ...state.character, serverTime: Date.now() } }), { status: 200 });
-  };
-  ({ state } = await import('../src/client/state.js'));
-  narrator = await import('../src/client/narrator.js');
-  // The first inner region, where Szybkie Polowanie waits at the end of the
-  // Społeczność chapter.
-  state.content = { tutorial, regions: [{ id: 'windfalls', areas: [{ id: 'windfalls-edge', minLevel: 1, unlockClassLevel: 1 }] }] };
-});
-
-after(() => {
-  for (const [name, value] of Object.entries(saved)) {
-    if (value === undefined) delete globalThis[name];
-    else globalThis[name] = value;
-  }
+  await page.ready;
+  ({ narrator, state } = page);
 });
 
 // No character: whatever the narrator had on the page goes with it.
@@ -152,10 +28,6 @@ beforeEach(() => {
   sent.length = 0;
   toastBox.textContent = '';
 });
-
-const settled = () => new Promise((resolve) => setTimeout(resolve, 10));
-const cards = () => globalThis.document.body.find((node) => node.tagName === 'DIALOG');
-const button = (className) => globalThis.document.body.find((node) => node.classList.contains(className))[0];
 
 // A character at home after the introduction, with the Ognisko built, at
 // `level` with the parts of the game it has.
