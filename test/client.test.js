@@ -302,6 +302,18 @@ test('the narrator knows when and where each of its lines shows', () => {
   }
 });
 
+// The parchment names the Osada's board as the game does (data/settlement.json):
+// "Tablica zleceń", not "Tablica Zleceń" (664; the recording stays).
+test('the narrator writes the Tablica zleceń as the Osada names it', () => {
+  const tutorial = JSON.parse(readFileSync(new URL('../data/tutorial.json', import.meta.url), 'utf8'));
+  const settlement = JSON.parse(readFileSync(new URL('../data/settlement.json', import.meta.url), 'utf8'));
+  assert.equal(settlement.places.find((place) => place.id === 'board').name, 'Tablica zleceń');
+  const said = tutorial.lines.flatMap((line) => [line, line.female, line.desktop, ...Object.values(line.classes ?? {})]).filter(Boolean);
+  const texts = said.flatMap((one) => one.text ?? []);
+  assert.ok(texts.some((text) => text.includes('Na Tablicy zleceń')));
+  assert.ok(!texts.some((text) => /Tablic\p{L}* Zleceń/u.test(text)));
+});
+
 test("the narrator's quests sit in the top bar, where his line points", () => {
   const layout = readFileSync(join(CLIENT, 'layout.js'), 'utf8');
   assert.match(layout, /'data-guide': 'quests'/);
