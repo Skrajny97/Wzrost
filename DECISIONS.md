@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Sprawdzanie typów w kodzie, stopniowo (650 A, 5.11.2026)
+
+Autor zapytał, czy przydałaby się migracja na inny język albo przegląd kodu („daj znać”). Odpowiedź: przenosiny nie są potrzebne, bo gra działa na Cloudflare Workers, gdzie JavaScript jest językiem podstawowym, a pilnują jej testy i automatyczne przejście wprowadzenia. Zaproponowano sprawdzanie typów TypeScriptem w samych komentarzach (JSDoc), bez przepisywania kodu. Autor: „650 A”.
+
+1. **Stopniowo.** Pliki dostają opisy typów po kolei, przy kolejnych etapach, zaczynając od czystego silnika (`src/engine/`). Gra się nie zmienia.
+2. **Sprawdzanie przed wdrożeniem.** Gdy pierwsze pliki będą opisane, `npm run typecheck` (kompilator TypeScript bez budowania, tylko sprawdzanie) dojdzie do testów przed wdrożeniem i obejmie opisane pliki. Nowe pliki obejmuje od razu.
+
 ## Wersja 0.1.71 (5.11.2026)
 
 Towarzysze noszą też amulet i pierścień: zob. „Biżuteria towarzyszy”. Wdrożenie do gry jest szybsze: zob. „Testy przed wdrożeniem w czterech częściach”.
