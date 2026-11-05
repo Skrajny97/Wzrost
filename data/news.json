@@ -185,6 +185,11 @@
       "id": "0.1.75",
       "title": "Wersja 0.1.75: towarzysze w drodze",
       "body": "- Towarzysze z Kwater, którzy idą z Tobą na wyprawę, idą też obok Twojej postaci na ekranie Walka.\n- Przycisk „Pomiń objaśnienie” jest mniejszy i nie zasłania już słów narratora."
+    },
+    {
+      "id": "0.1.76",
+      "title": "Wersja 0.1.76: czystsze chody towarzyszy",
+      "body": "- Towarzysze idący obok Twojej postaci na ekranie Walka nie migają już szarymi plamkami na obrysie: każdą klatkę ich chodu przejrzano piksel po pikselu."
     }
 ]
 }
