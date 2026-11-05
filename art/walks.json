@@ -360,7 +360,7 @@
     "companion-warrior-male": {
       "start": "art/references/walks/start/companion-warrior-male.png",
       "pose": 2,
-      "description": "a broad-shouldered slavic man warrior for hire in his forties, a shaved head and a thick fair beard braided in two, calm hazel eyes, a studded leather jerkin over a mail shirt, a wide belt, dark trousers and leather boots, a big axe resting on his shoulder"
+      "description": "a broad-shouldered slavic man warrior for hire in his forties, a shaved head and a thick fair beard braided in two, calm hazel eyes, a studded leather jerkin over a mail shirt, a wide belt, dark trousers and leather boots, a big axe resting on his shoulder, held at the shoulder by one hand whose bare forearm ends in a bent elbow wrapped in the leather bracer, the other arm swinging free, exactly two hands, no third hand, no fist at the elbow"
     },
     "companion-archer-female": {
       "start": "art/references/walks/start/companion-archer-female.png",
@@ -395,7 +395,7 @@
     "companion-shadow-female": {
       "start": "art/references/walks/start/companion-shadow-female.png",
       "pose": 2,
-      "description": "a young slavic woman rogue for hire, short dark red hair, a sly half smile, amber eyes, a dark grey hood half down, a black scarf around her neck, a dark leather jerkin, dark trousers and soft boots, a dagger in each hand"
+      "description": "a young slavic woman rogue for hire, short dark red hair, a sly half smile, amber eyes, a dark grey hood half down, a black scarf around her neck, a dark leather jerkin, dark trousers and soft boots, one short dagger in her back hand only, held in a reverse grip with the blade pointing down and back, her front hand empty, no second dagger"
     },
     "companion-shadow-male": {
       "start": "art/references/walks/start/companion-shadow-male.png",
