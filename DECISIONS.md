@@ -3034,7 +3034,11 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
-## Wyprawa Gildii (621 A) (5.11.2026, w grze od 0.1.66)
+## Wersja 0.1.65 (5.11.2026)
+
+Wyprawa Gildii (621 A): zob. „Wyprawa Gildii (621 A)”. Przerwanie budowy w toku ze zwrotem kosztu: zob. „Przerwanie budowy w toku”. Postać wystawiona jako najemnik nie atakuje Bestii Gildii ani strażników Wyprawy.
+
+## Wyprawa Gildii (621 A) (5.11.2026, w grze od 0.1.65)
 
 Autor o pierwszej wersji (616 B): „Coś to takie nudnawe, chyba że na końcu każdego etapu byłby coraz trudniejszy strażnik”, wcześniej o Próbach: „Do poprawy, bo jak Gildia się szybko rozwinie to przestanie być wyzwaniem sytuacja na cały tydzień. Do tego potrzebna jest nowa aktywnośc tez w Gildii.”, a potem „621 A” i „624 akcept”. Wariant 621 A: „Wyprawa Gildii ze strażnikiem na końcu każdego z 7 etapów. Minuty wypraw członków prowadzą gildię do strażnika, a ten zagradza drogę, aż gildia go pokona. Każdy, kto dołożył minut, atakuje go jak Bestię, 3 razy dziennie. Każdy następny strażnik jest silniejszy. Pokonany daje skrzynię wszystkim, którzy dołożyli minut, a ostatni także rzadki łup.”
 
@@ -3068,6 +3072,17 @@ Autor o pierwszej wersji (616 B): „Coś to takie nudnawe, chyba że na końcu 
 16. **Baza danych i API.** Migracja 0083: `guild_expeditions` (trasa gildii i tygodnia z krainą, poziomem, strażnikami, aktywnymi i dołączającymi), `guild_expedition_minutes` (minuty postaci w gildii i tygodniu), `guild_expedition_guardians` (strażnik, gdy przyjdzie: poziom, członkowie, minuty etapu, HP, upadek), `guild_expedition_hits` (ataki) i `guild_expedition_chests` (odebrane skrzynie). Wiersze sprzed poprzedniego tygodnia znikają, gdy przychodzi nowa trasa, a gildia, która znika, zabiera swoje trasy i minuty. Zapytania: `GET /api/guild/expedition`, `POST /api/guild/expedition/attack` i `POST /api/guild/expedition/claim` (`week`, `stage`); `GET /api/guild/todo` ma `expedition`.
 17. **Teksty** zakładki i odpowiedzi gry (`expedition.texts` w `data/guilds.json`) to propozycja do poprawy przez autora.
 18. **Najemnik nie atakuje (brakujący szczegół).** Postać wystawiona jako najemnik albo na usłudze nie atakuje strażników ani Bestii Gildii, jak mówi „Najemnicy w Karczmie”, punkt 2. Bestia nie sprawdzała tego od 0.1.60; teraz odmawia tak samo jak strażnik.
+
+## Przerwanie budowy w toku (5.11.2026, w grze od 0.1.65)
+
+Autor: „Nie można anulować aktualnie budowanego miejsca ze zwrotem kosztow zasobow a chcemy tego.”
+
+1. **„Przerwij budowę”** stoi pod budową w toku, na planszy obozu i na ekranie budynku. Po pytaniu budowa się kończy, a jej koszt wraca w całości: złoto i zasoby.
+2. **Budynek wraca do poziomu sprzed budowy**, a budynek stawiany od zera do pustego placu. Czas budowy, który już minął, przepada.
+3. **Wyższe poziomy tego budynku czekające w kolejce** wypadają razem z nią, bo jej potrzebują, i ich koszt też wraca, jak przy „Anuluj” w kolejce.
+4. **Reszta kolejki rusza od razu:** następna budowa zaczyna się w chwili przerwania.
+5. **Budynek produkcyjny** (np. Tartak) oddał magazyn do zasobów na początku budowy, więc po przerwaniu napełnia się od nowa od tej chwili.
+6. **Także poziom samego Obozu i przemiana w Warownię** (brakujący szczegół): przerywa się je tak samo, ze zwrotem kosztu.
 
 ## Wersja 0.1.64 (5.11.2026)
 

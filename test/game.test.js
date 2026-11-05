@@ -1016,6 +1016,50 @@ describe('camp', () => {
     assert.equal(both.character.gold, 1000 - cost('sawmill', 1).gold);
   });
 
+  test('"Przerwij budowę" stops the build under way: the building as it was, its whole cost back, the queue from now', async () => {
+    await stock(1000, { wood: 200, stone: 100, 'iron-ore': 50 });
+    const cost = (id, level) => upgradeCost(content.buildingsById[id], level);
+    await build('sawmill');
+    await build('sawmill');
+    const before = (await build('quarry')).data.character;
+    assert.deepEqual([before.camp.construction.buildingId, before.camp.construction.level], ['sawmill', 1]);
+    assert.deepEqual(before.camp.construction.cost, cost('sawmill', 1));
+    // The Tartak's first level stopped: it and its level 2 waiting in the
+    // queue give back all they cost, the plot is empty again, and the
+    // Kamieniołom starts at once.
+    const stopped = await call('POST', '/api/camp/cancel', { cookie, body: { buildingId: 'sawmill', level: 1 } });
+    assert.equal(stopped.status, 200, JSON.stringify(stopped.data).slice(0, 300));
+    assert.deepEqual(stopped.data.cancelled, [{ buildingId: 'sawmill', level: 1 }, { buildingId: 'sawmill', level: 2 }]);
+    const refund = { gold: cost('sawmill', 1).gold + cost('sawmill', 2).gold, wood: (cost('sawmill', 1).wood ?? 0) + (cost('sawmill', 2).wood ?? 0) };
+    assert.equal(stopped.data.refund.gold, refund.gold);
+    const after = stopped.data.character;
+    assert.equal(after.gold, before.gold + refund.gold);
+    assert.equal(after.resources.wood, before.resources.wood + refund.wood);
+    assert.equal(find(after, 'sawmill').level, 0);
+    assert.deepEqual([after.camp.construction?.buildingId, after.camp.construction?.level], ['quarry', 1]);
+    assert.deepEqual(after.camp.queue, []);
+    // Nothing left to stop: the same call again finds no such build.
+    assert.equal((await call('POST', '/api/camp/cancel', { cookie, body: { buildingId: 'sawmill', level: 1 } })).data.error.code, 'not_queued');
+  });
+
+  test('"Przerwij budowę" on a higher level: the building keeps the level it had, and a production building fills again from now', async () => {
+    await stock(3000, { wood: 200, stone: 100 });
+    await build('sawmill');
+    await call('POST', '/api/test/skip-build', { cookie });
+    await travel(3600000);
+    const upgrading = (await build('sawmill')).data.character;
+    assert.deepEqual([upgrading.camp.construction.buildingId, upgrading.camp.construction.level], ['sawmill', 2]);
+    const stopped = (await call('POST', '/api/camp/cancel', { cookie, body: { buildingId: 'sawmill', level: 2 } })).data.character;
+    assert.equal(stopped.camp.construction, null);
+    assert.equal(find(stopped, 'sawmill').level, 1);
+    assert.equal(stopped.gold, upgrading.gold + upgradeCost(content.buildingsById.sawmill, 2).gold);
+    // An hour later its store holds an hour of wood again.
+    await travel(3600000);
+    const later = await character();
+    assert.ok(find(later, 'sawmill').production.amount > 0, JSON.stringify(find(later, 'sawmill').production));
+    assert.equal(find(later, 'sawmill').production.paused, false);
+  });
+
   test('a camp level called off makes the builds after it slow again', async () => {
     await stock(3000, { wood: 100, stone: 50 });
     await build('craft-table');

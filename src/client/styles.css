@@ -14346,3 +14346,8 @@ a.profession-square:active {
     font-size: 12px;
   }
 }
+
+/* "Przerwij budowę" under the build under way, at its own width. */
+.build-stop {
+  align-self: flex-start;
+}
