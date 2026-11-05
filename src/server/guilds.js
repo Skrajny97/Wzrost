@@ -255,7 +255,8 @@ function guildIdOf(body) {
 // character, while it has a place; the character's other invitations go.
 // Joined after the guild's board of the week was drawn, it raises the
 // week's thresholds of the Próby Gildii by its share of the week left, in
-// the same batch (the author's 615 A).
+// the same batch (the author's 615 A), and so the Wyprawa Gildii's route of
+// the week, made already, its stages and guardians to come (621 A).
 export async function acceptGuildInvite(context) {
   const { player } = await requireGuildPlayer(context);
   const db = context.env.DB;
@@ -275,6 +276,14 @@ export async function acceptGuildInvite(context) {
       db
         .prepare(
           `UPDATE guild_trial_boards SET joined = joined + ?
+           WHERE guild_id = ? AND week = ? AND EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ? AND joined_at = ?)`,
+        )
+        .bind(joinShare(trialDay(context.now, content)), invite.guild_id, questPeriod('weekly', context.now, content).key, player.row.id, invite.guild_id, context.now),
+      // The Wyprawa Gildii's route of the week counts it in part too: its
+      // next stages take more minutes and its next guardians more HP.
+      db
+        .prepare(
+          `UPDATE guild_expeditions SET joined = joined + ?
            WHERE guild_id = ? AND week = ? AND EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ? AND joined_at = ?)`,
         )
         .bind(joinShare(trialDay(context.now, content)), invite.guild_id, questPeriod('weekly', context.now, content).key, player.row.id, invite.guild_id, context.now),

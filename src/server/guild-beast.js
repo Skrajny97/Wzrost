@@ -202,6 +202,9 @@ export async function attackGuildBeast(context) {
   const { row } = player;
   const db = context.env.DB;
   const now = context.now;
+  // A character offering itself as a mercenary, or serving, does not fight
+  // the beast (DECISIONS.md, "Najemnicy w Karczmie", 2).
+  if (player.activity?.kind === 'mercenary') requireNotExploring(player, now);
   const guild = await guildOf(db, row.id);
   if (!guild) throw new ApiError(409, 'no_guild', errors().noGuild);
   const day = questPeriod('daily', now, content).key;

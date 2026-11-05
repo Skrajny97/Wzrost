@@ -1,5 +1,5 @@
 {
-  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz. tabs: zakładki strony Gildii (#/gildia/<id>), po kolei: gildia z członkami, Siedziba (616 A, druga jak na makiecie), Bestia, Próby, Prośby Gildii i Wymiana. seat: Siedziba Gildii z budynkami, na które wpłacają członkowie. fame: Sława gildii w tygodniu, ranking gildii i najlepsza gildia poprzedniego tygodnia.",
+  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz. tabs: zakładki strony Gildii (#/gildia/<id>), po kolei: gildia z członkami, Siedziba (616 A, druga jak na makiecie), Wyprawa (621 A, przed Bestią), Bestia, Próby, Prośby Gildii i Wymiana. seat: Siedziba Gildii z budynkami, na które wpłacają członkowie. expedition: Wyprawa Gildii, trasa tygodnia ze strażnikami na końcu etapów. fame: Sława gildii w tygodniu, ranking gildii i najlepsza gildia poprzedniego tygodnia.",
   "place": "guild-keep",
   "found": {
     "level": 30,
@@ -18,6 +18,7 @@
   "tabs": [
     { "id": "guild", "name": "Gildia" },
     { "id": "seat", "name": "Siedziba" },
+    { "id": "expedition", "name": "Wyprawa" },
     { "id": "beast", "name": "Bestia" },
     { "id": "trials", "name": "Próby" },
     { "id": "requests", "name": "Prośby" },
@@ -92,6 +93,83 @@
         "notAllowed": "Budynki oznacza lider albo zastępca.",
         "invalidMark": "Wybierz, czy budynek ma być preferowany.",
         "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz."
+      }
+    }
+  },
+  "expedition": {
+    "$comment": "Wyprawa Gildii (src/engine/guild-expedition.js, src/server/guild-expedition.js, src/client/guild-expedition.js; DECISIONS.md, „Wyprawa Gildii (621 A)”). Autor: „621 A” i „624 akcept”: trasa tygodnia w 7 etapach, a na końcu każdego strażnik, który zagradza drogę, aż gildia go pokona. Tydzień jak przy Bestii i Próbach: od poniedziałku, od północy czasu polskiego. Trasa przychodzi z pierwszym spojrzeniem w tygodniu i prowadzi przez krainę, w której zakresie poziomów leży zaokrąglony średni poziom postaci członków (powyżej wszystkich krain: najwyższa). Strażnicy to stwory tej krainy, każdy inny, od najsłabszego: najsilniejsze zwykłe stwory z jej najwyższych miejsc, potem elity jej miejsc, na końcu czempion. Strażnik etapu k ma średni poziom członków z chwili przyjścia trasy plus k − 1, a HP jak Bestia: członkowie × guardians[k].attacks × typowe obrażenia ataku na jego poziomie (beast.damage). Członkowie to aktywni przy przyjściu trasy (konto w grze w ostatnich activeDays dniach, co najmniej 1) i część tygodnia tych, którzy dołączyli później, jak w Próbach. Minuty: każda minuta wyprawy członka (także Szybkie i Błyskawiczne polowanie i wyprawa Drużyny, bez najemników) liczy się przy odebraniu raportu, w gildii, w której postać wtedy jest. Etap to stageMinutes.perMember minut na członka, w górę do pełnych stageMinutes.step, co najmniej stageMinutes.min. Trasa staje u strażnika, którego gildia jeszcze nie pokonała; minuty zebrane w tym czasie czekają i przesuwają trasę od razu po jego upadku. Atakuje każdy, kto w tym tygodniu dołożył w tej gildii choć minutę, attacksPerDay razy na dobę (od północy czasu polskiego), osobno od ataków na Bestię; atak to jedna walka jak atak na Bestię. Pokonany strażnik daje każdemu, kto w tym tygodniu dołożył minut, skrzynię etapu (raz na postać, tydzień i etap, do końca następnego tygodnia): złoto gold.base + gold.perLevel × poziom postaci, materials losowań materiału strażnika (jak w Skrzyni Bestii, co najmniej jedna sztuka), a z item także przedmiot klasy postaci w rzadkości czempiona. texts: słowa zakładki Wyprawa i odpowiedzi gry; {…} wypełnia gra.",
+    "attacksPerDay": 3,
+    "activeDays": 7,
+    "stageMinutes": { "perMember": 150, "step": 10, "min": 150 },
+    "guardians": [
+      { "attacks": 1, "materials": 1, "gold": { "base": 10, "perLevel": 4 } },
+      { "attacks": 1, "materials": 2, "gold": { "base": 20, "perLevel": 8 } },
+      { "attacks": 1.25, "materials": 3, "gold": { "base": 30, "perLevel": 12 } },
+      { "attacks": 1.25, "materials": 4, "gold": { "base": 40, "perLevel": 16 } },
+      { "attacks": 1.5, "materials": 5, "gold": { "base": 50, "perLevel": 20 } },
+      { "attacks": 1.75, "materials": 6, "gold": { "base": 60, "perLevel": 24 } },
+      { "attacks": 2, "materials": 7, "gold": { "base": 70, "perLevel": 28 }, "item": true }
+    ],
+    "texts": {
+      "title": "Wyprawa Gildii",
+      "route": "Wyprawa tygodnia: {land}",
+      "lead": "Minuty wypraw członków prowadzą gildię przez {stages} etapów. Na końcu każdego etapu drogę zagradza strażnik.",
+      "how": [
+        "Co tydzień, od poniedziałku od północy, gildia rusza na nową trasę przez krainę na średnim poziomie członków.",
+        "Każda minuta wyprawy członka gildii przesuwa trasę, gdy odbierze on raport. Liczą się też Szybkie polowania i wyprawy Drużyny.",
+        "Etap to {perMember} minut wypraw na każdego aktywnego członka gildii.",
+        "Na końcu etapu czeka strażnik. Trasa stoi, aż gildia go pokona. Minuty zebrane w tym czasie czekają i przesuwają trasę zaraz po jego upadku.",
+        "Strażnika atakuje każdy, kto w tym tygodniu dołożył minut: {attacks} razy dziennie, osobno od ataków na Bestię. Atak to jedna walka z pełnym HP i bez mikstur.",
+        "Każdy następny strażnik jest silniejszy. Pokonany daje skrzynię każdemu, kto w tym tygodniu dołożył minut. Ostatni daje też rzadki łup: przedmiot Twojej klasy.",
+        "Skrzynię odbierzesz do końca następnego tygodnia."
+      ],
+      "stage": "Etap {stage} z {stages}: {progress} z {need} minut wypraw",
+      "done": "Trasa przebyta: wszyscy strażnicy padli. Nowa trasa w poniedziałek.",
+      "counts": "Minuty liczą się, gdy członek odbierze raport z wyprawy.",
+      "banked": "Czeka już {minutes} min wypraw. Przesuną trasę, gdy strażnik padnie.",
+      "stop": "Etap {stage}: {name}, {state}",
+      "states": { "fallen": "pokonany", "standing": "zagradza drogę", "ahead": "czeka na końcu etapu" },
+      "guardianTitle": "Strażnik etapu {stage}",
+      "level": "poz. {level}",
+      "ahead": "Czeka na końcu etapu. Do niego jeszcze {minutes} min wypraw.",
+      "standing": "Zagradza drogę. Trasa ruszy dalej, gdy strażnik padnie.",
+      "attacksLeft": "Ataki na dziś: {left} z {perDay}",
+      "newAttacks": "Nowe o północy.",
+      "attack": "Atakuj",
+      "contributeFirst": "Atakuje ten, kto w tym tygodniu dołożył minut wypraw. Odbierz raport z wyprawy, a dołączysz.",
+      "lastAttack": "Ostatni atak zabrał strażnikowi {damage} HP.",
+      "fell": "Strażnik pada! Trasa rusza dalej.",
+      "fellLast": "Ostatni strażnik pada! Trasa przebyta.",
+      "fallen": "Strażnik padł {at}.",
+      "lastBlow": "Ostatni cios: {name}.",
+      "fightTitle": "Atak na strażnika",
+      "log": "Przebieg walki",
+      "chestTitle": "Skrzynie Wyprawy",
+      "chest": "Etap {stage}: {name}",
+      "chestWeek": "Tydzień {week}",
+      "chestRare": "Rzadki łup",
+      "chestUntil": "Odbierzesz do {until}.",
+      "claim": "Odbierz",
+      "opened": "Skrzynia Wyprawy otwarta. W środku: {contents}.",
+      "gold": "{gold} złota",
+      "contribution": "Wkład tygodnia",
+      "contributionLine": "Dołożyło minut: {count}.",
+      "noMinutes": "Gildia czeka na pierwsze minuty wypraw w tym tygodniu.",
+      "own": "Twój wkład: {minutes} min.",
+      "minutes": "{minutes} min",
+      "notInBag": "Tego nie ma już w plecaku.",
+      "noGuild": "Na Wyprawę Gildii rusza cała gildia. Dołącz do gildii albo załóż własną.",
+      "errors": {
+        "locked": "Gildie odblokujesz na poziomie postaci {level}.",
+        "noGuild": "Nie należysz do gildii.",
+        "notContributor": "Strażnika atakuje ten, kto w tym tygodniu dołożył minut wypraw.",
+        "noGuardian": "Strażnik jeszcze nie zagradza drogi. Trasa potrzebuje więcej minut wypraw.",
+        "done": "Wszyscy strażnicy tego tygodnia już padli. Nowa trasa w poniedziałek.",
+        "noAttacks": "Ataki na dziś się skończyły. Nowe od północy.",
+        "raced": "Strażnik albo postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.",
+        "noChest": "Nie ma takiej skrzyni do odebrania.",
+        "claimed": "Ta skrzynia jest już odebrana.",
+        "bagFull": "Plecak jest pełny. Zrób w nim miejsce, żeby odebrać skrzynię."
       }
     }
   },

@@ -11,6 +11,7 @@
     "invites",
     "tabs",
     "seat",
+    "expedition",
     "trials",
     "requests",
     "exchange",
@@ -59,8 +60,8 @@
     "tabs": {
       "description": "Zakładki strony Gildii (src/client/screens/guild.js), w tej kolejności.",
       "type": "array",
-      "minItems": 6,
-      "maxItems": 6,
+      "minItems": 7,
+      "maxItems": 7,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -73,6 +74,7 @@
             "enum": [
               "guild",
               "seat",
+              "expedition",
               "beast",
               "trials",
               "requests",
@@ -230,6 +232,9 @@
     "seat": {
       "$ref": "#/definitions/seat"
     },
+    "expedition": {
+      "$ref": "#/definitions/expedition"
+    },
     "trials": {
       "$ref": "#/definitions/trials"
     },
@@ -244,6 +249,204 @@
     }
   },
   "definitions": {
+    "expedition": {
+      "description": "Wyprawa Gildii (src/engine/guild-expedition.js, src/server/guild-expedition.js, src/client/guild-expedition.js; autor: 621 A, makieta 624).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attacksPerDay",
+        "activeDays",
+        "stageMinutes",
+        "guardians",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "attacksPerDay": {
+          "description": "Ataki postaci na strażników na dobę (od północy czasu polskiego), osobno od ataków na Bestię.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "activeDays": {
+          "description": "Aktywny członek: konto w grze w ostatnich tylu dniach (jak w Próbach Gildii).",
+          "type": "integer",
+          "minimum": 1
+        },
+        "stageMinutes": {
+          "description": "Minuty wypraw etapu: perMember na członka, w górę do pełnych step, co najmniej min.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "perMember",
+            "step",
+            "min"
+          ],
+          "properties": {
+            "perMember": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "step": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "min": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "guardians": {
+          "description": "Strażnicy etapów po kolei: attacks (typowe ataki na członka w HP strażnika), materials (losowania materiału strażnika w skrzyni), gold (złoto skrzyni: base + perLevel × poziom postaci) i item (przedmiot klasy postaci w skrzyni).",
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "attacks",
+              "materials",
+              "gold"
+            ],
+            "properties": {
+              "attacks": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "materials": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "gold": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "base",
+                  "perLevel"
+                ],
+                "properties": {
+                  "base": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "perLevel": {
+                    "type": "number",
+                    "minimum": 0
+                  }
+                }
+              },
+              "item": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "required": [
+            "title",
+            "route",
+            "lead",
+            "how",
+            "stage",
+            "done",
+            "counts",
+            "banked",
+            "stop",
+            "states",
+            "guardianTitle",
+            "level",
+            "ahead",
+            "standing",
+            "attacksLeft",
+            "newAttacks",
+            "attack",
+            "contributeFirst",
+            "lastAttack",
+            "fell",
+            "fellLast",
+            "fallen",
+            "lastBlow",
+            "fightTitle",
+            "log",
+            "chestTitle",
+            "chest",
+            "chestWeek",
+            "chestRare",
+            "chestUntil",
+            "claim",
+            "opened",
+            "gold",
+            "contribution",
+            "contributionLine",
+            "noMinutes",
+            "own",
+            "minutes",
+            "notInBag",
+            "noGuild",
+            "errors"
+          ],
+          "properties": {
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "states": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "fallen",
+                "standing",
+                "ahead"
+              ],
+              "properties": {
+                "fallen": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "standing": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "ahead": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "errors": {
+              "type": "object",
+              "required": [
+                "locked",
+                "noGuild",
+                "notContributor",
+                "noGuardian",
+                "done",
+                "noAttacks",
+                "raced",
+                "noChest",
+                "claimed",
+                "bagFull"
+              ],
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
     "seat": {
       "description": "Siedziba Gildii (src/engine/guild-seat.js, src/server/guild-seat.js, src/client/guild-seat.js; autor: 616 A).",
       "type": "object",

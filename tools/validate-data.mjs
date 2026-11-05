@@ -730,6 +730,25 @@ function checkReferences(data) {
   errors.push(...checkCosmetics(data));
   errors.push(...checkTowers(data));
   errors.push(...checkGuildSeat(data, { resources }));
+  errors.push(...checkGuildExpedition(data));
+  return errors;
+}
+
+// The Wyprawa Gildii (guilds.json, expedition; 621 A): the Gildia page has
+// its tab, and every land has as many different creatures as the route has
+// guardians (src/engine/guild-expedition.js picks them), its last stage
+// giving the rare item.
+function checkGuildExpedition(data) {
+  const errors = [];
+  const { guardians } = data.guilds.expedition;
+  if (!data.guilds.tabs.some((tab) => tab.id === 'expedition')) errors.push('guilds.json: strona Gildii nie ma zakładki Wyprawy (expedition)');
+  if (!guardians.at(-1)?.item) errors.push('guilds.json: ostatni strażnik Wyprawy powinien dawać przedmiot (item)');
+  for (const region of data.regions) {
+    const creatures = new Set(
+      region.areas.flatMap((area) => [...area.encounters, ...(area.tough ?? [])].flatMap((encounter) => encounter.monsters).concat(area.elite ?? region.elite ?? [], area.champion ?? [])),
+    );
+    if (creatures.size < guardians.length) errors.push(`guilds.json: kraina ${region.id} ma ${creatures.size} stworów, a Wyprawa ${guardians.length} strażników`);
+  }
   return errors;
 }
 

@@ -138,6 +138,9 @@ describe('mercenaries through the API', () => {
     const unequip = await as('najemna', 'POST', `/api/items/${chest.id}/unequip`);
     assert.equal(unequip.status, 409);
     assert.equal(unequip.data.error.code, 'busy');
+    // No fight with the Bestia Gildii or a guardian of the Wyprawa Gildii either.
+    assert.equal((await as('najemna', 'POST', '/api/guild/beast/attack')).data.error.code, 'busy');
+    assert.equal((await as('najemna', 'POST', '/api/guild/expedition/attack')).data.error.code, 'busy');
 
     // Taken back: free again.
     const withdrawn = await as('najemna', 'POST', '/api/mercenary/withdraw');

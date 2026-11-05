@@ -32,7 +32,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `forge.js` | Kuźnia w Osadzie: Zwoje ochronne i przekucie przedmiotu na wyższą rzadkość |
 | `parties.js` | Drużyna: rozpiętość poziomów klas i kto zostaje w drużynie, gdy poziomy się rozjadą |
 | `towers.js` | Wieże Systemu: podwaliny, jeszcze poza grą |
-| `guild-beast.js`, `guild-trials.js`, `guild-seat.js` | Gildia: Bestia Gildii, Próby Gildii (tablica prób tygodnia, wielkość próby na poziom postaci, pasek z progami i skrzynie) oraz Siedziba Gildii (koszty poziomów budynków, poziom z sumy wpłat z nadwyżką na następny poziom, premie dla członków) |
+| `guild-beast.js`, `guild-trials.js`, `guild-seat.js`, `guild-expedition.js` | Gildia: Bestia Gildii, Próby Gildii (tablica prób tygodnia, wielkość próby na poziom postaci, pasek z progami i skrzynie), Siedziba Gildii (koszty poziomów budynków, poziom z sumy wpłat z nadwyżką na następny poziom, premie dla członków) oraz Wyprawa Gildii (kraina tygodnia, siedmiu strażników, minuty etapu, HP strażnika, postęp trasy z odłożonymi minutami i skrzynie strażników) |
 | `cosmetics.js` | Sklep Systemu: ramki, tła i wygląd wierzchowca za Punkty Systemu, co postać ma i nosi, oraz kolor imienia z ramki |
 | `gifts.js`, `gift-codes.js` | Upominek między znajomymi i kody podarunkowe |
 | `names.js`, `text.js`, `mail.js`, `notifications.js` | filtr imion postaci, warianty tekstów raportu, treść e-maila i powiadomienia na telefon |
