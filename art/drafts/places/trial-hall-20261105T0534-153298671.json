@@ -1,0 +1,14 @@
+{
+  "id": "trial-hall",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, a massive old stone hall of trials at the edge of a forest village at dusk, a wide arched gate flanked by two stone statues of armed warriors, torches in iron brackets, through the open gate a sand arena with wooden fences and weapon racks, red banners with crossed swords on the walls, thin ice-blue glowing runes carved around the arch and faint luminous blue lines on the path leading to it, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, greys and browns with warm torchlight and ice-blue accents, no text, no border, no people",
+  "style": "src/client/art/places/system-grove.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}

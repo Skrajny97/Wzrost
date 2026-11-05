@@ -1,0 +1,14 @@
+{
+  "id": "wanted-board",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, a village square at dusk with a big weathered wooden notice board under a small shingled roof, covered with yellowed wanted posters showing sketched faces and beasts, a lantern hanging beside it, a stone well and timber houses behind, faint ice-blue glowing runes carved into the board's frame, wide panorama for a dim background behind text, low contrast, muted dark palette of deep browns, greens and blues with warm lantern light and ice-blue accents, no readable text, no border, no people",
+  "style": "src/client/art/places/system-grove.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}
