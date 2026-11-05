@@ -1126,16 +1126,16 @@ describe('tutorial unlocks', () => {
     assert.deepEqual(unlockMessages(25, content), [
       'Odblokowano Górnictwo. Systemowa Kopalnia czeka w zakładce Profesje.',
       'Odblokowano Jubilerstwo. Systemowa Szlifiernia czeka w zakładce Profesje.',
-      content.unlocksById.party.message,
       'Odblokowano eksploracje do 1 godziny.',
     ]);
-    assert.deepEqual(unlockMessages(10, content), ['Odblokowano Profesje. Zajrzyj do zakładki Profesje.']);
+    // The Drużyna opens with the Profesje, at level 10 (642 B).
+    assert.deepEqual(unlockMessages(10, content), ['Odblokowano Profesje. Zajrzyj do zakładki Profesje.', content.unlocksById.party.message]);
     // Rzemieślnictwo's message only where the game has it on.
     assert.deepEqual(unlockMessages(15, content), []);
     assert.deepEqual(unlockMessages(15, { ...content, features: ['crafting'] }), ['Odblokowano Rzemieślnictwo. Systemowy Warsztat czeka w zakładce Profesje.']);
     assert.deepEqual(
       ['professions', 'settlement', 'party', 'towers'].map((id) => content.unlocksById[id].level),
-      [10, 20, 25, 50],
+      [10, 20, 10, 50],
     );
     // The skills open with the class level, not the character's.
     assert.equal(content.unlocksById.skills.classLevel, 10);
