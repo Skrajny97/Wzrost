@@ -17,7 +17,7 @@ import { fill, h } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
 import { skillSprite } from '../art.js';
 import { motionOn } from '../motion.js';
-import { call, isUnlocked, state, unlockInfo } from '../state.js';
+import { buildLocked, buildLockedText, call, isUnlocked, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from '../ui.js';
 
 // The skill's icon: its sprite (a second form's skill: its stand-in,
@@ -62,8 +62,9 @@ export function mountSkills(container) {
       fill(container, heading, systemPanel(`Umiejętności odblokujesz na poziomie klasy ${unlock.classLevel}. Twój poziom klasy: ${character.classLevel}.`));
       return;
     }
-    // Only an exploration counts its fights with the skills (hunts.js).
-    const busy = character.activity?.kind === 'hunt';
+    // Only an exploration counts its fights with the skills (hunts.js), and
+    // a mercenary goes as it is (mercenaries.js).
+    const busy = buildLocked(character);
     const evolution = view.evolution ?? {};
     const waiting = evolution.need && character.classLevel >= evolution.level;
     const before = pathTops();
@@ -72,7 +73,7 @@ export function mountSkills(container) {
       heading,
       waiting &&
         systemPanel(`Klasa czeka na ${evolution.level}. poziomie, u progu ewolucji. Urośnie dalej, gdy ${WAITS_FOR[evolution.need]}. Zdobyte XP klasy nie przepada.`),
-      busy && systemPanel('Postać jest na wyprawie. Umiejętności zmienisz po jej powrocie.'),
+      busy && systemPanel(buildLockedText(character, 'Umiejętności zmienisz')),
       evolution.need === 'evolve' && character.classLevel >= evolution.level && h('a', { class: 'button button--system', href: '#/postac/ewolucja', text: 'Przejdź do Ewolucji' }),
       view.pools.map((pool) => (pool.evolution ? evolutionPool(pool, view, busy) : poolSection(pool, view, busy))),
     );
@@ -256,7 +257,7 @@ export function mountSkills(container) {
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
             await call('POST', '/api/skills/raise', { skillId, count });
-            openCard(skillId, state.character.activity?.kind === 'hunt');
+            openCard(skillId, buildLocked(state.character));
           }),
       });
     const raise = raiseButton(1, 'Dodaj punkt');

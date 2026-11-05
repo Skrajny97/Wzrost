@@ -43,6 +43,7 @@ import { formatWait, stableNote, stableWait } from '../stable.js';
 import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { openEvent } from '../event.js';
 import { BUSY, skipLines } from './party.js';
+import { mercenaryChoice, servicePanel } from '../mercenaries.js';
 import { combatModes } from './towers.js';
 
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -402,6 +403,8 @@ export function mountCombat(container, { params, navigate }) {
   const modeTabs = () => combatModes('explore', navigate);
 
   function activityCard(activity) {
+    // A mercenary's offer or service lives in the Karczma (mercenaries.js).
+    if (activity.kind === 'mercenary') return servicePanel(activity);
     // A gathering of herbs, a brewing of potions and an order of items live
     // on their own screens; here they only say so.
     if (activity.kind === 'herbs') {
@@ -494,6 +497,7 @@ export function mountCombat(container, { params, navigate }) {
         ...(activity.avoidRare ? [h('p', { class: 'system-hint', text: 'Postać omija elity i czempionów.' })] : []),
         ...(activity.seekRare ? [h('p', { class: 'system-hint', text: 'Postać tropi elity i czempiony.' })] : []),
         ...(activity.hard ? [h('p', { class: 'system-hint', text: 'Trudna wyprawa: silniejsze stwory, więcej XP i złota.' })] : []),
+        ...(activity.mercenary ? [h('p', { class: 'system-hint', text: `Najemnik: ${activity.mercenary.name}, zapłata ${formatNumber(activity.mercenary.gold)} zł.` })] : []),
         ...(activity.tracksQuests ? [h('p', { class: 'system-hint', text: 'Postać tropi stwory z zadań.' })] : []),
         // The Stajnia's mount made the wait shorter than the length (327 A).
         ...(activity.endsAt - activity.startedAt < activity.minutes * 60000
@@ -746,6 +750,9 @@ export function mountCombat(container, { params, navigate }) {
           text: `Stwory: obrażenia ${times(hardRules.damage)}, HP ${times(hardRules.hp)}. Nagroda: +${Math.round(hardRules.xp * 100)}% XP i +${Math.round(hardRules.gold * 100)}% złota. Nie na Szybkim i Błyskawicznym polowaniu ani z drużyną.`,
         }),
       );
+    // A mercenary from the Karczma (mercenaries.js), from its level: on a
+    // plain "Wyrusz" only, for the length chosen.
+    const mercenary = !first && character.mercenaries ? mercenaryChoice(() => minutes, () => showSummary()) : null;
     // The boxes of the exploration; they go into "Opcje wyprawy" below.
     const choices =
       !first &&
@@ -763,6 +770,7 @@ export function mountCombat(container, { params, navigate }) {
           unknownNone,
         ),
         hard,
+        mercenary?.element,
       );
     // Potions to take along, once the character carries some that work in fights.
     const use = character.professions?.potionUse;
@@ -801,7 +809,7 @@ export function mountCombat(container, { params, navigate }) {
     const summary = h('span', { class: 'hunt-options-summary' });
     function showSummary() {
       const taken = Object.values(potions?.taken() ?? {}).reduce((sum, count) => sum + count, 0);
-      const ticked = [avoiding(), seeking(), tracking(), tracingUnknown(), Boolean(scouted), hardOn()].filter(Boolean).length;
+      const ticked = [avoiding(), seeking(), tracking(), tracingUnknown(), Boolean(scouted), hardOn(), Boolean(mercenary?.chosen())].filter(Boolean).length;
       summary.textContent = [
         formatMinutes(minutes),
         taken > 0 && countOf(taken, 'mikstura', 'mikstury', 'mikstur'),
@@ -869,6 +877,7 @@ export function mountCombat(container, { params, navigate }) {
       less.disabled = index === 0;
       more.disabled = index === allowed.length - 1;
       potions?.update(minutes);
+      mercenary?.update();
       showThreat();
       startLabel();
     }
@@ -926,9 +935,11 @@ export function mountCombat(container, { params, navigate }) {
             ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
             ...(scouted && !along && { scout: scouted }),
             ...(hardOn() && !along && { hard: true }),
+            ...(mercenary?.chosen() && !along && { mercenary: mercenary.chosen() }),
           });
           // Those who went, as the server says: one may have got busy meanwhile.
           if (along) toast(answer.went?.length > 0 ? `Drużyna wyrusza: ${answer.went.join(', ')}.` : 'Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.');
+          else if (mercenary?.chosen()) toast(`${mercenary.hired().name} idzie z Tobą. Zapłacono ${formatNumber(mercenary.hired().gold)} zł.`);
           leaveView(HOME, 2);
         }),
     });

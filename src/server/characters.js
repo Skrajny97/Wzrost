@@ -111,6 +111,7 @@ import { craftingOn, fortressOn, professionsOn, settlementOn } from './features.
 import { ApiError, json, readJson } from './http.js';
 import { raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
+import { mercenaryBusy, mercenaryPlace, mercenaryRules, serviceEnded } from './mercenaries.js';
 import { championOf } from './guild-fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { guildSeatSql } from './guild-seat.js';
@@ -283,7 +284,9 @@ const path = (id) => `$."${id}"`;
 
 // Gathering herbs, brewing potions, making items, digging and the work of
 // the Szlifiernia are no fights: the character rests meanwhile, as at home.
-export const restsDuring = (activity) => !activity || ['herbs', 'potions', 'items', 'minerals', 'jewels'].includes(activity.kind);
+// A mercenary waiting in the Karczma or serving rests too (mercenaries.js):
+// its HP is its own, the exploration's fights are another's.
+export const restsDuring = (activity) => !activity || ['herbs', 'potions', 'items', 'minerals', 'jewels', 'mercenary'].includes(activity.kind);
 
 // A character's buffs in fights (storedBuffs in potions.js): those kept in
 // time before 0.1.26 count as the fights of their minutes.
@@ -579,9 +582,10 @@ export function requireIdle(player, now) {
   const activity = player.activity;
   if (!activity) return;
   // A profession's work says so in its own words.
-  const texts = { herbs: content.professionTexts, potions: content.brewing?.texts, items: content.workshop?.texts, minerals: content.mining?.texts, jewels: content.jewelcrafting?.texts }[
-    activity.kind
-  ];
+  const texts =
+    activity.kind === 'mercenary'
+      ? mercenaryBusy(activity)
+      : { herbs: content.professionTexts, potions: content.brewing?.texts, items: content.workshop?.texts, minerals: content.mining?.texts, jewels: content.jewelcrafting?.texts }[activity.kind];
   throw activity.ends_at <= now
     ? new ApiError(409, 'claim_first', texts ? texts.claimFirst[0] : 'Wyprawa się skończyła. Najpierw odbierz raport.')
     : new ApiError(409, 'busy', texts ? texts.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
@@ -602,8 +606,11 @@ export function requireUnworn(player, item, now) {
 // equipment, the stat points, the skills and the evolution, since the report
 // is made with them when it is claimed (hunts.js). The work of a profession
 // needs none of it.
+// A mercenary offering itself or serving (mercenaries.js) keeps it all as
+// it is too: it goes with all it wears (the author: "Nie może też
+// modyfikować swojego rynsztunku").
 export function requireNotExploring(player, now) {
-  if (player.activity?.kind === 'hunt') requireIdle(player, now);
+  if (['hunt', 'mercenary'].includes(player.activity?.kind)) requireIdle(player, now);
 }
 
 // The character for a change of its stat points, skills or evolution (above).
@@ -1100,6 +1107,8 @@ function activityPlace(activity, level) {
     };
   }
   if (activity.kind === 'minerals') return { profession: content.mining.profession, placeName: content.mining.place.name };
+  // A mercenary's offer or service in the Karczma (mercenaries.js).
+  if (activity.kind === 'mercenary') return mercenaryPlace(activity);
   if (activity.kind === 'jewels') {
     const { base: baseId, rarity, count, set, gem, itemName } = JSON.parse(activity.options ?? '{}');
     const base = content.basesById[baseId];
@@ -1132,6 +1141,9 @@ function activityView(activity, level, now) {
       seekRare: activity.seek_rare === 1,
       // A Trudna wyprawa (629 A, hunts.js).
       ...(options.hard && { hard: true }),
+      // The mercenary from the Karczma it took along, and its fee
+      // (mercenaries.js).
+      ...(options.mercenary && { mercenary: { name: options.mercenary.name, gold: options.mercenary.gold } }),
       // The creatures the exploration tracks for the quests (hunts.js).
       tracksQuests: activity.tracked !== null && activity.tracked !== undefined,
       finished: activity.ends_at <= now,
@@ -1289,8 +1301,11 @@ export function characterView(player, now) {
     canRename: !row.name_changed,
     nameNotice: row.name_notice ?? null,
     // An order of the Osada that can be delivered now lights its tab.
-    settlementWaiting: settlementWaiting(row, items, now, player.marketWaiting),
+    settlementWaiting: settlementWaiting(row, items, now, player.marketWaiting) || serviceEnded(player.activity, now),
     huntDurations: huntDurations(row.level, content),
+    // The Karczma's mercenaries (mercenaries.js): what the character may
+    // offer and ask, or null below their level.
+    mercenaries: mercenaryRules(row),
     // The Trudna wyprawa's creatures and rewards (629 A), from the
     // challenge's level; null before it.
     hardHunt: challengeAt(row.level, content)?.hard ?? null,

@@ -141,6 +141,17 @@ export const fullStores = (character = state.character, now = serverNow()) =>
 // A second of slack, so the page never asks for a report before the server has it.
 export const activityFinished = (activity, now = serverNow()) => Boolean(activity) && now >= activity.endsAt + 1000;
 
+// While the character explores, or offers itself or serves as a mercenary
+// in the Karczma (mercenaries.js), what its fights are counted with waits:
+// its gear, stat points, skills and evolution (the server's
+// requireNotExploring). The words of the wait, `then` what comes after it
+// ("Ekwipunek zmienisz").
+export const buildLocked = (character) => ['hunt', 'mercenary'].includes(character?.activity?.kind);
+export const buildLockedText = (character, then) =>
+  character?.activity?.kind === 'mercenary'
+    ? `Postać wykonuje usługę najemną. ${then} po jej końcu${character.activity.service?.hired ? '' : ' albo po zdjęciu ogłoszenia w Karczmie'}.`
+    : `Postać jest na wyprawie. ${then} po jej powrocie.`;
+
 export const isUnlocked = (id) => state.character.features.includes(id);
 export const unlockInfo = (id) => state.content.unlocks.find((unlock) => unlock.id === id);
 

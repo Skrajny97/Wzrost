@@ -13,6 +13,7 @@ import { ApiError, json, readJson } from './http.js';
 import { requireSession } from './sessions.js';
 import { testMode, testModeFor, tutorialTestsFor } from './test-mode.js';
 import { shiftTrip, skipRecord, tripOf } from './trips.js';
+import { endService } from './mercenaries.js';
 
 const notFound = () => new ApiError(404, 'not_found', 'Nie znaleziono.');
 
@@ -43,6 +44,9 @@ export async function skipTime(context) {
     await shiftTrip(db, trip, activity.started_at, shift, skipRecord(player.row, Math.max(1, Math.round(shift / 60000)))).run();
   } else if (activity) {
     await end('activities', activity);
+    // The mercenary it took along serves until it ends (mercenaries.js).
+    const options = activity.kind === 'hunt' ? JSON.parse(activity.options ?? '{}') : {};
+    if (options.mercenary) await endService(db, options, player.row.id, now - 2000).run();
   } else {
     const { maxHp } = currentHp(player, now);
     await db

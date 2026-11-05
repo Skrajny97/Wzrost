@@ -11,7 +11,7 @@
 import { placeArt } from '../art.js';
 import { fill, h } from '../dom.js';
 import { chooseEvolution, evolutionCard } from '../evolution.js';
-import { isUnlocked, state, unlockInfo } from '../state.js';
+import { buildLocked, buildLockedText, isUnlocked, state, unlockInfo } from '../state.js';
 import { systemPanel } from '../ui.js';
 
 export function mountEvolution(container) {
@@ -36,8 +36,10 @@ export function mountEvolution(container) {
     }
     const { current, choices, next, nextLevel } = character.evolution ?? { current: null, choices: [] };
     const toSkills = h('a', { class: 'button button--system', href: '#/postac/umiejetnosci', text: t.toSkills });
-    // Only an exploration counts its fights with the evolution (hunts.js).
-    const busy = character.activity?.kind === 'hunt';
+    // Only an exploration counts its fights with the evolution (hunts.js),
+    // and a mercenary goes as it is (mercenaries.js).
+    const busy = buildLocked(character);
+    const busyText = character.activity?.kind === 'mercenary' ? buildLockedText(character, 'Ewolucję wybierzesz') : t.busy;
     const base = current && h('p', { class: 'muted evolution-base', text: t.baseClass.replace('{className}', character.baseClassName) });
     if (next) {
       // The one form the evolution grows into, to take (the author's
@@ -47,7 +49,7 @@ export function mountEvolution(container) {
         container,
         heading,
         base,
-        busy && systemPanel(t.busy),
+        busy && systemPanel(busyText),
         systemPanel(said.replace('{level}', String(nextLevel))),
         evolutionCard(next, { busy, onChoose: (button, chosen) => chooseEvolution(button, chosen) }),
       );
@@ -83,7 +85,7 @@ export function mountEvolution(container) {
     fill(
       container,
       heading,
-      busy && systemPanel(t.busy),
+      busy && systemPanel(busyText),
       intro,
       choices.map((choice) => evolutionCard(choice, { busy, onChoose: (button, chosen) => chooseEvolution(button, chosen) })),
     );

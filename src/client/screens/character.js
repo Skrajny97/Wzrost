@@ -12,7 +12,7 @@ import { askGuildButton } from '../guild-requests.js';
 import { countOf, formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, saleGold, timeFormat } from '../format.js';
 import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { playSound } from '../sound.js';
-import { call, costShortfall, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
+import { buildLocked, buildLockedText, call, costShortfall, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
 import { scrapperSheet } from '../scrapper.js';
 import { itemTip, setTipRenderer } from '../item-tip.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemLink, systemPanel, toast, withButton } from '../ui.js';
@@ -122,8 +122,9 @@ export const piecesText = (takes) => takes.map((one) => `${formatNumber(one.coun
 // report is made with what it wears (inventory.js). At a profession's work
 // the gear is at hand (the author: "W trakcie wykonywania Profesji.. w sumie
 // powinniśmy być w stanie zarządzać Ekwipunkiem?"), and the bag always.
-const onExploration = (character) => character.activity?.kind === 'hunt';
-const BUSY_TEXT = 'Postać jest na wyprawie. Ekwipunek zmienisz po jej powrocie.';
+// A mercenary's gear waits too (mercenaries.js).
+const onExploration = (character) => buildLocked(character);
+const busyText = (character) => buildLockedText(character, 'Ekwipunek zmienisz');
 
 // A herb's or a potion's stacks in the bag: full ones, then the rest.
 function stacksOf(entry, stack) {
@@ -769,7 +770,7 @@ export function itemSheet(item, { equipped, anvil = false }) {
     usable && worn && compareTable(item, worn),
     anvilSection(item, busy && equipped, anvil),
     !equipped && salvageSection(item, false),
-    busy && h('p', { class: 'muted', text: BUSY_TEXT }),
+    busy && h('p', { class: 'muted', text: busyText(state.character) }),
     !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
     early && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
     !equipped &&
@@ -1354,7 +1355,7 @@ setTipRenderer((item) =>
 
 // The System's words over the bag, with the way to where they point.
 function characterMessage(character, busy) {
-  if (busy) return [BUSY_TEXT];
+  if (busy) return [busyText(character)];
   if (character.freePoints > 0 && isUnlocked('stats')) {
     return [
       `Masz ${formatNumber(character.freePoints)} ${plural(character.freePoints, 'wolny punkt', 'wolne punkty', 'wolnych punktów')} statystyk. Rozdziel je w Statystykach.`,

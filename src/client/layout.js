@@ -317,12 +317,20 @@ export function updateTopbar(now = serverNow()) {
   const activity = character.activity;
   const { activityLabel, activityTime } = topbar;
   topbar.activity.classList.toggle('activity--done', activityFinished(activity, now));
-  // A profession's work leads to its screen, the rest to Walka.
+  // A profession's work leads to its screen, a mercenary's offer or service
+  // to the Karczma (mercenaries.js), the rest to Walka.
   const work = WORK_SCREENS[activity?.kind];
-  topbar.activity.setAttribute('href', work ? work.href : '#/walka');
+  const serving = activity?.kind === 'mercenary';
+  topbar.activity.setAttribute('href', work ? work.href : serving ? '#/osada/tavern' : '#/walka');
   if (activity) {
-    activityLabel.textContent = work ? `${work.label} · ${activity.placeName}` : `EKSPLORACJA · ${activity.areaName}`;
-    activityTime.textContent = activityFinished(activity, now) ? 'RAPORT GOTOWY' : formatCountdown(activity.endsAt - now);
+    activityLabel.textContent = work ? `${work.label} · ${activity.placeName}` : serving ? `USŁUGA NAJEMNA · ${activity.placeName}` : `EKSPLORACJA · ${activity.areaName}`;
+    activityTime.textContent = activityFinished(activity, now)
+      ? serving
+        ? activity.service?.hired
+          ? 'ZAPŁATA CZEKA'
+          : 'OGŁOSZENIE WYGASŁO'
+        : 'RAPORT GOTOWY'
+      : formatCountdown(activity.endsAt - now);
   } else {
     const hpNow = currentHp(character, now);
     activityLabel.textContent = 'ODPOCZYNEK';

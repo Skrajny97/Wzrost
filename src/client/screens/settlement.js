@@ -20,6 +20,7 @@ import { dayPart } from '../scenes.js';
 import { call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { companionCard } from '../companions.js';
+import { mercenariesCard } from '../mercenaries.js';
 import { askGuildButton } from '../guild-requests.js';
 import { mountCasino } from '../casino.js';
 import { trialHallCards } from '../trial-hall.js';
@@ -1121,7 +1122,7 @@ export function mountSettlement(container, { params = {} } = {}) {
         data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij afiks', onClick: reforgeSheet }),
         data.imbue && h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij żywioł', onClick: imbueSheet }),
       );
-    if (resident.service === 'tavern') return h('div', { class: 'stack' }, tavernCard(), companionsCard());
+    if (resident.service === 'tavern') return h('div', { class: 'stack' }, tavernCard(), companionsCard(), mercenariesCard(() => apply({})));
     if (resident.service === 'herbalist') return herbalistCard();
     if (resident.service === 'forge') return forgeCard();
     if (resident.service === 'tannery') {

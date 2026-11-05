@@ -12,6 +12,7 @@ import { buildQueue, characterView, currentHp, loadSettled, requirePlayer } from
 import { atomically, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { shiftTrip, skipRecord, tripOf } from './trips.js';
+import { shiftService } from './mercenaries.js';
 
 const MINUTE = 60000;
 // The page shows a report a second after the end, so a wait skipped to its
@@ -64,6 +65,13 @@ const skipAvatar = (db, player, now) => skipWork(db, player, now, 'avatar_activi
 function skipWork(db, player, now, table, activity, none) {
   const { row } = player;
   if (!activity || activity.ends_at <= now) throw nothing(none);
+  // A mercenary's offer or service in the Karczma has no time to skip: it
+  // waits for the werbunek, or serves to its exploration's end
+  // (mercenaries.js).
+  if (activity.kind === 'mercenary') throw nothing('Usługi najemnej nie da się przewinąć.');
+  // The mercenary an exploration took along serves until it ends, so its
+  // service moves with it.
+  const hired = table === 'activities' && activity.kind === 'hunt' ? JSON.parse(activity.options ?? '{}') : null;
   const { spent, shift } = cost(activity.ends_at - now, row.time_points);
   // A Drużyna's trip shares its timer: every exploration of it moves, not
   // only the skipper's, and each keeps who skipped and by how much, for the
@@ -93,6 +101,9 @@ function skipWork(db, player, now, table, activity, none) {
                WHERE character_id = ? AND started_at = ? AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ?)`,
             )
             .bind(shift, shift, row.id, activity.started_at, row.id, row.version + 1),
+      ...(hired?.mercenary
+        ? [shiftService(db, hired, row.id, shift, { sql: ' AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ?)', binds: [row.id, row.version + 1] })]
+        : []),
     ],
   };
 }

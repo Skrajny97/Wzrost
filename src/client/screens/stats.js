@@ -4,7 +4,7 @@
 
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatNumber, formatPrecise, plural } from '../format.js';
-import { call, isUnlocked, state, unlockInfo } from '../state.js';
+import { buildLocked, buildLockedText, call, isUnlocked, state, unlockInfo } from '../state.js';
 import { confirmAction, openSheet, systemPanel, withButton } from '../ui.js';
 
 // Segments of the source bar; profession and Core segments appear once unlocked.
@@ -114,8 +114,9 @@ export function mountStats(container) {
 
     const pendingTotal = Object.values(pending).reduce((sum, value) => sum + value, 0);
     const free = character.freePoints - pendingTotal;
-    // Only an exploration counts its fights with the points (hunts.js).
-    const busy = character.activity?.kind === 'hunt';
+    // Only an exploration counts its fights with the points (hunts.js), and
+    // a mercenary goes as it is (mercenaries.js).
+    const busy = buildLocked(character);
     const sources = SOURCES.filter((source) => !source.unlock || isUnlocked(source.unlock));
     const widest = Math.max(1, ...character.stats.map((stat) => stat.total + (pending[stat.id] ?? 0)));
 
@@ -127,7 +128,7 @@ export function mountStats(container) {
         h('span', { class: `badge badge--system badge--tall${free > 0 ? ' badge--ready' : ''}`, text: `WOLNE PUNKTY: ${formatNumber(free)}` }),
       ),
       levelsCard(character),
-      busy && systemPanel('Postać jest na wyprawie. Punkty rozdzielisz po jej powrocie.'),
+      busy && systemPanel(buildLockedText(character, 'Punkty rozdzielisz')),
       actions(character, busy, pendingTotal),
       h(
         'div',
@@ -404,7 +405,7 @@ export function mountStats(container) {
     update: () => {
       // Points the server no longer has room for are dropped.
       const total = Object.values(pending).reduce((sum, value) => sum + value, 0);
-      if (total > state.character.freePoints || state.character.activity?.kind === 'hunt') pending = {};
+      if (total > state.character.freePoints || buildLocked(state.character)) pending = {};
       render();
     },
   };

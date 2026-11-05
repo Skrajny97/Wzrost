@@ -179,8 +179,15 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
     // exploration and its report is claimed, as that report is made with
     // what it wears (the code review of 3.11.2026: the Awatar's setting
     // claimed on the way changed the exploration's fights).
-    if (item?.equippedSlot && player.activity?.kind === 'hunt') {
-      throw new ApiError(409, 'item_worn_exploring', 'Kamień trafi do noszonego przedmiotu, gdy postać wróci z wyprawy i odbierze jej raport.');
+    // A mercenary's gear waits as well (mercenaries.js).
+    if (item?.equippedSlot && ['hunt', 'mercenary'].includes(player.activity?.kind)) {
+      throw new ApiError(
+        409,
+        'item_worn_exploring',
+        player.activity.kind === 'mercenary'
+          ? 'Kamień trafi do noszonego przedmiotu, gdy postać skończy usługę najemną albo zdejmie ogłoszenie.'
+          : 'Kamień trafi do noszonego przedmiotu, gdy postać wróci z wyprawy i odbierze jej raport.',
+      );
     }
     // The item as its row's data keeps it, without the row's id and slot.
     const data = item && Object.fromEntries(Object.entries(item).filter(([field]) => field !== 'id' && field !== 'equippedSlot'));

@@ -46,7 +46,7 @@ const WORK = {
   jewelcrafting: { kind: 'jewels', busy: 'Pracuje w Szlifierni' },
 };
 // What the character or the Awatar Systemu is doing, by the activity's kind.
-const DOING = { herbs: 'zbiera zioła', potions: 'warzy mikstury', items: 'wykonuje przedmioty', minerals: 'kopie w Kopalni', jewels: 'pracuje w Szlifierni' };
+const DOING = { herbs: 'zbiera zioła', potions: 'warzy mikstury', items: 'wykonuje przedmioty', minerals: 'kopie w Kopalni', jewels: 'pracuje w Szlifierni', mercenary: 'wykonuje usługę najemną' };
 const FALLBACK_ICONS = { herbalism: 'leaf', alchemy: 'spirit', crafting: 'hammer', mining: 'ore', jewelcrafting: 'ring' };
 const HERB_CHOICE = 'wzrost.herb-choice';
 const WORKER_CHOICE = 'wzrost.worker-choice';

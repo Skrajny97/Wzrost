@@ -12,7 +12,7 @@ import { countOf, timeFormat } from '../format.js';
 import { CLASS_ICONS } from '../icons.js';
 import { systemPanel, withButton } from '../ui.js';
 
-const WORKS = { herbs: 'Zielarstwo', potions: 'Alchemia', items: 'Rzemieślnictwo', minerals: 'Górnictwo', jewels: 'Jubilerstwo' };
+const WORKS = { herbs: 'Zielarstwo', potions: 'Alchemia', items: 'Rzemieślnictwo', minerals: 'Górnictwo', jewels: 'Jubilerstwo', mercenary: 'Usługa najemna' };
 
 // What the character is doing, in a few words.
 function doing(activity) {

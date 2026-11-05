@@ -64,6 +64,7 @@ import {
 import { say } from '../engine/text.js';
 import { huntWait, mountStage } from '../engine/stable.js';
 import { finishBrewing } from './brewing.js';
+import { endService, hireMercenary, hireRaced, withdrawMercenary } from './mercenaries.js';
 import { content } from './content.js';
 import {
   bagItems,
@@ -325,7 +326,7 @@ export async function startHunt(context) {
 export async function beginHunt(
   db,
   player,
-  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false } = {},
+  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, mercenary = null } = {},
   now,
   { quick = false, flash = false, party: crew = null, partners = [], mount = null } = {},
 ) {
@@ -404,7 +405,8 @@ export async function beginHunt(
   // HP. Resting to full HP heals the wounds of them all for good, of those
   // who stay too. Not on a Szybkie Polowanie, nor on a Drużyna's trip.
   const healed = kept && restedNow(player, now) && (kept.companions ?? []).some((companion) => companion.wounded);
-  const party = kept && !quick && !crew ? companionsGoing(player, now) : [];
+  // A mercenary from the Karczma takes one companion's place (633.3 A).
+  const party = kept && !quick && !crew ? companionsGoing(player, now).slice(0, mercenary === null ? undefined : content.balance.parties.size - 2) : [];
   // The sołtys's wanted poster in hand, for this place (wanted.js): its
   // target may come on the way. Not on a Szybkie Polowanie, nor on a
   // Drużyna's trip.
@@ -429,6 +431,21 @@ export async function beginHunt(
           .filter(([, count]) => count > 0),
       )
     : null;
+  const startsAt = quick ? now - minutes * 60000 : now;
+  // The Stajnia's mount (327 A, stable.js in the engine) shortens only the
+  // wait: an hour with the first stage (5%) ends after 57 minutes, while
+  // `minutes` stays the length chosen, so the fights, the rewards, the XP
+  // and the report's minutes are those of the full hour. Not a Szybkie or a
+  // Błyskawiczne polowanie, over as they start. A Drużyna's trip keeps one
+  // time for all who go: it takes the stage the party code gives (`mount`,
+  // the slowest mount among them), and without one goes the full length.
+  const stage = quick ? 0 : (mount ?? (crew ? 0 : mountStage(kept, content)));
+  const endsAt = startsAt + huntWait(minutes, stage, content);
+
+  // A mercenary from the Karczma (mercenaries.js), on a plain "Wyrusz"
+  // only: hired with the start, in its batch, its fee paid at once; it
+  // fights beside the character as a Drużyna's member would.
+  const hire = mercenary === null ? null : await hireMercenary(db, player, mercenary, { area, minutes, startsAt, endsAt, now, plain: !quick && !crew });
   const options = {
     // When it really set out, which a "Przewiń" leaves as it was (started_at
     // moves back with a skip): a trial of the Próby Gildii moves on only
@@ -448,23 +465,13 @@ export async function beginHunt(
     ...(scouted && { scouted }),
     ...(sought && { wanted: sought }),
     ...(hard && { hard: true }),
+    ...(hire && { partners: [hire.partner], mercenary: hire.view }),
     // The Ołtarz's blessing of the day, for this exploration's first fights;
     // not on a Drużyna's trip, whose fights are one for all (fortress.js).
     ...(!crew && blessingOf(player.row) && { blessing: blessingOf(player.row) }),
     ...(quick && { quick }),
     ...(flash && { flash }),
   };
-  const startsAt = quick ? now - minutes * 60000 : now;
-  // The Stajnia's mount (327 A, stable.js in the engine) shortens only the
-  // wait: an hour with the first stage (5%) ends after 57 minutes, while
-  // `minutes` stays the length chosen, so the fights, the rewards, the XP
-  // and the report's minutes are those of the full hour. Not a Szybkie or a
-  // Błyskawiczne polowanie, over as they start. A Drużyna's trip keeps one
-  // time for all who go: it takes the stage the party code gives (`mount`,
-  // the slowest mount among them), and without one goes the full length.
-  const stage = quick ? 0 : (mount ?? (crew ? 0 : mountStage(kept, content)));
-  const endsAt = startsAt + huntWait(minutes, stage, content);
-
   const { hp } = currentHp(player, now);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const tracked = trackQuests ? questCreatures(questsNow(player, now), area) : [];
@@ -473,6 +480,7 @@ export async function beginHunt(
       // The HP, potions, buffs and the Osada below are computed from the row
       // read: the whole start holds only while it is as read (atomic.js).
       sameVersion(db, player.row),
+      ...(hire ? hire.statements : []),
       db
         .prepare(
           'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, avoid_rare, seek_rare, tracked, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -494,18 +502,19 @@ export async function beginHunt(
       // The HP rested so far is saved now, so it is not counted again later.
       db
         .prepare(
-          `UPDATE characters SET hp = ?, hp_at = ?${settlement ? ', settlement = ?' : ''}${reserving ? ', potions = ?' : ''}, version = version + 1 WHERE id = ?`,
+          `UPDATE characters SET hp = ?, hp_at = ?${settlement ? ', settlement = ?' : ''}${reserving ? ', potions = ?' : ''}${hire ? ', gold = gold - ?' : ''}, version = version + 1 WHERE id = ?`,
         )
         .bind(
           hp,
           now,
           ...(settlement ? [settlement] : []),
           ...(reserving ? [JSON.stringify(bagPotions)] : []),
+          ...(hire ? [hire.fee] : []),
           player.row.id,
         ),
     ]);
   } catch (error) {
-    if (raced(error)) throw characterChanged();
+    if (raced(error)) throw hire ? await hireRaced(db, hire) : characterChanged();
     if (String(error?.message).includes('constraint')) {
       throw new ApiError(409, 'busy', 'Postać jest już na wyprawie.');
     }
@@ -523,6 +532,9 @@ export async function cancelHunt(context) {
   const { session, player } = await requirePlayer(context);
   const activity = player.activity;
   if (!activity) throw new ApiError(409, 'no_activity', 'Postać nie jest na wyprawie.');
+  // A mercenary's offer is taken back as in the Karczma, and a hired one
+  // serves to the end (mercenaries.js).
+  if (activity.kind === 'mercenary') return withdrawMercenary(context);
   if (activity.ends_at <= context.now) {
     throw new ApiError(409, 'claim_first', 'Wyprawa się skończyła. Odbierz raport.');
   }
@@ -558,6 +570,8 @@ export async function cancelHunt(context) {
       ? [db.prepare('UPDATE characters SET potions = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify(potionsBack(player.row, back, {})), player.row.id)]
       : []),
     ...(trip ? [leaveTrip(db, trip, player.row)] : []),
+    // The mercenary taken along has served: its pay waits (mercenaries.js).
+    ...(options.mercenary ? [endService(db, options, player.row.id, context.now)] : []),
   ]);
   return json({ character: characterView(await loadPlayer(db, session.userId), context.now) });
 }

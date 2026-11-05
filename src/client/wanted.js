@@ -7,7 +7,7 @@ import { monsterSprite, placeArt } from './art.js';
 import { h } from './dom.js';
 import { formatNumber } from './format.js';
 import { call } from './state.js';
-import { toast, withButton } from './ui.js';
+import { howItWorks, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 // "[female|male]" in the texts, by the target's gender.
@@ -54,7 +54,10 @@ export function wantedCard(view, apply) {
     'section',
     { class: 'card wanted-card', 'aria-labelledby': 'wanted-title' },
     banner,
-    h('p', { class: 'wanted-intro', text: view.texts.intro }),
+    // The sołtys's words folded under "Jak to działa?", so the posters come
+    // first (the author's screenshot, 5.11.2026: „Ten opis schowaj pod »Jak
+    // to działa?«”).
+    howItWorks(null, view.texts.intro),
     h(
       'div',
       { class: 'wanted-posters' },
