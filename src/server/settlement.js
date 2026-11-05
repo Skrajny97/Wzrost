@@ -105,7 +105,7 @@ import {
 import { toHex } from './encoding.js';
 import { evolutionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
-import { wantedView } from './wanted.js';
+import { wantedToKeep, wantedView } from './wanted.js';
 import { forgeView } from './forge.js';
 import { trialProgress } from './guild-trials.js';
 import { upgradePayment, upgradePlan } from './inventory.js';
@@ -745,7 +745,6 @@ function pendingView(pending) {
   };
 }
 
-// Saves a board drawn anew (new orders came) if the row is still as read.
 // The reward waiting for a brotherhood's new standings (593 A and B), as
 // the panel lists it: the standings' names and the goods with their names
 // and counts, Punkty Systemu and gold first; null when nothing waits.
@@ -808,6 +807,8 @@ export async function claimStandingReward(context) {
   });
 }
 
+// Saves a board drawn anew (new orders came), and the day's wanted record
+// first kept, if the row is still as read.
 async function saveBoard(db, row, stored, board) {
   const next = JSON.stringify({ ...stored, board });
   if (next === (row.settlement ?? '{}')) return;
@@ -817,8 +818,12 @@ async function saveBoard(db, row, stored, board) {
 export async function getSettlement(context) {
   const { player } = await requirePlayer(context);
   requireOpen(player.row);
-  const stored = settlementOf(player.row);
-  const board = settlementBoard(player.row, stored, context.now);
+  const read = settlementOf(player.row);
+  const board = settlementBoard(player.row, read, context.now);
+  // The day's first look keeps what the day's wanted posters are drawn
+  // from, with the board (wanted.js).
+  const wanted = wantedToKeep(player.row, read, context.now);
+  const stored = wanted ? { ...read, wanted } : read;
   await saveBoard(context.env.DB, player.row, stored, board);
   return json({ settlement: settlementView(player, stored, board, context.now), character: characterView(player, context.now) });
 }
