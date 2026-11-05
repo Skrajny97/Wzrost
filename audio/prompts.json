@@ -889,7 +889,8 @@
       "settlement-board-wanted": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Sołtys rozwiesza tu też listy gończe. Weź list i wyrusz tam, gdzie widziano cel. Jeśli go spotkasz i pokonasz, nagroda jest Twoja."},
       "settlement-trial-hall": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Raz dziennie stoczysz tu trzy walki ze stworami z kolejnego miejsca. Zdrowie nie wraca między nimi, ale mikstury działają. Wygrasz, a to miejsce otworzy się dla Ciebie od razu."},
       "guild-expedition": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Każda minuta Twoich wypraw prowadzi gildię naprzód. Na końcu etapu czeka strażnik. Atakujesz go trzy razy dziennie, a gdy padnie, każdy, kto dołożył minut, dostaje skrzynię."},
-      "fortress-welcome": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Twój obóz stał się Warownią. Każda z jej siedmiu budowli coś daje: trening, błogosławieństwo, zioła albo lepsze tropienie. Zaglądaj tu codziennie."}
+      "fortress-welcome": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Twój obóz stał się Warownią. Każda z jej siedmiu budowli coś daje: trening, błogosławieństwo, zioła albo lepsze tropienie. Zaglądaj tu codziennie."},
+      "community-tabs": {"text": "U góry przełączasz zakładki: Czat, Znajomi, Ranking i Gildia. Drużynę założysz od 10. poziomu.", "ending": " [pauses] Tak."}
     },
     "allLines": {
       "voice": "Narrator",
