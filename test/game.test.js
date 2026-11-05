@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
-import { classXpToNext, createRng, generateItem, itemName, meetingChances, questPeriod, unknownCreatures, upgradeCost, xpToNext } from '../src/engine/index.js';
+import { classXpToNext, createRng, generateItem, itemName, meetingChances, notificationsDue, questPeriod, unknownCreatures, upgradeCost, xpToNext } from '../src/engine/index.js';
 import { skipTime } from '../src/server/testing.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -1060,6 +1060,61 @@ describe('camp', () => {
     assert.equal(find(later, 'sawmill').production.paused, false);
   });
 
+  test('"Przerwij budowę" gives back what the build was paid, also when the prices changed since', async () => {
+    await stock(1000, { wood: 200, stone: 100 });
+    const cost = (id, level) => upgradeCost(content.buildingsById[id], level);
+    const database = await db();
+    const kept = async (id) => JSON.parse((await database.prepare('SELECT cost FROM buildings WHERE building_id = ?').bind(id).first()).cost ?? 'null');
+    // Started by hand, the build keeps what it cost.
+    await build('sawmill');
+    assert.deepEqual(await kept('sawmill'), cost('sawmill', 1));
+    // A Kamieniołom waiting after it was paid 100 gold, a price changed by a
+    // deployment since; it keeps that when it starts.
+    await build('quarry');
+    const { build_queue: queue } = await database.prepare('SELECT build_queue FROM characters').first();
+    const paid = { gold: 100 };
+    await database.prepare('UPDATE characters SET build_queue = ?').bind(JSON.stringify(JSON.parse(queue).map((entry) => ({ ...entry, cost: paid })))).run();
+    const started = (await call('POST', '/api/test/skip-build', { cookie })).data.character;
+    assert.deepEqual([started.camp.construction.buildingId, started.camp.construction.cost], ['quarry', paid]);
+    assert.deepEqual(await kept('quarry'), paid);
+    const stopped = await call('POST', '/api/camp/cancel', { cookie, body: { buildingId: 'quarry', level: 1 } });
+    assert.equal(stopped.status, 200, JSON.stringify(stopped.data).slice(0, 300));
+    assert.deepEqual(stopped.data.refund, paid);
+    assert.equal(stopped.data.character.gold, started.gold + 100);
+    // A build from before the cost was kept gives back the price of its level now.
+    await build('quarry');
+    await database.prepare("UPDATE buildings SET cost = NULL WHERE building_id = 'quarry'").run();
+    const old = await call('POST', '/api/camp/cancel', { cookie, body: { buildingId: 'quarry', level: 1 } });
+    assert.deepEqual(old.data.refund, cost('quarry', 1));
+  });
+
+  test('a build stopped leaves the level it had as of old: no change of the rest\'s pace before it, and no build ended for the phone', async () => {
+    await stock(1000, { wood: 200, stone: 100 });
+    const database = await db();
+    await database.prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'campfire', 1, 0, 1 FROM characters").run();
+    // An exploration that ended an hour ago, its report not claimed yet: the
+    // rest after it counts from its end.
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } })).status, 201);
+    await database
+      .prepare("UPDATE activities SET started_at = started_at - 86400000, ends_at = ?, seed = 'test-seed'")
+      .bind(Date.now() - 3600000)
+      .run();
+    // The Ognisko's next level, begun and stopped meanwhile.
+    assert.equal((await build('campfire')).status, 201);
+    assert.equal((await call('POST', '/api/camp/cancel', { cookie, body: { buildingId: 'campfire', level: 2 } })).status, 200);
+    const row = await database.prepare("SELECT level, ends_at, cost FROM buildings WHERE building_id = 'campfire'").first();
+    assert.deepEqual(row, { level: 1, ends_at: 0, cost: null });
+    assert.equal((await call('POST', '/api/hunts/claim', { cookie })).status, 200);
+    // The Ognisko stood at level 1 all the time: one pace of rest since the
+    // exploration's end.
+    const view = await character();
+    assert.equal(view.regen.change, undefined, JSON.stringify(view.regen));
+    assert.equal(find(view, 'campfire').level, 1);
+    // Nothing for the phone: no build ended in any minute.
+    const due = notificationsDue({ level: view.level, buildings: { campfire: { level: 1, startedAt: 0, endsAt: row.ends_at, collectedAt: null } }, queue: [] }, Date.now() - 120000, Date.now(), content);
+    assert.deepEqual(due, []);
+  });
+
   test('a camp level called off makes the builds after it slow again', async () => {
     await stock(3000, { wood: 100, stone: 50 });
     await build('craft-table');
@@ -2052,13 +2107,17 @@ describe('Stół rozbiórki', () => {
     assert.equal((await salvage(id)).status, 200);
   });
 
-  test('from level 6 an order may bring extra parts, which come when it ends', async () => {
+  test('from level 6 an order may bring extra parts, which come when it ends and show only then', async () => {
     await tableAt(10);
     await stockMaterials({ 'wolf-pelt:common': 40 });
     const { data } = await craft({ all: true });
-    // A quarter of a part for each of the 40 at level 10.
+    // A quarter of a part for each of the 40 at level 10, drawn with the
+    // order but not shown before it ends: taken off and ordered again, it
+    // would be drawn anew.
     const [order] = data.character.crafting.queue;
-    assert.deepEqual([order.parts, order.bonus], [40, 10]);
+    assert.deepEqual([order.parts, order.bonus], [40, undefined]);
+    const { crafting } = await (await db()).prepare('SELECT crafting FROM characters').first();
+    assert.equal(JSON.parse(crafting)[0].bonus, 10);
     await wait((order.endsAt - order.startsAt) / 60000);
     assert.equal(parts(await character(), 'scraps'), 50);
   });
@@ -2407,6 +2466,13 @@ describe('Zadania od narratora', () => {
   const chest = (period) => call('POST', '/api/quests/chest', { cookie, body: { period } });
   const stored = async () => JSON.parse((await (await db()).prepare('SELECT quests FROM characters').first()).quests);
   const store = async (quests) => (await db()).prepare('UPDATE characters SET quests = ?').bind(JSON.stringify(quests)).run();
+  // The Stół rozbiórki's orders all done a minute ago.
+  async function tableDone() {
+    const database = await db();
+    const { crafting } = await database.prepare('SELECT crafting FROM characters').first();
+    const ended = JSON.parse(crafting).map((order) => ({ ...order, endsAt: Date.now() - 60000 }));
+    await database.prepare('UPDATE characters SET crafting = ?').bind(JSON.stringify(ended)).run();
+  }
   // Every quest of a period done, as if its work had been done.
   async function finishAll(periodId) {
     const quests = await stored();
@@ -2484,7 +2550,12 @@ describe('Zadania od narratora', () => {
     const item = generateItem({ baseId: 'helmet', level: 3, rarityId: 'common' }, createRng('zadanie'), content);
     const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(item)).run();
     await call('POST', '/api/craft/materials', { cookie, body: { all: true } });
-    const after = (await call('POST', `/api/items/${meta.last_row_id}/salvage`, { cookie })).data.character;
+    const ordered = (await call('POST', `/api/items/${meta.last_row_id}/salvage`, { cookie })).data.character;
+    // Nothing counts until the orders end (the author: „zrób też tak zeby
+    // zadania rozbiórki przedmiotów liczyły się po zakończonej rozbiórce”).
+    assert.deepEqual(ordered.quests.daily.quests.map((entry) => [entry.progress, entry.done]), [[0, false], [0, false]]);
+    await tableDone();
+    const after = await character();
     assert.deepEqual(after.quests.daily.quests.map((entry) => [entry.progress, entry.done]), [[3, false], [1, true]]);
   });
 
@@ -2502,7 +2573,10 @@ describe('Zadania od narratora', () => {
       const { meta } = await database.prepare('INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, ?, 0 FROM characters').bind(JSON.stringify(item)).run();
       ids.push(meta.last_row_id);
     }
-    const after = (await call('POST', '/api/items/salvage', { cookie, body: { ids } })).data.character;
+    const ordered = (await call('POST', '/api/items/salvage', { cookie, body: { ids } })).data.character;
+    assert.deepEqual(ordered.quests.daily.quests.map((entry) => [entry.progress, entry.done]), [[0, false]]);
+    await tableDone();
+    const after = await character();
     assert.deepEqual(after.quests.daily.quests.map((entry) => [entry.progress, entry.done]), [[2, false]]);
   });
 

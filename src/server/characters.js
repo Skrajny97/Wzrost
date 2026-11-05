@@ -81,6 +81,8 @@ import {
   settleBoard,
   settleCrafting,
   orderCancellable,
+  countedAtEnd,
+  addQuestProgress,
   tableBuilding,
   shopBought,
   shopLeft,
@@ -111,12 +113,13 @@ import { relationTo } from './community.js';
 import { content } from './content.js';
 import { craftingOn, fortressOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
-import { raced, sameVersion } from './atomic.js';
+import { assertion, characterChanged, raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
 import { mercenaryBusy, mercenaryPlace, mercenaryRules, serviceEnded } from './mercenaries.js';
 import { championOf } from './guild-fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { guildSeatSql } from './guild-seat.js';
+import { takenBefore, trialProgress } from './guild-trials.js';
 import { partyRemoval } from './parties.js';
 import { anvilDiscountOf } from './perks.js';
 import { bagHerbs, bagMinerals, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
@@ -178,7 +181,7 @@ async function playerOf(db, row) {
     db.prepare('SELECT id, slot, data FROM items WHERE character_id = ? ORDER BY id').bind(row.id),
     db.prepare('SELECT * FROM activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT * FROM avatar_activities WHERE character_id = ?').bind(row.id),
-    db.prepare('SELECT building_id, level, started_at, ends_at, collected_at FROM buildings WHERE character_id = ?').bind(row.id),
+    db.prepare('SELECT building_id, level, started_at, ends_at, collected_at, cost FROM buildings WHERE character_id = ?').bind(row.id),
     // With the tag of its guild, for its own name (guilds.js), whether it
     // is in a Drużyna, where its companions stay in the Kwatery (parties.js,
     // companions.js in the engine), and the donations to its guild's
@@ -204,11 +207,18 @@ async function playerOf(db, row) {
     // The levels of its guild's Siedziba, by building, all 0 outside a guild
     // (guild-seat.js): the bonuses it has as a member.
     guildSeat: seatLevels(JSON.parse(parcels.results[0]?.guild_seat ?? '{}'), content),
-    // { campfire: { level, startedAt, endsAt, collectedAt } }: see camp.js in the engine.
+    // { campfire: { level, startedAt, endsAt, collectedAt } }: see camp.js in
+    // the engine; `cost`, what a build was paid, once kept (camp.js).
     buildings: Object.fromEntries(
       buildings.results.map((building) => [
         building.building_id,
-        { level: building.level, startedAt: building.started_at, endsAt: building.ends_at, collectedAt: building.collected_at },
+        {
+          level: building.level,
+          startedAt: building.started_at,
+          endsAt: building.ends_at,
+          collectedAt: building.collected_at,
+          ...(building.cost && { cost: JSON.parse(building.cost) }),
+        },
       ]),
     ),
   };
@@ -226,7 +236,7 @@ export async function requirePlayer(context) {
   if (!player) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
   await settleBuilds(context.env.DB, player, context.now);
   await settleTimePoints(context.env.DB, player.row, context.now);
-  await settleTable(context.env.DB, player.row, context.now);
+  await settleTable(context.env.DB, player, context.now);
   await settleQuests(context.env.DB, player, context.now);
   await settleDiscoveries(context.env.DB, player, context.now);
   return { session, player };
@@ -382,16 +392,18 @@ async function settleBuilds(db, player, now) {
         ),
     ];
     // A build of a building the game no longer has only leaves the queue.
+    // One that starts keeps the cost it was paid in the queue, for
+    // "Przerwij budowę" (camp.js).
     if (building) {
       statements.push(
         db
           .prepare(
-            `INSERT INTO buildings (character_id, building_id, level, started_at, ends_at, collected_at)
-             SELECT ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ?)
+            `INSERT INTO buildings (character_id, building_id, level, started_at, ends_at, collected_at, cost)
+             SELECT ?, ?, ?, ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ?)
              ON CONFLICT (character_id, building_id) DO UPDATE
-               SET level = excluded.level, started_at = excluded.started_at, ends_at = excluded.ends_at, collected_at = excluded.collected_at`,
+               SET level = excluded.level, started_at = excluded.started_at, ends_at = excluded.ends_at, collected_at = excluded.collected_at, cost = excluded.cost`,
           )
-          .bind(row.id, building.id, entry.level, at, entry.endsAt, producing ? entry.endsAt : null, row.id, row.version + 1),
+          .bind(row.id, building.id, entry.level, at, entry.endsAt, producing ? entry.endsAt : null, entry.cost ? JSON.stringify(entry.cost) : null, row.id, row.version + 1),
       );
     }
     // The batch holds only while the character is as read (atomic.js), so
@@ -416,7 +428,7 @@ async function settleBuilds(db, player, now) {
     }
     if (resting) Object.assign(row, { hp, hp_at: at });
     if (building) {
-      player.buildings[building.id] = { level: entry.level, startedAt: at, endsAt: entry.endsAt, collectedAt: producing ? entry.endsAt : null };
+      player.buildings[building.id] = { level: entry.level, startedAt: at, endsAt: entry.endsAt, collectedAt: producing ? entry.endsAt : null, ...(entry.cost && { cost: entry.cost }) };
     }
   }
 }
@@ -439,18 +451,55 @@ async function settleTimePoints(db, row, now) {
 // The Stół rozbiórki's orders done by now leave the queue for their parts,
 // so whatever reads the parts sees them: the Osada's orders, the Targowisko,
 // the Wymiana (the code review: they waited for the next action at the
-// table). Saved only if the row is as read; the version stays, as nothing
-// the player did changed, and the result is the same whoever settles it.
-async function settleTable(db, row, now) {
-  const state = craftingState(row);
-  if (!state.queue.some((order) => order.endsAt <= now)) return;
-  const { parts, queue } = settleCrafting(state, now);
-  const next = { parts: JSON.stringify(parts), crafting: JSON.stringify(queue) };
-  const result = await db
-    .prepare('UPDATE characters SET parts = ?, crafting = ? WHERE id = ? AND parts IS ? AND crafting IS ?')
-    .bind(next.parts, next.crafting, row.id, row.parts, row.crafting)
-    .run();
-  if (result.meta.changes === 1) Object.assign(row, next);
+// table). Their work counts now (countedAtEnd; the author: „zrób też tak
+// zeby zadania rozbiórki przedmiotów liczyły się po zakończonej rozbiórce
+// bo inaczej bedzie mozna anulować rozbiórkę a zadanie zaliczone”): for the
+// narrator's quests of the periods of now, and for the Próby Gildii of the
+// guild the character is in now and of this week, a trial taken by the
+// time the order was made, as an exploration's counts from its start. All
+// in one write that holds only while the parts, the queue and the quests
+// are as read, so two requests settling at once count an order once; the
+// version moves on with it, so a change read before cannot put the order
+// back. With nothing to count (orders made before work counted at the end)
+// the version stays, as nothing the player did changed, and the result is
+// the same whoever settles it. When another request moved first, the
+// character is read again and its queue settled from there.
+export async function settleTable(db, player, now) {
+  for (let tries = 0; tries < 10; tries++) {
+    const { row } = player;
+    const state = craftingState(row);
+    if (!state.queue.some((order) => order.endsAt <= now)) return;
+    const { parts, queue, done } = settleCrafting(state, now);
+    const work = countedAtEnd(done);
+    const next = { parts: JSON.stringify(parts), crafting: JSON.stringify(queue) };
+    if (work.length === 0) {
+      const result = await db
+        .prepare('UPDATE characters SET parts = ?, crafting = ? WHERE id = ? AND parts IS ? AND crafting IS ?')
+        .bind(next.parts, next.crafting, row.id, row.parts, row.crafting)
+        .run();
+      if (result.meta.changes === 1) {
+        Object.assign(row, next);
+        return;
+      }
+    } else {
+      const pieces = (kind) => work.filter((one) => one.kind === kind).reduce((sum, one) => sum + one.pieces, 0);
+      const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { processed: pieces('process'), salvaged: pieces('salvage') }));
+      const gains = (one) => (one.kind === 'process' ? { processed: one.pieces } : { salvaged: one.pieces });
+      try {
+        await db.batch([
+          assertion(db, 'EXISTS (SELECT 1 FROM characters WHERE id = ? AND parts IS ? AND crafting IS ? AND quests IS ?)', [row.id, row.parts, row.crafting, row.quests]),
+          db.prepare('UPDATE characters SET parts = ?, crafting = ?, quests = ?, version = version + 1 WHERE id = ?').bind(next.parts, next.crafting, quests, row.id),
+          ...work.flatMap((one) => trialProgress(db, row.id, gains(one), now, takenBefore(one.orderedAt))),
+        ]);
+        Object.assign(row, { ...next, quests, version: row.version + 1 });
+        return;
+      } catch (error) {
+        if (!raced(error)) throw error;
+      }
+    }
+    Object.assign(player, await loadPlayer(db, row.user_id));
+  }
+  throw characterChanged();
 }
 
 // The Osada opened below its level by "Testuj Osadę" (settlement.js).
@@ -854,8 +903,9 @@ function campView(player, levels, now) {
       level: running.level,
       startedAt: running.startedAt,
       endsAt: running.endsAt,
-      // What "Przerwij budowę" gives back.
-      cost: upgradeCost(content.buildingsById[running.buildingId], running.level),
+      // What "Przerwij budowę" gives back: what the build was paid, or for
+      // one from before that was kept, the price of its level now.
+      cost: running.cost ?? upgradeCost(content.buildingsById[running.buildingId], running.level),
     },
     // The builds waiting after it, each with the time it starts, and how
     // many builds the camp has at most, the one under way too.
@@ -1073,14 +1123,18 @@ function craftingView(row, levels, now) {
         color: content.raritiesById[rarity].color,
         part: content.partsById[order.partId].name,
         parts: order.parts,
-        // Extra parts from the table's later levels, told when the order ends.
-        bonus: order.bonus ?? 0,
+        // No extra parts here: drawn with the order, they show only once it
+        // ends, among the parts (taken off and ordered again, an order would
+        // draw them anew).
         startsAt: order.startsAt,
         endsAt: order.endsAt,
         // "Usuń z kolejki" (cancelOrders in crafting.js): whether the order
-        // can leave the queue, and what it gave at once that would go back
+        // can leave the queue, whether its work counted already (`counted`:
+        // one made before work counted at the end, so the quests and the
+        // Próby Gildii lose it), and what it gave at once that would go back
         // with it: jewellery's gems and ores, the patterns its items taught.
         cancellable: orderCancellable(order),
+        counted: order.countsAtEnd !== true,
         minerals: Object.entries(order.minerals ?? {}).map(([id, count]) => ({ name: content.mineralsById[id]?.name ?? id, count })),
         patterns: (order.patterns ?? []).map((id) => content.basesById[id]?.name).filter(Boolean),
       };

@@ -240,7 +240,9 @@ const orderLabel = (order) => (order.count > 1 ? `${order.name} ×${formatNumber
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 
 // What else goes with orders leaving the queue: the gems and ores
-// jewellery gave at once, and the patterns their items taught.
+// jewellery gave at once, the patterns their items taught, and what the
+// quests and the Próby Gildii counted for an order made before the work of
+// the table counted at its end (`counted`); a newer order counted nothing.
 function goingBack(orders, confirm) {
   const minerals = new Map();
   for (const order of orders) for (const { name, count } of order.minerals) minerals.set(name, (minerals.get(name) ?? 0) + count);
@@ -248,6 +250,7 @@ function goingBack(orders, confirm) {
   return [
     minerals.size > 0 && filled(confirm.minerals, { minerals: [...minerals].map(([name, count]) => `${name} ×${formatNumber(count)}`).join(', ') }),
     patterns.length > 0 && filled(patterns.length === 1 ? confirm.pattern : confirm.patterns, { patterns: patterns.join(', ') }),
+    orders.some((order) => order.counted) && (state.character.guildTag ? confirm.countedGuild : confirm.counted),
   ];
 }
 
@@ -265,7 +268,6 @@ async function cancelOrder(crafting, order) {
       index === 0 && confirm.running,
       index < crafting.queue.length - 1 && confirm.later,
       ...goingBack([order], confirm),
-      state.character.guildTag ? confirm.countedGuild : confirm.counted,
     ]
       .filter(Boolean)
       .join(' '),
@@ -288,7 +290,6 @@ async function cancelAll(crafting) {
       crafting.queue[0].cancellable && confirm.runningAll,
       leaving.length < crafting.queue.length && confirm.kept,
       ...goingBack(leaving, confirm),
-      state.character.guildTag ? confirm.countedGuild : confirm.counted,
     ]
       .filter(Boolean)
       .join(' '),

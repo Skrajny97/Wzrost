@@ -3,13 +3,14 @@
 // (crafting.js in the engine). The table's level sets the highest rarity it
 // takes and, later, the chance of extra parts. The queue works on its own,
 // also while the character is away, and an order not finished yet can leave
-// it with all it took given back (cancelOrders). Every change first settles
-// the queue at the present time and is saved only if the character is as
-// read (its version), so two taps at once make one change.
+// it with all it took given back (cancelOrders). An order's work counts for
+// the narrator's quests and the Próby Gildii once it ends, as the queue is
+// settled (settleTable in characters.js). Every change first settles the
+// queue at the present time and is saved only if the character is as read
+// (its version), so two taps at once make one change.
 
 import {
   addCounts,
-  addQuestProgress,
   bagCapacity,
   campBonus,
   campLevels,
@@ -25,6 +26,7 @@ import {
   orderSalvage,
   orderSalvageMany,
   parseStack,
+  patternsKept,
   questPeriod,
   questText,
   rewardedQuest,
@@ -38,9 +40,9 @@ import {
 } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, craftingState, loadPlayer, questsNow, requireOffRack, requirePlayer, taughtPattern } from './characters.js';
+import { bagPlaces, characterView, craftingState, loadPlayer, questsNow, requireOffRack, requirePlayer, settleTable, taughtPattern } from './characters.js';
 import { toHex } from './encoding.js';
-import { tableTrials, trialProgress, trialTakenBack } from './guild-trials.js';
+import { tableTrials, trialTakenBack } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { testMode, testModeFor } from './test-mode.js';
 
@@ -169,17 +171,10 @@ export async function craftMaterials(context) {
     throw tooRare(rarities.sort((a, b) => craftLevelFor(a, content) - craftLevelFor(b, content))[0]);
   }
   if (ordered === 0) throw new ApiError(409, 'no_materials', 'Nie masz tych materiałów.');
-  // Every material handed to the table counts for the narrator's quests.
-  const processed = Object.entries(settled.materials).reduce((sum, [key, count]) => sum + count - (state.materials[key] ?? 0), 0);
-  const quests = addQuestProgress(questsNow(player, now), { processed });
+  // The materials count for the narrator's quests and the Próby Gildii once
+  // their order ends (settleTable in characters.js), not now.
   const db = context.env.DB;
-  const saved = withIds(settled.queue.length, state);
-  const [result] = await db.batch([
-    saveState(db, player.row, saved, { quests }),
-    // The Próby Gildii's trial too, only with the queue saved above, whose
-    // new orders' ids are this request's own (guild-trials.js).
-    ...trialProgress(db, player.row.id, { processed }, now, { sql: '(SELECT crafting FROM characters WHERE id = ?) = ?', binds: [player.row.id, JSON.stringify(saved.queue)] }),
-  ]);
+  const result = await saveState(db, player.row, withIds(settled.queue.length, state)).run();
   if (result.meta.changes !== 1) throw changed();
   return json({ ordered, skipped: rare, character: characterView(await loadPlayer(db, session.userId), now) });
 }
@@ -206,19 +201,17 @@ export async function salvageItem(context) {
   const state = pattern ? withPatterns(ordered, settled.queue.length, [{ id: pattern.id, partId: ordered.queue.at(-1).partId }]) : ordered;
   const order = state.queue.at(-1);
   // The order is saved only while the item is still in the bag, and the item
-  // goes only if that order was saved: two taps make one order.
-  const quests = addQuestProgress(questsNow(player, now), { salvaged: 1 });
+  // goes only if that order was saved: two taps make one order. The item
+  // counts for the narrator's quests and the Próby Gildii once the order
+  // ends (settleTable in characters.js).
   const jewel = withMinerals(row, [item]);
   const [saved] = await db.batch([
     saveState(db, row, state, {
-      quests,
       ...(pattern && { patterns: [...learned, pattern.id] }),
       ...(jewel && { minerals: jewel.minerals }),
       condition: ' AND EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ? AND slot IS NULL)',
       binds: [item.id, row.id],
     }),
-    // The Próby Gildii's trial too, only with that order (guild-trials.js).
-    ...trialProgress(db, row.id, { salvaged: 1 }, now, { sql: 'EXISTS (SELECT 1 FROM characters WHERE id = ? AND instr(crafting, ?) > 0)', binds: [row.id, `"id":"${order.id}"`] }),
     db
       .prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND instr(crafting, ?) > 0)')
       .bind(item.id, row.id, row.id, `"id":"${order.id}"`),
@@ -242,6 +235,8 @@ export async function salvageItem(context) {
 // rozbiórki"): one order for each kind of part (orderSalvageMany), the parts
 // and the time as one by one. All or none: the orders are saved only while
 // every item is still in the bag, and the items go only with those orders.
+// Each item counts for the narrator's quests and the Próby Gildii once its
+// order ends (settleTable in characters.js).
 export async function salvageItems(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
@@ -281,7 +276,6 @@ export async function salvageItems(context) {
     );
   }
   const db = context.env.DB;
-  const quests = addQuestProgress(questsNow(player, now), { salvaged: items.length });
   const patterns = [...learned, ...taught.map((one) => one.id)];
   const jewels = withMinerals(row, items);
   const list = JSON.stringify(ids);
@@ -289,14 +283,11 @@ export async function salvageItems(context) {
   const marker = [row.id, `"id":"${orders[0].id}"`];
   const [result] = await db.batch([
     saveState(db, row, state, {
-      quests,
       ...(taught.length > 0 && { patterns }),
       ...(jewels && { minerals: jewels.minerals }),
       condition: ' AND (SELECT COUNT(*) FROM items WHERE character_id = ? AND slot IS NULL AND id IN (SELECT value FROM json_each(?))) = ?',
       binds: [row.id, list, ids.length],
     }),
-    // The Próby Gildii's trial too, only with those orders (guild-trials.js).
-    ...trialProgress(db, row.id, { salvaged: items.length }, now, { sql: saved, binds: marker }),
     db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (SELECT value FROM json_each(?)) AND ${saved}`).bind(row.id, list, ...marker),
   ]);
   if (result.meta.changes !== 1) throw changed();
@@ -321,12 +312,15 @@ const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(va
 // they took comes back, the materials to the character's and the items to
 // the bag, also from the order at work, whose work so far is lost, and the
 // orders after them move up (takeOffQueue). What they brought goes too: the
-// narrator's quests and the Próby Gildii lose what they counted for them
-// (takeQuestProgress, trialAfterCancel), the minerals jewellery gave at
-// once go back, and a pattern an item taught hides again, unless an order
-// staying holds an item of it. All or none, so "Usuń wszystkie" too: nothing
-// leaves while the bag has no room for every item, the character no longer
-// has those minerals or a quest the work finished has given its reward.
+// minerals jewellery gave at once go back, and a pattern an item taught
+// hides again, unless an order staying holds an item of it, which takes
+// over its mark (patternsKept). An order counts for the narrator's quests
+// and the Próby Gildii only once it ends, so they lose nothing; but an
+// order made before that counted when ordered, and they lose what they
+// counted for it (takeQuestProgress, trialAfterCancel). All or none, so
+// "Usuń wszystkie" too: nothing leaves while the bag has no room for every
+// item, the character no longer has those minerals or a quest such older
+// work finished has given its reward.
 // An order taking items apart from before 0.1.65 does not hold its item and
 // stays; "Usuń wszystkie" leaves it. Saved only if the character is as read.
 export async function cancelOrders(context) {
@@ -354,11 +348,10 @@ export async function cancelOrders(context) {
   const after = takeQuestProgress(quests, cancelled, content);
   const rewarded = rewardedQuest(quests, after);
   if (rewarded) throw new ApiError(409, 'quest_rewarded', filled(errors.rewarded, { quest: questText(rewarded, content) }));
-  // A pattern stays known while an order staying holds an item of it: that
-  // item would have taught it. Only later orders can, as the table works one
-  // after another, so they are all still in the queue.
+  // A pattern stays known while an order staying holds an item of it, which
+  // would have taught it: that order takes over its mark (patternsKept).
   const learned = JSON.parse(row.patterns ?? '[]');
-  const hidden = back.patterns.filter((id) => learned.includes(id) && !back.state.queue.some((order) => (order.items ?? []).some((item) => item.base === id)));
+  const { queue, hidden } = patternsKept(back.state.queue, back.patterns.filter((id) => learned.includes(id)));
   const db = context.env.DB;
   const weeks = [...new Set(cancelled.map((one) => questPeriod('weekly', one.orderedAt, content).key))];
   const trials = (await tableTrials(db, row.id, weeks))
@@ -367,7 +360,7 @@ export async function cancelOrders(context) {
   const taken = Object.fromEntries(Object.entries(back.minerals).map(([id, count]) => [id, -count]));
   await atomically(db, [
     sameVersion(db, row),
-    saveState(db, row, back.state, {
+    saveState(db, row, { ...back.state, queue }, {
       quests: after,
       ...(hidden.length > 0 && { patterns: learned.filter((id) => !hidden.includes(id)) }),
       ...(Object.keys(taken).length > 0 && { minerals: addCounts(held, taken) }),
@@ -379,16 +372,20 @@ export async function cancelOrders(context) {
   return json({ cancelled: leaving.length, items: back.items.length, character: characterView(await loadPlayer(db, session.userId), now) });
 }
 
-// "Pomiń czas" at the table in test mode: every order ends now.
+// "Pomiń czas" at the table in test mode: every order ends now, and then
+// the queue is settled as at any request, its work counting as it ends
+// (settleTable in characters.js).
 export async function skipCrafting(context) {
   if (!testMode(context.env)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const { session, player } = await requirePlayer(context);
   if (!testModeFor(context.env, session.user.login)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const now = context.now;
   const stored = craftingState(player.row);
-  const state = settleCrafting({ ...stored, queue: stored.queue.map((order) => ({ ...order, startsAt: Math.min(order.startsAt, now), endsAt: now })) }, now);
+  const ending = { ...stored, queue: stored.queue.map((order) => ({ ...order, startsAt: Math.min(order.startsAt, now), endsAt: now })) };
   const db = context.env.DB;
-  const result = await saveState(db, player.row, state).run();
+  const result = await saveState(db, player.row, ending).run();
   if (result.meta.changes !== 1) throw changed();
-  return json({ character: characterView(await loadPlayer(db, session.userId), now) });
+  const after = await loadPlayer(db, session.userId);
+  await settleTable(db, after, now);
+  return json({ character: characterView(after, now) });
 }
