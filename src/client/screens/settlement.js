@@ -303,6 +303,8 @@ export function mountSettlement(container, { params = {} } = {}) {
       'details',
       {
         class: 'card settlement-standings',
+        // The narrator's line about the brotherhoods points here.
+        'data-guide': 'osada-standings',
         open: standingsOpen,
         onToggle: () => {
           standingsOpen = fold.open;
@@ -1114,7 +1116,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       'div',
       { class: 'stack' },
       scrollCard('scroll', 'forge-scrolls'),
-      scrollCard('steadyScroll'),
+      scrollCard('steadyScroll', 'forge-scrolls'),
       h(
         'section',
         { class: 'card stack', 'data-guide': 'forge-raise' },

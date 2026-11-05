@@ -171,7 +171,7 @@ export function mountGuildExpedition(container) {
     const how = howItWorks(texts.lead, texts.how);
     return h(
       'section',
-      { class: 'card guild-expedition-card', 'aria-labelledby': 'guild-expedition-title' },
+      { class: 'card guild-expedition-card', 'aria-labelledby': 'guild-expedition-title', 'data-guide': 'guild-expedition-route' },
       h('h2', { class: 'card-title expedition-title', id: 'guild-expedition-title' }, icon('tent', { size: 22 }), filled(texts.route, { land: route.land.name })),
       routePart(),
       route.done

@@ -99,8 +99,15 @@ const quickHuntHere = (hash, read) => onOpenArea(hash) && communityTour(hash, re
 // the Warsztat, points at its patterns and ends there.
 const onWorkshop = (hash) => hash === '#/profesje/rzemieslnictwo';
 const communityWaiting = (read) => isUnlocked('community') && !read.has('community-ending');
+// The Warsztat's, the Kopalnia's and the Szlifiernia's forms show only while
+// someone can take the work (professions.js): the character, or its Awatar
+// Systemu. Till then their chapters wait for it, rather than pass their
+// pointers over on a screen without them (the tutorials' review of
+// 5.11.2026: on an exploration the chapter lost its lines).
+const workerFree = () => !state.character.activity || Boolean(state.character.professions?.avatar?.owned && !state.character.professions.avatar.activity);
 const craftingDue = (hash, read) =>
   Boolean(state.character.professions?.workshop) &&
+  workerFree() &&
   !onReport(hash) &&
   !onCharacter(hash) &&
   !skillsWaiting(read) &&
@@ -140,6 +147,9 @@ const placesDue = (read) =>
   !professionsWaiting(read) &&
   !communityWaiting(read) &&
   !craftingWaiting(read) &&
+  !evolutionWaiting(read) &&
+  !towersWaiting(read) &&
+  !miningWaiting(read) &&
   read.has('settlement-ending');
 // A place's screen, also at one of its tabs (the Karczma's, settlement.js).
 const onPlace = (placeId) => (hash, read) => (hash === `#/osada/${placeId}` || hash.startsWith(`#/osada/${placeId}/`)) && placesDue(read);
@@ -200,8 +210,23 @@ const towersTrip = (hash, read) => (hash === '#/walka' && towersTour(hash, read)
 const onMine = (hash) => hash === '#/profesje/gornictwo';
 const onLapidary = (hash) => hash === '#/profesje/jubilerstwo';
 const towersWaiting = (read) => isUnlocked('towers') && !read.has('towers-ending');
+const miningWaiting = (read) => isUnlocked('mining') && !read.has('mining-ending');
+// After the introduction, with no chapter waiting: a line of its own place
+// told on the place's first visit, as the Osada's are (641-647): the
+// Wyprawa Gildii and the Warownia.
+const quietDue = (read) =>
+  read.has('ending') &&
+  !skillsWaiting(read) &&
+  !professionsWaiting(read) &&
+  !communityWaiting(read) &&
+  !craftingWaiting(read) &&
+  !settlementWaiting(read) &&
+  !evolutionWaiting(read) &&
+  !towersWaiting(read) &&
+  !miningWaiting(read);
 const miningDue = (hash, read) =>
   isUnlocked('mining') &&
+  workerFree() &&
   !onReport(hash) &&
   !onCharacter(hash) &&
   !skillsWaiting(read) &&
@@ -387,9 +412,10 @@ const BEATS = {
   'settlement-welcome': { when: settlementDue },
   'settlement-lead': { place: '.nav-item[href="#/osada"]', when: (hash, read) => settlementTour(hash, read) && !hash.startsWith('#/osada') },
   'settlement-board': { place: mark('osada-board'), when: settlementHere },
-  'settlement-brotherhoods': { place: mark('osada-board'), when: settlementHere },
+  // At the Akceptacja Bractw over the board, where the standings are.
+  'settlement-brotherhoods': { place: mark('osada-standings'), when: settlementHere },
   'settlement-ending': {
-    place: ['tavern', 'enchanter', 'hermitage', 'herbalist', 'market', 'forge', 'tannery', 'stable'].map((id) => mark(`osada-${id}`)).join(', '),
+    place: ['tavern', 'enchanter', 'hermitage', 'herbalist', 'market', 'forge', 'tannery', 'stable', 'casino', 'trial-hall'].map((id) => mark(`osada-${id}`)).join(', '),
     whole: true,
     when: settlementHere,
   },
@@ -399,6 +425,14 @@ const BEATS = {
   'settlement-tavern-mug': { place: mark('tavern-mug'), tab: mark('tavern-tab-mug'), when: onPlace('tavern') },
   'settlement-tavern-hire': { place: mark('tavern-companions'), tab: mark('tavern-tab-companions'), when: onPlace('tavern') },
   'settlement-tavern-quarters': { place: mark('tavern-quarters'), tab: mark('tavern-tab-companions'), when: onPlace('tavern') },
+  // The Najemnicy (643), once they open for the character (25th level).
+  'settlement-tavern-mercenaries': {
+    place: mark('tavern-mercenaries'),
+    tab: mark('tavern-tab-mercenaries'),
+    when: (hash, read) => Boolean(state.character.mercenaries) && onPlace('tavern')(hash, read),
+  },
+  // The Tablica zleceń's Poszukiwani (644).
+  'settlement-board-wanted': { place: mark('board-wanted'), tab: mark('board-tab-wanted'), when: onPlace('board') },
   'settlement-enchanter-affix': { place: mark('enchanter-services'), when: onPlace('enchanter') },
   'settlement-enchanter-element': { place: mark('enchanter-services'), when: onPlace('enchanter') },
   'settlement-enchanter-relation': { place: mark('resident-card'), when: onPlace('enchanter') },
@@ -413,7 +447,8 @@ const BEATS = {
   'settlement-market-company': { place: mark('market-intro'), when: onPlace('market') },
   // The Kuźnia, the Garbarnia and the Stajnia (the author: "Zrób też
   // Samouczki analogiczne do reszty lokacji w Osadzie").
-  'settlement-forge-scrolls': { place: mark('forge-scrolls'), when: onPlace('forge') },
+  // Both scrolls, the Zwój ochronny and the Zwój utrwalenia, in one ring.
+  'settlement-forge-scrolls': { place: mark('forge-scrolls'), whole: true, when: onPlace('forge') },
   'settlement-forge-raise': { place: mark('forge-raise'), when: onPlace('forge') },
   'settlement-forge-relation': { place: mark('resident-card'), when: onPlace('forge') },
   // The Kup tab rather than its list, which is taller than a phone's screen.
@@ -425,6 +460,8 @@ const BEATS = {
   // The Salon Gier (543.2 A): each game at its tab.
   'settlement-casino-lottery': { place: mark('casino-tab-lottery'), when: onPlace('casino') },
   'settlement-casino-wheel': { place: mark('casino-tab-wheel'), when: onPlace('casino') },
+  // The Sala prób (645).
+  'settlement-trial-hall': { place: mark('trial-hall'), when: onPlace('trial-hall') },
   'settlement-quarters': { place: mark('quarters-companions'), when: onQuarters },
   // The Ewolucja chapter, after all the others.
   'evolution-welcome': { when: evolutionDue },
@@ -454,6 +491,13 @@ const BEATS = {
   'mining-jewels': { place: mark('jewel-patterns'), go: lapidaryTrip, when: atLapidary },
   'mining-setting': { place: mark('jewel-tab-set'), go: lapidaryTrip, when: atLapidary },
   'mining-ending': { go: lapidaryTrip, when: atLapidary },
+  // The Wyprawa Gildii (646), on the first look at its tab in a guild.
+  'guild-expedition': {
+    place: mark('guild-expedition-route'),
+    when: (hash, read) => hash === '#/gildia/expedition' && Boolean(state.character.guildTag) && quietDue(read),
+  },
+  // The Warownia (647), on the first visit of the camp once it stands.
+  'fortress-welcome': { when: (hash, read) => hash === '#/oboz' && Boolean(state.character.camp?.cornerstone?.fortress?.stands) && quietDue(read) },
 };
 
 let place = '#/walka';
@@ -474,6 +518,10 @@ let missed = null; // { id, hash }: a lead or a tap whose place this screen lack
 // nothing more to show (a place this screen lacks, say) the player has the
 // screen back, so the game never stops dead.
 const HOLD = 2500;
+// After 2 s, how long more a pointer's place is looked for: SLOW_TRIES
+// looks SLOW_STEP ms apart (8 s).
+const SLOW_STEP = 250;
+const SLOW_TRIES = 32;
 const SURVEY = 1000;
 const SCROLL_KEYS = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'PageUp', 'PageDown', 'Home', 'End', ' ']);
 const blocker = h('div', { class: 'narrator-hold', hidden: true, 'aria-hidden': 'true', onClick: () => light?.nudge() });
@@ -961,6 +1009,15 @@ function lightUp(line) {
     // The screen may still be drawing.
     if (++tries < 20) {
       waiting = setTimeout(look, 100);
+      return;
+    }
+    // A pointer's screen may wait for the server on a slow connection (the
+    // Osada's places, the Targowisko, the Salon Gier: the tutorials' review
+    // found their pointers passed over): the screen goes back to the player
+    // while the place is looked for a while more.
+    if (line.kind === 'point' && tries < 20 + SLOW_TRIES) {
+      if (tries === 20) release(0);
+      waiting = setTimeout(look, SLOW_STEP);
       return;
     }
     // A pointer at a place this screen does not have is passed over; for a

@@ -24,7 +24,7 @@ export function trialHallCards(view, place, navigate) {
   if (!view) return null;
   const { texts, target } = view;
   const art = place.backdrop && placeArt(place.backdrop);
-  const banner = h('section', { class: `card trial-hall-banner${art ? ' place-card place-card--art' : ''}` }, h('p', { text: texts.intro }));
+  const banner = h('section', { class: `card trial-hall-banner${art ? ' place-card place-card--art' : ''}`, 'data-guide': 'trial-hall' }, h('p', { text: texts.intro }));
   if (art) banner.style.setProperty('--place-art', `url("${art}")`);
   if (!target) return [banner, systemPanel(texts.allOpen)];
   if (target.passed) return [banner, systemPanel(filled(texts.passed, { area: target.name }))];

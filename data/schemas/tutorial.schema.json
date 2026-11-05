@@ -211,6 +211,11 @@
               "settlement-casino-lottery",
               "settlement-casino-wheel",
               "settlement-quarters",
+              "settlement-tavern-mercenaries",
+              "settlement-board-wanted",
+              "settlement-trial-hall",
+              "guild-expedition",
+              "fortress-welcome",
               "evolution-welcome",
               "evolution-lead",
               "evolution-choice",
@@ -346,7 +351,9 @@
               "settlement",
               "evolution",
               "towers",
-              "mining"
+              "mining",
+              "guild",
+              "fortress"
             ],
             "description": "Część po wprowadzeniu, do której należy kwestia (chapters). Jej kwestie przychodzą dopiero po zakończeniu wprowadzenia, w swoim momencie gry."
           },

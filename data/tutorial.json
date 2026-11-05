@@ -44,6 +44,14 @@
     "mining": {
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Górnictwo i Jubilerstwo czekają w zakładce Profesje."
+    },
+    "guild": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Wyprawa Gildii czeka w Gildii, w zakładce Wyprawa."
+    },
+    "fortress": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Warownia czeka w zakładce Obóz."
     }
   },
   "lines": [
@@ -684,7 +692,7 @@
       "kind": "point",
       "chapter": "community",
       "text": [
-        "U góry przełączasz zakładki: Czat, Znajomi i Ranking. Gildia i Drużyna otworzą się, gdy urośniesz w siłę."
+        "U góry przełączasz zakładki: Czat, Znajomi, Ranking i Gildia. Drużynę założysz od 10. poziomu."
       ],
       "voice": "audio/narration/community-tabs.mp3"
     },
@@ -801,7 +809,7 @@
       "kind": "point",
       "chapter": "settlement",
       "text": [
-        "Tu najemnicy szukają pracy. Zwerbowany towarzysz rusza z Tobą na wyprawy i rośnie w siłę razem z Tobą."
+        "Tu szukają pracy przyszli towarzysze. Zwerbowany rusza z Tobą na wyprawy i rośnie w siłę razem z Tobą."
       ],
       "voice": "audio/narration/settlement-tavern-hire.mp3"
     },
@@ -813,6 +821,24 @@
         "Każdy towarzysz potrzebuje posłania. Zbuduj Kwatery w obozie, tam też go potem znajdziesz."
       ],
       "voice": "audio/narration/settlement-tavern-quarters.mp3"
+    },
+    {
+      "id": "settlement-tavern-mercenaries",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Tu wystawisz swoją postać do wynajęcia albo weźmiesz cudzą na swoją wyprawę. Płaci ten, kto najmuje, za każdą godzinę drogi."
+      ],
+      "voice": "audio/narration/settlement-tavern-mercenaries.mp3"
+    },
+    {
+      "id": "settlement-board-wanted",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Sołtys rozwiesza tu też listy gończe. Weź list i wyrusz tam, gdzie widziano cel. Jeśli go spotkasz i pokonasz, nagroda jest Twoja."
+      ],
+      "voice": "audio/narration/settlement-board-wanted.mp3"
     },
     {
       "id": "settlement-enchanter-affix",
@@ -1013,6 +1039,15 @@
       "voice": "audio/narration/settlement-casino-wheel.mp3"
     },
     {
+      "id": "settlement-trial-hall",
+      "kind": "point",
+      "chapter": "settlement",
+      "text": [
+        "Raz dziennie stoczysz tu trzy walki ze stworami z kolejnego miejsca. Zdrowie nie wraca między nimi, ale mikstury działają. Wygrasz, a to miejsce otworzy się dla Ciebie od razu."
+      ],
+      "voice": "audio/narration/settlement-trial-hall.mp3"
+    },
+    {
       "id": "settlement-quarters",
       "kind": "point",
       "chapter": "settlement",
@@ -1176,6 +1211,24 @@
       "chapter": "mining",
       "text": ["Rzadsze kamienie leżą głębiej. Każdy nowy poziom Górnictwa odsłoni Ci kolejne."],
       "voice": "audio/narration/mining-ending.mp3"
+    },
+    {
+      "id": "guild-expedition",
+      "kind": "point",
+      "chapter": "guild",
+      "text": [
+        "Każda minuta Twoich wypraw prowadzi gildię naprzód. Na końcu etapu czeka strażnik. Atakujesz go trzy razy dziennie, a gdy padnie, każdy, kto dołożył minut, dostaje skrzynię."
+      ],
+      "voice": "audio/narration/guild-expedition.mp3"
+    },
+    {
+      "id": "fortress-welcome",
+      "kind": "card",
+      "chapter": "fortress",
+      "text": [
+        "Twój obóz stał się Warownią. Każda z jej siedmiu budowli coś daje: trening, błogosławieństwo, zioła albo lepsze tropienie. Zaglądaj tu codziennie."
+      ],
+      "voice": "audio/narration/fortress-welcome.mp3"
     }
   ]
 }

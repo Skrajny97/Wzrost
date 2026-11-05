@@ -52,7 +52,7 @@ export function wantedCard(view, apply) {
   if (art) banner.style.setProperty('--place-art', `url("${art}")`);
   return h(
     'section',
-    { class: 'card wanted-card', 'aria-labelledby': 'wanted-title' },
+    { class: 'card wanted-card', 'aria-labelledby': 'wanted-title', 'data-guide': 'board-wanted' },
     banner,
     // The sołtys's words folded under "Jak to działa?", so the posters come
     // first (the author's screenshot, 5.11.2026: „Ten opis schowaj pod »Jak
