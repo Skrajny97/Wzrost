@@ -3034,6 +3034,18 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Odpowiedzi autora 615–620 (5.11.2026)
+
+Autor: „615 A”, „616 A - akcept, ale muszą być zwijalne budynki i ludzie muszą móc wpłacać na co chcą, lider i zastępca może tylko oznaczyć co jest preferowane”, „616 B - Coś to takie nudnawe, chyba że na końcu każdego etapu byłby coraz trudniejszy strażnik”, „617 prób nie trzeba będzie brać, one będą wszystkie na raz odpalone u gracza”, „618.4 - D, 618.5 - C, 618.6 - D, 618.7 - D”, „619 - wygląda fajnie tylko brakuje ikonki herszta”, „620 - Sala Prób wstępnie super, tylko tło widze chyba z wież”, „618.1 A, 618.2 A, 618.3 B albo nawet trochę lżej niż B”, „619 B”, „620 B, ale taniej wejście albo i za darmo raz dziennie”. O numeracji: „616 sie powtarza ale nie tak jak powinno bo dwie rozne kwestie - co do makiet - w makietach spoko wygląda”.
+
+1. **Próby Gildii (615 A, 617):** tablica co dzień (4 próby w poniedziałek, 2 nowe każdego kolejnego dnia), bez brania prób: wszystkie otwarte próby liczą się u postaci naraz, od chwili, gdy się pojawią.
+2. **Siedziba Gildii (616 A):** przyjęta ze zmianami autora. Każdy członek wpłaca na budynek, który sam wybierze; lider i zastępcy mogą tylko oznaczyć budynki preferowane; budynki zwijają się jak inne części Gildii. Makiety wyglądają dobrze. Najpierw grafiki w PixelLab, potem budowa.
+3. **Wyprawa Gildii (616 B):** w tej postaci „nudnawa”; ciekawsza byłaby z coraz trudniejszym strażnikiem na końcu każdego etapu. Na razie nie wchodzi i wraca do autora jako pytanie.
+4. **Budynki zasobów do 20. poziomu (618):** Tartak, Kamieniołom, Kopalnia i Staw Midasa (618.1 A); na każdy poziom tyle samo co dotąd, na 20. dwa razy więcej niż na 10. (618.2 A). Koszt „B albo nawet trochę lżej niż B” (618.3): złoto rośnie o 12% na poziom od kosztu 10. poziomu (w B o 15%), zasoby jak na 10. poziomie, czas o 10% na poziom. Czwarty wygląd na 20. poziomie: Tartak D, Kamieniołom C, Kopalnia D, Staw Midasa D.
+5. **Poszukiwani (619 B):** nazwane, silniejsze odmiany stworów z miejsc oraz wyjęci spod prawa z grafikami z PixelLab. Brakuje ikony Herszta: powstanie w PixelLab razem z trzema innymi wyjętymi spod prawa (Kłusownik, Koniokrad, Przemytnik), w wyglądzie zbójców z gry.
+6. **Sala prób (620 B):** przejście otwiera następne miejsce na stałe. Wejście raz dziennie za darmo (autor dopuścił „taniej” albo „za darmo raz dziennie”; za darmo jest najprostsze). Sala dostaje własne tło z PixelLab zamiast tła Wieży.
+7. **Numeracja:** makiety i grafiki dostają odtąd numery osobne od pytań o decyzję, żeby jeden numer nie znaczył dwóch rzeczy.
+
 ## Wersja 0.1.52 (4.11.2026)
 
 1. **Z towarzyszami też trudniej** (614 C, zob. „Trudniejsze wyprawy”, punkt 3).
