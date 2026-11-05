@@ -307,7 +307,7 @@ describe('companions through the API', () => {
     assert.equal(JSON.parse((await database.prepare('SELECT herbs FROM characters').first()).herbs)[gift.key], gift.count);
   });
 
-  test('items of its class from the bag go on the companion, what it wore goes back, and it gives them back when dismissed (108 A)', async () => {
+  test('items of its class and any jewellery from the bag go on the companion, what it wore goes back, and it gives them back when dismissed (108 A)', async () => {
     const [candidate] = (await settlement()).companions.candidates;
     await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
     const database = await db();
@@ -322,12 +322,17 @@ describe('companions through the API', () => {
     };
     const weapon = await put(familyBase(cls.weapons.at(-1)));
     const talisman = await put(content.bases.find((base) => base.slot === 'talisman'));
+    // The author: "zmień by towarzysze mogli nosić bizuterie ogolnie czyli
+    // amulety i pierscienie tez a nie sam talizman".
+    const amulet = await put(content.bases.find((base) => base.slot === 'amulet'));
+    const ring = await put(content.bases.find((base) => base.slot === 'ring'));
     const wrong = await put(other);
     const bagCount = async () => (await database.prepare('SELECT COUNT(*) AS n FROM items WHERE slot IS NULL').first()).n;
     let hired = (await settlement()).companions.hired[0];
-    assert.deepEqual(hired.wear.map((place) => place.slot), ['weapon', 'chest', 'talisman']);
-    assert.equal(hired.wear[2].item, null);
-    assert.ok(hired.wearable.includes(weapon) && hired.wearable.includes(talisman) && !hired.wearable.includes(wrong));
+    assert.deepEqual(hired.wear.map((place) => place.slot), ['weapon', 'chest', 'amulet', 'ring', 'talisman']);
+    assert.deepEqual(hired.wear.map((place) => place.slotName), ['Broń', 'Pancerz', 'Amulet', 'Pierścień', 'Talizman']);
+    assert.ok(hired.wear.slice(2).every((place) => place.item === null));
+    assert.ok([weapon, talisman, amulet, ring].every((id) => hired.wearable.includes(id)) && !hired.wearable.includes(wrong));
     assert.equal((await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: wrong } })).data.error.code, 'wrong_class');
     // The weapon takes the old one's place, and the old one goes to the bag.
     const before = await bagCount();
@@ -337,15 +342,19 @@ describe('companions through the API', () => {
     hired = armed.data.settlement.companions.hired[0];
     assert.equal(hired.wear[0].item.given, true);
     assert.equal(await database.prepare('SELECT id FROM items WHERE id = ?').bind(weapon).first(), null);
-    // The talisman fills an empty place.
+    // The talisman, the amulet and the ring fill empty places.
     await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: talisman } });
-    assert.equal(await bagCount(), before - 1);
-    // Dismissed, it gives back the two items from the bag and keeps its own armour.
+    await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: amulet } });
+    const ringed = await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: ring } });
+    assert.equal(ringed.status, 200);
+    assert.equal(await bagCount(), before - 3);
+    assert.ok(ringed.data.settlement.companions.hired[0].wear.every((place) => place.item));
+    // Dismissed, it gives back the four items from the bag and keeps its own armour.
     const dismissed = await call('POST', '/api/settlement/dismiss', { cookie, body: { companionId: candidate.id } });
     assert.equal(dismissed.status, 200);
     assert.equal(await bagCount(), before + 1);
     const back = (await database.prepare('SELECT data FROM items WHERE slot IS NULL').all()).results.map((row) => JSON.parse(row.data));
-    assert.ok(back.some((item) => item.slot === 'talisman' && !item.given));
+    assert.ok(['talisman', 'amulet', 'ring'].every((slot) => back.some((item) => item.slot === slot && !item.given)));
   });
 
   // The camp's Kowadło at a level, and the character's gold and iron ore.

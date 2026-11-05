@@ -51,7 +51,7 @@ function wearSheet(companion, apply) {
   openSheet(
     h('h2', { class: 'sheet-title', text: `Sprzęt: ${companion.name}` }),
     items.length === 0
-      ? h('p', { class: 'sheet-text', text: 'W plecaku nie ma nic, co ten towarzysz może założyć: broni ani pancerza swojej klasy na swój poziom, ani talizmanu.' })
+      ? h('p', { class: 'sheet-text', text: 'W plecaku nie ma nic, co ten towarzysz może założyć na swój poziom: broni ani pancerza swojej klasy, ani amuletu, pierścienia czy talizmanu.' })
       : [
           h('p', {
             class: 'sheet-text',
@@ -107,7 +107,7 @@ function companionItemSheet(companion, slot, apply, anvil = false) {
   );
 }
 
-// What a companion wears in its three places; one hired has a button to
+// What a companion wears in its five places; one hired has a button to
 // put on an item from the bag (question 108 A), at home or at a profession's
 // work, as the character's own equipment (an exploration keeps what it set
 // out with, so one away on it waits for its return), and each item it wears

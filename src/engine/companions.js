@@ -278,15 +278,16 @@ export function upgradedOnCompanion(companion, slot, outcome, roll) {
 }
 
 // The places a companion wears items in (the design: "broń, pancerz,
-// talizman").
-export const COMPANION_SLOTS = ['weapon', 'chest', 'talisman'];
+// talizman"; the author on 5.11.2026: "zmień by towarzysze mogli nosić
+// bizuterie ogolnie czyli amulety i pierscienie tez a nie sam talizman").
+export const COMPANION_SLOTS = ['weapon', 'chest', 'amulet', 'ring', 'talisman'];
 
 // Why the companion cannot wear `item` from the character's bag (question
 // 108 A: "gracz zakłada towarzyszowi przedmioty jego klasy z plecaka"), or
 // null: one of its places, its class, and its class level (its level) for
 // the item's Tier, wherever the item came from, as for the character.
 export function companionWearBlock(companion, item, content) {
-  if (!COMPANION_SLOTS.includes(item.slot)) return { code: 'wrong_slot', message: 'Towarzysz nosi tylko broń, pancerz i talizman.' };
+  if (!COMPANION_SLOTS.includes(item.slot)) return { code: 'wrong_slot', message: 'Towarzysz nosi tylko broń, pancerz i biżuterię: amulet, pierścień i talizman.' };
   if (!canUse(item.base, companion.classId, content)) return { code: 'wrong_class', message: 'Klasa towarzysza nie może używać tego przedmiotu.' };
   if (!canUse(item.base, companion.classId, content, companion.level)) {
     return { code: 'class_level', message: `Ten przedmiot towarzysz założy od poziomu ${baseClassLevel(item.base, content)}.` };

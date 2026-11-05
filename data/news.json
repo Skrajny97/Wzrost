@@ -160,6 +160,11 @@
       "id": "0.1.70",
       "title": "Wersja 0.1.70: nowe objaśnienia narratora",
       "body": "- Narrator opowiada o Najemnikach w Karczmie, listach gończych na Tablicy zleceń, Sali prób, Wyprawie Gildii i Warowni, gdy wejdziesz tam pierwszy raz.\n- Przy wolnym internecie wskazówki narratora nie przepadają.\n- Objaśnienia Rzemieślnictwa i Górnictwa czekają, aż wrócisz z wyprawy."
+    },
+    {
+      "id": "0.1.71",
+      "title": "Wersja 0.1.71: biżuteria dla towarzyszy",
+      "body": "- Towarzysze noszą teraz amulet i pierścień, a nie tylko talizman. Założysz je w Obozie, w Kwaterach, przyciskiem „Załóż z plecaka”."
     }
 ]
 }
