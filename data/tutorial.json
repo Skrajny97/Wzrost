@@ -1206,7 +1206,7 @@
       "id": "mining-setting",
       "kind": "point",
       "chapter": "mining",
-      "text": ["Kamień możesz też oprawić w przedmiot, który nosisz. Wzmocni wszystkie jego liczby."],
+      "text": ["Kamień możesz też oprawić w przedmiot, który nosisz. Wzmocni wszystkie jego wartości."],
       "voice": "audio/narration/mining-setting.mp3"
     },
     {
