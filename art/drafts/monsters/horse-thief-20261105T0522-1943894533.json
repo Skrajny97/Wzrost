@@ -1,0 +1,14 @@
+{
+  "id": "horse-thief",
+  "tool": "pixellab generate-image-v2",
+  "description": "wiry horse thief in a patched brown coat with a coiled rope lasso in one hand and a long knife in the other, a bridle over the shoulder, full body, three-quarter view",
+  "style": "src/client/art/monsters/bandit-knifer.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}
