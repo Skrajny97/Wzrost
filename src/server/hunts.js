@@ -81,6 +81,7 @@ import {
   quickHuntsUsed,
   blessingAfter,
   blessingOf,
+  requireIdle,
   requireIdlePlayer,
   requirePlayer,
   trophiesFor,
@@ -584,6 +585,10 @@ export async function cancelHunt(context) {
 export async function claimHunt(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
+  // A mercenary's offer or service has no report: its pay or its close
+  // waits in the Karczma (mercenaries.js), as these words say (the code
+  // review: it ran into the exploration's claim and failed).
+  if (player.activity?.kind === 'mercenary') requireIdle(player, now);
   // The option chosen in the event at the exploration's end, if one came.
   const body = (context.request.headers.get('Content-Type') ?? '').startsWith('application/json') ? await readJson(context.request) : {};
   const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels }[player.activity?.kind];
