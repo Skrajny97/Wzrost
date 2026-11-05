@@ -1220,7 +1220,7 @@ function startLight(line) {
       const middle = (anchor.left + anchor.right) / 2 - box.left;
       note.tail.style.setProperty('--tail-x', `${Math.min(box.width - 18, Math.max(18, middle))}px`);
     }
-    if (corners) keepClear(skip, corners, [...boxes.slice(0, lit), element.getBoundingClientRect()]);
+    if (corners) keepClear(skip, corners, element.getBoundingClientRect(), boxes.slice(0, lit));
     light.frame = requestAnimationFrame(follow);
   };
   follow();
@@ -1393,7 +1393,10 @@ function stopLight() {
 
 // "Pomiń wprowadzenie" keeps to a corner clear of the lit places and the
 // narrator: the top left one, or else the bottom left, the top right or the
-// bottom right. The corners are measured once for each light.
+// bottom right. When every corner touches one of them, it never covers the
+// narrator's words: a corner over a lit place will do (the author: "pomiń
+// objaśnienie zasłania nierzadko tekst, powinno być mniejsze i w
+// odpowiednim miejscu"). The corners are measured once for each light.
 const CORNERS = ['', 'guide-skip--bottom', 'guide-skip--right', 'guide-skip--bottom guide-skip--right'];
 
 function skipCorners(skip) {
@@ -1407,7 +1410,8 @@ function skipCorners(skip) {
 
 const overlap = (a, b) => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
 
-function keepClear(skip, corners, taken) {
-  const corner = corners.find(({ box }) => !taken.some((other) => overlap(box, other))) ?? corners[0];
+function keepClear(skip, corners, note, lit) {
+  const clearOf = (taken) => corners.find(({ box }) => !taken.some((other) => overlap(box, other)));
+  const corner = clearOf([note, ...lit]) ?? clearOf([note]) ?? corners[0];
   if (skip.className !== corner.name) skip.className = corner.name;
 }
