@@ -3034,6 +3034,29 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.66 (5.11.2026)
+
+Usuwanie zleceń z kolejki Stołu rozbiórki, bez kary: zob. „Stół rozbiórki: usuwanie z kolejki”. Sława za strażników Wyprawy Gildii (638 A): zob. „Wyprawa Gildii (621 A)”, punkt 13, i „Ranking gildii: Sława tygodnia”.
+
+## Stół rozbiórki: usuwanie z kolejki (5.11.2026, w grze od 0.1.66)
+
+Gracz na czacie: „Czy można dodać opcję usuwania budynków/przedmiotów z kolejki? Kliknąłem przerób wszystko przez pomyłkę i teraz widzę że brakuje takiej opcji”. Autor: „nie wiem czy jest sens karania za takie pomyłki, może to ogarniemy?”.
+
+1. **Usuń z kolejki.** Każde zlecenie Stołu rozbiórki, którego stół jeszcze nie skończył, ma w zakładce Kolejka przycisk „Usuń z kolejki”. Gra najpierw pyta („Zostaw” albo „Usuń”) i mówi, co wróci. Bez kary, jak chciał autor: wraca wszystko, co zlecenie wzięło. Materiały wracają do materiałów postaci, a rozebrane przedmioty na koniec plecaka, takie same jak przed rozbiórką, z ulepszeniem i afiksami.
+2. **Zlecenie w toku** też można usunąć. Jego dotychczasowa praca przepada i nie daje części. Kolejne zlecenia ruszają wcześniej, każde trwa tyle samo co dotąd, a pierwsze z nich startuje od razu (`takeOffQueue` w `src/engine/crafting.js`).
+3. **Usuń wszystkie.** Pod kolejką, gdy można usunąć co najmniej dwa zlecenia, stoi „Usuń wszystkie”, też z pytaniem. Działa jak usunięcie każdego zlecenia naraz.
+4. **Pełny plecak (brakujący szczegół, najprościej).** Przedmiot nie wraca do pełnego plecaka. Gdy na przedmioty z usuwanych zleceń brakuje miejsca, nic nie wypada z kolejki, a gra mówi, ile miejsc potrzeba i ile jest wolnych. „Usuń wszystkie” też nie oddaje części rzeczy: wszystko albo nic, jak „Rozbierz kilka”. Pojedyncze zlecenia można dalej usuwać osobno.
+5. **Zadania i Próby Gildii (brakujący szczegół).** Liczą pracę stołu jak dotąd, od razu przy zleceniu. Usunięte zlecenie zabiera im dokładnie to, co im dało: zadaniom narratora z okresu, w którym je złożono (dzień, tydzień, miesiąc), i Próbie Gildii z tygodnia, w którym je złożono, jeśli wtedy już trwała. Zadanie i próba pamiętają, ile przyszło ponad ich liczbę (`over` w zadaniu, kolumna `extra` w `guild_trials`, migracja `0084_trial_extra.sql`), więc praca, która zostaje, liczy się w całości. Przykład: zadanie „Przerób na Stole rozbiórki 4 materiały.” ma 2 z 4, a przez pomyłkę na stół idzie 50 materiałów. Po usunięciu tych 50 zadanie ma znowu 2 z 4.
+6. **Próba wykonana przez pomyłkę** otwiera się znowu, gdy bez usuniętej pracy nie osiąga swojej liczby. Zlecenia czekające w kolejce, złożone, gdy była już wykonana, liczą się wtedy do niej, jak byłoby bez pomyłki. Pasek gildii liczy ją jak każdą niewykonaną, a skrzynie już odebrane zostają.
+7. **Nagroda już odebrana (brakujący szczegół).** Gdy za zadanie odebrano już nagrodę albo otwarto skrzynię jego okresu, a bez usuwanej pracy nie byłoby wykonane, zlecenie zostaje w kolejce i gra mówi dlaczego. Zlecenia, bez których zadanie i tak jest wykonane, można usunąć. Praca, za którą przyszła nagroda, zawsze zostaje wykonana.
+8. **Co jeszcze wraca (brakujące szczegóły).**
+    - Kamienie i kruszce, które rozbiórka biżuterii dała od razu, wracają razem z przedmiotem. Gdy postać już ich nie ma, przedmiot nie wraca, a zlecenie zostaje.
+    - Wzór, który odsłoniła rozbiórka, znów się ukrywa, chyba że w kolejce czeka inny przedmiot tego wzoru (wtedy on go odsłania).
+    - Sztuki materiału z wymiany znów liczą się jako z wymiany, więc Encyklopedia nie zalicza ich jako własnej zdobyczy.
+9. **Zlecenia sprzed 0.1.65.** Rozbiórka sprzed tej wersji nie trzyma przedmiotu, bo ten znikał od razu, więc nie da się jej usunąć: zamiast przycisku ma dopisek, a „Usuń wszystkie” ją zostawia. Przeróbkę materiałów sprzed tej wersji można usunąć, a zadania i Próby liczą ją od jej startu, bo nie pamięta chwili zlecenia.
+10. **API.** `POST /api/craft/cancel` z `{ id }` albo `{ all: true }`, zapisane tylko wtedy, gdy postać jest taka jak przy odczycie, więc dwa dotknięcia naraz oddają wszystko raz. Zlecenie skończone, już usunięte albo innej postaci nic nie zmienia. Teksty są w `data/buildings.json` (`queue` przy Stole rozbiórki), do poprawy przez autora.
+11. **Układ ekranu.** `tools/layout-check.cjs` sprawdza też ekran Stołu rozbiórki z trzema zleceniami (`#/oboz/craft-table`, z zakładką Kolejka) na dziewięciu rozmiarach ekranu.
+
 ## Wersja 0.1.65 (5.11.2026)
 
 Wyprawa Gildii (621 A): zob. „Wyprawa Gildii (621 A)”. Przerwanie budowy w toku ze zwrotem kosztu: zob. „Przerwanie budowy w toku”. Postać wystawiona jako najemnik nie atakuje Bestii Gildii ani strażników Wyprawy.
@@ -3063,7 +3086,7 @@ Autor o pierwszej wersji (616 B): „Coś to takie nudnawe, chyba że na końcu 
 10. **Zakładka „Wyprawa” (makieta 624).** Trzecia, po „Gildia” i „Siedziba”, przed „Bestia”, z ikoną namiotu. Na górze karta „Wyprawa tygodnia: <kraina>”: trasa 7 kółek na krętej, kropkowanej drodze, etapy pokonane w złocie, etap teraz w obwódce, strażnik, który zagradza drogę, w czerwonej obwódce ze swoim obrazkiem, a ostatni strażnik na końcu trasy od początku, przygaszony. Nad etapem, którego skrzynia czeka, wisi prezent. Pod trasą „Etap 3 z 7: 1 240 z 2 000 minut wypraw” z paskiem, odłożone minuty i „Jak to działa?”. Niżej „Skrzynie Wyprawy” (gdy czekają), „Strażnik etapu k” z obrazkiem, poziomem, miejscem, paskiem HP, atakami na dziś i „Atakuj” (albo słowa, że atakuje ten, kto dołożył minut) i zwinięty „Wkład tygodnia”. Na komputerze ta sama kolumna, z wyższą trasą.
 11. **Siedem zakładek w rzędzie (brakujący szczegół).** Przy 15 px siedem nazw potrzebuje ok. 430 px. Na telefonie (poniżej 480 px) nazwy maleją z szerokością ekranu, od 15 do 11 px, i stoją bliżej siebie, więc wszystkie siedem mieści się w jednym rzędzie od 320 px. Sprawdzone w przeglądarce przy 390, 360 i 320 px, bez przewijania strony w bok.
 12. **Kropka.** Żółta kropka na zakładce Wyprawa (i na Społeczności), gdy postać może dziś zaatakować strażnika, który zagradza drogę, albo czeka jej skrzynia.
-13. **Sława bez zmian (do decyzji autora).** Ranking gildii liczy Sławę jednym zapytaniem z Bestii, Prób, Próśb i Wymiany, więc punkty za strażników to nie jedna zmiana w danych, tylko nowa część liczenia. Na razie Wyprawa Sławy nie daje.
+13. **Sława (638 A, w grze od 0.1.66).** Pytanie: „Czy pokonani strażnicy Wyprawy mają dawać Sławę w rankingu gildii? A (zalecam): 20 Sławy za każdego strażnika i 50 za siódmego, razem do 170 na tydzień”. Autor: „638 A”. Strażnik pokonany na trasie tygodnia daje gildii 20 punktów Sławy, a siódmy, ostatni, 50 zamiast 20, więc cała trasa to 170 punktów. Liczby są w `data/guilds.json`, `fame.expedition`. Mówi o tym „Jak to działa?” w Rankingu i na karcie Wyprawy. Sława tygodnia liczy się z wierszy trasy, więc strażnicy pokonani w tym tygodniu jeszcze w 0.1.65 też się liczą (brakujący szczegół). W 0.1.65 Wyprawa Sławy nie dawała.
 14. **Symulacja (`tools/guild-expedition-sim.mjs`).** Gildia 5 typowych postaci (`tools/simulate.mjs`, pięć klas), każdy członek atakuje 3 razy dziennie, gdy strażnik zagradza drogę, 40 tygodni na wiersz:
     - **30. poziom (Uroczysko Kamieni, strażnicy od 30. do 36. poziomu):** ataków na członka 0,5, 0,7, 1,0, 1,1, 2,4, 3,3 i 3,5 (HP od 9 000 do 23 360). Przy 4 godzinach wypraw dziennie na członka strażnicy padają w poniedziałek, wtorek, wtorek, środę, czwartek, piątek i niedzielę, przy 8 godzinach siódmy w piątek, a przy 3 godzinach trasa dochodzi do siódmego dopiero w sobotę i pada on w 3% tygodni.
     - **60. poziom (Zarośnięte Rozlewiska, od 60. do 66. poziomu):** ataków na członka 0,7, 0,8, 1,2, 1,3, 1,6, 3,8 i 4,8 (HP od 21 750 do 48 180). Przy 4 godzinach dziennie: poniedziałek, wtorek, środa, środa, czwartek, piątek i niedziela; przy 8 godzinach siódmy w sobotę; przy 3 godzinach siódmy nie pada.
@@ -5646,11 +5669,12 @@ Autor: „379 A”, „380 C” i „381 A”.
 
 1. **Sława tygodnia (379 A).** Gildia zbiera Sławę za to, co członkowie robią razem w tygodniu, od poniedziałku od północy czasu polskiego, jak przy Bestii i Próbach:
     - Bestia Gildii: 1 punkt za każdy pełny 1% paska bestii tygodnia i 50 punktów za jej upadek;
+    - Wyprawa Gildii (od 0.1.66, 638 A): 20 punktów za każdego pokonanego strażnika i 50 za siódmego, ostatniego, razem do 170;
     - Próby Gildii: 10 punktów za każdą wykonaną próbę, z jednej postaci najwyżej 10 prób, jak na pasku Prób;
     - Prośby Gildii: 1 punkt za każdą sztukę daną członkowi gildii, z jednej postaci najwyżej 30 sztuk;
     - Wymiana: 2 punkty za każdą wziętą ofertę, z jednej postaci, która bierze oferty, najwyżej 10 wymian.
 2. **Najpierw limity postaci,** potem suma gildii. Liczby są w `data/guilds.json`, `fame`.
-3. **Zapis tygodnia.** Pierwsze w nowym tygodniu wejście do gry, do rankingu gildii albo na stronę Gildii zapisuje raz Sławę poprzedniego tygodnia każdej gildii. Bestia, Próby, Prośby i Wymiana trzymają wiersze poprzedniego tygodnia do końca bieżącego, więc przed zapisem nic nie znika.
+3. **Zapis tygodnia.** Pierwsze w nowym tygodniu wejście do gry, do rankingu gildii albo na stronę Gildii zapisuje raz Sławę poprzedniego tygodnia każdej gildii. Bestia, Wyprawa, Próby, Prośby i Wymiana trzymają wiersze poprzedniego tygodnia do końca bieżącego, więc przed zapisem nic nie znika.
 4. **Ranking (381 A).** Ranking w Społeczności ma u góry dwie zakładki: „Postacie”, czyli dotychczasowy ranking bez zmian, i „Gildie”. W „Gildiach” przełącznik wybiera „Ten tydzień” albo „Od początku”. Wiersz ma miejsce, skrót i nazwę gildii, liczbę członków i Sławę. Gildia postaci jest podświetlona, a nad tabelą stoi jej miejsce. Zasady liczenia są pod „Jak to działa?”.
 5. **Od początku** to zapisane tygodnie i Sława bieżącego tygodnia.
 6. **Kolejność (brakujący szczegół).** Przy równej Sławie wyżej stoi starsza gildia. Tabela pokazuje do 100 gildii, jak Ranking postaci, także te bez Sławy.

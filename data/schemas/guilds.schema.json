@@ -1467,6 +1467,7 @@
       "additionalProperties": false,
       "required": [
         "beast",
+        "expedition",
         "trials",
         "requests",
         "exchange",
@@ -1490,6 +1491,25 @@
               "minimum": 0
             },
             "fell": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "expedition": {
+          "description": "Wyprawa Gildii: Sława za każdego strażnika pokonanego na trasie tygodnia, a za ostatniego last zamiast perGuardian (autor: 638 A).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "perGuardian",
+            "last"
+          ],
+          "properties": {
+            "perGuardian": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "last": {
               "type": "integer",
               "minimum": 0
             }

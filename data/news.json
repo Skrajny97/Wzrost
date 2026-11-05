@@ -135,6 +135,11 @@
       "id": "0.1.65",
       "title": "Wersja 0.1.65: Wyprawa Gildii i przerwanie budowy",
       "body": "- Gildia ma nową zakładkę: Wyprawa. Co tydzień gildia idzie przez 7 etapów, a naprzód prowadzą ją minuty wypraw wszystkich członków.\n- Na końcu każdego etapu drogę zagradza strażnik. Każdy, kto dołożył minut, atakuje go 3 razy dziennie. Pokonany strażnik daje skrzynię wszystkim, którzy dołożyli minut, a ostatni zostawia też przedmiot.\n- W Obozie możesz przerwać budowę w toku: złoto i zasoby wrócą w całości."
+    },
+    {
+      "id": "0.1.66",
+      "title": "Wersja 0.1.66: kolejka Stołu rozbiórki i Sława z Wyprawy",
+      "body": "- Na Stole rozbiórki każde zlecenie w kolejce ma „Usuń z kolejki”, a cała kolejka „Usuń wszystkie”.\n- Bez kary: materiały i przedmioty wracają, także ze zlecenia, które właśnie trwa.\n- Zadania i Próby Gildii oddają to, co policzyły z usuniętych zleceń.\n- Pokonani strażnicy Wyprawy Gildii dają gildii Sławę w Rankingu: 20 punktów za każdego i 50 za siódmego, razem do 170 na tydzień. Liczą się też strażnicy pokonani w tym tygodniu przed tą wersją."
     }
 ]
 }

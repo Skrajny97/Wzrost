@@ -1,6 +1,7 @@
 // The Sława of the guilds (src/server/guild-fame.js; the author: "379 A",
 // "380 C", "381 A"): each source's points with its cap, each member's part
-// capped first and then summed for the guild; the week before frozen once,
+// capped first and then summed for the guild; the Wyprawa's guardians as
+// they fall (638 A); the week before frozen once,
 // the first time the new week asks, and "Od początku" as the frozen weeks
 // and this one; the best guild of the week before, its tag in the answer
 // of GET /api/character and its Gildia page saying so.
@@ -145,6 +146,45 @@ describe('the Sława of the guilds through the API', () => {
     assert.equal(seen.place, 2);
     assert.equal(seen.period, 'week');
     assert.ok(seen.texts.how.every((line) => !line.includes('{')));
+  });
+
+  test("the Wyprawa's guardians: perGuardian for each that fell this week, `last` for the seventh (638 A)", async () => {
+    const forest = await guild('ala', 'Leśni Bracia', 'LB', [['ola', 'Ola']]);
+    const week = questPeriod('weekly', Date.now(), content);
+    const before = questPeriod('weekly', week.startsAt - 1, content);
+    const stages = content.guilds.expedition.guardians.length;
+    async function route(key) {
+      await run("INSERT OR IGNORE INTO guild_expeditions (guild_id, week, land_id, level, guardians, active, created_at) VALUES (?, ?, 'boar-thicket', 30, '[]', 2, 0)", forest, key);
+      return (await first('SELECT id FROM guild_expeditions WHERE guild_id = ? AND week = ?', forest, key)).id;
+    }
+    const guardian = (expeditionId, stage, fallenAt) =>
+      run(
+        "INSERT INTO guild_expedition_guardians (expedition_id, stage, monster_id, area_id, level, members, need, max_hp, hp, created_at, fallen_at, fallen_by) VALUES (?, ?, 'tusker', 'boar-thicket', 30, 2, 300, 1000, ?, 0, ?, ?)",
+        expeditionId,
+        stage,
+        fallenAt === null ? 400 : 0,
+        fallenAt,
+        fallenAt === null ? null : ids.ala,
+      );
+    // The route of the week before: all its guardians fell then, none of
+    // them this week's.
+    const old = await route(before.key);
+    for (let stage = 1; stage <= stages; stage += 1) await guardian(old, stage, before.startsAt);
+    // This week's: three fell, the fourth still stands.
+    const current = await route(week.key);
+    for (let stage = 1; stage <= 3; stage += 1) await guardian(current, stage, week.startsAt);
+    await guardian(current, 4, null);
+    assert.equal(famesOf(await ranking('ala')).LB, 3 * fame.expedition.perGuardian);
+    // The rest fell, the seventh the last: 20 each and 50 for it, 170.
+    await run('UPDATE guild_expedition_guardians SET hp = 0, fallen_at = ? WHERE expedition_id = ? AND stage = 4', week.startsAt, current);
+    for (let stage = 5; stage <= stages; stage += 1) await guardian(current, stage, week.startsAt);
+    const seen = await ranking('ala');
+    assert.equal(famesOf(seen).LB, (stages - 1) * fame.expedition.perGuardian + fame.expedition.last);
+    assert.equal(famesOf(seen).LB, 170);
+    assert.ok(seen.texts.how.some((line) => line.startsWith('Wyprawa Gildii:') && line.includes(`${fame.expedition.last} punktów`)));
+    // The Wyprawa's own "Jak to działa?" says so too (as anyone sees it).
+    const tab = (await as('ewa', 'GET', '/api/guild/expedition')).data;
+    assert.ok(tab.texts.how.some((line) => line.includes(`${fame.expedition.perGuardian} punktów`) && line.includes(`${fame.expedition.last} punktów`)));
   });
 
   test('the week before is frozen once, the first time the new week asks; "Od początku" adds this week', async () => {

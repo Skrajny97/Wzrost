@@ -78,9 +78,11 @@ function weeksAround(now) {
 // action brought (trialGains in the engine), to put into that action's own
 // batch, so both land together; none when the action brings nothing a
 // trial counts. Only the trial taken this week in the guild the character
-// is in now moves; one whose count is reached is done. `guard` ({ sql,
-// binds }) holds only with the action's own change, for a batch with no
-// assertion at its head, so two taps at once move the trial on once.
+// is in now moves; one whose count is reached is done, and what came over
+// its count is kept (`extra`), so orders taken off the Stół rozbiórki's
+// queue take back exactly theirs (cancelOrders in crafting.js). `guard` ({
+// sql, binds }) holds only with the action's own change, for a batch with
+// no assertion at its head, so two taps at once move the trial on once.
 export function trialProgress(db, characterId, progress, now, guard = null) {
   const gains = Object.entries(trialGains(progress));
   if (gains.length === 0) return [];
@@ -91,14 +93,35 @@ export function trialProgress(db, characterId, progress, now, guard = null) {
     db
       .prepare(
         `UPDATE guild_trials SET progress = MIN(count, progress + ${gain}),
+           extra = extra + MAX(0, progress + ${gain} - count),
            state = CASE WHEN progress + ${gain} >= count THEN 'done' ELSE state END,
            done_at = CASE WHEN progress + ${gain} >= count THEN ? ELSE done_at END
          WHERE character_id = ? AND week = ? AND state = 'active' AND kind IN (${gains.map(() => '?').join(', ')})
            AND guild_id = (SELECT guild_id FROM guild_members WHERE character_id = ?)${guard ? ` AND ${guard.sql}` : ''}`,
       )
-      .bind(...binds, ...binds, ...binds, now, characterId, week, ...gains.map(([kind]) => kind), characterId, ...(guard?.binds ?? [])),
+      .bind(...binds, ...binds, ...binds, ...binds, now, characterId, week, ...gains.map(([kind]) => kind), characterId, ...(guard?.binds ?? [])),
   ];
 }
+
+// The character's trials of the Stół rozbiórki's work in the weeks the
+// orders leaving its queue were made in, in its guild now (where
+// trialProgress moved them), as trialAfterCancel in the engine takes them.
+export async function tableTrials(db, characterId, weeks) {
+  if (weeks.length === 0) return [];
+  const { results } = await db
+    .prepare(
+      `SELECT id, kind, week, count, progress, extra, state, taken_at, done_at FROM guild_trials
+       WHERE character_id = ? AND kind IN ('process', 'salvage') AND week IN (${weeks.map(() => '?').join(', ')})
+         AND guild_id = (SELECT guild_id FROM guild_members WHERE character_id = ?)`,
+    )
+    .bind(characterId, ...weeks, characterId)
+    .all();
+  return results.map(({ taken_at: takenAt, done_at: doneAt, ...row }) => ({ ...row, takenAt, doneAt }));
+}
+
+// The statement that keeps a trial as trialAfterCancel left it.
+export const trialTakenBack = (db, row, next) =>
+  db.prepare('UPDATE guild_trials SET progress = ?, extra = ?, state = ?, done_at = ? WHERE id = ?').bind(next.progress, next.extra, next.state, next.doneAt, row.id);
 
 // The guard of trialProgress for what an activity of some length brings (an
 // exploration, a gathering, a brewing): only a trial taken by the time it

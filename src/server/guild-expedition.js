@@ -24,6 +24,7 @@
 import {
   bagCapacity,
   campLevels,
+  countedForm,
   expeditionChest,
   expeditionGuardian,
   expeditionProgress,
@@ -226,7 +227,15 @@ const monsterName = (id) => content.monstersById[id]?.name ?? id;
 // filled in.
 function tabTexts() {
   const { errors: _, ...texts } = words();
-  const numbers = { stages: expeditionStages(content), perMember: rules().stageMinutes.perMember, attacks: rules().attacksPerDay };
+  const fame = content.guilds.fame;
+  const points = (count) => `${count} ${countedForm(count, fame.texts.pointForms)}`;
+  const numbers = {
+    stages: expeditionStages(content),
+    perMember: rules().stageMinutes.perMember,
+    attacks: rules().attacksPerDay,
+    fame: points(fame.expedition.perGuardian),
+    fameLast: points(fame.expedition.last),
+  };
   return { ...texts, lead: filled(texts.lead, numbers), how: texts.how.map((line) => filled(line, numbers)) };
 }
 

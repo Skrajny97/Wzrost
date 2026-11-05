@@ -234,9 +234,78 @@ function itemsTab(built, picker) {
   return [h('p', { class: 'craft-note', text: 'Zaznacz przedmioty z plecaka, które stół ma rozebrać. Ponowne stuknięcie odznacza przedmiot.' }), ...nodes];
 }
 
-// The orders, the first one at work with its countdown; `ticks` gets its update.
+// An order as its row names it: "Skóra wilka ×12".
+const orderLabel = (order) => (order.count > 1 ? `${order.name} ×${formatNumber(order.count)}` : order.name);
+
+const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
+
+// What else goes with orders leaving the queue: the gems and ores
+// jewellery gave at once, and the patterns their items taught.
+function goingBack(orders, confirm) {
+  const minerals = new Map();
+  for (const order of orders) for (const { name, count } of order.minerals) minerals.set(name, (minerals.get(name) ?? 0) + count);
+  const patterns = [...new Set(orders.flatMap((order) => order.patterns))];
+  return [
+    minerals.size > 0 && filled(confirm.minerals, { minerals: [...minerals].map(([name, count]) => `${name} ×${formatNumber(count)}`).join(', ') }),
+    patterns.length > 0 && filled(patterns.length === 1 ? confirm.pattern : confirm.patterns, { patterns: patterns.join(', ') }),
+  ];
+}
+
+// "Usuń z kolejki" (the author: „nie wiem czy jest sens karania za takie
+// pomyłki”): after a question, the order leaves the queue and all it took
+// comes back; the one at work loses its work so far, and those after it
+// come sooner.
+async function cancelOrder(crafting, order) {
+  const { confirm } = crafting.texts;
+  const index = crafting.queue.indexOf(order);
+  const sure = await confirmAction({
+    title: confirm.title,
+    text: [
+      filled(confirm.back, { what: orderLabel(order) }),
+      index === 0 && confirm.running,
+      index < crafting.queue.length - 1 && confirm.later,
+      ...goingBack([order], confirm),
+      state.character.guildTag ? confirm.countedGuild : confirm.counted,
+    ]
+      .filter(Boolean)
+      .join(' '),
+    confirmLabel: confirm.yes,
+    cancelLabel: confirm.no,
+  });
+  if (!sure) return;
+  await call('POST', '/api/craft/cancel', { id: order.id });
+  toast(filled(crafting.texts.done, { what: orderLabel(order) }));
+}
+
+// "Usuń wszystkie": every order that can leave, at once, after a question.
+async function cancelAll(crafting) {
+  const { confirm } = crafting.texts;
+  const leaving = crafting.queue.filter((order) => order.cancellable);
+  const sure = await confirmAction({
+    title: confirm.titleAll,
+    text: [
+      filled(confirm.backAll, { count: formatNumber(leaving.length) }),
+      crafting.queue[0].cancellable && confirm.runningAll,
+      leaving.length < crafting.queue.length && confirm.kept,
+      ...goingBack(leaving, confirm),
+      state.character.guildTag ? confirm.countedGuild : confirm.counted,
+    ]
+      .filter(Boolean)
+      .join(' '),
+    confirmLabel: confirm.yes,
+    cancelLabel: confirm.no,
+  });
+  if (!sure) return;
+  const { cancelled } = await call('POST', '/api/craft/cancel', { all: true });
+  toast(filled(crafting.texts.doneAll, { count: formatNumber(cancelled) }));
+}
+
+// The orders, the first one at work with its countdown; `ticks` gets its
+// update. Each that can leave the queue has "Usuń z kolejki", and two or
+// more such have "Usuń wszystkie" under them.
 function queueCard(crafting, ticks) {
   const [first, ...waiting] = crafting.queue;
+  const { texts } = crafting;
   const countdown = h('strong', { class: 'craft-countdown' });
   const progress = h('div', { class: 'bar-fill bar-fill--gold' });
   ticks.push((now) => {
@@ -244,6 +313,16 @@ function queueCard(crafting, ticks) {
     const done = (now - first.startsAt) / (first.endsAt - first.startsAt);
     progress.style.width = `${Math.min(100, Math.max(0, done * 100))}%`;
   });
+  const cancel = (order) =>
+    order.cancellable
+      ? h('button', {
+          type: 'button',
+          class: 'craft-cancel',
+          text: texts.cancel,
+          'aria-label': `${texts.cancel}: ${orderLabel(order)}`,
+          onClick: (event) => withButton(event.currentTarget, () => cancelOrder(crafting, order)),
+        })
+      : h('span', { class: 'item-meta', text: texts.old });
   const row = (order, extra) =>
     h(
       'li',
@@ -252,11 +331,13 @@ function queueCard(crafting, ticks) {
       h(
         'span',
         { class: 'craft-text' },
-        h('span', { class: 'item-name', vars: { '--rarity': order.color }, text: order.count > 1 ? `${order.name} ×${order.count}` : order.name }),
+        h('span', { class: 'item-name', vars: { '--rarity': order.color }, text: orderLabel(order) }),
         h('span', { class: 'item-meta', text: `${order.kind === 'material' ? 'przeróbka' : 'rozbiórka'} · daje: ${order.part} ×${formatNumber(order.parts)}` }),
-        extra,
+        // Its time and its button in one line, the button below on a narrow screen.
+        h('span', { class: 'craft-foot' }, extra, cancel(order)),
       ),
     );
+  const leaving = crafting.queue.filter((order) => order.cancellable).length;
   return h(
     'section',
     { class: 'craft-card', 'aria-label': `Kolejka (${crafting.queue.length} z ${crafting.limit})` },
@@ -266,6 +347,13 @@ function queueCard(crafting, ticks) {
       row(first, h('span', { class: 'craft-progress' }, h('div', { class: 'bar' }, progress), countdown)),
       waiting.map((order) => row(order, h('span', { class: 'item-meta', text: `Gotowe o ${timeFormat.format(new Date(order.endsAt))}` }))),
     ),
+    leaving > 1 &&
+      h('button', {
+        type: 'button',
+        class: 'button button--world',
+        text: texts.cancelAll,
+        onClick: (event) => withButton(event.currentTarget, () => cancelAll(crafting)),
+      }),
     testSkip(),
   );
 }

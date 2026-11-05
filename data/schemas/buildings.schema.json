@@ -75,6 +75,54 @@
           "bonusPerLevel": { "type": "number", "exclusiveMinimum": 0, "description": "Tylko craftSpeed: szansa na dodatkową część za każdą robioną część, za każdy poziom od bonusFromLevel." }
         }
       },
+      "queue": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cancel", "cancelAll", "old", "confirm", "done", "doneAll", "errors"],
+        "description": "Tylko Stół rozbiórki (craftSpeed): usuwanie zleceń z kolejki („Usuń z kolejki”, „Usuń wszystkie”). Zlecenie oddaje wszystko, co wzięło, a zadania i Próby Gildii tracą to, co za nie policzyły. old: dopisek przy rozbiórce sprzed 0.1.65, której nie da się cofnąć. W tekstach: {what} to zlecenie („Skóra wilka ×12”), {count} liczba zleceń, {minerals} kamienie i kruszce, {patterns} nazwy wzorów, {need} i {free} miejsca w plecaku, {quest} treść zadania.",
+        "properties": {
+          "cancel": { "type": "string", "minLength": 1 },
+          "cancelAll": { "type": "string", "minLength": 1 },
+          "old": { "type": "string", "minLength": 1 },
+          "confirm": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["title", "titleAll", "back", "backAll", "running", "runningAll", "later", "counted", "countedGuild", "minerals", "pattern", "patterns", "kept", "yes", "no"],
+            "properties": {
+              "title": { "type": "string", "minLength": 1 },
+              "titleAll": { "type": "string", "minLength": 1 },
+              "back": { "type": "string", "pattern": "\\{what\\}" },
+              "backAll": { "type": "string", "pattern": "\\{count\\}" },
+              "running": { "type": "string", "minLength": 1 },
+              "runningAll": { "type": "string", "minLength": 1 },
+              "later": { "type": "string", "minLength": 1 },
+              "counted": { "type": "string", "minLength": 1, "description": "Postać bez gildii: zadania tracą to, co policzyły." },
+              "countedGuild": { "type": "string", "minLength": 1, "description": "Postać w gildii: zadania i Próby Gildii tracą to, co policzyły." },
+              "minerals": { "type": "string", "pattern": "\\{minerals\\}" },
+              "pattern": { "type": "string", "pattern": "\\{patterns\\}" },
+              "patterns": { "type": "string", "pattern": "\\{patterns\\}" },
+              "kept": { "type": "string", "minLength": 1 },
+              "yes": { "type": "string", "minLength": 1 },
+              "no": { "type": "string", "minLength": 1 }
+            }
+          },
+          "done": { "type": "string", "pattern": "\\{what\\}" },
+          "doneAll": { "type": "string", "pattern": "\\{count\\}" },
+          "errors": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["gone", "empty", "old", "bagFull", "minerals", "rewarded"],
+            "properties": {
+              "gone": { "type": "string", "minLength": 1 },
+              "empty": { "type": "string", "minLength": 1 },
+              "old": { "type": "string", "minLength": 1 },
+              "bagFull": { "type": "string", "pattern": "\\{need\\}" },
+              "minerals": { "type": "string", "pattern": "\\{minerals\\}" },
+              "rewarded": { "type": "string", "pattern": "\\{quest\\}" }
+            }
+          }
+        }
+      },
       "trade": {
         "type": "object",
         "additionalProperties": false,

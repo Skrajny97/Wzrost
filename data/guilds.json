@@ -121,6 +121,7 @@
         "Na końcu etapu czeka strażnik. Trasa stoi, aż gildia go pokona. Minuty zebrane w tym czasie czekają i przesuwają trasę zaraz po jego upadku.",
         "Strażnika atakuje każdy, kto w tym tygodniu dołożył minut: {attacks} razy dziennie, osobno od ataków na Bestię. Atak to jedna walka z pełnym HP i bez mikstur.",
         "Każdy następny strażnik jest silniejszy. Pokonany daje skrzynię każdemu, kto w tym tygodniu dołożył minut. Ostatni daje też rzadki łup: przedmiot Twojej klasy.",
+        "Pokonany strażnik daje też gildii Sławę w Rankingu: {fame} za każdego, a {fameLast} za ostatniego.",
         "Skrzynię odbierzesz do końca następnego tygodnia."
       ],
       "stage": "Etap {stage} z {stages}: {progress} z {need} minut wypraw",
@@ -495,8 +496,9 @@
     }
   },
   "fame": {
-    "$comment": "Ranking gildii: Sława tygodnia (src/server/guild-fame.js, screens/ranking.js; DECISIONS.md, „Ranking gildii: Sława tygodnia”). Autor: „379 A”, „380 C”, „381 A”. Tydzień jak przy zadaniach tygodniowych: od poniedziałku, od północy czasu polskiego. Sława gildii w tygodniu: beast.perPercent za każdy pełny 1% paska HP bestii tygodnia zbity przez gildię i beast.fell, gdy bestia padła; trials.perTrial za każdą próbę wykonaną w tygodniu, z jednej postaci najwyżej tyle prób, ile liczy pasek Prób (trials.cap Prób Gildii); requests.perPiece za każdą sztukę daną w tygodniu w Prośbach Gildii, z jednej postaci najwyżej requests.cap sztuk; exchange.perExchange za każdą ofertę Wymiany wziętą w tygodniu, z jednej biorącej postaci najwyżej exchange.cap wymian. Najpierw limity postaci, potem suma gildii. Pierwsze w nowym tygodniu spojrzenie na ranking gildii, stronę Gildii albo najlepszą gildię (każde wczytanie postaci) zapisuje raz Sławę poprzedniego tygodnia każdej gildii; „Od początku” to zapisane tygodnie i Sława tego tygodnia. Najlepsza gildia poprzedniego tygodnia (najwięcej Sławy, większej niż zero; przy remisie starsza gildia) ma przez cały tydzień złoty skrót wszędzie, gdzie skrót stoi, a jej strona Gildii mówi o tym słowami champion. texts: słowa Rankingu (zakładki, okresy, kolumny), opis pod „Jak to działa?” i strona Gildii; {…} wypełnia gra (pointForms: rzeczownik po liczbie punktów).",
+    "$comment": "Ranking gildii: Sława tygodnia (src/server/guild-fame.js, screens/ranking.js; DECISIONS.md, „Ranking gildii: Sława tygodnia”). Autor: „379 A”, „380 C”, „381 A”. Tydzień jak przy zadaniach tygodniowych: od poniedziałku, od północy czasu polskiego. Sława gildii w tygodniu: beast.perPercent za każdy pełny 1% paska HP bestii tygodnia zbity przez gildię i beast.fell, gdy bestia padła; expedition.perGuardian za każdego strażnika Wyprawy Gildii pokonanego na trasie tygodnia, a za ostatniego (siódmego) expedition.last zamiast tego, razem do 170 (autor: „638 A”); trials.perTrial za każdą próbę wykonaną w tygodniu, z jednej postaci najwyżej tyle prób, ile liczy pasek Prób (trials.cap Prób Gildii); requests.perPiece za każdą sztukę daną w tygodniu w Prośbach Gildii, z jednej postaci najwyżej requests.cap sztuk; exchange.perExchange za każdą ofertę Wymiany wziętą w tygodniu, z jednej biorącej postaci najwyżej exchange.cap wymian. Najpierw limity postaci, potem suma gildii. Pierwsze w nowym tygodniu spojrzenie na ranking gildii, stronę Gildii albo najlepszą gildię (każde wczytanie postaci) zapisuje raz Sławę poprzedniego tygodnia każdej gildii; „Od początku” to zapisane tygodnie i Sława tego tygodnia. Najlepsza gildia poprzedniego tygodnia (najwięcej Sławy, większej niż zero; przy remisie starsza gildia) ma przez cały tydzień złoty skrót wszędzie, gdzie skrót stoi, a jej strona Gildii mówi o tym słowami champion. texts: słowa Rankingu (zakładki, okresy, kolumny), opis pod „Jak to działa?” i strona Gildii; {…} wypełnia gra (pointForms: rzeczownik po liczbie punktów).",
     "beast": { "perPercent": 1, "fell": 50 },
+    "expedition": { "perGuardian": 20, "last": 50 },
     "trials": { "perTrial": 10 },
     "requests": { "perPiece": 1, "cap": 30 },
     "exchange": { "perExchange": 2, "cap": 10 },
@@ -506,6 +508,7 @@
       "lead": "Sława to punkty gildii za to, co członkowie robią razem. Tydzień zaczyna się w poniedziałek o północy.",
       "how": [
         "Bestia Gildii: {beastPercent} za każdy pełny 1% paska bestii tygodnia i {beastFell} za jej upadek.",
+        "Wyprawa Gildii: {perGuardian} za każdego pokonanego strażnika, a za siódmego, ostatniego, {lastGuardian}.",
         "Próby Gildii: {perTrial} za każdą wykonaną próbę. Z jednej postaci liczy się najwyżej {trialCap} prób, jak na pasku Prób.",
         "Prośby Gildii: {perPiece} za każdą sztukę daną członkowi gildii. Z jednej postaci liczy się najwyżej {giftCap} sztuk.",
         "Wymiana: {perExchange} za każdą wymianę. Z jednej postaci, która bierze oferty, liczy się najwyżej {exchangeCap} wymian.",

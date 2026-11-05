@@ -2,7 +2,8 @@
 // gildii: Sława tygodnia"; the author: "379 A", "380 C", "381 A"): what a
 // guild did together in a week (from Monday, midnight in Poland, as the
 // weekly quests), in points: the share of its Bestia's bar it took and the
-// beast's fall, the Próby its members finished, the pieces they gave in the
+// beast's fall, the guardians of its Wyprawa that fell (the author: "638
+// A"), the Próby its members finished, the pieces they gave in the
 // Prośby and the offers they took in the Wymiana, each member's part up to
 // its cap first, then summed for the guild. The Ranking's "Gildie" tab
 // shows the guilds by this week's Sława or by all of it ("Od początku": the
@@ -10,8 +11,9 @@
 // ranking, the Gildia page or the best guild of the week before (every
 // GET /api/character), the Sława of that week is frozen for every guild at
 // once (guild_fame): the sources keep the rows of the week before until the
-// week after it (the Bestia's, the Próby's and the Prośby's clean-ups, and
-// the Wymiana's, guild-exchange.js), so nothing of it is gone by then. The
+// week after it (the Bestia's, the Próby's and the Prośby's clean-ups, the
+// Wymiana's, guild-exchange.js, and the Wyprawa's, guild-expedition.js), so
+// nothing of it is gone by then. The
 // best guild of the week before (the most Sława, if any; of two with as
 // much, the older) has its tag in gold the whole week (380 C).
 
@@ -39,10 +41,13 @@ function weeksAround(now) {
 // each piece given in the guild that week, each giver's up to its cap.
 // Wymiana: perExchange for each offer taken in the guild that week, each
 // taker's up to its cap (a taker gone leaves each exchange on its own).
+// Wyprawa: perGuardian for each guardian of its route of that week that
+// fell, and `last` instead for the last of them (638 A: 20 each and 50 for
+// the seventh, up to 170 a week).
 function weekFame(week) {
-  const { beast, trials, requests, exchange } = rules();
+  const { beast, expedition, trials, requests, exchange } = rules();
   return {
-    sql: `SELECT g.id AS guild_id, COALESCE(b.points, 0) + COALESCE(t.points, 0) + COALESCE(r.points, 0) + COALESCE(x.points, 0) AS points
+    sql: `SELECT g.id AS guild_id, COALESCE(b.points, 0) + COALESCE(t.points, 0) + COALESCE(r.points, 0) + COALESCE(x.points, 0) + COALESCE(w.points, 0) AS points
       FROM guilds g
       LEFT JOIN (SELECT guild_id, SUM(CAST(MAX(0, max_hp - hp) * 100 / max_hp AS INTEGER) * ? + CASE WHEN fallen_at IS NULL THEN 0 ELSE ? END) AS points
                  FROM guild_beasts WHERE week = ? AND max_hp > 0 GROUP BY guild_id) b ON b.guild_id = g.id
@@ -54,7 +59,10 @@ function weekFame(week) {
                  GROUP BY guild_id) r ON r.guild_id = g.id
       LEFT JOIN (SELECT guild_id, SUM(MIN(n, ?)) * ? AS points
                  FROM (SELECT guild_id, COUNT(*) AS n FROM guild_offers WHERE state = 'taken' AND closed_at >= ? AND closed_at < ? GROUP BY guild_id, COALESCE(taker_id, -id))
-                 GROUP BY guild_id) x ON x.guild_id = g.id`,
+                 GROUP BY guild_id) x ON x.guild_id = g.id
+      LEFT JOIN (SELECT e.guild_id, SUM(CASE WHEN s.stage = ? THEN ? ELSE ? END) AS points
+                 FROM guild_expedition_guardians s JOIN guild_expeditions e ON e.id = s.expedition_id
+                 WHERE e.week = ? AND s.fallen_at IS NOT NULL GROUP BY e.guild_id) w ON w.guild_id = g.id`,
     binds: [
       beast.perPercent,
       beast.fell,
@@ -70,6 +78,10 @@ function weekFame(week) {
       exchange.perExchange,
       week.startsAt,
       week.endsAt,
+      content.guilds.expedition.guardians.length,
+      expedition.last,
+      expedition.perGuardian,
+      week.key,
     ],
   };
 }
@@ -106,12 +118,14 @@ export async function championOf(db, now) {
 
 // The words of the Ranking's "Gildie", with the rules' numbers filled in.
 function rankingTexts() {
-  const { beast, trials, requests, exchange } = rules();
+  const { beast, expedition, trials, requests, exchange } = rules();
   const texts = words();
   const points = (count) => `${count} ${countedForm(count, texts.pointForms)}`;
   const vars = {
     beastPercent: points(beast.perPercent),
     beastFell: points(beast.fell),
+    perGuardian: points(expedition.perGuardian),
+    lastGuardian: points(expedition.last),
     perTrial: points(trials.perTrial),
     trialCap: content.guilds.trials.cap,
     perPiece: points(requests.perPiece),
