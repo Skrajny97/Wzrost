@@ -1,0 +1,14 @@
+{
+  "id": "collector-spirit",
+  "tool": "pixellab generate-image-v2",
+  "description": "small friendly ghost spirit of a gatherer, translucent pale cyan glowing body fading into wisps below the waist, a deep hood with two bright cyan eyes, a big woven sack slung over its shoulder, floating, the whole figure inside the frame, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}
