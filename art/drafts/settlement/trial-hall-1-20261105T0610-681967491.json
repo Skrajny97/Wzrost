@@ -1,0 +1,14 @@
+{
+  "id": "trial-hall-1",
+  "tool": "pixellab generate-image-v2",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, made of logs, planks, thatch and wooden shingles, no stone houses and no tiled roofs, standing directly on bare ground with no ground tile, base or platform under it, the village trial hall where fighters prove themselves: a sturdy long log hall with a steep wooden shingle roof, a heavy carved wooden double door framed by an arch of logs carved with faintly glowing pale cyan runes, two burning torches beside the door, a round wooden shield and two crossed practice swords hung over the entrance, a weapon rack with wooden training weapons by the wall, a worn stone step before the door",
+  "style": "src/client/art/settlement/tavern.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
