@@ -574,7 +574,7 @@ describe('the Próby Gildii through the API', () => {
     assert.equal((await rowOf('Druh', 0)).progress, 0);
   });
 
-  test('the Stół rozbiórki, the Kowadło and the Wieże move their trials on with their own save, all running at once; a second tap that saves nothing moves nothing', async () => {
+  test('the Stół rozbiórki (once an order ends), the Kowadło and the Wieże move their trials on with their own save, all running at once; a second tap that saves nothing moves nothing', async () => {
     const id = await idOf('Mistrz');
     await run('UPDATE characters SET level = 60, class_level = 50, gold = 5000, resources = json_set(resources, ?, 50) WHERE id = ?', '$."iron-ore"', id);
     for (const [building, level] of [
@@ -593,14 +593,27 @@ describe('the Próby Gildii through the API', () => {
       (await run('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, 0)', id, JSON.stringify({ base: 'chainmail', slot: 'chest', level: 5, rarity: 'common', affixes: [], armor: 15 })))
         .meta.last_row_id;
 
-    // Three materials handed to the table, by two taps: counted once.
+    // The table's orders done a minute ago, and the next look settles them.
+    const tableDone = async () => {
+      const { crafting } = await first('SELECT crafting FROM characters WHERE id = ?', id);
+      await run('UPDATE characters SET crafting = ? WHERE id = ?', JSON.stringify(JSON.parse(crafting).map((order) => ({ ...order, endsAt: Date.now() - 60000 }))), id);
+      await as('mistrz', 'GET', '/api/character');
+    };
+
+    // Three materials handed to the table, by two taps: made once, and
+    // counted once the order ends (the author: „zrób też tak zeby zadania
+    // rozbiórki przedmiotów liczyły się po zakończonej rozbiórce”).
     await run('UPDATE characters SET materials = ? WHERE id = ?', JSON.stringify({ 'wolf-pelt:common': 3 }), id);
     const taps = await Promise.all([1, 2].map(() => as('mistrz', 'POST', '/api/craft/materials', { keys: ['wolf-pelt:common'] })));
     assert.equal(taps.filter((tap) => tap.status === 200).length, 1, JSON.stringify(taps.map((tap) => tap.data)).slice(0, 300));
+    assert.equal(await progress(0), 0);
+    await tableDone();
     assert.equal(await progress(0), 3);
 
     // An item taken apart.
     assert.equal((await as('mistrz', 'POST', `/api/items/${await bagItem()}/salvage`)).status, 200);
+    assert.equal(await progress(1), 0);
+    await tableDone();
     assert.equal(await progress(1), 1);
 
     // An upgrade counts when it comes off.

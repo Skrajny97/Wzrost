@@ -32,6 +32,7 @@ import { content } from './content.js';
 import { fortressOn } from './features.js';
 import { bagPlaces, characterView, engineCharacter, equippedItems, gearSetsOf, loadPlayer, requireNotExploring, requirePlayer } from './characters.js';
 import { herbsOf } from './professions-view.js';
+import { atomically, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 
 const HOUR = 3600000;
@@ -237,9 +238,14 @@ export async function wearGearSet(context) {
   if (wear.length === 0) throw new ApiError(409, 'empty_set', 'W tym zestawie nie ma niczego do założenia.');
   if (plan.toBag.length > 0 && plan.toBag.length > room) throw new ApiError(409, 'bag_full', 'Plecak nie zmieści zdejmowanych rzeczy.');
   const db = context.env.DB;
-  await db.batch([
+  // Only while the character is as read (its sets and its bag), and the
+  // version moves on, as with the sets saved: so a change of the sets or of
+  // the bag at the same moment cannot put more into it than it holds.
+  await atomically(db, [
+    sameVersion(db, row),
     db.prepare('UPDATE items SET slot = NULL WHERE character_id = ? AND slot IS NOT NULL').bind(row.id),
     ...wear.map((item) => db.prepare('UPDATE items SET slot = ? WHERE id = ? AND character_id = ?').bind(item.slot, item.id, row.id)),
+    db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(row.id),
   ]);
   return json({ character: characterView(await loadPlayer(db, session.userId), now) });
 }

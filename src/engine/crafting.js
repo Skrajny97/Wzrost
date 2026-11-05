@@ -272,12 +272,12 @@ export function settleCrafting({ materials, parts, queue }, now) {
 }
 
 // An order at the end of the queue: it starts when the one before it ends.
-// It keeps when it was ordered: the quests and the Próby Gildii count it
-// then, and an order taken off the queue takes it back from those periods
-// (takeOffQueue).
+// It keeps when it was ordered, and counts for the quests and the Próby
+// Gildii once it ends (`countsAtEnd`, countedAtEnd), so one taken off the
+// queue never counted.
 function append(queue, order, minutes, now) {
   const startsAt = Math.max(now, queue.at(-1)?.endsAt ?? now);
-  return [...queue, { ...order, orderedAt: now, startsAt, endsAt: startsAt + minutes * 60000 }];
+  return [...queue, { ...order, orderedAt: now, countsAtEnd: true, startsAt, endsAt: startsAt + minutes * 60000 }];
 }
 
 // An item as the bag keeps it, without its place there (id, equippedSlot):
@@ -394,14 +394,22 @@ export function orderSalvageMany(state, entries, table, now, rng, content) {
 // orders began to keep their items (before, the item was gone at once).
 export const orderCancellable = (order) => order.kind === 'material' || Array.isArray(order.items);
 
-// What an order brought the narrator's quests and the Próby Gildii when it
-// was ordered, by their kind: the pieces of materials processed or the items
-// salvaged, and when. An order from before 0.1.65 does not know when it was
-// ordered: its start stands for it.
+// The work of an order for the narrator's quests and the Próby Gildii, by
+// their kind: the pieces of materials processed or the items salvaged, and
+// when it was ordered. An order from before 0.1.65 does not know when it
+// was ordered: its start stands for it.
 export function orderWork(order) {
   const pieces = order.kind === 'material' ? order.count : (order.items?.length ?? order.count ?? 1);
   return { kind: order.kind === 'material' ? 'process' : 'salvage', pieces, orderedAt: order.orderedAt ?? order.startsAt };
 }
+
+// The work of the orders done (settleCrafting's `done`) that counts now for
+// the narrator's quests and the Próby Gildii: those that count at their end
+// (`countsAtEnd`, every order made since the author's „zrób też tak zeby
+// zadania rozbiórki przedmiotów liczyły się po zakończonej rozbiórce bo
+// inaczej bedzie mozna anulować rozbiórkę a zadanie zaliczone”). An older
+// order counted when it was ordered, so not again. Each as orderWork gives it.
+export const countedAtEnd = (done) => done.filter((order) => order.countsAtEnd === true).map(orderWork);
 
 // Orders taken off the queue ("Usuń z kolejki", "Usuń wszystkie"; the
 // author: „nie wiem czy jest sens karania za takie pomyłki”), `ids` of
@@ -411,8 +419,10 @@ export function orderWork(order) {
 // (its work so far is lost). Also returns what goes back to the bag
 // (`items`), what they gave at once and now goes (`minerals` of jewellery,
 // `patterns` taught), the traded pieces of each stack (`traded`, by stack)
-// and the `work` the quests and the trials counted for every order of the
-// queue (orderWork), `cancelled` for those leaving.
+// and the `work` the quests and the trials counted for the orders of the
+// queue that counted when ordered (orderWork; those made before work began
+// to count at the end), `cancelled` for those leaving. An order that
+// counts at its end has counted nothing yet, so it takes nothing back.
 export function takeOffQueue(state, ids, now) {
   const leaving = state.queue.filter((order) => ids.has(order.id));
   const queue = [];
@@ -433,6 +443,27 @@ export function takeOffQueue(state, ids, now) {
     minerals: leaving.reduce((sum, order) => addCounts(sum, order.minerals ?? {}), {}),
     patterns: [...new Set(leaving.flatMap((order) => order.patterns ?? []))],
     traded,
-    work: state.queue.map((order) => ({ ...orderWork(order), cancelled: ids.has(order.id) })),
+    work: state.queue.filter((order) => order.countsAtEnd !== true).map((order) => ({ ...orderWork(order), cancelled: ids.has(order.id) })),
   };
+}
+
+// The patterns `ids` that the items of orders taken off the queue taught,
+// with the orders staying (`queue`, after takeOffQueue). A pattern stays
+// known while an order staying holds an item of its base, as that item
+// would have taught it, and its mark moves onto the first such order: taken
+// off later, that order hides it in turn (the author: a pattern "znów się
+// ukrywa, chyba że w kolejce czeka inny przedmiot tego wzoru (wtedy on go
+// odsłania)"). The others are `hidden`.
+export function patternsKept(queue, ids) {
+  let kept = queue;
+  const hidden = [];
+  for (const id of ids) {
+    const at = kept.findIndex((order) => (order.items ?? []).some((item) => item.base === id));
+    if (at < 0) {
+      hidden.push(id);
+      continue;
+    }
+    kept = kept.map((order, index) => (index === at && !(order.patterns ?? []).includes(id) ? { ...order, patterns: [...(order.patterns ?? []), id] } : order));
+  }
+  return { queue: kept, hidden };
 }

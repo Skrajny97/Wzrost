@@ -34,6 +34,7 @@ import {
   requireUnworn,
   walletOf,
 } from './characters.js';
+import { atomically, sameVersion } from './atomic.js';
 import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
@@ -323,10 +324,14 @@ export async function upgradeItem(context) {
   if (outcome.result === 'broken') {
     statements.push(db.prepare("DELETE FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?").bind(item.id, roll));
   }
-  const results = await db.batch(statements);
-  if (results[0].meta.changes !== 1) {
-    throw new ApiError(409, 'item_changed', 'Przedmiot albo zapasy zmieniły się w międzyczasie. Spróbuj jeszcze raz.');
-  }
+  // The Zbrojownia's sets without the broken item are written whole, as
+  // read: then all of it holds only while the character is as read, so
+  // nothing the Warownia saved meanwhile (a training claimed, herbs
+  // collected, a set saved) is undone.
+  const itemChanged = () => new ApiError(409, 'item_changed', 'Przedmiot albo zapasy zmieniły się w międzyczasie. Spróbuj jeszcze raz.');
+  const head = forget ? [sameVersion(db, row)] : [];
+  const results = await atomically(db, [...head, ...statements], itemChanged);
+  if (results[head.length].meta.changes !== 1) throw itemChanged();
   return json({
     upgrade: {
       itemId: item.id,

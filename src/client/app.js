@@ -353,15 +353,26 @@ function watchConstruction(now) {
 }
 
 // When an order on the Stół rozbiórki ends, the character is fetched
-// again, with the parts made, and a short message says what is ready.
+// again, with the parts made, and a short message says what is ready. The
+// server tells an order's extra parts only once it has ended (taken off and
+// ordered again, an order would draw them anew), so the message finds them
+// among the parts that came: those of the part beyond what the orders done
+// since were to make.
 let craftRetryAt = 0;
 function watchCrafting(now) {
-  const order = state.character?.crafting?.queue[0];
+  const crafting = state.character?.crafting;
+  const order = crafting?.queue[0];
   if (!order || now < order.endsAt + 1000 || now < craftRetryAt) return;
   craftRetryAt = now + 30000;
+  const held = (view) => view?.parts.find((part) => part.name === order.part)?.count ?? 0;
   call('GET', '/api/character')
     .then(() => {
-      const extra = order.bonus > 0 ? ` i ${countOf(order.bonus, 'dodatkowa część', 'dodatkowe części', 'dodatkowych części')}` : '';
+      const after = state.character.crafting;
+      const made = crafting.queue
+        .filter((one) => one.part === order.part && !after?.queue.some((next) => next.id === one.id))
+        .reduce((sum, one) => sum + one.parts, 0);
+      const bonus = held(after) - held(crafting) - made;
+      const extra = bonus > 0 && bonus <= made ? ` i ${countOf(bonus, 'dodatkowa część', 'dodatkowe części', 'dodatkowych części')}` : '';
       toast(`Stół rozbiórki skończył: ${order.part} ×${order.parts}${extra}.`);
       playSound('done');
     })

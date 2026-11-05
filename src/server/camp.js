@@ -119,20 +119,21 @@ export async function beginBuilding(db, player, buildingId, now) {
   // The upgrade starts only if nothing is being built, the building is as
   // seen here (level and store) and the cost is still there; the payment only
   // if the upgrade started. So two taps at once start and pay one upgrade.
+  // The build keeps what it cost: "Przerwij budowę" gives back exactly that.
   const start = db
     .prepare(
-      `INSERT INTO buildings (character_id, building_id, level, started_at, ends_at, collected_at)
-       SELECT ?, ?, ?, ?, ?, ?
+      `INSERT INTO buildings (character_id, building_id, level, started_at, ends_at, collected_at, cost)
+       SELECT ?, ?, ?, ?, ?, ?, ?
        WHERE NOT EXISTS (SELECT 1 FROM buildings WHERE character_id = ? AND ends_at > ?)
          AND COALESCE((SELECT level FROM buildings WHERE character_id = ? AND building_id = ?), 0) = ?
          AND COALESCE((SELECT COALESCE(collected_at, ends_at) FROM buildings WHERE character_id = ? AND building_id = ?), 0) = ?
          AND (SELECT gold FROM characters WHERE id = ?) >= ?
          ${resources.map(() => 'AND COALESCE(json_extract((SELECT resources FROM characters WHERE id = ?), ?), 0) >= ?').join(' ')}
        ON CONFLICT (character_id, building_id) DO UPDATE
-         SET level = excluded.level, started_at = excluded.started_at, ends_at = excluded.ends_at, collected_at = excluded.collected_at`,
+         SET level = excluded.level, started_at = excluded.started_at, ends_at = excluded.ends_at, collected_at = excluded.collected_at, cost = excluded.cost`,
     )
     .bind(
-      row.id, building.id, target, now, endsAt, producing ? endsAt : null,
+      row.id, building.id, target, now, endsAt, producing ? endsAt : null, JSON.stringify(cost),
       row.id, now,
       row.id, building.id, built,
       row.id, building.id, stored ? stored.collectedAt ?? stored.endsAt : 0,
@@ -262,23 +263,30 @@ export async function cancelBuilding(context) {
 // można anulować aktualnie budowanego miejsca ze zwrotem kosztow zasobow a
 // chcemy tego”): the building goes back to the level it had, or to an empty
 // plot, its whole cost comes back with the higher levels of it waiting in
-// the queue, and the rest of the queue starts from now. A production
-// building, whose store went to the resources when the build began, fills
-// again from now. Saved only if the character and the build are as seen
-// here.
+// the queue, and the rest of the queue starts from now. The cost is what
+// the build was paid (`cost`, kept with it), or for a build from before it
+// was kept, the price of its level now. A production building, whose store
+// went to the resources when the build began, fills again from now. Saved
+// only if the character and the build are as seen here.
 async function stopBuilding(context, session, player, running, queue) {
   const db = context.env.DB;
   const now = context.now;
   const row = player.row;
   const building = content.buildingsById[running.buildingId];
   const { cancelled, kept } = cancelFromQueue(queue, running.buildingId, running.level + 1);
-  const costs = [building ? upgradeCost(building, running.level) : {}, ...cancelled.map((entry) => entry.cost ?? (building ? upgradeCost(building, entry.level) : {}))];
+  const paid = running.cost ?? (building ? upgradeCost(building, running.level) : {});
+  const costs = [paid, ...cancelled.map((entry) => entry.cost ?? (building ? upgradeCost(building, entry.level) : {}))];
   const back = {};
   for (const cost of costs) for (const [id, amount] of Object.entries(cost)) back[id] = (back[id] ?? 0) + amount;
   const before = running.level - 1;
   const producing = building?.effect?.kind === 'production';
+  // The level it goes back to stands as of old (`endsAt` 0): the time it was
+  // reached is not kept, and the start of the build stopped changed nothing.
+  // So a rest counted from before that start runs at the Ognisko's pace of
+  // that level all along (restBonus), and the phone hears of no build ended
+  // (notifications.js).
   const stored = { ...player.buildings };
-  if (before > 0) stored[running.buildingId] = { level: before, startedAt: running.startedAt, endsAt: running.startedAt, collectedAt: producing ? now : null };
+  if (before > 0) stored[running.buildingId] = { level: before, startedAt: running.startedAt, endsAt: 0, collectedAt: producing ? now : null };
   else delete stored[running.buildingId];
   const resources = Object.keys(back).filter((id) => id !== 'gold');
   const give = resources.length
@@ -302,8 +310,8 @@ async function stopBuilding(context, session, player, running, queue) {
       ),
     before > 0
       ? db
-          .prepare('UPDATE buildings SET level = ?, ends_at = ?, collected_at = ? WHERE character_id = ? AND building_id = ? AND level = ? AND ends_at = ?')
-          .bind(before, running.startedAt, producing ? now : null, ...where)
+          .prepare('UPDATE buildings SET level = ?, ends_at = 0, collected_at = ?, cost = NULL WHERE character_id = ? AND building_id = ? AND level = ? AND ends_at = ?')
+          .bind(before, producing ? now : null, ...where)
       : db.prepare('DELETE FROM buildings WHERE character_id = ? AND building_id = ? AND level = ? AND ends_at = ?').bind(...where),
   ], () => new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.'));
   return json({
