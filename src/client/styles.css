@@ -11760,8 +11760,8 @@ a.profession-square:active {
 }
 
 /* The Gildia's tabs (screens/guild.js): the Społeczność's row of tabs, the
-   six of them sharing its width, each with its icon over its name, so all
-   six fit in one row on a phone and in the computer's column. */
+   seven of them sharing its width, each with its icon over its name, so all
+   seven fit in one row on a phone and in the computer's column. */
 .guild-picker .community-tab {
   flex: 1 0 auto;
   flex-direction: column;
@@ -11772,16 +11772,17 @@ a.profession-square:active {
   line-height: 1.2;
 }
 
-/* Under 390 px the six need 353: the names a little smaller and closer
-   together, so they still fit one row down to 320 px. */
-@media (max-width: 389px) {
+/* At 15 px the seven need about 430 px: on a phone the names smaller with
+   the screen's width and closer together, so they still fit one row down
+   to 320 px (621 A brought the seventh). */
+@media (max-width: 479px) {
   .guild-picker .community-tabs {
-    gap: 4px;
+    gap: 3px;
   }
 
   .guild-picker .community-tab {
     padding: 6px 1px;
-    font-size: clamp(13px, 3.8vw, 15px);
+    font-size: clamp(11px, calc((100vw - 80px) / 21.5), 15px);
   }
 }
 
@@ -12423,6 +12424,258 @@ a.profession-square:active {
     width: 96px;
     height: 72px;
   }
+}
+
+/* The Wyprawa Gildii (guild-expedition.js, 621 A, mock-up 624): its cards
+   one under another. The route of the week: seven stops on a dotted path
+   winding over the card, up and down as on the mock-up; a stage done is a
+   gold coin, the stage now is ringed in the System's light, its guardian's
+   picture in its stop in the beast's red once it bars the way, and the
+   last stop, larger, shows the last guardian from the start. A gift hangs
+   over a stop whose chest waits. The guardian's card takes the Bestia's
+   look (guild-beast.js). */
+.guild-expedition {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.guild-expedition p {
+  margin: 0;
+}
+
+.guild-expedition .how-more > p + p {
+  margin-top: 6px;
+}
+
+.expedition-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.expedition-title svg {
+  flex: none;
+  color: var(--gold);
+}
+
+.expedition-route {
+  position: relative;
+  height: 136px;
+  margin: 6px 4px 4px;
+}
+
+.expedition-path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.expedition-path polyline {
+  fill: none;
+  stroke: var(--bark-line);
+  stroke-width: 3;
+  stroke-dasharray: 1 7;
+  stroke-linecap: round;
+}
+
+.expedition-stops {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.expedition-stop {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 2px solid var(--bark-line);
+  border-radius: 50%;
+  background: var(--bg-deep);
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 15px;
+  font-weight: 600;
+  transform: translate(-50%, -50%);
+}
+
+.expedition-stop--fallen {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: var(--bg-deep);
+}
+
+.expedition-stop--now {
+  width: 42px;
+  height: 42px;
+  border-color: var(--system);
+  color: var(--system-text);
+  box-shadow: 0 0 0 4px rgba(143, 227, 239, 0.16);
+}
+
+.expedition-stop--last {
+  width: 52px;
+  height: 52px;
+}
+
+.expedition-stop--standing {
+  border-color: #e8414d;
+  box-shadow: 0 0 0 4px rgba(232, 65, 77, 0.18);
+}
+
+.expedition-stop-art {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.expedition-stop-art .sprite {
+  width: 100%;
+  height: 100%;
+}
+
+/* The last guardian shows from the start, dimmed until it bars the way. */
+.expedition-stop--ahead .expedition-stop-art .sprite {
+  opacity: 0.55;
+  filter: grayscale(0.5);
+}
+
+.expedition-stop--fallen .expedition-stop-art .sprite {
+  opacity: 0.7;
+}
+
+.expedition-stop-gift {
+  position: absolute;
+  top: -15px;
+  right: -11px;
+  display: flex;
+  color: var(--gold);
+}
+
+.expedition-meter .meter-label {
+  margin-bottom: 4px;
+  color: var(--text);
+  font-family: var(--font-world);
+  font-size: 16px;
+  letter-spacing: 0;
+  white-space: normal;
+}
+
+.expedition-banked {
+  color: var(--system-text);
+}
+
+.expedition-note {
+  font-size: 13px;
+}
+
+.expedition-done {
+  color: var(--accent);
+}
+
+.expedition-standing {
+  color: var(--danger);
+}
+
+/* A guardian still ahead: no blood-red frame yet, its picture dimmed. */
+.guild-beast-art.expedition-art--ahead {
+  border-color: var(--bark-line);
+}
+
+.expedition-art--ahead .sprite {
+  opacity: 0.6;
+  filter: grayscale(0.4);
+}
+
+.expedition-chests {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.expedition-chest {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+}
+
+.expedition-chest-art {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+}
+
+.expedition-chest-art .sprite {
+  width: 48px;
+  height: 48px;
+}
+
+.expedition-chest-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.expedition-chest-name {
+  font-weight: 700;
+  overflow-wrap: break-word;
+}
+
+.expedition-chest-rare {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.expedition-chest .button {
+  flex: none;
+}
+
+/* A narrow phone: the chest's picture smaller, so a guardian's name keeps
+   its room beside "Odbierz" (Niedźwiedź at 320 px). */
+@media (max-width: 374px) {
+  .expedition-chest {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .expedition-chest-art,
+  .expedition-chest-art .sprite {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* On the computer the column is wider: the route a little taller. */
+:root[data-layout='desktop'] .expedition-route {
+  height: 156px;
+  margin: 8px 12px 6px;
 }
 
 /* The Sklep Systemu (screens/shop.js): the Punkty Systemu, its tabs and a

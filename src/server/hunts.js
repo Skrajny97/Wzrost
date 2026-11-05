@@ -90,6 +90,7 @@ import { assertion, atomically, characterChanged, raced, sameVersion } from './a
 import { ApiError, json, readJson } from './http.js';
 import { eventDraftsOn, eventsOn, fortressOn, settlementOn } from './features.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
+import { expeditionMinutes } from './guild-expedition.js';
 import { soldGold } from './inventory.js';
 import { perkOf } from './perks.js';
 import { finishGathering } from './professions.js';
@@ -935,6 +936,10 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       // the moment it is made. One that set out before this rule moves the
       // trial on as before.
       ...trialProgress(db, row.id, progress, now, takenBefore(options.begun)),
+      // The Wyprawa Gildii's route (guild-expedition.js): the exploration's
+      // minutes for the guild the character is in now, as the report is
+      // claimed (621 A), whenever the exploration set out.
+      ...expeditionMinutes(db, row.id, activity.minutes, now),
       // Bag items the scrapper bought: paid for above, while they were still there.
       ...(soldStored.length > 0
         ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${soldStored.map(() => '?').join(', ')})`).bind(row.id, ...soldStored)]

@@ -28,6 +28,7 @@ import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inv
 import { enterTower, getTowers } from './towers.js';
 import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, setGuildRole } from './guilds.js';
 import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-beast.js';
+import { attackGuildGuardian, claimGuildExpeditionChest, getGuildExpedition } from './guild-expedition.js';
 import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, openGuildTrials, takeGuildTrial } from './guild-trials.js';
 import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, thankForGuildGift } from './guild-requests.js';
 import { getGuildTodo } from './guild-todo.js';
@@ -295,6 +296,10 @@ const routes = [
   ['GET', '/api/guild/seat', getGuildSeat],
   ['POST', '/api/guild/seat/donate', donateToGuildSeat],
   ['POST', '/api/guild/seat/prefer', preferGuildSeat],
+  // The Wyprawa Gildii (guild-expedition.js, 621 A).
+  ['GET', '/api/guild/expedition', getGuildExpedition],
+  ['POST', '/api/guild/expedition/attack', attackGuildGuardian],
+  ['POST', '/api/guild/expedition/claim', claimGuildExpeditionChest],
   // The Bestia Gildii (guild-beast.js).
   ['GET', '/api/guild/beast', getGuildBeast],
   ['POST', '/api/guild/beast/attack', attackGuildBeast],
