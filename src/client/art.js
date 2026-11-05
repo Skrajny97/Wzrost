@@ -219,7 +219,8 @@ export const SPRITES = {
     ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs', 'black-bog', 'pine-dunes'],
   },
   // The camp's buildings, <building>-<look> for the looks of levels 1–3, 4–7
-  // and 8–10, 128×96 (camp-art.js keeps a vector drawing for a look without
+  // and 8–10 (8–19 for the resource buildings, whose fourth look is the
+  // Warownia's level 20), 128×96 (camp-art.js keeps a vector drawing for a look without
   // one).
   // The camp board's ground, without paths (camp-art.js draws them): the
   // glade at the camp's levels 1–3, 4–7 and 8–10, its fence and palisade
@@ -254,8 +255,8 @@ export const SPRITES = {
     height: 128,
     fit: true,
     ids: [
-      'sawmill-1', 'sawmill-2', 'sawmill-3', 'quarry-1', 'quarry-2', 'quarry-3', 'mine-1', 'mine-2', 'mine-3',
-      'midas-lake-1', 'midas-lake-2', 'midas-lake-3', 'campfire-1', 'campfire-2', 'campfire-3', 'loot-shed-1', 'loot-shed-2', 'loot-shed-3',
+      'sawmill-1', 'sawmill-2', 'sawmill-3', 'sawmill-4', 'quarry-1', 'quarry-2', 'quarry-3', 'quarry-4', 'mine-1', 'mine-2', 'mine-3', 'mine-4',
+      'midas-lake-1', 'midas-lake-2', 'midas-lake-3', 'midas-lake-4', 'campfire-1', 'campfire-2', 'campfire-3', 'loot-shed-1', 'loot-shed-2', 'loot-shed-3',
       'scrap-bench-1', 'scrap-bench-2', 'scrap-bench-3', 'anvil-1', 'anvil-2', 'anvil-3', 'craft-table-1', 'craft-table-2', 'craft-table-3',
       'quarters-1', 'quarters-2', 'quarters-3', 'cornerstone-1',
       'training-yard-1', 'training-yard-2', 'training-yard-3', 'armory-1', 'armory-2', 'trophy-hall-1', 'trophy-hall-2', 'trophy-hall-3',

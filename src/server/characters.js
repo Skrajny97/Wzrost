@@ -27,6 +27,7 @@ import {
   trophyHallBonuses,
   fortressReady,
   fortressStands,
+  buildingTop,
   campNeeds,
   canUse,
   classNameOf,
@@ -799,7 +800,7 @@ function campView(player, levels, now) {
       ready: finished === open.length && own >= camp.maxLevel ? camp.cornerstone.ready : null,
       // The transformation into a Warownia, where it is on (fortress.js).
       fortress: fortressOn() ? fortressView(player, open, queue, now) : null,
-      spirit: spiritView(player, built, queue),
+      spirit: spiritView(player, built, queue, now),
     },
     level: {
       id: camp.id,
@@ -833,7 +834,9 @@ function campView(player, levels, now) {
     buildings: content.buildings.filter((building) => buildingOpen(building, player.row, player.buildings, now)).map((building) => {
       const level = levels[building.id];
       const planned = plannedLevel(building, player.buildings, queue);
-      const next = planned < building.maxLevel ? planned + 1 : null;
+      // Past level 10 in the Warownia for the resource buildings (618).
+      const top = buildingTop(building, player.buildings, now, content);
+      const next = planned < top ? planned + 1 : null;
       const stored = player.buildings[building.id];
       // A production building's store, once the building stands: the page
       // counts it up from `since`.
@@ -843,7 +846,9 @@ function campView(player, levels, now) {
         name: building.name,
         description: building.description,
         level,
-        maxLevel: building.maxLevel,
+        maxLevel: top,
+        // At the camp's top with more to come in the Warownia (618): the hint.
+        beyond: building.beyond && top === building.maxLevel && level >= building.maxLevel ? building.beyond.hint : null,
         // A building with looks of its own (the Kwatery): the look at its
         // level, the first one while it is not built yet.
         ...(building.looks && { look: building.looks[Math.min(Math.max(level, 1), building.looks.length) - 1] }),
@@ -889,12 +894,19 @@ function campView(player, levels, now) {
 // the camp's builds not paid yet still need of it (`open`: the buildings
 // the character has), so the page can tell the surplus. Null where the
 // game has no spirit.
-function spiritView(player, open, queue) {
+function spiritView(player, open, queue, now) {
   const spirit = builderSpirit(content);
   if (!spirit) return null;
   const wallet = walletOf(player.row);
-  // With the Warownia in the game, what its transformation still needs too.
-  const needs = campNeeds(fortressOn() && content.camp.fortress ? [...open, content.camp.fortress] : open, player.buildings, queue, content);
+  // With the Warownia in the game, what its transformation still needs too,
+  // and once it stands the resource buildings' levels up to 20 (618).
+  const needs = campNeeds(
+    fortressOn() && content.camp.fortress ? [...open, content.camp.fortress] : open,
+    player.buildings,
+    queue,
+    content,
+    (building) => buildingTop(building, player.buildings, now, content),
+  );
   return {
     art: spirit.art,
     name: spirit.name,

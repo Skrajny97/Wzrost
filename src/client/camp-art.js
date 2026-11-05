@@ -110,7 +110,9 @@ export const campPlots = (tall) =>
     : CAMP_PLOTS;
 
 // The size of a building's drawing at a level.
-export const buildingTier = (level) => (level >= 8 ? 3 : level >= 4 ? 2 : 1);
+// The fourth look at level 20, which only the resource buildings reach, in
+// the Warownia (the author: „z jedną jeszcze przemianą na 20tym”, 618).
+export const buildingTier = (level) => (level >= 20 ? 4 : level >= 8 ? 3 : level >= 4 ? 2 : 1);
 
 const log = (x, y, w, h, fill = WOOD) =>
   `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}" fill="${fill}" stroke="${LINE}" stroke-width="0.8"></rect>` +
@@ -589,8 +591,9 @@ function svgElement(viewBox, className, markup) {
 }
 
 // The share of the plot a picture fills at each look, so that a building
-// grows on the board with its level.
-const ART_SIZES = [0.64, 0.82, 1];
+// grows on the board with its level; the fourth look of the resource
+// buildings at level 20 (618) fills it as the third does.
+const ART_SIZES = [0.64, 0.82, 1, 1];
 
 // A picture sits into the board: its colours muted and dimmed, its edges
 // soft and a faint blur of it around them. Each plot has its own filter, as
@@ -614,7 +617,7 @@ const blend = (id, grey = false) => `<filter id="${id}" x="-10%" y="-10%" width=
 // path comes from straight below, the Kamieniołom, Staw Midasa, the Kopalnia
 // and the round Ognisko face theirs already, as do the looks not named here.
 const MIRRORED = {
-  sawmill: [1, 2, 3],
+  sawmill: [1, 2, 3, 4],
   'loot-shed': [1, 2, 3],
   quarters: [1, 2],
   'craft-table': [2],

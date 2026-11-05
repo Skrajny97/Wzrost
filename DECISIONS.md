@@ -3034,6 +3034,21 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.55 (5.11.2026)
+
+Budynki zasobów do 20. poziomu w Warowni (618): zob. „Budynki zasobów do 20. poziomu”.
+
+## Budynki zasobów do 20. poziomu (5.11.2026, w grze od 0.1.55)
+
+Autor: „Dodajmy też możliwość rozwijania budynków od zasobów do 20ego w Warowni z jedną jeszcze przemianą na 20tym”, a potem „618.1 A, 618.2 A, 618.3 B albo nawet trochę lżej niż B” i „618.4 - D, 618.5 - C, 618.6 - D, 618.7 - D”.
+
+1. **Które budynki (618.1 A).** Tartak, Kamieniołom, Kopalnia i Staw Midasa (`beyond` w `data/buildings.json`). Poziomy 11–20 otwierają się, gdy przemiana Obozu w Warownię się skończy. Do tego czasu budynek ma 10 poziomów, a na 10. jego ekran mówi: „W Warowni rozbudujesz go do 20. poziomu.”
+2. **Co dają (618.2 A).** Każdy poziom dodaje tyle samo co dotąd, więc na 20. poziomie budynek daje dwa razy więcej niż na 10.: Tartak 120 drewna na godzinę, Kamieniołom 80 kamienia, Kopalnia 60 rudy żelaza, Staw Midasa 160 złota. Magazyn dalej rośnie o 2 godziny na poziom i na 20. mieści 40 godzin produkcji.
+3. **Koszt i czas (618.3, „trochę lżej niż B”).** Złoto za poziom n to złoto 10. poziomu razy 1,12^(n − 10) (w B było 1,15), zasoby jak za 10. poziom, a czas jak 10. poziomu razy 1,1^(n − 10), z przyspieszeniem z poziomu Obozu jak każda budowa. Tartak: 11. poziom 4 588 złota, 20. poziom 12 722; cztery budynki od 11. do 20. poziomu razem ok. 382 000 złota. Buduje się jak dotąd: jedno naraz, reszta czeka w kolejce.
+4. **Czwarty wygląd na 20. poziomie (618.4–618.7).** Tartak D, Kamieniołom C, Kopalnia D, Staw Midasa D, szkice z PixelLab. Poziomy 11–19 zostają przy trzecim wyglądzie. Na planszy czwarty wygląd zajmuje tyle miejsca co trzeci, a Tartak jest odbity jak jego wcześniejsze wyglądy, żeby wejściem patrzył na ścieżkę.
+5. **Duch budowniczego.** Po przemianie liczy jako potrzebne także zasoby na poziomy 11–20 tych budynków, więc nie pokazuje ich jako nadwyżki do sprzedania.
+6. **Kamień węgielny** liczy budynki obozu do 10. poziomu, jak przy przemianie, więc poziomy 11–20 nic w nim nie zmieniają.
+
 ## Wersja 0.1.54 (5.11.2026)
 
 Próby Gildii w tygodniu wdrożenia (sesja, po 0.1.53): tablica wylosowana przed 0.1.53 (12 prób) liczy na pasku wykonane próby bez limitu dnia, tylko do `cap`, więc żaden pasek nie spada i żaden osiągnięty próg nie znika (zob. „Próby Gildii co dzień, wszystkie naraz”, punkt 7).

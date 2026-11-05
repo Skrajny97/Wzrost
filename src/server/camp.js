@@ -12,6 +12,7 @@ import {
   builderSpirit,
   buildMinutes,
   buildingLevel,
+  buildingTop,
   buildsUnderWay,
   campLevel,
   cancelFromQueue,
@@ -95,7 +96,8 @@ export async function beginBuilding(db, player, buildingId, now) {
   }
   const built = buildingLevel(player.buildings[building.id], now);
   const level = Math.max(building.startLevel ?? 0, built);
-  if (level >= building.maxLevel) throw atTop(building);
+  // The resource buildings go on to level 20 in the Warownia (618).
+  if (level >= buildingTop(building, player.buildings, now, content)) throw atTop(building);
   const target = level + 1;
   const cost = upgradeCost(building, target);
   if (missingFor(cost, walletOf(player.row)).length > 0) throw shortOf(building);
@@ -172,8 +174,9 @@ async function queueBuilding(db, player, building, queue, now) {
     throw new ApiError(409, 'queue_full', 'Kolejka budowy jest pełna.');
   }
   const level = plannedLevel(building, player.buildings, queue);
-  if (level >= building.maxLevel) {
-    if (buildingLevel(player.buildings[building.id], now) >= building.maxLevel) throw atTop(building);
+  const top = buildingTop(building, player.buildings, now, content);
+  if (level >= top) {
+    if (buildingLevel(player.buildings[building.id], now) >= top) throw atTop(building);
     throw new ApiError(409, 'max_level', 'Najwyższy poziom jest już w kolejce.');
   }
   const target = level + 1;

@@ -40,11 +40,13 @@ export function spiritSaleBlock({ resources, resource, amount }, content) {
 // What the camp's builds still need, by resource (gold left out): every
 // level of the camp itself and of `buildings` (those the character has)
 // after the ones built, under way and waiting, which are paid already, up to
-// the highest. Nothing once all of them stand at their highest level.
-export function campNeeds(buildings, stored, queue, content) {
+// the highest one it can reach now (`top`: its maxLevel, or in the Warownia
+// the resource buildings' level 20, 618). Nothing once all of them stand at
+// their highest level.
+export function campNeeds(buildings, stored, queue, content, top = (building) => building.maxLevel) {
   const needs = Object.fromEntries(content.resources.map((resource) => [resource.id, 0]));
   for (const building of [content.camp, ...buildings]) {
-    for (let level = plannedLevel(building, stored, queue) + 1; level <= building.maxLevel; level++) {
+    for (let level = plannedLevel(building, stored, queue) + 1; level <= top(building); level++) {
       for (const [id, amount] of Object.entries(upgradeCost(building, level))) {
         if (Object.hasOwn(needs, id)) needs[id] += amount;
       }

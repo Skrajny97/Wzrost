@@ -616,6 +616,8 @@ function mountBuilding(container, id) {
       underway && constructionPanel(running, ticks),
       waitingNote(id),
       nextLevel(building),
+      // At the camp's top with more to come in the Warownia (618).
+      building.beyond && h('p', { class: 'muted small', text: building.beyond }),
       building.crafts && craftTableSection(ticks, salvagePicker),
       building.upgrades && upgradeList(building),
       // The Warownia's buildings (fortress.js).

@@ -6,7 +6,9 @@ import {
   applyHunt,
   blessingPlan,
   buildMinutes,
+  buildingTop,
   campLevels,
+  campNeeds,
   effectText,
   eventChance,
   faintPenalty,
@@ -30,6 +32,7 @@ import {
   trainingXp,
   trophyHallBonuses,
   upgradeCost,
+  upgradeMinutes,
   xpToNext,
 } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
@@ -804,5 +807,98 @@ describe('the Warownia where it is off', () => {
     assert.ok(view.camp.cornerstone.ready);
     assert.equal((await call('POST', '/api/camp/build', { cookie, body: { buildingId: 'fortress' } })).status, 400);
     assert.equal((await call('POST', '/api/camp/build', { cookie, body: { buildingId: 'shrine' } })).status, 400);
+  });
+});
+
+// The resource buildings go on to level 20 once the camp is a Warownia (the
+// author's 618: „618.1 A, 618.2 A, 618.3 B albo nawet trochę lżej niż B”):
+// the same more a level, gold growing 12% a level from the 10th level's,
+// the 10th level's resources, the time 10% longer a level, and a fourth
+// look at level 20.
+describe('the resource buildings past level 10 in the Warownia (618)', () => {
+  const RESOURCE = ['sawmill', 'quarry', 'mine', 'midas-lake'];
+
+  test('levels 11 to 20: the 10th level\'s resources, gold and time growing a level; the same production more a level', () => {
+    for (const id of RESOURCE) {
+      const building = content.buildingsById[id];
+      assert.deepEqual([building.maxLevel, building.beyond.maxLevel], [10, 20], id);
+      const top = upgradeCost(building, 10);
+      for (const level of [11, 15, 20]) {
+        const cost = upgradeCost(building, level);
+        assert.equal(cost.gold, Math.round(top.gold * 1.12 ** (level - 10)), `${id} ${level}`);
+        for (const resource of ['wood', 'stone', 'iron-ore']) assert.equal(cost[resource], top[resource], `${id} ${level} ${resource}`);
+        assert.equal(upgradeMinutes(building, level), Math.round(upgradeMinutes(building, 10) * 1.1 ** (level - 10)), `${id} ${level} minutes`);
+      }
+      // Twice as much at 20 as at 10.
+      assert.equal(building.effect.perLevel * 20, 2 * building.effect.perLevel * 10);
+    }
+    // Every other building keeps its own top.
+    assert.ok(content.buildings.filter((one) => one.beyond).every((one) => RESOURCE.includes(one.id)));
+  });
+
+  test('the top is 20 only once the Warownia stands', () => {
+    const sawmill = content.buildingsById.sawmill;
+    const camp = Object.fromEntries([...campBuildings, content.camp].map((one) => [one.id, { level: one.maxLevel, startedAt: 0, endsAt: 1 }]));
+    assert.equal(buildingTop(sawmill, camp, 10, content), 10);
+    const fortress = { ...camp, fortress: { level: 1, startedAt: 0, endsAt: 5 } };
+    assert.equal(buildingTop(sawmill, fortress, 2, content), 10, 'while the transformation lasts');
+    assert.equal(buildingTop(sawmill, fortress, 10, content), 20);
+    assert.equal(buildingTop(content.buildingsById.anvil, fortress, 10, content), content.buildingsById.anvil.maxLevel);
+  });
+
+  test('the Duch budowniczego counts the resources of levels 11 to 20 as needed once the Warownia stands', () => {
+    const sawmill = content.buildingsById.sawmill;
+    const stored = { [content.camp.id]: { level: content.camp.maxLevel, startedAt: 0, endsAt: 1 }, sawmill: { level: 10, startedAt: 0, endsAt: 1 } };
+    const none = { wood: 0, stone: 0, 'iron-ore': 0 };
+    assert.deepEqual(campNeeds([sawmill], stored, [], content), none);
+    const { gold, ...tenth } = upgradeCost(sawmill, 10);
+    assert.ok(gold > 0);
+    const beyond = (building) => building.beyond?.maxLevel ?? building.maxLevel;
+    assert.deepEqual(campNeeds([sawmill], stored, [], content, beyond), Object.fromEntries(Object.keys(none).map((id) => [id, 10 * (tenth[id] ?? 0)])));
+    // Built to 20, nothing more.
+    assert.deepEqual(campNeeds([sawmill], { ...stored, sawmill: { level: 20, startedAt: 0, endsAt: 1 } }, [], content, beyond), none);
+  });
+});
+
+describe('the resource buildings past level 10 in the game (618)', () => {
+  const { call, db, signUp } = useServer({ SETTLEMENT: 'on', FORTRESS: 'on' });
+  let cookie;
+  let id;
+  beforeEach(async () => {
+    ({ cookie } = await signUp('drwal'));
+    await call('POST', '/api/character', { cookie, body: { name: 'Drwal', classId: 'warrior', appearance: 'male' } });
+    const database = await db();
+    ({ id } = await database.prepare('SELECT id FROM characters').first());
+    await database
+      .prepare('UPDATE characters SET level = 90, class_level = 90, gold = 500000, resources = ? WHERE id = ?')
+      .bind(JSON.stringify({ wood: 50000, stone: 50000, 'iron-ore': 50000 }), id)
+      .run();
+    for (const one of [...campBuildings, content.camp]) {
+      await database.prepare('INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) VALUES (?, ?, ?, 0, 1)').bind(id, one.id, one.maxLevel).run();
+    }
+  });
+  const sawmill = async () => (await call('GET', '/api/character', { cookie })).data.character.camp.buildings.find((one) => one.id === 'sawmill');
+  const build = () => call('POST', '/api/camp/build', { cookie, body: { buildingId: 'sawmill' } });
+
+  test('at the camp\'s top the Tartak says it goes on in the Warownia; once the Warownia stands it builds level 11 for its cost', async () => {
+    const before = await sawmill();
+    assert.deepEqual([before.level, before.maxLevel, before.next], [10, 10, null]);
+    assert.equal(before.beyond, content.buildingsById.sawmill.beyond.hint);
+    assert.equal((await build()).data.error.code, 'max_level');
+    await (await db()).prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) VALUES (?, 'fortress', 1, 0, 1)").bind(id).run();
+    const after = await sawmill();
+    assert.deepEqual([after.maxLevel, after.next.level, after.beyond], [20, 11, null]);
+    assert.deepEqual(after.next.cost, upgradeCost(content.buildingsById.sawmill, 11));
+    const gold = (await (await db()).prepare('SELECT gold FROM characters WHERE id = ?').bind(id).first()).gold;
+    const built = await build();
+    assert.equal(built.status, 201, JSON.stringify(built.data).slice(0, 300));
+    const row = await (await db()).prepare("SELECT level FROM buildings WHERE character_id = ? AND building_id = 'sawmill'").bind(id).first();
+    assert.equal(row.level, 11);
+    assert.equal((await (await db()).prepare('SELECT gold FROM characters WHERE id = ?').bind(id).first()).gold, gold - upgradeCost(content.buildingsById.sawmill, 11).gold);
+    // At 20 it stands at its top.
+    await (await db()).prepare("UPDATE buildings SET level = 20, ends_at = 1 WHERE character_id = ? AND building_id = 'sawmill'").bind(id).run();
+    const top = await sawmill();
+    assert.deepEqual([top.level, top.next], [20, null]);
+    assert.equal((await build()).data.error.code, 'max_level');
   });
 });

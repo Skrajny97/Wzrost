@@ -13,6 +13,18 @@
       "name": { "type": "string", "minLength": 1 },
       "description": { "type": "string", "minLength": 1 },
       "maxLevel": { "type": "integer", "minimum": 1 },
+      "beyond": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["maxLevel", "goldGrowth", "minutesGrowth", "hint"],
+        "description": "Poziomy ponad maxLevel, gdy Obóz stał się Warownią (autor: „618.1 A, 618.2 A, 618.3 B albo nawet trochę lżej niż B”): do maxLevel tego obiektu. Efekt rośnie jak dotąd o perLevel na poziom; złoto za poziom n to złoto maxLevel budynku razy goldGrowth^(n − maxLevel), zasoby jak za maxLevel, czas jak za maxLevel razy minutesGrowth^(n − maxLevel). hint: dopisek na ekranie budynku, gdy ma najwyższy poziom Obozu, a Warowni jeszcze nie ma.",
+        "properties": {
+          "maxLevel": { "type": "integer", "minimum": 2 },
+          "goldGrowth": { "type": "number", "minimum": 1 },
+          "minutesGrowth": { "type": "number", "minimum": 1 },
+          "hint": { "type": "string", "minLength": 1 }
+        }
+      },
       "settlement": { "type": "boolean", "description": "Budynek tylko tam, gdzie działa Osada (SETTLEMENT): bez niej nie ma go w obozie ani w Encyklopedii." },
       "fortress": { "type": "boolean", "description": "Budynek Warowni: tylko tam, gdzie działa Warownia (FORTRESS), i dopiero po przemianie Obozu w Warownię (camp.json: fortress)." },
       "gearSets": {

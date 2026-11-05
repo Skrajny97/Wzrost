@@ -15,6 +15,12 @@ import { xpPerHour } from './progression.js';
 // The transformation as a building, or null where the data has none.
 export const fortressOf = (content) => content.camp?.fortress ?? null;
 
+// The highest level a building can reach now: its maxLevel, or for the
+// resource buildings that go on in the Warownia (beyond; the author's 618:
+// "rozwijania budynków od zasobów do 20ego w Warowni"), beyond.maxLevel
+// once the camp has become a Warownia.
+export const buildingTop = (building, stored, now, content) => (building.beyond && fortressStands(stored, now, content) ? building.beyond.maxLevel : building.maxLevel);
+
 // Whether the transformation has ended by `now`.
 export function fortressStands(stored, now, content) {
   const fortress = fortressOf(content);

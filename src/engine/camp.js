@@ -26,8 +26,15 @@ export function construction(stored, now) {
 }
 
 // What reaching `level` costs: { gold, wood, … }. Each part counts from its
-// own level on, so the first levels take gold alone.
+// own level on, so the first levels take gold alone. Past its maxLevel, in
+// the Warownia (beyond; the author's 618): the resources of the maxLevel
+// and its gold growing by beyond.goldGrowth a level.
 export function upgradeCost(building, level) {
+  const { beyond, maxLevel } = building;
+  if (beyond && level > maxLevel) {
+    const top = upgradeCost(building, maxLevel);
+    return { ...top, gold: Math.round((top.gold ?? 0) * beyond.goldGrowth ** (level - maxLevel)) };
+  }
   const cost = {};
   for (const part of building.costs) {
     const from = part.fromLevel ?? 1;
@@ -37,8 +44,11 @@ export function upgradeCost(building, level) {
 }
 
 // How long reaching `level` takes: the building's own list, level by level,
-// or base × growth^(level − 1).
+// or base × growth^(level − 1); past its maxLevel (beyond), the maxLevel's
+// time growing by beyond.minutesGrowth a level.
 export function upgradeMinutes(building, level) {
+  const { beyond, maxLevel } = building;
+  if (beyond && level > maxLevel) return Math.max(1, Math.round(upgradeMinutes(building, maxLevel) * beyond.minutesGrowth ** (level - maxLevel)));
   const { levels, base, growth } = building.minutes;
   return Math.max(1, Math.round(levels ? levels[level - 1] : base * growth ** (level - 1)));
 }

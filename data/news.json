@@ -80,6 +80,11 @@
       "id": "0.1.53",
       "title": "Wersja 0.1.53: Próby Gildii co dzień",
       "body": "- Prób Gildii nie trzeba już brać: wszystkie z tablicy liczą się naraz, od chwili, gdy się pojawią.\n- W poniedziałek na tablicy są 4 próby, a co dzień dochodzą 2 nowe.\n- Na pasek gildii wchodzą najwyżej 2 Twoje próby za każdy dzień tygodnia. Wykonane ponad to wejdą w kolejnych dniach.\n- Pasek ma 6 progów, a dwa ostatnie dają większe skrzynie.\n- W tym tygodniu pasek liczy wszystkie wykonane próby, bez limitu dnia."
+    },
+    {
+      "id": "0.1.55",
+      "title": "Wersja 0.1.55: budynki zasobów do 20. poziomu",
+      "body": "- W Warowni Tartak, Kamieniołom, Kopalnię i Staw Midasa rozbudujesz do 20. poziomu.\n- Każdy poziom dodaje tyle samo co dotąd, więc na 20. poziomie budynek daje dwa razy więcej niż na 10., a magazyn mieści 40 godzin produkcji.\n- Na 20. poziomie budynek dostaje nowy wygląd.\n- Poziomy 11–20 kosztują tyle zasobów co 10., a złota i czasu z każdym poziomem trochę więcej."
     }
   ]
 }
