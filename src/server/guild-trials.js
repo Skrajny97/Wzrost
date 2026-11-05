@@ -150,10 +150,13 @@ const boardRow = (db, guildId, week) => db.prepare('SELECT trials, active, joine
 // The guild's board of the week: the one kept, or one drawn now from the
 // guild and the week, with the members whose accounts were in the game in
 // the last activeDays days counted, at least one, and the shares of those
-// who joined since (joined; the author's 615 A). Of two requests at once,
-// the first one's stays. A new board takes the boards, trials and chests of
-// the weeks before the last one away, of every guild: nothing of them shows
-// or opens any more (as the Bestia Gildii's beasts).
+// who joined since (joined; the author's 615 A). The ids of the members it
+// counts are kept with it (`counted`), so one of them who leaves and joins
+// again this week adds no second share (acceptGuildInvite in guilds.js). Of
+// two requests at once, the first one's stays. A new board takes the
+// boards, trials and chests of the weeks before the last one away, of every
+// guild: nothing of them shows or opens any more (as the Bestia Gildii's
+// beasts).
 async function boardOf(db, guildId, now) {
   const { current, previous } = weeksAround(now);
   let row = await boardRow(db, guildId, current.key).first();
@@ -164,8 +167,8 @@ async function boardOf(db, guildId, now) {
       db.prepare('DELETE FROM guild_trial_chests WHERE week < ?').bind(previous.key),
       db
         .prepare(
-          `INSERT OR IGNORE INTO guild_trial_boards (guild_id, week, trials, active, created_at)
-           SELECT ?, ?, ?, MAX(1, COUNT(*)), ?
+          `INSERT OR IGNORE INTO guild_trial_boards (guild_id, week, trials, active, counted, created_at)
+           SELECT ?, ?, ?, MAX(1, COUNT(*)), json_group_array(m.character_id), ?
            FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
            WHERE m.guild_id = ? AND u.seen_at >= ?`,
         )
