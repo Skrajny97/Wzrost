@@ -200,6 +200,11 @@
       "id": "0.1.78",
       "title": "Wersja 0.1.78: zrzut ekranu w zgłoszeniu",
       "body": "- W „Zgłoś błąd” w Ustawieniach można dołączyć zrzut ekranu z galerii telefonu. Zobaczy go tylko autor gry."
+    },
+    {
+      "id": "0.1.79",
+      "title": "Wersja 0.1.79: poprawki",
+      "body": "- Objaśnienia pominięte przełącznikiem „Pomijaj objaśnienia narratora” nie wracają już po ponownym otwarciu gry.\n- Stary raport z oprawiania kamienia pokazuje w karcie przedmiotu, co daje kamień."
     }
 ]
 }

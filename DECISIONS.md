@@ -3034,6 +3034,19 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.79 (6.11.2026)
+
+Dwie poprawki z przeglądu kodu wersji 0.1.68–0.1.77: zob. „Przegląd kodu po 0.1.77 (663)”.
+
+## Przegląd kodu po 0.1.77 (663, 6.11.2026, od 0.1.79)
+
+Autor: „663 tak” (przegląd kodu po dzisiejszych wersjach: błędy i zbędny kod, poprawki z testami, do gry). Przegląd objął cały kod zmieniony od 0.1.68 do 0.1.77: przełącznik objaśnień, towarzyszy i najemnika w drodze, biżuterię towarzyszy z migracją 0088, Zbieracza Systemu, omdlenia, okno Rankingu, powiadomienia, kamień w karcie przedmiotu, miejsca chowańców, zakładki Gildii i style.
+
+1. **Dwie części objaśnień pominięte naraz.** Przełącznik „Pomijaj objaśnienia narratora” pomija części jedna po drugiej, bez stuknięcia pomiędzy, więc druga prośba mogła dojść do serwera, zanim zapisała się pierwsza. Serwer zapisywał wtedy listę przeczytanych kwestii z chwili rozpoczęcia prośby, a późniejszy zapis gubił część zapisaną przez wcześniejszy. Ta część wracała po ponownym otwarciu gry: z komunikatem jeszcze raz, a przy wyłączonym przełączniku jako całe objaśnienie. Teraz serwer dopisuje kwestie części jednym poleceniem do listy przeczytanych w chwili zapisu, w kolejności z danych. Sprawdzone: trzy pominięcia wysłane w tej samej chwili zostają wszystkie przeczytane (dotąd zawsze ginęło jedno).
+2. **Stary raport z oprawiania kamienia.** Raport ze Szlifierni zapisuje kartę przedmiotu z chwili oprawienia. Raport sprzed 0.1.77 miał kamień bez wiersza i objaśnienia, które karta czyta od 0.1.77, więc otwarty z Dziennika, gdy przedmiotu już nie ma w tej postaci (sprzedany, ulepszony, z innym kamieniem), pokazywał „undefined”. Teraz serwer przy otwarciu raportu opisuje ten kamień na nowo, tak jak nowa karta.
+3. **Sprawdzone i w porządku** (bez zmian): migracja 0088 na pustych, błędnych i niepełnych danych towarzyszy; zapisy Zbieracza Systemu i jego kupno; utrata wszystkiego przy omdleniu, zgodnie z decyzją; zgodność pól między stroną a serwerem; okno Rankingu; zakładki Gildii od 1 do 7; brak stylów w atrybutach i losowości w silniku gry.
+4. **Sprawdzone:** wszystkie testy (1262), w tym dwa nowe: pominięcia naraz (`test/game.test.js`) i stary raport z oprawiania (`test/mining.test.js`).
+
 ## Wersja 0.1.78 (5.11.2026)
 
 Do zgłoszenia błędu można dołączyć zrzut ekranu: zob. „Zgłoś błąd: zrzut ekranu”.
