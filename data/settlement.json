@@ -469,7 +469,7 @@
       "Szuka brata, który poszedł w głąb puszczy i nie wrócił.",
       "Słyszy, że w puszczy czekają skarby, i chce sprawdzić, ile w tym prawdy."
     ],
-    "relation": { "perHour": 4, "talk": 10, "bonus": 0.02 },
+    "relation": { "perHour": 4, "talk": 10, "bonus": 0.02, "standings": ["Dystans", "Koleżeństwo", "Zaufanie", "Przyjaźń", "Braterstwo broni"] },
     "talks": {
       "stories": [
         [
