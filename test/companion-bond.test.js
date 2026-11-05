@@ -30,11 +30,17 @@ describe('the relation with a companion in the engine', () => {
     assert.equal(companionAfterHunt(candidate, { xp: 10, fainted: false }, 25, content).relation, undefined);
   });
 
-  test('its standings are the residents\', and each above the first adds damage and HP in a fight', () => {
+  test("its standings are the residents' points under its own names, and each above the first adds damage and HP in a fight", () => {
     const base = companionCombatant({ ...candidate, relation: 0 }, {}, content);
+    // Names of their own, none a resident's or a Bractwo's (5.11.2026).
+    assert.equal(tuning.relation.standings.length, standings.length);
+    for (const name of tuning.relation.standings) assert.ok(!standings.some((standing) => gendered(name, 'female') === standing.name || gendered(name, 'male') === standing.name), name);
     standings.forEach((standing, index) => {
       const companion = { ...candidate, relation: standing.points };
-      assert.equal(companionStanding(companion, content).name, standing.name);
+      const seen = companionStanding(companion, content);
+      assert.equal(seen.name, gendered(tuning.relation.standings[index], candidate.appearance));
+      if (index > 0) assert.equal(companionStanding({ ...candidate, relation: standing.points - 1 }, content).next.name, seen.name);
+      assert.equal(seen.next?.points ?? null, standings[index + 1]?.points ?? null);
       const unit = companionCombatant(companion, {}, content);
       const bond = index * tuning.relation.bonus;
       assert.ok(Math.abs((unit.damageBonus ?? 0) - ((base.damageBonus ?? 0) + bond)) < 1e-9, standing.id);
@@ -184,7 +190,9 @@ describe('talks with a companion through the API', () => {
     const [first] = (await settlement()).companions.candidates;
     await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: first.id } });
     let hired = (await settlement()).companions.hired[0];
-    assert.deepEqual([hired.bond.standing, hired.bond.points, hired.bond.told, hired.bond.talked], [standings[0].name, 0, [], false]);
+    // The companions' own names of the standings, in its form (5.11.2026).
+    const named = (index) => gendered(tuning.relation.standings[index], first.appearance);
+    assert.deepEqual([hired.bond.standing, hired.bond.points, hired.bond.told, hired.bond.talked], [named(0), 0, [], false]);
     const talked = await call('POST', '/api/settlement/talk', { cookie, body: { companionId: first.id } });
     assert.equal(talked.status, 200, JSON.stringify(talked.data));
     assert.equal(talked.data.talk.story, true);
@@ -200,6 +208,6 @@ describe('talks with a companion through the API', () => {
     assert.equal((await call('POST', '/api/hunts/claim', { cookie })).status, 200);
     hired = (await settlement()).companions.hired[0];
     assert.equal(hired.bond.points, tuning.relation.talk + bondPoints(5, content));
-    assert.deepEqual(hired.bond.next, { name: standings[1].name, points: standings[1].points });
+    assert.deepEqual(hired.bond.next, { name: named(1), points: standings[1].points });
   });
 });

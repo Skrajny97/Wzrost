@@ -115,14 +115,18 @@ export function traitBonuses(companion, content) {
   return total;
 }
 
-// The standing of the relation with a companion (296 A: "stopnie są jak u
-// mieszkańców (od Obcego do Przyjaciela)"): its index and name, the points
-// and the next standing.
+// The standing of the relation with a companion: the residents' standings
+// and their points (296 A: "stopnie są jak u mieszkańców"), under the
+// companions' own names (the author, 5.11.2026: "stopnie relacji
+// towarzyszy powinny brzmieć inaczej niż w Bractwach"), in the companion's
+// form; its index and name, the points and the next standing.
 export function companionStanding(companion, content) {
   const { standings } = content.settlement;
+  const names = tuning(content).relation.standings;
+  const named = (index) => ({ ...standings[index], name: gendered(names[index] ?? standings[index].name, companion.appearance) });
   const points = companion.relation ?? 0;
   const index = Math.max(0, standings.findLastIndex((standing) => standing.points <= points));
-  return { index, name: standings[index].name, points, next: standings[index + 1] ?? null };
+  return { index, name: named(index).name, points, next: index + 1 < standings.length ? named(index + 1) : null };
 }
 
 // What the relation gives in a fight (296 A: "każdy stopień daje mu w walce
