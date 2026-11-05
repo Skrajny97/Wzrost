@@ -7,7 +7,7 @@
 // animations stills the light and the pet (.calm in styles.css). A name in
 // its frame's colour is ui.js framedName.
 
-import { cosmeticArt, portraitPerch, portraitSprite, SPRITES } from './art.js';
+import { cosmeticArt, portraitPerch, portraitPetSpot, portraitSprite, SPRITES } from './art.js';
 import { h } from './dom.js';
 import { portrait } from './portraits.js';
 import { state } from './state.js';
@@ -57,7 +57,7 @@ export function portraitLayers(look, { frame = null, background = null, aura = n
   const lit = cosmeticOf(aura)?.aura;
   if (figure && lit) light(art, figure, lit);
   const kept = cosmeticOf(pet)?.pet;
-  if (kept) art.append(petLayer(kept.portrait, look));
+  if (kept) art.append(petLayer(kept.portrait, look, pet));
   const framed = cosmeticOf(frame);
   const layer = framed && frameLayer(framed);
   if (!layer) return [art];
@@ -147,13 +147,16 @@ export function light(art, figure, { glow, spark, sparks }) {
 // the figure is drawn (.sprite--portrait), so the pet keeps its place on a
 // portrait of any size and in a frame's window. Its frames play in steps,
 // as the scenes' sheets do; with the animations off it stands on the first.
-function petLayer({ file, size, frames, fps, x, y, anchor }, look) {
+function petLayer({ file, size, frames, fps, x, y, anchor }, look, petId) {
   const { width, height } = SPRITES.portraits;
   const [fromX, fromY] = anchor === 'shoulder' ? portraitPerch(look.classId, look.appearance, look.evolution) : [0, 0];
+  // Some portraits hold something where the pet would be; there it has a
+  // place of its own (art.js petSpots).
+  const [left, top] = portraitPetSpot(petId, look.classId, look.appearance, look.evolution) ?? [fromX + x, fromY + y];
   const pet = h('span', { class: 'portrait-pet' });
   Object.assign(pet.style, {
-    left: `${((fromX + x) / width) * 100}%`,
-    top: `${((fromY + y) / height) * 100}%`,
+    left: `${(left / width) * 100}%`,
+    top: `${(top / height) * 100}%`,
     width: `${(size / width) * 100}%`,
     height: `${(size / height) * 100}%`,
   });

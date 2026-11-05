@@ -103,6 +103,23 @@ export const SPRITES = {
       'high-priest-female': [34, 35], 'high-priest-male': [32, 35], 'kingslayer-female': [37, 33], 'kingslayer-male': [34, 30],
       'necromancer-female': [30, 38], 'necromancer-male': [37, 32], 'phantom-female': [36, 35], 'phantom-male': [39, 42],
     },
+    // `petSpots`: a pet's own place on a portrait where its usual one would
+    // cover what the figure holds at the shoulder (a falcon, a staff's head,
+    // a bow, arrows in a quiver): the top left corner of its frame in the
+    // portrait's pixels, picked by eye (the author on the Łowca: "2 chowańce
+    // są źle ustawione przy Łowcy"). The wisp floats there, mostly behind the
+    // head; the raven perches beside the Łowca's head, not on its hair.
+    petSpots: {
+      raven: { 'hunter-female': [5, 13], 'hunter-male': [9, 12] },
+      wisp: {
+        'arcanist-female': [-3, 52], 'arcanist-male': [-3, 52], 'archmage-female': [-1, 11], 'archmage-male': [-1, 11],
+        'druid-female': [64, 4], 'druid-male': [2, 8], 'elementalist-female': [1, 14], 'healer-female': [-2, 16], 'healer-male': [-3, 14],
+        'high-priest-female': [0, 15], 'hunter-female': [0, 16], 'hunter-male': [2, 14], 'ice-lord-female': [-1, 13], 'ice-lord-male': [-1, 9],
+        'inquisitor-female': [-2, 11], 'marksman-female': [-3, 40], 'marksman-male': [-3, -4], 'master-hunter-male': [0, 9],
+        'miracle-worker-female': [-1, 15], 'miracle-worker-male': [-3, 14], 'necromancer-female': [-3, 18], 'night-dancer-female': [1, 17],
+        'phantom-male': [2, 8], 'sniper-male': [-3, 52],
+      },
+    },
     toned: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
     tonedEvolutions: [
       'guardian-female', 'guardian-male', 'sniper-female', 'sniper-male', 'ice-lord-female', 'ice-lord-male', 'priest-female', 'priest-male', 'assassin-female', 'assassin-male',
@@ -649,6 +666,13 @@ export function portraitSprite(classId, appearance, { bust = false, skin, evolut
 // class's, or, for a look without one, about where most shoulders are.
 export function portraitPerch(classId, appearance, evolution) {
   return SPRITES.portraits.perches[lookId('portraits', classId, appearance, evolution)] ?? [34, 34];
+}
+
+// A pet's own place on the portrait of a look (SPRITES.portraits.petSpots):
+// the top left corner of its frame in the portrait's pixels, or null where
+// the pet keeps its usual place.
+export function portraitPetSpot(petId, classId, appearance, evolution) {
+  return SPRITES.portraits.petSpots[petId]?.[lookId('portraits', classId, appearance, evolution)] ?? null;
 }
 
 // The sheet of the character walking in its look and skin tone, or its

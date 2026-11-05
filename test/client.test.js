@@ -259,6 +259,19 @@ test('every sprite on the list has its file at its size, and every class has its
   for (const [id, [x, y]] of Object.entries(SPRITES.portraits.perches)) {
     assert.ok(x > 16 && x < (SPRITES.portraits.faces[id] ?? SPRITES.portraits.width / 2) && y > 16 && y < SPRITES.portraits.height / 2, `perches: ${id} at ${x}, ${y}`);
   }
+  // A pet's own place on a portrait (petSpots) is for a pet of the Sklep
+  // Systemu on a portrait the game has, its 32-pixel frame within the
+  // portrait but for its empty edge (3 pixels across, 6 at the top).
+  const pets = data('cosmetics').items.filter((item) => item.kind === 'pet');
+  for (const [petId, spots] of Object.entries(SPRITES.portraits.petSpots)) {
+    const pet = pets.find((item) => item.id === petId);
+    assert.ok(pet, `petSpots: no pet ${petId}`);
+    const size = pet.pet.portrait.size;
+    for (const [id, [x, y]] of Object.entries(spots)) {
+      assert.ok(SPRITES.portraits.ids.includes(id), `petSpots: no portrait ${id}`);
+      assert.ok(x >= -3 && x <= SPRITES.portraits.width - size + 3 && y >= -6 && y <= SPRITES.portraits.height - size, `petSpots: ${petId} on ${id} at ${x}, ${y}`);
+    }
+  }
 });
 
 // The Walka scene's riding (scenes.js ride): each mount's trot is a row of
