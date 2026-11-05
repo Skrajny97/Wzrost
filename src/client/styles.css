@@ -14384,3 +14384,57 @@ a.profession-square:active {
 .build-stop {
   align-self: flex-start;
 }
+
+/* The bottom bars on narrow phones (tools/layout-check.cjs, 5.11.2026): a
+   long label ("Społeczność", "Umiejętności" at 320 px) gets the room it
+   needs instead of being cut, and the other tabs share the rest; below
+   310 px they cut again rather than push the page wider. */
+.nav--main,
+.nav--character {
+  grid-auto-columns: minmax(min-content, 1fr);
+}
+
+@media (max-width: 309px) {
+  .nav--main,
+  .nav--character {
+    grid-auto-columns: minmax(0, 1fr);
+  }
+}
+
+/* The camp's materials on narrow phones: less padding, and a long name
+   ("Ruda żelaza") on two lines instead of being cut. */
+@media (max-width: 400px) {
+  .camp-material {
+    column-gap: 4px;
+    padding: 4px 5px;
+  }
+}
+
+@media (max-width: 374px) {
+  .camp-material span {
+    line-height: 1.1;
+    white-space: normal;
+  }
+}
+
+/* A locked entry of the computer's menu: its hint ("zablokowane", "poz.
+   kl. 150") under the name instead of beside it, so the name is not cut
+   ("Rdzeń" in the narrow menu column). */
+:root[data-layout='desktop'] #nav-main > .nav-item--locked,
+:root[data-layout='desktop'] #nav-character .nav-item--locked {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-content: center;
+  column-gap: 14px;
+  row-gap: 1px;
+}
+
+:root[data-layout='desktop'] #nav-main > .nav-item--locked .nav-icon,
+:root[data-layout='desktop'] #nav-character .nav-item--locked .nav-icon {
+  grid-row: span 2;
+}
+
+:root[data-layout='desktop'] #nav-main > .nav-item--locked .nav-hint,
+:root[data-layout='desktop'] #nav-character .nav-item--locked .nav-hint {
+  margin-left: 0;
+}

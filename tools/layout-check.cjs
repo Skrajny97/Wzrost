@@ -1,8 +1,9 @@
 // The game's screens on many screen sizes (the author, 5.11.2026: „robić
 // solidnie gui adaptation na przyszlosc na rozne rozdzielczości”): phones
 // from 320 to 430 px wide, a tablet and computers, with a character of big
-// numbers (level 146, almost a million gold), a long name and orders on the
-// Stół rozbiórki's queue. On each screen, and on the tabs TABS opens, it
+// numbers (level 146, almost a million gold, six-digit camp resources), a
+// long name, orders on the Stół rozbiórki's queue and a guild of its own
+// with a long name. On each screen, and on the tabs TABS opens, it
 // looks for a page wider than the screen, text out of its frame
 // and elements past the right edge, and lists text cut with "…" for a look.
 // Run against a dev server (npm run dev) from the repo folder whose local D1
@@ -42,15 +43,26 @@ const SCREENS = [
   '#/osada',
   '#/osada/board',
   '#/osada/tavern',
+  '#/osada/tavern/companions',
+  '#/osada/tavern/mercenaries',
+  '#/osada/trial-hall',
   '#/spolecznosc',
+  '#/spolecznosc/ranking',
   '#/gildia',
+  '#/gildia/seat',
+  '#/gildia/expedition',
+  '#/gildia/beast',
+  '#/gildia/trials',
+  '#/gildia/requests',
+  '#/gildia/exchange',
   '#/sklep',
   '#/encyklopedia',
   '#/dziennik',
 ];
 // Tabs opened on a screen after its first look, by the start of their
-// names: the Stół rozbiórki's queue, with "Usuń z kolejki" by each order.
-const TABS = { '#/oboz/craft-table': ['Kolejka'] };
+// names: the Stół rozbiórki's queue, with "Usuń z kolejki" by each order,
+// the Tablica zleceń's Poszukiwani and the Ranking's guilds.
+const TABS = { '#/oboz/craft-table': ['Kolejka'], '#/osada/board': ['Poszukiwani'], '#/spolecznosc/ranking': ['Gildie'] };
 
 // What is wrong on the screen now, by the page itself.
 function audit() {
@@ -120,6 +132,9 @@ async function main() {
   await api('POST', '/api/auth/login', { identifier: login, password: 'pierwszekroki1' });
   if ((await api('POST', '/api/character', { name, classId: 'warrior', appearance: 'female' })) >= 400) throw new Error('Nie powstała postać.');
   sql(`UPDATE characters SET level = 146, class_level = 99, gold = 987654, system_points = 12345, time_points = 9876, tutorial = NULL WHERE name = '${name}'`);
+  sql(`UPDATE characters SET resources = '${JSON.stringify({ wood: 123456, stone: 98765, 'iron-ore': 54321 })}' WHERE name = '${name}'`);
+  // A guild of its own, with a long name, for the Gildia's tabs.
+  if ((await api('POST', '/api/guild/found', { name: `Bractwo Żelaznych ${stamp}`, tag: `W${stamp.slice(-3).toUpperCase()}` })) >= 400) throw new Error('Nie powstała gildia.');
   // The Stół rozbiórki built, with long names and big numbers: three orders
   // in its queue, one at work, and a stack left on the Materiały tab.
   const materials = { 'tick-shell:common': 12345, 'black-stork-feather:rare': 9876, 'night-heron-plume:mythic': 1234, 'goblin-trinket:epic': 987 };
@@ -154,7 +169,14 @@ async function main() {
       await view.waitForTimeout(1500);
       await check(screen);
       for (const tab of TABS[screen] ?? []) {
-        await view.locator('button.segmented-option', { hasText: tab }).first().click();
+        // A tab the screen does not show (as Poszukiwani with no posters)
+        // is named and skipped.
+        const button = view.locator('button.segmented-option, [role="tab"]', { hasText: tab }).first();
+        if ((await button.count()) === 0) {
+          console.log(`  – ${size.name} ${screen}: brak zakładki „${tab}”`);
+          continue;
+        }
+        await button.click();
         await view.waitForTimeout(500);
         await check(`${screen} › ${tab}`);
       }
