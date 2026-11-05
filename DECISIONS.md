@@ -3034,6 +3034,29 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.67 (5.11.2026)
+
+Towarzysze walczą w walce zdarzenia na końcu wyprawy: zob. „Towarzysze w walkach zdarzeń”. Całe napisy na wąskich telefonach i w menu na komputerze: zob. „Ucięte napisy na wąskich telefonach i w menu na komputerze”.
+
+## Towarzysze w walkach zdarzeń (5.11.2026, w grze od 0.1.67)
+
+Autor: „Gdzie sprawdza się czy towarzysz idzie ze mną, dodaj przycisk, bo cos nie poszedl ze mną na wyprawe”, „jest przycisk, ale nie idzie na wyprawe jakis blad i nie tylko ja tak mam”, „a nieee nie walczył w zdarzeniu to taki błąd”. Dotąd postać walczyła ze stworami zdarzenia zawsze sama (zob. „Walki w pojedynkę (438.3 A)”).
+
+1. **Kto walczy.** Towarzysze, którzy poszli na wyprawę i nie padli po drodze, walczą w walce zdarzenia obok postaci, każdy z HP z końca wyprawy (`resolveEvent` w `src/engine/events.js`). Ten, który padnie w tej walce, ma w raporcie zdanie jak na wyprawie („pada bez sił…”), a po wyprawie jest ranny jak po każdym upadku.
+2. **Siła stworów (brakujący szczegół).** Z towarzyszami stwory zdarzenia rosną jak na wyprawie. Postać sama ma jak dotąd połowę wzrostu późnej gry (438.3 A).
+3. **XP (brakujący szczegół).** Każdy walczący towarzysz bierze swoją część XP, jak na wyprawie (`xpCost`).
+4. **Drużyna.** Wyprawa Drużyny idzie bez towarzyszy, więc i walki jej zdarzeń.
+5. **Gdzie widać, czy towarzysz idzie.** Karta towarzysza w Kwaterach ma przycisk „Zostań w kwaterze” albo „Idź na wyprawy”, a Opcje wyprawy pokazują, kto idzie.
+
+## Ucięte napisy na wąskich telefonach i w menu na komputerze (5.11.2026, w grze od 0.1.67)
+
+`tools/layout-check.cjs` pokazał trzy napisy ucięte wielokropkiem.
+
+1. **Dolne paski.** Przy 320 px „Społeczność” i „Umiejętności” były ucięte, bo każda zakładka miała równą szerokość. Teraz długa nazwa dostaje tyle miejsca, ile potrzebuje, a reszta dzieli się po równo. Poniżej 310 px paski tną jak dawniej, żeby strona nie była szersza od ekranu.
+2. **Zasoby w Obozie.** „Ruda żelaza” przy 320 i 360 px: mniejsze odstępy w ramkach, a przy 374 px i mniej długa nazwa w dwóch wierszach.
+3. **Menu na komputerze.** Zablokowana pozycja („Rdzeń”) była ucięta do „Rd…” obok dopisku „zablokowane”. Teraz dopisek stoi pod nazwą.
+4. **Sprawdzanie układu** obejmuje 26 ekranów na 9 rozmiarach: postać ma też gildię z długą nazwą i sześciocyfrowe zasoby obozu, a sprawdzane są zakładki Gildii, Karczmy, Sala prób, Poszukiwani i ranking gildii.
+
 ## Wersja 0.1.66 (5.11.2026)
 
 Usuwanie zleceń z kolejki Stołu rozbiórki, bez kary: zob. „Stół rozbiórki: usuwanie z kolejki”. Sława za strażników Wyprawy Gildii (638 A): zob. „Wyprawa Gildii (621 A)”, punkt 13, i „Ranking gildii: Sława tygodnia”.
@@ -5324,7 +5347,7 @@ Autor (432 A): „na pierwszych poziomach do 50ego może być łatwiej, ale pozn
     - **Najlepiej wyposażony gracz** w najnowszej krainie, jaką otwiera mu poziom klasy, mdleje na 0–9% wypraw.
 3. **Gracz bez towarzyszy (438.2 A).** Od ok. 70. poziomu najnowsze krainy są dla gracza bez towarzyszy za trudne. Karta każdej krainy od 66. poziomu, czyli od Wierzbowych Kęp, mówi: „Od tej krainy stwory są bardzo silne. Idź tu z dwoma towarzyszami z Karczmy.” Tekst i próg są w `companionsAdvice` w `data/balance.json`.
 4. **Walki w pojedynkę (438.3 A).**
-    - Gdy postać walczy sama, stwory mają tylko połowę wzrostu z `lateGame` i `endGame` (`soloGrowth` 0,5). Dotyczy to Wieży Solo i walk w zdarzeniach.
+    - Gdy postać walczy sama, stwory mają tylko połowę wzrostu z `lateGame` i `endGame` (`soloGrowth` 0,5). Dotyczy to Wieży Solo i walk w zdarzeniach (od 0.1.67 tylko bez towarzyszy, zob. „Towarzysze w walkach zdarzeń”).
     - Brakujący szczegół: atak na Bestię Gildii to też walka w pojedynkę, więc działa tak samo.
     - Wyprawy bez towarzyszy mają pełną krzywą (438.2 A).
 5. **Podgląd umiejętności** (`src/engine/skill-demo.js`) pokazuje umiejętność na stworach bez wzrostu późnej gry. Postać w zwykłym ekwipunku i bez towarzyszy nie wytrzymałaby tam dość długo.

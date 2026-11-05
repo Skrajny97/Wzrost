@@ -140,6 +140,11 @@
       "id": "0.1.66",
       "title": "Wersja 0.1.66: kolejka Stołu rozbiórki i Sława z Wyprawy",
       "body": "- Na Stole rozbiórki każde zlecenie w kolejce ma „Usuń z kolejki”, a cała kolejka „Usuń wszystkie”.\n- Bez kary: materiały i przedmioty wracają, także ze zlecenia, które właśnie trwa.\n- Zadania i Próby Gildii oddają to, co policzyły z usuniętych zleceń.\n- Pokonani strażnicy Wyprawy Gildii dają gildii Sławę w Rankingu: 20 punktów za każdego i 50 za siódmego, razem do 170 na tydzień. Liczą się też strażnicy pokonani w tym tygodniu przed tą wersją."
+    },
+    {
+      "id": "0.1.67",
+      "title": "Wersja 0.1.67: towarzysze w zdarzeniach",
+      "body": "- Towarzysze, którzy poszli z Tobą na wyprawę, walczą też w walce zdarzenia na jej końcu.\n- Na wąskich telefonach napisy w dolnym pasku i nazwy zasobów w Obozie mieszczą się w całości. Na komputerze zablokowane pozycje menu nie są już ucięte."
     }
 ]
 }
