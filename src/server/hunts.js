@@ -751,6 +751,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
         seed: activity.seed,
         purse: row.gold,
         rumor,
+        // The companions who went fight the event's foes too (a trip goes
+        // without them).
+        companions: trip ? [] : (options.companions ?? []),
       },
       content,
     );

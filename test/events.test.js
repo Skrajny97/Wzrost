@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, encounterCombatants, eventCase, eventChance, eventFor, huntKills, playerCombatant, resolveEvent, simulateFight, simulateHunt } from '../src/engine/index.js';
+import { createRng, drawCandidates, encounterCombatants, eventCase, eventChance, eventFor, huntKills, playerCombatant, resolveEvent, simulateFight, simulateHunt } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -113,6 +113,35 @@ describe('events', () => {
     assert.deepEqual(left.event.option, { id: 'leave', label: 'Odejdź nieufnie', text: woman.options[2].outcome.text });
     assert.equal(left.event.fight, null);
     assert.equal(left.entries.at(-1).type, 'event');
+  });
+
+  test("the companions who went fight the event's foes beside the character, with the HP they ended with (5.11.2026)", () => {
+    const companions = drawCandidates({ character, seed: 'zdarzenie-towarzysze' }, Date.UTC(2026, 10, 5, 12), content).slice(0, 2);
+    const went = simulateHunt({ character, equipped, hp: 9999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed, companions }, content);
+    assert.equal(went.companions.length, 2);
+    // The first ended the exploration a little hurt, the second fell on the way.
+    const [first, second] = went.companions;
+    const hunt = { ...went, companions: [{ ...first, hpEnd: first.maxHp - 3 }, { ...second, hpEnd: 0, fainted: true }] };
+    const helped = resolveEvent({ hunt, event: woman, optionId: 'help', caseId: 'ambush', character, equipped, name: 'Mira', seed, companions }, content);
+    const fight = helped.fights.at(-1);
+    assert.deepEqual(fight.allies.map((ally) => ally.name), ['Mira', companions[0].name]);
+    const opening = fight.events.find((one) => one.target === fight.allies[1].id || one.actor === fight.allies[1].id);
+    assert.ok(opening, 'the companion takes part in the fight');
+    assert.equal(helped.companions.length, 2);
+    assert.ok(helped.companions[0].hpEnd <= first.maxHp - 3);
+    assert.deepEqual(helped.companions[1], hunt.companions[1]);
+    // Its share of the XP, as on the exploration.
+    const alone = resolveEvent({ hunt: { ...hunt, companions: undefined }, event: woman, optionId: 'help', caseId: 'ambush', character, equipped, name: 'Mira', seed }, content);
+    assert.equal(alone.fights.at(-1).allies.length, 1);
+    assert.equal(alone.companions, undefined);
+    // Late in the game the foes grow as on the exploration when a companion
+    // fights, and by half for a character alone (438.3 A).
+    const strong = typicalCharacter('warrior', 120, content);
+    const [mate] = drawCandidates({ character: strong.character, seed: 'zdarzenie-wysoko' }, Date.UTC(2026, 10, 5, 12), content);
+    const late = { ...base, hpEnd: 99999, companions: [{ id: mate.id, name: mate.name, hpEnd: 99999, maxHp: 99999, fainted: false }] };
+    const event = (withMate) =>
+      resolveEvent({ hunt: late, event: woman, optionId: 'help', caseId: 'ambush', character: strong.character, equipped: strong.equipped, name: 'Mira', seed, companions: withMate ? [mate] : [] }, content).fights.at(-1);
+    assert.ok(event(true).enemiesView[0].maxHp > event(false).enemiesView[0].maxHp);
   });
 
   test('"Pomóż jej sprawnie": the bandits ambush the character at its level and pay like people', () => {

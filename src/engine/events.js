@@ -24,6 +24,7 @@
 // may tell a further choice its own way while its options stay.
 
 import { simulateFight } from './combat.js';
+import { companionCombatant } from './companions.js';
 import { combatantView, playerCombatant } from './combatant.js';
 import { encounterCombatants } from './hunt.js';
 import { itemName, randomItem } from './items.js';
@@ -257,7 +258,7 @@ const resourceLoss = (lost, content) =>
 // rarities (told by its text, {item}); lost, the character faints (or, in a
 // safe place, only gets away) as after a lost fight on the way.
 export function resolveEvent(
-  { hunt, event, optionId, caseId = null, endingId = null, drafts = false, character, equipped, name, seed, purse = 0, rumor = null },
+  { hunt, event, optionId, caseId = null, endingId = null, drafts = false, character, equipped, name, seed, purse = 0, rumor = null, companions = [] },
   content,
 ) {
   // `optionId` is the option chosen, or the path of options to it when the
@@ -384,12 +385,28 @@ export function resolveEvent(
   }
 
   const texts = content.texts;
-  // The character fights an event's foes alone: they have only a share of
-  // the late and end game's growth (the author: 438.3 A).
-  const enemies = encounterCombatants({ members: outcome.foes.map((monsterId) => ({ monsterId, level: character.level })) }, content, { growth: content.balance.monsters.soloGrowth });
+  // The companions who went on the exploration and are still standing fight
+  // beside the character, each with the HP it ended the exploration with
+  // (the author, 5.11.2026: "nie walczył w zdarzeniu to taki błąd"). With
+  // them the foes grow as on the exploration; a character alone meets foes
+  // with only a share of the late and end game's growth (438.3 A).
+  const ended = new Map((hunt.companions ?? []).map((one) => [one.id, one]));
+  const mates = companions.flatMap((companion, index) => {
+    const end = ended.get(companion.id);
+    if (!end || end.fainted || end.hpEnd <= 0) return [];
+    return [{ id: companion.id, unit: companionCombatant(companion, { hp: end.hpEnd, area, id: `a${index + 1}` }, content) }];
+  });
+  const growth = mates.length > 0 ? {} : { growth: content.balance.monsters.soloGrowth };
+  const enemies = encounterCombatants({ members: outcome.foes.map((monsterId) => ({ monsterId, level: character.level })) }, content, growth);
   const player = playerCombatant({ character, equipped, hp: hunt.hpEnd, name, area }, content);
   const ally = { ...player, hp: hunt.hpEnd, ...(outcome.speedBonus && { speed: player.speed * (1 + outcome.speedBonus) }) };
-  const fight = simulateFight({ allies: [ally], enemies, rng, content, record: true, trait: area.trait, ambush: outcome.ambush === true });
+  const allies = [ally, ...mates.map((mate) => mate.unit)];
+  const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait, ambush: outcome.ambush === true });
+  const hpOf = (unit) => Math.max(0, fight.units.find((one) => one.id === unit.id).hp);
+  const companionsAfter = hunt.companions?.map((one) => {
+    const mate = mates.find((candidate) => candidate.id === one.id);
+    return mate ? { ...one, hpEnd: hpOf(mate.unit), fainted: hpOf(mate.unit) <= 0 } : one;
+  });
   const index = hunt.fights.length;
   const hpBefore = hunt.hpEnd;
   let hpNow = fight.units.find((unit) => unit.id === ally.id).hp;
@@ -409,12 +426,13 @@ export function resolveEvent(
     materials: {},
     chests: [],
     recovered: 0,
-    allies: [combatantView(ally, enemies[0].level, content)],
+    allies: allies.map((unit) => combatantView(unit, enemies[0].level, content)),
     enemiesView: enemies.map((enemy) => combatantView(enemy, ally.level, content)),
     events: fight.events,
   };
   const enemyList = enemies.map((enemy) => `${enemy.name} (poz. ${enemy.level})`).join(', ');
   const lines = [outcome.start.replace('{enemies}', enemyList)];
+  for (const mate of mates.filter((one) => hpOf(one.unit) <= 0)) lines.push(say(texts, 'companionDown', index, { name: mate.unit.name }));
   const items = [...hunt.items];
   let { result } = hunt;
 
@@ -432,7 +450,8 @@ export function resolveEvent(
     // What the win leaves besides: the offerings' silver, the leshy's gift.
     if (outcome.win?.gold) fightGold += goldOf(outcome.win.gold);
     const won = outcome.win?.itemRarities ? itemOf(outcome.win.itemRarities) : null;
-    summary.xp = Math.round(fightXp * (1 + content.balance.hunt.soloXpBonus));
+    // Each companion who fought takes its share, as on the exploration.
+    summary.xp = Math.round(fightXp * (1 + content.balance.hunt.soloXpBonus) * (1 - mates.length * content.settlement.companions.xpCost));
     summary.gold = Math.round(fightGold);
     summary.recovered = Math.round((player.maxHp - hpNow) * player.recovery);
     hpNow += summary.recovered;
@@ -459,6 +478,7 @@ export function resolveEvent(
     gold: hunt.gold + summary.gold,
     items,
     hpEnd: hpNow,
+    ...(companionsAfter && { companions: companionsAfter }),
     fights: [...hunt.fights, summary],
     entries: [...hunt.entries, tell(told), { t, type: 'fight', fight: index, text: lines.join(' ') }],
     // The report opens on the event's fight.
