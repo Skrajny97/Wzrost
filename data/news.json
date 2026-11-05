@@ -145,6 +145,11 @@
       "id": "0.1.67",
       "title": "Wersja 0.1.67: towarzysze w zdarzeniach",
       "body": "- Towarzysze, którzy poszli z Tobą na wyprawę, walczą też w walce zdarzenia na jej końcu.\n- W walce zdarzenia działają też mikstury zabrane na wyprawę, wzmacniające mikstury, które jeszcze działają, i trofea.\n- Na wąskich telefonach napisy w dolnym pasku i nazwy zasobów w Obozie mieszczą się w całości. Na komputerze zablokowane pozycje menu nie są już ucięte."
+    },
+    {
+      "id": "0.1.68",
+      "title": "Wersja 0.1.68: poprawki i stopnie relacji towarzyszy",
+      "body": "- Praca Stołu rozbiórki liczy się do zadań i Prób Gildii dopiero po zakończeniu zlecenia.\n- Towarzysze mają własne stopnie relacji: Dystans, Koleżeństwo, Zaufanie, Przyjaźń i Braterstwo broni.\n- Sala prób płaci za elitę jak za elitę i daje dwa razy więcej materiałów.\n- „Przerwij budowę” oddaje dokładnie to, co zapłacono.\n- Powrót do gildii w tym samym tygodniu nie podnosi już progów Prób ani etapów Wyprawy.\n- Postać wystawiona jako najemnik nie ma kropki ataku przy Bestii i Wyprawie.\n- Listy gończe dnia nie zmieniają się do północy, a listu, z którym postać wyruszyła, nie da się porzucić w drodze."
     }
 ]
 }

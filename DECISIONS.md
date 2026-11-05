@@ -3034,6 +3034,51 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.68 (5.11.2026)
+
+Praca Stołu rozbiórki liczy się do zadań i Prób Gildii dopiero po zakończeniu zlecenia: zob. „Stół rozbiórki: praca liczy się po zakończeniu”. Własne nazwy stopni relacji z towarzyszem: zob. „Stopnie relacji z towarzyszem (639 A)”. Piętnaście poprawek z przeglądu kodu: zob. „Przegląd kodu z 5.11.2026: poprawki”. Migracje bazy: 0085 (kto z gildii liczy się w tygodniu) i 0086 (zapłata za budowę w toku).
+
+## Stół rozbiórki: praca liczy się po zakończeniu (5.11.2026, w grze od 0.1.68)
+
+Autor: „zrób też tak zeby zadania rozbiórki przedmiotów liczyły się po zakończonej rozbiórce bo inaczej bedzie mozna anulować rozbiórkę a zadanie zaliczone”.
+
+1. **Kiedy praca się liczy.** Praca Stołu rozbiórki, przeróbka materiałów i rozbiórka przedmiotów, liczy się do zadań narratora i Prób Gildii dopiero po zakończeniu zlecenia, a nie przy jego złożeniu. Wcześniej zadanie zaliczało się od razu, więc dało się odebrać nagrodę, a następnego dnia usunąć zlecenie ze zwrotem materiałów.
+2. **Do czego (brakujący szczegół).** Do zadań dnia, tygodnia i miesiąca z chwili, gdy gra rozlicza zakończone zlecenie, i do Próby z tego tygodnia w obecnej gildii, jeśli ta Próba trwała już przy złożeniu zlecenia, jak przy wyprawach. Gra rozlicza zlecenie raz, w tym samym zapisie co jego zakończenie, także gdy dwie prośby przyjdą naraz.
+3. **Usunięcie z kolejki.** Usunięte zlecenie niczego nie zaliczyło, więc niczego nie zabiera. Pytanie przed usunięciem nie mówi już o zadaniach.
+4. **Zlecenia sprzed 0.1.68** policzyły się już przy złożeniu, więc po zakończeniu nie liczą się drugi raz, a ich usunięcie działa jak dotąd.
+
+## Stopnie relacji z towarzyszem (639 A, 5.11.2026, w grze od 0.1.68)
+
+Autor: „stopnie relacji towarzyszy powinny brzmieć inaczej niż w Bractwach”. Pytanie 639 z wariantami A (nazwy więzi), B (tytuły w rodzaju towarzysza) i C (własne). Autor: „639 A”.
+
+1. **Nazwy.** Dystans (od 0 punktów), Koleżeństwo (od 50), Zaufanie (od 250), Przyjaźń (od 700) i Braterstwo broni (od 1400), takie same dla towarzysza i towarzyszki. Progi i premia w walce (+2% obrażeń i HP za stopień) zostają jak u mieszkańców (296 A).
+2. **Dane.** `data/settlement.json`, `companions.relation.standings`; nazwa może mieć formę `[a|b]` dla towarzyszki i towarzysza.
+
+## Przegląd kodu z 5.11.2026: poprawki (w grze od 0.1.68)
+
+Przegląd kodu wszystkiego, co weszło od 0.1.28 (Gildia, Osada, Obóz), w trzech częściach naraz. Każda poprawka ma test, który bez niej nie przechodzi.
+
+Gildia:
+1. **Powrót do gildii w tym samym tygodniu.** Postać, która wychodzi z gildii i do niej wraca, liczy się w tym tygodniu tylko raz. Dotąd każdy powrót dodawał ją do członków jeszcze raz, więc progi Prób Gildii, etapy Wyprawy i HP strażników rosły, a ostatni próg Prób stawał się nieosiągalny. Tablica Prób i trasa Wyprawy pamiętają teraz, kogo liczą (migracja 0085). Tablice i trasy tego tygodnia liczą od razu wszystkich obecnych członków.
+2. **Skrzynie Wyprawy** gra szuka od minut wypraw samej postaci, a nie przez trasy wszystkich gildii. Skrzynie są te same, a kropki Gildii obciążają bazę dużo mniej.
+3. **Najemnik a ataki.** Postać wystawiona jako najemnik, na usłudze albo z zapłatą czekającą w Karczmie nie dostaje już żółtej kropki ataku przy Bestii ani przy Wyprawie, a „Atakuj” jest wyłączone. Pod licznikiem ataków stoi: „Najemnik nie atakuje. Zaatakujesz, gdy zdejmiesz swoje ogłoszenie albo odbierzesz zapłatę za usługę.” (tekst do poprawy przez autora, `data/guilds.json`).
+
+Osada:
+4. **List gończy w drodze.** Dotąd list dało się porzucić w trakcie wyprawy, a poszukiwany i tak się na niej pojawiał i zostawiał łup, po czym ten sam list można było wziąć znowu, wiele razy dziennie. Teraz listu, z którym postać wyruszyła, nie da się porzucić ani wziąć innego, dopóki raport nie zostanie odebrany: „Postać wyruszyła na wyprawę z tym listem. Porzucisz go albo weźmiesz inny po odebraniu raportu.” Poszukiwany pokonany bez listu w ręku wypełnia ten list na jego dzień, bez nagrody u sołtysa.
+5. **Przelosowanie zadań tygodnia i miesiąca** prosi o tyle samo pracy co pierwsze losowanie, bo tydzień i miesiąc pamiętają, jaką część zwykłych liczb dostały. Dotąd zadania miesięczne przelosowane ostatniego dnia prosiły o około jedną trzydziestą pracy przy pełnych nagrodach. Tydzień i miesiąc wylosowane przed tą wersją przelosowują się tak, jakby wylosowano je pierwszego dnia, z krzywą poziomu postaci. Zadania dzienne bez zmian. Zmienia to punkt 5 wpisu „Zadania tygodniowe: krzywa, krótszy tydzień i przelosowanie”, który był moim brakującym szczegółem.
+6. **Listy gończe dnia** są te z pierwszego spojrzenia na tablicę tego dnia i nie zmieniają się do północy. Dotąd nowy poziom klasy albo miejsce otwarte w Sali prób dokładały tego samego dnia nowe listy obok czterech wypełnionych.
+7. **Sala prób a mikstury.** W próbie działają tylko mikstury o znanej recepturze, jak na wyprawie.
+8. **Sala prób a nagroda.** Każda wygrana walka płaci jak walka godzinnej wyprawy na jej poziomie razy 2, jak w punkcie 4 wpisu „Sala prób”: elita daje XP i złoto elity, każda walka ma dodatkowe 10% XP jak na wyprawie, a materiałów jest dwa razy tyle. Dotąd elita płaciła jak zwykły stwór, a materiały nie były podwojone.
+9. **Raport najemnika po końcu usługi** (np. ze starej karty gry) kończył się błędem serwera. Teraz gra mówi: „Usługa najemna się skończyła. Odbierz zapłatę w Karczmie.”
+
+Obóz i Stół rozbiórki:
+10. **Wzór z dwóch rozbiórek.** Dwa przedmioty tego samego wzoru oddane do rozbiórki i kolejno usunięte z kolejki wracały do plecaka, a wzór zostawał odkryty za darmo. Teraz zlecenie, które czeka z drugim przedmiotem, przejmuje wzór, a jego usunięcie znów go ukrywa.
+11. **Dodatkowe części** zapadają przy zleceniu jak dotąd, ale gra pokazuje je dopiero po jego zakończeniu. Dotąd darmowe usuwanie z kolejki pozwalało losować je od nowa.
+12. **„Przerwij budowę”** oddaje dokładnie to, co zapłacono, także za budowę, która ruszyła z kolejki (migracja 0086). Dotąd oddawało dzisiejszą cenę poziomu, więc po zmianie cen zwrot różnił się od zapłaty. Budowy rozpoczęte przed tą wersją oddają cenę poziomu z chwili przerwania.
+13. **Pęknięty przedmiot z zestawu Zbrojowni** w tej samej chwili co odbiór treningu albo ziół ze Szklarni mógł cofnąć ten odbiór. Teraz próba ulepszenia zapisuje się tylko przy postaci takiej jak przy odczycie, inaczej gra prosi o ponowienie i niczego nie pobiera.
+14. **„Załóż zestaw”** zapisuje się tylko przy postaci takiej jak przy odczycie. Dotąd dwa dotknięcia naraz mogły włożyć do pełnego plecaka więcej, niż mieści.
+15. **Poziom po przerwanej budowie.** Przerwana budowa zostawiała chwilę swojego rozpoczęcia jako koniec poprzedniego poziomu, więc odpoczynek liczony sprzed niej szedł wolniej, a telefon mógł dostać powiadomienie o skończonej budowie. Teraz budynek wraca do poprzedniego poziomu bez zmiany w czasie.
+
 ## Wersja 0.1.67 (5.11.2026)
 
 Towarzysze, mikstury i trofea działają w walce zdarzenia na końcu wyprawy: zob. „Towarzysze w walkach zdarzeń”. Całe napisy na wąskich telefonach i w menu na komputerze: zob. „Ucięte napisy na wąskich telefonach i w menu na komputerze”.
@@ -3070,7 +3115,7 @@ Gracz na czacie: „Czy można dodać opcję usuwania budynków/przedmiotów z k
 2. **Zlecenie w toku** też można usunąć. Jego dotychczasowa praca przepada i nie daje części. Kolejne zlecenia ruszają wcześniej, każde trwa tyle samo co dotąd, a pierwsze z nich startuje od razu (`takeOffQueue` w `src/engine/crafting.js`).
 3. **Usuń wszystkie.** Pod kolejką, gdy można usunąć co najmniej dwa zlecenia, stoi „Usuń wszystkie”, też z pytaniem. Działa jak usunięcie każdego zlecenia naraz.
 4. **Pełny plecak (brakujący szczegół, najprościej).** Przedmiot nie wraca do pełnego plecaka. Gdy na przedmioty z usuwanych zleceń brakuje miejsca, nic nie wypada z kolejki, a gra mówi, ile miejsc potrzeba i ile jest wolnych. „Usuń wszystkie” też nie oddaje części rzeczy: wszystko albo nic, jak „Rozbierz kilka”. Pojedyncze zlecenia można dalej usuwać osobno.
-5. **Zadania i Próby Gildii (brakujący szczegół).** Liczą pracę stołu jak dotąd, od razu przy zleceniu. Usunięte zlecenie zabiera im dokładnie to, co im dało: zadaniom narratora z okresu, w którym je złożono (dzień, tydzień, miesiąc), i Próbie Gildii z tygodnia, w którym je złożono, jeśli wtedy już trwała. Zadanie i próba pamiętają, ile przyszło ponad ich liczbę (`over` w zadaniu, kolumna `extra` w `guild_trials`, migracja `0084_trial_extra.sql`), więc praca, która zostaje, liczy się w całości. Przykład: zadanie „Przerób na Stole rozbiórki 4 materiały.” ma 2 z 4, a przez pomyłkę na stół idzie 50 materiałów. Po usunięciu tych 50 zadanie ma znowu 2 z 4.
+5. **Zadania i Próby Gildii (brakujący szczegół).** Liczą pracę stołu jak dotąd, od razu przy zleceniu. Usunięte zlecenie zabiera im dokładnie to, co im dało: zadaniom narratora z okresu, w którym je złożono (dzień, tydzień, miesiąc), i Próbie Gildii z tygodnia, w którym je złożono, jeśli wtedy już trwała. Zadanie i próba pamiętają, ile przyszło ponad ich liczbę (`over` w zadaniu, kolumna `extra` w `guild_trials`, migracja `0084_trial_extra.sql`), więc praca, która zostaje, liczy się w całości. Przykład: zadanie „Przerób na Stole rozbiórki 4 materiały.” ma 2 z 4, a przez pomyłkę na stół idzie 50 materiałów. Po usunięciu tych 50 zadanie ma znowu 2 z 4. *Zmienione w 0.1.68 (autor): praca liczy się dopiero po zakończeniu zlecenia, zob. „Stół rozbiórki: praca liczy się po zakończeniu”.*
 6. **Próba wykonana przez pomyłkę** otwiera się znowu, gdy bez usuniętej pracy nie osiąga swojej liczby. Zlecenia czekające w kolejce, złożone, gdy była już wykonana, liczą się wtedy do niej, jak byłoby bez pomyłki. Pasek gildii liczy ją jak każdą niewykonaną, a skrzynie już odebrane zostają.
 7. **Nagroda już odebrana (brakujący szczegół).** Gdy za zadanie odebrano już nagrodę albo otwarto skrzynię jego okresu, a bez usuwanej pracy nie byłoby wykonane, zlecenie zostaje w kolejce i gra mówi dlaczego. Zlecenia, bez których zadanie i tak jest wykonane, można usunąć. Praca, za którą przyszła nagroda, zawsze zostaje wykonana.
 8. **Co jeszcze wraca (brakujące szczegóły).**
@@ -6293,7 +6338,7 @@ Autor przekazał uwagę osoby testującej grę: „Bardziej wyważone tygodniowe
 2. **Do końca pozostałego czasu.** Tydzień wylosowany później niż w poniedziałek (nowa postać albo pierwsze wejście w tygodniu) bierze z tego tyle siódmych części, ile dni zostało, licząc dzień losowania. Liczba zaokrągla się do kroku zadania (minuty wypraw co 60) i nie spada poniżej jednego kroku. Nagrody zostają całe. Pod zadaniami takiego tygodnia stoi: „Ten tydzień zaczął się dla Ciebie później, więc zadania są na 1 z 7 dni.” (z liczbą dni).
 3. **Bez skrzyń dziennych.** Nie ma już zadania „Otwórz skrzynię dziennych zadań”. U graczy niewykonane takie zadanie losuje się od nowa na inne, do zrobienia do końca tygodnia. Gdy nie ma już czego wylosować, zadanie znika, żeby nie blokowało skrzyni tygodnia.
 4. **Tydzień wylosowany przed 0.0.73.** Nieodebrane zadania bieżącego tygodnia dostają liczby z krzywej według obecnego poziomu postaci. Postać stworzona w tym tygodniu ma je dodatkowo przycięte do dni, które zostały w dniu jej stworzenia. Postęp zostaje, odebrane zadania się nie zmieniają.
-5. **Przelosowanie.** W oknie zadań jest przycisk „Przelosuj zadania”: dla dziennych raz na dzień, dla tygodniowych raz na tydzień. Niewykonane zadania zmieniają się na inne (póki starcza innych niż dotąd), a ich postęp przepada. Wykonane i odebrane zostają. Nowe zadania tygodnia są do zrobienia w dniach, które zostały (brakujący szczegół).
+5. **Przelosowanie.** W oknie zadań jest przycisk „Przelosuj zadania”: dla dziennych raz na dzień, dla tygodniowych raz na tydzień. Niewykonane zadania zmieniają się na inne (póki starcza innych niż dotąd), a ich postęp przepada. Wykonane i odebrane zostają. Nowe zadania tygodnia są do zrobienia w dniach, które zostały (brakujący szczegół). *Zmienione w 0.1.68: przelosowanie prosi o tyle samo pracy co pierwsze losowanie, zob. „Przegląd kodu z 5.11.2026: poprawki”, punkt 5.*
 
 ## Porównywarka na Targowisku i tła Wież (1.11.2026, w grze od 0.0.73)
 
@@ -6556,7 +6601,7 @@ Autor: „295 A / 296 A / 286 i 287 tak”.
     - Gdy nowego kawałka jeszcze nie ma, towarzysz mówi coś na dziś, np. o pogodzie albo o Zbylucie.
     - Rozmowa daje 10 punktów relacji. Opowiedziane kawałki zostają na karcie towarzysza pod „Z rozmów”.
     - Teksty mają formy dla towarzyszki i towarzysza.
-4. **Relacja z towarzyszem (296 A).** Stopnie są jak u mieszkańców: Obcy od 0 punktów, Znajomy od 50, Stały klient od 250, Zaufany od 700 i Przyjaciel od 1400.
+4. **Relacja z towarzyszem (296 A).** Stopnie są jak u mieszkańców: Obcy od 0 punktów, Znajomy od 50, Stały klient od 250, Zaufany od 700 i Przyjaciel od 1400. *Od 0.1.68 te same progi mają własne nazwy (639 A): Dystans, Koleżeństwo, Zaufanie, Przyjaźń i Braterstwo broni.*
     - Każdy stopień ponad Obcego daje towarzyszowi w walce +2% obrażeń i HP, czyli przy Przyjacielu +8%.
     - Karta towarzysza pokazuje stopień, premię i punkty do następnego stopnia.
     - **Brakujący szczegół: ile punktów.** Wspólna wyprawa daje 4 punkty za godzinę i co najmniej punkt za wyprawę, a rozmowa 10. *Zmienione 1.11.2026 (341 A): bez minimum punktu za wyprawę, punkty liczą się co do ułamka.* Przy 4 godzinach wypraw dziennie i jednej rozmowie relacja dochodzi do stopnia Znajomy po 2 dniach, a do stopnia Przyjaciel po około 2 miesiącach.
