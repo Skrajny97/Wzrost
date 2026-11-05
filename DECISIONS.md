@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Odpowiedzi autora 621, 624–626 i samouczki (5.11.2026)
+
+Autor: „625 zostaje”, „626 zostaje”, „624 akcept”, „621 A” oraz „Na koniec trzeba będzie zrewidować Samouczki - czy nie wychodzą jakieś kolizje i czy warto coś dodać”.
+
+1. **Tło Sali prób (625)** i **tło tablicy Poszukiwanych (626)** z PixelLab zostają, każde w swoim miejscu: `src/client/art/places/trial-hall.png` i `wanted-board.png`.
+2. **Wyprawa Gildii ze strażnikami (621 A, makieta 624):** 7 etapów, a na końcu każdego strażnik, który zagradza drogę, aż gildia go pokona. Minuty wypraw członków prowadzą do strażnika, a każdy, kto dołożył minut, atakuje go jak Bestię, 3 razy dziennie. Każdy następny strażnik jest silniejszy, a pokonany daje skrzynię wszystkim, którzy dołożyli minut; ostatni także rzadki łup. Powstaje po Siedzibie Gildii, Poszukiwanych i Sali prób.
+3. **Samouczki na koniec rundy:** przegląd rozdziałów narratora pod kątem kolizji z nowymi częściami gry (Próby Gildii bez brania, Sala prób, Poszukiwani, Siedziba) i propozycje nowych kwestii. Nowe kwestie trafiają do autora do zatwierdzenia przed nagraniem.
+
 ## Wersja 0.1.55 (5.11.2026)
 
 Budynki zasobów do 20. poziomu w Warowni (618): zob. „Budynki zasobów do 20. poziomu”.
