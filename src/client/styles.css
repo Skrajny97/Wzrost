@@ -8764,14 +8764,14 @@ a.profession-square:active {
   --party-step: clamp(56px, 20%, 88px);
 }
 /* When one of them rides, those on foot walk on the line of the hooves and
-   smaller, to the rider's chest (the author: "nierówno z postacią i są za
-   duży"): their frame stands on the ride's bottom, and the whole holder
-   (the figure with its light, trail and pet) is drawn at --afoot-scale
-   from the feet. */
+   smaller, their head at the height of the horse's back (the author:
+   "nierówno z postacią i są za duży", 659 B: 0.7): their frame stands on
+   the ride's bottom, and the whole holder (the figure with its light, trail
+   and pet) is drawn at --afoot-scale from the feet. */
 .scene-walk--riders {
   --party-step: clamp(72px, 26%, 120px);
   --walker-bottom: var(--ride-bottom);
-  --afoot-scale: 0.8;
+  --afoot-scale: 0.7;
 }
 .scene-walk--riders .scene-member--afoot {
   transform: scale(var(--afoot-scale));
