@@ -144,7 +144,7 @@ async function stopBuild(running) {
   const sure = await confirmAction({
     title: 'Przerwać budowę?',
     text: [
-      `${running.name}, poziom ${running.level}: koszt wróci w całości${cost ? ` (${cost.join(', ')})` : ''}, a budynek zostanie na poziomie ${running.level - 1 > 0 ? running.level - 1 : 'pustego placu'}.`,
+      `${running.name}, poziom ${running.level}: koszt wróci w całości${cost ? ` (${cost.join(', ')})` : ''}, ${running.level > 1 ? `a ${running.name} zostanie na poziomie ${running.level - 1}` : 'a plac zostanie pusty'}.`,
       later.length > 0 && `Z kolejki wypadnie też ${later.map((other) => `poziom ${other.level}`).join(' i ')}, bo go potrzebuje, i jego koszt również wróci.`,
     ]
       .filter(Boolean)
