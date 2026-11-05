@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Grafiki 622–623: wybory autora (5.11.2026)
+
+Autor: „622.1 D, 622.2 B, 622.3 C, 622.4 C, 623.1 B, 623.2 D, 623.3 D, 623.4 C”.
+
+1. **Wyjęci spod prawa (622, do Poszukiwanych, 619 B):** Herszt zbójców D, Kłusownik B, Koniokrad C, Przemytnik C. Szkice z PixelLab (48 × 48, w stylu zbójców z gry) czekają w `art/spare/monsters/` (`bandit-chief`, `poacher`, `horse-thief`, `smuggler`) i trafią do gry razem z Poszukiwanymi.
+2. **Budynki Siedziby Gildii (623, do 616 A):** Sztandar B, Skarbiec D, Kuźnia Gildii D, Dom Zwiadowców C. Pierwszy wygląd każdego czeka w `art/spare/guild/` (`guild-banner`, `guild-treasury`, `guild-forge`, `scouts-house`); dalsze wyglądy powstaną w PixelLab z nich jako wzoru, jak w Warowni.
+
 ## Odpowiedzi autora 615–620 (5.11.2026)
 
 Autor: „615 A”, „616 A - akcept, ale muszą być zwijalne budynki i ludzie muszą móc wpłacać na co chcą, lider i zastępca może tylko oznaczyć co jest preferowane”, „616 B - Coś to takie nudnawe, chyba że na końcu każdego etapu byłby coraz trudniejszy strażnik”, „617 prób nie trzeba będzie brać, one będą wszystkie na raz odpalone u gracza”, „618.4 - D, 618.5 - C, 618.6 - D, 618.7 - D”, „619 - wygląda fajnie tylko brakuje ikonki herszta”, „620 - Sala Prób wstępnie super, tylko tło widze chyba z wież”, „618.1 A, 618.2 A, 618.3 B albo nawet trochę lżej niż B”, „619 B”, „620 B, ale taniej wejście albo i za darmo raz dziennie”. O numeracji: „616 sie powtarza ale nie tak jak powinno bo dwie rozne kwestie - co do makiet - w makietach spoko wygląda”.
