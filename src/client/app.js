@@ -442,8 +442,10 @@ function route() {
   prefetchMusic();
   renderNav();
   $('.page-title', container)?.focus({ preventScroll: true });
-  // A new character's narrator: a card or the place to tap on this screen.
-  narrate(hash);
+  // A new character's narrator: a card or the place to tap on this screen,
+  // at the address the screen has once drawn: one that opens on a tab of
+  // its own puts it in the address (the Gildia's Wyprawa, 664).
+  narrate(location.hash || hash);
 }
 
 function renderNav() {
@@ -982,6 +984,9 @@ async function openTutorialTests() {
       row('Objaśnienie Górnictwa i Jubilerstwa', 'Od 25. poziomu postaci. Poziomy profesji zostają.', repeatMiningTour, told && isUnlocked('mining')),
       row('Objaśnienie Ewolucji', 'Od 50. poziomu klasy, dopóki ewolucja nie jest wybrana.', repeatEvolutionTour, told && (state.character.evolution?.choices.length ?? 0) > 0),
       row('Objaśnienie Wież', 'Od 50. poziomu postaci.', repeatTowersTour, told && isUnlocked('towers')),
+      // The lines of single places (646, 647), each told on its first look.
+      row('Wyprawa Gildii', 'W gildii, przy pierwszym spojrzeniu na zakładkę Wyprawa.', repeatGuildTour, told && Boolean(state.character.guildTag)),
+      row('Warownia', 'Gdy obóz jest Warownią, przy wejściu do obozu.', repeatFortressTour, told && Boolean(state.character.camp?.cornerstone?.fortress?.stands)),
     ),
   );
 }
@@ -1257,6 +1262,40 @@ async function repeatMiningTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/mining-tour');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's line about the Wyprawa Gildii from the start
+// (testing.js).
+async function repeatGuildTour() {
+  const sure = await confirmAction({
+    title: 'Wyprawa Gildii od nowa?',
+    text: 'Narrator powie o Wyprawie Gildii przy następnym spojrzeniu na jej zakładkę.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/guild-tour');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's card about the Warownia from the start
+// (testing.js).
+async function repeatFortressTour() {
+  const sure = await confirmAction({
+    title: 'Warownia od nowa?',
+    text: 'Narrator powie o Warowni przy następnym wejściu do obozu.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/fortress-tour');
   } catch (error) {
     toast(error.message);
   }

@@ -2106,6 +2106,24 @@ describe('Time Points and the narrator', () => {
     assert.deepEqual(again.data.character.tutorial, before);
   });
 
+  // "Testuj samouczki" has the lines of the Wyprawa Gildii (646) and the
+  // Warownia (647) too, each unread again on its own (664).
+  test('test mode tells the Wyprawa Gildii and the Warownia again', async () => {
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    await see({ skip: true });
+    const before = (await see({ skip: true, chapter: 'skills' })).data.character.tutorial;
+    for (const [chapter, line] of [
+      ['guild', 'guild-expedition'],
+      ['fortress', 'fortress-welcome'],
+    ]) {
+      const read = (await see({ skip: true, chapter })).data.character.tutorial;
+      assert.deepEqual(read, [...before, line]);
+      const again = await call('POST', `/api/test/${chapter}-tour`, { cookie });
+      assert.equal(again.status, 200, chapter);
+      assert.deepEqual(again.data.character.tutorial, before);
+    }
+  });
+
   test('"Testuj samouczki": the character waits aside while a test character goes through the introduction', async () => {
     const own = (await call('GET', '/api/character', { cookie })).data.character;
     assert.equal((await call('GET', '/api/test/tutorials', { cookie })).data.parked, null);

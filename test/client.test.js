@@ -329,6 +329,28 @@ test('on a computer the camp is a tab of the menu, where the narrator leads', ()
   assert.match(keys, /const TABS = \['#\/postac', '#\/walka', '#\/oboz', '#\/profesje', '#\/osada', '#\/spolecznosc'\];/);
 });
 
+// The Gildia's tabs change the address without a route (replaceState), so
+// its page tells the narrator itself, and a route narrates at the address
+// its screen has once drawn: the line about the Wyprawa Gildii (646) comes on
+// the first look at that tab, also when the page opens on it (664).
+test("the narrator hears of the Gildia's tabs, also of the one the page opens on", () => {
+  const guild = readFileSync(join(CLIENT, 'screens', 'guild.js'), 'utf8');
+  const show = /function show\(id\) \{([\s\S]*?)\n {2}\}/.exec(guild)[1];
+  assert.match(show, /history\.replaceState\([\s\S]*narrate\(location\.hash\);/);
+  const app = readFileSync(join(CLIENT, 'app.js'), 'utf8');
+  const route = /\nfunction route\(\) \{([\s\S]*?)\n\}/.exec(app)[1];
+  assert.match(route, /candidate\.mount\([\s\S]*narrate\(location\.hash \|\| hash\);/);
+  assert.doesNotMatch(route, /narrate\(hash\);/);
+  // "Testuj samouczki" starts both these lines again, each on its own.
+  for (const [title, path] of [
+    ['Wyprawa Gildii', 'guild-tour'],
+    ['Warownia', 'fortress-tour'],
+  ]) {
+    assert.match(app, new RegExp(`row\\('${title}',`));
+    assert.ok(app.includes(`'/api/test/${path}'`), path);
+  }
+});
+
 test('the page can be added to the home screen as an app', () => {
   const html = readFileSync(join(CLIENT, 'index.html'), 'utf8');
   assert.match(html, /<link rel="manifest" href="\/manifest\.webmanifest">/);

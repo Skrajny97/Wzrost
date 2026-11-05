@@ -29,6 +29,7 @@ import { mountGuildRequests } from '../guild-requests.js';
 import { mountGuildSeat } from '../guild-seat.js';
 import { mountGuildTrials } from '../guild-trials.js';
 import { CLASS_ICONS } from '../icons.js';
+import { narrate } from '../narrator.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, state } from '../state.js';
 import { confirmAction, foldPart, framedName, guildTag, toast, withButton } from '../ui.js';
@@ -94,6 +95,9 @@ export function mountGuildPage(container, context) {
     fill(body);
     part = TAB_MOUNTS[id](body);
     render();
+    // The new address changes no route, so the narrator is told of it: its
+    // line about the Wyprawa (646) comes on the first look at that tab (664).
+    narrate(location.hash);
   }
 
   // Two thin rows (the author: "Ciasno się tu zrobiło zrób dwa cieńsze
