@@ -248,9 +248,23 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
     );
   }
 
+  // The screenshot sent with a report (screenshot.js): small, as wide as the
+  // card after a tap, small again after another. Read only once in sight.
+  const shot = (bug) =>
+    h(
+      'button',
+      {
+        type: 'button',
+        class: 'author-bug-shot',
+        'aria-expanded': 'false',
+        onClick: (event) => event.currentTarget.setAttribute('aria-expanded', String(event.currentTarget.getAttribute('aria-expanded') !== 'true')),
+      },
+      h('img', { src: `/api/author/bugs/image?id=${bug.id}`, alt: 'Zrzut ekranu od gracza', loading: 'lazy', decoding: 'async' }),
+    );
+
   // The players' bug reports ("Zgłoś błąd", bugs.js): the open ones, newest
-  // first, each with who sent it, from which screen and version, and
-  // "Załatwione"; the done ones folded below, with "Przywróć".
+  // first, each with who sent it, its screenshot, from which screen and
+  // version, and "Załatwione"; the done ones folded below, with "Przywróć".
   function bugs(list) {
     const open = list.filter((bug) => !bug.resolvedAt);
     const done = list.filter((bug) => bug.resolvedAt);
@@ -260,6 +274,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
         { class: 'card author-bug' },
         h('p', { class: 'author-bug-head' }, h('strong', { text: bug.login ?? 'konto usunięte' }), bug.character && ` · ${bug.character}`),
         h('p', { class: 'author-bug-text', text: bug.text }),
+        bug.image && shot(bug),
         h('p', { class: 'author-bug-meta', text: [dateTimeFormat.format(new Date(bug.createdAt)), bug.screen && `ekran ${bug.screen}`, bug.version && `wersja ${bug.version}`].filter(Boolean).join(' · ') }),
         bug.device && h('p', { class: 'author-bug-meta', text: bug.device }),
         small(bug.resolvedAt ? 'Przywróć' : 'Załatwione', change('/api/author/bugs/resolve', { id: bug.id, done: !bug.resolvedAt })),

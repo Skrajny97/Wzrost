@@ -15,6 +15,7 @@ import { updateSide } from './side.js';
 import './keys.js';
 import { showQuests, watchQuests } from './quests.js';
 import { offerNameNotice, offerRename, openNameChange } from './rename.js';
+import { screenshotPicker } from './screenshot.js';
 import { mountAuthor } from './screens/author.js';
 import { mountEncyclopedia } from './screens/encyclopedia.js';
 import { mountEvolution } from './screens/evolution.js';
@@ -851,15 +852,27 @@ function openSettings() {
 // "Zgłoś błąd" (the author: "Trzeba dodac przycisk Zgłoś błąd i zeby
 // przychodzil mi w Panel Autora"): what went wrong, in the player's words;
 // the server adds the game's version and the character, and this the screen
-// the player was on under the settings.
+// the player was on under the settings. A screenshot may go with it
+// (screenshot.js), and then the report goes as a form.
 function openBugReport() {
   const screen = location.hash;
   const text = h('textarea', { class: 'bug-text', id: 'bug-text', rows: '6', maxlength: '2000', placeholder: 'Np. po stuknięciu „Wyrusz” ekran przestał reagować.' });
+  const shot = screenshotPicker();
+  const report = async () => {
+    const image = await shot.image();
+    if (!image) return { text: text.value, screen };
+    const form = new FormData();
+    form.append('text', text.value);
+    form.append('screen', screen);
+    form.append('image', image, 'zrzut-ekranu.jpg');
+    return form;
+  };
   openSheet(
     h('h2', { class: 'sheet-title', text: 'Zgłoś błąd' }),
     h('p', { class: 'sheet-text', text: 'Opisz, co się stało i co było wtedy na ekranie. Gra sama dołączy numer wersji, ekran, na którym jesteś, i Twoją postać.' }),
     h('label', { class: 'field-label', for: 'bug-text', text: 'Opis błędu' }),
     text,
+    shot.element,
     h(
       'div',
       { class: 'sheet-actions' },
@@ -870,7 +883,7 @@ function openBugReport() {
         text: 'Wyślij',
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
-            await call('POST', '/api/bug-reports', { text: text.value, screen });
+            await call('POST', '/api/bug-reports', await report());
             closeSheet();
             toast('Dzięki! Zgłoszenie trafiło do autora gry.');
           }),

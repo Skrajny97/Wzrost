@@ -9997,6 +9997,28 @@ a.profession-square:active {
   outline-offset: 1px;
 }
 
+/* "Zgłoś błąd": the screenshot to send (screenshot.js), its preview drawn
+   on a canvas, small, with "Usuń zrzut" under it. */
+.bug-shot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bug-shot-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 180px;
+  margin-bottom: 10px;
+  border: 1px solid var(--bark-line);
+}
+
+.bug-shot-note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
 /* The settings' gear with a dot when bug reports wait for the author, and
    the scroll of "Co nowego?" while a new entry waits. */
 .settings-button--ready,
@@ -10039,6 +10061,32 @@ a.profession-square:active {
   color: var(--text-muted);
   font-size: 13px;
   overflow-wrap: anywhere;
+}
+
+/* A report's screenshot: small, as wide as its card after a tap. */
+.author-bug-shot {
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 0;
+  border: 1px solid var(--bark-line);
+  background: var(--bg-deep);
+  cursor: zoom-in;
+}
+
+.author-bug-shot img {
+  display: block;
+  max-width: 100%;
+  max-height: 160px;
+}
+
+.author-bug-shot[aria-expanded='true'] {
+  align-self: stretch;
+  cursor: zoom-out;
+}
+
+.author-bug-shot[aria-expanded='true'] img {
+  width: 100%;
+  max-height: none;
 }
 
 .trade-number {

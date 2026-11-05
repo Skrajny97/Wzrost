@@ -425,6 +425,32 @@ test('the page asks for the character again when an action finds it out of date'
   }
 });
 
+// "Zgłoś błąd" with a screenshot (screenshot.js): a FormData goes as it is,
+// and the browser writes its Content-Type with the parts' boundary; any
+// other body goes as JSON, as before.
+test('a form with a file goes as it is, without a Content-Type of its own', async () => {
+  const { request } = await import('../src/client/api.js');
+  const saved = globalThis.fetch;
+  const sent = [];
+  globalThis.fetch = (path, options) => {
+    sent.push(options);
+    return Promise.resolve(new Response('{"ok":true}', { status: 201 }));
+  };
+  try {
+    const form = new FormData();
+    form.append('text', 'Ekran przestał reagować.');
+    form.append('image', new Blob([new Uint8Array([0xff, 0xd8, 0xff])], { type: 'image/jpeg' }), 'zrzut-ekranu.jpg');
+    assert.deepEqual(await request('POST', '/api/bug-reports', form), { ok: true });
+    await request('POST', '/api/bug-reports', { text: 'Ekran przestał reagować.' });
+    assert.equal(sent[0].body, form);
+    assert.equal(sent[0].headers['Content-Type'], undefined);
+    assert.equal(sent[1].headers['Content-Type'], 'application/json');
+    assert.equal(sent[1].body, '{"text":"Ekran przestał reagować."}');
+  } finally {
+    globalThis.fetch = saved;
+  }
+});
+
 // The Targowisko's filters (the author: "filtracja potrzebna w targowisku zeby
 // szukac itemy po kategoriach"): only the categories with goods, in the
 // order of the data, each with how many, and "Wszystko" once the chosen one

@@ -9,9 +9,13 @@ export class ApiError extends Error {
   }
 }
 
+// `body`: an object sent as JSON, or a FormData with a file ("Zgłoś błąd"
+// with a screenshot), sent as it is: the browser writes its Content-Type
+// with the boundary between the parts.
 export async function request(method, path, body) {
   const options = { method, headers: { Accept: 'application/json' }, credentials: 'same-origin' };
-  if (method !== 'GET') {
+  if (method !== 'GET' && body instanceof FormData) options.body = body;
+  else if (method !== 'GET') {
     options.headers['Content-Type'] = 'application/json';
     options.body = JSON.stringify(body ?? {});
   }

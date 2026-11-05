@@ -48,9 +48,12 @@ export async function authorPanel(context) {
        ORDER BY u.created_at DESC, u.id DESC
        LIMIT 1000`,
     ),
-    // The players' bug reports (bugs.js): the open ones first, newest first.
+    // The players' bug reports (bugs.js): the open ones first, newest first,
+    // each with whether a screenshot came with it (only that: the picture
+    // comes by itself, bugReportImage).
     db.prepare(
-      `SELECT b.*, u.login FROM bug_reports b LEFT JOIN users u ON u.id = b.user_id
+      `SELECT b.*, u.login, EXISTS (SELECT 1 FROM bug_report_images i WHERE i.report_id = b.id) AS image
+       FROM bug_reports b LEFT JOIN users u ON u.id = b.user_id
        ORDER BY b.resolved_at IS NOT NULL, b.created_at DESC, b.id DESC
        LIMIT 200`,
     ),
@@ -97,6 +100,7 @@ export async function authorPanel(context) {
       device: bug.device,
       createdAt: bug.created_at,
       resolvedAt: bug.resolved_at,
+      image: bug.image === 1,
     })),
   });
 }
@@ -117,6 +121,28 @@ export async function resolveBugReport(context) {
     .run();
   if (result.meta.changes !== 1) throw new ApiError(404, 'invalid_report', 'Nie ma takiego zgłoszenia.');
   return json({ ok: true, open: await openBugReports(context.env.DB) });
+}
+
+// GET /api/author/bugs/image?id=N: the screenshot sent with a report
+// (bugs.js), for the panel's <img>, as the kind its first bytes told.
+// Opened on its own, it is a picture and nothing more (the CSP).
+export async function bugReportImage(context) {
+  const session = await requireSession(context);
+  if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  const id = new URL(context.request.url).searchParams.get('id') ?? '';
+  const image = /^[1-9]\d{0,14}$/.test(id)
+    ? await context.env.DB.prepare('SELECT type, data FROM bug_report_images WHERE report_id = ?').bind(Number(id)).first()
+    : null;
+  if (!image) throw new ApiError(404, 'not_found', 'Nie ma takiego zrzutu ekranu.');
+  // D1 gives a BLOB as an array of bytes.
+  return new Response(new Uint8Array(image.data), {
+    headers: {
+      'Content-Type': image.type,
+      'Cache-Control': 'private, max-age=86400',
+      'X-Content-Type-Options': 'nosniff',
+      'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; sandbox",
+    },
+  });
 }
 
 // The author's preview of the skills: every skill with its class, and a short

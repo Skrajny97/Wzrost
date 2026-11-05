@@ -50,3 +50,32 @@ export async function readJson(request) {
   if (data === null || typeof data !== 'object' || Array.isArray(data)) throw invalidBody();
   return data;
 }
+
+// A form with a file (multipart/form-data, as fetch sends a FormData), read
+// to at most `limit` bytes; past them `tooLarge` is thrown, also for a body
+// that comes in pieces without its length, before the rest is read.
+export async function readForm(request, limit, tooLarge = bodyTooLarge()) {
+  const type = request.headers.get('Content-Type') ?? '';
+  if (!type.toLowerCase().startsWith('multipart/form-data')) {
+    throw new ApiError(415, 'unsupported_media_type', 'Nieprawidłowy format danych.');
+  }
+  if (Number(request.headers.get('Content-Length') ?? 0) > limit) throw tooLarge;
+  const chunks = [];
+  let size = 0;
+  const reader = request.body?.getReader();
+  while (reader) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > limit) {
+      await reader.cancel().catch(() => {});
+      throw tooLarge;
+    }
+    chunks.push(value);
+  }
+  try {
+    return await new Response(new Blob(chunks), { headers: { 'Content-Type': type } }).formData();
+  } catch {
+    throw invalidBody();
+  }
+}

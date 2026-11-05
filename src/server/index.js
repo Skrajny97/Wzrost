@@ -2,7 +2,7 @@
 // Assets before this code runs; only /api/* and unknown paths reach the Worker.
 
 import { deleteAccount, login, logout, me, register } from './accounts.js';
-import { authorPanel, authorSkillDemo, authorSkills, resolveBugReport } from './author.js';
+import { authorPanel, authorSkillDemo, authorSkills, bugReportImage, resolveBugReport } from './author.js';
 import { authorNews, deleteNews, editNews, listNews, publishNews, seeNews } from './news.js';
 import { reportBug } from './bugs.js';
 import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
@@ -112,6 +112,8 @@ const routes = [
   ['DELETE', '/api/me', deleteAccount],
   ['GET', '/api/author', authorPanel],
   ['POST', '/api/author/bugs/resolve', resolveBugReport],
+  // A report's screenshot, for the author's panel (?id= the report).
+  ['GET', '/api/author/bugs/image', bugReportImage],
   ['POST', '/api/bug-reports', reportBug],
   ['GET', '/api/author/skills', authorSkills],
   ['GET', '/api/author/news', authorNews],
