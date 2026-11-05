@@ -9,6 +9,7 @@ import {
   buildingTop,
   campLevels,
   campNeeds,
+  createRng,
   effectText,
   eventChance,
   faintPenalty,
@@ -24,6 +25,8 @@ import {
   greenhouseStore,
   herbsPerHour,
   leavingRack,
+  questPeriod,
+  rollUpgrade,
   scoutChances,
   scoutedCreature,
   scouting,
@@ -43,6 +46,10 @@ import { content, newCharacter } from './helpers/content.js';
 const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] }, challenge: { ...content.balance.challenge, fromLevel: Infinity } } };
 import { useServer } from './helpers/server.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
+import { toHex } from '../src/server/encoding.js';
+import { readFeatures } from '../src/server/features.js';
+import { wearGearSet } from '../src/server/fortress.js';
+import { upgradeItem } from '../src/server/inventory.js';
 
 const fortress = content.camp.fortress;
 const fortressBuildings = content.buildings.filter((building) => building.fortress);
@@ -901,5 +908,137 @@ describe('the resource buildings past level 10 in the game (618)', () => {
     const top = await sawmill();
     assert.deepEqual([top.level, top.next], [20, null]);
     assert.equal((await build()).data.error.code, 'max_level');
+  });
+});
+
+// Another request's change landing between a request's read and its write,
+// for the handlers called here directly: a D1 binding that runs `between`
+// once, right before the first batch after a statement whose SQL `matches`
+// was prepared (the request's own write).
+function racing(database, matches, between) {
+  let armed = false;
+  let done = false;
+  return {
+    prepare(sql) {
+      if (!done && matches(sql)) armed = true;
+      return database.prepare(sql);
+    },
+    async batch(statements) {
+      if (armed && !done) {
+        done = true;
+        await between();
+      }
+      return database.batch(statements);
+    },
+  };
+}
+
+describe('the Warownia with another request at the same moment', () => {
+  const { call, db, signUp } = useServer({ SETTLEMENT: 'on', FORTRESS: 'on' });
+  let cookie;
+  let id;
+  let armour;
+  let spare;
+  const chain = (level, upgrade = 0) => JSON.stringify({ base: 'chainmail', slot: 'chest', level, rarity: 'common', affixes: [], armor: 15, upgrade });
+  beforeEach(async () => {
+    ({ cookie } = await signUp('zbrojmistrz'));
+    await call('POST', '/api/character', { cookie, body: { name: 'Zbrojmistrz', classId: 'warrior', appearance: 'male' } });
+    const database = await db();
+    ({ id } = await database.prepare('SELECT id FROM characters').first());
+    await database.prepare('UPDATE characters SET level = 25, xp = 0 WHERE id = ?').bind(id).run();
+    for (const [buildingId, level] of [...[...campBuildings, content.camp].map((one) => [one.id, one.maxLevel]), ['fortress', 1], ['armory', 1]]) {
+      await database.prepare('INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) VALUES (?, ?, ?, 0, 1)').bind(id, buildingId, level).run();
+    }
+    // Armour at +7 worn, and a second one in the bag.
+    const insert = (slot, level, upgrade) => database.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, 0)').bind(id, slot, chain(level, upgrade)).run();
+    armour = (await insert('chest', 5, 7)).meta.last_row_id;
+    spare = (await insert(null, 6, 0)).meta.last_row_id;
+    // The handlers called here directly run with the Warownia on.
+    readFeatures({ SETTLEMENT: 'on', FORTRESS: 'on' });
+  });
+  const view = async () => (await call('GET', '/api/character', { cookie })).data.character;
+  const save = (index, name) => call('POST', '/api/fortress/sets', { cookie, body: { index, name } });
+  const request = (path, body) => new Request(`http://localhost${path}`, { method: 'POST', headers: { Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const fortressOf = async () => JSON.parse((await (await db()).prepare('SELECT fortress FROM characters').first()).fortress);
+
+  // The roll's 16 random bytes, made the ones given for a while.
+  async function withRoll(bytes, run) {
+    Object.defineProperty(globalThis.crypto, 'getRandomValues', {
+      value: (array) => {
+        array.set(bytes.subarray(0, array.length));
+        return array;
+      },
+      configurable: true,
+      writable: true,
+    });
+    try {
+      return await run();
+    } finally {
+      delete globalThis.crypto.getRandomValues;
+    }
+  }
+  // Bytes whose roll breaks an item of +7.
+  function breakingBytes() {
+    for (let seed = 0; ; seed++) {
+      const bytes = new Uint8Array(16).map((_, index) => (seed * 31 + index * 17 + (seed >> 3)) % 256);
+      if (rollUpgrade({ upgrade: 7 }, createRng(toHex(bytes)), content).result === 'broken') return bytes;
+    }
+  }
+
+  test('an item of a set that breaks on the Kowadło undoes nothing the Warownia saved meanwhile: the try waits', async () => {
+    const database = await db();
+    await database
+      .prepare('UPDATE characters SET gold = 1000000, resources = json_set(resources, ?, 10000), materials = ? WHERE id = ?')
+      .bind('$."iron-ore"', JSON.stringify({ 'wolf-pelt:common': 1000 }), id)
+      .run();
+    assert.equal((await save(0, 'Pierwszy')).status, 201);
+    // A training done, waiting to be claimed.
+    const day = questPeriod('daily', Date.now(), content).key;
+    const training = { day, startedAt: Date.now() - 7200000, endsAt: Date.now() - 1, hours: 1, xp: 50, claimed: false };
+    await database.prepare('UPDATE characters SET fortress = ?').bind(JSON.stringify({ ...(await fortressOf()), training })).run();
+    const bytes = breakingBytes();
+    // "Odbierz trening" lands between the try's read and its write.
+    const claimed = async () =>
+      database.prepare("UPDATE characters SET fortress = json_set(fortress, '$.training.claimed', json('true')), class_xp = class_xp + 50, version = version + 1 WHERE id = ?").bind(id).run();
+    const DB = racing(database, (sql) => sql.includes("SET data = json_set(data, '$.upgrade'"), claimed);
+    await withRoll(bytes, () =>
+      assert.rejects(upgradeItem({ request: request(`/api/items/${armour}/upgrade`, {}), env: { DB }, now: Date.now(), params: { id: String(armour) } }), (error) => error.status === 409 && error.code === 'item_changed'),
+    );
+    // The training stays claimed, and the item and the payment as they were.
+    assert.equal((await fortressOf()).training.claimed, true);
+    const item = await database.prepare('SELECT data FROM items WHERE id = ?').bind(armour).first();
+    assert.equal(JSON.parse(item.data).upgrade, 7);
+    assert.equal((await database.prepare('SELECT gold FROM characters').first()).gold, 1000000);
+    // Tried again on its own, the item breaks and its set forgets it.
+    const broken = await withRoll(bytes, () => upgradeItem({ request: request(`/api/items/${armour}/upgrade`, {}), env: { DB: database }, now: Date.now(), params: { id: String(armour) } }));
+    assert.equal(broken.status, 200);
+    assert.equal((await broken.json()).upgrade.result, 'broken');
+    assert.deepEqual((await fortressOf()).sets[0].items, []);
+    assert.equal((await fortressOf()).training.claimed, true);
+  });
+
+  test('"Załóż zestaw" waits when the sets changed meanwhile: the bag never takes more than it holds', async () => {
+    assert.equal((await save(0, 'Pierwszy')).status, 201);
+    assert.equal((await call('POST', `/api/items/${spare}/equip`, { cookie })).status, 200);
+    assert.equal((await save(1, 'Drugi')).status, 201);
+    // The bag exactly full.
+    const character = await view();
+    const stack = content.professionRules.stack;
+    const database = await db();
+    await database.prepare('UPDATE characters SET herbs = ?').bind(JSON.stringify({ [content.herbs[0].id]: stack * (character.bagCapacity - character.bagUsed) })).run();
+    // "Usuń zestaw" of the second set lands between the change's read and its
+    // write: the spare armour it kept would come off into the full bag.
+    const cleared = async () => {
+      const state = await fortressOf();
+      await database.prepare('UPDATE characters SET fortress = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify({ ...state, sets: [state.sets[0], null] }), id).run();
+    };
+    const DB = racing(database, (sql) => sql.startsWith('UPDATE items SET slot = NULL WHERE character_id = ? AND slot IS NOT NULL'), cleared);
+    await assert.rejects(wearGearSet({ request: request('/api/fortress/sets/wear', { index: 0 }), env: { DB }, now: Date.now(), params: {} }), (error) => error.status === 409 && error.code === 'character_changed');
+    const after = await view();
+    assert.equal(after.equipment.chest.id, spare);
+    assert.equal(after.bagUsed, after.bagCapacity);
+    // Read again, the change sees the spare armour would go to the full bag.
+    const again = await call('POST', '/api/fortress/sets/wear', { cookie, body: { index: 0 } });
+    assert.equal(again.data.error.code, 'bag_full');
   });
 });
