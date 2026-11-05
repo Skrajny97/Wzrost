@@ -1882,6 +1882,21 @@ describe('Time Points and the narrator', () => {
     assert.equal(next.level, 1);
   });
 
+  // With the switch on the page passes the parts due one after another,
+  // without a tap in between, so the next may go before the server has
+  // answered the one before (the code review of 0.1.77: a part was lost and
+  // came again).
+  test('parts skipped at the same moment all stay read, in the order of the data', async () => {
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once;
+    const ids = (chapter) => tutorial.lines.filter((line) => kept(line) && line.chapter === chapter).map((line) => line.id);
+    const intro = (await see({ skip: true })).data.character.tutorial;
+    const skipped = await Promise.all(['skills', 'professions', 'community'].map((chapter) => see({ skip: true, chapter })));
+    assert.deepEqual(skipped.map((answer) => answer.status), [200, 200, 200]);
+    assert.deepEqual((await character()).tutorial, [...intro, ...ids('skills'), ...ids('professions'), ...ids('community')]);
+  });
+
   test('the narrator remembers the cards and pointers read, and "Pomiń wprowadzenie" marks them all', async () => {
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     assert.deepEqual((await see({ card: 'intro' })).data.character.tutorial, ['intro']);

@@ -43,13 +43,23 @@ export async function seeTutorial(context) {
 
 // A part skipped (`chapter`, or null for the introduction): its lines are
 // read, and the other parts' stay as they were. The introduction skipped
-// before its ending has the first steps played for the player first.
+// before its ending has the first steps played for the player first. The
+// lines are the data's, in its order, of the part or read by the moment of
+// saving, in one statement: with "Pomijaj objaśnienia narratora" the page
+// passes the parts due one after another, so another part skipped at the
+// same moment stays read too (the code review of 0.1.77).
 async function skipPart(db, userId, row, chapter, now) {
-  const read = JSON.parse(row.tutorial);
-  if (chapter === null && !read.includes('ending')) await playFirstSteps(db, userId, now);
-  const part = tutorialPart(chapter);
-  const kept = tutorialLines.filter((id) => part.includes(id) || read.includes(id));
-  await db.prepare('UPDATE characters SET tutorial = ? WHERE id = ?').bind(JSON.stringify(kept), row.id).run();
+  if (chapter === null && !JSON.parse(row.tutorial).includes('ending')) await playFirstSteps(db, userId, now);
+  await db
+    .prepare(
+      `UPDATE characters SET tutorial = (
+         SELECT json_group_array(line.value) FROM json_each(?) AS line
+         WHERE line.value IN (SELECT value FROM json_each(?)) OR line.value IN (SELECT value FROM json_each(characters.tutorial))
+       )
+       WHERE id = ? AND tutorial IS NOT NULL`,
+    )
+    .bind(JSON.stringify(tutorialLines), JSON.stringify(tutorialPart(chapter)), row.id)
+    .run();
 }
 
 // A new character of an account with "Pomijaj objaśnienia narratora" on
