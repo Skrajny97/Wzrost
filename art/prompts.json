@@ -12,7 +12,10 @@
         "bandit-chief": "src/client/art/monsters/bandit-thug.png",
         "poacher": "src/client/art/monsters/bandit-crossbow.png",
         "horse-thief": "src/client/art/monsters/bandit-knifer.png",
-        "smuggler": "src/client/art/monsters/bandit-knifer.png"
+        "smuggler": "src/client/art/monsters/bandit-knifer.png",
+        "arsonist": "src/client/art/monsters/bandit-thug.png",
+        "highwaywoman": "src/client/art/monsters/bandit-knifer.png",
+        "grave-robber": "src/client/art/monsters/bandit-crossbow.png"
       },
       "references": {
         "drought-husk": [{ "path": "art/references/monsters/drought-husk-b.png", "usage": "the creature's look chosen by the author: the same gaunt cracked husk, its big skull-like head, face and colours, but drawn whole down to both feet, hunched so that it fills the whole picture" }]
@@ -25,6 +28,9 @@
       "poacher": "lean poacher in a hooded mossy-green cloak holding a short crossbow, snares and a hare hanging at the belt, full body, three-quarter view",
       "horse-thief": "wiry horse thief in a patched brown coat with a coiled rope lasso in one hand and a long knife in the other, a bridle over the shoulder, full body, three-quarter view",
       "smuggler": "hooded smuggler in a dark oilskin cloak carrying a heavy sack over the shoulder and a curved dagger, a small lantern at the belt, full body, three-quarter view",
+      "arsonist": "gaunt outlaw arsonist with wild red hair and a scruffy red beard, a soot-blackened tunic and a singed leather apron, a burning torch raised in one hand and a clay fire pot with a smoking fuse in the other, a wicked grin, full body, three-quarter view",
+      "highwaywoman": "lithe highwaywoman robber in a dark red hooded cloak over a studded leather jerkin, a cloth mask over the lower face, two daggers held in a reverse grip, a fat coin purse at the belt, long braid over the shoulder, full body, three-quarter view",
+      "grave-robber": "hunched grave robber in a tattered grey cloak, a heavy iron spade held in both hands, a dim lantern hanging from the belt, a lumpy sack of stolen trinkets on the back, a sunken pale face with a crooked nose, full body, three-quarter view",
       "fox": "red fox with a bushy white-tipped tail and black legs, full body, three-quarter view",
       "lynx": "Eurasian lynx with tufted ears, spotted tawny fur and a short black-tipped tail, crouching to pounce, full body, three-quarter view",
       "bear": "massive brown bear on all fours, mouth open in a roar, full body, three-quarter view",
