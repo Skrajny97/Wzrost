@@ -13951,3 +13951,54 @@ a.profession-square:active {
   color: var(--gold, #e0b04a);
   font-family: var(--font-system);
 }
+
+/* The chosen mercenary's fee more than the gold the character has. */
+.mercenary-chosen > .mercenary-chosen-short {
+  flex-basis: 100%;
+}
+
+/* The Karczma's list of those waiting to be hired, each with its price an
+   hour and "Weź na wyprawę" beside it (or under it on a narrow phone), as
+   the rows of "Opcje wyprawy" look. */
+.mercenary-hire {
+  margin-top: 8px;
+}
+
+.mercenary-offers {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mercenary-offer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2px 10px;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+.mercenary-offer > .mercenary-row-name,
+.mercenary-offer > .mercenary-row-line {
+  grid-column: 1;
+}
+
+.mercenary-offer-take {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+@media (max-width: 380px) {
+  .mercenary-offer-take {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    justify-self: start;
+    margin-top: 6px;
+  }
+}

@@ -751,7 +751,8 @@ export function mountCombat(container, { params, navigate }) {
         }),
       );
     // A mercenary from the Karczma (mercenaries.js), from its level: on a
-    // plain "Wyrusz" only, for the length chosen.
+    // plain "Wyrusz" only, for the length chosen. One taken in the Karczma
+    // ("Weź na wyprawę") comes chosen.
     const mercenary = !first && character.mercenaries ? mercenaryChoice(() => minutes, () => showSummary()) : null;
     // The boxes of the exploration; they go into "Opcje wyprawy" below.
     const choices =
@@ -925,21 +926,37 @@ export function mountCombat(container, { params, navigate }) {
         withButton(event.currentTarget, async () => {
           remember();
           const along = party?.along();
-          const answer = await call('POST', along ? '/api/party/hunt' : '/api/hunts', {
-            areaId: area.id,
-            minutes,
-            avoidRare: avoiding(),
-            seekRare: seeking(),
-            trackQuests: tracking(),
-            trackUnknown: tracingUnknown(),
-            ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
-            ...(scouted && !along && { scout: scouted }),
-            ...(hardOn() && !along && { hard: true }),
-            ...(mercenary?.chosen() && !along && { mercenary: mercenary.chosen() }),
-          });
-          // Those who went, as the server says: one may have got busy meanwhile.
-          if (along) toast(answer.went?.length > 0 ? `Drużyna wyrusza: ${answer.went.join(', ')}.` : 'Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.');
-          else if (mercenary?.chosen()) toast(`${mercenary.hired().name} idzie z Tobą. Zapłacono ${formatNumber(mercenary.hired().gold)} zł.`);
+          const hiring = !along && mercenary?.chosen();
+          let answer;
+          try {
+            answer = await call('POST', along ? '/api/party/hunt' : '/api/hunts', {
+              areaId: area.id,
+              minutes,
+              avoidRare: avoiding(),
+              seekRare: seeking(),
+              trackQuests: tracking(),
+              trackUnknown: tracingUnknown(),
+              ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
+              ...(scouted && !along && { scout: scouted }),
+              ...(hardOn() && !along && { hard: true }),
+              ...(hiring && { mercenary: hiring }),
+            });
+          } catch (error) {
+            // A mercenary hired by someone else meanwhile, or whose offer
+            // changed, is chosen no more; the server's words say why.
+            if (hiring) mercenary.failed(error);
+            throw error;
+          }
+          // Those who went, as the server says: one may have got busy
+          // meanwhile. A mercenary chosen stays home, chosen for a plain
+          // exploration (mercenaries.js).
+          if (along) {
+            const went = answer.went?.length > 0 ? `Drużyna wyrusza: ${answer.went.join(', ')}.` : 'Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.';
+            toast(mercenary?.chosen() ? `${went} ${character.mercenaries.texts.plainOnly}` : went);
+          } else if (hiring) {
+            toast(`${mercenary.hired().name} idzie z Tobą. Zapłacono ${formatNumber(mercenary.hired().gold)} zł.`);
+            mercenary.forget();
+          }
           leaveView(HOME, 2);
         }),
     });
@@ -996,7 +1013,8 @@ export function mountCombat(container, { params, navigate }) {
         // Everything the exploration is set up with in one frame, above the
         // threat it changes and "Wyrusz" (the author: not scattered over the
         // card). The narrator's first exploration has only its length.
-        first ? durations : huntOptions(summary, [durations, potions?.element, choices, scoutBox]),
+        // Open while a mercenary is chosen, so its fee is in sight.
+        first ? durations : huntOptions(summary, [durations, potions?.element, choices, scoutBox], Boolean(mercenary?.chosen())),
         threatLine,
         watchLine,
         party?.element,
@@ -1111,14 +1129,15 @@ export function mountCombat(container, { params, navigate }) {
 
   // "Opcje wyprawy" as a tab that unfolds (the author: "niech staną się
   // rozwijaną zakładką"): a bar with the summary, the choices under it.
-  function huntOptions(summary, parts) {
-    const body = h('div', { class: 'hunt-options-body', id: 'hunt-options-body', hidden: !huntOptionsOpen() }, parts);
+  // Folded as the player left it last, unless `force` (a mercenary chosen).
+  function huntOptions(summary, parts, force = false) {
+    const body = h('div', { class: 'hunt-options-body', id: 'hunt-options-body', hidden: !(force || huntOptionsOpen()) }, parts);
     const toggle = h(
       'button',
       {
         type: 'button',
         class: 'hunt-options-toggle',
-        'aria-expanded': String(huntOptionsOpen()),
+        'aria-expanded': String(force || huntOptionsOpen()),
         'aria-controls': 'hunt-options-body',
         onClick: () => {
           const open = body.hidden;

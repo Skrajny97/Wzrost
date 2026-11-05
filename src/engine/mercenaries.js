@@ -11,10 +11,12 @@ export const mercenariesOf = (content) => content.settlement?.mercenaries ?? nul
 export const mercenariesOpen = (level, content) => Boolean(mercenariesOf(content)) && level >= mercenariesOf(content).fromLevel;
 
 // What a character of `level` may ask for an hour of an exploration, in
-// whole gold: the least, the most and the game's suggestion.
+// whole gold: the least and the game's suggestion by its level, and the
+// most the same for every level (the author, 5.11.2026: "powinna sięgać
+// nawet i 100000 złota jesli ktoś chce").
 export function mercenaryPriceRange(level, content) {
   const { price } = mercenariesOf(content);
-  return { min: Math.round(price.min * level), max: Math.round(price.max * level), suggested: Math.round(price.suggested * level) };
+  return { min: Math.round(price.minPerLevel * level), max: price.max, suggested: Math.round(price.suggestedPerLevel * level) };
 }
 
 // What an exploration of `minutes` costs at `perHour`: at least one gold.

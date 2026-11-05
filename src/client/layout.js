@@ -14,6 +14,7 @@ import { communityNews, communityNewsText } from './chat-news.js';
 import { $, fill, h, icon } from './dom.js';
 import { formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
 import { SYSTEM_POINTS_ICON } from './icons.js';
+import { MERCENARIES_HASH } from './mercenaries.js';
 import { anyClaimable, showQuests } from './quests.js';
 import { SECTION_ICONS, SECTION_NEWS, sectionHash } from './screens/community.js';
 import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNow, state, timePointsNow, unlockInfo, walletEntries } from './state.js';
@@ -318,10 +319,10 @@ export function updateTopbar(now = serverNow()) {
   const { activityLabel, activityTime } = topbar;
   topbar.activity.classList.toggle('activity--done', activityFinished(activity, now));
   // A profession's work leads to its screen, a mercenary's offer or service
-  // to the Karczma (mercenaries.js), the rest to Walka.
+  // to the Karczma's Najemnicy tab (mercenaries.js), the rest to Walka.
   const work = WORK_SCREENS[activity?.kind];
   const serving = activity?.kind === 'mercenary';
-  topbar.activity.setAttribute('href', work ? work.href : serving ? '#/osada/tavern' : '#/walka');
+  topbar.activity.setAttribute('href', work ? work.href : serving ? MERCENARIES_HASH : '#/walka');
   if (activity) {
     activityLabel.textContent = work ? `${work.label} · ${activity.placeName}` : serving ? `USŁUGA NAJEMNA · ${activity.placeName}` : `EKSPLORACJA · ${activity.areaName}`;
     activityTime.textContent = activityFinished(activity, now)

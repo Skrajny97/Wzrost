@@ -18,6 +18,9 @@ export const state = {
   // The tag of last week's best guild, in gold wherever a guild's tag shows
   // (380 C; GET /api/character and the guilds' ranking, guild-fame.js).
   championTag: null,
+  // The mercenary taken from the Karczma or picked in "Opcje wyprawy", for
+  // the next exploration of the character named `by` (mercenaries.js).
+  mercenary: null,
 };
 
 const listeners = new Set();

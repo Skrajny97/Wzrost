@@ -722,6 +722,9 @@ describe('the Osada through the API', () => {
     // The page has the innkeeper's words only, with the place's name; what
     // the rumor means is not told (the author).
     assert.deepEqual(Object.keys(bought.data.settlement.tavern.rumor), ['text']);
+    // The names of the Karczma's tabs come with it (the author: "zrób
+    // zakładki, bo też trzeba scrollować").
+    assert.deepEqual(bought.data.settlement.tavern.tabs, content.settlement.tavern.tabs);
     assert.ok(bought.data.settlement.tavern.rumor.text.includes(content.areasById[told.areaId].name));
     assert.equal(told.used, false);
     assert.equal(bought.data.character.gold, 100000 - gold);

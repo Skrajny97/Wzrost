@@ -17,10 +17,10 @@ import { leaveView, openView } from '../history.js';
 import { desktopLayout, onLayoutChange } from '../layout-mode.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
-import { call, serverNow, state, unlockInfo } from '../state.js';
+import { activityFinished, call, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { companionCard } from '../companions.js';
-import { mercenariesCard } from '../mercenaries.js';
+import { mercenariesCard, mountMercenaryHire, serviceWaiting } from '../mercenaries.js';
 import { askGuildButton } from '../guild-requests.js';
 import { mountCasino } from '../casino.js';
 import { trialHallCards } from '../trial-hall.js';
@@ -51,6 +51,9 @@ function timeLeft(ms) {
 
 const SETTLEMENT = '#/osada';
 const HISTORY_KEY = 'osada'; // a place's screen lies one view below the board
+// The Karczma's tabs, the first one opened by default; the address may
+// name another (#/osada/tavern/mercenaries).
+const TAVERN_TABS = ['mug', 'companions', 'mercenaries'];
 // The board's ground, in its pixels: a place's picture keeps its own size on it.
 const BOARD_WIDTH = 384;
 // Its shape, as styles.css draws it (.settlement-map, aspect-ratio 384 / 768).
@@ -78,6 +81,22 @@ export function mountSettlement(container, { params = {} } = {}) {
   // (the author: "Podziel tablicę zleceń na dwie zakładki - zlecenia i
   // poszukiwani bo za dużo scrollowania"), kept while the screen redraws.
   let boardTab = 'orders';
+  // The Karczma's tab: the mug with the rumor first, then the companions
+  // and the mercenaries (the author: "Daj też opcję wynajęcia z pozycji
+  // Karczmy i zrób zakładki, bo też trzeba scrollować"), kept while the
+  // screen redraws. The address may name it (the top bar leads a mercenary
+  // to its tab) and follows the tab chosen, as the Encyklopedia's does.
+  let tavernTab = TAVERN_TABS.includes(params.tab) ? params.tab : 'mug';
+  // The mercenaries waiting to be hired (mercenaries.js), mounted once their
+  // tab opens and kept while the screen redraws, as the Targowisko is.
+  let hire = null;
+  const hirePanel = () => {
+    if (!hire) {
+      const holder = h('section', { class: 'stack mercenary-hire', 'data-guide': 'tavern-hire' });
+      hire = { holder, ...mountMercenaryHire(holder) };
+    } else hire.refresh();
+    return hire.holder;
+  };
   // The Targowisko's panel, mounted once and kept while the screen redraws
   // itself, so that a redraw does not ask the server for it again.
   let market = null;
@@ -1122,7 +1141,7 @@ export function mountSettlement(container, { params = {} } = {}) {
         data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij afiks', onClick: reforgeSheet }),
         data.imbue && h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij żywioł', onClick: imbueSheet }),
       );
-    if (resident.service === 'tavern') return h('div', { class: 'stack' }, tavernCard(), companionsCard(), mercenariesCard(() => apply({})));
+    if (resident.service === 'tavern') return tavernTabs();
     if (resident.service === 'herbalist') return herbalistCard();
     if (resident.service === 'forge') return forgeCard();
     if (resident.service === 'tannery') {
@@ -1213,6 +1232,57 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
+  // The Karczma's tabs: the mug with today's rumor, the companions, and
+  // from their level the mercenaries, with a dot while the pay of a
+  // service, or the close of an offer nobody took, waits there (as the
+  // Osada's dot lights for it). The narrator's lines open the tab that
+  // holds their place (narrator.js).
+  function tavernTabs() {
+    const names = data.tavern.tabs;
+    const mercenaries = state.character.mercenaries;
+    const shown = tavernTab === 'mercenaries' && !mercenaries ? 'mug' : tavernTab;
+    const tab = (id, label, dot = null) =>
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'chat-tab',
+          role: 'tab',
+          'data-guide': `tavern-tab-${id}`,
+          'aria-selected': String(shown === id),
+          onClick: () => pickTavernTab(id),
+        },
+        h('span', { class: 'chat-tab-name', text: label }),
+        dot && h('span', { class: 'community-dot', role: 'img', 'aria-label': dot }),
+      );
+    const body = {
+      mug: () => tavernCard(),
+      companions: () => companionsCard(),
+      mercenaries: () => [mercenariesCard(() => apply({})), hirePanel()],
+    }[shown]();
+    const name = data.places.find((place) => place.id === 'tavern')?.name;
+    return h(
+      'div',
+      { class: 'stack' },
+      h(
+        'div',
+        { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': name },
+        tab('mug', names.mug),
+        tab('companions', names.companions),
+        mercenaries && tab('mercenaries', mercenaries.texts.title, serviceWaiting()),
+      ),
+      body,
+    );
+  }
+
+  function pickTavernTab(id) {
+    tavernTab = id;
+    history.replaceState(history.state, '', id === TAVERN_TABS[0] ? `${SETTLEMENT}/tavern` : `${SETTLEMENT}/tavern/${id}`);
+    // Those waiting to be hired are asked for anew each time their tab opens.
+    if (id === 'mercenaries') hire?.reload();
+    render();
+  }
+
   // A torch on the board, at its own size, standing on its spot: its flame
   // flickers and glows as the camp's fire does, more at dusk and at night
   // (the author: "pochodnie [...] które będą działać jak małe ogniska");
@@ -1236,7 +1306,7 @@ export function mountSettlement(container, { params = {} } = {}) {
 
   // A place on the board: its picture at its own size on the ground, its
   // name, and a dot on the Tablica when an order waits, on the Targowisko
-  // when a parcel does.
+  // when a parcel does, on the Karczma when a mercenary's pay does.
   function placeLink(place) {
     const hash = `${SETTLEMENT}/${place.id}`;
     const art = settlementPlaceArt(place.id);
@@ -1254,7 +1324,8 @@ export function mountSettlement(container, { params = {} } = {}) {
       },
       art ? h('span', { class: 'settlement-place-art-box' }, art) : h('span', { class: 'settlement-place-empty' }),
       h('span', { class: 'settlement-place-label', text: place.name }),
-      ((place.id === 'board' && deliverable()) || (place.id === 'market' && data.market?.waiting > 0)) && h('span', { class: 'settlement-place-dot', 'aria-hidden': 'true' }),
+      ((place.id === 'board' && deliverable()) || (place.id === 'market' && data.market?.waiting > 0) || (place.id === 'tavern' && serviceWaiting())) &&
+        h('span', { class: 'settlement-place-dot', 'aria-hidden': 'true' }),
     );
     if (art) {
       const size = () => (link.style.width = `${(art.naturalWidth / BOARD_WIDTH) * 100}%`);
@@ -1352,14 +1423,19 @@ export function mountSettlement(container, { params = {} } = {}) {
     if (failure) return fill(container, pageHeading('Osada'), systemPanel(failure.message));
     if (!data) return fill(container, pageHeading('Osada'), h('p', { class: 'muted', text: 'Wczytywanie…' }));
     const place = placeId && data.places.find((one) => one.id === placeId);
-    // An unknown place in the address leads back to the board.
+    // An unknown place in the address leads back to the board, and a tab
+    // the place does not have to the place.
     if (placeId && !place) return location.replace(SETTLEMENT);
+    if (place && params.tab && (place.id !== 'tavern' || !TAVERN_TABS.includes(params.tab))) return location.replace(`${SETTLEMENT}/${place.id}`);
     if (place) placeView(place);
     else boardView();
-    // An empty slot fills when its time comes, and a wounded companion is
-    // ready again when the character has rested to full HP.
+    // An empty slot fills when its time comes, a wounded companion is ready
+    // again when the character has rested to full HP, and a mercenary's
+    // pay waits once its offer or service ends (its dots).
     const wounds = (data.companions?.hired ?? []).map((companion) => companion.healsAt).filter((at) => at > serverNow());
-    const next = Math.min(...data.board.slots.filter((slot) => slot.readyAt).map((slot) => slot.readyAt), ...wounds);
+    const activity = state.character.activity;
+    const service = activity?.kind === 'mercenary' && !activityFinished(activity) ? [activity.endsAt + 1000] : [];
+    const next = Math.min(...data.board.slots.filter((slot) => slot.readyAt).map((slot) => slot.readyAt), ...wounds, ...service);
     if (Number.isFinite(next)) timer = setTimeout(load, Math.max(1000, next - serverNow() + 1000));
   }
 
@@ -1374,6 +1450,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       stopLayout();
       market?.unmount();
       casino?.unmount();
+      hire?.unmount();
     },
   };
 }

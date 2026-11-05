@@ -348,6 +348,7 @@
   },
   "tavern": {
     "resident": "innkeeper",
+    "tabs": { "mug": "Kufel", "companions": "Towarzysze" },
     "relationGain": 10,
     "mugGoldPerLevel": 2,
     "rumor": {
@@ -721,12 +722,13 @@
     }
   },
   "mercenaries": {
-    "$comment": "Najemnicy w Karczmie (autor 5.11.2026: „Niech w Karczmie będzie opcja wystawienia swoich usług na czas nieobecności”, 633.1 A, 633.2 A, 633.3 A, „Oddanie się do werbunku jest okresowe i postać nie może nic wtedy robić, chyba że zdejmie wystawienie swojej usługi” i „Gdy zostanie zwerbowany nie może już zdjąć swojej usługi do czasu jej zakończenia (1 wyprawa)”). Od fromLevel poziomu postać wystawia się na jedną z hours godzin, z ceną za godzinę wyprawy od price.min do price.max razy jej poziom (podpowiedź: price.suggested razy poziom). Zasady w src/engine/mercenaries.js i src/server/mercenaries.js.",
+    "$comment": "Najemnicy w Karczmie (autor 5.11.2026: „Niech w Karczmie będzie opcja wystawienia swoich usług na czas nieobecności”, 633.1 A, 633.2 A, 633.3 A, „Oddanie się do werbunku jest okresowe i postać nie może nic wtedy robić, chyba że zdejmie wystawienie swojej usługi” i „Gdy zostanie zwerbowany nie może już zdjąć swojej usługi do czasu jej zakończenia (1 wyprawa)”). Od fromLevel poziomu postać wystawia się na jedną z hours godzin, z ceną za godzinę wyprawy od price.minPerLevel razy jej poziom do price.max złota bez względu na poziom (autor 5.11.2026: „Dlaczego cena za godzine wyprawy najemnika jest ograniczona.. powinna sięgać nawet i 100000 złota jesli ktoś chce”; podpowiedź: price.suggestedPerLevel razy poziom). Postacie, które czekają na werbunek, są też w Karczmie, z przyciskiem „Weź na wyprawę” (autor 5.11.2026: „Daj też opcję wynajęcia z pozycji Karczmy”). Zasady w src/engine/mercenaries.js i src/server/mercenaries.js.",
     "fromLevel": 25,
     "hours": [1, 2, 4, 8, 12, 24],
-    "price": { "min": 2, "max": 20, "suggested": 8 },
+    "price": { "minPerLevel": 2, "suggestedPerLevel": 8, "max": 100000 },
     "texts": {
       "title": "Najemnicy",
+      "offerTitle": "Twoje usługi",
       "intro": "Wystaw swoją postać do werbunku. Inny gracz zabierze ją na jedną wyprawę i zapłaci za każdą jej godzinę tyle, ile zażądasz.",
       "hoursLabel": "Na ile godzin",
       "priceLabel": "Cena za godzinę wyprawy",
@@ -765,7 +767,16 @@
       "hiredLocked": "Postać jest zwerbowana. Ogłoszenia nie da się zdjąć do końca wyprawy.",
       "notOffering": "Nie masz wystawionych usług.",
       "invalidHours": "Wybierz, na ile godzin.",
-      "invalidPrice": "Cena musi być od {min} do {max} zł za godzinę."
+      "invalidPrice": "Cena musi być od {min} do {max} zł za godzinę.",
+      "offerBusy": "Postać jest teraz zajęta. Usługi wystawisz, gdy wróci.",
+      "hireTitle": "Czekają na werbunek",
+      "hireIntro": "Najemnik pójdzie z Tobą na następną zwykłą wyprawę, zamiast jednego towarzysza. Miejsce i czas wybierzesz w Walce, a zapłacisz przy „Wyrusz”, za każdą godzinę wyprawy.",
+      "hire": "Weź na wyprawę",
+      "hireToast": "{name} pójdzie z Tobą. Wybierz miejsce wyprawy.",
+      "hireBusy": "Postać jest teraz zajęta. Najemnika weźmiesz po odebraniu raportu.",
+      "hireOwnOffer": "Najemnika weźmiesz, gdy zdejmiesz swoje ogłoszenie albo odbierzesz zapłatę za usługę.",
+      "dotPay": "zapłata do odebrania",
+      "dotClose": "ogłoszenie do zamknięcia"
     }
   }
 }

@@ -72,8 +72,9 @@ const ROUTES = [
   { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: lockedScreen('core', 'Rdzeń') },
   // Profesje, or one profession's screen (Zielarstwo).
   { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', part: ({ profession }) => profession, music: 'professions', mount: mountProfessions },
-  // The Osada's board, or one of its places.
-  { pattern: /^#\/osada(?:\/(?<place>[a-z0-9-]+))?$/, nav: 'main', tab: 'osada', part: ({ place }) => place, mount: mountSettlement },
+  // The Osada's board, or one of its places, the Karczma at one of its
+  // tabs (settlement.js).
+  { pattern: /^#\/osada(?:\/(?<place>[a-z0-9-]+)(?:\/(?<tab>[a-z]+))?)?$/, nav: 'main', tab: 'osada', part: ({ place }) => place, mount: mountSettlement },
   // The Społeczność, or one of its parts (the computer menu's shortcuts).
   { pattern: /^#\/spolecznosc(?:\/(?<section>[a-z]+))?$/, nav: 'main', tab: 'spolecznosc', mount: mountCommunity },
   // The Gildia's own page, from its tab in the Społeczność, at one of its

@@ -294,7 +294,7 @@ export function mountQuarters(holder) {
         { class: 'stack' },
         h('h2', { class: 'section-title', text: `Towarzysze: ${hired.length} z ${places}` }),
         hired.length === 0
-          ? h('p', { class: 'muted' }, 'Nikt tu jeszcze nie mieszka. Towarzyszy zwerbujesz w ', h('a', { href: '#/osada/tavern', text: 'Karczmie' }), ' w Osadzie.')
+          ? h('p', { class: 'muted' }, 'Nikt tu jeszcze nie mieszka. Towarzyszy zwerbujesz w ', h('a', { href: '#/osada/tavern/companions', text: 'Karczmie' }), ' w Osadzie.')
           : hired.map((companion) =>
               companionCard(
                 companion,

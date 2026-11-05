@@ -511,11 +511,14 @@ export async function buyFromHerbalist(context) {
   });
 }
 
-// The Karczma: the mug's price and today's rumor once the innkeeper told
-// it (not the beggar's song: the mug still tells it, for the relation).
+// The Karczma: the names of its tabs (the author, 5.11.2026: "zrób
+// zakładki, bo też trzeba scrollować"), the mug's price and today's rumor
+// once the innkeeper told it (not the beggar's song: the mug still tells
+// it, for the relation).
 function tavernView(row, stored, now) {
   const rumor = rumorToday(stored.rumor, now, content);
   return {
+    tabs: content.settlement.tavern.tabs,
     mug: mugCost(row.level, content),
     // The innkeeper's words only: the place and what it means are the
     // player's to work out.

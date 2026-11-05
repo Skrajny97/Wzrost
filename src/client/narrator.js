@@ -141,7 +141,8 @@ const placesDue = (read) =>
   !communityWaiting(read) &&
   !craftingWaiting(read) &&
   read.has('settlement-ending');
-const onPlace = (placeId) => (hash, read) => hash === `#/osada/${placeId}` && placesDue(read);
+// A place's screen, also at one of its tabs (the Karczma's, settlement.js).
+const onPlace = (placeId) => (hash, read) => (hash === `#/osada/${placeId}` || hash.startsWith(`#/osada/${placeId}/`)) && placesDue(read);
 const onQuarters = (hash, read) =>
   hash === '#/oboz/quarters' && placesDue(read) && (state.character.camp.buildings.find((building) => building.id === 'quarters')?.level ?? 0) > 0;
 
@@ -268,7 +269,9 @@ const campDone = (hash, read) => read.has('camp') && (campStarted() || !affordab
 // `survey` has the camera take in the whole of a place for a moment before
 // the light, with nothing lit: the camp's board before its plots. A `late`
 // line is told also after the ending, once, to a character that finished
-// the introduction before the line was written.
+// the introduction before the line was written. `tab` names the button of
+// the tab that holds the places, opened first: a tab not open is not drawn
+// at all, so its places would be missing (the Karczma's, settlement.js).
 const BEATS = {
   ask: { when: (hash, read) => read.size === 0 },
   intro: { when: () => true },
@@ -391,9 +394,11 @@ const BEATS = {
     when: settlementHere,
   },
   // The places, each on its first visit after the board's tour.
-  'settlement-tavern-mug': { place: mark('tavern-mug'), when: onPlace('tavern') },
-  'settlement-tavern-hire': { place: mark('tavern-companions'), when: onPlace('tavern') },
-  'settlement-tavern-quarters': { place: mark('tavern-quarters'), when: onPlace('tavern') },
+  // The Karczma's lines each open the tab of their place (the author: "zrób
+  // zakładki, bo też trzeba scrollować").
+  'settlement-tavern-mug': { place: mark('tavern-mug'), tab: mark('tavern-tab-mug'), when: onPlace('tavern') },
+  'settlement-tavern-hire': { place: mark('tavern-companions'), tab: mark('tavern-tab-companions'), when: onPlace('tavern') },
+  'settlement-tavern-quarters': { place: mark('tavern-quarters'), tab: mark('tavern-tab-companions'), when: onPlace('tavern') },
   'settlement-enchanter-affix': { place: mark('enchanter-services'), when: onPlace('enchanter') },
   'settlement-enchanter-element': { place: mark('enchanter-services'), when: onPlace('enchanter') },
   'settlement-enchanter-relation': { place: mark('resident-card'), when: onPlace('enchanter') },
@@ -946,6 +951,7 @@ function lightUp(line) {
   let tries = 0;
   const look = () => {
     waiting = null;
+    openTab(line);
     if (places(line).length > 0) {
       missed = null;
       if (BEATS[line.id].survey && !surveyed.has(line.id)) survey(line);
@@ -968,6 +974,14 @@ function lightUp(line) {
     release(0);
   };
   look();
+}
+
+// The tab that holds a line's places, opened if another one is (`tab`):
+// its button is tapped for the player, once the screen has drawn it.
+function openTab(line) {
+  const selector = BEATS[line.id].tab;
+  const tab = selector && document.querySelector(selector);
+  if (tab && tab.getAttribute('aria-selected') !== 'true') tab.click();
 }
 
 // The camera takes in the whole of a place for a moment, with nothing lit,

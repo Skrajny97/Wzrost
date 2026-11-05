@@ -23,8 +23,19 @@ describe('mercenaries in the engine', () => {
     assert.equal(mercenariesOpen(from - 1, content), false);
     assert.equal(mercenariesOpen(from, content), true);
     const range = mercenaryPriceRange(40, content);
-    assert.deepEqual(range, { min: rules.price.min * 40, max: rules.price.max * 40, suggested: rules.price.suggested * 40 });
+    assert.deepEqual(range, { min: rules.price.minPerLevel * 40, max: 100000, suggested: rules.price.suggestedPerLevel * 40 });
     assert.ok(range.min < range.suggested && range.suggested < range.max);
+    // The most is 100 000 gold an hour at every level (the author:
+    // "powinna sięgać nawet i 100000 złota jesli ktoś chce"), above the
+    // suggestion even at the last level.
+    assert.equal(mercenaryPriceRange(from, content).max, 100000);
+    const top = content.balance.progression.maxLevel;
+    assert.equal(mercenaryPriceRange(top, content).max, 100000);
+    assert.ok(mercenaryPriceRange(top, content).suggested < 100000);
+    // The longest exploration at the most stays a whole, safe number.
+    const longest = content.balance.hunt.maxMinutes;
+    assert.equal(mercenaryFee(100000, longest), (100000 * longest) / 60);
+    assert.ok(Number.isSafeInteger(mercenaryFee(100000, longest)));
     assert.equal(mercenaryFee(100, 60), 100);
     assert.equal(mercenaryFee(100, 90), 150);
     assert.equal(mercenaryFee(100, 15), 25);
@@ -81,6 +92,30 @@ describe('mercenaries through the API', () => {
     assert.equal((await as('najemna', 'POST', '/api/mercenary/offer', { hours: 5, perHour: seen.price.suggested })).data.error.code, 'invalid_hours');
     assert.equal((await as('najemna', 'POST', '/api/mercenary/offer', { hours: 4, perHour: seen.price.max + 1 })).data.error.code, 'invalid_price');
     assert.equal((await as('najemna', 'POST', '/api/mercenary/offer', { hours: 4, perHour: 1.5 })).data.error.code, 'invalid_price');
+    assert.equal((await as('najemna', 'POST', '/api/mercenary/offer', { hours: 4, perHour: seen.price.min - 1 })).data.error.code, 'invalid_price');
+  });
+
+  test('the price an hour goes up to 100 000 gold at any level, and the fee follows it', async () => {
+    assert.equal((await character('najemna')).mercenaries.price.max, 100000);
+    const above = await as('najemna', 'POST', '/api/mercenary/offer', { hours: 4, perHour: 100001 });
+    assert.equal(above.status, 400);
+    assert.equal(above.data.error.code, 'invalid_price');
+    assert.match(above.data.error.message, /100\s000 zł/);
+    // At its level's least, 100 000 is still allowed.
+    await set('Najemna', 'level = ?', from);
+    const offered = await as('najemna', 'POST', '/api/mercenary/offer', { hours: 4, perHour: 100000 });
+    assert.equal(offered.status, 200, JSON.stringify(offered.data).slice(0, 300));
+    assert.equal(offered.data.character.activity.service.perHour, 100000);
+
+    // Listed with it, and hired for 100 000 an hour of the exploration.
+    await set('Zleceniodawca', 'gold = 500000');
+    const [one] = (await as('zlecenie', 'GET', '/api/mercenaries?minutes=120')).data.mercenaries;
+    assert.equal(one.perHour, 100000);
+    assert.equal(one.fee, 200000);
+    const started = await as('zlecenie', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 120, mercenary: { id: one.id, perHour: 100000 } });
+    assert.equal(started.status, 201, JSON.stringify(started.data).slice(0, 300));
+    assert.equal((await row('Zleceniodawca')).gold, 300000);
+    assert.deepEqual(started.data.character.activity.mercenary, { name: 'Najemna', gold: 200000 });
   });
 
   test('while offered the character does nothing else and keeps its gear, until it takes the offer back', async () => {
