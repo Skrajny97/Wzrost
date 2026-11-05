@@ -26,7 +26,8 @@ export async function getGuildTodo(context) {
   const ready = (bar) => Boolean(bar?.thresholds.some((threshold) => threshold.ready));
   return json({
     todo: {
-      trials: (!trials.taken && trials.trials.some((trial) => trial.state === 'open')) || ready(trials.bar) || ready(trials.previous),
+      // A chest to open: the trials themselves run without taking (617).
+      trials: ready(trials.bar) || ready(trials.previous),
       beast: Boolean(beast.beast && !beast.beast.fallen && beast.attacks.left > 0) || beast.chests.length > 0,
       requests: Boolean(requests.mine?.gifts.some((gift) => !gift.thanked)),
     },

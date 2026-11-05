@@ -1,20 +1,66 @@
 // The Próby Gildii (the author's 345 A; data/guilds.json, `trials`): every
 // week a guild's board of trials from the whole game, drawn from a seed of
-// the guild and the week. A member takes one trial at a time and does it in
-// its usual play; what an action brings counts as the narrator's quests
-// count it (addQuestProgress), with the tower fights won, the Kowadło's
-// upgrades and the pieces given in the Prośby Gildii besides. A trial asks
-// for as much as suits the taker's level when taken (weekShare, as the
-// weekly quests). The guild's finished trials, each member's up to the
-// cap, fill one bar with four thresholds, which grow with the members
-// active when the board was drawn; each threshold reached brings a chest
-// to everyone who finished a trial that week.
+// the guild and the week. Every trial open on the board runs for each
+// member at once, from the moment it opens, with nothing to take (the
+// author: "617 prób nie trzeba będzie brać, one będą wszystkie na raz
+// odpalone u gracza"); what an action brings counts as the narrator's
+// quests count it (addQuestProgress), with the tower fights won, the
+// Kowadło's upgrades and the pieces given in the Prośby Gildii besides. A
+// trial asks for as much as suits the member's level when it opens
+// (weekShare, as the weekly quests). The week opens day by day (the
+// author's 615 A): a few trials on Monday and more each day after. The
+// guild's finished trials fill one bar, each member's up to the cap and
+// to so many for each day of the week so far (what is finished beyond that
+// comes onto the bar on the days after), with thresholds that grow with the
+// members active when the board was drawn and, in part, with those who
+// join later; each threshold reached brings a chest to everyone who
+// finished a trial that week.
 
-import { creaturesPerFight, countedForm, questArea, weekShare } from './quests.js';
+import { creaturesPerFight, countedForm, questArea, questPeriod, weekShare } from './quests.js';
 import { createRng } from './rng.js';
 import { stackKey } from './crafting.js';
 
 const rules = (content) => content.guilds.trials;
+const DAY = 24 * 3600000;
+const WEEK_DAYS = 7;
+
+// The day of the week at `now` on the quests' clock: 0 on Monday to 6 on
+// Sunday (rounded, so a day of 23 or 25 hours counts as one).
+export function trialDay(now, content) {
+  const week = questPeriod('weekly', now, content);
+  const day = questPeriod('daily', now, content);
+  return Math.min(WEEK_DAYS - 1, Math.max(0, Math.round((day.startsAt - week.startsAt) / DAY)));
+}
+
+// How many trials of the week's board are open on `day` (trialDay): the
+// first ones on Monday and more each day after (opens); all of them where
+// the data sets no such pace.
+export function trialsOpen(day, content) {
+  const { board, opens } = rules(content);
+  if (!opens) return board;
+  return Math.min(board, opens.first + opens.perDay * day);
+}
+
+// How many trials a character may have finished this week by the end of
+// `day`: perDay for each day of the week so far, so a day missed is made up
+// later; no limit where the data sets none.
+export function trialDayLimit(day, content) {
+  const { perDay } = rules(content);
+  return Number.isInteger(perDay) ? perDay * (day + 1) : Infinity;
+}
+
+// The day of the week (trialDay) on which the trial at `index` of the
+// board opens: the first ones on Monday, then perDay more each day.
+export function trialOpensOn(index, content) {
+  const { opens } = rules(content);
+  if (!opens || index < opens.first || opens.perDay <= 0) return 0;
+  return Math.min(WEEK_DAYS - 1, 1 + Math.floor((index - opens.first) / opens.perDay));
+}
+
+// What a member who joins after the board was drawn adds to the week's
+// members: the share of the week left on `day`, that day included (all of
+// a member on Monday, a seventh on Sunday).
+export const joinShare = (day) => (WEEK_DAYS - Math.min(WEEK_DAYS - 1, Math.max(0, day))) / WEEK_DAYS;
 
 export const trialKind = (kindId, content) => rules(content).kinds.find((kind) => kind.id === kindId) ?? null;
 
@@ -118,16 +164,21 @@ export function trialGains({ kills = {}, minutes = 0, processed = 0, salvaged = 
 }
 
 // The guild's finished trials of a week: each member's up to the cap (the
-// author: nobody does everything for the others). `perMember` lists how
-// many each finished.
-export const trialPoints = (perMember, content) => perMember.reduce((sum, count) => sum + Math.min(count, rules(content).cap), 0);
+// author: nobody does everything for the others) and up to `limit`, the
+// day's (trialDayLimit; the rest come onto the bar on the days after).
+// `perMember` lists how many each finished.
+export const trialPoints = (perMember, content, limit = Infinity) => perMember.reduce((sum, count) => sum + Math.min(count, rules(content).cap, limit), 0);
 
-// The week's thresholds: how many finished trials each needs (the members
-// active when the board was drawn, at least one, times its step) and
-// whether the guild has them.
-export function trialThresholds(active, points, content) {
-  const members = Math.max(1, active);
-  return rules(content).steps.map((step, index) => ({ index, need: members * step, reached: points >= members * step }));
+// The week's thresholds: how many finished trials each needs (the week's
+// members, at least one: those active when the board was drawn and the
+// shares of those who joined later, joinShare; times its step, rounded up)
+// and whether the guild has them.
+export function trialThresholds(members, points, content) {
+  const counted = Math.max(1, members);
+  return rules(content).steps.map((step, index) => {
+    const need = Math.ceil(counted * step - 1e-9);
+    return { index, need, reached: points >= need };
+  });
 }
 
 // The material a chest gives: one of an ordinary creature of the newest

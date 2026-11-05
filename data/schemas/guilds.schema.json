@@ -422,6 +422,28 @@
           "type": "integer",
           "minimum": 1
         },
+        "opens": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "first",
+            "perDay"
+          ],
+          "properties": {
+            "first": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "perDay": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "perDay": {
+          "type": "integer",
+          "minimum": 1
+        },
         "steps": {
           "type": "array",
           "minItems": 1,
@@ -524,26 +546,21 @@
             "open",
             "claimed",
             "contribute",
-            "taken",
             "progress",
             "progressValue",
-            "noTaken",
-            "drop",
-            "dropTitle",
-            "dropText",
             "board",
-            "take",
+            "boardLine",
+            "fromOpening",
+            "later",
+            "auto",
+            "soon",
             "done",
-            "takenMark",
-            "busy",
             "previous",
             "previousUntil",
             "members",
             "capped",
             "empty",
             "noGuild",
-            "took",
-            "dropped",
             "opened",
             "gold",
             "timePointForms",
@@ -591,10 +608,6 @@
               "required": [
                 "locked",
                 "noGuild",
-                "noTrial",
-                "busy",
-                "done",
-                "notTaken",
                 "tooLate",
                 "noThreshold",
                 "noBoard",

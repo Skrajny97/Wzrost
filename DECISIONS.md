@@ -3034,6 +3034,23 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.53 (5.11.2026)
+
+Próby Gildii co dzień i wszystkie naraz (615 A i 617): zob. „Próby Gildii co dzień, wszystkie naraz”.
+
+## Próby Gildii co dzień, wszystkie naraz (5.11.2026, w grze od 0.1.53)
+
+Autor: „Do poprawy, bo jak Gildia się szybko rozwinie to przestanie być wyzwaniem sytuacja na cały tydzień”, „615 A” i „617 prób nie trzeba będzie brać, one będą wszystkie na raz odpalone u gracza”.
+
+1. **Tablica co dzień.** Tablica tygodnia ma 16 prób. W poniedziałek otwarte są 4, a każdego kolejnego dnia o północy czasu polskiego dochodzą 2 (`trials.opens`). Prób, które dopiero się otworzą, nie widać; karta mówi, ile przyjdzie jutro.
+2. **Bez brania.** Każda otwarta próba biegnie u każdego członka gildii naraz, od chwili otwarcia, a u kogoś, kto dołączył później, od dołączenia. Czynność rozpoczęta wcześniej (np. wyprawa) jej nie posuwa, jak dotąd przy braniu. Każda próba to osobny wiersz członka z liczbą dla poziomu postaci w chwili otwarcia. Wiersze robi cron co minutę (tablice na początku tygodnia i próby dnia), dołączenie do gildii i każde spojrzenie na tablicę. „Weź” i „Porzuć” zniknęły, a strona sprzed zmiany dostaje tablicę z napisem, że prób nie trzeba już brać. Wstęp karty dla postaci bez gildii mówi o próbach co dzień, liczonych naraz.
+3. **Limit dnia na pasku.** Na pasek gildii wchodzą najwyżej 2 wykonane próby postaci za każdy dzień tygodnia do dziś (do wtorku 4, do środy 6 i tak dalej), najwyżej 14 w tygodniu (`trials.perDay`, `trials.cap`). Wykonane ponad to czekają i wchodzą na pasek w kolejnych dniach. W Rankingu gildii (Sława) próby liczą się jak dotąd, do `cap`.
+4. **Progi.** Sześć progów: 2, 4, 6, 8, 10 i 12 prób na członka. Skrzynia piąta: 40 złota i 16 za poziom postaci, 40 Punktów Czasu, 6 sztuk materiału, 5 Punktów Systemu; szósta: 50 złota i 20 za poziom, 50 Punktów Czasu, 8 sztuk materiału, 10 Punktów Systemu. Nawet gdy każdy członek wykonuje wszystko, na co pozwala dzień, ostatni próg przychodzi najwcześniej w sobotę.
+5. **Dochodzący członkowie.** Członkowie aktywni przy losowaniu tablicy liczą się jak dotąd. Kto dołączy później, dodaje (7 − dzień tygodnia)/7 członka: w poniedziałek całego, w niedzielę 1/7 (zapisane przy tablicy, `joined`). Próg to iloczyn zaokrąglony w górę.
+6. **617.** Pytanie o liczenie od wzięcia odpadło razem z braniem: liczy się to, co postać zrobi od pojawienia się próby na tablicy, o czym mówi dopisek na karcie.
+7. **Tydzień wdrożenia.** Tablice wylosowane w poniedziałek mają 12 prób; widać ich tyle, ile otwiera dzień. Próby wykonane wcześniej zostają wykonane, wzięta próba biegnie dalej, a obok niej ruszają pozostałe otwarte. Wiersze porzuconych prób znikają.
+8. **API i baza.** Migracja 0079: `guild_trial_boards.joined` i `opened` oraz unikalny wiersz (gildia, tydzień, postać, próba) zamiast jednej aktywnej próby na postać. `GET /api/guild/trials` zwraca `day` (open, soon, limit, finished, counted, later) i próby z `progress`; `POST /api/guild/trials/take` i `/drop` zwracają tylko tablicę z `texts.auto`. Kropka Gildii przy Próbach świeci już tylko przy skrzyni do otwarcia.
+
 ## Grafiki 622–623: wybory autora (5.11.2026)
 
 Autor: „622.1 D, 622.2 B, 622.3 C, 622.4 C, 623.1 B, 623.2 D, 623.3 D, 623.4 C”.

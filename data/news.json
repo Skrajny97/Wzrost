@@ -75,6 +75,11 @@
       "id": "0.1.52",
       "title": "Wersja 0.1.52: trudniej także z towarzyszami",
       "body": "- Od 30. poziomu najnowsze miejsce jest trudniejsze także z towarzyszami. Najdłuższa wyprawa czasem kończy się omdleniem.\n- Bez towarzyszy najnowsze miejsce jest teraz bardzo trudne. Bezpieczniej jest o miejsce niżej.\n- Przed wyprawą sprawdź „Zagrożenie”."
+    },
+    {
+      "id": "0.1.53",
+      "title": "Wersja 0.1.53: Próby Gildii co dzień",
+      "body": "- Prób Gildii nie trzeba już brać: wszystkie z tablicy liczą się naraz, od chwili, gdy się pojawią.\n- W poniedziałek na tablicy są 4 próby, a co dzień dochodzą 2 nowe.\n- Na pasek gildii wchodzą najwyżej 2 Twoje próby za każdy dzień tygodnia. Wykonane ponad to wejdą w kolejnych dniach.\n- Pasek ma 6 progów, a dwa ostatnie dają większe skrzynie."
     }
   ]
 }

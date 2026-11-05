@@ -179,13 +179,15 @@ describe('the Prośby Gildii through the API', () => {
 
   test('a gift moves the giver\'s trial of the Próby Gildii on, in the same batch', async () => {
     await as('druh', 'GET', '/api/guild/trials');
-    await run('UPDATE guild_trial_boards SET trials = ?', JSON.stringify([{ kind: 'gifts', size: 0, roll: 0 }]));
-    assert.equal((await as('druh', 'POST', '/api/guild/trials/take', { index: 0 })).status, 200);
+    // A board of one trial of gifts, running for every member (617).
+    await run('UPDATE guild_trial_boards SET trials = ?, opened = 0', JSON.stringify([{ kind: 'gifts', size: 0, roll: 0 }]));
+    await run("DELETE FROM guild_trials WHERE state = 'active'");
+    assert.equal((await as('druh', 'GET', '/api/guild/trials')).data.trials[0].state, 'active');
     await setStacks('Druh', 'materials', { 'wolf-pelt:common': 10 });
     const { mine } = (await ask('mistrz', { kind: 'material', key: 'wolf-pelt:common', count: 5 })).data;
     await give('druh', mine.id, 2);
-    const { taken } = (await as('druh', 'GET', '/api/guild/trials')).data;
-    assert.equal(taken.progress, 2);
+    const { trials } = (await as('druh', 'GET', '/api/guild/trials')).data;
+    assert.equal(trials[0].progress, 2);
   });
 
   test('a request\'s time runs out: it hangs no more and takes nothing', async () => {

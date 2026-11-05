@@ -2,8 +2,10 @@
 // DECISIONS.md, "Próby i Prośby Gildii"; the author: "345 A"): the guild's
 // bar of the week with its thresholds, each with its chest for this
 // character and "Otwórz" once it may open it; last week's chests still to
-// open; the character's trial with its progress and "Porzuć"; the board of
-// the week, each trial with "Weź", "Wykonana" or why it is shut; and the
+// open; the board of the week as far as it is open today, every trial
+// running at once with its meter (nothing to take, the author's 617),
+// "Wykonana" or why it is shut, with how many more come tomorrow (615 A);
+// and the
 // "Wkład tygodnia", who finished how many trials. The card asks for the
 // Próby itself and takes its words from the answer (data/guilds.json,
 // trials.texts). mountGuildTrials(container) adds the card to the
@@ -16,7 +18,7 @@ import { fill, h, icon } from './dom.js';
 import { formatNumber, plural } from './format.js';
 import { SYSTEM_POINTS_ICON } from './icons.js';
 import { call } from './state.js';
-import { confirmAction, foldPart, howItWorks, toast, withButton } from './ui.js';
+import { foldPart, howItWorks, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 
@@ -61,25 +63,11 @@ export function mountGuildTrials(container) {
     render();
   }
 
-  // An action answered with the Próby anew, its words in a toast.
-  async function act(path, body) {
-    const answer = await call('POST', path, body);
-    checkGuildTodo({ now: true });
-    show(answer);
-    if (answer.text) toast(answer.text);
-  }
-
   async function claim(week, threshold) {
     const answer = await call('POST', '/api/guild/trials/claim', { week, threshold });
     checkGuildTodo({ now: true });
     show(answer);
     toast(answer.chest.text);
-  }
-
-  async function drop() {
-    const { texts } = view;
-    if (!(await confirmAction({ title: texts.dropTitle, text: texts.dropText, confirmLabel: texts.drop }))) return;
-    await act('/api/guild/trials/drop');
   }
 
   const title = () => h('h2', { class: 'card-title', id: 'guild-trials-title', text: view.texts.title });
@@ -180,91 +168,58 @@ export function mountGuildTrials(container) {
     );
   }
 
-  // The character's trial: its words, its progress and "Porzuć".
-  function takenPart() {
-    const { taken, texts } = view;
-    return h(
-      'div',
-      { class: 'guild-part guild-taken' },
-      subtitle(texts.taken),
-      taken
-        ? [
-            h('p', { class: 'guild-trial-text' }, kindIcon(taken.kind), h('span', { text: taken.text })),
-            taken.note && h('p', { class: 'guild-trial-note', text: taken.note }),
-            meter({
-              label: texts.progress,
-              value: taken.progress,
-              max: taken.count,
-              text: filled(texts.progressValue, { progress: formatNumber(taken.progress), count: formatNumber(taken.count) }),
-              kind: 'class-xp',
-            }),
-            h('div', { class: 'guild-actions' }, h('button', { type: 'button', class: 'button button--world button--small', text: texts.drop, onClick: (event) => withButton(event.currentTarget, drop) })),
-          ]
-        : h('p', { class: 'muted', text: texts.noTaken }),
-    );
-  }
-
-  // What a trial on the board offers: "Weź", or how it stands.
-  function trialAction(trial) {
-    const { taken, texts } = view;
+  // A trial's state on the board: "Wykonana", or nothing while it runs
+  // (its meter shows how far it is) or is shut (its lock says why).
+  function trialState(trial) {
+    const { texts } = view;
     if (trial.state === 'done') return h('span', { class: 'chip guild-chip guild-chip--done' }, icon('check', { size: 14 }), texts.done);
-    if (trial.state === 'taken') return h('span', { class: 'chip guild-chip guild-chip--taken', text: texts.takenMark });
-    if (trial.state === 'locked') return null;
-    return h('button', {
-      type: 'button',
-      class: 'button button--system button--small',
-      text: texts.take,
-      disabled: Boolean(taken),
-      onClick: (event) => withButton(event.currentTarget, () => act('/api/guild/trials/take', { index: trial.index })),
-    });
+    return null;
   }
 
   // The board folds under its title (the author: „zeby dalo sie zwijać
-  // chociazby tablica prób”), which says what is left to take or how far
-  // the taken trial is.
+  // chociazby tablica prób”), which says how many of today's trials are
+  // done. Every open trial runs at once, with nothing to take (the
+  // author's 617), each with its meter; under the list how many trials come
+  // tomorrow and how many finished ones wait for the bar (615 A).
   function boardPart() {
-    const { trials: board, taken, texts } = view;
-    const free = board.filter((trial) => trial.state === 'open').length;
-    const line = taken
-      ? filled(texts.boardTaken, { progress: formatNumber(taken.progress), count: formatNumber(taken.count) })
-      : filled(texts.boardOpen, { count: formatNumber(free) });
+    const { trials: board, day, texts } = view;
+    const done = board.filter((trial) => trial.state === 'done').length;
+    const line = filled(texts.boardLine, { done: formatNumber(done), open: formatNumber(board.length) });
     return h(
       'div',
       { class: 'guild-part guild-board' },
       foldPart(
-        { key: 'guild-trials-board', title: texts.board, line, dot: !taken && free > 0 },
-        taken && h('p', { class: 'muted', text: texts.busy }),
+        { key: 'guild-trials-board', title: texts.board, line },
+        h('p', { class: 'muted small', text: texts.fromOpening }),
         h(
-        'ul',
-        { class: 'guild-trials-list' },
-        board.map((trial) =>
-          h(
-            'li',
-            { class: `guild-trial guild-trial--${trial.state}` },
-            kindIcon(trial.kind),
+          'ul',
+          { class: 'guild-trials-list' },
+          board.map((trial) =>
             h(
-              'div',
-              { class: 'guild-trial-body' },
-              h('p', { class: 'guild-trial-words', text: trial.text }),
-              trial.note && h('p', { class: 'guild-trial-note', text: trial.note }),
-              trial.lock && h('p', { class: 'guild-trial-lock' }, icon('lock', { size: 14 }), h('span', { text: trial.lock })),
-              // The taken trial shows how far it is right on the board (the
-              // author: "niech tutaj pokazuje ile już ukończone jest z danej
-              // próby"), as the "Twoja próba" part below does.
-              trial.state === 'taken' &&
-                taken?.index === trial.index &&
-                meter({
-                  label: texts.progress,
-                  value: taken.progress,
-                  max: taken.count,
-                  text: filled(texts.progressValue, { progress: formatNumber(taken.progress), count: formatNumber(taken.count) }),
-                  kind: 'class-xp',
-                }),
+              'li',
+              { class: `guild-trial guild-trial--${trial.state}` },
+              kindIcon(trial.kind),
+              h(
+                'div',
+                { class: 'guild-trial-body' },
+                h('p', { class: 'guild-trial-words', text: trial.text }),
+                trial.note && h('p', { class: 'guild-trial-note', text: trial.note }),
+                trial.lock && h('p', { class: 'guild-trial-lock' }, icon('lock', { size: 14 }), h('span', { text: trial.lock })),
+                trial.state === 'active' &&
+                  meter({
+                    label: texts.progress,
+                    value: trial.progress,
+                    max: trial.count,
+                    text: filled(texts.progressValue, { progress: formatNumber(trial.progress), count: formatNumber(trial.count) }),
+                    kind: 'class-xp',
+                  }),
+              ),
+              trialState(trial),
             ),
-            trialAction(trial),
           ),
         ),
-      ),
+        day.later > 0 && h('p', { class: 'muted small', text: filled(texts.later, { count: formatNumber(day.later) }) }),
+        day.soon > 0 && h('p', { class: 'muted small', text: filled(texts.soon, { count: formatNumber(day.soon) }) }),
       ),
     );
   }
@@ -303,7 +258,7 @@ export function mountGuildTrials(container) {
       return;
     }
     // The board first (the author: "Tablicę prób w próbach daj na sam szczyt").
-    fill(card, title(), boardPart(), how, barPart(), previousPart(), takenPart(), membersPart());
+    fill(card, title(), boardPart(), how, barPart(), previousPart(), membersPart());
   }
 
   call('GET', '/api/guild/trials')

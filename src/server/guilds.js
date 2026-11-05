@@ -12,7 +12,7 @@
 // offers in the Wymiana (guild-exchange.js) at once. The best guild of last
 // week says so on its page (guild-fame.js).
 
-import { blockedName, isUnlocked } from '../engine/index.js';
+import { blockedName, isUnlocked, joinShare, questPeriod, trialDay } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
@@ -20,6 +20,7 @@ import { nameColorOf } from './cosmetics.js';
 import { offersReturned, settleOffers } from './guild-exchange.js';
 import { championFrom, championOf, championStatement } from './guild-fame.js';
 import { ApiError, json, readJson } from './http.js';
+import { joinGuildTrials } from './guild-trials.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const rules = () => content.guilds;
@@ -251,6 +252,9 @@ function guildIdOf(body) {
 
 // POST /api/guild/accept { guildId }: joins the guild that invited this
 // character, while it has a place; the character's other invitations go.
+// Joined after the guild's board of the week was drawn, it raises the
+// week's thresholds of the Próby Gildii by its share of the week left, in
+// the same batch (the author's 615 A).
 export async function acceptGuildInvite(context) {
   const { player } = await requireGuildPlayer(context);
   const db = context.env.DB;
@@ -260,18 +264,28 @@ export async function acceptGuildInvite(context) {
   if (await guildOf(db, player.row.id)) throw new ApiError(409, 'in_guild', 'Najpierw opuść swoją gildię.');
   let joined;
   try {
-    joined = await db
-      .prepare(
-        `INSERT INTO guild_members (character_id, guild_id, role, joined_at)
-         SELECT ?, ?, 'member', ? WHERE EXISTS (SELECT 1 FROM guilds WHERE id = ?) AND (SELECT COUNT(*) FROM guild_members WHERE guild_id = ?) < ?`,
-      )
-      .bind(player.row.id, invite.guild_id, context.now, invite.guild_id, invite.guild_id, rules().size)
-      .run();
+    [joined] = await db.batch([
+      db
+        .prepare(
+          `INSERT INTO guild_members (character_id, guild_id, role, joined_at)
+           SELECT ?, ?, 'member', ? WHERE EXISTS (SELECT 1 FROM guilds WHERE id = ?) AND (SELECT COUNT(*) FROM guild_members WHERE guild_id = ?) < ?`,
+        )
+        .bind(player.row.id, invite.guild_id, context.now, invite.guild_id, invite.guild_id, rules().size),
+      db
+        .prepare(
+          `UPDATE guild_trial_boards SET joined = joined + ?
+           WHERE guild_id = ? AND week = ? AND EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ? AND joined_at = ?)`,
+        )
+        .bind(joinShare(trialDay(context.now, content)), invite.guild_id, questPeriod('weekly', context.now, content).key, player.row.id, invite.guild_id, context.now),
+    ]);
   } catch {
     throw new ApiError(409, 'in_guild', 'Najpierw opuść swoją gildię.');
   }
   await db.prepare('DELETE FROM guild_invites WHERE character_id = ? AND (guild_id = ? OR ? = 1)').bind(player.row.id, invite.guild_id, joined.meta.changes).run();
   if (joined.meta.changes !== 1) throw new ApiError(409, 'full', 'Ta gildia jest już pełna albo jej nie ma.');
+  // The trials open on the guild's board run for the new member from now
+  // (617); a look at the Próby makes them too, should this fail.
+  await joinGuildTrials(db, invite.guild_id, player.row, context.now).catch((error) => console.error(error));
   return answer(db, player.row.id, context.now, { text: 'Jesteś w gildii. Jej kanał czeka w Czacie, w zakładce „Gildia”.' });
 }
 

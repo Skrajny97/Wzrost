@@ -28,7 +28,7 @@ import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inv
 import { enterTower, getTowers } from './towers.js';
 import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, setGuildRole } from './guilds.js';
 import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-beast.js';
-import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, takeGuildTrial } from './guild-trials.js';
+import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, openGuildTrials, takeGuildTrial } from './guild-trials.js';
 import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, thankForGuildGift } from './guild-requests.js';
 import { getGuildTodo } from './guild-todo.js';
 import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } from './guild-exchange.js';
@@ -405,6 +405,9 @@ export default {
       () => sendNotifications(env, controller.scheduledTime),
       // A code's rewards moved by the author's word (gift-codes.js).
       () => moveGiftRewards(env, controller.scheduledTime),
+      // The guilds' boards of the Próby Gildii drawn as the week starts and
+      // their trials of the day opened for every member (guild-trials.js).
+      () => openGuildTrials(env.DB, controller.scheduledTime),
     ];
     for (const job of jobs) {
       try {
