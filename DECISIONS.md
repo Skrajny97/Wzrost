@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.54 (5.11.2026)
+
+Próby Gildii w tygodniu wdrożenia (sesja, po 0.1.53): tablica wylosowana przed 0.1.53 (12 prób) liczy na pasku wykonane próby bez limitu dnia, tylko do `cap`, więc żaden pasek nie spada i żaden osiągnięty próg nie znika (zob. „Próby Gildii co dzień, wszystkie naraz”, punkt 7).
+
 ## Wersja 0.1.53 (5.11.2026)
 
 Próby Gildii co dzień i wszystkie naraz (615 A i 617): zob. „Próby Gildii co dzień, wszystkie naraz”.
@@ -3048,7 +3052,7 @@ Autor: „Do poprawy, bo jak Gildia się szybko rozwinie to przestanie być wyzw
 4. **Progi.** Sześć progów: 2, 4, 6, 8, 10 i 12 prób na członka. Skrzynia piąta: 40 złota i 16 za poziom postaci, 40 Punktów Czasu, 6 sztuk materiału, 5 Punktów Systemu; szósta: 50 złota i 20 za poziom, 50 Punktów Czasu, 8 sztuk materiału, 10 Punktów Systemu. Nawet gdy każdy członek wykonuje wszystko, na co pozwala dzień, ostatni próg przychodzi najwcześniej w sobotę.
 5. **Dochodzący członkowie.** Członkowie aktywni przy losowaniu tablicy liczą się jak dotąd. Kto dołączy później, dodaje (7 − dzień tygodnia)/7 członka: w poniedziałek całego, w niedzielę 1/7 (zapisane przy tablicy, `joined`). Próg to iloczyn zaokrąglony w górę.
 6. **617.** Pytanie o liczenie od wzięcia odpadło razem z braniem: liczy się to, co postać zrobi od pojawienia się próby na tablicy, o czym mówi dopisek na karcie.
-7. **Tydzień wdrożenia.** Tablice wylosowane w poniedziałek mają 12 prób; widać ich tyle, ile otwiera dzień. Próby wykonane wcześniej zostają wykonane, wzięta próba biegnie dalej, a obok niej ruszają pozostałe otwarte. Wiersze porzuconych prób znikają.
+7. **Tydzień wdrożenia.** Tablice wylosowane w poniedziałek mają 12 prób; widać ich tyle, ile otwiera dzień. Taka tablica liczy na pasku wykonane próby członków bez limitu dnia, do `cap` (od 0.1.54): inaczej w czwartek, dniu wdrożenia, pasek gildii spadłby u tych, którzy wykonali już więcej niż 8 prób, a osiągnięty próg zniknąłby do piątku. Próby wykonane wcześniej zostają wykonane, wzięta próba biegnie dalej, a obok niej ruszają pozostałe otwarte. Wiersze porzuconych prób znikają.
 8. **API i baza.** Migracja 0079: `guild_trial_boards.joined` i `opened` oraz unikalny wiersz (gildia, tydzień, postać, próba) zamiast jednej aktywnej próby na postać. `GET /api/guild/trials` zwraca `day` (open, soon, limit, finished, counted, later) i próby z `progress`; `POST /api/guild/trials/take` i `/drop` zwracają tylko tablicę z `texts.auto`. Kropka Gildii przy Próbach świeci już tylko przy skrzyni do otwarcia.
 
 ## Grafiki 622–623: wybory autora (5.11.2026)

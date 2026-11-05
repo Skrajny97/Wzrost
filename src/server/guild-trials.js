@@ -279,6 +279,12 @@ function finishedBy(rows) {
   return counts;
 }
 
+// The day's limit on this week's bar (615 A), for a board drawn under it.
+// A board drawn before the change, with fewer trials (the week of 0.1.53),
+// counts each member's finished trials up to the cap alone: no bar falls
+// and no reached threshold goes away (DECISIONS.md, "Próby Gildii co dzień").
+const barLimit = (trials, day) => (trials.length >= rules().board ? trialDayLimit(day, content) : Infinity);
+
 const chestSeed = (characterId, week, index) => `${characterId}:${week}:trials:${index}`;
 
 // A chest as the page shows it, its materials with their names.
@@ -367,7 +373,7 @@ export async function trialsView(db, player, guild, now) {
   ]);
   const day = trialDay(now, content);
   const open = trialsOpen(day, content);
-  const limit = trialDayLimit(day, content);
+  const limit = barLimit(board.trials, day);
   const finished = own.results[0]?.count ?? 0;
   const rows = trials.results.filter((one) => one.week === current.key);
   const mine = new Map(rows.filter((one) => one.character_id === row.id).map((one) => [one.trial, one]));
@@ -467,7 +473,7 @@ export async function claimGuildTrialChest(context) {
   ]);
   if (!board.results[0]) throw new ApiError(404, 'no_board', errors().noBoard);
   // This week's bar counts each member's finished trials up to the day's limit.
-  const limit = body.week === current.key ? trialDayLimit(trialDay(now, content), content) : Infinity;
+  const limit = body.week === current.key ? barLimit(JSON.parse(board.results[0].trials), trialDay(now, content)) : Infinity;
   const bar = barView(body.week, trials.results, board.results[0].active, board.results[0].joined ?? 0, claims.results, player, limit);
   const threshold = bar.thresholds[index];
   if (threshold.claimed) throw new ApiError(409, 'claimed', errors().claimed);

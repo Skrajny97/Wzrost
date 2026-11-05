@@ -442,6 +442,26 @@ describe('the Próby Gildii through the API', () => {
     );
   });
 
+  test('a board drawn before the day\'s pace (12 trials, the week of 0.1.53) counts up to the cap alone: no bar falls, and a chest it reached opens', async () => {
+    await run('UPDATE users SET seen_at = ?', Date.now());
+    await as('mistrz', 'GET', '/api/guild/trials');
+    await setBoard(Array.from({ length: 12 }, (_, index) => ({ kind: index % 2 ? 'explore' : 'killAny', size: 0, roll: 0 })));
+    // Mistrz had finished 10 of them, the cap before the change, and Druh 2.
+    await finished('Mistrz', 10);
+    await finished('Druh', 2);
+    const view = (await as('mistrz', 'GET', '/api/guild/trials')).data;
+    assert.deepEqual([view.day.limit, view.day.later, view.day.counted], [null, 0, 10]);
+    assert.equal(view.bar.points, 12);
+    assert.equal(view.members.find((member) => member.name === 'Mistrz').counted, 10);
+    // Two members: the third threshold (3 × 2 × 2 = 12) is reached on any day of the week.
+    assert.deepEqual(
+      view.bar.thresholds.map((threshold) => threshold.reached),
+      rules.steps.map((step) => step * 2 <= 12),
+    );
+    const claimed = await as('mistrz', 'POST', '/api/guild/trials/claim', { week: week(), threshold: 2 });
+    assert.equal(claimed.status, 200, JSON.stringify(claimed.data));
+  });
+
   test('the thresholds come from the members active when the board was drawn, and each one\'s trials count up to the cap and the day\'s limit; reached, they stay', async () => {
     await player('trzeci', 'Trzeci');
     const guildId = (await as('mistrz', 'GET', '/api/guild')).data.guild.id;
