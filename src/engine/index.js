@@ -46,6 +46,7 @@ export * from './stable.js';
 export * from './casino.js';
 export * from './tannery.js';
 export * from './names.js';
+export * from './mentions.js';
 export * from './towers.js';
 export * from './trial-hall.js';
 export * from './guild-beast.js';

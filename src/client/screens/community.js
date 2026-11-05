@@ -29,29 +29,40 @@
 // the chat to be shown again. The chat reaches down to the bottom bar, so
 // the line to write in stays at the bottom of the screen, the messages right
 // over it.
+//
+// "@" and the start of a name in the line suggests the characters that may
+// be tagged in the tab shown (those who wrote there lately, the friends
+// and the guild's members; in a private conversation its other one), and
+// a tap puts "@" and the whole name in (../mentions.js). "Oznacz" in a
+// message's sheet and on a character's sheet does the same. A message that
+// tags the player shows gilded, and the tab of its channel lights until it
+// is read (chat-news.js, src/server/mentions.js).
 
 import { $, fill, h, icon } from '../dom.js';
 import { dateTimeFormat, timeFormat } from '../format.js';
 import {
+  channelNews,
+  channelRead,
   chatMuted,
   chatNews,
-  chatSeen,
   conversationNews,
   conversationsSeen,
   friendNews,
-  globalNews,
   guildChannel,
-  guildChannelNews,
   guildNews,
   guildRead,
   guildTodoNews,
+  mentionChannel,
+  mentionNews,
   partyNews,
   onChatNews,
   privateRead,
   setChatMuted,
   takeConversation,
+  takeMention,
 } from '../chat-news.js';
 import { CLASS_ICONS } from '../icons.js';
+import { appendMention, matchingPeople, taggedParts, typedMention, withMention } from '../mentions.js';
 import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, framedName, guildTag, openSheet, pageHeading, toast, withButton } from '../ui.js';
@@ -115,10 +126,12 @@ export function mountCommunity(container, context) {
   const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking, party: mountParty };
   const sections = state.content.community.sections;
   const asked = takeConversation();
+  // "Oznacz" on a character's sheet opened away from the chat (profile.js).
+  const tagging = takeMention();
   // A part named in the address (a shortcut in the computer's menu), when
   // it is open.
   const named = Object.keys(SECTION_SLUGS).find((id) => SECTION_SLUGS[id] === context.params?.section && sections.some((section) => section.id === id && !section.soon));
-  let current = asked ? 'chat' : (named ?? firstSection(sections));
+  let current = asked || tagging ? 'chat' : (named ?? firstSection(sections));
   let part = null;
   const body = h('div', { class: 'community-body' });
   const picker = sectionPicker(sections, () => current, show);
@@ -134,8 +147,9 @@ export function mountCommunity(container, context) {
   stick();
 
   // A part shown, with the bar under the list for its own row (the chat's
-  // tabs); `person` is the private conversation for the chat to open.
-  function show(id, person = null) {
+  // tabs); `person` is the private conversation for the chat to open, and
+  // `mention` a name to tag in its Globalny.
+  function show(id, person = null, mention = null) {
     // The Gildia has a page of its own (the author: "ona powinna uruchamiać
     // osobną stronę"), so its tab leads there.
     if (id === GUILD_PAGE_SECTION) {
@@ -153,21 +167,25 @@ export function mountCommunity(container, context) {
     part?.unmount();
     fill(body);
     fill(picker.bar);
-    part = MOUNTS[id](body, { bar: picker.bar, person });
+    part = MOUNTS[id](body, { bar: picker.bar, person, mention });
     picker.render();
   }
 
-  // "Prywatna wiadomość" on a character's sheet, shown over this screen,
-  // and the Wymiana as it is now.
+  // "Prywatna wiadomość" and "Oznacz" on a character's sheet, shown over
+  // this screen, and the Wymiana as it is now.
   const stopAsking = onChatNews(() => {
     fill(trade, tradeBanner());
     const person = takeConversation();
-    if (!person) return;
-    if (current === 'chat') part.talkTo(person);
-    else show('chat', person);
+    const mention = takeMention();
+    if (!person && !mention) return;
+    if (current !== 'chat') show('chat', person, mention);
+    else {
+      if (person) part.talkTo(person);
+      if (mention) part.mention(mention);
+    }
   });
 
-  show(current, asked);
+  show(current, asked, tagging);
   return {
     unmount() {
       part?.unmount();
@@ -263,15 +281,20 @@ function sectionPicker(sections, current, choose) {
 }
 
 // The Czat: its tabs, its notices, the players hidden and the room of
-// messages. `person` is the private conversation to open first.
+// messages. `person` is the private conversation to open first, `mention`
+// a name to tag in the Globalny's line ("Oznacz" on a character's sheet);
+// else it opens on the channel where a message that tags the player waits
+// unread, or on the Globalny.
 // Also in the side column on a computer (side.js), with its own `id` for
 // the line to write in, scrolling in its own box (`scroller`) and not the
 // page.
-export function mountChat(container, { bar, person = null, id = 'chat', scroller = null }) {
+export function mountChat(container, { bar, person = null, mention = null, id = 'chat', scroller = null }) {
   const chat = state.content.chat;
+  const tagWords = chat.mentions.texts;
   // The channel shown, or the other character of the private conversation
   // shown (null on a channel), and the private conversations for the tabs.
-  let channel = chat.channels[0];
+  const tagged = person || mention ? null : mentionChannel();
+  let channel = (tagged === GUILD.id && guildChannel() ? GUILD : chat.channels.find((entry) => entry.id === tagged)) ?? chat.channels[0];
   let talk = person && { id: person.id, name: person.name };
   // The items of the bag the next message in the Wymiana shows.
   let attached = [];
@@ -349,6 +372,8 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
     label.focus();
   }
   const attachedList = h('ul', { class: 'chat-attached', 'aria-label': 'Przedmioty w wiadomości' });
+  // The names "@" suggests, over the line (see suggest below).
+  const suggestions = h('ul', { class: 'chat-mentions', id: `${id}-mentions`, role: 'listbox', 'aria-label': tagWords.suggestions, hidden: true });
   const form = h(
     'form',
     {
@@ -358,9 +383,139 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
         withButton(sendButton, send);
       },
     },
+    suggestions,
     attachedList,
     h('div', { class: 'chat-form-row' }, attachButton, linkButton, text, sendButton),
   );
+
+  // "@" and the start of a name before the caret: the characters that may
+  // be tagged in the tab shown whose names start so, a tap putting the whole
+  // name in. Those who wrote in the tab lately come first, the newest
+  // first, then the friends and the guild's members (/api/chat/people, asked
+  // once); in the guild's channel only its members, in a private
+  // conversation only its other one, as only they read it.
+  let people = null;
+  let peopleAsked = false;
+  let typed = null;
+  let offered = [];
+  let chosen = 0;
+  async function askPeople() {
+    if (peopleAsked) return;
+    peopleAsked = true;
+    try {
+      people = await call('GET', '/api/chat/people');
+    } catch {
+      people = { friends: [], guild: [] };
+    }
+    if (!gone) suggest();
+  }
+  function taggable() {
+    if (talk) return [{ name: talk.name, classId: conversations.find((entry) => entry.id === talk.id)?.classId }];
+    if (channel.id === GUILD.id) return people?.guild ?? [];
+    const writers = messages
+      .filter((message) => !message.own && !message.system)
+      .reverse()
+      .map((message) => ({ name: message.name, classId: message.classId }));
+    return [...writers, ...(people?.friends ?? []), ...(people?.guild ?? [])];
+  }
+  function closeSuggestions() {
+    typed = null;
+    offered = [];
+    suggestions.hidden = true;
+    text.removeAttribute('aria-activedescendant');
+    text.setAttribute('aria-expanded', 'false');
+  }
+  function suggest() {
+    typed = document.activeElement === text ? typedMention(text.value, text.selectionStart ?? text.value.length) : null;
+    if (!typed) return closeSuggestions();
+    if (!talk) askPeople();
+    offered = matchingPeople(typed.query, taggable(), chat.mentions.suggestions);
+    if (offered.length === 0) return closeSuggestions();
+    chosen = Math.min(chosen, offered.length - 1);
+    fill(
+      suggestions,
+      offered.map((person, index) =>
+        h(
+          'li',
+          { role: 'presentation' },
+          h(
+            'button',
+            {
+              type: 'button',
+              id: `${id}-mention-${index}`,
+              class: 'chat-mention-option',
+              role: 'option',
+              tabindex: '-1',
+              'aria-selected': String(index === chosen),
+              // The line keeps the focus, and the phone its keyboard.
+              onMousedown: (event) => event.preventDefault(),
+              onClick: () => pick(person),
+            },
+            icon(CLASS_ICONS[person.classId] ?? 'person', { size: 16, className: 'chat-class' }),
+            h('span', { class: 'chat-mention-name', text: person.name }),
+          ),
+        ),
+      ),
+    );
+    suggestions.hidden = false;
+    text.setAttribute('aria-expanded', 'true');
+    text.setAttribute('aria-activedescendant', `${id}-mention-${chosen}`);
+  }
+  function pick(person) {
+    if (!typed) return;
+    const next = withMention(text.value, typed.start, text.selectionStart ?? text.value.length, person.name);
+    text.value = next.value;
+    text.focus();
+    text.setSelectionRange(next.caret, next.caret);
+    chosen = 0;
+    closeSuggestions();
+  }
+  text.setAttribute('aria-controls', suggestions.id);
+  text.setAttribute('aria-expanded', 'false');
+  text.addEventListener('input', () => {
+    chosen = 0;
+    suggest();
+  });
+  text.addEventListener('click', suggest);
+  text.addEventListener('keyup', (event) => {
+    if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) suggest();
+  });
+  text.addEventListener('blur', () => setTimeout(() => document.activeElement !== text && closeSuggestions(), 150));
+  // With the list open: up and down choose, Enter and Tab put the name in,
+  // Escape closes it.
+  text.addEventListener('keydown', (event) => {
+    if (suggestions.hidden || offered.length === 0) return;
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      chosen = (chosen + (event.key === 'ArrowDown' ? 1 : offered.length - 1)) % offered.length;
+      suggest();
+    } else if (event.key === 'Enter' || event.key === 'Tab') {
+      event.preventDefault();
+      pick(offered[chosen]);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      closeSuggestions();
+    }
+  });
+
+  // "Oznacz": "@" and the whole name at the end of the line, the line in
+  // front, at once or as soon as it shows. A private conversation tags only
+  // its other one, so another name goes to the Globalny.
+  function tag(name) {
+    if (talk && talk.name.toLowerCase() !== name.toLowerCase()) switchTo(chat.channels[0], null);
+    text.value = appendMention(text.value, name);
+    closeSuggestions();
+    if (!form.isConnected) {
+      focusLine = true;
+      return;
+    }
+    text.focus();
+    text.setSelectionRange(text.value.length, text.value.length);
+  }
+  // Whether the player may write now: the rules accepted, not silenced.
+  const canWrite = () => Boolean(account?.rulesAccepted) && !account?.mutedUntil;
+  // The line takes the focus once it shows (a name put in before).
+  let focusLine = false;
 
   // The items picked for the next message, each with a × to leave it out;
   // the button to pick them only in a channel with items.
@@ -461,12 +616,14 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
   fill(bar, tabs);
   fill(container, notices, hidden, room);
 
-  const tab = (label, selected, news, pick) =>
+  // A tab, its light saying "Oznaczono Cię" when a message there tags the
+  // player (`mentioned`).
+  const tab = (label, selected, news, choose, mentioned = false) =>
     h(
       'button',
-      { type: 'button', class: 'chat-tab', role: 'tab', 'aria-selected': String(selected), onClick: pick },
+      { type: 'button', class: 'chat-tab', role: 'tab', 'aria-selected': String(selected), onClick: choose },
       h('span', { class: 'chat-tab-name', text: label }),
-      news && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'nowe' }),
+      news && h('span', { class: 'community-dot', role: 'img', 'aria-label': mentioned ? tagWords.tagged : 'nowe' }),
     );
 
   // A private conversation's tab, with the × that closes it.
@@ -474,7 +631,13 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
     h(
       'span',
       { class: 'chat-tab-wrap' },
-      tab(entry.name, entry.id === talk?.id, entry.id !== talk?.id && conversationNews(entry.id, entry.latest), () => switchTo(channel, entry)),
+      tab(
+        entry.name,
+        entry.id === talk?.id,
+        entry.id !== talk?.id && (conversationNews(entry.id, entry.latest) || mentionNews(null, entry.id)),
+        () => switchTo(channel, entry),
+        mentionNews(null, entry.id),
+      ),
       h(
         'button',
         {
@@ -490,14 +653,17 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
   // The channels first, the guild's among them while the character is in
   // one, then the conversations, the most recent first; one opened from a
   // sheet shows before its first message too. The Globalny's and the
-  // guild's tabs light for their news.
+  // guild's tabs light for their news, every channel's for a message that
+  // tags the player (chat-news.js).
   function renderTabs() {
     const entries = talk && !conversations.some((entry) => entry.id === talk.id) ? [{ ...talk, latest: 0 }, ...conversations] : conversations;
     const channels = [...chat.channels, ...(guildChannel() ? [GUILD] : [])];
-    const lit = (entry, index) => (Boolean(talk) || channel.id !== entry.id) && (entry === GUILD ? guildChannelNews() : index === 0 && globalNews());
+    const elsewhere = (entry) => Boolean(talk) || channel.id !== entry.id;
     fill(
       tabs,
-      channels.map((entry, index) => tab(entry.name, !talk && entry.id === channel.id, lit(entry, index), () => switchTo(entry, null))),
+      channels.map((entry) =>
+        tab(entry.name, !talk && entry.id === channel.id, elsewhere(entry) && channelNews(entry.id), () => switchTo(entry, null), mentionNews(entry.id)),
+      ),
       entries.map(privateTab),
     );
   }
@@ -508,6 +674,7 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
     channel = nextChannel;
     talk = next && { id: next.id, name: next.name };
     attached = [];
+    closeSuggestions();
     messages = [];
     fill(list);
     loaded = false;
@@ -564,9 +731,10 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
         h('p', { class: 'chat-text', text: message.text }),
       );
     }
+    const classes = ['chat-message', message.own && 'chat-message--own', message.mentioned && 'chat-message--mentioned'].filter(Boolean).join(' ');
     return h(
       'li',
-      { class: message.own ? 'chat-message chat-message--own' : 'chat-message', 'data-id': String(message.id) },
+      { class: classes, 'data-id': String(message.id) },
       h(
         'div',
         { class: 'chat-head' },
@@ -577,13 +745,15 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
             class: 'chat-name',
             text: message.name,
             'aria-label': `${message.name}: zobacz postać`,
-            onClick: (event) => withButton(event.currentTarget, () => openProfile(message.name)),
+            onClick: (event) => withButton(event.currentTarget, () => openProfile(message.name, { mention: tag })),
           }),
           message.nameColor,
         ),
         guildTag(message.guildTag),
         message.role && h('span', { class: `chat-role chat-role--${message.role}`, text: `(${message.role})` }),
         h('span', { class: 'chat-level', text: `poz. ${message.level}` }),
+        // A message that tags the player: "@" in gold, read out as words.
+        message.mentioned && h('span', { class: 'chat-tagged', role: 'img', 'aria-label': tagWords.tagged, text: '@' }),
         stamp,
       ),
       // The admin's message with links: its words with the links to tap, and
@@ -597,11 +767,11 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
                 if (!message.own && !event.target.closest('a')) actions(message);
               },
             },
-            linkedText(message.text),
+            linkedText(message.text).flatMap((part) => (typeof part === 'string' ? withTags(part, message) : [part])),
           )
         : message.own
-          ? h('p', { class: 'chat-text', text: message.text })
-          : h('button', { type: 'button', class: 'chat-text chat-text--button', text: message.text, onClick: () => actions(message) }),
+          ? h('p', { class: 'chat-text' }, withTags(message.text, message))
+          : h('button', { type: 'button', class: 'chat-text chat-text--button', onClick: () => actions(message) }, withTags(message.text, message)),
       message.items?.length > 0 &&
         h(
           'ul',
@@ -610,6 +780,10 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
         ),
     );
   }
+
+  // The text of a message with the names it tags in gold (../mentions.js).
+  const withTags = (words, message) =>
+    taggedParts(words, message.mentions ?? []).map((part) => (typeof part === 'string' ? part : h('span', { class: 'chat-tag', text: part.tag })));
 
   // New messages at the bottom, the oldest over the limit gone from the top.
   // The page follows them down unless the player reads further up.
@@ -628,7 +802,7 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
     following = following || follow;
     if (talk) privateRead(talk.id, messages.at(-1).id);
     else if (channel.id === GUILD.id) guildRead(messages.at(-1).id);
-    else chatSeen(messages.at(-1).id);
+    else channelRead(channel.id, messages.at(-1).id);
     return true;
   }
 
@@ -667,6 +841,11 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
         : 'Nikt jeszcze nic nie napisał. Zacznij rozmowę!';
     const part = !account ? 'loading' : account.mutedUntil ? `muted:${account.mutedUntil}` : account.rulesAccepted ? 'form' : 'rules';
     if (changed('footer', part)) fill(footer, footerPart(part));
+    if (focusLine && part === 'form') {
+      focusLine = false;
+      text.focus();
+      text.setSelectionRange(text.value.length, text.value.length);
+    }
     const blocked = account?.blocked ?? [];
     if (changed('hidden', blocked.map((entry) => entry.id).join())) fill(hidden, blocked.length > 0 && hiddenList(blocked));
     fit();
@@ -752,7 +931,13 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
       h(
         'div',
         { class: 'chat-sheet-actions' },
-        act('Zobacz postać', () => openProfile(message.name)),
+        act('Zobacz postać', () => openProfile(message.name, { mention: tag })),
+        // "@" and the name in this tab's line, while the player may write.
+        canWrite() &&
+          act(tagWords.button, () => {
+            closeSheet();
+            tag(message.name);
+          }),
         !talk &&
           act('Prywatna wiadomość', () => {
             closeSheet();
@@ -929,6 +1114,9 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
   renderTabs();
   fit();
   ask();
+  // "Oznacz" on a character's sheet opened away from the chat
+  // (mountCommunity): the name in the Globalny's line.
+  if (mention) tag(mention);
   return {
     unmount() {
       gone = true;
@@ -939,5 +1127,6 @@ export function mountChat(container, { bar, person = null, id = 'chat', scroller
       if ($('#sheet')?.open && $('#sheet .chat-sheet')) closeSheet();
     },
     talkTo,
+    mention: tag,
   };
 }

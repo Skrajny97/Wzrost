@@ -9,12 +9,15 @@
 // also keeps the player online for a Wymiana. The newest messages read go
 // to the server too (/api/chat/seen), so a message read on the computer
 // no longer waits as new on the phone; the Globalny's light muted stays on
-// the device. Private messages light it even then.
+// the device. Private messages light it even then, and so does a message
+// that tags the character with "@" (src/server/mentions.js), in any
+// channel, the Wymiana too, until the character has read that channel.
 
 import { request } from './api.js';
 import { isUnlocked, state } from './state.js';
 
 const SEEN_KEY = 'insight-chat-seen';
+const CHANNELS_KEY = 'insight-chat-channels-seen';
 const GUILD_KEY = 'insight-chat-guild-seen';
 const PRIVATE_KEY = 'insight-chat-private-seen';
 const MUTED_KEY = 'insight-chat-muted';
@@ -22,6 +25,11 @@ const EVERY_MS = 15000;
 
 let latest = 0;
 let seen = 0;
+// The newest message read in the other channels (the Wymiana), by its id.
+let channelSeen = {};
+// The newest message of each channel that tags the character
+// (src/server/mentions.js): { global, trade, guild, private: { [other]: id } }.
+let tagged = { private: {} };
 // The character's guild (src/server/guilds.js) with the newest message of
 // its channel by someone else, or null, and the newest one read there.
 let guild = null;
@@ -39,6 +47,7 @@ let privateSeen = {};
 let muted = false;
 try {
   seen = Number(localStorage.getItem(SEEN_KEY)) || 0;
+  channelSeen = JSON.parse(localStorage.getItem(CHANNELS_KEY) ?? '{}') ?? {};
   guildSeenId = Number(localStorage.getItem(GUILD_KEY)) || 0;
   privateSeen = JSON.parse(localStorage.getItem(PRIVATE_KEY) ?? '{}') ?? {};
   muted = localStorage.getItem(MUTED_KEY) === '1';
@@ -61,12 +70,36 @@ const listeners = new Set();
 let activityListener = null;
 
 const open = () => Boolean(state.character) && isUnlocked('community');
-export const globalNews = () => open() && !muted && latest > seen;
+// The Globalny: the first channel, whose news the bell mutes.
+const globalId = () => state.content?.chat?.channels[0]?.id ?? 'global';
+const channelMark = (id) => (id === globalId() ? seen : (channelSeen[id] ?? 0));
+// A message that tags the character waits unread in channel `id` (the
+// guild's: 'guild'), or with `other` in the private conversation with that
+// character.
+export function mentionNews(id, other = null) {
+  if (!open()) return false;
+  if (other !== null) return (tagged.private[other] ?? 0) > (privateSeen[other] ?? 0);
+  if (id === 'guild') return Boolean(guild) && (tagged.guild ?? 0) > guildSeenId;
+  return (tagged[id] ?? 0) > channelMark(id);
+}
+const anyMentionNews = () =>
+  Object.keys(tagged).some((id) => id !== 'private' && mentionNews(id)) || Object.keys(tagged.private).some((other) => mentionNews(null, Number(other)));
+export const globalNews = () => open() && ((!muted && latest > seen) || mentionNews(globalId()));
 export const conversationNews = (id, newest = conversations.find((entry) => entry.id === id)?.latest ?? 0) => open() && newest > (privateSeen[id] ?? 0);
 // The guild's channel: messages there light the chat like private ones.
 export const guildChannel = () => (open() ? guild : null);
 export const guildChannelNews = () => Boolean(guildChannel()) && guild.latest > guildSeenId;
-export const chatNews = () => globalNews() || guildChannelNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest));
+export const chatNews = () => globalNews() || guildChannelNews() || conversations.some((entry) => conversationNews(entry.id, entry.latest)) || anyMentionNews();
+// The light of a channel's tab: the Globalny's and the guild's for any
+// news, the other channels' (the Wymiana) for a tag only.
+export const channelNews = (id) => (id === 'guild' ? guildChannelNews() : id === globalId() ? globalNews() : mentionNews(id));
+// The channel where the newest tag waits unread, for the chat to open on:
+// its id ('guild' for the guild's), or null; private conversations light
+// their own tabs.
+export function mentionChannel() {
+  const waiting = Object.keys(tagged).filter((id) => id !== 'private' && mentionNews(id));
+  return waiting.sort((a, b) => (tagged[b] ?? 0) - (tagged[a] ?? 0))[0] ?? null;
+}
 export const friendNews = () => open() && invites + gifts + unsent > 0;
 export const partyNews = () => open() && isUnlocked('party') && partyInvites > 0;
 export const guildNews = () => open() && guildInvites > 0;
@@ -85,6 +118,8 @@ export const communityNewsText = () =>
     ? trade.state === 'proposed'
       ? 'propozycja wymiany czeka'
       : 'trwa wymiana'
+    : anyMentionNews()
+      ? (state.content?.chat?.mentions?.texts.news ?? 'nowe wiadomości na czacie')
     : chatNews()
       ? 'nowe wiadomości na czacie'
       : partyNews()
@@ -110,6 +145,8 @@ export function onChatNews(callback) {
 const lights = () =>
   [
     globalNews(),
+    ...Object.keys(tagged).filter((id) => id !== 'private').map((id) => `${id}:${mentionNews(id)}`),
+    ...Object.keys(tagged.private).map((other) => `@${other}:${mentionNews(null, Number(other))}`),
     guildChannelNews(),
     friendNews(),
     partyNews(),
@@ -139,6 +176,7 @@ export function conversationsSeen(list) {
 function keep(tell) {
   try {
     localStorage.setItem(SEEN_KEY, String(seen));
+    localStorage.setItem(CHANNELS_KEY, JSON.stringify(channelSeen));
     localStorage.setItem(GUILD_KEY, String(guildSeenId));
     localStorage.setItem(PRIVATE_KEY, JSON.stringify(privateSeen));
   } catch {
@@ -169,6 +207,22 @@ export function takeConversation() {
   return person;
 }
 
+// "Oznacz" on a character's sheet opened away from the chat (profile.js):
+// the name for the Globalny's line in the Społeczność. Whether the
+// Społeczność on the screen took it at once; if not, it takes it when it
+// opens.
+let wantedTag = null;
+export function wantMention(name) {
+  wantedTag = name;
+  for (const listener of listeners) listener();
+  return wantedTag === null;
+}
+export function takeMention() {
+  const name = wantedTag;
+  wantedTag = null;
+  return name;
+}
+
 // The guild's channel shows messages up to `id`.
 export function guildRead(id) {
   if (id <= guildSeenId) return;
@@ -194,6 +248,20 @@ export function chatSeen(id) {
     seen = id;
   });
   keep({ global: id });
+}
+
+// Channel `channelId` shows messages up to `id`: the Globalny, or another
+// one (the Wymiana), with a mark of its own.
+export function channelRead(channelId, id) {
+  if (channelId === globalId()) {
+    chatSeen(id);
+    return;
+  }
+  if (id <= (channelSeen[channelId] ?? 0)) return;
+  update(() => {
+    channelSeen = { ...channelSeen, [channelId]: id };
+  });
+  keep({ [channelId]: id });
 }
 
 // "Wycisz powiadomienia czatu": new messages of the Globalny no longer
@@ -258,8 +326,12 @@ export async function checkChat({ now = false } = {}) {
     guild = answer.guild ?? null;
     guildInvites = answer.guildInvites ?? 0;
     trade = answer.trade ?? null;
+    tagged = { ...answer.mentions, private: answer.mentions?.private ?? {} };
     // What the character read on its other devices.
     seen = Math.max(seen, answer.seen?.global ?? 0);
+    for (const [id, mark] of Object.entries(answer.seen ?? {})) {
+      if (!['private', 'guild', globalId()].includes(id) && Number.isInteger(mark)) channelSeen = { ...channelSeen, [id]: Math.max(channelSeen[id] ?? 0, mark) };
+    }
     guildSeenId = Math.max(guildSeenId, answer.seen?.guild ?? 0);
     for (const [other, id] of Object.entries(answer.seen?.private ?? {})) privateSeen = { ...privateSeen, [other]: Math.max(privateSeen[other] ?? 0, id) };
   });
