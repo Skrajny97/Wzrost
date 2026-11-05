@@ -1,0 +1,14 @@
+{
+  "id": "guild-banner",
+  "tool": "pixellab generate-image-v2",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of a stone stronghold at the edge of a forest, made of grey hewn stone, heavy timber and iron, standing directly on bare ground with no ground tile, base or platform under it, the guild banner: a tall carved wooden pole on a round plinth of grey stone, flying a long deep-blue banner with a golden stag emblem, two smaller blue pennants on short poles beside it and an iron brazier with a small fire at its foot, no people and no figures",
+  "style": "src/client/art/camp/quarters-3.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
