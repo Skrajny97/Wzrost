@@ -3034,6 +3034,19 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.63 (5.11.2026)
+
+Trzech nazwanych wyjętych spod prawa w Poszukiwanych (635, 636): zob. „Wojsław Pożoga, Zamaskowana Diana i Ścibor Kopacz”.
+
+## Wojsław Pożoga, Zamaskowana Diana i Ścibor Kopacz (5.11.2026, w grze od 0.1.63)
+
+Autor: „Trzeba też wygenerować jeszcze z 3 wyjętych spod prawa, może nawet z imionami własnymi”, „635.1 A”, „635.2 C - Zamaskowana Diana” i „635.3 B, bardziej groźna”.
+
+1. **Kto.** Do czterech wyjętych spod prawa (Herszt zbójców, Kłusownik, Koniokrad, Przemytnik) dochodzi trzech z imionami własnymi: podpalacz Wojsław Pożoga (grafika 635.1 A), rozbójniczka Zamaskowana Diana (grafika 635.2, imię od autora) i rabuś grobów Ścibor Kopacz (groźniejsza grafika 636). Sołtys losuje wyjętego spod prawa z siedmiu, więc każdy z nich trafia się średnio co siódmy dzień.
+2. **Jak walczą (brakujący szczegół).** Wojsław stoi z tyłu i rzuca garnkiem ognia: cios fizyczny od Zręczności, który z szansą 30% podpala na 3 ruchy, a sam Wojsław jest trochę odporny na ogień. Fizyczny, bo atak magiczny omija pancerz: w symulacji silny wojownik bez sprzętu wygrywał z magicznym Wojsławem 2 walki na 60, a z każdym innym wyjętym spod prawa 60 na 60. Z fizycznym wygrywa 60 na 60, a łucznik 11 na 60, tyle co z Koniokradem (8) i Kłusownikiem (22). Diana stoi w środku, jest szybka i bije dwoma nożami od Zręczności. Ścibor stoi z przodu, ma więcej HP i pancerza i bije łopatą od Siły. HP i obrażenia każdego z nich równają się i tak elicie miejsca z listu razy 1,2 i 1,1, jak u pozostałych (zob. „Poszukiwani”, punkt 5), a nagroda jest ta sama.
+3. **Diana jest kobietą (brakujący szczegół).** Jej list mówi „Wyjęta spod prawa” i „Szukaj jej”, a po walce „Poszukiwana pokonana”. Stwór i przeciwnik zdarzenia może mieć w danych `"female": true`.
+4. Grafiki są w `src/client/art/monsters/` (`arsonist`, `highwaywoman`, `grave-robber`), przeciwnicy w `data/events.json` (`foes`), a lista wyjętych spod prawa w `data/settlement.json` (`wanted.outlaws`).
+
 ## Wersja 0.1.62 (5.11.2026)
 
 Oznaczanie na czacie przez „@” (634 A): zob. „Oznaczanie na czacie (634 A)”.

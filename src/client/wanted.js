@@ -34,7 +34,7 @@ function posterCard(poster, view, apply, label = null) {
     'article',
     { class: `wanted-poster wanted-poster--${poster.state}${outlaw ? ' wanted-poster--outlaw' : ''}` },
     label && h('p', { class: 'wanted-poster-earlier', text: label }),
-    h('p', { class: 'wanted-poster-label', text: outlaw ? texts.outlaw : gendered(texts.wanted, poster.female) }),
+    h('p', { class: 'wanted-poster-label', text: gendered(outlaw ? texts.outlaw : texts.wanted, poster.female) }),
     h('span', { class: 'wanted-poster-art' }, monsterSprite(poster.monsterId)),
     h('h3', { class: 'wanted-poster-name', text: poster.name }),
     h('p', { class: 'wanted-poster-place', text: filled(texts.place, { area: poster.areaName, levels: poster.levels }) }),

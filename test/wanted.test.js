@@ -144,6 +144,29 @@ describe('the wanted posters', () => {
     assert.match(robbed.entries.find((entry) => entry.fight === fought.index).text, /Poszukiwany pokonany/);
   });
 
+  test('the named outlaws of 5.11.2026 fight by their own names, Zamaskowana Diana in a woman\'s words', () => {
+    const named = { arsonist: 'Wojsław Pożoga', highwaywoman: 'Zamaskowana Diana', 'grave-robber': 'Ścibor Kopacz' };
+    for (const [monsterId, name] of Object.entries(named)) {
+      assert.ok(rules.outlaws.includes(monsterId), monsterId);
+      const foe = content.eventFoesById[monsterId];
+      assert.equal(foe.name, name);
+      const female = foe.female === true;
+      assert.equal(female, monsterId === 'highwaywoman');
+      const target = { id: `d:spider-gully:${monsterId}`, kind: 'outlaw', areaId: 'spider-gully', monsterId, name, female, level: 36 };
+      const hunt = explore(always, { wanted: target });
+      const fight = hunt.fights.find((one) => one.wanted);
+      assert.deepEqual(fight.enemies.map((enemy) => enemy.name), [name]);
+      assert.equal(fight.won, true, name);
+      assert.match(hunt.entries.find((entry) => entry.fight === fight.index).text, female ? /Poszukiwana pokonana/ : /Poszukiwany pokonany/);
+    }
+    // Her poster, when the sołtys draws her, is a woman's.
+    let diana = null;
+    for (let i = 0; !diana && i < 300; i++) diana = wantedPosters(47, '2026-11-05', `postać-${i}`, content).find((poster) => poster.monsterId === 'highwaywoman');
+    assert.equal(diana.kind, 'outlaw');
+    assert.equal(diana.name, 'Zamaskowana Diana');
+    assert.equal(diana.female, true);
+  });
+
   test('the Osada\'s record after an exploration: the poster in hand is beaten when its target fell', () => {
     const stored = { wanted: { day: 'd', done: [], taken: { id: 'd:a:b', beaten: false } } };
     assert.deepEqual(wantedAfterHunt(stored, { wanted: { id: 'd:a:b', met: true, beaten: true } }), { day: 'd', done: [], taken: { id: 'd:a:b', beaten: true } });

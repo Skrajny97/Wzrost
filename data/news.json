@@ -120,6 +120,11 @@
       "id": "0.1.62",
       "title": "Wersja 0.1.62: oznaczanie na czacie",
       "body": "- Wpisz „@” i początek imienia, a gra podpowie, kogo oznaczyć. Możesz też nacisnąć „Oznacz” w okienku wiadomości albo w karcie postaci.\n- Wiadomość, w której ktoś Cię oznaczył, ma złotą ramkę, a Społeczność zapala żółtą kropkę, dopóki jej nie przeczytasz.\n- Gdy masz włączone powiadomienia, oznaczenie przyjdzie też na telefon."
+    },
+    {
+      "id": "0.1.63",
+      "title": "Wersja 0.1.63: trzech nowych wyjętych spod prawa",
+      "body": "- Na listach gończych sołtysa pojawiają się Wojsław Pożoga, podpalacz z garnkiem ognia, Zamaskowana Diana, rozbójniczka z dwoma nożami, i Ścibor Kopacz, rabuś grobów z łopatą.\n- Wojsław podpala, Diana jest szybka, a Ścibor wytrzymały. Nagroda jest taka sama jak za pozostałych wyjętych spod prawa."
     }
 ]
 }

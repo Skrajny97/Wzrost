@@ -688,13 +688,13 @@
       { "area": "tar-pits", "monster": "tar-burner", "name": "Smolarz Podpalacz" },
       { "area": "burnt-forest", "monster": "ash-wraith", "name": "Popielec Żałobnik" }
     ],
-    "outlaws": ["bandit-chief", "poacher", "horse-thief", "smuggler"],
+    "outlaws": ["bandit-chief", "poacher", "horse-thief", "smuggler", "arsonist", "highwaywoman", "grave-robber"],
     "texts": {
       "title": "Poszukiwani",
       "intro": "Sołtys Bogumił wywiesza co dzień trzy listy gończe za stworami z miejsc, które masz otwarte, i jeden za wyjętym spod prawa. Weź list, a na wyprawie w tym miejscu częściej spotkasz poszukiwanego.",
       "footer": "Za pokonanie poszukiwanego nagroda u sołtysa: złoto, Punkty Czasu i przychylność Bractwa Łowców. Stwór zostawia trofeum: swój materiał w rzadkości, której brakuje Ci w Encyklopedii do premii +5% obrażeń przeciw niemu. Wyjęty spod prawa zostawia rzadki łup. Jeden list naraz, nowe listy co dzień.",
       "wanted": "[Poszukiwana|Poszukiwany]",
-      "outlaw": "Wyjęty spod prawa",
+      "outlaw": "[Wyjęta|Wyjęty] spod prawa",
       "place": "{area}, {levels}",
       "trophyReward": "{gold} złota, trofeum",
       "lootReward": "{gold} złota, rzadki łup",
