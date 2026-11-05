@@ -1,4 +1,4 @@
-// Drużyny (src/server/parties.js): from character level 25, up to three
+// Drużyny (src/server/parties.js): from character level 10 (642 B), up to three
 // characters of different players with a leader, who sends those free on an
 // exploration as far and as long as the lowest of them may; each goes with
 // the others beside it and gets its own report. One at a profession's work
@@ -52,13 +52,22 @@ describe('Drużyna through the API', () => {
     await player('druh', 'Druh');
   });
 
-  test('the Drużyna opens at character level 25', async () => {
-    await (await db()).prepare("UPDATE characters SET level = 24 WHERE name = 'Druh'").run();
+  test('the Drużyna opens at character level 10', async () => {
+    await (await db()).prepare("UPDATE characters SET level = 9, class_level = 9 WHERE name = 'Druh'").run();
     const locked = await as('druh', 'GET', '/api/party');
     assert.equal(locked.status, 403);
     assert.equal(locked.data.error.code, 'locked');
+    assert.match(locked.data.error.message, /poziomie postaci 10\./);
     const invited = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     assert.equal(invited.data.error.code, 'target_locked');
+    // At level 10 both open: the Drużyna screen and an invitation from a
+    // leader whose class level is within the spread.
+    await (await db()).prepare("UPDATE characters SET level = 10, class_level = 10 WHERE name IN ('Druh', 'Lider')").run();
+    const open = await as('druh', 'GET', '/api/party');
+    assert.equal(open.status, 200, JSON.stringify(open.data));
+    assert.equal(open.data.unlockLevel, 10);
+    const again = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    assert.equal(again.status, 200, JSON.stringify(again.data));
   });
 
   test('an invitation makes a party, the invited one joins, and the party goes out together', async () => {
@@ -90,6 +99,19 @@ describe('Drużyna through the API', () => {
       assert.deepEqual(options.party.names.sort(), ['Druh', 'Lider']);
       // The trip's roster, both players in the trip's order.
       assert.deepEqual(options.party.roster.map((one) => one.name), ['Lider', 'Druh']);
+    }
+    // Each sees the other walking beside it on the way (640 A), in the
+    // other's look; not itself, whom the page draws from its own character.
+    for (const [login, other] of [['lider', 'Druh'], ['druh', 'Lider']]) {
+      const { character } = (await as(login, 'GET', '/api/character')).data;
+      const walkers = character.activity.party.walkers;
+      assert.deepEqual(walkers.map((one) => one.name), [other]);
+      const row = await (await db()).prepare('SELECT class_id, appearance, skin FROM characters WHERE name = ?').bind(other).first();
+      assert.equal(walkers[0].classId, row.class_id);
+      assert.equal(walkers[0].appearance, row.appearance);
+      assert.equal(walkers[0].skin, row.skin ?? walkers[0].skin);
+      assert.ok(!('id' in walkers[0]));
+      for (const key of ['evolution', 'mount', 'mountSkin', 'aura', 'trail', 'pet']) assert.ok(key in walkers[0], key);
     }
     await (await db()).prepare('UPDATE activities SET started_at = started_at - ?, ends_at = ends_at - ?').bind(1800000, 1800000).run();
     for (const login of ['lider', 'druh']) {

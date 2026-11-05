@@ -1210,7 +1210,16 @@ function activityView(activity, level, now) {
   return (
     activity && {
       kind: activity.kind,
-      ...(options.party && { party: { names: options.party.names ?? [], skips: (options.skips ?? []).filter((skip) => skip.id !== activity.character_id) } }),
+      ...(options.party && {
+        party: {
+          names: options.party.names ?? [],
+          skips: (options.skips ?? []).filter((skip) => skip.id !== activity.character_id),
+          // The others who went, as they look on the way: they walk beside
+          // the character in the Walka scene (640 A). A trip that set out
+          // before 0.1.69 has none.
+          walkers: (options.party.looks ?? []).filter((look) => look.id !== activity.character_id).map(({ id, ...look }) => look),
+        },
+      }),
       ...activityPlace(activity, level),
       minutes: activity.minutes,
       startedAt: activity.started_at,

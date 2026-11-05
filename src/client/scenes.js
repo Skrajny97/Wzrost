@@ -74,21 +74,19 @@ export function workScene(professionId, activity, { avatar = false } = {}) {
 // The Walka scene of an exploration under way: the character in its own look
 // and skin tone (or its evolution's), or the System's figure for a look not
 // drawn walking yet, in the light of its aura, with its trail behind and its
-// pet beside it.
+// pet beside it. On a Drużyna's trip the others who went walk beside it, each
+// in its own look, on its own mount and with its own aura, trail and pet
+// (640 A; a player's idea via the author: "dostawić dane klasy w danym
+// odcieniu skóry i kolejności obok siebie w jakiejś odległości by sie nie
+// nakladaly").
 export function walkScene(activity) {
   const walk = config()?.walk;
   if (!walk) return null;
-  const { classId, appearance, skin, evolution } = state.character ?? {};
-  const own = walkerSheet(classId, appearance, skin, evolution?.current?.id);
-  const figure = ride(walk, state.character) ?? (own ? frames({ ...walk.walker, file: own }, 'scene-walker scene-walker--own') : frames(walk.figure, 'scene-walker'));
-  const stage = h('div', { class: `scene-walk scene--${dayPart()}` }, h('div', { class: 'scene-path' }), figure);
-  const worn = state.character?.cosmetics;
-  const aura = cosmeticOf(worn?.aura)?.aura;
-  if (aura) lightWalker(stage, figure, aura);
-  const trail = cosmeticOf(worn?.trail)?.trail;
-  if (trail) footprints(stage, trail, walk, figure.classList.contains('scene-ride'));
-  const pet = cosmeticOf(worn?.pet)?.pet;
-  if (pet) companion(figure, pet, figureBox(walk, figure, own));
+  const stage = h('div', { class: `scene-walk scene--${dayPart()}` }, h('div', { class: 'scene-path' }));
+  const party = [state.character, ...(activity.party?.walkers ?? []).map(wayCharacter)];
+  const members = party.map((character, index) => member(walk, character, index, party.length));
+  stage.append(...members);
+  if (members.some((holder) => holder.querySelector('.scene-ride'))) stage.classList.add('scene-walk--riders');
   const land = walk.lands[activity.regionId];
   if (land) stage.style.setProperty('--land', `url("/${land}")`);
   stage.style.setProperty('--land-width', `${LAND.width * SCALE}px`);
@@ -102,11 +100,49 @@ export function walkScene(activity) {
   return { element: h('div', { class: 'scene', 'aria-hidden': 'true' }, stage), update: () => {} };
 }
 
+// Another member of the trip as the scene draws a character, from its look on
+// the way (activity.party.walkers, parties.js).
+function wayCharacter(look) {
+  return {
+    classId: look.classId,
+    appearance: look.appearance,
+    skin: look.skin,
+    evolution: look.evolution ? { current: { id: look.evolution } } : null,
+    mount: look.mount ? { id: look.mount } : null,
+    cosmetics: { mountSkin: look.mountSkin, aura: look.aura, trail: look.trail, pet: look.pet },
+  };
+}
+
+// One walker on the way, in a holder of its own with its light, its trail
+// and its pet. In a Drużyna (`count` over one) the holders stand in a line
+// (styles.css, .scene-member--party): the character in front, on the right,
+// leading the way, and each next one a step behind it to the left and a
+// little further away, so that they do not cover each other.
+function member(walk, character, index, count) {
+  const { classId, appearance, skin, evolution } = character ?? {};
+  const own = walkerSheet(classId, appearance, skin, evolution?.current?.id);
+  const figure = ride(walk, character) ?? (own ? frames({ ...walk.walker, file: own }, 'scene-walker scene-walker--own') : frames(walk.figure, 'scene-walker'));
+  const holder = h('div', { class: `scene-member${count > 1 ? ' scene-member--party' : ''}` }, figure);
+  if (count > 1) {
+    holder.style.setProperty('--slot', String((count - 1) / 2 - index));
+    holder.style.setProperty('--depth', String(index));
+    holder.style.zIndex = String(2 + count - index);
+  }
+  const worn = character?.cosmetics;
+  const aura = cosmeticOf(worn?.aura)?.aura;
+  if (aura) lightWalker(holder, figure, aura);
+  const trail = cosmeticOf(worn?.trail)?.trail;
+  if (trail) footprints(holder, trail, walk, figure.classList.contains('scene-ride'));
+  const pet = cosmeticOf(worn?.pet)?.pet;
+  if (pet) companion(figure, pet, figureBox(walk, figure, own));
+  return holder;
+}
+
 // The aura on the way: its light around the walking figure (or the rider and
 // the mount), and its motes about it, or sparks rising, as on the portrait.
-function lightWalker(stage, figure, { glow, spark, sparks }) {
-  stage.style.setProperty('--aura-glow', glow);
-  stage.style.setProperty('--aura-spark', spark);
+function lightWalker(holder, figure, { glow, spark, sparks }) {
+  holder.style.setProperty('--aura-glow', glow);
+  holder.style.setProperty('--aura-spark', spark);
   figure.classList.add('scene-aura');
   const riding = figure.classList.contains('scene-ride');
   const motes = h('div', { class: `scene-aura-motes${riding ? ' scene-aura-motes--ride' : ''} aura-motes aura-motes--${sparks}` });
@@ -128,9 +164,10 @@ function lightWalker(stage, figure, { glow, spark, sparks }) {
 // (two to a stride of the walk, or of the mount's trot), each staying where it
 // fell as the path drifts on, fading. Only while the scene is on the screen,
 // the page in view and the animations on; with the animations off a few
-// footprints stand behind the figure.
-function footprints(stage, { color }, walk, riding) {
-  stage.style.setProperty('--trail', color);
+// footprints stand behind the figure. They go in the walker's holder, so
+// each member of a Drużyna leaves its own.
+function footprints(holder, { color }, walk, riding) {
+  holder.style.setProperty('--trail', color);
   const bottom = riding ? 20 : 28;
   const step = (offset, age = 0) => {
     const print = h('span', { class: `scene-step${offset % 2 ? ' scene-step--far' : ''}` });
@@ -142,7 +179,7 @@ function footprints(stage, { color }, walk, riding) {
       print.style.opacity = String(Math.max(0.15, 1 - age / STEP_LIFE));
       print.classList.add('scene-step--still');
     }
-    stage.append(print);
+    holder.append(print);
     return print;
   };
   if (!motionOn()) {
@@ -153,7 +190,7 @@ function footprints(stage, { color }, walk, riding) {
   let count = 0;
   const next = () =>
     setTimeout(() => {
-      if (!stage.isConnected) return;
+      if (!holder.isConnected) return;
       if (motionOn() && !document.hidden) {
         const print = step(count);
         setTimeout(() => print.remove(), STEP_LIFE * 1000);

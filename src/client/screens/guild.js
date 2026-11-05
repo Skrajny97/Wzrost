@@ -10,7 +10,7 @@
 // of the Czat (community.js).
 //
 // Under the heading, the page's tabs (data/guilds.json, tabs), in the look
-// of the Społeczność's row of parts: "Gildia" with all the above, then the
+// of the Społeczność's parts but in two thin rows: "Gildia" with all the above, then the
 // guild's "Siedziba" with its buildings (guild-seat.js, 616 A) and its
 // activities, "Wyprawa" (guild-expedition.js, 621 A), "Bestia"
 // (guild-beast.js), "Próby" (guild-trials.js), "Prośby"
@@ -96,11 +96,19 @@ export function mountGuildPage(container, context) {
     render();
   }
 
+  // Two thin rows (the author: "Ciasno się tu zrobiło zrób dwa cieńsze
+  // rzędy"): the first half of the tabs over the rest, each row filling the
+  // width (styles.css, .guild-picker): in a grid of first × second columns a
+  // tab of the first row spans `second` of them, one of the second `first`.
+  const first = Math.ceil(tabs.length / 2);
+  const second = tabs.length - first;
+  row.style.setProperty('--guild-columns', String(second ? first * second : first));
+
   function render() {
     fill(
       row,
-      tabs.map((tab) =>
-        h(
+      tabs.map((tab, index) => {
+        const button = h(
           'button',
           {
             type: 'button',
@@ -111,14 +119,16 @@ export function mountGuildPage(container, context) {
               if (tab.id !== current) show(tab.id);
             },
           },
-          icon(TAB_ICONS[tab.id] ?? 'unknown', { size: 20, className: 'community-icon' }),
+          icon(TAB_ICONS[tab.id] ?? 'unknown', { size: 16, className: 'community-icon' }),
           h('span', { class: 'community-name', text: tab.name }),
           // Something to do in this part: a trial's chest, an attack on the
           // Bestia or on the Wyprawa's guardian or a chest, a gift to thank
           // for (chat-news.js, guild-todo.js).
           guildTodoNews(tab.id) && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'do zrobienia' }),
-        ),
-      ),
+        );
+        button.style.setProperty('--guild-span', String(second ? (index < first ? second : first) : 1));
+        return button;
+      }),
     );
     row.querySelector('[aria-selected="true"]')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
   }
