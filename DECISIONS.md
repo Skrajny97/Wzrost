@@ -3034,6 +3034,36 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.69 (5.11.2026)
+
+Drużyna od 10. poziomu postaci: zob. „Drużyna od 10. poziomu (642 B)”. Drużyna idzie na ekranie Walka obok siebie: zob. „Drużyna w drodze obok siebie (640 A)”. Zakładki Gildii stoją w dwóch niższych rzędach: zob. „Zakładki Gildii w dwóch rzędach”.
+
+## Drużyna od 10. poziomu (642 B) (5.11.2026, w grze od 0.1.69)
+
+Autor o kwestii narratora o zakładkach Społeczności: „Powinno móc sie dołączyć do Gildii i Drużyny od 5 albo 10 poziomu jeśli dobrze pamietam”, a potem: „642 B tylko "Drużynę założysz od 10. poziomu" a nie zbierzesz”.
+
+1. **Próg.** Drużyna otwiera się na 10. poziomie postaci, a nie na 25. (`data/unlocks.json`, `party`). Od 10. poziomu postać zakłada drużynę, przyjmuje zaproszenia i chodzi na wyprawy drużyny. Zaprosić można postać od 10. poziomu, a napis w części Drużyna podaje próg z danych.
+2. **Bez zmian:** w drużynie najwyżej 5 poziomów klasy różnicy, Gildia od 5. poziomu (własna od 30.), wystawianie się jako najemnik w Karczmie od 25. poziomu (ma własny próg) i Wieża Drużyn od 50.
+3. **Kwestia narratora** o zakładkach Społeczności (rozdział na 5. poziomie) będzie brzmiała: „U góry przełączasz zakładki: Czat, Znajomi, Ranking i Gildia. Drużynę założysz od 10. poziomu.” Autor wybiera wersję nagrania, które wejdzie do gry razem z poprawkami samouczków. Do tego czasu narrator mówi dawną kwestię.
+
+## Drużyna w drodze obok siebie (640 A) (5.11.2026, w grze od 0.1.69)
+
+Pomysł gracza z czatu, przekazany przez autora: „w drużynie to chyba wystarczy dostawić dane klasy w danym odcieniu skóry i kolejności obok siebie w jakiejś odległości by sie nie nakladaly?”. Autor: „640 A”.
+
+1. **Kto idzie.** Na ekranie Walka, w czasie wyprawy drużyny, obok postaci idą pozostali członkowie, którzy z nią wyruszyli. Każdy we własnym wyglądzie: klasa, płeć, odcień skóry i forma ewolucji, a do tego wierzchowiec ze Stajni (z wyglądem ze Sklepu Systemu), aura, świetliste ślady i chowaniec.
+2. **Ustawienie.** Własna postać idzie z przodu, po prawej, jakby prowadziła. Każda następna idzie krok za nią w lewo i trochę dalej (wyżej i za poprzednią), więc postacie się nie zasłaniają. Krok to piąta część szerokości sceny, od 56 do 88 pikseli, a gdy ktoś jedzie wierzchem, od 72 do 120. Za własną postacią idą pozostali w kolejności składu wyprawy, najpierw lider.
+3. **Wygląd z chwili wyjścia** (brakujący szczegół). Gra zapisuje wygląd każdego członka, gdy drużyna wyrusza (`looks` w zapisie wyprawy), tak jak jego siłę do walk. Zmianę wyglądu w trakcie wyprawy widać od następnej. Wyprawy drużyny rozpoczęte przed 0.1.69 nie mają tego zapisu, więc do ich końca postać idzie sama.
+4. **Towarzysze z Kwater** pójdą w tym samym szeregu, gdy autor zatwierdzi ich chody (648).
+5. **Sprawdzone w przeglądarce:** trzy postacie (jedna wierzchem i z lisem, jedna z aurą i świetlistymi śladami) na 320, 390 i 1366 px, z ekranu każdego z trzech graczy, i postać idąca sama, która wygląda jak dotąd.
+
+## Zakładki Gildii w dwóch rzędach (5.11.2026, w grze od 0.1.69)
+
+Autor, ze zrzutem zakładek Gildii z telefonu: „Ciasno się tu zrobiło zrób dwa cieńsze rzędy”.
+
+1. **Dwa rzędy.** Siedem zakładek Gildii stoi w dwóch rzędach: Gildia, Siedziba, Wyprawa i Bestia nad Próbami, Prośbami i Wymianą. Oba rzędy wypełniają całą szerokość. Gdy zakładek będzie inna liczba, w pierwszym rzędzie stanie połowa zaokrąglona w górę.
+2. **Cieńsze.** Ikona stoi obok nazwy, a nie nad nią, więc rząd ma 38 pikseli wysokości zamiast około 54. Kropka „do zrobienia” siedzi w rogu zakładki.
+3. **Wąskie telefony.** Do 479 pikseli szerokości nazwy maleją razem z ekranem: przy 320 pikselach mają 11,6 piksela, a od 375 pełne 15. Sprawdzone na 320, 360, 390, 430 i 1366 pikselach: dwa rzędy i żadna nazwa nie jest ucięta.
+
 ## Wersja 0.1.68 (5.11.2026)
 
 Praca Stołu rozbiórki liczy się do zadań i Prób Gildii dopiero po zakończeniu zlecenia: zob. „Stół rozbiórki: praca liczy się po zakończeniu”. Własne nazwy stopni relacji z towarzyszem: zob. „Stopnie relacji z towarzyszem (639 A)”. Piętnaście poprawek z przeglądu kodu: zob. „Przegląd kodu z 5.11.2026: poprawki”. Migracje bazy: 0085 (kto z gildii liczy się w tygodniu) i 0086 (zapłata za budowę w toku).
@@ -6441,7 +6471,7 @@ Autor: „Następnie przygotuj podwaliny a najlepiej cały system Drużyn. Wdró
 
 Autor: „Następnie przygotuj podwaliny a najlepiej cały system Drużyn. Wdróż potem na main od 25 poziomu postaci inaczej niż Osada, która wlatuje na 20, zeby nie za duzo na raz było.” oraz „Niech Drużyna ma maksymalnie 3 członków i lidera  który decyduje o polowaniu. Drużyny powinny łatwo łączyć się, 1 członek wychodzić z nich jak stwierdzi ze potrzebuje Profesje robić. Drużyny poki co są tylko na wyprawy (mogą chodzić maksymalnie na tak długie i taki region jaki odblokowala postac z najnizszym lvlem w drużynie).”
 
-1. **Skład.** Drużyna to najwyżej 3 postacie różnych graczy, razem z liderem. To brakujący szczegół: „3 członków i lidera” czytam jako trzy postacie z liderem, jak „Tercet” w Wieżach i drużyna trzech postaci w dokumencie projektowym. Drużyna otwiera się na 25. poziomie postaci, w Społeczności, w części Drużyna.
+1. **Skład.** Drużyna to najwyżej 3 postacie różnych graczy, razem z liderem. To brakujący szczegół: „3 członków i lidera” czytam jako trzy postacie z liderem, jak „Tercet” w Wieżach i drużyna trzech postaci w dokumencie projektowym. Drużyna otwiera się na 25. poziomie postaci, w Społeczności, w części Drużyna. *Od 0.1.69 otwiera się na 10. poziomie: zob. „Drużyna od 10. poziomu (642 B)”.*
 2. **Łączenie.** Lider zaprasza postać jednym stuknięciem z listy swoich Znajomych albo po imieniu. Pierwsze zaproszenie zakłada drużynę. Zaproszona postać stuka „Dołącz”, a zaproszenie zapala kropkę na Społeczności. Własnej postaci z tego samego konta nie da się zaprosić, a gracze, z których jeden ukrył drugiego na czacie, nie zaproszą się nawzajem.
 3. **Wychodzenie.** Członek opuszcza drużynę jednym przyciskiem, np. gdy chce zająć się profesjami. *Zmienione 1.11.2026: przy profesji nie trzeba wychodzić z drużyny, zob. „Drużyna a profesje, zapraszanie do Gildii ze znajomych”.* Lider może też usunąć członka i cofnąć zaproszenie. Gdy lider odchodzi, drużynę prowadzi ta postać, która dołączyła najwcześniej. Drużyna bez członków znika.
 4. **Wyprawa drużyny.** Lider wybiera w Walce miejsce i czas, zaznacza „Z drużyną: …” i stuka „Wyrusz”. Idą ci członkowie, którzy nie mają innych zajęć i grają tą postacią. Każdy z nich musi mieć to miejsce i ten czas odblokowane, więc drużyna idzie najwyżej tam i tak długo, jak najniższa postać. Postać z innymi zajęciami zostaje w obozie.

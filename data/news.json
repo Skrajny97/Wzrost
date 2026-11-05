@@ -150,6 +150,11 @@
       "id": "0.1.68",
       "title": "Wersja 0.1.68: poprawki i stopnie relacji towarzyszy",
       "body": "- Praca Stołu rozbiórki liczy się do zadań i Prób Gildii dopiero po zakończeniu zlecenia.\n- Towarzysze mają własne stopnie relacji: Dystans, Koleżeństwo, Zaufanie, Przyjaźń i Braterstwo broni.\n- Sala prób płaci za elitę jak za elitę i daje dwa razy więcej materiałów.\n- „Przerwij budowę” oddaje dokładnie to, co zapłacono.\n- Powrót do gildii w tym samym tygodniu nie podnosi już progów Prób ani etapów Wyprawy.\n- Postać wystawiona jako najemnik nie ma kropki ataku przy Bestii i Wyprawie.\n- Listy gończe dnia nie zmieniają się do północy, a listu, z którym postać wyruszyła, nie da się porzucić w drodze."
+    },
+    {
+      "id": "0.1.69",
+      "title": "Wersja 0.1.69: Drużyna od 10. poziomu i wspólny marsz",
+      "body": "- Drużynę założysz już od 10. poziomu postaci, a nie od 25.\n- Na wyprawie drużyny w Walce idziecie obok siebie: każdy w swoim wyglądzie, na swoim wierzchowcu, z aurą, śladami i chowańcem.\n- Zakładki Gildii stoją w dwóch niższych rzędach, więc jest więcej miejsca na nazwy."
     }
 ]
 }
