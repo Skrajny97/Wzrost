@@ -36,9 +36,12 @@ export function howItWorks(lead, rest, { system = false } = {}) {
 // inside, and `dot` when something there waits to be done. It opens as the
 // player left it last on this device (`key`), else as `open` says; `force`
 // opens it whatever was left, while something in it must be done. `card`
-// gives the title a card's heading (with `id` for its label).
+// gives the title a card's heading (with `id` for its label). `art`, a
+// picture beside the title and the line, and `badge`, a mark after the
+// title, stay in sight while it is folded (a building of the Siedziba
+// Gildii, guild-seat.js).
 const FOLD_KEY = 'insight-fold-';
-export function foldPart({ key, title, line = null, open = true, force = false, dot = false, card = false, id = null, className = '' }, ...children) {
+export function foldPart({ key, title, line = null, open = true, force = false, dot = false, card = false, id = null, className = '', art = null, badge = null }, ...children) {
   let left = null;
   try {
     left = localStorage.getItem(FOLD_KEY + key);
@@ -49,7 +52,7 @@ export function foldPart({ key, title, line = null, open = true, force = false, 
   const summary = h(
     'summary',
     {
-      class: 'fold-part-summary',
+      class: `fold-part-summary${art ? ' fold-part-summary--art' : ''}`,
       // Only the player's own taps are kept, not an opening forced by `force`.
       onClick: () => {
         try {
@@ -59,11 +62,13 @@ export function foldPart({ key, title, line = null, open = true, force = false, 
         }
       },
     },
+    art && h('span', { class: 'fold-part-art', 'aria-hidden': 'true' }, art),
     h(
       'span',
       { class: 'fold-part-head' },
       card ? h('h2', { class: 'card-title', id, text: title }) : h('span', { class: 'fold-part-title', id, text: title }),
       h('span', { class: 'fold-part-marker', 'aria-hidden': 'true' }),
+      badge,
       dot && h('span', { class: 'fold-part-dot', role: 'img', 'aria-label': 'do zrobienia' }),
     ),
     line && h('span', { class: 'fold-part-line', text: line }),

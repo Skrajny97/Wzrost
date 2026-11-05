@@ -22,7 +22,7 @@
 // easy for it, the elite and the champion it has not met yet come far more
 // often, until it meets them (rareCatchUp).
 
-import { combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
+import { challengeAt, combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { canUse, itemName, itemRank, itemView, randomItem } from './items.js';
@@ -59,7 +59,9 @@ function byMinutes(pairs, minutes) {
 // with the most minutes not above its time), the time each fight stands for
 // against the reference, and the odds of a demanding encounter, the elite
 // and, where it lives, the champion.
-export function explorationPace(minutes, content) {
+// `level`: the character's (the trip's leader's), whose challenge rests
+// less after each won fight of a longer exploration (628 B).
+export function explorationPace(minutes, content, level = 0) {
   const tuning = content.balance.hunt;
   const fights = tuning.fightsByMinutes.filter(([from]) => from <= minutes).at(-1)?.[1] ?? 1;
   const timeFactor = minutes / fights / tuning.minutesPerFightReference;
@@ -80,7 +82,7 @@ export function explorationPace(minutes, content) {
     // The author (166): "nie może być więcej walk w krótkiej wyprawie niż w
     // długiej", with a light bonus for the length.
     lengthBonus: byMinutes(tuning.lengthBonusByMinutes, minutes),
-    restBonus: byMinutes(tuning.restBonusByMinutes, minutes),
+    restBonus: byMinutes((challengeAt(level, content) ?? tuning).restBonusByMinutes, minutes),
   };
 }
 
@@ -384,9 +386,14 @@ export function resourceBundle(area, total) {
 // before 0.1.26, for its first `ms`), and `speed` the same for a speed potion
 // alone, as explorations started before the other kinds kept it
 // (potions.js). `wanted`: the Osada's wanted poster the character set out
-// with (wanted.js), its target met in its place's explorations.
+// with (wanted.js), its target met in its place's explorations. `seat`: the
+// Siedziba Gildii's bonuses for the character as it set out (guild-seat.js,
+// seatHuntBonus): { xp, gold, rarity } shares, or null. `hard`: a Trudna
+// wyprawa (629 A), from the challenge's level: its creatures are
+// challenge.hard times stronger, and its fights and finds give that much
+// more XP and gold.
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null },
+  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null, seat = null, hard = false },
   content,
 ) {
   // A Drużyna's trip (src/server/trips.js) gives `roster`, its players in
@@ -417,8 +424,12 @@ export function simulateHunt(
   // The trip's encounters follow its leader (its level and the creatures it
   // has met), the same for everyone.
   const lead = fighters[0].character;
-  // The newest place's creatures, stronger by the leader's level.
-  const strength = exploreStrength(area, lead.level, content);
+  // The newest place's creatures, stronger by the leader's level, and those
+  // of a Trudna wyprawa stronger still, for more XP and gold.
+  const harder = hard ? (challengeAt(lead.level, content)?.hard ?? null) : null;
+  const strength = exploreStrength(area, lead.level, content, Boolean(harder));
+  const hardXp = 1 + (harder?.xp ?? 0);
+  const hardGold = 1 + (harder?.gold ?? 0);
   const durationMs = minutes * 60000;
   // The companions hired in the Osada (companions.js) go along, up to two
   // more members of the party, each with its own HP through the exploration
@@ -454,7 +465,7 @@ export function simulateHunt(
   // character, those it has not met come far more often until the first
   // fight with them, and then as usual.
   let catchUp = first || avoidRare ? null : rareCatchUp(lead.level, area, met, content);
-  const odds = () => withRareOdds(explorationPace(minutes, content), { avoidRare: first || avoidRare, seekRare, catchUp, rumor, more: rareMore }, content);
+  const odds = () => withRareOdds(explorationPace(minutes, content, lead.level), { avoidRare: first || avoidRare, seekRare, catchUp, rumor, more: rareMore }, content);
   let pace = odds();
   if (first) pace = { ...pace, toughChance: 0 };
   const fightCount = pace.fights;
@@ -478,7 +489,16 @@ export function simulateHunt(
   // A longer exploration finds unique and rarer items a little more often
   // (482 B, at most +10% at four hours).
   const uniqueBonus = byMinutes(tuning.uniqueLengthFactorByMinutes, minutes);
-  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare, uniqueBonus };
+  // The Siedziba Gildii (616 A): its Sztandar's and Skarbiec's shares more
+  // XP and gold, in every fight and find, and its Dom Zwiadowców's more of
+  // the rarities with affixes on the items found, as the Ołtarz's blessing
+  // of luck raises them (rollRarity in items.js). On a Drużyna's trip each
+  // member's own, from its own loot, so the trip's shared fights stay the
+  // same; without a seat nothing changes.
+  const seatXp = 1 + (seat?.xp ?? 0);
+  const seatGold = 1 + (seat?.gold ?? 0);
+  const seatRarity = 1 + (seat?.rarity ?? 0);
+  const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare, uniqueBonus, ...(seatRarity !== 1 && { rarityBonus: seatRarity }) };
   const hpStart = me.hp;
   let result = 'success';
   let endedAt = durationMs; // a faint or an escape ends the exploration early
@@ -542,7 +562,7 @@ export function simulateHunt(
       const outcomes = Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest'));
       const outcome = lootRng.weighted(outcomes, ([, weight]) => weight)[0];
       if (outcome === 'gold') {
-        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length)));
+        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length) * seatGold * hardGold));
         gold += amount;
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findGold', step, { gold: amount }) });
       } else if (outcome === 'chest') {
@@ -663,7 +683,7 @@ export function simulateHunt(
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
-        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1);
+        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * hardGold;
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * lootRng.float(0.5, 1.5) * goldFactor;
         const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials;
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, lootRng, content));
@@ -680,7 +700,7 @@ export function simulateHunt(
         chests.push([weapon, 'firstChest']);
       }
       if (encounter.elite) {
-        chests.push([randomItem(enemies[0].level, lootRng, content, blessedLoot({ ...loot, rarityBonus: rewards.eliteRarityBonus }, fights.length - 1)), 'eliteChest']);
+        chests.push([randomItem(enemies[0].level, lootRng, content, blessedLoot({ ...loot, rarityBonus: rewards.eliteRarityBonus * seatRarity }, fights.length - 1)), 'eliteChest']);
       }
       if (encounter.champion && lootRng.chance(rewards.championItemChance)) {
         const rarityId = championItemRarity(enemies[0].level, lootRng, content);
@@ -692,7 +712,7 @@ export function simulateHunt(
       const trophy = meeting && sought.trophy ? { [sought.trophy]: 1 } : null;
       if (meeting) sighting.beaten = true;
       for (const [item] of chests) summary.chests.push(take(item));
-      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1));
+      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1) * seatXp * hardXp);
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
       xp += summary.xp;
       reached = gainXp(reached.level, reached.xp, summary.xp, (level) => xpToNext(level, content), maxLevel);
@@ -769,6 +789,7 @@ export function simulateHunt(
     blessingFights: blessing ? Math.min(fights.length, blessing.fights) : 0,
     // The wanted poster's target: met on the way, and beaten.
     ...(sought && { wanted: { id: sought.id, ...sighting } }),
+    ...(harder && { hard: true }),
     // The companions at the end: their HP and whether they fell on the way;
     // the party's players too.
     ...(companions.length > 0 && {
@@ -918,6 +939,7 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
     endsAt,
     result: hunt.result,
     resultText: content.texts.result[hunt.result],
+    ...(hunt.hard && { hard: true }),
     summary: {
       // Fights give the same XP to the character and the class (solo); the
       // fainting penalty takes only character XP.

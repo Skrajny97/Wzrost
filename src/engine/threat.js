@@ -81,12 +81,13 @@ function mix(kinds) {
 // The expensive part: sample fights for the character's current build, with
 // its companions (companions.js) at full HP beside it. It does not depend on
 // HP or the length, so the server can keep it until the build changes.
-export function threatSamples({ character, equipped, areaId, companions = [] }, content) {
+// `hard`: against the stronger creatures of a Trudna wyprawa (629 A).
+export function threatSamples({ character, equipped, areaId, companions = [], hard = false }, content) {
   const area = content.areasById[areaId];
   const player = playerCombatant({ character, equipped, name: 'próba', area }, content);
   const mates = companions.map((companion, index) => companionCombatant(companion, { area, id: `a${index + 1}` }, content));
   const rng = createRng(`threat:${areaId}:${character.level}`);
-  const strength = exploreStrength(area, character.level, content);
+  const strength = exploreStrength(area, character.level, content, hard);
   const kinds = (encounters, options) =>
     encounters.map((encounter) =>
       sampleKind(() => regularEncounter(encounter, area, rng, content, { ...options, characterLevel: character.level }), encounter.weight),
@@ -122,8 +123,8 @@ export function threatSamples({ character, equipped, areaId, companions = [] }, 
 // Chance of fainting for every exploration length, between 0 and 1.
 // `healing`: the healing potions taken ({ count, amount, below }), at most
 // one for each fight of a length.
-export function faintChances({ character, equipped, hp, areaId, avoidRare = false, seekRare = false, catchUp = null, healing = null }, content, samples) {
-  const { maxHp, recovery, regular, tough, elite, champion, safe } = samples ?? threatSamples({ character, equipped, areaId }, content);
+export function faintChances({ character, equipped, hp, areaId, avoidRare = false, seekRare = false, catchUp = null, healing = null, hard = false }, content, samples) {
+  const { maxHp, recovery, regular, tough, elite, champion, safe } = samples ?? threatSamples({ character, equipped, areaId, hard }, content);
   const start = Math.round((Math.min(hp, maxHp) / maxHp) * STEPS);
   // A healing potion, in steps: what it heals, and the HP below which it is
   // drunk. The chances are kept for each number of potions left.
@@ -140,7 +141,7 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
 
   const result = {};
   for (const minutes of durationsUpTo(content.balance.hunt.maxMinutes, content)) {
-    const pace = withRareOdds(explorationPace(minutes, content), { avoidRare, seekRare, catchUp }, content);
+    const pace = withRareOdds(explorationPace(minutes, content, character.level), { avoidRare, seekRare, catchUp }, content);
     // HP after the rest that follows a won fight, for each HP left after it;
     // a longer exploration rests a little longer (restBonusByMinutes).
     const rest = Math.min(1, recovery + pace.restBonus);

@@ -729,6 +729,22 @@ function checkReferences(data) {
   errors.push(...checkCasino(data));
   errors.push(...checkCosmetics(data));
   errors.push(...checkTowers(data));
+  errors.push(...checkGuildSeat(data, { resources }));
+  return errors;
+}
+
+// The Siedziba Gildii (guilds.json, seat; 616 A): buildings of their own
+// ids, each taking a known camp resource beside gold and with its picture
+// (src/client/art/guild); the Gildia page has its tab.
+function checkGuildSeat(data, { resources }) {
+  const errors = [];
+  const { buildings } = data.guilds.seat;
+  uniqueIds(errors, 'guilds (seat)', buildings);
+  for (const building of buildings) {
+    if (!resources.has(building.resource)) errors.push(`guilds.json: budynek Siedziby ${building.id} bierze nieznany zasób "${building.resource}"`);
+    if (!existsSync(new URL(`art/guild/${building.id}.png`, CLIENT_DIR))) errors.push(`guilds.json: budynek Siedziby ${building.id} nie ma obrazka src/client/art/guild/${building.id}.png`);
+  }
+  if (!data.guilds.tabs.some((tab) => tab.id === 'seat')) errors.push('guilds.json: strona Gildii nie ma zakładki Siedziby (seat)');
   return errors;
 }
 

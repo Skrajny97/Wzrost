@@ -274,7 +274,7 @@ export function mountCharacter(container) {
     const mineralCount = minerals.reduce((sum, mineral) => sum + mineral.count, 0);
     const showMinerals = mineralCount > 0 || Boolean(state.character.professions?.mining);
     const grids = {
-      items: () => [bag.length > 1 && sortRow('items'), itemsGrid(sortBag('items', bag))],
+      items: () => [scrollsLine(), bag.length > 1 && sortRow('items'), itemsGrid(sortBag('items', bag))],
       materials: () => [materials.length > 1 && sortRow('materials'), materialsGrid(sortBag('materials', materials))],
       parts: () => partsGrid(parts),
       minerals: () => mineralsGrid(minerals),
@@ -297,6 +297,23 @@ export function mountCharacter(container) {
         showMinerals && tab('minerals', mineralCount > 0 ? `Minerały (${formatNumber(mineralCount)})` : 'Minerały'),
       ),
       (grids[bagTab === 'minerals' && !showMinerals ? 'items' : bagTab] ?? grids.items)(),
+    );
+  }
+
+  // The Kowadło's scrolls the character holds, over its items (632 A: they
+  // are its own, bought in the Kuźnia or made in the Warsztat), each with
+  // its picture; nothing without any.
+  function scrollsLine() {
+    const kinds = [
+      ['ward-scroll', 'ochronne', state.character.scrolls ?? 0],
+      ['steady-scroll', 'utrwalenia', state.character.steadyScrolls ?? 0],
+    ].filter(([, , count]) => count > 0);
+    if (kinds.length === 0) return null;
+    return h(
+      'p',
+      { class: 'bag-scrolls' },
+      'Zwoje: ',
+      kinds.map(([id, name, count], index) => h('span', { class: 'bag-scroll' }, scrollArt(id, 20), `${name} ${formatNumber(count)}${index < kinds.length - 1 ? ',' : ''}`)),
     );
   }
 

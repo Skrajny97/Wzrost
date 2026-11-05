@@ -69,6 +69,8 @@ export const ICONS = {
   chat: [path('M4 5h16v11H10l-6 4.5z'), path('M8 9h8M8 12.5h5')],
   trophy: [path('M8 3.5h8V9a4 4 0 0 1-8 0z'), path('M8 5.5H4.5c0 3 1.5 4.8 3.7 5M16 5.5h3.5c0 3-1.5 4.8-3.7 5'), path('M12 13v3.5M9 20.5h6M10 16.5h4v4h-4z')],
   banner: [path('M6 21V3'), path('M6 4h12l-3 4 3 4H6')],
+  // The Siedziba Gildii: a keep with battlements and an arched gate.
+  keep: [path('M4.5 21V6h3v2.5h3V6h3v2.5h3V6h3v15z'), path('M10 21v-4a2 2 0 0 1 4 0v4'), path('M12 11.5V13'), path('M3 21h18')],
   gift: [['rect', { x: 4, y: 10.5, width: 16, height: 10, rx: 1 }], path('M3 7h18v3.5H3z'), path('M12 7v13.5'), path('M12 7c-1.5-3.5-5.5-4.2-5.5-1.6C6.5 7 10 7 12 7zM12 7c1.5-3.5 5.5-4.2 5.5-1.6C17.5 7 14 7 12 7z')],
   bell: [path('M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z'), path('M10 20.5a2 2 0 0 0 4 0')],
   swap: [path('M4 8h14M14.5 4.5L18 8l-3.5 3.5'), path('M20 16H6M9.5 12.5L6 16l3.5 3.5')],

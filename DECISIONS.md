@@ -3034,6 +3034,30 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.59 (5.11.2026)
+
+Siedziba Gildii (616 A), trudniejsze wyprawy od 10. poziomu (628 B, 629 A, 630 C, 631 C) i zwoje w Plecaku (632 A): zob. „Siedziba Gildii (616 A)”, „Trudniejsze wyprawy od 10. poziomu” i „Zwoje w Plecaku”.
+
+## Trudniejsze wyprawy od 10. poziomu (5.11.2026, w grze od 0.1.59)
+
+Autor: „628 obniżamy leczenie czyli B”, „629 A przełącznik może być taki dodatkowy, wzmacniamy tam stwory dwukrotnie”, „Do tego wszystkim zwiększamy stwory 1,5-krotnie bo wszyscy nawet okazjonalni gracze korzystaja ze wszystkich funkcjonalności. Oczywiście od 10-ego poziomu postaci wchodzą te duże zmiany trudności. To ma być angażująca gra po przemianach w wizji, jest duzo opcji ulepszenia postaci, więc jedziemy z tematem, choćby zrobiło się high dla casuali i mid-high dla zaangażowanych.”, a po liczbach z symulacji: „630 C” i „631 1,5x C”.
+
+1. **Leczenie między walkami (628 B), od 10. poziomu postaci.** Po wygranej walce na wyprawie wraca 15% brakującego HP zamiast 30%, a dłuższe wyprawy dokładają najwyżej 10% zamiast 20%. Leczenie Kleryka i premie miejsc dochodzą do tego jak dotąd. Statystyki postaci („Odzysk HP po walce”) pokazują nową wartość.
+2. **Silniejsze stwory (630 C), od 30. poziomu postaci.** Stwory na wyprawach mają 1,1 raza większe obrażenia i 1,1 raza więcej HP, w każdym miejscu, także na Szybkim i Błyskawicznym polowaniu i na wyprawie Drużyny. Sala prób i Poszukiwani biorą siłę z wypraw, więc też rosną. Wieże, Bestia Gildii i walki w zdarzeniach zostają bez zmian. Od 30. poziomu, bo wtedy postacie mają już zwykle towarzyszy. Wariant ×1,5 od 10. poziomu dawał w symulacji omdlenia w 60–80% godzinnych wypraw nawet przy najlepszym sprzęcie na poziomach 12–25.
+3. **Trudna wyprawa (629 A, 631 C), od 10. poziomu postaci.** Pole „Trudna wyprawa” w „Opcjach wyprawy”: stwory mają 1,5 raza większe obrażenia i HP niż na zwykłej wyprawie, a walki i znaleziska dają +50% XP i złota. Tylko przy zwykłym „Wyrusz”: nie na Szybkim i Błyskawicznym polowaniu ani na wyprawie z drużyną (tam pole nic nie zmienia). Telefon pamięta pole jak inne opcje wyprawy, a „Wyrusz ponownie” bierze je stamtąd. Wyprawa w toku i jej raport mówią „Trudna wyprawa: silniejsze stwory, więcej XP i złota.”, a „Zagrożenie” liczy silniejsze stwory, gdy pole jest zaznaczone.
+4. **Liczby z symulacji** (omdlenia na wyprawie 1 h / 4 h):
+    - poziomy 12–25 (w symulacji jeszcze bez towarzyszy): okazjonalny 25–34 / 39–46%, zaangażowany 14–22 / 20–31%, najlepszy sprzęt 5–17 / 13–22%;
+    - poziomy 30–75 (z dwoma towarzyszami): okazjonalny 7–16 / 33–45%, zaangażowany 2–6 / 18–29%, najlepszy sprzęt 0–1 / 1–3%;
+    - Trudna wyprawa, najlepszy sprzęt na poziomach 30–75: 4–12 / 23–42%, na godzinnej wyprawie 11–30% więcej XP na czysto niż na zwykłej.
+5. Liczby są w `data/balance.json` (`challenge`), a symulator to `tools/difficulty-sim.mjs` (z `--hard` dla Trudnej wyprawy).
+
+## Zwoje w Plecaku (5.11.2026, w grze od 0.1.59)
+
+Autor: „Sprawdź czy przypadkiem zwoje utrwalenia i ochronne nie wchodzą na konto zamiast na postać.” i „632 A”.
+
+1. Zwoje są przy postaci: kupione w Kuźni i zrobione w Warsztacie trafiają do postaci, która je kupiła albo zrobiła. Sprawdzone na dwóch postaciach jednego konta.
+2. Nad przedmiotami w Plecaku stoi wiersz „Zwoje: ochronne N, utrwalenia N” z obrazkami zwojów, gdy postać ma choć jeden zwój.
+
 ## Wersja 0.1.58 (5.11.2026)
 
 Tablica zleceń w dwóch zakładkach (prośba autora): zob. „Tablica zleceń w dwóch zakładkach”.
@@ -3104,6 +3128,36 @@ Autor: „627.2 B”, „Uwaga zeby nie przesadzić z balansem jak te trofeum wl
 1. **627.2 B, balans trofeów i progi Prób:** w grze od 0.1.56 (zob. „Sala prób”, „Poszukiwani”, punkt 6, i „Progi Prób Gildii do wszystkich prób”).
 2. **Zadania miesięczne od narratora:** w grze od 0.1.57 (zob. „Zadania miesięczne od narratora”).
 
+## Siedziba Gildii (616 A)
+
+W grze od 0.1.59.
+
+Autor: „616 A - akcept, ale muszą być zwijalne budynki i ludzie muszą móc wpłacać na co chcą, lider i zastępca może tylko oznaczyć co jest preferowane” i „623.1 B, 623.2 D, 623.3 D, 623.4 C”.
+
+1. **Zakładka Siedziba.** Strona Gildii ma szóstą zakładkę, „Siedziba”, drugą po „Gildia”, jak na makiecie, z ikoną warownej wieży. Wszystkie sześć mieści się w jednym rzędzie od 320 px szerokości: poniżej 390 px nazwy są trochę mniejsze i stoją bliżej siebie.
+2. **Cztery budynki** całej gildii, każdy od 0 do 10. poziomu (`seat` w `data/guilds.json`). Każdy poziom daje każdemu członkowi gildii:
+    - Sztandar: +1% XP z wypraw;
+    - Skarbiec: +1% złota z wypraw;
+    - Kuźnia Gildii: ulepszenia na Kowadle 2% taniej (złoto);
+    - Dom Zwiadowców: +2% szans na rzadsze przedmioty z wypraw.
+3. **Koszt (z makiety 616).** Poziom n kosztuje max(8000, 5000 × n) złota i max(600, 400 × n) sztuk zasobu budynku: Sztandar i Dom Zwiadowców biorą drewno, Skarbiec kamień, a Kuźnia Gildii rudę żelaza. 1. poziom to 8000 złota i 600 sztuk, 2. poziom 10 000 i 800, a 10. poziom 50 000 i 4000. Budynek do 10. poziomu kosztuje razem 278 000 złota i 22 200 sztuk zasobu, cztery budynki 1 112 000 złota i 88 800 sztuk.
+4. **Wpłaty (zmiana autora).** Wspólnej skarbnicy nie ma. Każdy członek wpłaca swoje złoto i zasób budynku na budynek, który sam wybierze, ile chce, ale najwyżej tyle, ile ma. Gra pyta przed wpłatą, bo wpłaty nie wracają, także po wyjściu z gildii. Złoto i sztuki schodzą razem z zapisem wpłaty, w jednym kroku: dwa stuknięcia naraz nie wezmą więcej, niż postać ma.
+5. **Poziom z nadwyżką.** Budynek wchodzi na kolejny poziom, gdy wpłaty na niego pokryją cały koszt tego poziomu, w złocie i w zasobie. To, co wpłacono ponad koszt, przechodzi na następny poziom, a jedna duża wpłata może podnieść budynek o kilka poziomów naraz. Karta pokazuje nadwyżkę pod paskami.
+    - **Brakujący szczegół:** ponad koszt 10. poziomu wpłacić się nie da, żeby złoto nie przepadało. Za dużą wpłatę gra odrzuca, np. „Ten budynek przyjmie jeszcze najwyżej 100 złota.”, a szybkie kwoty ponad to są wyszarzone. Gdy złota jest już dość do 10. poziomu, a zasobu jeszcze nie, zamiast pola złota stoi: „Złota na ten budynek starczy już do najwyższego poziomu.”
+6. **Oznaczenie (616 A).** Lider i zastępcy oznaczają dowolne budynki jako preferowane i zdejmują oznaczenie. Tylko o tym decydują w Siedzibie. Członkowie widzą „Preferowany” przy nazwie budynku, także na zwiniętej karcie.
+7. **Kiedy działają premie (brakujący szczegół).** Wyprawa bierze premie Sztandaru, Skarbca i Domu Zwiadowców z chwili wyruszenia i zapisuje je przy sobie, jak korzyści Bractwa Łowców, więc raport wychodzi taki sam, kiedykolwiek się go odbierze. Kowadło liczy upust Kuźni Gildii w chwili ulepszenia. Kto opuści gildię, traci premie od następnej wyprawy i następnego ulepszenia; wyprawa, która już trwa, kończy się z premiami ze startu. Szybkie i Błyskawiczne Polowanie to też wyprawy. Na wyprawie Drużyny każdy ma premie swojej gildii, bo XP, złoto i przedmioty liczą się dla każdego osobno, a walki zostają wspólne.
+8. **Co dokładnie dają (brakujące szczegóły):**
+    - **XP:** więcej XP postaci i klasy z każdej wygranej walki na wyprawie, także z celem listu gończego Poszukiwanych. Wieże, Bestia Gildii i zdarzenia na końcu wyprawy bez zmian.
+    - **Złoto:** więcej złota z walk i ze znalezisk na wyprawie.
+    - **Rzadsze przedmioty:** przedmioty ze znalezisk i ze skrzyń elit wypadają w rzadkościach z afiksami (rzadkie i rzadsze) częściej, bo ich wagi rosną razy (1 + 2% × poziom). Ten sam mechanizm podnosi rzadkość przy błogosławieństwie szczęścia Ołtarza Systemu i w skrzyni elity. Skrzynia czempiona i łup wyjętego spod prawa z Poszukiwanych mają swoją rzadkość i premii nie dostają, jak przy 482 B. „Elity i czempioni częściej” Bractwa Łowców (591 B) to częstsze spotkania, a nie rzadsze przedmioty, więc Dom Zwiadowców go nie używa.
+    - **Kowadło:** upust Kuźni odchodzi od ceny, którą zostawia upust Bractwa Kowali (590). Przy obu najlepszych ulepszenie jest o 36% tańsze (1 − 0,8 × 0,8), a nie o 40%. Kosztuje więc zawsze więcej niż połowa ceny, którą ulepszony przedmiot oddaje przy sprzedaży, i na ulepszaniu nie da się zarobić. Upust działa też przy przedmiotach towarzyszy.
+9. **Zakładka (brakujący szczegół).** U góry karta z premiami, które gildia daje każdemu członkowi, np. „Premie dla każdego członka: +2% XP z wypraw, Kowadło 8% taniej.”, i z „Jak to działa?”. Pod nią karta każdego budynku, zwijana jak inne części Gildii (`foldPart`). Zwinięta pokazuje obrazek, nazwę, „Preferowany”, poziom i to, co budynek daje teraz. Rozwinięta: co daje teraz i na następnym poziomie, zbiórka na następny poziom (paski złota i zasobu, ile zebrano z kosztu, nadwyżka), wpłata, a u lidera i zastępców także oznaczenie. Budynek oznaczony jako preferowany jest rozwinięty, dopóki gracz go nie zwinie. Telefon pamięta, co gracz rozwinął i zwinął.
+10. **Formularz wpłaty (brakujący szczegół).** Pole złota i pole zasobu, każde z tym, ile postać ma, z szybkimi kwotami (złoto 1000, 5000 i 10 000, zasób 100, 500 i 1000; `quick`) i z „Do poziomu”, czyli tym, czego brakuje do następnego poziomu, ale najwyżej tyle, ile postać ma. Kwota, której postać nie ma, jest wyszarzona. Na komputerze oba pola stoją obok siebie, na telefonie jedno pod drugim.
+11. **Bez kropki (brakujący szczegół).** Siedziba nie zapala żółtej kropki, bo nic w niej na gracza nie czeka, jak w Wymianie.
+12. **Grafiki (623).** Pierwszy wygląd każdego budynku z PixelLab (Sztandar B, Skarbiec D, Kuźnia Gildii D, Dom Zwiadowców C) przeszedł z `art/spare/guild/` do `src/client/art/guild/` i na razie służy na wszystkich poziomach. Na telefonie węższym niż 375 px obrazek jest o ćwierć mniejszy, żeby nazwa i opis miały miejsce obok.
+13. **Baza danych i API.** Migracja 0081 (`guild_seat`): wiersz budynku gildii z całym złotem i zasobem, jakie na niego wpłacono, i z oznaczeniem. Poziom gra liczy z tej sumy i z kosztów w danych (brakujący szczegół: zmiana kosztów w danych przeliczy poziomy). Członek, który odchodzi, zostawia wpłaty w budynkach, a gildia, która znika po wyjściu ostatniego członka, zabiera swoją Siedzibę. Zapytania: `GET /api/guild/seat`, `POST /api/guild/seat/donate` i `POST /api/guild/seat/prefer`.
+14. **Teksty** zakładki i odpowiedzi gry (`seat.texts`) to propozycja do poprawy przez autora.
+
 ## Odpowiedzi autora 621, 624–626 i samouczki (5.11.2026)
 
 Autor: „625 zostaje”, „626 zostaje”, „624 akcept”, „621 A” oraz „Na koniec trzeba będzie zrewidować Samouczki - czy nie wychodzą jakieś kolizje i czy warto coś dodać”.
@@ -3153,14 +3207,14 @@ Autor: „Do poprawy, bo jak Gildia się szybko rozwinie to przestanie być wyzw
 Autor: „622.1 D, 622.2 B, 622.3 C, 622.4 C, 623.1 B, 623.2 D, 623.3 D, 623.4 C”.
 
 1. **Wyjęci spod prawa (622, do Poszukiwanych, 619 B):** Herszt zbójców D, Kłusownik B, Koniokrad C, Przemytnik C. Szkice z PixelLab (48 × 48, w stylu zbójców z gry) czekają w `art/spare/monsters/` (`bandit-chief`, `poacher`, `horse-thief`, `smuggler`) i trafią do gry razem z Poszukiwanymi.
-2. **Budynki Siedziby Gildii (623, do 616 A):** Sztandar B, Skarbiec D, Kuźnia Gildii D, Dom Zwiadowców C. Pierwszy wygląd każdego czeka w `art/spare/guild/` (`guild-banner`, `guild-treasury`, `guild-forge`, `scouts-house`); dalsze wyglądy powstaną w PixelLab z nich jako wzoru, jak w Warowni.
+2. **Budynki Siedziby Gildii (623, do 616 A):** Sztandar B, Skarbiec D, Kuźnia Gildii D, Dom Zwiadowców C. Pierwszy wygląd każdego jest w grze od 0.1.59 (`src/client/art/guild/`: `guild-banner`, `guild-treasury`, `guild-forge`, `scouts-house`); dalsze wyglądy powstaną w PixelLab z nich jako wzoru, jak w Warowni.
 
 ## Odpowiedzi autora 615–620 (5.11.2026)
 
 Autor: „615 A”, „616 A - akcept, ale muszą być zwijalne budynki i ludzie muszą móc wpłacać na co chcą, lider i zastępca może tylko oznaczyć co jest preferowane”, „616 B - Coś to takie nudnawe, chyba że na końcu każdego etapu byłby coraz trudniejszy strażnik”, „617 prób nie trzeba będzie brać, one będą wszystkie na raz odpalone u gracza”, „618.4 - D, 618.5 - C, 618.6 - D, 618.7 - D”, „619 - wygląda fajnie tylko brakuje ikonki herszta”, „620 - Sala Prób wstępnie super, tylko tło widze chyba z wież”, „618.1 A, 618.2 A, 618.3 B albo nawet trochę lżej niż B”, „619 B”, „620 B, ale taniej wejście albo i za darmo raz dziennie”. O numeracji: „616 sie powtarza ale nie tak jak powinno bo dwie rozne kwestie - co do makiet - w makietach spoko wygląda”.
 
 1. **Próby Gildii (615 A, 617):** tablica co dzień (4 próby w poniedziałek, 2 nowe każdego kolejnego dnia), bez brania prób: wszystkie otwarte próby liczą się u postaci naraz, od chwili, gdy się pojawią.
-2. **Siedziba Gildii (616 A):** przyjęta ze zmianami autora. Każdy członek wpłaca na budynek, który sam wybierze; lider i zastępcy mogą tylko oznaczyć budynki preferowane; budynki zwijają się jak inne części Gildii. Makiety wyglądają dobrze. Najpierw grafiki w PixelLab, potem budowa.
+2. **Siedziba Gildii (616 A):** przyjęta ze zmianami autora. Każdy członek wpłaca na budynek, który sam wybierze; lider i zastępcy mogą tylko oznaczyć budynki preferowane; budynki zwijają się jak inne części Gildii. Makiety wyglądają dobrze. Najpierw grafiki w PixelLab, potem budowa. W grze od 0.1.59 (zob. „Siedziba Gildii (616 A)”).
 3. **Wyprawa Gildii (616 B):** w tej postaci „nudnawa”; ciekawsza byłaby z coraz trudniejszym strażnikiem na końcu każdego etapu. Na razie nie wchodzi i wraca do autora jako pytanie.
 4. **Budynki zasobów do 20. poziomu (618):** Tartak, Kamieniołom, Kopalnia i Staw Midasa (618.1 A); na każdy poziom tyle samo co dotąd, na 20. dwa razy więcej niż na 10. (618.2 A). Koszt „B albo nawet trochę lżej niż B” (618.3): złoto rośnie o 12% na poziom od kosztu 10. poziomu (w B o 15%), zasoby jak na 10. poziomie, czas o 10% na poziom. Czwarty wygląd na 20. poziomie: Tartak D, Kamieniołom C, Kopalnia D, Staw Midasa D.
 5. **Poszukiwani (619 B):** nazwane, silniejsze odmiany stworów z miejsc oraz wyjęci spod prawa z grafikami z PixelLab. Brakuje ikony Herszta: powstanie w PixelLab razem z trzema innymi wyjętymi spod prawa (Kłusownik, Koniokrad, Przemytnik), w wyglądzie zbójców z gry.

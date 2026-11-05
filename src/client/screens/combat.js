@@ -19,6 +19,7 @@ import {
   avoidRareOn,
   call,
   currentHp,
+  hardHuntOn,
   huntOptionsOpen,
   isUnlocked,
   reportCache,
@@ -26,6 +27,7 @@ import {
   seekRareOn,
   serverNow,
   setAvoidRare,
+  setHardHunt,
   setHuntOptionsOpen,
   setSeekRare,
   setTrackQuests,
@@ -269,11 +271,23 @@ export function mountCombat(container, { params, navigate }) {
         const build = buildKey(character);
         const hp = hpStep(character, serverNow());
         const healing = healingQuery();
+        const hard = hardQuery();
         const known = options[areaId];
-        if (known && known.build === build && known.hp === hp && known.healing === healing) continue;
-        const { areas } = await call('GET', `/api/hunts/options?area=${encodeURIComponent(areaId)}${healing}`);
+        if (known && known.build === build && known.hp === hp && known.healing === healing && known.hard === hard) continue;
+        const { areas } = await call('GET', `/api/hunts/options?area=${encodeURIComponent(areaId)}${healing}${hard}`);
         const [found] = areas;
-        options[areaId] = { build, hp, healing, threat: found.threat, threatAvoiding: found.threatAvoiding, chances: found.chances, chancesSeeking: found.chancesSeeking, scout: found.scout };
+        options[areaId] = {
+          build,
+          hp,
+          healing,
+          hard,
+          threat: found.threat,
+          threatAvoiding: found.threatAvoiding,
+          threatSeeking: found.threatSeeking,
+          chances: found.chances,
+          chancesSeeking: found.chancesSeeking,
+          scout: found.scout,
+        };
         showThreat?.();
       } while (loadAgain);
       failed = false;
@@ -284,6 +298,12 @@ export function mountCombat(container, { params, navigate }) {
     } finally {
       loading = false;
     }
+  }
+
+  // A Trudna wyprawa for the threat (629 A): "&hard=1" while its box is
+  // ticked, where the character has it.
+  function hardQuery() {
+    return state.character?.hardHunt && hardHuntOn() ? '&hard=1' : '';
   }
 
   // The healing potions taken along, for the threat: "&heal=2&below=0.4".
@@ -473,6 +493,7 @@ export function mountCombat(container, { params, navigate }) {
         h('div', { class: 'bar bar--system' }, progress),
         ...(activity.avoidRare ? [h('p', { class: 'system-hint', text: 'Postać omija elity i czempionów.' })] : []),
         ...(activity.seekRare ? [h('p', { class: 'system-hint', text: 'Postać tropi elity i czempiony.' })] : []),
+        ...(activity.hard ? [h('p', { class: 'system-hint', text: 'Trudna wyprawa: silniejsze stwory, więcej XP i złota.' })] : []),
         ...(activity.tracksQuests ? [h('p', { class: 'system-hint', text: 'Postać tropi stwory z zadań.' })] : []),
         // The Stajnia's mount made the wait shorter than the length (327 A).
         ...(activity.endsAt - activity.startedAt < activity.minutes * 60000
@@ -696,6 +717,35 @@ export function mountCombat(container, { params, navigate }) {
       },
     });
     showUnknownNote();
+    // The Trudna wyprawa (629 A), from the level the server opens it at:
+    // stronger creatures for more XP and gold, on a plain "Wyrusz" only.
+    const hardRules = !first && character.hardHunt;
+    const hardOn = () => Boolean(hardRules) && hardHuntOn();
+    const times = (value) => `×${String(value).replace('.', ',')}`;
+    const hardBox =
+      hardRules &&
+      h('input', {
+        type: 'checkbox',
+        id: 'hard-hunt',
+        class: 'avoid-rare-box',
+        checked: hardHuntOn(),
+        onChange: () => {
+          setHardHunt(hardBox.checked);
+          loadOptions();
+          showThreat();
+        },
+      });
+    const hard =
+      hardRules &&
+      h(
+        'div',
+        { class: 'track-quests hard-hunt' },
+        h('label', { class: 'avoid-rare', for: 'hard-hunt' }, hardBox, h('span', { text: 'Trudna wyprawa' })),
+        h('p', {
+          class: 'muted track-quests-note',
+          text: `Stwory: obrażenia ${times(hardRules.damage)}, HP ${times(hardRules.hp)}. Nagroda: +${Math.round(hardRules.xp * 100)}% XP i +${Math.round(hardRules.gold * 100)}% złota. Nie na Szybkim i Błyskawicznym polowaniu ani z drużyną.`,
+        }),
+      );
     // The boxes of the exploration; they go into "Opcje wyprawy" below.
     const choices =
       !first &&
@@ -712,6 +762,7 @@ export function mountCombat(container, { params, navigate }) {
           h('label', { class: 'avoid-rare', for: 'track-unknown' }, unknownBox, h('span', { text: 'Trop nieznane stwory' })),
           unknownNone,
         ),
+        hard,
       );
     // Potions to take along, once the character carries some that work in fights.
     const use = character.professions?.potionUse;
@@ -721,7 +772,7 @@ export function mountCombat(container, { params, navigate }) {
     showThreat = () => {
       const known = options[area.id];
       const ratings =
-        known && known.build === buildKey(state.character) && known.healing === healingQuery()
+        known && known.build === buildKey(state.character) && known.healing === healingQuery() && known.hard === hardQuery()
           ? avoiding()
             ? known.threatAvoiding
             : seeking()
@@ -750,7 +801,7 @@ export function mountCombat(container, { params, navigate }) {
     const summary = h('span', { class: 'hunt-options-summary' });
     function showSummary() {
       const taken = Object.values(potions?.taken() ?? {}).reduce((sum, count) => sum + count, 0);
-      const ticked = [avoiding(), seeking(), tracking(), tracingUnknown(), Boolean(scouted)].filter(Boolean).length;
+      const ticked = [avoiding(), seeking(), tracking(), tracingUnknown(), Boolean(scouted), hardOn()].filter(Boolean).length;
       summary.textContent = [
         formatMinutes(minutes),
         taken > 0 && countOf(taken, 'mikstura', 'mikstury', 'mikstur'),
@@ -874,6 +925,7 @@ export function mountCombat(container, { params, navigate }) {
             trackUnknown: tracingUnknown(),
             ...(potions && { potions: potions.taken(), healBelow: potions.below() }),
             ...(scouted && !along && { scout: scouted }),
+            ...(hardOn() && !along && { hard: true }),
           });
           // Those who went, as the server says: one may have got busy meanwhile.
           if (along) toast(answer.went?.length > 0 ? `Drużyna wyrusza: ${answer.went.join(', ')}.` : 'Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.');

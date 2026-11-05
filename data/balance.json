@@ -205,5 +205,12 @@
     "refillHours": 12
   },
   "parties": { "size": 3, "xpCost": 0.045, "classSpread": 5 },
-  "journal": { "reports": 50, "towerReports": 50 }
+  "journal": { "reports": 50, "towerReports": 50 },
+  "challenge": {
+    "fromLevel": 10,
+    "strength": { "fromLevel": 30, "damage": 1.1, "hp": 1.1 },
+    "recoveryAfterFight": 0.15,
+    "restBonusByMinutes": [[1, 0], [30, 0], [60, 0.05], [240, 0.1]],
+    "hard": { "damage": 1.5, "hp": 1.5, "xp": 0.5, "gold": 0.5 }
+  }
 }

@@ -8,7 +8,7 @@ import { eventFigure, itemSprite, materialSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { playSound } from '../sound.js';
-import { activityFinished, avoidRareOn, call, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn } from '../state.js';
+import { activityFinished, avoidRareOn, call, hardHuntOn, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn } from '../state.js';
 import { guided, openSheet, systemPanel, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { scrapperSheet } from '../scrapper.js';
@@ -324,6 +324,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       'section',
       { class: 'card report-summary', 'aria-label': 'Podsumowanie', 'data-guide': 'report-summary' },
       h('p', { class: `result ${RESULT_CLASS[report.result] ?? ''}`, text: report.resultText }),
+      // A Trudna wyprawa (629 A).
+      report.hard && h('p', { class: 'report-potions', text: 'Trudna wyprawa: silniejsze stwory, więcej XP i złota.' }),
       // The potions drunk and the fights a speed potion sped up.
       (summary.potions ?? []).map((line) => h('p', { class: 'report-potions', text: line })),
       h(
@@ -479,6 +481,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
               seekRare: seekRareOn(),
               trackQuests: trackQuestsOn(),
               trackUnknown: trackUnknownOn(),
+              ...(character.hardHunt && hardHuntOn() && { hard: true }),
             });
             navigate('#/walka');
           }),

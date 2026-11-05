@@ -50,5 +50,6 @@ export * from './towers.js';
 export * from './trial-hall.js';
 export * from './guild-beast.js';
 export * from './guild-trials.js';
+export * from './guild-seat.js';
 export * from './cosmetics.js';
 export * from './wanted.js';

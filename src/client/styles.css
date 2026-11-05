@@ -415,6 +415,23 @@ button {
 }
 
 /* "Sortuj:" over the bag's items or materials, its options in one row. */
+/* The Kowadło's scrolls over the bag's items (632 A). */
+.bag-scrolls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.bag-scroll {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .bag-sort {
   display: flex;
   align-items: center;
@@ -6890,6 +6907,31 @@ a.camp-level-button {
   margin-bottom: 8px;
 }
 
+/* A part folded under a picture (foldPart's `art`): the picture on the
+   left, the title over the line beside it, in the middle of its height. */
+.fold-part-summary--art {
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: center;
+}
+
+.fold-part-summary--art > .fold-part-art {
+  grid-row: 1 / span 2;
+}
+
+.fold-part-summary--art > .fold-part-head,
+.fold-part-summary--art > .fold-part-line {
+  grid-column: 2;
+}
+
+.fold-part-summary--art > .fold-part-head {
+  align-self: end;
+}
+
+.fold-part-summary--art > .fold-part-line {
+  align-self: start;
+}
+
 .fold-part-dot {
   flex: none;
   width: 9px;
@@ -11614,8 +11656,8 @@ a.profession-square:active {
 }
 
 /* The Gildia's tabs (screens/guild.js): the Społeczność's row of tabs, the
-   five of them sharing its width, each with its icon over its name, so all
-   five fit in one row on a phone and in the computer's column. */
+   six of them sharing its width, each with its icon over its name, so all
+   six fit in one row on a phone and in the computer's column. */
 .guild-picker .community-tab {
   flex: 1 0 auto;
   flex-direction: column;
@@ -11624,6 +11666,19 @@ a.profession-square:active {
   padding: 6px 4px;
   font-size: 15px;
   line-height: 1.2;
+}
+
+/* Under 390 px the six need 353: the names a little smaller and closer
+   together, so they still fit one row down to 320 px. */
+@media (max-width: 389px) {
+  .guild-picker .community-tabs {
+    gap: 4px;
+  }
+
+  .guild-picker .community-tab {
+    padding: 6px 1px;
+    font-size: clamp(13px, 3.8vw, 15px);
+  }
 }
 
 /* A part of a guild activity's card, under its subtitle (guild-trials.js,
@@ -12072,6 +12127,198 @@ a.profession-square:active {
 .guild-exchange-name {
   font-size: 15px;
   line-height: 1.2;
+}
+
+/* The Siedziba Gildii (guild-seat.js, 616 A): its cards one under another,
+   the guild's bonuses on top, then a card for each building folded under
+   its picture at its drawn 128 × 96, on the dark ground of the camp's
+   building screens, with its name, the "Preferowany" mark, its level and
+   what it gives. Unfolded: what it gives, the next level's bars of gold in
+   gold and of the resource in green, and the donation, its two fields side
+   by side where the column is wide enough (the computer's), one under the
+   other on a phone, each with its quick amounts in a row of four. */
+.guild-seat {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.guild-seat p {
+  margin: 0;
+}
+
+.guild-seat .how-more > p + p {
+  margin-top: 6px;
+}
+
+.guild-seat-bonuses {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.guild-seat-bonuses svg {
+  flex: none;
+  color: var(--gold);
+}
+
+.guild-seat .fold-part-art {
+  display: flex;
+  flex: none;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: radial-gradient(ellipse at 50% 60%, #2d3b24, #1a2416 70%);
+}
+
+.sprite--seat {
+  width: 128px;
+  height: 96px;
+}
+
+.guild-seat .fold-part-head {
+  flex-wrap: wrap;
+  row-gap: 4px;
+}
+
+.guild-seat .fold-part-line {
+  font-size: 14px;
+}
+
+.guild-seat-preferred {
+  gap: 4px;
+  border-color: var(--gold);
+  border-radius: 4px;
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.guild-seat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.guild-seat-effects {
+  display: grid;
+  gap: 2px;
+}
+
+.guild-seat-effect {
+  font-size: 15px;
+}
+
+.guild-seat-effect--next {
+  color: var(--text-muted);
+}
+
+.guild-seat-meter .meter-label {
+  align-items: center;
+  font-size: 12px;
+}
+
+.guild-seat-meter-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.guild-seat-meter--gold .meter-track {
+  background: var(--xp-track);
+}
+
+.guild-seat-meter--gold .meter-fill {
+  background: var(--gold);
+}
+
+.guild-seat-meter--resource .meter-track {
+  background: #1d2817;
+}
+
+.guild-seat-meter--resource .meter-fill {
+  background: var(--leaf);
+}
+
+.guild-seat-note {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.guild-seat-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 14px;
+}
+
+.guild-seat-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.guild-seat-field-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.guild-seat-field-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 16px;
+}
+
+.guild-seat-number {
+  width: 100%;
+}
+
+/* The quick amounts share the row's width; "Do poziomu" keeps its words
+   in one line. */
+.guild-seat-quicks {
+  display: flex;
+  gap: 6px;
+}
+
+.guild-seat-quicks .guild-seat-quick {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 6px 2px;
+  font-family: var(--font-system);
+  font-size: 13px;
+  line-height: 1.15;
+}
+
+.guild-seat-quicks .guild-seat-quick--rest {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  white-space: nowrap;
+}
+
+.guild-seat-mark {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+}
+
+.guild-seat-mark[aria-pressed='true'] {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* A narrow phone: the picture a quarter smaller, so the name and the line
+   keep their room beside it. */
+@media (max-width: 374px) {
+  .sprite--seat {
+    width: 96px;
+    height: 72px;
+  }
 }
 
 /* The Sklep Systemu (screens/shop.js): the Punkty Systemu, its tabs and a

@@ -29,8 +29,11 @@ import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
 const rules = content.settlement.wanted;
-// The same game with every fight in the poster's place its target's.
-const always = { ...content, settlement: { ...content.settlement, wanted: { ...rules, chance: 1 } } };
+// The same game with every fight in the poster's place its target's,
+// without the harder explorations from the 10th level (balance.challenge):
+// these fights test the posters.
+const calm = { ...content, balance: { ...content.balance, challenge: { ...content.balance.challenge, fromLevel: Infinity } } };
+const always = { ...calm, settlement: { ...calm.settlement, wanted: { ...rules, chance: 1 } } };
 const strong = () => {
   const character = newCharacter('warrior', { level: 70, classLevel: 47 });
   character.points = autoDistribute(character, content);
@@ -104,12 +107,12 @@ describe('the wanted posters', () => {
   });
 
   test('an exploration without the poster, or with one for another place, goes as ever; one that does not meet its target too', () => {
-    const plain = explore(content);
+    const plain = explore(calm);
     const poster = wantedPosters(47, '2026-11-05', 'postać', content).find((one) => one.areaId !== 'spider-gully');
     const elsewhere = explore(always, { wanted: poster });
     assert.deepEqual(elsewhere, plain);
     const target = { ...wantedPosters(47, '2026-11-05', 'postać', content)[0], areaId: 'spider-gully' };
-    const never = { ...content, settlement: { ...content.settlement, wanted: { ...rules, chance: 1e-12 } } };
+    const never = { ...calm, settlement: { ...calm.settlement, wanted: { ...rules, chance: 1e-12 } } };
     const missed = explore(never, { wanted: target });
     const { wanted, ...rest } = missed;
     assert.deepEqual(wanted, { id: target.id, met: false, beaten: false });

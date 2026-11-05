@@ -11,8 +11,9 @@ import { huntWait, simulateHunt } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
 
 // The newest place's stronger creatures (balance.monsters.huntCurve,
-// hunt-strength.test.js) aside: these fights test something else.
-const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] } } };
+// hunt-strength.test.js) and the harder explorations from the 10th level
+// (balance.challenge) aside: these fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] }, challenge: { ...content.balance.challenge, fromLevel: Infinity } } };
 import { useServer } from './helpers/server.js';
 
 describe('a party in the engine', () => {

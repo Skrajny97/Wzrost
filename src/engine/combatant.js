@@ -8,6 +8,12 @@ import { gearLevel, midGameShare } from './progression.js';
 import { learnedSkills } from './skills.js';
 import { computeStats } from './stats.js';
 
+// From the 10th level of the character the explorations are harder (the
+// author, 5.11.2026: 628 B, 629 A, "wszystkim zwiększamy stwory
+// 1,5-krotnie" and "od 10-ego poziomu postaci wchodzą te duże zmiany
+// trudności"): balance.challenge from its level on, null before it.
+export const challengeAt = (level, content) => (level >= content.balance.challenge.fromLevel ? content.balance.challenge : null);
+
 // `statBoost`: shares some stats are raised by for a while, by stat (a
 // potion of focus, potions.js).
 export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally', statBoost = null }, content) {
@@ -69,8 +75,10 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     wisdom: totals.wisdom,
     skills: learnedSkills(character, content),
     ...(feat && { feat }),
+    // The share of the missing HP back after a won fight on an exploration:
+    // less from the challenge's level (628 B).
     recovery:
-      balance.hunt.recoveryAfterFight +
+      (challengeAt(character.level, content)?.recoveryAfterFight ?? balance.hunt.recoveryAfterFight) +
       cls.recovery.base +
       cls.recovery.perWisdom * totals.wisdom +
       (area?.trait.recoveryBonus ?? 0),
@@ -135,9 +143,17 @@ export function huntStrength(level, curve = []) {
 // within a place's five levels that the place, as hard as the author asked
 // in its middle, cost the first fight almost always on its first level (91%
 // at the 11th) and little on its last.
-export function exploreStrength(area, level, content) {
-  if (area.maxLevel < level) return [1, 1];
-  return huntStrength(Math.max(level, area.minLevel), content.balance.monsters.huntCurve);
+// From the level of the challenge's strength every exploration's creatures,
+// in any place, are stronger again by its damage and HP (the author:
+// "wszystkim zwiększamy stwory"), and from the challenge's level those of a
+// Trudna wyprawa (`hard`, 629 A) by its hard ones on top.
+export function exploreStrength(area, level, content, hard = false) {
+  const [damage, hp] = area.maxLevel < level ? [1, 1] : huntStrength(Math.max(level, area.minLevel), content.balance.monsters.huntCurve);
+  const challenge = challengeAt(level, content);
+  if (!challenge) return [damage, hp];
+  const base = level >= challenge.strength.fromLevel ? challenge.strength : { damage: 1, hp: 1 };
+  const more = hard ? challenge.hard : { damage: 1, hp: 1 };
+  return [damage * base.damage * more.damage, hp * base.hp * more.hp];
 }
 
 // `groupFactor` weakens each member of a group, so two or three monsters are

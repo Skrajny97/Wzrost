@@ -13,8 +13,9 @@ import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
 
 // The newest place's stronger creatures (balance.monsters.huntCurve,
-// hunt-strength.test.js) aside: these fights test something else.
-const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] } } };
+// hunt-strength.test.js) and the harder explorations from the 10th level
+// (balance.challenge) aside: these fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] }, challenge: { ...content.balance.challenge, fromLevel: Infinity } } };
 import { useServer } from './helpers/server.js';
 
 const beggar = content.eventsById['wandering-beggar'];

@@ -22,7 +22,8 @@
     "quickHunt",
     "flashHunt",
     "parties",
-    "journal"
+    "journal",
+    "challenge"
   ],
   "properties": {
     "combat": {
@@ -1296,6 +1297,42 @@
       "properties": {
         "reports": { "type": "integer", "minimum": 1 },
         "towerReports": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "challenge": {
+      "type": "object",
+      "description": "Trudność wypraw od fromLevel poziomu postaci (autor 5.11.2026: 628 B, 629 A i „od 10-ego poziomu postaci wchodzą te duże zmiany trudności”): po wygranej walce wraca recoveryAfterFight brakującego HP zamiast hunt.recoveryAfterFight, a dłuższe wyprawy dokładają restBonusByMinutes zamiast hunt.restBonusByMinutes. Od strength.fromLevel stwory wypraw mają strength.damage razy większe obrażenia i strength.hp razy więcej HP. Trudna wyprawa (hard, przełącznik przy wyruszaniu, od fromLevel): stwory jeszcze damage i hp razy silniejsze, a XP i złoto z wyprawy większe o xp i gold.",
+      "additionalProperties": false,
+      "required": ["fromLevel", "strength", "recoveryAfterFight", "restBonusByMinutes", "hard"],
+      "properties": {
+        "fromLevel": { "type": "integer", "minimum": 1 },
+        "strength": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["fromLevel", "damage", "hp"],
+          "properties": {
+            "fromLevel": { "type": "integer", "minimum": 1 },
+            "damage": { "type": "number", "exclusiveMinimum": 0 },
+            "hp": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "recoveryAfterFight": { "type": "number", "minimum": 0, "maximum": 1 },
+        "restBonusByMinutes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "minimum": 0 } }
+        },
+        "hard": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["damage", "hp", "xp", "gold"],
+          "properties": {
+            "damage": { "type": "number", "exclusiveMinimum": 0 },
+            "hp": { "type": "number", "exclusiveMinimum": 0 },
+            "xp": { "type": "number", "minimum": 0 },
+            "gold": { "type": "number", "minimum": 0 }
+          }
+        }
       }
     }
   }

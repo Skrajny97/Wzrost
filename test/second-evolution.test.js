@@ -493,14 +493,16 @@ describe('the second forms in fights', () => {
     // ends them with no less HP, or (where neither faints much) with clearly
     // more HP; a healer ends them near full HP either way.
     // The forms were set against the monsters of then (+25% from 50 to 100,
-    // nothing past it): against the steeper late game (balance.monsters) a
+    // nothing past it) and before the harder explorations of 0.1.59
+    // (balance.challenge): against the steeper late game (balance.monsters) a
     // typical character, without companions or upgrades, faints on every
     // such exploration with either form, so the comparison keeps them.
     const level = 90;
     const area = areaForLevel(level + 8, content);
     const { lateGame, endGame } = content.balance.monsters;
     const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0.25, hp: 0.25 }, endGame: { ...endGame, damage: 0, hp: 0 } };
-    const then = { ...content, balance: { ...content.balance, monsters } };
+    const challenge = { ...content.balance.challenge, fromLevel: Infinity };
+    const then = { ...content, balance: { ...content.balance, monsters, challenge } };
     const local = { ...then, areasById: { ...content.areasById, [area.id]: area } };
     const explore = (evolution) => {
       const base = typicalCharacter(evolution.classId, level, content);

@@ -81,6 +81,8 @@ import {
   withAffix,
   xpToNext,
   saleGold,
+  seatBonuses,
+  withSeatDiscount,
 } from '../engine/index.js';
 import { trialHallView } from './trial-hall.js';
 import { content } from './content.js';
@@ -620,7 +622,9 @@ function companionsView(player, stored, now) {
     hired: hired.map((companion) => {
       const away = companionAway(player, companion);
       return {
-        ...companionView(companion, { upgradeCap, materials, anvilDiscount: brotherhoodPerk('anvilDiscount', stored.reputation, content) }),
+        // The Kowadło's price with the Bractwo Kowali (590) and the guild's
+        // Kuźnia Gildii (616 A), as for the character's own items.
+        ...companionView(companion, { upgradeCap, materials, anvilDiscount: withSeatDiscount(brotherhoodPerk('anvilDiscount', stored.reputation, content), seatBonuses(player.guildSeat, content).anvil) }),
         // Wounded until the character rests to full HP, and when that is.
         ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
         gift: giftOf(companion, row, now),

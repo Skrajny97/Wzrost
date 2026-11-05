@@ -7,7 +7,8 @@
 // leader names and unnames deputies and hands the lead over; a deputy
 // invites and removes members, the leader anyone. A leader who leaves
 // passes the lead to the first deputy, else to the member there longest,
-// and a guild nobody is in goes with its invitations and its channel. A
+// and a guild nobody is in goes with its invitations, its channel and its
+// Siedziba (guild-seat.js). A
 // character that leaves or is removed gets back the pieces of its open
 // offers in the Wymiana (guild-exchange.js) at once. The best guild of last
 // week says so on its page (guild-fame.js).
@@ -314,9 +315,9 @@ export async function cancelGuildInvite(context) {
 // SQL for their ids, with `binds`) at `now`: their open offers in the
 // Wymiana close with the pieces back to them (guild-exchange.js), a guild
 // left without its leader gets its first deputy as leader, else the member
-// there longest, and a guild left empty goes with its invitations and its
-// channel's messages. Also for a deleted character or account
-// (characters.js, accounts.js).
+// there longest, and a guild left empty goes with its invitations, its
+// channel's messages and its Siedziba's buildings (guild-seat.js). Also for
+// a deleted character or account (characters.js, accounts.js).
 export function guildRemoval(db, characters, binds, now) {
   const gone = "channel LIKE 'guild:%' AND channel NOT IN (SELECT 'guild:' || guild_id FROM guild_members)";
   return [
@@ -332,6 +333,7 @@ export function guildRemoval(db, characters, binds, now) {
     db.prepare('DELETE FROM guild_invites WHERE guild_id NOT IN (SELECT guild_id FROM guild_members)'),
     db.prepare(`DELETE FROM chat_reports WHERE message_id IN (SELECT id FROM chat_messages WHERE ${gone})`),
     db.prepare(`DELETE FROM chat_messages WHERE ${gone}`),
+    db.prepare('DELETE FROM guild_seat WHERE guild_id NOT IN (SELECT guild_id FROM guild_members)'),
     db.prepare('DELETE FROM guilds WHERE id NOT IN (SELECT guild_id FROM guild_members)'),
   ];
 }

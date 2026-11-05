@@ -10,6 +10,7 @@
     "tag",
     "invites",
     "tabs",
+    "seat",
     "trials",
     "requests",
     "exchange",
@@ -58,8 +59,8 @@
     "tabs": {
       "description": "Zakładki strony Gildii (src/client/screens/guild.js), w tej kolejności.",
       "type": "array",
-      "minItems": 5,
-      "maxItems": 5,
+      "minItems": 6,
+      "maxItems": 6,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -71,6 +72,7 @@
           "id": {
             "enum": [
               "guild",
+              "seat",
               "beast",
               "trials",
               "requests",
@@ -225,6 +227,9 @@
         }
       }
     },
+    "seat": {
+      "$ref": "#/definitions/seat"
+    },
     "trials": {
       "$ref": "#/definitions/trials"
     },
@@ -239,6 +244,218 @@
     }
   },
   "definitions": {
+    "seat": {
+      "description": "Siedziba Gildii (src/engine/guild-seat.js, src/server/guild-seat.js, src/client/guild-seat.js; autor: 616 A).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "maxLevel",
+        "cost",
+        "quick",
+        "buildings",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "maxLevel": {
+          "description": "Najwyższy poziom każdego budynku.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "cost": {
+          "description": "Koszt poziomu n: max(min, perLevel × n) złota i tyle samo liczony zasób budynku.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "gold",
+            "resource"
+          ],
+          "properties": {
+            "gold": {
+              "$ref": "#/definitions/seatCost"
+            },
+            "resource": {
+              "$ref": "#/definitions/seatCost"
+            }
+          }
+        },
+        "quick": {
+          "description": "Szybkie kwoty złota i zasobu w formularzu wpłaty.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "gold",
+            "resource"
+          ],
+          "properties": {
+            "gold": {
+              "$ref": "#/definitions/seatQuick"
+            },
+            "resource": {
+              "$ref": "#/definitions/seatQuick"
+            }
+          }
+        },
+        "buildings": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "name",
+              "accusative",
+              "resource",
+              "bonus",
+              "perLevel",
+              "effect"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z]+(-[a-z]+)*$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "accusative": {
+                "description": "Nazwa w bierniku: „Wpłacić na Kuźnię Gildii?”.",
+                "type": "string",
+                "minLength": 1
+              },
+              "resource": {
+                "description": "Zasób obozu, który budynek bierze obok złota (id z data/resources.json).",
+                "type": "string",
+                "minLength": 1
+              },
+              "bonus": {
+                "description": "Premia budynku dla członków: xp (XP z walk wypraw), gold (złoto z walk i znalezisk wypraw), anvil (upust złota na Kowadle), rarity (rzadsze przedmioty z wypraw).",
+                "enum": [
+                  "xp",
+                  "gold",
+                  "anvil",
+                  "rarity"
+                ]
+              },
+              "perLevel": {
+                "description": "Premia za każdy poziom, jako ułamek (0.01 to 1%).",
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "maximum": 0.1
+              },
+              "effect": {
+                "type": "string",
+                "pattern": "\\{value\\}"
+              }
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "required": [
+            "title",
+            "intro",
+            "how",
+            "bonuses",
+            "noBonuses",
+            "level",
+            "now",
+            "next",
+            "none",
+            "raising",
+            "collected",
+            "surplus",
+            "top",
+            "preferred",
+            "prefer",
+            "unprefer",
+            "preferredOn",
+            "preferredOff",
+            "donation",
+            "gold",
+            "have",
+            "rest",
+            "donate",
+            "donateTitle",
+            "donateText",
+            "goldAmount",
+            "goldGenitive",
+            "enough",
+            "resourceAmount",
+            "both",
+            "donated",
+            "raised",
+            "noGuild",
+            "errors"
+          ],
+          "properties": {
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "errors": {
+              "type": "object",
+              "required": [
+                "locked",
+                "noGuild",
+                "noBuilding",
+                "invalidAmount",
+                "nothing",
+                "notEnough",
+                "top",
+                "tooMuch",
+                "notAllowed",
+                "invalidMark",
+                "changed"
+              ],
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "seatCost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "perLevel"
+      ],
+      "properties": {
+        "min": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "perLevel": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "seatQuick": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 4,
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
     "range": {
       "type": "object",
       "additionalProperties": false,

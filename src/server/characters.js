@@ -47,6 +47,7 @@ import {
   currentQuests,
   effectText,
   equipChange,
+  challengeAt,
   evolutionPanel,
   fireTrade,
   fireUnitsMade,
@@ -99,6 +100,7 @@ import {
   timedKind,
   cosmeticsOf,
   nameColor,
+  seatLevels,
 } from '../engine/index.js';
 import { mountView } from '../engine/stable.js';
 import { say } from '../engine/text.js';
@@ -111,8 +113,9 @@ import { raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
 import { championOf } from './guild-fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
+import { guildSeatSql } from './guild-seat.js';
 import { partyRemoval } from './parties.js';
-import { perkOf } from './perks.js';
+import { anvilDiscountOf } from './perks.js';
 import { bagHerbs, bagMinerals, bagPotions, herbsOf, potionsOf, professionsView } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
@@ -173,15 +176,16 @@ async function playerOf(db, row) {
     db.prepare('SELECT * FROM activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT * FROM avatar_activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT building_id, level, started_at, ends_at, collected_at FROM buildings WHERE character_id = ?').bind(row.id),
-    // With the tag of its guild, for its own name (guilds.js), and whether
-    // it is in a Drużyna, where its companions stay in the Kwatery
-    // (parties.js, companions.js in the engine).
+    // With the tag of its guild, for its own name (guilds.js), whether it
+    // is in a Drużyna, where its companions stay in the Kwatery (parties.js,
+    // companions.js in the engine), and the donations to its guild's
+    // Siedziba, whose levels give it its bonuses (guild-seat.js).
     db
       .prepare(
         `SELECT (SELECT COUNT(*) FROM market_parcels WHERE character_id = ?) AS waiting, ${guildTagSql('?')} AS guild_tag,
-           EXISTS (SELECT 1 FROM party_members WHERE character_id = ?) AS in_party`,
+           EXISTS (SELECT 1 FROM party_members WHERE character_id = ?) AS in_party, ${guildSeatSql('?')} AS guild_seat`,
       )
-      .bind(row.id, row.id, row.id),
+      .bind(row.id, row.id, row.id, row.id),
   ]);
   return {
     row,
@@ -194,6 +198,9 @@ async function playerOf(db, row) {
     marketWaiting: parcels.results[0]?.waiting ?? 0,
     guildTag: parcels.results[0]?.guild_tag ?? null,
     inParty: Boolean(parcels.results[0]?.in_party),
+    // The levels of its guild's Siedziba, by building, all 0 outside a guild
+    // (guild-seat.js): the bonuses it has as a member.
+    guildSeat: seatLevels(JSON.parse(parcels.results[0]?.guild_seat ?? '{}'), content),
     // { campfire: { level, startedAt, endsAt, collectedAt } }: see camp.js in the engine.
     buildings: Object.fromEntries(
       buildings.results.map((building) => [
@@ -1123,6 +1130,8 @@ function activityView(activity, level, now) {
       endsAt: activity.ends_at,
       avoidRare: activity.avoid_rare === 1,
       seekRare: activity.seek_rare === 1,
+      // A Trudna wyprawa (629 A, hunts.js).
+      ...(options.hard && { hard: true }),
       // The creatures the exploration tracks for the quests (hunts.js).
       tracksQuests: activity.tracked !== null && activity.tracked !== undefined,
       finished: activity.ends_at <= now,
@@ -1202,8 +1211,9 @@ export function characterView(player, now) {
   };
   // The materials that pay for the Kowadło's upgrades from +5 on.
   const materials = JSON.parse(row.materials ?? '{}');
-  // Less gold on the Kowadło with the Bractwo Kowali (590).
-  const anvilDiscount = perkOf(row, 'anvilDiscount');
+  // Less gold on the Kowadło with the Bractwo Kowali (590) and the guild's
+  // Kuźnia Gildii (616 A).
+  const anvilDiscount = anvilDiscountOf(player);
   const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap, materials, anvilDiscount }), salvage: salvage(item) });
   // Whether a bag item would make the character stronger in place of what
   // its slot holds (preview.js), for the marks on the bag and on finds; null
@@ -1281,6 +1291,9 @@ export function characterView(player, now) {
     // An order of the Osada that can be delivered now lights its tab.
     settlementWaiting: settlementWaiting(row, items, now, player.marketWaiting),
     huntDurations: huntDurations(row.level, content),
+    // The Trudna wyprawa's creatures and rewards (629 A), from the
+    // challenge's level; null before it.
+    hardHunt: challengeAt(row.level, content)?.hard ?? null,
     // Szybkie Polowania left today (hunts.js), or null below their level.
     quickHunts: quickHuntsView(row, now),
     // The next longer exploration and its level, for the hint under the slider.

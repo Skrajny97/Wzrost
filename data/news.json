@@ -100,6 +100,11 @@
       "id": "0.1.58",
       "title": "Wersja 0.1.58: Tablica zleceń w zakładkach",
       "body": "- Tablica zleceń ma dwie zakładki: Zlecenia i Poszukiwani. Jest mniej przewijania.\n- Żółta kropka na zakładce pokazuje, że czeka tam zlecenie do oddania albo nagroda do odebrania."
+    },
+    {
+      "id": "0.1.59",
+      "title": "Wersja 0.1.59: Siedziba Gildii i trudniejsze wyprawy",
+      "body": "- Gildia ma Siedzibę: nową zakładkę z czterema budynkami. Sztandar daje więcej XP z wypraw, Skarbiec więcej złota, Kuźnia Gildii tańsze ulepszenia na Kowadle, a Dom Zwiadowców częściej rzadsze przedmioty.\n- Każdy członek wpłaca złoto i zasoby obozu na wybrany budynek. Premie działają dla wszystkich członków gildii. Lider i zastępcy mogą oznaczyć budynki, na które warto zbierać najpierw.\n- Od 10. poziomu postaci po walce na wyprawie wraca mniej HP, a od 30. poziomu stwory na wyprawach są silniejsze.\n- W Opcjach wyprawy jest pole Trudna wyprawa: silniejsze stwory, a w zamian +50% XP i złota.\n- Plecak pokazuje, ile masz zwojów ochronnych i zwojów utrwalenia."
     }
 ]
 }

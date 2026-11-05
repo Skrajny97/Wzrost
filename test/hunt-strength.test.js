@@ -13,7 +13,12 @@ import { encounterCombatants, estimateThreat, exploreStrength, huntStrength, mon
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content } from './helpers/content.js';
 
-const withCurve = (huntCurve) => ({ ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve } } });
+// The curve alone, without the harder explorations from the 10th level
+// (balance.challenge, challenge.test.js).
+const withCurve = (huntCurve) => ({
+  ...content,
+  balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve }, challenge: { ...content.balance.challenge, fromLevel: Infinity } },
+});
 const monsterId = Object.keys(content.monstersById).find((id) => !content.monstersById[id].elite && !content.monstersById[id].champion);
 
 test('huntStrength: none before the first point, straight between two points, as the last past it', () => {

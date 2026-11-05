@@ -247,6 +247,31 @@ export function setTrackUnknown(value) {
   }
 }
 
+// Whether explorations go as a Trudna wyprawa (629 A: the box in "Opcje
+// wyprawy" from the level the server opens it at, and "Wyrusz ponownie");
+// kept in this browser.
+const HARD_KEY = 'wzrost.hard-hunt';
+let hardHunt = readHardHunt();
+
+function readHardHunt() {
+  try {
+    return localStorage.getItem(HARD_KEY) === 'on';
+  } catch {
+    return false;
+  }
+}
+
+export const hardHuntOn = () => hardHunt;
+
+export function setHardHunt(value) {
+  hardHunt = value;
+  try {
+    localStorage.setItem(HARD_KEY, value ? 'on' : 'off');
+  } catch {
+    // Without storage the choice lasts until the page is closed.
+  }
+}
+
 // "Opcje wyprawy" on the Walka screen stays as the player left it, folded
 // (the author: "rozwijaną zakładką") or unfolded; folded at first.
 const OPTIONS_KEY = 'wzrost.hunt-options';

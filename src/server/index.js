@@ -32,6 +32,7 @@ import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, openGuildTrials, 
 import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, thankForGuildGift } from './guild-requests.js';
 import { getGuildTodo } from './guild-todo.js';
 import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } from './guild-exchange.js';
+import { donateToGuildSeat, getGuildSeat, preferGuildSeat } from './guild-seat.js';
 import { guildRanking } from './guild-fame.js';
 import { craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
@@ -282,6 +283,10 @@ const routes = [
   ['POST', '/api/guild/kick', kickFromGuild],
   ['POST', '/api/guild/role', setGuildRole],
   ['POST', '/api/guild/lead', handGuildLead],
+  // The Siedziba Gildii (guild-seat.js, 616 A).
+  ['GET', '/api/guild/seat', getGuildSeat],
+  ['POST', '/api/guild/seat/donate', donateToGuildSeat],
+  ['POST', '/api/guild/seat/prefer', preferGuildSeat],
   // The Bestia Gildii (guild-beast.js).
   ['GET', '/api/guild/beast', getGuildBeast],
   ['POST', '/api/guild/beast/attack', attackGuildBeast],

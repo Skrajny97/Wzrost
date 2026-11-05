@@ -1,5 +1,5 @@
 {
-  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz. tabs: zakładki strony Gildii (#/gildia/<id>), po kolei: gildia z członkami, Bestia, Próby, Prośby Gildii i Wymiana. fame: Sława gildii w tygodniu, ranking gildii i najlepsza gildia poprzedniego tygodnia.",
+  "$comment": "Gildie graczy (src/server/guilds.js, screens/guild.js; DECISIONS.md, „Wieże Systemu i Gildia”). Autor: „307 A, ale za 1000 złota”: nazwa i skrót, do size postaci, lider i zastępcy, własny kanał czatu; zakładanie od found.level poziomu postaci za found.gold złota. Dołącza postać ze Społecznością (od jej poziomu), na zaproszenie lidera albo zastępcy. name i tag: najkrótsza i najdłuższa nazwa i skrót (skrót z wielkich liter i cyfr). invites: ile zaproszeń gildia może mieć naraz. tabs: zakładki strony Gildii (#/gildia/<id>), po kolei: gildia z członkami, Siedziba (616 A, druga jak na makiecie), Bestia, Próby, Prośby Gildii i Wymiana. seat: Siedziba Gildii z budynkami, na które wpłacają członkowie. fame: Sława gildii w tygodniu, ranking gildii i najlepsza gildia poprzedniego tygodnia.",
   "place": "guild-keep",
   "found": {
     "level": 30,
@@ -17,11 +17,84 @@
   "invites": 10,
   "tabs": [
     { "id": "guild", "name": "Gildia" },
+    { "id": "seat", "name": "Siedziba" },
     { "id": "beast", "name": "Bestia" },
     { "id": "trials", "name": "Próby" },
     { "id": "requests", "name": "Prośby" },
     { "id": "exchange", "name": "Wymiana" }
   ],
+  "seat": {
+    "$comment": "Siedziba Gildii (src/engine/guild-seat.js, src/server/guild-seat.js, src/client/guild-seat.js; DECISIONS.md, „Siedziba Gildii (616 A)”). Autor: „616 A - akcept, ale muszą być zwijalne budynki i ludzie muszą móc wpłacać na co chcą, lider i zastępca może tylko oznaczyć co jest preferowane”. Cztery budynki całej gildii (buildings), każdy od poziomu 0 do maxLevel. Wspólnej skarbnicy nie ma: każdy członek wpłaca złoto i zasób obozu budynku (resource, id z data/resources.json) na budynek, który sam wybierze. Poziom n kosztuje max(cost.gold.min, cost.gold.perLevel × n) złota i max(cost.resource.min, cost.resource.perLevel × n) zasobu (liczby z makiety 616). Budynek wchodzi na poziom, gdy wpłaty na niego pokryją cały koszt poziomu, w złocie i w zasobie; nadwyżka przechodzi na następny poziom, więc poziom wynika z sumy wszystkich wpłat na budynek. Ponad koszt maxLevel nie da się wpłacić. Każdy poziom daje każdemu członkowi gildii premię bonus, perLevel za poziom: xp: więcej XP z walk na wyprawach; gold: więcej złota z walk i znalezisk na wyprawach; anvil: Kowadło bierze o tyle mniej złota (po upuście Bractwa Kowali); rarity: przedmioty z wypraw w rzadkościach z afiksami częściej (ich wagi razy 1 + premia, jak przy błogosławieństwie szczęścia Ołtarza Systemu). Wyprawa bierze premie z chwili wyruszenia, Kowadło z chwili ulepszenia; kto opuści gildię, traci premie. Lider i zastępcy oznaczają budynki jako preferowane i tylko o tym decydują. name: nazwa budynku, accusative: jej biernik („wpłać na Kuźnię Gildii”), effect: premia na karcie ({value}: procent na danym poziomie). Obrazek budynku to src/client/art/guild/<id>.png, na razie jeden wygląd na wszystkie poziomy (623). quick: szybkie kwoty w formularzu wpłaty. texts: słowa zakładki Siedziba i odpowiedzi gry; {…} wypełnia gra.",
+    "maxLevel": 10,
+    "cost": {
+      "gold": { "min": 8000, "perLevel": 5000 },
+      "resource": { "min": 600, "perLevel": 400 }
+    },
+    "quick": {
+      "gold": [1000, 5000, 10000],
+      "resource": [100, 500, 1000]
+    },
+    "buildings": [
+      { "id": "guild-banner", "name": "Sztandar", "accusative": "Sztandar", "resource": "wood", "bonus": "xp", "perLevel": 0.01, "effect": "+{value}% XP z wypraw" },
+      { "id": "guild-treasury", "name": "Skarbiec", "accusative": "Skarbiec", "resource": "stone", "bonus": "gold", "perLevel": 0.01, "effect": "+{value}% złota z wypraw" },
+      { "id": "guild-forge", "name": "Kuźnia Gildii", "accusative": "Kuźnię Gildii", "resource": "iron-ore", "bonus": "anvil", "perLevel": 0.02, "effect": "Kowadło {value}% taniej" },
+      { "id": "scouts-house", "name": "Dom Zwiadowców", "accusative": "Dom Zwiadowców", "resource": "wood", "bonus": "rarity", "perLevel": 0.02, "effect": "+{value}% szans na rzadsze przedmioty z wypraw" }
+    ],
+    "texts": {
+      "title": "Siedziba Gildii",
+      "intro": "Budynki Siedziby dają premie każdemu członkowi gildii. Wpłacasz złoto i zasoby na budynek, który sam wybierzesz.",
+      "how": [
+        "Gildia nie ma wspólnej skarbnicy. Każdy członek wpłaca ze swojego złota i zasobów na budynek, który sam wybierze. Wpłaty nie wracają, także po wyjściu z gildii.",
+        "Każdy budynek rośnie od zera do {max}. poziomu. Wchodzi na kolejny poziom, gdy wpłaty na niego pokryją cały koszt tego poziomu: złoto i zasób. To, co wpłacisz ponad koszt, przechodzi na następny poziom.",
+        "Pierwszy poziom kosztuje {firstGold} złota i {firstResource} sztuk zasobu, a każdy następny więcej, aż do {lastGold} złota i {lastResource} sztuk na {max}. poziomie.",
+        "Lider i zastępcy mogą oznaczyć budynki jako preferowane, żeby gildia wiedziała, na co teraz zbierać. To tylko podpowiedź: wpłacasz, na co chcesz.",
+        "Premie działają u każdego członka gildii. Wyprawa bierze je z chwili wyruszenia, a Kowadło z chwili ulepszania. Po wyjściu z gildii premie znikają."
+      ],
+      "bonuses": "Premie dla każdego członka: {bonuses}.",
+      "noBonuses": "Budynki nie dają jeszcze premii. Pierwszy poziom każdego budynku da premię wszystkim członkom.",
+      "level": "Poziom {level} z {max}",
+      "now": "Teraz:",
+      "next": "Na {level}. poziomie:",
+      "none": "brak premii",
+      "raising": "Zbiórka na {level}. poziom",
+      "collected": "{collected} z {cost}",
+      "surplus": "Nadwyżka na kolejne poziomy: {amounts}.",
+      "top": "Najwyższy poziom. Na ten budynek nie trzeba już wpłacać.",
+      "preferred": "Preferowany",
+      "prefer": "Oznacz jako preferowany",
+      "unprefer": "Zdejmij oznaczenie",
+      "preferredOn": "Oznaczenie dodane: {name}.",
+      "preferredOff": "Oznaczenie zdjęte: {name}.",
+      "donation": "Twoja wpłata",
+      "gold": "Złoto",
+      "have": "Masz: {have}",
+      "rest": "Do poziomu",
+      "donate": "Wpłać",
+      "donateTitle": "Wpłacić na {name}?",
+      "donateText": "Wpłacasz {amounts}. Wpłaty nie wracają.",
+      "goldAmount": "{count} złota",
+      "goldGenitive": "złota",
+      "enough": "{what} na ten budynek starczy już do najwyższego poziomu.",
+      "resourceAmount": "{count} {genitive}",
+      "both": "{first} i {second}",
+      "donated": "Wpłata na {name}: {amounts}.",
+      "raised": "{name} wchodzi na {level}. poziom!",
+      "noGuild": "Siedzibę rozbudowują członkowie gildii. Dołącz do gildii albo załóż własną.",
+      "errors": {
+        "locked": "Gildie odblokujesz na poziomie postaci {level}.",
+        "noGuild": "Nie należysz do gildii.",
+        "noBuilding": "Nie ma takiego budynku.",
+        "invalidAmount": "Wpisz całą liczbę, od 0 w górę.",
+        "nothing": "Wpisz, ile złota albo zasobu wpłacasz.",
+        "notEnough": "Masz tylko {have}.",
+        "top": "Ten budynek ma już najwyższy poziom.",
+        "tooMuch": "Ten budynek przyjmie jeszcze najwyżej {room}.",
+        "notAllowed": "Budynki oznacza lider albo zastępca.",
+        "invalidMark": "Wybierz, czy budynek ma być preferowany.",
+        "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz."
+      }
+    }
+  },
   "beast": {
     "$comment": "Bestia Gildii (src/engine/guild-beast.js, src/server/guild-beast.js, src/client/guild-beast.js; DECISIONS.md, „Bestia Gildii”). Autor: „344 A”: cotygodniowe polowanie całej gildii na jedną ogromną bestię, bez grania w tym samym czasie. Tydzień jak przy zadaniach tygodniowych: od poniedziałku, od północy czasu polskiego. Bestia to czempion jednego z regionów, losowany z ziarna gildii i tygodnia, na zaokrąglonym średnim poziomie postaci członków z chwili, gdy przychodzi (pierwsze spojrzenie albo atak w tygodniu). HP bestii: członkowie z tej chwili × memberAttacks × damage, tak że memberAttacks typowych ataków jednej postaci (3 dziennie przez 4 dni) zbija 1/członków paska. damage: [poziom bestii, średnie obrażenia jednego ataku], zmierzone typowymi postaciami z tools/simulate.mjs (typicalCharacter): pięć klas, czterech czempionów, po 40 walk na każdą parę; między punktami po prostej, poniżej pierwszego jak w pierwszym, powyżej ostatniego proporcjonalnie do poziomu. attacksPerDay: ataki postaci na dobę (od północy czasu polskiego), osobno od wejść do Wież, liczone na postać, także po zmianie gildii. chests: Skrzynia Bestii dla każdej postaci, która w tygodniu zaatakowała bestię choć raz, jedna na tydzień (po zmianie gildii w tygodniu liczy się najlepsza z jej bestii); liczy się pierwsza skrzynia, której share (część paska zbita przez gildię) bestia osiągnęła, a share 1 to bestia powalona. item: przedmiot klasy postaci, który może ona założyć, na jej poziomie, z rzadkością jak w skrzyni czempiona. materials: ile razy losuje się materiał bestii, każdy raz jak po pokonanym czempionie, na poziomie bestii, co najmniej jedna sztuka. Poniżej najmniejszego share skrzyni nie ma. Skrzynię otwiera się od upadku bestii albo od końca tygodnia, najpóźniej do końca następnego tygodnia. texts: słowa karty Bestii i odpowiedzi gry; {…} wypełnia gra.",
     "attacksPerDay": 3,

@@ -13,6 +13,7 @@
 //   node tools/difficulty-sim.mjs --levels 75,100 --hunts 300 --models typical,casual,low,realistic
 //   node tools/difficulty-sim.mjs --set monsters.endGame.damage=0.5 --json out.json --rare 200
 //   node tools/difficulty-sim.mjs --models realistic-nocomp,realistic-noevo   one part left out
+//   node tools/difficulty-sim.mjs --hard                       Trudne wyprawy (629 A)
 //
 // Models: `typical` (tools/simulate.mjs), `casual` (the least any player of
 // the level has: the evolution, which the class waits for at 50 and 100, and
@@ -298,7 +299,8 @@ function roadKit(plan, area, minutes, content) {
 }
 
 // `hunts` explorations of `minutes` for a model at a level.
-export function measureCell({ model, classId, level, minutes, hunts, offset = 0 }, content) {
+// `hard`: Trudne wyprawy (629 A), from the challenge's level.
+export function measureCell({ model, classId, level, minutes, hunts, offset = 0, hard = false }, content) {
   const area = newestArea(level, content, offset);
   const local = withArea(area, content);
   const players = playersOf(model, classId, level, local);
@@ -310,7 +312,7 @@ export function measureCell({ model, classId, level, minutes, hunts, offset = 0 
     const { character, equipped } = players[i % players.length];
     const companions = companionsOf(player.plan, level, i, local);
     const hunt = engine.simulateHunt(
-      { character, equipped, hp: maxHps[i % players.length], name: 'Symulacja', areaId: area.id, minutes, seed: `difficulty:${classId}:${level}:${minutes}:${offset}:${i}`, companions, ...kit },
+      { character, equipped, hp: maxHps[i % players.length], name: 'Symulacja', areaId: area.id, minutes, seed: `difficulty:${classId}:${level}:${minutes}:${offset}:${i}`, companions, hard, ...kit },
       local,
     );
     if (hunt.result === 'fainted') {
@@ -338,6 +340,7 @@ export function measureCell({ model, classId, level, minutes, hunts, offset = 0 
     level,
     minutes,
     offset,
+    ...(hard && { hard }),
     area: `${area.id} ${area.minLevel}-${area.maxLevel}`,
     classLevel: player.character.classLevel,
     evolution: player.character.evolution ?? null,
@@ -439,7 +442,7 @@ function main() {
     for (const classId of classes) {
       for (const model of models) {
         for (const minutes of minutesList) {
-          const r = measureCell({ model, classId, level, minutes, hunts, offset }, content);
+          const r = measureCell({ model, classId, level, minutes, hunts, offset, hard: options.hard === true }, content);
           rows.push({ type: 'hunt', ...r });
           console.log(
             `${model.padEnd(17)} ${classId.padEnd(8)} ${String(level).padStart(3)} ${String(minutes).padStart(4)} min  omdlenia ${pct(r.faintRate).padStart(6)}  HP ${pct(r.endHp).padStart(6)}  XP/h ${r.xpPerHour.toFixed(0).padStart(7)} (netto ${r.netXpPerHour.toFixed(0).padStart(7)})  złoto/h ${r.goldPerHour.toFixed(0).padStart(5)}  ${r.area}`,

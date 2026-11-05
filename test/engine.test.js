@@ -154,8 +154,9 @@ import { simulateMany, typicalCharacter } from '../tools/simulate.mjs';
 import { content, newCharacter } from './helpers/content.js';
 
 // The newest place's stronger creatures (balance.monsters.huntCurve,
-// hunt-strength.test.js) aside: these fights test something else.
-const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] } } };
+// hunt-strength.test.js) and the harder explorations from the 10th level
+// (balance.challenge) aside: these fights test something else.
+const calm = { ...content, balance: { ...content.balance, monsters: { ...content.balance.monsters, huntCurve: [] }, challenge: { ...content.balance.challenge, fromLevel: Infinity } } };
 
 // A few level 1 common items of a class, like the first gear a character finds.
 const KITS = {
@@ -644,7 +645,7 @@ describe('hunts', () => {
     assert.deepEqual([1, 5, 15].map((minutes) => hunt({ minutes }).fights.length), [1, 2, 3]);
     // A character that does not outgrow the place earns with the time.
     const settled = typicalCharacter('warrior', 43, content);
-    const xp = (minutes) => simulateHunt({ ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes, seed: 'czas' }, content).xp;
+    const xp = (minutes) => simulateHunt({ ...settled, hp: 9999, name: 'Mira', areaId: 'wolf-circles', minutes, seed: 'czas' }, calm).xp;
     assert.ok(xp(240) > xp(15) * 5);
     const pace = (minutes) => explorationPace(minutes, content);
     assert.equal(pace(240).timeFactor, 240 / 10 / content.balance.hunt.minutesPerFightReference);
@@ -714,7 +715,7 @@ describe('hunts', () => {
 
   test('demanding encounters are stronger and leave more materials', () => {
     const level = 20;
-    const withTough = (chance) => ({ ...content, balance: { ...content.balance, hunt: { ...content.balance.hunt, toughChanceByMinutes: [[1, chance]] } } });
+    const withTough = (chance) => ({ ...calm, balance: { ...calm.balance, hunt: { ...calm.balance.hunt, toughChanceByMinutes: [[1, chance]] } } });
     const character = typicalCharacter('warrior', level, content);
     const result = simulateHunt({ ...character, hp: 9999, name: 'Mira', areaId: 'viper-heaps', minutes: 60, seed: 'trudne' }, withTough(1));
     assert.ok(result.fights.every((fight) => fight.tough));
@@ -1256,8 +1257,8 @@ describe('item comparisons', () => {
 test('the threat level rises with hunt length and falls with HP', () => {
   const { character, equipped } = typicalCharacter('mage', 26, content);
   const order = ['low', 'moderate', 'high', 'very-high'];
-  const full = estimateThreat({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, content);
-  const wounded = estimateThreat({ character, equipped, hp: 20, areaId: 'mossy-boulders' }, content);
+  const full = estimateThreat({ character, equipped, hp: 9999, areaId: 'mossy-boulders' }, calm);
+  const wounded = estimateThreat({ character, equipped, hp: 20, areaId: 'mossy-boulders' }, calm);
   const durations = huntDurations(50, content);
   assert.deepEqual(Object.keys(full).map(Number), durations);
   for (let i = 1; i < durations.length; i++) {
@@ -1270,12 +1271,12 @@ test('the threat level follows the whole character, not its level alone', () => 
   // The same level 26 mage, with and without equipment, in the first unsafe inner region.
   const { character, equipped } = typicalCharacter('mage', 26, content);
   const hp = 9999;
-  const geared = faintChances({ character, equipped, hp, areaId: 'mossy-boulders' }, content);
-  const bare = faintChances({ character, equipped: [], hp, areaId: 'mossy-boulders' }, content);
+  const geared = faintChances({ character, equipped, hp, areaId: 'mossy-boulders' }, calm);
+  const bare = faintChances({ character, equipped: [], hp, areaId: 'mossy-boulders' }, calm);
   assert.ok(bare[60] > geared[60] + 0.1);
   // An inner region far above the character is judged by sample fights too.
   const novice = newCharacter('warrior');
-  const above = faintChances({ character: novice, equipped: [], hp, areaId: 'mossy-boulders' }, content);
+  const above = faintChances({ character: novice, equipped: [], hp, areaId: 'mossy-boulders' }, calm);
   assert.ok(above[5] > 0.5);
 });
 
@@ -1826,6 +1827,9 @@ describe('upgrades', () => {
 
 
 describe('champions', () => {
+  // The game without the harder explorations from the 10th level
+  // (balance.challenge): these tests are about the champion and the elite.
+  const content = calm;
   const geared = (classId, level) => typicalCharacter(classId, level, content);
   // The same game in which every fight of a champion's inner region meets the champion.
   const always = (rewards = {}) => ({
@@ -2125,7 +2129,7 @@ describe('materials and chests', () => {
 
   test('the report lists the materials of each fight and of the whole exploration', () => {
     const character = geared('archer', 13);
-    const hunt = simulateHunt({ ...character, hp: 99999, name: 'Mira', areaId: 'raven-hollows', minutes: 240, seed: 'raport' }, content);
+    const hunt = simulateHunt({ ...character, hp: 99999, name: 'Mira', areaId: 'raven-hollows', minutes: 240, seed: 'raport' }, calm);
     const report = huntReport(
       { hunt, applied: applyHunt(character.character, hunt, content), character: character.character, areaId: 'raven-hollows', startedAt: 0, endsAt: 1 },
       content,

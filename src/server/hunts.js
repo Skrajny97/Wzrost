@@ -20,10 +20,12 @@ import {
   companionAfterHunt,
   companionGoes,
   campLevels,
+  challengeAt,
   faintShare,
   scoutChances,
   scoutedCreature,
   scouting,
+  seatHuntBonus,
   carryLimit,
   countList,
   drawRumor,
@@ -124,7 +126,8 @@ export function companionsGoing(player, now) {
   return hired.filter((companion) => companionGoes(companion, { rested, inParty: player.inParty })).slice(0, content.balance.parties.size - 1);
 }
 
-function cachedSamples(player, character, equipped, areaId, now) {
+// `hard`: against the creatures of a Trudna wyprawa (629 A).
+function cachedSamples(player, character, equipped, areaId, now, hard = false) {
   // Each item worn whole: an upgrade, a reforged affix or an element keeps
   // the item's id; and the evolution and the professions, whose levels give
   // stats (the code review: the threat stayed as before them).
@@ -132,10 +135,10 @@ function cachedSamples(player, character, equipped, areaId, now) {
   // The companions who would go along fight beside the character (companions.js).
   const companions = settlementOn() ? companionsGoing(player, now) : [];
   const party = companions.map((companion) => [companion.id, companion.level, companion.gear]);
-  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party]);
+  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard]);
   let samples = samplesCache.get(key);
   if (!samples) {
-    samples = threatSamples({ character, equipped, areaId, companions }, content);
+    samples = threatSamples({ character, equipped, areaId, companions, hard }, content);
     if (samplesCache.size >= SAMPLES_CACHE_SIZE) samplesCache.delete(samplesCache.keys().next().value);
     samplesCache.set(key, samples);
   }
@@ -217,6 +220,9 @@ export async function huntOptions(context) {
   // count too (healingFor).
   const met = JSON.parse(player.row.met ?? '[]');
   const healing = healingFor(player, params);
+  // ?hard=1: the threats of a Trudna wyprawa, from the challenge's level
+  // (629 A).
+  const hard = params.get('hard') === '1' && Boolean(challengeAt(character.level, content));
   // The Warownia's Strażnica: the chances of an elite, a champion and an
   // event for each length, plain and with the rare sought, and from its 2nd
   // level the place's creatures to track (fortress.js).
@@ -239,12 +245,12 @@ export async function huntOptions(context) {
     maxHp,
     areas: areas.map((place) => {
       const { id } = place;
-      const samples = cachedSamples(player, character, equipped, id, context.now);
+      const samples = cachedSamples(player, character, equipped, id, context.now, hard);
       const catchUp = rareCatchUp(character.level, place, met, content);
       const threat = estimateThreat({ character, equipped, hp, areaId: id, catchUp, healing }, content, samples);
       const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true, healing }, content, samples);
       const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true, catchUp, healing }, content, samples);
-      return { id, threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat), ...(watch && scoutView(place, threat, catchUp)) };
+      return { id, ...(hard && { hard }), threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat), ...(watch && scoutView(place, threat, catchUp)) };
     }),
   });
 }
@@ -313,11 +319,13 @@ export async function startHunt(context) {
 // (`partners`), who fight beside the character; it goes without companions
 // (the author: "wtedy nie poluje się z towarzyszem, tylko samemu/z
 // drużyną"). `mount`: the stage of the Stajnia's mount the exploration goes
-// at, which the party code gives a Drużyna's trip.
+// at, which the party code gives a Drużyna's trip. `hard`: a Trudna wyprawa
+// (629 A), from the challenge's level, on a plain "Wyrusz" only: its
+// creatures are stronger, for more XP and gold (simulateHunt).
 export async function beginHunt(
   db,
   player,
-  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null } = {},
+  { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false } = {},
   now,
   { quick = false, flash = false, party: crew = null, partners = [], mount = null } = {},
 ) {
@@ -334,6 +342,9 @@ export async function beginHunt(
   if (avoidRare && seekRare) throw new ApiError(400, 'invalid_rare', 'Postać nie może naraz unikać i tropić elit i czempionów.');
   if (typeof trackQuests !== 'boolean') throw new ApiError(400, 'invalid_track', 'Zaznacz albo odznacz tropienie stworów z zadań.');
   if (typeof trackUnknown !== 'boolean') throw new ApiError(400, 'invalid_track_unknown', 'Zaznacz albo odznacz tropienie nieznanych stworów.');
+  if (typeof hard !== 'boolean') throw new ApiError(400, 'invalid_hard', 'Zaznacz albo odznacz Trudną wyprawę.');
+  if (hard && (quick || crew)) throw new ApiError(400, 'hard_plain_only', 'Trudna wyprawa jest tylko na zwykłej wyprawie, bez drużyny.');
+  if (hard && !challengeAt(player.row.level, content)) throw new ApiError(403, 'hard_locked', `Trudna wyprawa otwiera się na ${content.balance.challenge.fromLevel}. poziomie postaci.`);
   if (!huntDurations(player.row.level, content).includes(minutes)) {
     const longest = longestHunt(player.row.level, content);
     const next = nextHuntUnlock(player.row.level, content);
@@ -382,6 +393,11 @@ export async function beginHunt(
   // Polowanie nor on one avoiding them, as the rumor.
   const materialsMore = perkOf(player.row, 'materialDrops');
   const rareMore = !quick && !avoidRare ? perkOf(player.row, 'rareOdds') : 0;
+  // The Siedziba Gildii (616 A), as at the start: more XP and gold and rarer
+  // items by the levels of the character's guild's buildings now
+  // (guild-seat.js), on a Drużyna's trip too, each member its own guild's;
+  // a character that left its guild sets out without them.
+  const seat = seatHuntBonus(player.guildSeat, content);
   // The companions hired in the Osada who do not stay in the Kwatery go
   // along, as they are now (companions.js), so the report comes out the same
   // whenever claimed; a wounded one once the character has rested to full
@@ -421,6 +437,7 @@ export async function beginHunt(
     ...(rumor > 1 && { rumor }),
     ...(rareMore > 0 && { rareMore }),
     ...(materialsMore > 0 && { materialsMore }),
+    ...(seat && { seat }),
     ...(party.length > 0 && { companions: party }),
     ...(crew && { party: crew }),
     ...(partners.length > 0 && { partners }),
@@ -430,6 +447,7 @@ export async function beginHunt(
     ...(Object.keys(trophies).length > 0 && { trophies }),
     ...(scouted && { scouted }),
     ...(sought && { wanted: sought }),
+    ...(hard && { hard: true }),
     // The Ołtarz's blessing of the day, for this exploration's first fights;
     // not on a Drużyna's trip, whose fights are one for all (fortress.js).
     ...(!crew && blessingOf(player.row) && { blessing: blessingOf(player.row) }),
@@ -642,6 +660,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       rumor: (trip ? trip.encounter.rumor : options.rumor) ?? 1,
       rareMore: (trip ? trip.encounter.rareMore : options.rareMore) ?? 0,
       materialsMore: options.materialsMore ?? 0,
+      // The Siedziba Gildii's bonuses the exploration set out with: its own
+      // XP, gold and items, so on a trip too.
+      seat: options.seat ?? null,
       // A trip goes without companions; one that set out before 2.11.2026
       // keeps its leader's, so its fights stay the same for everyone.
       companions: (trip ? trip.companions : options.companions) ?? [],
@@ -659,6 +680,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       blessing: trip ? null : (options.blessing ?? null),
       scouted: trip ? null : (options.scouted ?? null),
       wanted: trip ? null : (options.wanted ?? null),
+      hard: !trip && options.hard === true,
     },
     content,
   );
