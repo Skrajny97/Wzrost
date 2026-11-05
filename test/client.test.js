@@ -164,6 +164,8 @@ test('every sprite on the list has its file at its size, and every class has its
     // The companions' busts, one for each class and look.
     companions: data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     'companion-portraits': data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
+    // The companions walking beside the character on the Walka scene (648).
+    'companion-walkers': data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)),
     'settlement-board': ['settlement'],
     // The inner regions' circles and the lands' cards on the Walka screen.
     areas: data('regions').flatMap((region) => region.areas.map((area) => area.id)),

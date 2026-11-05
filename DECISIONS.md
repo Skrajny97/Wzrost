@@ -3034,6 +3034,31 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Towarzysze w drodze obok postaci (640 A, 648) (5.11.2026, w grze od 0.1.75)
+
+Punkt 4 sekcji „Drużyna w drodze obok siebie (640 A)” zapowiadał, że towarzysze z Kwater pójdą w tym samym szeregu, gdy autor zatwierdzi ich chody (648). Autor wybrał chody wszystkich dziesięciu towarzyszy (PixelLab, `art/drafts/walks-pixellab/` na gałęzi `art-drafts`; w przebiegu 20261105T1449 wersja A to pierwsze, a B drugie ziarno danego towarzysza, ułożone jak tekst):
+
+- 648.1 Wojowniczka (`companion-warrior-female`): 20261105T1449, A (ziarno 1521602663);
+- 648.2 Wojownik (`companion-warrior-male`): 20261105T1700, ziarno 1410079423;
+- 648.3 Łuczniczka (`companion-archer-female`): 20261105T1449, A (1557144891);
+- 648.4 Łucznik (`companion-archer-male`): 20261105T1449, A (1507354967);
+- 648.5 Magini (`companion-mage-female`): 20261105T1449, A (1290586317);
+- 648.6 Mag (`companion-mage-male`): 20261105T1449, B (2046651891);
+- 648.7 Kleryczka (`companion-cleric-female`): 20261105T1449, A (1559208431);
+- 648.8 Kleryk (`companion-cleric-male`): 20261105T1449, A (1045100964);
+- 648.9 Cień, kobieta (`companion-shadow-female`): 20261105T1608, ziarno 1736925784;
+- 648.10 Cień, mężczyzna (`companion-shadow-male`): 20261105T1449, B (648159734).
+
+1. **Kto idzie.** Na ekranie Walka, w czasie wyprawy bez drużyny, obok postaci idą towarzysze z Kwater, którzy z nią wyruszyli, czyli ci, którzy walczą w walkach tej wyprawy: każdy, kto nie zostaje w kwaterze („Zostań w kwaterze”), a ranny dopiero wtedy, gdy postać odpoczęła do pełna HP. Towarzysz, który został w kwaterze, nie idzie. Na wyprawie Drużyny towarzysze zostają w Kwaterach, więc tam nic się nie zmienia. Szybkie i Błyskawiczne polowanie nie mają sceny drogi, bo kończą się od razu.
+2. **Kolejność i ustawienie** jak w drużynie (640 A, punkt 2): postać idzie z przodu, po prawej, a każdy towarzysz krok za nią w lewo i trochę wyżej, za poprzednim, więc nikt nikogo nie zasłania. Towarzysze idą w kolejności z Kwater, czyli werbunku. Krok to piąta część szerokości sceny, od 56 do 88 pikseli.
+3. **Wierzchem.** Towarzysze nie mają wierzchowców, więc idą pieszo także wtedy, gdy postać jedzie wierzchem. Szereg bierze wtedy szerszy krok jeźdźców, od 72 do 120 pikseli, jak drużyna z jeźdźcem.
+4. **Wygląd.** Każdy towarzysz idzie w swoim stałym wyglądzie, jak na popiersiu i portrecie do walki: bez odcieni skóry, aury, świetlistych śladów i chowańca, bo to wybory gracza dla jego postaci. Chód ma więc jeden plik na wygląd.
+5. **Chody w grze.** Każda klatka wybranej wersji przeszła przez `tools/walk-palette.py` na kolory swojej klatki startowej (`art/references/walks/start/companion-*.png`), jak chody postaci. Chód to 8 klatek po 128 × 128 w jednym rzędzie, w tempie chodu postaci (8 klatek na sekundę), zapisany jako PNG z własną paletą, piksel w piksel taki jak klatki: `src/client/art/companion-walkers/<klasa>-<wygląd>.png`, razem około 137 KB, a gra pobiera tylko chody idących towarzyszy. Wygląd bez chodu szedłby jako postać Systemu, jak u postaci, ale chód ma każdy z dziesięciu wyglądów.
+6. **Wyprawy sprzed tej zmiany (brakujący szczegół).** Wyprawa od początku zapisuje przy wyjściu, którzy towarzysze z nią poszli, bo z nich liczą się walki raportu. Dlatego wyprawy rozpoczęte przed tą zmianą też pokazują swoich towarzyszy, a wyprawa bez nich to postać idąca sama, jak dotąd. Towarzysz odprawiony w czasie wyprawy idzie do jej końca, bo walczy w jej raporcie.
+7. **Najemnik z Karczmy** zajmuje miejsce jednego towarzysza, więc obok postaci idzie wtedy najwyżej jeden towarzysz. Sam najemnik w scenie nie idzie: to postać innego gracza, a ta zmiana obejmuje towarzyszy z Kwater.
+8. **Serwer i strona.** Wyprawa w `GET /api/character` ma `activity.companions`: imię, klasę i wygląd każdego towarzysza, który poszedł, z zapisu wyprawy (`activityView` w `src/server/characters.js`, `companions` w `options` z `beginHunt` w `src/server/hunts.js`). Strona stawia ich w szeregu po postaci i po członkach drużyny (`walkScene` w `src/client/scenes.js`).
+9. **Sprawdzone:** wszystkie testy (1242), w tym nowy: dwoje towarzyszy idzie, po „Zostań w kwaterze” idzie jeden, a gdy oboje zostają, postać idzie sama; pierwsze kroki nowej postaci (`tools/first-steps.cjs`) i układ na 9 rozmiarach ekranu (`tools/layout-check.cjs`). W przeglądarce: postać z jednym i z dwojgiem towarzyszy, pieszo i na Rumaku, na 320, 390 i 1366 px, oraz każdy z dziesięciu wyglądów na 390 px, bez przewijania na boki, błędów strony i brakujących plików. Scena na 390 px jest też w dwóch filmach MP4, pieszo i na Koniu wierzchowym.
+
 ## Wersja 0.1.74 (5.11.2026)
 
 Ranking bez „…” tam, gdzie lista niczego nie pomija: zob. „Ranking: „…” tylko przy pominiętych miejscach”.
@@ -3162,7 +3187,7 @@ Pomysł gracza z czatu, przekazany przez autora: „w drużynie to chyba wystarc
 1. **Kto idzie.** Na ekranie Walka, w czasie wyprawy drużyny, obok postaci idą pozostali członkowie, którzy z nią wyruszyli. Każdy we własnym wyglądzie: klasa, płeć, odcień skóry i forma ewolucji, a do tego wierzchowiec ze Stajni (z wyglądem ze Sklepu Systemu), aura, świetliste ślady i chowaniec.
 2. **Ustawienie.** Własna postać idzie z przodu, po prawej, jakby prowadziła. Każda następna idzie krok za nią w lewo i trochę dalej (wyżej i za poprzednią), więc postacie się nie zasłaniają. Krok to piąta część szerokości sceny, od 56 do 88 pikseli, a gdy ktoś jedzie wierzchem, od 72 do 120. Za własną postacią idą pozostali w kolejności składu wyprawy, najpierw lider.
 3. **Wygląd z chwili wyjścia** (brakujący szczegół). Gra zapisuje wygląd każdego członka, gdy drużyna wyrusza (`looks` w zapisie wyprawy), tak jak jego siłę do walk. Zmianę wyglądu w trakcie wyprawy widać od następnej. Wyprawy drużyny rozpoczęte przed 0.1.69 nie mają tego zapisu, więc do ich końca postać idzie sama.
-4. **Towarzysze z Kwater** pójdą w tym samym szeregu, gdy autor zatwierdzi ich chody (648).
+4. **Towarzysze z Kwater** pójdą w tym samym szeregu, gdy autor zatwierdzi ich chody (648). *Chody są zatwierdzone, a towarzysze idą obok postaci: zob. „Towarzysze w drodze obok postaci (640 A, 648)”.*
 5. **Sprawdzone w przeglądarce:** trzy postacie (jedna wierzchem i z lisem, jedna z aurą i świetlistymi śladami) na 320, 390 i 1366 px, z ekranu każdego z trzech graczy, i postać idąca sama, która wygląda jak dotąd.
 
 ## Zakładki Gildii w dwóch rzędach (5.11.2026, w grze od 0.1.69)

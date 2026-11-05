@@ -1310,6 +1310,13 @@ function activityView(activity, level, now) {
           walkers: (options.party.looks ?? []).filter((look) => look.id !== activity.character_id).map(({ id, ...look }) => look),
         },
       }),
+      // The companions from the Kwatery who went along, as the exploration
+      // keeps them from its start (hunts.js: beginHunt; never on a Drużyna's
+      // trip): they walk beside the character in the Walka scene too (640 A,
+      // 648), each in its fixed look.
+      ...(options.companions?.length > 0 && {
+        companions: options.companions.map(({ name, classId, appearance }) => ({ name, classId, appearance })),
+      }),
       ...activityPlace(activity, level),
       minutes: activity.minutes,
       startedAt: activity.started_at,

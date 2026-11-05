@@ -545,4 +545,27 @@ describe('companions through the API', () => {
     assert.deepEqual((await options()).companions.map((companion) => companion.id), [candidate.id]);
     assert.equal((await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: candidate.id } })).data.error.code, 'invalid_stay');
   });
+
+  test('the companions who went walk beside the character on the Walka screen, in their looks; one who stays in the Kwatery does not (640 A, 648)', async () => {
+    const [first, second] = (await settlement()).companions.candidates;
+    for (const candidate of [first, second]) assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } })).status, 200);
+    const activity = async () => (await call('GET', '/api/character', { cookie })).data.character.activity;
+    const look = ({ name, classId, appearance }) => ({ name, classId, appearance });
+    // Both go: the page gets their names, classes and looks, in the order
+    // they set out, and nothing else of them.
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.deepEqual((await activity()).companions, [look(first), look(second)]);
+    await call('POST', '/api/hunts/cancel', { cookie });
+    // The first stays in the Kwatery: only the second walks.
+    assert.equal((await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: first.id, stays: true } })).status, 200);
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.deepEqual((await activity()).companions, [look(second)]);
+    await call('POST', '/api/hunts/cancel', { cookie });
+    // Both stay: the character walks alone, as without companions.
+    assert.equal((await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: second.id, stays: true } })).status, 200);
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    const alone = await activity();
+    assert.equal(alone.kind, 'hunt');
+    assert.ok(!('companions' in alone));
+  });
 });

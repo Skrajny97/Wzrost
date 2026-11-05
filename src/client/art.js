@@ -394,6 +394,16 @@ export const SPRITES = {
     ids: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
     faces: { 'warrior-female': 54, 'warrior-male': 52, 'archer-female': 48, 'archer-male': 44, 'mage-female': 47, 'mage-male': 45, 'cleric-female': 53, 'cleric-male': 58, 'shadow-female': 45, 'shadow-male': 46 },
   },
+  // The companions walking beside the character on the Walka scene (640 A,
+  // 648), <class>-<look>: eight frames of 128×128 in a row, as the
+  // character's walks, from their walk starts (art/walks.json,
+  // companion-<class>-<look>) animated by PixelLab, as the author picked
+  // them. A companion's look is fixed, so there are no skin tones.
+  'companion-walkers': {
+    width: 1024,
+    height: 128,
+    ids: ['warrior-female', 'warrior-male', 'archer-female', 'archer-male', 'mage-female', 'mage-male', 'cleric-female', 'cleric-male', 'shadow-female', 'shadow-male'],
+  },
   'settlement-board': {
     width: 384,
     height: 768,
@@ -647,6 +657,13 @@ export function portraitPerch(classId, appearance, evolution) {
 export function walkerSheet(classId, appearance, skin, evolution) {
   const id = lookId('walkers', classId, appearance, evolution);
   return id ? `art/walkers/${toneFile(id, skin)}.png` : null;
+}
+
+// The sheet of a companion from the Kwatery walking, by its class and look,
+// as a path like walkerSheet's, or null for a look without one.
+export function companionWalkerSheet(classId, appearance) {
+  const id = `${classId}-${appearance}`;
+  return available['companion-walkers'].has(id) ? `art/companion-walkers/${id}.png` : null;
 }
 
 // The address of a frame's or a background's picture (the Sklep Systemu),
