@@ -201,6 +201,9 @@ export async function deleteAccount(context) {
     db
       .prepare(`DELETE FROM chat_reports WHERE user_id = ? OR message_id IN (SELECT id FROM chat_messages WHERE user_id = ? OR recipient_id IN (${characters}))`)
       .bind(id, id, id),
+    db
+      .prepare(`DELETE FROM chat_mentions WHERE character_id IN (${characters}) OR message_id IN (SELECT id FROM chat_messages WHERE user_id = ? OR recipient_id IN (${characters}))`)
+      .bind(id, id, id),
     db.prepare(`DELETE FROM chat_messages WHERE user_id = ? OR recipient_id IN (${characters})`).bind(id, id),
     db.prepare('DELETE FROM chat_blocks WHERE user_id = ? OR blocked_id = ?').bind(id, id),
     db.prepare(`DELETE FROM chat_closed WHERE character_id IN (${characters}) OR other_id IN (${characters})`).bind(id, id),

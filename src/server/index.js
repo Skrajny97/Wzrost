@@ -22,7 +22,7 @@ import {
   startTraining,
   wearGearSet,
 } from './fortress.js';
-import { acceptChatRules, blockInChat, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
+import { acceptChatRules, blockInChat, chatPeople, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendAllGifts, sendGift } from './community.js';
 import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
 import { enterTower, getTowers } from './towers.js';
@@ -247,6 +247,8 @@ const routes = [
   ['POST', '/api/test/settlement', testSettlement],
   ['GET', '/api/chat', readChat],
   ['GET', '/api/chat/latest', latestChat],
+  // Whom "@" suggests in the chat's line (mentions.js).
+  ['GET', '/api/chat/people', chatPeople],
   ['GET', '/api/ranking', ranking],
   ['GET', '/api/trade', readTrade],
   ['GET', '/api/trade/settings', tradeSettings],

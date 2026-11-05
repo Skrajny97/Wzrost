@@ -6541,6 +6541,28 @@ a.camp-level-button {
   background: rgba(143, 227, 239, 0.06);
 }
 
+/* A message that tags the player (src/server/mentions.js): gilded, with a
+   gold edge and "@" in gold by its time. The names a message tags are gold
+   for everyone. */
+.chat-message--mentioned {
+  border-color: rgba(217, 180, 90, 0.7);
+  background: rgba(217, 180, 90, 0.1);
+  box-shadow: inset 3px 0 0 var(--gold);
+}
+
+.chat-tagged {
+  flex: none;
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.chat-tag {
+  color: var(--gold);
+  font-weight: 700;
+}
+
 /* A message of the System (the Loteria's result): its cold glass and
    letters, under [ SYSTEM ]. */
 .chat-message--system {
@@ -6704,10 +6726,66 @@ a.camp-level-button {
 }
 
 /* The line to write in: the items picked for a Wymiana offer over it, then
-   the pouch that picks them, the line itself and Wyślij. */
+   the pouch that picks them, the line itself and Wyślij. The line gives way
+   on a narrow phone, so the pouch and Wyślij fit beside it (in the Wymiana
+   at 360 px the row stood 48 px wider than the screen). */
 .chat-form {
+  position: relative;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 6px;
+}
+
+.chat-form-row input {
+  width: 0;
+}
+
+/* "@" and the start of a name: the characters to tag, in a list over the
+   line, the chosen one in the System's light. */
+.chat-mentions {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 1;
+  display: grid;
+  gap: 2px;
+  max-height: min(224px, 40vh);
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  border: 1px solid var(--system-line);
+  border-radius: 4px;
+  background: var(--bg-deep);
+  box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.45);
+  list-style: none;
+}
+
+.chat-mention-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 3px;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-world);
+  font-size: 16px;
+  text-align: left;
+}
+
+.chat-mention-option[aria-selected='true'] {
+  background: rgba(143, 227, 239, 0.12);
+  color: var(--system-text);
+}
+
+.chat-mention-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .chat-form-row {

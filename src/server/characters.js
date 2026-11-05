@@ -1725,6 +1725,8 @@ export function characterRemoval(db, id, now) {
     db.prepare('DELETE FROM gifts WHERE sender_id = ? OR receiver_id = ?').bind(id, id),
     db.prepare('DELETE FROM trades WHERE from_id = ? OR to_id = ?').bind(id, id),
     db.prepare('DELETE FROM chat_reports WHERE message_id IN (SELECT id FROM chat_messages WHERE character_id = ? OR recipient_id = ?)').bind(id, id),
+    // Its tags in the chat, and the tags in its messages (mentions.js).
+    db.prepare('DELETE FROM chat_mentions WHERE character_id = ? OR message_id IN (SELECT id FROM chat_messages WHERE character_id = ? OR recipient_id = ?)').bind(id, id, id),
     db.prepare('DELETE FROM chat_messages WHERE character_id = ? OR recipient_id = ?').bind(id, id),
     db.prepare('DELETE FROM chat_closed WHERE character_id = ? OR other_id = ?').bind(id, id),
     db.prepare('DELETE FROM reports WHERE character_id = ?').bind(id),

@@ -245,6 +245,12 @@ export function publicContent() {
       rules: content.chat.texts.rules,
       // The window of a name the filter blocks (names.js).
       names: content.chat.names,
+      // Tagging with "@" (mentions.js): how many names the line suggests,
+      // and the words of the page.
+      mentions: {
+        suggestions: content.chat.mentions.suggestions,
+        texts: { button: content.chat.mentions.texts.button, suggestions: content.chat.mentions.texts.suggestions, tagged: content.chat.mentions.texts.tagged, news: content.chat.mentions.texts.news },
+      },
     },
     // The Społeczność's drop-down list, and the limits of the Znajomi, the
     // Upominek and the Wymiana the page tells of (community.js, trade.js).

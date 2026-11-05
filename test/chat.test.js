@@ -246,9 +246,9 @@ describe('Czat', () => {
     const seen = async () => (await call('GET', '/api/chat/latest', { cookie: players.ala })).data.seen;
     const mark = (body) => call('POST', '/api/chat/seen', { cookie: players.ala, body });
     const { message } = (await send(players.ola, 'Hej!')).data;
-    assert.deepEqual(await seen(), { global: 0, guild: 0, private: {} });
+    assert.deepEqual(await seen(), { global: 0, trade: 0, guild: 0, private: {} });
     assert.equal((await mark({ global: message.id })).status, 200);
-    assert.deepEqual(await seen(), { global: message.id, guild: 0, private: {} });
+    assert.deepEqual(await seen(), { global: message.id, trade: 0, guild: 0, private: {} });
     // A mark only goes forward, and only for the character's own reading.
     await mark({ global: 1 });
     assert.equal((await seen()).global, message.id);

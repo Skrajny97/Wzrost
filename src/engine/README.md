@@ -36,5 +36,6 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `cosmetics.js` | Sklep Systemu: ramki, tła i wygląd wierzchowca za Punkty Systemu, co postać ma i nosi, oraz kolor imienia z ramki |
 | `gifts.js`, `gift-codes.js` | Upominek między znajomymi i kody podarunkowe |
 | `names.js`, `text.js`, `mail.js`, `notifications.js` | filtr imion postaci, warianty tekstów raportu, treść e-maila i powiadomienia na telefon |
+| `mentions.js` | oznaczanie na czacie: miejsca, w których „@” może zaczynać imię postaci, i wybór najdłuższego imienia, które ma jakaś postać |
 
 Silnik działa tylko na serwerze (DECISIONS.md, Etap 1, punkt 28). Gra jest na planie Workers Paid (do 30 s CPU na żądanie), ale każde wywołanie ma być szybkie: liczy się każde żądanie gracza.

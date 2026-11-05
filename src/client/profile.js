@@ -9,21 +9,23 @@
 // invitation to the player's guild for its leader and deputies
 // (src/server/guilds.js); last, trades from its player blocked or not. A
 // tap on a piece of gear shows its properties. `onChange` gets the Znajomi
-// anew after a friend's action.
+// anew after a friend's action. "Oznacz" puts "@" and its name in the line
+// of the chat it was opened from (`mention`, screens/community.js), else
+// in the Globalny's in the Społeczność.
 
 import { skillSprite } from './art.js';
-import { friendsSeen, wantConversation } from './chat-news.js';
+import { friendsSeen, wantConversation, wantMention } from './chat-news.js';
 import { portraitBox } from './cosmetics.js';
 import { h, icon } from './dom.js';
 import { SLOT_ICONS } from './icons.js';
-import { call, state } from './state.js';
+import { call, isUnlocked, state } from './state.js';
 import { closeSheet, confirmAction, framedName, guildTag, openSheet, toast, withButton } from './ui.js';
 import { itemSummary } from './screens/character.js';
 import { proposeTrade } from './screens/trade.js';
 
 const PATHS = { main: 'ścieżka główna', second: 'ścieżka poboczna' };
 
-export async function openProfile(name, { onChange } = {}) {
+export async function openProfile(name, { onChange, mention } = {}) {
   const { profile } = await call('GET', `/api/profile/${encodeURIComponent(name)}`);
   openSheet(
     h(
@@ -44,7 +46,7 @@ export async function openProfile(name, { onChange } = {}) {
         profile.guild && h('p', { class: 'profile-levels', text: `Gildia: ${profile.guild.name} [${profile.guild.tag}]` }),
       ),
     ),
-    profile.relation?.state !== 'self' && friendship(profile, onChange),
+    profile.relation?.state !== 'self' && friendship(profile, onChange, mention),
     h('h3', { class: 'profile-section', text: 'Ekwipunek' }),
     h(
       'ul',
@@ -94,9 +96,9 @@ export async function openProfile(name, { onChange } = {}) {
 
 // Inviting the character, the invitation either way, or the friendship with
 // its Upominek for today. After each the sheet shows the character anew.
-function friendship(profile, onChange) {
+function friendship(profile, onChange, mention) {
   const { relation, name } = profile;
-  const again = () => openProfile(name, { onChange });
+  const again = () => openProfile(name, { onChange, mention });
   const act = (path, data, said) => async () => {
     const answer = await call('POST', path, data);
     friendsSeen(answer);
@@ -151,7 +153,25 @@ function friendship(profile, onChange) {
       : profile.guildInvite === 'sent'
         ? note('Zaproszenie do gildii wysłane.')
         : null;
-  return h('div', { class: 'profile-friend' }, whisper(profile), tradeButton(profile), parts, guildInvite, tradeBlock(profile, again));
+  return h('div', { class: 'profile-friend' }, whisper(profile), tagButton(profile, mention), tradeButton(profile), parts, guildInvite, tradeBlock(profile, again));
+}
+
+// "Oznacz": "@" and the character's name in the line of the chat the sheet
+// was opened from, else in the Globalny's in the Społeczność (taken at once
+// when it is on the screen). Only for a character that reads the chat.
+function tagButton(profile, mention) {
+  const level = state.content.unlocks.find((unlock) => unlock.id === 'community')?.level ?? 0;
+  if (!isUnlocked('community') || profile.level < level) return null;
+  return h('button', {
+    type: 'button',
+    class: 'button button--system button--small',
+    text: state.content.chat.mentions.texts.button,
+    onClick: () => {
+      closeSheet();
+      if (mention) mention(profile.name);
+      else if (!wantMention(profile.name)) location.hash = '#/spolecznosc/czat';
+    },
+  });
 }
 
 // "Wymiana": a trade proposed to the character, while both players are

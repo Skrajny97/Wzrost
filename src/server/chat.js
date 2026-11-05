@@ -15,7 +15,8 @@
 // down until the moderation looks at it, and the moderation takes messages
 // down and silences accounts. The moderation is the author's account (the
 // admin) and the accounts the author names moderators in the author's
-// panel; the chat marks their characters.
+// panel; the chat marks their characters. "@" and a character's whole name
+// tag it in a message (mentions.js).
 
 import { isUnlocked, itemView } from '../engine/index.js';
 import { isAuthor } from './author.js';
@@ -23,6 +24,7 @@ import { content } from './content.js';
 import { friendNews } from './community.js';
 import { nameColorOf } from './cosmetics.js';
 import { guildChannel, guildNews, guildOf, guildTagSql } from './guilds.js';
+import { findMentions, mentionPeople, mentionsSaved, mentionsSql, mentionsView, newestMentions } from './mentions.js';
 import { partyNews } from './parties.js';
 import { tradeNews } from './trades.js';
 import { ApiError, json, readJson } from './http.js';
@@ -143,12 +145,20 @@ export function cleanText(raw, { admin = false } = {}) {
   return kept + masked(text.slice(at));
 }
 
-// A message of the System (the Loteria's result in the Globalny,
-// casino.js) shows as the System's: its words and time only.
-const messageView = (row, userId, env) =>
-  row.system ? { id: row.id, system: true, text: row.text, createdAt: row.created_at, own: false } : playerMessageView(row, userId, env);
+// The message as the chat shows it: the admin's links as their labels, a
+// bare address left out (mentions.js reads the tags in it, and a phone
+// notification its beginning).
+export function shownText(text) {
+  return String(text).replace(ADMIN_LINK, (whole, label) => label ?? '');
+}
 
-const playerMessageView = (row, userId, env) => ({
+// A message of the System (the Loteria's result in the Globalny,
+// casino.js) shows as the System's: its words and time only. `readerId`:
+// the character that reads, whom the message may tag (mentions.js).
+const messageView = (row, userId, env, readerId) =>
+  row.system ? { id: row.id, system: true, text: row.text, createdAt: row.created_at, own: false } : playerMessageView(row, userId, env, readerId);
+
+const playerMessageView = (row, userId, env, readerId) => ({
   id: row.id,
   characterId: row.character_id,
   name: row.name,
@@ -163,6 +173,8 @@ const playerMessageView = (row, userId, env) => ({
   own: row.user_id === userId,
   role: chatRole(env, row),
   ...(row.items && { items: JSON.parse(row.items) }),
+  // The names it tags, as written, and whether it tags the reader.
+  ...mentionsView(JSON.parse(row.mentions ?? '[]'), readerId),
 });
 
 // An item a Wymiana message shows: what its sheet tells.
@@ -262,7 +274,7 @@ export async function readChat(context) {
     db
       .prepare(
         `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, m.system, u.login, u.google_sub, u.chat_moderator,
-                c.cosmetics, ${guildTagSql('m.character_id')} AS guild_tag
+                c.cosmetics, ${guildTagSql('m.character_id')} AS guild_tag, ${mentionsSql('m.id')} AS mentions
          FROM chat_messages m JOIN users u ON u.id = m.user_id LEFT JOIN characters c ON c.id = m.character_id
          WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND (m.system = 1 OR m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?))
          ORDER BY m.id DESC LIMIT ?`,
@@ -276,7 +288,7 @@ export async function readChat(context) {
   return json({
     channel: other ? PRIVATE : guild ? GUILD : channel.id,
     with: other && { id: other.id, name: other.name },
-    messages: messages.results.reverse().map((row) => messageView(row, userId, context.env)),
+    messages: messages.results.reverse().map((row) => messageView(row, userId, context.env, character.id)),
     hidden: hidden.results.map((row) => row.id),
     conversations: conversations.results.map(conversationView),
     rulesAccepted: Boolean(account.chat_rules_at),
@@ -287,8 +299,13 @@ export async function readChat(context) {
   });
 }
 
+// The channels whose reading a character keeps, besides the private
+// conversations: the Globalny, the Wymiana (where tags light it,
+// mentions.js) and the guild's, under "guild".
+const seenChannels = () => [...content.chat.channels.map((channel) => channel.id), GUILD];
+
 // What a character has read, as POST /api/chat/seen keeps it: the newest
-// message of the Globalny and of each private conversation, by the other
+// message of each channel and of each private conversation, by the other
 // character's id.
 function seenOf(text) {
   let seen;
@@ -298,16 +315,21 @@ function seenOf(text) {
     seen = {};
   }
   const entries = Object.entries(seen?.private ?? {}).map(([other, id]) => [other, whole(String(id))]);
-  return { global: whole(String(seen?.global ?? 0)), guild: whole(String(seen?.guild ?? 0)), private: Object.fromEntries(entries.filter(([other, id]) => whole(other) && id)) };
+  return {
+    ...Object.fromEntries(seenChannels().map((id) => [id, whole(String(seen?.[id] ?? 0))])),
+    private: Object.fromEntries(entries.filter(([other, id]) => whole(other) && id)),
+  };
 }
 
 // GET /api/chat/latest: the newest message someone else wrote in the
 // Globalny that this player may read, the private conversations with the
-// newest message of each other character, the Upominki and invitations
-// waiting in Znajomi (community.js), for the light on the Społeczność tab,
-// a Wymiana proposed or going on (trades.js), what the character has read
-// on any of its devices, and when its activity ends: a Drużyna's trip moves
-// when another member skips its time (time.js), and the page follows.
+// newest message of each other character, the newest message of each
+// channel that tags the character (mentions.js), the Upominki and
+// invitations waiting in Znajomi (community.js), for the light on the
+// Społeczność tab, a Wymiana proposed or going on (trades.js), what the
+// character has read on any of its devices, and when its activity ends: a
+// Drużyna's trip moves when another member skips its time (time.js), and
+// the page follows.
 export async function latestChat(context) {
   const { session, character, db } = await requireChatter(context);
   // The guild's channel and the invitations to guilds (guilds.js).
@@ -315,7 +337,7 @@ export async function latestChat(context) {
   // The System's messages light it for everyone, the winner too.
   const newest = `SELECT MAX(id) AS id FROM chat_messages
          WHERE channel = ? AND hidden_at IS NULL AND (system = 1 OR (user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)))`;
-  const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites, activity] = await Promise.all([
+  const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites, activity, mentions] = await Promise.all([
     db.prepare(newest).bind(content.chat.channels[0].id, session.userId, session.userId).first(),
     conversationsOf(db, session.userId, character.id).all(),
     friendNews(db, character.id, context.now),
@@ -325,10 +347,12 @@ export async function latestChat(context) {
     guild ? db.prepare(newest).bind(guildChannel(guild.id), session.userId, session.userId).first() : null,
     guildNews(db, character.id),
     db.prepare('SELECT ends_at FROM activities WHERE character_id = ?').bind(character.id).first(),
+    newestMentions(db, character.id, session.userId, guild ? guildChannel(guild.id) : null),
   ]);
   return json({
     latest: row.id ?? 0,
     conversations: conversations.results.map(conversationView),
+    mentions,
     ...friends,
     partyInvites,
     trade,
@@ -339,17 +363,16 @@ export async function latestChat(context) {
   });
 }
 
-// POST /api/chat/seen {global: id}, or {with: character id, id}: the
-// character has read the Globalny, or its private conversation with that
-// character, up to message `id` on one of its devices; the others hear it
-// from /api/chat/latest and put out the light (the tester: a message read
-// on the computer still waited as new on the phone). A mark only goes
-// forward.
+// POST /api/chat/seen {global: id}, {trade: id}, {guild: id}, or {with:
+// character id, id}: the character has read a channel, or its private
+// conversation with that character, up to message `id` on one of its
+// devices; the others hear it from /api/chat/latest and put out the light
+// (the tester: a message read on the computer still waited as new on the
+// phone). A mark only goes forward.
 export async function markChatSeen(context) {
   const { character, db } = await requireChatter(context);
   const body = await readJson(context.request);
-  const global = Number.isInteger(body.global) && body.global > 0 ? body.global : 0;
-  const guild = Number.isInteger(body.guild) && body.guild > 0 ? body.guild : 0;
+  const marks = Object.fromEntries(seenChannels().map((id) => [id, Number.isInteger(body[id]) && body[id] > 0 ? body[id] : 0]));
   const other = Number.isInteger(body.with) && body.with > 0 ? body.with : 0;
   const id = Number.isInteger(body.id) && body.id > 0 ? body.id : 0;
   // A conversation is marked only by a message of it, so the record keeps
@@ -362,13 +385,11 @@ export async function markChatSeen(context) {
     const read = await db.prepare('SELECT chat_seen FROM characters WHERE id = ?').bind(character.id).first();
     const seen = seenOf(read?.chat_seen);
     let changed = false;
-    if (global > seen.global) {
-      seen.global = global;
-      changed = true;
-    }
-    if (guild > seen.guild) {
-      seen.guild = guild;
-      changed = true;
+    for (const key of seenChannels()) {
+      if (marks[key] > seen[key]) {
+        seen[key] = marks[key];
+        changed = true;
+      }
     }
     if (known && id > (seen.private[other] ?? 0)) {
       seen.private[other] = id;
@@ -406,6 +427,8 @@ async function privateAllowed(db, userId, other) {
 // private message: a message under the character's name, level and class.
 // The channel keeps its last messages, a private conversation its last
 // privateKeep, and both the reported ones still waiting for the moderation.
+// The characters it tags with "@" are kept with it (mentions.js); a
+// message refused tags nobody.
 export async function sendChat(context) {
   const { session, character, account, db } = await requireChatter(context);
   const body = await readJson(context.request);
@@ -420,6 +443,7 @@ export async function sendChat(context) {
   if (other) await privateAllowed(db, userId, other);
   const offered = await offeredItems(db, channel, character.id, body.items);
   const items = offered && JSON.stringify(offered);
+  const tags = await findMentions(db, shownText(text), { userId, channel: other ? PRIVATE : (guild ?? channel.id), recipientId: other?.id ?? null }, now);
   const { everySeconds, keep, privateKeep } = content.chat.rules;
   const where = other ? `m.channel = '${PRIVATE}' AND ${PAIR}` : 'm.channel = ?';
   const binds = other ? pairOf(character.id, other.id) : [guild ?? channel.id];
@@ -439,9 +463,20 @@ export async function sendChat(context) {
       .bind(...binds, ...binds, other ? privateKeep : keep),
   ]);
   if (sent.meta.changes !== 1) throw new ApiError(429, 'too_fast', `Za szybko. Kolejną wiadomość wyślesz po ${everySeconds} sekundach.`);
+  const id = sent.meta.last_row_id;
+  // The message is written: tags that fail to keep do not undo it.
+  let kept = [];
+  if (tags.length > 0) {
+    try {
+      await db.batch(mentionsSaved(db, id, tags, now));
+      kept = tags;
+    } catch (error) {
+      console.error(error);
+    }
+  }
   const row = {
     ...account,
-    id: sent.meta.last_row_id,
+    id,
     user_id: userId,
     character_id: character.id,
     name: character.name,
@@ -451,8 +486,9 @@ export async function sendChat(context) {
     text,
     items,
     created_at: now,
+    mentions: JSON.stringify(kept.map((tag) => ({ id: tag.characterId, text: tag.written }))),
   };
-  return json({ message: messageView(row, userId, context.env) }, 201);
+  return json({ message: messageView(row, userId, context.env, character.id) }, 201);
 }
 
 // POST /api/chat/close {with: character id}: the private conversation
@@ -471,6 +507,14 @@ export async function closeChat(context) {
     .bind(character.id, other.id, ...pairOf(character.id, other.id))
     .run();
   return json({ closed: other.id });
+}
+
+// GET /api/chat/people: whom "@" suggests in the line to write in besides
+// those who wrote in the channel shown: the character's friends and the
+// members of its guild (mentions.js).
+export async function chatPeople(context) {
+  const { session, character, db } = await requireChatter(context);
+  return json(await mentionPeople(db, character.id, session.userId));
 }
 
 // The message a request names, still in the chat, with its writer's
