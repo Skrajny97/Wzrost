@@ -3036,7 +3036,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 
 ## Wersja 0.1.76 (5.11.2026)
 
-Chody towarzyszy nie migają już szarymi plamkami na obrysie: zob. „Szary szum na obrysie chodów towarzyszy”.
+Chody towarzyszy nie migają już szarymi plamkami na obrysie: zob. „Szary szum na obrysie chodów towarzyszy”. Najemnik z Karczmy idzie obok postaci na ekranie Walka: zob. „Najemnik w drodze obok postaci (654 A)”. Szereg w drodze idzie równo, a piesi obok jeźdźca są mniejsi: zob. „Szereg w drodze: równo i mniejsi obok jeźdźca”.
+
+## Szereg w drodze: równo i mniejsi obok jeźdźca (5.11.2026, od 0.1.76)
+
+Autor (zrzut: Mag-kobieta idzie obok postaci na Koniu wierzchowym, wyżej od niej i większa od jeźdźca z koniem): „nierówno Ci towarzysze idą też”, „nierówno z postacią i są za duży”.
+
+1. **Równo.** Postać, członkowie Drużyny, najemnik i towarzysze idą po jednej linii. Każdy kolejny dalej stoi krok w lewo i za poprzednim, ale już nie wyżej (dotąd 8 pikseli wyżej na każdy krok w głąb).
+2. **Mniejsi obok jeźdźca.** Gdy ktoś w szeregu jedzie wierzchem, piesi stają stopami na linii kopyt i są rysowani w skali 0,8, licząc od stóp, razem ze swoją aurą, śladami i chowańcem. Na piechotę towarzysz sięga wtedy jeźdźcowi do piersi, a nie nad głowę. Skalę wybrano z próbek 1, 0,85, 0,8 i 0,75 (brakujący szczegół). Gdy nikt nie jedzie, wszyscy mają swoją zwykłą wielkość.
+3. **Sprawdzone** w przeglądarce: postać z dwoma towarzyszami pieszo, na Kucu, Koniu wierzchowym i Rumaku, na 320, 390 i 1366 px. Stopy pieszych i kopyta stoją na tej samej linii, bez przewijania na boki i błędów strony.
 
 ## Szary szum na obrysie chodów towarzyszy (5.11.2026, od 0.1.76)
 
@@ -3086,7 +3094,7 @@ Autor po nagraniach 652.1–652.3: „653 A” (wdrożyć) i prośba o każdy ch
 - 648.10 Cień, mężczyzna (`companion-shadow-male`): 20261105T1449, B (648159734).
 
 1. **Kto idzie.** Na ekranie Walka, w czasie wyprawy bez drużyny, obok postaci idą towarzysze z Kwater, którzy z nią wyruszyli, czyli ci, którzy walczą w walkach tej wyprawy: każdy, kto nie zostaje w kwaterze („Zostań w kwaterze”), a ranny dopiero wtedy, gdy postać odpoczęła do pełna HP. Towarzysz, który został w kwaterze, nie idzie. Na wyprawie Drużyny towarzysze zostają w Kwaterach, więc tam nic się nie zmienia. Szybkie i Błyskawiczne polowanie nie mają sceny drogi, bo kończą się od razu.
-2. **Kolejność i ustawienie** jak w drużynie (640 A, punkt 2): postać idzie z przodu, po prawej, a każdy towarzysz krok za nią w lewo i trochę wyżej, za poprzednim, więc nikt nikogo nie zasłania. Towarzysze idą w kolejności z Kwater, czyli werbunku. Krok to piąta część szerokości sceny, od 56 do 88 pikseli.
+2. **Kolejność i ustawienie** jak w drużynie (640 A, punkt 2): postać idzie z przodu, po prawej, a każdy towarzysz krok za nią w lewo i trochę wyżej, za poprzednim, więc nikt nikogo nie zasłania. Od 0.1.76 wszyscy idą na jednej linii, a piesi obok jeźdźca są mniejsi: zob. „Szereg w drodze: równo i mniejsi obok jeźdźca”. Towarzysze idą w kolejności z Kwater, czyli werbunku. Krok to piąta część szerokości sceny, od 56 do 88 pikseli.
 3. **Wierzchem.** Towarzysze nie mają wierzchowców, więc idą pieszo także wtedy, gdy postać jedzie wierzchem. Szereg bierze wtedy szerszy krok jeźdźców, od 72 do 120 pikseli, jak drużyna z jeźdźcem.
 4. **Wygląd.** Każdy towarzysz idzie w swoim stałym wyglądzie, jak na popiersiu i portrecie do walki: bez odcieni skóry, aury, świetlistych śladów i chowańca, bo to wybory gracza dla jego postaci. Chód ma więc jeden plik na wygląd.
 5. **Chody w grze.** Każda klatka wybranej wersji przeszła przez `tools/walk-palette.py` na kolory swojej klatki startowej (`art/references/walks/start/companion-*.png`), jak chody postaci. Chód to 8 klatek po 128 × 128 w jednym rzędzie, w tempie chodu postaci (8 klatek na sekundę), zapisany jako PNG z własną paletą, piksel w piksel taki jak klatki: `src/client/art/companion-walkers/<klasa>-<wygląd>.png`, razem około 137 KB, a gra pobiera tylko chody idących towarzyszy. Wygląd bez chodu szedłby jako postać Systemu, jak u postaci, ale chód ma każdy z dziesięciu wyglądów.
