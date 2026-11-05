@@ -110,6 +110,11 @@
       "id": "0.1.60",
       "title": "Wersja 0.1.60: Najemnicy w Karczmie",
       "body": "- Od 25. poziomu możesz w Karczmie wystawić swoją postać do werbunku na kilka godzin, z własną ceną za godzinę wyprawy.\n- Inny gracz zabiera najemnika na jedną wyprawę, w miejsce jednego towarzysza. Najemnik walczy z całym swoim ekwipunkiem, a zapłata czeka na niego w Karczmie po końcu wyprawy.\n- Wystawiona postać nie wyrusza, nie pracuje w profesjach i nie zmienia rynsztunku. Ogłoszenie możesz zdjąć, dopóki nikt Cię nie zwerbował.\n- Najemnika wybierzesz w Opcjach wyprawy: płacisz z góry, za godziny wyprawy.\n- Opis Poszukiwanych schował się pod „Jak to działa?”, a zadania mieszczą się na wąskich telefonach."
+    },
+    {
+      "id": "0.1.61",
+      "title": "Wersja 0.1.61: profesje wzmacniają trzy razy mocniej",
+      "body": "- Każdy poziom profesji daje teraz +3 do obu jej statystyk zamiast +1, także za poziomy zdobyte wcześniej.\n- Opanowana profesja (100. poziom) daje 450 do każdej ze swoich statystyk zamiast 150."
     }
 ]
 }

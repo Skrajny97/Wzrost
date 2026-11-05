@@ -223,7 +223,7 @@ describe('the Warsztat in the engine', () => {
     assert.equal(report.revealed.length, 19);
     assert.ok(report.revealed.includes('war-axe'));
     assert.ok(report.system.includes('Osiągnięto poziom Rzemieślnictwa: 10'), report.system.join(' | '));
-    assert.ok(report.system.includes('Zdobyto Siłę: +6'));
+    assert.ok(report.system.includes(`Zdobyto Siłę: +${6 * content.professionsById[content.workshop.profession].statPerLevel}`), report.system.join(' | '));
     assert.ok(report.system.some((line) => line.startsWith('System odsłania nowe wzory: Pałasz, Czekan, Kordelas')));
     assert.ok(report.system.includes('System pozwala już wykonywać przedmioty rzadkości: rzadki'));
   });
@@ -414,7 +414,7 @@ describe('the Warsztat through the API', () => {
     assert.equal(after.activity, null);
     assert.equal(after.bag.filter((item) => item.base === 'axe').length, 2);
     assert.equal(after.professions.list[2].level, 2);
-    assert.equal(after.stats.find((stat) => stat.id === 'strength').sources.professions, 1);
+    assert.equal(after.stats.find((stat) => stat.id === 'strength').sources.professions, content.professionsById[content.workshop.profession].statPerLevel);
     // Nothing comes back from an order made in full.
     assert.deepEqual(parts(after), { scraps: 16 });
     assert.deepEqual(after.resources, { wood: 50, stone: 164, 'iron-ore': 28 });

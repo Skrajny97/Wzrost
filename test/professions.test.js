@@ -57,18 +57,21 @@ describe('herbalism in the engine', () => {
     assert.deepEqual(top, { level: 100, xp: 0, levels: 0 });
   });
 
-  test('level 1 gives no stats, each level after it +1 to Mądrość and Percepcja, and level 100 +51 more', () => {
+  test('level 1 gives no stats, each level after it its statPerLevel to Mądrość and Percepcja, and level 100 its maxLevelBonus more', () => {
+    // Three times what they were until 0.1.61 (the author, 5.11.2026: „Zwiększmy też bonus ze statystyk z Profesji x3”).
+    const { statPerLevel: per, maxLevelBonus: bonus } = herbalism;
+    assert.deepEqual([per, bonus], [3, 153]);
     assert.equal(professionStats({}, content).wisdom, 0);
     const third = professionStats({ herbalism: { level: 3, xp: 0 } }, content);
-    assert.equal(third.wisdom, 2);
-    assert.equal(third.perception, 2);
-    assert.equal(professionStats({ herbalism: { level: 99, xp: 0 } }, content).wisdom, 98);
+    assert.equal(third.wisdom, 2 * per);
+    assert.equal(third.perception, 2 * per);
+    assert.equal(professionStats({ herbalism: { level: 99, xp: 0 } }, content).wisdom, 98 * per);
     const master = professionStats({ herbalism: { level: 100, xp: 0 } }, content);
-    assert.deepEqual([master.wisdom, master.perception], [150, 150]);
+    assert.deepEqual([master.wisdom, master.perception], [450, 450]);
     const character = newCharacter('warrior', { professions: { herbalism: { level: 4, xp: 0 } } });
     const { sources, totals } = computeStats(character, [], content);
-    assert.equal(sources.perception.professions, 3);
-    assert.equal(totals.perception, computeStats(newCharacter('warrior'), [], content).totals.perception + 3);
+    assert.equal(sources.perception.professions, 3 * per);
+    assert.equal(totals.perception, computeStats(newCharacter('warrior'), [], content).totals.perception + 3 * per);
   });
 
   test('the System shows Żywokost first, Bylica from level 3 and Pokrzywa from 5', () => {
@@ -166,14 +169,15 @@ describe('herbalism in the engine', () => {
     assert.equal(report.lost, 'Plecak był pełny. Nie zmieściło się: 3 × Żywokost.');
     assert.equal(after.level, 3);
     assert.deepEqual(report.revealed, ['mugwort']);
-    assert.deepEqual(report.system, ['Osiągnięto poziom Zielarstwa: 3', 'Zdobyto Mądrość: +1', 'Zdobyto Percepcję: +1', 'System odsłania nowe zioło: Bylica']);
-    // The last level brings the master's bonus with it: +1 and +51.
+    assert.deepEqual(report.system, ['Osiągnięto poziom Zielarstwa: 3', `Zdobyto Mądrość: +${herbalism.statPerLevel}`, `Zdobyto Percepcję: +${herbalism.statPerLevel}`, 'System odsłania nowe zioło: Bylica']);
+    // The last level brings the master's bonus with it.
     const top = { level: 99, xp: 0 };
     const mastered = gatheringReport(
       { minutes: 480, startedAt: 0, endsAt: 1, seed: 'm', found: { comfrey: 1 }, stored: { comfrey: 1 }, lost: {}, before: top, after: workProfession(herbalism, top, 99 * 30), character, xp: 0, work },
       content,
     );
-    assert.deepEqual(mastered.system.slice(0, 3), ['Osiągnięto poziom Zielarstwa: 100', 'Zdobyto Mądrość: +52', 'Zdobyto Percepcję: +52']);
+    const last = herbalism.statPerLevel + herbalism.maxLevelBonus;
+    assert.deepEqual(mastered.system.slice(0, 3), ['Osiągnięto poziom Zielarstwa: 100', `Zdobyto Mądrość: +${last}`, `Zdobyto Percepcję: +${last}`]);
   });
 
   test('herb quests come with the professions, name only known herbs and count what was gathered', () => {
@@ -287,7 +291,7 @@ describe('herbalism through the API', () => {
     assert.deepEqual(after.herbs.map((herb) => [herb.name, herb.count]), [['Żywokost', comfrey]]);
     assert.equal(after.bagUsed, Math.ceil(comfrey / 20));
     assert.equal(after.professions.list[0].level, 3);
-    assert.equal(after.stats.find((stat) => stat.id === 'wisdom').sources.professions, 2);
+    assert.equal(after.stats.find((stat) => stat.id === 'wisdom').sources.professions, 2 * herbalism.statPerLevel);
     assert.ok(after.hp > 1);
     // The journal lists it with its summary.
     const { data } = await call('GET', '/api/reports', { cookie });

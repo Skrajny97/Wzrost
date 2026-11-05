@@ -111,8 +111,8 @@ describe('brewing in the engine', () => {
     assert.deepEqual(report.revealed, ['lesser-mana']);
     assert.deepEqual(report.system, [
       'Osiągnięto poziom Alchemii: 4',
-      'Zdobyto Intelekt: +2',
-      'Zdobyto Mądrość: +2',
+      `Zdobyto Intelekt: +${2 * content.professionsById[content.brewing.profession].statPerLevel}`,
+      `Zdobyto Mądrość: +${2 * content.professionsById[content.brewing.profession].statPerLevel}`,
       'System odsłania nowy przepis: Mniejsza mikstura many',
     ]);
   });
@@ -227,7 +227,7 @@ describe('brewing through the API', () => {
     assert.deepEqual(after.potions.map((potion) => [potion.name, potion.count, potion.price]), [['Mniejsza mikstura leczenia', report.potion.count, 9]]);
     assert.equal(after.bagUsed, 1);
     assert.equal(after.professions.list[1].level, 3);
-    assert.equal(after.stats.find((stat) => stat.id === 'intellect').sources.professions, 2);
+    assert.equal(after.stats.find((stat) => stat.id === 'intellect').sources.professions, 2 * content.professionsById[content.brewing.profession].statPerLevel);
     const { data } = await call('GET', '/api/reports', { cookie });
     assert.equal(data.reports[0].kind, 'potions');
     assert.equal((await call('POST', '/api/hunts/claim', { cookie })).status, 409);

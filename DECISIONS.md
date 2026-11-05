@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.61 (5.11.2026)
+
+Statystyki z profesji trzy razy większe: zob. „Statystyki z profesji ×3”.
+
+## Statystyki z profesji ×3 (5.11.2026, w grze od 0.1.61)
+
+Autor: „Zwiększmy też bonus ze statystyk z Profesji x3” i „Niech to motywuje do działania poza wyprawami”. Każdy awans profesji daje teraz +3 do obu jej statystyk zamiast +1, a opanowanie profesji (100. poziom) dokłada 153 zamiast 51, więc w pełni rozwinięta profesja daje 450 do każdej ze swoich dwóch statystyk zamiast 150. Liczy się to od razu, także dla poziomów zdobytych wcześniej, bo statystyki z profesji wynikają z jej poziomu (`statPerLevel` i `maxLevelBonus` w `data/professions.json`). Awatar Systemu dalej nie daje statystyk.
+
 ## Wersja 0.1.60 (5.11.2026)
 
 Najemnicy w Karczmie (633.1 A, 633.2 A, 633.3 A): zob. „Najemnicy w Karczmie”. Do tego opis sołtysa w zakładce Poszukiwani schowany pod „Jak to działa?” (autor, zrzut z 5.11.2026: „Ten opis schowaj pod »Jak to działa?«”), a pergamin zadań mieści się na wąskich telefonach (360 px i mniej): nagrody, „Idź” i skrzynia nie wychodzą już za prawą krawędź (przegląd kodu).

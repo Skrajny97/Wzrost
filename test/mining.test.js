@@ -56,15 +56,18 @@ describe('Górnictwo in the engine', () => {
         ['Jubilerstwo', 25, ['will', 'perception']],
       ],
     );
+    const mining = content.professionsById.mining;
+    const jewels = content.professionsById.jewelcrafting;
+    const mastered = 99 * jewels.statPerLevel + jewels.maxLevelBonus;
     assert.deepEqual(professionStats({ mining: { level: 11, xp: 0 }, jewelcrafting: { level: 100, xp: 0 } }, content), {
       wisdom: 0,
-      perception: 150,
+      perception: mastered,
       intellect: 0,
       strength: 0,
       dexterity: 0,
-      vitality: 10,
-      endurance: 10,
-      will: 150,
+      vitality: 10 * mining.statPerLevel,
+      endurance: 10 * mining.statPerLevel,
+      will: mastered,
     });
   });
 
@@ -135,8 +138,8 @@ describe('Górnictwo in the engine', () => {
     assert.deepEqual(report.revealed, ['agate']);
     assert.deepEqual(report.system, [
       'Osiągnięto poziom Górnictwa: 5',
-      'Zdobyto Witalność: +1',
-      'Zdobyto Wytrzymałość: +1',
+      `Zdobyto Witalność: +${content.professionsById.mining.statPerLevel}`,
+      `Zdobyto Wytrzymałość: +${content.professionsById.mining.statPerLevel}`,
       'System odsłania nowy kamień: Agat',
     ]);
   });
@@ -455,8 +458,8 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.equal(after.bagUsed, 0);
     // 480 minutes of work: 30 + 60 + 90 + 120 + 150 to level 6.
     assert.equal(report.profession.levelAfter, 6);
-    assert.equal(after.stats.find((stat) => stat.id === 'vitality').sources.professions, 5);
-    assert.equal(after.stats.find((stat) => stat.id === 'endurance').sources.professions, 5);
+    assert.equal(after.stats.find((stat) => stat.id === 'vitality').sources.professions, 5 * content.professionsById.mining.statPerLevel);
+    assert.equal(after.stats.find((stat) => stat.id === 'endurance').sources.professions, 5 * content.professionsById.mining.statPerLevel);
     assert.ok(after.hp > 1);
     const { data } = await call('GET', '/api/reports', { cookie });
     assert.equal(data.reports[0].kind, 'minerals');
