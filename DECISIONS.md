@@ -3036,7 +3036,18 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 
 ## Wersja 0.1.64 (5.11.2026)
 
-Najemnicy: cena do 100 000 zł za godzinę wyprawy, wynajem prosto z Karczmy i trzy zakładki Karczmy: zob. „Najemnicy: cena do 100 000 zł, wynajem z Karczmy i zakładki”.
+Najemnicy: cena do 100 000 zł za godzinę wyprawy, wynajem prosto z Karczmy i trzy zakładki Karczmy: zob. „Najemnicy: cena do 100 000 zł, wynajem z Karczmy i zakładki”. Do tego górny pasek na telefonach (zrzut autora z iPhone'a): zob. „Górny pasek na telefonach”.
+
+## Górny pasek na telefonach (5.11.2026, w grze od 0.1.64)
+
+Autor, ze zrzutem z iPhone'a: „rozjezdza sie gui adaptation przynajmniej na IPhonie”, potem: „mysle zmniejszyc przestrzenie z prawej miedzy ikonkami i robić solidnie gui adaptation na przyszlosc na rozne rozdzielczości”.
+
+1. **Przyczyna.** Przy pięciocyfrowym i większym złocie kolumna z poziomami kurczyła się: „POZ. 46” wychodziło za ramkę, a skrót klasy był ucięty do „I..”. Działo się tak na każdym telefonie o szerokości 390 px i mniejszej, nie tylko na iPhonie.
+2. **Odznaki poziomu i klasy nigdy się nie kurczą** i zawsze pokazują cały tekst, także „POZ. 146” i „WOJ 153”.
+3. **Miejsce oddają przyciski z prawej** (zgodnie z uwagą autora): bez odstępów między nimi, „Co nowego?” i Ustawienia mają 32 px szerokości zamiast 44 (wysokość do stuknięcia zostaje 44 px), Obóz 38 px, a złoto mniejsze marginesy.
+4. **Węższe telefony.** Do 374 px szerokości mniejsza twarz narratora, Sklep i czcionka odznak. Do 340 px namiot Obozu bez słowa „Obóz” i złoto o piksel mniejsze.
+5. **Sprawdzone** na szerokościach 320, 360, 390 i 430 px, ze złotem 14 817 i 987 654 oraz poziomem 146: wszystko mieści się w ramkach, bez przewijania na boki.
+6. **Na przyszłość:** każdą zmianę wyglądu sprawdzać na wielu rozdzielczościach z dużymi liczbami i długimi nazwami (stała zasada w CLAUDE.md). Robi to `tools/layout-check.cjs`: dziewięć rozmiarów ekranu (telefony 320, 360, 375, 390, 414 i 430 px, tablet 768 px, komputery 1366 i 1920 px) i 15 ekranów gry, z postacią na 146. poziomie, z prawie milionem złota i długim imieniem. Szuka strony szerszej od ekranu, tekstu wychodzącego z ramek i elementów za prawą krawędzią, a tekst ucięty „…” wypisuje do obejrzenia. Pierwsze uruchomienie znalazło jeszcze za szerokie „Wierzchowiec” w Sklepie (320 i 360 px) i „Materiały” w Encyklopedii (320 px): ich zakładki mają na wąskich telefonach mniejsze odstępy między literami. Do obejrzenia zostają nazwy skrócone „…”: „Ruda żelaza” w Obozie (320 i 360 px), „Umiejętności” i „Społeczność” na dolnym pasku przy 320 px oraz „Rdzeń” obok „zablokowane” w menu na komputerze.
 
 ## Najemnicy: cena do 100 000 zł, wynajem z Karczmy i zakładki (5.11.2026, w grze od 0.1.64)
 

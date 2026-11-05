@@ -14002,3 +14002,94 @@ a.profession-square:active {
     margin-top: 6px;
   }
 }
+
+/* Phones: the level badges keep their whole text, "POZ. 146" and the class
+   with its level, however big the purse (the author's iPhone, 5.11.2026:
+   "rozjezdza sie gui", "POZ. 46" over its frame and the class cut to
+   "I.."); the buttons on the right give way instead. Last in the file, so
+   these win over the buttons' own rules above. */
+@media (max-width: 480px) {
+  .topbar-badges {
+    flex: none;
+  }
+
+  .topbar-right {
+    gap: 0;
+  }
+
+  .topbar-right .icon-button {
+    width: 32px;
+  }
+
+  .camp-button {
+    min-width: 38px;
+    padding: 0 2px;
+  }
+
+  .gold {
+    padding: 0 2px;
+  }
+}
+
+@media (max-width: 374px) {
+  .topbar-row {
+    gap: 6px;
+  }
+
+  .quest-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .system-shop {
+    width: 34px;
+    height: 34px;
+  }
+
+  .topbar-badges .badge {
+    padding: 2px 4px;
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+}
+
+/* The narrowest phones: the tent without its word. */
+@media (max-width: 340px) {
+  .topbar-row {
+    gap: 4px;
+  }
+
+  .gold {
+    font-size: 12px;
+  }
+
+  .camp-label {
+    display: none;
+  }
+
+  .camp-button {
+    min-width: 30px;
+  }
+
+  .topbar-right .icon-button {
+    width: 30px;
+  }
+}
+
+/* The Sklep's and the Encyklopedia's tabs on narrow phones: the longest
+   names ("Wierzchowiec", "Materiały") stay inside their cells
+   (tools/layout-check.cjs, 5.11.2026). */
+@media (max-width: 400px) {
+  .shop-tabs .segmented-option,
+  .encyclopedia-tabs .segmented-option {
+    padding: 0 3px;
+    letter-spacing: 0.02em;
+  }
+}
+
+@media (max-width: 340px) {
+  .shop-tabs .segmented-option,
+  .encyclopedia-tabs .segmented-option {
+    font-size: 12px;
+  }
+}
