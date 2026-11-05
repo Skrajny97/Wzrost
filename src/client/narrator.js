@@ -24,7 +24,8 @@
 // passes only that chapter, and a line can be told for each class
 // (`classes`). With "Pomijaj objaśnienia narratora" on in the settings (the
 // account's) nothing is told: each line due is passed with its part, as its
-// "Pomiń" would pass it.
+// "Pomiń" would pass it, and a part begun before the switch went on at once;
+// a part's later lines and a single place's line go without its message.
 
 import { narratorSprite } from './art.js';
 import { aim } from './camera.js';
@@ -649,6 +650,22 @@ export function narrate(hash = place) {
   // "Dalej" and a survey: a change of the character meanwhile (its read line
   // saved, say) must not start the next line under it.
   if (scroll || light?.closing || surveying) return;
+  // "Pomijaj objaśnienia narratora": a part begun before it was turned on
+  // goes at once, wherever the player is, rather than when its next line
+  // comes due (664: meanwhile the parts after it waited, and their messages
+  // came all together later). Its first line was told, so without a word.
+  if (skipsAll()) {
+    const read = readNow();
+    const part = [null, ...Object.keys(state.content.tutorial.chapters)].find((chapter) => begun(chapter, read));
+    if (part === null) {
+      skipAll();
+      return;
+    }
+    if (part) {
+      skipChapter(part, { quiet: true });
+      return;
+    }
+  }
   const passed = justPassed;
   justPassed = null;
   const line = nextLine();
@@ -659,9 +676,8 @@ export function narrate(hash = place) {
   if (!line) {
     stopLight();
     aim([]);
-    // With "Pomijaj objaśnienia narratora" on, a chapter left halfway
-    // before it was turned on takes nobody anywhere: its next line goes
-    // when it comes due where the player goes.
+    // With "Pomijaj objaśnienia narratora" on, the narrator takes nobody
+    // anywhere: a part begun before it was turned on went at once (above).
     const trip = skipsAll() ? null : tripTarget(passed);
     if (trip) {
       location.hash = trip;
@@ -783,7 +799,8 @@ function skipAll() {
 }
 
 // A chapter's "Pomiń": its lines are read, and nothing else happens.
-function skipChapter(chapter) {
+// `quiet`: without the chapter's message (the switch's, below).
+function skipChapter(chapter, { quiet = false } = {}) {
   closeCard();
   stopLight();
   aim([]);
@@ -792,8 +809,19 @@ function skipChapter(chapter) {
   state.character.tutorial = [...new Set([...state.character.tutorial, ...ids])];
   for (const id of ids) passedHere.add(id);
   call('POST', '/api/tutorial', { skip: true, chapter })
-    .then(() => toast(state.content.tutorial.chapters[chapter].skippedText))
+    .then(() => quiet || toast(state.content.tutorial.chapters[chapter].skippedText))
     .catch((error) => toast(error.message));
+}
+
+// A part's lines kept once read, in their order: the introduction's (null)
+// or a chapter's.
+const partLines = (chapter) => state.content.tutorial.lines.filter((line) => kept(line) && (line.chapter ?? null) === chapter);
+// A part begun and not finished: its first line read, another still to come.
+// A single place's line (the Wyprawa Gildii's, the Warownia's) is a part of
+// its own, which never is.
+function begun(chapter, read) {
+  const [first, ...more] = partLines(chapter);
+  return more.length > 0 && read.has(first.id) && more.some((line) => !read.has(line.id));
 }
 
 // What "Pomiń" passes on a line: the introduction until its ending, or the
@@ -809,11 +837,18 @@ function skipping(line) {
 }
 
 // What "Pomijaj objaśnienia narratora" passes for a line due, its last one
-// too: the line's chapter, as "Pomiń objaśnienie" does, with its message,
-// or else the introduction, as "Pomiń wprowadzenie" does.
+// too: the line's chapter, as "Pomiń objaśnienie" does, or else the
+// introduction, as "Pomiń wprowadzenie" does. The chapter's message says
+// where its part waits, so it comes only with a part's first line: a later
+// one, as a place's line of an Osada toured before, and a single place's
+// line go without a word (664: the message pointed where the player stood).
 function passUntold(line) {
-  if (line.chapter) skipChapter(line.chapter);
-  else skipAll();
+  if (!line.chapter) {
+    skipAll();
+    return;
+  }
+  const [first, ...more] = partLines(line.chapter);
+  skipChapter(line.chapter, { quiet: more.length === 0 || readNow().has(first.id) });
 }
 
 // "Pomijaj objaśnienia narratora" turned on in the settings (app.js): the

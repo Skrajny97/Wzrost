@@ -3,7 +3,9 @@
 // wprowadzić opcję pominięcia instrukcji jak np. przy otwarciu osady? Aby
 // każdą postacią nie trzeba było czytać tego samego”. With the switch on, a
 // line that comes due never shows: its part is passed as its "Pomiń" passes
-// it, with the same request to the server and the same message. The
+// it, with the same request to the server and the same message; a part
+// begun before the switch goes at once, and it and a single place's line
+// go without the message (664). The
 // narrator runs here on just enough of a page for its cards; the server's
 // side (the switch kept on the account, a new character without the
 // introduction) is in game.test.js.
@@ -141,9 +143,10 @@ test('on: a late line, after the ending, goes without a word', async () => {
   assert.ok(state.character.tutorial.includes('quests'));
 });
 
-test('on: a chapter left halfway takes nobody anywhere, and goes when its next line comes due', async () => {
+test('on: a part begun before the switch goes at once, without a word, and takes nobody anywhere', async () => {
   // The Społeczność chapter told up to the chat's rules, before the switch:
-  // its end waits for an inner region, where the narrator takes the player.
+  // its Szybkie Polowanie waits for an inner region, where the narrator
+  // takes the player.
   const halfway = [...intro, 'community-welcome', 'community-tabs', 'community-rules'];
   state.user = { skipTutorials: false };
   state.character = { ...character({ tutorial: halfway }), quickHunts: { left: 3 } };
@@ -152,7 +155,9 @@ test('on: a chapter left halfway takes nobody anywhere, and goes when its next l
   assert.equal(globalThis.location.hash, '#/walka/windfalls/windfalls-edge');
   assert.equal(narrator.narratorIdle(), false);
 
-  // On, it stays where it is, and other parchments need not wait for it.
+  // On, the rest of the part goes at once, wherever the player is, without
+  // its message, which would say where the part waits (664: it waited for
+  // the inner region, and the parts after it with it).
   state.character = null;
   narrator.narrate();
   state.user = { skipTutorials: true };
@@ -160,14 +165,39 @@ test('on: a chapter left halfway takes nobody anywhere, and goes when its next l
   globalThis.location.hash = '#/walka';
   narrator.narrate('#/walka');
   assert.equal(globalThis.location.hash, '#/walka');
-  assert.deepEqual(sent, []);
-  assert.equal(narrator.narratorIdle(), true);
-  // In the inner region its last line goes, with the chapter's message.
-  narrator.narrate('#/walka/windfalls/windfalls-edge');
   assert.equal(cards().length, 0);
   assert.deepEqual(sent, [{ method: 'POST', path: '/api/tutorial', body: { skip: true, chapter: 'community' } }]);
+  assert.deepEqual(state.character.tutorial, [...intro, ...part('community')]);
   await settled();
-  assert.equal(toastBox.textContent, tutorial.chapters.community.skippedText);
+  assert.equal(toastBox.textContent, '');
+  assert.equal(narrator.narratorIdle(), true);
+});
+
+// A single place's line, told on the first look at its place (646, 647):
+// on, it goes without the message, which would say where it waits while the
+// player stands there (664).
+test("on: a single place's line goes without a word", async () => {
+  state.user = { skipTutorials: true };
+  state.character = { ...character({ tutorial: [...intro, ...part('community')] }), guildTag: 'KRUK' };
+  narrator.narrate('#/gildia/expedition');
+  assert.equal(cards().length, 0);
+  assert.deepEqual(sent, [{ method: 'POST', path: '/api/tutorial', body: { skip: true, chapter: 'guild' } }]);
+  await settled();
+  assert.equal(toastBox.textContent, '');
+});
+
+// The lines of the Osada's places written after a character heard its tour
+// (643–645, 0.1.70): on, they go at once, without the message "Osada czeka
+// w zakładce Osada.", which came in the Osada itself (664).
+test("on: the Osada's newer place lines, after its tour heard before them, go at once and without a word", async () => {
+  const newer = ['settlement-tavern-mercenaries', 'settlement-board-wanted', 'settlement-trial-hall'];
+  state.user = { skipTutorials: true };
+  state.character = character({ tutorial: [...intro, ...part('community'), ...part('settlement').filter((id) => !newer.includes(id))], level: 25, settlementOpen: true });
+  narrator.narrate('#/walka');
+  assert.deepEqual(sent, [{ method: 'POST', path: '/api/tutorial', body: { skip: true, chapter: 'settlement' } }]);
+  for (const id of newer) assert.ok(state.character.tutorial.includes(id), id);
+  await settled();
+  assert.equal(toastBox.textContent, '');
 });
 
 test('off again: the chapters to come show as before', () => {
