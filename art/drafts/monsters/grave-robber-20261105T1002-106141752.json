@@ -1,0 +1,14 @@
+{
+  "id": "grave-robber",
+  "tool": "pixellab generate-image-v2",
+  "description": "menacing grave robber with a gaunt skull-like face and glowing pale green eyes under a ragged black hood, snarling with crooked teeth, a heavy iron spade raised like a weapon in both hands, a tattered black cloak, a lantern with a ghostly green flame at the belt, a necklace of stolen rings and finger bones, hunched and ready to strike, full body, three-quarter view",
+  "style": "src/client/art/monsters/bandit-crossbow.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}
