@@ -351,6 +351,56 @@
       "start": "art/references/walks/start/necromancer-male.png",
       "pose": 2,
       "description": "a pale gaunt man necromancer with long black hair, a long black and purple robe with bone-white trim and a high collar, a staff topped with a ram skull in his right hand, a small green flame floating above his left hand held before his chest"
+    },
+    "companion-warrior-female": {
+      "start": "art/references/walks/start/companion-warrior-female.png",
+      "pose": 2,
+      "description": "a young slavic woman warrior for hire, short auburn hair, a thin scar on her chin, determined grey eyes, a chainmail coif pushed back over a padded brown gambeson, a leather belt, brown trousers and leather boots, a sword in her right hand"
+    },
+    "companion-warrior-male": {
+      "start": "art/references/walks/start/companion-warrior-male.png",
+      "pose": 2,
+      "description": "a broad-shouldered slavic man warrior for hire in his forties, a shaved head and a thick fair beard braided in two, calm hazel eyes, a studded leather jerkin over a mail shirt, a wide belt, dark trousers and leather boots, a big axe resting on his shoulder"
+    },
+    "companion-archer-female": {
+      "start": "art/references/walks/start/companion-archer-female.png",
+      "pose": 2,
+      "description": "a young slavic huntress for hire, long black hair in a loose braid with a grey feather, freckles, sharp green eyes, a hooded moss-green cape over a leather jerkin, a quiver of fletched arrows on her back, leather trousers and soft boots, a wooden longbow in her hand"
+    },
+    "companion-archer-male": {
+      "start": "art/references/walks/start/companion-archer-male.png",
+      "pose": 2,
+      "description": "a lean slavic hunter for hire in his thirties, short brown hair, stubble and a scar across one eyebrow, a fur-trimmed leather hood down on his shoulders, a leather jerkin, a quiver on his back, brown trousers and boots, a hunting bow in his hand"
+    },
+    "companion-mage-female": {
+      "start": "art/references/walks/start/companion-mage-female.png",
+      "pose": 2,
+      "description": "a young slavic woman mage for hire, silver-white hair tied back with a red ribbon, pale violet eyes, a dark green cloak embroidered with small runes over a long dress, a crystal pendant glowing faint blue at her throat, a slender wooden staff in her hand"
+    },
+    "companion-mage-male": {
+      "start": "art/references/walks/start/companion-mage-male.png",
+      "pose": 2,
+      "description": "a slavic mage for hire in his late thirties, long straight copper red hair tied back in a small bun, a neat short red goatee, sharp green eyes, a deep blue hooded robe down to the ankles with silver runes embroidered along the edge of the hood, the hood down on his shoulders, a pendant with a small glowing blue crystal, a wooden staff topped with a glowing blue crystal in his hand, soft leather boots"
+    },
+    "companion-cleric-female": {
+      "start": "art/references/walks/start/companion-cleric-female.png",
+      "pose": 2,
+      "description": "a dignified middle-aged slavic woman healer for hire, greying chestnut hair under a white linen kerchief, warm brown eyes, a long cream linen robe with a red embroidered border, a dark green shawl, a carved wooden sun amulet on a cord, a wooden staff topped with a sun in her hand"
+    },
+    "companion-cleric-male": {
+      "start": "art/references/walks/start/companion-cleric-male.png",
+      "pose": 2,
+      "description": "an old slavic wandering priest for hire, a long white beard, bushy eyebrows, a brown woollen habit with a rope belt reaching to the ankles, a small bronze sun pendant on a leather cord, sandals, a tall wooden staff topped with a bronze sun in his hand"
+    },
+    "companion-shadow-female": {
+      "start": "art/references/walks/start/companion-shadow-female.png",
+      "pose": 2,
+      "description": "a young slavic woman rogue for hire, short dark red hair, a sly half smile, amber eyes, a dark grey hood half down, a black scarf around her neck, a dark leather jerkin, dark trousers and soft boots, a dagger in each hand"
+    },
+    "companion-shadow-male": {
+      "start": "art/references/walks/start/companion-shadow-male.png",
+      "pose": 2,
+      "description": "a wiry young slavic thief for hire, messy black hair, a thin moustache, quick dark eyes, a dark leather hood down on his shoulders, a charcoal scarf pulled down under his chin, a dark padded jerkin, dark trousers and soft boots, a dagger in his hand"
     }
   }
 }
