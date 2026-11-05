@@ -366,6 +366,9 @@ export function currentQuests(stored, { character, hasTable, hasProfessions, has
           period: key,
           quests,
           chest: false,
+          // The share a week's or a month's quests were drawn with, for
+          // those drawn anew later in it (drawnShare).
+          ...(periodId !== 'daily' && { share }),
           ...(weekly && { scaled: true }),
           ...(weekly && days < 7 && { days }),
           ...(month && month.days < month.total && { days: month.days, total: month.total }),
@@ -398,12 +401,24 @@ function scaledWeek(period, character, createdAt, startsAt, content) {
   };
 }
 
+// The share of the usual numbers a week's or a month's quests were first
+// drawn with (`share`, kept with the period since 0.1.68), so quests drawn
+// anew later in it ask for as much as those drawn first (the code review: a
+// month drawn anew on its last day asked for a thirtieth of the work, for
+// its whole chest). A period kept before has the whole of it at the
+// character's level; a day's quests are always whole.
+export function drawnShare(period, periodId, level, content) {
+  if (periodId === 'daily') return 1;
+  return Number.isFinite(period.share) ? period.share : weekShare(level, 7, content);
+}
+
 // A period's quests not done yet drawn anew, once a period (the author:
 // "Niech będzie tez jednorazowa możliwość przelosowania zadań dziennych -
 // dziennie i tygodniowych - tygodniowo"): those done or claimed stay, the
 // others give way to quests the period does not ask for yet, others than
-// themselves while enough are left, a week's to be done in the days left of
-// it at `now`. Null when there is nothing to draw anew or it was done.
+// themselves while enough are left, a week's and a month's at the share
+// they were first drawn with (drawnShare), whenever in the period. Null
+// when there is nothing to draw anew or it was done.
 export function rerolledQuests(quests, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed }, now, content) {
   const period = quests[periodId];
   if (period.rerolled || period.chest) return null;
@@ -416,7 +431,7 @@ export function rerolledQuests(quests, periodId, { character, hasTable, hasProfe
   );
   const fresh = options.filter((option) => !period.quests.some((quest) => replaced(quest) && same(option, quest)));
   let pool = fresh.length >= count ? fresh : options;
-  const share = periodShare(periodId, character.level, now, content);
+  const share = drawnShare(period, periodId, character.level, content);
   const rng = createRng(`${seed}:${periodId}:${period.period}:reroll`);
   return {
     ...quests,
