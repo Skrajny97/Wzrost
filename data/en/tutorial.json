@@ -32,6 +32,14 @@
     "crafting": {
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. Crafting waits in the Professions tab."
+    },
+    "settlement": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Settlement waits in the Settlement tab."
+    },
+    "mining": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. Mining and Jewelcrafting wait in the Professions tab."
     }
   },
   "lines": {
@@ -505,6 +513,206 @@
     "crafting-ending": {
       "text": [
         "Each new level of Crafting will reveal more patterns to you. Look in here too when you salvage an item you have never taken apart before."
+      ]
+    },
+    "settlement-welcome": {
+      "text": [
+        "Your character's twentieth level… Life goes on beyond the wilds as well. The System has opened the Settlement to you."
+      ]
+    },
+    "settlement-lead": {
+      "text": [
+        "The Settlement waits in this tab. Let us look in on the Crossroads."
+      ]
+    },
+    "settlement-board": {
+      "text": [
+        "On the Order Board the residents post their requests. Orders hang here for a week."
+      ]
+    },
+    "settlement-brotherhoods": {
+      "text": [
+        "Every order you deliver earns you more respect among the brotherhoods. The higher your standing, the more they will allow you."
+      ]
+    },
+    "settlement-ending": {
+      "text": [
+        "Call on the other residents of the Crossroads too. When you first step through someone's door, I will tell you what they do."
+      ]
+    },
+    "settlement-tavern-mug": {
+      "text": [
+        "For a tankard, Zbylut will let you in on a rumour from the road. Listen closely – not everyone shares news like that."
+      ]
+    },
+    "settlement-tavern-hire": {
+      "text": [
+        "Here your future companions look for work. Once hired, a companion sets out with you on explorations and grows stronger along with you."
+      ]
+    },
+    "settlement-tavern-quarters": {
+      "text": [
+        "Every companion needs a place to sleep. Build the Quarters in your camp – that is where you will find them afterwards."
+      ]
+    },
+    "settlement-tavern-mercenaries": {
+      "text": [
+        "Here you can offer your character for hire, or take someone else's on your own exploration. Whoever hires pays, for every hour on the road."
+      ]
+    },
+    "settlement-board-wanted": {
+      "text": [
+        "The headman posts wanted posters here too. Take a poster and set out to where the quarry was seen. Should you meet it and defeat it, the reward is yours."
+      ]
+    },
+    "settlement-enchanter-affix": {
+      "text": [
+        "Wiedana enchants one affix of an item into another, and never fails. You pay in gold and creature materials."
+      ]
+    },
+    "settlement-enchanter-element": {
+      "text": [
+        "She can also bind an element. A weapon will deal part of its damage as fire, lightning or nature, and armour will grow resistant to it."
+      ]
+    },
+    "settlement-enchanter-relation": {
+      "text": [
+        "The better she knows you, the more affixes she will offer you to choose from."
+      ]
+    },
+    "settlement-hermit-reset": {
+      "text": [
+        "Sambor will help you begin anew. For gold, he will reset your skill path or the stats you have spent."
+      ]
+    },
+    "settlement-hermit-evolution": {
+      "text": [
+        "Once your class has evolved, he can change your evolution for another. The first change is free."
+      ]
+    },
+    "settlement-herbalist-buy": {
+      "text": [
+        "Jagna sells herbs. Only the three simplest at first, and more with every standing you reach with her."
+      ]
+    },
+    "settlement-herbalist-sell": {
+      "text": [
+        "In the Sell tab she will buy your herbs and potions for more than the scrap dealer pays. The better she knows you, the more she pays."
+      ]
+    },
+    "settlement-herbalist-relation": {
+      "text": [
+        "Trading with her also builds your standing with the Brotherhood of Herbalists."
+      ]
+    },
+    "settlement-market-offers": {
+      "text": [
+        "At the Marketplace, players auction their goods. An auction lasts from an hour to a full day, and an outbid player gets their gold back at once."
+      ]
+    },
+    "settlement-market-mine": {
+      "text": [
+        "Here you put up your own goods, and collect whatever you buy or sell."
+      ]
+    },
+    "settlement-market-residents": {
+      "text": [
+        "Gościwit has new wares every day. Once a week a travelling merchant calls in too, with rare items."
+      ]
+    },
+    "settlement-market-company": {
+      "text": [
+        "Every trade builds your standing with the Merchants' Company. The higher it is, the more offers you can put up at once."
+      ]
+    },
+    "settlement-forge-scrolls": {
+      "text": [
+        "Żelisław sells two kinds of scrolls, at most three of each a day. A Ward Scroll guards an item against breaking on the Anvil, and a Steady Scroll against losing its upgrade."
+      ]
+    },
+    "settlement-forge-raise": {
+      "text": [
+        "For gold and materials, he will reforge an item one rarity higher. Each item only once."
+      ]
+    },
+    "settlement-forge-relation": {
+      "text": [
+        "The better he knows you, the rarer the items he will forge. Standing with the Brotherhood of Smiths will lower his prices."
+      ]
+    },
+    "settlement-tannery-buy": {
+      "text": [
+        "Wszebor sells creature materials: hides, scales, feathers and fangs. They will come in handy when you are short of something for an order."
+      ]
+    },
+    "settlement-tannery-sell": {
+      "text": [
+        "In the Sell tab he will buy your materials for more than the scrap dealer pays. The better he knows you, the more he pays."
+      ]
+    },
+    "settlement-tannery-relation": {
+      "text": [
+        "Trading with him also builds your standing with the Brotherhood of Hunters, and with every standing you reach with him, Wszebor has more wares."
+      ]
+    },
+    "settlement-stable-mounts": {
+      "text": [
+        "Mirosław sells mounts for good. With a mount, explorations end sooner, yet the spoils are as for the full time."
+      ]
+    },
+    "settlement-stable-party": {
+      "text": [
+        "On a party's exploration, everyone rides at the pace of the slowest mount. If someone has no mount, the exploration takes the full time."
+      ]
+    },
+    "settlement-casino-lottery": {
+      "text": [
+        "Every day Szczęsny sells tickets for the Lottery. At midnight the System draws one of them, and its owner takes the whole pot."
+      ]
+    },
+    "settlement-casino-wheel": {
+      "text": [
+        "You spin the Wheel of Fortune for hundreds of gold pieces. The higher the stake, the greater the chance of a win and of a better prize – but the sharper the sting of a loss."
+      ]
+    },
+    "settlement-trial-hall": {
+      "text": [
+        "Once a day you can fight three battles here against the creatures of the next place. Your health does not return between them, but potions work. Win, and that place will open to you at once."
+      ]
+    },
+    "settlement-quarters": {
+      "text": [
+        "Your companions live here. You can talk with each of them once a day, and talks and shared explorations build your bond. Here, too, you can change their gear, collect their gifts or send them on their way."
+      ]
+    },
+    "mining-welcome": {
+      "text": [
+        "Your character's twenty-fifth level… The System has opened Mining and Jewelcrafting to you."
+      ]
+    },
+    "mining-lead": {
+      "text": [
+        "The System Mine and the System Gem Workshop wait in the Professions tab. Let us look in there."
+      ]
+    },
+    "mining-dig": {
+      "text": [
+        "In the Mine you will dig up gemstones and ores. Along the way, your pickaxe will strike veins of gold as well."
+      ]
+    },
+    "mining-jewels": {
+      "text": [
+        "In the Gem Workshop you will make rings, amulets and talismans from them. The jewellery's rarity depends on the stone."
+      ]
+    },
+    "mining-setting": {
+      "text": [
+        "You can also set a stone in an item you wear. It will strengthen all of its values."
+      ]
+    },
+    "mining-ending": {
+      "text": [
+        "The rarer stones lie deeper. Each new level of Mining will reveal more of them to you."
       ]
     }
   }

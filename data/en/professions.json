@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/professions.json (src/engine/overlay.js): Herbalism, Alchemy and Crafting with their places, herbs, potions, reports and messages, the System Avatar, and how potions are drunk on explorations. Mining, Jewelcrafting and their minerals come in stage 4. Herbs and potions are names, in Title Case wherever they appear (the bag, recipes, quests, reports). A herb's or a profession's `genitive` is its plain name: the quests say \"Gather 12 pieces of Comfrey\" and a report \"Herbalism level reached: 5\". A potion's `counted` is its name after a number, [one, other, other] for the Polish [one, few, many] (src/engine/text.js, countedForm): \"Brew 3 Healing Potions\"; its first form also stands alone in the fight lines (\"Mira drinks Healing Potion: +40 HP\"). potionUse.fightForms make {fights}: \"for 2 fights\". The Polish kinds of potion keep their own words: mikstura Potion, wywar Brew, napar Draught, eliksir Elixir, olejek Oil, balsam Balm. The places: Systemowy Zagajnik System Grove, Systemowa Pracownia System Laboratory, Systemowy Warsztat System Workshop.",
+  "$comment": "English texts of data/professions.json (src/engine/overlay.js): Herbalism, Alchemy and Crafting with their places, herbs, potions, reports and messages, the System Avatar, and how potions are drunk on explorations. Mining and Jewelcrafting (stage 4): the System Mine and the System Gem Workshop, stones and ores (Jewelcrafting speaks of stones, as the glossary's Stone, not of gems); a mineral's `genitive` is its plain name too. Herbs and potions are names, in Title Case wherever they appear (the bag, recipes, quests, reports). A herb's or a profession's `genitive` is its plain name: the quests say \"Gather 12 pieces of Comfrey\" and a report \"Herbalism level reached: 5\". A potion's `counted` is its name after a number, [one, other, other] for the Polish [one, few, many] (src/engine/text.js, countedForm): \"Brew 3 Healing Potions\"; its first form also stands alone in the fight lines (\"Mira drinks Healing Potion: +40 HP\"). potionUse.fightForms make {fights}: \"for 2 fights\". The Polish kinds of potion keep their own words: mikstura Potion, wywar Brew, napar Draught, eliksir Elixir, olejek Oil, balsam Balm. The places: Systemowy Zagajnik System Grove, Systemowa Pracownia System Laboratory, Systemowy Warsztat System Workshop.",
   "intro": "While working, the character does not set out on explorations, and their wounds heal. Each profession level strengthens two stats. You can develop every profession, but you work in only one at a time.",
   "avatar": {
     "name": "System Avatar",
@@ -34,6 +34,16 @@
       "name": "Crafting",
       "genitive": "Crafting",
       "description": "Making gear from parts."
+    },
+    "mining": {
+      "name": "Mining",
+      "genitive": "Mining",
+      "description": "Digging up gemstones, ores and gold in the System Mine."
+    },
+    "jewelcrafting": {
+      "name": "Jewelcrafting",
+      "genitive": "Jewelcrafting",
+      "description": "Making jewellery and setting stones in the System Gem Workshop."
     }
   },
   "gathering": {
@@ -147,6 +157,177 @@
       "lucky": [
         "A stroke of luck! An item of higher rarity: {item} ({rarity})."
       ]
+    }
+  },
+  "mining": {
+    "place": {
+      "name": "System Mine",
+      "description": "Paths lead deep beneath the wilds, and veins of ore glitter in the walls. The System reveals stones only when it judges that you can dig them out."
+    },
+    "about": [
+      "You dig up everything the System has already revealed to you: gemstones, one for each rarity, and ores. Each Mining level gives {yield}% more output.",
+      "Along the way your pickaxe strikes gold veins. On average they give {share}% of the gold an hour of exploration brings at your character level.",
+      "Stones and ores take no room in the bag. The scrap dealer will buy them, and in Jewelcrafting you can make jewellery from them."
+    ],
+    "texts": {
+      "report": [
+        "In the Mine the pickaxes thud, and the basket fills with ore.",
+        "Veins of ore run deep, as if someone had drawn them there.",
+        "The System's blue lines guide every swing of the pickaxe."
+      ],
+      "found": [
+        "Mined: {minerals}."
+      ],
+      "veins": [
+        "Gold veins: {count}, in all +{gold} gold."
+      ],
+      "noVeins": [
+        "No gold veins this time."
+      ],
+      "revealed": [
+        "The System reveals a new stone: {mineral}"
+      ],
+      "revealedOre": [
+        "The System reveals a new ore: {mineral}"
+      ],
+      "hidden": [
+        "Hidden by the System until Mining level {level}."
+      ],
+      "busy": [
+        "The character is digging in the Mine. Wait until the digging ends."
+      ],
+      "claimFirst": [
+        "The digging is over. Claim the report first."
+      ],
+      "pushTitle": [
+        "Digging over"
+      ],
+      "pushBody": [
+        "Digging finished: {place}. Your report is ready to collect."
+      ]
+    }
+  },
+  "jewelcrafting": {
+    "place": {
+      "name": "System Gem Workshop",
+      "description": "The grinding wheels turn here on their own, and settings wait on the table. Some stones will open to you only when the System judges that you can manage them."
+    },
+    "about": {
+      "craft": [
+        "A ring, amulet or talisman has the rarity of the stone you make it from. The setting also needs ore: silver, gold or star ore.",
+        "Making can fail: then the stone is lost, and the ore comes back. Finished jewellery has your character level, and its properties bear the names of creatures you know."
+      ],
+      "set": [
+        "Each item can hold one stone. It raises all the item's values by the percentage the stone gives: the rarer the stone, the more.",
+        "A new stone destroys the previous one. You can set a stone from the same Jewelcrafting level at which Mining finds it."
+      ]
+    },
+    "texts": {
+      "report": [
+        "The grinding wheel sings, and the stone takes on its shine.",
+        "The setting closes round the stone as if it had been waiting for just this one.",
+        "The System's blue lines guide every cut and every setting."
+      ],
+      "made": [
+        "Made: {items}."
+      ],
+      "failed": [
+        "Failed: {items}. The stones were lost, and the ore came back."
+      ],
+      "stopped": [
+        "Making stopped. The stones and ore for the rest came back."
+      ],
+      "set": [
+        "{gem} is now set in the item: {item}."
+      ],
+      "replaced": [
+        "The previous stone, {gem}, crumbled during the setting."
+      ],
+      "missing": [
+        "This item is gone. The stone went back to the bag: {gem}."
+      ],
+      "revealed": [
+        "The System reveals new patterns: {patterns}"
+      ],
+      "gem": [
+        "The System now lets you cut and set the stone: {gem}"
+      ],
+      "hidden": [
+        "Hidden by the System until Jewelcrafting level {level}."
+      ],
+      "patternAt": [
+        "in the Gem Workshop"
+      ],
+      "busy": [
+        "The character is working in the Gem Workshop. Wait until the work ends."
+      ],
+      "claimFirst": [
+        "The work in the Gem Workshop is over. Claim the report first."
+      ],
+      "pushTitle": [
+        "Gem cutting over"
+      ],
+      "pushBody": [
+        "Work finished: {place}. Your report is ready to collect."
+      ],
+      "gemLine": [
+        "{gem}: +{percent}% to all values"
+      ],
+      "gemHelp": [
+        "A stone set in the Gem Workshop raises every value of this item by {percent}%: damage, armour and every property on the list, each by at least 1. The values on this card already include it."
+      ]
+    }
+  },
+  "minerals": {
+    "quartz": {
+      "name": "Quartz",
+      "genitive": "Quartz",
+      "description": "A milky-white crystal, the most common in the Mine's walls."
+    },
+    "agate": {
+      "name": "Agate",
+      "genitive": "Agate",
+      "description": "A stone in coloured bands, like the rings of an old tree."
+    },
+    "amethyst": {
+      "name": "Amethyst",
+      "genitive": "Amethyst",
+      "description": "A violet crystal, cool even in a warm hand."
+    },
+    "emerald": {
+      "name": "Emerald",
+      "genitive": "Emerald",
+      "description": "Green as young leaves, rare and brittle."
+    },
+    "sapphire": {
+      "name": "Sapphire",
+      "genitive": "Sapphire",
+      "description": "Deep blue and hard as steel."
+    },
+    "ruby": {
+      "name": "Ruby",
+      "genitive": "Ruby",
+      "description": "Red as embers that never go out."
+    },
+    "diamond": {
+      "name": "Diamond",
+      "genitive": "Diamond",
+      "description": "The hardest stone in the Mine. It shines even in total darkness."
+    },
+    "silver-ore": {
+      "name": "Silver Ore",
+      "genitive": "Silver Ore",
+      "description": "Silver ore for the settings of common, rare and unique jewellery."
+    },
+    "gold-ore": {
+      "name": "Gold Ore",
+      "genitive": "Gold Ore",
+      "description": "Gold ore for the settings of epic and legendary jewellery."
+    },
+    "star-ore": {
+      "name": "Star Ore",
+      "genitive": "Star Ore",
+      "description": "Ore from shards of stars, for the settings of mythic and divine jewellery."
     }
   },
   "potionUse": {
