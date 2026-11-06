@@ -294,9 +294,8 @@ export const SPRITES = {
     size: 32,
     ids: ['comfrey', 'mugwort', 'nettle', 'plantain', 'st-johns-wort', 'calamus', 'arnica', 'wormwood', 'valerian', 'cranberry', 'aconite', 'mistletoe', 'fern-blossom'],
   },
-  // The potions of Alchemia, 32×32, filled in as they are approved. Jagna's
-  // six rare recipes (121 A) show copies of the nearest System potion's
-  // icon until the author picks their own.
+  // The potions of Alchemia, 32×32, filled in as they are approved, Jagna's
+  // six rare recipes (121 A) with the author's picks among the drafts (670).
   potions: {
     size: 32,
     ids: [
