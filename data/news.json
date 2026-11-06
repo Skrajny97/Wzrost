@@ -265,6 +265,11 @@
       "id": "0.1.92",
       "title": "Wersja 0.1.92",
       "body": "- W Kwaterach można zdjąć towarzyszowi broń, pancerz albo biżuterię: dotknij przedmiotu, który nosi, i wybierz „Zdejmij”. Przedmiot wraca do plecaka, a miejsce zostaje puste."
+    },
+    {
+      "id": "0.1.93",
+      "title": "Wersja 0.1.93",
+      "body": "- Objaśnienie narratora przy pierwszym wejściu do Siedziby Gildii nie oddala już ekranu: wskazuje pierwszy budynek."
     }
 ]
 }

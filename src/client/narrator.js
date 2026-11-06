@@ -560,7 +560,7 @@ const BEATS = {
   // page, then each tab on its first look, the Wyprawa Gildii (646) too.
   'guild-tabs': { place: mark('guild-tabs'), when: (hash, read) => onGuildPage(hash) && inGuild(read) },
   // The four buildings, folded, in one ring.
-  'guild-seat': { place: mark('guild-seat-building'), whole: true, when: guildTab('seat') },
+  'guild-seat': { place: mark('guild-seat-building'), when: guildTab('seat') },
   // The beast with its HP bar and "Atakuj", in one ring.
   'guild-beast': { place: mark('guild-beast'), whole: true, when: guildTab('beast') },
   // The board's title and the words under it, "Liczy się to, co zrobisz od
