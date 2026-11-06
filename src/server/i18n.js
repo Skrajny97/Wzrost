@@ -95,13 +95,20 @@ export function translateMessage(message) {
 }
 
 // The texts with {name}, as patterns, the longest fixed text first, so a
-// message takes the one that says the most of it.
+// message takes the one that says the most of it. A text that says almost
+// nothing of its own, as a label of the page ("{count} z {all}", "{label},
+// {waiting}"), is no pattern: it would take any sentence with " z " or a
+// comma, so a message without English would come out half translated
+// ("Gildia of tym skrótem…") instead of whole in Polish. The server's own
+// texts say far more (14 letters and up in stage 3).
+const MIN_PATTERN_LETTERS = 8;
 const compiled = new WeakMap();
 function patternsOf(words) {
   if (!compiled.has(words)) {
     const patterns = Object.entries(words)
       .filter(([polish, text]) => /\{\w+\}/.test(polish) && !polish.includes('|') && typeof text === 'string' && text !== '')
       .map(([polish, text]) => pattern(polish, text))
+      .filter((found) => found.letters >= MIN_PATTERN_LETTERS)
       .sort((a, b) => b.fixed - a.fixed);
     compiled.set(words, patterns);
   }
@@ -111,6 +118,7 @@ function patternsOf(words) {
 function pattern(polish, english) {
   const names = [];
   let fixed = 0;
+  let letters = 0;
   const source = polish
     .split(/(\{\w+\})/)
     .map((part, index) => {
@@ -119,10 +127,11 @@ function pattern(polish, english) {
         return '([\\s\\S]+?)';
       }
       fixed += part.length;
+      letters += part.match(/\p{L}/gu)?.length ?? 0;
       return part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     })
     .join('');
-  return { regex: new RegExp(`^${source}$`), names, english, fixed };
+  return { regex: new RegExp(`^${source}$`), names, english, fixed, letters };
 }
 
 // "12 345" and "1,5" as Polish writes them become "12,345" and "1.5".

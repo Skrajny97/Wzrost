@@ -20,6 +20,7 @@ import { describe, test } from 'node:test';
 import { blockedName, giftRewardsText, skillText } from '../src/engine/index.js';
 import { OVERLAYS, contentIn } from '../src/server/content.js';
 import { readFeatures } from '../src/server/features.js';
+import { runInLanguage, translateMessage } from '../src/server/i18n.js';
 import { mentionNotices } from '../src/server/mentions.js';
 import { useServer } from './helpers/server.js';
 
@@ -54,6 +55,16 @@ function players(server, db) {
     return cookie;
   };
 }
+
+test("a label of the page that says almost nothing of its own takes no server message: one without English stays whole in Polish", () => {
+  runInLanguage('en', () => {
+    // "{count} z {all}" (a counter of the page) and "{label}, {waiting}" (a
+    // tab's label) would make "Ala of kotem…" of it.
+    assert.equal(translateMessage('Ala z kotem, a kot z Alą.'), 'Ala z kotem, a kot z Alą.');
+    // The server's own shapes still find their English.
+    assert.equal(translateMessage('Anna nie przyjmuje wymian.'), 'Anna does not accept trades.');
+  });
+});
 
 describe("the engine's own texts", () => {
   const pl = contentIn('pl');
