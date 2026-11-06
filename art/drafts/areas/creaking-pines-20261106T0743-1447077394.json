@@ -1,0 +1,14 @@
+{
+  "id": "creaking-pines",
+  "tool": "pixellab generate-image-v2",
+  "description": "huge ancient pines on a moonless night, thick twisted creaking trunks, long grey beards of lichen hanging from every branch, a dark tree hollow with two glinting eyes inside, a stream of whirling pine needles flowing between the crowns, centered composition for a round medallion frame, pixel art scene, muted very dark palette of black greens, grey-blues and lichen greys, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

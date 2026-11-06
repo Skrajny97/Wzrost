@@ -1,0 +1,14 @@
+{
+  "id": "rotting-logs",
+  "tool": "pixellab generate-image-v2",
+  "description": "fallen rotting tree trunks on a dark forest floor glowing faintly pale green with rot, white fungal threads inside the broken logs, big cracked puffball mushrooms puffing grey spores, a black earwig crawling out of a crack, centered composition for a round medallion frame, pixel art scene, muted very dark palette of black browns, rot greens and greys, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "spruce-dusk",
+  "tool": "pixellab generate-image-v2",
+  "description": "the edge of a dense spruce forest where dusk falls at noon, close dark spruces with drooping branches, a black snake coiled in the thick moss, two yellow eyes glinting on a low branch, a faint shadowy shape lurking between the trunks, centered composition for a round medallion frame, pixel art scene, muted dark palette of spruce greens, moss greens and dusky blues, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

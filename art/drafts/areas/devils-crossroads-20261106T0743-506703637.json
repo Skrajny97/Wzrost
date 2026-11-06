@@ -1,0 +1,14 @@
+{
+  "id": "devils-crossroads",
+  "tool": "pixellab generate-image-v2",
+  "description": "four overgrown roads meeting at a crossroads deep in a pine forest at midnight, an old leaning wooden wayside cross in the middle, a tall straw-wrapped bush shaped like a figure standing at the crossing, a rusty sword stuck in the ground, faint cold mist, centered composition for a round medallion frame, pixel art scene, muted very dark palette of black greens, straw golds and grey-blues, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "forgotten-track",
+  "tool": "pixellab generate-image-v2",
+  "description": "an old overgrown road through a dark spruce forest at night, grass and young spruces growing between deep wheel ruts, an abandoned broken wooden cart with a fallen wheel by the roadside, a long whip lying in the grass, a faint ghostly light far down the road, centered composition for a round medallion frame, pixel art scene, muted dark palette of spruce greens, earthy browns and night blues, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

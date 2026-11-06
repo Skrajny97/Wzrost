@@ -1,0 +1,14 @@
+{
+  "id": "wild-den",
+  "tool": "pixellab generate-image-v2",
+  "description": "the darkest heart of an old spruce forest, a beast's lair under black spruces strewn with gnawed bones and shed antlers, a pale stag skull on a stump, pairs of white glowing eyes in the black thicket, the silhouette of great antlers in the mist, centered composition for a round medallion frame, pixel art scene, muted dark palette of black greens, bone whites and cold night blues, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

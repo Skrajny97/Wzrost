@@ -1,0 +1,14 @@
+{
+  "id": "mossy-dell",
+  "tool": "pixellab generate-image-v2",
+  "description": "a deep narrow ravine overgrown with thick moss, an icy stream along its bottom, the huge upturned root plate of a fallen spruce on the slope, loops of black roots hanging from the edge like snares, a pool of thick living darkness with two white eyes at the bottom, centered composition for a round medallion frame, pixel art scene, muted dark palette of moss greens, icy blues and black browns, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

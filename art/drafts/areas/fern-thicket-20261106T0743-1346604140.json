@@ -1,0 +1,14 @@
+{
+  "id": "fern-thicket",
+  "tool": "pixellab generate-image-v2",
+  "description": "a dense thicket of waist-high ferns under dark spruces at night, fern fronds hiding the ground completely, the pale shape of a huge praying mantis rising above the ferns, the glossy black coil of a giant millipede between the leaves, cold mist, centered composition for a round medallion frame, pixel art scene, muted dark palette of fern greens, spruce greens and night blues, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

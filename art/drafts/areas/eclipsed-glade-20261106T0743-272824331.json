@@ -1,0 +1,14 @@
+{
+  "id": "eclipsed-glade",
+  "tool": "pixellab generate-image-v2",
+  "description": "a dark forest glade under a black starless sky, a pale broken ring of light where the moon was bitten away, black pines around it, tangled balls of black hair in the grass, small glowing eyes at the edge of the trees, the vast shadow of a beast with a starry maw above the treetops, centered composition for a round medallion frame, pixel art scene, muted very dark palette of black-blues, deep greens and pale moon silver, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

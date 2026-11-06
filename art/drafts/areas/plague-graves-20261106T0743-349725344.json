@@ -1,0 +1,14 @@
+{
+  "id": "plague-graves",
+  "tool": "pixellab generate-image-v2",
+  "description": "a forgotten plague cemetery hidden deep in a pine forest at midnight, low grave mounds with tilted old wooden crosses, frost on the grass, a small wooden bell tower with a cracked bell, fresh earth dug up between the graves, centered composition for a round medallion frame, pixel art scene, muted very dark palette of frost greys, grey-blues and black greens, soft light, no text, no border, no people",
+  "style": "src/client/art/areas/rokita-deep.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
