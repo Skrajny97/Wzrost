@@ -409,7 +409,7 @@
                 "type": "string",
                 "minLength": 1
               },
-              "description": "Cień rzadkiego przepisu zielarki (taught), którego jeszcze nie zdradziła: {standing} to stopień relacji, {level} poziom Alchemii."
+              "description": "Cień rzadkiego przepisu zielarki (taught), którego jeszcze nie zdradziła: {standing} to stopień w relacji z nią albo w reputacji Bractwa Zielarzy, {level} poziom Alchemii."
             },
             "busy": {
               "type": "array",
@@ -1853,7 +1853,7 @@
           "taught": {
             "type": "string",
             "pattern": "^[a-z][a-z0-9-]*$",
-            "description": "Rzadki przepis zielarki (121 A: „zaufanym zdradza rzadkie receptury”): id stopnia relacji z nią (settlement.standings), od którego go zna postać. Do tego czasu przepis jest nieznany, choćby postać miała jego poziom."
+            "description": "Rzadki przepis zielarki (121 A: „zaufanym zdradza rzadkie receptury”): id stopnia (settlement.standings), od którego go zna postać, w relacji z zielarką albo w reputacji Bractwa Zielarzy, co przyjdzie pierwsze (682 A i C, settlement.herbalist.teaching). Do tego czasu przepis jest nieznany, choćby postać miała jego poziom."
           },
           "herbs": {
             "type": "object",

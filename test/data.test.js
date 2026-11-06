@@ -103,10 +103,17 @@ test('the validator catches broken references and schema errors', () => {
   assert.ok(placeErrors.some((error) => /^cosmetics\.json\/items\/\d+\/pet: must have required property 'ride'/.test(error)), placeErrors.join('\n'));
   assert.ok(placeErrors.some((error) => /^cosmetics\.json\/items\/\d+\/pet\/foot: must match exactly one schema in oneOf/.test(error)), placeErrors.join('\n'));
 
-  // A rare recipe of Jagna's comes at a standing of the relation that exists (121 A).
+  // A rare recipe of Jagna's comes at a standing that exists (121 A), of a
+  // relation with a resident or a reputation with a brotherhood that exist
+  // (682 A and C).
   const taught = structuredClone(loadData());
   taught.professions.potions.find((potion) => potion.id === 'owl-draught').taught = 'beloved';
-  assert.deepEqual(validateData(taught), ['professions.json: mikstura owl-draught ma nieznany stopień relacji "beloved" (taught)']);
+  taught.settlement.herbalist.teaching = [{ kind: 'relation', id: 'witch' }, { kind: 'reputation', id: 'herbalist' }];
+  assert.deepEqual(validateData(taught), [
+    'professions.json: mikstura owl-draught ma nieznany stopień "beloved" (taught)',
+    'settlement.json: herbalist.teaching ma nieznanego mieszkańca witch',
+    'settlement.json: herbalist.teaching ma nieznane bractwo herbalist',
+  ]);
 
   const broken = structuredClone(loadData());
   broken.rarities[0].color = 'grey';

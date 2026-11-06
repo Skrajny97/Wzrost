@@ -64,7 +64,7 @@ import {
   reforgeChoices,
   reforgeCost,
   reforgeOptions,
-  recipesTaughtBetween,
+  recipeCount,
   rejectOrder,
   rollUpgrade,
   rumorText,
@@ -73,6 +73,7 @@ import {
   standingOf,
   standingRewardsDue,
   statResetCost,
+  taughtWords,
   staying,
   talkWith,
   talkedToday,
@@ -118,7 +119,7 @@ import { counted, foreign, takenOff, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
 import { stableView } from './stable.js';
 import { tanneryView } from './tannery.js';
-import { countedForm, say } from '../engine/text.js';
+import { say } from '../engine/text.js';
 
 // A JSON path for a key with a hyphen or a colon ("iron-ore", "wolf-pelt:rare").
 const jsonPath = (key) => `$."${key}"`;
@@ -405,31 +406,29 @@ function herbalistPrices(player, stored, now) {
   return { premium, scrap, price: (kind, id) => scrap(kind, id) * (1 + premium) };
 }
 
-// "3 rzadkie przepisy Alchemii": a number of Jagna's rare recipes.
-const recipeCount = (count) => `${count} ${countedForm(count, content.settlement.herbalist.recipes.counted)}`;
-
-// The rare recipes of Alchemia Jagna teaches (121 A, herbalistRecipes) as
-// her Chata tells them: those she has taught, each with whether the
-// Pracownia brews it now or from which level of Alchemia, and the standing
-// that teaches the next ones.
-function recipesView(points, row) {
+// The rare recipes of Alchemia Jagna teaches (121 A, herbalistRecipes: by
+// the relation with her or the reputation of the Bractwo Zielarzy) as her
+// Chata tells them to a character with the Osada `stored`: those she has
+// taught, each with whether the Pracownia brews it now or from which level
+// of Alchemia, and the standing that teaches the next ones.
+function recipesView(stored, row) {
   const texts = content.settlement.herbalist.recipes;
-  const { taught, next } = herbalistRecipes(points, content);
+  const { taught, next } = herbalistRecipes(stored, content);
   const { level } = professionState(JSON.parse(row.professions ?? '{}'), content.brewing.profession);
   return {
     title: say(texts, 'title', 0),
     taught: taught.map((potion) => ({ id: potion.id, name: potion.name, note: potion.level <= level ? say(texts, 'ready', 0) : say(texts, 'level', 0, { level: potion.level }) })),
-    next: next && say(texts, 'next', 0, { standing: next.standing.name, count: recipeCount(next.potions.length) }),
+    next: next && say(texts, 'next', 0, { standing: next.standing.name, count: recipeCount(next.potions.length, content) }),
   };
 }
 
-// What a trade that took the relation with Jagna from `before` to `after`
-// points adds to its answer: { taught } with the words about the rare
-// recipes she teaches with it, or nothing.
-function taughtWords(before, after) {
-  const taught = recipesTaughtBetween(before, after, content);
-  if (taught.length === 0) return {};
-  return { taught: say(content.settlement.herbalist.recipes, 'taught', 0, { count: recipeCount(taught.length), potions: taught.map((potion) => potion.name).join(', ') }) };
+// What an answer that changed the Osada from `before` to `after` (as
+// stored) adds: { taught } with the words about the rare recipes Jagna
+// teaches with it (a trade with her, an order of the Bractwo Zielarzy), or
+// nothing.
+function taughtWith(before, after) {
+  const taught = taughtWords(before, after, content);
+  return taught ? { taught } : {};
 }
 
 // The Chata zielarki for the page: each herb and potion in the bag with
@@ -462,7 +461,7 @@ function herbalistView(player, stored, now) {
       next: next && { standing: next.standing, herbs: next.herbs.map((id) => content.herbsById[id].name) },
       discount: relationDiscount(points, content),
     },
-    recipes: recipesView(points, player.row),
+    recipes: recipesView(stored, player.row),
   };
 }
 
@@ -470,8 +469,8 @@ function herbalistView(player, stored, now) {
 // bag, also while the character is away, as the scrapper does (DECISIONS.md,
 // "Plecak pod ręką"); the trade raises the relation with her and the
 // reputation with the herbalists, up to the day's limit. A trade that takes
-// the relation to a standing where she teaches rare recipes names them
-// (`taught`, 121 A).
+// the relation or the reputation to a standing where she teaches rare
+// recipes names them (`taught`, 121 A, 682 A and C).
 export async function sellToHerbalist(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -499,9 +498,8 @@ export async function sellToHerbalist(context) {
     .run();
   if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(context.env.DB, session.userId);
-  const relation = stored.relations[herbalist.resident] ?? 0;
   return json({
-    sold: { count: body.count, gold, points, ...taughtWords(relation, relation + points) },
+    sold: { count: body.count, gold, points, ...taughtWith(stored, next) },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
   });
@@ -543,9 +541,8 @@ export async function buyFromHerbalist(context) {
     .run();
   if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(context.env.DB, session.userId);
-  const relation = stored.relations[herbalist.resident] ?? 0;
   return json({
-    bought: { name: content.herbsById[good.id].name, count: body.count, gold, points, ...taughtWords(relation, relation + points) },
+    bought: { name: content.herbsById[good.id].name, count: body.count, gold, points, ...taughtWith(stored, next) },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
   });
@@ -869,7 +866,9 @@ export async function getSettlement(context) {
 
 // { orderId }: hands over what an order asks for, for its gold, the
 // brotherhood's reputation, the relation with the resident who posts the
-// orders and maybe Punkty Systemu.
+// orders and maybe Punkty Systemu. An order of the Bractwo Zielarzy that
+// takes its reputation to a standing where Jagna teaches rare recipes names
+// them (`taught`, 682 A and C).
 export async function deliverSettlementOrder(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -896,7 +895,7 @@ export async function deliverSettlementOrder(context) {
     const after = await loadPlayer(db, session.userId);
     if (after.row.settlement !== JSON.stringify(next)) throw changed();
     return json({
-      delivered: { gold: done.gold, systemPoints: done.systemPoints, reputation: done.reputation },
+      delivered: { gold: done.gold, systemPoints: done.systemPoints, reputation: done.reputation, ...taughtWith(stored, next) },
       settlement: settlementView(after, next, done.board, context.now),
       character: characterView(after, context.now),
     });
@@ -918,7 +917,7 @@ export async function deliverSettlementOrder(context) {
     if (saved.at(-1).meta.changes !== 1) throw changed();
     const after = await loadPlayer(db, session.userId);
     return json({
-      delivered: { gold: done.gold, systemPoints: done.systemPoints, reputation: done.reputation },
+      delivered: { gold: done.gold, systemPoints: done.systemPoints, reputation: done.reputation, ...taughtWith(stored, next) },
       settlement: settlementView(after, next, done.board, context.now),
       character: characterView(after, context.now),
     });
@@ -942,7 +941,7 @@ export async function deliverSettlementOrder(context) {
   if (saved.at(-1).meta.changes !== 1) throw changed();
   const after = await loadPlayer(db, session.userId);
   return json({
-    delivered: { gold: done.gold, systemPoints: done.systemPoints, reputation: done.reputation },
+    delivered: { gold: done.gold, systemPoints: done.systemPoints, reputation: done.reputation, ...taughtWith(stored, next) },
     settlement: settlementView(after, next, done.board, context.now),
     character: characterView(after, context.now),
   });

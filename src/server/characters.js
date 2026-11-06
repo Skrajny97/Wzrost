@@ -124,7 +124,7 @@ import { guildSeatSql } from './guild-seat.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { partyRemoval } from './parties.js';
 import { anvilDiscountOf } from './perks.js';
-import { bagHerbs, bagMinerals, bagPotions, herbsOf, potionsOf, professionsView, relationsOf } from './professions-view.js';
+import { bagHerbs, bagMinerals, bagPotions, herbsOf, potionsOf, professionsView, settlementPointsOf } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
 import { tradeBlockOf, tradesEnded } from './trades.js';
@@ -641,8 +641,9 @@ export function settlementGoods(row, items, now) {
 
 // The character as an order of the Osada and a companion's gift see it: what
 // it knows, with the creatures it met, the patterns it learned and its
-// relations with the residents (the herbalist's rare recipes, 121 A).
-export const knowingCharacter = (row) => ({ ...engineCharacter(row), met: JSON.parse(row.met ?? '[]'), patterns: JSON.parse(row.patterns ?? '[]'), relations: relationsOf(row) });
+// relations and reputation in the Osada (`settlement`: the herbalist's rare
+// recipes, 121 A).
+export const knowingCharacter = (row) => ({ ...engineCharacter(row), met: JSON.parse(row.met ?? '[]'), patterns: JSON.parse(row.patterns ?? '[]'), settlement: settlementPointsOf(row) });
 
 // The Osada's board at `now` for the character as it is: the stored one
 // (settlement.js) with the orders whose time has come.
@@ -678,8 +679,9 @@ export function questContext(player, now) {
   const hasProfessions = professionsOn() && isUnlocked('professions', player.row.level, content);
   const crafting = content.professionsById[content.workshop.profession];
   return {
-    // With its relations, for the herbalist's rare recipes (121 A).
-    character: { ...engineCharacter(player.row), relations: relationsOf(player.row) },
+    // With its relations and reputation in the Osada, for the herbalist's
+    // rare recipes (121 A).
+    character: { ...engineCharacter(player.row), settlement: settlementPointsOf(player.row) },
     hasTable: craftTable(campLevels(player.buildings, now, content), content).pace > 0,
     hasProfessions,
     hasCrafting: hasProfessions && craftingOn() && professionOpen(crafting, player.row.level, content),

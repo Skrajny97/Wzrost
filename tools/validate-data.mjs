@@ -1245,7 +1245,7 @@ function checkSettlement(data, { rarities }) {
   const { places, residents, brotherhoods, standings, orders, reforge } = data.settlement;
   uniqueIds(errors, 'settlement (miejsca)', places);
   const residentIds = uniqueIds(errors, 'settlement (mieszkańcy)', residents);
-  uniqueIds(errors, 'settlement (bractwa)', brotherhoods);
+  const brotherhoodIds = uniqueIds(errors, 'settlement (bractwa)', brotherhoods);
   const standingIds = uniqueIds(errors, 'settlement (stopnie)', standings);
   for (const place of places) {
     if (place.resident && !residentIds.has(place.resident)) errors.push(`settlement.json: miejsce ${place.id} ma nieznanego mieszkańca ${place.resident}`);
@@ -1299,9 +1299,15 @@ function checkSettlement(data, { rarities }) {
   if (stock.some((count, index) => index > 0 && count < stock[index - 1])) errors.push('settlement.json: herbalist.sell.stock nie może maleć ze stopniem');
   if (Math.max(...stock) > data.professions.herbs.length) errors.push('settlement.json: herbalist.sell.stock podaje więcej ziół, niż jest w grze');
   // The rare recipes of Alchemia she teaches (121 A, `taught` in
-  // professions.json): each from a standing that exists.
+  // professions.json): each from a standing that exists, reached in a
+  // relation with a resident or a reputation with a brotherhood that exist
+  // (teaching, 682 A and C).
   for (const potion of data.professions.potions) {
-    if (potion.taught && !standingIds.has(potion.taught)) errors.push(`professions.json: mikstura ${potion.id} ma nieznany stopień relacji "${potion.taught}" (taught)`);
+    if (potion.taught && !standingIds.has(potion.taught)) errors.push(`professions.json: mikstura ${potion.id} ma nieznany stopień "${potion.taught}" (taught)`);
+  }
+  for (const { kind, id } of data.settlement.herbalist.teaching) {
+    const known = kind === 'relation' ? residentIds : brotherhoodIds;
+    if (!known.has(id)) errors.push(`settlement.json: herbalist.teaching ma ${kind === 'relation' ? 'nieznanego mieszkańca' : 'nieznane bractwo'} ${id}`);
   }
   reforge.choices.forEach((step, index) => {
     if (!standingIds.has(step.from)) errors.push(`settlement.json: reforge.choices ma nieznany stopień ${step.from}`);

@@ -59,6 +59,7 @@ import {
   simulateHunt,
   spendFights,
   storeStacks,
+  taughtWords,
   threatSamples,
   unknownCreatures,
 } from '../engine/index.js';
@@ -779,6 +780,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // A faint brings the companions no relation either (faintForfeit).
   const credited = hunt.forfeit ? 0 : activity.minutes;
   const settlementAfter = settlementAfterHunt(row, trip && trip.roster[0].id !== row.id ? { ...hunt, companions: [] } : hunt, kept, credited);
+  // An event's reputation of the Bractwo Zielarzy may make Jagna teach rare
+  // recipes (682 A and C): the report tells them among its System's lines.
+  const taught = settlementAfter ? taughtWords(JSON.parse(row.settlement ?? '{}'), JSON.parse(settlementAfter), content) : null;
   // The potions taken along were set aside at the start (`reserved`): what
   // was not drunk comes back to the bag. An exploration started before that
   // takes the potions drunk from the bag, where they stayed.
@@ -833,6 +837,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
     ...(options.party && { party: options.party.names }),
     ...((options.skips ?? []).some((skip) => skip.id !== row.id) && { skips: options.skips.filter((skip) => skip.id !== row.id) }),
   };
+  if (taught) report.system = [...report.system, taught];
   const summary = {
     areaName: report.areaName,
     regionName: report.regionName,

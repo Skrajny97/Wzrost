@@ -2,9 +2,9 @@
 // potions in the Systemowa Pracownia, one recipe at a time, with no fights
 // and no risk. The profession's level shows the recipes and makes each potion
 // quicker; a few rare recipes the Osada's herbalist teaches besides, at a
-// standing of the relation with her (recipeTaught). The herbs for all the
-// potions are taken at the start, and the seed saved then decides which
-// potions come out twice. Stopped early, a brewing keeps the potions done
+// standing of the relation with her or of the reputation with her
+// brotherhood (recipeTaught). The herbs for all the potions are taken at the
+// start, and the seed saved then decides which potions come out twice. Stopped early, a brewing keeps the potions done
 // and gives back the herbs for the rest. Potions stack in the bag as herbs
 // do, and the work gives the character the little XP gathering gives
 // (professions.js).
@@ -14,25 +14,36 @@ import { countList, professionLevelLines, professionProgress } from './professio
 import { createRng } from './rng.js';
 import { say } from './text.js';
 
-// The standing of the relation with the herbalist from which she teaches a
-// rare recipe (121 A: "zaufanym zdradza rzadkie receptury"; `taught`), or
-// null for a recipe of the System.
+// The standing from which the herbalist teaches a rare recipe (121 A:
+// "zaufanym zdradza rzadkie receptury"; `taught`), or null for a recipe of
+// the System.
 export const recipeStanding = (potion, content) => (potion.taught ? (content.settlement?.standings.find((standing) => standing.id === potion.taught) ?? null) : null);
+
+// The points that count for the herbalist's rare recipes in a character's
+// Osada (`settlement`: its relations with the residents and its reputation
+// with the brotherhoods, as stored, { relations: { herbalist: 720 },
+// reputation: { herbalists: 300 } }): the most of those her `teaching`
+// lists, the relation with her and the reputation of the Bractwo Zielarzy
+// (682 A and C: whichever reaches a standing first). Relations and
+// reputation share the same standings.
+export function teachingPoints(settlement, content) {
+  const teaching = content.settlement?.herbalist?.teaching ?? [];
+  return Math.max(0, ...teaching.map(({ kind, id }) => (kind === 'relation' ? settlement?.relations : settlement?.reputation)?.[id] ?? 0));
+}
 
 // Whether the character may know a recipe beside its level: one of the
 // System always, a rare one once the herbalist has taught it, that is once
-// the relation with her has reached its standing (`relations`: the
-// character's relations with the Osada's residents, { herbalist: 720 }).
+// the points that count for it (teachingPoints) have reached its standing.
 // Brewing and drinking it still wait for its level, as with any recipe.
-export function recipeTaught(potion, relations, content) {
+export function recipeTaught(potion, settlement, content) {
   if (!potion.taught) return true;
   const standing = recipeStanding(potion, content);
-  return Boolean(standing) && (relations?.[content.settlement.herbalist.resident] ?? 0) >= standing.points;
+  return Boolean(standing) && teachingPoints(settlement, content) >= standing.points;
 }
 
 // The recipes the System shows at a level of the brewing profession, and of
 // the herbalist's rare ones those she has taught (recipeTaught).
-export const knownPotions = (level, content, relations = {}) => content.potions.filter((potion) => potion.level <= level && recipeTaught(potion, relations, content));
+export const knownPotions = (level, content, settlement = {}) => content.potions.filter((potion) => potion.level <= level && recipeTaught(potion, settlement, content));
 
 // The minutes of one potion at a level: each level takes speedPerLevel of
 // the first level's time off, down to `fastest` of it, and the Bractwo
@@ -89,12 +100,12 @@ export const potionPrice = (potion, content) =>
 // potions made, the lucky ones among them and those the full bag lost, the
 // profession's new levels with their stats and the recipes the System
 // revealed with them (of the herbalist's rare ones only those she has
-// taught, by the character's `relations`), and the character's XP.
+// taught, by the character's Osada, `settlement`), and the character's XP.
 // `stopped`: the player called the character back before the end.
-export function brewingReport({ potion, minutes, startedAt, endsAt, seed, made, stored, lost, stopped, before, after, character, xp, work, relations = {} }, content) {
+export function brewingReport({ potion, minutes, startedAt, endsAt, seed, made, stored, lost, stopped, before, after, character, xp, work, settlement = {} }, content) {
   const texts = content.brewing.texts;
   const profession = content.professionsById[content.brewing.profession];
-  const revealed = content.potions.filter((candidate) => candidate.level > before.level && candidate.level <= after.level && recipeTaught(candidate, relations, content));
+  const revealed = content.potions.filter((candidate) => candidate.level > before.level && candidate.level <= after.level && recipeTaught(candidate, settlement, content));
   const list = (count) => countList({ [potion.id]: count }, content.potionsById);
   const lostCount = lost[potion.id] ?? 0;
   return {

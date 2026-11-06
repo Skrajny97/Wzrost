@@ -55,10 +55,14 @@ export const herbsOf = (row) => JSON.parse(row.herbs ?? '{}');
 export const potionsOf = (row) => JSON.parse(row.potions ?? '{}');
 // The gems and ores of Górnictwo, by id, which take no room in the bag.
 export const mineralsOf = (row) => JSON.parse(row.minerals ?? '{}');
-// The character's relations with the Osada's residents, by id
-// ({ herbalist: 720 }); the one with the herbalist makes her teach rare
-// recipes (121 A).
-export const relationsOf = (row) => JSON.parse(row.settlement ?? '{}').relations ?? {};
+// The points of the character's relations with the Osada's residents and of
+// its reputation with the brotherhoods, by id, as the row keeps them
+// ({ relations: { herbalist: 720 }, reputation: { herbalists: 300 } }): the
+// herbalist teaches rare recipes by them (121 A, 682 A and C).
+export function settlementPointsOf(row) {
+  const { relations = {}, reputation = {} } = JSON.parse(row.settlement ?? '{}');
+  return { relations, reputation };
+}
 
 // A mineral's colour: a gem's rarity's, an ore's that of the first rarity
 // whose jewellery it sets.
@@ -107,12 +111,13 @@ function catalystView(potion, materials) {
 // Alchemia itself (the author: "Jeśli gracz w wyniku wymiany wejdzie w
 // posiadanie mikstury jakiejś przed odblokowaniem jej receptury albo w ogóle
 // nawet Profesji Alchemii to nie może jej użyć"). A rare recipe of the
-// herbalist's also waits for her to teach it (recipeTaught, 121 A).
+// herbalist's also waits for her to teach it (recipeTaught, 121 A: by the
+// relation with her or the reputation of the Bractwo Zielarzy).
 export function potionKnown(row, potion) {
   if (!professionsOn() || !isUnlocked('professions', row.level, content)) return false;
   const alchemy = content.professions.find((profession) => profession.id === content.brewing.profession);
   const { level } = professionState(JSON.parse(row.professions ?? '{}'), alchemy.id);
-  return professionOpen(alchemy, row.level, content) && potion.level <= level && (!potion.taught || recipeTaught(potion, relationsOf(row), content));
+  return professionOpen(alchemy, row.level, content) && potion.level <= level && (!potion.taught || recipeTaught(potion, settlementPointsOf(row), content));
 }
 
 // The potions the character carries whose recipes it knows.
@@ -160,10 +165,11 @@ export function bagPotions(row, sellBonus) {
 
 // What the Pracownia says under a hidden recipe: the level the System
 // shows it at, or for a rare one the herbalist has not taught yet, the
-// standing of the relation with her and the level (121 A).
-function recipeHint(potion, relations) {
+// standing (in the relation with her or the reputation of the Bractwo
+// Zielarzy) and the level (121 A). `settlement`: settlementPointsOf.
+function recipeHint(potion, settlement) {
   const { texts } = content.brewing;
-  if (recipeTaught(potion, relations, content)) return say(texts, 'hidden', 0, { level: potion.level });
+  if (recipeTaught(potion, settlement, content)) return say(texts, 'hidden', 0, { level: potion.level });
   return say(texts, 'herbalistHidden', 0, { standing: recipeStanding(potion, content).name, level: potion.level });
 }
 
@@ -189,7 +195,7 @@ export function professionsView(row) {
   const brewer = professionState(professions, brewing.profession);
   const crafter = professionState(professions, workshop.profession);
   const hidden = content.professionTexts.hidden;
-  const relations = relationsOf(row);
+  const settlement = settlementPointsOf(row);
   return {
     // The System's words at the top of the tab.
     intro: content.professionsIntro,
@@ -252,7 +258,7 @@ export function professionsView(row) {
       // A rare recipe of the herbalist's not taught yet is a shadow that
       // says at which standing with her and from which level it comes.
       recipes: content.potions.map((potion) =>
-        potion.level <= brewer.level && recipeTaught(potion, relations, content)
+        potion.level <= brewer.level && recipeTaught(potion, settlement, content)
           ? {
               id: potion.id,
               name: potion.name,
@@ -263,7 +269,7 @@ export function professionsView(row) {
               count: potions[potion.id] ?? 0,
               most: mostPotions(potion, brewer.level, herbs, content, perkOf(row, 'brewFaster')),
             }
-          : { id: potion.id, level: potion.level, hidden: true, hint: recipeHint(potion, relations) },
+          : { id: potion.id, level: potion.level, hidden: true, hint: recipeHint(potion, settlement) },
       ),
     },
     workshop: craftingOn() && professionOpen(content.professionsById[workshop.profession], row.level, content) ? workshopView(crafter.level, row) : null,

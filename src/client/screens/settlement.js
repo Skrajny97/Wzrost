@@ -165,8 +165,10 @@ export function mountSettlement(container, { params = {} } = {}) {
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           const answer = await call('POST', '/api/settlement/deliver', { orderId: order.id });
-          const { gold, systemPoints } = answer.delivered;
-          toast(`Zlecenie oddane: +${formatNumber(gold)} złota${systemPoints ? `, +${systemPoints} PS` : ''}.`);
+          // `taught`: the rare recipes Jagna teaches as the Bractwo
+          // Zielarzy's reputation reaches a standing (682 A and C).
+          const { gold, systemPoints, taught } = answer.delivered;
+          toast(`Zlecenie oddane: +${formatNumber(gold)} złota${systemPoints ? `, +${systemPoints} PS` : ''}.${taught ? ` ${taught}` : ''}`);
           apply(answer);
         }),
     });
