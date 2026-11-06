@@ -13,6 +13,7 @@ import { bestiaryReady, placeReady } from '../bestiary.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
+import { t } from '../i18n.js';
 import { systemPoints } from '../quests.js';
 import { playSound } from '../sound.js';
 import { call, state } from '../state.js';
@@ -28,7 +29,7 @@ const DEFAULT_TAB = 'items';
 const unfolded = new Map();
 
 const chestText = (chest) =>
-  [`+${formatNumber(chest.gold)} złota`, chest.timePoints > 0 && `+${timePoints(chest.timePoints)}`, chest.systemPoints > 0 && `+${systemPoints(chest.systemPoints)}`]
+  [t('+{gold} złota', { gold: formatNumber(chest.gold) }), chest.timePoints > 0 && `+${timePoints(chest.timePoints)}`, chest.systemPoints > 0 && `+${systemPoints(chest.systemPoints)}`]
     .filter(Boolean)
     .join(', ');
 
@@ -55,9 +56,9 @@ export function mountEncyclopedia(container, { params }) {
   let book = null;
   let gone = false;
   let tab = params.tab ?? DEFAULT_TAB;
-  const tabs = h('div', { class: 'segmented encyclopedia-tabs', role: 'group', 'aria-label': 'Zakładki Encyklopedii' });
-  const body = h('div', { class: 'encyclopedia' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
-  fill(container, pageHeading('Encyklopedia'), tabs, body);
+  const tabs = h('div', { class: 'segmented encyclopedia-tabs', role: 'group', 'aria-label': t('Zakładki Encyklopedii') });
+  const body = h('div', { class: 'encyclopedia' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
+  fill(container, pageHeading(t('Encyklopedia')), tabs, body);
 
   // The chests ready to open by the character's view, to fetch the book
   // again when one more waits.
@@ -95,7 +96,7 @@ export function mountEncyclopedia(container, { params }) {
           type: 'button',
           class: `segmented-option${ready.has(each.id) ? ' encyclopedia-tab--ready' : ''}`,
           'aria-pressed': each.id === tab,
-          'aria-label': ready.has(each.id) ? `${each.name}: skrzynia do odebrania` : null,
+          'aria-label': ready.has(each.id) ? t('{name}: skrzynia do odebrania', { name: each.name }) : null,
           text: each.name,
           // The tab changes here, without a new request; the address
           // keeps it for a reload.
@@ -130,16 +131,16 @@ export function mountEncyclopedia(container, { params }) {
     const status = entry.opened ? 'opened' : entry.ready ? 'ready' : 'locked';
     const open = async () => {
       if (entry.opened) {
-        toast('Ta skrzynia jest już otwarta.');
+        toast(t('Ta skrzynia jest już otwarta.'));
         return;
       }
       if (!entry.ready) {
-        toast(`${inside} (${entry.have} z ${entry.need}), a skrzynia się otworzy. W środku: ${chestText(entry.chest)}.`);
+        toast(t('{task} ({have} z {need}), a skrzynia się otworzy. W środku: {chest}.', { task: inside, have: entry.have, need: entry.need, chest: chestText(entry.chest) }));
         return;
       }
       const result = await call('POST', '/api/encyclopedia/chest', { id: entry.id });
       playSound('chest');
-      toast(`Skrzynia otwarta: ${chestText(result.chest)}.`);
+      toast(t('Skrzynia otwarta: {chest}.', { chest: chestText(result.chest) }));
       book = result.encyclopedia;
       render();
     };
@@ -148,11 +149,15 @@ export function mountEncyclopedia(container, { params }) {
       {
         type: 'button',
         class: `quest-chest quest-chest--${status} encyclopedia-chest`,
-        'aria-label': entry.opened ? 'Skrzynia otwarta' : entry.ready ? `Otwórz skrzynię: ${chestText(entry.chest)}` : `Skrzynia: ${chestText(entry.chest)}. ${entry.have} z ${entry.need}`,
+        'aria-label': entry.opened
+          ? t('Skrzynia otwarta')
+          : entry.ready
+            ? t('Otwórz skrzynię: {chest}', { chest: chestText(entry.chest) })
+            : t('Skrzynia: {chest}. {have} z {need}', { chest: chestText(entry.chest), have: entry.have, need: entry.need }),
         onClick: (event) => withButton(event.currentTarget, open),
       },
       h('span', { class: 'quest-chest-art', 'aria-hidden': 'true' }, materialSprite('chest') ?? icon('pouch', { size: 28 })),
-      h('span', { class: 'quest-chest-caption', text: entry.opened ? 'Otwarta' : entry.ready ? 'Otwórz' : `${entry.have}/${entry.need}` }),
+      h('span', { class: 'quest-chest-caption', text: entry.opened ? t('Otwarta') : entry.ready ? t('Otwórz') : `${entry.have}/${entry.need}` }),
     );
   }
 
@@ -167,7 +172,7 @@ export function mountEncyclopedia(container, { params }) {
           type: 'button',
           class: `slot slot--bag encyclopedia-tile${entry.found ? '' : ' encyclopedia-tile--unknown'}${entry.trophy?.won ? ' encyclopedia-tile--trophy' : ''}`,
           vars: color ? { '--rarity': color } : {},
-          'aria-label': entry.found ? entry.name : 'Nieodkryte',
+          'aria-label': entry.found ? entry.name : t('Nieodkryte'),
           onClick: () => entrySheet(kind, entry, color),
         },
         ART[kind](entry),
@@ -198,19 +203,21 @@ export function mountEncyclopedia(container, { params }) {
   }
 
   const summary = (part, extra) =>
-    h('p', { class: 'encyclopedia-summary' }, h('strong', { text: `Odkryte: ${formatNumber(part.found)} z ${formatNumber(part.all)}` }), extra && ` · ${extra}`);
+    h('p', { class: 'encyclopedia-summary' }, h('strong', { text: t('Odkryte: {found} z {all}', { found: formatNumber(part.found), all: formatNumber(part.all) }) }), extra && ` · ${extra}`);
 
   // The chests of a tab's counts in one row, above its tiers.
   const countChests = (kind, chests) =>
     chests.length > 0 &&
     h(
       'section',
-      { class: `card encyclopedia-counts${chests.some((entry) => entry.ready) ? ' encyclopedia-ready' : ''}`, 'aria-label': 'Skrzynie za odkrycia' },
-      h('h2', { class: 'card-title', text: 'Skrzynie za odkrycia' }),
+      { class: `card encyclopedia-counts${chests.some((entry) => entry.ready) ? ' encyclopedia-ready' : ''}`, 'aria-label': t('Skrzynie za odkrycia') },
+      h('h2', { class: 'card-title', text: t('Skrzynie za odkrycia') }),
       h(
         'ul',
         { class: 'encyclopedia-count-list' },
-        chests.map((entry) => h('li', { class: 'encyclopedia-count' }, chestButton(entry, `Odkryj ${COUNTS[kind](entry.need)}`), h('span', { class: 'muted', text: COUNTS[kind](entry.need) }))),
+        chests.map((entry) =>
+          h('li', { class: 'encyclopedia-count' }, chestButton(entry, t('Odkryj {count}', { count: COUNTS[kind](entry.need) })), h('span', { class: 'muted', text: COUNTS[kind](entry.need) })),
+        ),
       ),
     );
 
@@ -234,12 +241,15 @@ export function mountEncyclopedia(container, { params }) {
   }
 
   // The gold dot of a folded heading whose chest waits.
-  const headDot = (ready) => ready && [h('span', { class: 'encyclopedia-dot', 'aria-hidden': 'true' }), h('span', { class: 'visually-hidden', text: 'Skrzynia do odebrania' })];
+  const headDot = (ready) => ready && [h('span', { class: 'encyclopedia-dot', 'aria-hidden': 'true' }), h('span', { class: 'visually-hidden', text: t('Skrzynia do odebrania') })];
 
-  // A tier's heading with how much of it is discovered.
+  // A tier's heading with how much of it is discovered: "3 z 22", the
+  // number apart from "z 22", as a key of nothing but "{found} z {all}"
+  // would match any message with " z " that the server translates by its
+  // shape (translateMessage, src/server/i18n.js).
   const tierHead = (tier, ready) => [
     h('h2', { class: 'section-title encyclopedia-tier' }, `${tier.name} `, h('span', { class: 'muted', text: `· ${tier.range}` })),
-    h('span', { class: 'encyclopedia-fold-count', text: `${tier.entries.filter((entry) => entry.found).length} z ${tier.entries.length}` }),
+    h('span', { class: 'encyclopedia-fold-count', text: `${tier.entries.filter((entry) => entry.found).length} ${t('z {max}', { max: tier.entries.length })}` }),
     headDot(ready),
   ];
 
@@ -273,7 +283,7 @@ export function mountEncyclopedia(container, { params }) {
                   onUnfold: (event) => event.currentTarget.closest('details')?.setAttribute('open', ''),
                 }),
               },
-              h('div', { class: 'encyclopedia-set-head' }, h('h3', { class: 'card-title', text: set.name }), chestButton(set, 'Zdobądź wszystkie przedmioty zestawu')),
+              h('div', { class: 'encyclopedia-set-head' }, h('h3', { class: 'card-title', text: set.name }), chestButton(set, t('Zdobądź wszystkie przedmioty zestawu'))),
               h(
                 'ul',
                 { class: 'bag-grid' },
@@ -305,7 +315,7 @@ export function mountEncyclopedia(container, { params }) {
   function materialsTab() {
     const part = book.materials;
     return [
-      summary(part, `Trofea: ${formatNumber(part.trophies)}`),
+      summary(part, t('Trofea: {count}', { count: formatNumber(part.trophies) })),
       countChests('materials', part.chests),
       part.tiers.map((tier) =>
         tierSection(
@@ -328,8 +338,10 @@ export function mountEncyclopedia(container, { params }) {
   // The Bestiariusz of every land and its inner regions, as at the Walka.
   function bestiaryTab() {
     const met = new Set(state.character.met ?? []);
-    const known = (place) => `${place.dangers.filter((danger) => met.has(danger.monsterId)).length} z ${place.dangers.length}`;
+    const known = (place) => ({ found: place.dangers.filter((danger) => met.has(danger.monsterId)).length, all: place.dangers.length });
     const ready = (place) => placeReady(place, state.character);
+    // A place's levels: "poz. 1–10".
+    const levels = (place) => t('poz. {min}–{max}', { min: place.minLevel, max: place.maxLevel });
     const { level } = state.character;
     // The land of the character's level, or one with a chest to open,
     // starts unfolded.
@@ -339,13 +351,13 @@ export function mountEncyclopedia(container, { params }) {
         `bestiary:${region.id}`,
         waiting || (level >= region.minLevel && level <= region.maxLevel),
         `card encyclopedia-land${waiting ? ' encyclopedia-ready' : ''}`,
-        [h('h2', { class: 'card-title' }, region.name, h('span', { class: 'muted', text: ` · poz. ${region.minLevel}–${region.maxLevel}` })), headDot(waiting)],
-        region.dangers?.length > 0 && [h('p', { class: 'muted', text: `Cała kraina, poznane stwory: ${known(region)}` }), bestiaryRow(region, true)],
+        [h('h2', { class: 'card-title' }, region.name, h('span', { class: 'muted', text: ` · ${levels(region)}` })), headDot(waiting)],
+        region.dangers?.length > 0 && [h('p', { class: 'muted', text: t('Cała kraina, poznane stwory: {found} z {all}', known(region)) }), bestiaryRow(region, true)],
         region.areas.map((area) =>
           h(
             'div',
             { class: `encyclopedia-area${ready(area) ? ' encyclopedia-ready' : ''}` },
-            h('p', { class: 'encyclopedia-area-name', text: `${area.name} · poz. ${area.minLevel}–${area.maxLevel}` }),
+            h('p', { class: 'encyclopedia-area-name', text: `${area.name} · ${levels(area)}` }),
             bestiaryRow(area),
           ),
         ),

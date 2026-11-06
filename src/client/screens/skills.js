@@ -15,6 +15,7 @@
 
 import { fill, h } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
+import { t } from '../i18n.js';
 import { skillSprite } from '../art.js';
 import { motionOn } from '../motion.js';
 import { buildLocked, buildLockedText, call, isUnlocked, state, unlockInfo } from '../state.js';
@@ -30,19 +31,20 @@ const skillIcon = (skill, size = 'large') =>
     skillSprite(skill.id) ?? (skill.from && skillSprite(skill.from)) ?? h('span', { class: 'skill-letter', text: skill.name[0] }),
   );
 
-const levelText = (skill) => `Poziom ${skill.level} / ${skill.maxLevel}`;
+const levelText = (skill) => t('Poziom {level} / {max}', { level: skill.level, max: skill.maxLevel });
 // How many points the card's second button adds at once.
 const RAISE_MANY = 10;
 const skillPoints = (count) => countOf(count, 'Punkt Umiejętności', 'Punkty Umiejętności', 'Punktów Umiejętności');
 
-// What stands before a path's name, by its state (skillsView).
+// What stands before a path's name, by its state (skillsView), in Polish
+// and shown in the page's language (t(), i18n.js).
 const PATH_LABELS = { main: 'Ścieżka główna', second: 'Ścieżka poboczna', closed: 'Ścieżka zamknięta' };
 
 // The main path on top, the side path under it, the paths still open in
 // their order, and a closed one at the bottom.
 const PATH_ORDER = { main: 0, second: 1, closed: 3 };
 
-// What the class waits for at an evolution level, by the reason's code.
+// What the class waits for at an evolution level, by the reason's code (t()).
 const WAITS_FOR = { second_path: 'wybierzesz ścieżkę poboczną', skill_points: 'rozdasz Punkty Umiejętności', evolve: 'w zakładce Ewolucja wybierzesz ewolucję' };
 
 export function mountSkills(container) {
@@ -52,14 +54,14 @@ export function mountSkills(container) {
     const heading = h(
       'div',
       { class: 'title-row' },
-      h('h1', { class: 'page-title', tabindex: '-1', text: 'Umiejętności' }),
+      h('h1', { class: 'page-title', tabindex: '-1', text: t('Umiejętności') }),
       view &&
         isUnlocked('skills') &&
-        h('span', { class: `badge badge--system badge--tall${view.points > 0 ? ' badge--ready' : ''}`, 'data-guide': 'skills-points', text: `PUNKTY: ${formatNumber(view.points)}` }),
+        h('span', { class: `badge badge--system badge--tall${view.points > 0 ? ' badge--ready' : ''}`, 'data-guide': 'skills-points', text: t('PUNKTY: {count}', { count: formatNumber(view.points) }) }),
     );
     if (!view || !isUnlocked('skills')) {
       const unlock = unlockInfo('skills');
-      fill(container, heading, systemPanel(`Umiejętności odblokujesz na poziomie klasy ${unlock.classLevel}. Twój poziom klasy: ${character.classLevel}.`));
+      fill(container, heading, systemPanel(t('Umiejętności odblokujesz na poziomie klasy {level}. Twój poziom klasy: {own}.', { level: unlock.classLevel, own: character.classLevel })));
       return;
     }
     // Only an exploration counts its fights with the skills (hunts.js), and
@@ -72,9 +74,11 @@ export function mountSkills(container) {
       container,
       heading,
       waiting &&
-        systemPanel(`Klasa czeka na ${evolution.level}. poziomie, u progu ewolucji. Urośnie dalej, gdy ${WAITS_FOR[evolution.need]}. Zdobyte XP klasy nie przepada.`),
-      busy && systemPanel(buildLockedText(character, 'Umiejętności zmienisz')),
-      evolution.need === 'evolve' && character.classLevel >= evolution.level && h('a', { class: 'button button--system', href: '#/postac/ewolucja', text: 'Przejdź do Ewolucji' }),
+        systemPanel(
+          t('Klasa czeka na {level}. poziomie, u progu ewolucji. Urośnie dalej, gdy {need}. Zdobyte XP klasy nie przepada.', { level: evolution.level, need: t(WAITS_FOR[evolution.need]) }),
+        ),
+      busy && systemPanel(buildLockedText(character, t('Umiejętności zmienisz'))),
+      evolution.need === 'evolve' && character.classLevel >= evolution.level && h('a', { class: 'button button--system', href: '#/postac/ewolucja', text: t('Przejdź do Ewolucji') }),
       view.pools.map((pool) => (pool.evolution ? evolutionPool(pool, view, busy) : poolSection(pool, view, busy))),
     );
     slidePaths(before);
@@ -85,13 +89,15 @@ export function mountSkills(container) {
     const raisable = pool.options.some((skill) => skill.level < skill.maxLevel);
     return h(
       'section',
-      { class: 'skill-paths', 'aria-label': 'Umiejętności ewolucji' },
-      view.points > 0 && raisable && systemPanel(`Masz ${skillPoints(view.points)}. Wybierz umiejętność ewolucji, żeby dodać punkt. Każdy poziom klasy do ${view.lastPointLevel}. daje jeden.`),
+      { class: 'skill-paths', 'aria-label': t('Umiejętności ewolucji') },
+      view.points > 0 &&
+        raisable &&
+        systemPanel(t('Masz {points}. Wybierz umiejętność ewolucji, żeby dodać punkt. Każdy poziom klasy do {level}. daje jeden.', { points: skillPoints(view.points), level: view.lastPointLevel })),
       pool.options.map((skill) =>
         h(
           'section',
-          { class: `skill-path skill-path--${skill.state}`, 'data-skill': skill.id, 'aria-label': `Umiejętność ewolucji: ${skill.name}` },
-          h('h2', { class: 'skill-path-title' }, h('span', { class: 'skill-path-label', text: 'Umiejętność ewolucji' }), h('span', { class: 'skill-path-name', text: skill.path })),
+          { class: `skill-path skill-path--${skill.state}`, 'data-skill': skill.id, 'aria-label': t('Umiejętność ewolucji: {name}', { name: skill.name }) },
+          h('h2', { class: 'skill-path-title' }, h('span', { class: 'skill-path-label', text: t('Umiejętność ewolucji') }), h('span', { class: 'skill-path-name', text: skill.path })),
           learnedRow(skill, view, busy),
         ),
       ),
@@ -115,7 +121,7 @@ export function mountSkills(container) {
   // A milestone's three paths, each with its name over its skill.
   function poolSection(pool, view, busy) {
     if (!pool.open) {
-      return h('section', { class: 'card skills-locked' }, h('p', { class: 'muted', text: `Kolejny wybór umiejętności: od poziomu klasy ${pool.classLevel}.` }));
+      return h('section', { class: 'card skills-locked' }, h('p', { class: 'muted', text: t('Kolejny wybór umiejętności: od poziomu klasy {level}.', { level: pool.classLevel }) }));
     }
     const known = pool.chosen.length;
     const raisable = pool.options.some((skill) => skill.level > 0 && skill.level < skill.maxLevel);
@@ -123,19 +129,25 @@ export function mountSkills(container) {
     const secondNow = secondOpen && state.character.classLevel >= view.secondLevel;
     const intro =
       known === 0
-        ? `Od ${pool.classLevel}. poziomu wzrost poziomu klasy pozwala Ci uzyskać 1 Punkt Umiejętności. Każda umiejętność otwiera jedną ze ścieżek rozwoju. Ale ostrożnie! Możesz otworzyć tylko dwie ścieżki – a one będą miały istotny wpływ na Twoje dalsze losy.`
+        ? t(
+            'Od {level}. poziomu wzrost poziomu klasy pozwala Ci uzyskać 1 Punkt Umiejętności. Każda umiejętność otwiera jedną ze ścieżek rozwoju. Ale ostrożnie! Możesz otworzyć tylko dwie ścieżki – a one będą miały istotny wpływ na Twoje dalsze losy.',
+            { level: pool.classLevel },
+          )
         : secondNow && view.points > 0
-          ? `Masz ${skillPoints(view.points)}. Dodaj punkt do znanej umiejętności albo wybierz ścieżkę poboczną. Ostatnia ścieżka się wtedy zamknie.`
+          ? t('Masz {points}. Dodaj punkt do znanej umiejętności albo wybierz ścieżkę poboczną. Ostatnia ścieżka się wtedy zamknie.', { points: skillPoints(view.points) })
           : secondNow
-            ? 'Ścieżkę poboczną wybierzesz za 1 Punkt Umiejętności, a każdy poziom klasy daje jeden. Ostatnia ścieżka się wtedy zamknie.'
+            ? t('Ścieżkę poboczną wybierzesz za 1 Punkt Umiejętności, a każdy poziom klasy daje jeden. Ostatnia ścieżka się wtedy zamknie.')
             : secondOpen
-              ? `Ścieżkę poboczną dobierzesz od poziomu klasy ${view.secondLevel} za 1 Punkt Umiejętności. Wtedy ostatnia ścieżka się zamknie.`
+              ? t('Ścieżkę poboczną dobierzesz od poziomu klasy {level} za 1 Punkt Umiejętności. Wtedy ostatnia ścieżka się zamknie.', { level: view.secondLevel })
               : null;
     // The deadline, while the second path is open and the class not yet
     // waiting for it.
     const evolutionLevel = view.evolution?.level;
     const deadline =
-      secondOpen && evolutionLevel && state.character.classLevel < evolutionLevel && `Ścieżkę poboczną wybierz najpóźniej na ${evolutionLevel}. poziomie klasy, przed ewolucją.`;
+      secondOpen &&
+      evolutionLevel &&
+      state.character.classLevel < evolutionLevel &&
+      t('Ścieżkę poboczną wybierz najpóźniej na {level}. poziomie klasy, przed ewolucją.', { level: evolutionLevel });
     // Points to spend, told unless the line above already tells them.
     const pointsNote = known > 0 && view.points > 0 && raisable && !(secondNow && view.points > 0);
     const panel = intro && systemPanel(deadline ? `${intro} ${deadline}` : intro);
@@ -143,9 +155,9 @@ export function mountSkills(container) {
     if (panel && known === 0) panel.dataset.guide = 'skills-intro';
     return h(
       'section',
-      { class: 'skill-paths', 'aria-label': 'Ścieżki rozwoju' },
+      { class: 'skill-paths', 'aria-label': t('Ścieżki rozwoju') },
       panel,
-      pointsNote && systemPanel(`Masz ${skillPoints(view.points)}. Wybierz umiejętność, żeby dodać punkt.`),
+      pointsNote && systemPanel(t('Masz {points}. Wybierz umiejętność, żeby dodać punkt.', { points: skillPoints(view.points) })),
       [...pool.options].sort((a, b) => (PATH_ORDER[a.state] ?? 2) - (PATH_ORDER[b.state] ?? 2)).map((skill) => pathSection(skill, pool, view, busy)),
     );
   }
@@ -154,11 +166,11 @@ export function mountSkills(container) {
     const learned = skill.state === 'main' || skill.state === 'second';
     return h(
       'section',
-      { class: `skill-path skill-path--${skill.state}`, 'data-skill': skill.id, 'data-guide': 'skills-path', 'aria-label': `${PATH_LABELS[skill.state] ?? 'Ścieżka'}: ${skill.path}` },
+      { class: `skill-path skill-path--${skill.state}`, 'data-skill': skill.id, 'data-guide': 'skills-path', 'aria-label': `${t(PATH_LABELS[skill.state] ?? 'Ścieżka')}: ${skill.path}` },
       h(
         'h2',
         { class: 'skill-path-title' },
-        h('span', { class: 'skill-path-label', text: PATH_LABELS[skill.state] ?? 'Ścieżka' }),
+        h('span', { class: 'skill-path-label', text: t(PATH_LABELS[skill.state] ?? 'Ścieżka') }),
         h('span', { class: 'skill-path-name', text: skill.path }),
       ),
       learned ? learnedRow(skill, view, busy) : skill.state === 'closed' ? closedRow(skill) : choiceCard(skill, pool, view, busy),
@@ -172,11 +184,11 @@ export function mountSkills(container) {
     const label =
       skill.state === 'pick'
         ? second
-          ? 'Wybierz jako poboczną · 1 punkt'
-          : 'Wybierz · 1 punkt'
+          ? t('Wybierz jako poboczną · 1 punkt')
+          : t('Wybierz · 1 punkt')
         : skill.state === 'soon'
-          ? `Od poziomu klasy ${view.secondLevel}`
-          : 'Potrzebny 1 Punkt Umiejętności';
+          ? t('Od poziomu klasy {level}', { level: view.secondLevel })
+          : t('Potrzebny 1 Punkt Umiejętności');
     return h(
       'article',
       { class: 'card skill-card', 'aria-label': skill.name },
@@ -201,20 +213,26 @@ export function mountSkills(container) {
     const sure = await confirmAction(
       second
         ? {
-            title: `Ścieżka poboczna: ${skill.path}?`,
-            text: `${skill.name} kosztuje 1 Punkt Umiejętności. Ścieżka ${left?.path ?? ''} zamknie się na stałe.`,
-            confirmLabel: 'Wybieram',
+            title: t('Ścieżka poboczna: {path}?', { path: skill.path }),
+            text: t('{skill} kosztuje 1 Punkt Umiejętności. Ścieżka {path} zamknie się na stałe.', { skill: skill.name, path: left?.path ?? '' }),
+            confirmLabel: t('Wybieram'),
           }
         : {
-            title: `Ścieżka główna: ${skill.path}?`,
-            text: `${skill.name} kosztuje 1 Punkt Umiejętności. To wybór na stałe. ${state.character.classLevel >= secondLevel ? 'Ścieżkę poboczną możesz dobrać od razu, za kolejny Punkt Umiejętności.' : `Ścieżkę poboczną dobierzesz od poziomu klasy ${secondLevel}.`}`,
-            confirmLabel: 'Wybieram',
+            title: t('Ścieżka główna: {path}?', { path: skill.path }),
+            text: t('{skill} kosztuje 1 Punkt Umiejętności. To wybór na stałe. {then}', {
+              skill: skill.name,
+              then:
+                state.character.classLevel >= secondLevel
+                  ? t('Ścieżkę poboczną możesz dobrać od razu, za kolejny Punkt Umiejętności.')
+                  : t('Ścieżkę poboczną dobierzesz od poziomu klasy {level}.', { level: secondLevel }),
+            }),
+            confirmLabel: t('Wybieram'),
           },
     );
     if (!sure) return;
     await withButton(button, async () => {
       await call('POST', '/api/skills/learn', { skillId: skill.id });
-      toast(`Nowa umiejętność: ${skill.name}. Ścieżka: ${skill.path}.`);
+      toast(t('Nowa umiejętność: {skill}. Ścieżka: {path}.', { skill: skill.name, path: skill.path }));
     });
   }
 
@@ -260,20 +278,23 @@ export function mountSkills(container) {
             openCard(skillId, buildLocked(state.character));
           }),
       });
-    const raise = raiseButton(1, 'Dodaj punkt');
-    const raiseTen = view.points >= RAISE_MANY && skill.maxLevel - skill.level >= RAISE_MANY && raiseButton(RAISE_MANY, `Dodaj ${RAISE_MANY} Punktów`);
+    const raise = raiseButton(1, t('Dodaj punkt'));
+    const raiseTen = view.points >= RAISE_MANY && skill.maxLevel - skill.level >= RAISE_MANY && raiseButton(RAISE_MANY, t('Dodaj {count} Punktów', { count: RAISE_MANY }));
     openSheet(
       h('div', { class: 'skill-head' }, skillIcon(skill), h('div', {}, h('h2', { class: 'sheet-title', text: skill.name }), h('p', { class: 'skill-style', text: `${skill.style} · ${levelText(skill)}` }))),
       h('p', { class: 'skill-description', text: skill.description }),
-      h('h3', { class: 'skill-subtitle', text: skill.level > 0 ? 'Teraz' : 'Na poziomie 1' }),
+      h('h3', { class: 'skill-subtitle', text: skill.level > 0 ? t('Teraz') : t('Na poziomie {level}', { level: 1 }) }),
       h('p', { class: 'skill-effect', text: skill.effect }),
-      skill.next && h('h3', { class: 'skill-subtitle', text: `Na poziomie ${skill.level + 1}` }),
+      skill.next && h('h3', { class: 'skill-subtitle', text: t('Na poziomie {level}', { level: skill.level + 1 }) }),
       skill.next && h('p', { class: 'skill-effect skill-effect--next', text: skill.next }),
       h('p', { class: 'skill-cost', text: skill.cost }),
-      h('p', { class: 'muted', text: `Punkty Umiejętności: ${formatNumber(view.points)}. Każdy poziom klasy do ${view.lastPointLevel}. daje jeden.` }),
-      h('p', { class: 'muted', text: state.character.evolution?.current ? `Umiejętność ewolucji: ${skill.path}.` : `Ścieżka: ${skill.path}. Zdecyduje o ewolucji klasy.` }),
+      h('p', { class: 'muted', text: t('Punkty Umiejętności: {count}. Każdy poziom klasy do {level}. daje jeden.', { count: formatNumber(view.points), level: view.lastPointLevel }) }),
+      h('p', {
+        class: 'muted',
+        text: state.character.evolution?.current ? t('Umiejętność ewolucji: {path}.', { path: skill.path }) : t('Ścieżka: {path}. Zdecyduje o ewolucji klasy.', { path: skill.path }),
+      }),
       raiseTen && h('div', { class: 'sheet-actions' }, raiseTen),
-      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: closeSheet, text: 'Zamknij' }), raise),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: closeSheet, text: t('Zamknij') }), raise),
     );
   }
 
