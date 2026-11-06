@@ -3040,11 +3040,12 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 
 ## Odpowiedź autora 715 (6.11.2026)
 
-Autor: „715 wszystko OK, wdrażaj angielski bez pytania bo i tak nie chce mi sie tego sprawdzać, na żywo w grze jak coś wyjdzie to się będzie poprawiać i wszystkimi innymi nagraniami kwestii narratora”.
+Autor: „715 wszystko OK, wdrażaj angielski bez pytania bo i tak nie chce mi sie tego sprawdzać, na żywo w grze jak coś wyjdzie to się będzie poprawiać”. Potem o nagraniach: „A co z nagraniami kwestii Samouczka po angielsku?” i „i wszystkimi innymi nagraniami kwestii narratora”.
 
 1. **715 OK.** Wszystkie 65 angielskich kwestii narratora z etapu 4 zostają w brzmieniu z `data/en/tutorial.json`.
 2. **Angielski idzie do gry** bez dalszego sprawdzania przez autora (0.1.97). Błędy poprawia się, gdy wyjdą w grze.
-3. **Angielskie nagrania narratora** (wszystkie kwestie: 709, 712 i 715) wchodzą do gry bez strony odsłuchu, tym samym głosem co po polsku (696 A), przycięte jak zawsze. Reguła trafiła do CLAUDE.md.
+3. **Angielskie teksty** idą odtąd do gry bez zatwierdzania (reguła w CLAUDE.md). **Angielskie nagrania narratora** obejmą wszystkie kwestie (709, 712 i 715, razem 143 nagrania z wersjami na komputer), tym samym głosem co po polsku (696 A); autor sprawdza je jak polskie, na stronie odsłuchu z „Akceptuj” i „Odrzuć”.
+4. **Kredyty ElevenLabs:** jedna wersja każdego z 143 nagrań to 19 300 kredytów, a na koncie jest 3 619 z 40 000 (odnowienie 24.11.2026, 13:00). Samo wprowadzenie to 45 nagrań i 6 034 kredyty. Pytanie 716 do autora: dokupić czy czekać.
 
 ## Angielski w grze (6.11.2026, od 0.1.97)
 
