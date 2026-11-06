@@ -61,6 +61,7 @@ import {
   takeConversation,
   takeMention,
 } from '../chat-news.js';
+import { t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
 import { appendMention, matchingPeople, taggedParts, typedMention, withMention } from '../mentions.js';
 import { openProfile } from '../profile.js';
@@ -102,12 +103,18 @@ const hasLink = (message) => message.role === 'admin' && /https?:\/\//i.test(mes
 // The most messages the page keeps; older ones leave from the top.
 const SHOWN = 200;
 
-// The guild's channel among the chat's tabs (chat.js resolves it).
-const GUILD = { id: 'guild', name: 'Gildia' };
+// The guild's channel among the chat's tabs (chat.js resolves it), its
+// name in the page's language.
+const GUILD = {
+  id: 'guild',
+  get name() {
+    return t('Gildia');
+  },
+};
 
 // A silence "na stałe" (chat.js).
 const FOREVER = 8.64e15;
-const untilText = (until) => (until >= FOREVER ? 'na stałe' : `do ${dateTimeFormat.format(new Date(until))}`);
+const untilText = (until) => (until >= FOREVER ? t('na stałe') : t('do {time}', { time: dateTimeFormat.format(new Date(until)) }));
 
 const SECTION_KEY = 'insight-community-section';
 // The part whose tab opens the Gildia's own page (screens/guild.js).
@@ -136,7 +143,7 @@ export function mountCommunity(container, context) {
   const body = h('div', { class: 'community-body' });
   const picker = sectionPicker(sections, () => current, show);
   const trade = h('div', { class: 'community-trade' }, tradeBanner());
-  fill(container, pageHeading('Społeczność'), picker.element, trade, body);
+  fill(container, pageHeading(t('Społeczność')), picker.element, trade, body);
 
   // The list stays under the top bar while the page scrolls, so it is at
   // hand under a long chat too (styles.css).
@@ -218,13 +225,13 @@ function firstSection(sections) {
 // cannot be picked yet.
 function sectionPicker(sections, current, choose) {
   // The row the narrator's Społeczność chapter points at (narrator.js).
-  const tabs = h('div', { class: 'community-tabs', role: 'tablist', 'aria-label': 'Części Społeczności', 'data-guide': 'community-tabs' });
+  const tabs = h('div', { class: 'community-tabs', role: 'tablist', 'aria-label': t('Części Społeczności'), 'data-guide': 'community-tabs' });
   const bell = h('button', {
     type: 'button',
     class: 'community-bell',
     onClick: () => {
       setChatMuted(!chatMuted());
-      toast(chatMuted() ? 'Powiadomienia czatu wyciszone: nowe wiadomości nie zapalą kropki na Społeczności.' : 'Powiadomienia czatu włączone.');
+      toast(chatMuted() ? t('Powiadomienia czatu wyciszone: nowe wiadomości nie zapalą kropki na Społeczności.') : t('Powiadomienia czatu włączone.'));
       render();
     },
   });
@@ -234,8 +241,8 @@ function sectionPicker(sections, current, choose) {
   const label = (section) => [
     icon(SECTION_ICONS[section.id] ?? 'unknown', { size: 20, className: 'community-icon' }),
     h('span', { class: 'community-name', text: section.name }),
-    SECTION_NEWS[section.id]?.() && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'nowe' }),
-    section.soon && h('span', { class: 'community-soon', text: 'Wkrótce' }),
+    SECTION_NEWS[section.id]?.() && h('span', { class: 'community-dot', role: 'img', 'aria-label': t('nowe') }),
+    section.soon && h('span', { class: 'community-soon', text: t('Wkrótce') }),
   ];
 
   function render() {
@@ -267,8 +274,8 @@ function sectionPicker(sections, current, choose) {
     const muted = chatMuted();
     bell.hidden = shown.id !== 'chat';
     bell.setAttribute('aria-pressed', String(muted));
-    bell.setAttribute('aria-label', 'Wycisz powiadomienia czatu');
-    bell.title = muted ? 'Powiadomienia czatu wyciszone' : 'Powiadomienia czatu włączone';
+    bell.setAttribute('aria-label', t('Wycisz powiadomienia czatu'));
+    bell.title = muted ? t('Powiadomienia czatu wyciszone') : t('Powiadomienia czatu włączone');
     fill(bell, icon(muted ? 'bell-off' : 'bell', { size: 20 }));
   }
 
@@ -313,9 +320,9 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   let gone = false;
 
   const notices = h('div', { class: 'chat-notices' });
-  const list = h('ol', { class: 'chat-list', 'aria-label': 'Wiadomości' });
-  const empty = h('p', { class: 'muted chat-empty', text: 'Wczytywanie…' });
-  const placeholder = () => (talk ? `Do postaci ${talk.name}…` : channel.items ? 'Napisz ofertę…' : 'Napisz wiadomość…');
+  const list = h('ol', { class: 'chat-list', 'aria-label': t('Wiadomości') });
+  const empty = h('p', { class: 'muted chat-empty', text: t('Wczytywanie…') });
+  const placeholder = () => (talk ? t('Do postaci {name}…', { name: talk.name }) : channel.items ? t('Napisz ofertę…') : t('Napisz wiadomość…'));
   // The admin writes links too, their addresses beyond the length shown.
   const admin = Boolean(state.user?.author);
   const text = h('input', {
@@ -325,12 +332,12 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     autocomplete: 'off',
     enterkeyhint: 'send',
     placeholder: placeholder(),
-    'aria-label': 'Wiadomość',
+    'aria-label': t('Wiadomość'),
   });
-  const sendButton = h('button', { type: 'submit', class: 'button button--system chat-send', text: 'Wyślij' });
+  const sendButton = h('button', { type: 'submit', class: 'button button--system chat-send', text: t('Wyślij') });
   const attachButton = h(
     'button',
-    { type: 'button', class: 'icon-button chat-attach', 'aria-label': 'Pokaż przedmioty z plecaka', onClick: pickItems },
+    { type: 'button', class: 'icon-button chat-attach', 'aria-label': t('Pokaż przedmioty z plecaka'), onClick: pickItems },
     icon('pouch', { size: 20 }),
   );
   // "Dodaj link", the admin's alone: a label and an address, put into the
@@ -369,12 +376,12 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
         h('p', { class: 'sheet-text', text: words.lead }),
         field(label, words.label),
         field(address, words.url),
-        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }), insert),
+        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), insert),
       ),
     );
     label.focus();
   }
-  const attachedList = h('ul', { class: 'chat-attached', 'aria-label': 'Przedmioty w wiadomości' });
+  const attachedList = h('ul', { class: 'chat-attached', 'aria-label': t('Przedmioty w wiadomości') });
   // The names "@" suggests, over the line (see suggest below).
   const suggestions = h('ul', { class: 'chat-mentions', id: `${id}-mentions`, role: 'listbox', 'aria-label': tagWords.suggestions, hidden: true });
   const form = h(
@@ -536,7 +543,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
             {
               type: 'button',
               class: 'chat-attached-drop',
-              'aria-label': `Bez przedmiotu ${item.name}`,
+              'aria-label': t('Bez przedmiotu {name}', { name: item.name }),
               onClick: () => {
                 attached = attached.filter((other) => other.id !== item.id);
                 renderAttached();
@@ -556,7 +563,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     const picked = new Set(attached.map((item) => item.id).filter((id) => bag.some((item) => item.id === id)));
     const count = h('p', { class: 'muted' });
     const showCount = () => {
-      count.textContent = `Wybrane: ${picked.size} z ${chat.itemsMax}.`;
+      count.textContent = t('Wybrane: {count} z {max}.', { count: picked.size, max: chat.itemsMax });
     };
     showCount();
     const rows = bag.map((item) => {
@@ -569,7 +576,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
           onClick: () => {
             if (picked.has(item.id)) picked.delete(item.id);
             else if (picked.size >= chat.itemsMax) {
-              toast(`Jedna wiadomość pokaże najwyżej ${chat.itemsMax} przedmioty.`);
+              toast(t('Jedna wiadomość pokaże najwyżej {count} przedmioty.', { count: chat.itemsMax }));
               return;
             } else picked.add(item.id);
             row.setAttribute('aria-pressed', String(picked.has(item.id)));
@@ -582,17 +589,17 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
       return h('li', {}, row);
     });
     openSheet(
-      h('h2', { class: 'sheet-title chat-sheet', text: 'Przedmioty do oferty' }),
-      h('p', { class: 'sheet-text', text: 'Wiadomość pokaże je wszystkim w Wymianie, tak jak wyglądają teraz. Same przedmioty zostają w plecaku.' }),
-      bag.length === 0 ? h('p', { class: 'muted', text: 'W plecaku nie ma przedmiotów. Założonych nie pokażesz.' }) : [count, h('ul', { class: 'item-list' }, rows)],
+      h('h2', { class: 'sheet-title chat-sheet', text: t('Przedmioty do oferty') }),
+      h('p', { class: 'sheet-text', text: t('Wiadomość pokaże je wszystkim w Wymianie, tak jak wyglądają teraz. Same przedmioty zostają w plecaku.') }),
+      bag.length === 0 ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotów. Założonych nie pokażesz.') }) : [count, h('ul', { class: 'item-list' }, rows)],
       h(
         'div',
         { class: 'sheet-actions' },
-        h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+        h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }),
         h('button', {
           type: 'button',
           class: 'button button--system',
-          text: 'Gotowe',
+          text: t('Gotowe'),
           onClick: () => {
             attached = bag.filter((item) => picked.has(item.id));
             closeSheet();
@@ -608,14 +615,14 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   const showItem = (item) =>
     openSheet(
       itemDetails(item),
-      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Zamknij', onClick: closeSheet })),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Zamknij'), onClick: closeSheet })),
     );
   // The narrator points here at the chat's rules (narrator.js).
   const footer = h('div', { class: 'chat-footer', 'data-guide': 'community-rules' });
   const hidden = h('div', { class: 'chat-hidden' });
   const room = h('div', { class: 'chat-room' }, empty, list, footer);
 
-  const tabs = h('div', { class: 'chat-tabs', role: 'tablist', 'aria-label': 'Rozmowy' });
+  const tabs = h('div', { class: 'chat-tabs', role: 'tablist', 'aria-label': t('Rozmowy') });
   fill(bar, tabs);
   fill(container, notices, hidden, room);
 
@@ -626,7 +633,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
       'button',
       { type: 'button', class: 'chat-tab', role: 'tab', 'aria-selected': String(selected), onClick: choose },
       h('span', { class: 'chat-tab-name', text: label }),
-      news && h('span', { class: 'community-dot', role: 'img', 'aria-label': mentioned ? tagWords.tagged : 'nowe' }),
+      news && h('span', { class: 'community-dot', role: 'img', 'aria-label': mentioned ? tagWords.tagged : t('nowe') }),
     );
 
   // A private conversation's tab, with the × that closes it.
@@ -646,7 +653,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
         {
           type: 'button',
           class: 'chat-tab-close',
-          'aria-label': `Zamknij rozmowę z postacią ${entry.name}`,
+          'aria-label': t('Zamknij rozmowę z postacią {name}', { name: entry.name }),
           onClick: (event) => withButton(event.currentTarget, () => closeTalk(entry)),
         },
         icon('close', { size: 12 }),
@@ -747,14 +754,14 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
             type: 'button',
             class: 'chat-name',
             text: message.name,
-            'aria-label': `${message.name}: zobacz postać`,
+            'aria-label': t('{name}: zobacz postać', { name: message.name }),
             onClick: (event) => withButton(event.currentTarget, () => openProfile(message.name, { mention: tag })),
           }),
           message.nameColor,
         ),
         guildTag(message.guildTag),
         message.role && h('span', { class: `chat-role chat-role--${message.role}`, text: `(${message.role})` }),
-        h('span', { class: 'chat-level', text: `poz. ${message.level}` }),
+        h('span', { class: 'chat-level', text: t('poz. {level}', { level: message.level }) }),
         // A message that tags the player: "@" in gold, read out as words.
         message.mentioned && h('span', { class: 'chat-tagged', role: 'img', 'aria-label': tagWords.tagged, text: '@' }),
         stamp,
@@ -778,7 +785,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
       message.items?.length > 0 &&
         h(
           'ul',
-          { class: 'chat-items', 'aria-label': 'Przedmioty w ofercie' },
+          { class: 'chat-items', 'aria-label': t('Przedmioty w ofercie') },
           message.items.map((item) => h('li', {}, h('button', { type: 'button', class: 'item-row chat-item', onClick: () => showItem(item) }, itemSummary(item)))),
         ),
     );
@@ -831,17 +838,17 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
           h('button', {
             type: 'button',
             class: 'button button--world button--small chat-reports',
-            text: `Zgłoszenia czekają: ${reports}`,
+            text: t('Zgłoszenia czekają: {count}', { count: reports }),
             onClick: (event) => withButton(event.currentTarget, openReports),
           }),
       );
     }
     empty.hidden = messages.length > 0;
     empty.textContent = !loaded
-      ? 'Wczytywanie…'
+      ? t('Wczytywanie…')
       : talk
-        ? `Napisz do postaci ${talk.name}. Tę rozmowę widzicie tylko Wy dwoje.`
-        : 'Nikt jeszcze nic nie napisał. Zacznij rozmowę!';
+        ? t('Napisz do postaci {name}. Tę rozmowę widzicie tylko Wy dwoje.', { name: talk.name })
+        : t('Nikt jeszcze nic nie napisał. Zacznij rozmowę!');
     const part = !account ? 'loading' : account.mutedUntil ? `muted:${account.mutedUntil}` : account.rulesAccepted ? 'form' : 'rules';
     if (changed('footer', part)) fill(footer, footerPart(part));
     if (focusLine && part === 'form') {
@@ -860,13 +867,13 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     if (part === 'rules') {
       return h(
         'section',
-        { class: 'card chat-rules', 'aria-label': 'Zasady czatu' },
-        h('h2', { class: 'card-title', text: 'Zasady czatu' }),
+        { class: 'card chat-rules', 'aria-label': t('Zasady czatu') },
+        h('h2', { class: 'card-title', text: t('Zasady czatu') }),
         chat.rules.map((line) => h('p', { text: line })),
         h('button', {
           type: 'button',
           class: 'button button--system',
-          text: 'Akceptuję zasady czatu',
+          text: t('Akceptuję zasady czatu'),
           onClick: (event) =>
             withButton(event.currentTarget, async () => {
               await call('POST', '/api/chat/rules');
@@ -877,14 +884,14 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
         }),
       );
     }
-    return h('p', { class: 'chat-muted', text: `Czat jest dla Ciebie wyciszony ${untilText(account.mutedUntil)}.` });
+    return h('p', { class: 'chat-muted', text: t('Czat jest dla Ciebie wyciszony {until}.', { until: untilText(account.mutedUntil) }) });
   }
 
   function hiddenList(blocked) {
     return h(
       'details',
       { class: 'card chat-blocked' },
-      h('summary', { text: `Ukryte postacie (${blocked.length})` }),
+      h('summary', { text: t('Ukryte postacie ({count})', { count: blocked.length }) }),
       h(
         'ul',
         { class: 'chat-blocked-list' },
@@ -896,7 +903,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
             h('button', {
               type: 'button',
               class: 'button button--world button--small',
-              text: 'Pokaż',
+              text: t('Pokaż'),
               onClick: (event) =>
                 withButton(event.currentTarget, async () => {
                   account.blocked = (await call('POST', '/api/chat/unblock', { id: entry.id })).blocked;
@@ -918,6 +925,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   // messages of the moderation itself.
   const decide = (messageId, action) => call('POST', '/api/chat/moderate', { messageId, action });
   const canModerate = (writerRole) => account?.role === 'admin' || (account?.role === 'moderator' && !writerRole);
+  // What a decision did, in a toast (t()).
   const DONE = { hide: 'Wiadomość usunięta.', keep: 'Wiadomość zostaje.', muteDay: 'Czat wyciszony na dobę.', muteForever: 'Czat wyciszony na stałe.' };
 
   // The sheet of someone else's message.
@@ -925,7 +933,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     const moderate = (action) => async () => {
       await decide(message.id, action);
       closeSheet();
-      toast(DONE[action]);
+      toast(t(DONE[action]));
       if (action === 'hide') drop([message.id]);
     };
     openSheet(
@@ -934,7 +942,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
       h(
         'div',
         { class: 'chat-sheet-actions' },
-        act('Zobacz postać', () => openProfile(message.name, { mention: tag })),
+        act(t('Zobacz postać'), () => openProfile(message.name, { mention: tag })),
         // "@" and the name in this tab's line, while the player may write.
         canWrite() &&
           act(tagWords.button, () => {
@@ -942,12 +950,12 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
             tag(message.name);
           }),
         !talk &&
-          act('Prywatna wiadomość', () => {
+          act(t('Prywatna wiadomość'), () => {
             closeSheet();
             talkTo({ id: message.characterId, name: message.name });
           }),
         act(
-          'Zgłoś',
+          t('Zgłoś'),
           async () => {
             const { text: done } = await call('POST', '/api/chat/report', { messageId: message.id });
             closeSheet();
@@ -955,18 +963,18 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
           },
           'danger',
         ),
-        act('Ukryj wiadomości tej postaci', async () => {
+        act(t('Ukryj wiadomości tej postaci'), async () => {
           account.blocked = (await call('POST', '/api/chat/block', { messageId: message.id })).blocked;
           closeSheet();
           drop(messages.filter((other) => other.name === message.name && !other.own && !other.system).map((other) => other.id));
           render();
-          toast(`Wiadomości postaci ${message.name} są ukryte. Pokażesz je nad czatem, w „Ukryte postacie”.`);
+          toast(t('Wiadomości postaci {name} są ukryte. Pokażesz je nad czatem, w „Ukryte postacie”.', { name: message.name }));
         }),
         canModerate(message.role) && [
-          h('p', { class: 'chat-sheet-label', text: 'Moderacja' }),
-          act('Usuń wiadomość', moderate('hide'), 'danger'),
-          act('Wycisz na dobę', moderate('muteDay')),
-          act('Wycisz na stałe', moderate('muteForever'), 'danger'),
+          h('p', { class: 'chat-sheet-label', text: t('Moderacja') }),
+          act(t('Usuń wiadomość'), moderate('hide'), 'danger'),
+          act(t('Wycisz na dobę'), moderate('muteDay')),
+          act(t('Wycisz na stałe'), moderate('muteForever'), 'danger'),
         ],
       ),
     );
@@ -978,15 +986,15 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     const { reports } = await call('GET', '/api/chat/reports');
     const decision = (report, action) => async () => {
       await decide(report.messageId, action);
-      toast(DONE[action]);
+      toast(t(DONE[action]));
       if (action === 'hide') drop([report.messageId]);
       await openReports();
       ask();
     };
     openSheet(
-      h('h2', { class: 'sheet-title chat-sheet', text: 'Zgłoszenia' }),
+      h('h2', { class: 'sheet-title chat-sheet', text: t('Zgłoszenia') }),
       reports.length === 0
-        ? h('p', { class: 'sheet-text', text: 'Nie ma zgłoszeń do sprawdzenia.' })
+        ? h('p', { class: 'sheet-text', text: t('Nie ma zgłoszeń do sprawdzenia.') })
         : h(
             'ol',
             { class: 'chat-report-list' },
@@ -1006,10 +1014,10 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
                   class: 'chat-report-meta',
                   text: [
                     dateTimeFormat.format(new Date(report.createdAt)),
-                    `zgłoszenia: ${report.reports}`,
-                    report.private && 'prywatna',
-                    report.hidden && 'ukryta do decyzji',
-                    report.mutedUntil && `czat wyciszony ${untilText(report.mutedUntil)}`,
+                    t('zgłoszenia: {count}', { count: report.reports }),
+                    report.private && t('prywatna'),
+                    report.hidden && t('ukryta do decyzji'),
+                    report.mutedUntil && t('czat wyciszony {until}', { until: untilText(report.mutedUntil) }),
                   ]
                     .filter(Boolean)
                     .join(' · '),
@@ -1018,10 +1026,10 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
                   h(
                     'div',
                     { class: 'chat-report-actions' },
-                    act('Usuń', decision(report, 'hide'), 'danger', 'button--small'),
-                    act('Zostaw', decision(report, 'keep'), 'world', 'button--small'),
-                    act('Wycisz na dobę', decision(report, 'muteDay'), 'world', 'button--small'),
-                    act('Wycisz na stałe', decision(report, 'muteForever'), 'danger', 'button--small'),
+                    act(t('Usuń'), decision(report, 'hide'), 'danger', 'button--small'),
+                    act(t('Zostaw'), decision(report, 'keep'), 'world', 'button--small'),
+                    act(t('Wycisz na dobę'), decision(report, 'muteDay'), 'world', 'button--small'),
+                    act(t('Wycisz na stałe'), decision(report, 'muteForever'), 'danger', 'button--small'),
                   ),
               ),
             ),
