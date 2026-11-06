@@ -145,10 +145,13 @@ export async function sellMaterials(context) {
   return json({ sold: { count: body.count, gold }, character: characterView(await loadPlayer(db, session.userId), now) });
 }
 
-// Materials to the queue: whole stacks, { keys: ["wolf-pelt:common", …] };
-// as many pieces of one stack as chosen, { key, count } (the author:
-// "Powinna być mozliwosc przerobienia pojedynczej sztuki danego materiału");
-// or { all: true } for every stack, while the queue has room.
+// Materials to the queue: whole stacks, { keys: ["wolf-pelt:common", …] },
+// with fewer pieces of some of them if chosen, { counts: { key: pieces } }
+// (a player on the chat, 6.11.2026: "nie da się wybrać ilości pojedynczego
+// materiału do przerobienia, tylko wrzuca od razu wszystkie"); as many
+// pieces of one stack as chosen, { key, count } (the author: "Powinna być
+// mozliwosc przerobienia pojedynczej sztuki danego materiału"); or
+// { all: true } for every stack, while the queue has room.
 export async function craftMaterials(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
@@ -165,7 +168,12 @@ export async function craftMaterials(context) {
   if (keys.length === 0) throw new ApiError(400, 'invalid_materials', 'Wybierz materiały do przeróbki.');
   checkRoom(settled.queue);
   const foreign = JSON.parse(player.row.foreign_stacks ?? '{}');
-  const { state, ordered, tooRare: rare } = orderMaterials(settled, keys, table, now, newRng(), content(), one ? { [body.key]: body.count } : {}, foreign);
+  // A count above the stack takes the whole stack (orderMaterials).
+  const chosen =
+    body.counts && typeof body.counts === 'object' && !Array.isArray(body.counts)
+      ? Object.fromEntries(Object.entries(body.counts).filter(([key, count]) => keys.includes(key) && Number.isInteger(count) && count >= 1))
+      : {};
+  const { state, ordered, tooRare: rare } = orderMaterials(settled, keys, table, now, newRng(), content(), one ? { [body.key]: body.count } : chosen, foreign);
   if (ordered === 0 && rare > 0) {
     const rarities = keys.filter((key) => settled.materials[key] > 0).map((key) => key.slice(key.lastIndexOf(':') + 1));
     throw tooRare(rarities.sort((a, b) => craftLevelFor(a, content()) - craftLevelFor(b, content()))[0]);

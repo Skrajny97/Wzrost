@@ -128,21 +128,29 @@ export function materialSheet(material, start = 1) {
   );
 }
 
-// The table's tab shown, and the marks on its Materiały and Przedmioty,
-// kept while the screen draws again.
+// The table's tab shown, and the marks on its Materiały (each stack with the
+// pieces chosen for it under its row, the whole stack at first) and
+// Przedmioty, kept while the screen draws again.
 let tableTab = 'materials';
-const markedMaterials = new Set();
+const markedMaterials = new Map();
 const markedItems = new Set();
 
 // The Materiały tab: a tap on a material opens its card for as many pieces
 // as chosen, and its tick marks it to go to the table with the others marked
 // (the author: "Dodajmy jeszcze opcje zaznaczania roznych materialow w Stole
-// rozbiórki"), each a whole stack and an order of its own.
+// rozbiórki"), each an order of its own: the whole stack, or fewer pieces
+// chosen under its row once marked (a player on the chat, 6.11.2026: "nie
+// da się wybrać ilości pojedynczego materiału do przerobienia, tylko wrzuca
+// od razu wszystkie").
 function materialsTab(crafting, built, full) {
   if (crafting.materials.length === 0) return h('p', { class: 'system-hint', text: t(MATERIALS_HINT) });
   const takes = (material) => material.needs === null;
   // Marks only on the stacks still there that the table takes.
-  for (const key of [...markedMaterials]) if (!crafting.materials.some((material) => material.key === key && takes(material))) markedMaterials.delete(key);
+  for (const [key, count] of [...markedMaterials]) {
+    const stack = crafting.materials.find((material) => material.key === key && takes(material));
+    if (!stack) markedMaterials.delete(key);
+    else if (count > stack.count) markedMaterials.set(key, stack.count);
+  }
   const room = Math.max(0, crafting.limit - crafting.queue.length);
   const roomNote = h('p', { class: 'region-warning', hidden: true });
   const processMarked = h('button', {
@@ -150,12 +158,12 @@ function materialsTab(crafting, built, full) {
     class: 'button button--world',
     onClick: (event) =>
       withButton(event.currentTarget, async () => {
-        const keys = [...markedMaterials];
+        const marked = [...markedMaterials];
         markedMaterials.clear();
         try {
-          await craft({ keys });
+          await craft({ keys: marked.map(([key]) => key), counts: Object.fromEntries(marked) });
         } catch (error) {
-          for (const key of keys) markedMaterials.add(key);
+          for (const [key, count] of marked) markedMaterials.set(key, count);
           throw error;
         }
       }),
@@ -172,6 +180,36 @@ function materialsTab(crafting, built, full) {
     });
   };
   const row = (material) => {
+    // The pieces to go, under the row of a marked stack.
+    const value = h('output', { class: 'herb-count-value' });
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Mniej'), text: '−', onClick: () => pick(markedMaterials.get(material.key) - 1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Więcej'), text: '+', onClick: () => pick(markedMaterials.get(material.key) + 1) });
+    const all = h('button', { type: 'button', class: 'link-button', text: t('wszystkie'), onClick: () => pick(material.count) });
+    const pieces = h('div', { class: 'herb-count craft-count' }, less, value, more, all);
+    // What the row says the table makes: the pieces chosen of a marked stack.
+    const meta = h('span', { class: 'item-meta' });
+    const describe = (count) => {
+      meta.textContent = [
+        material.rarityName,
+        t('daje: {what}', { what: `${material.part} ×${formatNumber(count)}` }),
+        material.needs ? t('od poziomu {level} stołu', { level: material.needs }) : built && formatMinutes(material.minutes),
+      ]
+        .filter(Boolean)
+        .join(' · ');
+    };
+    function pick(next) {
+      const count = Math.min(material.count, Math.max(1, next));
+      markedMaterials.set(material.key, count);
+      value.textContent = t('{count} szt.', { count: formatNumber(count) });
+      less.disabled = count === 1;
+      more.disabled = count === material.count;
+      describe(count);
+    }
+    const shown = () => {
+      pieces.hidden = !markedMaterials.has(material.key);
+      if (markedMaterials.has(material.key)) pick(markedMaterials.get(material.key));
+      else describe(material.count);
+    };
     const mark = h(
       'button',
       {
@@ -182,14 +220,15 @@ function materialsTab(crafting, built, full) {
         disabled: !built || !takes(material),
         onClick: () => {
           if (markedMaterials.has(material.key)) markedMaterials.delete(material.key);
-          else markedMaterials.add(material.key);
+          else markedMaterials.set(material.key, material.count);
           mark.setAttribute('aria-pressed', String(markedMaterials.has(material.key)));
+          shown();
           update();
         },
       },
       icon('check', { size: 16 }),
     );
-    return h(
+    const line = h(
       'li',
       { class: 'craft-row craft-row--pick' },
       h(
@@ -200,24 +239,18 @@ function materialsTab(crafting, built, full) {
           'span',
           { class: 'craft-text' },
           h('span', { class: 'item-name', vars: { '--rarity': material.color }, text: `${material.name} ×${formatNumber(material.count)}` }),
-          h('span', {
-            class: 'item-meta',
-            text: [
-              material.rarityName,
-              t('daje: {what}', { what: `${material.part} ×${formatNumber(material.count)}` }),
-              material.needs ? t('od poziomu {level} stołu', { level: material.needs }) : built && formatMinutes(material.minutes),
-            ]
-              .filter(Boolean)
-              .join(' · '),
-          }),
+          meta,
         ),
       ),
       mark,
+      pieces,
     );
+    shown();
+    return line;
   };
   update();
   return [
-    built && h('p', { class: 'craft-note', text: t('Stuknij materiał, żeby przerobić albo sprzedać wybraną liczbę sztuk. Zaznacz kilka, żeby przerobić je naraz w całości.') }),
+    built && h('p', { class: 'craft-note', text: t('Stuknij materiał, żeby przerobić albo sprzedać wybraną liczbę sztuk. Zaznacz kilka, żeby przerobić je naraz: pod zaznaczonym wybierzesz, ile sztuk.') }),
     h('ul', { class: 'craft-list' }, crafting.materials.map(row)),
     built &&
       h(

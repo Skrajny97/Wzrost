@@ -3034,6 +3034,18 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.94 (6.11.2026)
+
+- Stół rozbiórki: pod zaznaczonym materiałem wybiera się liczbę sztuk: zob. „Stół rozbiórki: liczba sztuk zaznaczonego materiału”.
+
+## Stół rozbiórki: liczba sztuk zaznaczonego materiału (gracz na czacie, potwierdzone przez autora, 6.11.2026; od 0.1.94)
+
+Gracz na czacie: „Stół rozbiórki – nie da się wybrać ilości pojedynczego materiału do przerobienia, tylko wrzuca od razu wszystkie”. Autor: „sprawdziłem, to prawda da się to zrobić tylko w plecaku”. Na ekranie Stołu dotknięcie nazwy materiału otwierało już kartę z wyborem liczby, ale kółko zaznaczenia i „Przerób zaznaczone” brały zawsze cały stos, a tę drogę wybierają gracze.
+
+1. Zaznaczony materiał pokazuje pod sobą wybór liczby sztuk: „−”, liczba, „+” i „wszystkie”. Na początek to cały stos, jak dotąd.
+2. „Przerób zaznaczone” wysyła każdy zaznaczony materiał z jego liczbą (`counts` przy `keys` w `POST /api/craft/materials`). Liczba większa niż stos bierze cały stos, a liczba, która nie jest całkowita i dodatnia, nic nie zmienia (cały stos).
+3. Podpowiedź nad listą: „Zaznacz kilka, żeby przerobić je naraz: pod zaznaczonym wybierzesz, ile sztuk.”
+
 ## Wersja 0.1.93 (6.11.2026)
 
 - Objaśnienie narratora w Siedzibie Gildii wskazuje pierwszy budynek i nie oddala już ekranu: zob. „Siedziba Gildii: objaśnienie bez oddalania”.
