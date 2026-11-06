@@ -590,7 +590,7 @@
       "chapter": "skills",
       "text": [
         "Pierwsza umiejętność, na którą przeznaczysz pierwszy Punkt Umiejętności, otworzy ścieżkę główną.",
-        "Od jedenastego poziomu klasy możesz dobrać ścieżkę poboczną – za jeden Punkt Umiejętności. Trzecia ścieżka zamknie się wtedy na zawsze."
+        "Od jedenastego poziomu klasy możesz dobrać ścieżkę poboczną – za jeden Punkt Umiejętności. Trzecia ścieżka się wtedy zamknie."
       ],
       "voice": "audio/narration/skills-choice.mp3"
     },
@@ -660,7 +660,7 @@
       "kind": "point",
       "chapter": "professions",
       "text": [
-        "Zielarstwo pozwala Ci zbierać zioła w Systemowym Zagajniku, a w Alchemii uwarzysz z nich mikstury w Systemowej Pracowni. Na Rzemieślnictwo przyjdzie jeszcze czas."
+        "Zielarstwo pozwala Ci zbierać zioła w Systemowym Zagajniku, a w Alchemii uwarzysz z nich mikstury w Systemowej Pracowni. Na pozostałe profesje przyjdzie jeszcze czas."
       ],
       "voice": "audio/narration/professions-list.mp3"
     },
