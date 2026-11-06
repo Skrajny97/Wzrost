@@ -3034,6 +3034,20 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.81 (6.11.2026)
+
+Poprawka z nocnego przeglądu kodu wersji 0.1.78–0.1.80, cały napis „E-mail” w Ustawieniach i szersze sprawdzanie układu: zob. „Nocny przegląd kodu 0.1.78–0.1.80”.
+
+## Nocny przegląd kodu 0.1.78–0.1.80 (6.11.2026, od 0.1.81)
+
+Drugi, niezależny przegląd kodu z tej nocy (zrzut ekranu w „Zgłoś błąd”, poprawki z przeglądu 663 i kod narratora z 664), zanim autor sprawdzi go rano.
+
+1. **„Testuj samouczki” na tej samej stronie.** Kwestia minięta na stronie (np. o Wyprawie Gildii) po „Od nowa” przychodziła dopiero po ponownym otwarciu gry, bo strona dalej pamiętała ją jako przeczytaną. Teraz każdy wiersz „Testuj samouczki” zapomina na stronie kwestie swojej części, więc przychodzą przy następnym spojrzeniu na ich miejsce (`forgetPart` w `src/client/narrator.js`). Dotyczy tylko trybu testowego.
+2. **Sprawdzone i w porządku:** żaden rozdział narratora nie utyka i dwa pergaminy się nie nakładają; przełącznik pomijania i zapis pominięć na serwerze; limity i zapis zrzutu ekranu, ochrona przed wysyłką z innych stron, zrzut tylko dla autora i jego usunięcie z kontem; opis kamienia w starych raportach. Pierwsze kroki i całe wprowadzenie na telefonie i komputerze, rozdział Społeczności z postacią w obozie i na wyprawie.
+3. **Napis „E-mail” w Ustawieniach** nie łamie się już na „E-” i „mail” obok długiego adresu na telefonie; to adres przechodzi do następnej linii, gdy musi.
+4. **Sprawdzanie układu** (`tools/layout-check.cjs`) obejmuje też okienko Ustawień (z „Pomijaj objaśnienia narratora” i najdłuższym możliwym loginem, 24 znaki) oraz okienko „Zgłoś błąd”, także z dołączonym zrzutem ekranu: żadne nie może przewijać się na boki ani mieć tekstu wychodzącego z ramek.
+5. **Sprawdzone:** wszystkie testy (1276), pierwsze kroki nowej postaci i układ na 9 rozmiarach ekranu razem z nowymi okienkami.
+
 ## Wersja 0.1.80 (6.11.2026)
 
 Poprawki kodu narratora z przeglądu objaśnień (664): zob. „Objaśnienia narratora: poprawki kodu z przeglądu 664”. Kwestie do zmiany i nowe kwestie czekają na autora.

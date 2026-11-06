@@ -210,6 +210,11 @@
       "id": "0.1.80",
       "title": "Wersja 0.1.80: narrator bez zatorów",
       "body": "- Objaśnienia narratora nie stają w miejscu, gdy z raportu od razu ruszasz na kolejną wyprawę. Osada, Wieże i inne części przyjdą w swoim czasie.\n- Karta narratora o nowym poziomie pokazuje się po raporcie, a nie nad nim.\n- Narrator mówi o Wyprawie Gildii zaraz po stuknięciu jej zakładki.\n- Gdy narrator prosi o przeczytanie słów Systemu w Profesjach, „Jak to działa?” rozwija się samo."
+    },
+    {
+      "id": "0.1.81",
+      "title": "Wersja 0.1.81: drobne poprawki",
+      "body": "- Napis „E-mail” w Ustawieniach nie łamie się już na telefonie obok długiego adresu."
     }
 ]
 }
