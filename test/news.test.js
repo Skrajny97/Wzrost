@@ -83,6 +83,28 @@ describe('Co nowego?', () => {
     assert.equal((await call('GET', '/api/news', { cookie: fresh })).data.entries.length, 2);
   });
 
+  test('the author deletes a draft for good; a published entry stays and its deletion does not bring the draft back', async () => {
+    const dismiss = (draft, cookie = author) => call('POST', '/api/author/news/dismiss', { cookie, body: { draft } });
+    const [first, second] = news.drafts;
+    assert.equal((await dismiss(first.id, player)).status, 404);
+    assert.equal((await dismiss('9.9.9')).data.error.code, 'invalid_draft');
+    const gone = await dismiss(first.id);
+    assert.equal(gone.status, 200, JSON.stringify(gone.data));
+    assert.ok(!gone.data.drafts.some((draft) => draft.id === first.id));
+    assert.equal(gone.data.drafts.length, news.drafts.length - 1);
+    // Twice is no error, and the draft stays gone on the next visit.
+    assert.equal((await dismiss(first.id)).status, 200);
+    assert.ok(!(await call('GET', '/api/author/news', { cookie: author })).data.drafts.some((draft) => draft.id === first.id));
+    // A draft published, then deleted, then its entry taken down: it does not come back.
+    const made = await publish({ draft: second.id, title: second.title, body: second.body });
+    const [entry] = made.data.entries;
+    await dismiss(second.id);
+    assert.equal((await call('GET', '/api/news', { cookie: player })).data.entries.length, 1);
+    const down = await call('POST', '/api/author/news/delete', { cookie: author, body: { id: entry.id } });
+    assert.ok(!down.data.drafts.some((draft) => draft.id === second.id));
+    assert.equal(await unseen(player), 0);
+  });
+
   test('a correction does not show an entry again; a deleted one gives its draft back and never its number', async () => {
     const made = await publish({ draft: news.drafts[0].id, title: news.drafts[0].title, body: news.drafts[0].body });
     const [entry] = made.data.entries;

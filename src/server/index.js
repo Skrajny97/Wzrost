@@ -3,7 +3,7 @@
 
 import { deleteAccount, login, logout, me, register, setLanguage } from './accounts.js';
 import { authorPanel, authorSkillDemo, authorSkills, bugReportImage, resolveBugReport } from './author.js';
-import { authorNews, deleteNews, editNews, listNews, publishNews, seeNews } from './news.js';
+import { authorNews, deleteNews, dismissDraft, editNews, listNews, publishNews, seeNews } from './news.js';
 import { reportBug } from './bugs.js';
 import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
@@ -133,6 +133,7 @@ const routes = [
   ['POST', '/api/author/news', publishNews],
   ['POST', '/api/author/news/edit', editNews],
   ['POST', '/api/author/news/delete', deleteNews],
+  ['POST', '/api/author/news/dismiss', dismissDraft],
   ['GET', '/api/news', listNews],
   ['POST', '/api/news/seen', seeNews],
   ['GET', '/api/author/skills/:id', authorSkillDemo],

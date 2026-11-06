@@ -85,8 +85,9 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
     }, !newsOpen && drafts > 0 && h('span', { class: 'author-news-count', text: ` (szkice: ${drafts})` }));
   }
 
-  // A title and a text to correct, with the action under them: "Opublikuj"
-  // for a draft or a new entry, "Zapisz" and "Usuń" for a published one.
+  // A title and a text to correct, with the actions under them: "Opublikuj"
+  // and "Usuń" for a draft, "Opublikuj" for a new entry, "Zapisz" and "Usuń"
+  // for a published one.
   function newsForm(entry, { label, send, remove }) {
     const { limits } = news;
     const title = h('input', { type: 'text', class: 'author-news-title', maxlength: String(limits.title), value: entry.title ?? '', 'aria-label': 'Tytuł' });
@@ -122,7 +123,16 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
       h('h3', { class: 'author-news-head', text: news.drafts.length > 0 ? `Szkice do zatwierdzenia: ${news.drafts.length}` : 'Szkice do zatwierdzenia' }),
       news.drafts.length === 0
         ? h('p', { class: 'muted', text: 'Wszystkie szkice są opublikowane.' })
-        : news.drafts.map((draft) => newsForm(draft, { label: 'Opublikuj', send: (written) => post('/api/author/news', { draft: draft.id, ...written }) })),
+        : news.drafts.map((draft) =>
+            newsForm(draft, {
+              label: 'Opublikuj',
+              send: (written) => post('/api/author/news', { draft: draft.id, ...written }),
+              remove: async () => {
+                const sure = await confirmAction({ title: 'Usunąć szkic?', text: `„${draft.title}” zniknie ze szkiców na zawsze. Gracze go nie zobaczą.`, confirmLabel: 'Usuń', danger: true });
+                return sure ? post('/api/author/news/dismiss', { draft: draft.id }) : news;
+              },
+            }),
+          ),
       h('h3', { class: 'author-news-head', text: 'Nowy wpis' }),
       newsForm({}, { label: 'Opublikuj', send: (written) => post('/api/author/news', written) }),
       h('h3', { class: 'author-news-head', text: news.entries.length > 0 ? `Opublikowane: ${news.entries.length}` : 'Opublikowane' }),
@@ -137,7 +147,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
                 label: 'Zapisz poprawkę',
                 send: (written) => post('/api/author/news/edit', { id: entry.id, ...written }),
                 remove: async () => {
-                  const sure = await confirmAction({ title: 'Usunąć wpis?', text: `„${entry.title}” zniknie z gry. Szkic, z którego powstał, wróci do szkiców.`, confirmLabel: 'Usuń', danger: true });
+                  const sure = await confirmAction({ title: 'Usunąć wpis?', text: `„${entry.title}” zniknie z gry.${entry.draft ? ' Szkic, z którego powstał, wróci do szkiców, chyba że go usunięto.' : ''}`, confirmLabel: 'Usuń', danger: true });
                   return sure ? post('/api/author/news/delete', { id: entry.id }) : news;
                 },
               }),

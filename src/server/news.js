@@ -57,14 +57,17 @@ function written(body) {
   return { title, text };
 }
 
-// What the Panel autora shows: the drafts not published yet, as the data has
-// them, and every published entry, newest first.
+// What the Panel autora shows: the drafts neither published nor deleted, as
+// the data has them, and every published entry, newest first.
 async function authorView(db) {
-  const { results } = await db.prepare('SELECT * FROM news ORDER BY id DESC').all();
-  const published = new Set(results.map((row) => row.draft).filter(Boolean));
+  const [{ results }, { results: dismissed }] = await db.batch([
+    db.prepare('SELECT * FROM news ORDER BY id DESC'),
+    db.prepare('SELECT draft FROM news_dismissed'),
+  ]);
+  const hidden = new Set([...results.map((row) => row.draft).filter(Boolean), ...dismissed.map((row) => row.draft)]);
   return {
     limits: { title: limits.title, body: limits.body },
-    drafts: news.drafts.filter((draft) => !published.has(draft.id)),
+    drafts: news.drafts.filter((draft) => !hidden.has(draft.id)),
     entries: results.map((row) => ({ ...entryView(row), draft: row.draft ?? null })),
   };
 }
@@ -92,6 +95,19 @@ export async function publishNews(context) {
   return json(await authorView(db), 201);
 }
 
+// POST /api/author/news/dismiss { draft }: "Usuń" by a draft (the author,
+// 6.11.2026). It leaves the drafts for good; a draft is in the game's data,
+// so the deletion is kept apart (news_dismissed). An entry already published
+// from it stays, and deleting that entry no longer brings the draft back.
+export async function dismissDraft(context) {
+  await requireAuthor(context);
+  const body = await readJson(context.request);
+  if (!Object.hasOwn(draftsById, body.draft)) throw new ApiError(400, 'invalid_draft', 'Nie ma takiego szkicu.');
+  const db = context.env.DB;
+  await db.prepare('INSERT OR IGNORE INTO news_dismissed (draft, dismissed_at) VALUES (?, ?)').bind(body.draft, context.now).run();
+  return json(await authorView(db));
+}
+
 // POST /api/author/news/edit { id, title, body }: a published entry corrected.
 // Players who saw it do not get it again.
 export async function editNews(context) {
@@ -105,7 +121,7 @@ export async function editNews(context) {
 }
 
 // POST /api/author/news/delete { id }: an entry taken down; a draft it came
-// from waits in the drafts again.
+// from waits in the drafts again, unless the author deleted that draft.
 export async function deleteNews(context) {
   await requireAuthor(context);
   const body = await readJson(context.request);
