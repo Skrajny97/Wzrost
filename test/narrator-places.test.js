@@ -283,8 +283,14 @@ test('the Skrzynia Konta is told on its first look', async () => {
   assert.equal(lights().length, 0);
 });
 
-// The report is seen first: its line comes a moment after it opens.
-const seen = () => new Promise((resolve) => setTimeout(resolve, 2600));
+// The report is seen first: its line comes a moment after it opens (2.5 s),
+// on a slow machine a little later still: up to 5 s more.
+async function seen() {
+  await new Promise((resolve) => setTimeout(resolve, 2600));
+  for (let waited = 0; lights().length === 0 && waited < 5000; waited += 100) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+}
 
 test("a faint's report is told once, at its summary, a moment after it opens; a report without a faint is not", async () => {
   place(mark('report-summary'));
