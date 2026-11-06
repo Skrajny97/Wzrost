@@ -462,7 +462,7 @@ describe('potions through the API', () => {
     const { report, character: after } = (await call('POST', '/api/hunts/claim', { cookie })).data;
     const all = report.fights.length;
     const worked = Math.min(2, all);
-    assert.deepEqual(report.summary.potions.slice(-2), [`Wywar kamiennej skóry działał w walkach: ${worked} z ${all}.`, `Olejek z tojadu działał w walkach: ${worked} z ${all}.`]);
+    assert.deepEqual(report.summary.potions.slice(-2), [`Twarda skóra działała w walkach: ${worked} z ${all}.`, `Olejek z tojadu działał w walkach: ${worked} z ${all}.`]);
     assert.deepEqual(after.buffs.map(({ kind, fights }) => [kind, fights]), all >= 2 ? [] : [['armor', 2 - all], ['poison', 2 - all]]);
   });
 });

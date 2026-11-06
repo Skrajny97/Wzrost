@@ -1200,6 +1200,9 @@ export function mountCombat(container, { params, navigate }) {
       return { potion, count, show, element };
     });
     const healRow = rows.find((row) => row.potion.fight === 'heal');
+    // Jagna's burn brew (667) is named only when the character carries it:
+    // until she teaches the recipe, it has never heard of it.
+    const burnCure = rows.some((row) => row.potion.cures === 'burning');
     const markValue = h('output', { class: 'potion-pick-value' });
     const mark = stepper('Próg leczenia', (sign) => {
       const choices = use.healBelowChoices;
@@ -1219,7 +1222,7 @@ export function mountCombat(container, { params, navigate }) {
       h('p', { class: 'duration-title', text: 'Mikstury na wyprawę' }),
       rows.map((row) => row.element),
       healRow && h('div', { class: 'potion-pick' }, h('span', { class: 'potion-pick-name', text: 'Lecz poniżej' }), mark.less, markValue, mark.more),
-      h('p', { class: 'muted', text: 'Każdego rodzaju najwyżej jedna na walkę, a Napar z kwiatu paproci jeden na wyprawę. Postać pije sama: leczenia poniżej progu, many, gdy zabraknie jej na umiejętność, Odtrutkę, gdy ją zatrują, a Napar, gdy padnie. Niewypite wrócą do plecaka.' }),
+      h('p', { class: 'muted', text: `Każdego rodzaju najwyżej jedna na walkę, a Napar z kwiatu paproci jeden na wyprawę. Postać pije sama: leczenia poniżej progu, many, gdy zabraknie jej na umiejętność, Odtrutkę, gdy ją zatrują, ${burnCure ? 'Wywar od oparzeń, gdy ją poparzy, ' : ''}a Napar, gdy padnie. Niewypite wrócą do plecaka.` }),
     );
     return {
       element,

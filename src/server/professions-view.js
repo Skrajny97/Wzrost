@@ -150,6 +150,7 @@ export function bagPotions(row, sellBonus) {
       count: potions[potion.id],
       price: potionPrice(potion, content) * (1 + sellBonus),
       fight: fightKind(potion),
+      cures: potion.cures ?? null,
       carry: carryLimit(potion, null),
       drink: Boolean(potion.effect.heal || timedKind(potion)),
       verb: potion.verb ?? 'Wypij',
