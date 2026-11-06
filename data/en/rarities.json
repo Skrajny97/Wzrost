@@ -1,0 +1,66 @@
+{
+  "$comment": "English texts of data/rarities.json, by the rarity's id (src/engine/overlay.js). An English adjective has one form for every gender.",
+  "common": {
+    "name": "common",
+    "forms": {
+      "m": "common",
+      "f": "common",
+      "n": "common",
+      "pl": "common"
+    }
+  },
+  "rare": {
+    "name": "rare",
+    "forms": {
+      "m": "rare",
+      "f": "rare",
+      "n": "rare",
+      "pl": "rare"
+    }
+  },
+  "unique": {
+    "name": "unique",
+    "forms": {
+      "m": "unique",
+      "f": "unique",
+      "n": "unique",
+      "pl": "unique"
+    }
+  },
+  "epic": {
+    "name": "epic",
+    "forms": {
+      "m": "epic",
+      "f": "epic",
+      "n": "epic",
+      "pl": "epic"
+    }
+  },
+  "legendary": {
+    "name": "legendary",
+    "forms": {
+      "m": "legendary",
+      "f": "legendary",
+      "n": "legendary",
+      "pl": "legendary"
+    }
+  },
+  "mythic": {
+    "name": "mythic",
+    "forms": {
+      "m": "mythic",
+      "f": "mythic",
+      "n": "mythic",
+      "pl": "mythic"
+    }
+  },
+  "divine": {
+    "name": "divine",
+    "forms": {
+      "m": "divine",
+      "f": "divine",
+      "n": "divine",
+      "pl": "divine"
+    }
+  }
+}

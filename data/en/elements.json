@@ -1,0 +1,35 @@
+{
+  "$comment": "English texts of data/elements.json, by the element's id (src/engine/overlay.js).",
+  "fire": {
+    "name": "fire",
+    "resistance": "Fire resistance"
+  },
+  "frost": {
+    "name": "frost",
+    "resistance": "Frost resistance"
+  },
+  "water": {
+    "name": "water",
+    "resistance": "Water resistance"
+  },
+  "lightning": {
+    "name": "lightning",
+    "resistance": "Lightning resistance"
+  },
+  "earth": {
+    "name": "earth",
+    "resistance": "Earth resistance"
+  },
+  "nature": {
+    "name": "nature",
+    "resistance": "Nature resistance"
+  },
+  "poison": {
+    "name": "poison",
+    "resistance": "Poison resistance"
+  },
+  "sacred": {
+    "name": "sacred",
+    "resistance": "Sacred resistance"
+  }
+}

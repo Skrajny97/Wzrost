@@ -1,0 +1,18 @@
+{
+  "$comment": "English texts of data/effects.json, by the effect's id (src/engine/overlay.js).",
+  "poisoned": {
+    "name": "Poison"
+  },
+  "burning": {
+    "name": "Burn"
+  },
+  "chilled": {
+    "name": "Chill"
+  },
+  "mired": {
+    "name": "Mire"
+  },
+  "bleeding": {
+    "name": "Bleeding"
+  }
+}

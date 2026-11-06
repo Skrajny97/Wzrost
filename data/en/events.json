@@ -1,0 +1,802 @@
+{
+  "$comment": "English texts of data/events.json (src/engine/overlay.js): the events that can happen in the first region, with every step, case and outcome, their shared texts and the events' foes. The `classes` and `xpFoes` of an option are ids, not texts.",
+  "texts": {
+    "loot": [
+      "The defeated left behind: {item}.",
+      "Lying beside the defeated: {item}."
+    ]
+  },
+  "list": {
+    "wounded-woman": {
+      "title": "Wounded Woman",
+      "text": "A wounded woman lies by the path. She is pale, barely breathing, and whispers: “Help me…”",
+      "options": {
+        "help": {
+          "label": "Help her quickly"
+        },
+        "ask": {
+          "label": "Ask more questions",
+          "outcome": {
+            "dies": {
+              "name": "Questions: dies in despair",
+              "text": "The woman tries to answer, but your suspicious questions do not help: they take away all her hope of being saved. She dies in despair before your eyes. There is nothing more you can do for her."
+            },
+            "wisp": {
+              "name": "Questions: turns into a Bwendnitsa",
+              "text": "The woman falls silent, offended. Her eyes turn white, her skin begins to glow with a cold light, and her body rises above the path. The wounded woman turns into a Bwendnitsa!",
+              "start": "{enemies} lunges at you."
+            }
+          }
+        },
+        "leave": {
+          "label": "Back away warily",
+          "outcome": {
+            "text": "You walk away without turning your back on her. No one follows you."
+          }
+        }
+      },
+      "cases": {
+        "ambush": {
+          "name": "Ambush",
+          "outcomes": {
+            "help": {
+              "text": "You lean over her, and three bandits leap out of the bushes. The woman jumps up and runs. It was an ambush!",
+              "start": "Ambush! The bandits strike first: {enemies}."
+            },
+            "ask": {
+              "text": "The woman stumbles over her answers, and a twig snaps in the bushes. You sense the ambush before the bandits leap out of hiding.",
+              "start": "The bandits leap out of hiding, but the ambush no longer takes you by surprise: {enemies}."
+            }
+          }
+        },
+        "grateful-gold": {
+          "name": "Gratitude: gold",
+          "outcomes": {
+            "help": {
+              "text": "You dress her wound and help her up. The woman thanks you with tears in her eyes and presses a purse of gold into your hand (+{gold})."
+            }
+          }
+        },
+        "grateful-find": {
+          "name": "Gratitude: item",
+          "outcomes": {
+            "help": {
+              "text": "You dress her wound and help her up. To thank you, the woman gives you something she found in the forest: {item}."
+            }
+          }
+        }
+      }
+    },
+    "blue-mushroom": {
+      "title": "Blue Mushroom",
+      "text": "A mushroom you do not know grows by the path. Its cap glows blue, and tiny shimmering spores float in the air around it. It smells sweet and strange.",
+      "options": {
+        "eat": {
+          "label": "Eat the mushroom",
+          "outcome": {
+            "faint": {
+              "name": "Eating: fainting",
+              "text": "You bite off a piece of the cap. The world starts to spin, and blue light floods your eyes. You wake up on the moss when the sun is already low.",
+              "lossText": "Your purse is noticeably lighter (−{gold} gold)."
+            },
+            "speed": {
+              "name": "Eating: lightness",
+              "text": "You bite off a piece of the cap. Your legs itch to run, and every move comes easily (speed in fights +25% for 2 fights)."
+            },
+            "armor": {
+              "name": "Eating: tough skin",
+              "text": "You bite off a piece of the cap. Your skin prickles and hardens like the bark of an old oak (armour +15% for 2 fights)."
+            },
+            "damage": {
+              "name": "Eating: strength",
+              "text": "You bite off a piece of the cap. Warmth spreads through your arms, and your hands tighten on your weapon of their own accord (damage +10% for 2 fights)."
+            },
+            "focus": {
+              "name": "Eating: clear mind",
+              "text": "You bite off a piece of the cap. Your thoughts become clear and sharp as frost at dawn (Intellect and Wisdom +10% for 2 fights)."
+            },
+            "point": {
+              "name": "Eating: free stat point",
+              "text": "You bite off a piece of the cap. For a moment you see the forest as the System sees it: lines, numbers and the paths between them. When the vision fades, something stays with you (+1 free stat point)."
+            }
+          }
+        },
+        "leave": {
+          "label": "Leave it",
+          "outcome": {
+            "text": "Not everything that glows is fit to eat. You give the mushroom a wide berth and return to the path."
+          }
+        }
+      }
+    },
+    "wandering-beggar": {
+      "title": "Wandering Beggar",
+      "text": "An old beggar with a hurdy-gurdy at his side stands by the road. He has holey boots and a grey beard, and holds out an empty cup. He raises his faded eyes: “Spare an old man a penny?”",
+      "options": {
+        "coins": {
+          "label": "Drop him a few coins"
+        },
+        "song": {
+          "label": "Listen to his song"
+        },
+        "chase": {
+          "label": "Chase him off"
+        },
+        "leave": {
+          "label": "Leave",
+          "outcome": {
+            "text": "You pass the beggar without a word. For a while you can still hear the quiet tune of his hurdy-gurdy behind you."
+          }
+        }
+      },
+      "cases": {
+        "beggar": {
+          "name": "Ordinary beggar",
+          "outcomes": {
+            "coins": {
+              "text": "You drop a few coins into the cup (−{cost} gold). The beggar traces a sign over you and mumbles a blessing. Your step grows surer and your skin tougher (armour +10% for 2 fights)."
+            },
+            "song": {
+              "text": "The beggar tunes his hurdy-gurdy and sings an old song about wanderers who never came home. One verse sounds like a warning: “{area}. The {creature} was seen there.”",
+              "noRumorText": "The beggar tunes his hurdy-gurdy and sings an old song about days long gone. It is beautiful, but nothing comes of it."
+            },
+            "chase": {
+              "text": "The beggar gathers his things and walks off towards the forest without a word."
+            }
+          }
+        },
+        "veles": {
+          "name": "Veles in disguise",
+          "outcomes": {
+            "coins": {
+              "text": "You drop a few coins into the cup (−{cost} gold). The beggar smiles, and for a moment a green fire lights up in his eyes: “A generous soul. Veles will remember this.” Before you can answer, the road is empty (+1 free stat point)."
+            },
+            "song": {
+              "text": "The beggar plays a song so beautiful that the whole forest falls silent and the birds freeze on the branches. When the last note fades, the road is empty, and something lies in the dust: {item}. A whisper comes from between the trees: “Veles thanks you for listening.”"
+            },
+            "chase": {
+              "text": "The beggar straightens up and suddenly seems taller than the trees: “You would chase off Veles?” The ground shakes, and he melts into the mist. Your arms feel heavy as lead (curse: damage −10% for 4 fights)."
+            }
+          }
+        },
+        "thief": {
+          "name": "Thief",
+          "outcomes": {
+            "coins": {
+              "text": "You reach for your purse, and the beggar snatches it from your hand as nimbly as a youngster and vanishes into the bushes. The purse lies abandoned a few steps further on.",
+              "lossText": "Some of the gold is missing from it (−{gold} gold)."
+            },
+            "song": {
+              "text": "The beggar plays for a long time, horribly out of tune. When he finally stops, your pack feels lighter: his accomplice must have looked inside in the meantime.",
+              "lossText": "Some of the resources you gathered are gone ({resources})."
+            },
+            "chase": {
+              "text": "The beggar springs up surprisingly briskly and runs into the forest. He leaves his hurdy-gurdy behind, and it turns out to be a plank with a string stretched across it."
+            }
+          }
+        }
+      }
+    },
+    "haunted-shrine": {
+      "title": "Haunted Shrine",
+      "text": "An old wayside shrine stands at a fork in the road. A candle inside burns with a pale flame, though no one lit it, and quiet weeping comes from within.",
+      "options": {
+        "pray": {
+          "label": "Pray"
+        },
+        "exorcism": {
+          "label": "Perform an exorcism"
+        },
+        "offerings": {
+          "label": "Take the offerings"
+        },
+        "leave": {
+          "label": "Leave",
+          "outcome": {
+            "text": "You walk away, and the weeping fades behind you. The candle goes out before the shrine is out of sight."
+          }
+        }
+      },
+      "cases": {
+        "soul": {
+          "name": "Penitent soul",
+          "outcomes": {
+            "pray": {
+              "text": "You kneel and pray for whoever is weeping. The weeping fades, and for a moment the candle flame shines gold. Your thoughts grow clear and calm (Intellect and Wisdom +10% for 2 fights)."
+            },
+            "exorcism": {
+              "text": "You trace a sign and speak the words of the exorcism. The penitent soul sighs with relief and departs to where it should have gone long ago. Something is left at the foot of the shrine: {item}."
+            },
+            "offerings": {
+              "text": "You sweep up the silver offerings and coins (+{gold} gold). The weeping turns into a whisper that makes your skin crawl: the soul puts a curse on you (damage −10% for 2 fights)."
+            }
+          }
+        },
+        "upior": {
+          "name": "Upyr",
+          "outcomes": {
+            "pray": {
+              "text": "You kneel to pray, but the weeping turns into a giggle. A pale figure with empty eyes slides out of the shrine. It is an Upyr!",
+              "start": "{enemies} lunges at you, claws outstretched."
+            },
+            "exorcism": {
+              "text": "You trace a sign and speak the words of the exorcism. An Upyr flies out of the shrine with a howl and scatters like smoke before it can reach you (+{xp} XP). Where it stood, something remains: {item}."
+            },
+            "offerings": {
+              "text": "You reach for the offerings, and an icy hand seizes your wrist. An Upyr guards its shrine!",
+              "start": "The Upyr strikes first: {enemies}."
+            }
+          }
+        },
+        "empty": {
+          "name": "Empty shrine",
+          "outcomes": {
+            "pray": {
+              "text": "You pray in silence. The weeping turns out to be the wind in the cracks of the old boards, and the candle burns down and goes out."
+            },
+            "exorcism": {
+              "text": "You speak the words of the exorcism, but nothing happens. There is no one in the shrine but spiders."
+            },
+            "offerings": {
+              "text": "The weeping turns out to be the wind in the cracks of the old boards. You sweep up the silver offerings and coins that no one is guarding (+{gold} gold)."
+            }
+          }
+        }
+      }
+    },
+    "stuck-merchant": {
+      "title": "Merchant Stuck in the Mud",
+      "text": "On the sodden road stands a cart sunk axle-deep in mud. A stout merchant in a fur hat waves his arms: “Help me, and you won't regret it!”",
+      "options": {
+        "help": {
+          "label": "Help push the cart out"
+        },
+        "demand": {
+          "label": "Demand payment up front"
+        },
+        "leave": {
+          "label": "Leave",
+          "outcome": {
+            "text": "You give the cart a wide berth. The merchant goes on cursing behind your back for a long while."
+          }
+        }
+      },
+      "cases": {
+        "honest": {
+          "name": "Honest merchant",
+          "outcomes": {
+            "help": {
+              "text": "You set your shoulder against the cart. At last the wheels pop out of the mud, and the merchant shakes your hand and counts out your pay (+{gold} gold): “I'll tell the Merchants' Company about you!” (+15 reputation with the Merchants' Company)."
+            },
+            "demand": {
+              "text": "The merchant grimaces but pays up front (+{gold} gold). You help push the cart out, and he drives off without looking back."
+            }
+          }
+        },
+        "swindler": {
+          "name": "Swindler",
+          "outcomes": {
+            "help": {
+              "text": "You set your shoulder against the cart while the merchant's helper hangs about behind your back. The cart rolls out of the mud and both of them drive off in a hurry.",
+              "lossText": "Only then do you notice the cut strap of your purse (−{gold} gold)."
+            },
+            "demand": {
+              "text": "“Up front? I can see at once who I'm dealing with!” The merchant cracks his whip, the cart somehow tears free of the mud, and off he drives."
+            }
+          }
+        },
+        "ambush": {
+          "name": "Ambush",
+          "outcomes": {
+            "help": {
+              "text": "You bend over the wheel, and bandits leap out from behind the cart. The merchant in the mud was the bait!",
+              "start": "Ambush! The bandits strike first: {enemies}."
+            },
+            "demand": {
+              "text": "The merchant fumbles for words, mumbles something and glances towards the bushes. You sense the ambush before the bandits leap out of hiding.",
+              "start": "The bandits leap out of hiding, but the ambush no longer takes you by surprise: {enemies}."
+            }
+          }
+        }
+      }
+    },
+    "leshy": {
+      "title": "The Leshy Twists the Path",
+      "text": "The path leads you back to the same fallen oak yet again. Someone giggles behind the trees. It is the Leshy, lord of the wilds, who loves leading travellers astray.",
+      "options": {
+        "clothes": {
+          "label": "Turn your clothes inside out",
+          "outcome": {
+            "breaks": {
+              "name": "Clothes: the spell breaks",
+              "text": "You turn your clothes inside out, as the old folk advise. The Leshy bursts out laughing until the leaves shake, and vanishes. The spell breaks, and on the trunk of the fallen oak lies his gift: {herbs}.",
+              "herbsKnown": {
+                "goldText": "You turn your clothes inside out, as the old folk advise. The Leshy bursts out laughing until the leaves shake, and vanishes. The spell breaks, and on the trunk of the fallen oak lies a handful of coins (+{gold} gold)."
+              }
+            },
+            "holds": {
+              "name": "Clothes: the spell holds",
+              "text": "You turn your clothes inside out, but the Leshy only giggles louder. This time the old trick fails, and you wander the forest until dusk.",
+              "lossText": "On the way you lose some of the resources you gathered ({resources})."
+            }
+          }
+        },
+        "bread": {
+          "label": "Leave him bread and a few coins",
+          "outcome": {
+            "text": "You place bread and a few coins on the trunk (−{cost} gold). The giggling stops, and the branches part before you of their own accord. A shortcut leads to a hidden clearing where an old chest stands among the ferns. Inside is your reward: {item}."
+          }
+        },
+        "onward": {
+          "label": "Keep walking straight ahead",
+          "outcome": {
+            "text": "You stubbornly keep going, but the path keeps turning back to the same oak. You wander until dusk, and the Leshy laughs from every bush.",
+            "lossText": "On the way you lose some of the resources you gathered ({resources})."
+          }
+        },
+        "duel": {
+          "label": "Challenge the Leshy",
+          "outcome": {
+            "text": "You call into the depths of the forest for the Leshy to show himself and fight. The trees creak, and from between them steps a figure taller than a man, with antlers and a beard of moss.",
+            "win": {
+              "text": "The Leshy bows low and vanishes into the thicket. His gift is left on the moss: {item}."
+            },
+            "start": "{enemies} accepts the challenge."
+          }
+        }
+      }
+    },
+    "lost-child": {
+      "title": "Lost Girl",
+      "text": "In the middle of the path sits a little girl in a linen shift, crying and hugging a straw doll. When she sees you, she raises her head: “I'm lost. Will you take me to my mum?”",
+      "options": {
+        "lead": {
+          "label": "Take her home",
+          "outcome": {
+            "text": "The girl takes your hand. Her fingers are as cold as water from a stream. She leads you deeper and deeper into the forest until she stops before a rotten oak: “Mum lives here.” There is no hut anywhere in sight.",
+            "options": {
+              "look": {
+                "label": "Look behind the oak"
+              },
+              "iron": {
+                "label": "Show her an iron knife"
+              },
+              "back": {
+                "label": "Let go of her hand and turn back"
+              }
+            }
+          }
+        },
+        "ask": {
+          "label": "Ask where she came from",
+          "outcome": {
+            "text": "“From Willow Village, past the third stream,” the girl whispers, wiping her tears with her sleeve. The sleeve is dry, though it rained all night.",
+            "options": {
+              "camp": {
+                "label": "Keep her with you for the night"
+              },
+              "food": {
+                "label": "Give her food and show her the way"
+              },
+              "go": {
+                "label": "Leave"
+              }
+            }
+          }
+        },
+        "leave": {
+          "label": "Leave",
+          "outcome": {
+            "text": "You walk past the girl. Her crying stops behind you as suddenly as if someone had shut a door."
+          }
+        }
+      },
+      "cases": {
+        "child": {
+          "name": "Lost child",
+          "outcomes": {
+            "lead/look": {
+              "text": "Behind the oak stands a tar-burner's hut, with her mother in the doorway, hair streaming. She throws her arms around her daughter and presses a bundle with all their silver into your hands (+{gold} gold)."
+            },
+            "lead/iron": {
+              "text": "The girl backs away in tears and runs behind the oak, where a tar-burner's hut stands. Her mother slams the door and shouts through it that they need no madmen with knives here."
+            },
+            "lead/back": {
+              "text": "You turn back to the road. The girl runs behind the oak on her own, straight to a tar-burner's hut with smoke rising from its chimney."
+            },
+            "ask/camp": {
+              "text": "The girl falls asleep by the fire, hugging her doll. At dawn her father, a woodcutter from the next valley, comes for her. He thanks you at length and leaves you the most precious thing he has: {item}."
+            },
+            "ask/food": {
+              "herbsKnown": {
+                "goldText": "The girl eats every last crumb and, to thank you, gives you a handful of small coins from her bundle (+{gold} gold). Then she runs off down the path you showed her, and a joyful shout comes from the forest: someone has found her."
+              },
+              "text": "The girl eats every last crumb and, to thank you, gives you a basket of the herbs she was gathering before she got lost ({herbs}). Then she runs off down the path you showed her, and a joyful shout comes from the forest: someone has found her."
+            },
+            "ask/go": {
+              "text": "You walk away. Behind you, you can hear the girl humming to herself as she heads towards the village."
+            }
+          }
+        },
+        "upior": {
+          "name": "Upyr child",
+          "outcomes": {
+            "lead/look": {
+              "text": "Behind the oak there is only a dug-up grave. The small hand clamps onto yours like pincers, and the girl's face turns grey and sinks in. It is an Upyr, looking for a companion in the grave!",
+              "start": "The Upyr strikes first: {enemies}."
+            },
+            "lead/iron": {
+              "text": "At the sight of iron the girl screams in an inhuman voice and falls apart into a wisp of mist. Only the straw doll is left under the oak, with something sewn inside it: {item}."
+            },
+            "lead/back": {
+              "text": "You let go of the cold little hand and turn back. All the way you feel an icy breath on the back of your neck, and your arms grow heavy as lead (curse: damage −10% for 2 fights)."
+            },
+            "ask/camp": {
+              "text": "In the night a piercing cold wakes you. The girl is standing over you with wide, empty eyes, and the fire is going out. It is an Upyr!",
+              "start": "The Upyr falls upon you in your sleep: {enemies}."
+            },
+            "ask/food": {
+              "text": "The girl takes the food but does not eat it. She smiles sadly: “No one has given me anything in a long time.” She melts away like mist, leaving you with a strange peace in your heart (focus +10% for 2 fights)."
+            },
+            "ask/go": {
+              "text": "You walk away briskly. The crying behind you turns into a giggle, then suddenly stops."
+            }
+          }
+        }
+      }
+    },
+    "forest-wedding": {
+      "title": "Wedding in the Woods",
+      "text": "Music drifts from between the trees. A wedding is under way in the clearing: bonfires blaze, fiddles scrape and couples whirl in the dance. The wedding host, in an embroidered shirt, blocks your way with a horn of mead in his hand: “A guest in the house! You won't refuse the young couple?”",
+      "options": {
+        "join": {
+          "label": "Join the celebration",
+          "outcome": {
+            "text": "The host sits you down at the table and hands you a horn full of mead: “To the young couple's health, bottoms up!” The music plays faster and faster, and the dancers never stop for a moment, though no one looks tired.",
+            "options": {
+              "drink": {
+                "label": "Drain the horn"
+              },
+              "pour": {
+                "label": "Secretly pour the mead under the table"
+              },
+              "gift": {
+                "label": "Give the young couple a gift"
+              }
+            }
+          }
+        },
+        "watch": {
+          "label": "Watch from hiding",
+          "outcome": {
+            "text": "Up close it looks like an ordinary village wedding: children are pinching the wedding cake, and the bride's uncle sings out of tune. The host spots you in the bushes and waves: “Come on, join us!”",
+            "options": {
+              "greet": {
+                "label": "Come out of hiding and say hello"
+              },
+              "cross": {
+                "label": "Cross yourself"
+              },
+              "run": {
+                "label": "Run"
+              }
+            }
+          }
+        },
+        "leave": {
+          "label": "Go around the clearing",
+          "outcome": {
+            "text": "You give the clearing a wide berth. The music carries through the trees for a long time after."
+          }
+        }
+      },
+      "cases": {
+        "living": {
+          "name": "Real wedding",
+          "outcomes": {
+            "join/drink": {
+              "text": "The mead is strong and sweet. You dance with the bridesmaids until broad daylight, and when you finally set off, the wedding still hums in your veins (damage +10% for 4 fights)."
+            },
+            "join/pour": {
+              "text": "The host sees you pour the mead under the table and turns red with anger: “You insult the young couple!” The music stops, and you have to leave to a chorus of whistles."
+            },
+            "join/gift": {
+              "text": "The bride thanks you for the gift (−{cost} gold), and the groom, a blacksmith's son, gives you something from his forge in return: {item}."
+            },
+            "watch/greet": {
+              "text": "You step out of the bushes to a burst of laughter. You get a slice of wedding cake, a place by the fire and the blessing of the old matchmaker (focus +10% for 2 fights)."
+            },
+            "watch/cross": {
+              "text": "You cross yourself with a flourish. The wedding guests look at you as if you were mad, and someone throws a gnawed bone your way."
+            },
+            "watch/run": {
+              "text": "You run into the forest. Behind you there is laughter and a jaunty ditty about a cowardly wanderer."
+            }
+          }
+        },
+        "dead": {
+          "name": "Wedding of the dead",
+          "outcomes": {
+            "join/drink": {
+              "text": "The mead tastes of earth and smoke. You dance until the world spins and goes dark. You wake at dawn in an overgrown graveyard, an empty horn in your hand.",
+              "lossText": "Your purse is lighter (−{gold} gold)."
+            },
+            "join/pour": {
+              "text": "The mead hisses on the ground like embers. The music breaks off mid-bar, and the guests turn their eyeless faces towards you. Somewhere far off a cock crows, and the clearing empties. Only some old silver tableware is left on the table (+{gold} gold)."
+            },
+            "join/gift": {
+              "text": "The bride takes the gift (−{cost} gold) with an icy hand: “No one has come to my wedding in a hundred years.” She takes the withered wreath from her head and hands it to you. In your fingers the wreath turns into something else: {item}. The clearing is empty."
+            },
+            "watch": {
+              "text": "The longer you watch, the more you see: the fires give no warmth, and the dancers cast no shadows. The host slowly turns his head straight towards you and smiles widely, too widely."
+            },
+            "watch/greet": {
+              "text": "The guests seize your hands and pull you into a round dance that never ends. When the cock crows, you are left in the empty clearing, breathless and drained.",
+              "lossText": "The guests also took something from your pack ({resources})."
+            },
+            "watch/cross": {
+              "text": "You cross yourself, and the music stops as if cut with a knife. One by one the guests bow low to you and drift away like smoke. The host vanishes last, with a grateful nod (+{xp} XP)."
+            },
+            "watch/run": {
+              "text": "You run, and the music follows you for a long time. No one gives chase, but you do not look back until dawn."
+            }
+          }
+        }
+      }
+    },
+    "treasure-hunter": {
+      "title": "Treasure Hunter",
+      "text": "A shaggy man in a patched jerkin is digging by an old barrow. When he sees you, he straightens up and waves a yellowed map: “There's robbers' treasure buried here! Help me dig and we'll split it down the middle.”",
+      "options": {
+        "dig": {
+          "label": "Help him dig",
+          "outcome": {
+            "text": "You dig together until dusk. At last a spade strikes the iron-bound lid of a chest. The treasure hunter puts down his spade and slowly reaches behind his belt.",
+            "options": {
+              "strike": {
+                "label": "Strike first"
+              },
+              "open": {
+                "label": "Open the chest"
+              },
+              "wait": {
+                "label": "Step back and watch his hands"
+              }
+            }
+          }
+        },
+        "map": {
+          "label": "Buy the map from him",
+          "outcome": {
+            "text": "The treasure hunter pockets the coins (−{cost} gold) and hands over the map in an odd hurry. The cross on the map leads to an old pine with a hollow. Something glints inside, and there are deep, fresh scratches on the bark.",
+            "options": {
+              "reach": {
+                "label": "Reach into the hollow"
+              },
+              "tracks": {
+                "label": "Examine the scratches on the bark"
+              },
+              "drop": {
+                "label": "Leave it",
+                "outcome": {
+                  "text": "You leave the hollow alone. The map ends up in the fire, and you move on with a lighter purse."
+                }
+              }
+            }
+          }
+        },
+        "leave": {
+          "label": "Leave",
+          "outcome": {
+            "text": "You wish him luck and walk away. For a long time you can still hear the crunch of his spade behind you."
+          }
+        }
+      },
+      "cases": {
+        "honest": {
+          "name": "Honest treasure hunter",
+          "outcomes": {
+            "dig/strike": {
+              "text": "You strike, but he was only reaching for his flask. He flees screaming into the forest. The chest holds nothing but rotten rags, and the bad taste stays with you for a long time."
+            },
+            "dig/open": {
+              "text": "Old coins glint in the chest. The treasure hunter counts them by lantern light and splits them fairly, down to the last penny (+{gold} gold)."
+            },
+            "dig/wait": {
+              "text": "The treasure hunter pulls a flask from behind his belt and offers you the first sip. You open the chest together: he takes the coins and leaves you what lay at the bottom: {item}."
+            },
+            "map/reach": {
+              "text": "The scratches were only left by a boar rubbing against the bark. In the hollow lies a bundle wrapped in greased leather, and in it: {item}."
+            },
+            "map/tracks": {
+              "text": "The scratches are a finger deep. They are claw marks, and the map turns out to be a hunting map with lairs marked on it: “{area}. The {creature} was seen there.” A hunter's purse also lies in the hollow (+{gold} gold).",
+              "noRumorText": "The scratches were left by a boar rubbing against the bark. The map turns out to be an ordinary hunting map, and in the hollow lies a hunter's purse (+{gold} gold)."
+            }
+          }
+        },
+        "robber": {
+          "name": "Robber and his mate",
+          "outcomes": {
+            "dig/strike": {
+              "text": "You beat him to it by the blink of an eye: a knife flashes in his hand, and his mate leaps out of the bushes with a club.",
+              "start": "The robbers rush at you, but you strike first: {enemies}."
+            },
+            "dig/open": {
+              "text": "As you lean over the chest, you feel a cold blade at the back of your neck. A second robber leaps out of the bushes. The treasure was bait!",
+              "start": "Ambush! The robbers strike first: {enemies}."
+            },
+            "dig/wait": {
+              "text": "The treasure hunter draws a knife, but sees you watching his hands. He whistles for his mate in the bushes, and they come at you together.",
+              "start": "The robbers attack: {enemies}."
+            },
+            "map/reach": {
+              "text": "In the hollow lies a stone wrapped in a rag. Before you can turn round, the treasure hunter is gone, and your coins with him."
+            },
+            "map/tracks": {
+              "text": "The scratches are knife cuts, and a trodden path leads away from the pine. You follow it straight to a robbers' camp.",
+              "start": "The robbers leap up from their fire: {enemies}."
+            }
+          }
+        },
+        "guardian": {
+          "name": "Barrow guardian",
+          "outcomes": {
+            "dig/strike": {
+              "text": "Your blade passes through the treasure hunter as if through smoke. He laughs, and his face sinks into a skull. It is an Upyr, the guardian of the barrow!",
+              "win": {
+                "text": "Among the yellowed bones in the chest lies your prize: {item}."
+              },
+              "start": "{enemies} defends its treasure."
+            },
+            "dig/open": {
+              "text": "The chest is full of gold. As you plunge your hands into it, the treasure hunter starts to laugh, and half the coins blacken and crumble into cinders. You are left with a handful of gold (+{gold} gold) and a weight on your heart (curse: damage −10% for 4 fights)."
+            },
+            "dig/wait": {
+              "text": "The treasure hunter takes a clod of barrow earth from behind his belt and crumbles it between his fingers. When the dust settles, he and the chest are both gone. All that is left is the pit and a chill in your bones."
+            },
+            "map/reach": {
+              "text": "In the hollow lies a yellowed skull with a coin between its teeth. When you touch it, you go cold to the marrow (curse: damage −10% for 2 fights)."
+            },
+            "map/tracks": {
+              "text": "The scratches form old runes. You read them and avoid the trap left by the barrow's guardian. In the hollow you find your reward: {item}."
+            }
+          }
+        }
+      }
+    }
+  },
+  "foes": {
+    "bandit-thug": {
+      "name": "Thug",
+      "counted": [
+        "Thug",
+        "Thugs",
+        "Thugs"
+      ],
+      "attack": {
+        "name": "Club Blow"
+      }
+    },
+    "bandit-knifer": {
+      "name": "Cutthroat",
+      "counted": [
+        "Cutthroat",
+        "Cutthroats",
+        "Cutthroats"
+      ],
+      "attack": {
+        "name": "Knife Thrust"
+      }
+    },
+    "bandit-crossbow": {
+      "name": "Crossbowman",
+      "counted": [
+        "Crossbowman",
+        "Crossbowmen",
+        "Crossbowmen"
+      ],
+      "attack": {
+        "name": "Crossbow Bolt"
+      }
+    },
+    "upior": {
+      "name": "Upyr",
+      "counted": [
+        "Upyr",
+        "Upyrs",
+        "Upyrs"
+      ],
+      "attack": {
+        "name": "Ghastly Claws"
+      }
+    },
+    "leshy": {
+      "name": "Leshy",
+      "counted": [
+        "Leshy",
+        "Leshies",
+        "Leshies"
+      ],
+      "attack": {
+        "name": "Staff Strike"
+      }
+    },
+    "bandit-chief": {
+      "name": "Robber Chief",
+      "counted": [
+        "Robber Chief",
+        "Robber Chiefs",
+        "Robber Chiefs"
+      ],
+      "attack": {
+        "name": "Axe Blow"
+      }
+    },
+    "poacher": {
+      "name": "Poacher",
+      "counted": [
+        "Poacher",
+        "Poachers",
+        "Poachers"
+      ],
+      "attack": {
+        "name": "Arrow"
+      }
+    },
+    "horse-thief": {
+      "name": "Horse Thief",
+      "counted": [
+        "Horse Thief",
+        "Horse Thieves",
+        "Horse Thieves"
+      ],
+      "attack": {
+        "name": "Knife Slash"
+      }
+    },
+    "smuggler": {
+      "name": "Smuggler",
+      "counted": [
+        "Smuggler",
+        "Smugglers",
+        "Smugglers"
+      ],
+      "attack": {
+        "name": "Cutlass Strike"
+      }
+    },
+    "arsonist": {
+      "name": "Wojsław the Blaze",
+      "counted": [
+        "Wojsław the Blaze",
+        "Wojsław the Blaze",
+        "Wojsław the Blaze"
+      ],
+      "attack": {
+        "name": "Fire Pot"
+      }
+    },
+    "highwaywoman": {
+      "name": "Masked Diana",
+      "counted": [
+        "Masked Diana",
+        "Masked Diana",
+        "Masked Diana"
+      ],
+      "attack": {
+        "name": "Twin Knives"
+      }
+    },
+    "grave-robber": {
+      "name": "Ścibor the Digger",
+      "counted": [
+        "Ścibor the Digger",
+        "Ścibor the Digger",
+        "Ścibor the Digger"
+      ],
+      "attack": {
+        "name": "Spade Blow"
+      }
+    }
+  }
+}

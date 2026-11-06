@@ -1,0 +1,37 @@
+{
+  "$comment": "English texts of data/regions.json (src/engine/overlay.js): the first region, Wiatrołomy, with its places, and the name of their land, the same for both regions of the Skraj Puszczy, as the casino groups the places of a land by it (src/engine/casino.js).",
+  "windfalls": {
+    "land": "Edge of the Wilds",
+    "name": "Windfalls",
+    "description": "A belt of fallen trees on the edge of the wilds. Wolves, boars, deer and ravens, and deep in the thicket a wandering light and a storm-bringing Pwanetnik.",
+    "trait": {
+      "name": "Sacred Grove",
+      "description": "Rest between fights restores 5% more HP."
+    },
+    "areas": {
+      "windfalls-edge": {
+        "name": "Edge of the Windfalls",
+        "description": "A sparse copse by the first fallen trunks. Lone wolves and badgers, grass snakes in the long grass, and squirrels hurling pine cones from the branches."
+      },
+      "fox-ravines": {
+        "name": "Fox Ravines",
+        "description": "Sandy ravines full of burrows. Foxes hunt here in pairs, martens leap through the trees, raccoon dogs take over the fox dens, and antlions wait at the bottom of sandy pits."
+      },
+      "raven-hollows": {
+        "name": "Raven Hollows",
+        "description": "Upturned trees with their roots to the sky. Ravens nest on them, a tawny owl hunts at dusk, weasels dart between the roots, and a capercaillie displays in the clearing."
+      },
+      "viper-heaps": {
+        "name": "Viper Deadfall",
+        "description": "Sun-warmed heaps of trunks. A viper basks on every stone, hornets buzz and stag beetles scrabble in the rotten logs, and a snake eagle circles above the deadfall."
+      },
+      "boar-thicket": {
+        "name": "Boar Thicket",
+        "description": "The densest part of the Windfalls. Churned earth gives the boars away, deer slip between the trunks, a wildcat lurks in the undergrowth, and a black stork wades in the stream. Tusk marks show on the trunks higher than a man can reach."
+      }
+    }
+  },
+  "stone-glade": {
+    "land": "Edge of the Wilds"
+  }
+}

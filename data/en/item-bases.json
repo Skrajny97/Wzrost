@@ -1,0 +1,219 @@
+{
+  "$comment": "English texts of data/item-bases.json, by the base's id (src/engine/overlay.js): the bases up to class level 25, with the attack of a weapon.",
+  "sword": {
+    "name": "Sword",
+    "attackName": "Slash"
+  },
+  "broadsword": {
+    "name": "Broadsword",
+    "attackName": "Slash"
+  },
+  "saber": {
+    "name": "Sabre",
+    "attackName": "Slash"
+  },
+  "axe": {
+    "name": "Axe",
+    "attackName": "Chop"
+  },
+  "war-axe": {
+    "name": "War Axe",
+    "attackName": "Chop"
+  },
+  "bearded-axe": {
+    "name": "Bearded Axe",
+    "attackName": "Chop"
+  },
+  "dagger": {
+    "name": "Dagger",
+    "attackName": "Stab"
+  },
+  "hunting-knife": {
+    "name": "Hunting Knife",
+    "attackName": "Stab"
+  },
+  "kindjal": {
+    "name": "Kindjal",
+    "attackName": "Stab"
+  },
+  "bow": {
+    "name": "Bow",
+    "attackName": "Shot"
+  },
+  "recurve-bow": {
+    "name": "Recurve Bow",
+    "attackName": "Shot"
+  },
+  "longbow": {
+    "name": "Longbow",
+    "attackName": "Shot"
+  },
+  "staff": {
+    "name": "Staff",
+    "attackName": "Elemental Bolt"
+  },
+  "rune-staff": {
+    "name": "Rune Staff",
+    "attackName": "Elemental Bolt"
+  },
+  "posokh": {
+    "name": "Posokh",
+    "attackName": "Elemental Bolt"
+  },
+  "aspergillum": {
+    "name": "Aspergillum",
+    "attackName": "Sacred Bolt"
+  },
+  "censer": {
+    "name": "Censer",
+    "attackName": "Sacred Bolt"
+  },
+  "rosary": {
+    "name": "Rosary",
+    "attackName": "Sacred Bolt"
+  },
+  "shield": {
+    "name": "Shield"
+  },
+  "pavise": {
+    "name": "Pavise"
+  },
+  "kalkan": {
+    "name": "Kalkan"
+  },
+  "quiver": {
+    "name": "Quiver"
+  },
+  "bow-case": {
+    "name": "Bow Case"
+  },
+  "war-quiver": {
+    "name": "War Quiver"
+  },
+  "misericorde": {
+    "name": "Misericorde"
+  },
+  "dirk": {
+    "name": "Dirk"
+  },
+  "parrying-dagger": {
+    "name": "Parrying Dagger"
+  },
+  "focus": {
+    "name": "Focus"
+  },
+  "tome": {
+    "name": "Tome"
+  },
+  "quartz-crystal": {
+    "name": "Crystal"
+  },
+  "hood": {
+    "name": "Hood"
+  },
+  "fur-cap": {
+    "name": "Fur Cap"
+  },
+  "hat": {
+    "name": "Hat"
+  },
+  "helmet": {
+    "name": "Helmet"
+  },
+  "peaked-helmet": {
+    "name": "Peaked Helmet"
+  },
+  "kettle-hat": {
+    "name": "Kettle Hat"
+  },
+  "tunic": {
+    "name": "Tunic"
+  },
+  "gambeson": {
+    "name": "Gambeson"
+  },
+  "caftan": {
+    "name": "Kaftan"
+  },
+  "chainmail": {
+    "name": "Chainmail"
+  },
+  "brigandine": {
+    "name": "Brigandine"
+  },
+  "cuirass": {
+    "name": "Cuirass"
+  },
+  "robe": {
+    "name": "Robe"
+  },
+  "cloak": {
+    "name": "Cloak"
+  },
+  "rune-cloak": {
+    "name": "Rune Cloak"
+  },
+  "cowl": {
+    "name": "Cowl"
+  },
+  "biretta": {
+    "name": "Biretta"
+  },
+  "monk-hood": {
+    "name": "Monk's Hood"
+  },
+  "surplice": {
+    "name": "Surplice"
+  },
+  "chasuble": {
+    "name": "Chasuble"
+  },
+  "dalmatic": {
+    "name": "Dalmatic"
+  },
+  "gloves": {
+    "name": "Gloves"
+  },
+  "bracers": {
+    "name": "Bracers"
+  },
+  "vambraces": {
+    "name": "Vambraces"
+  },
+  "boots": {
+    "name": "Boots"
+  },
+  "pointed-shoes": {
+    "name": "Pointed Shoes"
+  },
+  "laced-shoes": {
+    "name": "Laced Shoes"
+  },
+  "amulet": {
+    "name": "Amulet"
+  },
+  "reliquary": {
+    "name": "Reliquary"
+  },
+  "pendant": {
+    "name": "Pendant"
+  },
+  "ring": {
+    "name": "Ring"
+  },
+  "signet-ring": {
+    "name": "Signet Ring"
+  },
+  "band-ring": {
+    "name": "Band Ring"
+  },
+  "talisman": {
+    "name": "Talisman"
+  },
+  "holed-stone": {
+    "name": "Holed Stone"
+  },
+  "fang-charm": {
+    "name": "Fang Charm"
+  }
+}

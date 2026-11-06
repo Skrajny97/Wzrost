@@ -1,0 +1,13 @@
+{
+  "$comment": "English texts of data/balance.json (src/engine/overlay.js). hunt.uniqueLengthFrom is a rarity's id, not a text.",
+  "combat": {
+    "unarmed": {
+      "attackName": "Punch"
+    }
+  },
+  "hunt": {
+    "companionsAdvice": {
+      "text": "From this land on, the creatures are very strong. Come here with two companions from the Tavern."
+    }
+  }
+}

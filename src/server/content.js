@@ -48,10 +48,21 @@ import guilds from '../../data/guilds.json' with { type: 'json' };
 import cosmetics from '../../data/cosmetics.json' with { type: 'json' };
 // The English texts (data/en/), by the data file they translate. A file
 // added there is named here too (tools/i18n-check.mjs checks it).
+import enAffixes from '../../data/en/affixes.json' with { type: 'json' };
 import enAppearances from '../../data/en/appearances.json' with { type: 'json' };
+import enBalance from '../../data/en/balance.json' with { type: 'json' };
 import enChat from '../../data/en/chat.json' with { type: 'json' };
 import enClasses from '../../data/en/classes.json' with { type: 'json' };
+import enEffects from '../../data/en/effects.json' with { type: 'json' };
+import enElements from '../../data/en/elements.json' with { type: 'json' };
+import enEvents from '../../data/en/events.json' with { type: 'json' };
 import enGiftCodes from '../../data/en/gift-codes.json' with { type: 'json' };
+import enItemBases from '../../data/en/item-bases.json' with { type: 'json' };
+import enMaterials from '../../data/en/materials.json' with { type: 'json' };
+import enMonsters from '../../data/en/monsters.json' with { type: 'json' };
+import enRarities from '../../data/en/rarities.json' with { type: 'json' };
+import enRegions from '../../data/en/regions.json' with { type: 'json' };
+import enResources from '../../data/en/resources.json' with { type: 'json' };
 import enSkins from '../../data/en/skins.json' with { type: 'json' };
 import enSlots from '../../data/en/slots.json' with { type: 'json' };
 import enStats from '../../data/en/stats.json' with { type: 'json' };
@@ -99,10 +110,21 @@ const polishData = {
 
 export const OVERLAYS = {
   en: {
+    affixes: enAffixes,
     appearances: enAppearances,
+    balance: enBalance,
     chat: enChat,
     classes: enClasses,
+    effects: enEffects,
+    elements: enElements,
+    events: enEvents,
     'gift-codes': enGiftCodes,
+    'item-bases': enItemBases,
+    materials: enMaterials,
+    monsters: enMonsters,
+    rarities: enRarities,
+    regions: enRegions,
+    resources: enResources,
     skins: enSkins,
     slots: enSlots,
     stats: enStats,
