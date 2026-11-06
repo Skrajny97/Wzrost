@@ -1,0 +1,912 @@
+{
+  "$comment": "English texts of data/settlement.json (src/engine/overlay.js): the Settlement (Crossroads) with its places, residents, brotherhoods and standings, the Order Board, the Tavern with its rumours, the companions, the Stable, the Games Parlour, the Trial Hall, the Wanted posters and the mercenaries. Personal names stay as they are (Bogumił, Jagna…), and the companions' names are left out: they are names, drawn from the Polish list. A resident's `title` is written small, after the name (\"Bogumił, headman\"). The Polish [female|male] forms have one English text where the sentence is the same for both. `anyMaterial` and `recipes.counted` are a noun after a number, [one, other, other] (src/engine/text.js, countedForm): \"32 common materials\". A rumour's {creature} is the creature's name (its `counted` one), so the lines say \"the {creature}\". The Wanted variants are named variants of creatures named in data/en/monsters.json.",
+  "name": "Crossroads",
+  "description": "A settlement where forest roads cross, beyond the wilds. The people here trade with everyone who comes out of the forest alive.",
+  "places": {
+    "board": {
+      "name": "Order Board"
+    },
+    "enchanter": {
+      "name": "Enchantress's Workshop"
+    },
+    "hermitage": {
+      "name": "Hermit's Hut"
+    },
+    "stable": {
+      "name": "Stable"
+    },
+    "tavern": {
+      "name": "Tavern"
+    },
+    "market": {
+      "name": "Marketplace"
+    },
+    "tannery": {
+      "name": "Tannery"
+    },
+    "herbalist": {
+      "name": "Herbalist's Hut"
+    },
+    "forge": {
+      "name": "Forge"
+    },
+    "casino": {
+      "name": "Games Parlour"
+    },
+    "trial-hall": {
+      "name": "Trial Hall"
+    }
+  },
+  "residents": {
+    "headman": {
+      "name": "Bogumił",
+      "title": "headman",
+      "story": "He has run the Crossroads for thirty winters. He remembers every debt and every favour, and he hangs the orders on the board in front of his hut.",
+      "greetings": [
+        "A new face. There's always some work on the board. We pay fairly here.",
+        "People were asking if you'd come again. I have orders for you.",
+        "I keep the best orders aside for my regulars.",
+        "You I can trust with matters no one speaks of out loud.",
+        "The Crossroads has a friend in you. That is remembered here."
+      ]
+    },
+    "enchantress": {
+      "name": "Wiedana",
+      "title": "enchantress",
+      "story": "She came from the north with a single bundle and a book of runes. She says little, but in her case speech truly is silver and silence golden. For she listens to items, and she can enchant them.",
+      "greetings": [
+        "Don't touch the crystals. What do you want?",
+        "Ah, it's you. Show me what you've brought from the forest.",
+        "Your items hold more than meets the eye. I can draw it out.",
+        "For you, I stay in the workshop longer.",
+        "I show few people what I can truly do. I'll show you."
+      ]
+    },
+    "hermit": {
+      "name": "Sambor",
+      "title": "hermit",
+      "story": "He lives at the edge of the forest, far from the square. He once went on explorations; now he helps others start their path anew.",
+      "greetings": [
+        "Any path can be started anew. The only question is what it's worth to you.",
+        "Here again. Is something chafing in who you're becoming?",
+        "Sit down. Change takes calm.",
+        "Few come back here so often. You understand now what you're looking for.",
+        "You are one of the few I talk with unhurried."
+      ]
+    },
+    "groom": {
+      "name": "Mirosław",
+      "title": "stablemaster",
+      "story": "He grew up in a stable by the road and to this day sleeps closer to horses than to people. His mounts know the forest paths, so whoever rides them comes back from the wilds sooner.",
+      "greetings": [
+        "Don't come at a horse from behind, it'll kick. Looking for a mount?",
+        "Oh, you again. The horses know you by your step now.",
+        "For regulars I always have a horse saddled and a full manger.",
+        "I'd even let you have my best mare. And I don't let anyone have her.",
+        "The horses neigh with joy when they see you. So do I, only quieter."
+      ]
+    },
+    "innkeeper": {
+      "name": "Zbylut",
+      "title": "innkeeper",
+      "story": "He knows every rumour from the road and everyone looking for work. At his place you will find your future companions.",
+      "greetings": [
+        "Sit wherever there's room. A tankard of ale, and a rumour from the road with it, if anyone's curious.",
+        "Oh, you again. Folk off the road left some interesting news here today.",
+        "Your place at the bar is waiting. A tankard, and fresh rumours too.",
+        "I tell you what I don't tell others. Lean in closer.",
+        "For friends of the Crossroads the tankard's always full, and the back room's always open."
+      ]
+    },
+    "herbalist": {
+      "name": "Jagna",
+      "title": "herbalist",
+      "story": "She gathers herbs from dawn and dries them under the thatch. She pays well for good herbs, and shares rare recipes with those she trusts.",
+      "greetings": [
+        "Bringing herbs? Show me what's in your basket. For good ones I pay more than the scrap dealer.",
+        "Oh, you again. I'm running out of chamomile, and there are never enough potions.",
+        "Sit by the stove. Herbs first, then tea.",
+        "I pay you like one of my own. Someday I'll show you what I brew in this cauldron.",
+        "For friends my door is always open and my cauldron always warm."
+      ]
+    },
+    "tanner": {
+      "name": "Wszebor",
+      "title": "tanner",
+      "story": "He spent half his life tracking game in the wilds, and now he tans hides for the hunters of the Crossroads. He buys up everything the creatures leave behind: hides, scales, feathers and fangs, and he sells from his own stores to anyone short of materials for an order.",
+      "greetings": [
+        "Don't hold your nose, you get used to the smell. Got anything from the creatures? For proper goods I pay more than the scrap dealer.",
+        "Oh, you again. Wolf pelts sell like hot cakes, so bring as many as you can.",
+        "Sit down, just not by the vat. I've put a few better hides aside for you.",
+        "I'll show you hides I don't put out for just anyone.",
+        "For you I'll pull even a bear hide out of my stores. Take what you need."
+      ]
+    },
+    "merchant": {
+      "name": "Gościwit",
+      "title": "merchant",
+      "story": "He came with a caravan from beyond the great river and stayed, because all roads meet at the Crossroads. His stall has a bit of everything, and he speaks of each thing as if it were treasure.",
+      "greetings": [
+        "Look, choose, but don't touch. And mind you make up your mind quickly. Today's goods may be gone tomorrow.",
+        "Ah, a familiar face! I've got something you'll like. Or not, but it's worth a look.",
+        "A regular is a treasure. Whoever buys from me knows I don't cheat. Not much.",
+        "I'll tell you where I get my goods. I don't tell others, or they'd be off there without me.",
+        "My friend! Sit down, we will have some kvass. Business can wait."
+      ]
+    },
+    "smith": {
+      "name": "Żelisław",
+      "title": "smith",
+      "story": "He forges from dawn to dusk and rarely puts down his hammer. He sells Ward Scrolls and Steady Scrolls for the Anvil and reforges items one rarity higher: the better he knows someone, the rarer the items he forges for them. He belongs to the Brotherhood of Smiths, so anyone in good standing with the Brotherhood pays him less.",
+      "greetings": [
+        "What are you after? Speak quickly, the iron's cooling.",
+        "Ah, a familiar face. My scrolls are fresh and the hearth is hot.",
+        "Bring good material, and I'll raise your item a grade.",
+        "For those I trust, I forge with more care. Show me what you've brought today.",
+        "For friends I will forge even a divine item. What are we raising?"
+      ]
+    },
+    "gamehost": {
+      "name": "Szczęsny",
+      "title": "host of the Games Parlour",
+      "story": "They say that in his youth he won a whole tavern at dice, and lost it at cards a week later. Today he runs the Games Parlour at the Crossroads: he sells Lottery tickets and spins the Wheel of Fortune for anyone who dares.",
+      "greetings": [
+        "Come in, don't be shy, luck doesn't bite. A Lottery ticket or a spin of the Wheel?",
+        "Oh, you again. The Wheel spins light today, I can feel it in my bones.",
+        "My regulars get kvass on the house. So, shall we play?",
+        "I'll let you in on a secret: the Wheel likes those who come back.",
+        "For friends of the Crossroads I always keep the best seat at the table."
+      ]
+    }
+  },
+  "brotherhoods": {
+    "herbalists": {
+      "name": "Brotherhood of Herbalists",
+      "short": "Herbalists"
+    },
+    "smiths": {
+      "name": "Brotherhood of Smiths",
+      "short": "Smiths"
+    },
+    "hunters": {
+      "name": "Brotherhood of Hunters",
+      "short": "Hunters"
+    },
+    "merchants": {
+      "name": "Merchants' Company",
+      "short": "Merchants"
+    }
+  },
+  "standings": {
+    "stranger": {
+      "name": "Stranger"
+    },
+    "acquaintance": {
+      "name": "Acquaintance"
+    },
+    "regular": {
+      "name": "Regular"
+    },
+    "trusted": {
+      "name": "Trusted"
+    },
+    "friend": {
+      "name": "Friend"
+    }
+  },
+  "brotherhoodsPanel": {
+    "title": "Brotherhood standings",
+    "points": "{points} pts",
+    "toNext": "{toNext} pts to {next}",
+    "top": "Highest standing",
+    "now": "Now:",
+    "next": "At {next}:",
+    "none": "Orders from the Board and trade raise your reputation.",
+    "how": "Reputation with a Brotherhood comes from orders on the Order Board and from trade with its residents. A higher standing gives more.",
+    "perks": {
+      "special": "Special orders: a System Point and twice the reputation",
+      "quality": "Quality orders for materials: twice the reputation",
+      "market": "{offers} offers at once on the Marketplace",
+      "forge": "Forge {discount}% cheaper",
+      "herbYield": "Herbalism gathers {value}% more herbs",
+      "brewFaster": "Alchemy brews in {value}% less time",
+      "potionFights": "Timed potions last {value} {fights} longer",
+      "anvilDiscount": "Anvil {value}% cheaper",
+      "workshopFaster": "Workshop takes {value}% less time",
+      "workshopLuck": "Workshop: chance of an item one rarity higher +{value} percentage points",
+      "materialDrops": "{value}% more materials from creatures",
+      "rareOdds": "Elites and champions {value}% more often",
+      "tanneryPremium": "Tannery pays {value} percentage points more",
+      "marketFee": "Marketplace fee {value}%",
+      "wandererItems": "The travelling merchant lays out {value} {items}",
+      "auctionHours": "Auctions up to {value} hours"
+    },
+    "reward": "Reward for reaching {standings}:",
+    "claim": "Claim",
+    "claimed": "Claimed from the Brotherhood: {list}.",
+    "waiting": "Reward waiting",
+    "systemPoints": "System Points",
+    "gold": "Gold"
+  },
+  "orders": {
+    "anyMaterial": {
+      "common": [
+        "common material",
+        "common materials",
+        "common materials"
+      ],
+      "rare": [
+        "rare material",
+        "rare materials",
+        "rare materials"
+      ],
+      "unique": [
+        "unique material",
+        "unique materials",
+        "unique materials"
+      ],
+      "epic": [
+        "epic material",
+        "epic materials",
+        "epic materials"
+      ]
+    },
+    "stories": {
+      "herb": [
+        "My son goes to the Windfalls tomorrow, and I have nothing to dress his wounds with.",
+        "Old Dobrawa is coughing again. Herbs from the forest help her more than prayers.",
+        "I'm drying some for the winter, while I still can."
+      ],
+      "potion": [
+        "The caravan sets off at dawn, and no one wants to go without potions.",
+        "My brother came back from the forest white as a sheet. I need something stronger than a draught."
+      ],
+      "material": [
+        "The furrier from the town pays more for materials than anyone here.",
+        "I want to show the young ones what they'll be up against beyond the palisade.",
+        "For amulets. Don't ask who for."
+      ],
+      "resource": [
+        "The bridge over the river is falling apart again.",
+        "The forge stands idle: we've run out of building material."
+      ],
+      "part": [
+        "The smith has more orders than hands. Ready-made parts will come in handy.",
+        "A merchant's cart fell apart on the road. It has to be pieced back together somehow."
+      ],
+      "craft": [
+        "Young Radek is going beyond the palisade for the first time. Let him have proper gear.",
+        "The merchant from the town takes anything made by a skilled hand."
+      ]
+    },
+    "craftStories": [
+      {
+        "text": "The palisade guards go about unarmed. A disgrace in front of the merchants."
+      },
+      {
+        "text": "The palisade guards go about in rags. A disgrace in front of the merchants."
+      }
+    ]
+  },
+  "stable": {
+    "mounts": {
+      "pony": {
+        "name": "Pony",
+        "description": "Stocky and patient. It won't win a race, but it won't lose the path."
+      },
+      "horse": {
+        "name": "Riding Horse",
+        "description": "A hardy bay from the Crossroads. It goes all day without a rest."
+      },
+      "steed": {
+        "name": "Steed",
+        "description": "The best horse in the stable. It leaps fallen trunks and knows no fear in the forest."
+      }
+    }
+  },
+  "casino": {
+    "lottery": {
+      "name": "Lottery"
+    },
+    "wheel": {
+      "name": "Wheel of Fortune",
+      "tiers": {
+        "weak": {
+          "name": "Weak"
+        },
+        "fair": {
+          "name": "Fair"
+        },
+        "good": {
+          "name": "Good"
+        },
+        "great": {
+          "name": "Great"
+        }
+      }
+    },
+    "texts": {
+      "lotteryAbout": "A ticket costs {ticket} gold, and you can buy one a day. The pot is {base} gold from the System and {ticket} gold for every ticket. At midnight the System draws one ticket, and its owner takes the whole pot.",
+      "lotteryToday": "In the pot today: {pot} gold. Tickets bought: {tickets}.",
+      "lotteryBuy": "Buy a ticket ({ticket} gold)",
+      "lotteryHas": "You already have a ticket for today. The draw is at midnight.",
+      "lotteryBought": "Ticket bought. The draw is at midnight.",
+      "lotteryYesterday": "Yesterday's draw:",
+      "lotteryEarlier": "Last draw ({date}):",
+      "lotteryMine": "You won it: the gold is already in your purse.",
+      "lotteryNone": "The first Lottery draw takes place at midnight.",
+      "lotteryPlayers": "Playing today ({tickets})",
+      "announce": "{name} won the Lottery: {gold} gold.",
+      "wheelAbout": "The stake is {step} gold or more, in hundreds. At the lowest stake {low}% of spins give nothing, at the highest {high}%. The higher the stake, the greater the chance of a win and of a better prize. A lost stake is gone, and a win takes its prize out of the pool.",
+      "wheelPoolAbout": "There is one pool a day, the same at every stake. Most of it is weak prizes; there are fair ones too, one good and one great. A prize won leaves the pool until midnight, and when the Wheel stops on a prize that is gone, the spin gives nothing. The highest stake grows with your character's level.",
+      "wheelPool": "Today's pool: {left} of {all} left",
+      "wheelStake": "Stake: {stake} gold",
+      "wheelSpin": "Spin the Wheel ({stake} gold)",
+      "wheelEmpty": "The Wheel has given away all of today's pool. A new one comes after midnight.",
+      "wheelOdds": "Odds: great {great}%, good {good}%, fair {fair}%, weak {weak}%, nothing {none}%",
+      "wheelGone": "The Wheel stopped on a prize that is no longer in the pool. The stake is lost.",
+      "wheelWon": "Won",
+      "wheelBag": "A prize item goes into your bag, so the Wheel will turn once your bag has a free place.",
+      "won": "You win: {prize}.",
+      "lost": "Nothing this time. The stake is lost.",
+      "win": [
+        "The Wheel chose you! Take it while luck is looking.",
+        "Well, well! The prize is yours.",
+        "Spins like that are my favourite. Congratulations!"
+      ],
+      "loss": [
+        "The Wheel is fickle today. Maybe next time.",
+        "That was close. Luck favours the stubborn.",
+        "This time the stake stays with me."
+      ]
+    }
+  },
+  "trialHall": {
+    "texts": {
+      "intro": "Pass the trial, and you enter the next place sooner than your class level allows.",
+      "rules": "Three fights with the creatures of this place, one after another: two ordinary encounters and the place's elite. HP does not come back between fights, healing potions from your bag work, and your companions fight beside you. Once a day, free.",
+      "target": "{area}, lvl {levels}",
+      "usual": "This place usually opens at class level {level}.",
+      "after": "Pass it, and {area} will open to you for good.",
+      "passed": "{area} is already open to you. The next trial comes when your class level opens that place.",
+      "allOpen": "Every place is already open to you. The Trial Hall has no trial for you now.",
+      "used": "Today's trial is behind you. The next one from midnight.",
+      "start": "Take the trial",
+      "fight": "Fight {number}",
+      "eliteFight": "Fight {number}: {name}",
+      "fightStart": [
+        "Fight {number}: {enemies}."
+      ],
+      "eliteStart": [
+        "Fight {number}, the place's elite: {enemies}."
+      ],
+      "defeat": [
+        "Fight lost. {target} leaves the Trial Hall."
+      ],
+      "won": [
+        "Trial passed. {area} is open to you for good."
+      ],
+      "lost": [
+        "The trial failed. The next one tomorrow."
+      ]
+    }
+  },
+  "tavern": {
+    "tabs": {
+      "mug": "Tankard",
+      "companions": "Companions"
+    },
+    "rumor": {
+      "lines": [
+        "“Listen carefully. {area}. Woodcutters saw the {creature} there, and since then no one goes there for wood.”",
+        "“The merchants off the road talked of one thing only: {area}. Someone saw the {creature} there, they say, and up close.”",
+        "“Don't tell anyone where you heard this. {area}. The hunters swear they tracked the {creature} there.”",
+        "“Yesterday a herbalist sat at this table, white as a sheet. {area}. He says he saw the {creature} there.”",
+        "“{area}. The shepherds drove their sheep away from there when they saw the {creature}.”"
+      ]
+    }
+  },
+  "herbalist": {
+    "recipes": {
+      "title": [
+        "Rare recipes"
+      ],
+      "counted": [
+        "rare Alchemy recipe",
+        "rare Alchemy recipes",
+        "rare Alchemy recipes"
+      ],
+      "ready": [
+        "You can brew it in the System Laboratory."
+      ],
+      "level": [
+        "You can brew it from Alchemy level {level}."
+      ],
+      "next": [
+        "Jagna will share {count} with you at standing {standing} with her or with the Brotherhood of Herbalists."
+      ],
+      "taught": [
+        "Jagna shares {count} with you: {potions}."
+      ]
+    }
+  },
+  "market": {
+    "testSeller": "Trial merchant"
+  },
+  "companions": {
+    "traits": {
+      "fiery": {
+        "names": [
+          "Hot-headed",
+          "Hot-headed"
+        ],
+        "text": "Damage +10%, armour −10%."
+      },
+      "careful": {
+        "names": [
+          "Careful",
+          "Careful"
+        ],
+        "text": "Armour +12%, damage −5%."
+      },
+      "tough": {
+        "names": [
+          "Tough",
+          "Tough"
+        ],
+        "text": "Max HP +10%."
+      },
+      "nimble": {
+        "names": [
+          "Nimble",
+          "Nimble"
+        ],
+        "text": "Dodge +20%."
+      },
+      "keen": {
+        "names": [
+          "Keen-eyed",
+          "Keen-eyed"
+        ],
+        "text": "Critical hits +20%."
+      },
+      "swift": {
+        "names": [
+          "Swift",
+          "Swift"
+        ],
+        "text": "Turns in combat +8%."
+      },
+      "timid": {
+        "names": [
+          "Timid",
+          "Timid"
+        ],
+        "text": "Turns in combat +12%, max HP −8%."
+      },
+      "stubborn": {
+        "names": [
+          "Stubborn",
+          "Stubborn"
+        ],
+        "text": "Will +20%."
+      }
+    },
+    "professions": {
+      "gathering": {
+        "name": "Herbalism"
+      },
+      "brewing": {
+        "name": "Alchemy"
+      },
+      "crafting": {
+        "name": "Crafting"
+      }
+    },
+    "stories": [
+      "Has known the road since childhood and does not fear a night in the wilds.",
+      "Is running from debts in a distant town and looking for honest work.",
+      "Wants to save up gold for a farmstead of their own near the Crossroads.",
+      "Wolves slaughtered the family flock. Now looking for a chance to pay them back.",
+      "Life at a great lord's manor was dull. Prefers the forest, adventure, and the tavern afterwards.",
+      "Says little, but always keeps their word.",
+      "Is looking for a brother who went deep into the wilds and never came back.",
+      "Has heard that treasures wait in the wilds, and wants to see how much truth there is in it."
+    ],
+    "relation": {
+      "standings": [
+        "Distance",
+        "Comradeship",
+        "Trust",
+        "Friendship",
+        "Comrades in arms"
+      ]
+    },
+    "talks": {
+      "stories": [
+        [
+          "The road? I know it like the back of my hand. My father hauled salt along it, and I sat on the cart from the day I learned to walk.",
+          "At night in the wilds you listen, you don't look. The owl goes quiet when something's coming. My father taught me that.",
+          "Once our cart got stuck in the Peatlands. Father told me to sit quiet till dawn and went for help himself. He came back with two farmhands and a goat. To this day I don't know where he got the goat.",
+          "It's true, I don't fear the night. But I fear the silence. The night my father didn't come back from the road, the forest was as quiet as a grave.",
+          "I never found my father. But when I walk the road with you, I feel someone's watching my back again."
+        ],
+        [
+          "Where am I from? Far away. Far enough that no one comes looking for me here. I hope.",
+          "Back in town I had a workshop. A good workshop. I just liked dice more than the chisel.",
+          "I owe the merchant Radzim forty silver marks. His men have heavy fists and long memories.",
+          "I put aside every coin from our explorations. Not for dice, I swear. I want to go back and pay off the debt before someone comes for me.",
+          "I counted my purse yesterday. A few more explorations and I'll be free. Without you I'd still be stuck in debt."
+        ],
+        [
+          "Gold? Not for the tavern, not for fine clothes. For land. A patch of my own land near the Crossroads.",
+          "I've already picked the spot. A meadow by the stream, past the old oak. In spring it's full of marsh marigolds.",
+          "All my life I've worked someone else's field. Just once I want to bring in a harvest that's mine.",
+          "Bogumił says he'll sell me that meadow for a hundred marks. I still need half of it by autumn.",
+          "When I build my cottage, there'll always be a place for you at the table. A bowl of porridge, too, and a bench by the stove."
+        ],
+        [
+          "Wolves. That's all I'll say. For now.",
+          "I tended sheep from childhood. Forty head, and I knew each one by its bleat.",
+          "That winter a pack came, led by an old wolf with a grey muzzle. In one night they killed everything. The dogs too.",
+          "I saw him once more after that, in the Windfalls. Grey muzzle, a scar over the eye. I know it was him.",
+          "Revenge only keeps you warm at first. Now I just want no one else to lose their flock. It's good we go together."
+        ],
+        [
+          "At the manor they taught me to bow and keep quiet. I've forgotten how to bow. And how to keep quiet.",
+          "Lord Żelisław kept three minstrels at his manor and not one sword that had seen a real fight.",
+          "I escaped through the pantry window with a loaf of bread and my lord's sword under my arm. I gave the sword back later. Not the bread.",
+          "Sometimes I miss a warm chamber. But in that chamber nobody asked my opinion. You do.",
+          "The best tavern is the one you come back to together. Today the drinks are on me."
+        ],
+        [
+          "Mhm. Good hunting.",
+          "My word was all I had when I came here with nothing.",
+          "Once I promised my mother I'd be back before winter. I was. I don't break my word.",
+          "I don't say much, because words wear out. The ones I have left, I save for moments that matter.",
+          "You have my word: as long as I walk this world, I'll never leave you without support in a fight."
+        ],
+        [
+          "My brother went deep into the wilds. If you see a red-haired lad with a scar on his chin, let me know.",
+          "His name is Wojmir. People already speak of him in the past tense, but I don't believe it.",
+          "He took the deer path past Spider Gully. He said the Fern Flower grows there and he'd bring it back for our mother.",
+          "In the Gully I found his knife. Stuck in the bark, as if he'd left a sign. I think he wanted me to go on.",
+          "Maybe I'll never find Wojmir. But I've found someone worth going on with. That's something."
+        ],
+        [
+          "Treasure, you say? I'm only checking whether people tell the truth. So far they talk nonsense.",
+          "Grandad had a map. Half a map, since he lost the other half at dice.",
+          "On the map there's a cross by three stones. The Stone Glade? Maybe. Or maybe Grandad just drew crooked.",
+          "I've dug up two pots already. One had nails in it, the other chicken bones. But I haven't lost hope.",
+          "The other half of the map turned up. At Gościwit's, for three pennies. When we're back from our exploration, we'll go and check that cross together."
+        ]
+      ],
+      "chatter": {
+        "stranger": [
+          "Good going today. My legs ache, but my head is calm.",
+          "It's been raining since morning. In weather like this even wolves stay in their dens.",
+          "I don't know what to make of you yet. Give me a few explorations.",
+          "You don't have to like me. Just don't leave me in the forest.",
+          "I don't touch your loot. I'll win my own.",
+          "If you hear something at night, wake me. I sleep light.",
+          "The cold creeps up from the ground. A second hide for the bedding wouldn't hurt.",
+          "A long way behind us. The boots held up, and so did I.",
+          "You fight with confidence. I wonder how it'll be when real trouble comes.",
+          "The swallows are flying low. It'll pour tomorrow.",
+          "I'll fill the waterskins in the morning. You can't drink from every stream.",
+          "Zbylut says you can be trusted. We shall see.",
+          "When things get hot, don't run. I won't either.",
+          "I don't ask what you're looking for in the wilds. Don't ask me either.",
+          "A tidy camp. You can tell someone here thinks about tomorrow."
+        ],
+        "acquaintance": [
+          "Zbylut watered the ale again. Ah well, at least it's cold.",
+          "Jagna gave me a draught for my back. It stinks like a bog, but it helps.",
+          "The headman was asking about you. Must have a new order.",
+          "Gościwit tried to palm an aurochs horn off on me. I'd bet my head it was a cow's.",
+          "Wiedana told me not to touch the crystals. I hadn't even reached out.",
+          "The stablemaster says horses are wiser than people. After an evening at the Tavern, it's hard to argue.",
+          "The stench from the Tannery reaches all the way to the palisade today. The tanner says that's the smell of good money.",
+          "The smith rarely puts his hammer down. And when he does, the Crossroads goes strangely quiet.",
+          "Someone on the Order Board is asking for cough herbs again. For old Dobrawa, I bet.",
+          "The squirrels on the Edge of the Windfalls throw pine cones better than many an archer.",
+          "A raccoon dog looks like a fox dressed up as a badger. The wilds have a sense of humour.",
+          "The fire spirit hissed at me when I threw on wet wood. It sulked till evening.",
+          "The scrap dealer wanted to sell me a helmet full of holes. Said it was for the airflow.",
+          "Bogumił remembers every debt in the Crossroads. Better not borrow so much as a spoon from him.",
+          "Sambor was sitting in front of his hut again, staring into the forest. What does he see out there?",
+          "A marten once stole a biscuit right out of my satchel. A thief, but a pretty one.",
+          "The water from the well at the Crossroads is the coldest I've ever drunk. It makes your teeth ache."
+        ],
+        "regular": [
+          "I dreamt golden mushrooms were growing in the Windfalls. I know, a silly dream.",
+          "Before every march you fix your belt twice. Think nobody notices?",
+          "You mutter under your breath when you count gold. Did you know?",
+          "I can still feel that downpour from the way back in my boots.",
+          "Remember when I lost my way in the fog? Just don't tell anyone at the Tavern.",
+          "The Stone Glade won't leave me be. I swear those boulders are watching.",
+          "In the Overgrown Backwaters the mosquitoes are bigger than sparrows. And hungrier.",
+          "In the Peat Bogs every step sinks. I hate that squelching under my boots.",
+          "Of all the creatures, I hate leeches the most. A wolf at least bites honestly.",
+          "A tusker isn't a boar, it's a mountain of rage on four legs.",
+          "The Likho never sleeps, so they say. Me, I'd rather it did.",
+          "Before sleep I walk all the way round the Quarters. Old habit, don't laugh.",
+          "How many explorations together now? I've lost count.",
+          "Next time I pick the way. Your shortcuts always lead through mud.",
+          "In the Drowned Forest any log might be a crocodile. That's why I don't sit on logs there.",
+          "Grabbing the best loot again. One day I'll catch you at it."
+        ],
+        "trusted": [
+          "Will you tell me someday where you come from? Not today. Someday.",
+          "Sometimes I'm afraid that after some fight I won't get up again. I can tell you that.",
+          "Before a long exploration I sleep badly. I lie there counting what could go wrong.",
+          "I'd like to see what lies beyond the Peat Bogs. They say it's only swamp, but I don't believe it.",
+          "When I'm old I want a cottage with a view of the forest. The forest is most beautiful from afar.",
+          "A word of advice for the road: never sit with your back to the water. In the Overgrown Backwaters you pay for that.",
+          "Don't take everything that glitters. That's how the mud goblins started too.",
+          "Rest up fully before you set off again. The wilds aren't going anywhere.",
+          "Listen to Sambor now and then. Before he settled by the forest, they say he went further than anyone from the Crossroads.",
+          "Mother used to say the forest gives back what you give it. For a long time I didn't understand what she meant.",
+          "As a child I was afraid of storms. Now I'm only afraid of the Pwanetnik.",
+          "When I was young I had a dog that followed me everywhere. In the forest I still sometimes look round for him.",
+          "The first time I got lost in the wilds, a fox led me out. To this day I don't know if it was by chance.",
+          "I rarely trust anyone. I'm starting to trust you, and it worries me a little.",
+          "You take too much on yourself. Leave something for me now and then.",
+          "When you set out without me, I can't settle. Come back soon."
+        ],
+        "friend": [
+          "Hear that? Only the wind. I like evenings like this.",
+          "Rest. Tomorrow is another day.",
+          "We don't have to talk. Let's just sit by the fire.",
+          "With you, even the wilds at night aren't so frightening.",
+          "I wasn't looking for a home, and yet I found one here.",
+          "Wherever you go, I go with you. You don't even have to ask.",
+          "Zbylut asked if I was looking for new work. I laughed in his face.",
+          "Today I was thinking about what we'll leave behind. Maybe it's enough that someone at the Tavern will tell of our explorations.",
+          "Eat something warm before we set off. Someone has to look after you.",
+          "Your eyes are tired. Go to sleep, I'll watch the fire.",
+          "I know that if I fall in a fight, you won't leave me in the forest. You can rarely say that of anyone.",
+          "The wilds are vast and good people are few. I'm glad it was you I came across.",
+          "Someday the camp will become a stronghold. Then I want the room closest to yours.",
+          "I rarely say thank you, so I'll say it once and properly: thank you. For everything.",
+          "I don't know what waits deeper in the wilds. I only know I want to see it with you.",
+          "I used to think a sellsword has only those who pay. I was wrong.",
+          "Remember our first conversation? I was as prickly as a hedgehog back then. Good thing it didn't scare you off."
+        ]
+      }
+    },
+    "texts": {
+      "going": "Goes on explorations with the character.",
+      "staying": "Stays in the quarters: does not go on explorations, so gains no experience or relation on them. Conversations work as usual.",
+      "stayingAfter": "Will stay in the quarters after returning from this exploration.",
+      "inParty": "While the character is in a party, the companion stays in the quarters: the party hunts without companions from the Quarters.",
+      "stay": "Stay in quarters",
+      "go": "Go on explorations",
+      "stayed": "{name} stays in the quarters.",
+      "goes": "{name} now goes on explorations with the character.",
+      "invalidStay": "Choose whether the companion stays in the quarters.",
+      "away": "The companion is on an exploration. Items are equipped and upgraded after the return.",
+      "wornBy": "{name} wears this item. You pay for the upgrade from your own supplies.",
+      "noItem": "The companion wears nothing in this slot.",
+      "partyOne": "First leave the companion in the quarters: {names}. The party hunts without companions from the Quarters.",
+      "partyMany": "First leave the companions in the quarters: {names}. The party hunts without companions from the Quarters.",
+      "toQuarters": "Go to the Quarters",
+      "jewelry": "Jewellery"
+    }
+  },
+  "wanted": {
+    "variants": {
+      "wolf": {
+        "name": "Lone Wolf"
+      },
+      "fox": {
+        "name": "Old Fox"
+      },
+      "crow": {
+        "name": "Raven Seer"
+      },
+      "viper": {
+        "name": "Black Viper"
+      },
+      "boar": {
+        "name": "Old Tusker"
+      },
+      "stoneling": {
+        "name": "Mossy Stoneling"
+      },
+      "tarantula": {
+        "name": "Blood Tarantula"
+      },
+      "lynx": {
+        "name": "Silver Lynx"
+      },
+      "alpha-wolf": {
+        "name": "Old Alpha Wolf"
+      },
+      "aurochs": {
+        "name": "Black Aurochs"
+      },
+      "reedling": {
+        "name": "Whispering Reedling"
+      },
+      "beaver": {
+        "name": "Giant Beaver"
+      },
+      "catfish": {
+        "name": "Man-Eating Catfish"
+      },
+      "wraith": {
+        "name": "White Wraith"
+      },
+      "drowner": {
+        "name": "Black Drowner"
+      },
+      "elk": {
+        "name": "Giant Elk"
+      },
+      "crayfish": {
+        "name": "Armoured Crayfish"
+      },
+      "sundew": {
+        "name": "Blood Sundew"
+      },
+      "zmij": {
+        "name": "Fiery Zmey"
+      },
+      "giant-rat": {
+        "name": "Rat King"
+      },
+      "pond-turtle": {
+        "name": "Ancient Turtle"
+      },
+      "pike": {
+        "name": "One-Eyed Pike"
+      },
+      "pagan-priest": {
+        "name": "Sacrificial Priest"
+      },
+      "bog-demon": {
+        "name": "Bog Demon the Drowner"
+      },
+      "black-goat": {
+        "name": "Rokita's Black Goat"
+      },
+      "heather-mare": {
+        "name": "Night Mare"
+      },
+      "resin-golem": {
+        "name": "Amber Resin Golem"
+      },
+      "barrow-wight": {
+        "name": "Barrow Wight Chieftain"
+      },
+      "tar-burner": {
+        "name": "Tar Burner the Firestarter"
+      },
+      "ash-wraith": {
+        "name": "Mourning Ash Wraith"
+      },
+      "needleback": {
+        "name": "Leaping Needleback"
+      },
+      "mantis": {
+        "name": "Pale Mantis"
+      },
+      "ghost-coachman": {
+        "name": "Phantom Coachman"
+      },
+      "rootwad": {
+        "name": "Century-Old Rootwad"
+      },
+      "smoke-hound": {
+        "name": "Tracker Hound"
+      },
+      "lichen-beard": {
+        "name": "Elder Lichen Beard"
+      },
+      "puffball": {
+        "name": "Puffball the Sower"
+      },
+      "chochol": {
+        "name": "Wedding Strawman"
+      },
+      "bell-ringer": {
+        "name": "Old Bell Ringer"
+      },
+      "bebok": {
+        "name": "Bebok the Snatcher"
+      }
+    },
+    "texts": {
+      "title": "Wanted",
+      "intro": "Every day Headman Bogumił posts three wanted posters for creatures from the places open to you, and one for an outlaw. Take a poster, and on an exploration of that place you will meet the wanted one more often.",
+      "footer": "For defeating the wanted one, the headman pays a reward: gold, Time Points and reputation with the Brotherhood of Hunters. A creature leaves a trophy: its material in the rarity you still lack in the Encyclopedia for the +5% damage bonus against it. An outlaw leaves rare loot. One poster at a time, new posters every day.",
+      "wanted": "Wanted",
+      "outlaw": "Outlaw",
+      "place": "{area}, {levels}",
+      "trophyReward": "{gold} gold, a trophy",
+      "lootReward": "{gold} gold, rare loot",
+      "take": "Take poster",
+      "drop": "Drop poster",
+      "claim": "Claim reward",
+      "done": "Fulfilled",
+      "hunting": "Your poster. Hunt your quarry on explorations: {area}.",
+      "beaten": "Defeated! The reward waits with the headman.",
+      "earlier": "Yesterday's poster",
+      "one": "You already have a wanted poster. Fulfil it or drop it first.",
+      "gone": "This poster is no longer on the board.",
+      "notBeaten": "The reward waits until the wanted one is defeated.",
+      "claimFirst": "Claim your reward from the headman first.",
+      "carried": "The character set out on an exploration with this poster. You can drop it or take another after claiming the report.",
+      "claimed": "The headman pays {gold} gold and {time} Time Points. Brotherhood of Hunters: +{reputation} reputation.",
+      "meet": [
+        "The tracks match the headman's wanted poster. Before you: {enemies}.",
+        "It's the one from the wanted poster: {enemies}.",
+        "No one has come back alive from here in a long while. From the wanted poster: {enemies}."
+      ],
+      "won": [
+        "The wanted one is defeated. The reward waits with the headman."
+      ],
+      "trophy": [
+        "Trophy: {material}."
+      ],
+      "loot": [
+        "In the outlaw's saddlebags: {item}."
+      ]
+    }
+  },
+  "mercenaries": {
+    "texts": {
+      "title": "Mercenaries",
+      "offerTitle": "Your services",
+      "intro": "Offer your character for hire. Another player will take it on one exploration and pay as much as you ask for each of its hours.",
+      "hoursLabel": "For how many hours",
+      "priceLabel": "Price per hour of exploration",
+      "offer": "Offer services",
+      "confirmTitle": "Offer your services?",
+      "confirm": "For {hours} the character will not set out on an exploration, work at a profession or change gear, unless you take down the notice. Once hired, it serves until the end of one exploration, and then the notice cannot be taken down.",
+      "waiting": "You are waiting to be hired until {time}. Price: {price} gold per hour of exploration.",
+      "hired": "{name} hired you for an exploration to {area}. You serve until {time}, and the pay is {gold} gold.",
+      "done": "Mercenary service over. Pay waiting: {gold} gold.",
+      "expired": "Nobody hired you; the notice has expired.",
+      "withdraw": "Take down notice",
+      "claim": "Claim pay",
+      "close": "Close notice",
+      "paid": "Pay for the service: +{gold} gold.",
+      "withdrawn": "Notice taken down.",
+      "activity": "Mercenary service",
+      "place": "Tavern",
+      "busy": "The character is waiting to be hired at the Tavern. Take down the notice to do something else.",
+      "busyHired": "The character is on mercenary service until the end of the exploration.",
+      "claimFirst": "The mercenary service is over. Claim your pay at the Tavern.",
+      "locked": "Mercenaries are available from character level {level}.",
+      "pickTitle": "Mercenary",
+      "pickHint": "A mercenary comes with all their gear and fights like a Party member, in place of one companion. You pay up front, for the hours of the exploration.",
+      "pick": "Choose a mercenary",
+      "change": "Change",
+      "remove": "No mercenary",
+      "none": "No suitable mercenary is waiting to be hired right now.",
+      "row": "lvl {level}, class {classLevel} · {price} gold/h",
+      "chosen": "{name}: {gold} gold for this exploration",
+      "gone": "This mercenary is no longer waiting to be hired.",
+      "priceChanged": "The mercenary has changed the notice. Check it again.",
+      "own": "You cannot hire a character from your own account.",
+      "spread": "Class levels may differ by {spread} at most.",
+      "noGold": "Not enough gold for the mercenary.",
+      "plainOnly": "A mercenary goes only on a regular exploration, without a party.",
+      "hiredLocked": "The character has been hired. The notice cannot be taken down until the exploration ends.",
+      "notOffering": "You have no services on offer.",
+      "invalidHours": "Choose for how many hours.",
+      "invalidPrice": "The price must be from {min} to {max} gold per hour.",
+      "offerBusy": "The character is busy now. You can offer your services when it returns.",
+      "hireTitle": "Waiting to be hired",
+      "hireIntro": "The mercenary will go with you on your next regular exploration, in place of one companion. You choose the place and time in Combat, and you pay at “Set out”, for every hour of the exploration.",
+      "hire": "Hire",
+      "hireToast": "{name} will go with you. Choose the place of your exploration.",
+      "hireBusy": "The character is busy now. You can hire a mercenary after claiming the report.",
+      "hireOwnOffer": "You can hire a mercenary once you take down your notice or claim the pay for your service.",
+      "dotPay": "pay to claim",
+      "dotClose": "notice to close"
+    }
+  }
+}
