@@ -294,12 +294,15 @@ export const SPRITES = {
     size: 32,
     ids: ['comfrey', 'mugwort', 'nettle', 'plantain', 'st-johns-wort', 'calamus', 'arnica', 'wormwood', 'valerian', 'cranberry', 'aconite', 'mistletoe', 'fern-blossom'],
   },
-  // The potions of Alchemia, 32×32, filled in as they are approved.
+  // The potions of Alchemia, 32×32, filled in as they are approved. Jagna's
+  // six rare recipes (121 A) show copies of the nearest System potion's
+  // icon until the author picks their own.
   potions: {
     size: 32,
     ids: [
       'lesser-healing', 'lesser-mana', 'lesser-speed', 'healing', 'mana', 'antidote', 'speed', 'stoneskin-brew', 'strength-brew', 'focus-draught',
       'greater-healing', 'greater-mana', 'greater-speed', 'aconite-oil', 'mistletoe-elixir', 'fern-brew',
+      'owl-draught', 'bearskin-brew', 'wolf-strength-brew', 'burn-brew', 'evil-eye-brew', 'jagna-balm',
     ],
   },
   // The camp's resources (data/resources.json), 32×32, shown at the size of
