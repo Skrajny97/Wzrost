@@ -47,6 +47,7 @@ import { guildTagSql } from './guilds.js';
 import { beginHunt } from './hunts.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
+import { t } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 // The most invitations one party may have waiting.
@@ -62,15 +63,18 @@ async function classLevels(db, partyId) {
 }
 
 // Why a character of `classLevel` cannot be in a party of `levels`, or
-// null; `who` says whose level it is.
-function levelGap(who, classLevel, levels) {
+// null; `name` is the character's, another player's, or null for the
+// player's own. Each a whole sentence, for its English (i18n.js).
+function levelGap(name, classLevel, levels) {
   const { from, to } = partyRange(levels, content());
   if (classLevel >= from && classLevel <= to) return null;
   const { classSpread } = content().balance.parties;
   return new ApiError(
     409,
     'level_gap',
-    `${who} ${classLevel}. poziom klasy. Poziomy klas w drużynie mogą się różnić najwyżej o ${classSpread}, więc teraz dołączy postać z poziomem klasy od ${from} do ${to}.`,
+    name
+      ? `${name} ma ${classLevel}. poziom klasy. Poziomy klas w drużynie mogą się różnić najwyżej o ${classSpread}, więc teraz dołączy postać z poziomem klasy od ${from} do ${to}.`
+      : `Masz ${classLevel}. poziom klasy. Poziomy klas w drużynie mogą się różnić najwyżej o ${classSpread}, więc teraz dołączy postać z poziomem klasy od ${from} do ${to}.`,
   );
 }
 
@@ -264,7 +268,7 @@ export async function inviteToParty(context) {
   if (!party) requireCompanionsStay(player.row);
   if (party?.memberIds.includes(target.id)) throw new ApiError(409, 'member', `${target.name} jest już w Twojej drużynie.`);
   if (party && party.memberIds.length >= size()) throw new ApiError(409, 'full', `Drużyna jest pełna: ${size()} postacie.`);
-  const gap = levelGap(`${target.name} ma`, target.class_level, party ? await classLevels(db, party.id) : [player.row.class_level]);
+  const gap = levelGap(target.name, target.class_level, party ? await classLevels(db, party.id) : [player.row.class_level]);
   if (gap) throw gap;
   if (!party) {
     // The party and its leader at once, in one transaction.
@@ -286,7 +290,7 @@ export async function inviteToParty(context) {
     .prepare('INSERT OR IGNORE INTO party_invites (party_id, character_id, invited_by, created_at) VALUES (?, ?, ?, ?)')
     .bind(party.id, target.id, player.row.id, context.now)
     .run();
-  return answer(db, player.row.id, context.now, { text: `Zaproszenie wysłane. ${target.name} przyjmie je w Społeczności, w Drużynie.` });
+  return answer(db, player.row.id, context.now, { text: t('Zaproszenie wysłane. {name} przyjmie je w Społeczności, w Drużynie.', { name: target.name }) });
 }
 
 // POST /api/party/accept { partyId }: joins the party that invited this
@@ -324,10 +328,10 @@ export async function acceptPartyInvite(context) {
   await db.prepare('DELETE FROM party_invites WHERE character_id = ? AND (party_id = ? OR ? = 1)').bind(player.row.id, invite.party_id, joined.meta.changes).run();
   if (joined.meta.changes !== 1) {
     const levels = await classLevels(db, invite.party_id);
-    const gap = levels.length > 0 && levels.length < size() && levelGap('Masz', player.row.class_level, levels);
+    const gap = levels.length > 0 && levels.length < size() && levelGap(null, player.row.class_level, levels);
     throw gap || new ApiError(409, 'full', 'Ta drużyna jest już pełna albo jej nie ma.');
   }
-  return answer(db, player.row.id, context.now, { text: 'Jesteś w drużynie. Lider zabierze Cię na najbliższą wyprawę, gdy nie będziesz mieć innych zajęć.' });
+  return answer(db, player.row.id, context.now, { text: t('Jesteś w drużynie. Lider zabierze Cię na najbliższą wyprawę, gdy nie będziesz mieć innych zajęć.') });
 }
 
 // POST /api/party/decline { partyId }
@@ -367,7 +371,7 @@ export async function leaveParty(context) {
   const db = context.env.DB;
   if (!(await partyOf(db, player.row.id))) throw new ApiError(409, 'no_party', 'Nie jesteś w drużynie.');
   await db.batch(leaveStatements(db, player.row.id));
-  return answer(db, player.row.id, context.now, { text: 'Opuszczasz drużynę.' });
+  return answer(db, player.row.id, context.now, { text: t('Opuszczasz drużynę.') });
 }
 
 // POST /api/party/kick { characterId }: the leader sends a member out.

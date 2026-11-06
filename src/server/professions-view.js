@@ -46,6 +46,7 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn } from './features.js';
+import { t } from './i18n.js';
 import { perkOf } from './perks.js';
 import { say } from '../engine/text.js';
 
@@ -158,7 +159,7 @@ export function bagPotions(row, sellBonus) {
       cures: potion.cures ?? null,
       carry: carryLimit(potion, null),
       drink: Boolean(potion.effect.heal || timedKind(potion)),
-      verb: potion.verb ?? 'Wypij',
+      verb: potion.verb ?? t('Wypij'),
       known: potionKnown(row, potion),
     }));
 }

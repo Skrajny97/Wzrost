@@ -2,7 +2,8 @@
 // author: "Potrzebujemy tez funkcji oznaczania na czacie"): "@" and a
 // character's whole name in a message tag that character (mentionPlaces in
 // the engine) when it reads the message's channel: any character with the
-// Społeczność in the Globalny and the Wymiana, a member of the guild in
+// Społeczność in the Globalny, the Wymiana and the English channel (where
+// English is on), a member of the guild in
 // the guild's channel, the other one in a private conversation. Never a
 // character of the writer's own account, nor one whose player hides the
 // writer in the chat; a message refused (silenced writer, rules not
@@ -20,7 +21,7 @@
 
 import { gendered, isUnlocked, mentionPlaces, pickMentions } from '../engine/index.js';
 import { shownText } from './chat.js';
-import { content } from './content.js';
+import { chatChannels, content } from './content.js';
 import { accountLanguage, runInLanguage } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
 
@@ -35,9 +36,9 @@ const GUILD_PREFIX = 'guild:';
 
 // The characters a message tags: `text` as the chat shows it (shownText),
 // `userId` the writer's account, `channel` where it goes ('global',
-// 'trade', 'guild:<id>', or 'private' with its `recipientId`), at `now`.
-// Each with the name as written and whether a phone notification goes for
-// it: [{ characterId, written, push }].
+// 'trade', 'english', 'guild:<id>', or 'private' with its
+// `recipientId`), at `now`. Each with the name as written and whether a
+// phone notification goes for it: [{ characterId, written, push }].
 export async function findMentions(db, text, { userId, channel, recipientId = null }, now) {
   const places = mentionPlaces(text);
   if (places.length === 0) return [];
@@ -97,9 +98,9 @@ export function mentionsView(tags, readerId) {
 
 // The newest message of each channel that tags the character, still there
 // and not by a player it hides, for the lights of the chat: { global,
-// trade, guild, private: { [the other character's id]: id } }, 0 where
-// none. The guild's only in the channel of its guild now
-// (`guildChannelNow`, null outside a guild).
+// trade, english (where English is on, chatChannels), guild, private: {
+// [the other character's id]: id } }, 0 where none. The guild's only in
+// the channel of its guild now (`guildChannelNow`, null outside a guild).
 export async function newestMentions(db, characterId, userId, guildChannelNow) {
   const rows = await db
     .prepare(
@@ -110,7 +111,7 @@ export async function newestMentions(db, characterId, userId, guildChannelNow) {
     )
     .bind(characterId, userId)
     .all();
-  const newest = { ...Object.fromEntries(content().chat.channels.map((channel) => [channel.id, 0])), guild: 0, private: {} };
+  const newest = { ...Object.fromEntries(chatChannels().map((channel) => [channel.id, 0])), guild: 0, private: {} };
   for (const row of rows.results) {
     if (row.channel === PRIVATE) newest.private[row.other] = row.id;
     else if (row.channel.startsWith(GUILD_PREFIX)) {

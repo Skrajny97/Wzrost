@@ -12,6 +12,9 @@
 // the device. Private messages light it even then, and so does a message
 // that tags the character with "@" (src/server/mentions.js), in any
 // channel, the Wymiana too, until the character has read that channel.
+// "The Globalny" here is the chat's first channel, which a page in English
+// has the English one for (chatChannels in src/server/content.js); its
+// mark goes to the server under that channel's own id.
 
 import { request } from './api.js';
 import { t } from './i18n.js';
@@ -249,7 +252,7 @@ export function chatSeen(id) {
   update(() => {
     seen = id;
   });
-  keep({ global: id });
+  keep({ [globalId()]: id });
 }
 
 // Channel `channelId` shows messages up to `id`: the Globalny, or another
@@ -330,7 +333,7 @@ export async function checkChat({ now = false } = {}) {
     trade = answer.trade ?? null;
     tagged = { ...answer.mentions, private: answer.mentions?.private ?? {} };
     // What the character read on its other devices.
-    seen = Math.max(seen, answer.seen?.global ?? 0);
+    seen = Math.max(seen, answer.seen?.[globalId()] ?? 0);
     for (const [id, mark] of Object.entries(answer.seen ?? {})) {
       if (!['private', 'guild', globalId()].includes(id) && Number.isInteger(mark)) channelSeen = { ...channelSeen, [id]: Math.max(channelSeen[id] ?? 0, mark) };
     }

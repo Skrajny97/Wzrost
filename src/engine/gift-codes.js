@@ -3,6 +3,8 @@
 // until the code expires. The server says which codes the account has used
 // and what time it is.
 
+import { nameInText } from './text.js';
+
 // A code as typed, the way the codes are written: capitals and digits, no
 // spaces or dashes.
 export const normalCode = (typed) =>
@@ -29,14 +31,15 @@ export function giftCodeOf(typed, now, used, content, characterKey = null) {
 }
 
 // The rewards in words: "Punkty Systemu +100, Punkty Czasu +100, złoto
-// +1000, drewno +100…".
+// +1000, drewno +100…" (in English the resources with their capitals,
+// "Wood +100": nameInText).
 export function giftRewardsText(rewards, content) {
   const texts = content.giftTexts;
   const parts = [];
   if (rewards.systemPoints) parts.push(`${texts.systemPoints} +${rewards.systemPoints}`);
   if (rewards.timePoints) parts.push(`${texts.timePoints} +${rewards.timePoints}`);
   if (rewards.gold) parts.push(`${texts.gold} +${rewards.gold}`);
-  for (const [id, amount] of Object.entries(rewards.resources ?? {})) parts.push(`${content.resourcesById[id].name.toLowerCase()} +${amount}`);
+  for (const [id, amount] of Object.entries(rewards.resources ?? {})) parts.push(`${nameInText(content.resourcesById[id].name, content)} +${amount}`);
   return parts.join(', ');
 }
 

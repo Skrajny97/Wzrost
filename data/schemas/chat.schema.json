@@ -4,7 +4,7 @@
   "description": "Czat w zakładce Społeczność: kanały, zasady pisania, słowa zamieniane na gwiazdki i zasady czatu do zaakceptowania (src/server/chat.js).",
   "type": "object",
   "additionalProperties": false,
-  "required": ["channels", "rules", "words", "names", "mentions", "texts"],
+  "required": ["channels", "rules", "words", "wordsEn", "names", "mentions", "texts"],
   "properties": {
     "$comment": { "type": "string" },
     "channels": {
@@ -17,7 +17,8 @@
         "properties": {
           "id": { "type": "string", "pattern": "^[a-z]+$" },
           "name": { "type": "string" },
-          "items": { "type": "boolean", "description": "Wiadomość może pokazać przedmioty z plecaka (oferty Wymiany)." }
+          "items": { "type": "boolean", "description": "Wiadomość może pokazać przedmioty z plecaka (oferty Wymiany)." },
+          "language": { "type": "string", "enum": ["pl", "en"], "description": "Kanał jednego języka: tylko tam, gdzie serwer ma ten język (przełącznik ENGLISH), a czat strony w tym języku otwiera się na nim; czytać i pisać może tam każdy." }
         }
       }
     },
@@ -47,6 +48,11 @@
       }
     },
     "words": { "type": "array", "items": { "type": "string", "pattern": "^[a-ząćęłńóśźż]+$" } },
+    "wordsEn": {
+      "type": "array",
+      "description": "Angielskie początki albo części słów, które czat zamienia na gwiazdki, obok words, w każdym kanale; filtr imion postaci ich nie bierze.",
+      "items": { "type": "string", "pattern": "^[a-z]+$" }
+    },
     "names": {
       "type": "object",
       "description": "Filtr imion postaci (src/engine/names.js) z listą words: niepomijalny komunikat dla postaci, której imię łamie zasady, i odmowa przy tworzeniu postaci.",

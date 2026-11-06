@@ -13,6 +13,7 @@ import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
 import { guildTagSql } from './guilds.js';
 import { ApiError, json, readJson } from './http.js';
+import { t } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const DAY = 86400000;
@@ -224,7 +225,7 @@ export async function inviteFriend(context) {
     .first();
   if (taken.count >= max) throw new ApiError(409, 'full', `Masz już ${max} znajomych i zaproszeń. Usuń kogoś, żeby zaprosić nową postać.`);
   await db.prepare('INSERT INTO friends (character_id, friend_id, created_at) VALUES (?, ?, ?)').bind(character.id, target.id, context.now).run();
-  return json({ ...(await friendsOf(db, character.id, context.now)), text: `Zaproszenie wysłane. ${target.name} przyjmie je w Znajomych.` });
+  return json({ ...(await friendsOf(db, character.id, context.now)), text: t('Zaproszenie wysłane. {name} przyjmie je w Znajomych.', { name: target.name }) });
 }
 
 // POST /api/friends/accept { id }: an invitation to this character accepted.
@@ -245,7 +246,7 @@ async function accept(context, db, id, friendshipId) {
   if (own.count >= max) throw new ApiError(409, 'full', `Masz już ${max} znajomych. Usuń kogoś, żeby przyjąć zaproszenie.`);
   if (theirs.count >= max) throw new ApiError(409, 'full', `${row.name} ma już ${max} znajomych.`);
   await db.prepare('UPDATE friends SET accepted_at = ? WHERE id = ?').bind(context.now, row.id).run();
-  return json({ ...(await friendsOf(db, id, context.now)), text: `${row.name} jest teraz wśród Twoich znajomych.` });
+  return json({ ...(await friendsOf(db, id, context.now)), text: t('{name} jest teraz wśród Twoich znajomych.', { name: row.name }) });
 }
 
 // POST /api/friends/remove { id }: a friendship ended, or an invitation
@@ -277,7 +278,7 @@ export async function sendGift(context) {
     .bind(character.id, row.id, today(context.now), context.now, JSON.stringify(reward))
     .run();
   if (result.meta.changes !== 1) throw new ApiError(409, 'sent', `Dziś ${row.name} dostaje już od Ciebie ${content().community.gift.name}. Kolejny jutro.`);
-  return json({ ...(await friendsOf(db, character.id, context.now)), text: `${content().community.gift.name} wysłany: ${row.name} odbierze go w Znajomych.` });
+  return json({ ...(await friendsOf(db, character.id, context.now)), text: t('{gift} wysłany: {name} odbierze go w Znajomych.', { gift: content().community.gift.name, name: row.name }) });
 }
 
 // POST /api/friends/gift-all: today's Upominek to every friend not given

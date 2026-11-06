@@ -19,6 +19,7 @@ import { bagItems, characterView, loadPlayer, requireOffRack } from './character
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
+import { t } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { herbsOf, mineralsOf, potionKnown, potionsOf } from './professions-view.js';
 
@@ -215,7 +216,7 @@ export async function proposeTrade(context) {
     db.prepare("INSERT INTO trades (from_id, to_id, state, created_at, updated_at) VALUES (?, ?, 'proposed', ?, ?)").bind(character.id, other.id, now, now),
   ]);
   const trade = await db.prepare('SELECT * FROM trades WHERE id = ?').bind(made.meta.last_row_id).first();
-  return json({ trade: await tradeView(db, trade, character, now), text: `Propozycja wysłana. Czekasz, aż ${other.name} ją przyjmie.` });
+  return json({ trade: await tradeView(db, trade, character, now), text: t('Propozycja wysłana. Czekasz, aż {name} ją przyjmie.', { name: other.name }) });
 }
 
 // POST /api/trade/answer {id, accept}: the one asked accepts the proposal,
@@ -469,7 +470,7 @@ export async function confirmTrade(context) {
   return json({
     trade: await tradeView(db, { ...trade, state: 'done', updated_at: now }, character, now),
     character: characterView(await loadPlayer(db, mine.row.user_id), now),
-    text: 'Wymiana zakończona.',
+    text: t('Wymiana zakończona.'),
   });
 }
 
