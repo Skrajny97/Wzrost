@@ -51,6 +51,8 @@ import cosmetics from '../../data/cosmetics.json' with { type: 'json' };
 import enAffixes from '../../data/en/affixes.json' with { type: 'json' };
 import enAppearances from '../../data/en/appearances.json' with { type: 'json' };
 import enBalance from '../../data/en/balance.json' with { type: 'json' };
+import enBuildings from '../../data/en/buildings.json' with { type: 'json' };
+import enCamp from '../../data/en/camp.json' with { type: 'json' };
 import enChat from '../../data/en/chat.json' with { type: 'json' };
 import enClasses from '../../data/en/classes.json' with { type: 'json' };
 import enEffects from '../../data/en/effects.json' with { type: 'json' };
@@ -60,13 +62,16 @@ import enGiftCodes from '../../data/en/gift-codes.json' with { type: 'json' };
 import enItemBases from '../../data/en/item-bases.json' with { type: 'json' };
 import enMaterials from '../../data/en/materials.json' with { type: 'json' };
 import enMonsters from '../../data/en/monsters.json' with { type: 'json' };
+import enQuests from '../../data/en/quests.json' with { type: 'json' };
 import enRarities from '../../data/en/rarities.json' with { type: 'json' };
 import enRegions from '../../data/en/regions.json' with { type: 'json' };
 import enResources from '../../data/en/resources.json' with { type: 'json' };
 import enSkins from '../../data/en/skins.json' with { type: 'json' };
 import enSlots from '../../data/en/slots.json' with { type: 'json' };
 import enStats from '../../data/en/stats.json' with { type: 'json' };
+import enTexts from '../../data/en/texts.json' with { type: 'json' };
 import enTutorial from '../../data/en/tutorial.json' with { type: 'json' };
+import enUnlocks from '../../data/en/unlocks.json' with { type: 'json' };
 
 // The data files by their names, as data/en/ names its translations.
 const polishData = {
@@ -113,6 +118,8 @@ export const OVERLAYS = {
     affixes: enAffixes,
     appearances: enAppearances,
     balance: enBalance,
+    buildings: enBuildings,
+    camp: enCamp,
     chat: enChat,
     classes: enClasses,
     effects: enEffects,
@@ -122,13 +129,16 @@ export const OVERLAYS = {
     'item-bases': enItemBases,
     materials: enMaterials,
     monsters: enMonsters,
+    quests: enQuests,
     rarities: enRarities,
     regions: enRegions,
     resources: enResources,
     skins: enSkins,
     slots: enSlots,
     stats: enStats,
+    texts: enTexts,
     tutorial: enTutorial,
+    unlocks: enUnlocks,
   },
 };
 
