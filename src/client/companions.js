@@ -11,7 +11,7 @@ import { h } from './dom.js';
 import { formatCountdown, formatDecimal, formatNumber } from './format.js';
 import { call, serverNow, state } from './state.js';
 import { closeSheet, confirmAction, openSheet, toast, withButton } from './ui.js';
-import { anvilSection, itemDetails, itemSummary } from './screens/character.js';
+import { anvilSection, compareTable, itemDetails, itemSummary } from './screens/character.js';
 
 // An item of the character's, from the bag or worn.
 const itemView = (id) => (state.character.bag ?? []).find((one) => one.id === id) ?? Object.values(state.character.equipment ?? {}).find((one) => one?.id === id);
@@ -38,8 +38,11 @@ function giftRow(companion, apply) {
   );
 }
 
-// The bag's items the companion can wear, to tap one; what it wore in
-// that place goes back to the bag.
+// The bag's items the companion can wear, each with its numbers in sight
+// (a player on the chat: "fajnie jakby podświetlało staty przedmiotów, bo
+// tak to się trochę na ślepo strzela, jak mam np. 3 amulety te same"); a tap
+// folds out the comparison with what the companion wears in that place and
+// "Załóż". What it wore there goes back to the bag.
 function wearSheet(companion, apply) {
   const items = companion.wearable.map((id) => itemView(id)).filter(Boolean);
   const put = (item) => (event) =>
@@ -57,15 +60,37 @@ function wearSheet(companion, apply) {
             class: 'sheet-text',
             text:
               companion.appearance === 'female'
-                ? 'Wybierz przedmiot. To, co towarzyszka nosiła w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostała. Biżuterię nosi jedną: amulet, pierścień albo talizman.'
-                : 'Wybierz przedmiot. To, co towarzysz nosił w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostał. Biżuterię nosi jedną: amulet, pierścień albo talizman.',
+                ? 'Stuknij przedmiot, żeby porównać go z tym, co nosi, i założyć. To, co towarzyszka nosiła w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostała. Biżuterię nosi jedną: amulet, pierścień albo talizman.'
+                : 'Stuknij przedmiot, żeby porównać go z tym, co nosi, i założyć. To, co towarzysz nosił w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostał. Biżuterię nosi jedną: amulet, pierścień albo talizman.',
           }),
           h(
             'ul',
             { class: 'item-list' },
-            items.map((item) => h('li', {}, h('button', { type: 'button', class: 'item-row', onClick: put(item) }, itemSummary(item)))),
+            items.map((item) => h('li', {}, wearChoice(companion, item, put(item)))),
           ),
         ],
+  );
+}
+
+// One item of the bag in "Załóż z plecaka": its name and numbers; under a
+// tap, beside what the companion wears in its place (its weapon, its armour,
+// or its one piece of jewellery for an amulet, a ring or a talisman), and the
+// button that puts it on.
+function wearChoice(companion, item, put) {
+  const place = companion.wear.find((one) => one.slot === item.slot) ?? companion.wear.find((one) => one.slot === 'jewelry');
+  const worn = place?.item ?? null;
+  return h(
+    'details',
+    { class: 'wear-choice' },
+    h('summary', {}, h('span', { class: 'item-row wear-choice-row' }, itemSummary(item, { stats: true }), h('span', { class: 'wear-choice-mark', 'aria-hidden': 'true' }))),
+    h(
+      'div',
+      { class: 'wear-choice-body' },
+      worn
+        ? compareTable(item, worn, { title: `Porównanie z tym, co nosi ${companion.name}`, wornLabel: 'Nosi' })
+        : h('p', { class: 'muted', text: `W tym miejscu ${companion.name} nic teraz nie nosi.` }),
+      h('button', { type: 'button', class: 'button button--system', text: 'Załóż', onClick: put }),
+    ),
   );
 }
 

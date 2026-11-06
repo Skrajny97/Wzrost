@@ -793,18 +793,19 @@ export function itemSheet(item, { equipped, anvil = false }) {
 // The item beside the one worn in its slot, number by number: the damage of
 // a weapon, the armor and each stat, and by how much the item has more or
 // less of it (for damage, of its average). Also for an item of the
-// Targowisko (market.js).
-export function compareTable(item, worn) {
+// Targowisko (market.js) and, with its own words, for what a companion
+// wears (companions.js).
+export function compareTable(item, worn, { title = 'Porównanie z założonym', wornLabel = 'Założony' } = {}) {
   const ids = [...new Set([...item.lines, ...worn.lines].map((line) => line.id))];
   const lineOf = (of, id) => of.lines.find((line) => line.id === id);
   return h(
     'div',
     { class: 'compare' },
-    h('p', { class: 'compare-title', text: 'Porównanie z założonym' }),
+    h('p', { class: 'compare-title', text: title }),
     h(
       'p',
       { class: 'compare-worn' },
-      'Założony: ',
+      `${wornLabel}: `,
       h('span', { class: 'item-name', vars: { '--rarity': worn.color }, text: itemTitle(worn) }),
       ` · ${worn.rarityName} · poz. ${worn.level}`,
     ),
@@ -814,7 +815,7 @@ export function compareTable(item, worn) {
       h(
         'thead',
         {},
-        h('tr', {}, h('th', { scope: 'col' }, h('span', { class: 'visually-hidden', text: 'Wartość' })), ['Ten', 'Założony', 'Różnica'].map((text) => h('th', { scope: 'col', text }))),
+        h('tr', {}, h('th', { scope: 'col' }, h('span', { class: 'visually-hidden', text: 'Wartość' })), ['Ten', wornLabel, 'Różnica'].map((text) => h('th', { scope: 'col', text }))),
       ),
       h(
         'tbody',
@@ -1309,12 +1310,14 @@ async function showPreview(box, item, equipped) {
   }
 }
 
-export function itemSummary(item) {
+export function itemSummary(item, { stats = false } = {}) {
   const text = h(
     'span',
     { class: 'item-summary' },
     h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: itemTitle(item) }),
     h('span', { class: 'item-meta', text: `${item.rarityName} · ${item.slotName} · poz. ${item.level}` }),
+    // With `stats`, its numbers in one line too, to tell items of one name apart.
+    stats && item.properties?.length > 0 && h('span', { class: 'item-stats', text: item.properties.join(' · ') }),
   );
   const art = itemSprite(item);
   return art ? h('span', { class: 'item-summary-art' }, art, text) : text;

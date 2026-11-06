@@ -4,7 +4,8 @@
 // numbers (level 146, almost a million gold, six-digit camp resources), a
 // long name, orders on the Stół rozbiórki's queue and a guild of its own
 // with a long name, and a companion hired in the Kwatery, with its five
-// places for items, on an account with the longest login. On each screen,
+// places for items and amulets of big numbers in the bag for "Załóż z
+// plecaka" (one worn by the companion), on an account with the longest login. On each screen,
 // on the tabs TABS opens and in the sheets SHEETS opens over a screen (the
 // Ustawienia and "Zgłoś błąd", with a screenshot picked too), it looks for a
 // page wider than the screen (a sheet that scrolls sideways), text out of
@@ -77,6 +78,10 @@ const TABS = { '#/oboz/craft-table': ['Kolejka'], '#/osada/board': ['Poszukiwani
 // them; and the same with a picture picked in "Dołącz zrzut ekranu", which
 // the page makes smaller on a canvas and shows on it, "Usuń zrzut" under it.
 const SHEETS = {
+  '#/oboz/quarters': [
+    { name: 'Załóż z plecaka', tap: 'button:text-is("Załóż z plecaka")', ready: '.item-list:has(.wear-choice)' },
+    { name: 'porównanie', tap: '#sheet .item-list > li:first-child .wear-choice > summary', ready: '.wear-choice[open] .compare' },
+  ],
   '#/postac': [
     { name: 'Ustawienia', tap: '.topbar .settings-button', ready: 'h2.sheet-title:text-is("Ustawienia")' },
     { name: 'Zgłoś błąd', tap: '#sheet button:text-is("Zgłoś błąd")', ready: 'h2.sheet-title:text-is("Zgłoś błąd")' },
@@ -184,6 +189,14 @@ async function main() {
   const { settlement } = await page.evaluate(() => fetch('/api/settlement').then((response) => response.json()));
   const candidate = settlement?.companions?.candidates?.[0];
   if (!candidate || (await api('POST', '/api/settlement/hire', { candidateId: candidate.id })) >= 400) throw new Error('Nie udało się zwerbować towarzysza.');
+  // Three amulets of one name and big numbers in the bag, one of them put on
+  // the companion, for "Załóż z plecaka" and its comparison.
+  for (const affixes of [[{ stat: 'strength', value: 9876 }, { stat: 'vitality', value: 8765 }], [{ stat: 'dexterity', value: 7654 }, { stat: 'perception', value: 6543 }], [{ stat: 'endurance', value: 5432 }]]) {
+    const data = JSON.stringify({ base: 'amulet', slot: 'amulet', level: 146, rarity: 'legendary', affixes, implicit: { stat: 'will', value: 4321 } });
+    sql(`INSERT INTO items (character_id, slot, data, created_at) SELECT id, NULL, '${data}', 1 FROM characters WHERE name = '${name}'`);
+  }
+  const hired = (await page.evaluate(() => fetch('/api/settlement').then((response) => response.json()))).settlement?.companions?.hired?.[0];
+  if (!hired?.wearable?.length || (await api('POST', '/api/settlement/equip', { companionId: hired.id, itemId: hired.wearable[0] })) >= 400) throw new Error('Towarzysz nie założył amuletu.');
   // The picture for "Dołącz zrzut ekranu": a PNG drawn on a canvas, of a
   // computer screen's shape and wider than any sheet, so that its preview
   // has to fit itself in.

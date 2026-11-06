@@ -434,8 +434,9 @@ button {
 
 .bag-sort {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 6px 8px;
   margin: 0 0 6px;
 }
 
@@ -445,8 +446,10 @@ button {
   font-size: 13px;
 }
 
+/* Where "Sortuj:" and the options do not fit in one row (a phone or the
+   computer's narrow column), the options go under it, the whole width. */
 .bag-sort-options {
-  flex: 1;
+  flex: 1 1 240px;
   min-width: 0;
 }
 
@@ -462,7 +465,8 @@ button {
   min-height: 34px;
   padding: 0 2px;
   font-size: 12px;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
+  text-transform: none;
 }
 
 /* The Bestiariusz on an inner region's card, with its chest beside it (the
@@ -2376,6 +2380,49 @@ a.segmented-option {
   flex-direction: column;
   gap: 2px;
   min-width: 0;
+}
+
+/* An item's numbers in one line under its name (itemSummary with stats). */
+.item-stats {
+  color: var(--text);
+  font-family: var(--font-system);
+  font-size: 13px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+/* "Załóż z plecaka" in the Kwatery (companions.js wearChoice): each item
+   with its numbers, folding out the comparison and "Załóż" under a tap. */
+.wear-choice > summary {
+  cursor: pointer;
+  list-style: none;
+}
+
+.wear-choice > summary::-webkit-details-marker {
+  display: none;
+}
+
+.wear-choice-mark {
+  flex: none;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px 5px 0;
+  border-color: var(--text-muted) transparent transparent;
+}
+
+.wear-choice[open] .wear-choice-mark {
+  transform: rotate(180deg);
+}
+
+.wear-choice[open] .wear-choice-row {
+  border-color: var(--system);
+}
+
+.wear-choice-body {
+  display: grid;
+  gap: 10px;
+  padding: 10px 2px 6px;
 }
 
 .item-name {
