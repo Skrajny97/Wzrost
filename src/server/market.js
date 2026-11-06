@@ -52,7 +52,7 @@ import { requireOpen, settlementOf } from './settlement.js';
 
 const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', part: 'parts', mineral: 'minerals' };
 const STACKS = Object.keys(COLUMNS);
-const tuning = () => content.settlement.market;
+const tuning = () => content().settlement.market;
 const jsonPath = (key) => `$."${key}"`;
 const changed = () => new ApiError(409, 'character_changed', 'Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz.');
 
@@ -67,27 +67,27 @@ const atomically = (db, statements) => atomicBatch(db, statements, changed);
 function goodsView(kind, key, count, item) {
   if (kind === 'item') {
     const data = JSON.parse(item);
-    return { kind, count: 1, name: itemName(data, content), rarity: data.rarity, level: data.level, item: itemView(data, content) };
+    return { kind, count: 1, name: itemName(data, content()), rarity: data.rarity, level: data.level, item: itemView(data, content()) };
   }
   if (kind === 'material') {
-    const material = materialView(key, count, content);
-    const { description } = content.materialsById[material.materialId];
-    return { kind, key, count, name: material.label.charAt(0).toUpperCase() + material.label.slice(1), rarity: material.rarity, material, description, scrap: materialPrice(material.rarity, content) };
+    const material = materialView(key, count, content());
+    const { description } = content().materialsById[material.materialId];
+    return { kind, key, count, name: material.label.charAt(0).toUpperCase() + material.label.slice(1), rarity: material.rarity, material, description, scrap: materialPrice(material.rarity, content()) };
   }
   if (kind === 'part') {
-    const part = content.partsById[key];
+    const part = content().partsById[key];
     return { kind, key, count, name: part?.name ?? key, rarity: part?.rarity, description: part?.description };
   }
   if (kind === 'herb') {
-    const herb = content.herbsById[key];
+    const herb = content().herbsById[key];
     return { kind, key, count, name: herb?.name ?? key, description: herb?.description, scrap: herb?.price, gatherLevel: herb?.level };
   }
   if (kind === 'potion') {
-    const potion = content.potionsById[key];
-    return { kind, key, count, name: potion?.name ?? key, description: potion?.description, scrap: potion && potionPrice(potion, content) };
+    const potion = content().potionsById[key];
+    return { kind, key, count, name: potion?.name ?? key, description: potion?.description, scrap: potion && potionPrice(potion, content()) };
   }
   if (kind === 'mineral') {
-    const mineral = content.mineralsById[key];
+    const mineral = content().mineralsById[key];
     return { kind, key, count, name: mineral?.name ?? key, rarity: mineral && (mineral.rarity ?? mineral.for[0]), description: mineral?.description, scrap: mineral?.price, mineLevel: mineral?.level };
   }
   return { kind: 'gold', count };
@@ -116,7 +116,7 @@ function offerView(row, characterId) {
     bid: row.bid,
     bids: row.bids,
     endsAt: row.ends_at,
-    minBid: minimumBid(offer, content),
+    minBid: minimumBid(offer, content()),
     leading: row.bidder_id === characterId,
     own: row.seller_id === characterId,
   };
@@ -137,7 +137,7 @@ const goldParcel = (db, offer, price, now) =>
     : [
         db
           .prepare("INSERT INTO market_parcels (character_id, offer_id, kind, count, reason, price, created_at) VALUES (?, ?, 'gold', ?, 'sold', ?, ?)")
-          .bind(offer.seller_id, offer.id, sellerShare(price, content, offer.fee ?? tuning().fee), price, now),
+          .bind(offer.seller_id, offer.id, sellerShare(price, content(), offer.fee ?? tuning().fee), price, now),
       ];
 
 // The offers whose time ran out (questions 238 A, 239 A): a sold one gives
@@ -169,13 +169,13 @@ export async function settleMarket(db, now) {
 
 // A stack the game still knows; one it no longer has is not put up.
 function knownGood(kind, key) {
-  if (kind === 'herb') return Boolean(content.herbsById[key]);
-  if (kind === 'potion') return Boolean(content.potionsById[key]);
-  if (kind === 'part') return Boolean(content.partsById[key]);
-  if (kind === 'mineral') return Object.hasOwn(content.mineralsById, key);
+  if (kind === 'herb') return Boolean(content().herbsById[key]);
+  if (kind === 'potion') return Boolean(content().potionsById[key]);
+  if (kind === 'part') return Boolean(content().partsById[key]);
+  if (kind === 'mineral') return Object.hasOwn(content().mineralsById, key);
   if (kind !== 'material') return false;
   const { materialId, rarityId } = parseStack(key);
-  return Boolean(content.materialsById[materialId] && content.raritiesById[rarityId]);
+  return Boolean(content().materialsById[materialId] && content().raritiesById[rarityId]);
 }
 
 // What the character can put up: the items in its bag and its stacks, each
@@ -185,11 +185,11 @@ function knownGood(kind, key) {
 // ile dany przedmiot idzie u złomiarza").
 function sellable(player, now) {
   const { row } = player;
-  const sellBonus = campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
+  const sellBonus = campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content());
   const stacks = { herb: herbsOf(row), potion: potionsOf(row), material: JSON.parse(row.materials ?? '{}'), part: JSON.parse(row.parts ?? '{}'), mineral: mineralsOf(row) };
   const withBonus = (goods) => (typeof goods.scrap === 'number' ? { ...goods, scrap: goods.scrap * (1 + sellBonus) } : goods);
   return {
-    items: bagItems(player).map((item) => ({ id: item.id, ...itemView(item, content, { sellBonus }) })),
+    items: bagItems(player).map((item) => ({ id: item.id, ...itemView(item, content(), { sellBonus }) })),
     stacks: STACKS.flatMap((kind) =>
       Object.entries(stacks[kind])
         .filter(([key, count]) => count > 0 && knownGood(kind, key))
@@ -201,16 +201,16 @@ function sellable(player, now) {
 // The wandering trader for the character: on his day of the week, or today
 // when "Testuj Osadę" called him on the test version.
 function wandererFor(row, stored, now) {
-  const today = questPeriod('daily', now, content);
+  const today = questPeriod('daily', now, content());
   const called = stored.market?.wandererCalled === today.key ? today : undefined;
-  return wandererGoods({ level: row.level, classId: row.class_id, classLevel: row.class_level, seed: row.id }, now, content, called, brotherhoodPerk('wandererItems', stored.reputation, content));
+  return wandererGoods({ level: row.level, classId: row.class_id, classLevel: row.class_level, seed: row.id }, now, content(), called, brotherhoodPerk('wandererItems', stored.reputation, content()));
 }
 
 // The residents' offers (242 A): the merchant's goods of the day with what
 // the character may still buy of each, at its relation with him (287 A),
 // and the wandering trader's items on his day.
 function residentsView(player, stored, now) {
-  const stock = merchantStock(now, content);
+  const stock = merchantStock(now, content());
   const bought = stored.market?.day === stock.day ? (stored.market.bought ?? {}) : {};
   const { row } = player;
   const wanderer = wandererFor(row, stored, now);
@@ -219,13 +219,13 @@ function residentsView(player, stored, now) {
   return {
     merchant: {
       endsAt: stock.endsAt,
-      discount: relationDiscount(points, content),
-      goods: stock.goods.map((good) => ({ ...goodsView(good.kind, good.key, 1), id: good.id, price: merchantPrice(good, points, content), left: Math.max(0, good.stock - (bought[good.id] ?? 0)) })),
+      discount: relationDiscount(points, content()),
+      goods: stock.goods.map((good) => ({ ...goodsView(good.kind, good.key, 1), id: good.id, price: merchantPrice(good, points, content()), left: Math.max(0, good.stock - (bought[good.id] ?? 0)) })),
     },
     wanderer: {
       startsAt: wanderer.comes.startsAt,
       endsAt: wanderer.comes.endsAt,
-      goods: wanderer.goods?.map((good) => ({ id: good.id, name: itemName(good.item, content), rarity: good.item.rarity, level: good.item.level, item: itemView(good.item, content), price: good.price, bought: taken.includes(good.id) })) ?? null,
+      goods: wanderer.goods?.map((good) => ({ id: good.id, name: itemName(good.item, content()), rarity: good.item.rarity, level: good.item.level, item: itemView(good.item, content()), price: good.price, bought: taken.includes(good.id) })) ?? null,
     },
   };
 }
@@ -239,22 +239,22 @@ async function marketView(db, player, now) {
     db.prepare("SELECT * FROM market_offers WHERE state = 'open' AND seller_id = ? ORDER BY ends_at").bind(row.id),
     db.prepare('SELECT * FROM market_parcels WHERE character_id = ? ORDER BY id').bind(row.id),
   ]);
-  const day = questPeriod('daily', now, content).key;
+  const day = questPeriod('daily', now, content()).key;
   const { minHours, reputation, maxPrice } = tuning();
   return {
     // The character's own fee and longest auction, by the Kompania Kupców
     // (592), and the longest without it, which the hours start at.
-    fee: brotherhoodPerk('marketFee', stored.reputation, content),
-    hours: brotherhoodPerk('auctionHours', stored.reputation, content),
+    fee: brotherhoodPerk('marketFee', stored.reputation, content()),
+    hours: brotherhoodPerk('auctionHours', stored.reputation, content()),
     usualHours: tuning().hours,
     minHours,
     maxPrice,
-    limit: offerLimit(stored.reputation, content),
+    limit: offerLimit(stored.reputation, content()),
     offers: others.results.map((offer) => offerView(offer, row.id)),
     mine: mine.results.map((offer) => offerView(offer, row.id)),
     parcels: parcels.results.map((parcel) => ({ id: parcel.id, reason: parcel.reason, goods: goodsView(parcel.kind, parcel.good, parcel.count, parcel.item) })),
     sellable: sellable(player, now),
-    trade: tradeView(stored.marketTrade, row.level, now, content, reputation),
+    trade: tradeView(stored.marketTrade, row.level, now, content(), reputation),
     ...residentsView(player, stored, now),
   };
 }
@@ -292,14 +292,14 @@ export async function listOffer(context) {
   const held = kind === 'item' ? (item ? 1 : 0) : column && key && knownGood(kind, key) ? (JSON.parse(row[column] ?? '{}')[key] ?? 0) : 0;
   const open = (await db.prepare("SELECT COUNT(*) AS open FROM market_offers WHERE seller_id = ? AND state = 'open'").bind(row.id).first()).open;
   const { reputation } = settlementOf(row);
-  const limit = offerLimit(reputation, content);
+  const limit = offerLimit(reputation, content());
   const count = kind === 'item' ? 1 : body.count;
   const buyNow = body.buyNow === null || body.buyNow === undefined || body.buyNow === '' ? null : body.buyNow;
   const hours = body.hours === null || body.hours === undefined ? tuning().hours : body.hours;
   // Longer auctions and a lower fee with the Kompania Kupców (592); the fee
   // stays with the offer as it was put up.
-  const block = listBlock({ kind, count, startPrice: body.startPrice, buyNow, hours }, held, open, limit, content, brotherhoodPerk('auctionHours', reputation, content));
-  const fee = brotherhoodPerk('marketFee', reputation, content);
+  const block = listBlock({ kind, count, startPrice: body.startPrice, buyNow, hours }, held, open, limit, content(), brotherhoodPerk('auctionHours', reputation, content()));
+  const fee = brotherhoodPerk('marketFee', reputation, content());
   if (block) throw new ApiError(block.code === 'too_many' || block.code === 'not_enough' ? 409 : 400, block.code, block.message);
   const now = context.now;
   const endsAt = now + hours * 3600000;
@@ -349,7 +349,7 @@ export async function bidOnOffer(context) {
   const body = await readJson(context.request);
   const offer = await offerRow(db, body.offerId);
   const now = context.now;
-  const block = bidBlock(offerOf(offer), { amount: body.amount, characterId: row.id, userId: row.user_id, gold: row.gold, now }, content);
+  const block = bidBlock(offerOf(offer), { amount: body.amount, characterId: row.id, userId: row.user_id, gold: row.gold, now }, content());
   if (block) throw new ApiError(409, block.code, block.message);
   await atomically(db, [
     assertion(db, "EXISTS (SELECT 1 FROM market_offers WHERE id = ? AND state = 'open' AND version = ? AND ends_at > ?) AND (SELECT gold FROM characters WHERE id = ?) >= ?", [
@@ -374,7 +374,7 @@ export async function buyOffer(context) {
   const body = await readJson(context.request);
   const offer = await offerRow(db, body.offerId);
   const now = context.now;
-  const block = bidBlock(offerOf(offer), { buyNow: true, characterId: row.id, userId: row.user_id, gold: row.gold, now }, content);
+  const block = bidBlock(offerOf(offer), { buyNow: true, characterId: row.id, userId: row.user_id, gold: row.gold, now }, content());
   if (block) throw new ApiError(409, block.code, block.message);
   const price = offer.buy_now;
   await atomically(db, [
@@ -456,7 +456,7 @@ export function foreign(adds) {
 // buying at the merchant's stall (`relation`) brings as many points of the
 // relation with him (question 278 A).
 function marketReputation(row, stored, value, now, { relation = false } = {}) {
-  const { points, trade } = tradePoints(value, row.level, stored.marketTrade, now, content, tuning().reputation);
+  const { points, trade } = tradePoints(value, row.level, stored.marketTrade, now, content(), tuning().reputation);
   const { brotherhood, resident } = tuning();
   return {
     ...stored,
@@ -475,7 +475,7 @@ const merchantPoints = (stored) => stored.relations[tuning().resident] ?? 0;
 const stackPlaces = (counts, adds) => {
   const merged = { ...counts };
   for (const [key, count] of Object.entries(adds)) merged[key] = (merged[key] ?? 0) + count;
-  return bagStacks(merged, content);
+  return bagStacks(merged, content());
 };
 
 // POST /api/market/collect: everything waiting that fits: gold, materials,
@@ -488,7 +488,7 @@ export async function collectParcels(context) {
   const now = context.now;
   const parcels = (await db.prepare('SELECT * FROM market_parcels WHERE character_id = ? ORDER BY id').bind(row.id).all()).results;
   if (parcels.length === 0) throw new ApiError(409, 'nothing', 'Nic tu na Ciebie nie czeka.');
-  const free = bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player);
+  const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
   const held = { herb: herbsOf(row), potion: potionsOf(row) };
   const adds = { herb: {}, potion: {}, material: {}, part: {}, mineral: {} };
   const items = [];
@@ -561,7 +561,7 @@ export async function buyFromResident(context) {
   const now = context.now;
   const body = await readJson(context.request);
   const stored = settlementOf(row);
-  const free = bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player);
+  const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
   if (body.from === 'wanderer') {
     const wanderer = wandererFor(row, stored, now);
     const good = wanderer.goods?.find((one) => one.id === body.id);
@@ -576,17 +576,17 @@ export async function buyFromResident(context) {
       db.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ?').bind(good.price, JSON.stringify(next), row.id),
       db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)').bind(row.id, JSON.stringify({ ...good.item, traded: 1 }), now),
     ]);
-    return respond(db, session, now, { bought: { name: itemName(good.item, content), price: good.price } });
+    return respond(db, session, now, { bought: { name: itemName(good.item, content()), price: good.price } });
   }
-  const stock = merchantStock(now, content);
+  const stock = merchantStock(now, content());
   const good = stock.goods.find((one) => one.id === body.id);
   if (!good) throw new ApiError(404, 'no_goods', 'Kupiec ma już inny towar.');
   const bought = stored.market?.day === stock.day ? (stored.market.bought ?? {}) : {};
   const count = body.count;
   if (!Number.isInteger(count) || count < 1 || count > good.stock - (bought[good.id] ?? 0)) throw new ApiError(409, 'sold_out', 'Kupiec nie ma już tyle.');
-  const price = merchantPrice(good, merchantPoints(stored), content) * count;
+  const price = merchantPrice(good, merchantPoints(stored), content()) * count;
   if (row.gold < price) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota.');
-  if (good.kind === 'herb' && stackPlaces(herbsOf(row), { [good.key]: count }) - bagStacks(herbsOf(row), content) > free) {
+  if (good.kind === 'herb' && stackPlaces(herbsOf(row), { [good.key]: count }) - bagStacks(herbsOf(row), content()) > free) {
     throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
   }
   const market = { ...stored.market, day: stock.day, bought: { ...bought, [good.id]: (bought[good.id] ?? 0) + count } };
@@ -617,17 +617,17 @@ export async function testMarket(db, player, stored, action, now) {
     return stored;
   }
   const rng = createRng(`market:test:${row.id}:${now}`);
-  const item = randomItem(row.level, rng, content, { classId: row.class_id, maxClassLevel: row.class_level ?? 1, rarityId: 'rare' });
-  const herb = rng.pick(content.herbs);
-  const material = rng.pick(content.materials.filter((one) => one.rarity === 'rare'));
+  const item = randomItem(row.level, rng, content(), { classId: row.class_id, maxClassLevel: row.class_level ?? 1, rarityId: 'rare' });
+  const herb = rng.pick(content().herbs);
+  const material = rng.pick(content().materials.filter((one) => one.rarity === 'rare'));
   const herbs = 5;
   const materials = 3;
   const offers = [
-    { kind: 'item', good: null, count: 1, item: JSON.stringify(item), start: sellPrice(item, content) * 2, buyNow: sellPrice(item, content) * 4 },
-    { kind: 'herb', good: herb.id, count: herbs, item: null, start: Math.ceil(buyCeiling({ kind: 'herb', key: herb.id }, content) * herbs), buyNow: null },
+    { kind: 'item', good: null, count: 1, item: JSON.stringify(item), start: sellPrice(item, content()) * 2, buyNow: sellPrice(item, content()) * 4 },
+    { kind: 'herb', good: herb.id, count: herbs, item: null, start: Math.ceil(buyCeiling({ kind: 'herb', key: herb.id }, content()) * herbs), buyNow: null },
     (() => {
       const key = stackKey(material.id, material.rarity);
-      const start = Math.ceil(buyCeiling({ kind: 'material', key }, content) * materials);
+      const start = Math.ceil(buyCeiling({ kind: 'material', key }, content()) * materials);
       return { kind: 'material', good: key, count: materials, item: null, start, buyNow: start * 2 };
     })(),
   ];
@@ -642,7 +642,7 @@ export async function testMarket(db, player, stored, action, now) {
         .bind(tuning().testSeller, offer.kind, offer.good, offer.count, offer.item, offer.start, offer.buyNow, now, endsAt),
     ),
   );
-  return { ...stored, market: { ...stored.market, wandererCalled: questPeriod('daily', now, content).key } };
+  return { ...stored, market: { ...stored.market, wandererCalled: questPeriod('daily', now, content()).key } };
 }
 
 // What removing characters does at the Targowisko: the leading bidders on

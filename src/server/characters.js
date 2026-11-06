@@ -157,7 +157,7 @@ export function validateName(value) {
             : null;
   if (problem) throw new ApiError(400, 'invalid_name', problem);
   // The mildest filter of vulgar names there can be (names.js).
-  if (blockedName(name, content)) throw new ApiError(400, 'invalid_name', content.chat.names.refused);
+  if (blockedName(name, content())) throw new ApiError(400, 'invalid_name', content().chat.names.refused);
   return name;
 }
 
@@ -209,7 +209,7 @@ async function playerOf(db, row) {
     inParty: Boolean(parcels.results[0]?.in_party),
     // The levels of its guild's Siedziba, by building, all 0 outside a guild
     // (guild-seat.js): the bonuses it has as a member.
-    guildSeat: seatLevels(JSON.parse(parcels.results[0]?.guild_seat ?? '{}'), content),
+    guildSeat: seatLevels(JSON.parse(parcels.results[0]?.guild_seat ?? '{}'), content()),
     // { campfire: { level, startedAt, endsAt, collectedAt } }: see camp.js in
     // the engine; `cost`, what a build was paid, once kept (camp.js).
     buildings: Object.fromEntries(
@@ -230,7 +230,7 @@ async function playerOf(db, row) {
 // Gold and resources together, as building costs name them.
 export function walletOf(row) {
   const stored = JSON.parse(row.resources ?? '{}');
-  return { gold: row.gold, ...Object.fromEntries(content.resources.map((resource) => [resource.id, stored[resource.id] ?? 0])) };
+  return { gold: row.gold, ...Object.fromEntries(content().resources.map((resource) => [resource.id, stored[resource.id] ?? 0])) };
 }
 
 export async function requirePlayer(context) {
@@ -264,7 +264,7 @@ export async function settleDiscoveries(db, player, now) {
   const { materials, parts } = settleCrafting(craftingState(row), now);
   const stored = JSON.parse(row.foreign_stacks ?? '{}');
   const holdings = { items: player.items, potions: JSON.parse(row.potions ?? '{}'), herbs: JSON.parse(row.herbs ?? '{}'), materials, parts, minerals: JSON.parse(row.minerals ?? '{}') };
-  const { found, foreign } = ownDiscoveries(holdings, stored, content);
+  const { found, foreign } = ownDiscoveries(holdings, stored, content());
   // The trade pieces used up meanwhile are written down as gone.
   if (Object.keys(stored).some((key) => foreign[key] !== stored[key])) {
     const kept = JSON.stringify(foreign);
@@ -272,7 +272,7 @@ export async function settleDiscoveries(db, player, now) {
     if (result.meta.changes === 1) row.foreign_stacks = kept;
   }
   // The creature families known in full, for the Warownia's Sala trofeów.
-  const merged = mergeDiscoveries(JSON.parse(row.discovered ?? '{}'), { ...found, ...familyDiscoveries(JSON.parse(row.met ?? '[]'), content) });
+  const merged = mergeDiscoveries(JSON.parse(row.discovered ?? '{}'), { ...found, ...familyDiscoveries(JSON.parse(row.met ?? '[]'), content()) });
   if (!merged) return;
   const discovered = JSON.stringify(merged);
   const result = await db.prepare('UPDATE characters SET discovered = ? WHERE id = ? AND discovered = ?').bind(discovered, row.id, row.discovered ?? '{}').run();
@@ -285,10 +285,10 @@ export async function settleDiscoveries(db, player, now) {
 // with the professions (jewelPatternFrom). The character's `learned`
 // patterns hold both, as the two make different slots.
 export function taughtPattern(item, learned) {
-  const id = (craftingOn() && patternFrom(item, learned, content)) || (professionsOn() && jewelPatternFrom(item, learned, content)) || null;
+  const id = (craftingOn() && patternFrom(item, learned, content())) || (professionsOn() && jewelPatternFrom(item, learned, content())) || null;
   if (!id) return null;
-  const base = content.basesById[id];
-  const texts = content.workshop.parts[base.slot] ? content.workshop.texts : content.jewelcrafting.texts;
+  const base = content().basesById[id];
+  const texts = content().workshop.parts[base.slot] ? content().workshop.texts : content().jewelcrafting.texts;
   return { id, name: base.name, at: say(texts, 'patternAt', 0) };
 }
 
@@ -313,7 +313,7 @@ export const restsDuring = (activity) => !activity || ['herbs', 'potions', 'item
 
 // A character's buffs in fights (storedBuffs in potions.js): those kept in
 // time before 0.1.26 count as the fights of their minutes.
-export const buffsOf = (row, now) => storedBuffs(JSON.parse(row.buffs ?? '{}'), now, content);
+export const buffsOf = (row, now) => storedBuffs(JSON.parse(row.buffs ?? '{}'), now, content());
 
 // The strengthening potions drunk from the bag and the strengthenings of
 // events (the blue mushroom's) that still work (potions.js), by kind: the
@@ -327,8 +327,8 @@ function activeBuffs(player, now) {
     const fights = buffLeft(buffs, kind);
     if (fights <= 0) continue;
     const { bonus } = buffs[kind];
-    const potion = content.potions.find((one) => timedKind(one) === kind)?.id ?? null;
-    active.push({ kind, fights, bonus, label: content.potionUse.buffLabels[kind].replace('{bonus}', Math.round(bonus * 100)), potion });
+    const potion = content().potions.find((one) => timedKind(one) === kind)?.id ?? null;
+    active.push({ kind, fights, bonus, label: content().potionUse.buffLabels[kind].replace('{bonus}', Math.round(bonus * 100)), potion });
   }
   return active;
 }
@@ -360,7 +360,7 @@ export function requireOffRack(player, ...items) {
 
 // The bag's places taken: one an item, and the herbs and the potions by the
 // stack.
-export const bagPlaces = (player) => bagItems(player).length + bagStacks(herbsOf(player.row), content) + bagStacks(potionsOf(player.row), content);
+export const bagPlaces = (player) => bagItems(player).length + bagStacks(herbsOf(player.row), content()) + bagStacks(potionsOf(player.row), content());
 
 // What adds a gathered store to the character: gold has its own column, the
 // other resources sit in the JSON of `resources`.
@@ -419,7 +419,7 @@ export async function settleCollector(db, player, now) {
   for (let tries = 0; tries < 3; tries++) {
     const { row } = player;
     if (!row.collector_at) return;
-    const fills = content.buildings
+    const fills = content().buildings
       .filter((building) => building.effect.kind === 'production')
       .map((building) => {
         const stored = player.buildings[building.id];
@@ -457,7 +457,7 @@ async function settleBuilds(db, player, now) {
     if (!entry || entry.startsAt > now) return;
     const { row } = player;
     const at = entry.startsAt;
-    const building = content.buildingsById[entry.buildingId];
+    const building = content().buildingsById[entry.buildingId];
     const producing = building?.effect?.kind === 'production';
     const stored = player.buildings[building?.id];
     const gathered = !producing ? null : row.collector_at ? collectWithFills(building, stored, at, row.collector_at) : collect(building, stored, at);
@@ -520,7 +520,7 @@ async function settleBuilds(db, player, now) {
 // sent at the same moment still saves, and the condition on time_points_at
 // adds each point once.
 async function settleTimePoints(db, row, now) {
-  const { points, since } = gainedTimePoints(row.time_points_at, now, content);
+  const { points, since } = gainedTimePoints(row.time_points_at, now, content());
   if (points === 0) return;
   const result = await db
     .prepare('UPDATE characters SET time_points = time_points + ?, time_points_at = ? WHERE id = ? AND time_points_at = ?')
@@ -590,7 +590,7 @@ const settlementTest = (row) => settlementOn() && JSON.parse(row.settlement ?? '
 // Whether the character has the Osada: where the deployment has it on, from
 // its level, or opened by "Testuj Osadę".
 export const settlementOpen = (row) =>
-  settlementOn() && Boolean(content.settlement) && (row.level >= content.unlocksById.settlement.level || settlementTest(row));
+  settlementOn() && Boolean(content().settlement) && (row.level >= content().unlocksById.settlement.level || settlementTest(row));
 
 // The Ołtarz Systemu's blessing an exploration sets out with: the one of the
 // day with fights left (fortress.js), where the Warownia is on.
@@ -614,8 +614,8 @@ export function blessingAfter(row, taken, used) {
 export function trophiesFor(player, now, ids) {
   const discovered = JSON.parse(player.row.discovered ?? '{}');
   const met = JSON.parse(player.row.met ?? '[]');
-  const hall = trophyHallBonuses(campLevels(player.buildings, now, content), met, keptFamilies(discovered), content, ids);
-  return addBonuses(trophyBonuses(discovered, content, ids), hall);
+  const hall = trophyHallBonuses(campLevels(player.buildings, now, content()), met, keptFamilies(discovered), content(), ids);
+  return addBonuses(trophyBonuses(discovered, content(), ids), hall);
 }
 
 // A camp building of the Osada's (the Kwatery, `settlement` in
@@ -625,7 +625,7 @@ export function trophiesFor(player, now, ids) {
 // others always. (The Obóz's own `fortress` is its transformation, not this
 // mark.)
 export const buildingOpen = (building, row, stored = null, now = 0) =>
-  (!building.settlement || settlementOpen(row)) && (building.fortress !== true || (fortressOn() && Boolean(stored) && fortressStands(stored, now, content)));
+  (!building.settlement || settlementOpen(row)) && (building.fortress !== true || (fortressOn() && Boolean(stored) && fortressStands(stored, now, content())));
 
 // What the character holds of the goods the Osada's orders ask for, by the
 // column each kind is kept in, the parts of the Stół rozbiórki's orders
@@ -648,7 +648,7 @@ export const knowingCharacter = (row) => ({ ...engineCharacter(row), met: JSON.p
 // The Osada's board at `now` for the character as it is: the stored one
 // (settlement.js) with the orders whose time has come.
 export function settlementBoard(row, stored, now) {
-  return settleBoard(stored.board, { character: knowingCharacter(row), reputation: stored.reputation, seed: `${row.id}:settlement` }, now, content);
+  return settleBoard(stored.board, { character: knowingCharacter(row), reputation: stored.reputation, seed: `${row.id}:settlement` }, now, content());
 }
 
 // Whether an order on the board, the week's included, can be delivered
@@ -663,11 +663,11 @@ function settlementWaiting(row, items, now, parcels = 0) {
   // A wanted poster's bounty waits at the sołtys's (wanted.js).
   if (stored.wanted?.taken?.beaten) return true;
   const rewarded = stored.rewarded ?? {};
-  if (content.settlement.brotherhoods.some((one) => standingRewardsDue(one.id, stored.reputation?.[one.id] ?? 0, rewarded[one.id] ?? 0, content))) return true;
+  if (content().settlement.brotherhoods.some((one) => standingRewardsDue(one.id, stored.reputation?.[one.id] ?? 0, rewarded[one.id] ?? 0, content()))) return true;
   const board = settlementBoard(row, { board: stored.board ?? null, reputation: stored.reputation ?? {} }, now);
   const goods = settlementGoods(row, items, now);
   const weekly = board.weekly && !board.weekly.done ? board.weekly.order : null;
-  return [...board.slots.map((slot) => slot.order), weekly].some((order) => order && goodStock(order, goods, content) >= order.count);
+  return [...board.slots.map((slot) => slot.order), weekly].some((order) => order && goodStock(order, goods, content()) >= order.count);
 }
 
 // What a period's quests are drawn from: the character as it is, whether its
@@ -676,16 +676,16 @@ function settlementWaiting(row, items, now, parcels = 0) {
 // Górnictwo and Jubilerstwo from 25), whether its Osada is open, its id for
 // the seed and the moment it came, for its first week (quests.js).
 export function questContext(player, now) {
-  const hasProfessions = professionsOn() && isUnlocked('professions', player.row.level, content);
-  const crafting = content.professionsById[content.workshop.profession];
+  const hasProfessions = professionsOn() && isUnlocked('professions', player.row.level, content());
+  const crafting = content().professionsById[content().workshop.profession];
   return {
     // With its relations and reputation in the Osada, for the herbalist's
     // rare recipes (121 A).
     character: { ...engineCharacter(player.row), settlement: settlementPointsOf(player.row) },
-    hasTable: craftTable(campLevels(player.buildings, now, content), content).pace > 0,
+    hasTable: craftTable(campLevels(player.buildings, now, content()), content()).pace > 0,
     hasProfessions,
-    hasCrafting: hasProfessions && craftingOn() && professionOpen(crafting, player.row.level, content),
-    openProfessions: hasProfessions ? content.professions.filter((profession) => professionOpen(profession, player.row.level, content)).map((profession) => profession.id) : [],
+    hasCrafting: hasProfessions && craftingOn() && professionOpen(crafting, player.row.level, content()),
+    openProfessions: hasProfessions ? content().professions.filter((profession) => professionOpen(profession, player.row.level, content())).map((profession) => profession.id) : [],
     hasSettlement: settlementOpen(player.row),
     seed: player.row.id,
     createdAt: player.row.created_at,
@@ -693,7 +693,7 @@ export function questContext(player, now) {
 }
 
 // The quests of both periods at `now`.
-export const questsNow = (player, now) => currentQuests(JSON.parse(player.row.quests ?? '{}'), questContext(player, now), now, content);
+export const questsNow = (player, now) => currentQuests(JSON.parse(player.row.quests ?? '{}'), questContext(player, now), now, content());
 
 // A new day or week draws its quests and saves them at once, so they stay
 // the same however the character changes that day; so are the lost quests
@@ -703,7 +703,7 @@ export async function settleQuests(db, player, now) {
   const { row } = player;
   const stored = JSON.parse(row.quests ?? '{}');
   const settled = questsNow(player, now);
-  if (!questsStale(stored, now, content) && JSON.stringify(settled) === JSON.stringify(stored)) return;
+  if (!questsStale(stored, now, content()) && JSON.stringify(settled) === JSON.stringify(stored)) return;
   const quests = JSON.stringify(settled);
   const result = await db.prepare('UPDATE characters SET quests = ? WHERE id = ? AND quests = ?').bind(quests, row.id, row.quests).run();
   row.quests = result.meta.changes === 1 ? quests : (await db.prepare('SELECT quests FROM characters WHERE id = ?').bind(row.id).first()).quests;
@@ -725,7 +725,7 @@ export function requireIdle(player, now) {
   const texts =
     activity.kind === 'mercenary'
       ? mercenaryBusy(activity)
-      : { herbs: content.professionTexts, potions: content.brewing?.texts, items: content.workshop?.texts, minerals: content.mining?.texts, jewels: content.jewelcrafting?.texts }[activity.kind];
+      : { herbs: content().professionTexts, potions: content().brewing?.texts, items: content().workshop?.texts, minerals: content().mining?.texts, jewels: content().jewelcrafting?.texts }[activity.kind];
   throw activity.ends_at <= now
     ? new ApiError(409, 'claim_first', texts ? texts.claimFirst[0] : 'Wyprawa się skończyła. Najpierw odbierz raport.')
     : new ApiError(409, 'busy', texts ? texts.busy[0] : 'Postać jest na wyprawie. Poczekaj na jej koniec.');
@@ -775,7 +775,7 @@ export async function requireWorker(context, body) {
   const { row, avatarActivity } = found.player;
   if (!row.avatar_at) throw new ApiError(409, 'no_avatar', 'Nie masz jeszcze Awatara Systemu.');
   if (avatarActivity) {
-    const { texts } = content.avatar;
+    const { texts } = content().avatar;
     throw avatarActivity.ends_at <= context.now ? new ApiError(409, 'claim_first', texts.claimFirst[0]) : new ApiError(409, 'busy', texts.busy[0]);
   }
   return { ...found, avatar: true };
@@ -796,7 +796,7 @@ export function workOf(player, avatar) {
 // whatever else a request might once have stored counts for nothing (the
 // code review).
 const statPoints = (stored) =>
-  Object.fromEntries(Object.entries(stored ?? {}).filter(([stat, value]) => Object.hasOwn(content.statsById, stat) && Number.isInteger(value)));
+  Object.fromEntries(Object.entries(stored ?? {}).filter(([stat, value]) => Object.hasOwn(content().statsById, stat) && Number.isInteger(value)));
 
 // The place a character opened early in the Sala prób (trial-hall.js;
 // the author's 620 B), or null.
@@ -820,7 +820,7 @@ export function engineCharacter(row) {
     bonusPoints: row.bonus_points ?? 0,
     position: row.position,
     appearance: row.appearance,
-    skin: row.skin ?? content.defaultSkin,
+    skin: row.skin ?? content().defaultSkin,
     // The skills learned and their levels (skills.js).
     skills: JSON.parse(row.skills ?? '{}'),
     // The evolution taken at class level 50 (evolutions.js), or null.
@@ -836,14 +836,14 @@ export const equippedItems = (player) => player.items.filter((item) => item.equi
 // hp_at (also while gathering herbs), faster with the camp's Ognisko.
 export function currentHp(player, now) {
   const character = engineCharacter(player.row);
-  const { totals } = computeStats(character, equippedItems(player), content);
-  const combatant = playerCombatant({ character, equipped: equippedItems(player), name: player.row.name }, content);
-  const rest = restBonus(player.buildings, player.row.hp_at, now, content);
+  const { totals } = computeStats(character, equippedItems(player), content());
+  const combatant = playerCombatant({ character, equipped: equippedItems(player), name: player.row.name }, content());
+  const rest = restBonus(player.buildings, player.row.hp_at, now, content());
   const hp = !restsDuring(player.activity)
     ? player.activity.hp_at_start
     : restedHp(
         { hp: player.row.hp, since: player.row.hp_at, now, maxHp: combatant.maxHp, vitality: totals.vitality, ...rest },
-        content,
+        content(),
       );
   return { hp: Math.min(hp, combatant.maxHp), maxHp: combatant.maxHp, vitality: totals.vitality, combatant, rest };
 }
@@ -851,14 +851,14 @@ export function currentHp(player, now) {
 // The training as the yard's screen shows it: what one gives now, whether
 // one may start, and the one of the day under way or done.
 function trainingView(player, levels, now) {
-  const plan = trainingPlan(levels, content);
+  const plan = trainingPlan(levels, content());
   if (!fortressOn() || !plan) return null;
   const { training } = JSON.parse(player.row.fortress ?? '{}');
-  const day = questPeriod('daily', now, content);
+  const day = questPeriod('daily', now, content());
   const today = training?.day === day.key;
   return {
     hours: plan.hours,
-    xp: trainingXp(player.row.level, plan, content),
+    xp: trainingXp(player.row.level, plan, content()),
     canStart: !today && (!training || training.claimed),
     nextDayAt: today ? day.endsAt : null,
     current: training && !training.claimed ? { startedAt: training.startedAt, endsAt: training.endsAt, xp: training.xp, done: training.endsAt <= now } : null,
@@ -868,10 +868,10 @@ function trainingView(player, levels, now) {
 // The Ołtarz's blessing as its screen shows it: the three to choose from,
 // for how many fights, and the one of the day with the fights left.
 function blessingView(player, levels, now, building) {
-  const plan = blessingPlan(levels, content);
+  const plan = blessingPlan(levels, content());
   if (!fortressOn() || !plan) return null;
   const { blessing } = JSON.parse(player.row.fortress ?? '{}');
-  const today = blessing?.day === questPeriod('daily', now, content).key;
+  const today = blessing?.day === questPeriod('daily', now, content()).key;
   return {
     fights: plan.fights,
     choices: building.blessings,
@@ -883,15 +883,15 @@ function blessingView(player, levels, now, building) {
 // The Szklarnia as its screen shows it: the herbs it may grow (those known
 // from Zielarstwa), how much of the chosen one a day, and its store now.
 function greenhouseView(player, levels, now) {
-  const hours = greenhouseHours(levels, content);
+  const hours = greenhouseHours(levels, content());
   if (!fortressOn() || hours <= 0) return null;
-  const herbalism = professionState(JSON.parse(player.row.professions ?? '{}'), content.gathering.profession).level;
+  const herbalism = professionState(JSON.parse(player.row.professions ?? '{}'), content().gathering.profession).level;
   const { greenhouse } = JSON.parse(player.row.fortress ?? '{}');
-  const store = greenhouseStore(levels, greenhouse, herbalism, now, content);
+  const store = greenhouseStore(levels, greenhouse, herbalism, now, content());
   return {
     hours,
-    herbs: knownHerbs(herbalism, content).map((herb) => ({ id: herb.id, name: herb.name })),
-    current: store && { herb: store.herb, name: content.herbsById[store.herb].name, perDay: store.perDay, limit: store.limit, capacity: store.capacity, amount: store.amount, since: store.since },
+    herbs: knownHerbs(herbalism, content()).map((herb) => ({ id: herb.id, name: herb.name })),
+    current: store && { herb: store.herb, name: content().herbsById[store.herb].name, perDay: store.perDay, limit: store.limit, capacity: store.capacity, amount: store.amount, since: store.since },
   };
 }
 
@@ -899,7 +899,7 @@ function greenhouseView(player, levels, now) {
 // keeps, each with its name, the items of it still had (on a rack or worn)
 // and whether the character wears it now, all of it and nothing else.
 function gearSetsView(player, levels, building) {
-  const count = gearSetCount(levels, content);
+  const count = gearSetCount(levels, content());
   if (!fortressOn() || count <= 0) return null;
   const sets = gearSetsOf(player.row);
   const byId = new Map(player.items.map((item) => [item.id, item]));
@@ -912,7 +912,7 @@ function gearSetsView(player, levels, building) {
       return {
         index,
         name: sets[index]?.name ?? null,
-        items: items.map((item) => ({ id: item.id, worn: Boolean(item.equippedSlot), ...itemView(item, content) })),
+        items: items.map((item) => ({ id: item.id, worn: Boolean(item.equippedSlot), ...itemView(item, content()) })),
         worn: items.length > 0 && items.length === worn.length && items.every((item) => item.equippedSlot),
       };
     }),
@@ -924,16 +924,16 @@ function gearSetsView(player, levels, building) {
 // what it costs and takes, the build under way or waiting, and once done
 // that the Warownia stands.
 function fortressView(player, open, queue, now) {
-  const fortress = content.camp.fortress;
+  const fortress = content().camp.fortress;
   const stored = player.buildings[fortress.id];
-  const stands = fortressStands(player.buildings, now, content);
+  const stands = fortressStands(player.buildings, now, content());
   return {
     id: fortress.id,
     name: fortress.name,
     description: fortress.description,
-    ready: fortressReady(player.buildings, now, open, content) && !queue.some((entry) => entry.buildingId === fortress.id),
+    ready: fortressReady(player.buildings, now, open, content()) && !queue.some((entry) => entry.buildingId === fortress.id),
     cost: upgradeCost(fortress, 1),
-    minutes: buildMinutes(fortress, 1, campLevel(player.buildings, now, content), content),
+    minutes: buildMinutes(fortress, 1, campLevel(player.buildings, now, content()), content()),
     building: stored && !stands ? { startedAt: stored.startedAt, endsAt: stored.endsAt } : null,
     queued: queue.some((entry) => entry.buildingId === fortress.id),
     stands,
@@ -947,8 +947,8 @@ function fortressView(player, open, queue, now) {
 function campView(player, levels, now) {
   const running = construction(player.buildings, now);
   const queue = buildQueue(player.row);
-  const { camp } = content;
-  const own = campLevel(player.buildings, now, content);
+  const { camp } = content();
+  const own = campLevel(player.buildings, now, content());
   // The next level of each building comes after the builds under way and
   // waiting, and builds in the camp they leave behind.
   const campThen = plannedLevel(camp, player.buildings, queue);
@@ -958,7 +958,7 @@ function campView(player, levels, now) {
   // their highest level, and the camp's own level, out of all.
   // The Warownia's buildings, once they stand, count for the spirit but not
   // for the stone's rows: the transformation needs the camp's alone.
-  const built = content.buildings.filter((building) => buildingOpen(building, player.row, player.buildings, now));
+  const built = content().buildings.filter((building) => buildingOpen(building, player.row, player.buildings, now));
   const open = built.filter((building) => !building.fortress);
   const finished = open.filter((building) => levels[building.id] >= building.maxLevel).length;
   return {
@@ -982,37 +982,37 @@ function campView(player, levels, now) {
       description: camp.description,
       level: own,
       maxLevel: camp.maxLevel,
-      effect: campEffectText(own, content),
+      effect: campEffectText(own, content()),
       // At the highest level only the evolution to come is left.
       evolution: following ? null : camp.evolution,
       next: following && {
         level: following,
-        effect: campEffectText(following, content),
-        minutes: buildMinutes(camp, following, campThen, content),
+        effect: campEffectText(following, content()),
+        minutes: buildMinutes(camp, following, campThen, content()),
         cost: upgradeCost(camp, following),
       },
       queued: queued(camp.id),
     },
     construction: running && {
       buildingId: running.buildingId,
-      name: content.buildingsById[running.buildingId].name,
+      name: content().buildingsById[running.buildingId].name,
       level: running.level,
       startedAt: running.startedAt,
       endsAt: running.endsAt,
       // What "Przerwij budowę" gives back: what the build was paid, or for
       // one from before that was kept, the price of its level now.
-      cost: running.cost ?? upgradeCost(content.buildingsById[running.buildingId], running.level),
+      cost: running.cost ?? upgradeCost(content().buildingsById[running.buildingId], running.level),
     },
     // The builds waiting after it, each with the time it starts, and how
     // many builds the camp has at most, the one under way too.
-    queue: queue.map((entry) => ({ ...entry, name: content.buildingsById[entry.buildingId]?.name ?? entry.buildingId })),
+    queue: queue.map((entry) => ({ ...entry, name: content().buildingsById[entry.buildingId]?.name ?? entry.buildingId })),
     queueSize: camp.queue,
     underWay: buildsUnderWay(player.buildings, queue, now),
-    buildings: content.buildings.filter((building) => buildingOpen(building, player.row, player.buildings, now)).map((building) => {
+    buildings: content().buildings.filter((building) => buildingOpen(building, player.row, player.buildings, now)).map((building) => {
       const level = levels[building.id];
       const planned = plannedLevel(building, player.buildings, queue);
       // Past level 10 in the Warownia for the resource buildings (618).
-      const top = buildingTop(building, player.buildings, now, content);
+      const top = buildingTop(building, player.buildings, now, content());
       const next = planned < top ? planned + 1 : null;
       const stored = player.buildings[building.id];
       // A production building's store, once the building stands: the page
@@ -1033,7 +1033,7 @@ function campView(player, levels, now) {
         crafts: building.effect.kind === 'craftSpeed',
         // The Kowadło: its screen lists the items to upgrade.
         upgrades: building.effect.kind === 'upgradeCap',
-        effect: level > 0 ? effectText(building, level, content) : null,
+        effect: level > 0 ? effectText(building, level, content()) : null,
         production: store && {
           resource: store.resource,
           perHour: store.perHour,
@@ -1044,8 +1044,8 @@ function campView(player, levels, now) {
         },
         next: next && {
           level: next,
-          effect: effectText(building, next, content),
-          minutes: buildMinutes(building, next, campThen, content),
+          effect: effectText(building, next, content()),
+          minutes: buildMinutes(building, next, campThen, content()),
           cost: upgradeCost(building, next),
         },
         queued: queued(building.id),
@@ -1069,7 +1069,7 @@ function campView(player, levels, now) {
 // words, and whether the character has him; the board shows him by the
 // Skrzynia Konta until he is bought.
 function collectorView(row) {
-  const { art, name, price, texts } = content.camp.collector;
+  const { art, name, price, texts } = content().camp.collector;
   return { art, name, price, owned: Boolean(row.collector_at), texts: { offer: texts.offer, bought: texts.bought, hint: texts.hint } };
 }
 
@@ -1080,17 +1080,17 @@ function collectorView(row) {
 // the character has), so the page can tell the surplus. Null where the
 // game has no spirit.
 function spiritView(player, open, queue, now) {
-  const spirit = builderSpirit(content);
+  const spirit = builderSpirit(content());
   if (!spirit) return null;
   const wallet = walletOf(player.row);
   // With the Warownia in the game, what its transformation still needs too,
   // and once it stands the resource buildings' levels up to 20 (618).
   const needs = campNeeds(
-    fortressOn() && content.camp.fortress ? [...open, content.camp.fortress] : open,
+    fortressOn() && content().camp.fortress ? [...open, content().camp.fortress] : open,
     player.buildings,
     queue,
-    content,
-    (building) => buildingTop(building, player.buildings, now, content),
+    content(),
+    (building) => buildingTop(building, player.buildings, now, content()),
   );
   return {
     art: spirit.art,
@@ -1100,10 +1100,10 @@ function spiritView(player, open, queue, now) {
     texts: { price: spirit.texts.price, need: spirit.texts.need, least: spirit.texts.least, sold: spirit.texts.sold },
     goods: Object.entries(spirit.gold).map(([id, gold]) => ({
       id,
-      name: content.resourcesById[id].name,
+      name: content().resourcesById[id].name,
       have: wallet[id] ?? 0,
       gold,
-      least: spiritLeast(id, content),
+      least: spiritLeast(id, content()),
       need: needs[id] ?? 0,
     })),
   };
@@ -1112,9 +1112,9 @@ function spiritView(player, open, queue, now) {
 // The fire spirit's trade at the Ognisko's level: the price of a piece,
 // the pieces a day and those left today, and the same at the next level.
 function fireView(building, level, row, now) {
-  const trade = fireTrade(level, content);
-  const made = fireUnitsMade({ day: row.fire_day, units: row.fire_units }, now, content);
-  const next = level < building.maxLevel ? fireTrade(level + 1, content) : null;
+  const trade = fireTrade(level, content());
+  const made = fireUnitsMade({ day: row.fire_day, units: row.fire_units }, now, content());
+  const next = level < building.maxLevel ? fireTrade(level + 1, content()) : null;
   return {
     title: building.trade.title,
     text: building.trade.text,
@@ -1129,8 +1129,8 @@ function fireView(building, level, row, now) {
 // The Stół rozbiórki's exchange at its level: the pieces of a resource
 // given for one of another, and fewer at the next level.
 function exchangeView(building, level) {
-  const exchange = resourceExchange(level, content);
-  const next = level < building.maxLevel ? resourceExchange(level + 1, content) : null;
+  const exchange = resourceExchange(level, content());
+  const next = level < building.maxLevel ? resourceExchange(level + 1, content()) : null;
   return {
     title: building.exchange.title,
     text: building.exchange.text,
@@ -1144,9 +1144,9 @@ function exchangeView(building, level) {
 // their prices (the page takes their names and counts from crafting), and
 // what the next level adds.
 function shopView(building, level, row, now) {
-  const offer = shopOffer(level, content);
-  const later = level < building.maxLevel ? shopOffer(level + 1, content) : null;
-  const bought = shopBought({ day: row.shop_day, parts: JSON.parse(row.shop_parts ?? '{}') }, now, content);
+  const offer = shopOffer(level, content());
+  const later = level < building.maxLevel ? shopOffer(level + 1, content()) : null;
+  const bought = shopBought({ day: row.shop_day, parts: JSON.parse(row.shop_parts ?? '{}') }, now, content());
   return {
     title: building.shop.title,
     text: building.shop.text,
@@ -1155,14 +1155,14 @@ function shopView(building, level, row, now) {
     parts: offer.map(({ partId, price }) => ({
       id: partId,
       price,
-      daily: building.shop.daily[content.partsById[partId].rarity],
-      left: shopLeft(partId, bought, content),
+      daily: building.shop.daily[content().partsById[partId].rarity],
+      left: shopLeft(partId, bought, content()),
     })),
     next: later && {
       level: level + 1,
       added: later
         .filter(({ partId }) => !offer.some((entry) => entry.partId === partId))
-        .map(({ partId }) => ({ id: partId, name: content.partsById[partId].name, gender: content.partsById[partId].gender })),
+        .map(({ partId }) => ({ id: partId, name: content().partsById[partId].name, gender: content().partsById[partId].gender })),
       discount: building.shop.discountPerLevel,
     },
   };
@@ -1173,48 +1173,48 @@ export function craftingState(row) {
   return { materials: JSON.parse(row.materials ?? '{}'), parts: JSON.parse(row.parts ?? '{}'), queue: JSON.parse(row.crafting ?? '[]') };
 }
 
-const rarityIndex = (id) => content.rarities.findIndex((rarity) => rarity.id === id);
+const rarityIndex = (id) => content().rarities.findIndex((rarity) => rarity.id === id);
 
 // The table as the page shows it, settled at `now`. `pace` 0: no table yet.
 function craftingView(row, levels, now) {
-  const table = craftTable(levels, content);
+  const table = craftTable(levels, content());
   const { pace } = table;
   const { materials, parts, queue } = settleCrafting(craftingState(row), now);
   // What the scrapper pays for a piece, with the camp's Skup złomu.
-  const sellBonus = campBonus(levels, 'sellPrice', content);
+  const sellBonus = campBonus(levels, 'sellPrice', content());
   return {
     pace,
     // The table's level, the highest rarity it takes and the chance of an
     // extra part for each part made.
     level: table.level,
-    maxRarity: table.maxRarity < 0 ? null : content.rarities[table.maxRarity].id,
+    maxRarity: table.maxRarity < 0 ? null : content().rarities[table.maxRarity].id,
     bonusChance: table.bonusChance,
-    limit: content.balance.crafting.queueLimit,
+    limit: content().balance.crafting.queueLimit,
     // The words of "Usuń z kolejki" and "Usuń wszystkie" (data/buildings.json).
     texts: queueTexts(),
     materials: Object.entries(materials)
       .map(([key, count]) => {
-        const view = materialView(key, count, content);
+        const view = materialView(key, count, content());
         // `needs`: the table's level that takes this rarity, when it is not built up to it yet.
-        const takes = pace > 0 && craftTakes(table, view.rarity, content);
+        const takes = pace > 0 && craftTakes(table, view.rarity, content());
         return {
           ...view,
-          price: materialPrice(view.rarity, content) * (1 + sellBonus),
-          minutes: takes ? craftMinutes(view.rarity, count, pace, content) : null,
-          needs: pace > 0 && !takes ? craftLevelFor(view.rarity, content) : null,
+          price: materialPrice(view.rarity, content()) * (1 + sellBonus),
+          minutes: takes ? craftMinutes(view.rarity, count, pace, content()) : null,
+          needs: pace > 0 && !takes ? craftLevelFor(view.rarity, content()) : null,
         };
       })
       .sort((a, b) => rarityIndex(a.rarity) - rarityIndex(b.rarity) || a.name.localeCompare(b.name, 'pl')),
-    parts: content.parts.map((part) => ({
+    parts: content().parts.map((part) => ({
       id: part.id,
       name: part.name,
       description: part.description,
       rarity: part.rarity,
-      color: content.raritiesById[part.rarity].color,
+      color: content().raritiesById[part.rarity].color,
       count: parts[part.id] ?? 0,
     })),
     queue: queue.map((order) => {
-      const material = order.kind === 'material' ? materialView(order.key, order.count, content) : null;
+      const material = order.kind === 'material' ? materialView(order.key, order.count, content()) : null;
       const rarity = material ? material.rarity : order.rarity;
       return {
         id: order.id,
@@ -1224,8 +1224,8 @@ function craftingView(row, levels, now) {
         name: material ? material.name : (order.name ?? 'Przedmioty'),
         count: order.count ?? 1,
         rarity,
-        color: content.raritiesById[rarity].color,
-        part: content.partsById[order.partId].name,
+        color: content().raritiesById[rarity].color,
+        part: content().partsById[order.partId].name,
         parts: order.parts,
         // No extra parts here: drawn with the order, they show only once it
         // ends, among the parts (taken off and ordered again, an order would
@@ -1239,8 +1239,8 @@ function craftingView(row, levels, now) {
         // with it: jewellery's gems and ores, the patterns its items taught.
         cancellable: orderCancellable(order),
         counted: order.countsAtEnd !== true,
-        minerals: Object.entries(order.minerals ?? {}).map(([id, count]) => ({ name: content.mineralsById[id]?.name ?? id, count })),
-        patterns: (order.patterns ?? []).map((id) => content.basesById[id]?.name).filter(Boolean),
+        minerals: Object.entries(order.minerals ?? {}).map(([id, count]) => ({ name: content().mineralsById[id]?.name ?? id, count })),
+        patterns: (order.patterns ?? []).map((id) => content().basesById[id]?.name).filter(Boolean),
       };
     }),
   };
@@ -1248,7 +1248,7 @@ function craftingView(row, levels, now) {
 
 // The words of the table's queue for the page, without the server's answers.
 function queueTexts() {
-  const { errors: _, ...texts } = tableBuilding(content)?.queue ?? {};
+  const { errors: _, ...texts } = tableBuilding(content())?.queue ?? {};
   return texts;
 }
 
@@ -1260,43 +1260,43 @@ function queueTexts() {
 // ordered, or the gem set and the item's id.
 function activityPlace(activity, level) {
   if (activity.kind === 'herbs') {
-    const herbs = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content.herbsById[id]);
-    return { profession: content.gathering.profession, placeName: content.gathering.place.name, herbs: herbs.map((id) => ({ id, name: content.herbsById[id].name })) };
+    const herbs = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content().herbsById[id]);
+    return { profession: content().gathering.profession, placeName: content().gathering.place.name, herbs: herbs.map((id) => ({ id, name: content().herbsById[id].name })) };
   }
   if (activity.kind === 'potions') {
     const { recipe, count } = JSON.parse(activity.options ?? '{}');
-    const potion = content.potionsById[recipe];
-    return { profession: content.brewing.profession, placeName: content.brewing.place.name, potion: potion ? { id: potion.id, name: potion.name } : null, count: count ?? 0 };
+    const potion = content().potionsById[recipe];
+    return { profession: content().brewing.profession, placeName: content().brewing.place.name, potion: potion ? { id: potion.id, name: potion.name } : null, count: count ?? 0 };
   }
   if (activity.kind === 'items') {
     const { base: baseId, rarity, count, scroll } = JSON.parse(activity.options ?? '{}');
     // A scroll order names its scroll: the Zwój ochronny, or the Zwój
     // utrwalenia for one of "steady".
-    const base = scroll ? (scroll === 'steady' ? content.workshop.steadyScroll : content.workshop.scroll) : content.basesById[baseId];
+    const base = scroll ? (scroll === 'steady' ? content().workshop.steadyScroll : content().workshop.scroll) : content().basesById[baseId];
     return {
-      profession: content.workshop.profession,
-      placeName: content.workshop.place.name,
+      profession: content().workshop.profession,
+      placeName: content().workshop.place.name,
       base: base ? { id: base.id, name: base.name } : null,
-      rarityName: content.raritiesById[rarity]?.name ?? '',
+      rarityName: content().raritiesById[rarity]?.name ?? '',
       count: count ?? 0,
       ...(scroll && { scroll: true }),
     };
   }
-  if (activity.kind === 'minerals') return { profession: content.mining.profession, placeName: content.mining.place.name };
+  if (activity.kind === 'minerals') return { profession: content().mining.profession, placeName: content().mining.place.name };
   // A mercenary's offer or service in the Karczma (mercenaries.js).
   if (activity.kind === 'mercenary') return mercenaryPlace(activity);
   if (activity.kind === 'jewels') {
     const { base: baseId, rarity, count, set, gem, itemName } = JSON.parse(activity.options ?? '{}');
-    const base = content.basesById[baseId];
+    const base = content().basesById[baseId];
     return {
-      profession: content.jewelcrafting.profession,
-      placeName: content.jewelcrafting.place.name,
+      profession: content().jewelcrafting.profession,
+      placeName: content().jewelcrafting.place.name,
       ...(set
-        ? { set: { gem: content.mineralsById[gem]?.name ?? '', item: itemName ?? '' } }
-        : { base: base ? { id: base.id, name: base.name } : null, rarityName: content.raritiesById[rarity]?.name ?? '', count: count ?? 0 }),
+        ? { set: { gem: content().mineralsById[gem]?.name ?? '', item: itemName ?? '' } }
+        : { base: base ? { id: base.id, name: base.name } : null, rarityName: content().raritiesById[rarity]?.name ?? '', count: count ?? 0 }),
     };
   }
-  const area = areaFor(activity.region_id, level, content);
+  const area = areaFor(activity.region_id, level, content());
   return { areaId: area.id, areaName: area.name, regionId: area.regionId, regionName: area.regionName };
 }
 
@@ -1352,14 +1352,14 @@ function activityView(activity, level, now) {
 // (hunts.js).
 export function quickHuntsUsed(row, now) {
   const stored = JSON.parse(row.quick_hunts ?? 'null');
-  return stored?.day === questPeriod('daily', now, content).key ? stored.used : 0;
+  return stored?.day === questPeriod('daily', now, content()).key ? stored.used : 0;
 }
 
 // The Błyskawiczne polowania left, and when they come back once all are
 // used: `refillHours` after the last one (the author: "resetowane co 12h po
 // zużyciu"). Stored beside the Szybkie Polowania: { used, at }.
 export function flashHuntsLeft(row, now) {
-  const { count, refillHours } = content.balance.flashHunt;
+  const { count, refillHours } = content().balance.flashHunt;
   const flash = JSON.parse(row.quick_hunts ?? 'null')?.flash;
   if (!flash || flash.used < count) return { left: count - (flash?.used ?? 0), backAt: null };
   const backAt = flash.at + refillHours * 3600000;
@@ -1369,9 +1369,9 @@ export function flashHuntsLeft(row, now) {
 // The Szybkie Polowania left today and the Błyskawiczne polowania left, or
 // null below their level.
 function quickHuntsView(row, now) {
-  const { perDay, minutes } = content.balance.quickHunt;
-  const flash = content.balance.flashHunt;
-  return isUnlocked('quick-hunts', row.level, content)
+  const { perDay, minutes } = content().balance.quickHunt;
+  const flash = content().balance.flashHunt;
+  return isUnlocked('quick-hunts', row.level, content())
     ? { left: Math.max(0, perDay - quickHuntsUsed(row, now)), perDay, minutes, flash: { ...flashHuntsLeft(row, now), count: flash.count, minutes: flash.minutes } }
     : null;
 }
@@ -1379,7 +1379,7 @@ function quickHuntsView(row, now) {
 // The Awatar Systemu (avatar.js): its price and words until it is bought,
 // then its work under way, or null.
 function avatarView(player, now) {
-  const { name, price, description } = content.avatar;
+  const { name, price, description } = content().avatar;
   return { name, price, description, owned: Boolean(player.row.avatar_at), activity: activityView(player.avatarActivity, player.row.level, now) };
 }
 
@@ -1389,33 +1389,33 @@ export function characterView(player, now) {
   const spent = spentPoints(character);
   const equipped = equippedItems(player);
   const professions = professionsView(row);
-  const { totals, sources } = computeStats(character, equipped, content);
+  const { totals, sources } = computeStats(character, equipped, content());
   const { hp, maxHp, combatant, rest } = currentHp(player, now);
-  const values = combatValues(character, equipped, content);
-  const perPoint = statEffects(character, equipped, content);
-  const levels = campLevels(player.buildings, now, content);
-  const sellBonus = campBonus(levels, 'sellPrice', content);
+  const values = combatValues(character, equipped, content());
+  const perPoint = statEffects(character, equipped, content());
+  const levels = campLevels(player.buildings, now, content());
+  const sellBonus = campBonus(levels, 'sellPrice', content());
   // The Kowadło's level is the highest upgrade it allows.
-  const upgradeCap = campBonus(levels, 'upgradeCap', content);
+  const upgradeCap = campBonus(levels, 'upgradeCap', content());
   // What the Stół rozbiórki makes of an item taken apart and how long it
   // takes, or the table's level its rarity needs.
   // Also the pattern the item teaches, and where (taughtPattern).
-  const table = craftTable(levels, content);
+  const table = craftTable(levels, content());
   const learned = JSON.parse(row.patterns ?? '[]');
   const salvage = (item) => {
-    const { partId, count, minerals } = salvageYield(item, content);
-    const part = content.partsById[partId];
-    const takes = table.pace > 0 && craftTakes(table, item.rarity, content);
+    const { partId, count, minerals } = salvageYield(item, content());
+    const part = content().partsById[partId];
+    const takes = table.pace > 0 && craftTakes(table, item.rarity, content());
     const pattern = taughtPattern(item, learned);
     return {
       part: part.name,
-      color: content.raritiesById[part.rarity].color,
+      color: content().raritiesById[part.rarity].color,
       parts: count,
-      minutes: takes ? craftMinutes(item.rarity, count, table.pace, content) : null,
-      needs: table.pace > 0 && !takes ? craftLevelFor(item.rarity, content) : null,
+      minutes: takes ? craftMinutes(item.rarity, count, table.pace, content()) : null,
+      needs: table.pace > 0 && !takes ? craftLevelFor(item.rarity, content()) : null,
       ...(pattern && { pattern: pattern.name, patternAt: pattern.at }),
       // Jewellery's gem and ore for Jubilerstwo, given at once.
-      ...(minerals && { minerals: Object.entries(minerals).map(([id, mineralCount]) => ({ id, name: content.mineralsById[id].name, count: mineralCount })) }),
+      ...(minerals && { minerals: Object.entries(minerals).map(([id, mineralCount]) => ({ id, name: content().mineralsById[id].name, count: mineralCount })) }),
     };
   };
   // The materials that pay for the Kowadło's upgrades from +5 on.
@@ -1423,12 +1423,12 @@ export function characterView(player, now) {
   // Less gold on the Kowadło with the Bractwo Kowali (590) and the guild's
   // Kuźnia Gildii (616 A).
   const anvilDiscount = anvilDiscountOf(player);
-  const toItem = (item) => ({ id: item.id, ...itemView(item, content, { sellBonus, upgradeCap, materials, anvilDiscount }), salvage: salvage(item) });
+  const toItem = (item) => ({ id: item.id, ...itemView(item, content(), { sellBonus, upgradeCap, materials, anvilDiscount }), salvage: salvage(item) });
   // Whether a bag item would make the character stronger in place of what
   // its slot holds (preview.js), for the marks on the bag and on finds; null
   // for an item the class cannot wear.
   const verdict = (item) =>
-    canUse(item.base, row.class_id, content) && !content.slotsById[item.slot].locked ? equipChange(character, equipped, item, content, values).verdict : null;
+    canUse(item.base, row.class_id, content()) && !content().slotsById[item.slot].locked ? equipChange(character, equipped, item, content(), values).verdict : null;
   const { gold, ...resources } = walletOf(row);
   const weapon = combatant.weapon;
   const cosmetics = JSON.parse(row.cosmetics ?? '{}');
@@ -1438,23 +1438,23 @@ export function characterView(player, now) {
     // Its guild's tag, in square brackets beside its name (guilds.js).
     guildTag: player.guildTag ?? null,
     // Its name in its frame's colour, or null (cosmetics.js).
-    nameColor: nameColor(cosmetics, content),
+    nameColor: nameColor(cosmetics, content()),
     classId: row.class_id,
     // The class goes by its evolution's name; the class itself stays a note
     // on the character card.
-    className: classNameOf(character, content),
-    baseClassName: content.classesById[row.class_id].name,
+    className: classNameOf(character, content()),
+    baseClassName: content().classesById[row.class_id].name,
     // The look: the portrait and the voice in fights, and the portrait's
     // skin tone.
     appearance: row.appearance,
-    skin: row.skin ?? content.defaultSkin,
+    skin: row.skin ?? content().defaultSkin,
     level: row.level,
     xp: row.xp,
-    xpToNext: xpToNext(row.level, content),
-    hoursToNext: Math.round(hoursToNext(row.level, row.xp, content) * 100) / 100,
+    xpToNext: xpToNext(row.level, content()),
+    hoursToNext: Math.round(hoursToNext(row.level, row.xp, content()) * 100) / 100,
     classLevel: row.class_level,
     classXp: row.class_xp,
-    classXpToNext: classXpToNext(row.class_level, content),
+    classXpToNext: classXpToNext(row.class_level, content()),
     // The place opened early in the Sala prób (trial-hall.js), or null.
     earlyArea: earlyAreaOf(row),
     gold,
@@ -1462,11 +1462,11 @@ export function characterView(player, now) {
     // The Sklep Systemu (cosmetics.js): the cosmetics bought for Punkty
     // Systemu and those worn, and whether the name shows in the frame's
     // colour.
-    cosmetics: cosmeticsOf(cosmetics, content),
+    cosmetics: cosmeticsOf(cosmetics, content()),
     // Punkty Czasu: 1 point skips 1 minute of a wait (time.js). One more
     // comes every `minutes` from `since`; the page counts them up the same way.
     timePoints: row.time_points,
-    timePointsGain: { since: row.time_points_at, minutes: content.balance.timePoints.generateMinutes },
+    timePointsGain: { since: row.time_points_at, minutes: content().balance.timePoints.generateMinutes },
     resources,
     position: row.position,
     hp,
@@ -1478,54 +1478,54 @@ export function characterView(player, now) {
       : {
           hp: row.hp,
           since: row.hp_at,
-          perMinute: regenPerMinute(maxHp, totals.vitality, content, rest.bonus),
-          change: rest.change && { at: rest.change.at, perMinute: regenPerMinute(maxHp, totals.vitality, content, rest.change.bonus) },
+          perMinute: regenPerMinute(maxHp, totals.vitality, content(), rest.bonus),
+          change: rest.change && { at: rest.change.at, perMinute: regenPerMinute(maxHp, totals.vitality, content(), rest.change.bonus) },
         },
     mana: values.mana,
     maxMana: values.mana,
     // An evolution tried below its class level on the test version opens
     // its tab too, and so does the Osada opened by "Testuj Osadę".
     features: [
-      ...new Set([...unlockedFeatures(row.level, content, row.class_level), ...(row.evolution ? ['evolution'] : []), ...(settlementTest(row) ? ['settlement'] : [])]),
+      ...new Set([...unlockedFeatures(row.level, content(), row.class_level), ...(row.evolution ? ['evolution'] : []), ...(settlementTest(row) ? ['settlement'] : [])]),
     ],
     // Whether the character has the Osada (the narrator's Osada chapter).
     settlementOpen: settlementOpen(row),
     // A name the filter blocks (names.js): the game asks for a new one, and
     // nothing else goes on until it has it.
-    nameBlocked: blockedName(row.name, content),
+    nameBlocked: blockedName(row.name, content()),
     // The one change of the name the Ustawienia offer, and the System's
     // word after it gave the character a new name itself.
     canRename: !row.name_changed,
     nameNotice: row.name_notice ?? null,
     // An order of the Osada that can be delivered now lights its tab.
     settlementWaiting: settlementWaiting(row, items, now, player.marketWaiting) || serviceEnded(player.activity, now),
-    huntDurations: huntDurations(row.level, content),
+    huntDurations: huntDurations(row.level, content()),
     // The Karczma's mercenaries (mercenaries.js): what the character may
     // offer and ask, or null below their level.
     mercenaries: mercenaryRules(row),
     // The Trudna wyprawa's creatures and rewards (629 A), from the
     // challenge's level; null before it.
-    hardHunt: challengeAt(row.level, content)?.hard ?? null,
+    hardHunt: challengeAt(row.level, content())?.hard ?? null,
     // Szybkie Polowania left today (hunts.js), or null below their level.
     quickHunts: quickHuntsView(row, now),
     // The next longer exploration and its level, for the hint under the slider.
-    huntNext: nextHuntUnlock(row.level, content),
+    huntNext: nextHuntUnlock(row.level, content()),
     // The Stajnia's mount, which shortens the wait under the slider too
     // (stable.js in the engine), or null.
-    mount: settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content) : null,
-    freePoints: freePoints(character, content),
+    mount: settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content()) : null,
+    freePoints: freePoints(character, content()),
     // The Umiejętności tab: the choices, the skills learned and the Skill Points.
-    skills: skillsView(character, content),
+    skills: skillsView(character, content()),
     // The evolution taken, or the two to choose from at class level 50.
-    evolution: evolutionPanel(character, content),
+    evolution: evolutionPanel(character, content()),
     // On the test version, a test evolution can be undone (evolutions.js).
     evolutionUndo: Boolean(row.evolution_undo),
     // The free reset of the stat points after an evolution, while the player
     // has not decided: all the points there will be to give out again, from
     // the character's levels, the class's levels and events.
-    evolutionReset: row.evolution_reset && spent > 0 ? pointSources(character, content) : null,
-    canResetPoints: row.level <= content.balance.progression.freeResetMaxLevel && spent > 0,
-    stats: content.stats.map((stat) => ({
+    evolutionReset: row.evolution_reset && spent > 0 ? pointSources(character, content()) : null,
+    canResetPoints: row.level <= content().balance.progression.freeResetMaxLevel && spent > 0,
+    stats: content().stats.map((stat) => ({
       id: stat.id,
       name: stat.name,
       effect: stat.combat,
@@ -1535,19 +1535,19 @@ export function characterView(player, now) {
     })),
     combat: {
       damage: `${values.damageMin}–${values.damageMax}`,
-      damageKind: weapon.category === 'physical' ? 'fizyczne' : `magiczne, ${content.elementsById[weapon.element].name}`,
+      damageKind: weapon.category === 'physical' ? 'fizyczne' : `magiczne, ${content().elementsById[weapon.element].name}`,
       reduction: Math.round(values.reduction * 100),
       maxHp,
       maxMana: values.mana,
       // What every class level adds to both, without any points.
-      perClassLevel: content.classesById[character.classId].perClassLevel,
+      perClassLevel: content().classesById[character.classId].perClassLevel,
       // The Parametry dodatkowe window: the total armour, the chances with
       // their ratings, the resistances (preview.js); the HP at rest at the
       // Ognisko's pace of now.
-      extra: extraValues(character, equipped, content, { rest: rest.change?.bonus ?? rest.bonus }),
+      extra: extraValues(character, equipped, content(), { rest: rest.change?.bonus ?? rest.bonus }),
     },
     equipment: Object.fromEntries(
-      content.slots.map((slot) => {
+      content().slots.map((slot) => {
         const item = equipped.find((candidate) => candidate.equippedSlot === slot.id);
         return [slot.id, item ? toItem(item) : null];
       }),
@@ -1560,9 +1560,9 @@ export function characterView(player, now) {
     potions: bagPotions(row, sellBonus),
     // The gems and ores of Górnictwo, which take no room in it.
     minerals: bagMinerals(row, sellBonus),
-    herbStack: content.professionRules.stack,
+    herbStack: content().professionRules.stack,
     bagUsed: bagPlaces(player),
-    bagCapacity: bagCapacity(levels, content),
+    bagCapacity: bagCapacity(levels, content()),
     // The Profesje tab, or null while it is hidden or locked (professions-view.js),
     // with the Awatar Systemu.
     professions: professions && { ...professions, avatar: avatarView(player, now) },
@@ -1577,14 +1577,14 @@ export function characterView(player, now) {
     met: JSON.parse(row.met ?? '[]'),
     // The inner regions and lands whose Bestiariusz chest is open for their
     // lists as they are now (bestiary.js).
-    bestiary: openedChests(JSON.parse(row.bestiary ?? '[]'), content),
+    bestiary: openedChests(JSON.parse(row.bestiary ?? '[]'), content()),
     // The Encyklopedia's chests ready to open, for the top bar's light
     // (encyclopedia.js).
-    encyclopedia: { ready: readyChests(JSON.parse(row.discovered ?? '{}'), JSON.parse(row.encyclopedia ?? '[]'), content) },
+    encyclopedia: { ready: readyChests(JSON.parse(row.discovered ?? '{}'), JSON.parse(row.encyclopedia ?? '[]'), content()) },
     // The potions for a time still working (potions.js).
     buffs: activeBuffs(player, now),
     // The narrator's daily, weekly and monthly quests (quests.js).
-    quests: questsView(questsNow(player, now), now, content, JSON.parse(row.met ?? '[]'), row.level),
+    quests: questsView(questsNow(player, now), now, content(), JSON.parse(row.met ?? '[]'), row.level),
     // The narrator's cards seen so far, or null for a character made before
     // the introduction (tutorial.js).
     tutorial: row.tutorial === null ? null : JSON.parse(row.tutorial),
@@ -1626,7 +1626,7 @@ export async function characterProfile(context) {
   // 'sent' once its invitation waits (guilds.js, inviteToGuild).
   const viewerGuild = own && !mine && !guild ? await guildOf(db, own.id) : null;
   const guildInvite =
-    viewerGuild && ['leader', 'deputy'].includes(viewerGuild.role) && isUnlocked('community', found.level, content)
+    viewerGuild && ['leader', 'deputy'].includes(viewerGuild.role) && isUnlocked('community', found.level, content())
       ? (await db.prepare('SELECT 1 FROM guild_invites WHERE guild_id = ? AND character_id = ?').bind(viewerGuild.id, found.id).first())
         ? 'sent'
         : 'can'
@@ -1671,7 +1671,7 @@ export async function characterProfile(context) {
       guildInvite,
       relation: mine ? { state: 'self' } : own ? await relationTo(db, own.id, found.id, context.now) : null,
       tradeBlocked: await tradeBlockOf(db, session.userId, found.user_id),
-      equipment: content.slots.map((slot) => ({ slot: slot.id, slotName: slot.name, item: worn(view.equipment[slot.id]) })),
+      equipment: content().slots.map((slot) => ({ slot: slot.id, slotName: slot.name, item: worn(view.equipment[slot.id]) })),
       skills: view.skills.pools.flatMap((pool) =>
         pool.options
           .filter((skill) => skill.state === 'main' || skill.state === 'second')
@@ -1688,13 +1688,13 @@ export async function createCharacter(context) {
   const session = await requirePlayable(context);
   const body = await readJson(context.request);
   const name = validateName(body.name);
-  const cls = typeof body.classId === 'string' ? content.classesById[body.classId] : undefined;
+  const cls = typeof body.classId === 'string' ? content().classesById[body.classId] : undefined;
   if (!cls) throw new ApiError(400, 'invalid_class', 'Wybierz klasę postaci.');
   const appearance = validAppearance(body.appearance);
-  const skin = body.skin === undefined ? content.defaultSkin : validSkin(body.skin);
+  const skin = body.skin === undefined ? content().defaultSkin : validSkin(body.skin);
 
   const db = context.env.DB;
-  const max = content.balance.account.characters;
+  const max = content().balance.account.characters;
   const full = () => new ApiError(409, 'characters_full', `Masz już ${max} postaci. Usuń jedną z nich, żeby stworzyć nową.`);
   const [counted, played, parked] = await db.batch([
     db.prepare(`SELECT COUNT(*) AS count FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS}`).bind(session.userId),
@@ -1707,9 +1707,9 @@ export async function createCharacter(context) {
   if (played.results.length > 0 && parked.results.length > 0) throw new ApiError(409, 'parked', PARKED_TEXT);
 
   const character = { classId: cls.id, level: 1, classLevel: 1, points: {}, position: cls.position };
-  const hp = playerCombatant({ character, equipped: [], name }, content).maxHp;
+  const hp = playerCombatant({ character, equipped: [], name }, content()).maxHp;
   const now = context.now;
-  const supply = content.balance.startingSupply;
+  const supply = content().balance.startingSupply;
   try {
     await db.batch([
       // The character played until now waits aside, with its exploration or
@@ -1727,7 +1727,7 @@ export async function createCharacter(context) {
         )
         .bind(
           session.userId, name, nameKey(name), cls.id, appearance, skin, cls.position, hp, now, now,
-          supply.gold, JSON.stringify(supply.resources), content.balance.timePoints.start, now, session.userId, session.userId, max,
+          supply.gold, JSON.stringify(supply.resources), content().balance.timePoints.start, now, session.userId, session.userId, max,
         ),
       db.prepare("UPDATE users SET system_points_waiting = 0 WHERE id = ? AND EXISTS (SELECT 1 FROM characters WHERE user_id = ? AND role = 'player')").bind(session.userId, session.userId),
     ]);
@@ -1783,18 +1783,18 @@ export async function listCharacters(context) {
       id: row.id,
       name: row.name,
       classId: row.class_id,
-      className: classNameOf(engineCharacter(row), content),
+      className: classNameOf(engineCharacter(row), content()),
       appearance: row.appearance,
-      skin: row.skin ?? content.defaultSkin,
-      evolution: content.evolutionsById[row.evolution] ? row.evolution : null,
+      skin: row.skin ?? content().defaultSkin,
+      evolution: content().evolutionsById[row.evolution] ? row.evolution : null,
       level: row.level,
       classLevel: row.class_level,
       played: row.role === 'player',
       activity: activityView(activities.get(row.id) ?? null, row.level, context.now),
     })),
-    max: content.balance.account.characters,
+    max: content().balance.account.characters,
     parked: parked.results[0]?.name ?? null,
-    classes: Object.fromEntries(content.classes.map((cls) => [cls.id, counts.get(cls.id) ?? 0])),
+    classes: Object.fromEntries(content().classes.map((cls) => [cls.id, counts.get(cls.id) ?? 0])),
   });
 }
 
@@ -1830,8 +1830,8 @@ export async function chooseCharacter(context) {
 export async function renameCharacter(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
-  const forced = blockedName(player.row.name, content);
-  if (!forced && player.row.name_changed) throw new ApiError(409, 'name_locked', content.chat.names.locked);
+  const forced = blockedName(player.row.name, content());
+  if (!forced && player.row.name_changed) throw new ApiError(409, 'name_locked', content().chat.names.locked);
   const name = validateName(body.name);
   const db = context.env.DB;
   try {
@@ -1865,13 +1865,13 @@ export async function nameNoticeSeen(context) {
 // taken; its chat messages take it too, and its player is told. Returns
 // the characters renamed.
 export async function renameBlockedNames(env, now) {
-  const words = content.chat.names;
+  const words = content().chat.names;
   const from = Date.parse(words.renameAt);
   if (!(now >= from) || new Date(now).getUTCMinutes() !== 0) return 0;
   const db = env.DB;
   const { results } = await db.prepare('SELECT id, name, appearance FROM characters').all();
   let renamed = 0;
-  for (const row of results.filter((one) => blockedName(one.name, content))) {
+  for (const row of results.filter((one) => blockedName(one.name, content()))) {
     const pool = words.generated[row.appearance === 'female' ? 'female' : 'male'];
     const rng = createRng(`name:${row.id}`);
     const order = pool.map((name) => ({ name, key: rng.float(0, 1) })).sort((a, b) => a.key - b.key).map(({ name }) => name);
@@ -1895,7 +1895,7 @@ export async function renameBlockedNames(env, now) {
 }
 
 const validAppearance = (id) => {
-  if (typeof id !== 'string' || !content.appearancesById[id]) throw new ApiError(400, 'invalid_appearance', 'Wybierz wygląd postaci.');
+  if (typeof id !== 'string' || !content().appearancesById[id]) throw new ApiError(400, 'invalid_appearance', 'Wybierz wygląd postaci.');
   return id;
 };
 
@@ -1911,7 +1911,7 @@ export async function setAppearance(context) {
 }
 
 const validSkin = (id) => {
-  if (typeof id !== 'string' || !content.skinsById[id]) throw new ApiError(400, 'invalid_skin', 'Wybierz kolor skóry.');
+  if (typeof id !== 'string' || !content().skinsById[id]) throw new ApiError(400, 'invalid_skin', 'Wybierz kolor skóry.');
   return id;
 };
 
@@ -1985,12 +1985,12 @@ export async function spendPoints(context) {
   const points = { ...character.points };
   let total = 0;
   for (const [stat, value] of Object.entries(added)) {
-    if (!content.statsById[stat] || !Number.isInteger(value) || value < 0) throw invalid;
+    if (!content().statsById[stat] || !Number.isInteger(value) || value < 0) throw invalid;
     if (value > 0) points[stat] = (points[stat] ?? 0) + value;
     total += value;
   }
   if (total === 0) throw invalid;
-  if (!(total <= freePoints(character, content))) {
+  if (!(total <= freePoints(character, content()))) {
     throw new ApiError(400, 'not_enough_points', 'Nie masz tylu wolnych punktów.');
   }
   return savePoints(context, player, points);
@@ -1999,19 +1999,19 @@ export async function spendPoints(context) {
 export async function autoPoints(context) {
   const { player } = await requireBuildPlayer(context);
   const character = engineCharacter(player.row);
-  if (freePoints(character, content) === 0) {
+  if (freePoints(character, content()) === 0) {
     throw new ApiError(400, 'no_free_points', 'Nie masz wolnych punktów.');
   }
-  return savePoints(context, player, autoDistribute(character, content));
+  return savePoints(context, player, autoDistribute(character, content()));
 }
 
 export async function resetPoints(context) {
   const { player } = await requireBuildPlayer(context);
-  if (player.row.level > content.balance.progression.freeResetMaxLevel) {
+  if (player.row.level > content().balance.progression.freeResetMaxLevel) {
     throw new ApiError(
       403,
       'reset_locked',
-      `Darmowe zerowanie punktów jest dostępne do poziomu ${content.balance.progression.freeResetMaxLevel}.`,
+      `Darmowe zerowanie punktów jest dostępne do poziomu ${content().balance.progression.freeResetMaxLevel}.`,
     );
   }
   return savePoints(context, player, {});

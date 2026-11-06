@@ -1,0 +1,13 @@
+{
+  "$comment": "English texts of data/slots.json, by the slot's id (src/engine/overlay.js).",
+  "head": { "name": "Helmet" },
+  "amulet": { "name": "Amulet" },
+  "chest": { "name": "Armour" },
+  "hands": { "name": "Gloves" },
+  "feet": { "name": "Boots" },
+  "weapon": { "name": "Weapon" },
+  "offhand": { "name": "Off hand" },
+  "ring": { "name": "Ring" },
+  "talisman": { "name": "Talisman" },
+  "core": { "name": "Core" }
+}

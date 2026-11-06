@@ -69,7 +69,7 @@ export async function reportBug(context) {
     .bind(
       session.userId,
       character?.id ?? null,
-      character ? `${character.name} · ${content.classesById[character.class_id]?.name ?? character.class_id}, poziom ${character.level}, klasa ${character.class_level}` : null,
+      character ? `${character.name} · ${content().classesById[character.class_id]?.name ?? character.class_id}, poziom ${character.level}, klasa ${character.class_level}` : null,
       text,
       screen,
       String(context.env.APP_VERSION ?? 'dev'),

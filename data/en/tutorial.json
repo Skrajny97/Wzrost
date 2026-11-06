@@ -1,0 +1,15 @@
+{
+  "$comment": "English texts of data/tutorial.json (src/engine/overlay.js): for now only the narrator's buttons and the Ustawienia's switch; his lines come in stage 2 and are read by the author before recording (695 A).",
+  "skipLabel": "Skip the introduction",
+  "nextLabel": "Next",
+  "startLabel": "Guide me",
+  "recommendedLabel": "recommended",
+  "authorLabel": "Author",
+  "hideLabel": "Hide",
+  "showLabel": "Show the parchment",
+  "skippedText": "Introduction skipped. Your first exploration is already behind you and the Campfire is built. You will find the report in the Journal, at the top of the settings under the cog.",
+  "skipSetting": {
+    "label": "Skip the narrator's explanations",
+    "hint": "The narrator does not explain new tabs and places, and a new character starts without the introduction. Applies to every character on the account."
+  }
+}

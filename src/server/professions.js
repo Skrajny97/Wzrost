@@ -56,11 +56,11 @@ export function workGains(player, profession, before, minutes, avatar, now) {
   const { row } = player;
   const character = engineCharacter(row);
   const after = avatar ? before : workProfession(profession, before, minutes);
-  const xp = avatar ? 0 : workXp(row.level, minutes, content);
-  const work = applyWork(character, xp, content);
+  const xp = avatar ? 0 : workXp(row.level, minutes, content());
+  const work = applyWork(character, xp, content());
   // A new level heals fully; otherwise resting simply goes on.
   const levelled = { ...character, level: work.level, xp: work.xp };
-  const hp = work.levelled ? playerCombatant({ character: levelled, equipped: equippedItems(player), name: row.name }, content).maxHp : null;
+  const hp = work.levelled ? playerCombatant({ character: levelled, equipped: equippedItems(player), name: row.name }, content()).maxHp : null;
   const professions = { ...character.professions, [profession.id]: { level: after.level, xp: after.xp } };
   const sets = avatar
     ? { sql: '', binds: [] }
@@ -91,8 +91,8 @@ export function insertWork(db, avatar, row, { kind, placeId, minutes, now, seed,
 // Professions need this deployment to show them and the character's level.
 export function requireProfessions(player) {
   if (!professionsOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
-  const unlock = content.unlocksById.professions;
-  if (!isUnlocked('professions', player.row.level, content)) {
+  const unlock = content().unlocksById.professions;
+  if (!isUnlocked('professions', player.row.level, content())) {
     throw new ApiError(403, 'locked', `Profesje odblokujesz na poziomie postaci ${unlock.level}.`);
   }
 }
@@ -103,19 +103,19 @@ export async function startGathering(context) {
   const body = await readJson(context.request);
   const { session, player, avatar } = await requireWorker(context, body);
   requireProfessions(player);
-  const { gathering } = content;
+  const { gathering } = content();
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), gathering.profession);
   const herbIds = body.herbs;
-  const slots = herbSlots(level, content);
+  const slots = herbSlots(level, content());
   if (!Array.isArray(herbIds) || herbIds.length === 0 || new Set(herbIds).size !== herbIds.length) {
     throw new ApiError(400, 'invalid_herbs', 'Wybierz zioła do zbierania.');
   }
   if (herbIds.length > slots) throw new ApiError(400, 'too_many_herbs', `Na tym poziomie zbierasz naraz najwyżej ${slots} ${slots === 1 ? 'zioło' : 'zioła'}.`);
   for (const id of herbIds) {
-    const herb = typeof id === 'string' ? content.herbsById[id] : undefined;
+    const herb = typeof id === 'string' ? content().herbsById[id] : undefined;
     if (!herb || herb.level > level) throw new ApiError(400, 'unknown_herb', 'Tego zioła jeszcze nie znasz.');
   }
-  if (!gatheringMinutes(content).includes(body.minutes)) throw new ApiError(400, 'invalid_duration', 'Wybierz czas zbierania.');
+  if (!gatheringMinutes(content()).includes(body.minutes)) throw new ApiError(400, 'invalid_duration', 'Wybierz czas zbierania.');
 
   const now = context.now;
   const { hp } = currentHp(player, now);
@@ -145,7 +145,7 @@ export async function startGathering(context) {
           ],
     );
   } catch (error) {
-    if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', avatar ? content.avatar.texts.busy[0] : 'Postać jest już zajęta.');
+    if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', avatar ? content().avatar.texts.busy[0] : 'Postać jest już zajęta.');
     throw error;
   }
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
@@ -157,20 +157,20 @@ export async function startGathering(context) {
 export async function finishGathering(db, player, now, { avatar = false } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
-  const { gathering } = content;
-  const profession = content.professionsById[gathering.profession];
+  const { gathering } = content();
+  const profession = content().professionsById[gathering.profession];
   const before = professionState(JSON.parse(row.professions ?? '{}'), profession.id);
   // Herbs the data no longer has are left out.
-  const herbIds = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content.herbsById[id]);
+  const herbIds = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content().herbsById[id]);
   const more = JSON.parse(activity.options ?? '{}').more ?? 0;
-  const found = herbIds.length > 0 ? gatherHerbs({ herbIds, minutes: activity.minutes, level: before.level, seed: activity.seed, more }, content) : {};
-  const capacity = bagCapacity(campLevels(player.buildings, now, content), content);
-  const { stored, lost } = storeStacks(herbsOf(row), found, capacity - bagPlaces(player), content);
+  const found = herbIds.length > 0 ? gatherHerbs({ herbIds, minutes: activity.minutes, level: before.level, seed: activity.seed, more }, content()) : {};
+  const capacity = bagCapacity(campLevels(player.buildings, now, content()), content());
+  const { stored, lost } = storeStacks(herbsOf(row), found, capacity - bagPlaces(player), content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);
   const report = {
     ...gatheringReport(
       { minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, found, stored, lost, before, after, character, xp, work },
-      content,
+      content(),
     ),
     ...(avatar && { avatar: true }),
   };
@@ -217,7 +217,7 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
 // How many of a herb the request names: a whole number from 1 to what the
 // character has.
 function herbCount(player, body) {
-  const herb = typeof body.herbId === 'string' ? content.herbsById[body.herbId] : undefined;
+  const herb = typeof body.herbId === 'string' ? content().herbsById[body.herbId] : undefined;
   if (!herb) throw new ApiError(400, 'unknown_herb', 'Nie ma takiego zioła.');
   const have = herbsOf(player.row)[herb.id] ?? 0;
   if (have === 0) throw new ApiError(404, 'no_herb', 'Nie masz tego zioła.');
@@ -245,7 +245,7 @@ export async function sellHerbs(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const taken = herbCount(player, body);
-  const bonus = campBonus(campLevels(player.buildings, context.now, content), 'sellPrice', content);
+  const bonus = campBonus(campLevels(player.buildings, context.now, content()), 'sellPrice', content());
   const gold = saleGold(taken.price * (1 + bonus), taken.count);
   const result = await takeFromBag(context.env.DB, player, 'herbs', taken, gold);
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Zioła zmieniły się w międzyczasie. Spróbuj ponownie.');

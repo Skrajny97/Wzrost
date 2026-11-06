@@ -1,0 +1,5 @@
+{
+  "$comment": "English texts of data/appearances.json, by the look's id (src/engine/overlay.js).",
+  "female": { "name": "Female" },
+  "male": { "name": "Male" }
+}

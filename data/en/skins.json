@@ -1,0 +1,13 @@
+{
+  "$comment": "English texts of data/skins.json, by the tone's id (src/engine/overlay.js).",
+  "skins": {
+    "pale": { "name": "Pale" },
+    "light": { "name": "Light" },
+    "tan": { "name": "Tan" },
+    "brown": { "name": "Brown" },
+    "dark": { "name": "Dark" },
+    "golden": { "name": "Golden" },
+    "yellow": { "name": "Yellow" },
+    "grey": { "name": "Grey" }
+  }
+}

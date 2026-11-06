@@ -41,7 +41,7 @@ import { toHex } from './encoding.js';
 import { guildOf } from './guilds.js';
 import { ApiError, json, readJson } from './http.js';
 
-const rules = () => content.guilds.beast;
+const rules = () => content().guilds.beast;
 const errors = () => rules().texts.errors;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 const path = (key) => `$."${key}"`;
@@ -49,17 +49,17 @@ const path = (key) => `$."${key}"`;
 // The Bestia comes with the Gildie, with the Społeczność.
 async function requireBeastPlayer(context) {
   const found = await requirePlayer(context);
-  if (!isUnlocked('community', found.player.row.level, content)) {
-    throw new ApiError(403, 'locked', filled(errors().locked, { level: content.unlocksById.community.level }));
+  if (!isUnlocked('community', found.player.row.level, content())) {
+    throw new ApiError(403, 'locked', filled(errors().locked, { level: content().unlocksById.community.level }));
   }
   return found;
 }
 
 // The week around `now`, the one before it and the end of the one after.
 function weeksAround(now) {
-  const current = questPeriod('weekly', now, content);
-  const nextEndsAt = questPeriod('weekly', current.endsAt, content).endsAt;
-  const previous = questPeriod('weekly', current.startsAt - 1, content);
+  const current = questPeriod('weekly', now, content());
+  const nextEndsAt = questPeriod('weekly', current.endsAt, content()).endsAt;
+  const previous = questPeriod('weekly', current.startsAt - 1, content());
   return { current, previous, nextEndsAt };
 }
 
@@ -73,7 +73,7 @@ async function beastOf(db, guildId, now) {
   const found = await read();
   if (found) return found;
   const { results } = await db.prepare('SELECT c.level FROM guild_members m JOIN characters c ON c.id = m.character_id WHERE m.guild_id = ?').bind(guildId).all();
-  const beast = guildBeast({ seed: `${guildId}:${current.key}`, levels: results.map((member) => member.level) }, content);
+  const beast = guildBeast({ seed: `${guildId}:${current.key}`, levels: results.map((member) => member.level) }, content());
   await db.batch([
     db.prepare('DELETE FROM guild_beast_hits WHERE beast_id IN (SELECT id FROM guild_beasts WHERE week < ?)').bind(previous.key),
     db.prepare('DELETE FROM guild_beasts WHERE week < ?').bind(previous.key),
@@ -113,7 +113,7 @@ async function chestsOf(db, row, now) {
   const best = new Map();
   for (const beast of results) {
     if (beast.week === current.key && beast.hp > 0) continue;
-    const tier = beastChestTier({ hp: beast.hp, maxHp: beast.max_hp }, content);
+    const tier = beastChestTier({ hp: beast.hp, maxHp: beast.max_hp }, content());
     if (!tier) continue;
     const known = best.get(beast.week);
     if (!known || rank(tier) < rank(known.tier)) best.set(beast.week, { beast, tier });
@@ -147,7 +147,7 @@ function cardTexts() {
 export async function beastView(db, row, now, activity = null) {
   const guild = await guildOf(db, row.id);
   const { current } = weeksAround(now);
-  const day = questPeriod('daily', now, content).key;
+  const day = questPeriod('daily', now, content()).key;
   const beast = guild ? await beastOf(db, guild.id, now) : null;
   const [used, hits, felled] = await db.batch([
     attacksOn(db, row, day),
@@ -162,12 +162,12 @@ export async function beastView(db, row, now, activity = null) {
   ]);
   const contribution = hits.results.map((hit) => ({ name: hit.name, damage: hit.damage, hits: hit.hits, own: hit.character_id === row.id }));
   const own = contribution.find((entry) => entry.own);
-  const area = beast && content.areasById[beast.area_id];
+  const area = beast && content().areasById[beast.area_id];
   return {
     beast: beast && {
       week: beast.week,
       monsterId: beast.monster_id,
-      name: content.monstersById[beast.monster_id]?.name ?? beast.monster_id,
+      name: content().monstersById[beast.monster_id]?.name ?? beast.monster_id,
       level: beast.level,
       hp: beast.hp,
       maxHp: beast.max_hp,
@@ -209,7 +209,7 @@ export async function attackGuildBeast(context) {
   if (player.activity?.kind === 'mercenary') requireNotExploring(player, now);
   const guild = await guildOf(db, row.id);
   if (!guild) throw new ApiError(409, 'no_guild', errors().noGuild);
-  const day = questPeriod('daily', now, content).key;
+  const day = questPeriod('daily', now, content()).key;
   const beast = await beastOf(db, guild.id, now);
   if (beast.hp <= 0) throw new ApiError(409, 'fallen', errors().fallen);
   const perDay = rules().attacksPerDay;
@@ -218,7 +218,7 @@ export async function attackGuildBeast(context) {
   // The Encyklopedia's trophy against the beast's creature counts.
   const trophies = trophiesFor(player, now, [beast.monster_id]);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const fight = guildBeastFight({ character: engineCharacter(row), equipped: equippedItems(player), name: row.name, beast: engineBeast(beast), seed, trophies }, content);
+  const fight = guildBeastFight({ character: engineCharacter(row), equipped: equippedItems(player), name: row.name, beast: engineBeast(beast), seed, trophies }, content());
   const [, , , before, , , after] = await atomically(
     db,
     [
@@ -271,7 +271,7 @@ export async function claimGuildBeastChest(context) {
     const opened = await db.prepare('SELECT 1 FROM guild_beast_chests WHERE character_id = ? AND week = ? AND created_at >= ?').bind(row.id, week, row.created_at).first();
     throw opened ? new ApiError(409, 'claimed', errors().claimed) : new ApiError(404, 'no_chest', errors().noChest);
   }
-  if (chest.item && bagPlaces(player) >= bagCapacity(campLevels(player.buildings, now, content), content)) {
+  if (chest.item && bagPlaces(player) >= bagCapacity(campLevels(player.buildings, now, content()), content())) {
     throw new ApiError(409, 'bag_full', errors().bagFull);
   }
   const { item, materials } = beastChest(
@@ -284,7 +284,7 @@ export async function claimGuildBeastChest(context) {
       tier: chest.tier,
       seed: `${row.id}:beast:${week}`,
     },
-    content,
+    content(),
   );
   const found = Object.entries(materials);
   const setMaterials = found.length > 0 ? `materials = json_set(materials, ${found.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')}), ` : '';
@@ -304,7 +304,7 @@ export async function claimGuildBeastChest(context) {
         ]
       : []),
   ]);
-  const contents = [item && itemName(item, content), found.length > 0 && materialsText(materials, content)].filter(Boolean).join(', ');
+  const contents = [item && itemName(item, content()), found.length > 0 && materialsText(materials, content())].filter(Boolean).join(', ');
   const after = await loadPlayer(db, session.userId);
   // The item came last, so its id is the highest of the character's: the
   // page finds it in the bag by it, for its card.
@@ -312,9 +312,9 @@ export async function claimGuildBeastChest(context) {
   return json({
     chest: {
       week,
-      item: item && { id: itemId, name: itemName(item, content), rarity: item.rarity, color: content.raritiesById[item.rarity].color },
+      item: item && { id: itemId, name: itemName(item, content()), rarity: item.rarity, color: content().raritiesById[item.rarity].color },
       materials: found.map(([key, count]) => {
-        const view = materialView(key, count, content);
+        const view = materialView(key, count, content());
         return { key, materialId: view.materialId, name: view.name, label: view.label, color: view.color, rarityName: view.rarityName, count };
       }),
       text: filled(rules().texts.opened, { contents }),

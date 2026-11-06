@@ -50,7 +50,7 @@ export function soldGold(characterId, items, bonus) {
     if (!Number.isSafeInteger(value)) throw new Error(`Not a whole number: ${value}`);
     return value;
   };
-  const prices = items.map((item) => `WHEN ${whole(item.id)} THEN ${whole(sellPrice(item, content, bonus))}`).join(' ');
+  const prices = items.map((item) => `WHEN ${whole(item.id)} THEN ${whole(sellPrice(item, content(), bonus))}`).join(' ');
   return {
     sql: `(SELECT COALESCE(SUM(CASE id ${prices} ELSE 0 END), 0)
            FROM items WHERE character_id = ? AND id IN (${items.map(() => '?').join(', ')}))`,
@@ -58,7 +58,7 @@ export function soldGold(characterId, items, bonus) {
   };
 }
 
-const sellBonusOf = (player, now) => campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
+const sellBonusOf = (player, now) => campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content());
 
 function findItem(player, id) {
   const item = player.items.find((candidate) => String(candidate.id) === id);
@@ -77,16 +77,16 @@ export async function equipItem(context) {
   requireNotExploring(player, context.now);
   const item = findItem(player, context.params.id);
   if (item.equippedSlot) throw new ApiError(409, 'already_equipped', 'Ten przedmiot jest już założony.');
-  if (content.slotsById[item.slot].locked) throw new ApiError(403, 'slot_locked', 'Ten slot jest jeszcze zablokowany.');
-  if (!canUse(item.base, player.row.class_id, content)) {
+  if (content().slotsById[item.slot].locked) throw new ApiError(403, 'slot_locked', 'Ten slot jest jeszcze zablokowany.');
+  if (!canUse(item.base, player.row.class_id, content())) {
     throw new ApiError(403, 'wrong_class', 'Twoja klasa nie może używać tego przedmiotu.');
   }
   // Every item, an own find or one from a Wymiana, the Targowisko or the
   // Skrzynia Konta, is worn from its Tier, the class level its base asks
   // for, whatever its own level (the author: "Niech przedmioty z Wymian i
   // Targowiska działają w oparciu o Tiery a nie poziomy samej broni").
-  if (!canUse(item.base, player.row.class_id, content, player.row.class_level)) {
-    throw new ApiError(403, 'class_level', `Ten przedmiot założysz od poziomu klasy ${baseClassLevel(item.base, content)}.`);
+  if (!canUse(item.base, player.row.class_id, content(), player.row.class_level)) {
+    throw new ApiError(403, 'class_level', `Ten przedmiot założysz od poziomu klasy ${baseClassLevel(item.base, content())}.`);
   }
 
   // Whatever was in the slot goes back to the bag first; an item taken from
@@ -95,7 +95,7 @@ export async function equipItem(context) {
   const racked = rackedIds(player.row);
   const replaced = player.items.find((candidate) => candidate.equippedSlot === item.slot);
   if (racked.has(item.id) && replaced && !racked.has(replaced.id)) {
-    if (bagPlaces(player) >= bagCapacity(campLevels(player.buildings, context.now, content), content)) throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
+    if (bagPlaces(player) >= bagCapacity(campLevels(player.buildings, context.now, content()), content())) throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
   }
   const db = context.env.DB;
   await db.batch([
@@ -110,7 +110,7 @@ export async function unequipItem(context) {
   requireNotExploring(player, context.now);
   const item = findItem(player, context.params.id);
   if (!item.equippedSlot) throw new ApiError(409, 'not_equipped', 'Ten przedmiot nie jest założony.');
-  const capacity = bagCapacity(campLevels(player.buildings, context.now, content), content);
+  const capacity = bagCapacity(campLevels(player.buildings, context.now, content()), content());
   // An item of a saved set goes back onto the Zbrojownia's rack.
   if (!gearSetIds(gearSetsOf(player.row)).has(item.id) && bagPlaces(player) >= capacity) {
     throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
@@ -134,9 +134,9 @@ export async function discardItem(context) {
 export async function sellItems(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
-  const limit = content.rarities.findIndex((rarity) => rarity.id === body.maxRarity);
+  const limit = content().rarities.findIndex((rarity) => rarity.id === body.maxRarity);
   if (limit === -1) throw new ApiError(400, 'invalid_rarity', 'Wybierz rzadkość.');
-  const rank = (item) => content.rarities.findIndex((rarity) => rarity.id === item.rarity);
+  const rank = (item) => content().rarities.findIndex((rarity) => rarity.id === item.rarity);
   // Upgraded items, and those with a gem set in them, are not sold by the
   // handful: too much went into them.
   const sold = bagItems(player).filter((item) => !(item.upgrade > 0) && !item.gem && rank(item) <= limit);
@@ -156,7 +156,7 @@ export async function sellItems(context) {
     count = results[1].meta.changes;
   }
   const bonus = sellBonusOf(player, context.now);
-  const gold = count === sold.length ? sold.reduce((sum, item) => sum + sellPrice(item, content, bonus), 0) : 0;
+  const gold = count === sold.length ? sold.reduce((sum, item) => sum + sellPrice(item, content(), bonus), 0) : 0;
   return json({
     sold: { count, gold },
     character: characterView(await loadPlayer(context.env.DB, session.userId), context.now),
@@ -180,7 +180,7 @@ export async function sellItem(context) {
   ]);
   const count = results[1].meta.changes;
   return json({
-    sold: { count, gold: count === 1 ? sellPrice(item, content, bonus) : 0 },
+    sold: { count, gold: count === 1 ? sellPrice(item, content(), bonus) : 0 },
     character: characterView(await loadPlayer(context.env.DB, session.userId), context.now),
   });
 }
@@ -196,8 +196,8 @@ export async function previewItem(context) {
   const after = item.equippedSlot
     ? worn.filter((candidate) => candidate.id !== item.id)
     : [...worn.filter((candidate) => candidate.equippedSlot !== item.slot), item];
-  const nowValues = combatValues(character, worn, content);
-  const afterValues = combatValues(character, after, content);
+  const nowValues = combatValues(character, worn, content());
+  const afterValues = combatValues(character, after, content());
   const view = (values) => ({
     damage: `${values.damageMin}–${values.damageMax}`,
     damageAverage: Math.round(values.damage * 10) / 10,
@@ -225,10 +225,10 @@ export async function previewItem(context) {
 // (`body.ward`). The same for an item a companion wears, paid by the
 // character (settlement.js).
 export function upgradePlan(player, item, body, now) {
-  const cap = campBonus(campLevels(player.buildings, now, content), 'upgradeCap', content);
+  const cap = campBonus(campLevels(player.buildings, now, content()), 'upgradeCap', content());
   // Less gold with the Bractwo Kowali (590) and the guild's Kuźnia Gildii
   // (616 A), as the item card shows.
-  const view = upgradeView(item, cap, content, null, anvilDiscountOf(player));
+  const view = upgradeView(item, cap, content(), null, anvilDiscountOf(player));
   if (view.level >= view.max) throw new ApiError(409, 'max_upgrade', 'Ten przedmiot ma już najwyższe ulepszenie.');
   if (!view.next) {
     throw new ApiError(
@@ -249,10 +249,10 @@ export function upgradePlan(player, item, body, now) {
   if (steady && (player.row.steady_scrolls ?? 0) < 1) throw new ApiError(409, 'no_steady_scroll', 'Nie masz Zwoju utrwalenia. Zrobisz go w Systemowym Warsztacie albo kupisz u kowala w Kuźni.');
   const need = view.next.materials;
   const materials = JSON.parse(player.row.materials ?? '{}');
-  const taken = need ? piecesOfRarity(materials, need, content) : {};
+  const taken = need ? piecesOfRarity(materials, need, content()) : {};
   if (!taken) {
-    const short = need.count - heldOfRarity(materials, need.rarity, content);
-    throw new ApiError(409, 'no_material', `Brakuje ${short} szt. materiałów tej samej rzadkości co przedmiot (${content.raritiesById[need.rarity].name}).`);
+    const short = need.count - heldOfRarity(materials, need.rarity, content());
+    throw new ApiError(409, 'no_material', `Brakuje ${short} szt. materiałów tej samej rzadkości co przedmiot (${content().raritiesById[need.rarity].name}).`);
   }
   return { view, cost, warded, steady, taken };
 }
@@ -290,7 +290,7 @@ export async function upgradeItem(context) {
   const inSet = sets.some((set) => set?.items.includes(item.id));
 
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const outcome = rollUpgrade(item, createRng(roll), content, { warded, steady });
+  const outcome = rollUpgrade(item, createRng(roll), content(), { warded, steady });
   const forget =
     outcome.result === 'broken' && inSet
       ? JSON.stringify({ ...JSON.parse(row.fortress ?? '{}'), sets: sets.map((set) => set && { ...set, items: set.items.filter((id) => id !== item.id) }) })
@@ -335,7 +335,7 @@ export async function upgradeItem(context) {
   return json({
     upgrade: {
       itemId: item.id,
-      name: itemName(item, content),
+      name: itemName(item, content()),
       result: outcome.result,
       from: view.level,
       to: outcome.upgrade,

@@ -26,7 +26,7 @@ const LIVE = ['proposed', 'open', 'locked'];
 // An ended trade stays a day, for its screen and the pause after proposals
 // turned down; the proposer's older ones go with its next proposal.
 const KEEP_MS = 24 * 3600000;
-const rules = () => content.community.trade;
+const rules = () => content().community.trade;
 // Who asked the server within onlineSeconds is online (requireChatter), and
 // so is the character the player plays; one set aside waits offline.
 const onlineSince = (now) => now - rules().onlineSeconds * 1000;
@@ -116,31 +116,31 @@ async function tradeView(db, trade, character, now) {
   ]);
   const other = others.results[0];
   const viewer = viewers.results[0];
-  const described = new Map(items.results.map((row) => [row.id, { id: row.id, ...itemView({ id: row.id, ...JSON.parse(row.data) }, content) }]));
+  const described = new Map(items.results.map((row) => [row.id, { id: row.id, ...itemView({ id: row.id, ...JSON.parse(row.data) }, content()) }]));
   const offerView = (offer) => ({
     gold: offer.gold,
     items: offer.items.map((id) => described.get(id)).filter(Boolean),
-    herbs: Object.entries(offer.herbs).map(([id, count]) => ({ id, name: content.herbsById[id]?.name ?? id, count })),
+    herbs: Object.entries(offer.herbs).map(([id, count]) => ({ id, name: content().herbsById[id]?.name ?? id, count })),
     potions: Object.entries(offer.potions).map(([id, count]) => {
-      const potion = content.potionsById[id];
+      const potion = content().potionsById[id];
       return { id, name: potion?.name ?? id, count, known: Boolean(potion && viewer && potionKnown(viewer, potion)) };
     }),
     materials: Object.entries(offer.materials)
-      .filter(([key]) => knownStack(key, content))
+      .filter(([key]) => knownStack(key, content()))
       .map(([key, count]) => {
-        const { label, materialId, rarity, color } = materialView(key, count, content);
+        const { label, materialId, rarity, color } = materialView(key, count, content());
         return { id: key, materialId, label, rarity, color, count };
       }),
     minerals: Object.entries(offer.minerals)
-      .filter(([id]) => Object.hasOwn(content.mineralsById, id))
+      .filter(([id]) => Object.hasOwn(content().mineralsById, id))
       .map(([id, count]) => {
-        const mineral = content.mineralsById[id];
+        const mineral = content().mineralsById[id];
         const rarity = mineral.rarity ?? mineral.for[0];
-        return { id, name: mineral.name, rarity, color: content.raritiesById[rarity].color, count };
+        return { id, name: mineral.name, rarity, color: content().raritiesById[rarity].color, count };
       }),
     resources: Object.entries(offer.resources)
-      .filter(([id]) => Object.hasOwn(content.resourcesById, id))
-      .map(([id, count]) => ({ id, name: content.resourcesById[id].name, count })),
+      .filter(([id]) => Object.hasOwn(content().resourcesById, id))
+      .map(([id, count]) => ({ id, name: content().resourcesById[id].name, count })),
   });
   const { proposalSeconds, idleMinutes } = rules();
   return {
@@ -190,8 +190,8 @@ export async function proposeTrade(context) {
   if (other.id === character.id) throw new ApiError(400, 'self', 'Ze sobą się nie wymienisz.');
   if (other.user_id === session.userId) throw new ApiError(403, 'own', 'Postacie jednego konta nie wymieniają się między sobą.');
   if (account.trade_off) throw new ApiError(403, 'trade_off', 'Wymiana jest u Ciebie wyłączona. Włączysz ją w Ustawieniach.');
-  if (!isUnlocked('community', other.level, content)) {
-    throw new ApiError(409, 'locked', `${other.name} nie ma jeszcze Społeczności. Otworzy się na ${content.unlocksById.community.level}. poziomie.`);
+  if (!isUnlocked('community', other.level, content())) {
+    throw new ApiError(409, 'locked', `${other.name} nie ma jeszcze Społeczności. Otworzy się na ${content().unlocksById.community.level}. poziomie.`);
   }
   const [blocking, blocked] = await db.batch([
     db.prepare('SELECT 1 FROM trade_blocks WHERE user_id = ? AND blocked_id = ?').bind(session.userId, other.user_id),
@@ -261,11 +261,11 @@ function cleanOffer(raw, player) {
   offer.items = ids;
   const named = (table) => (id) => (Object.hasOwn(table, id) ? table[id].name : null);
   for (const [kind, have, nameOf] of [
-    ['herbs', herbsOf(player.row), named(content.herbsById)],
-    ['potions', potionsOf(player.row), named(content.potionsById)],
-    ['materials', JSON.parse(player.row.materials ?? '{}'), (key) => (knownStack(key, content) ? materialView(key, 0, content).label : null)],
-    ['minerals', mineralsOf(player.row), named(content.mineralsById)],
-    ['resources', JSON.parse(player.row.resources ?? '{}'), named(content.resourcesById)],
+    ['herbs', herbsOf(player.row), named(content().herbsById)],
+    ['potions', potionsOf(player.row), named(content().potionsById)],
+    ['materials', JSON.parse(player.row.materials ?? '{}'), (key) => (knownStack(key, content()) ? materialView(key, 0, content()).label : null)],
+    ['minerals', mineralsOf(player.row), named(content().mineralsById)],
+    ['resources', JSON.parse(player.row.resources ?? '{}'), named(content().resourcesById)],
   ]) {
     const asked = raw[kind] ?? {};
     if (!asked || typeof asked !== 'object' || Array.isArray(asked)) throw new ApiError(400, 'invalid_offer', 'Nieprawidłowa oferta.');
@@ -321,7 +321,7 @@ function placesAfter(player, give, get) {
     return Object.fromEntries(Object.entries(counts).filter(([, count]) => count > 0));
   };
   const items = bagItems(player).length - give.items.length + get.items.length;
-  return items + bagStacks(merged(herbsOf(player.row), give.herbs, get.herbs), content) + bagStacks(merged(potionsOf(player.row), give.potions, get.potions), content);
+  return items + bagStacks(merged(herbsOf(player.row), give.herbs, get.herbs), content()) + bagStacks(merged(potionsOf(player.row), give.potions, get.potions), content());
 }
 
 // Everything moves at once, or nothing: one statement fails the whole
@@ -453,7 +453,7 @@ export async function confirmTrade(context) {
     [fromPlayer, from, to],
     [toPlayer, to, from],
   ]) {
-    if (placesAfter(player, give, get) > bagCapacity(campLevels(player.buildings, now, content), content)) {
+    if (placesAfter(player, give, get) > bagCapacity(campLevels(player.buildings, now, content()), content())) {
       throw new ApiError(409, 'bag_full', `W plecaku postaci ${player.row.name} zabraknie miejsca. Zwolnijcie miejsce albo odrzućcie wymianę.`);
     }
   }

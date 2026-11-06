@@ -1,8 +1,15 @@
 // Game content bundled into the Worker from data/ (validated against
-// data/schemas before every deploy).
+// data/schemas before every deploy), in the request's language (i18n.js):
+// content() is the content as the engine uses it, publicContent() what the
+// page labels things with. The Polish is built as the Worker starts; the
+// English, the Polish with the texts of data/en/ laid over it
+// (src/engine/overlay.js), the first time a request asks for it. Each
+// language has its own content, so what the engine keeps once for a
+// content (skill-demo.js, encyclopedia.js) is kept for each language apart.
 
-import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, evolutionArt, landBestiaryChest, meetingChances, ordinaryMaterial, regionDangers } from '../engine/index.js';
+import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, evolutionArt, landBestiaryChest, meetingChances, ordinaryMaterial, overlayTexts, regionDangers } from '../engine/index.js';
 import { buildingOn, craftingOn, evolutionsOn, settlementOn } from './features.js';
+import { language } from './i18n.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
 import classes from '../../data/classes.json' with { type: 'json' };
@@ -39,8 +46,19 @@ import settlement from '../../data/settlement.json' with { type: 'json' };
 import towers from '../../data/towers.json' with { type: 'json' };
 import guilds from '../../data/guilds.json' with { type: 'json' };
 import cosmetics from '../../data/cosmetics.json' with { type: 'json' };
+// The English texts (data/en/), by the data file they translate. A file
+// added there is named here too (tools/i18n-check.mjs checks it).
+import enAppearances from '../../data/en/appearances.json' with { type: 'json' };
+import enChat from '../../data/en/chat.json' with { type: 'json' };
+import enClasses from '../../data/en/classes.json' with { type: 'json' };
+import enGiftCodes from '../../data/en/gift-codes.json' with { type: 'json' };
+import enSkins from '../../data/en/skins.json' with { type: 'json' };
+import enSlots from '../../data/en/slots.json' with { type: 'json' };
+import enStats from '../../data/en/stats.json' with { type: 'json' };
+import enTutorial from '../../data/en/tutorial.json' with { type: 'json' };
 
-export const content = buildContent({
+// The data files by their names, as data/en/ names its translations.
+const polishData = {
   stats,
   elements,
   effects,
@@ -73,24 +91,61 @@ export const content = buildContent({
   towers,
   guilds,
   cosmetics,
-});
-
-// The parts of the game this deployment has on, for the System's messages
-// about them (unlocks.json `feature`): read when asked, as the switches are
-// read for each request (features.js).
-Object.defineProperty(content, 'features', { get: () => [...(craftingOn() ? ['crafting'] : []), ...(settlementOn() ? ['settlement'] : [])] });
-
-// The class evolutions, where the deployment has them on (features.js).
-// Where they are off the game plays as before them: the class grows past
-// the first evolution level once its skills are ready, no evolution is
-// offered and there is no Ewolucja tab (the unlock "evolution").
-const evolutionParts = {
-  on: { evolutions: content.evolutions, evolutionsById: content.evolutionsById, evolutionSkills: content.evolutionSkills, unlocks: content.unlocks },
-  off: { evolutions: [], evolutionsById: {}, evolutionSkills: [], unlocks: content.unlocks.filter((unlock) => unlock.id !== 'evolution') },
+  tutorial,
+  music,
+  sounds,
+  animations,
 };
-for (const key of Object.keys(evolutionParts.on)) {
-  Object.defineProperty(content, key, { get: () => evolutionParts[evolutionsOn() ? 'on' : 'off'][key] });
+
+export const OVERLAYS = {
+  en: {
+    appearances: enAppearances,
+    chat: enChat,
+    classes: enClasses,
+    'gift-codes': enGiftCodes,
+    skins: enSkins,
+    slots: enSlots,
+    stats: enStats,
+    tutorial: enTutorial,
+  },
+};
+
+const dataByLanguage = { pl: polishData };
+// The data files in a language: the Polish ones with its texts over them.
+export function dataIn(lang) {
+  dataByLanguage[lang] ??= Object.fromEntries(Object.entries(polishData).map(([name, data]) => [name, overlayTexts(data, OVERLAYS[lang]?.[name])]));
+  return dataByLanguage[lang];
 }
+
+// The content of one language, with the deployment's switches.
+function prepare(built) {
+  // The parts of the game this deployment has on, for the System's messages
+  // about them (unlocks.json `feature`): read when asked, as the switches are
+  // read for each request (features.js).
+  Object.defineProperty(built, 'features', { get: () => [...(craftingOn() ? ['crafting'] : []), ...(settlementOn() ? ['settlement'] : [])] });
+
+  // The class evolutions, where the deployment has them on (features.js).
+  // Where they are off the game plays as before them: the class grows past
+  // the first evolution level once its skills are ready, no evolution is
+  // offered and there is no Ewolucja tab (the unlock "evolution").
+  const evolutionParts = {
+    on: { evolutions: built.evolutions, evolutionsById: built.evolutionsById, evolutionSkills: built.evolutionSkills, unlocks: built.unlocks },
+    off: { evolutions: [], evolutionsById: {}, evolutionSkills: [], unlocks: built.unlocks.filter((unlock) => unlock.id !== 'evolution') },
+  };
+  for (const key of Object.keys(evolutionParts.on)) {
+    Object.defineProperty(built, key, { get: () => evolutionParts[evolutionsOn() ? 'on' : 'off'][key] });
+  }
+  return built;
+}
+
+const contentByLanguage = { pl: prepare(buildContent(polishData)) };
+export function contentIn(lang) {
+  contentByLanguage[lang] ??= prepare(buildContent(dataIn(lang)));
+  return contentByLanguage[lang];
+}
+
+// The game's content in the request's language.
+export const content = () => contentIn(language());
 
 // The narrator's lines that are read once, in their order: cards and
 // pointers, and a lead marked `once`, whose tap changes no screen. Another
@@ -107,17 +162,19 @@ export const tutorialChapters = Object.keys(tutorial.chapters);
 export const firstSteps = tutorial.firstSteps;
 
 // A creature on a Bestiariusz list, with its name and family for the page.
-const dangerView = (danger) => ({
+const dangerView = (game) => (danger) => ({
   ...danger,
-  name: content.monstersById[danger.monsterId].name,
-  family: content.monstersById[danger.monsterId].family,
+  name: game.monstersById[danger.monsterId].name,
+  family: game.monstersById[danger.monsterId].family,
 });
 
 // What the page needs to label things; no balance numbers.
 export function publicContent() {
+  const game = content();
+  const data = dataIn(language());
   return {
-    stats: content.stats.map(({ id, name, combat }) => ({ id, name, effect: combat })),
-    classes: content.classes.map(({ id, name, short, role, start, description, position }) => ({
+    stats: game.stats.map(({ id, name, combat }) => ({ id, name, effect: combat })),
+    classes: game.classes.map(({ id, name, short, role, start, description, position }) => ({
       id,
       name,
       short,
@@ -128,34 +185,34 @@ export function publicContent() {
     })),
     // The words of the class evolutions' choice and ceremony, and the
     // picture behind the Ewolucja tab's heading.
-    evolutionTexts: content.evolutionTexts,
-    evolutionPlace: content.evolutionPlace,
+    evolutionTexts: game.evolutionTexts,
+    evolutionPlace: game.evolutionPlace,
     // The art a second form and its skills take until they have their own
     // (the first evolution's portrait, walk and ride; the icon, sound and
     // look of the skill grown from, or of the first evolution's in its
     // place): the page's art.js finds them by these ids.
-    evolutionArt: evolutionArt(content),
+    evolutionArt: evolutionArt(game),
     // The picture behind the Gildia page's heading, once one is chosen.
-    guildPlace: content.guilds.place ?? null,
+    guildPlace: game.guilds.place ?? null,
     // The tabs of the Gildia page: its members, the Siedziba, the Wyprawa,
     // the Bestia, the Próby, the Prośby Gildii and the Wymiana.
-    guildTabs: content.guilds.tabs,
+    guildTabs: game.guilds.tabs,
     // The words of "Poproś gildię", shown where pieces are missing, before
     // the Prośby Gildii answer (src/client/guild-requests.js).
-    guildAsk: content.guilds.requests.texts.ask,
+    guildAsk: game.guilds.requests.texts.ask,
     // The Ranking's tabs and the periods of its "Gildie", and the words of
     // the best guild of last week by its gold tag (guild-fame.js, 380 C).
-    guildFame: { tabs: content.guilds.fame.texts.tabs, periods: content.guilds.fame.texts.periods, champion: content.guilds.fame.texts.champion },
+    guildFame: { tabs: game.guilds.fame.texts.tabs, periods: game.guilds.fame.texts.periods, champion: game.guilds.fame.texts.champion },
     // The Sklep Systemu (cosmetics.js): its cosmetics with their prices and
     // looks, for the shop and for every portrait and name that wears one,
     // and the words of its page.
-    cosmetics: { items: content.cosmetics, texts: content.cosmeticTexts },
-    giftTexts: content.giftTexts,
-    elements: content.elements.map(({ id, name, resistance, color }) => ({ id, name, resistance, color })),
-    effects: content.effects.map(({ id, name, color }) => ({ id, name, color })),
-    slots: content.slots,
-    rarities: content.rarities.map(({ id, name, forms, color }) => ({ id, name, forms, color })),
-    regions: content.regions.map((region) => ({
+    cosmetics: { items: game.cosmetics, texts: game.cosmeticTexts },
+    giftTexts: game.giftTexts,
+    elements: game.elements.map(({ id, name, resistance, color }) => ({ id, name, resistance, color })),
+    effects: game.effects.map(({ id, name, color }) => ({ id, name, color })),
+    slots: game.slots,
+    rarities: game.rarities.map(({ id, name, forms, color }) => ({ id, name, forms, color })),
+    regions: game.regions.map((region) => ({
       id: region.id,
       land: region.land,
       name: region.name,
@@ -166,99 +223,99 @@ export function publicContent() {
       trait: { name: region.trait.name, description: region.trait.description },
       // The land's Bestiariusz: every creature of its inner regions, with
       // a chest of its own.
-      dangers: regionDangers(region, content).map(dangerView),
-      chest: landBestiaryChest(region, content),
+      dangers: regionDangers(region, game).map(dangerView(game)),
+      chest: landBestiaryChest(region, game),
       areas: region.areas.map((area) => {
-        const chances = meetingChances(area, content);
+        const chances = meetingChances(area, game);
         return {
           id: area.id,
           name: area.name,
           minLevel: area.minLevel,
           maxLevel: area.maxLevel,
           description: area.description,
-          unlockClassLevel: areaUnlockLevel(area, content),
+          unlockClassLevel: areaUnlockLevel(area, game),
           // From the strong inner regions on, the card says to go with two
           // companions (the author: 438.2 A).
-          ...(area.minLevel >= content.balance.hunt.companionsAdvice.fromLevel && { companionsAdvice: content.balance.hunt.companionsAdvice.text }),
+          ...(area.minLevel >= game.balance.hunt.companionsAdvice.fromLevel && { companionsAdvice: game.balance.hunt.companionsAdvice.text }),
           // The Bestiariusz: the page shows a creature by name only once
           // the character has met it (`met` in the character's view), with
           // its chance of coming in a fight from the start, and its chest
           // opens once all are met.
-          dangers: areaDangers(area, content).map((danger) => ({ ...dangerView(danger), chance: chances.get(danger.monsterId) ?? 0 })),
-          chest: bestiaryChest(area, content),
+          dangers: areaDangers(area, game).map((danger) => ({ ...dangerView(game)(danger), chance: chances.get(danger.monsterId) ?? 0 })),
+          chest: bestiaryChest(area, game),
         };
       }),
     })),
-    durations: { min: content.balance.hunt.minMinutes, step: content.balance.hunt.stepMinutes, max: content.balance.hunt.maxMinutes },
-    lengths: content.texts.lengths,
-    unlocks: content.unlocks.map(({ id, name, level, classLevel, condition }) => ({ id, name, level, classLevel, condition })),
-    resources: content.resources.map(({ id, name, genitive, description, system }) => ({ id, name, genitive, description, system: Boolean(system) })),
-    buildings: content.buildings.filter(buildingOn).map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
+    durations: { min: game.balance.hunt.minMinutes, step: game.balance.hunt.stepMinutes, max: game.balance.hunt.maxMinutes },
+    lengths: game.texts.lengths,
+    unlocks: game.unlocks.map(({ id, name, level, classLevel, condition }) => ({ id, name, level, classLevel, condition })),
+    resources: game.resources.map(({ id, name, genitive, description, system }) => ({ id, name, genitive, description, system: Boolean(system) })),
+    buildings: game.buildings.filter(buildingOn).map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
     // The places of the Osada's board, for their shortcuts under the Osada
     // in the computer's menu (src/client/layout.js).
-    settlementPlaces: (content.settlement?.places ?? []).map(({ id, name, soon }) => ({ id, name, ...(soon && { soon: true }) })),
+    settlementPlaces: (game.settlement?.places ?? []).map(({ id, name, soon }) => ({ id, name, ...(soon && { soon: true }) })),
     // With the family of the creature that leaves it, for its icon, and
     // `trophy` for an elite's or a champion's, which no order for any
     // materials takes ("Poproś gildię", src/client/guild-requests.js).
-    materials: content.materials.map(({ id, name, gender, rarity, description, monster }) => ({
+    materials: game.materials.map(({ id, name, gender, rarity, description, monster }) => ({
       id,
       name,
       gender,
       rarity,
       description,
-      family: content.monstersById[monster].family,
-      ...(!ordinaryMaterial(id, content) && { trophy: true }),
+      family: game.monstersById[monster].family,
+      ...(!ordinaryMaterial(id, game) && { trophy: true }),
     })),
-    parts: content.parts.map(({ id, name, rarity, description }) => ({ id, name, rarity, description })),
-    appearances: content.appearances,
+    parts: game.parts.map(({ id, name, rarity, description }) => ({ id, name, rarity, description })),
+    appearances: game.appearances,
     // The skin tones: `drawn` is the portrait as drawn, the others have their
     // own recoloured files (art.js).
-    skins: { default: content.defaultSkin, tones: content.skins.map(({ id, name, swatch, ramp }) => ({ id, name, swatch, drawn: !ramp })) },
-    freeResetMaxLevel: content.balance.progression.freeResetMaxLevel,
+    skins: { default: game.defaultSkin, tones: game.skins.map(({ id, name, swatch, ramp }) => ({ id, name, swatch, drawn: !ramp })) },
+    freeResetMaxLevel: game.balance.progression.freeResetMaxLevel,
     // Levels a character may have above a place's strongest creatures
     // before their XP drops: then the Walka screen warns of an easy place.
-    easyAbove: content.balance.hunt.lowLevelFreeDiff,
+    easyAbove: game.balance.hunt.lowLevelFreeDiff,
     // Punkty Systemu for a confirmed e-mail (email.js).
-    emailReward: content.balance.account.emailSystemPoints,
-    classEvolutionLevels: content.balance.progression.classEvolutionLevels,
+    emailReward: game.balance.account.emailSystemPoints,
+    classEvolutionLevels: game.balance.progression.classEvolutionLevels,
     // Background music: the client plays it on every screen (music.js).
-    music,
+    music: data.music,
     // Recorded combat sounds and voices (sound.js).
-    sounds,
+    sounds: data.sounds,
     // The looping scenes while the character works or explores (scenes.js).
-    animations: { ...animations, $comment: undefined },
+    animations: { ...data.animations, $comment: undefined },
     // The narrator's introduction for a new character (narrator.js), with
     // the Time Points the narrator gives.
-    tutorial: { ...tutorial, $comment: undefined, startTimePoints: content.balance.timePoints.start },
+    tutorial: { ...data.tutorial, $comment: undefined, startTimePoints: game.balance.timePoints.start },
     // The chat of the Społeczność tab (chat.js): its channels, how long a
     // message may be, how often the open chat asks for new ones, and the
     // rules accepted before the first message.
     chat: {
-      channels: content.chat.channels,
-      maxLength: content.chat.rules.maxLength,
+      channels: game.chat.channels,
+      maxLength: game.chat.rules.maxLength,
       // The admin's messages with links (chat.js, cleanText) and its window
       // "Dodaj link".
-      linkMaxLength: content.chat.rules.linkMaxLength,
-      link: content.chat.texts.link,
-      itemsMax: content.chat.rules.items,
-      pollSeconds: content.chat.rules.pollSeconds,
-      rules: content.chat.texts.rules,
+      linkMaxLength: game.chat.rules.linkMaxLength,
+      link: game.chat.texts.link,
+      itemsMax: game.chat.rules.items,
+      pollSeconds: game.chat.rules.pollSeconds,
+      rules: game.chat.texts.rules,
       // The window of a name the filter blocks (names.js).
-      names: content.chat.names,
+      names: game.chat.names,
       // Tagging with "@" (mentions.js): how many names the line suggests,
       // and the words of the page.
       mentions: {
-        suggestions: content.chat.mentions.suggestions,
-        texts: { button: content.chat.mentions.texts.button, suggestions: content.chat.mentions.texts.suggestions, tagged: content.chat.mentions.texts.tagged, news: content.chat.mentions.texts.news },
+        suggestions: game.chat.mentions.suggestions,
+        texts: { button: game.chat.mentions.texts.button, suggestions: game.chat.mentions.texts.suggestions, tagged: game.chat.mentions.texts.tagged, news: game.chat.mentions.texts.news },
       },
     },
     // The Społeczność's drop-down list, and the limits of the Znajomi, the
     // Upominek and the Wymiana the page tells of (community.js, trade.js).
     community: {
-      sections: content.community.sections,
-      friendsMax: content.community.friends.max,
-      gift: { name: content.community.gift.name, claimsPerDay: content.community.gift.claimsPerDay, timePoints: content.community.gift.timePoints },
-      trade: { proposalSeconds: content.community.trade.proposalSeconds, maxItems: content.community.trade.maxItems },
+      sections: game.community.sections,
+      friendsMax: game.community.friends.max,
+      gift: { name: game.community.gift.name, claimsPerDay: game.community.gift.claimsPerDay, timePoints: game.community.gift.timePoints },
+      trade: { proposalSeconds: game.community.trade.proposalSeconds, maxItems: game.community.trade.maxItems },
     },
   };
 }

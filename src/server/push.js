@@ -104,7 +104,7 @@ export async function testPush(context) {
   if (subscription.gone_at !== null) return json({ result: 'gone' });
   if (subscription.tested_at !== null && context.now - subscription.tested_at < TEST_EVERY_MS) return json({ result: 'wait' });
   await db.prepare('UPDATE push_subscriptions SET tested_at = ? WHERE endpoint = ?').bind(context.now, endpoint).run();
-  const message = { title: say(content.texts, 'pushTestTitle', 0), body: say(content.texts, 'pushTestBody', 0), tag: 'test', url: '#/walka', at: context.now, always: true };
+  const message = { title: say(content().texts, 'pushTestTitle', 0), body: say(content().texts, 'pushTestBody', 0), tag: 'test', url: '#/walka', at: context.now, always: true };
   let status = 0;
   try {
     const authorization = await vapidAuthorization(endpoint, await vapidKeys(db), context.now);
@@ -187,7 +187,7 @@ async function claimWindow(db, now) {
 // `from` and `to`: Map of user id → notifications.
 async function notificationsByUser(db, from, to) {
   const subscribed = "role = 'player' AND user_id IN (SELECT user_id FROM push_subscriptions)";
-  const producing = content.buildings.filter((building) => building.effect.kind === 'production').map((building) => building.id);
+  const producing = content().buildings.filter((building) => building.effect.kind === 'production').map((building) => building.id);
   const ending = (table) =>
     db
       .prepare(`SELECT character_id, kind, region_id, ends_at FROM ${table} WHERE ends_at > ? AND ends_at <= ? AND character_id IN (SELECT id FROM characters WHERE ${subscribed})`)
@@ -230,7 +230,7 @@ async function notificationsByUser(db, from, to) {
   }
   const due = new Map();
   for (const player of players.values()) {
-    const notifications = notificationsDue(player, from, to, content);
+    const notifications = notificationsDue(player, from, to, content());
     if (notifications.length > 0) due.set(player.userId, notifications);
   }
   return due;

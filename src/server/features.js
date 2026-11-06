@@ -7,7 +7,9 @@
 // and the test version (EVENTS "test") also has the outcomes the author has
 // not approved yet (drafts). The class evolutions are on except where
 // EVOLUTIONS is "off", which plays as before them (the live game hid them
-// in versions 0.0.58–0.0.60). The env is the same for every
+// in versions 0.0.58–0.0.60). English (ENGLISH "on", i18n.js) is only on
+// the test version and in local work: the live game always answers in
+// Polish and offers no choice of language. The env is the same for every
 // request of a deployment, so the switches are read once per request
 // (index.js) and kept here for the rest of the code.
 
@@ -19,6 +21,7 @@ let eventDrafts = false;
 let evolutions = true;
 let settlement = false;
 let fortress = false;
+let english = false;
 
 export function readFeatures(env) {
   professions = env.PROFESSIONS === 'on';
@@ -29,6 +32,7 @@ export function readFeatures(env) {
   evolutions = env.EVOLUTIONS !== 'off';
   settlement = env.SETTLEMENT === 'on';
   fortress = env.FORTRESS === 'on';
+  english = env.ENGLISH === 'on';
 }
 
 export const professionsOn = () => professions;
@@ -45,6 +49,9 @@ export const settlementOn = () => settlement;
 // The Warownia (fortress.js), first only where FORTRESS is "on", like the
 // Osada before it came into the game.
 export const fortressOn = () => fortress;
+// The English beta (i18n.js): the language of each request and the choice
+// of it, first only where ENGLISH is "on".
+export const englishOn = () => english;
 // A camp building of the Osada's (Kwatery, `settlement` in buildings.json)
 // stands only where the Osada is on, and one of the Warownia's (`fortress`)
 // only where the Warownia is; the others everywhere.

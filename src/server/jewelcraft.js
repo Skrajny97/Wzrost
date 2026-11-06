@@ -43,18 +43,18 @@ const shareOf = (amounts, of, count) =>
 // character's level, which is also the jewels' level, and room for them in
 // the bag.
 function jewelOrder(player, level, body) {
-  const { jewelcrafting } = content;
-  const base = typeof body.baseId === 'string' ? content.basesById[body.baseId] : undefined;
+  const { jewelcrafting } = content();
+  const base = typeof body.baseId === 'string' ? content().basesById[body.baseId] : undefined;
   const learned = JSON.parse(player.row.patterns ?? '[]');
-  if (!base || !jewelcrafting.ores[base.slot] || !knowsJewelPattern(base, level, learned, content)) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
-  const gem = typeof body.rarity === 'string' ? gemOf(body.rarity, content) : undefined;
+  if (!base || !jewelcrafting.ores[base.slot] || !knowsJewelPattern(base, level, learned, content())) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
+  const gem = typeof body.rarity === 'string' ? gemOf(body.rarity, content()) : undefined;
   if (!gem || gem.level > level) throw new ApiError(400, 'unknown_rarity', 'Tego kamienia jeszcze nie szlifujesz.');
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > jewelcrafting.maxCount) {
     throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${jewelcrafting.maxCount} sztuk.`);
   }
   return {
-    cost: jewelCost(base, gem.rarity, body.count, content),
-    minutes: jewelOrderMinutes(body.count, gem.rarity, level, content),
+    cost: jewelCost(base, gem.rarity, body.count, content()),
+    minutes: jewelOrderMinutes(body.count, gem.rarity, level, content()),
     room: body.count,
     options: { base: base.id, rarity: gem.rarity, count: body.count, level: player.row.level },
   };
@@ -76,11 +76,11 @@ function settingOrder(player, level, body, now) {
     return options.set === true && options.item === item.id;
   });
   if (setting) throw new ApiError(409, 'setting_under_way', 'W tym przedmiocie trwa już oprawianie kamienia.');
-  const gem = typeof body.gem === 'string' ? content.mineralsById[body.gem] : undefined;
+  const gem = typeof body.gem === 'string' ? content().mineralsById[body.gem] : undefined;
   if (!gem || gem.kind !== 'gem') throw new ApiError(400, 'unknown_gem', 'Nie ma takiego kamienia.');
-  if (gem.level > level) throw new ApiError(403, 'locked', say(content.jewelcrafting.texts, 'hidden', 0, { level: gem.level }));
+  if (gem.level > level) throw new ApiError(403, 'locked', say(content().jewelcrafting.texts, 'hidden', 0, { level: gem.level }));
   if (item.gem === gem.id) throw new ApiError(409, 'same_gem', `${gem.name} już tkwi w tym przedmiocie.`);
-  return { cost: { [gem.id]: 1 }, minutes: setMinutes(gem.id, level, content), room: 0, options: { set: true, item: item.id, itemName: itemName(item, content), gem: gem.id } };
+  return { cost: { [gem.id]: 1 }, minutes: setMinutes(gem.id, level, content()), room: 0, options: { set: true, item: item.id, itemName: itemName(item, content()), gem: gem.id } };
 }
 
 // A work in the Szlifiernia from now on: an order of jewels, or with `set`
@@ -90,15 +90,15 @@ export async function startJewelcraft(context) {
   const body = await readJson(context.request);
   const { session, player, avatar } = await requireWorker(context, body);
   requireProfessions(player);
-  const { jewelcrafting } = content;
-  requireOpen(player, content.professionsById[jewelcrafting.profession]);
+  const { jewelcrafting } = content();
+  requireOpen(player, content().professionsById[jewelcrafting.profession]);
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), jewelcrafting.profession);
   const now = context.now;
   const order = body.set === true ? settingOrder(player, level, body, now) : jewelOrder(player, level, body);
   const have = mineralsOf(player.row);
   const short = Object.entries(order.cost).find(([id, amount]) => (have[id] ?? 0) < amount);
-  if (short) throw new ApiError(409, 'no_minerals', `Brakuje: ${content.mineralsById[short[0]].name} (potrzeba ${short[1]}).`);
-  const free = bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player);
+  if (short) throw new ApiError(409, 'no_minerals', `Brakuje: ${content().mineralsById[short[0]].name} (potrzeba ${short[1]}).`);
+  const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
   if (order.room > free) throw new ApiError(409, 'bag_full', `W plecaku musi być ${order.room} wolnych miejsc na całe zlecenie.`);
 
   const left = { ...have };
@@ -147,8 +147,8 @@ const alreadyDone = () => new ApiError(409, 'already_claimed', 'Ten raport zosta
 export async function finishJewels(db, player, now, { stop = false, avatar = false } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
-  const { jewelcrafting } = content;
-  const profession = content.professionsById[jewelcrafting.profession];
+  const { jewelcrafting } = content();
+  const profession = content().professionsById[jewelcrafting.profession];
   const before = professionState(JSON.parse(row.professions ?? '{}'), profession.id);
   const options = JSON.parse(activity.options ?? '{}');
   // Only while the work is as seen (atomic.js), so a "Przerwij" and a claim
@@ -166,11 +166,11 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
     );
     return null;
   };
-  const known = (amounts) => Object.fromEntries(Object.entries(amounts ?? {}).filter(([id]) => content.mineralsById[id]));
+  const known = (amounts) => Object.fromEntries(Object.entries(amounts ?? {}).filter(([id]) => content().mineralsById[id]));
   const taken = known(options.minerals);
 
   if (options.set) {
-    const gem = content.mineralsById[options.gem];
+    const gem = content().mineralsById[options.gem];
     if (stop || !gem) return giveBack(taken);
     // An item gone by now (sold, taken apart, given away) gets no gem: the
     // gem comes back, and the report says so.
@@ -194,8 +194,8 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
     return saveReport(item ? {} : taken, { set: { gem: gem.id, item: data && { ...data, gem: gem.id }, replaced: data?.gem ?? null } }, activity.minutes, item);
   }
 
-  const base = content.basesById[options.base];
-  const gem = gemOf(options.rarity, content);
+  const base = content().basesById[options.base];
+  const gem = gemOf(options.rarity, content());
   // A pattern or a gem the data no longer has makes nothing.
   const count = base && gem ? options.count : 0;
   const elapsed = now - activity.started_at;
@@ -203,12 +203,12 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
   const worked = stop ? Math.floor(elapsed / 60000) : activity.minutes;
   const results =
     done > 0
-      ? craftJewels({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed }, content)
+      ? craftJewels({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed }, content())
       : [];
   const madeCount = results.filter((result) => result.made).length;
   // The gems of the jewels not done come back, and the ore of those and of
   // the failed ones.
-  const isGem = (id) => content.mineralsById[id].kind === 'gem';
+  const isGem = (id) => content().mineralsById[id].kind === 'gem';
   const back = {
     ...shareOf(Object.fromEntries(Object.entries(taken).filter(([id]) => isGem(id))), options.count - done, options.count),
     ...shareOf(Object.fromEntries(Object.entries(taken).filter(([id]) => !isGem(id))), options.count - madeCount, options.count),
@@ -238,7 +238,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
           xp,
           work,
         },
-        content,
+        content(),
       ),
       ...(avatar && { avatar: true }),
     };

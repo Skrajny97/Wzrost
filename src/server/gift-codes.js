@@ -10,7 +10,7 @@ import { content } from './content.js';
 import { raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 
-const usedText = () => content.giftTexts.used;
+const usedText = () => content().giftTexts.used;
 
 // The key of a character's name for a code given to it alone: the SHA-256 of
 // the name in small letters, in hex. The repository is public, so the data
@@ -39,7 +39,7 @@ export async function looseKey(name) {
 // once; a move whose characters are not found waits for a later run. Only
 // the accounts that took the code are read. Returns the moves made. The
 // tests pass moves of their own, as the data's name no test character.
-export async function moveGiftRewards(env, now, moves = content.giftMoves ?? []) {
+export async function moveGiftRewards(env, now, moves = content().giftMoves ?? []) {
   if (moves.length === 0 || new Date(now).getUTCMinutes() % 10 !== 0) return 0;
   const db = env.DB;
   const { results: done } = await db.prepare('SELECT id FROM gift_moves_done').all();
@@ -73,9 +73,9 @@ export async function redeemGiftCode(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const db = context.env.DB;
-  const texts = content.giftTexts;
+  const texts = content().giftTexts;
   const { results } = await db.prepare('SELECT gift_id FROM gift_codes_used WHERE user_id = ?').bind(session.userId).all();
-  const found = giftCodeOf(body.code, context.now, results.map((row) => row.gift_id), content, await characterKey(player.row.name));
+  const found = giftCodeOf(body.code, context.now, results.map((row) => row.gift_id), content(), await characterKey(player.row.name));
   if (found.reason === 'unknown') throw new ApiError(404, 'unknown_code', texts.unknown);
   if (found.reason === 'expired') throw new ApiError(400, 'expired_code', texts.expired);
   if (found.reason === 'used') throw new ApiError(409, 'used_code', usedText());
@@ -107,6 +107,6 @@ export async function redeemGiftCode(context) {
   }
   if (updated.meta.changes !== 1) throw new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
   const fresh = await loadPlayer(db, session.userId);
-  const text = texts.redeemed.replace('{rewards}', giftRewardsText(gift.rewards, content));
+  const text = texts.redeemed.replace('{rewards}', giftRewardsText(gift.rewards, content()));
   return json({ gift: { rewards: gift.rewards, text }, character: characterView(fresh, context.now) });
 }

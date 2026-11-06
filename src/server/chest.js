@@ -14,7 +14,7 @@ import { bagPlaces, characterView, loadPlayer, requireOffRack, requirePlayer } f
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
 
-const slots = () => content.balance.account.chestSlots;
+const slots = () => content().balance.account.chestSlots;
 
 // The chest as the character played sees it: each item with the name of
 // the character that put it in, and whether it comes back to this one as
@@ -31,14 +31,14 @@ async function chestView(db, player) {
       const own = row.character_id === player.row.id;
       // Another character's item comes out as the Skrzynia Konta's (take),
       // worn from its own level and its base's, whichever is higher.
-      const view = itemView(own ? item : { ...item, chest: 1 }, content);
+      const view = itemView(own ? item : { ...item, chest: 1 }, content());
       return {
         ...view,
         id: row.id,
         from: row.name ?? null,
         own,
         // Its class can wear it, and from which level of the class.
-        usable: canUse(item.base, player.row.class_id, content),
+        usable: canUse(item.base, player.row.class_id, content()),
         wornFrom: view.classLevel,
       };
     }),
@@ -89,7 +89,7 @@ export async function takeFromChest(context) {
   const db = context.env.DB;
   const stored = Number.isInteger(body.id) ? await db.prepare('SELECT id FROM chest_items WHERE id = ? AND user_id = ?').bind(body.id, session.userId).first() : null;
   if (!stored) throw new ApiError(404, 'not_in_chest', 'Tego przedmiotu nie ma już w Skrzyni Konta.');
-  if (bagPlaces(player) >= bagCapacity(campLevels(player.buildings, context.now, content), content)) {
+  if (bagPlaces(player) >= bagCapacity(campLevels(player.buildings, context.now, content()), content())) {
     throw new ApiError(409, 'bag_full', 'Plecak jest pełny. Zrób w nim miejsce, żeby wyjąć przedmiot.');
   }
   await db.batch([

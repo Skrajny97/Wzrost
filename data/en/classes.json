@@ -1,0 +1,33 @@
+{
+  "$comment": "English texts of data/classes.json, by the class's id (src/engine/overlay.js). Draft names: the glossary (glossary.json) waits for the author's review (691 A).",
+  "warrior": {
+    "name": "Warrior",
+    "short": "War",
+    "role": "defence",
+    "description": "Fights in the front line with a heavy weapon and a shield. Takes a lot of punishment and rarely faints, but kills more slowly."
+  },
+  "archer": {
+    "name": "Archer",
+    "short": "Arc",
+    "role": "range",
+    "description": "Shoots from the back line. Fast and accurate, but takes blows badly."
+  },
+  "mage": {
+    "name": "Mage",
+    "short": "Mag",
+    "role": "magic",
+    "description": "Casts elemental spells from the back line. Magic cannot be dodged or stopped by armour, but the mage is frail. The first steps are hard, and magic repays it in time."
+  },
+  "cleric": {
+    "name": "Cleric",
+    "short": "Cle",
+    "role": "support",
+    "description": "Wields the sacred. Rests better between fights, so long explorations are safer for him."
+  },
+  "shadow": {
+    "name": "Shadow",
+    "short": "Sha",
+    "role": "agility",
+    "description": "Agile and elusive. Often lands critical hits and dodges blows, but has little HP."
+  }
+}

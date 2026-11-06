@@ -2,6 +2,7 @@
 // seed always give the same result. No Date.now(), Math.random() or I/O here.
 
 export { buildContent } from './content.js';
+export { overlayKey, overlayTexts } from './overlay.js';
 export { countEvents, createRng } from './rng.js';
 export * from './formulas.js';
 export * from './stats.js';

@@ -128,7 +128,7 @@ export function restedNow(player, now) {
 export function companionsGoing(player, now) {
   const rested = restedNow(player, now);
   const hired = JSON.parse(player.row.settlement ?? '{}').companions ?? [];
-  return hired.filter((companion) => companionGoes(companion, { rested, inParty: player.inParty })).slice(0, content.balance.parties.size - 1);
+  return hired.filter((companion) => companionGoes(companion, { rested, inParty: player.inParty })).slice(0, content().balance.parties.size - 1);
 }
 
 // `hard`: against the creatures of a Trudna wyprawa (629 A).
@@ -143,7 +143,7 @@ function cachedSamples(player, character, equipped, areaId, now, hard = false) {
   const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard]);
   let samples = samplesCache.get(key);
   if (!samples) {
-    samples = threatSamples({ character, equipped, areaId, companions, hard }, content);
+    samples = threatSamples({ character, equipped, areaId, companions, hard }, content());
     if (samplesCache.size >= SAMPLES_CACHE_SIZE) samplesCache.delete(samplesCache.keys().next().value);
     samplesCache.set(key, samples);
   }
@@ -156,10 +156,10 @@ function cachedSamples(player, character, equipped, areaId, now, hard = false) {
 function healingFor(player, params) {
   const count = Number(params.get('heal') ?? 0);
   if (!Number.isInteger(count) || count <= 0) return null;
-  const { healBelow, healBelowChoices } = content.potionUse;
+  const { healBelow, healBelowChoices } = content().potionUse;
   const below = Number(params.get('below') ?? healBelow);
   const have = knownPotionsOf(player.row);
-  const kit = fightPotions(have, healBelowChoices.includes(below) ? below : healBelow, content).heal;
+  const kit = fightPotions(have, healBelowChoices.includes(below) ? below : healBelow, content()).heal;
   return kit ? { count: Math.min(count, have[kit.id]), amount: kit.amount, below: kit.below } : null;
 }
 
@@ -170,10 +170,10 @@ function takenPotions(player, asked, minutes) {
   if (asked === undefined || asked === null) return {};
   if (typeof asked !== 'object' || Array.isArray(asked)) throw new ApiError(400, 'invalid_potions', 'Wybierz mikstury na wyprawę.');
   const have = potionsOf(player.row);
-  const most = potionsPerKind(minutes, content);
+  const most = potionsPerKind(minutes, content());
   const taken = {};
   for (const [id, count] of Object.entries(asked)) {
-    const potion = content.potionsById[id];
+    const potion = content().potionsById[id];
     if (!potion || !fightKind(potion)) throw new ApiError(400, 'invalid_potions', 'Tej mikstury nie zabiera się na wyprawę.');
     const limit = Math.min(have[id] ?? 0, carryLimit(potion, most));
     if (!Number.isInteger(count) || count < 0 || count > limit) throw new ApiError(400, 'invalid_potions', `Zabierz od 0 do ${limit} sztuk.`);
@@ -195,7 +195,7 @@ function potionsBack(row, back, drunk) {
 
 // Inner regions open with the class level (areaUnlockLevel).
 const areaLocked = (area) =>
-  new ApiError(403, 'area_locked', `To miejsce odblokujesz na poziomie klasy ${areaUnlockLevel(area, content)}.`);
+  new ApiError(403, 'area_locked', `To miejsce odblokujesz na poziomie klasy ${areaUnlockLevel(area, content())}.`);
 
 // ?area=… asks for one inner region, which keeps each request within the CPU
 // limit. Without it the answer covers the inner region of each region that fits
@@ -207,16 +207,16 @@ export async function huntOptions(context) {
   const { hp, maxHp } = currentHp(player, context.now);
   const params = new URL(context.request.url).searchParams;
   const only = params.get('area') ?? params.get('region');
-  const area = only !== null && areaFor(only, character.level, content);
+  const area = only !== null && areaFor(only, character.level, content());
   if (only !== null && !area) throw new ApiError(400, 'invalid_area', 'Nie ma takiego miejsca.');
   // A place opened early in the Sala prób is open too (trial-hall.js).
   const early = earlyAreaOf(player.row);
-  if (area && !areaOpenFor(area, character.classLevel, early, content)) throw areaLocked(area);
+  if (area && !areaOpenFor(area, character.classLevel, early, content())) throw areaLocked(area);
   const areas = area
     ? [area]
-    : content.regions
-        .map((region) => areaFor(region.id, character.level, content))
-        .filter((candidate) => areaOpenFor(candidate, character.classLevel, early, content));
+    : content().regions
+        .map((region) => areaFor(region.id, character.level, content()))
+        .filter((candidate) => areaOpenFor(candidate, character.classLevel, early, content()));
   // threatAvoiding and threatSeeking: the same exploration with the elite and
   // the champion avoided or sought, from the same sample fights; the first is
   // never above the threat without them, the second never below it. In a
@@ -227,21 +227,21 @@ export async function huntOptions(context) {
   const healing = healingFor(player, params);
   // ?hard=1: the threats of a Trudna wyprawa, from the challenge's level
   // (629 A).
-  const hard = params.get('hard') === '1' && Boolean(challengeAt(character.level, content));
+  const hard = params.get('hard') === '1' && Boolean(challengeAt(character.level, content()));
   // The Warownia's Strażnica: the chances of an elite, a champion and an
   // event for each length, plain and with the rare sought, and from its 2nd
   // level the place's creatures to track (fortress.js).
-  const watch = fortressOn() ? scouting(campLevels(player.buildings, context.now, content), content) : null;
+  const watch = fortressOn() ? scouting(campLevels(player.buildings, context.now, content()), content()) : null;
   const rounded = (chances) => Object.fromEntries(Object.entries(chances).map(([key, value]) => [key, Math.round(value * 1000) / 1000]));
   const scoutView = (place, threat, catchUp) => ({
-    chances: Object.fromEntries(Object.keys(threat).map((minutes) => [minutes, rounded(scoutChances(place, Number(minutes), content, { catchUp }, eventsOn()))])),
+    chances: Object.fromEntries(Object.keys(threat).map((minutes) => [minutes, rounded(scoutChances(place, Number(minutes), content(), { catchUp }, eventsOn()))])),
     chancesSeeking: Object.fromEntries(
-      Object.keys(threat).map((minutes) => [minutes, rounded(scoutChances(place, Number(minutes), content, { catchUp, seekRare: true }, eventsOn()))]),
+      Object.keys(threat).map((minutes) => [minutes, rounded(scoutChances(place, Number(minutes), content(), { catchUp, seekRare: true }, eventsOn()))]),
     ),
     ...(watch.track > 0 && {
       scout: {
         share: watch.track,
-        creatures: [...new Set([...place.encounters, ...(place.tough ?? [])].flatMap((encounter) => encounter.monsters))].map((id) => ({ id, name: content.monstersById[id].name })),
+        creatures: [...new Set([...place.encounters, ...(place.tough ?? [])].flatMap((encounter) => encounter.monsters))].map((id) => ({ id, name: content().monstersById[id].name })),
       },
     }),
   });
@@ -251,10 +251,10 @@ export async function huntOptions(context) {
     areas: areas.map((place) => {
       const { id } = place;
       const samples = cachedSamples(player, character, equipped, id, context.now, hard);
-      const catchUp = rareCatchUp(character.level, place, met, content);
-      const threat = estimateThreat({ character, equipped, hp, areaId: id, catchUp, healing }, content, samples);
-      const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true, healing }, content, samples);
-      const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true, catchUp, healing }, content, samples);
+      const catchUp = rareCatchUp(character.level, place, met, content());
+      const threat = estimateThreat({ character, equipped, hp, areaId: id, catchUp, healing }, content(), samples);
+      const avoiding = estimateThreat({ character, equipped, hp, areaId: id, avoidRare: true, healing }, content(), samples);
+      const seeking = estimateThreat({ character, equipped, hp, areaId: id, seekRare: true, catchUp, healing }, content(), samples);
       return { id, ...(hard && { hard }), threat, threatAvoiding: lowerThreat(avoiding, threat), threatSeeking: higherThreat(seeking, threat), ...(watch && scoutView(place, threat, catchUp)) };
     }),
   });
@@ -269,8 +269,8 @@ export async function huntOptions(context) {
 // flashHunt).
 export async function quickHunt(context) {
   const { session, player } = await requireIdlePlayer(context);
-  if (!isUnlocked('quick-hunts', player.row.level, content)) {
-    throw new ApiError(403, 'locked', `Szybkie Polowanie odblokujesz na poziomie postaci ${content.unlocksById['quick-hunts'].level}.`);
+  if (!isUnlocked('quick-hunts', player.row.level, content())) {
+    throw new ApiError(403, 'locked', `Szybkie Polowanie odblokujesz na poziomie postaci ${content().unlocksById['quick-hunts'].level}.`);
   }
   const now = context.now;
   const body = await readJson(context.request);
@@ -279,20 +279,20 @@ export async function quickHunt(context) {
   let minutes;
   let next;
   if (flash) {
-    const rules = content.balance.flashHunt;
+    const rules = content().balance.flashHunt;
     const { left } = flashHuntsLeft(player.row, now);
     if (left === 0) throw new ApiError(409, 'no_flash_hunts', `Błyskawiczne polowania się skończyły. Wrócą ${rules.refillHours} godzin po ostatnim.`);
     minutes = rules.minutes;
     next = { ...stored, flash: { used: rules.count - left + 1, at: now } };
   } else {
-    const rules = content.balance.quickHunt;
+    const rules = content().balance.quickHunt;
     const used = quickHuntsUsed(player.row, now);
     if (used >= rules.perDay) throw new ApiError(409, 'no_quick_hunts', 'Szybkie Polowania na dziś się skończyły. Nowe od północy.');
     minutes = rules.minutes;
-    next = { ...stored, day: questPeriod('daily', now, content).key, used: used + 1 };
+    next = { ...stored, day: questPeriod('daily', now, content()).key, used: used + 1 };
   }
   // Potions chosen for a longer "Wyrusz" are cut to what this length takes.
-  const most = potionsPerKind(minutes, content);
+  const most = potionsPerKind(minutes, content());
   const asked = body.potions && typeof body.potions === 'object' && !Array.isArray(body.potions) ? body.potions : null;
   const potions = asked ? Object.fromEntries(Object.entries(asked).map(([id, count]) => [id, Number.isInteger(count) ? Math.min(count, most) : count])) : body.potions;
   const db = context.env.DB;
@@ -336,10 +336,10 @@ export async function beginHunt(
 ) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
-  const area = typeof id === 'string' ? areaFor(id, player.row.level, content) : undefined;
+  const area = typeof id === 'string' ? areaFor(id, player.row.level, content()) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
-  if (!areaOpenFor(area, player.row.class_level, earlyAreaOf(player.row), content)) throw areaLocked(area);
-  if (!durationsUpTo(content.balance.hunt.maxMinutes, content).includes(minutes)) {
+  if (!areaOpenFor(area, player.row.class_level, earlyAreaOf(player.row), content())) throw areaLocked(area);
+  if (!durationsUpTo(content().balance.hunt.maxMinutes, content()).includes(minutes)) {
     throw new ApiError(400, 'invalid_duration', 'Wybierz czas wyprawy.');
   }
   if (typeof avoidRare !== 'boolean') throw new ApiError(400, 'invalid_avoid', 'Zaznacz albo odznacz omijanie elit i czempionów.');
@@ -349,10 +349,10 @@ export async function beginHunt(
   if (typeof trackUnknown !== 'boolean') throw new ApiError(400, 'invalid_track_unknown', 'Zaznacz albo odznacz tropienie nieznanych stworów.');
   if (typeof hard !== 'boolean') throw new ApiError(400, 'invalid_hard', 'Zaznacz albo odznacz Trudną wyprawę.');
   if (hard && (quick || crew)) throw new ApiError(400, 'hard_plain_only', 'Trudna wyprawa jest tylko na zwykłej wyprawie, bez drużyny.');
-  if (hard && !challengeAt(player.row.level, content)) throw new ApiError(403, 'hard_locked', `Trudna wyprawa otwiera się na ${content.balance.challenge.fromLevel}. poziomie postaci.`);
-  if (!huntDurations(player.row.level, content).includes(minutes)) {
-    const longest = longestHunt(player.row.level, content);
-    const next = nextHuntUnlock(player.row.level, content);
+  if (hard && !challengeAt(player.row.level, content())) throw new ApiError(403, 'hard_locked', `Trudna wyprawa otwiera się na ${content().balance.challenge.fromLevel}. poziomie postaci.`);
+  if (!huntDurations(player.row.level, content()).includes(minutes)) {
+    const longest = longestHunt(player.row.level, content());
+    const next = nextHuntUnlock(player.row.level, content());
     throw new ApiError(
       403,
       'duration_locked',
@@ -360,7 +360,7 @@ export async function beginHunt(
     );
   }
 
-  if (healBelow !== undefined && !content.potionUse.healBelowChoices.includes(healBelow)) {
+  if (healBelow !== undefined && !content().potionUse.healBelowChoices.includes(healBelow)) {
     throw new ApiError(400, 'invalid_heal_below', 'Wybierz próg mikstury leczenia.');
   }
   const taken = takenPotions(player, potions, minutes);
@@ -378,20 +378,20 @@ export async function beginHunt(
   const unknown = trackUnknown ? unknownCreatures(area, JSON.parse(player.row.met ?? '[]')) : [];
   // The Warownia's Strażnica from its 2nd level: one creature of the place
   // tracked (fortress.js); not on a Drużyna's trip.
-  const scouted = scout !== null && fortressOn() ? scoutedCreature(campLevels(player.buildings, now, content), area, scout, content) : null;
+  const scouted = scout !== null && fortressOn() ? scoutedCreature(campLevels(player.buildings, now, content()), area, scout, content()) : null;
   if (scout !== null && (!scouted || crew)) {
     throw new ApiError(409, 'cannot_scout', 'Tropienie stwora wymaga Strażnicy Warowni na 2. poziomie i stwora z tego miejsca, a na wyprawie Drużyny go nie ma.');
   }
   // The Encyklopedia's trophies for the creatures of this place, as at the
   // start: the report comes out the same whenever it is claimed.
-  const trophies = trophiesFor(player, now, areaDangers(area, content).map((danger) => danger.monsterId));
+  const trophies = trophiesFor(player, now, areaDangers(area, content()).map((danger) => danger.monsterId));
   // A rumor about this place, from the Karczma or from the beggar's song
   // (an event, also without the Osada; settlement.js): the exploration
   // meets its elite and champion rumor.factor times as often, and uses the
   // rumor up. Not a Szybkie Polowanie, nor one avoiding them.
   const stored = JSON.parse(player.row.settlement ?? '{}');
   const kept = settlementOn() ? stored : null;
-  const rumor = !quick && !avoidRare ? rumorFactor(stored.rumor, area.id, now, content) : 1;
+  const rumor = !quick && !avoidRare ? rumorFactor(stored.rumor, area.id, now, content()) : 1;
   // The Bractwo Łowców (591 A, B), as at the start: more materials from the
   // character's own creatures, and the elite and the champion more often (on
   // a Drużyna's trip, its leader's, as its encounters), not on a Szybkie
@@ -402,7 +402,7 @@ export async function beginHunt(
   // items by the levels of the character's guild's buildings now
   // (guild-seat.js), on a Drużyna's trip too, each member its own guild's;
   // a character that left its guild sets out without them.
-  const seat = seatHuntBonus(player.guildSeat, content);
+  const seat = seatHuntBonus(player.guildSeat, content());
   // The companions hired in the Osada who do not stay in the Kwatery go
   // along, as they are now (companions.js), so the report comes out the same
   // whenever claimed; a wounded one once the character has rested to full
@@ -410,7 +410,7 @@ export async function beginHunt(
   // who stay too. Not on a Szybkie Polowanie, nor on a Drużyna's trip.
   const healed = kept && restedNow(player, now) && (kept.companions ?? []).some((companion) => companion.wounded);
   // A mercenary from the Karczma takes one companion's place (633.3 A).
-  const party = kept && !quick && !crew ? companionsGoing(player, now).slice(0, mercenary === null ? undefined : content.balance.parties.size - 2) : [];
+  const party = kept && !quick && !crew ? companionsGoing(player, now).slice(0, mercenary === null ? undefined : content().balance.parties.size - 2) : [];
   // The sołtys's wanted poster in hand, for this place (wanted.js): its
   // target may come on the way. Not on a Szybkie Polowanie, nor on a
   // Drużyna's trip.
@@ -443,8 +443,8 @@ export async function beginHunt(
   // Błyskawiczne polowanie, over as they start. A Drużyna's trip keeps one
   // time for all who go: it takes the stage the party code gives (`mount`,
   // the slowest mount among them), and without one goes the full length.
-  const stage = quick ? 0 : (mount ?? (crew ? 0 : mountStage(kept, content)));
-  const endsAt = startsAt + huntWait(minutes, stage, content);
+  const stage = quick ? 0 : (mount ?? (crew ? 0 : mountStage(kept, content())));
+  const endsAt = startsAt + huntWait(minutes, stage, content());
 
   // A mercenary from the Karczma (mercenaries.js), on a plain "Wyrusz"
   // only: hired with the start, in its batch, its fee paid at once; it
@@ -462,7 +462,7 @@ export async function beginHunt(
     ...(party.length > 0 && { companions: party }),
     ...(crew && { party: crew }),
     ...(partners.length > 0 && { partners }),
-    ...(reserving && { potions: taken, reserved: true, healBelow: healBelow ?? content.potionUse.healBelow }),
+    ...(reserving && { potions: taken, reserved: true, healBelow: healBelow ?? content().potionUse.healBelow }),
     ...(timed && { buffs: windows, spend: 'claim' }),
     ...(unknown.length > 0 && { unknown }),
     ...(Object.keys(trophies).length > 0 && { trophies }),
@@ -525,7 +525,7 @@ export async function beginHunt(
     throw error;
   }
   // What it set out with, for the roster of a Drużyna's trip (parties.js).
-  return { windows, trophies, taken, healBelow: healBelow ?? content.potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare };
+  return { windows, trophies, taken, healBelow: healBelow ?? content().potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare };
 }
 
 // Calling the character back early gives nothing and costs nothing. A
@@ -627,7 +627,7 @@ function settlementAfterHunt(row, hunt, kept, minutes) {
   if (went) {
     next.companions = (stored.companions ?? []).map((companion) => {
       const one = hunt.companions.find((member) => member.id === companion.id);
-      return one ? companionAfterHunt(companion, { xp: hunt.xp, fainted: one.fainted, minutes }, row.level, content) : companion;
+      return one ? companionAfterHunt(companion, { xp: hunt.xp, fainted: one.fainted, minutes }, row.level, content()) : companion;
     });
   }
   if (reward?.reputation) {
@@ -651,7 +651,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const row = player.row;
   const character = engineCharacter(row);
   // region_id holds the inner region (or a whole region, from before them).
-  const area = areaFor(activity.region_id, row.level, content);
+  const area = areaFor(activity.region_id, row.level, content());
   // The very first exploration, before any report, goes one way (simulateHunt).
   const first = !(await db.prepare('SELECT 1 AS found FROM reports WHERE character_id = ? LIMIT 1').bind(row.id).first());
   // The potions taken along and the windows of the potions for a time
@@ -704,14 +704,14 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       wanted: trip ? null : (options.wanted ?? null),
       hard: !trip && options.hard === true,
     },
-    content,
+    content(),
   );
   // "Testuj zdarzenia" (the test version) brings its event, and the case
   // and the ending chosen for it if any ("event:case:ending"), without the
   // draw.
   const [forcedEvent = null, forcedCase = null, forcedEnding = null] = row.event_test ? row.event_test.split(':').map((part) => part || null) : [];
   const event = eventsOn()
-    ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn(), settlement: settlementOn() }, content)
+    ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn(), settlement: settlementOn() }, content())
     : null;
   // An option's price comes from the purse, the character's gold with the
   // exploration's; an option of one class is greyed out for the others.
@@ -719,19 +719,19 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // An event that led to a further choice goes on from there (`eventPath`,
   // the options chosen so far): the choice made stays made, whether the
   // sheet was closed or the page reloaded.
-  const eventArea = content.areasById[hunt.areaId];
+  const eventArea = content().areasById[hunt.areaId];
   const walkOptions = { seed: activity.seed, caseId: forcedCase, endingId: forcedEnding, drafts: eventDraftsOn() };
   const storedPath = event && Array.isArray(options.eventPath) ? options.eventPath : [];
   const before = event && (eventChoices(event, storedPath, walkOptions)?.options ? storedPath : []);
-  if (event && choice === undefined) return { event: eventView(event, eventArea, who, content, before.length > 0 ? eventChoices(event, before, walkOptions) : null) };
+  if (event && choice === undefined) return { event: eventView(event, eventArea, who, content(), before.length > 0 ? eventChoices(event, before, walkOptions) : null) };
   // Today's rumor, as the Karczma told it, or as the beggar's song may.
-  const kept = rumorToday(JSON.parse(row.settlement ?? '{}').rumor, now, content);
+  const kept = rumorToday(JSON.parse(row.settlement ?? '{}').rumor, now, content());
   if (event) {
     const path = [...before, choice];
     const walk = typeof choice === 'string' ? eventChoices(event, path, walkOptions) : null;
     if (!walk) throw new ApiError(400, 'invalid_choice', 'Wybierz jedną z opcji.');
     const step = walk.steps.at(-1);
-    const lock = optionLock(step.option, { ...who, purse: who.purse - (walk.steps.slice(0, -1).reduce((sum, one) => sum + optionCost(one.option, row.level), 0)) }, content);
+    const lock = optionLock(step.option, { ...who, purse: who.purse - (walk.steps.slice(0, -1).reduce((sum, one) => sum + optionCost(one.option, row.level), 0)) }, content());
     if (lock) throw new ApiError(409, lock.code, lock.code === 'class_only' ? `Tę opcję wybiera ${lock.text}.` : 'Brakuje złota na tę opcję.');
     // A further choice: kept with the activity, and shown; nothing else is
     // saved until the event ends.
@@ -741,9 +741,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
         .bind(JSON.stringify({ ...options, eventPath: path }), row.id, activity.options ?? '{}')
         .run();
       if (saved.meta.changes !== 1) throw new ApiError(409, 'character_changed', 'Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz.');
-      return { event: eventView(event, eventArea, who, content, walk) };
+      return { event: eventView(event, eventArea, who, content(), walk) };
     }
-    const rumor = kept ?? drawRumor({ character, seed: `${row.id}:settlement` }, now, content);
+    const rumor = kept ?? drawRumor({ character, seed: `${row.id}:settlement` }, now, content());
     hunt = resolveEvent(
       {
         hunt,
@@ -767,13 +767,13 @@ export async function finishHunt(db, player, now, { choice } = {}) {
         buffs: claimed.windows,
         trophies: options.trophies ?? {},
       },
-      content,
+      content(),
     );
   }
   // A faint loses everything the exploration brought (faintForfeit, 651 C),
   // and costs XP, less with the Warownia's Kapliczka (427 A).
   hunt = faintForfeit(hunt);
-  const applied = applyHunt(character, hunt, content, { faintShare: faintShare(campLevels(player.buildings, now, content), content) });
+  const applied = applyHunt(character, hunt, content(), { faintShare: faintShare(campLevels(player.buildings, now, content()), content()) });
   // The companions who went gain XP, one who fell is wounded, and an
   // event's reputation and rumor are kept (settlementAfterHunt); of an
   // older trip's, only in its leader's report.
@@ -782,7 +782,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const settlementAfter = settlementAfterHunt(row, trip && trip.roster[0].id !== row.id ? { ...hunt, companions: [] } : hunt, kept, credited);
   // An event's reputation of the Bractwo Zielarzy may make Jagna teach rare
   // recipes (682 A and C): the report tells them among its System's lines.
-  const taught = settlementAfter ? taughtWords(JSON.parse(row.settlement ?? '{}'), JSON.parse(settlementAfter), content) : null;
+  const taught = settlementAfter ? taughtWords(JSON.parse(row.settlement ?? '{}'), JSON.parse(settlementAfter), content()) : null;
   // The potions taken along were set aside at the start (`reserved`): what
   // was not drunk comes back to the bag. An exploration started before that
   // takes the potions drunk from the bag, where they stayed.
@@ -791,19 +791,19 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const potionsChanged = drunk.length > 0 || Object.keys(reservedPotions).length > 0;
   const potionsLeft = potionsBack(row, reservedPotions, hunt.potionsUsed);
   // A find for a slot with nothing in it is worn at once.
-  const autoEquipped = autoEquip(equippedItems(player), hunt.items, content, row.class_id, row.class_level);
+  const autoEquipped = autoEquip(equippedItems(player), hunt.items, content(), row.class_id, row.class_level);
   // The rest goes to the bag. When it does not fit, the scrapper buys the
   // weakest items, old or new, at the camp's price. Herbs keep the places
   // their stacks take, and an event's herbs (the Kwiat paproci) take theirs
   // first; what finds no place at all is lost, said after the event's words.
-  const levels = campLevels(player.buildings, now, content);
+  const levels = campLevels(player.buildings, now, content());
   const bag = bagItems(player);
-  const free = bagCapacity(levels, content) - (bagPlaces(player) - bag.length);
+  const free = bagCapacity(levels, content()) - (bagPlaces(player) - bag.length);
   const herbsBefore = herbsOf(row);
-  const herbs = storeStacks(herbsBefore, hunt.herbs ?? {}, free, content);
-  const capacity = free - (bagStacks(herbs.after, content) - bagStacks(herbsBefore, content));
+  const herbs = storeStacks(herbsBefore, hunt.herbs ?? {}, free, content());
+  const capacity = free - (bagStacks(herbs.after, content()) - bagStacks(herbsBefore, content()));
   if (Object.keys(herbs.lost).length > 0) {
-    const lost = say(content.professionTexts, 'lost', 0, { herbs: countList(herbs.lost, content.herbsById) });
+    const lost = say(content().professionTexts, 'lost', 0, { herbs: countList(herbs.lost, content().herbsById) });
     const told = (text) => `${text} ${lost}`;
     hunt = {
       ...hunt,
@@ -811,25 +811,25 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       event: { ...hunt.event, option: { ...hunt.event.option, text: told(hunt.event.option.text) } },
     };
   }
-  const sellBonus = campBonus(levels, 'sellPrice', content);
+  const sellBonus = campBonus(levels, 'sellPrice', content());
   const toBag = hunt.items.map((item, index) => index).filter((index) => !autoEquipped.includes(index));
   const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
-  const sold = bagOverflow(candidates, capacity, row.class_id, content);
+  const sold = bagOverflow(candidates, capacity, row.class_id, content());
   const storedSold = sold.filter((index) => index < bag.length).map((index) => bag[index]);
   const soldStored = storedSold.map((item) => item.id);
   const soldFound = sold.filter((index) => index >= bag.length).map((index) => toBag[index - bag.length]);
-  const soldFoundGold = soldFound.reduce((sum, index) => sum + sellPrice(hunt.items[index], content, sellBonus), 0);
+  const soldFoundGold = soldFound.reduce((sum, index) => sum + sellPrice(hunt.items[index], content(), sellBonus), 0);
   const overflow =
     sold.length > 0
       ? {
           capacity,
           count: sold.length,
-          gold: sold.reduce((sum, index) => sum + sellPrice(candidates[index], content, sellBonus), 0),
+          gold: sold.reduce((sum, index) => sum + sellPrice(candidates[index], content(), sellBonus), 0),
           sold: soldFound,
         }
       : null;
   const report = {
-    ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped, overflow }, content),
+    ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: activity.started_at, endsAt: activity.ends_at, autoEquipped, overflow }, content()),
     ...(options.quick && { quick: true }),
     ...(options.flash && { flash: true }),
     // The Drużyna that went, by name (parties.js), and the time the others
@@ -868,7 +868,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const left = Object.entries(hunt.materials);
   // A new level heals fully, with the finds worn from now on (hpAfterHunt).
   const worn = [...equippedItems(player), ...autoEquipped.map((index) => hunt.items[index])];
-  const hp = hpAfterHunt({ character, applied, hunt, equipped: worn, name: row.name }, content);
+  const hp = hpAfterHunt({ character, applied, hunt, equipped: worn, name: row.name }, content());
   // The creatures of every fight join those the character has met (the
   // Bestiariusz shows them by name from now on), also a creature of an
   // event's fight (the Błędnica); the people of an event's fight are not in
@@ -876,15 +876,15 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const met = [
     ...new Set([
       ...JSON.parse(row.met ?? '[]'),
-      ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId)).filter((monsterId) => !content.eventFoesById[monsterId]),
+      ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId)).filter((monsterId) => !content().eventFoesById[monsterId]),
     ]),
   ];
   // The narrator's quests count the creatures beaten, the minutes and the
   // inner regions the new class levels open; after a faint nothing
   // (faintForfeit). They are saved only as read, so a reward claimed
   // meanwhile is not undone.
-  const opened = areasOpened(character.classLevel, applied.classLevel, content);
-  const progress = { kills: hunt.forfeit ? {} : huntKills(hunt, content), minutes: credited, opened };
+  const opened = areasOpened(character.classLevel, applied.classLevel, content());
+  const progress = { kills: hunt.forfeit ? {} : huntKills(hunt, content()), minutes: credited, opened };
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), progress));
   const setMaterials = left.length
     ? `, materials = json_set(materials, ${left.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})`

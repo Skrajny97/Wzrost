@@ -3,6 +3,9 @@
   "name": "wzrost",
   "main": "src/server/index.js",
   "compatibility_date": "2026-10-19",
+  // AsyncLocalStorage (node:async_hooks) and nothing more of Node's: each
+  // request keeps its own language in it (src/server/i18n.js).
+  "compatibility_flags": ["nodejs_als"],
   // The game's own domain, registered in Cloudflare: the main address and
   // www. The workers.dev address stays as a spare one.
   "workers_dev": true,
@@ -64,7 +67,12 @@
     // "on" lets a camp at its top turn into the Warownia
     // (src/server/fortress.js), with its seven buildings: in the live game
     // from version 0.1.49, once every building had its pictures (606, 608–610).
-    "FORTRESS": "on"
+    "FORTRESS": "on",
+    // "on" offers English beside Polish (src/server/i18n.js): the PL | EN
+    // switch on the login screen and in the Ustawienia, and the answers in
+    // the language chosen. The English beta is only on the test version and
+    // in local work (490–497 A): the live game answers in Polish.
+    "ENGLISH": "off"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain
@@ -117,7 +125,9 @@
         // The Osada (src/server/settlement.js), only here until it is ready.
         "SETTLEMENT": "on",
         // The Warownia (src/server/fortress.js), as in the game.
-        "FORTRESS": "on"
+        "FORTRESS": "on",
+        // The English beta, only here (490–497 A).
+        "ENGLISH": "on"
       },
       "triggers": {
         "crons": ["* * * * *"]

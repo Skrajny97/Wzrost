@@ -18,29 +18,29 @@ import { ApiError, json, readJson } from './http.js';
 export async function openBestiaryChest(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
-  const area = typeof body.area === 'string' ? content.areasById[body.area] : undefined;
-  const region = !area && typeof body.region === 'string' ? content.regionsById[body.region] : undefined;
+  const area = typeof body.area === 'string' ? content().areasById[body.area] : undefined;
+  const region = !area && typeof body.region === 'string' ? content().regionsById[body.region] : undefined;
   if (!area && !region) throw new ApiError(404, 'no_area', 'Nie ma takiego regionu.');
   const id = (area ?? region).id;
   const row = player.row;
   const opened = JSON.parse(row.bestiary ?? '[]');
-  if (openedChests(opened, content).includes(id)) throw new ApiError(409, 'opened', 'Ta skrzynia jest już otwarta.');
+  if (openedChests(opened, content()).includes(id)) throw new ApiError(409, 'opened', 'Ta skrzynia jest już otwarta.');
   const met = JSON.parse(row.met ?? '[]');
-  if (area ? !bestiaryFull(area, met, content) : !landBestiaryFull(region, met, content)) {
+  if (area ? !bestiaryFull(area, met, content()) : !landBestiaryFull(region, met, content())) {
     throw new ApiError(
       409,
       'not_ready',
       area ? 'Skrzynia otworzy się, gdy poznasz wszystkie stwory tego regionu.' : 'Skrzynia otworzy się, gdy poznasz wszystkie stwory tej krainy.',
     );
   }
-  const chest = area ? bestiaryChest(area, content) : landBestiaryChest(region, content);
+  const chest = area ? bestiaryChest(area, content()) : landBestiaryChest(region, content());
   const db = context.env.DB;
   const result = await db
     .prepare(
       `UPDATE characters SET gold = gold + ?, time_points = time_points + ?, system_points = system_points + ?, bestiary = ?, version = version + 1
        WHERE id = ? AND version = ?`,
     )
-    .bind(chest.gold, chest.timePoints, chest.systemPoints, JSON.stringify([...opened.filter((entry) => entry.split(':')[0] !== id), openedChestEntry(id, content)]), row.id, row.version)
+    .bind(chest.gold, chest.timePoints, chest.systemPoints, JSON.stringify([...opened.filter((entry) => entry.split(':')[0] !== id), openedChestEntry(id, content())]), row.id, row.version)
     .run();
   if (result.meta.changes !== 1) throw new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
   return json({ chest, character: characterView(await loadPlayer(db, session.userId), context.now) });

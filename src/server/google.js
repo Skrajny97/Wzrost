@@ -19,6 +19,7 @@ import { content } from './content.js';
 import { rewardStatements } from './email.js';
 import { fromBase64Url, toBase64Url } from './encoding.js';
 import { registrationOpen } from './features.js';
+import { language } from './i18n.js';
 import { createSession, deleteSession, getSession, readCookie, sessionCookie } from './sessions.js';
 import { testModeFor } from './test-mode.js';
 
@@ -165,7 +166,8 @@ export function loginBase(email) {
 }
 
 // A new account for the Google account, with the Punkty Systemu for the
-// first character it makes. A taken login gets 4 digits.
+// first character it makes, in the language of the return from Google (the
+// browser's, i18n.js). A taken login gets 4 digits.
 async function createGoogleUser(db, identity, now) {
   const base = loginBase(identity.email);
   for (let attempt = 0; attempt < 10; attempt++) {
@@ -173,8 +175,8 @@ async function createGoogleUser(db, identity, now) {
     if (await db.prepare('SELECT 1 FROM users WHERE login = ?').bind(login).first()) continue;
     try {
       const result = await db
-        .prepare('INSERT INTO users (login, email, password_hash, google_sub, created_at, system_points_waiting, email_rewarded_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
-        .bind(login, identity.email, NO_PASSWORD, identity.sub, now, content.balance.account.emailSystemPoints, now)
+        .prepare('INSERT INTO users (login, email, password_hash, google_sub, created_at, system_points_waiting, email_rewarded_at, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+        .bind(login, identity.email, NO_PASSWORD, identity.sub, now, content().balance.account.emailSystemPoints, now, language())
         .run();
       return { id: result.meta.last_row_id };
     } catch (error) {

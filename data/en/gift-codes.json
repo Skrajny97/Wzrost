@@ -1,0 +1,17 @@
+{
+  "$comment": "English texts of data/gift-codes.json (src/engine/overlay.js): the words of the gift code in the Ustawienia.",
+  "texts": {
+    "title": "Gift code",
+    "intro": "Enter a gift code. Each code works once per account.",
+    "placeholder": "Code",
+    "open": "Enter code",
+    "redeem": "Redeem",
+    "redeemed": "Code accepted. Received: {rewards}.",
+    "unknown": "There is no such code.",
+    "expired": "This code has expired.",
+    "used": "This code has already been redeemed on this account.",
+    "systemPoints": "System Points",
+    "timePoints": "Time Points",
+    "gold": "gold"
+  }
+}

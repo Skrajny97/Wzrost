@@ -80,7 +80,7 @@ export async function authorPanel(context) {
       characters: row.character_count,
       character: row.name && {
         name: row.name,
-        className: content.classesById[row.class_id]?.name ?? row.class_id,
+        className: content().classesById[row.class_id]?.name ?? row.class_id,
         level: row.level,
         classLevel: row.class_level,
         createdAt: row.character_created_at,
@@ -152,13 +152,13 @@ export async function authorSkills(context) {
   if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   return json({
     skills: [
-      ...content.skills.map((skill) => ({ id: skill.id, name: skill.name, style: skill.style, className: content.classesById[skill.classId].name })),
+      ...content().skills.map((skill) => ({ id: skill.id, name: skill.name, style: skill.style, className: content().classesById[skill.classId].name })),
       // The evolutions' skills, under the evolution's name and its class's.
-      ...content.evolutionSkills.map((skill) => ({
+      ...content().evolutionSkills.map((skill) => ({
         id: skill.id,
         name: skill.name,
         style: skill.style,
-        className: `${content.evolutionsById[skill.evolution].name} (${content.classesById[skill.classId].name})`,
+        className: `${content().evolutionsById[skill.evolution].name} (${content().classesById[skill.classId].name})`,
       })),
     ],
   });
@@ -167,6 +167,6 @@ export async function authorSkills(context) {
 export async function authorSkillDemo(context) {
   const session = await requireSession(context);
   if (!isAuthor(context.env, session.user)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
-  if (!content.skillsById[context.params.id]) throw new ApiError(404, 'not_found', 'Nie ma takiej umiejętności.');
-  return json({ fight: skillDemo(context.params.id, content) });
+  if (!content().skillsById[context.params.id]) throw new ApiError(404, 'not_found', 'Nie ma takiej umiejętności.');
+  return json({ fight: skillDemo(context.params.id, content()) });
 }

@@ -43,15 +43,15 @@ const stateOf = (row) => JSON.parse(row.fortress ?? '{}');
 export async function startTraining(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
-  const levels = campLevels(player.buildings, now, content);
-  const plan = fortressOn() ? trainingPlan(levels, content) : null;
+  const levels = campLevels(player.buildings, now, content());
+  const plan = fortressOn() ? trainingPlan(levels, content()) : null;
   if (!plan) throw new ApiError(409, 'no_training_yard', 'Trening wymaga Placu treningowego w Warowni.');
   const row = player.row;
   const state = stateOf(row);
-  const day = questPeriod('daily', now, content).key;
+  const day = questPeriod('daily', now, content()).key;
   if (state.training?.day === day) throw new ApiError(409, 'trained_today', 'Dzisiejszy trening już był. Następny po północy.');
   if (state.training && !state.training.claimed) throw new ApiError(409, 'training_unclaimed', 'Najpierw odbierz poprzedni trening.');
-  const training = { day, startedAt: now, endsAt: now + plan.hours * HOUR, hours: plan.hours, xp: trainingXp(row.level, plan, content), claimed: false };
+  const training = { day, startedAt: now, endsAt: now + plan.hours * HOUR, hours: plan.hours, xp: trainingXp(row.level, plan, content()), claimed: false };
   const result = await context.env.DB.prepare('UPDATE characters SET fortress = ?, version = version + 1 WHERE id = ? AND version = ?')
     .bind(JSON.stringify({ ...state, training }), row.id, row.version)
     .run();
@@ -72,7 +72,7 @@ export async function claimTraining(context) {
   if (player.activity?.kind === 'hunt') {
     throw new ApiError(409, 'training_exploring', 'Trening odbierzesz, gdy postać wróci z wyprawy i odbierze jej raport.');
   }
-  const applied = applyClassXp(engineCharacter(row), training.xp, content);
+  const applied = applyClassXp(engineCharacter(row), training.xp, content());
   const result = await context.env.DB.prepare(
     'UPDATE characters SET class_level = ?, class_xp = ?, time_points = time_points + ?, fortress = ?, version = version + 1 WHERE id = ? AND version = ?',
   )
@@ -90,14 +90,14 @@ export async function chooseBlessing(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
   const body = await readJson(context.request);
-  const plan = fortressOn() ? blessingPlan(campLevels(player.buildings, now, content), content) : null;
+  const plan = fortressOn() ? blessingPlan(campLevels(player.buildings, now, content()), content()) : null;
   if (!plan) throw new ApiError(409, 'no_altar', 'Błogosławieństwo daje Ołtarz Systemu w Warowni.');
-  const altar = content.buildings.find((building) => building.effect.kind === 'blessing');
+  const altar = content().buildings.find((building) => building.effect.kind === 'blessing');
   const choice = altar.blessings.find((one) => one.id === body.kind);
   if (!choice) throw new ApiError(400, 'invalid_blessing', 'Nie ma takiego błogosławieństwa.');
   const row = player.row;
   const state = stateOf(row);
-  const day = questPeriod('daily', now, content).key;
+  const day = questPeriod('daily', now, content()).key;
   if (state.blessing?.day === day) throw new ApiError(409, 'blessed_today', 'Dzisiejsze błogosławieństwo już wybrane. Następne po północy.');
   const blessing = { day, kind: choice.id, bonus: plan.bonus, left: plan.fights };
   const result = await context.env.DB.prepare('UPDATE characters SET fortress = ?, version = version + 1 WHERE id = ? AND version = ?')
@@ -108,7 +108,7 @@ export async function chooseBlessing(context) {
 }
 
 // The Zielarstwo level the Szklarnia grows with.
-const herbalismOf = (row) => professionState(JSON.parse(row.professions ?? '{}'), content.gathering.profession).level;
+const herbalismOf = (row) => professionState(JSON.parse(row.professions ?? '{}'), content().gathering.profession).level;
 
 // Saves the Szklarnia's state and the herbs collected, only if the character
 // is as read.
@@ -122,10 +122,10 @@ async function saveGreenhouse(context, row, state, herbs) {
 // What the store holds, into the bag as far as it fits (storeStacks): the
 // herbs after, the count taken, and the store's new start.
 function harvest(player, levels, state, now) {
-  const store = greenhouseStore(levels, state.greenhouse, herbalismOf(player.row), now, content);
+  const store = greenhouseStore(levels, state.greenhouse, herbalismOf(player.row), now, content());
   if (!store || store.amount < 1) return { herbs: herbsOf(player.row), taken: 0, since: state.greenhouse?.since ?? now, store };
-  const free = bagCapacity(levels, content) - bagPlaces(player);
-  const { after, stored } = storeStacks(herbsOf(player.row), { [store.herb]: store.amount }, free, content);
+  const free = bagCapacity(levels, content()) - bagPlaces(player);
+  const { after, stored } = storeStacks(herbsOf(player.row), { [store.herb]: store.amount }, free, content());
   const taken = stored[store.herb] ?? 0;
   return { herbs: after, taken, since: greenhouseSince(store, taken, now), store };
 }
@@ -137,10 +137,10 @@ export async function chooseGreenhouseHerb(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
   const body = await readJson(context.request);
-  const levels = campLevels(player.buildings, now, content);
-  if (!fortressOn() || greenhouseHours(levels, content) <= 0) throw new ApiError(409, 'no_greenhouse', 'Zioła hoduje Szklarnia w Warowni.');
+  const levels = campLevels(player.buildings, now, content());
+  if (!fortressOn() || greenhouseHours(levels, content()) <= 0) throw new ApiError(409, 'no_greenhouse', 'Zioła hoduje Szklarnia w Warowni.');
   const row = player.row;
-  if (!knownHerbs(herbalismOf(row), content).some((herb) => herb.id === body.herb)) {
+  if (!knownHerbs(herbalismOf(row), content()).some((herb) => herb.id === body.herb)) {
     throw new ApiError(400, 'unknown_herb', 'Szklarnia hoduje tylko zioła znane z Zielarstwa.');
   }
   const state = stateOf(row);
@@ -154,14 +154,14 @@ export async function chooseGreenhouseHerb(context) {
 export async function collectGreenhouse(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
-  const levels = campLevels(player.buildings, now, content);
+  const levels = campLevels(player.buildings, now, content());
   const row = player.row;
   const state = stateOf(row);
   const { herbs, taken, since, store } = harvest(player, levels, state, now);
   if (!fortressOn() || !store || store.amount < 1) throw new ApiError(409, 'nothing_grown', 'W Szklarni nic jeszcze nie urosło.');
   if (taken < 1) throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
   await saveGreenhouse(context, row, { ...state, greenhouse: { ...state.greenhouse, since } }, herbs);
-  return json({ collected: { herb: store.herb, name: content.herbsById[store.herb].name, count: taken }, character: characterView(await loadPlayer(context.env.DB, session.userId), now) });
+  return json({ collected: { herb: store.herb, name: content().herbsById[store.herb].name, count: taken }, character: characterView(await loadPlayer(context.env.DB, session.userId), now) });
 }
 
 // The Zbrojownia (421 A): "Zapisz zestaw" keeps what the character wears,
@@ -170,16 +170,16 @@ export async function collectGreenhouse(context) {
 // by hand. The items of the sets not worn hang on its racks, out of the
 // bag; "Usuń zestaw" empties one. What a change takes off the racks or off
 // the character goes to the bag, and the change waits while it does not fit.
-const armory = () => content.buildings.find((building) => building.fortress && building.effect.kind === 'gearSets');
+const armory = () => content().buildings.find((building) => building.fortress && building.effect.kind === 'gearSets');
 
 // The set asked for, the sets, and the bag's free places.
 function armoryRequest(player, now, body) {
-  const levels = campLevels(player.buildings, now, content);
-  const count = fortressOn() ? gearSetCount(levels, content) : 0;
+  const levels = campLevels(player.buildings, now, content());
+  const count = fortressOn() ? gearSetCount(levels, content()) : 0;
   if (count <= 0) throw new ApiError(409, 'no_armory', 'Zestawy ekwipunku zapisuje Zbrojownia w Warowni.');
   const index = body.index;
   if (!Number.isInteger(index) || index < 0 || index >= count) throw new ApiError(400, 'invalid_set', 'Nie ma takiego zestawu.');
-  return { index, sets: gearSetsOf(player.row), room: bagCapacity(levels, content) - bagPlaces(player) };
+  return { index, sets: gearSetsOf(player.row), room: bagCapacity(levels, content()) - bagPlaces(player) };
 }
 
 // The set's name: the player's, without control characters or extra
@@ -234,7 +234,7 @@ export async function wearGearSet(context) {
   const { row } = player;
   const plan = gearSetPlan(sets, index, player.items);
   // Only what the character may wear now (as equipItem asks).
-  const wear = plan.wear.filter((item) => !content.slotsById[item.slot].locked && canUse(item.base, row.class_id, content, row.class_level));
+  const wear = plan.wear.filter((item) => !content().slotsById[item.slot].locked && canUse(item.base, row.class_id, content(), row.class_level));
   if (wear.length === 0) throw new ApiError(409, 'empty_set', 'W tym zestawie nie ma niczego do założenia.');
   if (plan.toBag.length > 0 && plan.toBag.length > room) throw new ApiError(409, 'bag_full', 'Plecak nie zmieści zdejmowanych rzeczy.');
   const db = context.env.DB;

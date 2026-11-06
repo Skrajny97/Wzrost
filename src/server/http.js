@@ -1,8 +1,11 @@
 // JSON responses and request parsing shared by all API handlers.
 
+import { translateMessage } from './i18n.js';
+
 const MAX_BODY_BYTES = 4096;
 
-// An error that is safe to show to the player: `message` is in Polish.
+// An error that is safe to show to the player: `message` is in Polish, and
+// the answer gives it in the request's language (i18n.js).
 export class ApiError extends Error {
   constructor(status, code, message, headers = {}) {
     super(message);
@@ -25,7 +28,7 @@ export function json(data, status = 200, headers = {}) {
 }
 
 export function errorResponse(error) {
-  return json({ error: { code: error.code, message: error.message } }, error.status, error.headers);
+  return json({ error: { code: error.code, message: translateMessage(error.message) } }, error.status, error.headers);
 }
 
 const invalidBody = () => new ApiError(400, 'invalid_json', 'Nieprawidłowe dane żądania.');

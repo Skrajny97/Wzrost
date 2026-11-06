@@ -53,16 +53,16 @@ export async function startBrewing(context) {
   const body = await readJson(context.request);
   const { session, player, avatar } = await requireWorker(context, body);
   requireProfessions(player);
-  const { brewing } = content;
+  const { brewing } = content();
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), brewing.profession);
-  const potion = typeof body.recipe === 'string' ? content.potionsById[body.recipe] : undefined;
+  const potion = typeof body.recipe === 'string' ? content().potionsById[body.recipe] : undefined;
   // From its level, and a rare one of the herbalist's once she has taught
   // it (121 A, potionKnown).
   if (!potion || !potionKnown(player.row, potion)) throw new ApiError(400, 'unknown_recipe', 'Tego przepisu jeszcze nie znasz.');
   const herbs = herbsOf(player.row);
   // The Bractwo Zielarzy brews faster (589 B), for the Awatar's work too.
   const faster = perkOf(player.row, 'brewFaster');
-  let most = mostPotions(potion, level, herbs, content, faster);
+  let most = mostPotions(potion, level, herbs, content(), faster);
   if (most === 0) throw new ApiError(409, 'no_herbs', 'Brakuje ziół na tę miksturę.');
   // A recipe with a catalyst (proposal 3: "Wybrane mikstury biorą jeden
   // materiał stwora") takes a piece of its material a potion, of the grade
@@ -70,8 +70,8 @@ export async function startBrewing(context) {
   const materials = JSON.parse(player.row.materials ?? '{}');
   const catalystKey = potion.catalyst ? body.catalyst : null;
   if (potion.catalyst) {
-    const have = knownStack(catalystKey, content) && parseStack(catalystKey).materialId === potion.catalyst ? (materials[catalystKey] ?? 0) : 0;
-    if (have === 0) throw new ApiError(409, 'no_catalyst', `Ta mikstura bierze też katalizator: ${content.materialsById[potion.catalyst].name}.`);
+    const have = knownStack(catalystKey, content()) && parseStack(catalystKey).materialId === potion.catalyst ? (materials[catalystKey] ?? 0) : 0;
+    if (have === 0) throw new ApiError(409, 'no_catalyst', `Ta mikstura bierze też katalizator: ${content().materialsById[potion.catalyst].name}.`);
     most = Math.min(most, have);
   }
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > most) {
@@ -80,7 +80,7 @@ export async function startBrewing(context) {
   const catalyst = catalystKey ? { key: catalystKey, count: body.count } : null;
 
   const now = context.now;
-  const minutes = brewMinutes(body.count, level, content, faster);
+  const minutes = brewMinutes(body.count, level, content(), faster);
   const used = potionHerbs(potion, body.count);
   const left = Object.fromEntries(Object.entries(herbs).map(([id, count]) => [id, count - (used[id] ?? 0)]).filter(([, count]) => count > 0));
   const { hp } = currentHp(player, now);
@@ -130,12 +130,12 @@ export async function startBrewing(context) {
 export async function finishBrewing(db, player, now, { stop = false, avatar = false } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
-  const { brewing } = content;
-  const profession = content.professionsById[brewing.profession];
+  const { brewing } = content();
+  const profession = content().professionsById[brewing.profession];
   const before = professionState(JSON.parse(row.professions ?? '{}'), profession.id);
   const options = JSON.parse(activity.options ?? '{}');
   // A recipe the data no longer has brews nothing.
-  const potion = content.potionsById[options.recipe];
+  const potion = content().potionsById[options.recipe];
   const count = potion ? options.count : 0;
   const elapsed = now - activity.started_at;
   const done = stop ? potionsDone(count, activity.minutes, elapsed) : count;
@@ -144,7 +144,7 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
   const used = options.herbs ?? {};
   const back = Object.fromEntries(
     Object.entries(used)
-      .filter(([id]) => content.herbsById[id])
+      .filter(([id]) => content().herbsById[id])
       .map(([id, amount]) => [id, amount - Math.round((amount * done) / Math.max(1, options.count))]),
   );
   const herbs = herbsOf(row);
@@ -152,7 +152,7 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
   const herbsBack = addTo('herbs', back);
   // The catalyst: a piece a potion brewed, the rest back; its grade raises
   // every potion's chance of an extra one (catalystChance).
-  const catalyst = options.catalyst && knownStack(options.catalyst.key, content) ? options.catalyst : null;
+  const catalyst = options.catalyst && knownStack(options.catalyst.key, content()) ? options.catalyst : null;
   const catalystsBack = addTo('materials', catalyst ? { [catalyst.key]: catalyst.count - Math.min(catalyst.count, done) } : {});
   // Only while the activity is as seen, so two calls at once give back once.
   const ongoing = `EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ?)`;
@@ -176,15 +176,15 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
     return null;
   }
 
-  const made = brewPotions({ count: done, seed: activity.seed, extraChance: catalystChance(catalyst?.key, content) }, content);
-  const capacity = bagCapacity(campLevels(player.buildings, now, content), content);
-  const taken = bagItems(player).length + bagStacks(herbs, content) + bagStacks(potionsOf(row), content);
-  const { stored, lost } = storeStacks(potionsOf(row), { [potion.id]: made.count }, capacity - taken, content);
+  const made = brewPotions({ count: done, seed: activity.seed, extraChance: catalystChance(catalyst?.key, content()) }, content());
+  const capacity = bagCapacity(campLevels(player.buildings, now, content()), content());
+  const taken = bagItems(player).length + bagStacks(herbs, content()) + bagStacks(potionsOf(row), content());
+  const { stored, lost } = storeStacks(potionsOf(row), { [potion.id]: made.count }, capacity - taken, content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);
   const report = {
     ...brewingReport(
       { potion, minutes: worked, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, made, stored, lost, stopped: stop, before, after, character, xp, work, settlement: settlementPointsOf(row) },
-      content,
+      content(),
     ),
     ...(avatar && { avatar: true }),
   };
@@ -237,12 +237,12 @@ function alreadyDone() {
 // How many of a potion the request names: a whole number from 1 to what the
 // character has.
 function potionCount(player, body) {
-  const potion = typeof body.potionId === 'string' ? content.potionsById[body.potionId] : undefined;
+  const potion = typeof body.potionId === 'string' ? content().potionsById[body.potionId] : undefined;
   if (!potion) throw new ApiError(400, 'unknown_potion', 'Nie ma takiej mikstury.');
   const have = potionsOf(player.row)[potion.id] ?? 0;
   if (have === 0) throw new ApiError(404, 'no_potion', 'Nie masz tej mikstury.');
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > have) throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${have} sztuk.`);
-  return { id: potion.id, price: potionPrice(potion, content), have, count: body.count };
+  return { id: potion.id, price: potionPrice(potion, content()), have, count: body.count };
 }
 
 // The scrapper buys potions for priceFactor times their herbs, with the
@@ -251,7 +251,7 @@ export async function sellPotions(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const taken = potionCount(player, body);
-  const bonus = campBonus(campLevels(player.buildings, context.now, content), 'sellPrice', content);
+  const bonus = campBonus(campLevels(player.buildings, context.now, content()), 'sellPrice', content());
   const gold = saleGold(taken.price * (1 + bonus), taken.count);
   const result = await takeFromBag(context.env.DB, player, 'potions', taken, gold);
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Mikstury zmieniły się w międzyczasie. Spróbuj ponownie.');
@@ -268,16 +268,16 @@ export async function sellPotions(context) {
 export async function drinkPotion(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
-  const chosen = typeof body.potionId === 'string' ? content.potionsById[body.potionId] : undefined;
+  const chosen = typeof body.potionId === 'string' ? content().potionsById[body.potionId] : undefined;
   const taken = potionCount(player, { potionId: body.potionId, count: chosen && timedKind(chosen) ? (body.count ?? 1) : 1 });
-  const potion = content.potionsById[taken.id];
+  const potion = content().potionsById[taken.id];
   const kind = timedKind(potion);
   if (!potion.effect.heal && !kind) {
     throw new ApiError(409, 'fight_only', potion.effect.mana ? 'Ta mikstura działa sama w walce, gdy zabraknie many na umiejętność.' : 'Ta mikstura działa sama na wyprawie.');
   }
   // One got in a Wymiana waits for its recipe (DECISIONS.md, "Wymiana").
   if (!potionKnown(player.row, potion)) throw new ApiError(409, 'unknown_recipe', `Nie znasz jeszcze receptury: ${potion.name}.`);
-  const texts = content.potionUse.texts;
+  const texts = content().potionUse.texts;
   const now = context.now;
   let also;
   let text;
@@ -300,7 +300,7 @@ export async function drinkPotion(context) {
     // long; several at once by their count, as a report counts potions.
     const key = `drunk${kind[0].toUpperCase()}${kind.slice(1)}`;
     const drunk = taken.count > 1 ? `${taken.count} × ${potion.name}` : potion.counted[0];
-    text = say(texts, key, 0, { potion: drunk, bonus: Math.round(buffs[kind].bonus * 100), fights: fightsText(buffLeft(buffs, kind), content) });
+    text = say(texts, key, 0, { potion: drunk, bonus: Math.round(buffs[kind].bonus * 100), fights: fightsText(buffLeft(buffs, kind), content()) });
     // On a Drużyna's trip the fights are the same for all who went, as it
     // set out, so what is drunk on the way works from the next exploration
     // (claimWindows in potions.js).

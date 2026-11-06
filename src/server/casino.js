@@ -46,7 +46,7 @@ import { guildTagSql } from './guilds.js';
 import { counted, foreign } from './market.js';
 import { requireOpen, settlementOf } from './settlement.js';
 
-const tuning = () => content.settlement.casino;
+const tuning = () => content().settlement.casino;
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 const newSeed = () => toHex(crypto.getRandomValues(new Uint8Array(16)));
 const goldText = (gold) => new Intl.NumberFormat('pl-PL').format(gold);
@@ -59,10 +59,10 @@ const announcement = ({ name, appearance, pot }) => gendered(tuning().texts.anno
 // camp's Skup złomu, and the Garbarnia's premium at its relation with the
 // tanner.
 function bonusesOf(player, stored, now) {
-  const { tannery } = content.settlement;
+  const { tannery } = content().settlement;
   return {
-    sellBonus: campBonus(campLevels(player.buildings, now, content), 'sellPrice', content),
-    tanneryPremium: tannery ? tanneryPremium(stored.relations[tannery.resident] ?? 0, content) + brotherhoodPerk('tanneryPremium', stored.reputation, content) : 0,
+    sellBonus: campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content()),
+    tanneryPremium: tannery ? tanneryPremium(stored.relations[tannery.resident] ?? 0, content()) + brotherhoodPerk('tanneryPremium', stored.reputation, content()) : 0,
   };
 }
 
@@ -73,7 +73,7 @@ const seedOf = (row) => `${row.id}:casino`;
 // from the character as it is now.
 function wheelOf(player, stored, now) {
   const { level, classId, classLevel } = engineCharacter(player.row);
-  return wheelDay(stored.casino, { level, classId, classLevel, ...bonusesOf(player, stored, now) }, now, content);
+  return wheelDay(stored.casino, { level, classId, classLevel, ...bonusesOf(player, stored, now) }, now, content());
 }
 
 // A new Wheel of the day is kept in the Osada at once, as the Tablica's
@@ -85,27 +85,27 @@ async function keepWheel(db, row, stored, wheel) {
 
 // The stake asked for when it is one of the day's, or else the lowest.
 function stakeOf(wheel, asked) {
-  const stakes = dayStakes(wheel, content);
+  const stakes = dayStakes(wheel, content());
   return stakes.includes(asked) ? asked : stakes[0];
 }
 
 // The bag's free places, for an item of the pool.
-const bagFree = (player, now) => Math.max(0, bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player));
+const bagFree = (player, now) => Math.max(0, bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player));
 
 // A prize as the Salon shows it, with its tier: an item with its card (its
 // price at the character's scrapper), materials as the Targowisko shows a
 // stack, or the camp's resources; `worth` is what it is worth to the
 // character (prizeWorth).
 function prizeView(prize, won, bonuses) {
-  const worth = Math.floor(prizeWorth(prize, bonuses, content));
+  const worth = Math.floor(prizeWorth(prize, bonuses, content()));
   const tier = prize.tier;
   if (prize.kind === 'item') {
-    return { kind: 'item', tier, won, worth, name: itemName(prize.item, content), rarity: prize.item.rarity, level: prize.item.level, item: itemView(prize.item, content, { sellBonus: bonuses.sellBonus }) };
+    return { kind: 'item', tier, won, worth, name: itemName(prize.item, content()), rarity: prize.item.rarity, level: prize.item.level, item: itemView(prize.item, content(), { sellBonus: bonuses.sellBonus }) };
   }
   if (prize.kind === 'resource') {
-    return { kind: 'resource', tier, won, worth, key: prize.key, count: prize.count, name: content.resourcesById[prize.key].name };
+    return { kind: 'resource', tier, won, worth, key: prize.key, count: prize.count, name: content().resourcesById[prize.key].name };
   }
-  const material = materialView(prize.key, prize.count, content);
+  const material = materialView(prize.key, prize.count, content());
   return {
     kind: 'material',
     tier,
@@ -116,8 +116,8 @@ function prizeView(prize, won, bonuses) {
     name: material.label.charAt(0).toUpperCase() + material.label.slice(1),
     rarity: material.rarity,
     material,
-    description: content.materialsById[material.materialId].description,
-    scrap: materialPrice(material.rarity, content) * (1 + bonuses.sellBonus),
+    description: content().materialsById[material.materialId].description,
+    scrap: materialPrice(material.rarity, content()) * (1 + bonuses.sellBonus),
   };
 }
 
@@ -127,8 +127,8 @@ function prizeView(prize, won, bonuses) {
 // character has its ticket, and the last draw, with the System's words of
 // it.
 async function lotteryView(db, row, now) {
-  const day = casinoDay(now, content);
-  const yesterday = casinoDay(day.startsAt - 1, content).key;
+  const day = casinoDay(now, content());
+  const yesterday = casinoDay(day.startsAt - 1, content()).key;
   const [holders, last] = await db.batch([
     db
       .prepare(
@@ -146,7 +146,7 @@ async function lotteryView(db, row, now) {
     ticket: lottery.ticket,
     base: lottery.base,
     tickets,
-    pot: lotteryPot(tickets, content),
+    pot: lotteryPot(tickets, content()),
     players: holders.results.map((holder) => ({ name: holder.name, guildTag: holder.guild_tag ?? null })),
     mine: holders.results.some((holder) => holder.character_id === row.id),
     endsAt: day.endsAt,
@@ -160,9 +160,9 @@ async function lotteryView(db, row, now) {
 async function casinoView(db, player, stored, wheel, stake, now) {
   const bonuses = bonusesOf(player, stored, now);
   const { wheel: tuned, texts } = tuning();
-  const pool = wheelPool(wheel, seedOf(player.row), content);
+  const pool = wheelPool(wheel, seedOf(player.row), content());
   const left = prizesLeft(pool);
-  const stakes = dayStakes(wheel, content);
+  const stakes = dayStakes(wheel, content());
   return {
     texts,
     // The games on the screen: the Wheel turning, the ticket into the drum.
@@ -174,9 +174,9 @@ async function casinoView(db, player, stored, wheel, stake, now) {
       none: tuned.none,
       tiers: tuned.tiers.map(({ id, name, count }) => ({ id, name, count })),
       stakes,
-      odds: stakes.map((one) => wheelOdds(one, stakes, content)),
+      odds: stakes.map((one) => wheelOdds(one, stakes, content())),
       stake,
-      endsAt: casinoDay(now, content).endsAt,
+      endsAt: casinoDay(now, content()).endsAt,
       prizes: pool.prizes.map((prize, index) => prizeView(prize, pool.won.includes(index), bonuses)),
       left: left.length,
       itemLeft: left.some((index) => pool.prizes[index].kind === 'item'),
@@ -219,9 +219,9 @@ export async function buyTicket(context) {
     () => null,
   );
   const db = context.env.DB;
-  const day = casinoDay(context.now, content).key;
+  const day = casinoDay(context.now, content()).key;
   const has = await db.prepare('SELECT 1 AS ok FROM lottery_tickets WHERE day = ? AND character_id = ?').bind(day, row.id).first();
-  const block = ticketBlock({ gold: row.gold, has: Boolean(has) }, content);
+  const block = ticketBlock({ gold: row.gold, has: Boolean(has) }, content());
   if (block) throw new ApiError(409, block.code, block.message);
   const { resident, relationGain, lottery } = tuning();
   const stored = settlementOf(row);
@@ -257,15 +257,15 @@ export async function spinCasinoWheel(context) {
   const now = context.now;
   const stored = settlementOf(row);
   const wheel = wheelOf(player, stored, now);
-  const stakes = dayStakes(wheel, content);
+  const stakes = dayStakes(wheel, content());
   const stake = body.stake;
-  const pool = wheelPool(wheel, seedOf(row), content);
+  const pool = wheelPool(wheel, seedOf(row), content());
   const left = prizesLeft(pool);
   const itemLeft = left.some((index) => pool.prizes[index].kind === 'item');
-  const block = spinBlock(stake, { gold: row.gold, stakes, left: left.length, itemLeft, bagFree: bagFree(player, now) }, content);
+  const block = spinBlock(stake, { gold: row.gold, stakes, left: left.length, itemLeft, bagFree: bagFree(player, now) }, content());
   if (block) throw new ApiError(block.code === 'invalid_stake' ? 400 : 409, block.code, block.message);
   // The spin's own seed, which nobody knows before it.
-  const result = spinWheel(pool, wheelOdds(stake, stakes, content), newSeed());
+  const result = spinWheel(pool, wheelOdds(stake, stakes, content()), newSeed());
   const prize = result.win ? pool.prizes[result.prize] : null;
   const next = { ...stored, casino: result.win ? wheelWon(wheel, result.prize) : wheel };
   const db = context.env.DB;
@@ -296,7 +296,7 @@ export async function spinCasinoWheel(context) {
 // The draw of each day gone by with tickets, at the minute's cron, so at
 // Polish midnight (src/server/index.js): see drawLottery.
 export async function drawLotteries(db, now) {
-  const today = casinoDay(now, content).key;
+  const today = casinoDay(now, content()).key;
   const { results } = await db.prepare('SELECT DISTINCT day FROM lottery_tickets WHERE day < ? ORDER BY day').bind(today).all();
   const draws = [];
   for (const { day } of results) {
@@ -319,7 +319,7 @@ async function drawLottery(db, day, now) {
   if (tickets.length === 0) return null;
   const seed = newSeed();
   const winner = tickets[lotteryWinner(tickets.length, seed)];
-  const pot = lotteryPot(tickets.length, content);
+  const pot = lotteryPot(tickets.length, content());
   const text = announcement({ ...winner, pot });
   try {
     await db.batch([
@@ -338,7 +338,7 @@ async function drawLottery(db, day, now) {
           `INSERT INTO chat_messages (channel, user_id, character_id, name, level, class_id, text, created_at, system)
            SELECT ?, user_id, id, name, level, class_id, ?, ?, 1 FROM characters WHERE id = ?`,
         )
-        .bind(content.chat.channels[0].id, text, now, winner.character_id),
+        .bind(content().chat.channels[0].id, text, now, winner.character_id),
       db.prepare('DELETE FROM lottery_tickets WHERE day = ?').bind(day),
     ]);
   } catch (error) {

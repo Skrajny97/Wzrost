@@ -17,11 +17,11 @@ import { ApiError, json, readJson } from './http.js';
 const STATUS = { invalid_cosmetic: 400, invalid_kind: 400, not_owned: 403 };
 
 // What the character of a row owns and wears.
-export const cosmeticsOfRow = (row) => cosmeticsOf(JSON.parse(row.cosmetics ?? '{}'), content);
+export const cosmeticsOfRow = (row) => cosmeticsOf(JSON.parse(row.cosmetics ?? '{}'), content());
 
 // The colour of the name of the character whose cosmetics column `text`
 // holds (from a list's query), or null.
-export const nameColorOf = (text) => nameColor(JSON.parse(text ?? '{}'), content);
+export const nameColorOf = (text) => nameColor(JSON.parse(text ?? '{}'), content());
 
 // How the character of a row looks on the way, for another player's Walka
 // scene (scenes.js): its class, look and skin tone, its evolution's form,
@@ -31,12 +31,12 @@ export const nameColorOf = (text) => nameColor(JSON.parse(text ?? '{}'), content
 // mercenaries.js).
 export function wayLook(row) {
   const worn = cosmeticsOfRow(row);
-  const mount = settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content) : null;
+  const mount = settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content()) : null;
   return {
     classId: row.class_id,
     appearance: row.appearance,
-    skin: row.skin ?? content.defaultSkin,
-    evolution: content.evolutionsById[row.evolution] ? row.evolution : null,
+    skin: row.skin ?? content().defaultSkin,
+    evolution: content().evolutionsById[row.evolution] ? row.evolution : null,
     mount: mount?.id ?? null,
     mountSkin: worn.mountSkin,
     aura: worn.aura,
@@ -67,10 +67,10 @@ export async function buyCosmetic(context) {
   const { row } = player;
   const body = await readJson(context.request);
   const stored = cosmeticsOfRow(row);
-  const mount = settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content) : null;
-  const block = cosmeticBlock(body.id, stored, { systemPoints: row.system_points, mount }, content);
+  const mount = settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content()) : null;
+  const block = cosmeticBlock(body.id, stored, { systemPoints: row.system_points, mount }, content());
   if (block) throw refuse(block);
-  const item = content.cosmeticsById[body.id];
+  const item = content().cosmeticsById[body.id];
   const after = await save(context, session, row, { ...stored, owned: [...stored.owned, item.id] }, item.price);
   return json({ bought: { id: item.id, name: item.name, price: item.price }, character: characterView(after, context.now) });
 }
@@ -82,7 +82,7 @@ export async function wearCosmetic(context) {
   const body = await readJson(context.request);
   const id = body.id ?? null;
   const stored = cosmeticsOfRow(player.row);
-  const block = wearBlock(body.kind, id, stored, content);
+  const block = wearBlock(body.kind, id, stored, content());
   if (block) throw refuse(block);
   const after = await save(context, session, player.row, { ...stored, [body.kind]: id });
   return json({ character: characterView(after, context.now) });

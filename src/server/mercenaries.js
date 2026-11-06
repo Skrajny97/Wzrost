@@ -26,7 +26,7 @@ import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const HOUR = 3600000;
-const rules = () => mercenariesOf(content);
+const rules = () => mercenariesOf(content());
 const words = () => rules().texts;
 // A placeholder the values do not name stays, for the page to fill ({time}).
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (all, name) => (name in vars ? String(vars[name]) : all));
@@ -66,8 +66,8 @@ export const serviceEnded = (activity, now) => activity?.kind === 'mercenary' &&
 // What a character may offer, for the Karczma's form, or null below the
 // mercenaries' level.
 export function mercenaryRules(row) {
-  if (!mercenariesOpen(row.level, content)) return null;
-  return { hours: rules().hours, price: mercenaryPriceRange(row.level, content), fromLevel: rules().fromLevel, texts: words() };
+  if (!mercenariesOpen(row.level, content())) return null;
+  return { hours: rules().hours, price: mercenaryPriceRange(row.level, content()), fromLevel: rules().fromLevel, texts: words() };
 }
 
 // POST /api/mercenary/offer { hours, perHour }: the character offers
@@ -75,10 +75,10 @@ export function mercenaryRules(row) {
 export async function offerMercenary(context) {
   const { session, player } = await requireIdlePlayer(context);
   const { row } = player;
-  if (!mercenariesOpen(row.level, content)) throw new ApiError(403, 'locked', filled(words().locked, { level: rules().fromLevel }));
+  if (!mercenariesOpen(row.level, content())) throw new ApiError(403, 'locked', filled(words().locked, { level: rules().fromLevel }));
   const body = await readJson(context.request);
   if (!rules().hours.includes(body.hours)) throw new ApiError(400, 'invalid_hours', words().invalidHours);
-  const range = mercenaryPriceRange(row.level, content);
+  const range = mercenaryPriceRange(row.level, content());
   if (!Number.isInteger(body.perHour) || body.perHour < range.min || body.perHour > range.max) {
     throw new ApiError(400, 'invalid_price', filled(words().invalidPrice, { min: number(range.min), max: number(range.max) }));
   }
@@ -151,10 +151,10 @@ export async function claimMercenary(context) {
 export async function listMercenaries(context) {
   const { player } = await requirePlayer(context);
   const { row } = player;
-  if (!mercenariesOpen(row.level, content)) return json({ mercenaries: [] });
+  if (!mercenariesOpen(row.level, content())) return json({ mercenaries: [] });
   const asked = Number(new URL(context.request.url).searchParams.get('minutes'));
   const minutes = Number.isFinite(asked) && asked > 0 ? asked : 60;
-  const spread = content.balance.parties.classSpread;
+  const spread = content().balance.parties.classSpread;
   const { results } = await context.env.DB.prepare(
     `SELECT c.*, a.options AS offer, a.ends_at AS offer_ends
      FROM activities a JOIN characters c ON c.id = a.character_id
@@ -171,7 +171,7 @@ export async function listMercenaries(context) {
         id: one.id,
         name: one.name,
         classId: one.class_id,
-        className: classNameOf(engineCharacter(one), content),
+        className: classNameOf(engineCharacter(one), content()),
         level: one.level,
         classLevel: one.class_level,
         female: one.appearance === 'female',
@@ -194,7 +194,7 @@ export async function listMercenaries(context) {
 export async function hireMercenary(db, player, asked, { area, minutes, startsAt, endsAt, now, plain }) {
   const { row } = player;
   if (!plain) throw new ApiError(400, 'mercenary_plain_only', words().plainOnly);
-  if (!mercenariesOpen(row.level, content)) throw new ApiError(403, 'locked', filled(words().locked, { level: rules().fromLevel }));
+  if (!mercenariesOpen(row.level, content())) throw new ApiError(403, 'locked', filled(words().locked, { level: rules().fromLevel }));
   if (!asked || typeof asked !== 'object' || !Number.isInteger(asked.id) || !Number.isInteger(asked.perHour)) throw new ApiError(400, 'invalid_mercenary', words().gone);
   const mercenary = await loadCharacter(db, asked.id);
   const offer = offerOf(mercenary?.activity);
@@ -202,8 +202,8 @@ export async function hireMercenary(db, player, asked, { area, minutes, startsAt
     throw new ApiError(409, 'mercenary_gone', words().gone);
   }
   if (mercenary.row.user_id === row.user_id) throw new ApiError(403, 'own_mercenary', words().own);
-  if (!mercenaryFits(row.class_level, mercenary.row.class_level, content)) {
-    throw new ApiError(403, 'mercenary_spread', filled(words().spread, { spread: content.balance.parties.classSpread }));
+  if (!mercenaryFits(row.class_level, mercenary.row.class_level, content())) {
+    throw new ApiError(403, 'mercenary_spread', filled(words().spread, { spread: content().balance.parties.classSpread }));
   }
   if (offer.perHour !== asked.perHour) throw new ApiError(409, 'mercenary_changed', words().priceChanged);
   const fee = mercenaryFee(offer.perHour, minutes);

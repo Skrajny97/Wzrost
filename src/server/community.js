@@ -16,13 +16,13 @@ import { ApiError, json, readJson } from './http.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const DAY = 86400000;
-const today = (now) => questPeriod('daily', now, content).key;
+const today = (now) => questPeriod('daily', now, content()).key;
 // The first day whose Upominek still waits to be collected.
-const firstKept = (now) => questPeriod('daily', now - (content.community.gift.keepDays - 1) * DAY, content).key;
+const firstKept = (now) => questPeriod('daily', now - (content().community.gift.keepDays - 1) * DAY, content()).key;
 
 // The highest level of the character's professions (characters.professions,
 // {"herbalism": {"level": 3, ...}}), 0 before its first work.
-const levels = content.professions.map(({ id }) => `coalesce(json_extract(c.professions, '$.${id}.level'), 0)`);
+const levels = content().professions.map(({ id }) => `coalesce(json_extract(c.professions, '$.${id}.level'), 0)`);
 const PROFESSION_LEVEL = levels.length > 1 ? `max(${levels.join(', ')})` : levels[0];
 
 // The Ranking's orders: by the character's level, by its class's, or by its
@@ -49,7 +49,7 @@ export async function ranking(context) {
          FROM characters c JOIN users u ON u.id = c.user_id
          WHERE c.${OWN_CHARACTERS}${where} ORDER BY ${order} LIMIT ?`,
       )
-      .bind(content.community.ranking.size),
+      .bind(content().community.ranking.size),
     db
       .prepare(`SELECT place FROM (SELECT c.id, ROW_NUMBER() OVER (ORDER BY ${order}) AS place FROM characters c WHERE c.${OWN_CHARACTERS}${where}) WHERE id = ?`)
       .bind(character.id),
@@ -63,10 +63,10 @@ export async function ranking(context) {
       nameColor: nameColorOf(row.cosmetics),
       classId: row.class_id,
       // The evolution's name, a woman's for a female character.
-      className: content.classesById[row.class_id] ? classNameOf({ classId: row.class_id, evolution: row.evolution, appearance: row.appearance }, content) : row.class_id,
+      className: content().classesById[row.class_id] ? classNameOf({ classId: row.class_id, evolution: row.evolution, appearance: row.appearance }, content()) : row.class_id,
       level: row.level,
       classLevel: row.class_level,
-      profession: highestProfession(JSON.parse(row.professions ?? '{}'), content),
+      profession: highestProfession(JSON.parse(row.professions ?? '{}'), content()),
       role: chatRole(context.env, row),
       own: row.id === character.id,
     })),
@@ -88,14 +88,14 @@ export async function friendsView(context) {
 // turned off or blocked between the two), offline otherwise, also when the
 // character waits aside.
 function friendStatus(row, now) {
-  const { onlineSeconds } = content.community.trade;
+  const { onlineSeconds } = content().community.trade;
   if (row.role !== 'player' || !((row.seen_at ?? 0) >= now - onlineSeconds * 1000)) return 'offline';
   return row.away || row.trading || row.trade_off || row.blocked ? 'busy' : 'online';
 }
 
 async function friendsOf(db, id, now) {
   const day = today(now);
-  const { proposalSeconds, idleMinutes } = content.community.trade;
+  const { proposalSeconds, idleMinutes } = content().community.trade;
   const viewer = '(SELECT user_id FROM characters WHERE id = ?)';
   const [rows, sent, waiting, claimed] = await db.batch([
     db
@@ -131,8 +131,8 @@ async function friendsOf(db, id, now) {
     classLevel: row.class_level,
   });
   const pending = rows.results.filter((row) => row.accepted_at === null);
-  const { max } = content.community.friends;
-  const { claimsPerDay } = content.community.gift;
+  const { max } = content().community.friends;
+  const { claimsPerDay } = content().community.gift;
   return {
     friends: rows.results
       .filter((row) => row.accepted_at !== null)
@@ -167,7 +167,7 @@ export async function friendNews(db, id, now) {
     .first();
   return {
     invites: row.invites,
-    gifts: Math.min(row.waiting, Math.max(0, content.community.gift.claimsPerDay - row.claimed)),
+    gifts: Math.min(row.waiting, Math.max(0, content().community.gift.claimsPerDay - row.claimed)),
     unsent: row.unsent,
   };
 }
@@ -204,8 +204,8 @@ export async function inviteFriend(context) {
   // Nor another character of the same account: an Upominek between them
   // would be a trade (the author's 177 A).
   if (target.user_id === session.userId) throw new ApiError(400, 'self', `${target.name} to Twoja postać. Swoich postaci nie zaprosisz.`);
-  if (!isUnlocked('community', target.level, content)) {
-    throw new ApiError(409, 'locked', `${target.name} nie ma jeszcze Społeczności. Otworzy się na ${content.unlocksById.community.level}. poziomie.`);
+  if (!isUnlocked('community', target.level, content())) {
+    throw new ApiError(409, 'locked', `${target.name} nie ma jeszcze Społeczności. Otworzy się na ${content().unlocksById.community.level}. poziomie.`);
   }
   const existing = await db
     .prepare('SELECT id, character_id, accepted_at FROM friends WHERE (character_id = ? AND friend_id = ?) OR (character_id = ? AND friend_id = ?)')
@@ -214,7 +214,7 @@ export async function inviteFriend(context) {
   if (existing?.accepted_at) throw new ApiError(409, 'friends', `${target.name} jest już wśród Twoich znajomych.`);
   if (existing?.character_id === character.id) throw new ApiError(409, 'invited', `Zaproszenie dla postaci ${target.name} już czeka.`);
   if (existing) return accept(context, db, character.id, existing.id);
-  const { max } = content.community.friends;
+  const { max } = content().community.friends;
   const taken = await db
     .prepare(
       `SELECT (SELECT COUNT(*) FROM friends WHERE (character_id = ? OR friend_id = ?) AND accepted_at IS NOT NULL)
@@ -240,7 +240,7 @@ async function accept(context, db, id, friendshipId) {
     .bind(friendshipId, id)
     .first();
   if (!row) throw new ApiError(404, 'no_invitation', 'Tego zaproszenia już nie ma.');
-  const { max } = content.community.friends;
+  const { max } = content().community.friends;
   const [own, theirs] = await Promise.all([friendCount(db, id), friendCount(db, row.character_id)]);
   if (own.count >= max) throw new ApiError(409, 'full', `Masz już ${max} znajomych. Usuń kogoś, żeby przyjąć zaproszenie.`);
   if (theirs.count >= max) throw new ApiError(409, 'full', `${row.name} ma już ${max} znajomych.`);
@@ -271,13 +271,13 @@ export async function sendGift(context) {
     .first();
   if (!row) throw new ApiError(404, 'no_friend', 'Tej postaci nie ma wśród Twoich znajomych.');
   const [first, second] = crypto.getRandomValues(new Uint32Array(2));
-  const reward = giftReward(row.level, [first / 2 ** 32, second / 2 ** 32], content);
+  const reward = giftReward(row.level, [first / 2 ** 32, second / 2 ** 32], content());
   const result = await db
     .prepare('INSERT OR IGNORE INTO gifts (sender_id, receiver_id, day, created_at, reward) VALUES (?, ?, ?, ?, ?)')
     .bind(character.id, row.id, today(context.now), context.now, JSON.stringify(reward))
     .run();
-  if (result.meta.changes !== 1) throw new ApiError(409, 'sent', `Dziś ${row.name} dostaje już od Ciebie ${content.community.gift.name}. Kolejny jutro.`);
-  return json({ ...(await friendsOf(db, character.id, context.now)), text: `${content.community.gift.name} wysłany: ${row.name} odbierze go w Znajomych.` });
+  if (result.meta.changes !== 1) throw new ApiError(409, 'sent', `Dziś ${row.name} dostaje już od Ciebie ${content().community.gift.name}. Kolejny jutro.`);
+  return json({ ...(await friendsOf(db, character.id, context.now)), text: `${content().community.gift.name} wysłany: ${row.name} odbierze go w Znajomych.` });
 }
 
 // POST /api/friends/gift-all: today's Upominek to every friend not given
@@ -297,11 +297,11 @@ export async function sendAllGifts(context) {
       .bind(character.id, character.id, character.id, character.id, day)
       .all()
   ).results;
-  if (rows.length === 0) throw new ApiError(409, 'sent', `Dziś każdy znajomy dostał już od Ciebie ${content.community.gift.name}. Kolejne jutro.`);
+  if (rows.length === 0) throw new ApiError(409, 'sent', `Dziś każdy znajomy dostał już od Ciebie ${content().community.gift.name}. Kolejne jutro.`);
   const results = await db.batch(
     rows.map((row) => {
       const [first, second] = crypto.getRandomValues(new Uint32Array(2));
-      const reward = giftReward(row.level, [first / 2 ** 32, second / 2 ** 32], content);
+      const reward = giftReward(row.level, [first / 2 ** 32, second / 2 ** 32], content());
       return db
         .prepare('INSERT OR IGNORE INTO gifts (sender_id, receiver_id, day, created_at, reward) VALUES (?, ?, ?, ?, ?)')
         .bind(character.id, row.id, day, context.now, JSON.stringify(reward));
@@ -318,9 +318,9 @@ export async function claimGifts(context) {
   const { session, character, db } = await requireChatter(context);
   const now = context.now;
   const day = today(now);
-  const { claimsPerDay } = content.community.gift;
+  const { claimsPerDay } = content().community.gift;
   const token = crypto.randomUUID();
-  const ids = content.resources.map((resource) => resource.id);
+  const ids = content().resources.map((resource) => resource.id);
   const path = (id) => `$."${id}"`;
   const sum = (field) => `(SELECT COALESCE(SUM(json_extract(reward, '${field}')), 0) FROM gifts WHERE claim_token = ?)`;
   const resources = ids.reduce((sql, id) => `json_set(${sql}, '${path(id)}', COALESCE(json_extract(resources, '${path(id)}'), 0) + ${sum(`$.resources.${path(id).slice(2)}`)})`, "COALESCE(resources, '{}')");

@@ -52,10 +52,10 @@ export function hallRecord(row) {
 // squares: the place's two most usual encounters' first creatures and its
 // elite (the trial draws its encounters at the start).
 function preview(area) {
-  const encounters = trialEncounters(area, `preview:${area.id}`, content);
+  const encounters = trialEncounters(area, `preview:${area.id}`, content());
   return encounters.map((encounter) => {
-    const [enemy] = encounterCombatants(encounter, content);
-    return { monsterId: enemy.monsterId, name: content.monstersById[enemy.monsterId].name, elite: encounter.elite };
+    const [enemy] = encounterCombatants(encounter, content());
+    return { monsterId: enemy.monsterId, name: content().monstersById[enemy.monsterId].name, elite: encounter.elite };
   });
 }
 
@@ -63,20 +63,20 @@ function preview(area) {
 // place it tests the character for, with its creatures, or why there is
 // none; null where the game has no hall.
 export function trialHallView(row, now) {
-  const hall = trialHallOf(content);
+  const hall = trialHallOf(content());
   if (!hall) return null;
   const record = hallRecord(row);
-  const target = trialTarget(row.class_level, record.early, content);
+  const target = trialTarget(row.class_level, record.early, content());
   const { fightStart: _a, eliteStart: _b, defeat: _c, won: _d, lost: _e, ...texts } = hall.texts;
   return {
-    used: record.day === questPeriod('daily', now, content).key,
+    used: record.day === questPeriod('daily', now, content()).key,
     texts,
     target: target && {
       areaId: target.area.id,
       name: target.area.name,
       regionName: target.area.regionName ?? null,
       levels: `${target.area.minLevel}–${target.area.maxLevel}`,
-      unlockClassLevel: Math.max(1, target.area.minLevel - content.balance.hunt.areaUnlockLead),
+      unlockClassLevel: Math.max(1, target.area.minLevel - content().balance.hunt.areaUnlockLead),
       passed: target.passed,
       fights: target.passed ? [] : preview(target.area),
     },
@@ -90,14 +90,14 @@ export async function enterTrialHall(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
-  const hall = trialHallOf(content);
+  const hall = trialHallOf(content());
   if (!hall) throw new ApiError(404, 'not_found', 'Sali prób jeszcze nie ma.');
   const now = context.now;
   requireNotExploring(player, now);
   const record = hallRecord(row);
-  const today = questPeriod('daily', now, content).key;
+  const today = questPeriod('daily', now, content()).key;
   if (record.day === today) throw new ApiError(409, 'used', hall.texts.used);
-  const target = trialTarget(row.class_level, record.early, content);
+  const target = trialTarget(row.class_level, record.early, content());
   if (!target) throw new ApiError(409, 'all_open', hall.texts.allOpen);
   if (target.passed) throw new ApiError(409, 'passed', hall.texts.passed.replace('{area}', target.area.name));
 
@@ -106,17 +106,17 @@ export async function enterTrialHall(context) {
   const character = engineCharacter(row);
   const equipped = equippedItems(player);
   const companions = companionsGoing(player, now);
-  const trophies = trophiesFor(player, now, areaDangers(area, content).map((danger) => danger.monsterId));
+  const trophies = trophiesFor(player, now, areaDangers(area, content()).map((danger) => danger.monsterId));
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   // Only the potions whose recipes the character knows are drunk, as on an
   // exploration (potionKnown; the code review: one got in a Wymiana before
   // its recipe was drunk here).
-  const hunt = trialHallFights({ character, equipped, name: row.name, area, seed, potions: knownPotionsOf(row), companions, trophies }, content);
-  const applied = applyHunt(character, hunt, content);
+  const hunt = trialHallFights({ character, equipped, name: row.name, area, seed, potions: knownPotionsOf(row), companions, trophies }, content());
+  const applied = applyHunt(character, hunt, content());
   const won = hunt.hall.won;
 
   const report = {
-    ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: now, endsAt: now }, content),
+    ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: now, endsAt: now }, content()),
     kind: 'trial-hall',
     resultText: hunt.hall.text,
     hall: { areaId: area.id, areaName: area.name, won, fights: hunt.hall.fights },
@@ -147,13 +147,13 @@ export async function enterTrialHall(context) {
   const next = { day: today, early: won ? area.id : record.early };
   // The creatures fought join those the character has met (the Bestiariusz).
   const met = [...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))])];
-  const opened = areasOpened(character.classLevel, applied.classLevel, content);
-  const kills = huntKills(hunt, content);
+  const opened = areasOpened(character.classLevel, applied.classLevel, content());
+  const kills = huntKills(hunt, content());
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills, opened }));
   const found = Object.entries(hunt.materials);
   const setMaterials = found.length ? `, materials = json_set(materials, ${found.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})` : '';
   // A new level heals fully.
-  const healed = applied.levelled ? hpAfterHunt({ character, applied, hunt, equipped, name: row.name }, content) : null;
+  const healed = applied.levelled ? hpAfterHunt({ character, applied, hunt, equipped, name: row.name }, content()) : null;
 
   const results = await atomically(db, [
     sameVersion(db, row),

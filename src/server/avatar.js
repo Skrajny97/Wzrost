@@ -24,7 +24,7 @@ export async function buyAvatar(context) {
   const { session, player } = await requirePlayer(context);
   requireProfessions(player);
   const { row } = player;
-  const { price, texts } = content.avatar;
+  const { price, texts } = content().avatar;
   if (row.avatar_at) throw new ApiError(409, 'owned', 'Awatar Systemu już na Ciebie pracuje.');
   if (row.gold < price) throw new ApiError(409, 'no_gold', 'Masz za mało złota.');
   const db = context.env.DB;
@@ -63,7 +63,7 @@ export async function cancelAvatar(context) {
   const { session, player } = await requirePlayer(context);
   const now = context.now;
   const activity = avatarWork(player);
-  if (activity.ends_at <= now) throw new ApiError(409, 'claim_first', content.avatar.texts.claimFirst[0]);
+  if (activity.ends_at <= now) throw new ApiError(409, 'claim_first', content().avatar.texts.claimFirst[0]);
   const db = context.env.DB;
   const stop = { potions: finishBrewing, items: finishCrafting, jewels: finishJewels }[activity.kind];
   const stopped = stop ? await stop(db, player, now, { stop: true, avatar: true }) : null;

@@ -60,7 +60,7 @@ export async function sendLink(env, { userId, login, email }, origin, now) {
       .prepare('INSERT INTO email_links (id, user_id, email, created_at, expires_at) VALUES (?, ?, ?, ?, ?)')
       .bind(id, userId, email, now, now + LINK_TTL_MS),
   ]);
-  const message = confirmationEmail({ login, link: `${origin}${CONFIRM_PATH}?token=${token}` }, content);
+  const message = confirmationEmail({ login, link: `${origin}${CONFIRM_PATH}?token=${token}` }, content());
   try {
     if (!env.EMAIL) throw Object.assign(new Error('No EMAIL binding'), { code: 'E_NO_BINDING' });
     await env.EMAIL.send({ to: email, from: SENDER, ...message });
@@ -103,7 +103,7 @@ export async function requestLink(context) {
 // change, so two at once pay once. With `email`, only while the account
 // still has that address.
 export function rewardStatements(db, userId, now, email = null) {
-  const points = content.balance.account.emailSystemPoints;
+  const points = content().balance.account.emailSystemPoints;
   const account = email === null ? 'id = ?' : 'id = ? AND email = ?';
   const keys = email === null ? [userId] : [userId, email];
   return [

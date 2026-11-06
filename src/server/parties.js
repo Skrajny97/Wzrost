@@ -64,9 +64,9 @@ async function classLevels(db, partyId) {
 // Why a character of `classLevel` cannot be in a party of `levels`, or
 // null; `who` says whose level it is.
 function levelGap(who, classLevel, levels) {
-  const { from, to } = partyRange(levels, content);
+  const { from, to } = partyRange(levels, content());
   if (classLevel >= from && classLevel <= to) return null;
-  const { classSpread } = content.balance.parties;
+  const { classSpread } = content().balance.parties;
   return new ApiError(
     409,
     'level_gap',
@@ -74,11 +74,11 @@ function levelGap(who, classLevel, levels) {
   );
 }
 
-const unlock = () => content.unlocksById.party;
-const size = () => content.balance.parties.size;
+const unlock = () => content().unlocksById.party;
+const size = () => content().balance.parties.size;
 
 function requireUnlocked(row) {
-  if (!isUnlocked('party', row.level, content)) throw new ApiError(403, 'locked', `Drużynę odblokujesz na poziomie postaci ${unlock().level}.`);
+  if (!isUnlocked('party', row.level, content())) throw new ApiError(403, 'locked', `Drużynę odblokujesz na poziomie postaci ${unlock().level}.`);
 }
 
 async function requirePartyPlayer(context) {
@@ -89,7 +89,7 @@ async function requirePartyPlayer(context) {
 
 // Why a character of `row` cannot make or join a party, or null: its
 // companions who do not stay in the Kwatery, where the Osada is on.
-const companionsOut = (row) => (settlementOn() ? partyRefusal(JSON.parse(row.settlement ?? '{}').companions ?? [], content) : null);
+const companionsOut = (row) => (settlementOn() ? partyRefusal(JSON.parse(row.settlement ?? '{}').companions ?? [], content()) : null);
 
 // A character makes or joins a party only once its companions stay.
 function requireCompanionsStay(row) {
@@ -120,7 +120,7 @@ export async function partyOf(db, characterId) {
   // fit with those staying.
   const list = members.results.map((member) => ({ id: member.character_id, classLevel: member.class_level }));
   const leader = list.find((member) => member.id === row.leader_id);
-  const { apart } = leader ? partyFit(leader, list.filter((member) => member !== leader), content) : { apart: [] };
+  const { apart } = leader ? partyFit(leader, list.filter((member) => member !== leader), content()) : { apart: [] };
   if (apart.length > 0) {
     const ids = apart.map((member) => member.id);
     await db.batch(partyRemoval(db, ids.map(() => '?').join(', '), ids));
@@ -140,7 +140,7 @@ function memberStatus(row) {
 
 // The stage of the Stajnia's mount of a character's row (327 A): a party's
 // trip waits as long as the slowest mount of those who go.
-const mountOfRow = (row) => (settlementOn() ? mountStage(JSON.parse(row.settlement ?? '{}'), content) : 0);
+const mountOfRow = (row) => (settlementOn() ? mountStage(JSON.parse(row.settlement ?? '{}'), content()) : 0);
 
 // The Drużyna for the page: the party, with its members, the invitations it
 // sent and the limits of its explorations (the lowest member's), and the
@@ -167,14 +167,14 @@ export async function partyView(db, characterId, now) {
       .bind(characterId),
     db.prepare('SELECT class_level, settlement FROM characters WHERE id = ?').bind(characterId),
   ]);
-  const { onlineSeconds } = content.community.trade;
+  const { onlineSeconds } = content().community.trade;
   const list = members.results.map((row) => ({
     id: row.id,
     name: row.name,
     guildTag: row.guild_tag ?? null,
     nameColor: nameColorOf(row.cosmetics),
     classId: row.class_id,
-    className: content.classesById[row.class_id]?.name ?? '',
+    className: content().classesById[row.class_id]?.name ?? '',
     level: row.level,
     classLevel: row.class_level,
     leader: row.id === party?.leaderId,
@@ -199,15 +199,15 @@ export async function partyView(db, characterId, now) {
       members: list,
       invited: sent.results.map((row) => ({ id: row.id, name: row.name })),
       limits: lowest && {
-        minutes: longestHunt(lowest.level, content),
+        minutes: longestHunt(lowest.level, content()),
         minutesBy: lowest.name,
         classLevel: lowestClass.classLevel,
         classLevelBy: lowestClass.name,
-        mount: { shorter: mountOf(slowest.mount, content)?.shorter ?? 0, by: slowest.name },
+        mount: { shorter: mountOf(slowest.mount, content())?.shorter ?? 0, by: slowest.name },
       },
     },
     // The class levels a character invited now may have, and the spread.
-    range: { ...partyRange(levels, content), spread: content.balance.parties.classSpread },
+    range: { ...partyRange(levels, content()), spread: content().balance.parties.classSpread },
     invites: invites.results.map((row) => ({ partyId: row.party_id, invitedBy: row.invited_by, members: row.members ?? '', at: row.created_at })),
     unlockLevel: unlock().level,
     // Out of a party, the companions who still go on explorations keep the
@@ -221,7 +221,7 @@ export async function partyView(db, characterId, now) {
 // link to the Kwatery, or null.
 function companionsBlock(row) {
   const text = companionsOut(row);
-  return text && { text, link: content.settlement.companions.texts.toQuarters };
+  return text && { text, link: content().settlement.companions.texts.toQuarters };
 }
 
 const answer = async (db, characterId, now, extra = {}) => json({ ...(await partyView(db, characterId, now)), ...extra });
@@ -249,7 +249,7 @@ export async function inviteToParty(context) {
   if (!target) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
   if (target.id === player.row.id) throw new ApiError(400, 'self', 'Siebie nie zaprosisz.');
   if (target.user_id === session.userId) throw new ApiError(400, 'own', `${target.name} to Twoja postać. Swoich postaci nie zaprosisz do drużyny.`);
-  if (!isUnlocked('party', target.level, content)) {
+  if (!isUnlocked('party', target.level, content())) {
     throw new ApiError(409, 'target_locked', `${target.name} nie ma jeszcze Drużyny. Otworzy się na ${unlock().level}. poziomie postaci.`);
   }
   const blocked = await db
@@ -316,7 +316,7 @@ export async function acceptPartyInvite(context) {
          SELECT ?, ?, ? WHERE EXISTS (SELECT 1 FROM parties WHERE id = ?) AND (SELECT COUNT(*) FROM party_members WHERE party_id = ?) < ?
            AND (SELECT MAX(MAX(c.class_level), ?) - MIN(MIN(c.class_level), ?) FROM party_members m JOIN characters c ON c.id = m.character_id WHERE m.party_id = ?) <= ?`,
       )
-      .bind(player.row.id, invite.party_id, context.now, invite.party_id, invite.party_id, size(), player.row.class_level, player.row.class_level, invite.party_id, content.balance.parties.classSpread)
+      .bind(player.row.id, invite.party_id, context.now, invite.party_id, invite.party_id, size(), player.row.class_level, player.row.class_level, invite.party_id, content().balance.parties.classSpread)
       .run();
   } catch {
     throw new ApiError(409, 'in_party', 'Najpierw opuść swoją drużynę.');
@@ -418,14 +418,14 @@ export async function partyHunt(context) {
   const others = (await Promise.all(party.memberIds.filter((id) => id !== player.row.id).map((id) => loadCharacter(db, id)))).filter(Boolean);
   const going = others.filter((other) => other.row.role === 'player' && !other.activity);
   if (going.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
-  const area = typeof body.areaId === 'string' ? areaFor(body.areaId, player.row.level, content) : undefined;
+  const area = typeof body.areaId === 'string' ? areaFor(body.areaId, player.row.level, content()) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
   for (const member of [player, ...going]) {
-    if (!areaOpenFor(area, member.row.class_level, earlyAreaOf(member.row), content)) {
+    if (!areaOpenFor(area, member.row.class_level, earlyAreaOf(member.row), content())) {
       throw new ApiError(403, 'party_area_locked', `${member.row.name} nie ma jeszcze otwartego miejsca ${area.name}. Drużyna idzie tylko tam, gdzie może każdy z was.`);
     }
-    if (!huntDurations(member.row.level, content).includes(body.minutes)) {
-      throw new ApiError(403, 'party_duration_locked', `${member.row.name} może iść najwyżej na ${longestHunt(member.row.level, content)} minut. Drużyna idzie tylko tak długo, jak może każdy z was.`);
+    if (!huntDurations(member.row.level, content()).includes(body.minutes)) {
+      throw new ApiError(403, 'party_duration_locked', `${member.row.name} może iść najwyżej na ${longestHunt(member.row.level, content())} minut. Drużyna idzie tylko tak długo, jak może każdy z was.`);
     }
   }
   const everyone = [player, ...going];

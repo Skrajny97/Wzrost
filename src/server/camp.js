@@ -76,10 +76,10 @@ const atTop = (building) =>
   new ApiError(
     409,
     'max_level',
-    building.id === content.camp.id ? 'Obóz ma już najwyższy poziom.' : building.id === content.camp.fortress?.id ? 'Obóz jest już Warownią.' : 'Ten budynek ma już najwyższy poziom.',
+    building.id === content().camp.id ? 'Obóz ma już najwyższy poziom.' : building.id === content().camp.fortress?.id ? 'Obóz jest już Warownią.' : 'Ten budynek ma już najwyższy poziom.',
   );
 const shortOf = (building) =>
-  new ApiError(409, 'not_enough', building.id === content.camp.id ? 'Brakuje złota na rozwój obozu.' : 'Brakuje złota albo zasobów na tę budowę.');
+  new ApiError(409, 'not_enough', building.id === content().camp.id ? 'Brakuje złota na rozwój obozu.' : 'Brakuje złota albo zasobów na tę budowę.');
 
 // The next level of a building, from now on, paid at once; while another
 // build is under way, it goes to the queue. The skipped introduction builds
@@ -87,8 +87,8 @@ const shortOf = (building) =>
 // "camp") grows the same way, from its first level, which it has without
 // building.
 export async function beginBuilding(db, player, buildingId, now) {
-  const building = typeof buildingId === 'string' ? content.buildingsById[buildingId] : undefined;
-  const fortress = Boolean(building) && building.id === content.camp.fortress?.id;
+  const building = typeof buildingId === 'string' ? content().buildingsById[buildingId] : undefined;
+  const fortress = Boolean(building) && building.id === content().camp.fortress?.id;
   // The Osada's buildings (Kwatery) once the character has the Osada, the
   // Warownia's once the camp has turned into one, and the transformation
   // itself where the Warownia is on.
@@ -100,8 +100,8 @@ export async function beginBuilding(db, player, buildingId, now) {
   if (fortress) {
     const stored = player.buildings[building.id];
     if (stored && buildingLevel(stored, now) < building.maxLevel) throw new ApiError(409, 'fortress_building', 'Przemiana w Warownię już trwa.');
-    const open = content.buildings.filter((one) => !one.fortress && buildingOpen(one, player.row, player.buildings, now));
-    if (!stored && !fortressReady(player.buildings, now, open, content)) {
+    const open = content().buildings.filter((one) => !one.fortress && buildingOpen(one, player.row, player.buildings, now));
+    if (!stored && !fortressReady(player.buildings, now, open, content())) {
       throw new ApiError(409, 'fortress_not_ready', 'Przemiana w Warownię zacznie się, gdy Obóz i wszystkie jego budynki dojdą do najwyższego poziomu.');
     }
   }
@@ -113,7 +113,7 @@ export async function beginBuilding(db, player, buildingId, now) {
   const built = buildingLevel(player.buildings[building.id], now);
   const level = Math.max(building.startLevel ?? 0, built);
   // The resource buildings go on to level 20 in the Warownia (618).
-  if (level >= buildingTop(building, player.buildings, now, content)) throw atTop(building);
+  if (level >= buildingTop(building, player.buildings, now, content())) throw atTop(building);
   const target = level + 1;
   const cost = upgradeCost(building, target);
   if (missingFor(cost, walletOf(player.row)).length > 0) throw shortOf(building);
@@ -122,7 +122,7 @@ export async function beginBuilding(db, player, buildingId, now) {
   const stored = player.buildings[building.id];
   const gold = cost.gold ?? 0;
   const resources = Object.keys(cost).filter((id) => id !== 'gold');
-  const endsAt = now + buildMinutes(building, target, campLevel(player.buildings, now, content), content) * 60000;
+  const endsAt = now + buildMinutes(building, target, campLevel(player.buildings, now, content()), content()) * 60000;
   // A production building stops during the upgrade: what its store holds goes
   // to the resources now, and it fills again from the end of the upgrade.
   const producing = building.effect?.kind === 'production';
@@ -186,12 +186,12 @@ export async function beginBuilding(db, player, buildingId, now) {
 // behind. It is saved only if the character and the build under way are as
 // seen here, so two taps at once queue and pay once.
 async function queueBuilding(db, player, building, queue, now) {
-  const { camp } = content;
+  const { camp } = content();
   if (buildsUnderWay(player.buildings, queue, now) >= camp.queue) {
     throw new ApiError(409, 'queue_full', 'Kolejka budowy jest pełna.');
   }
   const level = plannedLevel(building, player.buildings, queue);
-  const top = buildingTop(building, player.buildings, now, content);
+  const top = buildingTop(building, player.buildings, now, content());
   if (level >= top) {
     if (buildingLevel(player.buildings[building.id], now) >= top) throw atTop(building);
     throw new ApiError(409, 'max_level', 'Najwyższy poziom jest już w kolejce.');
@@ -200,7 +200,7 @@ async function queueBuilding(db, player, building, queue, now) {
   const cost = upgradeCost(building, target);
   if (missingFor(cost, walletOf(player.row)).length > 0) throw shortOf(building);
   const startsAt = queueEnd(player.buildings, queue, now);
-  const minutes = buildMinutes(building, target, plannedLevel(camp, player.buildings, queue), content);
+  const minutes = buildMinutes(building, target, plannedLevel(camp, player.buildings, queue), content());
   // The cost paid is kept with the build: "Anuluj" gives back exactly that.
   const waiting = [...queue, { buildingId: building.id, level: target, startsAt, endsAt: startsAt + minutes * 60000, cost }];
   const row = player.row;
@@ -246,7 +246,7 @@ export async function cancelBuilding(context) {
   const { cancelled, kept } = cancelFromQueue(queue, body.buildingId, level);
   const back = {};
   for (const entry of cancelled) {
-    const building = content.buildingsById[entry.buildingId];
+    const building = content().buildingsById[entry.buildingId];
     const cost = entry.cost ?? (building ? upgradeCost(building, entry.level) : {});
     for (const [id, amount] of Object.entries(cost)) back[id] = (back[id] ?? 0) + amount;
   }
@@ -261,7 +261,7 @@ export async function cancelBuilding(context) {
     .bind(
       back.gold ?? 0,
       ...resources.flatMap((id) => [path(id), path(id), back[id]]),
-      JSON.stringify(replanQueue(player.buildings, kept, now, content)),
+      JSON.stringify(replanQueue(player.buildings, kept, now, content())),
       row.id,
       row.version,
     )
@@ -287,7 +287,7 @@ async function stopBuilding(context, session, player, running, queue) {
   const db = context.env.DB;
   const now = context.now;
   const row = player.row;
-  const building = content.buildingsById[running.buildingId];
+  const building = content().buildingsById[running.buildingId];
   const { cancelled, kept } = cancelFromQueue(queue, running.buildingId, running.level + 1);
   const paid = running.cost ?? (building ? upgradeCost(building, running.level) : {});
   const costs = [paid, ...cancelled.map((entry) => entry.cost ?? (building ? upgradeCost(building, entry.level) : {}))];
@@ -318,7 +318,7 @@ async function stopBuilding(context, session, player, running, queue) {
       .bind(
         back.gold ?? 0,
         ...resources.flatMap((id) => [path(id), path(id), back[id]]),
-        JSON.stringify(replanQueue(stored, kept, now, content)),
+        JSON.stringify(replanQueue(stored, kept, now, content())),
         ...(resting ? [currentHp(player, now).hp, now] : []),
         row.id,
         row.version,
@@ -369,12 +369,12 @@ export async function tradeAtFire(context) {
   const body = await readJson(context.request);
   const now = context.now;
   const row = player.row;
-  const level = buildingLevel(player.buildings[fireBuilding(content)?.id], now);
-  const made = fireUnitsMade({ day: row.fire_day, units: row.fire_units }, now, content);
-  const block = fireTradeBlock({ level, gold: row.gold, made, resource: body.resource, amount: body.amount }, content);
+  const level = buildingLevel(player.buildings[fireBuilding(content())?.id], now);
+  const made = fireUnitsMade({ day: row.fire_day, units: row.fire_units }, now, content());
+  const block = fireTradeBlock({ level, gold: row.gold, made, resource: body.resource, amount: body.amount }, content());
   if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
   const amount = body.amount;
-  const gold = amount * fireTrade(level, content).unitGold;
+  const gold = amount * fireTrade(level, content()).unitGold;
   const db = context.env.DB;
   const result = await db
     .prepare(
@@ -382,7 +382,7 @@ export async function tradeAtFire(context) {
          fire_day = ?, fire_units = ?, version = version + 1
        WHERE id = ? AND version = ? AND gold >= ?`,
     )
-    .bind(gold, path(body.resource), path(body.resource), amount, fireDay(now, content), made + amount, row.id, row.version, gold)
+    .bind(gold, path(body.resource), path(body.resource), amount, fireDay(now, content()), made + amount, row.id, row.version, gold)
     .run();
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
   return json({
@@ -398,12 +398,12 @@ export async function buyParts(context) {
   const body = await readJson(context.request);
   const now = context.now;
   const row = player.row;
-  const level = buildingLevel(player.buildings[shopBuilding(content)?.id], now);
+  const level = buildingLevel(player.buildings[shopBuilding(content())?.id], now);
   // The parts bought today, by id, count toward the dealer's daily limit.
-  const bought = shopBought({ day: row.shop_day, parts: JSON.parse(row.shop_parts ?? '{}') }, now, content);
-  const block = shopBlock({ level, gold: row.gold, partId: body.partId, count: body.count, bought }, content);
+  const bought = shopBought({ day: row.shop_day, parts: JSON.parse(row.shop_parts ?? '{}') }, now, content());
+  const block = shopBlock({ level, gold: row.gold, partId: body.partId, count: body.count, bought }, content());
   if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
-  const gold = partPrice(body.partId, level, content) * body.count;
+  const gold = partPrice(body.partId, level, content()) * body.count;
   const today = { ...bought, [body.partId]: (bought[body.partId] ?? 0) + body.count };
   const db = context.env.DB;
   const result = await db
@@ -411,7 +411,7 @@ export async function buyParts(context) {
       `UPDATE characters SET gold = gold - ?, parts = json_set(parts, ?, COALESCE(json_extract(parts, ?), 0) + ?), shop_day = ?, shop_parts = ?, version = version + 1
        WHERE id = ? AND version = ? AND gold >= ?`,
     )
-    .bind(gold, path(body.partId), path(body.partId), body.count, shopDay(now, content), JSON.stringify(today), row.id, row.version, gold)
+    .bind(gold, path(body.partId), path(body.partId), body.count, shopDay(now, content()), JSON.stringify(today), row.id, row.version, gold)
     .run();
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
   return json({
@@ -429,11 +429,11 @@ export async function exchangeResources(context) {
   const body = await readJson(context.request);
   const now = context.now;
   const row = player.row;
-  const level = buildingLevel(player.buildings[exchangeBuilding(content)?.id], now);
+  const level = buildingLevel(player.buildings[exchangeBuilding(content())?.id], now);
   const { from, to, amount } = body;
-  const block = exchangeBlock({ level, resources: walletOf(row), from, to, amount }, content);
+  const block = exchangeBlock({ level, resources: walletOf(row), from, to, amount }, content());
   if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
-  const given = amount * resourceExchange(level, content).rate;
+  const given = amount * resourceExchange(level, content()).rate;
   const db = context.env.DB;
   const result = await db
     .prepare(
@@ -459,14 +459,14 @@ export async function exchangeResources(context) {
 // pieces, so two taps at once sell once.
 export async function sellToSpirit(context) {
   const { session, player } = await requirePlayer(context);
-  const spirit = builderSpirit(content);
+  const spirit = builderSpirit(content());
   if (!spirit) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const row = player.row;
   if (!settlementOpen(row)) throw new ApiError(403, 'locked', spirit.texts.locked);
   const { resource, amount } = await readJson(context.request);
-  const block = spiritSaleBlock({ resources: walletOf(row), resource, amount }, content);
+  const block = spiritSaleBlock({ resources: walletOf(row), resource, amount }, content());
   if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
-  const gold = spiritGold(resource, amount, content);
+  const gold = spiritGold(resource, amount, content());
   const db = context.env.DB;
   const result = await db
     .prepare(
@@ -487,7 +487,7 @@ export async function sellToSpirit(context) {
 export async function collectProduction(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
-  const building = typeof body.buildingId === 'string' ? content.buildingsById[body.buildingId] : undefined;
+  const building = typeof body.buildingId === 'string' ? content().buildingsById[body.buildingId] : undefined;
   if (!building || building.effect.kind !== 'production') {
     throw new ApiError(400, 'invalid_building', 'Ten budynek niczego nie wytwarza.');
   }
@@ -521,7 +521,7 @@ export async function collectProduction(context) {
 // (characters.js: settleCollector), the stores full now at once.
 export async function buyCollector(context) {
   const { session, player } = await requirePlayer(context);
-  const { price, texts } = content.camp.collector;
+  const { price, texts } = content().camp.collector;
   const { row } = player;
   if (row.collector_at) throw new ApiError(409, 'owned', texts.owned);
   if (row.gold < price) throw new ApiError(409, 'no_gold', texts.noGold);

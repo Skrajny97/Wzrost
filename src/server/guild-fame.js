@@ -22,14 +22,14 @@ import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { json } from './http.js';
 
-const rules = () => content.guilds.fame;
+const rules = () => content().guilds.fame;
 const words = () => rules().texts;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 
 // The week around `now` and the one before it.
 function weeksAround(now) {
-  const current = questPeriod('weekly', now, content);
-  return { current, previous: questPeriod('weekly', current.startsAt - 1, content) };
+  const current = questPeriod('weekly', now, content());
+  return { current, previous: questPeriod('weekly', current.startsAt - 1, content()) };
 }
 
 // SQL for the Sława of every guild there is in a week (`week`: its key and
@@ -67,7 +67,7 @@ function weekFame(week) {
       beast.perPercent,
       beast.fell,
       week.key,
-      content.guilds.trials.cap,
+      content().guilds.trials.cap,
       trials.perTrial,
       week.key,
       requests.cap,
@@ -78,7 +78,7 @@ function weekFame(week) {
       exchange.perExchange,
       week.startsAt,
       week.endsAt,
-      content.guilds.expedition.guardians.length,
+      content().guilds.expedition.guardians.length,
       expedition.last,
       expedition.perGuardian,
       week.key,
@@ -127,7 +127,7 @@ function rankingTexts() {
     perGuardian: points(expedition.perGuardian),
     lastGuardian: points(expedition.last),
     perTrial: points(trials.perTrial),
-    trialCap: content.guilds.trials.cap,
+    trialCap: content().guilds.trials.cap,
     perPiece: points(requests.perPiece),
     giftCap: requests.cap,
     perExchange: points(exchange.perExchange),
@@ -162,7 +162,7 @@ export async function guildRanking(context) {
   const place = rows.results.findIndex((row) => row.id === ownId);
   return json({
     period,
-    rows: rows.results.slice(0, content.community.ranking.size).map((row, index) => ({
+    rows: rows.results.slice(0, content().community.ranking.size).map((row, index) => ({
       place: index + 1,
       id: row.id,
       name: row.name,

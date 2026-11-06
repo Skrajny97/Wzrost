@@ -54,10 +54,10 @@ export async function startCrafting(context) {
   const { session, player, avatar } = await requireWorker(context, body);
   requireProfessions(player);
   if (!craftingOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
-  const { workshop } = content;
-  const crafting = content.professionsById[workshop.profession];
-  if (!professionOpen(crafting, player.row.level, content)) {
-    throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content)}.`);
+  const { workshop } = content();
+  const crafting = content().professionsById[workshop.profession];
+  if (!professionOpen(crafting, player.row.level, content())) {
+    throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content())}.`);
   }
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), workshop.profession);
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > workshop.maxCount) {
@@ -72,10 +72,10 @@ export async function startCrafting(context) {
   const { parts } = table;
   const wallet = walletOf(player.row);
   const [partId, needed] = Object.entries(cost.parts)[0];
-  if ((parts[partId] ?? 0) < needed) throw new ApiError(409, 'no_parts', `Brakuje części: ${content.partsById[partId].name} (potrzeba ${needed}).`);
+  if ((parts[partId] ?? 0) < needed) throw new ApiError(409, 'no_parts', `Brakuje części: ${content().partsById[partId].name} (potrzeba ${needed}).`);
   const short = Object.entries(cost.resources).find(([id, amount]) => (wallet[id] ?? 0) < amount);
-  if (short) throw new ApiError(409, 'no_resources', `Brakuje zasobów: ${content.resourcesById[short[0]].name} (potrzeba ${short[1]}).`);
-  const free = bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player);
+  if (short) throw new ApiError(409, 'no_resources', `Brakuje zasobów: ${content().resourcesById[short[0]].name} (potrzeba ${short[1]}).`);
+  const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
   if (order.room && free < body.count) throw new ApiError(409, 'bag_full', `W plecaku musi być ${body.count} wolnych miejsc na całe zlecenie.`);
 
   const { minutes } = order;
@@ -121,16 +121,16 @@ export async function exchangeParts(context) {
   const { session, player } = await requirePlayer(context);
   requireProfessions(player);
   if (!craftingOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
-  const crafting = content.professionsById[content.workshop.profession];
-  if (!professionOpen(crafting, player.row.level, content)) {
-    throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content)}.`);
+  const crafting = content().professionsById[content().workshop.profession];
+  if (!professionOpen(crafting, player.row.level, content())) {
+    throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content())}.`);
   }
   const now = context.now;
   const table = settleCrafting(craftingState(player.row), now);
   const { partId, count } = body;
-  const block = partExchangeBlock({ parts: table.parts, partId, count }, content);
+  const block = partExchangeBlock({ parts: table.parts, partId, count }, content());
   if (block) throw new ApiError(block.code.startsWith('invalid') ? 400 : 409, block.code, block.message);
-  const source = partSource(partId, content);
+  const source = partSource(partId, content());
   const given = count * source.rate;
   const parts = { ...table.parts, [source.partId]: table.parts[source.partId] - given, [partId]: (table.parts[partId] ?? 0) + count };
   const { row } = player;
@@ -151,15 +151,15 @@ export async function exchangeParts(context) {
 // and room for them in the bag. The Bractwo Kowali shortens the work and
 // adds to the luck of a rarity up (590), the luck kept with the order.
 function itemOrder(row, level, body) {
-  const base = typeof body.baseId === 'string' ? content.basesById[body.baseId] : undefined;
+  const base = typeof body.baseId === 'string' ? content().basesById[body.baseId] : undefined;
   const learned = JSON.parse(row.patterns ?? '[]');
-  if (!base || !content.workshop.parts[base.slot] || !knowsPattern(base, level, learned, content)) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
-  const rarity = craftRarities(level, content).find((candidate) => candidate.id === body.rarity);
+  if (!base || !content().workshop.parts[base.slot] || !knowsPattern(base, level, learned, content())) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
+  const rarity = craftRarities(level, content()).find((candidate) => candidate.id === body.rarity);
   if (!rarity) throw new ApiError(400, 'unknown_rarity', 'Tej rzadkości jeszcze nie wykonasz.');
   const luck = perkOf(row, 'workshopLuck');
   return {
-    cost: craftCost(base, rarity.id, body.count, row.level, content),
-    minutes: orderMinutes(body.count, rarity.id, level, content, perkOf(row, 'workshopFaster')),
+    cost: craftCost(base, rarity.id, body.count, row.level, content()),
+    minutes: orderMinutes(body.count, rarity.id, level, content(), perkOf(row, 'workshopFaster')),
     room: true,
     options: { base: base.id, rarity: rarity.id, level: row.level, ...(luck > 0 && { luck }) },
   };
@@ -168,12 +168,12 @@ function itemOrder(row, level, body) {
 // An order of Zwoje ochronne, or with `steady` of Zwoje utrwalenia, from the
 // scroll's level of the profession.
 function scrollOrder(row, level, count, steady = false) {
-  const { texts } = content.workshop;
-  const scroll = steady ? content.workshop.steadyScroll : content.workshop.scroll;
+  const { texts } = content().workshop;
+  const scroll = steady ? content().workshop.steadyScroll : content().workshop.scroll;
   if (level < scroll.level) throw new ApiError(403, 'locked', say(texts, 'hidden', 0, { level: scroll.level }));
   return {
-    cost: { ...scrollCost(count, content, scroll), resources: {} },
-    minutes: scrollOrderMinutes(count, level, content, perkOf(row, 'workshopFaster'), scroll),
+    cost: { ...scrollCost(count, content(), scroll), resources: {} },
+    minutes: scrollOrderMinutes(count, level, content(), perkOf(row, 'workshopFaster'), scroll),
     room: false,
     options: { scroll: steady ? 'steady' : true },
   };
@@ -190,22 +190,22 @@ const alreadyDone = () => new ApiError(409, 'already_claimed', 'Ten raport zosta
 export async function finishCrafting(db, player, now, { stop = false, avatar = false } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
-  const { workshop } = content;
-  const profession = content.professionsById[workshop.profession];
+  const { workshop } = content();
+  const profession = content().professionsById[workshop.profession];
   const before = professionState(JSON.parse(row.professions ?? '{}'), profession.id);
   const options = JSON.parse(activity.options ?? '{}');
   const { scroll } = options;
   // The scroll's column: the Zwoje utrwalenia's for an order of them.
   const scrolls = scroll === 'steady' ? 'steady_scrolls' : 'scrolls';
   // A base the data no longer has makes nothing.
-  const base = scroll ? (scroll === 'steady' ? workshop.steadyScroll : workshop.scroll) : content.basesById[options.base];
+  const base = scroll ? (scroll === 'steady' ? workshop.steadyScroll : workshop.scroll) : content().basesById[options.base];
   const count = base ? options.count : 0;
   const elapsed = now - activity.started_at;
   const done = stop ? potionsDone(count, activity.minutes, elapsed) : count;
   const worked = stop ? Math.floor(elapsed / 60000) : activity.minutes;
   const results =
     done > 0 && !scroll
-      ? craftItems({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed, luck: options.luck ?? 0 }, content)
+      ? craftItems({ baseId: base.id, rarityId: options.rarity, count: done, level: options.level, professionLevel: before.level, met: JSON.parse(row.met ?? '[]'), seed: activity.seed, luck: options.luck ?? 0 }, content())
       : [];
   const made = results.filter((result) => result.made).map((result) => result.item);
   // Every scroll done comes out.
@@ -253,7 +253,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
         xp,
         work,
       },
-      content,
+      content(),
     ),
     ...(avatar && { avatar: true }),
   };

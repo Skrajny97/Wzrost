@@ -24,7 +24,7 @@ import { ApiError, json, readJson } from './http.js';
 import { joinGuildTrials } from './guild-trials.js';
 import { OWN_CHARACTERS } from './roles.js';
 
-const rules = () => content.guilds;
+const rules = () => content().guilds;
 const ROLES = { leader: 'lider', deputy: 'zastępca', member: 'członek' };
 
 // The chat channel of a guild (chat.js).
@@ -39,8 +39,8 @@ export const guildTagSql = (column) => `(SELECT g.tag FROM guild_members gm JOIN
 
 async function requireGuildPlayer(context) {
   const found = await requirePlayer(context);
-  if (!isUnlocked('community', found.player.row.level, content)) {
-    throw new ApiError(403, 'locked', `Gildie odblokujesz na poziomie postaci ${content.unlocksById.community.level}.`);
+  if (!isUnlocked('community', found.player.row.level, content())) {
+    throw new ApiError(403, 'locked', `Gildie odblokujesz na poziomie postaci ${content().unlocksById.community.level}.`);
   }
   return found;
 }
@@ -99,7 +99,7 @@ export async function guildView(db, characterId, now) {
       .bind(characterId, characterId, characterId, inviting ? 1 : 0, guild?.id ?? 0),
     championStatement(db, now),
   ]);
-  const { onlineSeconds } = content.community.trade;
+  const { onlineSeconds } = content().community.trade;
   const online = (row) => row.played === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000;
   const { found, size, name, tag } = rules();
   return {
@@ -155,7 +155,7 @@ function guildName(value) {
   if (!/^[\p{L}\p{N}](?:[\p{L}\p{N} '-]*[\p{L}\p{N}])?$/u.test(text)) {
     throw new ApiError(400, 'invalid_name', 'Nazwa gildii może mieć litery, cyfry, spacje, łączniki i apostrofy, a zaczynać i kończyć się literą albo cyfrą.');
   }
-  if (blockedName(text, content)) throw new ApiError(400, 'invalid_name', 'Ta nazwa łamie zasady. Wybierz inną.');
+  if (blockedName(text, content())) throw new ApiError(400, 'invalid_name', 'Ta nazwa łamie zasady. Wybierz inną.');
   return text;
 }
 
@@ -167,7 +167,7 @@ function guildTag(value) {
   if (length < min || length > max || !/^[\p{Lu}\p{N}]+$/u.test(text)) {
     throw new ApiError(400, 'invalid_tag', `Skrót gildii to od ${min} do ${max} liter albo cyfr.`);
   }
-  if (blockedName(text, content)) throw new ApiError(400, 'invalid_tag', 'Ten skrót łamie zasady. Wybierz inny.');
+  if (blockedName(text, content())) throw new ApiError(400, 'invalid_tag', 'Ten skrót łamie zasady. Wybierz inny.');
   return text;
 }
 
@@ -226,7 +226,7 @@ export async function inviteToGuild(context) {
   const target = await db.prepare(`SELECT id, user_id, name, level FROM characters WHERE name_key = ? AND ${OWN_CHARACTERS}`).bind(name.toLowerCase()).first();
   if (!target) throw new ApiError(404, 'no_character', 'Nie ma takiej postaci.');
   if (target.user_id === session.userId) throw new ApiError(400, 'own', `${target.name} to Twoja postać. Swoich postaci nie zaprosisz.`);
-  if (!isUnlocked('community', target.level, content)) throw new ApiError(409, 'target_locked', `${target.name} nie ma jeszcze Społeczności.`);
+  if (!isUnlocked('community', target.level, content())) throw new ApiError(409, 'target_locked', `${target.name} nie ma jeszcze Społeczności.`);
   const blocked = await db
     .prepare('SELECT 1 FROM chat_blocks WHERE (user_id = ? AND blocked_id = ?) OR (user_id = ? AND blocked_id = ?)')
     .bind(target.user_id, session.userId, session.userId, target.user_id)
@@ -265,7 +265,7 @@ function weekJoin(db, table, guildId, characterId, now) {
        WHERE guild_id = ? AND week = ? AND EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ? AND joined_at = ?)
          AND NOT EXISTS (SELECT 1 FROM json_each(${table}.counted) WHERE value = ?)`,
     )
-    .bind(joinShare(trialDay(now, content)), characterId, guildId, questPeriod('weekly', now, content).key, characterId, guildId, now, characterId);
+    .bind(joinShare(trialDay(now, content())), characterId, guildId, questPeriod('weekly', now, content()).key, characterId, guildId, now, characterId);
 }
 
 // POST /api/guild/accept { guildId }: joins the guild that invited this

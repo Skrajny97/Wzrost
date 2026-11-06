@@ -30,7 +30,7 @@ export async function learnSkill(context) {
   const { player } = await requireBuildPlayer(context);
   const skillId = skillOf(await readJson(context.request));
   const character = engineCharacter(player.row);
-  const block = learnBlock(character, skillId, content);
+  const block = learnBlock(character, skillId, content());
   if (block) throw new ApiError(block.code === 'unknown_skill' ? 400 : 409, block.code, block.message);
   return saveSkills(context, player, { ...character.skills, [skillId]: 1 });
 }
@@ -44,7 +44,7 @@ export async function raiseSkill(context) {
   const count = body.count ?? 1;
   if (!Number.isInteger(count) || count < 1) throw new ApiError(400, 'invalid_count', 'Podaj liczbę punktów.');
   const character = engineCharacter(player.row);
-  const block = raiseBlock(character, skillId, content, count);
+  const block = raiseBlock(character, skillId, content(), count);
   if (block) throw new ApiError(409, block.code, block.message);
   return saveSkills(context, player, { ...character.skills, [skillId]: character.skills[skillId] + count });
 }

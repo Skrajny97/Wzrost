@@ -16,10 +16,10 @@ import { requireOpen, settlementOf, settlementView } from './settlement.js';
 // none) and every mount with its stage, name, words, share of the wait, price
 // and level.
 export function stableView(stored) {
-  const { stable } = content.settlement;
+  const { stable } = content().settlement;
   if (!stable) return null;
   return {
-    stage: mountStage(stored, content),
+    stage: mountStage(stored, content()),
     mounts: stable.mounts.map((mount, index) => ({ stage: index + 1, ...mount })),
   };
 }
@@ -34,13 +34,13 @@ export async function buyMount(context) {
   requireOpen(row);
   const body = await readJson(context.request);
   const stored = settlementOf(row);
-  const block = mountBlock(body.stage, mountStage(stored, content), { level: row.level, gold: row.gold }, content);
+  const block = mountBlock(body.stage, mountStage(stored, content()), { level: row.level, gold: row.gold }, content());
   if (block) {
     const status = { invalid_mount: 400, locked: 403 }[block.code] ?? 409;
     throw new ApiError(status, block.code, block.message);
   }
-  const mount = mountOf(body.stage, content);
-  const { resident, relationGain } = content.settlement.stable;
+  const mount = mountOf(body.stage, content());
+  const { resident, relationGain } = content().settlement.stable;
   const next = { ...stored, mount: body.stage, relations: { ...stored.relations, [resident]: (stored.relations[resident] ?? 0) + relationGain } };
   const db = context.env.DB;
   const result = await db

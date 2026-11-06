@@ -40,9 +40,9 @@ export async function takeEvolution(context) {
   if (test) requireTests(context, session);
   const evolutionId = typeof body.evolutionId === 'string' ? body.evolutionId : '';
   const character = engineCharacter(player.row);
-  const block = evolveBlock(character, evolutionId, content, { test });
+  const block = evolveBlock(character, evolutionId, content(), { test });
   if (block) throw new ApiError(block.code === 'unknown_evolution' ? 400 : 409, block.code, block.message);
-  const target = content.evolutionsById[evolutionId];
+  const target = content().evolutionsById[evolutionId];
   const reset = target.from ? (player.row.evolution_reset ?? 0) : spentPoints(character) > 0 ? 1 : 0;
   const db = context.env.DB;
   const result = await db
@@ -51,11 +51,11 @@ export async function takeEvolution(context) {
          evolution_reset = ?, version = version + 1
        WHERE id = ? AND version = ? AND evolution IS ?`,
     )
-    .bind(evolutionId, JSON.stringify(evolvedSkills(evolutionId, content)), test ? 1 : 0, reset, player.row.id, player.row.version, target.from ?? null)
+    .bind(evolutionId, JSON.stringify(evolvedSkills(evolutionId, content())), test ? 1 : 0, reset, player.row.id, player.row.version, target.from ?? null)
     .run();
   if (result.meta.changes !== 1) throw conflict();
   const fresh = await loadPlayer(db, session.userId);
-  return json({ evolution: evolutionView(target, content, character), character: characterView(fresh, context.now) });
+  return json({ evolution: evolutionView(target, content(), character), character: characterView(fresh, context.now) });
 }
 
 // GET /api/evolution/test: every evolution of the class to try, or the
@@ -65,9 +65,9 @@ export async function testEvolutions(context) {
   const { session, player } = await requireIdlePlayer(context);
   requireTests(context, session);
   const character = engineCharacter(player.row);
-  const current = evolutionOf(character, content);
-  const list = current ? [nextFormOf(current, content)].filter(Boolean) : evolutionChoices(character, content, { all: true });
-  return json({ evolutions: list.map((evolution) => evolutionView(evolution, content, character)) });
+  const current = evolutionOf(character, content());
+  const list = current ? [nextFormOf(current, content())].filter(Boolean) : evolutionChoices(character, content(), { all: true });
+  return json({ evolutions: list.map((evolution) => evolutionView(evolution, content(), character)) });
 }
 
 // POST /api/evolution/points { reset }: the free reset of the stat points
@@ -97,7 +97,7 @@ export async function decidePointsReset(context) {
 // its second form), or the class.
 function evolutionBefore(kept) {
   const skills = JSON.parse(kept ?? '{}');
-  return Object.keys(skills).map((id) => content.skillsById[id]?.evolution).find(Boolean) ?? null;
+  return Object.keys(skills).map((id) => content().skillsById[id]?.evolution).find(Boolean) ?? null;
 }
 
 // POST /api/evolution/test-level: on the test version the character at the
@@ -113,11 +113,11 @@ export async function testClassLevel(context) {
   const { session, player } = await requireIdlePlayer(context);
   requireTests(context, session);
   const row = player.row;
-  const levels = content.balance.progression.classEvolutionLevels;
+  const levels = content().balance.progression.classEvolutionLevels;
   const db = context.env.DB;
   const asked = Number(new URL(context.request.url).searchParams.get('level'));
   if (asked === levels[1]) {
-    const current = evolutionOf(engineCharacter(row), content);
+    const current = evolutionOf(engineCharacter(row), content());
     if (!current || current.from) throw new ApiError(409, 'not_first', 'Najpierw potrzebna jest pierwsza ewolucja, bez drugiej.');
     const raised = await db
       .prepare('UPDATE characters SET class_level = MAX(class_level, ?), class_xp = 0, version = version + 1 WHERE id = ? AND version = ?')

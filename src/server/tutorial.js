@@ -95,7 +95,7 @@ async function playFirstSteps(db, userId, now) {
     const reports = await db.prepare('SELECT COUNT(*) AS count FROM reports WHERE character_id = ?').bind(player.row.id).first();
     if (reports.count === 0) {
       if (!player.activity) {
-        await beginHunt(db, player, { areaId, minutes: longestHunt(player.row.level, content) }, now);
+        await beginHunt(db, player, { areaId, minutes: longestHunt(player.row.level, content()) }, now);
         player = await loadPlayer(db, userId);
       }
       if (player.activity.ends_at > now && player.row.time_points > 0) {
@@ -107,7 +107,7 @@ async function playFirstSteps(db, userId, now) {
         player = await loadPlayer(db, userId);
       }
     }
-    const building = content.buildingsById[buildingId];
+    const building = content().buildingsById[buildingId];
     if (buildingLevel(player.buildings[building.id], now) > 0) return;
     if (!construction(player.buildings, now)) {
       if (missingFor(upgradeCost(building, 1), walletOf(player.row)).length > 0) return;

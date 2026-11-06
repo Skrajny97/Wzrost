@@ -1,7 +1,7 @@
 // Worker entry point. Static files from src/client are served by Workers Static
 // Assets before this code runs; only /api/* and unknown paths reach the Worker.
 
-import { deleteAccount, login, logout, me, register } from './accounts.js';
+import { deleteAccount, login, logout, me, register, setLanguage } from './accounts.js';
 import { authorPanel, authorSkillDemo, authorSkills, bugReportImage, resolveBugReport } from './author.js';
 import { authorNews, deleteNews, editNews, listNews, publishNews, seeNews } from './news.js';
 import { reportBug } from './bugs.js';
@@ -57,7 +57,8 @@ import {
 import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
-import { readFeatures, registrationOpen, settlementOn } from './features.js';
+import { englishOn, readFeatures, registrationOpen, settlementOn } from './features.js';
+import { dictionary, language, requestLanguage, runInLanguage } from './i18n.js';
 import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, getMarket, listOffer, settleMarket } from './market.js';
 import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
@@ -118,6 +119,10 @@ const routes = [
   ['POST', '/api/auth/email', requestLink],
   ['GET', '/api/me', me],
   ['DELETE', '/api/me', deleteAccount],
+  // The account's language, PL or EN, where English is on (i18n.js).
+  ['POST', '/api/me/language', setLanguage],
+  // The English of the page's own texts, for a page in English (i18n.js).
+  ['GET', '/api/strings', strings],
   ['GET', '/api/author', authorPanel],
   ['POST', '/api/author/bugs/resolve', resolveBugReport],
   // A report's screenshot, for the author's panel (?id= the report).
@@ -409,28 +414,8 @@ export default {
         headers: { 'Content-Type': 'text/plain; charset=utf-8' },
       });
     }
-
-    try {
-      const matching = routes
-        .map((route) => ({ route, params: match(route.parts, url.pathname) }))
-        .filter(({ params }) => params);
-      if (matching.length === 0) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
-      const found = matching.find(({ route }) => route.method === request.method);
-      if (!found) {
-        throw new ApiError(405, 'method_not_allowed', 'Niedozwolona metoda.', {
-          Allow: matching.map(({ route }) => route.method).join(', '),
-        });
-      }
-      if (request.method !== 'GET') checkOrigin(request, url);
-      // The server clock is the only source of truth about time.
-      return await found.route.handler({ request, env, now: Date.now(), params: found.params });
-    } catch (error) {
-      if (error instanceof ApiError) return errorResponse(error);
-      console.error(error);
-      return errorResponse(
-        new ApiError(500, 'internal', 'Wystąpił błąd serwera. Spróbuj ponownie za chwilę.'),
-      );
-    }
+    // Everything the request does, in its language (i18n.js).
+    return runInLanguage(requestLanguage(request), () => answer(request, env, url));
   },
 
   // The cron trigger (wrangler.jsonc), every minute: the phone notifications
@@ -465,11 +450,43 @@ export default {
   },
 };
 
+// A request to the API, in its language: the route's answer, or its error.
+async function answer(request, env, url) {
+  try {
+    const matching = routes
+      .map((route) => ({ route, params: match(route.parts, url.pathname) }))
+      .filter(({ params }) => params);
+    if (matching.length === 0) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+    const found = matching.find(({ route }) => route.method === request.method);
+    if (!found) {
+      throw new ApiError(405, 'method_not_allowed', 'Niedozwolona metoda.', {
+        Allow: matching.map(({ route }) => route.method).join(', '),
+      });
+    }
+    if (request.method !== 'GET') checkOrigin(request, url);
+    // The server clock is the only source of truth about time.
+    return await found.route.handler({ request, env, now: Date.now(), params: found.params });
+  } catch (error) {
+    if (error instanceof ApiError) return errorResponse(error);
+    console.error(error);
+    return errorResponse(
+      new ApiError(500, 'internal', 'Wystąpił błąd serwera. Spróbuj ponownie za chwilę.'),
+    );
+  }
+}
+
 async function health({ env, now }) {
   await env.DB.prepare('SELECT 1').first();
   // `google`: whether the Google sign-in buttons can show; `registration`:
-  // whether new accounts can be made (not on the test version).
-  return json({ ok: true, time: now, version: env.APP_VERSION, google: googleConfigured(env), registration: registrationOpen() });
+  // whether new accounts can be made (not on the test version); `english`:
+  // whether the page offers English beside Polish (only the test version).
+  return json({ ok: true, time: now, version: env.APP_VERSION, google: googleConfigured(env), registration: registrationOpen(), english: englishOn() });
+}
+
+// The English of the page's own texts (data/en/strings.json), in a request
+// in English; nothing in Polish, the page's own language.
+function strings() {
+  return json({ language: language(), strings: dictionary() ?? {} });
 }
 
 // Browsers always send Origin with POST requests made by fetch; a foreign one is refused.

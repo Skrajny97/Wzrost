@@ -19,7 +19,7 @@ const recordOf = (row) => ({
 // GET /api/encyclopedia: every tab with its entries and chests.
 export async function readEncyclopedia(context) {
   const { player } = await requirePlayer(context);
-  return json({ encyclopedia: encyclopediaView(recordOf(player.row), content) });
+  return json({ encyclopedia: encyclopediaView(recordOf(player.row), content()) });
 }
 
 // POST /api/encyclopedia/chest {id}: a chest of a full set or of a count
@@ -29,7 +29,7 @@ export async function openEncyclopediaChest(context) {
   const body = await readJson(context.request);
   const row = player.row;
   const record = recordOf(row);
-  const found = encyclopediaChest(typeof body.id === 'string' ? body.id : '', record.discovered, record.claimed, content);
+  const found = encyclopediaChest(typeof body.id === 'string' ? body.id : '', record.discovered, record.claimed, content());
   if (found.code === 'no_chest') throw new ApiError(404, 'no_chest', 'Nie ma takiej skrzyni.');
   if (found.code === 'opened') throw new ApiError(409, 'opened', 'Ta skrzynia jest już otwarta.');
   if (found.code === 'not_ready') throw new ApiError(409, 'not_ready', `Skrzynia otworzy się po odkryciu wszystkiego, czego wymaga (${found.entry.have} z ${found.entry.need}).`);
@@ -44,5 +44,5 @@ export async function openEncyclopediaChest(context) {
     .run();
   if (result.meta.changes !== 1) throw new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
   const fresh = await loadPlayer(db, session.userId);
-  return json({ chest: { gold, timePoints, systemPoints }, encyclopedia: encyclopediaView(recordOf(fresh.row), content), character: characterView(fresh, context.now) });
+  return json({ chest: { gold, timePoints, systemPoints }, encyclopedia: encyclopediaView(recordOf(fresh.row), content()), character: characterView(fresh, context.now) });
 }

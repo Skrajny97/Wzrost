@@ -32,7 +32,7 @@ import { guildPlayer, requireMember, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { counted, foreign } from './market.js';
 
-const rules = () => content.guilds.requests;
+const rules = () => content().guilds.requests;
 const words = () => rules().texts;
 const errors = () => words().errors;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
@@ -46,23 +46,23 @@ const member = (context) => requireMember(context, errors());
 // or a gem or an ore.
 function realGood(kind, key) {
   if (!rules().kinds.includes(kind) || typeof key !== 'string') return false;
-  if (kind === 'material') return knownStack(key, content);
-  if (kind === 'mineral') return Object.hasOwn(content.mineralsById, key);
-  return Object.hasOwn(kind === 'herb' ? content.herbsById : content.potionsById, key);
+  if (kind === 'material') return knownStack(key, content());
+  if (kind === 'mineral') return Object.hasOwn(content().mineralsById, key);
+  return Object.hasOwn(kind === 'herb' ? content().herbsById : content().potionsById, key);
 }
 
 // Goods as the page shows them: the name, and for a material its rarity
 // and the material for its picture, for a gem or an ore its rarity.
 function goodsView(kind, key) {
   if (kind === 'material') {
-    const material = materialView(key, 0, content);
+    const material = materialView(key, 0, content());
     return { kind, key, name: material.label.charAt(0).toUpperCase() + material.label.slice(1), rarity: material.rarity, materialId: material.materialId };
   }
   if (kind === 'mineral') {
-    const mineral = content.mineralsById[key];
+    const mineral = content().mineralsById[key];
     return { kind, key, name: mineral?.name ?? key, rarity: mineral && (mineral.rarity ?? mineral.for[0]) };
   }
-  return { kind, key, name: (kind === 'herb' ? content.herbsById[key] : content.potionsById[key])?.name ?? key };
+  return { kind, key, name: (kind === 'herb' ? content().herbsById[key] : content().potionsById[key])?.name ?? key };
 }
 
 const stockOf = (row, kind, key) => JSON.parse(row[COLUMNS[kind]] ?? '{}')[key] ?? 0;
@@ -73,8 +73,8 @@ const stockOf = (row, kind, key) => JSON.parse(row[COLUMNS[kind]] ?? '{}')[key] 
 const roomless = (kind) => kind === 'material' || kind === 'mineral';
 function bagRoom(player, kind, key, now) {
   if (roomless(kind)) return Infinity;
-  const { stack } = content.professionRules;
-  const free = Math.max(0, bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player));
+  const { stack } = content().professionRules;
+  const free = Math.max(0, bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player));
   const have = stockOf(player.row, kind, key);
   return Math.ceil(have / stack) * stack - have + free * stack;
 }
@@ -93,7 +93,7 @@ function knownGoods(row) {
   }
   for (const [kind, column] of Object.entries(COLUMNS)) for (const [key, count] of Object.entries(JSON.parse(row[column] ?? '{}'))) if (count > 0) add(kind, key);
   const order = Object.keys(COLUMNS);
-  const rank = (rarity) => content.rarities.findIndex((one) => one.id === rarity);
+  const rank = (rarity) => content().rarities.findIndex((one) => one.id === rarity);
   return [...pairs.values()]
     .map(([kind, key]) => goodsView(kind, key))
     .sort((a, b) => order.indexOf(a.kind) - order.indexOf(b.kind) || a.name.localeCompare(b.name, 'pl') || rank(a.rarity) - rank(b.rarity));
@@ -129,7 +129,7 @@ function cardTexts() {
 export async function requestsView(db, player, guild, now) {
   const { row } = player;
   const { most, waitHours, openHours } = rules();
-  const week = questPeriod('weekly', now, content);
+  const week = questPeriod('weekly', now, content());
   const [open, latest, ranking] = await db.batch([
     db
       .prepare(
@@ -242,7 +242,7 @@ export async function askGuild(context) {
   const nextAt = last ? last.created_at + waitHours * HOUR : 0;
   if (nextAt > now) throw new ApiError(409, 'wait', filled(errors().wait, { left: timeLeft(nextAt - now) }));
   if (bagRoom(player, body.kind, body.key, now) < body.count) throw new ApiError(409, 'bag_full', errors().bagFull);
-  const lastWeek = questPeriod('weekly', questPeriod('weekly', now, content).startsAt - 1, content);
+  const lastWeek = questPeriod('weekly', questPeriod('weekly', now, content()).startsAt - 1, content());
   let made;
   try {
     [, , , made] = await db.batch([

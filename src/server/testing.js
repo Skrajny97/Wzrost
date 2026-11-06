@@ -68,7 +68,7 @@ export async function skipBuilding(context) {
   if (construction(player.buildings, now)) {
     await completeBuilding(db, player, now);
   } else {
-    const filling = content.buildings.filter((building) => building.effect.kind === 'production' && player.buildings[building.id]);
+    const filling = content().buildings.filter((building) => building.effect.kind === 'production' && player.buildings[building.id]);
     if (filling.length > 0) {
       await db.batch(
         filling.map((building) => {
@@ -126,7 +126,7 @@ export async function eventTests(context) {
 
 // The events "Testuj zdarzenia" offers: every one, the drafts only where
 // they are on (the test version), and those of the Osada only where it is.
-const testableEvents = () => content.events.list.filter((event) => (eventDraftsOn() || !event.draft) && (settlementOn() || !event.settlement));
+const testableEvents = () => content().events.list.filter((event) => (eventDraftsOn() || !event.draft) && (settlementOn() || !event.settlement));
 
 // "Przy następnym raporcie": the next exploration that ends as planned
 // brings this event (`eventId`), in this case (`caseId`) or a drawn one

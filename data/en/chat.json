@@ -1,0 +1,16 @@
+{
+  "$comment": "English texts of data/chat.json (src/engine/overlay.js): for now the change of a character's name in the Ustawienia. The names the System gives (generated) are names and stay as they are.",
+  "names": {
+    "blocked": "WARNING: your character's name breaks the Google Play rules on inappropriate content. You must change your name.",
+    "refused": "This name breaks the Google Play rules on inappropriate content. Choose another.",
+    "label": "New character name",
+    "button": "Change name",
+    "done": "Your character is now called {name}.",
+    "renamed": "Your character's name broke the Google Play rules on inappropriate content, so the System gave it a new one: {name}. You can change it once in the Settings (the cog).",
+    "seen": "Got it",
+    "change": "Change name",
+    "once": "A character's name can be changed only once. After that this option is locked.",
+    "used": "Name change used",
+    "locked": "This character's name has already been changed once."
+  }
+}

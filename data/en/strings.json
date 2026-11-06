@@ -1,0 +1,3 @@
+{
+  "$comment": "The English of the texts written in the code (src/server/i18n.js, src/client/i18n.js), under the Polish text itself, so Polish stays the only source. {name} stands for what the code fills in, the same in both languages. A Polish noun after a number has its three forms as one key, \"punkt|punkty|punktów\", and English its two, \"point|points\". tools/i18n-check.mjs lists what is missing."
+}

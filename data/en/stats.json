@@ -1,0 +1,11 @@
+{
+  "$comment": "English texts of data/stats.json, by the statistic's id (src/engine/overlay.js). English has no cases, so `accusative` is the name.",
+  "strength": { "name": "Strength", "accusative": "Strength", "combat": "Damage with heavy weapons.", "events": "Moving a boulder, forcing an entrance." },
+  "dexterity": { "name": "Dexterity", "accusative": "Dexterity", "combat": "Damage with light and ranged weapons, dodge, initiative.", "events": "Climbing, disarming traps." },
+  "vitality": { "name": "Vitality", "accusative": "Vitality", "combat": "Maximum HP, regeneration between explorations.", "events": "Poisons, exhaustion." },
+  "endurance": { "name": "Endurance", "accusative": "Endurance", "combat": "Less physical damage taken.", "events": "Falls, cold, traps." },
+  "intellect": { "name": "Intellect", "accusative": "Intellect", "combat": "Power of spells and magic weapons.", "events": "Reading runes, recognising unknown materials." },
+  "wisdom": { "name": "Wisdom", "accusative": "Wisdom", "combat": "Mana, healing power.", "events": "The intentions of animals and forest spirits." },
+  "perception": { "name": "Perception", "accusative": "Perception", "combat": "Critical hits.", "events": "Tracks, hidden loot, dangers." },
+  "will": { "name": "Will", "accusative": "Will", "combat": "Resistance to fear, curses and effects over time.", "events": "Delusions, whispers." }
+}

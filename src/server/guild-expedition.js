@@ -45,7 +45,7 @@ import { toHex } from './encoding.js';
 import { guildOf } from './guilds.js';
 import { ApiError, json, readJson } from './http.js';
 
-const rules = () => content.guilds.expedition;
+const rules = () => content().guilds.expedition;
 const words = () => rules().texts;
 const errors = () => words().errors;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
@@ -55,17 +55,17 @@ const DAY = 24 * 3600000;
 // The Wyprawa comes with the Gildie, with the Społeczność.
 async function requireExpeditionPlayer(context) {
   const found = await requirePlayer(context);
-  if (!isUnlocked('community', found.player.row.level, content)) {
-    throw new ApiError(403, 'locked', filled(errors().locked, { level: content.unlocksById.community.level }));
+  if (!isUnlocked('community', found.player.row.level, content())) {
+    throw new ApiError(403, 'locked', filled(errors().locked, { level: content().unlocksById.community.level }));
   }
   return { ...found, db: context.env.DB };
 }
 
 // The week around `now`, the one before it and the end of the one after.
 function weeksAround(now) {
-  const current = questPeriod('weekly', now, content);
-  const nextEndsAt = questPeriod('weekly', current.endsAt, content).endsAt;
-  const previous = questPeriod('weekly', current.startsAt - 1, content);
+  const current = questPeriod('weekly', now, content());
+  const nextEndsAt = questPeriod('weekly', current.endsAt, content()).endsAt;
+  const previous = questPeriod('weekly', current.startsAt - 1, content());
   return { current, previous, nextEndsAt };
 }
 
@@ -76,7 +76,7 @@ function weeksAround(now) {
 // report; a mercenary of the Karczma claims none.
 export function expeditionMinutes(db, characterId, minutes, now) {
   if (!(minutes > 0)) return [];
-  const { key: week } = questPeriod('weekly', now, content);
+  const { key: week } = questPeriod('weekly', now, content());
   return [
     db
       .prepare(
@@ -111,7 +111,7 @@ async function routeOf(db, guildId, now) {
       )
       .bind(guildId, now - rules().activeDays * DAY),
   ]);
-  const route = guildExpedition({ levels: levels.results.map((member) => member.level) }, content);
+  const route = guildExpedition({ levels: levels.results.map((member) => member.level) }, content());
   await db.batch([
     db.prepare('DELETE FROM guild_expedition_hits WHERE guardian_id IN (SELECT g.id FROM guild_expedition_guardians g JOIN guild_expeditions e ON e.id = g.expedition_id WHERE e.week < ?)').bind(previous.key),
     db.prepare('DELETE FROM guild_expedition_guardians WHERE expedition_id IN (SELECT id FROM guild_expeditions WHERE week < ?)').bind(previous.key),
@@ -147,8 +147,8 @@ function standing(route, guardians, total) {
   const fallen = guardians.filter((guardian) => guardian.hp <= 0);
   const walked = fallen.reduce((sum, guardian) => sum + guardian.need, 0);
   const current = guardians.find((guardian) => guardian.stage === fallen.length + 1) ?? null;
-  const need = current?.need ?? expeditionStageMinutes(members, content);
-  return { members, current, progress: expeditionProgress({ minutes: total, walked, beaten: fallen.length, need, standing: Boolean(current) }, content) };
+  const need = current?.need ?? expeditionStageMinutes(members, content());
+  return { members, current, progress: expeditionProgress({ minutes: total, walked, beaten: fallen.length, need, standing: Boolean(current) }, content()) };
 }
 
 // Everything of the guild's route now, for its tab and its actions: the
@@ -159,7 +159,7 @@ function standing(route, guardians, total) {
 // minutes kept with it.
 async function routeState(db, guild, row, now) {
   const route = await routeOf(db, guild.id, now);
-  const day = questPeriod('daily', now, content).key;
+  const day = questPeriod('daily', now, content()).key;
   const read = () =>
     db.batch([
       guardiansOf(db, route.id),
@@ -176,7 +176,7 @@ async function routeState(db, guild, row, now) {
   const total = minutes.results.reduce((sum, one) => sum + one.minutes, 0);
   let state = standing(route, guardians.results, total);
   if (state.progress.guardian && !state.current && !state.progress.done) {
-    const guardian = expeditionGuardian({ stage: state.progress.stage, level: route.level, members: state.members, guardians: JSON.parse(route.guardians) }, content);
+    const guardian = expeditionGuardian({ stage: state.progress.stage, level: route.level, members: state.members, guardians: JSON.parse(route.guardians) }, content());
     await db
       .prepare(
         `INSERT OR IGNORE INTO guild_expedition_guardians (expedition_id, stage, monster_id, area_id, level, members, need, max_hp, hp, created_at)
@@ -230,16 +230,16 @@ async function chestsOf(db, row, now) {
   });
 }
 
-const monsterName = (id) => content.monstersById[id]?.name ?? id;
+const monsterName = (id) => content().monstersById[id]?.name ?? id;
 
 // The tab's words (all but the answers' errors), with the rules' numbers
 // filled in.
 function tabTexts() {
   const { errors: _, ...texts } = words();
-  const fame = content.guilds.fame;
+  const fame = content().guilds.fame;
   const points = (count) => `${count} ${countedForm(count, fame.texts.pointForms)}`;
   const numbers = {
-    stages: expeditionStages(content),
+    stages: expeditionStages(content()),
     perMember: rules().stageMinutes.perMember,
     attacks: rules().attacksPerDay,
     fame: points(fame.expedition.perGuardian),
@@ -267,7 +267,7 @@ export async function expeditionView(db, row, guild, now, activity = null) {
   const { route, progress, current } = state;
   const { current: week } = weeksAround(now);
   const planned = JSON.parse(route.guardians);
-  const land = content.regionsById[route.land_id];
+  const land = content().regionsById[route.land_id];
   const perDay = rules().attacksPerDay;
   const guardians = planned.map((guardian, index) => {
     const stage = index + 1;
@@ -288,7 +288,7 @@ export async function expeditionView(db, row, guild, now, activity = null) {
       }),
     };
   });
-  const area = current && content.areasById[current.area_id];
+  const area = current && content().areasById[current.area_id];
   return {
     expedition: {
       week: route.week,
@@ -355,7 +355,7 @@ export async function attackGuildGuardian(context) {
   // The Encyklopedia's trophy against the guardian's creature counts.
   const trophies = trophiesFor(player, now, [guardian.monster_id]);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const fight = guildBeastFight({ character: engineCharacter(row), equipped: equippedItems(player), name: row.name, beast: engineGuardian(guardian), seed, trophies }, content);
+  const fight = guildBeastFight({ character: engineCharacter(row), equipped: equippedItems(player), name: row.name, beast: engineGuardian(guardian), seed, trophies }, content());
   const [, , , , before, , , after] = await atomically(
     db,
     [
@@ -387,7 +387,7 @@ export async function attackGuildGuardian(context) {
       damage: Math.min(fight.damage, hpBefore),
       hp: after.results[0].hp,
       fell,
-      last: fell && guardian.stage >= expeditionStages(content),
+      last: fell && guardian.stage >= expeditionStages(content()),
       won: fight.won,
       log: fight.log,
       fight: fight.replay,
@@ -416,7 +416,7 @@ export async function claimGuildExpeditionChest(context) {
       : null;
     throw opened ? new ApiError(409, 'claimed', errors().claimed) : new ApiError(404, 'no_chest', errors().noChest);
   }
-  if (chest.item && bagPlaces(player) >= bagCapacity(campLevels(player.buildings, now, content), content)) {
+  if (chest.item && bagPlaces(player) >= bagCapacity(campLevels(player.buildings, now, content()), content())) {
     throw new ApiError(409, 'bag_full', errors().bagFull);
   }
   const { gold, materials, item } = expeditionChest(
@@ -429,7 +429,7 @@ export async function claimGuildExpeditionChest(context) {
       guardian: chest.guardian,
       seed: `${row.id}:expedition:${week}:${stage}`,
     },
-    content,
+    content(),
   );
   const found = Object.entries(materials);
   const setMaterials = found.length > 0 ? `, materials = json_set(materials, ${found.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})` : '';
@@ -449,7 +449,7 @@ export async function claimGuildExpeditionChest(context) {
         ]
       : []),
   ]);
-  const contents = [filled(words().gold, { gold: new Intl.NumberFormat('pl-PL').format(gold) }), item && itemName(item, content), found.length > 0 && materialsText(materials, content)].filter(Boolean).join(', ');
+  const contents = [filled(words().gold, { gold: new Intl.NumberFormat('pl-PL').format(gold) }), item && itemName(item, content()), found.length > 0 && materialsText(materials, content())].filter(Boolean).join(', ');
   const after = await loadPlayer(db, session.userId);
   // The item came last, so its id is the highest of the character's: the
   // page finds it in the bag by it, for its card.
@@ -459,9 +459,9 @@ export async function claimGuildExpeditionChest(context) {
       week,
       stage,
       gold,
-      item: item && { id: itemId, name: itemName(item, content), rarity: item.rarity, color: content.raritiesById[item.rarity].color },
+      item: item && { id: itemId, name: itemName(item, content()), rarity: item.rarity, color: content().raritiesById[item.rarity].color },
       materials: found.map(([key, count]) => {
-        const view = materialView(key, count, content);
+        const view = materialView(key, count, content());
         return { key, materialId: view.materialId, name: view.name, label: view.label, color: view.color, rarityName: view.rarityName, count };
       }),
       text: filled(words().opened, { contents }),

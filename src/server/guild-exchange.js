@@ -31,19 +31,19 @@ import { nameColorOf } from './cosmetics.js';
 import { guildPlayer, requireMember } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 
-const rules = () => content.guilds.exchange;
+const rules = () => content().guilds.exchange;
 const words = () => rules().texts;
 const errors = () => words().errors;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 const HOUR = 3600000;
 const path = (id) => `$."${id}"`;
-const resourceIds = () => content.resources.map((resource) => resource.id);
+const resourceIds = () => content().resources.map((resource) => resource.id);
 // Gold, one side of an offer at most, kept in the characters' `gold`.
 const GOLD = 'gold';
 const isGold = (id) => id === GOLD;
 const goodIds = () => [...resourceIds(), GOLD];
-const goodName = (id) => (isGold(id) ? rules().gold.name : (content.resourcesById[id]?.name ?? id));
-const genitiveOf = (id) => (isGold(id) ? rules().gold.genitive : content.resourcesById[id].genitive);
+const goodName = (id) => (isGold(id) ? rules().gold.name : (content().resourcesById[id]?.name ?? id));
+const genitiveOf = (id) => (isGold(id) ? rules().gold.genitive : content().resourcesById[id].genitive);
 const mostOf = (id) => (isGold(id) ? rules().gold.most : rules().most);
 const changed = () => new ApiError(409, 'changed', errors().changed);
 const member = (context) => requireMember(context, errors());
@@ -271,7 +271,7 @@ export async function postGuildOffer(context) {
   if (open.count >= offers) throw new ApiError(409, 'too_many', cardTexts().full);
   const have = holding(row, give.resource);
   if (have < give.count) throw new ApiError(409, 'not_enough', heldOnly(give.resource, have));
-  const lastWeek = questPeriod('weekly', questPeriod('weekly', now, content).startsAt - 1, content);
+  const lastWeek = questPeriod('weekly', questPeriod('weekly', now, content()).startsAt - 1, content());
   const held = heldSql(give.resource, row.id);
   const taken = adding([[give.resource, -give.count]]);
   const results = await atomically(

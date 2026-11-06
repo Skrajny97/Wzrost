@@ -59,12 +59,12 @@ import { soldGold } from './inventory.js';
 import { partyOf } from './parties.js';
 import { trimReports } from './reports.js';
 
-const rules = () => content.towers;
+const rules = () => content().towers;
 const path = (key) => `$."${key}"`;
 
 function requireUnlocked(row) {
-  if (!isUnlocked('towers', row.level, content)) {
-    throw new ApiError(403, 'locked', `Wieże odblokujesz na poziomie postaci ${content.unlocksById.towers.level}.`);
+  if (!isUnlocked('towers', row.level, content())) {
+    throw new ApiError(403, 'locked', `Wieże odblokujesz na poziomie postaci ${content().unlocksById.towers.level}.`);
   }
 }
 
@@ -83,7 +83,7 @@ function recordOf(row) {
   return { day: stored.day ?? null, used: stored.used ?? 0, best: stored.best ?? {}, chests: stored.chests ?? {}, champions: stored.champions ?? {} };
 }
 
-const entriesUsed = (record, now) => (record.day === questPeriod('daily', now, content).key ? record.used : 0);
+const entriesUsed = (record, now) => (record.day === questPeriod('daily', now, content()).key ? record.used : 0);
 
 // Who climbs a tower beside the character: in the Wieża Drużyn the other
 // players of its Drużyna as they are (within the class levels' spread, as
@@ -118,7 +118,7 @@ async function towersView(db, player, now) {
     eliteEvery: rules().floors.eliteEvery,
     eliteLapEvery: rules().floors.eliteLapEvery,
     championEvery: rules().floors.championEvery,
-    cycle: content.areas.map((area) => ({ id: area.id, name: area.name, regionName: area.regionName, elite: Boolean(area.elite), champion: Boolean(area.champion) })),
+    cycle: content().areas.map((area) => ({ id: area.id, name: area.name, regionName: area.regionName, elite: Boolean(area.elite), champion: Boolean(area.champion) })),
     towers: await Promise.all(
       towers.map(async (tower) => {
         const climbers = await climbersFor(db, player, tower);
@@ -176,32 +176,32 @@ export async function enterTower(context) {
   // A champion's trophy only at the first win of its floor in this tower.
   const beaten = record.champions[tower.id] ?? [];
   const championTrophy = !beaten.includes(floor);
-  const area = towerArea(floor, content);
+  const area = towerArea(floor, content());
   // The Encyklopedia's trophies for the creatures of the floor's region.
-  const trophies = trophiesFor(player, now, areaDangers(area, content).map((danger) => danger.monsterId));
+  const trophies = trophiesFor(player, now, areaDangers(area, content()).map((danger) => danger.monsterId));
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const hunt = towerFight({ character, equipped, name: row.name, floor, seed, partners: climbers.partners, companions: climbers.companions, trophies, chest, championTrophy }, content);
+  const hunt = towerFight({ character, equipped, name: row.name, floor, seed, partners: climbers.partners, companions: climbers.companions, trophies, chest, championTrophy }, content());
   const won = hunt.tower.won;
-  const applied = applyHunt(character, hunt, content);
+  const applied = applyHunt(character, hunt, content());
 
   // The chest's item: in an empty slot it is worn at once, else it goes to
   // the bag, and what does not fit there the scrapper buys, the weakest
   // first (as after an exploration).
-  const autoEquipped = autoEquip(equipped, hunt.items, content, row.class_id, row.class_level);
-  const levels = campLevels(player.buildings, now, content);
+  const autoEquipped = autoEquip(equipped, hunt.items, content(), row.class_id, row.class_level);
+  const levels = campLevels(player.buildings, now, content());
   const bag = bagItems(player);
-  const capacity = bagCapacity(levels, content) - (bagPlaces(player) - bag.length);
-  const sellBonus = campBonus(levels, 'sellPrice', content);
+  const capacity = bagCapacity(levels, content()) - (bagPlaces(player) - bag.length);
+  const sellBonus = campBonus(levels, 'sellPrice', content());
   const toBag = hunt.items.map((_, index) => index).filter((index) => !autoEquipped.includes(index));
   const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
-  const sold = toBag.length > 0 ? bagOverflow(candidates, capacity, row.class_id, content) : [];
+  const sold = toBag.length > 0 ? bagOverflow(candidates, capacity, row.class_id, content()) : [];
   const storedSold = sold.filter((index) => index < bag.length).map((index) => bag[index]);
   const soldFound = sold.filter((index) => index >= bag.length).map((index) => toBag[index - bag.length]);
-  const soldFoundGold = soldFound.reduce((sum, index) => sum + sellPrice(hunt.items[index], content, sellBonus), 0);
-  const overflow = sold.length > 0 ? { capacity, count: sold.length, gold: sold.reduce((sum, index) => sum + sellPrice(candidates[index], content, sellBonus), 0), sold: soldFound } : null;
+  const soldFoundGold = soldFound.reduce((sum, index) => sum + sellPrice(hunt.items[index], content(), sellBonus), 0);
+  const overflow = sold.length > 0 ? { capacity, count: sold.length, gold: sold.reduce((sum, index) => sum + sellPrice(candidates[index], content(), sellBonus), 0), sold: soldFound } : null;
 
   const report = {
-    ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: now, endsAt: now, autoEquipped, overflow }, content),
+    ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: now, endsAt: now, autoEquipped, overflow }, content()),
     kind: 'tower',
     resultText: hunt.tower.text,
     tower: { id: tower.id, name: tower.name, floor, level: hunt.tower.level, won, partners: climbers.partners.map((partner) => partner.name), companions: climbers.companions.map((companion) => companion.name) },
@@ -225,7 +225,7 @@ export async function enterTower(context) {
     system: report.system,
   };
 
-  const today = questPeriod('daily', now, content).key;
+  const today = questPeriod('daily', now, content()).key;
   const next = {
     day: today,
     used: used + 1,
@@ -235,13 +235,13 @@ export async function enterTower(context) {
   };
   // The creatures fought join those the character has met (the Bestiariusz).
   const met = [...new Set([...JSON.parse(row.met ?? '[]'), ...hunt.fights.flatMap((fight) => fight.enemies.map((enemy) => enemy.monsterId))])];
-  const opened = areasOpened(character.classLevel, applied.classLevel, content);
-  const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills: huntKills(hunt, content), opened }));
+  const opened = areasOpened(character.classLevel, applied.classLevel, content());
+  const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills: huntKills(hunt, content()), opened }));
   const found = Object.entries(hunt.materials);
   const setMaterials = found.length ? `, materials = json_set(materials, ${found.map(() => '?, COALESCE(json_extract(materials, ?), 0) + ?').join(', ')})` : '';
   // A new level heals fully, with the chest's item worn if it went on.
   const worn = [...equipped, ...autoEquipped.map((index) => hunt.items[index])];
-  const healed = applied.levelled ? hpAfterHunt({ character, applied, hunt, equipped: worn, name: row.name }, content) : null;
+  const healed = applied.levelled ? hpAfterHunt({ character, applied, hunt, equipped: worn, name: row.name }, content()) : null;
   const storedPrice = storedSold.length > 0 ? soldGold(row.id, storedSold, sellBonus) : { sql: '0', binds: [] };
   const insertItem = db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, ?, ?, ?)');
 
@@ -278,7 +278,7 @@ export async function enterTower(context) {
     // The Próby Gildii's trial too: the creatures and the fight won, on a
     // floor at most so many levels below the character (guild-trials.js;
     // the author: 488 A).
-    ...trialProgress(db, row.id, { kills: huntKills(hunt, content), towerWins: won && hunt.tower.level >= trialTowerFloor(row.level, content) ? 1 : 0 }, now),
+    ...trialProgress(db, row.id, { kills: huntKills(hunt, content()), towerWins: won && hunt.tower.level >= trialTowerFloor(row.level, content()) ? 1 : 0 }, now),
     ...(storedSold.length > 0 ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${storedSold.map(() => '?').join(', ')})`).bind(row.id, ...storedSold.map((item) => item.id))] : []),
   ]);
   const after = await loadPlayer(db, session.userId);

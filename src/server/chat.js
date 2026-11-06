@@ -51,7 +51,7 @@ export const ADMIN_LINK = /\[([^[\]]{1,80})\]\((https?:\/\/[^\s()]{1,500})\)|(ht
 const untilFormat = new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
 
 function channelOf(id) {
-  const channel = content.chat.channels.find((entry) => entry.id === id);
+  const channel = content().chat.channels.find((entry) => entry.id === id);
   if (!channel) throw new ApiError(404, 'no_channel', 'Nie ma takiego kanału.');
   return channel;
 }
@@ -100,7 +100,7 @@ const conversationsOf = (db, userId, characterId) =>
        WHERE c.${OWN_CHARACTERS} AND c.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?) AND (x.last_id IS NULL OR s.last > x.last_id)
        ORDER BY s.last DESC LIMIT ?`,
     )
-    .bind(characterId, characterId, characterId, characterId, characterId, userId, content.chat.rules.conversations);
+    .bind(characterId, characterId, characterId, characterId, characterId, userId, content().chat.rules.conversations);
 const conversationView = (row) => ({ id: row.id, name: row.name, classId: row.class_id, latest: row.latest ?? 0 });
 
 export function mutedText(until) {
@@ -123,10 +123,10 @@ export function cleanText(raw, { admin = false } = {}) {
   if (typeof raw !== 'string') throw new ApiError(400, 'empty', 'Napisz wiadomość.');
   const text = raw.normalize('NFC').replace(INVISIBLE, '').replace(CONTROL, ' ').replace(/\s+/g, ' ').trim();
   if (!text) throw new ApiError(400, 'empty', 'Napisz wiadomość.');
-  const { maxLength, linkMaxLength } = content.chat.rules;
+  const { maxLength, linkMaxLength } = content().chat.rules;
   const shown = admin ? text.replace(ADMIN_LINK, (whole, label) => label ?? whole) : text;
   if ([...shown].length > maxLength || [...text].length > linkMaxLength) throw new ApiError(400, 'too_long', `Wiadomość może mieć najwyżej ${maxLength} znaków.`);
-  const words = content.chat.words;
+  const words = content().chat.words;
   const masked = (part) => part.replace(WORD, (word) => (words.some((bad) => word.toLowerCase().includes(bad)) ? '*'.repeat([...word].length) : word));
   if (!admin) {
     if (LINK.test(text)) throw new ApiError(400, 'link', 'Linki w czacie są niedozwolone.');
@@ -179,7 +179,7 @@ const playerMessageView = (row, userId, env, readerId) => ({
 
 // An item a Wymiana message shows: what its sheet tells.
 const offeredItem = (item) => {
-  const view = itemView(item, content);
+  const view = itemView(item, content());
   return {
     name: view.name,
     base: view.base,
@@ -201,7 +201,7 @@ const offeredItem = (item) => {
 async function offeredItems(db, channel, characterId, ids) {
   if (ids === undefined || (Array.isArray(ids) && ids.length === 0)) return null;
   if (!channel?.items) throw new ApiError(400, 'no_items_here', 'Przedmioty pokażesz tylko w kanale Wymiana.');
-  const most = content.chat.rules.items;
+  const most = content().chat.rules.items;
   if (!Array.isArray(ids) || !ids.every(Number.isInteger) || new Set(ids).size !== ids.length) throw new ApiError(400, 'bad_items', 'Nie ma takich przedmiotów.');
   if (ids.length > most) throw new ApiError(400, 'too_many_items', `Jedna wiadomość pokaże najwyżej ${most} przedmioty.`);
   const rows = await db
@@ -226,8 +226,8 @@ export async function requireChatter(context) {
   ]);
   const character = characters.results[0];
   if (!character) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
-  if (!isUnlocked('community', character.level, content)) {
-    throw new ApiError(403, 'locked', `Społeczność odblokujesz na poziomie postaci ${content.unlocksById.community.level}.`);
+  if (!isUnlocked('community', character.level, content())) {
+    throw new ApiError(403, 'locked', `Społeczność odblokujesz na poziomie postaci ${content().unlocksById.community.level}.`);
   }
   const account = accounts.results[0];
   if (!(context.now - (account.seen_at ?? 0) < SEEN_EVERY)) {
@@ -279,7 +279,7 @@ export async function readChat(context) {
          WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND (m.system = 1 OR m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?))
          ORDER BY m.id DESC LIMIT ?`,
       )
-      .bind(...binds, after, userId, content.chat.rules.page),
+      .bind(...binds, after, userId, content().chat.rules.page),
     db.prepare(`SELECT m.id FROM chat_messages m WHERE ${where} AND m.id >= ? AND m.id <= ? AND m.hidden_at IS NOT NULL`).bind(...binds, from || after, after),
     blockedList(db, userId),
     db.prepare(role ? 'SELECT COUNT(DISTINCT message_id) AS count FROM chat_reports WHERE closed_at IS NULL' : 'SELECT NULL AS count'),
@@ -302,7 +302,7 @@ export async function readChat(context) {
 // The channels whose reading a character keeps, besides the private
 // conversations: the Globalny, the Wymiana (where tags light it,
 // mentions.js) and the guild's, under "guild".
-const seenChannels = () => [...content.chat.channels.map((channel) => channel.id), GUILD];
+const seenChannels = () => [...content().chat.channels.map((channel) => channel.id), GUILD];
 
 // What a character has read, as POST /api/chat/seen keeps it: the newest
 // message of each channel and of each private conversation, by the other
@@ -338,7 +338,7 @@ export async function latestChat(context) {
   const newest = `SELECT MAX(id) AS id FROM chat_messages
          WHERE channel = ? AND hidden_at IS NULL AND (system = 1 OR (user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)))`;
   const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites, activity, mentions] = await Promise.all([
-    db.prepare(newest).bind(content.chat.channels[0].id, session.userId, session.userId).first(),
+    db.prepare(newest).bind(content().chat.channels[0].id, session.userId, session.userId).first(),
     conversationsOf(db, session.userId, character.id).all(),
     friendNews(db, character.id, context.now),
     tradeNews(db, character.id, context.now),
@@ -412,8 +412,8 @@ export async function acceptChatRules(context) {
 // A private message goes only to a character that has the Społeczność,
 // and not between two players when either hides the other.
 async function privateAllowed(db, userId, other) {
-  if (!isUnlocked('community', other.level, content)) {
-    throw new ApiError(409, 'locked', `${other.name} nie ma jeszcze Społeczności. Otworzy się na ${content.unlocksById.community.level}. poziomie.`);
+  if (!isUnlocked('community', other.level, content())) {
+    throw new ApiError(409, 'locked', `${other.name} nie ma jeszcze Społeczności. Otworzy się na ${content().unlocksById.community.level}. poziomie.`);
   }
   const [hiding, hidden] = await db.batch([
     db.prepare('SELECT 1 FROM chat_blocks WHERE user_id = ? AND blocked_id = ?').bind(userId, other.user_id),
@@ -444,7 +444,7 @@ export async function sendChat(context) {
   const offered = await offeredItems(db, channel, character.id, body.items);
   const items = offered && JSON.stringify(offered);
   const tags = await findMentions(db, shownText(text), { userId, channel: other ? PRIVATE : (guild ?? channel.id), recipientId: other?.id ?? null }, now);
-  const { everySeconds, keep, privateKeep } = content.chat.rules;
+  const { everySeconds, keep, privateKeep } = content().chat.rules;
   const where = other ? `m.channel = '${PRIVATE}' AND ${PAIR}` : 'm.channel = ?';
   const binds = other ? pairOf(character.id, other.id) : [guild ?? channel.id];
   const [sent] = await db.batch([
@@ -552,7 +552,7 @@ export async function reportChat(context) {
         `UPDATE chat_messages SET hidden_at = ? WHERE id = ? AND hidden_at IS NULL
            AND (SELECT COUNT(*) FROM chat_reports WHERE message_id = ? AND closed_at IS NULL) >= ?`,
       )
-      .bind(context.now, message.id, message.id, content.chat.rules.hideAfterReports),
+      .bind(context.now, message.id, message.id, content().chat.rules.hideAfterReports),
   ]);
   return json({ text: 'Zgłoszono. Moderacja sprawdzi tę wiadomość.' });
 }

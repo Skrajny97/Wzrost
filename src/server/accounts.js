@@ -4,6 +4,8 @@ import { sendLink } from './email.js';
 import { registrationOpen } from './features.js';
 import { googleConfigured } from './google.js';
 import { ApiError, json, readJson } from './http.js';
+import { LANGUAGES, language } from './i18n.js';
+import { englishOn } from './features.js';
 import { marketRemoval } from './market.js';
 import { guildRemoval } from './guilds.js';
 import { partyRemoval } from './parties.js';
@@ -84,8 +86,8 @@ export async function register({ request, env, now }) {
   let userId;
   try {
     const result = await db
-      .prepare('INSERT INTO users (login, email, password_hash, created_at, email_required) VALUES (?, ?, ?, ?, 1)')
-      .bind(login, email, passwordHash, now)
+      .prepare('INSERT INTO users (login, email, password_hash, created_at, email_required, language) VALUES (?, ?, ?, ?, 1, ?)')
+      .bind(login, email, passwordHash, now, language())
       .run();
     userId = result.meta.last_row_id;
   } catch (error) {
@@ -105,7 +107,7 @@ export async function register({ request, env, now }) {
     if (!(error instanceof ApiError)) throw error;
     emailSent = false;
   }
-  const user = userView({ login, email, created_at: now, google_sub: null, email_confirmed_at: null, email_required: 1, skip_tutorials: 0 });
+  const user = userView({ login, email, created_at: now, google_sub: null, email_confirmed_at: null, email_required: 1, skip_tutorials: 0, language: language() });
   return json({ user: { ...user, testMode: testModeFor(env, login), tutorialTests: tutorialTestsFor(env, login), author: false }, emailSent }, 201, {
     'Set-Cookie': sessionCookie(session.token, session.expiresAt, now),
   });
@@ -139,7 +141,7 @@ export async function login({ request, env, now }) {
     );
   }
 
-  const columns = 'id, login, email, password_hash, google_sub, created_at, email_confirmed_at, email_required, skip_tutorials';
+  const columns = 'id, login, email, password_hash, google_sub, created_at, email_confirmed_at, email_required, skip_tutorials, language';
   const query = identifier.includes('@') ? `SELECT ${columns} FROM users WHERE email = ?` : `SELECT ${columns} FROM users WHERE login = ?`;
   const user = await db.prepare(query).bind(identifier).first();
   if (!user || !(await verifyPassword(password, user.password_hash))) {
@@ -243,4 +245,16 @@ export async function me(context) {
   // The author sees on the settings that players' bug reports wait.
   if (user.author) user.bugReports = await openBugReports(context.env.DB);
   return json({ user }, 200, headers);
+}
+
+// POST /api/me/language {language}: the PL | EN switch of the login screen
+// and the Ustawienia (src/client/i18n.js), kept on the account, so that what
+// the server sends it by itself can follow it. Only where English is on.
+export async function setLanguage(context) {
+  const session = await requireSession(context);
+  if (!englishOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  const body = await readJson(context.request);
+  if (!LANGUAGES.includes(body.language)) throw new ApiError(400, 'invalid_language', 'Nie ma takiego języka.');
+  await context.env.DB.prepare('UPDATE users SET language = ? WHERE id = ?').bind(body.language, session.userId).run();
+  return json({ language: body.language });
 }

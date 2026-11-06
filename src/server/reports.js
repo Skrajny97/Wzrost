@@ -14,8 +14,8 @@ import { ApiError, json } from './http.js';
 const TOWER = "kind = 'tower'";
 const OTHER = "kind <> 'tower'";
 const groups = () => [
-  { where: OTHER, kept: content.balance.journal.reports },
-  { where: TOWER, kept: content.balance.journal.towerReports },
+  { where: OTHER, kept: content().balance.journal.reports },
+  { where: TOWER, kept: content().balance.journal.towerReports },
 ];
 
 // The statement that removes the character's reports of the group of
@@ -55,6 +55,6 @@ export async function getReport(context) {
   // one set before 0.1.77 was kept without its line and what it means, which
   // the card reads (the code review of 0.1.77).
   const item = report.set?.item;
-  if (item?.gem) report.set = { ...report.set, item: { ...item, gem: gemView(item.gem.id, content) } };
+  if (item?.gem) report.set = { ...report.set, item: { ...item, gem: gemView(item.gem.id, content()) } };
   return json({ report: { id: row.id, createdAt: row.created_at, ...report } });
 }

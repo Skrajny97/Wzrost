@@ -95,18 +95,18 @@ export async function openChest(context) {
   const period = quests[periodId];
   if (period.chest) throw new ApiError(409, 'opened', 'Ta skrzynia jest już otwarta.');
   if (!chestReady(period)) throw new ApiError(409, 'not_ready', 'Skrzynia otworzy się, gdy wykonasz wszystkie zadania.');
-  const chest = content.quests.periods[periodId].chest;
+  const chest = content().quests.periods[periodId].chest;
   const db = context.env.DB;
   const row = player.row;
   let item = null;
   if (chest.item) {
-    const capacity = bagCapacity(campLevels(player.buildings, now, content), content);
+    const capacity = bagCapacity(campLevels(player.buildings, now, content()), content());
     if (bagPlaces(player) >= capacity) {
       throw new ApiError(409, 'bag_full', 'Plecak jest pełny. Zrób w nim miejsce, żeby otworzyć skrzynię.');
     }
     // The same week's chest holds the same item, whenever it is opened.
     const rng = createRng(`${row.id}:${periodId}:${period.period}:chest`);
-    item = chestItem({ level: row.level, classId: row.class_id, classLevel: row.class_level }, equippedItems(player).map((worn) => worn.slot), rng, content);
+    item = chestItem({ level: row.level, classId: row.class_id, classLevel: row.class_level }, equippedItems(player).map((worn) => worn.slot), rng, content());
   }
   const gold = chestGold(chest, row.level);
   const after = withChest(quests, periodId);
@@ -133,7 +133,7 @@ export async function openChest(context) {
       gold,
       timePoints: chest.timePoints,
       systemPoints: chest.systemPoints,
-      item: item && { name: itemName(item, content), rarity: item.rarity, color: content.raritiesById[item.rarity].color },
+      item: item && { name: itemName(item, content()), rarity: item.rarity, color: content().raritiesById[item.rarity].color },
     },
     character: characterView(await loadPlayer(db, session.userId), now),
   });
@@ -147,10 +147,10 @@ export async function rerollQuests(context) {
   const periodId = periodOf(body);
   const now = context.now;
   const quests = questsNow(player, now);
-  const next = rerolledQuests(quests, periodId, questContext(player, now), now, content);
+  const next = rerolledQuests(quests, periodId, questContext(player, now), now, content());
   if (!next) {
     throw quests[periodId].rerolled
-      ? new ApiError(409, 'rerolled', content.quests.periods[periodId].rerolled)
+      ? new ApiError(409, 'rerolled', content().quests.periods[periodId].rerolled)
       : new ApiError(409, 'nothing_to_reroll', 'Nie ma zadań do przelosowania.');
   }
   const db = context.env.DB;

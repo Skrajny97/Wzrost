@@ -115,7 +115,7 @@ function skipRest(db, player, now) {
   if (player.activity) throw new ApiError(409, 'busy', 'Postać jest na wyprawie, nie odpoczywa.');
   const { hp, maxHp, vitality, rest } = currentHp(player, now);
   if (hp >= maxHp) throw nothing('Postać ma pełne HP.');
-  const perMinute = regenPerMinute(maxHp, vitality, content, rest.change?.bonus ?? rest.bonus);
+  const perMinute = regenPerMinute(maxHp, vitality, content(), rest.change?.bonus ?? rest.bonus);
   const minutes = Math.ceil((maxHp - hp) / perMinute);
   const spent = Math.min(minutes, row.time_points);
   const hpAfter = spent === minutes ? maxHp : Math.min(maxHp, Math.floor(hp + perMinute * spent));

@@ -23,7 +23,7 @@ import { shownText } from './chat.js';
 import { content } from './content.js';
 import { OWN_CHARACTERS } from './roles.js';
 
-const tuning = () => content.chat.mentions;
+const tuning = () => content().chat.mentions;
 // D1 binds at most 100 values to a statement: the names one message looks
 // up, the longest first at each "@".
 const MOST_NAMES = 90;
@@ -52,7 +52,7 @@ export async function findMentions(db, text, { userId, channel, recipientId = nu
   const reads = (row) =>
     row.user_id !== userId &&
     !row.hiding &&
-    isUnlocked('community', row.level, content) &&
+    isUnlocked('community', row.level, content()) &&
     (channel === PRIVATE ? row.id === recipientId : channel.startsWith(GUILD_PREFIX) ? row.guild_id !== null && `${GUILD_PREFIX}${row.guild_id}` === channel : true);
   // First the longest name some character has at each "@", and only then
   // whether that character may be tagged (pickMentions).
@@ -109,7 +109,7 @@ export async function newestMentions(db, characterId, userId, guildChannelNow) {
     )
     .bind(characterId, userId)
     .all();
-  const newest = { ...Object.fromEntries(content.chat.channels.map((channel) => [channel.id, 0])), guild: 0, private: {} };
+  const newest = { ...Object.fromEntries(content().chat.channels.map((channel) => [channel.id, 0])), guild: 0, private: {} };
   for (const row of rows.results) {
     if (row.channel === PRIVATE) newest.private[row.other] = row.id;
     else if (row.channel.startsWith(GUILD_PREFIX)) {
@@ -159,7 +159,7 @@ const channelName = (channel) =>
     ? tuning().texts.channels.private
     : channel.startsWith(GUILD_PREFIX)
       ? tuning().texts.channels.guild
-      : (content.chat.channels.find((entry) => entry.id === channel)?.name ?? channel);
+      : (content().chat.channels.find((entry) => entry.id === channel)?.name ?? channel);
 
 // The phone notifications of the tags made after `from` up to `to`: Map of
 // user id → [{ tag, url, at, title, body }], oldest first. Only to a played

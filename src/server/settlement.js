@@ -136,7 +136,7 @@ const grow = (relations, { resident, relationGain }) => ({ ...relations, [reside
 // board's orders, the reforging, the resets, the Karczma, the Chata
 // zielarki, the Kuźnia or the Garbarnia; none for the others.
 const serviceOf = (residentId) =>
-  ['orders', 'reforge', 'hermit', 'tavern', 'herbalist', 'forge', 'tannery'].find((service) => content.settlement[service].resident === residentId) ?? null;
+  ['orders', 'reforge', 'hermit', 'tavern', 'herbalist', 'forge', 'tannery'].find((service) => content().settlement[service].resident === residentId) ?? null;
 
 // What the row keeps of the Osada: reputation and relations by id, the
 // board, a reforging's affixes waiting for the player's choice (`pending`),
@@ -185,14 +185,14 @@ function evolutionChangeView(row, stored) {
   const character = engineCharacter(row);
   if (!evolutionsOn() || !character.evolution) return null;
   return {
-    price: evolutionChangePrice(stored.evolutionChanges ?? 0, content),
-    current: classNameOf(character, content),
-    choices: evolutionChanges(character, content).map((evolution) => ({ id: evolution.id, name: evolutionName(evolution, character.appearance) })),
+    price: evolutionChangePrice(stored.evolutionChanges ?? 0, content()),
+    current: classNameOf(character, content()),
+    choices: evolutionChanges(character, content()).map((evolution) => ({ id: evolution.id, name: evolutionName(evolution, character.appearance) })),
   };
 }
 
 // How many affixes the Zaklinaczka offers at the character's relation.
-const choicesOf = (stored) => reforgeChoices(stored.relations[content.settlement.reforge.resident] ?? 0, content);
+const choicesOf = (stored) => reforgeChoices(stored.relations[content().settlement.reforge.resident] ?? 0, content());
 
 // A reforging's affixes waiting for a choice, of an item the character
 // still has, not reforged since (the Kowadło's upgrades do not matter);
@@ -204,58 +204,58 @@ function pendingOf(stored, items) {
 
 // An affix as the item card shows it, with the Kowadło's upgrade.
 const affixLabel = (item, index) => {
-  const affix = upgradedItem(item, content).affixes[index];
-  return `${propertyName(affix.stat, content)}: +${affix.value}`;
+  const affix = upgradedItem(item, content()).affixes[index];
+  return `${propertyName(affix.stat, content())}: +${affix.value}`;
 };
 
 export function requireOpen(row) {
-  const unlock = content.unlocksById.settlement;
-  if (!settlementOn() || !content.settlement) throw new ApiError(404, 'not_found', 'Osady jeszcze nie ma.');
+  const unlock = content().unlocksById.settlement;
+  if (!settlementOn() || !content().settlement) throw new ApiError(404, 'not_found', 'Osady jeszcze nie ma.');
   if (row.level < unlock.level && !settlementOf(row).test) throw new ApiError(403, 'locked', `Osadę odblokujesz na poziomie postaci ${unlock.level}.`);
 }
 
 // A good's name on the board.
 function goodLabel({ kind, key }) {
-  if (kind === 'herb') return content.herbsById[key].name;
-  if (kind === 'potion') return content.potionsById[key].name;
+  if (kind === 'herb') return content().herbsById[key].name;
+  if (kind === 'potion') return content().potionsById[key].name;
   if (isAnyMaterial({ kind, key })) {
-    const [name] = content.settlement.orders.anyMaterial[parseStack(key).rarityId];
+    const [name] = content().settlement.orders.anyMaterial[parseStack(key).rarityId];
     return name[0].toUpperCase() + name.slice(1);
   }
   if (kind === 'material') {
-    const { label } = materialView(key, 1, content);
+    const { label } = materialView(key, 1, content());
     return label[0].toUpperCase() + label.slice(1);
   }
-  if (kind === 'resource') return content.resourcesById[key].name;
-  if (kind === 'craft') return `${content.basesById[key].name} z Warsztatu`;
-  return content.partsById[key].name;
+  if (kind === 'resource') return content().resourcesById[key].name;
+  if (kind === 'craft') return `${content().basesById[key].name} z Warsztatu`;
+  return content().partsById[key].name;
 }
 
 // The orders pay at least overScrap times the scrapper's price with the
 // camp's Skup bonus (orderGold, question 236 A).
-const sellBonusOf = (player, now) => campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
+const sellBonusOf = (player, now) => campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content());
 
 // An order for any materials of a rarity has the three forms of their
 // name (`forms`: "materiał pospolity", "materiały pospolite", "materiałów
 // pospolitych") and, once the character holds enough, the stacks
 // delivering it would take (`takes`).
 function orderView(order, stocks, sellBonus) {
-  const have = goodStock(order, stocks, content);
+  const have = goodStock(order, stocks, content());
   const any = isAnyMaterial(order);
   const takes =
     any && have >= order.count
-      ? Object.entries(materialsTaken(order, stocks.materials, content)).map(([key, count]) => {
-          const { label } = materialView(key, count, content);
+      ? Object.entries(materialsTaken(order, stocks.materials, content())).map(([key, count]) => {
+          const { label } = materialView(key, count, content());
           return { name: label[0].toUpperCase() + label.slice(1), count };
         })
       : null;
   return {
     ...order,
-    gold: orderGold(order, sellBonus, content),
+    gold: orderGold(order, sellBonus, content()),
     label: goodLabel(order),
-    ...(any && { forms: content.settlement.orders.anyMaterial[parseStack(order.key).rarityId] }),
+    ...(any && { forms: content().settlement.orders.anyMaterial[parseStack(order.key).rarityId] }),
     ...(takes && { takes }),
-    brotherhoodName: content.settlement.brotherhoods.find((one) => one.id === order.brotherhood).name,
+    brotherhoodName: content().settlement.brotherhoods.find((one) => one.id === order.brotherhood).name,
     have,
   };
 }
@@ -266,7 +266,7 @@ function orderView(order, stocks, sellBonus) {
 export function settlementView(player, stored, board, now) {
   const stocks = settlementGoods(player.row, player.items, now);
   const sellBonus = sellBonusOf(player, now);
-  const { name, description, places, torches = [], residents, brotherhoods } = content.settlement;
+  const { name, description, places, torches = [], residents, brotherhoods } = content().settlement;
   return {
     name,
     description,
@@ -275,26 +275,26 @@ export function settlementView(player, stored, board, now) {
     // The Sala prób's trial of the day (trial-hall.js; 620 B).
     trialHall: trialHallView(player.row, now),
     residents: residents.map((resident) => {
-      const standing = standingOf(stored.relations[resident.id] ?? 0, content);
+      const standing = standingOf(stored.relations[resident.id] ?? 0, content());
       return { ...resident, service: serviceOf(resident.id), standing, greeting: resident.greetings[Math.min(standing.index, resident.greetings.length - 1)] };
     }),
     // Each brotherhood's standing, its points, and what the standing gives
     // now and what the next one adds (the panel on the board).
     brotherhoods: brotherhoods.map((brotherhood) => {
       const points = stored.reputation[brotherhood.id] ?? 0;
-      const standing = standingOf(points, content);
-      const now = brotherhoodPerks(brotherhood, standing.index, content);
-      const next = standing.next ? brotherhoodPerks(brotherhood, standing.index + 1, content).filter((perk) => !now.includes(perk)) : [];
-      const reward = rewardView(standingRewardsDue(brotherhood.id, points, stored.rewarded?.[brotherhood.id] ?? 0, content));
+      const standing = standingOf(points, content());
+      const now = brotherhoodPerks(brotherhood, standing.index, content());
+      const next = standing.next ? brotherhoodPerks(brotherhood, standing.index + 1, content()).filter((perk) => !now.includes(perk)) : [];
+      const reward = rewardView(standingRewardsDue(brotherhood.id, points, stored.rewarded?.[brotherhood.id] ?? 0, content()));
       return { ...brotherhood, points, standing, perks: { now, next }, reward };
     }),
-    brotherhoodsPanel: { ...content.settlement.brotherhoodsPanel, $comment: undefined },
+    brotherhoodsPanel: { ...content().settlement.brotherhoodsPanel, $comment: undefined },
     board: {
       slots: board.slots.map((slot) => (slot.order ? { order: orderView(slot.order, stocks, sellBonus) } : { readyAt: slot.readyAt })),
       weekly: board.weekly?.order && !board.weekly.done ? orderView({ ...board.weekly.order, id: 'weekly' }, stocks, sellBonus) : null,
       weeklyDone: board.weekly?.done ?? false,
       // The wait for a new order in a slot emptied (data/settlement.json).
-      refillMinutes: content.settlement.orders.refillMinutes,
+      refillMinutes: content().settlement.orders.refillMinutes,
     },
     reforge: {
       items: player.items.filter((item) => item.affixes?.length > 0).map((item) => reforgeView(item, stocks.materials, player.row.class_id)),
@@ -315,8 +315,8 @@ export function settlementView(player, stored, board, now) {
     imbue: imbueView(player),
     // After an evolution the paths change with it, so no path reset.
     hermit: {
-      path: player.row.evolution ? null : pathResetCost(player.row.level, content),
-      stats: statResetCost(player.row.level, content),
+      path: player.row.evolution ? null : pathResetCost(player.row.level, content()),
+      stats: statResetCost(player.row.level, content()),
       evolution: evolutionChangeView(player.row, stored),
     },
     now,
@@ -328,23 +328,23 @@ export function settlementView(player, stored, board, now) {
 // and the weapons and body armours it can go on, worn or in the bag, each
 // with its element now and the price in gold.
 function imbueView(player) {
-  const { imbue } = content.settlement;
+  const { imbue } = content().settlement;
   const materials = JSON.parse(player.row.materials ?? '{}');
   const items = player.items.filter((item) => imbue.slots.includes(item.slot));
   return {
     elements: imbue.elements.map(({ element, material }) => {
-      const { stack, count } = imbueCost({ level: 1, rarity: 'common' }, element, content);
+      const { stack, count } = imbueCost({ level: 1, rarity: 'common' }, element, content());
       // `key`: the material's stack, for "Poproś gildię" (guild-requests.js).
-      return { element, name: content.elementsById[element].name, material: content.materialsById[material].name, key: stack, count, have: materials[stack] ?? 0 };
+      return { element, name: content().elementsById[element].name, material: content().materialsById[material].name, key: stack, count, have: materials[stack] ?? 0 };
     }),
     items: items.map((item) => ({
       id: item.id,
-      name: itemName(item, content),
+      name: itemName(item, content()),
       equipped: Boolean(item.equippedSlot),
       slot: item.slot,
       element: item.imbue?.element ?? null,
-      gold: imbueCost(item, imbue.elements[0].element, content).gold,
-      effects: Object.fromEntries(imbue.elements.map(({ element }) => [element, imbueEffect(item, element, content)])),
+      gold: imbueCost(item, imbue.elements[0].element, content()).gold,
+      effects: Object.fromEntries(imbue.elements.map(({ element }) => [element, imbueEffect(item, element, content())])),
     })),
   };
 }
@@ -363,12 +363,12 @@ export async function imbueAtEnchantress(context) {
   // An item worn is changed at home; one in the bag also while away.
   requireUnworn(player, item, context.now);
   const materials = JSON.parse(row.materials ?? '{}');
-  const block = imbueBlock(item, body.element, { gold: row.gold, materials }, content);
+  const block = imbueBlock(item, body.element, { gold: row.gold, materials }, content());
   if (block) throw new ApiError(block.code === 'wrong_slot' || block.code === 'invalid_element' ? 400 : 409, block.code, block.message);
-  const cost = imbueCost(item, body.element, content);
-  const effect = imbueEffect(item, body.element, content);
+  const cost = imbueCost(item, body.element, content());
+  const effect = imbueEffect(item, body.element, content());
   const stored = settlementOf(row);
-  const next = { ...stored, relations: grow(stored.relations, content.settlement.imbue) };
+  const next = { ...stored, relations: grow(stored.relations, content().settlement.imbue) };
   const stack = jsonPath(cost.stack);
   const db = context.env.DB;
   // As the reforging: the item changes only if the character is as seen
@@ -391,7 +391,7 @@ export async function imbueAtEnchantress(context) {
   const saved = after.items.find((candidate) => candidate.id === item.id);
   if (saved?.imbue?.element !== body.element || after.row.gold !== row.gold - cost.gold) throw changed();
   return json({
-    imbued: { item: itemName(item, content), element: content.elementsById[body.element].name },
+    imbued: { item: itemName(item, content()), element: content().elementsById[body.element].name },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
   });
@@ -400,9 +400,9 @@ export async function imbueAtEnchantress(context) {
 // What Jagna pays for one herb or potion now (part III, 121 A): the
 // scrapper's price with the camp's Skup bonus, and her premium on top.
 function herbalistPrices(player, stored, now) {
-  const premium = herbalistPremium(stored.relations[content.settlement.herbalist.resident] ?? 0, content);
-  const bonus = campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
-  const scrap = (kind, id) => (kind === 'herb' ? content.herbsById[id].price : potionPrice(content.potionsById[id], content)) * (1 + bonus);
+  const premium = herbalistPremium(stored.relations[content().settlement.herbalist.resident] ?? 0, content());
+  const bonus = campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content());
+  const scrap = (kind, id) => (kind === 'herb' ? content().herbsById[id].price : potionPrice(content().potionsById[id], content())) * (1 + bonus);
   return { premium, scrap, price: (kind, id) => scrap(kind, id) * (1 + premium) };
 }
 
@@ -412,13 +412,13 @@ function herbalistPrices(player, stored, now) {
 // taught, each with whether the Pracownia brews it now or from which level
 // of Alchemia, and the standing that teaches the next ones.
 function recipesView(stored, row) {
-  const texts = content.settlement.herbalist.recipes;
-  const { taught, next } = herbalistRecipes(stored, content);
-  const { level } = professionState(JSON.parse(row.professions ?? '{}'), content.brewing.profession);
+  const texts = content().settlement.herbalist.recipes;
+  const { taught, next } = herbalistRecipes(stored, content());
+  const { level } = professionState(JSON.parse(row.professions ?? '{}'), content().brewing.profession);
   return {
     title: say(texts, 'title', 0),
     taught: taught.map((potion) => ({ id: potion.id, name: potion.name, note: potion.level <= level ? say(texts, 'ready', 0) : say(texts, 'level', 0, { level: potion.level }) })),
-    next: next && say(texts, 'next', 0, { standing: next.standing.name, count: recipeCount(next.potions.length, content) }),
+    next: next && say(texts, 'next', 0, { standing: next.standing.name, count: recipeCount(next.potions.length, content()) }),
   };
 }
 
@@ -427,7 +427,7 @@ function recipesView(stored, row) {
 // teaches with it (a trade with her, an order of the Bractwo Zielarzy), or
 // nothing.
 function taughtWith(before, after) {
-  const taught = taughtWords(before, after, content);
+  const taught = taughtWords(before, after, content());
   return taught ? { taught } : {};
 }
 
@@ -442,24 +442,24 @@ function herbalistView(player, stored, now) {
   const held = { herb: JSON.parse(player.row.herbs ?? '{}'), potion: JSON.parse(player.row.potions ?? '{}') };
   const goods = (kind, list) =>
     list.filter((good) => (held[kind][good.id] ?? 0) > 0).map((good) => ({ kind, id: good.id, name: good.name, count: held[kind][good.id], price: price(kind, good.id), scrap: scrap(kind, good.id) }));
-  const points = stored.relations[content.settlement.herbalist.resident] ?? 0;
-  const { herbs, next } = herbalistStock(points, content);
-  const { stack } = content.professionRules;
-  const free = Math.max(0, bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player));
+  const points = stored.relations[content().settlement.herbalist.resident] ?? 0;
+  const { herbs, next } = herbalistStock(points, content());
+  const { stack } = content().professionRules;
+  const free = Math.max(0, bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player));
   const room = (count) => (count % stack === 0 ? 0 : stack - (count % stack));
   return {
     premium,
     // At her best price already: no "more with a better relation".
-    best: premium >= Math.max(...content.settlement.herbalist.premium),
-    goods: [...goods('herb', content.herbs), ...goods('potion', content.potions)],
-    trade: tradeView(stored.trade, player.row.level, now, content),
+    best: premium >= Math.max(...content().settlement.herbalist.premium),
+    goods: [...goods('herb', content().herbs), ...goods('potion', content().potions)],
+    trade: tradeView(stored.trade, player.row.level, now, content()),
     shop: {
       goods: herbs.map(({ id, price: cost }) => {
-        const herb = content.herbsById[id];
+        const herb = content().herbsById[id];
         return { kind: 'herb', key: id, name: herb.name, description: herb.description, scrap: herb.price, gatherLevel: herb.level, price: cost, fits: free * stack + room(held.herb[id] ?? 0) };
       }),
-      next: next && { standing: next.standing, herbs: next.herbs.map((id) => content.herbsById[id].name) },
-      discount: relationDiscount(points, content),
+      next: next && { standing: next.standing, herbs: next.herbs.map((id) => content().herbsById[id].name) },
+      discount: relationDiscount(points, content()),
     },
     recipes: recipesView(stored, player.row),
   };
@@ -477,14 +477,14 @@ export async function sellToHerbalist(context) {
   requireOpen(row);
   const body = await readJson(context.request);
   const column = { herb: 'herbs', potion: 'potions' }[body.kind];
-  const known = { herb: content.herbsById, potion: content.potionsById }[body.kind]?.[body.id];
+  const known = { herb: content().herbsById, potion: content().potionsById }[body.kind]?.[body.id];
   if (!column || !known) throw new ApiError(400, 'invalid_goods', 'Zielarka kupuje tylko zioła i mikstury.');
   const held = JSON.parse(row[column] ?? '{}')[body.id] ?? 0;
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > held) throw new ApiError(409, 'not_enough', 'Nie masz tylu w torbie.');
   const stored = settlementOf(row);
   const gold = saleGold(herbalistPrices(player, stored, context.now).price(body.kind, body.id), body.count);
-  const { herbalist } = content.settlement;
-  const { points, trade } = tradePoints(gold, row.level, stored.trade, context.now, content);
+  const { herbalist } = content().settlement;
+  const { points, trade } = tradePoints(gold, row.level, stored.trade, context.now, content());
   const add = (counts, id) => ({ ...counts, [id]: (counts[id] ?? 0) + points });
   const next = { ...stored, relations: add(stored.relations, herbalist.resident), reputation: add(stored.reputation, herbalist.brotherhood), trade };
   const key = jsonPath(body.id);
@@ -517,18 +517,18 @@ export async function buyFromHerbalist(context) {
   requireOpen(row);
   const body = await readJson(context.request);
   const stored = settlementOf(row);
-  const { herbalist } = content.settlement;
-  const good = herbalistStock(stored.relations[herbalist.resident] ?? 0, content).herbs.find((one) => one.id === body.id);
+  const { herbalist } = content().settlement;
+  const good = herbalistStock(stored.relations[herbalist.resident] ?? 0, content()).herbs.find((one) => one.id === body.id);
   if (!good) throw new ApiError(404, 'no_goods', 'Jagna nie sprzedaje Ci jeszcze tego zioła.');
   if (!Number.isInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Podaj, ile sztuk kupić.');
   const gold = good.price * body.count;
   if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota.');
   const held = JSON.parse(row.herbs ?? '{}');
-  const free = bagCapacity(campLevels(player.buildings, context.now, content), content) - bagPlaces(player);
-  if (bagStacks({ ...held, [good.id]: (held[good.id] ?? 0) + body.count }, content) - bagStacks(held, content) > free) {
+  const free = bagCapacity(campLevels(player.buildings, context.now, content()), content()) - bagPlaces(player);
+  if (bagStacks({ ...held, [good.id]: (held[good.id] ?? 0) + body.count }, content()) - bagStacks(held, content()) > free) {
     throw new ApiError(409, 'bag_full', 'Tyle nie zmieści się w plecaku.');
   }
-  const { points, trade } = tradePoints(gold, row.level, stored.trade, context.now, content);
+  const { points, trade } = tradePoints(gold, row.level, stored.trade, context.now, content());
   const add = (counts, id) => ({ ...counts, [id]: (counts[id] ?? 0) + points });
   const next = { ...stored, relations: add(stored.relations, herbalist.resident), reputation: add(stored.reputation, herbalist.brotherhood), trade };
   const herbs = counted('herbs', { [good.id]: body.count });
@@ -542,7 +542,7 @@ export async function buyFromHerbalist(context) {
   if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(context.env.DB, session.userId);
   return json({
-    bought: { name: content.herbsById[good.id].name, count: body.count, gold, points, ...taughtWith(stored, next) },
+    bought: { name: content().herbsById[good.id].name, count: body.count, gold, points, ...taughtWith(stored, next) },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
   });
@@ -553,13 +553,13 @@ export async function buyFromHerbalist(context) {
 // once the innkeeper told it (not the beggar's song: the mug still tells
 // it, for the relation).
 function tavernView(row, stored, now) {
-  const rumor = rumorToday(stored.rumor, now, content);
+  const rumor = rumorToday(stored.rumor, now, content());
   return {
-    tabs: content.settlement.tavern.tabs,
-    mug: mugCost(row.level, content),
+    tabs: content().settlement.tavern.tabs,
+    mug: mugCost(row.level, content()),
     // The innkeeper's words only: the place and what it means are the
     // player's to work out.
-    rumor: rumor && !rumor.song ? { text: rumorText(rumor, content) } : null,
+    rumor: rumor && !rumor.song ? { text: rumorText(rumor, content()) } : null,
   };
 }
 
@@ -571,33 +571,33 @@ function tavernView(row, stored, now) {
 // paid from the character's `materials` too, and `roll`, the seed of its
 // last try on the Kowadło, which the next try names (upgradeCompanionItem).
 function companionView(companion, { upgradeCap, materials, anvilDiscount = 0 } = {}) {
-  const unit = companionCombatant(companion, {}, content);
+  const unit = companionCombatant(companion, {}, content());
   const female = companion.appearance === 'female';
-  const { traits, professions, stories } = content.settlement.companions;
+  const { traits, professions, stories } = content().settlement.companions;
   return {
     id: companion.id,
     name: companion.name,
     appearance: companion.appearance,
     classId: companion.classId,
-    className: content.classesById[companion.classId].name,
+    className: content().classesById[companion.classId].name,
     level: companion.level,
     xp: companion.xp ?? 0,
-    xpToNext: xpToNext(companion.level, content),
+    xpToNext: xpToNext(companion.level, content()),
     maxHp: unit.maxHp,
     armor: unit.armor,
     traits: companion.traits.map((id) => {
       const trait = traits.find((one) => one.id === id);
       return { name: trait.names[female ? 0 : 1], text: trait.text };
     }),
-    skills: companion.skills.map((id) => ({ name: content.skillsById[id].name, level: companionSkillLevel(id, companion.level, content) })),
-    gear: companion.gear.map((item) => itemName(item, content)),
+    skills: companion.skills.map((id) => ({ name: content().skillsById[id].name, level: companionSkillLevel(id, companion.level, content()) })),
+    gear: companion.gear.map((item) => itemName(item, content())),
     // What it wears in each of its places (question 108 A), and whether
     // the item came from the character's bag.
     // Jewellery is one place, for an amulet, a ring or a talisman.
     wear: COMPANION_PLACES.map((slot) => {
       const worn = companion.gear.find((item) => companionPlace(item.slot) === slot);
-      const shown = worn && { ...itemView(worn, content, { upgradeCap, materials, anvilDiscount }), given: Boolean(worn.given), ...(upgradeCap !== undefined && { roll: worn.lastRoll ?? '' }) };
-      return { slot, slotName: content.slotsById[slot]?.name ?? content.settlement.companions.texts.jewelry, item: shown || null };
+      const shown = worn && { ...itemView(worn, content(), { upgradeCap, materials, anvilDiscount }), given: Boolean(worn.given), ...(upgradeCap !== undefined && { roll: worn.lastRoll ?? '' }) };
+      return { slot, slotName: content().slotsById[slot]?.name ?? content().settlement.companions.texts.jewelry, item: shown || null };
     }),
     profession: professions.find((one) => one.id === companion.profession)?.name ?? null,
     story: stories[companion.story % stories.length],
@@ -611,15 +611,15 @@ function restedAt(player, now) {
   if (player.activity) return null;
   const { hp, maxHp, vitality, rest } = currentHp(player, now);
   if (hp >= maxHp) return now;
-  return Math.ceil(now + ((maxHp - hp) / regenPerMinute(maxHp, vitality, content, rest.change?.bonus ?? rest.bonus)) * 60000);
+  return Math.ceil(now + ((maxHp - hp) / regenPerMinute(maxHp, vitality, content(), rest.change?.bonus ?? rest.bonus)) * 60000);
 }
 
 // A companion's gift of the week (question 112 A), with the goods' name: of
 // what the character knows, as an order (knowingCharacter).
 function giftOf(companion, row, now) {
-  const gift = companionGift(companion, { character: knowingCharacter(row), seed: `${row.id}:settlement` }, now, content);
+  const gift = companionGift(companion, { character: knowingCharacter(row), seed: `${row.id}:settlement` }, now, content());
   if (!gift) return null;
-  const goods = { herb: content.herbsById, potion: content.potionsById, part: content.partsById }[gift.kind];
+  const goods = { herb: content().herbsById, potion: content().potionsById, part: content().partsById }[gift.kind];
   return { ...gift, name: goods[gift.key].name };
 }
 
@@ -627,13 +627,13 @@ function giftOf(companion, row, now) {
 // the companion lives in the camp), and how many beds the Kwatery have at
 // their highest level. The relation with the innkeeper sets the price only.
 function placesOf(player, now) {
-  const beds = campBonus(campLevels(player.buildings, now, content), 'companionPlaces', content);
-  const most = content.buildings.filter((building) => building.effect.kind === 'companionPlaces').reduce((sum, building) => sum + building.effect.perLevel * building.maxLevel, 0);
+  const beds = campBonus(campLevels(player.buildings, now, content()), 'companionPlaces', content());
+  const most = content().buildings.filter((building) => building.effect.kind === 'companionPlaces').reduce((sum, building) => sum + building.effect.perLevel * building.maxLevel, 0);
   return { places: beds, most };
 }
 
 // The innkeeper's relation points, which set the price of hiring.
-const innkeeperPoints = (stored) => stored.relations[content.settlement.tavern.resident] ?? 0;
+const innkeeperPoints = (stored) => stored.relations[content().settlement.tavern.resident] ?? 0;
 
 // The Karczma's werbunek (questions 104–106): the places the Kwatery give,
 // the companions hired with this week's gift and this week's candidates not
@@ -643,11 +643,11 @@ function companionsView(player, stored, now) {
   const bag = bagItems(player);
   const rested = (stored.companions ?? []).some((companion) => companion.wounded) ? restedAt(player, now) : now;
   const { places, most } = placesOf(player, now);
-  const upgradeCap = campBonus(campLevels(player.buildings, now, content), 'upgradeCap', content);
+  const upgradeCap = campBonus(campLevels(player.buildings, now, content()), 'upgradeCap', content());
   const materials = JSON.parse(row.materials ?? '{}');
   const hired = stored.companions ?? [];
   const points = innkeeperPoints(stored);
-  const candidates = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, now, content, [
+  const candidates = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, now, content(), [
     ...hired.map((companion) => companion.id),
     ...(stored.dismissed ?? []),
   ]);
@@ -656,28 +656,28 @@ function companionsView(player, stored, now) {
     // Whether the Kwatery can give another bed, and whether a higher
     // standing with the innkeeper would make hiring cheaper.
     moreBeds: places < most,
-    cheaper: hireCost({ level: 1 }, content, points) > hireCost({ level: 1 }, content, Infinity),
+    cheaper: hireCost({ level: 1 }, content(), points) > hireCost({ level: 1 }, content(), Infinity),
     // Each with this week's gift and the items in the bag it can wear.
     hired: hired.map((companion) => {
       const away = companionAway(player, companion);
       return {
         // The Kowadło's price with the Bractwo Kowali (590) and the guild's
         // Kuźnia Gildii (616 A), as for the character's own items.
-        ...companionView(companion, { upgradeCap, materials, anvilDiscount: withSeatDiscount(brotherhoodPerk('anvilDiscount', stored.reputation, content), seatBonuses(player.guildSeat, content).anvil) }),
+        ...companionView(companion, { upgradeCap, materials, anvilDiscount: withSeatDiscount(brotherhoodPerk('anvilDiscount', stored.reputation, content()), seatBonuses(player.guildSeat, content()).anvil) }),
         // Wounded until the character rests to full HP, and when that is.
         ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
         gift: giftOf(companion, row, now),
-        wearable: bag.filter((item) => !companionWearBlock(companion, item, content)).map((item) => item.id),
+        wearable: bag.filter((item) => !companionWearBlock(companion, item, content())).map((item) => item.id),
         bond: bondView(companion, now),
         // Out on the character's exploration: its gear waits for its return,
         // in its words; null at home.
-        away: away ? companionText('away', companion, content) : null,
+        away: away ? companionText('away', companion, content()) : null,
         // The line of its item's card: who wears it and who pays.
-        wornBy: companionText('wornBy', companion, content),
+        wornBy: companionText('wornBy', companion, content()),
         stay: stayView(companion, player.inParty, away),
       };
     }),
-    candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content, points) })),
+    candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content(), points) })),
   };
 }
 
@@ -703,12 +703,12 @@ function requireCompanionHome(player, companion, now) {
 // companion stays, with no switch. One set to stay while out on an
 // exploration stays from its return on.
 function stayView(companion, inParty, away) {
-  if (inParty) return { stays: true, text: companionText('inParty', companion, content), action: null };
+  if (inParty) return { stays: true, text: companionText('inParty', companion, content()), action: null };
   const stays = companionStays(companion);
   return {
     stays,
-    text: companionText(stays ? (away ? 'stayingAfter' : 'staying') : 'going', companion, content),
-    action: { stays: !stays, label: companionText(stays ? 'go' : 'stay', companion, content) },
+    text: companionText(stays ? (away ? 'stayingAfter' : 'staying') : 'going', companion, content()),
+    action: { stays: !stays, label: companionText(stays ? 'go' : 'stay', companion, content()) },
   };
 }
 
@@ -716,14 +716,14 @@ function stayView(companion, inParty, away) {
 // standing and the next, its bonus in a fight, the pieces of its story it
 // has told, and whether it was talked to today.
 function bondView(companion, now) {
-  const standing = companionStanding(companion, content);
+  const standing = companionStanding(companion, content());
   return {
     standing: standing.name,
     points: standing.points,
     next: standing.next && { name: standing.next.name, points: standing.next.points },
-    bonus: bondBonus(companion, content),
-    told: toldPieces(companion, content),
-    talked: talkedToday(companion, now, content),
+    bonus: bondBonus(companion, content()),
+    told: toldPieces(companion, content()),
+    talked: talkedToday(companion, now, content()),
   };
 }
 
@@ -732,18 +732,18 @@ function bondView(companion, now) {
 // materials' rarity the character holds in all and those it would take
 // (rarityNeedView), and which affixes matter to its class.
 function reforgeView(item, materials, classId) {
-  const shown = upgradedItem(item, content);
-  const cost = reforgeCost(item, item.reforged ?? 0, content);
+  const shown = upgradedItem(item, content());
+  const cost = reforgeCost(item, item.reforged ?? 0, content());
   const need = cost.materials;
   return {
     id: item.id,
-    name: itemName(item, content),
+    name: itemName(item, content()),
     rarity: item.rarity,
     equipped: Boolean(item.equippedSlot),
-    affixes: shown.affixes.map((affix) => `${propertyName(affix.stat, content)}: +${affix.value}`),
+    affixes: shown.affixes.map((affix) => `${propertyName(affix.stat, content())}: +${affix.value}`),
     hints: affixHints(shown.affixes, classId),
     gold: cost.gold,
-    materials: need && { ...rarityNeedView(materials, need, content), rarityName: content.raritiesById[need.rarity].name },
+    materials: need && { ...rarityNeedView(materials, need, content()), rarityName: content().raritiesById[need.rarity].name },
   };
 }
 
@@ -754,9 +754,9 @@ function reforgeView(item, materials, classId) {
 // unless it is important too. Armor and resistances help every class and are
 // neither.
 function affixHints(affixes, classId) {
-  const weights = content.classesById[classId]?.autoPoints ?? {};
+  const weights = content().classesById[classId]?.autoPoints ?? {};
   const top = Math.max(0, ...Object.values(weights));
-  const weightOf = (affix) => (content.statIds.includes(affix.stat) ? (weights[affix.stat] ?? 0) : null);
+  const weightOf = (affix) => (content().statIds.includes(affix.stat) ? (weights[affix.stat] ?? 0) : null);
   const stats = affixes.map((affix, index) => ({ index, weight: weightOf(affix), value: affix.value })).filter((one) => one.weight !== null);
   const worst = stats.sort((a, b) => a.weight - b.weight || a.value - b.value)[0];
   return affixes.map((affix, index) => {
@@ -775,7 +775,7 @@ function pendingView(pending) {
   const { item, affix, options } = pending;
   return {
     itemId: item.id,
-    name: itemName(item, content),
+    name: itemName(item, content()),
     old: affixLabel(item, affix),
     options: options.map((option) => affixLabel(withAffix(item, affix, option), affix)),
   };
@@ -786,15 +786,15 @@ function pendingView(pending) {
 // and counts, Punkty Systemu and gold first; null when nothing waits.
 function rewardView(due) {
   if (!due) return null;
-  const words = content.settlement.brotherhoodsPanel;
-  const material = (key) => materialView(key, 1, content);
+  const words = content().settlement.brotherhoodsPanel;
+  const material = (key) => materialView(key, 1, content());
   return {
-    standings: due.standings.map((index) => content.settlement.standings[index].name),
+    standings: due.standings.map((index) => content().settlement.standings[index].name),
     goods: [
       ...(due.systemPoints > 0 ? [{ kind: 'systemPoints', name: words.systemPoints, count: due.systemPoints }] : []),
       ...(due.gold > 0 ? [{ kind: 'gold', name: words.gold, count: due.gold }] : []),
-      ...Object.entries(due.herbs).map(([id, count]) => ({ kind: 'herb', key: id, name: content.herbsById[id].name, count })),
-      ...Object.entries(due.parts).map(([id, count]) => ({ kind: 'part', key: id, name: content.partsById[id].name, count })),
+      ...Object.entries(due.herbs).map(([id, count]) => ({ kind: 'herb', key: id, name: content().herbsById[id].name, count })),
+      ...Object.entries(due.parts).map(([id, count]) => ({ kind: 'part', key: id, name: content().partsById[id].name, count })),
       ...Object.entries(due.materials).map(([key, count]) => ({ kind: 'material', key, name: material(key).name, color: material(key).color, count })),
     ],
   };
@@ -810,15 +810,15 @@ export async function claimStandingReward(context) {
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
-  const brotherhood = content.settlement.brotherhoods.find((one) => one.id === body.brotherhood);
+  const brotherhood = content().settlement.brotherhoods.find((one) => one.id === body.brotherhood);
   if (!brotherhood) throw new ApiError(404, 'no_brotherhood', 'Nie ma takiego Bractwa.');
   const stored = settlementOf(row);
-  const due = standingRewardsDue(brotherhood.id, stored.reputation[brotherhood.id] ?? 0, stored.rewarded?.[brotherhood.id] ?? 0, content);
+  const due = standingRewardsDue(brotherhood.id, stored.reputation[brotherhood.id] ?? 0, stored.rewarded?.[brotherhood.id] ?? 0, content());
   if (!due) throw new ApiError(409, 'no_reward', 'Nagroda za ten stopień jest już odebrana.');
   if (Object.keys(due.herbs).length > 0) {
     const held = JSON.parse(row.herbs ?? '{}');
-    const free = bagCapacity(campLevels(player.buildings, context.now, content), content) - bagPlaces(player);
-    if (bagStacks(addCounts(held, due.herbs), content) - bagStacks(held, content) > free) {
+    const free = bagCapacity(campLevels(player.buildings, context.now, content()), content()) - bagPlaces(player);
+    if (bagStacks(addCounts(held, due.herbs), content()) - bagStacks(held, content()) > free) {
       throw new ApiError(409, 'bag_full', 'Zioła od Bractwa nie zmieszczą się w plecaku. Zrób w nim miejsce.');
     }
   }
@@ -877,9 +877,9 @@ export async function deliverSettlementOrder(context) {
   const stored = settlementOf(row);
   const board = settlementBoard(row, stored, context.now);
   const goods = settlementGoods(row, player.items, context.now);
-  const block = deliverBlock(board, body.orderId, goods, content);
+  const block = deliverBlock(board, body.orderId, goods, content());
   if (block) throw new ApiError(block.code === 'no_order' ? 404 : 409, block.code, block.message);
-  const done = deliverOrder(board, body.orderId, context.now, content, sellBonusOf(player, context.now));
+  const done = deliverOrder(board, body.orderId, context.now, content(), sellBonusOf(player, context.now));
   const add = (counts, more) => ({ ...counts, ...Object.fromEntries(Object.entries(more).map(([id, gain]) => [id, (counts[id] ?? 0) + gain])) });
   const next = { ...stored, reputation: add(stored.reputation, done.reputation), relations: add(stored.relations, done.relation), board: done.board };
   // The narrator's quests "Wykonaj N zleceń w Osadzie" (question 95).
@@ -903,7 +903,7 @@ export async function deliverSettlementOrder(context) {
   if (done.take.kind === 'material') {
     // Materials, any of a rarity from several stacks (materialsTaken), are
     // saved whole, only if the character is as read.
-    const taken = materialsTaken(done.take, goods.materials, content);
+    const taken = materialsTaken(done.take, goods.materials, content());
     const left = addCounts(goods.materials, Object.fromEntries(Object.entries(taken).map(([key, count]) => [key, -count])));
     const saved = await db.batch([
       ...trial({ sql: '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT materials FROM characters WHERE id = ?) IS ?', binds: [row.id, row.version, row.id, row.materials] }),
@@ -954,7 +954,7 @@ export async function deliverSettlementOrder(context) {
 // go only if that payment was saved (its new Osada is unique to it).
 async function deliverCrafted(db, player, done, { settlement, quests, trial = () => [] }) {
   const { row } = player;
-  const ids = craftedFor(bagItems(player), done.take.key, done.take.count, content).map((item) => item.id);
+  const ids = craftedFor(bagItems(player), done.take.key, done.take.count, content()).map((item) => item.id);
   if (ids.length < done.take.count) throw new ApiError(409, 'not_enough', 'Brakuje Ci jeszcze tego, o co proszą.');
   const list = ids.map(() => '?').join(', ');
   const inBag = `(SELECT COUNT(*) FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${list})) = ?`;
@@ -982,13 +982,13 @@ export async function buyMug(context) {
   const stored = settlementOf(row);
   // The day's rumor the beggar's song told is the same the innkeeper tells,
   // still unused or used as it was.
-  const today = rumorToday(stored.rumor, context.now, content);
+  const today = rumorToday(stored.rumor, context.now, content());
   if (today && !today.song) throw new ApiError(409, 'told', 'Zbylut nie słyszał dziś nic nowego. Zajrzyj jutro.');
-  const { song: _, ...rumor } = today ?? drawRumor({ character: engineCharacter(row), seed: `${row.id}:settlement` }, context.now, content) ?? {};
+  const { song: _, ...rumor } = today ?? drawRumor({ character: engineCharacter(row), seed: `${row.id}:settlement` }, context.now, content()) ?? {};
   if (!rumor.areaId) throw new ApiError(409, 'no_rumor', 'Zbylut nie słyszał o niczym groźnym w miejscach, do których chodzisz.');
-  const gold = mugCost(row.level, content);
+  const gold = mugCost(row.level, content());
   if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota na kufel.');
-  const next = { ...stored, rumor, relations: grow(stored.relations, content.settlement.tavern) };
+  const next = { ...stored, rumor, relations: grow(stored.relations, content().settlement.tavern) };
   const result = await context.env.DB.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?')
     .bind(gold, JSON.stringify(next), row.id, row.version, gold)
     .run();
@@ -1010,9 +1010,9 @@ export async function hireCompanion(context) {
   const hired = stored.companions ?? [];
   if (hired.length >= placesOf(player, context.now).places) throw new ApiError(409, 'no_bed', 'W Kwaterach w obozie nie ma wolnego posłania.');
   const taken = [...hired.map((companion) => companion.id), ...(stored.dismissed ?? [])];
-  const candidate = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, context.now, content, taken).find((one) => one.id === body.candidateId);
+  const candidate = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, context.now, content(), taken).find((one) => one.id === body.candidateId);
   if (!candidate) throw new ApiError(404, 'no_candidate', 'Tego kandydata już nie ma w Karczmie.');
-  const gold = hireCost(candidate, content, innkeeperPoints(stored));
+  const gold = hireCost(candidate, content(), innkeeperPoints(stored));
   if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota na werbunek.');
   const next = { ...stored, companions: [...hired, candidate] };
   const result = await context.env.DB.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?')
@@ -1037,7 +1037,7 @@ export async function dismissCompanion(context) {
   const companion = hired.find((one) => one.id === body.companionId);
   if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
   const given = companion.gear.filter((item) => item.given);
-  if (bagPlaces(player) + given.length > bagCapacity(campLevels(player.buildings, context.now, content), content)) {
+  if (bagPlaces(player) + given.length > bagCapacity(campLevels(player.buildings, context.now, content()), content())) {
     throw new ApiError(409, 'bag_full', `${companion.name} odda ${given.length === 1 ? 'przedmiot' : 'przedmioty'} z twojego plecaka, a brakuje w nim miejsca.`);
   }
   const next = { ...stored, companions: hired.filter((one) => one !== companion), dismissed: [...(stored.dismissed ?? []), body.companionId] };
@@ -1079,7 +1079,7 @@ export async function equipCompanion(context) {
   const item = player.items.find((one) => one.id === body.itemId && !one.equippedSlot);
   if (!item) throw new ApiError(404, 'item_not_found', 'Tego przedmiotu nie ma w plecaku.');
   requireOffRack(player, item);
-  const block = companionWearBlock(companion, item, content);
+  const block = companionWearBlock(companion, item, content());
   if (block) throw new ApiError(403, block.code, block.message);
   const { id, equippedSlot, ...data } = item;
   const { companion: dressed, off } = wearOnCompanion(companion, data);
@@ -1124,14 +1124,14 @@ export async function upgradeCompanionItem(context) {
   if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
   const place = companionPlace(body.slot);
   const item = place ? companion.gear.find((one) => companionPlace(one.slot) === place) : null;
-  if (!item) throw new ApiError(404, 'item_not_found', companionText('noItem', companion, content));
+  if (!item) throw new ApiError(404, 'item_not_found', companionText('noItem', companion, content()));
   const changedItem = () => new ApiError(409, 'item_changed', 'Przedmiot albo zapasy zmieniły się w międzyczasie. Spróbuj jeszcze raz.');
   if (typeof body.roll === 'string' && body.roll !== (item.lastRoll ?? '')) throw changedItem();
   requireCompanionHome(player, companion, context.now);
   const plan = upgradePlan(player, item, body, context.now);
   const pay = upgradePayment(plan);
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const outcome = rollUpgrade(item, createRng(roll), content, { warded: plan.warded, steady: plan.steady });
+  const outcome = rollUpgrade(item, createRng(roll), content(), { warded: plan.warded, steady: plan.steady });
   const next = { ...stored, companions: hired.map((one) => (one === companion ? upgradedOnCompanion(one, body.slot, outcome, roll) : one)) };
   const saved = JSON.stringify(next);
   const db = context.env.DB;
@@ -1153,7 +1153,7 @@ export async function upgradeCompanionItem(context) {
     upgrade: {
       companionId: companion.id,
       slot: body.slot,
-      name: itemName(item, content),
+      name: itemName(item, content()),
       result: outcome.result,
       from: plan.view.level,
       to: outcome.upgrade,
@@ -1185,8 +1185,8 @@ export async function setCompanionStay(context) {
   const hired = stored.companions ?? [];
   const companion = hired.find((one) => one.id === body.companionId);
   if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
-  if (typeof body.stays !== 'boolean') throw new ApiError(400, 'invalid_stay', companionText('invalidStay', companion, content));
-  if (!body.stays && player.inParty) throw new ApiError(409, 'in_party', companionText('inParty', companion, content));
+  if (typeof body.stays !== 'boolean') throw new ApiError(400, 'invalid_stay', companionText('invalidStay', companion, content()));
+  if (!body.stays && player.inParty) throw new ApiError(409, 'in_party', companionText('inParty', companion, content()));
   const next = { ...stored, companions: hired.map((one) => (one === companion ? staying(one, body.stays) : one)) };
   const result = await context.env.DB.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
     .bind(JSON.stringify(next), row.id, row.version)
@@ -1194,7 +1194,7 @@ export async function setCompanionStay(context) {
   if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(context.env.DB, session.userId);
   return json({
-    text: companionText(body.stays ? 'stayed' : 'goes', companion, content),
+    text: companionText(body.stays ? 'stayed' : 'goes', companion, content()),
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
   });
@@ -1222,8 +1222,8 @@ export async function takeCompanionGift(context) {
   // the next exploration sold the weakest items).
   if (gift.kind === 'herb' || gift.kind === 'potion') {
     const held = JSON.parse(row[column] ?? '{}');
-    const free = bagCapacity(campLevels(player.buildings, context.now, content), content) - bagPlaces(player);
-    if (bagStacks({ ...held, [gift.key]: (held[gift.key] ?? 0) + gift.count }, content) - bagStacks(held, content) > free) {
+    const free = bagCapacity(campLevels(player.buildings, context.now, content()), content()) - bagPlaces(player);
+    if (bagStacks({ ...held, [gift.key]: (held[gift.key] ?? 0) + gift.count }, content()) - bagStacks(held, content()) > free) {
       throw new ApiError(409, 'bag_full', `${companion.name} ma dla Ciebie prezent, ale nie zmieści się w plecaku. Zrób w nim miejsce.`);
     }
   }
@@ -1254,8 +1254,8 @@ export async function talkWithCompanion(context) {
   const hired = stored.companions ?? [];
   const companion = hired.find((one) => one.id === body.companionId);
   if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
-  if (talkedToday(companion, context.now, content)) throw new ApiError(409, 'talked', 'Na dziś wystarczy. Porozmawiacie jutro.');
-  const { talk, companion: after } = talkWith(companion, { seed: `${row.id}:settlement`, now: context.now }, content);
+  if (talkedToday(companion, context.now, content())) throw new ApiError(409, 'talked', 'Na dziś wystarczy. Porozmawiacie jutro.');
+  const { talk, companion: after } = talkWith(companion, { seed: `${row.id}:settlement`, now: context.now }, content());
   const next = { ...stored, companions: hired.map((one) => (one === companion ? after : one)) };
   const result = await context.env.DB.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
     .bind(JSON.stringify(next), row.id, row.version)
@@ -1276,7 +1276,7 @@ export async function rejectSettlementOrder(context) {
   requireOpen(row);
   const body = await readJson(context.request);
   const stored = settlementOf(row);
-  const board = rejectOrder(settlementBoard(row, stored, context.now), body.orderId, context.now, content);
+  const board = rejectOrder(settlementBoard(row, stored, context.now), body.orderId, context.now, content());
   if (!board) throw new ApiError(404, 'no_order', 'Tego zlecenia nie da się odrzucić.');
   const next = { ...stored, board };
   const result = await context.env.DB.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
@@ -1305,20 +1305,20 @@ export async function reforgeAtEnchantress(context) {
   requireUnworn(player, item, context.now);
   const times = item.reforged ?? 0;
   const materials = JSON.parse(row.materials ?? '{}');
-  const block = reforgeBlock(item, body.affix, { gold: row.gold, materials, times }, content);
+  const block = reforgeBlock(item, body.affix, { gold: row.gold, materials, times }, content());
   if (block) throw new ApiError(block.code.startsWith('invalid') || block.code === 'no_affixes' ? 400 : 409, block.code, block.message);
-  const cost = reforgeCost(item, times, content);
+  const cost = reforgeCost(item, times, content());
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const options = reforgeOptions(item, body.affix, choicesOf(stored), createRng(roll), content);
+  const options = reforgeOptions(item, body.affix, choicesOf(stored), createRng(roll), content());
   // One affix goes on the item at once; more wait for the choice.
   const affixes = options.length === 1 ? withAffix(item, body.affix, options[0]).affixes : item.affixes;
   const { pending: _, ...rest } = stored;
   const next = {
     ...rest,
-    relations: grow(stored.relations, content.settlement.reforge),
+    relations: grow(stored.relations, content().settlement.reforge),
     ...(options.length > 1 && { pending: { itemId: item.id, affix: body.affix, options, roll, reforged: times + 1 } }),
   };
-  const pay = takenOff('materials', cost.materials ? piecesOfRarity(materials, cost.materials, content) : {});
+  const pay = takenOff('materials', cost.materials ? piecesOfRarity(materials, cost.materials, content()) : {});
   const db = context.env.DB;
   // As at the Kowadło: the item changes only if it and the character are as
   // seen here, and the payment only if this roll was saved.
@@ -1353,7 +1353,7 @@ export async function reforgeAtEnchantress(context) {
 }
 
 // An affix before and after a reforging, as the item card shows them.
-const reforgeResult = (before, after, affix) => ({ itemId: after.id, name: itemName(after, content), old: affixLabel(before, affix), new: affixLabel(after, affix) });
+const reforgeResult = (before, after, affix) => ({ itemId: after.id, name: itemName(after, content()), old: affixLabel(before, affix), new: affixLabel(after, affix) });
 
 // { option }: the affix the player keeps of those a reforging drew.
 export async function chooseReforged(context) {
@@ -1409,13 +1409,13 @@ export async function hermitService(context) {
   let value;
   if (body.service === 'path') {
     if (character.evolution) throw new ApiError(409, 'evolved', 'Po ewolucji ścieżki zmieniają się razem z nią.');
-    const skills = Object.fromEntries(Object.entries(character.skills).filter(([id]) => content.skillsById[id]?.evolution));
+    const skills = Object.fromEntries(Object.entries(character.skills).filter(([id]) => content().skillsById[id]?.evolution));
     if (Object.keys(skills).length === Object.keys(character.skills).length) throw new ApiError(409, 'nothing_to_reset', 'Nie masz jeszcze żadnej ścieżki do wyzerowania.');
-    gold = pathResetCost(row.level, content);
+    gold = pathResetCost(row.level, content());
     set = 'skills';
     value = skills;
   } else if (body.service === 'stats') {
-    gold = statResetCost(row.level, content);
+    gold = statResetCost(row.level, content());
     if (gold === null) throw new ApiError(409, 'free_reset', 'Do tego poziomu punkty wyzerujesz za darmo w Statystykach.');
     if (Object.keys(character.points).length === 0) throw new ApiError(409, 'nothing_to_reset', 'Nie masz rozdanych punktów do wyzerowania.');
     set = 'points';
@@ -1425,7 +1425,7 @@ export async function hermitService(context) {
   }
   if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota.');
   const stored = settlementOf(row);
-  const relations = grow(stored.relations, content.settlement.hermit);
+  const relations = grow(stored.relations, content().settlement.hermit);
   const db = context.env.DB;
   const result = await db
     .prepare(`UPDATE characters SET gold = gold - ?, ${set} = ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?`)
@@ -1443,14 +1443,14 @@ async function changeEvolution(context, session, player, body) {
   if (!offer) throw new ApiError(409, 'not_evolved', 'Najpierw wybierz ewolucję w zakładce Ewolucja.');
   if (!offer.choices.some((choice) => choice.id === body.evolutionId)) throw new ApiError(400, 'unknown_evolution', 'Ta ewolucja nie jest dla tej postaci.');
   if (row.gold < offer.price) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota.');
-  const next = { ...stored, evolutionChanges: (stored.evolutionChanges ?? 0) + 1, relations: grow(stored.relations, content.settlement.hermit) };
+  const next = { ...stored, evolutionChanges: (stored.evolutionChanges ?? 0) + 1, relations: grow(stored.relations, content().settlement.hermit) };
   const db = context.env.DB;
   const result = await db
     .prepare(
       `UPDATE characters SET gold = gold - ?, evolution = ?, skills = ?, evolution_reset = ?, settlement = ?, version = version + 1
        WHERE id = ? AND version = ? AND gold >= ? AND evolution IS NOT NULL`,
     )
-    .bind(offer.price, body.evolutionId, JSON.stringify(evolvedSkills(body.evolutionId, content)), spentPoints(engineCharacter(row)) > 0 ? 1 : 0, JSON.stringify(next), row.id, row.version, offer.price)
+    .bind(offer.price, body.evolutionId, JSON.stringify(evolvedSkills(body.evolutionId, content())), spentPoints(engineCharacter(row)) > 0 ? 1 : 0, JSON.stringify(next), row.id, row.version, offer.price)
     .run();
   if (result.meta.changes !== 1) throw changed();
   return json({ gold: offer.price, character: characterView(await loadPlayer(db, session.userId), context.now) });
@@ -1460,14 +1460,14 @@ async function changeEvolution(context, session, player, body) {
 // (test-mode.js), where the deployment has the Osada.
 async function requireTester(context) {
   const { session, player } = await requirePlayer(context);
-  if (!settlementOn() || !content.settlement || !settlementTestsFor(context.env, session.user.login)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  if (!settlementOn() || !content().settlement || !settlementTestsFor(context.env, session.user.login)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   return { session, player };
 }
 
 // The standings to put everyone at.
 export async function settlementTests(context) {
   await requireTester(context);
-  return json({ standings: content.settlement.standings.map(({ id, name }) => ({ id, name })) });
+  return json({ standings: content().settlement.standings.map(({ id, name }) => ({ id, name })) });
 }
 
 // { action }: "open" opens the Osada below its level, "standing" (with
@@ -1484,10 +1484,10 @@ export async function testSettlement(context) {
   if (body.action === 'open') {
     next = { ...stored, test: true };
   } else if (body.action === 'standing') {
-    const standing = content.settlement.standings.find((one) => one.id === body.standing);
+    const standing = content().settlement.standings.find((one) => one.id === body.standing);
     if (!standing) throw new ApiError(400, 'invalid_standing', 'Nie ma takiego stopnia.');
     const everyone = (list) => Object.fromEntries(list.map(({ id }) => [id, standing.points]));
-    next = { ...stored, reputation: everyone(content.settlement.brotherhoods), relations: everyone(content.settlement.residents) };
+    next = { ...stored, reputation: everyone(content().settlement.brotherhoods), relations: everyone(content().settlement.residents) };
   } else if (body.action === 'orders') {
     next = { ...stored, board: stored.board && { ...stored.board, slots: stored.board.slots.map(() => ({ readyAt: context.now })), weekly: null } };
   } else if (body.action === 'market' || body.action === 'marketEnd') {

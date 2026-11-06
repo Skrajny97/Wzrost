@@ -44,7 +44,7 @@ import { guildOf } from './guilds.js';
 import { ApiError, json, readJson } from './http.js';
 import { counted } from './market.js';
 
-const rules = () => content.guilds.trials;
+const rules = () => content().guilds.trials;
 const words = () => rules().texts;
 const errors = () => words().errors;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
@@ -54,8 +54,8 @@ const DAY = 24 * 3600000;
 // the errors' words (also for the Prośby Gildii, guild-requests.js).
 export async function guildPlayer(context, texts = errors()) {
   const { session, player } = await requirePlayer(context);
-  if (!isUnlocked('community', player.row.level, content)) {
-    throw new ApiError(403, 'locked', filled(texts.locked, { level: content.unlocksById.community.level }));
+  if (!isUnlocked('community', player.row.level, content())) {
+    throw new ApiError(403, 'locked', filled(texts.locked, { level: content().unlocksById.community.level }));
   }
   const db = context.env.DB;
   return { session, player, guild: await guildOf(db, player.row.id), db };
@@ -70,8 +70,8 @@ export async function requireMember(context, texts = errors()) {
 
 // The week around `now` and the one before it.
 function weeksAround(now) {
-  const current = questPeriod('weekly', now, content);
-  return { current, previous: questPeriod('weekly', current.startsAt - 1, content) };
+  const current = questPeriod('weekly', now, content());
+  return { current, previous: questPeriod('weekly', current.startsAt - 1, content()) };
 }
 
 // The statement that moves the character's trial of the week on by what an
@@ -86,7 +86,7 @@ function weeksAround(now) {
 export function trialProgress(db, characterId, progress, now, guard = null) {
   const gains = Object.entries(trialGains(progress));
   if (gains.length === 0) return [];
-  const { key: week } = questPeriod('weekly', now, content);
+  const { key: week } = questPeriod('weekly', now, content());
   const gain = `(CASE kind ${gains.map(() => 'WHEN ? THEN ?').join(' ')} ELSE 0 END)`;
   const binds = gains.flat();
   return [
@@ -136,12 +136,12 @@ export const takenBefore = (begun) => (Number.isFinite(begun) ? { sql: 'taken_at
 function trialAccess(player, now) {
   const quests = questContext(player, now);
   return {
-    towers: isUnlocked('towers', player.row.level, content),
+    towers: isUnlocked('towers', player.row.level, content()),
     professions: professionsOn() ? quests.hasProfessions : 'off',
     crafting: craftingOn() ? quests.hasCrafting : 'off',
     table: quests.hasTable,
     settlement: settlementOn() ? quests.hasSettlement : 'off',
-    anvil: campBonus(campLevels(player.buildings, now, content), 'upgradeCap', content) > 0,
+    anvil: campBonus(campLevels(player.buildings, now, content()), 'upgradeCap', content()) > 0,
   };
 }
 
@@ -172,7 +172,7 @@ async function boardOf(db, guildId, now) {
            FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
            WHERE m.guild_id = ? AND u.seen_at >= ?`,
         )
-        .bind(guildId, current.key, JSON.stringify(drawTrialBoard(`${guildId}:${current.key}`, content)), now, guildId, now - rules().activeDays * DAY),
+        .bind(guildId, current.key, JSON.stringify(drawTrialBoard(`${guildId}:${current.key}`, content())), now, guildId, now - rules().activeDays * DAY),
     ]);
     row = await boardRow(db, guildId, current.key).first();
   }
@@ -184,7 +184,7 @@ async function boardOf(db, guildId, now) {
 // its midnight, right on the days of 23 and 25 hours too).
 function trialOpening(index, now) {
   const { current } = weeksAround(now);
-  return questPeriod('daily', current.startsAt + trialOpensOn(index, content) * DAY + DAY / 2, content).startsAt;
+  return questPeriod('daily', current.startsAt + trialOpensOn(index, content()) * DAY + DAY / 2, content()).startsAt;
 }
 
 // The rows of the board's trials at `indices` for `members` ({ id, level,
@@ -197,9 +197,9 @@ function trialRows(db, guildId, week, trials, members, indices, now) {
   const rows = [];
   for (const index of indices) {
     const trial = trials[index];
-    if (!trial || !trialKind(trial.kind, content)) continue;
+    if (!trial || !trialKind(trial.kind, content())) continue;
     const opening = trialOpening(index, now);
-    for (const member of members) rows.push([guildId, week, member.id, index, trial.kind, trialCount(trial, member, content), Math.max(opening, member.joinedAt ?? 0)]);
+    for (const member of members) rows.push([guildId, week, member.id, index, trial.kind, trialCount(trial, member, content()), Math.max(opening, member.joinedAt ?? 0)]);
   }
   const statements = [];
   for (let start = 0; start < rows.length; start += ROWS) {
@@ -228,8 +228,8 @@ const membersOf = async (db, guildId) =>
 // count of trialsOpen today), for every member of the guild at once (the
 // author's 617). Run by the cron as the day starts and at any look.
 async function openTrials(db, guildId, board, now) {
-  const { key: week } = questPeriod('weekly', now, content);
-  const open = trialsOpen(trialDay(now, content), content);
+  const { key: week } = questPeriod('weekly', now, content());
+  const open = trialsOpen(trialDay(now, content()), content());
   if (board.opened >= open) return board;
   const members = await membersOf(db, guildId);
   await db.batch([
@@ -243,8 +243,8 @@ async function openTrials(db, guildId, board, now) {
 // who joined after they opened (from its joining), or whose rows a look
 // makes before the cron did.
 async function ownRows(db, guildId, board, row, now) {
-  const { key: week } = questPeriod('weekly', now, content);
-  const open = Math.min(board.trials.length, trialsOpen(trialDay(now, content), content));
+  const { key: week } = questPeriod('weekly', now, content());
+  const open = Math.min(board.trials.length, trialsOpen(trialDay(now, content()), content()));
   const [have, membership] = await db.batch([
     db.prepare('SELECT trial FROM guild_trials WHERE guild_id = ? AND week = ? AND character_id = ?').bind(guildId, week, row.id),
     db.prepare('SELECT joined_at FROM guild_members WHERE character_id = ? AND guild_id = ?').bind(row.id, guildId),
@@ -259,7 +259,7 @@ async function ownRows(db, guildId, board, row, now) {
 // A member who has just joined: its rows of the trials open on the guild's
 // board, if the board of the week is drawn (else they come with it).
 export async function joinGuildTrials(db, guildId, row, now) {
-  const { key: week } = questPeriod('weekly', now, content);
+  const { key: week } = questPeriod('weekly', now, content());
   const found = await boardRow(db, guildId, week).first();
   if (!found) return;
   await ownRows(db, guildId, { trials: JSON.parse(found.trials) }, row, now);
@@ -276,7 +276,7 @@ export async function openGuildTrials(db, now) {
     .bind(current.key)
     .all();
   for (const { id } of missing.results) await boardOf(db, id, now);
-  const open = trialsOpen(trialDay(now, content), content);
+  const open = trialsOpen(trialDay(now, content()), content());
   const due = await db.prepare('SELECT guild_id, trials, active, joined, opened FROM guild_trial_boards WHERE week = ? AND opened < ? LIMIT 10').bind(current.key, open).all();
   for (const board of due.results) await openTrials(db, board.guild_id, { trials: JSON.parse(board.trials), active: board.active, joined: board.joined, opened: board.opened }, now);
 }
@@ -309,7 +309,7 @@ function finishedBy(rows) {
 // A board drawn before the change, with fewer trials (the week of 0.1.53),
 // counts each member's finished trials up to the cap alone: no bar falls
 // and no reached threshold goes away (DECISIONS.md, "Próby Gildii co dzień").
-const barLimit = (trials, day) => (trials.length >= rules().board ? trialDayLimit(day, content) : Infinity);
+const barLimit = (trials, day) => (trials.length >= rules().board ? trialDayLimit(day, content()) : Infinity);
 
 const chestSeed = (characterId, week, index) => `${characterId}:${week}:trials:${index}`;
 
@@ -319,7 +319,7 @@ const chestView = (chest) => ({
   timePoints: chest.timePoints,
   systemPoints: chest.systemPoints,
   materials: Object.entries(chest.materials).map(([key, count]) => {
-    const material = materialView(key, count, content);
+    const material = materialView(key, count, content());
     return { key, count, name: material.label.charAt(0).toUpperCase() + material.label.slice(1), rarity: material.rarity, materialId: material.materialId };
   }),
 });
@@ -330,7 +330,7 @@ function chestText(chest) {
   return [
     chest.gold > 0 && filled(texts.gold, { gold: chest.gold }),
     chest.timePoints > 0 && `${chest.timePoints} ${countedForm(chest.timePoints, texts.timePointForms)}`,
-    Object.keys(chest.materials).length > 0 && materialsText(chest.materials, content),
+    Object.keys(chest.materials).length > 0 && materialsText(chest.materials, content()),
     chest.systemPoints > 0 && `${chest.systemPoints} ${countedForm(chest.systemPoints, texts.systemPointForms)}`,
   ]
     .filter(Boolean)
@@ -346,7 +346,7 @@ function chestText(chest) {
 function barView(week, rows, active, joined, claims, player, limit = Infinity) {
   const { row } = player;
   const counts = finishedBy(rows);
-  const points = trialPoints([...counts.values()], content, limit);
+  const points = trialPoints([...counts.values()], content(), limit);
   const contributed = (counts.get(row.id) ?? 0) > 0;
   const character = engineCharacter(row);
   return {
@@ -355,13 +355,13 @@ function barView(week, rows, active, joined, claims, player, limit = Infinity) {
     active,
     joined,
     contributed,
-    thresholds: trialThresholds(active + joined, points, content).map((threshold) => {
+    thresholds: trialThresholds(active + joined, points, content()).map((threshold) => {
       const claimed = claims.some((claim) => claim.week === week && claim.threshold === threshold.index);
       return {
         ...threshold,
         claimed,
         ready: threshold.reached && contributed && !claimed,
-        chest: chestView(trialChest(threshold.index, character, chestSeed(row.id, week, threshold.index), content)),
+        chest: chestView(trialChest(threshold.index, character, chestSeed(row.id, week, threshold.index), content())),
       };
     }),
   };
@@ -397,8 +397,8 @@ export async function trialsView(db, player, guild, now) {
     db.prepare('SELECT week, threshold FROM guild_trial_chests WHERE character_id = ? AND week IN (?, ?)').bind(row.id, current.key, previous.key),
     db.prepare("SELECT COUNT(*) AS count FROM guild_trials WHERE character_id = ? AND week = ? AND state = 'done'").bind(row.id, current.key),
   ]);
-  const day = trialDay(now, content);
-  const open = trialsOpen(day, content);
+  const day = trialDay(now, content());
+  const open = trialsOpen(day, content());
   const limit = barLimit(board.trials, day);
   const finished = own.results[0]?.count ?? 0;
   const rows = trials.results.filter((one) => one.week === current.key);
@@ -416,18 +416,18 @@ export async function trialsView(db, player, guild, now) {
     week: current.key,
     endsAt: current.endsAt,
     trials: board.trials.flatMap((trial, index) => {
-      const kind = trialKind(trial.kind, content);
+      const kind = trialKind(trial.kind, content());
       const one = mine.get(index);
       if (!kind || (index >= open && !one)) return [];
       const done = one?.state === 'done';
-      const lock = done ? null : trialLock(trial.kind, access, content);
-      const count = one?.count ?? trialCount(trial, character, content);
+      const lock = done ? null : trialLock(trial.kind, access, content());
+      const count = one?.count ?? trialCount(trial, character, content());
       return [
         {
           index,
           kind: trial.kind,
-          text: trialText(trial.kind, count, content),
-          note: trialNote(trial.kind, row.level, content),
+          text: trialText(trial.kind, count, content()),
+          note: trialNote(trial.kind, row.level, content()),
           count,
           progress: one?.progress ?? 0,
           state: done ? 'done' : lock ? 'locked' : 'active',
@@ -437,7 +437,7 @@ export async function trialsView(db, player, guild, now) {
     }),
     day: {
       open,
-      soon: day < 6 ? trialsOpen(day + 1, content) - open : 0,
+      soon: day < 6 ? trialsOpen(day + 1, content()) - open : 0,
       limit: Number.isFinite(limit) ? limit : null,
       finished,
       counted: counted(finished),
@@ -499,13 +499,13 @@ export async function claimGuildTrialChest(context) {
   ]);
   if (!board.results[0]) throw new ApiError(404, 'no_board', errors().noBoard);
   // This week's bar counts each member's finished trials up to the day's limit.
-  const limit = body.week === current.key ? barLimit(JSON.parse(board.results[0].trials), trialDay(now, content)) : Infinity;
+  const limit = body.week === current.key ? barLimit(JSON.parse(board.results[0].trials), trialDay(now, content())) : Infinity;
   const bar = barView(body.week, trials.results, board.results[0].active, board.results[0].joined ?? 0, claims.results, player, limit);
   const threshold = bar.thresholds[index];
   if (threshold.claimed) throw new ApiError(409, 'claimed', errors().claimed);
   if (!threshold.reached) throw new ApiError(409, 'not_reached', errors().notReached);
   if (!bar.contributed) throw new ApiError(409, 'no_trial', words().contribute);
-  const chest = trialChest(index, engineCharacter(row), chestSeed(row.id, body.week, index), content);
+  const chest = trialChest(index, engineCharacter(row), chestSeed(row.id, body.week, index), content());
   const materials = counted('materials', chest.materials);
   try {
     await db.batch([

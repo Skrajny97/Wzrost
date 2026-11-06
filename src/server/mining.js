@@ -17,8 +17,8 @@ import { trimReports } from './reports.js';
 
 // A profession that opens later than the Profesje tab waits for its level.
 export function requireOpen(player, profession) {
-  if (!professionOpen(profession, player.row.level, content)) {
-    throw new ApiError(403, 'locked', `${profession.name} odblokujesz na poziomie postaci ${professionUnlockLevel(profession, content)}.`);
+  if (!professionOpen(profession, player.row.level, content())) {
+    throw new ApiError(403, 'locked', `${profession.name} odblokujesz na poziomie postaci ${professionUnlockLevel(profession, content())}.`);
   }
 }
 
@@ -30,9 +30,9 @@ export async function startMining(context) {
   const body = await readJson(context.request);
   const { session, player, avatar } = await requireWorker(context, body);
   requireProfessions(player);
-  const { mining } = content;
-  requireOpen(player, content.professionsById[mining.profession]);
-  if (!miningMinutes(content).includes(body.minutes)) throw new ApiError(400, 'invalid_duration', 'Wybierz czas kopania.');
+  const { mining } = content();
+  requireOpen(player, content().professionsById[mining.profession]);
+  if (!miningMinutes(content()).includes(body.minutes)) throw new ApiError(400, 'invalid_duration', 'Wybierz czas kopania.');
 
   const now = context.now;
   const { hp } = currentHp(player, now);
@@ -61,7 +61,7 @@ export async function startMining(context) {
           ],
     );
   } catch (error) {
-    if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', avatar ? content.avatar.texts.busy[0] : 'Postać jest już zajęta.');
+    if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', avatar ? content().avatar.texts.busy[0] : 'Postać jest już zajęta.');
     throw error;
   }
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
@@ -74,14 +74,14 @@ export async function startMining(context) {
 export async function finishMining(db, player, now, { avatar = false } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
-  const { mining } = content;
-  const profession = content.professionsById[mining.profession];
+  const { mining } = content();
+  const profession = content().professionsById[mining.profession];
   const before = professionState(JSON.parse(row.professions ?? '{}'), profession.id);
   const options = JSON.parse(activity.options ?? '{}');
-  const mined = mineMinerals({ minutes: activity.minutes, level: before.level, characterLevel: options.level ?? row.level, seed: activity.seed }, content);
+  const mined = mineMinerals({ minutes: activity.minutes, level: before.level, characterLevel: options.level ?? row.level, seed: activity.seed }, content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);
   const report = {
-    ...miningReport({ minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, mined, before, after, character, xp, work }, content),
+    ...miningReport({ minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, mined, before, after, character, xp, work }, content()),
     ...(avatar && { avatar: true }),
   };
   const summary = {
@@ -125,7 +125,7 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
 // How many of a mineral the request names: a whole number from 1 to what
 // the character has.
 function mineralCount(player, body) {
-  const mineral = typeof body.mineralId === 'string' ? content.mineralsById[body.mineralId] : undefined;
+  const mineral = typeof body.mineralId === 'string' ? content().mineralsById[body.mineralId] : undefined;
   if (!mineral) throw new ApiError(400, 'unknown_mineral', 'Nie ma takiego minerału.');
   const have = mineralsOf(player.row)[mineral.id] ?? 0;
   if (have === 0) throw new ApiError(404, 'no_mineral', 'Nie masz tego minerału.');
@@ -139,7 +139,7 @@ export async function sellMinerals(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const taken = mineralCount(player, body);
-  const bonus = campBonus(campLevels(player.buildings, context.now, content), 'sellPrice', content);
+  const bonus = campBonus(campLevels(player.buildings, context.now, content()), 'sellPrice', content());
   const gold = saleGold(taken.price * (1 + bonus), taken.count);
   const result = await takeFromBag(context.env.DB, player, 'minerals', taken, gold);
   if (result.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Minerały zmieniły się w międzyczasie. Spróbuj ponownie.');

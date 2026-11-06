@@ -26,7 +26,7 @@ import { content } from './content.js';
 import { guildPlayer, requireMember } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 
-const rules = () => content.guilds.seat;
+const rules = () => content().guilds.seat;
 const words = () => rules().texts;
 const errors = () => words().errors;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
@@ -44,7 +44,7 @@ export const guildSeatSql = (column) =>
 
 // "5000 złota", "300 drewna": gold, or pieces of the building's resource.
 const goldText = (count) => filled(words().goldAmount, { count: number(count) });
-const resourceText = (building, count) => filled(words().resourceAmount, { count: number(count), genitive: content.resourcesById[building.resource].genitive });
+const resourceText = (building, count) => filled(words().resourceAmount, { count: number(count), genitive: content().resourcesById[building.resource].genitive });
 
 // "5000 złota i 300 drewna": what a donation to the building gives, in
 // words, the parts above nothing.
@@ -58,8 +58,8 @@ function amountsText(building, gold, resource) {
 function cardTexts() {
   const { maxLevel } = rules();
   const { errors: _, ...texts } = words();
-  const first = seatLevelCost(1, content);
-  const last = seatLevelCost(maxLevel, content);
+  const first = seatLevelCost(1, content());
+  const last = seatLevelCost(maxLevel, content());
   const vars = { max: maxLevel, firstGold: number(first.gold), firstResource: number(first.resource), lastGold: number(last.gold), lastResource: number(last.resource) };
   return { ...texts, how: texts.how.map((line) => filled(line, vars)) };
 }
@@ -84,9 +84,9 @@ async function seatOf(db, guildId) {
 async function seatView(db, player, guild) {
   const wallet = walletOf(player.row);
   const { donated, preferred } = await seatOf(db, guild.id);
-  const buildings = seatBuildings(content).map((building) => {
-    const progress = seatProgress(donated[building.id], content);
-    const resource = content.resourcesById[building.resource];
+  const buildings = seatBuildings(content()).map((building) => {
+    const progress = seatProgress(donated[building.id], content());
+    const resource = content().resourcesById[building.resource];
     return {
       id: building.id,
       name: building.name,
@@ -107,7 +107,7 @@ async function seatView(db, player, guild) {
     guild: { name: guild.name, tag: guild.tag },
     canMark: guild.role !== 'member',
     buildings,
-    bonuses: seatBonuses(Object.fromEntries(buildings.map((building) => [building.id, building.level])), content),
+    bonuses: seatBonuses(Object.fromEntries(buildings.map((building) => [building.id, building.level])), content()),
     bonusesText: effects.length > 0 ? filled(words().bonuses, { bonuses: effects.join(', ') }) : words().noBonuses,
     rules: { maxLevel: rules().maxLevel, quick: rules().quick },
     texts: cardTexts(),
@@ -124,7 +124,7 @@ export async function getGuildSeat(context) {
 
 // The building a request names.
 function buildingOf(body) {
-  const building = typeof body.buildingId === 'string' ? seatBuilding(body.buildingId, content) : null;
+  const building = typeof body.buildingId === 'string' ? seatBuilding(body.buildingId, content()) : null;
   if (!building) throw new ApiError(400, 'invalid_building', errors().noBuilding);
   return building;
 }
@@ -163,13 +163,13 @@ export async function donateToGuildSeat(context) {
   if (gold > wallet.gold) throw new ApiError(409, 'not_enough', filled(errors().notEnough, { have: goldText(wallet.gold) }));
   if (resource > held) throw new ApiError(409, 'not_enough', filled(errors().notEnough, { have: resourceText(building, held) }));
   const before = (await db.prepare('SELECT gold, resource FROM guild_seat WHERE guild_id = ? AND building_id = ?').bind(guild.id, building.id).first()) ?? { gold: 0, resource: 0 };
-  const progress = seatProgress(before, content);
+  const progress = seatProgress(before, content());
   if (!progress.next) throw new ApiError(409, 'top', errors().top);
   if (gold > progress.room.gold) throw tooMuch(progress.room.gold, words().goldGenitive, goldText(progress.room.gold));
   if (resource > progress.room.resource) {
-    throw tooMuch(progress.room.resource, content.resourcesById[building.resource].genitive, resourceText(building, progress.room.resource));
+    throw tooMuch(progress.room.resource, content().resourcesById[building.resource].genitive, resourceText(building, progress.room.resource));
   }
-  const top = seatCostTo(rules().maxLevel, content);
+  const top = seatCostTo(rules().maxLevel, content());
   const onSeat = (column) => `COALESCE((SELECT ${column} FROM guild_seat WHERE guild_id = ? AND building_id = ?), 0)`;
   const taken = [gold > 0 && 'gold = gold - ?', resource > 0 && 'resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) - ?)'].filter(Boolean);
   const takenBinds = [...(gold > 0 ? [gold] : []), ...(resource > 0 ? [path(building.resource), path(building.resource), resource] : [])];

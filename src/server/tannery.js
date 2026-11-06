@@ -31,15 +31,15 @@ import { requireOpen, settlementOf, settlementView } from './settlement.js';
 // A JSON path for a key with a hyphen and a colon ("wolf-pelt:rare").
 const jsonPath = (key) => `$."${key}"`;
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
-const tuning = () => content.settlement.tannery;
-const rarityIndex = (id) => content.rarities.findIndex((rarity) => rarity.id === id);
+const tuning = () => content().settlement.tannery;
+const rarityIndex = (id) => content().rarities.findIndex((rarity) => rarity.id === id);
 
 // A stack of materials as the page shows it, as the Targowisko's goods: its
 // name, with the rarity when above its species', the material for its
 // picture, its description and what the scrapper pays for a piece
 // (`scrap`), with the camp's Skup bonus when given.
 function goodView(key, count, bonus = 0) {
-  const material = materialView(key, count, content);
+  const material = materialView(key, count, content());
   return {
     kind: 'material',
     key,
@@ -47,8 +47,8 @@ function goodView(key, count, bonus = 0) {
     name: material.label.charAt(0).toUpperCase() + material.label.slice(1),
     rarity: material.rarity,
     material,
-    description: content.materialsById[material.materialId].description,
-    scrap: materialPrice(material.rarity, content) * (1 + bonus),
+    description: content().materialsById[material.materialId].description,
+    scrap: materialPrice(material.rarity, content()) * (1 + bonus),
   };
 }
 
@@ -56,9 +56,9 @@ function goodView(key, count, bonus = 0) {
 // the camp's Skup bonus, and his premium on top.
 function tanneryPrices(player, stored, now) {
   // The relation with Wszebor's premium, and the Bractwo Łowców's (591 C).
-  const premium = tanneryPremium(stored.relations[tuning().resident] ?? 0, content) + brotherhoodPerk('tanneryPremium', stored.reputation, content);
-  const bonus = campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
-  return { premium, bonus, price: (key) => materialPrice(parseStack(key).rarityId, content) * (1 + bonus) * (1 + premium) };
+  const premium = tanneryPremium(stored.relations[tuning().resident] ?? 0, content()) + brotherhoodPerk('tanneryPremium', stored.reputation, content());
+  const bonus = campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content());
+  return { premium, bonus, price: (key) => materialPrice(parseStack(key).rarityId, content()) * (1 + bonus) * (1 + premium) };
 }
 
 // The Garbarnia for the page: each stack of materials he takes the
@@ -71,20 +71,20 @@ export function tanneryView(player, stored, now) {
   const points = stored.relations[resident] ?? 0;
   const { premium, bonus, price } = tanneryPrices(player, stored, now);
   const materials = JSON.parse(player.row.materials ?? '{}');
-  const { goods: offered, next } = tanneryStock(points, content);
+  const { goods: offered, next } = tanneryStock(points, content());
   return {
     premium,
     // At his best price already: no "more with a better relation".
     best: premium >= Math.max(...tuning().premium),
     goods: Object.entries(materials)
-      .filter(([key, count]) => count > 0 && tannerTakes(key, content))
+      .filter(([key, count]) => count > 0 && tannerTakes(key, content()))
       .map(([key, count]) => ({ ...goodView(key, count, bonus), price: price(key) }))
       .sort((a, b) => rarityIndex(a.rarity) - rarityIndex(b.rarity) || a.name.localeCompare(b.name, 'pl')),
-    trade: tradeView(stored.tanneryTrade, player.row.level, now, content, reputation),
+    trade: tradeView(stored.tanneryTrade, player.row.level, now, content(), reputation),
     shop: {
       goods: offered.map(({ key, price: cost }) => ({ ...goodView(key, 1), price: cost })),
       next: next && { standing: next.standing, count: next.goods.length },
-      discount: relationDiscount(points, content),
+      discount: relationDiscount(points, content()),
     },
   };
 }
@@ -94,7 +94,7 @@ export function tanneryView(player, stored, now) {
 // level, up to the day's limit, kept apart from Jagna's.
 function traded(row, stored, gold, now) {
   const { resident, brotherhood, reputation } = tuning();
-  const { points, trade } = tradePoints(gold, row.level, stored.tanneryTrade, now, content, reputation);
+  const { points, trade } = tradePoints(gold, row.level, stored.tanneryTrade, now, content(), reputation);
   const add = (counts, id) => ({ ...counts, [id]: (counts[id] ?? 0) + points });
   return { points, stored: { ...stored, relations: add(stored.relations, resident), reputation: add(stored.reputation, brotherhood), tanneryTrade: trade } };
 }
@@ -116,7 +116,7 @@ export async function sellToTanner(context) {
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
-  if (!tannerTakes(body.key, content)) throw new ApiError(400, 'invalid_goods', 'Wszebor kupuje materiały ze stworów, ale nie trofea elit i czempionów.');
+  if (!tannerTakes(body.key, content())) throw new ApiError(400, 'invalid_goods', 'Wszebor kupuje materiały ze stworów, ale nie trofea elit i czempionów.');
   const held = JSON.parse(row.materials ?? '{}')[body.key] ?? 0;
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > held) throw new ApiError(409, 'not_enough', 'Nie masz tylu.');
   const stored = settlementOf(row);
@@ -144,7 +144,7 @@ export async function buyFromTanner(context) {
   requireOpen(row);
   const body = await readJson(context.request);
   const stored = settlementOf(row);
-  const good = tanneryStock(stored.relations[tuning().resident] ?? 0, content).goods.find((one) => one.key === body.key);
+  const good = tanneryStock(stored.relations[tuning().resident] ?? 0, content()).goods.find((one) => one.key === body.key);
   if (!good) throw new ApiError(404, 'no_goods', 'Wszebor nie sprzedaje Ci jeszcze tego materiału.');
   if (!Number.isInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Podaj, ile sztuk kupić.');
   const gold = good.price * body.count;

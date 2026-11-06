@@ -48,19 +48,19 @@ import { testMode, testModeFor } from './test-mode.js';
 
 // The table at the camp's levels, or an error without one.
 function tableOf(player, now) {
-  const table = craftTable(campLevels(player.buildings, now, content), content);
+  const table = craftTable(campLevels(player.buildings, now, content()), content());
   if (table.pace === 0) throw new ApiError(409, 'no_table', 'Najpierw zbuduj Stół rozbiórki w obozie.');
   return table;
 }
 
 const tooRare = (rarityId) =>
-  new ApiError(409, 'too_rare', `Ta rzadkość wymaga Stołu rozbiórki na poziomie ${craftLevelFor(rarityId, content)}. Rozbuduj go w obozie.`);
+  new ApiError(409, 'too_rare', `Ta rzadkość wymaga Stołu rozbiórki na poziomie ${craftLevelFor(rarityId, content())}. Rozbuduj go w obozie.`);
 
 // The roll of extra parts for a new order.
 const newRng = () => createRng(toHex(crypto.getRandomValues(new Uint8Array(16))));
 
 function checkRoom(queue) {
-  const { queueLimit } = content.balance.crafting;
+  const { queueLimit } = content().balance.crafting;
   if (queue.length >= queueLimit) {
     throw new ApiError(409, 'queue_full', `Kolejka stołu jest pełna (${queueLimit} zleceń). Poczekaj, aż skończy się któreś.`);
   }
@@ -117,12 +117,12 @@ const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła 
 // The gem and the ore that jewellery taken apart gives at once, added to the
 // character's minerals, or null for other items (salvageYield).
 function withMinerals(row, items) {
-  const found = items.reduce((sum, item) => addCounts(sum, salvageYield(item, content).minerals ?? {}), {});
+  const found = items.reduce((sum, item) => addCounts(sum, salvageYield(item, content()).minerals ?? {}), {});
   return Object.keys(found).length > 0 ? { found, minerals: addCounts(JSON.parse(row.minerals ?? '{}'), found) } : null;
 }
 
 // Minerals as the page lists them: name and count.
-export const mineralList = (minerals) => Object.entries(minerals ?? {}).map(([id, count]) => ({ id, name: content.mineralsById[id].name, count }));
+export const mineralList = (minerals) => Object.entries(minerals ?? {}).map(([id, count]) => ({ id, name: content().mineralsById[id].name, count }));
 
 // The scrapper buys `count` pieces of a stack of materials ({ key, count }),
 // for their price with the camp's Skup złomu (proposal 1: "Skup złomu
@@ -133,11 +133,11 @@ export async function sellMaterials(context) {
   const body = await readJson(context.request);
   const now = context.now;
   const settled = settleCrafting(craftingState(player.row), now);
-  const have = knownStack(body.key, content) ? (settled.materials[body.key] ?? 0) : 0;
+  const have = knownStack(body.key, content()) ? (settled.materials[body.key] ?? 0) : 0;
   if (have === 0) throw new ApiError(404, 'no_materials', 'Nie masz tego materiału.');
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > have) throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${have} sztuk.`);
-  const bonus = campBonus(campLevels(player.buildings, now, content), 'sellPrice', content);
-  const gold = saleGold(materialPrice(parseStack(body.key).rarityId, content) * (1 + bonus), body.count);
+  const bonus = campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content());
+  const gold = saleGold(materialPrice(parseStack(body.key).rarityId, content()) * (1 + bonus), body.count);
   const state = { ...settled, materials: addCounts(settled.materials, { [body.key]: -body.count }) };
   const db = context.env.DB;
   const result = await saveState(db, player.row, state, { gold }).run();
@@ -157,7 +157,7 @@ export async function craftMaterials(context) {
   const settled = settleCrafting(craftingState(player.row), now);
   const one = typeof body.key === 'string';
   if (one) {
-    const have = knownStack(body.key, content) ? (settled.materials[body.key] ?? 0) : 0;
+    const have = knownStack(body.key, content()) ? (settled.materials[body.key] ?? 0) : 0;
     if (have === 0) throw new ApiError(404, 'no_materials', 'Nie masz tego materiału.');
     if (!Number.isInteger(body.count) || body.count < 1 || body.count > have) throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${have} sztuk.`);
   }
@@ -165,10 +165,10 @@ export async function craftMaterials(context) {
   if (keys.length === 0) throw new ApiError(400, 'invalid_materials', 'Wybierz materiały do przeróbki.');
   checkRoom(settled.queue);
   const foreign = JSON.parse(player.row.foreign_stacks ?? '{}');
-  const { state, ordered, tooRare: rare } = orderMaterials(settled, keys, table, now, newRng(), content, one ? { [body.key]: body.count } : {}, foreign);
+  const { state, ordered, tooRare: rare } = orderMaterials(settled, keys, table, now, newRng(), content(), one ? { [body.key]: body.count } : {}, foreign);
   if (ordered === 0 && rare > 0) {
     const rarities = keys.filter((key) => settled.materials[key] > 0).map((key) => key.slice(key.lastIndexOf(':') + 1));
-    throw tooRare(rarities.sort((a, b) => craftLevelFor(a, content) - craftLevelFor(b, content))[0]);
+    throw tooRare(rarities.sort((a, b) => craftLevelFor(a, content()) - craftLevelFor(b, content()))[0]);
   }
   if (ordered === 0) throw new ApiError(409, 'no_materials', 'Nie masz tych materiałów.');
   // The materials count for the narrator's quests and the Próby Gildii once
@@ -190,14 +190,14 @@ export async function salvageItem(context) {
   requireOffRack(player, item);
   const now = context.now;
   const table = tableOf(player, now);
-  if (!craftTakes(table, item.rarity, content)) throw tooRare(item.rarity);
+  if (!craftTakes(table, item.rarity, content())) throw tooRare(item.rarity);
   const settled = settleCrafting(craftingState(player.row), now);
   checkRoom(settled.queue);
   const db = context.env.DB;
   const row = player.row;
   const learned = JSON.parse(row.patterns ?? '[]');
   const pattern = taughtPattern(item, learned);
-  const ordered = withIds(settled.queue.length, orderSalvage(settled, item, itemName(item, content), table, now, newRng(), content));
+  const ordered = withIds(settled.queue.length, orderSalvage(settled, item, itemName(item, content()), table, now, newRng(), content()));
   const state = pattern ? withPatterns(ordered, settled.queue.length, [{ id: pattern.id, partId: ordered.queue.at(-1).partId }]) : ordered;
   const order = state.queue.at(-1);
   // The order is saved only while the item is still in the bag, and the item
@@ -220,7 +220,7 @@ export async function salvageItem(context) {
   return json({
     salvage: {
       name: order.name,
-      part: content.partsById[order.partId].name,
+      part: content().partsById[order.partId].name,
       parts: order.parts,
       endsAt: order.endsAt,
       ...(pattern && { pattern: pattern.name, patternAt: pattern.at }),
@@ -248,7 +248,7 @@ export async function salvageItems(context) {
   requireOffRack(player, ...items);
   const now = context.now;
   const table = tableOf(player, now);
-  const rare = items.find((item) => !craftTakes(table, item.rarity, content));
+  const rare = items.find((item) => !craftTakes(table, item.rarity, content()));
   if (rare) throw tooRare(rare.rarity);
   const settled = settleCrafting(craftingState(player.row), now);
   const row = player.row;
@@ -258,13 +258,13 @@ export async function salvageItems(context) {
   const learned = JSON.parse(row.patterns ?? '[]');
   const taught = items.reduce((list, item) => {
     const pattern = taughtPattern(item, [...learned, ...list.map((one) => one.id)]);
-    return pattern ? [...list, { ...pattern, partId: salvageYield(item, content).partId }] : list;
+    return pattern ? [...list, { ...pattern, partId: salvageYield(item, content()).partId }] : list;
   }, []);
-  const entries = items.map((item) => ({ item, name: itemName(item, content) }));
-  const ordered = withIds(settled.queue.length, orderSalvageMany(settled, entries, table, now, newRng(), content));
+  const entries = items.map((item) => ({ item, name: itemName(item, content()) }));
+  const ordered = withIds(settled.queue.length, orderSalvageMany(settled, entries, table, now, newRng(), content()));
   const state = withPatterns(ordered, settled.queue.length, taught);
   const orders = state.queue.slice(settled.queue.length);
-  const { queueLimit } = content.balance.crafting;
+  const { queueLimit } = content().balance.crafting;
   if (state.queue.length > queueLimit) {
     const room = Math.max(0, queueLimit - settled.queue.length);
     throw new ApiError(
@@ -294,7 +294,7 @@ export async function salvageItems(context) {
   return json({
     salvaged: {
       count: items.length,
-      orders: orders.map((order) => ({ part: content.partsById[order.partId].name, parts: order.parts, endsAt: order.endsAt })),
+      orders: orders.map((order) => ({ part: content().partsById[order.partId].name, parts: order.parts, endsAt: order.endsAt })),
       patterns: taught.map(({ name, at }) => ({ name, at })),
       ...(jewels && { minerals: mineralList(jewels.found) }),
     },
@@ -303,7 +303,7 @@ export async function salvageItems(context) {
 }
 
 // The words of the table's queue (data/buildings.json, the table's `queue`).
-const queueTexts = () => tableBuilding(content).queue;
+const queueTexts = () => tableBuilding(content()).queue;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 
 // "Usuń z kolejki" ({ id }) and "Usuń wszystkie" ({ all: true }): orders the
@@ -336,26 +336,26 @@ export async function cancelOrders(context) {
   if (!leaving.every(orderCancellable)) throw new ApiError(409, 'too_old', errors.old);
   const ids = new Set(leaving.map((order) => order.id));
   const back = takeOffQueue(settled, ids, now);
-  const free = bagCapacity(campLevels(player.buildings, now, content), content) - bagPlaces(player);
+  const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
   if (back.items.length > free) throw new ApiError(409, 'bag_full', filled(errors.bagFull, { need: back.items.length, free: Math.max(0, free) }));
   const held = JSON.parse(row.minerals ?? '{}');
   const short = Object.entries(back.minerals)
     .filter(([id, count]) => (held[id] ?? 0) < count)
-    .map(([id, count]) => `${content.mineralsById[id].name} ×${count - (held[id] ?? 0)}`);
+    .map(([id, count]) => `${content().mineralsById[id].name} ×${count - (held[id] ?? 0)}`);
   if (short.length > 0) throw new ApiError(409, 'minerals_used', filled(errors.minerals, { minerals: short.join(', ') }));
   const cancelled = back.work.filter((one) => one.cancelled);
   const quests = questsNow(player, now);
-  const after = takeQuestProgress(quests, cancelled, content);
+  const after = takeQuestProgress(quests, cancelled, content());
   const rewarded = rewardedQuest(quests, after);
-  if (rewarded) throw new ApiError(409, 'quest_rewarded', filled(errors.rewarded, { quest: questText(rewarded, content) }));
+  if (rewarded) throw new ApiError(409, 'quest_rewarded', filled(errors.rewarded, { quest: questText(rewarded, content()) }));
   // A pattern stays known while an order staying holds an item of it, which
   // would have taught it: that order takes over its mark (patternsKept).
   const learned = JSON.parse(row.patterns ?? '[]');
   const { queue, hidden } = patternsKept(back.state.queue, back.patterns.filter((id) => learned.includes(id)));
   const db = context.env.DB;
-  const weeks = [...new Set(cancelled.map((one) => questPeriod('weekly', one.orderedAt, content).key))];
+  const weeks = [...new Set(cancelled.map((one) => questPeriod('weekly', one.orderedAt, content()).key))];
   const trials = (await tableTrials(db, row.id, weeks))
-    .map((trial) => [trial, trialAfterCancel(trial, back.work, now, content)])
+    .map((trial) => [trial, trialAfterCancel(trial, back.work, now, content())])
     .filter(([, next]) => next);
   const taken = Object.fromEntries(Object.entries(back.minerals).map(([id, count]) => [id, -count]));
   await atomically(db, [

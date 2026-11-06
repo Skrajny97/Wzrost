@@ -6,6 +6,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 |---|---|
 | `rng.js` | losowość z ziarnem (sfc32) |
 | `content.js` | zamienia pliki z `data/` na słowniki używane przez silnik, w tym regiony wewnętrzne z cechą i elitą regionu |
+| `overlay.js` | nakłada angielskie teksty z `data/en/` na dane, po identyfikatorach; brak tłumaczenia zostawia polski |
 | `formulas.js` | wspólne wzory, m.in. malejący zwrot P / (P + K) |
 | `stats.js` | statystyki i ich źródła, wolne punkty, „Rozdaj według klasy” |
 | `items.js` | przedmioty: budżet, afiksy, nazwy, klasy, cena u złomiarza, zakładanie do pustych slotów |

@@ -15,7 +15,7 @@ import { ApiError, json, readJson } from './http.js';
 import { requireOpen, settlementOf, settlementView } from './settlement.js';
 import { hallRecord } from './trial-hall.js';
 
-const today = (now) => questPeriod('daily', now, content).key;
+const today = (now) => questPeriod('daily', now, content()).key;
 
 // The record for `day`: what its posters are drawn from, those done that
 // day and the one in hand. The day's posters are those of its first look
@@ -35,13 +35,13 @@ function recordOf(row, stored, day) {
 }
 
 // The day's posters, from the record's basis.
-const postersOf = (row, record) => wantedPosters(record.basis.classLevel, record.day, row.id, content, record.basis.early);
+const postersOf = (row, record) => wantedPosters(record.basis.classLevel, record.day, row.id, content(), record.basis.early);
 
 // The record the Osada's first look of a day keeps (getSettlement in
 // settlement.js), as the Koło Fortuny keeps its pool's basis; null when the
 // day's is kept already or the game has no posters.
 export function wantedToKeep(row, stored, now) {
-  if (!wantedOf(content)) return null;
+  if (!wantedOf(content())) return null;
   const day = today(now);
   if (stored.wanted?.day === day && stored.wanted.basis) return null;
   return recordOf(row, stored, day);
@@ -49,7 +49,7 @@ export function wantedToKeep(row, stored, now) {
 
 // A poster for the page, with its place's name and levels.
 function posterView(poster, state) {
-  const area = content.areasById[poster.areaId];
+  const area = content().areasById[poster.areaId];
   return {
     id: poster.id,
     kind: poster.kind,
@@ -70,7 +70,7 @@ const stateOf = (poster, done, taken) => (done.includes(poster.id) ? 'done' : ta
 // (its bounty waiting) or done, and a poster of an earlier day still in
 // hand; null where the game has no posters.
 export function wantedView(row, stored, now) {
-  const rules = wantedOf(content);
+  const rules = wantedOf(content());
   if (!rules) return null;
   const record = recordOf(row, stored, today(now));
   const { done, taken } = record;
@@ -90,8 +90,8 @@ export function wantedView(row, stored, now) {
 // variant would leave now; null otherwise.
 export function wantedGoing(row, stored, area) {
   const taken = stored.wanted?.taken;
-  if (!wantedOf(content) || !taken || taken.beaten || taken.areaId !== area.id) return null;
-  const trophy = taken.kind === 'creature' ? wantedTrophy(taken.monsterId, JSON.parse(row.discovered ?? '{}'), content) : null;
+  if (!wantedOf(content()) || !taken || taken.beaten || taken.areaId !== area.id) return null;
+  const trophy = taken.kind === 'creature' ? wantedTrophy(taken.monsterId, JSON.parse(row.discovered ?? '{}'), content()) : null;
   return { id: taken.id, kind: taken.kind, areaId: taken.areaId, monsterId: taken.monsterId, name: taken.name, female: taken.female, level: taken.level, ...(trophy && { trophy }) };
 }
 
@@ -127,7 +127,7 @@ async function start(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireOpen(row);
-  const rules = wantedOf(content);
+  const rules = wantedOf(content());
   if (!rules) throw new ApiError(404, 'not_found', 'Listów gończych jeszcze nie ma.');
   const stored = settlementOf(row);
   const carried = player.activity?.kind === 'hunt' ? (JSON.parse(player.activity.options ?? '{}').wanted?.id ?? null) : null;
