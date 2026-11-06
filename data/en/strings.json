@@ -1225,6 +1225,8 @@
   "Materiały": "Materials",
   "Minerały": "Minerals",
   "Zdejmij": "Unequip",
+  "{name} wraca do plecaka.": "{name} goes back to the bag.",
+  "Plecak jest pełny. Zrób w nim miejsce, żeby zdjąć przedmiot.": "The bag is full. Make room in it to take the item off.",
   "Załóż": "Equip",
   "Moduł {name} pojawi się w jednej z kolejnych aktualizacji gry.": "The {name} module will come in one of the game's next updates.",
   "Dostęp zablokowany. {name}: od poziomu postaci {level}. Twój poziom: {own}.": "Access locked. {name}: from character level {level}. Your level: {own}.",

@@ -135,13 +135,13 @@ function companionItemSheet(companion, slot, apply, anvil = false) {
     withButton(event.currentTarget, async () => {
       apply(await call('POST', '/api/settlement/unequip', { companionId: companion.id, slot }));
       closeSheet();
-      toast(`${item.name} wraca do plecaka.`);
+      toast(t('{name} wraca do plecaka.', { name: item.name }));
     });
   openSheet(
     itemDetails(item),
     h('p', { class: 'muted', text: companion.wornBy }),
     anvilSection(item, Boolean(companion.away), anvil, { send, reopen }),
-    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Zdejmij', disabled: Boolean(companion.away), onClick: takeOff })),
+    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Zdejmij'), disabled: Boolean(companion.away), onClick: takeOff })),
     companion.away && h('p', { class: 'muted', text: companion.away }),
   );
 }
