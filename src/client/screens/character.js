@@ -10,6 +10,7 @@ import { MATERIALS_HINT, materialIcon, materialSheet, materialTitle } from '../c
 import { fill, h, icon } from '../dom.js';
 import { askGuildButton } from '../guild-requests.js';
 import { countOf, formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, saleGold, timeFormat } from '../format.js';
+import { t } from '../i18n.js';
 import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { playSound } from '../sound.js';
 import { buildLocked, buildLockedText, call, costShortfall, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
@@ -17,6 +18,8 @@ import { scrapperSheet } from '../scrapper.js';
 import { itemTip, setTipRenderer } from '../item-tip.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemLink, systemPanel, toast, withButton } from '../ui.js';
 
+// The words of these tables are written in Polish and shown in the page's
+// language (t(), i18n.js).
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 
 // An item's name with its upgrade, e.g. "Miecz Rysia +3".
@@ -43,7 +46,7 @@ export function verdictMark(verdict, { tile = false } = {}) {
   if (!verdict || verdict === 'same') return null;
   return tile
     ? h('span', { class: `slot-verdict verdict verdict--${verdict}`, 'aria-hidden': 'true' })
-    : h('span', { class: `verdict verdict--${verdict}`, text: VERDICTS[verdict].text });
+    : h('span', { class: `verdict verdict--${verdict}`, text: t(VERDICTS[verdict].text) });
 }
 
 // A report keeps copies of its finds; the same item in the bag has an id.
@@ -124,7 +127,7 @@ export const piecesText = (takes) => takes.map((one) => `${formatNumber(one.coun
 // powinniśmy być w stanie zarządzać Ekwipunkiem?"), and the bag always.
 // A mercenary's gear waits too (mercenaries.js).
 const onExploration = (character) => buildLocked(character);
-const busyText = (character) => buildLockedText(character, 'Ekwipunek zmienisz');
+const busyText = (character) => buildLockedText(character, t('Ekwipunek zmienisz'));
 
 // A herb's or a potion's stacks in the bag: full ones, then the rest.
 function stacksOf(entry, stack) {
@@ -153,7 +156,7 @@ export function mountCharacter(container) {
         type: 'button',
         class: 'eye-toggle',
         'aria-pressed': gearHidden,
-        'aria-label': gearHidden ? 'Pokaż ekwipunek' : 'Ukryj ekwipunek',
+        'aria-label': gearHidden ? t('Pokaż ekwipunek') : t('Ukryj ekwipunek'),
         onClick: () => {
           gearHidden = !gearHidden;
           render();
@@ -175,7 +178,7 @@ export function mountCharacter(container) {
     frame.append(...layers, column('left'), column('right'), eye);
 
     fill(container,
-      pageHeading(character.name, `${character.className}${character.evolution?.current ? ` (z klasy: ${character.baseClassName})` : ''} · ${POSITION_NAMES[character.position]} · solo`, {
+      pageHeading(character.name, `${character.evolution?.current ? t('{name} (z klasy: {base})', { name: character.className, base: character.baseClassName }) : character.className} · ${t(POSITION_NAMES[character.position])} · solo`, {
         tag: character.guildTag,
         nameColor: character.nameColor,
       }),
@@ -206,11 +209,11 @@ export function mountCharacter(container) {
           type: 'button',
           class: 'slot slot--core slot--locked',
           'data-guide': `slot-${slot.id}`,
-          'aria-label': `${slot.name}: zablokowany`,
+          'aria-label': t('{slot}: zablokowany', { slot: slot.name }),
           onClick: () =>
             openSheet(
               h('h2', { class: 'sheet-title', text: slot.name }),
-              systemPanel(`${core.name} odblokuje się ${core.condition}.`),
+              systemPanel(t('{name} odblokuje się {condition}.', { name: core.name, condition: core.condition })),
             ),
         },
         icon('core', { size: 24 }),
@@ -219,7 +222,7 @@ export function mountCharacter(container) {
     if (!item) {
       return h(
         'button',
-        { type: 'button', class: 'slot slot--empty', 'data-guide': `slot-${slot.id}`, 'aria-label': `${slot.name}: pusty slot`, onClick: () => emptySlotSheet(slot) },
+        { type: 'button', class: 'slot slot--empty', 'data-guide': `slot-${slot.id}`, 'aria-label': t('{slot}: pusty slot', { slot: slot.name }), onClick: () => emptySlotSheet(slot) },
         icon(SLOT_ICONS[slot.id], { size: 24 }),
       );
     }
@@ -286,16 +289,16 @@ export function mountCharacter(container) {
       h(
         'div',
         { class: 'bag-head' },
-        h('h2', { class: 'section-title', id: 'bag-title' }, 'Plecak ', count),
+        h('h2', { class: 'section-title', id: 'bag-title' }, `${t('Plecak')} `, count),
       ),
       bagActions(bag),
       h(
         'div',
-        { class: `segmented bag-tabs${showMinerals ? ' bag-tabs--four' : ''}`, role: 'group', 'aria-label': 'Zawartość plecaka' },
-        tab('items', 'Przedmioty'),
-        tab('materials', stacked > 0 ? `Materiały (${formatNumber(stacked)})` : 'Materiały'),
-        tab('parts', partCount > 0 ? `Części (${formatNumber(partCount)})` : 'Części'),
-        showMinerals && tab('minerals', mineralCount > 0 ? `Minerały (${formatNumber(mineralCount)})` : 'Minerały'),
+        { class: `segmented bag-tabs${showMinerals ? ' bag-tabs--four' : ''}`, role: 'group', 'aria-label': t('Zawartość plecaka') },
+        tab('items', t('Przedmioty')),
+        tab('materials', stacked > 0 ? t('Materiały ({count})', { count: formatNumber(stacked) }) : t('Materiały')),
+        tab('parts', partCount > 0 ? t('Części ({count})', { count: formatNumber(partCount) }) : t('Części')),
+        showMinerals && tab('minerals', mineralCount > 0 ? t('Minerały ({count})', { count: formatNumber(mineralCount) }) : t('Minerały')),
       ),
       (grids[bagTab === 'minerals' && !showMinerals ? 'items' : bagTab] ?? grids.items)(),
     );
@@ -313,8 +316,8 @@ export function mountCharacter(container) {
     return h(
       'p',
       { class: 'bag-scrolls' },
-      'Zwoje: ',
-      kinds.map(([id, name, count], index) => h('span', { class: 'bag-scroll' }, scrollArt(id, 20), `${name} ${formatNumber(count)}${index < kinds.length - 1 ? ',' : ''}`)),
+      `${t('Zwoje:')} `,
+      kinds.map(([id, name, count], index) => h('span', { class: 'bag-scroll' }, scrollArt(id, 20), `${t(name)} ${formatNumber(count)}${index < kinds.length - 1 ? ',' : ''}`)),
     );
   }
 
@@ -324,10 +327,10 @@ export function mountCharacter(container) {
     return h(
       'div',
       { class: 'bag-sort' },
-      h('span', { class: 'bag-sort-label', text: 'Sortuj:' }),
+      h('span', { class: 'bag-sort-label', text: t('Sortuj:') }),
       h(
         'div',
-        { class: `segmented bag-sort-options bag-sort-options--${BAG_SORTS[kind].length}`, role: 'group', 'aria-label': 'Sortowanie plecaka' },
+        { class: `segmented bag-sort-options bag-sort-options--${BAG_SORTS[kind].length}`, role: 'group', 'aria-label': t('Sortowanie plecaka') },
         BAG_SORTS[kind].map((one) =>
           h(
             'button',
@@ -345,7 +348,7 @@ export function mountCharacter(container) {
                 render();
               },
             },
-            one.label,
+            t(one.label),
           ),
         ),
       ),
@@ -362,16 +365,16 @@ export function mountCharacter(container) {
     return h(
       'div',
       { class: 'bag-actions' },
-      sell && h('button', { type: 'button', class: 'button button--world button--small', text: 'Sprzedaj zbędne', onClick: scrapperSheet }),
-      salvage && h('button', { type: 'button', class: 'button button--world button--small', text: 'Rozbierz kilka', onClick: () => salvageManySheet() }),
+      sell && h('button', { type: 'button', class: 'button button--world button--small', text: t('Sprzedaj zbędne'), onClick: scrapperSheet }),
+      salvage && h('button', { type: 'button', class: 'button button--world button--small', text: t('Rozbierz kilka'), onClick: () => salvageManySheet() }),
     );
   }
 
   // The parts for the Warsztat, a slot for each, outside the bag's room too.
   function partsGrid(parts) {
-    if (parts.length === 0) return h('p', { class: 'muted', text: 'Nie masz jeszcze części. Stół rozbiórki robi je z materiałów i rozebranych przedmiotów.' });
+    if (parts.length === 0) return h('p', { class: 'muted', text: t('Nie masz jeszcze części. Stół rozbiórki robi je z materiałów i rozebranych przedmiotów.') });
     return [
-      h('p', { class: 'bag-note', text: 'Części nie zajmują miejsca w plecaku.' }),
+      h('p', { class: 'bag-note', text: t('Części nie zajmują miejsca w plecaku.') }),
       h(
         'ul',
         { class: 'bag-grid' },
@@ -385,7 +388,7 @@ export function mountCharacter(container) {
                 type: 'button',
                 class: 'slot slot--bag',
                 vars: { '--rarity': part.color },
-                'aria-label': `${part.name}, ${formatNumber(part.count)} szt.`,
+                'aria-label': t('{name}, {count} szt.', { name: part.name, count: formatNumber(part.count) }),
                 onClick: () => partSheet(part),
               },
               materialIcon(part.id),
@@ -400,7 +403,7 @@ export function mountCharacter(container) {
   function partSheet(part) {
     const art = materialSprite(part.id);
     const title = h('h2', { class: 'item-title', vars: { '--rarity': part.color }, text: part.name });
-    const meta = h('p', { class: 'item-meta', text: `${formatNumber(part.count)} szt.` });
+    const meta = h('p', { class: 'item-meta', text: t('{count} szt.', { count: formatNumber(part.count) }) });
     const workshop = state.character.professions?.workshop;
     openSheet(
       h(
@@ -408,18 +411,18 @@ export function mountCharacter(container) {
         { class: 'item-details' },
         art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art', vars: { '--rarity': part.color } }, art), h('div', {}, title, meta)) : [title, meta],
         part.description && h('p', { class: 'sheet-text', text: part.description }),
-        h('p', { class: 'sheet-text', text: 'Z części Warsztat wykonuje przedmioty, a przy wymianie 10 części daje 1 część rzadszą.' }),
+        h('p', { class: 'sheet-text', text: t('Z części Warsztat wykonuje przedmioty, a przy wymianie 10 części daje 1 część rzadszą.') }),
       ),
-      workshop && h('a', { class: 'button button--world', href: '#/profesje/rzemieslnictwo', onClick: closeSheet, text: 'Do Warsztatu' }),
+      workshop && h('a', { class: 'button button--world', href: '#/profesje/rzemieslnictwo', onClick: closeSheet, text: t('Do Warsztatu') }),
     );
   }
 
   // The gems and ores of Górnictwo, a slot for each, outside the bag's room
   // too, framed in their rarity's colour.
   function mineralsGrid(minerals) {
-    if (minerals.length === 0) return h('p', { class: 'muted', text: 'Nie masz jeszcze kamieni ani kruszców. Wydobędziesz je w Górnictwie.' });
+    if (minerals.length === 0) return h('p', { class: 'muted', text: t('Nie masz jeszcze kamieni ani kruszców. Wydobędziesz je w Górnictwie.') });
     return [
-      h('p', { class: 'bag-note', text: 'Kamienie i kruszce nie zajmują miejsca w plecaku.' }),
+      h('p', { class: 'bag-note', text: t('Kamienie i kruszce nie zajmują miejsca w plecaku.') }),
       h(
         'ul',
         { class: 'bag-grid' },
@@ -433,7 +436,7 @@ export function mountCharacter(container) {
                 type: 'button',
                 class: 'slot slot--bag slot--mineral',
                 vars: { '--rarity': mineral.color },
-                'aria-label': `${mineral.name}, ${formatNumber(mineral.count)} szt.`,
+                'aria-label': t('{name}, {count} szt.', { name: mineral.name, count: formatNumber(mineral.count) }),
                 onClick: () => mineralSheet(mineral),
               },
               mineralSprite(mineral.id) ?? icon('ore', { size: 24 }),
@@ -453,13 +456,13 @@ export function mountCharacter(container) {
     const price = (amount) => saleGold(mineral.price, amount);
     const value = h('output', { class: 'herb-count-value' });
     const sell = h('button', { type: 'button', class: 'button button--system' });
-    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
-    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
-    const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(mineral.count) });
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Mniej'), text: '−', onClick: () => set(count - 1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Więcej'), text: '+', onClick: () => set(count + 1) });
+    const all = h('button', { type: 'button', class: 'link-button', text: t('wszystkie'), onClick: () => set(mineral.count) });
     function set(next) {
       count = Math.min(mineral.count, Math.max(1, next));
-      value.textContent = `${formatNumber(count)} szt.`;
-      sell.textContent = `Sprzedaj za ${formatNumber(price(count))} złota`;
+      value.textContent = t('{count} szt.', { count: formatNumber(count) });
+      sell.textContent = t('Sprzedaj za {gold} złota', { gold: formatNumber(price(count)) });
       less.disabled = count === 1;
       more.disabled = count === mineral.count;
     }
@@ -473,29 +476,37 @@ export function mountCharacter(container) {
     sell.addEventListener('click', async (event) => {
       const button = event.currentTarget;
       const sure = await confirmAction({
-        title: 'Sprzedać minerał?',
-        text: `Złomiarz kupi: ${mineral.name} ×${formatNumber(count)} za ${formatNumber(price(count))} złota.`,
-        confirmLabel: 'Sprzedaj',
+        title: t('Sprzedać minerał?'),
+        text: t('Złomiarz kupi: {name} ×{count} za {gold} złota.', { name: mineral.name, count: formatNumber(count), gold: formatNumber(price(count)) }),
+        confirmLabel: t('Sprzedaj'),
       });
       if (!sure) return;
       await act('sell', ({ sold }) => {
         playSound('coin');
-        toast(`Złomiarz kupił ${formatNumber(sold.count)} szt. za ${formatNumber(sold.gold)} złota.`);
+        toast(t('Złomiarz kupił {count} szt. za {gold} złota.', { count: formatNumber(sold.count), gold: formatNumber(sold.gold) }));
       })({ currentTarget: button });
     });
     const discard = async (event) => {
       const button = event.currentTarget;
-      const sure = await confirmAction({ title: 'Wyrzucić minerał?', text: `${mineral.name}: ${formatNumber(count)} szt. zniknie na zawsze.`, confirmLabel: 'Wyrzuć', danger: true });
+      const sure = await confirmAction({
+        title: t('Wyrzucić minerał?'),
+        text: t('{name}: {count} szt. zniknie na zawsze.', { name: mineral.name, count: formatNumber(count) }),
+        confirmLabel: t('Wyrzuć'),
+        danger: true,
+      });
       if (sure) await act('discard')({ currentTarget: button });
     };
     const art = mineralSprite(mineral.id);
     const title = h('h2', { class: 'item-title', vars: { '--rarity': mineral.color }, text: mineral.name });
-    const kind = mineral.kind === 'gem' ? `Kamień szlachetny · ${mineral.rarityName}` : 'Kruszec';
-    const meta = h('p', { class: 'item-meta', text: `${kind} · ${formatNumber(mineral.count)} szt.` });
+    const kind = mineral.kind === 'gem' ? t('Kamień szlachetny · {rarity}', { rarity: mineral.rarityName }) : t('Kruszec');
+    const meta = h('p', { class: 'item-meta', text: t('{kind} · {count} szt.', { kind, count: formatNumber(mineral.count) }) });
     const use =
       mineral.kind === 'gem'
-        ? `Daje biżuterii rzadkość: ${mineral.rarityName}. Oprawiony w przedmiot podnosi wszystkie jego liczby o ${formatNumber(Math.round(mineral.bonus * 100))}%.`
-        : `Idzie na oprawy biżuterii rzadkości: ${mineral.rarityNames.join(', ')}.`;
+        ? t('Daje biżuterii rzadkość: {rarity}. Oprawiony w przedmiot podnosi wszystkie jego liczby o {percent}%.', {
+            rarity: mineral.rarityName,
+            percent: formatNumber(Math.round(mineral.bonus * 100)),
+          })
+        : t('Idzie na oprawy biżuterii rzadkości: {rarities}.', { rarities: mineral.rarityNames.join(', ') });
     const jeweller = state.character.professions?.jewelcrafting;
     openSheet(
       h(
@@ -504,19 +515,19 @@ export function mountCharacter(container) {
         art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art', vars: { '--rarity': mineral.color } }, art), h('div', {}, title, meta)) : [title, meta],
         h('p', { class: 'sheet-text', text: mineral.description }),
         h('p', { class: 'sheet-text', text: use }),
-        h('p', { class: 'sheet-text', text: `Złomiarz płaci ${formatDecimal(mineral.price)} złota za sztukę.` }),
+        h('p', { class: 'sheet-text', text: t('Złomiarz płaci {price} złota za sztukę.', { price: formatDecimal(mineral.price) }) }),
       ),
       h('div', { class: 'herb-count' }, less, value, more, all),
-      jeweller && h('a', { class: 'button button--world', href: '#/profesje/jubilerstwo', onClick: closeSheet, text: 'Do Szlifierni' }),
-      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: 'Wyrzuć' }), sell),
+      jeweller && h('a', { class: 'button button--world', href: '#/profesje/jubilerstwo', onClick: closeSheet, text: t('Do Szlifierni') }),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }), sell),
     );
   }
 
   // The materials from beaten creatures, a slot for each stack, outside the bag's room.
   function materialsGrid(materials) {
-    if (materials.length === 0) return h('p', { class: 'muted', text: MATERIALS_HINT });
+    if (materials.length === 0) return h('p', { class: 'muted', text: t(MATERIALS_HINT) });
     return [
-      h('p', { class: 'bag-note', text: 'Materiały nie zajmują miejsca w plecaku.' }),
+      h('p', { class: 'bag-note', text: t('Materiały nie zajmują miejsca w plecaku.') }),
       h(
         'ul',
         { class: 'bag-grid' },
@@ -544,7 +555,7 @@ export function mountCharacter(container) {
 
   function itemsGrid(bag) {
     const stacked = Object.keys(STACKS).flatMap((kind) => (state.character[kind] ?? []).map((entry) => ({ kind, entry })));
-    if (bag.length === 0 && stacked.length === 0) return h('p', { class: 'muted', text: 'Plecak jest pusty. Łupy z wypraw trafiają tutaj.' });
+    if (bag.length === 0 && stacked.length === 0) return h('p', { class: 'muted', text: t('Plecak jest pusty. Łupy z wypraw trafiają tutaj.') });
     return h(
       'ul',
       { class: 'bag-grid' },
@@ -558,7 +569,7 @@ export function mountCharacter(container) {
               {
                 type: 'button',
                 class: `slot slot--bag ${STACKS[kind].slot}`,
-                'aria-label': `${entry.name}, ${formatNumber(count)} szt.`,
+                'aria-label': t('{name}, {count} szt.', { name: entry.name, count: formatNumber(count) }),
                 onClick: () => stackSheet(kind, entry),
               },
               STACKS[kind].art(entry.id),
@@ -578,7 +589,7 @@ export function mountCharacter(container) {
                 type: 'button',
                 class: 'slot slot--bag',
                 vars: { '--rarity': item.color },
-                'aria-label': [itemTitle(item), item.rarityName, item.slotName, `poziom ${item.level}`, verdictMark(item.verdict) && VERDICTS[item.verdict].text]
+                'aria-label': [itemTitle(item), item.rarityName, item.slotName, t('poziom {level}', { level: item.level }), verdictMark(item.verdict) && t(VERDICTS[item.verdict].text)]
                   .filter(Boolean)
                   .join(', '),
                 onClick: () => itemSheet(item, { equipped: false }),
@@ -625,14 +636,14 @@ export function mountCharacter(container) {
             toast(text);
           }),
       });
-    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
-    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
-    const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(entry.count) });
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Mniej'), text: '−', onClick: () => set(count - 1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Więcej'), text: '+', onClick: () => set(count + 1) });
+    const all = h('button', { type: 'button', class: 'link-button', text: t('wszystkie'), onClick: () => set(entry.count) });
     function set(next) {
       count = Math.min(entry.count, Math.max(1, next));
-      value.textContent = `${formatNumber(count)} szt.`;
-      sell.textContent = `Sprzedaj za ${formatNumber(price(count))} złota`;
-      if (drink) drink.textContent = timed && count > 1 ? `${entry.verb} ${formatNumber(count)} szt.` : entry.verb;
+      value.textContent = t('{count} szt.', { count: formatNumber(count) });
+      sell.textContent = t('Sprzedaj za {gold} złota', { gold: formatNumber(price(count)) });
+      if (drink) drink.textContent = timed && count > 1 ? t('{verb} {count} szt.', { verb: entry.verb, count: formatNumber(count) }) : entry.verb;
       less.disabled = count === 1;
       more.disabled = count === entry.count;
     }
@@ -645,14 +656,14 @@ export function mountCharacter(container) {
       });
     sell.addEventListener('click', act('sell', ({ sold }) => {
       playSound('coin');
-      toast(`Złomiarz kupił ${formatNumber(sold.count)} szt. za ${formatNumber(sold.gold)} złota.`);
+      toast(t('Złomiarz kupił {count} szt. za {gold} złota.', { count: formatNumber(sold.count), gold: formatNumber(sold.gold) }));
     }));
     const discard = async (event) => {
       const button = event.currentTarget;
       const sure = await confirmAction({
-        title: discardTitle,
-        text: `${entry.name}: ${formatNumber(count)} szt. zniknie na zawsze.`,
-        confirmLabel: 'Wyrzuć',
+        title: t(discardTitle),
+        text: t('{name}: {count} szt. zniknie na zawsze.', { name: entry.name, count: formatNumber(count) }),
+        confirmLabel: t('Wyrzuć'),
         danger: true,
       });
       if (sure) await act('discard')({ currentTarget: button });
@@ -660,24 +671,30 @@ export function mountCharacter(container) {
     const art = artOf(entry.id);
     const title = h('h2', { class: 'item-title', text: entry.name });
     const stacks = Math.ceil(entry.count / character.herbStack);
-    const meta = h('p', { class: 'item-meta', text: `${formatNumber(entry.count)} szt. · ${stacks} ${plural(stacks, 'miejsce', 'miejsca', 'miejsc')} w plecaku` });
+    const meta = h('p', {
+      class: 'item-meta',
+      text: t('{count} szt. · {stacks} {places} w plecaku', { count: formatNumber(entry.count), stacks, places: plural(stacks, 'miejsce', 'miejsca', 'miejsc') }),
+    });
     openSheet(
       h(
         'div',
         { class: 'item-details' },
         art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art' }, art), h('div', {}, title, meta)) : [title, meta],
         h('p', { class: 'sheet-text', text: entry.description }),
-        h('p', { class: 'sheet-text', text: `Jedno miejsce mieści ${character.herbStack} szt. Złomiarz płaci ${formatDecimal(entry.price)} złota za sztukę.` }),
+        h('p', {
+          class: 'sheet-text',
+          text: t('Jedno miejsce mieści {stack} szt. Złomiarz płaci {price} złota za sztukę.', { stack: character.herbStack, price: formatDecimal(entry.price) }),
+        }),
       ),
       [
         // A healing potion or a potion for a time is drunk, or the oil put
         // on the blade, one at a time (potions.js); one from a Wymiana waits
         // for its recipe.
-        entry.known === false && h('p', { class: 'region-warning', text: 'Tej mikstury nie użyjesz, póki nie poznasz jej receptury w Alchemii.' }),
-        exploring && entry.known !== false && h('p', { class: 'muted', text: 'Leczyć się można po powrocie z wyprawy.' }),
+        entry.known === false && h('p', { class: 'region-warning', text: t('Tej mikstury nie użyjesz, póki nie poznasz jej receptury w Alchemii.') }),
+        exploring && entry.known !== false && h('p', { class: 'muted', text: t('Leczyć się można po powrocie z wyprawy.') }),
         drink,
         h('div', { class: 'herb-count' }, less, value, more, all),
-        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: 'Wyrzuć' }), sell),
+        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }), sell),
       ],
     );
   }
@@ -686,9 +703,9 @@ export function mountCharacter(container) {
     const fitting = state.character.bag.filter((item) => item.slot === slot.id);
     openSheet(
       h('h2', { class: 'sheet-title', text: slot.name }),
-      h('p', { class: 'sheet-text', text: 'Pusty slot.' }),
+      h('p', { class: 'sheet-text', text: t('Pusty slot.') }),
       fitting.length === 0
-        ? h('p', { class: 'muted', text: 'W plecaku nie ma przedmiotu do tego slotu.' })
+        ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotu do tego slotu.') })
         : h(
             'ul',
             { class: 'item-list' },
@@ -737,9 +754,9 @@ export function itemSheet(item, { equipped, anvil = false }) {
   const discard = async (event) => {
     const button = event.currentTarget;
     const sure = await confirmAction({
-      title: 'Wyrzucić przedmiot?',
-      text: `${itemTitle(item)} zniknie na zawsze.`,
-      confirmLabel: 'Wyrzuć',
+      title: t('Wyrzucić przedmiot?'),
+      text: t('{item} zniknie na zawsze.', { item: itemTitle(item) }),
+      confirmLabel: t('Wyrzuć'),
       danger: true,
     });
     if (sure) await withButton(button, () => call('POST', `/api/items/${item.id}/discard`));
@@ -749,21 +766,25 @@ export function itemSheet(item, { equipped, anvil = false }) {
   const sell = async (event) => {
     const button = event.currentTarget;
     const sure = await confirmAction({
-      title: 'Sprzedać przedmiot?',
-      text: `Złomiarz kupi: ${itemTitle(item)} za ${formatNumber(item.price)} złota.${item.upgrade > 0 ? ' W tej cenie jest też część złota wydanego na ulepszenia.' : ''}${
-        item.gem ? ` Kamień w nim przepadnie: ${item.gem.name}.` : ''
-      }`,
-      confirmLabel: 'Sprzedaj',
+      title: t('Sprzedać przedmiot?'),
+      text: [
+        t('Złomiarz kupi: {item} za {gold} złota.', { item: itemTitle(item), gold: formatNumber(item.price) }),
+        item.upgrade > 0 && t('W tej cenie jest też część złota wydanego na ulepszenia.'),
+        item.gem && t('Kamień w nim przepadnie: {gem}.', { gem: item.gem.name }),
+      ]
+        .filter(Boolean)
+        .join(' '),
+      confirmLabel: t('Sprzedaj'),
     });
     if (!sure) return;
     await withButton(button, async () => {
       const { sold } = await call('POST', `/api/items/${item.id}/sell`);
       closeSheet();
-      toast(`Sprzedano za ${formatNumber(sold.gold)} złota.`);
+      toast(t('Sprzedano za {gold} złota.', { gold: formatNumber(sold.gold) }));
     });
   };
 
-  const preview = usable && h('div', { class: 'preview', 'aria-live': 'polite' }, h('p', { class: 'muted', text: 'Liczenie zmian…' }));
+  const preview = usable && h('div', { class: 'preview', 'aria-live': 'polite' }, h('p', { class: 'muted', text: t('Liczenie zmian…') }));
   openSheet(
     itemDetails(item),
     preview,
@@ -771,19 +792,19 @@ export function itemSheet(item, { equipped, anvil = false }) {
     anvilSection(item, busy && equipped, anvil),
     !equipped && salvageSection(item, false),
     busy && h('p', { class: 'muted', text: busyText(state.character) }),
-    !usable && h('p', { class: 'region-warning', text: 'Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.' }),
-    early && h('p', { class: 'region-warning', text: `Ten przedmiot założysz od poziomu klasy ${item.classLevel}.` }),
+    !usable && h('p', { class: 'region-warning', text: t('Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.') }),
+    early && h('p', { class: 'region-warning', text: t('Ten przedmiot założysz od poziomu klasy {level}.', { level: item.classLevel }) }),
     !equipped &&
       item.price !== undefined &&
-      h('button', { type: 'button', class: 'button button--world', onClick: sell, text: `Sprzedaj za ${formatNumber(item.price)} złota` }),
+      h('button', { type: 'button', class: 'button button--world', onClick: sell, text: t('Sprzedaj za {gold} złota', { gold: formatNumber(item.price) }) }),
     h(
       'div',
       { class: 'sheet-actions' },
       equipped
-        ? h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: 'Zdejmij' })
+        ? h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: t('Zdejmij') })
         : [
-            h('button', { type: 'button', class: 'button button--world', onClick: discard, text: 'Wyrzuć' }),
-            h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early, onClick: act('equip'), text: 'Załóż' }),
+            h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }),
+            h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early, onClick: act('equip'), text: t('Załóż') }),
           ],
     ),
   );
@@ -795,7 +816,7 @@ export function itemSheet(item, { equipped, anvil = false }) {
 // less of it (for damage, of its average). Also for an item of the
 // Targowisko (market.js) and, with its own words, for what a companion
 // wears (companions.js).
-export function compareTable(item, worn, { title = 'Porównanie z założonym', wornLabel = 'Założony' } = {}) {
+export function compareTable(item, worn, { title = t('Porównanie z założonym'), wornLabel = t('Założony') } = {}) {
   const ids = [...new Set([...item.lines, ...worn.lines].map((line) => line.id))];
   const lineOf = (of, id) => of.lines.find((line) => line.id === id);
   return h(
@@ -807,7 +828,7 @@ export function compareTable(item, worn, { title = 'Porównanie z założonym', 
       { class: 'compare-worn' },
       `${wornLabel}: `,
       h('span', { class: 'item-name', vars: { '--rarity': worn.color }, text: itemTitle(worn) }),
-      ` · ${worn.rarityName} · poz. ${worn.level}`,
+      ` · ${worn.rarityName} · ${t('poz. {level}', { level: worn.level })}`,
     ),
     h(
       'table',
@@ -815,7 +836,7 @@ export function compareTable(item, worn, { title = 'Porównanie z założonym', 
       h(
         'thead',
         {},
-        h('tr', {}, h('th', { scope: 'col' }, h('span', { class: 'visually-hidden', text: 'Wartość' })), ['Ten', wornLabel, 'Różnica'].map((text) => h('th', { scope: 'col', text }))),
+        h('tr', {}, h('th', { scope: 'col' }, h('span', { class: 'visually-hidden', text: t('Wartość') })), [t('Ten'), wornLabel, t('Różnica')].map((text) => h('th', { scope: 'col', text }))),
       ),
       h(
         'tbody',
@@ -882,11 +903,21 @@ function salvageSection(item, busy) {
   const takeApart = async (event) => {
     const button = event.currentTarget;
     const sure = await confirmAction({
-      title: 'Rozebrać przedmiot?',
-      text: `${itemTitle(item)} zniknie, a stół zrobi z niego: ${salvage.part} ×${salvage.parts}, w ${formatMinutes(salvage.minutes)}.${
-        salvage.minerals ? ` Od razu dostaniesz do Jubilerstwa: ${mineralsLine(salvage.minerals)}.` : ''
-      }${salvage.pattern ? ` System odsłoni Ci wzór ${salvage.patternAt}: ${salvage.pattern}.` : ''}${item.gem ? ` Kamień w nim przepadnie: ${item.gem.name}.` : ''}`,
-      confirmLabel: 'Rozbierz',
+      title: t('Rozebrać przedmiot?'),
+      text: [
+        t('{item} zniknie, a stół zrobi z niego: {part} ×{count}, w {time}.', {
+          item: itemTitle(item),
+          part: salvage.part,
+          count: salvage.parts,
+          time: formatMinutes(salvage.minutes),
+        }),
+        salvage.minerals && t('Od razu dostaniesz do Jubilerstwa: {minerals}.', { minerals: mineralsLine(salvage.minerals) }),
+        salvage.pattern && t('System odsłoni Ci wzór {at}: {pattern}.', { at: salvage.patternAt, pattern: salvage.pattern }),
+        item.gem && t('Kamień w nim przepadnie: {gem}.', { gem: item.gem.name }),
+      ]
+        .filter(Boolean)
+        .join(' '),
+      confirmLabel: t('Rozbierz'),
     });
     if (!sure) return;
     await withButton(button, async () => {
@@ -894,23 +925,33 @@ function salvageSection(item, busy) {
       closeSheet();
       playSound('build');
       toast(
-        `Na stole: ${order.name}. ${order.part} ×${order.parts} będą gotowe o ${timeFormat.format(new Date(order.endsAt))}.${
-          order.minerals ? ` Do Jubilerstwa: ${mineralsLine(order.minerals)}.` : ''
-        }${order.pattern ? ` Nowy wzór ${order.patternAt}: ${order.pattern}.` : ''}`,
+        [
+          t('Na stole: {item}. {part} ×{count} będą gotowe o {time}.', { item: order.name, part: order.part, count: order.parts, time: timeFormat.format(new Date(order.endsAt)) }),
+          order.minerals && t('Do Jubilerstwa: {minerals}.', { minerals: mineralsLine(order.minerals) }),
+          order.pattern && t('Nowy wzór {at}: {pattern}.', { at: order.patternAt, pattern: order.pattern }),
+        ]
+          .filter(Boolean)
+          .join(' '),
       );
     });
   };
   return h(
     'div',
     { class: 'compare' },
-    h('p', { class: 'compare-title', text: table?.name ?? 'Stół rozbiórki' }),
-    h('p', { class: 'anvil-step' }, 'Rozbiórka: ', h('span', { class: 'item-name', vars: { '--rarity': salvage.color }, text: `${salvage.part} ×${salvage.parts}` }), salvage.minutes !== null ? ` · ${formatMinutes(salvage.minutes)}` : ''),
-    salvage.minerals && h('p', { class: 'anvil-step', text: `Do Jubilerstwa od razu: ${mineralsLine(salvage.minerals)}` }),
-    !built && h('p', { class: 'muted', text: 'Zbuduj w obozie Stół rozbiórki, żeby rozbierać przedmioty na części.' }),
-    needs && h('p', { class: 'muted', text: `Ta rzadkość wymaga Stołu rozbiórki na poziomie ${needs}.` }),
-    salvage.pattern && h('p', { class: 'system-hint', text: `Rozbiórka odsłoni wzór ${salvage.patternAt}: ${salvage.pattern}.` }),
-    built && !needs && full && h('p', { class: 'muted', text: 'Kolejka stołu jest pełna. Poczekaj, aż skończy się pierwsze zlecenie.' }),
-    h('button', { type: 'button', class: 'button button--world', disabled: busy || !built || Boolean(needs) || full, onClick: takeApart, text: 'Rozbierz' }),
+    h('p', { class: 'compare-title', text: table?.name ?? t('Stół rozbiórki') }),
+    h(
+      'p',
+      { class: 'anvil-step' },
+      `${t('Rozbiórka:')} `,
+      h('span', { class: 'item-name', vars: { '--rarity': salvage.color }, text: `${salvage.part} ×${salvage.parts}` }),
+      salvage.minutes !== null ? ` · ${formatMinutes(salvage.minutes)}` : '',
+    ),
+    salvage.minerals && h('p', { class: 'anvil-step', text: t('Do Jubilerstwa od razu: {minerals}', { minerals: mineralsLine(salvage.minerals) }) }),
+    !built && h('p', { class: 'muted', text: t('Zbuduj w obozie Stół rozbiórki, żeby rozbierać przedmioty na części.') }),
+    needs && h('p', { class: 'muted', text: t('Ta rzadkość wymaga Stołu rozbiórki na poziomie {level}.', { level: needs }) }),
+    salvage.pattern && h('p', { class: 'system-hint', text: t('Rozbiórka odsłoni wzór {at}: {pattern}.', { at: salvage.patternAt, pattern: salvage.pattern }) }),
+    built && !needs && full && h('p', { class: 'muted', text: t('Kolejka stołu jest pełna. Poczekaj, aż skończy się pierwsze zlecenie.') }),
+    h('button', { type: 'button', class: 'button button--world', disabled: busy || !built || Boolean(needs) || full, onClick: takeApart, text: t('Rozbierz') }),
   );
 }
 
@@ -952,24 +993,24 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
     fill(
       summary,
       items.length === 0
-        ? 'Nic jeszcze nie zaznaczono.'
+        ? t('Nic jeszcze nie zaznaczono.')
         : [
-            `Zaznaczone: ${formatNumber(items.length)}. Stół zrobi z nich: `,
+            `${t('Zaznaczone: {count}. Stół zrobi z nich:', { count: formatNumber(items.length) })} `,
             parts.map(([part, { color, count }], index) => [
               index > 0 && ', ',
               h('span', { class: 'item-name', vars: { '--rarity': color }, text: `${part} ×${formatNumber(count)}` }),
             ]),
-            `, w ${formatMinutes(minutesOf(items))}.`,
-            mineralsOf(items).length > 0 && ` Do Jubilerstwa od razu: ${mineralsLine(mineralsOf(items))}.`,
+            t(', w {time}.', { time: formatMinutes(minutesOf(items)) }),
+            mineralsOf(items).length > 0 && ` ${t('Do Jubilerstwa od razu: {minerals}.', { minerals: mineralsLine(mineralsOf(items)) })}`,
           ],
     );
     const tooMany = parts.length > room;
     roomNote.hidden = !tooMany;
     roomNote.textContent =
       room === 0
-        ? 'Kolejka stołu jest pełna. Poczekaj, aż skończy się pierwsze zlecenie.'
-        : `Każda rzadkość części to osobne zlecenie stołu. Zaznaczone potrzebują ich: ${parts.length}, a wolne miejsca w kolejce: ${room}.`;
-    takeApart.textContent = items.length > 0 ? `Rozbierz (${formatNumber(items.length)})` : 'Rozbierz';
+        ? t('Kolejka stołu jest pełna. Poczekaj, aż skończy się pierwsze zlecenie.')
+        : t('Każda rzadkość części to osobne zlecenie stołu. Zaznaczone potrzebują ich: {count}, a wolne miejsca w kolejce: {room}.', { count: parts.length, room });
+    takeApart.textContent = items.length > 0 ? t('Rozbierz ({count})', { count: formatNumber(items.length) }) : t('Rozbierz');
     takeApart.disabled = items.length === 0 || tooMany;
   };
   const tile = (item) => {
@@ -985,8 +1026,8 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
           itemTitle(item),
           item.rarityName,
           item.slotName,
-          `poziom ${item.level}`,
-          `daje: ${item.salvage.part} ×${item.salvage.parts}${item.salvage.minerals ? `, ${mineralsLine(item.salvage.minerals)}` : ''}`,
+          t('poziom {level}', { level: item.level }),
+          t('daje: {what}', { what: `${item.salvage.part} ×${item.salvage.parts}${item.salvage.minerals ? `, ${mineralsLine(item.salvage.minerals)}` : ''}` }),
         ].join(', '),
         onClick: () => {
           if (marked.has(item.id)) marked.delete(item.id);
@@ -1008,13 +1049,24 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
     const gems = items.filter((item) => item.gem).length;
     const patterns = patternsByPlace(items.filter((item) => item.salvage.pattern).map((item) => ({ name: item.salvage.pattern, at: item.salvage.patternAt })));
     const sure = await confirmAction({
-      title: 'Rozebrać przedmioty?',
-      text: `${countOf(items.length, 'przedmiot', 'przedmioty', 'przedmiotów')} ${plural(items.length, 'zniknie', 'znikną', 'zniknie')} z plecaka, a stół zrobi z nich: ${partsOf(items)
-        .map(([part, { count }]) => `${part} ×${formatNumber(count)}`)
-        .join(', ')}, w ${formatMinutes(minutesOf(items))}.${mineralsOf(items).length > 0 ? ` Od razu dostaniesz do Jubilerstwa: ${mineralsLine(mineralsOf(items))}.` : ''}${upgraded > 0 ? ` Ulepszone wśród nich: ${formatNumber(upgraded)}.` : ''}${gems > 0 ? ` Z kamieniem wśród nich: ${formatNumber(gems)}.` : ''}${
-        patterns.map(([at, names]) => ` System odsłoni Ci ${plural(names.length, 'wzór', 'wzory', 'wzory')} ${at}: ${names.join(', ')}.`).join('')
-      }`,
-      confirmLabel: 'Rozbierz',
+      title: t('Rozebrać przedmioty?'),
+      text: [
+        t('{items} {vanish} z plecaka, a stół zrobi z nich: {parts}, w {time}.', {
+          items: countOf(items.length, 'przedmiot', 'przedmioty', 'przedmiotów'),
+          vanish: plural(items.length, 'zniknie', 'znikną', 'zniknie'),
+          parts: partsOf(items)
+            .map(([part, { count }]) => `${part} ×${formatNumber(count)}`)
+            .join(', '),
+          time: formatMinutes(minutesOf(items)),
+        }),
+        mineralsOf(items).length > 0 && t('Od razu dostaniesz do Jubilerstwa: {minerals}.', { minerals: mineralsLine(mineralsOf(items)) }),
+        upgraded > 0 && t('Ulepszone wśród nich: {count}.', { count: formatNumber(upgraded) }),
+        gems > 0 && t('Z kamieniem wśród nich: {count}.', { count: formatNumber(gems) }),
+        ...patterns.map(([at, names]) => t('System odsłoni Ci {patterns} {at}: {names}.', { patterns: plural(names.length, 'wzór', 'wzory', 'wzory'), at, names: names.join(', ') })),
+      ]
+        .filter(Boolean)
+        .join(' '),
+      confirmLabel: t('Rozbierz'),
     });
     if (!sure) {
       back?.();
@@ -1033,11 +1085,17 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
       playSound('build');
       const ready = Math.max(...salvaged.orders.map((order) => order.endsAt));
       toast(
-        `Na stole: ${countOf(salvaged.count, 'przedmiot', 'przedmioty', 'przedmiotów')}. ${salvaged.orders
-          .map((order) => `${order.part} ×${formatNumber(order.parts)}`)
-          .join(', ')} będą gotowe o ${timeFormat.format(new Date(ready))}.${salvaged.minerals ? ` Do Jubilerstwa: ${mineralsLine(salvaged.minerals)}.` : ''}${patternsByPlace(salvaged.patterns)
-          .map(([at, names]) => ` ${plural(names.length, 'Nowy wzór', 'Nowe wzory', 'Nowe wzory')} ${at}: ${names.join(', ')}.`)
-          .join('')}`,
+        [
+          t('Na stole: {items}. {parts} będą gotowe o {time}.', {
+            items: countOf(salvaged.count, 'przedmiot', 'przedmioty', 'przedmiotów'),
+            parts: salvaged.orders.map((order) => `${order.part} ×${formatNumber(order.parts)}`).join(', '),
+            time: timeFormat.format(new Date(ready)),
+          }),
+          salvaged.minerals && t('Do Jubilerstwa: {minerals}.', { minerals: mineralsLine(salvaged.minerals) }),
+          ...patternsByPlace(salvaged.patterns).map(([at, names]) => `${plural(names.length, 'Nowy wzór', 'Nowe wzory', 'Nowe wzory')} ${at}: ${names.join(', ')}.`),
+        ]
+          .filter(Boolean)
+          .join(' '),
       );
     });
   };
@@ -1045,7 +1103,7 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
   return {
     nodes: [
       h('ul', { class: 'bag-grid salvage-grid' }, bag.map(tile)),
-      dim && h('p', { class: 'muted', text: 'Przyciemnionych stół jeszcze nie bierze: ich rzadkość wymaga wyższego poziomu Stołu rozbiórki.' }),
+      dim && h('p', { class: 'muted', text: t('Przyciemnionych stół jeszcze nie bierze: ich rzadkość wymaga wyższego poziomu Stołu rozbiórki.') }),
       h('div', { class: `salvage-bar${inline ? ' salvage-bar--inline' : ''}` }, summary, roomNote, takeApart),
     ],
     update,
@@ -1056,8 +1114,8 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
 function salvageManySheet(marked = new Set()) {
   const picker = salvagePicker(marked, { back: () => salvageManySheet(marked) });
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Rozbierz kilka' }),
-    h('p', { class: 'sheet-text', text: 'Wybierz przedmioty, które Stół rozbiórki ma rozebrać. Ponowny wybór odznacza przedmiot.' }),
+    h('h2', { class: 'sheet-title', text: t('Rozbierz kilka') }),
+    h('p', { class: 'sheet-text', text: t('Wybierz przedmioty, które Stół rozbiórki ma rozebrać. Ponowny wybór odznacza przedmiot.') }),
     ...picker.nodes,
   );
   picker.update();
@@ -1083,17 +1141,17 @@ function reopenOwned(done) {
 export function anvilSection(item, busy, open = false, { send = (choices) => call('POST', `/api/items/${item.id}/upgrade`, choices), reopen = reopenOwned } = {}) {
   const anvil = item.anvil;
   if (!anvil) return null;
-  const title = h('p', { class: 'compare-title', text: 'Kowadło' });
+  const title = h('p', { class: 'compare-title', text: t('Kowadło') });
   if (anvil.level >= anvil.max) {
-    return h('div', { class: 'compare' }, title, h('p', { class: 'muted', text: `Przedmiot ma najwyższe ulepszenie: +${anvil.max}.` }));
+    return h('div', { class: 'compare' }, title, h('p', { class: 'muted', text: t('Przedmiot ma najwyższe ulepszenie: +{max}.', { max: anvil.max }) }));
   }
   const { next } = anvil;
   if (!next) {
     const hint =
       anvil.cap === 0
-        ? 'Zbuduj Kowadło w obozie, żeby ulepszać przedmioty.'
-        : `Kowadło na poziomie ${anvil.cap} ulepsza do +${anvil.cap}. Rozbuduj je w obozie, żeby iść wyżej.`;
-    return h('div', { class: 'compare' }, title, h('p', { class: 'system-hint', text: hint }), h('a', { class: 'link-button', href: '#/oboz/anvil', onClick: closeSheet, text: 'Przejdź do Kowadła' }));
+        ? t('Zbuduj Kowadło w obozie, żeby ulepszać przedmioty.')
+        : t('Kowadło na poziomie {level} ulepsza do +{level}. Rozbuduj je w obozie, żeby iść wyżej.', { level: anvil.cap });
+    return h('div', { class: 'compare' }, title, h('p', { class: 'system-hint', text: hint }), h('a', { class: 'link-button', href: '#/oboz/anvil', onClick: closeSheet, text: t('Przejdź do Kowadła') }));
   }
   const have = Object.fromEntries(walletEntries().map((entry) => [entry.id, entry]));
   const short = Object.entries(next.cost).some(([resource, amount]) => (have[resource]?.amount ?? 0) < amount);
@@ -1105,20 +1163,20 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
   const lacks = Boolean(need && !need.takes);
   const missing = short || lacks;
   const rarityName = need ? (state.content.rarities.find((rarity) => rarity.id === need.rarity)?.name ?? need.rarity) : '';
-  const paid = need ? 'złoto, rudę i materiały' : 'złoto i rudę';
+  const paid = need ? t('złoto, rudę i materiały') : t('złoto i rudę');
   const risk =
     anvil.level === 0
-      ? `Porażka zabiera tylko ${paid}.`
-      : `Porażka zabiera ${paid}, a przedmiot spada do +${anvil.level - 1}${
-          next.breakChance > 0 ? `. Z szansą ${percent(next.breakChance)} przedmiot rozpada się` : ''
-        }.`;
+      ? t('Porażka zabiera tylko {paid}.', { paid })
+      : next.breakChance > 0
+        ? t('Porażka zabiera {paid}, a przedmiot spada do +{level}. Z szansą {chance} przedmiot rozpada się.', { paid, level: anvil.level - 1, chance: percent(next.breakChance) })
+        : t('Porażka zabiera {paid}, a przedmiot spada do +{level}.', { paid, level: anvil.level - 1 });
   const materialLine =
     need &&
     h(
       'li',
       { class: `cost${lacks ? ' cost--missing' : ''}` },
       lacks ? icon('unknown', { size: 16 }) : materialIcon(need.takes[0].materialId, 16),
-      h('span', { text: `Materiały (${rarityName})` }),
+      h('span', { text: t('Materiały ({rarity})', { rarity: rarityName }) }),
       h('strong', { text: `${formatNumber(need.have)} / ${formatNumber(need.count)}` }),
     );
   // The Zwój ochronny only where the item may break, and the Zwój
@@ -1132,10 +1190,11 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
   const steady =
     anvil.level > 0 && steadyScrolls > 0 ? h('input', { type: 'checkbox', class: 'avoid-rare-box', id: `steady-${item.id}`, 'aria-describedby': `steady-note-${item.id}` }) : null;
   const failed = (done) => {
-    if (done.saved && done.kept) return `Nie udało się, ale zwoje uchroniły przedmiot: ${done.name} zostaje na +${done.to}.`;
-    if (done.saved) return `Nie udało się: ${done.name} spada do +${done.to}. Zwój ochronny uchronił przedmiot przed rozpadem.`;
-    if (done.kept) return `Nie udało się, ale Zwój utrwalenia utrzymał ${done.name} na +${done.to}.`;
-    return done.to < done.from ? `Nie udało się: ${done.name} spada do +${done.to}.` : `Nie udało się: ${done.name} zostaje na +0.`;
+    const vars = { name: done.name, level: done.to };
+    if (done.saved && done.kept) return t('Nie udało się, ale zwoje uchroniły przedmiot: {name} zostaje na +{level}.', vars);
+    if (done.saved) return t('Nie udało się: {name} spada do +{level}. Zwój ochronny uchronił przedmiot przed rozpadem.', vars);
+    if (done.kept) return t('Nie udało się, ale Zwój utrwalenia utrzymał {name} na +{level}.', vars);
+    return done.to < done.from ? t('Nie udało się: {name} spada do +{level}.', vars) : t('Nie udało się: {name} zostaje na +0.', vars);
   };
   const upgrade = (event) =>
     withButton(event.currentTarget, async () => {
@@ -1143,38 +1202,38 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
       const done = answer.upgrade;
       if (done.result === 'success') {
         playSound('done');
-        toast(`Udało się: ${done.name} +${done.to}.`);
+        toast(t('Udało się: {name} +{level}.', { name: done.name, level: done.to }));
       } else {
         playSound('defeat');
-        toast(done.result === 'broken' ? `Przedmiot rozpadł się na kowadle: ${done.name} +${done.from}.` : failed(done));
+        toast(done.result === 'broken' ? t('Przedmiot rozpadł się na kowadle: {name} +{level}.', { name: done.name, level: done.from }) : failed(done));
       }
       reopen(done, answer);
     });
   // Where a scroll comes from: the Systemowy Warsztat (from the level of the
   // profession the scroll opens at), and the smith in the Osada's Kuźnia
   // (326 A).
-  const where = (name, does, scroll) => {
-    const workshop = scroll?.hidden ? `w Systemowym Warsztacie od ${scroll.level}. poziomu Rzemieślnictwa` : 'w Systemowym Warsztacie';
-    return `${name} ${does} ${
+  const where = (does, scroll) => {
+    const workshop = scroll?.hidden ? t('w Systemowym Warsztacie od {level}. poziomu Rzemieślnictwa', { level: scroll.level }) : t('w Systemowym Warsztacie');
+    return `${does} ${
       !state.character.settlementOpen
-        ? `Zrobisz go ${workshop}.`
+        ? t('Zrobisz go {where}.', { where: workshop })
         : state.character.professions?.workshop
-          ? `Zrobisz go ${workshop} albo kupisz u kowala w Kuźni w Osadzie.`
-          : 'Kupisz go u kowala w Kuźni w Osadzie.'
+          ? t('Zrobisz go {where} albo kupisz u kowala w Kuźni w Osadzie.', { where: workshop })
+          : t('Kupisz go u kowala w Kuźni w Osadzie.')
     }`;
   };
   const canGet = Boolean(state.character.professions?.workshop || state.character.settlementOpen);
-  const step = h('p', { class: 'anvil-step', tabindex: '-1', text: `Ulepszenie +${anvil.level} → +${next.level}` });
+  const step = h('p', { class: 'anvil-step', tabindex: '-1', text: t('Ulepszenie +{from} → +{to}', { from: anvil.level, to: next.level }) });
   const full = h(
     'div',
     { class: 'compare anvil' },
     title,
     step,
     h('ul', { class: 'preview-list' }, next.properties.map((line) => h('li', { class: 'preview-up', text: line }))),
-    h('p', { class: 'anvil-chance', text: `Szansa powodzenia: ${percent(next.chance)}` }),
+    h('p', { class: 'anvil-chance', text: t('Szansa powodzenia: {chance}', { chance: percent(next.chance) }) }),
     h(
       'ul',
-      { class: 'cost-list', 'aria-label': 'Koszt ulepszenia' },
+      { class: 'cost-list', 'aria-label': t('Koszt ulepszenia') },
       Object.entries(next.cost).map(([resource, amount]) =>
         h(
           'li',
@@ -1187,8 +1246,8 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
       materialLine,
     ),
     // Which pieces go: the server's pick (481 B).
-    need && !lacks && h('p', { class: 'muted', text: `Ulepszenie weźmie: ${piecesText(need.takes)}.` }),
-    lacks && h('p', { class: 'system-hint', text: `To ulepszenie bierze też ${formatNumber(need.count)} szt. materiałów tej samej rzadkości co przedmiot (dowolnych, sumują się).` }),
+    need && !lacks && h('p', { class: 'muted', text: t('Ulepszenie weźmie: {pieces}.', { pieces: piecesText(need.takes) }) }),
+    lacks && h('p', { class: 'system-hint', text: t('To ulepszenie bierze też {count} szt. materiałów tej samej rzadkości co przedmiot (dowolnych, sumują się).', { count: formatNumber(need.count) }) }),
     // A material of the item's rarity, from the guild (346 A): what is
     // missing in all, of whichever material is asked for.
     lacks && askGuildButton({ kind: 'material', rarity: need.rarity, missing: need.count - need.have }),
@@ -1199,36 +1258,39 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
         { class: 'avoid-rare', for: `ward-${item.id}` },
         ward,
         scrollArt('ward-scroll', 24),
-        h('span', { text: `Użyj Zwoju ochronnego (masz ${formatNumber(scrolls)})` }),
+        h('span', { text: t('Użyj Zwoju ochronnego (masz {count})', { count: formatNumber(scrolls) }) }),
       ),
-    ward && h('p', { class: 'muted', id: `ward-note-${item.id}`, text: 'Zwój chroni przed rozpadem, ale nie przed spadkiem ulepszenia. Przepada przy tej próbie.' }),
+    ward && h('p', { class: 'muted', id: `ward-note-${item.id}`, text: t('Zwój chroni przed rozpadem, ale nie przed spadkiem ulepszenia. Przepada przy tej próbie.') }),
     steady &&
       h(
         'label',
         { class: 'avoid-rare', for: `steady-${item.id}` },
         steady,
         scrollArt('steady-scroll', 24),
-        h('span', { text: `Użyj Zwoju utrwalenia (masz ${formatNumber(steadyScrolls)})` }),
+        h('span', { text: t('Użyj Zwoju utrwalenia (masz {count})', { count: formatNumber(steadyScrolls) }) }),
       ),
-    steady && h('p', { class: 'muted', id: `steady-note-${item.id}`, text: 'Po nieudanej próbie przedmiot zostaje na swoim poziomie. Zwój przepada przy tej próbie.' }),
-    next.breakChance > 0 && !ward && canGet && h('p', { class: 'system-hint', text: where('Zwój ochronny', 'chroni przed rozpadem na Kowadle.', state.character.professions?.workshop?.scroll) }),
+    steady && h('p', { class: 'muted', id: `steady-note-${item.id}`, text: t('Po nieudanej próbie przedmiot zostaje na swoim poziomie. Zwój przepada przy tej próbie.') }),
+    next.breakChance > 0 && !ward && canGet && h('p', { class: 'system-hint', text: where(t('Zwój ochronny chroni przed rozpadem na Kowadle.'), state.character.professions?.workshop?.scroll) }),
     anvil.level > 0 &&
       !steady &&
       canGet &&
-      h('p', { class: 'system-hint', text: where('Zwój utrwalenia', 'chroni przed spadkiem ulepszenia na Kowadle.', state.character.professions?.workshop?.steadyScroll) }),
+      h('p', { class: 'system-hint', text: where(t('Zwój utrwalenia chroni przed spadkiem ulepszenia na Kowadle.'), state.character.professions?.workshop?.steadyScroll) }),
     h('button', {
       type: 'button',
       class: 'button button--system',
       disabled: busy || missing,
       onClick: upgrade,
-      text: short ? `Brakuje: ${costShortfall(next.cost).join(', ')}` : missing ? 'Brakuje materiału' : `Ulepsz do +${next.level}`,
+      text: short ? t('Brakuje: {what}', { what: costShortfall(next.cost).join(', ') }) : missing ? t('Brakuje materiału') : t('Ulepsz do +{level}', { level: next.level }),
     }),
   );
   if (open) return full;
   // What the try lacks, said under "Ulepsz" instead of unfolding (the author:
   // "Niech Ulepsz jeśli chodzi o przedmiot nie otwiera się tylko pokazuje
   // czego brakuje jeśli nie da się ulepszyć").
-  const lacking = [...costShortfall(next.cost), lacks && `${formatNumber(need.count - need.have)} szt. materiałów (${rarityName}): to ulepszenie bierze ${formatNumber(need.count)} szt.`].filter(Boolean);
+  const lacking = [
+    ...costShortfall(next.cost),
+    lacks && t('{count} szt. materiałów ({rarity}): to ulepszenie bierze {need} szt.', { count: formatNumber(need.count - need.have), rarity: rarityName, need: formatNumber(need.count) }),
+  ].filter(Boolean);
   const note = h('p', { class: 'region-warning', role: 'status', hidden: true });
   // The materials the try lacks, from the guild (346 A), under what is
   // missing once "Ulepsz" says it.
@@ -1237,17 +1299,17 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
   const folded = h(
     'div',
     { class: 'compare anvil' },
-    h('p', { class: 'compare-title', text: 'Kowadło' }),
+    h('p', { class: 'compare-title', text: t('Kowadło') }),
     h('button', {
       type: 'button',
       class: 'button button--world',
       'aria-expanded': 'false',
-      text: 'Ulepsz',
+      text: t('Ulepsz'),
       onClick: () => {
         if (lacking.length > 0) {
           // One full stop, also after "szt.".
           const said = lacking.join(', ');
-          note.textContent = `Brakuje: ${said}${said.endsWith('.') ? '' : '.'}`;
+          note.textContent = `${t('Brakuje: {what}', { what: said })}${said.endsWith('.') ? '' : '.'}`;
           note.hidden = false;
           if (ask) ask.hidden = false;
           return;
@@ -1277,7 +1339,7 @@ const CHANGES = {
   regen: ['Regeneracja', ' HP/min'],
   recovery: ['Odzysk HP po walce', '%'],
 };
-const changeName = (key) => CHANGES[key] ?? [state.content.elements.find((element) => `resist.${element.id}` === key)?.resistance ?? key, '%'];
+const changeName = (key) => (CHANGES[key] ? [t(CHANGES[key][0]), CHANGES[key][1]] : [state.content.elements.find((element) => `resist.${element.id}` === key)?.resistance ?? key, '%']);
 
 // What wearing (or taking off) the item changes, counted by the server: the
 // verdict on the whole, then each change, as the author asked: "+2,5", "−4",
@@ -1288,8 +1350,8 @@ async function showPreview(box, item, equipped) {
     const rows = Object.entries(changes);
     fill(
       box,
-      h('p', { class: 'compare-title', text: equipped ? 'Po zdjęciu' : 'Po założeniu' }),
-      h('p', { class: `verdict verdict-line verdict--${verdict}`, text: VERDICTS[verdict].line }),
+      h('p', { class: 'compare-title', text: equipped ? t('Po zdjęciu') : t('Po założeniu') }),
+      h('p', { class: `verdict verdict-line verdict--${verdict}`, text: t(VERDICTS[verdict].line) }),
       rows.length > 0 &&
         h(
           'ul',
@@ -1315,7 +1377,7 @@ export function itemSummary(item, { stats = false } = {}) {
     'span',
     { class: 'item-summary' },
     h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: itemTitle(item) }),
-    h('span', { class: 'item-meta', text: `${item.rarityName} · ${item.slotName} · poz. ${item.level}` }),
+    h('span', { class: 'item-meta', text: `${item.rarityName} · ${item.slotName} · ${t('poz. {level}', { level: item.level })}` }),
     // With `stats`, its numbers in one line too, to tell items of one name apart.
     stats && item.properties?.length > 0 && h('span', { class: 'item-stats', text: item.properties.join(' · ') }),
   );
@@ -1325,7 +1387,7 @@ export function itemSummary(item, { stats = false } = {}) {
 
 export function itemDetails(item, { small = false } = {}) {
   const title = h(small ? 'p' : 'h2', { class: 'item-title', vars: { '--rarity': item.color }, text: itemTitle(item) });
-  const meta = h('p', { class: 'item-meta', text: [item.rarityName, item.slotName, `poz. ${item.level}`, item.tier].filter(Boolean).join(' · ') });
+  const meta = h('p', { class: 'item-meta', text: [item.rarityName, item.slotName, t('poz. {level}', { level: item.level }), item.tier].filter(Boolean).join(' · ') });
   // The card of an item shows its sprite large, on a frame in its rarity colour.
   const art = !small && itemSprite(item);
   return h(
@@ -1349,9 +1411,9 @@ export function itemDetails(item, { small = false } = {}) {
             h('p', { class: 'item-gem-help', text: item.gem.help }),
           ),
         ),
-      item.classNames && h('li', { class: 'item-classes', text: `${item.classNames.length > 1 ? 'Dla klas' : 'Dla klasy'}: ${item.classNames.join(', ')}` }),
-      item.classLevel && h('li', { class: 'item-classes', text: `Od poziomu klasy ${item.classLevel}` }),
-      item.price !== undefined && h('li', { class: 'item-price', text: `U złomiarza: ${formatNumber(item.price)} złota` }),
+      item.classNames && h('li', { class: 'item-classes', text: t(item.classNames.length > 1 ? 'Dla klas: {classes}' : 'Dla klasy: {classes}', { classes: item.classNames.join(', ') }) }),
+      item.classLevel && h('li', { class: 'item-classes', text: t('Od poziomu klasy {level}', { level: item.classLevel }) }),
+      item.price !== undefined && h('li', { class: 'item-price', text: t('U złomiarza: {gold} złota', { gold: formatNumber(item.price) }) }),
     ),
   );
 }
@@ -1363,7 +1425,7 @@ setTipRenderer((item) =>
     'div',
     {},
     itemDetails(item, { small: true }),
-    VERDICTS[item.verdict] && h('p', { class: `item-tip-verdict item-tip-verdict--${item.verdict}`, text: VERDICTS[item.verdict].line }),
+    VERDICTS[item.verdict] && h('p', { class: `item-tip-verdict item-tip-verdict--${item.verdict}`, text: t(VERDICTS[item.verdict].line) }),
   ),
 );
 
@@ -1372,11 +1434,19 @@ function characterMessage(character, busy) {
   if (busy) return [busyText(character)];
   if (character.freePoints > 0 && isUnlocked('stats')) {
     return [
-      `Masz ${formatNumber(character.freePoints)} ${plural(character.freePoints, 'wolny punkt', 'wolne punkty', 'wolnych punktów')} statystyk. Rozdziel je w Statystykach.`,
-      systemLink('#/postac/statystyki', 'Rozdziel punkty'),
+      t('Masz {count} {points} statystyk. Rozdziel je w Statystykach.', {
+        count: formatNumber(character.freePoints),
+        points: plural(character.freePoints, 'wolny punkt', 'wolne punkty', 'wolnych punktów'),
+      }),
+      systemLink('#/postac/statystyki', t('Rozdziel punkty')),
     ];
   }
   return [
-    `Doświadczenie: ${formatNumber(character.xp)} / ${formatNumber(character.xpToNext)}. Do poziomu ${character.level + 1} zostało ok. ${formatHours(character.hoursToNext)} eksploracji.`,
+    t('Doświadczenie: {xp} / {max}. Do poziomu {level} zostało ok. {time} eksploracji.', {
+      xp: formatNumber(character.xp),
+      max: formatNumber(character.xpToNext),
+      level: character.level + 1,
+      time: formatHours(character.hoursToNext),
+    }),
   ];
 }

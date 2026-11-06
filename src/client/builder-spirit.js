@@ -11,6 +11,7 @@
 import { residentBust, resourceArt } from './art.js';
 import { h } from './dom.js';
 import { formatNumber } from './format.js';
+import { t } from './i18n.js';
 import { playSound } from './sound.js';
 import { call } from './state.js';
 import { openSheet, toast, withButton } from './ui.js';
@@ -43,7 +44,7 @@ export function spiritPart(spirit, sell) {
       'div',
       { class: 'settlement-resident-head' },
       bust && h('span', { class: 'settlement-resident-bust' }, bust),
-      h('div', {}, h('p', { class: 'settlement-resident-name', text: spirit.name }), h('p', { class: 'settlement-greeting', text: `„${spirit.line}”` })),
+      h('div', {}, h('p', { class: 'settlement-resident-name', text: spirit.name }), h('p', { class: 'settlement-greeting', text: t('„{line}”', { line: spirit.line }) })),
     ),
     h(
       'ul',
@@ -59,7 +60,7 @@ export function spiritPart(spirit, sell) {
           h('button', {
             type: 'button',
             class: 'button button--world button--small',
-            text: 'Sprzedaj',
+            text: t('Sprzedaj'),
             disabled: !saleRange(good),
             onClick: () => sell(good),
           }),
@@ -86,23 +87,23 @@ export function spiritSaleSheet(spirit, good, back) {
     max: range.most,
     step: 1,
     value: count,
-    'aria-label': 'Ile sztuk sprzedać',
+    'aria-label': t('Ile sztuk sprzedać'),
     disabled: range.most <= range.least,
     onInput: () => set(Number(slider.value)),
   });
   const stepButton = (sign, label) =>
     h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': label, text: sign < 0 ? '−' : '+', onClick: () => set(count + sign) });
-  const less = stepButton(-1, 'O sztukę mniej');
-  const more = stepButton(1, 'O sztukę więcej');
+  const less = stepButton(-1, t('O sztukę mniej'));
+  const more = stepButton(1, t('O sztukę więcej'));
   const surplus = surplusOf(good);
   function set(next) {
     count = Math.min(range.most, Math.max(range.least, next));
     const gold = spiritGold(good, spirit.lot, count);
     slider.value = String(count);
-    slider.setAttribute('aria-valuetext', `${formatNumber(count)} szt. za ${formatNumber(gold)} zł`);
+    slider.setAttribute('aria-valuetext', t('{count} szt. za {gold} zł', { count: formatNumber(count), gold: formatNumber(gold) }));
     slider.style.setProperty('--fill', `${((count - range.least) / Math.max(1, range.most - range.least)) * 100}%`);
-    value.textContent = `${formatNumber(count)} szt.`;
-    sell.textContent = `Sprzedaj za ${formatNumber(gold)} zł`;
+    value.textContent = t('{count} szt.', { count: formatNumber(count) });
+    sell.textContent = t('Sprzedaj za {gold} zł', { gold: formatNumber(gold) });
     less.disabled = count <= range.least;
     more.disabled = count >= range.most;
   }
@@ -119,7 +120,7 @@ export function spiritSaleSheet(spirit, good, back) {
     h('h2', { class: 'sheet-title', text: good.name }),
     h('p', {
       class: 'sheet-text',
-      text: [`Masz ${formatNumber(good.have)} szt.`, `${spirit.name}: ${say(spirit.texts.price, { gold: good.gold, lot: spirit.lot })}`, good.need > 0 && say(spirit.texts.need, { count: good.need })]
+      text: [t('Masz {count} szt.', { count: formatNumber(good.have) }), `${spirit.name}: ${say(spirit.texts.price, { gold: good.gold, lot: spirit.lot })}`, good.need > 0 && say(spirit.texts.need, { count: good.need })]
         .filter(Boolean)
         .join(' '),
     }),
@@ -128,9 +129,9 @@ export function spiritSaleSheet(spirit, good, back) {
     h(
       'p',
       { class: 'builder-spirit-quick' },
-      h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(range.most) }),
-      surplus !== null && h('button', { type: 'button', class: 'link-button', text: 'nadmiar', onClick: () => set(surplus) }),
+      h('button', { type: 'button', class: 'link-button', text: t('wszystkie'), onClick: () => set(range.most) }),
+      surplus !== null && h('button', { type: 'button', class: 'link-button', text: t('nadmiar'), onClick: () => set(surplus) }),
     ),
-    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: back }), sell),
+    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: back }), sell),
   );
 }

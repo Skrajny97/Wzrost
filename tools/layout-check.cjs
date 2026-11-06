@@ -89,7 +89,7 @@ const TRANSLATED = new Set(['#/postac', '#/postac/statystyki', '#/walka', '#/wal
 // Tabs opened on a screen after its first look, by the start of their
 // names: the Stół rozbiórki's queue, with "Usuń z kolejki" by each order,
 // the Tablica zleceń's Poszukiwani and the Ranking's guilds.
-const TABS = { '#/oboz/craft-table': [said('Kolejka')], '#/osada/board': [said('Poszukiwani')], '#/spolecznosc/ranking': [said('Gildie')] };
+const TABS = { '#/oboz/craft-table': [said('Kolejka ({count}/{limit})').replace(/\s*\(.*$/, '')], '#/osada/board': [said('Poszukiwani')], '#/spolecznosc/ranking': [said('Gildie')] };
 // Sheets opened over a screen after its tabs, each from the one before (a
 // tap on `tap`, or a picture given to the file field `pick`), looked at
 // alone once `ready` shows in it, and closed at the end with "Zamknij". The

@@ -313,7 +313,18 @@
     "src/engine/unlocks.js",
     "src/engine/potions.js",
     "src/engine/notifications.js",
-    "src/engine/mail.js"
+    "src/engine/mail.js",
+    "src/client/bonuses.js",
+    "src/client/builder-spirit.js",
+    "src/client/categories.js",
+    "src/client/craft-table.js",
+    "src/client/item-tip.js",
+    "src/client/portraits.js",
+    "src/client/profile.js",
+    "src/client/scrapper.js",
+    "src/client/screens/character.js",
+    "src/client/screens/chest.js",
+    "src/client/screens/stats.js"
   ],
   "ignore": [
     "Google",
@@ -327,6 +338,8 @@
     "{} · {}, poziom {}, klasa {}",
     "Polski",
     "English",
-    "próba"
+    "próba",
+    "card levels",
+    "compare anvil"
   ]
 }
