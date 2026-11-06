@@ -14,6 +14,7 @@ import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatCountdown, formatDecimal, formatHours, formatMinutes, formatNumber, saleGold, tradePace } from '../format.js';
 import { leaveView, openView } from '../history.js';
+import { t } from '../i18n.js';
 import { desktopLayout, onLayoutChange } from '../layout-mode.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
@@ -46,7 +47,7 @@ const rarityColor = (id) => state.content.rarities.find((rarity) => rarity.id ==
 function timeLeft(ms) {
   const hours = Math.max(0, ms) / 3600000;
   const days = Math.floor(hours / 24);
-  return days > 0 ? `${days} ${days === 1 ? 'dzień' : 'dni'}` : formatHours(Math.max(hours, 1 / 60));
+  return days > 0 ? countOf(days, 'dzień', 'dni', 'dni') : formatHours(Math.max(hours, 1 / 60));
 }
 
 const SETTLEMENT = '#/osada';
@@ -150,9 +151,9 @@ export function mountSettlement(container, { params = {} } = {}) {
     const unlock = unlockInfo('settlement');
     const message =
       failure.status === 403
-        ? `Dostęp zablokowany. ${unlock.name}: od poziomu postaci ${unlock.level}. Twój poziom: ${state.character.level}.`
-        : `Moduł ${unlock.name} pojawi się w jednej z kolejnych aktualizacji gry.`;
-    fill(container, pageHeading('Osada'), systemPanel(message));
+        ? t('Dostęp zablokowany. {name}: od poziomu postaci {level}. Twój poziom: {own}.', { name: unlock.name, level: unlock.level, own: state.character.level })
+        : t('Moduł {name} pojawi się w jednej z kolejnych aktualizacji gry.', { name: unlock.name });
+    fill(container, pageHeading(t('Osada')), systemPanel(message));
   }
 
   function orderCard(order) {
@@ -160,7 +161,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     const deliver = h('button', {
       type: 'button',
       class: 'button button--world',
-      text: 'Oddaj',
+      text: t('Oddaj'),
       disabled: !enough,
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
@@ -168,7 +169,10 @@ export function mountSettlement(container, { params = {} } = {}) {
           // `taught`: the rare recipes Jagna teaches as the Bractwo
           // Zielarzy's reputation reaches a standing (682 A and C).
           const { gold, systemPoints, taught } = answer.delivered;
-          toast(`Zlecenie oddane: +${formatNumber(gold)} złota${systemPoints ? `, +${systemPoints} PS` : ''}.${taught ? ` ${taught}` : ''}`);
+          const paid = systemPoints
+            ? t('Zlecenie oddane: +{gold} złota, +{points} PS.', { gold: formatNumber(gold), points: systemPoints })
+            : t('Zlecenie oddane: +{gold} złota.', { gold: formatNumber(gold) });
+          toast(`${paid}${taught ? ` ${taught}` : ''}`);
           apply(answer);
         }),
     });
@@ -177,11 +181,13 @@ export function mountSettlement(container, { params = {} } = {}) {
       h('button', {
         type: 'button',
         class: 'button button--small',
-        text: 'Odrzuć',
+        text: t('Odrzuć'),
         onClick: async (event) => {
           const button = event.currentTarget;
-          const wait = data.board.refillMinutes ? `za ${formatMinutes(data.board.refillMinutes)}` : 'za kilka godzin';
-          if (!(await confirmAction({ title: 'Odrzucić zlecenie?', text: `Nowe zlecenie przyjdzie ${wait}.`, confirmLabel: 'Odrzuć' }))) return;
+          const wait = data.board.refillMinutes
+            ? t('Nowe zlecenie przyjdzie za {time}.', { time: formatMinutes(data.board.refillMinutes) })
+            : t('Nowe zlecenie przyjdzie za kilka godzin.');
+          if (!(await confirmAction({ title: t('Odrzucić zlecenie?'), text: wait, confirmLabel: t('Odrzuć') }))) return;
           withButton(button, async () => apply(await call('POST', '/api/settlement/reject', { orderId: order.id })));
         },
       });
@@ -199,26 +205,35 @@ export function mountSettlement(container, { params = {} } = {}) {
         h(
           'span',
           { class: 'settlement-fold-name' },
-          order.weekly && h('span', { class: 'settlement-weekly', text: 'Zlecenie tygodnia' }),
-          order.special && h('span', { class: 'settlement-weekly', text: 'Zlecenie specjalne' }),
+          order.weekly && h('span', { class: 'settlement-weekly', text: t('Zlecenie tygodnia') }),
+          order.special && h('span', { class: 'settlement-weekly', text: t('Zlecenie specjalne') }),
           h('span', { class: 'settlement-ask', text: order.forms ? countOf(order.count, ...order.forms) : `${formatNumber(order.count)} × ${order.label}` }),
         ),
-        enough && [h('span', { class: 'settlement-fold-dot', 'aria-hidden': 'true' }), h('span', { class: 'visually-hidden', text: 'Można oddać' })],
+        enough && [h('span', { class: 'settlement-fold-dot', 'aria-hidden': 'true' }), h('span', { class: 'visually-hidden', text: t('Można oddać') })],
         icon('chevron', { size: 18, className: 'settlement-fold-chevron' }),
       ),
       h(
         'div',
         { class: 'settlement-fold-body' },
-        h('p', { class: 'settlement-story', text: `„${order.story}”` }),
-        h('p', { class: 'settlement-ask', text: `Masz ${formatNumber(order.have)} z ${formatNumber(order.count)}` }),
-        h('p', { class: 'muted', text: `Zapłata: ${formatNumber(order.gold)} złota, +${order.reputation} reputacji: ${order.brotherhoodName}${order.special ? ', +1 PS' : ''}` }),
-        order.expiresAt && h('p', { class: 'muted', text: `Termin: jeszcze ${timeLeft(order.expiresAt - serverNow())}` }),
-        order.kind === 'craft' && h('p', { class: 'muted', text: 'Wyroby z Warsztatu oddajesz z plecaka, najpierw najsłabsze.' }),
+        h('p', { class: 'settlement-story', text: t('„{line}”', { line: order.story }) }),
+        h('p', { class: 'settlement-ask', text: t('Masz {have} z {count}', { have: formatNumber(order.have), count: formatNumber(order.count) }) }),
+        h('p', {
+          class: 'muted',
+          text: t(order.special ? 'Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}, +1 PS' : 'Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}', {
+            gold: formatNumber(order.gold),
+            reputation: order.reputation,
+            brotherhood: order.brotherhoodName,
+          }),
+        }),
+        order.expiresAt && h('p', { class: 'muted', text: t('Termin: jeszcze {time}', { time: timeLeft(order.expiresAt - serverNow()) }) }),
+        order.kind === 'craft' && h('p', { class: 'muted', text: t('Wyroby z Warsztatu oddajesz z plecaka, najpierw najsłabsze.') }),
         // Any materials of a rarity: what delivering takes, from the biggest stacks.
         order.forms &&
           h('p', {
             class: 'muted',
-            text: order.takes ? `Oddasz: ${order.takes.map((one) => `${formatNumber(one.count)} × ${one.name}`).join(', ')}.` : `Pasuje każdy ${order.forms[0]}.`,
+            text: order.takes
+              ? t('Oddasz: {list}.', { list: order.takes.map((one) => `${formatNumber(one.count)} × ${one.name}`).join(', ') })
+              : t('Pasuje każdy {name}.', { name: order.forms[0] }),
           }),
         h('div', { class: 'settlement-actions' }, deliver, reject),
         !enough && orderAsk(order),
@@ -241,10 +256,10 @@ export function mountSettlement(container, { params = {} } = {}) {
     const slots = data.board.slots.map((slot) =>
       slot.order
         ? orderCard(slot.order)
-        : h('div', { class: 'card settlement-order settlement-order--empty' }, h('p', { class: 'muted', text: `Nowe zlecenie za ${formatCountdown(slot.readyAt - serverNow())}.` })),
+        : h('div', { class: 'card settlement-order settlement-order--empty' }, h('p', { class: 'muted', text: t('Nowe zlecenie za {time}.', { time: formatCountdown(slot.readyAt - serverNow()) }) })),
     );
-    const weekly = data.board.weekly ? orderCard({ ...data.board.weekly, weekly: true }) : data.board.weeklyDone && h('p', { class: 'muted', text: 'Zlecenie tygodnia oddane. Następne w poniedziałek.' });
-    return h('section', { class: 'settlement-board' }, h('h2', { class: 'section-title', text: 'Tablica zleceń' }), slots, weekly);
+    const weekly = data.board.weekly ? orderCard({ ...data.board.weekly, weekly: true }) : data.board.weeklyDone && h('p', { class: 'muted', text: t('Zlecenie tygodnia oddane. Następne w poniedziałek.') });
+    return h('section', { class: 'settlement-board' }, h('h2', { class: 'section-title', text: t('Tablica zleceń') }), slots, weekly);
   }
 
   // "Akceptacja Bractw" over the board (the author: "Niech przy wejściu do
@@ -294,7 +309,7 @@ export function mountSettlement(container, { params = {} } = {}) {
         'li',
         { class: 'settlement-standing' },
         h('p', { class: 'settlement-standing-head' }, h('strong', { text: name }), h('span', { class: 'chip settlement-standing-chip', text: standing.name })),
-        h('div', { class: 'meter settlement-standing-meter' }, h('div', { class: 'meter-track', role: 'progressbar', 'aria-label': `${name}: reputacja`, 'aria-valuemin': floor, 'aria-valuemax': ceiling, 'aria-valuenow': points }, bar)),
+        h('div', { class: 'meter settlement-standing-meter' }, h('div', { class: 'meter-track', role: 'progressbar', 'aria-label': t('{name}: reputacja', { name }), 'aria-valuemin': floor, 'aria-valuemax': ceiling, 'aria-valuenow': points }, bar)),
         h('p', { class: 'muted settlement-standing-points', text: `${say(words.points, { points: formatNumber(points) })} · ${where}` }),
         rewardBlock(brotherhood),
         perkList(words.now, perks.now, false),
@@ -336,15 +351,15 @@ export function mountSettlement(container, { params = {} } = {}) {
     h(
       'section',
       { class: 'card settlement-brotherhoods' },
-      h('h2', { class: 'section-title', text: 'Bractwa' }),
+      h('h2', { class: 'section-title', text: t('Bractwa') }),
       data.brotherhoods.map(({ name, standing, goods }) =>
         h(
           'p',
           {},
           h('strong', { text: name }),
           `: ${standing.name}`,
-          standing.next ? `, ${formatNumber(standing.toNext)} pkt do stopnia ${standing.next.name}` : '',
-          goods.length === 0 ? ' (handel na Targowisku)' : '',
+          standing.next ? `, ${t('{points} pkt do stopnia {name}', { points: formatNumber(standing.toNext), name: standing.next.name })}` : '',
+          goods.length === 0 ? ` ${t('(handel na Targowisku)')}` : '',
         ),
       ),
     );
@@ -364,33 +379,34 @@ export function mountSettlement(container, { params = {} } = {}) {
   // graficznie to przedstawić"). `need` is the materials' count and rarity
   // with the pieces of that rarity held in all (`have`: any materials of it
   // add up, 481 B) and those the server takes (`takes`, the most plentiful
-  // material first; null while too few), or null; `who` begins the sentence
-  // on them ("Kowal").
-  function costPart({ gold, need, title, who }) {
+  // material first; null while too few), or null; `takes` and `rule` are the
+  // sentences on them (t(), with {pieces}, and {count} and {rarity}).
+  function costPart({ gold, need, title, takes, rule }) {
     const goldShort = Math.max(0, gold - state.character.gold);
     const chip = (art, label, have, wanted) =>
       h('li', { class: `cost${have < wanted ? ' cost--missing' : ''}` }, art, h('span', { text: label }), h('strong', { text: `${formatNumber(have)} / ${formatNumber(wanted)}` }));
     const materialShort = need && !need.takes ? Math.max(1, need.count - need.have) : 0;
     const materialChip =
-      need && chip(need.takes ? materialIcon(need.takes[0].materialId, 16) : icon('unknown', { size: 16 }), `Materiały (${need.rarityName})`, need.have, need.count);
-    const missing = [goldShort > 0 && `${formatNumber(goldShort)} złota`, materialShort > 0 && `${formatNumber(materialShort)} szt. materiałów (${need.rarityName})`].filter(Boolean);
+      need && chip(need.takes ? materialIcon(need.takes[0].materialId, 16) : icon('unknown', { size: 16 }), t('Materiały ({rarity})', { rarity: need.rarityName }), need.have, need.count);
+    const missing = [
+      goldShort > 0 && t('{gold} złota', { gold: formatNumber(goldShort) }),
+      materialShort > 0 && t('{count} szt. materiałów ({rarity})', { count: formatNumber(materialShort), rarity: need.rarityName }),
+    ].filter(Boolean);
     return {
       goldShort,
       // The materials there to give, or none needed.
       materialReady: !need || Boolean(need.takes),
       element: [
         h('p', { class: 'field-label', text: title }),
-        h('ul', { class: 'cost-list', 'aria-label': title }, chip(resourceArt('gold', 16), 'Złoto', state.character.gold, gold), materialChip),
+        h('ul', { class: 'cost-list', 'aria-label': title }, chip(resourceArt('gold', 16), t('Złoto'), state.character.gold, gold), materialChip),
         // Which pieces go, the server's pick, or the rule while too few.
         need &&
           h('p', {
             class: 'muted',
-            text: need.takes
-              ? `${who} weźmie: ${piecesText(need.takes)}.`
-              : `${who} bierze ${formatNumber(need.count)} szt. materiałów o rzadkości „${need.rarityName}” (dowolnych, sumują się).`,
+            text: need.takes ? t(takes, { pieces: piecesText(need.takes) }) : t(rule, { count: formatNumber(need.count), rarity: need.rarityName }),
           }),
-        missing.length > 0 && h('p', { class: 'region-warning', text: `Brakuje: ${missing.join(', ')}.` }),
-        materialShort > 0 && h('p', { class: 'system-hint', text: 'Materiały tej rzadkości wypadają ze stworów na wyprawach. Kupisz je też na Targowisku.' }),
+        missing.length > 0 && h('p', { class: 'region-warning', text: t('Brakuje: {what}.', { what: missing.join(', ') }) }),
+        materialShort > 0 && h('p', { class: 'system-hint', text: t('Materiały tej rzadkości wypadają ze stworów na wyprawach. Kupisz je też na Targowisku.') }),
         // A material of the rarity, from the guild (346 A): what is missing
         // in all, of whichever material is asked for.
         materialShort > 0 && askGuildButton({ kind: 'material', rarity: need.rarity, missing: materialShort }),
@@ -407,7 +423,7 @@ export function mountSettlement(container, { params = {} } = {}) {
   function imbueSheet() {
     const body = h('div', { class: 'settlement-reforge' });
     const capital = (text) => text.charAt(0).toUpperCase() + text.slice(1);
-    openSheet(h('h2', { class: 'sheet-title', text: 'Zaklęcie żywiołu' }), body);
+    openSheet(h('h2', { class: 'sheet-title', text: t('Zaklęcie żywiołu') }), body);
     pickItem();
 
     function pickItem() {
@@ -415,9 +431,9 @@ export function mountSettlement(container, { params = {} } = {}) {
       fill(
         body,
         items.length === 0
-          ? h('p', { class: 'muted', text: 'Nie masz broni ani pancerza do zaklęcia.' })
+          ? h('p', { class: 'muted', text: t('Nie masz broni ani pancerza do zaklęcia.') })
           : [
-              h('p', { class: 'sheet-text', text: 'Wybierz broń albo pancerz. Broń zamieni część obrażeń na żywioł, a pancerz dostanie odporność na niego.' }),
+              h('p', { class: 'sheet-text', text: t('Wybierz broń albo pancerz. Broń zamieni część obrażeń na żywioł, a pancerz dostanie odporność na niego.') }),
               h(
                 'ul',
                 { class: 'item-list' },
@@ -425,7 +441,7 @@ export function mountSettlement(container, { params = {} } = {}) {
                   h(
                     'li',
                     {},
-                    h('button', { type: 'button', class: 'item-row', onClick: () => pickElement(item.id) }, itemHead(item), item.equipped && h('span', { class: 'chip', text: 'Założony' })),
+                    h('button', { type: 'button', class: 'item-row', onClick: () => pickElement(item.id) }, itemHead(item), item.equipped && h('span', { class: 'chip', text: t('Założony') })),
                   ),
                 ),
               ),
@@ -439,31 +455,36 @@ export function mountSettlement(container, { params = {} } = {}) {
       const now = item.element && data.imbue.elements.find((one) => one.element === item.element);
       fill(
         body,
-        h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), 'Inny przedmiot'),
+        h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), t('Inny przedmiot')),
         h('div', { class: 'settlement-reforge-item' }, itemHead(item)),
-        now && h('p', { class: 'muted', text: `Ma już żywioł: ${now.name}. Nowy zastąpi stary.` }),
+        now && h('p', { class: 'muted', text: t('Ma już żywioł: {element}. Nowy zastąpi stary.', { element: now.name }) }),
         data.imbue.elements.map((element) => {
           const effect = item.effects[element.element];
-          const gives = effect.share ? `${Math.round(effect.share * 100)}% obrażeń jako ${element.name}` : `odporność na ${element.name} +${effect.value}`;
+          const gives = effect.share
+            ? t('{percent}% obrażeń jako {element}', { percent: Math.round(effect.share * 100), element: element.name })
+            : t('odporność na {element} +{value}', { element: element.name, value: effect.value });
           const ready = element.have >= element.count && state.character.gold >= item.gold && item.element !== element.element;
           return h(
             'div',
             { class: 'settlement-choice' },
             h('p', {}, h('strong', { text: capital(element.name) }), ` · ${gives}`),
-            h('p', { class: 'muted', text: `${formatNumber(item.gold)} zł. i ${element.count} × ${element.material} (masz ${formatNumber(element.have)})` }),
+            h('p', {
+              class: 'muted',
+              text: t('{gold} zł. i {count} × {material} (masz {have})', { gold: formatNumber(item.gold), count: element.count, material: element.material, have: formatNumber(element.have) }),
+            }),
             // The element's material, from the guild (346 A).
             element.have < element.count && askGuildButton({ kind: 'material', key: element.key, name: element.material, missing: element.count - element.have }),
             h('button', {
               type: 'button',
               class: 'button button--world button--small',
-              text: `Zaklnij: ${element.name}`,
+              text: t('Zaklnij: {element}', { element: element.name }),
               disabled: !ready,
               onClick: (event) =>
                 withButton(event.currentTarget, async () => {
                   const answer = await call('POST', '/api/settlement/imbue', { itemId: item.id, element: element.element });
                   apply(answer);
                   closeSheet();
-                  toast(`Zaklinaczka zaklęła żywioł w przedmiot ${answer.imbued.item}: ${answer.imbued.element}.`);
+                  toast(t('Zaklinaczka zaklęła żywioł w przedmiot {item}: {element}.', { item: answer.imbued.item, element: answer.imbued.element }));
                 }),
             }),
           );
@@ -474,7 +495,7 @@ export function mountSettlement(container, { params = {} } = {}) {
 
   function reforgeSheet() {
     const body = h('div', { class: 'settlement-reforge' });
-    openSheet(h('h2', { class: 'sheet-title', text: 'Zaklęcie afiksu' }), body);
+    openSheet(h('h2', { class: 'sheet-title', text: t('Zaklęcie afiksu') }), body);
     if (data.reforge.pending) choose(data.reforge.pending);
     else pickItem();
 
@@ -483,9 +504,9 @@ export function mountSettlement(container, { params = {} } = {}) {
       fill(
         body,
         items.length === 0
-          ? h('p', { class: 'muted', text: 'Nie masz przedmiotów z afiksami do zaklęcia.' })
+          ? h('p', { class: 'muted', text: t('Nie masz przedmiotów z afiksami do zaklęcia.') })
           : [
-              h('p', { class: 'sheet-text', text: 'Wybierz przedmiot. Zaklinaczka zaklnie jeden jego afiks: wylosuje go od nowa.' }),
+              h('p', { class: 'sheet-text', text: t('Wybierz przedmiot. Zaklinaczka zaklnie jeden jego afiks: wylosuje go od nowa.') }),
               h(
                 'ul',
                 { class: 'item-list' },
@@ -493,7 +514,7 @@ export function mountSettlement(container, { params = {} } = {}) {
                   h(
                     'li',
                     {},
-                    h('button', { type: 'button', class: 'item-row', onClick: () => pickAffix(item.id) }, itemHead(item), item.equipped && h('span', { class: 'chip', text: 'Założony' })),
+                    h('button', { type: 'button', class: 'item-row', onClick: () => pickAffix(item.id) }, itemHead(item), item.equipped && h('span', { class: 'chip', text: t('Założony') })),
                   ),
                 ),
               ),
@@ -507,15 +528,21 @@ export function mountSettlement(container, { params = {} } = {}) {
       // An item with one affix has nothing to choose.
       let chosen = affix ?? (item.affixes.length === 1 ? 0 : null);
       const draw = () => {
-        const cost = costPart({ gold: item.gold, need: item.materials, title: 'Koszt zaklęcia', who: 'Zaklęcie' });
+        const cost = costPart({
+          gold: item.gold,
+          need: item.materials,
+          title: t('Koszt zaklęcia'),
+          takes: 'Zaklęcie weźmie: {pieces}.',
+          rule: 'Zaklęcie bierze {count} szt. materiałów o rzadkości „{rarity}” (dowolnych, sumują się).',
+        });
         const ready = chosen !== null && cost.goldShort === 0 && cost.materialReady;
         fill(
           body,
-          h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), 'Inny przedmiot'),
+          h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), t('Inny przedmiot')),
           h('div', { class: 'settlement-reforge-item' }, itemHead(item)),
           // The cost first, seen at once.
           cost.element,
-          h('p', { class: 'field-label', text: 'Afiks do zaklęcia' }),
+          h('p', { class: 'field-label', text: t('Afiks do zaklęcia') }),
           h(
             'div',
             { class: 'settlement-picks' },
@@ -529,7 +556,7 @@ export function mountSettlement(container, { params = {} } = {}) {
                   type: 'button',
                   class: 'item-row trade-pick settlement-pick',
                   'aria-pressed': String(index === chosen),
-                  'aria-label': [label, hint.important && 'ważne dla Twojej klasy', hint.worth && 'warto zakląć'].filter(Boolean).join(', '),
+                  'aria-label': [label, hint.important && t('ważne dla Twojej klasy'), hint.worth && t('warto zakląć')].filter(Boolean).join(', '),
                   onClick: () => {
                     chosen = index;
                     draw();
@@ -540,17 +567,17 @@ export function mountSettlement(container, { params = {} } = {}) {
                   { class: 'settlement-pick-text' },
                   hint.important && h('span', { class: 'affix-star', 'aria-hidden': 'true', text: '★ ' }),
                   label,
-                  hint.worth && h('span', { class: 'affix-worth', text: 'Warto zakląć' }),
+                  hint.worth && h('span', { class: 'affix-worth', text: t('Warto zakląć') }),
                 ),
                 pickMark(),
               );
             }),
           ),
-          data.reforge.choices > 1 && h('p', { class: 'muted', text: `Zaklinaczka wylosuje ${data.reforge.choices} nowe afiksy, a Ty zatrzymasz jeden z nich.` }),
+          data.reforge.choices > 1 && h('p', { class: 'muted', text: t('Zaklinaczka wylosuje {count} nowe afiksy, a Ty zatrzymasz jeden z nich.', { count: data.reforge.choices }) }),
           h('button', {
             type: 'button',
             class: 'button button--world',
-            text: chosen === null ? 'Wybierz afiks' : cost.goldShort > 0 ? 'Brakuje złota' : !cost.materialReady ? 'Brakuje materiału' : 'Zaklnij',
+            text: chosen === null ? t('Wybierz afiks') : cost.goldShort > 0 ? t('Brakuje złota') : !cost.materialReady ? t('Brakuje materiału') : t('Zaklnij'),
             disabled: !ready,
             onClick: (event) =>
               withButton(event.currentTarget, async () => {
@@ -570,7 +597,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       fill(
         body,
         h('div', { class: 'settlement-reforge-item' }, itemHead({ id: pending.itemId, name: pending.name })),
-        h('p', { class: 'sheet-text', text: `Zaklinaczka wylosowała ${pending.options.length} afiksy. Wybierz ten, który zastąpi „${pending.old}”.` }),
+        h('p', { class: 'sheet-text', text: t('Zaklinaczka wylosowała {count} afiksy. Wybierz ten, który zastąpi „{old}”.', { count: pending.options.length, old: pending.old }) }),
         h(
           'div',
           { class: 'settlement-picks' },
@@ -599,7 +626,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     function showResult(result, { affix = null } = {}) {
       fill(
         body,
-        h('p', { class: 'settlement-result-title', text: 'Zaklinaczka zaklęła afiks' }),
+        h('p', { class: 'settlement-result-title', text: t('Zaklinaczka zaklęła afiks') }),
         h('div', { class: 'settlement-reforge-item' }, itemHead({ id: result.itemId, name: result.name })),
         h(
           'p',
@@ -611,8 +638,8 @@ export function mountSettlement(container, { params = {} } = {}) {
         h(
           'div',
           { class: 'sheet-actions' },
-          h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij ponownie', onClick: () => pickAffix(result.itemId, affix) }),
-          h('button', { type: 'button', class: 'button button--system', text: 'Gotowe', onClick: closeSheet }),
+          h('button', { type: 'button', class: 'button button--world', text: t('Zaklnij ponownie'), onClick: () => pickAffix(result.itemId, affix) }),
+          h('button', { type: 'button', class: 'button button--system', text: t('Gotowe'), onClick: closeSheet }),
         ),
       );
     }
@@ -626,10 +653,10 @@ export function mountSettlement(container, { params = {} } = {}) {
       text: label,
       onClick: async (event) => {
         const button = event.currentTarget;
-        if (!(await confirmAction({ title: 'Zerowanie u Pustelnika', text, confirmLabel: 'Zeruj' }))) return;
+        if (!(await confirmAction({ title: t('Zerowanie u Pustelnika'), text, confirmLabel: t('Zeruj') }))) return;
         withButton(button, async () => {
           const answer = await call('POST', '/api/settlement/hermit', { service });
-          toast(`Pustelnik wziął ${formatNumber(answer.gold)} złota. Gotowe.`);
+          toast(t('Pustelnik wziął {gold} złota. Gotowe.', { gold: formatNumber(answer.gold) }));
           load();
         });
       },
@@ -641,21 +668,24 @@ export function mountSettlement(container, { params = {} } = {}) {
     h(
       'div',
       { class: 'settlement-choice' },
-      h('p', {}, h('strong', { text: name }), `: Zaklinaczka czeka, aż wybierzesz afiks w miejsce „${old}”.`),
-      h('button', { type: 'button', class: 'button button--world', text: 'Wybierz afiks', onClick: reforgeSheet }),
+      h('p', {}, h('strong', { text: name }), `: ${t('Zaklinaczka czeka, aż wybierzesz afiks w miejsce „{old}”.', { old })}`),
+      h('button', { type: 'button', class: 'button button--world', text: t('Wybierz afiks'), onClick: reforgeSheet }),
     );
 
   // The Pustelnik's change of evolution: the class's other evolutions, the
   // first change free.
   function evolutionSheet() {
     const offer = data.hermit.evolution;
-    const price = offer.price > 0 ? `${formatNumber(offer.price)} złota` : 'za darmo, pierwszy raz';
+    const price = offer.price > 0 ? t('{gold} złota', { gold: formatNumber(offer.price) }) : t('za darmo, pierwszy raz');
     openSheet(
-      h('h2', { class: 'sheet-title', text: 'Zmiana ewolucji' }),
+      h('h2', { class: 'sheet-title', text: t('Zmiana ewolucji') }),
       h(
         'div',
         { class: 'settlement-choice' },
-        h('p', { class: 'muted', text: `Teraz: ${offer.current}. Zmiana: ${price}. Umiejętności nowej ewolucji zaczniesz od zera, a punkty z nich wrócą do rozdania.` }),
+        h('p', {
+          class: 'muted',
+          text: t('Teraz: {current}. Zmiana: {price}. Umiejętności nowej ewolucji zaczniesz od zera, a punkty z nich wrócą do rozdania.', { current: offer.current, price }),
+        }),
         h(
           'div',
           { class: 'settlement-actions' },
@@ -667,11 +697,11 @@ export function mountSettlement(container, { params = {} } = {}) {
               disabled: state.character.gold < offer.price,
               onClick: async (event) => {
                 const button = event.currentTarget;
-                if (!(await confirmAction({ title: `Zmienić ewolucję na: ${choice.name}?`, text: `Koszt: ${price}.`, confirmLabel: 'Zmień' }))) return;
+                if (!(await confirmAction({ title: t('Zmienić ewolucję na: {name}?', { name: choice.name }), text: t('Koszt: {price}.', { price }), confirmLabel: t('Zmień') }))) return;
                 withButton(button, async () => {
                   await call('POST', '/api/settlement/hermit', { service: 'evolution', evolutionId: choice.id });
                   closeSheet();
-                  toast(`Nowa ewolucja: ${choice.name}.`);
+                  toast(t('Nowa ewolucja: {name}.', { name: choice.name }));
                   load();
                 });
               },
@@ -693,11 +723,11 @@ export function mountSettlement(container, { params = {} } = {}) {
       return h(
         'div',
         { class: 'settlement-choice', 'data-guide': 'tavern-mug' },
-        h('p', { class: 'muted', text: 'Za kufel Zbylut chętnie podzieli się plotką z traktu.' }),
+        h('p', { class: 'muted', text: t('Za kufel Zbylut chętnie podzieli się plotką z traktu.') }),
         h('button', {
           type: 'button',
           class: 'button button--world',
-          text: `Postaw kufel (${formatNumber(mug)} zł.)`,
+          text: t('Postaw kufel ({gold} zł.)', { gold: formatNumber(mug) }),
           disabled: state.character.gold < mug,
           onClick: (event) =>
             withButton(event.currentTarget, async () => {
@@ -710,7 +740,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       'div',
       { class: 'settlement-choice', 'data-guide': 'tavern-mug' },
       h('p', { class: 'settlement-greeting', text: rumor.text }),
-      h('p', { class: 'muted', text: 'Następną plotkę Zbylut usłyszy jutro.' }),
+      h('p', { class: 'muted', text: t('Następną plotkę Zbylut usłyszy jutro.') }),
     );
   }
 
@@ -723,12 +753,12 @@ export function mountSettlement(container, { params = {} } = {}) {
     // The author's words, the camp's Kwatery stressed in them; every
     // standing with Zbylut may hire, a lower one for more gold.
     const intro = howItWorks(
-      'Towarzysze idą z tobą na każdą wyprawę.',
+      t('Towarzysze idą z tobą na każdą wyprawę.'),
       h(
         'p',
         { class: 'muted' },
-        'Rosną w siłę razem z tobą. Opłata za werbunek jest jednorazowa, a im lepiej zna cię Zbylut, tym jest tańsza. Towarzysz potrzebuje posłania: ',
-        h('strong', { class: 'text-stress', 'data-guide': 'tavern-quarters', text: 'zbuduj Kwatery w obozie' }),
+        t('Rosną w siłę razem z tobą. Opłata za werbunek jest jednorazowa, a im lepiej zna cię Zbylut, tym jest tańsza. Towarzysz potrzebuje posłania: '),
+        h('strong', { class: 'text-stress', 'data-guide': 'tavern-quarters', text: t('zbuduj Kwatery w obozie') }),
         '.',
       ),
     );
@@ -737,30 +767,34 @@ export function mountSettlement(container, { params = {} } = {}) {
       h(
         'p',
         { class: 'muted' },
-        `Posłania: ${hired.length} z ${places}.${full && moreBeds ? ' Kolejne da rozbudowa Kwater.' : ''} `,
-        hired.length > 0 && h('a', { href: '#/oboz/quarters', text: hired.length === 1 ? 'Twój towarzysz czeka w Kwaterach.' : 'Twoi towarzysze czekają w Kwaterach.' }),
+        `${t('Posłania: {count} z {all}.', { count: hired.length, all: places })}${full && moreBeds ? ` ${t('Kolejne da rozbudowa Kwater.')}` : ''} `,
+        hired.length > 0 && h('a', { href: '#/oboz/quarters', text: hired.length === 1 ? t('Twój towarzysz czeka w Kwaterach.') : t('Twoi towarzysze czekają w Kwaterach.') }),
       );
     const hire = (candidate) =>
       h('button', {
         type: 'button',
         class: 'button button--world button--small',
-        text: `Zwerbuj (${formatNumber(candidate.price)} zł.)`,
+        text: t('Zwerbuj ({gold} zł.)', { gold: formatNumber(candidate.price) }),
         disabled: full || state.character.gold < candidate.price,
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
             apply(await call('POST', '/api/settlement/hire', { candidateId: candidate.id }));
-            toast(`${candidate.name} ${candidate.appearance === 'female' ? 'zamieszkała' : 'zamieszkał'} w Kwaterach w obozie.`);
+            toast(
+              candidate.appearance === 'female'
+                ? t('{name} zamieszkała w Kwaterach w obozie.', { name: candidate.name })
+                : t('{name} zamieszkał w Kwaterach w obozie.', { name: candidate.name }),
+            );
           }),
       });
     return h(
       'section',
       { class: 'stack', 'data-guide': 'tavern-companions' },
-      h('h2', { class: 'section-title', text: 'Towarzysze' }),
+      h('h2', { class: 'section-title', text: t('Towarzysze') }),
       intro,
       beds,
-      h('h2', { class: 'section-title', text: 'Szukają pracy w tym tygodniu' }),
+      h('h2', { class: 'section-title', text: t('Szukają pracy w tym tygodniu') }),
       candidates.length === 0
-        ? h('p', { class: 'muted', text: 'Nikt więcej nie szuka pracy. Nowi przyjdą w poniedziałek.' })
+        ? h('p', { class: 'muted', text: t('Nikt więcej nie szuka pracy. Nowi przyjdą w poniedziałek.') })
         : candidates.map((candidate) =>
             // One line each, the whole card under a tap (316 A).
             h(
@@ -769,8 +803,8 @@ export function mountSettlement(container, { params = {} } = {}) {
               h(
                 'summary',
                 { class: 'tavern-candidate-line' },
-                h('span', { class: 'tavern-candidate-name', text: `${candidate.name}, ${candidate.className}, poz. ${candidate.level}` }),
-                h('span', { class: 'tavern-candidate-price', text: `${formatNumber(candidate.price)} zł.` }),
+                h('span', { class: 'tavern-candidate-name', text: t('{name}, {className}, poz. {level}', { name: candidate.name, className: candidate.className, level: candidate.level }) }),
+                h('span', { class: 'tavern-candidate-price', text: t('{gold} zł.', { gold: formatNumber(candidate.price) }) }),
               ),
               companionCard(candidate, hire(candidate), apply),
             ),
@@ -781,19 +815,22 @@ export function mountSettlement(container, { params = {} } = {}) {
   // Jagna's herb for sale: how many the gold and the bag allow, typed in.
   function herbalistBuySheet(good) {
     const most = Math.min(good.fits, Math.floor(state.character.gold / good.price));
-    const field = numberField('herbalist-buy-count', 'Ile sztuk', 1, 1, Math.max(1, most));
+    const field = numberField('herbalist-buy-count', t('Ile sztuk'), 1, 1, Math.max(1, most));
     openSheet(
       h('h2', { class: 'sheet-title', text: good.name }),
-      h('p', { class: 'sheet-text', text: `${formatNumber(good.price)} zł. za sztukę. Możesz kupić najwyżej ${formatNumber(most)} szt.: na tyle starczy złota i miejsca w plecaku.` }),
+      h('p', {
+        class: 'sheet-text',
+        text: t('{price} zł. za sztukę. Możesz kupić najwyżej {most} szt.: na tyle starczy złota i miejsca w plecaku.', { price: formatNumber(good.price), most: formatNumber(most) }),
+      }),
       field.element,
       h(
         'div',
         { class: 'sheet-actions' },
-        h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+        h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }),
         h('button', {
           type: 'button',
           class: 'button button--system',
-          text: 'Kup',
+          text: t('Kup'),
           onClick: (event) =>
             withButton(event.currentTarget, async () => {
               const answer = await call('POST', '/api/settlement/herbalist/buy', { id: good.key, count: field.read() });
@@ -801,7 +838,9 @@ export function mountSettlement(container, { params = {} } = {}) {
               apply(answer);
               // `taught`: the rare recipes the trade made her teach (121 A).
               const { name, count, gold, points, taught } = answer.bought;
-              toast(`Kupione: ${name} ×${formatNumber(count)} za ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z Jagną i reputacja Bractwa Zielarzy +${points}.` : ''}${taught ? ` ${taught}` : ''}`);
+              toast(
+                `${t('Kupione: {name} ×{count} za {gold} zł.', { name, count: formatNumber(count), gold: formatNumber(gold) })}${points > 0 ? ` ${t('Relacja z Jagną i reputacja Bractwa Zielarzy +{points}.', { points })}` : ''}${taught ? ` ${taught}` : ''}`,
+              );
             }),
         }),
       ),
@@ -819,12 +858,12 @@ export function mountSettlement(container, { params = {} } = {}) {
     return h(
       'section',
       { class: 'stack', 'data-guide': 'herbalist-buy' },
-      h('h2', { class: 'section-title', text: 'Zioła Jagny' }),
+      h('h2', { class: 'section-title', text: t('Zioła Jagny') }),
       h('p', {
         class: 'muted',
-        text: `Jagna sprzedaje zioła drożej, niż je skupuje. ${shop.discount > 0 ? `Dzięki relacji z nią ceny są niższe o ${formatDecimal(shop.discount * 100)}%.` : 'Z lepszą relacją ceny będą niższe.'} Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.${tradePace(trade)}`,
+        text: `${t('Jagna sprzedaje zioła drożej, niż je skupuje.')} ${shop.discount > 0 ? t('Dzięki relacji z nią ceny są niższe o {discount}%.', { discount: formatDecimal(shop.discount * 100) }) : t('Z lepszą relacją ceny będą niższe.')} ${t('Handel daje relację z nią i reputację Bractwa Zielarzy: dziś {today} z {daily} punktów.', { today: trade.today, daily: trade.daily })}${tradePace(trade)}`,
       }),
-      shop.goods.some((good) => good.fits < 1) && h('p', { class: 'region-warning', text: 'Plecak jest pełny. Zrób w nim miejsce, żeby kupić więcej ziół.' }),
+      shop.goods.some((good) => good.fits < 1) && h('p', { class: 'region-warning', text: t('Plecak jest pełny. Zrób w nim miejsce, żeby kupić więcej ziół.') }),
       h(
         'ul',
         { class: 'stack market-list' },
@@ -833,11 +872,11 @@ export function mountSettlement(container, { params = {} } = {}) {
             h('button', {
               type: 'button',
               class: `button button--world${small ? ' button--small' : ''}`,
-              text: 'Kup',
+              text: t('Kup'),
               disabled: good.fits < 1 || gold < good.price,
               onClick: () => herbalistBuySheet(good),
             });
-          const price = `${formatNumber(good.price)} zł. za sztukę`;
+          const price = t('{gold} zł. za sztukę', { gold: formatNumber(good.price) });
           return h(
             'li',
             { class: 'card herbalist-good' },
@@ -846,7 +885,7 @@ export function mountSettlement(container, { params = {} } = {}) {
           );
         }),
       ),
-      shop.next && h('p', { class: 'muted', text: `Od stopnia relacji ${shop.next.standing} dojdą: ${shop.next.herbs.join(', ')}.` }),
+      shop.next && h('p', { class: 'muted', text: t('Od stopnia relacji {standing} dojdą: {herbs}.', { standing: shop.next.standing, herbs: shop.next.herbs.join(', ') }) }),
       herbalistRecipes(),
     );
   }
@@ -885,7 +924,7 @@ export function mountSettlement(container, { params = {} } = {}) {
   function herbalistCard() {
     const tabs = h(
       'div',
-      { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': 'Chata zielarki' },
+      { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': t('Chata zielarki') },
       [
         ['buy', 'Kup'],
         ['sell', 'Sprzedaj'],
@@ -903,7 +942,7 @@ export function mountSettlement(container, { params = {} } = {}) {
               render();
             },
           },
-          h('span', { class: 'chat-tab-name', text: label }),
+          h('span', { class: 'chat-tab-name', text: t(label) }),
         ),
       ),
     );
@@ -917,13 +956,13 @@ export function mountSettlement(container, { params = {} } = {}) {
     let count = 1;
     const value = h('output', { class: 'herb-count-value' });
     const sell = h('button', { type: 'button', class: 'button button--system' });
-    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
-    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
-    const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(good.count) });
+    const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Mniej'), text: '−', onClick: () => set(count - 1) });
+    const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Więcej'), text: '+', onClick: () => set(count + 1) });
+    const all = h('button', { type: 'button', class: 'link-button', text: t('wszystkie'), onClick: () => set(good.count) });
     function set(next) {
       count = Math.min(good.count, Math.max(1, next));
-      value.textContent = `${formatNumber(count)} szt.`;
-      sell.textContent = `Sprzedaj za ${formatNumber(saleGold(good.price, count))} zł.`;
+      value.textContent = t('{count} szt.', { count: formatNumber(count) });
+      sell.textContent = t('Sprzedaj za {gold} zł.', { gold: formatNumber(saleGold(good.price, count)) });
       less.disabled = count === 1;
       more.disabled = count === good.count;
     }
@@ -934,14 +973,23 @@ export function mountSettlement(container, { params = {} } = {}) {
         closeSheet();
         apply(answer);
         const { gold, points, taught } = answer.sold;
-        toast(`Jagna płaci ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z nią i reputacja Bractwa Zielarzy +${points}.` : ''}${taught ? ` ${taught}` : ''}`);
+        toast(
+          `${t('Jagna płaci {gold} zł.', { gold: formatNumber(gold) })}${points > 0 ? ` ${t('Relacja z nią i reputacja Bractwa Zielarzy +{points}.', { points })}` : ''}${taught ? ` ${taught}` : ''}`,
+        );
       }),
     );
     openSheet(
       h('h2', { class: 'sheet-title', text: good.name }),
-      h('p', { class: 'sheet-text', text: `Masz ${formatNumber(good.count)} szt. Jagna płaci ${formatDecimal(good.price)} zł. za sztukę, złomiarz ${formatDecimal(good.scrap)} zł.` }),
+      h('p', {
+        class: 'sheet-text',
+        text: t('Masz {count} szt. Jagna płaci {price} zł. za sztukę, złomiarz {scrap} zł.', {
+          count: formatNumber(good.count),
+          price: formatDecimal(good.price),
+          scrap: formatDecimal(good.scrap),
+        }),
+      }),
       h('div', { class: 'herb-count' }, less, value, more, all),
-      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }), sell),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), sell),
     );
   }
 
@@ -950,13 +998,13 @@ export function mountSettlement(container, { params = {} } = {}) {
     return h(
       'section',
       { class: 'stack', 'data-guide': 'herbalist-sell' },
-      h('h2', { class: 'section-title', text: 'Skup ziół i mikstur' }),
+      h('h2', { class: 'section-title', text: t('Skup ziół i mikstur') }),
       h('p', {
         class: 'muted',
-        text: `Jagna płaci o ${Math.round(premium * 100)}% więcej niż złomiarz${best ? '' : ', a z lepszą relacją jeszcze więcej'}. Handel daje relację z nią i reputację Bractwa Zielarzy: dziś ${trade.today} z ${trade.daily} punktów.${tradePace(trade)}`,
+        text: `${best ? t('Jagna płaci o {percent}% więcej niż złomiarz.', { percent: Math.round(premium * 100) }) : t('Jagna płaci o {percent}% więcej niż złomiarz, a z lepszą relacją jeszcze więcej.', { percent: Math.round(premium * 100) })} ${t('Handel daje relację z nią i reputację Bractwa Zielarzy: dziś {today} z {daily} punktów.', { today: trade.today, daily: trade.daily })}${tradePace(trade)}`,
       }),
       goods.length === 0
-        ? h('p', { class: 'muted', text: 'W torbie nie ma ziół ani mikstur.' })
+        ? h('p', { class: 'muted', text: t('W torbie nie ma ziół ani mikstur.') })
         : h(
             'ul',
             { class: 'settlement-goods' },
@@ -972,11 +1020,11 @@ export function mountSettlement(container, { params = {} } = {}) {
                   h('span', { class: 'potion-pick-art' }, stackArt({ kind: good.kind, key: good.id })),
                   h('strong', { text: `${good.name} × ${formatNumber(good.count)}` }),
                 ),
-                h('p', { class: 'muted', text: `${formatDecimal(good.price)} zł. za sztukę, u złomiarza ${formatDecimal(good.scrap)} zł.` }),
+                h('p', { class: 'muted', text: t('{price} zł. za sztukę, u złomiarza {scrap} zł.', { price: formatDecimal(good.price), scrap: formatDecimal(good.scrap) }) }),
                 h('button', {
                   type: 'button',
                   class: 'button button--world button--small',
-                  text: 'Sprzedaj',
+                  text: t('Sprzedaj'),
                   onClick: () => herbalistSellSheet(good),
                 }),
               ),
@@ -987,7 +1035,8 @@ export function mountSettlement(container, { params = {} } = {}) {
 
   // The Kuźnia's two scrolls for the Kowadło: the Zwój ochronny (`scroll`)
   // and the Zwój utrwalenia (`steadyScroll`, the author's of 4.11.2026), each
-  // with its plural name, the words of its card and its icon.
+  // with its plural name, the words of its card and its icon (Polish, shown
+  // through t()).
   const SCROLLS = {
     scroll: { kind: 'ward', icon: 'ward-scroll', name: 'Zwój ochronny', plural: 'Zwoje ochronne', does: 'Zwój ochronny chroni przedmiot przed rozpadem na Kowadle.' },
     steadyScroll: {
@@ -1004,26 +1053,31 @@ export function mountSettlement(container, { params = {} } = {}) {
     const scroll = data.forge[which];
     const words = SCROLLS[which];
     const most = Math.min(scroll.left, Math.floor(state.character.gold / scroll.price));
-    const field = numberField('forge-scroll-count', 'Ile zwojów', 1, 1, Math.max(1, most));
+    const field = numberField('forge-scroll-count', t('Ile zwojów'), 1, 1, Math.max(1, most));
     openSheet(
-      h('h2', { class: 'sheet-title forge-scroll-title' }, scrollArt(words.icon, 32), words.plural),
-      h('p', { class: 'sheet-text', text: `${formatNumber(scroll.price)} zł. za sztukę. Możesz kupić najwyżej ${formatNumber(most)}: tyle kowal ma dziś dla Ciebie i na tyle starczy złota.` }),
+      h('h2', { class: 'sheet-title forge-scroll-title' }, scrollArt(words.icon, 32), t(words.plural)),
+      h('p', {
+        class: 'sheet-text',
+        text: t('{price} zł. za sztukę. Możesz kupić najwyżej {most}: tyle kowal ma dziś dla Ciebie i na tyle starczy złota.', { price: formatNumber(scroll.price), most: formatNumber(most) }),
+      }),
       field.element,
       h(
         'div',
         { class: 'sheet-actions' },
-        h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+        h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }),
         h('button', {
           type: 'button',
           class: 'button button--system',
-          text: 'Kup',
+          text: t('Kup'),
           onClick: (event) =>
             withButton(event.currentTarget, async () => {
               const answer = await call('POST', '/api/settlement/forge/scrolls', { count: field.read(), kind: words.kind });
               closeSheet();
               apply(answer);
               const { count, gold, points } = answer.bought;
-              toast(`Kupione: ${words.name} ×${formatNumber(count)} za ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z Żelisławem i reputacja Bractwa Kowali +${points}.` : ''}`);
+              toast(
+                `${t('Kupione: {name} ×{count} za {gold} zł.', { name: t(words.name), count: formatNumber(count), gold: formatNumber(gold) })}${points > 0 ? ` ${t('Relacja z Żelisławem i reputacja Bractwa Kowali +{points}.', { points })}` : ''}`,
+              );
             }),
         }),
       ),
@@ -1034,16 +1088,16 @@ export function mountSettlement(container, { params = {} } = {}) {
   // reforging: the item, then what it takes, then what the item became.
   function raiseSheet() {
     const body = h('div', { class: 'settlement-reforge' });
-    openSheet(h('h2', { class: 'sheet-title', text: 'Przekucie na wyższą rzadkość' }), body);
+    openSheet(h('h2', { class: 'sheet-title', text: t('Przekucie na wyższą rzadkość') }), body);
     pickItem();
 
     function pickItem() {
       const items = data.forge.items.filter((item) => item.gold !== undefined);
       fill(
         body,
-        h('p', { class: 'sheet-text', text: `Kowal przekuje przedmiot o stopień rzadkości wyżej, raz na przedmiot, teraz najwyżej do rzadkości „${data.forge.topName}”.` }),
+        h('p', { class: 'sheet-text', text: t('Kowal przekuje przedmiot o stopień rzadkości wyżej, raz na przedmiot, teraz najwyżej do rzadkości „{rarity}”.', { rarity: data.forge.topName }) }),
         items.length === 0
-          ? h('p', { class: 'muted', text: 'Nie masz przedmiotu, który kowal może teraz przekuć.' })
+          ? h('p', { class: 'muted', text: t('Nie masz przedmiotu, który kowal może teraz przekuć.') })
           : h(
               'ul',
               { class: 'item-list' },
@@ -1051,7 +1105,7 @@ export function mountSettlement(container, { params = {} } = {}) {
                 h(
                   'li',
                   {},
-                  h('button', { type: 'button', class: 'item-row', onClick: () => raiseItem(item.id) }, itemHead(item), item.equipped && h('span', { class: 'chip', text: 'Założony' })),
+                  h('button', { type: 'button', class: 'item-row', onClick: () => raiseItem(item.id) }, itemHead(item), item.equipped && h('span', { class: 'chip', text: t('Założony') })),
                 ),
               ),
             ),
@@ -1063,11 +1117,17 @@ export function mountSettlement(container, { params = {} } = {}) {
       if (!item) return pickItem();
       const draw = () => {
         const need = { count: item.materials, rarity: item.material, rarityName: item.materialName, have: item.have, takes: item.takes };
-        const cost = costPart({ gold: item.gold, need, title: 'Koszt przekucia', who: 'Kowal' });
+        const cost = costPart({
+          gold: item.gold,
+          need,
+          title: t('Koszt przekucia'),
+          takes: 'Kowal weźmie: {pieces}.',
+          rule: 'Kowal bierze {count} szt. materiałów o rzadkości „{rarity}” (dowolnych, sumują się).',
+        });
         const ready = cost.goldShort === 0 && cost.materialReady;
         fill(
           body,
-          h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), 'Inny przedmiot'),
+          h('button', { type: 'button', class: 'link-button settlement-back', onClick: pickItem }, icon('back', { size: 16 }), t('Inny przedmiot')),
           h('div', { class: 'settlement-reforge-item' }, itemHead(item)),
           h(
             'p',
@@ -1076,12 +1136,12 @@ export function mountSettlement(container, { params = {} } = {}) {
             icon('chevron', { size: 18 }),
             h('span', { class: 'settlement-change-new settlement-change-rarity', vars: { '--rarity': rarityColor(item.next) }, text: item.nextName }),
           ),
-          h('p', { class: 'muted', text: 'Afiksy urosną do wartości nowej rzadkości, a przedmiot dostanie jeden nowy afiks. Drugi raz kowal go nie przekuje.' }),
+          h('p', { class: 'muted', text: t('Afiksy urosną do wartości nowej rzadkości, a przedmiot dostanie jeden nowy afiks. Drugi raz kowal go nie przekuje.') }),
           cost.element,
           h('button', {
             type: 'button',
             class: 'button button--world',
-            text: cost.goldShort > 0 ? 'Brakuje złota' : !cost.materialReady ? 'Brakuje materiału' : 'Przekuj',
+            text: cost.goldShort > 0 ? t('Brakuje złota') : !cost.materialReady ? t('Brakuje materiału') : t('Przekuj'),
             disabled: !ready,
             onClick: (event) =>
               withButton(event.currentTarget, async () => {
@@ -1098,7 +1158,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     function showResult(raised) {
       fill(
         body,
-        h('p', { class: 'settlement-result-title', text: 'Kowal przekuł przedmiot' }),
+        h('p', { class: 'settlement-result-title', text: t('Kowal przekuł przedmiot') }),
         h('div', { class: 'settlement-reforge-item' }, itemHead({ id: raised.itemId, name: raised.name })),
         h(
           'p',
@@ -1107,8 +1167,8 @@ export function mountSettlement(container, { params = {} } = {}) {
           icon('chevron', { size: 18 }),
           h('span', { class: 'settlement-change-new settlement-change-rarity', vars: { '--rarity': rarityColor(raised.after) }, text: raised.afterName }),
         ),
-        raised.points > 0 && h('p', { class: 'muted', text: `Relacja z Żelisławem i reputacja Bractwa Kowali +${raised.points}.` }),
-        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--system', text: 'Gotowe', onClick: closeSheet })),
+        raised.points > 0 && h('p', { class: 'muted', text: t('Relacja z Żelisławem i reputacja Bractwa Kowali +{points}.', { points: raised.points }) }),
+        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--system', text: t('Gotowe'), onClick: closeSheet })),
       );
     }
   }
@@ -1129,15 +1189,15 @@ export function mountSettlement(container, { params = {} } = {}) {
       return h(
         'section',
         { class: 'card stack', ...(guide && { 'data-guide': guide }) },
-        h('h2', { class: 'section-title forge-scroll-title' }, scrollArt(words.icon, 32), words.plural),
+        h('h2', { class: 'section-title forge-scroll-title' }, scrollArt(words.icon, 32), t(words.plural)),
         h('p', {
           class: 'muted',
-          text: `${words.does} ${formatNumber(scroll.price)} zł. za sztukę. Dziś kowal sprzeda jeszcze ${scroll.left} z ${scroll.daily}. Masz: ${formatNumber(scroll.have)}.`,
+          text: `${t(words.does)} ${t('{price} zł. za sztukę. Dziś kowal sprzeda jeszcze {left} z {daily}. Masz: {have}.', { price: formatNumber(scroll.price), left: scroll.left, daily: scroll.daily, have: formatNumber(scroll.have) })}`,
         }),
         h('button', {
           type: 'button',
           class: 'button button--world',
-          text: scroll.left === 0 ? 'Na dziś koniec zwojów' : most < 1 ? 'Brakuje złota' : 'Kup zwoje',
+          text: scroll.left === 0 ? t('Na dziś koniec zwojów') : most < 1 ? t('Brakuje złota') : t('Kup zwoje'),
           disabled: most < 1,
           onClick: () => scrollSheet(which),
         }),
@@ -1151,16 +1211,16 @@ export function mountSettlement(container, { params = {} } = {}) {
       h(
         'section',
         { class: 'card stack', 'data-guide': 'forge-raise' },
-        h('h2', { class: 'section-title', text: 'Przekucie na wyższą rzadkość' }),
+        h('h2', { class: 'section-title', text: t('Przekucie na wyższą rzadkość') }),
         h('p', {
           class: 'muted',
-          text: `Kowal przekuwa przedmiot o stopień rzadkości wyżej, raz na przedmiot: afiksy rosną do wartości nowej rzadkości i dochodzi jeden nowy. Teraz najwyżej do rzadkości „${topName}”.${best ? '' : ' Lepsza relacja z nim pozwoli iść wyżej.'}`,
+          text: `${t('Kowal przekuwa przedmiot o stopień rzadkości wyżej, raz na przedmiot: afiksy rosną do wartości nowej rzadkości i dochodzi jeden nowy. Teraz najwyżej do rzadkości „{rarity}”.', { rarity: topName })}${best ? '' : ` ${t('Lepsza relacja z nim pozwoli iść wyżej.')}`}`,
         }),
-        h('button', { type: 'button', class: 'button button--world', text: raisable ? 'Wybierz przedmiot' : 'Brak przedmiotów do przekucia', disabled: !raisable, onClick: raiseSheet }),
+        h('button', { type: 'button', class: 'button button--world', text: raisable ? t('Wybierz przedmiot') : t('Brak przedmiotów do przekucia'), disabled: !raisable, onClick: raiseSheet }),
       ),
       h('p', {
         class: 'muted',
-        text: `${discount > 0 ? `Reputacja Bractwa Kowali obniża ceny kowala w złocie o ${formatDecimal(discount * 100)}%.` : 'Z lepszą reputacją Bractwa Kowali ceny kowala w złocie będą niższe.'} Handel daje relację z kowalem i reputację Bractwa Kowali: dziś ${trade.today} z ${trade.daily} punktów.${tradePace(trade)}`,
+        text: `${discount > 0 ? t('Reputacja Bractwa Kowali obniża ceny kowala w złocie o {discount}%.', { discount: formatDecimal(discount * 100) }) : t('Z lepszą reputacją Bractwa Kowali ceny kowala w złocie będą niższe.')} ${t('Handel daje relację z kowalem i reputację Bractwa Kowali: dziś {today} z {daily} punktów.', { today: trade.today, daily: trade.daily })}${tradePace(trade)}`,
       }),
     );
   }
@@ -1171,8 +1231,8 @@ export function mountSettlement(container, { params = {} } = {}) {
       return h(
         'div',
         { class: 'stack', 'data-guide': 'enchanter-services' },
-        data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij afiks', onClick: reforgeSheet }),
-        data.imbue && h('button', { type: 'button', class: 'button button--world', text: 'Zaklnij żywioł', onClick: imbueSheet }),
+        data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: t('Zaklnij afiks'), onClick: reforgeSheet }),
+        data.imbue && h('button', { type: 'button', class: 'button button--world', text: t('Zaklnij żywioł'), onClick: imbueSheet }),
       );
     if (resident.service === 'tavern') return tavernTabs();
     if (resident.service === 'herbalist') return herbalistCard();
@@ -1189,13 +1249,21 @@ export function mountSettlement(container, { params = {} } = {}) {
       'div',
       { class: 'settlement-actions settlement-actions--stack', 'data-guide': 'hermit-services' },
       data.hermit.path !== null &&
-        hermitButton('path', `Wyzeruj ścieżkę (${formatNumber(data.hermit.path)} zł.)`, 'Umiejętności klasy wrócą jako Punkty Umiejętności, a ścieżki wybierzesz od nowa.'),
-      data.hermit.stats !== null && hermitButton('stats', `Wyzeruj statystyki (${formatNumber(data.hermit.stats)} zł.)`, 'Wszystkie rozdane punkty statystyk wrócą do rozdania.'),
+        hermitButton(
+          'path',
+          t('Wyzeruj ścieżkę ({gold} zł.)', { gold: formatNumber(data.hermit.path) }),
+          t('Umiejętności klasy wrócą jako Punkty Umiejętności, a ścieżki wybierzesz od nowa.'),
+        ),
+      data.hermit.stats !== null &&
+        hermitButton('stats', t('Wyzeruj statystyki ({gold} zł.)', { gold: formatNumber(data.hermit.stats) }), t('Wszystkie rozdane punkty statystyk wrócą do rozdania.')),
       data.hermit.evolution &&
         h('button', {
           type: 'button',
           class: 'button button--world button--small',
-          text: data.hermit.evolution.price > 0 ? `Zmień ewolucję (${formatNumber(data.hermit.evolution.price)} zł.)` : 'Zmień ewolucję (pierwszy raz darmo)',
+          text:
+            data.hermit.evolution.price > 0
+              ? t('Zmień ewolucję ({gold} zł.)', { gold: formatNumber(data.hermit.evolution.price) })
+              : t('Zmień ewolucję (pierwszy raz darmo)'),
           onClick: evolutionSheet,
         }),
     );
@@ -1218,11 +1286,11 @@ export function mountSettlement(container, { params = {} } = {}) {
           'div',
           {},
           h('p', { class: 'settlement-resident-name', text: `${resident.name}, ${resident.title}` }),
-          h('p', { class: 'muted', text: `Relacja: ${resident.standing.name}` }),
+          h('p', { class: 'muted', text: t('Relacja: {standing}', { standing: resident.standing.name }) }),
           h('p', { class: 'muted settlement-resident-story', text: resident.story }),
         ),
       ),
-      h('p', { class: 'settlement-greeting', text: `„${resident.greeting}”` }),
+      h('p', { class: 'settlement-greeting', text: t('„{line}”', { line: resident.greeting }) }),
     );
     if (art) card.style.setProperty('--place-art', `url("${art}")`);
     return card;
@@ -1255,12 +1323,17 @@ export function mountSettlement(container, { params = {} } = {}) {
           },
         },
         h('span', { class: 'chat-tab-name', text: label }),
-        waiting && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'do odebrania' }),
+        waiting && h('span', { class: 'community-dot', role: 'img', 'aria-label': t('do odebrania') }),
       );
     return h(
       'div',
       { class: 'stack' },
-      h('div', { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': 'Tablica zleceń' }, tab('orders', 'Zlecenia', ordersReady()), tab('wanted', 'Poszukiwani', bountyReady())),
+      h(
+        'div',
+        { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': t('Tablica zleceń') },
+        tab('orders', t('Zlecenia'), ordersReady()),
+        tab('wanted', t('Poszukiwani'), bountyReady()),
+      ),
       boardTab === 'wanted' ? wanted : [boardCard(), brotherhoodsCard()],
     );
   }
@@ -1350,7 +1423,7 @@ export function mountSettlement(container, { params = {} } = {}) {
         class: `settlement-place${place.soon ? ' settlement-place--soon' : ''}${place.flip ? ' settlement-place--flip' : ''}`,
         href: hash,
         style: { left: `${place.x}%`, top: `${place.y}%` },
-        'aria-label': place.soon ? `${place.name}, wkrótce` : place.name,
+        'aria-label': place.soon ? t('{name}, wkrótce', { name: place.name }) : place.name,
         // Where the narrator's Osada chapter points (narrator.js).
         'data-guide': `osada-${place.id}`,
         onClick: (event) => openView(event, hash, HISTORY_KEY),
@@ -1381,11 +1454,11 @@ export function mountSettlement(container, { params = {} } = {}) {
         { class: 'settlement-board-view' },
         // On a computer the title and the Akceptacja Bractw stand beside the
         // board (styles.css), on a phone above it.
-        h('div', { class: 'settlement-board-side' }, pageHeading(`Osada: ${data.name}`, data.description), standingsPanel()),
+        h('div', { class: 'settlement-board-side' }, pageHeading(t('Osada: {name}', { name: data.name }), data.description), standingsPanel()),
         h(
           'div',
           // The camp's light of the hour in Poland (scenes.js), as on its board.
-          { class: `settlement-map settlement-map--${part}`, role: 'group', 'aria-label': 'Plansza Osady' },
+          { class: `settlement-map settlement-map--${part}`, role: 'group', 'aria-label': t('Plansza Osady') },
           ground && h('img', { class: 'settlement-map-ground', src: ground, alt: '', decoding: 'async', draggable: 'false' }),
           (data.torches ?? []).map((torch, index) => torchLight(torch, index, part !== 'day')),
           data.places.map(placeLink),
@@ -1431,11 +1504,11 @@ export function mountSettlement(container, { params = {} } = {}) {
           'div',
           { class: 'page-heading-text' },
           h('h1', { class: 'page-title', tabindex: '-1', text: place.name }),
-          h('p', { class: 'page-subtitle', text: resident ? `${resident.name}, ${resident.title}` : `Osada: ${data.name}` }),
+          h('p', { class: 'page-subtitle', text: resident ? `${resident.name}, ${resident.title}` : t('Osada: {name}', { name: data.name }) }),
         ),
-        h('button', { type: 'button', class: 'button button--system back-button', onClick: () => leaveView(SETTLEMENT, 1, HISTORY_KEY) }, icon('back', { size: 20 }), 'Powrót'),
+        h('button', { type: 'button', class: 'button button--system back-button', onClick: () => leaveView(SETTLEMENT, 1, HISTORY_KEY) }, icon('back', { size: 20 }), t('Powrót')),
       ),
-      place.soon && systemPanel(`${place.name} otworzy się w jednej z kolejnych aktualizacji gry.`),
+      place.soon && systemPanel(t('{name} otworzy się w jednej z kolejnych aktualizacji gry.', { name: place.name })),
       resident && residentCard(resident, place.backdrop),
       !place.soon && resident && services(resident),
       // The sołtys's orders and Poszukiwani (619 B), each in its tab.
@@ -1453,8 +1526,8 @@ export function mountSettlement(container, { params = {} } = {}) {
   function render() {
     clearTimeout(timer);
     if (failure && (failure.status === 403 || failure.status === 404)) return locked();
-    if (failure) return fill(container, pageHeading('Osada'), systemPanel(failure.message));
-    if (!data) return fill(container, pageHeading('Osada'), h('p', { class: 'muted', text: 'Wczytywanie…' }));
+    if (failure) return fill(container, pageHeading(t('Osada')), systemPanel(failure.message));
+    if (!data) return fill(container, pageHeading(t('Osada')), h('p', { class: 'muted', text: t('Wczytywanie…') }));
     const place = placeId && data.places.find((one) => one.id === placeId);
     // An unknown place in the address leads back to the board, and a tab
     // the place does not have to the place.

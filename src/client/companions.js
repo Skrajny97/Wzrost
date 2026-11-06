@@ -9,6 +9,7 @@
 import { companionBust } from './art.js';
 import { h } from './dom.js';
 import { formatCountdown, formatDecimal, formatNumber } from './format.js';
+import { t } from './i18n.js';
 import { call, serverNow, state } from './state.js';
 import { closeSheet, confirmAction, openSheet, toast, withButton } from './ui.js';
 import { anvilSection, compareTable, itemDetails, itemSummary } from './screens/character.js';
@@ -23,16 +24,16 @@ function giftRow(companion, apply) {
   return h(
     'div',
     { class: 'settlement-choice' },
-    h('p', { class: 'muted', text: `Prezent tygodnia z profesji: ${gift.count} × ${gift.name}.` }),
+    h('p', { class: 'muted', text: t('Prezent tygodnia z profesji: {count} × {name}.', { count: gift.count, name: gift.name }) }),
     h('button', {
       type: 'button',
       class: 'button button--world button--small',
-      text: 'Odbierz prezent',
+      text: t('Odbierz prezent'),
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           const answer = await call('POST', '/api/settlement/gift', { companionId: companion.id });
           apply(answer);
-          toast(`Odebrano: ${answer.gift.count} × ${answer.gift.name}.`);
+          toast(t('Odebrano: {count} × {name}.', { count: answer.gift.count, name: answer.gift.name }));
         }),
     }),
   );
@@ -49,19 +50,22 @@ function wearSheet(companion, apply) {
     withButton(event.currentTarget, async () => {
       apply(await call('POST', '/api/settlement/equip', { companionId: companion.id, itemId: item.id }));
       closeSheet();
-      toast(`${companion.name} nosi teraz: ${item.name}.`);
+      toast(t('{name} nosi teraz: {item}.', { name: companion.name, item: item.name }));
     });
   openSheet(
-    h('h2', { class: 'sheet-title', text: `Sprzęt: ${companion.name}` }),
+    h('h2', { class: 'sheet-title', text: t('Sprzęt: {name}', { name: companion.name }) }),
     items.length === 0
-      ? h('p', { class: 'sheet-text', text: 'W plecaku nie ma nic, co ten towarzysz może założyć na swój poziom: broni ani pancerza swojej klasy, ani biżuterii (amuletu, pierścienia albo talizmanu).' })
+      ? h('p', {
+          class: 'sheet-text',
+          text: t('W plecaku nie ma nic, co ten towarzysz może założyć na swój poziom: broni ani pancerza swojej klasy, ani biżuterii (amuletu, pierścienia albo talizmanu).'),
+        })
       : [
           h('p', {
             class: 'sheet-text',
             text:
               companion.appearance === 'female'
-                ? 'Stuknij przedmiot, żeby porównać go z tym, co nosi, i założyć. To, co towarzyszka nosiła w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostała. Biżuterię nosi jedną: amulet, pierścień albo talizman.'
-                : 'Stuknij przedmiot, żeby porównać go z tym, co nosi, i założyć. To, co towarzysz nosił w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostał. Biżuterię nosi jedną: amulet, pierścień albo talizman.',
+                ? t('Stuknij przedmiot, żeby porównać go z tym, co nosi, i założyć. To, co towarzyszka nosiła w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostała. Biżuterię nosi jedną: amulet, pierścień albo talizman.')
+                : t('Stuknij przedmiot, żeby porównać go z tym, co nosi, i założyć. To, co towarzysz nosił w tym miejscu, wróci do plecaka, a przy odprawie odda wszystko, co od Ciebie dostał. Biżuterię nosi jedną: amulet, pierścień albo talizman.'),
           }),
           h(
             'ul',
@@ -87,9 +91,9 @@ function wearChoice(companion, item, put) {
       'div',
       { class: 'wear-choice-body' },
       worn
-        ? compareTable(item, worn, { title: `Porównanie z tym, co nosi ${companion.name}`, wornLabel: 'Nosi' })
-        : h('p', { class: 'muted', text: `W tym miejscu ${companion.name} nic teraz nie nosi.` }),
-      h('button', { type: 'button', class: 'button button--system', text: 'Załóż', onClick: put }),
+        ? compareTable(item, worn, { title: t('Porównanie z tym, co nosi {name}', { name: companion.name }), wornLabel: t('Nosi') })
+        : h('p', { class: 'muted', text: t('W tym miejscu {name} nic teraz nie nosi.', { name: companion.name }) }),
+      h('button', { type: 'button', class: 'button button--system', text: t('Załóż'), onClick: put }),
     ),
   );
 }
@@ -149,13 +153,13 @@ function wearList(companion, apply) {
         { class: 'settlement-companion-slot' },
         h('span', { class: 'field-label', text: place.slotName }),
         !place.item
-          ? h('span', { class: 'muted', text: 'Pusto' })
+          ? h('span', { class: 'muted', text: t('Pusto') })
           : hired
             ? h('button', { type: 'button', class: 'item-row', onClick: () => companionItemSheet(companion, place.slot, apply) }, itemSummary(place.item))
             : itemSummary(place.item),
       ),
     ),
-    hired && h('button', { type: 'button', class: 'button button--small', text: 'Załóż z plecaka', disabled: Boolean(companion.away), onClick: () => wearSheet(companion, apply) }),
+    hired && h('button', { type: 'button', class: 'button button--small', text: t('Załóż z plecaka'), disabled: Boolean(companion.away), onClick: () => wearSheet(companion, apply) }),
     hired && companion.away && h('p', { class: 'muted', text: companion.away }),
   );
 }
@@ -188,25 +192,39 @@ function stayBlock(companion, apply) {
 // (295 A): its standing, its bonus in a fight, the points to the next
 // standing, and the pieces of its story, folded.
 function bondBlock(bond) {
-  const parts = [`Relacja: ${bond.standing}`];
-  if (bond.bonus > 0) parts.push(`w walce +${formatDecimal(bond.bonus * 100)}% obrażeń i HP`);
+  const parts = [t('Relacja: {standing}', { standing: bond.standing })];
+  if (bond.bonus > 0) parts.push(t('w walce +{bonus}% obrażeń i HP', { bonus: formatDecimal(bond.bonus * 100) }));
   // The points grow by fractions of a point (341 A): the rest rounded up.
-  if (bond.next) parts.push(`do stopnia ${bond.next.name}: ${formatNumber(Math.ceil(bond.next.points - bond.points))} pkt`);
+  if (bond.next) parts.push(t('do stopnia {name}: {points} pkt', { name: bond.next.name, points: formatNumber(Math.ceil(bond.next.points - bond.points)) }));
   return h(
     'div',
     { class: 'settlement-companion-bond' },
     h('p', { class: 'muted', text: `${parts.join(' · ')}.` }),
     bond.told.length > 0 &&
-      h('details', { class: 'settlement-companion-talks' }, h('summary', { text: `Z rozmów (${bond.told.length})` }), h('ul', {}, bond.told.map((piece) => h('li', { text: `„${piece}”` })))),
+      h(
+        'details',
+        { class: 'settlement-companion-talks' },
+        h('summary', { text: t('Z rozmów ({count})', { count: bond.told.length }) }),
+        h('ul', {}, bond.told.map((piece) => h('li', { text: t('„{line}”', { line: piece }) }))),
+      ),
   );
 }
 
 export function companionCard(companion, action, apply) {
   // Its wounds heal with the character's rest (the author: "Niech rany
-  // towarzyszy goją się wraz z ranami postaci").
-  const wounded = companion.wounded
-    ? `${companion.appearance === 'female' ? 'Ranna' : 'Ranny'}. Wróci do sił, gdy postać ${companion.healsAt ? `odpocznie do pełna HP (jeszcze ${formatCountdown(companion.healsAt - serverNow())})` : 'po wyprawie odpocznie do pełna HP'}.`
-    : null;
+  // towarzyszy goją się wraz z ranami postaci"): a sentence for each form
+  // and case (t()), one English for both forms.
+  const female = companion.appearance === 'female';
+  const healsIn = companion.healsAt ? { time: formatCountdown(companion.healsAt - serverNow()) } : null;
+  const wounded = !companion.wounded
+    ? null
+    : healsIn
+      ? female
+        ? t('Ranna. Wróci do sił, gdy postać odpocznie do pełna HP (jeszcze {time}).', healsIn)
+        : t('Ranny. Wróci do sił, gdy postać odpocznie do pełna HP (jeszcze {time}).', healsIn)
+      : female
+        ? t('Ranna. Wróci do sił, gdy postać po wyprawie odpocznie do pełna HP.')
+        : t('Ranny. Wróci do sił, gdy postać po wyprawie odpocznie do pełna HP.');
   // Its own face (question 107 B) beside who it is, as a resident's.
   const bust = companionBust(companion.classId, companion.appearance);
   return h(
@@ -219,8 +237,11 @@ export function companionCard(companion, action, apply) {
       h(
         'div',
         {},
-        h('p', { class: 'settlement-resident-name', text: `${companion.name}, ${companion.className}, poz. ${companion.level}` }),
-        h('p', { class: 'muted', text: `HP ${formatNumber(companion.maxHp)} · pancerz ${formatNumber(companion.armor)}${companion.profession ? ` · ${companion.profession}` : ''}` }),
+        h('p', { class: 'settlement-resident-name', text: t('{name}, {className}, poz. {level}', { name: companion.name, className: companion.className, level: companion.level }) }),
+        h('p', {
+          class: 'muted',
+          text: `${t('HP {hp} · pancerz {armor}', { hp: formatNumber(companion.maxHp), armor: formatNumber(companion.armor) })}${companion.profession ? ` · ${companion.profession}` : ''}`,
+        }),
         h('p', { class: 'muted settlement-resident-story', text: companion.story }),
       ),
     ),
@@ -228,8 +249,10 @@ export function companionCard(companion, action, apply) {
       'ul',
       { class: 'settlement-companion-list' },
       companion.traits.map((trait) => h('li', {}, h('strong', { text: trait.name }), `: ${trait.text}`)),
-      companion.skills.map((skill) => h('li', { text: `${skill.name}${skill.level > 0 ? `, poz. ${skill.level}` : ', jeszcze nie umie'}` })),
-      !companion.wear && h('li', { class: 'muted', text: `Sprzęt: ${companion.gear.join(', ')}` }),
+      companion.skills.map((skill) =>
+        h('li', { text: skill.level > 0 ? t('{name}, poz. {level}', { name: skill.name, level: skill.level }) : t('{name}, jeszcze nie umie', { name: skill.name }) }),
+      ),
+      !companion.wear && h('li', { class: 'muted', text: t('Sprzęt: {gear}', { gear: companion.gear.join(', ') }) }),
     ),
     companion.bond && bondBlock(companion.bond),
     companion.wear && wearList(companion, apply),
@@ -246,13 +269,18 @@ export const dismissButton = (companion, apply) =>
   h('button', {
     type: 'button',
     class: 'button button--small',
-    text: 'Odpraw',
+    text: t('Odpraw'),
     onClick: async (event) => {
       const button = event.currentTarget;
       const given = companion.wear.some((place) => place.item?.given);
-      const got = companion.appearance === 'female' ? 'dostała' : 'dostał';
-      const text = `${companion.name} odejdzie na dobre${given ? ` i odda wszystko, co od Ciebie ${got}` : ''}.`;
-      if (!(await confirmAction({ title: `Odprawić: ${companion.name}?`, text, confirmLabel: 'Odpraw' }))) return;
+      // A sentence for each case and form (t()), one English for both forms.
+      const name = { name: companion.name };
+      const text = !given
+        ? t('{name} odejdzie na dobre.', name)
+        : companion.appearance === 'female'
+          ? t('{name} odejdzie na dobre i odda wszystko, co od Ciebie dostała.', name)
+          : t('{name} odejdzie na dobre i odda wszystko, co od Ciebie dostał.', name);
+      if (!(await confirmAction({ title: t('Odprawić: {name}?', name), text, confirmLabel: t('Odpraw') }))) return;
       withButton(button, async () => apply(await call('POST', '/api/settlement/dismiss', { companionId: companion.id })));
     },
   });
@@ -262,9 +290,9 @@ function talkSheet(companion, talk) {
   const bust = companionBust(companion.classId, companion.appearance);
   openSheet(
     h('div', { class: 'settlement-resident-head' }, bust && h('span', { class: 'settlement-resident-bust' }, bust), h('h2', { class: 'sheet-title', text: companion.name })),
-    h('p', { class: 'sheet-text settlement-talk', text: `„${talk.text}”` }),
-    h('p', { class: 'muted', text: `${talk.story ? 'Nowy kawałek historii. ' : ''}Relacja +${talk.points} pkt.` }),
-    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Zamknij', onClick: closeSheet })),
+    h('p', { class: 'sheet-text settlement-talk', text: t('„{line}”', { line: talk.text }) }),
+    h('p', { class: 'muted', text: `${talk.story ? `${t('Nowy kawałek historii.')} ` : ''}${t('Relacja +{points} pkt.', { points: talk.points })}` }),
+    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Zamknij'), onClick: closeSheet })),
   );
 }
 
@@ -274,7 +302,7 @@ const talkButton = (companion, apply) =>
   h('button', {
     type: 'button',
     class: 'button button--world button--small',
-    text: 'Porozmawiaj',
+    text: t('Porozmawiaj'),
     disabled: companion.bond.talked,
     onClick: (event) =>
       withButton(event.currentTarget, async () => {
@@ -310,7 +338,7 @@ export function mountQuarters(holder) {
       return;
     }
     if (!companions) {
-      holder.replaceChildren(h('p', { class: 'muted', text: 'Wczytywanie towarzyszy…' }));
+      holder.replaceChildren(h('p', { class: 'muted', text: t('Wczytywanie towarzyszy…') }));
       return;
     }
     const { hired, places } = companions;
@@ -318,15 +346,21 @@ export function mountQuarters(holder) {
       h(
         'section',
         { class: 'stack' },
-        h('h2', { class: 'section-title', text: `Towarzysze: ${hired.length} z ${places}` }),
+        h('h2', { class: 'section-title', text: t('Towarzysze: {count} z {all}', { count: hired.length, all: places }) }),
         hired.length === 0
-          ? h('p', { class: 'muted' }, 'Nikt tu jeszcze nie mieszka. Towarzyszy zwerbujesz w ', h('a', { href: '#/osada/tavern/companions', text: 'Karczmie' }), ' w Osadzie.')
+          ? h(
+              'p',
+              { class: 'muted' },
+              t('Nikt tu jeszcze nie mieszka. Towarzyszy zwerbujesz w '),
+              h('a', { href: '#/osada/tavern/companions', text: t('Karczmie') }),
+              t(' w Osadzie.'),
+            )
           : hired.map((companion) =>
               companionCard(
                 companion,
                 [
                   h('div', { class: 'settlement-actions' }, talkButton(companion, apply), dismissButton(companion, apply)),
-                  companion.bond.talked && h('p', { class: 'muted', text: 'Następna rozmowa jutro.' }),
+                  companion.bond.talked && h('p', { class: 'muted', text: t('Następna rozmowa jutro.') }),
                 ],
                 apply,
               ),

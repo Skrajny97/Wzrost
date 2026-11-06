@@ -12,10 +12,13 @@ import { ALL, categoriesOf, goodsCategory, inCategory, shownCategory } from '../
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatDecimal, formatNumber, tradePace } from '../format.js';
+import { t } from '../i18n.js';
 import { call, serverNow, state } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { compareTable, itemSummary } from './character.js';
 
+// The tabs and the names of kinds and reasons below are Polish, shown
+// through t().
 const TABS = [
   ['offers', 'Oferty graczy'],
   ['mine', 'Moje'],
@@ -25,15 +28,16 @@ const KIND_NAMES = { herb: 'zioło', potion: 'mikstura', material: 'materiał', 
 // The same kinds as the filters name them, in their order.
 const KIND_GROUPS = { herb: 'Zioła', potion: 'Mikstury', material: 'Materiały', part: 'Części', mineral: 'Minerały' };
 const REASONS = { won: 'wygrana licytacja', bought: 'kupione', returned: 'wraca do Ciebie', sold: 'zapłata za sprzedaż' };
+const kindName = (kind) => (KIND_NAMES[kind] ? t(KIND_NAMES[kind]) : null);
 const rarityOf = (id) => state.content?.rarities?.find((rarity) => rarity.id === id);
 
 // What is left until `at`: "2 dni 5 h", "5 h 12 min", "12 min".
 function left(at) {
   const minutes = Math.ceil(Math.max(0, at - serverNow()) / 60000);
-  if (minutes <= 0) return 'chwilę';
+  if (minutes <= 0) return t('chwilę');
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
-  if (days > 0) return `${days} ${days === 1 ? 'dzień' : 'dni'} ${hours % 24} h`;
+  if (days > 0) return `${countOf(days, 'dzień', 'dni', 'dni')} ${hours % 24} h`;
   return hours > 0 ? `${hours} h ${minutes % 60} min` : `${minutes} min`;
 }
 
@@ -51,7 +55,7 @@ export function stackArt(goods, size = 24) {
 // as a price.
 function stackLine(goods, { count = true, meta } = {}) {
   const rarity = rarityOf(goods.rarity);
-  const name = goods.kind === 'gold' ? `${formatNumber(goods.count)} zł` : count ? `${goods.name} ×${formatNumber(goods.count)}` : goods.name;
+  const name = goods.kind === 'gold' ? t('{gold} zł', { gold: formatNumber(goods.count) }) : count ? `${goods.name} ×${formatNumber(goods.count)}` : goods.name;
   return h(
     'span',
     { class: 'item-summary-art market-goods' },
@@ -60,7 +64,7 @@ function stackLine(goods, { count = true, meta } = {}) {
       'span',
       { class: 'item-summary' },
       h('span', { class: 'item-name', vars: rarity ? { '--rarity': rarity.color } : {}, text: name }),
-      goods.kind !== 'gold' && h('span', { class: 'item-meta', text: meta ?? [KIND_NAMES[goods.kind], rarity?.name].filter(Boolean).join(' · ') }),
+      goods.kind !== 'gold' && h('span', { class: 'item-meta', text: meta ?? [kindName(goods.kind), rarity?.name].filter(Boolean).join(' · ') }),
     ),
   );
 }
@@ -96,17 +100,17 @@ function goodsSheet(goods, actions = null) {
           'div',
           {},
           h('h2', { class: 'item-title', vars: colour, text: goods.name }),
-          h('p', { class: 'item-meta', text: [KIND_NAMES[goods.kind], rarity?.name].filter(Boolean).join(' · ') }),
+          h('p', { class: 'item-meta', text: [kindName(goods.kind), rarity?.name].filter(Boolean).join(' · ') }),
         ),
       ),
       goods.description && h('p', { class: 'sheet-text', text: goods.description }),
       h(
         'ul',
         { class: 'item-properties' },
-        goods.scrap !== undefined && goods.scrap !== null && h('li', { class: 'item-price', text: `U złomiarza: ${formatDecimal(goods.scrap)} złota za sztukę` }),
-        goods.gatherLevel && h('li', { text: `Do zebrania w Zielarstwie od poziomu ${goods.gatherLevel}.` }),
-        goods.mineLevel && h('li', { text: `Do wydobycia w Górnictwie od poziomu ${goods.mineLevel}.` }),
-        h('li', { text: `Masz: ${formatNumber(owned(goods))} szt.` }),
+        goods.scrap !== undefined && goods.scrap !== null && h('li', { class: 'item-price', text: t('U złomiarza: {gold} złota za sztukę', { gold: formatDecimal(goods.scrap) }) }),
+        goods.gatherLevel && h('li', { text: t('Do zebrania w Zielarstwie od poziomu {level}.', { level: goods.gatherLevel }) }),
+        goods.mineLevel && h('li', { text: t('Do wydobycia w Górnictwie od poziomu {level}.', { level: goods.mineLevel }) }),
+        h('li', { text: t('Masz: {count} szt.', { count: formatNumber(owned(goods)) }) }),
       ),
     ),
     actions,
@@ -115,7 +119,7 @@ function goodsSheet(goods, actions = null) {
 
 // A stack in one line that opens its card under a tap (Jagna's herbs too).
 export const stackButton = (goods, options, actions) =>
-  h('button', { type: 'button', class: 'market-goods-button', 'aria-label': `${goods.name}: szczegóły`, onClick: () => goodsSheet(goods, actions?.()) }, stackLine(goods, options));
+  h('button', { type: 'button', class: 'market-goods-button', 'aria-label': t('{name}: szczegóły', { name: goods.name }), onClick: () => goodsSheet(goods, actions?.()) }, stackLine(goods, options));
 
 // An item to buy, its properties under a tap with the comparison to the
 // one the character wears in its slot (the author: "jak klikamy dany
@@ -128,8 +132,8 @@ export function itemEntry(item, key, opened) {
   const usable = !item.classIds || item.classIds.includes(character.classId);
   const worn = character.equipment?.[item.slot] ?? null;
   const notes = [
-    !usable && 'Twoja klasa nie może go używać.',
-    character.classLevel < (item.classLevel ?? 1) && `Założysz go od poziomu klasy ${item.classLevel}.`,
+    !usable && t('Twoja klasa nie może go używać.'),
+    character.classLevel < (item.classLevel ?? 1) && t('Założysz go od poziomu klasy {level}.', { level: item.classLevel }),
   ].filter(Boolean);
   return [
     h(
@@ -144,10 +148,14 @@ export function itemEntry(item, key, opened) {
         'ul',
         { class: 'item-properties' },
         item.properties.map((line) => h('li', { text: line })),
-        item.classNames && h('li', { class: 'item-classes', text: `${item.classNames.length > 1 ? 'Dla klas' : 'Dla klasy'}: ${item.classNames.join(', ')}` }),
-        item.price !== undefined && h('li', { class: 'item-price', text: `U złomiarza: ${formatNumber(item.price)} złota` }),
+        item.classNames &&
+          h('li', {
+            class: 'item-classes',
+            text: item.classNames.length > 1 ? t('Dla klas: {classes}', { classes: item.classNames.join(', ') }) : t('Dla klasy: {classes}', { classes: item.classNames.join(', ') }),
+          }),
+        item.price !== undefined && h('li', { class: 'item-price', text: t('U złomiarza: {gold} złota', { gold: formatNumber(item.price) }) }),
       ),
-      usable && (worn ? compareTable(item, worn) : h('p', { class: 'muted', text: `W miejscu „${item.slotName}” postać nic teraz nie nosi.` })),
+      usable && (worn ? compareTable(item, worn) : h('p', { class: 'muted', text: t('W miejscu „{slot}” postać nic teraz nie nosi.', { slot: item.slotName }) })),
     ),
     notes.map((note) => h('p', { class: 'region-warning trade-note', text: note })),
   ];
@@ -157,7 +165,7 @@ export function itemEntry(item, key, opened) {
 // in the data (data/slots.json), then the stacks by their kind.
 const goodsCategories = () => [
   ...state.content.slots.map(({ id, name }) => ({ id, name })),
-  ...Object.entries(KIND_GROUPS).map(([id, name]) => ({ id, name })),
+  ...Object.entries(KIND_GROUPS).map(([id, name]) => ({ id, name: t(name) })),
 ];
 
 // Chips over a long list of goods that show one category of them at a time
@@ -173,7 +181,7 @@ function filtered(entries, categoryOf, filter, draw) {
   filter.id = shownCategory(filter.id, categories);
   const list = h('div', { class: 'market-filtered' }, draw(inCategory(entries, categoryOf, filter.id)));
   if (categories.length < 2) return list;
-  const options = [{ id: ALL, name: 'Wszystko', count: entries.length }, ...categories];
+  const options = [{ id: ALL, name: t('Wszystko'), count: entries.length }, ...categories];
   const chips = options.map(({ id, name, count }) =>
     h(
       'button',
@@ -197,7 +205,7 @@ function filtered(entries, categoryOf, filter, draw) {
       h('span', { class: 'market-filter-count', text: formatNumber(count) }),
     ),
   );
-  return [h('div', { class: 'market-filters', role: 'group', 'aria-label': 'Kategoria towaru' }, chips), list];
+  return [h('div', { class: 'market-filters', role: 'group', 'aria-label': t('Kategoria towaru') }, chips), list];
 }
 
 // A whole number typed into a sheet, from `least` to `most`; an optional
@@ -209,7 +217,7 @@ export function numberField(id, label, value, least, most) {
     const raw = input.value.trim();
     if (optional && raw === '') return null;
     const number = Number(raw);
-    if (raw === '' || !Number.isInteger(number) || number < least || number > most) throw new Error(`${label}: wpisz od ${formatNumber(least)} do ${formatNumber(most)}.`);
+    if (raw === '' || !Number.isInteger(number) || number < least || number > most) throw new Error(t('{label}: wpisz od {least} do {most}.', { label, least: formatNumber(least), most: formatNumber(most) }));
     return number;
   };
   return { element, read };
@@ -277,26 +285,26 @@ export function mountMarket(holder) {
   };
 
   function bidSheet(offer) {
-    const field = numberField('market-bid', 'Twoja oferta (zł)', offer.minBid, offer.minBid, Math.max(offer.minBid, state.character.gold));
+    const field = numberField('market-bid', t('Twoja oferta (zł)'), offer.minBid, offer.minBid, Math.max(offer.minBid, state.character.gold));
     openSheet(
-      h('h2', { class: 'sheet-title', text: 'Licytuj' }),
+      h('h2', { class: 'sheet-title', text: t('Licytuj') }),
       goodsEntry(offer.goods, `bid:${offer.id}`),
       h(
         'p',
         { class: 'sheet-text' },
-        `Najmniej ${formatNumber(offer.minBid)} zł. Złoto odchodzi od razu. Gdy ktoś Cię przebije, wraca do Ciebie, a gdy licytacja się skończy, towar czeka w zakładce „Moje”.`,
+        t('Najmniej {gold} zł. Złoto odchodzi od razu. Gdy ktoś Cię przebije, wraca do Ciebie, a gdy licytacja się skończy, towar czeka w zakładce „Moje”.', { gold: formatNumber(offer.minBid) }),
       ),
-      offer.buyNow && h('p', { class: 'muted', text: `Za ${formatNumber(offer.buyNow)} zł kupisz od razu przyciskiem „Kup teraz”.` }),
+      offer.buyNow && h('p', { class: 'muted', text: t('Za {gold} zł kupisz od razu przyciskiem „Kup teraz”.', { gold: formatNumber(offer.buyNow) }) }),
       field.element,
       h(
         'div',
         { class: 'sheet-actions' },
-        h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+        h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }),
         h('button', {
           type: 'button',
           class: 'button button--system',
-          text: 'Licytuj',
-          onClick: submit('/api/market/bid', () => ({ offerId: offer.id, amount: field.read() }), (answer) => `Prowadzisz: ${formatNumber(answer.bid.amount)} zł.`),
+          text: t('Licytuj'),
+          onClick: submit('/api/market/bid', () => ({ offerId: offer.id, amount: field.read() }), (answer) => t('Prowadzisz: {gold} zł.', { gold: formatNumber(answer.bid.amount) })),
         }),
       ),
     );
@@ -304,33 +312,37 @@ export function mountMarket(holder) {
 
   async function buyNow(offer, button) {
     const what = offer.goods.kind === 'item' ? offer.goods.name : `${offer.goods.name} ×${formatNumber(offer.goods.count)}`;
-    const sure = await confirmAction({ title: 'Kupić teraz?', text: `${what} za ${formatNumber(offer.buyNow)} zł. Towar odbierzesz w zakładce „Moje”.`, confirmLabel: 'Kup' });
-    if (sure) act(button, '/api/market/buy', { offerId: offer.id }, 'Kupione. Towar czeka w zakładce „Moje”.');
+    const sure = await confirmAction({
+      title: t('Kupić teraz?'),
+      text: t('{what} za {gold} zł. Towar odbierzesz w zakładce „Moje”.', { what, gold: formatNumber(offer.buyNow) }),
+      confirmLabel: t('Kup'),
+    });
+    if (sure) act(button, '/api/market/buy', { offerId: offer.id }, t('Kupione. Towar czeka w zakładce „Moje”.'));
   }
 
   async function cancel(offer, button) {
-    const sure = await confirmAction({ title: 'Wycofać ofertę?', text: 'Towar wróci do Ciebie przez „Do odebrania” w zakładce „Moje”.', confirmLabel: 'Wycofaj' });
-    if (sure) act(button, '/api/market/cancel', { offerId: offer.id }, 'Oferta wycofana.');
+    const sure = await confirmAction({ title: t('Wycofać ofertę?'), text: t('Towar wróci do Ciebie przez „Do odebrania” w zakładce „Moje”.'), confirmLabel: t('Wycofaj') });
+    if (sure) act(button, '/api/market/cancel', { offerId: offer.id }, t('Oferta wycofana.'));
   }
 
   function offerCard(offer) {
     const price = offer.bid
-      ? `Najwyższa oferta: ${formatNumber(offer.bid)} zł (${countOf(offer.bids, 'licytacja', 'licytacje', 'licytacji')})`
-      : `Cena wywoławcza: ${formatNumber(offer.startPrice)} zł`;
+      ? t('Najwyższa oferta: {gold} zł ({bids})', { gold: formatNumber(offer.bid), bids: countOf(offer.bids, 'licytacja', 'licytacje', 'licytacji') })
+      : t('Cena wywoławcza: {gold} zł', { gold: formatNumber(offer.startPrice) });
     const gold = state.character.gold;
     const actions = offer.own
       ? [
           offer.bid
-            ? h('p', { class: 'muted', text: 'Ktoś licytuje, więc oferta zostaje do końca.' })
-            : h('button', { type: 'button', class: 'button button--small', text: 'Wycofaj', onClick: (event) => cancel(offer, event.currentTarget) }),
+            ? h('p', { class: 'muted', text: t('Ktoś licytuje, więc oferta zostaje do końca.') })
+            : h('button', { type: 'button', class: 'button button--small', text: t('Wycofaj'), onClick: (event) => cancel(offer, event.currentTarget) }),
         ]
       : [
           offer.leading
-            ? h('span', { class: 'market-leading', text: 'Prowadzisz' })
+            ? h('span', { class: 'market-leading', text: t('Prowadzisz') })
             : h('button', {
                 type: 'button',
                 class: 'button button--world button--small',
-                text: `Licytuj od ${formatNumber(offer.minBid)} zł`,
+                text: t('Licytuj od {gold} zł', { gold: formatNumber(offer.minBid) }),
                 disabled: gold < offer.minBid || Boolean(offer.buyNow && offer.minBid >= offer.buyNow),
                 onClick: () => bidSheet(offer),
               }),
@@ -338,7 +350,7 @@ export function mountMarket(holder) {
             h('button', {
               type: 'button',
               class: 'button button--system button--small',
-              text: `Kup teraz: ${formatNumber(offer.buyNow)} zł`,
+              text: t('Kup teraz: {gold} zł', { gold: formatNumber(offer.buyNow) }),
               disabled: gold < offer.buyNow,
               onClick: (event) => buyNow(offer, event.currentTarget),
             }),
@@ -348,8 +360,8 @@ export function mountMarket(holder) {
       { class: 'card market-offer' },
       goodsEntry(offer.goods, `offer:${offer.id}`),
       h('p', { class: 'market-price', text: price }),
-      offer.own && offer.buyNow && h('p', { class: 'muted', text: `„Kup teraz”: ${formatNumber(offer.buyNow)} zł` }),
-      h('p', { class: 'muted' }, `${offer.own ? 'Twoja oferta' : `Wystawia: ${offer.seller}`} · koniec za `, clock(offer.endsAt)),
+      offer.own && offer.buyNow && h('p', { class: 'muted', text: t('„Kup teraz”: {gold} zł', { gold: formatNumber(offer.buyNow) }) }),
+      h('p', { class: 'muted' }, offer.own ? t('Twoja oferta · koniec za ') : t('Wystawia: {name} · koniec za ', { name: offer.seller }), clock(offer.endsAt)),
       h('div', { class: 'settlement-actions' }, actions),
     );
   }
@@ -359,13 +371,17 @@ export function mountMarket(holder) {
   // wystawienia na licytacji pokazuje za ile dany przedmiot idzie u
   // złomiarza"); goods he does not buy, as parts, show nothing.
   const scrapText = (price, each = false) =>
-    typeof price === 'number' ? `U złomiarza: ${formatDecimal(price)} zł${each ? ' za sztukę' : ''}` : null;
+    typeof price === 'number'
+      ? each
+        ? t('U złomiarza: {gold} zł za sztukę', { gold: formatDecimal(price) })
+        : t('U złomiarza: {gold} zł', { gold: formatDecimal(price) })
+      : null;
   const pickWithScrap = (summary, text) => (text ? h('span', { class: 'market-pick-goods' }, summary, h('span', { class: 'muted market-scrap', text })) : summary);
 
   // "Wystaw": the goods first, then the count and the prices.
   function listSheet() {
     const { items, stacks } = market.sellable;
-    const choose = (goods) => h('button', { type: 'button', class: 'button button--world button--small', text: 'Wybierz', onClick: () => priceSheet(goods) });
+    const choose = (goods) => h('button', { type: 'button', class: 'button button--world button--small', text: t('Wybierz'), onClick: () => priceSheet(goods) });
     // The bag's items as goods, so that the filters sort them with the stacks.
     const goods = [...items.map((item) => ({ kind: 'item', item })), ...stacks];
     const picks = (shown) => {
@@ -389,10 +405,16 @@ export function mountMarket(holder) {
       ];
     };
     openSheet(
-      h('h2', { class: 'sheet-title', text: 'Wystaw na Targowisku' }),
-      h('p', { class: 'sheet-text', text: `Ofertę wystawisz na ${market.minHours}–${countOf(market.hours, 'godzinę', 'godziny', 'godzin')}. Przy sprzedaży Targowisko bierze ${formatDecimal(market.fee * 100)}% ceny.` }),
+      h('h2', { class: 'sheet-title', text: t('Wystaw na Targowisku') }),
+      h('p', {
+        class: 'sheet-text',
+        text: t('Ofertę wystawisz na {hours}. Przy sprzedaży Targowisko bierze {fee}% ceny.', {
+          hours: `${market.minHours}–${countOf(market.hours, 'godzinę', 'godziny', 'godzin')}`,
+          fee: formatDecimal(market.fee * 100),
+        }),
+      }),
       goods.length === 0
-        ? h('p', { class: 'muted', text: 'W plecaku nie ma nic do wystawienia. Założonych przedmiotów się nie wystawia.' })
+        ? h('p', { class: 'muted', text: t('W plecaku nie ma nic do wystawienia. Założonych przedmiotów się nie wystawia.') })
         : filtered(goods, goodsCategory, filters.sellable, picks),
     );
   }
@@ -413,13 +435,13 @@ export function mountMarket(holder) {
       max: longest,
       step: 1,
       value: hours,
-      'aria-label': 'Czas licytacji',
+      'aria-label': t('Czas licytacji'),
       onInput: () => set(Number(slider.value)),
     });
     const stepButton = (sign, label) =>
       h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': label, text: sign < 0 ? '−' : '+', onClick: () => set(hours + sign) });
-    const less = stepButton(-1, 'Krócej');
-    const more = stepButton(1, 'Dłużej');
+    const less = stepButton(-1, t('Krócej'));
+    const more = stepButton(1, t('Dłużej'));
     function set(next) {
       hours = Math.min(longest, Math.max(minHours, next));
       slider.value = String(hours);
@@ -433,7 +455,7 @@ export function mountMarket(holder) {
     const element = h(
       'div',
       { class: 'duration-picker' },
-      h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, 'Czas licytacji'), value),
+      h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, t('Czas licytacji')), value),
       h('div', { class: 'duration-row' }, less, slider, more),
       h('p', { class: 'duration-scale', 'aria-hidden': 'true' }, h('span', { text: text(minHours) }), h('span', { text: text(longest) })),
     );
@@ -442,15 +464,15 @@ export function mountMarket(holder) {
 
   function priceSheet(goods) {
     const { maxPrice } = market;
-    const count = goods.kind === 'item' ? null : numberField('market-count', `Ile sztuk (masz ${formatNumber(goods.count)})`, goods.count, 1, goods.count);
-    const start = numberField('market-start', 'Cena wywoławcza (zł)', null, 1, maxPrice);
-    const now = numberField('market-buy-now', '„Kup teraz” (zł, może zostać puste)', null, 1, maxPrice);
+    const count = goods.kind === 'item' ? null : numberField('market-count', t('Ile sztuk (masz {count})', { count: formatNumber(goods.count) }), goods.count, 1, goods.count);
+    const start = numberField('market-start', t('Cena wywoławcza (zł)'), null, 1, maxPrice);
+    const now = numberField('market-buy-now', t('„Kup teraz” (zł, może zostać puste)'), null, 1, maxPrice);
     const length = hoursPicker();
     const scrap = scrapText(goods.scrap, goods.kind !== 'item');
     openSheet(
       h('h2', { class: 'sheet-title', text: goods.name }),
       scrap && h('p', { class: 'muted market-scrap', text: scrap }),
-      count && h('p', { class: 'sheet-text', text: 'Cena dotyczy wszystkich wystawionych sztuk razem.' }),
+      count && h('p', { class: 'sheet-text', text: t('Cena dotyczy wszystkich wystawionych sztuk razem.') }),
       count?.element,
       start.element,
       now.element,
@@ -458,11 +480,11 @@ export function mountMarket(holder) {
       h(
         'div',
         { class: 'sheet-actions' },
-        h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+        h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }),
         h('button', {
           type: 'button',
           class: 'button button--system',
-          text: 'Wystaw',
+          text: t('Wystaw'),
           onClick: submit(
             '/api/market/list',
             () => ({
@@ -472,7 +494,7 @@ export function mountMarket(holder) {
               buyNow: now.read(true),
               hours: length.read(),
             }),
-            'Wystawione na Targowisku.',
+            t('Wystawione na Targowisku.'),
           ),
         }),
       ),
@@ -482,15 +504,17 @@ export function mountMarket(holder) {
   function mineTab() {
     const collect = (event) =>
       act(event.currentTarget, '/api/market/collect', {}, ({ collected }) =>
-        collected.left > 0 ? `Odebrane. Reszta poczeka, aż zrobisz miejsce w plecaku: ${countOf(collected.left, 'paczka', 'paczki', 'paczek')}.` : 'Odebrane.',
+        collected.left > 0
+          ? t('Odebrane. Reszta poczeka, aż zrobisz miejsce w plecaku: {parcels}.', { parcels: countOf(collected.left, 'paczka', 'paczki', 'paczek') })
+          : t('Odebrane.'),
       );
     return [
       h(
         'section',
         { class: 'stack' },
-        h('h2', { class: 'section-title', text: 'Do odebrania' }),
+        h('h2', { class: 'section-title', text: t('Do odebrania') }),
         market.parcels.length === 0
-          ? h('p', { class: 'muted', text: 'Nic na Ciebie nie czeka.' })
+          ? h('p', { class: 'muted', text: t('Nic na Ciebie nie czeka.') })
           : [
               h(
                 'ul',
@@ -500,19 +524,19 @@ export function mountMarket(holder) {
                     'li',
                     { class: 'market-pick' },
                     parcel.goods.kind === 'item' ? itemSummary(parcel.goods.item) : stackLine(parcel.goods),
-                    h('span', { class: 'muted market-reason', text: REASONS[parcel.reason] ?? '' }),
+                    h('span', { class: 'muted market-reason', text: REASONS[parcel.reason] ? t(REASONS[parcel.reason]) : '' }),
                   ),
                 ),
               ),
-              h('button', { type: 'button', class: 'button button--system', text: 'Odbierz wszystko', onClick: collect }),
+              h('button', { type: 'button', class: 'button button--system', text: t('Odbierz wszystko'), onClick: collect }),
             ],
       ),
       h(
         'section',
         { class: 'stack' },
-        h('h2', { class: 'section-title', text: `Moje oferty: ${market.mine.length} z ${market.limit}` }),
-        h('p', { class: 'muted', text: 'Każdy kolejny stopień reputacji Kompanii Kupców daje miejsce na jeszcze jedną ofertę.' }),
-        h('button', { type: 'button', class: 'button button--world', text: 'Wystaw', disabled: market.mine.length >= market.limit, onClick: listSheet }),
+        h('h2', { class: 'section-title', text: t('Moje oferty: {count} z {all}', { count: market.mine.length, all: market.limit }) }),
+        h('p', { class: 'muted', text: t('Każdy kolejny stopień reputacji Kompanii Kupców daje miejsce na jeszcze jedną ofertę.') }),
+        h('button', { type: 'button', class: 'button button--world', text: t('Wystaw'), disabled: market.mine.length >= market.limit, onClick: listSheet }),
         market.mine.length > 0 && h('ul', { class: 'stack market-list' }, market.mine.map(offerCard)),
       ),
     ];
@@ -520,28 +544,34 @@ export function mountMarket(holder) {
 
   function merchantSheet(good) {
     const most = Math.min(good.left, Math.max(1, Math.floor(state.character.gold / good.price)));
-    const field = numberField('market-merchant-count', 'Ile sztuk', 1, 1, most);
+    const field = numberField('market-merchant-count', t('Ile sztuk'), 1, 1, most);
     openSheet(
       h('h2', { class: 'sheet-title', text: good.name }),
-      h('p', { class: 'sheet-text', text: `${formatNumber(good.price)} zł za sztukę. Dziś możesz kupić jeszcze ${formatNumber(good.left)} szt.` }),
+      h('p', { class: 'sheet-text', text: t('{gold} zł za sztukę. Dziś możesz kupić jeszcze {left} szt.', { gold: formatNumber(good.price), left: formatNumber(good.left) }) }),
       field.element,
       h(
         'div',
         { class: 'sheet-actions' },
-        h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+        h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }),
         h('button', {
           type: 'button',
           class: 'button button--system',
-          text: 'Kup',
-          onClick: submit('/api/market/resident', () => ({ from: 'merchant', id: good.id, count: field.read() }), ({ bought }) => `Kupione: ${bought.name} ×${formatNumber(bought.count)}.`),
+          text: t('Kup'),
+          onClick: submit('/api/market/resident', () => ({ from: 'merchant', id: good.id, count: field.read() }), ({ bought }) =>
+            t('Kupione: {name} ×{count}.', { name: bought.name, count: formatNumber(bought.count) }),
+          ),
         }),
       ),
     );
   }
 
   async function buyItem(good, button) {
-    const sure = await confirmAction({ title: 'Kupić przedmiot?', text: `${good.name} za ${formatNumber(good.price)} zł. Trafi prosto do plecaka.`, confirmLabel: 'Kup' });
-    if (sure) act(button, '/api/market/resident', { from: 'wanderer', id: good.id }, ({ bought }) => `${bought.name}: w plecaku.`);
+    const sure = await confirmAction({
+      title: t('Kupić przedmiot?'),
+      text: t('{name} za {gold} zł. Trafi prosto do plecaka.', { name: good.name, gold: formatNumber(good.price) }),
+      confirmLabel: t('Kup'),
+    });
+    if (sure) act(button, '/api/market/resident', { from: 'wanderer', id: good.id }, ({ bought }) => t('{name}: w plecaku.', { name: bought.name }));
   }
 
   function residentsTab() {
@@ -551,12 +581,15 @@ export function mountMarket(holder) {
       h(
         'section',
         { class: 'stack' },
-        h('h2', { class: 'section-title', text: 'Kupiec' }),
-        h('p', { class: 'muted' }, 'Towar i ceny zmieniają się codziennie. Nowe za ', clock(merchant.endsAt), '.'),
+        h('h2', { class: 'section-title', text: t('Kupiec') }),
+        h('p', { class: 'muted' }, t('Towar i ceny zmieniają się codziennie. Nowe za '), clock(merchant.endsAt), '.'),
         // The relation with him lowers his prices (287 A).
         h('p', {
           class: 'muted',
-          text: merchant.discount > 0 ? `Dzięki relacji z Gościwitem ceny są niższe o ${formatDecimal(merchant.discount * 100)}%.` : 'Z lepszą relacją z Gościwitem ceny będą niższe.',
+          text:
+            merchant.discount > 0
+              ? t('Dzięki relacji z Gościwitem ceny są niższe o {discount}%.', { discount: formatDecimal(merchant.discount * 100) })
+              : t('Z lepszą relacją z Gościwitem ceny będą niższe.'),
         }),
         h(
           'ul',
@@ -566,21 +599,21 @@ export function mountMarket(holder) {
               'li',
               { class: 'card market-offer' },
               stackButton(good, { count: false }, () => [
-                h('p', { class: 'market-price', text: `Kupiec: ${formatNumber(good.price)} zł za sztukę, dziś jeszcze ${formatNumber(good.left)} szt.` }),
+                h('p', { class: 'market-price', text: t('Kupiec: {gold} zł za sztukę, dziś jeszcze {left} szt.', { gold: formatNumber(good.price), left: formatNumber(good.left) }) }),
                 h('button', {
                   type: 'button',
                   class: 'button button--world',
-                  text: 'Kup',
+                  text: t('Kup'),
                   disabled: good.left < 1 || state.character.gold < good.price,
                   onClick: () => merchantSheet(good),
                 }),
               ]),
-              h('p', { class: 'market-price', text: `${formatNumber(good.price)} zł za sztukę` }),
-              h('p', { class: 'muted', text: good.left > 0 ? `Dziś jeszcze ${formatNumber(good.left)} szt.` : 'Na dziś wykupione.' }),
+              h('p', { class: 'market-price', text: t('{gold} zł za sztukę', { gold: formatNumber(good.price) }) }),
+              h('p', { class: 'muted', text: good.left > 0 ? t('Dziś jeszcze {left} szt.', { left: formatNumber(good.left) }) : t('Na dziś wykupione.') }),
               h(
                 'div',
                 { class: 'settlement-actions' },
-                h('button', { type: 'button', class: 'button button--world button--small', text: 'Kup', disabled: good.left < 1 || gold < good.price, onClick: () => merchantSheet(good) }),
+                h('button', { type: 'button', class: 'button button--world button--small', text: t('Kup'), disabled: good.left < 1 || gold < good.price, onClick: () => merchantSheet(good) }),
               ),
             ),
           ),
@@ -589,10 +622,10 @@ export function mountMarket(holder) {
       h(
         'section',
         { class: 'stack' },
-        h('h2', { class: 'section-title', text: 'Wędrowny handlarz' }),
+        h('h2', { class: 'section-title', text: t('Wędrowny handlarz') }),
         wanderer.goods
           ? [
-              h('p', { class: 'muted' }, 'Przyszedł tylko na dziś. Odejdzie za ', clock(wanderer.endsAt), '.'),
+              h('p', { class: 'muted' }, t('Przyszedł tylko na dziś. Odejdzie za '), clock(wanderer.endsAt), '.'),
               h(
                 'ul',
                 { class: 'stack market-list' },
@@ -601,22 +634,22 @@ export function mountMarket(holder) {
                     'li',
                     { class: 'card market-offer' },
                     itemEntry(good.item, `wanderer:${good.id}`, opened),
-                    h('p', { class: 'market-price', text: `${formatNumber(good.price)} zł` }),
+                    h('p', { class: 'market-price', text: t('{gold} zł', { gold: formatNumber(good.price) }) }),
                     h(
                       'div',
                       { class: 'settlement-actions' },
                       good.bought
-                        ? h('span', { class: 'market-leading', text: 'Kupione' })
-                        : h('button', { type: 'button', class: 'button button--world button--small', text: 'Kup', disabled: gold < good.price, onClick: (event) => buyItem(good, event.currentTarget) }),
+                        ? h('span', { class: 'market-leading', text: t('Kupione') })
+                        : h('button', { type: 'button', class: 'button button--world button--small', text: t('Kup'), disabled: gold < good.price, onClick: (event) => buyItem(good, event.currentTarget) }),
                     ),
                   ),
                 ),
               ),
             ]
           : wanderer.startsAt > serverNow()
-            ? h('p', { class: 'muted' }, 'Przychodzi raz w tygodniu na jeden dzień. Będzie za ', clock(wanderer.startsAt), '.')
+            ? h('p', { class: 'muted' }, t('Przychodzi raz w tygodniu na jeden dzień. Będzie za '), clock(wanderer.startsAt), '.')
             // The author's words (1.11.2026).
-            : h('p', { class: 'muted', text: 'W tym tygodniu już go tu nie uświadczysz. Wyczekuj w kolejnym.' }),
+            : h('p', { class: 'muted', text: t('W tym tygodniu już go tu nie uświadczysz. Wyczekuj w kolejnym.') }),
       ),
     ];
   }
@@ -655,13 +688,13 @@ export function mountMarket(holder) {
       return;
     }
     if (!market) {
-      holder.replaceChildren(h('p', { class: 'muted', text: 'Wczytywanie Targowiska…' }));
+      holder.replaceChildren(h('p', { class: 'muted', text: t('Wczytywanie Targowiska…') }));
       return;
     }
     const body =
       tab === 'offers'
         ? market.offers.length === 0
-          ? h('p', { class: 'muted', text: 'Nikt nic teraz nie wystawia.' })
+          ? h('p', { class: 'muted', text: t('Nikt nic teraz nie wystawia.') })
           : filtered(market.offers, (offer) => goodsCategory(offer.goods), filters.offers, (shown) => h('ul', { class: 'stack market-list' }, shown.map(offerCard)))
         : tab === 'mine'
           ? mineTab()
@@ -673,14 +706,17 @@ export function mountMarket(holder) {
         h(
           'section',
           { class: 'card market-intro', 'data-guide': 'market-intro' },
-          howItWorks(`Licytacja trwa od ${countOf(market.minHours, 'godziny', 'godzin', 'godzin')} do ${market.hours} godzin, tyle, ile wybierze wystawiający.`, [
-            `Przebity gracz od razu dostaje złoto z powrotem, a Targowisko bierze ${formatDecimal(market.fee * 100)}% ceny sprzedaży.`,
-            `Handel daje reputację Kompanii Kupców, dziś ${market.trade.today} z ${market.trade.daily} pkt.${tradePace(market.trade)} Postacie z jednego konta nie kupują od siebie.`,
-          ]),
+          howItWorks(
+            t('Licytacja trwa od {from} do {to} godzin, tyle, ile wybierze wystawiający.', { from: countOf(market.minHours, 'godziny', 'godzin', 'godzin'), to: market.hours }),
+            [
+              t('Przebity gracz od razu dostaje złoto z powrotem, a Targowisko bierze {fee}% ceny sprzedaży.', { fee: formatDecimal(market.fee * 100) }),
+              `${t('Handel daje reputację Kompanii Kupców, dziś {today} z {daily} pkt.', { today: market.trade.today, daily: market.trade.daily })}${tradePace(market.trade)} ${t('Postacie z jednego konta nie kupują od siebie.')}`,
+            ],
+          ),
         ),
         h(
           'div',
-          { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': 'Targowisko' },
+          { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': t('Targowisko') },
           TABS.map(([id, label]) =>
             h(
               'button',
@@ -695,8 +731,8 @@ export function mountMarket(holder) {
                   render();
                 },
               },
-              h('span', { class: 'chat-tab-name', text: label }),
-              id === 'mine' && market.parcels.length > 0 && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'czeka do odebrania' }),
+              h('span', { class: 'chat-tab-name', text: t(label) }),
+              id === 'mine' && market.parcels.length > 0 && h('span', { class: 'community-dot', role: 'img', 'aria-label': t('czeka do odebrania') }),
             ),
           ),
         ),
