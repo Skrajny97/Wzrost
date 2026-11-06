@@ -1,6 +1,6 @@
 {
-  "$comment": "The English names of the game's key words, a draft that waits for the author's review, item by item (691 A), before stage 2. `en` is the name the translations use now; `or` the other one where Claude hesitates, for the author to choose. The translations of the code (strings.json) and of the data (data/en/) must use `en` wherever their Polish is the word itself (tools/i18n-check.mjs).",
-  "status": "draft",
+  "$comment": "The English names of the game's key words, approved by the author on 6.11.2026 (691 A, 705-707): `en` is the name the translations use. The translations of the code (strings.json) and of the data (data/en/) must use `en` wherever their Polish is the word itself (tools/i18n-check.mjs).",
+  "status": "approved",
   "groups": [
     {
       "id": "tabs",
@@ -283,8 +283,7 @@
         {
           "pl": "Warownia",
           "en": "Stronghold",
-          "note": "„Fortress” zgodne z id, ale „Stronghold” lepiej brzmi dla obozu, który urósł",
-          "or": "Fortress"
+          "note": "„Fortress” zgodne z id, ale „Stronghold” lepiej brzmi dla obozu, który urósł"
         },
         {
           "pl": "Drewno",
@@ -310,8 +309,7 @@
         {
           "pl": "Tablica zleceń",
           "en": "Order Board",
-          "note": "zlecenia mieszkańców; „Job Board” brzmi współcześnie",
-          "or": "Notice Board"
+          "note": "zlecenia mieszkańców; „Job Board” brzmi współcześnie"
         },
         {
           "pl": "Pracownia Zaklinaczki",
@@ -336,8 +334,7 @@
         {
           "pl": "Targowisko",
           "en": "Marketplace",
-          "note": "dosłownie; „Market” krótsze",
-          "or": "Market"
+          "note": "dosłownie; „Market” krótsze"
         },
         {
           "pl": "Garbarnia",
@@ -357,8 +354,7 @@
         {
           "pl": "Salon Gier",
           "en": "Games Parlour",
-          "note": "loteria i koło fortuny; „Casino” nie pasuje do wsi",
-          "or": "Game Hall"
+          "note": "loteria i koło fortuny; „Casino” nie pasuje do wsi"
         },
         {
           "pl": "Sala prób",
@@ -405,14 +401,12 @@
         {
           "pl": "Błędnica",
           "en": "Bwendnitsa",
-          "note": "zapis fonetyczny: „ł” czyta się jak „w”, „ę” jak „en”",
-          "or": "Blendnitsa"
+          "note": "zapis fonetyczny: „ł” czyta się jak „w”, „ę” jak „en”"
         },
         {
           "pl": "Płanetnik",
           "en": "Pwanetnik",
-          "note": "zapis fonetyczny; „Planetnik” Anglik przeczyta jak „planeta”",
-          "or": "Planetnik"
+          "note": "zapis fonetyczny; „Planetnik” Anglik przeczyta jak „planeta”"
         },
         {
           "pl": "Upiór",
@@ -474,6 +468,26 @@
           "pl": "Wejrzyj do miejsca pełnego wyzwań dla śmiałków",
           "en": "Look into a place full of challenges for the daring",
           "note": "hasło gry, dosłownie (694 A)"
+        },
+        {
+          "pl": "Kamień węgielny",
+          "en": "Cornerstone",
+          "note": "kamień Warowni na planszy obozu (707)"
+        },
+        {
+          "pl": "Zbieracz Systemu",
+          "en": "System Collector",
+          "note": "zbieracz rzeczy na planszy obozu (707)"
+        },
+        {
+          "pl": "Trudna wyprawa",
+          "en": "Hard exploration",
+          "note": "wyprawa z większą nagrodą (707)"
+        },
+        {
+          "pl": "Omdlenie",
+          "en": "Fainting",
+          "note": "gdy postać przegra wyprawę (707)"
         }
       ]
     }
