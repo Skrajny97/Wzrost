@@ -36,7 +36,11 @@
 // event's ambush), strike the one standing furthest back (an attack's
 // `target: "back"`, Atak na tył szyku: the same one draw as any monster's
 // choice of target) or burn the whole party (an effect's `all`, Ognista
-// nawałnica: one more chance for each other member).
+// nawałnica: one more chance for each other member). A creature may hide in
+// the dark (`hidden`, Ukryty w mroku: the party chooses it only once no
+// creature without it fights on; blows at many strike it as any) or strike
+// the whole line (an attack's `cleave`, Cios w cały szyk: its chosen target
+// at full strength, each other member at that share).
 //
 // An evolved character (evolutions.js) brings its trait (`feat`) and the
 // evolution's skills. A stance wakes at the start of the character's move,
@@ -516,13 +520,26 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     return opponents.filter((unit) => (DEPTH[unit.position] ?? 0) === depth);
   };
 
+  // Ukryty w mroku (666: a creature `hidden` in monsters.json): those a
+  // unit may choose for a blow of its own. A hidden one is not chosen while
+  // one without it still fights beside it; once only hidden ones are left,
+  // they are chosen as any. Blows at many (a sweep, a cloud, a splash, a
+  // pierce going on, a whirl) and answers to a blow strike it as any other.
+  // Draws no random numbers.
+  const inSight = (opponents) => {
+    if (!opponents.some((unit) => unit.hidden)) return opponents;
+    const plain = opponents.filter((unit) => !unit.hidden);
+    return plain.length > 0 ? plain : opponents;
+  };
+
   const pickTarget = (actor, opponents) => {
     const taunt = evolving ? challenger(opponents) : null;
     if (taunt) return taunt;
-    if (actor.side === 'ally') return quickestKill(actor, opponents);
+    const seen = inSight(opponents);
+    if (actor.side === 'ally') return quickestKill(actor, seen);
     // Atak na tył szyku (463: a monster's attack with `target: "back"`):
     // the one standing furthest back, by the same draw among equals.
-    return rng.weighted(actor.weapon.target === 'back' ? hindmost(opponents) : opponents, weightOf);
+    return rng.weighted(actor.weapon.target === 'back' ? hindmost(seen) : seen, weightOf);
   };
 
   // An effect over time from a blow: the target's Will may keep it off, and
@@ -733,9 +750,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         if (evolving && target.feat?.kind === 'shadowStep') target.nextBlow = target.feat.afterDodge;
         if (evading && actor.hp > 0) {
           strike(target, actor, t, { counter: true, power: evading.counter, undodgeable: true });
-          // Taniec ostrzy: a cut at a random foe besides the counter.
+          // Taniec ostrzy: a cut at a random foe besides the counter, one
+          // in sight (Ukryty w mroku).
           const foes = evading.blades && target.hp > 0 ? foesOf(target) : NO_SKILLS;
-          if (foes.length > 0) strike(target, rng.pick(foes), t, { skill: evading.skill, power: evading.blades, undodgeable: true, blade: true });
+          if (foes.length > 0) strike(target, rng.pick(inSight(foes)), t, { skill: evading.skill, power: evading.blades, undodgeable: true, blade: true });
         } else if (evolving && target.riposte && actor.hp > 0 && target.hp > 0) {
           const { skill, power, dot } = target.riposte;
           strike(target, actor, t, { skill, counter: true, power, undodgeable: true, dot });
@@ -895,8 +913,26 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     }
   };
 
-  // The opponent standing furthest back, the quickest kill among equals.
-  const furthestBack = (actor, opponents) => pickTarget(actor, hindmost(opponents));
+  // The opponent standing furthest back, the quickest kill among equals,
+  // of those in sight (Ukryty w mroku): a hidden one at the back is passed
+  // over while one without it stands further forward.
+  const furthestBack = (actor, opponents) => pickTarget(actor, hindmost(inSight(opponents)));
+
+  // A plain blow at the one the unit chooses. Cios w cały szyk (666: a
+  // monster's attack with `cleave`): each other member of the other side
+  // still standing takes the blow too, at that share of its power, each on
+  // its own (a dodge, a critical blow and the blow's effect for each), at
+  // once as a sweep's blows land. Without it, the same draws as one blow.
+  const plainBlow = (actor, opponents, t) => {
+    const target = pickTarget(actor, opponents);
+    strike(actor, target, t);
+    const share = actor.weapon.cleave;
+    if (!share) return;
+    for (const other of opponents) {
+      if (other === target || other.hp <= 0 || actor.hp <= 0) continue;
+      strike(actor, other, t, { power: share, sweep: true });
+    }
+  };
 
   // The one standing right behind a unit (Przebijający strzał), if anyone.
   const behind = (target, opponents) => {
@@ -909,14 +945,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
 
   // Who a skill's blow goes to: the back (Cios w plecy, Egzekucja), the foe
   // with the most HP (Strzał z ukrycia), the weakest of those below the
-  // mark (Wyrok), else the usual target.
+  // mark (Wyrok), else the usual target; each of those in sight (Ukryty w
+  // mroku).
   const skillTarget = (actor, opponents, p) => {
-    if (p.target === 'back') return furthestBack(actor, opponents);
-    if (p.target === 'strongest') return opponents.reduce((best, unit) => (unit.hp > best.hp ? unit : best));
+    const seen = inSight(opponents);
+    if (p.target === 'back') return furthestBack(actor, seen);
+    if (p.target === 'strongest') return seen.reduce((best, unit) => (unit.hp > best.hp ? unit : best));
     if (p.below !== undefined) {
-      return opponents.filter((unit) => unit.hp < p.below * unit.maxHp).reduce((best, unit) => (!best || unit.hp / unit.maxHp < best.hp / best.maxHp ? unit : best), null);
+      return seen.filter((unit) => unit.hp < p.below * unit.maxHp).reduce((best, unit) => (!best || unit.hp / unit.maxHp < best.hp / best.maxHp ? unit : best), null);
     }
-    return pickTarget(actor, opponents);
+    return pickTarget(actor, seen);
   };
 
   // Opiekun: a heal takes one bad effect off as well (Łaska: every one).
@@ -929,12 +967,12 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   };
 
   // A summon's move: the elemental strikes a random foe with the element it
-  // is weakest to, the slime poisons one.
+  // is weakest to, the slime poisons one, a foe in sight (Ukryty w mroku).
   const summonActs = (actor, t) => {
     const summon = actor.summon;
     const foes = foesOf(actor);
     if (!summon || foes.length === 0) return;
-    const foe = rng.pick(foes);
+    const foe = rng.pick(inSight(foes));
     // A wolf, an ent, a bear or a skeleton strikes with its claws, branches
     // or sword: a physical blow, which may miss, the skeleton's with its
     // poison (Wskrzeszenie).
@@ -983,9 +1021,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         if (!party.some((unit) => unit.hp < p.below * unit.maxHp)) continue;
       }
       // Strzał z ukrycia works only on the first move; Wyrok waits for a foe
-      // below its mark.
+      // in sight below its mark.
       if (p.opener && actor.moves > 0) continue;
-      if (p.below !== undefined && skill.kind === 'strike' && !opponents.some((unit) => unit.hp < p.below * unit.maxHp)) continue;
+      if (p.below !== undefined && skill.kind === 'strike' && !inSight(opponents).some((unit) => unit.hp < p.below * unit.maxHp)) continue;
       // A character has one summon at a time: another summoning skill (the
       // Druid's ent and bear) waits until the one standing falls or goes.
       if (skill.kind === 'summon' && actor.summon) continue;
@@ -1236,9 +1274,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           if (foe.hp > 0 && actor.hp > 0) strike(actor, foe, t, { skill, power: stance.power, category: stance.category, element: stance.element, sweep: true, cloud: true });
         }
       } else if (stance.pet) {
-        // A falcon pecks; Kula piorunów strikes with lightning.
+        // A falcon pecks; Kula piorunów strikes with lightning: a foe in
+        // sight (Ukryty w mroku).
         const foes = foesOf(actor);
-        if (foes.length > 0) strike(actor, rng.pick(foes), t, { skill, power: stance.power, undodgeable: true, category: stance.category, element: stance.element, pet: true });
+        if (foes.length > 0) strike(actor, rng.pick(inSight(foes)), t, { skill, power: stance.power, undodgeable: true, category: stance.category, element: stance.element, pet: true });
       } else if (stance.regen) {
         for (const member of units) {
           if (member.side !== actor.side || member.hp <= 0) continue;
@@ -1346,9 +1385,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     }
 
     const opponents = alive.filter((unit) => unit.side !== actor.side && unit.hp > 0);
-    if (!skilled) strike(actor, pickTarget(actor, opponents), t);
+    if (!skilled) plainBlow(actor, opponents, t);
     else {
-      if (!useSkill(actor, opponents, t)) strike(actor, pickTarget(actor, opponents), t);
+      if (!useSkill(actor, opponents, t)) plainBlow(actor, opponents, t);
       actor.moves += 1;
     }
   }

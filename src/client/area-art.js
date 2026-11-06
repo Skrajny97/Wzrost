@@ -276,6 +276,88 @@ ${[[33, 100], [51, 100], [69, 100], [87, 100], [42, 84], [60, 84], [78, 84], [51
 <path d="M20 90 V30 M20 48 l-8 -8 M48 92 V22 M48 40 l7 -7 M84 90 V34 M84 52 l-7 -6 M104 92 V44" stroke="#120f0c" stroke-width="4" fill="none" stroke-linecap="round"></path>
 <circle cx="30" cy="100" r="1.6" fill="#ff8a3d"></circle><circle cx="66" cy="96" r="1.4" fill="#ff8a3d"></circle><circle cx="94" cy="104" r="1.8" fill="#ff8a3d"></circle>
 <path d="M58 30 q4 -6 8 0 M70 22 q3 -4 6 0" stroke="#ff8a3d" stroke-width="1" fill="none" opacity="0.7"></path>`,
+
+  // Głucha Knieja (151–175), until their drawn scenes come.
+  // Świerkowy Zmrok: close dark spruces, two yellow eyes in the gloom.
+  'spruce-dusk': `${NIGHT}
+<path d="M0 92 Q60 84 120 92 V120 H0 Z" fill="#141b11"></path>
+<path d="M4 96 L20 24 L36 96 Z M30 98 L50 14 L70 98 Z M62 98 L82 20 L102 98 Z M94 96 L110 36 L126 96 Z" fill="#14231a" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M12 70 l8 -6 l8 6 M40 64 l10 -8 l10 8 M72 66 l10 -8 l10 8" stroke="#22382a" stroke-width="1.4" fill="none"></path>
+<circle cx="56" cy="80" r="1.6" fill="#e8c547"></circle><circle cx="62" cy="80" r="1.6" fill="#e8c547"></circle>`,
+
+  // Paprociowy Gąszcz: ferns waist-high, a pale mantis above them.
+  'fern-thicket': `${SKY}
+<path d="M0 88 Q60 80 120 88 V120 H0 Z" fill="#172014"></path>
+<path d="M10 120 C14 96 26 84 40 78 M30 120 C34 98 48 86 62 82 M58 120 C60 100 72 88 88 84 M84 120 C88 98 100 90 116 86" stroke="#3f6b35" stroke-width="2.4" fill="none" stroke-linecap="round"></path>
+<path d="M18 100 l-6 -3 M22 94 l-6 -4 M28 88 l-5 -5 M40 102 l-6 -3 M46 94 l-5 -5 M66 102 l-6 -3 M72 94 l-5 -5 M92 102 l-6 -3 M98 96 l-5 -5" stroke="#4f8a42" stroke-width="1.6" fill="none" stroke-linecap="round"></path>
+<path d="M98 62 V40 M98 44 l-6 -8 l-2 6 M98 44 l6 -8 l2 6 M96 36 h4" stroke="#c9c2a0" stroke-width="1.4" fill="none" stroke-linecap="round"></path>`,
+
+  // Zapomniany Trakt: an overgrown road and a cart's wheel left by it.
+  'forgotten-track': `${NIGHT}
+<path d="M0 84 Q60 76 120 84 V120 H0 Z" fill="#1a1712"></path>
+<path d="M44 120 L56 84 H64 L76 120 Z" fill="#3a2e22"></path>
+<path d="M48 112 l3 -6 M66 106 l3 -6 M58 96 l2 -5" stroke="#3f6b35" stroke-width="1.4" stroke-linecap="round"></path>
+<circle cx="94" cy="98" r="12" fill="none" stroke="#6b4a2c" stroke-width="2.4"></circle>
+<path d="M94 86 V110 M82 98 H106 M86 90 L102 106 M102 90 L86 106" stroke="#6b4a2c" stroke-width="1.4"></path>
+<path d="M10 90 V36 M22 92 V28" stroke="#2b2219" stroke-width="5" stroke-linecap="round"></path>`,
+
+  // Mszysty Wądół: mossy slopes of a ravine, a cold stream, a root plate.
+  'mossy-dell': `${NIGHT}
+<path d="M0 28 Q24 60 40 120 H0 Z" fill="#24361f"></path>
+<path d="M120 24 Q96 60 80 120 H120 Z" fill="#2f4a2a"></path>
+<path d="M50 120 Q58 96 62 70 Q66 96 72 120 Z" fill="#8fd3ff" opacity="0.35"></path>
+<circle cx="28" cy="64" r="11" fill="#3a2e22" stroke="${LINE}" stroke-width="0.8"></circle>
+<path d="M28 64 l-14 -6 M28 64 l-12 8 M28 64 l2 -14 M28 64 l12 4" stroke="#6b4a2c" stroke-width="1.4"></path>
+<path d="M98 36 v18 c-5 4 5 8 0 13" stroke="${LINE}" stroke-width="1" fill="none"></path>`,
+
+  // Matecznik: a dense den of black spruces, bones and an antler, white eyes.
+  'wild-den': `${NIGHT}
+<path d="M0 86 Q60 78 120 86 V120 H0 Z" fill="#1b1612"></path>
+<path d="M0 86 L14 30 L26 86 Z M18 86 L34 20 L48 86 Z M76 86 L92 18 L108 86 Z M98 86 L112 34 L126 86 Z" fill="#14231a"></path>
+<path d="M40 104 h18 M42 101 v6 M56 101 v6 M70 98 l12 8" stroke="#e7dcc2" stroke-width="1.6" fill="none" stroke-linecap="round"></path>
+<path d="M58 72 c-6 -6 -4 -14 2 -18 M54 62 l-6 -4 M60 56 l6 -5" stroke="#d8cfb4" stroke-width="1.4" fill="none" stroke-linecap="round"></path>
+<circle cx="86" cy="70" r="1.6" fill="#f2f2f2"></circle><circle cx="92" cy="70" r="1.6" fill="#f2f2f2"></circle>`,
+
+  // Ostępy Nowiu (176–200), until their drawn scenes come.
+  // Skrzypiące Sosny: huge old pines hung with grey beards of lichen.
+  'creaking-pines': `${NIGHT}
+<path d="M0 92 Q60 84 120 92 V120 H0 Z" fill="#141b11"></path>
+<path d="M24 96 V10 M64 98 V6 M100 96 V14" stroke="#5a3e28" stroke-width="9" stroke-linecap="round"></path>
+<path d="M10 20 Q24 10 38 20 Q24 26 10 20 Z M48 14 Q64 2 80 14 Q64 22 48 14 Z M86 22 Q100 12 114 22 Q100 28 86 22 Z" fill="#2f4a2a"></path>
+<path d="M30 30 v12 M34 34 v10 M60 26 v14 M70 30 v10 M96 34 v12" stroke="#b5b8ab" stroke-width="1.6" stroke-linecap="round"></path>`,
+
+  // Próchniejące Pnie: fallen trunks glowing green with rot, a puffball.
+  'rotting-logs': `${NIGHT}
+<path d="M0 90 Q60 82 120 90 V120 H0 Z" fill="#17140f"></path>
+<path d="M6 96 L80 82 L84 94 L10 108 Z" fill="#4a3d2c" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M40 112 L114 98 L116 108 L42 120 Z" fill="#3a2e22" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M20 98 h6 M40 94 h8 M60 90 h6 M60 108 h6 M82 104 h8" stroke="#8ee07a" stroke-width="1.6" opacity="0.8" stroke-linecap="round"></path>
+<circle cx="96" cy="72" r="7" fill="#a89a7a"></circle><path d="M92 64 q4 -8 8 0" stroke="#c9c2a0" stroke-width="1" fill="none" opacity="0.6"></path>`,
+
+  // Czarcie Rozdroże: four paths meeting, a straw chochoł at the crossing.
+  'devils-crossroads': `${NIGHT}
+<path d="M0 70 Q60 62 120 70 V120 H0 Z" fill="#1b1a14"></path>
+<path d="M0 96 L120 84 M20 70 L100 120 M100 70 L20 120" stroke="#3a2e22" stroke-width="7" stroke-linecap="round"></path>
+<path d="M60 40 L48 88 H72 Z" fill="#c9a24a" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M60 44 l-14 14 M60 44 l14 14 M60 34 v8" stroke="#c9a24a" stroke-width="2" stroke-linecap="round"></path>
+<circle cx="96" cy="30" r="1.2" fill="#e7dcc2"></circle><circle cx="20" cy="24" r="1" fill="#e7dcc2"></circle>`,
+
+  // Morowe Mogiły: forgotten mounds with crosses, a belfry with its bell.
+  'plague-graves': `${NIGHT}
+<path d="M0 88 Q60 80 120 88 V120 H0 Z" fill="#1a1d17"></path>
+<path d="M8 104 Q22 88 36 104 Z M44 110 Q60 94 76 110 Z M82 104 Q96 90 110 104 Z" fill="#2b2a22" stroke="${LINE}" stroke-width="0.8"></path>
+<path d="M22 92 v-10 M18 86 h8 M60 98 v-12 M56 90 h8" stroke="#6b5a3e" stroke-width="1.6"></path>
+<path d="M88 76 V36 H104 V76 M86 36 L96 26 L106 36" stroke="#4a3d2c" stroke-width="2" fill="none"></path>
+<path d="M92 50 q4 -8 8 0 v4 h-8 Z" fill="#8a8370"></path>`,
+
+  // Zaćmiona Polana: a glade under a black moon in a pale ring, yellow eyes.
+  'eclipsed-glade': `${NIGHT}
+<circle cx="60" cy="34" r="16" fill="#e7dcc2" opacity="0.35"></circle>
+<circle cx="60" cy="34" r="14" fill="#0b0d10"></circle>
+<path d="M0 80 Q60 70 120 80 V120 H0 Z" fill="#141b11"></path>
+<path d="M0 80 L10 44 L20 80 Z M100 80 L110 40 L120 80 Z" fill="#0f1a10"></path>
+<path d="M30 100 q4 -6 8 0 M50 108 q4 -6 8 0 M78 102 q4 -6 8 0" stroke="#3f6b35" stroke-width="1.6" fill="none"></path>
+<circle cx="88" cy="90" r="1.4" fill="#e8c547"></circle><circle cx="93" cy="90" r="1.4" fill="#e8c547"></circle>`,
 };
 
 // For a place without its own scene yet: a few trees.

@@ -50,8 +50,8 @@ describe('the Wieże Systemu', () => {
       if (floor % CHAMPION === 0 && area.champion) assert.equal(encounter.members[0].monsterId, area.champion, `floor ${floor}`);
       else if (lap(floor) % 2 === 0 && area.elite) assert.equal(encounter.members[0].monsterId, area.elite, `floor ${floor}`);
     }
-    // A lap is as long as the inner regions are many (30 with Sosnowe
-    // Wydmy), so the floors of each lap follow from the data.
+    // A lap is as long as the inner regions are many (40 with Ostępy
+    // Nowiu), so the floors of each lap follow from the data.
     const regions = content.areas.length;
     const fifths = (from, to) => Array.from({ length: to - from + 1 }, (_, index) => from + index).filter((floor) => floor % 5 === 0);
     assert.ok(fifths(1, regions).every((floor) => towerEliteFloor(floor, content)), 'the first lap keeps its elites');
@@ -85,7 +85,7 @@ describe('the Wieże Systemu', () => {
 
   test('every creature of every region comes on some floor, those of each land\'s last region too, as usual creatures (484 A)', () => {
     // The first four laps of the regions, or as many as the champions'
-    // floors take to come round to every region (five with 30 regions and
+    // floors take to come round to every region (five with 40 regions and
     // every 25th floor), many climbs on each floor.
     const met = new Map(content.areas.map((area) => [area.id, new Set()]));
     const usual = new Map(content.areas.map((area) => [area.id, new Set()]));

@@ -23,6 +23,7 @@
       "elite": { "type": "boolean" },
       "champion": { "type": "boolean", "description": "Czempion: najsilniejszy stwór regionu. Spotyka się go tylko w regionie wewnętrznym, który go wskazuje (champion w regions.json)." },
       "ambush": { "type": "boolean", "description": "Zasadzka (464): walka, w której jest ten stwór, zaczyna się od ruchów stworów, wszystkich przed pierwszym ruchem drużyny, jak zasadzka w zdarzeniach." },
+      "hidden": { "type": "boolean", "description": "Ukryty w mroku (666): drużyna nie wybiera tego stwora na cel, dopóki walczy obok niego stwór bez tej cechy; gdy zostaną same ukryte, bije je normalnie. Ciosy w kilku wrogów naraz (zamach, chmura, rozprysk, przebicie, wir) trafiają go jak każdego." },
       "stats": {
         "type": "object",
         "additionalProperties": false,
@@ -58,6 +59,7 @@
             }
           },
           "target": { "enum": ["back"], "description": "Atak na tył szyku (463): stwór bije postać stojącą najdalej z tyłu, a gdy tył jest pusty, najdalej z tyłu z żywych." },
+          "cleave": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Cios w cały szyk (666): po ciosie w wybrany cel stwór bije też każdego innego żywego członka drużyny, z taką częścią siły ciosu, każdego osobno (unik, krytyk i efekt ciosu dla każdego), np. 0.6 (Księżycożerca)." },
           "slow": {
             "type": "object",
             "description": "Ugrzęźnięcie: z szansą chance (mniejszą o Wolę celu) następny ruch celu przychodzi później, 1 / (1 - slow) razy później.",

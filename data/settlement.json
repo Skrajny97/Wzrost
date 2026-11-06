@@ -700,7 +700,17 @@
       { "area": "resin-pinewood", "monster": "resin-golem", "name": "Bursztynowy Żywicznik" },
       { "area": "drifting-sands", "monster": "barrow-wight", "name": "Kurhannik Wódz" },
       { "area": "tar-pits", "monster": "tar-burner", "name": "Smolarz Podpalacz" },
-      { "area": "burnt-forest", "monster": "ash-wraith", "name": "Popielec Żałobnik" }
+      { "area": "burnt-forest", "monster": "ash-wraith", "name": "Popielec Żałobnik" },
+      { "area": "spruce-dusk", "monster": "needleback", "name": "Iglak Skoczek" },
+      { "area": "fern-thicket", "monster": "mantis", "name": "Blada Modliszka", "female": true },
+      { "area": "forgotten-track", "monster": "ghost-coachman", "name": "Upiorny Woźnica" },
+      { "area": "mossy-dell", "monster": "rootwad", "name": "Wykrotnik Stuletni" },
+      { "area": "wild-den", "monster": "smoke-hound", "name": "Ogar Tropiciel" },
+      { "area": "creaking-pines", "monster": "lichen-beard", "name": "Brodacz Pradziad" },
+      { "area": "rotting-logs", "monster": "puffball", "name": "Purchawiec Siewca" },
+      { "area": "devils-crossroads", "monster": "chochol", "name": "Chochoł Weselny" },
+      { "area": "plague-graves", "monster": "bell-ringer", "name": "Stary Dzwonnik" },
+      { "area": "eclipsed-glade", "monster": "bebok", "name": "Bebok Porywacz" }
     ],
     "outlaws": ["bandit-chief", "poacher", "horse-thief", "smuggler", "arsonist", "highwaywoman", "grave-robber"],
     "texts": {

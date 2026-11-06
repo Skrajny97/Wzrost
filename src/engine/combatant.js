@@ -218,6 +218,9 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
     // Zasadzka (464): a fight with this creature starts with the creatures'
     // moves (combat.js).
     ...(monster.ambush && { ambush: true }),
+    // Ukryty w mroku (666): the party does not choose it while a creature
+    // without it still fights (combat.js).
+    ...(monster.hidden && { hidden: true }),
     groupFactor,
     position: position ?? monster.position,
     level,
@@ -239,6 +242,9 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
       // Atak na tył szyku (463): its blows go to the one standing furthest
       // back (combat.js).
       ...(monster.attack.target && { target: monster.attack.target }),
+      // Cios w cały szyk (666): the rest of the party takes this share of
+      // each blow (combat.js).
+      ...(monster.attack.cleave && { cleave: monster.attack.cleave }),
     },
     scalingValue: stat(monster.attack.scaling),
     damageScale: damageScale(stat(monster.attack.scaling), level, balance),

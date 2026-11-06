@@ -764,5 +764,249 @@
         "champion": "rarog"
       }
     ]
+  },
+  {
+    "id": "silent-wilds",
+    "land": "Szumiący Bór",
+    "name": "Głucha Knieja",
+    "minLevel": 151,
+    "maxLevel": 175,
+    "safe": false,
+    "description": "Gęsta świerkowa knieja, w której zawsze jest noc i nie śpiewają ptaki, a każdy łowca czeka w ukryciu na tego, kto idzie ostatni.",
+    "trait": {
+      "name": "Ciernie",
+      "description": "Krwawienie trwa o jeden ruch dłużej, u stworów i u postaci.",
+      "effectTicks": { "bleeding": 1 }
+    },
+    "elite": "nightingale-robber",
+    "resources": { "wood": 5, "stone": 3, "iron-ore": 2 },
+    "areas": [
+      {
+        "id": "spruce-dusk",
+        "name": "Świerkowy Zmrok",
+        "minLevel": 151,
+        "maxLevel": 155,
+        "description": "Skraj kniei, gdzie pod zwartymi świerkami zmierzch zapada już w południe. Z gałęzi skaczą iglaki, w mchu leżą gniewosze, a tuż za plecami coś szeleści.",
+        "encounters": [
+          { "weight": 18, "monsters": ["needleback"] },
+          { "weight": 14, "monsters": ["smooth-snake"] },
+          { "weight": 12, "monsters": ["rustler", "rustler"] },
+          { "weight": 12, "monsters": ["needleback", "rustler"] },
+          { "weight": 12, "monsters": ["smooth-snake", "smooth-snake"] },
+          { "weight": 10, "monsters": ["needleback", "smooth-snake"] },
+          { "weight": 8, "monsters": ["smooth-snake", "rustler"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["needleback", "smooth-snake", "rustler"] },
+          { "weight": 6, "monsters": ["needleback", "needleback"] },
+          { "weight": 6, "monsters": ["smooth-snake", "rustler", "rustler"] }
+        ]
+      },
+      {
+        "id": "fern-thicket",
+        "name": "Paprociowy Gąszcz",
+        "minLevel": 156,
+        "maxLevel": 160,
+        "description": "Paprocie po pas, w których nie widać własnych nóg. Pod liśćmi pełzają wije, spod ziemi wstają paprotniki, a nad paprociami czekają modliszki.",
+        "encounters": [
+          { "weight": 18, "monsters": ["millipede"] },
+          { "weight": 14, "monsters": ["fernling"] },
+          { "weight": 14, "monsters": ["mantis", "mantis"] },
+          { "weight": 12, "monsters": ["millipede", "mantis"] },
+          { "weight": 10, "monsters": ["fernling", "fernling"] },
+          { "weight": 10, "monsters": ["millipede", "fernling"] },
+          { "weight": 8, "monsters": ["fernling", "mantis"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["millipede", "fernling", "mantis"] },
+          { "weight": 6, "monsters": ["millipede", "millipede"] },
+          { "weight": 6, "monsters": ["fernling", "mantis", "mantis"] }
+        ]
+      },
+      {
+        "id": "forgotten-track",
+        "name": "Zapomniany Trakt",
+        "minLevel": 161,
+        "maxLevel": 165,
+        "description": "Zarośnięta droga przez knieję, przy której wciąż stoją porzucone wozy. Psiogłowcy czekają na wędrowców, nocą trzaska bat upiornego woźnicy, a nad drogą krążą gzy wielkie jak psy.",
+        "encounters": [
+          { "weight": 18, "monsters": ["dog-headed"] },
+          { "weight": 14, "monsters": ["ghost-coachman"] },
+          { "weight": 14, "monsters": ["gadfly"] },
+          { "weight": 12, "monsters": ["dog-headed", "gadfly"] },
+          { "weight": 10, "monsters": ["ghost-coachman", "gadfly"] },
+          { "weight": 10, "monsters": ["dog-headed", "ghost-coachman"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["dog-headed", "ghost-coachman", "gadfly"] },
+          { "weight": 6, "monsters": ["dog-headed", "dog-headed", "gadfly"] },
+          { "weight": 6, "monsters": ["ghost-coachman", "gadfly", "gadfly"] }
+        ]
+      },
+      {
+        "id": "mossy-dell",
+        "name": "Mszysty Wądół",
+        "minLevel": 166,
+        "maxLevel": 170,
+        "description": "Głęboki parów z lodowatym strumieniem, zarośnięty mchem. Wyrwane korzenie tylko udają martwe, na dnie zbiera się żywy mrok, a z krawędzi zwisają pętle dusicieli.",
+        "encounters": [
+          { "weight": 18, "monsters": ["rootwad"] },
+          { "weight": 14, "monsters": ["murkling"] },
+          { "weight": 14, "monsters": ["strangler"] },
+          { "weight": 12, "monsters": ["rootwad", "murkling"] },
+          { "weight": 10, "monsters": ["murkling", "strangler"] },
+          { "weight": 10, "monsters": ["rootwad", "strangler"] },
+          { "weight": 8, "monsters": ["strangler", "strangler"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["rootwad", "murkling", "strangler"] },
+          { "weight": 6, "monsters": ["rootwad", "rootwad"] },
+          { "weight": 6, "monsters": ["murkling", "strangler", "strangler"] }
+        ]
+      },
+      {
+        "id": "wild-den",
+        "name": "Matecznik",
+        "minLevel": 171,
+        "maxLevel": 175,
+        "description": "Najgęstsze serce kniei, legowisko pełne kości i poroży. Gnatojady ogryzają kości, wśród padliny wstają truchła, a w ciemności ujadają ogary. Tu poluje Nocny Łowczy.",
+        "encounters": [
+          { "weight": 18, "monsters": ["bone-gnawer"] },
+          { "weight": 14, "monsters": ["carcass"] },
+          { "weight": 14, "monsters": ["smoke-hound"] },
+          { "weight": 12, "monsters": ["bone-gnawer", "smoke-hound"] },
+          { "weight": 10, "monsters": ["carcass", "carcass"] },
+          { "weight": 10, "monsters": ["carcass", "smoke-hound"] },
+          { "weight": 8, "monsters": ["bone-gnawer", "carcass"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["bone-gnawer", "carcass", "smoke-hound"] },
+          { "weight": 6, "monsters": ["bone-gnawer", "bone-gnawer"] },
+          { "weight": 6, "monsters": ["carcass", "smoke-hound", "smoke-hound"] }
+        ],
+        "champion": "night-huntsman"
+      }
+    ]
+  },
+  {
+    "id": "new-moon-depths",
+    "land": "Szumiący Bór",
+    "name": "Ostępy Nowiu",
+    "minLevel": 176,
+    "maxLevel": 200,
+    "safe": false,
+    "description": "Najgłębsza noc Szumiącego Boru. Księżycożerca zjadł tu księżyc, stare sosny szumią bez wiatru, a z ciemności wychodzi to, co powinno leżeć pod ziemią.",
+    "trait": {
+      "name": "Przymrozek",
+      "description": "Wychłodzenie trwa o jeden ruch dłużej, u stworów i u postaci.",
+      "effectTicks": { "chilled": 1 }
+    },
+    "elite": "plague-maiden",
+    "resources": { "wood": 4, "stone": 4, "iron-ore": 2 },
+    "areas": [
+      {
+        "id": "creaking-pines",
+        "name": "Skrzypiące Sosny",
+        "minLevel": 176,
+        "maxLevel": 180,
+        "description": "Olbrzymie, stare sosny skrzypią i szumią, choć nie wieje wiatr. Z gałęzi zwisają siwe brody porostów, w dziuplach coś się rusza, a między koronami płynie szumiec.",
+        "encounters": [
+          { "weight": 18, "monsters": ["lichen-beard"] },
+          { "weight": 14, "monsters": ["hollow-dweller"] },
+          { "weight": 14, "monsters": ["murmur-wraith", "murmur-wraith"] },
+          { "weight": 12, "monsters": ["lichen-beard", "murmur-wraith"] },
+          { "weight": 12, "monsters": ["hollow-dweller", "hollow-dweller"] },
+          { "weight": 10, "monsters": ["lichen-beard", "hollow-dweller"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["lichen-beard", "hollow-dweller", "murmur-wraith"] },
+          { "weight": 6, "monsters": ["lichen-beard", "lichen-beard"] },
+          { "weight": 6, "monsters": ["hollow-dweller", "murmur-wraith", "murmur-wraith"] }
+        ]
+      },
+      {
+        "id": "rotting-logs",
+        "name": "Próchniejące Pnie",
+        "minLevel": 181,
+        "maxLevel": 185,
+        "description": "Powalone pnie świecą zielonkawo próchnem, a w ich wnętrzu rośnie grzybnia. Murszaki leżą jak kłody, purchawce dymią zarodnikami, a ze szczelin wypełzają skorki.",
+        "encounters": [
+          { "weight": 18, "monsters": ["rotwood"] },
+          { "weight": 14, "monsters": ["puffball"] },
+          { "weight": 14, "monsters": ["earwig", "earwig"] },
+          { "weight": 12, "monsters": ["rotwood", "earwig"] },
+          { "weight": 10, "monsters": ["puffball", "puffball"] },
+          { "weight": 10, "monsters": ["rotwood", "puffball"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["rotwood", "puffball", "earwig"] },
+          { "weight": 6, "monsters": ["rotwood", "rotwood"] },
+          { "weight": 6, "monsters": ["puffball", "earwig", "earwig"] }
+        ]
+      },
+      {
+        "id": "devils-crossroads",
+        "name": "Czarcie Rozdroże",
+        "minLevel": 186,
+        "maxLevel": 190,
+        "description": "Cztery zarośnięte drogi schodzą się tu w sercu boru. O północy bezgłowiec krąży wokół rozdroża, chochoł zaprasza do tańca, a smętek śpiewa tym, którzy zabłądzili.",
+        "encounters": [
+          { "weight": 18, "monsters": ["headless"] },
+          { "weight": 14, "monsters": ["chochol"] },
+          { "weight": 14, "monsters": ["smetek"] },
+          { "weight": 12, "monsters": ["headless", "smetek"] },
+          { "weight": 10, "monsters": ["chochol", "smetek"] },
+          { "weight": 10, "monsters": ["headless", "chochol"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["headless", "chochol", "smetek"] },
+          { "weight": 6, "monsters": ["headless", "headless", "smetek"] },
+          { "weight": 6, "monsters": ["chochol", "smetek", "smetek"] }
+        ]
+      },
+      {
+        "id": "plague-graves",
+        "name": "Morowe Mogiły",
+        "minLevel": 191,
+        "maxLevel": 195,
+        "description": "Zapomniany cmentarz z czasów zarazy, ukryty w samym środku boru. Umrzyki wstają z kopców, pod ziemią ryją grabarze, a o północy bije dzwon dzwonnika.",
+        "encounters": [
+          { "weight": 18, "monsters": ["deadman"] },
+          { "weight": 14, "monsters": ["burying-beetle"] },
+          { "weight": 14, "monsters": ["bell-ringer"] },
+          { "weight": 12, "monsters": ["deadman", "bell-ringer"] },
+          { "weight": 10, "monsters": ["burying-beetle", "burying-beetle"] },
+          { "weight": 10, "monsters": ["deadman", "burying-beetle"] },
+          { "weight": 8, "monsters": ["burying-beetle", "bell-ringer"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["deadman", "burying-beetle", "bell-ringer"] },
+          { "weight": 6, "monsters": ["deadman", "deadman"] },
+          { "weight": 6, "monsters": ["burying-beetle", "bell-ringer", "bell-ringer"] }
+        ]
+      },
+      {
+        "id": "eclipsed-glade",
+        "name": "Zaćmiona Polana",
+        "minLevel": 196,
+        "maxLevel": 200,
+        "description": "Polana, nad którą nigdy nie wschodzi księżyc. Po jej brzegu pełzają poczwary, w trawie toczą się kołtuny, a bebok czeka z workiem na tego, kto zostanie w tyle. Tu mieszka Księżycożerca.",
+        "encounters": [
+          { "weight": 18, "monsters": ["abomination"] },
+          { "weight": 14, "monsters": ["koltun"] },
+          { "weight": 14, "monsters": ["bebok"] },
+          { "weight": 12, "monsters": ["abomination", "bebok"] },
+          { "weight": 10, "monsters": ["koltun", "koltun"] },
+          { "weight": 10, "monsters": ["koltun", "bebok"] },
+          { "weight": 8, "monsters": ["abomination", "koltun"] }
+        ],
+        "tough": [
+          { "weight": 8, "monsters": ["abomination", "koltun", "bebok"] },
+          { "weight": 6, "monsters": ["abomination", "abomination"] },
+          { "weight": 6, "monsters": ["koltun", "bebok", "bebok"] }
+        ],
+        "champion": "moon-eater"
+      }
+    ]
   }
 ]

@@ -35,6 +35,11 @@ const ROSTER = {
   'burnt-forest': ['charred-pine', 'ash-wraith', 'spark-swarm'],
 };
 const BLOWS = new Set(['hit', 'crit', 'dodge']);
+// The land's creatures, its elite and its champion: the next lands have
+// their own that strike the back and lie in wait (test/silent-wilds.test.js,
+// test/new-moon-depths.test.js).
+const OWN = new Set([...Object.values(ROSTER).flat(), 'noon-wraith', 'rarog']);
+const own = (monster) => OWN.has(monster.id);
 
 // A character of a class at its position that does not fall, with no Will
 // to keep effects off.
@@ -96,7 +101,7 @@ describe('Sosnowe Wydmy', () => {
 
 describe('Atak na tył szyku (463)', () => {
   test('the Lelek, the Latawiec and the Iskrzak strike the back of the line, other creatures anyone', () => {
-    const backStrikers = Object.values(content.monstersById).filter((monster) => monster.attack.target === 'back').map((monster) => monster.id);
+    const backStrikers = Object.values(content.monstersById).filter((monster) => own(monster) && monster.attack.target === 'back').map((monster) => monster.id);
     assert.deepEqual(backStrikers.sort(), ['latawiec', 'nightjar', 'spark-swarm']);
     const party = [member('warrior', 'a0'), member('cleric', 'a1'), member('archer', 'a2')];
     assert.deepEqual(party.map((unit) => unit.position), ['front', 'middle', 'back']);
@@ -139,7 +144,7 @@ describe('Atak na tył szyku (463)', () => {
 
 describe('Zasadzka (464)', () => {
   test('with a Piaskun in the fight every creature moves before the party, however quick, and the playback opens with it', () => {
-    assert.deepEqual(Object.values(content.monstersById).filter((monster) => monster.ambush).map((monster) => monster.id), ['sandman']);
+    assert.deepEqual(Object.values(content.monstersById).filter((monster) => own(monster) && monster.ambush).map((monster) => monster.id), ['sandman']);
     const archer = member('archer', 'a0');
     const quick = { ...archer, speed: archer.speed * 3 };
     for (const seed of ['a', 'b', 'c', 'd']) {
