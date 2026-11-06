@@ -55,13 +55,17 @@ import enBuildings from '../../data/en/buildings.json' with { type: 'json' };
 import enCamp from '../../data/en/camp.json' with { type: 'json' };
 import enChat from '../../data/en/chat.json' with { type: 'json' };
 import enClasses from '../../data/en/classes.json' with { type: 'json' };
+import enCommunity from '../../data/en/community.json' with { type: 'json' };
+import enCosmetics from '../../data/en/cosmetics.json' with { type: 'json' };
 import enEffects from '../../data/en/effects.json' with { type: 'json' };
 import enElements from '../../data/en/elements.json' with { type: 'json' };
+import enEncyclopedia from '../../data/en/encyclopedia.json' with { type: 'json' };
 import enEvents from '../../data/en/events.json' with { type: 'json' };
 import enGiftCodes from '../../data/en/gift-codes.json' with { type: 'json' };
 import enItemBases from '../../data/en/item-bases.json' with { type: 'json' };
 import enMaterials from '../../data/en/materials.json' with { type: 'json' };
 import enMonsters from '../../data/en/monsters.json' with { type: 'json' };
+import enProfessions from '../../data/en/professions.json' with { type: 'json' };
 import enQuests from '../../data/en/quests.json' with { type: 'json' };
 import enRarities from '../../data/en/rarities.json' with { type: 'json' };
 import enRegions from '../../data/en/regions.json' with { type: 'json' };
@@ -123,13 +127,17 @@ export const OVERLAYS = {
     camp: enCamp,
     chat: enChat,
     classes: enClasses,
+    community: enCommunity,
+    cosmetics: enCosmetics,
     effects: enEffects,
     elements: enElements,
+    encyclopedia: enEncyclopedia,
     events: enEvents,
     'gift-codes': enGiftCodes,
     'item-bases': enItemBases,
     materials: enMaterials,
     monsters: enMonsters,
+    professions: enProfessions,
     quests: enQuests,
     rarities: enRarities,
     regions: enRegions,

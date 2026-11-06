@@ -1,0 +1,141 @@
+{
+  "$comment": "English texts of data/encyclopedia.json (src/engine/overlay.js): the Encyclopedia's tabs and tiers, and the lines that tell where each entry comes from (src/engine/encyclopedia.js). The Minerals tab and the lines of Mining and Jewelcrafting are here too, as the screen shows them from the start.",
+  "tabs": {
+    "bestiary": {
+      "name": "Bestiary"
+    },
+    "items": {
+      "name": "Items"
+    },
+    "potions": {
+      "name": "Potions"
+    },
+    "herbs": {
+      "name": "Herbs"
+    },
+    "materials": {
+      "name": "Materials"
+    },
+    "parts": {
+      "name": "Parts"
+    },
+    "minerals": {
+      "name": "Minerals"
+    }
+  },
+  "tiers": [
+    {
+      "name": "Tier I"
+    },
+    {
+      "name": "Tier II"
+    },
+    {
+      "name": "Tier III"
+    },
+    {
+      "name": "Tier IV"
+    },
+    {
+      "name": "Tier V"
+    },
+    {
+      "name": "Tier VI"
+    }
+  ],
+  "texts": {
+    "accessories": [
+      "Accessories"
+    ],
+    "tierItems": [
+      "from class level {level}"
+    ],
+    "tierItemsFirst": [
+      "from the start"
+    ],
+    "tierLevels": [
+      "levels {from}–{to}"
+    ],
+    "itemDrop": [
+      "Explorations: drops from {area} onwards (lvl {levels})."
+    ],
+    "itemDropAny": [
+      "Explorations: drops in every region."
+    ],
+    "itemClasses": [
+      "For classes: {classes}."
+    ],
+    "itemClass": [
+      "For the class: {classes}."
+    ],
+    "itemAnyClass": [
+      "For every class."
+    ],
+    "itemOtherClasses": [
+      "Other classes' items drop from character level {level}."
+    ],
+    "itemWear": [
+      "You can wear it from class level {level}."
+    ],
+    "itemPattern": [
+      "Workshop: pattern from Crafting level {level}."
+    ],
+    "itemJewelPattern": [
+      "Gem Workshop: pattern from Jewelcrafting level {level}."
+    ],
+    "itemBest": [
+      "Best obtained: {rarity}."
+    ],
+    "potionRecipe": [
+      "Alchemy: recipe from level {level}."
+    ],
+    "potionHerbs": [
+      "Ingredients: {herbs}."
+    ],
+    "potionCatalyst": [
+      "Catalyst: {material}."
+    ],
+    "potionTaught": [
+      "Rare recipe: the herbalist Jagna shares it at standing {standing} with her or with the Brotherhood of Herbalists."
+    ],
+    "herbGather": [
+      "Herbalism: from level {level}, in the Grove."
+    ],
+    "herbEvent": [
+      "An event on an exploration sometimes gives it too."
+    ],
+    "materialDrop": [
+      "Left by: {monster} ({areas})."
+    ],
+    "materialGrades": [
+      "Grades obtained: {grades}."
+    ],
+    "trophyNeeds": [
+      "Trophy: {grades}. Gives +{percent}% damage against this creature."
+    ],
+    "trophyWon": [
+      "Trophy won: +{percent}% damage against {monster}."
+    ],
+    "partTable": [
+      "Salvage Table: from materials and items of the same rarity."
+    ],
+    "partExchange": [
+      "Part exchange in the Workshop: {rate} × {part} for one."
+    ],
+    "partShop": [
+      "Scrap dealer's counter: from Scrapyard level {level}."
+    ],
+    "mineralMine": [
+      "Mining: from level {level}, in the Mine."
+    ],
+    "mineralCraft": [
+      "Jewelcrafting: from level {level}, in the Gem Workshop."
+    ],
+    "mineralGem": [
+      "Gives jewellery the rarity: {rarity}. Set in an item, it raises all its values by {percent}%."
+    ],
+    "mineralOre": [
+      "For setting jewellery of rarity: {rarities}."
+    ]
+  }
+}

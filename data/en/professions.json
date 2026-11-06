@@ -1,0 +1,535 @@
+{
+  "$comment": "English texts of data/professions.json (src/engine/overlay.js): Herbalism, Alchemy and Crafting with their places, herbs, potions, reports and messages, the System Avatar, and how potions are drunk on explorations. Mining, Jewelcrafting and their minerals come in stage 4. Herbs and potions are names, in Title Case wherever they appear (the bag, recipes, quests, reports). A herb's or a profession's `genitive` is its plain name: the quests say \"Gather 12 pieces of Comfrey\" and a report \"Herbalism level reached: 5\". A potion's `counted` is its name after a number, [one, other, other] for the Polish [one, few, many] (src/engine/text.js, countedForm): \"Brew 3 Healing Potions\"; its first form also stands alone in the fight lines (\"Mira drinks Healing Potion: +40 HP\"). potionUse.fightForms make {fights}: \"for 2 fights\". The Polish kinds of potion keep their own words: mikstura Potion, wywar Brew, napar Draught, eliksir Elixir, olejek Oil, balsam Balm. The places: Systemowy Zagajnik System Grove, Systemowa Pracownia System Laboratory, Systemowy Warsztat System Workshop.",
+  "intro": "While working, the character does not set out on explorations, and their wounds heal. Each profession level strengthens two stats. You can develop every profession, but you work in only one at a time.",
+  "avatar": {
+    "name": "System Avatar",
+    "description": "A reflection of the character that the System will weave in their likeness. It works at the professions alongside them, even while the character is on an exploration or working too. It knows their herbs, recipes and patterns and works just as efficiently, but gains no experience, profession levels or stats.",
+    "texts": {
+      "bought": [
+        "The System has woven the Avatar. It waits for work in the Professions."
+      ],
+      "busy": [
+        "The System Avatar is already working. Wait until its work is done."
+      ],
+      "claimFirst": [
+        "The System Avatar has finished its work. Claim its report first."
+      ],
+      "pushTitle": [
+        "System Avatar's work complete"
+      ]
+    }
+  },
+  "professions": {
+    "herbalism": {
+      "name": "Herbalism",
+      "genitive": "Herbalism",
+      "description": "Gathering herbs in the System Grove, with no fights and no risk."
+    },
+    "alchemy": {
+      "name": "Alchemy",
+      "genitive": "Alchemy",
+      "description": "Brewing potions from herbs."
+    },
+    "crafting": {
+      "name": "Crafting",
+      "genitive": "Crafting",
+      "description": "Making gear from parts."
+    }
+  },
+  "gathering": {
+    "place": {
+      "name": "System Grove",
+      "description": "More grows here than meets the eye. The System reveals herbs only when it judges that you can recognise them."
+    }
+  },
+  "brewing": {
+    "place": {
+      "name": "System Laboratory",
+      "description": "The cauldron heats here without fire, and the shelves wait for vials. The System reveals recipes only when it judges that you can brew them."
+    },
+    "texts": {
+      "report": [
+        "In the Laboratory the cauldron bubbles, and vials pile up on the shelf.",
+        "The herbs give the brew the very best they have.",
+        "The System's blue lines measure every drop of the potion."
+      ],
+      "brewed": [
+        "Brewed: {potions}."
+      ],
+      "lucky": [
+        "Lucky brewing, extra: {potions}."
+      ],
+      "lost": [
+        "The bag was full. No room for: {potions}."
+      ],
+      "stopped": [
+        "Brewing stopped. The herbs for the rest went back to the bag."
+      ],
+      "revealed": [
+        "The System reveals a new recipe: {potion}"
+      ],
+      "hidden": [
+        "Hidden by the System until Alchemy level {level}."
+      ],
+      "herbalistHidden": [
+        "Jagna's rare recipe: needs standing {standing} with Jagna or with the Brotherhood of Herbalists, and Alchemy level {level}."
+      ],
+      "busy": [
+        "The character is brewing potions. Wait until the brewing ends."
+      ],
+      "claimFirst": [
+        "The brewing is over. Claim the report first."
+      ],
+      "pushTitle": [
+        "Brewing over"
+      ],
+      "pushBody": [
+        "Potions brewed: {place}. Your report is ready to collect."
+      ]
+    }
+  },
+  "workshop": {
+    "place": {
+      "name": "System Workshop",
+      "description": "Neatly sorted tools seem to be waiting to be used. But that takes skilled hands. Some patterns will open to you only when the System judges that you can manage them."
+    },
+    "scroll": {
+      "name": "Ward Scroll",
+      "description": "A System scroll for the Anvil. When upgrading from +7 up, it guards the item against breaking, but not against losing its upgrade: the Steady Scroll guards against that."
+    },
+    "steadyScroll": {
+      "name": "Steady Scroll",
+      "description": "A System scroll for the Anvil. When an upgrade attempt fails, the item does not lose its upgrade level. It does not guard against breaking: the Ward Scroll does that."
+    },
+    "exchange": {
+      "title": "Part exchange",
+      "text": "On the spot, no waiting: for 10 parts of one rarity, the System gives 1 part of the next rarity."
+    },
+    "texts": {
+      "report": [
+        "In the Workshop the hammer rings, and the pattern slowly takes shape.",
+        "The parts fit together as if they had been waiting for the right hands.",
+        "The System's blue lines guide every seam and every blow."
+      ],
+      "made": [
+        "Crafted: {items}."
+      ],
+      "failed": [
+        "Failed: {items}. The parts were lost, and the camp's resources came back."
+      ],
+      "stopped": [
+        "Crafting stopped. The parts and resources for the rest came back."
+      ],
+      "revealed": [
+        "The System reveals new patterns: {patterns}"
+      ],
+      "rarity": [
+        "The System now lets you craft items of rarity: {rarity}"
+      ],
+      "hidden": [
+        "Hidden by the System until Crafting level {level}."
+      ],
+      "patternAt": [
+        "in the Workshop"
+      ],
+      "busy": [
+        "The character is crafting items. Wait until the crafting ends."
+      ],
+      "claimFirst": [
+        "The crafting is over. Claim the report first."
+      ],
+      "pushTitle": [
+        "Crafting over"
+      ],
+      "pushBody": [
+        "Items crafted: {place}. Your report is ready to collect."
+      ],
+      "lucky": [
+        "A stroke of luck! An item of higher rarity: {item} ({rarity})."
+      ]
+    }
+  },
+  "potionUse": {
+    "fightForms": [
+      "fight",
+      "fights",
+      "fights"
+    ],
+    "buffLabels": {
+      "speed": "Swiftness: speed in fights +{bonus}%",
+      "armor": "Tough Skin: armour +{bonus}%",
+      "damage": "Strength: damage +{bonus}%",
+      "focus": "Focus: Intellect and Wisdom +{bonus}%",
+      "poison": "Poisoned Weapon: {bonus}% chance of Poison per blow",
+      "ward": "Magic Ward: magic damage −{bonus}%",
+      "curse": "Curse: damage −{bonus}%"
+    },
+    "texts": {
+      "drinkHeal": [
+        "{actor} drinks {potion}: +{amount} HP."
+      ],
+      "drinkMana": [
+        "{actor} drinks {potion}: +{amount} mana."
+      ],
+      "drunkHeal": [
+        "The character drinks {potion}: +{amount} HP."
+      ],
+      "drunkSpeed": [
+        "The character drinks {potion}. Speed in fights rises by {bonus}% for {fights}."
+      ],
+      "used": [
+        "Potions used: {potions}."
+      ],
+      "speedFights": [
+        "Swiftness was active in {fights} of {all} fights."
+      ],
+      "drinkCure": [
+        "{actor} drinks {potion}: {effect} is gone and will not return until the end of the fight."
+      ],
+      "drinkRevive": [
+        "{actor} falls, but drinks {potion} and gets up with {amount} HP."
+      ],
+      "drunkArmor": [
+        "The character drinks {potion}. Armour rises by {bonus}% for {fights}."
+      ],
+      "drunkDamage": [
+        "The character drinks {potion}. Damage rises by {bonus}% for {fights}."
+      ],
+      "drunkFocus": [
+        "The character drinks {potion}. Intellect and Wisdom rise by {bonus}% for {fights}."
+      ],
+      "drunkPoison": [
+        "The character coats their weapon with {potion}. For {fights}, every blow has a {bonus}% chance of Poison."
+      ],
+      "drunkWard": [
+        "The character drinks {potion}. Damage from magic falls by {bonus}% for {fights}."
+      ],
+      "drunkTrip": [
+        "The party fights this exploration as it set out, so this bonus will work from the next exploration."
+      ],
+      "armorFights": [
+        "Tough Skin was active in {fights} of {all} fights."
+      ],
+      "damageFights": [
+        "Strength was active in {fights} of {all} fights."
+      ],
+      "focusFights": [
+        "Focus was active in {fights} of {all} fights."
+      ],
+      "poisonFights": [
+        "Aconite Oil was active in {fights} of {all} fights."
+      ],
+      "wardFights": [
+        "Magic Ward was active in {fights} of {all} fights."
+      ],
+      "curseFights": [
+        "The Curse weakened the blows in {fights} of {all} fights."
+      ]
+    }
+  },
+  "herbs": {
+    "comfrey": {
+      "name": "Comfrey",
+      "genitive": "Comfrey",
+      "description": "Rough leaves and a fleshy root. For ages it has knit wounds and bones."
+    },
+    "mugwort": {
+      "name": "Mugwort",
+      "genitive": "Mugwort",
+      "description": "A silvery herb with a bitter scent. It clears the mind and wakes dormant power."
+    },
+    "nettle": {
+      "name": "Nettle",
+      "genitive": "Nettle",
+      "description": "It stings whoever picks it, but its juice quickens every move."
+    },
+    "plantain": {
+      "name": "Ribwort",
+      "genitive": "Ribwort",
+      "description": "Narrow leaves beside every path. Laid on a wound, it stanches the blood."
+    },
+    "st-johns-wort": {
+      "name": "St John's Wort",
+      "genitive": "St John's Wort",
+      "description": "Yellow flowers, and leaves that show tiny holes against the light. It clears the mind."
+    },
+    "calamus": {
+      "name": "Calamus",
+      "genitive": "Calamus",
+      "description": "A fragrant root from the waterside. It draws poison from the blood."
+    },
+    "arnica": {
+      "name": "Arnica",
+      "genitive": "Arnica",
+      "description": "Orange flowers from mountain meadows. It heals bruises."
+    },
+    "wormwood": {
+      "name": "Wormwood",
+      "genitive": "Wormwood",
+      "description": "The bitterest herb in the wilds. It warms and gives strength."
+    },
+    "valerian": {
+      "name": "Valerian",
+      "genitive": "Valerian",
+      "description": "A strong-smelling root that calms the thoughts."
+    },
+    "cranberry": {
+      "name": "Cranberry",
+      "genitive": "Cranberry",
+      "description": "Red berries from the mossy bogs, sour and cool."
+    },
+    "aconite": {
+      "name": "Aconite",
+      "genitive": "Aconite",
+      "description": "Beautiful, blue and deadly poisonous."
+    },
+    "mistletoe": {
+      "name": "Mistletoe",
+      "genitive": "Mistletoe",
+      "description": "It grows high in the trees and wards off witchcraft."
+    },
+    "fern-blossom": {
+      "name": "Fern Flower",
+      "genitive": "Fern Flower",
+      "description": "It blooms once a year, on the shortest night. Few have ever seen it."
+    }
+  },
+  "potions": {
+    "lesser-healing": {
+      "name": "Lesser Healing Potion",
+      "counted": [
+        "Lesser Healing Potion",
+        "Lesser Healing Potions",
+        "Lesser Healing Potions"
+      ],
+      "description": "A ruby brew of Comfrey. It knits wounds: heals 20% of max HP."
+    },
+    "lesser-mana": {
+      "name": "Lesser Mana Potion",
+      "counted": [
+        "Lesser Mana Potion",
+        "Lesser Mana Potions",
+        "Lesser Mana Potions"
+      ],
+      "description": "A sapphire brew of Mugwort. It wakes dormant power: restores 30% of max mana."
+    },
+    "lesser-speed": {
+      "name": "Lesser Swiftness Potion",
+      "counted": [
+        "Lesser Swiftness Potion",
+        "Lesser Swiftness Potions",
+        "Lesser Swiftness Potions"
+      ],
+      "description": "A yellow-green brew of Nettle. Drunk from the bag, it raises the character's speed in fights by 15% for 2 fights. Each further one adds 2 more fights."
+    },
+    "healing": {
+      "name": "Healing Potion",
+      "counted": [
+        "Healing Potion",
+        "Healing Potions",
+        "Healing Potions"
+      ],
+      "description": "A ruby brew of Comfrey and Ribwort. It knits wounds: heals 35% of max HP."
+    },
+    "mana": {
+      "name": "Mana Potion",
+      "counted": [
+        "Mana Potion",
+        "Mana Potions",
+        "Mana Potions"
+      ],
+      "description": "A sapphire brew of Mugwort and St John's Wort. It wakes dormant power: restores 45% of max mana."
+    },
+    "antidote": {
+      "name": "Antidote",
+      "counted": [
+        "Antidote",
+        "Antidotes",
+        "Antidotes"
+      ],
+      "description": "A bitter brew of Calamus. Works on its own in a fight: it removes Poison and guards against it until the end of the fight."
+    },
+    "speed": {
+      "name": "Swiftness Potion",
+      "counted": [
+        "Swiftness Potion",
+        "Swiftness Potions",
+        "Swiftness Potions"
+      ],
+      "description": "A green brew of Nettle and Arnica. Drunk from the bag, it raises the character's speed in fights by 25% for 2 fights. Each further one adds 2 more fights."
+    },
+    "stoneskin-brew": {
+      "name": "Stoneskin Brew",
+      "counted": [
+        "Stoneskin Brew",
+        "Stoneskin Brews",
+        "Stoneskin Brews"
+      ],
+      "description": "A grey brew of Arnica. Drunk from the bag, it strengthens the character's armour by 15% for 2 fights. Each further one adds 2 more fights."
+    },
+    "strength-brew": {
+      "name": "Strength Brew",
+      "counted": [
+        "Strength Brew",
+        "Strength Brews",
+        "Strength Brews"
+      ],
+      "description": "An orange brew of Wormwood. Drunk from the bag, it raises the character's damage by 10% for 2 fights. Each further one adds 2 more fights."
+    },
+    "focus-draught": {
+      "name": "Focus Potion",
+      "counted": [
+        "Focus Potion",
+        "Focus Potions",
+        "Focus Potions"
+      ],
+      "description": "A violet brew of Valerian. Drunk from the bag, it raises the character's Intellect and Wisdom by 10% for 2 fights. Each further one adds 2 more fights."
+    },
+    "owl-draught": {
+      "name": "Owl Draught",
+      "counted": [
+        "Owl Draught",
+        "Owl Draughts",
+        "Owl Draughts"
+      ],
+      "description": "A dark violet draught of Valerian and St John's Wort, made to Jagna's recipe. Drunk from the bag, it raises the character's Intellect and Wisdom by 20% for 2 fights. Each further one adds 2 more fights."
+    },
+    "bearskin-brew": {
+      "name": "Bearskin Brew",
+      "counted": [
+        "Bearskin Brew",
+        "Bearskin Brews",
+        "Bearskin Brews"
+      ],
+      "description": "A brown brew of Arnica and Cranberry, made to Jagna's recipe. Drunk from the bag, it strengthens the character's armour by 30% for 2 fights. Each further one adds 2 more fights."
+    },
+    "greater-healing": {
+      "name": "Greater Healing Potion",
+      "counted": [
+        "Greater Healing Potion",
+        "Greater Healing Potions",
+        "Greater Healing Potions"
+      ],
+      "description": "A thick ruby brew of Comfrey and Cranberry. It knits even deep wounds: heals 50% of max HP."
+    },
+    "greater-mana": {
+      "name": "Greater Mana Potion",
+      "counted": [
+        "Greater Mana Potion",
+        "Greater Mana Potions",
+        "Greater Mana Potions"
+      ],
+      "description": "A dark sapphire brew of Mugwort and Cranberry. It restores 60% of max mana."
+    },
+    "wolf-strength-brew": {
+      "name": "Wolf Strength Brew",
+      "counted": [
+        "Wolf Strength Brew",
+        "Wolf Strength Brews",
+        "Wolf Strength Brews"
+      ],
+      "description": "A dark red brew of Wormwood and Cranberry, made to Jagna's recipe. Drunk from the bag, it raises the character's damage by 20% for 2 fights. Each further one adds 2 more fights."
+    },
+    "greater-speed": {
+      "name": "Greater Swiftness Potion",
+      "counted": [
+        "Greater Swiftness Potion",
+        "Greater Swiftness Potions",
+        "Greater Swiftness Potions"
+      ],
+      "description": "A bright green brew of Nettle and Cranberry. Drunk from the bag, it raises the character's speed in fights by 35% for 2 fights. Each further one adds 2 more fights."
+    },
+    "aconite-oil": {
+      "name": "Aconite Oil",
+      "counted": [
+        "Aconite Oil",
+        "Aconite Oils",
+        "Aconite Oils"
+      ],
+      "verb": "Apply",
+      "description": "A dark oil of Aconite for the blade. Applied from the bag, for 2 fights it gives each of the character's blows a 50% chance of Poison. Each further one adds 2 more fights."
+    },
+    "burn-brew": {
+      "name": "Burn Remedy",
+      "counted": [
+        "Burn Remedy",
+        "Burn Remedies",
+        "Burn Remedies"
+      ],
+      "description": "A cool brew of Cranberry and Ribwort, made to Jagna's recipe. Works on its own in a fight: it removes Burn and guards against it until the end of the fight."
+    },
+    "mistletoe-elixir": {
+      "name": "Mistletoe Elixir",
+      "counted": [
+        "Mistletoe Elixir",
+        "Mistletoe Elixirs",
+        "Mistletoe Elixirs"
+      ],
+      "description": "A white and green elixir of Mistletoe. Drunk from the bag, it reduces the damage from magic by 20% for 2 fights. Each further one adds 2 more fights."
+    },
+    "evil-eye-brew": {
+      "name": "Draught against Hexes",
+      "counted": [
+        "Draught against Hexes",
+        "Draughts against Hexes",
+        "Draughts against Hexes"
+      ],
+      "description": "A silvery draught of Mistletoe and St John's Wort, made to Jagna's recipe. Drunk from the bag, it reduces the damage from magic by 35% for 2 fights. Each further one adds 2 more fights."
+    },
+    "jagna-balm": {
+      "name": "Jagna's Balm",
+      "counted": [
+        "Jagna's Balm",
+        "Jagna's Balms",
+        "Jagna's Balms"
+      ],
+      "description": "A thick, golden balm of Comfrey, Cranberry and Fern Flower, made to Jagna's recipe. It knits even the deepest wounds: heals 70% of max HP."
+    },
+    "fern-brew": {
+      "name": "Fern Flower Draught",
+      "counted": [
+        "Fern Flower Draught",
+        "Fern Flower Draughts",
+        "Fern Flower Draughts"
+      ],
+      "description": "A golden draught of Fern Flower. Works on its own: once per exploration it saves the character from fainting, bringing them back up with 30% HP."
+    }
+  },
+  "texts": {
+    "report": [
+      "The Grove rustles softly, and the basket fills with herbs.",
+      "The herbs grow here in even rows, as if someone had planted them.",
+      "The System's blue light flickers above the clumps of herbs."
+    ],
+    "gathered": [
+      "Gathered: {herbs}."
+    ],
+    "lost": [
+      "The bag was full. No room for: {herbs}."
+    ],
+    "levelUp": [
+      "{profession} level reached: {level}"
+    ],
+    "statGained": [
+      "{stat} gained: +{bonus}"
+    ],
+    "revealed": [
+      "The System reveals a new herb: {herb}"
+    ],
+    "hidden": [
+      "Hidden by the System until Herbalism level {level}."
+    ],
+    "busy": [
+      "The character is gathering herbs. Wait until the gathering ends."
+    ],
+    "claimFirst": [
+      "The gathering is over. Claim the report first."
+    ],
+    "pushTitle": [
+      "Gathering over"
+    ],
+    "pushBody": [
+      "Herb gathering complete: {place}. Your report is ready to collect."
+    ]
+  }
+}

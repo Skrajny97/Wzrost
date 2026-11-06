@@ -1,0 +1,23 @@
+{
+  "$comment": "English texts of data/community.json (src/engine/overlay.js): the sections of the Community's drop-down list and the name of the daily Gift to a friend.",
+  "sections": {
+    "chat": {
+      "name": "Chat"
+    },
+    "friends": {
+      "name": "Friends"
+    },
+    "ranking": {
+      "name": "Ranking"
+    },
+    "guilds": {
+      "name": "Guild"
+    },
+    "party": {
+      "name": "Party"
+    }
+  },
+  "gift": {
+    "name": "Gift"
+  }
+}
