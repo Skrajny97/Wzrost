@@ -4,9 +4,12 @@
 // numbers (level 146, almost a million gold, six-digit camp resources), a
 // long name, orders on the Stół rozbiórki's queue and a guild of its own
 // with a long name, and a companion hired in the Kwatery, with its five
-// places for items. On each screen, and on the tabs TABS opens, it
-// looks for a page wider than the screen, text out of its frame
-// and elements past the right edge, and lists text cut with "…" for a look.
+// places for items, on an account with the longest login. On each screen,
+// on the tabs TABS opens and in the sheets SHEETS opens over a screen (the
+// Ustawienia and "Zgłoś błąd", with a screenshot picked too), it looks for a
+// page wider than the screen (a sheet that scrolls sideways), text out of
+// its frame and elements past the right edge, and lists text cut with "…"
+// for a look.
 // Run against a dev server (npm run dev) from the repo folder whose local D1
 // the server uses, as tools/first-steps.cjs:
 //   NODE_PATH=$(npm root -g) node tools/layout-check.cjs http://localhost:8787 [folder for screenshots]
@@ -65,18 +68,46 @@ const SCREENS = [
 // names: the Stół rozbiórki's queue, with "Usuń z kolejki" by each order,
 // the Tablica zleceń's Poszukiwani and the Ranking's guilds.
 const TABS = { '#/oboz/craft-table': ['Kolejka'], '#/osada/board': ['Poszukiwani'], '#/spolecznosc/ranking': ['Gildie'] };
+// Sheets opened over a screen after its tabs, each from the one before (a
+// tap on `tap`, or a picture given to the file field `pick`), looked at
+// alone once `ready` shows in it, and closed at the end with "Zamknij". The
+// Ustawienia from the gear in the top bar, found by its class as the
+// narrator finds it (on a computer the bar is laid out otherwise), with
+// "Pomijaj objaśnienia narratora" and the line under it; "Zgłoś błąd" from
+// them; and the same with a picture picked in "Dołącz zrzut ekranu", which
+// the page makes smaller on a canvas and shows on it, "Usuń zrzut" under it.
+const SHEETS = {
+  '#/postac': [
+    { name: 'Ustawienia', tap: '.topbar .settings-button', ready: 'h2.sheet-title:text-is("Ustawienia")' },
+    { name: 'Zgłoś błąd', tap: '#sheet button:text-is("Zgłoś błąd")', ready: 'h2.sheet-title:text-is("Zgłoś błąd")' },
+    { name: 'zrzut ekranu', pick: '#sheet input[type="file"]', ready: '.bug-shot-preview' },
+  ],
+};
 
-// What is wrong on the screen now, by the page itself.
-function audit() {
+// What is wrong on the screen now, by the page itself. With `frame`, the
+// selector of a sheet open over the screen, only what is in the sheet: it
+// stands for the screen, and as it scrolls on its own, what is too wide for
+// it makes it scroll sideways, not the page.
+function audit(frame) {
   const found = [];
-  const vw = document.documentElement.clientWidth;
-  const wider = document.documentElement.scrollWidth - vw;
-  if (wider > 1) found.push({ kind: 'page', where: 'strona', text: `szersza od ekranu o ${wider} px` });
   const label = (el) => {
     const id = el.id ? `#${el.id}` : '';
     const cls = typeof el.className === 'string' && el.className.trim() ? `.${el.className.trim().split(/\s+/).slice(0, 2).join('.')}` : '';
     return `${el.tagName.toLowerCase()}${id}${cls}`;
   };
+  const sheet = frame ? document.querySelector(frame) : null;
+  let vw = document.documentElement.clientWidth;
+  if (sheet) {
+    const box = sheet.getBoundingClientRect();
+    if (box.right > vw + 1) found.push({ kind: 'edge', where: label(sheet), text: `${Math.round(box.right - vw)} px za prawą krawędzią` });
+    const wider = sheet.scrollWidth - sheet.clientWidth;
+    if (wider > 1) found.push({ kind: 'page', where: 'okienko', text: `przewija się na boki o ${wider} px` });
+    // The sheet's own right edge, inside its border and scroll bar.
+    vw = box.left + sheet.clientLeft + sheet.clientWidth;
+  } else {
+    const wider = document.documentElement.scrollWidth - vw;
+    if (wider > 1) found.push({ kind: 'page', where: 'strona', text: `szersza od ekranu o ${wider} px` });
+  }
   const shown = (el) => {
     if (el.closest('[hidden], [aria-hidden="true"], .sr-only, .visually-hidden')) return false;
     const style = getComputedStyle(el);
@@ -84,15 +115,17 @@ function audit() {
     const box = el.getBoundingClientRect();
     return box.width > 0 && box.height > 0;
   };
-  // Inside something that scrolls sideways or clips on purpose.
+  // Inside something that scrolls sideways or clips on purpose (in the
+  // sheet, below the sheet itself).
+  const top = sheet ?? document.body;
   const insideClip = (el) => {
-    for (let up = el.parentElement; up && up !== document.body; up = up.parentElement) {
+    for (let up = el.parentElement; up && up !== top; up = up.parentElement) {
       const x = getComputedStyle(up).overflowX;
       if (x === 'auto' || x === 'scroll' || x === 'hidden' || x === 'clip') return true;
     }
     return false;
   };
-  for (const el of document.querySelectorAll('body *')) {
+  for (const el of sheet ? sheet.querySelectorAll('*') : document.querySelectorAll('body *')) {
     if (!shown(el)) continue;
     const style = getComputedStyle(el);
     if (style.position === 'fixed' && el.closest('#toast, .toast')) continue;
@@ -103,7 +136,9 @@ function audit() {
       else if (style.overflowX === 'visible' && !insideClip(el)) found.push({ kind: 'spill', where: label(el), text: `${text.slice(0, 40)} (${el.scrollWidth} px w ${el.clientWidth} px)` });
     }
     const box = el.getBoundingClientRect();
-    if (box.right > vw + 1 && box.left < vw && !insideClip(el) && style.position !== 'fixed') found.push({ kind: 'edge', where: label(el), text: `${Math.round(box.right - vw)} px za prawą krawędzią` });
+    if (box.right > vw + 1 && box.left < vw && !insideClip(el) && style.position !== 'fixed') {
+      found.push({ kind: 'edge', where: label(el), text: `${Math.round(box.right - vw)} px za prawą krawędzią${sheet ? ' okienka' : ''}` });
+    }
   }
   // One line for each element: an element past the edge drags its children.
   const seen = new Set();
@@ -118,7 +153,8 @@ function audit() {
 async function main() {
   const browser = await chromium.launch();
   const stamp = Date.now().toString(36).slice(-5);
-  const login = `uklad${stamp}`;
+  // The longest login, 24 characters, for the Ustawienia's Konto and E-mail.
+  const login = `uklad${stamp}_ekranu_gracza`;
   // A long name of 20 characters with Polish letters.
   const name = `Bożydarłomiej${stamp}`.slice(0, 20);
   const first = await browser.newContext();
@@ -148,6 +184,19 @@ async function main() {
   const { settlement } = await page.evaluate(() => fetch('/api/settlement').then((response) => response.json()));
   const candidate = settlement?.companions?.candidates?.[0];
   if (!candidate || (await api('POST', '/api/settlement/hire', { candidateId: candidate.id })) >= 400) throw new Error('Nie udało się zwerbować towarzysza.');
+  // The picture for "Dołącz zrzut ekranu": a PNG drawn on a canvas, of a
+  // computer screen's shape and wider than any sheet, so that its preview
+  // has to fit itself in.
+  const png = await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1280;
+    canvas.height = 720;
+    const draw = canvas.getContext('2d');
+    draw.fillStyle = '#2f4a2a';
+    draw.fillRect(0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL('image/png').split(',')[1];
+  });
+  const picture = { name: 'zrzut-ekranu.png', mimeType: 'image/png', buffer: Buffer.from(png, 'base64') };
   const storage = await first.storageState();
   await first.close();
 
@@ -159,8 +208,8 @@ async function main() {
     view.on('pageerror', (error) => errors.push(error.message));
     await view.goto(`${BASE}/${SCREENS[0]}`);
     await view.waitForTimeout(2500);
-    const check = async (screen) => {
-      const found = await view.evaluate(audit);
+    const check = async (screen, frame) => {
+      const found = await view.evaluate(audit, frame);
       const bad = found.filter((one) => one.kind !== 'cut');
       const cut = found.filter((one) => one.kind === 'cut');
       if (bad.length > 0) {
@@ -186,6 +235,30 @@ async function main() {
         await button.click();
         await view.waitForTimeout(500);
         await check(`${screen} › ${tab}`);
+      }
+      // A sheet that does not open or close is a problem; the steps after it
+      // are left, and the page loaded anew.
+      const trail = [screen];
+      try {
+        for (const step of SHEETS[screen] ?? []) {
+          trail.push(step.name);
+          if (step.pick) await view.locator(step.pick).setInputFiles(picture, { timeout: 5000 });
+          else await view.locator(step.tap).click({ timeout: 5000 });
+          await view.locator(`#sheet[open] ${step.ready}`).waitFor({ timeout: 5000 });
+          await view.waitForTimeout(500);
+          await check(trail.join(' › '), '#sheet');
+        }
+        if (SHEETS[screen]) {
+          trail.push('Zamknij');
+          await view.locator('#sheet .sheet-close').click({ timeout: 5000 });
+          await view.locator('#sheet').waitFor({ state: 'hidden', timeout: 5000 });
+        }
+      } catch (error) {
+        problems += 1;
+        console.log(`✖ ${size.name} ${trail.join(' › ')}`);
+        console.log(`    sheet: #sheet — ${error.message.split('\n')[0]}`);
+        await view.reload();
+        await view.waitForTimeout(1500);
       }
     }
     if (errors.length > 0) {
