@@ -1,0 +1,32 @@
+{
+  "$comment": "English texts of data/music.json, by the track's id (src/engine/overlay.js): the titles the phone shows for the music playing (src/client/music.js, the media session).",
+  "tracks": {
+    "background-v1": {
+      "name": "Background v1"
+    },
+    "victory-v1": {
+      "name": "Victory"
+    },
+    "defeat-v1": {
+      "name": "Fainting"
+    },
+    "skills-v1": {
+      "name": "Skills"
+    },
+    "professions-v1": {
+      "name": "Professions"
+    },
+    "camp-v1": {
+      "name": "Camp"
+    },
+    "evolution-v1": {
+      "name": "Class Evolution"
+    },
+    "settlement-v1": {
+      "name": "Settlement"
+    },
+    "casino-v1": {
+      "name": "Games Parlour"
+    }
+  }
+}

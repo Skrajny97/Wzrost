@@ -4328,5 +4328,14 @@
   "tutorial:lines.evolution-ending.text[0]": "36f82ba4d3ff",
   "tutorial:lines.evolution-lead.text[0]": "2de4b18e837a",
   "tutorial:lines.evolution-points.text[0]": "b543aad48863",
-  "tutorial:lines.evolution-welcome.text[0]": "8ca446baff59"
+  "tutorial:lines.evolution-welcome.text[0]": "8ca446baff59",
+  "music:tracks.background-v1.name": "d7593169bde5",
+  "music:tracks.camp-v1.name": "6e2174536e16",
+  "music:tracks.casino-v1.name": "397a95f60346",
+  "music:tracks.defeat-v1.name": "47903320bb7d",
+  "music:tracks.evolution-v1.name": "c8ae58b05090",
+  "music:tracks.professions-v1.name": "6a504ee58567",
+  "music:tracks.settlement-v1.name": "77d2585ff845",
+  "music:tracks.skills-v1.name": "7620d732ddf3",
+  "music:tracks.victory-v1.name": "beb5633cc36d"
 }

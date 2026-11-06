@@ -16,12 +16,15 @@
 // (guild-beast.js), "Próby" (guild-trials.js), "Prośby"
 // (guild-requests.js) and "Wymiana" (guild-exchange.js). The
 // address keeps the tab (#/gildia/<id>), and the page opens on the one
-// shown last on the device, or on "Gildia" outside a guild.
+// shown last on the device, or on "Gildia" outside a guild. Its own words
+// are shown in the page's language (t(), i18n.js); the tabs' names and the
+// parts' words come in it from the server.
 
 import { placeArt } from '../art.js';
 import { checkGuildTodo, guildSeen, guildTodoNews, onChatNews } from '../chat-news.js';
 import { $, fill, h, icon } from '../dom.js';
 import { formatNumber } from '../format.js';
+import { t } from '../i18n.js';
 import { mountGuildBeast } from '../guild-beast.js';
 import { mountGuildExchange } from '../guild-exchange.js';
 import { mountGuildExpedition } from '../guild-expedition.js';
@@ -65,12 +68,12 @@ function firstTab(tabs, asked) {
 export function mountGuildPage(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Gildia')(container, context);
   const art = placeArt(state.content.guildPlace);
-  const heading = h('div', { class: `page-heading${art ? ' guild-heading' : ''}` }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Gildia' }));
+  const heading = h('div', { class: `page-heading${art ? ' guild-heading' : ''}` }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Gildia') }));
   if (art) heading.style.setProperty('--place-art', `url("${art}")`);
-  const back = h('a', { class: 'link-button guild-back', href: '#/spolecznosc' }, icon('back', { size: 16 }), 'Społeczność');
+  const back = h('a', { class: 'link-button guild-back', href: '#/spolecznosc' }, icon('back', { size: 16 }), t('Społeczność'));
   const tabs = state.content.guildTabs;
   // The narrator points at the tabs on a member's first look (narrator.js).
-  const row = h('div', { class: 'community-tabs', role: 'tablist', 'aria-label': 'Części Gildii', 'data-guide': 'guild-tabs' });
+  const row = h('div', { class: 'community-tabs', role: 'tablist', 'aria-label': t('Części Gildii'), 'data-guide': 'guild-tabs' });
   // The row stays under the top bar while the page scrolls, as the
   // Społeczność's does (styles.css).
   const picker = h('div', { class: 'community-picker guild-picker' }, row);
@@ -129,7 +132,7 @@ export function mountGuildPage(container, context) {
           // Something to do in this part: a trial's chest, an attack on the
           // Bestia or on the Wyprawa's guardian or a chest, a gift to thank
           // for (chat-news.js, guild-todo.js).
-          guildTodoNews(tab.id) && h('span', { class: 'community-dot', role: 'img', 'aria-label': 'do zrobienia' }),
+          guildTodoNews(tab.id) && h('span', { class: 'community-dot', role: 'img', 'aria-label': t('do zrobienia') }),
         );
         button.style.setProperty('--guild-span', String(second ? (index < first ? second : first) : 1));
         return button;
@@ -154,7 +157,7 @@ export function mountGuildPage(container, context) {
 function mountGuild(container) {
   let view = null;
   let gone = false;
-  const body = h('div', { class: 'friends guild' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
+  const body = h('div', { class: 'friends guild' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   fill(container, body);
 
   function show(next) {
@@ -177,13 +180,13 @@ function mountGuild(container) {
     h(
       'div',
       { class: 'friend-who' },
-      person.online !== undefined && h('span', { class: `friend-status friend-status--${person.online ? 'online' : 'offline'}`, role: 'img', 'aria-label': person.online ? 'w grze' : 'poza grą' }),
+      person.online !== undefined && h('span', { class: `friend-status friend-status--${person.online ? 'online' : 'offline'}`, role: 'img', 'aria-label': person.online ? t('w grze') : t('poza grą') }),
       icon(CLASS_ICONS[person.classId] ?? 'person', { size: 16, className: 'chat-class' }),
       framedName(
-        h('button', { type: 'button', class: 'chat-name', text: person.name, 'aria-label': `${person.name}: zobacz postać`, onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)) }),
+        h('button', { type: 'button', class: 'chat-name', text: person.name, 'aria-label': t('{name}: zobacz postać', { name: person.name }), onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)) }),
         person.nameColor,
       ),
-      person.level && h('span', { class: 'chat-level', text: `poz. ${person.level}` }),
+      person.level && h('span', { class: 'chat-level', text: t('poz. {level}', { level: person.level }) }),
       more,
     );
 
@@ -192,7 +195,7 @@ function mountGuild(container) {
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'guild-invites-title' },
-      h('h2', { class: 'card-title', id: 'guild-invites-title', text: 'Zaproszenia do gildii' }),
+      h('h2', { class: 'card-title', id: 'guild-invites-title', text: t('Zaproszenia do gildii') }),
       h(
         'ul',
         { class: 'friends-list' },
@@ -200,12 +203,12 @@ function mountGuild(container) {
           h(
             'li',
             { class: 'friend' },
-            h('p', { class: 'party-invite', text: `${invite.name} [${invite.tag}]: zaprasza ${invite.invitedBy}. Członków: ${invite.members} z ${view.rules.size}.` }),
+            h('p', { class: 'party-invite', text: t('{name} [{tag}]: zaprasza {inviter}. Członków: {members} z {size}.', { name: invite.name, tag: invite.tag, inviter: invite.invitedBy, members: invite.members, size: view.rules.size }) }),
             h(
               'div',
               { class: 'friend-actions' },
-              button('Dołącz', act('/api/guild/accept', { guildId: invite.guildId }), 'system'),
-              button('Odrzuć', act('/api/guild/decline', { guildId: invite.guildId }, 'Zaproszenie odrzucone.')),
+              button(t('Dołącz'), act('/api/guild/accept', { guildId: invite.guildId }), 'system'),
+              button(t('Odrzuć'), act('/api/guild/decline', { guildId: invite.guildId }, t('Zaproszenie odrzucone.'))),
             ),
           ),
         ),
@@ -219,20 +222,20 @@ function mountGuild(container) {
     // The author's words (1.11.2026).
     const intro = h('p', {
       class: 'muted',
-      text: 'Gildia to miejsce dla Twojej własnej społeczności w grze. Gwarantuje dodatkowe aktywności i współpracę z innymi graczami. Do gildii dołączysz na zaproszenie liderów lub możesz założyć ją sam.',
+      text: t('Gildia to miejsce dla Twojej własnej społeczności w grze. Gwarantuje dodatkowe aktywności i współpracę z innymi graczami. Do gildii dołączysz na zaproszenie liderów lub możesz założyć ją sam.'),
     });
     if (state.character.level < foundLevel) {
-      return h('section', { class: 'card', 'aria-labelledby': 'guild-title' }, h('h2', { class: 'card-title', id: 'guild-title' }, icon('banner', { size: 22 }), 'Gildia'), intro, h('p', { class: 'muted', text: `Własną gildię założysz od ${foundLevel}. poziomu postaci. Twój poziom: ${state.character.level}.` }));
+      return h('section', { class: 'card', 'aria-labelledby': 'guild-title' }, h('h2', { class: 'card-title', id: 'guild-title' }, icon('banner', { size: 22 }), t('Gildia')), intro, h('p', { class: 'muted', text: t('Własną gildię założysz od {level}. poziomu postaci. Twój poziom: {own}.', { level: foundLevel, own: state.character.level }) }));
     }
-    const nameInput = h('input', { type: 'text', id: 'guild-name', maxlength: String(names.max), autocomplete: 'off', placeholder: 'Nazwa gildii', 'aria-label': 'Nazwa gildii' });
-    const tagInput = h('input', { type: 'text', id: 'guild-tag', maxlength: String(tags.max), autocomplete: 'off', autocapitalize: 'characters', placeholder: 'Skrót', 'aria-label': 'Skrót gildii', class: 'guild-tag-input' });
-    const found = h('button', { type: 'submit', class: 'button button--system', text: `Załóż za ${formatNumber(foundGold)} złota`, disabled: state.character.gold < foundGold });
+    const nameInput = h('input', { type: 'text', id: 'guild-name', maxlength: String(names.max), autocomplete: 'off', placeholder: t('Nazwa gildii'), 'aria-label': t('Nazwa gildii') });
+    const tagInput = h('input', { type: 'text', id: 'guild-tag', maxlength: String(tags.max), autocomplete: 'off', autocapitalize: 'characters', placeholder: t('Skrót'), 'aria-label': t('Skrót gildii'), class: 'guild-tag-input' });
+    const found = h('button', { type: 'submit', class: 'button button--system', text: t('Załóż za {gold} złota', { gold: formatNumber(foundGold) }), disabled: state.character.gold < foundGold });
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'guild-title' },
-      h('h2', { class: 'card-title', id: 'guild-title' }, icon('banner', { size: 22 }), 'Załóż gildię'),
+      h('h2', { class: 'card-title', id: 'guild-title' }, icon('banner', { size: 22 }), t('Załóż gildię')),
       intro,
-      h('p', { class: 'muted', text: `Nazwa: od ${names.min} do ${names.max} znaków. Skrót: od ${tags.min} do ${tags.max} liter albo cyfr, widoczny przy nazwie.` }),
+      h('p', { class: 'muted', text: t('Nazwa: od {min} do {max} znaków. Skrót: od {tagMin} do {tagMax} liter albo cyfr, widoczny przy nazwie.', { min: names.min, max: names.max, tagMin: tags.min, tagMax: tags.max }) }),
       h(
         'form',
         {
@@ -246,7 +249,7 @@ function mountGuild(container) {
         tagInput,
         found,
       ),
-      state.character.gold < foundGold && h('p', { class: 'muted', text: `Brakuje złota: masz ${formatNumber(state.character.gold)}.` }),
+      state.character.gold < foundGold && h('p', { class: 'muted', text: t('Brakuje złota: masz {gold}.', { gold: formatNumber(state.character.gold) }) }),
     );
   }
 
@@ -259,18 +262,18 @@ function mountGuild(container) {
       if (own === 'leader') {
         list.push(
           member.role === 'deputy'
-            ? button('Na członka', act('/api/guild/role', { characterId: member.id, role: 'member' }))
-            : button('Na zastępcę', act('/api/guild/role', { characterId: member.id, role: 'deputy' })),
-          button('Przekaż przywództwo', async () => {
-            if (!(await confirmAction({ title: 'Przekazać przywództwo?', text: `${member.name} poprowadzi gildię, a Ty zostaniesz zastępcą.`, confirmLabel: 'Przekaż' }))) return;
+            ? button(t('Na członka'), act('/api/guild/role', { characterId: member.id, role: 'member' }))
+            : button(t('Na zastępcę'), act('/api/guild/role', { characterId: member.id, role: 'deputy' })),
+          button(t('Przekaż przywództwo'), async () => {
+            if (!(await confirmAction({ title: t('Przekazać przywództwo?'), text: t('{name} poprowadzi gildię, a Ty zostaniesz zastępcą.', { name: member.name }), confirmLabel: t('Przekaż') }))) return;
             await act('/api/guild/lead', { characterId: member.id })();
           }),
         );
       }
       if (own === 'leader' || (own === 'deputy' && member.role === 'member')) {
         list.push(
-          button('Usuń', async () => {
-            if (!(await confirmAction({ title: 'Usunąć z gildii?', text: `${member.name} opuści gildię.`, confirmLabel: 'Usuń' }))) return;
+          button(t('Usuń'), async () => {
+            if (!(await confirmAction({ title: t('Usunąć z gildii?'), text: t('{name} opuści gildię.', { name: member.name }), confirmLabel: t('Usuń') }))) return;
             await act('/api/guild/kick', { characterId: member.id })();
           }),
         );
@@ -289,14 +292,14 @@ function mountGuild(container) {
       h(
         'details',
         { class: 'guild-members' },
-        h('summary', { class: 'guild-members-toggle', text: `Członkowie (${guild.members.length}/${guild.size})` }),
+        h('summary', { class: 'guild-members-toggle', text: t('Członkowie ({count}/{size})', { count: guild.members.length, size: guild.size }) }),
         h(
           'ul',
           { class: 'friends-list' },
-          guild.members.map((member) => h('li', { class: 'friend' }, who(member, member.role !== 'member' && h('span', { class: 'party-leader', text: member.role === 'leader' ? 'Lider' : 'Zastępca' })), actions(member))),
+          guild.members.map((member) => h('li', { class: 'friend' }, who(member, member.role !== 'member' && h('span', { class: 'party-leader', text: member.role === 'leader' ? t('Lider') : t('Zastępca') })), actions(member))),
         ),
       ),
-      h('p', { class: 'muted', text: 'Kanał gildii czeka w Czacie, w zakładce „Gildia”.' }),
+      h('p', { class: 'muted', text: t('Kanał gildii czeka w Czacie, w zakładce „Gildia”.') }),
     );
   }
 
@@ -306,19 +309,19 @@ function mountGuild(container) {
     const { guild } = view;
     if (guild.role === 'member' || guild.members.length >= guild.size) return null;
     const friends = guild.friends ?? [];
-    const name = h('input', { type: 'text', id: 'guild-invite-name', maxlength: '20', autocomplete: 'off', autocapitalize: 'none', enterkeyhint: 'send', placeholder: 'Imię postaci', 'aria-label': 'Imię postaci do zaproszenia do gildii' });
-    const send = h('button', { type: 'submit', class: 'button button--system chat-send', text: 'Zaproś' });
+    const name = h('input', { type: 'text', id: 'guild-invite-name', maxlength: '20', autocomplete: 'off', autocapitalize: 'none', enterkeyhint: 'send', placeholder: t('Imię postaci'), 'aria-label': t('Imię postaci do zaproszenia do gildii') });
+    const send = h('button', { type: 'submit', class: 'button button--system chat-send', text: t('Zaproś') });
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'guild-invite-title' },
       foldPart(
-        { key: 'guild-invite', title: 'Zaproś do gildii', card: true, id: 'guild-invite-title', open: false },
-      h('p', { class: 'muted', text: 'Poniżej możesz zaprosić kogoś z listy znajomych lub dodać kogokolwiek ręcznie spoza niej.' }),
+        { key: 'guild-invite', title: t('Zaproś do gildii'), card: true, id: 'guild-invite-title', open: false },
+      h('p', { class: 'muted', text: t('Poniżej możesz zaprosić kogoś z listy znajomych lub dodać kogokolwiek ręcznie spoza niej.') }),
       friends.length > 0 &&
         h(
           'ul',
           { class: 'friends-list' },
-          friends.map((friend) => h('li', { class: 'friend' }, who(friend), h('div', { class: 'friend-actions' }, button('Zaproś', act('/api/guild/invite', { name: friend.name }), 'system')))),
+          friends.map((friend) => h('li', { class: 'friend' }, who(friend), h('div', { class: 'friend-actions' }, button(t('Zaproś'), act('/api/guild/invite', { name: friend.name }), 'system')))),
         ),
       h(
         'form',
@@ -347,12 +350,12 @@ function mountGuild(container) {
       'section',
       { class: 'card', 'aria-labelledby': 'guild-sent-title' },
       foldPart(
-        { key: 'guild-sent', title: `Wysłane zaproszenia (${guild.invited.length})`, card: true, id: 'guild-sent-title', open: false },
+        { key: 'guild-sent', title: t('Wysłane zaproszenia ({count})', { count: guild.invited.length }), card: true, id: 'guild-sent-title', open: false },
       h(
         'ul',
         { class: 'friends-list' },
         guild.invited.map((one) =>
-          h('li', { class: 'friend' }, who(one), guild.role !== 'member' && h('div', { class: 'friend-actions' }, button('Cofnij', act('/api/guild/cancel', { characterId: one.id }, 'Zaproszenie cofnięte.')))),
+          h('li', { class: 'friend' }, who(one), guild.role !== 'member' && h('div', { class: 'friend-actions' }, button(t('Cofnij'), act('/api/guild/cancel', { characterId: one.id }, t('Zaproszenie cofnięte.'))))),
         ),
       ),
       ),
@@ -364,14 +367,14 @@ function mountGuild(container) {
     return h(
       'div',
       { class: 'party-leave' },
-      button('Opuść gildię', async () => {
+      button(t('Opuść gildię'), async () => {
         const text =
           guild.role === 'leader' && guild.members.length > 1
-            ? 'Przywództwo przejmie pierwszy zastępca, a gdy go nie ma, członek z najdłuższym stażem.'
+            ? t('Przywództwo przejmie pierwszy zastępca, a gdy go nie ma, członek z najdłuższym stażem.')
             : guild.members.length === 1
-              ? 'W gildii nie ma nikogo poza Twoją postacią: po wyjściu gildia zniknie razem ze swoim kanałem.'
-              : 'Wrócić możesz tylko na nowe zaproszenie.';
-        if (!(await confirmAction({ title: 'Opuścić gildię?', text, confirmLabel: 'Opuść' }))) return;
+              ? t('W gildii nie ma nikogo poza Twoją postacią: po wyjściu gildia zniknie razem ze swoim kanałem.')
+              : t('Wrócić możesz tylko na nowe zaproszenie.');
+        if (!(await confirmAction({ title: t('Opuścić gildię?'), text, confirmLabel: t('Opuść') }))) return;
         await act('/api/guild/leave')();
       }),
     );
@@ -380,7 +383,7 @@ function mountGuild(container) {
   call('GET', '/api/guild')
     .then(show)
     .catch((error) => {
-      if (!gone) fill(body, h('section', { class: 'card' }, h('p', { class: 'muted', text: error.message ?? 'Nie udało się wczytać gildii.' })));
+      if (!gone) fill(body, h('section', { class: 'card' }, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać gildii.') })));
     });
 
   return {

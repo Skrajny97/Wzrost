@@ -8,7 +8,8 @@
 // and the
 // "Wkład tygodnia", who finished how many trials. The card asks for the
 // Próby itself and takes its words from the answer (data/guilds.json,
-// trials.texts). mountGuildTrials(container) adds the card to the
+// trials.texts), in the page's language; its own few words go through t()
+// (i18n.js). mountGuildTrials(container) adds the card to the
 // container and gives { unmount() }, which takes it away.
 
 import { goldArt, timePointsArt } from './art.js';
@@ -16,6 +17,7 @@ import { checkGuildTodo } from './chat-news.js';
 import { materialIcon } from './craft-table.js';
 import { fill, h, icon } from './dom.js';
 import { formatNumber, plural } from './format.js';
+import { t } from './i18n.js';
 import { SYSTEM_POINTS_ICON } from './icons.js';
 import { call } from './state.js';
 import { foldPart, howItWorks, toast, withButton } from './ui.js';
@@ -43,18 +45,18 @@ export function chestContents(chest, label) {
   return h(
     'ul',
     { class: 'guild-chest', 'aria-label': label },
-    chest.gold > 0 && h('li', { title: 'Złoto' }, goldArt(16), h('span', { text: formatNumber(chest.gold) })),
-    chest.timePoints > 0 && h('li', { title: 'Punkty Czasu' }, timePointsArt(16), h('span', { text: formatNumber(chest.timePoints) })),
+    chest.gold > 0 && h('li', { title: t('Złoto') }, goldArt(16), h('span', { text: formatNumber(chest.gold) })),
+    chest.timePoints > 0 && h('li', { title: t('Punkty Czasu') }, timePointsArt(16), h('span', { text: formatNumber(chest.timePoints) })),
     chest.materials.map((material) => h('li', { title: material.name }, materialIcon(material.materialId, 16), h('span', { text: `${material.name} ×${formatNumber(material.count)}` }))),
     chest.systemPoints > 0 &&
-      h('li', { title: 'Punkty Systemu' }, icon(SYSTEM_POINTS_ICON, { size: 16, className: 'guild-chest-system' }), h('span', { text: formatNumber(chest.systemPoints) })),
+      h('li', { title: t('Punkty Systemu') }, icon(SYSTEM_POINTS_ICON, { size: 16, className: 'guild-chest-system' }), h('span', { text: formatNumber(chest.systemPoints) })),
   );
 }
 
 export function mountGuildTrials(container) {
   let view = null;
   let gone = false;
-  const card = h('section', { class: 'card guild-trials', 'aria-labelledby': 'guild-trials-title' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
+  const card = h('section', { class: 'card guild-trials', 'aria-labelledby': 'guild-trials-title' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   container.append(card);
 
   function show(next) {
@@ -104,7 +106,7 @@ export function mountGuildTrials(container) {
             text: texts.open,
             onClick: (event) => withButton(event.currentTarget, () => claim(bar.week, threshold.index)),
           })
-        : threshold.reached && h('span', { class: 'guild-threshold-reached', role: 'img', 'aria-label': 'osiągnięty' }, icon('check', { size: 18 }));
+        : threshold.reached && h('span', { class: 'guild-threshold-reached', role: 'img', 'aria-label': t('osiągnięty') }, icon('check', { size: 18 }));
     return h(
       'li',
       { class: `guild-threshold${threshold.reached ? ' guild-threshold--reached' : ''}` },
@@ -266,7 +268,7 @@ export function mountGuildTrials(container) {
   call('GET', '/api/guild/trials')
     .then(show)
     .catch((error) => {
-      if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? 'Nie udało się wczytać Prób Gildii.' }));
+      if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Prób Gildii.') }));
     });
 
   return {

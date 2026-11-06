@@ -11,13 +11,15 @@
 // author: "Daj też mozliwość wymiany i wystawiania ofert w Gildii zasoby za
 // złoto"), and takes the two counts; with the rules' sameCount the second
 // one follows the first. The words come with the answer (data/guilds.json,
-// exchange.texts).
+// exchange.texts), in the page's language; the card's own few go through
+// t() (i18n.js).
 // mountGuildExchange(container) adds the card to the container and gives
 // { unmount() }, which takes it away.
 
 import { goldArt, resourceArt } from './art.js';
 import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber } from './format.js';
+import { t } from './i18n.js';
 import { CLASS_ICONS } from './icons.js';
 import { openProfile } from './profile.js';
 import { call, state } from './state.js';
@@ -52,7 +54,7 @@ function deal(offer, giveLabel, wantLabel) {
 export function mountGuildExchange(container) {
   let view = null;
   let gone = false;
-  const card = h('section', { class: 'card guild-exchange', 'aria-labelledby': 'guild-exchange-title' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
+  const card = h('section', { class: 'card guild-exchange', 'aria-labelledby': 'guild-exchange-title' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   container.append(card);
 
   function show(next) {
@@ -76,7 +78,7 @@ export function mountGuildExchange(container) {
       { class: 'guild-who' },
       icon(CLASS_ICONS[person.classId] ?? 'person', { size: 16, className: 'chat-class' }),
       framedName(
-        h('button', { type: 'button', class: 'chat-name', text: person.name, 'aria-label': `${person.name}: zobacz postać`, onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)) }),
+        h('button', { type: 'button', class: 'chat-name', text: person.name, 'aria-label': t('{name}: zobacz postać', { name: person.name }), onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)) }),
         person.nameColor,
       ),
     );
@@ -189,7 +191,7 @@ export function mountGuildExchange(container) {
         h('p', { class: 'field-label', text: texts.want }),
         wantPicker,
         field(wantCount, wantLabel),
-        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }), send),
+        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), send),
       ),
     );
   }
@@ -288,7 +290,7 @@ export function mountGuildExchange(container) {
   call('GET', '/api/guild/exchange')
     .then(show)
     .catch((error) => {
-      if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? 'Nie udało się wczytać Wymiany.' }));
+      if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Wymiany.') }));
     });
 
   return {

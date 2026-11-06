@@ -9,7 +9,8 @@
 // and the rules under "Jak to działa?". The beast
 // is attacked whatever the character is doing, on an exploration too. The
 // card asks for the Bestia itself and takes its words from the
-// answer (data/guilds.json, beast.texts). mountGuildBeast(container) adds
+// answer (data/guilds.json, beast.texts), in the page's language; its own
+// few words go through t() (i18n.js). mountGuildBeast(container) adds
 // the card to the container and gives { unmount() }, which takes it away.
 
 import { createArena } from './arena.js';
@@ -18,23 +19,26 @@ import { materialIcon, materialSheet, materialTitle } from './craft-table.js';
 import { checkGuildTodo } from './chat-news.js';
 import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber, plural } from './format.js';
+import { language, t } from './i18n.js';
 import { call, onCharacterChange, state } from './state.js';
 import { foldPart, howItWorks, openSheet, toast, withButton } from './ui.js';
 import { itemSheet } from './screens/character.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 
-// "26.10–1.11": a week from the date of its Monday, its key.
+// "26.10–1.11" ("26/10–1/11" in English): a week from the date of its
+// Monday, its key.
 function weekLabel(key) {
   const monday = new Date(`${key}T12:00:00Z`);
   const sunday = new Date(monday.getTime() + 6 * 86400000);
-  const day = (date) => `${date.getUTCDate()}.${date.getUTCMonth() + 1}`;
+  const separator = language() === 'en' ? '/' : '.';
+  const day = (date) => `${date.getUTCDate()}${separator}${date.getUTCMonth() + 1}`;
   return `${day(monday)}–${day(sunday)}`;
 }
 
-// The last day a chest opens: the day before the midnight it waits until.
-const dayFormat = new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'numeric' });
-const lastDay = (until) => dayFormat.format(new Date(until - 1));
+// The last day a chest opens: the day before the midnight it waits until,
+// as the page's language writes a day.
+const lastDay = (until) => new Intl.DateTimeFormat(language() === 'en' ? 'en-GB' : 'pl-PL', { day: 'numeric', month: 'numeric' }).format(new Date(until - 1));
 
 export function mountGuildBeast(container) {
   let view = null;
@@ -44,7 +48,7 @@ export function mountGuildBeast(container) {
   let last = null;
   let opened = null;
   let gone = false;
-  const card = h('section', { class: 'card guild-beast', 'aria-labelledby': 'guild-beast-title' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
+  const card = h('section', { class: 'card guild-beast', 'aria-labelledby': 'guild-beast-title' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   container.append(card);
 
   function show(next) {
@@ -273,7 +277,7 @@ export function mountGuildBeast(container) {
   call('GET', '/api/guild/beast')
     .then(show)
     .catch((error) => {
-      if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? 'Nie udało się wczytać Bestii Gildii.' }));
+      if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Bestii Gildii.') }));
     });
 
   return {
