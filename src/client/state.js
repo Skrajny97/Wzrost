@@ -41,16 +41,21 @@ export function setCharacter(character) {
 // The content labels, asked for once in the page's language (i18n.js): the
 // start screen needs them for the music, the game for everything else. In
 // another language, as after the account's own was taken, they are asked
-// for again.
+// for again, and an answer in the language left behind, coming late, no
+// longer replaces them.
 let contentRequest = null;
 let contentLanguage = null;
 export function loadContent() {
   if (contentLanguage !== language()) contentRequest = null;
-  contentLanguage = language();
+  const asked = language();
+  contentLanguage = asked;
   contentRequest ??= request('GET', '/api/content').then(
-    (content) => (state.content = content),
+    (content) => {
+      if (asked === language()) state.content = content;
+      return content;
+    },
     (error) => {
-      contentRequest = null;
+      if (contentLanguage === asked) contentRequest = null;
       throw error;
     },
   );

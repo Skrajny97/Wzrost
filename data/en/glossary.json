@@ -1,0 +1,486 @@
+{
+  "$comment": "The English names of the game's key words, a draft that waits for the author's review, item by item (691 A), before stage 2. `en` is the name the translations use now; `or` the other one where Claude hesitates, for the author to choose. The translations of the code (strings.json) and of the data (data/en/) must use `en` wherever their Polish is the word itself (tools/i18n-check.mjs).",
+  "status": "draft",
+  "groups": [
+    {
+      "id": "tabs",
+      "name": "Zakładki i ekrany",
+      "terms": [
+        {
+          "pl": "Postać",
+          "en": "Character",
+          "note": "zakładka postaci; w grze zawsze „postać”, nie „bohater”"
+        },
+        {
+          "pl": "Walka",
+          "en": "Combat",
+          "note": "zakładka z Eksploracją i Wieżami; „Fight” krótsze, ale brzmi jak polecenie",
+          "or": "Fight"
+        },
+        {
+          "pl": "Eksploracja",
+          "en": "Exploration",
+          "note": "część Walki i licznik na zakładce"
+        },
+        {
+          "pl": "Wieże",
+          "en": "Towers",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Obóz",
+          "en": "Camp",
+          "note": "dosłownie, krótkie na pasek u góry"
+        },
+        {
+          "pl": "Profesje",
+          "en": "Professions",
+          "note": "przyjęte w grach MMO"
+        },
+        {
+          "pl": "Osada",
+          "en": "Settlement",
+          "note": "osada jako część gry; sama wieś nazywa się Rozstaje (niżej, w miejscach)"
+        },
+        {
+          "pl": "Społeczność",
+          "en": "Community",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Statystyki",
+          "en": "Stats",
+          "note": "w grach po angielsku „Stats”, mieści się w dolnym pasku"
+        },
+        {
+          "pl": "Umiejętności",
+          "en": "Skills",
+          "note": "dosłownie, krótkie"
+        },
+        {
+          "pl": "Ewolucja",
+          "en": "Evolution",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Rdzeń",
+          "en": "Core",
+          "note": "dosłownie, jak slot „Rdzeń”"
+        },
+        {
+          "pl": "Dziennik",
+          "en": "Journal",
+          "note": "dziennik z raportami; „Log” brzmi technicznie"
+        },
+        {
+          "pl": "Encyklopedia",
+          "en": "Encyclopedia",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Bestiariusz",
+          "en": "Bestiary",
+          "note": "przyjęte w grach"
+        },
+        {
+          "pl": "Sklep Systemu",
+          "en": "System Shop",
+          "note": "dosłownie, jak Punkty Systemu"
+        },
+        {
+          "pl": "Ustawienia",
+          "en": "Settings",
+          "note": "standard w aplikacjach"
+        }
+      ]
+    },
+    {
+      "id": "points",
+      "name": "Punkty i waluty",
+      "terms": [
+        {
+          "pl": "Punkty Systemu",
+          "en": "System Points",
+          "note": "dosłownie; skrót w opisach „SP” odpada, bo myli się ze Skill Points"
+        },
+        {
+          "pl": "Punkty Czasu",
+          "en": "Time Points",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Punkty Umiejętności",
+          "en": "Skill Points",
+          "note": "standard w RPG"
+        },
+        {
+          "pl": "wolne punkty",
+          "en": "free points",
+          "note": "punkty statystyk do rozdania; „unspent points” dłuższe",
+          "or": "unspent points"
+        },
+        {
+          "pl": "Złoto",
+          "en": "Gold",
+          "note": "w zdaniach też „zł” → „gold”"
+        },
+        {
+          "pl": "XP postaci / XP klasy",
+          "en": "Character XP / Class XP",
+          "note": "jak na pasku u góry"
+        },
+        {
+          "pl": "Reputacja",
+          "en": "Reputation",
+          "note": "reputacja bractw w Osadzie"
+        }
+      ]
+    },
+    {
+      "id": "professions",
+      "name": "Profesje",
+      "terms": [
+        {
+          "pl": "Zielarstwo",
+          "en": "Herbalism",
+          "note": "standard w grach"
+        },
+        {
+          "pl": "Alchemia",
+          "en": "Alchemy",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Rzemieślnictwo",
+          "en": "Crafting",
+          "note": "krótkie i jasne; „Craftsmanship” za długie"
+        },
+        {
+          "pl": "Górnictwo",
+          "en": "Mining",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Jubilerstwo",
+          "en": "Jewelcrafting",
+          "note": "standard w grach (WoW); „Jewellery” to wyroby, nie profesja"
+        },
+        {
+          "pl": "Awatar Systemu",
+          "en": "System Avatar",
+          "note": "dosłownie"
+        }
+      ]
+    },
+    {
+      "id": "places",
+      "name": "Miejsca do 25. poziomu",
+      "terms": [
+        {
+          "pl": "Skraj Puszczy",
+          "en": "Edge of the Wilds",
+          "note": "kraina; „puszcza” to dzika, pierwotna knieja, „Wilds” oddaje to lepiej niż „Forest”",
+          "or": "Forest's Edge"
+        },
+        {
+          "pl": "Wiatrołomy",
+          "en": "Windfalls",
+          "note": "windfall to drzewo powalone przez wiatr, zgodne z id windfalls"
+        },
+        {
+          "pl": "Święty gaj",
+          "en": "Sacred Grove",
+          "note": "cecha regionu, dosłownie"
+        },
+        {
+          "pl": "Skraj Wiatrołomów",
+          "en": "Edge of the Windfalls",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Lisie Jary",
+          "en": "Fox Ravines",
+          "note": "zgodne z id fox-ravines"
+        },
+        {
+          "pl": "Krucze Wykroty",
+          "en": "Raven Hollows",
+          "note": "wykrot to dół po wyrwanym drzewie; „hollow” zgodne z id"
+        },
+        {
+          "pl": "Żmijowe Zwalisko",
+          "en": "Viper Deadfall",
+          "note": "zwalisko to sterta zwalonych pni („deadfall”); id ma „heaps”",
+          "or": "Viper Heaps"
+        },
+        {
+          "pl": "Dzicza Głusza",
+          "en": "Boar Thicket",
+          "note": "zgodne z id boar-thicket"
+        },
+        {
+          "pl": "Rozstaje",
+          "en": "Crossroads",
+          "note": "nazwa wsi Osady, dosłownie"
+        }
+      ]
+    },
+    {
+      "id": "camp",
+      "name": "Obóz i jego budynki",
+      "terms": [
+        {
+          "pl": "Ognisko",
+          "en": "Campfire",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Tartak",
+          "en": "Sawmill",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Kamieniołom",
+          "en": "Quarry",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Kopalnia",
+          "en": "Mine",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Staw Midasa",
+          "en": "Midas Pond",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Magazyn",
+          "en": "Storehouse",
+          "note": "magazyn na łupy; „Storage” brzmi technicznie"
+        },
+        {
+          "pl": "Skup złomu",
+          "en": "Scrap Buyer",
+          "note": "budynek, gdzie złomiarz kupuje przedmioty",
+          "or": "Scrapyard"
+        },
+        {
+          "pl": "Kowadło",
+          "en": "Anvil",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Stół rozbiórki",
+          "en": "Salvage Table",
+          "note": "rozbiórka na części to w grach „salvage”"
+        },
+        {
+          "pl": "Kwatery",
+          "en": "Quarters",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Skrzynia Konta",
+          "en": "Account Chest",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Warownia",
+          "en": "Stronghold",
+          "note": "„Fortress” zgodne z id, ale „Stronghold” lepiej brzmi dla obozu, który urósł",
+          "or": "Fortress"
+        },
+        {
+          "pl": "Drewno",
+          "en": "Wood",
+          "note": "zasób obozu"
+        },
+        {
+          "pl": "Kamień",
+          "en": "Stone",
+          "note": "zasób obozu"
+        },
+        {
+          "pl": "Ruda żelaza",
+          "en": "Iron Ore",
+          "note": "zasób obozu"
+        }
+      ]
+    },
+    {
+      "id": "settlement",
+      "name": "Miejsca Osady",
+      "terms": [
+        {
+          "pl": "Tablica zleceń",
+          "en": "Order Board",
+          "note": "zlecenia mieszkańców; „Job Board” brzmi współcześnie",
+          "or": "Notice Board"
+        },
+        {
+          "pl": "Pracownia Zaklinaczki",
+          "en": "Enchantress's Workshop",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Chata Pustelnika",
+          "en": "Hermit's Hut",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Stajnia",
+          "en": "Stable",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Karczma",
+          "en": "Tavern",
+          "note": "standard w grach fantasy"
+        },
+        {
+          "pl": "Targowisko",
+          "en": "Marketplace",
+          "note": "dosłownie; „Market” krótsze",
+          "or": "Market"
+        },
+        {
+          "pl": "Garbarnia",
+          "en": "Tannery",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Chata zielarki",
+          "en": "Herbalist's Hut",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Kuźnia",
+          "en": "Forge",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Salon Gier",
+          "en": "Games Parlour",
+          "note": "loteria i koło fortuny; „Casino” nie pasuje do wsi",
+          "or": "Game Hall"
+        },
+        {
+          "pl": "Sala prób",
+          "en": "Trial Hall",
+          "note": "dosłownie"
+        }
+      ]
+    },
+    {
+      "id": "classes",
+      "name": "Klasy",
+      "terms": [
+        {
+          "pl": "Wojownik",
+          "en": "Warrior",
+          "note": "standard"
+        },
+        {
+          "pl": "Łucznik",
+          "en": "Archer",
+          "note": "standard"
+        },
+        {
+          "pl": "Mag",
+          "en": "Mage",
+          "note": "standard"
+        },
+        {
+          "pl": "Kleryk",
+          "en": "Cleric",
+          "note": "standard"
+        },
+        {
+          "pl": "Cień",
+          "en": "Shadow",
+          "note": "dosłownie; zwinna klasa od trafień krytycznych i uników"
+        }
+      ]
+    },
+    {
+      "id": "creatures",
+      "name": "Istoty słowiańskie do 25. poziomu (692 B) i przydomki (693 A)",
+      "terms": [
+        {
+          "pl": "Błędnica",
+          "en": "Bwendnitsa",
+          "note": "zapis fonetyczny: „ł” czyta się jak „w”, „ę” jak „en”",
+          "or": "Blendnitsa"
+        },
+        {
+          "pl": "Płanetnik",
+          "en": "Pwanetnik",
+          "note": "zapis fonetyczny; „Planetnik” Anglik przeczyta jak „planeta”",
+          "or": "Planetnik"
+        },
+        {
+          "pl": "Upiór",
+          "en": "Upyr",
+          "note": "forma przyjęta w angielskim (przykład autora)"
+        },
+        {
+          "pl": "Leszy",
+          "en": "Leshy",
+          "note": "forma przyjęta w angielskim (przykład autora)"
+        },
+        {
+          "pl": "Zamaskowana Diana",
+          "en": "Masked Diana",
+          "note": "imię zostaje, przydomek przetłumaczony (przykład autora)"
+        },
+        {
+          "pl": "Wojsław Pożoga",
+          "en": "Wojsław the Blaze",
+          "note": "pożoga to wielki pożar; „the” jak w przydomkach angielskich"
+        },
+        {
+          "pl": "Ścibor Kopacz",
+          "en": "Ścibor the Digger",
+          "note": "rabuś grobów, który kopie"
+        }
+      ]
+    },
+    {
+      "id": "other",
+      "name": "Inne",
+      "terms": [
+        {
+          "pl": "Szybkie Polowanie",
+          "en": "Quick Hunt",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "wyprawa",
+          "en": "exploration",
+          "note": "wyprawa postaci w grze; „expedition” zostaje dla Wyprawy Gildii"
+        },
+        {
+          "pl": "Wyprawa Gildii",
+          "en": "Guild Expedition",
+          "note": "odróżnia się od zwykłej wyprawy"
+        },
+        {
+          "pl": "Drużyna",
+          "en": "Party",
+          "note": "standard w RPG"
+        },
+        {
+          "pl": "Gildia",
+          "en": "Guild",
+          "note": "standard"
+        },
+        {
+          "pl": "Wejrzyj do miejsca pełnego wyzwań dla śmiałków",
+          "en": "Look into a place full of challenges for the daring",
+          "note": "hasło gry, dosłownie (694 A)"
+        }
+      ]
+    }
+  ]
+}

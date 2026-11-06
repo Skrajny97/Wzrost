@@ -58,7 +58,7 @@ import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
 import { englishOn, readFeatures, registrationOpen, settlementOn } from './features.js';
-import { dictionary, language, requestLanguage, runInLanguage, t } from './i18n.js';
+import { language, pageDictionary, requestLanguage, runInLanguage, t } from './i18n.js';
 import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, getMarket, listOffer, settleMarket } from './market.js';
 import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
@@ -488,7 +488,7 @@ async function health({ env, now }) {
 // The English of the page's own texts (data/en/strings.json), in a request
 // in English; nothing in Polish, the page's own language.
 function strings() {
-  return json({ language: language(), strings: dictionary() ?? {} });
+  return json({ language: language(), strings: pageDictionary() });
 }
 
 // Browsers always send Origin with POST requests made by fetch; a foreign one is refused.

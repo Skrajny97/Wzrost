@@ -49,6 +49,15 @@ export const accountLanguage = (stored) => (englishOn() && LANGUAGES.includes(st
 // The English of the code's texts, or null for Polish.
 export const dictionary = (lang = language()) => DICTIONARIES[lang] ?? null;
 
+// The same for the page, without the file's notes ($comment).
+const pageWords = new Map();
+export function pageDictionary(lang = language()) {
+  const words = dictionary(lang);
+  if (!words) return {};
+  if (!pageWords.has(lang)) pageWords.set(lang, Object.fromEntries(Object.entries(words).filter(([key]) => !key.startsWith('$'))));
+  return pageWords.get(lang);
+}
+
 // {name} filled in; one the code did not give stays as it is.
 const fill = (template, vars) => template.replace(/\{(\w+)\}/g, (whole, name) => (Object.hasOwn(vars, name) ? String(vars[name]) : whole));
 

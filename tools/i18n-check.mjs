@@ -9,7 +9,9 @@
 //     written (data/en/sources.json keeps a hash of the Polish each English
 //     was made from), or one with no hash yet;
 //   - niepodpięte: an English data file the server does not lay over the data
-//     (src/server/content.js).
+//     (src/server/content.js);
+//   - niezgodne ze słownikiem nazw: a text that is one of the key names of
+//     data/en/glossary.json, whose English is not the glossary's (`en`).
 // Everything but the superfluous fails `npm test` (test/i18n.test.js).
 //
 //   node tools/i18n-check.mjs              the report; exits 1 on a failure
@@ -363,7 +365,15 @@ export function checkTranslations({ root = ROOT, all = false } = {}) {
   const strings = readJson(join(en, 'strings.json'));
   const sources = existsSync(join(en, 'sources.json')) ? readJson(join(en, 'sources.json')) : {};
   const ignored = new Set(scope.ignore ?? []);
-  const result = { missing: [], superfluous: [], variables: [], outdated: [], unstamped: [], unwired: [], outside: {}, stamps: {} };
+  const result = { missing: [], superfluous: [], variables: [], outdated: [], unstamped: [], unwired: [], glossary: [], outside: {}, stamps: {} };
+  // The key names: a text that is the name itself has the glossary's English
+  // (an abbreviation, `short`, aside).
+  const names = new Map(
+    existsSync(join(en, 'glossary.json')) ? readJson(join(en, 'glossary.json')).groups.flatMap((group) => group.terms.map((term) => [term.pl, term.en])) : [],
+  );
+  const named = (where, polish, english) => {
+    if (names.has(polish) && english !== names.get(polish)) result.glossary.push({ where, text: polish, english: `${english} (słownik: ${names.get(polish)})` });
+  };
 
   // The data.
   const server = readFileSync(join(root, 'src/server/content.js'), 'utf8');
@@ -386,6 +396,7 @@ export function checkTranslations({ root = ROOT, all = false } = {}) {
         continue;
       }
       if (placeholders(leaf.polish) !== placeholders(leaf.english)) result.variables.push({ where: `data/en/${name}.json ${leaf.path.slice(name.length + 1)}`, text: leaf.polish, english: leaf.english });
+      if (leaf.key !== 'short') named(`data/en/${name}.json ${leaf.path.slice(name.length + 1)}`, leaf.polish, leaf.english);
       const hash = hashOf(leaf.polish);
       result.stamps[leaf.path] = hash;
       if (!(leaf.path in sources)) result.unstamped.push({ where: `data/en/${name}.json ${leaf.path.slice(name.length + 1)}`, text: leaf.polish });
@@ -427,11 +438,12 @@ export function checkTranslations({ root = ROOT, all = false } = {}) {
   }
   for (const [key, value] of dictionary) {
     if (!seen.has(key) && !seen.has(shape(key))) result.superfluous.push({ where: 'data/en/strings.json', text: key });
+    named('data/en/strings.json', key, value);
     if (key.includes('|') && !key.includes('{')) {
       if (typeof value !== 'string' || value.split('|').length > 2 || /\{\w+\}/.test(value)) result.variables.push({ where: 'data/en/strings.json', text: key, english: value });
     } else if (typeof value !== 'string' || placeholders(key) !== placeholders(value)) result.variables.push({ where: 'data/en/strings.json', text: key, english: value });
   }
-  for (const list of ['missing', 'superfluous', 'variables', 'outdated', 'unstamped']) {
+  for (const list of ['missing', 'superfluous', 'variables', 'outdated', 'unstamped', 'glossary']) {
     result[list] = [...new Map(result[list].map((entry) => [`${entry.where}\u0000${entry.text}`, entry])).values()];
   }
   return result;
@@ -467,13 +479,14 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   show('Nieaktualne: polski zmienił się po angielskim', result.outdated, true);
   show('Bez skrótu polskiego (node tools/i18n-check.mjs --stamp)', result.unstamped, true);
   show('Niepodpięte pliki tłumaczeń', result.unwired, true);
+  show('Niezgodne ze słownikiem nazw (data/en/glossary.json)', result.glossary, true);
   show('Zbędne wpisy', result.superfluous, false);
   const outside = Object.entries(result.outside).sort(([a], [b]) => (a < b ? -1 : 1));
   if (args.has('--all') && outside.length > 0) {
     console.log(`\n• Bez tłumaczenia poza częściami przetłumaczonymi (${outside.reduce((sum, [, count]) => sum + count, 0)}):`);
     for (const [where, count] of outside) console.log(`  ${where}: ${count}`);
   }
-  const failed = ['missing', 'variables', 'outdated', 'unstamped', 'unwired'].some((list) => result[list].length > 0);
+  const failed = ['missing', 'variables', 'outdated', 'unstamped', 'unwired', 'glossary'].some((list) => result[list].length > 0);
   console.log(failed ? '\nTłumaczenia wymagają poprawek.' : '\nTłumaczenia części przetłumaczonych są kompletne.');
   process.exit(failed ? 1 : 0);
 }

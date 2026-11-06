@@ -10,18 +10,34 @@
 // Ustawienia and "Zgłoś błąd", with a screenshot picked too), it looks for a
 // page wider than the screen (a sheet that scrolls sideways), text out of
 // its frame and elements past the right edge, and lists text cut with "…"
-// for a look.
+// for a look. Before the game, the screens around it: the login and the new
+// account's forms, the choice of a character on an account with two of them,
+// long-named, and the creation of a new one.
 // Run against a dev server (npm run dev) from the repo folder whose local D1
 // the server uses, as tools/first-steps.cjs:
-//   NODE_PATH=$(npm root -g) node tools/layout-check.cjs http://localhost:8787 [folder for screenshots]
+//   NODE_PATH=$(npm root -g) node tools/layout-check.cjs http://localhost:8787 [folder for screenshots] [--lang pl|en]
 // Exit code 1 when a screen has a problem; the "…" cuts never fail it.
+// --lang (Polish by default): the browser's language, so the accounts and
+// the page take it where the game offers English (src/client/i18n.js); the
+// names of tabs and sheets it looks for are then their English
+// (data/en/strings.json) where they have it. In English it also lists, for a
+// look, the Polish words left on the screens around the game and in the
+// Ustawienia (the names of the characters and the guild aside).
 const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
 const { chromium } = require('playwright');
 
-const BASE = process.argv[2] ?? 'http://localhost:8787';
-const OUT = process.argv[3] ?? null;
+const args = process.argv.slice(2);
+const langAt = args.indexOf('--lang');
+const LANG = langAt >= 0 ? args.splice(langAt, 2)[1] : 'pl';
+if (!['pl', 'en'].includes(LANG)) throw new Error(`Nieznany język: ${LANG}. Wybierz pl albo en.`);
+const LOCALE = { pl: 'pl-PL', en: 'en-US' }[LANG];
+const ENGLISH = LANG === 'en' ? JSON.parse(fs.readFileSync(path.join(__dirname, '../data/en/strings.json'), 'utf8')) : {};
+// A text of the page as it shows in the language checked.
+const said = (polish) => ENGLISH[polish] || polish;
+const BASE = args[0] ?? 'http://localhost:8787';
+const OUT = args[1] ?? null;
 // The local D1 of the folder it runs from, as tools/first-steps.cjs.
 const sql = (command) => execFileSync('npx', ['wrangler', 'd1', 'execute', 'DB', '--local', '--command', command], { stdio: 'ignore' });
 
@@ -68,7 +84,7 @@ const SCREENS = [
 // Tabs opened on a screen after its first look, by the start of their
 // names: the Stół rozbiórki's queue, with "Usuń z kolejki" by each order,
 // the Tablica zleceń's Poszukiwani and the Ranking's guilds.
-const TABS = { '#/oboz/craft-table': ['Kolejka'], '#/osada/board': ['Poszukiwani'], '#/spolecznosc/ranking': ['Gildie'] };
+const TABS = { '#/oboz/craft-table': [said('Kolejka')], '#/osada/board': [said('Poszukiwani')], '#/spolecznosc/ranking': [said('Gildie')] };
 // Sheets opened over a screen after its tabs, each from the one before (a
 // tap on `tap`, or a picture given to the file field `pick`), looked at
 // alone once `ready` shows in it, and closed at the end with "Zamknij". The
@@ -83,11 +99,28 @@ const SHEETS = {
     { name: 'porównanie', tap: '#sheet .item-list > li:first-child .wear-choice > summary', ready: '.wear-choice[open] .compare' },
   ],
   '#/postac': [
-    { name: 'Ustawienia', tap: '.topbar .settings-button', ready: 'h2.sheet-title:text-is("Ustawienia")' },
-    { name: 'Zgłoś błąd', tap: '#sheet button:text-is("Zgłoś błąd")', ready: 'h2.sheet-title:text-is("Zgłoś błąd")' },
+    { name: 'Ustawienia', tap: '.topbar .settings-button', ready: `h2.sheet-title:text-is("${said('Ustawienia')}")`, words: true },
+    { name: 'Zgłoś błąd', tap: `#sheet button:text-is("${said('Zgłoś błąd')}")`, ready: `h2.sheet-title:text-is("${said('Zgłoś błąd')}")`, words: true },
     { name: 'zrzut ekranu', pick: '#sheet input[type="file"]', ready: '.bug-shot-preview' },
   ],
 };
+
+// The Polish words on the screen, or in the sheet `frame`, for a look at
+// what is left to translate: each text with a Polish letter, but the names
+// the check gave (`names`).
+function polishWords({ frame, names }) {
+  const root = frame ? document.querySelector(frame) : document.body;
+  const found = new Set();
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const element = node.parentElement;
+    if (!element || element.closest('[hidden], [aria-hidden="true"]') || getComputedStyle(element).display === 'none') continue;
+    let text = node.textContent.trim();
+    for (const name of names) text = text.replaceAll(name, '');
+    if (/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(text)) found.add(node.textContent.trim().slice(0, 60));
+  }
+  return [...found];
+}
 
 // What is wrong on the screen now, by the page itself. With `frame`, the
 // selector of a sheet open over the screen, only what is in the sheet: it
@@ -162,7 +195,7 @@ async function main() {
   const login = `uklad${stamp}_ekranu_gracza`;
   // A long name of 20 characters with Polish letters.
   const name = `Bożydarłomiej${stamp}`.slice(0, 20);
-  const first = await browser.newContext();
+  const first = await browser.newContext({ locale: LOCALE });
   const page = await first.newPage();
   await page.goto(BASE);
   const api = (method, url, body) =>
@@ -211,17 +244,27 @@ async function main() {
   });
   const picture = { name: 'zrzut-ekranu.png', mimeType: 'image/png', buffer: Buffer.from(png, 'base64') };
   const storage = await first.storageState();
+  // For the screens before the game: an account with two characters, both
+  // with long names, and the longest login, signed in with the form. The
+  // first account's session stays for the game's screens: the cookie goes,
+  // without signing out.
+  const other = `wybor${stamp}_postaci_konta_`.slice(0, 24);
+  const otherNames = [`Wszemiłosława${stamp}`.slice(0, 20), `Świętopełkowa${stamp}`.slice(0, 20)];
+  await first.clearCookies();
+  await api('POST', '/api/auth/register', { login: other, email: `${other}@example.com`, password: 'pierwszekroki1' });
+  sql(`UPDATE users SET email_confirmed_at = 1 WHERE login = '${other}'`);
+  for (const [index, otherName] of otherNames.entries()) {
+    if ((await api('POST', '/api/character', { name: otherName, classId: index === 0 ? 'cleric' : 'shadow', appearance: 'male' })) >= 400) throw new Error('Nie powstała postać do wyboru.');
+  }
+  sql(`UPDATE characters SET level = 146, class_level = 99 WHERE name = '${otherNames[0]}'`);
   await first.close();
+  const names = [name, ...otherNames, login, other, `Bractwo Żelaznych ${stamp}`];
 
   let problems = 0;
   for (const size of SIZES) {
-    const context = await browser.newContext({ storageState: storage, viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1, isMobile: size.mobile, hasTouch: size.mobile, locale: 'pl-PL', timezoneId: 'Europe/Warsaw' });
-    const view = await context.newPage();
-    const errors = [];
-    view.on('pageerror', (error) => errors.push(error.message));
-    await view.goto(`${BASE}/${SCREENS[0]}`);
-    await view.waitForTimeout(2500);
-    const check = async (screen, frame) => {
+    const options = { viewport: { width: size.width, height: size.height }, deviceScaleFactor: 1, isMobile: size.mobile, hasTouch: size.mobile, locale: LOCALE, timezoneId: 'Europe/Warsaw' };
+    let view = null;
+    const check = async (screen, frame, words = false) => {
       const found = await view.evaluate(audit, frame);
       const bad = found.filter((one) => one.kind !== 'cut');
       const cut = found.filter((one) => one.kind === 'cut');
@@ -232,7 +275,55 @@ async function main() {
         if (OUT) await view.screenshot({ path: path.join(OUT, `${size.width}-${screen.replace(/[^\p{L}\w]+/gu, '-').replace(/^-|-$/g, '')}.png`) });
       }
       for (const one of cut) console.log(`  … ${size.name} ${screen}: ${one.where} „${one.text}”`);
+      if (LANG === 'en' && words) for (const text of await view.evaluate(polishWords, { frame, names })) console.log(`  pl ${size.name} ${screen}: „${text}”`);
     };
+
+    // Before the game: the login, the new account's form, the choice of a
+    // character after signing in, and the creation of a new one from it.
+    const start = await browser.newContext(options);
+    view = await start.newPage();
+    const startErrors = [];
+    view.on('pageerror', (error) => startErrors.push(error.message));
+    const trail = [];
+    try {
+      await view.goto(BASE);
+      await view.locator('#view-auth:not([hidden]) #login-form').waitFor({ timeout: 10000 });
+      await view.waitForTimeout(1000);
+      trail.push('logowanie');
+      await check('logowanie', null, true);
+      trail.push('nowe konto');
+      await view.locator('[data-auth-mode="register"]').click();
+      await check('nowe konto', null, true);
+      trail.push('wybór postaci');
+      await view.locator('[data-auth-mode="login"]').click();
+      await view.locator('#login-identifier').fill(other);
+      await view.locator('#login-password').fill('pierwszekroki1');
+      await view.locator('#login-form button[type="submit"]').click();
+      await view.locator('#view-select:not([hidden]) .select-card').first().waitFor({ timeout: 10000 });
+      await view.waitForTimeout(500);
+      await check('wybór postaci', null, true);
+      trail.push('nowa postać');
+      await view.locator('#view-select .select-actions .button--system').click();
+      await view.locator('#view-create:not([hidden]) .class-card').first().waitFor({ timeout: 10000 });
+      await view.waitForTimeout(500);
+      await check('nowa postać', null, true);
+    } catch (error) {
+      problems += 1;
+      console.log(`✖ ${size.name} ${trail.join(' › ')}`);
+      console.log(`    start: ${error.message.split('\n')[0]}`);
+    }
+    if (startErrors.length > 0) {
+      problems += startErrors.length;
+      console.log(`✖ ${size.name}: błędy strony przed grą: ${startErrors.join(' | ')}`);
+    }
+    await start.close();
+
+    const context = await browser.newContext({ ...options, storageState: storage });
+    view = await context.newPage();
+    const errors = [];
+    view.on('pageerror', (error) => errors.push(error.message));
+    await view.goto(`${BASE}/${SCREENS[0]}`);
+    await view.waitForTimeout(2500);
     for (const screen of SCREENS) {
       await view.goto(`${BASE}/${screen}`);
       await view.waitForTimeout(1500);
@@ -259,7 +350,7 @@ async function main() {
           else await view.locator(step.tap).click({ timeout: 5000 });
           await view.locator(`#sheet[open] ${step.ready}`).waitFor({ timeout: 5000 });
           await view.waitForTimeout(500);
-          await check(trail.join(' › '), '#sheet');
+          await check(trail.join(' › '), '#sheet', step.words);
         }
         if (SHEETS[screen]) {
           trail.push('Zamknij');
@@ -281,7 +372,7 @@ async function main() {
     await context.close();
   }
   await browser.close();
-  console.log(problems === 0 ? `✔ ${SIZES.length} rozmiarów ekranu × ${SCREENS.length} ekranów bez problemów.` : `✖ Problemów: ${problems}.`);
+  console.log(problems === 0 ? `✔ ${SIZES.length} rozmiarów ekranu × ${SCREENS.length + 4} ekranów bez problemów${LANG === 'pl' ? '' : ` (${LANG.toUpperCase()})`}.` : `✖ Problemów: ${problems}.`);
   process.exit(problems === 0 ? 0 : 1);
 }
 

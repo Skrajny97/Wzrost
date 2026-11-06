@@ -7,14 +7,24 @@
 //
 // Needs the game running locally (npm run dev, http://localhost:8787 by
 // default) and Playwright with its Chromium:
-//   node tools/first-steps.cjs [base URL]
+//   node tools/first-steps.cjs [base URL] [--lang pl|en]
 // Each walk takes a new account; its e-mail is marked confirmed straight in
 // the local D1 database (wrangler d1 execute --local).
+// --lang (Polish by default): the browser's language, so the account and
+// the page take it where the game offers English (src/client/i18n.js); in
+// English the walk ends on a page that says it is English, with the top
+// bar's Settings in English.
 
 const { execFileSync } = require('node:child_process');
 const { chromium } = require('playwright');
 
-const BASE = process.argv[2] ?? 'http://localhost:8787';
+const args = process.argv.slice(2);
+const langAt = args.indexOf('--lang');
+const LANG = langAt >= 0 ? args.splice(langAt, 2)[1] : 'pl';
+if (!['pl', 'en'].includes(LANG)) throw new Error(`Nieznany język: ${LANG}. Wybierz pl albo en.`);
+// The browser's language, and the narrator's "Dalej" in it (data/tutorial.json, data/en/tutorial.json).
+const LANGUAGES = { pl: { locale: 'pl-PL', next: 'Dalej' }, en: { locale: 'en-US', next: 'Next' } };
+const BASE = args[0] ?? 'http://localhost:8787';
 const SIZES = [
   { name: 'telefon', width: 390, height: 844 },
   { name: 'komputer', width: 1366, height: 768 },
@@ -40,7 +50,7 @@ async function account(page) {
 }
 
 async function walk(browser, size) {
-  const page = await browser.newPage({ viewport: { width: size.width, height: size.height } });
+  const page = await browser.newPage({ viewport: { width: size.width, height: size.height }, locale: LANGUAGES[LANG].locale });
   const errors = [];
   page.on('pageerror', (error) => errors.push(error.message));
   await page.goto(BASE);
@@ -52,13 +62,15 @@ async function walk(browser, size) {
     for (const text of await page.locator('.toast').allInnerTexts().catch(() => [])) if (text.trim()) toasts.add(text.trim());
     const activity = await page.evaluate(async () => (await (await fetch('/api/character')).json()).character?.activity?.kind ?? null);
     if (activity === 'hunt') {
+      const shown = LANG === 'en' && (await page.evaluate(() => ({ lang: document.documentElement.lang, settings: document.querySelector('.topbar .settings-button')?.getAttribute('aria-label') })));
       await page.close();
       if (errors.length > 0) throw new Error(`${size.name}: błędy strony: ${errors.join(' | ')}`);
+      if (shown && (shown.lang !== 'en' || !/^Settings/.test(shown.settings ?? ''))) throw new Error(`${size.name}: strona nie jest po angielsku (lang="${shown.lang}", zębatka „${shown.settings}”).`);
       return step;
     }
     const choice = page.locator('.narrator-choice button').first();
     const next = page.locator('.narrator-actions button:not(.narrator-skip)').last();
-    const noteNext = page.locator('.guide-note:not(.guide-note--hidden) button', { hasText: 'Dalej' }).first();
+    const noteNext = page.locator('.guide-note:not(.guide-note--hidden) button', { hasText: LANGUAGES[LANG].next }).first();
     const ring = await page.evaluate(() => {
       const element = document.querySelector('.guide-ring');
       if (!element) return null;
@@ -85,7 +97,7 @@ async function walk(browser, size) {
   for (const size of SIZES) {
     try {
       const steps = await walk(browser, size);
-      console.log(`✔ ${size.name} (${size.width}×${size.height}): pierwsza wyprawa ruszyła po ${steps} krokach.`);
+      console.log(`✔ ${size.name} (${size.width}×${size.height})${LANG === 'pl' ? '' : `, ${LANG.toUpperCase()}`}: pierwsza wyprawa ruszyła po ${steps} krokach.`);
     } catch (error) {
       failed = true;
       console.error(`✖ ${error.message}`);

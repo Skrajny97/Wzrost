@@ -12,7 +12,7 @@ import { MAX_FAILURES } from '../src/server/throttle.js';
 import { checkTranslations, codeTexts, htmlTexts, looksLikeText } from '../tools/i18n-check.mjs';
 import { useServer } from './helpers/server.js';
 
-test('the parts already translated have all their English, with the same {names}, made from the Polish as it is now', () => {
+test('the parts already translated have all their English, with the same {names} and key names, made from the Polish as it is now', () => {
   const result = checkTranslations();
   const show = (list) => list.map((entry) => `${entry.where}: ${entry.text}`).join('\n');
   assert.equal(show(result.missing), '', 'brakujące tłumaczenia (node tools/i18n-check.mjs)');
@@ -20,6 +20,7 @@ test('the parts already translated have all their English, with the same {names}
   assert.equal(show(result.outdated), '', 'polski zmienił się po angielskim: przetłumacz go od nowa, potem node tools/i18n-check.mjs --stamp-all');
   assert.equal(show(result.unstamped), '', 'node tools/i18n-check.mjs --stamp');
   assert.equal(show(result.unwired), '', 'plik tłumaczeń bez importu w src/server/content.js');
+  assert.equal(show(result.glossary), '', 'tłumaczenie inne niż w słowniku nazw (data/en/glossary.json)');
 });
 
 test('English lies over the Polish data by ids and keys, and never changes anything but its texts', () => {
