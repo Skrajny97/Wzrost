@@ -3034,6 +3034,28 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.99 (6.11.2026)
+
+- Po angielsku stwory z polskich podań mają angielskie nazwy zamiast zapisu fonetycznego, a z nimi ich afiksy na przedmiotach, materiały, opisy miejsc, zdarzenia i Poszukiwani; sześć przedmiotów o polskich nazwach też. Zob. „Odpowiedź autora: bez nazw fonetycznych”.
+
+## Odpowiedź autora: bez nazw fonetycznych (6.11.2026)
+
+Autor: „Rezygnujemy z tych fonetycznych tłumaczeń na angielski, tłumacz na angielski jakimis zamiennikami/neologizmami a w rolce zmień nazwy tych stworów. Tak wiem, to chwilę zajmie, ale chodzi głównie o stwory, zadania i ich afiksy pewnie w przedmiotach” i „I Come back for the loot chyba? a nie to the loot”.
+
+1. **Zapis fonetyczny z 692 B odpada** (Bwendnitsa, Pwanetnik, Kwobuk, Khokhow i inne), także Leshy i Upyr z przykładów autora. Istoty z polskich podań mają angielskie zamienniki albo nowe słowa w stylu gry (Stoneling, Mossling): Licho → Misfortune, Błędnica → Strayling, Płanetnik → Cloudherder, Topielica → Drowned Maiden, Utopiec → Drowner, Wodnik → Nix, Kikimora → Bog Hag, Strzyga → Shriekwing, Żmij → Wyrm, Skarbnik → Hoardkeeper, Bagiennik → Mire Demon, Bies → Fiend, Kłobuk → Pilferbird, Mamuna → Cradle Thief, Rokita → Marsh Devil, Latawiec → Gale Sprite, Południca → Noon Witch, Raróg → Firehawk, Chochoł → Strawman, Smętek → Sorrowling, Kołtun → Tanglelock, Bebok → Bogeyman, Upiór → Revenant, Leszy → Forest Lord.
+2. **Gdzie:** nazwa stwora i jej liczba mnoga (`counted`), afiksy na przedmiotach („Sword of Misfortune”, przedrostek „Strawbound” dla Chochoła), materiały („Misfortune's Eye”), opisy miejsc („Marsh Devil's Abyss”), zdarzenia, Poszukiwani („Mire Demon the Engulfer”, bo „Drowner” to już Utopiec) i słownik nazw (`data/en/glossary.json`, grupa istot, pilnowana przez `npm test`). Zadania biorą nazwę stwora z jego danych, więc zmieniają się same.
+3. **Przedmioty o polskich nazwach:** Karabela → Noble Sabre, Posoch → Elder Staff, Żupan → Longcoat, Kontusz → Sashed Coat, Delia → Fur Mantle, Ferezja → Long Robe. Zostają nazwy, które angielski zna (Kris, Yataghan, Kaftan i inne).
+4. **Zostają imiona:** mieszkańcy (Bogumił, Wszebor, Wiedana), przydomki z 693 A (Masked Diana, Wojsław the Blaze, Ścibor the Digger) i bogowie (Perun, Veles).
+5. **Rolka po angielsku:** nowe nazwy stworów i „Come back for the loot”.
+
+## Odpowiedź autora: angielski narrator (6.11.2026)
+
+Autor: „on nie mówi akcentem angielskim tylko polskim, nie może tak być, możesz nawet nowego narratora wygenerować na angielską wersję, ale nie takiego, tragedia, wszystko out.”
+
+1. **Wszystkie 142 angielskie nagrania** głosem polskiego narratora odpadają. Polski głos („Gawędziarz 1”) czyta angielski z polskim akcentem. Karta autora na początku („ask”) nie ma nagrania także po angielsku, jak po polsku.
+2. **Nowy głos:** kandydaci czytają te same dwie pierwsze kwestie na stronie odsłuchu (718): głosy zaprojektowane z opisu starego gawędziarza przy ognisku (brytyjski i amerykański, jak polski „Gawędziarz 1”) i gotowe angielskie głosy ElevenLabs (George, Daniel, Brian). Wybranym głosem powstaną wszystkie kwestie i znów trafią na stronę odsłuchu.
+3. Do tego czasu narrator po angielsku jest w grze bez głosu.
+
 ## Wersja 0.1.98 (6.11.2026)
 
 - Poszukiwani: objaśnienie na Tablicy zleceń („Jak to działa?”) i list gończy w ręku mówią, że poszukiwanych spotyka się tylko na zwykłej wyprawie, nie na Szybkim Polowaniu, Błyskawicznym polowaniu ani wyprawie Drużyny. Tak było od początku (`src/server/hunts.js`), ale opis tego nie mówił; zapytał o to gracz na czacie.

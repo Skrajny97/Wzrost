@@ -22,8 +22,8 @@
               "text": "The woman tries to answer, but your suspicious questions do not help: they take away all her hope of being saved. She dies in despair before your eyes. There is nothing more you can do for her."
             },
             "wisp": {
-              "name": "Questions: turns into a Bwendnitsa",
-              "text": "The woman falls silent, offended. Her eyes turn white, her skin begins to glow with a cold light, and her body rises above the path. The wounded woman turns into a Bwendnitsa!",
+              "name": "Questions: turns into a Strayling",
+              "text": "The woman falls silent, offended. Her eyes turn white, her skin begins to glow with a cold light, and her body rises above the path. The wounded woman turns into a Strayling!",
               "start": "{enemies} lunges at you."
             }
           }
@@ -86,14 +86,14 @@
       },
       "cases": {
         "guarded": {
-          "name": "Likho guards the flower",
+          "name": "Misfortune guards the flower",
           "outcomes": {
             "pick": {
-              "text": "As you reach for the flower, the Likho steps out from behind a boulder: gaunt, one-eyed, its hand stretched out for the luck of others.",
+              "text": "As you reach for the flower, Misfortune steps out from behind a boulder: gaunt, one-eyed, its hand stretched out for the luck of others.",
               "start": "{enemies} stands between you and the flower."
             },
             "watch": {
-              "text": "The Likho steps out from behind a boulder. It looks the flower over with its one eye, sniffs and vanishes among the stones. You pick the flower, and in your hand it turns into gold coins (+{gold})."
+              "text": "Misfortune steps out from behind a boulder. It looks the flower over with its one eye, sniffs and vanishes among the stones. You pick the flower, and in your hand it turns into gold coins (+{gold})."
             }
           }
         },
@@ -118,7 +118,7 @@
       }
     },
     "fern-flower-calm": {
-      "name": "Fern Flower without the Likho",
+      "name": "Fern Flower without Misfortune",
       "title": "Fern Flower",
       "text": "Among the ferns, a red light glows. It is the fern flower they tell of in every village: whoever picks it will never be forsaken by luck.",
       "options": {
@@ -295,18 +295,18 @@
           }
         },
         "upior": {
-          "name": "Upyr",
+          "name": "Revenant",
           "outcomes": {
             "pray": {
-              "text": "You kneel to pray, but the weeping turns into a giggle. A pale figure with empty eyes slides out of the shrine. It is an Upyr!",
+              "text": "You kneel to pray, but the weeping turns into a giggle. A pale figure with empty eyes slides out of the shrine. It is a Revenant!",
               "start": "{enemies} lunges at you, claws outstretched."
             },
             "exorcism": {
-              "text": "You trace a sign and speak the words of the exorcism. An Upyr flies out of the shrine with a howl and scatters like smoke before it can reach you (+{xp} XP). Where it stood, something remains: {item}."
+              "text": "You trace a sign and speak the words of the exorcism. A Revenant flies out of the shrine with a howl and scatters like smoke before it can reach you (+{xp} XP). Where it stood, something remains: {item}."
             },
             "offerings": {
-              "text": "You reach for the offerings, and an icy hand seizes your wrist. An Upyr guards its shrine!",
-              "start": "The Upyr strikes first: {enemies}."
+              "text": "You reach for the offerings, and an icy hand seizes your wrist. A Revenant guards its shrine!",
+              "start": "The Revenant strikes first: {enemies}."
             }
           }
         },
@@ -383,22 +383,22 @@
       }
     },
     "leshy": {
-      "title": "The Leshy Twists the Path",
-      "text": "The path leads you back to the same fallen oak yet again. Someone giggles behind the trees. It is the Leshy, lord of the wilds, who loves leading travellers astray.",
+      "title": "The Forest Lord Twists the Path",
+      "text": "The path leads you back to the same fallen oak yet again. Someone giggles behind the trees. It is the Forest Lord, master of the wilds, who loves leading travellers astray.",
       "options": {
         "clothes": {
           "label": "Turn your clothes inside out",
           "outcome": {
             "breaks": {
               "name": "Clothes: the spell breaks",
-              "text": "You turn your clothes inside out, as the old folk advise. The Leshy bursts out laughing until the leaves shake, and vanishes. The spell breaks, and on the trunk of the fallen oak lies his gift: {herbs}.",
+              "text": "You turn your clothes inside out, as the old folk advise. The Forest Lord bursts out laughing until the leaves shake, and vanishes. The spell breaks, and on the trunk of the fallen oak lies his gift: {herbs}.",
               "herbsKnown": {
-                "goldText": "You turn your clothes inside out, as the old folk advise. The Leshy bursts out laughing until the leaves shake, and vanishes. The spell breaks, and on the trunk of the fallen oak lies a handful of coins (+{gold} gold)."
+                "goldText": "You turn your clothes inside out, as the old folk advise. The Forest Lord bursts out laughing until the leaves shake, and vanishes. The spell breaks, and on the trunk of the fallen oak lies a handful of coins (+{gold} gold)."
               }
             },
             "holds": {
               "name": "Clothes: the spell holds",
-              "text": "You turn your clothes inside out, but the Leshy only giggles louder. This time the old trick fails, and you wander the forest until dusk.",
+              "text": "You turn your clothes inside out, but the Forest Lord only giggles louder. This time the old trick fails, and you wander the forest until dusk.",
               "lossText": "On the way you lose some of the resources you gathered ({resources})."
             }
           }
@@ -412,16 +412,16 @@
         "onward": {
           "label": "Keep walking straight ahead",
           "outcome": {
-            "text": "You stubbornly keep going, but the path keeps turning back to the same oak. You wander until dusk, and the Leshy laughs from every bush.",
+            "text": "You stubbornly keep going, but the path keeps turning back to the same oak. You wander until dusk, and the Forest Lord laughs from every bush.",
             "lossText": "On the way you lose some of the resources you gathered ({resources})."
           }
         },
         "duel": {
-          "label": "Challenge the Leshy",
+          "label": "Challenge the Forest Lord",
           "outcome": {
-            "text": "You call into the depths of the forest for the Leshy to show himself and fight. The trees creak, and from between them steps a figure taller than a man, with antlers and a beard of moss.",
+            "text": "You call into the depths of the forest for the Forest Lord to show himself and fight. The trees creak, and from between them steps a figure taller than a man, with antlers and a beard of moss.",
             "win": {
-              "text": "The Leshy bows low and vanishes into the thicket. His gift is left on the moss: {item}."
+              "text": "The Forest Lord bows low and vanishes into the thicket. His gift is left on the moss: {item}."
             },
             "start": "{enemies} accepts the challenge."
           }
@@ -501,11 +501,11 @@
           }
         },
         "upior": {
-          "name": "Upyr child",
+          "name": "Revenant child",
           "outcomes": {
             "lead/look": {
-              "text": "Behind the oak there is only a dug-up grave. The small hand clamps onto yours like pincers, and the girl's face turns grey and sinks in. It is an Upyr, looking for a companion in the grave!",
-              "start": "The Upyr strikes first: {enemies}."
+              "text": "Behind the oak there is only a dug-up grave. The small hand clamps onto yours like pincers, and the girl's face turns grey and sinks in. It is a Revenant, looking for a companion in the grave!",
+              "start": "The Revenant strikes first: {enemies}."
             },
             "lead/iron": {
               "text": "At the sight of iron the girl screams in an inhuman voice and falls apart into a wisp of mist. Only the straw doll is left under the oak, with something sewn inside it: {item}."
@@ -514,8 +514,8 @@
               "text": "You let go of the cold little hand and turn back. All the way you feel an icy breath on the back of your neck, and your arms grow heavy as lead (curse: damage −10% for 2 fights)."
             },
             "ask/camp": {
-              "text": "In the night a piercing cold wakes you. The girl is standing over you with wide, empty eyes, and the fire is going out. It is an Upyr!",
-              "start": "The Upyr falls upon you in your sleep: {enemies}."
+              "text": "In the night a piercing cold wakes you. The girl is standing over you with wide, empty eyes, and the fire is going out. It is a Revenant!",
+              "start": "The Revenant falls upon you in your sleep: {enemies}."
             },
             "ask/food": {
               "text": "The girl takes the food but does not eat it. She smiles sadly: “No one has given me anything in a long time.” She melts away like mist, leaving you with a strange peace in your heart (focus +10% for 2 fights)."
@@ -724,7 +724,7 @@
           "name": "Barrow guardian",
           "outcomes": {
             "dig/strike": {
-              "text": "Your blade passes through the treasure hunter as if through smoke. He laughs, and his face sinks into a skull. It is an Upyr, the guardian of the barrow!",
+              "text": "Your blade passes through the treasure hunter as if through smoke. He laughs, and his face sinks into a skull. It is a Revenant, the guardian of the barrow!",
               "win": {
                 "text": "Among the yellowed bones in the chest lies your prize: {item}."
               },
@@ -782,22 +782,22 @@
       }
     },
     "upior": {
-      "name": "Upyr",
+      "name": "Revenant",
       "counted": [
-        "Upyr",
-        "Upyrs",
-        "Upyrs"
+        "Revenant",
+        "Revenants",
+        "Revenants"
       ],
       "attack": {
         "name": "Ghastly Claws"
       }
     },
     "leshy": {
-      "name": "Leshy",
+      "name": "Forest Lord",
       "counted": [
-        "Leshy",
-        "Leshies",
-        "Leshies"
+        "Forest Lord",
+        "Forest Lords",
+        "Forest Lords"
       ],
       "attack": {
         "name": "Staff Strike"

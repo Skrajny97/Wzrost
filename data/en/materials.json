@@ -30,7 +30,7 @@
       "description": "A soft, speckled feather. It muffles every rustle."
     },
     "wisp-flame": {
-      "name": "Bwendnitsa Flame",
+      "name": "Strayling Flame",
       "description": "A tiny flame that never goes out and never burns."
     },
     "stag-antler": {
@@ -47,7 +47,7 @@
     },
     "hailstone": {
       "name": "Hailstone",
-      "description": "An icy pellet from a Pwanetnik's storm. It never melts and sparks faintly."
+      "description": "An icy pellet from a Cloudherder's storm. It never melts and sparks faintly."
     },
     "tusker-tusks": {
       "name": "Tusker Sabres",
@@ -122,7 +122,7 @@
       "description": "A heavy, thick hide with brown fur."
     },
     "likho-eye": {
-      "name": "Likho Eye",
+      "name": "Misfortune's Eye",
       "description": "A cloudy, cold eye. It is still watching."
     },
     "stone-heart": {
@@ -206,7 +206,7 @@
       "description": "A cold drop that never dries and gives off a faint vapour."
     },
     "drowned-tear": {
-      "name": "Topielitsa Tear",
+      "name": "Drowned Maiden's Tear",
       "description": "A clear drop, hard as glass and cold as water at dawn."
     },
     "old-bone": {
@@ -214,7 +214,7 @@
       "description": "A yellowed bone, worn smooth by the water."
     },
     "drowner-weeds": {
-      "name": "Utopiets Waterweed",
+      "name": "Drowner Waterweed",
       "description": "Wet green strands of waterweed, tangled like hair."
     },
     "sludge-lump": {
@@ -226,7 +226,7 @@
       "description": "A brass button polished to a shine, a mud goblin's treasure."
     },
     "vodnik-pearl": {
-      "name": "Vodnik Pearl",
+      "name": "Nix Pearl",
       "description": "A large black pearl. Something moves inside it."
     },
     "crane-feather": {
@@ -274,7 +274,7 @@
       "description": "A round jaw full of small, curved teeth."
     },
     "kikimora-yarn": {
-      "name": "Kikimora Yarn",
+      "name": "Bog Hag Yarn",
       "description": "A grey thread spun from moss and hair. It cannot be broken."
     },
     "bog-heart": {
@@ -318,7 +318,7 @@
       "description": "A long strip of olive skin with a yellow underside."
     },
     "strzyga-fang": {
-      "name": "Strzyga Fang",
+      "name": "Shriekwing Fang",
       "description": "A long, pale fang with a drop of blood that never dries."
     },
     "phantasm-shard": {
@@ -338,7 +338,7 @@
       "description": "A brown feather with white spots. It makes no rustle."
     },
     "zmij-scale": {
-      "name": "Zmey Scale",
+      "name": "Wyrm Scale",
       "description": "A red-black scale whose edges still glow."
     },
     "fume-ember": {
@@ -346,7 +346,7 @@
       "description": "A lump of coal with red cracks. It never stops smouldering."
     },
     "mine-lantern": {
-      "name": "Skarbnik Lamp",
+      "name": "Hoardkeeper's Lamp",
       "description": "An old brass lamp with a green flame that never goes out."
     },
     "rat-tail": {
@@ -390,7 +390,7 @@
       "description": "An old amulet on a leather thong, carved with a sun sign."
     },
     "bog-lantern-eye": {
-      "name": "Bagiennik Eye",
+      "name": "Mire Demon Eye",
       "description": "A round yellow eye that glows in the dark like a lantern."
     },
     "tick-shell": {
@@ -402,7 +402,7 @@
       "description": "Long, thin white feathers from a night heron's head."
     },
     "bies-horn": {
-      "name": "Bies Horn",
+      "name": "Fiend Horn",
       "description": "A short, thick black horn with a cracked tip. Warm to the touch."
     },
     "black-fleece": {
@@ -414,7 +414,7 @@
       "description": "A wet black feather whose tip still smoulders."
     },
     "mamuna-braid": {
-      "name": "Mamuna Braid",
+      "name": "Cradle Thief's Braid",
       "description": "A long braid of black hair tied with a red thread. Always wet."
     },
     "cyrograf": {
@@ -466,8 +466,8 @@
       "description": "A small coal glowing bright orange. Now and then it hops by itself, as if trying to escape."
     },
     "latawiec-membrane": {
-      "name": "Latavets Membrane",
-      "description": "A thin grey membrane from the wing of a Latavets. It rustles even when there is no wind."
+      "name": "Gale Sprite Membrane",
+      "description": "A thin grey membrane from the wing of a Gale Sprite. It rustles even when there is no wind."
     },
     "charred-splinter": {
       "name": "Charred Splinter",
@@ -482,12 +482,12 @@
       "description": "A tiny bright spark that will not go out. It hovers over your palm and warms like a campfire."
     },
     "noon-sickle": {
-      "name": "Poludnitsa Sickle",
+      "name": "Noon Witch's Sickle",
       "description": "An old iron sickle with a worn wooden handle. At high noon the blade glows red-hot."
     },
     "rarog-feather": {
-      "name": "Rarog Feather",
-      "description": "A long feather from the Rarog's fiery tail. It burns, but never burns away."
+      "name": "Firehawk Feather",
+      "description": "A long feather from the Firehawk's fiery tail. It burns, but never burns away."
     },
     "black-needle": {
       "name": "Black Needle",
@@ -586,7 +586,7 @@
       "description": "An old rowel spur that jingles by itself when someone walks the road."
     },
     "chochol-straw": {
-      "name": "Khokhow Straw",
+      "name": "Strawman's Sheaf",
       "description": "A bundle of straw that rustles in rhythm, though no one is playing."
     },
     "cold-candle": {
@@ -614,7 +614,7 @@
       "description": "A dense tangle of black hair in which something still moves."
     },
     "bebok-sack": {
-      "name": "Bebok Sack",
+      "name": "Bogeyman's Sack",
       "description": "An old, patched sack of coarse cloth. Something scratches inside."
     },
     "plague-kerchief": {

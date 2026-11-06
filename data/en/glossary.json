@@ -1,5 +1,5 @@
 {
-  "$comment": "The English names of the game's key words, approved by the author on 6.11.2026 (691 A, 705-707): `en` is the name the translations use. The translations of the code (strings.json) and of the data (data/en/) must use `en` wherever their Polish is the word itself (tools/i18n-check.mjs).",
+  "$comment": "The English names of the game's key words, approved by the author on 6.11.2026 (691 A, 705-707); the creatures of Slavic tales have English names, not their Polish ones spelled for English (the author, 6.11.2026): `en` is the name the translations use. The translations of the code (strings.json) and of the data (data/en/) must use `en` wherever their Polish is the word itself (tools/i18n-check.mjs).",
   "status": "approved",
   "groups": [
     {
@@ -396,27 +396,127 @@
     },
     {
       "id": "creatures",
-      "name": "Istoty słowiańskie do 25. poziomu (692 B) i przydomki (693 A)",
+      "name": "Istoty słowiańskie: angielskie nazwy zamiast zapisu fonetycznego (autor 6.11.2026) i przydomki (693 A)",
       "terms": [
         {
+          "pl": "Licho",
+          "en": "Misfortune",
+          "note": "licho to uosobione nieszczęście; jak imię, bez „the” („Misfortune never sleeps”)"
+        },
+        {
           "pl": "Błędnica",
-          "en": "Bwendnitsa",
-          "note": "zapis fonetyczny: „ł” czyta się jak „w”, „ę” jak „en”"
+          "en": "Strayling",
+          "note": "zwodzi wędrowców z drogi; „stray” i „-ling”, jak Stoneling i Mossling"
         },
         {
           "pl": "Płanetnik",
-          "en": "Pwanetnik",
-          "note": "zapis fonetyczny; „Planetnik” Anglik przeczyta jak „planeta”"
+          "en": "Cloudherder",
+          "note": "pędzi chmury i sprowadza burze"
+        },
+        {
+          "pl": "Topielica",
+          "en": "Drowned Maiden",
+          "note": "dosłownie"
+        },
+        {
+          "pl": "Utopiec",
+          "en": "Drowner",
+          "note": "ten, kto topi; zgodne z id drowner"
+        },
+        {
+          "pl": "Wodnik",
+          "en": "Nix",
+          "note": "angielska nazwa wodnego ducha, który wciąga ludzi pod wodę"
+        },
+        {
+          "pl": "Kikimora",
+          "en": "Bog Hag",
+          "note": "wiedźma z bagien"
+        },
+        {
+          "pl": "Strzyga",
+          "en": "Shriekwing",
+          "note": "nocą lata i krzyczy jak sowa"
+        },
+        {
+          "pl": "Żmij",
+          "en": "Wyrm",
+          "note": "skrzydlaty wąż, smok z dawnych podań"
+        },
+        {
+          "pl": "Skarbnik",
+          "en": "Hoardkeeper",
+          "note": "strażnik skarbów kopalni"
+        },
+        {
+          "pl": "Bagiennik",
+          "en": "Mire Demon",
+          "note": "demon bagien"
+        },
+        {
+          "pl": "Bies",
+          "en": "Fiend",
+          "note": "dosłownie: zły duch, demon"
+        },
+        {
+          "pl": "Kłobuk",
+          "en": "Pilferbird",
+          "note": "ptak, który znosi panu kradzione dobra"
+        },
+        {
+          "pl": "Mamuna",
+          "en": "Cradle Thief",
+          "note": "podmienia dzieci w kołyskach"
+        },
+        {
+          "pl": "Rokita",
+          "en": "Marsh Devil",
+          "note": "diabeł z bagien; jego miejsce to Marsh Devil’s Abyss"
+        },
+        {
+          "pl": "Latawiec",
+          "en": "Gale Sprite",
+          "note": "duch wichru"
+        },
+        {
+          "pl": "Południca",
+          "en": "Noon Witch",
+          "note": "jak w angielskim tytule „The Noon Witch” Dworzaka"
+        },
+        {
+          "pl": "Raróg",
+          "en": "Firehawk",
+          "note": "ognisty ptak"
+        },
+        {
+          "pl": "Chochoł",
+          "en": "Strawman",
+          "note": "jak w angielskich przekładach „Wesela”; przed nazwą przedmiotu „Strawbound”"
+        },
+        {
+          "pl": "Smętek",
+          "en": "Sorrowling",
+          "note": "duch smutku; „sorrow” i „-ling”"
+        },
+        {
+          "pl": "Kołtun",
+          "en": "Tanglelock",
+          "note": "skołtuniony kosmyk"
+        },
+        {
+          "pl": "Bebok",
+          "en": "Bogeyman",
+          "note": "straszydło, które porywa dzieci"
         },
         {
           "pl": "Upiór",
-          "en": "Upyr",
-          "note": "forma przyjęta w angielskim (przykład autora)"
+          "en": "Revenant",
+          "note": "zmarły, który wraca z grobu"
         },
         {
           "pl": "Leszy",
-          "en": "Leshy",
-          "note": "forma przyjęta w angielskim (przykład autora)"
+          "en": "Forest Lord",
+          "note": "pan lasu"
         },
         {
           "pl": "Zamaskowana Diana",

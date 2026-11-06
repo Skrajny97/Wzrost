@@ -16,7 +16,7 @@ import { useServer } from './helpers/server.js';
 test('the language of a message: Polish letters and words only one language writes, else the writer\'s', () => {
   assert.equal(guessLanguage('Hej! Ktoś wie, gdzie najlepiej expić na 20 poziomie?'), 'pl');
   assert.equal(guessLanguage('siema, ktos idzie na bagno?'), 'pl');
-  assert.equal(guessLanguage('Hi all! Does anyone know where the Likho drops its eye?'), 'en');
+  assert.equal(guessLanguage('Hi all! Does anyone know where Misfortune drops its eye?'), 'en');
   assert.equal(guessLanguage('xD', 'en'), 'en');
   assert.equal(guessLanguage('xD', 'pl'), 'pl');
   assert.equal(guessLanguage('ok', undefined), 'pl');
@@ -94,11 +94,11 @@ describe('Tłumaczenie na czacie', () => {
   test('an English message for a Polish reader, in a private conversation too', async () => {
     const rowan = (await (await db()).prepare("SELECT id FROM characters WHERE name = 'Rowan'").first()).id;
     const ala = (await (await db()).prepare("SELECT id FROM characters WHERE name = 'Ala'").first()).id;
-    const sent = await ask('POST', '/api/chat', { cookie: players.rowan, lang: 'en', body: { with: ala, text: 'Hi! Do you know where the Likho is?' } });
+    const sent = await ask('POST', '/api/chat', { cookie: players.rowan, lang: 'en', body: { with: ala, text: 'Hi! Do you know where the Bog Hag is?' } });
     assert.equal(sent.status, 201);
     const talk = (await ask('GET', `/api/chat?with=${rowan}`, { cookie: players.ala, lang: 'pl' })).data.messages;
     assert.equal(talk[0].language, 'en');
-    assert.equal((await translate(players.ala, talk[0].id, 'pl')).data.text, '[en→pl] Hi! Do you know where the Likho is?');
+    assert.equal((await translate(players.ala, talk[0].id, 'pl')).data.text, '[en→pl] Hi! Do you know where the Bog Hag is?');
     // Ola is not in that conversation.
     assert.equal((await translate(players.ola, talk[0].id, 'pl')).data.error.code, 'no_message');
   });

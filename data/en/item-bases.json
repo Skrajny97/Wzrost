@@ -17,7 +17,7 @@
     "attackName": "Slash"
   },
   "karabela": {
-    "name": "Karabela",
+    "name": "Noble Sabre",
     "attackName": "Slash"
   },
   "flamberge": {
@@ -105,7 +105,7 @@
     "attackName": "Elemental Bolt"
   },
   "posokh": {
-    "name": "Posokh",
+    "name": "Elder Staff",
     "attackName": "Elemental Bolt"
   },
   "star-staff": {
@@ -265,10 +265,10 @@
     "name": "Buff Coat"
   },
   "zupan": {
-    "name": "Zhupan"
+    "name": "Longcoat"
   },
   "kontusz": {
-    "name": "Kontusz"
+    "name": "Sashed Coat"
   },
   "chainmail": {
     "name": "Chainmail"
@@ -301,10 +301,10 @@
     "name": "Star Robe"
   },
   "delia": {
-    "name": "Delia"
+    "name": "Fur Mantle"
   },
   "ferezja": {
-    "name": "Ferezja"
+    "name": "Long Robe"
   },
   "cowl": {
     "name": "Cowl"

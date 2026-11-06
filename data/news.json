@@ -290,6 +290,11 @@
       "id": "0.1.98",
       "title": "Wersja 0.1.98",
       "body": "- Poszukiwani: opis na Tablicy zleceń mówi teraz wprost, że poszukiwanych spotkasz tylko na zwykłej wyprawie, a nie na Szybkim ani Błyskawicznym polowaniu, ani na wyprawie Drużyny."
+    },
+    {
+      "id": "0.1.99",
+      "title": "Wersja 0.1.99",
+      "body": "- Po angielsku stwory z polskich podań mają angielskie nazwy zamiast zapisu fonetycznego (np. Licho to Misfortune, a Strzyga to Shriekwing). Zmieniły się też ich afiksy na przedmiotach i nazwy materiałów."
     }
 ]
 }

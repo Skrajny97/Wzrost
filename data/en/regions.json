@@ -3,7 +3,7 @@
   "windfalls": {
     "land": "Edge of the Wilds",
     "name": "Windfalls",
-    "description": "A belt of fallen trees on the edge of the wilds. Wolves, boars, deer and ravens, and deep in the thicket a wandering light and a storm-bringing Pwanetnik.",
+    "description": "A belt of fallen trees on the edge of the wilds. Wolves, boars, deer and ravens, and deep in the thicket a wandering light and a storm-bringing Cloudherder.",
     "trait": {
       "name": "Sacred Grove",
       "description": "Rest between fights restores 5% more HP."
@@ -58,7 +58,7 @@
       },
       "glade-heart": {
         "name": "Heart of the Glade",
-        "description": "The middle of the stone circle. Everything here is bigger and more dangerous: a bear lives in the thicket, the last aurochs grazes, an Aesculapian snake winds through the grass, and at night a Strzyga flies. Among the boulders stand stone animals that no one ever carved."
+        "description": "The middle of the stone circle. Everything here is bigger and more dangerous: a bear lives in the thicket, the last aurochs grazes, an Aesculapian snake winds through the grass, and at night a Shriekwing flies. Among the boulders stand stone animals that no one ever carved."
       }
     }
   },
@@ -85,11 +85,11 @@
       },
       "willow-isles": {
         "name": "Willow Isles",
-        "description": "Islands of old willows in the mist. Wraiths and mistlings drift between the trunks, phantasms emerge from the vapours, willow spirits rustle in the treetops, and at night a Topielitsa dances on the water."
+        "description": "Islands of old willows in the mist. Wraiths and mistlings drift between the trunks, phantasms emerge from the vapours, willow spirits rustle in the treetops, and at night a Drowned Maiden dances on the water."
       },
       "old-riverbed": {
         "name": "Old Riverbed",
-        "description": "The old bed of the river, deep and dark. Bones lie in the mud, Utopietses and sludgers climb out of the water, and mud goblins collect anything that glitters. Here lives the Vodnik, who keeps the souls of the drowned in jars."
+        "description": "The old bed of the river, deep and dark. Bones lie in the mud, Drowners and sludgers climb out of the water, and mud goblins collect anything that glitters. Here lives the Nix, who keeps the souls of the drowned in jars."
       }
     }
   },
@@ -116,18 +116,18 @@
       },
       "smoldering-peat": {
         "name": "Smouldering Peat",
-        "description": "The peat smoulders underground, and acrid smoke pours from the holes, with a reek hiding in it. At night will-o'-the-wisps wander between the tussocks, salamanders warm themselves in the hot ash, and a Zmey nests in the embers."
+        "description": "The peat smoulders underground, and acrid smoke pours from the holes, with a reek hiding in it. At night will-o'-the-wisps wander between the tussocks, salamanders warm themselves in the hot ash, and a Wyrm nests in the embers."
       },
       "old-diggings": {
         "name": "Old Diggings",
-        "description": "An abandoned peat pit with log walkways. Peat cutters the bog never gave back still dig here, the Skarbnik wanders with his lantern, worms bore through the walls, rats scurry along the passages, and at the bottom of the pit the peat itself comes alive."
+        "description": "An abandoned peat pit with log walkways. Peat cutters the bog never gave back still dig here, the Hoardkeeper wanders with his lantern, worms bore through the walls, rats scurry along the passages, and at the bottom of the pit the peat itself comes alive."
       }
     }
   },
   "black-bog": {
     "land": "Peatlands",
     "name": "Black Bog",
-    "description": "The deepest part of the Peatlands, where the water is black as tar. Alders stand here on stilts of roots, the pillars of an old temple rise from the depths, and in a thicket of creeping willow lives the devil Rokita.",
+    "description": "The deepest part of the Peatlands, where the water is black as tar. Alders stand here on stilts of roots, the pillars of an old temple rise from the depths, and in a thicket of creeping willow lives the Marsh Devil.",
     "trait": {
       "name": "Healing Mud",
       "description": "Healing from skills and potions restores 5% more HP."
@@ -147,18 +147,18 @@
       },
       "quaking-bog": {
         "name": "Quaking Bog",
-        "description": "A thin mat of moss over bottomless pools of black water. The ground trembles at every step, the lantern eyes of a Bagiennik stare out of the dark, giant ticks lurk in the moss, and at dusk a night heron hunts."
+        "description": "A thin mat of moss over bottomless pools of black water. The ground trembles at every step, the lantern eyes of a Mire Demon stare out of the dark, giant ticks lurk in the moss, and at dusk a night heron hunts."
       },
       "rokita-deep": {
-        "name": "Rokita's Abyss",
-        "description": "The blackest spot in the bog, in a thicket of old creeping willows. Green fire burns on the water, black goats and Bieses guard the way, and Kwobuks carry plunder to their master. Here lives the devil Rokita."
+        "name": "Marsh Devil's Abyss",
+        "description": "The blackest spot in the bog, in a thicket of old creeping willows. Green fire burns on the water, black goats and Fiends guard the way, and Pilferbirds carry plunder to their master. Here lives the Marsh Devil."
       }
     }
   },
   "pine-dunes": {
     "land": "Whispering Pines",
     "name": "Pine Dunes",
-    "description": "The first part of the Whispering Pines: dunes overgrown with heather and crooked pines. Further on the resinous forest murmurs, drifting sands bury and uncover old barrows, tar kilns smoke in the hollows, and beyond them lies a blackened burn, circled by the fiery Rarog.",
+    "description": "The first part of the Whispering Pines: dunes overgrown with heather and crooked pines. Further on the resinous forest murmurs, drifting sands bury and uncover old barrows, tar kilns smoke in the hollows, and beyond them lies a blackened burn, circled by the fiery Firehawk.",
     "trait": {
       "name": "Scorching Heat",
       "description": "Burn lasts one turn longer, for creatures and characters alike."
@@ -178,11 +178,11 @@
       },
       "tar-pits": {
         "name": "Tar Pits",
-        "description": "The pits of the old tar burners, where wood still smoulders and birch tar bubbles. The ghosts of the tar burners guard their cauldrons, charcoal imps leap in the embers, and a Latavets circles above the smoke."
+        "description": "The pits of the old tar burners, where wood still smoulders and birch tar bubbles. The ghosts of the tar burners guard their cauldrons, charcoal imps leap in the embers, and a Gale Sprite circles above the smoke."
       },
       "burnt-forest": {
         "name": "Burnt Forest",
-        "description": "A forest that burned in one terrible blaze. Charred pines and ash wraiths walk between the black trunks, and spark swarms keep the last flames alive. Here nests the Rarog, the fiery falcon of legend."
+        "description": "A forest that burned in one terrible blaze. Charred pines and ash wraiths walk between the black trunks, and spark swarms keep the last flames alive. Here nests the Firehawk, the fiery falcon of legend."
       }
     }
   },
@@ -236,7 +236,7 @@
       },
       "devils-crossroads": {
         "name": "Devil's Crossroads",
-        "description": "Four overgrown roads meet here in the heart of the forest. At midnight a headless one circles the crossroads, a Khokhow invites you to dance, and a Smentek sings to those who have lost their way."
+        "description": "Four overgrown roads meet here in the heart of the forest. At midnight a headless one circles the crossroads, a Strawman invites you to dance, and a Sorrowling sings to those who have lost their way."
       },
       "plague-graves": {
         "name": "Plague Graves",
@@ -244,7 +244,7 @@
       },
       "eclipsed-glade": {
         "name": "Eclipsed Glade",
-        "description": "A glade over which the moon never rises. Abominations crawl along its edge, Kowtuns roll through the grass, and a Bebok waits with a sack for whoever falls behind. Here lives the Moon-Eater."
+        "description": "A glade over which the moon never rises. Abominations crawl along its edge, Tanglelocks roll through the grass, and a Bogeyman waits with a sack for whoever falls behind. Here lives the Moon-Eater."
       }
     }
   }

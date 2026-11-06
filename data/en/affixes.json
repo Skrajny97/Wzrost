@@ -82,7 +82,7 @@
       "suffix": "of the Owl"
     },
     "wisp": {
-      "suffix": "of the Bwendnitsa"
+      "suffix": "of the Strayling"
     },
     "stag": {
       "prefix": {
@@ -106,7 +106,7 @@
       "suffix": "of Hornets"
     },
     "planetnik": {
-      "suffix": "of the Pwanetnik"
+      "suffix": "of the Cloudherder"
     },
     "tusker": {
       "suffix": "of the Tusker"
@@ -253,7 +253,7 @@
       "suffix": "of the Bear"
     },
     "likho": {
-      "suffix": "of the Likho"
+      "suffix": "of Misfortune"
     },
     "stoneling": {
       "prefix": {
@@ -394,7 +394,7 @@
       "suffix": "of the Mistling"
     },
     "drowned-maiden": {
-      "suffix": "of the Topielitsa"
+      "suffix": "of the Drowned Maiden"
     },
     "skeleton": {
       "prefix": {
@@ -406,7 +406,7 @@
       "suffix": "of the Skeleton"
     },
     "drowner": {
-      "suffix": "of the Utopiets"
+      "suffix": "of the Drowner"
     },
     "sludger": {
       "prefix": {
@@ -427,7 +427,7 @@
       "suffix": "of the Goblin"
     },
     "water-spirit": {
-      "suffix": "of the Vodnik"
+      "suffix": "of the Nix"
     },
     "crane": {
       "prefix": {
@@ -499,7 +499,7 @@
       "suffix": "of the Worm"
     },
     "kikimora": {
-      "suffix": "of the Kikimora"
+      "suffix": "of the Bog Hag"
     },
     "mud-lord": {
       "prefix": {
@@ -593,12 +593,12 @@
     },
     "strzyga": {
       "prefix": {
-        "m": "Strzyga",
-        "f": "Strzyga",
-        "n": "Strzyga",
-        "pl": "Strzyga"
+        "m": "Shriekwing",
+        "f": "Shriekwing",
+        "n": "Shriekwing",
+        "pl": "Shriekwing"
       },
-      "suffix": "of the Strzyga"
+      "suffix": "of the Shriekwing"
     },
     "phantasm": {
       "suffix": "of the Phantasm"
@@ -625,13 +625,13 @@
         "n": "Dragon",
         "pl": "Dragon"
       },
-      "suffix": "of the Zmey"
+      "suffix": "of the Wyrm"
     },
     "fume-spirit": {
       "suffix": "of the Reek"
     },
     "mine-spirit": {
-      "suffix": "of the Skarbnik"
+      "suffix": "of the Hoardkeeper"
     },
     "giant-rat": {
       "prefix": {
@@ -706,7 +706,7 @@
       "suffix": "of the Pagan Priest"
     },
     "bog-demon": {
-      "suffix": "of the Bagiennik"
+      "suffix": "of the Mire Demon"
     },
     "tick": {
       "prefix": {
@@ -727,7 +727,7 @@
         "n": "Fiendish",
         "pl": "Fiendish"
       },
-      "suffix": "of the Bies"
+      "suffix": "of the Fiend"
     },
     "black-goat": {
       "prefix": {
@@ -739,10 +739,10 @@
       "suffix": "of the Black Goat"
     },
     "klobuk": {
-      "suffix": "of the Kwobuk"
+      "suffix": "of the Pilferbird"
     },
     "mamuna": {
-      "suffix": "of the Mamuna"
+      "suffix": "of the Cradle Thief"
     },
     "rokita": {
       "prefix": {
@@ -751,7 +751,7 @@
         "n": "Diabolic",
         "pl": "Diabolic"
       },
-      "suffix": "of Rokita"
+      "suffix": "of the Marsh Devil"
     },
     "sandman": {
       "prefix": {
@@ -829,7 +829,7 @@
         "n": "Gale",
         "pl": "Gale"
       },
-      "suffix": "of the Latavets"
+      "suffix": "of the Gale Sprite"
     },
     "charred-pine": {
       "prefix": {
@@ -859,7 +859,7 @@
       "suffix": "of the Spark Swarm"
     },
     "noon-wraith": {
-      "suffix": "of the Poludnitsa"
+      "suffix": "of the Noon Witch"
     },
     "rarog": {
       "prefix": {
@@ -868,7 +868,7 @@
         "n": "Flaming",
         "pl": "Flaming"
       },
-      "suffix": "of the Rarog"
+      "suffix": "of the Firehawk"
     },
     "needleback": {
       "prefix": {
@@ -1040,12 +1040,12 @@
     },
     "chochol": {
       "prefix": {
-        "m": "Khokhow",
-        "f": "Khokhow",
-        "n": "Khokhow",
-        "pl": "Khokhow"
+        "m": "Strawbound",
+        "f": "Strawbound",
+        "n": "Strawbound",
+        "pl": "Strawbound"
       },
-      "suffix": "of the Khokhow"
+      "suffix": "of the Strawman"
     },
     "smetek": {
       "prefix": {
@@ -1054,7 +1054,7 @@
         "n": "Mournful",
         "pl": "Mournful"
       },
-      "suffix": "of the Smentek"
+      "suffix": "of the Sorrowling"
     },
     "deadman": {
       "prefix": {
@@ -1093,10 +1093,10 @@
         "n": "Matted",
         "pl": "Matted"
       },
-      "suffix": "of the Kowtun"
+      "suffix": "of the Tanglelock"
     },
     "bebok": {
-      "suffix": "of the Bebok"
+      "suffix": "of the Bogeyman"
     },
     "plague-maiden": {
       "prefix": {

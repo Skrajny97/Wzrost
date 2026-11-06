@@ -629,7 +629,7 @@
           "In the Peat Bogs every step sinks. I hate that squelching under my boots.",
           "Of all the creatures, I hate leeches the most. A wolf at least bites honestly.",
           "A tusker isn't a boar, it's a mountain of rage on four legs.",
-          "The Likho never sleeps, so they say. Me, I'd rather it did.",
+          "Misfortune never sleeps, so they say. Me, I'd rather it did.",
           "Before sleep I walk all the way round the Quarters. Old habit, don't laugh.",
           "How many explorations together now? I've lost count.",
           "Next time I pick the way. Your shortcuts always lead through mud.",
@@ -647,7 +647,7 @@
           "Rest up fully before you set off again. The wilds aren't going anywhere.",
           "Listen to Sambor now and then. Before he settled by the forest, they say he went further than anyone from the Crossroads.",
           "Mother used to say the forest gives back what you give it. For a long time I didn't understand what she meant.",
-          "As a child I was afraid of storms. Now I'm only afraid of the Pwanetnik.",
+          "As a child I was afraid of storms. Now I'm only afraid of the Cloudherder.",
           "When I was young I had a dog that followed me everywhere. In the forest I still sometimes look round for him.",
           "The first time I got lost in the wilds, a fox led me out. To this day I don't know if it was by chance.",
           "I rarely trust anyone. I'm starting to trust you, and it worries me a little.",
@@ -739,7 +739,7 @@
         "name": "White Wraith"
       },
       "drowner": {
-        "name": "Black Utopiets"
+        "name": "Black Drowner"
       },
       "elk": {
         "name": "Giant Elk"
@@ -751,7 +751,7 @@
         "name": "Blood Sundew"
       },
       "zmij": {
-        "name": "Fiery Zmey"
+        "name": "Fiery Wyrm"
       },
       "giant-rat": {
         "name": "Rat King"
@@ -766,10 +766,10 @@
         "name": "Sacrificial Priest"
       },
       "bog-demon": {
-        "name": "Bagiennik the Drowner"
+        "name": "Mire Demon the Engulfer"
       },
       "black-goat": {
-        "name": "Rokita's Black Goat"
+        "name": "Marsh Devil's Black Goat"
       },
       "heather-mare": {
         "name": "Night Mare"
@@ -808,13 +808,13 @@
         "name": "Puffball the Sower"
       },
       "chochol": {
-        "name": "Wedding Khokhow"
+        "name": "Wedding Strawman"
       },
       "bell-ringer": {
         "name": "Old Bell-Ringer"
       },
       "bebok": {
-        "name": "Bebok the Snatcher"
+        "name": "Bogeyman the Snatcher"
       }
     },
     "texts": {

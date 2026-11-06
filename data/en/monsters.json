@@ -221,22 +221,22 @@
     }
   },
   "wisp": {
-    "name": "Bwendnitsa",
+    "name": "Strayling",
     "counted": [
-      "Bwendnitsa",
-      "Bwendnitsas",
-      "Bwendnitsas"
+      "Strayling",
+      "Straylings",
+      "Straylings"
     ],
     "attack": {
       "name": "Wandering Fire"
     }
   },
   "planetnik": {
-    "name": "Pwanetnik",
+    "name": "Cloudherder",
     "counted": [
-      "Pwanetnik",
-      "Pwanetniks",
-      "Pwanetniks"
+      "Cloudherder",
+      "Cloudherders",
+      "Cloudherders"
     ],
     "attack": {
       "name": "Thunderbolt"
@@ -331,11 +331,11 @@
     }
   },
   "likho": {
-    "name": "Likho",
+    "name": "Misfortune",
     "counted": [
-      "Likho",
-      "Likhos",
-      "Likhos"
+      "Misfortune",
+      "Misfortunes",
+      "Misfortunes"
     ],
     "attack": {
       "name": "Frost Touch"
@@ -562,11 +562,11 @@
     }
   },
   "drowned-maiden": {
-    "name": "Topielitsa",
+    "name": "Drowned Maiden",
     "counted": [
-      "Topielitsa",
-      "Topielitsas",
-      "Topielitsas"
+      "Drowned Maiden",
+      "Drowned Maidens",
+      "Drowned Maidens"
     ],
     "attack": {
       "name": "Cold Kiss"
@@ -584,11 +584,11 @@
     }
   },
   "drowner": {
-    "name": "Utopiets",
+    "name": "Drowner",
     "counted": [
-      "Utopiets",
-      "Utopietses",
-      "Utopietses"
+      "Drowner",
+      "Drowners",
+      "Drowners"
     ],
     "attack": {
       "name": "Drag Under"
@@ -617,11 +617,11 @@
     }
   },
   "water-spirit": {
-    "name": "Vodnik",
+    "name": "Nix",
     "counted": [
-      "Vodnik",
-      "Vodniks",
-      "Vodniks"
+      "Nix",
+      "Nixes",
+      "Nixes"
     ],
     "attack": {
       "name": "Undertow"
@@ -749,11 +749,11 @@
     }
   },
   "kikimora": {
-    "name": "Kikimora",
+    "name": "Bog Hag",
     "counted": [
-      "Kikimora",
-      "Kikimoras",
-      "Kikimoras"
+      "Bog Hag",
+      "Bog Hags",
+      "Bog Hags"
     ],
     "attack": {
       "name": "Bog Hex"
@@ -870,11 +870,11 @@
     }
   },
   "strzyga": {
-    "name": "Strzyga",
+    "name": "Shriekwing",
     "counted": [
-      "Strzyga",
-      "Strzygas",
-      "Strzygas"
+      "Shriekwing",
+      "Shriekwings",
+      "Shriekwings"
     ],
     "attack": {
       "name": "Blood Drain"
@@ -925,11 +925,11 @@
     }
   },
   "zmij": {
-    "name": "Zmey",
+    "name": "Wyrm",
     "counted": [
-      "Zmey",
-      "Zmeys",
-      "Zmeys"
+      "Wyrm",
+      "Wyrms",
+      "Wyrms"
     ],
     "attack": {
       "name": "Fiery Bite"
@@ -947,11 +947,11 @@
     }
   },
   "mine-spirit": {
-    "name": "Skarbnik",
+    "name": "Hoardkeeper",
     "counted": [
-      "Skarbnik",
-      "Skarbniks",
-      "Skarbniks"
+      "Hoardkeeper",
+      "Hoardkeepers",
+      "Hoardkeepers"
     ],
     "attack": {
       "name": "Lantern Glare"
@@ -1068,11 +1068,11 @@
     }
   },
   "bog-demon": {
-    "name": "Bagiennik",
+    "name": "Mire Demon",
     "counted": [
-      "Bagiennik",
-      "Bagienniks",
-      "Bagienniks"
+      "Mire Demon",
+      "Mire Demons",
+      "Mire Demons"
     ],
     "attack": {
       "name": "Bog Grip"
@@ -1101,11 +1101,11 @@
     }
   },
   "bies": {
-    "name": "Bies",
+    "name": "Fiend",
     "counted": [
-      "Bies",
-      "Bieses",
-      "Bieses"
+      "Fiend",
+      "Fiends",
+      "Fiends"
     ],
     "attack": {
       "name": "Goring Horns"
@@ -1123,33 +1123,33 @@
     }
   },
   "klobuk": {
-    "name": "Kwobuk",
+    "name": "Pilferbird",
     "counted": [
-      "Kwobuk",
-      "Kwobuks",
-      "Kwobuks"
+      "Pilferbird",
+      "Pilferbirds",
+      "Pilferbirds"
     ],
     "attack": {
       "name": "Fiery Tail"
     }
   },
   "mamuna": {
-    "name": "Mamuna",
+    "name": "Cradle Thief",
     "counted": [
-      "Mamuna",
-      "Mamunas",
-      "Mamunas"
+      "Cradle Thief",
+      "Cradle Thieves",
+      "Cradle Thieves"
     ],
     "attack": {
       "name": "Cold Embrace"
     }
   },
   "rokita": {
-    "name": "Rokita",
+    "name": "Marsh Devil",
     "counted": [
-      "Rokita",
-      "Rokitas",
-      "Rokitas"
+      "Marsh Devil",
+      "Marsh Devils",
+      "Marsh Devils"
     ],
     "attack": {
       "name": "Hellfire"
@@ -1277,11 +1277,11 @@
     }
   },
   "latawiec": {
-    "name": "Latavets",
+    "name": "Gale Sprite",
     "counted": [
-      "Latavets",
-      "Latavetses",
-      "Latavetses"
+      "Gale Sprite",
+      "Gale Sprites",
+      "Gale Sprites"
     ],
     "attack": {
       "name": "Gale Talons"
@@ -1321,22 +1321,22 @@
     }
   },
   "noon-wraith": {
-    "name": "Poludnitsa",
+    "name": "Noon Witch",
     "counted": [
-      "Poludnitsa",
-      "Poludnitsas",
-      "Poludnitsas"
+      "Noon Witch",
+      "Noon Witches",
+      "Noon Witches"
     ],
     "attack": {
       "name": "Noonday Stroke"
     }
   },
   "rarog": {
-    "name": "Rarog",
+    "name": "Firehawk",
     "counted": [
-      "Rarog",
-      "Rarogs",
-      "Rarogs"
+      "Firehawk",
+      "Firehawks",
+      "Firehawks"
     ],
     "attack": {
       "name": "Firestorm"
@@ -1607,22 +1607,22 @@
     }
   },
   "chochol": {
-    "name": "Khokhow",
+    "name": "Strawman",
     "counted": [
-      "Khokhow",
-      "Khokhows",
-      "Khokhows"
+      "Strawman",
+      "Strawmen",
+      "Strawmen"
     ],
     "attack": {
-      "name": "Khokhow's Dance"
+      "name": "Strawman's Dance"
     }
   },
   "smetek": {
-    "name": "Smentek",
+    "name": "Sorrowling",
     "counted": [
-      "Smentek",
-      "Smenteks",
-      "Smenteks"
+      "Sorrowling",
+      "Sorrowlings",
+      "Sorrowlings"
     ],
     "attack": {
       "name": "Mournful Song"
@@ -1673,22 +1673,22 @@
     }
   },
   "koltun": {
-    "name": "Kowtun",
+    "name": "Tanglelock",
     "counted": [
-      "Kowtun",
-      "Kowtuns",
-      "Kowtuns"
+      "Tanglelock",
+      "Tanglelocks",
+      "Tanglelocks"
     ],
     "attack": {
       "name": "Entangle"
     }
   },
   "bebok": {
-    "name": "Bebok",
+    "name": "Bogeyman",
     "counted": [
-      "Bebok",
-      "Beboks",
-      "Beboks"
+      "Bogeyman",
+      "Bogeymen",
+      "Bogeymen"
     ],
     "attack": {
       "name": "Into the Sack!"
