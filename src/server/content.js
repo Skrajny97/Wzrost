@@ -66,6 +66,7 @@ import enQuests from '../../data/en/quests.json' with { type: 'json' };
 import enRarities from '../../data/en/rarities.json' with { type: 'json' };
 import enRegions from '../../data/en/regions.json' with { type: 'json' };
 import enResources from '../../data/en/resources.json' with { type: 'json' };
+import enSkills from '../../data/en/skills.json' with { type: 'json' };
 import enSkins from '../../data/en/skins.json' with { type: 'json' };
 import enSlots from '../../data/en/slots.json' with { type: 'json' };
 import enStats from '../../data/en/stats.json' with { type: 'json' };
@@ -133,6 +134,7 @@ export const OVERLAYS = {
     rarities: enRarities,
     regions: enRegions,
     resources: enResources,
+    skills: enSkills,
     skins: enSkins,
     slots: enSlots,
     stats: enStats,

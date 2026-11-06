@@ -12,6 +12,16 @@
     "label": "Skip the narrator's explanations",
     "hint": "The narrator does not explain new tabs and places, and a new character starts without the introduction. Applies to every character on the account."
   },
+  "chapters": {
+    "skills": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. Skills wait in the Character tab."
+    },
+    "party": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Party waits in the Community, in the Party tab."
+    }
+  },
   "lines": {
     "ask": {
       "text": [
@@ -299,6 +309,120 @@
           "That is all for a start. The rest of the System's workings, your goal and your liking – you will have to discover on your own. Good luck."
         ]
       }
+    },
+    "skills-welcome": {
+      "classes": {
+        "warrior": {
+          "text": [
+            "The tenth level of your class… Your blows have grown heavier, and the System could not fail to notice. It has unlocked Skills for you.",
+            "Before you choose one – allow me to introduce them."
+          ]
+        },
+        "archer": {
+          "text": [
+            "The tenth level of your class… Your arrows miss ever more rarely, and the System could not fail to notice. It has unlocked Skills for you.",
+            "Before you choose one – allow me to introduce them."
+          ]
+        },
+        "mage": {
+          "text": [
+            "The tenth level of your class… Mana heeds you ever more willingly, and the System could not fail to notice. It has unlocked Skills for you.",
+            "Before you choose one – allow me to introduce them."
+          ]
+        },
+        "cleric": {
+          "text": [
+            "The tenth level of your class… Your prayers carry ever further, and the System could not fail to notice. It has unlocked Skills for you.",
+            "Before you choose one – allow me to introduce them."
+          ]
+        },
+        "shadow": {
+          "text": [
+            "The tenth level of your class… You move ever more quietly, but nothing stays hidden from the System. It has unlocked Skills for you.",
+            "Before you choose one – allow me to introduce them."
+          ]
+        }
+      }
+    },
+    "skills-lead-character": {
+      "text": [
+        "Let us go back to the Character window."
+      ]
+    },
+    "skills-lead": {
+      "text": [
+        "Your Skills wait in this tab. Let us take a look at them."
+      ]
+    },
+    "skills-intro": {
+      "text": [
+        "Read the System's words carefully. Rarely does it warn so plainly."
+      ]
+    },
+    "skills-paths": {
+      "classes": {
+        "warrior": {
+          "text": [
+            "Before you lie three paths. The Barbarian crushes a foe with one blow, the Gladiator slashes them all at once, and the Guardian never takes a step back."
+          ]
+        },
+        "archer": {
+          "text": [
+            "Before you lie three paths. The Sniper hits where it hurts most, the Storm Archer showers the foes with a hail of arrows, and the Hunter pins the quarry down before it can move."
+          ]
+        },
+        "mage": {
+          "text": [
+            "Before you lie three paths. The Elementalist hurls fire, the Ice Lord slows the foes with a frosty wind, and the Arcanist delves into the nature of mana itself."
+          ]
+        },
+        "cleric": {
+          "text": [
+            "Before you lie three paths. The Healer closes wounds, the Inquisitor lashes the foes with holy power, and the Priest blesses themselves and their companions."
+          ]
+        },
+        "shadow": {
+          "text": [
+            "Before you lie three paths. The Assassin catches those who hide behind others' backs, the Poisoner laces the blade with venom, and the Night Dancer eludes blows and can deliver a swift counter."
+          ]
+        }
+      }
+    },
+    "skills-card": {
+      "text": [
+        "The System, as always, has worked it all out for you. On the card you will see what a skill gives, how much mana it costs and how often you can use it."
+      ]
+    },
+    "skills-choice": {
+      "text": [
+        "The first skill you put your first Skill Point into will open your main path.",
+        "From the eleventh level of your class you may add a second path – for one Skill Point. The third path will then close."
+      ]
+    },
+    "skills-points": {
+      "text": [
+        "Here you will see your Skill Points. Every new class level will bring you one. A point raises a skill you have learned by one level – all the way to the twentieth."
+      ]
+    },
+    "skills-evolution": {
+      "text": [
+        "One more thing. At the fiftieth level of your class, evolution awaits you. Before you get there, choose both paths and spend your points – otherwise the System will hold your class at the threshold until you do."
+      ]
+    },
+    "skills-ending": {
+      "text": [
+        "That is all from me. This time not even the System will do it for you – the choice is yours alone. Choose your path when you are ready."
+      ],
+      "female": {
+        "text": [
+          "That is all from me. This time not even the System will do it for you – the choice is yours alone. Choose your path when you are ready."
+        ]
+      }
+    },
+    "party-intro": {
+      "text": [
+        "A Party is up to three wanderers on one exploration, and their class levels may differ by five at most. The leader sends the exploration off by ticking “With the party” above “Set out”."
+      ]
     }
   }
 }
