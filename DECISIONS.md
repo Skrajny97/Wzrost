@@ -3034,6 +3034,33 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.82 (6.11.2026)
+
+Tier VI przedmiotów: 22 przedmioty od 100. poziomu klasy z ikonami, które wybrał autor: zob. „Tier VI przedmiotów”. Odpowiedzi autora na pytania 669–698: zob. „Odpowiedzi autora 669–698”.
+
+## Tier VI przedmiotów (665, 669, 671, 672; 6.11.2026, od 0.1.82)
+
+Punkt 665 z listy na noc 5/6.11 („Tier VI przedmiotów (570 A, od 100. poziomu klasy)”), autor: „665 tak”. Nazwy według odpowiedzi 671 A, skrzynia według 672 A, ikony według 669.
+
+1. **Bazy.** 22 nowe bazy od 100. poziomu klasy, w każdej rodzinie zaraz za bazą Tieru V: Flamberg, Topór dwusieczny, Cinquedea, Łuk scytyjski, Kaduceusz, Krzyż procesyjny, Tarcza turniejowa, Kołczan paradny, Łamacz mieczy, Astrolabium, Diadem, Hełm garnczkowy, Kontusz, Zbroja gotycka, Ferezja, Aureola, Sutanna („Ornat” jest już w Tierze I), Rękawice sokolnicze, Sabatony, Kamea, Pierścień wieczności i Lunula (`data/item-bases.json`).
+2. **Liczby (brakujący szczegół).** Współczynnik bazy to współczynnik pierwszej bazy jej rodziny razy 1,25, w górę do setnych. Premia sięga od najwyższej premii Tieru V plus 1 do półtora raza tej premii, np. Flamberg 55–81. Walidator (`tools/validate-data.mjs`) pozwala odtąd, by późniejsza baza była najwyżej o 25% mocniejsza od pierwszej bazy rodziny, w górę do setnych (dotąd o 20%).
+3. **Skąd.** Wypadają na wyprawach w każdym miejscu, którego poziomy sięgają 100.: od Starego Wyrobiska (96–100) przez Czarne Bagno po Sosnowe Wydmy. Wypadają tam przy każdym poziomie klasy, ale założyć je można od 100. Od 100. poziomu klasy dają je też skrzynia tygodniowa, wędrowny handlarz na Targowisku, Salon Gier, Wieże, skrzynie Bestii Gildii i Wyprawa Gildii. Wzory Warsztatu (19 baz) odsłaniają się na 100. poziomie Rzemieślnictwa, a Szlifierni (Kamea, Pierścień wieczności, Lunula) na 100. poziomie Jubilerstwa; rozbiórka przedmiotu uczy wzoru wcześniej, jak w Tierze V. Wszystko to działało już według poziomu klasy, więc nie potrzebowało zmian w kodzie.
+4. **Encyklopedia.** Dział „Tier VI · od 100. poziomu klasy” z sześcioma zestawami: Wojownik, Łucznik, Mag, Kleryk, Cień i Dodatki. Każdy pełny zestaw daje skrzynię: 6250 złota, 160 Punktów Czasu i 64 Punkty Systemu (672 A, ten sam przyrost co z Tieru IV do V: złoto ×2,5, punkty ×2). W zakładce Materiały materiały stworów, których najwyższy poziom przekracza 125, przechodzą z Tieru V do Tieru VI (poziomy 126–150), m.in. Biesa, Czarnego kozła, Kłobuka, Mamuny i Rokity z Rokitowego Bezdna.
+5. **Ikony (669).** Narysował je PixelLab, po cztery wersje obok ikony z Tieru V, a autor wybrał: Flamberg D, Topór dwusieczny B, Cinquedea A, Łuk scytyjski D, Kaduceusz B, Krzyż procesyjny A, Tarcza turniejowa D, Kołczan paradny B, Łamacz mieczy D, Astrolabium B, Diadem D, Hełm garnczkowy C, Kontusz C, Zbroja gotycka D, Ferezja C, Aureola D, Sutanna D, Rękawice sokolnicze C, Sabatony A, Kamea A, Pierścień wieczności B, Lunula D.
+6. **Sprawdzone:** wszystkie testy (1278), w tym nowe testy baz, wzorów, działu Encyklopedii i zakładki Materiały (`test/engine.test.js`, `test/encyclopedia.test.js`, `test/mining.test.js`, `test/workshop.test.js`); pierwsze kroki nowej postaci i układ na 9 rozmiarach ekranu.
+
+## Odpowiedzi autora 669–698 (6.11.2026)
+
+Autor: „669.1 D / 669.2 B / 669.3 A / 669.4 D / 669.5 B / 669.6 A / 669.7 D / 669.8 B / 669.9 D / 669.10 B / 669.11 D / 669.12 C / 669.13 C / 669.14 D / 669.15 C / 669.16 D / 669.17 D / 669.18 C / 669.19 A / 669.20 A / 669.21 B / 669.22 D / 670.1 A / 670.2 C / 670.3 B / 670.4 B / 670.5 B / 670.6 A / 671 A / 672 A / 673 A / 674 B / 675 A / 676 A / 677 wszystko ok, potrzebne / 678 A / 679 A / 680 "które zmieniają wygląd" a nie "tylko wygląd" / 681 zatwierdzam wszystkie trzy / 682 A i C / 683 A / 684 A / 685 A / 686 A / 687 A / 688 A / 689 A / 690 A / 691 A / 692 B / 693 A / 694 A / 695 A / 696 A / 697 A / 698 A”.
+
+1. **Tier VI (669, 671 A, 672 A):** w grze od 0.1.82, zob. „Tier VI przedmiotów”.
+2. **Ikony rzadkich receptur Jagny (670):** Sowi napar A, Wywar niedźwiedziej skóry C, Wywar wilczej siły B, Wywar od oparzeń B, Napar od uroków B, Balsam Jagny A.
+3. **Narrator (673–681).** Zmiany: 673 A („Na pozostałe profesje przyjdzie jeszcze czas.”) i 675 A („Trzecia ścieżka się wtedy zamknie.”); 674 B, więc koniec rozdziału o Społeczności zostaje bez dopisku o Błyskawicznych polowaniach. Nowe kwestie: 676 A (pierwsze omdlenie), 677 wszystkie sześć o Gildii („wszystko ok, potrzebne”), 678 A (Drużyna), 679 A (Kamień węgielny), 680 z poprawką autora („Punkty Systemu wydasz w Sklepie Systemu. Kupisz w nim ozdoby, które zmieniają wygląd.”) i 681 wszystkie trzy (Trudna wyprawa, Skrzynia Konta, Zbieracz Systemu). Nagrania trafią do gry po odsłuchu autora.
+4. **Rzadkie receptury Jagny (682–684).** 682 „A i C”: Jagna zdradza receptury przy stopniu Zaufany (pierwsze trzy) i Przyjaciel (kolejne trzy), a liczy się i relacja z nią, i reputacja Bractwa Zielarzy: wystarczy, że jedna z nich dojdzie do stopnia (odczytanie odpowiedzi „A i C”). 683 A: za darmo. 684 A: postać nosi i pije osobną miksturę na każdy efekt.
+5. **Krainy 151–200 (685–690):** wszystkie A: Głucha Knieja i Ostępy Nowiu, „Ukryty w mroku”, „Cios w cały szyk”, Przymrozek, psy zostają, imiona Poszukiwanych z propozycji. Do gry wejdą z grafikami i odgłosami.
+6. **Angielska wersja beta (691–697).** 691 A: autor przegląda cały słownik ok. 65 nazw. 692 B: istoty słowiańskie w zapisie fonetycznym dla Anglika (np. Leshy, Upyr). 693 A: imię zostaje, przydomek tłumaczony. 694 A: hasło dosłownie, „Look into a place full of challenges for the daring”. 695 A: autor czyta wszystkie angielskie kwestie narratora, partiami po etapach 2, 3 i 4. 696 A: ten sam głos narratora. 697 A: po angielsku testują tylko autor i Claude.
+7. **Zrzuty w zgłoszeniach błędów (698 A):** zostają po „Załatwione”.
+
 ## Wersja 0.1.81 (6.11.2026)
 
 Poprawka z nocnego przeglądu kodu wersji 0.1.78–0.1.80, cały napis „E-mail” w Ustawieniach i szersze sprawdzanie układu: zob. „Nocny przegląd kodu 0.1.78–0.1.80”.

@@ -215,6 +215,11 @@
       "id": "0.1.81",
       "title": "Wersja 0.1.81: drobne poprawki",
       "body": "- Napis „E-mail” w Ustawieniach nie łamie się już na telefonie obok długiego adresu."
+    },
+    {
+      "id": "0.1.82",
+      "title": "Wersja 0.1.82: Tier VI przedmiotów",
+      "body": "- Od 100. poziomu klasy czekają 22 nowe przedmioty Tieru VI, od Flamberga po Lunulę. Wypadają na wyprawach od Starego Wyrobiska, a znajdziesz je też w skrzyni tygodniowej, u wędrownego handlarza i w Salonie Gier.\n- Wzory Warsztatu i Szlifierni odsłaniają się na 100. poziomie Rzemieślnictwa i Jubilerstwa, a rozbiórka przedmiotu uczy wzoru wcześniej.\n- Encyklopedia ma dział Tier VI z sześcioma zestawami. Każdy pełny zestaw daje skrzynię: 6250 złota, 160 Punktów Czasu i 64 Punkty Systemu."
     }
 ]
 }
