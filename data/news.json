@@ -280,6 +280,11 @@
       "id": "0.1.95",
       "title": "Wersja 0.1.95",
       "body": "- Strona Wież mieści się na wąskich telefonach.\n- Zasady Bestii Gildii mówią już, że atakujesz ją także w trakcie wyprawy."
+    },
+    {
+      "id": "0.1.97",
+      "title": "Wersja 0.1.97",
+      "body": "- Gra jest także po angielsku. Język zmienisz w Ustawieniach (zębatka) albo na ekranie logowania.\n- Na czacie jest kanał English, a pod wiadomością w innym języku przycisk „A→ Przetłumacz”: tłumaczenie maszynowe, do 100 dziennie."
     }
 ]
 }

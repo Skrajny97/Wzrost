@@ -2,8 +2,8 @@
 // English of its texts.
 //
 // The page offers English only where the server does (/api/health
-// `english`: the test version and local work); the live game shows Polish
-// and no choice. The language comes first from the phone, Polish for a
+// `english`: everywhere from version 0.1.97); where it does not, the page
+// shows Polish and no choice. The language comes first from the phone, Polish for a
 // Polish phone and English for any other, then from the PL | EN switch on
 // the login screen and in the Ustawienia, or the "Język gry" of the
 // registration form. The account keeps it (users.language), so a signed-in

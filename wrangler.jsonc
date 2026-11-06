@@ -70,9 +70,11 @@
     "FORTRESS": "on",
     // "on" offers English beside Polish (src/server/i18n.js): the PL | EN
     // switch on the login screen and in the Ustawienia, and the answers in
-    // the language chosen. The English beta is only on the test version and
-    // in local work (490–497 A): the live game answers in Polish.
-    "ENGLISH": "off"
+    // the language chosen. In the live game from version 0.1.97 (the author:
+    // "715 wszystko OK, wdrażaj angielski bez pytania"); the chat's
+    // translations there need Workers AI, which the deploy adds
+    // (tools/prepare-cloudflare.mjs).
+    "ENGLISH": "on"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain

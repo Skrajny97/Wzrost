@@ -108,3 +108,18 @@ if (current === PLACEHOLDER_ID) {
 } else if (current !== databaseId) {
   fail(`${CONFIG_FILE} wskazuje inną bazę D1 niż „${name}” w Cloudflare (${databaseId}).`);
 }
+
+// Workers AI, which translates chat messages (src/server/translate.js), for
+// the live game: added here, in the CI checkout only, because the binding
+// has no local stand-in and always calls the account, so at the top level of
+// the repository's file it would make the tests and local work call it too.
+// The test version has it in env.test.
+if (!process.argv[2]) {
+  const prepared = readFileSync(CONFIG_FILE, 'utf8');
+  const anchor = /^  "send_email": \[\{ "name": "EMAIL" \}\],$/m;
+  if (!/^  "ai":/m.test(prepared)) {
+    if (!anchor.test(prepared)) fail(`Nie znaleziono w ${CONFIG_FILE} miejsca na Workers AI (send_email gry).`);
+    writeFileSync(CONFIG_FILE, prepared.replace(anchor, (line) => `${line}\n  "ai": { "binding": "AI" },`));
+    console.log('Workers AI (tłumaczenie czatu) podpięte do gry.');
+  }
+}

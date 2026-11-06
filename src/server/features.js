@@ -7,8 +7,8 @@
 // and the test version (EVENTS "test") also has the outcomes the author has
 // not approved yet (drafts). The class evolutions are on except where
 // EVOLUTIONS is "off", which plays as before them (the live game hid them
-// in versions 0.0.58–0.0.60). English (ENGLISH "on", i18n.js) is only on
-// the test version and in local work: the live game always answers in
+// in versions 0.0.58–0.0.60). English (ENGLISH "on", i18n.js) is on
+// everywhere from version 0.1.97; where it is off, the game answers in
 // Polish and offers no choice of language. The env is the same for every
 // request of a deployment, so the switches are read once per request
 // (index.js) and kept here for the rest of the code.

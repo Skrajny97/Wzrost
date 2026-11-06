@@ -3034,6 +3034,27 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.97 (6.11.2026)
+
+- Angielski w grze: przełącznik PL | EN na ekranie logowania i w Ustawieniach, wybór języka przy zakładaniu konta, kanał English na czacie i „A→ Przetłumacz” pod wiadomościami w drugim języku. Zob. „Angielski w grze” i „Odpowiedź autora 715”.
+
+## Odpowiedź autora 715 (6.11.2026)
+
+Autor: „715 wszystko OK, wdrażaj angielski bez pytania bo i tak nie chce mi sie tego sprawdzać, na żywo w grze jak coś wyjdzie to się będzie poprawiać i wszystkimi innymi nagraniami kwestii narratora”.
+
+1. **715 OK.** Wszystkie 65 angielskich kwestii narratora z etapu 4 zostają w brzmieniu z `data/en/tutorial.json`.
+2. **Angielski idzie do gry** bez dalszego sprawdzania przez autora (0.1.97). Błędy poprawia się, gdy wyjdą w grze.
+3. **Angielskie nagrania narratora** (wszystkie kwestie: 709, 712 i 715) wchodzą do gry bez strony odsłuchu, tym samym głosem co po polsku (696 A), przycięte jak zawsze. Reguła trafiła do CLAUDE.md.
+
+## Angielski w grze (6.11.2026, od 0.1.97)
+
+1. **Przełącznik** `ENGLISH` jest włączony także w grze (`wrangler.jsonc`). Gra pokazuje PL | EN na ekranie logowania i w Ustawieniach, „Język gry” w formularzu nowego konta i kanał English na czacie (713 A).
+2. **Kto widzi angielski.** Nowa osoba bez wybranego języka dostaje język telefonu: polski dla polskiego, angielski dla każdego innego. Zalogowana strona bierze język konta, a wszystkie dotychczasowe konta mają polski (migracja 0091), więc obecni gracze dalej grają po polsku, dopóki sami nie przełączą.
+3. **Po polsku zostają** Panel autora, narzędzia testowe i wpisy „Co nowego?”, jak na wersji testowej.
+4. **Narrator** pokazuje po angielsku tekst; angielskie nagrania wchodzą osobno (zob. „Odpowiedź autora 715”, punkt 3). Do tego czasu angielska strona mówi bez głosu, nie polskim nagraniem.
+5. **Tłumaczenie na czacie** w grze: skrypt wdrożenia (`tools/prepare-cloudflare.mjs`) dopisuje Workers AI do ustawień gry w kopii na GitHubie, bo w pliku repozytorium wiązanie kazałoby testom i lokalnej pracy łączyć się z kontem (zob. „Tłumaczenie na czacie”, punkt 6).
+6. **Testy** zakładają wyłączony angielski, chyba że test sam go włącza (`ENGLISH: ''` w `test/helpers/server.js`), bo powstały, zanim angielski wszedł do gry. Sprawdzenie „Pierwsze kroki nowej postaci” na GitHubie przechodzi wprowadzenie po polsku i po angielsku.
+
 ## Wersja 0.1.96 (6.11.2026)
 
 - Czat: przycisk „A→ Przetłumacz” (714 A), na razie tylko na wersji testowej, tam gdzie angielski: zob. „Tłumaczenie na czacie”.

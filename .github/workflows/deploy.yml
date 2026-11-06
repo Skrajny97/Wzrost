@@ -103,6 +103,8 @@ jobs:
           npx wrangler dev --port 8787 > first-steps.log 2>&1 &
           for i in $(seq 1 90); do curl -sf http://localhost:8787/api/health > /dev/null && break; sleep 2; done
           node tools/first-steps.cjs http://localhost:8787 || { tail -n 60 first-steps.log; exit 1; }
+          # The game is in English too from 0.1.97: the beginning in English.
+          node tools/first-steps.cjs http://localhost:8787 --lang en || { tail -n 60 first-steps.log; exit 1; }
 
   configuration:
     name: Sprawdzenie sekretów Cloudflare

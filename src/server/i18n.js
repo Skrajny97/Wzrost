@@ -28,7 +28,7 @@ const storage = new AsyncLocalStorage();
 export const language = () => storage.getStore() ?? 'pl';
 export const runInLanguage = (lang, task) => storage.run(LANGUAGES.includes(lang) ? lang : 'pl', task);
 
-// A request's language: Polish where English is off (the live game);
+// A request's language: Polish where English is off (the live game until 0.1.97);
 // otherwise the page's own choice (X-Lang, src/client/i18n.js), and without
 // one the browser's first language, Polish for a Polish phone and English
 // for any other (a link from a mail, the return from Google). No language

@@ -11,9 +11,11 @@ export function useServer(vars = {}) {
   // are on, as on the test version, unless a test turns them off. The Osada
   // is off unless a test opens it (SETTLEMENT), as before it came into the
   // game: its companions and rumors would change the other tests' trips. So
-  // is the Warownia (FORTRESS), on in the game from 0.1.49.
+  // is the Warownia (FORTRESS), on in the game from 0.1.49. English is off
+  // unless a test asks for it (ENGLISH), as the tests were written before
+  // it came into the game (0.1.97): Polish answers and no English channel.
   const server = createTestHarness({
-    workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ...vars } }],
+    workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', ...vars } }],
   });
   before(() => server.listen());
   beforeEach(async () => {
