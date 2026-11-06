@@ -339,6 +339,7 @@
             "stopped",
             "revealed",
             "hidden",
+            "herbalistHidden",
             "busy",
             "claimFirst",
             "pushTitle",
@@ -400,6 +401,15 @@
                 "type": "string",
                 "minLength": 1
               }
+            },
+            "herbalistHidden": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": "Cień rzadkiego przepisu zielarki (taught), którego jeszcze nie zdradziła: {standing} to stopień relacji, {level} poziom Alchemii."
             },
             "busy": {
               "type": "array",
@@ -1840,6 +1850,11 @@
             "minimum": 1,
             "description": "Poziom profesji, od którego postać zna ten przepis."
           },
+          "taught": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "description": "Rzadki przepis zielarki (121 A: „zaufanym zdradza rzadkie receptury”): id stopnia relacji z nią (settlement.standings), od którego go zna postać. Do tego czasu przepis jest nieznany, choćby postać miała jego poziom."
+          },
           "herbs": {
             "type": "object",
             "minProperties": 1,
@@ -1909,7 +1924,7 @@
               },
               "cure": {
                 "const": 1,
-                "description": "Działa sama w walce: zdejmuje Zatrucie i chroni przed nim do końca walki."
+                "description": "Działa sama w walce: zdejmuje efekt z cures i chroni przed nim do końca walki."
               },
               "revive": {
                 "type": "number",
@@ -1927,7 +1942,7 @@
           "cures": {
             "type": "string",
             "minLength": 1,
-            "description": "Odtrutka (cure): id efektu z effects.json, który zdejmuje w walce."
+            "description": "Mikstura z cure (Odtrutka, Wywar od oparzeń): id efektu z effects.json, który zdejmuje w walce. Postać bierze i pije osobną taką miksturę na każdy efekt."
           },
           "verb": {
             "type": "string",

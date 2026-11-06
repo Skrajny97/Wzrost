@@ -17,13 +17,14 @@
 //
 // A character may carry potions (potions.js): a healing one is drunk the
 // moment HP falls below the player's mark, a mana one when a skill lacks
-// mana, an antidote the moment the effect it cures lands (it then keeps the
-// effect off to the end of the fight) and a fern brew the moment the
-// character faints (it rises with a share of its HP), each kind at most once
-// a fight. Potions drunk before an exploration may also have strengthened
-// its blows (`damageBonus`), coated its blade or warded it from magic
-// (`ward`: a share less of every magical blow). Potions draw no random
-// numbers of their own.
+// mana, a cure the moment the effect it cures lands (an antidote for
+// Zatrucie, the burn brew for Oparzenie; it then keeps that effect off to
+// the end of the fight) and a fern brew the moment the character faints (it
+// rises with a share of its HP), each kind at most once a fight, and each
+// effect's cure as a kind of its own. Potions drunk before an exploration
+// may also have strengthened its blows (`damageBonus`), coated its blade or
+// warded it from magic (`ward`: a share less of every magical blow).
+// Potions draw no random numbers of their own.
 //
 // A monster's blow may also mire its target (`slow`: Ugrzęźnięcie puts off
 // its next move, as a skill's slow does), heal the monster by a share of the
@@ -242,11 +243,14 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   const mend = (unit, amount) => heal(unit, unit.side === 'ally' ? amount * (1 + (trait?.healBonus ?? 0)) : amount);
 
   // A potion of a kind (`heal`, `mana`, `cure` or `revive`) the unit carries
-  // and has not drunk yet in this fight. Gives whether it drank.
-  const drink = (unit, kind, t) => {
-    const potion = unit.potions?.[kind];
-    if (!potion || drank.has(`${unit.id}:${kind}`)) return false;
-    drank.add(`${unit.id}:${kind}`);
+  // and has not drunk yet in this fight; of the cures the one for the effect
+  // `cures` (an antidote for Zatrucie, the burn brew for Oparzenie), each
+  // once a fight. Gives whether it drank.
+  const drink = (unit, kind, t, cures = null) => {
+    const potion = kind === 'cure' ? unit.potions?.cure?.[cures] : unit.potions?.[kind];
+    const once = kind === 'cure' ? `${unit.id}:cure:${cures}` : `${unit.id}:${kind}`;
+    if (!potion || drank.has(once)) return false;
+    drank.add(once);
     drunk.push(potion.id);
     const vars = { actor: unit.name, potion: potion.accusative };
     const potionTexts = content.potionUse.texts;
@@ -257,8 +261,8 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       // The effect goes and stays off to the end of the fight.
       const effect = content.effectsById[potion.cures];
       unit.dots = unit.dots.filter((dot) => dot.effect !== effect.id);
-      unit.cured = effect.id;
-      log(() => ({ t, kind: 'potion', effect: 'cure', actor: unit.id, target: unit.id, potion: potion.id, cleared: effect.name, hp: unit.hp, text: say(potionTexts, 'drinkCure', actions, vars) }));
+      unit.cured = [...(unit.cured ?? []), effect.id];
+      log(() => ({ t, kind: 'potion', effect: 'cure', actor: unit.id, target: unit.id, potion: potion.id, cleared: effect.name, hp: unit.hp, text: say(potionTexts, 'drinkCure', actions, { ...vars, effect: effect.name }) }));
     } else if (kind === 'revive') {
       unit.hp = Math.max(1, Math.round(potion.amount * unit.maxHp));
       const amount = unit.hp;
@@ -522,12 +526,12 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   };
 
   // An effect over time from a blow: the target's Will may keep it off, and
-  // so does an antidote drunk in this fight. One the target carries is drunk
-  // the moment the effect it cures lands. Toksyny makes a poison stronger and
-  // longer, Przewodnik żywiołów an effect of its elements longer; Czarny
-  // jad's poison weakens the blows of the poisoned (`weaken`).
+  // so does a cure for it drunk in this fight. One the target carries is
+  // drunk the moment the effect it cures lands. Toksyny makes a poison
+  // stronger and longer, Przewodnik żywiołów an effect of its elements
+  // longer; Czarny jad's poison weakens the blows of the poisoned (`weaken`).
   const applyDot = (actor, target, dot, raw, t, vars) => {
-    if (target.cured === dot.effect) return;
+    if (target.cured?.includes(dot.effect)) return;
     const resisted = cappedChance(target.willRating, actor.level, tuning.willCap, balance);
     if (!rng.chance(dot.chance * (1 - resisted))) return;
     const effect = content.effectsById[dot.effect];
@@ -557,7 +561,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       });
     }
     log(() => ({ t, kind: 'effect', actor: actor.id, target: target.id, effect: effect.name, element: effect.element, hp: target.hp, text: say(texts, 'effectApplied', actions, { ...vars, effect: effect.name }) }));
-    if (target.potions?.cure?.cures === effect.id) drink(target, 'cure', t);
+    if (target.potions?.cure?.[effect.id]) drink(target, 'cure', t, effect.id);
   };
 
   // A blow that mires (Ugrzęźnięcie): the target's Will may keep it off, as

@@ -181,11 +181,12 @@ export function creaturesPerFight(area, level) {
 }
 
 // The herbs the character's gathering profession knows: those a gathering
-// quest can name. The same for the recipes of brewing.
+// quest can name. The same for the recipes of brewing, of the herbalist's
+// rare ones those she has taught it (`relations`, brewing.js).
 const questHerbs = (character, content) =>
   content.gathering ? knownHerbs(professionState(character.professions, content.gathering.profession).level, content) : [];
 const questPotions = (character, content) =>
-  content.brewing ? knownPotions(professionState(character.professions, content.brewing.profession).level, content) : [];
+  content.brewing ? knownPotions(professionState(character.professions, content.brewing.profession).level, content, character.relations) : [];
 
 // What can be drawn: each kind once for each of its variants (kill: each
 // creature that the period's most fights bring at least once on average;

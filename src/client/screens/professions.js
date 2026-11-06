@@ -110,9 +110,11 @@ function backHeading(title, subtitle, hash) {
 // A folded list of the herbs, recipes or patterns, which grew too many for
 // tiles (the author: the screens were long to scroll). Folded, its button
 // shows the choice; open, a row for each known one and, last, the shadows
-// the System still hides, a row for each level that shows them (`unknown`
-// names them: one, a few, many). A choice folds the list, except in a list
-// of several choices at once (`multi`), folded by its button or "Gotowe".
+// still hidden, a row for each hint under them, by level: one for each level
+// the System shows them at, and one of its own for each rare recipe Jagna
+// has not taught yet (`unknown` names them: one, a few, many). A choice
+// folds the list, except in a list of several choices at once (`multi`),
+// folded by its button or "Gotowe".
 function choiceList(label, { multi = false, unknown }) {
   let open = false;
   const chosen = h('span', { class: 'choice-chosen' });
@@ -137,7 +139,8 @@ function choiceList(label, { multi = false, unknown }) {
     // { art, level, hint }; `pick(id)` takes one.
     show(picked, entries, hidden, pick) {
       fill(chosen, h('span', { class: 'choice-art' }, picked.art), text(picked.name, picked.meta));
-      const levels = [...new Set(hidden.map((each) => each.level))].sort((a, b) => a - b);
+      // The shadows by level, and by their hint within a level.
+      const hints = [...new Set([...hidden].sort((a, b) => a.level - b.level).map((each) => each.hint))];
       fill(
         rows,
         entries.map((entry) =>
@@ -161,8 +164,8 @@ function choiceList(label, { multi = false, unknown }) {
             ),
           ),
         ),
-        levels.map((level) => {
-          const group = hidden.filter((each) => each.level === level);
+        hints.map((hint) => {
+          const group = hidden.filter((each) => each.hint === hint);
           return h(
             'li',
             { class: 'choice-hidden', role: 'img', 'aria-label': `${countOf(group.length, ...unknown)}. ${group[0].hint}` },

@@ -95,7 +95,7 @@ describe('potions in fights', () => {
   test('an antidote is drunk the moment the poison lands, takes it off and keeps it off to the end of the fight', () => {
     const ally = fighter('warrior', null);
     const poisoned = (event) => event.target === ally.id && event.effect === 'Zatrucie';
-    const result = fight('jad', { ...ally, potions: { cure } }, 'viper');
+    const result = fight('jad', { ...ally, potions: { cure: { poisoned: cure } } }, 'viper');
     const landed = result.events.filter((event) => event.kind === 'effect' && poisoned(event));
     assert.equal(landed.length, 1, 'it lands once');
     const drunk = result.events[result.events.indexOf(landed[0]) + 1];
@@ -104,6 +104,36 @@ describe('potions in fights', () => {
     assert.equal(result.events.filter((event) => event.kind === 'tick' && poisoned(event)).length, 0);
     assert.deepEqual(result.drunk, ['antidote']);
     assert.ok(fight('jad', ally, 'viper').events.some((event) => event.kind === 'tick' && poisoned(event)), 'without it the poison ticks');
+  });
+
+  test('an antidote and the burn brew go along together: each is drunk the moment its own effect lands, once a fight', () => {
+    const ally = fighter('warrior', null);
+    const kit = fightPotions({ antidote: 2, 'burn-brew': 2 }, 0.4, content);
+    assert.deepEqual(kit.cure, { poisoned: cure, burning: { id: 'burn-brew', accusative: 'Wywar od oparzeń', amount: 1, cures: 'burning' } });
+    // A viper poisons and a will-o'-wisp burns.
+    const foes = [sturdy('viper', 12), { ...sturdy('will-o-wisp', 12), id: 'e1', name: 'Ognik' }];
+    const both = (seed, potions) => simulateFight({ allies: [{ ...ally, potions }], enemies: foes, rng: createRng(seed), content, record: true });
+    const on = (result, name, kind) => result.events.filter((event) => event.kind === kind && event.target === ally.id && event.effect === name);
+    const seed = Array.from({ length: 40 }, (_, index) => `oba${index}`).find((one) => {
+      const result = both(one, kit);
+      return on(result, 'Zatrucie', 'effect').length > 0 && on(result, 'Oparzenie', 'effect').length > 0;
+    });
+    assert.ok(seed, 'a fight where both land');
+    const result = both(seed, kit);
+    for (const [name, potion, text] of [
+      ['Zatrucie', 'antidote', 'Mira wypija Odtrutkę: Zatrucie znika i nie wróci do końca walki.'],
+      ['Oparzenie', 'burn-brew', 'Mira wypija Wywar od oparzeń: Oparzenie znika i nie wróci do końca walki.'],
+    ]) {
+      const landed = on(result, name, 'effect');
+      assert.equal(landed.length, 1, `${name} lands once`);
+      const drunk = result.events[result.events.indexOf(landed[0]) + 1];
+      assert.deepEqual([drunk.kind, drunk.effect, drunk.potion, drunk.cleared, drunk.text], ['potion', 'cure', potion, name, text]);
+      assert.equal(on(result, name, 'tick').length, 0, `no ${name} ticks`);
+    }
+    assert.deepEqual([...result.drunk].sort(), ['antidote', 'burn-brew']);
+    // A cure of an effect that never lands changes nothing in a fight.
+    const antidoteOnly = fight('jad', { ...ally, potions: { cure: { poisoned: cure } } }, 'viper');
+    assert.deepEqual(fight('jad', { ...ally, potions: kit }, 'viper').events, antidoteOnly.events);
   });
 
   test('a fern brew raises the character once, with 30% of max HP, instead of fainting', () => {
@@ -133,7 +163,7 @@ describe('potions in fights', () => {
     const kit = (left) => fightPotions(left, 0.4, content);
     assert.equal(kit({ 'lesser-healing': 2, healing: 1, 'greater-healing': 1 }).heal.id, 'greater-healing');
     assert.equal(kit({ 'lesser-healing': 2, healing: 1, 'greater-healing': 0 }).heal.id, 'healing');
-    assert.deepEqual(kit({ antidote: 1, 'fern-brew': 1, 'lesser-speed': 1 }), { cure, revive });
+    assert.deepEqual(kit({ antidote: 1, 'fern-brew': 1, 'lesser-speed': 1 }), { cure: { poisoned: cure }, revive });
     assert.deepEqual([carryLimit(content.potionsById['fern-brew'], 5), carryLimit(content.potionsById.healing, 5)], [1, 5]);
   });
 

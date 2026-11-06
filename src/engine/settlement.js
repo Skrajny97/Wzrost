@@ -11,7 +11,7 @@
 // turn, so a slot always gets the same order; the server gives the time
 // and the seed.
 
-import { knownPotions, potionPrice } from './brewing.js';
+import { knownPotions, potionPrice, recipeTaught } from './brewing.js';
 import { heldOfRarity, knownStack, materialPrice, parseStack, piecesOfRarity, stackKey } from './crafting.js';
 import { fireBuilding, fireTrade } from './fire.js';
 import { affixShare, affixValue, sellPrice } from './items.js';
@@ -141,9 +141,11 @@ export const isAnyMaterial = ({ kind, key }) => kind === 'material' && parseStac
 
 // The goods an order may ask for: only what the character can already get
 // (question 89 A): the herbs its Zielarstwo knows, the potions its Alchemia
-// knows, any materials of each rarity of the creatures it has met (no
-// elite's or champion's trophy, and only the rarities anyMaterial names),
-// the camp's resources and the parts up to the board's partRarity.
+// knows (of the herbalist's rare recipes those she has taught it, by its
+// `relations` with the residents), any materials of each rarity of the
+// creatures it has met (no elite's or champion's trophy, and only the
+// rarities anyMaterial names), the camp's resources and the parts up to the
+// board's partRarity.
 export function orderGoods(character, content) {
   const goods = [];
   const open = (profession) => profession && professionOpen(content.professionsById[profession.profession], character.level, content);
@@ -153,7 +155,7 @@ export function orderGoods(character, content) {
   }
   if (open(content.brewing)) {
     const level = professionState(character.professions, content.brewing.profession).level;
-    for (const potion of knownPotions(level, content)) goods.push({ kind: 'potion', key: potion.id });
+    for (const potion of knownPotions(level, content, character.relations)) goods.push({ kind: 'potion', key: potion.id });
   }
   // The author: "Te zlecenie powinny być losowane dla danej postaci na dany
   // poziom, powinno ich być albo dużo albo ogólne (raczej ogólne)".
@@ -642,6 +644,27 @@ export function companionGift(companion, { character, seed }, now, content) {
 export function herbalistPremium(points, content) {
   const { premium } = content.settlement.herbalist;
   return premium[Math.min(standingOf(points, content).index, premium.length - 1)];
+}
+
+// The rare recipes of Alchemia Jagna teaches (question 121 A: "zaufanym
+// zdradza rzadkie receptury"; `taught` in professions.json) at `points` of
+// the relation with her, free: those she has taught, and the next standing
+// that teaches more, with its recipes (null once she has taught them all).
+export function herbalistRecipes(points, content) {
+  const relations = { [content.settlement.herbalist.resident]: points };
+  const rare = content.potions.filter((potion) => potion.taught);
+  const next = content.settlement.standings.find((standing) => standing.points > points && rare.some((potion) => potion.taught === standing.id));
+  return {
+    taught: rare.filter((potion) => recipeTaught(potion, relations, content)),
+    next: next ? { standing: next, potions: rare.filter((potion) => potion.taught === next.id) } : null,
+  };
+}
+
+// The recipes a trade that takes the relation with Jagna from `before` to
+// `after` points makes her teach.
+export function recipesTaughtBetween(before, after, content) {
+  const had = new Set(herbalistRecipes(before, content).taught.map((potion) => potion.id));
+  return herbalistRecipes(after, content).taught.filter((potion) => !had.has(potion.id));
 }
 
 // What a resident who sells takes off the price at `points` of the

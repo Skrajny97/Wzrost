@@ -10,6 +10,7 @@
 // species and the trophy's grades above it is a trophy: blows against its
 // creature hit harder.
 
+import { recipeStanding } from './brewing.js';
 import { knownStack } from './crafting.js';
 import { areaDangers } from './hunt.js';
 import { baseClasses, baseClassLevel } from './items.js';
@@ -261,9 +262,13 @@ function itemEntry(base, discovered, content, patterns, jewels) {
   };
 }
 
+// A potion's entry: where its recipe comes from (a rare one of the
+// herbalist's from a standing of the relation with her, 121 A), and once
+// discovered its herbs and catalyst.
 function potionEntry(potion, discovered, content) {
   const found = Boolean(discovered[`potion:${potion.id}`]);
   const herbs = Object.entries(potion.herbs).map(([id, count]) => `${count} × ${content.herbsById[id].name}`);
+  const standing = recipeStanding(potion, content);
   return {
     id: potion.id,
     found,
@@ -272,6 +277,7 @@ function potionEntry(potion, discovered, content) {
     description: found ? potion.description : null,
     sources: [
       text(content, 'potionRecipe', { level: potion.level }),
+      standing && text(content, 'potionTaught', { standing: standing.name }),
       found && text(content, 'potionHerbs', { herbs: herbs.join(', ') }),
       found && potion.catalyst && text(content, 'potionCatalyst', { material: content.materialsById[potion.catalyst].name }),
     ].filter(Boolean),

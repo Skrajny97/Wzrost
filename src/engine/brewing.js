@@ -1,19 +1,38 @@
 // Alchemia (data/professions.json: brewing and potions): the character brews
 // potions in the Systemowa Pracownia, one recipe at a time, with no fights
 // and no risk. The profession's level shows the recipes and makes each potion
-// quicker. The herbs for all the potions are taken at the start, and the seed
-// saved then decides which potions come out twice. Stopped early, a brewing
-// keeps the potions done and gives back the herbs for the rest. Potions stack
-// in the bag as herbs do, and the work gives the character the little XP
-// gathering gives (professions.js).
+// quicker; a few rare recipes the Osada's herbalist teaches besides, at a
+// standing of the relation with her (recipeTaught). The herbs for all the
+// potions are taken at the start, and the seed saved then decides which
+// potions come out twice. Stopped early, a brewing keeps the potions done
+// and gives back the herbs for the rest. Potions stack in the bag as herbs
+// do, and the work gives the character the little XP gathering gives
+// (professions.js).
 
 import { gradeSteps } from './crafting.js';
 import { countList, professionLevelLines, professionProgress } from './professions.js';
 import { createRng } from './rng.js';
 import { say } from './text.js';
 
-// The recipes the System shows at a level of the brewing profession.
-export const knownPotions = (level, content) => content.potions.filter((potion) => potion.level <= level);
+// The standing of the relation with the herbalist from which she teaches a
+// rare recipe (121 A: "zaufanym zdradza rzadkie receptury"; `taught`), or
+// null for a recipe of the System.
+export const recipeStanding = (potion, content) => (potion.taught ? (content.settlement?.standings.find((standing) => standing.id === potion.taught) ?? null) : null);
+
+// Whether the character may know a recipe beside its level: one of the
+// System always, a rare one once the herbalist has taught it, that is once
+// the relation with her has reached its standing (`relations`: the
+// character's relations with the Osada's residents, { herbalist: 720 }).
+// Brewing and drinking it still wait for its level, as with any recipe.
+export function recipeTaught(potion, relations, content) {
+  if (!potion.taught) return true;
+  const standing = recipeStanding(potion, content);
+  return Boolean(standing) && (relations?.[content.settlement.herbalist.resident] ?? 0) >= standing.points;
+}
+
+// The recipes the System shows at a level of the brewing profession, and of
+// the herbalist's rare ones those she has taught (recipeTaught).
+export const knownPotions = (level, content, relations = {}) => content.potions.filter((potion) => potion.level <= level && recipeTaught(potion, relations, content));
 
 // The minutes of one potion at a level: each level takes speedPerLevel of
 // the first level's time off, down to `fastest` of it, and the Bractwo
@@ -69,12 +88,13 @@ export const potionPrice = (potion, content) =>
 // The report of a brewing: a line about the workshop from the seed, the
 // potions made, the lucky ones among them and those the full bag lost, the
 // profession's new levels with their stats and the recipes the System
-// revealed with them, and the character's XP. `stopped`: the player called
-// the character back before the end.
-export function brewingReport({ potion, minutes, startedAt, endsAt, seed, made, stored, lost, stopped, before, after, character, xp, work }, content) {
+// revealed with them (of the herbalist's rare ones only those she has
+// taught, by the character's `relations`), and the character's XP.
+// `stopped`: the player called the character back before the end.
+export function brewingReport({ potion, minutes, startedAt, endsAt, seed, made, stored, lost, stopped, before, after, character, xp, work, relations = {} }, content) {
   const texts = content.brewing.texts;
   const profession = content.professionsById[content.brewing.profession];
-  const revealed = content.potions.filter((candidate) => candidate.level > before.level && candidate.level <= after.level);
+  const revealed = content.potions.filter((candidate) => candidate.level > before.level && candidate.level <= after.level && recipeTaught(candidate, relations, content));
   const list = (count) => countList({ [potion.id]: count }, content.potionsById);
   const lostCount = lost[potion.id] ?? 0;
   return {

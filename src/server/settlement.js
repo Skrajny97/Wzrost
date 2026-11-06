@@ -38,6 +38,7 @@ import {
   evolvedSkills,
   goodStock,
   herbalistPremium,
+  herbalistRecipes,
   herbalistStock,
   relationDiscount,
   hireCost,
@@ -55,6 +56,7 @@ import {
   pathResetCost,
   piecesOfRarity,
   potionPrice,
+  professionState,
   propertyName,
   rarityNeedView,
   regenPerMinute,
@@ -62,6 +64,7 @@ import {
   reforgeChoices,
   reforgeCost,
   reforgeOptions,
+  recipesTaughtBetween,
   rejectOrder,
   rollUpgrade,
   rumorText,
@@ -94,6 +97,7 @@ import {
   characterView,
   currentHp,
   engineCharacter,
+  knowingCharacter,
   loadPlayer,
   questsNow,
   requireBuildPlayer,
@@ -114,6 +118,7 @@ import { counted, foreign, takenOff, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
 import { stableView } from './stable.js';
 import { tanneryView } from './tannery.js';
+import { countedForm, say } from '../engine/text.js';
 
 // A JSON path for a key with a hyphen or a colon ("iron-ore", "wolf-pelt:rare").
 const jsonPath = (key) => `$."${key}"`;
@@ -400,11 +405,39 @@ function herbalistPrices(player, stored, now) {
   return { premium, scrap, price: (kind, id) => scrap(kind, id) * (1 + premium) };
 }
 
+// "3 rzadkie przepisy Alchemii": a number of Jagna's rare recipes.
+const recipeCount = (count) => `${count} ${countedForm(count, content.settlement.herbalist.recipes.counted)}`;
+
+// The rare recipes of Alchemia Jagna teaches (121 A, herbalistRecipes) as
+// her Chata tells them: those she has taught, each with whether the
+// Pracownia brews it now or from which level of Alchemia, and the standing
+// that teaches the next ones.
+function recipesView(points, row) {
+  const texts = content.settlement.herbalist.recipes;
+  const { taught, next } = herbalistRecipes(points, content);
+  const { level } = professionState(JSON.parse(row.professions ?? '{}'), content.brewing.profession);
+  return {
+    title: say(texts, 'title', 0),
+    taught: taught.map((potion) => ({ id: potion.id, name: potion.name, note: potion.level <= level ? say(texts, 'ready', 0) : say(texts, 'level', 0, { level: potion.level }) })),
+    next: next && say(texts, 'next', 0, { standing: next.standing.name, count: recipeCount(next.potions.length) }),
+  };
+}
+
+// What a trade that took the relation with Jagna from `before` to `after`
+// points adds to its answer: { taught } with the words about the rare
+// recipes she teaches with it, or nothing.
+function taughtWords(before, after) {
+  const taught = recipesTaughtBetween(before, after, content);
+  if (taught.length === 0) return {};
+  return { taught: say(content.settlement.herbalist.recipes, 'taught', 0, { count: recipeCount(taught.length), potions: taught.map((potion) => potion.name).join(', ') }) };
+}
+
 // The Chata zielarki for the page: each herb and potion in the bag with
 // Jagna's price of one and the scrapper's beside it, her premium, and the
 // trade's reputation today out of the day's limit (120 A). `shop` has the
 // herbs she sells at the relation with her, each with its price and how
-// many more of it the bag takes, and the standing that brings more.
+// many more of it the bag takes, and the standing that brings more;
+// `recipes` the rare recipes she teaches (121 A).
 function herbalistView(player, stored, now) {
   const { premium, scrap, price } = herbalistPrices(player, stored, now);
   const held = { herb: JSON.parse(player.row.herbs ?? '{}'), potion: JSON.parse(player.row.potions ?? '{}') };
@@ -429,13 +462,16 @@ function herbalistView(player, stored, now) {
       next: next && { standing: next.standing, herbs: next.herbs.map((id) => content.herbsById[id].name) },
       discount: relationDiscount(points, content),
     },
+    recipes: recipesView(points, player.row),
   };
 }
 
 // { kind: herb or potion, id, count }: Jagna buys herbs or potions from the
 // bag, also while the character is away, as the scrapper does (DECISIONS.md,
 // "Plecak pod ręką"); the trade raises the relation with her and the
-// reputation with the herbalists, up to the day's limit.
+// reputation with the herbalists, up to the day's limit. A trade that takes
+// the relation to a standing where she teaches rare recipes names them
+// (`taught`, 121 A).
 export async function sellToHerbalist(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -463,8 +499,9 @@ export async function sellToHerbalist(context) {
     .run();
   if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(context.env.DB, session.userId);
+  const relation = stored.relations[herbalist.resident] ?? 0;
   return json({
-    sold: { count: body.count, gold, points },
+    sold: { count: body.count, gold, points, ...taughtWords(relation, relation + points) },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
   });
@@ -474,7 +511,8 @@ export async function sellToHerbalist(context) {
 // taką funkcję żeby to ona zioła sprzedawała"), those she has at the
 // relation with her, into the bag while it has places, as bought goods
 // the Encyklopedia leaves out. The trade raises the relation with her and
-// the herbalists' reputation as selling does, in the same day's limit.
+// the herbalists' reputation as selling does, in the same day's limit, and
+// may make her teach rare recipes as selling does (`taught`).
 export async function buyFromHerbalist(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -505,8 +543,9 @@ export async function buyFromHerbalist(context) {
     .run();
   if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(context.env.DB, session.userId);
+  const relation = stored.relations[herbalist.resident] ?? 0;
   return json({
-    bought: { name: content.herbsById[good.id].name, count: body.count, gold, points },
+    bought: { name: content.herbsById[good.id].name, count: body.count, gold, points, ...taughtWords(relation, relation + points) },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
   });
@@ -578,12 +617,10 @@ function restedAt(player, now) {
   return Math.ceil(now + ((maxHp - hp) / regenPerMinute(maxHp, vitality, content, rest.change?.bonus ?? rest.bonus)) * 60000);
 }
 
-// The character as an order and a companion's gift see it: what it knows.
-const knowing = (row) => ({ ...engineCharacter(row), met: JSON.parse(row.met ?? '[]'), patterns: JSON.parse(row.patterns ?? '[]') });
-
-// A companion's gift of the week (question 112 A), with the goods' name.
+// A companion's gift of the week (question 112 A), with the goods' name: of
+// what the character knows, as an order (knowingCharacter).
 function giftOf(companion, row, now) {
-  const gift = companionGift(companion, { character: knowing(row), seed: `${row.id}:settlement` }, now, content);
+  const gift = companionGift(companion, { character: knowingCharacter(row), seed: `${row.id}:settlement` }, now, content);
   if (!gift) return null;
   const goods = { herb: content.herbsById, potion: content.potionsById, part: content.partsById }[gift.kind];
   return { ...gift, name: goods[gift.key].name };

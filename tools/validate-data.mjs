@@ -1095,7 +1095,7 @@ function checkWorkshop(data, ids) {
 // every tab once, and the sentences the engine says.
 const ENCYCLOPEDIA_TEXTS = [
   'accessories', 'tierItems', 'tierItemsFirst', 'tierLevels', 'itemDrop', 'itemDropAny', 'itemClasses', 'itemClass', 'itemAnyClass',
-  'itemOtherClasses', 'itemWear', 'itemPattern', 'itemJewelPattern', 'itemBest', 'potionRecipe', 'potionHerbs', 'potionCatalyst', 'herbGather', 'herbEvent',
+  'itemOtherClasses', 'itemWear', 'itemPattern', 'itemJewelPattern', 'itemBest', 'potionRecipe', 'potionHerbs', 'potionCatalyst', 'potionTaught', 'herbGather', 'herbEvent',
   'materialDrop', 'materialGrades', 'trophyNeeds', 'trophyWon', 'partTable', 'partExchange', 'partShop', 'mineralMine', 'mineralCraft', 'mineralGem', 'mineralOre', 'unknown',
 ];
 
@@ -1298,6 +1298,11 @@ function checkSettlement(data, { rarities }) {
   if (stock.length > standings.length) errors.push('settlement.json: herbalist.sell.stock ma więcej liczb niż stopni');
   if (stock.some((count, index) => index > 0 && count < stock[index - 1])) errors.push('settlement.json: herbalist.sell.stock nie może maleć ze stopniem');
   if (Math.max(...stock) > data.professions.herbs.length) errors.push('settlement.json: herbalist.sell.stock podaje więcej ziół, niż jest w grze');
+  // The rare recipes of Alchemia she teaches (121 A, `taught` in
+  // professions.json): each from a standing that exists.
+  for (const potion of data.professions.potions) {
+    if (potion.taught && !standingIds.has(potion.taught)) errors.push(`professions.json: mikstura ${potion.id} ma nieznany stopień relacji "${potion.taught}" (taught)`);
+  }
   reforge.choices.forEach((step, index) => {
     if (!standingIds.has(step.from)) errors.push(`settlement.json: reforge.choices ma nieznany stopień ${step.from}`);
     const before = reforge.choices[index - 1];

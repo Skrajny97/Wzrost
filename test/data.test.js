@@ -103,6 +103,11 @@ test('the validator catches broken references and schema errors', () => {
   assert.ok(placeErrors.some((error) => /^cosmetics\.json\/items\/\d+\/pet: must have required property 'ride'/.test(error)), placeErrors.join('\n'));
   assert.ok(placeErrors.some((error) => /^cosmetics\.json\/items\/\d+\/pet\/foot: must match exactly one schema in oneOf/.test(error)), placeErrors.join('\n'));
 
+  // A rare recipe of Jagna's comes at a standing of the relation that exists (121 A).
+  const taught = structuredClone(loadData());
+  taught.professions.potions.find((potion) => potion.id === 'owl-draught').taught = 'beloved';
+  assert.deepEqual(validateData(taught), ['professions.json: mikstura owl-draught ma nieznany stopień relacji "beloved" (taught)']);
+
   const broken = structuredClone(loadData());
   broken.rarities[0].color = 'grey';
   assert.match(validateData(broken)[0], /^rarities\.json\/0\/color: must match pattern/);

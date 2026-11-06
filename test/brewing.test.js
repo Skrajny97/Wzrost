@@ -176,9 +176,14 @@ describe('brewing through the API', () => {
     assert.equal(known.name, 'Mniejsza mikstura leczenia');
     assert.deepEqual(known.herbs, [{ id: 'comfrey', name: 'Żywokost', need: 3, have: 31 }]);
     assert.equal(known.most, 10);
+    // The System's recipes wait for their level, Jagna's rare ones for her
+    // to teach them at a standing of the relation with her (121 A).
+    const jagna = { 40: 'Zaufany', 44: 'Zaufany', 50: 'Zaufany', 60: 'Przyjaciel', 70: 'Przyjaciel', 75: 'Przyjaciel' };
     assert.deepEqual(
       hidden.map((recipe) => recipe.hint),
-      [3, 5, 10, 14, 18, 24, 26, 32, 36, 45, 48, 52, 55, 65, 90].map((level) => `Ukryte przez System do ${level}. poziomu Alchemii.`),
+      [3, 5, 10, 14, 18, 24, 26, 32, 36, 40, 44, 45, 48, 50, 52, 55, 60, 65, 70, 75, 90].map((level) =>
+        jagna[level] ? `Rzadki przepis Jagny: od stopnia relacji ${jagna[level]} i ${level}. poziomu Alchemii.` : `Ukryte przez System do ${level}. poziomu Alchemii.`,
+      ),
     );
   });
 

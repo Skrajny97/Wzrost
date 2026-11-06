@@ -1,5 +1,5 @@
 {
-  "$comment": "Encyklopedia (DECISIONS.md, „Encyklopedia”): wszystko, co postać już zdobyła, w zakładkach i tierach, ze wskazówką, skąd to wziąć. Przedmioty mają zestawy: w każdym tierze jeden na klasę i jeden z dodatkami dla wszystkich. Biżuteria stoi w tierach jak inne przedmioty, według poziomu klasy, od którego się ją zakłada, a ten sam poziom Jubilerstwa odsłania jej wzór w Szlifierni. Mikstury, zioła i minerały Górnictwa stoją w tierach według poziomu swojej profesji (upTo), a materiały według najwyższego poziomu swojego stwora. Mikstury, zioła, materiały, części i minerały mają progi odkryć (milestones). Pełny zestaw albo próg otwiera skrzynię: zestaw ze skrzynią swojego tieru, kolejne progi z kolejnymi skrzyniami (chests). Materiał zdobyty w stopniu swojego gatunku i w trophy.grades - 1 wyższych to trofeum: obrażenia przeciw jego stworowi rosną o trophy.damage.",
+  "$comment": "Encyklopedia (DECISIONS.md, „Encyklopedia”): wszystko, co postać już zdobyła, w zakładkach i tierach, ze wskazówką, skąd to wziąć. Przedmioty mają zestawy: w każdym tierze jeden na klasę i jeden z dodatkami dla wszystkich. Biżuteria stoi w tierach jak inne przedmioty, według poziomu klasy, od którego się ją zakłada, a ten sam poziom Jubilerstwa odsłania jej wzór w Szlifierni. Mikstury, zioła i minerały Górnictwa stoją w tierach według poziomu swojej profesji (upTo), a materiały według najwyższego poziomu swojego stwora. Rzadki przepis zielarki (taught w professions.json) mówi, od którego stopnia relacji z nią go zna postać (potionTaught). Mikstury, zioła, materiały, części i minerały mają progi odkryć (milestones). Pełny zestaw albo próg otwiera skrzynię: zestaw ze skrzynią swojego tieru, kolejne progi z kolejnymi skrzyniami (chests). Materiał zdobyty w stopniu swojego gatunku i w trophy.grades - 1 wyższych to trofeum: obrażenia przeciw jego stworowi rosną o trophy.damage.",
   "tabs": [
     { "id": "bestiary", "name": "Bestiariusz" },
     { "id": "items", "name": "Przedmioty" },
@@ -51,6 +51,7 @@
     "potionRecipe": ["Alchemia: przepis od {level}. poziomu."],
     "potionHerbs": ["Składniki: {herbs}."],
     "potionCatalyst": ["Katalizator: {material}."],
+    "potionTaught": ["Rzadki przepis: zdradza go zielarka Jagna od stopnia relacji {standing}."],
     "herbGather": ["Zielarstwo: od {level}. poziomu, w Zagajniku."],
     "herbEvent": ["Czasem daje go też zdarzenie na wyprawie."],
     "materialDrop": ["Zostawia: {monster} ({areas})."],

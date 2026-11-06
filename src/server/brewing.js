@@ -39,7 +39,7 @@ import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, insertWork, requireProfessions, takeFromBag, workGains } from './professions.js';
-import { herbsOf, potionKnown, potionsOf } from './professions-view.js';
+import { herbsOf, potionKnown, potionsOf, relationsOf } from './professions-view.js';
 import { perkOf } from './perks.js';
 import { trimReports } from './reports.js';
 import { tripOf } from './trips.js';
@@ -56,7 +56,9 @@ export async function startBrewing(context) {
   const { brewing } = content;
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), brewing.profession);
   const potion = typeof body.recipe === 'string' ? content.potionsById[body.recipe] : undefined;
-  if (!potion || potion.level > level) throw new ApiError(400, 'unknown_recipe', 'Tego przepisu jeszcze nie znasz.');
+  // From its level, and a rare one of the herbalist's once she has taught
+  // it (121 A, potionKnown).
+  if (!potion || !potionKnown(player.row, potion)) throw new ApiError(400, 'unknown_recipe', 'Tego przepisu jeszcze nie znasz.');
   const herbs = herbsOf(player.row);
   // The Bractwo Zielarzy brews faster (589 B), for the Awatar's work too.
   const faster = perkOf(player.row, 'brewFaster');
@@ -181,7 +183,7 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
   const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);
   const report = {
     ...brewingReport(
-      { potion, minutes: worked, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, made, stored, lost, stopped: stop, before, after, character, xp, work },
+      { potion, minutes: worked, startedAt: activity.started_at, endsAt: stop ? now : activity.ends_at, seed: activity.seed, made, stored, lost, stopped: stop, before, after, character, xp, work, relations: relationsOf(row) },
       content,
     ),
     ...(avatar && { avatar: true }),

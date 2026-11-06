@@ -797,8 +797,9 @@ export function mountSettlement(container, { params = {} } = {}) {
               const answer = await call('POST', '/api/settlement/herbalist/buy', { id: good.key, count: field.read() });
               closeSheet();
               apply(answer);
-              const { name, count, gold, points } = answer.bought;
-              toast(`Kupione: ${name} ×${formatNumber(count)} za ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z Jagną i reputacja Bractwa Zielarzy +${points}.` : ''}`);
+              // `taught`: the rare recipes the trade made her teach (121 A).
+              const { name, count, gold, points, taught } = answer.bought;
+              toast(`Kupione: ${name} ×${formatNumber(count)} za ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z Jagną i reputacja Bractwa Zielarzy +${points}.` : ''}${taught ? ` ${taught}` : ''}`);
             }),
         }),
       ),
@@ -844,6 +845,34 @@ export function mountSettlement(container, { params = {} } = {}) {
         }),
       ),
       shop.next && h('p', { class: 'muted', text: `Od stopnia relacji ${shop.next.standing} dojdą: ${shop.next.herbs.join(', ')}.` }),
+      herbalistRecipes(),
+    );
+  }
+
+  // Jagna's rare recipes of Alchemia under her herbs (121 A: "zaufanym
+  // zdradza rzadkie receptury"): those she has taught, each with its icon
+  // and when the Pracownia brews it, and the standing that teaches the next.
+  function herbalistRecipes() {
+    const { recipes } = data.herbalist;
+    if (!recipes || (recipes.taught.length === 0 && !recipes.next)) return null;
+    return h(
+      'div',
+      { class: 'stack' },
+      h('h2', { class: 'section-title', text: recipes.title }),
+      recipes.taught.length > 0 &&
+        h(
+          'ul',
+          { class: 'settlement-goods' },
+          recipes.taught.map((recipe) =>
+            h(
+              'li',
+              { class: 'settlement-good' },
+              h('p', { class: 'settlement-good-name' }, h('span', { class: 'potion-pick-art' }, stackArt({ kind: 'potion', key: recipe.id })), h('strong', { text: recipe.name })),
+              h('p', { class: 'muted', text: recipe.note }),
+            ),
+          ),
+        ),
+      recipes.next && h('p', { class: 'muted', text: recipes.next }),
     );
   }
 
@@ -902,8 +931,8 @@ export function mountSettlement(container, { params = {} } = {}) {
         const answer = await call('POST', '/api/settlement/herbalist', { kind: good.kind, id: good.id, count });
         closeSheet();
         apply(answer);
-        const { gold, points } = answer.sold;
-        toast(`Jagna płaci ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z nią i reputacja Bractwa Zielarzy +${points}.` : ''}`);
+        const { gold, points, taught } = answer.sold;
+        toast(`Jagna płaci ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z nią i reputacja Bractwa Zielarzy +${points}.` : ''}${taught ? ` ${taught}` : ''}`);
       }),
     );
     openSheet(

@@ -2,16 +2,18 @@
 // The player takes some along, each kind at most as many as the
 // exploration's fights. In a fight the character drinks a healing potion the
 // moment HP falls below the player's mark, a mana potion when a skill lacks
-// mana, an antidote the moment it is poisoned and the fern brew the moment it
-// faints, each kind at most once a fight and the strongest of a kind first
-// (combat.js). The fern brew saves the character once an exploration, so an
-// exploration takes one along at most. A strengthening potion is drunk from
-// the bag instead (speed, armour, damage, focus, the aconite oil on the
-// blade, the mistletoe ward) and works in its number of the next fights of
-// explorations (the author: "nakładamy na ilość walk w wyprawie a nie na
-// czas"); each one drunk adds its fights to those left, and an exploration
-// uses up the fights they worked in as its report is claimed, whenever they
-// were drunk (claimWindows). Potions not drunk stay in the bag.
+// mana, a cure the moment the effect it cures lands (an antidote for
+// Zatrucie, the burn brew for Oparzenie, each a kind of its own) and the
+// fern brew the moment it faints, each kind at most once a fight and the
+// strongest of a kind first (combat.js). The fern brew saves the character
+// once an exploration, so an exploration takes one along at most. A
+// strengthening potion is drunk from the bag instead (speed, armour,
+// damage, focus, the aconite oil on the blade, the mistletoe ward) and works
+// in its number of the next fights of explorations (the author: "nakładamy
+// na ilość walk w wyprawie a nie na czas"); each one drunk adds its fights
+// to those left, and an exploration uses up the fights they worked in as its
+// report is claimed, whenever they were drunk (claimWindows). Potions not
+// drunk stay in the bag.
 
 import { countedForm } from './text.js';
 
@@ -35,13 +37,19 @@ export const carryLimit = (potion, fights) => (potion.effect.revive ? 1 : fights
 
 // What a fight can drink from `left` (counts by id): for each kind the
 // strongest potion of it still carried, with its strength and, for healing,
-// the mark, for an antidote the effect it cures.
+// the mark; of the cures one for each effect, by the effect it cures (an
+// antidote for Zatrucie, the burn brew for Oparzenie: `cure` is
+// { poisoned: …, burning: … }). On a tie the first in the data stays.
 export function fightPotions(left, healBelow, content) {
   const kit = {};
   for (const potion of content.potions) {
     const kind = fightKind(potion);
-    if (!kind || !((left[potion.id] ?? 0) > 0) || (kit[kind] && kit[kind].amount >= potion.effect[kind])) continue;
-    kit[kind] = { id: potion.id, accusative: potion.counted[0], amount: potion.effect[kind], ...(kind === 'heal' && { below: healBelow }), ...(kind === 'cure' && { cures: potion.cures }) };
+    if (!kind || !((left[potion.id] ?? 0) > 0)) continue;
+    const entry = { id: potion.id, accusative: potion.counted[0], amount: potion.effect[kind], ...(kind === 'heal' && { below: healBelow }), ...(kind === 'cure' && { cures: potion.cures }) };
+    const held = kind === 'cure' ? kit.cure?.[potion.cures] : kit[kind];
+    if (held && held.amount >= entry.amount) continue;
+    if (kind === 'cure') kit.cure = { ...kit.cure, [potion.cures]: entry };
+    else kit[kind] = entry;
   }
   return kit;
 }
