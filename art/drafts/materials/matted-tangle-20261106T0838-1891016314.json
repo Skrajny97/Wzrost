@@ -1,0 +1,14 @@
+{
+  "id": "matted-tangle",
+  "tool": "pixellab generate-image-v2",
+  "description": "a dense tangled ball of coarse black woolly fibres like a crow's nest, a few loose strands curling out, two tiny yellow glints deep inside, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}
