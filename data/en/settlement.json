@@ -819,7 +819,7 @@
     },
     "texts": {
       "title": "Wanted",
-      "intro": "Every day Headman Bogumił posts three wanted posters for creatures from the places open to you, and one for an outlaw. Take a poster, and on an exploration of that place you will meet the wanted one more often.",
+      "intro": "Every day Headman Bogumił posts three wanted posters for creatures from the places open to you, and one for an outlaw. Take a poster, and on a regular exploration of that place you will meet the wanted one more often. The wanted never turn up on a Quick Hunt, a Lightning Hunt or a Party trip.",
       "footer": "For defeating the wanted one, the headman pays a reward: gold, Time Points and reputation with the Brotherhood of Hunters. A creature leaves a trophy: its material in the rarity you still lack in the Encyclopedia for the +5% damage bonus against it. An outlaw leaves rare loot. One poster at a time, new posters every day.",
       "wanted": "Wanted",
       "outlaw": "Outlaw",
@@ -830,7 +830,7 @@
       "drop": "Drop poster",
       "claim": "Claim reward",
       "done": "Fulfilled",
-      "hunting": "Your poster. Hunt your quarry on explorations: {area}.",
+      "hunting": "Your poster. Hunt your quarry on regular explorations: {area}.",
       "beaten": "Defeated! The reward waits with the headman.",
       "earlier": "Yesterday's poster",
       "one": "You already have a wanted poster. Fulfil it or drop it first.",

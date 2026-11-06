@@ -285,6 +285,11 @@
       "id": "0.1.97",
       "title": "Wersja 0.1.97",
       "body": "- Gra jest także po angielsku. Język zmienisz w Ustawieniach (zębatka) albo na ekranie logowania.\n- Na czacie jest kanał English, a pod wiadomością w innym języku przycisk „A→ Przetłumacz”: tłumaczenie maszynowe, do 100 dziennie."
+    },
+    {
+      "id": "0.1.98",
+      "title": "Wersja 0.1.98",
+      "body": "- Poszukiwani: opis na Tablicy zleceń mówi teraz wprost, że poszukiwanych spotkasz tylko na zwykłej wyprawie, a nie na Szybkim ani Błyskawicznym polowaniu, ani na wyprawie Drużyny."
     }
 ]
 }

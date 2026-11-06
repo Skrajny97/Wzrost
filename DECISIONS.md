@@ -3034,6 +3034,11 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.98 (6.11.2026)
+
+- Poszukiwani: objaśnienie na Tablicy zleceń („Jak to działa?”) i list gończy w ręku mówią, że poszukiwanych spotyka się tylko na zwykłej wyprawie, nie na Szybkim Polowaniu, Błyskawicznym polowaniu ani wyprawie Drużyny. Tak było od początku (`src/server/hunts.js`), ale opis tego nie mówił; zapytał o to gracz na czacie.
+- `npm test` nie przepuszcza nowego pliku z polskim tekstem bez angielskiego (zob. „WAŻNE: każda nowa treść od razu po angielsku”, punkt 4).
+
 ## WAŻNE: każda nowa treść od razu po angielsku (6.11.2026)
 
 Autor: „i w Decisions na później i jako ważna rzecz wpisz, że automatycznie sam będziesz teraz każdy nowy kontent tłumaczył i wdrażał jednocześnie po angielsku” i „w naprawdę skrajnych sytuacjach Ci w tym pomogę wybierając, ale oby jak najrzadziej”.
