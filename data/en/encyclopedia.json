@@ -75,7 +75,7 @@
       "Other classes' items drop from character level {level}."
     ],
     "itemWear": [
-      "You can wear it from class level {level}."
+      "You can equip it from class level {level}."
     ],
     "itemPattern": [
       "Workshop: pattern from Crafting level {level}."

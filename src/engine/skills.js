@@ -17,6 +17,8 @@
 // the evolution bring more points for them. The second form (class level
 // 100) does the same once more, with a higher top level.
 
+import { decimalText, word } from './text.js';
+
 // Kinds used instead of a plain blow on the character's move, at the start of
 // a fight, and the moment its HP falls below the skill's mark; a stance
 // (evolutions) wakes at the start of the character's move, besides its blow,
@@ -119,7 +121,7 @@ export function learnBlock(character, skillId, content) {
     return { code: 'class_level', message: `Ścieżkę poboczną dobierzesz od poziomu klasy ${secondClassLevel}.` };
   }
   if (skillPoints(character, content).free < 1) {
-    return { code: 'no_points', message: `Ścieżka ${known.length > 0 ? 'poboczna' : 'główna'} kosztuje 1 Punkt Umiejętności.` };
+    return { code: 'no_points', message: known.length > 0 ? 'Ścieżka poboczna kosztuje 1 Punkt Umiejętności.' : 'Ścieżka główna kosztuje 1 Punkt Umiejętności.' };
   }
   return null;
 }
@@ -188,18 +190,17 @@ export function raiseBlock(character, skillId, content, count = 1) {
 // The skill's effect in words at its numbers. {name} is a whole number,
 // {name%} a percent, {name%.1} a percent with one decimal, {name pp}
 // percentage points, {name.1} one decimal, {cooldown} the cooldown and
-// {critPower%} the power with a critical hit.
-const decimal = (value) => String(Math.round(value * 10) / 10).replace('.', ',');
-
+// {critPower%} the power with a critical hit; the decimals and the points
+// as the content's language writes them ("2,5", "2.5"; word()).
 export function skillText(template, skill, params, content) {
   const values = { ...params, cooldown: skill.cooldown, critPower: (params.power ?? 0) * content.balance.combat.critMultiplier };
   return template.replace(/\{(\w+)(%\.1|%| pp|\.1)?\}/g, (whole, name, format) => {
     const value = values[name];
     if (typeof value !== 'number') return whole;
-    if (format === '%.1') return `${decimal(value * 100)}%`;
+    if (format === '%.1') return `${decimalText(value * 100, content)}%`;
     if (format === '%') return `${Math.round(value * 100)}%`;
-    if (format === ' pp') return `${Math.round(value * 100)} pkt proc.`;
-    if (format === '.1') return decimal(value);
+    if (format === ' pp') return word(content, '{value} pkt proc.', { value: Math.round(value * 100) });
+    if (format === '.1') return decimalText(value, content);
     return String(Math.round(value));
   }).replace('proc..', 'proc.');
 }

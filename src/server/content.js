@@ -9,7 +9,7 @@
 
 import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, evolutionArt, landBestiaryChest, meetingChances, ordinaryMaterial, overlayTexts, regionDangers } from '../engine/index.js';
 import { buildingOn, craftingOn, evolutionsOn, settlementOn } from './features.js';
-import { language, pageDictionary } from './i18n.js';
+import { language, languageOffered, pageDictionary } from './i18n.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
 import classes from '../../data/classes.json' with { type: 'json' };
@@ -195,6 +195,19 @@ export function contentIn(lang) {
 // The game's content in the request's language.
 export const content = () => contentIn(language());
 
+// The chat's channels on this server (data/chat.json): one of a language
+// (`language`, the English one) only where the server speaks it (i18n.js),
+// so the live game keeps its two. With `own`, as the page gets them: the
+// channel of the request's language first, as the chat opens on its first
+// channel and lights the Społeczność for its messages
+// (src/client/chat-news.js), so a page in English opens on the English
+// one; everyone may read and write in it.
+export function chatChannels({ own = false } = {}) {
+  const channels = content().chat.channels.filter((channel) => !channel.language || languageOffered(channel.language));
+  const first = own ? channels.find((channel) => channel.language === language()) : null;
+  return first ? [first, ...channels.filter((channel) => channel !== first)] : channels;
+}
+
 // The narrator's lines that are read once, in their order: cards and
 // pointers, and a lead marked `once`, whose tap changes no screen. Another
 // lead or a tap is done when the game moves on, so it is not kept.
@@ -335,11 +348,12 @@ export function publicContent() {
     // The narrator's introduction for a new character (narrator.js), with
     // the Time Points the narrator gives.
     tutorial: { ...data.tutorial, $comment: undefined, startTimePoints: game.balance.timePoints.start },
-    // The chat of the Społeczność tab (chat.js): its channels, how long a
+    // The chat of the Społeczność tab (chat.js): its channels on this
+    // server, the page's language's first (chatChannels), how long a
     // message may be, how often the open chat asks for new ones, and the
     // rules accepted before the first message.
     chat: {
-      channels: game.chat.channels,
+      channels: chatChannels({ own: true }),
       maxLength: game.chat.rules.maxLength,
       // The admin's messages with links (chat.js, cleanText) and its window
       // "Dodaj link".

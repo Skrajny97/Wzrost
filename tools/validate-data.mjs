@@ -717,6 +717,11 @@ function checkReferences(data) {
   errors.push(...checkQuests(data, { resources, rarities }));
   errors.push(...checkProfessions(data, { stats }));
   uniqueIds(errors, 'chat', data.chat.channels);
+  // The first channel, the Globalny, is everyone's on every server (the
+  // Loteria's result goes there, casino.js), and a language has one channel.
+  if (data.chat.channels[0].language) errors.push('chat.json: pierwszy kanał nie może mieć language');
+  const languages = data.chat.channels.map((channel) => channel.language).filter(Boolean);
+  if (new Set(languages).size !== languages.length) errors.push('chat.json: jeden język ma najwyżej jeden kanał');
   const { pollSeconds, page, keep } = data.chat.rules;
   if (pollSeconds.min > pollSeconds.max) errors.push('chat.json: rules.pollSeconds.min nie może być większe niż max');
   if (page > keep) errors.push('chat.json: rules.page nie może być większe niż keep');

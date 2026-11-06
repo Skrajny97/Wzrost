@@ -46,6 +46,10 @@ export function requestLanguage(request) {
 // is off.
 export const accountLanguage = (stored) => (englishOn() && LANGUAGES.includes(stored) ? stored : 'pl');
 
+// Whether the server speaks a language: Polish always, English where it is
+// on (the English chat channel, content.js).
+export const languageOffered = (lang) => accountLanguage(lang) === lang;
+
 // The English of the code's texts, or null for Polish.
 export const dictionary = (lang = language()) => DICTIONARIES[lang] ?? null;
 

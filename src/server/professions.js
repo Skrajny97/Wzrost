@@ -110,7 +110,9 @@ export async function startGathering(context) {
   if (!Array.isArray(herbIds) || herbIds.length === 0 || new Set(herbIds).size !== herbIds.length) {
     throw new ApiError(400, 'invalid_herbs', 'Wybierz zioła do zbierania.');
   }
-  if (herbIds.length > slots) throw new ApiError(400, 'too_many_herbs', `Na tym poziomie zbierasz naraz najwyżej ${slots} ${slots === 1 ? 'zioło' : 'zioła'}.`);
+  if (herbIds.length > slots) {
+    throw new ApiError(400, 'too_many_herbs', slots === 1 ? 'Na tym poziomie zbierasz naraz najwyżej 1 zioło.' : `Na tym poziomie zbierasz naraz najwyżej ${slots} zioła.`);
+  }
   for (const id of herbIds) {
     const herb = typeof id === 'string' ? content().herbsById[id] : undefined;
     if (!herb || herb.level > level) throw new ApiError(400, 'unknown_herb', 'Tego zioła jeszcze nie znasz.');

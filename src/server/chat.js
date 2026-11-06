@@ -1,12 +1,14 @@
 // The chat of the Społeczność tab (DECISIONS.md, "Czat"): the Globalny and
-// the Wymiana channels of data/chat.json, and the private conversations of
+// the Wymiana channels of data/chat.json, the English one where English is
+// on (chatChannels in content.js), and the private conversations of
 // two characters beside them, open from the character level of its unlock
 // (community in data/unlocks.json). A message in the Wymiana can show items
 // from the writer's bag, as they were when it was sent, for offers made in
 // words. A character closes a private conversation until a newer message
 // comes. The open chat asks every few seconds for the messages after the
 // last one it has. A player writes once they accept the rules, once every few seconds,
-// with no links and with rude words masked; only the admin writes links,
+// with no links and with rude words masked (both lists, the Polish and the
+// English, in every channel); only the admin writes links,
 // bare or with a label, "[Changelog - 1](https://…)", which the chat shows
 // as the label (the author: "Daj mi - adminowi możliwość dawania linków w
 // czacie" and "żebym mógł gdzies taki link podpisać jako Changelog - 1"). As the Play Store asks of
@@ -20,7 +22,7 @@
 
 import { isUnlocked, itemView } from '../engine/index.js';
 import { isAuthor } from './author.js';
-import { content } from './content.js';
+import { chatChannels, content } from './content.js';
 import { friendNews } from './community.js';
 import { nameColorOf } from './cosmetics.js';
 import { guildChannel, guildNews, guildOf, guildTagSql } from './guilds.js';
@@ -28,6 +30,7 @@ import { findMentions, mentionPeople, mentionsSaved, mentionsSql, mentionsView, 
 import { partyNews } from './parties.js';
 import { tradeNews } from './trades.js';
 import { ApiError, json, readJson } from './http.js';
+import { language, t } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable, requireSession } from './sessions.js';
 
@@ -48,10 +51,15 @@ const WORD = /[\p{L}\p{N}_]+/gu;
 // ones, or a bare address; http(s) only, the address without spaces.
 export const ADMIN_LINK = /\[([^[\]]{1,80})\]\((https?:\/\/[^\s()]{1,500})\)|(https?:\/\/[^\s()]{1,500})/giu;
 
-const untilFormat = new Intl.DateTimeFormat('pl-PL', { timeZone: 'Europe/Warsaw', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+// The end of a silence, Polish time, as the request's language writes it:
+// "06.11, 14:30", in English "06/11, 14:30".
+const untilOptions = { timeZone: 'Europe/Warsaw', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' };
+const untilFormats = { pl: new Intl.DateTimeFormat('pl-PL', untilOptions), en: new Intl.DateTimeFormat('en-GB', untilOptions) };
 
+// A channel of this server (chatChannels): the English one only where
+// English is on.
 function channelOf(id) {
-  const channel = content().chat.channels.find((entry) => entry.id === id);
+  const channel = chatChannels().find((entry) => entry.id === id);
   if (!channel) throw new ApiError(404, 'no_channel', 'Nie ma takiego kanału.');
   return channel;
 }
@@ -103,8 +111,11 @@ const conversationsOf = (db, userId, characterId) =>
     .bind(characterId, characterId, characterId, characterId, characterId, userId, content().chat.rules.conversations);
 const conversationView = (row) => ({ id: row.id, name: row.name, classId: row.class_id, latest: row.latest ?? 0 });
 
+// Why a silenced account cannot write, in the request's language, which
+// writes the date its own way.
 export function mutedText(until) {
-  return until >= FOREVER ? 'Czat jest dla Ciebie wyciszony na stałe.' : `Czat jest dla Ciebie wyciszony do ${untilFormat.format(new Date(until))}.`;
+  if (until >= FOREVER) return t('Czat jest dla Ciebie wyciszony na stałe.');
+  return t('Czat jest dla Ciebie wyciszony do {until}.', { until: (untilFormats[language()] ?? untilFormats.pl).format(new Date(until)) });
 }
 
 // "admin" for the author's account, "moderator" for an account the author
@@ -114,7 +125,8 @@ export const chatRole = (env, row) =>
   isAuthor(env, { login: row.login, google: row.google_sub !== null }) ? 'admin' : row.chat_moderator === 1 ? 'moderator' : null;
 
 // The message as it is kept: one line of visible signs, within the length,
-// without links, with the words of data/chat.json turned into stars. The
+// without links, with the words of data/chat.json turned into stars, of
+// both lists (words, wordsEn) in every channel and language. The
 // admin's (`admin`) may hold links (ADMIN_LINK): a labelled one counts as
 // its label towards the length, the whole message stays within
 // linkMaxLength signs, and the addresses keep their letters, stars only in
@@ -126,7 +138,7 @@ export function cleanText(raw, { admin = false } = {}) {
   const { maxLength, linkMaxLength } = content().chat.rules;
   const shown = admin ? text.replace(ADMIN_LINK, (whole, label) => label ?? whole) : text;
   if ([...shown].length > maxLength || [...text].length > linkMaxLength) throw new ApiError(400, 'too_long', `Wiadomość może mieć najwyżej ${maxLength} znaków.`);
-  const words = content().chat.words;
+  const words = [...content().chat.words, ...(content().chat.wordsEn ?? [])];
   const masked = (part) => part.replace(WORD, (word) => (words.some((bad) => word.toLowerCase().includes(bad)) ? '*'.repeat([...word].length) : word));
   if (!admin) {
     if (LINK.test(text)) throw new ApiError(400, 'link', 'Linki w czacie są niedozwolone.');
@@ -301,8 +313,9 @@ export async function readChat(context) {
 
 // The channels whose reading a character keeps, besides the private
 // conversations: the Globalny, the Wymiana (where tags light it,
-// mentions.js) and the guild's, under "guild".
-const seenChannels = () => [...content().chat.channels.map((channel) => channel.id), GUILD];
+// mentions.js), the English one where English is on, and the guild's,
+// under "guild".
+const seenChannels = () => [...chatChannels().map((channel) => channel.id), GUILD];
 
 // What a character has read, as POST /api/chat/seen keeps it: the newest
 // message of each channel and of each private conversation, by the other
@@ -322,8 +335,9 @@ function seenOf(text) {
 }
 
 // GET /api/chat/latest: the newest message someone else wrote in the
-// Globalny that this player may read, the private conversations with the
-// newest message of each other character, the newest message of each
+// Globalny that this player may read (the page's first channel, the English
+// one for a page in English: chatChannels), the private conversations with
+// the newest message of each other character, the newest message of each
 // channel that tags the character (mentions.js), the Upominki and
 // invitations waiting in Znajomi (community.js), for the light on the
 // Społeczność tab, a Wymiana proposed or going on (trades.js), what the
@@ -338,7 +352,7 @@ export async function latestChat(context) {
   const newest = `SELECT MAX(id) AS id FROM chat_messages
          WHERE channel = ? AND hidden_at IS NULL AND (system = 1 OR (user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)))`;
   const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites, activity, mentions] = await Promise.all([
-    db.prepare(newest).bind(content().chat.channels[0].id, session.userId, session.userId).first(),
+    db.prepare(newest).bind(chatChannels({ own: true })[0].id, session.userId, session.userId).first(),
     conversationsOf(db, session.userId, character.id).all(),
     friendNews(db, character.id, context.now),
     tradeNews(db, character.id, context.now),
@@ -363,7 +377,8 @@ export async function latestChat(context) {
   });
 }
 
-// POST /api/chat/seen {global: id}, {trade: id}, {guild: id}, or {with:
+// POST /api/chat/seen {global: id}, {trade: id}, {english: id} where
+// English is on, {guild: id}, or {with:
 // character id, id}: the character has read a channel, or its private
 // conversation with that character, up to message `id` on one of its
 // devices; the others hear it from /api/chat/latest and put out the light
@@ -554,7 +569,7 @@ export async function reportChat(context) {
       )
       .bind(context.now, message.id, message.id, content().chat.rules.hideAfterReports),
   ]);
-  return json({ text: 'Zgłoszono. Moderacja sprawdzi tę wiadomość.' });
+  return json({ text: t('Zgłoszono. Moderacja sprawdzi tę wiadomość.') });
 }
 
 // POST /api/chat/block {messageId}: the player stops seeing the messages of
