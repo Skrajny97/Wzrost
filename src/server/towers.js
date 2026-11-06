@@ -55,6 +55,7 @@ import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
+import { t } from './i18n.js';
 import { soldGold } from './inventory.js';
 import { partyOf } from './parties.js';
 import { trimReports } from './reports.js';
@@ -99,7 +100,8 @@ async function climbersFor(db, player, tower) {
   const places = Math.max(0, tower.size - 1 - partners.length);
   const hired = tower.companions ? (JSON.parse(row.settlement ?? '{}').companions ?? []).filter((companion) => companionReady(companion, true)) : [];
   const companions = hired.slice(0, places);
-  const missing = 1 + partners.length < tower.members[0] ? `Do Wieży Drużyn wchodzi się z drużyną: co najmniej ${tower.members[0]} postacie graczy. Drużynę założysz w Społeczności.` : null;
+  const missing =
+    1 + partners.length < tower.members[0] ? t('Do Wieży Drużyn wchodzi się z drużyną: co najmniej {count} postacie graczy. Drużynę założysz w Społeczności.', { count: tower.members[0] }) : null;
   return { partners, companions, top: Math.min(row.level, ...partners.map((partner) => partner.level)), missing };
 }
 

@@ -23,6 +23,7 @@ import { characterView, currentHp, engineCharacter, equippedItems, loadCharacter
 import { content } from './content.js';
 import { wayLook } from './cosmetics.js';
 import { ApiError, json, readJson } from './http.js';
+import { numberText } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const HOUR = 3600000;
@@ -30,7 +31,7 @@ const rules = () => mercenariesOf(content());
 const words = () => rules().texts;
 // A placeholder the values do not name stays, for the page to fill ({time}).
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (all, name) => (name in vars ? String(vars[name]) : all));
-const number = (value) => new Intl.NumberFormat('pl-PL').format(value);
+const number = (value) => numberText(value);
 
 // The offer an activity holds: its price an hour and, once hired, who took
 // it along, where, until when and for how much; null for any other activity.

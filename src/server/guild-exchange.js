@@ -30,6 +30,7 @@ import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
 import { guildPlayer, requireMember } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
+import { numberText } from './i18n.js';
 
 const rules = () => content().guilds.exchange;
 const words = () => rules().texts;
@@ -110,7 +111,7 @@ function cardTexts() {
   const { errors: _, ...texts } = words();
   const vars = {
     most,
-    goldMost: new Intl.NumberFormat('pl-PL').format(gold.most),
+    goldMost: numberText(gold.most),
     counts: sameCount ? texts.countsSame : texts.countsFree,
     offers: `${offers} ${countedForm(offers, texts.offerForms)}`,
     open: `${openHours} ${countedForm(openHours, texts.hourForms)}`,
@@ -211,8 +212,7 @@ function sideOf(value) {
   if (!value || typeof value !== 'object' || !goodIds().includes(value.resource)) throw new ApiError(400, 'invalid_resource', errors().invalidResource);
   const most = mostOf(value.resource);
   if (!Number.isInteger(value.count) || value.count < 1 || value.count > most) {
-    const format = new Intl.NumberFormat('pl-PL').format;
-    throw new ApiError(400, 'invalid_count', isGold(value.resource) ? filled(errors().invalidGold, { most: format(most) }) : filled(errors().invalidCount, { most }));
+    throw new ApiError(400, 'invalid_count', isGold(value.resource) ? filled(errors().invalidGold, { most: numberText(most) }) : filled(errors().invalidCount, { most }));
   }
   return side(value.resource, value.count);
 }

@@ -20,7 +20,7 @@ import { knownHerbs, professionOpen, professionState } from './professions.js';
 import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { partPrice, shopBuilding } from './shop.js';
-import { countedForm, say } from './text.js';
+import { countedForm, decimalText, say, word } from './text.js';
 import { areaUnlocked } from './unlocks.js';
 import { craftCost, knownPatterns } from './workshop.js';
 
@@ -59,7 +59,7 @@ export function brotherhoodPerks(brotherhood, index, content) {
     if (perk.brotherhood !== brotherhood.id) continue;
     const value = perkAt(perk, index);
     if (value === perkAt(perk, 0)) continue;
-    perks.push(fill(words[id], { value: shownPerk(id, value), fights: pluralPl(value, ['walkę', 'walki', 'walk']), items: pluralPl(value, ['przedmiot', 'przedmioty', 'przedmiotów']) }));
+    perks.push(fill(words[id], { value: shownPerk(id, value, content), fights: plural(value, 'walkę', 'walki', 'walk', content), items: plural(value, 'przedmiot', 'przedmioty', 'przedmiotów', content) }));
   }
   if (brotherhood.goods.includes('material') && index >= from(orders.quality.from)) perks.push(words.quality);
   if (brotherhood.goods.length > 0 && index >= from(orders.special.from)) perks.push(words.special);
@@ -72,18 +72,25 @@ const perkEntries = (content) => Object.entries(content.settlement.brotherhoodPe
 const perkAt = (perk, index) => perk.byStanding[Math.min(index, perk.byStanding.length - 1)];
 
 // A perk's number as the panel says it: shares in whole percents (the
-// Targowisko's fee to a tenth), counts as they are.
-function shownPerk(id, value) {
-  if (id === 'marketFee') return String(Math.round(value * 1000) / 10).replace('.', ',');
+// Targowisko's fee to a tenth, "4,5" in Polish, "4.5" in English), counts
+// as they are.
+function shownPerk(id, value, content) {
+  if (id === 'marketFee') return decimalText(Math.round(value * 1000) / 10, content);
   if (id === 'potionFights' || id === 'wandererItems' || id === 'auctionHours') return String(value);
   return String(Math.round(value * 100));
 }
 
-// The Polish form of a count: one, two to four (not 12 to 14), five and more.
-function pluralPl(count, [one, few, many]) {
-  if (count === 1) return one;
-  const tens = count % 100;
-  return count % 10 >= 2 && count % 10 <= 4 && (tens < 12 || tens > 14) ? few : many;
+// A noun after a count, in the content's language: in Polish its form of
+// one, two to four (not 12 to 14), five and more (countedForm); in English
+// one or the other of its two, the English of the three Polish forms as
+// one key ("walkę|walki|walk": "fight|fights", word()), as the page's
+// plural() takes them.
+function plural(count, one, few, many, content) {
+  const key = [one, few, many].join('|');
+  const english = word(content, key);
+  if (english === key) return countedForm(count, [one, few, many]);
+  const [single, other = single] = english.split('|');
+  return count === 1 ? single : other;
 }
 
 // A perk of a brotherhood's standing (brotherhoodPerks in the data, the

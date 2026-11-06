@@ -11,6 +11,8 @@
 // its building's bonus: more XP or gold from explorations, a cheaper
 // Kowadło, rarer items more often. Pure.
 
+import { decimalText } from './text.js';
+
 const rules = (content) => content.guilds.seat;
 
 export const seatBuildings = (content) => rules(content).buildings;
@@ -103,11 +105,12 @@ export function seatHuntBonus(levels, content) {
 }
 
 // What a building gives at a level, in the words of its card: "+3% XP z
-// wypraw", a share with up to one decimal as the camp's ("0,5%"); null at
-// level 0.
-export function seatEffect(building, level) {
+// wypraw", a share with up to one decimal as the camp's, as the language
+// of the `content` given writes it ("0,5%", "0.5%" in English; Polish
+// without one); null at level 0.
+export function seatEffect(building, level, content) {
   if (level <= 0) return null;
-  const value = String(Math.round(seatBonusAt(building, level) * 1000) / 10).replace('.', ',');
+  const value = decimalText(Math.round(seatBonusAt(building, level) * 1000) / 10, content);
   return building.effect.replace('{value}', value);
 }
 

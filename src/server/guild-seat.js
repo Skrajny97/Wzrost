@@ -25,12 +25,13 @@ import { characterView, loadPlayer, walletOf } from './characters.js';
 import { content } from './content.js';
 import { guildPlayer, requireMember } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
+import { numberText } from './i18n.js';
 
 const rules = () => content().guilds.seat;
 const words = () => rules().texts;
 const errors = () => words().errors;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
-const number = (value) => new Intl.NumberFormat('pl-PL').format(value);
+const number = (value) => numberText(value);
 const path = (id) => `$."${id}"`;
 const changed = () => new ApiError(409, 'changed', errors().changed);
 
@@ -94,8 +95,8 @@ async function seatView(db, player, guild) {
       resource: { id: resource.id, name: resource.name, genitive: resource.genitive },
       level: progress.level,
       maxLevel: progress.maxLevel,
-      effect: seatEffect(building, progress.level),
-      nextEffect: progress.next && seatEffect(building, progress.next.level),
+      effect: seatEffect(building, progress.level, content()),
+      nextEffect: progress.next && seatEffect(building, progress.next.level, content()),
       next: progress.next,
       room: progress.room,
       preferred: preferred.has(building.id),

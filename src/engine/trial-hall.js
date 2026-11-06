@@ -19,7 +19,7 @@ import { encounterCombatants, encountersFor, explorationPace } from './hunt.js';
 import { fightPotions } from './potions.js';
 import { lowLevelMultiplier, monsterXp } from './progression.js';
 import { createRng } from './rng.js';
-import { say } from './text.js';
+import { say, word } from './text.js';
 import { areaUnlocked } from './unlocks.js';
 
 export const trialHallOf = (content) => content.settlement?.trialHall ?? null;
@@ -107,7 +107,7 @@ export function trialHallFights({ character, equipped, name, area, seed, potions
       left[id] = (left[id] ?? 0) - 1;
       potionsUsed[id] = (potionsUsed[id] ?? 0) + 1;
     }
-    const enemyList = enemies.map((enemy) => `${enemy.name} (poz. ${enemy.level})`).join(', ');
+    const enemyList = enemies.map((enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
     lines.push(say(hall.texts, encounter.elite ? 'eliteStart' : 'fightStart', index, { number: index + 1, enemies: enemyList }));
 
     let fightXp = 0;
@@ -128,7 +128,7 @@ export function trialHallFights({ character, equipped, name, area, seed, potions
       xp += fightXp;
       gold += fightGold;
       materials = addCounts(materials, fightMaterials);
-      lines.push(say(content.texts, 'victory', index), `+${fightXp} XP, +${fightGold} złota.`);
+      lines.push(say(content.texts, 'victory', index), word(content, '+{xp} XP, +{gold} złota.', { xp: fightXp, gold: fightGold }));
     } else {
       won = false;
       lines.push(say(hall.texts, 'defeat', index, { target: player.name }));

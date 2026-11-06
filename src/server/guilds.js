@@ -21,6 +21,7 @@ import { nameColorOf } from './cosmetics.js';
 import { offersReturned, settleOffers } from './guild-exchange.js';
 import { championFrom, championOf, championStatement } from './guild-fame.js';
 import { ApiError, json, readJson } from './http.js';
+import { t } from './i18n.js';
 import { joinGuildTrials } from './guild-trials.js';
 import { OWN_CHARACTERS } from './roles.js';
 
@@ -118,7 +119,7 @@ export async function guildView(db, characterId, now) {
         classId: row.class_id,
         level: row.level,
         role: row.role,
-        roleName: ROLES[row.role] ?? ROLES.member,
+        roleName: t(ROLES[row.role] ?? ROLES.member),
         own: row.id === characterId,
         online: online(row),
       })),
@@ -202,7 +203,7 @@ export async function foundGuild(context) {
     throw error;
   }
   const after = await loadPlayer(db, session.userId);
-  return answer(db, row.id, context.now, { text: `Gildia ${name} [${tag}] założona.`, character: characterView(after, context.now) });
+  return answer(db, row.id, context.now, { text: t('Gildia {name} [{tag}] założona.', { name, tag }), character: characterView(after, context.now) });
 }
 
 // The guild of the one who asks, with its role in it, or an error.
@@ -243,7 +244,7 @@ export async function inviteToGuild(context) {
     .prepare('INSERT OR IGNORE INTO guild_invites (guild_id, character_id, invited_by, created_at) VALUES (?, ?, ?, ?)')
     .bind(guild.id, target.id, player.row.id, context.now)
     .run();
-  return answer(db, player.row.id, context.now, { text: `Zaproszenie wysłane. ${target.name} przyjmie je w Społeczności, w Gildii.` });
+  return answer(db, player.row.id, context.now, { text: t('Zaproszenie wysłane. {name} przyjmie je w Społeczności, w Gildii.', { name: target.name }) });
 }
 
 function guildIdOf(body) {
@@ -304,7 +305,7 @@ export async function acceptGuildInvite(context) {
   // The trials open on the guild's board run for the new member from now
   // (617); a look at the Próby makes them too, should this fail.
   await joinGuildTrials(db, invite.guild_id, player.row, context.now).catch((error) => console.error(error));
-  return answer(db, player.row.id, context.now, { text: 'Jesteś w gildii. Jej kanał czeka w Czacie, w zakładce „Gildia”.' });
+  return answer(db, player.row.id, context.now, { text: t('Jesteś w gildii. Jej kanał czeka w Czacie, w zakładce „Gildia”.') });
 }
 
 // POST /api/guild/decline { guildId }
@@ -363,7 +364,7 @@ export async function leaveGuild(context) {
   const db = context.env.DB;
   const guild = await ownGuild(db, player.row.id);
   await db.batch(guildRemoval(db, '?', [player.row.id], context.now));
-  return answer(db, player.row.id, context.now, { text: `Opuszczasz gildię ${guild.name}.`, character: characterView(await loadPlayer(db, session.userId), context.now) });
+  return answer(db, player.row.id, context.now, { text: t('Opuszczasz gildię {name}.', { name: guild.name }), character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
 // The member a request names, in the guild of the one who asks.
@@ -388,7 +389,7 @@ export async function kickFromGuild(context) {
   if (member.character_id === player.row.id) throw new ApiError(400, 'self', 'Siebie nie usuniesz. Możesz opuścić gildię.');
   if (guild.role === 'deputy' && member.role !== 'member') throw new ApiError(403, 'not_allowed', 'Zastępca usuwa tylko członków.');
   await db.batch(guildRemoval(db, '?', [member.character_id], context.now));
-  return answer(db, player.row.id, context.now, { text: `${member.name} nie jest już w gildii.` });
+  return answer(db, player.row.id, context.now, { text: t('{name} nie jest już w gildii.', { name: member.name }) });
 }
 
 // POST /api/guild/role { characterId, role: deputy | member }: the leader
@@ -402,7 +403,7 @@ export async function setGuildRole(context) {
   const member = await memberOf(db, guild, body);
   if (member.role === 'leader') throw new ApiError(400, 'self', 'Lider zostaje liderem. Przywództwo przekażesz osobno.');
   await db.prepare("UPDATE guild_members SET role = ? WHERE guild_id = ? AND character_id = ? AND role != 'leader'").bind(body.role, guild.id, member.character_id).run();
-  return answer(db, player.row.id, context.now, { text: body.role === 'deputy' ? `${member.name} jest teraz zastępcą.` : `${member.name} jest teraz członkiem.` });
+  return answer(db, player.row.id, context.now, { text: body.role === 'deputy' ? t('{name} jest teraz zastępcą.', { name: member.name }) : t('{name} jest teraz członkiem.', { name: member.name }) });
 }
 
 // POST /api/guild/lead { characterId }: the leader hands the lead over and
@@ -418,7 +419,7 @@ export async function handGuildLead(context) {
     db.prepare("UPDATE guild_members SET role = 'deputy' WHERE guild_id = ? AND character_id = ? AND role = 'leader'").bind(guild.id, player.row.id),
     db.prepare("UPDATE guild_members SET role = 'leader' WHERE guild_id = ? AND character_id = ? AND EXISTS (SELECT 1 FROM guild_members WHERE guild_id = ? AND character_id = ? AND role = 'deputy')").bind(guild.id, member.character_id, guild.id, player.row.id),
   ]);
-  return answer(db, player.row.id, context.now, { text: `${member.name} prowadzi teraz gildię.` });
+  return answer(db, player.row.id, context.now, { text: t('{name} prowadzi teraz gildię.', { name: member.name }) });
 }
 
 // The invitations to guilds waiting for a character, for the light on the

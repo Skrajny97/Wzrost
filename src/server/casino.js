@@ -42,6 +42,7 @@ import { bagPlaces, characterView, engineCharacter, loadPlayer, requirePlayer } 
 import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
+import { numberText } from './i18n.js';
 import { guildTagSql } from './guilds.js';
 import { counted, foreign } from './market.js';
 import { requireOpen, settlementOf } from './settlement.js';
@@ -49,7 +50,7 @@ import { requireOpen, settlementOf } from './settlement.js';
 const tuning = () => content().settlement.casino;
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 const newSeed = () => toHex(crypto.getRandomValues(new Uint8Array(16)));
-const goldText = (gold) => new Intl.NumberFormat('pl-PL').format(gold);
+const goldText = (gold) => numberText(gold);
 
 // The words of a draw, in the chat and in the Salon: "Loterię wygrała
 // Dobromira: 650 zł." (the author: „Loterię wygrał X: 650 zł”).
