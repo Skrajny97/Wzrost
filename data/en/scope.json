@@ -324,7 +324,20 @@
     "src/client/scrapper.js",
     "src/client/screens/character.js",
     "src/client/screens/chest.js",
-    "src/client/screens/stats.js"
+    "src/client/screens/stats.js",
+    "src/client/area-art.js",
+    "src/client/arena.js",
+    "src/client/camp-art.js",
+    "src/client/event.js",
+    "src/client/narrator.js",
+    "src/client/parchment.js",
+    "src/client/quests.js",
+    "src/client/scenes.js",
+    "src/client/skill-fx.js",
+    "src/client/screens/camp.js",
+    "src/client/screens/combat.js",
+    "src/client/screens/journal.js",
+    "src/client/screens/report.js"
   ],
   "ignore": [
     "Google",
@@ -340,6 +353,13 @@
     "English",
     "próba",
     "card levels",
-    "compare anvil"
+    "compare anvil",
+    "Home",
+    "End",
+    "Tab",
+    "Enter",
+    "M{} {}H{}V{}H{}Z",
+    "path(evenodd, 'M0 0H{}V{}H0Z{}')",
+    "muted small"
   ]
 }

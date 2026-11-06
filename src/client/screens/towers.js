@@ -15,6 +15,7 @@ import { areaArt } from '../area-art.js';
 import { placeArt } from '../art.js';
 import { fill, h } from '../dom.js';
 import { formatNumber } from '../format.js';
+import { t } from '../i18n.js';
 import { activityFinished, call, isUnlocked, reportCache, state, unlockInfo } from '../state.js';
 import { howItWorks, lockLabel, systemLink, systemPanel, withButton } from '../ui.js';
 
@@ -37,7 +38,8 @@ function savePicks(picks) {
   }
 }
 
-// "Eksploracja" and "Wieże" over the Walka, as in screens/combat.js.
+// "Eksploracja" and "Wieże" over the Walka, as in screens/combat.js, in the
+// page's language (t(), i18n.js): the Walka tab shows them from the start.
 export function combatModes(active, navigate) {
   const towers = isUnlocked('towers');
   const info = unlockInfo('towers');
@@ -53,13 +55,13 @@ export function combatModes(active, navigate) {
           if (!pressed) navigate(hash);
         },
       },
-      locked ? [label, ' ', lockLabel(`poz. ${info.level}`)] : label,
+      locked ? [label, ' ', lockLabel(t('poz. {level}', { level: info.level }))] : label,
     );
   return h(
     'div',
-    { class: 'segmented', role: 'group', 'aria-label': 'Rodzaj walki' },
-    option('Eksploracja', '#/walka', active === 'explore', false),
-    option('Wieże', '#/wieze', active === 'towers', !towers),
+    { class: 'segmented', role: 'group', 'aria-label': t('Rodzaj walki') },
+    option(t('Eksploracja'), '#/walka', active === 'explore', false),
+    option(t('Wieże'), '#/wieze', active === 'towers', !towers),
   );
 }
 

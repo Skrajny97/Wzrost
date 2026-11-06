@@ -2,11 +2,14 @@
 // parchment that unrolls under his face in the top bar, with a tab for each
 // period on top, the time to its new quests, the quests with their rewards
 // and "Odbierz", the period's chest in the top right corner, and at the
-// bottom "Odbierz wszystkie" while a reward of the open tab waits.
+// bottom "Odbierz wszystkie" while a reward of the open tab waits. Its texts
+// are written in Polish and shown in the page's language (t(), i18n.js); the
+// quests' own words come from the server in it.
 
 import { materialSprite, monsterSprite, resourceArt } from './art.js';
 import { $, fill, h, icon } from './dom.js';
 import { countOf, formatCountdown, formatNumber } from './format.js';
+import { t } from './i18n.js';
 import { rod, roll, stopRoll } from './parchment.js';
 import { playSound } from './sound.js';
 import { call, onCharacterChange, serverNow, state } from './state.js';
@@ -35,7 +38,7 @@ function untilNew(ms) {
 
 // A reward as its icon and amount, and as words for a message.
 function rewardName(reward) {
-  if (reward.kind === 'gold') return 'Złoto';
+  if (reward.kind === 'gold') return t('Złoto');
   const list = reward.kind === 'resource' ? state.content.resources : state.content.parts;
   return list.find((entry) => entry.id === reward.id)?.name ?? reward.id;
 }
@@ -108,15 +111,15 @@ function questRow(periodId, quest) {
   const share = Math.min(1, quest.progress / quest.count);
   const way = !quest.done && !quest.claimed ? questWay(quest) : null;
   const status = quest.claimed
-    ? h('span', { class: 'quest-taken', text: 'Odebrano' })
+    ? h('span', { class: 'quest-taken', text: t('Odebrano') })
     : quest.done
-      ? h('button', { type: 'button', class: 'button quest-claim', text: 'Odbierz', onClick: (event) => withButton(event.currentTarget, () => claimReward(periodId, quest)) })
+      ? h('button', { type: 'button', class: 'button quest-claim', text: t('Odbierz'), onClick: (event) => withButton(event.currentTarget, () => claimReward(periodId, quest)) })
       : way &&
         h('button', {
           type: 'button',
           class: 'button quest-go',
-          text: 'Idź',
-          'aria-label': way.where ? `Idź: ${way.where}` : `Idź do zadania: ${quest.text}`,
+          text: t('Idź'),
+          'aria-label': way.where ? t('Idź: {where}', { where: way.where }) : t('Idź do zadania: {quest}', { quest: quest.text }),
           onClick: () => {
             showQuests(false);
             location.hash = way.href;
@@ -130,7 +133,7 @@ function questRow(periodId, quest) {
       'div',
       { class: 'quest-body' },
       h('p', { class: 'quest-text', text: quest.text }),
-      way?.where && h('p', { class: 'quest-where', text: `Gdzie: ${way.where}` }),
+      way?.where && h('p', { class: 'quest-where', text: t('Gdzie: {where}', { where: way.where }) }),
       h(
         'div',
         { class: 'quest-progress' },
@@ -144,19 +147,21 @@ function questRow(periodId, quest) {
 
 // What the chest holds, in words.
 function chestText(chest) {
-  return [chest.item && 'przedmiot', chest.gold > 0 && `${formatNumber(chest.gold)} złota`, timePoints(chest.timePoints), systemPoints(chest.systemPoints)].filter(Boolean).join(', ');
+  return [chest.item && t('przedmiot'), chest.gold > 0 && t('{gold} złota', { gold: formatNumber(chest.gold) }), timePoints(chest.timePoints), systemPoints(chest.systemPoints)]
+    .filter(Boolean)
+    .join(', ');
 }
 
 function chestButton(periodId, period) {
   const { chest } = period;
   const done = period.quests.filter((quest) => quest.done).length;
   const look = chest.opened ? 'opened' : chest.ready ? 'ready' : 'locked';
-  const caption = chest.opened ? 'Otwarta' : chest.ready ? 'Otwórz' : `${done}/${period.quests.length}`;
+  const caption = chest.opened ? t('Otwarta') : chest.ready ? t('Otwórz') : `${done}/${period.quests.length}`;
   const label = chest.opened
-    ? 'Skrzynia otwarta'
+    ? t('Skrzynia otwarta')
     : chest.ready
-      ? `Otwórz skrzynię: ${chestText(chest)}`
-      : `Skrzynia za wszystkie zadania: ${chestText(chest)}. Wykonane: ${done} z ${period.quests.length}`;
+      ? t('Otwórz skrzynię: {inside}', { inside: chestText(chest) })
+      : t('Skrzynia za wszystkie zadania: {inside}. Wykonane: {done} z {all}', { inside: chestText(chest), done, all: period.quests.length });
   return h(
     'button',
     {
@@ -204,7 +209,7 @@ function drawPage(place, now = serverNow()) {
   place.countdown = h('span', { class: 'quests-timer', text: untilNew(period.endsAt - now) });
   fill(
     place.page,
-    h('p', { class: 'narrator-label quests-label', id: `${id}-label`, text: 'Zadania od narratora' }),
+    h('p', { class: 'narrator-label quests-label', id: `${id}-label`, text: t('Zadania od narratora') }),
     h(
       'div',
       { class: 'quests-head' },
@@ -214,12 +219,12 @@ function drawPage(place, now = serverNow()) {
     h(
       'div',
       { class: 'quests-panel', id: `${id}-panel`, role: 'tabpanel', 'aria-labelledby': `${id}-tab-${tab}` },
-      h('p', { class: 'quests-reset' }, 'Nowe zadania za ', place.countdown),
+      h('p', { class: 'quests-reset' }, t('Nowe zadania za '), place.countdown),
       // A week drawn while it was under way asks for less (quests.json, late).
       period.late && h('p', { class: 'quests-note', text: period.late }),
       period.quests.length > 0
         ? h('ul', { class: 'quests-list' }, period.quests.map((quest) => questRow(tab, quest)))
-        : h('p', { class: 'quests-empty', text: 'Na razie nie mam dla Ciebie zadań.' }),
+        : h('p', { class: 'quests-empty', text: t('Na razie nie mam dla Ciebie zadań.') }),
       rerollPart(tab, period),
       h('p', { class: 'quests-note', text: period.chest.text }),
     ),
@@ -231,10 +236,10 @@ function drawPage(place, now = serverNow()) {
           h('button', {
             type: 'button',
             class: 'button quest-claim quests-claim-all',
-            text: 'Odbierz wszystkie',
+            text: t('Odbierz wszystkie'),
             onClick: (event) => withButton(event.currentTarget, () => claimAll(tab)),
           }),
-        place.fold && h('button', { type: 'button', class: 'button narrator-next', text: 'Zwiń', onClick: () => showQuests(false) }),
+        place.fold && h('button', { type: 'button', class: 'button narrator-next', text: t('Zwiń'), onClick: () => showQuests(false) }),
       ),
   );
 }
@@ -269,50 +274,49 @@ export function watchQuests(now) {
 function rerollPart(periodId, period) {
   if (period.rerolled) return h('p', { class: 'quests-note', text: period.texts.rerolled });
   if (period.chest.opened || !period.quests.some((quest) => !quest.done && !quest.claimed)) return null;
-  return h('button', { type: 'button', class: 'button quests-reroll', text: 'Przelosuj zadania', onClick: (event) => withButton(event.currentTarget, () => reroll(periodId, period)) });
+  return h('button', { type: 'button', class: 'button quests-reroll', text: t('Przelosuj zadania'), onClick: (event) => withButton(event.currentTarget, () => reroll(periodId, period)) });
 }
 
 async function reroll(periodId, period) {
   const when = period.texts.rerollWhen;
   const sure = await confirmAction({
-    title: 'Przelosować zadania?',
-    text: `Niewykonane zadania zmienią się na inne, a ich postęp przepadnie. Wykonane zostają. Przelosować możesz ${when}.`,
-    confirmLabel: 'Przelosuj',
+    title: t('Przelosować zadania?'),
+    text: t('Niewykonane zadania zmienią się na inne, a ich postęp przepadnie. Wykonane zostają. Przelosować możesz {when}.', { when }),
+    confirmLabel: t('Przelosuj'),
   });
   if (!sure) return;
   await call('POST', '/api/quests/reroll', { period: periodId });
   playSound('system');
-  toast('Narrator ma dla Ciebie nowe zadania.');
+  toast(t('Narrator ma dla Ciebie nowe zadania.'));
 }
 
 async function claimReward(periodId, quest) {
   const { reward } = await call('POST', '/api/quests/claim', { period: periodId, index: quest.index });
   playSound('collect');
-  toast(`Nagroda za zadanie: ${rewardName(reward)} +${formatNumber(reward.amount)}.`);
+  toast(t('Nagroda za zadanie: {reward} +{amount}.', { reward: rewardName(reward), amount: formatNumber(reward.amount) }));
 }
 
 // Every reward of the period's quests done, in one go; the chest opens on its own.
 async function claimAll(periodId) {
   const { rewards } = await call('POST', '/api/quests/claim-all', { period: periodId });
   playSound('collect');
-  toast(`Nagrody za zadania: ${rewardsText(rewards)}.`);
+  toast(t('Nagrody za zadania: {rewards}.', { rewards: rewardsText(rewards) }));
 }
 
 async function openChest(periodId, period) {
   if (period.chest.opened) {
-    toast('Ta skrzynia jest już otwarta. Nowa przyjdzie z nowymi zadaniami.');
+    toast(t('Ta skrzynia jest już otwarta. Nowa przyjdzie z nowymi zadaniami.'));
     return;
   }
   if (!period.chest.ready) {
-    toast(`Wykonaj wszystkie zadania, a skrzynia się otworzy. W środku: ${chestText(period.chest)}.`);
+    toast(t('Wykonaj wszystkie zadania, a skrzynia się otworzy. W środku: {inside}.', { inside: chestText(period.chest) }));
     return;
   }
   const { chest } = await call('POST', '/api/quests/chest', { period: periodId });
   // Coins spilling from the chest (data/sounds.json).
   playSound('chest');
-  const item = chest.item ? `${chest.item.name}, ` : '';
-  const gold = chest.gold > 0 ? `${formatNumber(chest.gold)} złota, ` : '';
-  toast(`Skrzynia otwarta: ${item}${gold}${timePoints(chest.timePoints)}, ${systemPoints(chest.systemPoints)}.`);
+  const inside = [chest.item && chest.item.name, chest.gold > 0 && t('{gold} złota', { gold: formatNumber(chest.gold) }), timePoints(chest.timePoints), systemPoints(chest.systemPoints)];
+  toast(t('Skrzynia otwarta: {inside}.', { inside: inside.filter(Boolean).join(', ') }));
 }
 
 // Opens or closes the parchment of quests; it opens on the tab with

@@ -9,7 +9,9 @@
 // trades gold for resources a few times a day, at the Skup złomu the scrap
 // dealer sells crafting parts, and with the Osada the Duch budowniczego at
 // the Kamień węgielny buys resources for gold. Opened with the camp button in
-// the top bar, on a computer with the camp's tab in the menu (508 A).
+// the top bar, on a computer with the camp's tab in the menu (508 A). Its
+// texts are written in Polish and shown in the page's language (t(),
+// i18n.js); the buildings' own words come from the server in it.
 
 import { campIcon, goldArt, materialSprite, resourceArt } from '../art.js';
 import { spiritPart, spiritSaleSheet } from '../builder-spirit.js';
@@ -18,6 +20,7 @@ import { craftTableSection, materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { leaveView, openView } from '../history.js';
+import { t } from '../i18n.js';
 import { playSound } from '../sound.js';
 import { call, costShortfall, serverNow, state, storeAmount, storeFullAt, testModeOn, walletEntries } from '../state.js';
 import { skipControl } from '../time.js';
@@ -113,11 +116,11 @@ function collectorSheet() {
   openSheet(
     h('div', { class: 'collector-head' }, h('span', { class: 'collector-art' }, campIcon(collector.art)), h('h2', { class: 'sheet-title', text: collector.name })),
     h('p', { class: 'sheet-text', text: collector.texts.offer }),
-    h('p', { class: 'sheet-text avatar-price' }, goldArt(20), ` ${formatNumber(collector.price)} złota, jednorazowo i na zawsze`),
+    h('p', { class: 'sheet-text avatar-price' }, goldArt(20), t(' {gold} złota, jednorazowo i na zawsze', { gold: formatNumber(collector.price) })),
     h('button', {
       type: 'button',
       class: 'button button--system',
-      text: lacking.length > 0 ? `Brakuje: ${lacking.join(', ')}` : 'Kup',
+      text: lacking.length > 0 ? t('Brakuje: {missing}', { missing: lacking.join(', ') }) : t('Kup'),
       disabled: lacking.length > 0,
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
@@ -141,8 +144,21 @@ const resourceName = (id) => walletEntries().find((entry) => entry.id === id)?.n
 // "o 21:10" today, "26 paź, 01:10" on another day.
 function moment(ms) {
   const date = new Date(ms);
-  return date.toDateString() === new Date(serverNow()).toDateString() ? `o ${timeFormat.format(date)}` : dateTimeFormat.format(date);
+  return date.toDateString() === new Date(serverNow()).toDateString() ? t('o {time}', { time: timeFormat.format(date) }) : dateTimeFormat.format(date);
 }
+
+// "Tartak, poziom 2".
+const levelOf = (name, level) => t('{name}, poziom {level}', { name, level });
+
+// The cost that comes back, " (drewno 120, kamień 40)", or nothing.
+const costBack = (cost) => (cost ? ` (${Object.entries(cost).map(([id, amount]) => `${resourceName(id).toLowerCase()} ${formatNumber(amount)}`).join(', ')})` : '');
+
+// The higher levels of the same building that leave the queue with a build.
+const laterOnes = (later) =>
+  later.length > 0 &&
+  t('Z kolejki wypadnie też {levels}, bo go potrzebuje, i jego koszt również wróci.', {
+    levels: later.map((other) => t('poziom {level}', { level: other.level })).join(t(' i ')),
+  });
 
 // The builds the camp has now: the one under way and the waiting ones.
 const underWay = () => (runningBuild() ? 1 : 0) + state.character.camp.queue.length;
@@ -151,21 +167,17 @@ const underWay = () => (runningBuild() ? 1 : 0) + state.character.camp.queue.len
 // the higher levels of the same building after it, and its cost comes back.
 async function cancelBuild(entry) {
   const later = state.character.camp.queue.filter((other) => other.buildingId === entry.buildingId && other.level > entry.level);
-  const cost = entry.cost && Object.entries(entry.cost).map(([id, amount]) => `${resourceName(id).toLowerCase()} ${formatNumber(amount)}`);
   const sure = await confirmAction({
-    title: 'Anulować budowę?',
-    text: [
-      `${entry.name}, poziom ${entry.level}: koszt wróci w całości${cost ? ` (${cost.join(', ')})` : ''}.`,
-      later.length > 0 && `Z kolejki wypadnie też ${later.map((other) => `poziom ${other.level}`).join(' i ')}, bo go potrzebuje, i jego koszt również wróci.`,
-    ]
+    title: t('Anulować budowę?'),
+    text: [t('{name}, poziom {level}: koszt wróci w całości{cost}.', { name: entry.name, level: entry.level, cost: costBack(entry.cost) }), laterOnes(later)]
       .filter(Boolean)
       .join(' '),
-    confirmLabel: 'Anuluj budowę',
-    cancelLabel: 'Zostaw',
+    confirmLabel: t('Anuluj budowę'),
+    cancelLabel: t('Zostaw'),
   });
   if (!sure) return;
   await call('POST', '/api/camp/cancel', { buildingId: entry.buildingId, level: entry.level });
-  toast(`Anulowano: ${entry.name}, poziom ${entry.level}. Koszt wrócił.`);
+  toast(t('Anulowano: {name}, poziom {level}. Koszt wrócił.', { name: entry.name, level: entry.level }));
 }
 
 // "Przerwij budowę" by the build under way (the author: „Nie można anulować
@@ -174,29 +186,33 @@ async function cancelBuild(entry) {
 // that of its higher levels waiting in the queue come back.
 async function stopBuild(running) {
   const later = state.character.camp.queue.filter((other) => other.buildingId === running.buildingId && other.level > running.level);
-  const cost = running.cost && Object.entries(running.cost).map(([id, amount]) => `${resourceName(id).toLowerCase()} ${formatNumber(amount)}`);
   const sure = await confirmAction({
-    title: 'Przerwać budowę?',
+    title: t('Przerwać budowę?'),
     text: [
-      `${running.name}, poziom ${running.level}: koszt wróci w całości${cost ? ` (${cost.join(', ')})` : ''}, ${running.level > 1 ? `a ${running.name} zostanie na poziomie ${running.level - 1}` : 'a plac zostanie pusty'}.`,
-      later.length > 0 && `Z kolejki wypadnie też ${later.map((other) => `poziom ${other.level}`).join(' i ')}, bo go potrzebuje, i jego koszt również wróci.`,
+      t('{name}, poziom {level}: koszt wróci w całości{cost}, {after}.', {
+        name: running.name,
+        level: running.level,
+        cost: costBack(running.cost),
+        after: running.level > 1 ? t('a {name} zostanie na poziomie {level}', { name: running.name, level: running.level - 1 }) : t('a plac zostanie pusty'),
+      }),
+      laterOnes(later),
     ]
       .filter(Boolean)
       .join(' '),
-    confirmLabel: 'Przerwij budowę',
-    cancelLabel: 'Buduj dalej',
+    confirmLabel: t('Przerwij budowę'),
+    cancelLabel: t('Buduj dalej'),
   });
   if (!sure) return;
   await call('POST', '/api/camp/cancel', { buildingId: running.buildingId, level: running.level });
-  toast(`Przerwano budowę: ${running.name}, poziom ${running.level}. Koszt wrócił.`);
+  toast(t('Przerwano budowę: {name}, poziom {level}. Koszt wrócił.', { name: running.name, level: running.level }));
 }
 
 const cancelButton = (entry) =>
   h('button', {
     type: 'button',
     class: 'build-queue-cancel',
-    text: 'Anuluj',
-    'aria-label': `Anuluj: ${entry.name}, poziom ${entry.level}`,
+    text: t('Anuluj'),
+    'aria-label': t('Anuluj: {name}, poziom {level}', { name: entry.name, level: entry.level }),
     onClick: (event) => withButton(event.currentTarget, () => cancelBuild(entry)),
   });
 
@@ -208,7 +224,7 @@ function queuePanel() {
   return h(
     'section',
     { class: 'card build-queue', 'aria-labelledby': 'build-queue-title' },
-    h('h2', { class: 'card-title', id: 'build-queue-title', text: `Kolejka budowy: ${underWay()} z ${queueSize}` }),
+    h('h2', { class: 'card-title', id: 'build-queue-title', text: t('Kolejka budowy: {count} z {size}', { count: underWay(), size: queueSize }) }),
     h(
       'ol',
       { class: 'build-queue-list' },
@@ -216,7 +232,7 @@ function queuePanel() {
         h(
           'li',
           { class: 'build-queue-item' },
-          h('span', { class: 'build-queue-what' }, h('span', { text: `${entry.name}, poziom ${entry.level}` }), h('span', { class: 'build-queue-time', text: `start ${moment(entry.startsAt)}` })),
+          h('span', { class: 'build-queue-what' }, h('span', { text: levelOf(entry.name, entry.level) }), h('span', { class: 'build-queue-time', text: t('start {when}', { when: moment(entry.startsAt) }) })),
           cancelButton(entry),
         ),
       ),
@@ -227,48 +243,64 @@ function queuePanel() {
 async function collectStore(building) {
   const { collected } = await call('POST', '/api/camp/collect', { buildingId: building.id });
   playSound('collect');
-  toast(`Zebrano: ${resourceName(collected.resource).toLowerCase()} +${formatNumber(collected.amount)}.`);
+  toast(t('Zebrano: {resource} +{amount}.', { resource: resourceName(collected.resource).toLowerCase(), amount: formatNumber(collected.amount) }));
 }
 
 // Asked first (the author: "Wymiana złota na zasoby w ognisku potrzebuje
 // dodatkowego okna potwierdzenia").
 async function tradeAtFire(resource, amount, gold) {
   const sure = await confirmAction({
-    title: 'Wymiana u ducha ognia',
-    text: `Duch ognia weźmie ${formatNumber(gold)} złota i odda: ${resourceName(resource).toLowerCase()} +${formatNumber(amount)}.`,
-    confirmLabel: 'Wymień',
+    title: t('Wymiana u ducha ognia'),
+    text: t('Duch ognia weźmie {gold} złota i odda: {resource} +{amount}.', { gold: formatNumber(gold), resource: resourceName(resource).toLowerCase(), amount: formatNumber(amount) }),
+    confirmLabel: t('Wymień'),
   });
   if (!sure) return;
   const { traded } = await call('POST', '/api/camp/trade', { resource, amount });
   playSound('collect');
-  toast(`Duch ognia przyjął ${formatNumber(traded.gold)} złota i oddał: ${resourceName(traded.resource).toLowerCase()} +${formatNumber(traded.amount)}.`);
+  toast(
+    t('Duch ognia przyjął {gold} złota i oddał: {resource} +{amount}.', {
+      gold: formatNumber(traded.gold),
+      resource: resourceName(traded.resource).toLowerCase(),
+      amount: formatNumber(traded.amount),
+    }),
+  );
 }
 
 async function exchangeResources(from, to, amount, given) {
   const sure = await confirmAction({
-    title: 'Wymiana zasobów',
-    text: `Oddasz ${formatNumber(given)} × ${resourceName(from)} i dostaniesz ${formatNumber(amount)} × ${resourceName(to)}.`,
-    confirmLabel: 'Wymień',
+    title: t('Wymiana zasobów'),
+    text: t('Oddasz {given} × {from} i dostaniesz {amount} × {to}.', { given: formatNumber(given), from: resourceName(from), amount: formatNumber(amount), to: resourceName(to) }),
+    confirmLabel: t('Wymień'),
   });
   if (!sure) return;
   const { exchanged } = await call('POST', '/api/camp/exchange', { from, to, amount });
   playSound('collect');
-  toast(`Wymieniono ${formatNumber(exchanged.given)} × ${resourceName(exchanged.from)} na ${formatNumber(exchanged.amount)} × ${resourceName(exchanged.to)}.`);
+  toast(
+    t('Wymieniono {given} × {from} na {amount} × {to}.', {
+      given: formatNumber(exchanged.given),
+      from: resourceName(exchanged.from),
+      amount: formatNumber(exchanged.amount),
+      to: resourceName(exchanged.to),
+    }),
+  );
 }
 
 async function buyParts(partId, count) {
   const { bought } = await call('POST', '/api/camp/buy', { partId, count });
   playSound('chest');
   const name = state.character.crafting.parts.find((part) => part.id === bought.partId)?.name ?? bought.partId;
-  toast(`Kupiono: ${name} +${formatNumber(bought.count)} za ${formatNumber(bought.gold)} złota.`);
+  toast(t('Kupiono: {name} +{count} za {gold} złota.', { name, count: formatNumber(bought.count), gold: formatNumber(bought.gold) }));
 }
 
 // "Na poziomie 3 dojdą Okucia, a ceny spadną o 6%."
 function shopNextText(next) {
-  const cut = `ceny spadną o ${Math.round(next.discount * 100)}%`;
-  if (next.added.length === 0) return `Na poziomie ${next.level} ${cut}.`;
-  const verb = next.added.length > 1 || next.added[0].gender === 'pl' ? 'dojdą' : 'dojdzie';
-  return `Na poziomie ${next.level} ${verb} ${next.added.map((part) => part.name).join(' i ')}, a ${cut}.`;
+  const cut = t('ceny spadną o {percent}%', { percent: Math.round(next.discount * 100) });
+  if (next.added.length === 0) return t('Na poziomie {level} {cut}.', { level: next.level, cut });
+  const parts = next.added.map((part) => part.name).join(t(' i '));
+  // The verb agrees with the parts in Polish; English has one sentence.
+  return next.added.length > 1 || next.added[0].gender === 'pl'
+    ? t('Na poziomie {level} dojdą {parts}, a {cut}.', { level: next.level, parts, cut })
+    : t('Na poziomie {level} dojdzie {parts}, a {cut}.', { level: next.level, parts, cut });
 }
 
 function heading(title, subtitle, back, badge = null) {
@@ -295,12 +327,12 @@ function testTools(building) {
     { class: 'test-tools' },
     h('p', {
       class: 'test-tools-text',
-      text: building ? 'Tryb testowy: budowa skończy się od razu.' : 'Tryb testowy: magazyny zapełnią się od razu.',
+      text: building ? t('Tryb testowy: budowa skończy się od razu.') : t('Tryb testowy: magazyny zapełnią się od razu.'),
     }),
     h('button', {
       type: 'button',
       class: 'button button--test',
-      text: 'Pomiń czas',
+      text: t('Pomiń czas'),
       onClick: (event) => withButton(event.currentTarget, () => call('POST', '/api/test/skip-build')),
     }),
   );
@@ -311,7 +343,7 @@ function testTools(building) {
 function constructionPanel(running, ticks) {
   const countdown = h('p', { class: 'countdown', 'aria-live': 'off' });
   const progress = h('div', { class: 'bar-fill bar-fill--system' });
-  const skipper = skipControl('build', (now) => running.endsAt - now, `${running.name}, poziom ${running.level}`);
+  const skipper = skipControl('build', (now) => running.endsAt - now, levelOf(running.name, running.level));
   ticks.push((now) => {
     countdown.textContent = formatCountdown(running.endsAt - now);
     const done = (now - running.startedAt) / (running.endsAt - running.startedAt);
@@ -323,10 +355,10 @@ function constructionPanel(running, ticks) {
     { class: 'stack' },
     guided(
       systemPanel(
-        `Budowa: ${running.name}, poziom ${running.level}.`,
+        t('Budowa: {name}, poziom {level}.', { name: running.name, level: running.level }),
         countdown,
         h('div', { class: 'bar bar--system' }, progress),
-        h('p', { class: 'system-hint', text: `Gotowe ${moment(running.endsAt)}.` }),
+        h('p', { class: 'system-hint', text: t('Gotowe {when}.', { when: moment(running.endsAt) }) }),
       ),
       'build-countdown',
     ),
@@ -334,8 +366,8 @@ function constructionPanel(running, ticks) {
     h('button', {
       type: 'button',
       class: 'button button--world button--small build-stop',
-      text: 'Przerwij budowę',
-      'aria-label': `Przerwij budowę: ${running.name}, poziom ${running.level}`,
+      text: t('Przerwij budowę'),
+      'aria-label': t('Przerwij budowę: {name}, poziom {level}', { name: running.name, level: running.level }),
       onClick: (event) => withButton(event.currentTarget, () => stopBuild(running)),
     }),
   );
@@ -357,16 +389,16 @@ function mountBoard(container, backHash) {
     fill(
       container,
       heading(
-        'Obóz',
-        'Polana na skraju puszczy',
-        h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
-        h('span', { class: 'camp-level-badge', text: `Poziom ${campOf().level}` }),
+        t('Obóz'),
+        t('Polana na skraju puszczy'),
+        h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), t('Powrót')),
+        h('span', { class: 'camp-level-badge', text: t('Poziom {level}', { level: campOf().level }) }),
       ),
       testTools(running),
       guided(materials(), 'camp-stock'),
       campBoard(character, running),
       nothingBuilt &&
-        h('p', { class: 'system-hint camp-hint', text: 'Wybierz pusty plac, żeby zobaczyć koszt budowy. Zasoby znajdziesz na eksploracjach.' }),
+        h('p', { class: 'system-hint camp-hint', text: t('Wybierz pusty plac, żeby zobaczyć koszt budowy. Zasoby znajdziesz na eksploracjach.') }),
       running && constructionPanel(running, ticks),
       queuePanel(),
     );
@@ -385,7 +417,11 @@ function mountBoard(container, backHash) {
     if (!split()) {
       return h(
         'div',
-        { class: `camp-board camp-board--${dayPart()}${tall() ? ' camp-board--tall' : ''}${tall() === 'fortress' ? ' camp-board--fortress' : ''}`, role: 'group', 'aria-label': tall() === 'fortress' ? 'Plansza Warowni' : 'Plansza obozu' },
+        {
+          class: `camp-board camp-board--${dayPart()}${tall() ? ' camp-board--tall' : ''}${tall() === 'fortress' ? ' camp-board--fortress' : ''}`,
+          role: 'group',
+          'aria-label': tall() === 'fortress' ? t('Plansza Warowni') : t('Plansza obozu'),
+        },
         boardArt(campOf().level, tall()),
         character.camp.buildings.map((building) => plot(building, running)),
         chestLink(),
@@ -396,7 +432,7 @@ function mountBoard(container, backHash) {
     }
     return h(
       'div',
-      { class: 'camp-board-split', role: 'group', 'aria-label': 'Plansza Warowni' },
+      { class: 'camp-board-split', role: 'group', 'aria-label': t('Plansza Warowni') },
       FORTRESS_HALVES.map((range, index) =>
         h(
           'div',
@@ -442,7 +478,7 @@ function mountBoard(container, backHash) {
     const [, ...entries] = walletEntries();
     return h(
       'ul',
-      { class: 'camp-materials', 'aria-label': 'Zasoby' },
+      { class: 'camp-materials', 'aria-label': t('Zasoby') },
       entries.map((entry) =>
         h(
           'li',
@@ -470,9 +506,9 @@ function mountBoard(container, backHash) {
         'data-guide': 'camp-level',
         onClick: (event) => openView(event, hash, HISTORY_KEY),
       },
-      'Rozwiń poziom',
+      t('Rozwiń poziom'),
       h('br'),
-      'obozu',
+      t('obozu'),
       running?.buildingId === campOf().id && timer(running),
     );
   }
@@ -486,7 +522,7 @@ function mountBoard(container, backHash) {
       {
         class: 'camp-chest',
         href: hash,
-        'aria-label': 'Skrzynia Konta',
+        'aria-label': t('Skrzynia Konta'),
         // Beside the Magazyn on either board, at the top of the taller one's band.
         style: {
           left: `${((tall() === 'fortress' ? FORTRESS_CHEST_SPOT : CHEST_SPOT).x / BOARD_WIDTH) * 100}%`,
@@ -495,7 +531,7 @@ function mountBoard(container, backHash) {
         onClick: (event) => openView(event, hash, HISTORY_KEY),
       },
       h('span', { class: 'camp-chest-art' }, materialSprite('chest')),
-      h('span', { class: 'camp-plot-label' }, h('span', { text: 'Skrzynia Konta' })),
+      h('span', { class: 'camp-plot-label' }, h('span', { text: t('Skrzynia Konta') })),
     );
   }
 
@@ -560,7 +596,7 @@ function mountBoard(container, backHash) {
     const waiting = !underway && building.queued.length > 0;
     const empty = building.level === 0;
     const hash = `${CAMP}/${building.id}`;
-    const said = [empty ? `Pusty plac: ${building.name}` : `${building.name}, poziom ${building.level}`, underway && 'trwa budowa', waiting && 'w kolejce'];
+    const said = [empty ? t('Pusty plac: {name}', { name: building.name }) : levelOf(building.name, building.level), underway && t('trwa budowa'), waiting && t('w kolejce')];
     const link = h(
       'a',
       {
@@ -591,7 +627,7 @@ function mountBoard(container, backHash) {
       },
       link,
       underway && timer(running),
-      waiting && h('span', { class: 'camp-plot-timer camp-plot-timer--queued', 'aria-hidden': 'true' }, icon('hourglass', { size: 12 }), 'w kolejce'),
+      waiting && h('span', { class: 'camp-plot-timer camp-plot-timer--queued', 'aria-hidden': 'true' }, icon('hourglass', { size: 12 }), t('w kolejce')),
       building.production && !building.production.paused && bubble(building, spot.bubble),
     );
   }
@@ -637,7 +673,8 @@ function mountBoard(container, backHash) {
       button.hidden = held < 1;
       amount.textContent = `+${formatNumber(held)}`;
       button.classList.toggle('camp-bubble--full', full);
-      button.setAttribute('aria-label', `Zbierz: ${resourceName(store.resource).toLowerCase()} +${held}${full ? ', magazyn pełny' : ''}`);
+      const what = { resource: resourceName(store.resource).toLowerCase(), amount: held };
+      button.setAttribute('aria-label', full ? t('Zbierz: {resource} +{amount}, magazyn pełny', what) : t('Zbierz: {resource} +{amount}', what));
     });
     return button;
   }
@@ -695,12 +732,12 @@ function mountBuilding(container, id) {
       container,
       heading(
         building.name,
-        building.level === 0 ? 'Pusty plac' : `Poziom ${building.level} z ${building.maxLevel}`,
+        building.level === 0 ? t('Pusty plac') : t('Poziom {level} z {max}', { level: building.level, max: building.maxLevel }),
         h(
           'button',
           { type: 'button', class: 'button button--system back-button', onClick: () => leaveView(CAMP, 1, HISTORY_KEY) },
           icon('back', { size: 20 }),
-          'Powrót',
+          t('Powrót'),
         ),
       ),
       testTools(running),
@@ -724,7 +761,7 @@ function mountBuilding(container, id) {
         { class: 'card building-view', 'aria-label': building.name },
         !own && h('div', { class: 'building-art' }, plotArt(id, { level: building.level, building: underway, tier: building.look })),
         h('p', { class: 'region-description', text: building.description }),
-        building.effect && h('p', { class: 'building-effect' }, h('strong', { text: 'Teraz: ' }), building.effect),
+        building.effect && h('p', { class: 'building-effect' }, h('strong', { text: t('Teraz: ') }), building.effect),
         building.production && storeView(building),
         building.trade && tradeView(building.trade),
         building.shop && saleView(),
@@ -750,16 +787,16 @@ function mountBuilding(container, id) {
     return h(
       'section',
       { class: 'card anvil-items', 'aria-labelledby': 'anvil-items' },
-      h('h2', { class: 'card-title', id: 'anvil-items', text: 'Ulepszanie przedmiotów' }),
+      h('h2', { class: 'card-title', id: 'anvil-items', text: t('Ulepszanie przedmiotów') }),
       h('p', {
         class: 'muted',
         text:
           building.level > 0
-            ? `Wybierz przedmiot, żeby go ulepszyć. Kowadło ulepsza do +${building.level}.`
-            : 'Zbuduj Kowadło, żeby ulepszać przedmioty. Ulepszysz je tu albo z karty przedmiotu w plecaku.',
+            ? t('Wybierz przedmiot, żeby go ulepszyć. Kowadło ulepsza do +{level}.', { level: building.level })
+            : t('Zbuduj Kowadło, żeby ulepszać przedmioty. Ulepszysz je tu albo z karty przedmiotu w plecaku.'),
       }),
       items.length === 0
-        ? h('p', { class: 'muted', text: 'Nie masz jeszcze przedmiotów.' })
+        ? h('p', { class: 'muted', text: t('Nie masz jeszcze przedmiotów.') })
         : h(
             'ul',
             { class: 'item-list' },
@@ -772,7 +809,7 @@ function mountBuilding(container, id) {
                   // Tapped here to be upgraded: the card opens with the Kowadło unfolded.
                   { type: 'button', class: 'item-row', onClick: () => itemSheet(item, { equipped, anvil: true }) },
                   itemSummary(item),
-                  equipped && h('span', { class: 'chip', text: 'założony' }),
+                  equipped && h('span', { class: 'chip', text: t('założony') }),
                 ),
               ),
             ),
@@ -794,7 +831,7 @@ function mountBuilding(container, id) {
     const button = h('button', {
       type: 'button',
       class: 'button button--world',
-      text: 'Zbierz',
+      text: t('Zbierz'),
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           collecting = true;
@@ -810,10 +847,10 @@ function mountBuilding(container, id) {
       amount.textContent = `${formatNumber(held)} / ${formatNumber(store.capacity)}`;
       fillBar.style.width = `${(held / store.capacity) * 100}%`;
       hint.textContent = store.paused
-        ? 'Rozbudowa: produkcja ruszy po jej końcu.'
+        ? t('Rozbudowa: produkcja ruszy po jej końcu.')
         : held >= store.capacity
-          ? 'Magazyn pełny: produkcja stoi do zebrania.'
-          : `Pełny za ${formatCountdown(storeFullAt(store) - now)}.`;
+          ? t('Magazyn pełny: produkcja stoi do zebrania.')
+          : t('Pełny za {time}.', { time: formatCountdown(storeFullAt(store) - now) });
       hint.hidden = Boolean(collector) && !store.paused && held >= store.capacity;
       button.disabled = collecting || held < 1;
     });
@@ -824,7 +861,7 @@ function mountBuilding(container, id) {
         'p',
         { class: 'store-head' },
         resourceArt(store.resource, 18),
-        h('span', { text: `Magazyn: ${resourceName(store.resource)}` }),
+        h('span', { text: t('Magazyn: {resource}', { resource: resourceName(store.resource) }) }),
         amount,
       ),
       h('div', { class: 'bar' }, fillBar),
@@ -843,17 +880,20 @@ function mountBuilding(container, id) {
     const head = [
       h('h2', { class: 'fire-trade-title', text: trade.title }),
       h('p', { class: 'fire-trade-text', text: trade.text }),
-      h('p', { class: 'store-head' }, h('span', { text: 'Cena' }), h('strong', { text: `${formatNumber(trade.unitGold)} złota za sztukę` })),
+      h('p', { class: 'store-head' }, h('span', { text: t('Cena') }), h('strong', { text: t('{gold} złota za sztukę', { gold: formatNumber(trade.unitGold) }) })),
     ];
     const next =
       trade.next &&
-      h('p', { class: 'store-hint', text: `Na poziomie ${trade.next.level}: ${formatNumber(trade.next.unitGold)} złota za sztukę, do ${pieces(trade.next.perDay)} dziennie.` });
+      h('p', {
+        class: 'store-hint',
+        text: t('Na poziomie {level}: {gold} złota za sztukę, do {pieces} dziennie.', { level: trade.next.level, gold: formatNumber(trade.next.unitGold), pieces: pieces(trade.next.perDay) }),
+      });
     if (trade.left < 1) {
       return h(
         'section',
         { class: 'fire-trade', 'aria-label': trade.title },
         ...head,
-        h('p', { class: 'store-hint', text: 'Na dziś duch ognia nie przyjmie już złota. Wróć po północy.' }),
+        h('p', { class: 'store-hint', text: t('Na dziś duch ognia nie przyjmie już złota. Wróć po północy.') }),
         next,
       );
     }
@@ -867,7 +907,7 @@ function mountBuilding(container, id) {
       max: trade.left,
       step: 1,
       value: amount,
-      'aria-label': 'Ile sztuk wymienić',
+      'aria-label': t('Ile sztuk wymienić'),
       disabled: trade.left < 2,
       onInput: () => choose(Number(slider.value)),
     });
@@ -879,8 +919,8 @@ function mountBuilding(container, id) {
         text: sign < 0 ? '−' : '+',
         onClick: () => choose(amount + sign),
       });
-    const less = stepButton(-1, 'O sztukę mniej');
-    const more = stepButton(1, 'O sztukę więcej');
+    const less = stepButton(-1, t('O sztukę mniej'));
+    const more = stepButton(1, t('O sztukę więcej'));
     const hint = h('p', { class: 'store-hint' });
     const buttons = trade.resources.map((id) => {
       const label = h('span', {});
@@ -905,18 +945,19 @@ function mountBuilding(container, id) {
       const gold = amount * trade.unitGold;
       const short = state.character.gold < gold;
       slider.value = String(amount);
-      slider.setAttribute('aria-valuetext', `${pieces(amount)} za ${formatNumber(gold)} złota`);
+      const price = t('{pieces} za {gold} złota', { pieces: pieces(amount), gold: formatNumber(gold) });
+      slider.setAttribute('aria-valuetext', price);
       slider.style.setProperty('--fill', `${((amount - 1) / Math.max(1, trade.left - 1)) * 100}%`);
-      value.textContent = `${pieces(amount)} za ${formatNumber(gold)} złota`;
+      value.textContent = price;
       less.disabled = amount <= 1;
       more.disabled = amount >= trade.left;
       for (const { id, button, label } of buttons) {
         label.textContent = `${resourceName(id)} +${formatNumber(amount)}`;
         button.disabled = short;
-        button.setAttribute('aria-label', `Wymień ${formatNumber(gold)} złota na: ${resourceName(id).toLowerCase()} +${formatNumber(amount)}`);
+        button.setAttribute('aria-label', t('Wymień {gold} złota na: {resource} +{amount}', { gold: formatNumber(gold), resource: resourceName(id).toLowerCase(), amount: formatNumber(amount) }));
       }
-      const left = `Na dziś zostało: ${formatNumber(trade.left)} z ${pieces(trade.perDay)}.`;
-      hint.textContent = short ? `${left} Brakuje złota na tę wymianę.` : left;
+      const left = t('Na dziś zostało: {left} z {pieces}.', { left: formatNumber(trade.left), pieces: pieces(trade.perDay) });
+      hint.textContent = short ? t('{left} Brakuje złota na tę wymianę.', { left }) : left;
     }
     set(amount);
     return h(
@@ -948,7 +989,7 @@ function mountBuilding(container, id) {
       const most = Math.floor(have(from) / exchange.rate);
       const picker = h(
         'div',
-        { class: 'segmented segmented--three', role: 'group', 'aria-label': 'Oddajesz' },
+        { class: 'segmented segmented--three', role: 'group', 'aria-label': t('Oddajesz') },
         exchange.resources.map((id) =>
           h(
             'button',
@@ -962,20 +1003,25 @@ function mountBuilding(container, id) {
               },
             },
             h('span', { class: 'exchange-option-name' }, resourceArt(id, 16), resourceName(id)),
-            h('small', { text: `masz ${formatNumber(have(id))}` }),
+            h('small', { text: t('masz {count}', { count: formatNumber(have(id)) }) }),
           ),
         ),
       );
       const head = [
         h('h2', { class: 'fire-trade-title', text: exchange.title }),
         h('p', { class: 'fire-trade-text', text: exchange.text }),
-        h('p', { class: 'store-head' }, h('span', { text: 'Stawka' }), h('strong', { text: `${pieces(exchange.rate)} za 1` })),
-        h('p', { class: 'exchange-label', text: 'Oddajesz' }),
+        h('p', { class: 'store-head' }, h('span', { text: t('Stawka') }), h('strong', { text: t('{pieces} za 1', { pieces: pieces(exchange.rate) }) })),
+        h('p', { class: 'exchange-label', text: t('Oddajesz') }),
         picker,
       ];
-      const next = exchange.next && h('p', { class: 'store-hint', text: `Na poziomie ${exchange.next.level}: ${pieces(exchange.next.rate)} za 1.` });
+      const next = exchange.next && h('p', { class: 'store-hint', text: t('Na poziomie {level}: {pieces} za 1.', { level: exchange.next.level, pieces: pieces(exchange.next.rate) }) });
       if (most < 1) {
-        fill(section, ...head, h('p', { class: 'store-hint', text: `Za mało: ${resourceName(from).toLowerCase()}. Jedna sztuka innego zasobu to ${pieces(exchange.rate)}.` }), next);
+        fill(
+          section,
+          ...head,
+          h('p', { class: 'store-hint', text: t('Za mało: {resource}. Jedna sztuka innego zasobu to {pieces}.', { resource: resourceName(from).toLowerCase(), pieces: pieces(exchange.rate) }) }),
+          next,
+        );
         return;
       }
       let amount = Math.max(1, Math.min(most, exchangeChoice.amount ?? 1));
@@ -987,7 +1033,7 @@ function mountBuilding(container, id) {
         max: most,
         step: 1,
         value: amount,
-        'aria-label': 'Ile sztuk wziąć',
+        'aria-label': t('Ile sztuk wziąć'),
         disabled: most < 2,
         onInput: () => choose(Number(slider.value)),
       });
@@ -999,8 +1045,8 @@ function mountBuilding(container, id) {
           text: sign < 0 ? '−' : '+',
           onClick: () => choose(amount + sign),
         });
-      const less = stepButton(-1, 'O sztukę mniej');
-      const more = stepButton(1, 'O sztukę więcej');
+      const less = stepButton(-1, t('O sztukę mniej'));
+      const more = stepButton(1, t('O sztukę więcej'));
       const buttons = exchange.resources
         .filter((id) => id !== from)
         .map((id) => {
@@ -1022,14 +1068,18 @@ function mountBuilding(container, id) {
         exchangeChoice.amount = amount;
         const given = amount * exchange.rate;
         slider.value = String(amount);
-        slider.setAttribute('aria-valuetext', `${pieces(amount)} za ${formatNumber(given)} × ${resourceName(from)}`);
+        const price = t('{pieces} za {given} × {resource}', { pieces: pieces(amount), given: formatNumber(given), resource: resourceName(from) });
+        slider.setAttribute('aria-valuetext', price);
         slider.style.setProperty('--fill', `${((amount - 1) / Math.max(1, most - 1)) * 100}%`);
-        value.textContent = `${pieces(amount)} za ${formatNumber(given)} × ${resourceName(from)}`;
+        value.textContent = price;
         less.disabled = amount <= 1;
         more.disabled = amount >= most;
         for (const { id, button, label } of buttons) {
           label.textContent = `${resourceName(id)} +${formatNumber(amount)}`;
-          button.setAttribute('aria-label', `Wymień ${formatNumber(given)} × ${resourceName(from)} na ${formatNumber(amount)} × ${resourceName(id)}`);
+          button.setAttribute(
+            'aria-label',
+            t('Wymień {given} × {from} na {amount} × {to}', { given: formatNumber(given), from: resourceName(from), amount: formatNumber(amount), to: resourceName(id) }),
+          );
         }
       }
       choose(amount);
@@ -1052,10 +1102,10 @@ function mountBuilding(container, id) {
   function saleView() {
     return h(
       'section',
-      { class: 'fire-trade scrap-sale', 'aria-label': 'Skup przedmiotów' },
-      h('h2', { class: 'fire-trade-title', text: 'Skup przedmiotów' }),
-      h('p', { class: 'fire-trade-text', text: 'Złomiarz kupi zbędne przedmioty z plecaka. Sprzedasz u niego przedmioty także bezpośrednio z pozycji plecaka.' }),
-      h('button', { type: 'button', class: 'button button--world', onClick: scrapperSheet, text: 'Sprzedaj zbędne przedmioty' }),
+      { class: 'fire-trade scrap-sale', 'aria-label': t('Skup przedmiotów') },
+      h('h2', { class: 'fire-trade-title', text: t('Skup przedmiotów') }),
+      h('p', { class: 'fire-trade-text', text: t('Złomiarz kupi zbędne przedmioty z plecaka. Sprzedasz u niego przedmioty także bezpośrednio z pozycji plecaka.') }),
+      h('button', { type: 'button', class: 'button button--world', onClick: scrapperSheet, text: t('Sprzedaj zbędne przedmioty') }),
     );
   }
 
@@ -1082,8 +1132,13 @@ function mountBuilding(container, id) {
               'span',
               { class: 'craft-text' },
               h('span', { class: 'item-name', vars: { '--rarity': part.color }, text: part.name }),
-              h('span', { class: 'item-meta shop-meta' }, h('strong', { class: 'shop-price', text: `${formatNumber(price)} złota` }), h('span', { text: `masz ${formatNumber(part.count)}` })),
-              h('span', { class: 'item-meta', text: `Dziś zostało: ${formatNumber(left)} z ${formatNumber(daily)}` }),
+              h(
+                'span',
+                { class: 'item-meta shop-meta' },
+                h('strong', { class: 'shop-price', text: t('{gold} złota', { gold: formatNumber(price) }) }),
+                h('span', { text: t('masz {count}', { count: formatNumber(part.count) }) }),
+              ),
+              h('span', { class: 'item-meta', text: t('Dziś zostało: {left} z {all}', { left: formatNumber(left), all: formatNumber(daily) }) }),
             ),
             h(
               'span',
@@ -1093,8 +1148,8 @@ function mountBuilding(container, id) {
                   type: 'button',
                   class: 'button button--world button--small shop-button',
                   disabled: gold < price * count || count > left,
-                  'aria-label': `Kup ${part.name}: ${formatNumber(count)} za ${formatNumber(price * count)} złota`,
-                  text: `Kup ${count}`,
+                  'aria-label': t('Kup {name}: {count} za {gold} złota', { name: part.name, count: formatNumber(count), gold: formatNumber(price * count) }),
+                  text: t('Kup {count}', { count }),
                   onClick: (event) => withButton(event.currentTarget, () => buyParts(id, count)),
                 }),
               ),
@@ -1113,7 +1168,12 @@ function mountBuilding(container, id) {
     if (waiting.length === 0) return null;
     return systemPanel(
       ...waiting.map((entry) =>
-        h('div', { class: 'build-queue-item' }, h('p', { class: 'system-text', text: `W kolejce: poziom ${entry.level}, start ${moment(entry.startsAt)}.` }), cancelButton(entry)),
+        h(
+          'div',
+          { class: 'build-queue-item' },
+          h('p', { class: 'system-text', text: t('W kolejce: poziom {level}, start {when}.', { level: entry.level, when: moment(entry.startsAt) }) }),
+          cancelButton(entry),
+        ),
       ),
     );
   }
@@ -1123,7 +1183,7 @@ function mountBuilding(container, id) {
   function nextLevel(building) {
     const next = building.next;
     const own = building.id === campOf().id;
-    if (!next) return h('p', { class: 'muted', text: building.evolution ?? (building.queued.length > 0 ? 'Najwyższy poziom jest już w kolejce.' : 'Najwyższy poziom.') });
+    if (!next) return h('p', { class: 'muted', text: building.evolution ?? (building.queued.length > 0 ? t('Najwyższy poziom jest już w kolejce.') : t('Najwyższy poziom.')) });
     const have = Object.fromEntries(walletEntries().map((entry) => [entry.id, entry.amount]));
     // What is missing, named (311).
     const lacking = costShortfall(next.cost);
@@ -1131,24 +1191,24 @@ function mountBuilding(container, id) {
     const busy = underWay();
     const full = busy >= state.character.camp.queueSize;
     const label = full
-      ? 'Kolejka budowy pełna'
+      ? t('Kolejka budowy pełna')
       : missing
-        ? `Brakuje: ${lacking.join(', ')}`
+        ? t('Brakuje: {missing}', { missing: lacking.join(', ') })
         : busy > 0
-          ? `Dodaj do kolejki: poziom ${next.level}`
+          ? t('Dodaj do kolejki: poziom {level}', { level: next.level })
           : own
-            ? `Rozwiń obóz do poziomu ${next.level}`
+            ? t('Rozwiń obóz do poziomu {level}', { level: next.level })
             : building.level === 0
-              ? 'Zbuduj'
-              : `Ulepsz do poziomu ${next.level}`;
+              ? t('Zbuduj')
+              : t('Ulepsz do poziomu {level}', { level: next.level });
     return h(
       'section',
       { class: 'card building-next-card', 'aria-labelledby': 'building-next' },
-      h('h2', { class: 'card-title', id: 'building-next', text: next.level === 1 ? 'Budowa' : `Poziom ${next.level}` }),
+      h('h2', { class: 'card-title', id: 'building-next', text: next.level === 1 ? t('Budowa') : t('Poziom {level}', { level: next.level }) }),
       h('p', { class: 'building-next', text: next.effect }),
       h(
         'ul',
-        { class: 'cost-list', 'aria-label': 'Koszt' },
+        { class: 'cost-list', 'aria-label': t('Koszt') },
         Object.entries(next.cost).map(([resource, amount]) =>
           h(
             'li',
@@ -1159,7 +1219,12 @@ function mountBuilding(container, id) {
           ),
         ),
       ),
-      h('p', { class: 'building-time' }, icon('hourglass', { size: 16 }), `${own ? 'Czas rozwoju' : 'Czas budowy'}: ${formatMinutes(next.minutes)}`),
+      h(
+        'p',
+        { class: 'building-time' },
+        icon('hourglass', { size: 16 }),
+        own ? t('Czas rozwoju: {time}', { time: formatMinutes(next.minutes) }) : t('Czas budowy: {time}', { time: formatMinutes(next.minutes) }),
+      ),
       h('button', {
         type: 'button',
         class: 'button button--system',
@@ -1175,15 +1240,17 @@ function mountBuilding(container, id) {
       full &&
         h('p', {
           class: 'system-hint',
-          text: `Naraz można mieć ${countOf(state.character.camp.queueSize, 'budowę', 'budowy', 'budów')}: trwającą i czekające w kolejce. Kolejna zmieści się, gdy któraś się skończy.`,
+          text: t('Naraz można mieć {builds}: trwającą i czekające w kolejce. Kolejna zmieści się, gdy któraś się skończy.', {
+            builds: countOf(state.character.camp.queueSize, 'budowę', 'budowy', 'budów'),
+          }),
         }),
       !full &&
         missing &&
         h('p', {
           class: 'system-hint',
           text: own
-            ? 'Złoto zdobędziesz na eksploracjach.'
-            : 'Złoto i zasoby zdobędziesz na eksploracjach. Tartak, Kamieniołom i Kopalnia wytwarzają zasoby w obozie.',
+            ? t('Złoto zdobędziesz na eksploracjach.')
+            : t('Złoto i zasoby zdobędziesz na eksploracjach. Tartak, Kamieniołom i Kopalnia wytwarzają zasoby w obozie.'),
         }),
     );
   }

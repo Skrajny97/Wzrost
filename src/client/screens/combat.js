@@ -3,7 +3,8 @@
 // its inner regions as circles, open from the class level each needs. An
 // inner region shows the length, the threat level and the start. Dungeons
 // appear here once unlocked. The code calls explorations hunts and
-// inner regions areas.
+// inner regions areas. Its texts are written in Polish and shown in the
+// page's language (t(), i18n.js).
 
 import { areaArt } from '../area-art.js';
 import { landArt, materialSprite, monsterSprite, potionSprite } from '../art.js';
@@ -11,6 +12,7 @@ import { bonusList } from '../bonuses.js';
 import { leaveView as leaveHistoryView, openView as openHistoryView } from '../history.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatMinutes, formatNumber, timeFormat } from '../format.js';
+import { language, t } from '../i18n.js';
 import { preloadReportMusic } from '../music.js';
 import { systemPoints } from '../quests.js';
 import { walkScene } from '../scenes.js';
@@ -46,6 +48,7 @@ import { BUSY, skipLines } from './party.js';
 import { mercenaryChoice, servicePanel } from '../mercenaries.js';
 import { combatModes } from './towers.js';
 
+// Shown through t(), as the page loads its English after this module.
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
 const CHOICE_KEY = 'wzrost.hunt-choice';
 // The potions to take along and the healing mark: { potions: { [id]: count }, healBelow }.
@@ -95,10 +98,13 @@ const areaOpen = (area, character) => character.classLevel >= area.unlockClassLe
 
 const chip = (text, className = '') => h('span', { class: `chip ${className}`.trim(), text });
 
+// A decimal as the page's language writes it: "2,5" in Polish, "2.5" in English.
+const decimal = (text) => (language() === 'pl' ? text.replace('.', ',') : text);
+
 // A chance of meeting a creature: whole percents, below 10% to a tenth.
 function chanceText(chance) {
   const percent = chance * 100;
-  return `${percent >= 10 ? Math.round(percent) : percent.toFixed(1).replace('.', ',')}%`;
+  return `${percent >= 10 ? Math.round(percent) : decimal(percent.toFixed(1))}%`;
 }
 
 // The Bestiariusz: the creatures of an inner region with the levels they
@@ -109,21 +115,22 @@ function chanceText(chance) {
 function dangersSheet(place, land = false) {
   const met = new Set(state.character.met ?? []);
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Bestiariusz' }),
+    h('h2', { class: 'sheet-title', text: t('Bestiariusz') }),
     h('p', { class: 'sheet-text', text: place.name }),
     h(
       'ul',
       { class: 'danger-list' },
       place.dangers.map((danger) => {
         const known = met.has(danger.monsterId);
-        const levels = danger.minLevel === danger.maxLevel ? `poz. ${danger.minLevel}` : `poz. ${danger.minLevel}–${danger.maxLevel}`;
-        const rank = danger.champion ? 'czempion' : danger.elite ? 'elita' : null;
+        const levels =
+          danger.minLevel === danger.maxLevel ? t('poz. {level}', { level: danger.minLevel }) : t('poz. {min}–{max}', { min: danger.minLevel, max: danger.maxLevel });
+        const rank = danger.champion ? t('czempion') : danger.elite ? t('elita') : null;
         const chance = danger.chance === undefined ? null : chanceText(danger.chance);
         return h(
           'li',
           {
             class: `danger-row${known ? '' : ' danger-row--unknown'}`,
-            'aria-label': `${known ? danger.name : 'Nieznany stwór'}, ${levels}${rank ? `, ${rank}` : ''}${chance ? `, ${chance}` : ''}`,
+            'aria-label': `${known ? danger.name : t('Nieznany stwór')}, ${levels}${rank ? `, ${rank}` : ''}${chance ? `, ${chance}` : ''}`,
           },
           h('span', { class: 'danger-art' }, monsterSprite(danger.monsterId) ?? icon(danger.family, { size: 28 })),
           h(
@@ -136,16 +143,20 @@ function dangersSheet(place, land = false) {
         );
       }),
     ),
-    // The author's sentence, in the feminine for a woman, like the narrator's lines.
+    // The author's sentence, in the feminine for a woman, like the narrator's
+    // lines (English has one for both).
     h('p', {
       class: 'muted',
-      text: `Zobaczysz tutaj pełne informacje jedynie o stworach, z którymi ${state.character.appearance === 'female' ? 'stoczyłaś' : 'stoczyłeś'} potyczkę.`,
+      text:
+        state.character.appearance === 'female'
+          ? t('Zobaczysz tutaj pełne informacje jedynie o stworach, z którymi stoczyłaś potyczkę.')
+          : t('Zobaczysz tutaj pełne informacje jedynie o stworach, z którymi stoczyłeś potyczkę.'),
     }),
-    h('p', { class: 'muted', text: `Skrzynia Bestiariusza dostarcza ${chestText(place.chest)}, gdy poznasz wszystkie stwory ${whose(land)}.` }),
+    h('p', { class: 'muted', text: t('Skrzynia Bestiariusza dostarcza {chest}, gdy poznasz wszystkie stwory {whose}.', { chest: chestText(place.chest), whose: whose(land) }) }),
   );
 }
 
-const whose = (land) => (land ? 'tej krainy' : 'tego regionu');
+const whose = (land) => (land ? t('tej krainy') : t('tego regionu'));
 
 // The way to a Bestiariusz, of an inner region or a whole land, with its chest.
 export function bestiaryRow(place, land = false) {
@@ -156,14 +167,15 @@ export function bestiaryRow(place, land = false) {
       'button',
       { type: 'button', class: 'danger-link', onClick: () => dangersSheet(place, land) },
       icon('beast', { size: 20 }),
-      h('span', { text: 'Bestiariusz' }),
+      h('span', { text: t('Bestiariusz') }),
       icon('chevron', { size: 18 }),
     ),
     chestButton(place, land),
   );
 }
 
-const chestText = (chest) => `+${formatNumber(chest.gold)} złota, +${timePoints(chest.timePoints)} i +${systemPoints(chest.systemPoints)}`;
+const chestText = (chest) =>
+  t('+{gold} złota, +{time} i +{points}', { gold: formatNumber(chest.gold), time: timePoints(chest.timePoints), points: systemPoints(chest.systemPoints) });
 
 // The Bestiariusz chest beside its name, as at the quests: shut, with the
 // creatures met so far, until all are met, then ready to open, then open.
@@ -176,23 +188,23 @@ function chestButton(place, land = false) {
   const ready = !opened && known === all;
   const inside = chestText(place.chest);
   const label = opened
-    ? 'Skrzynia Bestiariusza otwarta'
+    ? t('Skrzynia Bestiariusza otwarta')
     : ready
-      ? `Otwórz skrzynię Bestiariusza: ${inside}`
-      : `Skrzynia Bestiariusza: ${inside}. Poznane stwory: ${known} z ${all}`;
+      ? t('Otwórz skrzynię Bestiariusza: {inside}', { inside })
+      : t('Skrzynia Bestiariusza: {inside}. Poznane stwory: {known} z {all}', { inside, known, all });
   const open = async () => {
     if (opened) {
-      toast('Ta skrzynia jest już otwarta.');
+      toast(t('Ta skrzynia jest już otwarta.'));
       return;
     }
     if (!ready) {
-      toast(`Poznaj wszystkie stwory ${whose(land)} (${known} z ${all}), a skrzynia się otworzy. W środku: ${inside}.`);
+      toast(t('Poznaj wszystkie stwory {whose} ({known} z {all}), a skrzynia się otworzy. W środku: {inside}.', { whose: whose(land), known, all, inside }));
       return;
     }
     const { chest } = await call('POST', '/api/bestiary/chest', land ? { region: place.id } : { area: place.id });
     // Coins spilling from the chest (data/sounds.json).
     playSound('chest');
-    toast(`Skrzynia otwarta: ${chestText(chest)}.`);
+    toast(t('Skrzynia otwarta: {inside}.', { inside: chestText(chest) }));
   };
   return h(
     'button',
@@ -203,7 +215,7 @@ function chestButton(place, land = false) {
       onClick: (event) => withButton(event.currentTarget, open),
     },
     h('span', { class: 'quest-chest-art', 'aria-hidden': 'true' }, materialSprite('chest') ?? icon('pouch', { size: 28 })),
-    h('span', { class: 'quest-chest-caption', text: opened ? 'Otwarta' : ready ? 'Otwórz' : `${known}/${all}` }),
+    h('span', { class: 'quest-chest-caption', text: opened ? t('Otwarta') : ready ? t('Otwórz') : `${known}/${all}` }),
   );
 }
 
@@ -329,7 +341,7 @@ export function mountCombat(container, { params, navigate }) {
     if (activity || !region) {
       fill(
         container,
-        h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Walka' })),
+        h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Walka') })),
         modeTabs(),
         testTools(),
         activity ? activityCard(activity) : regionList(character),
@@ -339,7 +351,7 @@ export function mountCombat(container, { params, navigate }) {
     if (!area) {
       fill(
         container,
-        backHeading(region.name, `poz. ${region.minLevel}–${region.maxLevel}`, () => leaveView(HOME, 1)),
+        backHeading(region.name, t('poz. {min}–{max}', { min: region.minLevel, max: region.maxLevel }), () => leaveView(HOME, 1)),
         testTools(),
         regionView(character),
       );
@@ -350,7 +362,7 @@ export function mountCombat(container, { params, navigate }) {
       container,
       backHeading(area.name, region.name, () => leaveView(regionHash, 1)),
       testTools(),
-      open ? areaView(character) : systemPanel(`To miejsce odblokujesz na poziomie klasy ${area.unlockClassLevel}.`),
+      open ? areaView(character) : systemPanel(t('To miejsce odblokujesz na poziomie klasy {level}.', { level: area.unlockClassLevel })),
     );
     if (open) loadOptions();
   }
@@ -366,7 +378,7 @@ export function mountCombat(container, { params, navigate }) {
         h('h1', { class: 'page-title', tabindex: '-1', text: title }),
         h('p', { class: 'page-subtitle', text: subtitle }),
       ),
-      h('button', { type: 'button', class: 'button button--system back-button', onClick: onBack }, icon('back', { size: 20 }), 'Powrót'),
+      h('button', { type: 'button', class: 'button button--system back-button', onClick: onBack }, icon('back', { size: 20 }), t('Powrót')),
     );
   }
 
@@ -387,13 +399,13 @@ export function mountCombat(container, { params, navigate }) {
         class: 'test-tools-text',
         text:
           shownSkip === 'hunt'
-            ? 'Tryb testowy: wyprawa skończy się od razu, z tym samym wynikiem.'
-            : 'Tryb testowy: HP wróci od razu do pełna.',
+            ? t('Tryb testowy: wyprawa skończy się od razu, z tym samym wynikiem.')
+            : t('Tryb testowy: HP wróci od razu do pełna.'),
       }),
       h('button', {
         type: 'button',
         class: 'button button--test',
-        text: 'Pomiń czas',
+        text: t('Pomiń czas'),
         onClick: (event) => withButton(event.currentTarget, () => call('POST', '/api/test/skip-time')),
       }),
     );
@@ -409,32 +421,32 @@ export function mountCombat(container, { params, navigate }) {
     // on their own screens; here they only say so.
     if (activity.kind === 'herbs') {
       return systemPanel(
-        activityFinished(activity) ? 'Zbieranie ziół zakończone. Raport czeka w Zielarstwie.' : `Postać zbiera zioła w miejscu: ${activity.placeName}.`,
-        h('a', { class: 'button button--system', href: '#/profesje/zielarstwo', text: 'Do Zielarstwa' }),
+        activityFinished(activity) ? t('Zbieranie ziół zakończone. Raport czeka w Zielarstwie.') : t('Postać zbiera zioła w miejscu: {place}.', { place: activity.placeName }),
+        h('a', { class: 'button button--system', href: '#/profesje/zielarstwo', text: t('Do Zielarstwa') }),
       );
     }
     if (activity.kind === 'potions') {
       return systemPanel(
-        activityFinished(activity) ? 'Warzenie mikstur zakończone. Raport czeka w Alchemii.' : `Postać warzy mikstury w miejscu: ${activity.placeName}.`,
-        h('a', { class: 'button button--system', href: '#/profesje/alchemia', text: 'Do Alchemii' }),
+        activityFinished(activity) ? t('Warzenie mikstur zakończone. Raport czeka w Alchemii.') : t('Postać warzy mikstury w miejscu: {place}.', { place: activity.placeName }),
+        h('a', { class: 'button button--system', href: '#/profesje/alchemia', text: t('Do Alchemii') }),
       );
     }
     if (activity.kind === 'items') {
       return systemPanel(
-        activityFinished(activity) ? 'Wyrób przedmiotów zakończony. Raport czeka w Rzemieślnictwie.' : `Postać wykonuje przedmioty w miejscu: ${activity.placeName}.`,
-        h('a', { class: 'button button--system', href: '#/profesje/rzemieslnictwo', text: 'Do Rzemieślnictwa' }),
+        activityFinished(activity) ? t('Wyrób przedmiotów zakończony. Raport czeka w Rzemieślnictwie.') : t('Postać wykonuje przedmioty w miejscu: {place}.', { place: activity.placeName }),
+        h('a', { class: 'button button--system', href: '#/profesje/rzemieslnictwo', text: t('Do Rzemieślnictwa') }),
       );
     }
     if (activity.kind === 'minerals') {
       return systemPanel(
-        activityFinished(activity) ? 'Kopanie zakończone. Raport czeka w Górnictwie.' : `Postać kopie w miejscu: ${activity.placeName}.`,
-        h('a', { class: 'button button--system', href: '#/profesje/gornictwo', text: 'Do Górnictwa' }),
+        activityFinished(activity) ? t('Kopanie zakończone. Raport czeka w Górnictwie.') : t('Postać kopie w miejscu: {place}.', { place: activity.placeName }),
+        h('a', { class: 'button button--system', href: '#/profesje/gornictwo', text: t('Do Górnictwa') }),
       );
     }
     if (activity.kind === 'jewels') {
       return systemPanel(
-        activityFinished(activity) ? 'Praca w Szlifierni zakończona. Raport czeka w Jubilerstwie.' : `Postać pracuje w miejscu: ${activity.placeName}.`,
-        h('a', { class: 'button button--system', href: '#/profesje/jubilerstwo', text: 'Do Jubilerstwa' }),
+        activityFinished(activity) ? t('Praca w Szlifierni zakończona. Raport czeka w Jubilerstwie.') : t('Postać pracuje w miejscu: {place}.', { place: activity.placeName }),
+        h('a', { class: 'button button--system', href: '#/profesje/jubilerstwo', text: t('Do Jubilerstwa') }),
       );
     }
     preloadReportMusic();
@@ -443,7 +455,7 @@ export function mountCombat(container, { params, navigate }) {
         type: 'button',
         class: 'button button--system',
         'data-guide': 'claim',
-        text: 'Odbierz raport',
+        text: t('Odbierz raport'),
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
             const open = (report) => {
@@ -461,7 +473,7 @@ export function mountCombat(container, { params, navigate }) {
         'div',
         { class: 'stack' },
         partySkips(activity),
-        systemPanel(`Eksploracja zakończona: ${activity.areaName}, ${formatMinutes(activity.minutes)}.`, 'Raport czeka na odbiór.', claim),
+        systemPanel(t('Eksploracja zakończona: {area}, {time}.', { area: activity.areaName, time: formatMinutes(activity.minutes) }), t('Raport czeka na odbiór.'), claim),
       );
     }
 
@@ -470,20 +482,20 @@ export function mountCombat(container, { params, navigate }) {
     const cancel = h('button', {
       type: 'button',
       class: 'button button--world',
-      text: 'Przerwij eksplorację',
+      text: t('Przerwij eksplorację'),
       onClick: async (event) => {
         const button = event.currentTarget;
         const sure = await confirmAction({
-          title: 'Przerwać eksplorację?',
-          text: 'Postać wróci od razu, bez doświadczenia, złota i łupów.',
-          confirmLabel: 'Przerwij',
+          title: t('Przerwać eksplorację?'),
+          text: t('Postać wróci od razu, bez doświadczenia, złota i łupów.'),
+          confirmLabel: t('Przerwij'),
           danger: true,
         });
         if (sure) await withButton(button, () => call('POST', '/api/hunts/cancel'));
       },
     });
     // A Drużyna's trip shares its timer: a skip shortens it for everyone.
-    skipper = skipControl('activity', (now) => activity.endsAt - now, activity.party ? 'Wyprawa drużyny, dla wszystkich' : 'Eksploracja');
+    skipper = skipControl('activity', (now) => activity.endsAt - now, activity.party ? t('Wyprawa drużyny, dla wszystkich') : t('Eksploracja'));
     const scene = walkScene(activity);
     const card = h(
       'div',
@@ -491,20 +503,25 @@ export function mountCombat(container, { params, navigate }) {
       partySkips(activity),
       ...(scene ? [scene.element] : []),
       systemPanel(
-        `Eksploracja w toku: ${activity.areaName}, ${formatMinutes(activity.minutes)}.`,
+        t('Eksploracja w toku: {area}, {time}.', { area: activity.areaName, time: formatMinutes(activity.minutes) }),
         countdown,
         h('div', { class: 'bar bar--system' }, progress),
-        ...(activity.avoidRare ? [h('p', { class: 'system-hint', text: 'Postać omija elity i czempionów.' })] : []),
-        ...(activity.seekRare ? [h('p', { class: 'system-hint', text: 'Postać tropi elity i czempiony.' })] : []),
-        ...(activity.hard ? [h('p', { class: 'system-hint', text: 'Trudna wyprawa: silniejsze stwory, więcej XP i złota.' })] : []),
-        ...(activity.mercenary ? [h('p', { class: 'system-hint', text: `Najemnik: ${activity.mercenary.name}, zapłata ${formatNumber(activity.mercenary.gold)} zł.` })] : []),
-        ...(activity.tracksQuests ? [h('p', { class: 'system-hint', text: 'Postać tropi stwory z zadań.' })] : []),
+        ...(activity.avoidRare ? [h('p', { class: 'system-hint', text: t('Postać omija elity i czempionów.') })] : []),
+        ...(activity.seekRare ? [h('p', { class: 'system-hint', text: t('Postać tropi elity i czempiony.') })] : []),
+        ...(activity.hard ? [h('p', { class: 'system-hint', text: t('Trudna wyprawa: silniejsze stwory, więcej XP i złota.') })] : []),
+        ...(activity.mercenary
+          ? [h('p', { class: 'system-hint', text: t('Najemnik: {name}, zapłata {gold} zł.', { name: activity.mercenary.name, gold: formatNumber(activity.mercenary.gold) }) })]
+          : []),
+        ...(activity.tracksQuests ? [h('p', { class: 'system-hint', text: t('Postać tropi stwory z zadań.') })] : []),
         // The Stajnia's mount made the wait shorter than the length (327 A).
         ...(activity.endsAt - activity.startedAt < activity.minutes * 60000
-          ? [h('p', { class: 'system-hint', text: `Z wierzchowcem: ${formatWait(activity.endsAt - activity.startedAt)}.` })]
+          ? [h('p', { class: 'system-hint', text: t('Z wierzchowcem: {time}.', { time: formatWait(activity.endsAt - activity.startedAt) }) })]
           : []),
-        ...(activity.party ? [h('p', { class: 'system-hint', text: 'Wyprawa drużyny ma wspólny czas: przewinięcie skraca ją wszystkim.' })] : []),
-        h('p', { class: 'system-hint', text: `Raport będzie gotowy o ${timeFormat.format(new Date(activity.endsAt))}. Do tego czasu rozbuduj obóz albo sprawdź zadania.` }),
+        ...(activity.party ? [h('p', { class: 'system-hint', text: t('Wyprawa drużyny ma wspólny czas: przewinięcie skraca ją wszystkim.') })] : []),
+        h('p', {
+          class: 'system-hint',
+          text: t('Raport będzie gotowy o {time}. Do tego czasu rozbuduj obóz albo sprawdź zadania.', { time: timeFormat.format(new Date(activity.endsAt)) }),
+        }),
       ),
       skipper.element,
       cancel,
@@ -522,8 +539,8 @@ export function mountCombat(container, { params, navigate }) {
       { class: 'stack' },
       restSkip(character),
       first
-        ? systemPanel('Wiatrołomy to najbezpieczniejsze miejsce na start. Wybierz czas eksploracji i wyrusz.')
-        : unarmed && systemPanel('Walczysz gołymi rękami. Załóż broń z plecaka w zakładce Postać, jeśli już ją masz.'),
+        ? systemPanel(t('Wiatrołomy to najbezpieczniejsze miejsce na start. Wybierz czas eksploracji i wyrusz.'))
+        : unarmed && systemPanel(t('Walczysz gołymi rękami. Załóż broń z plecaka w zakładce Postać, jeśli już ją masz.')),
       state.content.regions.map((candidate) => regionLink(candidate, character)),
     );
   }
@@ -547,8 +564,8 @@ export function mountCombat(container, { params, navigate }) {
         h(
           'span',
           { class: 'region-chips' },
-          chip(`poz. ${candidate.minLevel}–${candidate.maxLevel}`),
-          candidate.safe && chip('bezpieczny', 'chip--safe'),
+          chip(t('poz. {min}–{max}', { min: candidate.minLevel, max: candidate.maxLevel })),
+          candidate.safe && chip(t('bezpieczny'), 'chip--safe'),
         ),
       ),
       h('p', { class: 'region-description', text: candidate.description }),
@@ -557,8 +574,8 @@ export function mountCombat(container, { params, navigate }) {
         'p',
         { class: 'region-foot' },
         open > 0
-          ? h('span', { text: `Otwarte miejsca: ${open} z ${candidate.areas.length}` })
-          : lockLabel(`poz. klasy ${candidate.areas[0].unlockClassLevel}`),
+          ? h('span', { text: t('Otwarte miejsca: {open} z {all}', { open, all: candidate.areas.length }) })
+          : lockLabel(t('poz. klasy {level}', { level: candidate.areas[0].unlockClassLevel })),
         icon('chevron', { size: 20 }),
       ),
     );
@@ -587,10 +604,10 @@ export function mountCombat(container, { params, navigate }) {
       circle.append(h('span', { class: 'area-lock' }, icon('lock', { size: 28 })));
       return h(
         'div',
-        { class: 'area-tile area-tile--locked', role: 'img', 'aria-label': `${place.name}: od poziomu klasy ${place.unlockClassLevel}` },
+        { class: 'area-tile area-tile--locked', role: 'img', 'aria-label': t('{name}: od poziomu klasy {level}', { name: place.name, level: place.unlockClassLevel }) },
         circle,
         h('span', { class: 'area-tile-name', text: place.name }),
-        lockLabel(`poz. klasy ${place.unlockClassLevel}`),
+        lockLabel(t('poz. klasy {level}', { level: place.unlockClassLevel })),
       );
     }
     const hash = `${regionHash}/${place.id}`;
@@ -599,7 +616,7 @@ export function mountCombat(container, { params, navigate }) {
       { class: 'area-tile', href: hash, 'data-guide': `area-${place.id}`, onClick: (event) => openView(event, hash) },
       circle,
       h('span', { class: 'area-tile-name', text: place.name }),
-      h('span', { class: 'area-levels', text: `poz. ${place.minLevel}–${place.maxLevel}` }),
+      h('span', { class: 'area-levels', text: t('poz. {min}–{max}', { min: place.minLevel, max: place.maxLevel }) }),
     );
   }
 
@@ -618,7 +635,7 @@ export function mountCombat(container, { params, navigate }) {
     shownArea = area.id;
 
     const threatValue = h('strong', {});
-    const threatLine = h('p', { class: 'threat' }, 'Zagrożenie: ', threatValue);
+    const threatLine = h('p', { class: 'threat' }, t('Zagrożenie: '), threatValue);
     // The Warownia's Strażnica: the chances of the length chosen under the
     // threat, and from its 2nd level one of the place's creatures to track
     // (fortress.js in the engine). Not on a Drużyna's trip, whose fights are
@@ -637,11 +654,11 @@ export function mountCombat(container, { params, navigate }) {
       };
       fill(
         scoutBox,
-        h('p', { class: 'hunt-scout-title', text: `Strażnica: tropiony stwór, spotykany o ${Math.round(scout.share * 100)}% częściej` }),
+        h('p', { class: 'hunt-scout-title', text: t('Strażnica: tropiony stwór, spotykany o {share}% częściej', { share: Math.round(scout.share * 100) }) }),
         h(
           'div',
           { class: 'fortress-choices' },
-          [{ id: '', name: 'Żaden' }, ...scout.creatures].map((creature) =>
+          [{ id: '', name: t('Żaden') }, ...scout.creatures].map((creature) =>
             h('button', { type: 'button', class: 'button button--world button--small', 'data-id': creature.id, 'aria-pressed': creature.id === '', text: creature.name, onClick: () => pick(creature.id || null) }),
           ),
         ),
@@ -677,15 +694,15 @@ export function mountCombat(container, { params, navigate }) {
         showThreat();
       },
     });
-    const avoid = !first && h('label', { class: 'avoid-rare', for: 'avoid-rare' }, avoidBox, h('span', { text: 'Unikaj elit i czempionów' }));
-    const seek = !first && h('label', { class: 'avoid-rare', for: 'seek-rare' }, seekBox, h('span', { text: 'Trop elity i czempiony' }));
+    const avoid = !first && h('label', { class: 'avoid-rare', for: 'avoid-rare' }, avoidBox, h('span', { text: t('Unikaj elit i czempionów') }));
+    const seek = !first && h('label', { class: 'avoid-rare', for: 'seek-rare' }, seekBox, h('span', { text: t('Trop elity i czempiony') }));
     // The box under the dangers sends the character mostly after the
     // creatures its quests still ask for; a note says when none lives here.
     const tracking = () => !first && trackQuestsOn();
     const wanted = new Set(
       Object.values(character.quests ?? {}).flatMap((period) => period.quests.filter((quest) => quest.kind === 'kill' && !quest.done).map((quest) => quest.monsterId)),
     );
-    const trackNone = h('p', { class: 'muted track-quests-note', text: 'Żaden stwór z Twoich zadań nie żyje w tym miejscu.' });
+    const trackNone = h('p', { class: 'muted track-quests-note', text: t('Żaden stwór z Twoich zadań nie żyje w tym miejscu.') });
     const showTrackNote = () => {
       trackNone.hidden = !trackQuestsOn() || (area.dangers ?? []).some((danger) => wanted.has(danger.monsterId));
     };
@@ -705,7 +722,7 @@ export function mountCombat(container, { params, navigate }) {
     // fill the Bestiariusz; a note says when all of this place's are known.
     const tracingUnknown = () => !first && trackUnknownOn();
     const met = new Set(character.met ?? []);
-    const unknownNone = h('p', { class: 'muted track-quests-note', text: 'Wszystkie stwory z tego miejsca są już w Bestiariuszu.' });
+    const unknownNone = h('p', { class: 'muted track-quests-note', text: t('Wszystkie stwory z tego miejsca są już w Bestiariuszu.') });
     const showUnknownNote = () => {
       unknownNone.hidden = !trackUnknownOn() || (area.dangers ?? []).some((danger) => !met.has(danger.monsterId));
     };
@@ -725,7 +742,7 @@ export function mountCombat(container, { params, navigate }) {
     // stronger creatures for more XP and gold, on a plain "Wyrusz" only.
     const hardRules = !first && character.hardHunt;
     const hardOn = () => Boolean(hardRules) && hardHuntOn();
-    const times = (value) => `×${String(value).replace('.', ',')}`;
+    const times = (value) => `×${decimal(String(value))}`;
     const hardBox =
       hardRules &&
       h('input', {
@@ -745,10 +762,15 @@ export function mountCombat(container, { params, navigate }) {
         'div',
         // The narrator opens "Opcje wyprawy" and points here (narrator.js).
         { class: 'track-quests hard-hunt', 'data-guide': 'hard-hunt' },
-        h('label', { class: 'avoid-rare', for: 'hard-hunt' }, hardBox, h('span', { text: 'Trudna wyprawa' })),
+        h('label', { class: 'avoid-rare', for: 'hard-hunt' }, hardBox, h('span', { text: t('Trudna wyprawa') })),
         h('p', {
           class: 'muted track-quests-note',
-          text: `Stwory: obrażenia ${times(hardRules.damage)}, HP ${times(hardRules.hp)}. Nagroda: +${Math.round(hardRules.xp * 100)}% XP i +${Math.round(hardRules.gold * 100)}% złota. Nie na Szybkim i Błyskawicznym polowaniu ani z drużyną.`,
+          text: t('Stwory: obrażenia {damage}, HP {hp}. Nagroda: +{xp}% XP i +{gold}% złota. Nie na Szybkim i Błyskawicznym polowaniu ani z drużyną.', {
+            damage: times(hardRules.damage),
+            hp: times(hardRules.hp),
+            xp: Math.round(hardRules.xp * 100),
+            gold: Math.round(hardRules.gold * 100),
+          }),
         }),
       );
     // A mercenary from the Karczma (mercenaries.js), from its level: on a
@@ -766,9 +788,9 @@ export function mountCombat(container, { params, navigate }) {
         h(
           'div',
           { class: 'track-quests' },
-          h('label', { class: 'avoid-rare', for: 'track-quests' }, trackBox, h('span', { text: 'Trop przede wszystkim stwory z zadań' })),
+          h('label', { class: 'avoid-rare', for: 'track-quests' }, trackBox, h('span', { text: t('Trop przede wszystkim stwory z zadań') })),
           trackNone,
-          h('label', { class: 'avoid-rare', for: 'track-unknown' }, unknownBox, h('span', { text: 'Trop nieznane stwory' })),
+          h('label', { class: 'avoid-rare', for: 'track-unknown' }, unknownBox, h('span', { text: t('Trop nieznane stwory') })),
           unknownNone,
         ),
         hard,
@@ -791,17 +813,19 @@ export function mountCombat(container, { params, navigate }) {
           : undefined;
       const threat = ratings?.[minutes];
       threatLine.className = `threat threat--${threat ?? 'unknown'}`;
-      threatValue.textContent = threat ? THREAT_NAMES[threat] : '…';
+      threatValue.textContent = threat ? t(THREAT_NAMES[threat]) : '…';
       const chances = !first && known ? (seeking() ? known.chancesSeeking : known.chances)?.[minutes] : null;
       watchLine.hidden = !chances;
       if (chances) {
-        watchLine.textContent = `Strażnica: ${[
-          !avoiding() && `elita ${percent(chances.elite)}`,
-          !avoiding() && chances.champion > 0 && `czempion ${percent(chances.champion)}`,
-          `zdarzenie ${percent(chances.event)}`,
-        ]
-          .filter(Boolean)
-          .join(', ')}.`;
+        watchLine.textContent = t('Strażnica: {chances}.', {
+          chances: [
+            !avoiding() && t('elita {chance}', { chance: percent(chances.elite) }),
+            !avoiding() && chances.champion > 0 && t('czempion {chance}', { chance: percent(chances.champion) }),
+            t('zdarzenie {chance}', { chance: percent(chances.event) }),
+          ]
+            .filter(Boolean)
+            .join(', '),
+        });
       }
       showScout(known?.scout);
       showSummary();
@@ -835,8 +859,8 @@ export function mountCombat(container, { params, navigate }) {
         partyRide === undefined
           ? stableNote(minutes, character.mount)
           : partyRide.shorter > 0
-            ? `Z wierzchowcami drużyny: ${formatWait(stableWait(minutes, partyRide))} (najwolniejszy ma ${partyRide.by})`
-            : `Wyprawa drużyny trwa pełny czas: ${partyRide.by} nie ma wierzchowca.`;
+            ? t('Z wierzchowcami drużyny: {time} (najwolniejszy ma {name})', { time: formatWait(stableWait(minutes, partyRide)), name: partyRide.by })
+            : t('Wyprawa drużyny trwa pełny czas: {name} nie ma wierzchowca.', { name: partyRide.by });
     };
     const slider = h('input', {
       type: 'range',
@@ -846,7 +870,7 @@ export function mountCombat(container, { params, navigate }) {
       max: allowed.length - 1,
       step: 1,
       value: index,
-      'aria-label': `Czas wyprawy: ${area.name}`,
+      'aria-label': t('Czas wyprawy: {area}', { area: area.name }),
       onInput: () => set(Number(slider.value)),
       onChange: () => remember(),
     });
@@ -861,8 +885,8 @@ export function mountCombat(container, { params, navigate }) {
           remember();
         },
       });
-    const less = stepButton(-1, 'Krócej');
-    const more = stepButton(1, 'Dłużej');
+    const less = stepButton(-1, t('Krócej'));
+    const more = stepButton(1, t('Dłużej'));
     const remember = () => {
       choice[area.id] = minutes;
       saveChoice(choice);
@@ -886,14 +910,14 @@ export function mountCombat(container, { params, navigate }) {
     // "Wyrusz" with the length chosen, as it stays in sight (312 A).
     let start = null;
     const startLabel = () => {
-      if (start) start.textContent = `Wyrusz · ${formatMinutes(minutes)}`;
+      if (start) start.textContent = t('Wyrusz · {time}', { time: formatMinutes(minutes) });
     };
     set(index);
 
     const durations = h(
       'div',
       { class: 'duration-picker' },
-      h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, 'Czas wyprawy', kind), value),
+      h('p', { class: 'duration-head' }, h('span', { class: 'duration-title' }, t('Czas wyprawy'), kind), value),
       h('div', { class: 'duration-row' }, less, slider, more),
       h(
         'p',
@@ -902,7 +926,7 @@ export function mountCombat(container, { params, navigate }) {
         h('span', { text: formatMinutes(allowed.at(-1)) }),
       ),
       riding,
-      longer && h('p', { class: 'duration-lock', text: `Dłuższe wyprawy, do ${formatMinutes(longer.minutes)}, od poziomu ${longer.level}.` }),
+      longer && h('p', { class: 'duration-lock', text: t('Dłuższe wyprawy, do {time}, od poziomu {level}.', { time: formatMinutes(longer.minutes), level: longer.level }) }),
     );
 
     // A Drużyna's leader takes the members free now along (parties.js):
@@ -922,7 +946,7 @@ export function mountCombat(container, { params, navigate }) {
       type: 'button',
       class: 'button button--system',
       'data-guide': 'start',
-      text: 'Wyrusz',
+      text: t('Wyrusz'),
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           remember();
@@ -952,10 +976,11 @@ export function mountCombat(container, { params, navigate }) {
           // meanwhile. A mercenary chosen stays home, chosen for a plain
           // exploration (mercenaries.js).
           if (along) {
-            const went = answer.went?.length > 0 ? `Drużyna wyrusza: ${answer.went.join(', ')}.` : 'Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.';
+            const went =
+              answer.went?.length > 0 ? t('Drużyna wyrusza: {names}.', { names: answer.went.join(', ') }) : t('Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.');
             toast(mercenary?.chosen() ? `${went} ${character.mercenaries.texts.plainOnly}` : went);
           } else if (hiring) {
-            toast(`${mercenary.hired().name} idzie z Tobą. Zapłacono ${formatNumber(mercenary.hired().gold)} zł.`);
+            toast(t('{name} idzie z Tobą. Zapłacono {gold} zł.', { name: mercenary.hired().name, gold: formatNumber(mercenary.hired().gold) }));
             mercenary.forget();
           }
           leaveView(HOME, 2);
@@ -980,9 +1005,9 @@ export function mountCombat(container, { params, navigate }) {
 
     const levelNote =
       character.level < area.minLevel
-        ? h('p', { class: 'region-warning', text: `Przeciwnicy mają tu poziom ${area.minLevel}–${area.maxLevel}, wyżej niż Twoja postać.` })
+        ? h('p', { class: 'region-warning', text: t('Przeciwnicy mają tu poziom {min}–{max}, wyżej niż Twoja postać.', { min: area.minLevel, max: area.maxLevel }) })
         : character.level > area.maxLevel + (state.content.easyAbove ?? 3)
-          ? h('p', { class: 'region-warning', text: 'To miejsce jest już dla Ciebie za łatwe: dostaniesz mało doświadczenia.' })
+          ? h('p', { class: 'region-warning', text: t('To miejsce jest już dla Ciebie za łatwe: dostaniesz mało doświadczenia.') })
           : null;
 
     return h(
@@ -999,8 +1024,8 @@ export function mountCombat(container, { params, navigate }) {
           h(
             'span',
             { class: 'region-chips' },
-            chip(`poz. ${area.minLevel}–${area.maxLevel}`),
-            region.safe && chip('bezpieczny', 'chip--safe'),
+            chip(t('poz. {min}–{max}', { min: area.minLevel, max: area.maxLevel })),
+            region.safe && chip(t('bezpieczny'), 'chip--safe'),
           ),
         ),
         h('p', { class: 'region-description', text: area.description }),
@@ -1024,7 +1049,7 @@ export function mountCombat(container, { params, navigate }) {
         first ? start : h('div', { class: 'start-bar' }, start),
         quick,
       ),
-      h('p', { class: 'muted threat-note', text: 'Zagrożenie to szansa omdlenia na wyprawie.' }),
+      h('p', { class: 'muted threat-note', text: t('Zagrożenie to szansa omdlenia na wyprawie.') }),
     );
   }
 
@@ -1052,9 +1077,10 @@ export function mountCombat(container, { params, navigate }) {
           if (!own?.leader || party.members.length < 2) return;
           const others = party.members.filter((member) => !member.own);
           free = others.filter((member) => member.status === 'free').map((member) => member.name);
-          const busy = others.filter((member) => member.status !== 'free').map((member) => `${member.name} (${BUSY[member.status] ?? 'zajęte'})`);
+          // What keeps each busy one (BUSY, screens/party.js), in the page's language.
+          const busy = others.filter((member) => member.status !== 'free').map((member) => `${member.name} (${t(BUSY[member.status] ?? 'zajęte')})`);
           if (free.length === 0) {
-            fill(element, h('p', { class: 'muted', text: `Z drużyny nikt teraz nie pójdzie: ${busy.join(', ')}. Wyprawa będzie tylko Twoja.` }));
+            fill(element, h('p', { class: 'muted', text: t('Z drużyny nikt teraz nie pójdzie: {names}. Wyprawa będzie tylko Twoja.', { names: busy.join(', ') }) }));
             element.hidden = false;
             return;
           }
@@ -1071,12 +1097,24 @@ export function mountCombat(container, { params, navigate }) {
           onRide(partyTicked ? party.limits.mount : undefined);
           fill(
             element,
-            h('label', { class: 'avoid-rare', for: 'party-along' }, box, h('span', { text: `Z drużyną: ${free.join(', ')}` })),
+            h('label', { class: 'avoid-rare', for: 'party-along' }, box, h('span', { text: t('Z drużyną: {names}', { names: free.join(', ') }) })),
             h('p', {
               class: 'muted',
-              text: `Drużyna idzie najwyżej na ${formatMinutes(party.limits.minutes)} (${party.limits.minutesBy}) i tylko tam, gdzie wejdzie ${party.limits.classLevelBy} (poziom klasy ${party.limits.classLevel}).`,
+              text: t('Drużyna idzie najwyżej na {time} ({timeBy}) i tylko tam, gdzie wejdzie {levelBy} (poziom klasy {level}).', {
+                time: formatMinutes(party.limits.minutes),
+                timeBy: party.limits.minutesBy,
+                levelBy: party.limits.classLevelBy,
+                level: party.limits.classLevel,
+              }),
             }),
-            busy.length > 0 && h('p', { class: 'muted', text: `${busy.length === 1 ? 'Nie idzie' : 'Nie idą'}, ale ${busy.length === 1 ? 'zostaje' : 'zostają'} w drużynie: ${busy.join(', ')}.` }),
+            busy.length > 0 &&
+              h('p', {
+                class: 'muted',
+                text:
+                  busy.length === 1
+                    ? t('Nie idzie, ale zostaje w drużynie: {names}.', { names: busy.join(', ') })
+                    : t('Nie idą, ale zostają w drużynie: {names}.', { names: busy.join(', ') }),
+              }),
           );
           element.hidden = false;
         })
@@ -1106,24 +1144,28 @@ export function mountCombat(container, { params, navigate }) {
     return h(
       'div',
       { class: 'quick-hunt', 'data-guide': 'quick-hunt' },
-      start('Szybkie Polowanie', null, left === 0),
+      start(t('Szybkie Polowanie'), null, left === 0),
       h('p', {
         class: 'muted',
         text:
           left > 0
-            ? `Wyprawa jak na ${formatMinutes(minutes)}, z raportem od razu. Zostało dziś: ${left} z ${perDay}.`
-            : 'Szybkie Polowania na dziś się skończyły. Nowe od północy.',
+            ? t('Wyprawa jak na {time}, z raportem od razu. Zostało dziś: {left} z {all}.', { time: formatMinutes(minutes), left, all: perDay })
+            : t('Szybkie Polowania na dziś się skończyły. Nowe od północy.'),
       }),
       // A second button (the author): shorter ones, back 12 hours after
       // the last.
-      flash && start('Błyskawiczne polowanie', 'flash', flash.left === 0),
+      flash && start(t('Błyskawiczne polowanie'), 'flash', flash.left === 0),
       flash &&
         h('p', {
           class: 'muted',
           text:
             flash.left > 0
-              ? `Wyprawa jak na ${formatMinutes(flash.minutes)}, z raportem od razu. Zostało: ${flash.left} z ${flash.count}. Gdy zużyjesz wszystkie, wrócą po 12 godzinach.`
-              : `Błyskawiczne polowania się skończyły. Wrócą ${dateTimeFormat.format(new Date(flash.backAt))}.`,
+              ? t('Wyprawa jak na {time}, z raportem od razu. Zostało: {left} z {all}. Gdy zużyjesz wszystkie, wrócą po 12 godzinach.', {
+                  time: formatMinutes(flash.minutes),
+                  left: flash.left,
+                  all: flash.count,
+                })
+              : t('Błyskawiczne polowania się skończyły. Wrócą {when}.', { when: dateTimeFormat.format(new Date(flash.backAt)) }),
         }),
     );
   }
@@ -1147,11 +1189,11 @@ export function mountCombat(container, { params, navigate }) {
           setHuntOptionsOpen(open);
         },
       },
-      h('span', { class: 'hunt-options-title', text: 'Opcje wyprawy' }),
+      h('span', { class: 'hunt-options-title', text: t('Opcje wyprawy') }),
       summary,
       icon('chevron', { size: 18, className: 'hunt-options-chevron' }),
     );
-    return h('section', { class: 'hunt-options', 'aria-label': 'Opcje wyprawy' }, toggle, body);
+    return h('section', { class: 'hunt-options', 'aria-label': t('Opcje wyprawy') }, toggle, body);
   }
 
   // The potions to take along, each kind with −/+ up to one for each fight
@@ -1171,8 +1213,8 @@ export function mountCombat(container, { params, navigate }) {
       showThreat?.();
     };
     const stepper = (label, onStep) => {
-      const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': `${label}: mniej`, text: '−', onClick: () => onStep(-1) });
-      const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': `${label}: więcej`, text: '+', onClick: () => onStep(1) });
+      const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: mniej', { name: label }), text: '−', onClick: () => onStep(-1) });
+      const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('{name}: więcej', { name: label }), text: '+', onClick: () => onStep(1) });
       return { less, more };
     };
     const rows = carried.map((potion) => {
@@ -1185,7 +1227,7 @@ export function mountCombat(container, { params, navigate }) {
         changed();
       });
       const show = () => {
-        value.textContent = `${count()} z ${limit()}`;
+        value.textContent = t('{count} z {all}', { count: count(), all: limit() });
         less.disabled = count() === 0;
         more.disabled = count() >= limit();
       };
@@ -1205,7 +1247,7 @@ export function mountCombat(container, { params, navigate }) {
     // until she teaches the recipe, it has never heard of it.
     const burnCure = rows.some((row) => row.potion.cures === 'burning');
     const markValue = h('output', { class: 'potion-pick-value' });
-    const mark = stepper('Próg leczenia', (sign) => {
+    const mark = stepper(t('Próg leczenia'), (sign) => {
       const choices = use.healBelowChoices;
       below = choices[Math.max(0, Math.min(choices.length - 1, choices.indexOf(below) + sign))];
       showMark();
@@ -1219,11 +1261,17 @@ export function mountCombat(container, { params, navigate }) {
     showMark();
     const element = h(
       'section',
-      { class: 'potion-picks', 'aria-label': 'Mikstury na wyprawę' },
-      h('p', { class: 'duration-title', text: 'Mikstury na wyprawę' }),
+      { class: 'potion-picks', 'aria-label': t('Mikstury na wyprawę') },
+      h('p', { class: 'duration-title', text: t('Mikstury na wyprawę') }),
       rows.map((row) => row.element),
-      healRow && h('div', { class: 'potion-pick' }, h('span', { class: 'potion-pick-name', text: 'Lecz poniżej' }), mark.less, markValue, mark.more),
-      h('p', { class: 'muted', text: `Każdego rodzaju najwyżej jedna na walkę, a Napar z kwiatu paproci jeden na wyprawę. Postać pije sama: leczenia poniżej progu, many, gdy zabraknie jej na umiejętność, Odtrutkę, gdy ją zatrują, ${burnCure ? 'Wywar od oparzeń, gdy ją poparzy, ' : ''}a Napar, gdy padnie. Niewypite wrócą do plecaka.` }),
+      healRow && h('div', { class: 'potion-pick' }, h('span', { class: 'potion-pick-name', text: t('Lecz poniżej') }), mark.less, markValue, mark.more),
+      h('p', {
+        class: 'muted',
+        text: t(
+          'Każdego rodzaju najwyżej jedna na walkę, a Napar z kwiatu paproci jeden na wyprawę. Postać pije sama: leczenia poniżej progu, many, gdy zabraknie jej na umiejętność, Odtrutkę, gdy ją zatrują, {burn}a Napar, gdy padnie. Niewypite wrócą do plecaka.',
+          { burn: burnCure ? t('Wywar od oparzeń, gdy ją poparzy, ') : '' },
+        ),
+      }),
     );
     return {
       element,
@@ -1244,13 +1292,13 @@ export function mountCombat(container, { params, navigate }) {
   // read as part of the exploration. Hidden once HP is full.
   function restSkip(character) {
     const left = (now) => ((character.maxHp - currentHp(state.character, now)) / Math.max(1e-9, restRate(state.character))) * 60000;
-    const control = skipControl('rest', left, 'Odpoczynek');
+    const control = skipControl('rest', left, t('Odpoczynek'));
     const text = h('p', { class: 'rest-skip-text' });
     const panel = h('div', { class: 'rest-skip', 'aria-live': 'off' }, text, control.element);
     const update = (now = serverNow()) => {
       control.update(now);
       panel.hidden = control.element.hidden;
-      text.textContent = `Odpoczynek: pełne HP za ${formatMinutes(Math.max(1, Math.ceil(left(now) / 60000)))}.`;
+      text.textContent = t('Odpoczynek: pełne HP za {time}.', { time: formatMinutes(Math.max(1, Math.ceil(left(now) / 60000))) });
     };
     update();
     skipper = { element: panel, update };

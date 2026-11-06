@@ -1,12 +1,14 @@
 // A hunt report: the summary at the top, the event at its end if one came,
 // then every fight of the hunt to play back (tabs, or a swipe on the arena),
 // the finds, and the full text account on request. The report opens on its
-// key fight.
+// key fight. Its own texts are written in Polish and shown in the page's
+// language (t(), i18n.js); what the server wrote comes in it already.
 
 import { createArena } from '../arena.js';
 import { eventFigure, itemSprite, materialSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
+import { t } from '../i18n.js';
 import { playSound } from '../sound.js';
 import { activityFinished, avoidRareOn, call, hardHuntOn, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn } from '../state.js';
 import { guided, openSheet, systemPanel, withButton } from '../ui.js';
@@ -22,7 +24,9 @@ const materialsText = (materials) => materials.map((material) => (material.count
 const capitalized = (text) => text.charAt(0).toUpperCase() + text.slice(1);
 
 const RESULT_CLASS = { success: 'result--success', fainted: 'result--fainted', escaped: 'result--escaped' };
+// Shown through t(), as the page loads its English after this module.
 const FIGHT_RESULTS = { true: 'wygrana', false: 'przegrana', null: 'odwrót' };
+const fightResult = (won) => t(FIGHT_RESULTS[String(won)]);
 const SWIPE_DISTANCE = 60;
 // The failed work cracks once the hammer's blows have rung out, and a gem
 // once the grinding has.
@@ -48,7 +52,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
   const actionBox = h('div', { class: 'stack' });
   const fightBox = h('div', { class: 'fight-view' });
   // The narrator points at the tabs, or at the title of a single fight.
-  const tabList = h('div', { class: 'fight-tabs', role: 'tablist', 'aria-label': 'Walki wyprawy', 'data-guide': 'report-fights' });
+  const tabList = h('div', { class: 'fight-tabs', role: 'tablist', 'aria-label': t('Walki wyprawy'), 'data-guide': 'report-fights' });
 
   // "Powrót" leads back to the tab the report was opened from: Walka or Dziennik.
   const heading = (title, subtitle) =>
@@ -61,7 +65,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         h('h1', { class: 'page-title', tabindex: '-1', text: title }),
         subtitle && h('p', { class: 'page-subtitle', text: subtitle }),
       ),
-      h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), 'Powrót'),
+      h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), t('Powrót')),
     );
 
   // A report that comes after the player has left the screen is only kept
@@ -75,7 +79,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       reportCache.set(params.id, report);
       if (!gone) render();
     } catch (error) {
-      if (!gone) fill(container, heading('Raport'), systemPanel(error.message));
+      if (!gone) fill(container, heading(t('Raport')), systemPanel(error.message));
       return;
     }
     // Fetched after the screen was drawn (opened from the Dziennik, say):
@@ -85,7 +89,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
 
   function render() {
     if (!report) {
-      fill(container, heading('Raport z wyprawy'), h('p', { class: 'muted', text: 'Wczytywanie raportu…' }));
+      fill(container, heading(t('Raport z wyprawy')), h('p', { class: 'muted', text: t('Wczytywanie raportu…') }));
       return;
     }
     // A gathering of herbs, a brewing of potions, an order in the Warsztat,
@@ -126,17 +130,19 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       container,
       // An entry to a Wieża (towers.js): its tower and floor, no length.
       report.tower
-        ? heading(report.tower.name, `Piętro ${report.tower.floor} · ${report.areaName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)
+        ? heading(report.tower.name, t('Piętro {floor} · {area} · {date}', { floor: report.tower.floor, area: report.areaName, date: dateTimeFormat.format(new Date(report.endsAt)) }))
         : // A trial of the Sala prób (trial-hall.js): its place, no length.
           report.hall
-          ? heading('Sala prób', `${report.hall.areaName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)
+          ? heading(t('Sala prób'), `${report.hall.areaName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)
           : heading(
-            report.flash ? 'Błyskawiczne polowanie' : report.quick ? 'Szybkie Polowanie' : 'Raport z wyprawy',
+            report.flash ? t('Błyskawiczne polowanie') : report.quick ? t('Szybkie Polowanie') : t('Raport z wyprawy'),
             `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
           ),
-      report.tower && (report.tower.partners.length > 0 || report.tower.companions.length > 0) && h('p', { class: 'report-party', text: `Z postacią: ${[...report.tower.partners, ...report.tower.companions].join(', ')}.` }),
+      report.tower &&
+        (report.tower.partners.length > 0 || report.tower.companions.length > 0) &&
+        h('p', { class: 'report-party', text: t('Z postacią: {names}.', { names: [...report.tower.partners, ...report.tower.companions].join(', ') }) }),
       // An exploration of a Drużyna names those who went (parties.js).
-      report.party?.length > 1 && h('p', { class: 'report-party', text: `W drużynie: ${report.party.join(', ')}.` }),
+      report.party?.length > 1 && h('p', { class: 'report-party', text: t('W drużynie: {names}.', { names: report.party.join(', ') }) }),
       // The time the others skipped for the whole party (the author: "xxx
       // przewinął czas o xxx").
       skipLines(report.skips).map((line) => h('p', { class: 'report-party', text: line })),
@@ -147,7 +153,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         h(
           'section',
           { class: 'report-section', 'aria-labelledby': 'fights-title' },
-          h('h2', { class: 'section-title', id: 'fights-title', 'data-guide': count === 1 && 'report-fights', text: `Walki (${count})` }),
+          h('h2', { class: 'section-title', id: 'fights-title', 'data-guide': count === 1 && 'report-fights', text: t('Walki ({count})', { count }) }),
           count > 1 && tabList,
           fightBox,
         ),
@@ -176,7 +182,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
             class: `fight-tab fight-tab--${String(fight.won)}`,
             role: 'tab',
             'aria-selected': index === selected,
-            'aria-label': `Walka ${index + 1}: ${FIGHT_RESULTS[String(fight.won)]}${isKey ? ', najważniejsza' : ''}`,
+            'aria-label': isKey
+              ? t('Walka {number}: {result}, najważniejsza', { number: index + 1, result: fightResult(fight.won) })
+              : t('Walka {number}: {result}', { number: index + 1, result: fightResult(fight.won) }),
             onClick: () => select(index),
           },
           h('span', { text: index + 1 }),
@@ -207,27 +215,40 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const data = playable(report, index);
     const enemies = (fight.enemies ?? []).map((enemy) => `${enemy.name} (${enemy.level})`).join(', ');
     // Reports from before materials count the items dropped (`loot`).
-    const left = fight.materials?.length > 0 ? ` · łup: ${materialsText(fight.materials)}` : fight.loot ? ` · łup: ${fight.loot}` : '';
+    const left = fight.materials?.length > 0 ? t(' · łup: {loot}', { loot: materialsText(fight.materials) }) : fight.loot ? t(' · łup: {loot}', { loot: fight.loot }) : '';
     // An event's foes leave items, not chests.
-    const chest = fight.chests > 0 ? ` · ${fight.event ? `przedmioty: ${fight.chests}` : fight.chests === 1 ? 'skrzynia' : `skrzynie: ${fight.chests}`}` : '';
+    const chest =
+      fight.chests > 0
+        ? ` · ${fight.event ? t('przedmioty: {count}', { count: fight.chests }) : fight.chests === 1 ? t('skrzynia') : t('skrzynie: {count}', { count: fight.chests })}`
+        : '';
     const outcome =
       fight.won === true
-        ? `HP ${fight.hpBefore} → ${fight.hpAfter} · +${formatNumber(fight.xp)} XP · +${formatNumber(fight.gold)} złota${left}${chest}`
-        : `HP ${fight.hpBefore} → ${fight.hpAfter} · ${FIGHT_RESULTS[String(fight.won)]}`;
+        ? t('HP {before} → {after} · +{xp} XP · +{gold} złota{loot}{chests}', {
+            before: fight.hpBefore,
+            after: fight.hpAfter,
+            xp: formatNumber(fight.xp),
+            gold: formatNumber(fight.gold),
+            loot: left,
+            chests: chest,
+          })
+        : `HP ${fight.hpBefore} → ${fight.hpAfter} · ${fightResult(fight.won)}`;
     const header = h(
       'div',
       { class: 'fight-header' },
       h(
         'p',
         { class: 'fight-title' },
-        `Walka ${index + 1} z ${count}`,
-        report.keyFight?.index === index && h('span', { class: 'chip chip--key', text: 'najważniejsza' }),
-        fight.champion && h('span', { class: 'chip chip--champion', text: 'czempion' }),
-        fight.elite && h('span', { class: 'chip chip--elite', text: 'elita' }),
-        fight.tough && h('span', { class: 'chip chip--tough', text: 'wymagająca' }),
-        fight.event && h('span', { class: 'chip chip--event', text: 'zdarzenie' }),
+        t('Walka {number} z {count}', { number: index + 1, count }),
+        report.keyFight?.index === index && h('span', { class: 'chip chip--key', text: t('najważniejsza') }),
+        fight.champion && h('span', { class: 'chip chip--champion', text: t('czempion') }),
+        fight.elite && h('span', { class: 'chip chip--elite', text: t('elita') }),
+        fight.tough && h('span', { class: 'chip chip--tough', text: t('wymagająca') }),
+        fight.event && h('span', { class: 'chip chip--event', text: t('zdarzenie') }),
       ),
-      h('p', { class: 'fight-meta', text: `${report.tower ? `Piętro ${report.tower.floor}` : report.hall ? `${fight.index + 1}. walka` : formatOffset(fight.t)} · ${enemies}` }),
+      h('p', {
+        class: 'fight-meta',
+        text: `${report.tower ? t('Piętro {floor}', { floor: report.tower.floor }) : report.hall ? t('{number}. walka', { number: fight.index + 1 }) : formatOffset(fight.t)} · ${enemies}`,
+      }),
       h('p', { class: `fight-outcome fight-outcome--${String(fight.won)}`, text: outcome }),
     );
 
@@ -241,19 +262,19 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           class: 'button button--world button--small',
           disabled: index === 0,
           onClick: () => select(index - 1),
-          text: '‹ Poprzednia',
+          text: t('‹ Poprzednia'),
         }),
         h('button', {
           type: 'button',
           class: 'button button--world button--small',
           disabled: index === count - 1,
           onClick: () => select(index + 1),
-          text: 'Następna ›',
+          text: t('Następna ›'),
         }),
       );
 
     if (!data) {
-      fill(fightBox, header, systemPanel('Ta walka nie ma zapisu do odtworzenia: raport powstał przed tą aktualizacją gry.'), pager);
+      fill(fightBox, header, systemPanel(t('Ta walka nie ma zapisu do odtworzenia: raport powstał przed tą aktualizacją gry.')), pager);
       return;
     }
     arena = createArena(data, { autoplay: autoplay ?? (firstPlayback ? 'visible' : 'now') });
@@ -287,7 +308,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const parts = state.content.resources
       .filter((resource) => found[resource.id] > 0)
       .map((resource) => `${resource.name} +${formatNumber(found[resource.id])}`);
-    return parts.length > 0 && ['Zasoby', parts.join(' · ')];
+    return parts.length > 0 && [t('Zasoby'), parts.join(' · ')];
   }
 
   // The event at the exploration's end: who was met, the options chosen,
@@ -315,26 +336,26 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     // says so, and the rows show only the penalty, the fights and the HP.
     const lost = Boolean(summary.forfeit);
     const rows = [
-      !lost && ['XP postaci', `+${formatNumber(summary.xp)} XP`],
-      summary.penalty > 0 && ['Kara za omdlenie', `−${formatNumber(summary.penalty)} XP postaci`],
+      !lost && [t('XP postaci'), `+${formatNumber(summary.xp)} XP`],
+      summary.penalty > 0 && [t('Kara za omdlenie'), t('−{xp} XP postaci', { xp: formatNumber(summary.penalty) })],
       // Reports from before the split have no classXp: the class got the same XP.
-      !lost && ['XP klasy', `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
-      !lost && ['Złoto', `+${formatNumber(summary.gold)}`],
+      !lost && [t('XP klasy'), `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
+      !lost && [t('Złoto'), `+${formatNumber(summary.gold)}`],
       !lost && resourcesRow(summary.resources),
-      summary.materials?.length > 0 && ['Materiały', capitalized(materialsText(summary.materials))],
-      summary.timePoints > 0 && ['Punkty Czasu', `+${formatNumber(summary.timePoints)}`],
+      summary.materials?.length > 0 && [t('Materiały'), capitalized(materialsText(summary.materials))],
+      summary.timePoints > 0 && [t('Punkty Czasu'), `+${formatNumber(summary.timePoints)}`],
       // A Wieża's floor is one fight, and the tower keeps no HP (towers.js).
-      !report.tower && ['Walki', formatNumber(summary.fights)],
+      !report.tower && [t('Walki'), formatNumber(summary.fights)],
       !report.tower && ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
     ].filter(Boolean);
     const best = summary.bestFind;
     return h(
       'section',
-      { class: 'card report-summary', 'aria-label': 'Podsumowanie', 'data-guide': 'report-summary' },
+      { class: 'card report-summary', 'aria-label': t('Podsumowanie'), 'data-guide': 'report-summary' },
       h('p', { class: `result ${RESULT_CLASS[report.result] ?? ''}`, text: report.resultText }),
       lost && h('p', { class: 'report-potions', text: summary.forfeit }),
       // A Trudna wyprawa (629 A).
-      report.hard && h('p', { class: 'report-potions', text: 'Trudna wyprawa: silniejsze stwory, więcej XP i złota.' }),
+      report.hard && h('p', { class: 'report-potions', text: t('Trudna wyprawa: silniejsze stwory, więcej XP i złota.') }),
       // The potions drunk and the fights a speed potion sped up.
       (summary.potions ?? []).map((line) => h('p', { class: 'report-potions', text: line })),
       h(
@@ -345,7 +366,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           h(
             'div',
             { class: 'status-row' },
-            h('dt', { text: 'Najlepsze znalezisko' }),
+            h('dt', { text: t('Najlepsze znalezisko') }),
             h(
               'dd',
               {},
@@ -356,13 +377,13 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
                       type: 'button',
                       class: 'link-button item-name',
                       vars: { '--rarity': best.color },
-                      'aria-label': `${best.name}: pokaż przedmiot`,
+                      'aria-label': t('{name}: pokaż przedmiot', { name: best.name }),
                       onClick: () => findSheet(best),
                     },
                     itemSprite(best),
                     best.name,
                   )
-                : 'brak',
+                : t('brak'),
             ),
           ),
       ),
@@ -377,7 +398,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       itemSheet(owned.item, { equipped: owned.equipped });
       return;
     }
-    openSheet(itemDetails(item), h('p', { class: 'muted', text: 'Tego przedmiotu nie ma już w plecaku ani w ekwipunku.' }));
+    openSheet(itemDetails(item), h('p', { class: 'muted', text: t('Tego przedmiotu nie ma już w plecaku ani w ekwipunku.') }));
   }
 
   function itemsSection(report) {
@@ -390,7 +411,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         'h2',
         { class: 'section-title section-title--art', id: 'items-title' },
         report.summary.materials && materialSprite('chest'),
-        `${report.summary.materials ? 'Skrzynie skarbów' : 'Łupy i znaleziska'} (${report.items.length})`,
+        report.summary.materials ? t('Skrzynie skarbów ({count})', { count: report.items.length }) : t('Łupy i znaleziska ({count})', { count: report.items.length }),
       ),
       h(
         'ul',
@@ -404,7 +425,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
               { type: 'button', class: 'item-row', onClick: () => findSheet(item) },
               itemSummary(item),
               // Bought by the scrapper at once, because the bag was full.
-              item.sold ? h('span', { class: 'chip chip--dashed', text: 'sprzedany' }) : findMark(item),
+              item.sold ? h('span', { class: 'chip chip--dashed', text: t('sprzedany') }) : findMark(item),
               icon('chevron', { size: 18 }),
             ),
           ),
@@ -421,7 +442,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     return h(
       'section',
       { class: 'report-section', 'aria-labelledby': 'materials-title' },
-      h('h2', { class: 'section-title', id: 'materials-title', text: `Materiały (${materials.reduce((sum, material) => sum + material.count, 0)})` }),
+      h('h2', { class: 'section-title', id: 'materials-title', text: t('Materiały ({count})', { count: materials.reduce((sum, material) => sum + material.count, 0) }) }),
       h(
         'ul',
         { class: 'craft-list' },
@@ -434,7 +455,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
               'span',
               { class: 'craft-text' },
               h('span', { class: 'item-name', vars: { '--rarity': material.color }, text: `${material.name} ×${formatNumber(material.count)}` }),
-              h('span', { class: 'item-meta', text: `${material.rarityName} · daje: ${material.part} ×${formatNumber(material.count)}` }),
+              h('span', { class: 'item-meta', text: t('{rarity} · daje: {part} ×{count}', { rarity: material.rarityName, part: material.part, count: formatNumber(material.count) }) }),
             ),
           ),
         ),
@@ -443,7 +464,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         h(
           'a',
           { class: 'button button--world', href: `#/oboz/${table.id}` },
-          table.level > 0 ? `Przerób na stole: ${table.name}` : `Zbuduj w obozie: ${table.name}`,
+          table.level > 0 ? t('Przerób na stole: {name}', { name: table.name }) : t('Zbuduj w obozie: {name}', { name: table.name }),
         ),
     );
   }
@@ -465,7 +486,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       class: 'button button--world',
       'data-guide': 'report-account',
       'aria-expanded': false,
-      text: `Pełna relacja (${countOf(report.entries.length, 'wpis', 'wpisy', 'wpisów')})`,
+      text: t('Pełna relacja ({entries})', { entries: countOf(report.entries.length, 'wpis', 'wpisy', 'wpisów') }),
       onClick: () => show(list.hidden),
     });
     toggle.addEventListener('unfold', () => show(true));
@@ -481,7 +502,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       h('button', {
         type: 'button',
         class: 'button button--system',
-        text: `Wyrusz ponownie: ${report.areaName ?? report.regionName}, ${formatMinutes(report.minutes)}`,
+        text: t('Wyrusz ponownie: {area}, {time}', { area: report.areaName ?? report.regionName, time: formatMinutes(report.minutes) }),
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
             await call('POST', '/api/hunts', {
@@ -500,16 +521,16 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const scrap =
       idle &&
       character.bag.length > 0 &&
-      h('button', { type: 'button', class: 'button button--world', onClick: scrapperSheet, text: 'Sprzedaj zbędne przedmioty u złomiarza' });
+      h('button', { type: 'button', class: 'button button--world', onClick: scrapperSheet, text: t('Sprzedaj zbędne przedmioty u złomiarza') });
     fill(
       actionBox,
-      report.tower && h('a', { class: 'button button--system', href: '#/wieze', text: 'Wróć do Wież' }),
-      report.hall && h('a', { class: 'button button--system', href: '#/osada/trial-hall', text: 'Wróć do Sali prób' }),
+      report.tower && h('a', { class: 'button button--system', href: '#/wieze', text: t('Wróć do Wież') }),
+      report.hall && h('a', { class: 'button button--system', href: '#/osada/trial-hall', text: t('Wróć do Sali prób') }),
       again,
       scrap,
-      waiting && h('a', { class: 'button button--system', href: '#/walka', text: 'Kolejny raport czeka na odbiór' }),
-      h('a', { class: 'button button--world', href: '#/postac', text: 'Postać i plecak' }),
-      h('a', { class: 'button button--world', href: '#/dziennik', text: 'Dziennik' }),
+      waiting && h('a', { class: 'button button--system', href: '#/walka', text: t('Kolejny raport czeka na odbiór') }),
+      h('a', { class: 'button button--world', href: '#/postac', text: t('Postać i plecak') }),
+      h('a', { class: 'button button--world', href: '#/dziennik', text: t('Dziennik') }),
     );
   }
 
