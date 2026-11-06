@@ -11,40 +11,45 @@
 import { placeArt } from '../art.js';
 import { fill, h } from '../dom.js';
 import { chooseEvolution, evolutionCard } from '../evolution.js';
+import { t } from '../i18n.js';
 import { buildLocked, buildLockedText, isUnlocked, state, unlockInfo } from '../state.js';
 import { systemPanel } from '../ui.js';
 
 export function mountEvolution(container) {
   function render() {
     const character = state.character;
-    const t = state.content.evolutionTexts;
+    const words = state.content.evolutionTexts;
     // The heading over the tab's place, a spring with a ceremonial table
     // (the author: "jakiegoś źródła wody ze stołem ceremonialnym").
     const art = placeArt(state.content.evolutionPlace);
-    const heading = h('div', { class: `page-heading${art ? ' evolution-heading' : ''}` }, h('h1', { class: 'page-title', tabindex: '-1', text: t.title }));
+    const heading = h('div', { class: `page-heading${art ? ' evolution-heading' : ''}` }, h('h1', { class: 'page-title', tabindex: '-1', text: words.title }));
     if (art) heading.style.setProperty('--place-art', `url("${art}")`);
     const unlock = unlockInfo('evolution');
     // Where the deployment has the evolutions off there is no tab, and the
     // address alone leads here.
     if (!unlock) {
-      fill(container, heading, systemPanel('Ewolucja klasy: wkrótce.'));
+      fill(container, heading, systemPanel(t('Ewolucja klasy: wkrótce.')));
       return;
     }
     if (!isUnlocked('evolution')) {
-      fill(container, heading, systemPanel(`Dostęp zablokowany. ${unlock.name}: od poziomu klasy ${unlock.classLevel}. Twój poziom klasy: ${character.classLevel}.`));
+      fill(
+        container,
+        heading,
+        systemPanel(t('Dostęp zablokowany. {name}: od poziomu klasy {level}. Twój poziom klasy: {own}.', { name: unlock.name, level: unlock.classLevel, own: character.classLevel })),
+      );
       return;
     }
     const { current, choices, next, nextLevel } = character.evolution ?? { current: null, choices: [] };
-    const toSkills = h('a', { class: 'button button--system', href: '#/postac/umiejetnosci', text: t.toSkills });
+    const toSkills = h('a', { class: 'button button--system', href: '#/postac/umiejetnosci', text: words.toSkills });
     // Only an exploration counts its fights with the evolution (hunts.js),
     // and a mercenary goes as it is (mercenaries.js).
     const busy = buildLocked(character);
-    const busyText = character.activity?.kind === 'mercenary' ? buildLockedText(character, 'Ewolucję wybierzesz') : t.busy;
-    const base = current && h('p', { class: 'muted evolution-base', text: t.baseClass.replace('{className}', character.baseClassName) });
+    const busyText = character.activity?.kind === 'mercenary' ? buildLockedText(character, t('Ewolucję wybierzesz')) : words.busy;
+    const base = current && h('p', { class: 'muted evolution-base', text: words.baseClass.replace('{className}', character.baseClassName) });
     if (next) {
       // The one form the evolution grows into, to take (the author's
       // words, with "mogła" for a woman); no narrator here (385 B).
-      const said = character.appearance === 'female' ? t.nextIntroFemale : t.nextIntro;
+      const said = character.appearance === 'female' ? words.nextIntroFemale : words.nextIntro;
       fill(
         container,
         heading,
@@ -65,19 +70,19 @@ export function mountEvolution(container) {
         container,
         heading,
         base,
-        points && h('div', { class: 'evolution-spend' }, systemPanel(waiting ? t.nextNotReady : t.spend), toSkills),
-        nextLevel && !waiting && systemPanel(t.nextWaiting.replace('{level}', String(nextLevel))),
+        points && h('div', { class: 'evolution-spend' }, systemPanel(waiting ? words.nextNotReady : words.spend), toSkills),
+        nextLevel && !waiting && systemPanel(words.nextWaiting.replace('{level}', String(nextLevel))),
         evolutionCard(current),
       );
       return;
     }
     if (choices.length === 0) {
       // The paths are not ready yet: the second one, or the points.
-      fill(container, heading, systemPanel(t.notReady), toSkills);
+      fill(container, heading, systemPanel(words.notReady), toSkills);
       return;
     }
     // The author's words, with "mogła" for a woman.
-    const said = character.appearance === 'female' ? t.introFemale : t.intro;
+    const said = character.appearance === 'female' ? words.introFemale : words.intro;
     const intro = systemPanel(said.replace('{level}', String(character.skills.evolution.level)));
     // Where the narrator's Ewolucja chapter points (narrator.js): the cards
     // below are too tall to be lit whole.

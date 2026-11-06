@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/item-bases.json, by the base's id (src/engine/overlay.js): the bases up to class level 25, with the attack of a weapon.",
+  "$comment": "English texts of data/item-bases.json, by the base's id (src/engine/overlay.js): every base, Tiers I–VI, with the attack of a weapon.",
   "sword": {
     "name": "Sword",
     "attackName": "Slash"
@@ -10,6 +10,18 @@
   },
   "saber": {
     "name": "Sabre",
+    "attackName": "Slash"
+  },
+  "estoc": {
+    "name": "Estoc",
+    "attackName": "Slash"
+  },
+  "karabela": {
+    "name": "Karabela",
+    "attackName": "Slash"
+  },
+  "flamberge": {
+    "name": "Flamberge",
     "attackName": "Slash"
   },
   "axe": {
@@ -24,6 +36,18 @@
     "name": "Bearded Axe",
     "attackName": "Chop"
   },
+  "berdiche": {
+    "name": "Bardiche",
+    "attackName": "Chop"
+  },
+  "halberd": {
+    "name": "Halberd",
+    "attackName": "Chop"
+  },
+  "double-axe": {
+    "name": "Double Axe",
+    "attackName": "Chop"
+  },
   "dagger": {
     "name": "Dagger",
     "attackName": "Stab"
@@ -34,6 +58,18 @@
   },
   "kindjal": {
     "name": "Kindjal",
+    "attackName": "Stab"
+  },
+  "yataghan": {
+    "name": "Yataghan",
+    "attackName": "Stab"
+  },
+  "kris": {
+    "name": "Kris",
+    "attackName": "Stab"
+  },
+  "cinquedea": {
+    "name": "Cinquedea",
     "attackName": "Stab"
   },
   "bow": {
@@ -48,6 +84,18 @@
     "name": "Longbow",
     "attackName": "Shot"
   },
+  "horn-bow": {
+    "name": "Horn Bow",
+    "attackName": "Shot"
+  },
+  "tatar-bow": {
+    "name": "Tatar Bow",
+    "attackName": "Shot"
+  },
+  "scythian-bow": {
+    "name": "Scythian Bow",
+    "attackName": "Shot"
+  },
   "staff": {
     "name": "Staff",
     "attackName": "Elemental Bolt"
@@ -58,6 +106,18 @@
   },
   "posokh": {
     "name": "Posokh",
+    "attackName": "Elemental Bolt"
+  },
+  "star-staff": {
+    "name": "Star Staff",
+    "attackName": "Elemental Bolt"
+  },
+  "scepter": {
+    "name": "Sceptre",
+    "attackName": "Elemental Bolt"
+  },
+  "caduceus": {
+    "name": "Caduceus",
     "attackName": "Elemental Bolt"
   },
   "aspergillum": {
@@ -72,6 +132,18 @@
     "name": "Rosary",
     "attackName": "Sacred Bolt"
   },
+  "crozier": {
+    "name": "Crozier",
+    "attackName": "Sacred Bolt"
+  },
+  "monstrance": {
+    "name": "Monstrance",
+    "attackName": "Sacred Bolt"
+  },
+  "processional-cross": {
+    "name": "Processional Cross",
+    "attackName": "Sacred Bolt"
+  },
   "shield": {
     "name": "Shield"
   },
@@ -80,6 +152,15 @@
   },
   "kalkan": {
     "name": "Kalkan"
+  },
+  "heraldic-shield": {
+    "name": "Heraldic Shield"
+  },
+  "hussar-shield": {
+    "name": "Hussar Shield"
+  },
+  "jousting-shield": {
+    "name": "Jousting Shield"
   },
   "quiver": {
     "name": "Quiver"
@@ -90,6 +171,15 @@
   "war-quiver": {
     "name": "War Quiver"
   },
+  "falcon-quiver": {
+    "name": "Falcon Quiver"
+  },
+  "hunting-quiver": {
+    "name": "Hunting Quiver"
+  },
+  "parade-quiver": {
+    "name": "Parade Quiver"
+  },
   "misericorde": {
     "name": "Misericorde"
   },
@@ -98,6 +188,15 @@
   },
   "parrying-dagger": {
     "name": "Parrying Dagger"
+  },
+  "poniard": {
+    "name": "Poniard"
+  },
+  "stiletto": {
+    "name": "Stiletto"
+  },
+  "swordbreaker": {
+    "name": "Swordbreaker"
   },
   "focus": {
     "name": "Focus"
@@ -108,6 +207,15 @@
   "quartz-crystal": {
     "name": "Crystal"
   },
+  "grimoire": {
+    "name": "Grimoire"
+  },
+  "crystal-ball": {
+    "name": "Crystal Ball"
+  },
+  "astrolabe": {
+    "name": "Astrolabe"
+  },
   "hood": {
     "name": "Hood"
   },
@@ -116,6 +224,15 @@
   },
   "hat": {
     "name": "Hat"
+  },
+  "mask": {
+    "name": "Mask"
+  },
+  "turban": {
+    "name": "Turban"
+  },
+  "diadem": {
+    "name": "Diadem"
   },
   "helmet": {
     "name": "Helmet"
@@ -126,6 +243,15 @@
   "kettle-hat": {
     "name": "Kettle Hat"
   },
+  "visored-helmet": {
+    "name": "Visored Helmet"
+  },
+  "hussar-helmet": {
+    "name": "Hussar Helmet"
+  },
+  "great-helm": {
+    "name": "Great Helm"
+  },
   "tunic": {
     "name": "Tunic"
   },
@@ -134,6 +260,15 @@
   },
   "caftan": {
     "name": "Kaftan"
+  },
+  "buff-coat": {
+    "name": "Buff Coat"
+  },
+  "zupan": {
+    "name": "Zhupan"
+  },
+  "kontusz": {
+    "name": "Kontusz"
   },
   "chainmail": {
     "name": "Chainmail"
@@ -144,6 +279,15 @@
   "cuirass": {
     "name": "Cuirass"
   },
+  "scale-armor": {
+    "name": "Scale Armour"
+  },
+  "hussar-armor": {
+    "name": "Hussar Armour"
+  },
+  "gothic-armor": {
+    "name": "Gothic Armour"
+  },
   "robe": {
     "name": "Robe"
   },
@@ -152,6 +296,15 @@
   },
   "rune-cloak": {
     "name": "Rune Cloak"
+  },
+  "star-robe": {
+    "name": "Star Robe"
+  },
+  "delia": {
+    "name": "Delia"
+  },
+  "ferezja": {
+    "name": "Ferezja"
   },
   "cowl": {
     "name": "Cowl"
@@ -162,6 +315,15 @@
   "monk-hood": {
     "name": "Monk's Hood"
   },
+  "mitre": {
+    "name": "Mitre"
+  },
+  "crown-of-faith": {
+    "name": "Crown of Faith"
+  },
+  "halo": {
+    "name": "Halo"
+  },
   "surplice": {
     "name": "Surplice"
   },
@@ -170,6 +332,15 @@
   },
   "dalmatic": {
     "name": "Dalmatic"
+  },
+  "cope": {
+    "name": "Cope"
+  },
+  "alb": {
+    "name": "Alb"
+  },
+  "cassock": {
+    "name": "Cassock"
   },
   "gloves": {
     "name": "Gloves"
@@ -180,6 +351,15 @@
   "vambraces": {
     "name": "Vambraces"
   },
+  "gauntlets": {
+    "name": "Gauntlets"
+  },
+  "knight-gloves": {
+    "name": "Knight's Gloves"
+  },
+  "falconry-gloves": {
+    "name": "Falconry Gloves"
+  },
   "boots": {
     "name": "Boots"
   },
@@ -188,6 +368,15 @@
   },
   "laced-shoes": {
     "name": "Laced Shoes"
+  },
+  "greaves": {
+    "name": "Greaves"
+  },
+  "riding-boots": {
+    "name": "Riding Boots"
+  },
+  "sabatons": {
+    "name": "Sabatons"
   },
   "amulet": {
     "name": "Amulet"
@@ -198,6 +387,15 @@
   "pendant": {
     "name": "Pendant"
   },
+  "medallion": {
+    "name": "Medallion"
+  },
+  "necklace": {
+    "name": "Necklace"
+  },
+  "cameo": {
+    "name": "Cameo"
+  },
   "ring": {
     "name": "Ring"
   },
@@ -207,6 +405,15 @@
   "band-ring": {
     "name": "Band Ring"
   },
+  "family-ring": {
+    "name": "Heirloom Ring"
+  },
+  "crown-ring": {
+    "name": "Crown Ring"
+  },
+  "eternity-ring": {
+    "name": "Eternity Ring"
+  },
   "talisman": {
     "name": "Talisman"
   },
@@ -215,5 +422,14 @@
   },
   "fang-charm": {
     "name": "Fang Charm"
+  },
+  "amber-charm": {
+    "name": "Amber Charm"
+  },
+  "aurochs-horn": {
+    "name": "Aurochs Horn"
+  },
+  "lunula": {
+    "name": "Lunula"
   }
 }
