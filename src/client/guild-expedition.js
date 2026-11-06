@@ -12,7 +12,8 @@
 // added minutes this week), its fight played back in the arena as an
 // attack on the Bestia; and the "Wkład tygodnia", who added how many
 // minutes. The tab asks for the Wyprawa itself and takes its words from the
-// answer (data/guilds.json, expedition.texts). mountGuildExpedition
+// answer (data/guilds.json, expedition.texts), in the page's language; its
+// own few words go through t() (i18n.js). mountGuildExpedition
 // (container) adds the cards to the container and gives { unmount() },
 // which takes them away.
 
@@ -22,6 +23,7 @@ import { checkGuildTodo } from './chat-news.js';
 import { materialIcon, materialSheet, materialTitle } from './craft-table.js';
 import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber } from './format.js';
+import { language, t } from './i18n.js';
 import { call, state } from './state.js';
 import { foldPart, howItWorks, openSheet, toast, withButton } from './ui.js';
 import { itemSheet } from './screens/character.js';
@@ -36,17 +38,19 @@ const STOPS_Y = [74, 42, 70, 28, 62, 26, 50];
 const stopX = (index, count) => (count > 1 ? 8 + (index * 83) / (count - 1) : 50);
 const stopY = (index) => STOPS_Y[index % STOPS_Y.length];
 
-// "26.10–1.11": a week from the date of its Monday, its key.
+// "26.10–1.11" ("26/10–1/11" in English): a week from the date of its
+// Monday, its key.
 function weekLabel(key) {
   const monday = new Date(`${key}T12:00:00Z`);
   const sunday = new Date(monday.getTime() + 6 * 86400000);
-  const day = (date) => `${date.getUTCDate()}.${date.getUTCMonth() + 1}`;
+  const separator = language() === 'en' ? '/' : '.';
+  const day = (date) => `${date.getUTCDate()}${separator}${date.getUTCMonth() + 1}`;
   return `${day(monday)}–${day(sunday)}`;
 }
 
-// The last day a chest opens: the day before the midnight it waits until.
-const dayFormat = new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'numeric' });
-const lastDay = (until) => dayFormat.format(new Date(until - 1));
+// The last day a chest opens: the day before the midnight it waits until,
+// as the page's language writes a day.
+const lastDay = (until) => new Intl.DateTimeFormat(language() === 'en' ? 'en-GB' : 'pl-PL', { day: 'numeric', month: 'numeric' }).format(new Date(until - 1));
 
 // A bar of `value` of `max`, as the Próby's and the Bestia's, read aloud
 // by `name` (else its label).
@@ -81,7 +85,7 @@ export function mountGuildExpedition(container) {
   let last = null;
   let opened = null;
   let gone = false;
-  const body = h('div', { class: 'guild-expedition' }, h('section', { class: 'card' }, h('p', { class: 'muted', text: 'Wczytywanie…' })));
+  const body = h('div', { class: 'guild-expedition' }, h('section', { class: 'card' }, h('p', { class: 'muted', text: t('Wczytywanie…') })));
   container.append(body);
 
   function show(next) {
@@ -391,7 +395,7 @@ export function mountGuildExpedition(container) {
   call('GET', '/api/guild/expedition')
     .then(show)
     .catch((error) => {
-      if (!gone) fill(body, h('section', { class: 'card' }, h('p', { class: 'muted', text: error.message ?? 'Nie udało się wczytać Wyprawy Gildii.' })));
+      if (!gone) fill(body, h('section', { class: 'card' }, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Wyprawy Gildii.') })));
     });
 
   return {

@@ -9,7 +9,8 @@
 // exploration, or its report waits, the towers wait for it (towers.js). The
 // floor picked is remembered on this device. Over each card its tower,
 // huge and grim (data/towers.json, place; the author: "ogromne budzące
-// grozę Wieże").
+// grozę Wieże"). The words are shown in the page's language (t(),
+// i18n.js); English counts the floors without ordinals ("Every 25 floors").
 
 import { areaArt } from '../area-art.js';
 import { placeArt } from '../art.js';
@@ -70,7 +71,7 @@ export function mountTowers(container, { navigate }) {
   let gone = false;
   const picks = loadPicks();
 
-  const heading = () => [h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Walka' })), combatModes('towers', navigate)];
+  const heading = () => [h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Walka') })), combatModes('towers', navigate)];
 
   function show(message) {
     if (gone) return;
@@ -84,13 +85,16 @@ export function mountTowers(container, { navigate }) {
       h(
         'section',
         { class: 'card towers-intro' },
-        h('p', { class: 'towers-entries', 'data-guide': 'towers-entries', text: `Wejścia na dziś: ${view.left} z ${view.perDay}. Nowe od północy.` }),
+        h('p', { class: 'towers-entries', 'data-guide': 'towers-entries', text: t('Wejścia na dziś: {left} z {perDay}. Nowe od północy.', { left: view.left, perDay: view.perDay }) }),
         howItWorks(
-          'Wejście to jedna walka na wybranym piętrze, z wynikiem od razu.',
-          `Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. ${eliteText()} Na zwykłych piętrach czasem czeka elita. Co ${view.championEvery}. piętro czeka czempion, a co ${view.chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.`,
+          t('Wejście to jedna walka na wybranym piętrze, z wynikiem od razu.'),
+          t(
+            'Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. {elites} Na zwykłych piętrach czasem czeka elita. Co {championEvery}. piętro czeka czempion, a co {chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.',
+            { elites: eliteText(), championEvery: view.championEvery, chestEvery: view.chestEvery },
+          ),
         ),
       ),
-      exploring() && systemPanel(exploring(), activityFinished(state.character.activity) && systemLink('#/walka', 'Odbierz raport')),
+      exploring() && systemPanel(exploring(), activityFinished(state.character.activity) && systemLink('#/walka', t('Odbierz raport'))),
       view.towers.map(towerCard),
     );
   }
@@ -101,8 +105,8 @@ export function mountTowers(container, { navigate }) {
     const activity = state.character.activity;
     if (activity?.kind !== 'hunt') return null;
     return activityFinished(activity)
-      ? 'Wyprawa się skończyła. Odbierz raport w Walce, a potem wejdź do Wieży.'
-      : 'Postać jest na wyprawie. Wieże poczekają na jej powrót, bo raport z wyprawy liczy się z postacią taką, jaka jest na jej końcu.';
+      ? t('Wyprawa się skończyła. Odbierz raport w Walce, a potem wejdź do Wieży.')
+      : t('Postać jest na wyprawie. Wieże poczekają na jej powrót, bo raport z wyprawy liczy się z postacią taką, jaka jest na jej końcu.');
   }
 
   // The floor a tower's card starts at: the one picked before, else the
@@ -117,10 +121,12 @@ export function mountTowers(container, { navigate }) {
   // The intro's words on those elites, with the floors of their first laps.
   function eliteText() {
     const every = view.eliteLapEvery ?? 1;
-    if (every <= 1) return `Co ${view.eliteEvery}. piętro czeka elita.`;
+    if (every <= 1) return t('Co {every}. piętro czeka elita.', { every: view.eliteEvery });
     const lap = view.cycle.length;
     const floors = [0, 1, 2].map((index) => `${index * every * lap + 1}–${index * every * lap + lap}`).join(', ');
-    return `Co ${view.eliteEvery}. piętro czeka elita, ale tylko w co ${every === 2 ? 'drugim' : `${every}.`} okrążeniu regionów: na piętrach ${floors} i tak dalej.`;
+    return every === 2
+      ? t('Co {every}. piętro czeka elita, ale tylko w co drugim okrążeniu regionów: na piętrach {floors} i tak dalej.', { every: view.eliteEvery, floors })
+      : t('Co {every}. piętro czeka elita, ale tylko w co {laps}. okrążeniu regionów: na piętrach {floors} i tak dalej.', { every: view.eliteEvery, laps: every, floors });
   }
 
   function towerCard(tower) {
@@ -134,7 +140,7 @@ export function mountTowers(container, { navigate }) {
       max: String(tower.top),
       value: String(floor),
       class: 'tower-slider',
-      'aria-label': `${tower.name}: piętro`,
+      'aria-label': t('{name}: piętro', { name: tower.name }),
       onInput: () => pick(Number(slider.value)),
     });
     const step = (by, label, text) => h('button', { type: 'button', class: 'button button--world button--small', 'aria-label': label, text, onClick: () => pick(floor + by) });
@@ -163,8 +169,8 @@ export function mountTowers(container, { navigate }) {
       // A champion leaves its trophy only at the first win of its floor (483 A).
       const trophy = !(tower.champions ?? []).includes(floor);
       const waits = [
-        champion && place.champion ? (trophy ? 'czempion i jego trofeum' : 'czempion') : (champion || elite) && place.elite ? 'elita' : null,
-        chest && 'skrzynia Wieży',
+        champion && place.champion ? (trophy ? t('czempion i jego trofeum') : t('czempion')) : (champion || elite) && place.elite ? t('elita') : null,
+        chest && t('skrzynia Wieży'),
       ].filter(Boolean);
       fill(
         details,
@@ -172,12 +178,12 @@ export function mountTowers(container, { navigate }) {
         h(
           'div',
           { class: 'tower-floor-text' },
-          h('p', { class: 'tower-floor-title', text: `Piętro ${floor} · poz. ${floor}` }),
+          h('p', { class: 'tower-floor-title', text: t('Piętro {floor} · poz. {level}', { floor, level: floor }) }),
           h('p', { text: `${place.name} (${place.regionName})` }),
-          waits.length > 0 && h('p', { class: 'tower-waits', text: `Czeka: ${waits.join(', ')}.` }),
+          waits.length > 0 && h('p', { class: 'tower-waits', text: t('Czeka: {gifts}.', { gifts: waits.join(', ') }) }),
         ),
       );
-      enter.textContent = `Wejdź na piętro ${floor}`;
+      enter.textContent = t('Wejdź na piętro {floor}', { floor });
     }
     pick(floor);
 
@@ -187,33 +193,35 @@ export function mountTowers(container, { navigate }) {
     const climbers =
       tower.missing ??
       (tower.partners.length > 0 || tower.companions.length > 0
-        ? `Z Tobą: ${[...tower.partners.map((partner) => `${partner.name} (poz. ${partner.level})`), ...tower.companions].join(', ')}. Najwyższe piętro to poziom najniższej postaci gracza.`
+        ? t('Z Tobą: {climbers}. Najwyższe piętro to poziom najniższej postaci gracza.', {
+            climbers: [...tower.partners.map((partner) => t('{name} (poz. {level})', { name: partner.name, level: partner.level })), ...tower.companions].join(', '),
+          })
         : null);
     return h(
       'section',
       { class: 'card tower-card', 'data-guide': `tower-${tower.id}`, 'aria-label': tower.name },
       head,
-      h('p', { class: 'muted', text: `Otwarte piętra: 1–${formatNumber(tower.top)}. Najwyżej zdobyte: ${tower.best > 0 ? `piętro ${formatNumber(tower.best)}` : 'jeszcze żadne'}.` }),
+      h('p', { class: 'muted', text: t('Otwarte piętra: 1–{top}. Najwyżej zdobyte: {best}.', { top: formatNumber(tower.top), best: tower.best > 0 ? t('piętro {floor}', { floor: formatNumber(tower.best) }) : t('jeszcze żadne') }) }),
       climbers && h('p', { class: tower.missing ? 'tower-missing' : 'muted', text: climbers }),
       details,
-      h('div', { class: 'tower-picker' }, step(-10, 'Dziesięć pięter niżej', '−10'), step(-1, 'Piętro niżej', '−'), slider, step(1, 'Piętro wyżej', '+'), step(10, 'Dziesięć pięter wyżej', '+10')),
+      h('div', { class: 'tower-picker' }, step(-10, t('Dziesięć pięter niżej'), '−10'), step(-1, t('Piętro niżej'), '−'), slider, step(1, t('Piętro wyżej'), '+'), step(10, t('Dziesięć pięter wyżej'), '+10')),
       enter,
     );
   }
 
   if (!isUnlocked('towers')) {
     const unlock = unlockInfo('towers');
-    show(`Wieże odblokujesz na poziomie postaci ${unlock.level}. Twój poziom: ${state.character.level}.`);
+    show(t('Wieże odblokujesz na poziomie postaci {level}. Twój poziom: {own}.', { level: unlock.level, own: state.character.level }));
     return { unmount() {} };
   }
 
-  fill(container, ...heading(), h('p', { class: 'muted', text: 'Wczytywanie…' }));
+  fill(container, ...heading(), h('p', { class: 'muted', text: t('Wczytywanie…') }));
   call('GET', '/api/towers')
     .then(({ towers }) => {
       view = towers;
       show();
     })
-    .catch((error) => show(error.message ?? 'Nie udało się wczytać Wież.'));
+    .catch((error) => show(error.message ?? t('Nie udało się wczytać Wież.')));
 
   return {
     // The character changed (an exploration began or its report was

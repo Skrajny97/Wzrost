@@ -8,7 +8,8 @@
 // sheet asks for the goods named there, or for one material of a rarity,
 // or, from the card, for anything the character knows. The card and the
 // sheet ask for the Prośby themselves and take their words from the answer
-// (data/guilds.json, requests.texts). mountGuildRequests(container) adds
+// (data/guilds.json, requests.texts), in the page's language; their own few
+// words go through t() (i18n.js). mountGuildRequests(container) adds
 // the card to the container and gives { unmount() }, which takes it away.
 
 import { herbSprite, mineralSprite, potionSprite } from './art.js';
@@ -16,6 +17,7 @@ import { checkGuildTodo } from './chat-news.js';
 import { materialIcon } from './craft-table.js';
 import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber, plural } from './format.js';
+import { language, t } from './i18n.js';
 import { CLASS_ICONS } from './icons.js';
 import { openProfile } from './profile.js';
 import { call, state } from './state.js';
@@ -47,9 +49,10 @@ function goodsLine(goods, extra = null) {
 }
 
 // A material at a rarity, as the server names it: "Skóra wilka", "Rzadka
-// skóra wilka" (materialView in the engine).
+// skóra wilka"; in English with the name's capitals, "Rare Wolf Pelt"
+// (materialView and nameInText in the engine).
 function materialAt(material, rarityId) {
-  const name = material.name.toLowerCase();
+  const name = language() === 'en' ? material.name : material.name.toLowerCase();
   const label = rarityId === material.rarity ? name : `${rarityOf(rarityId).forms[material.gender]} ${name}`;
   return { kind: 'material', key: `${material.id}:${rarityId}`, name: label.charAt(0).toUpperCase() + label.slice(1), rarity: rarityId, materialId: material.id };
 }
@@ -109,7 +112,7 @@ export function askGuildButton(ask) {
 // The sheet of a request: the goods and how many, or why the character
 // cannot ask now. `onAsked` gets the answer.
 export function openAskSheet(ask = {}, onAsked = null) {
-  const body = h('div', { class: 'guild-ask-sheet' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
+  const body = h('div', { class: 'guild-ask-sheet' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   openSheet(h('h2', { class: 'sheet-title', text: state.content.guildAsk }), body);
   call('GET', '/api/guild/requests')
     .then((view) => {
@@ -234,14 +237,14 @@ function fillAskSheet(body, view, ask, onAsked) {
     h('p', { class: 'field-label', text: texts.goods }),
     goods,
     h('div', { class: 'trade-field' }, h('label', { for: 'guild-ask-count', class: 'trade-field-label', text: `${texts.count} (1–${rules.most})` }), count),
-    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }), send),
+    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), send),
   );
 }
 
 export function mountGuildRequests(container) {
   let view = null;
   let gone = false;
-  const card = h('section', { class: 'card guild-requests', 'aria-labelledby': 'guild-requests-title' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
+  const card = h('section', { class: 'card guild-requests', 'aria-labelledby': 'guild-requests-title' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   container.append(card);
 
   function show(next) {
@@ -267,7 +270,7 @@ export function mountGuildRequests(container) {
       { class: 'guild-who' },
       icon(CLASS_ICONS[person.classId] ?? 'person', { size: 16, className: 'chat-class' }),
       person.name
-        ? h('button', { type: 'button', class: 'chat-name', text: person.name, 'aria-label': `${person.name}: zobacz postać`, onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)) })
+        ? h('button', { type: 'button', class: 'chat-name', text: person.name, 'aria-label': t('{name}: zobacz postać', { name: person.name }), onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name)) })
         : h('span', { class: 'muted', text: '?' }),
     );
 
@@ -406,7 +409,7 @@ export function mountGuildRequests(container) {
   call('GET', '/api/guild/requests')
     .then(show)
     .catch((error) => {
-      if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? 'Nie udało się wczytać Próśb Gildii.' }));
+      if (!gone) fill(card, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Próśb Gildii.') }));
     });
 
   return {

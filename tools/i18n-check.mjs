@@ -241,6 +241,9 @@ function technical(text) {
   // A cookie, a query or a media query.
   if (/\w=\S|^\(|;\s*\w+=/.test(text) && !PL.test(text)) return true;
   if (/^[.#[:(][\w-]/.test(text) && !/\s[a-ząćęłńóśźż]{3,}\s/.test(text)) return true;
+  // SVG path data ("M12 3l7 3v5…z", icons.js, class-art.js), whose "z" is
+  // no Polish word.
+  if (/^[Mm]\s*(-?[\d.]|\{)/.test(text) && /^[\d\s.,{}MmLlHhVvCcSsQqTtAaZz-]+$/.test(text)) return true;
   return false;
 }
 

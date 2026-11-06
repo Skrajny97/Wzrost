@@ -3,11 +3,13 @@
 // and store and the Zbrojownia's gear sets; and the camp's transformation in
 // the Kamień węgielny's window. The Sala trofeów and the Kapliczka work by
 // themselves, so their screens only say what they give; the Strażnica's
-// chances show before an exploration (screens/combat.js).
+// chances show before an exploration (screens/combat.js). The words are shown
+// in the page's language (t(), i18n.js).
 
 import { herbSprite, resourceArt } from './art.js';
 import { h, icon } from './dom.js';
 import { countOf, dateTimeFormat, formatCountdown, formatHours, formatMinutes, formatNumber } from './format.js';
+import { t } from './i18n.js';
 import { playSound } from './sound.js';
 import { call, costShortfall, walletEntries } from './state.js';
 import { confirmAction, toast, withButton } from './ui.js';
@@ -26,35 +28,35 @@ export function trainingSection(training, ticks) {
   const current = training.current;
   if (!current) {
     return part(
-      'Trening',
-      h('p', { class: 'muted', text: `Klon postaci trenuje ${formatHours(training.hours)} za Ciebie, także w czasie wyprawy, i daje ${formatNumber(training.xp)} XP klasy.` }),
+      t('Trening'),
+      h('p', { class: 'muted', text: t('Klon postaci trenuje {time} za Ciebie, także w czasie wyprawy, i daje {xp} XP klasy.', { time: formatHours(training.hours), xp: formatNumber(training.xp) }) }),
       training.canStart
-        ? h('button', { type: 'button', class: 'button button--system', text: 'Trenuj', onClick: tapped(startTraining) })
-        : h('p', { class: 'store-hint', text: 'Dzisiejszy trening już był. Następny po północy.' }),
+        ? h('button', { type: 'button', class: 'button button--system', text: t('Trenuj'), onClick: tapped(startTraining) })
+        : h('p', { class: 'store-hint', text: t('Dzisiejszy trening już był. Następny po północy.') }),
     );
   }
   const countdown = h('p', { class: 'store-hint', 'aria-live': 'off' });
   const fill = h('div', { class: 'bar-fill bar-fill--system' });
-  const claim = h('button', { type: 'button', class: 'button button--system', text: 'Odbierz trening', onClick: tapped(claimTraining) });
+  const claim = h('button', { type: 'button', class: 'button button--system', text: t('Odbierz trening'), onClick: tapped(claimTraining) });
   ticks.push((now) => {
     const left = current.endsAt - now;
-    countdown.textContent = left > 0 ? `Do końca treningu: ${formatCountdown(left)}` : 'Trening skończony.';
+    countdown.textContent = left > 0 ? t('Do końca treningu: {time}', { time: formatCountdown(left) }) : t('Trening skończony.');
     fill.style.width = `${Math.min(100, Math.max(0, ((now - current.startedAt) / (current.endsAt - current.startedAt)) * 100))}%`;
     claim.disabled = left > 0;
   });
-  return part('Trening', h('p', { class: 'muted', text: `Za ten trening: ${formatNumber(current.xp)} XP klasy.` }), h('div', { class: 'bar' }, fill), countdown, claim);
+  return part(t('Trening'), h('p', { class: 'muted', text: t('Za ten trening: {xp} XP klasy.', { xp: formatNumber(current.xp) }) }), h('div', { class: 'bar' }, fill), countdown, claim);
 }
 
 async function startTraining() {
   await call('POST', '/api/fortress/training');
   playSound('build');
-  toast('Klon postaci zaczął trening.');
+  toast(t('Klon postaci zaczął trening.'));
 }
 
 async function claimTraining() {
   const { trained } = await call('POST', '/api/fortress/training/claim');
   playSound('collect');
-  toast([`Trening dał ${formatNumber(trained.xp)} XP klasy.`, ...trained.messages].join(' '));
+  toast([t('Trening dał {xp} XP klasy.', { xp: formatNumber(trained.xp) }), ...trained.messages].join(' '));
 }
 
 // The Ołtarz Systemu (424 A, 425 A): once a day one of its three blessings
@@ -63,25 +65,25 @@ export function blessingSection(blessing) {
   const current = blessing.current;
   const named = (kind) => blessing.choices.find((choice) => choice.id === kind)?.name ?? kind;
   return part(
-    'Błogosławieństwo',
+    t('Błogosławieństwo'),
     current
-      ? h('p', {}, h('strong', { text: named(current.kind) }), `: jeszcze ${fights(current.left)} na wyprawach.`)
-      : h('p', { class: 'muted', text: `Wybrane błogosławieństwo działa przez ${fights(blessing.fights)} na wyprawach.` }),
+      ? h('p', {}, h('strong', { text: named(current.kind) }), t(': jeszcze {fights} na wyprawach.', { fights: fights(current.left) }))
+      : h('p', { class: 'muted', text: t('Wybrane błogosławieństwo działa przez {fights} na wyprawach.', { fights: fights(blessing.fights) }) }),
     blessing.canChoose
       ? h(
           'div',
           { class: 'fortress-choices' },
           blessing.choices.map((choice) => h('button', { type: 'button', class: 'button button--world', text: choice.name, onClick: tapped(() => chooseBlessing(choice, blessing.fights)) })),
         )
-      : h('p', { class: 'store-hint', text: 'Następne błogosławieństwo po północy.' }),
-    blessing.canChoose && current && h('p', { class: 'store-hint', text: 'Nowe błogosławieństwo zastąpi resztę obecnego.' }),
+      : h('p', { class: 'store-hint', text: t('Następne błogosławieństwo po północy.') }),
+    blessing.canChoose && current && h('p', { class: 'store-hint', text: t('Nowe błogosławieństwo zastąpi resztę obecnego.') }),
   );
 }
 
 async function chooseBlessing(choice, count) {
   await call('POST', '/api/fortress/blessing', { kind: choice.id });
   playSound('build');
-  toast(`Błogosławieństwo: ${choice.name} na ${fights(count)}.`);
+  toast(t('Błogosławieństwo: {name} na {fights}.', { name: choice.name, fights: fights(count) }));
 }
 
 // The Szklarnia (426 A): the herb it grows, one known from Zielarstwo, its
@@ -106,8 +108,8 @@ export function greenhouseSection(greenhouse, ticks) {
       ),
     ),
   );
-  const intro = h('p', { class: 'muted', text: `Szklarnia hoduje jedno zioło znane z Zielarstwa: na dobę tyle, ile ${formatHours(greenhouse.hours)} zbierania w Systemowym Zagajniku.` });
-  if (!current) return part('Grządki', intro, h('p', { class: 'store-hint', text: 'Wybierz zioło:' }), herbs);
+  const intro = h('p', { class: 'muted', text: t('Szklarnia hoduje jedno zioło znane z Zielarstwa: na dobę tyle, ile {time} zbierania w Systemowym Zagajniku.', { time: formatHours(greenhouse.hours) }) });
+  if (!current) return part(t('Grządki'), intro, h('p', { class: 'store-hint', text: t('Wybierz zioło:') }), herbs);
   const amount = h('strong', {});
   const fill = h('div', { class: 'bar-fill bar-fill--gold' });
   const hint = h('p', { class: 'store-hint' });
@@ -115,7 +117,7 @@ export function greenhouseSection(greenhouse, ticks) {
   const collect = h('button', {
     type: 'button',
     class: 'button button--world',
-    text: 'Zbierz',
+    text: t('Zbierz'),
     onClick: tapped(async () => {
       collecting = true;
       try {
@@ -133,21 +135,21 @@ export function greenhouseSection(greenhouse, ticks) {
     amount.textContent = `${formatNumber(held)} / ${formatNumber(current.capacity)}`;
     fill.style.width = `${(grown(now) / current.capacity) * 100}%`;
     const fullAt = current.since + (current.limit / current.perDay) * DAY;
-    hint.textContent = held >= current.capacity ? 'Grządki pełne: zioła rosną dalej po zebraniu.' : `Pełne za ${formatCountdown(fullAt - now)}.`;
+    hint.textContent = held >= current.capacity ? t('Grządki pełne: zioła rosną dalej po zebraniu.') : t('Pełne za {time}.', { time: formatCountdown(fullAt - now) });
     collect.disabled = collecting || held < 1;
   });
   return part(
-    'Grządki',
+    t('Grządki'),
     intro,
     h(
       'div',
       { class: 'store' },
-      h('p', { class: 'store-head' }, herbSprite(current.herb), h('span', { text: `${current.name}: ${formatNumber(Math.floor(current.perDay))} na dobę` }), amount),
+      h('p', { class: 'store-head' }, herbSprite(current.herb), h('span', { text: t('{name}: {count} na dobę', { name: current.name, count: formatNumber(Math.floor(current.perDay)) }) }), amount),
       h('div', { class: 'bar' }, fill),
       hint,
       collect,
     ),
-    h('p', { class: 'store-hint', text: 'Zmień zioło:' }),
+    h('p', { class: 'store-hint', text: t('Zmień zioło:') }),
     herbs,
   );
 }
@@ -156,21 +158,21 @@ async function chooseHerb(herb, current) {
   // What has grown of the herb before goes to the bag first.
   const { collected } = await call('POST', '/api/fortress/greenhouse', { herb: herb.id });
   playSound('build');
-  toast(collected > 0 ? `Zebrano: ${current.name} +${formatNumber(collected)}. Teraz rośnie: ${herb.name}.` : `Teraz rośnie: ${herb.name}.`);
+  toast(collected > 0 ? t('Zebrano: {name} +{count}. Teraz rośnie: {herb}.', { name: current.name, count: formatNumber(collected), herb: herb.name }) : t('Teraz rośnie: {herb}.', { herb: herb.name }));
 }
 
 async function collectHerbs() {
   const { collected } = await call('POST', '/api/fortress/greenhouse/collect');
   playSound('collect');
-  toast(`Zebrano: ${collected.name} +${formatNumber(collected.count)}.`);
+  toast(t('Zebrano: {resource} +{amount}.', { resource: collected.name, amount: formatNumber(collected.count) }));
 }
 
 // The Zbrojownia (421 A): its sets, each with what it keeps, "Załóż",
 // "Zapisz" (what the character wears now, under a name) and "Usuń".
 export function gearSetsSection(gearSets) {
   return part(
-    'Zestawy ekwipunku',
-    h('p', { class: 'muted', text: 'Zestaw zapamiętuje to, co postać ma na sobie. Rzeczy z zestawów, których nie nosisz, wiszą na stojakach i nie zajmują miejsca w plecaku.' }),
+    t('Zestawy ekwipunku'),
+    h('p', { class: 'muted', text: t('Zestaw zapamiętuje to, co postać ma na sobie. Rzeczy z zestawów, których nie nosisz, wiszą na stojakach i nie zajmują miejsca w plecaku.') }),
     h(
       'ul',
       { class: 'gear-sets' },
@@ -180,24 +182,24 @@ export function gearSetsSection(gearSets) {
 }
 
 function gearSetRow(set, nameLength) {
-  const fallback = `Zestaw ${set.index + 1}`;
+  const fallback = t('Zestaw {number}', { number: set.index + 1 });
   const title = set.name ?? fallback;
   const saved = set.name !== null;
-  const name = h('input', { type: 'text', maxlength: String(nameLength), autocomplete: 'off', value: set.name ?? '', placeholder: fallback, 'aria-label': `Nazwa zestawu: ${title}` });
+  const name = h('input', { type: 'text', maxlength: String(nameLength), autocomplete: 'off', value: set.name ?? '', placeholder: fallback, 'aria-label': t('Nazwa zestawu: {name}', { name: title }) });
   return h(
     'li',
     { class: 'gear-set' },
-    h('p', { class: 'gear-set-head' }, h('strong', { text: title }), set.worn && h('span', { class: 'chip', text: 'założony' })),
+    h('p', { class: 'gear-set-head' }, h('strong', { text: title }), set.worn && h('span', { class: 'chip', text: t('założony') })),
     !saved
-      ? h('p', { class: 'muted', text: 'Pusty stojak.' })
+      ? h('p', { class: 'muted', text: t('Pusty stojak.') })
       : set.items.length === 0
-        ? h('p', { class: 'muted', text: 'Rzeczy z tego zestawu już nie ma.' })
+        ? h('p', { class: 'muted', text: t('Rzeczy z tego zestawu już nie ma.') })
         : h(
             'ul',
             { class: 'item-list' },
-            set.items.map((item) => h('li', { class: 'gear-set-item' }, itemSummary(item), !item.worn && h('span', { class: 'chip', text: 'na stojaku' }))),
+            set.items.map((item) => h('li', { class: 'gear-set-item' }, itemSummary(item), !item.worn && h('span', { class: 'chip', text: t('na stojaku') }))),
           ),
-    saved && set.items.length > 0 && !set.worn && h('button', { type: 'button', class: 'button button--system', text: 'Załóż', onClick: tapped(() => wearSet(set, title)) }),
+    saved && set.items.length > 0 && !set.worn && h('button', { type: 'button', class: 'button button--system', text: t('Załóż'), onClick: tapped(() => wearSet(set, title)) }),
     h(
       'form',
       {
@@ -208,36 +210,36 @@ function gearSetRow(set, nameLength) {
         },
       },
       name,
-      h('button', { type: 'submit', class: 'button button--world', text: 'Zapisz to, co masz na sobie' }),
+      h('button', { type: 'submit', class: 'button button--world', text: t('Zapisz to, co masz na sobie') }),
     ),
-    saved && h('button', { type: 'button', class: 'button button--world button--small', text: 'Usuń zestaw', onClick: tapped(() => clearSet(set, title)) }),
+    saved && h('button', { type: 'button', class: 'button button--world button--small', text: t('Usuń zestaw'), onClick: tapped(() => clearSet(set, title)) }),
   );
 }
 
 async function wearSet(set, title) {
   await call('POST', '/api/fortress/sets/wear', { index: set.index });
-  toast(`Założono zestaw „${title}”.`);
+  toast(t('Założono zestaw „{name}”.', { name: title }));
 }
 
 async function saveSet(set, name, title) {
   if (set.name !== null) {
-    const sure = await confirmAction({ title: 'Zapisać zestaw na nowo?', text: `Zestaw „${title}” zapamięta to, co postać ma teraz na sobie.`, confirmLabel: 'Zapisz' });
+    const sure = await confirmAction({ title: t('Zapisać zestaw na nowo?'), text: t('Zestaw „{name}” zapamięta to, co postać ma teraz na sobie.', { name: title }), confirmLabel: t('Zapisz') });
     if (!sure) return;
   }
   await call('POST', '/api/fortress/sets', { index: set.index, name });
   playSound('build');
-  toast('Zestaw zapisany.');
+  toast(t('Zestaw zapisany.'));
 }
 
 async function clearSet(set, title) {
   const sure = await confirmAction({
-    title: 'Usunąć zestaw?',
-    text: `Rzeczy zestawu „${title}”, których nie trzyma inny zestaw ani postać, zejdą ze stojaka do plecaka.`,
-    confirmLabel: 'Usuń',
+    title: t('Usunąć zestaw?'),
+    text: t('Rzeczy zestawu „{name}”, których nie trzyma inny zestaw ani postać, zejdą ze stojaka do plecaka.', { name: title }),
+    confirmLabel: t('Usuń'),
   });
   if (!sure) return;
   await call('POST', '/api/fortress/sets/clear', { index: set.index });
-  toast(`Zestaw „${title}” usunięty.`);
+  toast(t('Zestaw „{name}” usunięty.', { name: title }));
 }
 
 // The camp's transformation in the Kamień węgielny's window (419 A, 430 A):
@@ -248,9 +250,9 @@ export function fortressPart(fortress, back) {
   const title = h('h3', { class: 'fortress-subtitle', text: fortress.name });
   if (fortress.stands) return h('section', { class: 'fortress-transform' }, title, h('p', { text: fortress.texts.done }));
   if (fortress.building) {
-    return h('section', { class: 'fortress-transform' }, title, h('p', { text: fortress.texts.building }), h('p', { class: 'store-hint', text: `Koniec: ${dateTimeFormat.format(new Date(fortress.building.endsAt))}.` }));
+    return h('section', { class: 'fortress-transform' }, title, h('p', { text: fortress.texts.building }), h('p', { class: 'store-hint', text: t('Koniec: {time}.', { time: dateTimeFormat.format(new Date(fortress.building.endsAt)) }) }));
   }
-  if (fortress.queued) return h('section', { class: 'fortress-transform' }, title, h('p', { class: 'muted', text: 'Przemiana czeka w kolejce budowy.' }));
+  if (fortress.queued) return h('section', { class: 'fortress-transform' }, title, h('p', { class: 'muted', text: t('Przemiana czeka w kolejce budowy.') }));
   const have = Object.fromEntries(walletEntries().map((entry) => [entry.id, entry.amount]));
   const lacking = costShortfall(fortress.cost);
   return h(
@@ -260,7 +262,7 @@ export function fortressPart(fortress, back) {
     h('p', { class: 'muted', text: fortress.description }),
     h(
       'ul',
-      { class: 'cost-list', 'aria-label': 'Koszt' },
+      { class: 'cost-list', 'aria-label': t('Koszt') },
       Object.entries(fortress.cost).map(([resource, amount]) =>
         h(
           'li',
@@ -271,18 +273,18 @@ export function fortressPart(fortress, back) {
         ),
       ),
     ),
-    h('p', { class: 'building-time' }, icon('hourglass', { size: 16 }), `Czas przemiany: ${formatMinutes(fortress.minutes)}`),
+    h('p', { class: 'building-time' }, icon('hourglass', { size: 16 }), t('Czas przemiany: {time}', { time: formatMinutes(fortress.minutes) })),
     h('button', {
       type: 'button',
       class: 'button button--system',
       disabled: !fortress.ready || lacking.length > 0,
-      text: fortress.ready && lacking.length > 0 ? `Brakuje: ${lacking.join(', ')}` : fortress.texts.start,
+      text: fortress.ready && lacking.length > 0 ? t('Brakuje: {missing}', { missing: lacking.join(', ') }) : fortress.texts.start,
       onClick: tapped(async () => {
         await call('POST', '/api/camp/build', { buildingId: fortress.id });
         playSound('build');
         back();
       }),
     }),
-    !fortress.ready && h('p', { class: 'system-hint', text: 'Przemiana ruszy, gdy Obóz i wszystkie jego budynki dojdą do najwyższego poziomu.' }),
+    !fortress.ready && h('p', { class: 'system-hint', text: t('Przemiana ruszy, gdy Obóz i wszystkie jego budynki dojdą do najwyższego poziomu.') }),
   );
 }

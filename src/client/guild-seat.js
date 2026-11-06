@@ -10,12 +10,14 @@
 // member's donation of gold and the building's resource, with quick amounts
 // and "Do poziomu" (what the level still lacks), and for the leader and the
 // deputies the mark to put on or take off. The words come with the answer
-// (data/guilds.json, seat.texts). mountGuildSeat(container) adds the cards
+// (data/guilds.json, seat.texts), in the page's language; the tab's own few
+// go through t() (i18n.js). mountGuildSeat(container) adds the cards
 // to the container and gives { unmount() }, which takes them away.
 
 import { goldArt, guildSeatSprite, resourceArt } from './art.js';
 import { fill, h, icon } from './dom.js';
 import { formatNumber } from './format.js';
+import { t } from './i18n.js';
 import { call } from './state.js';
 import { confirmAction, foldPart, howItWorks, toast, withButton } from './ui.js';
 
@@ -25,7 +27,7 @@ const KINDS = ['gold', 'resource'];
 export function mountGuildSeat(container) {
   let view = null;
   let gone = false;
-  const body = h('div', { class: 'guild-seat' }, h('section', { class: 'card' }, h('p', { class: 'muted', text: 'Wczytywanie…' })));
+  const body = h('div', { class: 'guild-seat' }, h('section', { class: 'card' }, h('p', { class: 'muted', text: t('Wczytywanie…') })));
   container.append(body);
 
   function show(next) {
@@ -233,7 +235,7 @@ export function mountGuildSeat(container) {
   call('GET', '/api/guild/seat')
     .then(show)
     .catch((error) => {
-      if (!gone) fill(body, h('section', { class: 'card' }, h('p', { class: 'muted', text: error.message ?? 'Nie udało się wczytać Siedziby.' })));
+      if (!gone) fill(body, h('section', { class: 'card' }, h('p', { class: 'muted', text: error.message ?? t('Nie udało się wczytać Siedziby.') })));
     });
 
   return {

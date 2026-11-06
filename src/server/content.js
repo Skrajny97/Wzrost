@@ -65,6 +65,7 @@ import enGiftCodes from '../../data/en/gift-codes.json' with { type: 'json' };
 import enItemBases from '../../data/en/item-bases.json' with { type: 'json' };
 import enMaterials from '../../data/en/materials.json' with { type: 'json' };
 import enMonsters from '../../data/en/monsters.json' with { type: 'json' };
+import enMusic from '../../data/en/music.json' with { type: 'json' };
 import enProfessions from '../../data/en/professions.json' with { type: 'json' };
 import enQuests from '../../data/en/quests.json' with { type: 'json' };
 import enRarities from '../../data/en/rarities.json' with { type: 'json' };
@@ -137,6 +138,7 @@ export const OVERLAYS = {
     'item-bases': enItemBases,
     materials: enMaterials,
     monsters: enMonsters,
+    music: enMusic,
     professions: enProfessions,
     quests: enQuests,
     rarities: enRarities,
