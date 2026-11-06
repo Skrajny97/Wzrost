@@ -19,6 +19,7 @@ on:
           - ui
           - narration
           - narrationEn
+          - narrationEnVoices
       ids:
         description: Identyfikatory po przecinku albo all
         required: true
