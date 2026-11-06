@@ -268,7 +268,14 @@
     "regions:silent-wilds.description",
     "regions:new-moon-depths.land",
     "regions:new-moon-depths.name",
-    "regions:new-moon-depths.description"
+    "regions:new-moon-depths.description",
+    "regions:stone-glade.trait",
+    "regions:backwaters.trait",
+    "regions:peat-bogs.trait",
+    "regions:black-bog.trait",
+    "regions:pine-dunes.trait",
+    "regions:silent-wilds.trait",
+    "regions:new-moon-depths.trait"
   ],
   "code": [
     "src/client/index.html",

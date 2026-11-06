@@ -34,36 +34,64 @@
   "stone-glade": {
     "land": "Edge of the Wilds",
     "name": "Stone Glade",
-    "description": "A clearing with a ring of mossy boulders, beyond which the true wilds begin. Stonelings, spiders, lynxes and packs of she-wolves led by an alpha wolf."
+    "description": "A clearing with a ring of mossy boulders, beyond which the true wilds begin. Stonelings, spiders, lynxes and packs of she-wolves led by an alpha wolf.",
+    "trait": {
+      "name": "Stone Circle",
+      "description": "The character at the front has 5% more armour."
+    }
   },
   "backwaters": {
     "land": "Peatlands",
     "name": "Overgrown Backwaters",
-    "description": "A valley where an old river lost its bed and spilled across the forest. Herons, beavers, catfish and crocodiles, and in the mist, drowned maidens and the water spirit."
+    "description": "A valley where an old river lost its bed and spilled across the forest. Herons, beavers, catfish and crocodiles, and in the mist, drowned maidens and the water spirit.",
+    "trait": {
+      "name": "Reed Beds",
+      "description": "The character at the back of the line has 5% more dodge, hiding among the reeds."
+    }
   },
   "peat-bogs": {
     "land": "Peatlands",
     "name": "Peat Bogs",
-    "description": "Here the water has grown over with moss, and mists hang above the peat. Cranes, elk, leeches and sundews, and between the tussocks, will-o’-the-wisps, the kikimora and the bogman."
+    "description": "Here the water has grown over with moss, and mists hang above the peat. Cranes, elk, leeches and sundews, and between the tussocks, will-o’-the-wisps, the kikimora and the bogman.",
+    "trait": {
+      "name": "Peat Fumes",
+      "description": "Poison lasts one turn longer, for creatures and characters alike."
+    }
   },
   "black-bog": {
     "land": "Peatlands",
     "name": "Black Bog",
-    "description": "The deepest part of the Peatlands, where the water is black as tar. Alders stand here on stilts of roots, the pillars of an old temple rise from the depths, and in a thicket of creeping willow lives the devil Rokita."
+    "description": "The deepest part of the Peatlands, where the water is black as tar. Alders stand here on stilts of roots, the pillars of an old temple rise from the depths, and in a thicket of creeping willow lives the devil Rokita.",
+    "trait": {
+      "name": "Healing Mud",
+      "description": "Healing from skills and potions restores 5% more HP."
+    }
   },
   "pine-dunes": {
     "land": "Whispering Pines",
     "name": "Pine Dunes",
-    "description": "The first part of the Whispering Pines: dunes overgrown with heather and crooked pines. Further on the resinous forest murmurs, drifting sands bury and uncover old barrows, tar kilns smoke in the hollows, and beyond them lies a blackened burn, circled by the fiery Rarog."
+    "description": "The first part of the Whispering Pines: dunes overgrown with heather and crooked pines. Further on the resinous forest murmurs, drifting sands bury and uncover old barrows, tar kilns smoke in the hollows, and beyond them lies a blackened burn, circled by the fiery Rarog.",
+    "trait": {
+      "name": "Scorching Heat",
+      "description": "Burn lasts one turn longer, for creatures and characters alike."
+    }
   },
   "silent-wilds": {
     "land": "Whispering Pines",
     "name": "Silent Wilds",
-    "description": "A dense spruce wilderness where it is always night and no birds sing, and every hunter waits in hiding for whoever walks last."
+    "description": "A dense spruce wilderness where it is always night and no birds sing, and every hunter waits in hiding for whoever walks last.",
+    "trait": {
+      "name": "Thorns",
+      "description": "Bleeding lasts one turn longer, for creatures and characters alike."
+    }
   },
   "new-moon-depths": {
     "land": "Whispering Pines",
     "name": "New Moon Depths",
-    "description": "The deepest night of the Whispering Pines. The Moon-Eater ate the moon here, old pines rustle without wind, and out of the dark comes what should lie beneath the earth."
+    "description": "The deepest night of the Whispering Pines. The Moon-Eater ate the moon here, old pines rustle without wind, and out of the dark comes what should lie beneath the earth.",
+    "trait": {
+      "name": "Ground Frost",
+      "description": "Chill lasts one turn longer, for creatures and characters alike."
+    }
   }
 }
