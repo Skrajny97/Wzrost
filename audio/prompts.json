@@ -1045,10 +1045,12 @@
     "prompts": {
       "design-british": {
         "text": "At the edge of the wilds, where the wind breaks old trees, someone the forest does not yet know awakens. There is no road behind, and ahead lies only the wilderness. Welcome, stranger. You have found yourself in a place whose purpose is growth. I am counting on you to reach great heights.",
+        "ending": " The fire crackles softly.",
         "design": "An elderly British man telling an old tale by a campfire at night. Deep, warm, slightly husky voice, calm and unhurried, with a hint of mystery and kindness. Native British English accent, clear diction, no foreign accent."
       },
       "design-american": {
         "text": "At the edge of the wilds, where the wind breaks old trees, someone the forest does not yet know awakens. There is no road behind, and ahead lies only the wilderness. Welcome, stranger. You have found yourself in a place whose purpose is growth. I am counting on you to reach great heights.",
+        "ending": " The fire crackles softly.",
         "design": "An elderly American man, a wise storyteller by a campfire at night. Deep, gravelly, warm voice, slow and deliberate, gently mysterious. Native American English accent, clear diction, no foreign accent."
       },
       "george": {
@@ -1058,7 +1060,7 @@
         "settings": {
           "stability": 0.5
         },
-        "ending": " [pauses]"
+        "ending": " The fire crackles softly. [pauses]"
       },
       "daniel": {
         "text": "At the edge of the wilds, where the wind breaks old trees, someone the forest does not yet know awakens. There is no road behind, and ahead lies only the wilderness. Welcome, stranger. You have found yourself in a place whose purpose is growth. I am counting on you to reach great heights.",
@@ -1067,7 +1069,7 @@
         "settings": {
           "stability": 0.5
         },
-        "ending": " [pauses]"
+        "ending": " The fire crackles softly. [pauses]"
       },
       "brian": {
         "text": "At the edge of the wilds, where the wind breaks old trees, someone the forest does not yet know awakens. There is no road behind, and ahead lies only the wilderness. Welcome, stranger. You have found yourself in a place whose purpose is growth. I am counting on you to reach great heights.",
@@ -1076,7 +1078,7 @@
         "settings": {
           "stability": 0.5
         },
-        "ending": " [pauses]"
+        "ending": " The fire crackles softly. [pauses]"
       }
     }
   }
