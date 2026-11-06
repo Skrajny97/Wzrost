@@ -3034,6 +3034,21 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.96 (6.11.2026)
+
+- Czat: przycisk „A→ Przetłumacz” (714 A), na razie tylko na wersji testowej, tam gdzie angielski: zob. „Tłumaczenie na czacie”.
+
+## Tłumaczenie na czacie (714 A; 6.11.2026, od 0.1.96)
+
+Odpowiedź autora 714 A i jego wiadomość z 6.11.2026: „Daj znać później jak podpiąć, a jeśli umiesz to podepnij sam to Cloudflare Workers AI pod tłumaczenie w czacie”.
+
+1. **Przycisk.** Pod cudzą wiadomością w innym języku niż język strony jest „A→ Przetłumacz” (po angielsku „A→ Translate”). Stuknięcie pokazuje pod treścią tłumaczenie maszynowe z dopiskiem „Tłumaczenie maszynowe”, a przycisk zmienia się na „A→ Oryginał”, który chowa tłumaczenie; drugie stuknięcie pokazuje je znów bez pytania serwera. Działa we wszystkich kanałach (Globalny, Wymiana, English, Gildia) i w prywatnych rozmowach; nie ma go pod własnymi wiadomościami ani pod wiadomościami Systemu.
+2. **Język wiadomości** serwer zgaduje po polskich literach i po słowach, które pisze tylko jeden z dwóch języków; gdy to nie rozstrzyga, bierze język konta piszącego (`src/server/translate.js`).
+3. **Tłumacz:** Cloudflare Workers AI, model m2m100 (`@cf/meta/m2m100-1.2b`). Schemat modelu podaje języki kodami („pl”, „en”), a przykłady w dokumentacji nazwami („polish”, „english”), więc serwer próbuje najpierw kodów, potem nazw. Tłumaczenie zrobione raz zostaje w bazie (tabela `chat_translations`, migracja 0093) i każdy, kto poprosi o nie w tym samym języku, dostaje je bez nowego wywołania.
+4. **Limit:** 100 nowych tłumaczeń dziennie na konto, liczone od północy czasu polskiego (`data/chat.json`, rules.translations). Zapamiętane tłumaczenia się nie liczą, a nieudane (tłumacz nic nie zwrócił) wracają do puli.
+5. **Koszt:** Workers AI ma dzienną darmową pulę 10 000 „neuronów” (także na planie Workers Paid), a powyżej niej 0,011 USD za 1000 neuronów. m2m100 to 31 050 neuronów za milion tokenów wejścia i tyle samo wyjścia (0,342 USD), więc krótka wiadomość to kilka neuronów, a darmowa pula wystarcza na kilka tysięcy tłumaczeń dziennie.
+6. **Podpięcie:** wpis `ai` jest tylko w ustawieniach wersji testowej (`wrangler.jsonc`, env.test), bo tylko tam jest angielski. Workers AI nie ma wersji lokalnej i zawsze łączy się z kontem Cloudflare, więc testy, lokalna praca i sprawdzenie wprowadzenia na GitHubie używają zastępczego tłumacza (`FAKE_TRANSLATOR` „on”), który tylko oznacza tekst językami. Bez tłumacza czat nie pokazuje przycisku. Do gry tłumaczenie trafi razem z angielskim.
+
 ## Wersja 0.1.95 (6.11.2026)
 
 - Angielska wersja beta, etap 4: po angielsku jest wszystko, co gracz może zobaczyć, poza Panelem autora, narzędziami testowymi i wpisami „Co nowego?”. Tylko na wersji testowej: zob. „Angielska wersja beta, etap 4: cała reszta gry”.

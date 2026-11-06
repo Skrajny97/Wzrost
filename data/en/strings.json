@@ -2525,5 +2525,11 @@
   "Praca Awatara Systemu jeszcze trwa.": "The System Avatar's work is still under way.",
   "Gildie odblokujesz na poziomie postaci {level}.": "Guilds unlock at character level {level}.",
   "Osadę odblokujesz na poziomie postaci {level}.": "The Settlement unlocks at character level {level}.",
-  "Wieże odblokujesz na poziomie postaci {level}.": "The Towers unlock at character level {level}."
+  "Wieże odblokujesz na poziomie postaci {level}.": "The Towers unlock at character level {level}.",
+  "A→ Przetłumacz": "A→ Translate",
+  "A→ Oryginał": "A→ Original",
+  "Tłumaczenie maszynowe": "Machine translation",
+  "Nie ma takiej wiadomości.": "There is no such message.",
+  "Dzisiejsze tłumaczenia ({count}) są już wykorzystane. Nowe od północy.": "Today's translations ({count}) are all used up. New ones from midnight.",
+  "Tłumaczenie się nie udało. Spróbuj za chwilę.": "The translation failed. Try again in a moment."
 }

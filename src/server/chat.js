@@ -18,9 +18,11 @@
 // down and silences accounts. The moderation is the author's account (the
 // admin) and the accounts the author names moderators in the author's
 // panel; the chat marks their characters. "@" and a character's whole name
-// tag it in a message (mentions.js).
+// tag it in a message (mentions.js). Where English is on, a message in the
+// other language than the reader's has "A→ Przetłumacz", a machine's
+// translation (translate.js).
 
-import { isUnlocked, itemView } from '../engine/index.js';
+import { isUnlocked, itemView, questPeriod } from '../engine/index.js';
 import { isAuthor } from './author.js';
 import { chatChannels, content } from './content.js';
 import { friendNews } from './community.js';
@@ -33,6 +35,7 @@ import { ApiError, json, readJson } from './http.js';
 import { language, t } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable, requireSession } from './sessions.js';
+import { guessLanguage, translateText, translationOn } from './translate.js';
 
 const DAY = 24 * 3600000;
 // How often the time the game last asked is written down: who is online
@@ -187,6 +190,8 @@ const playerMessageView = (row, userId, env, readerId) => ({
   ...(row.items && { items: JSON.parse(row.items) }),
   // The names it tags, as written, and whether it tags the reader.
   ...mentionsView(JSON.parse(row.mentions ?? '[]'), readerId),
+  // The language it is written in, where the chat translates (translate.js).
+  ...(translationOn(env) && { language: guessLanguage(shownText(row.text), row.writer_language) }),
 });
 
 // An item a Wymiana message shows: what its sheet tells.
@@ -234,7 +239,7 @@ export async function requireChatter(context) {
   const db = context.env.DB;
   const [characters, accounts] = await db.batch([
     db.prepare("SELECT id, name, level, class_id, cosmetics FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId),
-    db.prepare('SELECT login, google_sub, chat_moderator, chat_rules_at, chat_muted_until, trade_off, seen_at FROM users WHERE id = ?').bind(session.userId),
+    db.prepare('SELECT login, google_sub, chat_moderator, chat_rules_at, chat_muted_until, trade_off, seen_at, language FROM users WHERE id = ?').bind(session.userId),
   ]);
   const character = characters.results[0];
   if (!character) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
@@ -285,7 +290,7 @@ export async function readChat(context) {
   const [messages, hidden, blocked, reports, conversations] = await db.batch([
     db
       .prepare(
-        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, m.system, u.login, u.google_sub, u.chat_moderator,
+        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, m.system, u.login, u.google_sub, u.chat_moderator, u.language AS writer_language,
                 c.cosmetics, ${guildTagSql('m.character_id')} AS guild_tag, ${mentionsSql('m.id')} AS mentions
          FROM chat_messages m JOIN users u ON u.id = m.user_id LEFT JOIN characters c ON c.id = m.character_id
          WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND (m.system = 1 OR m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?))
@@ -501,9 +506,72 @@ export async function sendChat(context) {
     text,
     items,
     created_at: now,
+    writer_language: account.language,
     mentions: JSON.stringify(kept.map((tag) => ({ id: tag.characterId, text: tag.written }))),
   };
   return json({ message: messageView(row, userId, context.env, character.id) }, 201);
+}
+
+// Whether the character reads the message: in a channel of this server, in
+// its guild's, or a private one it wrote or got; never one taken down, the
+// System's, or one of a player it hides.
+async function readable(db, character, userId, row) {
+  if (!row || row.hidden_at !== null || row.system) return false;
+  if (row.channel === PRIVATE) {
+    if (row.character_id !== character.id && row.recipient_id !== character.id) return false;
+  } else if (row.channel.startsWith(`${GUILD}:`)) {
+    const guild = await guildOf(db, character.id);
+    if (!guild || guildChannel(guild.id) !== row.channel) return false;
+  } else if (!chatChannels().some((channel) => channel.id === row.channel)) return false;
+  return !(await db.prepare('SELECT 1 FROM chat_blocks WHERE user_id = ? AND blocked_id = ?').bind(userId, row.user_id).first());
+}
+
+// POST /api/chat/translate {id}: the message in the language the player
+// plays in, by the machine (714 A, translate.js). A translation made once
+// is kept for everyone who asks in that language; a new one counts towards
+// the account's rules.translations of the day (Polish time) and is given
+// back when the translator gives nothing.
+export async function translateChat(context) {
+  const { session, character, db } = await requireChatter(context);
+  const { env, now } = context;
+  if (!translationOn(env)) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
+  const body = await readJson(context.request);
+  const id = Number.isInteger(body.id) && body.id > 0 ? body.id : 0;
+  const row = id
+    ? await db
+        .prepare(
+          `SELECT m.id, m.channel, m.user_id, m.character_id, m.recipient_id, m.text, m.system, m.hidden_at, u.language AS writer_language
+           FROM chat_messages m JOIN users u ON u.id = m.user_id WHERE m.id = ?`,
+        )
+        .bind(id)
+        .first()
+    : null;
+  if (!(await readable(db, character, session.userId, row))) throw new ApiError(404, 'no_message', 'Nie ma takiej wiadomości.');
+  const target = language();
+  const text = shownText(row.text);
+  const source = guessLanguage(text, row.writer_language);
+  if (source === target) return json({ id, text });
+  const kept = await db.prepare('SELECT text FROM chat_translations WHERE message_id = ? AND language = ?').bind(id, target).first();
+  if (kept) return json({ id, text: kept.text });
+  const most = content().chat.rules.translations;
+  const day = questPeriod('daily', now, content()).key;
+  // One more of the day's, only while some are left; SQLite reads the old
+  // day in both assignments.
+  const counted = await db
+    .prepare(
+      `UPDATE users SET translations_used = CASE WHEN translations_day = ? THEN translations_used + 1 ELSE 1 END, translations_day = ?
+       WHERE id = ? AND (translations_day IS NOT ? OR translations_used < ?)`,
+    )
+    .bind(day, day, session.userId, day, most)
+    .run();
+  if (counted.meta.changes !== 1) throw new ApiError(429, 'translations_used', `Dzisiejsze tłumaczenia (${most}) są już wykorzystane. Nowe od północy.`);
+  const translated = await translateText(env, text, source, target);
+  if (!translated) {
+    await db.prepare('UPDATE users SET translations_used = translations_used - 1 WHERE id = ? AND translations_day = ? AND translations_used > 0').bind(session.userId, day).run();
+    throw new ApiError(502, 'translate_failed', 'Tłumaczenie się nie udało. Spróbuj za chwilę.');
+  }
+  await db.prepare('INSERT OR IGNORE INTO chat_translations (message_id, language, text, created_at) VALUES (?, ?, ?, ?)').bind(id, target, translated, now).run();
+  return json({ id, text: translated });
 }
 
 // POST /api/chat/close {with: character id}: the private conversation

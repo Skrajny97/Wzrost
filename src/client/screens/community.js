@@ -61,7 +61,7 @@ import {
   takeConversation,
   takeMention,
 } from '../chat-news.js';
-import { t } from '../i18n.js';
+import { language, t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
 import { appendMention, matchingPeople, taggedParts, typedMention, withMention } from '../mentions.js';
 import { openProfile } from '../profile.js';
@@ -782,6 +782,7 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
         : message.own
           ? h('p', { class: 'chat-text' }, withTags(message.text, message))
           : h('button', { type: 'button', class: 'chat-text chat-text--button', onClick: () => actions(message) }, withTags(message.text, message)),
+      ...translation(message),
       message.items?.length > 0 &&
         h(
           'ul',
@@ -789,6 +790,33 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
           message.items.map((item) => h('li', {}, h('button', { type: 'button', class: 'item-row chat-item', onClick: () => showItem(item) }, itemSummary(item)))),
         ),
     );
+  }
+
+  // "A→ Przetłumacz" under someone else's message in the other language
+  // than the page's, where the server translates (714 A,
+  // src/server/translate.js): the machine's translation under its words,
+  // marked as the machine's, and back to the words alone with "A→ Oryginał".
+  // A message translated once shows its translation again without asking.
+  function translation(message) {
+    if (message.own || !message.language || message.language === language()) return [];
+    let translated = null;
+    const shown = h('div', { class: 'chat-translation' });
+    shown.hidden = true;
+    const button = h('button', { type: 'button', class: 'chat-translate', text: t('A→ Przetłumacz') });
+    button.addEventListener('click', () =>
+      withButton(button, async () => {
+        if (!shown.hidden) {
+          shown.hidden = true;
+          button.textContent = t('A→ Przetłumacz');
+          return;
+        }
+        translated ??= (await call('POST', '/api/chat/translate', { id: message.id })).text;
+        fill(shown, h('p', { class: 'chat-translation-text', text: translated }), h('small', { class: 'chat-translation-note', text: t('Tłumaczenie maszynowe') }));
+        shown.hidden = false;
+        button.textContent = t('A→ Oryginał');
+      }),
+    );
+    return [shown, button];
   }
 
   // The text of a message with the names it tags in gold (../mentions.js).

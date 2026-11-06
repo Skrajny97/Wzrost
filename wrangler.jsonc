@@ -133,7 +133,12 @@
         "crons": ["* * * * *"]
       },
       // Bindings are not inherited: the test version sends the same mail.
-      "send_email": [{ "name": "EMAIL" }]
+      "send_email": [{ "name": "EMAIL" }],
+      // Workers AI, which translates chat messages ("A→ Przetłumacz",
+      // src/server/chat-translate.js): only here, where English is on. It has
+      // no local stand-in and always calls the Cloudflare account, so the
+      // top level (tests, local work, the first steps in CI) goes without it.
+      "ai": { "binding": "AI" }
     }
   }
 }

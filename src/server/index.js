@@ -22,7 +22,7 @@ import {
   startTraining,
   wearGearSet,
 } from './fortress.js';
-import { acceptChatRules, blockInChat, chatPeople, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, unblockInChat, unmuteInChat } from './chat.js';
+import { acceptChatRules, blockInChat, chatPeople, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, translateChat, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendAllGifts, sendGift } from './community.js';
 import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
 import { enterTower, getTowers } from './towers.js';
@@ -347,6 +347,8 @@ const routes = [
   ['POST', '/api/chat/rules', acceptChatRules],
   ['POST', '/api/chat/seen', markChatSeen],
   ['POST', '/api/chat/close', closeChat],
+  // "A→ Przetłumacz" (714 A, translate.js).
+  ['POST', '/api/chat/translate', translateChat],
   ['POST', '/api/chat/report', reportChat],
   ['POST', '/api/chat/block', blockInChat],
   ['POST', '/api/chat/unblock', unblockInChat],

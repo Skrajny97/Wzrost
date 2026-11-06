@@ -25,7 +25,7 @@
     "rules": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["maxLength", "linkMaxLength", "everySeconds", "keep", "privateKeep", "items", "conversations", "page", "hideAfterReports", "pollSeconds"],
+      "required": ["maxLength", "linkMaxLength", "everySeconds", "keep", "privateKeep", "items", "conversations", "page", "hideAfterReports", "pollSeconds", "translations"],
       "properties": {
         "maxLength": { "type": "integer", "minimum": 1 },
         "linkMaxLength": { "type": "integer", "minimum": 1, "description": "Najwięcej znaków wiadomości admina z linkami, razem z adresami (do maxLength liczy się tylko to, co widać: podpis zamiast adresu)." },
@@ -44,7 +44,8 @@
             "min": { "type": "integer", "minimum": 1 },
             "max": { "type": "integer", "minimum": 1 }
           }
-        }
+        },
+        "translations": { "type": "integer", "minimum": 1, "description": "Ile nowych tłumaczeń maszynowych („A→ Przetłumacz”, 714 A) dziennie zamówi jedno konto." }
       }
     },
     "words": { "type": "array", "items": { "type": "string", "pattern": "^[a-ząćęłńóśźż]+$" } },

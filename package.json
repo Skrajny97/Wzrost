@@ -1,13 +1,13 @@
 {
   "name": "insight",
-  "version": "0.1.95",
+  "version": "0.1.96",
   "private": true,
   "type": "module",
   "engines": {
     "node": ">=22"
   },
   "scripts": {
-    "dev": "wrangler d1 migrations apply DB --local && wrangler dev --var TEST_LOGINS: --var PROFESSIONS:on --var CRAFTING:on --var EVOLUTIONS:on --var ENGLISH:on",
+    "dev": "wrangler d1 migrations apply DB --local && wrangler dev --var TEST_LOGINS: --var PROFESSIONS:on --var CRAFTING:on --var EVOLUTIONS:on --var ENGLISH:on --var FAKE_TRANSLATOR:on",
     "test": "node --test --test-reporter=spec 'test/**/*.test.js'",
     "validate": "node tools/validate-data.mjs",
     "simulate": "node tools/simulate.mjs",
