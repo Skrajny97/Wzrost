@@ -1290,7 +1290,7 @@
   "{name} ×{count}: wybierz liczbę sztuk": "{name} ×{count}: choose how many",
   "daje: {what}": "gives: {what}",
   "od poziomu {level} stołu": "from table level {level}",
-  "Stuknij materiał, żeby przerobić albo sprzedać wybraną liczbę sztuk. Zaznacz kilka, żeby przerobić je naraz w całości.": "Tap a material to process or sell as many pieces as you choose. Mark several to process them whole, all at once.",
+  "Stuknij materiał, żeby przerobić albo sprzedać wybraną liczbę sztuk. Zaznacz kilka, żeby przerobić je naraz: pod zaznaczonym wybierzesz, ile sztuk.": "Tap a material to process or sell as many pieces as you choose. Mark several to process them all at once: under each one marked you choose how many pieces.",
   "Przerób wszystko": "Process all",
   "Zbuduj stół, żeby przerabiać materiały i rozbierać przedmioty.": "Build the table to process materials and salvage items.",
   "Kolejka jest pełna ({limit} zleceń). Poczekaj, aż skończy się pierwsze.": "The queue is full ({limit} orders). Wait until the first one is done.",

@@ -266,6 +266,21 @@ describe('orders taken off the table, through the API', () => {
     assert.deepEqual([none.status, none.data.error.code, none.data.error.message], [409, 'not_queued', texts.errors.empty]);
   });
 
+  test('marked stacks go with the pieces chosen under them: fewer of one, the whole of another, a count above the stack takes it whole (a player on the chat, 6.11.2026)', async () => {
+    await stock({ 'wolf-pelt:common': 5, 'fox-pelt:common': 2, 'boar-tusk:rare': 1 });
+    const done = await craft({ keys: ['wolf-pelt:common', 'fox-pelt:common', 'boar-tusk:rare'], counts: { 'wolf-pelt:common': 2, 'boar-tusk:rare': 9, 'deer-antler:common': 3 } });
+    assert.equal(done.status, 200, JSON.stringify(done.data).slice(0, 300));
+    assert.equal(done.data.ordered, 3);
+    assert.deepEqual(stacks(done.data.character), { 'wolf-pelt:common': 3 });
+    assert.deepEqual(done.data.character.crafting.queue.map((order) => order.count), [2, 2, 1]);
+    // A count that is no whole number above zero is no choice: the whole stack.
+    await stock({ 'wolf-pelt:common': 4 });
+    await cancel({ all: true });
+    await stock({ 'wolf-pelt:common': 4 });
+    const whole = await craft({ keys: ['wolf-pelt:common'], counts: { 'wolf-pelt:common': 0 } });
+    assert.deepEqual(stacks(whole.data.character), {});
+  });
+
   test('a finished order, one taken off already or another character\'s, and two taps at once: nothing more comes back', async () => {
     await stock({ 'wolf-pelt:common': 3, 'fox-pelt:common': 2 });
     const [wolf, fox] = (await craft({ all: true })).data.character.crafting.queue;
