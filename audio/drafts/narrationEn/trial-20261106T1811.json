@@ -1,0 +1,16 @@
+{
+  "id": "trial",
+  "payload": {
+    "text": "You are not ready for longer explorations yet. Let us begin with a half-hour trial. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/trial-20261106T1811-0.mp3"
+  ],
+  "credits": 118
+}

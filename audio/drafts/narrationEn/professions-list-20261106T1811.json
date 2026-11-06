@@ -1,0 +1,16 @@
+{
+  "id": "professions-list",
+  "payload": {
+    "text": "Herbalism lets you gather herbs in the System Grove, and with Alchemy you will brew potions from them in the System Laboratory. There will be time yet for the other professions. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/professions-list-20261106T1811-0.mp3"
+  ],
+  "credits": 212
+}

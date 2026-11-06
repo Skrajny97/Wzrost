@@ -1,0 +1,16 @@
+{
+  "id": "skills-paths-warrior",
+  "payload": {
+    "text": "Before you lie three paths. The Barbarian crushes a foe with one blow, the Gladiator slashes them all at once, and the Guardian never takes a step back. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/skills-paths-warrior-20261106T1811-0.mp3"
+  ],
+  "credits": 187
+}

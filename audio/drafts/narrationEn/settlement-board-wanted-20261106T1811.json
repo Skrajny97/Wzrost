@@ -1,0 +1,16 @@
+{
+  "id": "settlement-board-wanted",
+  "payload": {
+    "text": "The headman posts wanted posters here too. Take a poster and set out to where the quarry was seen. Should you meet it and defeat it, the reward is yours. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-board-wanted-20261106T1811-0.mp3"
+  ],
+  "credits": 188
+}

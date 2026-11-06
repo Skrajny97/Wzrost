@@ -1,0 +1,16 @@
+{
+  "id": "settlement-market-company",
+  "payload": {
+    "text": "Every trade builds your standing with the Merchants' Company. The higher it is, the more offers you can put up at once. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-market-company-20261106T1811-0.mp3"
+  ],
+  "credits": 154
+}

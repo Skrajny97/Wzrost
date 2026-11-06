@@ -1,0 +1,16 @@
+{
+  "id": "system-collector",
+  "payload": {
+    "text": "The System Collector keeps watch close by. For gold, once and for all, it will collect the resources from full stores on its own. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/system-collector-20261106T1811-0.mp3"
+  ],
+  "credits": 164
+}

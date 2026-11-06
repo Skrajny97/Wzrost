@@ -1,0 +1,16 @@
+{
+  "id": "guild-trials",
+  "payload": {
+    "text": "The trials count by themselves, from the moment they appear on the board. New ones come every day, and each one completed brings the whole guild closer to the next chest. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/guild-trials-20261106T1811-0.mp3"
+  ],
+  "credits": 205
+}

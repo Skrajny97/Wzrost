@@ -1,0 +1,16 @@
+{
+  "id": "report-fights",
+  "payload": {
+    "text": "The System records the skirmishes you fought during the exploration. You can look through them by choosing a tab. A star on a tab marks the most important of the fights. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/report-fights-20261106T1811-0.mp3"
+  ],
+  "credits": 204
+}

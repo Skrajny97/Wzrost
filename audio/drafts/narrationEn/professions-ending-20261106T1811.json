@@ -1,0 +1,16 @@
+{
+  "id": "professions-ending",
+  "payload": {
+    "text": "You will take your potions on an exploration – you pack them for the road before you set out. In a fight, your character will reach for them of their own accord. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/professions-ending-20261106T1811-0.mp3"
+  ],
+  "credits": 196
+}

@@ -1,0 +1,16 @@
+{
+  "id": "skills-paths-mage",
+  "payload": {
+    "text": "Before you lie three paths. The Elementalist hurls fire, the Ice Lord slows the foes with a frosty wind, and the Arcanist delves into the nature of mana itself. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/skills-paths-mage-20261106T1811-0.mp3"
+  ],
+  "credits": 195
+}

@@ -1,0 +1,16 @@
+{
+  "id": "guild-tabs",
+  "payload": {
+    "text": "Each tab is another of the guild's shared undertakings. A dot by a tab will tell you that something is waiting for you there. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/guild-tabs-20261106T1811-0.mp3"
+  ],
+  "credits": 160
+}

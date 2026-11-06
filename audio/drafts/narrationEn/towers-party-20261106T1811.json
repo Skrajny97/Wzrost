@@ -1,0 +1,16 @@
+{
+  "id": "towers-party",
+  "payload": {
+    "text": "You enter the Party Tower with one or two other wanderers. A companion from the Quarters will take a free place. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/towers-party-20261106T1811-0.mp3"
+  ],
+  "credits": 147
+}

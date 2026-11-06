@@ -1,0 +1,16 @@
+{
+  "id": "settlement-herbalist-relation",
+  "payload": {
+    "text": "Trading with her also builds your standing with the Brotherhood of Herbalists. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-herbalist-relation-20261106T1811-0.mp3"
+  ],
+  "credits": 113
+}

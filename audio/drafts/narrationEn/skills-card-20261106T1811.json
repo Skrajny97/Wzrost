@@ -1,0 +1,16 @@
+{
+  "id": "skills-card",
+  "payload": {
+    "text": "The System, as always, has worked it all out for you. On the card you will see what a skill gives, how much mana it costs and how often you can use it. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/skills-card-20261106T1811-0.mp3"
+  ],
+  "credits": 186
+}

@@ -1,0 +1,16 @@
+{
+  "id": "settlement-hermit-reset",
+  "payload": {
+    "text": "Sambor will help you begin anew. For gold, he will reset your skill path or the stats you have spent. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-hermit-reset-20261106T1811-0.mp3"
+  ],
+  "credits": 136
+}

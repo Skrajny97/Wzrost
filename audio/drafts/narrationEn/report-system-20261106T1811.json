@@ -1,0 +1,16 @@
+{
+  "id": "report-system",
+  "payload": {
+    "text": "This is the System's domain. No one has ever unravelled its mysteries for good. Its usefulness, however – that you have laid out before you. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/report-system-20261106T1811-0.mp3"
+  ],
+  "credits": 175
+}

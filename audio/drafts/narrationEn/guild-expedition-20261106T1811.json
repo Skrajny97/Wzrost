@@ -1,0 +1,16 @@
+{
+  "id": "guild-expedition",
+  "payload": {
+    "text": "Every minute of your explorations leads the guild onward. A guardian waits at the end of each stage. You attack it three times a day, and when it falls, everyone who added minutes gets a chest. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/guild-expedition-20261106T1811-0.mp3"
+  ],
+  "credits": 228
+}

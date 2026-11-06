@@ -1,0 +1,16 @@
+{
+  "id": "fortress-welcome",
+  "payload": {
+    "text": "Your camp has become a Stronghold. Each of its seven buildings gives something: training, a blessing, herbs or better tracking. Look in here every day. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/fortress-welcome-20261106T1811-0.mp3"
+  ],
+  "credits": 186
+}

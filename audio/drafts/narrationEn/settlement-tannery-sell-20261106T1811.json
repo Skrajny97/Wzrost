@@ -1,0 +1,16 @@
+{
+  "id": "settlement-tannery-sell",
+  "payload": {
+    "text": "In the Sell tab he will buy your materials for more than the scrap dealer pays. The better he knows you, the more he pays. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-tannery-sell-20261106T1811-0.mp3"
+  ],
+  "credits": 157
+}

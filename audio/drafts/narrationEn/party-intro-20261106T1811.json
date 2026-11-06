@@ -1,0 +1,16 @@
+{
+  "id": "party-intro",
+  "payload": {
+    "text": "A Party is up to three wanderers on one exploration, and their class levels may differ by five at most. The leader sends the exploration off by ticking “With the party” above “Set out”. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/party-intro-20261106T1811-0.mp3"
+  ],
+  "credits": 220
+}
