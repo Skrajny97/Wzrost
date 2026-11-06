@@ -4,7 +4,7 @@ import { sendLink } from './email.js';
 import { registrationOpen } from './features.js';
 import { googleConfigured } from './google.js';
 import { ApiError, json, readJson } from './http.js';
-import { LANGUAGES, language } from './i18n.js';
+import { LANGUAGES, language, runInLanguage } from './i18n.js';
 import { englishOn } from './features.js';
 import { marketRemoval } from './market.js';
 import { guildRemoval } from './guilds.js';
@@ -62,6 +62,11 @@ export function validatePassword(value) {
   return value;
 }
 
+function validLanguage(value) {
+  if (!LANGUAGES.includes(value)) throw new ApiError(400, 'invalid_language', 'Nie ma takiego języka.');
+  return value;
+}
+
 const loginTaken = () => new ApiError(409, 'login_taken', 'Ten login jest już zajęty.');
 const emailTaken = () =>
   new ApiError(409, 'email_taken', 'Ten e-mail jest już przypisany do innego konta.');
@@ -75,6 +80,9 @@ export async function register({ request, env, now }) {
   const email = validateEmail(body.email);
   if (!email) throw new ApiError(400, 'email_required', 'Podaj adres e-mail: wyślemy na niego link, który otworzy konto.');
   const password = validatePassword(body.password);
+  // The language picked in the form ("Język gry"), else the page's; Polish
+  // where English is off.
+  const accountLanguage = englishOn() && body.language !== undefined ? validLanguage(body.language) : language();
   const db = env.DB;
 
   if (await db.prepare('SELECT 1 FROM users WHERE login = ?').bind(login).first()) throw loginTaken();
@@ -87,7 +95,7 @@ export async function register({ request, env, now }) {
   try {
     const result = await db
       .prepare('INSERT INTO users (login, email, password_hash, created_at, email_required, language) VALUES (?, ?, ?, ?, 1, ?)')
-      .bind(login, email, passwordHash, now, language())
+      .bind(login, email, passwordHash, now, accountLanguage)
       .run();
     userId = result.meta.last_row_id;
   } catch (error) {
@@ -102,12 +110,13 @@ export async function register({ request, env, now }) {
   // The account is made even when the mail fails: the page offers to send it again.
   let emailSent = true;
   try {
-    await sendLink(env, { userId, login, email }, new URL(request.url).origin, now);
+    // In the account's language, whatever the page shows.
+    await runInLanguage(accountLanguage, () => sendLink(env, { userId, login, email }, new URL(request.url).origin, now));
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
     emailSent = false;
   }
-  const user = userView({ login, email, created_at: now, google_sub: null, email_confirmed_at: null, email_required: 1, skip_tutorials: 0, language: language() });
+  const user = userView({ login, email, created_at: now, google_sub: null, email_confirmed_at: null, email_required: 1, skip_tutorials: 0, language: accountLanguage });
   return json({ user: { ...user, testMode: testModeFor(env, login), tutorialTests: tutorialTestsFor(env, login), author: false }, emailSent }, 201, {
     'Set-Cookie': sessionCookie(session.token, session.expiresAt, now),
   });
@@ -254,7 +263,7 @@ export async function setLanguage(context) {
   const session = await requireSession(context);
   if (!englishOn()) throw new ApiError(404, 'not_found', 'Nie znaleziono.');
   const body = await readJson(context.request);
-  if (!LANGUAGES.includes(body.language)) throw new ApiError(400, 'invalid_language', 'Nie ma takiego języka.');
-  await context.env.DB.prepare('UPDATE users SET language = ? WHERE id = ?').bind(body.language, session.userId).run();
-  return json({ language: body.language });
+  const chosen = validLanguage(body.language);
+  await context.env.DB.prepare('UPDATE users SET language = ? WHERE id = ?').bind(chosen, session.userId).run();
+  return json({ language: chosen });
 }

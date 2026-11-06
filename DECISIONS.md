@@ -3034,6 +3034,24 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.89 (6.11.2026)
+
+Formularz nowego konta ma wybór „Język gry: Polski | English” tam, gdzie gra oferuje angielski: zob. „Wybór języka przy zakładaniu konta”.
+
+## Wybór języka przy zakładaniu konta (autor 6.11.2026, od 0.1.89)
+
+Autor 6.11.2026: „Lecisz dalej pozniej z tłumaczeniem wszystkiego co jest na angielski i wyborem przy zakładaniu konta języka”.
+
+1. **Pole „Język gry”** stoi pierwsze w formularzu „Nowe konto”. Ma dwa przyciski, „Polski” i „English”, każdy w swoim języku, a pod nimi zdanie „Zmienisz go później w Ustawieniach.”. Na początku zaznaczony jest język strony: z telefonu albo z przełącznika PL | EN.
+2. **Wybór od razu przełącza stronę** bez wczytywania jej od nowa, więc wpisany login, e-mail i hasło zostają. Komunikat błędu sprzed zmiany znika, bo był w poprzednim języku.
+3. **Konto powstaje w wybranym języku.** Serwer zapisuje go w `users.language`, a mail z linkiem idzie w języku konta. Język spoza listy kończy się błędem „Nie ma takiego języka.” i konto nie powstaje.
+4. **Przełącznik PL | EN pod formularzem** widać tylko przy logowaniu, bo formularz nowego konta ma własny wybór (brakujący szczegół).
+5. **Gdzie widać:** tylko tam, gdzie serwer oferuje angielski.
+    - W grze głównej angielski jest wyłączony, więc pola nie ma, a serwer pomija język przysłany z formularzem.
+    - Na wersji testowej angielski działa, ale zakładanie kont jest tam wyłączone, więc pole widać na razie tylko lokalnie.
+    - W grze pojawi się razem z angielskim (E7).
+6. **Sprawdzone:** wszystkie testy, w tym nowe testy serwera (angielski wybrany na polskiej stronie i odwrotnie, język spoza listy, wyłączony angielski). W przeglądarce: telefon polski i angielski, wybór bez przeładowania, wpisane dane zostają, konto i ekran potwierdzenia w wybranym języku, wyłączony angielski. Do tego pierwsze kroki po polsku i po angielsku oraz wygląd na 9 rozmiarach ekranu w obu językach.
+
 ## Wersja 0.1.88 (6.11.2026)
 
 Angielski słownik nazw zatwierdzony przez autora i krótki napis XP na angielskim pasku u góry: zob. „Odpowiedzi autora 701–705”, punkt 3, i „Odpowiedź autora 708”. Dotyczy tylko angielskiej wersji, która działa na wersji testowej; w grze głównej nic się nie zmienia.
@@ -3093,7 +3111,7 @@ Angielska wersja beta, etap 1: język każdego zapytania, ekrany wokół gry po 
 2. **Język każdego zapytania.** Strona wysyła swój język w nagłówku `X-Lang`. Bez niego liczy się język przeglądarki: polski telefon daje polski, każdy inny angielski, a zapytanie bez języka (testy, narzędzia) polski. Zapytania różnych graczy przeplatają się w jednym Workerze, więc język trzyma się osobno dla każdego z nich (AsyncLocalStorage z flagą zgodności `nodejs_als`, jedyną częścią Node w Workerze). Poza zapytaniem (cron) serwer pisze po polsku.
 3. **Treść gry w języku zapytania.** Moduły serwera biorą treść przez `content()` (`src/server/content.js`). Angielska treść to polskie dane z nałożonymi tekstami z `data/en/<plik>.json`, po identyfikatorach (`src/engine/overlay.js`). Brak tłumaczenia albo pusty tekst zostawia polski, a nakładka nie zmienia liczb, identyfikatorów ani budowy danych. Polska treść powstaje przy starcie Workera, angielska przy pierwszym angielskim zapytaniu.
 4. **Napisy z kodu** mają angielski w `data/en/strings.json`, pod polskim tekstem jako kluczem. `{nazwa}` oznacza wstawianą wartość, taką samą w obu językach. Rzeczownik po liczbie ma klucz z trzech polskich form i dwie angielskie („punkt|punkty|punktów” → „point|points”), więc wywołań `plural()` nie trzeba było zmieniać. Błędy serwera tłumaczy jedno miejsce (`errorResponse()`): stałe po treści, a te z liczbami według wzoru, z liczbami w zapisie angielskim.
-5. **Wybór języka.** Na start decyduje język telefonu. Potem przełącznik PL | EN: na ekranie logowania pod formularzem i jako pierwszy wiersz Ustawień. Zmiana przeładowuje stronę w nowym języku. Konto pamięta język (migracja 0091, `users.language`, domyślnie „pl”); rejestracja zapisuje język strony. Po zalogowaniu strona przyjmuje język konta, chyba że gracz przełączył język na ekranie logowania: wtedy to konto przyjmuje ten wybór.
+5. **Wybór języka.** Na start decyduje język telefonu. Potem przełącznik PL | EN: na ekranie logowania pod formularzem i jako pierwszy wiersz Ustawień. Zmiana przeładowuje stronę w nowym języku. Konto pamięta język (migracja 0091, `users.language`, domyślnie „pl”); rejestracja zapisuje język strony (od 0.1.89 język wybrany w formularzu, zob. „Wybór języka przy zakładaniu konta”). Po zalogowaniu strona przyjmuje język konta, chyba że gracz przełączył język na ekranie logowania: wtedy to konto przyjmuje ten wybór.
 6. **Liczby i daty** po angielsku w zapisie brytyjskim (1,234; zegar 24-godzinny).
 7. **Przetłumaczone w etapie 1:** logowanie i rejestracja, potwierdzanie e-maila, wybór i tworzenie postaci, Ustawienia razem z narzędziami wersji testowej, menu i zakładki, pasek u góry, przyciski narratora oraz błędy kont. Z danych: klasy, wygląd, odcienie skóry, statystyki, miejsca na przedmioty, zmiana imienia i kod podarunkowy. Hasło gry dosłownie (694 A).
 8. **Zostaje po polsku do kolejnych etapów:** treść gry (narrator, regiony, przedmioty, raporty), mail z linkiem i powiadomienia (etap 2), wpisy „Co nowego?”, strona bez internetu, opis aplikacji w manifeście i podgląd linku. Opis postaci w zgłoszeniu błędu zostaje po polsku dla autora, w każdym języku gracza.

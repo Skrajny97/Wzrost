@@ -5,13 +5,15 @@
 // `english`: the test version and local work); the live game shows Polish
 // and no choice. The language comes first from the phone, Polish for a
 // Polish phone and English for any other, then from the PL | EN switch on
-// the login screen and in the Ustawienia. The account keeps it
-// (users.language), so a signed-in page takes the account's, and one
-// picked on the login screen goes to the account at the sign-in. Each
-// request tells the server the language (X-Lang, api.js), so the game's
-// data, the errors and what the server writes come in it too
-// (src/server/i18n.js). A switch loads the page again, so every screen is
-// drawn anew in the language chosen.
+// the login screen and in the Ustawienia, or the "Język gry" of the
+// registration form. The account keeps it (users.language), so a signed-in
+// page takes the account's, and one picked on the login screen goes to the
+// account at the sign-in. Each request tells the server the language
+// (X-Lang, api.js), so the game's data, the errors and what the server
+// writes come in it too (src/server/i18n.js). A switch loads the page
+// again, so every screen is drawn anew in the language chosen; the
+// registration form's choice turns only the login screen, in place, so
+// what was typed stays.
 //
 // t() gives a Polish text of the page in the language shown: its English
 // (data/en/strings.json, under the Polish text), or the Polish itself
@@ -171,6 +173,24 @@ export async function followAccount(user) {
   translatePage();
   return true;
 }
+
+// A language picked in the registration form ("Język gry", app.js): the
+// page turns to it at once, without loading again, so what was typed stays.
+// The account is made in it; signed in another way instead (Google, the
+// login form), the account takes it at the sign-in (followAccount). True
+// when the language changed.
+export async function pickLanguage(next) {
+  if (!offered || next === lang || !LANGUAGES.includes(next)) return false;
+  lang = next;
+  write('localStorage', LANGUAGE_KEY, next);
+  write('sessionStorage', PICKED_KEY, '1');
+  await loadStrings();
+  translatePage();
+  return true;
+}
+
+// The languages by their own names, for the registration form.
+export const LANGUAGE_NAMES = { pl: 'Polski', en: 'English' };
 
 // The PL | EN switch: the language for this phone and, signed in, for the
 // account; the page loads again in it. Picked before the sign-in, the

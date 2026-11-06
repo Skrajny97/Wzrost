@@ -64,6 +64,8 @@
     "MANA",
     "name",
     "password",
-    "{} · {}, poziom {}, klasa {}"
+    "{} · {}, poziom {}, klasa {}",
+    "Polski",
+    "English"
   ]
 }

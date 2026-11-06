@@ -159,10 +159,27 @@ describe('English where ENGLISH is on (the test version)', () => {
     const stored = await (await db()).prepare('SELECT language FROM users WHERE login = ?').bind('Angielski').first('language');
     assert.equal(stored, 'pl');
   });
+
+  test('the registration form names the account language ("Język gry"), whatever the page shows', async () => {
+    const languageOf = async (login) => (await db()).prepare('SELECT language FROM users WHERE login = ?').bind(login).first('language');
+    const english = await ask('POST', '/api/auth/register', { body: { login: 'Wybor_en', email: 'wybor-en@example.com', password: 'tajnehaslo1', language: 'en' }, lang: 'pl' });
+    assert.equal(english.status, 201);
+    assert.equal(english.data.user.language, 'en');
+    assert.equal(await languageOf('Wybor_en'), 'en');
+    const polish = await ask('POST', '/api/auth/register', { body: { login: 'Wybor_pl', email: 'wybor-pl@example.com', password: 'tajnehaslo1', language: 'pl' }, lang: 'en' });
+    assert.equal(polish.status, 201);
+    assert.equal(polish.data.user.language, 'pl');
+    assert.equal(await languageOf('Wybor_pl'), 'pl');
+    // No such language: no account, and the message in the page's language.
+    const wrong = await ask('POST', '/api/auth/register', { body: { login: 'Wybor_de', email: 'wybor-de@example.com', password: 'tajnehaslo1', language: 'de' }, lang: 'en' });
+    assert.equal(wrong.status, 400);
+    assert.equal(wrong.data.error.message, 'There is no such language.');
+    assert.equal(await languageOf('Wybor_de'), null);
+  });
 });
 
 describe('Polish only where ENGLISH is off (the live game)', () => {
-  const { server } = useServer();
+  const { server, db } = useServer();
   const ask = caller(server);
 
   test('the server answers in Polish whatever the page asks for, and offers no choice', async () => {
@@ -171,8 +188,14 @@ describe('Polish only where ENGLISH is off (the live game)', () => {
     assert.equal(content.data.classes.find((cls) => cls.id === 'warrior').name, 'Wojownik');
     assert.equal((await ask('POST', '/api/auth/login', { body: {}, lang: 'en' })).data.error.message, 'Podaj login lub e-mail oraz hasło.');
     assert.deepEqual((await ask('GET', '/api/strings', { lang: 'en' })).data, { language: 'pl', strings: {} });
-    const made = await ask('POST', '/api/auth/register', { body: { login: 'Polski', email: 'polski@example.com', password: 'tajnehaslo1' }, lang: 'en' });
+    // The form's choice is not there either: a language sent anyway is not
+    // looked at.
+    const made = await ask('POST', '/api/auth/register', { body: { login: 'Polski', email: 'polski@example.com', password: 'tajnehaslo1', language: 'en' }, lang: 'en' });
+    assert.equal(made.status, 201);
     assert.ok(!('language' in made.data.user));
+    assert.equal(await (await db()).prepare('SELECT language FROM users WHERE login = ?').bind('Polski').first('language'), 'pl');
+    const odd = await ask('POST', '/api/auth/register', { body: { login: 'Polski2', email: 'polski2@example.com', password: 'tajnehaslo1', language: 'de' } });
+    assert.equal(odd.status, 201);
     const choice = await ask('POST', '/api/me/language', { body: { language: 'en' }, cookie: made.cookie, lang: 'en' });
     assert.equal(choice.status, 404);
     assert.equal(choice.data.error.message, 'Nie znaleziono.');

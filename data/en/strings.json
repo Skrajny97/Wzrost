@@ -30,6 +30,8 @@
   "Ukryj hasło": "Hide password",
   "Pokaż hasło": "Show password",
   "Język": "Language",
+  "Język gry": "Game language",
+  "Zmienisz go później w Ustawieniach.": "You can change it later in the Settings.",
   "{count} Punktów Systemu": "{count} System Points",
   "{note} Za połączenie: {points}.": "{note} For linking: {points}.",
   "{note} Na start: {points}.": "{note} To start with: {points}.",

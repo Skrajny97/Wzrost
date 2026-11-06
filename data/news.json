@@ -250,6 +250,11 @@
       "id": "0.1.88",
       "title": "Wersja 0.1.88",
       "body": "- Poprawki angielskiej wersji gry, która na razie działa tylko na wersji testowej. W grze wszystko zostaje po polsku."
+    },
+    {
+      "id": "0.1.89",
+      "title": "Wersja 0.1.89",
+      "body": "- Przygotowania do angielskiej wersji gry: wybór języka przy zakładaniu konta. Na razie angielski działa tylko na wersji testowej, a w grze wszystko zostaje po polsku."
     }
 ]
 }

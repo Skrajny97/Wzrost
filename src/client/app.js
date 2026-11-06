@@ -44,7 +44,7 @@ import { applyMotion } from './motion.js';
 import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
 import { forgetPart, narrate, narrateSoon, passTold } from './narrator.js';
 import { forgetNews, watchNews } from './news.js';
-import { followAccount, languageSwitch, prepareLanguage, t } from './i18n.js';
+import { LANGUAGES, LANGUAGE_NAMES, englishOffered, followAccount, language, languageSwitch, pickLanguage, prepareLanguage, t } from './i18n.js';
 import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, filledForCollector, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn, unlockInfo } from './state.js';
@@ -1537,16 +1537,9 @@ function enterAuth(note = null) {
   }
   for (const toggle of $$('.password-toggle')) setPasswordVisible(toggle, false);
   setAuthMode('login');
-  // PL | EN where the server offers English (i18n.js).
-  const switchSlot = $('#auth-language');
-  const choice = languageSwitch();
-  fill(switchSlot, choice);
-  switchSlot.hidden = !choice;
+  drawAuthLanguage();
   setMusicPlace([]);
-  const installSlot = $('#install-slot');
-  clear(installSlot);
-  const install = installBlock();
-  if (install) installSlot.append(install);
+  drawInstall();
   show('auth');
   request('GET', '/api/health')
     .then((health) => {
@@ -1554,12 +1547,20 @@ function enterAuth(note = null) {
       state.googleLogin = health.google === true;
       // Where no new accounts are made, only the login form stays.
       $('#auth-modes').hidden = health.registration === false;
-      const hint = state.googleLogin ? googleHint() : null;
-      $('#google-block').hidden = !state.googleLogin || hint !== null;
-      $('#google-hint').textContent = hint ?? '';
-      $('#google-hint').hidden = hint === null;
+      drawGoogleHint();
     })
     .catch(() => {});
+}
+
+function drawInstall() {
+  fill($('#install-slot'), installBlock());
+}
+
+function drawGoogleHint() {
+  const hint = state.googleLogin ? googleHint() : null;
+  $('#google-block').hidden = !state.googleLogin || hint !== null;
+  $('#google-hint').textContent = hint ?? '';
+  $('#google-hint').hidden = hint === null;
 }
 
 function setAuthMode(mode) {
@@ -1568,6 +1569,60 @@ function setAuthMode(mode) {
   }
   $('#login-form').hidden = mode !== 'login';
   $('#register-form').hidden = mode !== 'register';
+  // The registration form has a choice of its own ("Język gry").
+  $('#auth-language').hidden = mode === 'register' || !englishOffered();
+}
+
+// The choices of language on the login screen, where the server offers
+// English (i18n.js): PL | EN under the login form, which loads the page
+// again, and the "Język gry" of the registration form, the page's own
+// language at first. The account is made in the language picked there,
+// and the page turns to it at once, keeping what was typed.
+function drawAuthLanguage() {
+  const switchSlot = $('#auth-language');
+  const choice = languageSwitch();
+  fill(switchSlot, choice);
+  switchSlot.hidden = !choice || !$('#register-form').hidden;
+  const field = $('#register-language-field');
+  const value = $('#register-language-value');
+  field.hidden = !englishOffered();
+  value.disabled = field.hidden;
+  value.value = language();
+  fill(
+    $('#register-language'),
+    LANGUAGES.map((id) =>
+      h('button', {
+        type: 'button',
+        class: 'segmented-option',
+        lang: id,
+        'aria-pressed': String(id === language()),
+        text: LANGUAGE_NAMES[id],
+        onClick: () => pickAuthLanguage(id),
+      }),
+    ),
+  );
+}
+
+// The registration form's language picked: the login screen in it, with
+// the texts the code writes there drawn again.
+let pickingLanguage = false;
+async function pickAuthLanguage(id) {
+  if (pickingLanguage) return;
+  pickingLanguage = true;
+  try {
+    if (!(await pickLanguage(id))) return;
+  } finally {
+    pickingLanguage = false;
+  }
+  drawAuthLanguage();
+  $('#register-language [aria-pressed="true"]')?.focus();
+  for (const toggle of $$('.password-toggle')) {
+    setPasswordVisible(toggle, document.getElementById(toggle.getAttribute('aria-controls')).type === 'text');
+  }
+  // A message shown before stays in the language it came in: gone.
+  for (const box of $$('#view-auth .form-error')) box.hidden = true;
+  drawInstall();
+  drawGoogleHint();
 }
 
 function setPasswordVisible(toggle, visible) {

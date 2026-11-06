@@ -87,6 +87,13 @@
       </form>
 
       <form id="register-form" class="form" novalidate hidden>
+        <!-- The account's language, where the server offers English (app.js). -->
+        <div class="field" id="register-language-field" hidden>
+          <span class="field-label" id="register-language-label" data-i18n>Język gry</span>
+          <div class="segmented" id="register-language" role="group" aria-labelledby="register-language-label" aria-describedby="register-language-hint"></div>
+          <input type="hidden" name="language" id="register-language-value" disabled>
+          <p class="field-hint" id="register-language-hint" data-i18n>Zmienisz go później w Ustawieniach.</p>
+        </div>
         <div class="field">
           <label for="register-login" data-i18n>Login</label>
           <input id="register-login" name="login" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="24" aria-describedby="register-login-hint" required>
