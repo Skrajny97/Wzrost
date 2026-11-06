@@ -371,3 +371,22 @@ test('with the switch on, each line of a place goes without a word', async () =>
   await settled();
   assert.equal(toastBox.textContent, '');
 });
+
+// The Społeczność's and the Gildia's rows of tabs stay under the top bar as
+// the page scrolls; while the narrator has the screen they scroll with it,
+// or the camera would frame a place below them behind them (the Siedziba's
+// first building, the top of the Próby's board).
+test('while the narrator has the screen, the rows of tabs scroll with the page', async () => {
+  const { readFileSync } = await import('node:fs');
+  const css = readFileSync(new URL('../src/client/styles.css', import.meta.url), 'utf8');
+  assert.match(css, /\.narrator-held \.community-picker \{\s*position: static;\s*\}/);
+  const root = globalThis.document.documentElement;
+  place(mark('guild-tabs'));
+  state.character = character({ guildTag: 'KRUK' });
+  narrator.narrate('#/gildia');
+  assert.equal(lights().length, 1);
+  assert.ok(root.classList.contains('narrator-held'));
+  // The screen back to the player: the rows stay under the top bar again.
+  clean();
+  assert.ok(!root.classList.contains('narrator-held'));
+});

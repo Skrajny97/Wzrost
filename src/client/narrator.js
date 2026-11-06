@@ -627,11 +627,17 @@ const reachable = (target) =>
   Boolean(target.closest?.('.guide, dialog[open]')) ||
   Boolean(light && light.line.kind !== 'point' && places(light.line).some((element) => element.contains(target)));
 
+// Meanwhile the rows of tabs that stay under the top bar as the page scrolls
+// (the Społeczność's and the Gildia's) scroll with it (styles.css,
+// .narrator-held), so the camera never frames a place behind them (the
+// Gildia's tabs of 6.11.2026: the Siedziba's first building and the top of
+// the Próby's board were hidden).
 function hold() {
   clearTimeout(letGo);
   letGo = null;
   if (!held) {
     held = true;
+    document.documentElement.classList.add('narrator-held');
     document.addEventListener('touchmove', still, { capture: true, passive: false });
     document.addEventListener('wheel', still, { capture: true, passive: false });
   }
@@ -650,6 +656,7 @@ function release(after = HOLD) {
     return;
   }
   held = false;
+  document.documentElement.classList.remove('narrator-held');
   blocker.hidden = true;
   blocker.style.clipPath = '';
   document.removeEventListener('touchmove', still, { capture: true });

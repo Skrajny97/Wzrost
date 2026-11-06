@@ -9539,6 +9539,12 @@ a.profession-square:active {
   background: var(--bg-deep);
 }
 
+/* While the narrator has the screen (narrator.js, .narrator-held), the row
+   scrolls with the page, so his camera never frames a place behind it. */
+.narrator-held .community-picker {
+  position: static;
+}
+
 .community-picker-row {
   position: relative;
   display: flex;
