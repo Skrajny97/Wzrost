@@ -8846,6 +8846,16 @@ a.profession-square:active {
 .scene-aura {
   filter: drop-shadow(0 0 2px var(--aura-glow)) drop-shadow(0 0 5px var(--aura-glow));
 }
+/* Riding, the rider and the mount each glow on their own: the rider moves on
+   a layer of its own (ride-<frames>), and Safari lit the ride's box around
+   the mount only, leaving the rider dark. */
+.scene-ride.scene-aura {
+  filter: none;
+}
+.scene-ride.scene-aura > .scene-ride-mount,
+.scene-ride.scene-aura > .scene-ride-rider {
+  filter: drop-shadow(0 0 2px var(--aura-glow)) drop-shadow(0 0 5px var(--aura-glow));
+}
 /* About the walker's body; two classes, so that the portrait's .aura-motes
    (later in this file, filling its frame) does not pull it to the corner. */
 .aura-motes.scene-aura-motes {
