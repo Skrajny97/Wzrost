@@ -1,0 +1,205 @@
+{
+  "$comment": "English texts of data/affixes.json (src/engine/overlay.js): the words the first region's creatures give an item's name, by the creature, before the base (one word for every gender) and after it, and the suffixes named after no creature (src/engine/items.js, itemName): \"Wolf Sword of the Raven\".",
+  "suffixes": {
+    "mire": {
+      "text": "of the Mire"
+    },
+    "storm": {
+      "text": "of the Storm"
+    },
+    "rocks": {
+      "text": "of the Rocks"
+    },
+    "moss": {
+      "text": "of Moss"
+    },
+    "shrine": {
+      "text": "of the Shrine"
+    }
+  },
+  "names": {
+    "wolf": {
+      "prefix": {
+        "m": "Wolf",
+        "f": "Wolf",
+        "n": "Wolf",
+        "pl": "Wolf"
+      },
+      "suffix": "of the Wolf"
+    },
+    "boar": {
+      "prefix": {
+        "m": "Boar",
+        "f": "Boar",
+        "n": "Boar",
+        "pl": "Boar"
+      },
+      "suffix": "of the Boar"
+    },
+    "crow": {
+      "prefix": {
+        "m": "Raven",
+        "f": "Raven",
+        "n": "Raven",
+        "pl": "Raven"
+      },
+      "suffix": "of the Raven"
+    },
+    "viper": {
+      "prefix": {
+        "m": "Viper",
+        "f": "Viper",
+        "n": "Viper",
+        "pl": "Viper"
+      },
+      "suffix": "of the Viper"
+    },
+    "badger": {
+      "prefix": {
+        "m": "Badger",
+        "f": "Badger",
+        "n": "Badger",
+        "pl": "Badger"
+      },
+      "suffix": "of the Badger"
+    },
+    "fox": {
+      "prefix": {
+        "m": "Fox",
+        "f": "Fox",
+        "n": "Fox",
+        "pl": "Fox"
+      },
+      "suffix": "of the Fox"
+    },
+    "owl": {
+      "prefix": {
+        "m": "Owl",
+        "f": "Owl",
+        "n": "Owl",
+        "pl": "Owl"
+      },
+      "suffix": "of the Owl"
+    },
+    "wisp": {
+      "suffix": "of the Bwendnitsa"
+    },
+    "stag": {
+      "prefix": {
+        "m": "Stag",
+        "f": "Stag",
+        "n": "Stag",
+        "pl": "Stag"
+      },
+      "suffix": "of the Stag"
+    },
+    "marten": {
+      "prefix": {
+        "m": "Marten",
+        "f": "Marten",
+        "n": "Marten",
+        "pl": "Marten"
+      },
+      "suffix": "of the Marten"
+    },
+    "hornets": {
+      "suffix": "of Hornets"
+    },
+    "planetnik": {
+      "suffix": "of the Pwanetnik"
+    },
+    "tusker": {
+      "suffix": "of the Tusker"
+    },
+    "squirrel": {
+      "prefix": {
+        "m": "Squirrel",
+        "f": "Squirrel",
+        "n": "Squirrel",
+        "pl": "Squirrel"
+      },
+      "suffix": "of the Squirrel"
+    },
+    "grass-snake": {
+      "prefix": {
+        "m": "Grass Snake",
+        "f": "Grass Snake",
+        "n": "Grass Snake",
+        "pl": "Grass Snake"
+      },
+      "suffix": "of the Grass Snake"
+    },
+    "raccoon-dog": {
+      "prefix": {
+        "m": "Raccoon Dog",
+        "f": "Raccoon Dog",
+        "n": "Raccoon Dog",
+        "pl": "Raccoon Dog"
+      },
+      "suffix": "of the Raccoon Dog"
+    },
+    "antlion": {
+      "prefix": {
+        "m": "Antlion",
+        "f": "Antlion",
+        "n": "Antlion",
+        "pl": "Antlion"
+      },
+      "suffix": "of the Antlion"
+    },
+    "capercaillie": {
+      "prefix": {
+        "m": "Capercaillie",
+        "f": "Capercaillie",
+        "n": "Capercaillie",
+        "pl": "Capercaillie"
+      },
+      "suffix": "of the Capercaillie"
+    },
+    "weasel": {
+      "prefix": {
+        "m": "Weasel",
+        "f": "Weasel",
+        "n": "Weasel",
+        "pl": "Weasel"
+      },
+      "suffix": "of the Weasel"
+    },
+    "stag-beetle": {
+      "prefix": {
+        "m": "Stag Beetle",
+        "f": "Stag Beetle",
+        "n": "Stag Beetle",
+        "pl": "Stag Beetle"
+      },
+      "suffix": "of the Stag Beetle"
+    },
+    "snake-hawk": {
+      "prefix": {
+        "m": "Snake Eagle",
+        "f": "Snake Eagle",
+        "n": "Snake Eagle",
+        "pl": "Snake Eagle"
+      },
+      "suffix": "of the Snake Eagle"
+    },
+    "wildcat": {
+      "prefix": {
+        "m": "Wildcat",
+        "f": "Wildcat",
+        "n": "Wildcat",
+        "pl": "Wildcat"
+      },
+      "suffix": "of the Wildcat"
+    },
+    "black-stork": {
+      "prefix": {
+        "m": "Stork",
+        "f": "Stork",
+        "n": "Stork",
+        "pl": "Stork"
+      },
+      "suffix": "of the Stork"
+    }
+  }
+}

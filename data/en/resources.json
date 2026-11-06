@@ -1,0 +1,18 @@
+{
+  "$comment": "English texts of data/resources.json, by the resource's id (src/engine/overlay.js). `genitive` is the name after a number: \"5 wood\".",
+  "wood": {
+    "name": "Wood",
+    "genitive": "wood",
+    "description": "Trunks and branches from the windfalls. Needed for almost every building."
+  },
+  "stone": {
+    "name": "Stone",
+    "genitive": "stone",
+    "description": "Boulders and rock fragments for hearths and foundations."
+  },
+  "iron-ore": {
+    "name": "Iron Ore",
+    "genitive": "iron ore",
+    "description": "Rusty lumps from under roots and out of rocks. For fittings and tools."
+  }
+}

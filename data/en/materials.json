@@ -1,0 +1,127 @@
+{
+  "$comment": "English texts of data/materials.json (src/engine/overlay.js): the materials of the first region's creatures, and the parts. The report writes a material in lower case after its rarity (src/engine/crafting.js, materialView): \"rare wolf pelt ×2\".",
+  "materials": {
+    "wolf-pelt": {
+      "name": "Wolf Pelt",
+      "description": "A rough grey pelt with thick fur."
+    },
+    "fox-pelt": {
+      "name": "Fox Pelt",
+      "description": "A soft, light russet pelt."
+    },
+    "badger-claws": {
+      "name": "Badger Claws",
+      "description": "Short, hard claws made for digging burrows."
+    },
+    "viper-scales": {
+      "name": "Viper Scale",
+      "description": "A patch of tiny scales with a dark zigzag."
+    },
+    "boar-tusk": {
+      "name": "Boar Tusk",
+      "description": "A curved tusk, sharp as a knife."
+    },
+    "crow-feather": {
+      "name": "Raven Feather",
+      "description": "A black feather with a dark blue sheen."
+    },
+    "owl-feather": {
+      "name": "Tawny Owl Feather",
+      "description": "A soft, speckled feather. It muffles every rustle."
+    },
+    "wisp-flame": {
+      "name": "Bwendnitsa Flame",
+      "description": "A tiny flame that never goes out and never burns."
+    },
+    "stag-antler": {
+      "name": "Stag Antlers",
+      "description": "Wide-spreading antlers with many tines, hard as bone."
+    },
+    "marten-fur": {
+      "name": "Marten Fur",
+      "description": "Soft, dark brown fur with a cream patch on the chest."
+    },
+    "hornet-sting": {
+      "name": "Hornet Sting",
+      "description": "A sharp sting with a drop of venom at the tip."
+    },
+    "hailstone": {
+      "name": "Hailstone",
+      "description": "An icy pellet from a Pwanetnik's storm. It never melts and sparks faintly."
+    },
+    "tusker-tusks": {
+      "name": "Tusker Sabres",
+      "description": "The long, curved tusks of an old tusker, sharp as sabres."
+    },
+    "squirrel-tail": {
+      "name": "Squirrel Tail",
+      "description": "A bushy russet tail, light as a feather."
+    },
+    "grass-snake-slough": {
+      "name": "Grass Snake Slough",
+      "description": "A thin, translucent skin the snake shed in the grass."
+    },
+    "raccoon-dog-fur": {
+      "name": "Raccoon Dog Fur",
+      "description": "Thick grey-brown fur with a dark stripe."
+    },
+    "antlion-jaws": {
+      "name": "Antlion Jaws",
+      "description": "Two curved sickles, sharp as thorns."
+    },
+    "capercaillie-feather": {
+      "name": "Capercaillie Feather",
+      "description": "A long black feather with a green sheen."
+    },
+    "weasel-fur": {
+      "name": "Weasel Fur",
+      "description": "A small, soft pelt, brown with a white belly."
+    },
+    "stag-beetle-horn": {
+      "name": "Stag Beetle Horn",
+      "description": "A glossy mandible shaped like small antlers."
+    },
+    "snake-hawk-talon": {
+      "name": "Snake Eagle Talon",
+      "description": "A hooked talon that pierces viper scales."
+    },
+    "wildcat-fur": {
+      "name": "Wildcat Fur",
+      "description": "Thick, striped fur, grey as bark."
+    },
+    "black-stork-feather": {
+      "name": "Black Stork Feather",
+      "description": "A long black feather with a coppery sheen."
+    }
+  },
+  "parts": {
+    "scraps": {
+      "name": "Scraps",
+      "description": "Bits of leather, bone and feather, cleaned and trimmed."
+    },
+    "straps": {
+      "name": "Straps",
+      "description": "Strong strips of tanned leather."
+    },
+    "fittings": {
+      "name": "Fittings",
+      "description": "Buckles, rivets and plates for joining parts."
+    },
+    "shards": {
+      "name": "Shards",
+      "description": "Sharp crystal splinters, harder than steel."
+    },
+    "amber": {
+      "name": "Amber",
+      "description": "A warm lump of resin from ages past."
+    },
+    "bloodstone": {
+      "name": "Bloodstone",
+      "description": "A dark red stone with veins like blood."
+    },
+    "star-shard": {
+      "name": "Star Shard",
+      "description": "A splinter that fell from the sky and still glows faintly."
+    }
+  }
+}

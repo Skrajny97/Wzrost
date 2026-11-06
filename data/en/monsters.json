@@ -1,0 +1,256 @@
+{
+  "$comment": "English texts of data/monsters.json, by the creature's id (src/engine/overlay.js): the creatures of the first region. `counted` is the name after a number, [one, other, other] (src/engine/text.js, countedForm), in Title Case like the name: \"Defeat 5 Wolves\".",
+  "wolf": {
+    "name": "Wolf",
+    "counted": [
+      "Wolf",
+      "Wolves",
+      "Wolves"
+    ],
+    "attack": {
+      "name": "Bite"
+    }
+  },
+  "badger": {
+    "name": "Badger",
+    "counted": [
+      "Badger",
+      "Badgers",
+      "Badgers"
+    ],
+    "attack": {
+      "name": "Claws"
+    }
+  },
+  "squirrel": {
+    "name": "Squirrel",
+    "counted": [
+      "Squirrel",
+      "Squirrels",
+      "Squirrels"
+    ],
+    "attack": {
+      "name": "Pine Cone Throw"
+    }
+  },
+  "grass-snake": {
+    "name": "Grass Snake",
+    "counted": [
+      "Grass Snake",
+      "Grass Snakes",
+      "Grass Snakes"
+    ],
+    "attack": {
+      "name": "Grass Snake's Bite"
+    }
+  },
+  "fox": {
+    "name": "Fox",
+    "counted": [
+      "Fox",
+      "Foxes",
+      "Foxes"
+    ],
+    "attack": {
+      "name": "Snap"
+    }
+  },
+  "marten": {
+    "name": "Marten",
+    "counted": [
+      "Marten",
+      "Martens",
+      "Martens"
+    ],
+    "attack": {
+      "name": "Neck Bite"
+    }
+  },
+  "raccoon-dog": {
+    "name": "Raccoon Dog",
+    "counted": [
+      "Raccoon Dog",
+      "Raccoon Dogs",
+      "Raccoon Dogs"
+    ],
+    "attack": {
+      "name": "Savage Bite"
+    }
+  },
+  "antlion": {
+    "name": "Antlion",
+    "counted": [
+      "Antlion",
+      "Antlions",
+      "Antlions"
+    ],
+    "attack": {
+      "name": "Sand Toss"
+    }
+  },
+  "crow": {
+    "name": "Raven",
+    "counted": [
+      "Raven",
+      "Ravens",
+      "Ravens"
+    ],
+    "attack": {
+      "name": "Peck"
+    }
+  },
+  "owl": {
+    "name": "Tawny Owl",
+    "counted": [
+      "Tawny Owl",
+      "Tawny Owls",
+      "Tawny Owls"
+    ],
+    "attack": {
+      "name": "Talon Strike"
+    }
+  },
+  "capercaillie": {
+    "name": "Capercaillie",
+    "counted": [
+      "Capercaillie",
+      "Capercaillies",
+      "Capercaillies"
+    ],
+    "attack": {
+      "name": "Wing Strike"
+    }
+  },
+  "weasel": {
+    "name": "Weasel",
+    "counted": [
+      "Weasel",
+      "Weasels",
+      "Weasels"
+    ],
+    "attack": {
+      "name": "Quick Snap"
+    }
+  },
+  "viper": {
+    "name": "Viper",
+    "counted": [
+      "Viper",
+      "Vipers",
+      "Vipers"
+    ],
+    "attack": {
+      "name": "Snakebite"
+    }
+  },
+  "hornets": {
+    "name": "Hornet Swarm",
+    "counted": [
+      "Hornet Swarm",
+      "Hornet Swarms",
+      "Hornet Swarms"
+    ],
+    "attack": {
+      "name": "Stings"
+    }
+  },
+  "stag-beetle": {
+    "name": "Stag Beetle",
+    "counted": [
+      "Stag Beetle",
+      "Stag Beetles",
+      "Stag Beetles"
+    ],
+    "attack": {
+      "name": "Mandible Grip"
+    }
+  },
+  "snake-hawk": {
+    "name": "Snake Eagle",
+    "counted": [
+      "Snake Eagle",
+      "Snake Eagles",
+      "Snake Eagles"
+    ],
+    "attack": {
+      "name": "Swoop"
+    }
+  },
+  "boar": {
+    "name": "Boar",
+    "counted": [
+      "Boar",
+      "Boars",
+      "Boars"
+    ],
+    "attack": {
+      "name": "Charge"
+    }
+  },
+  "stag": {
+    "name": "Stag",
+    "counted": [
+      "Stag",
+      "Stags",
+      "Stags"
+    ],
+    "attack": {
+      "name": "Antler Strike"
+    }
+  },
+  "wildcat": {
+    "name": "Wildcat",
+    "counted": [
+      "Wildcat",
+      "Wildcats",
+      "Wildcats"
+    ],
+    "attack": {
+      "name": "Wildcat's Claws"
+    }
+  },
+  "black-stork": {
+    "name": "Black Stork",
+    "counted": [
+      "Black Stork",
+      "Black Storks",
+      "Black Storks"
+    ],
+    "attack": {
+      "name": "Beak Thrust"
+    }
+  },
+  "wisp": {
+    "name": "Bwendnitsa",
+    "counted": [
+      "Bwendnitsa",
+      "Bwendnitsas",
+      "Bwendnitsas"
+    ],
+    "attack": {
+      "name": "Wandering Fire"
+    }
+  },
+  "planetnik": {
+    "name": "Pwanetnik",
+    "counted": [
+      "Pwanetnik",
+      "Pwanetniks",
+      "Pwanetniks"
+    ],
+    "attack": {
+      "name": "Thunderbolt"
+    }
+  },
+  "tusker": {
+    "name": "Tusker",
+    "counted": [
+      "Tusker",
+      "Tuskers",
+      "Tuskers"
+    ],
+    "attack": {
+      "name": "Tusker's Charge"
+    }
+  }
+}
