@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.1 (6.11.2026)
+
+- 45 angielskich kwestii narratora odrzuconych w 719 („zbyt zabłocone”) nagranych jeszcze raz tym samym głosem (718.6) z najwyższą stabilnością eleven_v3 (1.0). Weszły do gry w miejsce poprzednich; autor słucha ich na stronie odsłuchu 720. Ścieżki nagrań się nie zmieniły, zmieniły się same pliki.
+
 ## Wersja 0.2.0 (6.11.2026)
 
 - Narrator po angielsku mówi głosem rodzimego lektora, wybranym przez autora w 718 (718.6, amerykański gawędziarz): wszystkie 142 kwestie z wersjami na komputer. Autor: „używamy 718.6” i „Teraz generuj kwestie i zaraz je wdrażamy, na 20:30 zaplanowana rolka do publikacji”. Nagrania weszły do gry od razu; autor słucha ich na stronie odsłuchu (719), a odrzucone zostaną nagrane jeszcze raz.
