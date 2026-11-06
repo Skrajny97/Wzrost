@@ -3034,6 +3034,47 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.91 (6.11.2026)
+
+- Angielska wersja beta, etap 3: Umiejętności, Drużyna, Społeczność, Profesje, Encyklopedia i Sklep Systemu po angielsku, z rozdziałami narratora jako tekst (do zatwierdzenia przed nagraniem). Tylko na wersji testowej: zob. „Angielska wersja beta, etap 3: poziomy 5–15”.
+- W grze: filtr czatu zamienia na gwiazdki także angielskie przekleństwa (lista `wordsEn`), we wszystkich kanałach.
+- Na telefonach drążki pergaminu narratora i zadań mieszczą się w całości na ekranie, a długa nazwa miejsca (np. „Skraj Wiatrołomów”) mieści się obok „Powrót” przy 320 px.
+
+## Angielska wersja beta, etap 3: poziomy 5–15 (668; 6.11.2026, od 0.1.91)
+
+Etap 3 z planu angielskiej bety (668). Jak w etapach 1 i 2 angielski działa tylko tam, gdzie przełącznik `ENGLISH` jest włączony (wersja testowa i praca lokalna).
+
+1. **Co jest po angielsku**
+    - Umiejętności: ścieżki i umiejętności wszystkich klas z opisami i kosztami, ekran Umiejętności i jego komunikaty.
+    - Profesje: Zielarstwo, Alchemia i Rzemieślnictwo z ziołami, miksturami, przepisami, Warsztatem i Awatarem Systemu. Ekran Profesji ma po angielsku także napisy Górnictwa i Jubilerstwa, ale ich dane (minerały, kamienie, wzory) zostają po polsku do etapu 4.
+    - Społeczność: czat z zasadami i moderacją, Znajomi, Ranking postaci, Wymiana i Drużyna.
+    - Encyklopedia, Sklep Systemu z kosmetykami i kody upominkowe.
+    - Rozdziały narratora: Umiejętności, Drużyna, Profesje, Rzemieślnictwo i Społeczność (25 kwestii, z wersjami klas). Na razie jako tekst, a przed nagraniem w etapie 5 autor je zatwierdza (711).
+    - Serwer i silnik tych części: błędy, potwierdzenia i zdania umiejętności („15 percentage points”, „32.1%”).
+2. **Kanał „English” na czacie:** trzeci kanał, tylko tam, gdzie angielski jest włączony; gra na żywo ma nadal dwa kanały. Strona po angielsku ma go pierwszego i na nim otwiera czat, strona po polsku ma go trzeciego. Czytać i pisać może w nim każdy. Kropka Społeczności i znacznik przeczytania biorą pierwszy kanał strony.
+3. **Filtr przekleństw:** obok listy polskiej (`words`) jest angielska (`wordsEn`, 17 rdzeni). Czat maskuje słowa z obu list we wszystkich kanałach, także w grze. Filtr imion postaci zostaje przy liście polskiej, bo inaczej nocna zmiana imion objęłaby istniejące postacie. Z angielskiej listy wypadły rdzenie, które łapałyby słowa gry albo polskie (np. „coon” w „Raccoon Dog”, „paki” w „szczupaki”, „crap” w „Scrapyard”).
+4. **Nazwy spoza słownika** (słownik nazw zostaje bez zmian):
+    - Systemowy Zagajnik → System Grove, Systemowa Pracownia → System Laboratory, Awatar Systemu → System Avatar.
+    - Ścieżka główna → main path, ścieżka poboczna → side path.
+    - Zakładki Sklepu: Ramki → Frames, Tła → Backgrounds, Aury → Auras, Ślady → Trails, Wierzchowiec → Mount, Chowańce → Pets.
+    - Upominki → Gifts, Lider → Leader, Moderacja → Moderation, Ukryte postacie → Hidden characters, Łut szczęścia → Stroke of luck, Żyły złota → Gold veins.
+    - Załóż / Zdejmij → Equip / Unequip, wszędzie tak samo.
+5. **Zasady angielskiego**
+    - „Kamień” to ze słownika „Stone”, więc Jubilerstwo mówi o kamieniach („stones”), nie o klejnotach.
+    - Krótkie napisy dla 320 px: „Poziom Profesji” → „Prof. level”, „Kup ({price} PS)” → „Buy ({price})” (cena z ikoną Punktów Systemu stoi tuż nad przyciskiem), „Brakuje {count} PS” → „{count} points short”.
+    - Data końca wyciszenia na czacie po angielsku: „06/11, 14:05”.
+6. **Komunikaty serwera po kształcie:** krótki napis strony z mniej niż 8 literami własnego tekstu (np. „{count} z {all}”, „{label}, {waiting}”) nie jest wzorcem dla komunikatów serwera (`translateMessage`, `src/server/i18n.js`). Inaczej komunikat bez angielskiego wychodził w połowie przetłumaczony („Gildia of tym skrótem…”), a tak zostaje cały po polsku. Własne komunikaty serwera mają 14 liter i więcej.
+7. **Zostaje po polsku do kolejnych etapów:** Osada z Górnictwem i Jubilerstwem (etap 4), a dalej Gildia (także sława gildii w Rankingu), Wieże, Ewolucje, Warownia i krainy od 26. poziomu.
+8. **Pilnowanie:** `tools/layout-check.cjs --lang en` wypisuje polskie słowa także z ekranów etapu 3 i z ekranu miejsca (`TRANSLATED`). `test/i18n-stage3.test.js` sprawdza kanał English, obie listy przekleństw, komunikaty i zdania silnika w obu językach.
+9. **Znane ograniczenie:** znacznik przeczytania czatu na urządzeniu jest wspólny dla obu języków. Kto na jednym telefonie przełącza języki, może nie zobaczyć kropki przy starszych wiadomościach.
+10. **Podział pracy:** pięciu pomocników w osobnych gałęziach (umiejętności, profesje, dwa zestawy ekranów, serwer z kanałem English). Gałęzie scalono w jedną, bez podwójnych kluczy w `strings.json`; przy różnych tłumaczeniach jednego napisu zostało jedno (np. „Zwiń” → „Close”, „Mniej” → „Less”).
+
+## Telefony: drążki pergaminu i długa nazwa miejsca (6.11.2026, od 0.1.91)
+
+1. **Drążki:** na ekranach do 459 px pergamin narratora i zadań stoi 16 px od krawędzi ekranu, a drążki z gałkami wystawały poza niego 19 px, więc gałki były ucięte o 3 px. Teraz wystają 15 px i mieszczą się całe.
+2. **Nazwa miejsca:** tytuł z jednym długim słowem obok dużego „Powrót” (np. „Skraj Wiatrołomów”) wychodził przy 320 px o ok. 20 px poza ramkę. Do 374 px taki tytuł ma 24 px zamiast 28 px.
+3. **Pilnowanie:** `tools/layout-check.cjs` ogląda też ekran miejsca (Skraj Wiatrołomów).
+
 ## Wersja 0.1.90 (6.11.2026)
 
 - Angielska wersja beta, etap 2: poziomy 1–10 po angielsku, z wprowadzeniem narratora (709 OK). Tylko na wersji testowej, w grze wszystko zostaje po polsku: zob. „Angielska wersja beta, etap 2: poziomy 1–10”.
