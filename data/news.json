@@ -220,6 +220,11 @@
       "id": "0.1.82",
       "title": "Wersja 0.1.82: Tier VI przedmiotów",
       "body": "- Od 100. poziomu klasy czekają 22 nowe przedmioty Tieru VI, od Flamberga po Lunulę. Wypadają na wyprawach od Starego Wyrobiska, a znajdziesz je też w skrzyni tygodniowej, u wędrownego handlarza i w Salonie Gier.\n- Wzory Warsztatu i Szlifierni odsłaniają się na 100. poziomie Rzemieślnictwa i Jubilerstwa, a rozbiórka przedmiotu uczy wzoru wcześniej.\n- Encyklopedia ma dział Tier VI z sześcioma zestawami. Każdy pełny zestaw daje skrzynię: 6250 złota, 160 Punktów Czasu i 64 Punkty Systemu."
+    },
+    {
+      "id": "0.1.83",
+      "title": "Wersja 0.1.83: rzadkie przepisy Jagny",
+      "body": "- Zielarka Jagna zdradza rzadkie przepisy Alchemii: trzy od stopnia Zaufany i trzy od stopnia Przyjaciel, w relacji z nią albo w reputacji Bractwa Zielarzy. Zdradzone przepisy widać u niej w zakładce „Kup”.\n- Raport wyprawy nazywa działanie mikstury, np. „Twarda skóra działała w walkach: 2 z 4.”.\n- Aura świeci teraz wokół postaci, która jedzie wierzchem, a nie tylko wokół konia."
     }
 ]
 }

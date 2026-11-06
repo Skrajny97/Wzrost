@@ -3034,6 +3034,40 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.83 (6.11.2026)
+
+Rzadkie przepisy Jagny: sześć przepisów Alchemii od stopnia Zaufany i od stopnia Przyjaciel, w relacji z Jagną albo w reputacji Bractwa Zielarzy: zob. „Rzadkie przepisy Jagny”. Aura przy jeździe wierzchem świeci też wokół jeźdźca: zob. „Aura przy jeździe wierzchem”.
+
+## Rzadkie przepisy Jagny (667, 682–684, 670; 6.11.2026, od 0.1.83)
+
+Punkt 667 z listy na noc 5/6.11 (rzadkie receptury Jagny), autor: „667 tak”. Odpowiedzi autora: 121 A (zielarka „zaufanym zdradza rzadkie receptury”), 682 A i C, 683 A, 684 A i 670 (ikony).
+
+1. **Kiedy (682 A i C, 683 A).** Jagna sama, bez opłaty, zdradza sześć rzadkich przepisów Alchemii: trzy od stopnia Zaufany, trzy od stopnia Przyjaciel. Liczy się relacja z Jagną albo reputacja Bractwa Zielarzy, co pierwsze dojdzie do stopnia. Relację z nią daje handel z nią (najwyżej 10 punktów dziennie), a reputację Bractwa ten sam handel i zlecenia Bractwa z Tablicy zleceń (10 punktów za zlecenie, 50 za zlecenie tygodnia), więc przez Bractwo przychodzą szybciej.
+2. **Poziom Alchemii zostaje.** Zdradzony przepis czeka jeszcze na swój poziom Alchemii, jak każdy: dopiero od niego postać go warzy i pije jego mikstury. Mikstura z Wymiany albo z Targowiska działa tylko u postaci, która zna jej przepis, jak dotąd.
+3. **Przepisy** (poziom Alchemii, zioła, katalizator, działanie; w nawiasie mikstura Systemu, którą przewyższa):
+    - od stopnia Zaufany: Sowi napar: 40, Kozłek ×3 i Dziurawiec ×1, Pióro puchacza (Puchacz, Rysia Grań 36–40), Intelekt i Mądrość +20% na 2 walki (Mikstura skupienia +10%); Wywar niedźwiedziej skóry: 44, Arnika ×3 i Żurawina ×1, Skóra niedźwiedzia (Niedźwiedź, Serce Uroczyska 46–50), pancerz +30% na 2 walki (Wywar kamiennej skóry +15%); Wywar wilczej siły: 50, Piołun ×3 i Żurawina ×1, Kieł basiora (Basior, Wilcze Kręgi 41–45), obrażenia +20% na 2 walki (Wywar siły +10%);
+    - od stopnia Przyjaciel: Wywar od oparzeń: 60, Żurawina ×2 i Babka lancetowata ×2, Kropla mgły (Mgławica, Wierzbowe Kępy 66–70), działa sam w walce: zdejmuje Oparzenie i chroni przed nim do końca walki (Odtrutka robi to samo z Zatruciem); Napar od uroków: 70, Jemioła ×3 i Dziurawiec ×1, Welon zjawy (Zjawa, Wierzbowe Kępy 66–70), obrażenia od magii −35% na 2 walki (Eliksir jemiołowy −20%); Balsam Jagny: 75, Żywokost ×3, Żurawina ×2 i Kwiat paproci ×1, bez katalizatora, leczy 70% maks. HP (Duża mikstura leczenia 50%).
+4. **Czas i cena (brakujący szczegół).** Warzą się tyle co każda mikstura na tym samym poziomie Alchemii. Złomiarz płaci za nie 1,5 raza tyle co za ich zioła, jak za każdą miksturę: Sowi napar 63 złota, Wywar niedźwiedziej skóry 57, Wywar wilczej siły 66, Wywar od oparzeń 57, Napar od uroków 117, Balsam Jagny 141, przed premią Skupu złomu. Mikstura z ziół kupionych u Jagny dalej nie daje zysku.
+5. **Zioła (brakujący szczegół).** Zioła tych przepisów Jagna ma na półce już od stopnia relacji, przy którym je zdradza (przy Zaufanym 10 ziół, przy Przyjacielu wszystkie 13, z Kwiatem paproci), więc półka się nie zmienia.
+6. **Przed zdradzeniem** przepis jest nieznany w całej grze. Pracownia pokazuje cień z „???” i zdaniem „Rzadki przepis Jagny: od stopnia Zaufany w relacji z Jagną albo w reputacji Bractwa Zielarzy, i od 40. poziomu Alchemii.”. Zlecenia z Tablicy, prezenty towarzyszy, zadania narratora i raport z warzenia go nie podają. Encyklopedia ma sześć nowych mikstur (22 zamiast 16), a przy każdej zdanie „Rzadki przepis: zdradza go zielarka Jagna od stopnia Zaufany w relacji z nią albo w reputacji Bractwa Zielarzy.”.
+7. **Jak gracz się dowiaduje.** Handel z Jagną albo oddane zlecenie Bractwa Zielarzy, po którym relacja albo reputacja dojdzie do stopnia, dopisuje do komunikatu „Jagna zdradza Ci 3 rzadkie przepisy Alchemii: Sowi napar, Wywar niedźwiedziej skóry, Wywar wilczej siły.”. Gdyby zdarzenie na wyprawie dało reputację Bractwa Zielarzy, to samo zdanie stanie w raporcie wyprawy; dziś żadne zdarzenie jej nie daje. W zakładce „Kup” u Jagny, pod ziołami, jest część „Rzadkie przepisy”: zdradzone przepisy z ikoną i zdaniem „Uwarzysz go w Systemowej Pracowni.” albo „Uwarzysz go od 50. poziomu Alchemii.”, a pod nimi „Jagna zdradzi Ci 3 rzadkie przepisy Alchemii od stopnia Przyjaciel w relacji z nią albo w reputacji Bractwa Zielarzy.”. Przepis, który czekał na poziom Alchemii, raport z warzenia odsłania na tym poziomie jak każdy.
+8. **Mikstura na każdy efekt (684 A).** Postać zabiera i pije osobną miksturę na każdy efekt: Odtrutkę na Zatrucie i Wywar od oparzeń na Oparzenie, każdą najwyżej raz na walkę, w chwili gdy dopadnie ją jej efekt. Wpis walki podaje efekt („Mira wypija Wywar od oparzeń: Oparzenie znika i nie wróci do końca walki.”). Walka z samą Odtrutką toczy się dokładnie jak dotąd.
+9. **Raport wyprawy i wybór mikstur.** Mikstura Systemu i przepis Jagny jednego rodzaju dają jeden bonus, więc raport nazywa działanie, jak „Aktywne bonusy”: „Twarda skóra działała w walkach: 2 z 4.”, a tak samo Siła, Skupienie i Osłona przed magią. Podpowiedź przy wyborze mikstur na wyprawę wymienia Wywar od oparzeń tylko u postaci, która go niesie.
+10. **Ikony (670).** Wybory autora spośród szkiców PixelLab: Sowi napar A, Wywar niedźwiedziej skóry C, Wywar wilczej siły B, Wywar od oparzeń B, Napar od uroków B, Balsam Jagny A.
+11. **Zapis.**
+    - Dane: `taught` przy miksturze w `data/professions.json` (id stopnia z `settlement.standings`); `settlement.herbalist.teaching` mówi, co się liczy (relacja z mieszkańcem albo reputacja bractwa).
+    - Kod: `teachingPoints`, `recipeTaught` i `recipeStanding` w `src/engine/brewing.js`; `herbalistRecipes` i `taughtWords` w `src/engine/settlement.js`.
+    - Teksty: `brewing.texts.herbalistHidden`, `settlement.herbalist.recipes` i `potionTaught` w `data/encyclopedia.json`.
+    - Walidator sprawdza stopień i to, że mieszkaniec i bractwo istnieją. Testy: `test/herbalist-recipes.test.js`, `test/potions.test.js`.
+
+## Aura przy jeździe wierzchem (gracz na czacie, 6.11.2026, od 0.1.83)
+
+Gracz na czacie (zrzut od autora): „Nie wiem czy to bug, ale jak ma się aurę to na wyprawie ona podświetla tylko konia zamiast postaci”.
+
+1. **Przyczyna (najpewniej).** W scenie Walka jeździec unosi się i opada w siodle z każdą klatką kłusa (animacja `ride-<klatki>` w `src/client/styles.css`), więc przeglądarka rysuje go na osobnej warstwie. Światło aury (filtr `drop-shadow`) leżało na całym pudełku jazdy. Safari, także każda przeglądarka na iPhonie, rysuje taki filtr tylko wokół tego, co leży na warstwie samego pudełka, czyli wokół konia. Chromium rysował światło wokół obu, dlatego sprawdzenia w przeglądarce tego nie pokazały, a Safari nie ma w narzędziach testowych.
+2. **Poprawka.** Przy jeździe światło aury dostaje osobno koń i osobno jeździec (`.scene-ride.scene-aura` w `src/client/styles.css`), więc nie zależy od tego, na ilu warstwach przeglądarka je rysuje. Tam, gdzie jeździec siedzi na koniu, jego światło kładzie się też na grzbiet konia. Pieszo nic się nie zmienia.
+3. **Sprawdzenie.** W Chromium przy 390 i 1366 px: postać z Koniem wierzchowym i Aurą Systemu na wyprawie świeci w całości. Na iPhonie sprawdzi to autor albo gracz, który zgłosił błąd.
+
 ## Wersja 0.1.82 (6.11.2026)
 
 Tier VI przedmiotów: 22 przedmioty od 100. poziomu klasy z ikonami, które wybrał autor: zob. „Tier VI przedmiotów”. Odpowiedzi autora na pytania 669–698: zob. „Odpowiedzi autora 669–698”.
