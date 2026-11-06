@@ -226,8 +226,10 @@ async function creditsLeft() {
   try {
     const response = await fetch(`${API}/user/subscription`, { headers: { 'xi-api-key': token } });
     if (!response.ok) return null;
-    const { character_count: used, character_limit: limit } = await response.json();
-    return `${limit - used} z ${limit}`;
+    const { character_count: used, character_limit: limit, next_character_count_reset_unix: reset } = await response.json();
+    // When the plan gives its credits anew, Polish time.
+    const renewed = reset ? `, odnowienie ${new Date(reset * 1000).toLocaleString('pl-PL', { timeZone: 'Europe/Warsaw', dateStyle: 'short', timeStyle: 'short' })}` : '';
+    return `${limit - used} z ${limit}${renewed}`;
   } catch {
     return null;
   }
