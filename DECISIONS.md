@@ -3046,6 +3046,7 @@ Etap 2 z planu angielskiej bety (668). Jak w etapie 1 angielski działa tylko ta
 1. **Co jest po angielsku**
     - Wprowadzenie narratora: 42 kwestie w brzmieniu zatwierdzonym przez autora (709 OK), na razie jako tekst. Angielski głos przyjdzie w etapie 5, tym samym głosem co po polsku (696 A).
     - Pierwsza kraina: Wiatrołomy → Windfalls z pięcioma miejscami, 23 stworami (z elitami i czempionem), ich materiałami i przydomkami, częściami, wszystkimi przedmiotami do 25. poziomu klasy (66 podstaw), rzadkościami, żywiołami, efektami i zasobami.
+    - Karty siedmiu dalszych regionów w zakładce Walka: nazwa, opis, kraina i cecha (np. Uroczysko Kamieni → Stone Glade, Torfowiska → Peatlands, Szumiący Bór → Whispering Pines, Przymrozek → Ground Frost). Ich miejsca, stwory i materiały przyjdą w kolejnych etapach.
     - Dziewięć zdarzeń pierwszej krainy z ich przeciwnikami. Kwiat paproci zostaje po polsku, bo w pierwszej krainie się nie zdarza.
     - Zdania walk, znalezisk, awansów i raportów, powiadomienia na telefon, mail z linkiem, komunikaty Systemu o odblokowaniach, obóz bez Warowni z dziewięcioma budynkami i zadania narratora.
     - Ekrany: Postać, Statystyki, Plecak, karta przedmiotu z Kowadłem, Skrzynia Konta, Stół rozbiórki, złomiarz, Duch budowniczego, Walka z wyprawami i Szybkim Polowaniem, raport, Dziennik, Obóz i zadania narratora.
