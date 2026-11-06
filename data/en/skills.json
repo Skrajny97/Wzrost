@@ -1,0 +1,114 @@
+{
+  "$comment": "English texts of data/skills.json, by the skill's id (src/engine/overlay.js): the three paths of each class at class level 10, each with its skill. A path's name is also the name of the class's first evolution (data/evolutions.json), and the narrator's line skills-paths (data/en/tutorial.json) names each path exactly as it is written here: narrator.js finds the name in the line to move the camera to it. `style` is shown in capitals over the skill. In `effect`, {name%}, {name%.1}, {name pp}, {cooldown} and {critPower%} are filled with the skill's numbers by src/engine/skills.js (skillText); every number of turns, hits and points there is more than one. `stunLabel` stands on the card of the creature that loses its turn.",
+  "power-strike": {
+    "path": "Barbarian",
+    "name": "Mighty Blow",
+    "style": "attack",
+    "description": "The warrior swings with all their might. A blow like this pierces even a thick hide.",
+    "effect": "A blow dealing {power%} damage that ignores {armorIgnore%} of the target's armour."
+  },
+  "wide-sweep": {
+    "path": "Gladiator",
+    "name": "Wide Sweep",
+    "style": "area",
+    "description": "The blade cuts a wide arc and reaches everyone who stands before it.",
+    "effect": "Attacks every enemy for {power%} damage. You may miss. When the target is a single enemy – the skill deals {single%} damage."
+  },
+  "unyielding": {
+    "path": "Guardian",
+    "name": "Unyielding",
+    "style": "defence",
+    "description": "When things turn dangerous, the warrior braces behind the shield and does not take a single step back.",
+    "effect": "Once per fight, when HP falls below {below%}, recovers {heal%} of max HP and gains {armor%} more armour for {turns} of their own turns."
+  },
+  "aimed-shot": {
+    "path": "Sniper",
+    "name": "True Shot",
+    "style": "attack",
+    "description": "The archer holds their breath and aims at an unguarded spot.",
+    "effect": "A shot dealing {power%} damage that cannot be dodged. With it, the chance of a critical hit rises by {critBonus pp}."
+  },
+  "arrow-rain": {
+    "path": "Storm Archer",
+    "name": "Hail of Arrows",
+    "style": "area",
+    "description": "Several arrows loosed one after another, falling upon the foes.",
+    "effect": "Deals {power%} damage to all foes, with a chance to miss. Used on a single enemy, it deals {single%} damage."
+  },
+  "pinning-shot": {
+    "path": "Hunter",
+    "name": "Pinning Shot",
+    "style": "control",
+    "description": "The arrow nails the enemy's foot to the ground before it can move.",
+    "effect": "A shot dealing {power%} damage. The enemy hit loses its next turn.",
+    "params": {
+      "stunLabel": "pinned"
+    }
+  },
+  "fireball": {
+    "path": "Elementalist",
+    "name": "Fireball",
+    "style": "attack",
+    "description": "The mage gathers embers in their hands and hurls them at the enemy.",
+    "effect": "A fire spell dealing {power%} damage. The target has a {dotChance%} chance of Burn: for {dotTicks} of its turns it loses {dotPower%} of the spell's damage each turn."
+  },
+  "frost-gust": {
+    "path": "Ice Lord",
+    "name": "Frost Gust",
+    "style": "area",
+    "description": "An icy wind lashes every enemy and slows their every move.",
+    "effect": "A frost spell on all enemies deals {power%} damage. Every enemy hit is slowed by {slow%}."
+  },
+  "mana-shield": {
+    "path": "Arcanist",
+    "name": "Mana Shield",
+    "style": "defence",
+    "description": "The mage surrounds themselves with a magic shield built upon their own mana.",
+    "effect": "Once per fight, when HP falls below {below%}, uses {pool%} of max mana and turns it into a shield that stops damage equal to {ratio%} of the mana taken. The shield takes blows until it is spent."
+  },
+  "prayer-of-health": {
+    "path": "Healer",
+    "name": "Prayer for Health",
+    "style": "healing",
+    "description": "The cleric whispers a prayer, and the wounds begin to close.",
+    "effect": "Once per fight, when HP falls below {below%}, heals {heal%.1} of max HP, plus 1 HP for every {wisdomPerHp} points of Wisdom."
+  },
+  "exorcism": {
+    "path": "Inquisitor",
+    "name": "Exorcism",
+    "style": "area",
+    "description": "The cleric speaks the words of exorcism and lashes every enemy with the sacred element.",
+    "effect": "Exorcism lashes every enemy, dealing {power%} sacred damage. Against a single target – it deals {single%} damage. Every enemy hit has a {stunChance%} chance of paralysis and then loses its next turn.",
+    "params": {
+      "stunLabel": "paralysed"
+    }
+  },
+  "blessing": {
+    "path": "Priest",
+    "name": "Blessing",
+    "style": "empowerment",
+    "description": "The cleric traces a holy sign over themselves and their companions. Damage taken falls, and damage dealt – rises.",
+    "effect": "At the start of a fight, until its end: armour and resistances +{armor%}, damage +{damage%}. In a party fight the bonus grows and is shared out."
+  },
+  "backstab": {
+    "path": "Assassin",
+    "name": "Backstab",
+    "style": "attack",
+    "description": "The Shadow vanishes from the enemy's sight and strikes where it is least expected.",
+    "effect": "A blow dealing {power%} damage, always critical ({critPower%} in all), at the enemy standing furthest back. Works on the first turn of a fight, then at most once every {cooldown} turns."
+  },
+  "poisoned-blade": {
+    "path": "Poisoner",
+    "name": "Poisoned Blade",
+    "style": "poison",
+    "description": "The Shadow smears the blade with viper venom. Every scratch burns from within.",
+    "effect": "At the start of a fight, until its end: every blow has a {dotChance%} chance of Poison. For {dotTicks} of its turns, a poisoned enemy loses {dotPower%} of the blow's damage each turn."
+  },
+  "shadow-dance": {
+    "path": "Night Dancer",
+    "name": "Shadow Dance",
+    "style": "dodge",
+    "description": "The Shadow blurs in motion. Enemy blows cut only air.",
+    "effect": "Once per fight, when HP falls below {below%}: for the next {hits} enemy blows, dodge rises by {dodge pp}. Each dodge brings a counter dealing {counter%} damage."
+  }
+}
