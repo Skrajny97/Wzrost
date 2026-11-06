@@ -1003,6 +1003,12 @@
         "Lily": "pFZP5JQG7iQjIQuC4Bku",
         "Narrator": "EzVQa2PYE48LG3dn30Fa"
       },
+      "saved": {
+        "NarratorEn": {
+          "description": "An elderly American man, a wise storyteller by a campfire at night. Deep, gravelly, warm voice, slow and deliberate, gently mysterious. Native American English accent, clear diction, no foreign accent.",
+          "generatedVoiceId": "YQFe5bfDepM6tYS29SMV"
+        }
+      },
       "remixGuidance": 2,
       "previewCreditsPerCharacter": 3,
       "designModel": "eleven_ttv_v3",
@@ -1010,12 +1016,12 @@
       "languageCode": "en"
     },
     "allLines": {
-      "voice": "Narrator",
+      "voice": "NarratorEn",
       "model": "eleven_v3",
       "settings": {
         "stability": 0.5
       },
-      "ending": " [pauses]"
+      "ending": " The fire crackles softly. [pauses]"
     },
     "prompts": {}
   },

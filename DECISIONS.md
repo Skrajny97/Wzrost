@@ -3055,6 +3055,7 @@ Autor: „on nie mówi akcentem angielskim tylko polskim, nie może tak być, mo
 1. **Wszystkie 142 angielskie nagrania** głosem polskiego narratora odpadają. Polski głos („Gawędziarz 1”) czyta angielski z polskim akcentem. Karta autora na początku („ask”) nie ma nagrania także po angielsku, jak po polsku.
 2. **Nowy głos:** kandydaci czytają te same dwie pierwsze kwestie na stronie odsłuchu (718): głosy zaprojektowane z opisu starego gawędziarza przy ognisku (brytyjski i amerykański, jak polski „Gawędziarz 1”) i gotowe angielskie głosy ElevenLabs (George, Daniel, Brian). Wybranym głosem powstaną wszystkie kwestie i znów trafią na stronę odsłuchu.
 3. Do tego czasu narrator po angielsku jest w grze bez głosu.
+4. **Odpowiedź 718:** autor zaakceptował 718.6 (amerykański gawędziarz, wersja C), a resztę odrzucił. Głos jest na koncie ElevenLabs jako „NarratorEn” (`narrationEn.tts.saved` w `audio/prompts.json`) i czyta wszystkie 142 kwestie. Każda kończy się dodatkowym zdaniem („The fire crackles softly.”), które odcina się 0,3 s po ostatnim słowie kwestii, bo ten model ucinał końcówki.
 
 ## Wersja 0.1.98 (6.11.2026)
 
