@@ -1,6 +1,7 @@
 // Game page: checks the session on start, then shows the login screen, the
 // character creation or the game. Screens are chosen by the address after #,
-// so the static file server needs no routes. All visible texts are in Polish.
+// so the static file server needs no routes. The visible texts are written in
+// Polish and shown in the page's language (t(), i18n.js).
 
 import { ApiError, request } from './api.js';
 import { $, $$, clear, fill, h, icon } from './dom.js';
@@ -43,6 +44,7 @@ import { applyMotion } from './motion.js';
 import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
 import { forgetPart, narrate, narrateSoon, passTold } from './narrator.js';
 import { forgetNews, watchNews } from './news.js';
+import { followAccount, languageSwitch, prepareLanguage, t } from './i18n.js';
 import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, filledForCollector, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn, unlockInfo } from './state.js';
@@ -142,10 +144,10 @@ const GOOGLE_NOTES = {
 // opens only with Google once linked, and Punkty Systemu are named.
 function googleNote(result, user) {
   const linked = result === 'linked' || result === 'rewarded';
-  const note = GOOGLE_NOTES[linked && user.testMode ? 'linkedOnly' : result];
-  const points = `${state.content?.emailReward ?? 10} Punktów Systemu`;
-  if (result === 'rewarded') return `${note} Za połączenie: ${points}.`;
-  if (result === 'created') return `${note} Na start: ${points}.`;
+  const note = t(GOOGLE_NOTES[linked && user.testMode ? 'linkedOnly' : result]);
+  const points = t('{count} Punktów Systemu', { count: state.content?.emailReward ?? 10 });
+  if (result === 'rewarded') return t('{note} Za połączenie: {points}.', { note, points });
+  if (result === 'created') return t('{note} Na start: {points}.', { note, points });
   return note;
 }
 
@@ -154,10 +156,10 @@ function googleNote(result, user) {
 // cookies apart from Safari, where the sign-in would end.
 function googleHint() {
   if (inAppBrowser()) {
-    return 'Google nie pozwala logować się w przeglądarce wbudowanej w inną aplikację. Aby zalogować się przez Google, wybierz w jej menu „Otwórz w przeglądarce”.';
+    return t('Google nie pozwala logować się w przeglądarce wbudowanej w inną aplikację. Aby zalogować się przez Google, wybierz w jej menu „Otwórz w przeglądarce”.');
   }
   if (navigator.standalone === true) {
-    return 'Na iPhonie logowanie przez Google działa w Safari, ale jeszcze nie w grze z ekranu początkowego. Tutaj zaloguj się loginem i hasłem.';
+    return t('Na iPhonie logowanie przez Google działa w Safari, ale jeszcze nie w grze z ekranu początkowego. Tutaj zaloguj się loginem i hasłem.');
   }
   return null;
 }
@@ -175,36 +177,52 @@ function takeGoogleResult() {
 
 async function start() {
   const googleResult = takeGoogleResult();
-  // How a link from the confirmation mail went (email.js).
-  const emailResult = takeEmailResult();
+  // The version this page runs, to notice a newer one later, and the page's
+  // language (i18n.js): whether the server offers English, and the English
+  // of the page's texts.
+  const languageReady = request('GET', '/api/health')
+    .catch(() => null)
+    .then((health) => {
+      if (health) {
+        loadedVersion ??= health.version;
+        state.googleLogin = health.google === true;
+      }
+      return prepareLanguage(health);
+    });
   // The music plays from the start screen on, after the first touch, and
   // the recorded fight sounds load then too.
-  loadContent()
+  languageReady
+    .then(() => loadContent())
     .then((content) => {
       setMusicConfig(content.music);
       setRecordings(content.sounds);
     })
     .catch(() => {});
   preloadPortraits();
-  // The version this page runs, to notice a newer one later.
-  request('GET', '/api/health')
-    .then((health) => {
-      loadedVersion ??= health.version;
-      state.googleLogin = health.google === true;
-    })
-    .catch(() => {});
   show('loading');
-  $('#loading-text').textContent = 'Nawiązywanie połączenia…';
+  $('#loading-text').textContent = t('Nawiązywanie połączenia…');
   $('#retry-button').hidden = true;
+  let user = null;
+  let failure = null;
   try {
-    const { user } = await request('GET', '/api/me');
+    ({ user } = await request('GET', '/api/me'));
+  } catch (error) {
+    failure = error;
+  }
+  await languageReady;
+  // How a link from the confirmation mail went (email.js).
+  const emailResult = takeEmailResult();
+  try {
+    if (failure) throw failure;
+    // The account's language, or one picked before the sign-in for it.
+    await followAccount(user);
     state.user = user;
     await enterGame({ choose: googleResult === 'signed' });
     if (googleResult && GOOGLE_NOTES[googleResult]) toast(googleNote(googleResult, user));
     if (emailResult) toast(emailResult);
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
-      enterAuth((googleResult && GOOGLE_NOTES[googleResult]) || (emailResult && `${emailResult} Zaloguj się, żeby grać.`));
+      enterAuth((googleResult && GOOGLE_NOTES[googleResult] && t(GOOGLE_NOTES[googleResult])) || (emailResult && t('{note} Zaloguj się, żeby grać.', { note: emailResult })));
       return;
     }
     $('#loading-text').textContent = error.message;
@@ -270,7 +288,7 @@ function showCreate(list) {
   if (list.parked) {
     if (state.user.tutorialTests) offerBack(container);
   } else if (list.characters.length > 0) {
-    container.append(h('div', { class: 'create-back' }, h('button', { type: 'button', class: 'button button--world', onClick: () => showChoice(list), text: 'Wróć do wyboru postaci' })));
+    container.append(h('div', { class: 'create-back' }, h('button', { type: 'button', class: 'button button--world', onClick: () => showChoice(list), text: t('Wróć do wyboru postaci') })));
   }
 }
 
@@ -348,7 +366,7 @@ function watchConstruction(now) {
   campRetryAt = now + 30000;
   call('GET', '/api/character')
     .then(() => {
-      toast(`${building.name}: poziom ${building.level} gotowy.`);
+      toast(t('{name}: poziom {level} gotowy.', { name: building.name, level: building.level }));
       playSound('done');
     })
     .catch((error) => toast(error.message));
@@ -385,8 +403,8 @@ function watchCrafting(now) {
         .filter((one) => one.part === order.part && !after?.queue.some((next) => next.id === one.id))
         .reduce((sum, one) => sum + one.parts, 0);
       const bonus = held(after) - held(crafting) - made;
-      const extra = bonus > 0 && bonus <= made ? ` i ${countOf(bonus, 'dodatkowa część', 'dodatkowe części', 'dodatkowych części')}` : '';
-      toast(`Stół rozbiórki skończył: ${order.part} ×${order.parts}${extra}.`);
+      const extra = bonus > 0 && bonus <= made ? t(' i {parts}', { parts: countOf(bonus, 'dodatkowa część', 'dodatkowe części', 'dodatkowych części') }) : '';
+      toast(t('Stół rozbiórki skończył: {part} ×{count}{extra}.', { part: order.part, count: order.parts, extra }));
       playSound('done');
     })
     .catch((error) => toast(error.message));
@@ -539,8 +557,8 @@ function volumeRow(id, label, value, change, preview) {
     onChange: () => preview?.(),
   });
   const show = () => {
-    output.textContent = slider.value === '0' ? 'wył.' : `${slider.value}%`;
-    slider.setAttribute('aria-valuetext', slider.value === '0' ? 'wyłączone' : `${slider.value}%`);
+    output.textContent = slider.value === '0' ? t('wył.') : `${slider.value}%`;
+    slider.setAttribute('aria-valuetext', slider.value === '0' ? t('wyłączone') : `${slider.value}%`);
     slider.style.setProperty('--fill', `${slider.value}%`);
   };
   show();
@@ -563,7 +581,7 @@ function layoutRow() {
       type: 'button',
       class: 'segmented-option',
       'aria-pressed': String(layoutChoice() === layout.id),
-      text: layout.name,
+      text: t(layout.name),
       onClick: () => {
         setLayoutChoice(layout.id);
         for (const [index, button] of buttons.entries()) button.setAttribute('aria-pressed', String(LAYOUTS[index].id === layoutChoice()));
@@ -573,7 +591,7 @@ function layoutRow() {
   return h(
     'div',
     { class: 'status-row status-row--layout' },
-    h('dt', { id: 'layout-label', text: 'Układ ekranu' }),
+    h('dt', { id: 'layout-label', text: t('Układ ekranu') }),
     h('dd', {}, h('div', { class: 'segmented segmented--three', role: 'group', 'aria-labelledby': 'layout-label' }, buttons)),
   );
 }
@@ -584,8 +602,8 @@ function zoomRow() {
     stepZoom(direction);
     show();
   };
-  const farther = h('button', { type: 'button', class: 'zoom-button', 'aria-label': 'Oddal widok', onClick: () => step(-1) }, icon('minus', { size: 20 }));
-  const closer = h('button', { type: 'button', class: 'zoom-button', 'aria-label': 'Przybliż widok', onClick: () => step(1) }, icon('plus', { size: 20 }));
+  const farther = h('button', { type: 'button', class: 'zoom-button', 'aria-label': t('Oddal widok'), onClick: () => step(-1) }, icon('minus', { size: 20 }));
+  const closer = h('button', { type: 'button', class: 'zoom-button', 'aria-label': t('Przybliż widok'), onClick: () => step(1) }, icon('plus', { size: 20 }));
   const show = () => {
     output.textContent = `${zoomLevel()}%`;
     farther.disabled = zoomLevel() <= ZOOM_MIN;
@@ -595,7 +613,7 @@ function zoomRow() {
   return h(
     'div',
     { class: 'status-row status-row--zoom' },
-    h('dt', { id: 'zoom-label', text: 'Widok' }),
+    h('dt', { id: 'zoom-label', text: t('Widok') }),
     h('dd', {}, h('div', { class: 'zoom-control', role: 'group', 'aria-labelledby': 'zoom-label' }, farther, output, closer)),
   );
 }
@@ -620,7 +638,7 @@ function lookRow() {
   return h(
     'div',
     { class: 'status-row status-row--look' },
-    h('dt', { id: 'look-label', text: 'Wygląd' }),
+    h('dt', { id: 'look-label', text: t('Wygląd') }),
     h('dd', {}, h('div', { class: 'segmented', role: 'group', 'aria-labelledby': 'look-label' }, buttons)),
   );
 }
@@ -628,11 +646,11 @@ function lookRow() {
 // The character's name, with its one change (the author: "jednorazowo, po
 // czym opcja się blokuje"), greyed out once used.
 function nameRow() {
-  const t = state.content.chat.names;
+  const names = state.content.chat.names;
   return h(
     'div',
     { class: 'status-row status-row--name' },
-    h('dt', { text: 'Postać' }),
+    h('dt', { text: t('Postać') }),
     h(
       'dd',
       {},
@@ -641,7 +659,7 @@ function nameRow() {
         type: 'button',
         class: 'button button--world button--small status-rename',
         disabled: !state.character.canRename,
-        text: state.character.canRename ? t.change : t.used,
+        text: state.character.canRename ? names.change : names.used,
         onClick: openNameChange,
       }),
     ),
@@ -661,7 +679,7 @@ function skinRow() {
   return h(
     'div',
     { class: 'status-row status-row--skin' },
-    h('dt', { id: 'skin-label', text: 'Kolor skóry' }),
+    h('dt', { id: 'skin-label', text: t('Kolor skóry') }),
     h('dd', {}, h('div', { class: 'skin-swatches', role: 'radiogroup', 'aria-labelledby': 'skin-label' }, dots)),
   );
 }
@@ -677,12 +695,12 @@ function googleRow() {
       'dd',
       {},
       state.user.google
-        ? h('span', { class: 'status-ok', text: 'Połączone' })
+        ? h('span', { class: 'status-ok', text: t('Połączone') })
         : h(
             'a',
             { class: 'google-button google-button--small', href: '/api/auth/google/start?mode=link', onClick: confirmGoogleOnly },
             h('img', { class: 'google-logo', src: '/google-g.svg', alt: '', width: 18, height: 18 }),
-            'Połącz z Google',
+            t('Połącz z Google'),
           ),
     ),
   );
@@ -699,11 +717,11 @@ function tradeRows() {
     off = settings.off;
     toggle.disabled = false;
     toggle.setAttribute('aria-checked', String(!off));
-    toggle.textContent = off ? 'Wyłączona' : 'Włączona';
+    toggle.textContent = off ? t('Wyłączona') : t('Włączona');
     blocked.hidden = settings.blocked.length === 0;
     fill(
       blocked,
-      h('dt', { text: 'Zablokowane wymiany' }),
+      h('dt', { text: t('Zablokowane wymiany') }),
       h(
         'dd',
         {},
@@ -718,7 +736,7 @@ function tradeRows() {
               h('button', {
                 type: 'button',
                 class: 'button button--world button--small',
-                text: 'Odblokuj',
+                text: t('Odblokuj'),
                 onClick: (event) => withButton(event.currentTarget, async () => show(await call('POST', '/api/trade/block', { user: entry.user, blocked: false }))),
               }),
             ),
@@ -729,9 +747,9 @@ function tradeRows() {
   };
   toggle.addEventListener('click', () => withButton(toggle, async () => show(await call('POST', '/api/trade/settings', { off: !off }))));
   call('GET', '/api/trade/settings').then(show, () => {
-    toggle.textContent = 'brak połączenia';
+    toggle.textContent = t('brak połączenia');
   });
-  return [h('div', { class: 'status-row' }, h('dt', { id: 'trade-label', text: 'Wymiana' }), h('dd', {}, toggle)), blocked];
+  return [h('div', { class: 'status-row' }, h('dt', { id: 'trade-label', text: t('Wymiana') }), h('dd', {}, toggle)), blocked];
 }
 
 // "Pomijaj objaśnienia narratora" (the account's, so for each of its
@@ -741,12 +759,12 @@ function tradeRows() {
 // passes at once what the narrator is telling now. The line under it says
 // what it does (data/tutorial.json, skipSetting).
 function tutorialsRow() {
-  const t = state.content.tutorial.skipSetting;
+  const setting = state.content.tutorial.skipSetting;
   const toggle = h('button', { type: 'button', class: 'toggle', role: 'switch', 'aria-labelledby': 'tutorials-label', 'aria-describedby': 'tutorials-hint' });
   const show = () => {
     const on = Boolean(state.user.skipTutorials);
     toggle.setAttribute('aria-checked', String(on));
-    toggle.textContent = on ? 'Włączone' : 'Wyłączone';
+    toggle.textContent = on ? t('Włączone') : t('Wyłączone');
   };
   toggle.addEventListener('click', () =>
     withButton(toggle, async () => {
@@ -760,9 +778,9 @@ function tutorialsRow() {
   return h(
     'div',
     { class: 'status-row status-row--hinted' },
-    h('dt', { id: 'tutorials-label', text: t.label }),
+    h('dt', { id: 'tutorials-label', text: setting.label }),
     h('dd', {}, toggle),
-    h('dd', { class: 'status-hint', id: 'tutorials-hint', text: t.hint }),
+    h('dd', { class: 'status-hint', id: 'tutorials-hint', text: setting.hint }),
   );
 }
 
@@ -773,9 +791,9 @@ async function confirmGoogleOnly(event) {
   event.preventDefault();
   const { href } = event.currentTarget;
   const sure = await confirmAction({
-    title: 'Połączyć z Google?',
-    text: 'To konto ma tryb testowy. Po połączeniu otworzy się już tylko przez Google, bez hasła, a na innych urządzeniach się wyloguje.',
-    confirmLabel: 'Połącz',
+    title: t('Połączyć z Google?'),
+    text: t('To konto ma tryb testowy. Po połączeniu otworzy się już tylko przez Google, bez hasła, a na innych urządzeniach się wyloguje.'),
+    confirmLabel: t('Połącz'),
   });
   if (sure) location.href = href;
 }
@@ -794,63 +812,73 @@ function openSettings() {
       onClick: () => {
         setTestMode(!testModeOn());
         testToggle.setAttribute('aria-checked', String(testModeOn()));
-        testToggle.textContent = testModeOn() ? 'Włączony' : 'Wyłączony';
+        testToggle.textContent = testModeOn() ? t('Włączony') : t('Wyłączony');
         current?.screen.update?.();
       },
-      text: testModeOn() ? 'Włączony' : 'Wyłączony',
+      text: testModeOn() ? t('Włączony') : t('Wyłączony'),
     });
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Ustawienia' }),
+    h('h2', { class: 'sheet-title', text: t('Ustawienia') }),
     // The reports and System messages: the Dziennik has no tab in the bottom
     // bar.
-    h('a', { class: 'button button--world settings-journal', href: '#/dziennik', onClick: closeSheet }, icon('book', { size: 20 }), 'Dziennik'),
-    h('button', { type: 'button', class: 'button button--world', onClick: openBugReport, text: 'Zgłoś błąd' }),
+    h('a', { class: 'button button--world settings-journal', href: '#/dziennik', onClick: closeSheet }, icon('book', { size: 20 }), t('Dziennik')),
+    h('button', { type: 'button', class: 'button button--world', onClick: openBugReport, text: t('Zgłoś błąd') }),
     h(
       'dl',
       { class: 'status-list' },
+      // PL | EN, where the server offers English (i18n.js).
+      languageRow(),
       layoutOffered() && layoutRow(),
-      h('div', { class: 'status-row' }, h('dt', { text: 'Konto' }), h('dd', { text: state.user.login })),
+      h('div', { class: 'status-row' }, h('dt', { text: t('Konto') }), h('dd', { text: state.user.login })),
       emailRow(),
       nameRow(),
       lookRow(),
       skinRow(),
       googleRow(),
-      volumeRow('music-volume', 'Muzyka', musicVolume(), setMusicVolume),
-      volumeRow('effects-volume', 'Efekty dźwiękowe', effectsVolume(), setEffectsVolume, () => playSound('system')),
-      h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: 'Głos narratora' }), h('dd', {}, voiceSwitch('voice-label'))),
+      volumeRow('music-volume', t('Muzyka'), musicVolume(), setMusicVolume),
+      volumeRow('effects-volume', t('Efekty dźwiękowe'), effectsVolume(), setEffectsVolume, () => playSound('system')),
+      h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: t('Głos narratora') }), h('dd', {}, voiceSwitch('voice-label'))),
       tutorialsRow(),
-      h('div', { class: 'status-row' }, h('dt', { id: 'motion-label', text: 'Animacje' }), h('dd', {}, motionSwitch('motion-label'))),
+      h('div', { class: 'status-row' }, h('dt', { id: 'motion-label', text: t('Animacje') }), h('dd', {}, motionSwitch('motion-label'))),
       pushRow(),
       tradeRows(),
       zoomOffered() && zoomRow(),
-      testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: 'Tryb testowy' }), h('dd', {}, testToggle)),
+      testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: t('Tryb testowy') }), h('dd', {}, testToggle)),
       giftCodeRow(),
-      h('div', { class: 'status-row' }, h('dt', { text: 'Wersja gry' }), version),
+      h('div', { class: 'status-row' }, h('dt', { text: t('Wersja gry') }), version),
     ),
-    state.user.tutorialTests && h('button', { type: 'button', class: 'button button--system', onClick: openTutorialTests, text: 'Testuj samouczki' }),
-    state.user.tutorialTests && h('button', { type: 'button', class: 'button button--system', onClick: openEventTests, text: 'Testuj zdarzenia' }),
-    state.user.tutorialTests && state.character && h('button', { type: 'button', class: 'button button--system', onClick: () => openEvolutionTests().catch((error) => toast(error.message)), text: 'Testuj ewolucję' }),
-    state.user.tutorialTests && state.character && h('button', { type: 'button', class: 'button button--system', onClick: openSettlementTests, text: 'Testuj Osadę' }),
+    state.user.tutorialTests && h('button', { type: 'button', class: 'button button--system', onClick: openTutorialTests, text: t('Testuj samouczki') }),
+    state.user.tutorialTests && h('button', { type: 'button', class: 'button button--system', onClick: openEventTests, text: t('Testuj zdarzenia') }),
+    state.user.tutorialTests && state.character && h('button', { type: 'button', class: 'button button--system', onClick: () => openEvolutionTests().catch((error) => toast(error.message)), text: t('Testuj ewolucję') }),
+    state.user.tutorialTests && state.character && h('button', { type: 'button', class: 'button button--system', onClick: openSettlementTests, text: t('Testuj Osadę') }),
     installButton(),
     state.user.author &&
       h('a', {
         class: `button button--system${state.user.bugReports > 0 ? ' settings-author--news' : ''}`,
         href: '#/autor',
         onClick: closeSheet,
-        text: state.user.bugReports > 0 ? `Panel autora · nowe zgłoszenia: ${state.user.bugReports}` : 'Panel autora',
+        text: state.user.bugReports > 0 ? t('Panel autora · nowe zgłoszenia: {count}', { count: state.user.bugReports }) : t('Panel autora'),
       }),
-    h('button', { type: 'button', class: 'button button--world', onClick: changeCharacter, text: 'Zmień postać' }),
-    h('button', { type: 'button', class: 'button button--world', onClick: logout, text: 'Wyloguj się' }),
-    h('button', { type: 'button', class: 'button button--danger', onClick: deleteCharacter, text: 'Usuń postać' }),
-    h('button', { type: 'button', class: 'button button--danger', onClick: deleteAccount, text: 'Usuń konto' }),
+    h('button', { type: 'button', class: 'button button--world', onClick: changeCharacter, text: t('Zmień postać') }),
+    h('button', { type: 'button', class: 'button button--world', onClick: logout, text: t('Wyloguj się') }),
+    h('button', { type: 'button', class: 'button button--danger', onClick: deleteCharacter, text: t('Usuń postać') }),
+    h('button', { type: 'button', class: 'button button--danger', onClick: deleteAccount, text: t('Usuń konto') }),
   );
   request('GET', '/api/health')
     .then((health) => {
       version.textContent = health.version;
     })
     .catch(() => {
-      version.textContent = 'brak połączenia';
+      version.textContent = t('brak połączenia');
     });
+}
+
+// "Język" (490–497 A): PL | EN for the account, where the server offers
+// English; the page loads again in the language chosen (i18n.js).
+function languageRow() {
+  const choice = languageSwitch({ labelledBy: 'language-label', signedIn: true });
+  if (!choice) return null;
+  return h('div', { class: 'status-row status-row--language' }, h('dt', { id: 'language-label', text: t('Język') }), h('dd', {}, choice));
 }
 
 // "Zgłoś błąd" (the author: "Trzeba dodac przycisk Zgłoś błąd i zeby
@@ -860,7 +888,7 @@ function openSettings() {
 // (screenshot.js), and then the report goes as a form.
 function openBugReport() {
   const screen = location.hash;
-  const text = h('textarea', { class: 'bug-text', id: 'bug-text', rows: '6', maxlength: '2000', placeholder: 'Np. po stuknięciu „Wyrusz” ekran przestał reagować.' });
+  const text = h('textarea', { class: 'bug-text', id: 'bug-text', rows: '6', maxlength: '2000', placeholder: t('Np. po stuknięciu „Wyrusz” ekran przestał reagować.') });
   const shot = screenshotPicker();
   const report = async () => {
     const image = await shot.image();
@@ -872,24 +900,24 @@ function openBugReport() {
     return form;
   };
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Zgłoś błąd' }),
-    h('p', { class: 'sheet-text', text: 'Opisz, co się stało i co było wtedy na ekranie. Gra sama dołączy numer wersji, ekran, na którym jesteś, i Twoją postać.' }),
-    h('label', { class: 'field-label', for: 'bug-text', text: 'Opis błędu' }),
+    h('h2', { class: 'sheet-title', text: t('Zgłoś błąd') }),
+    h('p', { class: 'sheet-text', text: t('Opisz, co się stało i co było wtedy na ekranie. Gra sama dołączy numer wersji, ekran, na którym jesteś, i Twoją postać.') }),
+    h('label', { class: 'field-label', for: 'bug-text', text: t('Opis błędu') }),
     text,
     shot.element,
     h(
       'div',
       { class: 'sheet-actions' },
-      h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+      h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }),
       h('button', {
         type: 'button',
         class: 'button button--system',
-        text: 'Wyślij',
+        text: t('Wyślij'),
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
             await call('POST', '/api/bug-reports', await report());
             closeSheet();
-            toast('Dzięki! Zgłoszenie trafiło do autora gry.');
+            toast(t('Dzięki! Zgłoszenie trafiło do autora gry.'));
           }),
       }),
     ),
@@ -925,9 +953,9 @@ async function signOut(rethrow = false) {
 async function deleteAccount() {
   const { login } = state.user;
   const sure = await confirmAction({
-    title: 'Usunąć konto?',
-    text: `Konto ${login} zniknie na zawsze razem ze wszystkimi postaciami, przedmiotami, raportami i obozem. Tego nie da się cofnąć.`,
-    confirmLabel: 'Usuń konto',
+    title: t('Usunąć konto?'),
+    text: t('Konto {login} zniknie na zawsze razem ze wszystkimi postaciami, przedmiotami, raportami i obozem. Tego nie da się cofnąć.', { login }),
+    confirmLabel: t('Usuń konto'),
     danger: true,
     typed: login,
   });
@@ -936,7 +964,7 @@ async function deleteAccount() {
     await request('DELETE', '/api/me', { login });
     stopPush();
     leaveGame();
-    toast('Konto zostało usunięte.');
+    toast(t('Konto zostało usunięte.'));
   } catch (error) {
     toast(error.message);
   }
@@ -960,42 +988,42 @@ async function openTutorialTests() {
       'li',
       { class: 'tutorial-test' },
       h('div', { class: 'tutorial-test-text' }, h('strong', { text: title }), h('span', { class: 'muted', text: note })),
-      h('button', { type: 'button', class: 'button button--system button--small', text: 'Od nowa', disabled: !ready, onClick: run }),
+      h('button', { type: 'button', class: 'button button--system button--small', text: t('Od nowa'), disabled: !ready, onClick: run }),
     );
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Testuj samouczki' }),
-    h('p', { class: 'sheet-text', text: 'Na wersji testowej każdy samouczek zaczniesz tu od początku.' }),
+    h('h2', { class: 'sheet-title', text: t('Testuj samouczki') }),
+    h('p', { class: 'sheet-text', text: t('Na wersji testowej każdy samouczek zaczniesz tu od początku.') }),
     // With "Pomijaj objaśnienia narratora" on, the narrator passes them too.
     state.user.skipTutorials &&
-      h('p', { class: 'sheet-text', text: `Przełącznik „${state.content.tutorial.skipSetting.label}” jest włączony, więc samouczki miną bez słowa. Wyłącz go w Ustawieniach, żeby je obejrzeć.` }),
+      h('p', { class: 'sheet-text', text: t('Przełącznik „{label}” jest włączony, więc samouczki miną bez słowa. Wyłącz go w Ustawieniach, żeby je obejrzeć.', { label: state.content.tutorial.skipSetting.label }) }),
     parked && backButton(parked),
     h(
       'ul',
       { class: 'tutorial-tests' },
       row(
-        'Wprowadzenie',
-        parked ? `Trwa na postaci testowej, ${parked.name} czeka z boku.` : 'Nowa postać testowa od pierwszej karty. Twoja postać poczeka z boku.',
+        t('Wprowadzenie'),
+        parked ? t('Trwa na postaci testowej, {name} czeka z boku.', { name: parked.name }) : t('Nowa postać testowa od pierwszej karty. Twoja postać poczeka z boku.'),
         testIntroduction,
         !parked,
       ),
-      row('Objaśnienie Społeczności i Szybkiego Polowania', 'Od 5. poziomu postaci.', repeatCommunityTour, told && isUnlocked('community')),
-      row('Objaśnienie Umiejętności', 'Od 10. poziomu klasy. Postać zapomni wybrane umiejętności.', repeatSkillsTour, told && isUnlocked('skills')),
-      row('Objaśnienie Profesji', 'Od 10. poziomu postaci. Poziomy profesji zostają.', repeatProfessionsTour, told && Boolean(state.character.professions)),
-      row('Objaśnienie Rzemieślnictwa', 'Od 15. poziomu postaci. Poziomy profesji zostają.', repeatCraftingTour, told && Boolean(state.character.professions?.workshop)),
-      row('Objaśnienie Osady', 'Od 20. poziomu postaci.', repeatSettlementTour, told && Boolean(state.character.settlementOpen)),
-      row('Objaśnienie Górnictwa i Jubilerstwa', 'Od 25. poziomu postaci. Poziomy profesji zostają.', repeatMiningTour, told && isUnlocked('mining')),
-      row('Objaśnienie Ewolucji', 'Od 50. poziomu klasy, dopóki ewolucja nie jest wybrana.', repeatEvolutionTour, told && (state.character.evolution?.choices.length ?? 0) > 0),
-      row('Objaśnienie Wież', 'Od 50. poziomu postaci.', repeatTowersTour, told && isUnlocked('towers')),
+      row(t('Objaśnienie Społeczności i Szybkiego Polowania'), t('Od 5. poziomu postaci.'), repeatCommunityTour, told && isUnlocked('community')),
+      row(t('Objaśnienie Umiejętności'), t('Od 10. poziomu klasy. Postać zapomni wybrane umiejętności.'), repeatSkillsTour, told && isUnlocked('skills')),
+      row(t('Objaśnienie Profesji'), t('Od 10. poziomu postaci. Poziomy profesji zostają.'), repeatProfessionsTour, told && Boolean(state.character.professions)),
+      row(t('Objaśnienie Rzemieślnictwa'), t('Od 15. poziomu postaci. Poziomy profesji zostają.'), repeatCraftingTour, told && Boolean(state.character.professions?.workshop)),
+      row(t('Objaśnienie Osady'), t('Od 20. poziomu postaci.'), repeatSettlementTour, told && Boolean(state.character.settlementOpen)),
+      row(t('Objaśnienie Górnictwa i Jubilerstwa'), t('Od 25. poziomu postaci. Poziomy profesji zostają.'), repeatMiningTour, told && isUnlocked('mining')),
+      row(t('Objaśnienie Ewolucji'), t('Od 50. poziomu klasy, dopóki ewolucja nie jest wybrana.'), repeatEvolutionTour, told && (state.character.evolution?.choices.length ?? 0) > 0),
+      row(t('Objaśnienie Wież'), t('Od 50. poziomu postaci.'), repeatTowersTour, told && isUnlocked('towers')),
       // The lines of places (646, 647 and those of 6.11.2026), each told on
       // its first look; the Gildia's all together.
-      row('Gildia', 'W gildii, przy pierwszym spojrzeniu na jej stronę i na każdą jej zakładkę.', repeatGuildTour, told && Boolean(state.character.guildTag)),
-      row('Warownia', 'Gdy obóz jest Warownią, przy wejściu do obozu.', repeatFortressTour, told && Boolean(state.character.camp?.cornerstone?.fortress?.stands)),
-      row('Kamień węgielny', 'Po objaśnieniu Osady, przy wejściu do obozu, dopóki obóz nie jest Warownią.', repeatCornerstoneTour, told && Boolean(state.character.settlementOpen && state.character.camp?.cornerstone?.fortress && !state.character.camp.cornerstone.fortress.stands)),
-      row('Drużyna', 'Od 10. poziomu postaci, przy wejściu do Społeczności.', repeatPartyTour, told && isUnlocked('party')),
-      row('Trudna wyprawa', 'Od 10. poziomu postaci, przy wejściu na miejsce wyprawy.', repeatHardHuntTour, told && Boolean(state.character.hardHunt)),
-      row('Skrzynia Konta', 'Przy wejściu do Skrzyni Konta w obozie.', repeatAccountChestTour, told),
-      row('Zbieracz Systemu', 'Przy wejściu do obozu, dopóki Zbieracz nie jest kupiony.', repeatSystemCollectorTour, told && Boolean(state.character.camp?.collector && !state.character.camp.collector.owned)),
-      row('Omdlenie', 'Przy pierwszym raporcie z wyprawy zakończonej omdleniem.', repeatFaintTour, told),
+      row(t('Gildia'), t('W gildii, przy pierwszym spojrzeniu na jej stronę i na każdą jej zakładkę.'), repeatGuildTour, told && Boolean(state.character.guildTag)),
+      row(t('Warownia'), t('Gdy obóz jest Warownią, przy wejściu do obozu.'), repeatFortressTour, told && Boolean(state.character.camp?.cornerstone?.fortress?.stands)),
+      row(t('Kamień węgielny'), t('Po objaśnieniu Osady, przy wejściu do obozu, dopóki obóz nie jest Warownią.'), repeatCornerstoneTour, told && Boolean(state.character.settlementOpen && state.character.camp?.cornerstone?.fortress && !state.character.camp.cornerstone.fortress.stands)),
+      row(t('Drużyna'), t('Od 10. poziomu postaci, przy wejściu do Społeczności.'), repeatPartyTour, told && isUnlocked('party')),
+      row(t('Trudna wyprawa'), t('Od 10. poziomu postaci, przy wejściu na miejsce wyprawy.'), repeatHardHuntTour, told && Boolean(state.character.hardHunt)),
+      row(t('Skrzynia Konta'), t('Przy wejściu do Skrzyni Konta w obozie.'), repeatAccountChestTour, told),
+      row(t('Zbieracz Systemu'), t('Przy wejściu do obozu, dopóki Zbieracz nie jest kupiony.'), repeatSystemCollectorTour, told && Boolean(state.character.camp?.collector && !state.character.camp.collector.owned)),
+      row(t('Omdlenie'), t('Przy pierwszym raporcie z wyprawy zakończonej omdleniem.'), repeatFaintTour, told),
     ),
   );
 }
@@ -1015,7 +1043,7 @@ async function openEventTests() {
   const choose = (eventId, caseId = null, endingId = null) => async (event) => {
     await withButton(event.currentTarget, async () => {
       const { next } = await call('POST', '/api/test/events', { eventId, caseId, endingId });
-      toast(next ? 'Zdarzenie przyjdzie po następnej wyprawie, przy „Odbierz raport”.' : 'Zdarzenia znów losują się jak w grze.');
+      toast(next ? t('Zdarzenie przyjdzie po następnej wyprawie, przy „Odbierz raport”.') : t('Zdarzenia znów losują się jak w grze.'));
       closeSheet();
     });
   };
@@ -1025,15 +1053,15 @@ async function openEventTests() {
     h('button', {
       type: 'button',
       class: 'button button--system button--small',
-      text: chosen(eventId, caseId, endingId) ? `${text} (wybrane)` : text,
+      text: chosen(eventId, caseId, endingId) ? t('{text} (wybrane)', { text }) : text,
       disabled: chosen(eventId, caseId, endingId),
       onClick: choose(eventId, caseId, endingId),
     });
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Testuj zdarzenia' }),
+    h('h2', { class: 'sheet-title', text: t('Testuj zdarzenia') }),
     h('p', {
       class: 'sheet-text',
-      text: 'Wybrane zdarzenie przyjdzie po następnej wyprawie, gdy dotkniesz „Odbierz raport”, bez losowania. Możesz też wybrać, co się w nim naprawdę dzieje. Wyprawa musi się skończyć bez omdlenia.',
+      text: t('Wybrane zdarzenie przyjdzie po następnej wyprawie, gdy dotkniesz „Odbierz raport”, bez losowania. Możesz też wybrać, co się w nim naprawdę dzieje. Wyprawa musi się skończyć bez omdlenia.'),
     }),
     h(
       'ul',
@@ -1042,16 +1070,16 @@ async function openEventTests() {
         h(
           'li',
           { class: 'tutorial-test event-test' },
-          h('div', { class: 'tutorial-test-text' }, h('strong', { text: event.draft ? `${event.title} (szkic)` : event.title }), data.next?.eventId === event.id && h('span', { class: 'muted', text: 'Czeka na następny raport.' })),
+          h('div', { class: 'tutorial-test-text' }, h('strong', { text: event.draft ? t('{title} (szkic)', { title: event.title }) : event.title }), data.next?.eventId === event.id && h('span', { class: 'muted', text: t('Czeka na następny raport.') })),
           h('div', { class: 'event-test-cases' }, [
-            pick(event.id, null, 'Losowo'),
+            pick(event.id, null, t('Losowo')),
             ...event.cases.map((one) => pick(event.id, one.id, one.name)),
             ...event.endings.map((one) => pick(event.id, null, one.name, one.id)),
           ]),
         ),
       ),
     ),
-    data.next && h('button', { type: 'button', class: 'button button--world', text: 'Bez wybranego zdarzenia', onClick: choose(null) }),
+    data.next && h('button', { type: 'button', class: 'button button--world', text: t('Bez wybranego zdarzenia'), onClick: choose(null) }),
   );
 }
 
@@ -1075,13 +1103,13 @@ async function openSettlementTests() {
     });
   const unlock = unlockInfo('settlement');
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Testuj Osadę' }),
+    h('h2', { class: 'sheet-title', text: t('Testuj Osadę') }),
     h('p', {
       class: 'sheet-text',
-      text: 'Na wersji testowej ustawisz tu naraz stopień u wszystkich bractw i mieszkańców. „Nowe zlecenia” zmienia od razu wszystkie zlecenia na tablicy, a oddane zlecenie tygodnia wraca.',
+      text: t('Na wersji testowej ustawisz tu naraz stopień u wszystkich bractw i mieszkańców. „Nowe zlecenia” zmienia od razu wszystkie zlecenia na tablicy, a oddane zlecenie tygodnia wraca.'),
     }),
     !isUnlocked('settlement') &&
-      h('button', { type: 'button', class: 'button button--world', text: `Otwórz Osadę przed ${unlock.level}. poziomem`, onClick: run({ action: 'open' }, 'Osada otwarta do testu.') }),
+      h('button', { type: 'button', class: 'button button--world', text: t('Otwórz Osadę przed {level}. poziomem', { level: unlock.level }), onClick: run({ action: 'open' }, t('Osada otwarta do testu.')) }),
     h(
       'div',
       { class: 'settlement-test-standings' },
@@ -1090,32 +1118,32 @@ async function openSettlementTests() {
           type: 'button',
           class: 'button button--system button--small',
           text: standing.name,
-          onClick: run({ action: 'standing', standing: standing.id }, `Stopień „${standing.name}” u wszystkich bractw i mieszkańców.`),
+          onClick: run({ action: 'standing', standing: standing.id }, t('Stopień „{name}” u wszystkich bractw i mieszkańców.', { name: standing.name })),
         }),
       ),
     ),
-    h('button', { type: 'button', class: 'button button--system', text: 'Nowe zlecenia', onClick: run({ action: 'orders' }, 'Na tablicy wiszą nowe zlecenia.') }),
+    h('button', { type: 'button', class: 'button button--system', text: t('Nowe zlecenia'), onClick: run({ action: 'orders' }, t('Na tablicy wiszą nowe zlecenia.')) }),
     h('p', {
       class: 'sheet-text',
-      text: 'Targowisko: „Próbne oferty” wystawiają przedmiot, zioła i materiał od handlarza próbnego na 15 minut, a wędrowny handlarz przychodzi dziś. „Zakończ licytacje” kończy od razu Twoje oferty i oferty handlarza próbnego.',
+      text: t('Targowisko: „Próbne oferty” wystawiają przedmiot, zioła i materiał od handlarza próbnego na 15 minut, a wędrowny handlarz przychodzi dziś. „Zakończ licytacje” kończy od razu Twoje oferty i oferty handlarza próbnego.'),
     }),
     h(
       'div',
       { class: 'settlement-test-standings' },
-      h('button', { type: 'button', class: 'button button--system button--small', text: 'Próbne oferty', onClick: run({ action: 'market' }, 'Na Targowisku czekają próbne oferty.', '#/osada/market') }),
-      h('button', { type: 'button', class: 'button button--system button--small', text: 'Zakończ licytacje', onClick: run({ action: 'marketEnd' }, 'Licytacje zakończone.', '#/osada/market') }),
+      h('button', { type: 'button', class: 'button button--system button--small', text: t('Próbne oferty'), onClick: run({ action: 'market' }, t('Na Targowisku czekają próbne oferty.'), '#/osada/market') }),
+      h('button', { type: 'button', class: 'button button--system button--small', text: t('Zakończ licytacje'), onClick: run({ action: 'marketEnd' }, t('Licytacje zakończone.'), '#/osada/market') }),
     ),
   );
 }
 
 const backButton = (parked) =>
-  h('button', { type: 'button', class: 'button button--world', text: `Wróć do postaci ${parked.name}`, onClick: backFromTest });
+  h('button', { type: 'button', class: 'button button--world', text: t('Wróć do postaci {name}', { name: parked.name }), onClick: backFromTest });
 
 async function testIntroduction() {
   const sure = await confirmAction({
-    title: 'Wprowadzenie od nowa?',
-    text: `${state.character.name} poczeka z boku. Stworzysz postać testową i przejdziesz wprowadzenie od pierwszej karty. Potem w „Testuj samouczki” wybierz „Wróć do postaci ${state.character.name}”, a postać testowa zniknie.`,
-    confirmLabel: 'Zacznij',
+    title: t('Wprowadzenie od nowa?'),
+    text: t('{name} poczeka z boku. Stworzysz postać testową i przejdziesz wprowadzenie od pierwszej karty. Potem w „Testuj samouczki” wybierz „Wróć do postaci {name}”, a postać testowa zniknie.', { name: state.character.name }),
+    confirmLabel: t('Zacznij'),
   });
   if (!sure) return;
   closeSheet();
@@ -1151,9 +1179,9 @@ async function offerBack(container) {
 // Test mode: the narrator's Umiejętności chapter from the start (testing.js).
 async function repeatSkillsTour() {
   const sure = await confirmAction({
-    title: 'Objaśnienie Umiejętności od nowa?',
-    text: 'Postać zapomni wybrane umiejętności, a Punkty Umiejętności wrócą. Narrator objaśni Umiejętności od początku.',
-    confirmLabel: 'Od nowa',
+    title: t('Objaśnienie Umiejętności od nowa?'),
+    text: t('Postać zapomni wybrane umiejętności, a Punkty Umiejętności wrócą. Narrator objaśni Umiejętności od początku.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1168,9 +1196,9 @@ async function repeatSkillsTour() {
 // Test mode: the narrator's Profesje chapter from the start (testing.js).
 async function repeatCraftingTour() {
   const sure = await confirmAction({
-    title: 'Objaśnienie Rzemieślnictwa od nowa?',
-    text: 'Poziomy profesji zostaną. Narrator objaśni Rzemieślnictwo od początku.',
-    confirmLabel: 'Od nowa',
+    title: t('Objaśnienie Rzemieślnictwa od nowa?'),
+    text: t('Poziomy profesji zostaną. Narrator objaśni Rzemieślnictwo od początku.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1184,9 +1212,9 @@ async function repeatCraftingTour() {
 
 async function repeatProfessionsTour() {
   const sure = await confirmAction({
-    title: 'Objaśnienie Profesji od nowa?',
-    text: 'Poziomy profesji zostaną. Narrator objaśni Profesje od początku.',
-    confirmLabel: 'Od nowa',
+    title: t('Objaśnienie Profesji od nowa?'),
+    text: t('Poziomy profesji zostaną. Narrator objaśni Profesje od początku.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1201,9 +1229,9 @@ async function repeatProfessionsTour() {
 // Test mode: the narrator's Społeczność chapter from the start (testing.js).
 async function repeatCommunityTour() {
   const sure = await confirmAction({
-    title: 'Objaśnienie Społeczności od nowa?',
-    text: 'Narrator objaśni Społeczność i Szybkie Polowanie od początku.',
-    confirmLabel: 'Od nowa',
+    title: t('Objaśnienie Społeczności od nowa?'),
+    text: t('Narrator objaśni Społeczność i Szybkie Polowanie od początku.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1218,9 +1246,9 @@ async function repeatCommunityTour() {
 // Test mode: the narrator's Osada chapter from the start (testing.js).
 async function repeatSettlementTour() {
   const sure = await confirmAction({
-    title: 'Objaśnienie Osady od nowa?',
-    text: 'Narrator objaśni Osadę od początku.',
-    confirmLabel: 'Od nowa',
+    title: t('Objaśnienie Osady od nowa?'),
+    text: t('Narrator objaśni Osadę od początku.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1235,9 +1263,9 @@ async function repeatSettlementTour() {
 // Test mode: the narrator's Ewolucja chapter from the start (testing.js).
 async function repeatEvolutionTour() {
   const sure = await confirmAction({
-    title: 'Objaśnienie Ewolucji od nowa?',
-    text: 'Narrator objaśni Ewolucję od początku.',
-    confirmLabel: 'Od nowa',
+    title: t('Objaśnienie Ewolucji od nowa?'),
+    text: t('Narrator objaśni Ewolucję od początku.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1252,9 +1280,9 @@ async function repeatEvolutionTour() {
 // Test mode: the narrator's Wieże chapter from the start (testing.js).
 async function repeatTowersTour() {
   const sure = await confirmAction({
-    title: 'Objaśnienie Wież od nowa?',
-    text: 'Narrator objaśni Wieże od początku.',
-    confirmLabel: 'Od nowa',
+    title: t('Objaśnienie Wież od nowa?'),
+    text: t('Narrator objaśni Wieże od początku.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1270,9 +1298,9 @@ async function repeatTowersTour() {
 // (testing.js).
 async function repeatMiningTour() {
   const sure = await confirmAction({
-    title: 'Objaśnienie Górnictwa i Jubilerstwa od nowa?',
-    text: 'Narrator objaśni Górnictwo i Jubilerstwo od początku.',
-    confirmLabel: 'Od nowa',
+    title: t('Objaśnienie Górnictwa i Jubilerstwa od nowa?'),
+    text: t('Narrator objaśni Górnictwo i Jubilerstwo od początku.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1288,9 +1316,9 @@ async function repeatMiningTour() {
 // Wyprawa, from the start (testing.js).
 async function repeatGuildTour() {
   const sure = await confirmAction({
-    title: 'Objaśnienia Gildii od nowa?',
-    text: 'Narrator powie o zakładkach Gildii przy następnym spojrzeniu na jej stronę, a o każdej zakładce przy pierwszym spojrzeniu na nią.',
-    confirmLabel: 'Od nowa',
+    title: t('Objaśnienia Gildii od nowa?'),
+    text: t('Narrator powie o zakładkach Gildii przy następnym spojrzeniu na jej stronę, a o każdej zakładce przy pierwszym spojrzeniu na nią.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1306,9 +1334,9 @@ async function repeatGuildTour() {
 // (testing.js).
 async function repeatFortressTour() {
   const sure = await confirmAction({
-    title: 'Warownia od nowa?',
-    text: 'Narrator powie o Warowni przy następnym wejściu do obozu.',
-    confirmLabel: 'Od nowa',
+    title: t('Warownia od nowa?'),
+    text: t('Narrator powie o Warowni przy następnym wejściu do obozu.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1324,9 +1352,9 @@ async function repeatFortressTour() {
 // (testing.js).
 async function repeatCornerstoneTour() {
   const sure = await confirmAction({
-    title: 'Kamień węgielny od nowa?',
-    text: 'Narrator powie o Kamieniu węgielnym przy następnym wejściu do obozu.',
-    confirmLabel: 'Od nowa',
+    title: t('Kamień węgielny od nowa?'),
+    text: t('Narrator powie o Kamieniu węgielnym przy następnym wejściu do obozu.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1342,9 +1370,9 @@ async function repeatCornerstoneTour() {
 // (testing.js).
 async function repeatPartyTour() {
   const sure = await confirmAction({
-    title: 'Drużyna od nowa?',
-    text: 'Narrator powie o Drużynie przy następnym wejściu do Społeczności.',
-    confirmLabel: 'Od nowa',
+    title: t('Drużyna od nowa?'),
+    text: t('Narrator powie o Drużynie przy następnym wejściu do Społeczności.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1360,9 +1388,9 @@ async function repeatPartyTour() {
 // (testing.js).
 async function repeatHardHuntTour() {
   const sure = await confirmAction({
-    title: 'Trudna wyprawa od nowa?',
-    text: 'Narrator powie o Trudnej wyprawie przy następnym wejściu na miejsce wyprawy.',
-    confirmLabel: 'Od nowa',
+    title: t('Trudna wyprawa od nowa?'),
+    text: t('Narrator powie o Trudnej wyprawie przy następnym wejściu na miejsce wyprawy.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1378,9 +1406,9 @@ async function repeatHardHuntTour() {
 // (testing.js).
 async function repeatAccountChestTour() {
   const sure = await confirmAction({
-    title: 'Skrzynia Konta od nowa?',
-    text: 'Narrator powie o Skrzyni Konta przy następnym wejściu do niej.',
-    confirmLabel: 'Od nowa',
+    title: t('Skrzynia Konta od nowa?'),
+    text: t('Narrator powie o Skrzyni Konta przy następnym wejściu do niej.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1396,9 +1424,9 @@ async function repeatAccountChestTour() {
 // (testing.js).
 async function repeatSystemCollectorTour() {
   const sure = await confirmAction({
-    title: 'Zbieracz Systemu od nowa?',
-    text: 'Narrator powie o Zbieraczu Systemu przy następnym wejściu do obozu.',
-    confirmLabel: 'Od nowa',
+    title: t('Zbieracz Systemu od nowa?'),
+    text: t('Narrator powie o Zbieraczu Systemu przy następnym wejściu do obozu.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1413,9 +1441,9 @@ async function repeatSystemCollectorTour() {
 // Test mode: the narrator's line about a faint from the start (testing.js).
 async function repeatFaintTour() {
   const sure = await confirmAction({
-    title: 'Omdlenie od nowa?',
-    text: 'Narrator powie o omdleniu przy następnym raporcie z wyprawy zakończonej omdleniem.',
-    confirmLabel: 'Od nowa',
+    title: t('Omdlenie od nowa?'),
+    text: t('Narrator powie o omdleniu przy następnym raporcie z wyprawy zakończonej omdleniem.'),
+    confirmLabel: t('Od nowa'),
   });
   if (!sure) return;
   closeSheet();
@@ -1440,11 +1468,12 @@ async function deleteCharacter() {
   }
   const { name } = state.character;
   const sure = await confirmAction({
-    title: 'Usunąć postać?',
-    text: `${name} zniknie na zawsze razem z przedmiotami, złotem i raportami. Tego nie da się cofnąć. ${
-      others > 0 ? 'Konto i inne postacie zostają, a zaraz potem wybierzesz postać albo stworzysz nową.' : 'Konto zostaje, a zaraz potem stworzysz nową postać.'
-    }`,
-    confirmLabel: 'Usuń postać',
+    title: t('Usunąć postać?'),
+    text: t('{name} zniknie na zawsze razem z przedmiotami, złotem i raportami. Tego nie da się cofnąć. {then}', {
+      name,
+      then: others > 0 ? t('Konto i inne postacie zostają, a zaraz potem wybierzesz postać albo stworzysz nową.') : t('Konto zostaje, a zaraz potem stworzysz nową postać.'),
+    }),
+    confirmLabel: t('Usuń postać'),
     danger: true,
     typed: name,
   });
@@ -1508,6 +1537,11 @@ function enterAuth(note = null) {
   }
   for (const toggle of $$('.password-toggle')) setPasswordVisible(toggle, false);
   setAuthMode('login');
+  // PL | EN where the server offers English (i18n.js).
+  const switchSlot = $('#auth-language');
+  const choice = languageSwitch();
+  fill(switchSlot, choice);
+  switchSlot.hidden = !choice;
   setMusicPlace([]);
   const installSlot = $('#install-slot');
   clear(installSlot);
@@ -1539,14 +1573,15 @@ function setAuthMode(mode) {
 function setPasswordVisible(toggle, visible) {
   const input = document.getElementById(toggle.getAttribute('aria-controls'));
   input.type = visible ? 'text' : 'password';
-  toggle.textContent = visible ? 'Ukryj' : 'Pokaż';
-  toggle.setAttribute('aria-label', visible ? 'Ukryj hasło' : 'Pokaż hasło');
+  toggle.textContent = visible ? t('Ukryj') : t('Pokaż');
+  toggle.setAttribute('aria-label', visible ? t('Ukryj hasło') : t('Pokaż hasło'));
 }
 
 function bindForm(form, submit) {
   const errorBox = $('.form-error', form);
   const button = $('button[type="submit"]', form);
-  const idleLabel = button.textContent;
+  // The labels as index.html writes them, shown in the page's language.
+  const idleLabel = button.textContent.trim();
   form.addEventListener('input', () => {
     errorBox.hidden = true;
   });
@@ -1554,10 +1589,12 @@ function bindForm(form, submit) {
     event.preventDefault();
     errorBox.hidden = true;
     button.disabled = true;
-    button.textContent = button.dataset.busyLabel;
+    button.textContent = t(button.dataset.busyLabel);
     try {
       const { user } = await submit(Object.fromEntries(new FormData(form)));
       form.reset();
+      // The account's language, or the one picked on this screen for it.
+      await followAccount(user);
       state.user = user;
       await enterGame({ choose: true });
     } catch (error) {
@@ -1565,7 +1602,7 @@ function bindForm(form, submit) {
       errorBox.hidden = false;
     } finally {
       button.disabled = false;
-      button.textContent = idleLabel;
+      button.textContent = t(idleLabel);
     }
   });
 }

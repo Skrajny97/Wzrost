@@ -5,12 +5,13 @@ import { $, append, clear, h, icon } from './dom.js';
 import { motionOn, setMotion } from './motion.js';
 import { narratorVoiceOn, playSound, setNarratorVoice } from './sound.js';
 import { state } from './state.js';
+import { t } from './i18n.js';
 
 // A message from the System: the cold, ice-blue panel with the [ SYSTEM ] header.
 export function systemPanel(...lines) {
   return h(
     'section',
-    { class: 'system-panel', 'aria-label': 'Komunikat Systemu' },
+    { class: 'system-panel', 'aria-label': t('Komunikat Systemu') },
     h('div', { class: 'system-message' }, h('p', { class: 'system-label', text: '[ SYSTEM ]' }), lines.map(systemLine)),
   );
 }
@@ -26,7 +27,7 @@ export function howItWorks(lead, rest, { system = false } = {}) {
     'div',
     { class: 'how' },
     lead && line(lead),
-    h('details', { class: `how-more${system ? ' how-more--system' : ''}` }, h('summary', { class: 'how-toggle', text: 'Jak to działa?' }), [rest].flat().map(line)),
+    h('details', { class: `how-more${system ? ' how-more--system' : ''}` }, h('summary', { class: 'how-toggle', text: t('Jak to działa?') }), [rest].flat().map(line)),
   );
 }
 
@@ -69,7 +70,7 @@ export function foldPart({ key, title, line = null, open = true, force = false, 
       card ? h('h2', { class: 'card-title', id, text: title }) : h('span', { class: 'fold-part-title', id, text: title }),
       h('span', { class: 'fold-part-marker', 'aria-hidden': 'true' }),
       badge,
-      dot && h('span', { class: 'fold-part-dot', role: 'img', 'aria-label': 'do zrobienia' }),
+      dot && h('span', { class: 'fold-part-dot', role: 'img', 'aria-label': t('do zrobienia') }),
     ),
     line && h('span', { class: 'fold-part-line', text: line }),
   );
@@ -139,7 +140,7 @@ export function openSheet(...children) {
     h(
       'div',
       { class: 'sheet-body' },
-      h('button', { type: 'button', class: 'sheet-close', 'aria-label': 'Zamknij', onClick: closeSheet }, icon('close')),
+      h('button', { type: 'button', class: 'sheet-close', 'aria-label': t('Zamknij'), onClick: closeSheet }, icon('close')),
       children,
     ),
   ]);
@@ -196,7 +197,7 @@ export function initSheet() {
 // With `typed`, the confirm button waits until that word is typed in, as the
 // account's login before deleting the account. `cancelLabel` names the way
 // back when "Anuluj" is the thing asked about.
-export function confirmAction({ title, text, confirmLabel, cancelLabel = 'Anuluj', danger = false, typed = null }) {
+export function confirmAction({ title, text, confirmLabel, cancelLabel = t('Anuluj'), danger = false, typed = null }) {
   return new Promise((resolve) => {
     let answered = false;
     const answer = (value) => {
@@ -228,7 +229,7 @@ export function confirmAction({ title, text, confirmLabel, cancelLabel = 'Anuluj
     const dialog = openSheet(
       h('h2', { class: 'sheet-title', text: title }),
       h('p', { class: 'sheet-text', text }),
-      input && h('div', { class: 'field' }, h('label', { for: 'confirm-typed', text: `Wpisz „${typed}”, żeby potwierdzić.` }), input),
+      input && h('div', { class: 'field' }, h('label', { for: 'confirm-typed', text: t('Wpisz „{typed}”, żeby potwierdzić.', { typed }) }), input),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: () => answer(false), text: cancelLabel }), confirm),
     );
     dialog.addEventListener('close', () => answer(false), { once: true });
@@ -321,10 +322,10 @@ export function meter({ label, value, max, kind }) {
 }
 
 // "Głos narratora": the switch on the creation screen and in the settings.
-export const voiceSwitch = (labelId) => switchButton(labelId, narratorVoiceOn, setNarratorVoice, ['Włączony', 'Wyłączony']);
+export const voiceSwitch = (labelId) => switchButton(labelId, narratorVoiceOn, setNarratorVoice, [t('Włączony'), t('Wyłączony')]);
 
 // "Animacje" in the settings (motion.js).
-export const motionSwitch = (labelId) => switchButton(labelId, motionOn, setMotion, ['Włączone', 'Wyłączone']);
+export const motionSwitch = (labelId) => switchButton(labelId, motionOn, setMotion, [t('Włączone'), t('Wyłączone')]);
 
 function switchButton(labelId, read, write, [onText, offText]) {
   const button = h('button', { type: 'button', class: 'toggle', role: 'switch', 'aria-labelledby': labelId });

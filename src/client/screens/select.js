@@ -9,6 +9,7 @@ import { portraitSprite } from '../art.js';
 import { classArt } from '../class-art.js';
 import { $, fill, h, icon } from '../dom.js';
 import { countOf, timeFormat } from '../format.js';
+import { t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
 import { systemPanel, withButton } from '../ui.js';
 
@@ -16,9 +17,9 @@ const WORKS = { herbs: 'Zielarstwo', potions: 'Alchemia', items: 'Rzemieślnictw
 
 // What the character is doing, in a few words.
 function doing(activity) {
-  if (!activity) return 'Odpoczynek';
-  const what = WORKS[activity.kind] ? `${WORKS[activity.kind]} · ${activity.placeName}` : `Eksploracja · ${activity.areaName}`;
-  return `${what} · ${activity.finished ? 'raport gotowy' : `do ${timeFormat.format(new Date(activity.endsAt))}`}`;
+  if (!activity) return t('Odpoczynek');
+  const what = WORKS[activity.kind] ? `${t(WORKS[activity.kind])} · ${activity.placeName}` : t('Eksploracja · {area}', { area: activity.areaName });
+  return `${what} · ${activity.finished ? t('raport gotowy') : t('do {time}', { time: timeFormat.format(new Date(activity.endsAt)) })}`;
 }
 
 const bust = (character) =>
@@ -46,8 +47,8 @@ export function renderSelect(container, list, { onChoose, onCreate, onLogout }) 
         h(
           'span',
           { class: 'select-text' },
-          h('span', { class: 'select-name' }, character.name, character.played && h('span', { class: 'select-tag', text: 'Grasz teraz' })),
-          h('span', { class: 'select-levels', text: `${character.className} · poziom ${character.level} · klasa ${character.classLevel}` }),
+          h('span', { class: 'select-name' }, character.name, character.played && h('span', { class: 'select-tag', text: t('Grasz teraz') })),
+          h('span', { class: 'select-levels', text: t('{className} · poziom {level} · klasa {classLevel}', { className: character.className, level: character.level, classLevel: character.classLevel }) }),
           h('span', { class: `select-doing${character.activity?.finished ? ' select-doing--ready' : ''}`, text: doing(character.activity) }),
         ),
       ),
@@ -57,18 +58,18 @@ export function renderSelect(container, list, { onChoose, onCreate, onLogout }) 
     h(
       'header',
       { class: 'hero hero--small' },
-      h('h1', { class: 'hero-title', tabindex: '-1', text: 'Wybierz postać' }),
-      h('p', { class: 'hero-tagline', text: `Postacie na koncie: ${characters.length} z ${max}` }),
+      h('h1', { class: 'hero-title', tabindex: '-1', text: t('Wybierz postać') }),
+      h('p', { class: 'hero-tagline', text: t('Postacie na koncie: {count} z {max}', { count: characters.length, max }) }),
     ),
-    systemPanel('Wybierz postać, którą chcesz grać. Pozostałe czekają, a ich wyprawy i prace trwają dalej.'),
+    systemPanel(t('Wybierz postać, którą chcesz grać. Pozostałe czekają, a ich wyprawy i prace trwają dalej.')),
     h('ul', { class: 'select-list' }, characters.map(card)),
     h(
       'div',
       { class: 'select-actions' },
       characters.length < max
-        ? h('button', { type: 'button', class: 'button button--system', onClick: onCreate, text: 'Nowa postać' })
-        : h('p', { class: 'muted', text: `Na koncie jest już ${countOf(max, 'postać', 'postacie', 'postaci')}. Nową stworzysz, gdy usuniesz jedną z nich.` }),
-      h('button', { type: 'button', class: 'button button--world', onClick: (event) => withButton(event.currentTarget, onLogout), text: 'Wyloguj się' }),
+        ? h('button', { type: 'button', class: 'button button--system', onClick: onCreate, text: t('Nowa postać') })
+        : h('p', { class: 'muted', text: t('Na koncie jest już {count}. Nową stworzysz, gdy usuniesz jedną z nich.', { count: countOf(max, 'postać', 'postacie', 'postaci') }) }),
+      h('button', { type: 'button', class: 'button button--world', onClick: (event) => withButton(event.currentTarget, onLogout), text: t('Wyloguj się') }),
     ),
   );
   $('.hero-title', container).focus();

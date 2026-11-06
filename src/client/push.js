@@ -7,9 +7,11 @@
 
 import { request } from './api.js';
 import { h } from './dom.js';
+import { t } from './i18n.js';
 import { onIphone, runsAsApp } from './install.js';
 import { toast } from './ui.js';
 
+// The messages are written in Polish and shown in the page's language (t()).
 const BLOCKED = 'Powiadomienia gry są zablokowane. Zezwól na nie w ustawieniach telefonu albo przeglądarki i spróbuj ponownie.';
 const FAILED = 'Nie udało się włączyć powiadomień. Spróbuj ponownie za chwilę.';
 const LOST = 'Powiadomienia przestały docierać na ten telefon. Włącz je ponownie w Ustawieniach (zębatka).';
@@ -70,9 +72,9 @@ async function enable() {
   // Asked first, while the tap still counts: phones show the question only
   // right after one.
   const permission = await Notification.requestPermission();
-  if (permission !== 'granted') throw new Error(permission === 'denied' ? BLOCKED : 'Bez zgody telefonu powiadomienia nie przyjdą.');
+  if (permission !== 'granted') throw new Error(permission === 'denied' ? t(BLOCKED) : t('Bez zgody telefonu powiadomienia nie przyjdą.'));
   const registration = await activeWorker();
-  if (!registration) throw new Error(FAILED);
+  if (!registration) throw new Error(t(FAILED));
   const { key } = await request('GET', '/api/push/key');
   let current = await registration.pushManager.getSubscription();
   if (current && !madeWith(current, key)) {
@@ -82,7 +84,7 @@ async function enable() {
   try {
     current ??= await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: fromBase64Url(key) });
   } catch {
-    throw new Error(FAILED);
+    throw new Error(t(FAILED));
   }
   await request('POST', '/api/push/subscribe', current.toJSON());
   remember(true);
@@ -138,7 +140,7 @@ export async function syncPush() {
     }
     if (!(await renew(current, key))) {
       remember(false);
-      toast(Notification.permission === 'denied' ? BLOCKED : LOST);
+      toast(Notification.permission === 'denied' ? t(BLOCKED) : t(LOST));
     }
   } catch {
     // The next start tries again.
@@ -152,15 +154,15 @@ export async function syncPush() {
 // one it gives up on now is switched off here too, to be switched on anew.
 async function sendTest() {
   let current = await subscription();
-  if (!current) return TESTED.unknown;
+  if (!current) return t(TESTED.unknown);
   if ((await request('POST', '/api/push/subscribe', current.toJSON())).gone) {
     current = await renew(current, (await request('GET', '/api/push/key')).key);
-    if (!current) return TESTED.gone;
+    if (!current) return t(TESTED.gone);
   }
   const { result, status } = await request('POST', '/api/push/test', { endpoint: current.endpoint });
   if (result === 'gone') await current.unsubscribe().catch(() => {});
-  if (result === 'failed') return `Usługa powiadomień telefonu nie przyjęła wiadomości (kod ${status}). Spróbuj ponownie za chwilę.`;
-  return TESTED[result] ?? FAILED;
+  if (result === 'failed') return t('Usługa powiadomień telefonu nie przyjęła wiadomości (kod {status}). Spróbuj ponownie za chwilę.', { status });
+  return t(TESTED[result] ?? FAILED);
 }
 
 // Before signing out or deleting the account: the phone stops getting the
@@ -198,27 +200,27 @@ if ('serviceWorker' in navigator) {
 // test notification.
 export function pushRow() {
   const hint = h('small', { class: 'status-hint' });
-  const test = h('button', { type: 'button', class: 'link-button push-test', text: 'Wyślij próbne powiadomienie' });
+  const test = h('button', { type: 'button', class: 'link-button push-test', text: t('Wyślij próbne powiadomienie') });
   test.hidden = true;
   const row = (value) =>
-    h('div', { class: 'status-row status-row--push' }, h('dt', {}, h('span', { id: 'push-label', text: 'Powiadomienia' }), hint, test), h('dd', {}, value));
+    h('div', { class: 'status-row status-row--push' }, h('dt', {}, h('span', { id: 'push-label', text: t('Powiadomienia') }), hint, test), h('dd', {}, value));
   if (!supported()) {
     hint.textContent =
       onIphone() && !runsAsApp()
-        ? 'Na iPhonie przychodzą do gry dodanej do ekranu początkowego. Dodaj ją przyciskiem „Zainstaluj jako aplikację” i otwórz z ikony Insight.'
-        : 'Ta przeglądarka ich nie obsługuje. Otwórz grę w Chrome albo w Safari.';
-    return row(h('span', { class: 'status-muted', text: 'Niedostępne' }));
+        ? t('Na iPhonie przychodzą do gry dodanej do ekranu początkowego. Dodaj ją przyciskiem „Zainstaluj jako aplikację” i otwórz z ikony Insight.')
+        : t('Ta przeglądarka ich nie obsługuje. Otwórz grę w Chrome albo w Safari.');
+    return row(h('span', { class: 'status-muted', text: t('Niedostępne') }));
   }
   const button = h('button', { type: 'button', class: 'toggle', role: 'switch', 'aria-labelledby': 'push-label', 'aria-checked': false, disabled: true, text: '…' });
   let busy = false;
   const show = async () => {
     const on = Boolean(await subscription().catch(() => null));
     button.setAttribute('aria-checked', String(on));
-    button.textContent = on ? 'Włączone' : 'Wyłączone';
+    button.textContent = on ? t('Włączone') : t('Wyłączone');
     button.disabled = busy;
     test.hidden = !on;
     test.disabled = busy;
-    hint.textContent = !on && Notification.permission === 'denied' ? BLOCKED : '';
+    hint.textContent = !on && Notification.permission === 'denied' ? t(BLOCKED) : '';
     hint.hidden = !hint.textContent;
   };
   test.addEventListener('click', async () => {
@@ -228,7 +230,7 @@ export function pushRow() {
     try {
       toast(await sendTest());
     } catch (error) {
-      toast(error.message || FAILED);
+      toast(error.message || t(FAILED));
     } finally {
       busy = false;
       await show();
@@ -242,13 +244,13 @@ export function pushRow() {
     try {
       if (on) {
         await disable();
-        toast('Powiadomienia wyłączone.');
+        toast(t('Powiadomienia wyłączone.'));
       } else {
         await enable();
-        toast('Powiadomienia włączone. Przyjdą, gdy gra będzie w tle albo zamknięta.');
+        toast(t('Powiadomienia włączone. Przyjdą, gdy gra będzie w tle albo zamknięta.'));
       }
     } catch (error) {
-      toast(error.message || FAILED);
+      toast(error.message || t(FAILED));
     } finally {
       busy = false;
       await show();

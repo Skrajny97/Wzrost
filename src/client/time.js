@@ -5,6 +5,7 @@
 import { timePointsArt } from './art.js';
 import { h } from './dom.js';
 import { countOf, formatMinutes } from './format.js';
+import { t } from './i18n.js';
 import { playSound } from './sound.js';
 import { call, serverNow, state, timePointsNow } from './state.js';
 import { confirmAction, toast, withButton } from './ui.js';
@@ -43,7 +44,7 @@ export function skipControl(target, left, name) {
   const update = (now = serverNow()) => {
     const { minutes, spend } = plan(left(now), now);
     element.hidden = spend < 1;
-    label.textContent = spend < minutes ? `Przewiń o ${formatMinutes(spend)}` : 'Przewiń';
+    label.textContent = spend < minutes ? t('Przewiń o {time}', { time: formatMinutes(spend) }) : t('Przewiń');
     cost.textContent = String(spend);
     element.setAttribute('aria-label', `${label.textContent}, ${timePoints(spend)}`);
   };
@@ -56,12 +57,17 @@ async function skip(target, left, name) {
   const { minutes, points, spend } = plan(left(now), now);
   if (spend < 1) return;
   const sure = await confirmAction({
-    title: 'Przewinąć czas?',
-    text: `${name}: ${spend < minutes ? `krócej o ${formatMinutes(spend)}` : 'od razu do końca'}. To kosztuje ${timePoints(spend)}, zostanie ${points - spend}.`,
-    confirmLabel: 'Przewiń',
+    title: t('Przewinąć czas?'),
+    text: t('{name}: {how}. To kosztuje {cost}, zostanie {left}.', {
+      name,
+      how: spend < minutes ? t('krócej o {time}', { time: formatMinutes(spend) }) : t('od razu do końca'),
+      cost: timePoints(spend),
+      left: points - spend,
+    }),
+    confirmLabel: t('Przewiń'),
   });
   if (!sure) return;
   const { spent } = await call('POST', '/api/time/skip', { target });
   playSound('system');
-  toast(`Przewinięto ${formatMinutes(spent)}.`);
+  toast(t('Przewinięto {time}.', { time: formatMinutes(spent) }));
 }

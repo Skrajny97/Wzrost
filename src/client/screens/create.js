@@ -6,6 +6,7 @@ import { portraitSprite } from '../art.js';
 import { classArt } from '../class-art.js';
 import { $, fill, h, icon } from '../dom.js';
 import { countOf } from '../format.js';
+import { t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
 import { call, state } from '../state.js';
 import { skinSwatches, systemPanel, toast, voiceSwitch } from '../ui.js';
@@ -13,7 +14,7 @@ import { skinSwatches, systemPanel, toast, voiceSwitch } from '../ui.js';
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 const START_BADGES = { gentle: 'łagodniejszy start', hard: 'trudniejszy start' };
 
-const inGame = (count) => (count > 0 ? `W grze: ${countOf(count, 'postać', 'postacie', 'postaci')} tej klasy` : 'Nikt jeszcze nie gra tą klasą.');
+const inGame = (count) => (count > 0 ? t('W grze: {count} tej klasy', { count: countOf(count, 'postać', 'postacie', 'postaci') }) : t('Nikt jeszcze nie gra tą klasą.'));
 
 // `counts`: the game's characters of each class (GET /api/characters).
 export function renderCreate(container, onCreated, counts = null) {
@@ -34,7 +35,7 @@ export function renderCreate(container, onCreated, counts = null) {
     required: true,
     'aria-describedby': 'character-name-hint',
   });
-  const submit = h('button', { type: 'submit', class: 'button button--system', text: 'Rozpocznij' });
+  const submit = h('button', { type: 'submit', class: 'button button--system', text: t('Rozpocznij') });
 
   const cards = state.content.classes.map((cls) =>
     h(
@@ -52,9 +53,9 @@ export function renderCreate(container, onCreated, counts = null) {
         { class: 'class-card-head' },
         h('span', { class: 'class-icons' }, classIcons(cls.id)),
         h('span', { class: 'class-name', text: cls.name }),
-        START_BADGES[cls.start] && h('span', { class: `badge badge--${cls.start}`, text: START_BADGES[cls.start] }),
+        START_BADGES[cls.start] && h('span', { class: `badge badge--${cls.start}`, text: t(START_BADGES[cls.start]) }),
       ),
-      h('span', { class: 'class-meta', text: `${cls.role} · pozycja: ${POSITION_NAMES[cls.position]}` }),
+      h('span', { class: 'class-meta', text: t('{role} · pozycja: {position}', { role: cls.role, position: t(POSITION_NAMES[cls.position]) }) }),
       h('span', { class: 'class-description', text: cls.description }),
       counts && h('span', { class: 'class-count', text: inGame(counts[cls.id] ?? 0) }),
     ),
@@ -104,33 +105,33 @@ export function renderCreate(container, onCreated, counts = null) {
     h(
       'div',
       { class: 'field' },
-      h('span', { class: 'field-label', id: 'look-label', text: 'Wygląd' }),
+      h('span', { class: 'field-label', id: 'look-label', text: t('Wygląd') }),
       h('div', { class: 'segmented', role: 'group', 'aria-labelledby': 'look-label' }, looks),
     ),
     h(
       'div',
       { class: 'field' },
-      h('span', { class: 'field-label', id: 'skin-label', text: 'Kolor skóry' }),
+      h('span', { class: 'field-label', id: 'skin-label', text: t('Kolor skóry') }),
       h('div', { class: 'skin-swatches', role: 'radiogroup', 'aria-labelledby': 'skin-label' }, tones),
     ),
     h(
       'div',
-      { class: 'class-list', role: 'radiogroup', 'aria-label': 'Klasa postaci' },
+      { class: 'class-list', role: 'radiogroup', 'aria-label': t('Klasa postaci') },
       cards,
     ),
     h(
       'div',
       { class: 'field' },
-      h('label', { for: 'character-name', text: 'Imię postaci' }),
+      h('label', { for: 'character-name', text: t('Imię postaci') }),
       nameInput,
-      h('p', { class: 'field-hint', id: 'character-name-hint', text: 'Od 2 do 20 znaków, na początku litera. Mogą być cyfry, spacje, myślniki, apostrofy i podkreślniki.' }),
+      h('p', { class: 'field-hint', id: 'character-name-hint', text: t('Od 2 do 20 znaków, na początku litera. Mogą być cyfry, spacje, myślniki, apostrofy i podkreślniki.') }),
     ),
     h(
       'div',
       { class: 'field field--switch' },
-      h('span', { class: 'field-label', id: 'create-voice-label', text: 'Głos narratora' }),
+      h('span', { class: 'field-label', id: 'create-voice-label', text: t('Głos narratora') }),
       voiceSwitch('create-voice-label'),
-      h('p', { class: 'field-hint', text: 'Narrator czyta wprowadzenie na głos. Zmienisz to też w ustawieniach.' }),
+      h('p', { class: 'field-hint', text: t('Narrator czyta wprowadzenie na głos. Zmienisz to też w ustawieniach.') }),
     ),
     error,
     submit,
@@ -142,12 +143,12 @@ export function renderCreate(container, onCreated, counts = null) {
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!look || !selected) {
-      error.textContent = look ? 'Wybierz klasę postaci.' : 'Wybierz wygląd postaci.';
+      error.textContent = look ? t('Wybierz klasę postaci.') : t('Wybierz wygląd postaci.');
       error.hidden = false;
       return;
     }
     submit.disabled = true;
-    submit.textContent = 'Tworzenie postaci…';
+    submit.textContent = t('Tworzenie postaci…');
     try {
       const { character } = await call('POST', '/api/character', { name: nameInput.value, classId: selected, appearance: look, skin });
       onCreated();
@@ -160,7 +161,7 @@ export function renderCreate(container, onCreated, counts = null) {
       error.hidden = false;
     } finally {
       submit.disabled = false;
-      submit.textContent = 'Rozpocznij';
+      submit.textContent = t('Rozpocznij');
     }
   });
 
@@ -168,10 +169,10 @@ export function renderCreate(container, onCreated, counts = null) {
     h(
       'header',
       { class: 'hero hero--small' },
-      h('h1', { class: 'hero-title', tabindex: '-1', text: 'Nowa postać' }),
-      h('p', { class: 'hero-tagline', text: 'Skraj Puszczy. Tu wszystko się zaczyna.' }),
+      h('h1', { class: 'hero-title', tabindex: '-1', text: t('Nowa postać') }),
+      h('p', { class: 'hero-tagline', text: t('Skraj Puszczy. Tu wszystko się zaczyna.') }),
     ),
-    systemPanel('Wykryto nową istotę na skraju puszczy. Wybierz wygląd, ścieżkę klasy i podaj imię.'),
+    systemPanel(t('Wykryto nową istotę na skraju puszczy. Wybierz wygląd, ścieżkę klasy i podaj imię.')),
     form,
   );
   $('.hero-title', container).focus();

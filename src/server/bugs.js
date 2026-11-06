@@ -5,7 +5,7 @@
 // panel (author.js) until marked done. A few a day per account, so that
 // no one floods the panel.
 
-import { content } from './content.js';
+import { contentIn } from './content.js';
 import { ApiError, json, readForm, readJson } from './http.js';
 import { requireSession } from './sessions.js';
 
@@ -69,7 +69,8 @@ export async function reportBug(context) {
     .bind(
       session.userId,
       character?.id ?? null,
-      character ? `${character.name} · ${content().classesById[character.class_id]?.name ?? character.class_id}, poziom ${character.level}, klasa ${character.class_level}` : null,
+      // For the author's panel, in Polish whatever the player's language.
+      character ? `${character.name} · ${contentIn('pl').classesById[character.class_id]?.name ?? character.class_id}, poziom ${character.level}, klasa ${character.class_level}` : null,
       text,
       screen,
       String(context.env.APP_VERSION ?? 'dev'),

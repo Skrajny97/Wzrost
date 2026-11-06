@@ -3,6 +3,7 @@
 
 import { ApiError, request } from './api.js';
 import { formatNumber } from './format.js';
+import { language, t } from './i18n.js';
 
 export const state = {
   user: null,
@@ -37,10 +38,15 @@ export function setCharacter(character) {
   for (const listener of listeners) listener(character);
 }
 
-// The content labels, asked for once: the start screen needs them for the
-// music, the game for everything else.
+// The content labels, asked for once in the page's language (i18n.js): the
+// start screen needs them for the music, the game for everything else. In
+// another language, as after the account's own was taken, they are asked
+// for again.
 let contentRequest = null;
+let contentLanguage = null;
 export function loadContent() {
+  if (contentLanguage !== language()) contentRequest = null;
+  contentLanguage = language();
   contentRequest ??= request('GET', '/api/content').then(
     (content) => (state.content = content),
     (error) => {
@@ -117,7 +123,7 @@ export const restRate = (character = state.character) => character.regen?.change
 
 // Gold and the camp's materials, with their names, in the order to show them.
 export const walletEntries = (character = state.character) => [
-  { id: 'gold', name: 'Złoto', genitive: 'złota', amount: character.gold },
+  { id: 'gold', name: t('Złoto'), genitive: t('złota'), amount: character.gold },
   ...state.content.resources.map((resource) => ({ id: resource.id, name: resource.name, genitive: resource.genitive, amount: character.resources[resource.id] ?? 0 })),
 ];
 
@@ -161,8 +167,8 @@ export const activityFinished = (activity, now = serverNow()) => Boolean(activit
 export const buildLocked = (character) => ['hunt', 'mercenary'].includes(character?.activity?.kind);
 export const buildLockedText = (character, then) =>
   character?.activity?.kind === 'mercenary'
-    ? `Postać wykonuje usługę najemną. ${then} po jej końcu${character.activity.service?.hired ? '' : ' albo po zdjęciu ogłoszenia w Karczmie'}.`
-    : `Postać jest na wyprawie. ${then} po jej powrocie.`;
+    ? t('Postać wykonuje usługę najemną. {then} po jej końcu{or}.', { then, or: character.activity.service?.hired ? '' : t(' albo po zdjęciu ogłoszenia w Karczmie') })
+    : t('Postać jest na wyprawie. {then} po jej powrocie.', { then });
 
 export const isUnlocked = (id) => state.character.features.includes(id);
 export const unlockInfo = (id) => state.content.unlocks.find((unlock) => unlock.id === id);

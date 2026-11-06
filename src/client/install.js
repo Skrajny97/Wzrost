@@ -5,6 +5,7 @@
 // as an installed app, the button is gone.
 
 import { h, icon } from './dom.js';
+import { t } from './i18n.js';
 import { openSheet, toast } from './ui.js';
 
 let prompt = null; // the browser's install dialog, kept until the button asks for it
@@ -17,7 +18,7 @@ window.addEventListener('beforeinstallprompt', (event) => {
 window.addEventListener('appinstalled', () => {
   prompt = null;
   for (const element of document.querySelectorAll('.install-block, .install-button')) element.remove();
-  toast('Zainstalowano. Grę otworzysz ikoną Insight na ekranie głównym.');
+  toast(t('Zainstalowano. Grę otworzysz ikoną Insight na ekranie głównym.'));
 });
 
 export function runsAsApp() {
@@ -38,7 +39,7 @@ export function installButton() {
     'button',
     { type: 'button', class: 'button button--world install-button', onClick: install },
     icon('install', { size: 22 }),
-    'Zainstaluj jako aplikację',
+    t('Zainstaluj jako aplikację'),
   );
 }
 
@@ -47,7 +48,7 @@ export function installBlock() {
   const button = installButton();
   return (
     button &&
-    h('div', { class: 'install-block' }, button, h('p', { class: 'install-hint', text: 'Gra otworzy się z ikony na ekranie głównym, na pełnym ekranie.' }))
+    h('div', { class: 'install-block' }, button, h('p', { class: 'install-hint', text: t('Gra otworzy się z ikony na ekranie głównym, na pełnym ekranie.') }))
   );
 }
 
@@ -61,7 +62,7 @@ async function install() {
   try {
     await dialog.prompt();
     const { outcome } = await dialog.userChoice;
-    if (outcome === 'accepted') toast('Instalacja rozpoczęta. Ikona Insight pojawi się na ekranie głównym.');
+    if (outcome === 'accepted') toast(t('Instalacja rozpoczęta. Ikona Insight pojawi się na ekranie głównym.'));
   } catch {
     showGuide();
   }
@@ -82,15 +83,15 @@ function showGuide() {
         'Potwierdź. Na ekranie pojawi się ikona Insight.',
       ];
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Zainstaluj grę' }),
-    h('p', { class: 'sheet-text', text: 'Gra otworzy się z ikony na ekranie głównym, na pełnym ekranie, bez paska przeglądarki.' }),
+    h('h2', { class: 'sheet-title', text: t('Zainstaluj grę') }),
+    h('p', { class: 'sheet-text', text: t('Gra otworzy się z ikony na ekranie głównym, na pełnym ekranie, bez paska przeglądarki.') }),
     inAppBrowser() &&
-      h('p', { class: 'sheet-text install-warning', text: 'Gra jest otwarta w innej aplikacji. Najpierw wybierz w jej menu „Otwórz w przeglądarce”.' }),
+      h('p', { class: 'sheet-text install-warning', text: t('Gra jest otwarta w innej aplikacji. Najpierw wybierz w jej menu „Otwórz w przeglądarce”.') }),
     h(
       'ol',
       { class: 'install-steps' },
-      steps.map((step) => h('li', { text: step })),
+      steps.map((step) => h('li', { text: t(step) })),
     ),
-    h('p', { class: 'sheet-text install-note', text: 'Jeśli gra jest już zainstalowana, otwórz ją ikoną Insight na ekranie głównym.' }),
+    h('p', { class: 'sheet-text install-note', text: t('Jeśli gra jest już zainstalowana, otwórz ją ikoną Insight na ekranie głównym.') }),
   );
 }

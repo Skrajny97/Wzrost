@@ -6,6 +6,7 @@
 // address into an <img>. Only the author sees it (screens/author.js).
 
 import { fill, h } from './dom.js';
+import { t } from './i18n.js';
 import { toast } from './ui.js';
 
 const LONGEST = 1600;
@@ -44,7 +45,7 @@ async function shrinkScreenshot(file) {
   try {
     bitmap = await createImageBitmap(file);
   } catch {
-    return { problem: CANNOT_OPEN };
+    return { problem: t(CANNOT_OPEN) };
   }
   try {
     const fit = Math.min(1, LONGEST / Math.max(bitmap.width, bitmap.height));
@@ -58,10 +59,10 @@ async function shrinkScreenshot(file) {
       const blob = await jpeg(canvas, quality);
       if (blob && blob.size <= MOST_BYTES) return { blob, canvas };
     }
-    return { problem: TOO_BIG };
+    return { problem: t(TOO_BIG) };
   } catch {
     // The browser gave up on drawing it (a phone short of memory).
-    return { problem: CANNOT_OPEN };
+    return { problem: t(CANNOT_OPEN) };
   } finally {
     bitmap.close?.();
   }
@@ -87,15 +88,15 @@ export function screenshotPicker() {
       if (file) preparing = prepare(file);
     },
   });
-  const pick = h('button', { type: 'button', class: 'button button--world button--small', text: PICK, onClick: () => input.click() });
+  const pick = h('button', { type: 'button', class: 'button button--world button--small', text: t(PICK), onClick: () => input.click() });
   const area = h('div', { class: 'bug-shot-area' }, pick);
 
   async function prepare(file) {
     pick.disabled = true;
-    pick.textContent = 'Wczytywanie zrzutu…';
+    pick.textContent = t('Wczytywanie zrzutu…');
     const shrunk = await shrinkScreenshot(file);
     pick.disabled = false;
-    pick.textContent = PICK;
+    pick.textContent = t(PICK);
     if (shrunk.problem) {
       toast(shrunk.problem);
       return;
@@ -103,11 +104,11 @@ export function screenshotPicker() {
     picked = shrunk;
     picked.canvas.className = 'bug-shot-preview';
     picked.canvas.setAttribute('role', 'img');
-    picked.canvas.setAttribute('aria-label', 'Dołączony zrzut ekranu');
+    picked.canvas.setAttribute('aria-label', t('Dołączony zrzut ekranu'));
     const remove = h('button', {
       type: 'button',
       class: 'button button--danger button--small',
-      text: 'Usuń zrzut',
+      text: t('Usuń zrzut'),
       onClick: () => {
         picked = null;
         fill(area, pick);
@@ -121,9 +122,9 @@ export function screenshotPicker() {
   const element = h(
     'div',
     { class: 'bug-shot', role: 'group', 'aria-labelledby': 'bug-shot-label' },
-    h('span', { class: 'field-label', id: 'bug-shot-label', text: 'Zrzut ekranu' }),
+    h('span', { class: 'field-label', id: 'bug-shot-label', text: t('Zrzut ekranu') }),
     area,
-    h('p', { class: 'bug-shot-note', text: 'Nieobowiązkowy. Zobaczy go tylko autor gry.' }),
+    h('p', { class: 'bug-shot-note', text: t('Nieobowiązkowy. Zobaczy go tylko autor gry.') }),
     input,
   );
   return {

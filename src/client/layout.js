@@ -21,6 +21,7 @@ import { activityFinished, currentHp, fullStores, isUnlocked, restRate, serverNo
 import { meter, toast } from './ui.js';
 import { newsWaiting, openNews } from './news.js';
 import { desktopLayout } from './layout-mode.js';
+import { t } from './i18n.js';
 
 // A profession's work, by the kind of its activity: its screen, its name
 // in the top bar and the profession doing it.
@@ -58,6 +59,9 @@ const CHARACTER_TABS = [
 
 let topbar = null;
 
+// The tabs' labels and the works' names are written in Polish and shown in
+// the page's language (t(), i18n.js).
+
 // The coin and the core of Punkty Systemu in one size, one over the other, so
 // the two numbers start in one column (the author: the coin "wielkościowo i
 // pozycją zbliżona do Punktów Systemu").
@@ -82,14 +86,14 @@ export function buildTopbar(onSettings) {
   // The Encyklopedia by the current activity, where the pouch of parts was
   // (the parts have their tab in the backpack); a dot when a chest waits
   // there or in a Bestiariusz.
-  const encyclopedia = h('a', { class: 'encyclopedia-button', href: '#/encyklopedia', 'aria-label': 'Encyklopedia' }, encyclopediaArt(28));
+  const encyclopedia = h('a', { class: 'encyclopedia-button', href: '#/encyklopedia', 'aria-label': t('Encyklopedia') }, encyclopediaArt(28));
   // On a computer the camp's resources and the Punkty Czasu stand beside the
   // gold, always in sight (505 A; the player: "Sporo jest jeszcze miejsca na
   // HUD'zie na PC"); on a phone they wait in the list under it, and
   // styles.css hides them there. A tap on them opens the list too.
   const stock = [
     ...state.content.resources.map((resource) => ({ id: resource.id, name: resource.name, art: resourceArt(resource.id, STOCK_ICON) })),
-    { id: 'time', name: 'Punkty Czasu', art: timePointsArt(STOCK_ICON) },
+    { id: 'time', name: t('Punkty Czasu'), art: timePointsArt(STOCK_ICON) },
   ].map((entry) => {
     const value = h('span', { class: 'gold-stock-value' });
     return { ...entry, value, element: h('span', { class: `gold-stock gold-stock--${entry.id}`, title: entry.name }, entry.art, value) };
@@ -99,13 +103,13 @@ export function buildTopbar(onSettings) {
     {
       type: 'button',
       class: 'gold',
-      'aria-label': 'Złoto, Punkty Systemu i zasoby',
+      'aria-label': t('Złoto, Punkty Systemu i zasoby'),
       'aria-expanded': 'false',
       'aria-controls': 'wallet-list',
       onClick: () => showWallet(wallet.hidden),
     },
-    h('span', { class: 'gold-row', title: 'Złoto' }, goldArt(TOPBAR_ICON), gold),
-    h('span', { class: 'points', title: 'Punkty Systemu' }, icon(SYSTEM_POINTS_ICON, { size: TOPBAR_ICON }), points),
+    h('span', { class: 'gold-row', title: t('Złoto') }, goldArt(TOPBAR_ICON), gold),
+    h('span', { class: 'points', title: t('Punkty Systemu') }, icon(SYSTEM_POINTS_ICON, { size: TOPBAR_ICON }), points),
     stock.map((entry) => entry.element),
   );
   // The narrator waits with his quests between the levels and the gold.
@@ -115,7 +119,7 @@ export function buildTopbar(onSettings) {
       type: 'button',
       class: 'quest-button',
       'data-guide': 'quests',
-      'aria-label': 'Zadania od narratora',
+      'aria-label': t('Zadania od narratora'),
       'aria-haspopup': 'dialog',
       'aria-expanded': 'false',
       onClick: () => showQuests(),
@@ -124,13 +128,13 @@ export function buildTopbar(onSettings) {
   );
   // The Sklep Systemu beside him, the System's stall (the author: "jakąś
   // specjalną ikonę"), open since its cosmetics came (screens/shop.js).
-  const shop = h('a', { class: 'system-shop', href: '#/sklep', 'aria-label': 'Sklep Systemu' }, icon('shop', { size: 24 }));
+  const shop = h('a', { class: 'system-shop', href: '#/sklep', 'aria-label': t('Sklep Systemu') }, icon('shop', { size: 24 }));
   const campLabel = h('span', { class: 'camp-label' });
-  const camp = h('a', { class: 'camp-button', href: '#/oboz', 'aria-label': 'Obóz' }, icon('tent'), campLabel);
+  const camp = h('a', { class: 'camp-button', href: '#/oboz', 'aria-label': t('Obóz') }, icon('tent'), campLabel);
   const hp = meter({ label: 'HP', value: 0, max: 0, kind: 'hp' });
   const mana = meter({ label: 'MANA', value: 0, max: 0, kind: 'mana' });
-  const xp = meter({ label: 'XP POSTACI', value: 0, max: 0, kind: 'xp' });
-  const classXp = meter({ label: 'XP KLASY', value: 0, max: 0, kind: 'class-xp' });
+  const xp = meter({ label: t('XP POSTACI'), value: 0, max: 0, kind: 'xp' });
+  const classXp = meter({ label: t('XP KLASY'), value: 0, max: 0, kind: 'class-xp' });
   const activityLabel = h('span', { class: 'activity-label' });
   const activityTime = h('span', { class: 'activity-time' });
   const activity = h('a', { class: 'activity', href: '#/walka' }, activityLabel, activityTime);
@@ -142,10 +146,10 @@ export function buildTopbar(onSettings) {
   // The settings, with a dot for the author when players' bug reports wait.
   // A class of its own, which the narrator points at: the label changes with
   // the bug reports waiting for the author (664).
-  const settings = h('button', { type: 'button', class: 'icon-button settings-button', 'aria-label': 'Ustawienia', onClick: onSettings }, icon('gear'));
+  const settings = h('button', { type: 'button', class: 'icon-button settings-button', 'aria-label': t('Ustawienia'), onClick: onSettings }, icon('gear'));
   // "Co nowego?" beside them (594 C): the latest entries, with a yellow dot
   // while an entry the account has not seen waits (news.js).
-  const news = h('button', { type: 'button', class: 'icon-button news-button', 'aria-label': 'Co nowego?', onClick: () => openNews().catch((error) => toast(error.message)) }, icon('scroll'));
+  const news = h('button', { type: 'button', class: 'icon-button news-button', 'aria-label': t('Co nowego?'), onClick: () => openNews().catch((error) => toast(error.message)) }, icon('scroll'));
 
   const element = $('#topbar');
   fill(element,
@@ -213,8 +217,8 @@ function walletRows(timePoints) {
     );
   return [
     row(goldArt(WALLET_ICON), gold.name, gold.amount, 'gold'),
-    row(icon(SYSTEM_POINTS_ICON, { size: WALLET_ICON }), 'Punkty Systemu', state.character.systemPoints, 'system'),
-    row(timePointsArt(WALLET_ICON), 'Punkty Czasu', timePoints, 'time', topbar.timeNote),
+    row(icon(SYSTEM_POINTS_ICON, { size: WALLET_ICON }), t('Punkty Systemu'), state.character.systemPoints, 'system'),
+    row(timePointsArt(WALLET_ICON), t('Punkty Czasu'), timePoints, 'time', topbar.timeNote),
     ...materials.map((entry, index) => row(resourceArt(entry.id, WALLET_ICON), entry.name, entry.amount, index === 0 && 'materials')),
   ];
 }
@@ -232,7 +236,7 @@ export function showWallet(open) {
 // next Punkt Czasu counts down on its own.
 function refreshWallet(now = serverNow()) {
   const { points, nextAt } = timePointsNow(state.character, now);
-  topbar.timeNote.textContent = `+1 za ${formatCountdown(nextAt - now)}`;
+  topbar.timeNote.textContent = t('+1 za {time}', { time: formatCountdown(nextAt - now) });
   const key = JSON.stringify([state.character.systemPoints, points, ...walletEntries().map((entry) => entry.amount)]);
   if (key === topbar.walletKey) return;
   topbar.walletKey = key;
@@ -253,7 +257,7 @@ document.addEventListener('keydown', (event) => {
 export function updateTopbar(now = serverNow()) {
   const character = state.character;
   if (!topbar || !character) return;
-  topbar.level.textContent = `POZ. ${character.level}`;
+  topbar.level.textContent = t('POZ. {level}', { level: character.level });
   // The class by its short name, so the bar fits a phone (Woj for Wojownik);
   // an evolution by the first letters of its name (Bar for Barbarzyńca).
   const short = character.evolution?.current
@@ -270,36 +274,36 @@ export function updateTopbar(now = serverNow()) {
   const stocked = topbar.stock.map((entry) => {
     const amount = entry.id === 'time' ? time.points : (character.resources[entry.id] ?? 0);
     entry.value.textContent = formatShort(amount);
-    if (entry.id === 'time') entry.element.title = `${entry.name}: +1 za ${formatCountdown(time.nextAt - now)}`;
+    if (entry.id === 'time') entry.element.title = t('{name}: +1 za {time}', { name: entry.name, time: formatCountdown(time.nextAt - now) });
     return `, ${entry.name}: ${formatNumber(amount)}`;
   });
   topbar.goldButton.setAttribute(
     'aria-label',
-    `Złoto: ${formatNumber(character.gold)}, Punkty Systemu: ${formatNumber(character.systemPoints)}${desktopLayout() ? stocked.join('') : ''}. Zasoby`,
+    t('Złoto: {gold}, Punkty Systemu: {points}{stock}. Zasoby', { gold: formatNumber(character.gold), points: formatNumber(character.systemPoints), stock: desktopLayout() ? stocked.join('') : '' }),
   );
   if (!topbar.wallet.hidden) refreshWallet(now);
   // A dot on the settings when players' bug reports wait for the author.
   const reports = state.user?.bugReports ?? 0;
   topbar.settings.classList.toggle('settings-button--ready', reports > 0);
-  topbar.settings.setAttribute('aria-label', reports > 0 ? `Ustawienia, nowe zgłoszenia błędów: ${reports}` : 'Ustawienia');
+  topbar.settings.setAttribute('aria-label', reports > 0 ? t('Ustawienia, nowe zgłoszenia błędów: {count}', { count: reports }) : t('Ustawienia'));
   // A dot on the scroll while a new entry of "Co nowego?" waits.
   const unread = newsWaiting();
   topbar.news.classList.toggle('news-button--ready', unread);
-  topbar.news.setAttribute('aria-label', unread ? 'Co nowego?, nowy wpis' : 'Co nowego?');
+  topbar.news.setAttribute('aria-label', unread ? t('Co nowego?, nowy wpis') : t('Co nowego?'));
   // A dot when a chest of the Encyklopedia or a Bestiariusz waits.
   const chests = (character.encyclopedia?.ready ?? 0) + bestiaryReady(character, state.content);
   topbar.encyclopedia.classList.toggle('encyclopedia-button--ready', chests > 0);
-  topbar.encyclopedia.setAttribute('aria-label', chests > 0 ? 'Encyklopedia, skrzynie do otwarcia' : 'Encyklopedia');
+  topbar.encyclopedia.setAttribute('aria-label', chests > 0 ? t('Encyklopedia, skrzynie do otwarcia') : t('Encyklopedia'));
   // A dot when a quest's reward or a chest waits.
   const waiting = anyClaimable(character);
   topbar.quests.classList.toggle('quest-button--ready', waiting);
-  topbar.quests.setAttribute('aria-label', waiting ? 'Zadania od narratora, nagrody do odebrania' : 'Zadania od narratora');
+  topbar.quests.setAttribute('aria-label', waiting ? t('Zadania od narratora, nagrody do odebrania') : t('Zadania od narratora'));
   // The camp shows the time left of the building being upgraded, and a dot
   // when a production building's store is full and waits.
   const camp = campNow(now);
   topbar.camp.classList.toggle('camp-button--busy', camp.busy);
   topbar.camp.classList.toggle('camp-button--ready', camp.ready);
-  topbar.campLabel.textContent = camp.busy ? formatCountdown(camp.building.endsAt - now) : CAMP_TAB.label;
+  topbar.campLabel.textContent = camp.busy ? formatCountdown(camp.building.endsAt - now) : t(CAMP_TAB.label);
   topbar.camp.setAttribute('aria-label', camp.said);
   updateNavTimers(now);
   topbar.hp.set(currentHp(character, now), character.maxHp);
@@ -314,7 +318,7 @@ export function updateTopbar(now = serverNow()) {
   topbar.speed.hidden = !(left > 0);
   if (left > 0) {
     topbar.speedTime.textContent = fightsLeft(left);
-    topbar.speed.setAttribute('aria-label', buffs.map((buff) => `${buff.label}, jeszcze ${fightsLeft(buff.fights)}`).join('; '));
+    topbar.speed.setAttribute('aria-label', buffs.map((buff) => t('{name}, jeszcze {fights}', { name: buff.label, fights: fightsLeft(buff.fights) })).join('; '));
   }
 
   const activity = character.activity;
@@ -326,21 +330,25 @@ export function updateTopbar(now = serverNow()) {
   const serving = activity?.kind === 'mercenary';
   topbar.activity.setAttribute('href', work ? work.href : serving ? MERCENARIES_HASH : '#/walka');
   if (activity) {
-    activityLabel.textContent = work ? `${work.label} · ${activity.placeName}` : serving ? `USŁUGA NAJEMNA · ${activity.placeName}` : `EKSPLORACJA · ${activity.areaName}`;
+    activityLabel.textContent = work
+      ? t('{work} · {place}', { work: t(work.label), place: activity.placeName })
+      : serving
+        ? t('USŁUGA NAJEMNA · {place}', { place: activity.placeName })
+        : t('EKSPLORACJA · {area}', { area: activity.areaName });
     activityTime.textContent = activityFinished(activity, now)
       ? serving
         ? activity.service?.hired
-          ? 'ZAPŁATA CZEKA'
-          : 'OGŁOSZENIE WYGASŁO'
-        : 'RAPORT GOTOWY'
+          ? t('ZAPŁATA CZEKA')
+          : t('OGŁOSZENIE WYGASŁO')
+        : t('RAPORT GOTOWY')
       : formatCountdown(activity.endsAt - now);
   } else {
     const hpNow = currentHp(character, now);
-    activityLabel.textContent = 'ODPOCZYNEK';
+    activityLabel.textContent = t('ODPOCZYNEK');
     activityTime.textContent =
       hpNow >= character.maxHp
-        ? 'PEŁNE HP'
-        : `PEŁNE HP ZA ${formatMinutes(Math.ceil((character.maxHp - hpNow) / restRate(character)))}`.toUpperCase();
+        ? t('PEŁNE HP')
+        : t('PEŁNE HP ZA {time}', { time: formatMinutes(Math.ceil((character.maxHp - hpNow) / restRate(character))) }).toUpperCase();
   }
 }
 
@@ -379,7 +387,7 @@ function campNow(now = serverNow()) {
   const building = state.character.camp.construction;
   const busy = Boolean(building) && now < building.endsAt;
   const ready = fullStores(state.character, now).length > 0;
-  return { building, busy, ready, said: [CAMP_TAB.label, busy && `budowa: ${building.name}`, ready && 'pełny magazyn'].filter(Boolean).join(', ') };
+  return { building, busy, ready, said: [t(CAMP_TAB.label), busy && t('budowa: {name}', { name: building.name }), ready && t('pełny magazyn')].filter(Boolean).join(', ') };
 }
 const WAITING = {
   postac: () => pointsWaiting() || skillsWaiting() || evolutionWaiting(),
@@ -395,25 +403,26 @@ const WAITING = {
 const WAITING_TEXTS = { walka: 'raport czeka', profesje: 'raport czeka', evolution: 'ewolucja czeka', osada: 'zlecenie czeka', oboz: 'pełny magazyn' };
 function waitingText(id) {
   if (id === 'spolecznosc') return communityNewsText();
-  if (WAITING_TEXTS[id]) return WAITING_TEXTS[id];
-  if (id === 'postac' && !pointsWaiting() && !skillsWaiting()) return WAITING_TEXTS.evolution;
-  return id === 'skills' || (id === 'postac' && !pointsWaiting()) ? 'umiejętność czeka' : 'wolne punkty do rozdania';
+  if (WAITING_TEXTS[id]) return t(WAITING_TEXTS[id]);
+  if (id === 'postac' && !pointsWaiting() && !skillsWaiting()) return t(WAITING_TEXTS.evolution);
+  return id === 'skills' || (id === 'postac' && !pointsWaiting()) ? t('umiejętność czeka') : t('wolne punkty do rozdania');
 }
 
 function navButton(tab, active, onBack) {
   const unlocked = !tab.unlock || isUnlocked(tab.unlock);
   const unlock = tab.unlock && unlockInfo(tab.unlock);
-  const lockText = unlocked ? null : unlock.level ? `poz. ${unlock.level}` : unlock.classLevel ? `poz. kl. ${unlock.classLevel}` : 'zablokowane';
+  const lockText = unlocked ? null : unlock.level ? t('poz. {level}', { level: unlock.level }) : unlock.classLevel ? t('poz. kl. {level}', { level: unlock.classLevel }) : t('zablokowane');
   const ready = WAITING[tab.id]?.() ?? false;
+  const label = t(tab.label);
   const children = [
     h('span', { class: 'nav-icon' }, icon(tab.icon), !unlocked && icon('lock', { size: 12, className: 'nav-lock' })),
-    h('span', { class: 'nav-label', text: tab.label }),
+    h('span', { class: 'nav-label', text: label }),
     lockText && h('span', { class: 'nav-hint', text: lockText }),
   ];
   const props = {
     class: ['nav-item', tab.system && 'nav-item--system', !unlocked && 'nav-item--locked', ready && 'nav-item--ready'].filter(Boolean).join(' '),
     'aria-current': tab.id === active ? 'page' : undefined,
-    'aria-label': lockText ? `${tab.label}, zablokowane (${lockText})` : ready ? `${tab.label}, ${waitingText(tab.id)}` : tab.label,
+    'aria-label': lockText ? t('{label}, zablokowane ({lock})', { label, lock: lockText }) : ready ? t('{label}, {waiting}', { label, waiting: waitingText(tab.id) }) : label,
   };
   if (tab.id === 'back') return h('button', { ...props, type: 'button', onClick: onBack }, children);
   return h('a', { ...props, href: tab.href }, children);
@@ -435,8 +444,8 @@ const PARTS = {
   walka: () => {
     const towers = unlockInfo('towers');
     return [
-      { id: 'explore', label: 'Eksploracja', icon: 'beast', href: '#/walka', ready: tabTime('walka').ready, readyText: 'raport czeka' },
-      towers && { id: 'towers', label: 'Wieże', icon: 'evolution', href: '#/wieze', lock: !isUnlocked('towers') && `poz. ${towers.level}` },
+      { id: 'explore', label: t('Eksploracja'), icon: 'beast', href: '#/walka', ready: tabTime('walka').ready, readyText: t('raport czeka') },
+      towers && { id: 'towers', label: t('Wieże'), icon: 'evolution', href: '#/wieze', lock: !isUnlocked('towers') && t('poz. {level}', { level: towers.level }) },
     ];
   },
   // The professions as their squares on the tab (screens/professions.js),
@@ -454,9 +463,9 @@ const PARTS = {
           label: profession.name,
           icon: PROFESSION_ICONS[profession.id] ?? 'leaf',
           href: screen.href,
-          lock: profession.soon ? 'wkrótce' : profession.locked && `poz. ${profession.unlockLevel}`,
+          lock: profession.soon ? t('wkrótce') : profession.locked && t('poz. {level}', { level: profession.unlockLevel }),
           ready: done.some((work) => WORK_SCREENS[work.kind] === screen),
-          readyText: 'raport czeka',
+          readyText: t('raport czeka'),
         }
       );
     });
@@ -464,7 +473,7 @@ const PARTS = {
   // The places of the Osada's board (data/settlement.json).
   osada: () =>
     state.character.settlementOpen
-      ? (state.content.settlementPlaces ?? []).map((place) => ({ id: place.id, label: place.name, icon: PLACE_ICONS[place.id] ?? 'house', href: `#/osada/${place.id}`, lock: place.soon && 'wkrótce' }))
+      ? (state.content.settlementPlaces ?? []).map((place) => ({ id: place.id, label: place.name, icon: PLACE_ICONS[place.id] ?? 'house', href: `#/osada/${place.id}`, lock: place.soon && t('wkrótce') }))
       : [],
   // The parts of the Społeczność, as its tabs (screens/community.js), each
   // with the light of its news.
@@ -475,9 +484,9 @@ const PARTS = {
           label: section.name,
           icon: SECTION_ICONS[section.id] ?? 'unknown',
           href: sectionHash(section.id),
-          lock: section.soon && 'wkrótce',
+          lock: section.soon && t('wkrótce'),
           ready: Boolean(SECTION_NEWS[section.id]?.()),
-          readyText: 'nowe',
+          readyText: t('nowe'),
         }))
       : [],
 };
@@ -490,7 +499,7 @@ function partItem(part, current) {
   ];
   const props = {
     class: ['nav-item', part.lock && 'nav-item--locked', part.ready && 'nav-item--ready'].filter(Boolean).join(' '),
-    'aria-label': part.lock ? `${part.label}, zablokowane (${part.lock})` : part.ready ? `${part.label}, ${part.readyText}` : part.label,
+    'aria-label': part.lock ? t('{label}, zablokowane ({lock})', { label: part.label, lock: part.lock }) : part.ready ? t('{label}, {waiting}', { label: part.label, waiting: part.readyText }) : part.label,
   };
   if (part.lock) return h('span', { ...props, 'aria-disabled': 'true' }, children);
   return h('a', { ...props, href: part.href, 'aria-current': part.id === current ? 'page' : undefined }, children);
@@ -500,7 +509,7 @@ function partItem(part, current) {
 function partsList(tab, current) {
   const parts = (PARTS[tab.id]?.() ?? []).filter(Boolean);
   if (parts.length === 0) return null;
-  return h('div', { class: 'nav-parts', role: 'group', 'aria-label': tab.label }, parts.map((part) => partItem(part, current)));
+  return h('div', { class: 'nav-parts', role: 'group', 'aria-label': t(tab.label) }, parts.map((part) => partItem(part, current)));
 }
 
 // `part` is the part of the game shown on the screen (app.js): the
@@ -548,8 +557,8 @@ export function updateNavTimers(now = serverNow()) {
     const { work, running, ready } = tabTime(id, now);
     item.classList.toggle('nav-item--busy', running);
     item.classList.toggle('nav-item--ready', ready);
-    label.textContent = running ? formatCountdown(work.endsAt - now) : tab.label;
-    item.setAttribute('aria-label', [tab.label, running && `${tab.doing}: ${label.textContent}`, ready && 'raport czeka'].filter(Boolean).join(', '));
+    label.textContent = running ? formatCountdown(work.endsAt - now) : t(tab.label);
+    item.setAttribute('aria-label', [t(tab.label), running && `${t(tab.doing)}: ${label.textContent}`, ready && t('raport czeka')].filter(Boolean).join(', '));
   }
   const camp = $(`#nav-main > .nav-item[href="${CAMP_TAB.href}"]`);
   const label = camp && $('.nav-label', camp);
@@ -557,7 +566,7 @@ export function updateNavTimers(now = serverNow()) {
   const { building, busy, ready, said } = campNow(now);
   camp.classList.toggle('nav-item--busy', busy);
   camp.classList.toggle('nav-item--ready', ready);
-  label.textContent = busy ? formatCountdown(building.endsAt - now) : CAMP_TAB.label;
+  label.textContent = busy ? formatCountdown(building.endsAt - now) : t(CAMP_TAB.label);
   camp.setAttribute('aria-label', said);
 }
 

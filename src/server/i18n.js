@@ -65,8 +65,9 @@ export function t(text, vars = null) {
 
 // A message the code wrote in Polish, in the request's language: its own
 // English, or the English of one of the texts with {name} it was made from,
-// with the parts it was filled with in their places (a number written as
-// English writes it). A message without English stays Polish.
+// with the parts it was filled with in their places: a part with English of
+// its own in it (a sentence the code added), a number as English writes it.
+// A message without English stays Polish.
 export function translateMessage(message) {
   const words = dictionary();
   if (!words || typeof message !== 'string') return message;
@@ -74,7 +75,7 @@ export function translateMessage(message) {
   if (exact !== null) return exact;
   for (const pattern of patternsOf(words)) {
     const found = pattern.regex.exec(message);
-    if (found) return fill(pattern.english, Object.fromEntries(pattern.names.map((name, index) => [name, englishNumber(found[index + 1])])));
+    if (found) return fill(pattern.english, Object.fromEntries(pattern.names.map((name, index) => [name, englishOf(words, found[index + 1]) ?? englishNumber(found[index + 1])])));
   }
   return message;
 }

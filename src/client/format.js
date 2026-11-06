@@ -1,27 +1,48 @@
-// Polish number, time and plural formatting for the page.
+// Number, time and plural formatting for the page, in its language
+// (i18n.js): Polish, or English in the English beta.
 
-const integerFormat = new Intl.NumberFormat('pl-PL');
-const decimalFormat = new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 1 });
-const preciseFormat = new Intl.NumberFormat('pl-PL', { maximumFractionDigits: 2 });
+import { englishForms, language, t } from './i18n.js';
 
-export const timeFormat = new Intl.DateTimeFormat('pl-PL', { hour: '2-digit', minute: '2-digit' });
-export const dateTimeFormat = new Intl.DateTimeFormat('pl-PL', {
-  day: 'numeric',
-  month: 'short',
-  hour: '2-digit',
-  minute: '2-digit',
-});
+// The locale of the page's language; English writes 24-hour time too.
+const LOCALES = { pl: 'pl-PL', en: 'en-GB' };
+const formats = new Map();
+// One Intl format of each kind for each language, made when first needed.
+function format(kind, make) {
+  const key = `${language()}:${kind}`;
+  if (!formats.has(key)) formats.set(key, make(LOCALES[language()] ?? LOCALES.pl));
+  return formats.get(key);
+}
+const integerFormat = () => format('integer', (locale) => new Intl.NumberFormat(locale));
+const decimalFormat = () => format('decimal', (locale) => new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }));
+const preciseFormat = () => format('precise', (locale) => new Intl.NumberFormat(locale, { maximumFractionDigits: 2 }));
 
-export const formatNumber = (value) => integerFormat.format(value);
+export const timeFormat = { format: (date) => format('time', (locale) => new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' })).format(date) };
+export const dateTimeFormat = {
+  format: (date) =>
+    format('dateTime', (locale) =>
+      new Intl.DateTimeFormat(locale, {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      }),
+    ).format(date),
+};
+
+export const formatNumber = (value) => integerFormat().format(value);
 // For the narrow top bar: from a million on, "1,2 mln".
-const shortFormat = new Intl.NumberFormat('pl-PL', { notation: 'compact', maximumFractionDigits: 1 });
-export const formatShort = (value) => (Math.abs(value) >= 1e6 ? shortFormat.format(value) : integerFormat.format(value));
-export const formatDecimal = (value) => decimalFormat.format(value);
-export const formatPrecise = (value) => preciseFormat.format(value);
+const shortFormat = () => format('short', (locale) => new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }));
+export const formatShort = (value) => (Math.abs(value) >= 1e6 ? shortFormat().format(value) : integerFormat().format(value));
+export const formatDecimal = (value) => decimalFormat().format(value);
+export const formatPrecise = (value) => preciseFormat().format(value);
 
-// Polish has three plural forms: 1 punkt, 2–4 punkty, 5 punktów (and 12–14 punktów).
+// Polish has three plural forms: 1 punkt, 2–4 punkty, 5 punktów (and 12–14
+// punktów). English has two, one and the rest, under the three Polish ones
+// (i18n.js); a noun without them stays Polish.
 export function plural(count, one, few, many) {
   const n = Math.abs(count);
+  const english = englishForms(one, few, many);
+  if (english) return n === 1 ? english[0] : english[1];
   if (n === 1) return one;
   const last = n % 10;
   const lastTwo = n % 100;
@@ -36,8 +57,8 @@ export const countOf = (count, one, few, many) => `${formatNumber(count)} ${plur
 // dwa materiały jednego typu i nie wzrosła relacja").
 export function tradePace(trade) {
   if (!trade?.perPoint) return '';
-  if (trade.toNext === null) return ' Na dziś to już wszystkie punkty.';
-  return ` Punkt za każde ${formatNumber(trade.perPoint)} zł handlu, do następnego brakuje ${formatNumber(Math.ceil(trade.toNext))} zł.`;
+  if (trade.toNext === null) return ` ${t('Na dziś to już wszystkie punkty.')}`;
+  return ` ${t('Punkt za każde {gold} zł handlu, do następnego brakuje {left} zł.', { gold: formatNumber(trade.perPoint), left: formatNumber(Math.ceil(trade.toNext)) })}`;
 }
 
 // What the scrapper or Jagna pays for `count` pieces at `unit` gold a piece,
@@ -73,7 +94,8 @@ export function formatHours(hours) {
 // Minutes after the start of a hunt, for the report: "po 12 min", "po 1 h 5 min".
 export function formatOffset(ms) {
   const minutes = Math.max(1, Math.round(ms / 60000));
-  if (minutes < 60) return `po ${minutes} min`;
+  if (minutes < 60) return t('po {minutes} min', { minutes });
   const rest = minutes % 60;
-  return `po ${Math.floor(minutes / 60)} h${rest ? ` ${rest} min` : ''}`;
+  const hours = Math.floor(minutes / 60);
+  return rest ? t('po {hours} h {minutes} min', { hours, minutes: rest }) : t('po {hours} h', { hours });
 }

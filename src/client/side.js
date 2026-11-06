@@ -5,6 +5,7 @@
 // On a phone the column is not there and the chat is in the Społeczność.
 
 import { $, fill, h } from './dom.js';
+import { t } from './i18n.js';
 import { desktopLayout } from './layout-mode.js';
 import { mountChat } from './screens/community.js';
 import { isUnlocked, state, unlockInfo } from './state.js';
@@ -41,14 +42,14 @@ export function updateSide() {
     const bar = h('div', { class: 'side-chat-bar' });
     const chatBody = h('div', { class: 'side-chat-body' });
     const scroller = h('div', { class: 'side-chat-scroll' }, chatBody);
-    fill(side, h('section', { class: 'side-chat', 'aria-label': 'Czat' }, h('h2', { class: 'side-title', text: 'Czat' }), bar, scroller));
+    fill(side, h('section', { class: 'side-chat', 'aria-label': t('Czat') }, h('h2', { class: 'side-title', text: t('Czat') }), bar, scroller));
     shown = { chat: null, chatBody, bar, scroller };
   }
   if (!shown.chat && isUnlocked('community')) {
     shown.chat = mountChat(shown.chatBody, { bar: shown.bar, id: 'side-chat', scroller: shown.scroller });
   } else if (!shown.chat) {
     const level = unlockInfo('community')?.level;
-    fill(shown.chatBody, h('p', { class: 'muted side-note', text: level ? `Czat otworzy się razem ze Społecznością, na poziomie ${level}.` : 'Czat otworzy się razem ze Społecznością.' }));
+    fill(shown.chatBody, h('p', { class: 'muted side-note', text: level ? t('Czat otworzy się razem ze Społecznością, na poziomie {level}.', { level }) : t('Czat otworzy się razem ze Społecznością.') }));
   }
 }
 

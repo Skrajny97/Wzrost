@@ -14746,3 +14746,19 @@ a.profession-square:active {
 :root[data-layout='desktop'] #nav-character .nav-item--locked .nav-hint {
   margin-left: 0;
 }
+
+/* The PL | EN switch of the English beta (i18n.js): on the login screen
+   under the forms, and in a row of the Ustawienia. Only where the server
+   offers English. */
+.auth-language {
+  display: flex;
+  justify-content: center;
+}
+
+.segmented--language {
+  width: 120px;
+}
+
+.status-row--language {
+  align-items: center;
+}

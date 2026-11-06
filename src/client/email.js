@@ -5,6 +5,7 @@
 
 import { ApiError, request } from './api.js';
 import { clear, h } from './dom.js';
+import { t } from './i18n.js';
 import { narratorIdle } from './narrator.js';
 import { rod, roll, stopRoll } from './parchment.js';
 import { playSound } from './sound.js';
@@ -17,14 +18,14 @@ export const mustConfirm = (user) => Boolean(user?.emailRequired && !user.emailC
 const invited = (user) => Boolean(user && !user.emailConfirmed && !user.emailRequired);
 
 const reward = () => state.content?.emailReward ?? 10;
-const pointsText = () => `${reward()} Punktów Systemu`;
+const pointsText = () => t('{count} Punktów Systemu', { count: reward() });
 
 // How a link from the mail went: the server sends the browser to
 // /?email=<result>.
 const EMAIL_NOTES = {
-  confirmed: () => `Adres e-mail potwierdzony. Za potwierdzenie: ${pointsText()}.`,
-  already: () => 'Ten adres e-mail był już potwierdzony.',
-  expired: () => 'Ten link wygasł albo został już użyty. Wyślij nowy z gry.',
+  confirmed: () => t('Adres e-mail potwierdzony. Za potwierdzenie: {points}.', { points: pointsText() }),
+  already: () => t('Ten adres e-mail był już potwierdzony.'),
+  expired: () => t('Ten link wygasł albo został już użyty. Wyślij nowy z gry.'),
 };
 
 // Reads the result once and removes it from the address.
@@ -78,10 +79,10 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
     error.hidden = !message;
   };
   const describe = () => {
-    text.textContent = `Ostatni krok: potwierdź adres e-mail. Na adres ${state.user.email} został wysłany link, który otworzy konto. Za potwierdzenie dostaniesz ${pointsText()}.`;
+    text.textContent = t('Ostatni krok: potwierdź adres e-mail. Na adres {email} został wysłany link, który otworzy konto. Za potwierdzenie dostaniesz {points}.', { email: state.user.email, points: pointsText() });
   };
   describe();
-  if (unsent) showError('Nie udało się wysłać maila. Naciśnij „Wyślij link ponownie”.');
+  if (unsent) showError(t('Nie udało się wysłać maila. Naciśnij „Wyślij link ponownie”.'));
 
   // Back from the mail app: the page looks whether the link was opened.
   const check = async (quiet) => {
@@ -93,7 +94,7 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
         document.removeEventListener('visibilitychange', onVisible);
         onConfirmed();
       } else if (!quiet) {
-        showError('Adres e-mail nie jest jeszcze potwierdzony. Otwórz link z maila.');
+        showError(t('Adres e-mail nie jest jeszcze potwierdzony. Otwórz link z maila.'));
       }
     } catch (failure) {
       if (!quiet) showError(failure.message);
@@ -121,33 +122,33 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
             await sendLink(input.value);
             describe();
             change.hidden = true;
-            toast(`Link został wysłany na adres ${state.user.email}.`);
+            toast(t('Link został wysłany na adres {email}.', { email: state.user.email }));
           } catch (failure) {
             showError(failure.message);
           }
         });
       },
     },
-    h('div', { class: 'field' }, h('label', { for: 'confirm-email', text: 'Nowy adres e-mail' }), input),
-    h('button', { type: 'submit', class: 'button button--system', text: 'Zapisz i wyślij link' }),
+    h('div', { class: 'field' }, h('label', { for: 'confirm-email', text: t('Nowy adres e-mail') }), input),
+    h('button', { type: 'submit', class: 'button button--system', text: t('Zapisz i wyślij link') }),
   );
 
   clear(panel);
   panel.append(
     h('div', { class: 'system-message' }, h('p', { class: 'system-label', text: '[ SYSTEM ]' }), text),
-    h('p', { class: 'field-hint email-confirm-hint', text: 'Nie widzisz maila? Zajrzyj do folderu spam albo oferty. Link działa przez dobę.' }),
+    h('p', { class: 'field-hint email-confirm-hint', text: t('Nie widzisz maila? Zajrzyj do folderu spam albo oferty. Link działa przez dobę.') }),
     error,
-    h('button', { type: 'button', class: 'button button--system', text: 'Mam już potwierdzone', onClick: (event) => withButton(event.currentTarget, () => check(false)) }),
+    h('button', { type: 'button', class: 'button button--system', text: t('Mam już potwierdzone'), onClick: (event) => withButton(event.currentTarget, () => check(false)) }),
     h('button', {
       type: 'button',
       class: 'button button--world',
-      text: 'Wyślij link ponownie',
+      text: t('Wyślij link ponownie'),
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           showError('');
           try {
             await sendLink();
-            toast(`Link został wysłany na adres ${state.user.email}.`);
+            toast(t('Link został wysłany na adres {email}.', { email: state.user.email }));
           } catch (failure) {
             showError(failure.message);
           }
@@ -156,7 +157,7 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
     h('button', {
       type: 'button',
       class: 'button button--world',
-      text: 'Zmień adres e-mail',
+      text: t('Zmień adres e-mail'),
       onClick: () => {
         change.hidden = !change.hidden;
         if (!change.hidden) input.focus();
@@ -166,7 +167,7 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
     h('button', {
       type: 'button',
       class: 'button button--world',
-      text: 'Wyloguj się',
+      text: t('Wyloguj się'),
       onClick: () => {
         document.removeEventListener('visibilitychange', onVisible);
         onLogout();
@@ -221,7 +222,7 @@ function drawAsk(page) {
   clear(page);
   page.append(
     h('p', { class: 'narrator-label quests-label', id: 'email-invite-label', text: 'System' }),
-    h('p', { class: 'email-invite-text', text: `Potwierdź adres e-mail swojego konta, a dostaniesz ${pointsText()}.` }),
+    h('p', { class: 'email-invite-text', text: t('Potwierdź adres e-mail swojego konta, a dostaniesz {points}.', { points: pointsText() }) }),
     h(
       'form',
       {
@@ -235,20 +236,20 @@ function drawAsk(page) {
               const email = await sendLink(input.value);
               drawSent(page, email);
             } catch (failure) {
-              error.textContent = failure instanceof ApiError ? failure.message : 'Nie udało się wysłać linku. Spróbuj ponownie.';
+              error.textContent = failure instanceof ApiError ? failure.message : t('Nie udało się wysłać linku. Spróbuj ponownie.');
               error.hidden = false;
             }
           });
         },
       },
-      h('label', { class: 'email-invite-label', for: 'invite-email', text: 'Adres e-mail' }),
+      h('label', { class: 'email-invite-label', for: 'invite-email', text: t('Adres e-mail') }),
       input,
       error,
       h(
         'div',
         { class: 'narrator-actions' },
-        h('button', { type: 'button', class: 'narrator-skip', text: 'Później', onClick: () => closeInvite(true) }),
-        h('button', { type: 'submit', class: 'button narrator-next', text: 'Wyślij link' }),
+        h('button', { type: 'button', class: 'narrator-skip', text: t('Później'), onClick: () => closeInvite(true) }),
+        h('button', { type: 'submit', class: 'button narrator-next', text: t('Wyślij link') }),
       ),
     ),
   );
@@ -260,9 +261,9 @@ function drawSent(page, email) {
     h('p', { class: 'narrator-label quests-label', id: 'email-invite-label', text: 'System' }),
     h('p', {
       class: 'email-invite-text',
-      text: `Link został wysłany na adres ${email}. Otwórz go, a ${pointsText()} trafi do postaci. Link działa przez dobę, a gdyby mail nie przyszedł, zajrzyj do folderu spam.`,
+      text: t('Link został wysłany na adres {email}. Otwórz go, a {points} trafi do postaci. Link działa przez dobę, a gdyby mail nie przyszedł, zajrzyj do folderu spam.', { email, points: pointsText() }),
     }),
-    h('div', { class: 'narrator-actions' }, h('button', { type: 'button', class: 'button narrator-next', text: 'Zamknij', onClick: () => closeInvite(false) })),
+    h('div', { class: 'narrator-actions' }, h('button', { type: 'button', class: 'button narrator-next', text: t('Zamknij'), onClick: () => closeInvite(false) })),
   );
 }
 
@@ -300,11 +301,11 @@ export function emailRow() {
       {},
       user.email && h('span', { class: 'email-row-address', text: user.email }),
       user.emailConfirmed
-        ? h('span', { class: 'status-ok', text: 'Potwierdzony' })
+        ? h('span', { class: 'status-ok', text: t('Potwierdzony') })
         : h('button', {
             type: 'button',
             class: 'button button--world button--small',
-            text: 'Potwierdź',
+            text: t('Potwierdź'),
             onClick: () => {
               closeSheet();
               showInvite();

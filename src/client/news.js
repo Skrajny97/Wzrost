@@ -5,10 +5,13 @@
 // kropkę jak wjedzie nowy wpis”). Only the entries the author published show.
 
 import { h } from './dom.js';
+import { language, t } from './i18n.js';
 import { call, state } from './state.js';
 import { closeSheet, openSheet } from './ui.js';
 
-const dateFormat = new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'numeric', year: 'numeric' });
+// The entries stay in Polish until English comes to the live game; their
+// dates follow the page's language.
+const dateFormat = { format: (date) => new Intl.DateTimeFormat(language() === 'en' ? 'en-GB' : 'pl-PL', { day: 'numeric', month: 'numeric', year: 'numeric' }).format(date) };
 
 // The entry's text: a line beginning with "- " is a point of a list, any
 // other line a paragraph of its own.
@@ -84,9 +87,9 @@ export async function openNews() {
   const { entries, seen: before } = await call('GET', '/api/news');
   seenUpTo = Math.max(seenUpTo, before);
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Co nowego?' }),
-    entries.length === 0 ? h('p', { class: 'sheet-text muted', text: 'Na razie nie ma tu wpisów.' }) : h('div', { class: 'news-entries' }, entries.map(newsEntry)),
-    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--system', text: 'Zamknij', onClick: closeSheet })),
+    h('h2', { class: 'sheet-title', text: t('Co nowego?') }),
+    entries.length === 0 ? h('p', { class: 'sheet-text muted', text: t('Na razie nie ma tu wpisów.') }) : h('div', { class: 'news-entries' }, entries.map(newsEntry)),
+    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--system', text: t('Zamknij'), onClick: closeSheet })),
   );
   seen(entries);
 }

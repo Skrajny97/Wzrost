@@ -320,7 +320,8 @@ test("the narrator's quests sit in the top bar, where his line points", () => {
   // Between the levels and the gold, with the Sklep Systemu's stall beside
   // him, which opens the shop's page.
   assert.match(layout, /h\('div', \{ class: 'topbar-badges' \}, level, classLevel\),\s*h\('div', \{ class: 'topbar-middle' \}, quests, shop\),/);
-  assert.match(layout, /h\('a', \{ class: 'system-shop', href: '#\/sklep', 'aria-label': 'Sklep Systemu' \}/);
+  // Its words in the page's language (t(), src/client/i18n.js).
+  assert.match(layout, /h\('a', \{ class: 'system-shop', href: '#\/sklep', 'aria-label': t\('Sklep Systemu'\) \}/);
   assert.doesNotMatch(layout, /dojdzie w jednej z kolejnych aktualizacji/);
   assert.match(readFileSync(join(CLIENT, 'app.js'), 'utf8'), /pattern: \/\^#\\\/sklep\b[^\n]*mount: mountShop/);
   const quests = readFileSync(join(CLIENT, 'quests.js'), 'utf8');
@@ -365,7 +366,7 @@ test("the narrator hears of the Gildia's tabs, also of the one the page opens on
     ['Zbieracz Systemu', 'system-collector-tour'],
     ['Omdlenie', 'faint-tour'],
   ]) {
-    assert.match(app, new RegExp(`row\\('${title}',`));
+    assert.match(app, new RegExp(`row\\(t\\('${title}'\\),`));
     assert.ok(app.includes(`'/api/test/${path}'`), path);
   }
 });
@@ -433,8 +434,9 @@ test("the narrator hears of the character's change once the page is where it goe
 // over unseen (664).
 test('the narrator finds the settings gear whatever its label says', () => {
   const layout = readFileSync(join(CLIENT, 'layout.js'), 'utf8');
-  assert.match(layout, /const settings = h\('button', \{ type: 'button', class: 'icon-button settings-button', 'aria-label': 'Ustawienia'/);
-  assert.match(layout, /topbar\.settings\.setAttribute\('aria-label', reports > 0 \? `Ustawienia, nowe zgłoszenia błędów: \$\{reports\}` : 'Ustawienia'\);/);
+  // Its words in the page's language (t(), src/client/i18n.js).
+  assert.match(layout, /const settings = h\('button', \{ type: 'button', class: 'icon-button settings-button', 'aria-label': t\('Ustawienia'\)/);
+  assert.match(layout, /topbar\.settings\.setAttribute\('aria-label', reports > 0 \? t\('Ustawienia, nowe zgłoszenia błędów: \{count\}', \{ count: reports \}\) : t\('Ustawienia'\)\);/);
   const beats = /const BEATS = \{([\s\S]*?)\n\};/.exec(readFileSync(join(CLIENT, 'narrator.js'), 'utf8'))[1];
   assert.match(beats, /\n {2}settings: \{ place: '\.topbar \.settings-button',/);
   assert.doesNotMatch(beats, /aria-label="Ustawienia"/);

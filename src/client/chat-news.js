@@ -14,6 +14,7 @@
 // channel, the Wymiana too, until the character has read that channel.
 
 import { request } from './api.js';
+import { t } from './i18n.js';
 import { isUnlocked, state } from './state.js';
 
 const SEEN_KEY = 'insight-chat-seen';
@@ -117,23 +118,23 @@ export const chatMuted = () => muted;
 export const communityNewsText = () =>
   tradeNews()
     ? trade.state === 'proposed'
-      ? 'propozycja wymiany czeka'
-      : 'trwa wymiana'
+      ? t('propozycja wymiany czeka')
+      : t('trwa wymiana')
     : anyMentionNews()
-      ? (state.content?.chat?.mentions?.texts.news ?? 'nowe wiadomości na czacie')
+      ? (state.content?.chat?.mentions?.texts.news ?? t('nowe wiadomości na czacie'))
     : chatNews()
-      ? 'nowe wiadomości na czacie'
+      ? t('nowe wiadomości na czacie')
       : partyNews()
-        ? 'zaproszenie do drużyny czeka'
+        ? t('zaproszenie do drużyny czeka')
         : guildNews()
-          ? 'zaproszenie do gildii czeka'
+          ? t('zaproszenie do gildii czeka')
           : guildTodoNews()
-            ? 'w gildii czeka coś do zrobienia'
+            ? t('w gildii czeka coś do zrobienia')
           : invites > 0
-        ? 'zaproszenie do znajomych czeka'
+        ? t('zaproszenie do znajomych czeka')
         : gifts > 0
-          ? 'upominek czeka'
-          : 'upominek do wysłania';
+          ? t('upominek czeka')
+          : t('upominek do wysłania');
 
 // What happens when a light changes (app.js redraws the bar); the returned
 // function stops it.

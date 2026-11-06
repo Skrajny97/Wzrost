@@ -58,7 +58,7 @@ import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
 import { englishOn, readFeatures, registrationOpen, settlementOn } from './features.js';
-import { dictionary, language, requestLanguage, runInLanguage } from './i18n.js';
+import { dictionary, language, requestLanguage, runInLanguage, t } from './i18n.js';
 import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, getMarket, listOffer, settleMarket } from './market.js';
 import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
@@ -408,14 +408,16 @@ export default {
   async fetch(request, env) {
     readFeatures(env);
     const url = new URL(request.url);
-    if (!url.pathname.startsWith('/api/')) {
-      return new Response('Nie znaleziono strony.', {
-        status: 404,
-        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-      });
-    }
     // Everything the request does, in its language (i18n.js).
-    return runInLanguage(requestLanguage(request), () => answer(request, env, url));
+    return runInLanguage(requestLanguage(request), () => {
+      if (!url.pathname.startsWith('/api/')) {
+        return new Response(t('Nie znaleziono strony.'), {
+          status: 404,
+          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+        });
+      }
+      return answer(request, env, url);
+    });
   },
 
   // The cron trigger (wrangler.jsonc), every minute: the phone notifications

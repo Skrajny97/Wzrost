@@ -32,7 +32,7 @@
         <p class="system-label">[ SYSTEM ]</p>
         <p class="system-text" id="loading-text">Nawiązywanie połączenia…</p>
       </div>
-      <button type="button" class="button button--system" id="retry-button" hidden>Spróbuj ponownie</button>
+      <button type="button" class="button button--system" id="retry-button" data-i18n hidden>Spróbuj ponownie</button>
     </section>
   </main>
 
@@ -40,7 +40,7 @@
     <header class="hero">
       <img class="emblem" src="/logo.png" width="128" height="128" alt="">
       <h1 class="hero-title">Insight</h1>
-      <p class="hero-tagline">Wejrzyj do miejsca pełnego wyzwań dla śmiałków</p>
+      <p class="hero-tagline" data-i18n>Wejrzyj do miejsca pełnego wyzwań dla śmiałków</p>
     </header>
 
     <!-- "Zainstaluj jako aplikację" (install.js), unless the game runs as an app. -->
@@ -49,7 +49,7 @@
     <section class="system-panel" aria-labelledby="auth-message">
       <div class="system-message">
         <p class="system-label">[ SYSTEM ]</p>
-        <p class="system-text" id="auth-message">Wykryto istotę na skraju puszczy. Potwierdź tożsamość, aby kontynuować.</p>
+        <p class="system-text" id="auth-message" data-i18n>Wykryto istotę na skraju puszczy. Potwierdź tożsamość, aby kontynuować.</p>
       </div>
 
       <!-- How the return from Google went (app.js). -->
@@ -58,59 +58,62 @@
       <div class="google-block" id="google-block" hidden>
         <a class="google-button" href="/api/auth/google/start">
           <img class="google-logo" src="/google-g.svg" alt="" width="20" height="20">
-          <span>Zaloguj się przez Google</span>
+          <span data-i18n>Zaloguj się przez Google</span>
         </a>
-        <p class="auth-divider">albo</p>
+        <p class="auth-divider" data-i18n>albo</p>
       </div>
       <!-- In place of the button where Google sign-in cannot work. -->
       <p class="google-hint" id="google-hint" hidden></p>
 
-      <div class="segmented" id="auth-modes" role="group" aria-label="Wybierz formularz">
-        <button type="button" class="segmented-option" data-auth-mode="login" aria-pressed="true">Logowanie</button>
-        <button type="button" class="segmented-option" data-auth-mode="register" aria-pressed="false">Nowe konto</button>
+      <div class="segmented" id="auth-modes" role="group" aria-label="Wybierz formularz" data-i18n-attr="aria-label">
+        <button type="button" class="segmented-option" data-auth-mode="login" aria-pressed="true" data-i18n>Logowanie</button>
+        <button type="button" class="segmented-option" data-auth-mode="register" aria-pressed="false" data-i18n>Nowe konto</button>
       </div>
 
       <form id="login-form" class="form" novalidate>
         <div class="field">
-          <label for="login-identifier">Login lub e-mail</label>
+          <label for="login-identifier" data-i18n>Login lub e-mail</label>
           <input id="login-identifier" name="identifier" type="text" inputmode="email" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" required>
         </div>
         <div class="field">
-          <label for="login-password">Hasło</label>
+          <label for="login-password" data-i18n>Hasło</label>
           <div class="password">
             <input id="login-password" name="password" type="password" autocomplete="current-password" required>
             <button type="button" class="password-toggle" aria-controls="login-password" aria-label="Pokaż hasło">Pokaż</button>
           </div>
         </div>
         <p class="form-error" role="alert" hidden></p>
-        <button type="submit" class="button button--system" data-busy-label="Łączenie…">Zaloguj się</button>
+        <button type="submit" class="button button--system" data-busy-label="Łączenie…" data-i18n>Zaloguj się</button>
       </form>
 
       <form id="register-form" class="form" novalidate hidden>
         <div class="field">
-          <label for="register-login">Login</label>
+          <label for="register-login" data-i18n>Login</label>
           <input id="register-login" name="login" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false" maxlength="24" aria-describedby="register-login-hint" required>
-          <p class="field-hint" id="register-login-hint">3–24 znaki: litery bez polskich znaków, cyfry oraz _ . -</p>
+          <p class="field-hint" id="register-login-hint" data-i18n>3–24 znaki: litery bez polskich znaków, cyfry oraz _ . -</p>
         </div>
         <div class="field">
-          <label for="register-email">E-mail</label>
+          <label for="register-email" data-i18n>E-mail</label>
           <input id="register-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="254" aria-describedby="register-email-hint" required>
-          <p class="field-hint" id="register-email-hint">Wyślemy na niego link, który otworzy konto. Możesz też logować się nim zamiast loginu.</p>
+          <p class="field-hint" id="register-email-hint" data-i18n>Wyślemy na niego link, który otworzy konto. Możesz też logować się nim zamiast loginu.</p>
         </div>
         <div class="field">
-          <label for="register-password">Hasło</label>
+          <label for="register-password" data-i18n>Hasło</label>
           <div class="password">
             <input id="register-password" name="password" type="password" autocomplete="new-password" aria-describedby="register-password-hint" required>
             <button type="button" class="password-toggle" aria-controls="register-password" aria-label="Pokaż hasło">Pokaż</button>
           </div>
-          <p class="field-hint" id="register-password-hint">Co najmniej 8 znaków.</p>
+          <p class="field-hint" id="register-password-hint" data-i18n>Co najmniej 8 znaków.</p>
         </div>
         <p class="form-error" role="alert" hidden></p>
-        <button type="submit" class="button button--system" data-busy-label="Zakładanie konta…">Załóż konto</button>
+        <button type="submit" class="button button--system" data-busy-label="Zakładanie konta…" data-i18n>Załóż konto</button>
       </form>
     </section>
 
-    <p class="version">Wersja <span data-version>—</span></p>
+    <!-- PL | EN where the server offers English (i18n.js). -->
+    <div class="auth-language" id="auth-language" hidden></div>
+
+    <p class="version"><span data-i18n>Wersja</span> <span data-version>—</span></p>
   </main>
 
   <main id="view-create" hidden>
@@ -134,14 +137,14 @@
          the character's own tabs under its Postać (layout-mode.js). -->
     <div class="menu" id="menu">
       <p class="menu-brand" aria-hidden="true">Insight</p>
-      <nav class="nav nav--main" id="nav-main" aria-label="Menu główne"></nav>
-      <nav class="nav nav--character" id="nav-character" aria-label="Nawigacja postaci" hidden></nav>
+      <nav class="nav nav--main" id="nav-main" aria-label="Menu główne" data-i18n-attr="aria-label"></nav>
+      <nav class="nav nav--character" id="nav-character" aria-label="Nawigacja postaci" data-i18n-attr="aria-label" hidden></nav>
     </div>
     <!-- On a computer: the narrator's quests and the chat (side.js). -->
-    <aside class="side" id="side" aria-label="Zadania i czat" hidden></aside>
+    <aside class="side" id="side" aria-label="Zadania i czat" data-i18n-attr="aria-label" hidden></aside>
   </div>
 
-  <dialog class="sheet" id="sheet" aria-label="Szczegóły"></dialog>
+  <dialog class="sheet" id="sheet" aria-label="Szczegóły" data-i18n-attr="aria-label"></dialog>
   <div class="toast" id="toast" role="status" aria-live="polite" popover="manual" hidden></div>
 </body>
 </html>
