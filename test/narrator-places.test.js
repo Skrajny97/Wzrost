@@ -141,7 +141,9 @@ test('a character past the introduction hears of the Sklep Systemu once, but nev
 test("the Gildia's tabs come on a member's first look at its page, then each tab's own line, once", async () => {
   place(mark('guild-tabs'));
   place(BOARD_HEAD);
-  for (let index = 0; index < 4; index += 1) place(mark('guild-seat-building'));
+  // The Siedziba marks its first building only: a ring round all four drew
+  // the camera far back on a phone (a player on the chat, 6.11.2026).
+  place(mark('guild-seat-building'));
   // Outside a guild nothing is told.
   state.character = character();
   narrator.narrate('#/gildia/trials');
@@ -157,6 +159,7 @@ test("the Gildia's tabs come on a member's first look at its page, then each tab
   // Another tab: its own line only; the tabs' line is not told again.
   narrator.narrate('#/gildia/seat');
   assert.match(told(), new RegExp(words('guild-seat')));
+  assert.equal(lights().length, 1);
   await next();
   narrator.narrate('#/gildia/trials');
   narrator.narrate('#/gildia');

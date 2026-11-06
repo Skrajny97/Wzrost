@@ -107,6 +107,9 @@ function wearChoice(companion, item, put) {
 // as the card shows it (`roll`), so a second tap makes none. After a try
 // the card opens again with the Kowadło unfolded, or closes when the item
 // broke; when the item changed meanwhile, the Kwatery load it anew.
+// "Zdejmij" under it (the author: "Brakuje też opcji zdjęcia ekwipunku
+// towarzyszowi") puts the item into the bag and leaves the place empty, at
+// home only, as "Załóż z plecaka".
 function companionItemSheet(companion, slot, apply, anvil = false) {
   const item = companion.wear.find((place) => place.slot === slot)?.item;
   if (!item) {
@@ -128,10 +131,17 @@ function companionItemSheet(companion, slot, apply, anvil = false) {
     if (after) companionItemSheet(after, slot, apply, true);
     else closeSheet();
   };
+  const takeOff = (event) =>
+    withButton(event.currentTarget, async () => {
+      apply(await call('POST', '/api/settlement/unequip', { companionId: companion.id, slot }));
+      closeSheet();
+      toast(`${item.name} wraca do plecaka.`);
+    });
   openSheet(
     itemDetails(item),
     h('p', { class: 'muted', text: companion.wornBy }),
     anvilSection(item, Boolean(companion.away), anvil, { send, reopen }),
+    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Zdejmij', disabled: Boolean(companion.away), onClick: takeOff })),
     companion.away && h('p', { class: 'muted', text: companion.away }),
   );
 }

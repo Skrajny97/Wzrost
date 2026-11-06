@@ -82,6 +82,7 @@ import {
   tradePoints,
   tradeView,
   upgradedItem,
+  takeOffCompanion,
   upgradedOnCompanion,
   wearOnCompanion,
   withAffix,
@@ -1110,6 +1111,41 @@ export async function equipCompanion(context) {
     db
       .prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND slot IS NULL AND EXISTS (SELECT 1 FROM characters WHERE id = ? AND version = ? AND settlement = ?)')
       .bind(item.id, row.id, row.id, row.version + 1, saved),
+    ...off.map((one) => backToBag(db, row, one, saved, context.now)),
+  ]);
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(db, session.userId);
+  return json({ settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now), character: characterView(after, context.now) });
+}
+
+// { companionId, slot }: the companion takes off what it wears in the place
+// of `slot` (the author, 6.11.2026: "Brakuje też opcji zdjęcia ekwipunku
+// towarzyszowi, powinna być"), and the item goes to the bag: when and where
+// "Załóż z plecaka" may be used (at home or at a profession's work, not
+// while the companion is away on an exploration), with room in the bag.
+// The place stays empty; the companion fights without it, as the character
+// does without a weapon.
+export async function unequipCompanion(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const hired = stored.companions ?? [];
+  const companion = hired.find((one) => one.id === body.companionId);
+  if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
+  const place = companionPlace(body.slot);
+  const { companion: bare, off } = place ? takeOffCompanion(companion, place) : { companion, off: [] };
+  if (off.length === 0) throw new ApiError(404, 'item_not_found', companionText('noItem', companion, content()));
+  requireCompanionHome(player, companion, context.now);
+  if (bagPlaces(player) + off.length > bagCapacity(campLevels(player.buildings, context.now, content()), content())) {
+    throw new ApiError(409, 'bag_full', 'Plecak jest pełny. Zrób w nim miejsce, żeby zdjąć przedmiot.');
+  }
+  const next = { ...stored, companions: hired.map((one) => (one === companion ? bare : one)) };
+  const saved = JSON.stringify(next);
+  const db = context.env.DB;
+  const [result] = await db.batch([
+    db.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?').bind(saved, row.id, row.version),
     ...off.map((one) => backToBag(db, row, one, saved, context.now)),
   ]);
   if (result.meta.changes !== 1) throw changed();

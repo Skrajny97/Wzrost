@@ -3034,6 +3034,27 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.93 (6.11.2026)
+
+- Objaśnienie narratora w Siedzibie Gildii wskazuje pierwszy budynek i nie oddala już ekranu: zob. „Siedziba Gildii: objaśnienie bez oddalania”.
+
+## Siedziba Gildii: objaśnienie bez oddalania (gracz na czacie, przez autora, 6.11.2026; od 0.1.93)
+
+Gracz na czacie: przy pierwszym wejściu do Siedziby objaśnienie zaznacza cały ekran, który się znacząco oddala (tylko w trakcie objaśnienia). Kwestia „guild-seat” brała jednym pierścieniem wszystkie cztery budynki (`whole`), a kamera cofała się, żeby zmieścić je w całości: na telefonie to cztery karty jedna pod drugą. Teraz światło pada na pierwszy budynek, bez oddalania; tekst kwestii („Tu gildia stawia cztery budynki…”) i nagranie bez zmian.
+
+## Wersja 0.1.92 (6.11.2026)
+
+- W Kwaterach towarzysz zdejmuje przedmiot przyciskiem „Zdejmij” w karcie przedmiotu, który nosi: zob. „Zdejmowanie przedmiotów towarzyszowi”.
+
+## Zdejmowanie przedmiotów towarzyszowi (autor, 6.11.2026; od 0.1.92)
+
+Autor: „Brakuje też opcji zdjęcia ekwipunku towarzyszowi, powinna być”.
+
+1. Karta przedmiotu, który towarzysz nosi (Kwatery, dotknięcie broni, pancerza albo biżuterii), ma pod Kowadłem przycisk „Zdejmij”.
+2. Zdjęty przedmiot trafia do plecaka postaci, a miejsce towarzysza zostaje puste („Pusto”). Tak samo jak przy „Załóż z plecaka”: przedmiot dany z plecaka i własny przedmiot towarzysza (ten, z którym przyszedł z Karczmy) wracają jednakowo, bez znaku „dany”, więc przy odprawie towarzysz nie oddaje go drugi raz.
+3. Zdjąć można tylko wtedy, gdy wolno też zakładać: towarzysz jest w Kwaterach, a nie na wyprawie z postacią (przycisk jest wtedy wyszarzony, a pod nim stoi, kiedy wróci). W plecaku musi być wolne miejsce; gdy go nie ma, gra mówi: „Plecak jest pełny. Zrób w nim miejsce, żeby zdjąć przedmiot.”
+4. Towarzysz bez broni albo pancerza dalej chodzi na wyprawy i walczy, jak postać bez broni: słabiej, ale bez blokady. Najprostsze rozwiązanie; autor nie prosił o ostrzeżenie.
+
 ## Wersja 0.1.91 (6.11.2026)
 
 - Angielska wersja beta, etap 3: Umiejętności, Drużyna, Społeczność, Profesje, Encyklopedia i Sklep Systemu po angielsku, z rozdziałami narratora jako tekst (do zatwierdzenia przed nagraniem). Tylko na wersji testowej: zob. „Angielska wersja beta, etap 3: poziomy 5–15”.

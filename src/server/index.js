@@ -98,7 +98,7 @@ import {
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
 import { enterTrialHall } from './trial-hall.js';
-import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, upgradeCompanionItem } from './settlement.js';
+import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, unequipCompanion, upgradeCompanionItem } from './settlement.js';
 import { claimWanted, dropWanted, takeWanted } from './wanted.js';
 import { claimMercenary, listMercenaries, offerMercenary, withdrawMercenary } from './mercenaries.js';
 import { buyFromTanner, sellToTanner } from './tannery.js';
@@ -254,6 +254,7 @@ const routes = [
   ['POST', '/api/settlement/dismiss', dismissCompanion],
   ['POST', '/api/settlement/gift', takeCompanionGift],
   ['POST', '/api/settlement/equip', equipCompanion],
+  ['POST', '/api/settlement/unequip', unequipCompanion],
   ['POST', '/api/settlement/companion-upgrade', upgradeCompanionItem],
   ['POST', '/api/settlement/companion-stay', setCompanionStay],
   ['POST', '/api/settlement/herbalist', sellToHerbalist],

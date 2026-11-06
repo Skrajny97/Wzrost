@@ -197,14 +197,16 @@ export function mountGuildSeat(container) {
 
   // A building's card, folded under its picture, name, level and what it
   // gives now; a marked one opens by itself until the player folds it.
-  function buildingCard(building) {
+  function buildingCard(building, index) {
     const { texts } = view;
     const titleId = `guild-seat-${building.id}-title`;
     const badge = building.preferred && h('span', { class: 'chip guild-seat-preferred' }, icon('banner', { size: 14 }), h('span', { text: texts.preferred }));
     return h(
       'section',
-      // The narrator's line about the Siedziba rings the four (narrator.js).
-      { class: 'card guild-seat-building', 'aria-labelledby': titleId, 'data-guide': 'guild-seat-building' },
+      // The narrator's line about the Siedziba lights the first of the four
+      // (narrator.js): a ring round all four drew the camera far back on a
+      // phone (a player on the chat, 6.11.2026).
+      { class: 'card guild-seat-building', 'aria-labelledby': titleId, ...(index === 0 && { 'data-guide': 'guild-seat-building' }) },
       foldPart(
         {
           key: `guild-seat-${building.id}`,

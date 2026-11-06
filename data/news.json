@@ -260,6 +260,16 @@
       "id": "0.1.91",
       "title": "Wersja 0.1.91",
       "body": "- Towarzysze z Kwater idą z postacią także na Szybkie i Błyskawiczne Polowanie: walczą obok niej i zdobywają doświadczenie jak na zwykłej wyprawie.\n- Na wąskich telefonach pergamin narratora i zadań mieści się w całości na ekranie, a długie nazwy miejsc nie wychodzą poza ramkę.\n- Czat zamienia na gwiazdki także angielskie przekleństwa."
+    },
+    {
+      "id": "0.1.92",
+      "title": "Wersja 0.1.92",
+      "body": "- W Kwaterach można zdjąć towarzyszowi broń, pancerz albo biżuterię: dotknij przedmiotu, który nosi, i wybierz „Zdejmij”. Przedmiot wraca do plecaka, a miejsce zostaje puste."
+    },
+    {
+      "id": "0.1.93",
+      "title": "Wersja 0.1.93",
+      "body": "- Objaśnienie narratora przy pierwszym wejściu do Siedziby Gildii nie oddala już ekranu: wskazuje pierwszy budynek."
     }
 ]
 }
