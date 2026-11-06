@@ -72,9 +72,12 @@ jobs:
   # (the author: "pilnuj tego na przyszlosc nie może tak byc, poczatek
   # jest najwazniejszy"). The game runs here as in the live one. Installing
   # the browser may take ten minutes (0.0.90, 2.11.2026), so it gets 30.
+  # Ubuntu 24.04 by name: ubuntu-latest moved to 26.04 (6.11.2026), where
+  # Playwright 1.56.1 installs no Chromium, and 0.1.93 and 0.1.94 stopped
+  # here before the browser started.
   first-steps:
     name: Pierwsze kroki nowej postaci
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6

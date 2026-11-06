@@ -3039,6 +3039,7 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 - Angielska wersja beta, etap 4: po angielsku jest wszystko, co gracz może zobaczyć, poza Panelem autora, narzędziami testowymi i wpisami „Co nowego?”. Tylko na wersji testowej: zob. „Angielska wersja beta, etap 4: cała reszta gry”.
 - W grze: strona Wież mieści się na telefonie 320 px (była o 42 px szersza), a zasady Bestii Gildii mówią, że atakuje się także w trakcie wyprawy (było nieaktualne zdanie sprzed 0.1.29).
 - Odpowiedzi autora 713 A i 714 A: zob. „Odpowiedzi autora 713 i 714”.
+- Wdrożenie do gry: GitHub przeniósł maszyny „ubuntu-latest” na Ubuntu 26.04, gdzie Playwright 1.56.1 nie instaluje Chromium, więc sprawdzenie „Pierwsze kroki nowej postaci” padało przed startem przeglądarki i 0.1.93–0.1.95 trafiły tylko na wersję testową. To sprawdzenie działa teraz na „ubuntu-24.04”, jak do 0.1.92.
 
 ## Angielska wersja beta, etap 4: cała reszta gry (668, 712; 6.11.2026, od 0.1.95)
 
@@ -3057,7 +3058,7 @@ Etap 4 z planu angielskiej bety (668), po słowach autora: „to co jest dostęp
 6. **Zapisane w bazie teksty:** historie zleceń na Tablicy i nazwy listów gończych zapisują się po polsku, a strona pokazuje je w swoim języku (po numerze historii i z danych), więc zmiana języka nie zmienia już zapisanych zleceń. Zostaje w języku, w którym powstało: nazwa zestawu ekwipunku w Warowni („Zestaw 1”), przedmiot w toku oprawiania kamienia, raporty Wież i Sali prób oraz ogłoszenie Loterii na czacie (o północy, po polsku).
 7. **Pilnowanie:** `tools/layout-check.cjs` ogląda też Wieże i Ewolucję, a po angielsku (`--lang en`) wypisuje polskie słowa ze wszystkich ekranów gry. `test/i18n-stage4.test.js` sprawdza błędy i zdania silnika tych części w obu językach.
 8. **Podział pracy:** ośmiu pomocników w osobnych gałęziach (dwie części krain, dane Osady, dane Gildii z Wieżami i Warownią, Ewolucje z przedmiotami, ekrany Osady, ekrany Gildii, serwer z silnikiem). Gałęzie scalono w jedną, bez podwójnych kluczy w `strings.json`; nazwy stworów w listach gończych ujednolicono z krainami (np. „Black Utopiets”, „Wedding Khokhow”).
-9. **Do decyzji autora (nic nie zmienione):** w kwestii narratora „settlement-brotherhoods” brakuje przecinka („respekt, jaki budzisz”), Ewolucja Bastion ma przy „Nieugiętym” pancerz i odbicie jakby zamienione miejscami względem „Niezłomnego”, a komunikat Zaklinaczki „Najpierw wybierz afiks z poprzedniego zaklęcia” mówi „zaklęcie” o przekuciu.
+9. **Uwagi tłumaczy, sprawdzone:** w kwestii narratora „settlement-brotherhoods” doszły przecinki („respekt, jaki budzisz, wśród bractw”; nagranie bez zmian). Pancerz i odbicie Bastionu przy „Nieugiętym” i „Niezłomnym” są takie celowo (zob. wyżej przy Bastionie), a „zaklęcie” w komunikacie Zaklinaczki to jej słowo od 0.0.59 (zaklęła zamiast przekuła), więc oba zostają.
 
 ## Odpowiedzi autora 713 i 714 (6.11.2026)
 
