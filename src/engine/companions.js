@@ -311,3 +311,12 @@ export function wearOnCompanion(companion, item) {
   const off = companion.gear.filter((worn) => companionPlace(worn.slot) === place);
   return { companion: { ...companion, gear: [...companion.gear.filter((worn) => !off.includes(worn)), { ...item, given: true }] }, off };
 }
+
+// The companion taking off what it wears in `place` (the author: "Brakuje
+// też opcji zdjęcia ekwipunku towarzyszowi"): the place is empty after it,
+// and the item (`off`, given or its own) goes to the bag, as one taken off
+// by "Załóż z plecaka" does. Nothing in the place: nothing taken off.
+export function takeOffCompanion(companion, place) {
+  const off = companion.gear.filter((worn) => companionPlace(worn.slot) === place);
+  return { companion: { ...companion, gear: companion.gear.filter((worn) => !off.includes(worn)) }, off };
+}

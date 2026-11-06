@@ -559,6 +559,51 @@ describe('companions through the API', () => {
     }
   });
 
+  test('"Zdejmij": what a companion wears goes to the bag and its place stays empty, at home, with room in the bag; it fights without it (author, 6.11.2026)', async () => {
+    const candidate = await hireFirst();
+    const database = await db();
+    const bagCount = async () => (await database.prepare('SELECT COUNT(*) AS n FROM items WHERE slot IS NULL').first()).n;
+    const takeOff = (slot, companionId = candidate.id) => call('POST', '/api/settlement/unequip', { cookie, body: { companionId, slot } });
+    const own = await storedItem('weapon');
+    assert.ok(own, 'a hired companion comes with a weapon of its own');
+    // Away on an exploration with the character: the item waits.
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.equal((await takeOff('weapon')).data.error.code, 'busy');
+    await call('POST', '/api/hunts/cancel', { cookie });
+    // No room in the bag: nothing is taken off.
+    const filler = JSON.stringify(generateItem({ baseId: content.bases.find((base) => base.slot === 'chest').id, level: 1 }, createRng('filler'), content));
+    await database
+      .prepare('WITH RECURSIVE n(i) AS (SELECT 1 UNION ALL SELECT i + 1 FROM n WHERE i < ?) INSERT INTO items (character_id, slot, data, created_at) SELECT characters.id, NULL, ?, 0 FROM characters, n')
+      .bind(content.balance.items.bagSlots - (await bagCount()), filler)
+      .run();
+    const full = await takeOff('weapon');
+    assert.equal(full.data.error.code, 'bag_full');
+    assert.ok(await storedItem('weapon'));
+    await database.prepare('DELETE FROM items WHERE slot IS NULL AND data = ?').bind(filler).run();
+    // At home, with room: the weapon goes to the bag, and the place is empty.
+    const before = await bagCount();
+    const done = await takeOff('weapon');
+    assert.equal(done.status, 200, JSON.stringify(done.data).slice(0, 300));
+    assert.equal(await bagCount(), before + 1);
+    assert.equal(placeOf(done.data.settlement, 'weapon').item, null);
+    assert.equal(await storedItem('weapon'), undefined);
+    const rows = (await database.prepare('SELECT id, data FROM items WHERE slot IS NULL').all()).results.map((row) => ({ id: row.id, ...JSON.parse(row.data) }));
+    const back = rows.find((item) => item.slot === 'weapon');
+    assert.deepEqual([back.baseId, back.level, back.given], [own.baseId, own.level, undefined]);
+    assert.ok(done.data.character.bag.some((item) => item.id === back.id));
+    // An empty place, a place it has no such thing in, or no such companion.
+    assert.equal((await takeOff('weapon')).data.error.code, 'item_not_found');
+    assert.equal((await takeOff('jewelry')).data.error.code, 'item_not_found');
+    assert.equal((await takeOff('chest', 'nobody')).data.error.code, 'no_companion');
+    // Bare-handed, it still goes and fights.
+    const quick = await call('POST', '/api/hunts/quick', { cookie, body: { areaId: 'windfalls-edge' } });
+    assert.equal(quick.status, 200, JSON.stringify(quick.data).slice(0, 300));
+    // And the weapon goes back on from the bag.
+    const again = await call('POST', '/api/settlement/equip', { cookie, body: { companionId: candidate.id, itemId: back.id } });
+    assert.equal(again.status, 200, JSON.stringify(again.data).slice(0, 300));
+    assert.equal((await storedItem('weapon')).baseId, own.baseId);
+  });
+
   test('the companions who went walk beside the character on the Walka screen, in their looks; one who stays in the Kwatery does not (640 A, 648)', async () => {
     const [first, second] = (await settlement()).companions.candidates;
     for (const candidate of [first, second]) assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } })).status, 200);
