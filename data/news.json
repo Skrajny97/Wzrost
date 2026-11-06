@@ -245,6 +245,11 @@
       "id": "0.1.87",
       "title": "Wersja 0.1.87",
       "body": "- Dwie nowe krainy Szumiącego Boru dla poziomów 151–200: Głucha Knieja i Ostępy Nowiu. Dziesięć miejsc i 34 nowe stwory, w tym elity Słowik Rozbójnik i Morowa Dziewica oraz czempioni Nocny Łowczy i Księżycożerca.\n- Nowe sposoby walki: stwory ukryte w mroku stają się celem dopiero wtedy, gdy zostaną same, a Księżycożerca uderza w cały szyk naraz.\n- Cechy krain: w Głuchej Kniei krwawienie trwa o jeden ruch dłużej, a w Ostępach Nowiu wychłodzenie."
+    },
+    {
+      "id": "0.1.88",
+      "title": "Wersja 0.1.88",
+      "body": "- Poprawki angielskiej wersji gry, która na razie działa tylko na wersji testowej. W grze wszystko zostaje po polsku."
     }
 ]
 }

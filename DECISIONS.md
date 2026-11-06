@@ -3034,6 +3034,17 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.88 (6.11.2026)
+
+Angielski słownik nazw zatwierdzony przez autora i krótki napis XP na angielskim pasku u góry: zob. „Odpowiedzi autora 701–705”, punkt 3, i „Odpowiedź autora 708”. Dotyczy tylko angielskiej wersji, która działa na wersji testowej; w grze głównej nic się nie zmienia.
+
+## Odpowiedź autora 708 (6.11.2026)
+
+Autor: „708 A”.
+
+1. **Pasek u góry po angielsku.** Napis przy XP postaci to „CHAR. XP” (`data/en/strings.json`, klucz „XP POSTACI”), więc liczba obok mieści się na telefonie o szerokości 320 px. Pełna nazwa ze słownika, „Character XP”, zostaje wszędzie indziej, np. w raportach, gdy zostaną przetłumaczone.
+2. **Sprawdzone:** wygląd po angielsku na 9 rozmiarach ekranu (31 ekranów) bez uciętego XP i bez polskich słów na ekranach przed grą i w Ustawieniach; po polsku pierwsze kroki i wygląd jak w 0.1.87; wszystkie testy (1330).
+
 ## Wersja 0.1.87 (6.11.2026)
 
 Krainy Głucha Knieja i Ostępy Nowiu (poziomy 151–200) z grafikami i okrzykami, które wybrał autor: zob. „Głucha Knieja i Ostępy Nowiu”. Odpowiedzi autora 701–705: zob. „Odpowiedzi autora 701–705”.
