@@ -457,7 +457,11 @@
     "src/engine/skill-demo.js",
     "src/engine/gifts.js",
     "src/engine/parties.js",
-    "src/engine/names.js"
+    "src/engine/names.js",
+    "src/client/bestiary.js",
+    "src/client/screens/encyclopedia.js",
+    "src/client/screens/professions.js",
+    "src/client/screens/skills.js"
   ],
   "ignore": [
     "Google",
