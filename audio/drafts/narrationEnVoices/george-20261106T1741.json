@@ -1,0 +1,16 @@
+{
+  "id": "george",
+  "payload": {
+    "text": "At the edge of the wilds, where the wind breaks old trees, someone the forest does not yet know awakens. There is no road behind, and ahead lies only the wilderness. Welcome, stranger. You have found yourself in a place whose purpose is growth. I am counting on you to reach great heights. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEnVoices/george-20261106T1741-0.mp3"
+  ],
+  "credits": 298
+}

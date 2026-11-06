@@ -1,0 +1,29 @@
+{
+  "id": "design-american",
+  "payload": {
+    "voice_description": "An elderly American man, a wise storyteller by a campfire at night. Deep, gravelly, warm voice, slow and deliberate, gently mysterious. Native American English accent, clear diction, no foreign accent.",
+    "text": "At the edge of the wilds, where the wind breaks old trees, someone the forest does not yet know awakens. There is no road behind, and ahead lies only the wilderness. Welcome, stranger. You have found yourself in a place whose purpose is growth. I am counting on you to reach great heights.",
+    "model_id": "eleven_ttv_v3",
+    "guidance_scale": 3
+  },
+  "files": [
+    "audio/drafts/narrationEnVoices/design-american-20261106T1741-0-0.mp3",
+    "audio/drafts/narrationEnVoices/design-american-20261106T1741-0-1.mp3",
+    "audio/drafts/narrationEnVoices/design-american-20261106T1741-0-2.mp3"
+  ],
+  "generated": [
+    {
+      "file": "audio/drafts/narrationEnVoices/design-american-20261106T1741-0-0.mp3",
+      "generatedVoiceId": "rPTaEVjF6PZICnSLz47F"
+    },
+    {
+      "file": "audio/drafts/narrationEnVoices/design-american-20261106T1741-0-1.mp3",
+      "generatedVoiceId": "yKG1O2xp5MJBWQrlPcP3"
+    },
+    {
+      "file": "audio/drafts/narrationEnVoices/design-american-20261106T1741-0-2.mp3",
+      "generatedVoiceId": "OAE0APQq33CIB0XJdYDr"
+    }
+  ],
+  "credits": 867
+}

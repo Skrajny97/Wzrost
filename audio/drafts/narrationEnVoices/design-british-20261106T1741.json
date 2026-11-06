@@ -1,0 +1,29 @@
+{
+  "id": "design-british",
+  "payload": {
+    "voice_description": "An elderly British man telling an old tale by a campfire at night. Deep, warm, slightly husky voice, calm and unhurried, with a hint of mystery and kindness. Native British English accent, clear diction, no foreign accent.",
+    "text": "At the edge of the wilds, where the wind breaks old trees, someone the forest does not yet know awakens. There is no road behind, and ahead lies only the wilderness. Welcome, stranger. You have found yourself in a place whose purpose is growth. I am counting on you to reach great heights.",
+    "model_id": "eleven_ttv_v3",
+    "guidance_scale": 3
+  },
+  "files": [
+    "audio/drafts/narrationEnVoices/design-british-20261106T1741-0-0.mp3",
+    "audio/drafts/narrationEnVoices/design-british-20261106T1741-0-1.mp3",
+    "audio/drafts/narrationEnVoices/design-british-20261106T1741-0-2.mp3"
+  ],
+  "generated": [
+    {
+      "file": "audio/drafts/narrationEnVoices/design-british-20261106T1741-0-0.mp3",
+      "generatedVoiceId": "4MGIB5nKzpBcih5nmsuG"
+    },
+    {
+      "file": "audio/drafts/narrationEnVoices/design-british-20261106T1741-0-1.mp3",
+      "generatedVoiceId": "6JiEMSy4BtHsrtPJgbOB"
+    },
+    {
+      "file": "audio/drafts/narrationEnVoices/design-british-20261106T1741-0-2.mp3",
+      "generatedVoiceId": "5GH4qBfwzW38WnycaX7b"
+    }
+  ],
+  "credits": 867
+}
