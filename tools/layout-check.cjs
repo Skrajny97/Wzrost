@@ -57,9 +57,11 @@ const SCREENS = [
   '#/postac',
   '#/postac/statystyki',
   '#/postac/umiejetnosci',
+  '#/postac/ewolucja',
   '#/walka',
   '#/walka/windfalls',
   '#/walka/windfalls/windfalls-edge',
+  '#/wieze',
   '#/profesje',
   '#/oboz',
   '#/oboz/craft-table',
@@ -84,15 +86,17 @@ const SCREENS = [
   '#/dziennik',
 ];
 // The screens already in English (data/en/scope.json, stages 2 to 4 of
-// the English beta): in English the check lists the Polish words left on
-// them, as on the screens before the game.
+// the English beta: all of them now): in English the check lists the
+// Polish words left on them, as on the screens before the game.
 const TRANSLATED = new Set([
   '#/postac',
   '#/postac/statystyki',
   '#/postac/umiejetnosci',
+  '#/postac/ewolucja',
   '#/walka',
   '#/walka/windfalls',
   '#/walka/windfalls/windfalls-edge',
+  '#/wieze',
   '#/profesje',
   '#/oboz',
   '#/oboz/craft-table',
@@ -105,6 +109,13 @@ const TRANSLATED = new Set([
   '#/osada/trial-hall',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
+  '#/gildia',
+  '#/gildia/seat',
+  '#/gildia/expedition',
+  '#/gildia/beast',
+  '#/gildia/trials',
+  '#/gildia/requests',
+  '#/gildia/exchange',
   '#/sklep',
   '#/encyklopedia',
   '#/dziennik',

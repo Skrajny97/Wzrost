@@ -11812,8 +11812,11 @@ a.profession-square:active {
   font-weight: 600;
 }
 
+/* One column no wider than the card: the slider's own width would
+   otherwise widen it past a 320 px phone. */
 .tower-card {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
 
