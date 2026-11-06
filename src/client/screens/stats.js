@@ -4,10 +4,12 @@
 
 import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatNumber, formatPrecise, plural } from '../format.js';
+import { t } from '../i18n.js';
 import { buildLocked, buildLockedText, call, isUnlocked, state, unlockInfo } from '../state.js';
 import { confirmAction, openSheet, systemPanel, withButton } from '../ui.js';
 
 // Segments of the source bar; profession and Core segments appear once unlocked.
+// The labels here and below are shown in the page's language (t(), i18n.js).
 const SOURCES = [
   { id: 'class', label: 'klasa' },
   { id: 'character', label: 'postać' },
@@ -53,44 +55,44 @@ function openExtra(character) {
       h('dd', { class: 'num', text: value }),
       notes.filter(Boolean).map((note) => h('dd', { class: 'extra-note', text: note })),
     );
-  const rating = (value, stat, cap) => `ocena ${formatNumber(value)} (${stat}), najwyżej ${percent(cap)}`;
+  const rating = (value, stat, cap) => t('ocena {value} ({stat}), najwyżej {cap}', { value: formatNumber(value), stat, cap: percent(cap) });
   const group = (title, ...rows) => [h('h3', { class: 'extra-title', text: title }), h('dl', { class: 'extra-list' }, rows)];
   const armorFrom = [
-    `ekwipunek ${formatNumber(armor.equipment)}`,
-    `Wytrzymałość ${formatNumber(armor.endurance)}`,
-    armor.trait && `cecha ${armor.trait.name} +${formatDecimal(armor.trait.share * 100)}%`,
+    t('ekwipunek {armor}', { armor: formatNumber(armor.equipment) }),
+    t('Wytrzymałość {armor}', { armor: formatNumber(armor.endurance) }),
+    armor.trait && t('cecha {name} +{share}%', { name: armor.trait.name, share: formatDecimal(armor.trait.share * 100) }),
   ].filter(Boolean);
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Parametry dodatkowe' }),
+    h('h2', { class: 'sheet-title', text: t('Parametry dodatkowe') }),
     h('p', {
       class: 'muted extra-intro',
-      text: `Procenty liczą się przeciw przeciwnikowi na Twoim poziomie (${formatNumber(extra.level)}). Silniejszy przeciwnik je zmniejsza, a słabszy zwiększa.`,
+      text: t('Procenty liczą się przeciw przeciwnikowi na Twoim poziomie ({level}). Silniejszy przeciwnik je zmniejsza, a słabszy zwiększa.', { level: formatNumber(extra.level) }),
     }),
     group(
-      'Obrona',
-      row('Pancerz', formatNumber(armor.total), armorFrom.join(' · '), `redukcja obrażeń fizycznych ${percent(armor.reduction)}`),
-      row('Unik', percent(dodge.chance), rating(dodge.rating, 'Zręczność', dodge.cap)),
-      row('Odporność na efekty', percent(effectResist.chance), rating(effectResist.rating, 'Wola', effectResist.cap)),
+      t('Obrona'),
+      row(t('Pancerz'), formatNumber(armor.total), armorFrom.join(' · '), t('redukcja obrażeń fizycznych {percent}', { percent: percent(armor.reduction) })),
+      row(t('Unik'), percent(dodge.chance), rating(dodge.rating, t('Zręczność'), dodge.cap)),
+      row(t('Odporność na efekty'), percent(effectResist.chance), rating(effectResist.rating, t('Wola'), effectResist.cap)),
     ),
     group(
-      'Atak',
-      row('Trafienie krytyczne', percent(crit.chance), rating(crit.rating, 'Percepcja', crit.cap)),
-      row('Mnożnik krytyka', `×${formatPrecise(crit.multiplier)}`, 'tyle razy mocniej uderza cios krytyczny'),
-      row('Szybkość', formatPrecise(extra.speed), 'im wyższa, tym częściej postać rusza się w walce (Zręczność)'),
+      t('Atak'),
+      row(t('Trafienie krytyczne'), percent(crit.chance), rating(crit.rating, t('Percepcja'), crit.cap)),
+      row(t('Mnożnik krytyka'), `×${formatPrecise(crit.multiplier)}`, t('tyle razy mocniej uderza cios krytyczny')),
+      row(t('Szybkość'), formatPrecise(extra.speed), t('im wyższa, tym częściej postać rusza się w walce (Zręczność)')),
     ),
     group(
-      'Zdrowie',
-      row('Regeneracja', `${formatPrecise(extra.regen)} HP/min`, 'między wyprawami, z premią Ogniska'),
-      row('Odzysk HP po walce', percent(Math.min(1, extra.recovery)), 'tyle brakującego HP wraca po każdej walce na wyprawie'),
+      t('Zdrowie'),
+      row(t('Regeneracja'), `${formatPrecise(extra.regen)} HP/min`, t('między wyprawami, z premią Ogniska')),
+      row(t('Odzysk HP po walce'), percent(Math.min(1, extra.recovery)), t('tyle brakującego HP wraca po każdej walce na wyprawie')),
     ),
     group(
-      'Odporności na żywioły',
+      t('Odporności na żywioły'),
       extra.resist.map((element) =>
         row(
           element.name[0].toUpperCase() + element.name.slice(1),
           percent(element.reduction),
-          `odporność ${formatNumber(element.rating)}`,
-          element.shelter > 0 && `cecha: o ${formatDecimal(element.shelter * 100)}% mniej obrażeń`,
+          t('odporność {rating}', { rating: formatNumber(element.rating) }),
+          element.shelter > 0 && t('cecha: o {percent}% mniej obrażeń', { percent: formatDecimal(element.shelter * 100) }),
         ),
       ),
     ),
@@ -106,8 +108,8 @@ export function mountStats(container) {
     const character = state.character;
     if (!isUnlocked('stats')) {
       fill(container,
-        h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Statystyki' })),
-        systemPanel(`Ekran statystyk i wolne punkty odblokują się na poziomie ${unlockInfo('stats').level}.`),
+        h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Statystyki') })),
+        systemPanel(t('Ekran statystyk i wolne punkty odblokują się na poziomie {level}.', { level: unlockInfo('stats').level })),
       );
       return;
     }
@@ -124,22 +126,22 @@ export function mountStats(container) {
       h(
         'div',
         { class: 'title-row' },
-        h('h1', { class: 'page-title', tabindex: '-1', text: 'Statystyki' }),
-        h('span', { class: `badge badge--system badge--tall${free > 0 ? ' badge--ready' : ''}`, text: `WOLNE PUNKTY: ${formatNumber(free)}` }),
+        h('h1', { class: 'page-title', tabindex: '-1', text: t('Statystyki') }),
+        h('span', { class: `badge badge--system badge--tall${free > 0 ? ' badge--ready' : ''}`, text: t('WOLNE PUNKTY: {count}', { count: formatNumber(free) }) }),
       ),
       levelsCard(character),
-      busy && systemPanel(buildLockedText(character, 'Punkty rozdzielisz')),
+      busy && systemPanel(buildLockedText(character, t('Punkty rozdzielisz'))),
       actions(character, busy, pendingTotal),
       h(
         'div',
         { class: 'legend', 'aria-hidden': 'true' },
         sources.map((source) =>
-          h('span', { class: 'legend-item' }, h('span', { class: `swatch swatch--${source.id}` }), source.label),
+          h('span', { class: 'legend-item' }, h('span', { class: `swatch swatch--${source.id}` }), t(source.label)),
         ),
       ),
       h(
         'section',
-        { class: 'stat-list', 'aria-label': 'Atrybuty' },
+        { class: 'stat-list', 'aria-label': t('Atrybuty') },
         character.stats.map((stat) => statRow(stat, sources, widest, free > 0 && !busy)),
       ),
       combatValues(character),
@@ -155,16 +157,16 @@ export function mountStats(container) {
   // hint shows where the evolution is.
   function evolutionHint(character, evolution) {
     const { need, level = evolution } = character.skills?.evolution ?? {};
-    if (need === 'skill_points' && character.classLevel >= level) return 'KLASA CZEKA: ROZDAJ PUNKTY UMIEJĘTNOŚCI';
+    if (need === 'skill_points' && character.classLevel >= level) return t('KLASA CZEKA: ROZDAJ PUNKTY UMIEJĘTNOŚCI');
     // The second form waits to be taken (class level 100).
-    if (need === 'evolve' && character.evolution?.current && character.classLevel >= level) return 'KLASA CZEKA: WYBIERZ EWOLUCJĘ';
-    if (character.evolution?.current) return `EWOLUCJA: ${character.className.toUpperCase()}`;
-    if (character.classLevel < evolution) return `PIERWSZA EWOLUCJA: POZ. KLASY ${evolution}`;
-    if (need === 'second_path') return 'KLASA CZEKA: WYBIERZ ŚCIEŻKĘ POBOCZNĄ';
+    if (need === 'evolve' && character.evolution?.current && character.classLevel >= level) return t('KLASA CZEKA: WYBIERZ EWOLUCJĘ');
+    if (character.evolution?.current) return t('EWOLUCJA: {name}', { name: character.className.toUpperCase() });
+    if (character.classLevel < evolution) return t('PIERWSZA EWOLUCJA: POZ. KLASY {level}', { level: evolution });
+    if (need === 'second_path') return t('KLASA CZEKA: WYBIERZ ŚCIEŻKĘ POBOCZNĄ');
     // Where the deployment has the evolutions off (the live game), they are
     // still to come.
-    if (!unlockInfo('evolution')) return 'EWOLUCJA KLASY: WKRÓTCE';
-    return need === 'evolve' ? 'KLASA CZEKA: WYBIERZ EWOLUCJĘ' : 'WYBIERZ EWOLUCJĘ KLASY';
+    if (!unlockInfo('evolution')) return t('EWOLUCJA KLASY: WKRÓTCE');
+    return need === 'evolve' ? t('KLASA CZEKA: WYBIERZ EWOLUCJĘ') : t('WYBIERZ EWOLUCJĘ KLASY');
   }
 
   function levelsCard(character) {
@@ -172,14 +174,14 @@ export function mountStats(container) {
     const professions = unlockInfo('professions');
     return h(
       'section',
-      { class: 'card levels', 'aria-label': 'Poziomy' },
-      levelRow('Poziom postaci', character.level, character.xp, character.xpToNext, 'level',
-        `DO POZ. ${character.level + 1}: OK. ${formatHours(character.hoursToNext).toUpperCase()} EKSPLORACJI`),
-      levelRow(`Klasa · ${character.className}`, character.classLevel, character.classXp, character.classXpToNext, 'class', evolutionHint(character, evolution)),
+      { class: 'card levels', 'aria-label': t('Poziomy') },
+      levelRow(t('Poziom postaci'), character.level, character.xp, character.xpToNext, 'level',
+        t('DO POZ. {level}: OK. {time} EKSPLORACJI', { level: character.level + 1, time: formatHours(character.hoursToNext).toUpperCase() })),
+      levelRow(t('Klasa · {name}', { name: character.className }), character.classLevel, character.classXp, character.classXpToNext, 'class', evolutionHint(character, evolution)),
       h(
         'div',
         { class: 'level-professions' },
-        h('span', { text: 'Profesje' }),
+        h('span', { text: t('Profesje') }),
         // The professions with work, and their levels; "wkrótce" while hidden.
         // Three long names go to a second line on a narrow phone.
         h(
@@ -190,8 +192,8 @@ export function mountStats(container) {
                 .filter((profession) => !profession.soon)
                 .map((profession) => h('span', { class: 'chip', text: `${profession.name} ${profession.level}` }))
             : isUnlocked('professions')
-              ? h('span', { class: 'chip chip--dashed', text: 'wkrótce' })
-              : h('span', { class: 'chip chip--dashed', text: `od poz. ${professions.level}` }),
+              ? h('span', { class: 'chip chip--dashed', text: t('wkrótce') })
+              : h('span', { class: 'chip chip--dashed', text: t('od poz. {level}', { level: professions.level }) }),
         ),
       ),
     );
@@ -204,7 +206,7 @@ export function mountStats(container) {
       'div',
       { class: 'level-block' },
       h('div', { class: 'level-row' }, h('span', { text: label }), h('span', { class: 'num', text: level })),
-      h('div', { class: 'bar', role: 'img', 'aria-label': `${formatNumber(xp)} z ${formatNumber(toNext)} XP` }, fill),
+      h('div', { class: 'bar', role: 'img', 'aria-label': t('{xp} z {max} XP', { xp: formatNumber(xp), max: formatNumber(toNext) }) }, fill),
       h('div', { class: 'level-note' }, h('span', { text: note }), h('span', { text: `${formatNumber(xp)} / ${formatNumber(toNext)} XP` })),
     );
   }
@@ -215,7 +217,7 @@ export function mountStats(container) {
       class: 'button button--world button--small',
       'data-guide': 'auto-points',
       disabled: busy || character.freePoints === 0,
-      text: 'Rozdaj według klasy',
+      text: t('Rozdaj według klasy'),
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           pending = {};
@@ -227,13 +229,13 @@ export function mountStats(container) {
           type: 'button',
           class: 'button button--world button--small',
           disabled: busy,
-          text: 'Wyzeruj punkty',
+          text: t('Wyzeruj punkty'),
           onClick: async (event) => {
             const button = event.currentTarget;
             const sure = await confirmAction({
-              title: 'Wyzerować punkty?',
-              text: `Wszystkie rozdane punkty wrócą do puli. Do poziomu ${state.content.freeResetMaxLevel} zerowanie jest darmowe.`,
-              confirmLabel: 'Wyzeruj',
+              title: t('Wyzerować punkty?'),
+              text: t('Wszystkie rozdane punkty wrócą do puli. Do poziomu {level} zerowanie jest darmowe.', { level: state.content.freeResetMaxLevel }),
+              confirmLabel: t('Wyzeruj'),
             });
             if (sure) {
               await withButton(button, async () => {
@@ -291,7 +293,7 @@ export function mountStats(container) {
           {
             type: 'button',
             class: 'stat-add',
-            'aria-label': `Dodaj punkt: ${stat.name}`,
+            'aria-label': t('Dodaj punkt: {name}', { name: stat.name }),
             onClick: () => {
               pending = { ...pending, [stat.id]: extra + 1 };
               render();
@@ -317,36 +319,36 @@ export function mountStats(container) {
       h(
         'p',
         { class: 'stat-detail-title' },
-        effects.length > 0 ? 'Jeden punkt więcej:' : 'Jeden punkt więcej nie zmieni dziś Twoich wartości bojowych.',
+        effects.length > 0 ? t('Jeden punkt więcej:') : t('Jeden punkt więcej nie zmieni dziś Twoich wartości bojowych.'),
       ),
       effects.length > 0 &&
         h(
           'ul',
           { class: 'stat-detail-list' },
-          effects.map((effect) => h('li', {}, h('span', { text: effect.label }), h('span', { class: 'num', text: effect.format(stat.perPoint[effect.key]) }))),
+          effects.map((effect) => h('li', {}, h('span', { text: t(effect.label) }), h('span', { class: 'num', text: effect.format(stat.perPoint[effect.key]) }))),
         ),
       h(
         'p',
         { class: 'stat-detail-sources' },
-        sources.map((source) => `${source.label} ${formatNumber(stat.sources[source.id])}`).join(' · '),
+        sources.map((source) => `${t(source.label)} ${formatNumber(stat.sources[source.id])}`).join(' · '),
       ),
     );
   }
 
   function combatValues(character) {
     const values = [
-      ['Obrażenia', character.combat.damage, character.combat.damageKind],
-      ['Redukcja obrażeń', `${character.combat.reduction}%`, 'fizycznych'],
+      [t('Obrażenia'), character.combat.damage, character.combat.damageKind],
+      [t('Redukcja obrażeń'), `${character.combat.reduction}%`, t('fizycznych')],
       // Both grow with every character level, also without points (the
       // author: "Niech poziom Many i Zdrowia rośnie u każdej postaci
       // również bez zwiększania statystyk").
-      ['Maks. HP', formatNumber(character.combat.maxHp), `+${formatNumber(character.combat.perClassLevel.hp)} z każdym poziomem klasy`],
-      ['Maks. mana', formatNumber(character.combat.maxMana), `+${formatNumber(character.combat.perClassLevel.mana)} z każdym poziomem klasy`],
+      [t('Maks. HP'), formatNumber(character.combat.maxHp), t('+{count} z każdym poziomem klasy', { count: formatNumber(character.combat.perClassLevel.hp) })],
+      [t('Maks. mana'), formatNumber(character.combat.maxMana), t('+{count} z każdym poziomem klasy', { count: formatNumber(character.combat.perClassLevel.mana) })],
     ];
     return h(
       'section',
       { class: 'combat-values', 'aria-labelledby': 'combat-values-title' },
-      h('h2', { class: 'section-title', id: 'combat-values-title', text: 'Wartości bojowe' }),
+      h('h2', { class: 'section-title', id: 'combat-values-title', text: t('Wartości bojowe') }),
       h(
         'div',
         { class: 'value-grid' },
@@ -364,7 +366,7 @@ export function mountStats(container) {
         h('button', {
           type: 'button',
           class: 'button button--world button--small combat-extra',
-          text: 'Parametry dodatkowe',
+          text: t('Parametry dodatkowe'),
           onClick: () => openExtra(character),
         }),
     );
@@ -374,7 +376,7 @@ export function mountStats(container) {
     const confirm = h('button', {
       type: 'button',
       class: 'button button--system button--small',
-      text: 'Zatwierdź',
+      text: t('Zatwierdź'),
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
           const points = pending;
@@ -385,12 +387,12 @@ export function mountStats(container) {
     });
     return h(
       'div',
-      { class: 'pending-bar', role: 'region', 'aria-label': 'Rozdane punkty' },
-      h('span', { class: 'pending-text', text: `Wybrano ${formatNumber(total)} ${plural(total, 'punkt', 'punkty', 'punktów')}` }),
+      { class: 'pending-bar', role: 'region', 'aria-label': t('Rozdane punkty') },
+      h('span', { class: 'pending-text', text: t('Wybrano {count} {points}', { count: formatNumber(total), points: plural(total, 'punkt', 'punkty', 'punktów') }) }),
       h('button', {
         type: 'button',
         class: 'button button--world button--small',
-        text: 'Cofnij',
+        text: t('Cofnij'),
         onClick: () => {
           pending = {};
           render();

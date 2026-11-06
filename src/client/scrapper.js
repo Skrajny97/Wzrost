@@ -5,6 +5,7 @@
 
 import { h } from './dom.js';
 import { countOf, formatNumber } from './format.js';
+import { t } from './i18n.js';
 import { call, state } from './state.js';
 import { confirmAction, openSheet, toast } from './ui.js';
 
@@ -13,8 +14,8 @@ export function scrapperSheet() {
   const rarities = state.content.rarities;
   const rank = (item) => rarities.findIndex((rarity) => rarity.id === item.rarity);
   openSheet(
-    h('h2', { class: 'sheet-title', text: 'Złomiarz' }),
-    h('p', { class: 'sheet-text', text: 'Sprzedaj przedmioty z plecaka o rzadkości niższej lub równej:' }),
+    h('h2', { class: 'sheet-title', text: t('Złomiarz') }),
+    h('p', { class: 'sheet-text', text: t('Sprzedaj przedmioty z plecaka o rzadkości niższej lub równej:') }),
     h(
       'div',
       { class: 'scrap-options' },
@@ -31,24 +32,24 @@ export function scrapperSheet() {
             onClick: () => sell(rarity, amount, gold),
           },
           h('span', { class: 'item-name', vars: { '--rarity': rarity.color }, text: rarity.name }),
-          h('span', { class: 'scrap-detail', text: items.length > 0 ? `${amount} · ${formatNumber(gold)} złota` : 'nic do sprzedania' }),
+          h('span', { class: 'scrap-detail', text: items.length > 0 ? t('{items} · {gold} złota', { items: amount, gold: formatNumber(gold) }) : t('nic do sprzedania') }),
         );
       }),
     ),
-    h('p', { class: 'muted', text: 'Założone i ulepszone przedmioty oraz te z kamieniem zostają. Sprzedasz je bezpośrednio z pozycji plecaka.' }),
+    h('p', { class: 'muted', text: t('Założone i ulepszone przedmioty oraz te z kamieniem zostają. Sprzedasz je bezpośrednio z pozycji plecaka.') }),
   );
 }
 
 async function sell(rarity, amount, gold) {
   const sure = await confirmAction({
-    title: 'Sprzedać przedmioty?',
-    text: `Złomiarz kupi ${amount} (do rzadkości: ${rarity.name}) za ${formatNumber(gold)} złota.`,
-    confirmLabel: 'Sprzedaj',
+    title: t('Sprzedać przedmioty?'),
+    text: t('Złomiarz kupi {items} (do rzadkości: {rarity}) za {gold} złota.', { items: amount, rarity: rarity.name, gold: formatNumber(gold) }),
+    confirmLabel: t('Sprzedaj'),
   });
   if (!sure) return;
   try {
     const { sold } = await call('POST', '/api/items/sell', { maxRarity: rarity.id });
-    toast(`Sprzedano: ${countOf(sold.count, 'przedmiot', 'przedmioty', 'przedmiotów')} za ${formatNumber(sold.gold)} złota.`);
+    toast(t('Sprzedano: {items} za {gold} złota.', { items: countOf(sold.count, 'przedmiot', 'przedmioty', 'przedmiotów'), gold: formatNumber(sold.gold) }));
   } catch (error) {
     toast(error.message);
   }

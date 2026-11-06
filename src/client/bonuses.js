@@ -10,6 +10,7 @@
 import { potionSprite } from './art.js';
 import { h, icon } from './dom.js';
 import { countOf } from './format.js';
+import { t } from './i18n.js';
 
 // The fights a bonus has left: they go when a report is claimed
 // (characters.js), so they stay as they are on an exploration.
@@ -18,7 +19,7 @@ export const activeBuffs = (character) => (character?.buffs ?? []).filter((buff)
 // "4 walki", "1 walka".
 export const fightsLeft = (fights) => countOf(fights, 'walka', 'walki', 'walk');
 
-const leftText = (fights) => `jeszcze ${fightsLeft(fights)}`;
+const leftText = (fights) => t('jeszcze {fights}', { fights: fightsLeft(fights) });
 
 // The list, or null while no bonus works. A bonus's words are its name, a
 // colon and what it does (data/professions.json, buffLabels).
@@ -27,8 +28,8 @@ export function bonusList(character) {
   if (buffs.length === 0) return null;
   return h(
     'section',
-    { class: 'bonus-list', 'aria-label': 'Aktywne bonusy' },
-    h('h2', { class: 'bonus-title', text: 'Aktywne bonusy' }),
+    { class: 'bonus-list', 'aria-label': t('Aktywne bonusy') },
+    h('h2', { class: 'bonus-title', text: t('Aktywne bonusy') }),
     h(
       'ul',
       { class: 'bonus-rows' },

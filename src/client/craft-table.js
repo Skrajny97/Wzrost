@@ -9,6 +9,7 @@
 import { materialSprite } from './art.js';
 import { h, icon } from './dom.js';
 import { countOf, formatCountdown, formatDecimal, formatMinutes, formatNumber, saleGold, timeFormat } from './format.js';
+import { t } from './i18n.js';
 import { playSound } from './sound.js';
 import { call, state, testModeOn } from './state.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from './ui.js';
@@ -25,11 +26,17 @@ export function materialIcon(materialId, size = 24) {
 export async function craft(body) {
   const { ordered, skipped } = await call('POST', '/api/craft/materials', body);
   playSound('build');
-  const waiting = skipped > 0 ? ` Na wyższy poziom stołu ${skipped === 1 ? 'czeka' : 'czekają'}: ${countOf(skipped, 'materiał', 'materiały', 'materiałów')}.` : '';
-  toast(`${ordered === 1 ? 'Materiał trafił na stół.' : `Na stole: ${countOf(ordered, 'zlecenie', 'zlecenia', 'zleceń')}.`}${waiting}`);
+  const materials = skipped > 0 && countOf(skipped, 'materiał', 'materiały', 'materiałów');
+  const waiting = materials && (skipped === 1 ? t('Na wyższy poziom stołu czeka: {materials}.', { materials }) : t('Na wyższy poziom stołu czekają: {materials}.', { materials }));
+  toast(
+    [ordered === 1 ? t('Materiał trafił na stół.') : t('Na stole: {orders}.', { orders: countOf(ordered, 'zlecenie', 'zlecenia', 'zleceń') }), waiting]
+      .filter(Boolean)
+      .join(' '),
+  );
 }
 
-// What materials are, while there are none yet (the author's sentence).
+// What materials are, while there are none yet (the author's sentence),
+// shown in the page's language (t(), i18n.js) where it is used.
 export const MATERIALS_HINT = 'Z pokonanych stworów zdobędziesz różne materiały, które można przerobić na części do rzemiosła.';
 
 // A material's name as a title: "Skóra wilka", or "Rzadka skóra wilka" for
@@ -52,7 +59,7 @@ export function materialSheet(material, start = 1) {
   const needs = crafting?.materials.find((one) => one.key === material.key)?.needs ?? null;
   const art = materialSprite(material.materialId);
   const title = h('h2', { class: 'item-title', vars: { '--rarity': material.color }, text: materialTitle(material) });
-  const meta = h('p', { class: 'item-meta', text: `${material.rarityName} · ${formatNumber(material.count)} szt.` });
+  const meta = h('p', { class: 'item-meta', text: t('{rarity} · {count} szt.', { rarity: material.rarityName, count: formatNumber(material.count) }) });
   let count = start;
   const price = (amount) => saleGold(material.price, amount);
   const value = h('output', { class: 'herb-count-value' });
@@ -69,16 +76,16 @@ export function materialSheet(material, start = 1) {
             closeSheet();
           }),
       })
-    : table && h('a', { class: 'button button--world', href: `#/oboz/${table.id}`, onClick: closeSheet, text: 'Zbuduj Stół rozbiórki' });
-  const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
-  const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
-  const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(material.count) });
+    : table && h('a', { class: 'button button--world', href: `#/oboz/${table.id}`, onClick: closeSheet, text: t('Zbuduj Stół rozbiórki') });
+  const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Mniej'), text: '−', onClick: () => set(count - 1) });
+  const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Więcej'), text: '+', onClick: () => set(count + 1) });
+  const all = h('button', { type: 'button', class: 'link-button', text: t('wszystkie'), onClick: () => set(material.count) });
   function set(next) {
     count = Math.min(material.count, Math.max(1, next));
-    value.textContent = `${formatNumber(count)} szt.`;
-    makes.textContent = `Stół rozbiórki zrobi z tego: ${material.part} ×${formatNumber(count)}.`;
-    if (built) process.textContent = `Przerób ${formatNumber(count)} szt.`;
-    sell.textContent = `Sprzedaj za ${formatNumber(price(count))} złota`;
+    value.textContent = t('{count} szt.', { count: formatNumber(count) });
+    makes.textContent = t('Stół rozbiórki zrobi z tego: {part} ×{count}.', { part: material.part, count: formatNumber(count) });
+    if (built) process.textContent = t('Przerób {count} szt.', { count: formatNumber(count) });
+    sell.textContent = t('Sprzedaj za {gold} złota', { gold: formatNumber(price(count)) });
     less.disabled = count === 1;
     more.disabled = count === material.count;
   }
@@ -86,9 +93,14 @@ export function materialSheet(material, start = 1) {
   sell.addEventListener('click', async (event) => {
     const button = event.currentTarget;
     const sure = await confirmAction({
-      title: 'Sprzedać materiał?',
-      text: `Złomiarz kupi: ${materialTitle(material)} ×${formatNumber(count)} za ${formatNumber(price(count))} złota. Stół rozbiórki zrobiłby z tego: ${material.part} ×${formatNumber(count)}.`,
-      confirmLabel: 'Sprzedaj',
+      title: t('Sprzedać materiał?'),
+      text: t('Złomiarz kupi: {name} ×{count} za {gold} złota. Stół rozbiórki zrobiłby z tego: {part} ×{count}.', {
+        name: materialTitle(material),
+        count: formatNumber(count),
+        gold: formatNumber(price(count)),
+        part: material.part,
+      }),
+      confirmLabel: t('Sprzedaj'),
     });
     // Not sold: back to the material's card as it was, once the
     // confirmation's sheet has finished closing.
@@ -97,7 +109,7 @@ export function materialSheet(material, start = 1) {
       const { sold } = await call('POST', '/api/materials/sell', { key: material.key, count });
       closeSheet();
       playSound('coin');
-      toast(`Złomiarz kupił ${formatNumber(sold.count)} szt. za ${formatNumber(sold.gold)} złota.`);
+      toast(t('Złomiarz kupił {count} szt. za {gold} złota.', { count: formatNumber(sold.count), gold: formatNumber(sold.gold) }));
     });
   });
   openSheet(
@@ -107,9 +119,9 @@ export function materialSheet(material, start = 1) {
       art ? h('div', { class: 'item-head' }, h('span', { class: 'item-art', vars: { '--rarity': material.color } }, art), h('div', {}, title, meta)) : [title, meta],
       description && h('p', { class: 'sheet-text', text: description }),
       makes,
-      h('p', { class: 'sheet-text', text: `Złomiarz płaci ${formatDecimal(material.price)} złota za sztukę.` }),
-      built && needs !== null && h('p', { class: 'system-hint', text: `Ten materiał Stół rozbiórki przerobi od swojego poziomu ${needs}.` }),
-      built && needs === null && full && h('p', { class: 'system-hint', text: `Kolejka stołu jest pełna (${crafting.limit} zleceń). Poczekaj, aż skończy się pierwsze.` }),
+      h('p', { class: 'sheet-text', text: t('Złomiarz płaci {price} złota za sztukę.', { price: formatDecimal(material.price) }) }),
+      built && needs !== null && h('p', { class: 'system-hint', text: t('Ten materiał Stół rozbiórki przerobi od swojego poziomu {level}.', { level: needs }) }),
+      built && needs === null && full && h('p', { class: 'system-hint', text: t('Kolejka stołu jest pełna ({limit} zleceń). Poczekaj, aż skończy się pierwsze.', { limit: crafting.limit }) }),
     ),
     h('div', { class: 'herb-count' }, less, value, more, all),
     h('div', { class: 'sheet-actions' }, process, sell),
@@ -127,7 +139,7 @@ const markedItems = new Set();
 // (the author: "Dodajmy jeszcze opcje zaznaczania roznych materialow w Stole
 // rozbiórki"), each a whole stack and an order of its own.
 function materialsTab(crafting, built, full) {
-  if (crafting.materials.length === 0) return h('p', { class: 'system-hint', text: MATERIALS_HINT });
+  if (crafting.materials.length === 0) return h('p', { class: 'system-hint', text: t(MATERIALS_HINT) });
   const takes = (material) => material.needs === null;
   // Marks only on the stacks still there that the table takes.
   for (const key of [...markedMaterials]) if (!crafting.materials.some((material) => material.key === key && takes(material))) markedMaterials.delete(key);
@@ -151,10 +163,13 @@ function materialsTab(crafting, built, full) {
   const update = () => {
     const marked = markedMaterials.size;
     const tooMany = marked > room;
-    processMarked.textContent = marked > 0 ? `Przerób zaznaczone (${formatNumber(marked)})` : 'Przerób zaznaczone';
+    processMarked.textContent = marked > 0 ? t('Przerób zaznaczone ({count})', { count: formatNumber(marked) }) : t('Przerób zaznaczone');
     processMarked.disabled = !built || full || marked === 0 || tooMany;
     roomNote.hidden = !built || full || !tooMany;
-    roomNote.textContent = `Każdy materiał to osobne zlecenie stołu. Zaznaczone potrzebują ich: ${formatNumber(marked)}, a wolne miejsca w kolejce: ${formatNumber(room)}.`;
+    roomNote.textContent = t('Każdy materiał to osobne zlecenie stołu. Zaznaczone potrzebują ich: {count}, a wolne miejsca w kolejce: {room}.', {
+      count: formatNumber(marked),
+      room: formatNumber(room),
+    });
   };
   const row = (material) => {
     const mark = h(
@@ -163,7 +178,7 @@ function materialsTab(crafting, built, full) {
         type: 'button',
         class: 'craft-mark',
         'aria-pressed': String(markedMaterials.has(material.key)),
-        'aria-label': `Zaznacz: ${material.name} ×${material.count}`,
+        'aria-label': t('Zaznacz: {name} ×{count}', { name: material.name, count: material.count }),
         disabled: !built || !takes(material),
         onClick: () => {
           if (markedMaterials.has(material.key)) markedMaterials.delete(material.key);
@@ -179,7 +194,7 @@ function materialsTab(crafting, built, full) {
       { class: 'craft-row craft-row--pick' },
       h(
         'button',
-        { type: 'button', class: 'craft-open', 'aria-label': `${material.name} ×${material.count}: wybierz liczbę sztuk`, onClick: () => materialSheet(material) },
+        { type: 'button', class: 'craft-open', 'aria-label': t('{name} ×{count}: wybierz liczbę sztuk', { name: material.name, count: material.count }), onClick: () => materialSheet(material) },
         h('span', { class: 'craft-art' }, materialIcon(material.materialId)),
         h(
           'span',
@@ -187,7 +202,11 @@ function materialsTab(crafting, built, full) {
           h('span', { class: 'item-name', vars: { '--rarity': material.color }, text: `${material.name} ×${formatNumber(material.count)}` }),
           h('span', {
             class: 'item-meta',
-            text: [material.rarityName, `daje: ${material.part} ×${formatNumber(material.count)}`, material.needs ? `od poziomu ${material.needs} stołu` : built && formatMinutes(material.minutes)]
+            text: [
+              material.rarityName,
+              t('daje: {what}', { what: `${material.part} ×${formatNumber(material.count)}` }),
+              material.needs ? t('od poziomu {level} stołu', { level: material.needs }) : built && formatMinutes(material.minutes),
+            ]
               .filter(Boolean)
               .join(' · '),
           }),
@@ -198,7 +217,7 @@ function materialsTab(crafting, built, full) {
   };
   update();
   return [
-    built && h('p', { class: 'craft-note', text: 'Stuknij materiał, żeby przerobić albo sprzedać wybraną liczbę sztuk. Zaznacz kilka, żeby przerobić je naraz w całości.' }),
+    built && h('p', { class: 'craft-note', text: t('Stuknij materiał, żeby przerobić albo sprzedać wybraną liczbę sztuk. Zaznacz kilka, żeby przerobić je naraz w całości.') }),
     h('ul', { class: 'craft-list' }, crafting.materials.map(row)),
     built &&
       h(
@@ -211,12 +230,12 @@ function materialsTab(crafting, built, full) {
             type: 'button',
             class: 'button button--system',
             disabled: full || !crafting.materials.some(takes),
-            text: 'Przerób wszystko',
+            text: t('Przerób wszystko'),
             onClick: (event) => withButton(event.currentTarget, () => craft({ all: true })),
           }),
       ),
-    !built && h('p', { class: 'system-hint', text: 'Zbuduj stół, żeby przerabiać materiały i rozbierać przedmioty.' }),
-    built && full && h('p', { class: 'system-hint', text: `Kolejka jest pełna (${crafting.limit} zleceń). Poczekaj, aż skończy się pierwsze.` }),
+    !built && h('p', { class: 'system-hint', text: t('Zbuduj stół, żeby przerabiać materiały i rozbierać przedmioty.') }),
+    built && full && h('p', { class: 'system-hint', text: t('Kolejka jest pełna ({limit} zleceń). Poczekaj, aż skończy się pierwsze.', { limit: crafting.limit }) }),
   ];
 }
 
@@ -227,11 +246,11 @@ function materialsTab(crafting, built, full) {
 function itemsTab(built, picker) {
   const bag = state.character.bag.filter((item) => item.salvage);
   for (const id of [...markedItems]) if (!bag.some((item) => item.id === id)) markedItems.delete(id);
-  if (!built) return h('p', { class: 'system-hint', text: 'Zbuduj stół, żeby przerabiać materiały i rozbierać przedmioty.' });
-  if (bag.length === 0) return h('p', { class: 'system-hint', text: 'W plecaku nie ma przedmiotów do rozbiórki. Łupy z wypraw trafiają do plecaka.' });
+  if (!built) return h('p', { class: 'system-hint', text: t('Zbuduj stół, żeby przerabiać materiały i rozbierać przedmioty.') });
+  if (bag.length === 0) return h('p', { class: 'system-hint', text: t('W plecaku nie ma przedmiotów do rozbiórki. Łupy z wypraw trafiają do plecaka.') });
   const { nodes, update } = picker(markedItems, { inline: true });
   update();
-  return [h('p', { class: 'craft-note', text: 'Zaznacz przedmioty z plecaka, które stół ma rozebrać. Ponowne stuknięcie odznacza przedmiot.' }), ...nodes];
+  return [h('p', { class: 'craft-note', text: t('Zaznacz przedmioty z plecaka, które stół ma rozebrać. Ponowne stuknięcie odznacza przedmiot.') }), ...nodes];
 }
 
 // An order as its row names it: "Skóra wilka ×12".
@@ -333,7 +352,10 @@ function queueCard(crafting, ticks) {
         'span',
         { class: 'craft-text' },
         h('span', { class: 'item-name', vars: { '--rarity': order.color }, text: orderLabel(order) }),
-        h('span', { class: 'item-meta', text: `${order.kind === 'material' ? 'przeróbka' : 'rozbiórka'} · daje: ${order.part} ×${formatNumber(order.parts)}` }),
+        h('span', {
+          class: 'item-meta',
+          text: `${order.kind === 'material' ? t('przeróbka') : t('rozbiórka')} · ${t('daje: {what}', { what: `${order.part} ×${formatNumber(order.parts)}` })}`,
+        }),
         // Its time and its button in one line, the button below on a narrow screen.
         h('span', { class: 'craft-foot' }, extra, cancel(order)),
       ),
@@ -341,12 +363,12 @@ function queueCard(crafting, ticks) {
   const leaving = crafting.queue.filter((order) => order.cancellable).length;
   return h(
     'section',
-    { class: 'craft-card', 'aria-label': `Kolejka (${crafting.queue.length} z ${crafting.limit})` },
+    { class: 'craft-card', 'aria-label': t('Kolejka ({count} z {limit})', { count: crafting.queue.length, limit: crafting.limit }) },
     h(
       'ol',
       { class: 'craft-list' },
       row(first, h('span', { class: 'craft-progress' }, h('div', { class: 'bar' }, progress), countdown)),
-      waiting.map((order) => row(order, h('span', { class: 'item-meta', text: `Gotowe o ${timeFormat.format(new Date(order.endsAt))}` }))),
+      waiting.map((order) => row(order, h('span', { class: 'item-meta', text: t('Gotowe o {time}', { time: timeFormat.format(new Date(order.endsAt)) }) }))),
     ),
     leaving > 1 &&
       h('button', {
@@ -365,11 +387,11 @@ function testSkip() {
   return h(
     'div',
     { class: 'test-tools' },
-    h('p', { class: 'test-tools-text', text: 'Tryb testowy: kolejka skończy się od razu.' }),
+    h('p', { class: 'test-tools-text', text: t('Tryb testowy: kolejka skończy się od razu.') }),
     h('button', {
       type: 'button',
       class: 'button button--test',
-      text: 'Pomiń czas',
+      text: t('Pomiń czas'),
       onClick: (event) => withButton(event.currentTarget, () => call('POST', '/api/test/skip-craft')),
     }),
   );
@@ -378,7 +400,7 @@ function testSkip() {
 function partsCard(crafting) {
   return h(
     'section',
-    { class: 'craft-card', 'aria-label': 'Części' },
+    { class: 'craft-card', 'aria-label': t('Części') },
     h(
       'ul',
       { class: 'craft-list craft-list--parts' },
@@ -397,7 +419,7 @@ function partsCard(crafting) {
         ),
       ),
     ),
-    h('p', { class: 'system-hint', text: 'Z części powstaną przedmioty w profesjach, które dojdą później.' }),
+    h('p', { class: 'system-hint', text: t('Z części powstaną przedmioty w profesjach, które dojdą później.') }),
   );
 }
 
@@ -411,14 +433,16 @@ export function craftTableSection(ticks, picker) {
   const items = state.character.bag.filter((item) => item.salvage).length;
   const parts = crafting.parts.reduce((sum, part) => sum + part.count, 0);
   const tabs = {
-    materials: { label: pieces > 0 ? `Materiały (${formatNumber(pieces)})` : 'Materiały', body: () => materialsTab(crafting, built, full) },
-    items: { label: items > 0 ? `Przedmioty (${formatNumber(items)})` : 'Przedmioty', body: () => itemsTab(built, picker) },
+    materials: { label: pieces > 0 ? t('Materiały ({count})', { count: formatNumber(pieces) }) : t('Materiały'), body: () => materialsTab(crafting, built, full) },
+    items: { label: items > 0 ? t('Przedmioty ({count})', { count: formatNumber(items) }) : t('Przedmioty'), body: () => itemsTab(built, picker) },
     queue: {
-      label: `Kolejka (${crafting.queue.length}/${crafting.limit})`,
+      label: t('Kolejka ({count}/{limit})', { count: crafting.queue.length, limit: crafting.limit }),
       body: () =>
-        crafting.queue.length > 0 ? queueCard(crafting, tableTicks) : h('p', { class: 'system-hint', text: 'Kolejka jest pusta. Przerób materiały albo rozbierz przedmioty, a zlecenia staną tutaj.' }),
+        crafting.queue.length > 0
+          ? queueCard(crafting, tableTicks)
+          : h('p', { class: 'system-hint', text: t('Kolejka jest pusta. Przerób materiały albo rozbierz przedmioty, a zlecenia staną tutaj.') }),
     },
-    parts: { label: parts > 0 ? `Części (${formatNumber(parts)})` : 'Części', body: () => partsCard(crafting) },
+    parts: { label: parts > 0 ? t('Części ({count})', { count: formatNumber(parts) }) : t('Części'), body: () => partsCard(crafting) },
   };
   const shown = tabs[tableTab] ? tableTab : 'materials';
   const body = h('div', { class: 'craft-tab' });
@@ -446,11 +470,11 @@ export function craftTableSection(ticks, picker) {
       crafting.materials.length === 0 &&
       crafting.queue.length === 0 &&
       items === 0 &&
-      systemPanel('Stół czeka na materiały i przedmioty z plecaka. Zdobędziesz je na wyprawach.'),
+      systemPanel(t('Stół czeka na materiały i przedmioty z plecaka. Zdobędziesz je na wyprawach.')),
     h(
       'section',
-      { class: 'card craft-card', 'aria-label': 'Stół rozbiórki' },
-      h('div', { class: 'segmented craft-tabs', role: 'group', 'aria-label': 'Stół rozbiórki' }, Object.keys(tabs).map(tab)),
+      { class: 'card craft-card', 'aria-label': t('Stół rozbiórki') },
+      h('div', { class: 'segmented craft-tabs', role: 'group', 'aria-label': t('Stół rozbiórki') }, Object.keys(tabs).map(tab)),
       body,
     ),
   ];

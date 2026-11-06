@@ -7,6 +7,7 @@
 import { materialSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf } from '../format.js';
+import { t } from '../i18n.js';
 import { call, state } from '../state.js';
 import { systemPanel, toast, withButton } from '../ui.js';
 import { itemSheet, itemSummary } from './character.js';
@@ -42,24 +43,24 @@ export function mountChest(container, onBack) {
         h(
           'div',
           { class: 'page-heading-text' },
-          h('h1', { class: 'page-title', tabindex: '-1', text: 'Skrzynia Konta' }),
-          h('p', { class: 'page-subtitle', text: 'Wspólna dla postaci na koncie' }),
+          h('h1', { class: 'page-title', tabindex: '-1', text: t('Skrzynia Konta') }),
+          h('p', { class: 'page-subtitle', text: t('Wspólna dla postaci na koncie') }),
         ),
-        h('button', { type: 'button', class: 'button button--system back-button', onClick: onBack }, icon('back', { size: 20 }), 'Powrót'),
+        h('button', { type: 'button', class: 'button button--system back-button', onClick: onBack }, icon('back', { size: 20 }), t('Powrót')),
       ),
       systemPanel(
-        `Skrzynia Konta mieści ${chest ? countOf(chest.slots, 'przedmiot', 'przedmioty', 'przedmiotów') : '…'} i jest wspólna dla wszystkich postaci na tym koncie.`,
+        t('Skrzynia Konta mieści {items} i jest wspólna dla wszystkich postaci na tym koncie.', { items: chest ? countOf(chest.slots, 'przedmiot', 'przedmioty', 'przedmiotów') : '…' }),
         // The author's words: "Encyklopedia nie zaliczy przedmiotu: [...]".
-        'Encyklopedia nie zaliczy przedmiotu: liczy się tylko to, co postać sama zdobędzie albo wytworzy.',
+        t('Encyklopedia nie zaliczy przedmiotu: liczy się tylko to, co postać sama zdobędzie albo wytworzy.'),
       ),
       chest &&
         h(
           'section',
           // The narrator points here on the first look (narrator.js).
-          { class: 'card chest-section', 'aria-label': 'W skrzyni', 'data-guide': 'account-chest' },
-          h('div', { class: 'chest-head' }, h('span', { class: 'chest-art' }, materialSprite('chest')), h('h2', { class: 'section-title', text: `W skrzyni · ${chest.items.length} / ${chest.slots}` })),
+          { class: 'card chest-section', 'aria-label': t('W skrzyni'), 'data-guide': 'account-chest' },
+          h('div', { class: 'chest-head' }, h('span', { class: 'chest-art' }, materialSprite('chest')), h('h2', { class: 'section-title', text: t('W skrzyni · {count} / {slots}', { count: chest.items.length, slots: chest.slots }) })),
           chest.items.length === 0
-            ? h('p', { class: 'muted', text: 'Skrzynia jest pusta. Włóż do niej przedmiot z plecaka.' })
+            ? h('p', { class: 'muted', text: t('Skrzynia jest pusta. Włóż do niej przedmiot z plecaka.') })
             : h(
                 'ul',
                 { class: 'chest-list' },
@@ -71,8 +72,8 @@ export function mountChest(container, onBack) {
                     h('button', {
                       type: 'button',
                       class: 'button button--system button--small',
-                      text: 'Wyjmij',
-                      onClick: act('/api/chest/take', { id: item.id }, `${item.name}: w plecaku.`),
+                      text: t('Wyjmij'),
+                      onClick: act('/api/chest/take', { id: item.id }, t('{name}: w plecaku.', { name: item.name })),
                     }),
                   ),
                 ),
@@ -81,10 +82,10 @@ export function mountChest(container, onBack) {
       chest &&
         h(
           'section',
-          { class: 'card chest-section', 'aria-label': 'Plecak' },
-          h('h2', { class: 'section-title', text: `Plecak · ${countOf(character.bag.length, 'przedmiot', 'przedmioty', 'przedmiotów')}` }),
+          { class: 'card chest-section', 'aria-label': t('Plecak') },
+          h('h2', { class: 'section-title', text: t('Plecak · {items}', { items: countOf(character.bag.length, 'przedmiot', 'przedmioty', 'przedmiotów') }) }),
           character.bag.length === 0
-            ? h('p', { class: 'muted', text: 'W plecaku nie ma przedmiotów.' })
+            ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotów.') })
             : h(
                 'ul',
                 { class: 'chest-list' },
@@ -97,8 +98,8 @@ export function mountChest(container, onBack) {
                       type: 'button',
                       class: 'button button--world button--small',
                       disabled: room <= 0,
-                      text: 'Włóż',
-                      onClick: act('/api/chest/put', { itemId: item.id }, `${item.name}: w Skrzyni Konta.`),
+                      text: t('Włóż'),
+                      onClick: act('/api/chest/put', { itemId: item.id }, t('{name}: w Skrzyni Konta.', { name: item.name })),
                     }),
                   ),
                 ),
@@ -109,8 +110,8 @@ export function mountChest(container, onBack) {
 
   // Who put the item in, and whether this character wears it at once.
   function note(item, character) {
-    const from = item.own ? 'Twój przedmiot' : item.from ? `Od postaci ${item.from}` : 'Od postaci, której już nie ma';
-    const wear = !item.usable ? 'nie dla tej klasy' : item.wornFrom && item.wornFrom > character.classLevel ? `założysz od poziomu klasy ${item.wornFrom}` : null;
+    const from = item.own ? t('Twój przedmiot') : item.from ? t('Od postaci {name}', { name: item.from }) : t('Od postaci, której już nie ma');
+    const wear = !item.usable ? t('nie dla tej klasy') : item.wornFrom && item.wornFrom > character.classLevel ? t('założysz od poziomu klasy {level}', { level: item.wornFrom }) : null;
     return [from, wear].filter(Boolean).join(' · ');
   }
 

@@ -17,12 +17,14 @@ import { skillSprite } from './art.js';
 import { friendsSeen, wantConversation, wantMention } from './chat-news.js';
 import { portraitBox } from './cosmetics.js';
 import { h, icon } from './dom.js';
+import { t } from './i18n.js';
 import { SLOT_ICONS } from './icons.js';
 import { call, isUnlocked, state } from './state.js';
 import { closeSheet, confirmAction, framedName, guildTag, openSheet, toast, withButton } from './ui.js';
 import { itemSummary } from './screens/character.js';
 import { proposeTrade } from './screens/trade.js';
 
+// Shown in the page's language (t(), i18n.js).
 const PATHS = { main: 'ścieżka główna', second: 'ścieżka poboczna' };
 
 export async function openProfile(name, { onChange, mention } = {}) {
@@ -42,12 +44,12 @@ export async function openProfile(name, { onChange, mention } = {}) {
           profile.guild && [' ', guildTag(profile.guild.tag)],
           profile.role && h('span', { class: `chat-role chat-role--${profile.role}`, text: ` (${profile.role})` }),
         ),
-        h('p', { class: 'profile-levels', text: `${profile.className} · poziom ${profile.level} · klasa ${profile.classLevel}` }),
-        profile.guild && h('p', { class: 'profile-levels', text: `Gildia: ${profile.guild.name} [${profile.guild.tag}]` }),
+        h('p', { class: 'profile-levels', text: t('{className} · poziom {level} · klasa {classLevel}', { className: profile.className, level: profile.level, classLevel: profile.classLevel }) }),
+        profile.guild && h('p', { class: 'profile-levels', text: t('Gildia: {name} [{tag}]', { name: profile.guild.name, tag: profile.guild.tag }) }),
       ),
     ),
     profile.relation?.state !== 'self' && friendship(profile, onChange, mention),
-    h('h3', { class: 'profile-section', text: 'Ekwipunek' }),
+    h('h3', { class: 'profile-section', text: t('Ekwipunek') }),
     h(
       'ul',
       { class: 'profile-items' },
@@ -64,16 +66,16 @@ export async function openProfile(name, { onChange, mention } = {}) {
                   'ul',
                   { class: 'item-properties' },
                   item.properties.map((line) => h('li', { text: line })),
-                  item.classNames && h('li', { class: 'item-classes', text: `${item.classNames.length > 1 ? 'Dla klas' : 'Dla klasy'}: ${item.classNames.join(', ')}` }),
+                  item.classNames && h('li', { class: 'item-classes', text: t(item.classNames.length > 1 ? 'Dla klas: {classes}' : 'Dla klasy: {classes}', { classes: item.classNames.join(', ') }) }),
                 ),
               )
-            : h('p', { class: 'profile-empty' }, icon(SLOT_ICONS[slot] ?? 'unknown', { size: 20 }), h('span', { text: `${slotName}: pusto` })),
+            : h('p', { class: 'profile-empty' }, icon(SLOT_ICONS[slot] ?? 'unknown', { size: 20 }), h('span', { text: t('{slot}: pusto', { slot: slotName }) })),
         ),
       ),
     ),
-    h('h3', { class: 'profile-section', text: 'Umiejętności' }),
+    h('h3', { class: 'profile-section', text: t('Umiejętności') }),
     profile.skills.length === 0
-      ? h('p', { class: 'muted', text: 'Jeszcze żadnej.' })
+      ? h('p', { class: 'muted', text: t('Jeszcze żadnej.') })
       : h(
           'ul',
           { class: 'profile-skills' },
@@ -86,7 +88,7 @@ export async function openProfile(name, { onChange, mention } = {}) {
                 'span',
                 { class: 'profile-skill-text' },
                 h('strong', { text: skill.name }),
-                h('span', { class: 'profile-skill-meta', text: `poziom ${skill.level} z ${skill.maxLevel} · ${PATHS[skill.path]}` }),
+                h('span', { class: 'profile-skill-meta', text: t('poziom {level} z {max} · {path}', { level: skill.level, max: skill.maxLevel, path: t(PATHS[skill.path]) }) }),
               ),
             ),
           ),
@@ -110,28 +112,28 @@ function friendship(profile, onChange, mention) {
     h('button', { type: 'button', class: `button button--${kind} button--small`, text: label, onClick: (event) => withButton(event.currentTarget, run) });
   const note = (...children) => h('span', { class: 'profile-relation' }, children);
   const parts = !relation
-    ? [button('Dodaj do znajomych', act('/api/friends/invite', { name }), 'system')]
+    ? [button(t('Dodaj do znajomych'), act('/api/friends/invite', { name }), 'system')]
     : relation.state === 'sent'
-      ? [note('Zaproszenie wysłane.'), button('Cofnij', act('/api/friends/remove', { id: relation.id }, `Zaproszenie dla postaci ${name} cofnięte.`))]
+      ? [note(t('Zaproszenie wysłane.')), button(t('Cofnij'), act('/api/friends/remove', { id: relation.id }, t('Zaproszenie dla postaci {name} cofnięte.', { name })))]
       : relation.state === 'received'
         ? [
-            button('Przyjmij zaproszenie', act('/api/friends/accept', { id: relation.id }), 'system'),
-            button('Odrzuć', act('/api/friends/remove', { id: relation.id }, `Zaproszenie od postaci ${name} odrzucone.`)),
+            button(t('Przyjmij zaproszenie'), act('/api/friends/accept', { id: relation.id }), 'system'),
+            button(t('Odrzuć'), act('/api/friends/remove', { id: relation.id }, t('Zaproszenie od postaci {name} odrzucone.', { name }))),
           ]
         : [
             relation.sentToday
-              ? note(icon('gift', { size: 16 }), `${state.content.community.gift.name} wysłany dziś.`)
-              : button(`Wyślij ${state.content.community.gift.name}`, act('/api/friends/gift', { id: relation.id }), 'system'),
+              ? note(icon('gift', { size: 16 }), t('{gift} wysłany dziś.', { gift: state.content.community.gift.name }))
+              : button(t('Wyślij {gift}', { gift: state.content.community.gift.name }), act('/api/friends/gift', { id: relation.id }), 'system'),
             button(
-              'Usuń ze znajomych',
+              t('Usuń ze znajomych'),
               async () => {
                 const sure = await confirmAction({
-                  title: 'Usunąć ze znajomych?',
-                  text: `${name} zniknie z Twoich znajomych, a Ty z listy tej postaci.`,
-                  confirmLabel: 'Usuń',
+                  title: t('Usunąć ze znajomych?'),
+                  text: t('{name} zniknie z Twoich znajomych, a Ty z listy tej postaci.', { name }),
+                  confirmLabel: t('Usuń'),
                   danger: true,
                 });
-                if (sure) await act('/api/friends/remove', { id: relation.id }, `${name} nie jest już wśród Twoich znajomych.`)();
+                if (sure) await act('/api/friends/remove', { id: relation.id }, t('{name} nie jest już wśród Twoich znajomych.', { name }))();
                 else await again();
               },
               'danger',
@@ -142,7 +144,7 @@ function friendship(profile, onChange, mention) {
   const guildInvite =
     profile.guildInvite === 'can'
       ? button(
-          'Zaproś do gildii',
+          t('Zaproś do gildii'),
           async () => {
             const answer = await call('POST', '/api/guild/invite', { name });
             toast(answer.text);
@@ -151,7 +153,7 @@ function friendship(profile, onChange, mention) {
           'system',
         )
       : profile.guildInvite === 'sent'
-        ? note('Zaproszenie do gildii wysłane.')
+        ? note(t('Zaproszenie do gildii wysłane.'))
         : null;
   return h('div', { class: 'profile-friend' }, whisper(profile), tagButton(profile, mention), tradeButton(profile), parts, guildInvite, tradeBlock(profile, again));
 }
@@ -180,7 +182,7 @@ const tradeButton = (profile) =>
   h('button', {
     type: 'button',
     class: 'button button--system button--small',
-    text: 'Wymiana',
+    text: t('Wymiana'),
     onClick: (event) => withButton(event.currentTarget, () => proposeTrade({ id: profile.id, name: profile.name })),
   });
 
@@ -190,11 +192,11 @@ function tradeBlock(profile, again) {
   return h('button', {
     type: 'button',
     class: 'button button--world button--small',
-    text: blocked ? 'Odblokuj wymianę' : 'Zablokuj wymianę',
+    text: blocked ? t('Odblokuj wymianę') : t('Zablokuj wymianę'),
     onClick: (event) =>
       withButton(event.currentTarget, async () => {
         await call('POST', '/api/trade/block', { id: profile.id, blocked: !blocked });
-        toast(blocked ? `${profile.name} znów może zaproponować Ci wymianę.` : `${profile.name} nie zaproponuje Ci już wymiany.`);
+        toast(blocked ? t('{name} znów może zaproponować Ci wymianę.', { name: profile.name }) : t('{name} nie zaproponuje Ci już wymiany.', { name: profile.name }));
         await again();
       }),
   });
@@ -206,7 +208,7 @@ function whisper(profile) {
   return h('button', {
     type: 'button',
     class: 'button button--system button--small',
-    text: 'Prywatna wiadomość',
+    text: t('Prywatna wiadomość'),
     onClick: () => {
       closeSheet();
       wantConversation({ id: profile.id, name: profile.name });
