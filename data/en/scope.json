@@ -283,7 +283,37 @@
     "src/server/sessions.js",
     "src/server/throttle.js",
     "src/server/time.js",
-    "src/server/tutorial.js"
+    "src/server/tutorial.js",
+    "src/server/characters.js",
+    "src/server/hunts.js",
+    "src/server/camp.js",
+    "src/server/inventory.js",
+    "src/server/quests.js",
+    "src/server/crafting.js",
+    "src/server/chest.js",
+    "src/server/bestiary.js",
+    "src/server/reports.js",
+    "src/server/trips.js",
+    "src/server/content.js",
+    "src/server/perks.js",
+    "src/engine/text.js",
+    "src/engine/items.js",
+    "src/engine/hunt.js",
+    "src/engine/events.js",
+    "src/engine/camp.js",
+    "src/engine/fire.js",
+    "src/engine/exchange.js",
+    "src/engine/shop.js",
+    "src/engine/builder-spirit.js",
+    "src/engine/crafting.js",
+    "src/engine/threat.js",
+    "src/engine/combat.js",
+    "src/engine/progression.js",
+    "src/engine/quests.js",
+    "src/engine/unlocks.js",
+    "src/engine/potions.js",
+    "src/engine/notifications.js",
+    "src/engine/mail.js"
   ],
   "ignore": [
     "Google",
@@ -296,6 +326,7 @@
     "password",
     "{} · {}, poziom {}, klasa {}",
     "Polski",
-    "English"
+    "English",
+    "próba"
   ]
 }

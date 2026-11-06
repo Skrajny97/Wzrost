@@ -4,7 +4,7 @@ import { sendLink } from './email.js';
 import { registrationOpen } from './features.js';
 import { googleConfigured } from './google.js';
 import { ApiError, json, readJson } from './http.js';
-import { LANGUAGES, language, runInLanguage } from './i18n.js';
+import { LANGUAGES, language } from './i18n.js';
 import { englishOn } from './features.js';
 import { marketRemoval } from './market.js';
 import { guildRemoval } from './guilds.js';
@@ -82,7 +82,7 @@ export async function register({ request, env, now }) {
   const password = validatePassword(body.password);
   // The language picked in the form ("Język gry"), else the page's; Polish
   // where English is off.
-  const accountLanguage = englishOn() && body.language !== undefined ? validLanguage(body.language) : language();
+  const chosenLanguage = englishOn() && body.language !== undefined ? validLanguage(body.language) : language();
   const db = env.DB;
 
   if (await db.prepare('SELECT 1 FROM users WHERE login = ?').bind(login).first()) throw loginTaken();
@@ -95,7 +95,7 @@ export async function register({ request, env, now }) {
   try {
     const result = await db
       .prepare('INSERT INTO users (login, email, password_hash, created_at, email_required, language) VALUES (?, ?, ?, ?, 1, ?)')
-      .bind(login, email, passwordHash, now, accountLanguage)
+      .bind(login, email, passwordHash, now, chosenLanguage)
       .run();
     userId = result.meta.last_row_id;
   } catch (error) {
@@ -111,12 +111,12 @@ export async function register({ request, env, now }) {
   let emailSent = true;
   try {
     // In the account's language, whatever the page shows.
-    await runInLanguage(accountLanguage, () => sendLink(env, { userId, login, email }, new URL(request.url).origin, now));
+    await sendLink(env, { userId, login, email, language: chosenLanguage }, new URL(request.url).origin, now);
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
     emailSent = false;
   }
-  const user = userView({ login, email, created_at: now, google_sub: null, email_confirmed_at: null, email_required: 1, skip_tutorials: 0, language: accountLanguage });
+  const user = userView({ login, email, created_at: now, google_sub: null, email_confirmed_at: null, email_required: 1, skip_tutorials: 0, language: chosenLanguage });
   return json({ user: { ...user, testMode: testModeFor(env, login), tutorialTests: tutorialTestsFor(env, login), author: false }, emailSent }, 201, {
     'Set-Cookie': sessionCookie(session.token, session.expiresAt, now),
   });

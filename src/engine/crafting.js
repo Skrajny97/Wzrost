@@ -14,6 +14,7 @@
 
 import { campBonus } from './camp.js';
 import { countEvents } from './rng.js';
+import { nameInText } from './text.js';
 
 // A material at one rarity, as the store keeps it: "wolf-pelt:rare".
 export const stackKey = (materialId, rarityId) => `${materialId}:${rarityId}`;
@@ -156,17 +157,19 @@ export function materialDrops(monsterId, level, weight, rng, content, trophy = n
 }
 
 // A stack as the report and the table show it. The name has the rarity only
-// when it is above the species': "skóra wilka", "rzadka skóra wilka".
+// when it is above the species': "skóra wilka", "rzadka skóra wilka" (in
+// English with the name's capitals, nameInText).
 export function materialView(key, count, content) {
   const { materialId, rarityId } = parseStack(key);
   const material = content.materialsById[materialId];
   const rarity = content.raritiesById[rarityId];
   const raised = rarityId !== material.rarity;
+  const name = nameInText(material.name, content);
   return {
     key,
     materialId,
     name: material.name,
-    label: raised ? `${rarity.forms[material.gender]} ${material.name.toLowerCase()}` : material.name.toLowerCase(),
+    label: raised ? `${rarity.forms[material.gender]} ${name}` : name,
     rarity: rarity.id,
     rarityName: rarity.name,
     color: rarity.color,

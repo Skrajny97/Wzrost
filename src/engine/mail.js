@@ -1,5 +1,7 @@
 // The e-mail with the link that confirms an account's address
-// (src/server/email.js sends it). The words come from data/texts.json.
+// (src/server/email.js sends it). The words come from data/texts.json, in
+// the content's language, which the page names too (`language`, from
+// src/server/content.js; Polish for the data as it is).
 
 import { say } from './text.js';
 
@@ -23,7 +25,7 @@ export function confirmationEmail({ login, link }, content) {
     subject: say(texts, 'emailConfirmSubject', 0),
     text: [words.intro, link, words.reward, words.ignore].join('\n\n'),
     html: [
-      '<!doctype html><html lang="pl"><body style="margin:0;padding:24px;background:#f4efe4;font-family:Georgia,serif;color:#2b2418;font-size:16px;line-height:1.5">',
+      `<!doctype html><html lang="${escapeHtml(content.language ?? 'pl')}"><body style="margin:0;padding:24px;background:#f4efe4;font-family:Georgia,serif;color:#2b2418;font-size:16px;line-height:1.5">`,
       '<div style="max-width:480px;margin:0 auto">',
       paragraph(words.intro),
       `<p style="margin:0 0 16px"><a href="${href}" style="display:inline-block;padding:12px 20px;background:#5b3f1d;color:#fff8e7;text-decoration:none;border-radius:6px;font-weight:bold">${escapeHtml(words.button)}</a></p>`,
