@@ -3034,6 +3034,31 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.85 (6.11.2026)
+
+Narrator: dwie poprawione karty, kwestia o Sklepie Systemu we wprowadzeniu i kwestie miejsc (Gildia, Drużyna, Kamień węgielny, Trudna wyprawa, Skrzynia Konta, Zbieracz Systemu, omdlenie) z nagraniami, które wybrał autor: zob. „Kwestie narratora z 6.11.2026”.
+
+## Kwestie narratora z 6.11.2026: miejsca, Sklep Systemu i dwie poprawione karty (673–681, 699; 6.11.2026, od 0.1.85)
+
+Autor zatwierdził 6.11.2026 brzmienie dwóch poprawionych kart i trzynastu nowych kwestii (673–681), a z dwóch nagrań każdej wybrał jedno (699).
+
+1. **Poprawione karty.** Profesje kończą się zdaniem „Na pozostałe profesje przyjdzie jeszcze czas.” (było „Na Rzemieślnictwo…”). Karta o wyborze ścieżki mówi „Trzecia ścieżka się wtedy zamknie.” (było „zamknie się wtedy na zawsze”). Kto słyszał dawne brzmienie, nie usłyszy ich drugi raz. Nowe nagrania zastępują dawne pod tymi samymi nazwami.
+2. **Wprowadzenie o jedną kwestię dłuższe.** Po Encyklopedii, przed ostatnią kartą, narrator wskazuje Sklep Systemu w górnym pasku: „Punkty Systemu wydasz w Sklepie Systemu. Kupisz w nim ozdoby, które zmieniają wygląd.” Postać, która skończyła wprowadzenie wcześniej, usłyszy ją raz, przy najbliższym wejściu do gry, jak kwestię o Encyklopedii, ale nigdy nad raportem. „Pomiń wprowadzenie” pomija ją razem z wprowadzeniem.
+3. **Kwestie miejsc.** Każda przychodzi przy pierwszym spojrzeniu na swoje miejsce, z pierścieniem wokół niego, gdy nie czeka żaden rozdział. Dostają je też postacie, które były tam przed tą wersją, jak kwestie 641–647 (brakujący szczegół).
+    - **Gildia** (członek gildii): przy pierwszym wejściu na stronę Gildii kwestia o zakładkach. Potem przy pierwszym spojrzeniu na każdą zakładkę jej kwestia: Siedziba (cztery budynki), Bestia (bestia, pasek HP i „Atakuj”), Próby (tytuł „Tablica prób” i zdanie pod nim, bo cała tablica jest wyższa od ekranu), Prośby i Wymiana (część gracza i część członków). Kwestia o Wyprawie Gildii (646) zostaje.
+    - **Drużyna:** od 10. poziomu postaci, przy pierwszym wejściu do Społeczności. Narrator sam otwiera zakładkę Drużyna i ją wskazuje (Społeczność otwiera się potem na Drużynie, jak po stuknięciu gracza). Gdy czeka kwestia o Szybkim Polowaniu, Drużyna przychodzi po niej.
+    - **Kamień węgielny:** po objaśnieniu Osady, przy pierwszym wejściu do obozu, dopóki obóz nie jest Warownią.
+    - **Trudna wyprawa:** od 10. poziomu, przy pierwszym wejściu na miejsce wyprawy z postacią w obozie. Narrator sam rozwija „Opcje wyprawy” (zostają rozwinięte) i wskazuje „Trudną wyprawę”. Gdy czeka kwestia o Szybkim Polowaniu, przychodzi po niej.
+    - **Skrzynia Konta:** przy pierwszym wejściu do niej, z pierścieniem wokół „W skrzyni”.
+    - **Zbieracz Systemu:** przy wejściu do obozu, dopóki nie jest kupiony; na planszy z Kamieniem węgielnym po nim.
+    - **Omdlenie:** przy pierwszym raporcie z wyprawy zakończonej omdleniem, 2,5 s po jego otwarciu, żeby gracz najpierw zobaczył raport. Pierścień obejmuje podsumowanie. Kwestia przychodzi także przy raporcie otwartym z Dziennika. Raporty sprzed 0.1.73, w których łupy zostawały, jej nie mają.
+4. **Części objaśnień (brakujący szczegół).** Gildia to jedna część: sześć nowych kwestii i Wyprawa. Przy każdej poza ostatnią (o Wyprawie) jest „Pomiń objaśnienie”, które pomija wszystkie objaśnienia Gildii, z komunikatem „Objaśnienie pominięte. Gildia czeka w Społeczności, w zakładce Gildia.”. Każda z pozostałych kwestii miejsc to osobna część, jak Warownia: ma tylko „Dalej”.
+5. **„Pomijaj objaśnienia narratora”** pomija nowe kwestie od razu i bez komunikatu, także pierwszą kwestię Gildii: część mówiona tylko w swoich miejscach nie mówi, gdzie czeka (por. 664). Kwestia o Sklepie Systemu mija jak inne kwestie dopisane do wprowadzenia.
+6. **Testuj samouczki** (wersja testowa): wiersz „Wyprawa Gildii” to teraz „Gildia” i przywraca wszystkie kwestie Gildii. Nowe wiersze: „Kamień węgielny”, „Drużyna”, „Trudna wyprawa”, „Skrzynia Konta”, „Zbieracz Systemu”, „Omdlenie”.
+7. **Zakładki pod górnym paskiem.** Gdy narrator ma ekran, rząd zakładek Społeczności i Gildii przewija się ze stroną. Wcześniej zasłaniał pierwszy budynek Siedziby i górę tablicy Prób. Po kwestii rząd znów stoi pod paskiem.
+8. **Nagrania (699).** Wybory autora: 699.1 B (lista profesji), 699.2 A (wybór ścieżki), 699.3 B (omdlenie), 699.4 B (zakładki Gildii), 699.5 B (Próby), 699.6 B (Bestia), 699.7 B (Siedziba), 699.8 B (Prośby), 699.9 A (Wymiana), 699.10 B (Drużyna), 699.11 A (Kamień węgielny), 699.12 B (Sklep Systemu), 699.13 A (Trudna wyprawa), 699.14 A (Skrzynia Konta), 699.15 B (Zbieracz Systemu). Każde kończy się 0,3 s po ostatnim słowie (mono, 56 kb/s), pod nazwą kwestii w `src/client/audio/narration/`.
+9. **Zapis.** Kwestie i części w `data/tutorial.json`, ich miejsca w `src/client/narrator.js` i na ekranach, testy strony w `test/narrator-places.test.js`.
+
 ## Wersja 0.1.84 (6.11.2026)
 
 W Kwaterach „Załóż z plecaka” pokazuje statystyki każdego przedmiotu i porównanie z tym, co towarzysz nosi: zob. „Kwatery: statystyki przy zakładaniu z plecaka”. Przyciski sortowania plecaka mieszczą swoje napisy: zob. „Sortowanie plecaka na wąskim ekranie”.
