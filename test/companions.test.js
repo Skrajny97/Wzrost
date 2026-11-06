@@ -546,6 +546,19 @@ describe('companions through the API', () => {
     assert.equal((await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: candidate.id } })).data.error.code, 'invalid_stay');
   });
 
+  test('a companion goes on a Szybkie Polowanie and a Błyskawiczne polowanie too, and gains from them as from an exploration (711 A)', async () => {
+    const candidate = await hireFirst();
+    const gains = (companion) => [companion.level, companion.xp ?? 0, companion.relation ?? 0];
+    for (const kind of ['quick', 'flash']) {
+      const before = (await stored()).companions[0];
+      const done = await call('POST', '/api/hunts/quick', { cookie, body: { areaId: 'windfalls-edge', ...(kind === 'flash' && { kind }) } });
+      assert.equal(done.status, 200, JSON.stringify(done.data).slice(0, 300));
+      const after = (await stored()).companions[0];
+      assert.equal(after.id, candidate.id);
+      assert.notDeepEqual(gains(after), gains(before), kind);
+    }
+  });
+
   test('the companions who went walk beside the character on the Walka screen, in their looks; one who stays in the Kwatery does not (640 A, 648)', async () => {
     const [first, second] = (await settlement()).companions.candidates;
     for (const candidate of [first, second]) assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } })).status, 200);

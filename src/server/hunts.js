@@ -407,10 +407,11 @@ export async function beginHunt(
   // along, as they are now (companions.js), so the report comes out the same
   // whenever claimed; a wounded one once the character has rested to full
   // HP. Resting to full HP heals the wounds of them all for good, of those
-  // who stay too. Not on a Szybkie Polowanie, nor on a Drużyna's trip.
+  // who stay too. On a Szybkie and a Błyskawiczne polowanie too (711 A),
+  // not on a Drużyna's trip.
   const healed = kept && restedNow(player, now) && (kept.companions ?? []).some((companion) => companion.wounded);
   // A mercenary from the Karczma takes one companion's place (633.3 A).
-  const party = kept && !quick && !crew ? companionsGoing(player, now).slice(0, mercenary === null ? undefined : content().balance.parties.size - 2) : [];
+  const party = kept && !crew ? companionsGoing(player, now).slice(0, mercenary === null ? undefined : content().balance.parties.size - 2) : [];
   // The sołtys's wanted poster in hand, for this place (wanted.js): its
   // target may come on the way. Not on a Szybkie Polowanie, nor on a
   // Drużyna's trip.

@@ -723,7 +723,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     // The author's words, the camp's Kwatery stressed in them; every
     // standing with Zbylut may hire, a lower one for more gold.
     const intro = howItWorks(
-      'Towarzysze idą z tobą na każdą wyprawę poza Szybkim i Błyskawicznym Polowaniem.',
+      'Towarzysze idą z tobą na każdą wyprawę.',
       h(
         'p',
         { class: 'muted' },

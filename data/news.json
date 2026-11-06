@@ -255,6 +255,11 @@
       "id": "0.1.89",
       "title": "Wersja 0.1.89",
       "body": "- Przygotowania do angielskiej wersji gry: wybór języka przy zakładaniu konta. Na razie angielski działa tylko na wersji testowej, a w grze wszystko zostaje po polsku."
+    },
+    {
+      "id": "0.1.91",
+      "title": "Wersja 0.1.91",
+      "body": "- Towarzysze z Kwater idą z postacią także na Szybkie i Błyskawiczne Polowanie: walczą obok niej i zdobywają doświadczenie jak na zwykłej wyprawie.\n- Na wąskich telefonach pergamin narratora i zadań mieści się w całości na ekranie, a długie nazwy miejsc nie wychodzą poza ramkę.\n- Czat zamienia na gwiazdki także angielskie przekleństwa."
     }
 ]
 }
