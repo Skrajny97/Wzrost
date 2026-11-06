@@ -509,6 +509,142 @@
     "rarog": {
       "hurt": { "files": ["audio/sfx/rarog-hurt-1.mp3", "audio/sfx/rarog-hurt-2.mp3"], "gain": 0.6 },
       "death": { "files": ["audio/sfx/rarog-death-1.mp3", "audio/sfx/rarog-death-2.mp3"], "gain": 0.7 }
+    },
+    "needleback": {
+      "hurt": { "files": ["audio/sfx/needleback-hurt-1.mp3", "audio/sfx/needleback-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/needleback-death-1.mp3", "audio/sfx/needleback-death-2.mp3"], "gain": 0.7 }
+    },
+    "smooth-snake": {
+      "hurt": { "files": ["audio/sfx/smooth-snake-hurt-1.mp3", "audio/sfx/smooth-snake-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/smooth-snake-death-1.mp3", "audio/sfx/smooth-snake-death-2.mp3"], "gain": 0.7 }
+    },
+    "rustler": {
+      "hurt": { "files": ["audio/sfx/rustler-hurt-1.mp3", "audio/sfx/rustler-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/rustler-death-1.mp3", "audio/sfx/rustler-death-2.mp3"], "gain": 0.7 }
+    },
+    "millipede": {
+      "hurt": { "files": ["audio/sfx/millipede-hurt-1.mp3", "audio/sfx/millipede-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/millipede-death-1.mp3", "audio/sfx/millipede-death-2.mp3"], "gain": 0.7 }
+    },
+    "fernling": {
+      "hurt": { "files": ["audio/sfx/fernling-hurt-1.mp3", "audio/sfx/fernling-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/fernling-death-1.mp3", "audio/sfx/fernling-death-2.mp3"], "gain": 0.7 }
+    },
+    "mantis": {
+      "hurt": { "files": ["audio/sfx/mantis-hurt-1.mp3", "audio/sfx/mantis-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/mantis-death-1.mp3", "audio/sfx/mantis-death-2.mp3"], "gain": 0.7 }
+    },
+    "dog-headed": {
+      "hurt": { "files": ["audio/sfx/dog-headed-hurt-1.mp3", "audio/sfx/dog-headed-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/dog-headed-death-1.mp3", "audio/sfx/dog-headed-death-2.mp3"], "gain": 0.7 }
+    },
+    "ghost-coachman": {
+      "hurt": { "files": ["audio/sfx/ghost-coachman-hurt-1.mp3", "audio/sfx/ghost-coachman-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/ghost-coachman-death-1.mp3", "audio/sfx/ghost-coachman-death-2.mp3"], "gain": 0.7 }
+    },
+    "gadfly": {
+      "hurt": { "files": ["audio/sfx/gadfly-hurt-1.mp3", "audio/sfx/gadfly-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/gadfly-death-1.mp3", "audio/sfx/gadfly-death-2.mp3"], "gain": 0.7 }
+    },
+    "rootwad": {
+      "hurt": { "files": ["audio/sfx/rootwad-hurt-1.mp3", "audio/sfx/rootwad-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/rootwad-death-1.mp3", "audio/sfx/rootwad-death-2.mp3"], "gain": 0.7 }
+    },
+    "murkling": {
+      "hurt": { "files": ["audio/sfx/murkling-hurt-1.mp3", "audio/sfx/murkling-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/murkling-death-1.mp3", "audio/sfx/murkling-death-2.mp3"], "gain": 0.7 }
+    },
+    "strangler": {
+      "hurt": { "files": ["audio/sfx/strangler-hurt-1.mp3", "audio/sfx/strangler-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/strangler-death-1.mp3", "audio/sfx/strangler-death-2.mp3"], "gain": 0.7 }
+    },
+    "bone-gnawer": {
+      "hurt": { "files": ["audio/sfx/bone-gnawer-hurt-1.mp3", "audio/sfx/bone-gnawer-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/bone-gnawer-death-1.mp3", "audio/sfx/bone-gnawer-death-2.mp3"], "gain": 0.7 }
+    },
+    "carcass": {
+      "hurt": { "files": ["audio/sfx/carcass-hurt-1.mp3", "audio/sfx/carcass-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/carcass-death-1.mp3", "audio/sfx/carcass-death-2.mp3"], "gain": 0.7 }
+    },
+    "smoke-hound": {
+      "hurt": { "files": ["audio/sfx/smoke-hound-hurt-1.mp3", "audio/sfx/smoke-hound-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/smoke-hound-death-1.mp3", "audio/sfx/smoke-hound-death-2.mp3"], "gain": 0.7 }
+    },
+    "nightingale-robber": {
+      "hurt": { "files": ["audio/sfx/nightingale-robber-hurt-1.mp3", "audio/sfx/nightingale-robber-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/nightingale-robber-death-1.mp3", "audio/sfx/nightingale-robber-death-2.mp3"], "gain": 0.7 }
+    },
+    "night-huntsman": {
+      "hurt": { "files": ["audio/sfx/night-huntsman-hurt-1.mp3", "audio/sfx/night-huntsman-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/night-huntsman-death-1.mp3", "audio/sfx/night-huntsman-death-2.mp3"], "gain": 0.7 }
+    },
+    "lichen-beard": {
+      "hurt": { "files": ["audio/sfx/lichen-beard-hurt-1.mp3", "audio/sfx/lichen-beard-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/lichen-beard-death-1.mp3", "audio/sfx/lichen-beard-death-2.mp3"], "gain": 0.7 }
+    },
+    "hollow-dweller": {
+      "hurt": { "files": ["audio/sfx/hollow-dweller-hurt-1.mp3", "audio/sfx/hollow-dweller-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/hollow-dweller-death-1.mp3", "audio/sfx/hollow-dweller-death-2.mp3"], "gain": 0.7 }
+    },
+    "murmur-wraith": {
+      "hurt": { "files": ["audio/sfx/murmur-wraith-hurt-1.mp3", "audio/sfx/murmur-wraith-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/murmur-wraith-death-1.mp3", "audio/sfx/murmur-wraith-death-2.mp3"], "gain": 0.7 }
+    },
+    "rotwood": {
+      "hurt": { "files": ["audio/sfx/rotwood-hurt-1.mp3", "audio/sfx/rotwood-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/rotwood-death-1.mp3", "audio/sfx/rotwood-death-2.mp3"], "gain": 0.7 }
+    },
+    "puffball": {
+      "hurt": { "files": ["audio/sfx/puffball-hurt-1.mp3", "audio/sfx/puffball-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/puffball-death-1.mp3", "audio/sfx/puffball-death-2.mp3"], "gain": 0.7 }
+    },
+    "earwig": {
+      "hurt": { "files": ["audio/sfx/earwig-hurt-1.mp3", "audio/sfx/earwig-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/earwig-death-1.mp3", "audio/sfx/earwig-death-2.mp3"], "gain": 0.7 }
+    },
+    "headless": {
+      "hurt": { "files": ["audio/sfx/headless-hurt-1.mp3", "audio/sfx/headless-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/headless-death-1.mp3", "audio/sfx/headless-death-2.mp3"], "gain": 0.7 }
+    },
+    "chochol": {
+      "hurt": { "files": ["audio/sfx/chochol-hurt-1.mp3", "audio/sfx/chochol-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/chochol-death-1.mp3", "audio/sfx/chochol-death-2.mp3"], "gain": 0.7 }
+    },
+    "smetek": {
+      "hurt": { "files": ["audio/sfx/smetek-hurt-1.mp3", "audio/sfx/smetek-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/smetek-death-1.mp3", "audio/sfx/smetek-death-2.mp3"], "gain": 0.7 }
+    },
+    "deadman": {
+      "hurt": { "files": ["audio/sfx/deadman-hurt-1.mp3", "audio/sfx/deadman-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/deadman-death-1.mp3", "audio/sfx/deadman-death-2.mp3"], "gain": 0.7 }
+    },
+    "burying-beetle": {
+      "hurt": { "files": ["audio/sfx/burying-beetle-hurt-1.mp3", "audio/sfx/burying-beetle-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/burying-beetle-death-1.mp3", "audio/sfx/burying-beetle-death-2.mp3"], "gain": 0.7 }
+    },
+    "bell-ringer": {
+      "hurt": { "files": ["audio/sfx/bell-ringer-hurt-1.mp3", "audio/sfx/bell-ringer-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/bell-ringer-death-1.mp3", "audio/sfx/bell-ringer-death-2.mp3"], "gain": 0.7 }
+    },
+    "abomination": {
+      "hurt": { "files": ["audio/sfx/abomination-hurt-1.mp3", "audio/sfx/abomination-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/abomination-death-1.mp3", "audio/sfx/abomination-death-2.mp3"], "gain": 0.7 }
+    },
+    "koltun": {
+      "hurt": { "files": ["audio/sfx/koltun-hurt-1.mp3", "audio/sfx/koltun-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/koltun-death-1.mp3", "audio/sfx/koltun-death-2.mp3"], "gain": 0.7 }
+    },
+    "bebok": {
+      "hurt": { "files": ["audio/sfx/bebok-hurt-1.mp3", "audio/sfx/bebok-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/bebok-death-1.mp3", "audio/sfx/bebok-death-2.mp3"], "gain": 0.7 }
+    },
+    "plague-maiden": {
+      "hurt": { "files": ["audio/sfx/plague-maiden-hurt-1.mp3", "audio/sfx/plague-maiden-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/plague-maiden-death-1.mp3", "audio/sfx/plague-maiden-death-2.mp3"], "gain": 0.7 }
+    },
+    "moon-eater": {
+      "hurt": { "files": ["audio/sfx/moon-eater-hurt-1.mp3", "audio/sfx/moon-eater-hurt-2.mp3"], "gain": 0.6 },
+      "death": { "files": ["audio/sfx/moon-eater-death-1.mp3", "audio/sfx/moon-eater-death-2.mp3"], "gain": 0.7 }
     }
   },
   "effects": {

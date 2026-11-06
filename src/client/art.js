@@ -41,6 +41,11 @@ export const SPRITES = {
       'pond-turtle', 'mink', 'dragonfly', 'pike', 'water-spider', 'black-tern', 'wooden-idol', 'veles-serpent', 'pagan-priest', 'bog-demon', 'tick', 'night-heron', 'bies', 'black-goat', 'klobuk', 'mamuna', 'rokita',
       // Sosnowe Wydmy (126–150) from 3.11.2026.
       'sandman', 'heather-mare', 'nightjar', 'resin-golem', 'barkborer', 'tar-moth', 'drought-husk', 'sand-whirl', 'barrow-wight', 'tar-burner', 'charcoal-imp', 'latawiec', 'charred-pine', 'ash-wraith', 'spark-swarm', 'noon-wraith', 'rarog',
+      // Głucha Knieja and Ostępy Nowiu (151–200) from 6.11.2026.
+      'needleback', 'smooth-snake', 'rustler', 'millipede', 'fernling', 'mantis', 'dog-headed', 'ghost-coachman', 'gadfly', 'rootwad', 'murkling',
+      'strangler', 'bone-gnawer', 'carcass', 'smoke-hound', 'nightingale-robber', 'night-huntsman', 'lichen-beard', 'hollow-dweller',
+      'murmur-wraith', 'rotwood', 'puffball', 'earwig', 'headless', 'chochol', 'smetek', 'deadman', 'burying-beetle', 'bell-ringer', 'abomination',
+      'koltun', 'bebok', 'plague-maiden', 'moon-eater',
     ],
   },
   // <class>-<look>, 96×128 (3:4), filled in as the portraits are approved,
@@ -181,6 +186,10 @@ export const SPRITES = {
       'mine-lantern', 'rat-tail',
       'turtle-shell', 'mink-fur', 'dragonfly-wing', 'pike-teeth', 'silver-bubble', 'tern-feather', 'bog-oak', 'veles-scale', 'bone-amulet', 'bog-lantern-eye', 'tick-shell', 'night-heron-plume', 'bies-horn', 'black-fleece', 'klobuk-feather', 'mamuna-braid', 'cyrograf',
       'glassy-sand', 'everheather', 'nightjar-feather', 'amber-lump', 'bored-bark', 'moth-dust', 'husk-dust', 'whirl-pebble', 'bronze-ring', 'birch-tar', 'glowing-ember', 'latawiec-membrane', 'charred-splinter', 'ruin-ash', 'everspark', 'noon-sickle', 'rarog-feather',
+      'black-needle', 'copper-scale', 'glass-tooth', 'millipede-segment', 'fern-curl', 'mantis-blade', 'dog-skull', 'coachman-whip', 'rainbow-eye',
+      'tangled-root', 'congealed-murk', 'black-rope', 'gnawed-bone', 'rotten-pelt', 'broken-leash', 'whistling-feather', 'hunting-horn',
+      'grey-beard', 'bony-finger', 'murmuring-cone', 'glowing-rot', 'spore-pouch', 'earwig-pincers', 'rusty-spur', 'chochol-straw', 'cold-candle',
+      'deadman-shroud', 'beetle-antenna', 'bell-clapper', 'abomination-tooth', 'matted-tangle', 'bebok-sack', 'plague-kerchief', 'moon-bite',
     ],
   },
   // The skills of the classes (data/skills.json), 48×48.
@@ -233,13 +242,15 @@ export const SPRITES = {
       'old-diggings',
       'black-alder-carr', 'black-tarn', 'sunken-shrine', 'quaking-bog', 'rokita-deep',
       'heather-dunes', 'resin-pinewood', 'drifting-sands', 'tar-pits', 'burnt-forest',
+      'spruce-dusk', 'fern-thicket', 'forgotten-track', 'mossy-dell', 'wild-den', 'creaking-pines', 'rotting-logs', 'devils-crossroads',
+      'plague-graves', 'eclipsed-glade',
     ],
   },
   // The lands' wide scenes, dim behind the text of their cards, 192×96.
   lands: {
     width: 192,
     height: 96,
-    ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs', 'black-bog', 'pine-dunes'],
+    ids: ['windfalls', 'stone-glade', 'backwaters', 'peat-bogs', 'black-bog', 'pine-dunes', 'silent-wilds', 'new-moon-depths'],
   },
   // The camp's buildings, <building>-<look> for the looks of levels 1–3, 4–7
   // and 8–10 (8–19 for the resource buildings, whose fourth look is the
