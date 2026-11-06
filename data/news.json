@@ -235,6 +235,11 @@
       "id": "0.1.85",
       "title": "Wersja 0.1.85: nowe objaśnienia narratora",
       "body": "- Narrator objaśnia teraz Sklep Systemu, zakładki Gildii, Drużynę, Trudną wyprawę, Skrzynię Konta, Zbieracza Systemu, Kamień węgielny i omdlenie, każde przy pierwszym spotkaniu.\n- Karty narratora o profesjach i o wyborze ścieżki umiejętności brzmią po nowemu."
+    },
+    {
+      "id": "0.1.86",
+      "title": "Wersja 0.1.86",
+      "body": "- Przygotowania do angielskiej wersji gry. Na razie działa ona tylko na wersji testowej, a w grze wszystko zostaje po polsku."
     }
 ]
 }
