@@ -1,0 +1,14 @@
+{
+  "id": "burn-brew",
+  "tool": "pixellab generate-image-v2",
+  "description": "a squat round flask of thick bubbly glass, its cork sealed under dripping red wax, a linen string wound round the neck, filled with pale icy blue liquid with a swirl of white mist inside, frost on the glass, a sprig of red cranberries tied under the string, single inventory item icon, bold clean outline",
+  "style": "src/client/art/potions/strength-brew.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

@@ -1,0 +1,14 @@
+{
+  "id": "jagna-balm",
+  "tool": "pixellab generate-image-v2",
+  "description": "a squat round flask of thick bubbly glass, its cork sealed under dripping red wax, a linen string wound round the neck, filled with glowing ruby red balm with a faint golden shimmer, a tiny fiery red fern flower tied under the string, single inventory item icon, bold clean outline",
+  "style": "src/client/art/potions/strength-brew.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}
