@@ -1,0 +1,14 @@
+{
+  "id": "broken-leash",
+  "tool": "pixellab generate-image-v2",
+  "description": "a thick black leather leash in a loose coil with a torn end, still fastened to a broken iron collar, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}
