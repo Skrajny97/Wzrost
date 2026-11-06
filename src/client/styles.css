@@ -1777,6 +1777,17 @@ a.segmented-option {
   align-items: center;
 }
 
+/* E-mail: the label keeps its word whole beside a long address (it broke
+   into "E-" and "mail" on phones), and the address wraps where it must. */
+.status-row--email dt {
+  flex: none;
+}
+
+.status-row--email dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 /* Postać: the name and, under it, its one change (greyed out once used). */
 .status-row--name {
   align-items: center;
