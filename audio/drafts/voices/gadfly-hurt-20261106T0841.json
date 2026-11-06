@@ -1,0 +1,13 @@
+{
+  "id": "gadfly-hurt",
+  "payload": {
+    "text": "a sharp angry insect buzz that suddenly jumps higher and rattles, like a giant horsefly struck in flight, wings fluttering hard, purely an insect sound, no voice, no human sound, no words, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/gadfly-hurt-20261106T0841-0.mp3",
+    "audio/drafts/voices/gadfly-hurt-20261106T0841-1.mp3"
+  ],
+  "credits": 20
+}

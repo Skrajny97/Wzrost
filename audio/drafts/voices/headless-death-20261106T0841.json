@@ -1,0 +1,13 @@
+{
+  "id": "headless-death",
+  "payload": {
+    "text": "a long hollow ghostly sigh out of empty air, like cold wind through an empty helmet, fading into a faint whisper, no metal, no sword, no clang, no words, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/headless-death-20261106T0841-0.mp3",
+    "audio/drafts/voices/headless-death-20261106T0841-1.mp3"
+  ],
+  "credits": 56
+}

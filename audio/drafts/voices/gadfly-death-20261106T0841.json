@@ -1,0 +1,13 @@
+{
+  "id": "gadfly-death",
+  "payload": {
+    "text": "the loud high buzzing of a giant horsefly sputters in short broken bursts and cuts out, then a light dry tick as it lands, stays high-pitched, no low rumble, no voice, no words, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/gadfly-death-20261106T0841-0.mp3",
+    "audio/drafts/voices/gadfly-death-20261106T0841-1.mp3"
+  ],
+  "credits": 44
+}
