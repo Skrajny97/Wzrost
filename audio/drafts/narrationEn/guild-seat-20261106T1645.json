@@ -1,0 +1,16 @@
+{
+  "id": "guild-seat",
+  "payload": {
+    "text": "Here the guild raises four buildings, and each of their levels gives a bonus to all the members. You donate gold and resources to the one you choose. Donations do not come back. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/guild-seat-20261106T1645-0.mp3"
+  ],
+  "credits": 186
+}

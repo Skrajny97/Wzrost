@@ -1,0 +1,16 @@
+{
+  "id": "towers-entries",
+  "payload": {
+    "text": "Each entry is a single fight, with the result at once. You fight with full HP, but without potions. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/towers-entries-20261106T1645-0.mp3"
+  ],
+  "credits": 108
+}

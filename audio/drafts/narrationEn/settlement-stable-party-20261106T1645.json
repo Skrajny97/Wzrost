@@ -1,0 +1,16 @@
+{
+  "id": "settlement-stable-party",
+  "payload": {
+    "text": "On a party's exploration, everyone rides at the pace of the slowest mount. If someone has no mount, the exploration takes the full time. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-stable-party-20261106T1645-0.mp3"
+  ],
+  "credits": 145
+}

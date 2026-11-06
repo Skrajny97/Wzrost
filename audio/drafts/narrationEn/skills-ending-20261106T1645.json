@@ -1,0 +1,16 @@
+{
+  "id": "skills-ending",
+  "payload": {
+    "text": "That is all from me. This time not even the System will do it for you – the choice is yours alone. Choose your path when you are ready. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/skills-ending-20261106T1645-0.mp3"
+  ],
+  "credits": 144
+}

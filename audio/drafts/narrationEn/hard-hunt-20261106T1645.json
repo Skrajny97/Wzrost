@@ -1,0 +1,16 @@
+{
+  "id": "hard-hunt",
+  "payload": {
+    "text": "From the tenth level you can tick the Hard exploration. The creatures are stronger then, but they give more experience and gold. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/hard-hunt-20261106T1645-0.mp3"
+  ],
+  "credits": 137
+}

@@ -1,0 +1,16 @@
+{
+  "id": "account-chest",
+  "payload": {
+    "text": "This chest is shared by all the characters on your account. An item put in by one character can be taken out by another. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/account-chest-20261106T1645-0.mp3"
+  ],
+  "credits": 129
+}

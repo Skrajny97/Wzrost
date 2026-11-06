@@ -1,0 +1,16 @@
+{
+  "id": "camp-sawmill",
+  "payload": {
+    "text": "This is a good spot to build a Sawmill. The System supports us in our daily lives, so the wood in one is produced on its own as well. You will only have to collect the wood it makes. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/camp-sawmill-20261106T1645-0.mp3"
+  ],
+  "credits": 191
+}

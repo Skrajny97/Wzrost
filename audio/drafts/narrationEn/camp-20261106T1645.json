@@ -1,0 +1,16 @@
+{
+  "id": "camp",
+  "payload": {
+    "text": "Someone has camped in this clearing before. Good for you! It looks like they left some wood, stone and iron ore behind. Finders keepers. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/camp-20261106T1645-0.mp3"
+  ],
+  "credits": 145
+}

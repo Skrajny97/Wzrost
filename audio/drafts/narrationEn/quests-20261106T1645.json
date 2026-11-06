@@ -1,0 +1,16 @@
+{
+  "id": "quests",
+  "payload": {
+    "text": "Every day I will give you quests – that way we will keep up our, I hope, fruitful relationship. I will be waiting for you here. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/quests-20261106T1645-0.mp3"
+  ],
+  "credits": 136
+}

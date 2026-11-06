@@ -1,0 +1,16 @@
+{
+  "id": "settlement-forge-relation",
+  "payload": {
+    "text": "The better he knows you, the rarer the items he will forge. Standing with the Brotherhood of Smiths will lower his prices. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-forge-relation-20261106T1645-0.mp3"
+  ],
+  "credits": 131
+}

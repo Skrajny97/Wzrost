@@ -1,0 +1,16 @@
+{
+  "id": "ask",
+  "payload": {
+    "text": "Would you like to go through the Introduction? It will help you get to know the System, and if you skip it, you will not lose any of the resources gained in the Tutorial. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/ask-20261106T1645-0.mp3"
+  ],
+  "credits": 179
+}

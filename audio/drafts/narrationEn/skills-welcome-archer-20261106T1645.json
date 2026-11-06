@@ -1,0 +1,16 @@
+{
+  "id": "skills-welcome-archer",
+  "payload": {
+    "text": "The tenth level of your class… Your arrows miss ever more rarely, and the System could not fail to notice. It has unlocked Skills for you. Before you choose one – allow me to introduce them. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/skills-welcome-archer-20261106T1645-0.mp3"
+  ],
+  "credits": 199
+}

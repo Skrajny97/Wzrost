@@ -1,0 +1,16 @@
+{
+  "id": "encyclopedia",
+  "payload": {
+    "text": "The weapon from your first exploration is already here. Every entry will tell you where to get it, even one you do not know yet. A full set earns a chest, and a gold dot by the book will tell you when one is ready to open. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/encyclopedia-20261106T1645-0.mp3"
+  ],
+  "credits": 231
+}

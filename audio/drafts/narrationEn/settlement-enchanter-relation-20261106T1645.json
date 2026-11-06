@@ -1,0 +1,16 @@
+{
+  "id": "settlement-enchanter-relation",
+  "payload": {
+    "text": "The better she knows you, the more affixes she will offer you to choose from. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-enchanter-relation-20261106T1645-0.mp3"
+  ],
+  "credits": 86
+}

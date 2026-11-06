@@ -1,0 +1,16 @@
+{
+  "id": "community-welcome",
+  "payload": {
+    "text": "Your character's fifth level… The System has opened two new paths before you: the Community and the Quick Hunt. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/community-welcome-20261106T1645-0.mp3"
+  ],
+  "credits": 120
+}

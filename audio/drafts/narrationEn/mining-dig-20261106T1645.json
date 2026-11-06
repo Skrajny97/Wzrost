@@ -1,0 +1,16 @@
+{
+  "id": "mining-dig",
+  "payload": {
+    "text": "In the Mine you will dig up gemstones and ores. Along the way, your pickaxe will strike veins of gold as well. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/mining-dig-20261106T1645-0.mp3"
+  ],
+  "credits": 119
+}

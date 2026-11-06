@@ -1,0 +1,16 @@
+{
+  "id": "towers-floor",
+  "payload": {
+    "text": "Elites and champions wait along the way, and every tenth floor gives a Tower chest for the first victory. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/towers-floor-20261106T1645-0.mp3"
+  ],
+  "credits": 114
+}

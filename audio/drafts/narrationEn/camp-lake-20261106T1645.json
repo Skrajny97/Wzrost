@@ -1,0 +1,16 @@
+{
+  "id": "camp-lake",
+  "payload": {
+    "text": "Gold lies at the bottom of Midas Pond. A prospector's pan sifts it out by itself – not much, but without pause. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/camp-lake-20261106T1645-0.mp3"
+  ],
+  "credits": 120
+}

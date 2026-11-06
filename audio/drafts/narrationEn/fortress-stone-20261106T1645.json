@@ -1,0 +1,16 @@
+{
+  "id": "fortress-stone",
+  "payload": {
+    "text": "One day a Stronghold will stand on this spot. The stone will show you how much is still missing, and the Builder Spirit will buy your surplus wood, stone and ore. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/fortress-stone-20261106T1645-0.mp3"
+  ],
+  "credits": 171
+}

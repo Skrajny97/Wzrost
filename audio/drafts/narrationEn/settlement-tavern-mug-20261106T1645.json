@@ -1,0 +1,16 @@
+{
+  "id": "settlement-tavern-mug",
+  "payload": {
+    "text": "For a tankard, Zbylut will let you in on a rumour from the road. Listen closely – not everyone shares news like that. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-tavern-mug-20261106T1645-0.mp3"
+  ],
+  "credits": 126
+}

@@ -1,0 +1,16 @@
+{
+  "id": "skills-welcome-mage",
+  "payload": {
+    "text": "The tenth level of your class… Mana heeds you ever more willingly, and the System could not fail to notice. It has unlocked Skills for you. Before you choose one – allow me to introduce them. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/skills-welcome-mage-20261106T1645-0.mp3"
+  ],
+  "credits": 200
+}

@@ -1,0 +1,16 @@
+{
+  "id": "evolution-points",
+  "payload": {
+    "text": "Your Skill Points will come back to be spent anew, and you may reset your stats once, for free. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/evolution-points-20261106T1645-0.mp3"
+  ],
+  "credits": 104
+}

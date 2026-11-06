@@ -1,0 +1,16 @@
+{
+  "id": "evolution-lead",
+  "payload": {
+    "text": "Evolution waits in the Character tab. Let us take a look. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/evolution-lead-20261106T1645-0.mp3"
+  ],
+  "credits": 66
+}

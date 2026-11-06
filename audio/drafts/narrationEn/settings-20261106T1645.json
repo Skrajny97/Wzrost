@@ -1,0 +1,16 @@
+{
+  "id": "settings",
+  "payload": {
+    "text": "For your convenience, you can also look into some of the System's own settings and set them just as you please. If you decide you have made too many mistakes – you can even start over. At the very top of the settings waits the Journal, too – there you will find all your reports. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settings-20261106T1645-0.mp3"
+  ],
+  "credits": 288
+}

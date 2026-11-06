@@ -1,0 +1,16 @@
+{
+  "id": "settlement-hermit-evolution",
+  "payload": {
+    "text": "Once your class has evolved, he can change your evolution for another. The first change is free. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-hermit-evolution-20261106T1645-0.mp3"
+  ],
+  "credits": 105
+}

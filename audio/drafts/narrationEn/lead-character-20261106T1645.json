@@ -1,0 +1,16 @@
+{
+  "id": "lead-character",
+  "payload": {
+    "text": "Let us also take a look at the window of the Character you have come to lead. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/lead-character-20261106T1645-0.mp3"
+  ],
+  "credits": 86
+}

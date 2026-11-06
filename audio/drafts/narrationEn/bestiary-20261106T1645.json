@@ -1,0 +1,16 @@
+{
+  "id": "bestiary",
+  "payload": {
+    "text": "Here is the Bestiary of this place. The creatures you have not fought yet appear in it only as shadows. Get to know them all, and you will open the chest. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/bestiary-20261106T1645-0.mp3"
+  ],
+  "credits": 163
+}

@@ -1,0 +1,16 @@
+{
+  "id": "settlement-trial-hall",
+  "payload": {
+    "text": "Once a day you can fight three battles here against the creatures of the next place. Your health does not return between them, but potions work. Win, and that place will open to you at once. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-trial-hall-20261106T1645-0.mp3"
+  ],
+  "credits": 199
+}

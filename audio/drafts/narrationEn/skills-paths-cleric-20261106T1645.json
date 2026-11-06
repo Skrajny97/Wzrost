@@ -1,0 +1,16 @@
+{
+  "id": "skills-paths-cleric",
+  "payload": {
+    "text": "Before you lie three paths. The Healer closes wounds, the Inquisitor lashes the foes with holy power, and the Priest blesses themselves and their companions. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/skills-paths-cleric-20261106T1645-0.mp3"
+  ],
+  "credits": 166
+}

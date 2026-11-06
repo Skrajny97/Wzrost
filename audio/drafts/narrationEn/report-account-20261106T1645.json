@@ -1,0 +1,16 @@
+{
+  "id": "report-account",
+  "payload": {
+    "text": "And if you are curious how the whole exploration went – the System describes it in detail right here. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/report-account-20261106T1645-0.mp3"
+  ],
+  "credits": 110
+}

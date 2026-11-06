@@ -1,0 +1,16 @@
+{
+  "id": "camp-anvil",
+  "payload": {
+    "text": "And when you wish to strengthen the items you own – you might think about setting up and developing the Anvil. It will let you upgrade your equipment. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/camp-anvil-20261106T1645-0.mp3"
+  ],
+  "credits": 159
+}

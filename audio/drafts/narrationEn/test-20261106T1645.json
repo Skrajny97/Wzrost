@@ -1,0 +1,16 @@
+{
+  "id": "test",
+  "payload": {
+    "text": "To begin, a small test for you. One of the safest challenges that await you. Set out on an exploration to the Edge of the Windfalls. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/test-20261106T1645-0.mp3"
+  ],
+  "credits": 141
+}

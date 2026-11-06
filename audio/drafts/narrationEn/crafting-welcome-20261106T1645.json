@@ -1,0 +1,16 @@
+{
+  "id": "crafting-welcome",
+  "payload": {
+    "text": "Your character's fifteenth level… The System has opened Crafting to you. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/crafting-welcome-20261106T1645-0.mp3"
+  ],
+  "credits": 81
+}

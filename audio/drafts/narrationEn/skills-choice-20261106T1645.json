@@ -1,0 +1,16 @@
+{
+  "id": "skills-choice",
+  "payload": {
+    "text": "The first skill you put your first Skill Point into will open your main path. From the eleventh level of your class you may add a side path – for one Skill Point. The third path will then close. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/skills-choice-20261106T1645-0.mp3"
+  ],
+  "credits": 203
+}

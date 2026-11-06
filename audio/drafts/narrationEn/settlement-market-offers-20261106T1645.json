@@ -1,0 +1,16 @@
+{
+  "id": "settlement-market-offers",
+  "payload": {
+    "text": "At the Marketplace, players auction their goods. An auction lasts from an hour to a full day, and an outbid player gets their gold back at once. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/settlement-market-offers-20261106T1645-0.mp3"
+  ],
+  "credits": 153
+}

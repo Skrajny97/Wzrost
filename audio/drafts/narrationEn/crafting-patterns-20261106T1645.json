@@ -1,0 +1,16 @@
+{
+  "id": "crafting-patterns",
+  "payload": {
+    "text": "Here you will make weapons and armour from patterns. You will get the parts for them at the Salvage Table, or buy them from the scrap dealer. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/crafting-patterns-20261106T1645-0.mp3"
+  ],
+  "credits": 150
+}

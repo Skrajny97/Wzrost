@@ -1,0 +1,16 @@
+{
+  "id": "lead-stats",
+  "payload": {
+    "text": "Gaining levels on explorations – be it class or character levels – also gives you stat points to distribute. Let us take a look at them. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/lead-stats-20261106T1645-0.mp3"
+  ],
+  "credits": 145
+}

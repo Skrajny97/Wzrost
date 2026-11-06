@@ -1,0 +1,16 @@
+{
+  "id": "skills-points",
+  "payload": {
+    "text": "Here you will see your Skill Points. Every new class level will bring you one. A point raises a skill you have learned by one level – all the way to the twentieth. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/skills-points-20261106T1645-0.mp3"
+  ],
+  "credits": 172
+}

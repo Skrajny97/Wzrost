@@ -1,0 +1,16 @@
+{
+  "id": "guild-beast",
+  "payload": {
+    "text": "The beast of the week belongs to the whole guild. You attack it three times a day, even during an exploration. The harder the guild wounds it, the more you will find in the chest. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/guild-beast-20261106T1645-0.mp3"
+  ],
+  "credits": 188
+}

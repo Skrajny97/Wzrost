@@ -1,0 +1,16 @@
+{
+  "id": "purpose",
+  "payload": {
+    "text": "You have found yourself in a place whose purpose is growth. I am counting on you to reach great heights. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/purpose-20261106T1645-0.mp3"
+  ],
+  "credits": 113
+}

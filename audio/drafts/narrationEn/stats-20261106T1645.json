@@ -1,0 +1,16 @@
+{
+  "id": "stats",
+  "payload": {
+    "text": "The System makes things easier, so you need not rack your brains over all these numbers. You can distribute the points you have gained in the way that best suits your class. But! You can also build your character however you see fit. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/stats-20261106T1645-0.mp3"
+  ],
+  "credits": 242
+}

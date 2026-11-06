@@ -1,0 +1,16 @@
+{
+  "id": "crafting-ending",
+  "payload": {
+    "text": "Each new level of Crafting will reveal more patterns to you. Look in here too when you salvage an item you have never taken apart before. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "en"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/crafting-ending-20261106T1645-0.mp3"
+  ],
+  "credits": 146
+}
