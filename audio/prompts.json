@@ -1019,7 +1019,7 @@
       "voice": "NarratorEn",
       "model": "eleven_v3",
       "settings": {
-        "stability": 0.5
+        "stability": 1.0
       },
       "ending": " The fire crackles softly. [pauses]"
     },

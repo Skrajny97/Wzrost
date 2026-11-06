@@ -3037,6 +3037,7 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 ## Wersja 0.2.0 (6.11.2026)
 
 - Narrator po angielsku mówi głosem rodzimego lektora, wybranym przez autora w 718 (718.6, amerykański gawędziarz): wszystkie 142 kwestie z wersjami na komputer. Autor: „używamy 718.6” i „Teraz generuj kwestie i zaraz je wdrażamy, na 20:30 zaplanowana rolka do publikacji”. Nagrania weszły do gry od razu; autor słucha ich na stronie odsłuchu (719), a odrzucone zostaną nagrane jeszcze raz.
+- Autor ocenił 719: 97 nagrań przyjętych, 45 odrzuconych z uwagą „zbyt zabłocone”. Barwą (widmo) nie różnią się od przyjętych, więc chodzi o niewyraźną wymowę w tych nagraniach: 45 kwestii nagrywa się jeszcze raz z najwyższą stabilnością głosu eleven_v3 (1.0, wyraźniejsza dykcja) i trafiają na stronę odsłuchu 720.
 - Numer wersji: po 0.1.99 idzie 0.2.0, dalej 0.2.1, 0.2.2 i tak dalej, jak po 0.0.99 poszło 0.1.0.
 - Angielska strona gry odtwarza tylko nagrania z `audio/narration/en/` (`src/client/narrator.js`), nigdy polskie; test `test/narration-en.test.js` pilnuje, żeby każda kwestia czytana po polsku miała angielskie nagranie.
 
