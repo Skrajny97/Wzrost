@@ -1,0 +1,16 @@
+{
+  "id": "skills-paths-shadow",
+  "payload": {
+    "text": "Before you lie three paths. The Assassin catches those who hide behind others' backs, the Poisoner laces the blade with venom, and the Night Dancer eludes blows and can deliver a swift counter. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 1
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/skills-paths-shadow-20261106T1852-0.mp3"
+  ],
+  "credits": 228
+}

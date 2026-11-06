@@ -1,0 +1,16 @@
+{
+  "id": "lead-camp",
+  "payload": {
+    "text": "No self-respecting character would deny themselves the chance to build a camp – and who knows, in time perhaps a whole stronghold. Let us look into your camp. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 1
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/lead-camp-20261106T1852-0.mp3"
+  ],
+  "credits": 193
+}

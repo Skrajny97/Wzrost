@@ -1,0 +1,16 @@
+{
+  "id": "community-tabs",
+  "payload": {
+    "text": "At the top you switch between the tabs: Chat, Friends, Ranking and Guild. You can form a Party from level 10. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 1
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/community-tabs-20261106T1852-0.mp3"
+  ],
+  "credits": 144
+}
