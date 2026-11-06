@@ -1,0 +1,17 @@
+{
+  "id": "system-collector",
+  "payload": {
+    "text": "Obok czuwa Zbieracz Systemu. Za złoto, raz na zawsze, sam zbierze zasoby z pełnych magazynów. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/system-collector-20261106T0601-0.mp3",
+    "audio/drafts/narration/system-collector-20261106T0601-1.mp3"
+  ],
+  "credits": 214
+}

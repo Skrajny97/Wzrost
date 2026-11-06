@@ -1,0 +1,17 @@
+{
+  "id": "guild-exchange",
+  "payload": {
+    "text": "Tu wymienisz zasoby z innymi członkami gildii, także na złoto. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/guild-exchange-20261106T0601-0.mp3",
+    "audio/drafts/narration/guild-exchange-20261106T0601-1.mp3"
+  ],
+  "credits": 152
+}

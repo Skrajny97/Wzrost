@@ -1,0 +1,17 @@
+{
+  "id": "party-intro",
+  "payload": {
+    "text": "Drużyna to do trzech wędrowców na jednej wyprawie, a ich poziomy klasy mogą się różnić najwyżej o pięć. Wyprawę wysyła lider, gdy nad „Wyrusz” zaznaczy „Z drużyną”. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/party-intro-20261106T0601-0.mp3",
+    "audio/drafts/narration/party-intro-20261106T0601-1.mp3"
+  ],
+  "credits": 356
+}

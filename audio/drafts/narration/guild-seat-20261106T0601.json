@@ -1,0 +1,17 @@
+{
+  "id": "guild-seat",
+  "payload": {
+    "text": "Tu gildia stawia cztery budynki, a każdy ich poziom daje premię wszystkim członkom. Wpłacasz złoto i zasoby na ten, który wybierzesz. Wpłaty nie wracają. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/guild-seat-20261106T0601-0.mp3",
+    "audio/drafts/narration/guild-seat-20261106T0601-1.mp3"
+  ],
+  "credits": 334
+}

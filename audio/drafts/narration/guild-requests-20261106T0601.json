@@ -1,0 +1,17 @@
+{
+  "id": "guild-requests",
+  "payload": {
+    "text": "Gdy zabraknie Ci materiału, zioła albo mikstury, poproś tu gildię. Ty też możesz dać innym to, o co proszą. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/guild-requests-20261106T0601-0.mp3",
+    "audio/drafts/narration/guild-requests-20261106T0601-1.mp3"
+  ],
+  "credits": 242
+}

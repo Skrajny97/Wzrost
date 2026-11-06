@@ -1,0 +1,17 @@
+{
+  "id": "guild-tabs",
+  "payload": {
+    "text": "Każda zakładka to inna wspólna sprawa gildii. Kropka przy zakładce powie Ci, że coś tam na Ciebie czeka. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/guild-tabs-20261106T0601-0.mp3",
+    "audio/drafts/narration/guild-tabs-20261106T0601-1.mp3"
+  ],
+  "credits": 236
+}

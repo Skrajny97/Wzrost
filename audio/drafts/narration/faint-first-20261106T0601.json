@@ -1,0 +1,17 @@
+{
+  "id": "faint-first",
+  "payload": {
+    "text": "Po omdleniu nic z wyprawy nie zostaje, a System odbiera jeszcze część doświadczenia. Zanim znów wyruszysz, sprawdź zagrożenie i odpocznij. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/faint-first-20261106T0601-0.mp3",
+    "audio/drafts/narration/faint-first-20261106T0601-1.mp3"
+  ],
+  "credits": 304
+}

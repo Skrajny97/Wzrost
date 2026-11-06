@@ -1,0 +1,17 @@
+{
+  "id": "fortress-stone",
+  "payload": {
+    "text": "W tym miejscu stanie kiedyś Warownia. Kamień pokaże Ci, ile jeszcze brakuje, a duch budowniczego odkupi od Ciebie nadmiar drewna, kamienia i rudy. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/fortress-stone-20261106T0601-0.mp3",
+    "audio/drafts/narration/fortress-stone-20261106T0601-1.mp3"
+  ],
+  "credits": 320
+}

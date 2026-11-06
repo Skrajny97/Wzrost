@@ -1,0 +1,17 @@
+{
+  "id": "hard-hunt",
+  "payload": {
+    "text": "Od dziesiątego poziomu możesz zaznaczyć Trudną wyprawę. Stwory są wtedy silniejsze, ale dają więcej doświadczenia i złota. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/hard-hunt-20261106T0601-0.mp3",
+    "audio/drafts/narration/hard-hunt-20261106T0601-1.mp3"
+  ],
+  "credits": 272
+}

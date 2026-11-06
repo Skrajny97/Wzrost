@@ -1,0 +1,17 @@
+{
+  "id": "shop-system",
+  "payload": {
+    "text": "Punkty Systemu wydasz w Sklepie Systemu. Kupisz w nim ozdoby, które zmieniają wygląd. [pauses] Tak.",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses] Tak.",
+  "files": [
+    "audio/drafts/narration/shop-system-20261106T0601-0.mp3",
+    "audio/drafts/narration/shop-system-20261106T0601-1.mp3"
+  ],
+  "credits": 198
+}
