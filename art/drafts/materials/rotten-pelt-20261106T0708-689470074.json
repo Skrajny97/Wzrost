@@ -1,0 +1,14 @@
+{
+  "id": "rotten-pelt",
+  "tool": "pixellab generate-image-v2",
+  "description": "a ragged patch of rotting grey-brown fur and hide with green mould spots, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

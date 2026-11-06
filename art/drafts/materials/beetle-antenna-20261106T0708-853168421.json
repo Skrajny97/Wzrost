@@ -1,0 +1,14 @@
+{
+  "id": "beetle-antenna",
+  "tool": "pixellab generate-image-v2",
+  "description": "a single orange club-tipped beetle antenna, segmented, diagonal, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

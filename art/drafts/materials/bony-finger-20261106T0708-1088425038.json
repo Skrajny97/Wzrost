@@ -1,0 +1,14 @@
+{
+  "id": "bony-finger",
+  "tool": "pixellab generate-image-v2",
+  "description": "a long thin grey bony finger with a black hooked claw, bent at the joints, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

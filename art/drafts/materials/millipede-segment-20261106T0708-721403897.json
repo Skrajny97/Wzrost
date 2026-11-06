@@ -1,0 +1,14 @@
+{
+  "id": "millipede-segment",
+  "tool": "pixellab generate-image-v2",
+  "description": "a single glossy black armoured ring segment of a giant millipede with a pair of thin legs still twitching, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

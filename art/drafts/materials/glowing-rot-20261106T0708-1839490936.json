@@ -1,0 +1,14 @@
+{
+  "id": "glowing-rot",
+  "tool": "pixellab generate-image-v2",
+  "description": "a small heap of crumbly rotten wood glowing pale green in the dark, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

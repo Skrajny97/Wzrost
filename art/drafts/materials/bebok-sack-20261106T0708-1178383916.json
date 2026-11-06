@@ -1,0 +1,14 @@
+{
+  "id": "bebok-sack",
+  "tool": "pixellab generate-image-v2",
+  "description": "an old patched sack of coarse brown cloth tied with a rope, bulging as if something inside is moving, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

@@ -1,0 +1,14 @@
+{
+  "id": "moon-bite",
+  "tool": "pixellab generate-image-v2",
+  "description": "a pale glowing shard bitten out of the moon, a small crescent-shaped chunk with jagged tooth marks along one edge, shining with cold silver-white light, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

@@ -1,0 +1,14 @@
+{
+  "id": "grey-beard",
+  "tool": "pixellab generate-image-v2",
+  "description": "a long tangled tuft of grey beard lichen covered with white frost, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

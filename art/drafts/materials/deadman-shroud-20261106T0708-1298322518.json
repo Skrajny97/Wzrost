@@ -1,0 +1,14 @@
+{
+  "id": "deadman-shroud",
+  "tool": "pixellab generate-image-v2",
+  "description": "a torn scrap of grey linen burial cloth with frayed edges and specks of grave earth, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

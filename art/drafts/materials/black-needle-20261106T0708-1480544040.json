@@ -1,0 +1,14 @@
+{
+  "id": "black-needle",
+  "tool": "pixellab generate-image-v2",
+  "description": "a single long black spruce needle, sharp and unbreakable, with a cold steely sheen, diagonal, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

@@ -1,0 +1,14 @@
+{
+  "id": "abomination-tooth",
+  "tool": "pixellab generate-image-v2",
+  "description": "a huge crooked yellowed fang the size of a hand, stained with dried black blood, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

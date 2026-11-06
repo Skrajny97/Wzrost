@@ -1,0 +1,14 @@
+{
+  "id": "gnawed-bone",
+  "tool": "pixellab generate-image-v2",
+  "description": "a big thick bone covered with deep tooth marks, hard as iron with a dark metallic sheen, diagonal, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

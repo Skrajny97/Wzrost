@@ -1,0 +1,14 @@
+{
+  "id": "coachman-whip",
+  "tool": "pixellab generate-image-v2",
+  "description": "a long black leather coachman's whip coiled in a loose loop with a worn wooden handle, a tiny pale spark at its tip, the whole whip inside the picture with a margin, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

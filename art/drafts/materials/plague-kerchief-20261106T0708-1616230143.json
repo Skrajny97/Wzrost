@@ -1,0 +1,14 @@
+{
+  "id": "plague-kerchief",
+  "tool": "pixellab generate-image-v2",
+  "description": "a long blood-red kerchief fluttering in the wind, a faint sickly green haze around it and withered grass blades below, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

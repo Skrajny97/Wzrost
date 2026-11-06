@@ -1,0 +1,14 @@
+{
+  "id": "black-rope",
+  "tool": "pixellab generate-image-v2",
+  "description": "a coil of thick black rope braided from roots, damp and cold, with a few drops of water, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}

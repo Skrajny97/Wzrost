@@ -1,0 +1,14 @@
+{
+  "id": "rainbow-eye",
+  "tool": "pixellab generate-image-v2",
+  "description": "a large round insect compound eye made of thousands of tiny facets, shimmering with rainbow colours like oil on water, single inventory item icon",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 64
+}
