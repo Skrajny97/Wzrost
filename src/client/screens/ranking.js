@@ -14,12 +14,15 @@
 import { professionSprite } from '../art.js';
 import { fill, h, icon } from '../dom.js';
 import { formatNumber } from '../format.js';
+import { t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { rankingWindow } from '../ranking-window.js';
 import { call, state } from '../state.js';
 import { framedName, guildTag, howItWorks, withButton } from '../ui.js';
 
+// The orders and their columns, their words shown in the page's language
+// (t()).
 const ORDERS = [
   { id: 'level', name: 'Poziom postaci', column: 'Poziom' },
   { id: 'class', name: 'Poziom klasy', column: 'Klasa' },
@@ -38,7 +41,7 @@ const professionLevel = (profession) =>
 export function mountRanking(container) {
   const names = state.content.guildFame.tabs;
   const ids = Object.keys(TAB_ICONS);
-  const row = h('div', { class: 'community-tabs ranking-tabs', role: 'tablist', 'aria-label': 'Ranking' });
+  const row = h('div', { class: 'community-tabs ranking-tabs', role: 'tablist', 'aria-label': t('Ranking') });
   const body = h('div', { class: 'ranking-body' });
   fill(container, row, body);
   let current = null;
@@ -94,13 +97,13 @@ function mountCharacterRanking(container) {
   let last = null;
   const switcher = h(
     'div',
-    { class: 'segmented ranking-by', role: 'group', 'aria-label': 'Kolejność rankingu' },
+    { class: 'segmented ranking-by', role: 'group', 'aria-label': t('Kolejność rankingu') },
     ORDERS.map((order) =>
       h('button', {
         type: 'button',
         class: 'segmented-option',
         dataset: { by: order.id },
-        text: order.name,
+        text: t(order.name),
         onClick: () => {
           if (by === order.id) return;
           by = order.id;
@@ -111,7 +114,7 @@ function mountCharacterRanking(container) {
     ),
   );
   const place = h('p', { class: 'ranking-place' });
-  const board = h('div', { class: 'card ranking' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
+  const board = h('div', { class: 'card ranking' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   fill(container, switcher, place, board);
 
   async function load() {
@@ -130,7 +133,7 @@ function mountCharacterRanking(container) {
   function show(answer) {
     last = answer;
     const { rows, place: own } = answer;
-    place.textContent = own ? `Twoje miejsce: ${formatNumber(own)}.` : '';
+    place.textContent = own ? t('Twoje miejsce: {place}.', { place: formatNumber(own) }) : '';
     const mine = rows.findIndex((row) => row.own);
     // The rows shown, with a gap (null) only where places are left out.
     const picked = rankingWindow(rows, mine, whole);
@@ -148,9 +151,9 @@ function mountCharacterRanking(container) {
           h(
             'tr',
             {},
-            h('th', { scope: 'col', 'aria-label': 'Miejsce', text: '#' }),
-            h('th', { scope: 'col', text: 'Postać' }),
-            columns.map((order) => h('th', { scope: 'col', class: sorted(order.id), 'aria-sort': order.id === by ? 'descending' : undefined, text: order.column })),
+            h('th', { scope: 'col', 'aria-label': t('Miejsce'), text: '#' }),
+            h('th', { scope: 'col', text: t('Postać') }),
+            columns.map((order) => h('th', { scope: 'col', class: sorted(order.id), 'aria-sort': order.id === by ? 'descending' : undefined, text: t(order.column) })),
           ),
         ),
         h(
@@ -175,7 +178,7 @@ function mountCharacterRanking(container) {
                       type: 'button',
                       class: 'chat-name',
                       text: row.name,
-                      'aria-label': `${row.name}: zobacz postać`,
+                      'aria-label': t('{name}: zobacz postać', { name: row.name }),
                       onClick: (event) => withButton(event.currentTarget, () => openProfile(row.name)),
                     }),
                     row.nameColor,
@@ -195,7 +198,7 @@ function mountCharacterRanking(container) {
         h('button', {
           type: 'button',
           class: 'button button--world button--small ranking-whole',
-          text: `Pokaż całą ${rows.length === 100 ? 'setkę' : 'listę'}`,
+          text: rows.length === 100 ? t('Pokaż całą setkę') : t('Pokaż całą listę'),
           onClick: () => {
             whole = true;
             show(last);
@@ -220,7 +223,7 @@ function mountGuildRanking(container) {
   let gone = false;
   const switcher = h(
     'div',
-    { class: 'segmented ranking-period', role: 'group', 'aria-label': 'Okres rankingu gildii' },
+    { class: 'segmented ranking-period', role: 'group', 'aria-label': t('Okres rankingu gildii') },
     Object.entries(periods).map(([id, name]) =>
       h('button', {
         type: 'button',
@@ -236,7 +239,7 @@ function mountGuildRanking(container) {
     ),
   );
   const place = h('p', { class: 'ranking-place' });
-  const board = h('div', { class: 'card ranking ranking-guilds' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
+  const board = h('div', { class: 'card ranking ranking-guilds' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   fill(container, switcher, place, board);
 
   async function load() {
@@ -270,7 +273,7 @@ function mountGuildRanking(container) {
               h(
                 'tr',
                 {},
-                h('th', { scope: 'col', 'aria-label': 'Miejsce', text: columns.place }),
+                h('th', { scope: 'col', 'aria-label': t('Miejsce'), text: columns.place }),
                 h('th', { scope: 'col', text: columns.guild }),
                 h('th', { scope: 'col', text: columns.members }),
                 h('th', { scope: 'col', class: 'ranking-sorted', 'aria-sort': 'descending', text: columns.fame }),

@@ -15,6 +15,7 @@ import { liveTrade, tradeSeen } from '../chat-news.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { formatCountdown, formatNumber } from '../format.js';
+import { t } from '../i18n.js';
 import { narratorIdle } from '../narrator.js';
 import { playSound } from '../sound.js';
 import { call, serverNow, state, walletEntries } from '../state.js';
@@ -53,7 +54,7 @@ async function answer(id, accept) {
   if (accept) follow(trade);
   else {
     tradeSeen(trade);
-    toast('Propozycja odrzucona.');
+    toast(t('Propozycja odrzucona.'));
   }
   return trade;
 }
@@ -79,10 +80,10 @@ export function offerTrade() {
     }
   };
   openSheet(
-    h('h2', { class: 'sheet-title trade-sheet-title' }, icon('swap', { size: 22 }), 'Propozycja wymiany'),
-    h('p', { class: 'sheet-text', text: `${trade.other} proponuje Ci wymianę przedmiotów, ziół, mikstur, materiałów albo złota.` }),
-    h('p', { class: 'muted', text: `Bez odpowiedzi propozycja przepadnie po ${Math.round(state.content.community.trade.proposalSeconds / 60)} min.` }),
-    h('div', { class: 'sheet-actions' }, button('Odrzuć', 'world', reply(false)), button('Przyjmij', 'system', reply(true))),
+    h('h2', { class: 'sheet-title trade-sheet-title' }, icon('swap', { size: 22 }), t('Propozycja wymiany')),
+    h('p', { class: 'sheet-text', text: t('{name} proponuje Ci wymianę przedmiotów, ziół, mikstur, materiałów albo złota.', { name: trade.other }) }),
+    h('p', { class: 'muted', text: t('Bez odpowiedzi propozycja przepadnie po {minutes} min.', { minutes: Math.round(state.content.community.trade.proposalSeconds / 60) }) }),
+    h('div', { class: 'sheet-actions' }, button(t('Odrzuć'), 'world', reply(false)), button(t('Przyjmij'), 'system', reply(true))),
   );
 }
 
@@ -91,15 +92,18 @@ export function offerTrade() {
 export function tradeBanner() {
   const trade = liveTrade();
   if (!trade) return null;
-  const open = () => h('a', { class: 'button button--system button--small', href: HASH, onClick: () => (followed = trade.id), text: 'Otwórz' });
+  const open = () => h('a', { class: 'button button--system button--small', href: HASH, onClick: () => (followed = trade.id), text: t('Otwórz') });
   const parts =
     trade.state === 'proposed' && !trade.proposer
       ? [
-          h('p', { text: `${trade.other} proponuje Ci wymianę.` }),
-          h('div', { class: 'trade-banner-actions' }, button('Odrzuć', 'world', () => answer(trade.id, false)), button('Przyjmij', 'system', () => answer(trade.id, true))),
+          h('p', { text: t('{name} proponuje Ci wymianę.', { name: trade.other }) }),
+          h('div', { class: 'trade-banner-actions' }, button(t('Odrzuć'), 'world', () => answer(trade.id, false)), button(t('Przyjmij'), 'system', () => answer(trade.id, true))),
         ]
-      : [h('p', { text: trade.state === 'proposed' ? `Czekasz, aż ${trade.other} przyjmie wymianę.` : `Trwa wymiana z postacią ${trade.other}.` }), open()];
-  return h('section', { class: 'card trade-banner', 'aria-label': 'Wymiana' }, icon('swap', { size: 22, className: 'trade-banner-icon' }), parts);
+      : [
+          h('p', { text: trade.state === 'proposed' ? t('Czekasz, aż {name} przyjmie wymianę.', { name: trade.other }) : t('Trwa wymiana z postacią {name}.', { name: trade.other }) }),
+          open(),
+        ];
+  return h('section', { class: 'card trade-banner', 'aria-label': t('Wymiana') }, icon('swap', { size: 22, className: 'trade-banner-icon' }), parts);
 }
 
 // The herbs, potions, materials, minerals and camp resources of an offer,
@@ -115,11 +119,11 @@ const stacksOf = (offer) => [
 // What an offer holds, in words: "120 złota, Amulet Dębu, Żywokost ×5".
 function offerText(offer) {
   const parts = [
-    offer.gold > 0 && `${formatNumber(offer.gold)} złota`,
+    offer.gold > 0 && t('{gold} złota', { gold: formatNumber(offer.gold) }),
     ...offer.items.map(itemTitle),
     ...stacksOf(offer).map((stack) => `${stack.name} ×${formatNumber(stack.count)}`),
   ].filter(Boolean);
-  return parts.length > 0 ? parts.join(', ') : 'nic';
+  return parts.length > 0 ? parts.join(', ') : t('nic');
 }
 
 const isEmpty = (offer) => offer.gold === 0 && offer.items.length === 0 && stacksOf(offer).length === 0;
@@ -131,8 +135,8 @@ export function mountTrade(container, { backHash }) {
   let asking = false;
   let timer = null;
   const countdown = h('p', { class: 'muted trade-countdown' });
-  const body = h('div', { class: 'trade' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
-  fill(container, pageHeading('Wymiana'), body);
+  const body = h('div', { class: 'trade' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
+  fill(container, pageHeading(t('Wymiana')), body);
 
   async function refresh() {
     if (gone || asking || document.hidden) return;
@@ -169,7 +173,7 @@ export function mountTrade(container, { backHash }) {
     if (view?.state === 'done' && was && was.state !== 'done') {
       playSound('collect');
       if (!own) {
-        toast('Wymiana zakończona.');
+        toast(t('Wymiana zakończona.'));
         call('GET', '/api/character').catch(() => {});
       }
     }
@@ -195,10 +199,13 @@ export function mountTrade(container, { backHash }) {
     const final = view.state === 'locked';
     // The offers as the player saw them: changed meanwhile, the server says so.
     const { id, version, mine, theirs, other } = view;
+    const offers = { give: offerText(mine), get: offerText(theirs) };
     const sure = await confirmAction({
-      title: final ? 'Przyjąć wymianę?' : 'Zatwierdzić wymianę?',
-      text: `Oddasz: ${offerText(mine)}. Dostaniesz: ${offerText(theirs)}.${final ? '' : ` Potem żadna z ofert już się nie zmieni, a ${other.name} przyjmie wymianę albo ją odrzuci.`}`,
-      confirmLabel: final ? 'Przyjmij' : 'Zatwierdź',
+      title: final ? t('Przyjąć wymianę?') : t('Zatwierdzić wymianę?'),
+      text: final
+        ? t('Oddasz: {give}. Dostaniesz: {get}.', offers)
+        : t('Oddasz: {give}. Dostaniesz: {get}. Potem żadna z ofert już się nie zmieni, a {name} przyjmie wymianę albo ją odrzuci.', { ...offers, name: other.name }),
+      confirmLabel: final ? t('Przyjmij') : t('Zatwierdź'),
     });
     if (!sure || gone) return;
     const result = await call('POST', '/api/trade/confirm', { id, version });
@@ -210,21 +217,21 @@ export function mountTrade(container, { backHash }) {
     const name = view.other.name;
     switch (view.state) {
       case 'proposed':
-        return view.proposer ? `Propozycja wysłana. Czekasz, aż ${name} ją przyjmie.` : `${name} proponuje Ci wymianę.`;
+        return view.proposer ? t('Propozycja wysłana. Czekasz, aż {name} ją przyjmie.', { name }) : t('{name} proponuje Ci wymianę.', { name });
       case 'open':
-        return 'Dodajcie do ofert, co chcecie dać. Kto pierwszy zatwierdzi wymianę, ten zamrozi obie oferty, a druga strona już tylko ją przyjmie albo odrzuci.';
+        return t('Dodajcie do ofert, co chcecie dać. Kto pierwszy zatwierdzi wymianę, ten zamrozi obie oferty, a druga strona już tylko ją przyjmie albo odrzuci.');
       case 'locked':
         return view.lockedBy === 'me'
-          ? `Wymiana zatwierdzona. Oferty już się nie zmienią. Czekasz, aż ${name} ją przyjmie albo odrzuci.`
-          : `Postać ${name} zatwierdziła wymianę. Oferty już się nie zmienią: przyjmij ją albo odrzuć.`;
+          ? t('Wymiana zatwierdzona. Oferty już się nie zmienią. Czekasz, aż {name} ją przyjmie albo odrzuci.', { name })
+          : t('Postać {name} zatwierdziła wymianę. Oferty już się nie zmienią: przyjmij ją albo odrzuć.', { name });
       case 'done':
-        return 'Wymiana zakończona. Wszystko jest już w plecakach.';
+        return t('Wymiana zakończona. Wszystko jest już w plecakach.');
       case 'rejected':
-        return view.proposer ? `Postać ${name} odrzuciła wymianę.` : 'Wymiana odrzucona.';
+        return view.proposer ? t('Postać {name} odrzuciła wymianę.', { name }) : t('Wymiana odrzucona.');
       case 'cancelled':
-        return 'Wymiana anulowana.';
+        return t('Wymiana anulowana.');
       default:
-        return 'Wymiana przepadła, bo za długo nic się w niej nie działo.';
+        return t('Wymiana przepadła, bo za długo nic się w niej nie działo.');
     }
   }
 
@@ -232,18 +239,18 @@ export function mountTrade(container, { backHash }) {
     if (!view) {
       fill(
         body,
-        h('p', { class: 'sheet-text', text: 'Nie trwa żadna wymiana. Zaproponujesz ją w karcie postaci innego gracza albo na liście Znajomych.' }),
-        h('a', { class: 'button button--world', href: '#/spolecznosc', text: 'Społeczność' }),
+        h('p', { class: 'sheet-text', text: t('Nie trwa żadna wymiana. Zaproponujesz ją w karcie postaci innego gracza albo na liście Znajomych.') }),
+        h('a', { class: 'button button--world', href: '#/spolecznosc', text: t('Społeczność') }),
       );
       return;
     }
     const live = LIVE.includes(view.state);
     fill(
       body,
-      h('p', { class: 'trade-with' }, icon('swap', { size: 18 }), `Z postacią ${view.other.name}`),
+      h('p', { class: 'trade-with' }, icon('swap', { size: 18 }), t('Z postacią {name}', { name: view.other.name })),
       h('p', { class: 'trade-status', role: 'status', text: statusText() }),
       view.state === 'proposed' && countdown,
-      live && !view.other.online && h('p', { class: 'region-warning', text: `Gracz ${view.other.name} nie jest teraz online.` }),
+      live && !view.other.online && h('p', { class: 'region-warning', text: t('Gracz {name} nie jest teraz online.', { name: view.other.name }) }),
       ['open', 'locked', 'done'].includes(view.state) && [offerCard(true), offerCard(false)],
       actions(),
     );
@@ -256,12 +263,15 @@ export function mountTrade(container, { backHash }) {
     return h(
       'section',
       { class: 'card trade-offer' },
-      h('h2', { class: 'card-title', text: view.state === 'done' ? (mine ? 'Oddano' : 'Otrzymano') : mine ? 'Twoja oferta' : `Oferta: ${view.other.name}` }),
-      isEmpty(offer) && h('p', { class: 'muted', text: 'Na razie pusto.' }),
-      offer.gold > 0 && h('p', { class: 'trade-gold' }, goldArt(20), `${formatNumber(offer.gold)} złota`),
+      h('h2', {
+        class: 'card-title',
+        text: view.state === 'done' ? (mine ? t('Oddano') : t('Otrzymano')) : mine ? t('Twoja oferta') : t('Oferta: {name}', { name: view.other.name }),
+      }),
+      isEmpty(offer) && h('p', { class: 'muted', text: t('Na razie pusto.') }),
+      offer.gold > 0 && h('p', { class: 'trade-gold' }, goldArt(20), t('{gold} złota', { gold: formatNumber(offer.gold) })),
       offer.items.length > 0 && h('ul', { class: 'item-list' }, offer.items.map((item) => h('li', {}, itemEntry(item, mine)))),
       stacks.length > 0 && h('ul', { class: 'trade-stacks' }, stacks.map((stack) => stackEntry(stack, mine))),
-      mine && view.state === 'open' && h('button', { type: 'button', class: 'button button--world', text: isEmpty(offer) ? 'Dodaj do oferty' : 'Zmień ofertę', onClick: editOffer }),
+      mine && view.state === 'open' && h('button', { type: 'button', class: 'button button--world', text: isEmpty(offer) ? t('Dodaj do oferty') : t('Zmień ofertę'), onClick: editOffer }),
     );
   }
 
@@ -273,9 +283,9 @@ export function mountTrade(container, { backHash }) {
     const notes = mine
       ? []
       : [
-          item.classIds && !item.classIds.includes(character.classId) && 'Twoja klasa nie może go używać.',
+          item.classIds && !item.classIds.includes(character.classId) && t('Twoja klasa nie może go używać.'),
           // From its own level of the class on, as one from a Wymiana is.
-          character.classLevel < (item.classLevel ?? 1) && `Założysz go od poziomu klasy ${item.classLevel}.`,
+          character.classLevel < (item.classLevel ?? 1) && t('Założysz go od poziomu klasy {level}.', { level: item.classLevel }),
         ].filter(Boolean);
     return [
       h(
@@ -286,8 +296,12 @@ export function mountTrade(container, { backHash }) {
           'ul',
           { class: 'item-properties' },
           item.properties.map((line) => h('li', { text: line })),
-          item.classNames && h('li', { class: 'item-classes', text: `${item.classNames.length > 1 ? 'Dla klas' : 'Dla klasy'}: ${item.classNames.join(', ')}` }),
-          item.price !== undefined && h('li', { class: 'item-price', text: `U złomiarza: ${formatNumber(item.price)} złota` }),
+          item.classNames &&
+            h('li', {
+              class: 'item-classes',
+              text: item.classNames.length > 1 ? t('Dla klas: {classes}', { classes: item.classNames.join(', ') }) : t('Dla klasy: {classes}', { classes: item.classNames.join(', ') }),
+            }),
+          item.price !== undefined && h('li', { class: 'item-price', text: t('U złomiarza: {gold} złota', { gold: formatNumber(item.price) }) }),
         ),
       ),
       notes.map((note) => h('p', { class: 'region-warning trade-note', text: note })),
@@ -310,7 +324,7 @@ export function mountTrade(container, { backHash }) {
       h('span', { class: 'potion-pick-art' }, art),
       h('span', { class: 'trade-stack-name', text: stack.name }),
       h('span', { class: 'trade-stack-count', text: `×${formatNumber(stack.count)}` }),
-      !mine && !stack.herb && !stack.material && !stack.mineral && !stack.resource && !stack.known && h('p', { class: 'region-warning trade-note', text: 'Nie znasz jej receptury, więc jej nie użyjesz.' }),
+      !mine && !stack.herb && !stack.material && !stack.mineral && !stack.resource && !stack.known && h('p', { class: 'region-warning trade-note', text: t('Nie znasz jej receptury, więc jej nie użyjesz.') }),
     );
   }
 
@@ -318,13 +332,13 @@ export function mountTrade(container, { backHash }) {
     const row = (...buttons) => h('div', { class: 'sheet-actions' }, buttons);
     switch (view.state) {
       case 'proposed':
-        return view.proposer ? row(button('Cofnij propozycję', 'world', end)) : row(button('Odrzuć', 'world', reply(false)), button('Przyjmij', 'system', reply(true)));
+        return view.proposer ? row(button(t('Cofnij propozycję'), 'world', end)) : row(button(t('Odrzuć'), 'world', reply(false)), button(t('Przyjmij'), 'system', reply(true)));
       case 'open':
-        return row(button('Odrzuć wymianę', 'world', end), button('Zatwierdź wymianę', 'system', confirm, { disabled: isEmpty(view.mine) && isEmpty(view.theirs) }));
+        return row(button(t('Odrzuć wymianę'), 'world', end), button(t('Zatwierdź wymianę'), 'system', confirm, { disabled: isEmpty(view.mine) && isEmpty(view.theirs) }));
       case 'locked':
-        return row(button('Odrzuć wymianę', 'world', end), view.lockedBy === 'them' && button('Przyjmij wymianę', 'system', confirm));
+        return row(button(t('Odrzuć wymianę'), 'world', end), view.lockedBy === 'them' && button(t('Przyjmij wymianę'), 'system', confirm));
       default:
-        return row(h('a', { class: 'button button--world', href: backHash ?? '#/spolecznosc', text: 'Wróć' }));
+        return row(h('a', { class: 'button button--world', href: backHash ?? '#/spolecznosc', text: t('Wróć') }));
     }
   }
 
@@ -344,16 +358,16 @@ export function mountTrade(container, { backHash }) {
         art && h('span', { class: 'potion-pick-art' }, art),
         h('label', { for: id, class: 'trade-field-label', text: label }),
         input,
-        h('span', { class: 'muted trade-field-most', text: `z ${formatNumber(most)}` }),
+        h('span', { class: 'muted trade-field-most', text: t('z {max}', { max: formatNumber(most) }) }),
       );
       const read = () => {
         const value = input.value.trim() === '' ? 0 : Number(input.value);
-        if (!Number.isInteger(value) || value < 0 || value > most) throw new Error(`${label}: wpisz od 0 do ${formatNumber(most)}.`);
+        if (!Number.isInteger(value) || value < 0 || value > most) throw new Error(t('{name}: wpisz od 0 do {max}.', { name: label, max: formatNumber(most) }));
         return value;
       };
       return { element, read };
     };
-    const gold = field('trade-gold', 'Złoto', view.mine.gold, character.gold, goldArt(20));
+    const gold = field('trade-gold', t('Złoto'), view.mine.gold, character.gold, goldArt(20));
     const stackFields = (entries, kind, art) =>
       entries.map((entry) => ({ id: entry.id, ...field(`trade-${kind}-${entry.id.replace(':', '-')}`, entry.name, counts[entry.id] ?? 0, entry.count, art(entry)) }));
     const herbs = stackFields(character.herbs ?? [], 'herb', (entry) => herbSprite(entry.id) ?? icon('leaf', { size: 20 }));
@@ -368,7 +382,7 @@ export function mountTrade(container, { backHash }) {
     const resources = stackFields(stores, 'resource', (entry) => resourceArt(entry.id, 20));
     const count = h('p', { class: 'muted' });
     const showCount = () => {
-      count.textContent = `Wybrane: ${picked.size} z ${maxItems}.`;
+      count.textContent = t('Wybrane: {count} z {max}.', { count: picked.size, max: maxItems });
     };
     showCount();
     const items = character.bag.map((item) => {
@@ -381,7 +395,7 @@ export function mountTrade(container, { backHash }) {
           onClick: () => {
             if (picked.has(item.id)) picked.delete(item.id);
             else if (picked.size >= maxItems) {
-              toast(`W jednej wymianie najwyżej ${maxItems} przedmiotów.`);
+              toast(t('W jednej wymianie najwyżej {count} przedmiotów.', { count: maxItems }));
               return;
             } else picked.add(item.id);
             row.setAttribute('aria-pressed', String(picked.has(item.id)));
@@ -414,25 +428,25 @@ export function mountTrade(container, { backHash }) {
     };
     const section = (title, ...children) => [h('h3', { class: 'profile-section', text: title }), children];
     openSheet(
-      h('h2', { class: 'sheet-title', text: 'Twoja oferta' }),
-      h('p', { class: 'sheet-text', text: `Co dasz postaci ${view.other.name}? Zapisana oferta od razu pokaże się po drugiej stronie.` }),
+      h('h2', { class: 'sheet-title', text: t('Twoja oferta') }),
+      h('p', { class: 'sheet-text', text: t('Co dasz postaci {name}? Zapisana oferta od razu pokaże się po drugiej stronie.', { name: view.other.name }) }),
       gold.element,
-      resources.length > 0 && section('Zasoby obozu', resources.map((entry) => entry.element)),
+      resources.length > 0 && section(t('Zasoby obozu'), resources.map((entry) => entry.element)),
       section(
-        'Przedmioty z plecaka',
-        character.bag.length === 0 ? h('p', { class: 'muted', text: 'W plecaku nie ma przedmiotów. Założonych nie wymienisz.' }) : [count, h('ul', { class: 'item-list' }, items)],
+        t('Przedmioty z plecaka'),
+        character.bag.length === 0 ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotów. Założonych nie wymienisz.') }) : [count, h('ul', { class: 'item-list' }, items)],
       ),
-      herbs.length > 0 && section('Zioła', herbs.map((entry) => entry.element)),
-      potions.length > 0 && section('Mikstury', potions.map((entry) => entry.element)),
-      materials.length > 0 && section('Materiały', materials.map((entry) => entry.element)),
-      minerals.length > 0 && section('Minerały', minerals.map((entry) => entry.element)),
-      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }), button('Zapisz ofertę', 'system', save)),
+      herbs.length > 0 && section(t('Zioła'), herbs.map((entry) => entry.element)),
+      potions.length > 0 && section(t('Mikstury'), potions.map((entry) => entry.element)),
+      materials.length > 0 && section(t('Materiały'), materials.map((entry) => entry.element)),
+      minerals.length > 0 && section(t('Minerały'), minerals.map((entry) => entry.element)),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), button(t('Zapisz ofertę'), 'system', save)),
     );
   }
 
   // A proposal waits a while for its answer.
   function tick(now) {
-    if (view?.state === 'proposed') countdown.textContent = `Propozycja przepadnie za ${formatCountdown(view.endsAt - now)}.`;
+    if (view?.state === 'proposed') countdown.textContent = t('Propozycja przepadnie za {time}.', { time: formatCountdown(view.endsAt - now) });
   }
 
   restart = start;

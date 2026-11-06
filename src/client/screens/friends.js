@@ -7,6 +7,7 @@
 import { friendsSeen } from '../chat-news.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
+import { t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
 import { openProfile } from '../profile.js';
 import { playSound } from '../sound.js';
@@ -15,14 +16,15 @@ import { framedName, guildTag, howItWorks, toast, withButton } from '../ui.js';
 import { proposeTrade } from './trade.js';
 
 const resourceName = (id) => walletEntries().find((entry) => entry.id === id)?.name ?? id;
-// A friend's dot in words: green, yellow and red (styles.css).
+// A friend's dot in words: green, yellow and red (styles.css), shown in
+// the page's language (t()).
 const STATUS = { online: 'online', busy: 'zajęty, teraz bez wymiany', offline: 'offline' };
 
 // What the Upominki collected held: "Punkty Czasu +3, Złoto +40, Drewno +5".
 export const giftText = (reward) =>
   [
-    `Punkty Czasu +${formatNumber(reward.timePoints)}`,
-    reward.gold > 0 && `Złoto +${formatNumber(reward.gold)}`,
+    t('Punkty Czasu +{count}', { count: formatNumber(reward.timePoints) }),
+    reward.gold > 0 && t('Złoto +{count}', { count: formatNumber(reward.gold) }),
     ...Object.entries(reward.resources).map(([id, amount]) => `${resourceName(id)} +${formatNumber(amount)}`),
   ]
     .filter(Boolean)
@@ -32,7 +34,7 @@ export function mountFriends(container) {
   const { gift } = state.content.community;
   let view = null;
   let gone = false;
-  const body = h('div', { class: 'friends' }, h('p', { class: 'muted', text: 'Wczytywanie…' }));
+  const body = h('div', { class: 'friends' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
 
   // The line to invite a character by its name stays as typed between the
   // answers.
@@ -43,10 +45,10 @@ export function mountFriends(container) {
     autocomplete: 'off',
     autocapitalize: 'none',
     enterkeyhint: 'send',
-    placeholder: 'Imię postaci',
-    'aria-label': 'Imię postaci do zaproszenia',
+    placeholder: t('Imię postaci'),
+    'aria-label': t('Imię postaci do zaproszenia'),
   });
-  const inviteButton = h('button', { type: 'submit', class: 'button button--system chat-send', text: 'Zaproś' });
+  const inviteButton = h('button', { type: 'submit', class: 'button button--system chat-send', text: t('Zaproś') });
   const inviteForm = h(
     'form',
     {
@@ -89,20 +91,20 @@ export function mountFriends(container) {
     h(
       'div',
       { class: 'friend-who' },
-      person.status && h('span', { class: `friend-status friend-status--${person.status}`, role: 'img', 'aria-label': STATUS[person.status], title: STATUS[person.status] }),
+      person.status && h('span', { class: `friend-status friend-status--${person.status}`, role: 'img', 'aria-label': t(STATUS[person.status]), title: t(STATUS[person.status]) }),
       icon(CLASS_ICONS[person.classId] ?? 'person', { size: 16, className: 'chat-class' }),
       framedName(
         h('button', {
           type: 'button',
           class: 'chat-name',
           text: person.name,
-          'aria-label': `${person.name}: zobacz postać`,
+          'aria-label': t('{name}: zobacz postać', { name: person.name }),
           onClick: (event) => withButton(event.currentTarget, () => openProfile(person.name, { onChange: show })),
         }),
         person.nameColor,
       ),
       guildTag(person.guildTag),
-      h('span', { class: 'chat-level', text: `poz. ${person.level}` }),
+      h('span', { class: 'chat-level', text: t('poz. {level}', { level: person.level }) }),
       more,
     );
 
@@ -115,19 +117,26 @@ export function mountFriends(container) {
     return h(
       'section',
       { class: 'card friends-gifts', 'aria-labelledby': 'friends-gifts-title' },
-      h('h2', { class: 'card-title', id: 'friends-gifts-title' }, icon('gift', { size: 22 }), 'Upominki'),
+      h('h2', { class: 'card-title', id: 'friends-gifts-title' }, icon('gift', { size: 22 }), t('Upominki')),
       // The author: all of it under "Jak to działa?".
       howItWorks(null, [
-        `Każdego dnia możesz wysłać każdemu znajomemu jeden ${gift.name}: ${countOf(gift.timePoints, 'Punkt Czasu', 'Punkty Czasu', 'Punktów Czasu')} i trochę złota albo surowców.`,
-        `Dziennie odbierzesz do ${claimsPerDay}.`,
+        t('Każdego dnia możesz wysłać każdemu znajomemu jeden {gift}: {points} i trochę złota albo surowców.', {
+          gift: gift.name,
+          points: countOf(gift.timePoints, 'Punkt Czasu', 'Punkty Czasu', 'Punktów Czasu'),
+        }),
+        t('Dziennie odbierzesz do {count}.', { count: claimsPerDay }),
       ]),
       h('p', {
         class: 'friends-gifts-count',
-        text: `${waiting === 0 ? 'Żaden upominek nie czeka.' : `Czeka: ${countOf(waiting, 'upominek', 'upominki', 'upominków')}.`} Dziś odebrano ${claimedToday} z ${claimsPerDay}.`,
+        text: t('{waiting} Dziś odebrano {count} z {max}.', {
+          waiting: waiting === 0 ? t('Żaden upominek nie czeka.') : t('Czeka: {gifts}.', { gifts: countOf(waiting, 'upominek', 'upominki', 'upominków') }),
+          count: claimedToday,
+          max: claimsPerDay,
+        }),
       }),
-      ready > 0 && button(`Odbierz upominki (${ready})`, claim, 'system', { class: 'button button--system' }),
-      waiting > 0 && left === 0 && h('p', { class: 'muted', text: 'Kolejne odbierzesz od północy.' }),
-      unsent > 0 && button(`Wyślij wszystkie (${unsent})`, sendAll, 'world', { class: 'button button--world' }),
+      ready > 0 && button(t('Odbierz upominki ({count})', { count: ready }), claim, 'system', { class: 'button button--system' }),
+      waiting > 0 && left === 0 && h('p', { class: 'muted', text: t('Kolejne odbierzesz od północy.') }),
+      unsent > 0 && button(t('Wyślij wszystkie ({count})', { count: unsent }), sendAll, 'world', { class: 'button button--world' }),
     );
   }
 
@@ -136,14 +145,14 @@ export function mountFriends(container) {
   async function sendAll() {
     const answer = await call('POST', '/api/friends/gift-all');
     show(answer);
-    toast(`Wysłano ${countOf(answer.sent, 'upominek', 'upominki', 'upominków')}.`);
+    toast(t('Wysłano {gifts}.', { gifts: countOf(answer.sent, 'upominek', 'upominki', 'upominków') }));
   }
 
   async function claim() {
     const answer = await call('POST', '/api/friends/claim');
     playSound('collect');
     show(answer);
-    toast(`Odebrano ${countOf(answer.reward.count, 'upominek', 'upominki', 'upominków')}: ${giftText(answer.reward)}.`);
+    toast(t('Odebrano {gifts}: {reward}.', { gifts: countOf(answer.reward.count, 'upominek', 'upominki', 'upominków'), reward: giftText(answer.reward) }));
   }
 
   function incomingCard() {
@@ -151,7 +160,7 @@ export function mountFriends(container) {
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'friends-incoming-title' },
-      h('h2', { class: 'card-title', id: 'friends-incoming-title', text: 'Zaproszenia' }),
+      h('h2', { class: 'card-title', id: 'friends-incoming-title', text: t('Zaproszenia') }),
       h(
         'ul',
         { class: 'friends-list' },
@@ -163,8 +172,8 @@ export function mountFriends(container) {
             h(
               'div',
               { class: 'friend-actions' },
-              button('Przyjmij', act('/api/friends/accept', { id: person.id }), 'system'),
-              button('Odrzuć', act('/api/friends/remove', { id: person.id }, `Zaproszenie od postaci ${person.name} odrzucone.`)),
+              button(t('Przyjmij'), act('/api/friends/accept', { id: person.id }), 'system'),
+              button(t('Odrzuć'), act('/api/friends/remove', { id: person.id }, t('Zaproszenie od postaci {name} odrzucone.', { name: person.name }))),
             ),
           ),
         ),
@@ -176,11 +185,11 @@ export function mountFriends(container) {
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'friends-title' },
-      h('h2', { class: 'card-title', id: 'friends-title', text: `Znajomi (${view.friends.length}/${view.max})` }),
+      h('h2', { class: 'card-title', id: 'friends-title', text: t('Znajomi ({count}/{max})', { count: view.friends.length, max: view.max }) }),
       view.friends.length === 0
         ? h('p', {
             class: 'muted',
-            text: 'Nie masz jeszcze znajomych. Wybierz imię postaci na czacie albo w Rankingu i zaproś ją w jej karcie albo wpisz imię poniżej.',
+            text: t('Nie masz jeszcze znajomych. Wybierz imię postaci na czacie albo w Rankingu i zaproś ją w jej karcie albo wpisz imię poniżej.'),
           })
         : h(
             'ul',
@@ -189,7 +198,7 @@ export function mountFriends(container) {
               h(
                 'li',
                 { class: 'friend' },
-                who(person, person.waiting > 0 && h('span', { class: 'friend-waiting', title: 'Upominek od tej postaci czeka' }, icon('gift', { size: 14 }))),
+                who(person, person.waiting > 0 && h('span', { class: 'friend-waiting', title: t('Upominek od tej postaci czeka') }, icon('gift', { size: 14 }))),
                 h(
                   'div',
                   { class: 'friend-actions' },
@@ -198,24 +207,24 @@ export function mountFriends(container) {
                     {
                       type: 'button',
                       class: 'button button--world button--small friend-gift',
-                      'aria-label': `Wymiana: ${person.name}`,
+                      'aria-label': t('Wymiana: {name}', { name: person.name }),
                       onClick: (event) => withButton(event.currentTarget, () => proposeTrade({ id: person.characterId, name: person.name })),
                     },
                     icon('swap', { size: 16 }),
-                    'Wymiana',
+                    t('Wymiana'),
                   ),
                   person.sentToday
-                    ? h('span', { class: 'friend-sent' }, icon('gift', { size: 16 }), 'Wysłany')
+                    ? h('span', { class: 'friend-sent' }, icon('gift', { size: 16 }), t('Wysłany'))
                     : h(
                         'button',
                         {
                           type: 'button',
                           class: 'button button--system button--small friend-gift',
-                          'aria-label': `Wyślij ${gift.name}: ${person.name}`,
+                          'aria-label': t('Wyślij {gift}: {name}', { gift: gift.name, name: person.name }),
                           onClick: (event) => withButton(event.currentTarget, act('/api/friends/gift', { id: person.id })),
                         },
                         icon('gift', { size: 16 }),
-                        'Wyślij',
+                        t('Wyślij'),
                       ),
                 ),
               ),
@@ -225,19 +234,19 @@ export function mountFriends(container) {
   }
 
   const inviteCard = () =>
-    h('section', { class: 'card', 'aria-labelledby': 'friends-invite-title' }, h('h2', { class: 'card-title', id: 'friends-invite-title', text: 'Zaproś postać' }), inviteForm);
+    h('section', { class: 'card', 'aria-labelledby': 'friends-invite-title' }, h('h2', { class: 'card-title', id: 'friends-invite-title', text: t('Zaproś postać') }), inviteForm);
 
   function outgoingCard() {
     if (view.outgoing.length === 0) return null;
     return h(
       'section',
       { class: 'card', 'aria-labelledby': 'friends-outgoing-title' },
-      h('h2', { class: 'card-title', id: 'friends-outgoing-title', text: 'Wysłane zaproszenia' }),
+      h('h2', { class: 'card-title', id: 'friends-outgoing-title', text: t('Wysłane zaproszenia') }),
       h(
         'ul',
         { class: 'friends-list' },
         view.outgoing.map((person) =>
-          h('li', { class: 'friend' }, who(person), button('Cofnij', act('/api/friends/remove', { id: person.id }, `Zaproszenie dla postaci ${person.name} cofnięte.`))),
+          h('li', { class: 'friend' }, who(person), button(t('Cofnij'), act('/api/friends/remove', { id: person.id }, t('Zaproszenie dla postaci {name} cofnięte.', { name: person.name })))),
         ),
       ),
     );

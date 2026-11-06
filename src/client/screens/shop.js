@@ -11,12 +11,14 @@ import { mountArt, walkerSheet } from '../art.js';
 import { characterLook, portraitBox } from '../cosmetics.js';
 import { fill, h, icon } from '../dom.js';
 import { formatNumber } from '../format.js';
+import { t } from '../i18n.js';
 import { SYSTEM_POINTS_ICON } from '../icons.js';
 import { systemPoints } from '../quests.js';
 import { call, state } from '../state.js';
 import { confirmAction, howItWorks, pageHeading, toast, withButton } from '../ui.js';
 
 const HOME = '#/sklep';
+// The tabs, their names shown in the page's language (t()).
 const TABS = [
   { id: 'ramki', kind: 'frame', name: 'Ramki' },
   { id: 'tla', kind: 'background', name: 'Tła' },
@@ -34,16 +36,16 @@ export function mountShop(container, { params }) {
     const { items, texts } = state.content.cosmetics;
     fill(
       container,
-      pageHeading('Sklep Systemu'),
+      pageHeading(t('Sklep Systemu')),
       h(
         'p',
         { class: 'shop-points' },
         icon(SYSTEM_POINTS_ICON, { size: 20 }),
-        h('span', { text: 'Punkty Systemu:' }),
+        h('span', { text: t('Punkty Systemu:') }),
         h('strong', { text: formatNumber(character.systemPoints) }),
       ),
       howItWorks(texts.lead, texts.rules),
-      h('div', { class: 'segmented shop-tabs', role: 'group', 'aria-label': 'Działy Sklepu Systemu' }, TABS.map(tabButton)),
+      h('div', { class: 'segmented shop-tabs', role: 'group', 'aria-label': t('Działy Sklepu Systemu') }, TABS.map(tabButton)),
       tab.kind === 'frame' && character.cosmetics.frame && nameSwitch(character),
       h(
         'ul',
@@ -59,7 +61,7 @@ export function mountShop(container, { params }) {
       type: 'button',
       class: 'segmented-option',
       'aria-pressed': each === tab,
-      text: each.name,
+      text: t(each.name),
       onClick: () => {
         tab = each;
         history.replaceState(history.state, '', each === TABS[0] ? HOME : `${HOME}/${each.id}`);
@@ -78,7 +80,7 @@ export function mountShop(container, { params }) {
       h(
         'div',
         { class: 'shop-item-text' },
-        h('h2', { class: 'shop-item-name' }, item.name, worn && [' ', h('span', { class: 'chip chip--success', text: 'W użyciu' })]),
+        h('h2', { class: 'shop-item-name' }, item.name, worn && [' ', h('span', { class: 'chip chip--success', text: t('W użyciu') })]),
         h('p', { class: 'muted', text: item.description }),
         !owned && h('p', { class: 'shop-price' }, icon(SYSTEM_POINTS_ICON, { size: 16 }), systemPoints(item.price)),
         action(item, character, { owned, worn }),
@@ -120,7 +122,7 @@ export function mountShop(container, { params }) {
       return h('button', {
         type: 'button',
         class: `button button--small ${worn ? 'button--world' : 'button--system'}`,
-        text: worn ? 'Zdejmij' : 'Załóż',
+        text: worn ? t('Zdejmij') : t('Załóż'),
         onClick: (event) => withButton(event.currentTarget, () => wear(item, worn ? null : item.id)),
       });
     }
@@ -129,7 +131,11 @@ export function mountShop(container, { params }) {
     return h('button', {
       type: 'button',
       class: 'button button--system button--small',
-      text: noMount ? 'Najpierw kup wierzchowca w Stajni' : short > 0 ? `Brakuje ${formatNumber(short)} PS` : `Kup (${formatNumber(item.price)} PS)`,
+      text: noMount
+        ? t('Najpierw kup wierzchowca w Stajni')
+        : short > 0
+          ? t('Brakuje {count} PS', { count: formatNumber(short) })
+          : t('Kup ({price} PS)', { price: formatNumber(item.price) }),
       disabled: noMount || short > 0,
       onClick: (event) => buy(event.currentTarget, item),
     });
@@ -137,20 +143,20 @@ export function mountShop(container, { params }) {
 
   async function buy(button, item) {
     const sure = await confirmAction({
-      title: 'Kupić przedmiot?',
-      text: `${item.name} za ${systemPoints(item.price)}. Przedmiot zostanie przy tej postaci na stałe.`,
-      confirmLabel: 'Kup',
+      title: t('Kupić przedmiot?'),
+      text: t('{name} za {price}. Przedmiot zostanie przy tej postaci na stałe.', { name: item.name, price: systemPoints(item.price) }),
+      confirmLabel: t('Kup'),
     });
     if (!sure) return;
     await withButton(button, async () => {
       await call('POST', '/api/cosmetics/buy', { id: item.id });
-      toast(`Kupiono: ${item.name}.`);
+      toast(t('Kupiono: {name}.', { name: item.name }));
     });
   }
 
   async function wear(item, id) {
     await call('POST', '/api/cosmetics/wear', { kind: item.kind, id });
-    toast(id ? `Założono: ${item.name}.` : `Zdjęto: ${item.name}.`);
+    toast(id ? t('Założono: {name}.', { name: item.name }) : t('Zdjęto: {name}.', { name: item.name }));
   }
 
   // The name in the frame's colour, or in its own (the author: "opcja zmiany
@@ -163,10 +169,10 @@ export function mountShop(container, { params }) {
       role: 'switch',
       'aria-checked': on,
       'aria-labelledby': 'shop-name-label',
-      text: on ? 'Włączony' : 'Wyłączony',
+      text: on ? t('Włączony') : t('Wyłączony'),
       onClick: () => withButton(button, () => call('POST', '/api/cosmetics/name-color', { on: !on })),
     });
-    return h('div', { class: 'shop-switch' }, h('span', { id: 'shop-name-label', text: 'Kolor imienia jak ramka' }), button);
+    return h('div', { class: 'shop-switch' }, h('span', { id: 'shop-name-label', text: t('Kolor imienia jak ramka') }), button);
   }
 
   render();
