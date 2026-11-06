@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/tutorial.json (src/engine/overlay.js): the narrator's buttons, the Ustawienia's switch, and the lines of the introduction, approved by the author (709 OK); the other chapters come in the next stages. The recordings come in stage 5 (696 A).",
+  "$comment": "English texts of data/tutorial.json (src/engine/overlay.js): the narrator's buttons, the Ustawienia's switch, the lines of the introduction, approved by the author (709 OK), and the chapters of the Community, the Professions and Crafting (stage 3, for the author's review); the other chapters come in the next stages. The recordings come in stage 5 (696 A).",
   "skipLabel": "Skip the introduction",
   "nextLabel": "Next",
   "startLabel": "Guide me",
@@ -11,6 +11,20 @@
   "skipSetting": {
     "label": "Skip the narrator's explanations",
     "hint": "The narrator does not explain new tabs and places, and a new character starts without the introduction. Applies to every character on the account."
+  },
+  "chapters": {
+    "professions": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Professions wait in the Professions tab."
+    },
+    "community": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Community waits in the Community tab."
+    },
+    "crafting": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. Crafting waits in the Professions tab."
+    }
   },
   "lines": {
     "ask": {
@@ -299,6 +313,77 @@
           "That is all for a start. The rest of the System's workings, your goal and your liking – you will have to discover on your own. Good luck."
         ]
       }
+    },
+    "professions-welcome": {
+      "text": [
+        "Your character's tenth level… The wilds already know your name, and the System could not overlook that. It has unlocked the Professions for you.",
+        "Before you try your hand at one – allow me to introduce them."
+      ]
+    },
+    "professions-lead": {
+      "text": [
+        "The Professions wait in this tab. Let us take a look at them."
+      ]
+    },
+    "professions-intro": {
+      "text": [
+        "First, read what the System says about them."
+      ]
+    },
+    "professions-list": {
+      "text": [
+        "Herbalism lets you gather herbs in the System Grove, and with Alchemy you will brew potions from them in the System Laboratory. There will be time yet for the other professions."
+      ]
+    },
+    "professions-ending": {
+      "text": [
+        "You will take your potions on an exploration – you pack them for the road before you set out. In a fight, your character will reach for them of their own accord."
+      ]
+    },
+    "community-welcome": {
+      "text": [
+        "Your character's fifth level… The System has opened two new paths before you: the Community and the Quick Hunt."
+      ]
+    },
+    "community-lead": {
+      "text": [
+        "Other wanderers await in this tab. Let us look in on them."
+      ]
+    },
+    "community-tabs": {
+      "text": [
+        "At the top you switch between the tabs: Chat, Friends, Ranking and Guild. You can form a Party from level 10."
+      ]
+    },
+    "community-rules": {
+      "text": [
+        "Here you can talk with other wanderers. Before you write your first word, read the chat rules."
+      ]
+    },
+    "community-ending": {
+      "text": [
+        "And when you lack the time for a long exploration, reach for the Quick Hunt. It waits in Combat, below “Set out” – three times a day."
+      ]
+    },
+    "crafting-welcome": {
+      "text": [
+        "Your character's fifteenth level… The System has opened Crafting to you."
+      ]
+    },
+    "crafting-lead": {
+      "text": [
+        "The System Workshop waits in the Professions tab. Let us look in there."
+      ]
+    },
+    "crafting-patterns": {
+      "text": [
+        "Here you will make weapons and armour from patterns. You will get the parts for them at the Salvage Table, or buy them from the scrap dealer."
+      ]
+    },
+    "crafting-ending": {
+      "text": [
+        "Each new level of Crafting will reveal more patterns to you. Look in here too when you salvage an item you have never taken apart before."
+      ]
     }
   }
 }

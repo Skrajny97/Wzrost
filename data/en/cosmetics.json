@@ -1,0 +1,68 @@
+{
+  "$comment": "English texts of data/cosmetics.json (src/engine/overlay.js): the System Shop's cosmetics and the words under “How does it work?”. The names are Title Case; a familiar is \"Familiar: Fox\", as the Polish \"Chowaniec: Lis\".",
+  "items": {
+    "frame-gold": {
+      "name": "Gold Frame",
+      "description": "Carved gold with a ruby in each corner. Every few seconds a gleam runs across it, and the rubies sparkle."
+    },
+    "frame-system": {
+      "name": "System Frame",
+      "description": "Ice-blue runes and crystals of the System. The frame pulses with cold light, and a bright line slides down it."
+    },
+    "frame-forest": {
+      "name": "Forest Frame",
+      "description": "Roots, moss and fly agarics. Flickering fireflies circle the frame."
+    },
+    "bg-spring": {
+      "name": "System Spring",
+      "description": "A clearing at night with a spring that shines with the System's light."
+    },
+    "bg-tower": {
+      "name": "Tower",
+      "description": "The foot of a huge tower with the System's runes, under a stormy sky."
+    },
+    "bg-camp": {
+      "name": "Camp at Night",
+      "description": "A campfire and a tent in the forest, under a starry sky."
+    },
+    "sabertooth": {
+      "name": "Sabre-Toothed Tiger",
+      "description": "The character rides a sabre-toothed tiger instead of the mount from the Stable."
+    },
+    "aura-system": {
+      "name": "System Aura",
+      "description": "The System's cool light shines around the character, and bright motes drift in the air."
+    },
+    "aura-ember": {
+      "name": "Ember Aura",
+      "description": "A glow like that of a campfire surrounds the character, and sparks fly upwards."
+    },
+    "trail-light": {
+      "name": "Luminous Trail",
+      "description": "Glowing tracks stay behind the character in the Combat scene and slowly fade."
+    },
+    "fox": {
+      "name": "Familiar: Fox",
+      "description": "A russet fox runs beside the character in the Combat scene, and on the portrait it sits at their feet."
+    },
+    "raven": {
+      "name": "Familiar: Raven",
+      "description": "A black raven flies ahead of the character in the Combat scene, and on the portrait it perches on their shoulder."
+    },
+    "wisp": {
+      "name": "Familiar: Will-o'-the-Wisp",
+      "description": "A tamed will-o'-the-wisp floats behind the character in the Combat scene, and on the portrait it glows with a blue light by their shoulder."
+    }
+  },
+  "texts": {
+    "lead": "Here you can spend System Points on items that change only how you look.",
+    "rules": [
+      "An item belongs to the character who bought it, just like their System Points.",
+      "A frame and a background adorn the portrait in the Character tab and on the character card that other players see.",
+      "With a frame on, the character's name can take the frame's colour: in the chat, in the Ranking, among Friends, in the Party and in the Guild.",
+      "A mount changes only the look of the one bought at the Stable, so only a character who already has a mount can buy it.",
+      "An aura shines around the character on the portrait, on the character card and in the Combat scene. The Luminous Trail stays behind the character in the Combat scene, behind their mount too.",
+      "A familiar keeps the character company on the portrait, on the character card and in the Combat scene, beside their mount too. A character has one familiar with them at a time."
+    ]
+  }
+}

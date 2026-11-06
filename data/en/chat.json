@@ -1,5 +1,13 @@
 {
-  "$comment": "English texts of data/chat.json (src/engine/overlay.js): for now the change of a character's name in the Ustawienia. The names the System gives (generated) are names and stay as they are.",
+  "$comment": "English texts of data/chat.json (src/engine/overlay.js): the chat's channels, the rules accepted before the first message, the admin's “Add link” window, tagging with “@” and the change of a character's name in the Settings. The names the System gives (generated) are names and stay as they are; `words` is the swear filter, no text. A tag's phone notification has one English form for both genders (the Polish [a|b]).",
+  "channels": {
+    "global": {
+      "name": "Global"
+    },
+    "trade": {
+      "name": "Trade"
+    }
+  },
   "names": {
     "blocked": "WARNING: your character's name breaks the Google Play rules on inappropriate content. You must change your name.",
     "refused": "This name breaks the Google Play rules on inappropriate content. Choose another.",
@@ -12,5 +20,38 @@
     "once": "A character's name can be changed only once. After that this option is locked.",
     "used": "Name change used",
     "locked": "This character's name has already been changed once."
+  },
+  "mentions": {
+    "texts": {
+      "button": "Tag",
+      "suggestions": "Tag a character",
+      "tagged": "You were tagged",
+      "news": "a tag in the chat waits",
+      "pushTitle": "Chat: {channel}",
+      "pushBody": "{name} tagged you in the chat: {text}",
+      "channels": {
+        "guild": "Guild",
+        "private": "private conversation"
+      }
+    }
+  },
+  "texts": {
+    "link": {
+      "button": "Add link",
+      "title": "Link in a message",
+      "lead": "The label will show in the chat as a link to the address. Only the admin sends links.",
+      "label": "Label",
+      "url": "Address",
+      "insert": "Insert",
+      "noLabel": "Enter the link's label.",
+      "invalid": "The address must start with https:// or http:// and cannot contain spaces."
+    },
+    "rules": [
+      "Every player can see the chat. Write with respect: no swearing, insults, threats, adult content, spam or links.",
+      "Only the two of you can see a private conversation, but the moderators will also read a reported message.",
+      "Do not give out your personal details, such as your address, phone number or password.",
+      "Report a message that breaks the rules: press it and choose “Report”. You can hide the messages of someone you do not want to read in the same way.",
+      "For breaking the rules, the moderators may mute the chat for an account for a day or for good."
+    ]
   }
 }
