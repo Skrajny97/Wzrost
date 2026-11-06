@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/tutorial.json (src/engine/overlay.js): the narrator's buttons, the Ustawienia's switch, the lines of the introduction, approved by the author (709 OK), and the chapters of the Skills, the Party, the Professions, Crafting and the Community (stage 3, waiting for the author's approval); the other chapters come in the next stages. The recordings come in stage 5 (696 A).",
+  "$comment": "English texts of data/tutorial.json (src/engine/overlay.js): the narrator's buttons, the Ustawienia's switch, the lines of the introduction, approved by the author (709 OK), and the chapters of the Skills, the Party, the Professions, Crafting and the Community (stage 3, approved: 712 OK), and all the other chapters (stage 4: the Settlement, Mining, the Towers, the Guild, the Stronghold, the Cornerstone, the Hard exploration, the Account Chest, the System Collector, fainting and Evolution; waiting for the author's approval). The recordings come in stage 5 (696 A).",
   "skipLabel": "Skip the introduction",
   "nextLabel": "Next",
   "startLabel": "Guide me",

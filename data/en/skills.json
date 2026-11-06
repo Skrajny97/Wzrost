@@ -50,7 +50,7 @@
     "name": "Fireball",
     "style": "attack",
     "description": "The mage gathers embers in their hands and hurls them at the enemy.",
-    "effect": "A fire spell dealing {power%} damage. The target has a {dotChance%} chance of Burn: for {dotTicks} of its turns it loses {dotPower%} of the spell's damage each turn."
+    "effect": "A fire spell dealing {power%} damage. The target may catch Burn ({dotChance%} chance): for {dotTicks} of its turns it loses {dotPower%} of the spell's damage each turn."
   },
   "frost-gust": {
     "path": "Ice Lord",
@@ -78,7 +78,7 @@
     "name": "Exorcism",
     "style": "area",
     "description": "The cleric speaks the words of exorcism and lashes every enemy with the sacred element.",
-    "effect": "Exorcism lashes every enemy, dealing {power%} sacred damage. Against a single target – it deals {single%} damage. Every enemy hit has a {stunChance%} chance of paralysis and then loses its next turn.",
+    "effect": "Exorcism lashes every enemy, dealing {power%} sacred damage. Against a single target – it deals {single%} damage. Every enemy hit may be paralysed ({stunChance%} chance) and then loses its next turn.",
     "params": {
       "stunLabel": "paralysed"
     }
@@ -102,7 +102,7 @@
     "name": "Poisoned Blade",
     "style": "poison",
     "description": "The Shadow smears the blade with viper venom. Every scratch burns from within.",
-    "effect": "At the start of a fight, until its end: every blow has a {dotChance%} chance of Poison. For {dotTicks} of its turns, a poisoned enemy loses {dotPower%} of the blow's damage each turn."
+    "effect": "At the start of a fight, until its end: every blow may Poison ({dotChance%} chance). For {dotTicks} of its turns, a poisoned enemy loses {dotPower%} of the blow's damage each turn."
   },
   "shadow-dance": {
     "path": "Night Dancer",

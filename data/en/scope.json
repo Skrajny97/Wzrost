@@ -396,6 +396,7 @@
     "tutorial:skipSetting",
     "tutorial:lines.ask",
     "!tutorial:lines.ask.speaker",
+    "!tutorial:firstSteps.buildingId",
     "tutorial:lines.intro",
     "tutorial:lines.purpose",
     "tutorial:lines.test",

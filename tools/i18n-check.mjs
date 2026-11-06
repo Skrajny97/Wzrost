@@ -357,10 +357,10 @@ const placeholders = (text) => (text.match(/\{\w+\}/g) ?? []).sort().join(' ');
 const shape = (text) => text.replace(/\{\w*\}/g, '{}');
 export const hashOf = (text) => createHash('sha1').update(text).digest('hex').slice(0, 12);
 
-const inScope = (path, scope) => {
-  const matches = (entry) => path === entry || path.startsWith(`${entry}.`) || path.startsWith(`${entry}[`) || (entry.endsWith(':') && path.startsWith(entry)) || path.startsWith(`${entry}:`);
-  return scope.some((entry) => !entry.startsWith('!') && matches(entry)) && !scope.some((entry) => entry.startsWith('!') && matches(entry.slice(1)));
-};
+const covers = (entry, path) => path === entry || path.startsWith(`${entry}.`) || path.startsWith(`${entry}[`) || (entry.endsWith(':') && path.startsWith(entry)) || path.startsWith(`${entry}:`);
+// A `!` entry: left Polish on purpose (an id, a personal name).
+const leftOut = (path, scope) => scope.some((entry) => entry.startsWith('!') && covers(entry.slice(1), path));
+const inScope = (path, scope) => scope.some((entry) => !entry.startsWith('!') && covers(entry, path)) && !leftOut(path, scope);
 
 // --- The check -------------------------------------------------------------
 
@@ -397,7 +397,7 @@ export function checkTranslations({ root = ROOT, all = false } = {}) {
       const scoped = inScope(leaf.path, scope.data);
       if (!translated) {
         if (scoped) result.missing.push({ where: `data/${name}.json ${leaf.path.slice(name.length + 1)}`, text: leaf.polish });
-        else result.outside[`data/${name}.json`] = (result.outside[`data/${name}.json`] ?? 0) + 1;
+        else if (!leftOut(leaf.path, scope.data)) result.outside[`data/${name}.json`] = (result.outside[`data/${name}.json`] ?? 0) + 1;
         continue;
       }
       if (placeholders(leaf.polish) !== placeholders(leaf.english)) result.variables.push({ where: `data/en/${name}.json ${leaf.path.slice(name.length + 1)}`, text: leaf.polish, english: leaf.english });

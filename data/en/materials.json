@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/materials.json (src/engine/overlay.js): the materials of the creatures, and the parts. The report writes a material in lower case after its rarity (src/engine/crafting.js, materialView): \"rare wolf pelt ×2\".",
+  "$comment": "English texts of data/materials.json (src/engine/overlay.js): the materials of the creatures, and the parts. A material keeps its capitals in a sentence, after its rarity in lower case (src/engine/crafting.js, materialView; nameInText): \"rare Wolf Pelt ×2\".",
   "materials": {
     "wolf-pelt": {
       "name": "Wolf Pelt",
