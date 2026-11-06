@@ -1,0 +1,14 @@
+{
+  "id": "nightingale-robber",
+  "tool": "pixellab generate-image-v2",
+  "description": "Slowik Rozbojnik, the monstrous robber nightingale of old Slavic legends, a huge dark grey-brown bird with a bearded human face, fierce glaring eyes and a wild black beard, its mouth wide open in a piercing whistle, perched on a nest of broken tree trunks, wings half spread, menacing, the whole bird and nest inside the picture, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

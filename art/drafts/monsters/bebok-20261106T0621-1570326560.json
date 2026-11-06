@@ -1,0 +1,14 @@
+{
+  "id": "bebok",
+  "tool": "pixellab generate-image-v2",
+  "description": "Bebok, a Silesian bogeyman, a shaggy hunched black figure with very long arms and grasping claws, a big patched sack on its back, eyes glowing in the dark, a broad silhouette filling the whole picture, eerie and menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

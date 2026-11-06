@@ -1,0 +1,14 @@
+{
+  "id": "night-huntsman",
+  "tool": "pixellab generate-image-v2",
+  "description": "Nocny Lowczy, the legendary Night Huntsman, a towering majestic hunter made of living shadow, a long tattered black cloak billowing around him, a pale stag skull with huge branching antlers instead of a face, cold glowing eyes in the sockets, drawing a great black bow with a dark arrow, a silver-bound black hunting horn at his belt, regal and terrifying, the whole figure inside the picture, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

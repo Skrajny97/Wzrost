@@ -1,0 +1,14 @@
+{
+  "id": "fernling",
+  "tool": "pixellab generate-image-v2",
+  "description": "Paprotnik, a hunched creature made of curled dark green fern fronds rising out of the earth, a black empty void where its face should be, long whip-like fern arms lashing out, clods of soil falling off it, eerie and menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

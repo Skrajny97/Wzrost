@@ -1,0 +1,14 @@
+{
+  "id": "bone-gnawer",
+  "tool": "pixellab generate-image-v2",
+  "description": "Gnatojad, a squat hairless grey beast with enormous crushing jaws full of jagged teeth, hung all over with gnawed bones on cords, small mean glowing eyes, hunched on thick short legs, menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

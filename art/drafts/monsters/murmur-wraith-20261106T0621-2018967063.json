@@ -1,0 +1,14 @@
+{
+  "id": "murmur-wraith",
+  "tool": "pixellab generate-image-v2",
+  "description": "Szumiec, a long serpent-like streak of whirling pine needles and dry pine cones flowing through the air, two cold glowing eyes at its head, an abstract living gust of the forest, menacing, the whole streak inside the picture, full body",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

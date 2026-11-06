@@ -1,0 +1,14 @@
+{
+  "id": "carcass",
+  "tool": "pixellab generate-image-v2",
+  "description": "Truchlo, the rotting carcass of a huge beast stitched together with dark roots, ribs showing through torn grey hide, empty eye sockets, rising again on stiff legs, sickly green fumes seeping from it, few big readable shapes, eerie and menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

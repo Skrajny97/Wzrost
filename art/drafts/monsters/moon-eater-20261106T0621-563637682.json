@@ -1,0 +1,14 @@
+{
+  "id": "moon-eater",
+  "tool": "pixellab generate-image-v2",
+  "description": "Ksiezycozerca, the legendary Moon-Eater, a colossal majestic beast of pure darkness with blurred shifting edges like black smoke lit by cold starlight, its huge open maw full of glittering stars, a gnawed pale crescent of the moon caught between its fangs, cold glowing eyes, icy frost mist swirling around it, regal and terrifying, the whole creature inside the picture, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

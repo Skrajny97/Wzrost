@@ -1,0 +1,14 @@
+{
+  "id": "gadfly",
+  "tool": "pixellab generate-image-v2",
+  "description": "Giez, a giant menacing horsefly the size of a dog, enormous iridescent rainbow compound eyes, a hairy dark striped body, a long sharp sting like an awl, smoky translucent wings buzzing, diving to strike, full body",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

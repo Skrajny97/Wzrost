@@ -1,0 +1,14 @@
+{
+  "id": "earwig",
+  "tool": "pixellab generate-image-v2",
+  "description": "Skorek, a giant glossy black earwig the size of a dog, huge curved pincers at the end of its raised abdomen ready to strike, long antennae, segmented armour, menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

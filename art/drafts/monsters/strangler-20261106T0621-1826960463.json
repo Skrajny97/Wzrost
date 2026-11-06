@@ -1,0 +1,14 @@
+{
+  "id": "strangler",
+  "tool": "pixellab generate-image-v2",
+  "description": "Dusiciel, a gaunt pitch-black faceless figure with arms as long as ropes hanging down in loose loops, holding up a snare loop made of twisted roots, two small white eyes, hunched forward, eerie and menacing, abstract silhouette, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

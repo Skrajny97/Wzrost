@@ -1,0 +1,14 @@
+{
+  "id": "lichen-beard",
+  "tool": "pixellab generate-image-v2",
+  "description": "Brodacz, a hulking giant completely covered in long hanging grey beards of lichen down to the ground, no face visible, only two cold pale blue eyes staring out from under the lichen, huge frosted hands reaching forward, abstract shaggy silhouette, menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

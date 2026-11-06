@@ -1,0 +1,14 @@
+{
+  "id": "chochol",
+  "tool": "pixellab generate-image-v2",
+  "description": "Chochol, a tall eerie straw figure like a rose bush wrapped in straw for the winter, made of bound golden straw and dry brushwood, a faceless pointed top with a tuft, long straw arms spread wide as if inviting to a dance, swaying, eerie and menacing, full body",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

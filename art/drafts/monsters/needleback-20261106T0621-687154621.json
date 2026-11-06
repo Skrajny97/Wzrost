@@ -1,0 +1,14 @@
+{
+  "id": "needleback",
+  "tool": "pixellab generate-image-v2",
+  "description": "Iglak, a hunched menacing beast bristling all over with long black spruce needles, a spiky mass of needles for a body, two glowing yellow eyes, long hooked claws, crouched low and ready to pounce, abstract spiky silhouette, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

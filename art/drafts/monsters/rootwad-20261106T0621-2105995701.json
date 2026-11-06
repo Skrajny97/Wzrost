@@ -1,0 +1,14 @@
+{
+  "id": "rootwad",
+  "tool": "pixellab generate-image-v2",
+  "description": "Wykrotnik, the upturned root plate of a fallen tree come alive, a huge round disc of tangled roots with clods of earth and stones stuck in it, a gaping jagged maw in its middle, dragging itself on thick root legs, abstract and menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

@@ -1,0 +1,14 @@
+{
+  "id": "smetek",
+  "tool": "pixellab generate-image-v2",
+  "description": "Smetek, a grey hunched ghost from Kashubian legends, a long sorrowful face with eyes like deep black wells, a drooping grey cloak dripping with cold water, thin pale hands raised as it sings a mournful song, eerie and menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

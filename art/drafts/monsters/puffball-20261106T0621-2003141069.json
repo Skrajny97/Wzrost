@@ -1,0 +1,14 @@
+{
+  "id": "puffball",
+  "tool": "pixellab generate-image-v2",
+  "description": "Purchawiec, a huge cracked puffball mushroom creature, a round pale grey-brown body split by deep cracks, a wide toothless gaping mouth, a cloud of grey poisonous spores bursting out of it, two small dark eyes, eerie and menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

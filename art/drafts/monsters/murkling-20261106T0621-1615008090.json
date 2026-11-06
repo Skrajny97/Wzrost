@@ -1,0 +1,14 @@
+{
+  "id": "murkling",
+  "tool": "pixellab generate-image-v2",
+  "description": "Mrokun, a dense pool of living darkness welling up from the ground like thick black tar, two round glowing white eyes, dark tendrils reaching out to swallow, a faint cold blue sheen on its edges, an abstract shapeless creature of shadow, menacing, full body",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

@@ -1,0 +1,14 @@
+{
+  "id": "burying-beetle",
+  "tool": "pixellab generate-image-v2",
+  "description": "Grabarz, a giant black burying beetle with bright orange bands across its wing cases, orange club-tipped antennae, strong spiked legs, digging out of the earth in a spray of soil, menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

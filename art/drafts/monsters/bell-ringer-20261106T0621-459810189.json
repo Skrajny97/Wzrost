@@ -1,0 +1,14 @@
+{
+  "id": "bell-ringer",
+  "tool": "pixellab generate-image-v2",
+  "description": "Dzwonnik, an emaciated hooded ghost in a ragged grey robe, a skeletal face in the shadow of the hood, holding a big cracked bronze bell in bony hands, frost spreading from the bell, eerie and menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

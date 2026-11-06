@@ -1,0 +1,14 @@
+{
+  "id": "rustler",
+  "tool": "pixellab generate-image-v2",
+  "description": "Szelesnik, an eerie almost invisible creature of shadow, a tall stooping elongated silhouette of translucent dark blue-grey mist with a faint pale outline, tangled with black spruce twigs, only two pale glowing eyes and a long row of white teeth clearly visible, a breath of frosty mist from its mouth, long thin arms spread wide, abstract and menacing, full body",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

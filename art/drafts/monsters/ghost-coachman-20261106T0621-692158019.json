@@ -1,0 +1,14 @@
+{
+  "id": "ghost-coachman",
+  "tool": "pixellab generate-image-v2",
+  "description": "Woznica, the tall ghost of a coachman in a torn long dark coat and a battered wide-brimmed hat, a pale gaunt face with cold glowing eyes, cracking a long whip that flashes like lightning in a wide arc around him, eerie and menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

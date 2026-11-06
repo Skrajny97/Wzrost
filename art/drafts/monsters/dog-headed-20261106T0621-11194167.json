@@ -1,0 +1,14 @@
+{
+  "id": "dog-headed",
+  "tool": "pixellab generate-image-v2",
+  "description": "Psioglowiec, a gaunt dog-headed man in tattered grey rags, a snarling black dog's head with long bared fangs and glowing ember eyes, hunched forward in a wide stance with long clawed hands reaching out, a broad silhouette filling the whole picture, menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

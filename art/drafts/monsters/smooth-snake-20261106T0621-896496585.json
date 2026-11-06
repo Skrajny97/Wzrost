@@ -1,0 +1,14 @@
+{
+  "id": "smooth-snake",
+  "tool": "pixellab generate-image-v2",
+  "description": "Gniewosz, a thick menacing black snake with a coppery metallic sheen on its scales, glowing red eyes, coiled on a tuft of dark moss, its head raised to strike with jaws wide open and long fangs, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

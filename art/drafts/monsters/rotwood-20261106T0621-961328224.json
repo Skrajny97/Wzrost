@@ -1,0 +1,14 @@
+{
+  "id": "rotwood",
+  "tool": "pixellab generate-image-v2",
+  "description": "Murszak, a hulking rotten log come alive, wrapped in white fungal threads, glowing with pale green rot in its cracks, a gaping maw like a dark tree hollow, crawling on stubby broken branch legs, menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

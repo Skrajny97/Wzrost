@@ -1,0 +1,14 @@
+{
+  "id": "millipede",
+  "tool": "pixellab generate-image-v2",
+  "description": "Wij, a giant black millipede with glossy armoured ring segments and hundreds of thin legs, curled into a tight coil with its head raised high, green corrosive venom dripping from its jaws, menacing, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}

@@ -1,0 +1,14 @@
+{
+  "id": "mantis",
+  "tool": "pixellab generate-image-v2",
+  "description": "Modliszka, a tall pale ghostly praying mantis with a bone-white body, huge spiked forelegs folded as if in prayer, a small triangular head with big black eyes, rearing up and leaning forward to strike, eerie and menacing, the whole mantis inside the picture, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}
