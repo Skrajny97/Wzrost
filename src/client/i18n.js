@@ -110,6 +110,8 @@ async function loadStrings() {
 const originals = new WeakMap();
 export function translatePage(root = document) {
   document.documentElement.lang = lang;
+  // The app's description when installed, in the language shown (0.2.2).
+  document.querySelector('link[rel="manifest"]')?.setAttribute('href', lang === 'en' ? '/manifest-en.webmanifest' : '/manifest.webmanifest');
   for (const element of root.querySelectorAll('[data-i18n], [data-i18n-attr]')) {
     if (!originals.has(element)) {
       const names = (element.dataset.i18nAttr ?? '').split(/\s+/).filter(Boolean);

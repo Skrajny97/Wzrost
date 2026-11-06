@@ -300,6 +300,11 @@
       "id": "0.2.0",
       "title": "Wersja 0.2.0",
       "body": "- Po angielsku narrator mówi własnym głosem: angielskiego lektora."
+    },
+    {
+      "id": "0.2.2",
+      "title": "Wersja 0.2.2",
+      "body": "- Wpisy „Co nowego?” są także po angielsku: grający po angielsku czytają je w swoim języku.\n- Ekran braku połączenia mówi w języku gry.\n- Link insightrpg.com/en pokazuje w podglądzie angielski opis gry i otwiera grę po angielsku."
     }
 ]
 }

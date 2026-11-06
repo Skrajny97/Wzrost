@@ -6,6 +6,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
+import enNews from '../data/en/news.json' with { type: 'json' };
 import news from '../data/news.json' with { type: 'json' };
 import { useServer } from './helpers/server.js';
 
@@ -122,5 +123,92 @@ describe('Co nowego?', () => {
     const next = await publish({ title: 'Po usunięciu', body: 'Treść.' });
     assert.ok(next.data.entries[0].id > entry.id);
     assert.equal(await unseen(player), 1);
+  });
+});
+
+// "Co nowego?" in English (0.2.2): a draft published as written reads in its
+// own English (data/en/news.json), anything else in the translator's, kept
+// once made; a player in Polish reads the Polish.
+describe('Co nowego? po angielsku', () => {
+  const { server, db, signUp } = useServer({ AUTHOR_LOGINS: 'szef', ENGLISH: 'on', FAKE_TRANSLATOR: 'on' });
+  const ask = async (method, path, { body, cookie, lang } = {}) => {
+    const headers = { ...(body !== undefined && { 'Content-Type': 'application/json' }), ...(cookie && { Cookie: cookie }), ...(lang && { 'X-Lang': lang }) };
+    const response = await server.fetch(path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+    return { status: response.status, data: await response.json() };
+  };
+  let player;
+  let author;
+
+  beforeEach(async () => {
+    ({ cookie: player } = await signUp('gracz'));
+    await ask('POST', '/api/character', { cookie: player, body: { name: 'Gracz', classId: 'mage', appearance: 'female' } });
+    ({ cookie: author } = await signUp('szef'));
+    await (await db()).prepare("UPDATE users SET google_sub = 'szef' WHERE login = 'szef'").run();
+  });
+
+  const publish = (body) => ask('POST', '/api/author/news', { cookie: author, body });
+  const list = async (lang) => (await ask('GET', '/api/news', { cookie: player, lang })).data.entries;
+
+  test('every draft has its English, and a draft published as written reads in it', async () => {
+    for (const draft of news.drafts) {
+      const own = enNews.drafts[draft.id];
+      assert.ok(own?.title && own?.body, `${draft.id}: brak angielskiego`);
+      // The same list points in both languages.
+      assert.equal(own.body.split('\n').length, draft.body.split('\n').length, draft.id);
+    }
+    const [draft] = news.drafts;
+    const made = await publish({ draft: draft.id, title: draft.title, body: draft.body });
+    assert.equal(made.status, 201, JSON.stringify(made.data));
+    assert.equal(made.data.entries[0].english, true);
+    const [english] = await list('en');
+    assert.equal(english.title, enNews.drafts[draft.id].title);
+    assert.equal(english.body, enNews.drafts[draft.id].body);
+    const [polish] = await list('pl');
+    assert.equal(polish.title, draft.title);
+    assert.equal(polish.body, draft.body);
+  });
+
+  test('an entry of the author’s own, or a corrected draft, goes through the translator, the list’s points kept', async () => {
+    const own = await publish({ title: 'Wersja 9.9.9: Turniej', body: 'Od 18:00 na czacie.\n- Nagrody: Punkty Systemu.' });
+    assert.equal(own.status, 201);
+    const [english] = await list('en');
+    assert.equal(english.title, 'Version 9.9.9: [pl→en] Turniej');
+    assert.equal(english.body, '[pl→en] Od 18:00 na czacie.\n- [pl→en] Nagrody: Punkty Systemu.');
+    // A correction is translated anew.
+    await ask('POST', '/api/author/news/edit', { cookie: author, body: { id: own.data.entries[0].id, title: 'Turniej', body: 'Od 19:00.' } });
+    const [corrected] = await list('en');
+    assert.equal(corrected.title, '[pl→en] Turniej');
+    assert.equal(corrected.body, '[pl→en] Od 19:00.');
+  });
+
+  test('an entry from before 0.2.2 gets its English on the first list in English, and keeps it', async () => {
+    const [draft] = news.drafts;
+    const database = await db();
+    await database.prepare('INSERT INTO news (draft, title, body, published_at) VALUES (?, ?, ?, 1), (NULL, ?, ?, 2)').bind(draft.id, draft.title, draft.body, 'Stary wpis', 'Treść.').run();
+    assert.equal((await list('pl'))[0].title, 'Stary wpis');
+    const english = await list('en');
+    assert.deepEqual(
+      english.map((entry) => entry.title),
+      ['[pl→en] Stary wpis', enNews.drafts[draft.id].title],
+    );
+    const kept = await database.prepare('SELECT title_en FROM news ORDER BY id').all();
+    assert.deepEqual(
+      kept.results.map((row) => row.title_en),
+      [enNews.drafts[draft.id].title, '[pl→en] Stary wpis'],
+    );
+  });
+});
+
+describe('Co nowego? po angielsku bez tłumacza', () => {
+  const { server, signUp, db } = useServer({ AUTHOR_LOGINS: 'szef', ENGLISH: 'on' });
+
+  test('without the translator an entry of the author’s own stays Polish for players in English', async () => {
+    const { cookie: author } = await signUp('szef');
+    await (await db()).prepare("UPDATE users SET google_sub = 'szef' WHERE login = 'szef'").run();
+    const headers = { 'Content-Type': 'application/json', Cookie: author };
+    const made = await server.fetch('/api/author/news', { method: 'POST', headers, body: JSON.stringify({ title: 'Turniej', body: 'Treść.' }) });
+    assert.equal(made.status, 201);
+    const listed = await (await server.fetch('/api/news', { headers: { Cookie: author, 'X-Lang': 'en' } })).json();
+    assert.equal(listed.entries[0].title, 'Turniej');
   });
 });

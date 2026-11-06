@@ -25,9 +25,10 @@ test('the parts already translated have all their English, with the same {names}
 
 // Every new text of the game comes in English at once (the author,
 // 6.11.2026): Polish outside the parts translated is only the author's own,
-// the news, the Author Panel and the test tools.
+// the Author Panel and the test tools. The news drafts are translated too
+// (0.2.2).
 test('every new text has its English: no Polish outside the parts translated but the author\'s own', () => {
-  const ownPolish = new Set(['data/news.json', 'src/client/screens/author.js', 'src/server/author.js', 'src/server/testing.js']);
+  const ownPolish = new Set(['src/client/screens/author.js', 'src/server/author.js', 'src/server/testing.js']);
   const outside = Object.keys(checkTranslations({ all: true }).outside).filter((where) => !ownPolish.has(where));
   assert.deepEqual(outside, [], 'polski tekst bez angielskiego: przetłumacz go i dopisz plik do data/en/scope.json');
 });

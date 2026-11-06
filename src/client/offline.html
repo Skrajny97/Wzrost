@@ -8,17 +8,19 @@
   <title>Insight</title>
   <link rel="icon" href="/favicon-64.png" type="image/png" sizes="64x64">
   <link rel="stylesheet" href="/offline.css">
+  <script src="/offline.js" defer></script>
 </head>
 <body>
-  <!-- Shown by the service worker (sw.js) when a page cannot load. -->
+  <!-- Shown by the service worker (sw.js) when a page cannot load; in English
+       by offline.js where the game plays in English on this phone. -->
   <main class="screen screen--center">
     <section class="system-panel">
       <div class="system-message">
         <p class="system-label">[ SYSTEM ]</p>
-        <p class="system-text">Brak połączenia z siecią. Czas wypraw i ich wyniki liczy serwer, więc gra potrzebuje internetu.</p>
-        <p class="system-text">Wyprawy trwają dalej. Wróć, gdy połączenie wróci.</p>
+        <p class="system-text" data-en="No network connection. The server keeps the time and results of explorations, so the game needs the internet.">Brak połączenia z siecią. Czas wypraw i ich wyniki liczy serwer, więc gra potrzebuje internetu.</p>
+        <p class="system-text" data-en="Your explorations go on. Come back when the connection returns.">Wyprawy trwają dalej. Wróć, gdy połączenie wróci.</p>
       </div>
-      <a class="button button--system" href="/">Spróbuj ponownie</a>
+      <a class="button button--system" href="/" data-en="Try again">Spróbuj ponownie</a>
     </section>
   </main>
 </body>

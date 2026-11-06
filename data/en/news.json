@@ -1,0 +1,245 @@
+{
+  "$comment": "What's new? drafts in English, by the id of each draft in data/news.json. An entry published from a draft unchanged shows this text to English players; an entry the author wrote or changed is translated by machine (src/server/news.js).",
+  "drafts": {
+    "0.1.39": {
+      "title": "Version 0.1.39",
+      "body": "- In the Settlement, above the board, there is a “Brotherhood standings” bar. Folded, it shows each Brotherhood's standing.\n- Unfolded, it shows the points, a bar to the next standing, what the current standing gives and what the next one will add."
+    },
+    "0.1.40": {
+      "title": "Version 0.1.40",
+      "body": "- On a computer the whole Settlement board fits on the screen without scrolling. The title and the Brotherhood bar stand beside it."
+    },
+    "0.1.41": {
+      "title": "Version 0.1.41",
+      "body": "- In the Trade between players you can give wood, stone and iron ore: the offer has a “Camp resources” part under the gold.\n- At Jagna's and Wszebor's, the “Sell” tab shows icons of herbs, potions and materials next to their names."
+    },
+    "0.1.42": {
+      "title": "Version 0.1.42",
+      "body": "- The Brotherhood of Smiths gives more: a cheaper Anvil (up to 20% of the gold), a faster Workshop (up to 20%) and more items made one rarity higher (up to +4 percentage points).\n- The Merchants' Company gives more: a lower Marketplace fee (down to 0.2%), auctions up to 48 hours and up to 5 items at the travelling merchant's.\n- The “Brotherhood standings” panel shows the new benefits at each standing."
+    },
+    "0.1.43": {
+      "title": "Version 0.1.43",
+      "body": "- The game's news now shows in a “What's new?” window when you enter the game, each entry once.\n- The scroll icon in the top bar, next to the Settings, also opens earlier entries."
+    },
+    "0.1.44": {
+      "title": "Version 0.1.44",
+      "body": "- A new Steady Scroll: when an upgrade on the Anvil fails, the item keeps its level. It works from +1 and can be used together with a Ward Scroll.\n- The smith in the Forge sells the Steady Scroll for 1000 gold and the Ward Scroll for 2000 gold. Both are cheaper with the Brotherhood of Smiths.\n- In the Workshop the Steady Scroll is made from Crafting level 10: 5 Fittings and 30 minutes.\n- Both scrolls have icons."
+    },
+    "0.1.45": {
+      "title": "Version 0.1.45",
+      "body": "- Rings, amulets and talismans taken apart at the Salvage Table now give mostly things for Jewelcrafting: setting ore and, from rare upwards, a gem one rarity lower. They give three times fewer parts for the Workshop.\n- The gem and the ore come at once, the parts when the table is done."
+    },
+    "0.1.46": {
+      "title": "Version 0.1.46",
+      "body": "- The Brotherhood of Herbalists gives more: Herbalism gathers up to 20% more herbs, Alchemy brews up to 20% faster, and timed potions last up to 2 fights longer.\n- The Brotherhood of Hunters gives more: up to 20% more materials from creatures, elites and champions up to 20% more often, and up to 8 percentage points more at the Tannery.\n- The “Brotherhood standings” panel shows these benefits at each standing."
+    },
+    "0.1.47": {
+      "title": "Version 0.1.47",
+      "body": "- Each new Brotherhood standing has a reward waiting: System Points (1, 2, 3 or 5) and a gift of the Brotherhood's goods. Claim it with “Claim” in the “Brotherhood standings” panel in the Settlement.\n- Standings reached earlier give their rewards too, all at once.\n- The narrator in the Forge now speaks of both scrolls."
+    },
+    "0.1.48": {
+      "title": "Version 0.1.48",
+      "body": "- The “What's new?” window no longer opens by itself when you enter the game.\n- When a new entry appears, the scroll icon in the top bar gets a yellow dot. The dot goes out once you open the list."
+    },
+    "0.1.49": {
+      "title": "Version 0.1.49: the Stronghold",
+      "body": "- A Camp at level 10, with every building at its highest level, can be turned into a Stronghold. The change starts at the Cornerstone.\n- The Stronghold gets stone walls and seven new buildings: the Training Yard, the Armoury, the Trophy Hall, the Watchtower, the System Altar, the Greenhouse and the Shrine.\n- Each of them strengthens your character in its own way. Its screen says how."
+    },
+    "0.1.50": {
+      "title": "Version 0.1.50",
+      "body": "- In the Guild, long parts fold under their titles: the Trial board, thresholds and chests, the week's contribution, requests, benefactors, offers and invitations.\n- Under the title of a folded part you see in short what it holds, e.g. how many trials are left to take.\n- Your phone remembers which parts you folded."
+    },
+    "0.1.51": {
+      "title": "Version 0.1.51: harder explorations",
+      "body": "- From level 11 the creatures in the newest place are stronger. A long exploration into the newest place may end in fainting.\n- Companions and a party help a lot.\n- Lower places are as they were. Check the “Threat” before you set out."
+    },
+    "0.1.52": {
+      "title": "Version 0.1.52: harder with companions too",
+      "body": "- From level 30 the newest place is harder with companions too. The longest exploration sometimes ends in fainting.\n- Without companions the newest place is now very hard. One place lower is safer.\n- Check the “Threat” before you set out."
+    },
+    "0.1.53": {
+      "title": "Version 0.1.53: Guild Trials every day",
+      "body": "- Guild Trials no longer need taking: all the trials on the board count at once, from the moment they appear.\n- On Monday the board has 4 trials, and 2 new ones come every day.\n- At most 2 of your trials count towards the guild bar for each day of the week. Those done beyond that will count on the following days.\n- The bar has 6 thresholds, and the last two give bigger chests.\n- This week the bar counts every trial done, with no daily limit."
+    },
+    "0.1.55": {
+      "title": "Version 0.1.55: resource buildings up to level 20",
+      "body": "- In the Stronghold you can build the Sawmill, the Quarry, the Mine and the Midas Pond up to level 20.\n- Each level adds as much as before, so at level 20 a building gives twice as much as at level 10, and its storehouse holds 40 hours of production.\n- At level 20 a building gets a new look.\n- Levels 11–20 cost as many resources as level 10, and a little more gold and time with each level."
+    },
+    "0.1.56": {
+      "title": "Version 0.1.56: the Trial Hall and the Wanted",
+      "body": "- The Settlement has a Trial Hall. Once a day, for free, you can take its trial: three fights with the creatures of the next place, its elite among them. Pass it, and you may enter that place for good before your class level allows.\n- On the Order Board the headman puts up wanted posters every day: three for named kinds of creatures and one for an outlaw. Take a poster, and on an exploration in that place you will meet the wanted one more often.\n- For defeating the wanted one the headman pays in gold and Time Points, and the Brotherhood of Hunters shows its favour. A creature leaves a trophy, an outlaw rare loot.\n- Guild Trials have a seventh threshold: the highest chest waits once all members have done all the week's trials."
+    },
+    "0.1.57": {
+      "title": "Version 0.1.57: monthly quests",
+      "body": "- The narrator has monthly quests: a third tab next to the daily and weekly ones.\n- Five quests for the whole month. The same explorations and work count as in the daily and weekly quests.\n- The chest for all of them: +240 Time Points, +50 System Points and gold by your character's level.\n- This month's quests fit the days left in it."
+    },
+    "0.1.58": {
+      "title": "Version 0.1.58: the Order Board in tabs",
+      "body": "- The Order Board has two tabs: Orders and Wanted. There is less scrolling.\n- A yellow dot on a tab shows that an order is waiting there to be handed in, or a reward to be claimed."
+    },
+    "0.1.59": {
+      "title": "Version 0.1.59: the Guild Hall and harder explorations",
+      "body": "- The Guild has a Hall: a new tab with four buildings. The Banner gives more XP from explorations, the Treasury more gold, the Guild Forge cheaper upgrades on the Anvil, and the Scouts' Lodge rarer items more often.\n- Each member pays gold and camp resources into a chosen building. The bonuses work for all the guild's members. The leader and deputies can mark the buildings worth saving for first.\n- From character level 10 less HP comes back after a fight on an exploration, and from level 30 the creatures on explorations are stronger.\n- The Exploration options have a Hard exploration box: stronger creatures, and in return +50% XP and gold.\n- The bag shows how many Ward Scrolls and Steady Scrolls you have."
+    },
+    "0.1.60": {
+      "title": "Version 0.1.60: Mercenaries in the Tavern",
+      "body": "- From level 25 you can put your character up for hire in the Tavern for a few hours, at your own price per hour of exploration.\n- Another player takes the mercenary on one exploration, in place of one companion. The mercenary fights with all of their gear, and the pay waits for them in the Tavern when the exploration ends.\n- A character up for hire does not set out, does not work in professions and does not change gear. You can take the notice down as long as no one has hired you.\n- You choose a mercenary in the Exploration options: you pay up front, for the hours of the exploration.\n- The description of the Wanted is now under “How does it work?”, and the quests fit on narrow phones."
+    },
+    "0.1.61": {
+      "title": "Version 0.1.61: professions strengthen three times more",
+      "body": "- Each profession level now gives +3 to both of its stats instead of +1, for the levels gained earlier too.\n- A mastered profession (level 100) gives 450 to each of its stats instead of 150."
+    },
+    "0.1.62": {
+      "title": "Version 0.1.62: tagging on the chat",
+      "body": "- Type “@” and the start of a name, and the game suggests whom to tag. You can also tap “Tag” in a message's window or on a character's card.\n- A message in which someone tagged you has a golden frame, and the Community shows a yellow dot until you read it.\n- With notifications on, the tag also reaches your phone."
+    },
+    "0.1.63": {
+      "title": "Version 0.1.63: three new outlaws",
+      "body": "- The headman's wanted posters now show Wojsław the Blaze, an arsonist with a fire pot, Masked Diana, a robber with two knives, and Ścibor the Digger, a grave robber with a spade.\n- Wojsław sets things on fire, Diana is quick, and Ścibor is tough. The reward is the same as for the other outlaws."
+    },
+    "0.1.64": {
+      "title": "Version 0.1.64: mercenaries straight from the Tavern",
+      "body": "- The Tavern has three tabs: Tankard, Companions and Mercenaries, so there is no more scrolling.\n- The Mercenaries tab lists the characters waiting to be hired. “Hire” takes a mercenary to Combat, and you pay at “Set out”, for each hour of the exploration.\n- You can now ask up to 100,000 gold per hour of exploration.\n- The top bar on phones: the level and class fit in their frames again, even with a lot of gold, and the icons on the right stand closer together."
+    },
+    "0.1.65": {
+      "title": "Version 0.1.65: the Guild Expedition and stopping a build",
+      "body": "- The Guild has a new tab: Expedition. Every week the guild goes through 7 stages, carried forward by the minutes of all its members' explorations.\n- At the end of each stage a guardian bars the way. Everyone who added minutes attacks it 3 times a day. A defeated guardian gives a chest to everyone who added minutes, and the last one also leaves an item.\n- In the Camp you can stop a build in progress: the gold and resources come back in full."
+    },
+    "0.1.66": {
+      "title": "Version 0.1.66: the Salvage Table queue and Fame from the Expedition",
+      "body": "- At the Salvage Table each order in the queue has “Remove from queue”, and the whole queue “Remove all”.\n- No penalty: materials and items come back, even from the order under way.\n- Quests and Guild Trials give back what they counted from removed orders.\n- Defeated guardians of the Guild Expedition give the guild Fame in the Ranking: 20 points for each and 50 for the seventh, up to 170 a week. Guardians defeated this week before this version count too."
+    },
+    "0.1.67": {
+      "title": "Version 0.1.67: companions in events",
+      "body": "- Companions who went on the exploration with you also fight in the event fight at its end.\n- Potions taken on the exploration, strengthening potions still at work and trophies work in the event fight too.\n- On narrow phones the labels in the bottom bar and the resource names in the Camp fit in full. On a computer locked menu items are no longer cut off."
+    },
+    "0.1.68": {
+      "title": "Version 0.1.68: fixes and companion standings",
+      "body": "- Salvage Table work counts towards quests and Guild Trials only once the order is done.\n- Companions have their own relation standings: Distance, Comradeship, Trust, Friendship and Comrades in arms.\n- The Trial Hall pays for an elite as for an elite and gives twice as many materials.\n- “Stop the build” gives back exactly what was paid.\n- Coming back to a guild in the same week no longer raises the thresholds of the Trials or the stages of the Expedition.\n- A character up for hire as a mercenary has no attack dot at the Beast and the Expedition.\n- The day's wanted posters do not change until midnight, and a poster your character set out with cannot be dropped on the way."
+    },
+    "0.1.69": {
+      "title": "Version 0.1.69: a Party from level 10 and marching together",
+      "body": "- You can found a Party from character level 10, not 25.\n- On a party exploration you walk side by side in Combat: each in their own look, on their own mount, with their aura, trails and familiar.\n- The Guild tabs stand in two lower rows, so there is more room for the names."
+    },
+    "0.1.70": {
+      "title": "Version 0.1.70: new narrator explanations",
+      "body": "- The narrator tells of the Mercenaries in the Tavern, the wanted posters on the Order Board, the Trial Hall, the Guild Expedition and the Stronghold when you go there for the first time.\n- With a slow internet connection the narrator's hints are no longer lost.\n- The explanations of Crafting and Mining wait until you come back from an exploration."
+    },
+    "0.1.71": {
+      "title": "Version 0.1.71: jewellery for companions",
+      "body": "- Companions now wear an amulet and a ring, not just a talisman. You put them on in the Camp, in the Quarters, with “Equip from bag”."
+    },
+    "0.1.72": {
+      "title": "Version 0.1.72: the System Collector",
+      "body": "- In the Camp, by the Account Chest, the System Collector floats. For 10,000 gold, once and for good, it gathers resources from the Camp's storehouses by itself when they fill up, even while you are away."
+    },
+    "0.1.73": {
+      "title": "Version 0.1.73: fainting and companions' jewellery",
+      "body": "- Fainting wipes out the exploration: everything from it is lost, that is XP, gold, resources, materials and items, and an XP penalty comes on top. Check the “Threat” before you set out.\n- A companion wears one piece of jewellery: an amulet, a ring or a talisman. If yours wore several, they keep the one put on last, and the rest went back to your bag."
+    },
+    "0.1.74": {
+      "title": "Version 0.1.74: the Ranking without needless dots",
+      "body": "- In the Ranking “…” now stands only where the list really skips places. When your place is just below the top ten, the list runs without a break."
+    },
+    "0.1.75": {
+      "title": "Version 0.1.75: companions on the road",
+      "body": "- Companions from the Quarters who go on the exploration with you also walk beside your character on the Combat screen.\n- The “Skip the explanation” button is smaller and no longer covers the narrator's words."
+    },
+    "0.1.76": {
+      "title": "Version 0.1.76: the mercenary on the road and an even line",
+      "body": "- The mercenary from the Tavern walks beside your character on the Combat screen, in their own look and on their own mount.\n- Companions and the mercenary walk level with your character, and when you ride, those on foot are smaller and tread the same path as the hooves.\n- The companions' walks no longer flicker with grey specks on the outline: every frame was checked pixel by pixel."
+    },
+    "0.1.77": {
+      "title": "Version 0.1.77: explanations you can skip",
+      "body": "- In the Settings, under “Narrator's voice”, there is a “Skip the narrator's explanations” switch. It works for all the characters on the account: the narrator does not explain new tabs and places, and a new character starts without the introduction.\n- Tap the gem on an item's card to see what it gives. A gem raises all the item's values.\n- The Raven and the Will-o'-the-Wisp no longer cover what your character holds in the portrait.\n- When you ride, those walking beside you are smaller, as next to a real horse.\n- Companions on the road have a black outline in every frame of their walk."
+    },
+    "0.1.78": {
+      "title": "Version 0.1.78: a screenshot in a report",
+      "body": "- In “Report a bug” in the Settings you can attach a screenshot from your phone's gallery. Only the game's author will see it."
+    },
+    "0.1.79": {
+      "title": "Version 0.1.79: fixes",
+      "body": "- Explanations skipped with the “Skip the narrator's explanations” switch no longer come back when you open the game again.\n- An old report of setting a gem shows on the item's card what the gem gives."
+    },
+    "0.1.80": {
+      "title": "Version 0.1.80: the narrator without hold-ups",
+      "body": "- The narrator's explanations no longer stall when you set out on the next exploration straight from the report. The Settlement, the Towers and other parts will come in their own time.\n- The narrator's card about a new level shows after the report, not over it.\n- The narrator speaks of the Guild Expedition right after you tap its tab.\n- When the narrator asks you to read the System's words in the Professions, “How does it work?” unfolds by itself."
+    },
+    "0.1.81": {
+      "title": "Version 0.1.81: small fixes",
+      "body": "- The “E-mail” label in the Settings no longer breaks on a phone next to a long address."
+    },
+    "0.1.82": {
+      "title": "Version 0.1.82: Tier VI items",
+      "body": "- From class level 100, 22 new Tier VI items await, from the Flamberge to the Lunula. They drop on explorations from the Old Diggings on, and you will also find them in the weekly chest, at the travelling merchant's and in the Games Parlour.\n- Their Workshop and Gem Workshop patterns are revealed at Crafting and Jewelcrafting level 100, and taking an item apart teaches its pattern earlier.\n- The Encyclopedia has a Tier VI section with six sets. Each full set gives a chest: 6250 gold, 160 Time Points and 64 System Points."
+    },
+    "0.1.83": {
+      "title": "Version 0.1.83: Jagna's rare recipes",
+      "body": "- Jagna the herbalist shares rare Alchemy recipes: three from the Trusted standing and three from the Friend standing, in your relation with her or in the Brotherhood of Herbalists' reputation. The recipes she has shared show in her “Buy” tab.\n- An exploration's report names what a potion did, e.g. “Tough Skin was active in 2 of 4 fights.”\n- The aura now glows around a character riding a mount, not just around the horse."
+    },
+    "0.1.84": {
+      "title": "Version 0.1.84: comparing in the Quarters",
+      "body": "- In the Quarters “Equip from bag” shows the stats of each item. Tapping an item compares it with what the companion wears, and the “Equip” button puts it on.\n- The bag's sorting buttons fit their labels even on a narrow phone."
+    },
+    "0.1.85": {
+      "title": "Version 0.1.85: new narrator explanations",
+      "body": "- The narrator now explains the System Shop, the Guild tabs, the Party, the Hard exploration, the Account Chest, the System Collector, the Cornerstone and fainting, each at the first meeting.\n- The narrator's cards about professions and about choosing a skill path sound new."
+    },
+    "0.1.86": {
+      "title": "Version 0.1.86",
+      "body": "- Preparations for the English version of the game. For now it works only on the test version, and in the game everything stays in Polish."
+    },
+    "0.1.87": {
+      "title": "Version 0.1.87",
+      "body": "- Two new lands of the Whispering Pines for levels 151–200: the Silent Wilds and the New Moon Depths. Ten places and 34 new creatures, among them the elites Robber Nightingale and Plague Maiden and the champions Night Huntsman and Moon-Eater.\n- New ways of fighting: creatures hidden in the dark become a target only once they are left alone, and the Moon-Eater strikes the whole formation at once.\n- The lands' traits: in the Silent Wilds bleeding lasts one turn longer, and in the New Moon Depths chill does."
+    },
+    "0.1.88": {
+      "title": "Version 0.1.88",
+      "body": "- Fixes to the English version of the game, which for now works only on the test version. In the game everything stays in Polish."
+    },
+    "0.1.89": {
+      "title": "Version 0.1.89",
+      "body": "- Preparations for the English version of the game: choosing the language when creating an account. For now English works only on the test version, and in the game everything stays in Polish."
+    },
+    "0.1.91": {
+      "title": "Version 0.1.91",
+      "body": "- Companions from the Quarters now go with your character on the Quick Hunt and the Lightning Hunt too: they fight beside it and gain experience as on a regular exploration.\n- On narrow phones the narrator's and the quests' parchment fits fully on the screen, and long place names no longer run out of the frame.\n- The chat also turns English swear words into asterisks."
+    },
+    "0.1.92": {
+      "title": "Version 0.1.92",
+      "body": "- In the Quarters you can take a weapon, armour or jewellery off a companion: tap the item they wear and choose “Unequip”. The item goes back to the bag, and the slot stays empty."
+    },
+    "0.1.93": {
+      "title": "Version 0.1.93",
+      "body": "- The narrator's explanation on your first visit to the Guild Hall no longer zooms the screen out: it points at the first building."
+    },
+    "0.1.94": {
+      "title": "Version 0.1.94",
+      "body": "- Salvage Table: under the material you picked, you choose how many pieces to process, not just the whole stack."
+    },
+    "0.1.95": {
+      "title": "Version 0.1.95",
+      "body": "- The Towers page fits on narrow phones.\n- The rules of the Guild Beast now say that you attack it during an exploration too."
+    },
+    "0.1.97": {
+      "title": "Version 0.1.97",
+      "body": "- The game is in English too. You change the language in the Settings (the cog) or on the sign-in screen.\n- The chat has an English channel, and under a message in another language there is an “A→ Translate” button: machine translation, up to 100 a day."
+    },
+    "0.1.98": {
+      "title": "Version 0.1.98",
+      "body": "- Wanted: the description on the Order Board now says plainly that you meet the wanted only on a regular exploration, not on a Quick Hunt, a Lightning Hunt or a Party exploration."
+    },
+    "0.1.99": {
+      "title": "Version 0.1.99",
+      "body": "- In English the creatures of Polish legend have English names instead of a phonetic spelling (e.g. Licho is Misfortune and Strzyga is Shriekwing). Their affixes on items and the names of their materials changed too."
+    },
+    "0.2.0": {
+      "title": "Version 0.2.0",
+      "body": "- In English the narrator speaks with a voice of his own: a native English narrator."
+    },
+    "0.2.2": {
+      "title": "Version 0.2.2",
+      "body": "- What's new? entries are in English too: those who play in English read them in their own language.\n- The no-connection screen speaks the game's language.\n- The link insightrpg.com/en shows an English description of the game in its preview and opens the game in English."
+    }
+  }
+}

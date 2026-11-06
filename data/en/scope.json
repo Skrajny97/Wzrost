@@ -2,6 +2,7 @@
   "$comment": "The parts of the game already translated into English (tools/i18n-check.mjs; npm test fails on a text missing in them). data: data/<file>.json or a part of it, `file:path` with an item of a list by its id (\"chat:names\"), a part left out after `!`. code: the files whose every text has its English in strings.json. ignore: literals of those files that look like Polish words but are no text to translate (names, keys, the author's own Polish).",
   "stage": 1,
   "data": [
+    "news:drafts",
     "affixes:prefixes",
     "affixes:suffixes",
     "affixes:names.wolf",

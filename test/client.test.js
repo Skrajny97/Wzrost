@@ -477,7 +477,42 @@ test('a service worker makes the game installable and shows a page offline', () 
   const offline = readFileSync(join(CLIENT, 'offline.html'), 'utf8');
   assert.match(offline, /href="\/offline\.css"/);
   assert.doesNotMatch(offline, /styles\.css/);
-  assert.match(offline, /href="\/">Spróbuj ponownie</);
+  assert.match(offline, /href="\/" data-en="Try again">Spróbuj ponownie</);
+});
+
+// The English of what shows outside the game (0.2.2): the offline page, the
+// link insightrpg.com/en with its preview, and the app's description.
+test('the offline page, the English link and the installed app speak English too', () => {
+  const english = JSON.parse(readFileSync(new URL('../data/en/strings.json', import.meta.url), 'utf8'));
+  const i18n = readFileSync(join(CLIENT, 'i18n.js'), 'utf8');
+  const key = (name) => new RegExp(`const ${name} = '([^']+)'`).exec(i18n)[1];
+  // The offline page: every text has its English, and its script reads the
+  // language where the game keeps it.
+  const offline = readFileSync(join(CLIENT, 'offline.html'), 'utf8');
+  assert.match(offline, /<script src="\/offline\.js" defer><\/script>/);
+  const texts = [...offline.matchAll(/<(p|a) class="(?:system-text|button[^"]*)"[^>]*>/g)];
+  assert.equal(texts.length, 3);
+  for (const [tag] of texts) assert.match(tag, /data-en="[^"]+"/, tag);
+  const offlineScript = readFileSync(join(CLIENT, 'offline.js'), 'utf8');
+  assert.ok(offlineScript.includes(`'${key('LANGUAGE_KEY')}'`) && offlineScript.includes(`'${key('ENGLISH_KEY')}'`));
+  // insightrpg.com/en: an English preview, then the game in English.
+  const tagline = english['Wejrzyj do miejsca pełnego wyzwań dla śmiałków'];
+  const page = readFileSync(join(CLIENT, 'en.html'), 'utf8');
+  assert.ok(page.includes(`<meta property="og:description" content="${tagline}">`));
+  assert.ok(page.includes(`<meta name="description" content="${tagline}">`));
+  assert.match(page, /<meta property="og:url" content="https:\/\/insightrpg\.com\/en">/);
+  assert.match(page, /<html lang="en">/);
+  assert.doesNotMatch(page, /[ąćęłńóśźż]/i);
+  const go = readFileSync(join(CLIENT, 'en.js'), 'utf8');
+  assert.ok(go.includes(`localStorage.setItem('${key('LANGUAGE_KEY')}', 'en')`));
+  assert.match(go, /location\.replace\('\/'\)/);
+  // The installed app's description, the same app in either language.
+  const polish = JSON.parse(readFileSync(join(CLIENT, 'manifest.webmanifest'), 'utf8'));
+  const englishManifest = JSON.parse(readFileSync(join(CLIENT, 'manifest-en.webmanifest'), 'utf8'));
+  assert.deepEqual({ ...englishManifest, description: polish.description, lang: polish.lang }, polish);
+  assert.equal(englishManifest.description, tagline);
+  assert.equal(englishManifest.lang, 'en');
+  assert.match(i18n, /manifest-en\.webmanifest/);
 });
 
 // The server's answers as a phone may get them: turned down, lost, or late.

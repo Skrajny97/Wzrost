@@ -5,8 +5,9 @@
 // also shows the game's phone notifications (push.js).
 
 // v3: the offline page has its own stylesheet; activating this worker drops
-// the old store with its copy of the game's styles.css.
-const CACHE = 'insight-offline-v3';
+// the old store with its copy of the game's styles.css. v4: and its own
+// script, which shows it in English (0.2.2).
+const CACHE = 'insight-offline-v4';
 // offline.html, at the address the static files answer without a redirect
 // (a page load cannot take a redirected answer from the worker).
 const OFFLINE_PAGE = '/offline';
@@ -15,7 +16,7 @@ const OFFLINE_PAGE = '/offline';
 // stylesheet the phone failed to fetch, older than the game's scripts (the
 // Sklep Systemu broken on an iPhone, 2.11.2026); offline.css is the offline
 // page's own.
-const OFFLINE_FILES = [OFFLINE_PAGE, '/offline.css', '/favicon-64.png'];
+const OFFLINE_FILES = [OFFLINE_PAGE, '/offline.css', '/offline.js', '/favicon-64.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.2 (6.11.2026)
+
+- Ostatnie rzeczy po polsku poza grą dostały angielski (autor: „Dobra to te 3 rzeczy też zrób”):
+  1. „Co nowego?”: każdy szkic w `data/news.json` ma angielski w `data/en/news.json` (szkice weszły do sprawdzania tłumaczeń, `news:drafts` w `data/en/scope.json`). Wpis opublikowany z niezmienionego szkicu gracz grający po angielsku czyta w tym angielskim, a wpis własny autora albo poprawiony w tłumaczeniu maszynowym (Workers AI, wiersz po wierszu, z zachowaniem punktów listy, „Wersja X” zamieniana na „Version X” bez tłumacza). Angielski powstaje raz, przy „Opublikuj” i przy poprawce, a wpisy sprzed 0.2.2 przy pierwszym otwarciu listy po angielsku (do 8 wywołań tłumacza na jedno otwarcie; po błędzie tłumacza listy graczy dają mu spokój na 10 minut). Bez tłumacza gracz czyta wpis po polsku. Kolumny `title_en` i `body_en` (migracja 0094). Panel autora pokazuje wpisy po polsku jak dotąd.
+  2. Ekran braku połączenia (`offline.html`) mówi po angielsku tam, gdzie telefon gra po angielsku (`offline.js`, ten sam wybór języka co gra).
+  3. Adres `insightrpg.com/en` (`en.html`): podgląd linku po angielsku (opis, obrazek z angielskim opisem, `og:locale` en_GB), a wejście ustawia telefonowi angielski i otwiera grę; konto, które się zaloguje, zachowuje swój język. Pod angielskie rolki i posty daje się ten adres. Zainstalowana gra ma opis w języku gry (`manifest-en.webmanifest`).
+- Pytanie 721 (jaśniejsza barwa angielskiego narratora) wycofane: uwaga autora o jasności dotyczyła nagrań sprzed poprawek, a po poprawkach (720, wszystkie 45 przyjęte) autor napisał „Dobra jest znośnie wdrażaj” i „już było dobrze po poprawkach”. Nagrania zostają bez zmian.
+
 ## Wersja 0.2.1 (6.11.2026)
 
 - 45 angielskich kwestii narratora odrzuconych w 719 („zbyt zabłocone”) nagranych jeszcze raz tym samym głosem (718.6) z najwyższą stabilnością eleven_v3 (1.0). Weszły do gry w miejsce poprzednich; autor słucha ich na stronie odsłuchu 720. Ścieżki nagrań się nie zmieniły, zmieniły się same pliki.
