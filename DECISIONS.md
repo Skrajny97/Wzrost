@@ -3034,6 +3034,12 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.0 (6.11.2026)
+
+- Narrator po angielsku mówi głosem rodzimego lektora, wybranym przez autora w 718 (718.6, amerykański gawędziarz): wszystkie 142 kwestie z wersjami na komputer. Autor: „używamy 718.6” i „Teraz generuj kwestie i zaraz je wdrażamy, na 20:30 zaplanowana rolka do publikacji”. Nagrania weszły do gry od razu; autor słucha ich na stronie odsłuchu (719), a odrzucone zostaną nagrane jeszcze raz.
+- Numer wersji: po 0.1.99 idzie 0.2.0, dalej 0.2.1, 0.2.2 i tak dalej, jak po 0.0.99 poszło 0.1.0.
+- Angielska strona gry odtwarza tylko nagrania z `audio/narration/en/` (`src/client/narrator.js`), nigdy polskie; test `test/narration-en.test.js` pilnuje, żeby każda kwestia czytana po polsku miała angielskie nagranie.
+
 ## Wersja 0.1.99 (6.11.2026)
 
 - Po angielsku stwory z polskich podań mają angielskie nazwy zamiast zapisu fonetycznego, a z nimi ich afiksy na przedmiotach, materiały, opisy miejsc, zdarzenia i Poszukiwani; sześć przedmiotów o polskich nazwach też. Zob. „Odpowiedź autora: bez nazw fonetycznych”.

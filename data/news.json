@@ -295,6 +295,11 @@
       "id": "0.1.99",
       "title": "Wersja 0.1.99",
       "body": "- Po angielsku stwory z polskich podań mają angielskie nazwy zamiast zapisu fonetycznego (np. Licho to Misfortune, a Strzyga to Shriekwing). Zmieniły się też ich afiksy na przedmiotach i nazwy materiałów."
+    },
+    {
+      "id": "0.2.0",
+      "title": "Wersja 0.2.0",
+      "body": "- Po angielsku narrator mówi własnym głosem: angielskiego lektora."
     }
 ]
 }

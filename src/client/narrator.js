@@ -955,16 +955,18 @@ export function passTold() {
 
 // A line as told to this character: its class's text for a line told per
 // class, and for a female look its female version, with that version's own
-// recording (none until it is recorded). The recordings are Polish: a page
-// in English tells its lines without them until the English ones are made
-// (the English beta's stage 5, 696 A).
+// recording (none until it is recorded). A page in English plays the
+// English recordings (audio/narration/en/, data/en/tutorial.json), the same
+// for both looks as their words are; a line without one stays silent there
+// rather than speak Polish (696 A, 715).
+const englishVoice = (path) => (typeof path === 'string' && path.startsWith('audio/narration/en/') ? path : undefined);
 function told(line) {
   const forClass = line.classes?.[state.character?.classId] ?? line;
   // On a computer a line may say it otherwise (519: "Kliknij" for
   // "Stuknij", the resources in the top bar).
   const own = (desktopLayout() && forClass.desktop) || forClass;
   const female = own.female && state.character?.appearance === 'female';
-  const voice = language() === 'pl' ? (female ? own.female.voice : own.voice) : undefined;
+  const voice = language() === 'pl' ? (female ? own.female.voice : own.voice) : englishVoice(own.voice);
   return { ...line, text: female ? own.female.text : own.text, voice };
 }
 const words = (line) => told(line).text.map((text) => text.replaceAll('{points}', String(state.content.tutorial.startTimePoints)));

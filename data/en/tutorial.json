@@ -94,7 +94,8 @@
           "At the edge of the wilds, where the wind breaks old trees, someone the forest does not yet know awakens. There is no road behind, and ahead lies only the wilderness.",
           "Welcome, stranger."
         ]
-      }
+      },
+      "voice": "audio/narration/en/intro.mp3"
     },
     "purpose": {
       "text": [
@@ -104,12 +105,14 @@
         "text": [
           "You have found yourself in a place whose purpose is growth. I am counting on you to reach great heights."
         ]
-      }
+      },
+      "voice": "audio/narration/en/purpose.mp3"
     },
     "test": {
       "text": [
         "To begin, a small test for you. One of the safest challenges that await you. Set out on an exploration to the Edge of the Windfalls."
-      ]
+      ],
+      "voice": "audio/narration/en/test.mp3"
     },
     "tap-region": {
       "text": [
@@ -118,13 +121,16 @@
       "desktop": {
         "text": [
           "Click the Windfalls."
-        ]
-      }
+        ],
+        "voice": "audio/narration/en/tap-region-desktop.mp3"
+      },
+      "voice": "audio/narration/en/tap-region.mp3"
     },
     "tap-area": {
       "text": [
         "Choose the Edge of the Windfalls."
-      ]
+      ],
+      "voice": "audio/narration/en/tap-area.mp3"
     },
     "bestiary": {
       "text": [
@@ -134,7 +140,8 @@
         "text": [
           "Here is the Bestiary of this place. The creatures you have not fought yet appear in it only as shadows. Get to know them all, and you will open the chest."
         ]
-      }
+      },
+      "voice": "audio/narration/en/bestiary.mp3"
     },
     "trial": {
       "text": [
@@ -144,7 +151,8 @@
         "text": [
           "You are not ready for longer explorations yet. Let us begin with a half-hour trial."
         ]
-      }
+      },
+      "voice": "audio/narration/en/trial.mp3"
     },
     "tap-start": {
       "text": [
@@ -153,38 +161,46 @@
       "desktop": {
         "text": [
           "The slider is set to thirty minutes. Click “Set out”."
-        ]
-      }
+        ],
+        "voice": "audio/narration/en/tap-start-desktop.mp3"
+      },
+      "voice": "audio/narration/en/tap-start.mp3"
     },
     "skip": {
       "text": [
         "You are in the forest now. Time is relentless… were it not for the System's help. Time Points let you speed up an exploration. Here – {points} of them to start with. Treat this… as a precious gift."
-      ]
+      ],
+      "voice": "audio/narration/en/skip.mp3"
     },
     "tap-skip": {
       "text": [
         "Skip time with Time Points."
-      ]
+      ],
+      "voice": "audio/narration/en/tap-skip.mp3"
     },
     "tap-claim": {
       "text": [
         "Claim the report."
-      ]
+      ],
+      "voice": "audio/narration/en/tap-claim.mp3"
     },
     "report": {
       "text": [
         "Your exploration was a success, but to grasp its weight… let me walk you through the report of your journey."
-      ]
+      ],
+      "voice": "audio/narration/en/report.mp3"
     },
     "report-summary": {
       "text": [
         "At the very top of the report you can see the most important information."
-      ]
+      ],
+      "voice": "audio/narration/en/report-summary.mp3"
     },
     "report-system": {
       "text": [
         "This is the System's domain. No one has ever unravelled its mysteries for good. Its usefulness, however – that you have laid out before you."
-      ]
+      ],
+      "voice": "audio/narration/en/report-system.mp3"
     },
     "report-fights": {
       "text": [
@@ -194,7 +210,8 @@
         "text": [
           "The System records the skirmishes you fought during the exploration. You can look through them by choosing a tab. A star on a tab marks the most important of the fights."
         ]
-      }
+      },
+      "voice": "audio/narration/en/report-fights.mp3"
     },
     "report-items": {
       "text": [
@@ -204,17 +221,20 @@
         "text": [
           "This is everything you found during the exploration. It has already landed in your bag."
         ]
-      }
+      },
+      "voice": "audio/narration/en/report-items.mp3"
     },
     "report-account": {
       "text": [
         "And if you are curious how the whole exploration went – the System describes it in detail right here."
-      ]
+      ],
+      "voice": "audio/narration/en/report-account.mp3"
     },
     "lead-character": {
       "text": [
         "Let us also take a look at the window of the Character you have come to lead."
-      ]
+      ],
+      "voice": "audio/narration/en/lead-character.mp3"
     },
     "character": {
       "text": [
@@ -224,32 +244,38 @@
         "text": [
           "In this window of the System you can look through your equipment. During the exploration you obtained a weapon and, as you can see – the System made things easier and let you draw it without lifting a finger."
         ]
-      }
+      },
+      "voice": "audio/narration/en/character.mp3"
     },
     "lead-stats": {
       "text": [
         "Gaining levels on explorations – be it class or character levels – also gives you stat points to distribute. Let us take a look at them."
-      ]
+      ],
+      "voice": "audio/narration/en/lead-stats.mp3"
     },
     "stats": {
       "text": [
         "The System makes things easier, so you need not rack your brains over all these numbers. You can distribute the points you have gained in the way that best suits your class. But! You can also build your character however you see fit."
-      ]
+      ],
+      "voice": "audio/narration/en/stats.mp3"
     },
     "free-points": {
       "text": [
         "Distribute your free points."
-      ]
+      ],
+      "voice": "audio/narration/en/free-points.mp3"
     },
     "lead-camp": {
       "text": [
         "No self-respecting character would deny themselves the chance to build a camp – and who knows, in time perhaps a whole stronghold. Let us look into your camp."
-      ]
+      ],
+      "voice": "audio/narration/en/lead-camp.mp3"
     },
     "camp": {
       "text": [
         "Someone has camped in this clearing before. Good for you! It looks like they left some wood, stone and iron ore behind. Finders keepers."
-      ]
+      ],
+      "voice": "audio/narration/en/camp.mp3"
     },
     "camp-sawmill": {
       "text": [
@@ -259,52 +285,62 @@
         "text": [
           "This is a good spot to build a Sawmill. The System supports us in our daily lives, so the wood in one is produced on its own as well. You will only have to collect the wood it makes."
         ]
-      }
+      },
+      "voice": "audio/narration/en/camp-sawmill.mp3"
     },
     "camp-quarry": {
       "text": [
         "The same goes for the Quarry, which will dig up stone for you, and the Mine, which will give you iron ore."
-      ]
+      ],
+      "voice": "audio/narration/en/camp-quarry.mp3"
     },
     "camp-lake": {
       "text": [
         "Gold lies at the bottom of Midas Pond. A prospector's pan sifts it out by itself – not much, but without pause."
-      ]
+      ],
+      "voice": "audio/narration/en/camp-lake.mp3"
     },
     "camp-anvil": {
       "text": [
         "And when you wish to strengthen the items you own – you might think about setting up and developing the Anvil. It will let you upgrade your equipment."
-      ]
+      ],
+      "voice": "audio/narration/en/camp-anvil.mp3"
     },
     "camp-loot-shed": {
       "text": [
         "Spoils from explorations go into your bag. The Storehouse will make it bigger, and the Scrapyard will make the scrap dealer pay you more for what you do not need – and sell you parts for crafting, too."
-      ]
+      ],
+      "voice": "audio/narration/en/camp-loot-shed.mp3"
     },
     "camp-craft-table": {
       "text": [
         "At the Salvage Table you will turn creature materials into parts. You can also take apart the items you do not need there. The parts will come in handy once you learn the professions."
-      ]
+      ],
+      "voice": "audio/narration/en/camp-craft-table.mp3"
     },
     "camp-level": {
       "text": [
         "You can also develop the camp itself. It costs only gold, and every level of the camp speeds up all building. You can also queue up to three buildings at once."
-      ]
+      ],
+      "voice": "audio/narration/en/camp-level.mp3"
     },
     "lead-campfire": {
       "text": [
         "Now let us see to your rest between explorations. By the fire your character recovers faster, and the fire spirit will take your gold and give you resources for it. Build the Campfire."
-      ]
+      ],
+      "voice": "audio/narration/en/lead-campfire.mp3"
     },
     "tap-build": {
       "text": [
         "Build the Campfire."
-      ]
+      ],
+      "voice": "audio/narration/en/tap-build.mp3"
     },
     "camp-countdown": {
       "text": [
         "Building always takes a while, especially when it comes to upgrades. Luckily, the System takes this off your hands too. While something is being built, you can do anything else that is available."
-      ]
+      ],
+      "voice": "audio/narration/en/camp-countdown.mp3"
     },
     "wallet": {
       "text": [
@@ -323,8 +359,10 @@
           "text": [
             "By the way – here you see your gold and System Points, and right next to them the rest of your resources along with your Time Points. See for yourself."
           ]
-        }
-      }
+        },
+        "voice": "audio/narration/en/wallet-desktop.mp3"
+      },
+      "voice": "audio/narration/en/wallet.mp3"
     },
     "settings": {
       "text": [
@@ -334,27 +372,32 @@
         "text": [
           "For your convenience, you can also look into some of the System's own settings and set them just as you please. If you decide you have made too many mistakes – you can even start over. At the very top of the settings waits the Journal, too – there you will find all your reports."
         ]
-      }
+      },
+      "voice": "audio/narration/en/settings.mp3"
     },
     "quests": {
       "text": [
         "Every day I will give you quests – that way we will keep up our, I hope, fruitful relationship. I will be waiting for you here."
-      ]
+      ],
+      "voice": "audio/narration/en/quests.mp3"
     },
     "encyclopedia-lead": {
       "text": [
         "Everything you obtain, the System records in the Encyclopedia. Let us take a look at it."
-      ]
+      ],
+      "voice": "audio/narration/en/encyclopedia-lead.mp3"
     },
     "encyclopedia": {
       "text": [
         "The weapon from your first exploration is already here. Every entry will tell you where to get it, even one you do not know yet. A full set earns a chest, and a gold dot by the book will tell you when one is ready to open."
-      ]
+      ],
+      "voice": "audio/narration/en/encyclopedia.mp3"
     },
     "shop-system": {
       "text": [
         "You spend System Points in the System Shop. There you can buy cosmetics that change your look."
-      ]
+      ],
+      "voice": "audio/narration/en/shop-system.mp3"
     },
     "ending": {
       "text": [
@@ -364,107 +407,128 @@
         "text": [
           "That is all for a start. The rest of the System's workings, your goal and your liking – you will have to discover on your own. Good luck."
         ]
-      }
+      },
+      "voice": "audio/narration/en/ending.mp3"
     },
     "towers-welcome": {
       "text": [
         "Your character's fiftieth level… The System has opened the Towers to you."
-      ]
+      ],
+      "voice": "audio/narration/en/towers-welcome.mp3"
     },
     "towers-lead": {
       "text": [
         "The Towers wait in the Combat tab. Let us look in there."
-      ]
+      ],
+      "voice": "audio/narration/en/towers-lead.mp3"
     },
     "towers-entries": {
       "text": [
         "Each entry is a single fight, with the result at once. You fight with full HP, but without potions."
-      ]
+      ],
+      "voice": "audio/narration/en/towers-entries.mp3"
     },
     "towers-solo": {
       "text": [
         "Each floor holds the creatures of one region, one after another through all the lands. You can climb no higher than the floor of your own level."
-      ]
+      ],
+      "voice": "audio/narration/en/towers-solo.mp3"
     },
     "towers-floor": {
       "text": [
         "Elites and champions wait along the way, and every tenth floor gives a Tower chest for the first victory."
-      ]
+      ],
+      "voice": "audio/narration/en/towers-floor.mp3"
     },
     "towers-party": {
       "text": [
         "You enter the Party Tower with one or two other wanderers. A companion from the Quarters will take a free place."
-      ]
+      ],
+      "voice": "audio/narration/en/towers-party.mp3"
     },
     "towers-ending": {
       "text": [
         "You have a dozen or so entries a day, with new ones from midnight. The Towers will also help you fill in old Bestiary entries."
-      ]
+      ],
+      "voice": "audio/narration/en/towers-ending.mp3"
     },
     "guild-tabs": {
       "text": [
         "Each tab is another of the guild's shared undertakings. A dot by a tab will tell you that something is waiting for you there."
-      ]
+      ],
+      "voice": "audio/narration/en/guild-tabs.mp3"
     },
     "guild-seat": {
       "text": [
         "Here the guild raises four buildings, and each of their levels gives a bonus to all the members. You donate gold and resources to the one you choose. Donations do not come back."
-      ]
+      ],
+      "voice": "audio/narration/en/guild-seat.mp3"
     },
     "guild-beast": {
       "text": [
         "The beast of the week belongs to the whole guild. You attack it three times a day, even during an exploration. The harder the guild wounds it, the more you will find in the chest."
-      ]
+      ],
+      "voice": "audio/narration/en/guild-beast.mp3"
     },
     "guild-trials": {
       "text": [
         "The trials count by themselves, from the moment they appear on the board. New ones come every day, and each one completed brings the whole guild closer to the next chest."
-      ]
+      ],
+      "voice": "audio/narration/en/guild-trials.mp3"
     },
     "guild-requests": {
       "text": [
         "When you run short of a material, herb or potion, ask the guild here. You, too, can give others what they ask for."
-      ]
+      ],
+      "voice": "audio/narration/en/guild-requests.mp3"
     },
     "guild-exchange": {
       "text": [
         "Here you can exchange resources with other guild members – for gold, too."
-      ]
+      ],
+      "voice": "audio/narration/en/guild-exchange.mp3"
     },
     "guild-expedition": {
       "text": [
         "Every minute of your explorations leads the guild onward. A guardian waits at the end of each stage. You attack it three times a day, and when it falls, everyone who added minutes gets a chest."
-      ]
+      ],
+      "voice": "audio/narration/en/guild-expedition.mp3"
     },
     "fortress-welcome": {
       "text": [
         "Your camp has become a Stronghold. Each of its seven buildings gives something: training, a blessing, herbs or better tracking. Look in here every day."
-      ]
+      ],
+      "voice": "audio/narration/en/fortress-welcome.mp3"
     },
     "fortress-stone": {
       "text": [
         "One day a Stronghold will stand on this spot. The stone will show you how much is still missing, and the Builder Spirit will buy your surplus wood, stone and ore."
-      ]
+      ],
+      "voice": "audio/narration/en/fortress-stone.mp3"
     },
     "hard-hunt": {
       "text": [
         "From the tenth level you can tick the Hard exploration. The creatures are stronger then, but they give more experience and gold."
-      ]
+      ],
+      "voice": "audio/narration/en/hard-hunt.mp3"
     },
     "account-chest": {
       "text": [
         "This chest is shared by all the characters on your account. An item put in by one character can be taken out by another."
-      ]
+      ],
+      "voice": "audio/narration/en/account-chest.mp3"
     },
     "system-collector": {
       "text": [
         "The System Collector keeps watch close by. For gold, once and for all, it will collect the resources from full stores on its own."
-      ]
+      ],
+      "voice": "audio/narration/en/system-collector.mp3"
     },
     "faint-first": {
       "text": [
         "After fainting, nothing from the exploration is kept, and the System takes away part of your experience as well. Before you set out again, check the threat and rest."
-      ]
+      ],
+      "voice": "audio/narration/en/faint-first.mp3"
     },
     "skills-welcome": {
       "classes": {
@@ -472,98 +536,115 @@
           "text": [
             "The tenth level of your class… Your blows have grown heavier, and the System could not fail to notice. It has unlocked Skills for you.",
             "Before you choose one – allow me to introduce them."
-          ]
+          ],
+          "voice": "audio/narration/en/skills-welcome-warrior.mp3"
         },
         "archer": {
           "text": [
             "The tenth level of your class… Your arrows miss ever more rarely, and the System could not fail to notice. It has unlocked Skills for you.",
             "Before you choose one – allow me to introduce them."
-          ]
+          ],
+          "voice": "audio/narration/en/skills-welcome-archer.mp3"
         },
         "mage": {
           "text": [
             "The tenth level of your class… Mana heeds you ever more willingly, and the System could not fail to notice. It has unlocked Skills for you.",
             "Before you choose one – allow me to introduce them."
-          ]
+          ],
+          "voice": "audio/narration/en/skills-welcome-mage.mp3"
         },
         "cleric": {
           "text": [
             "The tenth level of your class… Your prayers carry ever further, and the System could not fail to notice. It has unlocked Skills for you.",
             "Before you choose one – allow me to introduce them."
-          ]
+          ],
+          "voice": "audio/narration/en/skills-welcome-cleric.mp3"
         },
         "shadow": {
           "text": [
             "The tenth level of your class… You move ever more quietly, but nothing stays hidden from the System. It has unlocked Skills for you.",
             "Before you choose one – allow me to introduce them."
-          ]
+          ],
+          "voice": "audio/narration/en/skills-welcome-shadow.mp3"
         }
       }
     },
     "skills-lead-character": {
       "text": [
         "Let us go back to the Character window."
-      ]
+      ],
+      "voice": "audio/narration/en/skills-lead-character.mp3"
     },
     "skills-lead": {
       "text": [
         "Your Skills wait in this tab. Let us take a look at them."
-      ]
+      ],
+      "voice": "audio/narration/en/skills-lead.mp3"
     },
     "skills-intro": {
       "text": [
         "Read the System's words carefully. Rarely does it warn so plainly."
-      ]
+      ],
+      "voice": "audio/narration/en/skills-intro.mp3"
     },
     "skills-paths": {
       "classes": {
         "warrior": {
           "text": [
             "Before you lie three paths. The Barbarian crushes a foe with one blow, the Gladiator slashes them all at once, and the Guardian never takes a step back."
-          ]
+          ],
+          "voice": "audio/narration/en/skills-paths-warrior.mp3"
         },
         "archer": {
           "text": [
             "Before you lie three paths. The Sniper hits where it hurts most, the Storm Archer showers the foes with a hail of arrows, and the Hunter pins the quarry down before it can move."
-          ]
+          ],
+          "voice": "audio/narration/en/skills-paths-archer.mp3"
         },
         "mage": {
           "text": [
             "Before you lie three paths. The Elementalist hurls fire, the Ice Lord slows the foes with a frosty wind, and the Arcanist delves into the nature of mana itself."
-          ]
+          ],
+          "voice": "audio/narration/en/skills-paths-mage.mp3"
         },
         "cleric": {
           "text": [
             "Before you lie three paths. The Healer closes wounds, the Inquisitor lashes the foes with holy power, and the Priest blesses themselves and their companions."
-          ]
+          ],
+          "voice": "audio/narration/en/skills-paths-cleric.mp3"
         },
         "shadow": {
           "text": [
             "Before you lie three paths. The Assassin catches those who hide behind others' backs, the Poisoner laces the blade with venom, and the Night Dancer eludes blows and can deliver a swift counter."
-          ]
+          ],
+          "voice": "audio/narration/en/skills-paths-shadow.mp3"
         }
       }
     },
     "skills-card": {
       "text": [
         "The System, as always, has worked it all out for you. On the card you will see what a skill gives, how much mana it costs and how often you can use it."
-      ]
+      ],
+      "voice": "audio/narration/en/skills-card.mp3"
     },
     "skills-choice": {
       "text": [
         "The first skill you put your first Skill Point into will open your main path.",
         "From the eleventh level of your class you may add a side path – for one Skill Point. The third path will then close."
-      ]
+      ],
+      "voice": "audio/narration/en/skills-choice.mp3"
     },
     "skills-points": {
       "text": [
         "Here you will see your Skill Points. Every new class level will bring you one. A point raises a skill you have learned by one level – all the way to the twentieth."
-      ]
+      ],
+      "voice": "audio/narration/en/skills-points.mp3"
     },
     "skills-evolution": {
       "text": [
         "One more thing. At the fiftieth level of your class, evolution awaits you. Before you get there, choose both paths and spend your points – otherwise the System will hold your class at the threshold until you do."
-      ]
+      ],
+      "voice": "audio/narration/en/skills-evolution.mp3"
     },
     "skills-ending": {
       "text": [
@@ -573,17 +654,20 @@
         "text": [
           "That is all from me. This time not even the System will do it for you – the choice is yours alone. Choose your path when you are ready."
         ]
-      }
+      },
+      "voice": "audio/narration/en/skills-ending.mp3"
     },
     "evolution-welcome": {
       "text": [
         "The fiftieth level of your class… The System has opened Evolution before you."
-      ]
+      ],
+      "voice": "audio/narration/en/evolution-welcome.mp3"
     },
     "evolution-lead": {
       "text": [
         "Evolution waits in the Character tab. Let us take a look."
-      ]
+      ],
+      "voice": "audio/narration/en/evolution-lead.mp3"
     },
     "evolution-choice": {
       "text": [
@@ -593,293 +677,351 @@
         "text": [
           "It is time you chose your path. One of two evolutions is open to you: that of your main path or that of your side path. Each will give you a new class name, a lasting trait and two new skills."
         ]
-      }
+      },
+      "voice": "audio/narration/en/evolution-choice.mp3"
     },
     "evolution-points": {
       "text": [
         "Your Skill Points will come back to be spent anew, and you may reset your stats once, for free."
-      ]
+      ],
+      "voice": "audio/narration/en/evolution-points.mp3"
     },
     "evolution-ending": {
       "text": [
         "The next evolution awaits at the hundredth level of your class."
-      ]
+      ],
+      "voice": "audio/narration/en/evolution-ending.mp3"
     },
     "party-intro": {
       "text": [
         "A Party is up to three wanderers on one exploration, and their class levels may differ by five at most. The leader sends the exploration off by ticking “With the party” above “Set out”."
-      ]
+      ],
+      "voice": "audio/narration/en/party-intro.mp3"
     },
     "professions-welcome": {
       "text": [
         "Your character's tenth level… The wilds already know your name, and the System could not overlook that. It has unlocked the Professions for you.",
         "Before you try your hand at one – allow me to introduce them."
-      ]
+      ],
+      "voice": "audio/narration/en/professions-welcome.mp3"
     },
     "professions-lead": {
       "text": [
         "The Professions wait in this tab. Let us take a look at them."
-      ]
+      ],
+      "voice": "audio/narration/en/professions-lead.mp3"
     },
     "professions-intro": {
       "text": [
         "First, read what the System says about them."
-      ]
+      ],
+      "voice": "audio/narration/en/professions-intro.mp3"
     },
     "professions-list": {
       "text": [
         "Herbalism lets you gather herbs in the System Grove, and with Alchemy you will brew potions from them in the System Laboratory. There will be time yet for the other professions."
-      ]
+      ],
+      "voice": "audio/narration/en/professions-list.mp3"
     },
     "professions-ending": {
       "text": [
         "You will take your potions on an exploration – you pack them for the road before you set out. In a fight, your character will reach for them of their own accord."
-      ]
+      ],
+      "voice": "audio/narration/en/professions-ending.mp3"
     },
     "community-welcome": {
       "text": [
         "Your character's fifth level… The System has opened two new paths before you: the Community and the Quick Hunt."
-      ]
+      ],
+      "voice": "audio/narration/en/community-welcome.mp3"
     },
     "community-lead": {
       "text": [
         "Other wanderers await in this tab. Let us look in on them."
-      ]
+      ],
+      "voice": "audio/narration/en/community-lead.mp3"
     },
     "community-tabs": {
       "text": [
         "At the top you switch between the tabs: Chat, Friends, Ranking and Guild. You can form a Party from level 10."
-      ]
+      ],
+      "voice": "audio/narration/en/community-tabs.mp3"
     },
     "community-rules": {
       "text": [
         "Here you can talk with other wanderers. Before you write your first word, read the chat rules."
-      ]
+      ],
+      "voice": "audio/narration/en/community-rules.mp3"
     },
     "community-ending": {
       "text": [
         "And when you lack the time for a long exploration, reach for the Quick Hunt. It waits in Combat, below “Set out” – three times a day."
-      ]
+      ],
+      "voice": "audio/narration/en/community-ending.mp3"
     },
     "crafting-welcome": {
       "text": [
         "Your character's fifteenth level… The System has opened Crafting to you."
-      ]
+      ],
+      "voice": "audio/narration/en/crafting-welcome.mp3"
     },
     "crafting-lead": {
       "text": [
         "The System Workshop waits in the Professions tab. Let us look in there."
-      ]
+      ],
+      "voice": "audio/narration/en/crafting-lead.mp3"
     },
     "crafting-patterns": {
       "text": [
         "Here you will make weapons and armour from patterns. You will get the parts for them at the Salvage Table, or buy them from the scrap dealer."
-      ]
+      ],
+      "voice": "audio/narration/en/crafting-patterns.mp3"
     },
     "crafting-ending": {
       "text": [
         "Each new level of Crafting will reveal more patterns to you. Look in here too when you salvage an item you have never taken apart before."
-      ]
+      ],
+      "voice": "audio/narration/en/crafting-ending.mp3"
     },
     "settlement-welcome": {
       "text": [
         "Your character's twentieth level… Life goes on beyond the wilds as well. The System has opened the Settlement to you."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-welcome.mp3"
     },
     "settlement-lead": {
       "text": [
         "The Settlement waits in this tab. Let us look in on the Crossroads."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-lead.mp3"
     },
     "settlement-board": {
       "text": [
         "On the Order Board the residents post their requests. Orders hang here for a week."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-board.mp3"
     },
     "settlement-brotherhoods": {
       "text": [
         "Every order you deliver earns you more respect among the brotherhoods. The higher your standing, the more they will allow you."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-brotherhoods.mp3"
     },
     "settlement-ending": {
       "text": [
         "Call on the other residents of the Crossroads too. When you first step through someone's door, I will tell you what they do."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-ending.mp3"
     },
     "settlement-tavern-mug": {
       "text": [
         "For a tankard, Zbylut will let you in on a rumour from the road. Listen closely – not everyone shares news like that."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-tavern-mug.mp3"
     },
     "settlement-tavern-hire": {
       "text": [
         "Here your future companions look for work. Once hired, a companion sets out with you on explorations and grows stronger along with you."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-tavern-hire.mp3"
     },
     "settlement-tavern-quarters": {
       "text": [
         "Every companion needs a place to sleep. Build the Quarters in your camp – that is where you will find them afterwards."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-tavern-quarters.mp3"
     },
     "settlement-tavern-mercenaries": {
       "text": [
         "Here you can offer your character for hire, or take someone else's on your own exploration. Whoever hires pays, for every hour on the road."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-tavern-mercenaries.mp3"
     },
     "settlement-board-wanted": {
       "text": [
         "The headman posts wanted posters here too. Take a poster and set out to where the quarry was seen. Should you meet it and defeat it, the reward is yours."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-board-wanted.mp3"
     },
     "settlement-enchanter-affix": {
       "text": [
         "Wiedana enchants one affix of an item into another, and never fails. You pay in gold and creature materials."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-enchanter-affix.mp3"
     },
     "settlement-enchanter-element": {
       "text": [
         "She can also bind an element. A weapon will deal part of its damage as fire, lightning or nature, and armour will grow resistant to it."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-enchanter-element.mp3"
     },
     "settlement-enchanter-relation": {
       "text": [
         "The better she knows you, the more affixes she will offer you to choose from."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-enchanter-relation.mp3"
     },
     "settlement-hermit-reset": {
       "text": [
         "Sambor will help you begin anew. For gold, he will reset your skill path or the stats you have spent."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-hermit-reset.mp3"
     },
     "settlement-hermit-evolution": {
       "text": [
         "Once your class has evolved, he can change your evolution for another. The first change is free."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-hermit-evolution.mp3"
     },
     "settlement-herbalist-buy": {
       "text": [
         "Jagna sells herbs. Only the three simplest at first, and more with every standing you reach with her."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-herbalist-buy.mp3"
     },
     "settlement-herbalist-sell": {
       "text": [
         "In the Sell tab she will buy your herbs and potions for more than the scrap dealer pays. The better she knows you, the more she pays."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-herbalist-sell.mp3"
     },
     "settlement-herbalist-relation": {
       "text": [
         "Trading with her also builds your standing with the Brotherhood of Herbalists."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-herbalist-relation.mp3"
     },
     "settlement-market-offers": {
       "text": [
         "At the Marketplace, players auction their goods. An auction lasts from an hour to a full day, and an outbid player gets their gold back at once."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-market-offers.mp3"
     },
     "settlement-market-mine": {
       "text": [
         "Here you put up your own goods, and collect whatever you buy or sell."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-market-mine.mp3"
     },
     "settlement-market-residents": {
       "text": [
         "Gościwit has new wares every day. Once a week a travelling merchant calls in too, with rare items."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-market-residents.mp3"
     },
     "settlement-market-company": {
       "text": [
         "Every trade builds your standing with the Merchants' Company. The higher it is, the more offers you can put up at once."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-market-company.mp3"
     },
     "settlement-forge-scrolls": {
       "text": [
         "Żelisław sells two kinds of scrolls, at most three of each a day. A Ward Scroll guards an item against breaking on the Anvil, and a Steady Scroll against losing its upgrade."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-forge-scrolls.mp3"
     },
     "settlement-forge-raise": {
       "text": [
         "For gold and materials, he will reforge an item one rarity higher. Each item only once."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-forge-raise.mp3"
     },
     "settlement-forge-relation": {
       "text": [
         "The better he knows you, the rarer the items he will forge. Standing with the Brotherhood of Smiths will lower his prices."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-forge-relation.mp3"
     },
     "settlement-tannery-buy": {
       "text": [
         "Wszebor sells creature materials: hides, scales, feathers and fangs. They will come in handy when you are short of something for an order."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-tannery-buy.mp3"
     },
     "settlement-tannery-sell": {
       "text": [
         "In the Sell tab he will buy your materials for more than the scrap dealer pays. The better he knows you, the more he pays."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-tannery-sell.mp3"
     },
     "settlement-tannery-relation": {
       "text": [
         "Trading with him also builds your standing with the Brotherhood of Hunters, and with every standing you reach with him, Wszebor has more wares."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-tannery-relation.mp3"
     },
     "settlement-stable-mounts": {
       "text": [
         "Mirosław sells mounts for good. With a mount, explorations end sooner, yet the spoils are as for the full time."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-stable-mounts.mp3"
     },
     "settlement-stable-party": {
       "text": [
         "On a party's exploration, everyone rides at the pace of the slowest mount. If someone has no mount, the exploration takes the full time."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-stable-party.mp3"
     },
     "settlement-casino-lottery": {
       "text": [
         "Every day Szczęsny sells tickets for the Lottery. At midnight the System draws one of them, and its owner takes the whole pot."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-casino-lottery.mp3"
     },
     "settlement-casino-wheel": {
       "text": [
         "You spin the Wheel of Fortune for hundreds of gold pieces. The higher the stake, the greater the chance of a win and of a better prize – but the sharper the sting of a loss."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-casino-wheel.mp3"
     },
     "settlement-trial-hall": {
       "text": [
         "Once a day you can fight three battles here against the creatures of the next place. Your health does not return between them, but potions work. Win, and that place will open to you at once."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-trial-hall.mp3"
     },
     "settlement-quarters": {
       "text": [
         "Your companions live here. You can talk with each of them once a day, and talks and shared explorations build your bond. Here, too, you can change their gear, collect their gifts or send them on their way."
-      ]
+      ],
+      "voice": "audio/narration/en/settlement-quarters.mp3"
     },
     "mining-welcome": {
       "text": [
         "Your character's twenty-fifth level… The System has opened Mining and Jewelcrafting to you."
-      ]
+      ],
+      "voice": "audio/narration/en/mining-welcome.mp3"
     },
     "mining-lead": {
       "text": [
         "The System Mine and the System Gem Workshop wait in the Professions tab. Let us look in there."
-      ]
+      ],
+      "voice": "audio/narration/en/mining-lead.mp3"
     },
     "mining-dig": {
       "text": [
         "In the Mine you will dig up gemstones and ores. Along the way, your pickaxe will strike veins of gold as well."
-      ]
+      ],
+      "voice": "audio/narration/en/mining-dig.mp3"
     },
     "mining-jewels": {
       "text": [
         "In the Gem Workshop you will make rings, amulets and talismans from them. The jewellery's rarity depends on the stone."
-      ]
+      ],
+      "voice": "audio/narration/en/mining-jewels.mp3"
     },
     "mining-setting": {
       "text": [
         "You can also set a stone in an item you wear. It will strengthen all of its values."
-      ]
+      ],
+      "voice": "audio/narration/en/mining-setting.mp3"
     },
     "mining-ending": {
       "text": [
         "The rarer stones lie deeper. Each new level of Mining will reveal more of them to you."
-      ]
+      ],
+      "voice": "audio/narration/en/mining-ending.mp3"
     }
   }
 }
