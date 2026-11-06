@@ -65,6 +65,28 @@
     "trait": {
       "name": "Healing Mud",
       "description": "Healing from skills and potions restores 5% more HP."
+    },
+    "areas": {
+      "black-alder-carr": {
+        "name": "Black Alder Carr",
+        "description": "A forest of black alders on stilts of roots, knee-deep in black water. Pond turtles bask on the roots, a mink darts between the trunks, and giant dragonflies hunt above the water."
+      },
+      "black-tarn": {
+        "name": "Black Tarn",
+        "description": "A round lake of bottomless black water, ringed by a mat of moss. A pike waits in the depths, a water spider lives in silver bubbles of air, and terns cry above the water."
+      },
+      "sunken-shrine": {
+        "name": "Sunken Temple",
+        "description": "A pagan temple the bog took long ago. Carved pillars rise from the water, and some of them still move. The serpent of Veles circles in the depths, and the ghost of a pagan priest still performs the rites here."
+      },
+      "quaking-bog": {
+        "name": "Quaking Bog",
+        "description": "A thin mat of moss over bottomless pools of black water. The ground trembles at every step, the lantern eyes of a Bagiennik stare out of the dark, giant ticks lurk in the moss, and at dusk a night heron hunts."
+      },
+      "rokita-deep": {
+        "name": "Rokita's Abyss",
+        "description": "The blackest spot in the bog, in a thicket of old creeping willows. Green fire burns on the water, black goats and Bieses guard the way, and Kwobuks carry plunder to their master. Here lives the devil Rokita."
+      }
     }
   },
   "pine-dunes": {
@@ -74,6 +96,28 @@
     "trait": {
       "name": "Scorching Heat",
       "description": "Burn lasts one turn longer, for creatures and characters alike."
+    },
+    "areas": {
+      "heather-dunes": {
+        "name": "Heather Dunes",
+        "description": "Gentle dunes under a purple carpet of heather, with twisted pines on their crests. A sandman rises from the sand, a heather mare drifts over the heather, and at dusk nightjars skim low over the ground."
+      },
+      "resin-pinewood": {
+        "name": "Resin Pinewood",
+        "description": "An old pinewood where resin runs down the trunks like honey. A resin golem shuffles between the pines, barkborers gnaw at the bark, and at night tar moths flutter around the trunks."
+      },
+      "drifting-sands": {
+        "name": "Drifting Sands",
+        "description": "A wasteland where the wind shifts the sand from place to place and uncovers old barrows. Drought husks wander the dunes, sand whirls spin, and barrow-wights come out of the barrows."
+      },
+      "tar-pits": {
+        "name": "Tar Pits",
+        "description": "The pits of the old tar burners, where wood still smoulders and birch tar bubbles. The ghosts of the tar burners guard their cauldrons, charcoal imps leap in the embers, and a Latavets circles above the smoke."
+      },
+      "burnt-forest": {
+        "name": "Burnt Forest",
+        "description": "A forest that burned in one terrible blaze. Charred pines and ash wraiths walk between the black trunks, and spark swarms keep the last flames alive. Here nests the Rarog, the fiery falcon of legend."
+      }
     }
   },
   "silent-wilds": {
@@ -83,6 +127,28 @@
     "trait": {
       "name": "Thorns",
       "description": "Bleeding lasts one turn longer, for creatures and characters alike."
+    },
+    "areas": {
+      "spruce-dusk": {
+        "name": "Spruce Dusk",
+        "description": "The fringe of the wilds, where dusk falls at noon under the dense spruces. Needlebacks leap from the branches, smooth snakes lie in the moss, and something rustles right behind your back."
+      },
+      "fern-thicket": {
+        "name": "Fern Thicket",
+        "description": "Waist-high ferns where you cannot see your own feet. Millipedes crawl under the fronds, fernlings rise from the earth, and mantises wait above the ferns."
+      },
+      "forgotten-track": {
+        "name": "Forgotten Road",
+        "description": "An overgrown road through the wilds, where abandoned wagons still stand. Dogheads lie in wait for travellers, a ghostly coachman's whip cracks at night, and gadflies as big as dogs circle above the road."
+      },
+      "mossy-dell": {
+        "name": "Mossy Dell",
+        "description": "A deep ravine with an icy stream, overgrown with moss. The torn-up roots only pretend to be dead, living darkness gathers at the bottom, and stranglers' nooses hang from the edges."
+      },
+      "wild-den": {
+        "name": "Wild Den",
+        "description": "The densest heart of the wilds, a lair full of bones and antlers. Bone gnawers crack the bones, carcasses rise among the carrion, and hounds bay in the dark. Here hunts the Night Huntsman."
+      }
     }
   },
   "new-moon-depths": {
@@ -92,6 +158,28 @@
     "trait": {
       "name": "Ground Frost",
       "description": "Chill lasts one turn longer, for creatures and characters alike."
+    },
+    "areas": {
+      "creaking-pines": {
+        "name": "Creaking Pines",
+        "description": "Huge old pines creak and whisper, though no wind blows. Grey beards of lichen hang from the branches, something stirs in the hollows, and a murmur wraith drifts between the treetops."
+      },
+      "rotting-logs": {
+        "name": "Rotting Logs",
+        "description": "Fallen trunks glow greenish with rot, and fungus grows inside them. Rotwoods lie like logs, puffballs smoke with spores, and earwigs crawl out of the cracks."
+      },
+      "devils-crossroads": {
+        "name": "Devil's Crossroads",
+        "description": "Four overgrown roads meet here in the heart of the forest. At midnight a headless one circles the crossroads, a Khokhow invites you to dance, and a Smentek sings to those who have lost their way."
+      },
+      "plague-graves": {
+        "name": "Plague Graves",
+        "description": "A forgotten graveyard from the time of the plague, hidden deep in the forest. Dead men rise from their mounds, burying beetles dig under the earth, and at midnight the bell-ringer's bell tolls."
+      },
+      "eclipsed-glade": {
+        "name": "Eclipsed Glade",
+        "description": "A glade over which the moon never rises. Abominations crawl along its edge, Kowtuns roll through the grass, and a Bebok waits with a sack for whoever falls behind. Here lives the Moon-Eater."
+      }
     }
   }
 }

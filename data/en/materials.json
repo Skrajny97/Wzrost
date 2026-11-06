@@ -92,6 +92,278 @@
     "black-stork-feather": {
       "name": "Black Stork Feather",
       "description": "A long black feather with a coppery sheen."
+    },
+    "turtle-shell": {
+      "name": "Turtle Shell",
+      "description": "A domed olive shell with yellow speckles, overgrown with moss."
+    },
+    "mink-fur": {
+      "name": "Mink Fur",
+      "description": "Glossy dark brown fur, soft and waterproof."
+    },
+    "dragonfly-wing": {
+      "name": "Dragonfly Wing",
+      "description": "A clear wing with blue veins. It shimmers in the sun."
+    },
+    "pike-teeth": {
+      "name": "Pike Teeth",
+      "description": "A row of needle-thin teeth on a piece of jaw."
+    },
+    "silver-bubble": {
+      "name": "Silver Bubble",
+      "description": "A bubble of air in spider silk. Under water it gleams like quicksilver."
+    },
+    "tern-feather": {
+      "name": "Tern Feather",
+      "description": "A slender dark grey feather with a black tip."
+    },
+    "bog-oak": {
+      "name": "Bog Oak",
+      "description": "A piece of oak that lay in the peat for hundreds of years. Hard, and black as tar."
+    },
+    "veles-scale": {
+      "name": "Veles Scale",
+      "description": "A huge black scale with a faint golden pattern."
+    },
+    "bone-amulet": {
+      "name": "Bone Amulet",
+      "description": "An old amulet on a leather thong, carved with a sun sign."
+    },
+    "bog-lantern-eye": {
+      "name": "Bagiennik Eye",
+      "description": "A round yellow eye that glows in the dark like a lantern."
+    },
+    "tick-shell": {
+      "name": "Giant Tick Shell",
+      "description": "A hard, rust-brown shell. Empty inside."
+    },
+    "night-heron-plume": {
+      "name": "Night Heron Plume",
+      "description": "Long, thin white feathers from a night heron's head."
+    },
+    "bies-horn": {
+      "name": "Bies Horn",
+      "description": "A short, thick black horn with a cracked tip. Warm to the touch."
+    },
+    "black-fleece": {
+      "name": "Black Fleece",
+      "description": "A tuft of matted black hair that smells of sulphur."
+    },
+    "klobuk-feather": {
+      "name": "Fiery Feather",
+      "description": "A wet black feather whose tip still smoulders."
+    },
+    "mamuna-braid": {
+      "name": "Mamuna Braid",
+      "description": "A long braid of black hair tied with a red thread. Always wet."
+    },
+    "cyrograf": {
+      "name": "Devil's Pact",
+      "description": "A scroll of yellowed parchment with a signature in blood and a red seal."
+    },
+    "glassy-sand": {
+      "name": "Glassy Sand",
+      "description": "A handful of sand that glitters like broken glass. It sifts between your fingers, though nothing stirs it."
+    },
+    "everheather": {
+      "name": "Undying Heather",
+      "description": "A sprig of heather that never withers. It smells of honey and sleep."
+    },
+    "nightjar-feather": {
+      "name": "Nightjar Feather",
+      "description": "A soft feather with grey-brown stripes, like pine bark. It makes no sound in flight."
+    },
+    "amber-lump": {
+      "name": "Amber Lump",
+      "description": "A golden lump of resin with an insect trapped inside. Warm in the hand, as if alive."
+    },
+    "bored-bark": {
+      "name": "Tunnelled Bark",
+      "description": "A slab of pine bark full of winding tunnels. Something still scrabbles inside them."
+    },
+    "moth-dust": {
+      "name": "Moth Dust",
+      "description": "A pinch of black dust from a tar moth's wings. It sticks to your fingers and stings your eyes."
+    },
+    "husk-dust": {
+      "name": "Husk Dust",
+      "description": "A handful of grey dust, dry as old bones. It dries out everything it touches."
+    },
+    "whirl-pebble": {
+      "name": "Whirl Pebble",
+      "description": "A smooth, round pebble polished by the wind. Laid on your palm, it slowly turns by itself."
+    },
+    "bronze-ring": {
+      "name": "Bronze Ring",
+      "description": "An old ring from a barrow, covered in green patina. Cold as ice, even in the heat."
+    },
+    "birch-tar": {
+      "name": "Birch Tar",
+      "description": "Thick black pitch from birch bark that smells of smoke. Tar burners rubbed it on wheels and wounds."
+    },
+    "glowing-ember": {
+      "name": "Live Coal",
+      "description": "A small coal glowing bright orange. Now and then it hops by itself, as if trying to escape."
+    },
+    "latawiec-membrane": {
+      "name": "Latavets Membrane",
+      "description": "A thin grey membrane from the wing of a Latavets. It rustles even when there is no wind."
+    },
+    "charred-splinter": {
+      "name": "Charred Splinter",
+      "description": "A black splinter of pine that still glows inside. It does not go out even in the rain."
+    },
+    "ruin-ash": {
+      "name": "Cinder Ash",
+      "description": "A handful of grey ash from the burnt forest. It never cools and cannot be blown away."
+    },
+    "everspark": {
+      "name": "Undying Spark",
+      "description": "A tiny bright spark that will not go out. It hovers over your palm and warms like a campfire."
+    },
+    "noon-sickle": {
+      "name": "Poludnitsa Sickle",
+      "description": "An old iron sickle with a worn wooden handle. At high noon the blade glows red-hot."
+    },
+    "rarog-feather": {
+      "name": "Rarog Feather",
+      "description": "A long feather from the Rarog's fiery tail. It burns, but never burns away."
+    },
+    "black-needle": {
+      "name": "Black Needle",
+      "description": "A long black spruce needle that never breaks or dulls."
+    },
+    "copper-scale": {
+      "name": "Copper Scale",
+      "description": "A warm scale with a coppery sheen. It trembles when someone comes near."
+    },
+    "glass-tooth": {
+      "name": "Glass Tooth",
+      "description": "A clear tooth you can see only against the light."
+    },
+    "millipede-segment": {
+      "name": "Millipede Segment",
+      "description": "A black, glossy ring of armour with a pair of little legs that still move."
+    },
+    "fern-curl": {
+      "name": "Fern Curl",
+      "description": "A young, curled fern frond, black as soot."
+    },
+    "mantis-blade": {
+      "name": "Mantis Blade",
+      "description": "A pale, spiny mantis foreleg, sharp as a razor."
+    },
+    "dog-skull": {
+      "name": "Dog Skull",
+      "description": "A long skull with sharp fangs, too big for a dog."
+    },
+    "coachman-whip": {
+      "name": "Coachman's Whip",
+      "description": "A long leather whip that cracks by itself when night falls."
+    },
+    "rainbow-eye": {
+      "name": "Rainbow Eye",
+      "description": "A huge insect eye made of thousands of tiny eyes, shimmering like oil on water."
+    },
+    "tangled-root": {
+      "name": "Tangled Root",
+      "description": "A thick root twisted into a knot, still shedding soil."
+    },
+    "congealed-murk": {
+      "name": "Congealed Murk",
+      "description": "A lump of cold black ooze that reflects no light."
+    },
+    "black-rope": {
+      "name": "Black Rope",
+      "description": "A thick rope braided from roots, cold and damp."
+    },
+    "gnawed-bone": {
+      "name": "Gnawed Bone",
+      "description": "A huge bone with deep tooth marks, hard as iron."
+    },
+    "rotten-pelt": {
+      "name": "Rotten Hide",
+      "description": "A patch of fur and hide that has been rotting for a hundred years and still holds together."
+    },
+    "broken-leash": {
+      "name": "Broken Leash",
+      "description": "A thick black leather leash, snapped right at the collar."
+    },
+    "whistling-feather": {
+      "name": "Whistling Feather",
+      "description": "A grey feather that whistles at the slightest movement, so shrilly that leaves wither."
+    },
+    "hunting-horn": {
+      "name": "Hunting Horn",
+      "description": "A black horn bound with silver. When someone blows it, the whole forest falls silent."
+    },
+    "grey-beard": {
+      "name": "Grey Beard",
+      "description": "A long tuft of grey lichen, cold as hoarfrost."
+    },
+    "bony-finger": {
+      "name": "Bony Finger",
+      "description": "A long finger with a black claw that still bends."
+    },
+    "murmuring-cone": {
+      "name": "Whispering Cone",
+      "description": "A pine cone that whispers like a whole forest when you hold it to your ear."
+    },
+    "glowing-rot": {
+      "name": "Glowing Rot",
+      "description": "A handful of greenish rotten wood that glows in the dark and never fades."
+    },
+    "spore-pouch": {
+      "name": "Spore Pouch",
+      "description": "The dried skin of a puffball, full of choking dust."
+    },
+    "earwig-pincers": {
+      "name": "Earwig Pincers",
+      "description": "A pair of curved, glossy pincers that snap shut on their own."
+    },
+    "rusty-spur": {
+      "name": "Rusty Spur",
+      "description": "An old rowel spur that jingles by itself when someone walks the road."
+    },
+    "chochol-straw": {
+      "name": "Khokhow Straw",
+      "description": "A bundle of straw that rustles in rhythm, though no one is playing."
+    },
+    "cold-candle": {
+      "name": "Cold Candle",
+      "description": "The stub of a black candle that burns with frost instead of fire."
+    },
+    "deadman-shroud": {
+      "name": "Dead Man's Shroud",
+      "description": "A shred of grey linen, cold as the earth of a grave."
+    },
+    "beetle-antenna": {
+      "name": "Beetle Antenna",
+      "description": "An orange, club-tipped antenna that senses the dead through a fathom of earth."
+    },
+    "bell-clapper": {
+      "name": "Bell Clapper",
+      "description": "The iron clapper of a cracked bell, cold as ice. At midnight it strikes by itself."
+    },
+    "abomination-tooth": {
+      "name": "Abomination Tooth",
+      "description": "A crooked tooth as big as a hand, crusted with dried black blood."
+    },
+    "matted-tangle": {
+      "name": "Matted Tangle",
+      "description": "A dense tangle of black hair in which something still moves."
+    },
+    "bebok-sack": {
+      "name": "Bebok Sack",
+      "description": "An old, patched sack of coarse cloth. Something scratches inside."
+    },
+    "plague-kerchief": {
+      "name": "Plague Kerchief",
+      "description": "A long, blood-red kerchief. Wherever it flutters, the grass withers."
+    },
+    "moon-bite": {
+      "name": "Moon Morsel",
+      "description": "A pale, cold crumb bitten off the moon. It shines even on the darkest night."
     }
   },
   "parts": {
