@@ -36,7 +36,7 @@ import {
   xpToNext,
 } from './progression.js';
 import { countEvents, createRng } from './rng.js';
-import { say } from './text.js';
+import { nameInText, say, word } from './text.js';
 import { classUnlockMessages, unlockMessages } from './unlocks.js';
 import { classNameOf, evolutionOf } from './evolutions.js';
 import { evolutionBlock, skillPoints } from './skills.js';
@@ -591,7 +591,7 @@ export function simulateHunt(
       } else if (outcome === 'resource') {
         const found = resourceBundle(area, rewards.findResourcePerLevel * findLevel * lootRng.float(0.5, 1.5));
         for (const [id, amount] of found) resources[id] = (resources[id] ?? 0) + amount;
-        const list = found.map(([id, amount]) => `${content.resourcesById[id].name.toLowerCase()} +${amount}`).join(', ');
+        const list = found.map(([id, amount]) => `${nameInText(content.resourcesById[id].name, content)} +${amount}`).join(', ');
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findResource', step, { resources: list }) });
       } else if (outcome === 'time') {
         const amount = content.balance.timePoints.find;
@@ -671,7 +671,7 @@ export function simulateHunt(
         : (meeting ? 3.5e9 : encounter.champion ? 3e9 : encounter.elite ? 2e9 : encounter.tough ? 1e9 : 0) + enemies.reduce((sum, e) => sum + e.maxHp, 0);
     if (!key || score > key.score) key = { score, index: summary.index };
 
-    const enemyList = enemies.map((enemy) => `${enemy.name} (poz. ${enemy.level})`).join(', ');
+    const enemyList = enemies.map((enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
     const start = encounter.champion ? 'championStart' : encounter.elite ? 'eliteStart' : encounter.tough ? 'toughStart' : 'fightStart';
     const lines = [meeting ? told(say(rules.texts, 'meet', step, { enemies: enemyList })) : say(texts, start, step, { enemies: enemyList })];
     for (const mate of fighting.filter((one) => one.hp <= 0)) {
@@ -729,7 +729,7 @@ export function simulateHunt(
       }
       for (const mate of fighting.filter((one) => !one.out)) mate.hp += Math.round((mate.unit.maxHp - mate.hp) * Math.min(1, mate.unit.recovery + pace.restBonus));
 
-      lines.push(say(texts, 'victory', step), `HP: ${hpBefore} → ${summary.hpAfter}. +${summary.xp} XP, +${summary.gold} złota.`);
+      lines.push(say(texts, 'victory', step), word(content, 'HP: {before} → {after}. +{xp} XP, +{gold} złota.', { before: hpBefore, after: summary.hpAfter, xp: summary.xp, gold: summary.gold }));
       if (Object.keys(summary.materials).length > 0) {
         lines.push(say(texts, 'materials', step, { materials: materialsText(summary.materials, content) }));
       }
@@ -768,7 +768,7 @@ export function simulateHunt(
   if (gatheredTotal >= 0.5) {
     const gathered = resourceBundle(area, gatheredTotal);
     for (const [id, amount] of gathered) resources[id] = (resources[id] ?? 0) + amount;
-    const list = gathered.map(([id, amount]) => `${content.resourcesById[id].name.toLowerCase()} +${amount}`).join(', ');
+    const list = gathered.map(([id, amount]) => `${nameInText(content.resourcesById[id].name, content)} +${amount}`).join(', ');
     entries.push({ t: endedAt, type: 'gather', text: say(texts, 'gathered', timeline.length, { resources: list }) });
   }
 

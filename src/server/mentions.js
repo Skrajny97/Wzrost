@@ -21,6 +21,7 @@
 import { gendered, isUnlocked, mentionPlaces, pickMentions } from '../engine/index.js';
 import { shownText } from './chat.js';
 import { content } from './content.js';
+import { accountLanguage, runInLanguage } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const tuning = () => content().chat.mentions;
@@ -167,11 +168,13 @@ const channelName = (channel) =>
 // there, the character has not read its channel that far (chat_seen) and
 // does not hide its writer, and in a guild's channel only while the
 // character is still in that guild. "Mira oznaczyła Cię na czacie: …", a
-// woman's verb for a female writer.
+// woman's verb for a female writer; in the language of the tagged player's
+// account, as the cron runs outside any request (push.js).
 export async function mentionNotices(db, from, to) {
   const rows = await db
     .prepare(
       `SELECT x.message_id, x.created_at, c.user_id, m.channel, m.character_id AS writer_id, m.text, w.name, w.appearance,
+              (SELECT u.language FROM users u WHERE u.id = c.user_id) AS language,
               CASE WHEN json_valid(c.chat_seen) THEN json_extract(c.chat_seen,
                 CASE WHEN m.channel = '${PRIVATE}' THEN '$.private."' || m.character_id || '"'
                      WHEN m.channel LIKE '${GUILD_PREFIX}%' THEN '$.guild'
@@ -189,19 +192,21 @@ export async function mentionNotices(db, from, to) {
     )
     .bind(from, to)
     .all();
-  const { texts, pushLength } = tuning();
   const due = new Map();
   for (const row of rows.results) {
     if ((Number(row.seen) || 0) >= row.message_id) continue;
-    const words = { channel: channelName(row.channel), name: row.name, text: beginning(shownText(row.text), pushLength) };
-    const notice = {
-      // One writer's newer tag takes the place of its older one on the phone.
-      tag: `mention-${row.writer_id}`,
-      url: '#/spolecznosc/czat',
-      at: row.created_at,
-      title: filled(texts.pushTitle, words),
-      body: filled(gendered(texts.pushBody, row.appearance), words),
-    };
+    const notice = runInLanguage(accountLanguage(row.language), () => {
+      const { texts, pushLength } = tuning();
+      const words = { channel: channelName(row.channel), name: row.name, text: beginning(shownText(row.text), pushLength) };
+      return {
+        // One writer's newer tag takes the place of its older one on the phone.
+        tag: `mention-${row.writer_id}`,
+        url: '#/spolecznosc/czat',
+        at: row.created_at,
+        title: filled(texts.pushTitle, words),
+        body: filled(gendered(texts.pushBody, row.appearance), words),
+      };
+    });
     due.set(row.user_id, [...(due.get(row.user_id) ?? []), notice]);
   }
   return due;

@@ -9,7 +9,7 @@
 
 import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, evolutionArt, landBestiaryChest, meetingChances, ordinaryMaterial, overlayTexts, regionDangers } from '../engine/index.js';
 import { buildingOn, craftingOn, evolutionsOn, settlementOn } from './features.js';
-import { language } from './i18n.js';
+import { language, pageDictionary } from './i18n.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
 import classes from '../../data/classes.json' with { type: 'json' };
@@ -118,7 +118,13 @@ export function dataIn(lang) {
 }
 
 // The content of one language, with the deployment's switches.
-function prepare(built) {
+function prepare(built, lang) {
+  // Its language, and the English of the texts the engine writes itself
+  // (word() in src/engine/text.js): the engine takes nothing from the
+  // server, so its words come with the content, none for Polish.
+  built.language = lang;
+  built.words = pageDictionary(lang);
+
   // The parts of the game this deployment has on, for the System's messages
   // about them (unlocks.json `feature`): read when asked, as the switches are
   // read for each request (features.js).
@@ -138,9 +144,9 @@ function prepare(built) {
   return built;
 }
 
-const contentByLanguage = { pl: prepare(buildContent(polishData)) };
+const contentByLanguage = { pl: prepare(buildContent(polishData), 'pl') };
 export function contentIn(lang) {
-  contentByLanguage[lang] ??= prepare(buildContent(dataIn(lang)));
+  contentByLanguage[lang] ??= prepare(buildContent(dataIn(lang)), lang);
   return contentByLanguage[lang];
 }
 

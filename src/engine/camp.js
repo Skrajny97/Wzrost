@@ -7,7 +7,7 @@
 // its store started filling. The server passes the time. The Zbieracz
 // Systemu, once bought, collects every store as it fills (wholeFills).
 
-import { countedForm } from './text.js';
+import { countedForm, decimalText, word } from './text.js';
 
 // The level a stored building has at `now`: an upgrade counts once it ends.
 export function buildingLevel(stored, now) {
@@ -180,17 +180,18 @@ export function effectText(building, level, content) {
   // The Stół rozbiórki also names the highest rarity it takes and, from
   // a level on, the chance of an extra part.
   const all = level >= effect.rarities.length;
-  const cap = all ? 'Wszystkie rzadkości' : `Najwyższa rzadkość: ${content.raritiesById[effect.rarities[level - 1]].forms.f}`;
-  const bonus = level >= effect.bonusFromLevel ? `, szansa na dodatkową część: ${Math.round((level - effect.bonusFromLevel + 1) * effect.bonusPerLevel * 100)}%` : '';
+  const cap = all ? word(content, 'Wszystkie rzadkości') : word(content, 'Najwyższa rzadkość: {rarity}', { rarity: content.raritiesById[effect.rarities[level - 1]].forms.f });
+  const bonus =
+    level >= effect.bonusFromLevel ? word(content, ', szansa na dodatkową część: {chance}%', { chance: Math.round((level - effect.bonusFromLevel + 1) * effect.bonusPerLevel * 100) }) : '';
   return `${cap}, ${text.charAt(0).toLowerCase()}${text.slice(1)}${bonus}${rate}`;
 }
 
 // A value as the page shows it: a share with up to one decimal ("0,5%"),
-// hours ("1,5 h"), fights ("8 walk") or a count.
+// hours ("1,5 h"), fights ("8 walk") or a count; the decimal as the
+// content's language writes it ("0.5%" in English).
 function shownValue(value, unit, content) {
-  const decimal = (number) => String(Math.round(number * 10) / 10).replace('.', ',');
-  if (unit === 'percent') return `${decimal(value * 100)}%`;
-  if (unit === 'hours') return `${decimal(value)}\u00a0h`;
+  if (unit === 'percent') return `${decimalText(value * 100, content)}%`;
+  if (unit === 'hours') return `${decimalText(value, content)}\u00a0h`;
   if (unit === 'fights') return `${value} ${countedForm(value, content.potionUse.fightForms)}`;
   return String(Math.round(value));
 }

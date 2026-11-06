@@ -36,7 +36,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `guild-beast.js`, `guild-trials.js`, `guild-seat.js`, `guild-expedition.js` | Gildia: Bestia Gildii, Próby Gildii (tablica prób tygodnia, wielkość próby na poziom postaci, pasek z progami i skrzynie), Siedziba Gildii (koszty poziomów budynków, poziom z sumy wpłat z nadwyżką na następny poziom, premie dla członków) oraz Wyprawa Gildii (kraina tygodnia, siedmiu strażników, minuty etapu, HP strażnika, postęp trasy z odłożonymi minutami i skrzynie strażników) |
 | `cosmetics.js` | Sklep Systemu: ramki, tła i wygląd wierzchowca za Punkty Systemu, co postać ma i nosi, oraz kolor imienia z ramki |
 | `gifts.js`, `gift-codes.js` | Upominek między znajomymi i kody podarunkowe |
-| `names.js`, `text.js`, `mail.js`, `notifications.js` | filtr imion postaci, warianty tekstów raportu, treść e-maila i powiadomienia na telefon |
+| `names.js`, `text.js`, `mail.js`, `notifications.js` | filtr imion postaci, warianty tekstów raportu i własne teksty silnika w języku treści (`word()`: angielski z `data/en/strings.json`, który serwer daje razem z treścią), treść e-maila i powiadomienia na telefon |
 | `mentions.js` | oznaczanie na czacie: miejsca, w których „@” może zaczynać imię postaci, i wybór najdłuższego imienia, które ma jakaś postać |
 
 Silnik działa tylko na serwerze (DECISIONS.md, Etap 1, punkt 28). Gra jest na planie Workers Paid (do 30 s CPU na żądanie), ale każde wywołanie ma być szybkie: liczy się każde żądanie gracza.

@@ -49,7 +49,8 @@ export const accountLanguage = (stored) => (englishOn() && LANGUAGES.includes(st
 // The English of the code's texts, or null for Polish.
 export const dictionary = (lang = language()) => DICTIONARIES[lang] ?? null;
 
-// The same for the page, without the file's notes ($comment).
+// The same without the file's notes ($comment): for the page, and for the
+// texts the engine writes itself (word(), which content.js gives it).
 const pageWords = new Map();
 export function pageDictionary(lang = language()) {
   const words = dictionary(lang);

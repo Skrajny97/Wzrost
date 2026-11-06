@@ -32,7 +32,7 @@ import { fightPotions } from './potions.js';
 import { countList, knownHerbs, professionOpen, professionState } from './professions.js';
 import { monsterXp } from './progression.js';
 import { createRng } from './rng.js';
-import { say } from './text.js';
+import { say, word } from './text.js';
 
 // The chance an exploration of `minutes` that ended as planned brings an
 // event: `chance` at fullChanceMinutes and a share of it below, so a very
@@ -96,9 +96,10 @@ export const optionCost = (option, level) => (option.goldPerLevel ? Math.round(o
 // out, question 223 B), or a price above the purse.
 export function optionLock(option, { classId, level, purse }, content) {
   if (option.classes && !option.classes.includes(classId)) {
-    return { code: 'class_only', text: `tylko ${option.classes.map((id) => content.classesById[id].name).join(' i ')}` };
+    const classes = option.classes.map((id) => content.classesById[id].name).join(word(content, ' i '));
+    return { code: 'class_only', text: word(content, 'tylko {classes}', { classes }) };
   }
-  if (optionCost(option, level) > purse) return { code: 'not_enough_gold', text: 'za mało złota' };
+  if (optionCost(option, level) > purse) return { code: 'not_enough_gold', text: word(content, 'za mało złota') };
   return null;
 }
 
@@ -470,7 +471,7 @@ export function resolveEvent(
     enemiesView: enemies.map((enemy) => combatantView(enemy, ally.level, content)),
     events: fight.events,
   };
-  const enemyList = enemies.map((enemy) => `${enemy.name} (poz. ${enemy.level})`).join(', ');
+  const enemyList = enemies.map((enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
   const lines = [outcome.start.replace('{enemies}', enemyList)];
   for (const mate of mates.filter((one) => hpOf(one.unit) <= 0)) lines.push(say(texts, 'companionDown', index, { name: mate.unit.name }));
   const items = [...hunt.items];
@@ -495,7 +496,7 @@ export function resolveEvent(
     summary.gold = Math.round(fightGold);
     summary.recovered = Math.round((player.maxHp - hpNow) * player.recovery);
     hpNow += summary.recovered;
-    lines.push(say(texts, 'victory', index), `HP: ${hpBefore} → ${summary.hpAfter}. +${summary.xp} XP, +${summary.gold} złota.`);
+    lines.push(say(texts, 'victory', index), word(content, 'HP: {before} → {after}. +{xp} XP, +{gold} złota.', { before: hpBefore, after: summary.hpAfter, xp: summary.xp, gold: summary.gold }));
     summary.chests.forEach((itemIndex, i) => lines.push(say(content.events.texts, 'loot', i, { item: itemName(items[itemIndex], content) })));
     if (won) {
       summary.chests.push(items.push(won) - 1);

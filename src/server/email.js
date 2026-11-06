@@ -12,9 +12,10 @@
 
 import { confirmationEmail } from '../engine/index.js';
 import { validateEmail } from './accounts.js';
-import { content } from './content.js';
+import { content, contentIn } from './content.js';
 import { sha256Hex, toBase64Url } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
+import { accountLanguage } from './i18n.js';
 import { requireSession } from './sessions.js';
 
 const SENDER = { email: 'no-reply@insightrpg.com', name: 'Insight' };
@@ -34,9 +35,11 @@ const SEND_ERRORS = {
 };
 const sendFailed = () => new ApiError(503, 'email_failed', 'Nie udało się wysłać maila. Spróbuj ponownie za chwilę.');
 
-// Sends a new link to `email`, the account's address. Throws an ApiError when
-// it cannot: too soon after the last one, too many today, or the mail failed.
-export async function sendLink(env, { userId, login, email }, origin, now) {
+// Sends a new link to `email`, the account's address, in the account's
+// `language` (users.language, i18n.js), whatever the page's. Throws an
+// ApiError when it cannot: too soon after the last one, too many today, or
+// the mail failed.
+export async function sendLink(env, { userId, login, email, language }, origin, now) {
   const db = env.DB;
   const recent = await db
     .prepare('SELECT COUNT(*) AS count, MAX(created_at) AS last FROM email_links WHERE user_id = ? AND created_at > ?')
@@ -60,7 +63,7 @@ export async function sendLink(env, { userId, login, email }, origin, now) {
       .prepare('INSERT INTO email_links (id, user_id, email, created_at, expires_at) VALUES (?, ?, ?, ?, ?)')
       .bind(id, userId, email, now, now + LINK_TTL_MS),
   ]);
-  const message = confirmationEmail({ login, link: `${origin}${CONFIRM_PATH}?token=${token}` }, content());
+  const message = confirmationEmail({ login, link: `${origin}${CONFIRM_PATH}?token=${token}` }, contentIn(accountLanguage(language)));
   try {
     if (!env.EMAIL) throw Object.assign(new Error('No EMAIL binding'), { code: 'E_NO_BINDING' });
     await env.EMAIL.send({ to: email, from: SENDER, ...message });
@@ -93,7 +96,7 @@ export async function requestLink(context) {
       throw error;
     }
   }
-  await sendLink(context.env, { userId, login: user.login, email }, new URL(context.request.url).origin, context.now);
+  await sendLink(context.env, { userId, login: user.login, email, language: user.language }, new URL(context.request.url).origin, context.now);
   return json({ sent: true, email });
 }
 

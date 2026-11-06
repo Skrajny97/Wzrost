@@ -115,6 +115,7 @@ import { relationTo } from './community.js';
 import { content } from './content.js';
 import { craftingOn, fortressOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
+import { t } from './i18n.js';
 import { assertion, characterChanged, raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
 import { mercenaryBusy, mercenaryPlace, mercenaryRules, serviceEnded } from './mercenaries.js';
@@ -1221,7 +1222,7 @@ function craftingView(row, levels, now) {
         kind: order.kind,
         materialId: material?.materialId ?? null,
         // A handful taken apart at once ("Rozbierz kilka") has no one name.
-        name: material ? material.name : (order.name ?? 'Przedmioty'),
+        name: material ? material.name : (order.name ?? t('Przedmioty')),
         count: order.count ?? 1,
         rarity,
         color: content().raritiesById[rarity].color,
@@ -1535,7 +1536,7 @@ export function characterView(player, now) {
     })),
     combat: {
       damage: `${values.damageMin}–${values.damageMax}`,
-      damageKind: weapon.category === 'physical' ? 'fizyczne' : `magiczne, ${content().elementsById[weapon.element].name}`,
+      damageKind: weapon.category === 'physical' ? t('fizyczne') : t('magiczne, {element}', { element: content().elementsById[weapon.element].name }),
       reduction: Math.round(values.reduction * 100),
       maxHp,
       maxMana: values.mana,

@@ -4,13 +4,17 @@
 // switch in the settings asks the phone for permission and hands the server
 // its push subscription; every minute the cron trigger (wrangler.jsonc)
 // takes the minute that passed and sends what came due in it to the phones
-// of those players. The service worker (src/client/sw.js) shows them.
+// of those players. The service worker (src/client/sw.js) shows them. The
+// cron runs outside any request, so each player's are written in the
+// language of its account (users.language, i18n.js); a test notification
+// in the language of the page that asks for it.
 
 import { notificationsDue } from '../engine/index.js';
 import { say } from '../engine/text.js';
-import { content } from './content.js';
+import { content, contentIn } from './content.js';
 import { fromBase64Url } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
+import { accountLanguage } from './i18n.js';
 import { mentionNotices } from './mentions.js';
 import { requireSession } from './sessions.js';
 import { createVapidKeys, sendPush, vapidAuthorization } from './webpush.js';
@@ -193,8 +197,9 @@ async function notificationsByUser(db, from, to) {
       .prepare(`SELECT character_id, kind, region_id, ends_at FROM ${table} WHERE ends_at > ? AND ends_at <= ? AND character_id IN (SELECT id FROM characters WHERE ${subscribed})`)
       .bind(from, to);
   const [characters, activities, avatarActivities, buildings] = await db.batch([
-    // With the Zbieracz Systemu (collector_at) no store stands full.
-    db.prepare(`SELECT id, user_id, level, build_queue, collector_at FROM characters WHERE ${subscribed}`),
+    // With the Zbieracz Systemu (collector_at) no store stands full. The
+    // account's language, for the words.
+    db.prepare(`SELECT id, user_id, level, build_queue, collector_at, (SELECT language FROM users WHERE users.id = characters.user_id) AS language FROM characters WHERE ${subscribed}`),
     ending('activities'),
     // The works of the Awatar Systemu (avatar.js).
     ending('avatar_activities'),
@@ -211,7 +216,7 @@ async function notificationsByUser(db, from, to) {
   const players = new Map(
     characters.results.map((row) => [
       row.id,
-      { userId: row.user_id, level: row.level, activity: null, avatarActivity: null, buildings: {}, queue: JSON.parse(row.build_queue ?? '[]'), collector: Boolean(row.collector_at) },
+      { userId: row.user_id, language: accountLanguage(row.language), level: row.level, activity: null, avatarActivity: null, buildings: {}, queue: JSON.parse(row.build_queue ?? '[]'), collector: Boolean(row.collector_at) },
     ]),
   );
   for (const [rows, key] of [
@@ -230,7 +235,7 @@ async function notificationsByUser(db, from, to) {
   }
   const due = new Map();
   for (const player of players.values()) {
-    const notifications = notificationsDue(player, from, to, content());
+    const notifications = notificationsDue(player, from, to, contentIn(player.language));
     if (notifications.length > 0) due.set(player.userId, notifications);
   }
   return due;

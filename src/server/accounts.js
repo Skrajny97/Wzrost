@@ -102,7 +102,7 @@ export async function register({ request, env, now }) {
   // The account is made even when the mail fails: the page offers to send it again.
   let emailSent = true;
   try {
-    await sendLink(env, { userId, login, email }, new URL(request.url).origin, now);
+    await sendLink(env, { userId, login, email, language: language() }, new URL(request.url).origin, now);
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
     emailSent = false;

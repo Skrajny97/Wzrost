@@ -9,7 +9,7 @@
 
 import { rarityNeedView } from './crafting.js';
 import { budget, weaponDamage } from './formulas.js';
-import { say } from './text.js';
+import { say, word } from './text.js';
 
 // `affixIds` picks the affixes instead of rolling them (tests, simulations).
 // `area` is the inner region the item was found in: its creatures name the
@@ -239,7 +239,7 @@ export function itemName(item, content) {
 }
 
 export function propertyName(stat, content) {
-  if (stat === 'armor') return 'Pancerz';
+  if (stat === 'armor') return word(content, 'Pancerz');
   if (stat.startsWith('resist.')) return content.elementsById[stat.slice('resist.'.length)].resistance;
   return content.statsById[stat].name;
 }
@@ -399,20 +399,22 @@ export function itemProperties(raw, content) {
   if (item.damage) {
     const base = content.basesById[item.base];
     const kind =
-      base.category === 'physical' ? 'fizyczne' : `magiczne, ${content.elementsById[item.element].name}`;
-    lines.push(`Obrażenia: ${item.damage.min}–${item.damage.max} (${kind})`);
+      base.category === 'physical' ? word(content, 'fizyczne') : word(content, 'magiczne, {element}', { element: content.elementsById[item.element].name });
+    lines.push(word(content, 'Obrażenia: {min}–{max} ({kind})', { min: item.damage.min, max: item.damage.max, kind }));
   }
   // An item's own armor comes first; the armor an upgrade gives an item
   // without any, like a talisman, after its stats.
-  const armor = item.armor ? `Pancerz: +${item.armor}` : null;
+  const armor = item.armor ? word(content, 'Pancerz: +{armor}', { armor: item.armor }) : null;
   if (armor && raw.armor) lines.push(armor);
   for (const { stat, value } of [...(item.implicit ? [item.implicit] : []), ...item.affixes]) {
     lines.push(`${propertyName(stat, content)}: +${value}`);
   }
   if (armor && !raw.armor) lines.push(armor);
   // The Zaklinaczka's zaklęcie żywiołu (settlement.js).
-  if (item.imbue?.share) lines.push(`Zaklęcie żywiołu: ${Math.round(item.imbue.share * 100)}% obrażeń jako ${content.elementsById[item.imbue.element].name}`);
-  if (item.imbue?.stat) lines.push(`Zaklęcie żywiołu: ${propertyName(item.imbue.stat, content)} +${item.imbue.value}`);
+  if (item.imbue?.share) {
+    lines.push(word(content, 'Zaklęcie żywiołu: {percent}% obrażeń jako {element}', { percent: Math.round(item.imbue.share * 100), element: content.elementsById[item.imbue.element].name }));
+  }
+  if (item.imbue?.stat) lines.push(word(content, 'Zaklęcie żywiołu: {stat} +{value}', { stat: propertyName(item.imbue.stat, content), value: item.imbue.value }));
   return lines;
 }
 
@@ -423,7 +425,7 @@ export function itemLines(raw, content) {
   const item = upgradedItem(raw, content);
   const lines = [];
   if (item.damage) {
-    lines.push({ id: 'damage', label: 'Obrażenia', value: (item.damage.min + item.damage.max) / 2, text: `${item.damage.min}–${item.damage.max}` });
+    lines.push({ id: 'damage', label: word(content, 'Obrażenia'), value: (item.damage.min + item.damage.max) / 2, text: `${item.damage.min}–${item.damage.max}` });
   }
   const stats = new Map(item.armor ? [['armor', item.armor]] : []);
   for (const { stat, value } of [...(item.implicit ? [item.implicit] : []), ...item.affixes, ...(item.imbue?.stat ? [item.imbue] : [])]) {
