@@ -13,6 +13,38 @@
     "hint": "The narrator does not explain new tabs and places, and a new character starts without the introduction. Applies to every character on the account."
   },
   "chapters": {
+    "towers": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Towers wait in the Combat tab."
+    },
+    "guild": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Guild waits in the Community, in the Guild tab."
+    },
+    "fortress": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Stronghold waits in the Camp tab."
+    },
+    "cornerstone": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Cornerstone waits in the Camp tab."
+    },
+    "hard-hunt": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Hard exploration waits in Combat, in the exploration options."
+    },
+    "account-chest": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Account Chest waits in the Camp tab."
+    },
+    "system-collector": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The System Collector waits in the Camp tab."
+    },
+    "faint": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. Reports wait in the Journal, at the top of the settings under the cog."
+    },
     "skills": {
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. Skills wait in the Character tab."
@@ -321,6 +353,106 @@
           "That is all for a start. The rest of the System's workings, your goal and your liking – you will have to discover on your own. Good luck."
         ]
       }
+    },
+    "towers-welcome": {
+      "text": [
+        "Your character's fiftieth level… The System has opened the Towers to you."
+      ]
+    },
+    "towers-lead": {
+      "text": [
+        "The Towers wait in the Combat tab. Let us look in there."
+      ]
+    },
+    "towers-entries": {
+      "text": [
+        "Each entry is a single fight, with the result at once. You fight with full HP, but without potions."
+      ]
+    },
+    "towers-solo": {
+      "text": [
+        "Each floor holds the creatures of one region, one after another through all the lands. You can climb no higher than the floor of your own level."
+      ]
+    },
+    "towers-floor": {
+      "text": [
+        "Elites and champions wait along the way, and every tenth floor gives a Tower chest for the first victory."
+      ]
+    },
+    "towers-party": {
+      "text": [
+        "You enter the Party Tower with one or two other wanderers. A companion from the Quarters will take a free place."
+      ]
+    },
+    "towers-ending": {
+      "text": [
+        "You have a dozen or so entries a day, with new ones from midnight. The Towers will also help you fill in old Bestiary entries."
+      ]
+    },
+    "guild-tabs": {
+      "text": [
+        "Each tab is another of the guild's shared undertakings. A dot by a tab will tell you that something is waiting for you there."
+      ]
+    },
+    "guild-seat": {
+      "text": [
+        "Here the guild raises four buildings, and each of their levels gives a bonus to all the members. You donate gold and resources to the one you choose. Donations do not come back."
+      ]
+    },
+    "guild-beast": {
+      "text": [
+        "The beast of the week belongs to the whole guild. You attack it three times a day, even during an exploration. The harder the guild wounds it, the more you will find in the chest."
+      ]
+    },
+    "guild-trials": {
+      "text": [
+        "The trials count by themselves, from the moment they appear on the board. New ones come every day, and each one completed brings the whole guild closer to the next chest."
+      ]
+    },
+    "guild-requests": {
+      "text": [
+        "When you run short of a material, herb or potion, ask the guild here. You, too, can give others what they ask for."
+      ]
+    },
+    "guild-exchange": {
+      "text": [
+        "Here you can exchange resources with other guild members – for gold, too."
+      ]
+    },
+    "guild-expedition": {
+      "text": [
+        "Every minute of your explorations leads the guild onward. A guardian waits at the end of each stage. You attack it three times a day, and when it falls, everyone who added minutes gets a chest."
+      ]
+    },
+    "fortress-welcome": {
+      "text": [
+        "Your camp has become a Stronghold. Each of its seven buildings gives something: training, a blessing, herbs or better tracking. Look in here every day."
+      ]
+    },
+    "fortress-stone": {
+      "text": [
+        "One day a Stronghold will stand on this spot. The stone will show you how much is still missing, and the Builder Spirit will buy your surplus wood, stone and ore."
+      ]
+    },
+    "hard-hunt": {
+      "text": [
+        "From the tenth level you can tick the Hard exploration. The creatures are stronger then, but they give more experience and gold."
+      ]
+    },
+    "account-chest": {
+      "text": [
+        "This chest is shared by all the characters on your account. An item put in by one character can be taken out by another."
+      ]
+    },
+    "system-collector": {
+      "text": [
+        "The System Collector keeps watch close by. For gold, once and for all, it will collect the resources from full stores on its own."
+      ]
+    },
+    "faint-first": {
+      "text": [
+        "After fainting, nothing from the exploration is kept, and the System takes away part of your experience as well. Before you set out again, check the threat and rest."
+      ]
     },
     "skills-welcome": {
       "classes": {

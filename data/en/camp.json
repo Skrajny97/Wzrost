@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/camp.json (src/engine/overlay.js): the camp's own level, the Cornerstone with the Builder Spirit, and the System Collector. The Stronghold (fortress) comes in a later stage.",
+  "$comment": "English texts of data/camp.json (src/engine/overlay.js): the camp's own level, the Cornerstone with the Builder Spirit, the System Collector and the change into the Stronghold (fortress).",
   "name": "Camp",
   "description": "A clearing at the edge of the wilds that will in time become a stronghold. Each camp level speeds up the construction of every building.",
   "effect": {
@@ -7,6 +7,13 @@
     "startText": "Building at the normal pace"
   },
   "evolution": "Once the Camp and all its buildings reach their highest level, the Camp will be able to become a Stronghold.",
+  "fortress": {
+    "name": "Stronghold",
+    "description": "Stone walls where the palisade once stood. The Stronghold's buildings strengthen the character.",
+    "start": "Begin the change into a Stronghold",
+    "building": "The change into a Stronghold is under way. When it ends, stone walls will stand where the palisade was.",
+    "done": "The camp has become a Stronghold. All seven Stronghold buildings can be built right away."
+  },
   "cornerstone": {
     "name": "Stronghold Cornerstone",
     "label": "Cornerstone",
