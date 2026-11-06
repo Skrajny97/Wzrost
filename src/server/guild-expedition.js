@@ -44,6 +44,7 @@ import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { guildOf } from './guilds.js';
 import { ApiError, json, readJson } from './http.js';
+import { numberText } from './i18n.js';
 
 const rules = () => content().guilds.expedition;
 const words = () => rules().texts;
@@ -449,7 +450,7 @@ export async function claimGuildExpeditionChest(context) {
         ]
       : []),
   ]);
-  const contents = [filled(words().gold, { gold: new Intl.NumberFormat('pl-PL').format(gold) }), item && itemName(item, content()), found.length > 0 && materialsText(materials, content())].filter(Boolean).join(', ');
+  const contents = [filled(words().gold, { gold: numberText(gold) }), item && itemName(item, content()), found.length > 0 && materialsText(materials, content())].filter(Boolean).join(', ');
   const after = await loadPlayer(db, session.userId);
   // The item came last, so its id is the highest of the character's: the
   // page finds it in the bag by it, for its card.

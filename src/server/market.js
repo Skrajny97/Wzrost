@@ -105,11 +105,14 @@ const offerOf = (row) => ({
   endsAt: row.ends_at,
 });
 
+// An offer for the page. The test version's own trader (no seller) is
+// named in the page's language, as its offers keep the name they were put
+// up with.
 function offerView(row, characterId) {
   const offer = offerOf(row);
   return {
     id: row.id,
-    seller: row.seller_name,
+    seller: row.seller_id === null ? tuning().testSeller : row.seller_name,
     goods: goodsView(row.kind, row.good, row.count, row.item),
     startPrice: row.start_price,
     buyNow: row.buy_now,

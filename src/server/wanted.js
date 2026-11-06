@@ -47,6 +47,19 @@ export function wantedToKeep(row, stored, now) {
   return recordOf(row, stored, day);
 }
 
+// A poster's name in the request's language: its creature's variant's or
+// its outlaw's, as the data has it (wantedPosters in the engine), so one
+// kept in the Osada (`taken`), named in the language it was taken in,
+// reads in the page's own.
+function posterName(poster) {
+  const rules = wantedOf(content());
+  const named =
+    poster.kind === 'outlaw'
+      ? content().monstersById[poster.monsterId]
+      : rules.variants.find((variant) => variant.area === poster.areaId && variant.monster === poster.monsterId);
+  return named?.name ?? poster.name;
+}
+
 // A poster for the page, with its place's name and levels.
 function posterView(poster, state) {
   const area = content().areasById[poster.areaId];
@@ -57,7 +70,7 @@ function posterView(poster, state) {
     areaName: area.name,
     levels: `${area.minLevel}–${area.maxLevel}`,
     monsterId: poster.monsterId,
-    name: poster.name,
+    name: posterName(poster),
     female: poster.female,
     gold: poster.gold,
     state,
@@ -92,7 +105,7 @@ export function wantedGoing(row, stored, area) {
   const taken = stored.wanted?.taken;
   if (!wantedOf(content()) || !taken || taken.beaten || taken.areaId !== area.id) return null;
   const trophy = taken.kind === 'creature' ? wantedTrophy(taken.monsterId, JSON.parse(row.discovered ?? '{}'), content()) : null;
-  return { id: taken.id, kind: taken.kind, areaId: taken.areaId, monsterId: taken.monsterId, name: taken.name, female: taken.female, level: taken.level, ...(trophy && { trophy }) };
+  return { id: taken.id, kind: taken.kind, areaId: taken.areaId, monsterId: taken.monsterId, name: posterName(taken), female: taken.female, level: taken.level, ...(trophy && { trophy }) };
 }
 
 // The Osada's record after an exploration whose wanted target fell: the

@@ -112,7 +112,7 @@ import { mountView } from '../engine/stable.js';
 import { say } from '../engine/text.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
-import { content } from './content.js';
+import { content, contentIn } from './content.js';
 import { craftingOn, fortressOn, professionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
@@ -647,9 +647,14 @@ export function settlementGoods(row, items, now) {
 export const knowingCharacter = (row) => ({ ...engineCharacter(row), met: JSON.parse(row.met ?? '[]'), patterns: JSON.parse(row.patterns ?? '[]'), settlement: settlementPointsOf(row) });
 
 // The Osada's board at `now` for the character as it is: the stored one
-// (settlement.js) with the orders whose time has come.
+// (settlement.js) with the orders whose time has come. Settled in Polish
+// whatever the request's language: an order keeps the sentence of the one
+// who posts it as it was drawn, and one not among the data's sentences is
+// rewritten (freshStory in the engine), so a board settled in English would
+// rewrite every sentence at each change of the language. The page gets it
+// in its own language (orderView in settlement.js).
 export function settlementBoard(row, stored, now) {
-  return settleBoard(stored.board, { character: knowingCharacter(row), reputation: stored.reputation, seed: `${row.id}:settlement` }, now, content());
+  return settleBoard(stored.board, { character: knowingCharacter(row), reputation: stored.reputation, seed: `${row.id}:settlement` }, now, contentIn('pl'));
 }
 
 // Whether an order on the board, the week's included, can be delivered

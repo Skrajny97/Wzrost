@@ -134,6 +134,12 @@ function pattern(polish, english) {
   return { regex: new RegExp(`^${source}$`), names, english, fixed, letters };
 }
 
+// A number the server writes into a text, as the request's language
+// writes it: "12 345" in Polish (pl-PL, as these texts always had it),
+// "12,345" in English.
+const numberFormats = { pl: new Intl.NumberFormat('pl-PL'), en: new Intl.NumberFormat('en-GB') };
+export const numberText = (value) => (numberFormats[language()] ?? numberFormats.pl).format(value);
+
 // "12 345" and "1,5" as Polish writes them become "12,345" and "1.5".
 const POLISH_NUMBER = /^-?(?:\d{1,3}(?:[   ]\d{3})+(?:,\d+)?|\d+,\d+)$/;
 const englishFormat = new Intl.NumberFormat('en-GB', { maximumFractionDigits: 6 });

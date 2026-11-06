@@ -52,6 +52,7 @@ import {
   materialsTaken,
   mugCost,
   orderGold,
+  orderStories,
   parseStack,
   pathResetCost,
   piecesOfRarity,
@@ -90,7 +91,7 @@ import {
   withSeatDiscount,
 } from '../engine/index.js';
 import { trialHallView } from './trial-hall.js';
-import { content } from './content.js';
+import { content, contentIn } from './content.js';
 import {
   bagItems,
   bagPlaces,
@@ -111,6 +112,7 @@ import {
 import { toHex } from './encoding.js';
 import { evolutionsOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
+import { t } from './i18n.js';
 import { wantedToKeep, wantedView } from './wanted.js';
 import { forgeView } from './forge.js';
 import { trialProgress } from './guild-trials.js';
@@ -227,7 +229,7 @@ function goodLabel({ kind, key }) {
     return label[0].toUpperCase() + label.slice(1);
   }
   if (kind === 'resource') return content().resourcesById[key].name;
-  if (kind === 'craft') return `${content().basesById[key].name} z Warsztatu`;
+  if (kind === 'craft') return t('{name} z Warsztatu', { name: content().basesById[key].name });
   return content().partsById[key].name;
 }
 
@@ -255,9 +257,18 @@ function orderView(order, stocks, sellBonus) {
     label: goodLabel(order),
     ...(any && { forms: content().settlement.orders.anyMaterial[parseStack(order.key).rarityId] }),
     ...(takes && { takes }),
+    story: storyOf(order),
     brotherhoodName: content().settlement.brotherhoods.find((one) => one.id === order.brotherhood).name,
     have,
   };
+}
+
+// The sentence of the one who posts an order, kept in the Osada as it was
+// drawn, in Polish (settlementBoard in characters.js), in the request's
+// language: the one at its place among the sentences its goods may carry.
+function storyOf(order) {
+  const shown = orderStories(order.kind, order.key, content());
+  return shown[orderStories(order.kind, order.key, contentIn('pl')).indexOf(order.story)] ?? order.story;
 }
 
 // The Osada for the page: the board's places, the residents with the
@@ -1038,7 +1049,13 @@ export async function dismissCompanion(context) {
   if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
   const given = companion.gear.filter((item) => item.given);
   if (bagPlaces(player) + given.length > bagCapacity(campLevels(player.buildings, context.now, content()), content())) {
-    throw new ApiError(409, 'bag_full', `${companion.name} odda ${given.length === 1 ? 'przedmiot' : 'przedmioty'} z twojego plecaka, a brakuje w nim miejsca.`);
+    throw new ApiError(
+      409,
+      'bag_full',
+      given.length === 1
+        ? `${companion.name} odda przedmiot z twojego plecaka, a brakuje w nim miejsca.`
+        : `${companion.name} odda przedmioty z twojego plecaka, a brakuje w nim miejsca.`,
+    );
   }
   const next = { ...stored, companions: hired.filter((one) => one !== companion), dismissed: [...(stored.dismissed ?? []), body.companionId] };
   const saved = JSON.stringify(next);

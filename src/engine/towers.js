@@ -27,7 +27,7 @@ import { championItemRarity, encounterCombatants, encountersFor, explorationPace
 import { itemName, randomItem } from './items.js';
 import { lowLevelMultiplier, monsterXp } from './progression.js';
 import { createRng } from './rng.js';
-import { say } from './text.js';
+import { say, word } from './text.js';
 
 // The highest floor open to characters of these levels.
 export const towerTop = (levels) => Math.max(1, Math.min(...levels));
@@ -129,12 +129,12 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
     }
   }
 
-  const enemyList = enemies.map((enemy) => `${enemy.name} (poz. ${enemy.level})`).join(', ');
+  const enemyList = enemies.map((enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
   const start = plan.encounter.champion ? 'championStart' : plan.encounter.elite ? 'eliteStart' : 'fightStart';
   // The towers' own words for the start, not the forest's and the road's.
   const lines = [say(texts, start, floor, { enemies: enemyList })];
   if (won) {
-    lines.push(say(content.texts, 'victory', floor), `+${xp} XP, +${gold} złota.`);
+    lines.push(say(content.texts, 'victory', floor), word(content, '+{xp} XP, +{gold} złota.', { xp, gold }));
     if (Object.keys(materials).length > 0) lines.push(say(content.texts, 'materials', floor, { materials: materialsText(materials, content) }));
     for (const item of items) lines.push(say(texts, 'chest', floor, { item: itemName(item, content) }));
   } else {
