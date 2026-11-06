@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/buildings.json, by the building's id (src/engine/overlay.js): the camp's buildings. The Quarters (settlement) and the Stronghold's buildings (fortress) come in a later stage. An effect's {value} and {hours} come from the code (src/engine/camp.js, effectText): a share as \"10%\", hours as \"2 h\", a count as a number; the Salvage Table's effect follows its highest rarity with a small first letter.",
+  "$comment": "English texts of data/buildings.json, by the building's id (src/engine/overlay.js): the camp's buildings. The Quarters (settlement) and the seven buildings of the Stronghold (fortress) follow the camp's: Plac treningowy Training Yard, Zbrojownia Armoury, Sala trofeów Trophy Hall, Strażnica Watchtower, Ołtarz Systemu System Altar, Szklarnia Greenhouse, Kapliczka Shrine. An effect's {value} and {hours} come from the code (src/engine/camp.js, effectText): a share as \"10%\", hours as \"2 h\", a count as a number; the Salvage Table's effect follows its highest rarity with a small first letter.",
   "sawmill": {
     "name": "Sawmill",
     "description": "A saw and a sawhorse under a lean-to. Slowly turns fallen trunks into wood.",
@@ -93,5 +93,54 @@
         "rewarded": "The reward for the quest “{quest}” has already been collected, and without this work it would not be done. Remove fewer orders or wait until the table finishes them."
       }
     }
+  },
+  "quarters": {
+    "name": "Quarters",
+    "description": "A tent with bedrolls for the people recruited in the Tavern in the Settlement. Each level of the Quarters is a place for one companion.",
+    "effect": { "text": "Companion places: {value}" }
+  },
+  "training-yard": {
+    "name": "Training Yard",
+    "description": "Packed earth, straw dummies and a rack of blunt weapons. The System generates a clone of you that trains in your place. Once a day it gives Class XP for training that runs on its own, even during an exploration.",
+    "effect": { "text": "Training once a day for {value}, for Class XP as from 25% of an exploration of the same length" }
+  },
+  "armory": {
+    "name": "Armoury",
+    "description": "Racks for armour and weapons, each with a label. Saved gear sets are put on with a single click.",
+    "gearSets": { "name": "Set {n}" },
+    "effect": { "text": "Saved gear sets: {value}" }
+  },
+  "trophy-hall": {
+    "name": "Trophy Hall",
+    "description": "Heads, hides and fangs on the walls of a long hall. Creature families known in the Bestiary give a damage bonus against them.",
+    "effect": { "text": "Damage +{value} against creature families fully known in the Bestiary" }
+  },
+  "watchtower": {
+    "name": "Watchtower",
+    "description": "A tower over the gate with a view of the whole trail. Before an exploration it shows the chances of an elite, a champion and an event, and higher levels let you track a particular creature.",
+    "effect": {
+      "startText": "Chances of an elite, a champion and an event before an exploration",
+      "text": "a tracked creature met {value} more often"
+    }
+  },
+  "system-altar": {
+    "name": "System Altar",
+    "description": "A black stone with the System's sign. Once a day it offers a choice of one of three blessings for explorations.",
+    "effect": { "text": "A blessing once a day for {value}: +10% XP, gold or chance of rarer items" },
+    "blessings": {
+      "xp": { "name": "+10% XP" },
+      "gold": { "name": "+10% gold" },
+      "luck": { "name": "+10% chance of rarer items" }
+    }
+  },
+  "greenhouse": {
+    "name": "Greenhouse",
+    "description": "A glass roof on wooden ribs, with garden beds beneath it. The Greenhouse grows and gathers by itself the herbs the character knows from Herbalism.",
+    "effect": { "text": "Grows the chosen herb: as much per day as {value} of gathering in the System Grove" }
+  },
+  "shrine": {
+    "name": "Shrine",
+    "description": "A wayside shrine by the gate, with a candle that never goes out. After fainting on an exploration, the character loses less experience.",
+    "effect": { "text": "After fainting, the character loses {value} less experience" }
   }
 }

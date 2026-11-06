@@ -62,6 +62,7 @@ import enElements from '../../data/en/elements.json' with { type: 'json' };
 import enEncyclopedia from '../../data/en/encyclopedia.json' with { type: 'json' };
 import enEvents from '../../data/en/events.json' with { type: 'json' };
 import enGiftCodes from '../../data/en/gift-codes.json' with { type: 'json' };
+import enGuilds from '../../data/en/guilds.json' with { type: 'json' };
 import enItemBases from '../../data/en/item-bases.json' with { type: 'json' };
 import enMaterials from '../../data/en/materials.json' with { type: 'json' };
 import enMonsters from '../../data/en/monsters.json' with { type: 'json' };
@@ -75,6 +76,7 @@ import enSkins from '../../data/en/skins.json' with { type: 'json' };
 import enSlots from '../../data/en/slots.json' with { type: 'json' };
 import enStats from '../../data/en/stats.json' with { type: 'json' };
 import enTexts from '../../data/en/texts.json' with { type: 'json' };
+import enTowers from '../../data/en/towers.json' with { type: 'json' };
 import enTutorial from '../../data/en/tutorial.json' with { type: 'json' };
 import enUnlocks from '../../data/en/unlocks.json' with { type: 'json' };
 
@@ -134,6 +136,7 @@ export const OVERLAYS = {
     encyclopedia: enEncyclopedia,
     events: enEvents,
     'gift-codes': enGiftCodes,
+    guilds: enGuilds,
     'item-bases': enItemBases,
     materials: enMaterials,
     monsters: enMonsters,
@@ -147,6 +150,7 @@ export const OVERLAYS = {
     slots: enSlots,
     stats: enStats,
     texts: enTexts,
+    towers: enTowers,
     tutorial: enTutorial,
     unlocks: enUnlocks,
   },

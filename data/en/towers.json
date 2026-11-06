@@ -1,0 +1,35 @@
+{
+  "$comment": "English texts of data/towers.json (src/engine/overlay.js): the two System Towers and the sentences of a Tower fight's report. Each key keeps the Polish number of variants, as the engine picks one by index. „Piętro” is a floor; the stone floor underfoot („posadzka”) is the flagstones, so the two do not mix.",
+  "towers": {
+    "solo": { "name": "Solo Tower" },
+    "party": { "name": "Party Tower" }
+  },
+  "texts": {
+    "won": [
+      "Floor {floor} conquered."
+    ],
+    "lost": [
+      "Floor {floor} was not conquered."
+    ],
+    "defeat": [
+      "The System leads {target} out of the Tower.",
+      "Fight lost. The System leads {target} out of the Tower."
+    ],
+    "fightStart": [
+      "Foes: {enemies}.",
+      "Waiting on the floor: {enemies}.",
+      "The floor's door opens. Inside: {enemies}."
+    ],
+    "eliteStart": [
+      "The air thickens. Tower elite: {enemies}.",
+      "The floor falls silent. Tower elite: {enemies}."
+    ],
+    "championStart": [
+      "The flagstones tremble under heavy steps. Tower champion: {enemies}.",
+      "The whole Tower goes quiet and waits. The champion steps out: {enemies}."
+    ],
+    "chest": [
+      "A Tower chest waits on this floor. Inside: {item}."
+    ]
+  }
+}
