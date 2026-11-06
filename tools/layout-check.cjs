@@ -21,8 +21,9 @@
 // the page take it where the game offers English (src/client/i18n.js); the
 // names of tabs and sheets it looks for are then their English
 // (data/en/strings.json) where they have it. In English it also lists, for a
-// look, the Polish words left on the screens around the game and in the
-// Ustawienia (the names of the characters and the guild aside).
+// look, the Polish words left on the screens around the game, in the
+// Ustawienia and on the screens already translated (TRANSLATED; the names of
+// the characters and the guild aside).
 const { execFileSync } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -81,6 +82,10 @@ const SCREENS = [
   '#/encyklopedia',
   '#/dziennik',
 ];
+// The screens already in English (data/en/scope.json, stage 2 of the
+// English beta): in English the check lists the Polish words left on them,
+// as on the screens before the game.
+const TRANSLATED = new Set(['#/postac', '#/postac/statystyki', '#/walka', '#/walka/windfalls', '#/oboz', '#/oboz/craft-table', '#/dziennik']);
 // Tabs opened on a screen after its first look, by the start of their
 // names: the Stół rozbiórki's queue, with "Usuń z kolejki" by each order,
 // the Tablica zleceń's Poszukiwani and the Ranking's guilds.
@@ -327,7 +332,7 @@ async function main() {
     for (const screen of SCREENS) {
       await view.goto(`${BASE}/${screen}`);
       await view.waitForTimeout(1500);
-      await check(screen);
+      await check(screen, null, TRANSLATED.has(screen));
       for (const tab of TABS[screen] ?? []) {
         // A tab the screen does not show (as Poszukiwani with no posters)
         // is named and skipped.
@@ -338,7 +343,7 @@ async function main() {
         }
         await button.click();
         await view.waitForTimeout(500);
-        await check(`${screen} › ${tab}`);
+        await check(`${screen} › ${tab}`, null, TRANSLATED.has(screen));
       }
       // A sheet that does not open or close is a problem; the steps after it
       // are left, and the page loaded anew.

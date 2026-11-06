@@ -167,7 +167,7 @@
               "lossText": "Some of the gold is missing from it (−{gold} gold)."
             },
             "song": {
-              "text": "The beggar plays for a long time, horribly out of tune. When he finally stops, your pack feels lighter: his accomplice must have looked inside in the meantime.",
+              "text": "The beggar plays for a long time, horribly out of tune. When he finally stops, your bag feels lighter: his accomplice must have looked inside in the meantime.",
               "lossText": "Some of the resources you gathered are gone ({resources})."
             },
             "chase": {
@@ -532,7 +532,7 @@
             },
             "watch/greet": {
               "text": "The guests seize your hands and pull you into a round dance that never ends. When the cock crows, you are left in the empty clearing, breathless and drained.",
-              "lossText": "The guests also took something from your pack ({resources})."
+              "lossText": "The guests also took something from your bag ({resources})."
             },
             "watch/cross": {
               "text": "You cross yourself, and the music stops as if cut with a knife. One by one the guests bow low to you and drift away like smoke. The host vanishes last, with a grateful nod (+{xp} XP)."
