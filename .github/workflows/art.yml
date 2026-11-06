@@ -4,7 +4,7 @@
 # (kinds evolutions-, walk-starts-, monsters-, materials-, residents-, areas-,
 # lands-, settlement-, pets-, pets-portrait-, gems-, scrolls-, places-, professions-, salon-,
 # salon-small-, scenes-, scenes-hd-, fortress-, fortress-board- (the Warownia's
-# board, drawn into the camp's by inpainting) and items-pixellab,
+# board, drawn into the camp's by inpainting), items- and potions-pixellab,
 # "variants" are calls, of one to 64 versions each by size,
 # tools/generate-portraits-pixellab.mjs), or the
 # walks animated by PixelLab (kind walks-pixellab, tools/animate-walks.mjs),
@@ -51,6 +51,7 @@ on:
           - fortress-pixellab
           - fortress-board-pixellab
           - items-pixellab
+          - potions-pixellab
           - pets-animate
           - scenes-animate
           - materials
@@ -144,7 +145,7 @@ jobs:
             node tools/animate-mounts-skeleton.mjs "${args[@]}"
             exit
           fi
-          if [ "$KIND" = "evolutions-pixellab" ] || [ "$KIND" = "walk-starts-pixellab" ] || [ "$KIND" = "monsters-pixellab" ] || [ "$KIND" = "materials-pixellab" ] || [ "$KIND" = "residents-pixellab" ] || [ "$KIND" = "areas-pixellab" ] || [ "$KIND" = "lands-pixellab" ] || [ "$KIND" = "settlement-pixellab" ] || [ "$KIND" = "pets-pixellab" ] || [ "$KIND" = "pets-portrait-pixellab" ] || [ "$KIND" = "gems-pixellab" ] || [ "$KIND" = "scrolls-pixellab" ] || [ "$KIND" = "places-pixellab" ] || [ "$KIND" = "professions-pixellab" ] || [ "$KIND" = "salon-pixellab" ] || [ "$KIND" = "salon-small-pixellab" ] || [ "$KIND" = "scenes-pixellab" ] || [ "$KIND" = "scenes-hd-pixellab" ] || [ "$KIND" = "fortress-pixellab" ] || [ "$KIND" = "fortress-board-pixellab" ] || [ "$KIND" = "items-pixellab" ]; then
+          if [ "$KIND" = "evolutions-pixellab" ] || [ "$KIND" = "walk-starts-pixellab" ] || [ "$KIND" = "monsters-pixellab" ] || [ "$KIND" = "materials-pixellab" ] || [ "$KIND" = "residents-pixellab" ] || [ "$KIND" = "areas-pixellab" ] || [ "$KIND" = "lands-pixellab" ] || [ "$KIND" = "settlement-pixellab" ] || [ "$KIND" = "pets-pixellab" ] || [ "$KIND" = "pets-portrait-pixellab" ] || [ "$KIND" = "gems-pixellab" ] || [ "$KIND" = "scrolls-pixellab" ] || [ "$KIND" = "places-pixellab" ] || [ "$KIND" = "professions-pixellab" ] || [ "$KIND" = "salon-pixellab" ] || [ "$KIND" = "salon-small-pixellab" ] || [ "$KIND" = "scenes-pixellab" ] || [ "$KIND" = "scenes-hd-pixellab" ] || [ "$KIND" = "fortress-pixellab" ] || [ "$KIND" = "fortress-board-pixellab" ] || [ "$KIND" = "items-pixellab" ] || [ "$KIND" = "potions-pixellab" ]; then
             args=(--kind "${KIND%-pixellab}" --ids "$IDS" --calls "$VARIANTS" --max-cost "$MAX_COST")
             if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
             node tools/generate-portraits-pixellab.mjs "${args[@]}"
