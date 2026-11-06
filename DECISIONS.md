@@ -3034,6 +3034,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## WAŻNE: każda nowa treść od razu po angielsku (6.11.2026)
+
+Autor: „i w Decisions na później i jako ważna rzecz wpisz, że automatycznie sam będziesz teraz każdy nowy kontent tłumaczył i wdrażał jednocześnie po angielsku” i „w naprawdę skrajnych sytuacjach Ci w tym pomogę wybierając, ale oby jak najrzadziej”.
+
+1. **Zawsze w dwóch językach.** Każda nowa treść gry (napisy na ekranach, komunikaty serwera, zdarzenia, przedmioty, potwory, NPC, kwestie narratora) powstaje od razu po polsku i po angielsku i wchodzi do gry w tym samym etapie: polski w `data/` i w kodzie, angielski w `data/en/` (teksty danych z hashem polskiego w `data/en/sources.json`, napisy kodu w `data/en/strings.json`). Nie ma osobnych etapów tłumaczenia.
+2. **Bez pytania autora.** Angielski idzie do gry bez zatwierdzania (reguła w CLAUDE.md, „Odpowiedź autora 715”). Autor pomaga tylko w naprawdę skrajnych sytuacjach, np. gra słów albo nazwa bez dobrego odpowiednika, i wtedy dostaje pytanie z wariantami do wyboru.
+3. **Nagrania.** Nowa kwestia narratora dostaje od razu nagranie polskie i angielskie, tym samym głosem; oba przechodzą przez stronę odsłuchu z „Akceptuj” i „Odrzuć”.
+4. **Pilnuje tego `npm test`:** sprawdzenie tłumaczeń (`tools/i18n-check.mjs`, `test/i18n.test.js`) nie przepuszcza polskiego tekstu bez angielskiego ani angielskiego starszego niż polski. Od 0.1.98 nie przepuszcza też nowego pliku z polskim tekstem spoza zakresu tłumaczeń (`data/en/scope.json`): po polsku zostają tylko Panel autora, narzędzia testowe i wpisy „Co nowego?”.
+
 ## Wersja 0.1.97 (6.11.2026)
 
 - Angielski w grze: przełącznik PL | EN na ekranie logowania i w Ustawieniach, wybór języka przy zakładaniu konta, kanał English na czacie i „A→ Przetłumacz” pod wiadomościami w drugim języku. Zob. „Angielski w grze” i „Odpowiedź autora 715”.
