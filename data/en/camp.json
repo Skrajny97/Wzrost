@@ -1,0 +1,42 @@
+{
+  "$comment": "English texts of data/camp.json (src/engine/overlay.js): the camp's own level, the Cornerstone with the Builder Spirit, and the System Collector. The Stronghold (fortress) comes in a later stage.",
+  "name": "Camp",
+  "description": "A clearing at the edge of the wilds that will in time become a stronghold. Each camp level speeds up the construction of every building.",
+  "effect": {
+    "text": "Building {value} faster",
+    "startText": "Building at the normal pace"
+  },
+  "evolution": "Once the Camp and all its buildings reach their highest level, the Camp will be able to become a Stronghold.",
+  "cornerstone": {
+    "name": "Stronghold Cornerstone",
+    "label": "Cornerstone",
+    "text": "A large stone with a carved sign. The Stronghold will stand here once the Camp and all its buildings reach their highest level.",
+    "buildings": "Buildings at the highest level",
+    "camp": "Camp level",
+    "ready": "The Camp is ready. The change into a Stronghold will begin here once it comes to the game.",
+    "spirit": {
+      "name": "Builder Spirit",
+      "line": "I will buy your surplus wood, stone and ore for gold.",
+      "texts": {
+        "price": "{gold} gold for {lot} pcs",
+        "need": "The Camp's builds still need {count} more.",
+        "least": "For fewer than {count} the spirit pays nothing.",
+        "sold": "The Builder Spirit pays {gold} gold.",
+        "unknown": "The Builder Spirit buys only wood, stone and iron ore.",
+        "amount": "Choose how many to sell.",
+        "notEnough": "You do not have that many.",
+        "locked": "The Builder Spirit will appear in the Camp along with the Settlement."
+      }
+    }
+  },
+  "collector": {
+    "name": "System Collector",
+    "texts": {
+      "offer": "Collects resources from the Camp's full stores for you, so nothing is lost even during a long absence.",
+      "bought": "The System Collector will now look after the Camp's stores.",
+      "hint": "The System Collector will collect the resources when the store fills up.",
+      "owned": "You already have the System Collector.",
+      "noGold": "Not enough gold for the System Collector."
+    }
+  }
+}

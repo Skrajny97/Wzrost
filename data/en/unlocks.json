@@ -1,0 +1,71 @@
+{
+  "$comment": "English texts of data/unlocks.json, by the unlock's id (src/engine/overlay.js): the names of the parts of the game as the locked screen names them, and the System's messages when they open. The condition follows \"{name} unlocks\" (src/client/screens/locked.js).",
+  "stats": {
+    "name": "Free points and the Stats screen",
+    "message": "Stats screen unlocked. You can spend free points in the Character tab."
+  },
+  "quick-hunts": {
+    "name": "Quick Hunt",
+    "message": "Quick Hunt unlocked: three quick explorations a day, with the report at once. Find it in Combat, below “Set out”."
+  },
+  "community": {
+    "name": "Community",
+    "message": "Community unlocked. In the Community tab you can talk with other players in the chat."
+  },
+  "skills": {
+    "name": "Skills",
+    "message": "Skills unlocked. Choose one of three in the Character tab, under Skills."
+  },
+  "evolution": {
+    "name": "Evolution",
+    "message": "Evolution unlocked. Once both paths are ready, you will choose your class's evolution in the Character tab, under Evolution."
+  },
+  "professions": {
+    "name": "Professions",
+    "message": "Professions unlocked. Look into the Professions tab."
+  },
+  "crafting": {
+    "name": "Crafting",
+    "message": "Crafting unlocked. The System Workshop waits in the Professions tab."
+  },
+  "mining": {
+    "name": "Mining",
+    "message": "Mining unlocked. The System Mine waits in the Professions tab."
+  },
+  "jewelcrafting": {
+    "name": "Jewelcrafting",
+    "message": "Jewelcrafting unlocked. The System Gem Workshop waits in the Professions tab."
+  },
+  "settlement": {
+    "name": "Settlement",
+    "message": "Settlement unlocked. The residents wait in the Settlement tab."
+  },
+  "party": {
+    "name": "Party",
+    "message": "Party unlocked. Form one or accept an invitation in the Community tab, in the Party section, and set out on explorations together."
+  },
+  "guild": {
+    "name": "Guild",
+    "message": "Creating a Guild unlocked. Create one in the Community tab, in the Guild section."
+  },
+  "hunts-1h": {
+    "name": "Explorations up to 1 hour",
+    "message": "Explorations up to 1 hour unlocked."
+  },
+  "hunts-2h": {
+    "name": "Explorations up to 2 hours",
+    "message": "Explorations up to 2 hours unlocked."
+  },
+  "hunts-4h": {
+    "name": "Explorations up to 4 hours",
+    "message": "Explorations up to 4 hours unlocked."
+  },
+  "towers": {
+    "name": "Towers",
+    "message": "System Towers unlocked. Enter them in the Combat tab, in the Towers section: a dozen or so fights a day, between explorations and even while working at a profession."
+  },
+  "core": {
+    "name": "Core",
+    "condition": "after defeating the first dungeon boss"
+  }
+}

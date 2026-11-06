@@ -1,0 +1,97 @@
+{
+  "$comment": "English texts of data/buildings.json, by the building's id (src/engine/overlay.js): the camp's buildings. The Quarters (settlement) and the Stronghold's buildings (fortress) come in a later stage. An effect's {value} and {hours} come from the code (src/engine/camp.js, effectText): a share as \"10%\", hours as \"2 h\", a count as a number; the Salvage Table's effect follows its highest rarity with a small first letter.",
+  "sawmill": {
+    "name": "Sawmill",
+    "description": "A saw and a sawhorse under a lean-to. Slowly turns fallen trunks into wood.",
+    "beyond": { "hint": "In the Stronghold you can upgrade it to level 20." },
+    "effect": { "text": "Produces {value} wood per hour, store holds {hours} of output" }
+  },
+  "quarry": {
+    "name": "Quarry",
+    "description": "An open pit by the mossy boulders. Slowly quarries stone.",
+    "beyond": { "hint": "In the Stronghold you can upgrade it to level 20." },
+    "effect": { "text": "Quarries {value} stone per hour, store holds {hours} of output" }
+  },
+  "mine": {
+    "name": "Mine",
+    "description": "A shaft beneath the roots of old trees. Slowly mines iron ore.",
+    "beyond": { "hint": "In the Stronghold you can upgrade it to level 20." },
+    "effect": { "text": "Mines {value} iron ore per hour, store holds {hours} of output" }
+  },
+  "midas-lake": {
+    "name": "Midas Pond",
+    "description": "A quiet pond with gold lying on its bed. A prospector's pan sifts it from the silt by itself: not much, but without pause.",
+    "beyond": { "hint": "In the Stronghold you can upgrade it to level 20." },
+    "effect": { "text": "Pans {value} gold per hour, store holds {hours} of output" }
+  },
+  "campfire": {
+    "name": "Campfire",
+    "description": "Warmth, food and sleep by the fire. The character recovers HP faster between explorations, and the fire spirit trades gold for resources.",
+    "effect": { "text": "Rest between explorations {value} faster" },
+    "trade": {
+      "title": "Fire Spirit",
+      "text": "You can throw your gold into the campfire, and the fire spirit will trade it for the resources you need."
+    }
+  },
+  "loot-shed": {
+    "name": "Storehouse",
+    "description": "A dry shelter for spoils. The bag holds more items.",
+    "effect": { "text": "Bag bigger by {value} slots" }
+  },
+  "scrap-bench": {
+    "name": "Scrapyard",
+    "description": "A roofed yard where the scrap dealer takes unwanted items and sells parts for crafting. The better it is fitted out, the more he pays, and the rarer and cheaper his parts.",
+    "effect": { "text": "The scrap dealer pays {value} more" },
+    "shop": {
+      "title": "Scrap dealer's counter",
+      "text": "The scrap dealer sells parts for crafting for gold. The higher the Scrapyard's level, the rarer his parts and the less he charges for them."
+    }
+  },
+  "anvil": {
+    "name": "Anvil",
+    "description": "An anvil on a stump, and in time a smithy with a hearth. Each level lets you upgrade items one step higher, up to +10.",
+    "effect": { "text": "Item upgrades up to +{value}" }
+  },
+  "craft-table": {
+    "name": "Salvage Table",
+    "description": "A simple table with tools. For free, over time, it turns creature materials and salvaged items into parts for making items. Here you can also trade one camp resource for another.",
+    "effect": { "text": "Processing {value} faster" },
+    "exchange": {
+      "title": "Resource exchange",
+      "text": "For a few pieces of one resource you get a piece of another. The higher the table's level, the less you give.",
+      "levelText": "resource exchange {rate} for 1"
+    },
+    "queue": {
+      "cancel": "Remove from queue",
+      "cancelAll": "Remove all",
+      "old": "Salvage from before version 0.1.65 will finish on its own.",
+      "confirm": {
+        "title": "Remove from the queue?",
+        "titleAll": "Remove all orders?",
+        "back": "Back to the bag: {what}.",
+        "backAll": "Orders to remove: {count}. Everything they took will go back to the bag.",
+        "running": "The table is already working on this, so that work will be lost.",
+        "runningAll": "The work on the first order will be lost.",
+        "later": "The next orders will start sooner.",
+        "counted": "Quests will lose what they counted for this work.",
+        "countedGuild": "Quests and Guild Trials will lose what they counted for this work.",
+        "minerals": "You will give back the gems and ores from salvage: {minerals}.",
+        "pattern": "The System will hide the pattern from salvage again: {patterns}.",
+        "patterns": "The System will hide the patterns from salvage again: {patterns}.",
+        "kept": "Salvage from before version 0.1.65 will stay in the queue.",
+        "yes": "Remove",
+        "no": "Keep"
+      },
+      "done": "From the queue to the bag: {what}.",
+      "doneAll": "Orders removed: {count}. Everything from them is back in the bag.",
+      "errors": {
+        "gone": "This order is no longer in the queue.",
+        "empty": "There are no orders in the queue to remove.",
+        "old": "This salvage from before version 0.1.65 cannot be undone, as the item is gone. It will finish on its own.",
+        "bagFull": "The bag cannot hold the items from the queue (slots needed: {need}, free: {free}). Make room in it.",
+        "minerals": "The gems and ores from salvage are missing: {minerals}. Without them the item will not go back to the bag.",
+        "rewarded": "The reward for the quest “{quest}” has already been collected, and without this work it would not be done. Remove fewer orders or wait until the table finishes them."
+      }
+    }
+  }
+}

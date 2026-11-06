@@ -49,13 +49,18 @@ import cosmetics from '../../data/cosmetics.json' with { type: 'json' };
 // The English texts (data/en/), by the data file they translate. A file
 // added there is named here too (tools/i18n-check.mjs checks it).
 import enAppearances from '../../data/en/appearances.json' with { type: 'json' };
+import enBuildings from '../../data/en/buildings.json' with { type: 'json' };
+import enCamp from '../../data/en/camp.json' with { type: 'json' };
 import enChat from '../../data/en/chat.json' with { type: 'json' };
 import enClasses from '../../data/en/classes.json' with { type: 'json' };
 import enGiftCodes from '../../data/en/gift-codes.json' with { type: 'json' };
+import enQuests from '../../data/en/quests.json' with { type: 'json' };
 import enSkins from '../../data/en/skins.json' with { type: 'json' };
 import enSlots from '../../data/en/slots.json' with { type: 'json' };
 import enStats from '../../data/en/stats.json' with { type: 'json' };
+import enTexts from '../../data/en/texts.json' with { type: 'json' };
 import enTutorial from '../../data/en/tutorial.json' with { type: 'json' };
+import enUnlocks from '../../data/en/unlocks.json' with { type: 'json' };
 
 // The data files by their names, as data/en/ names its translations.
 const polishData = {
@@ -100,13 +105,18 @@ const polishData = {
 export const OVERLAYS = {
   en: {
     appearances: enAppearances,
+    buildings: enBuildings,
+    camp: enCamp,
     chat: enChat,
     classes: enClasses,
     'gift-codes': enGiftCodes,
+    quests: enQuests,
     skins: enSkins,
     slots: enSlots,
     stats: enStats,
+    texts: enTexts,
     tutorial: enTutorial,
+    unlocks: enUnlocks,
   },
 };
 

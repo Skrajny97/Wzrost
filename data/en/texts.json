@@ -1,0 +1,234 @@
+{
+  "$comment": "English texts of data/texts.json (src/engine/overlay.js): the sentences of fights, finds, level-ups and reports, the phone notifications and the confirmation e-mail. Each key keeps the Polish number of variants, as the engine picks one by index. Names come in from the data (creatures, attacks, skills, items), numbers and lists from the code; a fight's turn (ruch) is a turn. The Polish split by the character's gender (levelHealFemale) has the same English.",
+  "fightStart": [
+    "Foes: {enemies}.",
+    "On the path: {enemies}.",
+    "Out of the thicket: {enemies}.",
+    "Lurking among the trees: {enemies}."
+  ],
+  "eliteStart": [
+    "The air thickens. The local elite: {enemies}.",
+    "The forest falls silent. The local elite: {enemies}."
+  ],
+  "championStart": [
+    "The ground trembles under heavy steps. The champion of these parts: {enemies}.",
+    "The whole forest goes quiet and waits. The champion steps out: {enemies}."
+  ],
+  "toughStart": [
+    "Deeper in the wilds a demanding encounter awaits: {enemies}.",
+    "The tracks lead to a stronger group: {enemies}."
+  ],
+  "hit": [
+    "{actor}: {attack}. {target} loses {damage} HP.",
+    "{actor} attacks ({attack}). {target} loses {damage} HP.",
+    "{actor} hits ({attack}). {target} loses {damage} HP."
+  ],
+  "crit": [
+    "{actor} lands a critical hit ({attack})! {target} loses {damage} HP.",
+    "Critical hit! {actor}: {attack}. {target} loses {damage} HP."
+  ],
+  "dodge": [
+    "{target} dodges the blow.",
+    "{actor} misses as {target} leaps aside.",
+    "{target} steps out of the line of attack."
+  ],
+  "effectApplied": [
+    "{target}: {effect}.",
+    "{target} suffers the effects: {effect}."
+  ],
+  "effectTick": [
+    "{target} suffers ({effect}) and loses {damage} HP.",
+    "{effect}: {target} loses {damage} HP."
+  ],
+  "kill": [
+    "{target} falls.",
+    "{target} does not get up.",
+    "{target} slumps onto the moss."
+  ],
+  "skillHit": [
+    "{actor} uses {skill}. {target} loses {damage} HP.",
+    "{actor}: {skill}! {target} loses {damage} HP."
+  ],
+  "skillCrit": [
+    "{actor} uses {skill} and lands a critical hit! {target} loses {damage} HP.",
+    "{actor}: {skill}, critical hit! {target} loses {damage} HP."
+  ],
+  "skillDodge": [
+    "{actor} uses {skill}, but {target} dodges the blow.",
+    "{actor}: {skill}! {target} steps out of the line of attack."
+  ],
+  "skillUse": [
+    "{actor} uses {skill}.",
+    "{actor}: {skill}!"
+  ],
+  "skillBuff": ["{actor}: {skill}. Until the end of the fight: armour +{armor}%, resistances +{resist}%, damage +{damage}%."],
+  "skillBuffShared": ["The bonus is shared across the party: each of the {count} gets a share."],
+  "skillCoat": ["{actor}: {skill}. Until the end of the fight each blow has a {chance}% chance of {effect}: {power}% of the blow's damage every turn for {ticks} turns."],
+  "skillShield": ["{actor}: {skill}. A shield made of {mana} mana will take {shield} damage."],
+  "skillEvade": ["{actor}: {skill}. For {hits} enemy blows, dodge rises by {dodge} percentage points, and each dodge brings a counter dealing {counter}% damage."],
+  "skillHeal": [
+    "{actor} uses {skill} and recovers {amount} HP.",
+    "{actor}: {skill}. {amount} HP restored."
+  ],
+  "stun": [
+    "{target} loses the next turn.",
+    "{target} cannot move."
+  ],
+  "slow": [
+    "The enemies slow down.",
+    "The foes move more slowly."
+  ],
+  "slowOne": [
+    "{target} slows down.",
+    "{target} moves more slowly."
+  ],
+  "mired": [
+    "{target} gets mired and slows down.",
+    "{effect}: {target} moves more slowly."
+  ],
+  "drain": [
+    "{actor} drains {amount} HP.",
+    "{actor} recovers {amount} HP from the wound."
+  ],
+  "ambush": [
+    "Ambush! {actor} appears out of nowhere and the creatures strike first."
+  ],
+  "weakness": [
+    "Weak spot ({element}): +{percent}%."
+  ],
+  "absorbed": [
+    "The shield absorbs {absorbed}.",
+    "The shield takes {absorbed} upon itself."
+  ],
+  "guardArmor": [
+    "Armour rises by {armor}% for {turns} turns.",
+    "Armour hardens: +{armor}% for {turns} turns."
+  ],
+  "guardArmorMany": [
+    "Armour rises by {armor}% for {turns} turns.",
+    "Armour hardens: +{armor}% for {turns} turns."
+  ],
+  "skillEnd": [
+    "{skill} wears off.",
+    "{actor}: {skill} fades."
+  ],
+  "counter": [
+    "{actor} counters. {target} loses {damage} HP.",
+    "{actor} strikes back. {target} loses {damage} HP."
+  ],
+  "counterCrit": [
+    "{actor} lands a critical counter! {target} loses {damage} HP."
+  ],
+  "skillBuffSpeed": ["Speed +{speed}%."],
+  "skillCoatWeaken": ["A poisoned target deals {weaken}% less damage."],
+  "skillShieldReflect": ["The shield reflects {reflect}% of the damage it absorbs."],
+  "skillEvadeBlades": ["Each dodge also brings a cut dealing {blades}% damage to a random enemy."],
+  "guardReflect": ["Meanwhile {reflect}% of the damage taken is reflected."],
+  "skillRiposte": ["{actor}: {skill}. Until the end of the fight dodge rises by {dodge} percentage points, and each dodge brings a counter dealing {power}% damage. Whoever it hits bleeds for {ticks} turns."],
+  "stanceFrenzy": ["{actor}: {skill}. For {turns} turns damage +{damage}% and healing for {lifesteal}% of the damage dealt, but damage taken +{taken}%."],
+  "stanceProvoke": ["{actor}: {skill}. For {turns} turns the enemies strike only this character, who reflects {reflect}% of the damage taken."],
+  "stanceCloud": ["{actor}: {skill}. For {turns} turns a storm cloud hangs over the enemies."],
+  "stancePet": ["{actor}: {skill}. For {turns} turns a falcon attacks the enemies."],
+  "stanceRegen": ["{actor}: {skill}. For {turns} turns the whole party recovers {heal}% of max HP each turn."],
+  "cloudStrike": ["{skill}: lightning strikes the enemies."],
+  "reflect": ["{actor} reflects part of the blow. {target} loses {damage} HP."],
+  "lifesteal": ["{actor} heals from the wound dealt: +{amount} HP."],
+  "regen": ["{skill}: {target} recovers {amount} HP."],
+  "renewalHot": ["For the next {turns} turns everyone recovers {hot}% of max HP each turn."],
+  "renewalHotMany": ["For the next {turns} turns everyone recovers {hot}% of max HP each turn."],
+  "miracle": ["{actor}: {skill}! {target} rises again with {amount} HP."],
+  "cleansed": ["{target}: {effect} is gone."],
+  "summonUp": ["{actor} summons: {summon}, {hp} HP."],
+  "summonHit": ["{summon} strikes ({element}). {target} loses {damage} HP."],
+  "summonTaken": ["{summon} takes the blow ({attack}) and loses {damage} HP."],
+  "summonSpit": ["{summon} spits venom."],
+  "summonGone": ["{summon} vanishes."],
+  "summonFell": ["{summon} falls."],
+  "summonBurst": ["{summon} bursts and splatters the enemies with venom."],
+  "marked": ["{target}: {skill}. Takes {percent}% more damage for {turns} turns."],
+  "doomed": ["{actor}: {skill}. After {turns} turns {target} will take {echo}% of the damage taken in that time once again."],
+  "echo": ["{skill}: {target} loses another {damage} HP."],
+  "charged": ["A spark from the arrowhead: +{damage}."],
+  "armorShred": ["The target's armour weakens by {percent}%."],
+  "stunMoves": ["{target} loses the next {moves} turns."],
+  "vanished": ["{target} vanishes into the shadows, and the blow meets empty air."],
+  "blocked": ["{target} stops the blow with a shield."],
+  "ovation": ["The crowd cheers: {actor} recovers {amount} HP."],
+  "skillShieldParty": ["{actor}: {skill}. Everyone in the party gets a shield of {percent}% of their max HP."],
+  "skillShieldSlow": ["Whoever strikes it slows down by {slow}%."],
+  "skillHarmony": ["{actor}: {skill}. Until the end of the fight each element used in spells makes the next ones {bonus}% stronger."],
+  "summonStrike": ["{summon} attacks. {target} loses {damage} HP."],
+  "summonMiss": ["{summon} attacks, but {target} dodges the blow."],
+  "summonRisen": ["{target} rises as a skeleton ({hp} HP) and now fights against its own."],
+  "duel": ["{actor}: {skill}! {target} is challenged to a duel: takes {damage}% more damage from the challenger and deals {guard}% less in return."],
+  "locked": ["{actor}: {skill}. {target} is targeted: takes {damage}% more damage and cannot dodge blows."],
+  "stanceRoar": ["{actor}: {skill}! For {turns} turns the enemies deal {weaken}% less damage, and the character {damage}% more."],
+  "stanceWall": ["{actor}: {skill}. For {turns} turns the whole party has {wall}% more armour."],
+  "stanceOrb": ["{actor}: {skill}. For {turns} turns a ball of lightning strikes the enemies."],
+  "stanceAura": ["{actor}: {skill}. For {turns} turns the whole party recovers {heal}% of max HP each turn."],
+  "stancePyre": ["{actor}: {skill}. For {turns} turns holy fire burns beneath the enemies."],
+  "pyreStrike": ["{skill}: holy fire burns the enemies."],
+  "stanceChoir": ["{actor}: {skill}. For {turns} turns the whole party recovers {heal}% of max HP each turn and deals {chorus}% more damage."],
+  "stanceVanish": ["{actor}: {skill}. The character vanishes into the shadows, beyond the enemies' reach; the next blow will be critical and {power}% stronger."],
+  "stanceDouble": ["{actor}: {skill}. For {turns} turns a shadow repeats every blow, dealing {power}% damage."],
+  "skillPoints": ["Skill Points gained: +{points}"],
+  "skillCostActive": ["Cost: {mana} mana, at most once every {cooldown} turns."],
+  "skillCostStart": ["Cost: {mana} mana, at the start of the fight."],
+  "skillCostOnce": ["Cost: {mana} mana, once per fight."],
+  "skillCostPool": ["Cost: {pool} of max mana, once per fight."],
+  "classWaitsPath": ["{className}: the class waits at level {level}, on the threshold of evolution. It will grow further once you choose a side path under Skills. The class XP gained is not lost."],
+  "classWaitsPoints": ["{className}: the class waits at level {level}, on the threshold of evolution. It will grow further once you spend your Skill Points under Skills. The class XP gained is not lost."],
+  "classWaitsEvolution": ["{className}: the class waits at level {level}, on the threshold of evolution. It will grow further once you choose an evolution in the Evolution tab. The class XP gained is not lost."],
+  "victory": ["Victory.", "The fight is won."],
+  "defeat": ["{target} loses consciousness.", "Darkness. {target} loses consciousness."],
+  "escape": ["{target} barely escapes alive.", "{target} withdraws before it is too late."],
+  "draw": ["The fight drags on. {target} withdraws."],
+  "recover": ["Rest: +{hp} HP.", "A short breather: +{hp} HP."],
+  "companionDown": ["{name} collapses, spent, and stays back for the rest of the exploration.", "{name} does not get up after the last blow. You go on without support."],
+  "findGold": ["A pouch lies in the grass: {gold} gold.", "Found {gold} gold.", "Coins glint under a stone: {gold} gold."],
+  "findChest": ["A treasure chest stands under the roots. Inside: {item}.", "Someone has hidden an iron-bound box among the boulders. Inside: {item}.", "A small chest sits in the hollow of an old oak. Inside: {item}."],
+  "findResource": ["Gathered: {resources}.", "Picked up along the way: {resources}.", "A useful supply: {resources}."],
+  "gathered": ["Gathered along the way: {resources}.", "Gathered over the whole journey: {resources}."],
+  "findNothing": ["The area holds nothing of interest.", "The tracks lead nowhere.", "Under the roots, only moss and earth.", "Nothing of value among the fallen trunks."],
+  "findTime": ["A shard of time gleams among the roots. Time Points: +{time}.", "A tiny shard of time lies in the moss. Time Points: +{time}."],
+  "materials": ["Loot: {materials}."],
+  "eliteChest": ["Where the elite fell, a chest stands. Inside: {item}."],
+  "championChest": ["By the defeated champion lies a chest. Inside: {item}."],
+  "firstChest": ["Close by, under a fern, lies an old chest. Inside: {item}."],
+  "levelUp": ["Level reached: {level}"],
+  "classLevelUp": ["{className} class level reached: {level}"],
+  "statPointsGained": ["Free stat points gained: +{points}"],
+  "statPointsWaiting": ["Free stat points gained: +{points} (you can spend them from level {unlockLevel})"],
+  "timePointsGained": ["Time Points gained: +{time}"],
+  "levelHeal": ["You levelled up. Your HP and Mana are restored."],
+  "levelHealFemale": ["You levelled up. Your HP and Mana are restored."],
+  "faintPenalty": ["Fainting. Experience lost: {xp}."],
+  "faintForfeit": ["After fainting, nothing of this exploration is kept: XP, gold, resources, materials and items are lost."],
+  "bagOverflow": ["The bag was full ({capacity} slots). The scrap dealer bought the weakest items: {count} for {gold} gold."],
+  "autoEquip": ["Equipped at once: {item} ({slot}), as that slot was empty."],
+  "pushHuntTitle": ["Exploration over"],
+  "pushHuntBody": ["Exploration complete: {area}. Your report is ready to collect."],
+  "pushBuildTitle": ["Build complete"],
+  "pushBuildBody": ["{building}: level {level} ready."],
+  "pushStoreTitle": ["Store full"],
+  "pushStoreBody": ["{buildings}: production halted until collected."],
+  "pushTestTitle": ["Test notification"],
+  "pushTestBody": ["This is how you will hear when an exploration, a build or work in a profession ends."],
+  "emailConfirmSubject": ["Confirm your e-mail address in Insight"],
+  "emailConfirmIntro": ["Hi {login}! Click the button below to confirm this e-mail address in the game Insight."],
+  "emailConfirmButton": ["Confirm e-mail address"],
+  "emailConfirmReward": ["For confirming it you will get {points} System Points. The link works for a day."],
+  "emailConfirmLink": ["If the button does not work, open this address:"],
+  "emailConfirmIgnore": ["If this was not you, simply ignore this message."],
+  "lengths": [
+    { "name": "very short" },
+    { "name": "short" },
+    { "name": "medium" },
+    { "name": "long" }
+  ],
+  "result": {
+    "success": "Exploration complete.",
+    "fainted": "Fainting.",
+    "escaped": "Retreat."
+  }
+}

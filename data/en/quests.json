@@ -1,0 +1,91 @@
+{
+  "$comment": "English texts of data/quests.json (src/engine/overlay.js): the narrator's daily, weekly and monthly quests. A kind's {noun} is its `counted` form after {count} (src/engine/quests.js, questText): English has [one, other, other] for the Polish [one, few, many]. In kill the noun comes from monsters.json, in brew from professions.json, and gather's {herb} is the herb's `genitive` there.",
+  "periods": {
+    "daily": {
+      "name": "Daily",
+      "chest": {
+        "text": "The daily quest chest gives +30 Time Points and +5 System Points."
+      },
+      "rerolled": "Today's quests have already been rerolled.",
+      "rerollWhen": "once a day"
+    },
+    "weekly": {
+      "name": "Weekly",
+      "chest": {
+        "text": "The weekly quest chest gives a random item, +120 Time Points and +20 System Points."
+      },
+      "late": "This week began later for you, so the quests are for {days} of its 7 days.",
+      "rerolled": "This week's quests have already been rerolled.",
+      "rerollWhen": "once a week"
+    },
+    "monthly": {
+      "name": "Monthly",
+      "chest": {
+        "text": "The monthly quest chest gives gold based on your level, +240 Time Points and +50 System Points."
+      },
+      "late": "The quests are for {days} of this month's {total} days.",
+      "rerolled": "This month's quests have already been rerolled.",
+      "rerollWhen": "once a month"
+    }
+  },
+  "kinds": {
+    "kill": {
+      "text": "Defeat {count} {noun}."
+    },
+    "killAny": {
+      "text": "Defeat {count} {noun} in total.",
+      "counted": ["creature", "creatures", "creatures"]
+    },
+    "explore": {
+      "text": "Explore for {count} {noun} in total.",
+      "counted": ["minute", "minutes", "minutes"]
+    },
+    "unlock": {
+      "text": "Unlock access to {count} {noun}.",
+      "counted": ["new region", "new regions", "new regions"]
+    },
+    "process": {
+      "text": "Process {count} {noun} at the Salvage Table.",
+      "counted": ["material", "materials", "materials"]
+    },
+    "salvage": {
+      "text": "Salvage {count} {noun} at the Salvage Table.",
+      "counted": ["item", "items", "items"]
+    },
+    "gather": {
+      "text": "Gather {count} {noun} of {herb}.",
+      "counted": ["piece", "pieces", "pieces"]
+    },
+    "gatherAny": {
+      "text": "Gather {count} {noun} in total.",
+      "counted": ["herb", "herbs", "herbs"]
+    },
+    "brew": {
+      "text": "Brew {count} {noun}."
+    },
+    "brewAny": {
+      "text": "Brew {count} {noun} in total.",
+      "counted": ["potion", "potions", "potions"]
+    },
+    "make": {
+      "text": "Craft {count} {noun}.",
+      "counted": ["item", "items", "items"]
+    },
+    "makeAny": {
+      "text": "Craft {count} {noun} in total.",
+      "counted": ["item", "items", "items"]
+    },
+    "mineAny": {
+      "text": "Mine {count} {noun} in total.",
+      "counted": ["mineral", "minerals", "minerals"]
+    },
+    "jewelAny": {
+      "text": "Make {count} {noun} of jewellery in total.",
+      "counted": ["piece", "pieces", "pieces"]
+    },
+    "orders": {
+      "text": "Complete {count} {noun} in the Settlement.",
+      "counted": ["order", "orders", "orders"]
+    }
+  }
+}
