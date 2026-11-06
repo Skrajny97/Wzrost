@@ -248,6 +248,14 @@ button {
   min-width: 0;
 }
 
+/* A title of one long word beside the large "Powrót" on a narrow phone
+   ("Skraj Wiatrołomów", a place's name) fits in a smaller size. */
+@media (max-width: 374px) {
+  .page-heading--back .page-title {
+    font-size: 24px;
+  }
+}
+
 /* After .button in specificity, so the button keeps its own width. */
 .page-heading--back .back-button {
   display: inline-flex;
@@ -5680,6 +5688,23 @@ a.camp-level-button {
 
 .narrator-rod::after {
   right: -9px;
+}
+
+/* On a phone the parchment stands a gutter (16 px) from the screen's edges,
+   so the rods with their knobs reach out 15 px at most and stay whole on
+   the screen (19 px cut 3 px off each knob at 320–451 px). */
+@media (max-width: 459px) {
+  .narrator-rod {
+    margin: 0 -7px;
+  }
+
+  .narrator-rod::before {
+    left: -8px;
+  }
+
+  .narrator-rod::after {
+    right: -8px;
+  }
 }
 
 .narrator-sheet {

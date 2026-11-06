@@ -59,6 +59,7 @@ const SCREENS = [
   '#/postac/umiejetnosci',
   '#/walka',
   '#/walka/windfalls',
+  '#/walka/windfalls/windfalls-edge',
   '#/profesje',
   '#/oboz',
   '#/oboz/craft-table',
@@ -82,10 +83,25 @@ const SCREENS = [
   '#/encyklopedia',
   '#/dziennik',
 ];
-// The screens already in English (data/en/scope.json, stage 2 of the
-// English beta): in English the check lists the Polish words left on them,
-// as on the screens before the game.
-const TRANSLATED = new Set(['#/postac', '#/postac/statystyki', '#/walka', '#/walka/windfalls', '#/oboz', '#/oboz/craft-table', '#/dziennik']);
+// The screens already in English (data/en/scope.json, stages 2 and 3 of
+// the English beta): in English the check lists the Polish words left on
+// them, as on the screens before the game.
+const TRANSLATED = new Set([
+  '#/postac',
+  '#/postac/statystyki',
+  '#/postac/umiejetnosci',
+  '#/walka',
+  '#/walka/windfalls',
+  '#/walka/windfalls/windfalls-edge',
+  '#/profesje',
+  '#/oboz',
+  '#/oboz/craft-table',
+  '#/spolecznosc',
+  '#/spolecznosc/ranking',
+  '#/sklep',
+  '#/encyklopedia',
+  '#/dziennik',
+]);
 // Tabs opened on a screen after its first look, by the start of their
 // names: the Stół rozbiórki's queue, with "Usuń z kolejki" by each order,
 // the Tablica zleceń's Poszukiwani and the Ranking's guilds.
