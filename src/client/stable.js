@@ -8,6 +8,7 @@
 import { mountArt } from './art.js';
 import { h } from './dom.js';
 import { formatMinutes, formatNumber } from './format.js';
+import { t } from './i18n.js';
 import { call, state } from './state.js';
 import { confirmAction, howItWorks, toast, withButton } from './ui.js';
 
@@ -26,7 +27,7 @@ export function formatWait(ms) {
 
 // The line under the length chosen: "Z wierzchowcem: 27 min", or '' when
 // the character has no mount.
-export const stableNote = (minutes, mount) => (mount ? `Z wierzchowcem: ${formatWait(stableWait(minutes, mount))}` : '');
+export const stableNote = (minutes, mount) => (mount ? t('Z wierzchowcem: {time}', { time: formatWait(stableWait(minutes, mount)) }) : '');
 
 const percent = (share) => `${Math.round(share * 100)}%`;
 
@@ -40,9 +41,9 @@ export function stableCard({ stage, mounts }, apply) {
   const buy = (mount) => async (event) => {
     const button = event.currentTarget;
     const sure = await confirmAction({
-      title: 'Kupić wierzchowca?',
-      text: `${mount.name} za ${formatNumber(mount.gold)} zł. Każda wyprawa będzie krótsza o ${percent(mount.shorter)}.`,
-      confirmLabel: 'Kup',
+      title: t('Kupić wierzchowca?'),
+      text: t('{name} za {gold} zł. Każda wyprawa będzie krótsza o {percent}.', { name: mount.name, gold: formatNumber(mount.gold), percent: percent(mount.shorter) }),
+      confirmLabel: t('Kup'),
     });
     if (!sure) return;
     withButton(button, async () => {
@@ -50,21 +51,23 @@ export function stableCard({ stage, mounts }, apply) {
       apply(answer);
       // An exploration going on keeps its end; the next one goes quicker.
       const away = state.character.activity?.kind === 'hunt' && !state.character.activity.finished;
-      toast(`Nowy wierzchowiec: ${mount.name}. Wyprawy są krótsze o ${percent(mount.shorter)}.${away ? ' Działa od następnej wyprawy.' : ''}`);
+      toast(
+        `${t('Nowy wierzchowiec: {name}. Wyprawy są krótsze o {percent}.', { name: mount.name, percent: percent(mount.shorter) })}${away ? ` ${t('Działa od następnej wyprawy.')}` : ''}`,
+      );
     });
   };
   const status = (mount) => {
-    if (mount.stage < stage) return h('p', { class: 'muted', text: 'Masz już lepszego.' });
+    if (mount.stage < stage) return h('p', { class: 'muted', text: t('Masz już lepszego.') });
     if (mount.stage === stage) return null;
     const low = level < mount.level;
     const short = gold < mount.gold;
     return [
-      h('p', { class: 'muted', text: `Cena: ${formatNumber(mount.gold)} zł. Od ${mount.level}. poziomu postaci.` }),
+      h('p', { class: 'muted', text: t('Cena: {gold} zł. Od {level}. poziomu postaci.', { gold: formatNumber(mount.gold), level: mount.level }) }),
       mount.stage === stage + 1 &&
         h('button', {
           type: 'button',
           class: 'button button--world button--small',
-          text: low ? `Od ${mount.level}. poziomu postaci` : short ? 'Brakuje złota' : `Kup (${formatNumber(mount.gold)} zł.)`,
+          text: low ? t('Od {level}. poziomu postaci', { level: mount.level }) : short ? t('Brakuje złota') : t('Kup ({gold} zł.)', { gold: formatNumber(mount.gold) }),
           disabled: low || short,
           onClick: buy(mount),
         }),
@@ -73,13 +76,13 @@ export function stableCard({ stage, mounts }, apply) {
   return h(
     'section',
     { class: 'stack', 'data-guide': 'stable-mounts' },
-    h('h2', { class: 'section-title', text: 'Wierzchowce' }),
+    h('h2', { class: 'section-title', text: t('Wierzchowce') }),
     // All under "Jak to działa?" (the author: "Zdanie nad jak to działa
     // ładujemy pod jak to działa, a ostatnie o Szybkim Polowaniu wywalamy").
     howItWorks(null, [
-      'Wierzchowiec zostaje na stałe i skraca czekanie na koniec każdej wyprawy.',
-      'Nagrody, doświadczenie i walki są jak za pełny czas wyprawy.',
-      'Wierzchowce kupuje się po kolei, a lepszy zastępuje słabszego.',
+      t('Wierzchowiec zostaje na stałe i skraca czekanie na koniec każdej wyprawy.'),
+      t('Nagrody, doświadczenie i walki są jak za pełny czas wyprawy.'),
+      t('Wierzchowce kupuje się po kolei, a lepszy zastępuje słabszego.'),
     ]),
     h(
       'ul',
@@ -91,9 +94,9 @@ export function stableCard({ stage, mounts }, apply) {
           // The mount itself (the author: "wygenerować grafiki wierzchowców i
           // wkleić do stajni"), at the size it trots in the Walka scene.
           mountArt(mount.id),
-          h('p', {}, h('strong', { text: mount.name }), mount.stage === stage && [' ', h('span', { class: 'chip chip--success', text: 'Twój' })]),
+          h('p', {}, h('strong', { text: mount.name }), mount.stage === stage && [' ', h('span', { class: 'chip chip--success', text: t('Twój') })]),
           h('p', { class: 'muted', text: mount.description }),
-          h('p', { text: `Wyprawy krótsze o ${percent(mount.shorter)}: godzinna trwa ${formatWait(stableWait(60, mount))}.` }),
+          h('p', { text: t('Wyprawy krótsze o {percent}: godzinna trwa {time}.', { percent: percent(mount.shorter), time: formatWait(stableWait(60, mount)) }) }),
           status(mount),
         ),
       ),

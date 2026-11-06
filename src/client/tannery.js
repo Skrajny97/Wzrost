@@ -8,42 +8,47 @@
 
 import { h } from './dom.js';
 import { countOf, formatDecimal, formatNumber, saleGold, tradePace } from './format.js';
+import { t } from './i18n.js';
 import { call, state } from './state.js';
 import { closeSheet, openSheet, toast, withButton } from './ui.js';
 import { numberField, stackArt, stackButton } from './screens/market.js';
 
+// The tabs, their names shown through t().
 const TABS = [
   ['buy', 'Kup'],
   ['sell', 'Sprzedaj'],
 ];
 
 // The trade's reputation today out of the day's limit, under both tabs.
-const tradeLine = (trade) => `Handel daje relację z nim i reputację Bractwa Łowców: dziś ${trade.today} z ${trade.daily} punktów.${tradePace(trade)}`;
+const tradeLine = (trade) =>
+  `${t('Handel daje relację z nim i reputację Bractwa Łowców: dziś {today} z {daily} punktów.', { today: trade.today, daily: trade.daily })}${tradePace(trade)}`;
 
 // A material he sells: as many pieces as the gold allows, typed in.
 // Materials take no place in the bag.
 function buySheet(good, apply) {
   const most = Math.floor(state.character.gold / good.price);
-  const field = numberField('tannery-buy-count', 'Ile sztuk', 1, 1, Math.max(1, most));
+  const field = numberField('tannery-buy-count', t('Ile sztuk'), 1, 1, Math.max(1, most));
   openSheet(
     h('h2', { class: 'sheet-title', text: good.name }),
-    h('p', { class: 'sheet-text', text: `${formatNumber(good.price)} zł. za sztukę. Możesz kupić najwyżej ${formatNumber(most)} szt.: na tyle starczy złota.` }),
+    h('p', { class: 'sheet-text', text: t('{price} zł. za sztukę. Możesz kupić najwyżej {most} szt.: na tyle starczy złota.', { price: formatNumber(good.price), most: formatNumber(most) }) }),
     field.element,
     h(
       'div',
       { class: 'sheet-actions' },
-      h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }),
+      h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }),
       h('button', {
         type: 'button',
         class: 'button button--system',
-        text: 'Kup',
+        text: t('Kup'),
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
             const answer = await call('POST', '/api/settlement/tannery/buy', { key: good.key, count: field.read() });
             closeSheet();
             apply(answer);
             const { name, count, gold, points } = answer.bought;
-            toast(`Kupione: ${name} ×${formatNumber(count)} za ${formatNumber(gold)} zł.${points > 0 ? ` Relacja ze Wszeborem i reputacja Bractwa Łowców +${points}.` : ''}`);
+            toast(
+              `${t('Kupione: {name} ×{count} za {gold} zł.', { name, count: formatNumber(count), gold: formatNumber(gold) })}${points > 0 ? ` ${t('Relacja ze Wszeborem i reputacja Bractwa Łowców +{points}.', { points })}` : ''}`,
+            );
           }),
       }),
     ),
@@ -61,12 +66,12 @@ function shop(view, apply) {
   return h(
     'section',
     { class: 'stack' },
-    h('h2', { class: 'section-title', text: 'Towar Wszebora' }),
+    h('h2', { class: 'section-title', text: t('Towar Wszebora') }),
     h('p', {
       class: 'muted',
-      text: `Wszebor sprzedaje materiały ze stworów drożej, niż je skupuje. ${offer.discount > 0 ? `Dzięki relacji z nim ceny są niższe o ${formatDecimal(offer.discount * 100)}%.` : 'Z lepszą relacją ceny będą niższe.'} ${tradeLine(trade)}`,
+      text: `${t('Wszebor sprzedaje materiały ze stworów drożej, niż je skupuje.')} ${offer.discount > 0 ? t('Dzięki relacji z nim ceny są niższe o {discount}%.', { discount: formatDecimal(offer.discount * 100) }) : t('Z lepszą relacją ceny będą niższe.')} ${tradeLine(trade)}`,
     }),
-    h('p', { class: 'muted', text: 'Kupione materiały pasują do zleceń z Tablicy zleceń.' }),
+    h('p', { class: 'muted', text: t('Kupione materiały pasują do zleceń z Tablicy zleceń.') }),
     h(
       'ul',
       { class: 'stack market-list' },
@@ -75,11 +80,11 @@ function shop(view, apply) {
           h('button', {
             type: 'button',
             class: `button button--world${small ? ' button--small' : ''}`,
-            text: 'Kup',
+            text: t('Kup'),
             disabled: gold < good.price,
             onClick: () => buySheet(good, apply),
           });
-        const price = `${formatNumber(good.price)} zł. za sztukę`;
+        const price = t('{gold} zł. za sztukę', { gold: formatNumber(good.price) });
         return h(
           'li',
           { class: 'card tannery-good' },
@@ -88,7 +93,14 @@ function shop(view, apply) {
         );
       }),
     ),
-    offer.next && h('p', { class: 'muted', text: `Od stopnia relacji ${offer.next.standing} dojdą kolejne: ${countOf(offer.next.count, 'materiał', 'materiały', 'materiałów')}.` }),
+    offer.next &&
+      h('p', {
+        class: 'muted',
+        text: t('Od stopnia relacji {standing} dojdą kolejne: {materials}.', {
+          standing: offer.next.standing,
+          materials: countOf(offer.next.count, 'materiał', 'materiały', 'materiałów'),
+        }),
+      }),
   );
 }
 
@@ -97,13 +109,13 @@ function sellSheet(good, apply) {
   let count = 1;
   const value = h('output', { class: 'herb-count-value' });
   const sell = h('button', { type: 'button', class: 'button button--system' });
-  const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Mniej', text: '−', onClick: () => set(count - 1) });
-  const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': 'Więcej', text: '+', onClick: () => set(count + 1) });
-  const all = h('button', { type: 'button', class: 'link-button', text: 'wszystkie', onClick: () => set(good.count) });
+  const less = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Mniej'), text: '−', onClick: () => set(count - 1) });
+  const more = h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': t('Więcej'), text: '+', onClick: () => set(count + 1) });
+  const all = h('button', { type: 'button', class: 'link-button', text: t('wszystkie'), onClick: () => set(good.count) });
   function set(next) {
     count = Math.min(good.count, Math.max(1, next));
-    value.textContent = `${formatNumber(count)} szt.`;
-    sell.textContent = `Sprzedaj za ${formatNumber(saleGold(good.price, count))} zł.`;
+    value.textContent = t('{count} szt.', { count: formatNumber(count) });
+    sell.textContent = t('Sprzedaj za {gold} zł.', { gold: formatNumber(saleGold(good.price, count)) });
     less.disabled = count === 1;
     more.disabled = count === good.count;
   }
@@ -114,14 +126,21 @@ function sellSheet(good, apply) {
       closeSheet();
       apply(answer);
       const { gold, points } = answer.sold;
-      toast(`Wszebor płaci ${formatNumber(gold)} zł.${points > 0 ? ` Relacja z nim i reputacja Bractwa Łowców +${points}.` : ''}`);
+      toast(`${t('Wszebor płaci {gold} zł.', { gold: formatNumber(gold) })}${points > 0 ? ` ${t('Relacja z nim i reputacja Bractwa Łowców +{points}.', { points })}` : ''}`);
     }),
   );
   openSheet(
     h('h2', { class: 'sheet-title', text: good.name }),
-    h('p', { class: 'sheet-text', text: `Masz ${formatNumber(good.count)} szt. Wszebor płaci ${formatDecimal(good.price)} zł. za sztukę, złomiarz ${formatDecimal(good.scrap)} zł.` }),
+    h('p', {
+      class: 'sheet-text',
+      text: t('Masz {count} szt. Wszebor płaci {price} zł. za sztukę, złomiarz {scrap} zł.', {
+        count: formatNumber(good.count),
+        price: formatDecimal(good.price),
+        scrap: formatDecimal(good.scrap),
+      }),
+    }),
     h('div', { class: 'herb-count' }, less, value, more, all),
-    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Anuluj', onClick: closeSheet }), sell),
+    h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet }), sell),
   );
 }
 
@@ -132,13 +151,13 @@ function sale(view, apply) {
   return h(
     'section',
     { class: 'stack', 'data-guide': 'tannery-sell' },
-    h('h2', { class: 'section-title', text: 'Skup materiałów' }),
+    h('h2', { class: 'section-title', text: t('Skup materiałów') }),
     h('p', {
       class: 'muted',
-      text: `Wszebor płaci o ${Math.round(premium * 100)}% więcej niż złomiarz${best ? '' : ', a z lepszą relacją jeszcze więcej'}. ${tradeLine(trade)}`,
+      text: `${best ? t('Wszebor płaci o {percent}% więcej niż złomiarz.', { percent: Math.round(premium * 100) }) : t('Wszebor płaci o {percent}% więcej niż złomiarz, a z lepszą relacją jeszcze więcej.', { percent: Math.round(premium * 100) })} ${tradeLine(trade)}`,
     }),
     goods.length === 0
-      ? h('p', { class: 'muted', text: 'Nie masz materiałów ze stworów, które Wszebor kupuje.' })
+      ? h('p', { class: 'muted', text: t('Nie masz materiałów ze stworów, które Wszebor kupuje.') })
       : h(
           'ul',
           { class: 'settlement-goods' },
@@ -148,8 +167,8 @@ function sale(view, apply) {
               { class: 'settlement-good' },
               // The material's icon by its name, as at Jagna's.
               h('p', { class: 'settlement-good-name' }, h('span', { class: 'potion-pick-art' }, stackArt(good)), h('strong', { text: `${good.name} × ${formatNumber(good.count)}` })),
-              h('p', { class: 'muted', text: `${formatDecimal(good.price)} zł. za sztukę, u złomiarza ${formatDecimal(good.scrap)} zł.` }),
-              h('button', { type: 'button', class: 'button button--world button--small', text: 'Sprzedaj', onClick: () => sellSheet(good, apply) }),
+              h('p', { class: 'muted', text: t('{price} zł. za sztukę, u złomiarza {scrap} zł.', { price: formatDecimal(good.price), scrap: formatDecimal(good.scrap) }) }),
+              h('button', { type: 'button', class: 'button button--world button--small', text: t('Sprzedaj'), onClick: () => sellSheet(good, apply) }),
             ),
           ),
         ),
@@ -162,7 +181,7 @@ function sale(view, apply) {
 export function tanneryCard(view, { tab, pick, apply }) {
   const tabs = h(
     'div',
-    { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': 'Garbarnia' },
+    { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': t('Garbarnia') },
     TABS.map(([id, label]) =>
       h(
         'button',
@@ -174,7 +193,7 @@ export function tanneryCard(view, { tab, pick, apply }) {
           'aria-selected': String(tab === id),
           onClick: () => pick(id),
         },
-        h('span', { class: 'chat-tab-name', text: label }),
+        h('span', { class: 'chat-tab-name', text: t(label) }),
       ),
     ),
   );

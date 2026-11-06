@@ -9,13 +9,15 @@
 // (character.mercenaries).
 
 import { fill, h } from './dom.js';
-import { formatMinutes, formatNumber, timeFormat } from './format.js';
+import { countOf, formatMinutes, formatNumber, timeFormat } from './format.js';
+import { t } from './i18n.js';
 import { activityFinished, call, serverNow, state } from './state.js';
 import { closeSheet, confirmAction, openSheet, systemPanel, toast, withButton } from './ui.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (all, name) => (name in vars ? String(vars[name]) : all));
 const at = (time) => timeFormat.format(new Date(time));
-const hoursText = (hours) => (hours === 1 ? '1 godzinę' : `${hours} ${hours % 10 >= 2 && hours % 10 <= 4 && (hours < 10 || hours > 20) ? 'godziny' : 'godzin'}`);
+// "1 godzinę", "4 godziny", "12 godzin" ("1 hour", "4 hours").
+const hoursText = (hours) => countOf(hours, 'godzinę', 'godziny', 'godzin');
 
 // The Karczma's tab with the character's offer and the mercenaries to take
 // along (settlement.js), where the top bar and "Do Karczmy" lead.
@@ -28,10 +30,10 @@ export const mercenaryFee = (perHour, minutes) => Math.max(1, Math.round((perHou
 // The words of the character's offer or service now (its activity of the
 // kind 'mercenary'), the server's with the time filled in here.
 export function serviceText(activity) {
-  const t = state.character.mercenaries?.texts;
+  const words = state.character.mercenaries?.texts;
   const { service } = activity;
-  if (!t || !service) return '';
-  if (activityFinished(activity)) return service.hired ? filled(t.done, { gold: formatNumber(service.hired.gold) }) : t.expired;
+  if (!words || !service) return '';
+  if (activityFinished(activity)) return service.hired ? filled(words.done, { gold: formatNumber(service.hired.gold) }) : words.expired;
   return filled(service.text, { time: at(activity.endsAt) });
 }
 
@@ -41,14 +43,14 @@ export function serviceText(activity) {
 // otherwise null.
 export function serviceWaiting(character = state.character) {
   const activity = character?.activity;
-  const t = character?.mercenaries?.texts;
-  if (!t || activity?.kind !== 'mercenary' || !activityFinished(activity)) return null;
-  return activity.service?.hired ? t.dotPay : t.dotClose;
+  const words = character?.mercenaries?.texts;
+  if (!words || activity?.kind !== 'mercenary' || !activityFinished(activity)) return null;
+  return activity.service?.hired ? words.dotPay : words.dotClose;
 }
 
 // The offer or the service on the Walka screen: it lives in the Karczma.
 export function servicePanel(activity) {
-  return systemPanel(serviceText(activity), h('a', { class: 'button button--system', href: MERCENARIES_HASH, text: 'Do Karczmy' }));
+  return systemPanel(serviceText(activity), h('a', { class: 'button button--system', href: MERCENARIES_HASH, text: t('Do Karczmy') }));
 }
 
 // The Karczma's card (`done` re-renders the place): the form to offer the
@@ -56,9 +58,9 @@ export function servicePanel(activity) {
 export function mercenariesCard(done) {
   const rules = state.character.mercenaries;
   if (!rules) return null;
-  const t = rules.texts;
+  const words = rules.texts;
   const activity = state.character.activity;
-  const head = [h('h2', { class: 'section-title', text: t.offerTitle }), h('p', { class: 'muted', text: t.intro })];
+  const head = [h('h2', { class: 'section-title', text: words.offerTitle }), h('p', { class: 'muted', text: words.intro })];
   if (activity?.kind === 'mercenary') {
     const finished = activityFinished(activity);
     const hired = activity.service?.hired;
@@ -81,7 +83,7 @@ export function mercenariesCard(done) {
       ...head,
       systemPanel(
         serviceText(activity),
-        finished ? act('/api/mercenary/claim', hired ? t.claim : t.close) : hired ? null : act('/api/mercenary/withdraw', t.withdraw),
+        finished ? act('/api/mercenary/claim', hired ? words.claim : words.close) : hired ? null : act('/api/mercenary/withdraw', words.withdraw),
       ),
     );
   }
@@ -100,29 +102,29 @@ export function mercenariesCard(done) {
       },
     }),
   );
-  const price = h('input', { type: 'number', class: 'mercenary-price', inputmode: 'numeric', min, max, step: 1, value: suggested, 'aria-label': t.priceLabel });
+  const price = h('input', { type: 'number', class: 'mercenary-price', inputmode: 'numeric', min, max, step: 1, value: suggested, 'aria-label': words.priceLabel });
   const busy = Boolean(activity);
   return h(
     'section',
     { class: 'stack', 'data-guide': 'tavern-mercenaries' },
     ...head,
-    h('p', { class: 'mercenary-label', text: t.hoursLabel }),
+    h('p', { class: 'mercenary-label', text: words.hoursLabel }),
     h('div', { class: 'mercenary-hours' }, hourButtons),
-    h('label', { class: 'mercenary-label' }, h('span', { text: `${t.priceLabel} (${formatNumber(min)}–${formatNumber(max)} zł)` }), price),
-    busy && h('p', { class: 'muted', text: t.offerBusy }),
+    h('label', { class: 'mercenary-label' }, h('span', { text: t('{label} ({min}–{max} zł)', { label: words.priceLabel, min: formatNumber(min), max: formatNumber(max) }) }), price),
+    busy && h('p', { class: 'muted', text: words.offerBusy }),
     h('button', {
       type: 'button',
       class: 'button button--system',
-      text: t.offer,
+      text: words.offer,
       disabled: busy,
       onClick: async (event) => {
         const button = event.currentTarget;
         const perHour = Math.round(Number(price.value));
         if (!Number.isFinite(perHour) || perHour < min || perHour > max) {
-          toast(filled(t.invalidPrice, { min: formatNumber(min), max: formatNumber(max) }));
+          toast(filled(words.invalidPrice, { min: formatNumber(min), max: formatNumber(max) }));
           return;
         }
-        const sure = await confirmAction({ title: t.confirmTitle, text: filled(t.confirm, { hours: hoursText(hours) }), confirmLabel: t.offer });
+        const sure = await confirmAction({ title: words.confirmTitle, text: filled(words.confirm, { hours: hoursText(hours) }), confirmLabel: words.offer });
         if (!sure) return;
         await withButton(button, async () => {
           await call('POST', '/api/mercenary/offer', { hours, perHour });
@@ -151,9 +153,9 @@ const keepMercenary = (one) => {
 // not let it (the server's requireIdle): its own offer or service, or
 // anything else it is doing; null when it can. Below the mercenaries'
 // level the Karczma has no such tab.
-function hireBlocked(character, t) {
-  if (character.activity?.kind === 'mercenary') return t.hireOwnOffer;
-  return character.activity ? t.hireBusy : null;
+function hireBlocked(character, words) {
+  if (character.activity?.kind === 'mercenary') return words.hireOwnOffer;
+  return character.activity ? words.hireBusy : null;
 }
 
 // The Karczma's list of those waiting to be hired now, as "Opcje wyprawy"
@@ -191,23 +193,23 @@ export function mountMercenaryHire(holder) {
   }
 
   function render() {
-    const t = state.character.mercenaries?.texts;
-    if (!t) {
+    const words = state.character.mercenaries?.texts;
+    if (!words) {
       fill(holder);
       return;
     }
-    const why = hireBlocked(state.character, t);
+    const why = hireBlocked(state.character, words);
     fill(
       holder,
-      h('h2', { class: 'section-title', text: t.hireTitle }),
-      h('p', { class: 'muted', text: t.hireIntro }),
+      h('h2', { class: 'section-title', text: words.hireTitle }),
+      h('p', { class: 'muted', text: words.hireIntro }),
       why && h('p', { class: 'region-warning', text: why }),
       failure
         ? h('p', { class: 'chat-error', role: 'status', text: failure.message })
         : list === null
-          ? h('p', { class: 'muted', text: 'Wczytywanie…' })
+          ? h('p', { class: 'muted', text: t('Wczytywanie…') })
           : list.length === 0
-            ? h('p', { class: 'muted', text: t.none })
+            ? h('p', { class: 'muted', text: words.none })
             : h(
                 'ul',
                 { class: 'stack mercenary-offers' },
@@ -216,8 +218,8 @@ export function mountMercenaryHire(holder) {
                     'li',
                     { class: 'mercenary-offer' },
                     h('span', { class: 'mercenary-row-name', text: `${one.name}, ${one.className}` }),
-                    h('span', { class: 'mercenary-row-line', text: filled(t.row, { level: one.level, classLevel: one.classLevel, price: formatNumber(one.perHour) }) }),
-                    !why && h('button', { type: 'button', class: 'button button--world button--small mercenary-offer-take', text: t.hire, onClick: () => take(one) }),
+                    h('span', { class: 'mercenary-row-line', text: filled(words.row, { level: one.level, classLevel: one.classLevel, price: formatNumber(one.perHour) }) }),
+                    !why && h('button', { type: 'button', class: 'button button--world button--small mercenary-offer-take', text: words.hire, onClick: () => take(one) }),
                   ),
                 ),
               ),
@@ -245,7 +247,7 @@ export function mountMercenaryHire(holder) {
 // changed meanwhile (the server's words say so).
 const GONE = new Set(['mercenary_gone', 'mercenary_changed', 'mercenary_spread', 'own_mercenary', 'invalid_mercenary']);
 export function mercenaryChoice(minutesNow, onChange) {
-  const t = state.character.mercenaries.texts;
+  const words = state.character.mercenaries.texts;
   let chosen = takenMercenary();
   const element = h('div', { class: 'mercenary-choice' });
   const feeOf = (one) => mercenaryFee(one.perHour, minutesNow());
@@ -261,10 +263,10 @@ export function mercenaryChoice(minutesNow, onChange) {
       const { mercenaries } = await call('GET', `/api/mercenaries?minutes=${minutes}`);
       const gold = state.character.gold;
       openSheet(
-        h('h2', { class: 'sheet-title', text: t.pickTitle }),
-        h('p', { class: 'sheet-text', text: `Cena za ${formatMinutes(minutes)} wyprawy. Masz ${formatNumber(gold)} zł.` }),
+        h('h2', { class: 'sheet-title', text: words.pickTitle }),
+        h('p', { class: 'sheet-text', text: t('Cena za {time} wyprawy. Masz {gold} zł.', { time: formatMinutes(minutes), gold: formatNumber(gold) }) }),
         mercenaries.length === 0
-          ? h('p', { class: 'muted', text: t.none })
+          ? h('p', { class: 'muted', text: words.none })
           : h(
               'div',
               { class: 'stack mercenary-list' },
@@ -281,30 +283,30 @@ export function mercenaryChoice(minutesNow, onChange) {
                     },
                   },
                   h('span', { class: 'mercenary-row-name', text: `${one.name}, ${one.className}` }),
-                  h('span', { class: 'mercenary-row-line', text: filled(t.row, { level: one.level, classLevel: one.classLevel, price: formatNumber(one.perHour) }) }),
-                  h('span', { class: 'mercenary-row-fee', text: `${formatNumber(feeOf(one))} zł` }),
+                  h('span', { class: 'mercenary-row-line', text: filled(words.row, { level: one.level, classLevel: one.classLevel, price: formatNumber(one.perHour) }) }),
+                  h('span', { class: 'mercenary-row-fee', text: t('{gold} zł', { gold: formatNumber(feeOf(one)) }) }),
                 ),
               ),
             ),
-        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: 'Zamknij', onClick: closeSheet })),
+        h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Zamknij'), onClick: closeSheet })),
       );
     });
   function render() {
     fill(
       element,
-      h('p', { class: 'mercenary-choice-title', text: t.pickTitle }),
-      h('p', { class: 'muted mercenary-choice-note', text: t.pickHint }),
+      h('p', { class: 'mercenary-choice-title', text: words.pickTitle }),
+      h('p', { class: 'muted mercenary-choice-note', text: words.pickHint }),
       chosen
         ? h(
             'div',
             { class: 'mercenary-chosen' },
-            h('span', { text: filled(t.chosen, { name: chosen.name, gold: formatNumber(feeOf(chosen)) }) }),
+            h('span', { text: filled(words.chosen, { name: chosen.name, gold: formatNumber(feeOf(chosen)) }) }),
             // The length chosen may ask more than the character has.
-            state.character.gold < feeOf(chosen) && h('span', { class: 'region-warning mercenary-chosen-short', text: t.noGold }),
-            h('button', { type: 'button', class: 'button button--world button--small', text: t.change, onClick: pick }),
-            h('button', { type: 'button', class: 'button button--world button--small', text: t.remove, onClick: () => choose(null) }),
+            state.character.gold < feeOf(chosen) && h('span', { class: 'region-warning mercenary-chosen-short', text: words.noGold }),
+            h('button', { type: 'button', class: 'button button--world button--small', text: words.change, onClick: pick }),
+            h('button', { type: 'button', class: 'button button--world button--small', text: words.remove, onClick: () => choose(null) }),
           )
-        : h('button', { type: 'button', class: 'button button--world button--small', text: t.pick, onClick: pick }),
+        : h('button', { type: 'button', class: 'button button--world button--small', text: words.pick, onClick: pick }),
     );
   }
   render();

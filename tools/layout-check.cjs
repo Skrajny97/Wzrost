@@ -83,7 +83,7 @@ const SCREENS = [
   '#/encyklopedia',
   '#/dziennik',
 ];
-// The screens already in English (data/en/scope.json, stages 2 and 3 of
+// The screens already in English (data/en/scope.json, stages 2 to 4 of
 // the English beta): in English the check lists the Polish words left on
 // them, as on the screens before the game.
 const TRANSLATED = new Set([
@@ -96,6 +96,13 @@ const TRANSLATED = new Set([
   '#/profesje',
   '#/oboz',
   '#/oboz/craft-table',
+  '#/oboz/quarters',
+  '#/osada',
+  '#/osada/board',
+  '#/osada/tavern',
+  '#/osada/tavern/companions',
+  '#/osada/tavern/mercenaries',
+  '#/osada/trial-hall',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
   '#/sklep',
@@ -116,8 +123,8 @@ const TABS = { '#/oboz/craft-table': [said('Kolejka ({count}/{limit})').replace(
 // the page makes smaller on a canvas and shows on it, "Usuń zrzut" under it.
 const SHEETS = {
   '#/oboz/quarters': [
-    { name: 'Załóż z plecaka', tap: 'button:text-is("Załóż z plecaka")', ready: '.item-list:has(.wear-choice)' },
-    { name: 'porównanie', tap: '#sheet .item-list > li:first-child .wear-choice > summary', ready: '.wear-choice[open] .compare' },
+    { name: 'Załóż z plecaka', tap: `button:text-is("${said('Załóż z plecaka')}")`, ready: '.item-list:has(.wear-choice)', words: true },
+    { name: 'porównanie', tap: '#sheet .item-list > li:first-child .wear-choice > summary', ready: '.wear-choice[open] .compare', words: true },
   ],
   '#/postac': [
     { name: 'Ustawienia', tap: '.topbar .settings-button', ready: `h2.sheet-title:text-is("${said('Ustawienia')}")`, words: true },

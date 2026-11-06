@@ -22,6 +22,7 @@
 import { resourceArt, salonArt } from './art.js';
 import { h } from './dom.js';
 import { formatDecimal, formatNumber } from './format.js';
+import { language, t } from './i18n.js';
 import { motionOn } from './motion.js';
 import { openProfile } from './profile.js';
 import { playSound } from './sound.js';
@@ -37,10 +38,10 @@ const say = (text, values = {}) =>
 // A chance as a percent, "50", "0,5".
 const percent = (chance) => formatDecimal(chance * 100);
 
-// A day of the draws ("2026-11-02") as "2.11".
+// A day of the draws ("2026-11-02") as "2.11", in English "2/11".
 const dayLabel = (key) => {
   const [, month, day] = key.split('-').map(Number);
-  return `${day}.${month}`;
+  return language() === 'en' ? `${day}/${month}` : `${day}.${month}`;
 };
 
 // A prize's name in one line: an item's own, materials with their count.
@@ -211,7 +212,7 @@ export function mountCasino(holder) {
     const names = { lottery: casino.lottery.name, wheel: casino.wheel.name };
     return h(
       'div',
-      { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': 'Salon Gier' },
+      { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': t('Salon Gier') },
       ['lottery', 'wheel'].map((id) =>
         h(
           'button',
@@ -294,7 +295,7 @@ export function mountCasino(holder) {
         : h('button', {
             type: 'button',
             class: 'button button--world',
-            text: short ? 'Brakuje złota' : say(texts.lotteryBuy, { ticket: lottery.ticket }),
+            text: short ? t('Brakuje złota') : say(texts.lotteryBuy, { ticket: lottery.ticket }),
             disabled: short,
             onClick: (event) =>
               withButton(event.currentTarget, async () => {
@@ -355,15 +356,15 @@ export function mountCasino(holder) {
       max: stakes.length - 1,
       step: 1,
       value: at,
-      'aria-label': 'Stawka',
-      'aria-valuetext': `${formatNumber(stake)} zł`,
+      'aria-label': t('Stawka'),
+      'aria-valuetext': t('{gold} zł', { gold: formatNumber(stake) }),
       vars: { '--fill': fill(at) },
       onInput: () => {
         const index = Number(slider.value);
         label.textContent = stakeText(stakes[index]);
         chances.textContent = oddsText(stakes[index]);
         slider.style.setProperty('--fill', fill(index));
-        slider.setAttribute('aria-valuetext', `${formatNumber(stakes[index])} zł`);
+        slider.setAttribute('aria-valuetext', t('{gold} zł', { gold: formatNumber(stakes[index]) }));
       },
       onChange: () => choose(stakes[Number(slider.value)]),
     });
@@ -384,7 +385,7 @@ export function mountCasino(holder) {
         : h('button', {
             type: 'button',
             class: 'button button--world',
-            text: short ? 'Brakuje złota' : say(texts.wheelSpin, { stake }),
+            text: short ? t('Brakuje złota') : say(texts.wheelSpin, { stake }),
             disabled: short || blocked,
             onClick: (event) =>
               withButton(event.currentTarget, async () => {
@@ -407,14 +408,14 @@ export function mountCasino(holder) {
         label,
         chances,
         // With one stake of the day there is nothing to step through.
-        stakes.length > 1 && h('div', { class: 'duration-row' }, stepButton(-1, 'Mniejsza stawka'), slider, stepButton(1, 'Większa stawka')),
+        stakes.length > 1 && h('div', { class: 'duration-row' }, stepButton(-1, t('Mniejsza stawka')), slider, stepButton(1, t('Większa stawka'))),
         wheel.left > 0 && blocked && h('p', { class: 'region-warning', text: texts.wheelBag }),
         spin,
         result &&
           h(
             'div',
             { class: `casino-result${result.win ? ' casino-result--win' : ''}`, role: 'status' },
-            h('p', { class: 'settlement-greeting', text: `„${result.words}”` }),
+            h('p', { class: 'settlement-greeting', text: t('„{line}”', { line: result.words }) }),
             h('p', { class: 'casino-result-text', text: result.text }),
           ),
         howItWorks(null, [say(texts.wheelAbout, { step: wheel.step, low: percent(wheel.none.low), high: percent(wheel.none.high) }), texts.wheelPoolAbout]),
@@ -431,7 +432,7 @@ export function mountCasino(holder) {
       return;
     }
     if (!casino) {
-      holder.replaceChildren(h('p', { class: 'muted', text: 'Wczytywanie Salonu Gier…' }));
+      holder.replaceChildren(h('p', { class: 'muted', text: t('Wczytywanie Salonu Gier…') }));
       return;
     }
     holder.replaceChildren(h('div', { class: 'stack' }, tabs(), tab === 'lottery' ? lotteryCard() : wheelCard()));
