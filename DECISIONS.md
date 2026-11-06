@@ -3034,6 +3034,38 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.95 (6.11.2026)
+
+- Angielska wersja beta, etap 4: po angielsku jest wszystko, co gracz może zobaczyć, poza Panelem autora, narzędziami testowymi i wpisami „Co nowego?”. Tylko na wersji testowej: zob. „Angielska wersja beta, etap 4: cała reszta gry”.
+- W grze: strona Wież mieści się na telefonie 320 px (była o 42 px szersza), a zasady Bestii Gildii mówią, że atakuje się także w trakcie wyprawy (było nieaktualne zdanie sprzed 0.1.29).
+- Odpowiedzi autora 713 A i 714 A: zob. „Odpowiedzi autora 713 i 714”.
+
+## Angielska wersja beta, etap 4: cała reszta gry (668, 712; 6.11.2026, od 0.1.95)
+
+Etap 4 z planu angielskiej bety (668), po słowach autora: „to co jest dostępne musi być w całości przetłumaczone, choćby i etapami” (712). Jak w etapach 1–3 angielski działa tylko tam, gdzie przełącznik `ENGLISH` jest włączony (wersja testowa i praca lokalna).
+
+1. **Co doszło po angielsku**
+    - Krainy od 26. poziomu: Kamienna Polana, Zarośnięte Starorzecza, Torfowiska, Czarne Bagno, Sosnowe Wydmy, Szumiący Bór i Ostępy Nowiu z miejscami, 133 stworami (z elitami i czempionami), ich materiałami i nazwami przedmiotów, oraz zdarzenia z Kwiatem paproci.
+    - Osada: mieszkańcy, Tablica zleceń z Poszukiwanymi, Bractwa, Karczma z plotkami, towarzysze z rozmowami, najemnicy, Stajnia, Targowisko, Garbarnia, Kuźnia, Zaklinaczka, Pustelnik, Zielarka, Sala prób i Salon Gier; Górnictwo i Jubilerstwo z minerałami.
+    - Gildia ze wszystkimi zakładkami (Siedziba, Wyprawa, Bestia, Próby, Prośby, Wymiana, Sława w Rankingu), Wieże, Warownia z budynkami, Ewolucje (pierwsze i drugie, z cechami i umiejętnościami) i wszystkie podstawy przedmiotów do Tieru VI, tytuły muzyki.
+    - Pozostałe rozdziały narratora: Osada, Górnictwo, Wieże, Gildia, Warownia, Kamień węgielny, Trudna wyprawa, Skrzynia Konta, Zbieracz Systemu, Omdlenie i Ewolucja (65 kwestii). Na razie jako tekst, a przed nagraniem w etapie 5 autor je zatwierdza (715).
+    - Serwer i silnik tych części: błędy, potwierdzenia i zdania silnika (premie Bractw, Wieże, Sala prób, Siedziba), liczby po angielsku („12,345”) w tekstach serwera (`numberText`, `src/server/i18n.js`).
+2. **Zostaje po polsku na stałe:** Panel autora, narzędzia testowe i wpisy „Co nowego?” (pisze je autor), a także imiona: towarzyszy, mieszkańców, wyjętych spod prawa i graczy. `tools/i18n-check.mjs --all` nie liczy już tego, co jest celowo po polsku (wpisy `!` w `scope.json`), więc wypisuje tylko te trzy części.
+3. **Słowiańskie istoty (692 B):** zostają przy swoich imionach, w zwyczajowym angielskim zapisie, jeśli taki jest (Likho, Strzyga, Kikimora, Zmey, Poludnitsa, Rarog), a inaczej według liter słownika (Topielitsa, Utopiets, Vodnik, Latavets, Khokhow, Kwobuk). Zwykłe zwierzęta i stwory wymyślone w grze mają angielskie nazwy (Stoneling, Resin Golem, Barrow-Wight, Nightjar).
+4. **Nazwy spoza słownika** (najważniejsze; słownik bez zmian): Siedziba Gildii → Guild Hall (zakładka „Hall”), zakładka Wymiana w Gildii → Exchange, lider / zastępca → leader / deputy, Wieża Solo / Wieża Drużyn → Solo Tower / Party Tower, Plac treningowy → Training Yard, Ołtarz Systemu → System Altar, Szklarnia → Greenhouse, Bractwo Łowców / Kowali → Brotherhood of Hunters / Smiths, Akceptacja Bractw → Brotherhood standings, Kufel → Tankard, Koło Fortuny → Wheel of Fortune, Systemowa Kopalnia → System Mine, Szlifiernia → Gem Workshop. Formy żeńskie ewolucji są po angielsku takie same jak męskie, poza Thunder Lady, Winter Lady i High Priestess.
+5. **Zasady angielskiego:** „ma {x%} szans” → „… ({x%} chance)”, bo „a 85%” byłoby błędem (poprawione też w umiejętnościach z etapu 3). Piętra Wież bez liczebników porządkowych („every {n} floors”). Kufel, zlecenia i plotki z nazwą stwora: „the {creature}”.
+6. **Zapisane w bazie teksty:** historie zleceń na Tablicy i nazwy listów gończych zapisują się po polsku, a strona pokazuje je w swoim języku (po numerze historii i z danych), więc zmiana języka nie zmienia już zapisanych zleceń. Zostaje w języku, w którym powstało: nazwa zestawu ekwipunku w Warowni („Zestaw 1”), przedmiot w toku oprawiania kamienia, raporty Wież i Sali prób oraz ogłoszenie Loterii na czacie (o północy, po polsku).
+7. **Pilnowanie:** `tools/layout-check.cjs` ogląda też Wieże i Ewolucję, a po angielsku (`--lang en`) wypisuje polskie słowa ze wszystkich ekranów gry. `test/i18n-stage4.test.js` sprawdza błędy i zdania silnika tych części w obu językach.
+8. **Podział pracy:** ośmiu pomocników w osobnych gałęziach (dwie części krain, dane Osady, dane Gildii z Wieżami i Warownią, Ewolucje z przedmiotami, ekrany Osady, ekrany Gildii, serwer z silnikiem). Gałęzie scalono w jedną, bez podwójnych kluczy w `strings.json`; nazwy stworów w listach gończych ujednolicono z krainami (np. „Black Utopiets”, „Wedding Khokhow”).
+9. **Do decyzji autora (nic nie zmienione):** w kwestii narratora „settlement-brotherhoods” brakuje przecinka („respekt, jaki budzisz”), Ewolucja Bastion ma przy „Nieugiętym” pancerz i odbicie jakby zamienione miejscami względem „Niezłomnego”, a komunikat Zaklinaczki „Najpierw wybierz afiks z poprzedniego zaklęcia” mówi „zaklęcie” o przekuciu.
+
+## Odpowiedzi autora 713 i 714 (6.11.2026)
+
+Autor: „713 A, 714 A”.
+
+1. **713 A:** czat zostaje z osobnym kanałem „English” jako trzecią zakładką (na stronie po angielsku pierwszą), jak na wersji testowej od 0.1.91.
+2. **714 A:** pod wiadomością w innym języku niż strona gracza przycisk „A→ Przetłumacz”; po dotknięciu pod oryginałem tłumaczenie z dopiskiem „Tłumaczenie maszynowe” i przycisk „A→ Oryginał”. Na wszystkich kanałach i w rozmowach prywatnych, do 100 tłumaczeń dziennie na gracza. Tłumaczy Workers AI w Cloudflare (model m2m100), każda wiadomość raz na język, zapisana. Budowa po etapie 4.
+
 ## Wersja 0.1.94 (6.11.2026)
 
 - Stół rozbiórki: pod zaznaczonym materiałem wybiera się liczbę sztuk: zob. „Stół rozbiórki: liczba sztuk zaznaczonego materiału”.

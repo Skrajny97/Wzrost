@@ -275,6 +275,11 @@
       "id": "0.1.94",
       "title": "Wersja 0.1.94",
       "body": "- Stół rozbiórki: pod zaznaczonym materiałem wybierzesz, ile sztuk przerobić, a nie tylko cały stos."
+    },
+    {
+      "id": "0.1.95",
+      "title": "Wersja 0.1.95",
+      "body": "- Strona Wież mieści się na wąskich telefonach.\n- Zasady Bestii Gildii mówią już, że atakujesz ją także w trakcie wyprawy."
     }
 ]
 }

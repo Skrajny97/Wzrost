@@ -195,7 +195,7 @@
       "rules": [
         "Bestia to czempion jednej z krain, na średnim poziomie członków gildii. Im więcej członków, tym więcej ma HP.",
         "Każda postać atakuje {attacks} razy dziennie, osobno od wejść do Wież. Nowe ataki przychodzą o północy.",
-        "Atak to jedna walka z pełnym HP i bez mikstur, z wynikiem od razu. Nie daje XP, złota ani łupów. W czasie wyprawy i przed odebraniem jej raportu bestia czeka.",
+        "Atak to jedna walka z pełnym HP i bez mikstur, z wynikiem od razu. Nie daje XP, złota ani łupów. Atakujesz także w trakcie wyprawy.",
         "Bestia zostaje do niedzieli, do północy. W poniedziałek przychodzi nowa.",
         "Każda postać, która choć raz zaatakuje bestię, dostaje Skrzynię Bestii. Gdy bestia padnie, w skrzyni czeka przedmiot klasy postaci na jej poziomie i materiały bestii.",
         "Gdy bestia przetrwa tydzień, w skrzyni są same materiały: tym więcej, im więcej paska zbiła gildia (od 25, 50 i 75%). Poniżej 25% skrzyni nie ma.",
