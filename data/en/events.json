@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/events.json (src/engine/overlay.js): the events that can happen in the first region, with every step, case and outcome, their shared texts and the events' foes. The `classes` and `xpFoes` of an option are ids, not texts.",
+  "$comment": "English texts of data/events.json (src/engine/overlay.js): every event, with every step, case and outcome, their shared texts and the events' foes. The `classes` and `xpFoes` of an option are ids, not texts.",
   "texts": {
     "loot": [
       "The defeated left behind: {item}.",
@@ -63,6 +63,88 @@
             "help": {
               "text": "You dress her wound and help her up. To thank you, the woman gives you something she found in the forest: {item}."
             }
+          }
+        }
+      }
+    },
+    "fern-flower": {
+      "title": "Fern Flower",
+      "text": "Among the ferns beneath a mossy boulder, a red light glows. It is the fern flower they tell of in every village: whoever picks it will never be forsaken by luck. Something stirred between the boulders.",
+      "options": {
+        "pick": {
+          "label": "Pick the flower"
+        },
+        "watch": {
+          "label": "Watch from hiding"
+        },
+        "leave": {
+          "label": "Leave",
+          "outcome": {
+            "text": "Not all luck is worth its price. You walk away, and the red light fades behind your back."
+          }
+        }
+      },
+      "cases": {
+        "guarded": {
+          "name": "Likho guards the flower",
+          "outcomes": {
+            "pick": {
+              "text": "As you reach for the flower, the Likho steps out from behind a boulder: gaunt, one-eyed, its hand stretched out for the luck of others.",
+              "start": "{enemies} stands between you and the flower."
+            },
+            "watch": {
+              "text": "The Likho steps out from behind a boulder. It looks the flower over with its one eye, sniffs and vanishes among the stones. You pick the flower, and in your hand it turns into gold coins (+{gold})."
+            }
+          }
+        },
+        "free": {
+          "name": "Unguarded flower",
+          "outcomes": {
+            "pick": {
+              "item": {
+                "name": "Picking: an item",
+                "text": "You pick the flower. It blooms in your hand and crumbles into red dust. Something is left in your palm: {item}."
+              },
+              "blossom": {
+                "name": "Picking: a Fern Flower",
+                "text": "You pick the flower. It does not fade or crumble into dust: it glows in your hand with a warm red light. You tuck it carefully into your bag (+1 Fern Flower)."
+              }
+            },
+            "watch": {
+              "text": "You wait in hiding, but nothing happens. Towards morning the flower fades and vanishes, as if it had never been there."
+            }
+          }
+        }
+      }
+    },
+    "fern-flower-calm": {
+      "name": "Fern Flower without the Likho",
+      "title": "Fern Flower",
+      "text": "Among the ferns, a red light glows. It is the fern flower they tell of in every village: whoever picks it will never be forsaken by luck.",
+      "options": {
+        "pick": {
+          "label": "Pick the flower",
+          "outcome": {
+            "item": {
+              "name": "Picking: an item",
+              "text": "You pick the flower. It blooms in your hand and crumbles into red dust. Something is left in your palm: {item}."
+            },
+            "blossom": {
+              "name": "Picking: a Fern Flower",
+              "text": "You pick the flower. It does not fade or crumble into dust: it glows in your hand with a warm red light. You tuck it carefully into your bag (+1 Fern Flower)."
+            }
+          }
+        },
+        "watch": {
+          "label": "Watch from hiding",
+          "outcome": {
+            "text": "You wait in hiding, but nothing happens. Towards morning the flower fades and vanishes, as if it had never been there."
+          }
+        },
+        "leave": {
+          "label": "Leave",
+          "outcome": {
+            "text": "Not all luck is worth its price. You walk away, and the red light fades behind your back."
           }
         }
       }

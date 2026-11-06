@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/regions.json (src/engine/overlay.js): the first region, Wiatrołomy, with its places, and the cards of the other regions (name, description, land), as the Combat tab shows them all; their places come in later stages. The name of a land is the same in all of its regions, as the casino groups the places of a land by it (src/engine/casino.js).",
+  "$comment": "English texts of data/regions.json (src/engine/overlay.js): each region's card (name, description, land, trait), as the Combat tab shows them all, and its places. The name of a land is the same in all of its regions, as the casino groups the places of a land by it (src/engine/casino.js).",
   "windfalls": {
     "land": "Edge of the Wilds",
     "name": "Windfalls",
@@ -38,6 +38,28 @@
     "trait": {
       "name": "Stone Circle",
       "description": "The character at the front has 5% more armour."
+    },
+    "areas": {
+      "mossy-boulders": {
+        "name": "Mossy Boulders",
+        "description": "The outer ring of moss-covered stones. Some boulders wake to life, the moss sometimes rises by itself, bats sleep in the cracks, and an imp leaps from stone to stone."
+      },
+      "spider-gully": {
+        "name": "Spider Gully",
+        "description": "A narrow gully shrouded in cobwebs. Spiders wait in their webs, a cross spider strings its nets above the gully, tarantulas hunt among the boulders, a fresh brood pours out from under the stones, and in the deepest burrow lives the birdeater."
+      },
+      "lynx-ridge": {
+        "name": "Lynx Ridge",
+        "description": "A rocky ridge above the clearing. Lynxes lurk on the ledges and drop onto their prey from above, mouflons walk the steep paths, an eagle owl circles over them, and a falcon plunges from the sky."
+      },
+      "wolf-circles": {
+        "name": "Wolf Circles",
+        "description": "Clearings where the packs howl. She-wolves hunt together, led by an alpha wolf. A werewolf runs with the wolves, and a wolf shepherd herds them."
+      },
+      "glade-heart": {
+        "name": "Heart of the Glade",
+        "description": "The middle of the stone circle. Everything here is bigger and more dangerous: a bear lives in the thicket, the last aurochs grazes, an Aesculapian snake winds through the grass, and at night a Strzyga flies. Among the boulders stand stone animals that no one ever carved."
+      }
     }
   },
   "backwaters": {
@@ -47,6 +69,28 @@
     "trait": {
       "name": "Reed Beds",
       "description": "The character at the back of the line has 5% more dodge, hiding among the reeds."
+    },
+    "areas": {
+      "reed-beds": {
+        "name": "Reed Marsh",
+        "description": "A belt of reeds by the first water. Herons wade in the shallows, otters have trodden paths through the reeds, and giant mosquitoes whine above the water. Some clumps of reeds walk on their own."
+      },
+      "beaver-dams": {
+        "name": "Beaver Dams",
+        "description": "Beavers have dammed the streams and flooded the forest. They defend their lodges, swarms of mosquitoes hang over the water, eels hide in the mud, and an eagle keeps watch from the dead trees."
+      },
+      "drowned-forest": {
+        "name": "Drowned Forest",
+        "description": "Dead trees stand knee-deep in water. Cormorants perch on the dry branches, a catfish lurks in the shadow of the trunks, and what looks like a log is sometimes a crocodile."
+      },
+      "willow-isles": {
+        "name": "Willow Isles",
+        "description": "Islands of old willows in the mist. Wraiths and mistlings drift between the trunks, phantasms emerge from the vapours, willow spirits rustle in the treetops, and at night a Topielitsa dances on the water."
+      },
+      "old-riverbed": {
+        "name": "Old Riverbed",
+        "description": "The old bed of the river, deep and dark. Bones lie in the mud, Utopietses and sludgers climb out of the water, and mud goblins collect anything that glitters. Here lives the Vodnik, who keeps the souls of the drowned in jars."
+      }
     }
   },
   "peat-bogs": {
@@ -56,6 +100,28 @@
     "trait": {
       "name": "Peat Fumes",
       "description": "Poison lasts one turn longer, for creatures and characters alike."
+    },
+    "areas": {
+      "crane-meadows": {
+        "name": "Crane Meadows",
+        "description": "Open moss bogs where cranes dance and black grouse battle over their courting grounds. Water lies under the moss, so every step sinks, and elk wade here chest-deep."
+      },
+      "leech-pools": {
+        "name": "Leech Pools",
+        "description": "Windows of black water in the peat, full of leeches and crayfish. Diving beetles hunt in the depths, and a marsh harrier circles above the water."
+      },
+      "sundew-field": {
+        "name": "Sundew Field",
+        "description": "Moss red with sundews that catch insects. Peatlings stride between the tussocks, a great owl hunts without a sound at night, and the fumes make your head spin."
+      },
+      "smoldering-peat": {
+        "name": "Smouldering Peat",
+        "description": "The peat smoulders underground, and acrid smoke pours from the holes, with a reek hiding in it. At night will-o'-the-wisps wander between the tussocks, salamanders warm themselves in the hot ash, and a Zmey nests in the embers."
+      },
+      "old-diggings": {
+        "name": "Old Diggings",
+        "description": "An abandoned peat pit with log walkways. Peat cutters the bog never gave back still dig here, the Skarbnik wanders with his lantern, worms bore through the walls, rats scurry along the passages, and at the bottom of the pit the peat itself comes alive."
+      }
     }
   },
   "black-bog": {

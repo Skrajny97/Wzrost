@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/affixes.json (src/engine/overlay.js): the words the first region's creatures give an item's name, by the creature, before the base (one word for every gender) and after it, and the suffixes named after no creature (src/engine/items.js, itemName): \"Wolf Sword of the Raven\".",
+  "$comment": "English texts of data/affixes.json (src/engine/overlay.js): the words the creatures give an item's name, by the creature, before the base (one word for every gender) and after it, and the suffixes named after no creature (src/engine/items.js, itemName): \"Wolf Sword of the Raven\".",
   "suffixes": {
     "mire": {
       "text": "of the Mire"
@@ -200,6 +200,447 @@
         "pl": "Stork"
       },
       "suffix": "of the Stork"
+    },
+    "lynx": {
+      "prefix": {
+        "m": "Lynx",
+        "f": "Lynx",
+        "n": "Lynx",
+        "pl": "Lynx"
+      },
+      "suffix": "of the Lynx"
+    },
+    "spider": {
+      "prefix": {
+        "m": "Spider",
+        "f": "Spider",
+        "n": "Spider",
+        "pl": "Spider"
+      },
+      "suffix": "of the Spider"
+    },
+    "tarantula": {
+      "prefix": {
+        "m": "Tarantula",
+        "f": "Tarantula",
+        "n": "Tarantula",
+        "pl": "Tarantula"
+      },
+      "suffix": "of the Tarantula"
+    },
+    "spiderlings": {
+      "suffix": "of the Brood"
+    },
+    "bird-eater": {
+      "suffix": "of the Birdeater"
+    },
+    "alpha-wolf": {
+      "prefix": {
+        "m": "Alpha",
+        "f": "Alpha",
+        "n": "Alpha",
+        "pl": "Alpha"
+      },
+      "suffix": "of the Alpha"
+    },
+    "bear": {
+      "prefix": {
+        "m": "Bear",
+        "f": "Bear",
+        "n": "Bear",
+        "pl": "Bear"
+      },
+      "suffix": "of the Bear"
+    },
+    "likho": {
+      "suffix": "of the Likho"
+    },
+    "stoneling": {
+      "prefix": {
+        "m": "Stone",
+        "f": "Stone",
+        "n": "Stone",
+        "pl": "Stone"
+      },
+      "suffix": "of the Stoneling"
+    },
+    "bat": {
+      "suffix": "of the Bat"
+    },
+    "eagle-owl": {
+      "prefix": {
+        "m": "Eagle Owl",
+        "f": "Eagle Owl",
+        "n": "Eagle Owl",
+        "pl": "Eagle Owl"
+      },
+      "suffix": "of the Eagle Owl"
+    },
+    "she-wolf": {
+      "suffix": "of the She-Wolf"
+    },
+    "basilisk": {
+      "prefix": {
+        "m": "Basilisk",
+        "f": "Basilisk",
+        "n": "Basilisk",
+        "pl": "Basilisk"
+      },
+      "suffix": "of the Basilisk"
+    },
+    "heron": {
+      "suffix": "of the Heron"
+    },
+    "otter": {
+      "prefix": {
+        "m": "Otter",
+        "f": "Otter",
+        "n": "Otter",
+        "pl": "Otter"
+      },
+      "suffix": "of the Otter"
+    },
+    "giant-mosquito": {
+      "prefix": {
+        "m": "Mosquito",
+        "f": "Mosquito",
+        "n": "Mosquito",
+        "pl": "Mosquito"
+      },
+      "suffix": "of the Giant Mosquito"
+    },
+    "reedling": {
+      "prefix": {
+        "m": "Reed",
+        "f": "Reed",
+        "n": "Reed",
+        "pl": "Reed"
+      },
+      "suffix": "of the Reedling"
+    },
+    "beaver": {
+      "prefix": {
+        "m": "Beaver",
+        "f": "Beaver",
+        "n": "Beaver",
+        "pl": "Beaver"
+      },
+      "suffix": "of the Beaver"
+    },
+    "mosquitoes": {
+      "suffix": "of Mosquitoes"
+    },
+    "eel": {
+      "prefix": {
+        "m": "Eel",
+        "f": "Eel",
+        "n": "Eel",
+        "pl": "Eel"
+      },
+      "suffix": "of the Eel"
+    },
+    "eagle": {
+      "prefix": {
+        "m": "Eagle",
+        "f": "Eagle",
+        "n": "Eagle",
+        "pl": "Eagle"
+      },
+      "suffix": "of the Eagle"
+    },
+    "cormorant": {
+      "suffix": "of the Cormorant"
+    },
+    "catfish": {
+      "suffix": "of the Catfish"
+    },
+    "toad": {
+      "prefix": {
+        "m": "Toad",
+        "f": "Toad",
+        "n": "Toad",
+        "pl": "Toad"
+      },
+      "suffix": "of the Toad"
+    },
+    "crocodile": {
+      "prefix": {
+        "m": "Crocodile",
+        "f": "Crocodile",
+        "n": "Crocodile",
+        "pl": "Crocodile"
+      },
+      "suffix": "of the Crocodile"
+    },
+    "willow-spirit": {
+      "prefix": {
+        "m": "Willow",
+        "f": "Willow",
+        "n": "Willow",
+        "pl": "Willow"
+      },
+      "suffix": "of the Willow"
+    },
+    "wraith": {
+      "suffix": "of the Wraith"
+    },
+    "mistling": {
+      "prefix": {
+        "m": "Misty",
+        "f": "Misty",
+        "n": "Misty",
+        "pl": "Misty"
+      },
+      "suffix": "of the Mistling"
+    },
+    "drowned-maiden": {
+      "suffix": "of the Topielitsa"
+    },
+    "skeleton": {
+      "prefix": {
+        "m": "Bone",
+        "f": "Bone",
+        "n": "Bone",
+        "pl": "Bone"
+      },
+      "suffix": "of the Skeleton"
+    },
+    "drowner": {
+      "suffix": "of the Utopiets"
+    },
+    "sludger": {
+      "prefix": {
+        "m": "Sludge",
+        "f": "Sludge",
+        "n": "Sludge",
+        "pl": "Sludge"
+      },
+      "suffix": "of the Sludger"
+    },
+    "mud-goblin": {
+      "prefix": {
+        "m": "Goblin",
+        "f": "Goblin",
+        "n": "Goblin",
+        "pl": "Goblin"
+      },
+      "suffix": "of the Goblin"
+    },
+    "water-spirit": {
+      "suffix": "of the Vodnik"
+    },
+    "crane": {
+      "prefix": {
+        "m": "Crane",
+        "f": "Crane",
+        "n": "Crane",
+        "pl": "Crane"
+      },
+      "suffix": "of the Crane"
+    },
+    "elk": {
+      "prefix": {
+        "m": "Elk",
+        "f": "Elk",
+        "n": "Elk",
+        "pl": "Elk"
+      },
+      "suffix": "of the Elk"
+    },
+    "leech": {
+      "suffix": "of the Leech"
+    },
+    "harrier": {
+      "suffix": "of the Harrier"
+    },
+    "crayfish": {
+      "prefix": {
+        "m": "Crayfish",
+        "f": "Crayfish",
+        "n": "Crayfish",
+        "pl": "Crayfish"
+      },
+      "suffix": "of the Crayfish"
+    },
+    "sundew": {
+      "suffix": "of the Sundew"
+    },
+    "peatling": {
+      "prefix": {
+        "m": "Peat",
+        "f": "Peat",
+        "n": "Peat",
+        "pl": "Peat"
+      },
+      "suffix": "of the Peatling"
+    },
+    "will-o-wisp": {
+      "prefix": {
+        "m": "Fiery",
+        "f": "Fiery",
+        "n": "Fiery",
+        "pl": "Fiery"
+      },
+      "suffix": "of the Will-o'-the-Wisp"
+    },
+    "salamander": {
+      "suffix": "of the Salamander"
+    },
+    "peat-cutter": {
+      "prefix": {
+        "m": "Peat Cutter's",
+        "f": "Peat Cutter's",
+        "n": "Peat Cutter's",
+        "pl": "Peat Cutter's"
+      },
+      "suffix": "of the Peat Cutter"
+    },
+    "bog-worm": {
+      "suffix": "of the Worm"
+    },
+    "kikimora": {
+      "suffix": "of the Kikimora"
+    },
+    "mud-lord": {
+      "prefix": {
+        "m": "Bog",
+        "f": "Bog",
+        "n": "Bog",
+        "pl": "Bog"
+      },
+      "suffix": "of the Mud King"
+    },
+    "mossling": {
+      "prefix": {
+        "m": "Moss",
+        "f": "Moss",
+        "n": "Moss",
+        "pl": "Moss"
+      },
+      "suffix": "of the Mossling"
+    },
+    "imp": {
+      "prefix": {
+        "m": "Imp",
+        "f": "Imp",
+        "n": "Imp",
+        "pl": "Imp"
+      },
+      "suffix": "of the Imp"
+    },
+    "cross-spider": {
+      "prefix": {
+        "m": "Cross Spider",
+        "f": "Cross Spider",
+        "n": "Cross Spider",
+        "pl": "Cross Spider"
+      },
+      "suffix": "of the Cross Spider"
+    },
+    "mouflon": {
+      "prefix": {
+        "m": "Mouflon",
+        "f": "Mouflon",
+        "n": "Mouflon",
+        "pl": "Mouflon"
+      },
+      "suffix": "of the Mouflon"
+    },
+    "falcon": {
+      "prefix": {
+        "m": "Falcon",
+        "f": "Falcon",
+        "n": "Falcon",
+        "pl": "Falcon"
+      },
+      "suffix": "of the Falcon"
+    },
+    "werewolf": {
+      "prefix": {
+        "m": "Werewolf",
+        "f": "Werewolf",
+        "n": "Werewolf",
+        "pl": "Werewolf"
+      },
+      "suffix": "of the Werewolf"
+    },
+    "wolf-shepherd": {
+      "prefix": {
+        "m": "Shepherd",
+        "f": "Shepherd",
+        "n": "Shepherd",
+        "pl": "Shepherd"
+      },
+      "suffix": "of the Shepherd"
+    },
+    "aurochs": {
+      "prefix": {
+        "m": "Aurochs",
+        "f": "Aurochs",
+        "n": "Aurochs",
+        "pl": "Aurochs"
+      },
+      "suffix": "of the Aurochs"
+    },
+    "aesculapian-snake": {
+      "prefix": {
+        "m": "Serpent",
+        "f": "Serpent",
+        "n": "Serpent",
+        "pl": "Serpent"
+      },
+      "suffix": "of the Serpent"
+    },
+    "strzyga": {
+      "prefix": {
+        "m": "Strzyga",
+        "f": "Strzyga",
+        "n": "Strzyga",
+        "pl": "Strzyga"
+      },
+      "suffix": "of the Strzyga"
+    },
+    "phantasm": {
+      "suffix": "of the Phantasm"
+    },
+    "black-grouse": {
+      "prefix": {
+        "m": "Grouse",
+        "f": "Grouse",
+        "n": "Grouse",
+        "pl": "Grouse"
+      },
+      "suffix": "of the Grouse"
+    },
+    "diving-beetle": {
+      "suffix": "of the Diving Beetle"
+    },
+    "little-owl": {
+      "suffix": "of the Great Owl"
+    },
+    "zmij": {
+      "prefix": {
+        "m": "Dragon",
+        "f": "Dragon",
+        "n": "Dragon",
+        "pl": "Dragon"
+      },
+      "suffix": "of the Zmey"
+    },
+    "fume-spirit": {
+      "suffix": "of the Reek"
+    },
+    "mine-spirit": {
+      "suffix": "of the Skarbnik"
+    },
+    "giant-rat": {
+      "prefix": {
+        "m": "Rat",
+        "f": "Rat",
+        "n": "Rat",
+        "pl": "Rat"
+      },
+      "suffix": "of the Rat"
     }
   }
 }

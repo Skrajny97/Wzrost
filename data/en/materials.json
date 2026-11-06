@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/materials.json (src/engine/overlay.js): the materials of the first region's creatures, and the parts. The report writes a material in lower case after its rarity (src/engine/crafting.js, materialView): \"rare wolf pelt ×2\".",
+  "$comment": "English texts of data/materials.json (src/engine/overlay.js): the materials of the creatures, and the parts. The report writes a material in lower case after its rarity (src/engine/crafting.js, materialView): \"rare wolf pelt ×2\".",
   "materials": {
     "wolf-pelt": {
       "name": "Wolf Pelt",
@@ -92,6 +92,266 @@
     "black-stork-feather": {
       "name": "Black Stork Feather",
       "description": "A long black feather with a coppery sheen."
+    },
+    "lynx-fur": {
+      "name": "Lynx Fur",
+      "description": "Thick, spotted fur, warm even in winter."
+    },
+    "spider-silk": {
+      "name": "Spider Silk",
+      "description": "A ball of sticky, strong spider thread."
+    },
+    "tarantula-hair": {
+      "name": "Tarantula Hair",
+      "description": "A tuft of stiff, prickly hairs from a tarantula's abdomen."
+    },
+    "spider-moults": {
+      "name": "Spider Moults",
+      "description": "Paper-thin, empty husks that young spiders shed as they grew."
+    },
+    "bird-eater-fang": {
+      "name": "Birdeater Fang",
+      "description": "A black, curved fang. A drop of venom still glistens on its tip."
+    },
+    "alpha-fang": {
+      "name": "Alpha Fang",
+      "description": "The fang of a pack leader, longer than a finger."
+    },
+    "bear-hide": {
+      "name": "Bear Hide",
+      "description": "A heavy, thick hide with brown fur."
+    },
+    "likho-eye": {
+      "name": "Likho Eye",
+      "description": "A cloudy, cold eye. It is still watching."
+    },
+    "stone-heart": {
+      "name": "Stoneling Core",
+      "description": "A mossy stone from inside a stoneling. It is still warm."
+    },
+    "bat-wing": {
+      "name": "Bat Wing",
+      "description": "A thin, leathery membrane stretched over delicate bones."
+    },
+    "eagle-owl-feather": {
+      "name": "Eagle Owl Feather",
+      "description": "A large, tawny feather with dark bars."
+    },
+    "she-wolf-fur": {
+      "name": "She-Wolf Fur",
+      "description": "Light grey fur with white-tipped hairs."
+    },
+    "basilisk-scale": {
+      "name": "Basilisk Scale",
+      "description": "A shimmering scale. Whoever looks at it too long feels the chill of stone."
+    },
+    "heron-feather": {
+      "name": "Heron Feather",
+      "description": "A long grey feather with a black tip."
+    },
+    "otter-fur": {
+      "name": "Otter Fur",
+      "description": "Thick, glossy fur that keeps out the water."
+    },
+    "mosquito-proboscis": {
+      "name": "Mosquito Proboscis",
+      "description": "A long, thin proboscis, sharp as a needle."
+    },
+    "reed-bundle": {
+      "name": "Reed Bundle",
+      "description": "A tightly woven handful of reeds, still damp."
+    },
+    "beaver-teeth": {
+      "name": "Beaver Teeth",
+      "description": "Two orange teeth, hard as a chisel."
+    },
+    "mosquito-wings": {
+      "name": "Mosquito Wings",
+      "description": "A handful of tiny clear wings, light as dust."
+    },
+    "eel-skin": {
+      "name": "Eel Skin",
+      "description": "Slippery dark skin that now and then crackles with a spark."
+    },
+    "eagle-feather": {
+      "name": "Eagle Feather",
+      "description": "A large brown flight feather, strong as a reed."
+    },
+    "cormorant-feather": {
+      "name": "Cormorant Feather",
+      "description": "A black feather with a green sheen, always a little wet."
+    },
+    "catfish-whisker": {
+      "name": "Catfish Whisker",
+      "description": "A long, thick whisker that senses movement in murky water."
+    },
+    "toad-venom": {
+      "name": "Toad Venom",
+      "description": "A few drops of milky venom on a leaf."
+    },
+    "crocodile-hide": {
+      "name": "Crocodile Hide",
+      "description": "Tough, scaly hide that no ordinary knife can pierce."
+    },
+    "willow-bark": {
+      "name": "Willow Bark",
+      "description": "The cracked bark of an old willow, with rotten wood glowing in the cracks."
+    },
+    "wraith-veil": {
+      "name": "Wraith Veil",
+      "description": "A cold grey scrap of cloth that floats in the air by itself."
+    },
+    "mist-drop": {
+      "name": "Mist Drop",
+      "description": "A cold drop that never dries and gives off a faint vapour."
+    },
+    "drowned-tear": {
+      "name": "Topielitsa Tear",
+      "description": "A clear drop, hard as glass and cold as water at dawn."
+    },
+    "old-bone": {
+      "name": "Old Bone",
+      "description": "A yellowed bone, worn smooth by the water."
+    },
+    "drowner-weeds": {
+      "name": "Utopiets Waterweed",
+      "description": "Wet green strands of waterweed, tangled like hair."
+    },
+    "sludge-lump": {
+      "name": "Sludge Lump",
+      "description": "A sticky, greenish lump that slowly crawls across your palm."
+    },
+    "goblin-trinket": {
+      "name": "Goblin Trinket",
+      "description": "A brass button polished to a shine, a mud goblin's treasure."
+    },
+    "vodnik-pearl": {
+      "name": "Vodnik Pearl",
+      "description": "A large black pearl. Something moves inside it."
+    },
+    "crane-feather": {
+      "name": "Crane Feather",
+      "description": "An ash-grey feather, long and light."
+    },
+    "elk-antler": {
+      "name": "Elk Antler",
+      "description": "A broad, flat palm of antler."
+    },
+    "leech-slime": {
+      "name": "Leech Slime",
+      "description": "Thick slime that keeps wounds from closing for a long time."
+    },
+    "harrier-feather": {
+      "name": "Marsh Harrier Feather",
+      "description": "A rust-red feather with dark stripes."
+    },
+    "crayfish-shell": {
+      "name": "Crayfish Shell",
+      "description": "A hard red shell covered in spikes."
+    },
+    "sundew-dew": {
+      "name": "Sundew Dew",
+      "description": "A sticky, sweet drop with a mosquito stuck in it."
+    },
+    "peat-heart": {
+      "name": "Peatling Heart",
+      "description": "A heavy, dark lump of peat, warm inside."
+    },
+    "wisp-spark": {
+      "name": "Wisp Spark",
+      "description": "A tiny flame that does not go out in a closed hand."
+    },
+    "salamander-skin": {
+      "name": "Salamander Skin",
+      "description": "Black skin with yellow spots, cool even by the fire."
+    },
+    "peat-spade": {
+      "name": "Peat Cutter's Spade",
+      "description": "A narrow spade of black oak, its handle worn smooth by hands."
+    },
+    "worm-jaw": {
+      "name": "Bog Worm Jaw",
+      "description": "A round jaw full of small, curved teeth."
+    },
+    "kikimora-yarn": {
+      "name": "Kikimora Yarn",
+      "description": "A grey thread spun from moss and hair. It cannot be broken."
+    },
+    "bog-heart": {
+      "name": "Heart of the Bog",
+      "description": "A black lump that beats like a heart when you squeeze it."
+    },
+    "living-moss": {
+      "name": "Living Moss",
+      "description": "A tuft of moss that still stirs faintly."
+    },
+    "imp-dust": {
+      "name": "Imp Dust",
+      "description": "A handful of glittering dust. It tickles your fingers."
+    },
+    "cross-spider-silk": {
+      "name": "Cross Spider Thread",
+      "description": "A thick, sticky thread from a cross spider's web."
+    },
+    "mouflon-horn": {
+      "name": "Mouflon Horn",
+      "description": "The heavy, curled horn of a wild ram."
+    },
+    "falcon-feather": {
+      "name": "Falcon Feather",
+      "description": "A grey feather with fine bars, hard as a blade."
+    },
+    "werewolf-fur": {
+      "name": "Werewolf Hair",
+      "description": "A tuft of coarse grey hair. It smells of a storm."
+    },
+    "shepherd-crook": {
+      "name": "Shepherd's Crook",
+      "description": "A short, knotty crook covered in frost that never melts."
+    },
+    "aurochs-horn": {
+      "name": "Aurochs Horn",
+      "description": "A huge horn with a black tip. Long ago such horns were made into drinking cups."
+    },
+    "aesculapian-skin": {
+      "name": "Aesculapian Snakeskin",
+      "description": "A long strip of olive skin with a yellow underside."
+    },
+    "strzyga-fang": {
+      "name": "Strzyga Fang",
+      "description": "A long, pale fang with a drop of blood that never dries."
+    },
+    "phantasm-shard": {
+      "name": "Phantasm Shard",
+      "description": "A shard of rainbow glass with mist swirling inside."
+    },
+    "black-grouse-feather": {
+      "name": "Black Grouse Feather",
+      "description": "A blue-black tail feather, curved like a lyre."
+    },
+    "diving-beetle-shell": {
+      "name": "Diving Beetle Shell",
+      "description": "A glossy olive wing case with a yellow rim."
+    },
+    "little-owl-feather": {
+      "name": "Great Owl Feather",
+      "description": "A brown feather with white spots. It makes no rustle."
+    },
+    "zmij-scale": {
+      "name": "Zmey Scale",
+      "description": "A red-black scale whose edges still glow."
+    },
+    "fume-ember": {
+      "name": "Smouldering Ember",
+      "description": "A lump of coal with red cracks. It never stops smouldering."
+    },
+    "mine-lantern": {
+      "name": "Skarbnik Lamp",
+      "description": "An old brass lamp with a green flame that never goes out."
+    },
+    "rat-tail": {
+      "name": "Rat Tail",
+      "description": "A long, hairless tail curled in a loose ring."
     }
   },
   "parts": {
