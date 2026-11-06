@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/monsters.json, by the creature's id (src/engine/overlay.js): the creatures of the first region. `counted` is the name after a number, [one, other, other] (src/engine/text.js, countedForm), in Title Case like the name: \"Defeat 5 Wolves\".",
+  "$comment": "English texts of data/monsters.json, by the creature's id (src/engine/overlay.js). `counted` is the name after a number, [one, other, other] (src/engine/text.js, countedForm), in Title Case like the name: \"Defeat 5 Wolves\".",
   "wolf": {
     "name": "Wolf",
     "counted": [
@@ -251,6 +251,721 @@
     ],
     "attack": {
       "name": "Tusker's Charge"
+    }
+  },
+  "lynx": {
+    "name": "Lynx",
+    "counted": [
+      "Lynx",
+      "Lynxes",
+      "Lynxes"
+    ],
+    "attack": {
+      "name": "Paw Strike"
+    }
+  },
+  "spider": {
+    "name": "Spider",
+    "counted": [
+      "Spider",
+      "Spiders",
+      "Spiders"
+    ],
+    "attack": {
+      "name": "Venomous Bite"
+    }
+  },
+  "tarantula": {
+    "name": "Tarantula",
+    "counted": [
+      "Tarantula",
+      "Tarantulas",
+      "Tarantulas"
+    ],
+    "attack": {
+      "name": "Tarantula's Leap"
+    }
+  },
+  "spiderlings": {
+    "name": "Spider Brood",
+    "counted": [
+      "Spider Brood",
+      "Spider Broods",
+      "Spider Broods"
+    ],
+    "attack": {
+      "name": "Swarm of Bites"
+    }
+  },
+  "bird-eater": {
+    "name": "Birdeater",
+    "counted": [
+      "Birdeater",
+      "Birdeaters",
+      "Birdeaters"
+    ],
+    "attack": {
+      "name": "Venomous Fangs"
+    }
+  },
+  "alpha-wolf": {
+    "name": "Alpha Wolf",
+    "counted": [
+      "Alpha Wolf",
+      "Alpha Wolves",
+      "Alpha Wolves"
+    ],
+    "attack": {
+      "name": "Alpha's Fangs"
+    }
+  },
+  "bear": {
+    "name": "Bear",
+    "counted": [
+      "Bear",
+      "Bears",
+      "Bears"
+    ],
+    "attack": {
+      "name": "Paw Swipe"
+    }
+  },
+  "likho": {
+    "name": "Likho",
+    "counted": [
+      "Likho",
+      "Likhos",
+      "Likhos"
+    ],
+    "attack": {
+      "name": "Frost Touch"
+    }
+  },
+  "stoneling": {
+    "name": "Stoneling",
+    "counted": [
+      "Stoneling",
+      "Stonelings",
+      "Stonelings"
+    ],
+    "attack": {
+      "name": "Stone Fist"
+    }
+  },
+  "bat": {
+    "name": "Bat",
+    "counted": [
+      "Bat",
+      "Bats",
+      "Bats"
+    ],
+    "attack": {
+      "name": "Bite"
+    }
+  },
+  "eagle-owl": {
+    "name": "Eagle Owl",
+    "counted": [
+      "Eagle Owl",
+      "Eagle Owls",
+      "Eagle Owls"
+    ],
+    "attack": {
+      "name": "Eagle Owl's Talons"
+    }
+  },
+  "she-wolf": {
+    "name": "She-Wolf",
+    "counted": [
+      "She-Wolf",
+      "She-Wolves",
+      "She-Wolves"
+    ],
+    "attack": {
+      "name": "She-Wolf's Fangs"
+    }
+  },
+  "basilisk": {
+    "name": "Basilisk",
+    "counted": [
+      "Basilisk",
+      "Basilisks",
+      "Basilisks"
+    ],
+    "attack": {
+      "name": "Petrifying Gaze"
+    }
+  },
+  "heron": {
+    "name": "Heron",
+    "counted": [
+      "Heron",
+      "Herons",
+      "Herons"
+    ],
+    "attack": {
+      "name": "Beak Thrust"
+    }
+  },
+  "otter": {
+    "name": "Otter",
+    "counted": [
+      "Otter",
+      "Otters",
+      "Otters"
+    ],
+    "attack": {
+      "name": "Otter's Bite"
+    }
+  },
+  "giant-mosquito": {
+    "name": "Giant Mosquito",
+    "counted": [
+      "Giant Mosquito",
+      "Giant Mosquitoes",
+      "Giant Mosquitoes"
+    ],
+    "attack": {
+      "name": "Proboscis"
+    }
+  },
+  "reedling": {
+    "name": "Reedling",
+    "counted": [
+      "Reedling",
+      "Reedlings",
+      "Reedlings"
+    ],
+    "attack": {
+      "name": "Entangling Reeds"
+    }
+  },
+  "beaver": {
+    "name": "Beaver",
+    "counted": [
+      "Beaver",
+      "Beavers",
+      "Beavers"
+    ],
+    "attack": {
+      "name": "Incisors"
+    }
+  },
+  "mosquitoes": {
+    "name": "Mosquito Swarm",
+    "counted": [
+      "Mosquito Swarm",
+      "Mosquito Swarms",
+      "Mosquito Swarms"
+    ],
+    "attack": {
+      "name": "Bites"
+    }
+  },
+  "eel": {
+    "name": "Eel",
+    "counted": [
+      "Eel",
+      "Eels",
+      "Eels"
+    ],
+    "attack": {
+      "name": "Discharge"
+    }
+  },
+  "eagle": {
+    "name": "Eagle",
+    "counted": [
+      "Eagle",
+      "Eagles",
+      "Eagles"
+    ],
+    "attack": {
+      "name": "Eagle's Talons"
+    }
+  },
+  "cormorant": {
+    "name": "Cormorant",
+    "counted": [
+      "Cormorant",
+      "Cormorants",
+      "Cormorants"
+    ],
+    "attack": {
+      "name": "Diving Strike"
+    }
+  },
+  "catfish": {
+    "name": "Catfish",
+    "counted": [
+      "Catfish",
+      "Catfish",
+      "Catfish"
+    ],
+    "attack": {
+      "name": "Catfish's Maw"
+    }
+  },
+  "toad": {
+    "name": "Toad",
+    "counted": [
+      "Toad",
+      "Toads",
+      "Toads"
+    ],
+    "attack": {
+      "name": "Toad Venom"
+    }
+  },
+  "crocodile": {
+    "name": "Crocodile",
+    "counted": [
+      "Crocodile",
+      "Crocodiles",
+      "Crocodiles"
+    ],
+    "attack": {
+      "name": "Crocodile Jaws"
+    }
+  },
+  "willow-spirit": {
+    "name": "Willow Spirit",
+    "counted": [
+      "Willow Spirit",
+      "Willow Spirits",
+      "Willow Spirits"
+    ],
+    "attack": {
+      "name": "Willow Lash"
+    }
+  },
+  "wraith": {
+    "name": "Wraith",
+    "counted": [
+      "Wraith",
+      "Wraiths",
+      "Wraiths"
+    ],
+    "attack": {
+      "name": "Icy Touch"
+    }
+  },
+  "mistling": {
+    "name": "Mistling",
+    "counted": [
+      "Mistling",
+      "Mistlings",
+      "Mistlings"
+    ],
+    "attack": {
+      "name": "Choking Vapours"
+    }
+  },
+  "drowned-maiden": {
+    "name": "Topielitsa",
+    "counted": [
+      "Topielitsa",
+      "Topielitsas",
+      "Topielitsas"
+    ],
+    "attack": {
+      "name": "Cold Kiss"
+    }
+  },
+  "skeleton": {
+    "name": "Skeleton",
+    "counted": [
+      "Skeleton",
+      "Skeletons",
+      "Skeletons"
+    ],
+    "attack": {
+      "name": "Rusty Sword"
+    }
+  },
+  "drowner": {
+    "name": "Utopiets",
+    "counted": [
+      "Utopiets",
+      "Utopietses",
+      "Utopietses"
+    ],
+    "attack": {
+      "name": "Drag Under"
+    }
+  },
+  "sludger": {
+    "name": "Sludger",
+    "counted": [
+      "Sludger",
+      "Sludgers",
+      "Sludgers"
+    ],
+    "attack": {
+      "name": "Acid Sludge"
+    }
+  },
+  "mud-goblin": {
+    "name": "Mud Goblin",
+    "counted": [
+      "Mud Goblin",
+      "Mud Goblins",
+      "Mud Goblins"
+    ],
+    "attack": {
+      "name": "Mud Toss"
+    }
+  },
+  "water-spirit": {
+    "name": "Vodnik",
+    "counted": [
+      "Vodnik",
+      "Vodniks",
+      "Vodniks"
+    ],
+    "attack": {
+      "name": "Undertow"
+    }
+  },
+  "crane": {
+    "name": "Crane",
+    "counted": [
+      "Crane",
+      "Cranes",
+      "Cranes"
+    ],
+    "attack": {
+      "name": "Crane's Beak"
+    }
+  },
+  "elk": {
+    "name": "Elk",
+    "counted": [
+      "Elk",
+      "Elk",
+      "Elk"
+    ],
+    "attack": {
+      "name": "Antler Charge"
+    }
+  },
+  "leech": {
+    "name": "Leech",
+    "counted": [
+      "Leech",
+      "Leeches",
+      "Leeches"
+    ],
+    "attack": {
+      "name": "Drain"
+    }
+  },
+  "harrier": {
+    "name": "Marsh Harrier",
+    "counted": [
+      "Marsh Harrier",
+      "Marsh Harriers",
+      "Marsh Harriers"
+    ],
+    "attack": {
+      "name": "Swooping Talons"
+    }
+  },
+  "crayfish": {
+    "name": "Crayfish",
+    "counted": [
+      "Crayfish",
+      "Crayfish",
+      "Crayfish"
+    ],
+    "attack": {
+      "name": "Pincers"
+    }
+  },
+  "sundew": {
+    "name": "Bog Sundew",
+    "counted": [
+      "Bog Sundew",
+      "Bog Sundews",
+      "Bog Sundews"
+    ],
+    "attack": {
+      "name": "Sticky Tentacles"
+    }
+  },
+  "peatling": {
+    "name": "Peatling",
+    "counted": [
+      "Peatling",
+      "Peatlings",
+      "Peatlings"
+    ],
+    "attack": {
+      "name": "Peat Fist"
+    }
+  },
+  "will-o-wisp": {
+    "name": "Will-o'-the-Wisp",
+    "counted": [
+      "Will-o'-the-Wisp",
+      "Will-o'-the-Wisps",
+      "Will-o'-the-Wisps"
+    ],
+    "attack": {
+      "name": "Flicker"
+    }
+  },
+  "salamander": {
+    "name": "Salamander",
+    "counted": [
+      "Salamander",
+      "Salamanders",
+      "Salamanders"
+    ],
+    "attack": {
+      "name": "Toxic Slime"
+    }
+  },
+  "peat-cutter": {
+    "name": "Peat Cutter",
+    "counted": [
+      "Peat Cutter",
+      "Peat Cutters",
+      "Peat Cutters"
+    ],
+    "attack": {
+      "name": "Spade Blow"
+    }
+  },
+  "bog-worm": {
+    "name": "Bog Worm",
+    "counted": [
+      "Bog Worm",
+      "Bog Worms",
+      "Bog Worms"
+    ],
+    "attack": {
+      "name": "Acid Spit"
+    }
+  },
+  "kikimora": {
+    "name": "Kikimora",
+    "counted": [
+      "Kikimora",
+      "Kikimoras",
+      "Kikimoras"
+    ],
+    "attack": {
+      "name": "Bog Hex"
+    }
+  },
+  "mud-lord": {
+    "name": "Mud King",
+    "counted": [
+      "Mud King",
+      "Mud Kings",
+      "Mud Kings"
+    ],
+    "attack": {
+      "name": "Bog Grip"
+    }
+  },
+  "mossling": {
+    "name": "Mossling",
+    "counted": [
+      "Mossling",
+      "Mosslings",
+      "Mosslings"
+    ],
+    "attack": {
+      "name": "Creeping Moss"
+    }
+  },
+  "imp": {
+    "name": "Imp",
+    "counted": [
+      "Imp",
+      "Imps",
+      "Imps"
+    ],
+    "attack": {
+      "name": "Mischief Spell"
+    }
+  },
+  "cross-spider": {
+    "name": "Cross Spider",
+    "counted": [
+      "Cross Spider",
+      "Cross Spiders",
+      "Cross Spiders"
+    ],
+    "attack": {
+      "name": "Sticky Web"
+    }
+  },
+  "mouflon": {
+    "name": "Mouflon",
+    "counted": [
+      "Mouflon",
+      "Mouflons",
+      "Mouflons"
+    ],
+    "attack": {
+      "name": "Battering Ram"
+    }
+  },
+  "falcon": {
+    "name": "Falcon",
+    "counted": [
+      "Falcon",
+      "Falcons",
+      "Falcons"
+    ],
+    "attack": {
+      "name": "Power Dive"
+    }
+  },
+  "werewolf": {
+    "name": "Werewolf",
+    "counted": [
+      "Werewolf",
+      "Werewolves",
+      "Werewolves"
+    ],
+    "attack": {
+      "name": "Rend"
+    }
+  },
+  "wolf-shepherd": {
+    "name": "Wolf Shepherd",
+    "counted": [
+      "Wolf Shepherd",
+      "Wolf Shepherds",
+      "Wolf Shepherds"
+    ],
+    "attack": {
+      "name": "Frost Howl"
+    }
+  },
+  "aurochs": {
+    "name": "Aurochs",
+    "counted": [
+      "Aurochs",
+      "Aurochs",
+      "Aurochs"
+    ],
+    "attack": {
+      "name": "Aurochs Charge"
+    }
+  },
+  "aesculapian-snake": {
+    "name": "Aesculapian Snake",
+    "counted": [
+      "Aesculapian Snake",
+      "Aesculapian Snakes",
+      "Aesculapian Snakes"
+    ],
+    "attack": {
+      "name": "Constricting Coils"
+    }
+  },
+  "strzyga": {
+    "name": "Strzyga",
+    "counted": [
+      "Strzyga",
+      "Strzygas",
+      "Strzygas"
+    ],
+    "attack": {
+      "name": "Blood Drain"
+    }
+  },
+  "phantasm": {
+    "name": "Phantasm",
+    "counted": [
+      "Phantasm",
+      "Phantasms",
+      "Phantasms"
+    ],
+    "attack": {
+      "name": "Beguiling Glow"
+    }
+  },
+  "black-grouse": {
+    "name": "Black Grouse",
+    "counted": [
+      "Black Grouse",
+      "Black Grouse",
+      "Black Grouse"
+    ],
+    "attack": {
+      "name": "Battle Flutter"
+    }
+  },
+  "diving-beetle": {
+    "name": "Diving Beetle",
+    "counted": [
+      "Diving Beetle",
+      "Diving Beetles",
+      "Diving Beetles"
+    ],
+    "attack": {
+      "name": "Mandible Clamp"
+    }
+  },
+  "little-owl": {
+    "name": "Great Owl",
+    "counted": [
+      "Great Owl",
+      "Great Owls",
+      "Great Owls"
+    ],
+    "attack": {
+      "name": "Silent Talons"
+    }
+  },
+  "zmij": {
+    "name": "Zmey",
+    "counted": [
+      "Zmey",
+      "Zmeys",
+      "Zmeys"
+    ],
+    "attack": {
+      "name": "Fiery Bite"
+    }
+  },
+  "fume-spirit": {
+    "name": "Reek",
+    "counted": [
+      "Reek",
+      "Reeks",
+      "Reeks"
+    ],
+    "attack": {
+      "name": "Acrid Smoke"
+    }
+  },
+  "mine-spirit": {
+    "name": "Skarbnik",
+    "counted": [
+      "Skarbnik",
+      "Skarbniks",
+      "Skarbniks"
+    ],
+    "attack": {
+      "name": "Lantern Glare"
+    }
+  },
+  "giant-rat": {
+    "name": "Rat",
+    "counted": [
+      "Rat",
+      "Rats",
+      "Rats"
+    ],
+    "attack": {
+      "name": "Vicious Bite"
     }
   }
 }
