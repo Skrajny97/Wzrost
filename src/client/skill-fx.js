@@ -8,6 +8,7 @@
 
 import { artChain } from './art.js';
 import { h } from './dom.js';
+import { t } from './i18n.js';
 import { playSkill } from './sound.js';
 
 // cast: what plays when the skill wakes or a sweep starts; impact: extra
@@ -398,7 +399,7 @@ export function skillEffects(kit) {
     kit.setHp(event.target, event.hp);
     kit.float(event.target, `+${event.amount}`, 'heal');
     if (look.cast === 'guard') {
-      if (event.armor) kit.float(event.target, `pancerz +${event.armor}%`, 'guard', 380);
+      if (event.armor) kit.float(event.target, t('pancerz +{armor}%', { armor: event.armor }), 'guard', 380);
       await flashAround(event.target, look.color);
       return;
     }

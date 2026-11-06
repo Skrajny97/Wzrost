@@ -1,12 +1,16 @@
 // The journal: past reports of explorations and gatherings, and the history
-// of System messages.
+// of System messages. Its texts are written in Polish and shown in the
+// page's language (t(), i18n.js).
 
 import { fill, h, icon } from '../dom.js';
 import { dateTimeFormat, formatMinutes, formatNumber, timeFormat } from '../format.js';
+import { language, t } from '../i18n.js';
 import { call, serverNow } from '../state.js';
 import { systemPanel } from '../ui.js';
 import { workSummaryText } from './professions.js';
 
+// The names below are shown through t(), as the page loads its English
+// after this module.
 const RESULT_NAMES = { success: 'sukces', fainted: 'omdlenie', escaped: 'odwrót' };
 // A profession's work, by the kind of its report, and its chip.
 const WORK_CHIPS = { herbs: 'zbieranie', potions: 'warzenie', items: 'wyrób', minerals: 'kopanie', jewels: 'szlifiernia' };
@@ -22,14 +26,20 @@ const FILTERS = [
 const FILTER_KEY = 'insight.journalFilter';
 const kindOf = (report) => (report.tower ? 'towers' : WORK_CHIPS[report.kind] ? 'work' : 'hunts');
 const dayKey = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
-const dayName = new Intl.DateTimeFormat('pl-PL', { day: 'numeric', month: 'long' });
+// "6 listopada", or "6 November" in English, made once for each language.
+const dayNames = new Map();
+function dayName(ms) {
+  const lang = language();
+  if (!dayNames.has(lang)) dayNames.set(lang, new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'pl-PL', { day: 'numeric', month: 'long' }));
+  return dayNames.get(lang).format(ms);
+}
 
 function dayHeading(ms) {
   const key = dayKey.format(ms);
   const now = serverNow();
-  if (key === dayKey.format(now)) return 'Dziś';
-  if (key === dayKey.format(now - 86400000)) return 'Wczoraj';
-  return dayName.format(ms);
+  if (key === dayKey.format(now)) return t('Dziś');
+  if (key === dayKey.format(now - 86400000)) return t('Wczoraj');
+  return dayName(ms);
 }
 
 function loadFilter() {
@@ -58,29 +68,29 @@ export function mountJournal(container, { params }) {
 
   function render() {
     fill(container,
-      h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: 'Dziennik' })),
+      h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Dziennik') })),
       h(
         'div',
-        { class: 'segmented', role: 'group', 'aria-label': 'Część dziennika' },
-        h('a', { class: 'segmented-option', href: '#/dziennik', 'aria-current': tab === 'reports' ? 'page' : undefined, text: 'Raporty' }),
+        { class: 'segmented', role: 'group', 'aria-label': t('Część dziennika') },
+        h('a', { class: 'segmented-option', href: '#/dziennik', 'aria-current': tab === 'reports' ? 'page' : undefined, text: t('Raporty') }),
         h('a', { class: 'segmented-option', href: '#/dziennik/system', 'aria-current': tab === 'system' ? 'page' : undefined, text: 'System' }),
       ),
-      error ? systemPanel(error) : reports === null ? h('p', { class: 'muted', text: 'Wczytywanie…' }) : tab === 'reports' ? reportList() : systemList(),
+      error ? systemPanel(error) : reports === null ? h('p', { class: 'muted', text: t('Wczytywanie…') }) : tab === 'reports' ? reportList() : systemList(),
     );
   }
 
   function reportList() {
-    if (reports.length === 0) return h('p', { class: 'muted', text: 'Brak raportów. Wyrusz na pierwszą eksplorację w zakładce Walka.' });
+    if (reports.length === 0) return h('p', { class: 'muted', text: t('Brak raportów. Wyrusz na pierwszą eksplorację w zakładce Walka.') });
     const shown = reports.filter((report) => filter === 'all' || kindOf(report) === filter);
     const filters = h(
       'div',
-      { class: 'journal-filters', role: 'group', 'aria-label': 'Rodzaj raportów' },
+      { class: 'journal-filters', role: 'group', 'aria-label': t('Rodzaj raportów') },
       FILTERS.map(([id, label]) =>
         h('button', {
           type: 'button',
           class: 'journal-filter',
           'aria-pressed': String(id === filter),
-          text: label,
+          text: t(label),
           onClick: () => {
             filter = id;
             try {
@@ -93,7 +103,7 @@ export function mountJournal(container, { params }) {
         }),
       ),
     );
-    if (shown.length === 0) return [filters, h('p', { class: 'muted', text: 'Nie ma tu jeszcze takich raportów.' })];
+    if (shown.length === 0) return [filters, h('p', { class: 'muted', text: t('Nie ma tu jeszcze takich raportów.') })];
     // The days in the order of the reports, newest first.
     const days = [];
     for (const report of shown) {
@@ -121,16 +131,16 @@ export function mountJournal(container, { params }) {
               h('span', {
                 class: 'report-row-title',
                 text: report.tower
-                  ? `${report.tower.name} · piętro ${report.tower.floor}`
+                  ? t('{tower} · piętro {floor}', { tower: report.tower.name, floor: report.tower.floor })
                   : report.hall
-                    ? `Sala prób · ${report.hall.areaName}`
+                    ? t('Sala prób · {area}', { area: report.hall.areaName })
                     : `${report.areaName ?? report.regionName ?? report.placeName} · ${formatMinutes(report.minutes)}`,
               }),
               WORK_CHIPS[report.kind]
                 ? h(
                     'span',
                     { class: 'report-row-meta' },
-                    h('span', { class: `chip chip--${report.kind}`, text: WORK_CHIPS[report.kind] }),
+                    h('span', { class: `chip chip--${report.kind}`, text: t(WORK_CHIPS[report.kind]) }),
                     ` +${formatNumber(report.xp)} XP · ${report.professionName} ${report.professionLevel}`,
                   )
                 : h(
@@ -141,18 +151,20 @@ export function mountJournal(container, { params }) {
                       // A floor of a Wieża is won or lost, not explored.
                       text: report.tower
                         ? report.result === 'success'
-                          ? 'zdobyte'
-                          : 'porażka'
+                          ? t('zdobyte')
+                          : t('porażka')
                         : report.hall
                           ? report.result === 'success'
-                            ? 'zdana'
-                            : 'porażka'
-                          : (RESULT_NAMES[report.result] ?? report.result),
+                            ? t('zdana')
+                            : t('porażka')
+                          : RESULT_NAMES[report.result]
+                            ? t(RESULT_NAMES[report.result])
+                            : report.result,
                     }),
                     // After a faint the exploration brought nothing (651 C), and cost XP.
                     report.forfeit
-                      ? ` −${formatNumber(report.penalty ?? 0)} XP · łupy przepadły`
-                      : ` +${formatNumber(report.xp)} XP · +${formatNumber(report.gold)} złota`,
+                      ? t(' −{xp} XP · łupy przepadły', { xp: formatNumber(report.penalty ?? 0) })
+                      : t(' +{xp} XP · +{gold} złota', { xp: formatNumber(report.xp), gold: formatNumber(report.gold) }),
                   ),
               WORK_CHIPS[report.kind] && h('span', { class: 'report-row-herbs', text: workSummaryText(report) }),
               report.bestFind && h('span', { class: 'item-name', vars: { '--rarity': report.bestFind.color }, text: report.bestFind.name }),
@@ -167,7 +179,7 @@ export function mountJournal(container, { params }) {
 
   function systemList() {
     const messages = reports.flatMap((report) => (report.system ?? []).map((text) => ({ text, at: report.createdAt })));
-    if (messages.length === 0) return h('p', { class: 'muted', text: 'System nie wysłał jeszcze żadnych komunikatów.' });
+    if (messages.length === 0) return h('p', { class: 'muted', text: t('System nie wysłał jeszcze żadnych komunikatów.') });
     return h(
       'ul',
       { class: 'system-history' },

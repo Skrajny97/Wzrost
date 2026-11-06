@@ -2,17 +2,22 @@
 // at the bottom, fields labelled przód, środek and tył. Every strike travels
 // between the portraits: a blow lunges at the target, an arrow or a spell
 // flies to it, and the hit flashes with the damage. The text log runs
-// underneath and "+" opens the participants' stats.
+// underneath and "+" opens the participants' stats. Its own words are
+// written in Polish and shown in the page's language (t(), i18n.js); the
+// fight's names and lines come from the server in it.
 
 import { companionBust, companionPortrait, monsterSprite, portraitSprite, summonSprite } from './art.js';
 import { classArt } from './class-art.js';
 import { h, icon } from './dom.js';
+import { language, t } from './i18n.js';
 import { CLASS_ICONS } from './icons.js';
 import { motionOn } from './motion.js';
 import { lookOf, skillEffects } from './skill-fx.js';
 import { playHit, playMoment, playSound, playVoice, preloadVoices } from './sound.js';
 import { state } from './state.js';
 
+// The fields' labels and the results are shown through t(), as the page
+// loads its English after this module.
 const FIELDS = [
   ['front', 'przód'],
   ['middle', 'środek'],
@@ -64,7 +69,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
 
   const fx = h('div', { class: 'arena-fx', 'aria-hidden': 'true' });
   const banner = h('div', { class: 'arena-banner', 'aria-hidden': 'true' });
-  const log = h('ol', { class: 'fight-log', 'aria-label': 'Przebieg walki' });
+  const log = h('ol', { class: 'fight-log', 'aria-label': t('Przebieg walki') });
   const controls = h('div', { class: 'arena-controls' });
   const statsBox = h('div', { class: 'participants', hidden: true }, participantsTable(units));
 
@@ -75,7 +80,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     // A mana shield's points, under the HP while the shield holds.
     const shieldFill = h('div', { class: 'unit-shield-fill' });
     const shieldBar = h('div', { class: 'unit-shield', hidden: true }, shieldFill);
-    const level = h('span', { class: 'unit-level', text: `poz. ${unit.level}` });
+    const level = h('span', { class: 'unit-level', text: t('poz. {level}', { level: unit.level }) });
     // The character's head and shoulders (older reports have no look: male),
     // the monster's sprite or a summon's figure, with the level in its
     // corner; without one, the vector bust or the old line icon beside the
@@ -92,7 +97,9 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       {
         class: `unit unit--${unit.side}${unit.summon ? ' unit--summon' : unit.champion ? ' unit--champion' : unit.elite ? ' unit--elite' : ''}`,
         role: 'group',
-        'aria-label': `${unit.name}, poziom ${unit.level}${unit.summon ? ', przywołaniec' : unit.champion ? ', czempion' : unit.elite ? ', elita' : ''}`,
+        'aria-label': [t('{name}, poziom {level}', { name: unit.name, level: unit.level }), unit.summon ? t('przywołaniec') : unit.champion ? t('czempion') : unit.elite ? t('elita') : null]
+          .filter(Boolean)
+          .join(', '),
       },
       art
         ? h('span', { class: 'unit-art' }, art, level)
@@ -116,12 +123,12 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
   function row(side, list) {
     return h(
       'div',
-      { class: `arena-row arena-row--${side}`, 'aria-label': side === 'enemy' ? 'Przeciwnicy' : 'Drużyna' },
+      { class: `arena-row arena-row--${side}`, 'aria-label': side === 'enemy' ? t('Przeciwnicy') : t('Drużyna') },
       FIELDS.map(([position, label]) => {
         const field = h(
           'div',
           { class: 'arena-field' },
-          h('span', { class: 'arena-field-label', text: label }),
+          h('span', { class: 'arena-field-label', text: t(label) }),
           list.filter((unit) => unit.position === position).map(unitCard),
         );
         fields.set(`${side} ${position}`, field);
@@ -386,7 +393,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
   // short, so it fits a narrow card (the skill's name was called out over it).
   const guards = new Map(); // unit id → the text it shows
   function guardUp(event) {
-    const text = `pancerz +${event.armor}%`;
+    const text = t('pancerz +{armor}%', { armor: event.armor });
     guards.set(event.target, text);
     cards.get(event.target).status.textContent = text;
   }
@@ -518,7 +525,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       setHp(event.target, event.hp);
       if (event.effect === 'cure') effectOver(event);
       const color = { mana: '#8fd3ff', revive: '#f2c14e' }[event.effect] ?? '#a7c47f';
-      const text = { mana: `+${event.amount} many`, cure: `−${event.cleared}` }[event.effect] ?? `+${event.amount}`;
+      const text = { mana: t('+{amount} many', { amount: event.amount }), cure: `−${event.cleared}` }[event.effect] ?? `+${event.amount}`;
       float(event.target, text, 'heal', 0, color === '#a7c47f' ? null : color);
       line();
       await flash(event.target, color, tint(color, 0.25));
@@ -531,8 +538,8 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       return;
     }
     if (event.kind === 'stun') {
-      hold(event.target, event.label ?? 'przyszpilony');
-      float(event.target, 'traci ruch', 'effect');
+      hold(event.target, event.label ?? t('przyszpilony'));
+      float(event.target, t('traci ruch'), 'effect');
       line();
       await flash(event.target, '#c49a6c', 'rgba(196, 154, 108, 0.3)');
       return;
@@ -542,7 +549,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (event.kind === 'slow') {
       const color = event.effect ? effectColor(event.effect) : '#8fd3ff';
       for (const id of event.targets) {
-        hold(id, event.effect ?? 'spowolniony');
+        hold(id, event.effect ?? t('spowolniony'));
         if (event.effect) float(id, event.effect, 'effect', 0, color);
         flash(id, color, tint(color, 0.25));
       }
@@ -560,7 +567,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     }
     // A share of a blow thrown back (Niezłomny, Wyzwanie, Lustro many).
     if (event.kind === 'reflect') {
-      skills.callout(event.actor, 'Odbicie', '#f2c14e');
+      skills.callout(event.actor, t('Odbicie'), '#f2c14e');
       setHp(event.target, event.hp);
       float(event.target, `−${event.damage}`, 'hit', 0, '#f2c14e');
       line();
@@ -631,7 +638,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
         await wait(240 / speed);
         return;
       }
-      if (event.counter) skills.callout(actor.id, 'Kontra', '#a690e8');
+      if (event.counter) skills.callout(actor.id, t('Kontra'), '#a690e8');
       if (look) skills.before(acting);
       await strike(actor, target, onImpact, style);
     };
@@ -647,7 +654,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
         slash(target.id, strong);
         if (look && !event.sweep) skills.impact(event);
         float(target.id, strong ? `−${event.damage}!` : `−${event.damage}`, strong ? 'crit' : 'hit');
-        if (event.absorbed) float(target.id, `osłona ${event.absorbed}`, 'absorb');
+        if (event.absorbed) float(target.id, t('osłona {amount}', { amount: event.absorbed }), 'absorb');
         shieldLeft(target.id, event.shield);
         line();
       });
@@ -656,7 +663,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (event.kind === 'dodge') {
       await land(() => {
         playMoment('dodge');
-        float(target.id, event.blocked ? 'blok' : 'unik', 'dodge');
+        float(target.id, event.blocked ? t('blok') : t('unik'), 'dodge');
         const card = cards.get(target.id).card;
         if (!reducedMotion()) {
           animate(card, [{ transform: 'translateX(0)' }, { transform: 'translateX(16px)' }, { transform: 'translateX(0)' }], {
@@ -684,7 +691,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
       playSound('tick');
       setHp(target.id, event.hp);
       float(target.id, `−${event.damage}`, 'tick', 0, effectColor(event.effect));
-      if (event.absorbed) float(target.id, `osłona ${event.absorbed}`, 'absorb');
+      if (event.absorbed) float(target.id, t('osłona {amount}', { amount: event.absorbed }), 'absorb');
       shieldLeft(target.id, event.shield);
       effectOver(event);
       line();
@@ -730,8 +737,8 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     if (event.kind === 'summon') summonState(event);
     if (event.kind === 'heal' && event.armor) guardUp(event);
     if (event.kind === 'fade') stanceDown(event);
-    if (event.kind === 'stun') hold(event.target, event.label ?? 'przyszpilony');
-    if (event.kind === 'slow') for (const id of event.targets) hold(id, event.effect ?? 'spowolniony');
+    if (event.kind === 'stun') hold(event.target, event.label ?? t('przyszpilony'));
+    if (event.kind === 'slow') for (const id of event.targets) hold(id, event.effect ?? t('spowolniony'));
     log.append(logLine(event));
   }
 
@@ -762,7 +769,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
   }
 
   function showResult(withSound) {
-    banner.textContent = RESULTS[String(fight.won)];
+    banner.textContent = t(RESULTS[String(fight.won)]);
     banner.dataset.result = String(fight.won);
     banner.classList.add('arena-banner--shown');
     if (withSound) playSound(fight.won === true ? 'victory' : 'defeat');
@@ -799,18 +806,18 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
   function setControls(mode) {
     controls.replaceChildren(
       mode === 'playing'
-        ? h('button', { type: 'button', class: 'button button--world button--small', onClick: skip, text: 'Pomiń' })
-        : h('button', { type: 'button', class: 'button button--world button--small', onClick: play, text: 'Powtórz' }),
+        ? h('button', { type: 'button', class: 'button button--world button--small', onClick: skip, text: t('Pomiń') })
+        : h('button', { type: 'button', class: 'button button--world button--small', onClick: play, text: t('Powtórz') }),
       h('button', {
         type: 'button',
         class: 'button button--world button--small',
-        'aria-label': `Tempo animacji: ${speed}×`,
-        text: `Tempo ${speed}×`,
+        'aria-label': t('Tempo animacji: {speed}×', { speed }),
+        text: t('Tempo {speed}×', { speed }),
         onClick: (event) => {
           speed = speed === 1 ? 2 : 1;
           saveSpeed(speed);
-          event.currentTarget.textContent = `Tempo ${speed}×`;
-          event.currentTarget.setAttribute('aria-label', `Tempo animacji: ${speed}×`);
+          event.currentTarget.textContent = t('Tempo {speed}×', { speed });
+          event.currentTarget.setAttribute('aria-label', t('Tempo animacji: {speed}×', { speed }));
         },
       }),
       h(
@@ -825,7 +832,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
           },
         },
         icon('plus', { size: 16 }),
-        ' Statystyki uczestników',
+        t(' Statystyki uczestników'),
       ),
     );
   }
@@ -867,11 +874,12 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
 function participantsTable(units) {
   const rows = [
     ['HP', (unit) => `${unit.maxHp}`],
-    ['Atak', (unit) => `${unit.attack}, ${unit.damage}`],
-    ['Pancerz', (unit) => `${unit.armor}`],
-    ['Unik', (unit) => `${unit.dodge}%`],
-    ['Krytyk', (unit) => `${unit.crit}%`],
-    ['Szybkość', (unit) => `${String(unit.speed).replace('.', ',')}`],
+    [t('Atak'), (unit) => `${unit.attack}, ${unit.damage}`],
+    [t('Pancerz'), (unit) => `${unit.armor}`],
+    [t('Unik'), (unit) => `${unit.dodge}%`],
+    [t('Krytyk'), (unit) => `${unit.crit}%`],
+    // A decimal as the page's language writes it: "1,2", "1.2".
+    [t('Szybkość'), (unit) => (language() === 'pl' ? `${String(unit.speed).replace('.', ',')}` : String(unit.speed))],
   ];
   return h(
     'div',
@@ -879,7 +887,7 @@ function participantsTable(units) {
     h(
       'table',
       { class: 'participants-table' },
-      h('caption', { class: 'visually-hidden', text: 'Statystyki uczestników walki' }),
+      h('caption', { class: 'visually-hidden', text: t('Statystyki uczestników walki') }),
       h('thead', {}, h('tr', {}, h('th', { scope: 'col', text: '' }), units.map((unit) => h('th', { scope: 'col', text: `${unit.name} (${unit.level})` })))),
       h(
         'tbody',

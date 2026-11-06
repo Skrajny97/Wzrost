@@ -41,6 +41,7 @@ import { rod, roll, stopRoll } from './parchment.js';
 import { narrationWaits, narratorVoiceOn, playNarration, playSound, preloadNarration, stopNarration } from './sound.js';
 import { activityFinished, call, isUnlocked, reportCache, state } from './state.js';
 import { desktopLayout } from './layout-mode.js';
+import { t } from './i18n.js';
 import { toast } from './ui.js';
 
 const running = () => Boolean(state.character.activity) && !activityFinished(state.character.activity);
@@ -1032,7 +1033,7 @@ function write(line) {
       h(
         'div',
         { class: 'narrator-head' },
-        h('p', { class: 'narrator-label', id: 'narrator-label', text: author ? tutorial.authorLabel : 'Narrator' }),
+        h('p', { class: 'narrator-label', id: 'narrator-label', text: author ? tutorial.authorLabel : t('Narrator') }),
         h('button', { type: 'button', class: 'narrator-hide', onClick: hideCard }, icon('eye-off', { size: 16 }), tutorial.hideLabel),
       ),
       h('div', { class: 'narrator-text' }, words(line).map((text) => h('p', { text }))),

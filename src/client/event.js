@@ -9,6 +9,7 @@
 import { eventFigure, eventScene, landArt } from './art.js';
 import { h } from './dom.js';
 import { formatNumber } from './format.js';
+import { t } from './i18n.js';
 import { playSound } from './sound.js';
 import { call } from './state.js';
 import { closeSheet, openSheet, withButton } from './ui.js';
@@ -38,7 +39,7 @@ export function openEvent(event, done) {
             done(answer.report);
           }),
       },
-      option.cost ? `${option.label} (${formatNumber(option.cost)} zł)` : option.label,
+      option.cost ? t('{label} ({gold} zł)', { label: option.label, gold: formatNumber(option.cost) }) : option.label,
       option.locked && h('span', { class: 'event-option-note', text: option.locked }),
     ),
   );
