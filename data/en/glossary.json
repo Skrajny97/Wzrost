@@ -14,8 +14,7 @@
         {
           "pl": "Walka",
           "en": "Combat",
-          "note": "zakładka z Eksploracją i Wieżami; „Fight” krótsze, ale brzmi jak polecenie",
-          "or": "Fight"
+          "note": "zakładka z Eksploracją i Wieżami; „Fight” krótsze, ale brzmi jak polecenie"
         },
         {
           "pl": "Eksploracja",
@@ -116,8 +115,7 @@
         {
           "pl": "wolne punkty",
           "en": "free points",
-          "note": "punkty statystyk do rozdania; „unspent points” dłuższe",
-          "or": "unspent points"
+          "note": "punkty statystyk do rozdania; „unspent points” dłuższe"
         },
         {
           "pl": "Złoto",
@@ -179,8 +177,7 @@
         {
           "pl": "Skraj Puszczy",
           "en": "Edge of the Wilds",
-          "note": "kraina; „puszcza” to dzika, pierwotna knieja, „Wilds” oddaje to lepiej niż „Forest”",
-          "or": "Forest's Edge"
+          "note": "kraina; „puszcza” to dzika, pierwotna knieja, „Wilds” oddaje to lepiej niż „Forest”"
         },
         {
           "pl": "Wiatrołomy",
@@ -210,8 +207,7 @@
         {
           "pl": "Żmijowe Zwalisko",
           "en": "Viper Deadfall",
-          "note": "zwalisko to sterta zwalonych pni („deadfall”); id ma „heaps”",
-          "or": "Viper Heaps"
+          "note": "zwalisko to sterta zwalonych pni („deadfall”); id ma „heaps”"
         },
         {
           "pl": "Dzicza Głusza",
@@ -261,9 +257,8 @@
         },
         {
           "pl": "Skup złomu",
-          "en": "Scrap Buyer",
-          "note": "budynek, gdzie złomiarz kupuje przedmioty",
-          "or": "Scrapyard"
+          "en": "Scrapyard",
+          "note": "budynek, gdzie złomiarz kupuje przedmioty"
         },
         {
           "pl": "Kowadło",
