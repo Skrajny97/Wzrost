@@ -3034,6 +3034,43 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.87 (6.11.2026)
+
+Krainy Głucha Knieja i Ostępy Nowiu (poziomy 151–200) z grafikami i okrzykami, które wybrał autor: zob. „Głucha Knieja i Ostępy Nowiu”. Odpowiedzi autora 701–705: zob. „Odpowiedzi autora 701–705”.
+
+## Głucha Knieja i Ostępy Nowiu (poziomy 151–200, 6.11.2026, od 0.1.87)
+
+Druga i trzecia kraina Szumiącego Boru z propozycji 666. Autor przyjął wszystkie warianty A (685–690), a stwory, materiały, kręgi miejsc, karty krain i okrzyki wybrał sam (700–704).
+
+1. **Krainy i miejsca.**
+   - Głucha Knieja (151–175): Świerkowy Zmrok (151–155), Paprociowy Gąszcz (156–160), Zapomniany Trakt (161–165), Mszysty Wądół (166–170) i Matecznik (171–175) z czempionem Nocnym Łowczym. Elita: Słowik Rozbójnik. Cecha krainy to Ciernie: krwawienie trwa o jeden ruch dłużej, u stworów i u postaci.
+   - Ostępy Nowiu (176–200): Skrzypiące Sosny (176–180), Próchniejące Pnie (181–185), Czarcie Rozdroże (186–190), Morowe Mogiły (191–195) i Zaćmiona Polana (196–200) z czempionem Księżycożercą. Elita: Morowa Dziewica. Cecha krainy to Przymrozek (688 A): wychłodzenie trwa o jeden ruch dłużej, u stworów i u postaci.
+
+   Razem 30 stworów, 2 elity i 2 czempionów, a każdy z nich zostawia własny materiał (34). Rzadkości materiałów rosną z miejscem jak w Sosnowych Wydmach; materiały elit są mityczne, a czempionów boskie. Każde nowe miejsce ma wariant Poszukiwanego w Osadzie, z imionami z propozycji (690 A).
+2. **Ukryty w mroku (686 A).** Szeleśnik i Mrokun kryją się w ciemności: drużyna nie wybiera ich na cel, dopóki walczy stwór bez tej cechy. Dotyczy to zwykłego ciosu, celu umiejętności, sokoła, przywołańca i cięcia ostrza. Gdy zostaną same ukryte stwory, wybiera się je jak każde inne. Ciosy w wielu (zamach, chmura, rozprysk, przebicie, wir, echo) i odpowiedzi na cios trafiają je normalnie. Cecha nie losuje nic własnego, więc walki bez tych stworów się nie zmieniają.
+3. **Cios w cały szyk (687 A).** Księżycożerca bije wybrany cel pełnym ciosem, a każdego innego członka drużyny 60% tego ciosu, każdego osobno (z trafieniem krytycznym i wychłodzeniem dla każdego). W odtworzeniu walki ciosy spadają naraz, jak przy zamachu. Trucizna Morowej Dziewicy może trafić całą drużynę, jak oparzenie Raroga.
+4. **Liczby.** Ciosy, zdrowie i nagrody stworów dobrano w `tools/difficulty-sim.mjs` do krzywej trudności (stwory Pogorzeliska na tych poziomach, zmierzone przed dodaniem krain).
+   - Realistyczny gracz zdobywa na godzinę XP i złoto w granicach około 2,5% krzywej i nie mdleje częściej niż na niej.
+   - Gracz okazjonalny z towarzyszami mdleje rzadziej, niż przewiduje krzywa, a w każdym kolejnym miejscu trochę częściej.
+   - Elity są jak Południca, a czempioni trochę trudniejsi od Raroga.
+   - Wieże: przy 40 miejscach czempion dalej czeka co 25. piętro; piętra 25–200 spotykają po kolei ostatnie miejsca wszystkich ośmiu krain (pilnuje tego walidator).
+5. **Grafiki (PixelLab).** Wszystkie wybrał autor:
+   - 34 stwory (700: 700.1 A, 700.2 C, 700.3 B, 700.4 C, 700.5 A, 700.6 B, 700.7 A, 700.8 A, 700.9 C, 700.10 B, 700.11 B, 700.12 C, 700.13 C, 700.14 B, 700.15 A, 700.16 B, 700.17 B, 700.18 C, 700.19 C, 700.20 D, 700.21 D, 700.22 C, 700.23 B, 700.24 C, 700.25 A, 700.26 C, 700.27 D, 700.28 C, 700.29 B, 700.30 C, 700.31 A, 700.32 C, 700.33 D, 700.34 B). Sześć z nich (Szeleśnik, Wij, Giez, Skorek, Umrzyk, Grabarz) jest odbitych w poziomie, żeby patrzyły w prawo jak inne stwory w grze;
+   - 34 materiały (701: 701.1 A, 701.2 A, 701.3 A, 701.4 D, 701.5 A, 701.6 B, 701.7 D, 701.8 C, 701.9 C, 701.10 C, 701.11 B, 701.12 A, 701.13 B, 701.14 B, 701.15 C, 701.16 A, 701.17 B, 701.18 A, 701.19 B, 701.20 D, 701.21 B, 701.22 A, 701.23 C, 701.24 C, 701.25 D, 701.26 C, 701.27 B, 701.28 C, 701.29 B, 701.30 A, 701.31 D, 701.32 B, 701.33 C, 701.34 A);
+   - kręgi miejsc (702: Świerkowy Zmrok A, Paprociowy Gąszcz A, Zapomniany Trakt D, Mszysty Wądół D, Matecznik D, Skrzypiące Sosny D, Próchniejące Pnie A, Czarcie Rozdroże A, Morowe Mogiły C, Zaćmiona Polana C);
+   - karty krain (703: Głucha Knieja A, Ostępy Nowiu C), z których powstają też panoramy w Walce (karta i jej lustro obok siebie, 384 × 96).
+
+   Poprawki autora, wprowadzone bez ponownej oceny, zgodnie z prośbą autora: Zwój paproci (701.5 A) ma zieleń Paprotnika, a Splątany korzeń (701.10 C) barwy Wykrotnika, oba z zachowanym światłem i cieniem. Skołtuniony kłąb (701.31 D) nie ma już dwóch jasnych plamek jak oczy. Morowej chuście (701.33 C) zostały usunięte kępki trawy, które PixelLab dorysował w rogach.
+6. **Okrzyki (704).** Każdy stwór ma po dwa nagrania krzyku przy trafieniu i dwa przy śmierci. Autor ocenił je na stronie odsłuchu przyciskami „Akceptuj” i „Odrzuć”: 130 przeszło od razu, a okrzyki Gieza (zbyt ludzkie) i śmierć Bezgłowca (brzmiała jak miecz) nagrano od nowa i autor przyjął je wszystkie.
+7. **Sprawdzone:** wszystkie testy (1330); pierwsze kroki nowej postaci na telefonie, komputerze i dużym monitorze; wygląd na 9 rozmiarach ekranu. W przeglądarce postać na 200. poziomie widzi obie krainy z kartami i cechami, miejsca Głuchej Kniei w kręgach, wyrusza na Zaćmioną Polanę, a scena Walki ma panoramę Ostępów Nowiu. Raport po przewinięciu czasu pokazuje stwory krainy. Nie brakuje żadnego pliku i strona nie ma błędów.
+
+## Odpowiedzi autora 701–705 (6.11.2026)
+
+Autor: „703.1 A / 703.2 C / 701.1 A / 701.2 A / 701.3 A / 701.4 D / 701.5 A, tylko pokoloruj na zielony kolor stwora / 701.6 B / 701.7 D / 701.8 C / 701.9 C / 701.10 C, tylko przekoloruj na kolor stwora / 701.11 B / 701.12 A / 701.13 B / 701.14 B / 701.15 C / 701.16 A / 701.17 B / 701.18 A / 701.19 B / 701.20 D / 701.21 B / 701.22 A / 701.23 C / 701.24 C / 701.25 D / 701.26 C / 701.27 B / 701.28 C / 701.29 B / 701.30 A / 701.31 D, bez tych jasnych plamek jakby oczu / 701.32 B / 701.33 C / 701.34 A / 702.1 A / 702.2 A / 702.3 D / 702.4 D / 702.5 D / 702.6 D / 702.7 A / 702.8 A / 702.9 C / 702.10 C / 705.1 A / 705.2 A / 705.3 A / 705.4 A / 705.5 B” i „to co poprawisz co wyżej dałem nie dawaj wiecej do oceny”. Na stronie odsłuchu autor przyjął sześć nowych okrzyków (Giez i śmierć Bezgłowca).
+
+1. **Krainy 151–200:** grafiki i okrzyki w grze od 0.1.87, zob. „Głucha Knieja i Ostępy Nowiu”. Poprawek 701.5, 701.10 i 701.31 autor nie chce oglądać ponownie.
+2. **Słownik angielskich nazw (705.1–705.5):** Walka → Combat, wolne punkty → free points, Skraj Puszczy → Edge of the Wilds, Żmijowe Zwalisko → Viper Deadfall (wszystkie A), Skup złomu → Scrapyard (B), w `data/en/glossary.json`. Pozycje 705.6–705.11, 706, 707 i 708 czekają na autora.
+
 ## Wersja 0.1.86 (6.11.2026)
 
 Angielska wersja beta, etap 1: język każdego zapytania, ekrany wokół gry po angielsku i przełącznik PL | EN, tylko na wersji testowej. W grze głównej wszystko zostaje po polsku: zob. „Angielska wersja beta, etap 1: mechanizm i ekrany wokół gry”.
