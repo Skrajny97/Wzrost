@@ -1,0 +1,13 @@
+{
+  "id": "hollow-dweller-hurt",
+  "payload": {
+    "text": "a thin creature from a tree hollow gives a sharp screeching hiss of pain with a scrape of claws on wood, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/hollow-dweller-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/hollow-dweller-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 20
+}

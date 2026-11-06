@@ -1,0 +1,13 @@
+{
+  "id": "rootwad-hurt",
+  "payload": {
+    "text": "a living mass of torn roots and earth groans with a deep creak of wood, crunching stones and falling soil, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/rootwad-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/rootwad-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 28
+}

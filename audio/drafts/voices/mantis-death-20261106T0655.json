@@ -1,0 +1,13 @@
+{
+  "id": "mantis-death",
+  "payload": {
+    "text": "a giant mantis gives a thin fading screech as its spiked limbs click and fold, then falls with a dry rustle, no words, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/mantis-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/mantis-death-20261106T0655-1.mp3"
+  ],
+  "credits": 44
+}

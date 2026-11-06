@@ -1,0 +1,13 @@
+{
+  "id": "murkling-death",
+  "payload": {
+    "text": "a pool of living darkness gives a long hollow sucking moan and drains away into silence, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/murkling-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/murkling-death-20261106T0655-1.mp3"
+  ],
+  "credits": 56
+}

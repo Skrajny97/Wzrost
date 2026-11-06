@@ -1,0 +1,13 @@
+{
+  "id": "gadfly-death",
+  "payload": {
+    "text": "the loud buzzing of a giant horsefly stutters, drops in pitch and dies away as it falls with a soft thud, no words, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/gadfly-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/gadfly-death-20261106T0655-1.mp3"
+  ],
+  "credits": 44
+}

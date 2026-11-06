@@ -1,0 +1,13 @@
+{
+  "id": "deadman-death",
+  "payload": {
+    "text": "a risen corpse gives a long hollow death rattle and sinks into the earth with a crackle of ice and a soft thud, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/deadman-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/deadman-death-20261106T0655-1.mp3"
+  ],
+  "credits": 56
+}

@@ -1,0 +1,13 @@
+{
+  "id": "night-huntsman-hurt",
+  "payload": {
+    "text": "a ghostly giant hunter gives a short terrifying roar of pain with a deep echoing voice and a creak of a bowstring, horror, menacing, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/night-huntsman-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/night-huntsman-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 28
+}

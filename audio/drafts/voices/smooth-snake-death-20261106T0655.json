@@ -1,0 +1,13 @@
+{
+  "id": "smooth-snake-death",
+  "payload": {
+    "text": "a big black snake lets out a long fading hiss as its heavy coils go limp in the moss, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/smooth-snake-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/smooth-snake-death-20261106T0655-1.mp3"
+  ],
+  "credits": 48
+}

@@ -1,0 +1,13 @@
+{
+  "id": "moon-eater-hurt",
+  "payload": {
+    "text": "a colossal beast of darkness gives a short terrifying roar of pain, a deep distorted rumble with an icy echo and a crackle of frost, horror, menacing, no words, video game boss hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/moon-eater-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/moon-eater-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 28
+}

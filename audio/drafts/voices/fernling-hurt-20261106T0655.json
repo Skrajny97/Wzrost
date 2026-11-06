@@ -1,0 +1,13 @@
+{
+  "id": "fernling-hurt",
+  "payload": {
+    "text": "a creature of fern leaves hisses in pain with a sharp rustle and a crack of breaking stems, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/fernling-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/fernling-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 24
+}

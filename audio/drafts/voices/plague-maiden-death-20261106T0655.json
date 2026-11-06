@@ -1,0 +1,13 @@
+{
+  "id": "plague-maiden-death",
+  "payload": {
+    "text": "a ghostly plague maiden lets out a long chilling wail that fades into a wheezing breath and the soft flutter of a kerchief in the wind, no words, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/plague-maiden-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/plague-maiden-death-20261106T0655-1.mp3"
+  ],
+  "credits": 64
+}

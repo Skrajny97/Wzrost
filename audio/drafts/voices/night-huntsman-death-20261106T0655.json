@@ -1,0 +1,13 @@
+{
+  "id": "night-huntsman-death",
+  "payload": {
+    "text": "a ghostly giant hunter lets out a long echoing howl that ends in the last mournful call of a hunting horn fading into a silent forest, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/night-huntsman-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/night-huntsman-death-20261106T0655-1.mp3"
+  ],
+  "credits": 64
+}

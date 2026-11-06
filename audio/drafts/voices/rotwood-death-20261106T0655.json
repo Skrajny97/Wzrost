@@ -1,0 +1,13 @@
+{
+  "id": "rotwood-death",
+  "payload": {
+    "text": "a huge rotten log breaks apart with a deep hollow groan, splintering soft wood and a long crumbling of rot, no words, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/rotwood-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/rotwood-death-20261106T0655-1.mp3"
+  ],
+  "credits": 64
+}

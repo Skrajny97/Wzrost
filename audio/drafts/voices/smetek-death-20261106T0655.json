@@ -1,0 +1,13 @@
+{
+  "id": "smetek-death",
+  "payload": {
+    "text": "a sorrowful ghost's sad wailing song fades into a long echoing sigh and the slow drip of water, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/smetek-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/smetek-death-20261106T0655-1.mp3"
+  ],
+  "credits": 56
+}

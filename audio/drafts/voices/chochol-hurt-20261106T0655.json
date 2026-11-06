@@ -1,0 +1,13 @@
+{
+  "id": "chochol-hurt",
+  "payload": {
+    "text": "a straw figure rustles sharply and gives a dry whispering hiss of pain, brushwood crackling, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/chochol-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/chochol-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 24
+}

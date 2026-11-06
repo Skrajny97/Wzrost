@@ -1,0 +1,13 @@
+{
+  "id": "earwig-death",
+  "payload": {
+    "text": "a giant earwig's shell crunches as its pincers snap shut one last time, its legs scraping and going still, no words, close up, dry, no music",
+    "duration_seconds": 1.1,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/earwig-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/earwig-death-20261106T0655-1.mp3"
+  ],
+  "credits": 44
+}

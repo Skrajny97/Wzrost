@@ -1,0 +1,13 @@
+{
+  "id": "rotwood-hurt",
+  "payload": {
+    "text": "a living rotten log groans in pain with a deep soft creak of rotten wood and a wet crumble, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/rotwood-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/rotwood-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 28
+}

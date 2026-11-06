@@ -1,0 +1,13 @@
+{
+  "id": "lichen-beard-death",
+  "payload": {
+    "text": "a giant covered in lichen gives a long deep groan and falls with a heavy thud, a crackle of frost and a rustle of lichen, no words, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/lichen-beard-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/lichen-beard-death-20261106T0655-1.mp3"
+  ],
+  "credits": 64
+}

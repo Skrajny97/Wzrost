@@ -1,0 +1,13 @@
+{
+  "id": "carcass-hurt",
+  "payload": {
+    "text": "a rotting carcass of a beast groans with a wet gurgle and a creak of stitched roots, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/carcass-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/carcass-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 24
+}

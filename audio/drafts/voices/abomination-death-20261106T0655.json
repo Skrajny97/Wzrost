@@ -1,0 +1,13 @@
+{
+  "id": "abomination-death",
+  "payload": {
+    "text": "a shapeless many-legged beast gives a long chorus of gurgling snarls from many mouths that die out one by one, legs scraping and going still, no words, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/abomination-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/abomination-death-20261106T0655-1.mp3"
+  ],
+  "credits": 64
+}

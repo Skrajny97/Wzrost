@@ -1,0 +1,13 @@
+{
+  "id": "gadfly-hurt",
+  "payload": {
+    "text": "a giant horsefly gives an angry high buzzing whine of pain with a stutter of its wings, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/gadfly-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/gadfly-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 20
+}

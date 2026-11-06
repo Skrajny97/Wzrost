@@ -1,0 +1,13 @@
+{
+  "id": "fernling-death",
+  "payload": {
+    "text": "a creature of curled fern leaves gives a hollow fading moan and crumbles into the earth with a long dry rustle, no words, close up, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/fernling-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/fernling-death-20261106T0655-1.mp3"
+  ],
+  "credits": 52
+}

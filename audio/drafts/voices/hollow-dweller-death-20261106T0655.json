@@ -1,0 +1,13 @@
+{
+  "id": "hollow-dweller-death",
+  "payload": {
+    "text": "a thin creature gives a long fading screech that echoes inside a hollow tree, its claws scratching weakly on wood, no words, close up, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/hollow-dweller-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/hollow-dweller-death-20261106T0655-1.mp3"
+  ],
+  "credits": 48
+}

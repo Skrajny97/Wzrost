@@ -1,0 +1,13 @@
+{
+  "id": "bebok-death",
+  "payload": {
+    "text": "a shaggy bogeyman gives a long gruff groan that fades away as a heavy sack drops with a thud, no words, close up, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bebok-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/bebok-death-20261106T0655-1.mp3"
+  ],
+  "credits": 52
+}

@@ -1,0 +1,13 @@
+{
+  "id": "koltun-death",
+  "payload": {
+    "text": "a ball of tangled black hair gives a long fading hiss as it unravels with a dry rustle, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/koltun-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/koltun-death-20261106T0655-1.mp3"
+  ],
+  "credits": 48
+}

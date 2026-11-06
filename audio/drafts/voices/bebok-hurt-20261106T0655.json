@@ -1,0 +1,13 @@
+{
+  "id": "bebok-hurt",
+  "payload": {
+    "text": "a shaggy bogeyman grunts and growls in pain with a gruff raspy voice and a rustle of a coarse sack, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bebok-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/bebok-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 24
+}

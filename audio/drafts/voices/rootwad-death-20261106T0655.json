@@ -1,0 +1,13 @@
+{
+  "id": "rootwad-death",
+  "payload": {
+    "text": "a huge living root plate cracks and collapses with a deep wooden groan, a rumble of stones and a long shower of falling earth, no words, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/rootwad-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/rootwad-death-20261106T0655-1.mp3"
+  ],
+  "credits": 64
+}

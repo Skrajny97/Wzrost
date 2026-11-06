@@ -1,0 +1,13 @@
+{
+  "id": "strangler-hurt",
+  "payload": {
+    "text": "a thin shadow figure gives a choked rasping hiss of pain as a rope of roots creaks taut, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/strangler-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/strangler-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 24
+}

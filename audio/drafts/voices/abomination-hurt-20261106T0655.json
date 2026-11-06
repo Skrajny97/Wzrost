@@ -1,0 +1,13 @@
+{
+  "id": "abomination-hurt",
+  "payload": {
+    "text": "a shapeless many-mouthed beast snarls and gurgles from many throats at once in pain, wet chattering teeth, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.7,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/abomination-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/abomination-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 28
+}

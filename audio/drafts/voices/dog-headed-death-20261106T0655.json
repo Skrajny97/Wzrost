@@ -1,0 +1,13 @@
+{
+  "id": "dog-headed-death",
+  "payload": {
+    "text": "a dog-headed man gives a long howling death cry that breaks into a choked human groan, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/dog-headed-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/dog-headed-death-20261106T0655-1.mp3"
+  ],
+  "credits": 56
+}

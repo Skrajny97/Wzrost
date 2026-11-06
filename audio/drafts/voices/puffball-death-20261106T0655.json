@@ -1,0 +1,13 @@
+{
+  "id": "puffball-death",
+  "payload": {
+    "text": "a giant puffball mushroom bursts with a dull pop and a long wheezing hiss of spore dust that slowly settles, no words, close up, dry, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/puffball-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/puffball-death-20261106T0655-1.mp3"
+  ],
+  "credits": 52
+}

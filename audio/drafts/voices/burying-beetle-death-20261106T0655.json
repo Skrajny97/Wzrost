@@ -1,0 +1,13 @@
+{
+  "id": "burying-beetle-death",
+  "payload": {
+    "text": "a giant beetle's shell crunches as it digs feebly into the soil, its legs scraping and going still, no words, close up, dry, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/burying-beetle-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/burying-beetle-death-20261106T0655-1.mp3"
+  ],
+  "credits": 48
+}

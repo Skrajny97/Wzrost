@@ -1,0 +1,13 @@
+{
+  "id": "headless-death",
+  "payload": {
+    "text": "a headless ghost gives a long hollow echoing moan as a heavy rusty sword falls with a clang and a cloak crumples, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/headless-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/headless-death-20261106T0655-1.mp3"
+  ],
+  "credits": 56
+}

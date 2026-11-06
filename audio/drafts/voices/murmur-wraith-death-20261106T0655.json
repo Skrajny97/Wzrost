@@ -1,0 +1,13 @@
+{
+  "id": "murmur-wraith-death",
+  "payload": {
+    "text": "a rushing wraith of pine needles slows into a long fading murmur of wind in the pines, dry cones dropping to the ground, then silence, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/murmur-wraith-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/murmur-wraith-death-20261106T0655-1.mp3"
+  ],
+  "credits": 56
+}

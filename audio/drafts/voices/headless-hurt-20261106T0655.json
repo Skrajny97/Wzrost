@@ -1,0 +1,13 @@
+{
+  "id": "headless-hurt",
+  "payload": {
+    "text": "a headless wanderer gives a hollow muffled groan of pain from nowhere and a clank of a rusty sword, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/headless-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/headless-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 24
+}

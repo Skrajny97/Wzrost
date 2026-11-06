@@ -1,0 +1,13 @@
+{
+  "id": "smoke-hound-hurt",
+  "payload": {
+    "text": "a black hound of smoke yelps and snarls in pain with a hiss of smoke, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/smoke-hound-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/smoke-hound-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 20
+}

@@ -1,0 +1,13 @@
+{
+  "id": "smetek-hurt",
+  "payload": {
+    "text": "a sorrowful grey ghost gives a mournful wailing sob of pain with a drip of cold water, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/smetek-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/smetek-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 24
+}

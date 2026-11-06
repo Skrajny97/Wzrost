@@ -1,0 +1,13 @@
+{
+  "id": "nightingale-robber-hurt",
+  "payload": {
+    "text": "a monstrous giant bird with a man's voice gives a furious piercing whistle of pain with a gust of wind, no words, video game monster hurt sound, close up, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/nightingale-robber-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/nightingale-robber-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 24
+}

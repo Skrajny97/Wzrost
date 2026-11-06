@@ -1,0 +1,13 @@
+{
+  "id": "chochol-death",
+  "payload": {
+    "text": "a dancing straw figure gives a long fading whisper as its straw rustles in a slow rhythm and collapses into a dry heap, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/chochol-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/chochol-death-20261106T0655-1.mp3"
+  ],
+  "credits": 56
+}

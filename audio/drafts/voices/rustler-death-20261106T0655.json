@@ -1,0 +1,13 @@
+{
+  "id": "rustler-death",
+  "payload": {
+    "text": "a shadow creature's eerie whisper fades into a long cold breath and a last rustle of twigs, then silence, no words, close up, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/rustler-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/rustler-death-20261106T0655-1.mp3"
+  ],
+  "credits": 52
+}

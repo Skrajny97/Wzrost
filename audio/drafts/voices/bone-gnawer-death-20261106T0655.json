@@ -1,0 +1,13 @@
+{
+  "id": "bone-gnawer-death",
+  "payload": {
+    "text": "a heavy beast gives a long gurgling growl and collapses with a clatter of bones, no words, close up, dry, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bone-gnawer-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/bone-gnawer-death-20261106T0655-1.mp3"
+  ],
+  "credits": 56
+}

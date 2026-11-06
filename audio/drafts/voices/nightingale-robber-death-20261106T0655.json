@@ -1,0 +1,13 @@
+{
+  "id": "nightingale-robber-death",
+  "payload": {
+    "text": "a monstrous robber bird gives a long shrill whistle that breaks into a deep human groan and a heavy flutter of wings, withered leaves rustling, no words, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/nightingale-robber-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/nightingale-robber-death-20261106T0655-1.mp3"
+  ],
+  "credits": 64
+}

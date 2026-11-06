@@ -1,0 +1,13 @@
+{
+  "id": "dog-headed-hurt",
+  "payload": {
+    "text": "a dog-headed man snarls and yelps in pain, a savage canine growl with a human rasp, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/dog-headed-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/dog-headed-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 24
+}

@@ -1,0 +1,13 @@
+{
+  "id": "smooth-snake-hurt",
+  "payload": {
+    "text": "a thick angry snake hisses sharply in pain with a snap of its jaws, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/smooth-snake-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/smooth-snake-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 24
+}

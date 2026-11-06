@@ -1,0 +1,13 @@
+{
+  "id": "ghost-coachman-death",
+  "payload": {
+    "text": "the ghost of a coachman gives a long echoing moan that fades into the night, a last whip crack like distant thunder and a creak of cart wheels, no words, close up, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/ghost-coachman-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/ghost-coachman-death-20261106T0655-1.mp3"
+  ],
+  "credits": 56
+}

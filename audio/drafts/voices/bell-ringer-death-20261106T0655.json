@@ -1,0 +1,13 @@
+{
+  "id": "bell-ringer-death",
+  "payload": {
+    "text": "a hooded ghost gives a long cold echoing moan as a cracked funeral bell tolls one last broken toll that fades into frost, no words, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/bell-ringer-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/bell-ringer-death-20261106T0655-1.mp3"
+  ],
+  "credits": 64
+}

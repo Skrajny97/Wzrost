@@ -1,0 +1,13 @@
+{
+  "id": "moon-eater-death",
+  "payload": {
+    "text": "a colossal beast of darkness lets out a long deep howling roar that echoes and ends in a shattering crack of ice, fading into a cold silent wind, no words, video game boss death sound, close up, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/moon-eater-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/moon-eater-death-20261106T0655-1.mp3"
+  ],
+  "credits": 64
+}

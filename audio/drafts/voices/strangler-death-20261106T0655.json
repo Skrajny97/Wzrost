@@ -1,0 +1,13 @@
+{
+  "id": "strangler-death",
+  "payload": {
+    "text": "a shadow figure gives a long choking rattle as a rope of roots snaps and falls loose, no words, close up, no music",
+    "duration_seconds": 1.3,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/strangler-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/strangler-death-20261106T0655-1.mp3"
+  ],
+  "credits": 52
+}

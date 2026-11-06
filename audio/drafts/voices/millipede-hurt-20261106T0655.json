@@ -1,0 +1,13 @@
+{
+  "id": "millipede-hurt",
+  "payload": {
+    "text": "a giant millipede hisses in pain as its armoured segments click and grind, hundreds of legs scraping, no words, video game monster hurt sound, close up, dry, no music",
+    "duration_seconds": 0.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/millipede-hurt-20261106T0655-0.mp3",
+    "audio/drafts/voices/millipede-hurt-20261106T0655-1.mp3"
+  ],
+  "credits": 24
+}

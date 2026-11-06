@@ -1,0 +1,13 @@
+{
+  "id": "smoke-hound-death",
+  "payload": {
+    "text": "a hound made of smoke gives a long fading howl that dissolves into a soft hiss of smoke, a broken leash clinks, no words, close up, no music",
+    "duration_seconds": 1.2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/voices/smoke-hound-death-20261106T0655-0.mp3",
+    "audio/drafts/voices/smoke-hound-death-20261106T0655-1.mp3"
+  ],
+  "credits": 48
+}
