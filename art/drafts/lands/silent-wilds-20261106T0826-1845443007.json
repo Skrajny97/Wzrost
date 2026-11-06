@@ -1,0 +1,14 @@
+{
+  "id": "silent-wilds",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, a vast dense spruce forest at night where no birds sing, tall black spruces with drooping branches hung with grey moss, the sky hidden behind their dark tops, a narrow overgrown path vanishing into the darkness, a few pairs of small glowing eyes in the thicket, faint cold light filtering down, wide panorama for a dim background behind text, low contrast, muted dark palette of black spruce greens, moss greens and cold night blues, no text, no border, no people, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}

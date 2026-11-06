@@ -1,0 +1,14 @@
+{
+  "id": "new-moon-depths",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the darkest depths of an ancient pine forest on a moonless night, huge old pines hung with grey lichen beards, a pale gnawed remnant of the moon with jagged bite marks high in the middle of a black starless sky, faintly glowing green rotten logs, a forgotten graveyard with leaning crosses in a small clearing, wide panorama for a dim background behind text, low contrast, very dark muted palette of black-blues, deep pine greens and pale moon silver, no text, no border, no people, no animals in front",
+  "style": "src/client/art/lands/black-bog.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}
