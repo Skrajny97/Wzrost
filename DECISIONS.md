@@ -3076,6 +3076,13 @@ Etap 3 z planu angielskiej bety (668). Jak w etapach 1 i 2 angielski działa tyl
 2. **Nazwa miejsca:** tytuł z jednym długim słowem obok dużego „Powrót” (np. „Skraj Wiatrołomów”) wychodził przy 320 px o ok. 20 px poza ramkę. Do 374 px taki tytuł ma 24 px zamiast 28 px.
 3. **Pilnowanie:** `tools/layout-check.cjs` ogląda też ekran miejsca (Skraj Wiatrołomów).
 
+## Odpowiedź autora 712 (6.11.2026)
+
+Autor: „712 OK, lecisz dalej z tłumaczeniami gry, to co jest dostępne musi być w całości przetłumaczone, choćby i etapami”.
+
+1. **712 OK.** Wszystkie 33 angielskie kwestie narratora z etapu 3 (rozdziały Społeczność, Umiejętności, Profesje, Rzemieślnictwo i Drużyna) zostają w brzmieniu z `data/en/tutorial.json` i tak zostaną nagrane w etapie 5.
+2. **Dalej:** całą resztę gry, którą gracz może zobaczyć, dostaje angielski w kolejnym etapie: krainy od 26. poziomu z ich stworami, materiałami, przedmiotami i zdarzeniami, Osada z Górnictwem i Jubilerstwem, Gildia, Wieże, Warownia, Ewolucje i pozostałe rozdziały narratora.
+
 ## Odpowiedzi autora 710 i 711 (6.11.2026, od 0.1.91)
 
 1. **710 A.** W zdarzeniu „Ranna kobieta”, w skutku „Pytania: umiera w beznadziei”, zdanie autora ma poprawioną gramatykę: „Kobieta próbuje odpowiadać, ale Twoje podejrzliwe pytania nie pomagają, a odbierają nadzieję na jakąkolwiek pomoc.” Reszta tekstu i angielskie tłumaczenie zostają bez zmian.
