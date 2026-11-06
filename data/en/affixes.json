@@ -641,6 +641,480 @@
         "pl": "Rat"
       },
       "suffix": "of the Rat"
+    },
+    "pond-turtle": {
+      "prefix": {
+        "m": "Turtle",
+        "f": "Turtle",
+        "n": "Turtle",
+        "pl": "Turtle"
+      },
+      "suffix": "of the Pond Turtle"
+    },
+    "mink": {
+      "prefix": {
+        "m": "Mink",
+        "f": "Mink",
+        "n": "Mink",
+        "pl": "Mink"
+      },
+      "suffix": "of the Mink"
+    },
+    "dragonfly": {
+      "suffix": "of the Dragonfly"
+    },
+    "pike": {
+      "prefix": {
+        "m": "Pike",
+        "f": "Pike",
+        "n": "Pike",
+        "pl": "Pike"
+      },
+      "suffix": "of the Pike"
+    },
+    "water-spider": {
+      "suffix": "of the Water Spider"
+    },
+    "black-tern": {
+      "suffix": "of the Tern"
+    },
+    "wooden-idol": {
+      "prefix": {
+        "m": "Oaken",
+        "f": "Oaken",
+        "n": "Oaken",
+        "pl": "Oaken"
+      },
+      "suffix": "of the Idol"
+    },
+    "veles-serpent": {
+      "prefix": {
+        "m": "Veles",
+        "f": "Veles",
+        "n": "Veles",
+        "pl": "Veles"
+      },
+      "suffix": "of the Veles Serpent"
+    },
+    "pagan-priest": {
+      "prefix": {
+        "m": "Pagan",
+        "f": "Pagan",
+        "n": "Pagan",
+        "pl": "Pagan"
+      },
+      "suffix": "of the Pagan Priest"
+    },
+    "bog-demon": {
+      "suffix": "of the Bagiennik"
+    },
+    "tick": {
+      "prefix": {
+        "m": "Tick",
+        "f": "Tick",
+        "n": "Tick",
+        "pl": "Tick"
+      },
+      "suffix": "of the Giant Tick"
+    },
+    "night-heron": {
+      "suffix": "of the Night Heron"
+    },
+    "bies": {
+      "prefix": {
+        "m": "Fiendish",
+        "f": "Fiendish",
+        "n": "Fiendish",
+        "pl": "Fiendish"
+      },
+      "suffix": "of the Bies"
+    },
+    "black-goat": {
+      "prefix": {
+        "m": "Goat",
+        "f": "Goat",
+        "n": "Goat",
+        "pl": "Goat"
+      },
+      "suffix": "of the Black Goat"
+    },
+    "klobuk": {
+      "suffix": "of the Kwobuk"
+    },
+    "mamuna": {
+      "suffix": "of the Mamuna"
+    },
+    "rokita": {
+      "prefix": {
+        "m": "Diabolic",
+        "f": "Diabolic",
+        "n": "Diabolic",
+        "pl": "Diabolic"
+      },
+      "suffix": "of Rokita"
+    },
+    "sandman": {
+      "prefix": {
+        "m": "Sand",
+        "f": "Sand",
+        "n": "Sand",
+        "pl": "Sand"
+      },
+      "suffix": "of the Sandman"
+    },
+    "heather-mare": {
+      "prefix": {
+        "m": "Heather",
+        "f": "Heather",
+        "n": "Heather",
+        "pl": "Heather"
+      },
+      "suffix": "of the Heather Mare"
+    },
+    "nightjar": {
+      "suffix": "of the Nightjar"
+    },
+    "resin-golem": {
+      "prefix": {
+        "m": "Resin",
+        "f": "Resin",
+        "n": "Resin",
+        "pl": "Resin"
+      },
+      "suffix": "of the Resin Golem"
+    },
+    "barkborer": {
+      "suffix": "of the Barkborer"
+    },
+    "tar-moth": {
+      "suffix": "of the Tar Moth"
+    },
+    "drought-husk": {
+      "suffix": "of the Drought Husk"
+    },
+    "sand-whirl": {
+      "prefix": {
+        "m": "Whirling",
+        "f": "Whirling",
+        "n": "Whirling",
+        "pl": "Whirling"
+      },
+      "suffix": "of the Sand Whirl"
+    },
+    "barrow-wight": {
+      "prefix": {
+        "m": "Barrow",
+        "f": "Barrow",
+        "n": "Barrow",
+        "pl": "Barrow"
+      },
+      "suffix": "of the Barrow-Wight"
+    },
+    "tar-burner": {
+      "prefix": {
+        "m": "Tar",
+        "f": "Tar",
+        "n": "Tar",
+        "pl": "Tar"
+      },
+      "suffix": "of the Tar Burner"
+    },
+    "charcoal-imp": {
+      "suffix": "of the Charcoal Imp"
+    },
+    "latawiec": {
+      "prefix": {
+        "m": "Gale",
+        "f": "Gale",
+        "n": "Gale",
+        "pl": "Gale"
+      },
+      "suffix": "of the Latavets"
+    },
+    "charred-pine": {
+      "prefix": {
+        "m": "Charred",
+        "f": "Charred",
+        "n": "Charred",
+        "pl": "Charred"
+      },
+      "suffix": "of the Charred Pine"
+    },
+    "ash-wraith": {
+      "prefix": {
+        "m": "Ashen",
+        "f": "Ashen",
+        "n": "Ashen",
+        "pl": "Ashen"
+      },
+      "suffix": "of the Ash Wraith"
+    },
+    "spark-swarm": {
+      "prefix": {
+        "m": "Sparkling",
+        "f": "Sparkling",
+        "n": "Sparkling",
+        "pl": "Sparkling"
+      },
+      "suffix": "of the Spark Swarm"
+    },
+    "noon-wraith": {
+      "suffix": "of the Poludnitsa"
+    },
+    "rarog": {
+      "prefix": {
+        "m": "Flaming",
+        "f": "Flaming",
+        "n": "Flaming",
+        "pl": "Flaming"
+      },
+      "suffix": "of the Rarog"
+    },
+    "needleback": {
+      "prefix": {
+        "m": "Needle",
+        "f": "Needle",
+        "n": "Needle",
+        "pl": "Needle"
+      },
+      "suffix": "of the Needleback"
+    },
+    "smooth-snake": {
+      "prefix": {
+        "m": "Wrathful",
+        "f": "Wrathful",
+        "n": "Wrathful",
+        "pl": "Wrathful"
+      },
+      "suffix": "of the Smooth Snake"
+    },
+    "rustler": {
+      "prefix": {
+        "m": "Rustling",
+        "f": "Rustling",
+        "n": "Rustling",
+        "pl": "Rustling"
+      },
+      "suffix": "of the Rustler"
+    },
+    "millipede": {
+      "suffix": "of the Millipede"
+    },
+    "fernling": {
+      "prefix": {
+        "m": "Fern",
+        "f": "Fern",
+        "n": "Fern",
+        "pl": "Fern"
+      },
+      "suffix": "of the Fernling"
+    },
+    "mantis": {
+      "suffix": "of the Mantis"
+    },
+    "dog-headed": {
+      "prefix": {
+        "m": "Dog",
+        "f": "Dog",
+        "n": "Dog",
+        "pl": "Dog"
+      },
+      "suffix": "of the Doghead"
+    },
+    "ghost-coachman": {
+      "suffix": "of the Coachman"
+    },
+    "gadfly": {
+      "suffix": "of the Gadfly"
+    },
+    "rootwad": {
+      "suffix": "of the Rootwad"
+    },
+    "murkling": {
+      "prefix": {
+        "m": "Gloom",
+        "f": "Gloom",
+        "n": "Gloom",
+        "pl": "Gloom"
+      },
+      "suffix": "of the Murkling"
+    },
+    "strangler": {
+      "prefix": {
+        "m": "Choking",
+        "f": "Choking",
+        "n": "Choking",
+        "pl": "Choking"
+      },
+      "suffix": "of the Strangler"
+    },
+    "bone-gnawer": {
+      "suffix": "of the Bone Gnawer"
+    },
+    "carcass": {
+      "prefix": {
+        "m": "Corpse",
+        "f": "Corpse",
+        "n": "Corpse",
+        "pl": "Corpse"
+      },
+      "suffix": "of the Carcass"
+    },
+    "smoke-hound": {
+      "prefix": {
+        "m": "Hound",
+        "f": "Hound",
+        "n": "Hound",
+        "pl": "Hound"
+      },
+      "suffix": "of the Hound"
+    },
+    "nightingale-robber": {
+      "prefix": {
+        "m": "Robber's",
+        "f": "Robber's",
+        "n": "Robber's",
+        "pl": "Robber's"
+      },
+      "suffix": "of the Robber Nightingale"
+    },
+    "night-huntsman": {
+      "prefix": {
+        "m": "Hunter's",
+        "f": "Hunter's",
+        "n": "Hunter's",
+        "pl": "Hunter's"
+      },
+      "suffix": "of the Night Huntsman"
+    },
+    "lichen-beard": {
+      "prefix": {
+        "m": "Lichen",
+        "f": "Lichen",
+        "n": "Lichen",
+        "pl": "Lichen"
+      },
+      "suffix": "of the Lichenbeard"
+    },
+    "hollow-dweller": {
+      "prefix": {
+        "m": "Hollow",
+        "f": "Hollow",
+        "n": "Hollow",
+        "pl": "Hollow"
+      },
+      "suffix": "of the Hollow Dweller"
+    },
+    "murmur-wraith": {
+      "prefix": {
+        "m": "Whispering",
+        "f": "Whispering",
+        "n": "Whispering",
+        "pl": "Whispering"
+      },
+      "suffix": "of the Murmur Wraith"
+    },
+    "rotwood": {
+      "prefix": {
+        "m": "Rotten",
+        "f": "Rotten",
+        "n": "Rotten",
+        "pl": "Rotten"
+      },
+      "suffix": "of the Rotwood"
+    },
+    "puffball": {
+      "suffix": "of the Puffball"
+    },
+    "earwig": {
+      "suffix": "of the Earwig"
+    },
+    "headless": {
+      "prefix": {
+        "m": "Headless",
+        "f": "Headless",
+        "n": "Headless",
+        "pl": "Headless"
+      },
+      "suffix": "of the Headless One"
+    },
+    "chochol": {
+      "prefix": {
+        "m": "Khokhow",
+        "f": "Khokhow",
+        "n": "Khokhow",
+        "pl": "Khokhow"
+      },
+      "suffix": "of the Khokhow"
+    },
+    "smetek": {
+      "prefix": {
+        "m": "Mournful",
+        "f": "Mournful",
+        "n": "Mournful",
+        "pl": "Mournful"
+      },
+      "suffix": "of the Smentek"
+    },
+    "deadman": {
+      "prefix": {
+        "m": "Grave",
+        "f": "Grave",
+        "n": "Grave",
+        "pl": "Grave"
+      },
+      "suffix": "of the Dead Man"
+    },
+    "burying-beetle": {
+      "suffix": "of the Burying Beetle"
+    },
+    "bell-ringer": {
+      "prefix": {
+        "m": "Funeral",
+        "f": "Funeral",
+        "n": "Funeral",
+        "pl": "Funeral"
+      },
+      "suffix": "of the Bell-Ringer"
+    },
+    "abomination": {
+      "prefix": {
+        "m": "Monstrous",
+        "f": "Monstrous",
+        "n": "Monstrous",
+        "pl": "Monstrous"
+      },
+      "suffix": "of the Abomination"
+    },
+    "koltun": {
+      "prefix": {
+        "m": "Matted",
+        "f": "Matted",
+        "n": "Matted",
+        "pl": "Matted"
+      },
+      "suffix": "of the Kowtun"
+    },
+    "bebok": {
+      "suffix": "of the Bebok"
+    },
+    "plague-maiden": {
+      "prefix": {
+        "m": "Plague",
+        "f": "Plague",
+        "n": "Plague",
+        "pl": "Plague"
+      },
+      "suffix": "of the Plague Maiden"
+    },
+    "moon-eater": {
+      "prefix": {
+        "m": "Eclipsed",
+        "f": "Eclipsed",
+        "n": "Eclipsed",
+        "pl": "Eclipsed"
+      },
+      "suffix": "of the Moon-Eater"
     }
   }
 }

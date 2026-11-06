@@ -967,5 +967,753 @@
     "attack": {
       "name": "Vicious Bite"
     }
+  },
+  "pond-turtle": {
+    "name": "Pond Turtle",
+    "counted": [
+      "Pond Turtle",
+      "Pond Turtles",
+      "Pond Turtles"
+    ],
+    "attack": {
+      "name": "Turtle Snap"
+    }
+  },
+  "mink": {
+    "name": "Mink",
+    "counted": [
+      "Mink",
+      "Minks",
+      "Minks"
+    ],
+    "attack": {
+      "name": "Quick Bites"
+    }
+  },
+  "dragonfly": {
+    "name": "Dragonfly",
+    "counted": [
+      "Dragonfly",
+      "Dragonflies",
+      "Dragonflies"
+    ],
+    "attack": {
+      "name": "Mid-Air Slash"
+    }
+  },
+  "pike": {
+    "name": "Pike",
+    "counted": [
+      "Pike",
+      "Pike",
+      "Pike"
+    ],
+    "attack": {
+      "name": "Pike's Bite"
+    }
+  },
+  "water-spider": {
+    "name": "Water Spider",
+    "counted": [
+      "Water Spider",
+      "Water Spiders",
+      "Water Spiders"
+    ],
+    "attack": {
+      "name": "Venom from Below"
+    }
+  },
+  "black-tern": {
+    "name": "Tern",
+    "counted": [
+      "Tern",
+      "Terns",
+      "Terns"
+    ],
+    "attack": {
+      "name": "Diving Beak"
+    }
+  },
+  "wooden-idol": {
+    "name": "Wooden Idol",
+    "counted": [
+      "Wooden Idol",
+      "Wooden Idols",
+      "Wooden Idols"
+    ],
+    "attack": {
+      "name": "Idol's Blow"
+    }
+  },
+  "veles-serpent": {
+    "name": "Veles Serpent",
+    "counted": [
+      "Veles Serpent",
+      "Veles Serpents",
+      "Veles Serpents"
+    ],
+    "attack": {
+      "name": "Waters of Nav"
+    }
+  },
+  "pagan-priest": {
+    "name": "Pagan Priest",
+    "counted": [
+      "Pagan Priest",
+      "Pagan Priests",
+      "Pagan Priests"
+    ],
+    "attack": {
+      "name": "Wrath of Perun"
+    }
+  },
+  "bog-demon": {
+    "name": "Bagiennik",
+    "counted": [
+      "Bagiennik",
+      "Bagienniks",
+      "Bagienniks"
+    ],
+    "attack": {
+      "name": "Bog Grip"
+    }
+  },
+  "tick": {
+    "name": "Giant Tick",
+    "counted": [
+      "Giant Tick",
+      "Giant Ticks",
+      "Giant Ticks"
+    ],
+    "attack": {
+      "name": "Puncture"
+    }
+  },
+  "night-heron": {
+    "name": "Night Heron",
+    "counted": [
+      "Night Heron",
+      "Night Herons",
+      "Night Herons"
+    ],
+    "attack": {
+      "name": "Night Stab"
+    }
+  },
+  "bies": {
+    "name": "Bies",
+    "counted": [
+      "Bies",
+      "Bieses",
+      "Bieses"
+    ],
+    "attack": {
+      "name": "Goring Horns"
+    }
+  },
+  "black-goat": {
+    "name": "Black Goat",
+    "counted": [
+      "Black Goat",
+      "Black Goats",
+      "Black Goats"
+    ],
+    "attack": {
+      "name": "Battering Ram"
+    }
+  },
+  "klobuk": {
+    "name": "Kwobuk",
+    "counted": [
+      "Kwobuk",
+      "Kwobuks",
+      "Kwobuks"
+    ],
+    "attack": {
+      "name": "Fiery Tail"
+    }
+  },
+  "mamuna": {
+    "name": "Mamuna",
+    "counted": [
+      "Mamuna",
+      "Mamunas",
+      "Mamunas"
+    ],
+    "attack": {
+      "name": "Cold Embrace"
+    }
+  },
+  "rokita": {
+    "name": "Rokita",
+    "counted": [
+      "Rokita",
+      "Rokitas",
+      "Rokitas"
+    ],
+    "attack": {
+      "name": "Hellfire"
+    }
+  },
+  "sandman": {
+    "name": "Sandman",
+    "counted": [
+      "Sandman",
+      "Sandmen",
+      "Sandmen"
+    ],
+    "attack": {
+      "name": "Sand Burial"
+    }
+  },
+  "heather-mare": {
+    "name": "Heather Mare",
+    "counted": [
+      "Heather Mare",
+      "Heather Mares",
+      "Heather Mares"
+    ],
+    "attack": {
+      "name": "Smothering Sleep"
+    }
+  },
+  "nightjar": {
+    "name": "Nightjar",
+    "counted": [
+      "Nightjar",
+      "Nightjars",
+      "Nightjars"
+    ],
+    "attack": {
+      "name": "Night Swoop"
+    }
+  },
+  "resin-golem": {
+    "name": "Resin Golem",
+    "counted": [
+      "Resin Golem",
+      "Resin Golems",
+      "Resin Golems"
+    ],
+    "attack": {
+      "name": "Sticky Clutch"
+    }
+  },
+  "barkborer": {
+    "name": "Barkborer",
+    "counted": [
+      "Barkborer",
+      "Barkborers",
+      "Barkborers"
+    ],
+    "attack": {
+      "name": "Gnawing"
+    }
+  },
+  "tar-moth": {
+    "name": "Tar Moth",
+    "counted": [
+      "Tar Moth",
+      "Tar Moths",
+      "Tar Moths"
+    ],
+    "attack": {
+      "name": "Poison Dust"
+    }
+  },
+  "drought-husk": {
+    "name": "Drought Husk",
+    "counted": [
+      "Drought Husk",
+      "Drought Husks",
+      "Drought Husks"
+    ],
+    "attack": {
+      "name": "Withering"
+    }
+  },
+  "sand-whirl": {
+    "name": "Sand Whirl",
+    "counted": [
+      "Sand Whirl",
+      "Sand Whirls",
+      "Sand Whirls"
+    ],
+    "attack": {
+      "name": "Stone Teeth"
+    }
+  },
+  "barrow-wight": {
+    "name": "Barrow-Wight",
+    "counted": [
+      "Barrow-Wight",
+      "Barrow-Wights",
+      "Barrow-Wights"
+    ],
+    "attack": {
+      "name": "Call of the Barrow"
+    }
+  },
+  "tar-burner": {
+    "name": "Tar Burner",
+    "counted": [
+      "Tar Burner",
+      "Tar Burners",
+      "Tar Burners"
+    ],
+    "attack": {
+      "name": "Boiling Tar"
+    }
+  },
+  "charcoal-imp": {
+    "name": "Charcoal Imp",
+    "counted": [
+      "Charcoal Imp",
+      "Charcoal Imps",
+      "Charcoal Imps"
+    ],
+    "attack": {
+      "name": "Ember Leap"
+    }
+  },
+  "latawiec": {
+    "name": "Latavets",
+    "counted": [
+      "Latavets",
+      "Latavetses",
+      "Latavetses"
+    ],
+    "attack": {
+      "name": "Gale Talons"
+    }
+  },
+  "charred-pine": {
+    "name": "Charred Pine",
+    "counted": [
+      "Charred Pine",
+      "Charred Pines",
+      "Charred Pines"
+    ],
+    "attack": {
+      "name": "Crushing Bough"
+    }
+  },
+  "ash-wraith": {
+    "name": "Ash Wraith",
+    "counted": [
+      "Ash Wraith",
+      "Ash Wraiths",
+      "Ash Wraiths"
+    ],
+    "attack": {
+      "name": "Ash in the Eyes"
+    }
+  },
+  "spark-swarm": {
+    "name": "Spark Swarm",
+    "counted": [
+      "Spark Swarm",
+      "Spark Swarms",
+      "Spark Swarms"
+    ],
+    "attack": {
+      "name": "Shower of Sparks"
+    }
+  },
+  "noon-wraith": {
+    "name": "Poludnitsa",
+    "counted": [
+      "Poludnitsa",
+      "Poludnitsas",
+      "Poludnitsas"
+    ],
+    "attack": {
+      "name": "Noonday Stroke"
+    }
+  },
+  "rarog": {
+    "name": "Rarog",
+    "counted": [
+      "Rarog",
+      "Rarogs",
+      "Rarogs"
+    ],
+    "attack": {
+      "name": "Firestorm"
+    }
+  },
+  "needleback": {
+    "name": "Needleback",
+    "counted": [
+      "Needleback",
+      "Needlebacks",
+      "Needlebacks"
+    ],
+    "attack": {
+      "name": "Needle Pounce"
+    }
+  },
+  "smooth-snake": {
+    "name": "Smooth Snake",
+    "counted": [
+      "Smooth Snake",
+      "Smooth Snakes",
+      "Smooth Snakes"
+    ],
+    "attack": {
+      "name": "Wrathful Bite"
+    }
+  },
+  "rustler": {
+    "name": "Rustler",
+    "counted": [
+      "Rustler",
+      "Rustlers",
+      "Rustlers"
+    ],
+    "attack": {
+      "name": "Whisper from Behind"
+    }
+  },
+  "millipede": {
+    "name": "Millipede",
+    "counted": [
+      "Millipede",
+      "Millipedes",
+      "Millipedes"
+    ],
+    "attack": {
+      "name": "Caustic Ooze"
+    }
+  },
+  "fernling": {
+    "name": "Fernling",
+    "counted": [
+      "Fernling",
+      "Fernlings",
+      "Fernlings"
+    ],
+    "attack": {
+      "name": "Fern Lash"
+    }
+  },
+  "mantis": {
+    "name": "Mantis",
+    "counted": [
+      "Mantis",
+      "Mantises",
+      "Mantises"
+    ],
+    "attack": {
+      "name": "Thorny Grasp"
+    }
+  },
+  "dog-headed": {
+    "name": "Doghead",
+    "counted": [
+      "Doghead",
+      "Dogheads",
+      "Dogheads"
+    ],
+    "attack": {
+      "name": "Dog Fangs"
+    }
+  },
+  "ghost-coachman": {
+    "name": "Coachman",
+    "counted": [
+      "Coachman",
+      "Coachmen",
+      "Coachmen"
+    ],
+    "attack": {
+      "name": "Whipcrack"
+    }
+  },
+  "gadfly": {
+    "name": "Gadfly",
+    "counted": [
+      "Gadfly",
+      "Gadflies",
+      "Gadflies"
+    ],
+    "attack": {
+      "name": "Diving Sting"
+    }
+  },
+  "rootwad": {
+    "name": "Rootwad",
+    "counted": [
+      "Rootwad",
+      "Rootwads",
+      "Rootwads"
+    ],
+    "attack": {
+      "name": "Crushing Roots"
+    }
+  },
+  "murkling": {
+    "name": "Murkling",
+    "counted": [
+      "Murkling",
+      "Murklings",
+      "Murklings"
+    ],
+    "attack": {
+      "name": "Engulf"
+    }
+  },
+  "strangler": {
+    "name": "Strangler",
+    "counted": [
+      "Strangler",
+      "Stranglers",
+      "Stranglers"
+    ],
+    "attack": {
+      "name": "Tightening Noose"
+    }
+  },
+  "bone-gnawer": {
+    "name": "Bone Gnawer",
+    "counted": [
+      "Bone Gnawer",
+      "Bone Gnawers",
+      "Bone Gnawers"
+    ],
+    "attack": {
+      "name": "Bone-Crushing Bite"
+    }
+  },
+  "carcass": {
+    "name": "Carcass",
+    "counted": [
+      "Carcass",
+      "Carcasses",
+      "Carcasses"
+    ],
+    "attack": {
+      "name": "Corpse Poison"
+    }
+  },
+  "smoke-hound": {
+    "name": "Hound",
+    "counted": [
+      "Hound",
+      "Hounds",
+      "Hounds"
+    ],
+    "attack": {
+      "name": "Pursuit"
+    }
+  },
+  "nightingale-robber": {
+    "name": "Robber Nightingale",
+    "counted": [
+      "Robber Nightingale",
+      "Robber Nightingales",
+      "Robber Nightingales"
+    ],
+    "attack": {
+      "name": "Robber's Whistle"
+    }
+  },
+  "night-huntsman": {
+    "name": "Night Huntsman",
+    "counted": [
+      "Night Huntsman",
+      "Night Huntsmen",
+      "Night Huntsmen"
+    ],
+    "attack": {
+      "name": "Arrow from the Dark"
+    }
+  },
+  "lichen-beard": {
+    "name": "Lichenbeard",
+    "counted": [
+      "Lichenbeard",
+      "Lichenbeards",
+      "Lichenbeards"
+    ],
+    "attack": {
+      "name": "Frost Grip"
+    }
+  },
+  "hollow-dweller": {
+    "name": "Hollow Dweller",
+    "counted": [
+      "Hollow Dweller",
+      "Hollow Dwellers",
+      "Hollow Dwellers"
+    ],
+    "attack": {
+      "name": "Grab from the Hollow"
+    }
+  },
+  "murmur-wraith": {
+    "name": "Murmur Wraith",
+    "counted": [
+      "Murmur Wraith",
+      "Murmur Wraiths",
+      "Murmur Wraiths"
+    ],
+    "attack": {
+      "name": "Whisper of the Pines"
+    }
+  },
+  "rotwood": {
+    "name": "Rotwood",
+    "counted": [
+      "Rotwood",
+      "Rotwoods",
+      "Rotwoods"
+    ],
+    "attack": {
+      "name": "Rotting Blow"
+    }
+  },
+  "puffball": {
+    "name": "Puffball",
+    "counted": [
+      "Puffball",
+      "Puffballs",
+      "Puffballs"
+    ],
+    "attack": {
+      "name": "Spore Cloud"
+    }
+  },
+  "earwig": {
+    "name": "Earwig",
+    "counted": [
+      "Earwig",
+      "Earwigs",
+      "Earwigs"
+    ],
+    "attack": {
+      "name": "Pincer Slash"
+    }
+  },
+  "headless": {
+    "name": "Headless One",
+    "counted": [
+      "Headless One",
+      "Headless Ones",
+      "Headless Ones"
+    ],
+    "attack": {
+      "name": "Blind Strike"
+    }
+  },
+  "chochol": {
+    "name": "Khokhow",
+    "counted": [
+      "Khokhow",
+      "Khokhows",
+      "Khokhows"
+    ],
+    "attack": {
+      "name": "Khokhow's Dance"
+    }
+  },
+  "smetek": {
+    "name": "Smentek",
+    "counted": [
+      "Smentek",
+      "Smenteks",
+      "Smenteks"
+    ],
+    "attack": {
+      "name": "Mournful Song"
+    }
+  },
+  "deadman": {
+    "name": "Dead Man",
+    "counted": [
+      "Dead Man",
+      "Dead Men",
+      "Dead Men"
+    ],
+    "attack": {
+      "name": "Grave Chill"
+    }
+  },
+  "burying-beetle": {
+    "name": "Burying Beetle",
+    "counted": [
+      "Burying Beetle",
+      "Burying Beetles",
+      "Burying Beetles"
+    ],
+    "attack": {
+      "name": "Undermine"
+    }
+  },
+  "bell-ringer": {
+    "name": "Bell-Ringer",
+    "counted": [
+      "Bell-Ringer",
+      "Bell-Ringers",
+      "Bell-Ringers"
+    ],
+    "attack": {
+      "name": "Death Knell"
+    }
+  },
+  "abomination": {
+    "name": "Abomination",
+    "counted": [
+      "Abomination",
+      "Abominations",
+      "Abominations"
+    ],
+    "attack": {
+      "name": "Rend"
+    }
+  },
+  "koltun": {
+    "name": "Kowtun",
+    "counted": [
+      "Kowtun",
+      "Kowtuns",
+      "Kowtuns"
+    ],
+    "attack": {
+      "name": "Entangle"
+    }
+  },
+  "bebok": {
+    "name": "Bebok",
+    "counted": [
+      "Bebok",
+      "Beboks",
+      "Beboks"
+    ],
+    "attack": {
+      "name": "Into the Sack!"
+    }
+  },
+  "plague-maiden": {
+    "name": "Plague Maiden",
+    "counted": [
+      "Plague Maiden",
+      "Plague Maidens",
+      "Plague Maidens"
+    ],
+    "attack": {
+      "name": "Plague Breath"
+    }
+  },
+  "moon-eater": {
+    "name": "Moon-Eater",
+    "counted": [
+      "Moon-Eater",
+      "Moon-Eaters",
+      "Moon-Eaters"
+    ],
+    "attack": {
+      "name": "Eclipse"
+    }
   }
 }
