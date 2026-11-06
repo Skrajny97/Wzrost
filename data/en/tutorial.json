@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/tutorial.json (src/engine/overlay.js): for now only the narrator's buttons and the Ustawienia's switch; his lines come in stage 2 and are read by the author before recording (695 A).",
+  "$comment": "English texts of data/tutorial.json (src/engine/overlay.js): the narrator's buttons, the Ustawienia's switch, and the lines of the introduction, approved by the author (709 OK); the other chapters come in the next stages. The recordings come in stage 5 (696 A).",
   "skipLabel": "Skip the introduction",
   "nextLabel": "Next",
   "startLabel": "Guide me",
@@ -11,5 +11,294 @@
   "skipSetting": {
     "label": "Skip the narrator's explanations",
     "hint": "The narrator does not explain new tabs and places, and a new character starts without the introduction. Applies to every character on the account."
+  },
+  "lines": {
+    "ask": {
+      "text": [
+        "Would you like to go through the Introduction? It will help you get to know the System, and if you skip it, you will not lose any of the resources gained in the Tutorial."
+      ]
+    },
+    "intro": {
+      "text": [
+        "At the edge of the wilds, where the wind breaks old trees, someone the forest does not yet know awakens. There is no road behind, and ahead lies only the wilderness.",
+        "Welcome, stranger."
+      ],
+      "female": {
+        "text": [
+          "At the edge of the wilds, where the wind breaks old trees, someone the forest does not yet know awakens. There is no road behind, and ahead lies only the wilderness.",
+          "Welcome, stranger."
+        ]
+      }
+    },
+    "purpose": {
+      "text": [
+        "You have found yourself in a place whose purpose is growth. I am counting on you to reach great heights."
+      ],
+      "female": {
+        "text": [
+          "You have found yourself in a place whose purpose is growth. I am counting on you to reach great heights."
+        ]
+      }
+    },
+    "test": {
+      "text": [
+        "To begin, a small test for you. One of the safest challenges that await you. Set out on an exploration to the Edge of the Windfalls."
+      ]
+    },
+    "tap-region": {
+      "text": [
+        "Tap the Windfalls."
+      ],
+      "desktop": {
+        "text": [
+          "Click the Windfalls."
+        ]
+      }
+    },
+    "tap-area": {
+      "text": [
+        "Choose the Edge of the Windfalls."
+      ]
+    },
+    "bestiary": {
+      "text": [
+        "Here is the Bestiary of this place. The creatures you have not fought yet appear in it only as shadows. Get to know them all, and you will open the chest."
+      ],
+      "female": {
+        "text": [
+          "Here is the Bestiary of this place. The creatures you have not fought yet appear in it only as shadows. Get to know them all, and you will open the chest."
+        ]
+      }
+    },
+    "trial": {
+      "text": [
+        "You are not ready for longer explorations yet. Let us begin with a half-hour trial."
+      ],
+      "female": {
+        "text": [
+          "You are not ready for longer explorations yet. Let us begin with a half-hour trial."
+        ]
+      }
+    },
+    "tap-start": {
+      "text": [
+        "The slider is set to thirty minutes. Tap “Set out”."
+      ],
+      "desktop": {
+        "text": [
+          "The slider is set to thirty minutes. Click “Set out”."
+        ]
+      }
+    },
+    "skip": {
+      "text": [
+        "You are in the forest now. Time is relentless… were it not for the System's help. Time Points let you speed up an exploration. Here – {points} of them to start with. Treat this… as a precious gift."
+      ]
+    },
+    "tap-skip": {
+      "text": [
+        "Skip time with Time Points."
+      ]
+    },
+    "tap-claim": {
+      "text": [
+        "Claim the report."
+      ]
+    },
+    "report": {
+      "text": [
+        "Your exploration was a success, but to grasp its weight… let me walk you through the report of your journey."
+      ]
+    },
+    "report-summary": {
+      "text": [
+        "At the very top of the report you can see the most important information."
+      ]
+    },
+    "report-system": {
+      "text": [
+        "This is the System's domain. No one has ever unravelled its mysteries for good. Its usefulness, however – that you have laid out before you."
+      ]
+    },
+    "report-fights": {
+      "text": [
+        "The System records the skirmishes you fought during the exploration. You can look through them by choosing a tab. A star on a tab marks the most important of the fights."
+      ],
+      "female": {
+        "text": [
+          "The System records the skirmishes you fought during the exploration. You can look through them by choosing a tab. A star on a tab marks the most important of the fights."
+        ]
+      }
+    },
+    "report-items": {
+      "text": [
+        "This is everything you found during the exploration. It has already landed in your bag."
+      ],
+      "female": {
+        "text": [
+          "This is everything you found during the exploration. It has already landed in your bag."
+        ]
+      }
+    },
+    "report-account": {
+      "text": [
+        "And if you are curious how the whole exploration went – the System describes it in detail right here."
+      ]
+    },
+    "lead-character": {
+      "text": [
+        "Let us also take a look at the window of the Character you have come to lead."
+      ]
+    },
+    "character": {
+      "text": [
+        "In this window of the System you can look through your equipment. During the exploration you obtained a weapon and, as you can see – the System made things easier and let you draw it without lifting a finger."
+      ],
+      "female": {
+        "text": [
+          "In this window of the System you can look through your equipment. During the exploration you obtained a weapon and, as you can see – the System made things easier and let you draw it without lifting a finger."
+        ]
+      }
+    },
+    "lead-stats": {
+      "text": [
+        "Gaining levels on explorations – be it class or character levels – also gives you stat points to distribute. Let us take a look at them."
+      ]
+    },
+    "stats": {
+      "text": [
+        "The System makes things easier, so you need not rack your brains over all these numbers. You can distribute the points you have gained in the way that best suits your class. But! You can also build your character however you see fit."
+      ]
+    },
+    "free-points": {
+      "text": [
+        "Distribute your free points."
+      ]
+    },
+    "lead-camp": {
+      "text": [
+        "No self-respecting character would deny themselves the chance to build a camp – and who knows, in time perhaps a whole stronghold. Let us look into your camp."
+      ]
+    },
+    "camp": {
+      "text": [
+        "Someone has camped in this clearing before. Good for you! It looks like they left some wood, stone and iron ore behind. Finders keepers."
+      ]
+    },
+    "camp-sawmill": {
+      "text": [
+        "This is a good spot to build a Sawmill. The System supports us in our daily lives, so the wood in one is produced on its own as well. You will only have to collect the wood it makes."
+      ],
+      "female": {
+        "text": [
+          "This is a good spot to build a Sawmill. The System supports us in our daily lives, so the wood in one is produced on its own as well. You will only have to collect the wood it makes."
+        ]
+      }
+    },
+    "camp-quarry": {
+      "text": [
+        "The same goes for the Quarry, which will dig up stone for you, and the Mine, which will give you iron ore."
+      ]
+    },
+    "camp-lake": {
+      "text": [
+        "Gold lies at the bottom of Midas Pond. A prospector's pan sifts it out by itself – not much, but without pause."
+      ]
+    },
+    "camp-anvil": {
+      "text": [
+        "And when you wish to strengthen the items you own – you might think about setting up and developing the Anvil. It will let you upgrade your equipment."
+      ]
+    },
+    "camp-loot-shed": {
+      "text": [
+        "Spoils from explorations go into your bag. The Storehouse will make it bigger, and the Scrapyard will make the scrap dealer pay you more for what you do not need – and sell you parts for crafting, too."
+      ]
+    },
+    "camp-craft-table": {
+      "text": [
+        "At the Salvage Table you will turn creature materials into parts. You can also take apart the items you do not need there. The parts will come in handy once you learn the professions."
+      ]
+    },
+    "camp-level": {
+      "text": [
+        "You can also develop the camp itself. It costs only gold, and every level of the camp speeds up all building. You can also queue up to three buildings at once."
+      ]
+    },
+    "lead-campfire": {
+      "text": [
+        "Now let us see to your rest between explorations. By the fire your character recovers faster, and the fire spirit will take your gold and give you resources for it. Build the Campfire."
+      ]
+    },
+    "tap-build": {
+      "text": [
+        "Build the Campfire."
+      ]
+    },
+    "camp-countdown": {
+      "text": [
+        "Building always takes a while, especially when it comes to upgrades. Luckily, the System takes this off your hands too. While something is being built, you can do anything else that is available."
+      ]
+    },
+    "wallet": {
+      "text": [
+        "By the way – here you can check your gold and System Points, and with a tap, the rest of your resources along with your Time Points. See for yourself."
+      ],
+      "female": {
+        "text": [
+          "By the way – here you can check your gold and System Points, and with a tap, the rest of your resources along with your Time Points. See for yourself."
+        ]
+      },
+      "desktop": {
+        "text": [
+          "By the way – here you see your gold and System Points, and right next to them the rest of your resources along with your Time Points. See for yourself."
+        ],
+        "female": {
+          "text": [
+            "By the way – here you see your gold and System Points, and right next to them the rest of your resources along with your Time Points. See for yourself."
+          ]
+        }
+      }
+    },
+    "settings": {
+      "text": [
+        "For your convenience, you can also look into some of the System's own settings and set them just as you please. If you decide you have made too many mistakes – you can even start over. At the very top of the settings waits the Journal, too – there you will find all your reports."
+      ],
+      "female": {
+        "text": [
+          "For your convenience, you can also look into some of the System's own settings and set them just as you please. If you decide you have made too many mistakes – you can even start over. At the very top of the settings waits the Journal, too – there you will find all your reports."
+        ]
+      }
+    },
+    "quests": {
+      "text": [
+        "Every day I will give you quests – that way we will keep up our, I hope, fruitful relationship. I will be waiting for you here."
+      ]
+    },
+    "encyclopedia-lead": {
+      "text": [
+        "Everything you obtain, the System records in the Encyclopedia. Let us take a look at it."
+      ]
+    },
+    "encyclopedia": {
+      "text": [
+        "The weapon from your first exploration is already here. Every entry will tell you where to get it, even one you do not know yet. A full set earns a chest, and a gold dot by the book will tell you when one is ready to open."
+      ]
+    },
+    "shop-system": {
+      "text": [
+        "You spend System Points in the System Shop. There you can buy cosmetics that change your look."
+      ]
+    },
+    "ending": {
+      "text": [
+        "That is all for a start. The rest of the System's workings, your goal and your liking – you will have to discover on your own. Good luck."
+      ],
+      "female": {
+        "text": [
+          "That is all for a start. The rest of the System's workings, your goal and your liking – you will have to discover on your own. Good luck."
+        ]
+      }
+    }
   }
 }
