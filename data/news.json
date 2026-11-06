@@ -225,6 +225,11 @@
       "id": "0.1.83",
       "title": "Wersja 0.1.83: rzadkie przepisy Jagny",
       "body": "- Zielarka Jagna zdradza rzadkie przepisy Alchemii: trzy od stopnia Zaufany i trzy od stopnia Przyjaciel, w relacji z nią albo w reputacji Bractwa Zielarzy. Zdradzone przepisy widać u niej w zakładce „Kup”.\n- Raport wyprawy nazywa działanie mikstury, np. „Twarda skóra działała w walkach: 2 z 4.”.\n- Aura świeci teraz wokół postaci, która jedzie wierzchem, a nie tylko wokół konia."
+    },
+    {
+      "id": "0.1.84",
+      "title": "Wersja 0.1.84: porównanie w Kwaterach",
+      "body": "- W Kwaterach „Załóż z plecaka” pokazuje statystyki każdego przedmiotu. Stuknięcie przedmiotu porównuje go z tym, co towarzysz nosi, a przycisk „Załóż” go zakłada.\n- Przyciski sortowania plecaka mieszczą swoje napisy także na wąskim telefonie."
     }
 ]
 }

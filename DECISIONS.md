@@ -3034,6 +3034,25 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.84 (6.11.2026)
+
+W Kwaterach „Załóż z plecaka” pokazuje statystyki każdego przedmiotu i porównanie z tym, co towarzysz nosi: zob. „Kwatery: statystyki przy zakładaniu z plecaka”. Przyciski sortowania plecaka mieszczą swoje napisy: zob. „Sortowanie plecaka na wąskim ekranie”.
+
+## Kwatery: statystyki przy zakładaniu z plecaka (gracz na czacie, 6.11.2026, od 0.1.84)
+
+Gracz na czacie (zrzut od autora): „Kwatery - towarzysze - załóż z plecaka, fajnie jakby podświetlało staty przedmiotów, bo tak to się trochę na ślepo strzela, jak mam np. 3 amulety te same”.
+
+1. **Statystyki na liście.** Każdy przedmiot w „Załóż z plecaka” ma pod nazwą swoje liczby w jednym wierszu, jak w karcie przedmiotu (np. „Wola: +6 · Siła: +9 · Witalność: +7”). Przedmioty o tej samej nazwie da się więc odróżnić bez otwierania.
+2. **Porównanie i „Załóż”.** Stuknięcie przedmiotu już go nie zakłada, tylko rozwija porównanie z tym, co towarzysz nosi w tym miejscu (broń, pancerz albo jedna sztuka biżuterii), w takiej tabeli jak na Targowisku: „Ten”, „Nosi”, „Różnica”. Gdy towarzysz nic tam nie nosi, okienko to mówi. Pod porównaniem jest przycisk „Załóż”.
+3. **Zapis.** `itemSummary(item, { stats: true })` i `compareTable(item, worn, { title, wornLabel })` w `src/client/screens/character.js`, `wearChoice` w `src/client/companions.js`. `tools/layout-check.cjs` daje postaci trzy amulety o dużych liczbach, jeden zakłada towarzyszowi i sprawdza okienko „Załóż z plecaka” z rozwiniętym porównaniem.
+
+## Sortowanie plecaka na wąskim ekranie (6.11.2026, od 0.1.84)
+
+`tools/layout-check.cjs`, odkąd postać sprawdzania ma przedmioty w plecaku, znalazł napis „NAJNOWSZE” szerszy od swojego przycisku w „Sortuj:” (75 px w 61 px na telefonie 320 px, 71 px przy 360 px i 66 px w wąskiej kolumnie komputera 1366 px).
+
+1. **Napisy.** Przyciski sortowania piszą się zwykłymi literami („Najnowsze”, „Rzadkość”, „Poziom”, „Rodzaj”), bez wersalików i rozstrzelenia, jak drobny przełącznik.
+2. **Rząd.** Gdy „Sortuj:” i przyciski nie mieszczą się w jednym rzędzie, przyciski schodzą pod napis na całą szerokość (`.bag-sort-options` z `flex: 1 1 240px`).
+
 ## Wersja 0.1.83 (6.11.2026)
 
 Rzadkie przepisy Jagny: sześć przepisów Alchemii od stopnia Zaufany i od stopnia Przyjaciel, w relacji z Jagną albo w reputacji Bractwa Zielarzy: zob. „Rzadkie przepisy Jagny”. Aura przy jeździe wierzchem świeci też wokół jeźdźca: zob. „Aura przy jeździe wierzchem”.
