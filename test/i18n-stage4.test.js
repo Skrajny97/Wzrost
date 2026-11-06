@@ -192,7 +192,7 @@ describe('English where ENGLISH is on (the test version)', () => {
     assert.equal(await error('/api/settlement/talk', { companionId: 'nobody' }), 'You have no such companion.');
     assert.equal(await error('/api/market/bid', { offerId: 999, amount: 5 }), 'This offer is gone.');
     assert.equal(await error('/api/market/collect', {}), 'Nothing is waiting for you here.');
-    assert.equal(await error('/api/fortress/training', {}), 'Training needs the Training Ground in the Stronghold.');
+    assert.equal(await error('/api/fortress/training', {}), 'Training needs the Training Yard in the Stronghold.');
     assert.equal(await error('/api/fortress/training', {}, 'pl'), 'Trening wymaga Placu treningowego w Warowni.');
     assert.equal(await error('/api/towers/enter', { tower: 'nowhere' }), 'Choose a tower.');
   });

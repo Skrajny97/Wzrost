@@ -12166,6 +12166,18 @@ a.profession-square:active {
   }
 }
 
+/* The English names are longer ("Expedition" beside "Wyprawa"): a step
+   smaller, so the longest still fits beside its icon at every width. */
+:lang(en) .guild-picker .community-tab {
+  font-size: 14px;
+}
+
+@media (max-width: 479px) {
+  :lang(en) .guild-picker .community-tab {
+    font-size: clamp(10px, calc((100vw - 136px) / 19), 14px);
+  }
+}
+
 /* A part of a guild activity's card, under its subtitle (guild-trials.js,
    guild-requests.js). */
 .guild-part {
