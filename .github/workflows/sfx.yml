@@ -18,6 +18,7 @@ on:
           - effects
           - ui
           - narration
+          - narrationEn
       ids:
         description: Identyfikatory po przecinku albo all
         required: true

@@ -18,6 +18,10 @@
 // recording (ElevenLabs Voice Design). A remix or a design comes back as a
 // few previews reading the text. Speech can also take the text around it
 // (`previousText`, `nextText`) and an `ending` read after it, then cut off.
+// A kind with `language` "en" reads the narrator's lines in English
+// (data/en/tutorial.json over data/tutorial.json): one recording for both
+// looks, as English says them alike, and one for a computer's words
+// (`<id>-desktop`) where they differ.
 
 import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { parseArgs } from 'node:util';
@@ -52,7 +56,39 @@ const kind = config[values.kind];
 if (!kind || values.kind === '$comment') fail(`Nieznany rodzaj dźwięków: ${values.kind}. Dostępne: ${Object.keys(config).filter((key) => key !== '$comment').join(', ')}.`);
 const tts = kind.tts ?? null;
 const balance = tts && JSON.parse(readFileSync('data/balance.json', 'utf8'));
-const tutorial = tts && JSON.parse(readFileSync('data/tutorial.json', 'utf8'));
+const english = kind.language === 'en';
+const tutorial = tts && (english ? englishTutorial() : JSON.parse(readFileSync('data/tutorial.json', 'utf8')));
+
+// The narrator's lines with their English words: each line, class and
+// computer's version takes its text from data/en/tutorial.json; the female
+// versions go, as English says them as the male ones.
+function englishTutorial() {
+  const polish = JSON.parse(readFileSync('data/tutorial.json', 'utf8'));
+  const overlay = JSON.parse(readFileSync('data/en/tutorial.json', 'utf8')).lines ?? {};
+  // A line told per class has its words only in its classes.
+  const told = (base, en, id) => {
+    const { female, desktop, ...rest } = base;
+    if (!base.text) return rest;
+    if (!en?.text) fail(`Brak angielskiego tekstu kwestii ${id} w data/en/tutorial.json.`);
+    return {
+      ...rest,
+      text: en.text,
+      ...(desktop && { desktop: { ...desktop, text: en.desktop?.text ?? en.text } }),
+    };
+  };
+  return {
+    ...polish,
+    lines: polish.lines.map((line) => {
+      const en = overlay[line.id];
+      if (!en) fail(`Brak kwestii ${line.id} w data/en/tutorial.json.`);
+      const { classes, ...rest } = line;
+      return {
+        ...told(rest, en, line.id),
+        ...(classes && { classes: Object.fromEntries(Object.entries(classes).map(([classId, forClass]) => [classId, told(forClass, en.classes?.[classId], `${line.id}-${classId}`)])) }),
+      };
+    }),
+  };
+}
 
 // `allLines` makes a prompt of every line of the narrator's introduction,
 // named by the line's id, and of its female version, `<id>-female`; a line
@@ -74,6 +110,11 @@ const prompts = {
           return [
             [id, { ...entry, ...own(id) }],
             ...(told.female ? [[`${id}-female`, { ...entry, variant: 'female', ...own(`${id}-female`) }]] : []),
+            // English records the computer's words with the lines; Polish has
+            // them as prompts of their own.
+            ...(english && told.desktop && told.desktop.text.join(' ') !== told.text.join(' ')
+              ? [[`${id}-desktop`, { ...entry, variant: 'desktop', ...own(`${id}-desktop`) }]]
+              : []),
           ];
         }),
       ),
@@ -104,7 +145,7 @@ function mainText(entry) {
   const line = tutorial.lines.find((candidate) => candidate.id === entry.line);
   if (!line) fail(`Brak kwestii ${entry.line} w data/tutorial.json.`);
   const forClass = entry.classId ? line.classes[entry.classId] : line;
-  const told = entry.variant === 'female' ? forClass.female : forClass;
+  const told = entry.variant === 'female' ? forClass.female : entry.variant === 'desktop' ? forClass.desktop : forClass;
   let text = told.text.join(' ').replaceAll('{points}', String(balance.timePoints.start));
   // `say`: [written, read] pairs, e.g. a comma that helps the voice end "broń".
   for (const [written, read] of entry.say ?? []) {
@@ -134,8 +175,10 @@ if (total > maxCredits) {
 }
 if (values['dry-run']) {
   for (const id of ids) lines.push(`| ${id} | wycena ${credits(id) * takesOf[id]} kredytów (${size(id)}, ${takesOf[id]}×) |`);
-  summary([`Wycena razem: ${total} kredytów.`, '', ...lines].join('\n'));
-  console.log(`Wycena razem: ${total} kredytów.`);
+  const left = await creditsLeft();
+  const priced = `Wycena razem: ${total} kredytów.${left ? ` Na koncie jest ${left}.` : ''}`;
+  summary([priced, '', ...lines].join('\n'));
+  console.log(priced);
   process.exit(0);
 }
 
