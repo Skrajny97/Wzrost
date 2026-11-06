@@ -3034,6 +3034,61 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.1.90 (6.11.2026)
+
+- Angielska wersja beta, etap 2: poziomy 1–10 po angielsku, z wprowadzeniem narratora (709 OK). Tylko na wersji testowej, w grze wszystko zostaje po polsku: zob. „Angielska wersja beta, etap 2: poziomy 1–10”.
+- Autor usuwa szkice „Co nowego?” w Panelu Autora: zob. „Usuwanie szkiców „Co nowego?””.
+
+## Angielska wersja beta, etap 2: poziomy 1–10 (668, 709 OK; 6.11.2026, od 0.1.90)
+
+Etap 2 z planu angielskiej bety (668). Jak w etapie 1 angielski działa tylko tam, gdzie przełącznik `ENGLISH` jest włączony (wersja testowa i praca lokalna).
+
+1. **Co jest po angielsku**
+    - Wprowadzenie narratora: 42 kwestie w brzmieniu zatwierdzonym przez autora (709 OK), na razie jako tekst. Angielski głos przyjdzie w etapie 5, tym samym głosem co po polsku (696 A).
+    - Pierwsza kraina: Wiatrołomy → Windfalls z pięcioma miejscami, 23 stworami (z elitami i czempionem), ich materiałami i przydomkami, częściami, wszystkimi przedmiotami do 25. poziomu klasy (66 podstaw), rzadkościami, żywiołami, efektami i zasobami.
+    - Dziewięć zdarzeń pierwszej krainy z ich przeciwnikami. Kwiat paproci zostaje po polsku, bo w pierwszej krainie się nie zdarza.
+    - Zdania walk, znalezisk, awansów i raportów, powiadomienia na telefon, mail z linkiem, komunikaty Systemu o odblokowaniach, obóz bez Warowni z dziewięcioma budynkami i zadania narratora.
+    - Ekrany: Postać, Statystyki, Plecak, karta przedmiotu z Kowadłem, Skrzynia Konta, Stół rozbiórki, złomiarz, Duch budowniczego, Walka z wyprawami i Szybkim Polowaniem, raport, Dziennik, Obóz i zadania narratora.
+    - Serwer i silnik pierwszych poziomów: ich błędy, linie karty przedmiotu, linia „HP … +XP, +złoto” raportu i opisy budynków.
+2. **Przyciski, o których mówi narrator:** „Wyrusz” → „Set out”, „Odbierz raport” → „Claim report” (wszędzie, także w Ustawieniach wersji testowej).
+3. **Nazwy spoza słownika** (słownik nazw zostaje bez zmian):
+    - Duch budowniczego → Builder Spirit, duch ognia → Fire Spirit, złomiarz → scrap dealer, kowal → smith.
+    - Systemowy Warsztat → System Workshop, Systemowa Kopalnia → System Mine, Systemowa Szlifiernia → System Gem Workshop, Zbrojownia → Armoury.
+    - Zwój ochronny → Ward Scroll, Zwój utrwalenia → Steady Scroll.
+    - Kamień węgielny Warowni → Stronghold Cornerstone, Błyskawiczne polowanie → Lightning Hunt, Próby Gildii → Guild Trials, Wieże Systemu → System Towers.
+    - Plecak → Bag, Ekwipunek → Gear, misa traperska → prospector's pan, Weles → Veles.
+    - Stwory, materiały, przedmioty i zdarzenia mają nazwy w `data/en/` (np. Wilk → Wolf, Odyniec → Tusker, Skóra wilka → Wolf Pelt, Kolczuga → Chainmail).
+4. **Zasady angielskiego**
+    - Nazwa przedmiotu: stwór + podstawa + „of the …”, np. „Wolf Sword of the Raven”.
+    - Nazwy w Title Case. Rzeczownik po liczbie ma formy [jedna, inne, inne], np. „1 Wolf Pelt”, „3 Wolf Pelts”. Rzadkości i żywioły piszą się małą literą, jak po polsku.
+    - „Ruch” w walce to „turn”, a imiona w zdaniach walki nie mają przedimka („Grey Wolf loses 5 HP”).
+    - Zdania o postaci omijają „he” i „she”. Wersje żeńskie mają ten sam angielski co męskie.
+    - „Szt.” po angielsku znika: liczba stoi sama albo jako „×3”.
+    - „Skraj Puszczy” → „Edge of the Wilds” w obu regionach tej krainy, bo Salon Gier grupuje miejsca po nazwie krainy.
+    - Cudzysłowy „…” po angielsku to “…”.
+5. **Silnik:** jego własne zdania biorą angielski z treści gry w języku zapytania (`word()` w `src/engine/text.js`, słownik `words` z `src/server/content.js`), więc zostaje czysty. Jego komunikaty, które stają się błędami, tłumaczy `errorResponse()` jak błędy serwera. Po angielsku nazwy w listach zachowują wielkie litery, a ułamki mają kropkę (2.5%).
+6. **Język tego, co serwer wysyła sam:** powiadomienia z crona i oznaczenia na czacie idą w języku konta (`users.language`). Mail z linkiem idzie w języku konta także przy ponownym wysłaniu, z `<html lang>` w tym języku. Raport powstaje przy „Claim report” w języku strony i w nim zostaje.
+7. **Zostaje po polsku do kolejnych etapów:** Społeczność, Drużyna, Umiejętności, Profesje, Encyklopedia i Sklep (etap 3), Osada z Górnictwem i Jubilerstwem (etap 4), a dalej Gildia, Wieże, Ewolucje, Warownia i krainy od 26. poziomu.
+8. **Narrator po angielsku mówi samym tekstem:** jego nagrania są polskie, więc strona po angielsku ich nie odtwarza do czasu nagrań angielskich (brakujący szczegół).
+9. **Pilnowanie:** `tools/layout-check.cjs --lang en` wypisuje polskie słowa także z ekranów etapu 2 (`TRANSLATED`). `test/i18n-stage2.test.js` sprawdza język raportu, powiadomień, maila i linii silnika.
+10. **Podział pracy:** pięciu pomocników, każdy w osobnej gałęzi (dane krainy i zdarzeń, zdania i obóz, dwa zestawy ekranów, serwer i silnik). Gałęzie scalono w jedną, a pliki `strings.json`, `scope.json` i `sources.json` połączono jako sumę wpisów, bez podwójnych kluczy.
+
+## Odpowiedź autora 709 (6.11.2026)
+
+Autor o angielskich kwestiach narratora z wprowadzenia (709.1–709.42): „Zatwierdzam wszystko, nie będę drugi raz sie w to zagłębiał, wyjdzie w praniu 😁”.
+
+1. **Wszystkie 42 kwestie wprowadzenia po angielsku są zatwierdzone** w brzmieniu z pytania 709. Wersje żeńskie mają ten sam angielski tekst co męskie, a wersje na komputer mówią „Click” zamiast „Tap”.
+2. **Przyciski, o których mówi narrator:** „Wyrusz” to po angielsku „Set out”, a „Odbierz raport” to „Claim report”.
+3. **Nagrania:** kwestie wchodzą do gry z etapem 2 jako tekst. Angielski głos narratora przyjdzie w etapie 5, tym samym głosem co po polsku (696 A).
+
+## Usuwanie szkiców „Co nowego?” (autor 6.11.2026, od 0.1.90)
+
+Autor 6.11.2026: „Dodaj mi opcję usuwania szkiców wpisów w co nowego”.
+
+1. **Przy każdym szkicu w Panelu Autora**, obok „Opublikuj”, jest „Usuń”. Przed usunięciem gra pyta o potwierdzenie.
+2. **Usunięty szkic znika ze szkiców na zawsze.** Szkic jest zapisany w danych gry (`data/news.json`), więc usunięcie pamięta baza (migracja 0092, tabela `news_dismissed`).
+3. **Wpis opublikowany wcześniej z tego szkicu zostaje w grze.** Gdy autor usunie potem ten wpis, szkic już nie wraca do szkiców.
+
 ## Wersja 0.1.89 (6.11.2026)
 
 Formularz nowego konta ma wybór „Język gry: Polski | English” tam, gdzie gra oferuje angielski: zob. „Wybór języka przy zakładaniu konta”.
