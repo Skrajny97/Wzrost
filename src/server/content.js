@@ -61,6 +61,7 @@ import enEffects from '../../data/en/effects.json' with { type: 'json' };
 import enElements from '../../data/en/elements.json' with { type: 'json' };
 import enEncyclopedia from '../../data/en/encyclopedia.json' with { type: 'json' };
 import enEvents from '../../data/en/events.json' with { type: 'json' };
+import enEvolutions from '../../data/en/evolutions.json' with { type: 'json' };
 import enGiftCodes from '../../data/en/gift-codes.json' with { type: 'json' };
 import enGuilds from '../../data/en/guilds.json' with { type: 'json' };
 import enItemBases from '../../data/en/item-bases.json' with { type: 'json' };
@@ -135,6 +136,7 @@ export const OVERLAYS = {
     elements: enElements,
     encyclopedia: enEncyclopedia,
     events: enEvents,
+    evolutions: enEvolutions,
     'gift-codes': enGiftCodes,
     guilds: enGuilds,
     'item-bases': enItemBases,

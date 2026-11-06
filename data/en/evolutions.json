@@ -1,0 +1,693 @@
+{
+  "$comment": "English texts of data/evolutions.json (src/engine/overlay.js): the first evolutions by their id, each named as its path in data/en/skills.json, the second forms with a woman's name (nameFemale; English gives a woman's form only where English has one, as Lady or Priestess), their traits and skills, and the words of the Evolution tab and the ceremony. In a skill's `effect`, {name%}, {name%.1}, {name pp} and {critPower%} are filled with its numbers by src/engine/skills.js (skillText); every number of turns, hits and blows there is more than one. `stunLabel` stands on the card of the creature that loses its turn, `summonName` and `raiseName` name what fights at the character's side.",
+  "evolutions": {
+    "barbarian": {
+      "name": "Barbarian",
+      "trait": {
+        "name": "Fury",
+        "text": "The less HP, the more damage: up to +30% at 10% HP."
+      }
+    },
+    "gladiator": {
+      "name": "Gladiator",
+      "trait": {
+        "name": "Spectacle",
+        "text": "Every enemy defeated gives +5% damage until the end of the fight, up to +25%."
+      }
+    },
+    "guardian": {
+      "name": "Guardian",
+      "trait": {
+        "name": "Bulwark",
+        "text": "+10% armour and resistances, and enemies strike the Guardian more often than the rest of the party."
+      }
+    },
+    "sniper": {
+      "name": "Sniper",
+      "trait": {
+        "name": "Cold Blood",
+        "text": "Critical hits deal 25% more, and the first shot of a fight is always critical."
+      }
+    },
+    "storm-archer": {
+      "name": "Storm Archer",
+      "trait": {
+        "name": "Charged Arrowheads",
+        "text": "Every arrow has a 15% chance to add 30% lightning damage."
+      }
+    },
+    "hunter": {
+      "name": "Hunter",
+      "trait": {
+        "name": "Tracker",
+        "text": "+10% damage against beasts and birds, and 10% more materials from creatures."
+      }
+    },
+    "elementalist": {
+      "name": "Elementalist",
+      "trait": {
+        "name": "Conduit of the Elements",
+        "text": "Fire, frost and lightning spells are 15% stronger, and their effects last a turn longer."
+      }
+    },
+    "ice-lord": {
+      "name": "Ice Lord",
+      "trait": {
+        "name": "Winter's Breath",
+        "text": "Chilled enemies deal 10% less damage, and frost resistance rises by 15%."
+      }
+    },
+    "arcanist": {
+      "name": "Arcanist",
+      "trait": {
+        "name": "Arcana",
+        "text": "Max mana +15%, and 3% of mana returns every turn."
+      }
+    },
+    "healer": {
+      "name": "Healer",
+      "trait": {
+        "name": "Caretaker",
+        "text": "Healing is 20% stronger and removes one harmful effect, such as Poison."
+      }
+    },
+    "inquisitor": {
+      "name": "Inquisitor",
+      "trait": {
+        "name": "Zeal",
+        "text": "Sacred damage is 20% higher, and 40% higher against spirits."
+      }
+    },
+    "priest": {
+      "name": "Priest",
+      "trait": {
+        "name": "Anointing",
+        "text": "Blessing's bonuses are 25% greater and are split less thinly in a party."
+      }
+    },
+    "assassin": {
+      "name": "Assassin",
+      "trait": {
+        "name": "Deadly Precision",
+        "text": "Critical hits deal 30% more, and a poisoned target takes 10% more."
+      }
+    },
+    "poisoner": {
+      "name": "Poisoner",
+      "trait": {
+        "name": "Toxins",
+        "text": "Poison deals 25% more and lasts a turn longer, and poison resistance rises by 20%."
+      }
+    },
+    "night-dancer": {
+      "name": "Night Dancer",
+      "trait": {
+        "name": "Shadow Step",
+        "text": "+10% speed, and after every dodge the next blow is 50% stronger."
+      }
+    },
+    "berserker": {
+      "name": "Berserker",
+      "nameFemale": "Berserker",
+      "description": "Lost in battle frenzy, a Berserker feels neither pain nor fear. The closer to death, the more dangerous.",
+      "trait": {
+        "name": "Frenzy",
+        "text": "The less HP, the more damage: up to +50% at 10% HP. Below 30% HP the character heals by 5% of the damage dealt."
+      }
+    },
+    "arena-champion": {
+      "name": "Arena Champion",
+      "nameFemale": "Arena Champion",
+      "description": "The terror of the arena, known to the crowd by name. Every enemy defeated adds to their strength.",
+      "trait": {
+        "name": "Ovation",
+        "text": "Every enemy defeated gives +8% damage until the end of the fight, up to +40%, and heals 5% of max HP."
+      }
+    },
+    "bastion": {
+      "name": "Bastion",
+      "description": "A living fortress. Behind the Bastion's shield the whole party can catch its breath.",
+      "trait": {
+        "name": "Fortress",
+        "text": "+15% armour and resistances, enemies strike the Bastion even more often than the rest of the party, and the shield stops 5% of blows."
+      }
+    },
+    "marksman": {
+      "name": "Sharpshooter",
+      "nameFemale": "Sharpshooter",
+      "description": "Hits where the enemy is not even looking. The first two shots usually settle the matter.",
+      "trait": {
+        "name": "Falcon Eye",
+        "text": "Critical hits deal 40% more, and the first two shots of a fight are always critical."
+      }
+    },
+    "thunder-lord": {
+      "name": "Thunder Lord",
+      "nameFemale": "Thunder Lady",
+      "description": "Their arrows carry thunder. A storm gathers over the battlefield the moment they draw the bow.",
+      "trait": {
+        "name": "Thunder Arrowheads",
+        "text": "Every arrow has a 25% chance to add 40% lightning damage, and the enemy hit then loses 30% of its speed."
+      }
+    },
+    "master-hunter": {
+      "name": "Huntmaster",
+      "nameFemale": "Huntmaster",
+      "description": "The wilds hold no secrets from the Huntmaster. Game walks into the snares of its own accord.",
+      "trait": {
+        "name": "Lord of the Wilds",
+        "text": "+20% damage against beasts and birds, and 20% more materials from creatures."
+      }
+    },
+    "archmage": {
+      "name": "Elemental Archmage",
+      "nameFemale": "Elemental Archmage",
+      "description": "Fire, ice and lightning obey the Archmage as one element.",
+      "trait": {
+        "name": "Mastery of the Elements",
+        "text": "Fire, frost and lightning spells are 25% stronger, and their effects last 2 turns longer."
+      }
+    },
+    "winter-lord": {
+      "name": "Winter Lord",
+      "nameFemale": "Winter Lady",
+      "description": "Where they tread, the ground freezes. Enemies slow down before they can strike.",
+      "trait": {
+        "name": "Eternal Winter",
+        "text": "Chilled enemies deal 20% less damage, frost resistance rises by 30%, and every frost spell chills those it hits until the end of the fight."
+      }
+    },
+    "druid": {
+      "name": "Druid",
+      "nameFemale": "Druid",
+      "description": "Instead of pure mana, the Druid draws on the power of the wilds. Trees and beasts come at their call.",
+      "trait": {
+        "name": "Power of the Wilds",
+        "text": "Max mana +25%, 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage."
+      }
+    },
+    "miracle-worker": {
+      "name": "Miracle Worker",
+      "nameFemale": "Miracle Worker",
+      "description": "Their touch closes wounds faster than the enemy can deal them.",
+      "trait": {
+        "name": "Grace",
+        "text": "Healing is 35% stronger and removes all harmful effects."
+      }
+    },
+    "grand-inquisitor": {
+      "name": "Grand Inquisitor",
+      "nameFemale": "Grand Inquisitor",
+      "description": "Their verdict knows no mercy. Spirits flee before the Grand Inquisitor even speaks.",
+      "trait": {
+        "name": "Holy Fire",
+        "text": "Sacred damage is 30% higher, and 60% higher against spirits. Spirits hit burn: for 3 turns they lose 20% of the blow's damage each turn."
+      }
+    },
+    "high-priest": {
+      "name": "High Priest",
+      "nameFemale": "High Priestess",
+      "description": "Their blessing carries the whole party. Their song gives strength and heals wounds.",
+      "trait": {
+        "name": "Great Anointing",
+        "text": "Bonuses from blessings are 40% greater and are not split in a party."
+      }
+    },
+    "kingslayer": {
+      "name": "Kingslayer",
+      "nameFemale": "Kingslayer",
+      "description": "They say there is no guard the Kingslayer cannot slip past. One blow is usually enough.",
+      "trait": {
+        "name": "Lethal Precision",
+        "text": "Critical hits deal 45% more, and a poisoned target takes 15% more."
+      }
+    },
+    "necromancer": {
+      "name": "Necromancer",
+      "nameFemale": "Necromancer",
+      "description": "Poison was only the beginning. The Necromancer takes on necrotic traits.",
+      "trait": {
+        "name": "Harvest",
+        "text": "Poison deals 40% more and lasts 2 turns longer. An enemy killed by Poison rises as a skeleton and fights on the character's side until the end of the fight.",
+        "params": {
+          "raiseName": "Skeleton"
+        }
+      }
+    },
+    "phantom": {
+      "name": "Phantom",
+      "description": "The Phantom blurs into the shadows and appears where the enemy least expects it.",
+      "trait": {
+        "name": "Phantom Step",
+        "text": "+15% speed, after every dodge the next blow is 80% stronger, and dodge rises by 5 percentage points."
+      }
+    }
+  },
+  "skills": {
+    "crushing-blow": {
+      "name": "Crushing Blow",
+      "style": "attack",
+      "description": "The Barbarian puts their whole weight into the swing. After a blow like this, the enemy takes a long time to get up.",
+      "effect": "A blow dealing {power%} damage that ignores {armorIgnore%} of the target's armour. The target may lose its next turn ({stunChance%} chance).",
+      "params": {
+        "stunLabel": "stunned"
+      }
+    },
+    "blood-frenzy": {
+      "name": "Blood Frenzy",
+      "style": "empowerment",
+      "description": "Pain no longer matters. Only the next blow counts.",
+      "effect": "For {turns} of their own turns, the character deals {damage%} more damage and heals by {lifesteal%} of the damage dealt, but takes {taken%} more."
+    },
+    "millstone": {
+      "name": "Millstone",
+      "style": "area",
+      "description": "The Gladiator spins with their weapon like a millstone. Whoever stands within reach gets hit.",
+      "effect": "Attacks every enemy for {power%} damage, without a miss. When the target is a single enemy – it deals {single%}. Those hit lose {armorShred%} of their armour until the end of the fight."
+    },
+    "riposte": {
+      "name": "Riposte",
+      "style": "dodge",
+      "description": "In the arena, the one who survives is the one who strikes back faster than they were struck.",
+      "effect": "Until the end of the fight, the character's dodge rises by {dodge pp}, and after every dodge they strike back for {power%} damage. The enemy hit bleeds for {dotTicks} of its turns, losing {dotPower%} of the blow's damage each turn."
+    },
+    "indomitable": {
+      "name": "Indomitable",
+      "style": "defence",
+      "description": "The Guardian does not take a single step back. Every blow they take goes back to the one who dealt it.",
+      "effect": "Once per fight, when HP falls below {below%}, recovers {heal%} of max HP and gains {armor%} more armour for {turns} of their own turns. Meanwhile, reflects {reflect%} of the damage taken."
+    },
+    "challenge": {
+      "name": "Challenge",
+      "style": "control",
+      "description": "The Guardian strikes their shield and calls the enemies over. No one can ignore such a challenge.",
+      "effect": "For {turns} of the character's turns, enemies strike only the character, who reflects {reflect%} of the damage taken and deals {damage%} more."
+    },
+    "piercing-shot": {
+      "name": "Piercing Shot",
+      "style": "attack",
+      "description": "The arrowhead goes straight through and flies on. The Sniper counts it as two hits.",
+      "effect": "A shot dealing {power%} damage that cannot be dodged, with the chance of a critical hit higher by {critBonus pp}. It pierces the target and hits the one standing behind it for {pierce%} damage."
+    },
+    "ambush-shot": {
+      "name": "Ambush Shot",
+      "style": "attack",
+      "description": "Before the enemy works out where the shot came from, it is all over.",
+      "effect": "Once per fight, on the first turn: a shot dealing {power%} damage at the enemy with the most HP."
+    },
+    "arrow-storm": {
+      "name": "Arrow Storm",
+      "style": "area",
+      "description": "Arrows fall with a crackle, and the air smells of a storm.",
+      "effect": "A rain of charged arrows deals {power%} lightning damage to all enemies. When the target is a single enemy – {single%}. Every enemy hit may lose its next turn ({stunChance%} chance).",
+      "params": {
+        "stunLabel": "shocked"
+      }
+    },
+    "storm-cloud": {
+      "name": "Storm Cloud",
+      "style": "area",
+      "description": "A cloud gathers over the battlefield. The lightning knows whom to strike.",
+      "effect": "For {turns} of the character's turns, a cloud hangs over the enemies: on each of the character's turns, every enemy takes {power%} lightning damage."
+    },
+    "barbed-arrow": {
+      "name": "Barbed Arrow",
+      "style": "control",
+      "description": "An arrowhead like this is hard to pull out. The quarry will not get far.",
+      "effect": "A shot dealing {power%} damage. The enemy hit loses its next turn and bleeds for {dotTicks} of its turns, losing {dotPower%} of the shot's damage each turn.",
+      "params": {
+        "stunLabel": "pinned"
+      }
+    },
+    "falcon": {
+      "name": "Falcon",
+      "style": "attack",
+      "description": "At the Hunter's whistle a falcon swoops from the sky and goes for the enemy's eyes.",
+      "effect": "For {turns} of the character's turns, the falcon pecks a random enemy every turn for {power%} damage."
+    },
+    "fire-burst": {
+      "name": "Fire Burst",
+      "style": "attack",
+      "description": "The fireball does not die out on the first target. It bursts over everyone around.",
+      "effect": "A fire spell dealing {power%} damage. The target may catch Burn ({dotChance%} chance): for {dotTicks} of its turns it loses {dotPower%} of the spell's damage each turn. The ball bursts and scorches the other enemies for {splash%}."
+    },
+    "elemental-ray": {
+      "name": "Elemental Ray",
+      "style": "area",
+      "description": "Fire, frost and lightning twine into a single ray.",
+      "effect": "The ray hits every enemy for {power%} damage, split evenly between fire, frost and lightning. The frost slows those hit by {slow%}."
+    },
+    "blizzard": {
+      "name": "Blizzard",
+      "style": "control",
+      "description": "Frost does more than slow. An enemy that stops freezes on the spot.",
+      "effect": "A frost spell on all enemies deals {power%} damage and slows them by {slow%}. Every enemy hit may freeze and lose its next turn ({stunChance%} chance). Those hit stay chilled until the end of the fight.",
+      "params": {
+        "stunLabel": "frozen"
+      }
+    },
+    "ice-lance": {
+      "name": "Ice Lance",
+      "style": "attack",
+      "description": "Ice gathers into a blade longer than a spear and flies straight for the heart.",
+      "effect": "The ice lance hits one enemy for {power%} frost damage. A chilled target takes {chilledBonus%} more."
+    },
+    "mana-mirror": {
+      "name": "Mana Mirror",
+      "style": "defence",
+      "description": "The shield does more than stop blows. It sends part of them back to whoever dealt them.",
+      "effect": "Once per fight, when HP falls below {below%}, turns {pool%} of max mana into a shield that stops damage equal to {ratio%} of the mana taken. The shield reflects {reflect%} of the damage it absorbs back at the attacker."
+    },
+    "elemental-summon": {
+      "name": "Summon Elemental",
+      "style": "attack",
+      "description": "An elemental emerges from a whirl of mana. It obeys only the Arcanist.",
+      "effect": "Summons an elemental for {turns} of their own turns. The elemental stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it strikes a random enemy for {power%} damage with the element that enemy is weakest against.",
+      "params": {
+        "summonName": "Elemental"
+      }
+    },
+    "renewal": {
+      "name": "Renewal",
+      "style": "healing",
+      "description": "The prayer does not end with a single word. Strength keeps returning long after it.",
+      "effect": "Once per fight, when HP falls below {below%}, heals the whole party by {heal%.1} of max HP, plus 1 HP for every {wisdomPerHp} points of Wisdom. Then, for {hotTurns} of their own turns, heals everyone by {hot%} of max HP each turn."
+    },
+    "miracle": {
+      "name": "Miracle",
+      "style": "healing",
+      "description": "Sometimes faith is stronger than wounds.",
+      "effect": "Once per fight, when someone in the party faints, they get back up with {hp%} of max HP."
+    },
+    "judgement": {
+      "name": "Judgement",
+      "style": "area",
+      "description": "The Inquisitor does not just cast out spirits, but brands them so they have nowhere to hide.",
+      "effect": "Exorcism lashes all enemies for {power%} sacred damage, a single target for {single%}. The enemy hit may be paralysed ({stunChance%} chance). Spirits hit take {mark%} more damage for {markTurns} of their turns.",
+      "params": {
+        "stunLabel": "paralysed"
+      }
+    },
+    "verdict": {
+      "name": "Verdict",
+      "style": "attack",
+      "description": "The weak deserve no mercy. The verdict falls at once.",
+      "effect": "A sacred verdict dealing {power%} damage to an enemy with less than {below%} HP left."
+    },
+    "great-blessing": {
+      "name": "Great Blessing",
+      "style": "empowerment",
+      "description": "The Priest's blessing gives strength and a light step.",
+      "effect": "At the start of a fight, until its end: armour and resistances +{armor%}, damage +{damage%}, speed +{speed%}. In a party fight the bonus is shared out."
+    },
+    "psalm": {
+      "name": "Psalm",
+      "style": "healing",
+      "description": "The chant carries over the battlefield and seals wounds.",
+      "effect": "When someone in the party has less than {below%} HP: for {turns} of their own turns the character sings a psalm, and the whole party recovers {heal%} of max HP every turn."
+    },
+    "execution": {
+      "name": "Execution",
+      "style": "attack",
+      "description": "The Assassin waits until the prey weakens. Then gives it no chance.",
+      "effect": "A blow dealing {power%} damage, always critical ({critPower%} in all), at the enemy standing furthest back. A target with less than {executeBelow%} HP takes {executeBonus%} more."
+    },
+    "death-mark": {
+      "name": "Death Mark",
+      "style": "attack",
+      "description": "The mark on the enemy's skin counts every wound. Then it returns them all at once.",
+      "effect": "Marks an enemy. After {turns} of the character's turns, the marked enemy takes {echo%} of the damage it took in that time once more."
+    },
+    "black-venom": {
+      "name": "Black Venom",
+      "style": "poison",
+      "description": "The Poisoner's venom does more than burn the blood. It also saps the strength of the arms.",
+      "effect": "At the start of a fight, until its end: every blow may cause Poison ({dotChance%} chance). For {dotTicks} of its turns, a poisoned enemy loses {dotPower%} of the blow's damage each turn and deals {weaken%} less damage."
+    },
+    "toxic-slime": {
+      "name": "Toxic Slime",
+      "style": "poison",
+      "description": "A slime crawls out of a pool of venom. When it bursts, no one nearby comes out of it clean.",
+      "effect": "Summons a Toxic Slime for {turns} of their own turns. The slime stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it poisons a random enemy for {dotTicks} turns at {dotPower%} of the character's damage, and when it dies, it poisons all enemies.",
+      "params": {
+        "summonName": "Toxic Slime"
+      }
+    },
+    "blade-dance": {
+      "name": "Blade Dance",
+      "style": "dodge",
+      "description": "In the Night Dancer's dance, every blade lands where an enemy stood a moment before.",
+      "effect": "Once per fight, when HP falls below {below%}: for the next {hits} enemy blows, dodge rises by {dodge pp}. Each dodge brings a counter dealing {counter%} damage and a slash for {blades%} at a random enemy."
+    },
+    "shadow-whirl": {
+      "name": "Shadow Whirl",
+      "style": "area",
+      "description": "The Dancer vanishes into a whirl of shadows and cuts everything caught in it.",
+      "effect": "Shadow Whirl: {blows} blows of {power%} damage each at random enemies."
+    },
+    "shattering-blow": {
+      "name": "Shattering Blow",
+      "style": "attack",
+      "description": "The Berserker does not go around armour, but straight through it. After a blow like this, the enemy stays down for a long time.",
+      "effect": "A blow dealing {power%} damage that ignores {armorIgnore%} of the target's armour. The target may lose its next {stunMoves} turns ({stunChance%} chance).",
+      "params": {
+        "stunLabel": "stunned"
+      }
+    },
+    "berserker-roar": {
+      "name": "Berserker's Roar",
+      "style": "empowerment",
+      "description": "The roar carries across the battlefield. The enemies step back, and the Berserker charges forward.",
+      "effect": "For {turns} of the character's turns, enemies deal {weaken%} less damage, and the character deals {damage%} more."
+    },
+    "steel-whirl": {
+      "name": "Steel Whirl",
+      "style": "area",
+      "description": "The Champion whirls their weapon so fast that the steel blurs into a single flash. No one within reach escapes unwounded.",
+      "effect": "Attacks every enemy for {power%} damage, without a miss. When the target is a single enemy, it deals {single%}. Those hit bleed for {dotTicks} of their turns, losing {dotPower%} of the blow's damage each turn."
+    },
+    "duel": {
+      "name": "Duel",
+      "style": "control",
+      "description": "The Champion points their weapon at the most dangerous enemy. The crowd falls silent, for it knows how this will end.",
+      "effect": "Challenges the enemy with the most HP. Until the end of the fight, the character deals {damage%} more damage to it and takes {guard%} less from it."
+    },
+    "unbending": {
+      "name": "Unbending",
+      "style": "defence",
+      "description": "The Bastion will not bend under any blow. Wounds close, and the attacker gets back what they dealt.",
+      "effect": "Once per fight, when HP falls below {below%}, recovers {heal%} of max HP and gains {armor%} more armour for {turns} of their own turns. Meanwhile, reflects {reflect%} of the damage taken."
+    },
+    "shield-wall": {
+      "name": "Shield Wall",
+      "style": "defence",
+      "description": "The Bastion drives the shield into the ground, and the party stands behind it shoulder to shoulder.",
+      "effect": "For {turns} of the character's turns, the whole party has {wall%} more armour."
+    },
+    "heart-shot": {
+      "name": "Heart Shot",
+      "style": "attack",
+      "description": "The arrowhead seeks the heart and does not stop at the first one. The Sharpshooter counts hits in threes.",
+      "effect": "A shot dealing {power%} damage that cannot be dodged, with the chance of a critical hit higher by {critBonus pp}. It pierces the target and hits {pierces} more enemies behind it, each for {pierce%} damage."
+    },
+    "target-lock": {
+      "name": "Target Lock",
+      "style": "control",
+      "description": "The Sharpshooter takes aim at an enemy. From that moment on, it has nowhere to hide.",
+      "effect": "Marks an enemy until it falls. The marked enemy takes {damage%} more damage from the character and cannot dodge it."
+    },
+    "sky-thunder": {
+      "name": "Thunder from the Sky",
+      "style": "area",
+      "description": "Arrows fall together with lightning. Whoever survives this rain will not have the use of their legs for a long while.",
+      "effect": "A rain of arrows and lightning deals {power%} lightning damage to all enemies. When the target is a single enemy, {single%}. Every enemy hit may lose its next turn ({stunChance%} chance).",
+      "params": {
+        "stunLabel": "shocked"
+      }
+    },
+    "thunder-orb": {
+      "name": "Thunder Orb",
+      "style": "attack",
+      "description": "A ball of lightning circles above the Thunder Lord's head. Again and again it strikes at the enemy.",
+      "effect": "Summons a thunder orb for {turns} of their own turns. Every turn the orb strikes a random enemy for {power%} lightning damage."
+    },
+    "harpoon": {
+      "name": "Harpoon",
+      "style": "control",
+      "description": "A heavy barbed head on a line. The quarry it hits will not break free.",
+      "effect": "A shot dealing {power%} damage. The enemy hit loses its next turn and bleeds for {dotTicks} of its turns, losing {dotPower%} of the shot's damage each turn.",
+      "params": {
+        "stunLabel": "pinned"
+      }
+    },
+    "wolf-call": {
+      "name": "Wolf",
+      "style": "attack",
+      "description": "At the Huntmaster's whistle a wolf bursts out of the thicket. It stands by the hunter and never leaves their side.",
+      "effect": "Summons a wolf for {turns} of their own turns. The wolf stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it bites a random enemy for {power%} damage.",
+      "params": {
+        "summonName": "Wolf"
+      }
+    },
+    "meteor-shower": {
+      "name": "Meteor Shower",
+      "style": "area",
+      "description": "The sky cracks open and burning boulders fall from it. The fire does not choose whom it reaches.",
+      "effect": "A fire spell on all enemies deals {power%} damage, {single%} against a single target. Every enemy hit may catch Burn ({dotChance%} chance): for {dotTicks} of its turns it loses {dotPower%} of the spell's damage each turn."
+    },
+    "elemental-harmony": {
+      "name": "Elemental Harmony",
+      "style": "empowerment",
+      "description": "The Archmage weaves the elements into a single song. Each of them lends strength to the next.",
+      "effect": "At the start of a fight, until its end: every element the character uses in spells during this fight makes their next spells {bonus%} stronger."
+    },
+    "ice-star": {
+      "name": "Ice Star",
+      "style": "attack",
+      "description": "Ice gathers into a star with sharp points. Whoever already shivers with cold shatters beneath it like glass.",
+      "effect": "The ice star hits one enemy for {power%} frost damage. A chilled target takes {chilledBonus%} more."
+    },
+    "ice-armor": {
+      "name": "Ice Armour",
+      "style": "defence",
+      "description": "The Winter Lord wraps up in ice. Whoever strikes it feels their hands go numb.",
+      "effect": "Once per fight, when HP falls below {below%}, turns {pool%} of max mana into ice armour that stops damage equal to {ratio%} of the mana taken. Whoever strikes the armour is slowed by {slow%}."
+    },
+    "ent-summon": {
+      "name": "Summon Ent",
+      "style": "defence",
+      "description": "A tree-being with bark as hard as stone grows out of the ground. It draws the blows to itself and strikes back with its branches.",
+      "effect": "Summons an ent for {turns} of their own turns. The ent stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it lashes a random enemy with its branches for {power%} damage.",
+      "params": {
+        "summonName": "Ent"
+      }
+    },
+    "bear-summon": {
+      "name": "Summon Bear",
+      "style": "attack",
+      "description": "A bear steps out of the thicket and stands between the Druid and the enemies. Whoever comes closer will feel its claws.",
+      "effect": "Summons a bear for {turns} of their own turns. The bear stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it rakes a random enemy with its claws for {power%} damage.",
+      "params": {
+        "summonName": "Bear"
+      }
+    },
+    "great-renewal": {
+      "name": "Great Renewal",
+      "style": "healing",
+      "description": "The Miracle Worker's prayer raises the whole party from its knees. Wounds keep healing long after it.",
+      "effect": "Once per fight, when HP falls below {below%}, heals the whole party by {heal%.1} of max HP, plus 1 HP for every {wisdomPerHp} points of Wisdom. Then, for {hotTurns} of their own turns, heals everyone by {hot%} of max HP each turn."
+    },
+    "life-aura": {
+      "name": "Aura of Life",
+      "style": "healing",
+      "description": "A warm light hovers around the Miracle Worker. Whoever stands in it regains strength with every breath.",
+      "effect": "When someone in the party has less than {below%} HP: for {turns} of the character's turns, the whole party recovers {heal%} of max HP every turn."
+    },
+    "final-verdict": {
+      "name": "Final Verdict",
+      "style": "attack",
+      "description": "The verdict falls before the enemy does. Holy fire finishes what steel began.",
+      "effect": "A sacred verdict dealing {power%} damage to an enemy with less than {below%} HP left."
+    },
+    "pyre": {
+      "name": "Pyre",
+      "style": "area",
+      "description": "Holy fire kindles beneath the Grand Inquisitor's enemies. It burns for as long as the Inquisitor wills it.",
+      "effect": "For {turns} of the character's turns, holy fire burns the enemies: on each of the character's turns, every enemy takes {power%} sacred damage."
+    },
+    "choir": {
+      "name": "Choir",
+      "style": "healing",
+      "description": "Voices no one can see join the High Priest's song. Wounds close, and arms grow strong.",
+      "effect": "For {turns} of the character's turns, the whole party recovers {heal%} of max HP every turn and deals {chorus%} more damage."
+    },
+    "divine-shield": {
+      "name": "Divine Protection",
+      "style": "defence",
+      "description": "A golden dome spreads over the party. The enemies' blows glance off it as off a rock.",
+      "effect": "Once per fight, when HP falls below {below%}, the whole party gets a shield that stops damage equal to {guard%} of each one's max HP."
+    },
+    "beheading": {
+      "name": "Beheading",
+      "style": "attack",
+      "description": "The Kingslayer leaves no wounded. One cut, and the matter is closed.",
+      "effect": "A blow dealing {power%} damage, always critical ({critPower%} in all), at the enemy standing furthest back. A target with less than {executeBelow%} HP takes {executeBonus%} more."
+    },
+    "vanish": {
+      "name": "Vanish",
+      "style": "dodge",
+      "description": "The Kingslayer melts into the shadows. When they reappear, the blow falls where no one expects it.",
+      "effect": "The character vanishes for one turn: enemies cannot hit them, and their next blow is critical and deals {power%} more damage."
+    },
+    "raise-dead": {
+      "name": "Raise Dead",
+      "style": "poison",
+      "description": "A skeleton warrior rises from the ground. Its sword is coated in green venom.",
+      "effect": "A skeleton warrior rises for {turns} of the character's turns. It stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it strikes a random enemy for {power%} damage and poisons it: for {dotTicks} turns the target loses {dotPower%} of the blow's damage each turn.",
+      "params": {
+        "summonName": "Skeleton Warrior"
+      }
+    },
+    "curse-of-decay": {
+      "name": "Curse of Decay",
+      "style": "poison",
+      "description": "The Necromancer whispers words that wither the grass. Enemies rot while still alive, and their armour crumbles.",
+      "effect": "The curse falls on all enemies: for {dotTicks} of their turns, each loses {dotPower%} of the character's blow damage each turn (Poison), and its armour weakens by {decay%} every turn."
+    },
+    "blade-storm": {
+      "name": "Blade Storm",
+      "style": "area",
+      "description": "The Phantom turns into a whirl of blades. Blows fall faster than the enemy can count them.",
+      "effect": "Blade Storm: {blows} blows of {power%} damage each at random enemies."
+    },
+    "shadow-double": {
+      "name": "Shadow Double",
+      "style": "attack",
+      "description": "The Phantom's shadow peels off the ground and stands at its side. It repeats every move like a reflection in black water.",
+      "effect": "Summons the character's shadow for {turns} of their own turns. The shadow repeats each of the character's blows on the same target for {power%} damage."
+    }
+  },
+  "texts": {
+    "title": "Class evolution",
+    "intro": "At class level {level}, your character stands on the threshold of evolution. Choose one of the two paths. The other path will vanish for good. But do not worry – you will be able to redistribute the points invested in it once, on the evolved Skills.",
+    "introFemale": "At class level {level}, your character stands on the threshold of evolution. Choose one of the two paths. The other path will vanish for good. But do not worry – you will be able to redistribute the points invested in it once, on the evolved Skills.",
+    "waiting": "Evolution awaits at class level {level}.",
+    "notReady": "Before the evolution, choose a side path and spend your Skill Points.",
+    "growth": "Growth per class level",
+    "trait": "Trait",
+    "skills": "Skills",
+    "choose": "Choose evolution",
+    "confirm": "The evolution is for good. Only a resident of the Settlement will be able to change it. Choose {name}?",
+    "ceremony": "Evolution: {name}",
+    "ceremonyLine": "Your new class is: {name}. Spend your Skill Points on your new abilities.",
+    "spend": "Spend your Skill Points on your new abilities.",
+    "toSkills": "Go to Skills",
+    "busy": "The character is on an exploration. You can choose the evolution after it returns.",
+    "resetTitle": "Reset your stats?",
+    "resetText": "A new class may need different stats. A reset puts every point spent back in the pool: from character levels and from class levels, spent by hand and with “Spend by class”.",
+    "resetPool": "Points to spend anew: {points} ({character} from character levels, {class} from class levels).",
+    "resetPoolBonus": "Points to spend anew: {points} ({character} from character levels, {class} from class levels, {bonus} from events).",
+    "resetWarning": "This reset is free, once. Decide now: you will not get this choice later.",
+    "reset": "Reset",
+    "recommended": "recommended",
+    "keep": "Keep stats",
+    "resetDone": "The points are back in the pool. Spend them in the Stats tab.",
+    "baseClass": "from the class: {className}",
+    "test": "Test evolution",
+    "testText": "Test version only: choose an evolution at any class level, with the option to undo it.",
+    "undo": "Undo evolution",
+    "undone": "Evolution undone. The class, skills and stats are as they were before it.",
+    "testLevel": "Set class level {level}",
+    "testLevelDone": "The character is at class level {level}. Evolution waits in the Character tab.",
+    "nextIntro": "At class level {level}, your character stands on the threshold of the next evolution. From here this path leads only one way. Both skills will give way to new ones, and you will be able to spend the points invested in them anew.",
+    "nextIntroFemale": "At class level {level}, your character stands on the threshold of the next evolution. From here this path leads only one way. Both skills will give way to new ones, and you will be able to spend the points invested in them anew.",
+    "nextWaiting": "The next evolution awaits at class level {level}.",
+    "nextNotReady": "Before the next evolution, spend all your Skill Points.",
+    "take": "Accept evolution",
+    "nextConfirm": "The evolution is for good. Both skills will give way to new ones, and their points will come back to be spent. Accept {name}?",
+    "accept": "Accept",
+    "fromEvolution": "From the evolution: {name}",
+    "testNext": "Test version only: the next evolution at any class level, with the option to undo it.",
+    "testDone": "The character has already been through every evolution: {name}."
+  }
+}

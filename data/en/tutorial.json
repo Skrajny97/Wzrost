@@ -49,6 +49,10 @@
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. Skills wait in the Character tab."
     },
+    "evolution": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. Evolution waits in the Character tab."
+    },
     "party": {
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Party waits in the Community, in the Party tab."
@@ -562,6 +566,36 @@
           "That is all from me. This time not even the System will do it for you – the choice is yours alone. Choose your path when you are ready."
         ]
       }
+    },
+    "evolution-welcome": {
+      "text": [
+        "The fiftieth level of your class… The System has opened Evolution before you."
+      ]
+    },
+    "evolution-lead": {
+      "text": [
+        "Evolution waits in the Character tab. Let us take a look."
+      ]
+    },
+    "evolution-choice": {
+      "text": [
+        "It is time you chose your path. One of two evolutions is open to you: that of your main path or that of your side path. Each will give you a new class name, a lasting trait and two new skills."
+      ],
+      "female": {
+        "text": [
+          "It is time you chose your path. One of two evolutions is open to you: that of your main path or that of your side path. Each will give you a new class name, a lasting trait and two new skills."
+        ]
+      }
+    },
+    "evolution-points": {
+      "text": [
+        "Your Skill Points will come back to be spent anew, and you may reset your stats once, for free."
+      ]
+    },
+    "evolution-ending": {
+      "text": [
+        "The next evolution awaits at the hundredth level of your class."
+      ]
     },
     "party-intro": {
       "text": [
