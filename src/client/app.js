@@ -41,7 +41,7 @@ import { musicVolume, prefetchMusic, setMusicConfig, setMusicPlace, setMusicVolu
 import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
 import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
-import { narrate, narrateSoon, passTold } from './narrator.js';
+import { forgetPart, narrate, narrateSoon, passTold } from './narrator.js';
 import { forgetNews, watchNews } from './news.js';
 import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
@@ -1152,6 +1152,7 @@ async function repeatSkillsTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/skills-tour');
+    forgetPart('skills');
   } catch (error) {
     toast(error.message);
   }
@@ -1168,6 +1169,7 @@ async function repeatCraftingTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/crafting-tour');
+    forgetPart('crafting');
   } catch (error) {
     toast(error.message);
   }
@@ -1183,6 +1185,7 @@ async function repeatProfessionsTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/professions-tour');
+    forgetPart('professions');
   } catch (error) {
     toast(error.message);
   }
@@ -1199,6 +1202,7 @@ async function repeatCommunityTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/community-tour');
+    forgetPart('community');
   } catch (error) {
     toast(error.message);
   }
@@ -1215,6 +1219,7 @@ async function repeatSettlementTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/settlement-tour');
+    forgetPart('settlement');
   } catch (error) {
     toast(error.message);
   }
@@ -1231,6 +1236,7 @@ async function repeatEvolutionTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/evolution-tour');
+    forgetPart('evolution');
   } catch (error) {
     toast(error.message);
   }
@@ -1247,6 +1253,7 @@ async function repeatTowersTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/towers-tour');
+    forgetPart('towers');
   } catch (error) {
     toast(error.message);
   }
@@ -1264,6 +1271,7 @@ async function repeatMiningTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/mining-tour');
+    forgetPart('mining');
   } catch (error) {
     toast(error.message);
   }
@@ -1281,6 +1289,7 @@ async function repeatGuildTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/guild-tour');
+    forgetPart('guild');
   } catch (error) {
     toast(error.message);
   }
@@ -1298,6 +1307,7 @@ async function repeatFortressTour() {
   closeSheet();
   try {
     await call('POST', '/api/test/fortress-tour');
+    forgetPart('fortress');
   } catch (error) {
     toast(error.message);
   }

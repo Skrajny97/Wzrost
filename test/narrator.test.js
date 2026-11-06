@@ -146,3 +146,34 @@ test('the Rzemieślnictwo waiting for a free worker does not begin in the middle
   assert.equal(cards().length, 1);
   assert.match(cards()[0].textContent, /System otworzył przed Tobą Rzemieślnictwo/);
 });
+
+// "Testuj samouczki" (app.js) starts a chapter anew: its line comes on the
+// next look at its place, also when it was passed on this page. The
+// Wyprawa Gildii's line passed, then "Od nowa": nothing came on the next
+// look at the tab, only once the page was opened again (the review of 664).
+test('a line passed on this page comes again once "Testuj samouczki" starts its chapter anew', async () => {
+  state.user = { skipTutorials: false };
+  const route = globalThis.document.createElement('section');
+  route.dataset.guide = 'guild-expedition-route';
+  globalThis.document.body.append(route);
+  page.places.set('[data-guide="guild-expedition-route"]', [route]);
+  const lit = () => globalThis.document.body.find((node) => node.classList.contains('guide'));
+  const told = [...toldSoFar, 'community-ending', ...part('crafting'), ...part('settlement')];
+  state.character = { ...character({ read: told }), guildTag: 'KRUK' };
+  narrator.narrate('#/gildia/expedition');
+  assert.equal(lit().length, 1);
+  globalThis.document.body.find((node) => node.classList.contains('guide-next'))[0].click();
+  await settled();
+  assert.equal(lit().length, 0);
+  assert.deepEqual(sent.map((one) => one.body), [{ card: 'guild-expedition' }]);
+  // The test row's answer: the line unread on the server again.
+  state.character = { ...character({ read: told }), guildTag: 'KRUK' };
+  narrator.forgetPart('guild');
+  narrator.narrate('#/gildia/expedition');
+  assert.equal(lit().length, 1);
+  // The light goes with the character, and the place with the screen.
+  state.character = null;
+  narrator.narrate();
+  page.places.clear();
+  route.remove();
+});

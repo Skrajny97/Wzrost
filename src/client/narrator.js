@@ -823,6 +823,14 @@ function begun(chapter, read) {
   return more.length > 0 && read.has(first.id) && more.some((line) => !read.has(line.id));
 }
 
+// "Testuj samouczki" (app.js): a chapter told anew from its start. Its lines
+// passed on this page are forgotten here too, or they would stay read until
+// the page is opened again (the Wyprawa Gildii's line passed, then "Od
+// nowa": nothing came on the next look at its tab).
+export function forgetPart(chapter) {
+  for (const line of partLines(chapter)) passedHere.delete(line.id);
+}
+
 // What "Pomiń" passes on a line: the introduction until its ending, or the
 // line's chapter, but not on the last line of either; a late line after the
 // ending has nothing left to pass.

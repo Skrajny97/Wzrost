@@ -363,6 +363,18 @@ test("the narrator hears of the Gildia's tabs, also of the one the page opens on
   }
 });
 
+// Each "Testuj samouczki" row that starts a chapter anew forgets the
+// chapter's lines passed on this page (narrator.js, forgetPart): the chapter
+// comes on the next look at its place, not only once the page is opened
+// again (the review of 664; narrator.test.js).
+test('each "Testuj samouczki" row forgets its chapter\'s lines passed on the page', () => {
+  const app = readFileSync(join(CLIENT, 'app.js'), 'utf8');
+  const { chapters } = JSON.parse(readFileSync(new URL('../data/tutorial.json', import.meta.url), 'utf8'));
+  for (const chapter of Object.keys(chapters)) {
+    assert.ok(app.includes(`await call('POST', '/api/test/${chapter}-tour');\n    forgetPart('${chapter}');`), chapter);
+  }
+});
+
 // A change of the character reaches the narrator a moment later, at the
 // page's address then: a chapter that the claim of a report brings begins
 // after the report, not over it (664; narrator.test.js).
