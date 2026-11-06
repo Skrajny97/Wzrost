@@ -154,7 +154,8 @@ const STORED = { 'insight.motion': 'off', 'insight.narratorVoice': 'off' };
 // come (the test runner does not wait for one top-level `before` before it
 // starts the next), `page.sent` with the requests, `page.toastBox` with the
 // message, and in `page.places` the elements the narrator finds for a
-// place's selector (none unless a test puts them there). The game's screen
+// place's selector, the first of them also for the button of a tab or a
+// fold he opens (none unless a test puts them there). The game's screen
 // is empty, so the camera stays where it is.
 export function narratorPage() {
   const page = { sent: [], toastBox: new FakeNode('div'), screen: new FakeNode('main'), places: new Map(), state: null, narrator: null };
@@ -179,7 +180,7 @@ export function narratorPage() {
       addEventListener() {},
       removeEventListener() {},
       getElementById: (id) => ({ toast: page.toastBox, screen: page.screen })[id] ?? null,
-      querySelector: (selector) => (selector === '#toast' ? page.toastBox : null),
+      querySelector: (selector) => (selector === '#toast' ? page.toastBox : (page.places.get(selector)?.[0] ?? null)),
       querySelectorAll: (selector) => page.places.get(selector) ?? [],
       elementsFromPoint: () => [],
     };

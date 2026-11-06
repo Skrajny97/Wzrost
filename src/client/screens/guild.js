@@ -69,7 +69,8 @@ export function mountGuildPage(container, context) {
   if (art) heading.style.setProperty('--place-art', `url("${art}")`);
   const back = h('a', { class: 'link-button guild-back', href: '#/spolecznosc' }, icon('back', { size: 16 }), 'Społeczność');
   const tabs = state.content.guildTabs;
-  const row = h('div', { class: 'community-tabs', role: 'tablist', 'aria-label': 'Części Gildii' });
+  // The narrator points at the tabs on a member's first look (narrator.js).
+  const row = h('div', { class: 'community-tabs', role: 'tablist', 'aria-label': 'Części Gildii', 'data-guide': 'guild-tabs' });
   // The row stays under the top bar while the page scrolls, as the
   // Społeczność's does (styles.css).
   const picker = h('div', { class: 'community-picker guild-picker' }, row);

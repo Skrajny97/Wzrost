@@ -187,7 +187,9 @@ export function mountGuildTrials(container) {
     const line = filled(texts.boardLine, { done: formatNumber(done), open: formatNumber(board.length) });
     return h(
       'div',
-      { class: 'guild-part guild-board' },
+      // The narrator's line about the Próby rings the board's title and the
+      // words under it (narrator.js).
+      { class: 'guild-part guild-board', 'data-guide': 'guild-trials-board' },
       foldPart(
         { key: 'guild-trials-board', title: texts.board, line },
         h('p', { class: 'muted small', text: texts.fromOpening }),

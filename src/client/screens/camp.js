@@ -512,6 +512,8 @@ function mountBoard(container, backHash) {
       {
         type: 'button',
         class: 'camp-collector',
+        // The narrator points at him on the first look (narrator.js).
+        'data-guide': 'camp-collector',
         'aria-label': collector.name,
         style: {
           left: `${((chest.x - COLLECTOR_GAP) / BOARD_WIDTH) * 100}%`,

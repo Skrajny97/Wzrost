@@ -353,14 +353,56 @@ test("the narrator hears of the Gildia's tabs, also of the one the page opens on
   const route = /\nfunction route\(\) \{([\s\S]*?)\n\}/.exec(app)[1];
   assert.match(route, /candidate\.mount\([\s\S]*narrate\(location\.hash \|\| hash\);/);
   assert.doesNotMatch(route, /narrate\(hash\);/);
-  // "Testuj samouczki" starts both these lines again, each on its own.
+  // "Testuj samouczki" starts the places' lines again: the Gildia's all
+  // together, and each of the others on its own (6.11.2026).
   for (const [title, path] of [
-    ['Wyprawa Gildii', 'guild-tour'],
+    ['Gildia', 'guild-tour'],
     ['Warownia', 'fortress-tour'],
+    ['Kamień węgielny', 'cornerstone-tour'],
+    ['Drużyna', 'party-tour'],
+    ['Trudna wyprawa', 'hard-hunt-tour'],
+    ['Skrzynia Konta', 'account-chest-tour'],
+    ['Zbieracz Systemu', 'system-collector-tour'],
+    ['Omdlenie', 'faint-tour'],
   ]) {
     assert.match(app, new RegExp(`row\\('${title}',`));
     assert.ok(app.includes(`'/api/test/${path}'`), path);
   }
+});
+
+// The places of the narrator's lines of 6.11.2026 are marked where he looks
+// for them (narrator-places.test.js tells the lines on a page of its own).
+test("the places of the narrator's lines of 6.11.2026 are marked on their screens", () => {
+  const source = (...path) => readFileSync(join(CLIENT, ...path), 'utf8');
+  const beats = /const BEATS = \{([\s\S]*?)\n\};/.exec(source('narrator.js'))[1];
+  for (const [file, guide] of [
+    [['screens', 'guild.js'], 'guild-tabs'],
+    [['guild-seat.js'], 'guild-seat-building'],
+    [['guild-beast.js'], 'guild-beast'],
+    [['guild-trials.js'], 'guild-trials-board'],
+    [['guild-requests.js'], 'guild-requests'],
+    [['guild-exchange.js'], 'guild-exchange'],
+    [['screens', 'camp.js'], 'camp-collector'],
+    [['screens', 'camp.js'], 'plot-cornerstone'],
+    [['screens', 'chest.js'], 'account-chest'],
+    [['screens', 'combat.js'], 'hard-hunt'],
+    [['screens', 'report.js'], 'report-summary'],
+  ]) {
+    assert.ok(source(...file).includes(`'data-guide': '${guide}'`), `${file.join('/')}: ${guide}`);
+    assert.ok(beats.includes(`mark('${guide}')`), guide);
+  }
+  // The Społeczność's tabs, the Drużyna's among them, and the Sklep Systemu's
+  // stall in the top bar.
+  assert.ok(source('screens', 'community.js').includes("'data-guide': `community-tab-${section.id}`"));
+  assert.ok(JSON.parse(readFileSync(new URL('../data/community.json', import.meta.url), 'utf8')).sections.some((section) => section.id === 'party'));
+  assert.ok(beats.includes("mark('community-tab-party')"));
+  assert.match(source('layout.js'), /h\('a', \{ class: 'system-shop'/);
+  assert.ok(beats.includes("'.topbar .system-shop'"));
+  // The fold the narrator opens for the Trudna wyprawa says whether it is open.
+  assert.match(source('screens', 'combat.js'), /class: 'hunt-options-toggle',\s*'aria-expanded'/);
+  // A report fetched after its screen was drawn is shown to the narrator.
+  const load = /async function load\(\) \{([\s\S]*?)\n {2}\}/.exec(source('screens', 'report.js'))[1];
+  assert.match(load, /reportCache\.set\(params\.id, report\);[\s\S]*if \(!gone\) narrate\(location\.hash\);/);
 });
 
 // Each "Testuj samouczki" row that starts a chapter anew forgets the

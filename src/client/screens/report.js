@@ -11,6 +11,7 @@ import { playSound } from '../sound.js';
 import { activityFinished, avoidRareOn, call, hardHuntOn, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn } from '../state.js';
 import { guided, openSheet, systemPanel, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
+import { narrate } from '../narrator.js';
 import { scrapperSheet } from '../scrapper.js';
 import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy } from './character.js';
 import { skipLines } from './party.js';
@@ -75,7 +76,11 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       if (!gone) render();
     } catch (error) {
       if (!gone) fill(container, heading('Raport'), systemPanel(error.message));
+      return;
     }
+    // Fetched after the screen was drawn (opened from the Dziennik, say):
+    // the narrator looks at it now, for its line about a faint.
+    if (!gone) narrate(location.hash);
   }
 
   function render() {

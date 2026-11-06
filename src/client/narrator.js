@@ -22,10 +22,15 @@
 // class level 50, the Wieże at character level 50 and the Górnictwo with
 // the Jubilerstwo at character level 25, each after all the earlier ones. A chapter's own "Pomiń"
 // passes only that chapter, and a line can be told for each class
-// (`classes`). With "Pomijaj objaśnienia narratora" on in the settings (the
-// account's) nothing is told: each line due is passed with its part, as its
-// "Pomiń" would pass it, and a part begun before the switch went on at once;
-// a part's later lines and a single place's line go without its message.
+// (`classes`). A place's line comes on the first look at its place once no
+// chapter waits, also to a character that was there before the line was
+// written: the Osada's places, the Gildia's page and tabs, the Warownia,
+// the Drużyna, the Kamień węgielny, the Trudna wyprawa, the Skrzynia Konta,
+// the Zbieracz Systemu and the report of a faint. With "Pomijaj objaśnienia
+// narratora" on in the settings (the account's) nothing is told: each line
+// due is passed with its part, as its "Pomiń" would pass it, and a part
+// begun before the switch went on at once; a part's later lines and a
+// place's line go without its message.
 
 import { narratorSprite } from './art.js';
 import { aim } from './camera.js';
@@ -34,7 +39,7 @@ import { motionOn } from './motion.js';
 import { duckMusic } from './music.js';
 import { rod, roll, stopRoll } from './parchment.js';
 import { narrationWaits, narratorVoiceOn, playNarration, playSound, preloadNarration, stopNarration } from './sound.js';
-import { activityFinished, call, isUnlocked, state } from './state.js';
+import { activityFinished, call, isUnlocked, reportCache, state } from './state.js';
 import { desktopLayout } from './layout-mode.js';
 import { toast } from './ui.js';
 
@@ -93,12 +98,14 @@ const communityDue = (hash, read) =>
 const communityTour = (hash, read) => communityDue(hash, read) && read.has('community-welcome');
 const communityHere = (hash, read) => onCommunity(hash) && communityTour(hash, read);
 // An inner region the class has opened, while the character is at home: its
-// screen has "Wyrusz" and Szybkie Polowanie (screens/combat.js).
-function onOpenArea(hash) {
+// screen has "Wyrusz" with the exploration's options (screens/combat.js),
+// and Szybkie Polowanie once the character has it.
+function onHomeArea(hash) {
   const [, regionId, areaId] = hash.match(/^#\/walka\/([^/]+)\/([^/]+)$/) ?? [];
   const area = state.content.regions.find((region) => region.id === regionId)?.areas.find((candidate) => candidate.id === areaId);
-  return Boolean(area && state.character.quickHunts) && !state.character.activity && state.character.classLevel >= area.unlockClassLevel;
+  return Boolean(area) && !state.character.activity && state.character.classLevel >= area.unlockClassLevel;
 }
+const onOpenArea = (hash) => onHomeArea(hash) && Boolean(state.character.quickHunts);
 // Szybkie Polowanie's line, with the character at home and nothing else to
 // tell.
 const quickHuntDue = (read) =>
@@ -229,7 +236,7 @@ const towersWaiting = (read) => isUnlocked('towers') && !read.has('towers-ending
 // worker is busy (664).
 const miningWaiting = (read) => isUnlocked('mining') && !read.has('mining-ending') && (read.has('mining-welcome') || workerFree());
 // No chapter waits: only then a line of a single place comes (the Osada's,
-// Szybkie Polowanie's, the Wyprawa Gildii's and the Warownia's).
+// Szybkie Polowanie's, the Gildia's, the Warownia's and the other places').
 const noChapterWaits = (read) =>
   !skillsWaiting(read) &&
   !professionsWaiting(read) &&
@@ -241,8 +248,42 @@ const noChapterWaits = (read) =>
   !miningWaiting(read);
 // After the introduction, with no chapter waiting: a line of its own place
 // told on the place's first visit, as the Osada's are (641-647): the
-// Wyprawa Gildii and the Warownia.
+// Gildia's, the Warownia's, and those of 6.11.2026 below.
 const quietDue = (read) => read.has('ending') && noChapterWaits(read);
+
+// The Gildia (646, and the author's lines of 6.11.2026), for a member: its
+// page's tabs on the first look at any of them, then each tab's own line on
+// the first look at that tab. The page tells the narrator of each tab it
+// shows (screens/guild.js).
+const onGuildPage = (hash) => hash === '#/gildia' || hash.startsWith('#/gildia/');
+const inGuild = (read) => Boolean(state.character.guildTag) && quietDue(read);
+const guildTab = (tab) => (hash, read) => hash === `#/gildia/${tab}` && inGuild(read);
+
+// The Drużyna (6.11.2026): on the first look at the Społeczność, at any of
+// its parts, from the level it opens at; while Szybkie Polowanie's line waits
+// for the narrator to take the player there, after it.
+const onCommunityPage = (hash) => hash === '#/spolecznosc' || hash.startsWith('#/spolecznosc/');
+const partyHere = (hash, read) => onCommunityPage(hash) && isUnlocked('party') && quietDue(read) && !quickHuntDue(read);
+
+// The Kamień węgielny Warowni on the camp's board (6.11.2026): once the Osada
+// is told, as the Kwatery's line, while the camp is no Warownia yet and the
+// game has the Warownia.
+const stoneWaits = () => Boolean(state.character.camp.cornerstone?.fortress) && !state.character.camp.cornerstone.fortress.stands;
+const stoneHere = (hash, read) => onBoard(hash) && placesDue(read) && stoneWaits();
+
+// The Zbieracz Systemu by the Skrzynia Konta (6.11.2026), until he is
+// bought.
+const collectorHere = (hash, read) => onBoard(hash) && Boolean(state.character.camp.collector) && !state.character.camp.collector.owned && quietDue(read);
+
+// A report of an exploration that ended in a faint, under the rules of
+// 651 C, whose summary says nothing of it is left (`forfeit`), once the page
+// has it: the claim puts it there before the report opens, and a report
+// opened from the Dziennik once it comes (screens/report.js).
+function faintReport(hash) {
+  const [, id] = hash.match(/^#\/raport\/(\d+)$/) ?? [];
+  const report = id ? reportCache.get(id) : null;
+  return report?.result === 'fainted' && Boolean(report.summary?.forfeit);
+}
 const miningDue = (hash, read) =>
   isUnlocked('mining') &&
   workerFree() &&
@@ -310,7 +351,9 @@ const campDone = (hash, read) => read.has('camp') && (campStarted() || !affordab
 // line is told also after the ending, once, to a character that finished
 // the introduction before the line was written. `tab` names the button of
 // the tab that holds the places, opened first: a tab not open is not drawn
-// at all, so its places would be missing (the Karczma's, settlement.js).
+// at all, so its places would be missing (the Karczma's, settlement.js); or
+// the button of a fold (aria-expanded) whose places stay hidden till it
+// opens ("Opcje wyprawy", screens/combat.js).
 const BEATS = {
   ask: { when: (hash, read) => read.size === 0 },
   intro: { when: () => true },
@@ -389,6 +432,10 @@ const BEATS = {
     when: (hash, read) => campDone(hash, read) && !hash.startsWith('#/encyklopedia') && !read.has('encyclopedia'),
   },
   encyclopedia: { place: mark('encyclopedia-set'), unfold: true, late: true, when: (hash, read) => campDone(hash, read) && hash.startsWith('#/encyklopedia') },
+  // The author (6.11.2026): and the Sklep Systemu, its stall in the top bar.
+  // Told also to those who finished before, as the Encyklopedia was, but
+  // never over a report they have not seen.
+  'shop-system': { place: '.topbar .system-shop', late: true, when: (hash, read) => campDone(hash, read) && !onReport(hash) },
   ending: { when: campDone },
   // The Umiejętności chapter, after the introduction.
   'skills-welcome': { when: skillsDue },
@@ -508,13 +555,41 @@ const BEATS = {
   'mining-jewels': { place: mark('jewel-patterns'), go: lapidaryTrip, when: atLapidary },
   'mining-setting': { place: mark('jewel-tab-set'), go: lapidaryTrip, when: atLapidary },
   'mining-ending': { go: lapidaryTrip, when: atLapidary },
-  // The Wyprawa Gildii (646), on the first look at its tab in a guild.
-  'guild-expedition': {
-    place: mark('guild-expedition-route'),
-    when: (hash, read) => hash === '#/gildia/expedition' && Boolean(state.character.guildTag) && quietDue(read),
+  // The Gildia, for a member (6.11.2026): its tabs on the first look at its
+  // page, then each tab on its first look, the Wyprawa Gildii (646) too.
+  'guild-tabs': { place: mark('guild-tabs'), when: (hash, read) => onGuildPage(hash) && inGuild(read) },
+  // The four buildings, folded, in one ring.
+  'guild-seat': { place: mark('guild-seat-building'), whole: true, when: guildTab('seat') },
+  // The beast with its HP bar and "Atakuj", in one ring.
+  'guild-beast': { place: mark('guild-beast'), whole: true, when: guildTab('beast') },
+  // The board's title and the words under it, "Liczy się to, co zrobisz od
+  // pojawienia się próby na tablicy.", in one ring: the board itself is
+  // taller than a screen.
+  'guild-trials': {
+    place: `${mark('guild-trials-board')} .fold-part-summary, ${mark('guild-trials-board')} .fold-part > p:first-of-type`,
+    whole: true,
+    when: guildTab('trials'),
   },
+  // The character's own request and the others', in one ring; the same in
+  // the Wymiana.
+  'guild-requests': { place: mark('guild-requests'), whole: true, when: guildTab('requests') },
+  'guild-exchange': { place: mark('guild-exchange'), whole: true, when: guildTab('exchange') },
+  'guild-expedition': { place: mark('guild-expedition-route'), when: guildTab('expedition') },
   // The Warownia (647), on the first visit of the camp once it stands.
   'fortress-welcome': { when: (hash, read) => hash === '#/oboz' && Boolean(state.character.camp?.cornerstone?.fortress?.stands) && quietDue(read) },
+  // The places of 6.11.2026, each a part of its own. The Drużyna: the
+  // narrator opens its tab of the Społeczność (scrolled into sight in their
+  // row) and points at it.
+  'party-intro': { place: mark('community-tab-party'), tab: mark('community-tab-party'), when: partyHere },
+  'fortress-stone': { place: mark('plot-cornerstone'), when: stoneHere },
+  // The Trudna wyprawa, in the folded "Opcje wyprawy", which the narrator
+  // opens; after Szybkie Polowanie's line where both are due.
+  'hard-hunt': { place: mark('hard-hunt'), tab: '.hunt-options-toggle', when: (hash, read) => onHomeArea(hash) && Boolean(state.character.hardHunt) && quietDue(read) },
+  'account-chest': { place: mark('account-chest'), when: (hash, read) => hash === '#/oboz/skrzynia-konta' && quietDue(read) },
+  'system-collector': { place: mark('camp-collector'), when: collectorHere },
+  // At the top of the report, where it says what the faint took, a moment
+  // after the report opens: the player sees it first.
+  'faint-first': { place: mark('report-summary'), delay: 2500, when: (hash, read) => faintReport(hash) && quietDue(read) },
 };
 
 let place = '#/walka';
@@ -816,7 +891,7 @@ function skipChapter(chapter, { quiet = false } = {}) {
 // or a chapter's.
 const partLines = (chapter) => state.content.tutorial.lines.filter((line) => kept(line) && (line.chapter ?? null) === chapter);
 // A part begun and not finished: its first line read, another still to come.
-// A single place's line (the Wyprawa Gildii's, the Warownia's) is a part of
+// A single place's line (the Warownia's, the Skrzynia Konta's) is a part of
 // its own, which never is.
 function begun(chapter, read) {
   const [first, ...more] = partLines(chapter);
@@ -846,16 +921,18 @@ function skipping(line) {
 // What "Pomijaj objaśnienia narratora" passes for a line due, its last one
 // too: the line's chapter, as "Pomiń objaśnienie" does, or else the
 // introduction, as "Pomiń wprowadzenie" does. The chapter's message says
-// where its part waits, so it comes only with a part's first line: a later
-// one, as a place's line of an Osada toured before, and a single place's
-// line go without a word (664: the message pointed where the player stood).
+// where its part waits, so it comes only with a part's first line, the card
+// that opens it wherever the player is: a later one, as a place's line of an
+// Osada toured before, a single place's line and the lines of a part told
+// at its places alone (the Gildia's) go without a word (664: the message
+// pointed where the player stood).
 function passUntold(line) {
   if (!line.chapter) {
     skipAll();
     return;
   }
   const [first, ...more] = partLines(line.chapter);
-  skipChapter(line.chapter, { quiet: more.length === 0 || readNow().has(first.id) });
+  skipChapter(line.chapter, { quiet: more.length === 0 || first.kind !== 'card' || readNow().has(first.id) });
 }
 
 // "Pomijaj objaśnienia narratora" turned on in the settings (app.js): the
@@ -1141,11 +1218,15 @@ function lightUp(line) {
 }
 
 // The tab that holds a line's places, opened if another one is (`tab`):
-// its button is tapped for the player, once the screen has drawn it.
+// its button is tapped for the player, once the screen has drawn it. A
+// fold's button says by aria-expanded whether it is open, a tab's by
+// aria-selected.
 function openTab(line) {
   const selector = BEATS[line.id].tab;
   const tab = selector && document.querySelector(selector);
-  if (tab && tab.getAttribute('aria-selected') !== 'true') tab.click();
+  if (!tab) return;
+  const expanded = tab.getAttribute('aria-expanded');
+  if ((expanded === null ? tab.getAttribute('aria-selected') : expanded) !== 'true') tab.click();
 }
 
 // The camera takes in the whole of a place for a moment, with nothing lit,

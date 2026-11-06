@@ -249,6 +249,9 @@ function sectionPicker(sections, current, choose) {
             type: 'button',
             role: 'tab',
             class: 'community-tab',
+            // A part's tab, which the narrator opens and points at (the
+            // Drużyna's, narrator.js).
+            'data-guide': `community-tab-${section.id}`,
             disabled: Boolean(section.soon),
             'aria-selected': String(section.id === shown.id),
             onClick: () => {

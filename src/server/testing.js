@@ -214,13 +214,22 @@ export const repeatTowersTour = (context) => repeatChapter(context, 'towers');
 // character level 25, when both open.
 export const repeatMiningTour = (context) => repeatChapter(context, 'mining');
 
-// The line about the Wyprawa Gildii (646) unread again: it comes on the next
-// look at the Wyprawa tab in a guild (664).
+// The Gildia's lines unread again, its tabs' and its Wyprawa's (646): each
+// comes on the next look at its place in a guild (664).
 export const repeatGuildTour = (context) => repeatChapter(context, 'guild');
 
 // The card about the Warownia (647) unread again: it comes on the next visit
 // of the camp once it stands (664).
 export const repeatFortressTour = (context) => repeatChapter(context, 'fortress');
+
+// The lines of single places (6.11.2026) unread again, each on its own: it
+// comes on the next look at its place.
+export const repeatCornerstoneTour = (context) => repeatChapter(context, 'cornerstone');
+export const repeatPartyTour = (context) => repeatChapter(context, 'party');
+export const repeatHardHuntTour = (context) => repeatChapter(context, 'hard-hunt');
+export const repeatAccountChestTour = (context) => repeatChapter(context, 'account-chest');
+export const repeatSystemCollectorTour = (context) => repeatChapter(context, 'system-collector');
+export const repeatFaintTour = (context) => repeatChapter(context, 'faint');
 
 // A chapter's lines unread again, with `reset` (SQL assignments) done too.
 async function repeatChapter(context, chapterId, reset = '') {

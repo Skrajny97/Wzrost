@@ -143,7 +143,7 @@ export function mountGuildBeast(container) {
     bar.style.width = `${beast.maxHp > 0 ? Math.max(0, Math.min(1, beast.hp / beast.maxHp)) * 100 : 0}%`;
     return h(
       'div',
-      { class: 'meter meter--hp guild-beast-hp' },
+      { class: 'meter meter--hp guild-beast-hp', 'data-guide': 'guild-beast' },
       h('div', { class: 'meter-label' }, h('span', { text: 'HP' }), h('span', { class: 'meter-value', text: `${formatNumber(beast.hp)} / ${formatNumber(beast.maxHp)}` })),
       h('div', { class: 'meter-track', role: 'progressbar', 'aria-label': `${beast.name}: HP`, 'aria-valuemin': 0, 'aria-valuemax': beast.maxHp, 'aria-valuenow': beast.hp }, bar),
     );
@@ -151,12 +151,14 @@ export function mountGuildBeast(container) {
 
   // The beast, its bar, and "Atakuj" with the attacks left today; shut, with
   // the words of why, while the character offers itself or serves as a
-  // mercenary (attacks.blocked).
+  // mercenary (attacks.blocked). The narrator's line about the Bestia rings
+  // the three (narrator.js).
   function beastPart() {
     const { beast, attacks, texts } = view;
     const button = h('button', {
       type: 'button',
       class: 'button button--system',
+      'data-guide': 'guild-beast',
       text: texts.attack,
       disabled: beast.fallen || attacks.left === 0 || Boolean(attacks.blocked),
       onClick: (event) => withButton(event.currentTarget, attack),
@@ -164,7 +166,7 @@ export function mountGuildBeast(container) {
     return [
       h(
         'div',
-        { class: 'guild-beast-head' },
+        { class: 'guild-beast-head', 'data-guide': 'guild-beast' },
         h('span', { class: 'guild-beast-art' }, monsterSprite(beast.monsterId)),
         h(
           'div',

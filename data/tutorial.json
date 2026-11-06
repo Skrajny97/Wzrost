@@ -1,5 +1,5 @@
 {
-  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. Pierwsza karta (ask) pyta, czy przejść wprowadzenie: startLabel (z recommendedLabel pod spodem) idzie dalej, a skipLabel pomija całość. Ta karta jest od autora gry (speaker: author): podpisana authorLabel, bez postaci narratora i bez nagrania. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. once: lead, który po stuknięciu zostaje zapamiętany jak karta, bo stuknięcie nie zmienia ekranu (portfel pod złotem). Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest. chapter: kwestia z części po wprowadzeniu (chapters), która przychodzi w swoim momencie gry, np. Umiejętności na 10. poziomie klasy i Profesje na 10. poziomie postaci (Umiejętności zawsze pierwsze); jej skipLabel pomija tylko tę część, a skippedText mówi, co się stało. classes: osobny tekst dla każdej klasy (z własnym female i voice), gdy kwestia mówi o klasie postaci. skipSetting: przełącznik w Ustawieniach (label, a pod nim hint), ustawienie konta, nie postaci: gdy jest włączony, nowa postać zaczyna jak po skipLabel, bez pierwszej karty, a każda część (chapters) mija w swoim momencie jak po swoim skipLabel, z jej skippedText.",
+  "$comment": "Wprowadzenie narratora dla nowej postaci, kwestie po kolei, w brzmieniu autora. card: narrator czyta z pergaminu na środku ekranu. Pierwsza karta (ask) pyta, czy przejść wprowadzenie: startLabel (z recommendedLabel pod spodem) idzie dalej, a skipLabel pomija całość. Ta karta jest od autora gry (speaker: author): podpisana authorLabel, bez postaci narratora i bez nagrania. point: pergamin przy podświetlonym miejscu, z „Dalej”. lead: pergamin przy podświetlonym miejscu, które trzeba stuknąć. tap: sam narrator z poleceniem w dymku przy miejscu, które trzeba stuknąć. once: lead, który po stuknięciu zostaje zapamiętany jak karta, bo stuknięcie nie zmienia ekranu (portfel pod złotem). Pergamin rozwija się przed kwestią i zwija po niej. Kiedy i gdzie kwestia się pojawia, wyznacza kod według id (src/client/narrator.js). {points} to Punkty Czasu na start z balance.json (timePoints.start). voice: nagranie kwestii, gdy już jest. chapter: kwestia z części po wprowadzeniu (chapters), która przychodzi w swoim momencie gry, np. Umiejętności na 10. poziomie klasy i Profesje na 10. poziomie postaci (Umiejętności zawsze pierwsze); jej skipLabel pomija tylko tę część, a skippedText mówi, co się stało. Kwestia miejsca przychodzi przy pierwszym spojrzeniu na swoje miejsce, gdy nie czeka żaden rozdział, także do postaci, która była tam przed jej dopisaniem (miejsca Osady, zakładki Gildii); kwestia jedynego miejsca części (np. Skrzynia Konta) ma tylko „Dalej”, bo pomijanie dałoby to samo. classes: osobny tekst dla każdej klasy (z własnym female i voice), gdy kwestia mówi o klasie postaci. skipSetting: przełącznik w Ustawieniach (label, a pod nim hint), ustawienie konta, nie postaci: gdy jest włączony, nowa postać zaczyna jak po skipLabel, bez pierwszej karty, a każda część (chapters) mija w swoim momencie jak po swoim skipLabel, z jej skippedText.",
   "skipLabel": "Pomiń wprowadzenie",
   "nextLabel": "Dalej",
   "startLabel": "Wprowadź mnie",
@@ -51,11 +51,35 @@
     },
     "guild": {
       "skipLabel": "Pomiń objaśnienie",
-      "skippedText": "Objaśnienie pominięte. Wyprawa Gildii czeka w Gildii, w zakładce Wyprawa."
+      "skippedText": "Objaśnienie pominięte. Gildia czeka w Społeczności, w zakładce Gildia."
     },
     "fortress": {
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Warownia czeka w zakładce Obóz."
+    },
+    "party": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Drużyna czeka w Społeczności, w zakładce Drużyna."
+    },
+    "cornerstone": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Kamień węgielny czeka w zakładce Obóz."
+    },
+    "hard-hunt": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Trudna wyprawa czeka w Walce, w opcjach wyprawy."
+    },
+    "account-chest": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Skrzynia Konta czeka w zakładce Obóz."
+    },
+    "system-collector": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Zbieracz Systemu czeka w zakładce Obóz."
+    },
+    "faint": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Raporty czekają w Dzienniku, na górze ustawień pod zębatką."
     }
   },
   "lines": [
@@ -454,6 +478,14 @@
         "Broń z pierwszej wyprawy już tu jest. Każdy wpis podpowie Ci, skąd go zdobyć, nawet ten, którego jeszcze nie znasz. Za pełny zestaw czeka skrzynia, a złota kropka przy księdze powie Ci, gdy któraś będzie do otwarcia."
       ],
       "voice": "audio/narration/encyclopedia.mp3"
+    },
+    {
+      "id": "shop-system",
+      "kind": "point",
+      "text": [
+        "Punkty Systemu wydasz w Sklepie Systemu. Kupisz w nim ozdoby, które zmieniają wygląd."
+      ],
+      "voice": "audio/narration/shop-system.mp3"
     },
     {
       "id": "ending",
@@ -1217,6 +1249,60 @@
       "voice": "audio/narration/mining-ending.mp3"
     },
     {
+      "id": "guild-tabs",
+      "kind": "point",
+      "chapter": "guild",
+      "text": [
+        "Każda zakładka to inna wspólna sprawa gildii. Kropka przy zakładce powie Ci, że coś tam na Ciebie czeka."
+      ],
+      "voice": "audio/narration/guild-tabs.mp3"
+    },
+    {
+      "id": "guild-seat",
+      "kind": "point",
+      "chapter": "guild",
+      "text": [
+        "Tu gildia stawia cztery budynki, a każdy ich poziom daje premię wszystkim członkom. Wpłacasz złoto i zasoby na ten, który wybierzesz. Wpłaty nie wracają."
+      ],
+      "voice": "audio/narration/guild-seat.mp3"
+    },
+    {
+      "id": "guild-beast",
+      "kind": "point",
+      "chapter": "guild",
+      "text": [
+        "Bestia tygodnia jest wspólna dla całej gildii. Atakujesz ją trzy razy dziennie, także w trakcie wyprawy. Im mocniej gildia ją zrani, tym więcej znajdziesz w skrzyni."
+      ],
+      "voice": "audio/narration/guild-beast.mp3"
+    },
+    {
+      "id": "guild-trials",
+      "kind": "point",
+      "chapter": "guild",
+      "text": [
+        "Próby liczą się same, od chwili, gdy pojawią się na tablicy. Co dzień dochodzą nowe, a każda wykonana przybliża całą gildię do kolejnej skrzyni."
+      ],
+      "voice": "audio/narration/guild-trials.mp3"
+    },
+    {
+      "id": "guild-requests",
+      "kind": "point",
+      "chapter": "guild",
+      "text": [
+        "Gdy zabraknie Ci materiału, zioła albo mikstury, poproś tu gildię. Ty też możesz dać innym to, o co proszą."
+      ],
+      "voice": "audio/narration/guild-requests.mp3"
+    },
+    {
+      "id": "guild-exchange",
+      "kind": "point",
+      "chapter": "guild",
+      "text": [
+        "Tu wymienisz zasoby z innymi członkami gildii, także na złoto."
+      ],
+      "voice": "audio/narration/guild-exchange.mp3"
+    },
+    {
       "id": "guild-expedition",
       "kind": "point",
       "chapter": "guild",
@@ -1233,6 +1319,60 @@
         "Twój obóz stał się Warownią. Każda z jej siedmiu budowli coś daje: trening, błogosławieństwo, zioła albo lepsze tropienie. Zaglądaj tu codziennie."
       ],
       "voice": "audio/narration/fortress-welcome.mp3"
+    },
+    {
+      "id": "party-intro",
+      "kind": "point",
+      "chapter": "party",
+      "text": [
+        "Drużyna to do trzech wędrowców na jednej wyprawie, a ich poziomy klasy mogą się różnić najwyżej o pięć. Wyprawę wysyła lider, gdy nad „Wyrusz” zaznaczy „Z drużyną”."
+      ],
+      "voice": "audio/narration/party-intro.mp3"
+    },
+    {
+      "id": "fortress-stone",
+      "kind": "point",
+      "chapter": "cornerstone",
+      "text": [
+        "W tym miejscu stanie kiedyś Warownia. Kamień pokaże Ci, ile jeszcze brakuje, a duch budowniczego odkupi od Ciebie nadmiar drewna, kamienia i rudy."
+      ],
+      "voice": "audio/narration/fortress-stone.mp3"
+    },
+    {
+      "id": "hard-hunt",
+      "kind": "point",
+      "chapter": "hard-hunt",
+      "text": [
+        "Od dziesiątego poziomu możesz zaznaczyć Trudną wyprawę. Stwory są wtedy silniejsze, ale dają więcej doświadczenia i złota."
+      ],
+      "voice": "audio/narration/hard-hunt.mp3"
+    },
+    {
+      "id": "account-chest",
+      "kind": "point",
+      "chapter": "account-chest",
+      "text": [
+        "Ta skrzynia jest wspólna dla wszystkich postaci na Twoim koncie. Przedmiot włożony przez jedną postać wyjmie inna."
+      ],
+      "voice": "audio/narration/account-chest.mp3"
+    },
+    {
+      "id": "system-collector",
+      "kind": "point",
+      "chapter": "system-collector",
+      "text": [
+        "Obok czuwa Zbieracz Systemu. Za złoto, raz na zawsze, sam zbierze zasoby z pełnych magazynów."
+      ],
+      "voice": "audio/narration/system-collector.mp3"
+    },
+    {
+      "id": "faint-first",
+      "kind": "point",
+      "chapter": "faint",
+      "text": [
+        "Po omdleniu nic z wyprawy nie zostaje, a System odbiera jeszcze część doświadczenia. Zanim znów wyruszysz, sprawdź zagrożenie i odpocznij."
+      ],
+      "voice": "audio/narration/faint-first.mp3"
     }
   ]
 }

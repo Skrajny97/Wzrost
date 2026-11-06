@@ -214,7 +214,9 @@ export function mountGuildExchange(container) {
       });
     return h(
       'div',
-      { class: 'guild-part guild-mine' },
+      // The narrator's line about the Wymiana rings this part and the
+      // others' (narrator.js).
+      { class: 'guild-part guild-mine', 'data-guide': 'guild-exchange' },
       subtitle(texts.mine),
       mine.length === 0
         ? h('p', { class: 'muted', text: texts.mineEmpty })
@@ -262,10 +264,10 @@ export function mountGuildExchange(container) {
   function othersPart() {
     const { offers, texts } = view;
     const others = offers.filter((offer) => !offer.own);
-    if (others.length === 0) return h('div', { class: 'guild-part' }, subtitle(texts.others), h('p', { class: 'muted', text: texts.empty }));
+    if (others.length === 0) return h('div', { class: 'guild-part', 'data-guide': 'guild-exchange' }, subtitle(texts.others), h('p', { class: 'muted', text: texts.empty }));
     return h(
       'div',
-      { class: 'guild-part' },
+      { class: 'guild-part', 'data-guide': 'guild-exchange' },
       foldPart(
         { key: 'guild-exchange-others', title: texts.others, line: filled(texts.othersLine, { count: formatNumber(others.length) }) },
         h('ul', { class: 'guild-requests-list' }, others.map(offerRow)),

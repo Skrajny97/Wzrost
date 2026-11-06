@@ -55,7 +55,8 @@ export function mountChest(container, onBack) {
       chest &&
         h(
           'section',
-          { class: 'card chest-section', 'aria-label': 'W skrzyni' },
+          // The narrator points here on the first look (narrator.js).
+          { class: 'card chest-section', 'aria-label': 'W skrzyni', 'data-guide': 'account-chest' },
           h('div', { class: 'chest-head' }, h('span', { class: 'chest-art' }, materialSprite('chest')), h('h2', { class: 'section-title', text: `W skrzyni · ${chest.items.length} / ${chest.slots}` })),
           chest.items.length === 0
             ? h('p', { class: 'muted', text: 'Skrzynia jest pusta. Włóż do niej przedmiot z plecaka.' })

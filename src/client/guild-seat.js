@@ -201,7 +201,8 @@ export function mountGuildSeat(container) {
     const badge = building.preferred && h('span', { class: 'chip guild-seat-preferred' }, icon('banner', { size: 14 }), h('span', { text: texts.preferred }));
     return h(
       'section',
-      { class: 'card guild-seat-building', 'aria-labelledby': titleId },
+      // The narrator's line about the Siedziba rings the four (narrator.js).
+      { class: 'card guild-seat-building', 'aria-labelledby': titleId, 'data-guide': 'guild-seat-building' },
       foldPart(
         {
           key: `guild-seat-${building.id}`,

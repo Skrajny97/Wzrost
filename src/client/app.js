@@ -986,9 +986,16 @@ async function openTutorialTests() {
       row('Objaśnienie Górnictwa i Jubilerstwa', 'Od 25. poziomu postaci. Poziomy profesji zostają.', repeatMiningTour, told && isUnlocked('mining')),
       row('Objaśnienie Ewolucji', 'Od 50. poziomu klasy, dopóki ewolucja nie jest wybrana.', repeatEvolutionTour, told && (state.character.evolution?.choices.length ?? 0) > 0),
       row('Objaśnienie Wież', 'Od 50. poziomu postaci.', repeatTowersTour, told && isUnlocked('towers')),
-      // The lines of single places (646, 647), each told on its first look.
-      row('Wyprawa Gildii', 'W gildii, przy pierwszym spojrzeniu na zakładkę Wyprawa.', repeatGuildTour, told && Boolean(state.character.guildTag)),
+      // The lines of places (646, 647 and those of 6.11.2026), each told on
+      // its first look; the Gildia's all together.
+      row('Gildia', 'W gildii, przy pierwszym spojrzeniu na jej stronę i na każdą jej zakładkę.', repeatGuildTour, told && Boolean(state.character.guildTag)),
       row('Warownia', 'Gdy obóz jest Warownią, przy wejściu do obozu.', repeatFortressTour, told && Boolean(state.character.camp?.cornerstone?.fortress?.stands)),
+      row('Kamień węgielny', 'Po objaśnieniu Osady, przy wejściu do obozu, dopóki obóz nie jest Warownią.', repeatCornerstoneTour, told && Boolean(state.character.settlementOpen && state.character.camp?.cornerstone?.fortress && !state.character.camp.cornerstone.fortress.stands)),
+      row('Drużyna', 'Od 10. poziomu postaci, przy wejściu do Społeczności.', repeatPartyTour, told && isUnlocked('party')),
+      row('Trudna wyprawa', 'Od 10. poziomu postaci, przy wejściu na miejsce wyprawy.', repeatHardHuntTour, told && Boolean(state.character.hardHunt)),
+      row('Skrzynia Konta', 'Przy wejściu do Skrzyni Konta w obozie.', repeatAccountChestTour, told),
+      row('Zbieracz Systemu', 'Przy wejściu do obozu, dopóki Zbieracz nie jest kupiony.', repeatSystemCollectorTour, told && Boolean(state.character.camp?.collector && !state.character.camp.collector.owned)),
+      row('Omdlenie', 'Przy pierwszym raporcie z wyprawy zakończonej omdleniem.', repeatFaintTour, told),
     ),
   );
 }
@@ -1277,12 +1284,12 @@ async function repeatMiningTour() {
   }
 }
 
-// Test mode: the narrator's line about the Wyprawa Gildii from the start
-// (testing.js).
+// Test mode: the narrator's lines about the Gildia, its tabs and its
+// Wyprawa, from the start (testing.js).
 async function repeatGuildTour() {
   const sure = await confirmAction({
-    title: 'Wyprawa Gildii od nowa?',
-    text: 'Narrator powie o Wyprawie Gildii przy następnym spojrzeniu na jej zakładkę.',
+    title: 'Objaśnienia Gildii od nowa?',
+    text: 'Narrator powie o zakładkach Gildii przy następnym spojrzeniu na jej stronę, a o każdej zakładce przy pierwszym spojrzeniu na nią.',
     confirmLabel: 'Od nowa',
   });
   if (!sure) return;
@@ -1308,6 +1315,113 @@ async function repeatFortressTour() {
   try {
     await call('POST', '/api/test/fortress-tour');
     forgetPart('fortress');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's line about the Kamień węgielny from the start
+// (testing.js).
+async function repeatCornerstoneTour() {
+  const sure = await confirmAction({
+    title: 'Kamień węgielny od nowa?',
+    text: 'Narrator powie o Kamieniu węgielnym przy następnym wejściu do obozu.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/cornerstone-tour');
+    forgetPart('cornerstone');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's line about the Drużyna from the start
+// (testing.js).
+async function repeatPartyTour() {
+  const sure = await confirmAction({
+    title: 'Drużyna od nowa?',
+    text: 'Narrator powie o Drużynie przy następnym wejściu do Społeczności.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/party-tour');
+    forgetPart('party');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's line about the Trudna wyprawa from the start
+// (testing.js).
+async function repeatHardHuntTour() {
+  const sure = await confirmAction({
+    title: 'Trudna wyprawa od nowa?',
+    text: 'Narrator powie o Trudnej wyprawie przy następnym wejściu na miejsce wyprawy.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/hard-hunt-tour');
+    forgetPart('hard-hunt');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's line about the Skrzynia Konta from the start
+// (testing.js).
+async function repeatAccountChestTour() {
+  const sure = await confirmAction({
+    title: 'Skrzynia Konta od nowa?',
+    text: 'Narrator powie o Skrzyni Konta przy następnym wejściu do niej.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/account-chest-tour');
+    forgetPart('account-chest');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's line about the Zbieracz Systemu from the start
+// (testing.js).
+async function repeatSystemCollectorTour() {
+  const sure = await confirmAction({
+    title: 'Zbieracz Systemu od nowa?',
+    text: 'Narrator powie o Zbieraczu Systemu przy następnym wejściu do obozu.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/system-collector-tour');
+    forgetPart('system-collector');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's line about a faint from the start (testing.js).
+async function repeatFaintTour() {
+  const sure = await confirmAction({
+    title: 'Omdlenie od nowa?',
+    text: 'Narrator powie o omdleniu przy następnym raporcie z wyprawy zakończonej omdleniem.',
+    confirmLabel: 'Od nowa',
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/faint-tour');
+    forgetPart('faint');
   } catch (error) {
     toast(error.message);
   }

@@ -2106,22 +2106,70 @@ describe('Time Points and the narrator', () => {
     assert.deepEqual(again.data.character.tutorial, before);
   });
 
-  // "Testuj samouczki" has the lines of the Wyprawa Gildii (646) and the
-  // Warownia (647) too, each unread again on its own (664).
-  test('test mode tells the Wyprawa Gildii and the Warownia again', async () => {
+  // "Testuj samouczki" has the lines of the places too: the Gildia's (its
+  // tabs and its Wyprawa, 646) all together, the Warownia (647) and each
+  // place of 6.11.2026 on its own (664).
+  test('test mode tells the Gildia, the Warownia and the other places again', async () => {
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });
     const before = (await see({ skip: true, chapter: 'skills' })).data.character.tutorial;
-    for (const [chapter, line] of [
-      ['guild', 'guild-expedition'],
-      ['fortress', 'fortress-welcome'],
+    for (const [chapter, lines] of [
+      ['guild', ['guild-tabs', 'guild-seat', 'guild-beast', 'guild-trials', 'guild-requests', 'guild-exchange', 'guild-expedition']],
+      ['fortress', ['fortress-welcome']],
+      ['party', ['party-intro']],
+      ['cornerstone', ['fortress-stone']],
+      ['hard-hunt', ['hard-hunt']],
+      ['account-chest', ['account-chest']],
+      ['system-collector', ['system-collector']],
+      ['faint', ['faint-first']],
     ]) {
       const read = (await see({ skip: true, chapter })).data.character.tutorial;
-      assert.deepEqual(read, [...before, line]);
+      assert.deepEqual(read, [...before, ...lines], chapter);
       const again = await call('POST', `/api/test/${chapter}-tour`, { cookie });
       assert.equal(again.status, 200, chapter);
       assert.deepEqual(again.data.character.tutorial, before);
     }
+  });
+
+  // The author's lines of 6.11.2026, in his words, each with its recording
+  // named after it: one more at the end of the introduction, the Gildia's
+  // tabs before its Wyprawa, and each other place a part of its own.
+  test("the narrator's lines of 6.11.2026 stand where they are told", async () => {
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    const line = (id) => tutorial.lines.find((one) => one.id === id);
+    const at = (id) => tutorial.lines.findIndex((one) => one.id === id);
+    const fresh = ['shop-system', 'guild-tabs', 'guild-seat', 'guild-beast', 'guild-trials', 'guild-requests', 'guild-exchange', 'party-intro', 'fortress-stone', 'hard-hunt', 'account-chest', 'system-collector', 'faint-first'];
+    for (const id of fresh) {
+      assert.equal(line(id).kind, 'point', id);
+      assert.equal(line(id).voice, `audio/narration/${id}.mp3`, id);
+    }
+    // The introduction one line longer: the Sklep Systemu after the Encyklopedia.
+    assert.equal(line('shop-system').chapter, undefined);
+    assert.equal(at('shop-system'), at('encyclopedia') + 1);
+    assert.equal(at('ending'), at('shop-system') + 1);
+    assert.deepEqual(line('shop-system').text, ['Punkty Systemu wydasz w Sklepie Systemu. Kupisz w nim ozdoby, które zmieniają wygląd.']);
+    // The Gildia: its tabs first, its Wyprawa last.
+    const guild = tutorial.lines.filter((one) => one.chapter === 'guild').map((one) => one.id);
+    assert.deepEqual(guild, ['guild-tabs', 'guild-seat', 'guild-beast', 'guild-trials', 'guild-requests', 'guild-exchange', 'guild-expedition']);
+    assert.deepEqual(tutorial.chapters.guild, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Gildia czeka w Społeczności, w zakładce Gildia.' });
+    assert.deepEqual(line('guild-tabs').text, ['Każda zakładka to inna wspólna sprawa gildii. Kropka przy zakładce powie Ci, że coś tam na Ciebie czeka.']);
+    assert.deepEqual(line('guild-exchange').text, ['Tu wymienisz zasoby z innymi członkami gildii, także na złoto.']);
+    // The other places, each the only line of its part.
+    for (const [chapter, id] of [
+      ['party', 'party-intro'],
+      ['cornerstone', 'fortress-stone'],
+      ['hard-hunt', 'hard-hunt'],
+      ['account-chest', 'account-chest'],
+      ['system-collector', 'system-collector'],
+      ['faint', 'faint-first'],
+    ]) {
+      assert.deepEqual(tutorial.lines.filter((one) => one.chapter === chapter).map((one) => one.id), [id], chapter);
+    }
+    assert.deepEqual(line('party-intro').text, ['Drużyna to do trzech wędrowców na jednej wyprawie, a ich poziomy klasy mogą się różnić najwyżej o pięć. Wyprawę wysyła lider, gdy nad „Wyrusz” zaznaczy „Z drużyną”.']);
+    assert.deepEqual(line('faint-first').text, ['Po omdleniu nic z wyprawy nie zostaje, a System odbiera jeszcze część doświadczenia. Zanim znów wyruszysz, sprawdź zagrożenie i odpocznij.']);
+    // The two cards changed (their recordings come anew).
+    assert.match(line('professions-list').text[0], / Na pozostałe profesje przyjdzie jeszcze czas\.$/);
+    assert.equal(line('skills-choice').text[1], 'Od jedenastego poziomu klasy możesz dobrać ścieżkę poboczną – za jeden Punkt Umiejętności. Trzecia ścieżka się wtedy zamknie.');
   });
 
   test('"Testuj samouczki": the character waits aside while a test character goes through the introduction', async () => {

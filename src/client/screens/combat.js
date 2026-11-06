@@ -743,7 +743,8 @@ export function mountCombat(container, { params, navigate }) {
       hardRules &&
       h(
         'div',
-        { class: 'track-quests hard-hunt' },
+        // The narrator opens "Opcje wyprawy" and points here (narrator.js).
+        { class: 'track-quests hard-hunt', 'data-guide': 'hard-hunt' },
         h('label', { class: 'avoid-rare', for: 'hard-hunt' }, hardBox, h('span', { text: 'Trudna wyprawa' })),
         h('p', {
           class: 'muted track-quests-note',

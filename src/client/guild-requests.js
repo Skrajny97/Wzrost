@@ -283,7 +283,9 @@ export function mountGuildRequests(container) {
     });
     return h(
       'div',
-      { class: 'guild-part guild-mine' },
+      // The narrator's line about the Prośby rings this part and the
+      // others' (narrator.js).
+      { class: 'guild-part guild-mine', 'data-guide': 'guild-requests' },
       subtitle(texts.mine),
       mine && [
         h('p', { class: 'guild-mine-goods' }, goodsLine(mine.goods, h('span', { class: 'muted', text: ` × ${formatNumber(mine.count)}` }))),
@@ -353,10 +355,10 @@ export function mountGuildRequests(container) {
   function othersPart() {
     const { requests, texts } = view;
     const others = requests.filter((request) => !request.own);
-    if (others.length === 0) return h('div', { class: 'guild-part' }, subtitle(texts.others), h('p', { class: 'muted', text: texts.empty }));
+    if (others.length === 0) return h('div', { class: 'guild-part', 'data-guide': 'guild-requests' }, subtitle(texts.others), h('p', { class: 'muted', text: texts.empty }));
     return h(
       'div',
-      { class: 'guild-part' },
+      { class: 'guild-part', 'data-guide': 'guild-requests' },
       foldPart(
         { key: 'guild-requests-others', title: texts.others, line: filled(texts.othersLine, { count: formatNumber(others.length) }) },
         h('ul', { class: 'guild-requests-list' }, others.map(requestRow)),
