@@ -370,6 +370,11 @@
       "id": "0.2.16",
       "title": "Wersja 0.2.16",
       "body": "- Stół rozbiórki: w zakładce Części opisy znów mieszczą się w ramkach, a liczby sztuk nie nachodzą na tekst."
+    },
+    {
+      "id": "0.2.17",
+      "title": "Wersja 0.2.17",
+      "body": "- Bazyliszek ma nowy wygląd: król węży w koronie z kolców, już bez głowy koguta."
     }
 ]
 }

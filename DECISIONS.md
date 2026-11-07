@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.17 (7.11.2026): bazyliszek bez głowy koguta
+
+Autor (7.11.2026, zrzut walki): „Bazyliszek ma twarz koguta.. … to koniecznie do poprawy”. Stary opis grafiki kazał narysować węża z głową i grzebieniem koguta, jak w polskiej legendzie. Nowy opis w art/prompts.json: wielki zwinięty wąż o płaskiej gadziej głowie w koronie z kościanych kolców, bez piór, dzioba i grzebienia. PixelLab narysował 50 wersji, autorowi pokazane cztery (749.1–749.4). Autor: „749.1 wstaw”.
+
 ## Wersja 0.2.16 (7.11.2026): opisy części na Stole rozbiórki
 
 Zrzut z iPhone'a od gracza (przez autora): w zakładce Części Stołu rozbiórki opisy łamały się po jednym słowie w linii, a liczby sztuk nachodziły na tekst. Przyczyna: reguła z 0.1.94, która stawia licznik sztuk pod zaznaczonym materiałem na całą szerokość wiersza, działała też na liczbę części, bo obie mają tę samą klasę. Błąd był na każdym telefonie i komputerze, nie tylko na iPhonie. Teraz reguła dotyczy tylko wierszy zakładki Materiały, a liczba części stoi na końcu wiersza.
