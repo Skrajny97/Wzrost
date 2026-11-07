@@ -347,7 +347,7 @@ export const SPRITES = {
   places: {
     width: 192,
     height: 96,
-    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-mine', 'system-lapidary', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall', 'trial-hall', 'wanted-board'],
+    ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-mine', 'system-lapidary', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall', 'trial-hall', 'wanted-board', 'portal-gold', 'portal-wood', 'portal-stone', 'portal-ore', 'portal-materials', 'portal-parts'],
   },
   // The buildings of the Siedziba Gildii (data/guilds.json, seat), by the
   // building's id, 128×96 on a transparent ground: the first look the

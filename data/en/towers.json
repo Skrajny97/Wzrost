@@ -30,6 +30,10 @@
     ],
     "chest": [
       "A Tower chest waits on this floor. Inside: {item}."
+    ],
+    "loot": [
+      "Among the Tower's spoils: {item}.",
+      "Tower spoils lie on the floor: {item}."
     ]
   }
 }

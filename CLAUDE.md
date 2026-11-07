@@ -19,6 +19,7 @@
 - Autor pracuje wyłącznie z telefonu. Każdą czynność po jego stronie opisz krok po kroku dla przeglądarki mobilnej.
 - Propozycje i pytania dawaj autorowi tutaj, w czacie, pozycja po pozycji: przedmiot po przedmiocie, z grafiką, nazwą i opisem, z numerem do odpowiedzi. Nie rób z nich osobnych dokumentów, bo autor musi wtedy przeskakiwać między okienkami. Dotyczy to też ewolucji klas i wszystkich kolejnych tematów. Makiety i grafiki numeruj osobno od pytań o decyzję, żeby jeden numer nie znaczył dwóch rzeczy. Autor: „616 sie powtarza ale nie tak jak powinno bo dwie rozne kwestie” (5.11.2026).
 - Treść gry (zdarzenia, przedmioty, potwory, NPC, teksty) trafia do `data/`, nigdy do logiki.
+- W tekstach gry wygrana niczym nie „płaci”: pisz „Za wygraną zgarniesz…”. Autor: „Nigdy "wygrana płaci czymś" a "Za wygraną zgarniesz xxx"” (7.11.2026).
 - `src/engine/` to czyste, deterministyczne funkcje, bez `Date.now()`, `Math.random()` i wejścia-wyjścia. Czas i ziarno losowości podaje serwer.
 - Gra działa na planie Workers Paid: do 30 s CPU na żądanie, a 30 mln ms CPU miesięcznie jest w cenie. Żądania i tak mają być szybkie.
 - Docelowo gra trafi do Sklepu Play jako aplikacja. Autor może dokupić tani plan Cloudflare albo domenę: zalecaj taki zakup, gdy się przyda.

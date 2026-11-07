@@ -62,7 +62,7 @@ export function mountPortals(container, { navigate }) {
         howItWorks(
           t('Walcz o kolejne stopnie portali, ile chcesz. Pokonane stopnie czyścisz: łup od razu, bez walki, {count} razy dziennie w każdym portalu.', { count: view.sweepsPerDay }),
           t(
-            'Postać walczy z pełnym HP i bez mikstur, a może zabrać towarzyszy z Kwater (bez Drużyny). Wejść można zawsze, także w czasie wyprawy i pracy w profesji. Każdy portal płaci tylko swoim łupem: złotem, zasobem obozu, materiałami stworów albo częściami do rzemiosła. Stopień ma zwykłe stwory krainy swoich poziomów, silniejsze niż w Eksploracji, bez elit i czempionów. Pokonany stopień otwiera następny, najwyżej do stopnia równego poziomowi postaci i do {max}. Wygrana i czyszczenie dają tyle, ile około {minutes} minut wyprawy na poziomie stopnia, więc im wyższy stopień, tym większy łup. Czyszczenie daje łup najwyższego pokonanego stopnia. Portale nie dają doświadczenia ani przedmiotów.',
+            'Postać walczy z pełnym HP i bez mikstur, a może zabrać towarzyszy z Kwater (bez Drużyny). Wejść można zawsze, także w czasie wyprawy i pracy w profesji. W każdym portalu za wygraną zgarniesz tylko jego łup: złoto, zasób obozu, materiały stworów albo części do rzemiosła. Stopień ma zwykłe stwory krainy swoich poziomów, silniejsze niż w Eksploracji, bez elit i czempionów. Pokonany stopień otwiera następny, najwyżej do stopnia równego poziomowi postaci i do {max}. Za wygraną i za czyszczenie zgarniesz tyle, ile daje około {minutes} minut wyprawy na poziomie stopnia, więc im wyższy stopień, tym większy łup. Czyszczenie daje łup najwyższego pokonanego stopnia. Portale nie dają doświadczenia ani przedmiotów.',
             { max: view.maxStage, minutes: view.lootMinutes },
           ),
         ),
@@ -108,7 +108,7 @@ export function mountPortals(container, { navigate }) {
                 { class: 'tower-floor-text' },
                 h('p', { class: 'tower-floor-title', text: t('Stopień {stage} · poz. {level}', { stage: portal.next, level: portal.next }) }),
                 h('p', { text: `${regionOf(portal.next).name} (${regionOf(portal.next).regionName})` }),
-                h('p', { text: t('Łup za wygraną: {loot}.', { loot: lootText(portal, portal.nextLoot) }) }),
+                h('p', { text: t('Za wygraną zgarniesz: {loot}.', { loot: lootText(portal, portal.nextLoot) }) }),
               ),
             ),
             h('button', {

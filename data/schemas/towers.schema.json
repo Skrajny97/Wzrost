@@ -3,7 +3,7 @@
   "title": "Wieże Systemu",
   "type": "object",
   "additionalProperties": false,
-  "required": ["towers", "floors", "entries", "rewardMinutes", "chestEvery", "texts"],
+  "required": ["towers", "floors", "entries", "rewardMinutes", "chestEvery", "loot", "texts"],
   "properties": {
     "$comment": { "type": "string" },
     "towers": {
@@ -42,10 +42,41 @@
     },
     "rewardMinutes": { "type": "integer", "minimum": 1 },
     "chestEvery": { "type": "integer", "minimum": 1 },
+    "loot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goldMultiplier", "materials", "itemChance"],
+      "properties": {
+        "goldMultiplier": { "type": "number", "exclusiveMinimum": 0, "description": "Wygrana płaci złotem tyle, ile średnio cała wyprawa rewardMinutes minut na poziomie piętra, razy tyle." },
+        "materials": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pieces", "rarities"],
+          "properties": {
+            "pieces": { "type": "integer", "minimum": 1, "description": "Ile materiałów stworów piętra na pewno daje wygrana." },
+            "rarities": {
+              "type": "array",
+              "minItems": 1,
+              "description": "Wagi rzadkości każdej sztuki od poziomu piętra fromLevel (najwyższy osiągnięty próg); nigdy poniżej rzadkości gatunku.",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["fromLevel", "rarities"],
+                "properties": {
+                  "fromLevel": { "type": "integer", "minimum": 1 },
+                  "rarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 } }
+                }
+              }
+            }
+          }
+        },
+        "itemChance": { "type": "number", "minimum": 0, "maximum": 1, "description": "Szansa, że wygrana da też przedmiot klasy postaci na poziomie piętra, o rzadkości przedmiotu czempiona (championItems)." }
+      }
+    },
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["won", "lost", "defeat", "fightStart", "eliteStart", "championStart", "chest"],
+      "required": ["won", "lost", "defeat", "fightStart", "eliteStart", "championStart", "chest", "loot"],
       "properties": {
         "won": { "$ref": "#/definitions/variants" },
         "lost": { "$ref": "#/definitions/variants" },
@@ -53,7 +84,8 @@
         "fightStart": { "$ref": "#/definitions/variants", "description": "Początek walki na piętrze; {enemies}: przeciwnicy z poziomami." },
         "eliteStart": { "$ref": "#/definitions/variants" },
         "championStart": { "$ref": "#/definitions/variants" },
-        "chest": { "$ref": "#/definitions/variants" }
+        "chest": { "$ref": "#/definitions/variants" },
+        "loot": { "$ref": "#/definitions/variants", "description": "Przedmiot z łupów Wieży (itemChance); {item}: jego nazwa." }
       }
     }
   },

@@ -194,6 +194,7 @@ test('every sprite on the list has its file at its size, and every class has its
       ...['gathering', 'brewing', 'workshop', 'mining', 'jewelcrafting'].map((work) => data('professions')[work].place.id),
       data('evolutions').place,
       ...data('towers').towers.map((tower) => tower.place),
+      ...data('portals').portals.map((portal) => portal.art),
       data('guilds').place,
       ...data('settlement').places.flatMap((place) => place.backdrop ?? []),
       ...(data('settlement').wanted?.backdrop ? [data('settlement').wanted.backdrop] : []),

@@ -21,9 +21,9 @@
 import { combatantView, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { companionCombatant } from './companions.js';
-import { addCounts, materialDrops, materialsText } from './crafting.js';
+import { addCounts, materialDrops, materialsText, stackKey } from './crafting.js';
 import { evolutionOf } from './evolutions.js';
-import { championItemRarity, encounterCombatants, encountersFor, explorationPace } from './hunt.js';
+import { championItemRarity, encounterCombatants, encountersFor, expectedExploration, explorationPace } from './hunt.js';
 import { itemName, randomItem } from './items.js';
 import { lowLevelMultiplier, monsterXp } from './progression.js';
 import { createRng } from './rng.js';
@@ -66,28 +66,77 @@ export function towerFloor(floor, seed, content) {
   return { floor, level: floor, areaId: area.id, encounter: { elite: false, members: group.monsters.map((monsterId) => ({ monsterId, level: floor })) } };
 }
 
+// The gold a win on floor `floor` pays: what a whole exploration of
+// rewardMinutes brings on average at the floor's level in its region,
+// loot.goldMultiplier times (the author: "zmodyfikować Wieże by dawały
+// więcej niż Portale, o wiele więcej").
+export function towerGold(floor, content) {
+  const { rewardMinutes, loot } = content.towers;
+  return Math.round(expectedExploration(towerArea(floor, content), floor, rewardMinutes, content).gold * loot.goldMultiplier);
+}
+
+// The rarity weights of a tower material on floor `floor`: those of the
+// highest loot.materials.rarities step its level has reached.
+export function towerMaterialRarities(floor, content) {
+  const steps = content.towers.loot.materials.rarities;
+  return (steps.filter((step) => step.fromLevel <= floor).at(-1) ?? steps[0]).rarities;
+}
+
+// The materials a win on floor `floor` brings for certain (the author:
+// "rzadkie łupy i materiały szczególnie legendarne i mityczne na
+// odpowiednich poziomach"): loot.materials.pieces pieces, each of one of
+// the ordinary creatures fought (on a champion's floor of the region's
+// creatures the floor's level lets come), its rarity drawn by the floor's
+// level (towerMaterialRarities) and never below its species' own. `more`:
+// the share more of the Tropiciel's trait (tracker), a part of a piece by
+// chance.
+export function towerMaterials(floor, enemies, rng, content, more = 1) {
+  const ordinary = (ids) => [...new Set(ids)].filter((id) => content.materialsByMonster[id] && !content.monstersById[id]?.champion);
+  let creatures = ordinary(enemies.map((enemy) => enemy.monsterId));
+  if (creatures.length === 0) {
+    const area = towerArea(floor, content);
+    const open = encountersFor(area, floor);
+    creatures = ordinary((open.length > 0 ? open : area.encounters).flatMap((encounter) => encounter.monsters));
+  }
+  const found = {};
+  if (creatures.length === 0) return found;
+  const index = (id) => content.rarities.findIndex((rarity) => rarity.id === id);
+  const weights = Object.entries(towerMaterialRarities(floor, content));
+  const pieces = content.towers.loot.materials.pieces * more;
+  const count = Math.floor(pieces) + (rng.chance(pieces - Math.floor(pieces)) ? 1 : 0);
+  for (let i = 0; i < count; i++) {
+    const material = content.materialsByMonster[creatures[rng.int(0, creatures.length - 1)]];
+    const [drawn] = rng.weighted(weights, ([, weight]) => weight);
+    const key = stackKey(material.id, index(drawn) > index(material.rarity) ? drawn : material.rarity);
+    found[key] = (found[key] ?? 0) + 1;
+  }
+  return found;
+}
+
 // One entry: a fight on floor `floor` (the author: "wspinaczka nie zajmuje
 // postaci: kilka wejść dziennie, wynik od razu"), the character at full HP
 // with no potions, beside it in the Wieża Drużyn the other players of its
 // Drużyna as they are (`partners`, as in parties.js) and its companions,
-// in the floor's region (its trait counts). A win pays as one fight of an
-// exploration of rewardMinutes at the floor's level: XP, gold and the
-// creatures' materials, the elite and the champion as a regular creature
-// (no multipliers of the explorations, so the entries are no way to farm
-// them), and the companions and the other players take their shares of
-// the XP as on an exploration. A champion leaves its trophy (its material)
-// only at the first win of its floor in this tower (`championTrophy`, the
-// server knows; the author: 483 A), and then for certain, else none. A
-// win of a chestEvery floor the first time in this tower (`chest`, the
-// server knows) brings the tower's chest: an item of the character's
-// class it can wear, of the floor's level and a champion's rarity. Returns
-// a hunt of one fight, for applyHunt and huntReport, with `tower`.
+// in the floor's region (its trait counts). A win pays far more than a
+// portal (the author: "zmodyfikować Wieże by dawały więcej niż Portale, o
+// wiele więcej - rzadkie łupy i materiały szczególnie legendarne i
+// mityczne na odpowiednich poziomach"): the XP of one fight of an
+// exploration of rewardMinutes at the floor's level, the elite and the
+// champion as a regular creature (the companions and the other players
+// take their shares of it as on an exploration), the gold of towerGold,
+// the rare materials of towerMaterials and, by loot.itemChance, an item of
+// the character's class it can wear, of the floor's level and a
+// champion's rarity. A champion leaves its trophy (its material) only at
+// the first win of its floor in this tower (`championTrophy`, the server
+// knows; the author: 483 A), and then for certain, else none. A win of a
+// chestEvery floor the first time in this tower (`chest`, the server
+// knows) brings the tower's chest too: one more such item. Returns a hunt
+// of one fight, for applyHunt and huntReport, with `tower`.
 export function towerFight({ character, equipped, name, floor, seed, partners = [], companions = [], trophies = {}, chest = false, championTrophy = false }, content) {
   const plan = towerFloor(floor, seed, content);
   const area = content.areasById[plan.areaId];
   const rng = createRng(`${seed}:fight`);
   const tuning = content.balance.hunt;
-  const rewards = content.balance.rewards;
   const { texts } = content.towers;
   const pace = explorationPace(content.towers.rewardMinutes, content);
   const lengthed = pace.timeFactor * (1 + pace.lengthBonus);
@@ -112,20 +161,26 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   let gold = 0;
   let materials = {};
   const items = [];
+  let lootItem = null;
   if (won) {
     let fightXp = 0;
-    let fightGold = 0;
     for (const enemy of enemies) {
       const monster = content.monstersById[enemy.monsterId];
       fightXp += monsterXp({ ...monster, elite: false, champion: false }, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(character.level, enemy.level, content);
-      fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * rng.float(0.5, 1.5) * enemy.groupFactor * lengthed;
-      materials = addCounts(materials, materialDrops(enemy.monsterId, enemy.level, enemy.groupFactor * pace.timeFactor * moreMaterials, rng, content, championTrophy));
+      // A champion's trophy, its own material (483 A).
+      if (monster.champion) materials = addCounts(materials, materialDrops(enemy.monsterId, enemy.level, 1, rng, content, championTrophy));
     }
     xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * lengthed * partyXp);
-    gold = Math.round(fightGold);
-    if (chest) {
-      const rarityId = championItemRarity(floor, rng, content);
-      items.push(randomItem(floor, rng, content, { classId: character.classId, maxClassLevel: character.classLevel, rarityId, area }));
+    // The tower's loot (towerGold, towerMaterials), far above a portal's.
+    gold = towerGold(floor, content);
+    materials = addCounts(materials, towerMaterials(floor, enemies, rng, content, moreMaterials));
+    const classItem = () => randomItem(floor, rng, content, { classId: character.classId, maxClassLevel: character.classLevel, rarityId: championItemRarity(floor, rng, content), area });
+    // The loot's item drawn first, so the chest changes nothing else.
+    const lucky = rng.chance(content.towers.loot.itemChance);
+    if (chest) items.push(classItem());
+    if (lucky) {
+      lootItem = classItem();
+      items.push(lootItem);
     }
   }
 
@@ -136,7 +191,7 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   if (won) {
     lines.push(say(content.texts, 'victory', floor), word(content, '+{xp} XP, +{gold} złota.', { xp, gold }));
     if (Object.keys(materials).length > 0) lines.push(say(content.texts, 'materials', floor, { materials: materialsText(materials, content) }));
-    for (const item of items) lines.push(say(texts, 'chest', floor, { item: itemName(item, content) }));
+    for (const item of items) lines.push(say(texts, item === lootItem ? 'loot' : 'chest', floor, { item: itemName(item, content) }));
   } else {
     lines.push(say(texts, 'defeat', floor, { target: player.name }));
   }
@@ -178,6 +233,15 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
     keyFight: { index: 0 },
     potionsUsed: {},
     buffFights: {},
-    tower: { floor, level: plan.level, won, elite: plan.encounter.elite, champion: plan.encounter.champion ?? false, text: say(texts, won ? 'won' : 'lost', floor, { floor }) },
+    tower: {
+      floor,
+      level: plan.level,
+      won,
+      elite: plan.encounter.elite,
+      champion: plan.encounter.champion ?? false,
+      chest: won && chest,
+      lootItem: lootItem !== null,
+      text: say(texts, won ? 'won' : 'lost', floor, { floor }),
+    },
   };
 }

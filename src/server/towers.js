@@ -35,6 +35,7 @@ import {
   sellPrice,
   towerArea,
   towerFight,
+  towerGold,
   trialTowerFloor,
 } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
@@ -106,14 +107,24 @@ async function climbersFor(db, player, tower) {
 }
 
 // The towers for the page: the entries left today, the order of the
-// inner regions the floors go through, and each tower with its highest
-// floor open, the highest won, the chests taken, the champions' floors won
-// (their trophies taken) and who climbs with the character.
+// inner regions the floors go through, what a win pays (the gold of each
+// floor up to the highest open, the materials' pieces and their rarities
+// by the floor's level, the chance of an item), and each tower with its
+// highest floor open, the highest won, the chests taken, the champions'
+// floors won (their trophies taken) and who climbs with the character.
 async function towersView(db, player, now) {
   const row = player.row;
   const record = recordOf(row);
-  const { towers, entries, chestEvery } = rules();
+  const { towers, entries, chestEvery, loot } = rules();
+  const climbs = await Promise.all(towers.map((tower) => climbersFor(db, player, tower)));
+  const top = Math.max(1, ...climbs.map((climbers) => climbers.top));
   return {
+    loot: {
+      gold: Array.from({ length: top }, (_, index) => towerGold(index + 1, content())),
+      pieces: loot.materials.pieces,
+      rarities: loot.materials.rarities,
+      itemChance: loot.itemChance,
+    },
     perDay: entries.perDay,
     left: Math.max(0, entries.perDay - entriesUsed(record, now)),
     chestEvery,
@@ -121,23 +132,21 @@ async function towersView(db, player, now) {
     eliteLapEvery: rules().floors.eliteLapEvery,
     championEvery: rules().floors.championEvery,
     cycle: content().areas.map((area) => ({ id: area.id, name: area.name, regionName: area.regionName, elite: Boolean(area.elite), champion: Boolean(area.champion) })),
-    towers: await Promise.all(
-      towers.map(async (tower) => {
-        const climbers = await climbersFor(db, player, tower);
-        return {
-          id: tower.id,
-          name: tower.name,
-          place: tower.place ?? null,
-          top: climbers.top,
-          best: record.best[tower.id] ?? 0,
-          chests: record.chests[tower.id] ?? [],
-          champions: record.champions[tower.id] ?? [],
-          partners: climbers.partners.map((partner) => ({ name: partner.name, level: partner.level })),
-          companions: climbers.companions.map((companion) => companion.name),
-          missing: climbers.missing,
-        };
-      }),
-    ),
+    towers: towers.map((tower, index) => {
+      const climbers = climbs[index];
+      return {
+        id: tower.id,
+        name: tower.name,
+        place: tower.place ?? null,
+        top: climbers.top,
+        best: record.best[tower.id] ?? 0,
+        chests: record.chests[tower.id] ?? [],
+        champions: record.champions[tower.id] ?? [],
+        partners: climbers.partners.map((partner) => ({ name: partner.name, level: partner.level })),
+        companions: climbers.companions.map((companion) => companion.name),
+        missing: climbers.missing,
+      };
+    }),
   };
 }
 
@@ -206,7 +215,17 @@ export async function enterTower(context) {
     ...huntReport({ hunt, applied, character, areaId: area.id, startedAt: now, endsAt: now, autoEquipped, overflow }, content()),
     kind: 'tower',
     resultText: hunt.tower.text,
-    tower: { id: tower.id, name: tower.name, floor, level: hunt.tower.level, won, partners: climbers.partners.map((partner) => partner.name), companions: climbers.companions.map((companion) => companion.name) },
+    tower: {
+      id: tower.id,
+      name: tower.name,
+      floor,
+      level: hunt.tower.level,
+      won,
+      chest: hunt.tower.chest,
+      lootItem: hunt.tower.lootItem,
+      partners: climbers.partners.map((partner) => partner.name),
+      companions: climbers.companions.map((companion) => companion.name),
+    },
   };
   const summary = {
     tower: { name: tower.name, floor },

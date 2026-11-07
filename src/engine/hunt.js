@@ -86,6 +86,41 @@ export function explorationPace(minutes, content, level = 0) {
   };
 }
 
+// What `minutes` of an exploration in `area` at `level` bring on average,
+// as an exploration pays them: the gold of the fights and of the finds, the
+// camp's resources gathered and found (all kinds together), the materials
+// the creatures leave, and the parts the finds' chests give when taken
+// apart (salvageYield). The Portale pay a part of it (portals.js) and the
+// Wieże their gold (towers.js).
+export function expectedExploration(area, level, minutes, content) {
+  const { rewards, hunt, crafting } = content.balance;
+  const pace = explorationPace(minutes, content);
+  const open = encountersFor(area, level);
+  const encounters = open.length > 0 ? open : area.encounters;
+  const weights = encounters.reduce((sum, encounter) => sum + (encounter.weight ?? 1), 0);
+  let gold = 0;
+  let materials = 0;
+  for (const encounter of encounters) {
+    const share = (encounter.weight ?? 1) / weights;
+    const groupFactor = hunt.groupFactors[encounter.monsters.length - 1];
+    for (const id of encounter.monsters) {
+      gold += share * content.monstersById[id].reward.gold * groupFactor;
+      const material = content.materialsByMonster[id];
+      if (material) materials += share * content.raritiesById[material.rarity].materialChance * groupFactor;
+    }
+  }
+  const fights = pace.fights * pace.timeFactor;
+  const outcomes = rewards.findOutcomes;
+  const all = Object.values(outcomes).reduce((sum, weight) => sum + weight, 0);
+  const finds = (kind) => (pace.finds * (outcomes[kind] ?? 0)) / all;
+  return {
+    gold: rewards.goldPerLevel * level * gold * fights * (1 + pace.lengthBonus) + finds('gold') * rewards.findGoldPerLevel * level,
+    resources: finds('resource') * rewards.findResourcePerLevel * level + (rewards.gatherPerLevelHour * level * minutes) / 60,
+    materials: materials * fights,
+    parts: finds('chest') * (crafting.salvageBase + Math.floor(level / crafting.salvageLevelStep)),
+  };
+}
+
 // The most potions of a kind an exploration of `minutes` takes along
 // (potions.js): one for each of its fights.
 export const potionsPerKind = (minutes, content) => explorationPace(minutes, content).fights;

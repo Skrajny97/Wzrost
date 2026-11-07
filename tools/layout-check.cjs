@@ -305,7 +305,7 @@ async function main() {
   }
   sql(`UPDATE characters SET level = 146, class_level = 99 WHERE name = '${otherNames[0]}'`);
   await first.close();
-  const names = [name, ...otherNames, login, other, `Bractwo Żelaznych ${stamp}`];
+  const names = [name, ...otherNames, login, other, `Bractwo Żelaznych ${stamp}`, ...(hired?.name ? [hired.name] : [])];
 
   let problems = 0;
   for (const size of SIZES) {

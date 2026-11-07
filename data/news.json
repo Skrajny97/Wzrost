@@ -319,7 +319,12 @@
     {
       "id": "0.2.6",
       "title": "Wersja 0.2.6",
-      "body": "- Nowość od 5. poziomu postaci: Portale Systemu, w zakładce Walka. Jest ich sześć: Portal Złota, Drewna, Kamienia, Rudy, Materiałów i Części, a każdy płaci tylko swoim łupem.\n- O kolejne stopnie walczysz, ile chcesz, także w czasie wyprawy, a towarzysze z Kwater mogą iść z Tobą. Wygrana otwiera następny stopień, najwyżej do Twojego poziomu (na razie 100 stopni). Stwory są silniejsze niż na wyprawach.\n- Wygrana i czyszczenie pokonanego stopnia dają tyle, ile około 45 minut wyprawy na tym poziomie. Czyścisz bez walki, 5 razy dziennie w każdym portalu."
+      "body": "- Nowość od 5. poziomu postaci: Portale Systemu, w zakładce Walka. Jest ich sześć: Portal Złota, Drewna, Kamienia, Rudy, Materiałów i Części, a w każdym za wygraną zgarniesz tylko jego łup.\n- O kolejne stopnie walczysz, ile chcesz, także w czasie wyprawy, a towarzysze z Kwater mogą iść z Tobą. Wygrana otwiera następny stopień, najwyżej do Twojego poziomu (na razie 100 stopni). Stwory są silniejsze niż na wyprawach.\n- Wygrana i czyszczenie pokonanego stopnia dają tyle, ile około 45 minut wyprawy na tym poziomie. Czyścisz bez walki, 5 razy dziennie w każdym portalu."
+    },
+    {
+      "id": "0.2.7",
+      "title": "Wersja 0.2.7",
+      "body": "- W Wieżach zgarniesz teraz dużo więcej. Za wygraną dostajesz złoto jak za dwie godziny wyprawy na poziomie piętra, kilka razy więcej niż za czyszczenie Portalu.\n- Każda wygrana daje też 3 materiały stworów piętra, tym rzadsze, im wyższe piętro: od 50. piętra legendarne i mityczne, od 150. także boskie.\n- Z szansą 15% wygrana daje przedmiot Twojej klasy na poziomie piętra, epicki albo rzadszy. Na karcie Wieży widzisz łup za wybrane piętro.\n- Portale mają swoje tła, a postęp w nich zaczyna się od nowa: w każdym portalu znów walczysz o stopień 1."
     }
 ]
 }

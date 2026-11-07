@@ -12,7 +12,25 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { areaDangers, autoDistribute, createRng, encountersFor, materialDrops, parseStack, towerArea, towerEliteFloor, towerFight, towerFloor, towerTop } from '../src/engine/index.js';
+import {
+  areaDangers,
+  autoDistribute,
+  createRng,
+  encountersFor,
+  expectedExploration,
+  materialDrops,
+  parseStack,
+  portalAmount,
+  portalById,
+  towerArea,
+  towerEliteFloor,
+  towerFight,
+  towerFloor,
+  towerGold,
+  towerMaterialRarities,
+  towerMaterials,
+  towerTop,
+} from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -133,7 +151,7 @@ describe('an entry\'s fight', () => {
     if (!lost.tower.won) assert.match(lost.entries[0].text, /z Wieży: Słaby\./);
   });
 
-  test('a won floor pays as a fight of an hour\'s exploration, an elite and a champion as a regular creature', () => {
+  test('a won floor pays the XP of a fight of an hour\'s exploration, an elite and a champion as a regular creature', () => {
     const won = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 3, seed: 'a' }, content);
     assert.equal(won.tower.won, true);
     assert.equal(won.result, 'success');
@@ -181,12 +199,93 @@ describe('an entry\'s fight', () => {
 
   test('the chest comes only when asked, with an item of the character\'s class it can wear', () => {
     const none = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 10, seed: 'c' }, content);
-    assert.equal(none.items.length, 0);
+    assert.equal(none.items.length, Number(none.tower.lootItem));
+    assert.equal(none.tower.chest, false);
     const chest = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 10, seed: 'c', chest: true }, content);
-    assert.equal(chest.items.length, 1);
+    assert.equal(chest.tower.chest, true);
+    assert.equal(chest.tower.lootItem, none.tower.lootItem);
+    assert.equal(chest.items.length, 1 + Number(chest.tower.lootItem));
     const [item] = chest.items;
     assert.equal(item.level, 10);
     assert.ok(content.rarities.findIndex((rarity) => rarity.id === item.rarity) >= content.rarities.findIndex((rarity) => rarity.id === 'epic'));
+  });
+
+  // The author: "zmodyfikować Wieże by dawały więcej niż Portale, o wiele
+  // więcej - rzadkie łupy i materiały szczególnie legendarne i mityczne na
+  // odpowiednich poziomach".
+  test('a win pays far more gold than a portal\'s sweep: two hours\' worth of an exploration at the floor\'s level', () => {
+    const { rewardMinutes, loot } = content.towers;
+    assert.equal(loot.goldMultiplier, 2);
+    for (const floor of [3, 50, 100, 150]) {
+      const gold = towerGold(floor, content);
+      assert.equal(gold, Math.round(expectedExploration(towerArea(floor, content), floor, rewardMinutes, content).gold * loot.goldMultiplier));
+      if (floor <= content.portals.maxStage) {
+        const portal = portalAmount(portalById('gold', content), floor, false, content);
+        assert.ok(gold > portal * 2, `${floor}: ${gold} vs ${portal}`);
+      }
+    }
+    assert.ok(towerGold(100, content) > towerGold(50, content));
+    const won = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 3, seed: 'a' }, content);
+    assert.equal(won.gold, towerGold(3, content));
+  });
+
+  test('a win brings three materials of the floor\'s creatures, rarer with the floor\'s level: legendary and mythic high up, never below the species\' own', () => {
+    const index = (id) => content.rarities.findIndex((rarity) => rarity.id === id);
+    const top = (floor) => Math.max(...Object.keys(towerMaterialRarities(floor, content)).map(index));
+    assert.ok(top(10) < index('legendary'));
+    assert.ok(top(50) >= index('mythic'));
+    assert.ok(Object.keys(towerMaterialRarities(100, content)).includes('legendary'));
+    for (const floor of [3, 26, 50, 100, 160]) {
+      const plan = towerFloor(floor, 'm', content);
+      const enemies = plan.encounter.members;
+      const counts = {};
+      const rng = createRng(`materials${floor}`);
+      for (let n = 0; n < 200; n++) {
+        const found = towerMaterials(floor, enemies, rng, content);
+        assert.equal(Object.values(found).reduce((sum, count) => sum + count, 0), content.towers.loot.materials.pieces);
+        for (const [key, count] of Object.entries(found)) {
+          const { materialId, rarityId } = parseStack(key);
+          const material = content.materialsById[materialId];
+          assert.ok(index(rarityId) >= index(material.rarity), key);
+          // Of the creatures fought, the champion's trophy aside.
+          if (!plan.encounter.champion) assert.ok(enemies.some((enemy) => content.materialsByMonster[enemy.monsterId]?.id === materialId), `${floor}: ${key}`);
+          counts[rarityId] = (counts[rarityId] ?? 0) + count;
+        }
+      }
+      // The rarities drawn are those of the floor's level.
+      const allowed = Object.keys(towerMaterialRarities(floor, content)).map(index);
+      for (const rarityId of Object.keys(counts)) assert.ok(index(rarityId) >= Math.min(...allowed), `${floor}: ${rarityId}`);
+    }
+    // At floor 100 most pieces are legendary or mythic.
+    const rng = createRng('sto');
+    const enemies = towerFloor(101, 'm', content).encounter.members;
+    let rare = 0;
+    for (let n = 0; n < 300; n++) {
+      for (const [key, count] of Object.entries(towerMaterials(100, enemies, rng, content))) if (index(parseStack(key).rarityId) >= index('legendary')) rare += count;
+    }
+    assert.ok(rare / (300 * 3) > 0.6, `${rare}`);
+  });
+
+  test('now and then a win brings an item of the character\'s class, of a champion\'s rarity at the floor\'s level', () => {
+    const climber = { ...character, points: autoDistribute(character, content) };
+    let wins = 0;
+    let lucky = 0;
+    for (let n = 0; n < 200; n++) {
+      const won = towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: 20, seed: `łup${n}` }, content);
+      if (!won.tower.won) continue;
+      wins += 1;
+      assert.equal(won.items.length, Number(won.tower.lootItem));
+      if (won.tower.lootItem) {
+        lucky += 1;
+        const [item] = won.items;
+        assert.equal(item.level, 20);
+        assert.equal(item.rarity, 'epic');
+        assert.match(won.entries[0].text, new RegExp(content.towers.texts.loot.map((line) => line.split('{item}')[0]).join('|')));
+      }
+    }
+    assert.ok(wins > 150, `${wins}`);
+    const share = lucky / wins;
+    assert.ok(Math.abs(share - content.towers.loot.itemChance) < 0.08, `${share}`);
   });
 
   test('a lost floor pays nothing and costs no XP', () => {
@@ -265,14 +364,16 @@ describe('the Wieże through the API', () => {
     let first = null;
     for (let i = 0; i < 5 && !first?.tower.won; i++) first = (await enter('wspinacz', { tower: 'solo', floor: 10 })).data.report;
     assert.equal(first.tower.won, true, 'the floor is won');
-    assert.equal(first.items.length, 1);
+    assert.equal(first.tower.chest, true);
+    assert.equal(first.items.length, 1 + Number(first.tower.lootItem));
     const items = async () => (await (await db()).prepare('SELECT COUNT(*) AS count FROM items').first()).count;
     const before = await items();
     let again = null;
     for (let i = 0; i < 5 && !again?.tower.won; i++) again = (await enter('wspinacz', { tower: 'solo', floor: 10 })).data.report;
     assert.equal(again.tower.won, true);
-    assert.equal(again.items.length, 0);
-    assert.equal(await items(), before);
+    assert.equal(again.tower.chest, false);
+    assert.equal(again.items.length, Number(again.tower.lootItem));
+    assert.equal(await items(), before + again.items.length);
     assert.deepEqual(JSON.parse((await (await db()).prepare('SELECT towers FROM characters').first()).towers).chests.solo, [10]);
   });
 

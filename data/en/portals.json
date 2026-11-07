@@ -3,27 +3,27 @@
   "portals": {
     "gold": {
       "name": "Gold Portal",
-      "description": "A gate to the System's vault. A win pays in gold."
+      "description": "A gate to the System's vault. Win to collect gold."
     },
     "wood": {
       "name": "Wood Portal",
-      "description": "A gate to a forest no map shows. A win pays in wood."
+      "description": "A gate to a forest no map shows. Win to collect wood."
     },
     "stone": {
       "name": "Stone Portal",
-      "description": "A gate to the System's quarry. A win pays in stone."
+      "description": "A gate to the System's quarry. Win to collect stone."
     },
     "ore": {
       "name": "Ore Portal",
-      "description": "A gate to deep mine shafts. A win pays in iron ore."
+      "description": "A gate to deep mine shafts. Win to collect iron ore."
     },
     "materials": {
       "name": "Material Portal",
-      "description": "A gate to the creatures' lairs. A win pays in the materials of the stage's creatures."
+      "description": "A gate to the creatures' lairs. Win to collect the materials of the stage's creatures."
     },
     "parts": {
       "name": "Parts Portal",
-      "description": "A gate to the System's armoury. A win pays in crafting parts."
+      "description": "A gate to the System's armoury. Win to collect crafting parts."
     }
   },
   "texts": {

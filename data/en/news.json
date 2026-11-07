@@ -251,7 +251,11 @@
     },
     "0.2.6": {
       "title": "Version 0.2.6",
-      "body": "- New from character level 5: the System Portals, in the Combat tab. There are six: the Gold, Wood, Stone, Ore, Material and Parts Portals, and each pays only in its own loot.\n- You fight for the next stages as often as you like, even during an exploration, and your companions from the Quarters can come along. A win opens the next stage, up to your level (100 stages for now). The creatures are stronger than on explorations.\n- A win and a sweep of a cleared stage give about as much as 45 minutes of an exploration at that level. You sweep with no fight, 5 times a day in each portal."
+      "body": "- New from character level 5: the System Portals, in the Combat tab. There are six: the Gold, Wood, Stone, Ore, Material and Parts Portals, and in each a win brings you only its own loot.\n- You fight for the next stages as often as you like, even during an exploration, and your companions from the Quarters can come along. A win opens the next stage, up to your level (100 stages for now). The creatures are stronger than on explorations.\n- A win and a sweep of a cleared stage give about as much as 45 minutes of an exploration at that level. You sweep with no fight, 5 times a day in each portal."
+    },
+    "0.2.7": {
+      "title": "Version 0.2.7",
+      "body": "- The Towers now bring you much more. A win gets you as much gold as two hours of exploring at the floor's level, several times a Portal sweep.\n- Every win also gives 3 materials of the floor's creatures, rarer the higher the floor: legendary and mythic from floor 50, divine too from floor 150.\n- With a 15% chance a win gives an item of your class at the floor's level, epic or rarer. The Tower card shows the loot for the floor you pick.\n- The Portals have their own backdrops, and their progress starts anew: in each portal you fight for stage 1 again."
     }
   }
 }

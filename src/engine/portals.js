@@ -24,7 +24,7 @@ import { combatantView, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { companionCombatant } from './companions.js';
 import { materialsText, raisedRarity, rarityUpChances, stackKey } from './crafting.js';
-import { encounterCombatants, encountersFor, explorationPace } from './hunt.js';
+import { encounterCombatants, encountersFor, expectedExploration } from './hunt.js';
 import { createRng } from './rng.js';
 import { nameInText, say, word } from './text.js';
 
@@ -48,36 +48,7 @@ export function portalArea(stage, content) {
 // and of the finds, the camp's resources gathered and found (all kinds
 // together), the materials the creatures leave, and the parts the finds'
 // chests give when taken apart (salvageYield).
-export function portalExpected(stage, content) {
-  const area = portalArea(stage, content);
-  const { rewards, hunt, crafting } = content.balance;
-  const minutes = content.portals.lootMinutes;
-  const pace = explorationPace(minutes, content);
-  const open = encountersFor(area, stage);
-  const encounters = open.length > 0 ? open : area.encounters;
-  const weights = encounters.reduce((sum, encounter) => sum + (encounter.weight ?? 1), 0);
-  let gold = 0;
-  let materials = 0;
-  for (const encounter of encounters) {
-    const share = (encounter.weight ?? 1) / weights;
-    const groupFactor = hunt.groupFactors[encounter.monsters.length - 1];
-    for (const id of encounter.monsters) {
-      gold += share * content.monstersById[id].reward.gold * groupFactor;
-      const material = content.materialsByMonster[id];
-      if (material) materials += share * content.raritiesById[material.rarity].materialChance * groupFactor;
-    }
-  }
-  const fights = pace.fights * pace.timeFactor;
-  const outcomes = rewards.findOutcomes;
-  const all = Object.values(outcomes).reduce((sum, weight) => sum + weight, 0);
-  const finds = (kind) => (pace.finds * (outcomes[kind] ?? 0)) / all;
-  return {
-    gold: rewards.goldPerLevel * stage * gold * fights * (1 + pace.lengthBonus) + finds('gold') * rewards.findGoldPerLevel * stage,
-    resources: finds('resource') * rewards.findResourcePerLevel * stage + (rewards.gatherPerLevelHour * stage * minutes) / 60,
-    materials: materials * fights,
-    parts: finds('chest') * (crafting.salvageBase + Math.floor(stage / crafting.salvageLevelStep)),
-  };
-}
+export const portalExpected = (stage, content) => expectedExploration(portalArea(stage, content), stage, content.portals.lootMinutes, content);
 
 // How much a portal pays on `stage`: its part of portalExpected, in whole
 // pieces, at least one, firstWinMultiplier times as much at the stage's

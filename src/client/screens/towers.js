@@ -132,6 +132,25 @@ export function mountTowers(container, { navigate }) {
       : t('Co {every}. piętro czeka elita, ale tylko w co {laps}. okrążeniu regionów: na piętrach {floors} i tak dalej.', { every: view.eliteEvery, laps: every, floors });
   }
 
+  // What a win on `floor` pays, in words: its gold, the materials' pieces
+  // with the odds of their rarities at its level, and the chance of an item
+  // (towerGold, towerMaterials in the engine; the author: "o wiele więcej
+  // - rzadkie łupy i materiały szczególnie legendarne i mityczne").
+  function lootText(floor) {
+    const { gold, pieces, rarities, itemChance } = view.loot;
+    const step = rarities.filter((one) => one.fromLevel <= floor).at(-1) ?? rarities[0];
+    const total = Object.values(step.rarities).reduce((sum, weight) => sum + weight, 0);
+    const odds = Object.entries(step.rarities)
+      .map(([id, weight]) => `${state.content.rarities.find((rarity) => rarity.id === id)?.forms.pl ?? id} ${Math.round((weight / total) * 100)}%`)
+      .join(', ');
+    return t('Za wygraną zgarniesz: {gold} złota, {pieces} materiały stworów piętra ({odds}), a z szansą {chance}% przedmiot.', {
+      gold: formatNumber(gold[floor - 1] ?? gold.at(-1)),
+      pieces,
+      odds,
+      chance: Math.round(itemChance * 100),
+    });
+  }
+
   function towerCard(tower) {
     let floor = floorOf(tower);
     // The narrator's Wieże chapter points at the cards and at what waits on
@@ -184,6 +203,7 @@ export function mountTowers(container, { navigate }) {
           h('p', { class: 'tower-floor-title', text: t('Piętro {floor} · poz. {level}', { floor, level: floor }) }),
           h('p', { text: `${place.name} (${place.regionName})` }),
           waits.length > 0 && h('p', { class: 'tower-waits', text: t('Czeka: {gifts}.', { gifts: waits.join(', ') }) }),
+          view.loot && h('p', { text: lootText(floor) }),
         ),
       );
       enter.textContent = t('Wejdź na piętro {floor}', { floor });

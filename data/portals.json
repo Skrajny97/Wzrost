@@ -8,41 +8,47 @@
   "portals": [
     {
       "id": "gold",
+      "art": "portal-gold",
       "name": "Portal Złota",
-      "description": "Wrota do skarbca Systemu. Wygrana płaci złotem.",
+      "description": "Wrota do skarbca Systemu. Za wygraną zgarniesz złoto.",
       "loot": "gold"
     },
     {
       "id": "wood",
+      "art": "portal-wood",
       "name": "Portal Drewna",
-      "description": "Wrota do puszczy, której nie ma na mapach. Wygrana płaci drewnem.",
+      "description": "Wrota do puszczy, której nie ma na mapach. Za wygraną zgarniesz drewno.",
       "loot": "resource",
       "resource": "wood"
     },
     {
       "id": "stone",
+      "art": "portal-stone",
       "name": "Portal Kamienia",
-      "description": "Wrota do kamieniołomu Systemu. Wygrana płaci kamieniem.",
+      "description": "Wrota do kamieniołomu Systemu. Za wygraną zgarniesz kamień.",
       "loot": "resource",
       "resource": "stone"
     },
     {
       "id": "ore",
+      "art": "portal-ore",
       "name": "Portal Rudy",
-      "description": "Wrota do głębokich sztolni. Wygrana płaci rudą żelaza.",
+      "description": "Wrota do głębokich sztolni. Za wygraną zgarniesz rudę żelaza.",
       "loot": "resource",
       "resource": "iron-ore"
     },
     {
       "id": "materials",
+      "art": "portal-materials",
       "name": "Portal Materiałów",
-      "description": "Wrota do legowisk stworów. Wygrana płaci materiałami stworów stopnia.",
+      "description": "Wrota do legowisk stworów. Za wygraną zgarniesz materiały stworów stopnia.",
       "loot": "material"
     },
     {
       "id": "parts",
+      "art": "portal-parts",
       "name": "Portal Części",
-      "description": "Wrota do zbrojowni Systemu. Wygrana płaci częściami do rzemiosła.",
+      "description": "Wrota do zbrojowni Systemu. Za wygraną zgarniesz części do rzemiosła.",
       "loot": "part",
       "part": "scraps"
     }
