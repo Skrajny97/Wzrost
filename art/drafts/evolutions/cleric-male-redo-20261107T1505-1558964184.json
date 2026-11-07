@@ -1,0 +1,19 @@
+{
+  "id": "cleric-male-redo",
+  "tool": "pixellab generate-image-v2",
+  "description": "young man novice cleric, calm and friendly, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, black messy hair, a clear face with two clearly visible dark eyes looking at the viewer and thin eyebrows, humble threadbare clothes: a simple undyed cream linen tunic, a rope belt, a small wooden pendant on a cord and cloth-wrapped feet, empty hands, arms relaxed at the sides, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/portraits/cleric-male.png",
+      "usage": "the same young novice cleric: the same black messy hair, face, ragged cream linen tunic, rope belt, small wooden pendant, cloth-wrapped feet, pose, size and place in the picture"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

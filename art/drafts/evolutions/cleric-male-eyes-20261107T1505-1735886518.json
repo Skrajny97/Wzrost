@@ -1,0 +1,14 @@
+{
+  "id": "cleric-male-eyes",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art face of a young man in three-quarter view, two clearly visible dark brown eyes of the same size, both looking in the same direction toward the viewer, a tiny white highlight in each eye, thin dark eyebrows above them, a calm friendly expression, warm light skin, black messy hair fringe above the eyebrows, not covering the eyes",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": "art/inputs/portraits/cleric-male.png",
+  "mask": "art/inputs/portraits/cleric-male-eyes-mask.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}
