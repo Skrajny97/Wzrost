@@ -93,7 +93,7 @@ export function mountTowers(container, { navigate }) {
         howItWorks(
           t('Wejście to jedna walka na wybranym piętrze, z wynikiem od razu.'),
           t(
-            'Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro 1 ma poziom {first}, a każde następne o jeden więcej. Najwyżej wejdziesz na piętro swojego poziomu. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, a System je wzmacnia: obrażenia ×{damage}, HP ×{hp}. {elites} Na zwykłych piętrach czasem czeka elita. Co {championEvery}. piętro czeka czempion, a co {chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.',
+            'Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro 1 ma poziom {first}, a każde następne o jeden więcej. Każde zdobyte piętro otwiera kolejne, bez względu na poziom postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, a System je wzmacnia: obrażenia ×{damage}, HP ×{hp}. {elites} Na zwykłych piętrach czasem czeka elita. Co {championEvery}. piętro czeka czempion, a co {chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.',
             {
               first: view.firstFloorLevel,
               damage: formatDecimal(view.strength[0]),
@@ -121,8 +121,8 @@ export function mountTowers(container, { navigate }) {
   }
 
   // The floor a tower's card starts at: the one picked before, else the
-  // next above the highest won, within the floors open (the first when
-  // none is: a Drużyna with a player below the first floor's level).
+  // next above the highest won, within the floors open (one above the
+  // highest won, whatever the character's level).
   const topOf = (tower) => Math.max(1, tower.top);
   const floorOf = (tower) => Math.min(topOf(tower), Math.max(1, Number.isInteger(picks[tower.id]) ? picks[tower.id] : tower.best + 1));
   // The level of `floor` (towerLevel in the engine).
@@ -228,7 +228,7 @@ export function mountTowers(container, { navigate }) {
     const climbers =
       tower.missing ??
       (tower.partners.length > 0 || tower.companions.length > 0
-        ? t('Z Tobą: {climbers}. Najwyżej wejdziecie na piętro poziomu najniższej postaci gracza.', {
+        ? t('Z Tobą: {climbers}.', {
             climbers: [...tower.partners.map((partner) => t('{name} (poz. {level})', { name: partner.name, level: partner.level })), ...tower.companions].join(', '),
           })
         : null);

@@ -16,7 +16,6 @@ import { beforeEach, describe, test } from 'node:test';
 
 import {
   areaDangers,
-  autoDistribute,
   createRng,
   encountersFor,
   expectedExploration,
@@ -35,7 +34,7 @@ import {
   towerMaterials,
   towerTop,
 } from '../src/engine/index.js';
-import { climbingGear, wearClimbingGear } from './helpers/climb.js';
+import { makeClimber, strongClimber } from './helpers/climb.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -45,23 +44,22 @@ const CHAMPION = content.towers.floors.championEvery;
 const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
 
 describe('the Wieże Systemu', () => {
-  test('floor 1 is of level 50, each next one a level higher; the highest floor open is the one of the lowest level in the party, none below 50 (0.2.11)', () => {
+  test('floor 1 is of level 50, each next one a level higher (0.2.11); the floors open one by one as they are won, whatever the level (0.2.12)', () => {
     assert.equal(content.towers.firstFloorLevel, 50);
     assert.equal(content.towers.firstFloorLevel, content.unlocksById.towers.level);
     assert.equal(towerLevel(1, content), 50);
     assert.equal(towerLevel(11, content), 60);
-    assert.equal(towerTop([50], content), 1);
-    assert.equal(towerTop([60], content), 11);
-    assert.equal(towerTop([80, 76, 91], content), 27);
-    assert.equal(towerTop([60, 49], content), 0);
+    assert.equal(towerTop(undefined), 1);
+    assert.equal(towerTop(0), 1);
+    assert.equal(towerTop(30), 31);
   });
 
-  test('the System makes the creatures twice as strong: twice the HP (744)', () => {
-    assert.deepEqual(content.towers.strength, [2, 2]);
+  test('the System makes the creatures three times as strong: three times the HP (746 B)', () => {
+    assert.deepEqual(content.towers.strength, [3, 3]);
     const plain = { ...content, towers: { ...content.towers, strength: [1, 1] } };
     const climber = newCharacter('warrior', { level: 60, classLevel: 50 });
     const hp = (rules) => towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: 3, seed: 'moc' }, rules).fights[0].enemiesView[0].maxHp;
-    assert.ok(Math.abs(hp(content) / hp(plain) - 2) < 0.02, `${hp(content)} vs ${hp(plain)}`);
+    assert.ok(Math.abs(hp(content) / hp(plain) - 3) < 0.03, `${hp(content)} vs ${hp(plain)}`);
   });
 
   test('a floor holds one inner region\'s creatures at its level, the regions in turn from the first', () => {
@@ -151,11 +149,9 @@ describe('the Wieże Systemu', () => {
 
 describe('an entry\'s fight', () => {
   const character = newCharacter('warrior', { level: 60, classLevel: 50 });
-  // Strong enough for the low floors, with its points spent as the game
-  // spends them and the gear of tests/helpers/climb.js.
-  const strong = newCharacter('warrior', { level: 200, classLevel: 50 });
-  const climber = { ...strong, points: autoDistribute(strong, content) };
-  const gear = climbingGear();
+  // Strong enough for the low floors and the first champions
+  // (tests/helpers/climb.js).
+  const { character: climber, equipped: gear } = strongClimber();
 
   test('alone on a floor the monsters have half the late growth, with a partner all of it; up to 50 the same (438.3 A)', () => {
     const climber = newCharacter('warrior', { level: 110, classLevel: 100 });
@@ -343,12 +339,13 @@ describe('the Wieże through the API', () => {
   }
   const as = (login, method, path, body) => call(method, path, { cookie: cookies[login], body });
   const enter = (login, body) => as(login, 'POST', '/api/towers/enter', body);
-  // Strong enough for the low floors (0.2.11): level 200, its points spent
-  // as the game spends them, and the gear of tests/helpers/climb.js.
-  async function strong() {
+  // Strong enough for the low floors and the first champions
+  // (tests/helpers/climb.js), the Wieża Solo climbed to `best` (the floors
+  // open as they are won, 0.2.12).
+  async function strong(best = 60) {
     const database = await db();
-    await set('level = 200, points = ?', JSON.stringify(autoDistribute(newCharacter('warrior', { level: 200, classLevel: 50 }), content)));
-    await wearClimbingGear(database, (await database.prepare('SELECT id FROM characters').first()).id);
+    await makeClimber(database, (await database.prepare('SELECT id FROM characters').first()).id);
+    await set('towers = ?', JSON.stringify({ best: { solo: best } }));
   }
 
   beforeEach(async () => {
@@ -363,15 +360,15 @@ describe('the Wieże through the API', () => {
     assert.equal((await enter('wspinacz', { tower: 'solo', floor: 1 })).data.error.code, 'locked');
   });
 
-  test('an entry fights one floor and brings its report at once; floors go up to the one of the character\'s level, floor 1 being the 50th', async () => {
+  test('an entry fights one floor and brings its report at once; at first only floor 1, the 50th level, is open', async () => {
     const { towers } = (await as('wspinacz', 'GET', '/api/towers')).data;
     assert.equal(towers.left, content.towers.entries.perDay);
     assert.equal(towers.cycle.length, content.areas.length);
     const solo = towers.towers.find((tower) => tower.id === 'solo');
-    assert.equal(solo.top, 11);
+    assert.equal(solo.top, 1);
     assert.equal(towers.firstFloorLevel, 50);
-    assert.deepEqual(towers.strength, [2, 2]);
-    assert.equal((await enter('wspinacz', { tower: 'solo', floor: 12 })).data.error.code, 'invalid_floor');
+    assert.deepEqual(towers.strength, [3, 3]);
+    assert.equal((await enter('wspinacz', { tower: 'solo', floor: 2 })).data.error.code, 'invalid_floor');
     assert.equal((await enter('wspinacz', { tower: 'solo', floor: 0 })).data.error.code, 'invalid_floor');
     assert.equal((await enter('wspinacz', { tower: 'none', floor: 1 })).data.error.code, 'invalid_tower');
     const entered = await enter('wspinacz', { tower: 'solo', floor: 1 });
@@ -390,6 +387,21 @@ describe('the Wieże through the API', () => {
     const journal = (await as('wspinacz', 'GET', '/api/reports')).data.reports;
     assert.equal(journal[0].kind, 'tower');
     assert.equal(journal[0].tower.floor, 1);
+  });
+
+  test('a floor won opens the next one, whatever the character\'s level: a level-200 character climbs from floor 1 (0.2.12)', async () => {
+    await strong(0);
+    const solo = async () => (await as('wspinacz', 'GET', '/api/towers')).data.towers.towers.find((tower) => tower.id === 'solo');
+    assert.equal((await solo()).top, 1);
+    assert.equal((await enter('wspinacz', { tower: 'solo', floor: 2 })).data.error.code, 'invalid_floor');
+    const won = (await enter('wspinacz', { tower: 'solo', floor: 1 })).data.report;
+    assert.equal(won.tower.won, true);
+    assert.equal((await solo()).top, 2);
+    assert.equal((await solo()).best, 1);
+    // A character below the floor's level climbs as high as it wins.
+    await set('level = 50, towers = ?', JSON.stringify({ best: { solo: 40 } }));
+    assert.equal((await solo()).top, 41);
+    assert.equal((await enter('wspinacz', { tower: 'solo', floor: 41 })).status, 200);
   });
 
   test('the entries of a day run out and come back from midnight', async () => {
@@ -487,7 +499,7 @@ describe('the Wieże through the API', () => {
     assert.equal(await stays('old-tower-1'), true);
   });
 
-  test('the Wieża Drużyn needs a Drużyna of two players; the lowest of them sets the top, none below 50', async () => {
+  test('the Wieża Drużyn needs a Drużyna of two players; its floors open as the character entering climbs them', async () => {
     const shut = await enter('wspinacz', { tower: 'party', floor: 1 });
     assert.equal(shut.data.error.code, 'no_party');
     await player('druh', 'Druh', 55);
@@ -495,20 +507,19 @@ describe('the Wieże through the API', () => {
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
     const party = (await as('wspinacz', 'GET', '/api/towers')).data.towers.towers.find((tower) => tower.id === 'party');
     assert.equal(party.missing, null);
-    assert.equal(party.top, 6);
+    assert.equal(party.top, 1);
     assert.deepEqual(party.partners.map((partner) => partner.name), ['Druh']);
-    assert.equal((await enter('wspinacz', { tower: 'party', floor: 7 })).data.error.code, 'invalid_floor');
-    const entered = await enter('wspinacz', { tower: 'party', floor: 5 });
+    assert.equal((await enter('wspinacz', { tower: 'party', floor: 2 })).data.error.code, 'invalid_floor');
+    const entered = await enter('wspinacz', { tower: 'party', floor: 1 });
     assert.equal(entered.status, 200, JSON.stringify(entered.data).slice(0, 300));
     assert.deepEqual(entered.data.report.tower.partners, ['Druh']);
     assert.ok(entered.data.report.fights[0].allies.some((unit) => unit.name === 'Druh'));
-    // A player below the first floor's level: no floor is open.
-    await (await db()).prepare("UPDATE characters SET level = 49 WHERE name = 'Druh'").run();
-    const below = (await as('wspinacz', 'GET', '/api/towers')).data.towers.towers.find((tower) => tower.id === 'party');
-    assert.equal(below.top, 0);
-    assert.match(below.missing, /co najmniej 50\. poziom/);
-    assert.equal((await enter('wspinacz', { tower: 'party', floor: 1 })).data.error.code, 'no_party');
-    await (await db()).prepare("UPDATE characters SET level = 55 WHERE name = 'Druh'").run();
+    // The floors open by the character's own climb in this tower, whatever
+    // the levels in the Drużyna.
+    await (await db()).prepare("UPDATE characters SET towers = ? WHERE name = 'Wspinacz'").bind(JSON.stringify({ best: { party: 12 } })).run();
+    const climbed = (await as('wspinacz', 'GET', '/api/towers')).data.towers.towers.find((tower) => tower.id === 'party');
+    assert.equal(climbed.top, 13);
+    assert.equal(climbed.missing, null);
     // One grown beyond the class levels' spread leaves the party, so it
     // climbs no more (parties.js).
     await (await db()).prepare("UPDATE characters SET class_level = ? WHERE name = 'Druh'").bind(50 + content.balance.parties.classSpread + 1).run();
@@ -527,7 +538,7 @@ describe('the Wieże through the API', () => {
     assert.equal(claimed.status, 200);
     // Home again: in it goes, and its HP stays.
     const before = await (await db()).prepare('SELECT hp, hp_at, level FROM characters').first();
-    const entered = await enter('wspinacz', { tower: 'solo', floor: 2 });
+    const entered = await enter('wspinacz', { tower: 'solo', floor: 1 });
     assert.equal(entered.status, 200, JSON.stringify(entered.data).slice(0, 300));
     const after = await (await db()).prepare('SELECT hp, hp_at, level FROM characters').first();
     if (after.level === before.level) assert.deepEqual(after, before);

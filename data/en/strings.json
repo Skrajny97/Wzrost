@@ -1372,7 +1372,7 @@
   "Nie udało się wczytać Wymiany.": "Could not load the Exchange.",
   "Wejścia na dziś: {left} z {perDay}. Nowe od północy.": "Entries today: {left} of {perDay}. New ones from midnight.",
   "Wejście to jedna walka na wybranym piętrze, z wynikiem od razu.": "An entry is one fight on the floor you choose, with the result at once.",
-  "Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro 1 ma poziom {first}, a każde następne o jeden więcej. Najwyżej wejdziesz na piętro swojego poziomu. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, a System je wzmacnia: obrażenia ×{damage}, HP ×{hp}. {elites} Na zwykłych piętrach czasem czeka elita. Co {championEvery}. piętro czeka czempion, a co {chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.": "The character fights at full HP, without potions or their bonuses. You can enter during a profession's work, but during an exploration the Towers wait for the character to return. Floor 1 is level {first}, and each next floor is one level higher. You can climb no higher than the floor of your own level. A floor has the creatures of one region, in turn through all the lands, and the System makes them stronger: damage ×{damage}, HP ×{hp}. {elites} On ordinary floors an elite sometimes waits. A champion waits every {championEvery} floors, and every {chestEvery} floors the first win gives a Tower chest. A champion leaves its trophy only at the first win on its floor.",
+  "Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro 1 ma poziom {first}, a każde następne o jeden więcej. Każde zdobyte piętro otwiera kolejne, bez względu na poziom postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, a System je wzmacnia: obrażenia ×{damage}, HP ×{hp}. {elites} Na zwykłych piętrach czasem czeka elita. Co {championEvery}. piętro czeka czempion, a co {chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.": "The character fights at full HP, without potions or their bonuses. You can enter during a profession's work, but during an exploration the Towers wait for the character to return. Floor 1 is level {first}, and each next floor is one level higher. Every floor you conquer opens the next one, whatever your character's level. A floor has the creatures of one region, in turn through all the lands, and the System makes them stronger: damage ×{damage}, HP ×{hp}. {elites} On ordinary floors an elite sometimes waits. A champion waits every {championEvery} floors, and every {chestEvery} floors the first win gives a Tower chest. A champion leaves its trophy only at the first win on its floor.",
   "Wyprawa się skończyła. Odbierz raport w Walce, a potem wejdź do Wieży.": "The exploration is over. Claim the report in Combat, then enter a Tower.",
   "Postać jest na wyprawie. Wieże poczekają na jej powrót, bo raport z wyprawy liczy się z postacią taką, jaka jest na jej końcu.": "The character is on an exploration. The Towers will wait for its return, as the exploration's report counts the character as it is at the end.",
   "Co {every}. piętro czeka elita.": "An elite waits every {every} floors.",
@@ -1383,7 +1383,7 @@
   "skrzynia Wieży": "Tower chest",
   "Piętro {floor} · poz. {level}": "Floor {floor} · lvl {level}",
   "Wejdź na piętro {floor}": "Enter floor {floor}",
-  "Z Tobą: {climbers}. Najwyżej wejdziecie na piętro poziomu najniższej postaci gracza.": "With you: {climbers}. You can climb no higher than the floor of the lowest-level player character.",
+  "Z Tobą: {climbers}.": "With you: {climbers}.",
   "Otwarte piętra: 1–{top}. Najwyżej zdobyte: {best}.": "Floors open: 1–{top}. Highest won: {best}.",
   "piętro {floor}": "floor {floor}",
   "jeszcze żadne": "none yet",
@@ -2581,6 +2581,5 @@
   "Narrator objaśni Portale od początku.": "The narrator will explain the Portals from the beginning.",
   "Twoje postacie": "Your characters",
   "{name} (grasz teraz)": "{name} (playing now)",
-  "Graj postacią {name}": "Play {name}",
-  "Wieża Drużyn otworzy się, gdy każda postać gracza w drużynie będzie miała co najmniej {level}. poziom.": "The Party Tower opens once every player character in the party is at least level {level}."
+  "Graj postacią {name}": "Play {name}"
 }

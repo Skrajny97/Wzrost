@@ -272,6 +272,10 @@
     "0.2.11": {
       "title": "Version 0.2.11",
       "body": "- The Towers anew: floor 1 is level 50, and each next floor is one level higher. You can climb up to the floor of your own level.\n- The System made the Towers' creatures twice as strong: they hit twice as hard and have twice the HP. Loot follows the floor's level, so even the first floor gives level 50 rewards.\n- Tower progress starts over: chests and champions' trophies wait on their floors again, and today's entries are full. Nothing you have already won is taken away."
+    },
+    "0.2.12": {
+      "title": "Version 0.2.12",
+      "body": "- You open the Towers' floors by climbing: every floor you conquer opens the next one, whatever your character's level.\n- The Towers' creatures are now three times as strong: they hit three times as hard and have three times the HP."
     }
   }
 }

@@ -2038,7 +2038,6 @@ describe('Time Points and the narrator', () => {
         ['towers-welcome', 'card'],
         ['towers-lead', 'lead'],
         ['towers-entries', 'point'],
-        ['towers-solo', 'point'],
         ['towers-floor', 'point'],
         ['towers-party', 'point'],
         ['towers-ending', 'card'],

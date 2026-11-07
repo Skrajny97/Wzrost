@@ -432,11 +432,6 @@
       ],
       "voice": "audio/narration/en/towers-entries.mp3"
     },
-    "towers-solo": {
-      "text": [
-        "The first floor is already level fifty, and each next one is a level higher. Here the System strengthens the creatures of every land: they hit twice as hard and have twice the HP."
-      ]
-    },
     "towers-floor": {
       "text": [
         "Elites and champions wait along the way, and every tenth floor gives a Tower chest for the first victory."

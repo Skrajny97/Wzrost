@@ -3034,6 +3034,16 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.12 (7.11.2026): piętra Wież otwiera wspinaczka, stwory trzy razy silniejsze
+
+Autor (7.11.2026, 13:39, wiadomość doczytana dopiero po wysłaniu 0.2.11): „i wieże się odblokowują niezależnie od poziomu mozna isc w gore bez poziomu odpowiedniego inaczej niż Portale”. Potem, o pytaniu 746: „746 B nagrania zaznaczone, Ty za mało czynników bierzesz pod uwagę i to bedzie dalej za latwe, juz znam te Twoje numery”.
+
+1. **Piętra otwierają się po kolei, wygranymi, bez względu na poziom postaci**, inaczej niż stopnie Portali. Otwarte są piętra do jednego powyżej najwyżej zdobytego w danej wieży, na start tylko piętro 1. Postać na 50. poziomie może więc wejść na piętro 30, jeśli zdobyła 29. Zmienia to punkt 2 „Wersji 0.2.11” i punkt 4 „Wieże Systemu i Gildia”. Pytanie 743 (czy piętra mają się otwierać po kolei) rozstrzyga to zdanie autora.
+2. **W Wieży Drużyn liczy się wspinaczka postaci, która wchodzi** (brakujący szczegół): partnerzy idą z nią na jej piętro, bez względu na swój poziom i swoje piętra. Znika zasada z 0.2.11, że Wieża Drużyn czeka na drużynę z postacią poniżej 50. poziomu.
+3. **Stwory w obu Wieżach są trzy razy silniejsze**: obrażenia ×3 i HP ×3 (746 B; w 0.2.11 dwa razy).
+4. **Kwestia narratora przy Wieży Solo wypada w całości** (autor: „do wież wywal całą te kwestie narratora ze pierwsze piętro to to czy tamto i ze stwory biją mocniej, to logiczne i niech gracz odkrywa sam”). Rozdział narratora o Wieżach ma o jedną kwestię mniej; nagrania z 745 nie wchodzą do gry.
+5. Opis „Jak to działa?” w Wieżach mówi, że każde zdobyte piętro otwiera kolejne, bez względu na poziom postaci.
+
 ## Wersja 0.2.11 (7.11.2026): Wieże od 50. poziomu, ze stworami dwa razy silniejszymi
 
 Gracz na czacie (przez autora, 7.11.2026) wszedł od razu na 50. piętro, a tam „tylko czempion co pada jak leszcz”. Symulacja pokazała przyczynę: stwory w Wieżach nie miały wzmocnienia stworów z wypraw w najnowszym miejscu (na 50. poziomie obrażenia ×2,9 i HP ×2,1), więc zwykłe piętra wygrywało się prawie zawsze z 80–98% HP, a czempiona 50. piętra postać z ewolucją zawsze. Autor: „zmień trudność na wysoki bardzo poziom, tam są wysokie nagrody teraz przecież”, a potem: „pierwszy poziom wieży ma byc już trudny, maja być tam stwory ale wzmocnione tak by pasowały na poziom 50ty postaci”, „Wieże to tak jakby 1 poziom był 50ty w zamyśle”, „i nie o 50% więcej jak w 744 C a nawet 100% więcej”, „wyzeruj też wszystkim co odblokowali Wieże je, nie zabieraj nagród”.
@@ -3048,7 +3058,7 @@ Gracz na czacie (przez autora, 7.11.2026) wszedł od razu na 50. piętro, a tam 
 8. **Nowa kwestia narratora przy Wieży Solo** (autor: „nie, usuń linie narratora”, „i w ogóle inaczej o tym myśl tak jak napisałem wyżej”, „i nagraj od nowa zatem te kwestie narratora”). Stara kwestia o piętrach („Każde piętro to stwory jednego regionu… Najwyżej wejdziesz na piętro swojego poziomu.”) wypada, a nowa brzmi: „Pierwsze piętro to już pięćdziesiąty poziom, a każde kolejne jest o poziom wyżej. System wzmacnia tu stwory ze wszystkich krain: biją dwa razy mocniej i mają dwa razy więcej HP.” Po angielsku tak samo. Nagrania nowej kwestii idą na stronę odsłuchu; do czasu akceptacji ta kwestia jest w grze bez głosu, żeby narrator nie mówił starych zasad.
 9. **Trudność w symulacji** (sama postać w Wieży Solo, wszystkie klasy, bez mikstur; „zaangażowany” gracz to ten z ewolucją, ulepszeniami i porządnym ekwipunkiem, „przeciętny” bez ewolucji): na 50. poziomie piętro 1 wygrywa przeciętny w 89%, zaangażowany w 99%. Na 60. poziomie najwyższe piętro (11) wygrywa przeciętny w 61%, zaangażowany w 92%, a elitę 10. piętra w 0% i 56%. Na 75. poziomie czempiona 25. piętra nie pokonuje sam nikt (we dwoje zaangażowani w 67%). Na 100. poziomie czempiona 50. piętra zaangażowany pokonuje sam w 5%, we dwoje w 52%; na 150. poziomie czempiona 100. piętra w 61%.
 
-Pytanie 743 (czy piętra mają się otwierać po kolei) czeka na autora. Do tego czasu można wybrać dowolne otwarte piętro.
+Pytanie 743 rozstrzygnęło zdanie autora z 13:39, wdrożone w 0.2.12 (zob. „Wersja 0.2.12”).
 
 ## Wersja 0.2.10 (7.11.2026): miniaturki postaci w zakładce Postać
 

@@ -345,6 +345,11 @@
       "id": "0.2.11",
       "title": "Wersja 0.2.11",
       "body": "- Wieże od nowa: piętro 1 ma poziom 50, a każde kolejne o jeden więcej. Wejdziesz najwyżej na piętro swojego poziomu.\n- System wzmocnił stwory w Wieżach dwa razy: biją dwa razy mocniej i mają dwa razy więcej HP. Łupy liczą się z poziomu piętra, więc już pierwsze piętro daje nagrody poziomu 50.\n- Postęp w Wieżach zaczyna się od nowa: skrzynie i trofea czempionów znowu czekają na swoich piętrach, a dzisiejsze wejścia są pełne. Nic z tego, co już zdobyte, nie znika."
+    },
+    {
+      "id": "0.2.12",
+      "title": "Wersja 0.2.12",
+      "body": "- Piętra Wież otwierasz wspinaczką: każde zdobyte piętro otwiera kolejne, bez względu na poziom postaci.\n- Stwory w Wieżach są teraz trzy razy silniejsze: biją trzy razy mocniej i mają trzy razy więcej HP."
     }
 ]
 }

@@ -17,9 +17,10 @@
 // (eliteChance; "Elity mogą częściej"), and every championEvery floor, in
 // every lap, its champion (an elite where the region has none). The
 // champion leaves its trophy only at the first win of its floor in a tower
-// (483 A, the server knows). The highest floor open is the one of the
-// character's level, a party's of its lowest member's ("Maksymalny
-// odblokowany stopień Wieży bedzie na poziomie najniższego w Drużynie").
+// (483 A, the server knows). The floors open one by one as they are won,
+// whatever the character's level (the author, 7.11.2026: "wieże się
+// odblokowują niezależnie od poziomu mozna isc w gore bez poziomu
+// odpowiedniego inaczej niż Portale").
 // Pure: the seed is the server's.
 
 import { combatantView, playerCombatant } from './combatant.js';
@@ -37,9 +38,9 @@ import { say, word } from './text.js';
 // level higher.
 export const towerLevel = (floor, content) => floor + content.towers.firstFloorLevel - 1;
 
-// The highest floor open to characters of these levels: the one of the
-// lowest level, 0 when it is below the first floor's.
-export const towerTop = (levels, content) => Math.max(0, Math.min(...levels) - content.towers.firstFloorLevel + 1);
+// The highest floor open in a tower: the one above the highest won there
+// (`best`), whatever the character's level.
+export const towerTop = (best) => Math.max(0, best ?? 0) + 1;
 
 // The inner region whose creatures live on floor `floor`.
 export function towerArea(floor, content) {

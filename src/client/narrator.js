@@ -567,7 +567,6 @@ const BEATS = {
     when: (hash, read) => towersTour(hash, read) && hash !== '#/walka' && !onTowers(hash) && !read.has('towers-entries'),
   },
   'towers-entries': { place: mark('towers-entries'), go: towersTrip, when: towersHere },
-  'towers-solo': { place: mark('tower-solo'), when: towersHere },
   'towers-floor': { place: mark('tower-solo-floor'), when: towersHere },
   'towers-party': { place: mark('tower-party'), when: towersHere },
   'towers-ending': { when: towersHere },

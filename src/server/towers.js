@@ -1,10 +1,10 @@
 // The Wieże Systemu (data/towers.json, src/engine/towers.js; DECISIONS.md,
 // "Wieże Systemu i Gildia"), from character level 50: the Wieża Solo and
 // the Wieża Drużyn. An entry is one fight on a floor the player picks, up
-// to the floor of the character's level, floor 1 being the 50th (in the
-// Wieża Drużyn of the lowest level of its Drużyna; towerTop), with its
-// report at once; the entries of a day are counted
-// together for both towers, from midnight in Poland. The climb does not
+// to the one above the highest it has won in that tower, whatever its
+// level (towerTop; floor 1 is of level 50), with its report at once; the
+// entries of a day are counted together for both towers, from midnight in
+// Poland. The climb does not
 // keep the character from anything (the author: "wspinaczka nie zajmuje
 // postaci"): it goes in also while it works in a profession, at full HP and
 // with no potions, and its HP stays as it was, unless a new level heals it.
@@ -93,25 +93,20 @@ const entriesUsed = (record, now) => (record.day === questPeriod('daily', now, c
 // players of its Drużyna as they are (within the class levels' spread, as
 // every party is: parties.js), and its companions in the places left (a
 // wounded one too: the tower takes nobody's HP); in the Wieża Solo nobody.
-// `top` is the highest floor open, `missing` why the tower is shut.
+// `top` is the highest floor open (one above the highest the character has
+// won in this tower), `missing` why the tower is shut.
 async function climbersFor(db, player, tower) {
   const row = player.row;
-  if (tower.members[1] === 1) return { partners: [], companions: [], top: towerTop([row.level], content()), missing: null };
+  const top = towerTop(recordOf(row).best[tower.id]);
+  if (tower.members[1] === 1) return { partners: [], companions: [], top, missing: null };
   const party = await partyOf(db, row.id);
   const others = party ? (await Promise.all(party.memberIds.filter((id) => id !== row.id).map((id) => loadCharacter(db, id)))).filter(Boolean) : [];
   const partners = others.slice(0, tower.members[1] - 1).map((other) => ({ id: other.row.id, name: other.row.name, level: other.row.level, character: engineCharacter(other.row), equipped: equippedItems(other) }));
   const places = Math.max(0, tower.size - 1 - partners.length);
   const hired = tower.companions ? (JSON.parse(row.settlement ?? '{}').companions ?? []).filter((companion) => companionReady(companion, true)) : [];
   const companions = hired.slice(0, places);
-  const top = towerTop([row.level, ...partners.map((partner) => partner.level)], content());
-  // Floor 1 is of the level the towers open at: with a player below it
-  // in the Drużyna no floor is open (0.2.11).
   const missing =
-    1 + partners.length < tower.members[0]
-      ? t('Do Wieży Drużyn wchodzi się z drużyną: co najmniej {count} postacie graczy. Drużynę założysz w Społeczności.', { count: tower.members[0] })
-      : top < 1
-        ? t('Wieża Drużyn otworzy się, gdy każda postać gracza w drużynie będzie miała co najmniej {level}. poziom.', { level: rules().firstFloorLevel })
-        : null;
+    1 + partners.length < tower.members[0] ? t('Do Wieży Drużyn wchodzi się z drużyną: co najmniej {count} postacie graczy. Drużynę założysz w Społeczności.', { count: tower.members[0] }) : null;
   return { partners, companions, top, missing };
 }
 
