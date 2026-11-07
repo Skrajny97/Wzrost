@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Sklep Play: konto deweloperskie czeka na dokumenty (7.11.2026)
+
+- Autor: „Potrzebuję weryfikacji dokumentu tożsamości i paru innych z tego co widzę, a mObywatel nie wchodzi w grę, więc jak uzyskam dostęp do dokumentów to zatwierdzę dopiero temat.” Założenie konta deweloperskiego Google Play czeka, aż autor będzie miał dokumenty. Do tego czasu kroki po stronie autora (konto, paczka, testerzy) stoją, a pytanie 727 dotyczy tego, co robić w międzyczasie.
+
 ## Wersja 0.2.5 (7.11.2026): Regulamin z miejscem na płatne Punkty Systemu
 
 - Autor: „W regulaminie napisałeś że gra jest bezpłatna, a mam zamiar dodać w niedalekiej przyszlosci możliwość zakupienia Punktów Systemu przecież.” Regulamin (`regulamin.html`, `terms.html`) nie mówi już, że w Grze nie ma płatności. Mówi, że korzystanie z Gry jest bezpłatne, że Twórca może wprowadzić płatne dodatki, na przykład zakup Punktów Systemu, i że ich ceny i zasady, w tym prawa kupującego, Regulamin opisze, zanim staną się dostępne. Waluty i przedmioty w Grze służą tylko do gry: nie można ich wymienić na pieniądze ani przenieść poza Grę.
