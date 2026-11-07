@@ -3048,7 +3048,7 @@ Autor: „Zmieniamy Błyskawiczne wyprawy na reset co 6 godzin, a Szybkie wypraw
 1. **Po 5 każdego rodzaju** (balance.json, quickHunt i flashHunt, count 5).
 2. **Reset tak jak dotąd Błyskawicznych:** gdy zużyje się wszystkie, wracają wszystkie naraz refillHours godzin po ostatnim. Szybkie po 12 godzinach, Błyskawiczne po 6 (wcześniej Szybkie 3 dziennie od północy, Błyskawiczne 3 co 12 godzin). Najprostsze: jedna zasada dla obu rodzajów, ta sama, którą gracze znają z Błyskawicznych. Licznik Szybkich z dnia (stary zapis) przy zmianie przepada, więc każdy ma od razu 5.
 3. Pod przyciskami: „Zostało: N z 5. Gdy zużyjesz wszystkie, wrócą po 12 (6) godzinach.”, a po zużyciu „Wrócą {kiedy}”.
-4. **Kwestia narratora** o Szybkim Polowaniu (community-ending) kończyła się „– trzy razy dziennie”. Ten kawałek wycięty z tekstu i z obu nagrań (PL i EN), zostaje „Czeka w Walce, pod „Wyrusz”.”. Autor sprawdza przycięte nagrania na słuch.
+4. **Kwestia narratora** o Szybkim Polowaniu (community-ending) kończyła się „– trzy razy dziennie”. Ten kawałek wycięty z tekstu i z obu nagrań (PL i EN), zostaje „Czeka w Walce, pod „Wyrusz”.”. Autor sprawdził przycięte nagrania na słuch: „752 A” (zostają).
 
 ## Wersja 0.2.19 (7.11.2026): w Wieżach bez wyboru piętra
 
