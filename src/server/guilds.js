@@ -70,6 +70,10 @@ export async function guildOf(db, characterId) {
 // `champion`: whether the guild was the best of last week (380 C).
 export async function guildView(db, characterId, now) {
   const guild = await guildOf(db, characterId);
+  // A character in a guild has no invitations: any left from before go
+  // (the author, 7.11.2026: "Niech zaproszenia do gildii nie wyswietlaja
+  // sie osobom które już w jakiejś są").
+  if (guild) await db.prepare('DELETE FROM guild_invites WHERE character_id = ?').bind(characterId).run();
   const inviting = guild !== null && guild.role !== 'member';
   const [members, sent, invites, friends, best] = await db.batch([
     db
@@ -423,8 +427,11 @@ export async function handGuildLead(context) {
 }
 
 // The invitations to guilds waiting for a character, for the light on the
-// Społeczność tab (chat.js).
+// Społeczność tab (chat.js); none for a character in a guild.
 export async function guildNews(db, characterId) {
-  const row = await db.prepare('SELECT COUNT(*) AS count FROM guild_invites WHERE character_id = ?').bind(characterId).first();
+  const row = await db
+    .prepare('SELECT COUNT(*) AS count FROM guild_invites WHERE character_id = ? AND NOT EXISTS (SELECT 1 FROM guild_members m WHERE m.character_id = ?)')
+    .bind(characterId, characterId)
+    .first();
   return row.count;
 }

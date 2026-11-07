@@ -312,6 +312,10 @@
     "0.2.21": {
       "title": "Version 0.2.21",
       "body": "- Players online counter: a tab at the right edge of the screen. Tap the green dot and the number of players in the game slides out."
+    },
+    "0.2.22": {
+      "title": "Version 0.2.22",
+      "body": "- Guilds: a character already in a guild no longer sees invitations to other guilds, and cannot be invited."
     }
   }
 }

@@ -395,6 +395,11 @@
       "id": "0.2.21",
       "title": "Wersja 0.2.21",
       "body": "- Licznik graczy online: zakładka przy prawej krawędzi ekranu. Stuknij zieloną kropkę, a wysunie się liczba graczy w grze."
+    },
+    {
+      "id": "0.2.22",
+      "title": "Wersja 0.2.22",
+      "body": "- Gildie: kto jest już w gildii, nie widzi zaproszeń do innych gildii, a zaprosić go nie można."
     }
 ]
 }

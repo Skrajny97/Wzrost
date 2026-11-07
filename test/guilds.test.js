@@ -51,6 +51,21 @@ describe('the Gildia through the API', () => {
     assert.equal((await as('trzeci', 'POST', '/api/guild/found', { name: 'Inni', tag: 'Lb' })).data.error.code, 'tag_taken');
   });
 
+  test('a character in a guild cannot be invited, and sees no invitations left from before (0.2.22)', async () => {
+    await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' });
+    await player('trzeci', 'Trzeci');
+    await as('trzeci', 'POST', '/api/guild/found', { name: 'Inni', tag: 'IN' });
+    const refused = await as('mistrz', 'POST', '/api/guild/invite', { name: 'Trzeci' });
+    assert.equal(refused.data.error.code, 'in_guild');
+    assert.equal(refused.data.error.message, 'Trzeci jest już w gildii.');
+    // An invitation from before, as one left by an older version.
+    const guildId = (await as('mistrz', 'GET', '/api/guild')).data.guild.id;
+    await (await db()).prepare('INSERT INTO guild_invites (guild_id, character_id, invited_by, created_at) VALUES (?, ?, ?, ?)').bind(guildId, await idOf('Trzeci'), await idOf('Mistrz'), Date.now()).run();
+    assert.equal((await as('trzeci', 'GET', '/api/chat/latest')).data.guildInvites, 0);
+    assert.deepEqual((await as('trzeci', 'GET', '/api/guild')).data.invites, []);
+    assert.equal(await count('guild_invites'), 0);
+  });
+
   test('the leader and the deputies invite; a member joins, a deputy removes only members, a leader who leaves passes the lead', async () => {
     await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' });
     const invited = await as('mistrz', 'POST', '/api/guild/invite', { name: 'druh' });

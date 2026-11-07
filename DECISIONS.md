@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.22 (7.11.2026): bez zaproszeń do gildii dla członków gildii
+
+Autor: „Niech zaproszenia do gildii nie wyswietlaja sie osobom które już w jakiejś są albo niech nie mozna bedzie zaprosic takich osob - to lepiej.”
+
+1. **Zaprosić członka gildii nie można** i tak było już wcześniej: serwer odpowiada „{imię} jest już w gildii.”, karta postaci nie pokazuje wtedy „Zaproś do gildii”, a lista znajomych do zaproszenia pomija członków gildii.
+2. **Członek gildii nie widzi zaproszeń.** Karta „Zaproszenia do gildii” pokazywała się nad gildią, gdy zostały stare zaproszenia z czasu, zanim postać weszła do gildii. Teraz zaproszenia członka gildii znikają przy otwarciu Gildii, a światło na zakładce Społeczność ich nie liczy. Migracja 0100 usuwa wszystkie takie stare zaproszenia.
+
 ## Wersja 0.2.21 (7.11.2026): licznik graczy online
 
 Autor: „Do tego dodajemy Licznik graczy online. Wysuwana zakładka z boku ekranu tylko z ilością graczy.”
