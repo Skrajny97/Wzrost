@@ -973,7 +973,12 @@
       "shop-system": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Punkty Systemu wydasz w Sklepie Systemu. Kupisz w nim ozdoby, które zmieniają wygląd."},
       "hard-hunt": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Od dziesiątego poziomu możesz zaznaczyć Trudną wyprawę. Stwory są wtedy silniejsze, ale dają więcej doświadczenia i złota."},
       "account-chest": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Ta skrzynia jest wspólna dla wszystkich postaci na Twoim koncie. Przedmiot włożony przez jedną postać wyjmie inna."},
-      "system-collector": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Obok czuwa Zbieracz Systemu. Za złoto, raz na zawsze, sam zbierze zasoby z pełnych magazynów."}
+      "system-collector": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Obok czuwa Zbieracz Systemu. Za złoto, raz na zawsze, sam zbierze zasoby z pełnych magazynów."},
+      "portals-welcome": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Piąty poziom postaci… System otworzył przed Tobą Portale."},
+      "portals-lead": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Portale czekają w zakładce Walka. Zajrzyjmy tam."},
+      "portals-lands": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "W każdym Portalu przeniesiesz się do innej krainy, która da Ci odpowiednie surowce."},
+      "portals-stages": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Stopnie możesz pokonywać wedle własnego uznania… i możliwości. Najwyżej jednak dojdziesz do swojego poziomu postaci."},
+      "portals-sweep": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Możesz czyścić również pokonany wcześniej stopień bez walki – pięć razy dziennie, zgarniając niezbędne zasoby."}
     },
     "allLines": {
       "voice": "Narrator",
@@ -1024,7 +1029,13 @@
       },
       "ending": " The fire crackles softly. [pauses]"
     },
-    "prompts": {}
+    "prompts": {
+      "portals-welcome": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "Your character's fifth level… The System has opened the Portals to you."},
+      "portals-lead": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "The Portals wait in the Combat tab. Let us look in there."},
+      "portals-lands": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "Each Portal takes you to a different land, one that will give you the resources you need."},
+      "portals-stages": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "You may take on the stages as you see fit… and as far as you can. But you will go no higher than your character's level."},
+      "portals-sweep": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "You can also clear a stage you have already beaten, without a fight – five times a day, gathering the resources you need."}
+    }
   },
   "narrationEnVoices": {
     "$comment": "The English narrator's voice anew (the author, 6.11.2026: the Polish narrator read English with a Polish accent, \"wszystko out\"): candidates reading the same words, the first card and the next one, for the author to pick on a listening page (718). design-*: voices designed from a description of an old storyteller by the fire, as the Polish one (three previews each); the others: ElevenLabs' own English voices.",
