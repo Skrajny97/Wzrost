@@ -288,6 +288,10 @@
     "0.2.15": {
       "title": "Version 0.2.15",
       "body": "- Gift code 1111, on November 11 only: 11 System Points, 111 Time Points and 1111 gold. Enter it in the Settings, under \"Gift code\". It works from midnight to midnight, Polish time."
+    },
+    "0.2.16": {
+      "title": "Version 0.2.16",
+      "body": "- Salvage Table: on the Parts tab the descriptions fit their frames again, and the piece counts no longer cover the text."
     }
   }
 }

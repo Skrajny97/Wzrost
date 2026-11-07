@@ -365,6 +365,11 @@
       "id": "0.2.15",
       "title": "Wersja 0.2.15",
       "body": "- Kod podarunkowy 1111 tylko 11 listopada: 11 Punktów Systemu, 111 Punktów Czasu i 1111 złota. Wpisz go w Ustawieniach, w „Kod podarunkowy”. Działa od północy do północy czasu polskiego."
+    },
+    {
+      "id": "0.2.16",
+      "title": "Wersja 0.2.16",
+      "body": "- Stół rozbiórki: w zakładce Części opisy znów mieszczą się w ramkach, a liczby sztuk nie nachodzą na tekst."
     }
 ]
 }

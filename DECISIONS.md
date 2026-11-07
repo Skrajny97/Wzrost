@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.16 (7.11.2026): opisy części na Stole rozbiórki
+
+Zrzut z iPhone'a od gracza (przez autora): w zakładce Części Stołu rozbiórki opisy łamały się po jednym słowie w linii, a liczby sztuk nachodziły na tekst. Przyczyna: reguła z 0.1.94, która stawia licznik sztuk pod zaznaczonym materiałem na całą szerokość wiersza, działała też na liczbę części, bo obie mają tę samą klasę. Błąd był na każdym telefonie i komputerze, nie tylko na iPhonie. Teraz reguła dotyczy tylko wierszy zakładki Materiały, a liczba części stoi na końcu wiersza.
+
 ## Wersja 0.2.15 (7.11.2026): kod podarunkowy „1111” na 11 listopada
 
 Autor: „A na 11.11 tylko w ten dzień przygotuj kod 1111 -> dający 11 Punktów Systemu, 111 Punktów Czasu i 1111 złota”.
