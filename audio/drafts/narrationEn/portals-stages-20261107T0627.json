@@ -1,0 +1,17 @@
+{
+  "id": "portals-stages",
+  "payload": {
+    "text": "You may take on the stages as you see fit… and as far as you can. But you will go no higher than your character's level. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 1
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/portals-stages-20261107T0627-0.mp3",
+    "audio/drafts/narrationEn/portals-stages-20261107T0627-1.mp3"
+  ],
+  "credits": 310
+}

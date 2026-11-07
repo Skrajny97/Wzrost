@@ -1,0 +1,17 @@
+{
+  "id": "portals-sweep",
+  "payload": {
+    "text": "You can also clear a stage you have already beaten, without a fight – five times a day, gathering the resources you need. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 1
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/portals-sweep-20261107T0627-0.mp3",
+    "audio/drafts/narrationEn/portals-sweep-20261107T0627-1.mp3"
+  ],
+  "credits": 312
+}
