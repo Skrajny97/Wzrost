@@ -1,0 +1,17 @@
+{
+  "id": "portals-stages",
+  "payload": {
+    "text": "Stopnie możesz pokonywać wedle własnego uznania… i możliwości. Najwyżej jednak dojdziesz do swojego poziomu postaci. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/portals-stages-20261107T0626-0.mp3",
+    "audio/drafts/narration/portals-stages-20261107T0626-1.mp3"
+  ],
+  "credits": 250
+}

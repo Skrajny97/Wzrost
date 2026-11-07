@@ -1,0 +1,17 @@
+{
+  "id": "portals-welcome",
+  "payload": {
+    "text": "Piąty poziom postaci… System otworzył przed Tobą Portale. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/portals-welcome-20261107T0626-0.mp3",
+    "audio/drafts/narration/portals-welcome-20261107T0626-1.mp3"
+  ],
+  "credits": 132
+}

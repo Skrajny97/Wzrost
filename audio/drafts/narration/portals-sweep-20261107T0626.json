@@ -1,0 +1,17 @@
+{
+  "id": "portals-sweep",
+  "payload": {
+    "text": "Możesz czyścić również pokonany wcześniej stopień bez walki – pięć razy dziennie, zgarniając niezbędne zasoby. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/portals-sweep-20261107T0626-0.mp3",
+    "audio/drafts/narration/portals-sweep-20261107T0626-1.mp3"
+  ],
+  "credits": 238
+}
