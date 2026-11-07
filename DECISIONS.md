@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.18 (7.11.2026): Wieża Drużyn tak trudna jak Wieża Solo
+
+Autor: „Fajnie ze poprawiles wieże solo, ale drużynowych chyba nie ruszałeś bo dalej są banalnie łatwe”. Obie wieże miały te same stwory ×3, ale w Wieży Drużyn biją je dwie albo trzy postacie naraz. W symulacji tercet graczy doszedł mniej więcej 2,5 raza wyżej niż gracz solo na tym samym poziomie (poziom 60: piętra 47–57 wobec 12–22; poziom 100: 128–144 wobec 57–92).
+
+1. **Wzmocnienie Systemu razy liczba walczących.** Wzmocnienie stworów (towers.json, strength, ×3 obrażeń i HP) mnoży się jeszcze przez liczbę walczących po stronie postaci, licząc graczy i towarzyszy: w Wieży Solo ×1, w Wieży Drużyn ×2 albo ×3. Tercet ma więc stwory ×9. W symulacji tercet dochodzi wtedy mniej więcej tak wysoko jak gracz solo albo trochę niżej, bo w Wieży Drużyn stwory mają też cały wzrost późnej gry. Najprostsza zasada: każdy walczący dokłada tyle siły, ile ma stwór w Wieży Solo przeciw jednej postaci. Ekran Wież mówi o tym jednym zdaniem.
+2. **Postęp w Wieży Drużyn od nowa** (migracja 0099), jak przy 0.2.11 („wyzeruj też wszystkim co odblokowali Wieże je, nie zabieraj nagród”): zdobyte piętra, skrzynie i trofea czempionów tej wieży. Postęp w Wieży Solo i dzisiejsze wejścia zostają, a zdobyte nagrody zostają przy postaciach.
+
 ## Wersja 0.2.17 (7.11.2026): bazyliszek bez głowy koguta
 
 Autor (7.11.2026, zrzut walki): „Bazyliszek ma twarz koguta.. … to koniecznie do poprawy”. Stary opis grafiki kazał narysować węża z głową i grzebieniem koguta, jak w polskiej legendzie. Nowy opis w art/prompts.json: wielki zwinięty wąż o płaskiej gadziej głowie w koronie z kościanych kolców, bez piór, dzioba i grzebienia. PixelLab narysował 50 wersji, autorowi pokazane cztery (749.1–749.4). Autor: „749.1 wstaw”.

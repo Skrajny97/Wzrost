@@ -93,7 +93,7 @@ export function mountTowers(container, { navigate }) {
         howItWorks(
           t('Wejście to jedna walka na wybranym piętrze, z wynikiem od razu.'),
           t(
-            'Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro 1 ma poziom {first}, a każde następne o jeden więcej. Każde zdobyte piętro otwiera kolejne, bez względu na poziom postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, a System je wzmacnia: obrażenia ×{damage}, HP ×{hp}. {elites} Na zwykłych piętrach czasem czeka elita. Co {championEvery}. piętro czeka czempion, a co {chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.',
+            'Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro 1 ma poziom {first}, a każde następne o jeden więcej. Każde zdobyte piętro otwiera kolejne, bez względu na poziom postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, a System je wzmacnia: obrażenia ×{damage}, HP ×{hp}. W Wieży Drużyn to wzmocnienie mnoży się jeszcze przez liczbę walczących po stronie drużyny. {elites} Na zwykłych piętrach czasem czeka elita. Co {championEvery}. piętro czeka czempion, a co {chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.',
             {
               first: view.firstFloorLevel,
               damage: formatDecimal(view.strength[0]),

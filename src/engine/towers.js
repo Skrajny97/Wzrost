@@ -164,8 +164,14 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   // Alone on a floor (the Wieża Solo), the monsters have only a share of the
   // late and end game's growth, as no companion helps (the author: 438.3 A).
   const alone = partners.length === 0 && companions.length === 0;
-  // The System's strength on top, in both towers (744).
-  const enemies = encounterCombatants(plan.encounter, content, { growth: alone ? content.balance.monsters.soloGrowth : 1, strength: content.towers.strength });
+  // The System's strength on top, in both towers (744), as many times over
+  // as there are fighters on the character's side: in the Wieża Drużyn three
+  // players or companions face creatures three times as strong as the Wieża
+  // Solo's (the author, 7.11.2026: "drużynowych chyba nie ruszałeś bo dalej
+  // są banalnie łatwe").
+  const [damage, hp] = content.towers.strength;
+  const strength = [damage * allies.length, hp * allies.length];
+  const enemies = encounterCombatants(plan.encounter, content, { growth: alone ? content.balance.monsters.soloGrowth : 1, strength });
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
   const won = fight.won === true;
   const hpAfter = Math.max(0, fight.units.find((unit) => unit.id === player.id).hp);

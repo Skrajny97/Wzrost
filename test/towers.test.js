@@ -34,6 +34,7 @@ import {
   towerMaterials,
   towerTop,
 } from '../src/engine/index.js';
+import { encounterCombatants } from '../src/engine/hunt.js';
 import { makeClimber, strongClimber } from './helpers/climb.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -60,6 +61,16 @@ describe('the Wieże Systemu', () => {
     const climber = newCharacter('warrior', { level: 60, classLevel: 50 });
     const hp = (rules) => towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: 3, seed: 'moc' }, rules).fights[0].enemiesView[0].maxHp;
     assert.ok(Math.abs(hp(content) / hp(plain) - 3) < 0.03, `${hp(content)} vs ${hp(plain)}`);
+  });
+
+  test('in the Wieża Drużyn the System\'s strength goes as many times over as there are fighters on the party\'s side (0.2.18)', () => {
+    const fighter = (classId) => ({ character: newCharacter(classId, { level: 60, classLevel: 50 }), equipped: [], name: classId });
+    const climber = newCharacter('warrior', { level: 60, classLevel: 50 });
+    const enemy = (partners) => towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: 3, seed: 'moc', partners }, content).fights[0].enemiesView[0].maxHp;
+    const [damage, hp] = content.towers.strength;
+    const expected = (fighters) => encounterCombatants(towerFloor(3, 'moc', content).encounter, content, { strength: [damage * fighters, hp * fighters] })[0].maxHp;
+    assert.equal(enemy([fighter('cleric')]), expected(2));
+    assert.equal(enemy([fighter('cleric'), fighter('mage')]), expected(3));
   });
 
   test('a floor holds one inner region\'s creatures at its level, the regions in turn from the first', () => {
@@ -156,9 +167,11 @@ describe('an entry\'s fight', () => {
   test('alone on a floor the monsters have half the late growth, with a partner all of it; up to 50 the same (438.3 A)', () => {
     const climber = newCharacter('warrior', { level: 110, classLevel: 100 });
     const partner = { character: newCharacter('mage', { level: 110, classLevel: 100 }), equipped: [], name: 'Druh' };
-    const hp = (floor, partners) => towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor, seed: 'g', partners }, content).fights[0].enemiesView[0].maxHp;
+    // Per fighter on the character's side, as the System's strength goes
+    // as many times over as there are fighters (0.2.18).
+    const hp = (floor, partners) => towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor, seed: 'g', partners }, content).fights[0].enemiesView[0].maxHp / (1 + partners.length);
     // Floor 1 is of level 50; floors 51 and 91 of 100 and 140.
-    assert.equal(hp(1, []), hp(1, [partner]));
+    assert.ok(Math.abs(hp(1, []) - hp(1, [partner])) <= 1, `${hp(1, [])} vs ${hp(1, [partner])}`);
     for (const floor of [51, 91]) assert.ok(hp(floor, []) < hp(floor, [partner]) * 0.8, `${floor}: ${hp(floor, [])} vs ${hp(floor, [partner])}`);
   });
 
