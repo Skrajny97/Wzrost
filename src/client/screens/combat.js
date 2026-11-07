@@ -1125,8 +1125,10 @@ export function mountCombat(container, { params, navigate }) {
     return { element, along: () => (partyTicked && free.length > 0 && !element.hidden ? free : null) };
   }
 
-  // "Szybkie Polowanie" under "Wyrusz", with how many are left today.
-  function quickHuntBox({ left, perDay, minutes, flash }, choices) {
+  // "Szybkie Polowanie" and "Błyskawiczne polowanie" under "Wyrusz", each
+  // with how many are left and when they come back once all are used.
+  function quickHuntBox(quick, choices) {
+    const { flash } = quick;
     const start = (label, kind, none) =>
       h('button', {
         type: 'button',
@@ -1144,30 +1146,25 @@ export function mountCombat(container, { params, navigate }) {
     return h(
       'div',
       { class: 'quick-hunt', 'data-guide': 'quick-hunt' },
-      start(t('Szybkie Polowanie'), null, left === 0),
-      h('p', {
-        class: 'muted',
-        text:
-          left > 0
-            ? t('Wyprawa jak na {time}, z raportem od razu. Zostało dziś: {left} z {all}.', { time: formatMinutes(minutes), left, all: perDay })
-            : t('Szybkie Polowania na dziś się skończyły. Nowe od północy.'),
-      }),
-      // A second button (the author): shorter ones, back 12 hours after
-      // the last.
+      start(t('Szybkie Polowanie'), null, quick.left === 0),
+      h('p', { class: 'muted', text: leftText(quick, t('Szybkie Polowania się skończyły. Wrócą {when}.', { when: quick.backAt && dateTimeFormat.format(new Date(quick.backAt)) })) }),
+      // A second button (the author): shorter ones, back sooner.
       flash && start(t('Błyskawiczne polowanie'), 'flash', flash.left === 0),
-      flash &&
-        h('p', {
-          class: 'muted',
-          text:
-            flash.left > 0
-              ? t('Wyprawa jak na {time}, z raportem od razu. Zostało: {left} z {all}. Gdy zużyjesz wszystkie, wrócą po 12 godzinach.', {
-                  time: formatMinutes(flash.minutes),
-                  left: flash.left,
-                  all: flash.count,
-                })
-              : t('Błyskawiczne polowania się skończyły. Wrócą {when}.', { when: dateTimeFormat.format(new Date(flash.backAt)) }),
-        }),
+      flash && h('p', { class: 'muted', text: leftText(flash, t('Błyskawiczne polowania się skończyły. Wrócą {when}.', { when: flash.backAt && dateTimeFormat.format(new Date(flash.backAt)) })) }),
     );
+  }
+
+  // How many of a kind are left and when they come back, or `none` once
+  // all are used.
+  function leftText(kind, none) {
+    return kind.left > 0
+      ? t('Wyprawa jak na {time}, z raportem od razu. Zostało: {left} z {all}. Gdy zużyjesz wszystkie, wrócą po {hours} godzinach.', {
+          time: formatMinutes(kind.minutes),
+          left: kind.left,
+          all: kind.count,
+          hours: kind.refillHours,
+        })
+      : none;
   }
 
   // "Opcje wyprawy" as a tab that unfolds (the author: "niech staną się

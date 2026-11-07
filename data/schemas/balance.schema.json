@@ -1259,12 +1259,13 @@
     },
     "quickHunt": {
       "type": "object",
-      "description": "Szybkie Polowanie: od poziomu postaci z wpisu quick-hunts w unlocks.json, perDay razy na dzień (w Polsce, od północy), wyprawa jak na minutes minut w wybranym regionie wewnętrznym, z raportem od razu.",
+      "description": "Szybkie Polowanie: od poziomu postaci z wpisu quick-hunts w unlocks.json, count wypraw jak na minutes minut w wybranym regionie wewnętrznym, z raportem od razu. Gdy zużyje się wszystkie, wracają refillHours godzin po ostatniej (autor 7.11.2026: 5 co 12 godzin; wcześniej 3 dziennie, od północy).",
       "additionalProperties": false,
-      "required": ["perDay", "minutes"],
+      "required": ["count", "minutes", "refillHours"],
       "properties": {
-        "perDay": { "type": "integer", "minimum": 1 },
-        "minutes": { "type": "integer", "minimum": 1 }
+        "count": { "type": "integer", "minimum": 1 },
+        "minutes": { "type": "integer", "minimum": 1 },
+        "refillHours": { "type": "number", "exclusiveMinimum": 0 }
       }
     },
     "flashHunt": {

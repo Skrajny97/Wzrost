@@ -196,13 +196,14 @@
     "chestSlots": 5
   },
   "quickHunt": {
-    "perDay": 3,
-    "minutes": 15
+    "count": 5,
+    "minutes": 15,
+    "refillHours": 12
   },
   "flashHunt": {
-    "count": 3,
+    "count": 5,
     "minutes": 10,
-    "refillHours": 12
+    "refillHours": 6
   },
   "parties": { "size": 3, "xpCost": 0.045, "classSpread": 5 },
   "journal": { "reports": 50, "towerReports": 50, "portalReports": 40 },

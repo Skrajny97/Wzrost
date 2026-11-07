@@ -40,7 +40,7 @@ function character({ read = intro, level = 20, features = ['community'], away = 
     tutorial: [...read],
     features,
     skills: { pools: [] },
-    quickHunts: { left: 3, perDay: 3 },
+    quickHunts: { left: 5, count: 5 },
     professions: { workshop: {}, avatar: { owned: false, activity: null } },
     settlementOpen: level >= 20,
     camp: { construction: null, buildings: [{ id: 'campfire', level: 1 }] },

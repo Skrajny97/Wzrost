@@ -304,6 +304,10 @@
     "0.2.19": {
       "title": "Version 0.2.19",
       "body": "- Towers: no more choosing a floor. The character always enters the first floor not yet won: a win leads up, and after a loss the same floor waits."
+    },
+    "0.2.20": {
+      "title": "Version 0.2.20",
+      "body": "- Quick Hunts: 5 instead of 3, and once you use them all, they come back after 12 hours.\n- Lightning Hunts: 5 instead of 3, and once you use them all, they come back after 6 hours."
     }
   }
 }

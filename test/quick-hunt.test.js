@@ -1,6 +1,6 @@
-// Szybkie Polowanie: from level 5, three a day in Poland, an exploration of
-// 15 minutes in the inner region chosen that comes back with its report at
-// once.
+// Szybkie Polowanie: from level 5, five of them, back 12 hours after the
+// last (0.2.20), an exploration of 15 minutes in the inner region chosen
+// that comes back with its report at once.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -28,11 +28,14 @@ describe('Szybkie Polowanie', () => {
     assert.equal((await quick()).data.error.code, 'locked');
     await set('level = 5, xp = 0');
     const flash = content.balance.flashHunt;
+    assert.deepEqual([rules.count, rules.refillHours, flash.count, flash.refillHours], [5, 12, 5, 6]);
     assert.deepEqual((await character()).quickHunts, {
-      left: 3,
-      perDay: 3,
+      left: 5,
+      backAt: null,
+      count: 5,
       minutes: rules.minutes,
-      flash: { left: flash.count, backAt: null, count: flash.count, minutes: flash.minutes },
+      refillHours: 12,
+      flash: { left: flash.count, backAt: null, count: flash.count, minutes: flash.minutes, refillHours: 6 },
     });
     const done = await quick();
     assert.equal(done.status, 200);
@@ -41,25 +44,36 @@ describe('Szybkie Polowanie', () => {
     assert.equal(report.minutes, rules.minutes);
     assert.equal(report.areaName, 'Skraj Wiatrołomów');
     assert.equal(after.activity, null);
-    assert.equal(after.quickHunts.left, 2);
+    assert.equal(after.quickHunts.left, 4);
     const { data } = await call('GET', '/api/reports', { cookie });
     assert.equal(data.reports[0].id, report.id);
   });
 
-  test('three a day: the fourth waits for the next day in Poland', async () => {
+  test('five of them, back 12 hours after the last (0.2.20); the count by the day before starts anew', async () => {
     await set('level = 5');
-    for (let index = 0; index < rules.perDay; index++) {
+    // A count by the day, as before 0.2.20, does not take any away.
+    const day = new Intl.DateTimeFormat('en-CA', { timeZone: content.quests.timeZone }).format(new Date());
+    await set(`quick_hunts = '{"day":"${day}","used":3}'`);
+    assert.equal((await character()).quickHunts.left, rules.count);
+    for (let index = 0; index < rules.count; index++) {
       await set('hp = 999');
       assert.equal((await quick()).status, 200);
     }
     const none = await quick();
     assert.equal(none.data.error.code, 'no_quick_hunts');
-    assert.equal((await character()).quickHunts.left, 0);
-    await set(`quick_hunts = '{"day":"2000-01-01","used":3}'`);
-    assert.equal((await character()).quickHunts.left, 3);
+    assert.equal(none.data.error.message, 'Szybkie Polowania się skończyły. Wrócą 12 godzin po ostatnim.');
+    const view = (await character()).quickHunts;
+    assert.equal(view.left, 0);
+    assert.ok(Math.abs(view.backAt - (Date.now() + rules.refillHours * 3600000)) < 60000, `${view.backAt}`);
+    const database = await db();
+    const stored = JSON.parse(await database.prepare('SELECT quick_hunts FROM characters').first('quick_hunts'));
+    assert.equal(stored.day, undefined);
+    stored.quick.at -= rules.refillHours * 3600000;
+    await database.prepare('UPDATE characters SET quick_hunts = ?').bind(JSON.stringify(stored)).run();
+    assert.equal((await character()).quickHunts.left, rules.count);
   });
 
-  test('Błyskawiczne polowanie: three of 10 minutes beside the Szybkie Polowania, back 12 hours after the last', async () => {
+  test('Błyskawiczne polowanie: five of 10 minutes beside the Szybkie Polowania, back 6 hours after the last (0.2.20)', async () => {
     const flash = content.balance.flashHunt;
     const lightning = () => quick({ areaId: 'windfalls-edge', kind: 'flash' });
     await set('level = 5');
@@ -76,16 +90,16 @@ describe('Szybkie Polowanie', () => {
     assert.equal(view.flash.left, 0);
     assert.ok(Math.abs(view.flash.backAt - (Date.now() + flash.refillHours * 3600000)) < 60000, `${view.flash.backAt}`);
     // The Szybkie Polowania are all there still, and leave these as they are.
-    assert.equal(view.left, rules.perDay);
+    assert.equal(view.left, rules.count);
     await set('hp = 999');
     assert.equal((await quick()).status, 200);
-    assert.deepEqual([(await character()).quickHunts.left, (await character()).quickHunts.flash.left], [rules.perDay - 1, 0]);
-    // 12 hours after the last one, all three come back.
+    assert.deepEqual([(await character()).quickHunts.left, (await character()).quickHunts.flash.left], [rules.count - 1, 0]);
+    // 6 hours after the last one, all five come back.
     const database = await db();
     const stored = JSON.parse(await database.prepare('SELECT quick_hunts FROM characters').first('quick_hunts'));
     stored.flash.at -= flash.refillHours * 3600000;
     await database.prepare('UPDATE characters SET quick_hunts = ?').bind(JSON.stringify(stored)).run();
-    assert.deepEqual((await character()).quickHunts.flash, { left: flash.count, backAt: null, count: flash.count, minutes: flash.minutes });
+    assert.deepEqual((await character()).quickHunts.flash, { left: flash.count, backAt: null, count: flash.count, minutes: flash.minutes, refillHours: flash.refillHours });
     await set('hp = 999');
     assert.equal((await lightning()).status, 200);
     assert.equal((await character()).quickHunts.flash.left, flash.count - 1);
@@ -99,6 +113,6 @@ describe('Szybkie Polowanie', () => {
     await call('POST', '/api/hunts/cancel', { cookie });
     const done = await quick({ areaId: 'windfalls-edge', potions: { 'lesser-healing': 9 }, healBelow: 0.4 });
     assert.equal(done.status, 200);
-    assert.equal((await character()).quickHunts.left, 2);
+    assert.equal((await character()).quickHunts.left, rules.count - 1);
   });
 });

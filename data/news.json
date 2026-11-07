@@ -385,6 +385,11 @@
       "id": "0.2.19",
       "title": "Wersja 0.2.19",
       "body": "- Wieże: bez wyboru piętra. Postać wchodzi zawsze na pierwsze niezdobyte piętro: wygrana prowadzi wyżej, a po przegranej czeka to samo piętro."
+    },
+    {
+      "id": "0.2.20",
+      "title": "Wersja 0.2.20",
+      "body": "- Szybkie Polowania: 5 zamiast 3, a gdy zużyjesz wszystkie, wracają po 12 godzinach.\n- Błyskawiczne polowania: 5 zamiast 3, a gdy zużyjesz wszystkie, wracają po 6 godzinach."
     }
 ]
 }

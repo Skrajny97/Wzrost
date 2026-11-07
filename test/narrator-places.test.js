@@ -93,7 +93,7 @@ function character({ read = pastAll, level = 20, features = ['community'], ...mo
     tutorial: [...read],
     features,
     skills: { pools: [] },
-    quickHunts: { left: 3, perDay: 3 },
+    quickHunts: { left: 5, count: 5 },
     professions: null,
     settlementOpen: level >= 20,
     hardHunt: level >= 10 ? { damage: 1.5, hp: 1.5, xp: 0.5, gold: 0.5 } : null,

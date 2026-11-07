@@ -3034,6 +3034,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.20 (7.11.2026): Szybkie i Błyskawiczne polowania po 5, wracają po 12 i 6 godzinach
+
+Autor: „Zmieniamy Błyskawiczne wyprawy na reset co 6 godzin, a Szybkie wyprawy na reset co 12 godzin”, „Zwiększamy również ilość obydwóch do 5, w związku ze wzrostem trudności”.
+
+1. **Po 5 każdego rodzaju** (balance.json, quickHunt i flashHunt, count 5).
+2. **Reset tak jak dotąd Błyskawicznych:** gdy zużyje się wszystkie, wracają wszystkie naraz refillHours godzin po ostatnim. Szybkie po 12 godzinach, Błyskawiczne po 6 (wcześniej Szybkie 3 dziennie od północy, Błyskawiczne 3 co 12 godzin). Najprostsze: jedna zasada dla obu rodzajów, ta sama, którą gracze znają z Błyskawicznych. Licznik Szybkich z dnia (stary zapis) przy zmianie przepada, więc każdy ma od razu 5.
+3. Pod przyciskami: „Zostało: N z 5. Gdy zużyjesz wszystkie, wrócą po 12 (6) godzinach.”, a po zużyciu „Wrócą {kiedy}”.
+4. **Kwestia narratora** o Szybkim Polowaniu (community-ending) kończyła się „– trzy razy dziennie”. Ten kawałek wycięty z tekstu i z obu nagrań (PL i EN), zostaje „Czeka w Walce, pod „Wyrusz”.”. Autor sprawdza przycięte nagrania na słuch.
+
 ## Wersja 0.2.19 (7.11.2026): w Wieżach bez wyboru piętra
 
 Autor: „i suwak miałeś wyjebać - stopień po prostu masz konkretny i nie mozesz zejsc nizej ani wyżej”.

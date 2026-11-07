@@ -50,7 +50,6 @@ import {
   optionLock,
   potionsPerKind,
   questCreatures,
-  questPeriod,
   rareCatchUp,
   rumorFactor,
   rumorToday,
@@ -77,10 +76,9 @@ import {
   earlyAreaOf,
   engineCharacter,
   equippedItems,
-  flashHuntsLeft,
+  huntsLeft,
   loadPlayer,
   questsNow,
-  quickHuntsUsed,
   blessingAfter,
   blessingOf,
   requireIdle,
@@ -261,12 +259,12 @@ export async function huntOptions(context) {
 }
 
 // Szybkie Polowanie: from the level of its unlock (quick-hunts in
-// data/unlocks.json), `perDay` times a day in Poland, an exploration of `minutes` in the inner region chosen,
-// with the same choices as "Wyrusz", that ends as it starts, so its report
-// comes with the answer (DECISIONS.md, "Szybkie Polowanie"). Asked with
-// `kind` "flash", it is a Błyskawiczne polowanie instead: a shorter one,
-// `count` of them, back `refillHours` after the last (data/balance.json,
-// flashHunt).
+// data/unlocks.json), `count` of them, back `refillHours` after the last
+// (data/balance.json, quickHunt), an exploration of `minutes` in the inner
+// region chosen, with the same choices as "Wyrusz", that ends as it starts,
+// so its report comes with the answer (DECISIONS.md, "Szybkie Polowanie").
+// Asked with `kind` "flash", it is a Błyskawiczne polowanie instead: a
+// shorter one, counted the same way (flashHunt).
 export async function quickHunt(context) {
   const { session, player } = await requireIdlePlayer(context);
   if (!isUnlocked('quick-hunts', player.row.level, content())) {
@@ -275,22 +273,17 @@ export async function quickHunt(context) {
   const now = context.now;
   const body = await readJson(context.request);
   const flash = body.kind === 'flash';
-  const stored = JSON.parse(player.row.quick_hunts ?? 'null') ?? {};
-  let minutes;
-  let next;
-  if (flash) {
-    const rules = content().balance.flashHunt;
-    const { left } = flashHuntsLeft(player.row, now);
-    if (left === 0) throw new ApiError(409, 'no_flash_hunts', `Błyskawiczne polowania się skończyły. Wrócą ${rules.refillHours} godzin po ostatnim.`);
-    minutes = rules.minutes;
-    next = { ...stored, flash: { used: rules.count - left + 1, at: now } };
-  } else {
-    const rules = content().balance.quickHunt;
-    const used = quickHuntsUsed(player.row, now);
-    if (used >= rules.perDay) throw new ApiError(409, 'no_quick_hunts', 'Szybkie Polowania na dziś się skończyły. Nowe od północy.');
-    minutes = rules.minutes;
-    next = { ...stored, day: questPeriod('daily', now, content()).key, used: used + 1 };
+  // The Szybkie Polowania counted by the day before 0.2.20 (day, used) go.
+  const { day, used, ...stored } = JSON.parse(player.row.quick_hunts ?? 'null') ?? {};
+  const kind = flash ? 'flash' : 'quick';
+  const rules = content().balance[flash ? 'flashHunt' : 'quickHunt'];
+  const { left } = huntsLeft(player.row, kind, now);
+  if (left === 0) {
+    if (flash) throw new ApiError(409, 'no_flash_hunts', `Błyskawiczne polowania się skończyły. Wrócą ${rules.refillHours} godzin po ostatnim.`);
+    throw new ApiError(409, 'no_quick_hunts', `Szybkie Polowania się skończyły. Wrócą ${rules.refillHours} godzin po ostatnim.`);
   }
+  const minutes = rules.minutes;
+  const next = { ...stored, [kind]: { used: rules.count - left + 1, at: now } };
   // Potions chosen for a longer "Wyrusz" are cut to what this length takes.
   const most = potionsPerKind(minutes, content());
   const asked = body.potions && typeof body.potions === 'object' && !Array.isArray(body.potions) ? body.potions : null;
