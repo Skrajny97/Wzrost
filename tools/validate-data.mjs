@@ -1404,6 +1404,12 @@ function checkTowers(data) {
     }
     if (!usual.has(area.id)) errors.push(`towers.json: region ${area.id} nie ma w Wieżach zwykłego piętra (484 A)`);
   }
+  // Floor 1 is the level the towers open at, so the first floor is open
+  // to every character that may enter (0.2.11).
+  const unlock = data.unlocks.find((one) => one.id === 'towers');
+  if (unlock && unlock.level !== data.towers.firstFloorLevel) {
+    errors.push(`towers.json: firstFloorLevel ${data.towers.firstFloorLevel} różny od poziomu odblokowania Wież (${unlock.level}, unlocks.json)`);
+  }
   return errors;
 }
 

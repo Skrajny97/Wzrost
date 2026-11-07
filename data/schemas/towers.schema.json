@@ -3,7 +3,7 @@
   "title": "Wieże Systemu",
   "type": "object",
   "additionalProperties": false,
-  "required": ["towers", "floors", "entries", "rewardMinutes", "chestEvery", "loot", "texts"],
+  "required": ["towers", "floors", "entries", "firstFloorLevel", "strength", "rewardMinutes", "chestEvery", "loot", "texts"],
   "properties": {
     "$comment": { "type": "string" },
     "towers": {
@@ -40,6 +40,8 @@
       "required": ["perDay"],
       "properties": { "perDay": { "type": "integer", "minimum": 1 } }
     },
+    "firstFloorLevel": { "type": "integer", "minimum": 1, "description": "Poziom piętra 1; każde kolejne piętro o jeden wyżej." },
+    "strength": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "exclusiveMinimum": 0 }, "description": "O tyle System wzmacnia stwory w Wieżach: [obrażenia, HP]." },
     "rewardMinutes": { "type": "integer", "minimum": 1 },
     "chestEvery": { "type": "integer", "minimum": 1 },
     "loot": {

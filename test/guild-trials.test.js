@@ -35,6 +35,7 @@ import {
   weekShare,
 } from '../src/engine/index.js';
 import { openGuildTrials, trialProgress } from '../src/server/guild-trials.js';
+import { wearClimbingGear } from './helpers/climb.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -86,13 +87,14 @@ describe('the Próby Gildii', () => {
     assert.equal(trialLock('orders', { settlement: 'off' }, content), rules.locks.off);
   });
 
-  test('a tower win counts only on a floor at most levelsBelow levels below the character (488 A); the note says from which floor', () => {
+  test('a tower win counts only on a floor of a level at most levelsBelow below the character (488 A), floor 1 of level 50; the note says from which floor', () => {
     assert.equal(rules.kinds.find((kind) => kind.id === 'towers').levelsBelow, 10);
-    assert.equal(trialTowerFloor(60, content), 50);
-    assert.equal(trialTowerFloor(50, content), 40);
+    assert.equal(trialTowerFloor(110, content), 51);
+    assert.equal(trialTowerFloor(61, content), 2);
+    assert.equal(trialTowerFloor(60, content), 1);
     assert.equal(trialTowerFloor(5, content), 1);
-    assert.equal(trialNote('towers', 60, content), 'Liczą się piętra od 50. w górę.');
-    assert.equal(trialNote('towers', 73, content), 'Liczą się piętra od 63. w górę.');
+    assert.equal(trialNote('towers', 60, content), 'Liczą się piętra od 1. w górę.');
+    assert.equal(trialNote('towers', 73, content), 'Liczą się piętra od 14. w górę.');
     // Other notes as they are, and none where a kind has none.
     assert.equal(trialNote('makeAny', 60, content), rules.kinds.find((kind) => kind.id === 'makeAny').note);
     assert.equal(trialNote('explore', 60, content), null);
@@ -624,7 +626,7 @@ describe('the Próby Gildii through the API', () => {
     // A fight won in a Wieża, on a floor near the character's level (488 A),
     // by a character strong enough for it.
     await run('UPDATE characters SET points = ? WHERE id = ?', JSON.stringify(STRONG), id);
-    const entered = await as('mistrz', 'POST', '/api/towers/enter', { tower: 'solo', floor: 51 });
+    const entered = await as('mistrz', 'POST', '/api/towers/enter', { tower: 'solo', floor: 1 });
     assert.equal(entered.status, 200, JSON.stringify(entered.data).slice(0, 300));
     assert.equal(await progress(3), entered.data.report.tower.won ? 1 : 0);
     // Each moved only its own kind's trial.
@@ -634,11 +636,14 @@ describe('the Próby Gildii through the API', () => {
 
   test('a fight won in a Wieża moves a trial on only on a floor at most 10 levels below the character, as its note says (488 A)', async () => {
     const id = await idOf('Mistrz');
-    await run('UPDATE characters SET level = 60, class_level = 50, points = ? WHERE id = ?', JSON.stringify(STRONG), id);
+    // At level 61 floor 1 (of level 50) is 11 levels below, floor 2 ten;
+    // the gear of tests/helpers/climb.js wins them (0.2.11).
+    await run('UPDATE characters SET level = 61, class_level = 50, points = ? WHERE id = ?', JSON.stringify(STRONG), id);
+    await wearClimbingGear(await db(), id);
     await as('mistrz', 'GET', '/api/guild/trials');
     await setBoard([{ kind: 'towers', size: 0, roll: 0 }]);
     const board = (await as('mistrz', 'GET', '/api/guild/trials')).data;
-    assert.equal(board.trials[0].note, 'Liczą się piętra od 50. w górę.');
+    assert.equal(board.trials[0].note, 'Liczą się piętra od 2. w górę.');
     await run('UPDATE guild_trials SET count = 100 WHERE character_id = ?', id);
     const progress = async () => (await rowOf('Mistrz', 0)).progress;
     // The first floor, won with ease: it counts for nothing.
@@ -646,9 +651,9 @@ describe('the Próby Gildii through the API', () => {
     assert.equal(low.status, 200, JSON.stringify(low.data).slice(0, 300));
     assert.equal(low.data.report.tower.won, true);
     assert.equal(await progress(), 0);
-    // A floor 9 levels below the character, won: it counts.
+    // A floor 10 levels below the character, won: it counts.
     let won = null;
-    for (let i = 0; i < 8 && !won; i++) won = (await as('mistrz', 'POST', '/api/towers/enter', { tower: 'solo', floor: 51 })).data.report.tower.won ? true : null;
+    for (let i = 0; i < 8 && !won; i++) won = (await as('mistrz', 'POST', '/api/towers/enter', { tower: 'solo', floor: 2 })).data.report.tower.won ? true : null;
     assert.equal(won, true, 'the floor is won');
     assert.equal(await progress(), 1);
   });

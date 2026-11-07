@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { canUse, craftItems, encountersFor, itemName, levelUpMessages, salvageYield, simulateHunt, towerArea, towerFloor } from '../src/engine/index.js';
+import { canUse, craftItems, encountersFor, itemName, levelUpMessages, salvageYield, simulateHunt, towerArea, towerFloor, towerLevel } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -71,7 +71,8 @@ describe('the code review: the engine', () => {
   });
 
   test('a tower\'s floor brings only the encounters its level lets come', () => {
-    const open = new Set(encountersFor(towerArea(1, content), 1).map((encounter) => encounter.monsters.join()));
+    // Floor 1 is of level 50 (0.2.11).
+    const open = new Set(encountersFor(towerArea(1, content), towerLevel(1, content)).map((encounter) => encounter.monsters.join()));
     for (let n = 0; n < 300; n += 1) {
       const { encounter } = towerFloor(1, `s${n}`, content);
       if (encounter.elite || encounter.champion) continue;

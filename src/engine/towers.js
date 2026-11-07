@@ -3,9 +3,13 @@
 // będzie robić się niezależnie od wypraw, profesji. Bedzie podział na Wieże
 // Solo i w Tercecie"). A tower is a climb, floor after floor: floor f
 // holds the creatures of one inner region, in order from the first one and
-// round again after the last, at level f, so the climb leads through the
-// creatures of every land at the character's level (the author: "Pomoże to
-// uzupełniać zaległe Bestiariusze po Ewolucji Klasy by się nie cofać").
+// round again after the last, at the floor's level: floor 1 at
+// firstFloorLevel, each next one a level higher (the author, 7.11.2026:
+// "Wieże to tak jakby 1 poziom był 50ty w zamyśle"), so the climb leads
+// through the creatures of every land at the character's level (the
+// author: "Pomoże to uzupełniać zaległe Bestiariusze po Ewolucji Klasy by
+// się nie cofać"). The System makes them stronger by `strength` (the
+// author, 744: "nie o 50% więcej [...] a nawet 100% więcej").
 // Every eliteEvery floor waits the region's elite, but only in every
 // eliteLapEvery lap of the regions (the author: 484 A), so in the laps
 // between those floors are their region's usual ones and every creature
@@ -13,8 +17,8 @@
 // (eliteChance; "Elity mogą częściej"), and every championEvery floor, in
 // every lap, its champion (an elite where the region has none). The
 // champion leaves its trophy only at the first win of its floor in a tower
-// (483 A, the server knows). The highest floor open is
-// the character's level, a party's its lowest member's ("Maksymalny
+// (483 A, the server knows). The highest floor open is the one of the
+// character's level, a party's of its lowest member's ("Maksymalny
 // odblokowany stopień Wieży bedzie na poziomie najniższego w Drużynie").
 // Pure: the seed is the server's.
 
@@ -29,8 +33,13 @@ import { lowLevelMultiplier, monsterXp } from './progression.js';
 import { createRng } from './rng.js';
 import { say, word } from './text.js';
 
-// The highest floor open to characters of these levels.
-export const towerTop = (levels) => Math.max(1, Math.min(...levels));
+// The level of floor `floor`: floor 1 at firstFloorLevel, each next one a
+// level higher.
+export const towerLevel = (floor, content) => floor + content.towers.firstFloorLevel - 1;
+
+// The highest floor open to characters of these levels: the one of the
+// lowest level, 0 when it is below the first floor's.
+export const towerTop = (levels, content) => Math.max(0, Math.min(...levels) - content.towers.firstFloorLevel + 1);
 
 // The inner region whose creatures live on floor `floor`.
 export function towerArea(floor, content) {
@@ -56,14 +65,15 @@ export function towerEliteFloor(floor, content) {
 export function towerFloor(floor, seed, content) {
   const { floors } = content.towers;
   const area = towerArea(floor, content);
+  const level = towerLevel(floor, content);
   const rng = createRng(`${seed}:floor:${floor}`);
   const champion = floor % floors.championEvery === 0 && area.champion;
   const elite = !champion && (towerEliteFloor(floor, content) || floor % floors.championEvery === 0 || rng.chance(floors.eliteChance)) && area.elite;
-  if (champion) return { floor, level: floor, areaId: area.id, encounter: { elite: false, champion: true, members: [{ monsterId: area.champion, level: floor }] } };
-  if (elite) return { floor, level: floor, areaId: area.id, encounter: { elite: true, members: [{ monsterId: area.elite, level: floor }] } };
-  const open = encountersFor(area, floor);
+  if (champion) return { floor, level, areaId: area.id, encounter: { elite: false, champion: true, members: [{ monsterId: area.champion, level }] } };
+  if (elite) return { floor, level, areaId: area.id, encounter: { elite: true, members: [{ monsterId: area.elite, level }] } };
+  const open = encountersFor(area, level);
   const group = rng.weighted(open.length > 0 ? open : area.encounters, (encounter) => encounter.weight ?? 1);
-  return { floor, level: floor, areaId: area.id, encounter: { elite: false, members: group.monsters.map((monsterId) => ({ monsterId, level: floor })) } };
+  return { floor, level, areaId: area.id, encounter: { elite: false, members: group.monsters.map((monsterId) => ({ monsterId, level })) } };
 }
 
 // The gold a win on floor `floor` pays: what a whole exploration of
@@ -72,14 +82,15 @@ export function towerFloor(floor, seed, content) {
 // więcej niż Portale, o wiele więcej").
 export function towerGold(floor, content) {
   const { rewardMinutes, loot } = content.towers;
-  return Math.round(expectedExploration(towerArea(floor, content), floor, rewardMinutes, content).gold * loot.goldMultiplier);
+  return Math.round(expectedExploration(towerArea(floor, content), towerLevel(floor, content), rewardMinutes, content).gold * loot.goldMultiplier);
 }
 
 // The rarity weights of a tower material on floor `floor`: those of the
 // highest loot.materials.rarities step its level has reached.
 export function towerMaterialRarities(floor, content) {
   const steps = content.towers.loot.materials.rarities;
-  return (steps.filter((step) => step.fromLevel <= floor).at(-1) ?? steps[0]).rarities;
+  const level = towerLevel(floor, content);
+  return (steps.filter((step) => step.fromLevel <= level).at(-1) ?? steps[0]).rarities;
 }
 
 // The materials a win on floor `floor` brings for certain (the author:
@@ -95,7 +106,7 @@ export function towerMaterials(floor, enemies, rng, content, more = 1) {
   let creatures = ordinary(enemies.map((enemy) => enemy.monsterId));
   if (creatures.length === 0) {
     const area = towerArea(floor, content);
-    const open = encountersFor(area, floor);
+    const open = encountersFor(area, towerLevel(floor, content));
     creatures = ordinary((open.length > 0 ? open : area.encounters).flatMap((encounter) => encounter.monsters));
   }
   const found = {};
@@ -152,7 +163,8 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   // Alone on a floor (the Wieża Solo), the monsters have only a share of the
   // late and end game's growth, as no companion helps (the author: 438.3 A).
   const alone = partners.length === 0 && companions.length === 0;
-  const enemies = encounterCombatants(plan.encounter, content, { growth: alone ? content.balance.monsters.soloGrowth : 1 });
+  // The System's strength on top, in both towers (744).
+  const enemies = encounterCombatants(plan.encounter, content, { growth: alone ? content.balance.monsters.soloGrowth : 1, strength: content.towers.strength });
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
   const won = fight.won === true;
   const hpAfter = Math.max(0, fight.units.find((unit) => unit.id === player.id).hp);
@@ -174,7 +186,7 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
     // The tower's loot (towerGold, towerMaterials), far above a portal's.
     gold = towerGold(floor, content);
     materials = addCounts(materials, towerMaterials(floor, enemies, rng, content, moreMaterials));
-    const classItem = () => randomItem(floor, rng, content, { classId: character.classId, maxClassLevel: character.classLevel, rarityId: championItemRarity(floor, rng, content), area });
+    const classItem = () => randomItem(plan.level, rng, content, { classId: character.classId, maxClassLevel: character.classLevel, rarityId: championItemRarity(plan.level, rng, content), area });
     // The loot's item drawn first, so the chest changes nothing else.
     const lucky = rng.chance(content.towers.loot.itemChance);
     if (chest) items.push(classItem());

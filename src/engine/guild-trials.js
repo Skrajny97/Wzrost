@@ -111,12 +111,13 @@ export function trialText(kindId, count, content) {
 }
 
 // The lowest floor whose win counts for a trial of the Wieże for a
-// character of `level`: at most the kind's levelsBelow levels below it, so
-// a high character does not do the trial on the first floor (the author:
-// 488 A); any floor when the kind sets no such limit.
+// character of `level`: of a level at most the kind's levelsBelow below
+// its own (floor 1 is of the towers' firstFloorLevel), so a high character
+// does not do the trial on the first floor (the author: 488 A); any floor
+// when the kind sets no such limit.
 export function trialTowerFloor(level, content) {
   const below = trialKind('towers', content)?.levelsBelow;
-  return Number.isInteger(below) ? Math.max(1, level - below) : 1;
+  return Number.isInteger(below) ? Math.max(1, level - below - content.towers.firstFloorLevel + 1) : 1;
 }
 
 // A trial's note under its words, or null: its kind's, with the lowest

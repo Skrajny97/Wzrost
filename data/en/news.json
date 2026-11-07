@@ -268,6 +268,10 @@
     "0.2.10": {
       "title": "Version 0.2.10",
       "body": "- The top of the Character tab shows all your characters as small portraits: one tap and you play another. A yellow dot means that character has a report waiting."
+    },
+    "0.2.11": {
+      "title": "Version 0.2.11",
+      "body": "- The Towers anew: floor 1 is level 50, and each next floor is one level higher. You can climb up to the floor of your own level.\n- The System made the Towers' creatures twice as strong: they hit twice as hard and have twice the HP. Loot follows the floor's level, so even the first floor gives level 50 rewards.\n- Tower progress starts over: chests and champions' trophies wait on their floors again, and today's entries are full. Nothing you have already won is taken away."
     }
   }
 }

@@ -1,5 +1,7 @@
 // The Wieże Systemu (src/engine/towers.js, src/server/towers.js): the floors
-// of a climb, the creatures of every land in turn at the floor's level,
+// of a climb, floor 1 of level 50 and each next one a level higher (0.2.11),
+// the creatures of every land in turn at the floor's level, made stronger
+// by the System (744),
 // elites on the fifth floors of every other lap of the regions and
 // champions every championEvery floors (the 25th since Sosnowe Wydmy),
 // champions of every land in turn, every creature somewhere, the top open
@@ -19,6 +21,7 @@ import {
   encountersFor,
   expectedExploration,
   materialDrops,
+  monsterXp,
   parseStack,
   portalAmount,
   portalById,
@@ -27,10 +30,12 @@ import {
   towerFight,
   towerFloor,
   towerGold,
+  towerLevel,
   towerMaterialRarities,
   towerMaterials,
   towerTop,
 } from '../src/engine/index.js';
+import { climbingGear, wearClimbingGear } from './helpers/climb.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -40,9 +45,23 @@ const CHAMPION = content.towers.floors.championEvery;
 const gcd = (a, b) => (b === 0 ? a : gcd(b, a % b));
 
 describe('the Wieże Systemu', () => {
-  test('the highest floor open is the lowest level in the party', () => {
-    assert.equal(towerTop([30]), 30);
-    assert.equal(towerTop([30, 26, 41]), 26);
+  test('floor 1 is of level 50, each next one a level higher; the highest floor open is the one of the lowest level in the party, none below 50 (0.2.11)', () => {
+    assert.equal(content.towers.firstFloorLevel, 50);
+    assert.equal(content.towers.firstFloorLevel, content.unlocksById.towers.level);
+    assert.equal(towerLevel(1, content), 50);
+    assert.equal(towerLevel(11, content), 60);
+    assert.equal(towerTop([50], content), 1);
+    assert.equal(towerTop([60], content), 11);
+    assert.equal(towerTop([80, 76, 91], content), 27);
+    assert.equal(towerTop([60, 49], content), 0);
+  });
+
+  test('the System makes the creatures twice as strong: twice the HP (744)', () => {
+    assert.deepEqual(content.towers.strength, [2, 2]);
+    const plain = { ...content, towers: { ...content.towers, strength: [1, 1] } };
+    const climber = newCharacter('warrior', { level: 60, classLevel: 50 });
+    const hp = (rules) => towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: 3, seed: 'moc' }, rules).fights[0].enemiesView[0].maxHp;
+    assert.ok(Math.abs(hp(content) / hp(plain) - 2) < 0.02, `${hp(content)} vs ${hp(plain)}`);
   });
 
   test('a floor holds one inner region\'s creatures at its level, the regions in turn from the first', () => {
@@ -51,10 +70,10 @@ describe('the Wieże Systemu', () => {
     assert.equal(towerArea(2, content).id, areas[1].id);
     assert.equal(towerArea(areas.length + 1, content).id, areas[0].id);
     const floor = towerFloor(3, 'climb', content);
-    assert.equal(floor.level, 3);
+    assert.equal(floor.level, 52);
     assert.equal(floor.areaId, areas[2].id);
     const living = new Set(areas[2].encounters.flatMap((encounter) => encounter.monsters));
-    assert.ok(floor.encounter.members.every((member) => member.level === 3 && living.has(member.monsterId)));
+    assert.ok(floor.encounter.members.every((member) => member.level === 52 && living.has(member.monsterId)));
     assert.deepEqual(towerFloor(3, 'climb', content), floor);
   });
 
@@ -132,13 +151,19 @@ describe('the Wieże Systemu', () => {
 
 describe('an entry\'s fight', () => {
   const character = newCharacter('warrior', { level: 60, classLevel: 50 });
+  // Strong enough for the low floors, with its points spent as the game
+  // spends them and the gear of tests/helpers/climb.js.
+  const strong = newCharacter('warrior', { level: 200, classLevel: 50 });
+  const climber = { ...strong, points: autoDistribute(strong, content) };
+  const gear = climbingGear();
 
   test('alone on a floor the monsters have half the late growth, with a partner all of it; up to 50 the same (438.3 A)', () => {
     const climber = newCharacter('warrior', { level: 110, classLevel: 100 });
     const partner = { character: newCharacter('mage', { level: 110, classLevel: 100 }), equipped: [], name: 'Druh' };
     const hp = (floor, partners) => towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor, seed: 'g', partners }, content).fights[0].enemiesView[0].maxHp;
-    assert.equal(hp(40, []), hp(40, [partner]));
-    for (const floor of [100, 140]) assert.ok(hp(floor, []) < hp(floor, [partner]) * 0.8, `${floor}: ${hp(floor, [])} vs ${hp(floor, [partner])}`);
+    // Floor 1 is of level 50; floors 51 and 91 of 100 and 140.
+    assert.equal(hp(1, []), hp(1, [partner]));
+    for (const floor of [51, 91]) assert.ok(hp(floor, []) < hp(floor, [partner]) * 0.8, `${floor}: ${hp(floor, [])} vs ${hp(floor, [partner])}`);
   });
 
   test('a floor starts and ends in the towers\' own words, the name after a colon', () => {
@@ -152,21 +177,23 @@ describe('an entry\'s fight', () => {
   });
 
   test('a won floor pays the XP of a fight of an hour\'s exploration, an elite and a champion as a regular creature', () => {
-    const won = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 3, seed: 'a' }, content);
+    const won = towerFight({ character: climber, equipped: gear, name: 'Wspinacz', floor: 3, seed: 'a' }, content);
     assert.equal(won.tower.won, true);
     assert.equal(won.result, 'success');
     assert.ok(won.xp > 0 && won.gold > 0);
     assert.equal(won.fights.length, 1);
     assert.equal(won.areaId, towerArea(3, content).id);
     // The same seed, the same fight.
-    assert.deepEqual(towerFight({ character, equipped: [], name: 'Wspinacz', floor: 3, seed: 'a' }, content), won);
+    assert.deepEqual(towerFight({ character: climber, equipped: gear, name: 'Wspinacz', floor: 3, seed: 'a' }, content), won);
     // A champion floor: no champion's multiplier on the pay.
-    const champion = towerFight({ character, equipped: [], name: 'Wspinacz', floor: CHAMPION, seed: 'b' }, content);
+    const champion = towerFight({ character: climber, equipped: gear, name: 'Wspinacz', floor: CHAMPION, seed: 'b' }, content);
+    assert.equal(champion.tower.won, true);
     assert.equal(champion.fights[0].champion, true);
-    const monster = content.monstersById[champion.fights[0].enemies[0].monsterId];
-    const { xpBase, xpExponent } = content.balance.rewards;
-    const regular = xpBase * 10 ** xpExponent * monster.reward.xp;
+    const [enemy] = champion.fights[0].enemies;
+    const monster = content.monstersById[enemy.monsterId];
+    const regular = monsterXp({ ...monster, elite: false, champion: false }, enemy.level, content);
     assert.ok(champion.xp < regular * 2, `${champion.xp} vs ${regular}`);
+    assert.ok(champion.xp < monsterXp(monster, enemy.level, content) / 2, `${champion.xp} vs ${monsterXp(monster, enemy.level, content)}`);
   });
 
   test('a champion leaves its trophy only when asked (the first win of its floor in the tower), and then for certain; the rest of the pay the same (483 A)', () => {
@@ -174,19 +201,18 @@ describe('an entry\'s fight', () => {
     assert.ok(content.monstersById[champion].champion);
     const trophy = content.materialsByMonster[champion].id;
     const pieces = (found) => Object.entries(found).filter(([key]) => parseStack(key).materialId === trophy).reduce((sum, [, count]) => sum + count, 0);
-    // With its points spent, as the game spends them, the character wins
-    // the first champion's floor (Rokita, at 25).
-    const climber = { ...character, points: autoDistribute(character, content) };
+    // The strong character wins the first champion's floor (Rokita, the
+    // 25th, of level 74).
     for (let n = 0; n < 20; n++) {
-      const first = towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: CHAMPION, seed: `trofeum${n}`, championTrophy: true }, content);
+      const first = towerFight({ character: climber, equipped: gear, name: 'Wspinacz', floor: CHAMPION, seed: `trofeum${n}`, championTrophy: true }, content);
       assert.equal(first.tower.won, true);
       assert.equal(first.tower.champion, true);
       assert.equal(pieces(first.materials), 1, JSON.stringify(first.materials));
-      const again = towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: CHAMPION, seed: `trofeum${n}`, championTrophy: false }, content);
+      const again = towerFight({ character: climber, equipped: gear, name: 'Wspinacz', floor: CHAMPION, seed: `trofeum${n}`, championTrophy: false }, content);
       assert.equal(pieces(again.materials), 0, JSON.stringify(again.materials));
       assert.deepEqual([again.tower.won, again.xp, again.gold], [true, first.xp, first.gold]);
       // Not asked, none.
-      assert.equal(pieces(towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: CHAMPION, seed: `trofeum${n}` }, content).materials), 0);
+      assert.equal(pieces(towerFight({ character: climber, equipped: gear, name: 'Wspinacz', floor: CHAMPION, seed: `trofeum${n}` }, content).materials), 0);
     }
     // Elsewhere (an exploration, the Bestia Gildii) a champion leaves it by its chance, as before.
     const rng = createRng('czempion');
@@ -198,15 +224,16 @@ describe('an entry\'s fight', () => {
   });
 
   test('the chest comes only when asked, with an item of the character\'s class it can wear', () => {
-    const none = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 10, seed: 'c' }, content);
+    const none = towerFight({ character: climber, equipped: gear, name: 'Wspinacz', floor: 10, seed: 'c' }, content);
+    assert.equal(none.tower.won, true);
     assert.equal(none.items.length, Number(none.tower.lootItem));
     assert.equal(none.tower.chest, false);
-    const chest = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 10, seed: 'c', chest: true }, content);
+    const chest = towerFight({ character: climber, equipped: gear, name: 'Wspinacz', floor: 10, seed: 'c', chest: true }, content);
     assert.equal(chest.tower.chest, true);
     assert.equal(chest.tower.lootItem, none.tower.lootItem);
     assert.equal(chest.items.length, 1 + Number(chest.tower.lootItem));
     const [item] = chest.items;
-    assert.equal(item.level, 10);
+    assert.equal(item.level, towerLevel(10, content));
     assert.ok(content.rarities.findIndex((rarity) => rarity.id === item.rarity) >= content.rarities.findIndex((rarity) => rarity.id === 'epic'));
   });
 
@@ -218,23 +245,28 @@ describe('an entry\'s fight', () => {
     assert.equal(loot.goldMultiplier, 2);
     for (const floor of [3, 50, 100, 150]) {
       const gold = towerGold(floor, content);
-      assert.equal(gold, Math.round(expectedExploration(towerArea(floor, content), floor, rewardMinutes, content).gold * loot.goldMultiplier));
+      assert.equal(gold, Math.round(expectedExploration(towerArea(floor, content), towerLevel(floor, content), rewardMinutes, content).gold * loot.goldMultiplier));
       if (floor <= content.portals.maxStage) {
         const portal = portalAmount(portalById('gold', content), floor, false, content);
         assert.ok(gold > portal * 2, `${floor}: ${gold} vs ${portal}`);
       }
     }
     assert.ok(towerGold(100, content) > towerGold(50, content));
-    const won = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 3, seed: 'a' }, content);
+    const won = towerFight({ character: climber, equipped: gear, name: 'Wspinacz', floor: 3, seed: 'a' }, content);
+    assert.equal(won.tower.won, true);
     assert.equal(won.gold, towerGold(3, content));
   });
 
   test('a win brings three materials of the floor\'s creatures, rarer with the floor\'s level: legendary and mythic high up, never below the species\' own', () => {
     const index = (id) => content.rarities.findIndex((rarity) => rarity.id === id);
     const top = (floor) => Math.max(...Object.keys(towerMaterialRarities(floor, content)).map(index));
-    assert.ok(top(10) < index('legendary'));
-    assert.ok(top(50) >= index('mythic'));
-    assert.ok(Object.keys(towerMaterialRarities(100, content)).includes('legendary'));
+    // By the floor's level: floor 1 is of level 50, so the step of 50 at once.
+    const step = (level) => content.towers.loot.materials.rarities.filter((one) => one.fromLevel <= level).at(-1).rarities;
+    assert.deepEqual(towerMaterialRarities(1, content), step(50));
+    assert.deepEqual(towerMaterialRarities(26, content), step(75));
+    assert.deepEqual(towerMaterialRarities(51, content), step(100));
+    assert.ok(top(1) >= index('mythic'));
+    assert.ok(Object.keys(towerMaterialRarities(51, content)).includes('legendary'));
     for (const floor of [3, 26, 50, 100, 160]) {
       const plan = towerFloor(floor, 'm', content);
       const enemies = plan.encounter.members;
@@ -267,19 +299,19 @@ describe('an entry\'s fight', () => {
   });
 
   test('now and then a win brings an item of the character\'s class, of a champion\'s rarity at the floor\'s level', () => {
-    const climber = { ...character, points: autoDistribute(character, content) };
     let wins = 0;
     let lucky = 0;
     for (let n = 0; n < 200; n++) {
-      const won = towerFight({ character: climber, equipped: [], name: 'Wspinacz', floor: 20, seed: `łup${n}` }, content);
+      const won = towerFight({ character: climber, equipped: gear, name: 'Wspinacz', floor: 20, seed: `łup${n}` }, content);
       if (!won.tower.won) continue;
       wins += 1;
       assert.equal(won.items.length, Number(won.tower.lootItem));
       if (won.tower.lootItem) {
         lucky += 1;
         const [item] = won.items;
-        assert.equal(item.level, 20);
-        assert.equal(item.rarity, 'epic');
+        assert.equal(item.level, towerLevel(20, content));
+        // Of a champion's rarity at the floor's level (69): epic or legendary.
+        assert.ok(['epic', 'legendary'].includes(item.rarity), item.rarity);
         assert.match(won.entries[0].text, new RegExp(content.towers.texts.loot.map((line) => line.split('{item}')[0]).join('|')));
       }
     }
@@ -311,6 +343,13 @@ describe('the Wieże through the API', () => {
   }
   const as = (login, method, path, body) => call(method, path, { cookie: cookies[login], body });
   const enter = (login, body) => as(login, 'POST', '/api/towers/enter', body);
+  // Strong enough for the low floors (0.2.11): level 200, its points spent
+  // as the game spends them, and the gear of tests/helpers/climb.js.
+  async function strong() {
+    const database = await db();
+    await set('level = 200, points = ?', JSON.stringify(autoDistribute(newCharacter('warrior', { level: 200, classLevel: 50 }), content)));
+    await wearClimbingGear(database, (await database.prepare('SELECT id FROM characters').first()).id);
+  }
 
   beforeEach(async () => {
     await player('wspinacz', 'Wspinacz');
@@ -324,13 +363,15 @@ describe('the Wieże through the API', () => {
     assert.equal((await enter('wspinacz', { tower: 'solo', floor: 1 })).data.error.code, 'locked');
   });
 
-  test('an entry fights one floor and brings its report at once; floors go up to the character\'s level', async () => {
+  test('an entry fights one floor and brings its report at once; floors go up to the one of the character\'s level, floor 1 being the 50th', async () => {
     const { towers } = (await as('wspinacz', 'GET', '/api/towers')).data;
     assert.equal(towers.left, content.towers.entries.perDay);
     assert.equal(towers.cycle.length, content.areas.length);
     const solo = towers.towers.find((tower) => tower.id === 'solo');
-    assert.equal(solo.top, 60);
-    assert.equal((await enter('wspinacz', { tower: 'solo', floor: 61 })).data.error.code, 'invalid_floor');
+    assert.equal(solo.top, 11);
+    assert.equal(towers.firstFloorLevel, 50);
+    assert.deepEqual(towers.strength, [2, 2]);
+    assert.equal((await enter('wspinacz', { tower: 'solo', floor: 12 })).data.error.code, 'invalid_floor');
     assert.equal((await enter('wspinacz', { tower: 'solo', floor: 0 })).data.error.code, 'invalid_floor');
     assert.equal((await enter('wspinacz', { tower: 'none', floor: 1 })).data.error.code, 'invalid_tower');
     const entered = await enter('wspinacz', { tower: 'solo', floor: 1 });
@@ -338,6 +379,7 @@ describe('the Wieże through the API', () => {
     const { report } = entered.data;
     assert.equal(report.kind, 'tower');
     assert.equal(report.tower.floor, 1);
+    assert.equal(report.tower.level, 50);
     assert.equal(report.fights.length, 1);
     assert.equal(entered.data.towers.left, content.towers.entries.perDay - 1);
     // The creatures fought are in the Bestiariusz, and the report in the Dziennik.
@@ -361,6 +403,7 @@ describe('the Wieże through the API', () => {
   });
 
   test('a tenth floor won the first time brings the chest, once in each tower', async () => {
+    await strong();
     let first = null;
     for (let i = 0; i < 5 && !first?.tower.won; i++) first = (await enter('wspinacz', { tower: 'solo', floor: 10 })).data.report;
     assert.equal(first.tower.won, true, 'the floor is won');
@@ -386,8 +429,8 @@ describe('the Wieże through the API', () => {
         .filter(([key]) => parseStack(key).materialId === trophy)
         .reduce((sum, [, count]) => sum + count, 0);
     const solo = async () => (await as('wspinacz', 'GET', '/api/towers')).data.towers.towers.find((tower) => tower.id === 'solo');
-    // Its points spent, as the game spends them: it wins Rokita's floor (25).
-    await set('points = ?', JSON.stringify(autoDistribute(newCharacter('warrior', { level: 60, classLevel: 50 }), content)));
+    // Strong enough, it wins Rokita's floor (the 25th, of level 74).
+    await strong();
     assert.deepEqual((await solo()).champions, []);
     let first = null;
     for (let i = 0; i < 5 && !first?.tower.won; i++) first = (await enter('wspinacz', { tower: 'solo', floor: CHAMPION })).data.report;
@@ -444,21 +487,28 @@ describe('the Wieże through the API', () => {
     assert.equal(await stays('old-tower-1'), true);
   });
 
-  test('the Wieża Drużyn needs a Drużyna of two players; the lowest of them sets the top', async () => {
+  test('the Wieża Drużyn needs a Drużyna of two players; the lowest of them sets the top, none below 50', async () => {
     const shut = await enter('wspinacz', { tower: 'party', floor: 1 });
     assert.equal(shut.data.error.code, 'no_party');
-    await player('druh', 'Druh', 40);
+    await player('druh', 'Druh', 55);
     const { data } = await as('wspinacz', 'POST', '/api/party/invite', { name: 'Druh' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
     const party = (await as('wspinacz', 'GET', '/api/towers')).data.towers.towers.find((tower) => tower.id === 'party');
     assert.equal(party.missing, null);
-    assert.equal(party.top, 40);
+    assert.equal(party.top, 6);
     assert.deepEqual(party.partners.map((partner) => partner.name), ['Druh']);
-    assert.equal((await enter('wspinacz', { tower: 'party', floor: 41 })).data.error.code, 'invalid_floor');
+    assert.equal((await enter('wspinacz', { tower: 'party', floor: 7 })).data.error.code, 'invalid_floor');
     const entered = await enter('wspinacz', { tower: 'party', floor: 5 });
     assert.equal(entered.status, 200, JSON.stringify(entered.data).slice(0, 300));
     assert.deepEqual(entered.data.report.tower.partners, ['Druh']);
     assert.ok(entered.data.report.fights[0].allies.some((unit) => unit.name === 'Druh'));
+    // A player below the first floor's level: no floor is open.
+    await (await db()).prepare("UPDATE characters SET level = 49 WHERE name = 'Druh'").run();
+    const below = (await as('wspinacz', 'GET', '/api/towers')).data.towers.towers.find((tower) => tower.id === 'party');
+    assert.equal(below.top, 0);
+    assert.match(below.missing, /co najmniej 50\. poziom/);
+    assert.equal((await enter('wspinacz', { tower: 'party', floor: 1 })).data.error.code, 'no_party');
+    await (await db()).prepare("UPDATE characters SET level = 55 WHERE name = 'Druh'").run();
     // One grown beyond the class levels' spread leaves the party, so it
     // climbs no more (parties.js).
     await (await db()).prepare("UPDATE characters SET class_level = ? WHERE name = 'Druh'").bind(50 + content.balance.parties.classSpread + 1).run();

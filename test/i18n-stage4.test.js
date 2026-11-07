@@ -36,6 +36,7 @@ import {
 } from '../src/engine/index.js';
 import { contentIn } from '../src/server/content.js';
 import { numberText, runInLanguage, translateMessage } from '../src/server/i18n.js';
+import { climbingGear } from './helpers/climb.js';
 import { newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -46,15 +47,18 @@ const english = (message) => runInLanguage('en', () => translateMessage(message)
 
 describe("the engine's own sentences", () => {
   test("a Wieża's fight: the creatures' levels and its pay as each language writes them, the fight the same", () => {
-    const character = { ...newCharacter('warrior', { level: 60, classLevel: 50 }) };
+    // Strong enough for floor 3, of level 52 (0.2.11), with the gear of
+    // tests/helpers/climb.js.
+    const character = { ...newCharacter('warrior', { level: 200, classLevel: 50 }) };
     character.points = autoDistribute(character, pl);
-    const polish = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 3, seed: 'a' }, pl);
-    const inEnglish = towerFight({ character, equipped: [], name: 'Wspinacz', floor: 3, seed: 'a' }, en);
+    const equipped = climbingGear();
+    const polish = towerFight({ character, equipped, name: 'Wspinacz', floor: 3, seed: 'a' }, pl);
+    const inEnglish = towerFight({ character, equipped, name: 'Wspinacz', floor: 3, seed: 'a' }, en);
     assert.equal(polish.tower.won, true);
     assert.deepEqual([inEnglish.xp, inEnglish.gold, inEnglish.tower.won], [polish.xp, polish.gold, polish.tower.won]);
-    assert.match(polish.entries[0].text, / \(poz\. 3\)/);
+    assert.match(polish.entries[0].text, / \(poz\. 52\)/);
     assert.ok(polish.entries[0].text.includes(`+${polish.xp} XP, +${polish.gold} złota.`), polish.entries[0].text);
-    assert.match(inEnglish.entries[0].text, / \(lvl 3\)/);
+    assert.match(inEnglish.entries[0].text, / \(lvl 52\)/);
     assert.ok(inEnglish.entries[0].text.includes(`+${polish.xp} XP, +${polish.gold} gold.`), inEnglish.entries[0].text);
   });
 

@@ -434,9 +434,8 @@
     },
     "towers-solo": {
       "text": [
-        "Each floor holds the creatures of one region, one after another through all the lands. You can climb no higher than the floor of your own level."
-      ],
-      "voice": "audio/narration/en/towers-solo.mp3"
+        "The first floor is already level fifty, and each next one is a level higher. Here the System strengthens the creatures of every land: they hit twice as hard and have twice the HP."
+      ]
     },
     "towers-floor": {
       "text": [

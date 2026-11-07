@@ -1,7 +1,8 @@
 // The Wieże in the Walka (src/server/towers.js), from character level 50:
 // the entries left today and each tower with its floors. The floor is
 // picked with the slider or − and +; the card shows its inner region, its
-// level and what waits there (an elite of every fifth floor in every other
+// level (floor 1 is of the towers' firstFloorLevel, each next one a level
+// higher) and what waits there (an elite of every fifth floor in every other
 // lap of the regions, a champion with its trophy while its floor is not
 // won yet, the tower's chest not taken yet), who climbs beside the
 // character in the Wieża Drużyn, and
@@ -15,7 +16,7 @@
 import { areaArt } from '../area-art.js';
 import { placeArt } from '../art.js';
 import { fill, h } from '../dom.js';
-import { formatNumber } from '../format.js';
+import { formatDecimal, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { activityFinished, call, isUnlocked, reportCache, state, unlockInfo } from '../state.js';
 import { howItWorks, lockLabel, systemLink, systemPanel, withButton } from '../ui.js';
@@ -92,8 +93,15 @@ export function mountTowers(container, { navigate }) {
         howItWorks(
           t('Wejście to jedna walka na wybranym piętrze, z wynikiem od razu.'),
           t(
-            'Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, na swoim poziomie. {elites} Na zwykłych piętrach czasem czeka elita. Co {championEvery}. piętro czeka czempion, a co {chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.',
-            { elites: eliteText(), championEvery: view.championEvery, chestEvery: view.chestEvery },
+            'Postać walczy z pełnym HP, bez mikstur i bez ich bonusów. W czasie pracy w profesji wejść można, a w czasie wyprawy Wieże czekają na powrót postaci. Piętro 1 ma poziom {first}, a każde następne o jeden więcej. Najwyżej wejdziesz na piętro swojego poziomu. Piętro ma stwory jednego regionu, po kolei przez wszystkie krainy, a System je wzmacnia: obrażenia ×{damage}, HP ×{hp}. {elites} Na zwykłych piętrach czasem czeka elita. Co {championEvery}. piętro czeka czempion, a co {chestEvery}. piętro za pierwszym zwycięstwem daje skrzynię Wieży. Czempion zostawia trofeum tylko za pierwszym zwycięstwem na swoim piętrze.',
+            {
+              first: view.firstFloorLevel,
+              damage: formatDecimal(view.strength[0]),
+              hp: formatDecimal(view.strength[1]),
+              elites: eliteText(),
+              championEvery: view.championEvery,
+              chestEvery: view.chestEvery,
+            },
           ),
         ),
       ),
@@ -113,8 +121,12 @@ export function mountTowers(container, { navigate }) {
   }
 
   // The floor a tower's card starts at: the one picked before, else the
-  // next above the highest won, within the floors open.
-  const floorOf = (tower) => Math.min(tower.top, Math.max(1, Number.isInteger(picks[tower.id]) ? picks[tower.id] : tower.best + 1));
+  // next above the highest won, within the floors open (the first when
+  // none is: a Drużyna with a player below the first floor's level).
+  const topOf = (tower) => Math.max(1, tower.top);
+  const floorOf = (tower) => Math.min(topOf(tower), Math.max(1, Number.isInteger(picks[tower.id]) ? picks[tower.id] : tower.best + 1));
+  // The level of `floor` (towerLevel in the engine).
+  const levelOf = (floor) => floor + view.firstFloorLevel - 1;
 
   // Whether a floor is in a lap of the regions with the elites of every
   // eliteEvery floor: one lap in eliteLapEvery, from the first (the
@@ -138,7 +150,7 @@ export function mountTowers(container, { navigate }) {
   // - rzadkie łupy i materiały szczególnie legendarne i mityczne").
   function lootText(floor) {
     const { gold, pieces, rarities, itemChance } = view.loot;
-    const step = rarities.filter((one) => one.fromLevel <= floor).at(-1) ?? rarities[0];
+    const step = rarities.filter((one) => one.fromLevel <= levelOf(floor)).at(-1) ?? rarities[0];
     const total = Object.values(step.rarities).reduce((sum, weight) => sum + weight, 0);
     const odds = Object.entries(step.rarities)
       .map(([id, weight]) => `${state.content.rarities.find((rarity) => rarity.id === id)?.forms.pl ?? id} ${Math.round((weight / total) * 100)}%`)
@@ -159,7 +171,7 @@ export function mountTowers(container, { navigate }) {
     const slider = h('input', {
       type: 'range',
       min: '1',
-      max: String(tower.top),
+      max: String(topOf(tower)),
       value: String(floor),
       class: 'tower-slider',
       'aria-label': t('{name}: piętro', { name: tower.name }),
@@ -180,7 +192,7 @@ export function mountTowers(container, { navigate }) {
     });
 
     function pick(next) {
-      floor = Math.min(tower.top, Math.max(1, next));
+      floor = Math.min(topOf(tower), Math.max(1, next));
       slider.value = String(floor);
       picks[tower.id] = floor;
       savePicks(picks);
@@ -200,7 +212,7 @@ export function mountTowers(container, { navigate }) {
         h(
           'div',
           { class: 'tower-floor-text' },
-          h('p', { class: 'tower-floor-title', text: t('Piętro {floor} · poz. {level}', { floor, level: floor }) }),
+          h('p', { class: 'tower-floor-title', text: t('Piętro {floor} · poz. {level}', { floor, level: levelOf(floor) }) }),
           h('p', { text: `${place.name} (${place.regionName})` }),
           waits.length > 0 && h('p', { class: 'tower-waits', text: t('Czeka: {gifts}.', { gifts: waits.join(', ') }) }),
           view.loot && h('p', { text: lootText(floor) }),
@@ -216,7 +228,7 @@ export function mountTowers(container, { navigate }) {
     const climbers =
       tower.missing ??
       (tower.partners.length > 0 || tower.companions.length > 0
-        ? t('Z Tobą: {climbers}. Najwyższe piętro to poziom najniższej postaci gracza.', {
+        ? t('Z Tobą: {climbers}. Najwyżej wejdziecie na piętro poziomu najniższej postaci gracza.', {
             climbers: [...tower.partners.map((partner) => t('{name} (poz. {level})', { name: partner.name, level: partner.level })), ...tower.companions].join(', '),
           })
         : null);
@@ -224,7 +236,8 @@ export function mountTowers(container, { navigate }) {
       'section',
       { class: 'card tower-card', 'data-guide': `tower-${tower.id}`, 'aria-label': tower.name },
       head,
-      h('p', { class: 'muted', text: t('Otwarte piętra: 1–{top}. Najwyżej zdobyte: {best}.', { top: formatNumber(tower.top), best: tower.best > 0 ? t('piętro {floor}', { floor: formatNumber(tower.best) }) : t('jeszcze żadne') }) }),
+      tower.top >= 1 &&
+        h('p', { class: 'muted', text: t('Otwarte piętra: 1–{top}. Najwyżej zdobyte: {best}.', { top: formatNumber(tower.top), best: tower.best > 0 ? t('piętro {floor}', { floor: formatNumber(tower.best) }) : t('jeszcze żadne') }) }),
       climbers && h('p', { class: tower.missing ? 'tower-missing' : 'muted', text: climbers }),
       details,
       h('div', { class: 'tower-picker' }, step(-10, t('Dziesięć pięter niżej'), '−10'), step(-1, t('Piętro niżej'), '−'), slider, step(1, t('Piętro wyżej'), '+'), step(10, t('Dziesięć pięter wyżej'), '+10')),

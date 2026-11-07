@@ -1,8 +1,9 @@
 // The Wieże Systemu (data/towers.json, src/engine/towers.js; DECISIONS.md,
 // "Wieże Systemu i Gildia"), from character level 50: the Wieża Solo and
 // the Wieża Drużyn. An entry is one fight on a floor the player picks, up
-// to the character's level (in the Wieża Drużyn the lowest level of its
-// Drużyna), with its report at once; the entries of a day are counted
+// to the floor of the character's level, floor 1 being the 50th (in the
+// Wieża Drużyn of the lowest level of its Drużyna; towerTop), with its
+// report at once; the entries of a day are counted
 // together for both towers, from midnight in Poland. The climb does not
 // keep the character from anything (the author: "wspinaczka nie zajmuje
 // postaci"): it goes in also while it works in a profession, at full HP and
@@ -36,6 +37,7 @@ import {
   towerArea,
   towerFight,
   towerGold,
+  towerTop,
   trialTowerFloor,
 } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
@@ -94,16 +96,23 @@ const entriesUsed = (record, now) => (record.day === questPeriod('daily', now, c
 // `top` is the highest floor open, `missing` why the tower is shut.
 async function climbersFor(db, player, tower) {
   const row = player.row;
-  if (tower.members[1] === 1) return { partners: [], companions: [], top: row.level, missing: null };
+  if (tower.members[1] === 1) return { partners: [], companions: [], top: towerTop([row.level], content()), missing: null };
   const party = await partyOf(db, row.id);
   const others = party ? (await Promise.all(party.memberIds.filter((id) => id !== row.id).map((id) => loadCharacter(db, id)))).filter(Boolean) : [];
   const partners = others.slice(0, tower.members[1] - 1).map((other) => ({ id: other.row.id, name: other.row.name, level: other.row.level, character: engineCharacter(other.row), equipped: equippedItems(other) }));
   const places = Math.max(0, tower.size - 1 - partners.length);
   const hired = tower.companions ? (JSON.parse(row.settlement ?? '{}').companions ?? []).filter((companion) => companionReady(companion, true)) : [];
   const companions = hired.slice(0, places);
+  const top = towerTop([row.level, ...partners.map((partner) => partner.level)], content());
+  // Floor 1 is of the level the towers open at: with a player below it
+  // in the Drużyna no floor is open (0.2.11).
   const missing =
-    1 + partners.length < tower.members[0] ? t('Do Wieży Drużyn wchodzi się z drużyną: co najmniej {count} postacie graczy. Drużynę założysz w Społeczności.', { count: tower.members[0] }) : null;
-  return { partners, companions, top: Math.min(row.level, ...partners.map((partner) => partner.level)), missing };
+    1 + partners.length < tower.members[0]
+      ? t('Do Wieży Drużyn wchodzi się z drużyną: co najmniej {count} postacie graczy. Drużynę założysz w Społeczności.', { count: tower.members[0] })
+      : top < 1
+        ? t('Wieża Drużyn otworzy się, gdy każda postać gracza w drużynie będzie miała co najmniej {level}. poziom.', { level: rules().firstFloorLevel })
+        : null;
+  return { partners, companions, top, missing };
 }
 
 // The towers for the page: the entries left today, the order of the
@@ -128,6 +137,8 @@ async function towersView(db, player, now) {
     perDay: entries.perDay,
     left: Math.max(0, entries.perDay - entriesUsed(record, now)),
     chestEvery,
+    firstFloorLevel: rules().firstFloorLevel,
+    strength: rules().strength,
     eliteEvery: rules().floors.eliteEvery,
     eliteLapEvery: rules().floors.eliteLapEvery,
     championEvery: rules().floors.championEvery,
@@ -297,9 +308,9 @@ export async function enterTower(context) {
         row.id,
       ),
     // The Próby Gildii's trial too: the creatures and the fight won, on a
-    // floor at most so many levels below the character (guild-trials.js;
-    // the author: 488 A).
-    ...trialProgress(db, row.id, { kills: huntKills(hunt, content()), towerWins: won && hunt.tower.level >= trialTowerFloor(row.level, content()) ? 1 : 0 }, now),
+    // floor of a level at most so many below the character's
+    // (guild-trials.js; the author: 488 A).
+    ...trialProgress(db, row.id, { kills: huntKills(hunt, content()), towerWins: won && floor >= trialTowerFloor(row.level, content()) ? 1 : 0 }, now),
     ...(storedSold.length > 0 ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${storedSold.map(() => '?').join(', ')})`).bind(row.id, ...storedSold.map((item) => item.id))] : []),
   ]);
   const after = await loadPlayer(db, session.userId);
