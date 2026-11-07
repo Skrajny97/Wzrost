@@ -1,6 +1,17 @@
 {
-  "$comment": "Kody podarunkowe (DECISIONS.md, „Kod podarunkowy”). Gracz wpisuje kod w Ustawieniach; wielkość liter, spacje i myślniki nie mają znaczenia. Każdy kod działa raz na konto, do chwili `until` (czas z przesunięciem, np. Warszawy). Nagrody idą do postaci: Punkty Systemu, Punkty Czasu, złoto i zasoby obozu po id z resources.json. Repozytorium jest publiczne, więc kod widać w tym pliku. Kod dla jednej postaci (`for`) ma zamiast jej imienia skrót SHA-256 imienia małymi literami; inne postacie go nie znają. Takie kody dodaje się tylko na polecenie autora (kod PC: za zaangażowanie). `moves`: nagroda kodu przeniesiona na polecenie autora z jednej postaci konta na drugą (raz; postacie po skrócie SHA-256 imienia bez spacji i znaków innych niż litery i cyfry, małymi literami; robi to serwer, src/server/gift-codes.js).",
+  "$comment": "Kody podarunkowe (DECISIONS.md, „Kod podarunkowy”). Gracz wpisuje kod w Ustawieniach; wielkość liter, spacje i myślniki nie mają znaczenia. Każdy kod działa raz na konto, do chwili `until` (czas z przesunięciem, np. Warszawy); kod z `from` gra zna dopiero od tej chwili. Nagrody idą do postaci: Punkty Systemu, Punkty Czasu, złoto i zasoby obozu po id z resources.json. Repozytorium jest publiczne, więc kod widać w tym pliku. Kod dla jednej postaci (`for`) ma zamiast jej imienia skrót SHA-256 imienia małymi literami; inne postacie go nie znają. Takie kody dodaje się tylko na polecenie autora (kod PC: za zaangażowanie). `moves`: nagroda kodu przeniesiona na polecenie autora z jednej postaci konta na drugą (raz; postacie po skrócie SHA-256 imienia bez spacji i znaków innych niż litery i cyfry, małymi literami; robi to serwer, src/server/gift-codes.js).",
   "codes": [
+    {
+      "id": "eleven-eleven-2026",
+      "code": "1111",
+      "from": "2026-11-11T00:00:00+01:00",
+      "until": "2026-11-12T00:00:00+01:00",
+      "rewards": {
+        "systemPoints": 11,
+        "timePoints": 111,
+        "gold": 1111
+      }
+    },
     {
       "id": "fifty-accounts-2026-11",
       "code": "50",

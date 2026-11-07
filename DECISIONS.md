@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.15 (7.11.2026): kod podarunkowy „1111” na 11 listopada
+
+Autor: „A na 11.11 tylko w ten dzień przygotuj kod 1111 -> dający 11 Punktów Systemu, 111 Punktów Czasu i 1111 złota”.
+
+1. **Kod „1111”** działa tylko 11.11.2026, od 0:00 do 24:00 czasu polskiego, raz na konto, i daje 11 Punktów Systemu, 111 Punktów Czasu i 1111 złota (data/gift-codes.json).
+2. **Początek kodu.** Kody mają teraz opcjonalne pole `from`: przed tą chwilą gra nie zna kodu i odpowiada jak na nieznany kod („Nie ma takiego kodu”), po `until` jak na kod, który się skończył. Najprostsze rozwiązanie: nie zdradza wcześniej, że kod będzie działał, i nie potrzebuje nowego tekstu.
+
 ## Wersja 0.2.14 (7.11.2026): kod podarunkowy „50”
 
 Autor: „Przygotuj też kod podarunkowy "50" ważny cztery tygodnie od dzisiaj -> niech daje 50 Punktów Systemu, 100 Punktów Czasu i 5000 złota”, „to będzie w ramach świętowania 50 otwartych kont, do którego się zbliżamy, ale odpal od razu”.

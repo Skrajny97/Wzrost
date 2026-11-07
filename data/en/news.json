@@ -284,6 +284,10 @@
     "0.2.14": {
       "title": "Version 0.2.14",
       "body": "- Gift code 50 for fifty accounts in the game: 50 System Points, 100 Time Points and 5000 gold. Enter it in the Settings, under \"Gift code\". It works until December 4 inclusive."
+    },
+    "0.2.15": {
+      "title": "Version 0.2.15",
+      "body": "- Gift code 1111, on November 11 only: 11 System Points, 111 Time Points and 1111 gold. Enter it in the Settings, under \"Gift code\". It works from midnight to midnight, Polish time."
     }
   }
 }

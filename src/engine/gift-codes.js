@@ -18,10 +18,12 @@ export const normalCode = (typed) =>
 // works out, characterKey in src/server/gift-codes.js) is unknown to every
 // other one; the same code can be given that way to several characters, one
 // entry each (the author: "na stałe może być ten kod, ale dostępny tylko dla
-// danej konkretnej postaci i tylko na moje polecenie").
+// danej konkretnej postaci i tylko na moje polecenie"). A code with `from`
+// is unknown before that moment, like the 11 November code "1111".
 export function giftCodeOf(typed, now, used, content, characterKey = null) {
   const code = normalCode(typed);
-  const gifts = code ? content.giftCodes.filter((each) => each.code === code && (!each.for || each.for === characterKey)) : [];
+  const known = (each) => each.code === code && (!each.for || each.for === characterKey) && (!each.from || now >= Date.parse(each.from));
+  const gifts = code ? content.giftCodes.filter(known) : [];
   if (gifts.length === 0) return { reason: 'unknown' };
   const open = gifts.filter((each) => now < Date.parse(each.until));
   if (open.length === 0) return { reason: 'expired' };

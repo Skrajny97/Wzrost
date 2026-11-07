@@ -364,6 +364,8 @@ function checkReferences(data) {
       if (owners.length > 0 && (owner === '' || owners.includes('') || owners.includes(owner))) errors.push(`gift-codes.json: kod ${gift.code} powtarza się`);
       typed.set(gift.code, [...owners, owner]);
       if (Number.isNaN(Date.parse(gift.until))) errors.push(`gift-codes.json: ${gift.id} ma nieczytelną datę końca "${gift.until}"`);
+      if (gift.from !== undefined && Number.isNaN(Date.parse(gift.from))) errors.push(`gift-codes.json: ${gift.id} ma nieczytelną datę początku "${gift.from}"`);
+      else if (gift.from !== undefined && Date.parse(gift.from) >= Date.parse(gift.until)) errors.push(`gift-codes.json: ${gift.id} kończy się, zanim zacznie działać`);
       for (const id of Object.keys(gift.rewards.resources ?? {})) {
         if (!resources.has(id)) errors.push(`gift-codes.json: ${gift.id} daje nieznany zasób "${id}"`);
       }

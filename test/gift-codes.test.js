@@ -35,6 +35,26 @@ describe('gift codes in the engine', () => {
     assert.equal(giftRewardsText(tiger.rewards, content), 'Punkty Systemu +500');
   });
 
+  test('50 gives 50 Punkty Systemu, 100 Punktów Czasu and 5000 złota, to the end of 4 December in Warsaw', () => {
+    const fifty = content.giftCodes.find((gift) => gift.id === 'fifty-accounts-2026-11');
+    assert.equal(fifty.code, '50');
+    assert.deepEqual(fifty.rewards, { systemPoints: 50, timePoints: 100, gold: 5000 });
+    assert.equal(giftCodeOf('50', Date.parse('2026-11-07T18:00:00+01:00'), [], content).gift, fifty);
+    assert.equal(giftCodeOf('50', Date.parse('2026-12-04T23:59:00+01:00'), [], content).gift, fifty);
+    assert.equal(giftCodeOf('50', Date.parse('2026-12-05T00:00:00+01:00'), [], content).reason, 'expired');
+  });
+
+  test('1111 works on 11 November in Warsaw only, and is unknown before', () => {
+    const eleven = content.giftCodes.find((gift) => gift.id === 'eleven-eleven-2026');
+    assert.equal(eleven.code, '1111');
+    assert.deepEqual(eleven.rewards, { systemPoints: 11, timePoints: 111, gold: 1111 });
+    assert.equal(giftCodeOf('1111', Date.parse('2026-11-10T23:59:00+01:00'), [], content).reason, 'unknown');
+    assert.equal(giftCodeOf('11-11', Date.parse('2026-11-11T00:00:00+01:00'), [], content).gift, eleven);
+    assert.equal(giftCodeOf('1111', Date.parse('2026-11-11T23:59:00+01:00'), [], content).gift, eleven);
+    assert.equal(giftCodeOf('1111', Date.parse('2026-11-12T00:00:00+01:00'), [], content).reason, 'expired');
+    assert.equal(giftCodeOf('1111', Date.parse('2026-11-11T12:00:00+01:00'), ['eleven-eleven-2026'], content).reason, 'used');
+  });
+
   test('case, spaces and dashes do not matter; an unknown code, an ended one and one taken already give nothing', () => {
     assert.equal(normalCode(' jestem-testerem '), 'JESTEMTESTEREM');
     assert.equal(giftCodeOf('Jestem Testerem', before, [], content).gift, tester);
