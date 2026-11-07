@@ -1,0 +1,14 @@
+{
+  "id": "basilisk",
+  "tool": "pixellab generate-image-v2",
+  "description": "giant basilisk serpent, the king of snakes: thick coiled body of dark green and olive scales with a pale belly, a broad flat reptile head crowned with a ring of bony horn spikes, glowing yellow petrifying eyes, forked tongue, no feathers, no beak, no comb, no wattle, no bird parts, full body",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 25
+}
