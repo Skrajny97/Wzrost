@@ -183,32 +183,49 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
     assert.equal((await call('POST', '/api/friends/gift-all', { cookie: players.ala })).data.error.code, 'sent');
   });
 
-  test('collecting the Upominki pays all they hold, at most ten a day', async () => {
+  test('collecting the Upominki pays all they hold, at most claimsPerDay a day', async () => {
     const database = await db();
+    const limit = content.community.gift.claimsPerDay;
     const ola = await database.prepare("SELECT id, gold, time_points, resources FROM characters WHERE name = 'Ola'").first();
-    // Twelve sent yesterday by twelve senders, each worth 1 Time Point and 5
-    // gold, or 3 wood.
-    const day = questPeriod('daily', Date.now() - 86400000, content).key;
-    for (let index = 0; index < 12; index += 1) {
+    // Two more than a day's limit, from twelve senders over the days before
+    // today, each worth 1 Time Point and 5 gold, or 3 wood. They are
+    // collected oldest first, in the order they were sent.
+    const senders = 12;
+    const sent = [];
+    for (let index = 0; index < senders; index += 1) {
       const { cookie } = await signUp(`dawca${index}`);
       await call('POST', '/api/character', { cookie, body: { name: `Dawca${index}`, classId: 'warrior', appearance: 'male' } });
-      const reward = index % 2 === 0 ? { timePoints: 1, gold: 5, resources: {} } : { timePoints: 1, gold: 0, resources: { wood: 3 } };
-      await database
-        .prepare("INSERT INTO gifts (sender_id, receiver_id, day, created_at, reward) SELECT id, ?, ?, 0, ? FROM characters WHERE name = ?")
-        .bind(ola.id, day, JSON.stringify(reward), `Dawca${index}`)
-        .run();
     }
+    for (let back = 1; sent.length < limit + 2; back += 1) {
+      const day = questPeriod('daily', Date.now() - back * 86400000, content).key;
+      for (let index = 0; index < senders && sent.length < limit + 2; index += 1) {
+        const reward = index % 2 === 0 ? { timePoints: 1, gold: 5, resources: {} } : { timePoints: 1, gold: 0, resources: { wood: 3 } };
+        await database
+          .prepare("INSERT INTO gifts (sender_id, receiver_id, day, created_at, reward) SELECT id, ?, ?, 0, ? FROM characters WHERE name = ?")
+          .bind(ola.id, day, JSON.stringify(reward), `Dawca${index}`)
+          .run();
+        sent.push(reward);
+      }
+    }
+    const taken = sent.slice(0, limit);
+    const gold = taken.reduce((sum, reward) => sum + reward.gold, 0);
+    const wood = taken.reduce((sum, reward) => sum + (reward.resources.wood ?? 0), 0);
     const claimed = await call('POST', '/api/friends/claim', { cookie: players.ola });
     assert.equal(claimed.status, 200);
-    assert.deepEqual(claimed.data.reward, { count: 10, timePoints: 10, gold: 25, resources: { wood: 15 } });
+    assert.deepEqual(claimed.data.reward, { count: limit, timePoints: limit, gold, resources: { wood } });
     const after = await database.prepare("SELECT gold, time_points, resources FROM characters WHERE name = 'Ola'").first();
-    assert.equal(after.gold, ola.gold + 25);
-    assert.ok(after.time_points >= ola.time_points + 10);
-    assert.equal(JSON.parse(after.resources).wood, (JSON.parse(ola.resources).wood ?? 0) + 15);
-    assert.deepEqual([claimed.data.gifts.claimedToday, claimed.data.gifts.waiting], [10, 2]);
+    assert.equal(after.gold, ola.gold + gold);
+    assert.ok(after.time_points >= ola.time_points + limit);
+    assert.equal(JSON.parse(after.resources).wood, (JSON.parse(ola.resources).wood ?? 0) + wood);
+    assert.deepEqual([claimed.data.gifts.claimedToday, claimed.data.gifts.waiting], [limit, 2]);
     // The rest waits for tomorrow, and the light does not promise it today.
     assert.equal((await call('POST', '/api/friends/claim', { cookie: players.ola })).data.error.code, 'limit');
     assert.equal((await call('GET', '/api/chat/latest', { cookie: players.ola })).data.gifts, 0);
+  });
+
+  // The author, 7.11.2026: "Zwiększmy możliwość odbierania upominków do 30 dziennie."
+  test('a character collects up to 30 Upominki a day', () => {
+    assert.equal(content.community.gift.claimsPerDay, 30);
   });
 
   test('a character gone takes its friendships and Upominki along', async () => {

@@ -11,7 +11,7 @@
   "friends": { "max": 30 },
   "gift": {
     "name": "Upominek",
-    "claimsPerDay": 10,
+    "claimsPerDay": 30,
     "keepDays": 7,
     "timePoints": 1,
     "goldChance": 0.5,

@@ -244,6 +244,10 @@
     "0.2.3": {
       "title": "Version 0.2.3",
       "body": "- The game has Terms and a Privacy Policy (insightrpg.com/terms and insightrpg.com/privacy), and the page insightrpg.com/delete-account explains how to delete an account. The links are on the sign-in screen and in the Settings.\n- Insight is for people aged 16 or over: a new account confirms it when it is made."
+    },
+    "0.2.4": {
+      "title": "Version 0.2.4",
+      "body": "- You can collect up to 30 Gifts from friends a day instead of 10. Each still gives a Time Point and gold or resources."
     }
   }
 }

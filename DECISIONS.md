@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.4 (7.11.2026): 30 Upominków dziennie
+
+- Autor: „Zwiększmy możliwość odbierania upominków do 30 dziennie.” Postać odbiera dziennie do 30 Upominków zamiast 10 (`claimsPerDay` w `data/community.json`). Każdy daje jak dotąd 1 Punkt Czasu oraz złoto albo zasób, więc z Upominków przychodzi dziennie do 30 Punktów Czasu. Wysyłanie się nie zmienia: jeden Upominek dziennie do każdego znajomego.
+
 ## Wersja 0.2.3 (7.11.2026): przygotowanie do Sklepu Play
 
 Autor wybrał Sklep Play jako następną pracę (722 A) i odpowiedział: „723 A - już istnieje, właśnie kontakt@insightrpg.com”, „724 A” z imieniem i nazwiskiem do polityki prywatności, „725 A”, „726 A (zrzuty z IPhone'a są od testerów)”.
