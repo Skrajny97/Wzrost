@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.9 (7.11.2026): kolejny stopień prosto z raportu
+
+Autor (7.11.2026): „dodaj opcje następny portal po pokonaniu jednego stopnia jesli jest dostępny (wymagania poziomu spełnione) na samej górze raportu”.
+
+1. **„Walcz o stopień N” na samej górze raportu**, zaraz pod tytułem, gdy stopień właśnie wygrano, a kolejny jest otwarty: nie wyżej niż poziom postaci i nie wyżej niż ostatni stopień. Naciśnięcie od razu walczy o ten stopień w tym samym portalu, tak jak przycisk na karcie portalu (z towarzyszami albo bez, jak zaznaczono na Portalach), i otwiera nowy raport. Po wygranej znowu pojawia się przycisk, więc można iść stopień po stopniu bez wracania do listy.
+2. **Tylko w raporcie walki stoczonej przed chwilą.** Raport otwarty później z Dziennika przycisku nie ma, bo kolejny stopień mógł być już pokonany. Po przegranej przycisku też nie ma.
+3. Serwer zapisuje w raporcie walki w portalu kolejny otwarty stopień (`portal.next`, albo null). Walka w portalu nie daje doświadczenia, więc liczy się poziom, na którym walczono.
+
 ## Wersja 0.2.8 (7.11.2026): narrator o Portalach
 
 Autor: 738.1 i 738.2 bez poprawek, 738.3–738.5 w swoim brzmieniu, a na stronie odsłuchu 740 wybrał nagrania.

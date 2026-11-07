@@ -330,6 +330,11 @@
       "id": "0.2.8",
       "title": "Wersja 0.2.8",
       "body": "- Narrator opowiada o Portalach, gdy tylko się otworzą (od 5. poziomu postaci), po polsku i po angielsku.\n- Portal to teraz jego tło z nazwą: dotknij go, a pokaże stopień, walkę i czyszczenie. Bez kółek i nazw krain. Zwinięty portal to niski pasek, więc całą listę widać bez przewijania.\n- Na górze Portali jest „Wyczyść wszystkie”: jedno naciśnięcie zużywa wszystkie dzisiejsze czyszczenia we wszystkich portalach.\n- „Zmień postać” jest w Ustawieniach wyżej, nad „Zgłoś błąd”."
+    },
+    {
+      "id": "0.2.9",
+      "title": "Wersja 0.2.9",
+      "body": "- Po wygranej w Portalu na samej górze raportu jest „Walcz o stopień”: kolejny stopień od razu, bez wracania do listy, jeśli poziom postaci już na niego pozwala."
     }
 ]
 }

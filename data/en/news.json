@@ -260,6 +260,10 @@
     "0.2.8": {
       "title": "Version 0.2.8",
       "body": "- The narrator tells you about the Portals as soon as they open (from character level 5), in Polish and in English.\n- A portal is now its picture with its name: tap it to see its stage, its fight and its sweep. No circles and no land names. A closed portal is a low strip, so the whole list fits without scrolling.\n- At the top of the Portals there is \"Sweep all\": one tap uses all of today's sweeps in every portal.\n- \"Change character\" is higher up in the Settings, above \"Report a bug\"."
+    },
+    "0.2.9": {
+      "title": "Version 0.2.9",
+      "body": "- After a win in a Portal, the top of the report has \"Fight for stage\": the next stage at once, without going back to the list, if your character's level already allows it."
     }
   }
 }

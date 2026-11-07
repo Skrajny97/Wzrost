@@ -17,6 +17,7 @@ import { narrate } from '../narrator.js';
 import { scrapperSheet } from '../scrapper.js';
 import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy } from './character.js';
 import { skipLines } from './party.js';
+import { fightPortal } from './portals.js';
 import { herbsReport, itemsReport, jewelsReport, mineralsReport, potionsReport } from './professions.js';
 
 // "skóra wilka ×2, rzadkie pióro kruka": what beaten creatures left.
@@ -50,6 +51,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
   let report = reportCache.get(params.id) ?? null;
   let selected = null;
   let firstPlayback = true;
+  // The report of a fight just fought (not one opened from the Dziennik).
+  const fresh = state.freshReport === String(params.id);
   const actionBox = h('div', { class: 'stack' });
   const fightBox = h('div', { class: 'fight-view' });
   // The narrator points at the tabs, or at the title of a single fight.
@@ -142,6 +145,18 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
             report.flash ? t('Błyskawiczne polowanie') : report.quick ? t('Szybkie Polowanie') : t('Raport z wyprawy'),
             `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
           ),
+      // A stage just won with the next one open: its fight at the very top
+      // (the author, 7.11.2026), as the button on the portal's card.
+      fresh &&
+        report.portal?.won &&
+        report.portal.next &&
+        h('button', {
+          type: 'button',
+          class: 'button button--system report-next-stage',
+          'data-guide': 'report-next-stage',
+          text: t('Walcz o stopień {stage}', { stage: report.portal.next }),
+          onClick: (event) => withButton(event.currentTarget, () => fightPortal(report.portal.id, navigate)),
+        }),
       report.portal?.companions?.length > 0 && h('p', { class: 'report-party', text: t('Z postacią: {names}.', { names: report.portal.companions.join(', ') }) }),
       report.tower &&
         (report.tower.partners.length > 0 || report.tower.companions.length > 0) &&

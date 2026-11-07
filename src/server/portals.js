@@ -144,6 +144,11 @@ export async function enterPortal(context) {
     resultText: hunt.portal.text,
     portal: { id: portal.id, name: portal.name, stage, level: hunt.portal.level, won, first: hunt.portal.first, loot: hunt.portal.loot, companions: hunt.portal.companions },
   };
+  // The stage the portal opens next, null when the character's level or the
+  // last stage holds it: the report of a stage won offers its fight at the
+  // top (the author, 7.11.2026). A portal's fight gives no experience, so
+  // the level is the one fought at.
+  report.portal.next = portalNext(won ? stage : best, row.level, content());
   const summary = {
     portal: { id: portal.id, name: portal.name, stage, loot: hunt.portal.loot },
     areaName: report.areaName,

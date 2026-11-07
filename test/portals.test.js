@@ -270,6 +270,18 @@ describe('the Portale through the API', () => {
     assert.equal(journal[0].kind, 'portal');
   });
 
+  test('the report of a stage won names the next stage open, and none at the character\'s level (the next fight at the top of the report)', async () => {
+    const entered = await win('gold');
+    assert.equal(entered.data.report.portal.stage, 1);
+    assert.equal(entered.data.report.portal.next, 2);
+    const stored = (await as('GET', `/api/reports/${entered.data.report.id}`)).data.report;
+    assert.equal(stored.portal.next, 2);
+    await set('portals = ?', JSON.stringify({ best: { wood: 4 } }));
+    const last = await win('wood');
+    assert.equal(last.data.report.portal.stage, 5);
+    assert.equal(last.data.report.portal.next, null, 'stage 6 waits for character level 6');
+  });
+
   test('never above the character\'s level', async () => {
     await set('portals = ?', JSON.stringify({ best: { stone: 5 } }));
     const stone = (await view()).portals.find((one) => one.id === 'stone');

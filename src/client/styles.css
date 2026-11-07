@@ -11682,6 +11682,12 @@ a.profession-square:active {
   color: var(--text-muted);
 }
 
+/* The next stage of a portal, at the top of the report of a stage won. */
+.report-next-stage {
+  width: 100%;
+  margin: 0 0 12px;
+}
+
 /* "Wyrusz" held above the bottom tabs on a place's screen (combat.js). */
 .start-bar {
   position: sticky;

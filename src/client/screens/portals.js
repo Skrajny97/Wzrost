@@ -40,6 +40,18 @@ function setTakesCompanions(value) {
   }
 }
 
+// A fight for a portal's next stage, with or without the companions as the
+// box on the Portale says, its report opened at once: from the portal's card
+// and from the top of the report of a stage won (the author, 7.11.2026:
+// "dodaj opcje następny portal po pokonaniu jednego stopnia jesli jest
+// dostępny […] na samej górze raportu").
+export async function fightPortal(portalId, navigate) {
+  const { report } = await call('POST', '/api/portals/enter', { portal: portalId, companions: takesCompanions() });
+  reportCache.set(String(report.id), report);
+  state.freshReport = String(report.id);
+  navigate(`#/raport/${report.id}`);
+}
+
 // The portals opened with a tap, kept while the page is open: a portal
 // stays open after its sweep and on the way back from its fight's report.
 const openPortals = new Set();
@@ -135,13 +147,7 @@ export function mountPortals(container, { navigate }) {
               type: 'button',
               class: 'button button--system',
               text: t('Walcz o stopień {stage}', { stage: portal.next }),
-              onClick: (event) =>
-                withButton(event.currentTarget, async () => {
-                  const { report } = await call('POST', '/api/portals/enter', { portal: portal.id, companions: takesCompanions() });
-                  reportCache.set(String(report.id), report);
-                  state.freshReport = String(report.id);
-                  navigate(`#/raport/${report.id}`);
-                }),
+              onClick: (event) => withButton(event.currentTarget, () => fightPortal(portal.id, navigate)),
             }),
           ];
     const sweep =
