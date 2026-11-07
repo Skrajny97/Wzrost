@@ -276,6 +276,10 @@
     "0.2.12": {
       "title": "Version 0.2.12",
       "body": "- You open the Towers' floors by climbing: every floor you conquer opens the next one, whatever your character's level.\n- The Towers' creatures are now three times as strong: they hit three times as hard and have three times the HP."
+    },
+    "0.2.13": {
+      "title": "Version 0.2.13",
+      "body": "- The Cleric has a new portrait, with a clear face."
     }
   }
 }

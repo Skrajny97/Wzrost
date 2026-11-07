@@ -3034,6 +3034,12 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.13 (7.11.2026): nowy portret Kleryka
+
+Autor (7.11.2026, zrzut portretu): „trzeba poprawić portret Kleryka bo wygląda jego twarz tragicznie - jakby nie miał oczu albo miał zeza”. PixelLab narysował poprawkę samych oczu (747.1) i portret od nowa z obecnym jako wzorem (747.2, 747.3; dwie inne wersje z kijem i księgą odpadły, bo portrety klas mają puste ręce). Autor: „748 -> 747.2”.
+
+1. **Kleryk ma portret 747.2**: ta sama postać, strój i poza, z wyraźną twarzą i oczami. Portret jest przeskalowany i ustawiony jak pozostałe (tools/normalize-portraits.py; twarz dalej w kolumnie 49, więc popiersia i miejsce chowańca bez zmian), a osiem odcieni skóry zrobiło na nowo tools/skin-tones.py.
+
 ## Wersja 0.2.12 (7.11.2026): piętra Wież otwiera wspinaczka, stwory trzy razy silniejsze
 
 Autor (7.11.2026, 13:39, wiadomość doczytana dopiero po wysłaniu 0.2.11): „i wieże się odblokowują niezależnie od poziomu mozna isc w gore bez poziomu odpowiedniego inaczej niż Portale”. Potem, o pytaniu 746: „746 B nagrania zaznaczone, Ty za mało czynników bierzesz pod uwagę i to bedzie dalej za latwe, juz znam te Twoje numery”.
