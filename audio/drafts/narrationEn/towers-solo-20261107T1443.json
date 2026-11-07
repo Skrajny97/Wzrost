@@ -1,0 +1,17 @@
+{
+  "id": "towers-solo",
+  "payload": {
+    "text": "The first floor is already level fifty, and each next one is a level higher. Here the System strengthens the creatures of every land: they hit twice as hard and have twice the HP. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 1
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/towers-solo-20261107T1443-0.mp3",
+    "audio/drafts/narrationEn/towers-solo-20261107T1443-1.mp3"
+  ],
+  "credits": 428
+}
