@@ -128,6 +128,9 @@ const TRANSLATED = new Set([
 // The Ranking's guilds tab is named in data/guilds.json (fame.tabs), so its
 // English comes from data/en/guilds.json, not from strings.json.
 const GUILDS_TAB = LANG === 'en' ? JSON.parse(fs.readFileSync(path.join(__dirname, '../data/en/guilds.json'), 'utf8')).fame.texts.tabs.guilds : 'Gildie';
+// Folds opened on a screen after its tabs, all at once: the Portale's
+// cards, each its picture till a tap shows its stage (7.11.2026).
+const FOLDS = { '#/portale': '.portal-toggle[aria-expanded="false"]' };
 const TABS = { '#/oboz/craft-table': [said('Kolejka ({count}/{limit})').replace(/\s*\(.*$/, '')], '#/osada/board': [said('Poszukiwani')], '#/spolecznosc/ranking': [GUILDS_TAB] };
 // Sheets opened over a screen after its tabs, each from the one before (a
 // tap on `tap`, or a picture given to the file field `pick`), looked at
@@ -386,6 +389,12 @@ async function main() {
         await button.click();
         await view.waitForTimeout(500);
         await check(`${screen} › ${tab}`, null, TRANSLATED.has(screen));
+      }
+      if (FOLDS[screen]) {
+        // Each one opened leaves the selector, so always the first closed one.
+        for (let left = await view.locator(FOLDS[screen]).count(); left > 0; left -= 1) await view.locator(FOLDS[screen]).first().click();
+        await view.waitForTimeout(500);
+        await check(`${screen} › otwarte`, null, TRANSLATED.has(screen));
       }
       // A sheet that does not open or close is a problem; the steps after it
       // are left, and the page loaded anew.

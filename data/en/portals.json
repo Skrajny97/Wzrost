@@ -32,6 +32,7 @@
     "lost": ["Stage {stage} was not cleared."],
     "defeat": ["The System leads {target} out of the portal.", "Fight lost. The System leads {target} out of the portal."],
     "loot": ["Loot: {loot}."],
+    "sweptAll": ["Portals cleared: {list}."],
     "swept": ["Stage {stage} cleared again. Loot: {loot}."]
   }
 }

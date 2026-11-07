@@ -26,7 +26,7 @@ import { acceptChatRules, blockInChat, chatPeople, chatReports, closeChat, lates
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendAllGifts, sendGift } from './community.js';
 import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
 import { enterTower, getTowers } from './towers.js';
-import { enterPortal, getPortals, sweepPortal } from './portals.js';
+import { enterPortal, getPortals, sweepAllPortals, sweepPortal } from './portals.js';
 import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, setGuildRole } from './guilds.js';
 import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-beast.js';
 import { attackGuildGuardian, claimGuildExpeditionChest, getGuildExpedition } from './guild-expedition.js';
@@ -88,6 +88,7 @@ import {
   repeatSystemCollectorTour,
   repeatTowersTour,
   repeatMiningTour,
+  repeatPortalsTour,
   repeatProfessionsTour,
   repeatSettlementTour,
   repeatSkillsTour,
@@ -348,6 +349,7 @@ const routes = [
   ['POST', '/api/towers/enter', enterTower],
   ['POST', '/api/portals/enter', enterPortal],
   ['POST', '/api/portals/sweep', sweepPortal],
+  ['POST', '/api/portals/sweep-all', sweepAllPortals],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],
   ['POST', '/api/chat/seen', markChatSeen],
@@ -379,6 +381,7 @@ const routes = [
   ['POST', '/api/test/evolution-tour', repeatEvolutionTour],
   ['POST', '/api/test/towers-tour', repeatTowersTour],
   ['POST', '/api/test/mining-tour', repeatMiningTour],
+  ['POST', '/api/test/portals-tour', repeatPortalsTour],
   ['POST', '/api/test/guild-tour', repeatGuildTour],
   ['POST', '/api/test/fortress-tour', repeatFortressTour],
   ['POST', '/api/test/cornerstone-tour', repeatCornerstoneTour],

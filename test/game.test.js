@@ -2095,6 +2095,40 @@ describe('Time Points and the narrator', () => {
     assert.deepEqual(again.data.character.tutorial, before);
   });
 
+  test('the Portale chapter (738) comes after the Górnictwo, as the author wrote it, and test mode starts it again', async () => {
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once;
+    const lines = tutorial.lines.filter((line) => line.chapter === 'portals');
+    assert.deepEqual(
+      lines.map((line) => [line.id, line.kind]),
+      [
+        ['portals-welcome', 'card'],
+        ['portals-lead', 'lead'],
+        ['portals-lands', 'point'],
+        ['portals-stages', 'point'],
+        ['portals-sweep', 'card'],
+      ],
+    );
+    // 738.1 and 738.2 as proposed, 738.3-738.5 as the author wrote them.
+    assert.equal(lines[0].text[0], 'Piąty poziom postaci… System otworzył przed Tobą Portale.');
+    assert.equal(lines[2].text[0], 'W każdym Portalu przeniesiesz się do innej krainy, która da Ci odpowiednie surowce.');
+    assert.equal(lines.at(-1).text[0], 'Możesz czyścić również pokonany wcześniej stopień bez walki – pięć razy dziennie, zgarniając niezbędne zasoby.');
+    // The takes the author accepted on the listening page (740).
+    assert.ok(lines.every((line) => line.voice === `audio/narration/${line.id}.mp3`));
+    const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
+    assert.ok(at('portals-welcome') > at('mining-ending'));
+    assert.deepEqual(tutorial.chapters.portals, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Portale czekają w zakładce Walka.' });
+    const chapter = lines.filter(kept).map((line) => line.id);
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    await see({ skip: true });
+    const before = (await see({ skip: true, chapter: 'skills' })).data.character.tutorial;
+    const read = (await see({ skip: true, chapter: 'portals' })).data.character.tutorial;
+    assert.deepEqual(read, [...before, ...chapter]);
+    const again = await call('POST', '/api/test/portals-tour', { cookie });
+    assert.equal(again.status, 200);
+    assert.deepEqual(again.data.character.tutorial, before);
+  });
+
   test('test mode starts the Społeczność chapter again', async () => {
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });

@@ -325,6 +325,11 @@
       "id": "0.2.7",
       "title": "Wersja 0.2.7",
       "body": "- W Wieżach zgarniesz teraz dużo więcej. Za wygraną dostajesz złoto jak za dwie godziny wyprawy na poziomie piętra, kilka razy więcej niż za czyszczenie Portalu.\n- Każda wygrana daje też 3 materiały stworów piętra, tym rzadsze, im wyższe piętro: od 50. piętra legendarne i mityczne, od 150. także boskie.\n- Z szansą 15% wygrana daje przedmiot Twojej klasy na poziomie piętra, epicki albo rzadszy. Na karcie Wieży widzisz łup za wybrane piętro.\n- Portale mają swoje tła, a postęp w nich zaczyna się od nowa: w każdym portalu znów walczysz o stopień 1."
+    },
+    {
+      "id": "0.2.8",
+      "title": "Wersja 0.2.8",
+      "body": "- Narrator opowiada o Portalach, gdy tylko się otworzą (od 5. poziomu postaci), po polsku i po angielsku.\n- Portal to teraz jego tło z nazwą: dotknij go, a pokaże stopień, walkę i czyszczenie. Bez kółek i nazw krain. Zwinięty portal to niski pasek, więc całą listę widać bez przewijania.\n- Na górze Portali jest „Wyczyść wszystkie”: jedno naciśnięcie zużywa wszystkie dzisiejsze czyszczenia we wszystkich portalach.\n- „Zmień postać” jest w Ustawieniach wyżej, nad „Zgłoś błąd”."
     }
 ]
 }

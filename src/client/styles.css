@@ -11952,6 +11952,87 @@ a.profession-square:active {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 
+/* A portal's card: its picture with its name, and a tap anywhere on the
+   picture shows the stage below it (7.11.2026). Closed, the picture is the
+   whole card. */
+.portal-head {
+  position: relative;
+}
+
+/* Closed, the picture is a low strip of its middle (the author: "pozwól
+   też zwijać i rozwijać portale, żeby nie trzeba było tyle scrollować"). */
+.portal-card:not(.portal-card--open) .tower-head--art {
+  aspect-ratio: auto;
+  height: 76px;
+  margin-bottom: -14px;
+  border-bottom: 0;
+  border-radius: 4px;
+}
+
+.portal-sweep-all {
+  width: 100%;
+}
+
+.portal-head .card-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.portal-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.portal-toggle::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.portal-toggle:focus-visible {
+  outline: none;
+}
+
+.portal-toggle:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.portal-marker::before {
+  content: '▾';
+  font-size: 16px;
+}
+
+.portal-toggle[aria-expanded='true'] .portal-marker::before {
+  content: '▴';
+}
+
+.portal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.portal-body[hidden] {
+  display: none;
+}
+
+.portal-stage p {
+  margin: 0 0 4px;
+}
+
 .tower-floor {
   display: flex;
   align-items: center;

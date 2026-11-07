@@ -156,7 +156,8 @@ const laterHalfway = (read) =>
   (read.has('settlement-welcome') && settlementWaiting(read)) ||
   (read.has('evolution-welcome') && evolutionWaiting(read)) ||
   (read.has('towers-welcome') && towersWaiting(read)) ||
-  (read.has('mining-welcome') && miningWaiting(read));
+  (read.has('mining-welcome') && miningWaiting(read)) ||
+  (read.has('portals-welcome') && portalsWaiting(read));
 const settlementDue = (hash, read) =>
   Boolean(state.character.settlementOpen) &&
   !onReport(hash) &&
@@ -236,6 +237,30 @@ const towersWaiting = (read) => isUnlocked('towers') && !read.has('towers-ending
 // As the Rzemieślnictwo's: not begun yet, it holds nothing up while the
 // worker is busy (664).
 const miningWaiting = (read) => isUnlocked('mining') && !read.has('mining-ending') && (read.has('mining-welcome') || workerFree());
+// The Portale chapter (738): once the portals open (character level 5),
+// after the report that brought it there and only when no other chapter
+// waits. Not on the character's screens either. It leads to the Walka tab,
+// from where the narrator itself opens the Portale, points at the first
+// portal and at its next stage, and ends there with its sweeps.
+const onPortals = (hash) => hash === '#/portale';
+const portalsWaiting = (read) => isUnlocked('portals') && !read.has('portals-sweep');
+const portalsDue = (hash, read) =>
+  isUnlocked('portals') &&
+  !onReport(hash) &&
+  !onCharacter(hash) &&
+  !skillsWaiting(read) &&
+  !professionsWaiting(read) &&
+  !communityWaiting(read) &&
+  !craftingWaiting(read) &&
+  !settlementWaiting(read) &&
+  !evolutionWaiting(read) &&
+  !towersWaiting(read) &&
+  !miningWaiting(read) &&
+  !read.has('portals-sweep');
+const portalsTour = (hash, read) => portalsDue(hash, read) && read.has('portals-welcome');
+const portalsHere = (hash, read) => onPortals(hash) && portalsTour(hash, read);
+// From the Walka tab, which the lead opens, on to the Portale.
+const portalsTrip = (hash, read) => (hash === '#/walka' && portalsTour(hash, read) && !read.has('portals-lands') ? '#/portale' : null);
 // No chapter waits: only then a line of a single place comes (the Osada's,
 // Szybkie Polowanie's, the Gildia's, the Warownia's and the other places').
 const noChapterWaits = (read) =>
@@ -246,7 +271,8 @@ const noChapterWaits = (read) =>
   !settlementWaiting(read) &&
   !evolutionWaiting(read) &&
   !towersWaiting(read) &&
-  !miningWaiting(read);
+  !miningWaiting(read) &&
+  !portalsWaiting(read);
 // After the introduction, with no chapter waiting: a line of its own place
 // told on the place's first visit, as the Osada's are (641-647): the
 // Gildia's, the Warownia's, and those of 6.11.2026 below.
@@ -556,6 +582,15 @@ const BEATS = {
   'mining-jewels': { place: mark('jewel-patterns'), go: lapidaryTrip, when: atLapidary },
   'mining-setting': { place: mark('jewel-tab-set'), go: lapidaryTrip, when: atLapidary },
   'mining-ending': { go: lapidaryTrip, when: atLapidary },
+  // The Portale chapter, after all the others (738).
+  'portals-welcome': { when: portalsDue },
+  'portals-lead': {
+    place: '#nav-main > .nav-item[href="#/walka"]',
+    when: (hash, read) => portalsTour(hash, read) && hash !== '#/walka' && !onPortals(hash) && !read.has('portals-lands'),
+  },
+  'portals-lands': { place: mark('portal-gold'), go: portalsTrip, when: portalsHere },
+  'portals-stages': { place: mark('portal-gold-stage'), tab: mark('portal-gold-open'), when: portalsHere },
+  'portals-sweep': { when: portalsHere },
   // The Gildia, for a member (6.11.2026): its tabs on the first look at its
   // page, then each tab on its first look, the Wyprawa Gildii (646) too.
   'guild-tabs': { place: mark('guild-tabs'), when: (hash, read) => onGuildPage(hash) && inGuild(read) },

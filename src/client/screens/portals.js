@@ -1,14 +1,15 @@
 // The Portale Systemu in the Walka (src/server/portals.js), from character
 // level 5 (731 A): each portal with its highest stage won, the fight for
-// the next one (its inner region, its level and the loot of a win,
-// as often as the player likes, up to the character's level) and the sweep
-// of the stage won, its loot at once, a few times a day. A fight's report
-// opens at once; a sweep's loot shows in a toast. Entries come at any
-// time, also during an exploration (732 A). Over a card its portal's
-// picture, when it has one (data/portals.json, art). The words are shown
-// in the page's language (t(), i18n.js).
+// the next one (its level and the loot of a win, as often as the player
+// likes, up to the character's level) and the sweep of the stage won, its
+// loot at once, a few times a day. A fight's report opens at once; a
+// sweep's loot shows in a toast. Entries come at any time, also during an
+// exploration (732 A). A card is its portal's picture with its name
+// (data/portals.json, art); a tap on it shows the stage, with nothing of
+// the lands (the author, 7.11.2026: "po prostu się klika w te tła Portal
+// Złota itp. i pokazuje stopień", "nie ma byc nic o krainach to jest poza
+// wyprawami"). The words are shown in the page's language (t(), i18n.js).
 
-import { areaArt } from '../area-art.js';
 import { placeArt } from '../art.js';
 import { fill, h } from '../dom.js';
 import { formatNumber } from '../format.js';
@@ -39,6 +40,10 @@ function setTakesCompanions(value) {
   }
 }
 
+// The portals opened with a tap, kept while the page is open: a portal
+// stays open after its sweep and on the way back from its fight's report.
+const openPortals = new Set();
+
 export function mountPortals(container, { navigate }) {
   let view = null;
   let gone = false;
@@ -59,10 +64,11 @@ export function mountPortals(container, { navigate }) {
         'section',
         { class: 'card towers-intro' },
         view.companions.length > 0 && companionsBox(),
+        sweepAllButton(),
         howItWorks(
           t('Walcz o kolejne stopnie portali, ile chcesz. Pokonane stopnie czyścisz: łup od razu, bez walki, {count} razy dziennie w każdym portalu.', { count: view.sweepsPerDay }),
           t(
-            'Postać walczy z pełnym HP i bez mikstur, a może zabrać towarzyszy z Kwater (bez Drużyny). Wejść można zawsze, także w czasie wyprawy i pracy w profesji. W każdym portalu za wygraną zgarniesz tylko jego łup: złoto, zasób obozu, materiały stworów albo części do rzemiosła. Stopień ma zwykłe stwory krainy swoich poziomów, silniejsze niż w Eksploracji, bez elit i czempionów. Pokonany stopień otwiera następny, najwyżej do stopnia równego poziomowi postaci i do {max}. Za wygraną i za czyszczenie zgarniesz tyle, ile daje około {minutes} minut wyprawy na poziomie stopnia, więc im wyższy stopień, tym większy łup. Czyszczenie daje łup najwyższego pokonanego stopnia. Portale nie dają doświadczenia ani przedmiotów.',
+            'Postać walczy z pełnym HP i bez mikstur, a może zabrać towarzyszy z Kwater (bez Drużyny). Wejść można zawsze, także w czasie wyprawy i pracy w profesji. W każdym portalu za wygraną zgarniesz tylko jego łup: złoto, zasób obozu, materiały stworów albo części do rzemiosła. Na stopniu czekają zwykłe stwory jego poziomu, silniejsze niż w Eksploracji, bez elit i czempionów. Pokonany stopień otwiera następny, najwyżej do stopnia równego poziomowi postaci i do {max}. Za wygraną i za czyszczenie zgarniesz tyle, ile daje około {minutes} minut wyprawy na poziomie stopnia, więc im wyższy stopień, tym większy łup. Czyszczenie daje łup najwyższego pokonanego stopnia. Portale nie dają doświadczenia ani przedmiotów.',
             { max: view.maxStage, minutes: view.lootMinutes },
           ),
         ),
@@ -71,15 +77,34 @@ export function mountPortals(container, { navigate }) {
     );
   }
 
+  // "Wyczyść wszystkie" at the top (the author, 7.11.2026): every sweep
+  // left today in every portal with a stage won, with how many there are.
+  function sweepAllButton() {
+    const won = view.portals.filter((portal) => portal.best > 0);
+    if (won.length === 0) return null;
+    const left = won.reduce((sum, portal) => sum + portal.sweepsLeft, 0);
+    return h('button', {
+      type: 'button',
+      class: 'button button--world portal-sweep-all',
+      'data-guide': 'portal-sweep-all',
+      disabled: left === 0,
+      text: t('Wyczyść wszystkie ({count})', { count: left }),
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          const result = await call('POST', '/api/portals/sweep-all');
+          view = result.portals;
+          setCharacter(result.character);
+          show();
+          toast(result.sweep.text);
+        }),
+    });
+  }
+
   // The box that takes the companions along, with their names.
   function companionsBox() {
     const box = h('input', { type: 'checkbox', id: 'portal-companions', class: 'avoid-rare-box', checked: takesCompanions(), onChange: () => setTakesCompanions(box.checked) });
     return h('label', { class: 'avoid-rare', for: 'portal-companions' }, box, h('span', { text: t('Zabierz towarzyszy: {names}', { names: view.companions.join(', ') }) }));
   }
-
-  // The inner region of a stage: the one whose levels hold it, past the
-  // last land its last place (portalArea in the engine).
-  const regionOf = (stage) => view.regions.find((region) => region.from <= stage && stage <= region.to) ?? view.regions.reduce((last, region) => (region.to > last.to ? region : last));
 
   // A loot of `pieces` in words: its gold, or so many pieces of the portal's
   // goods (the server counts them: portalAmount in the engine).
@@ -96,20 +121,15 @@ export function mountPortals(container, { navigate }) {
       portal.next === null
         ? h('p', {
             class: 'muted',
-            text: portal.best >= view.maxStage ? t('To ostatni stopień tego portalu. Kolejne przyjdą z nowymi krainami.') : t('Kolejny stopień otworzy się na poziomie postaci {level}.', { level: portal.best + 1 }),
+            'data-guide': `portal-${portal.id}-stage`,
+            text: portal.best >= view.maxStage ? t('To ostatni stopień tego portalu. Kolejne stopnie przyjdą później.') : t('Kolejny stopień otworzy się na poziomie postaci {level}.', { level: portal.best + 1 }),
           })
         : [
             h(
               'div',
-              { class: 'tower-floor' },
-              h('span', { class: 'area-circle tower-circle' }, areaArt(regionOf(portal.next).id)),
-              h(
-                'div',
-                { class: 'tower-floor-text' },
-                h('p', { class: 'tower-floor-title', text: t('Stopień {stage} · poz. {level}', { stage: portal.next, level: portal.next }) }),
-                h('p', { text: `${regionOf(portal.next).name} (${regionOf(portal.next).regionName})` }),
-                h('p', { text: t('Za wygraną zgarniesz: {loot}.', { loot: lootText(portal, portal.nextLoot) }) }),
-              ),
+              { class: 'portal-stage', 'data-guide': `portal-${portal.id}-stage` },
+              h('p', { class: 'tower-floor-title', text: t('Stopień {stage} · poz. {level}', { stage: portal.next, level: portal.next }) }),
+              h('p', { text: t('Za wygraną zgarniesz: {loot}.', { loot: lootText(portal, portal.nextLoot) }) }),
             ),
             h('button', {
               type: 'button',
@@ -146,18 +166,43 @@ export function mountPortals(container, { navigate }) {
         }),
       ];
 
-    const art = portal.art && placeArt(portal.art);
-    const head = h('div', { class: `tower-head${art ? ' tower-head--art' : ''}` }, h('h2', { class: 'card-title', text: portal.name }));
-    if (art) head.style.setProperty('--place-art', `url("${art}")`);
-    return h(
-      'section',
-      { class: 'card tower-card', 'data-guide': `portal-${portal.id}`, 'aria-label': portal.name },
-      head,
+    // The picture with the portal's name; a tap anywhere on it shows or
+    // hides the rest (the button's ::after spans the picture).
+    const open = openPortals.has(portal.id);
+    const bodyId = `portal-body-${portal.id}`;
+    const body = h(
+      'div',
+      { class: 'portal-body', id: bodyId, hidden: !open },
       h('p', { class: 'muted', text: portal.description }),
       h('p', { class: 'muted', text: t('Najwyżej pokonany: {best}.', { best: portal.best > 0 ? t('stopień {stage}', { stage: formatNumber(portal.best) }) : t('jeszcze żaden') }) }),
       fight,
       sweep,
     );
+    const toggle = h(
+      'button',
+      {
+        type: 'button',
+        class: 'portal-toggle',
+        'aria-expanded': String(open),
+        'aria-controls': bodyId,
+        'data-guide': `portal-${portal.id}-open`,
+        onClick: () => {
+          const opening = body.hidden;
+          body.hidden = !opening;
+          toggle.setAttribute('aria-expanded', String(opening));
+          card.classList.toggle('portal-card--open', opening);
+          if (opening) openPortals.add(portal.id);
+          else openPortals.delete(portal.id);
+        },
+      },
+      h('span', { text: portal.name }),
+      h('span', { class: 'portal-marker', 'aria-hidden': 'true' }),
+    );
+    const art = portal.art && placeArt(portal.art);
+    const head = h('div', { class: `tower-head portal-head${art ? ' tower-head--art' : ''}` }, h('h2', { class: 'card-title' }, toggle));
+    if (art) head.style.setProperty('--place-art', `url("${art}")`);
+    const card = h('section', { class: `card tower-card portal-card${open ? ' portal-card--open' : ''}`, 'data-guide': `portal-${portal.id}`, 'aria-label': portal.name }, head, body);
+    return card;
   }
 
   if (!isUnlocked('portals')) {

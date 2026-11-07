@@ -134,7 +134,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         ? heading(report.tower.name, t('Piętro {floor} · {area} · {date}', { floor: report.tower.floor, area: report.areaName, date: dateTimeFormat.format(new Date(report.endsAt)) }))
         : // An entry to a Portal Systemu (portals.js): its portal and stage.
           report.portal
-          ? heading(report.portal.name, t('Stopień {stage} · {area} · {date}', { stage: report.portal.stage, area: report.areaName, date: dateTimeFormat.format(new Date(report.endsAt)) }))
+          ? heading(report.portal.name, t('Stopień {stage} · {date}', { stage: report.portal.stage, date: dateTimeFormat.format(new Date(report.endsAt)) }))
           : // A trial of the Sala prób (trial-hall.js): its place, no length.
           report.hall
           ? heading(t('Sala prób'), `${report.hall.areaName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)

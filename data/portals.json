@@ -59,6 +59,7 @@
     "lost": ["Stopień {stage} nie został pokonany."],
     "defeat": ["System wyprowadza z portalu: {target}.", "Walka przegrana. System wyprowadza z portalu: {target}."],
     "loot": ["Łup: {loot}."],
+    "sweptAll": ["Wyczyszczone portale: {list}."],
     "swept": ["Stopień {stage} wyczyszczony. Łup: {loot}."]
   }
 }

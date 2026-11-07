@@ -845,6 +845,10 @@ function openSettings() {
     // The reports and System messages: the Dziennik has no tab in the bottom
     // bar.
     h('a', { class: 'button button--world settings-journal', href: '#/dziennik', onClick: closeSheet }, icon('book', { size: 20 }), t('Dziennik')),
+    // "Zmień postać" above "Zgłoś błąd", not at the bottom (the author,
+    // 7.11.2026: "Daj przycisk Zmień postać nad Zgłoś błąd zamiast na samym
+    // dole").
+    h('button', { type: 'button', class: 'button button--world', onClick: changeCharacter, text: t('Zmień postać') }),
     h('button', { type: 'button', class: 'button button--world', onClick: openBugReport, text: t('Zgłoś błąd') }),
     h(
       'dl',
@@ -883,7 +887,6 @@ function openSettings() {
         onClick: closeSheet,
         text: state.user.bugReports > 0 ? t('Panel autora · nowe zgłoszenia: {count}', { count: state.user.bugReports }) : t('Panel autora'),
       }),
-    h('button', { type: 'button', class: 'button button--world', onClick: changeCharacter, text: t('Zmień postać') }),
     h('button', { type: 'button', class: 'button button--world', onClick: logout, text: t('Wyloguj się') }),
     h('button', { type: 'button', class: 'button button--danger', onClick: deleteCharacter, text: t('Usuń postać') }),
     h('button', { type: 'button', class: 'button button--danger', onClick: deleteAccount, text: t('Usuń konto') }),
@@ -1031,6 +1034,7 @@ async function openTutorialTests() {
         !parked,
       ),
       row(t('Objaśnienie Społeczności i Szybkiego Polowania'), t('Od 5. poziomu postaci.'), repeatCommunityTour, told && isUnlocked('community')),
+      row(t('Objaśnienie Portali'), t('Od 5. poziomu postaci. Pokonane stopnie zostają.'), repeatPortalsTour, told && isUnlocked('portals')),
       row(t('Objaśnienie Umiejętności'), t('Od 10. poziomu klasy. Postać zapomni wybrane umiejętności.'), repeatSkillsTour, told && isUnlocked('skills')),
       row(t('Objaśnienie Profesji'), t('Od 10. poziomu postaci. Poziomy profesji zostają.'), repeatProfessionsTour, told && Boolean(state.character.professions)),
       row(t('Objaśnienie Rzemieślnictwa'), t('Od 15. poziomu postaci. Poziomy profesji zostają.'), repeatCraftingTour, told && Boolean(state.character.professions?.workshop)),
@@ -1313,6 +1317,23 @@ async function repeatTowersTour() {
   try {
     await call('POST', '/api/test/towers-tour');
     forgetPart('towers');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's Portale chapter from the start (testing.js).
+async function repeatPortalsTour() {
+  const sure = await confirmAction({
+    title: t('Objaśnienie Portali od nowa?'),
+    text: t('Narrator objaśni Portale od początku.'),
+    confirmLabel: t('Od nowa'),
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/portals-tour');
+    forgetPart('portals');
   } catch (error) {
     toast(error.message);
   }

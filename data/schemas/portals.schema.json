@@ -37,14 +37,15 @@
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fightStart", "won", "lost", "defeat", "loot", "swept"],
+      "required": ["fightStart", "won", "lost", "defeat", "loot", "swept", "sweptAll"],
       "properties": {
         "fightStart": { "$ref": "#/definitions/variants", "description": "Początek walki na stopniu; {enemies}: przeciwnicy z poziomami." },
         "won": { "$ref": "#/definitions/variants", "description": "{stage}: numer stopnia." },
         "lost": { "$ref": "#/definitions/variants" },
         "defeat": { "$ref": "#/definitions/variants", "description": "{target}: imię postaci." },
         "loot": { "$ref": "#/definitions/variants", "description": "{loot}: łup słowami." },
-        "swept": { "$ref": "#/definitions/variants", "description": "Czyszczenie: {stage} i {loot}." }
+        "swept": { "$ref": "#/definitions/variants", "description": "Czyszczenie: {stage} i {loot}." },
+        "sweptAll": { "$ref": "#/definitions/variants", "description": "„Wyczyść wszystkie”: {list}, każdy wyczyszczony portal z liczbą czyszczeń i łupem." }
       }
     }
   },

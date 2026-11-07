@@ -114,6 +114,30 @@ export function portalLootText(loot, content) {
   return parts.join(', ');
 }
 
+// Loot `loot` added into `sum` (both { gold, resources, materials, parts }).
+function addLoot(sum, loot) {
+  sum.gold += loot.gold;
+  for (const store of ['resources', 'materials', 'parts']) for (const [key, count] of Object.entries(loot[store])) sum[store][key] = (sum[store][key] ?? 0) + count;
+  return sum;
+}
+
+// Every sweep left today in every portal with a stage won, at once (the
+// author, 7.11.2026: "daj tez przycisk na górze \"Wyczyść wszystkie\""):
+// `left` lists each portal's id, its highest stage won and its sweeps left,
+// each sweep drawn on its own as a single one. The loot of all, each
+// portal's in words, and one line naming them.
+export function portalSweepAll(left, seed, content) {
+  const total = { gold: 0, resources: {}, materials: {}, parts: {} };
+  const swept = left.map(({ portalId, stage, count }) => {
+    const sum = { gold: 0, resources: {}, materials: {}, parts: {} };
+    for (let i = 0; i < count; i++) addLoot(sum, portalSweep(portalId, stage, `${seed}:${portalId}:${i}`, content));
+    addLoot(total, sum);
+    return { portal: portalId, stage, count, loot: portalLootText(sum, content) };
+  });
+  const list = swept.map((one) => `${portalById(one.portal, content).name} ×${one.count}: ${one.loot}`).join('; ');
+  return { ...total, swept, text: say(content.portals.texts, 'sweptAll', swept.length, { list }) };
+}
+
 // What waits on stage `stage` of an entry with `seed`: the region, the
 // level and the encounter, a group of ordinary creatures the stage's level
 // lets come (encountersFor), never an elite or a champion.

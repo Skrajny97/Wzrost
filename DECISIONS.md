@@ -3034,6 +3034,20 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.8 (7.11.2026): narrator o Portalach
+
+Autor: 738.1 i 738.2 bez poprawek, 738.3–738.5 w swoim brzmieniu, a na stronie odsłuchu 740 wybrał nagrania.
+
+1. **Rozdział „Portale”** (`chapter: "portals"` w `data/tutorial.json`): karta „Piąty poziom postaci… System otworzył przed Tobą Portale.”, prowadzenie do zakładki Walka, a stamtąd narrator sam otwiera Portale, wskazuje kartę Portalu Złota (738.3) i jego kolejny stopień (738.4) i kończy kartą o czyszczeniu (738.5). Przychodzi, gdy Portale są otwarte (5. poziom postaci) i żaden inny rozdział nie czeka, po raporcie, który tam doprowadził, i nie na ekranach postaci; jak inne rozdziały ma „Pomiń objaśnienie”. Postacie, które już mają 5. poziom, dostaną go przy najbliższym ekranie bez innego rozdziału.
+2. **Pisownia w kwestiach autora:** wielokropek „...” jako „…”, a łącznik „ - ” jako półpauza „ – ”; słowa bez zmian.
+3. **Nagrania (740):** po polsku 738.1 B, 738.2 B, 738.3 B, 738.4 A, 738.5 A; po angielsku 738.1 A, 738.2 B, 738.3 A, 738.4 A, 738.5 B. Każde kończy się 0,3 s po ostatnim słowie.
+4. **Tryb testowy:** „Objaśnienie Portali” w menu testów zaczyna rozdział od nowa.
+5. **Komunikat o odblokowaniu Portali** mówi „W każdym portalu zgarniesz co innego: złoto, zasoby obozu, materiały albo części.” zamiast „Każdy portal płaci czym innym…” (zasada autora z 7.11.2026: wygrana niczym nie „płaci”).
+6. **Karta Portalu to jego tło z nazwą** (autor 7.11.2026: „usuń te przypisy że Skraj Wiatrołomów itp. to nie ma być przyporządkowane pod krainy po prostu się klika w te tła Portal Złota itp. i pokazuje stopień!”, „te kółka wypierdol nie ma byc niz o krainach to jest poza wyprawami przecież”). Dotknięcie tła pokazuje opis, najwyżej pokonany stopień, kolejny stopień z łupem, „Walcz o stopień” i czyszczenie; drugie dotknięcie je chowa, a otwarty portal zostaje otwarty po czyszczeniu i po powrocie z raportu. Bez kółka miejsca i bez nazwy krainy przy stopniu, a nagłówek raportu z walki w portalu to „Stopień N · data”. W „Jak to działa?” stopień ma „zwykłe stwory jego poziomu”, a ostatni stopień mówi „Kolejne stopnie przyjdą później”. Stwory stopnia nadal pochodzą z krainy jego poziomu (silnik bez zmian), tylko gra o tym nie mówi. Narrator przy kwestii o stopniach sam otwiera Portal Złota.
+7. **Zamknięty portal to niski pasek** (autor 7.11.2026: „pozwól też zwijać i rozwijać portale, żeby nie trzeba było tyle scrollować”): środek tła na 76 px wysokości z nazwą i strzałką. Dopiero dotknięcie rozwija pełne tło i resztę karty, a następne ją zwija. Na starcie wszystkie portale są zwinięte.
+8. **„Wyczyść wszystkie (N)” na górze strony Portali** (autor 7.11.2026: „daj tez przycisk na górze "Wyczyść wszystkie"”). Jedno naciśnięcie zużywa wszystkie czyszczenia, które zostały na dziś, we wszystkich portalach z pokonanym stopniem. Każde czyszczenie liczy się jak pojedyncze, a N to ich liczba. Komunikat wylicza portale, np. „Wyczyszczone portale: Portal Złota ×5: 140 złota; Portal Drewna ×5: drewno +40.” Przycisk pojawia się, gdy pokonano choć jeden stopień, a gdy N = 0, jest nieaktywny. Autor wybrał to w 741 A: wszystkie czyszczenia naraz, a nie po jednym w każdym portalu.
+9. **„Zmień postać” w Ustawieniach stoi nad „Zgłoś błąd”**, zaraz pod „Dziennikiem”, a nie na samym dole (autor 7.11.2026: „Daj przycisk Zmień postać nad Zgłoś błąd zamiast na samym dole”).
+
 ## Wersja 0.2.7 (7.11.2026): Wieże płacą o wiele więcej niż Portale
 
 Autor: „Trzeba też w związku z tym zmodyfikować Wieże by dawały więcej niż Portale, o wiele więcej - rzadkie łupy i materiały szczególnie legendarne i mityczne na odpowiednich poziomach.”

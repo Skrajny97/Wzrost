@@ -268,7 +268,12 @@
               "mining-dig",
               "mining-jewels",
               "mining-setting",
-              "mining-ending"
+              "mining-ending",
+              "portals-welcome",
+              "portals-lead",
+              "portals-lands",
+              "portals-stages",
+              "portals-sweep"
             ]
           },
           "kind": {
@@ -387,6 +392,7 @@
               "evolution",
               "towers",
               "mining",
+              "portals",
               "guild",
               "fortress",
               "party",

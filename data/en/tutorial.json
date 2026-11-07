@@ -17,6 +17,10 @@
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Towers wait in the Combat tab."
     },
+    "portals": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Portals wait in the Combat tab."
+    },
     "guild": {
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Guild waits in the Community, in the Guild tab."
@@ -1022,6 +1026,36 @@
         "The rarer stones lie deeper. Each new level of Mining will reveal more of them to you."
       ],
       "voice": "audio/narration/en/mining-ending.mp3"
+    },
+    "portals-welcome": {
+      "text": [
+        "Your character's fifth level… The System has opened the Portals to you."
+      ],
+      "voice": "audio/narration/en/portals-welcome.mp3"
+    },
+    "portals-lead": {
+      "text": [
+        "The Portals wait in the Combat tab. Let us look in there."
+      ],
+      "voice": "audio/narration/en/portals-lead.mp3"
+    },
+    "portals-lands": {
+      "text": [
+        "Each Portal takes you to a different land, one that will give you the resources you need."
+      ],
+      "voice": "audio/narration/en/portals-lands.mp3"
+    },
+    "portals-stages": {
+      "text": [
+        "You may take on the stages as you see fit… and as far as you can. But you will go no higher than your character's level."
+      ],
+      "voice": "audio/narration/en/portals-stages.mp3"
+    },
+    "portals-sweep": {
+      "text": [
+        "You can also clear a stage you have already beaten, without a fight – five times a day, gathering the resources you need."
+      ],
+      "voice": "audio/narration/en/portals-sweep.mp3"
     }
   }
 }

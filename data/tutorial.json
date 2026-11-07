@@ -49,6 +49,10 @@
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Górnictwo i Jubilerstwo czekają w zakładce Profesje."
     },
+    "portals": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Portale czekają w zakładce Walka."
+    },
     "guild": {
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Gildia czeka w Społeczności, w zakładce Gildia."
@@ -1247,6 +1251,41 @@
       "chapter": "mining",
       "text": ["Rzadsze kamienie leżą głębiej. Każdy nowy poziom Górnictwa odsłoni Ci kolejne."],
       "voice": "audio/narration/mining-ending.mp3"
+    },
+    {
+      "id": "portals-welcome",
+      "kind": "card",
+      "chapter": "portals",
+      "text": ["Piąty poziom postaci… System otworzył przed Tobą Portale."],
+      "voice": "audio/narration/portals-welcome.mp3"
+    },
+    {
+      "id": "portals-lead",
+      "kind": "lead",
+      "chapter": "portals",
+      "text": ["Portale czekają w zakładce Walka. Zajrzyjmy tam."],
+      "voice": "audio/narration/portals-lead.mp3"
+    },
+    {
+      "id": "portals-lands",
+      "kind": "point",
+      "chapter": "portals",
+      "text": ["W każdym Portalu przeniesiesz się do innej krainy, która da Ci odpowiednie surowce."],
+      "voice": "audio/narration/portals-lands.mp3"
+    },
+    {
+      "id": "portals-stages",
+      "kind": "point",
+      "chapter": "portals",
+      "text": ["Stopnie możesz pokonywać wedle własnego uznania… i możliwości. Najwyżej jednak dojdziesz do swojego poziomu postaci."],
+      "voice": "audio/narration/portals-stages.mp3"
+    },
+    {
+      "id": "portals-sweep",
+      "kind": "card",
+      "chapter": "portals",
+      "text": ["Możesz czyścić również pokonany wcześniej stopień bez walki – pięć razy dziennie, zgarniając niezbędne zasoby."],
+      "voice": "audio/narration/portals-sweep.mp3"
     },
     {
       "id": "guild-tabs",

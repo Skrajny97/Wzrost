@@ -256,6 +256,10 @@
     "0.2.7": {
       "title": "Version 0.2.7",
       "body": "- The Towers now bring you much more. A win gets you as much gold as two hours of exploring at the floor's level, several times a Portal sweep.\n- Every win also gives 3 materials of the floor's creatures, rarer the higher the floor: legendary and mythic from floor 50, divine too from floor 150.\n- With a 15% chance a win gives an item of your class at the floor's level, epic or rarer. The Tower card shows the loot for the floor you pick.\n- The Portals have their own backdrops, and their progress starts anew: in each portal you fight for stage 1 again."
+    },
+    "0.2.8": {
+      "title": "Version 0.2.8",
+      "body": "- The narrator tells you about the Portals as soon as they open (from character level 5), in Polish and in English.\n- A portal is now its picture with its name: tap it to see its stage, its fight and its sweep. No circles and no land names. A closed portal is a low strip, so the whole list fits without scrolling.\n- At the top of the Portals there is \"Sweep all\": one tap uses all of today's sweeps in every portal.\n- \"Change character\" is higher up in the Settings, above \"Report a bug\"."
     }
   }
 }

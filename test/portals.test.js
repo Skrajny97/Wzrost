@@ -306,6 +306,38 @@ describe('the Portale through the API', () => {
     assert.equal((await sweep('gold')).status, 200);
   });
 
+  test('"Wyczyść wszystkie" uses every sweep left today in every portal with a stage won, at once, and then says there is nothing left', async () => {
+    const sweepAll = () => as('POST', '/api/portals/sweep-all');
+    assert.equal((await sweepAll()).data.error.code, 'no_sweeps');
+    await set('portals = ?', JSON.stringify({ best: { gold: 4, wood: 3, materials: 5 } }));
+    // Two of the gold portal's sweeps used before.
+    for (let i = 0; i < 2; i++) assert.equal((await sweep('gold')).status, 200);
+    const before = await row();
+    const all = await sweepAll();
+    assert.equal(all.status, 200, JSON.stringify(all.data).slice(0, 300));
+    assert.deepEqual(
+      all.data.sweep.swept.map((one) => [one.portal, one.stage, one.count]),
+      [
+        ['gold', 4, rules.sweeps.perDay - 2],
+        ['wood', 3, rules.sweeps.perDay],
+        ['materials', 5, rules.sweeps.perDay],
+      ],
+    );
+    assert.match(all.data.sweep.text, /^Wyczyszczone portale: Portal Złota ×3: \d+ złota; Portal Drewna ×5: drewno \+\d+; Portal Materiałów ×5: .+\.$/);
+    const after = await row();
+    assert.equal(after.gold - before.gold, (rules.sweeps.perDay - 2) * portalAmount(portal('gold'), 4, false, content));
+    const grew = (column) => {
+      const old = JSON.parse(before[column]);
+      const now = JSON.parse(after[column]);
+      return Object.keys(now).reduce((sum, key) => sum + now[key] - (old[key] ?? 0), 0);
+    };
+    assert.equal(grew('resources'), rules.sweeps.perDay * portalAmount(portal('wood'), 3, false, content));
+    assert.equal(grew('materials'), rules.sweeps.perDay * portalAmount(portal('materials'), 5, false, content));
+    assert.ok(all.data.portals.portals.every((one) => one.sweepsLeft === 0));
+    assert.equal((await sweepAll()).data.error.code, 'no_sweeps');
+    assert.equal((await sweep('wood')).data.error.code, 'no_sweeps');
+  });
+
   test('in also during an exploration and before its report is claimed (732 A), and the report claimed after', async () => {
     assert.equal((await as('POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
     assert.equal((await enter('gold')).status, 200);

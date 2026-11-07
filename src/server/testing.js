@@ -214,6 +214,10 @@ export const repeatTowersTour = (context) => repeatChapter(context, 'towers');
 // character level 25, when both open.
 export const repeatMiningTour = (context) => repeatChapter(context, 'mining');
 
+// The narrator's Portale chapter (738) unread again: it comes on the next
+// screen with no other chapter waiting.
+export const repeatPortalsTour = (context) => repeatChapter(context, 'portals');
+
 // The Gildia's lines unread again, its tabs' and its Wyprawa's (646): each
 // comes on the next look at its place in a guild (664).
 export const repeatGuildTour = (context) => repeatChapter(context, 'guild');

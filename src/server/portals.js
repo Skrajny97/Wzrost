@@ -13,7 +13,7 @@
 // full HP with no potions and its HP stays as it was. Everything is saved
 // in one batch only while the character is as read (atomic.js).
 
-import { applyHunt, areaDangers, companionReady, companionStays, huntReport, isUnlocked, portalAmount, portalArea, portalById, portalFight, portalNext, portalSweep, questPeriod } from '../engine/index.js';
+import { applyHunt, areaDangers, companionReady, companionStays, huntReport, isUnlocked, portalAmount, portalArea, portalById, portalFight, portalNext, portalSweep, portalSweepAll, questPeriod } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
 import { characterView, engineCharacter, equippedItems, loadPlayer, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
@@ -51,8 +51,7 @@ const today = (now) => questPeriod('daily', now, content()).key;
 const companionsOf = (row) => (JSON.parse(row.settlement ?? '{}').companions ?? []).filter((companion) => !companionStays(companion) && companionReady(companion, true));
 const sweptToday = (record, portalId, now) => (record.day === today(now) ? (record.swept[portalId] ?? 0) : 0);
 
-// The portals for the page: a stage's region by its levels, the last
-// stage, the companions the character may take, and each portal with the
+// The portals for the page: the last stage, the companions the character may take, and each portal with the
 // highest stage won, the stage of its next fight (null above the
 // character's level or the last stage) with what its win pays, and the
 // sweeps left today with what a sweep pays.
@@ -61,7 +60,6 @@ function portalsView(row, now) {
   const { sweeps, portals } = rules();
   return {
     sweepsPerDay: sweeps.perDay,
-    regions: content().areas.map((area) => ({ id: area.id, name: area.name, regionName: area.regionName, from: area.minLevel, to: area.maxLevel })),
     maxStage: rules().maxStage,
     lootMinutes: rules().lootMinutes,
     companions: companionsOf(row).map((companion) => companion.name),
@@ -126,7 +124,7 @@ export async function enterPortal(context) {
   const record = recordOf(row);
   const best = record.best[portal.id] ?? 0;
   const stage = portalNext(best, row.level, content());
-  if (stage === null && best >= rules().maxStage) throw new ApiError(409, 'last_stage', 'To ostatni stopień tego portalu. Kolejne przyjdą z nowymi krainami.');
+  if (stage === null && best >= rules().maxStage) throw new ApiError(409, 'last_stage', 'To ostatni stopień tego portalu. Kolejne stopnie przyjdą później.');
   if (stage === null) throw new ApiError(409, 'level', `Kolejny stopień otworzy się na poziomie postaci ${best + 1}.`);
   const companions = body.companions === false ? [] : companionsOf(row);
 
@@ -188,6 +186,39 @@ export async function enterPortal(context) {
 
 // { portal }: a sweep of the portal's highest stage won, its plain loot at
 // once with no fight, while the day's sweeps last.
+// "Wyczyść wszystkie" (the author, 7.11.2026): every sweep left today in
+// every portal with a stage won, at once, each as a single sweep.
+export async function sweepAllPortals(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireUnlocked(row);
+  const db = context.env.DB;
+  const now = context.now;
+  const record = recordOf(row);
+  const { perDay } = rules().sweeps;
+  const left = rules()
+    .portals.map((portal) => ({ portalId: portal.id, stage: record.best[portal.id] ?? 0, count: perDay - sweptToday(record, portal.id, now) }))
+    .filter((one) => one.stage > 0 && one.count > 0);
+  if (left.length === 0) throw new ApiError(409, 'no_sweeps', 'Na dziś nie ma już czego czyścić. Nowe czyszczenia od północy.');
+
+  const loot = portalSweepAll(left, toHex(crypto.getRandomValues(new Uint8Array(16))), content());
+  const day = today(now);
+  const swept = { ...(record.day === day ? record.swept : {}) };
+  for (const one of left) swept[one.portalId] = perDay;
+  const next = { ...record, day, swept };
+  const stores = storesSql(loot);
+  await atomically(db, [
+    sameVersion(db, row),
+    db.prepare(`UPDATE characters SET gold = gold + ?${stores.sql}, portals = ?, version = version + 1 WHERE id = ?`).bind(loot.gold, ...stores.binds, JSON.stringify(next), row.id),
+  ]);
+  const after = await loadPlayer(db, session.userId);
+  return json({
+    sweep: { swept: loot.swept, text: loot.text },
+    portals: portalsView(after.row, now),
+    character: characterView(after, now),
+  });
+}
+
 export async function sweepPortal(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
