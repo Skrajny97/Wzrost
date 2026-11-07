@@ -280,6 +280,10 @@
     "0.2.13": {
       "title": "Version 0.2.13",
       "body": "- The Cleric has a new portrait, with a clear face."
+    },
+    "0.2.14": {
+      "title": "Version 0.2.14",
+      "body": "- Gift code 50 for fifty accounts in the game: 50 System Points, 100 Time Points and 5000 gold. Enter it in the Settings, under \"Gift code\". It works until December 4 inclusive."
     }
   }
 }

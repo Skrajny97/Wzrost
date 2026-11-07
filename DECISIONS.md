@@ -3034,6 +3034,12 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.14 (7.11.2026): kod podarunkowy „50”
+
+Autor: „Przygotuj też kod podarunkowy "50" ważny cztery tygodnie od dzisiaj -> niech daje 50 Punktów Systemu, 100 Punktów Czasu i 5000 złota”, „to będzie w ramach świętowania 50 otwartych kont, do którego się zbliżamy, ale odpal od razu”.
+
+1. **Kod „50”** działa od razu, raz na konto, do 4.12.2026 włącznie (`until` 5.12.2026, 0:00 czasu polskiego), i daje 50 Punktów Systemu, 100 Punktów Czasu i 5000 złota (data/gift-codes.json).
+
 ## Wersja 0.2.13 (7.11.2026): nowy portret Kleryka
 
 Autor (7.11.2026, zrzut portretu): „trzeba poprawić portret Kleryka bo wygląda jego twarz tragicznie - jakby nie miał oczu albo miał zeza”. PixelLab narysował poprawkę samych oczu (747.1) i portret od nowa z obecnym jako wzorem (747.2, 747.3; dwie inne wersje z kijem i księgą odpadły, bo portrety klas mają puste ręce). Autor: „748 -> 747.2”.
