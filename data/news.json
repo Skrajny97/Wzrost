@@ -335,6 +335,11 @@
       "id": "0.2.9",
       "title": "Wersja 0.2.9",
       "body": "- Po wygranej w Portalu na samej górze raportu jest „Walcz o stopień”: kolejny stopień od razu, bez wracania do listy, jeśli poziom postaci już na niego pozwala."
+    },
+    {
+      "id": "0.2.10",
+      "title": "Wersja 0.2.10",
+      "body": "- Na górze zakładki Postać są miniaturki wszystkich Twoich postaci: jedno dotknięcie i grasz inną. Żółta kropka znaczy, że ta postać ma raport do odebrania."
     }
 ]
 }

@@ -264,6 +264,10 @@
     "0.2.9": {
       "title": "Version 0.2.9",
       "body": "- After a win in a Portal, the top of the report has \"Fight for stage\": the next stage at once, without going back to the list, if your character's level already allows it."
+    },
+    "0.2.10": {
+      "title": "Version 0.2.10",
+      "body": "- The top of the Character tab shows all your characters as small portraits: one tap and you play another. A yellow dot means that character has a report waiting."
     }
   }
 }

@@ -3034,6 +3034,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.10 (7.11.2026): miniaturki postaci w zakładce Postać
+
+Gracze na czacie (przez autora, 7.11.2026): „Fajnie jakby zmiana postaci była nieco bardziej dostępna”, „miniaturki postaci w formie ikon”. Autor: „jest to mozliwe np w zakładce Postać?”, potem 742 A.
+
+1. **Rząd okrągłych miniaturek postaci konta na samej górze zakładki Postać**, nad imieniem. Każda ma popiersie postaci w jej wyglądzie i odcieniu skóry, a pod nim imię. Postać, którą się gra, ma obwódkę w kolorze Systemu.
+2. **Jedno dotknięcie innej miniaturki od razu gra tą postacią** (742 A, bez pytania). Gra zaczyna się z nią od nowa tak jak po wyborze na ekranie postaci, ale ląduje na jej zakładce Postać, a nie w Walce.
+3. Żółta kropka na miniaturce postaci, której raport z wyprawy albo pracy czeka na odbiór.
+4. Rząd pojawia się tylko przy co najmniej dwóch postaciach na koncie. „Zmień postać” w Ustawieniach zostaje, a z niej da się też stworzyć nową postać.
+
 ## Wersja 0.2.9 (7.11.2026): kolejny stopień prosto z raportu
 
 Autor (7.11.2026): „dodaj opcje następny portal po pokonaniu jednego stopnia jesli jest dostępny (wymagania poziomu spełnione) na samej górze raportu”.

@@ -17,6 +17,7 @@ import { buildLocked, buildLockedText, call, costShortfall, isUnlocked, state, u
 import { scrapperSheet } from '../scrapper.js';
 import { itemTip, setTipRenderer } from '../item-tip.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemLink, systemPanel, toast, withButton } from '../ui.js';
+import { bust } from './select.js';
 
 // The words of these tables are written in Polish and shown in the page's
 // language (t(), i18n.js).
@@ -143,7 +144,44 @@ const STACKS = {
   potions: { art: (id) => potionSprite(id) ?? icon('flask', { size: 24 }), slot: 'slot--potion', api: 'potions', key: 'potionId', discard: 'Wyrzucić mikstury?' },
 };
 
-export function mountCharacter(container) {
+// The account's characters as round busts over the Postać tab, the one
+// played marked, a dot on one whose report waits; a tap on another plays it
+// at once (players on the chat, via the author, 7.11.2026: "miniaturki
+// postaci w formie ikon", instead of three taps through the Ustawienia).
+// Only with two characters or more.
+function characterSwitch(list, switchCharacter) {
+  if (!list || list.characters.length < 2 || !switchCharacter) return null;
+  return h(
+    'nav',
+    { class: 'char-switch', 'aria-label': t('Twoje postacie'), 'data-guide': 'char-switch' },
+    list.characters.map((one) =>
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'char-switch-item',
+          'aria-current': one.played ? 'true' : null,
+          'aria-label': one.played ? t('{name} (grasz teraz)', { name: one.name }) : t('Graj postacią {name}', { name: one.name }),
+          onClick: one.played ? null : (event) => withButton(event.currentTarget, () => switchCharacter(one.id)),
+        },
+        h('span', { class: 'char-switch-bust' }, bust(one)),
+        one.activity?.finished && !one.played && h('span', { class: 'char-switch-dot', 'aria-hidden': 'true' }),
+        h('span', { class: 'char-switch-name', text: one.name }),
+      ),
+    ),
+  );
+}
+
+export function mountCharacter(container, { switchCharacter } = {}) {
+  // The account's characters for the busts at the top, asked once.
+  let characters = null;
+  call('GET', '/api/characters')
+    .then((list) => {
+      characters = list;
+      if (list.characters.length > 1) render();
+    })
+    .catch(() => {});
+
   function render() {
     const character = state.character;
     const busy = onExploration(character);
@@ -178,6 +216,7 @@ export function mountCharacter(container) {
     frame.append(...layers, column('left'), column('right'), eye);
 
     fill(container,
+      characterSwitch(characters, switchCharacter),
       pageHeading(character.name, `${character.evolution?.current ? t('{name} (z klasy: {base})', { name: character.className, base: character.baseClassName }) : character.className} · ${t(POSITION_NAMES[character.position])} · solo`, {
         tag: character.guildTag,
         nameColor: character.nameColor,

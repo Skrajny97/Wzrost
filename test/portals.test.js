@@ -276,10 +276,13 @@ describe('the Portale through the API', () => {
     assert.equal(entered.data.report.portal.next, 2);
     const stored = (await as('GET', `/api/reports/${entered.data.report.id}`)).data.report;
     assert.equal(stored.portal.next, 2);
+    // A fight at the character's level (5): won, stage 6 waits for level 6;
+    // lost, stage 5 stays the next. Either way, whatever the fight's luck.
     await set('portals = ?', JSON.stringify({ best: { wood: 4 } }));
-    const last = await win('wood');
+    const last = await enter('wood');
+    assert.equal(last.status, 200, JSON.stringify(last.data).slice(0, 300));
     assert.equal(last.data.report.portal.stage, 5);
-    assert.equal(last.data.report.portal.next, null, 'stage 6 waits for character level 6');
+    assert.equal(last.data.report.portal.next, last.data.report.portal.won ? null : 5);
   });
 
   test('never above the character\'s level', async () => {

@@ -22,7 +22,7 @@ function doing(activity) {
   return `${what} · ${activity.finished ? t('raport gotowy') : t('do {time}', { time: timeFormat.format(new Date(activity.endsAt)) })}`;
 }
 
-const bust = (character) =>
+export const bust = (character) =>
   portraitSprite(character.classId, character.appearance, { bust: true, skin: character.skin, evolution: character.evolution }) ??
   classArt(character.classId) ??
   icon(CLASS_ICONS[character.classId] ?? 'person', { size: 26 });

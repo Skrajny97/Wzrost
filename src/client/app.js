@@ -320,6 +320,15 @@ async function chooseCharacter(id) {
   await characterGone();
 }
 
+// Another of the account's characters played with one tap on its bust at
+// the top of the Postać tab (players on the chat, via the author, 7.11.2026:
+// "miniaturki postaci w formie ikon"): the game starts again with it, on its
+// Postać tab.
+async function switchCharacter(id) {
+  await call('POST', '/api/characters/choose', { id });
+  await characterGone('#/postac');
+}
+
 // "Zmień postać" in the Ustawienia: the game steps back to the choice.
 async function changeCharacter(event) {
   await withButton(event.currentTarget, async () => {
@@ -470,7 +479,7 @@ function route() {
     view.part = id;
     if (current?.view === view && desktopLayout()) renderNav();
   };
-  const screen = candidate.mount(container, { params, navigate, backHash: lastTabHash, setPart }) ?? {};
+  const screen = candidate.mount(container, { params, navigate, backHash: lastTabHash, setPart, switchCharacter }) ?? {};
   current = { route: candidate, screen, view };
   // An inner region or a region can have its own music, and so can the camp
   // and the tabs with a music place (Umiejętności, Profesje). A report opened
@@ -1533,13 +1542,13 @@ async function deleteCharacter() {
 
 // The character is gone from the game (removed or waiting aside): the game
 // starts again from the account, with a new character or the one back.
-async function characterGone() {
+async function characterGone(landing = HOME) {
   clearInterval(ticker);
   current?.screen.unmount?.();
   current = null;
   state.character = null;
   narrate();
-  history.replaceState(null, '', HOME);
+  history.replaceState(null, '', landing);
   // The way back of the reports and screens starts anew too.
   lastMainHash = HOME;
   lastMainTab = 'walka';
