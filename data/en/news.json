@@ -248,6 +248,10 @@
     "0.2.4": {
       "title": "Version 0.2.4",
       "body": "- You can collect up to 30 Gifts from friends a day instead of 10. Each still gives a Time Point and gold or resources."
+    },
+    "0.2.6": {
+      "title": "Version 0.2.6",
+      "body": "- New from character level 5: the System Portals, in the Combat tab. There are six: the Gold, Wood, Stone, Ore, Material and Parts Portals, and each pays only in its own loot.\n- You fight for the next stages as often as you like, even during an exploration, and your companions from the Quarters can come along. A win opens the next stage, up to your level (100 stages for now). The creatures are stronger than on explorations.\n- A win and a sweep of a cleared stage give about as much as 45 minutes of an exploration at that level. You sweep with no fight, 5 times a day in each portal."
     }
   }
 }

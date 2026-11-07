@@ -26,6 +26,7 @@ import { acceptChatRules, blockInChat, chatPeople, chatReports, closeChat, lates
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendAllGifts, sendGift } from './community.js';
 import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
 import { enterTower, getTowers } from './towers.js';
+import { enterPortal, getPortals, sweepPortal } from './portals.js';
 import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, setGuildRole } from './guilds.js';
 import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-beast.js';
 import { attackGuildGuardian, claimGuildExpeditionChest, getGuildExpedition } from './guild-expedition.js';
@@ -303,6 +304,7 @@ const routes = [
   ['POST', '/api/party/kick', kickFromParty],
   ['POST', '/api/party/hunt', partyHunt],
   ['GET', '/api/towers', getTowers],
+  ['GET', '/api/portals', getPortals],
   ['GET', '/api/guild', getGuild],
   ['POST', '/api/guild/found', foundGuild],
   ['POST', '/api/guild/invite', inviteToGuild],
@@ -344,6 +346,8 @@ const routes = [
   // The guilds' ranking by their Sława (guild-fame.js, 381 A).
   ['GET', '/api/ranking/guilds', guildRanking],
   ['POST', '/api/towers/enter', enterTower],
+  ['POST', '/api/portals/enter', enterPortal],
+  ['POST', '/api/portals/sweep', sweepPortal],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],
   ['POST', '/api/chat/seen', markChatSeen],

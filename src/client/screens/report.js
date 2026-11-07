@@ -44,6 +44,7 @@ function playable(report, index) {
   return null;
 }
 
+
 export function mountReport(container, { params, navigate, backHash = '#/walka' }) {
   let arena = null;
   let report = reportCache.get(params.id) ?? null;
@@ -131,13 +132,17 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       // An entry to a Wieża (towers.js): its tower and floor, no length.
       report.tower
         ? heading(report.tower.name, t('Piętro {floor} · {area} · {date}', { floor: report.tower.floor, area: report.areaName, date: dateTimeFormat.format(new Date(report.endsAt)) }))
-        : // A trial of the Sala prób (trial-hall.js): its place, no length.
+        : // An entry to a Portal Systemu (portals.js): its portal and stage.
+          report.portal
+          ? heading(report.portal.name, t('Stopień {stage} · {area} · {date}', { stage: report.portal.stage, area: report.areaName, date: dateTimeFormat.format(new Date(report.endsAt)) }))
+          : // A trial of the Sala prób (trial-hall.js): its place, no length.
           report.hall
           ? heading(t('Sala prób'), `${report.hall.areaName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)
           : heading(
             report.flash ? t('Błyskawiczne polowanie') : report.quick ? t('Szybkie Polowanie') : t('Raport z wyprawy'),
             `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
           ),
+      report.portal?.companions?.length > 0 && h('p', { class: 'report-party', text: t('Z postacią: {names}.', { names: report.portal.companions.join(', ') }) }),
       report.tower &&
         (report.tower.partners.length > 0 || report.tower.companions.length > 0) &&
         h('p', { class: 'report-party', text: t('Z postacią: {names}.', { names: [...report.tower.partners, ...report.tower.companions].join(', ') }) }),
@@ -221,8 +226,12 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       fight.chests > 0
         ? ` · ${fight.event ? t('przedmioty: {count}', { count: fight.chests }) : fight.chests === 1 ? t('skrzynia') : t('skrzynie: {count}', { count: fight.chests })}`
         : '';
-    const outcome =
-      fight.won === true
+    // A portal's stage pays only its loot (portals.js), in the words of the
+    // report's language.
+    const portalLoot = report.portal && fight.won === true && report.portal.loot;
+    const outcome = portalLoot
+      ? t('HP {before} → {after} · łup: {loot}', { before: fight.hpBefore, after: fight.hpAfter, loot: portalLoot })
+      : fight.won === true
         ? t('HP {before} → {after} · +{xp} XP · +{gold} złota{loot}{chests}', {
             before: fight.hpBefore,
             after: fight.hpAfter,
@@ -335,18 +344,22 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     // After a faint nothing of the exploration is left (651 C): its line
     // says so, and the rows show only the penalty, the fights and the HP.
     const lost = Boolean(summary.forfeit);
+    // A portal pays only its loot, in one fight, and keeps no HP
+    // (portals.js): its line instead of the XP, gold, goods and HP.
+    const below = Boolean(report.portal);
     const rows = [
-      !lost && [t('XP postaci'), `+${formatNumber(summary.xp)} XP`],
+      below && report.result === 'success' && [t('Łup'), capitalized(report.portal.loot)],
+      !lost && !below && [t('XP postaci'), `+${formatNumber(summary.xp)} XP`],
       summary.penalty > 0 && [t('Kara za omdlenie'), t('−{xp} XP postaci', { xp: formatNumber(summary.penalty) })],
       // Reports from before the split have no classXp: the class got the same XP.
-      !lost && [t('XP klasy'), `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
-      !lost && [t('Złoto'), `+${formatNumber(summary.gold)}`],
-      !lost && resourcesRow(summary.resources),
-      summary.materials?.length > 0 && [t('Materiały'), capitalized(materialsText(summary.materials))],
+      !lost && !below && [t('XP klasy'), `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
+      !lost && !below && [t('Złoto'), `+${formatNumber(summary.gold)}`],
+      !lost && !below && resourcesRow(summary.resources),
+      !below && summary.materials?.length > 0 && [t('Materiały'), capitalized(materialsText(summary.materials))],
       summary.timePoints > 0 && [t('Punkty Czasu'), `+${formatNumber(summary.timePoints)}`],
       // A Wieża's floor is one fight, and the tower keeps no HP (towers.js).
-      !report.tower && [t('Walki'), formatNumber(summary.fights)],
-      !report.tower && ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
+      !report.tower && !below && [t('Walki'), formatNumber(summary.fights)],
+      !report.tower && !below && ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
     ].filter(Boolean);
     const best = summary.bestFind;
     return h(
@@ -363,6 +376,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         { class: 'status-list' },
         rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value }))),
         !lost &&
+          !below &&
           h(
             'div',
             { class: 'status-row' },
@@ -525,6 +539,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     fill(
       actionBox,
       report.tower && h('a', { class: 'button button--system', href: '#/wieze', text: t('Wróć do Wież') }),
+      report.portal && h('a', { class: 'button button--system', href: '#/portale', text: t('Wróć do Portali') }),
       report.hall && h('a', { class: 'button button--system', href: '#/osada/trial-hall', text: t('Wróć do Sali prób') }),
       again,
       scrap,

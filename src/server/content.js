@@ -44,6 +44,7 @@ import evolutions from '../../data/evolutions.json' with { type: 'json' };
 import giftCodes from '../../data/gift-codes.json' with { type: 'json' };
 import settlement from '../../data/settlement.json' with { type: 'json' };
 import towers from '../../data/towers.json' with { type: 'json' };
+import portals from '../../data/portals.json' with { type: 'json' };
 import guilds from '../../data/guilds.json' with { type: 'json' };
 import cosmetics from '../../data/cosmetics.json' with { type: 'json' };
 // The English texts (data/en/), by the data file they translate. A file
@@ -81,6 +82,7 @@ import enSlots from '../../data/en/slots.json' with { type: 'json' };
 import enStats from '../../data/en/stats.json' with { type: 'json' };
 import enTexts from '../../data/en/texts.json' with { type: 'json' };
 import enTowers from '../../data/en/towers.json' with { type: 'json' };
+import enPortals from '../../data/en/portals.json' with { type: 'json' };
 import enTutorial from '../../data/en/tutorial.json' with { type: 'json' };
 import enUnlocks from '../../data/en/unlocks.json' with { type: 'json' };
 
@@ -116,6 +118,7 @@ const polishData = {
   'gift-codes': giftCodes,
   settlement,
   towers,
+  portals,
   guilds,
   cosmetics,
   tutorial,
@@ -161,6 +164,7 @@ export const OVERLAYS = {
     texts: enTexts,
     towers: enTowers,
     tutorial: enTutorial,
+    portals: enPortals,
     unlocks: enUnlocks,
   },
 };

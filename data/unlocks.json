@@ -18,6 +18,12 @@
     "message": "Odblokowano Społeczność. W zakładce Społeczność porozmawiasz z innymi graczami na czacie."
   },
   {
+    "id": "portals",
+    "name": "Portale",
+    "level": 5,
+    "message": "Odblokowano Portale Systemu: walki o kolejne stopnie, ile chcesz, i czyszczenia pokonanych stopni, z łupem od razu, także w czasie wyprawy. Każdy portal płaci czym innym: złotem, zasobami obozu, materiałami albo częściami. Znajdziesz je w Walce, w części Portale."
+  },
+  {
     "id": "skills",
     "name": "Umiejętności",
     "classLevel": 10,

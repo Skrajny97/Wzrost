@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Portale Systemu",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["sweeps", "maxStage", "strength", "lootMinutes", "firstWinMultiplier", "portals", "texts"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "sweeps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["perDay"],
+      "properties": { "perDay": { "type": "integer", "minimum": 1, "description": "Czyszczenia dziennie w każdym portalu." } }
+    },
+    "maxStage": { "type": "integer", "minimum": 1, "description": "Najwyższy stopień portali (autor: na start 100)." },
+    "strength": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "minimum": 1 }, "description": "[obrażenia, HP] stworów razy tyle co w Eksploracji." },
+    "lootMinutes": { "type": "number", "exclusiveMinimum": 0, "description": "Łup wygranej i czyszczenia: tyle, ile średnio daje tyle minut wyprawy na poziomie stopnia." },
+    "firstWinMultiplier": { "type": "number", "minimum": 1 },
+    "portals": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "description", "loot"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "name": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 },
+          "loot": { "enum": ["gold", "resource", "material", "part"], "description": "Czym płaci portal." },
+          "resource": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Zasób obozu portalu zasobu." },
+          "part": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Część portalu części, od której liczy się rzadkość." },
+          "art": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Tło portalu w src/client/art." }
+        }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fightStart", "won", "lost", "defeat", "loot", "swept"],
+      "properties": {
+        "fightStart": { "$ref": "#/definitions/variants", "description": "Początek walki na stopniu; {enemies}: przeciwnicy z poziomami." },
+        "won": { "$ref": "#/definitions/variants", "description": "{stage}: numer stopnia." },
+        "lost": { "$ref": "#/definitions/variants" },
+        "defeat": { "$ref": "#/definitions/variants", "description": "{target}: imię postaci." },
+        "loot": { "$ref": "#/definitions/variants", "description": "{loot}: łup słowami." },
+        "swept": { "$ref": "#/definitions/variants", "description": "Czyszczenie: {stage} i {loot}." }
+      }
+    }
+  },
+  "definitions": {
+    "variants": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+  }
+}

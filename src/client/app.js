@@ -25,6 +25,7 @@ import { mountCamp } from './screens/camp.js';
 import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
 import { mountTowers } from './screens/towers.js';
+import { mountPortals } from './screens/portals.js';
 import { mountCommunity } from './screens/community.js';
 import { mountGuildPage } from './screens/guild.js';
 import { checkChat, onActivityEnds, onChatNews } from './chat-news.js';
@@ -69,6 +70,7 @@ const ROUTES = [
   // Walka, a region, an inner region of it.
   { pattern: /^#\/walka(?:\/(?<region>[a-z0-9-]+)(?:\/(?<area>[a-z0-9-]+))?)?$/, nav: 'main', tab: 'walka', part: () => 'explore', mount: mountCombat },
   { pattern: /^#\/wieze$/, nav: 'main', tab: 'walka', part: () => 'towers', mount: mountTowers },
+  { pattern: /^#\/portale$/, nav: 'main', tab: 'walka', part: () => 'portals', mount: mountPortals },
   { pattern: /^#\/postac$/, nav: 'character', tab: 'equipment', mount: mountCharacter },
   { pattern: /^#\/postac\/statystyki$/, nav: 'character', tab: 'stats', mount: mountStats },
   { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', music: 'skills', mount: mountSkills },

@@ -20,11 +20,12 @@ const WORK_CHIPS = { herbs: 'zbieranie', potions: 'warzenie', items: 'wyrób', m
 const FILTERS = [
   ['all', 'Wszystko'],
   ['hunts', 'Wyprawy'],
+  ['portals', 'Portale'],
   ['towers', 'Wieże'],
   ['work', 'Profesje'],
 ];
 const FILTER_KEY = 'insight.journalFilter';
-const kindOf = (report) => (report.tower ? 'towers' : WORK_CHIPS[report.kind] ? 'work' : 'hunts');
+const kindOf = (report) => (report.tower ? 'towers' : report.portal ? 'portals' : WORK_CHIPS[report.kind] ? 'work' : 'hunts');
 const dayKey = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
 // "6 listopada", or "6 November" in English, made once for each language.
 const dayNames = new Map();
@@ -132,7 +133,9 @@ export function mountJournal(container, { params }) {
                 class: 'report-row-title',
                 text: report.tower
                   ? t('{tower} · piętro {floor}', { tower: report.tower.name, floor: report.tower.floor })
-                  : report.hall
+                  : report.portal
+                    ? t('{portal} · stopień {stage}', { portal: report.portal.name, stage: report.portal.stage })
+                    : report.hall
                     ? t('Sala prób · {area}', { area: report.hall.areaName })
                     : `${report.areaName ?? report.regionName ?? report.placeName} · ${formatMinutes(report.minutes)}`,
               }),
@@ -148,10 +151,13 @@ export function mountJournal(container, { params }) {
                     { class: 'report-row-meta' },
                     h('span', {
                       class: `chip chip--${report.result}`,
-                      // A floor of a Wieża is won or lost, not explored.
-                      text: report.tower
+                      // A floor of a Wieża and a portal's stage are won or
+                      // lost, not explored.
+                      text: report.tower || report.portal
                         ? report.result === 'success'
-                          ? t('zdobyte')
+                          ? report.portal
+                            ? t('pokonany')
+                            : t('zdobyte')
                           : t('porażka')
                         : report.hall
                           ? report.result === 'success'
@@ -164,7 +170,11 @@ export function mountJournal(container, { params }) {
                     // After a faint the exploration brought nothing (651 C), and cost XP.
                     report.forfeit
                       ? t(' −{xp} XP · łupy przepadły', { xp: formatNumber(report.penalty ?? 0) })
-                      : t(' +{xp} XP · +{gold} złota', { xp: formatNumber(report.xp), gold: formatNumber(report.gold) }),
+                      : report.portal
+                        ? report.result === 'success'
+                          ? ` ${report.portal.loot}`
+                          : ''
+                        : t(' +{xp} XP · +{gold} złota', { xp: formatNumber(report.xp), gold: formatNumber(report.gold) }),
                   ),
               WORK_CHIPS[report.kind] && h('span', { class: 'report-row-herbs', text: workSummaryText(report) }),
               report.bestFind && h('span', { class: 'item-name', vars: { '--rarity': report.bestFind.color }, text: report.bestFind.name }),

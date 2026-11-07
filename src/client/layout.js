@@ -440,11 +440,13 @@ function navButton(tab, active, onBack) {
 const PROFESSION_ICONS = { herbalism: 'leaf', alchemy: 'flask', crafting: 'hammer', mining: 'ore', jewelcrafting: 'ring' };
 const PLACE_ICONS = { board: 'check', enchanter: 'skills', hermitage: 'hood', stable: 'beast', tavern: 'chat', market: 'coin', tannery: 'pouch', herbalist: 'leaf', forge: 'hammer', casino: 'dice' };
 const PARTS = {
-  // Eksploracja and Wieże, as over the Walka (screens/towers.js).
+  // Eksploracja, Portale and Wieże, as over the Walka (screens/towers.js).
   walka: () => {
+    const portals = unlockInfo('portals');
     const towers = unlockInfo('towers');
     return [
       { id: 'explore', label: t('Eksploracja'), icon: 'beast', href: '#/walka', ready: tabTime('walka').ready, readyText: t('raport czeka') },
+      portals && { id: 'portals', label: t('Portale'), icon: 'coin', href: '#/portale', lock: !isUnlocked('portals') && t('poz. {level}', { level: portals.level }) },
       towers && { id: 'towers', label: t('Wieże'), icon: 'evolution', href: '#/wieze', lock: !isUnlocked('towers') && t('poz. {level}', { level: towers.level }) },
     ];
   },

@@ -1,0 +1,58 @@
+{
+  "$comment": "Portale Systemu (src/engine/portals.js, src/server/portals.js; DECISIONS.md, „Portale Systemu”; autor 7.11.2026: „coś bardziej natychmiastowego trochę jak Wieże ale prawie od samego początku […] pokonujesz kolejne stopnie”, odpowiedzi 731 A, 732 A, 734 A, 735 A, a potem „Tu pasuje wpuszczenie Systemu. Portal Złota, Portal Drewna, Portal Kamienia, Portal Rudy, Portal Materiałów i Portal Części”, „niech będą nieograniczone co do ilości wejść. Ograniczeniem będzie trudność. Na czyszczenia (swipe'y) będzie ograniczona ilość - do 5 dziennie. Ale robić kolejne poziomy będzie można zawsze”, „Portale też nie będą posiadać elit ani czempionów”, „Odpowiednie Portale nie będą też dawać niczego poza danym zasobem”, „Na start 100 poziomów […] trudność analogiczna do danego poziomu postaci. Walka jedna ale z trudniejszymi stworami niż w Eksploracji. Możliwość zabrania towarzyszy, ale w tym przypadku - nie drużyn”, „Czyszczenie i pierwsza walka na danym stopniu powinna gwarantować zasób o podobnej wielkości co około 45 minut wyprawy na tym poziomie”). Od poziomu postaci z unlocks.json (portals). W każdym portalu (portals) postać walczy o kolejny stopień, ile razy chce: jedna walka z wynikiem od razu, a wygrana otwiera następny stopień, najwyżej do stopnia równego poziomowi postaci i do maxStage. Pokonany już stopień się czyści: łup najwyższego pokonanego stopnia od razu, bez walki, sweeps.perDay razy dziennie w każdym portalu, od północy w Polsce. Stopień s ma zwykłe stwory regionu wewnętrznego, którego poziomy obejmują s (jak w krainie tych poziomów), na poziomie s, bez elit i czempionów, więc im wyższy stopień, tym trudniej; stwory są silniejsze niż w Eksploracji, o strength [obrażenia, HP] razy. Postać może zabrać towarzyszy z Kwater (tych, którzy nie zostają w kwaterze, także rannych), ale nie Drużynę. Każdy portal płaci tylko swoim łupem (loot): gold złotem; resource zasobem obozu resource; material materiałami stworów stopnia; part częściami do rzemiosła, od części pospolitej (part). Ile: tyle, ile średnio daje lootMinutes minut wyprawy na poziomie stopnia w jego regionie (src/engine/portals.js: portalExpected): portal złota złoto z walk i znalezisk; portal zasobu tyle sztuk swojego zasobu, ile wyprawa zbiera i znajduje wszystkich zasobów razem; portal materiałów tyle materiałów, ile zostawiają stwory z walk; portal części tyle części, ile dają po rozbiórce przedmioty ze skrzyń tej wyprawy; zaokrąglone do pełnej sztuki, co najmniej jedna. Tyle samo płaci czyszczenie i pierwsza wygrana (firstWinMultiplier razy). Materiał i część, każda sztuka osobno, bywają rzadsze jak łupy wypraw na poziomie stopnia (rarityUpChances). Stwory z walki trafiają do Bestiariusza; poza tym portale nie dają doświadczenia, przedmiotów ani postępu zadań, więc wejść można zawsze, także w trakcie wyprawy i pracy w profesji; postać walczy z pełnym HP, bez mikstur, i jej HP się nie zmienia; towarzysze nie dostają z portali doświadczenia ani relacji. art: tło portalu w src/client/art (gra pokazuje je, gdy jest na liście w src/client/art.js). texts: zdania raportu walki ({enemies}, {stage}, {target}, {loot}) i czyszczenia (swept).",
+  "sweeps": { "perDay": 5 },
+  "maxStage": 100,
+  "strength": [1.25, 1.25],
+  "lootMinutes": 45,
+  "firstWinMultiplier": 1,
+  "portals": [
+    {
+      "id": "gold",
+      "name": "Portal Złota",
+      "description": "Wrota do skarbca Systemu. Wygrana płaci złotem.",
+      "loot": "gold"
+    },
+    {
+      "id": "wood",
+      "name": "Portal Drewna",
+      "description": "Wrota do puszczy, której nie ma na mapach. Wygrana płaci drewnem.",
+      "loot": "resource",
+      "resource": "wood"
+    },
+    {
+      "id": "stone",
+      "name": "Portal Kamienia",
+      "description": "Wrota do kamieniołomu Systemu. Wygrana płaci kamieniem.",
+      "loot": "resource",
+      "resource": "stone"
+    },
+    {
+      "id": "ore",
+      "name": "Portal Rudy",
+      "description": "Wrota do głębokich sztolni. Wygrana płaci rudą żelaza.",
+      "loot": "resource",
+      "resource": "iron-ore"
+    },
+    {
+      "id": "materials",
+      "name": "Portal Materiałów",
+      "description": "Wrota do legowisk stworów. Wygrana płaci materiałami stworów stopnia.",
+      "loot": "material"
+    },
+    {
+      "id": "parts",
+      "name": "Portal Części",
+      "description": "Wrota do zbrojowni Systemu. Wygrana płaci częściami do rzemiosła.",
+      "loot": "part",
+      "part": "scraps"
+    }
+  ],
+  "texts": {
+    "fightStart": ["Z portalu wychodzą: {enemies}.", "Po drugiej stronie portalu czekają: {enemies}.", "Portal rozbłyska. Przeciwnicy: {enemies}."],
+    "won": ["Stopień {stage} pokonany."],
+    "lost": ["Stopień {stage} nie został pokonany."],
+    "defeat": ["System wyprowadza z portalu: {target}.", "Walka przegrana. System wyprowadza z portalu: {target}."],
+    "loot": ["Łup: {loot}."],
+    "swept": ["Stopień {stage} wyczyszczony. Łup: {loot}."]
+  }
+}

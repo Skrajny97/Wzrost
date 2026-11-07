@@ -399,6 +399,18 @@ button {
   color: var(--system-text);
 }
 
+/* The Walka's three parts, Eksploracja, Portale and Wieże, side by side
+   down to a 320 px phone: smaller letters, closer together. */
+.segmented--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.segmented--three .segmented-option {
+  padding: 0 4px;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
 /* The bag's three tabs: items, materials and parts. */
 .bag-tabs {
   grid-template-columns: repeat(3, minmax(0, 1fr));

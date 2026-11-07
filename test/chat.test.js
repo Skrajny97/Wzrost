@@ -73,7 +73,7 @@ describe('Czat', () => {
     const level = content.unlocksById.community.level;
     assert.equal(level, 5);
     assert.equal(content.unlocksById['quick-hunts'].level, level);
-    assert.deepEqual(unlockMessages(level, content), [content.unlocksById['quick-hunts'].message, content.unlocksById.community.message]);
+    assert.deepEqual(unlockMessages(level, content), [content.unlocksById['quick-hunts'].message, content.unlocksById.community.message, content.unlocksById.portals.message]);
   });
 
   test('writes after the rules are accepted, not too fast, without links, with rude words masked', async () => {

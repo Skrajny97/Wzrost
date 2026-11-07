@@ -14,10 +14,10 @@ export const DATA_FILES = [
   'stats', 'elements', 'effects', 'rarities', 'slots', 'classes',
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
-  'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'guilds', 'cosmetics', 'news',
+  'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'portals', 'guilds', 'cosmetics', 'news',
 ];
 // Unlocks the code refers to by id.
-const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'core'];
+const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'portals', 'core'];
 const POSITIONS = ['front', 'middle', 'back'];
 
 function readJson(path) {
@@ -739,6 +739,7 @@ function checkReferences(data) {
   errors.push(...checkCasino(data));
   errors.push(...checkCosmetics(data));
   errors.push(...checkTowers(data));
+  errors.push(...checkPortals(data));
   errors.push(...checkGuildSeat(data, { resources }));
   errors.push(...checkGuildExpedition(data));
   return errors;
@@ -1402,6 +1403,23 @@ function checkTowers(data) {
       errors.push(`towers.json: czempion ${area.champion} nie czeka na żadnym piętrze (co ${championEvery}. piętro przy ${areas.length} regionach, 342 A)`);
     }
     if (!usual.has(area.id)) errors.push(`towers.json: region ${area.id} nie ma w Wieżach zwykłego piętra (484 A)`);
+  }
+  return errors;
+}
+
+// The Portale Systemu (src/engine/portals.js): each portal has an id of
+// its own and pays what it says: gold alone, or a camp resource or a part
+// that exists, or materials.
+function checkPortals(data) {
+  const errors = [];
+  const resources = new Set(data.resources.map((resource) => resource.id));
+  const parts = new Set(data.materials.parts.map((part) => part.id));
+  const ids = new Set();
+  for (const portal of data.portals.portals) {
+    if (ids.has(portal.id)) errors.push(`portals.json: portal ${portal.id} jest dwa razy`);
+    ids.add(portal.id);
+    if ((portal.loot === 'resource') !== (portal.resource !== undefined) || (portal.resource !== undefined && !resources.has(portal.resource))) errors.push(`portals.json: portal ${portal.id}: zasób tylko w portalu zasobu, i znany`);
+    if ((portal.loot === 'part') !== (portal.part !== undefined) || (portal.part !== undefined && !parts.has(portal.part))) errors.push(`portals.json: portal ${portal.id}: część tylko w portalu części, i znana`);
   }
   return errors;
 }

@@ -39,13 +39,14 @@ function savePicks(picks) {
   }
 }
 
-// "Eksploracja" and "Wieże" over the Walka, as in screens/combat.js, in the
-// page's language (t(), i18n.js): the Walka tab shows them from the start.
+// "Eksploracja", "Portale" and "Wieże" over the Walka, as in
+// screens/combat.js, in the page's language (t(), i18n.js): the Walka tab
+// shows them from the start, a locked one with its level.
 export function combatModes(active, navigate) {
-  const towers = isUnlocked('towers');
-  const info = unlockInfo('towers');
-  const option = (label, hash, pressed, locked) =>
-    h(
+  const option = (label, hash, pressed, id) => {
+    const locked = Boolean(id) && !isUnlocked(id);
+    const info = id && unlockInfo(id);
+    return h(
       'button',
       {
         type: 'button',
@@ -58,11 +59,13 @@ export function combatModes(active, navigate) {
       },
       locked ? [label, ' ', lockLabel(t('poz. {level}', { level: info.level }))] : label,
     );
+  };
   return h(
     'div',
-    { class: 'segmented', role: 'group', 'aria-label': t('Rodzaj walki') },
-    option(t('Eksploracja'), '#/walka', active === 'explore', false),
-    option(t('Wieże'), '#/wieze', active === 'towers', !towers),
+    { class: 'segmented segmented--three', role: 'group', 'aria-label': t('Rodzaj walki') },
+    option(t('Eksploracja'), '#/walka', active === 'explore', null),
+    option(t('Portale'), '#/portale', active === 'portals', 'portals'),
+    option(t('Wieże'), '#/wieze', active === 'towers', 'towers'),
   );
 }
 

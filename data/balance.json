@@ -205,7 +205,7 @@
     "refillHours": 12
   },
   "parties": { "size": 3, "xpCost": 0.045, "classSpread": 5 },
-  "journal": { "reports": 50, "towerReports": 50 },
+  "journal": { "reports": 50, "towerReports": 50, "portalReports": 40 },
   "challenge": {
     "fromLevel": 10,
     "strength": { "fromLevel": 30, "damage": 1.1, "hp": 1.1 },

@@ -1291,12 +1291,13 @@
     },
     "journal": {
       "type": "object",
-      "description": "Dziennik (src/server/reports.js): ile najnowszych raportów zostaje. towerReports: raporty z Wież, liczone osobno, żeby walki w Wieżach nie wypychały raportów wypraw (autor: 486 A); reports: wszystkie pozostałe, czyli wyprawy i profesje. Starsze raporty ponad liczbę znikają przy zapisie nowego raportu ze swojej grupy.",
+      "description": "Dziennik (src/server/reports.js): ile najnowszych raportów zostaje. towerReports: raporty z Wież, liczone osobno, żeby walki w Wieżach nie wypychały raportów wypraw (autor: 486 A); portalReports: tak samo raporty z Portali; reports: wszystkie pozostałe, czyli wyprawy i profesje. Starsze raporty ponad liczbę znikają przy zapisie nowego raportu ze swojej grupy.",
       "additionalProperties": false,
-      "required": ["reports", "towerReports"],
+      "required": ["reports", "towerReports", "portalReports"],
       "properties": {
         "reports": { "type": "integer", "minimum": 1 },
-        "towerReports": { "type": "integer", "minimum": 1 }
+        "towerReports": { "type": "integer", "minimum": 1 },
+        "portalReports": { "type": "integer", "minimum": 1 }
       }
     },
     "challenge": {

@@ -210,6 +210,8 @@ export function buildContent(raw) {
     settlement: raw.settlement ?? null,
     // The Wieże Systemu (towers.js).
     towers: raw.towers ?? null,
+    // The Portale Systemu (portals.js).
+    portals: raw.portals ?? null,
     // The players' Gildie (src/server/guilds.js).
     guilds: raw.guilds ?? null,
     // The Sklep Systemu's cosmetics (cosmetics.js) and the words of its page.

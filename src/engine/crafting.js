@@ -126,7 +126,7 @@ export function rarityUpChances(level, content) {
 const rarityIndex = (rarityId, content) => content.rarities.findIndex((rarity) => rarity.id === rarityId);
 
 // The rarity `steps` above `rarityId`, at most the last one.
-function raisedRarity(rarityId, steps, content) {
+export function raisedRarity(rarityId, steps, content) {
   return content.rarities[Math.min(rarityIndex(rarityId, content) + steps, content.rarities.length - 1)].id;
 }
 

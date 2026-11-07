@@ -1,0 +1,37 @@
+{
+  "$comment": "English texts of data/portals.json (src/engine/portals.js): the System Portals and the sentences of a portal fight's report. Each key keeps the Polish number of variants, as the engine picks one by index. „Stopień” is a stage (Stage 12), so it does not mix with the creatures' levels.",
+  "portals": {
+    "gold": {
+      "name": "Gold Portal",
+      "description": "A gate to the System's vault. A win pays in gold."
+    },
+    "wood": {
+      "name": "Wood Portal",
+      "description": "A gate to a forest no map shows. A win pays in wood."
+    },
+    "stone": {
+      "name": "Stone Portal",
+      "description": "A gate to the System's quarry. A win pays in stone."
+    },
+    "ore": {
+      "name": "Ore Portal",
+      "description": "A gate to deep mine shafts. A win pays in iron ore."
+    },
+    "materials": {
+      "name": "Material Portal",
+      "description": "A gate to the creatures' lairs. A win pays in the materials of the stage's creatures."
+    },
+    "parts": {
+      "name": "Parts Portal",
+      "description": "A gate to the System's armoury. A win pays in crafting parts."
+    }
+  },
+  "texts": {
+    "fightStart": ["Out of the portal come: {enemies}.", "Waiting on the other side of the portal: {enemies}.", "The portal flares. Foes: {enemies}."],
+    "won": ["Stage {stage} cleared."],
+    "lost": ["Stage {stage} was not cleared."],
+    "defeat": ["The System leads {target} out of the portal.", "Fight lost. The System leads {target} out of the portal."],
+    "loot": ["Loot: {loot}."],
+    "swept": ["Stage {stage} cleared again. Loot: {loot}."]
+  }
+}

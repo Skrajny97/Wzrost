@@ -315,6 +315,11 @@
       "id": "0.2.4",
       "title": "Wersja 0.2.4",
       "body": "- Dziennie odbierzesz do 30 Upominków od znajomych zamiast 10. Każdy daje jak dotąd Punkt Czasu oraz złoto albo zasoby."
+    },
+    {
+      "id": "0.2.6",
+      "title": "Wersja 0.2.6",
+      "body": "- Nowość od 5. poziomu postaci: Portale Systemu, w zakładce Walka. Jest ich sześć: Portal Złota, Drewna, Kamienia, Rudy, Materiałów i Części, a każdy płaci tylko swoim łupem.\n- O kolejne stopnie walczysz, ile chcesz, także w czasie wyprawy, a towarzysze z Kwater mogą iść z Tobą. Wygrana otwiera następny stopień, najwyżej do Twojego poziomu (na razie 100 stopni). Stwory są silniejsze niż na wyprawach.\n- Wygrana i czyszczenie pokonanego stopnia dają tyle, ile około 45 minut wyprawy na tym poziomie. Czyścisz bez walki, 5 razy dziennie w każdym portalu."
     }
 ]
 }
