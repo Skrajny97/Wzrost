@@ -3034,6 +3034,11 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.5 (7.11.2026): Regulamin z miejscem na płatne Punkty Systemu
+
+- Autor: „W regulaminie napisałeś że gra jest bezpłatna, a mam zamiar dodać w niedalekiej przyszlosci możliwość zakupienia Punktów Systemu przecież.” Regulamin (`regulamin.html`, `terms.html`) nie mówi już, że w Grze nie ma płatności. Mówi, że korzystanie z Gry jest bezpłatne, że Twórca może wprowadzić płatne dodatki, na przykład zakup Punktów Systemu, i że ich ceny i zasady, w tym prawa kupującego, Regulamin opisze, zanim staną się dostępne. Waluty i przedmioty w Grze służą tylko do gry: nie można ich wymienić na pieniądze ani przenieść poza Grę.
+- Gdy powstanie zakup Punktów Systemu (wariant A planu Sklepu Play), trzeba: dopisać do Regulaminu zasady zakupu (ceny w złotówkach, prawo odstąpienia, zwroty), uzupełnić Politykę prywatności o płatności przez Google Play, zmienić w Play Console status na przedsiębiorcę (trader) z profilem płatności oraz poprawić formularz bezpieczeństwa danych i ankietę wiekową. Do tego czasu konto w Play Console może być założone jako osoba niebędąca przedsiębiorcą.
+
 ## Wersja 0.2.4 (7.11.2026): 30 Upominków dziennie
 
 - Autor: „Zwiększmy możliwość odbierania upominków do 30 dziennie.” Postać odbiera dziennie do 30 Upominków zamiast 10 (`claimsPerDay` w `data/community.json`). Każdy daje jak dotąd 1 Punkt Czasu oraz złoto albo zasób, więc z Upominków przychodzi dziennie do 30 Punktów Czasu. Wysyłanie się nie zmienia: jeden Upominek dziennie do każdego znajomego.

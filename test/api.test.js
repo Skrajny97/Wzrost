@@ -491,6 +491,9 @@ describe('static files', () => {
     }
     assert.match(await (await server.fetch('/prywatnosc')).text(), /Administratorem danych osobowych jest Karol Wilk/);
     assert.match(await (await server.fetch('/regulamin')).text(), /co najmniej 16 lat/);
+    // Paid System Points may come (the author, 7.11.2026): the terms leave room for them.
+    assert.match(await (await server.fetch('/regulamin')).text(), /płatne dodatki, na przykład zakup Punktów Systemu/);
+    assert.match(await (await server.fetch('/terms')).text(), /paid extras, for example buying System Points/);
   });
 
   test('does not expose the headers file', async () => {
