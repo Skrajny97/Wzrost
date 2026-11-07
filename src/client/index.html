@@ -113,6 +113,12 @@
           </div>
           <p class="field-hint" id="register-password-hint" data-i18n>Co najmniej 8 znaków.</p>
         </div>
+        <!-- The game is for people aged 16 or over (725 A, age.js). -->
+        <label class="check-field" for="register-adult">
+          <input id="register-adult" name="adult" type="checkbox" required>
+          <span data-i18n>Mam co najmniej 16 lat</span>
+        </label>
+        <p class="field-hint register-legal"><span data-i18n>Zakładając konto, akceptujesz</span> <a href="/regulamin" data-href-en="/terms" target="_blank" rel="noopener" data-i18n>Regulamin</a>. <span data-i18n>Jak dbamy o dane:</span> <a href="/prywatnosc" data-href-en="/privacy" target="_blank" rel="noopener" data-i18n>Polityka prywatności</a>.</p>
         <p class="form-error" role="alert" hidden></p>
         <button type="submit" class="button button--system" data-busy-label="Zakładanie konta…" data-i18n>Załóż konto</button>
       </form>
@@ -122,6 +128,7 @@
     <div class="auth-language" id="auth-language" hidden></div>
 
     <p class="version"><span data-i18n>Wersja</span> <span data-version>—</span></p>
+    <p class="version auth-legal"><a href="/regulamin" data-href-en="/terms" target="_blank" rel="noopener" data-i18n>Regulamin</a> · <a href="/prywatnosc" data-href-en="/privacy" target="_blank" rel="noopener" data-i18n>Polityka prywatności</a></p>
   </main>
 
   <main id="view-create" hidden>

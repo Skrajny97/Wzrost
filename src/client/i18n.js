@@ -110,6 +110,12 @@ async function loadStrings() {
 const originals = new WeakMap();
 export function translatePage(root = document) {
   document.documentElement.lang = lang;
+  // Links to a page that has its own English (data-href-en), as the
+  // terms and the privacy policy (0.2.3).
+  for (const link of root.querySelectorAll('a[data-href-en]')) {
+    link.dataset.hrefPl ??= link.getAttribute('href');
+    link.setAttribute('href', lang === 'en' ? link.dataset.hrefEn : link.dataset.hrefPl);
+  }
   // The app's description when installed, in the language shown (0.2.2).
   document.querySelector('link[rel="manifest"]')?.setAttribute('href', lang === 'en' ? '/manifest-en.webmanifest' : '/manifest.webmanifest');
   for (const element of root.querySelectorAll('[data-i18n], [data-i18n-attr]')) {

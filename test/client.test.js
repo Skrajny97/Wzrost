@@ -480,6 +480,23 @@ test('a service worker makes the game installable and shows a page offline', () 
   assert.match(offline, /href="\/" data-en="Try again">Spróbuj ponownie</);
 });
 
+// Google Play (0.2.3): the new account's form asks for "Mam co najmniej 16
+// lat" and points to the terms and the privacy policy, in the language shown;
+// the login screen and the Ustawienia link to them too.
+test('the new account form asks for 16 or over and links the terms and the privacy policy', () => {
+  const html = readFileSync(join(CLIENT, 'index.html'), 'utf8');
+  const form = /<form id="register-form"[\s\S]*?<\/form>/.exec(html)[0];
+  assert.match(form, /<input id="register-adult" name="adult" type="checkbox" required>/);
+  assert.match(form, /<span data-i18n>Mam co najmniej 16 lat<\/span>/);
+  assert.match(form, /href="\/regulamin" data-href-en="\/terms"/);
+  assert.match(form, /href="\/prywatnosc" data-href-en="\/privacy"/);
+  assert.match(html, /<p class="version auth-legal">/);
+  const app = readFileSync(join(CLIENT, 'app.js'), 'utf8');
+  assert.match(app, /adult: data\.adult === 'on'/);
+  assert.match(app, /legalLinks\(\)/);
+  for (const page of ['regulamin', 'terms', 'prywatnosc', 'privacy', 'usun-konto', 'delete-account']) assert.ok(existsSync(join(CLIENT, `${page}.html`)), page);
+});
+
 // The English of what shows outside the game (0.2.2): the offline page, the
 // link insightrpg.com/en with its preview, and the app's description.
 test('the offline page, the English link and the installed app speak English too', () => {

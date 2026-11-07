@@ -240,6 +240,10 @@
     "0.2.2": {
       "title": "Version 0.2.2",
       "body": "- What's new? entries are in English too: those who play in English read them in their own language.\n- The no-connection screen speaks the game's language.\n- The link insightrpg.com/en shows an English description of the game in its preview and opens the game in English."
+    },
+    "0.2.3": {
+      "title": "Version 0.2.3",
+      "body": "- The game has Terms and a Privacy Policy (insightrpg.com/terms and insightrpg.com/privacy), and the page insightrpg.com/delete-account explains how to delete an account. The links are on the sign-in screen and in the Settings.\n- Insight is for people aged 16 or over: a new account confirms it when it is made."
     }
   }
 }

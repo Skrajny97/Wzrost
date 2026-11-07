@@ -36,7 +36,7 @@ export async function getSession(db, request, now) {
   const row = await db
     .prepare(
       `SELECT s.expires_at, u.id AS user_id, u.login, u.email, u.created_at, u.google_sub, u.email_confirmed_at, u.email_required, u.news_seen,
-         u.skip_tutorials, u.language
+         u.skip_tutorials, u.language, u.age_confirmed_at, u.age_required
        FROM sessions s JOIN users u ON u.id = s.user_id
        WHERE s.id = ?`,
     )
@@ -73,6 +73,9 @@ export function userView(row) {
     emailConfirmed: google || row.email_confirmed_at !== null,
     emailRequired: row.email_required === 1,
     skipTutorials: row.skip_tutorials === 1,
+    // A new account made with Google answers once that its player is 16 or
+    // over before it plays (725 A, accounts.js confirmAge).
+    ageRequired: row.age_required === 1 && (row.age_confirmed_at ?? null) === null,
     ...(englishOn() && { language: accountLanguage(row.language) }),
   };
 }
@@ -90,6 +93,7 @@ export async function requirePlayable(context) {
   if (session.user.emailRequired && !session.user.emailConfirmed) {
     throw new ApiError(403, 'email_unconfirmed', 'Najpierw potwierdź adres e-mail: link czeka w skrzynce.');
   }
+  if (session.user.ageRequired) throw new ApiError(403, 'age_unconfirmed', 'Najpierw potwierdź, że masz co najmniej 16 lat.');
   return session;
 }
 

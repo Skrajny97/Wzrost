@@ -12,9 +12,10 @@ import { useServer } from './helpers/server.js';
 const { server, call, db, signUp } = useServer();
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-// Registration needs an e-mail: a test that names none gets one of its own.
+// Registration needs an e-mail: a test that names none gets one of its own;
+// and the player's "Mam co najmniej 16 lat", unless the test says otherwise.
 const register = (body) =>
-  call('POST', '/api/auth/register', { body: 'email' in body ? body : { ...body, email: `${String(body.login).toLowerCase()}@example.com` } });
+  call('POST', '/api/auth/register', { body: { adult: true, ...('email' in body ? body : { ...body, email: `${String(body.login).toLowerCase()}@example.com` }) } });
 const login = (identifier, password) => call('POST', '/api/auth/login', { body: { identifier, password } });
 
 describe('health', () => {
@@ -41,7 +42,7 @@ describe('registration', () => {
       password: 'tajnehaslo1',
     });
     assert.equal(status, 201);
-    assert.deepEqual(Object.keys(data.user).sort(), ['author', 'createdAt', 'email', 'emailConfirmed', 'emailRequired', 'google', 'login', 'skipTutorials', 'testMode', 'tutorialTests']);
+    assert.deepEqual(Object.keys(data.user).sort(), ['ageRequired', 'author', 'createdAt', 'email', 'emailConfirmed', 'emailRequired', 'google', 'login', 'skipTutorials', 'testMode', 'tutorialTests']);
     assert.equal(data.user.author, false);
     // "Pomijaj objaśnienia narratora" starts off (tutorial.js).
     assert.equal(data.user.skipTutorials, false);
@@ -312,6 +313,62 @@ describe('deleting the account', () => {
   });
 });
 
+// The game is for people aged 16 or over (725 A, 0.2.3): the form's "Mam co
+// najmniej 16 lat", and once for a new account made with Google.
+describe('age 16 or over', () => {
+  test('a new account needs "Mam co najmniej 16 lat", and keeps when it was ticked', async () => {
+    const refused = await register({ login: 'mlody', password: 'tajnehaslo1', adult: false });
+    assert.equal(refused.status, 400);
+    assert.equal(refused.data.error.code, 'age_required');
+    assert.equal(refused.cookie, null);
+    assert.equal(await (await db()).prepare('SELECT COUNT(*) AS count FROM users').first('count'), 0);
+    const made = await register({ login: 'dorosly', password: 'tajnehaslo1' });
+    assert.equal(made.status, 201);
+    assert.equal(made.data.user.ageRequired, false);
+    const row = await (await db()).prepare('SELECT age_confirmed_at, age_required FROM users WHERE login = ?').bind('dorosly').first();
+    assert.ok(row.age_confirmed_at > 0);
+    assert.equal(row.age_required, 0);
+  });
+
+  // An account as signing in with Google makes it: age_required until it answers.
+  async function googleAccount(login) {
+    const { cookie } = await signUp(login);
+    await (await db()).prepare('UPDATE users SET age_required = 1, age_confirmed_at = NULL WHERE login = ?').bind(login).run();
+    return cookie;
+  }
+
+  test('a new Google account answers once before it plays; "Mam co najmniej 16 lat" lets it in', async () => {
+    const cookie = await googleAccount('Googlowy');
+    assert.equal((await call('GET', '/api/me', { cookie })).data.user.ageRequired, true);
+    const blocked = await call('POST', '/api/character', { cookie, body: { name: 'Czekam', classId: 'mage', appearance: 'female' } });
+    assert.equal(blocked.status, 403);
+    assert.equal(blocked.data.error.code, 'age_unconfirmed');
+    assert.equal((await call('POST', '/api/me/age', { cookie, body: { adult: 'tak' } })).data.error.code, 'invalid_answer');
+    const answered = await call('POST', '/api/me/age', { cookie, body: { adult: true } });
+    assert.equal(answered.status, 200);
+    assert.equal(answered.data.user.ageRequired, false);
+    assert.equal((await call('GET', '/api/me', { cookie })).data.user.ageRequired, false);
+    assert.equal((await call('POST', '/api/character', { cookie, body: { name: 'Wchodze', classId: 'mage', appearance: 'female' } })).status, 201);
+  });
+
+  test('"Nie mam 16 lat" deletes the new account at once', async () => {
+    const cookie = await googleAccount('Zamlody');
+    const answered = await call('POST', '/api/me/age', { cookie, body: { adult: false } });
+    assert.equal(answered.status, 200);
+    assert.equal(answered.data.deleted, true);
+    assert.match(answered.headers.get('Set-Cookie'), /Max-Age=0/);
+    assert.equal((await call('GET', '/api/me', { cookie })).status, 401);
+    assert.equal(await (await db()).prepare('SELECT COUNT(*) AS count FROM users').first('count'), 0);
+  });
+
+  test('accounts made before 0.2.3 are not asked', async () => {
+    const { cookie } = await signUp('Weteran');
+    await (await db()).prepare('UPDATE users SET age_confirmed_at = NULL, age_required = 0 WHERE login = ?').bind('Weteran').run();
+    assert.equal((await call('GET', '/api/me', { cookie })).data.user.ageRequired, false);
+    assert.equal((await call('POST', '/api/character', { cookie, body: { name: 'Stary', classId: 'mage', appearance: 'female' } })).status, 201);
+  });
+});
+
 describe('sessions', () => {
   let cookie;
   beforeEach(async () => {
@@ -415,6 +472,25 @@ describe('static files', () => {
     assert.match(response.headers.get('Content-Type'), /text\/html/);
     assert.match(response.headers.get('Content-Security-Policy'), /default-src 'self'/);
     assert.match(await response.text(), /<html lang="pl">/);
+  });
+
+  // The documents for players and Google Play (0.2.3), in both languages,
+  // with the game's contact address and links to each other.
+  test('serves the privacy policy, the terms and the account deletion page', async () => {
+    const pages = { prywatnosc: 'privacy', regulamin: 'terms', 'usun-konto': 'delete-account' };
+    for (const [polish, english] of Object.entries(pages)) {
+      for (const [path, lang, other] of [[polish, 'pl', english], [english, 'en', polish]]) {
+        const response = await server.fetch(`/${path}`);
+        assert.equal(response.status, 200, path);
+        assert.match(response.headers.get('Content-Security-Policy'), /default-src 'self'/);
+        const html = await response.text();
+        assert.match(html, new RegExp(`<html lang="${lang}">`), path);
+        assert.ok(html.includes('kontakt@insightrpg.com'), path);
+        assert.ok(html.includes(`href="/${other}"`), `${path} links to /${other}`);
+      }
+    }
+    assert.match(await (await server.fetch('/prywatnosc')).text(), /Administratorem danych osobowych jest Karol Wilk/);
+    assert.match(await (await server.fetch('/regulamin')).text(), /co najmniej 16 lat/);
   });
 
   test('does not expose the headers file', async () => {

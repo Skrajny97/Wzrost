@@ -160,7 +160,7 @@ describe('English where ENGLISH is on (the test version)', () => {
   // character out on an exploration of the Skraj Wiatrołomów; its cookie
   // and the exploration's end.
   async function explorer(login, lang) {
-    const { cookie } = await ask('POST', '/api/auth/register', { body: { login, email: `${login.toLowerCase()}@example.com`, password: 'tajnehaslo1' }, lang });
+    const { cookie } = await ask('POST', '/api/auth/register', { body: { login, email: `${login.toLowerCase()}@example.com`, password: 'tajnehaslo1', adult: true }, lang });
     const database = await db();
     await database.prepare('UPDATE users SET email_confirmed_at = created_at WHERE login = ?').bind(login).run();
     assert.equal((await ask('POST', '/api/character', { body: { name: login, classId: 'warrior', appearance: 'female' }, cookie, lang })).status, 201);
@@ -250,7 +250,7 @@ describe('English where ENGLISH is on (the test version)', () => {
       new Request(`https://test.insightrpg.com${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(cookie && { Cookie: cookie }) }, body: JSON.stringify(body) });
     const now = Date.now();
     // Made from a page in English: the account and its mail are English.
-    const made = await runInLanguage('en', () => register({ request: post('/api/auth/register', { login: 'Angielka', email: 'angielka@example.com', password: 'tajnehaslo1' }), env, now }));
+    const made = await runInLanguage('en', () => register({ request: post('/api/auth/register', { login: 'Angielka', email: 'angielka@example.com', password: 'tajnehaslo1', adult: true }), env, now }));
     assert.equal(made.status, 201);
     const cookie = made.headers.get('Set-Cookie').split(';')[0];
     assert.match(mails[0].html, /^<!doctype html><html lang="en">/);

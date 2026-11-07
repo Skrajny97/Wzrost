@@ -80,6 +80,9 @@ export async function register({ request, env, now }) {
   const email = validateEmail(body.email);
   if (!email) throw new ApiError(400, 'email_required', 'Podaj adres e-mail: wyślemy na niego link, który otworzy konto.');
   const password = validatePassword(body.password);
+  // The game is for people aged 16 or over (725 A): the form's "Mam co
+  // najmniej 16 lat".
+  if (body.adult !== true) throw new ApiError(400, 'age_required', 'Insight jest dla osób, które mają co najmniej 16 lat. Zaznacz „Mam co najmniej 16 lat”.');
   // The language picked in the form ("Język gry"), else the page's; Polish
   // where English is off.
   const chosenLanguage = englishOn() && body.language !== undefined ? validLanguage(body.language) : language();
@@ -94,8 +97,8 @@ export async function register({ request, env, now }) {
   let userId;
   try {
     const result = await db
-      .prepare('INSERT INTO users (login, email, password_hash, created_at, email_required, language) VALUES (?, ?, ?, ?, 1, ?)')
-      .bind(login, email, passwordHash, now, chosenLanguage)
+      .prepare('INSERT INTO users (login, email, password_hash, created_at, email_required, language, age_confirmed_at) VALUES (?, ?, ?, ?, 1, ?, ?)')
+      .bind(login, email, passwordHash, now, chosenLanguage, now)
       .run();
     userId = result.meta.last_row_id;
   } catch (error) {
@@ -150,7 +153,7 @@ export async function login({ request, env, now }) {
     );
   }
 
-  const columns = 'id, login, email, password_hash, google_sub, created_at, email_confirmed_at, email_required, skip_tutorials, language';
+  const columns = 'id, login, email, password_hash, google_sub, created_at, email_confirmed_at, email_required, skip_tutorials, language, age_confirmed_at, age_required';
   const query = identifier.includes('@') ? `SELECT ${columns} FROM users WHERE email = ?` : `SELECT ${columns} FROM users WHERE login = ?`;
   const user = await db.prepare(query).bind(identifier).first();
   if (!user || !(await verifyPassword(password, user.password_hash))) {
@@ -201,11 +204,33 @@ export async function deleteAccount(context) {
   const session = await requireSession(context);
   const body = await readJson(context.request);
   const typed = typeof body.login === 'string' ? body.login.trim().toLowerCase() : '';
-  const { login, email } = session.user;
-  if (typed !== login.toLowerCase()) {
+  if (typed !== session.user.login.toLowerCase()) {
     throw new ApiError(400, 'login_mismatch', 'Wpisz swój login, żeby potwierdzić usunięcie konta.');
   }
-  const db = context.env.DB;
+  await removeAccount(context.env.DB, session, context.now);
+  return json({ ok: true }, 200, { 'Set-Cookie': clearedSessionCookie() });
+}
+
+// POST /api/me/age { adult }: a new account made by signing in with Google
+// answers once whether its player is 16 or over (725 A). "Mam co najmniej
+// 16 lat" lets it play; "Nie mam 16 lat" deletes it at once, as "Usuń
+// konto" does.
+export async function confirmAge(context) {
+  const session = await requireSession(context);
+  const body = await readJson(context.request);
+  if (typeof body.adult !== 'boolean') throw new ApiError(400, 'invalid_answer', 'Wybierz jedną z odpowiedzi.');
+  if (!body.adult) {
+    await removeAccount(context.env.DB, session, context.now);
+    return json({ deleted: true }, 200, { 'Set-Cookie': clearedSessionCookie() });
+  }
+  await context.env.DB.prepare('UPDATE users SET age_confirmed_at = COALESCE(age_confirmed_at, ?), age_required = 0 WHERE id = ?').bind(context.now, session.userId).run();
+  return json({ user: { ...session.user, ageRequired: false } });
+}
+
+// The account goes for good, with its characters and everything they have,
+// its sessions and its link to Google.
+async function removeAccount(db, session, now) {
+  const { login, email } = session.user;
   const id = session.userId;
   const characters = 'SELECT id FROM characters WHERE user_id = ?';
   await db.batch([
@@ -227,7 +252,7 @@ export async function deleteAccount(context) {
     ),
     ...marketRemoval(db, characters, [id]),
     ...partyRemoval(db, characters, [id]),
-    ...guildRemoval(db, characters, [id], context.now),
+    ...guildRemoval(db, characters, [id], now),
     db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(id),
@@ -238,7 +263,6 @@ export async function deleteAccount(context) {
     db.prepare('DELETE FROM login_failures WHERE identifier IN (?, ?)').bind(login.toLowerCase(), email ?? ''),
     db.prepare('DELETE FROM users WHERE id = ?').bind(id),
   ]);
-  return json({ ok: true }, 200, { 'Set-Cookie': clearedSessionCookie() });
 }
 
 export async function me(context) {

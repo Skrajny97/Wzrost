@@ -139,6 +139,12 @@ describe('Google sign-in', () => {
     const login = await call('POST', '/api/auth/login', { body: { identifier: 'jan.kowalski', password: 'google' } });
     assert.equal(login.status, 401);
 
+    // A new account made with Google answers once that its player is 16 or
+    // over before it plays (725 A, 0.2.3).
+    assert.equal(me.data.user.ageRequired, true);
+    assert.equal((await call('POST', '/api/character', { cookie: session, body: { name: 'Jan', classId: 'warrior', appearance: 'male' } })).data.error.code, 'age_unconfirmed');
+    assert.equal((await call('POST', '/api/me/age', { cookie: session, body: { adult: true } })).status, 200);
+
     // The Punkty Systemu of a confirmed e-mail wait for the first character.
     const made = await call('POST', '/api/character', { cookie: session, body: { name: 'Jan', classId: 'warrior', appearance: 'male' } });
     assert.equal(made.status, 201);

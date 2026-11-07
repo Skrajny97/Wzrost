@@ -46,7 +46,7 @@ function caller(server) {
 function players(server, db) {
   const ask = caller(server);
   return async (login, { level = 30, classLevel = 30 } = {}) => {
-    const { cookie } = await ask('POST', '/api/auth/register', { body: { login, email: `${login.toLowerCase()}@example.com`, password: 'tajnehaslo1' } });
+    const { cookie } = await ask('POST', '/api/auth/register', { body: { login, email: `${login.toLowerCase()}@example.com`, password: 'tajnehaslo1', adult: true } });
     const database = await db();
     await database.prepare('UPDATE users SET email_confirmed_at = created_at WHERE login = ?').bind(login).run();
     assert.equal((await ask('POST', '/api/character', { body: { name: login, classId: 'warrior', appearance: 'female' }, cookie })).status, 201);

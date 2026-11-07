@@ -1,0 +1,94 @@
+/* The game's documents for players and Google Play (0.2.3): the privacy
+   policy, the terms and how to delete an account, in Polish and English
+   (prywatnosc.html, privacy.html, regulamin.html, terms.html,
+   usun-konto.html, delete-account.html). They load offline.css first for
+   its fonts, colours and the System panel, and this file for reading text. */
+
+@font-face {
+  font-family: 'Alegreya';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/alegreya-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+@font-face {
+  font-family: 'Alegreya';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/alegreya-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+.doc {
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: max(24px, env(safe-area-inset-top)) max(var(--gutter), env(safe-area-inset-right)) max(40px, env(safe-area-inset-bottom)) max(var(--gutter), env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-family: 'Alegreya', Georgia, serif;
+  font-size: 18px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.doc-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-family: var(--font-system);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+}
+
+.doc h1,
+.doc h2 {
+  margin: 0;
+  font-family: var(--font-system);
+  color: var(--system-text);
+  text-wrap: balance;
+}
+
+.doc h1 {
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+.doc h2 {
+  margin-top: 14px;
+  font-size: 17px;
+  letter-spacing: 0.04em;
+}
+
+.doc p,
+.doc ul,
+.doc ol {
+  margin: 0;
+}
+
+.doc ul,
+.doc ol {
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.doc a {
+  color: var(--system);
+}
+
+.doc .doc-date {
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.doc .system-panel {
+  font-family: var(--font-system);
+}

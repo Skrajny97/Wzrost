@@ -3034,6 +3034,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.3 (7.11.2026): przygotowanie do Sklepu Play
+
+Autor wybrał Sklep Play jako następną pracę (722 A) i odpowiedział: „723 A - już istnieje, właśnie kontakt@insightrpg.com”, „724 A” z imieniem i nazwiskiem do polityki prywatności, „725 A”, „726 A (zrzuty z IPhone'a są od testerów)”.
+
+1. **Dokumenty (723 A, 724 A).** Gra ma stałe strony obok siebie, po polsku i po angielsku: Polityka prywatności (`/prywatnosc`, `/privacy`), Regulamin (`/regulamin`, `/terms`) i Usuwanie konta (`/usun-konto`, `/delete-account`). Adres kontaktowy to kontakt@insightrpg.com, a administratorem danych i usługodawcą jest autor, z imieniem i nazwiskiem podanym w 724 A. Polityka opisuje to, co gra naprawdę zbiera: konto, logowanie przez Google, grę, czat (ostatnie 300 wiadomości kanału i 100 rozmowy prywatnej), tłumaczenie Workers AI, powiadomienia, zgłoszenia błędów ze zrzutami, nieudane logowania i ciasteczka. Strony są statycznymi plikami (`src/client/*.html` z `legal.css`), z tymi samymi zabezpieczeniami co gra. Linki do Regulaminu i Polityki są na ekranie logowania, w formularzu nowego konta, na ekranie wieku i w Ustawieniach („Dokumenty”), w języku gry. Teksty nie są przejrzane przez prawnika; autor może je zlecić do sprawdzenia.
+2. **Wiek 16+ (725 A).** Formularz nowego konta ma pole „Mam co najmniej 16 lat”; bez niego serwer odmawia (`age_required`) i zapisuje chwilę potwierdzenia (`age_confirmed_at`, migracja 0095). Nowe konto z logowania przez Google odpowiada raz, zanim zagra: „Mam co najmniej 16 lat” albo „Nie mam 16 lat”, a druga odpowiedź od razu usuwa konto jak „Usuń konto” (`POST /api/me/age`, `age_required`). Do tego czasu gra odmawia (`age_unconfirmed`), jak przy niepotwierdzonym mailu. Konta sprzed 0.2.3 nie są pytane (brakujący szczegół: najprostsze, bez przerywania gry obecnym graczom).
+3. **Android do weryfikacji (726 A).** Autor ma telefon z Androidem; zrzuty z iPhone'a są od testerów.
+4. **Dalej po stronie autora:** konto deweloperskie Google Play (25 USD), weryfikacja w aplikacji Play Console na Androidzie, paczka przez PWABuilder, konto dla recenzenta, 12 testerów przez 14 dni. Po mojej: zrzuty i grafika do sklepu, teksty sklepu po polsku i po angielsku, odpowiedzi do formularzy bezpieczeństwa danych i oceny wieku (IARC), plik `assetlinks.json` po paczce.
+
 ## Wersja 0.2.2 (6.11.2026)
 
 - Ostatnie rzeczy po polsku poza grą dostały angielski (autor: „Dobra to te 3 rzeczy też zrób”):

@@ -5,6 +5,7 @@
 
 import { ApiError, request } from './api.js';
 import { $, $$, clear, fill, h, icon } from './dom.js';
+import { legalLinks, mustConfirmAge, renderAge } from './age.js';
 import { emailRow, hideInvite, inviteToConfirm, mustConfirm, renderConfirm, takeEmailResult } from './email.js';
 import { countOf } from './format.js';
 import { preloadPortraits } from './art.js';
@@ -235,6 +236,12 @@ async function start() {
 // of them chooses too, and one without any creates its first.
 async function enterGame({ choose = false } = {}) {
   await loadContent();
+  // A new account made with Google answers once that its player is 16 or
+  // over (age.js).
+  if (mustConfirmAge(state.user)) {
+    showAge();
+    return;
+  }
   // A new account plays once its e-mail is confirmed (email.js).
   if (mustConfirm(state.user)) {
     showConfirm();
@@ -252,6 +259,11 @@ async function enterGame({ choose = false } = {}) {
     }
     await call('GET', '/api/character');
   } catch (error) {
+    if (error instanceof ApiError && error.code === 'age_unconfirmed') {
+      state.user = { ...state.user, ageRequired: true };
+      showAge();
+      return;
+    }
     if (error instanceof ApiError && error.code === 'email_unconfirmed') {
       state.user = { ...state.user, emailConfirmed: false, emailRequired: true };
       showConfirm();
@@ -322,6 +334,15 @@ async function changeCharacter(event) {
 
 // The screen of a new account that waits for the link from its mail.
 let emailUnsent = false; // the mail after the registration did not go out
+function showAge() {
+  setMusicPlace([]);
+  show('confirm');
+  renderAge($('#confirm-panel'), {
+    onConfirmed: () => enterGame({ choose: true }),
+    onDeleted: () => enterAuth(t('Konto zostało usunięte. Insight jest dla osób, które mają co najmniej 16 lat.')),
+  });
+}
+
 function showConfirm() {
   setMusicPlace([]);
   show('confirm');
@@ -845,6 +866,7 @@ function openSettings() {
       zoomOffered() && zoomRow(),
       testToggle && h('div', { class: 'status-row' }, h('dt', { id: 'test-mode-label', text: t('Tryb testowy') }), h('dd', {}, testToggle)),
       giftCodeRow(),
+      h('div', { class: 'status-row' }, h('dt', { text: t('Dokumenty') }), h('dd', {}, legalLinks())),
       h('div', { class: 'status-row' }, h('dt', { text: t('Wersja gry') }), version),
     ),
     state.user.tutorialTests && h('button', { type: 'button', class: 'button button--system', onClick: openTutorialTests, text: t('Testuj samouczki') }),
@@ -1675,7 +1697,8 @@ for (const toggle of $$('.password-toggle')) {
 
 bindForm($('#login-form'), (data) => request('POST', '/api/auth/login', data));
 bindForm($('#register-form'), async (data) => {
-  const answer = await request('POST', '/api/auth/register', data);
+  // "Mam co najmniej 16 lat" (age.js).
+  const answer = await request('POST', '/api/auth/register', { ...data, adult: data.adult === 'on' });
   emailUnsent = answer.emailSent === false;
   return answer;
 });

@@ -175,7 +175,7 @@ async function createGoogleUser(db, identity, now) {
     if (await db.prepare('SELECT 1 FROM users WHERE login = ?').bind(login).first()) continue;
     try {
       const result = await db
-        .prepare('INSERT INTO users (login, email, password_hash, google_sub, created_at, system_points_waiting, email_rewarded_at, language) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+        .prepare('INSERT INTO users (login, email, password_hash, google_sub, created_at, system_points_waiting, email_rewarded_at, language, age_required) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1)')
         .bind(login, identity.email, NO_PASSWORD, identity.sub, now, content().balance.account.emailSystemPoints, now, language())
         .run();
       return { id: result.meta.last_row_id };

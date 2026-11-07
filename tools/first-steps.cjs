@@ -35,7 +35,7 @@ const MOST_STEPS = 40;
 async function account(page) {
   const login = `start${Date.now().toString(36)}${Math.floor(Math.random() * 1e4)}`;
   const made = await page.evaluate(
-    async ({ login }) => (await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login, email: `${login}@example.com`, password: 'pierwszekroki1' }) })).status,
+    async ({ login }) => (await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ login, email: `${login}@example.com`, password: 'pierwszekroki1', adult: true }) })).status,
     { login },
   );
   if (made !== 201 && made !== 200) throw new Error(`Rejestracja zwróciła ${made}.`);

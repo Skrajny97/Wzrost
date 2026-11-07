@@ -245,7 +245,7 @@ async function main() {
       const response = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) });
       return response.status;
     }, { method, url, body });
-  await api('POST', '/api/auth/register', { login, email: `${login}@example.com`, password: 'pierwszekroki1' });
+  await api('POST', '/api/auth/register', { login, email: `${login}@example.com`, password: 'pierwszekroki1', adult: true });
   sql(`UPDATE users SET email_confirmed_at = 1 WHERE login = '${login}'`);
   await api('POST', '/api/auth/login', { identifier: login, password: 'pierwszekroki1' });
   if ((await api('POST', '/api/character', { name, classId: 'warrior', appearance: 'female' })) >= 400) throw new Error('Nie powstała postać.');
@@ -293,7 +293,7 @@ async function main() {
   const other = `wybor${stamp}_postaci_konta_`.slice(0, 24);
   const otherNames = [`Wszemiłosława${stamp}`.slice(0, 20), `Świętopełkowa${stamp}`.slice(0, 20)];
   await first.clearCookies();
-  await api('POST', '/api/auth/register', { login: other, email: `${other}@example.com`, password: 'pierwszekroki1' });
+  await api('POST', '/api/auth/register', { login: other, email: `${other}@example.com`, password: 'pierwszekroki1', adult: true });
   sql(`UPDATE users SET email_confirmed_at = 1 WHERE login = '${other}'`);
   for (const [index, otherName] of otherNames.entries()) {
     if ((await api('POST', '/api/character', { name: otherName, classId: index === 0 ? 'cleric' : 'shadow', appearance: 'male' })) >= 400) throw new Error('Nie powstała postać do wyboru.');

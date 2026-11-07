@@ -305,6 +305,11 @@
       "id": "0.2.2",
       "title": "Wersja 0.2.2",
       "body": "- Wpisy „Co nowego?” są także po angielsku: grający po angielsku czytają je w swoim języku.\n- Ekran braku połączenia mówi w języku gry.\n- Link insightrpg.com/en pokazuje w podglądzie angielski opis gry i otwiera grę po angielsku."
+    },
+    {
+      "id": "0.2.3",
+      "title": "Wersja 0.2.3",
+      "body": "- Gra ma Regulamin i Politykę prywatności (insightrpg.com/regulamin i insightrpg.com/prywatnosc), a strona insightrpg.com/usun-konto opisuje usuwanie konta. Linki są na ekranie logowania i w Ustawieniach.\n- Insight jest dla osób, które mają co najmniej 16 lat: nowe konto potwierdza to przy zakładaniu."
     }
 ]
 }

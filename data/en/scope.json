@@ -850,6 +850,7 @@
     "src/client/index.html",
     "src/client/api.js",
     "src/client/app.js",
+    "src/client/age.js",
     "src/client/chat-news.js",
     "src/client/email.js",
     "src/client/format.js",

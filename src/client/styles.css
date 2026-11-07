@@ -786,6 +786,33 @@ button {
   text-align: center;
 }
 
+/* The terms and the privacy policy (0.2.3, age.js): under the login forms,
+   in the new account's form and in the Ustawienia. */
+.version a,
+.register-legal a,
+.legal-links a,
+#confirm-panel .field-hint a {
+  color: var(--system);
+}
+
+/* "Mam co najmniej 16 lat" in the new account's form. */
+.check-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  color: var(--text);
+  font-size: 15px;
+}
+
+.check-field input {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--system);
+}
+
 /* Game frame: top bar, screen and the two bottom bars */
 
 .topbar {
