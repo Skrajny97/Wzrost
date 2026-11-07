@@ -1,0 +1,14 @@
+{
+  "id": "portal-parts",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, a tall ancient stone portal gate standing alone in a dark forest clearing at night, its arch filled with a slowly swirling vortex of ice-blue System light, thin ice-blue glowing runes carved along the arch and faint luminous blue lines on the ground leading to it, through the portal glimpses of an old armoury of the System with racks of leather straps, metal fittings, scraps of armour and a cold anvil, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, greys and blues with ice-blue accents, no text, no border, no people",
+  "style": "src/client/art/places/system-grove.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}
