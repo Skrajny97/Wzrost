@@ -390,6 +390,11 @@
       "id": "0.2.20",
       "title": "Wersja 0.2.20",
       "body": "- Szybkie Polowania: 5 zamiast 3, a gdy zużyjesz wszystkie, wracają po 12 godzinach.\n- Błyskawiczne polowania: 5 zamiast 3, a gdy zużyjesz wszystkie, wracają po 6 godzinach."
+    },
+    {
+      "id": "0.2.21",
+      "title": "Wersja 0.2.21",
+      "body": "- Licznik graczy online: zakładka przy prawej krawędzi ekranu. Stuknij zieloną kropkę, a wysunie się liczba graczy w grze."
     }
 ]
 }

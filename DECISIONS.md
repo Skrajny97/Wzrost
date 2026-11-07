@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.21 (7.11.2026): licznik graczy online
+
+Autor: „Do tego dodajemy Licznik graczy online. Wysuwana zakładka z boku ekranu tylko z ilością graczy.”
+
+1. **Zakładka przy prawej krawędzi** gry, na wysokości 38% ekranu (na komputerze przy krawędzi głównej kolumny, obok czatu). Zwinięta pokazuje tylko zieloną kropkę. Stuknięcie wysuwa liczbę i podpis „graczy online”, następne ją chowa. Wysuwa się w lewo, w głąb ekranu, więc nic nie wystaje poza krawędź (src/client/online.js).
+2. **Kto jest online:** konta, od których gra coś usłyszała w ciągu community.trade.onlineSeconds (120 s), tak jak kropki przy znajomych. Licznik pyta serwer raz na minutę, gdy strona jest na wierzchu, i od razu przy wysunięciu (GET /api/online, src/server/online.js). Samo pytanie zaznacza konto jako widziane, najwyżej raz na 30 s, więc liczą się też gracze poniżej Społeczności, których strona nie pyta czatu.
+
 ## Wersja 0.2.20 (7.11.2026): Szybkie i Błyskawiczne polowania po 5, wracają po 12 i 6 godzinach
 
 Autor: „Zmieniamy Błyskawiczne wyprawy na reset co 6 godzin, a Szybkie wyprawy na reset co 12 godzin”, „Zwiększamy również ilość obydwóch do 5, w związku ze wzrostem trudności”.

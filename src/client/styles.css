@@ -10069,6 +10069,71 @@ a.profession-square:active {
   background: #d9534f;
 }
 
+/* The players online (online.js): a tab on the right edge of the game (at
+   the main column's edge on a computer, beside the chat), only its green
+   dot until tapped; then it slides out with the count. It grows leftwards
+   inside the screen, so nothing ever sticks out past its edge. */
+.online-tab {
+  position: fixed;
+  top: 38%;
+  right: calc(var(--side-width, 0px) + env(safe-area-inset-right, 0px));
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  min-width: 30px;
+  min-height: 44px;
+  padding: 8px 8px 8px 10px;
+  border: 1px solid var(--line);
+  border-right: 0;
+  border-radius: 10px 0 0 10px;
+  background: var(--bg-deep);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.online-dot {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #5fcf6a;
+  box-shadow: 0 0 6px #5fcf6a;
+}
+
+.online-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: 0;
+  overflow: hidden;
+  line-height: 1.15;
+  white-space: nowrap;
+  transition: max-width 0.2s ease, margin 0.2s ease;
+}
+
+.online-tab[aria-expanded='true'] .online-body {
+  max-width: 10em;
+  margin-left: 8px;
+}
+
+.online-count {
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 18px;
+}
+
+.online-label {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* With the game's animations off, it opens at once. */
+.calm .online-body {
+  transition: none;
+}
+
 .profile-friend {
   display: flex;
   flex-wrap: wrap;

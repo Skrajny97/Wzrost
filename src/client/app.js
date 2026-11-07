@@ -29,6 +29,7 @@ import { mountPortals } from './screens/portals.js';
 import { mountCommunity } from './screens/community.js';
 import { mountGuildPage } from './screens/guild.js';
 import { checkChat, onActivityEnds, onChatNews } from './chat-news.js';
+import { checkOnline, mountOnline } from './online.js';
 import { renderCreate } from './screens/create.js';
 import { renderSelect } from './screens/select.js';
 import { mountJournal } from './screens/journal.js';
@@ -364,6 +365,7 @@ function showConfirm() {
 function openGame() {
   show('game');
   buildTopbar(openSettings);
+  mountOnline($('#view-game'));
   route();
   // An older account without a confirmed e-mail is invited to confirm it,
   // once the narrator is done (email.js).
@@ -380,6 +382,7 @@ function openGame() {
     // A new entry of "Co nowego?" lights the scroll's dot (news.js).
     watchNews(now);
     checkChat();
+    checkOnline();
     offerTrade();
     offerPointsReset();
     offerRename();

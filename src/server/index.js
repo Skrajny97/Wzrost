@@ -5,6 +5,7 @@ import { confirmAge, deleteAccount, login, logout, me, register, setLanguage } f
 import { authorPanel, authorSkillDemo, authorSkills, bugReportImage, resolveBugReport } from './author.js';
 import { authorNews, deleteNews, dismissDraft, editNews, listNews, publishNews, seeNews } from './news.js';
 import { reportBug } from './bugs.js';
+import { getOnline } from './online.js';
 import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { openEncyclopediaChest, readEncyclopedia } from './encyclopedia.js';
@@ -138,6 +139,7 @@ const routes = [
   ['POST', '/api/author/news/delete', deleteNews],
   ['POST', '/api/author/news/dismiss', dismissDraft],
   ['GET', '/api/news', listNews],
+  ['GET', '/api/online', getOnline],
   ['POST', '/api/news/seen', seeNews],
   ['GET', '/api/author/skills/:id', authorSkillDemo],
   ['POST', '/api/author/chat/unmute', unmuteInChat],
