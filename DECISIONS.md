@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.19 (7.11.2026): w Wieżach bez wyboru piętra
+
+Autor: „i suwak miałeś wyjebać - stopień po prostu masz konkretny i nie mozesz zejsc nizej ani wyżej”.
+
+1. **Zawsze pierwsze niezdobyte piętro.** Postać wchodzi w każdej wieży tylko na piętro jedno powyżej najwyżej zdobytego (na start 1). Wygrana prowadzi piętro wyżej, a po przegranej czeka to samo piętro. Z ekranu Wież zniknął suwak i przyciski −10, −, +, +10, a karta pokazuje tylko to jedno piętro i „Najwyżej zdobyte”. Serwer sam wybiera piętro. Gdy strona poda inne (stary widok z drugiego urządzenia), odpowiada „Wejść można tylko na piętro N.”.
+2. Zdobytych pięter nie da się już powtarzać, więc każde piętro płaci tylko raz. Skrzynie i trofea czempionów działają jak dotąd: pierwsza wygrana piętra jest teraz jedyną. Kwestia narratora o skrzyni „za pierwsze zwycięstwo” zostaje, bo nadal jest prawdziwa.
+
 ## Wersja 0.2.18 (7.11.2026): Wieża Drużyn tak trudna jak Wieża Solo
 
 Autor: „Fajnie ze poprawiles wieże solo, ale drużynowych chyba nie ruszałeś bo dalej są banalnie łatwe”. Obie wieże miały te same stwory ×3, ale w Wieży Drużyn biją je dwie albo trzy postacie naraz. W symulacji tercet graczy doszedł mniej więcej 2,5 raza wyżej niż gracz solo na tym samym poziomie (poziom 60: piętra 47–57 wobec 12–22; poziom 100: 128–144 wobec 57–92).

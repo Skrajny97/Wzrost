@@ -415,6 +415,11 @@ describe('the Wieże through the API', () => {
     await set('level = 50, towers = ?', JSON.stringify({ best: { solo: 40 } }));
     assert.equal((await solo()).top, 41);
     assert.equal((await enter('wspinacz', { tower: 'solo', floor: 41 })).status, 200);
+    // Never lower than the first floor not won (0.2.19); without a floor
+    // named, the entry goes there.
+    await set('towers = ?', JSON.stringify({ best: { solo: 40 } }));
+    assert.equal((await enter('wspinacz', { tower: 'solo', floor: 39 })).data.error.code, 'invalid_floor');
+    assert.equal((await enter('wspinacz', { tower: 'solo' })).data.report.tower.floor, 41);
   });
 
   test('the entries of a day run out and come back from midnight', async () => {
@@ -427,25 +432,20 @@ describe('the Wieże through the API', () => {
     assert.equal((await enter('wspinacz', { tower: 'solo', floor: 1 })).status, 200);
   });
 
-  test('a tenth floor won the first time brings the chest, once in each tower', async () => {
-    await strong();
+  test('a tenth floor won brings the chest; then the climb goes on above it, never back to it (0.2.19)', async () => {
+    await strong(9);
     let first = null;
     for (let i = 0; i < 5 && !first?.tower.won; i++) first = (await enter('wspinacz', { tower: 'solo', floor: 10 })).data.report;
     assert.equal(first.tower.won, true, 'the floor is won');
     assert.equal(first.tower.chest, true);
     assert.equal(first.items.length, 1 + Number(first.tower.lootItem));
-    const items = async () => (await (await db()).prepare('SELECT COUNT(*) AS count FROM items').first()).count;
-    const before = await items();
-    let again = null;
-    for (let i = 0; i < 5 && !again?.tower.won; i++) again = (await enter('wspinacz', { tower: 'solo', floor: 10 })).data.report;
-    assert.equal(again.tower.won, true);
-    assert.equal(again.tower.chest, false);
-    assert.equal(again.items.length, Number(again.tower.lootItem));
-    assert.equal(await items(), before + again.items.length);
+    const again = await enter('wspinacz', { tower: 'solo', floor: 10 });
+    assert.equal(again.data.error.code, 'invalid_floor');
+    assert.equal(again.data.error.message, 'Wejść można tylko na piętro 11.');
     assert.deepEqual(JSON.parse((await (await db()).prepare('SELECT towers FROM characters').first()).towers).chests.solo, [10]);
   });
 
-  test('a champion\'s floor won the first time brings its trophy, a second win not; the page knows the floors won (483 A)', async () => {
+  test('a champion\'s floor won brings its trophy; the page knows the floors won (483 A)', async () => {
     const champion = towerFloor(CHAMPION, 'any', content).encounter.members[0].monsterId;
     const trophy = content.materialsByMonster[champion].id;
     const row = async () => (await db()).prepare('SELECT materials, towers FROM characters').first();
@@ -455,7 +455,7 @@ describe('the Wieże through the API', () => {
         .reduce((sum, [, count]) => sum + count, 0);
     const solo = async () => (await as('wspinacz', 'GET', '/api/towers')).data.towers.towers.find((tower) => tower.id === 'solo');
     // Strong enough, it wins Rokita's floor (the 25th, of level 74).
-    await strong();
+    await strong(CHAMPION - 1);
     assert.deepEqual((await solo()).champions, []);
     let first = null;
     for (let i = 0; i < 5 && !first?.tower.won; i++) first = (await enter('wspinacz', { tower: 'solo', floor: CHAMPION })).data.report;
@@ -463,13 +463,9 @@ describe('the Wieże through the API', () => {
     assert.equal(first.fights[0].champion, true);
     assert.equal(await pieces(), 1);
     assert.deepEqual((await solo()).champions, [CHAMPION]);
-    let again = null;
-    for (let i = 0; i < 5 && !again?.tower.won; i++) again = (await enter('wspinacz', { tower: 'solo', floor: CHAMPION })).data.report;
-    assert.equal(again.tower.won, true);
-    assert.ok(again.summary.xp > 0);
-    assert.equal(await pieces(), 1);
     assert.deepEqual(JSON.parse((await row()).towers).champions, { solo: [CHAMPION] });
     // A floor lost is not won: its trophy still waits.
+    await set('towers = ?', JSON.stringify({ best: { solo: 2 * CHAMPION - 1 }, champions: { solo: [CHAMPION] } }));
     const lost = (await enter('wspinacz', { tower: 'solo', floor: 2 * CHAMPION })).data.report;
     assert.equal((await solo()).champions.includes(2 * CHAMPION), lost.tower.won);
   });

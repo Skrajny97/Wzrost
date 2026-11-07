@@ -162,7 +162,7 @@ export async function getTowers(context) {
   return json({ towers: await towersView(context.env.DB, player, context.now) });
 }
 
-// { tower, floor }: an entry. The report comes at once; the character's
+// { tower, floor? }: an entry, on the first floor not won yet. The report comes at once; the character's
 // gains, the chest's item (worn at once in an empty slot, else in the bag,
 // where the scrapper buys the weakest items that do not fit, as after an
 // exploration), the Bestiariusz and the quests are saved with the entry.
@@ -181,10 +181,11 @@ export async function enterTower(context) {
   if (used >= rules().entries.perDay) throw new ApiError(409, 'no_entries', 'Wejścia do Wież na dziś się skończyły. Nowe od północy.');
   const climbers = await climbersFor(db, player, tower);
   if (climbers.missing) throw new ApiError(409, 'no_party', climbers.missing);
-  const floor = body.floor;
-  if (!Number.isInteger(floor) || floor < 1 || floor > climbers.top) {
-    throw new ApiError(400, 'invalid_floor', `Wybierz piętro od 1 do ${climbers.top}.`);
-  }
+  // Always the first floor not won yet, never one lower or higher (the
+  // author, 7.11.2026: "stopień po prostu masz konkretny i nie mozesz zejsc
+  // nizej ani wyżej"). A page that names another floor saw an old state.
+  const floor = climbers.top;
+  if (body.floor !== undefined && body.floor !== floor) throw new ApiError(400, 'invalid_floor', `Wejść można tylko na piętro ${floor}.`);
 
   const character = engineCharacter(row);
   const equipped = equippedItems(player);

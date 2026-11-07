@@ -380,6 +380,11 @@
       "id": "0.2.18",
       "title": "Wersja 0.2.18",
       "body": "- Wieża Drużyn jest teraz tak trudna jak Wieża Solo: System wzmacnia stwory tyle razy więcej, ilu walczy po stronie drużyny. Postęp w Wieży Drużyn liczy się od nowa, a zdobyte nagrody zostają."
+    },
+    {
+      "id": "0.2.19",
+      "title": "Wersja 0.2.19",
+      "body": "- Wieże: bez wyboru piętra. Postać wchodzi zawsze na pierwsze niezdobyte piętro: wygrana prowadzi wyżej, a po przegranej czeka to samo piętro."
     }
 ]
 }

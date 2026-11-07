@@ -300,6 +300,10 @@
     "0.2.18": {
       "title": "Version 0.2.18",
       "body": "- The Party Tower is now as hard as the Solo Tower: the System makes the creatures stronger as many times over as there are fighters on the party's side. Party Tower progress starts anew, and the rewards you won stay with you."
+    },
+    "0.2.19": {
+      "title": "Version 0.2.19",
+      "body": "- Towers: no more choosing a floor. The character always enters the first floor not yet won: a win leads up, and after a loss the same floor waits."
     }
   }
 }

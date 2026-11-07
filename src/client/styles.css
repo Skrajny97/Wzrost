@@ -12147,18 +12147,6 @@ a.profession-square:active {
   color: var(--danger);
 }
 
-.tower-picker {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.tower-slider {
-  flex: 1;
-  min-width: 0;
-  accent-color: var(--accent);
-}
-
 /* The Gildia in the Społeczność (screens/guild.js): founding one. */
 .guild-found {
   display: grid;
