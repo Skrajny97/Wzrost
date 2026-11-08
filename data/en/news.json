@@ -352,6 +352,10 @@
     "0.2.32": {
       "title": "Version 0.2.32",
       "body": "- A lost exploration is now called a defeat, not fainting: in the report, the Journal, at the Shrine and in the description of the Fern Flower draught."
+    },
+    "0.2.33": {
+      "title": "Version 0.2.33",
+      "body": "- After the first lost exploration, the narrator now speaks of a defeat, just like the text."
     }
   }
 }

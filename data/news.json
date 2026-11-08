@@ -445,6 +445,11 @@
       "id": "0.2.32",
       "title": "Wersja 0.2.32",
       "body": "- Przegrana wyprawa nazywa się teraz porażką, a nie omdleniem: w raporcie, w Dzienniku, przy Kapliczce i w opisie mikstury z Kwiatu paproci."
+    },
+    {
+      "id": "0.2.33",
+      "title": "Wersja 0.2.33",
+      "body": "- Narrator po pierwszej przegranej wyprawie mówi teraz o porażce, tak jak napis."
     }
 ]
 }

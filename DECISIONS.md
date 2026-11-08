@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.33 (8.11.2026): narrator mówi „porażka”
+
+Autor przesłuchał nagrania 755 i wybrał: po polsku 755.1 (wersja A), po angielsku 755.4 (wersja B). Kwestia narratora po pierwszej przegranej wyprawie („Po porażce nic z wyprawy nie zostaje…”, „After a defeat, nothing from the exploration is kept…”) ma teraz nagrania z tymi samymi słowami, co napis. Nagrania kończą się 0,3 s po ostatnim słowie.
+
 ## Wersja 0.2.32 (8.11.2026): „porażka” zamiast „omdlenia”
 
 Autor: „Niech zamiast omdlenia też bedzie napisane porażka wszędzie.”
