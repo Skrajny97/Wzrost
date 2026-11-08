@@ -348,6 +348,10 @@
     "0.2.31": {
       "title": "Version 0.2.31",
       "body": "- In Combat under the threat: “The threat is the chance of defeat during the exploration.”"
+    },
+    "0.2.32": {
+      "title": "Version 0.2.32",
+      "body": "- A lost exploration is now called a defeat, not fainting: in the report, the Journal, at the Shrine and in the description of the Fern Flower draught."
     }
   }
 }

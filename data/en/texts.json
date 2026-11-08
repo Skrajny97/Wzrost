@@ -202,8 +202,8 @@
   "timePointsGained": ["Time Points gained: +{time}"],
   "levelHeal": ["You levelled up. Your HP and Mana are restored."],
   "levelHealFemale": ["You levelled up. Your HP and Mana are restored."],
-  "faintPenalty": ["Fainting. Experience lost: {xp}."],
-  "faintForfeit": ["After fainting, nothing of this exploration is kept: XP, gold, resources, materials and items are lost."],
+  "faintPenalty": ["Defeat. Experience lost: {xp}."],
+  "faintForfeit": ["After a defeat, nothing of this exploration is kept: XP, gold, resources, materials and items are lost."],
   "bagOverflow": ["The bag was full ({capacity} slots). The scrap dealer bought the weakest items: {count} for {gold} gold."],
   "autoEquip": ["Equipped at once: {item} ({slot}), as that slot was empty."],
   "pushHuntTitle": ["Exploration over"],
@@ -228,7 +228,7 @@
   ],
   "result": {
     "success": "Exploration complete.",
-    "fainted": "Fainting.",
+    "fainted": "Defeat.",
     "escaped": "Retreat."
   }
 }

@@ -4,7 +4,7 @@
     "name": "Warrior",
     "short": "War",
     "role": "defence",
-    "description": "Fights in the front line with a heavy weapon and a shield. Takes a lot of punishment and rarely faints, but kills more slowly."
+    "description": "Fights in the front line with a heavy weapon and a shield. Takes a lot of punishment and rarely falls, but kills more slowly."
   },
   "archer": {
     "name": "Archer",

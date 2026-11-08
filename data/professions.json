@@ -707,7 +707,7 @@
       "level": 90,
       "herbs": { "fern-blossom": 1, "comfrey": 5 },
       "effect": { "revive": 0.3 },
-      "description": "Złoty napar z Kwiatu paproci. Działa sam: raz na wyprawę chroni przed omdleniem i postać wstaje z 30% HP."
+      "description": "Złoty napar z Kwiatu paproci. Działa sam: raz na wyprawę chroni przed porażką i postać wstaje z 30% HP."
     }
   ],
   "texts": {

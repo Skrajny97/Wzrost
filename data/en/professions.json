@@ -673,7 +673,7 @@
         "Fern Flower Draughts",
         "Fern Flower Draughts"
       ],
-      "description": "A golden draught of Fern Flower. Works on its own: once per exploration it saves the character from fainting, bringing them back up with 30% HP."
+      "description": "A golden draught of Fern Flower. Works on its own: once per exploration it saves the character from defeat, bringing them back up with 30% HP."
     }
   },
   "texts": {

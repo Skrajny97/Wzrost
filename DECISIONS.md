@@ -3034,6 +3034,16 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.32 (8.11.2026): „porażka” zamiast „omdlenia”
+
+Autor: „Niech zamiast omdlenia też bedzie napisane porażka wszędzie.”
+
+1. **Wszędzie, gdzie gra mówiła o omdleniu jako końcu wyprawy, mówi o porażce:** raport („Porażka.”, „Porażka. Utracone doświadczenie: …”, „Po porażce nic z tej wyprawy nie zostaje: …”, „Kara za porażkę”), Dziennik (wynik „porażka”), Kapliczka („Po porażce na wyprawie postać traci mniej doświadczenia”), mikstura z Kwiatu paproci („chroni przed porażką”), muzyka po przegranej („Porażka”), kwestia narratora po pierwszej przegranej wyprawie („Po porażce nic z wyprawy nie zostaje…”) i wiersze „Testuj samouczki” i „Testuj zdarzenie” na wersji testowej. Po angielsku „fainting” zmienia się na „defeat” w tych samych miejscach, a słownik ma „Porażka → Defeat”.
+2. **Umiejętność ewolucji** mówiła, że ktoś z drużyny „omdleje”. Chodzi o upadek w jednej walce, nie o koniec wyprawy, więc teraz: „gdy ktoś z drużyny padnie” („falls”). Opis Wojownika po angielsku: „rarely falls”.
+3. **Zostaje „omdlenie” w zdarzeniu z grzybem** („Zjedzenie: omdlenie”, nazwa wyniku widoczna tylko w „Testuj zdarzenie”), bo tam postać naprawdę mdleje od grzyba i budzi się na mchu, a wyprawa trwa dalej.
+4. **Nagranie kwestii narratora** mówi jeszcze „Po omdleniu…” po polsku i „After fainting…” po angielsku. Nowe nagrania (tekst z jedną zmienioną wg autora frazą) przyjdą na stronę odsłuchu, a do gry trafią po akceptacji.
+5. Identyfikatory w kodzie (`fainted`, `faint`) zostają, bo gracz ich nie widzi.
+
 ## Wersja 0.2.31 (8.11.2026): zdanie o zagrożeniu
 
 Autor, ze zrzutem zdania pod zagrożeniem miejsca wyprawy: „Zmień zdanie na "Zagrożenie to szansa porażki podczas wyprawy"”.

@@ -11,7 +11,7 @@ import { workSummaryText } from './professions.js';
 
 // The names below are shown through t(), as the page loads its English
 // after this module.
-const RESULT_NAMES = { success: 'sukces', fainted: 'omdlenie', escaped: 'odwrót' };
+const RESULT_NAMES = { success: 'sukces', fainted: 'porażka', escaped: 'odwrót' };
 // A profession's work, by the kind of its report, and its chip.
 const WORK_CHIPS = { herbs: 'zbieranie', potions: 'warzenie', items: 'wyrób', minerals: 'kopanie', jewels: 'szlifiernia' };
 

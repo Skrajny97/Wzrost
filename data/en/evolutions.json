@@ -377,7 +377,7 @@
       "name": "Miracle",
       "style": "healing",
       "description": "Sometimes faith is stronger than wounds.",
-      "effect": "Once per fight, when someone in the party faints, they get back up with {hp%} of max HP."
+      "effect": "Once per fight, when someone in the party falls, they get back up with {hp%} of max HP."
     },
     "judgement": {
       "name": "Judgement",

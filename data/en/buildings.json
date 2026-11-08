@@ -140,7 +140,7 @@
   },
   "shrine": {
     "name": "Shrine",
-    "description": "A wayside shrine by the gate, with a candle that never goes out. After fainting on an exploration, the character loses less experience.",
-    "effect": { "text": "After fainting, the character loses {value} less experience" }
+    "description": "A wayside shrine by the gate, with a candle that never goes out. After a defeat on an exploration, the character loses less experience.",
+    "effect": { "text": "After a defeat, the character loses {value} less experience" }
   }
 }

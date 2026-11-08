@@ -2200,7 +2200,7 @@ describe('Time Points and the narrator', () => {
     assert.equal(line('system-collector'), undefined);
     assert.equal(tutorial.chapters['system-collector'], undefined);
     assert.deepEqual(line('party-intro').text, ['Drużyna to do trzech wędrowców na jednej wyprawie, a ich poziomy klasy mogą się różnić najwyżej o pięć. Wyprawę wysyła lider, gdy nad „Wyrusz” zaznaczy „Z drużyną”.']);
-    assert.deepEqual(line('faint-first').text, ['Po omdleniu nic z wyprawy nie zostaje, a System odbiera jeszcze część doświadczenia. Zanim znów wyruszysz, sprawdź zagrożenie i odpocznij.']);
+    assert.deepEqual(line('faint-first').text, ['Po porażce nic z wyprawy nie zostaje, a System odbiera jeszcze część doświadczenia. Zanim znów wyruszysz, sprawdź zagrożenie i odpocznij.']);
     // The two cards changed (their recordings come anew).
     assert.match(line('professions-list').text[0], / Na pozostałe profesje przyjdzie jeszcze czas\.$/);
     assert.equal(line('skills-choice').text[1], 'Od jedenastego poziomu klasy możesz dobrać ścieżkę poboczną – za jeden Punkt Umiejętności. Trzecia ścieżka się wtedy zamknie.');

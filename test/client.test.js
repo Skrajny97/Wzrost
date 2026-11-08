@@ -364,7 +364,7 @@ test("the narrator hears of the Gildia's tabs, also of the one the page opens on
     ['Drużyna', 'party-tour'],
     ['Trudna wyprawa', 'hard-hunt-tour'],
     ['Skrzynia Konta', 'account-chest-tour'],
-    ['Omdlenie', 'faint-tour'],
+    ['Porażka', 'faint-tour'],
   ]) {
     assert.match(app, new RegExp(`row\\(t\\('${title}'\\),`));
     assert.ok(app.includes(`'/api/test/${path}'`), path);

@@ -365,7 +365,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     const rows = [
       below && report.result === 'success' && [t('Łup'), capitalized(report.portal.loot)],
       !lost && !below && [t('XP postaci'), `+${formatNumber(summary.xp)} XP`],
-      summary.penalty > 0 && [t('Kara za omdlenie'), t('−{xp} XP postaci', { xp: formatNumber(summary.penalty) })],
+      summary.penalty > 0 && [t('Kara za porażkę'), t('−{xp} XP postaci', { xp: formatNumber(summary.penalty) })],
       // Reports from before the split have no classXp: the class got the same XP.
       !lost && !below && [t('XP klasy'), `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
       !lost && !below && [t('Złoto'), `+${formatNumber(summary.gold)}`],

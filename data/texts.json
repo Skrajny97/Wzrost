@@ -201,8 +201,8 @@
   "timePointsGained": ["Zdobyto Punkty Czasu: +{time}"],
   "levelHeal": ["Awansowałeś. Twoje HP i Mana odnowiły się."],
   "levelHealFemale": ["Awansowałaś. Twoje HP i Mana odnowiły się."],
-  "faintPenalty": ["Omdlenie. Utracone doświadczenie: {xp}."],
-  "faintForfeit": ["Po omdleniu nic z tej wyprawy nie zostaje: XP, złoto, zasoby, materiały i przedmioty przepadają."],
+  "faintPenalty": ["Porażka. Utracone doświadczenie: {xp}."],
+  "faintForfeit": ["Po porażce nic z tej wyprawy nie zostaje: XP, złoto, zasoby, materiały i przedmioty przepadają."],
   "bagOverflow": ["Plecak był pełny ({capacity} miejsc). Złomiarz kupił najsłabsze przedmioty: {count} za {gold} złota."],
   "autoEquip": ["Założono od razu: {item} ({slot}), bo ten slot był pusty."],
   "pushHuntTitle": ["Koniec wyprawy"],
@@ -227,7 +227,7 @@
   ],
   "result": {
     "success": "Wyprawa zakończona.",
-    "fainted": "Omdlenie.",
+    "fainted": "Porażka.",
     "escaped": "Odwrót."
   }
 }

@@ -549,7 +549,7 @@
       "name": "Cud",
       "style": "leczenie",
       "description": "Czasem wiara jest silniejsza niż rany.",
-      "effect": "Raz na walkę, gdy ktoś z drużyny omdleje, wstaje z {hp%} maks. HP.",
+      "effect": "Raz na walkę, gdy ktoś z drużyny padnie, wstaje z {hp%} maks. HP.",
       "kind": "miracle",
       "mana": 20,
       "params": { "hp": [0.2, 0.5] }

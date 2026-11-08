@@ -514,7 +514,7 @@
     },
     "faint-first": {
       "text": [
-        "After fainting, nothing from the exploration is kept, and the System takes away part of your experience as well. Before you set out again, check the threat and rest."
+        "After a defeat, nothing from the exploration is kept, and the System takes away part of your experience as well. Before you set out again, check the threat and rest."
       ],
       "voice": "audio/narration/en/faint-first.mp3"
     },

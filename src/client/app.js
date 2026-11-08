@@ -1063,7 +1063,7 @@ async function openTutorialTests() {
       row(t('Drużyna'), t('Od 10. poziomu postaci, przy wejściu do Społeczności.'), repeatPartyTour, told && isUnlocked('party')),
       row(t('Trudna wyprawa'), t('Od 10. poziomu postaci, przy wejściu na miejsce wyprawy.'), repeatHardHuntTour, told && Boolean(state.character.hardHunt)),
       row(t('Skrzynia Konta'), t('Przy wejściu do Skrzyni Konta w obozie.'), repeatAccountChestTour, told),
-      row(t('Omdlenie'), t('Przy pierwszym raporcie z wyprawy zakończonej omdleniem.'), repeatFaintTour, told),
+      row(t('Porażka'), t('Przy pierwszym raporcie z wyprawy zakończonej porażką.'), repeatFaintTour, told),
     ),
   );
 }
@@ -1101,7 +1101,7 @@ async function openEventTests() {
     h('h2', { class: 'sheet-title', text: t('Testuj zdarzenia') }),
     h('p', {
       class: 'sheet-text',
-      text: t('Wybrane zdarzenie przyjdzie po następnej wyprawie, gdy dotkniesz „Odbierz raport”, bez losowania. Możesz też wybrać, co się w nim naprawdę dzieje. Wyprawa musi się skończyć bez omdlenia.'),
+      text: t('Wybrane zdarzenie przyjdzie po następnej wyprawie, gdy dotkniesz „Odbierz raport”, bez losowania. Możesz też wybrać, co się w nim naprawdę dzieje. Wyprawa musi się skończyć bez porażki.'),
     }),
     h(
       'ul',
@@ -1480,8 +1480,8 @@ async function repeatAccountChestTour() {
 // Test mode: the narrator's line about a faint from the start (testing.js).
 async function repeatFaintTour() {
   const sure = await confirmAction({
-    title: t('Omdlenie od nowa?'),
-    text: t('Narrator powie o omdleniu przy następnym raporcie z wyprawy zakończonej omdleniem.'),
+    title: t('Porażka od nowa?'),
+    text: t('Narrator powie o porażce przy następnym raporcie z wyprawy zakończonej porażką.'),
     confirmLabel: t('Od nowa'),
   });
   if (!sure) return;

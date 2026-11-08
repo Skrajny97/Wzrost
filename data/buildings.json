@@ -312,10 +312,10 @@
   {
     "id": "shrine",
     "name": "Kapliczka",
-    "description": "Kapliczka przy bramie, ze świecą, która nie gaśnie. Po omdleniu na wyprawie postać traci mniej doświadczenia.",
+    "description": "Kapliczka przy bramie, ze świecą, która nie gaśnie. Po porażce na wyprawie postać traci mniej doświadczenia.",
     "maxLevel": 10,
     "fortress": true,
-    "effect": { "kind": "faintXp", "perLevel": 0.05, "unit": "percent", "text": "Po omdleniu postać traci o {value} mniej doświadczenia" },
+    "effect": { "kind": "faintXp", "perLevel": 0.05, "unit": "percent", "text": "Po porażce postać traci o {value} mniej doświadczenia" },
     "costs": [
       { "resource": "gold", "base": 8000, "growth": 1.15 },
       { "resource": "wood", "base": 3000, "growth": 1.15 },
