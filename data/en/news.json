@@ -316,6 +316,10 @@
     "0.2.22": {
       "title": "Version 0.2.22",
       "body": "- Guilds: a character already in a guild no longer sees invitations to other guilds, and cannot be invited."
+    },
+    "0.2.23": {
+      "title": "Version 0.2.23",
+      "body": "- Hold “+” or “−” next to numbers (selling, stat points and more) and the number keeps changing by itself, faster and faster.\n- Tapping buttons quickly no longer zooms the screen on a phone."
     }
   }
 }

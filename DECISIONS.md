@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.23 (8.11.2026): przytrzymanie „+” i „−”, bez przybliżania przy szybkim stukaniu
+
+Uwaga gracza na czacie, przekazana przez autora: „Można dodać przyciskanie plusa w sprzedaży różnych surowców, punktów statystyk, bo da się tylko pojedynczy klik a na telefonie czasem jak się szybko klika to przybliża zamiast zwiększyć liczbę”.
+
+1. **Przytrzymanie.** Każdy „+” i „−” liczby w grze (sprzedaż, wymiana, mikstury, Stół rozbiórki, stawki i inne, klasa .duration-step) i „+” punktu statystyki (.stat-add) przytrzymany dłużej niż 0,4 s sam dodaje dalej, coraz szybciej (od 180 ms do 50 ms między krokami), aż do puszczenia albo do końca zakresu. Puszczenie nie dodaje już nic. Gdy ekran rysuje się po każdym kroku na nowo (punkty statystyk), naciska się przycisk pod palcem (src/client/hold.js).
+2. **Bez przybliżania.** Przyciski, linki i pola mają touch-action: manipulation, więc szybkie podwójne stuknięcie nie przybliża strony na telefonie. Przybliżanie dwoma palcami zostaje.
+
 ## Wersja 0.2.22 (7.11.2026): bez zaproszeń do gildii dla członków gildii
 
 Autor: „Niech zaproszenia do gildii nie wyswietlaja sie osobom które już w jakiejś są albo niech nie mozna bedzie zaprosic takich osob - to lepiej.”

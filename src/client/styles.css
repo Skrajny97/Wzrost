@@ -3115,6 +3115,25 @@ img.area-art {
   opacity: 0.4;
 }
 
+/* Fast taps on a control never zoom the page on a phone, and a "+" or "−"
+   held down (hold.js) shows no text selection or menu (a player's note,
+   8.11.2026). */
+button,
+a,
+input,
+select,
+label,
+summary {
+  touch-action: manipulation;
+}
+
+.duration-step,
+.stat-add {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 .duration-slider {
   --fill: 0%;
   width: 100%;

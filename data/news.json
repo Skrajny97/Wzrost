@@ -400,6 +400,11 @@
       "id": "0.2.22",
       "title": "Wersja 0.2.22",
       "body": "- Gildie: kto jest już w gildii, nie widzi zaproszeń do innych gildii, a zaprosić go nie można."
+    },
+    {
+      "id": "0.2.23",
+      "title": "Wersja 0.2.23",
+      "body": "- Przytrzymaj „+” albo „−” przy liczbach (sprzedaż, punkty statystyk i inne), a liczba będzie rosła sama, coraz szybciej.\n- Szybkie stukanie w przyciski nie przybliża już ekranu na telefonie."
     }
 ]
 }

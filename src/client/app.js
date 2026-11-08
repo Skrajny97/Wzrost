@@ -30,6 +30,7 @@ import { mountCommunity } from './screens/community.js';
 import { mountGuildPage } from './screens/guild.js';
 import { checkChat, onActivityEnds, onChatNews } from './chat-news.js';
 import { checkOnline, mountOnline } from './online.js';
+import { enableHold } from './hold.js';
 import { renderCreate } from './screens/create.js';
 import { renderSelect } from './screens/select.js';
 import { mountJournal } from './screens/journal.js';
@@ -1770,4 +1771,5 @@ if ('serviceWorker' in navigator) {
 applyZoom();
 applyMotion();
 initSheet();
+enableHold();
 start();
