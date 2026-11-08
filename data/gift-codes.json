@@ -13,6 +13,16 @@
       }
     },
     {
+      "id": "hundred-characters-2026-11",
+      "code": "100",
+      "until": "2026-12-06T00:00:00+01:00",
+      "rewards": {
+        "systemPoints": 10,
+        "timePoints": 100,
+        "gold": 1000
+      }
+    },
+    {
       "id": "fifty-accounts-2026-11",
       "code": "50",
       "until": "2026-12-05T00:00:00+01:00",

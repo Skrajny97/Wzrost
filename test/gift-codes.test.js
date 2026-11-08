@@ -44,6 +44,15 @@ describe('gift codes in the engine', () => {
     assert.equal(giftCodeOf('50', Date.parse('2026-12-05T00:00:00+01:00'), [], content).reason, 'expired');
   });
 
+  test('100 gives 10 Punkty Systemu, 100 Punktów Czasu and 1000 złota, to the end of 5 December in Warsaw', () => {
+    const hundred = content.giftCodes.find((gift) => gift.id === 'hundred-characters-2026-11');
+    assert.equal(hundred.code, '100');
+    assert.deepEqual(hundred.rewards, { systemPoints: 10, timePoints: 100, gold: 1000 });
+    assert.equal(giftCodeOf('100', Date.parse('2026-11-08T09:00:00+01:00'), [], content).gift, hundred);
+    assert.equal(giftCodeOf('100', Date.parse('2026-12-05T23:59:00+01:00'), [], content).gift, hundred);
+    assert.equal(giftCodeOf('100', Date.parse('2026-12-06T00:00:00+01:00'), [], content).reason, 'expired');
+  });
+
   test('1111 works on 11 November in Warsaw only, and is unknown before', () => {
     const eleven = content.giftCodes.find((gift) => gift.id === 'eleven-eleven-2026');
     assert.equal(eleven.code, '1111');

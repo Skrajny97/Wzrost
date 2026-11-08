@@ -336,6 +336,10 @@
     "0.2.28": {
       "title": "Version 0.2.28",
       "body": "- The timer over the character icons also counts the profession the System Avatar is working on. When two things run at once, you see the one that ends first."
+    },
+    "0.2.29": {
+      "title": "Version 0.2.29",
+      "body": "- Gift code 100 for a hundred characters in the game: 10 System Points, 100 Time Points and 1000 gold. Enter it in the Settings, under “Gift code”. It works until 5 December inclusive."
     }
   }
 }

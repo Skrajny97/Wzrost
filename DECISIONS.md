@@ -3034,6 +3034,12 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.29 (8.11.2026): kod podarunkowy „100”
+
+Autor: „Wprowadź kod podarunkowy z okazji 100 założonych postaci, ważny 4 tygodnie. Kod: 100. 10 Punktów Systemu, 100 Punktów Czasu, 1000 złota”.
+
+1. **Kod „100”** działa od razu, raz na konto, do 5.12.2026 włącznie (`until` 6.12.2026, 0:00 czasu polskiego, czyli cztery tygodnie od 8.11, tak jak kod „50”), i daje 10 Punktów Systemu, 100 Punktów Czasu i 1000 złota (data/gift-codes.json).
+
 ## Wersja 0.2.28 (8.11.2026): licznik nad ikonkami postaci liczy też pracę Awatara
 
 Autor (wiadomości, które doszły po wysłaniu 0.2.27): „tylko niech to obejmuje i wyprawy i profesje nie?”, „Obóz niech pomija”.

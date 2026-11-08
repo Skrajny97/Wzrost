@@ -425,6 +425,11 @@
       "id": "0.2.28",
       "title": "Wersja 0.2.28",
       "body": "- Licznik nad ikonkami postaci liczy też profesję, którą wykonuje Awatar Systemu. Gdy dzieją się dwie rzeczy naraz, widać tę, która skończy się pierwsza."
+    },
+    {
+      "id": "0.2.29",
+      "title": "Wersja 0.2.29",
+      "body": "- Kod podarunkowy 100 na sto postaci w grze: 10 Punktów Systemu, 100 Punktów Czasu i 1000 złota. Wpisz go w Ustawieniach, w „Kod podarunkowy”. Działa do 5 grudnia włącznie."
     }
 ]
 }
