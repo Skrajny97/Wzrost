@@ -1032,7 +1032,8 @@
       "portals-lead": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "The Portals wait in the Combat tab. Let us look in there."},
       "portals-lands": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "Each Portal takes you to a different land, one that will give you the resources you need."},
       "portals-stages": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "You may take on the stages as you see fit… and as far as you can. But you will go no higher than your character's level."},
-      "portals-sweep": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "You can also clear a stage you have already beaten, without a fight – five times a day, gathering the resources you need."}
+      "portals-sweep": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "You can also clear a stage you have already beaten, without a fight – five times a day, gathering the resources you need."},
+      "faint-first": {"voice": "NarratorEn", "model": "eleven_v3", "settings": {"stability": 1.0}, "ending": " The fire crackles softly. [pauses]", "text": "After a defeat, nothing from the exploration is kept, and the System takes away part of your experience as well. Before you set out again, check the threat and rest."}
     }
   },
   "narrationEnVoices": {
