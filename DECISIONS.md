@@ -3034,6 +3034,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.24 (8.11.2026): Próby Gildii dwa razy dłuższe
+
+Autor: „Za szybko się robi próby Gildii, trzeba zwiększyć progi gdzieś ze dwa razy.”
+
+1. **Liczby w próbach razy dwa.** Każda próba wymaga mniej więcej dwa razy więcej niż wcześniej: stwory (killAny: walki z najnowszego miejsca 20–32 zamiast 10–16), minuty wypraw (240–480 zamiast 120–240), zioła (80–160), mikstury (20–32), wyroby Warsztatu (6–10), materiały przerobione (30–60) i przedmioty rozebrane (12–24) na Stole rozbiórki oraz ulepszenia na Kowadle (6–12).
+2. **Bez zmian:** walki w Wieżach (od 0.2.11 Wieże są dużo trudniejsze), zlecenia Osady i sztuki w Prośbach Gildii, bo te mają własne tempo, którego gracz nie przyspieszy.
+3. **Progi paska zostają.** Najwyższy próg już teraz znaczy, że każdy aktywny członek wykonał wszystko, co mógł zaliczyć, więc wyżej podnieść się go nie da. Trudniej robi się droga do każdego progu, bo każda próba trwa dwa razy dłużej.
+4. **Od kiedy.** Liczba próby zapisuje się, gdy próba otwiera się u członka, więc próby otwarte przed wdrożeniem zostają przy starych liczbach. Nowe liczby mają próby otwierane od teraz, a całą tablicę od poniedziałku 9.11.
+
 ## Wersja 0.2.23 (8.11.2026): przytrzymanie „+” i „−”, bez przybliżania przy szybkim stukaniu
 
 Uwaga gracza na czacie, przekazana przez autora: „Można dodać przyciskanie plusa w sprzedaży różnych surowców, punktów statystyk, bo da się tylko pojedynczy klik a na telefonie czasem jak się szybko klika to przybliża zamiast zwiększyć liczbę”.

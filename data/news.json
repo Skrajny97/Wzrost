@@ -405,6 +405,11 @@
       "id": "0.2.23",
       "title": "Wersja 0.2.23",
       "body": "- Przytrzymaj „+” albo „−” przy liczbach (sprzedaż, punkty statystyk i inne), a liczba będzie rosła sama, coraz szybciej.\n- Szybkie stukanie w przyciski nie przybliża już ekranu na telefonie."
+    },
+    {
+      "id": "0.2.24",
+      "title": "Wersja 0.2.24",
+      "body": "- Próby Gildii wymagają teraz mniej więcej dwa razy więcej: stworów, minut wypraw, ziół, mikstur, wyrobów, materiałów i ulepszeń. Walki w Wieżach, zlecenia Osady i Prośby bez zmian. Nowe liczby mają próby otwierane od teraz, cała tablica od poniedziałku."
     }
 ]
 }

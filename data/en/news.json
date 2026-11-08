@@ -320,6 +320,10 @@
     "0.2.23": {
       "title": "Version 0.2.23",
       "body": "- Hold “+” or “−” next to numbers (selling, stat points and more) and the number keeps changing by itself, faster and faster.\n- Tapping buttons quickly no longer zooms the screen on a phone."
+    },
+    "0.2.24": {
+      "title": "Version 0.2.24",
+      "body": "- Guild Trials now ask for about twice as much: creatures, expedition minutes, herbs, potions, crafted items, materials and upgrades. Tower fights, Settlement orders and Requests stay the same. Trials opened from now on use the new numbers, the whole board from Monday."
     }
   }
 }
