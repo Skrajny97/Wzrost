@@ -328,6 +328,10 @@
     "0.2.25": {
       "title": "Version 0.2.25",
       "body": "- The System Collector now collects resources as they come, about once a minute, not only from full stores. Whoever already has one gets this at no extra cost.\n- The Collector flies over the resources in the Camp, and their frames glow blue."
+    },
+    "0.2.27": {
+      "title": "Version 0.2.27",
+      "body": "- Over the character icons on the Character tab you now see how long each of them has left of what it is doing: an exploration, a profession's work or a mercenary service. When it ends, “Done” appears."
     }
   }
 }

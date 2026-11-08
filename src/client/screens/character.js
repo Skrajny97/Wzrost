@@ -9,11 +9,11 @@ import { characterLook, portraitLayers } from '../cosmetics.js';
 import { MATERIALS_HINT, materialIcon, materialSheet, materialTitle } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { askGuildButton } from '../guild-requests.js';
-import { countOf, formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, saleGold, timeFormat } from '../format.js';
+import { countOf, formatCountdown, formatDecimal, formatHours, formatMinutes, formatNumber, formatPrecise, plural, saleGold, timeFormat } from '../format.js';
 import { t } from '../i18n.js';
 import { SLOT_ICONS, itemIcon } from '../icons.js';
 import { playSound } from '../sound.js';
-import { buildLocked, buildLockedText, call, costShortfall, isUnlocked, state, unlockInfo, walletEntries } from '../state.js';
+import { buildLocked, buildLockedText, call, costShortfall, isUnlocked, serverNow, state, unlockInfo, walletEntries } from '../state.js';
 import { scrapperSheet } from '../scrapper.js';
 import { itemTip, setTipRenderer } from '../item-tip.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemLink, systemPanel, toast, withButton } from '../ui.js';
@@ -149,7 +149,29 @@ const STACKS = {
 // at once (players on the chat, via the author, 7.11.2026: "miniaturki
 // postaci w formie ikon", instead of three taps through the Ustawienia).
 // Only with two characters or more.
+// Over each bust the time left of what the character does now (the author,
+// 8.11.2026: "nad ikonki zmiany postaci wrzucić jeszcze timer odmierzający
+// czas ich głównej aktywności aktualnie wykonywanej"): its exploration, its
+// profession's work or its mercenary service, counted down every second;
+// "Gotowe" once it ended, nothing while it does nothing. The one played
+// follows its own activity as it changes; the others, the list asked when
+// the tab opened.
+let switchTicks = [];
+function switchTimer(one) {
+  const time = h('span', { class: 'char-switch-time', 'aria-hidden': 'true' });
+  const update = (now) => {
+    const activity = one.played ? state.character.activity : one.activity;
+    const left = activity?.endsAt ? activity.endsAt - now : null;
+    time.textContent = left === null ? '' : left > 0 ? formatCountdown(left) : t('Gotowe');
+    time.classList.toggle('char-switch-time--done', left !== null && left <= 0);
+  };
+  update(serverNow());
+  switchTicks.push(update);
+  return time;
+}
+
 function characterSwitch(list, switchCharacter) {
+  switchTicks = [];
   if (!list || list.characters.length < 2 || !switchCharacter) return null;
   return h(
     'nav',
@@ -164,6 +186,7 @@ function characterSwitch(list, switchCharacter) {
           'aria-label': one.played ? t('{name} (grasz teraz)', { name: one.name }) : t('Graj postacią {name}', { name: one.name }),
           onClick: one.played ? null : (event) => withButton(event.currentTarget, () => switchCharacter(one.id)),
         },
+        switchTimer(one),
         h('span', { class: 'char-switch-bust' }, bust(one)),
         one.activity?.finished && !one.played && h('span', { class: 'char-switch-dot', 'aria-hidden': 'true' }),
         h('span', { class: 'char-switch-name', text: one.name }),
@@ -766,7 +789,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
   }
 
   render();
-  return { update: render };
+  return { update: render, tick: (now) => switchTicks.forEach((update) => update(now)) };
 }
 
 // An item from the bag or the equipment: its properties, what wearing it

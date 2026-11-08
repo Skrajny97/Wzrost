@@ -9765,6 +9765,24 @@ a.profession-square:active {
   cursor: default;
 }
 
+/* Over the bust, the time left of what the character does now, "Gotowe"
+   in gold once it ended; an empty line keeps the busts in one row. */
+.char-switch-time {
+  min-height: 14px;
+  max-width: 64px;
+  overflow: hidden;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  line-height: 14px;
+  white-space: nowrap;
+}
+
+.char-switch-time--done {
+  color: var(--gold);
+}
+
 .char-switch-bust {
   display: flex;
   align-items: center;
@@ -9803,7 +9821,7 @@ a.profession-square:active {
 
 .char-switch-dot {
   position: absolute;
-  top: 0;
+  top: 18px;
   right: 4px;
   width: 11px;
   height: 11px;

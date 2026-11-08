@@ -3034,6 +3034,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.27 (8.11.2026): czas aktywności nad ikonkami postaci
+
+Autor: „A jesteś w stanie nad ikonki zmiany postaci wrzucić jeszcze timer odmierzający czas ich głównej aktywności aktualnie wykonywanej?”
+
+1. **Licznik nad każdą ikonką** w rzędzie postaci konta nad zakładką Postać (widać go przy dwóch postaciach i więcej): ile zostało do końca tego, co postać robi, czyli wyprawy, pracy profesji albo usługi najemnej, co sekundę, jak liczniki w innych miejscach gry (h:mm:ss, poniżej godziny mm:ss).
+2. **Po końcu** zamiast liczby złote „Gotowe”, a złota kropka przy ikonce zostaje jak dotąd. **Bez aktywności** nad ikonką nic nie ma, a pusty wiersz trzyma ikonki w jednej linii.
+3. **Skąd czas:** grana postać bierze go ze swojej aktywności na bieżąco, więc po wysłaniu na wyprawę licznik od razu się zmienia. Pozostałe biorą go z listy postaci pobranej przy wejściu na zakładkę (`GET /api/characters`, `activity.endsAt`) i odliczają na stronie. Serwer się nie zmienia.
+4. Licznik jest w kolorze Systemu, cyframi o stałej szerokości, 11 px, i mieści się w szerokości ikonki także przy wyprawach dłuższych niż 10 godzin.
+
 ## Wersja 0.2.26 (8.11.2026): bez kwestii narratora o Zbieraczu Systemu
 
 Autor, po pytaniu 754 o nowy tekst kwestii: „Wywal w ogóle info z gry o Zbieraczu, miało być że każdy sam sobie kliknie jeśli się zaciekawi ludkiem.” (por. pierwsze słowa autora o Zbieraczu: „duchem stojącym przy Skrzyni Konta bez opisu”).

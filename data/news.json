@@ -415,6 +415,11 @@
       "id": "0.2.25",
       "title": "Wersja 0.2.25",
       "body": "- Zbieracz Systemu zbiera teraz zasoby na bieżąco, mniej więcej co minutę, a nie dopiero z pełnych magazynów. Kto go już ma, dostaje to bez dopłaty.\n- Zbieracz lata nad zasobami w Obozie, a ich ramki świecą na niebiesko."
+    },
+    {
+      "id": "0.2.27",
+      "title": "Wersja 0.2.27",
+      "body": "- Nad ikonkami postaci w zakładce Postać widać teraz, ile zostało do końca tego, co każda z nich robi: wyprawy, pracy profesji albo usługi najemnej. Po końcu pojawia się „Gotowe”."
     }
 ]
 }
