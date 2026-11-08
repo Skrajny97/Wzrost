@@ -1778,9 +1778,12 @@ export async function listCharacters(context) {
   const session = await requirePlayable(context);
   const db = context.env.DB;
   const own = `SELECT id FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS}`;
-  const [rows, works, parked, perClass] = await db.batch([
+  const [rows, works, avatarWorks, parked, perClass] = await db.batch([
     db.prepare(`SELECT * FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS} ORDER BY id`).bind(session.userId),
     db.prepare(`SELECT * FROM activities WHERE character_id IN (${own})`).bind(session.userId),
+    // The Awatar Systemu's profession work, for the time over each bust on
+    // the Postać tab (screens/character.js, 0.2.27).
+    db.prepare(`SELECT character_id, kind, ends_at FROM avatar_activities WHERE character_id IN (${own})`).bind(session.userId),
     db.prepare("SELECT name FROM characters WHERE user_id = ? AND role = 'parked'").bind(session.userId),
     // All the game's characters of each class, played or set aside, for the
     // creation screen (the author: "po to by gracz wiedział jakiej klasy może
@@ -1788,6 +1791,7 @@ export async function listCharacters(context) {
     db.prepare(`SELECT class_id, COUNT(*) AS count FROM characters WHERE ${OWN_CHARACTERS} GROUP BY class_id`),
   ]);
   const activities = new Map(works.results.map((row) => [row.character_id, row]));
+  const avatars = new Map(avatarWorks.results.map((row) => [row.character_id, { kind: row.kind, endsAt: row.ends_at }]));
   const counts = new Map(perClass.results.map((row) => [row.class_id, row.count]));
   return json({
     characters: rows.results.map((row) => ({
@@ -1802,6 +1806,7 @@ export async function listCharacters(context) {
       classLevel: row.class_level,
       played: row.role === 'player',
       activity: activityView(activities.get(row.id) ?? null, row.level, context.now),
+      avatarActivity: avatars.get(row.id) ?? null,
     })),
     max: content().balance.account.characters,
     parked: parked.results[0]?.name ?? null,

@@ -332,6 +332,10 @@
     "0.2.27": {
       "title": "Version 0.2.27",
       "body": "- Over the character icons on the Character tab you now see how long each of them has left of what it is doing: an exploration, a profession's work or a mercenary service. When it ends, “Done” appears."
+    },
+    "0.2.28": {
+      "title": "Version 0.2.28",
+      "body": "- The timer over the character icons also counts the profession the System Avatar is working on. When two things run at once, you see the one that ends first."
     }
   }
 }

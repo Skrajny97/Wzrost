@@ -420,6 +420,11 @@
       "id": "0.2.27",
       "title": "Wersja 0.2.27",
       "body": "- Nad ikonkami postaci w zakładce Postać widać teraz, ile zostało do końca tego, co każda z nich robi: wyprawy, pracy profesji albo usługi najemnej. Po końcu pojawia się „Gotowe”."
+    },
+    {
+      "id": "0.2.28",
+      "title": "Wersja 0.2.28",
+      "body": "- Licznik nad ikonkami postaci liczy też profesję, którą wykonuje Awatar Systemu. Gdy dzieją się dwie rzeczy naraz, widać tę, która skończy się pierwsza."
     }
 ]
 }

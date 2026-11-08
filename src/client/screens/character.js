@@ -151,17 +151,20 @@ const STACKS = {
 // Only with two characters or more.
 // Over each bust the time left of what the character does now (the author,
 // 8.11.2026: "nad ikonki zmiany postaci wrzucić jeszcze timer odmierzający
-// czas ich głównej aktywności aktualnie wykonywanej"): its exploration, its
-// profession's work or its mercenary service, counted down every second;
-// "Gotowe" once it ended, nothing while it does nothing. The one played
-// follows its own activity as it changes; the others, the list asked when
-// the tab opened.
+// czas ich głównej aktywności aktualnie wykonywanej", "niech to obejmuje i
+// wyprawy i profesje", "Obóz niech pomija"): its exploration, its
+// profession's work or its mercenary service, and the work of its Awatar
+// Systemu, counted down every second; with two at once the one that ends
+// first, and "Gotowe" as soon as either has ended; nothing while neither
+// runs. The camp's builds are not counted. The one played follows its own
+// works as they change; the others, the list asked when the tab opened.
 let switchTicks = [];
 function switchTimer(one) {
   const time = h('span', { class: 'char-switch-time', 'aria-hidden': 'true' });
   const update = (now) => {
-    const activity = one.played ? state.character.activity : one.activity;
-    const left = activity?.endsAt ? activity.endsAt - now : null;
+    const works = one.played ? [state.character.activity, state.character.professions?.avatar?.activity] : [one.activity, one.avatarActivity];
+    const ends = works.filter((work) => work?.endsAt).map((work) => work.endsAt);
+    const left = ends.length > 0 ? Math.min(...ends) - now : null;
     time.textContent = left === null ? '' : left > 0 ? formatCountdown(left) : t('Gotowe');
     time.classList.toggle('char-switch-time--done', left !== null && left <= 0);
   };

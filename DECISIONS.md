@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.28 (8.11.2026): licznik nad ikonkami postaci liczy też pracę Awatara
+
+Autor (wiadomości, które doszły po wysłaniu 0.2.27): „tylko niech to obejmuje i wyprawy i profesje nie?”, „Obóz niech pomija”.
+
+1. **Profesje Awatara Systemu.** Wyprawy, usługi najemne i profesje wykonywane przez samą postać licznik liczył już w 0.2.27. Teraz liczy też profesję, którą robi Awatar Systemu, bo ta ma osobną kolejkę (`avatar_activities`). Lista postaci podaje ją jako `avatarActivity` (`kind`, `endsAt`).
+2. **Dwie naraz:** licznik pokazuje tę, która skończy się pierwsza, a „Gotowe”, gdy którakolwiek już się skończyła.
+3. **Obóz pomijany:** budowy w Obozie nie wchodzą do licznika.
+
 ## Wersja 0.2.27 (8.11.2026): czas aktywności nad ikonkami postaci
 
 Autor: „A jesteś w stanie nad ikonki zmiany postaci wrzucić jeszcze timer odmierzający czas ich głównej aktywności aktualnie wykonywanej?”
