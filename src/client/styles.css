@@ -9735,6 +9735,58 @@ a.profession-square:active {
   height: 100%;
 }
 
+/* "Rozdaj ręcznie" on the Statystyki screen (screens/stats.js): a slider
+   for each stat between "−" and "+" (.duration-row), its name over it and its value with
+   what is added; and the slider for many Punkty Umiejętności on a skill's
+   card (screens/skills.js). */
+.manual-left {
+  margin: 0 0 8px;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.manual-list {
+  display: grid;
+  gap: 6px;
+}
+
+.manual-stat {
+  display: grid;
+  gap: 0;
+}
+
+.manual-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.manual-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.manual-value {
+  flex: none;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.manual-value--added {
+  color: var(--system);
+}
+
+.skill-many {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+}
+
 /* The account's characters over the Postać tab (screens/character.js): round
    busts in a row, the one played ringed, a tap on another plays it. */
 .char-switch {

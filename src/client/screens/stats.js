@@ -6,7 +6,7 @@ import { fill, h, icon } from '../dom.js';
 import { formatDecimal, formatHours, formatNumber, formatPrecise, plural } from '../format.js';
 import { t } from '../i18n.js';
 import { buildLocked, buildLockedText, call, isUnlocked, state, unlockInfo } from '../state.js';
-import { confirmAction, openSheet, systemPanel, withButton } from '../ui.js';
+import { closeSheet, confirmAction, openSheet, systemPanel, withButton } from '../ui.js';
 
 // Segments of the source bar; profession and Core segments appear once unlocked.
 // The labels here and below are shown in the page's language (t(), i18n.js).
@@ -224,6 +224,15 @@ export function mountStats(container) {
           await call('POST', '/api/character/points/auto');
         }),
     });
+    // "Rozdaj ręcznie" (the author, 8.11.2026: "dodaj suwak do rozdawania
+    // punktów klas, jeśli ktoś chce ręcznie"): the sliders' window.
+    const manual = h('button', {
+      type: 'button',
+      class: 'button button--world button--small',
+      disabled: busy || character.freePoints === 0,
+      text: t('Rozdaj ręcznie'),
+      onClick: () => manualSheet(character),
+    });
     const reset = character.canResetPoints
       ? h('button', {
           type: 'button',
@@ -247,7 +256,72 @@ export function mountStats(container) {
         })
       : null;
     if (character.freePoints === 0 && !reset && pendingTotal === 0) return null;
-    return h('div', { class: 'stat-actions' }, auto, reset);
+    return h('div', { class: 'stat-actions' }, auto, manual, reset);
+  }
+
+  // The free points by sliders: one for each stat, from the points chosen
+  // with "+" so far. The sliders share the free points, so each goes up to
+  // its own and what is left; "−" and "+" beside it move it by one, held
+  // down on and on (hold.js). "Rozdaj" sends them as "Zatwierdź" does.
+  function manualSheet(character) {
+    const chosen = { ...pending };
+    const total = () => Object.values(chosen).reduce((sum, value) => sum + value, 0);
+    const left = () => character.freePoints - total();
+    const leftText = h('p', { class: 'manual-left' });
+    const send = h('button', { type: 'button', class: 'button button--system' });
+    const rows = character.stats.map((stat) => {
+      const value = h('output', { class: 'manual-value' });
+      const set = (next) => {
+        const own = chosen[stat.id] ?? 0;
+        chosen[stat.id] = Math.max(0, Math.min(own + left(), next));
+        refresh();
+      };
+      const slider = h('input', { type: 'range', class: 'duration-slider manual-slider', min: 0, step: 1, 'aria-label': stat.name, onInput: () => set(Number(slider.value)) });
+      const step = (sign, label) =>
+        h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': label, text: sign < 0 ? '−' : '+', onClick: () => set((chosen[stat.id] ?? 0) + sign) });
+      const less = step(-1, t('O punkt mniej: {name}', { name: stat.name }));
+      const more = step(1, t('O punkt więcej: {name}', { name: stat.name }));
+      const element = h(
+        'div',
+        { class: 'manual-stat' },
+        h('div', { class: 'manual-head' }, h('span', { class: 'manual-name', text: stat.name }), value),
+        h('div', { class: 'duration-row' }, less, slider, more),
+      );
+      return { stat, value, slider, less, more, element };
+    });
+    function refresh() {
+      for (const { stat, value, slider, less, more } of rows) {
+        const own = chosen[stat.id] ?? 0;
+        const most = own + left();
+        slider.max = String(most);
+        slider.value = String(own);
+        slider.disabled = most === 0;
+        slider.style.setProperty('--fill', `${most > 0 ? (own / most) * 100 : 0}%`);
+        value.textContent = own > 0 ? `${formatNumber(stat.total + own)} (+${formatNumber(own)})` : formatNumber(stat.total);
+        value.classList.toggle('manual-value--added', own > 0);
+        less.disabled = own <= 0;
+        more.disabled = left() <= 0;
+      }
+      leftText.textContent = t('Wolne punkty: {count}', { count: formatNumber(left()) });
+      send.textContent = t('Rozdaj {count} {points}', { count: formatNumber(total()), points: plural(total(), 'punkt', 'punkty', 'punktów') });
+      send.disabled = total() === 0;
+    }
+    send.addEventListener('click', (event) =>
+      withButton(event.currentTarget, async () => {
+        const points = Object.fromEntries(Object.entries(chosen).filter(([, value]) => value > 0));
+        await call('POST', '/api/character/points', { points });
+        pending = {};
+        closeSheet();
+        render();
+      }),
+    );
+    refresh();
+    openSheet(
+      h('h2', { class: 'sheet-title', text: t('Rozdaj ręcznie') }),
+      leftText,
+      h('div', { class: 'manual-list' }, rows.map((row) => row.element)),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: closeSheet, text: t('Anuluj') }), send),
+    );
   }
 
   function statRow(stat, sources, widest, canAdd) {

@@ -404,7 +404,6 @@
   "Ścieżkę poboczną dobierzesz od poziomu klasy {level}.": "You can add a side path from class level {level}.",
   "Nowa umiejętność: {skill}. Ścieżka: {path}.": "New skill: {skill}. Path: {path}.",
   "Dodaj punkt": "Add a point",
-  "Dodaj {count} Punktów": "Add {count} Points",
   "Teraz": "Now",
   "Na poziomie {level}": "At level {level}",
   "Punkty Umiejętności: {count}. Każdy poziom klasy do {level}. daje jeden.": "Skill Points: {count}. Every class level up to {level} gives one.",
@@ -569,7 +568,6 @@
   "Od 10. poziomu postaci, przy wejściu na miejsce wyprawy.": "From character level 10, on entering a place to explore.",
   "Skrzynia Konta": "Account Chest",
   "Przy wejściu do Skrzyni Konta w obozie.": "On opening the Account Chest in the camp.",
-  "Zbieracz Systemu": "System Collector",
   "Omdlenie": "Fainting",
   "Przy pierwszym raporcie z wyprawy zakończonej omdleniem.": "At the first report of an exploration that ended in fainting.",
   "Zdarzenie przyjdzie po następnej wyprawie, przy „Odbierz raport”.": "The event will come after the next exploration, at “Claim report”.",
@@ -2575,5 +2573,15 @@
   "{name} (grasz teraz)": "{name} (playing now)",
   "Graj postacią {name}": "Play {name}",
   "Gracze online": "Players online",
-  "graczy online": "players online"
+  "graczy online": "players online",
+  "Rozdaj ręcznie": "Spend by hand",
+  "O punkt mniej: {name}": "One point less: {name}",
+  "O punkt więcej: {name}": "One point more: {name}",
+  "Wolne punkty: {count}": "Free points: {count}",
+  "Rozdaj {count} {points}": "Spend {count} {points}",
+  "Ile Punktów Umiejętności dodać": "How many Skill Points to add",
+  "O punkt mniej": "One point less",
+  "O punkt więcej": "One point more",
+  "Dodaj {count} {points}": "Add {count} {points}",
+  "Punkt|Punkty|Punktów": "Point|Points"
 }

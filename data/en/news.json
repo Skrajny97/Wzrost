@@ -340,6 +340,10 @@
     "0.2.29": {
       "title": "Version 0.2.29",
       "body": "- Gift code 100 for a hundred characters in the game: 10 System Points, 100 Time Points and 1000 gold. Enter it in the Settings, under “Gift code”. It works until 5 December inclusive."
+    },
+    "0.2.30": {
+      "title": "Version 0.2.30",
+      "body": "- Stats: “Spend by hand” next to “Spend by class” opens a slider for each stat. Set how many points go where and tap “Spend”.\n- Skills: on a skill's card a slider adds as many Skill Points at once as you like."
     }
   }
 }

@@ -430,6 +430,11 @@
       "id": "0.2.29",
       "title": "Wersja 0.2.29",
       "body": "- Kod podarunkowy 100 na sto postaci w grze: 10 Punktów Systemu, 100 Punktów Czasu i 1000 złota. Wpisz go w Ustawieniach, w „Kod podarunkowy”. Działa do 5 grudnia włącznie."
+    },
+    {
+      "id": "0.2.30",
+      "title": "Wersja 0.2.30",
+      "body": "- Statystyki: „Rozdaj ręcznie” obok „Rozdaj według klasy” otwiera suwaki dla każdej statystyki. Ustaw, ile punktów gdzie, i stuknij „Rozdaj”.\n- Umiejętności: w karcie umiejętności suwak dodaje tyle Punktów Umiejętności naraz, ile chcesz."
     }
 ]
 }

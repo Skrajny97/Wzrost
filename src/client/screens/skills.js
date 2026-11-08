@@ -14,7 +14,7 @@
 // (narrator.js) points at the places marked data-guide.
 
 import { fill, h } from '../dom.js';
-import { countOf, formatNumber } from '../format.js';
+import { countOf, formatNumber, plural } from '../format.js';
 import { t } from '../i18n.js';
 import { skillSprite } from '../art.js';
 import { motionOn } from '../motion.js';
@@ -259,9 +259,13 @@ export function mountSkills(container) {
   }
 
   // The card of a learned skill: what it does now and at the next level,
-  // "Dodaj punkt" while there are points and levels left, and "Dodaj 10
-  // Punktów" while there are ten of each (after an evolution a character has
-  // dozens of points to spend).
+  // "Dodaj punkt" while there are points and levels left, and, while there
+  // are two of each or more, a slider for many at once (after an evolution
+  // a character has dozens of points to spend): from 2 to as many as there
+  // are points and levels left, at ten where it can, with "−" and "+" by one
+  // (held down on and on, hold.js) and "Dodaj N Punktów" (the author,
+  // 8.11.2026: "dodaj suwak do rozdawania punktów klas, jeśli ktoś chce
+  // ręcznie"; before, a button for ten, 514).
   function openCard(skillId, busy) {
     const view = state.character.skills;
     const skill = view.pools.flatMap((pool) => pool.options).find((option) => option.id === skillId);
@@ -279,7 +283,8 @@ export function mountSkills(container) {
           }),
       });
     const raise = raiseButton(1, t('Dodaj punkt'));
-    const raiseTen = view.points >= RAISE_MANY && skill.maxLevel - skill.level >= RAISE_MANY && raiseButton(RAISE_MANY, t('Dodaj {count} Punktów', { count: RAISE_MANY }));
+    const most = Math.min(view.points, skill.maxLevel - skill.level);
+    const raiseMany = most >= 2 && manySlider(most, raiseButton);
     openSheet(
       h('div', { class: 'skill-head' }, skillIcon(skill), h('div', {}, h('h2', { class: 'sheet-title', text: skill.name }), h('p', { class: 'skill-style', text: `${skill.style} · ${levelText(skill)}` }))),
       h('p', { class: 'skill-description', text: skill.description }),
@@ -293,9 +298,37 @@ export function mountSkills(container) {
         class: 'muted',
         text: state.character.evolution?.current ? t('Umiejętność ewolucji: {path}.', { path: skill.path }) : t('Ścieżka: {path}. Zdecyduje o ewolucji klasy.', { path: skill.path }),
       }),
-      raiseTen && h('div', { class: 'sheet-actions' }, raiseTen),
+      raiseMany,
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: closeSheet, text: t('Zamknij') }), raise),
     );
+  }
+
+  // The slider for many points at once on a skill's card (openCard).
+  function manySlider(most, raiseButton) {
+    let count = Math.min(RAISE_MANY, most);
+    const holder = h('div', { class: 'sheet-actions' });
+    const slider = h('input', {
+      type: 'range',
+      class: 'duration-slider manual-slider',
+      min: 2,
+      max: most,
+      step: 1,
+      'aria-label': t('Ile Punktów Umiejętności dodać'),
+      onInput: () => set(Number(slider.value)),
+    });
+    const step = (sign, label) => h('button', { type: 'button', class: 'button button--world duration-step', 'aria-label': label, text: sign < 0 ? '−' : '+', onClick: () => set(count + sign) });
+    const less = step(-1, t('O punkt mniej'));
+    const more = step(1, t('O punkt więcej'));
+    function set(next) {
+      count = Math.max(2, Math.min(most, next));
+      slider.value = String(count);
+      slider.style.setProperty('--fill', `${((count - 2) / Math.max(1, most - 2)) * 100}%`);
+      less.disabled = count <= 2;
+      more.disabled = count >= most;
+      holder.replaceChildren(raiseButton(count, t('Dodaj {count} {points}', { count: formatNumber(count), points: plural(count, 'Punkt', 'Punkty', 'Punktów') })));
+    }
+    set(count);
+    return h('div', { class: 'skill-many' }, h('div', { class: 'duration-row' }, less, slider, more), holder);
   }
 
   render();

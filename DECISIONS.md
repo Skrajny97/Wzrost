@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.30 (8.11.2026): suwaki do ręcznego rozdawania punktów
+
+Autor: „dodaj suwak do rozdawania punktów klas, jeśli ktoś chce ręcznie”.
+
+1. **Statystyki: „Rozdaj ręcznie”** obok „Rozdaj według klasy”. Otwiera okno z suwakiem dla każdej z ośmiu statystyk, z „−” i „+” po bokach (przytrzymane liczą dalej, jak od 0.2.23). Nad suwakiem nazwa statystyki i jej wartość z tym, co dochodzi, np. „351 (+285)”. Suwaki dzielą wolne punkty: każdy sięga do swoich punktów i tego, co zostało. U góry „Wolne punkty: N”. „Rozdaj N punktów” zapisuje je jak „Zatwierdź” (ten sam `POST /api/character/points`), a „Anuluj” zamyka okno bez zmian. Okno zaczyna od punktów wybranych już „+”, a pojedyncze „+” przy statystykach zostają.
+2. **Umiejętności: suwak w karcie umiejętności.** Gdy jest co najmniej 2 Punkty Umiejętności i 2 poziomy do zdobycia, karta ma suwak od 2 do tylu, ile się da, ustawiony na 10, gdy się da, z „−” i „+”, i przycisk „Dodaj N Punktów”. Zastępuje przycisk „Dodaj 10 Punktów” (514). „Dodaj punkt” zostaje. Powód: autor napisał o „punktach klas”, a punkty rozdaje się w dwóch miejscach (statystyki i umiejętności, te drugie dochodzą z poziomami klasy), więc suwak jest w obu.
+3. Serwer się nie zmienia. Teksty są po polsku i po angielsku.
+
 ## Wersja 0.2.29 (8.11.2026): kod podarunkowy „100”
 
 Autor: „Wprowadź kod podarunkowy z okazji 100 założonych postaci, ważny 4 tygodnie. Kod: 100. 10 Punktów Systemu, 100 Punktów Czasu, 1000 złota”.
