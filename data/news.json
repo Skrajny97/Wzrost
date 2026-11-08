@@ -435,6 +435,11 @@
       "id": "0.2.30",
       "title": "Wersja 0.2.30",
       "body": "- Statystyki: „Rozdaj ręcznie” obok „Rozdaj według klasy” otwiera suwaki dla każdej statystyki. Ustaw, ile punktów gdzie, i stuknij „Rozdaj”.\n- Umiejętności: w karcie umiejętności suwak dodaje tyle Punktów Umiejętności naraz, ile chcesz."
+    },
+    {
+      "id": "0.2.31",
+      "title": "Wersja 0.2.31",
+      "body": "- W Walce pod zagrożeniem: „Zagrożenie to szansa porażki podczas wyprawy.”"
     }
 ]
 }

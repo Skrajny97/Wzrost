@@ -1049,7 +1049,7 @@ export function mountCombat(container, { params, navigate }) {
         first ? start : h('div', { class: 'start-bar' }, start),
         quick,
       ),
-      h('p', { class: 'muted threat-note', text: t('Zagrożenie to szansa omdlenia na wyprawie.') }),
+      h('p', { class: 'muted threat-note', text: t('Zagrożenie to szansa porażki podczas wyprawy.') }),
     );
   }
 

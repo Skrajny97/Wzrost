@@ -2121,7 +2121,7 @@
   "{name} idzie z Tobą. Zapłacono {gold} zł.": "{name} goes with you. Paid {gold} gold.",
   "Przeciwnicy mają tu poziom {min}–{max}, wyżej niż Twoja postać.": "The foes here are level {min}–{max}, above your character.",
   "To miejsce jest już dla Ciebie za łatwe: dostaniesz mało doświadczenia.": "This place is too easy for you now: you will get little experience.",
-  "Zagrożenie to szansa omdlenia na wyprawie.": "The threat is the chance of fainting on the exploration.",
+  "Zagrożenie to szansa porażki podczas wyprawy.": "The threat is the chance of defeat during the exploration.",
   "zajęte": "busy",
   "Z drużyny nikt teraz nie pójdzie: {names}. Wyprawa będzie tylko Twoja.": "Nobody from the party can go now: {names}. The exploration will be yours alone.",
   "Z drużyną: {names}": "With the party: {names}",

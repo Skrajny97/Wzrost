@@ -3034,6 +3034,12 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.31 (8.11.2026): zdanie o zagrożeniu
+
+Autor, ze zrzutem zdania pod zagrożeniem miejsca wyprawy: „Zmień zdanie na "Zagrożenie to szansa porażki podczas wyprawy"”.
+
+1. Pod zagrożeniem w Walce stoi teraz „Zagrożenie to szansa porażki podczas wyprawy.” zamiast „Zagrożenie to szansa omdlenia na wyprawie.”, z kropką na końcu jak inne zdania gry. Po angielsku: „The threat is the chance of defeat during the exploration.”
+
 ## Wersja 0.2.30 (8.11.2026): suwaki do ręcznego rozdawania punktów
 
 Autor: „dodaj suwak do rozdawania punktów klas, jeśli ktoś chce ręcznie”.

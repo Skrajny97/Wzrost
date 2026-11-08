@@ -344,6 +344,10 @@
     "0.2.30": {
       "title": "Version 0.2.30",
       "body": "- Stats: “Spend by hand” next to “Spend by class” opens a slider for each stat. Set how many points go where and tap “Spend”.\n- Skills: on a skill's card a slider adds as many Skill Points at once as you like."
+    },
+    "0.2.31": {
+      "title": "Version 0.2.31",
+      "body": "- In Combat under the threat: “The threat is the chance of defeat during the exploration.”"
     }
   }
 }
