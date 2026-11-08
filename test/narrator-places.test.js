@@ -294,7 +294,7 @@ test("a faint's report is told once, at its summary, a moment after it opens; a 
   reportCache.set('7', { id: 7, result: 'success', summary: {} });
   // A faint before 651 C kept its finds: the line would not be true of it.
   reportCache.set('8', { id: 8, result: 'fainted', summary: {} });
-  reportCache.set('9', { id: 9, result: 'fainted', summary: { forfeit: 'Po omdleniu nic z tej wyprawy nie zostaje.' } });
+  reportCache.set('9', { id: 9, result: 'fainted', summary: { forfeit: 'Po porażce nic z tej wyprawy nie zostaje.' } });
   state.character = character({ level: 12 });
   for (const id of ['7', '8']) {
     narrator.narrate(`#/raport/${id}`);
@@ -316,7 +316,7 @@ test("a faint's report not fetched yet waits for it", async () => {
   narrator.narrate('#/raport/9');
   assert.equal(lights().length, 0);
   // The report's screen tells the narrator once it comes (screens/report.js).
-  reportCache.set('9', { id: 9, result: 'fainted', summary: { forfeit: 'Po omdleniu nic z tej wyprawy nie zostaje.' } });
+  reportCache.set('9', { id: 9, result: 'fainted', summary: { forfeit: 'Po porażce nic z tej wyprawy nie zostaje.' } });
   narrator.narrate('#/raport/9');
   await seen();
   assert.equal(lights().length, 1);
@@ -352,7 +352,7 @@ test('with the switch on, each line of a place goes without a word', async () =>
   for (const [hash, more, chapter] of cases) {
     clean();
     sent.length = 0;
-    reportCache.set('9', { id: 9, result: 'fainted', summary: { forfeit: 'Po omdleniu nic z tej wyprawy nie zostaje.' } });
+    reportCache.set('9', { id: 9, result: 'fainted', summary: { forfeit: 'Po porażce nic z tej wyprawy nie zostaje.' } });
     state.character = character(more);
     narrator.narrate(hash);
     assert.equal(lights().length, 0, chapter);

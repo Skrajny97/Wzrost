@@ -123,7 +123,7 @@ describe('the Warownia', () => {
     assert.equal(effectText(building('system-altar'), 10, content), 'Błogosławieństwo raz dziennie na 40 walk: +10% XP, złota albo szans na rzadsze przedmioty');
     assert.equal(effectText(building('greenhouse'), 1, content), 'Hoduje wybrane zioło: tyle, ile 0,5 h zbierania w Systemowym Zagajniku na dobę');
     assert.equal(effectText(building('greenhouse'), 10, content), 'Hoduje wybrane zioło: tyle, ile 5 h zbierania w Systemowym Zagajniku na dobę');
-    assert.equal(effectText(building('shrine'), 10, content), 'Po omdleniu postać traci o 50% mniej doświadczenia');
+    assert.equal(effectText(building('shrine'), 10, content), 'Po porażce postać traci o 50% mniej doświadczenia');
   });
 
   test("the effects at the camp's levels, nothing before a building stands", () => {
