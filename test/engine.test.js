@@ -40,6 +40,7 @@ import {
   missingFor,
   collect,
   collectWithFills,
+  collectorTakes,
   production,
   wholeFills,
   regenPerMinute,
@@ -1728,6 +1729,31 @@ describe('production', () => {
     assert.equal(wholeFills(sawmill, store, 40 * hour, 50 * hour), null);
     // A build that begins takes the fills and the rest along.
     assert.deepEqual(collectWithFills(sawmill, store, 53 * hour, 50 * hour), { resource: 'wood', amount: 108 + 54, collectedAt: 53 * hour });
+  });
+
+  test('the Zbieracz Systemu collects as it goes (753 A): all made by now, at most once a minute, a whole fill at once', () => {
+    const minute = 60000;
+    // Level 3: 18 an hour, a unit every 200 seconds, full in 6 hours.
+    const store = { level: 3, startedAt: 0, endsAt: hour, collectedAt: hour };
+    // Two and a half hours: 45 units, the store empty after, the unit on its way kept.
+    const taken = collectorTakes(sawmill, store, 3.5 * hour + 100000, null, minute);
+    assert.deepEqual(taken, { resource: 'wood', amount: 45, collectedAt: 3.5 * hour });
+    assert.equal(production(sawmill, { ...store, collectedAt: taken.collectedAt }, 3.5 * hour + 100000).amount, 0);
+    // Whole fills and the rest at once, as collectWithFills.
+    assert.deepEqual(collectorTakes(sawmill, store, 16 * hour + 20 * minute, null, minute), collectWithFills(sawmill, store, 16 * hour + 20 * minute, null));
+    // Nothing before a whole unit, nor before the minute since the store started filling.
+    assert.equal(collectorTakes(sawmill, store, hour + 199000, null, minute), null);
+    const gold = content.buildingsById['midas-lake'];
+    const lake = { level: 20, startedAt: 0, endsAt: 0, collectedAt: 0 };
+    assert.ok(production(gold, lake, 59000).amount >= 1);
+    assert.equal(collectorTakes(gold, lake, 59000, null, minute), null);
+    assert.equal(collectorTakes(gold, lake, minute, null, minute).resource, 'gold');
+    // A store that stood full before he came: one fill as he comes, then as it goes.
+    const stood = { level: 3, startedAt: 0, endsAt: 0, collectedAt: 0 };
+    assert.deepEqual(collectorTakes(sawmill, stood, 50 * hour, 50 * hour, minute), { resource: 'wood', amount: 108, collectedAt: 50 * hour });
+    assert.deepEqual(collectorTakes(sawmill, { ...stood, collectedAt: 50 * hour }, 51 * hour, 50 * hour, minute), { resource: 'wood', amount: 18, collectedAt: 51 * hour });
+    // Nothing while an upgrade keeps the building from producing.
+    assert.equal(collectorTakes(sawmill, { level: 4, startedAt: 10 * hour, endsAt: 20 * hour, collectedAt: 20 * hour }, 19 * hour, null, minute), null);
   });
 });
 

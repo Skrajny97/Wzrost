@@ -410,6 +410,11 @@
       "id": "0.2.24",
       "title": "Wersja 0.2.24",
       "body": "- Próby Gildii wymagają teraz mniej więcej dwa razy więcej: stworów, minut wypraw, ziół, mikstur, wyrobów, materiałów i ulepszeń. Walki w Wieżach, zlecenia Osady i Prośby bez zmian. Nowe liczby mają próby otwierane od teraz, cała tablica od poniedziałku."
+    },
+    {
+      "id": "0.2.25",
+      "title": "Wersja 0.2.25",
+      "body": "- Zbieracz Systemu zbiera teraz zasoby na bieżąco, mniej więcej co minutę, a nie dopiero z pełnych magazynów. Kto go już ma, dostaje to bez dopłaty.\n- Zbieracz lata nad zasobami w Obozie, a ich ramki świecą na niebiesko."
     }
 ]
 }

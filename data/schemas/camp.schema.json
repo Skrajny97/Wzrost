@@ -105,12 +105,13 @@
     "collector": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["art", "name", "price", "texts"],
-      "description": "Zbieracz Systemu: duch tuż obok Skrzyni Konta na planszy, bez podpisu (art, ikona 32 × 32 w src/client/art/camp), kupowany raz na zawsze za price złota. Potem znika z planszy, a gra sama zbiera całe zapełnienia magazynów budynków produkcyjnych.",
+      "required": ["art", "name", "price", "everySeconds", "texts"],
+      "description": "Zbieracz Systemu: duch tuż obok Skrzyni Konta na planszy, bez podpisu (art, ikona 32 × 32 w src/client/art/camp), kupowany raz na zawsze za price złota. Potem znika z planszy, a gra sama zbiera na bieżąco magazyny budynków produkcyjnych.",
       "properties": {
         "art": { "type": "string", "pattern": "^[a-z0-9-]+$" },
         "name": { "type": "string", "minLength": 1 },
         "price": { "type": "integer", "minimum": 1, "description": "Cena w złocie, płatna raz." },
+        "everySeconds": { "type": "integer", "minimum": 1, "description": "Co ile sekund najwyżej Zbieracz zbiera jeden magazyn (pełne zapełnienie zbiera od razu)." },
         "texts": {
           "type": "object",
           "additionalProperties": false,

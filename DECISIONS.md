@@ -3034,6 +3034,20 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.25 (8.11.2026): Zbieracz Systemu zbiera na bieżąco i lata nad zasobami
+
+Autor: „Czy da się ustawić zbieracza systemu tak by zbierał zasoby na bieżąco? Zrobić taki całkowity automat?”, a po pytaniu 753: „753 A”. Potem: „A jeśli ktoś kupi zbieracza to niech lata on nad zasobami w obozie a ramka zasobów świeci sie na niebiesko pulsującym światłem” i, ze zrzutem paska Drewno, Kamień, Ruda żelaza w Obozie: „o te ramke chodzi”.
+
+1. **Na bieżąco (753 A).** Zbieracz zabiera z magazynu wszystko, co urosło: całe zapełnienia i całe sztuki następnego, a część sztuki w drodze zostaje, jak przy „Zbierz” (`collectorTakes` w `src/engine/camp.js`). Dotyczy Tartaku, Kamieniołomu, Kopalni i Stawu Midasa, także na poziomach Warowni. Szklarnia zostaje jak dotąd (753 A: zioła szłyby do plecaka i zabierałyby miejsce na łupy).
+2. **Jak często.** Przy każdym wczytaniu postaci przez jej gracza, ale z jednego magazynu najwyżej mniej więcej raz na minutę (`collector.everySeconds` w `data/camp.json`, 60), żeby serwer nie zapisywał przy każdym żądaniu. Całe zapełnienie zbiera od razu. Otwarta gra pyta serwer o postać, gdy w którymś magazynie jest już cała sztuka, a minęła minuta od początku napełniania, więc zasoby przybywają same mniej więcej co minutę, a przy wolnych budynkach co sztukę (`filledForCollector` w `src/client/state.js`).
+3. **Bez „Zbierz”.** Z Zbieraczem ekran budynku produkcyjnego nie ma przycisku „Zbierz” ani zdania o czasie zapełnienia, tylko pasek magazynu i zdanie „Zbieracz Systemu zbiera zasoby z magazynu na bieżąco.” Na planszy nie ma dymków nad budynkami. Serwerowe „Zbierz” działa dalej, gdyby ktoś je wywołał.
+4. **Teksty.** Okienko zakupu: „Zbiera za Ciebie na bieżąco zasoby z magazynów Obozu, dzięki czemu nic nie przepada nawet przy długiej nieobecności.” Po angielsku w `data/en/camp.json`.
+5. **Kto już ma Zbieracza,** dostaje nowe działanie bez dopłaty. Cena zostaje: 10 000 złota.
+6. **Lata nad zasobami.** Po zakupie Zbieracz lata tam i z powrotem nad paskiem zasobów Obozu (Drewno, Kamień, Ruda żelaza), co 14 sekund tam i z powrotem, i przy tym unosi się jak na planszy. Leci zawsze ogonem do tyłu: obrazek patrzy w lewo, więc w prawo leci odbity. Ma 30 px szerokości i lata tuż nad górną krawędzią ramek. Nie zasłania stuknięć.
+7. **Niebieskie ramki.** Ramki trzech zasobów pulsują niebieskim światłem Systemu w rytmie unoszenia się Zbieracza (2,4 s). Na komputerze zasoby stoją w górnym pasku (505 A), więc tam niebiesko pulsują same ich liczby, bez latającego ducha, bo nie ma na niego miejsca.
+8. **Bez animacji** (przełącznik „Animacje” w Ustawieniach): Zbieracz stoi na prawym końcu paska, a ramki i liczby świecą bez pulsowania.
+9. **Kwestia narratora** o Zbieraczu mówi jeszcze „sam zbierze zasoby z pełnych magazynów”. Nowy tekst czeka na autora (754), a nagrania przyjdą po zatwierdzeniu.
+
 ## Wersja 0.2.24 (8.11.2026): Próby Gildii dwa razy dłuższe
 
 Autor: „Za szybko się robi próby Gildii, trzeba zwiększyć progi gdzieś ze dwa razy.”
@@ -3919,6 +3933,8 @@ Autor (5.11.2026, ze zrzutem raportu): „duzy błąd-> omdlenie a dostalem wszy
 Zbieracz Systemu przy Skrzyni Konta: zob. „Zbieracz Systemu”.
 
 ## Zbieracz Systemu (5.11.2026, w grze od 0.1.72)
+
+Od 0.2.25 Zbieracz zbiera na bieżąco, a nie tylko całe zapełnienia, i lata nad zasobami Obozu: zob. „Wersja 0.2.25 (8.11.2026): Zbieracz Systemu zbiera na bieżąco i lata nad zasobami”. Punkty 1, 5 i 6 poniżej opisują działanie sprzed tej wersji.
 
 Autor: „Stwórzmy też opcje automatycznego zbierania zasobów przy pełnym zapełnieniu magazynów w Obozie. Niech Zbieracz Systemu bedzie duchem stojącym przy Skrzyni Konta bez opisu (potrzebujemy tylko ikonki dla niego) po kliknięciu w niego wyświetlać się będzie opcja zakupu za sporą ilość złota (coś jak Awatar Systemu, może byc 10000) i wtedy on znika i automatycznie w grze toczy się zbieranie max zasobów gdy się wygenerują”. Ikona: „649 D”. O ruchu: „Niech ten zbieracz lekko porusza sie w górę i w dół zanimowany”.
 

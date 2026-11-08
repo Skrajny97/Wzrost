@@ -324,6 +324,10 @@
     "0.2.24": {
       "title": "Version 0.2.24",
       "body": "- Guild Trials now ask for about twice as much: creatures, expedition minutes, herbs, potions, crafted items, materials and upgrades. Tower fights, Settlement orders and Requests stay the same. Trials opened from now on use the new numbers, the whole board from Monday."
+    },
+    "0.2.25": {
+      "title": "Version 0.2.25",
+      "body": "- The System Collector now collects resources as they come, about once a minute, not only from full stores. Whoever already has one gets this at no extra cost.\n- The Collector flies over the resources in the Camp, and their frames glow blue."
     }
   }
 }

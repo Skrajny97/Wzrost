@@ -5,7 +5,7 @@
 // A stored building is { level, startedAt, endsAt, collectedAt }: the level it
 // has once the last upgrade has ended, and for a production building the time
 // its store started filling. The server passes the time. The Zbieracz
-// Systemu, once bought, collects every store as it fills (wholeFills).
+// Systemu, once bought, collects every store as it goes (collectorTakes).
 
 import { countedForm, decimalText, word } from './text.js';
 
@@ -250,4 +250,17 @@ export function collectWithFills(building, stored, now, from = null) {
   if (!fills) return collect(building, stored, now);
   const rest = collect(building, { ...stored, collectedAt: fills.collectedAt }, now);
   return { resource: fills.resource, amount: fills.amount + (rest?.amount ?? 0), collectedAt: rest?.collectedAt ?? fills.collectedAt };
+}
+
+// The Zbieracz Systemu collecting as it goes (the author's 753 A), there
+// since `from`: at `now` a store gives all it made, its whole fills and
+// the whole units of the next one (collectWithFills), once `every` ms have
+// passed since it started filling, or at once when a fill is whole; null
+// when nothing is due yet. So a store never stands, and the server writes
+// at most about once in `every` for each building.
+export function collectorTakes(building, stored, now, from, every) {
+  const store = production(building, stored, now);
+  if (!store || stored.endsAt > now) return null;
+  if (!wholeFills(building, stored, now, from) && now - store.since < every) return null;
+  return collectWithFills(building, stored, now, from);
 }

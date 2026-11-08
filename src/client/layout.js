@@ -281,6 +281,9 @@ export function updateTopbar(now = serverNow()) {
     'aria-label',
     t('Złoto: {gold}, Punkty Systemu: {points}{stock}. Zasoby', { gold: formatNumber(character.gold), points: formatNumber(character.systemPoints), stock: desktopLayout() ? stocked.join('') : '' }),
   );
+  // With the Zbieracz Systemu the camp's resources pulse with the System's
+  // blue, as over the camp's board on a phone (753 A; styles.css).
+  topbar.goldButton.classList.toggle('gold--collector', Boolean(character.camp?.collector?.owned));
   if (!topbar.wallet.hidden) refreshWallet(now);
   // A dot on the settings when players' bug reports wait for the author.
   const reports = state.user?.bugReports ?? 0;

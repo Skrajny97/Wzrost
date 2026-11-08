@@ -1,8 +1,8 @@
 // The Zbieracz Systemu (DECISIONS.md, „Zbieracz Systemu”): a spirit by the
 // Skrzynia Konta, bought once for good for gold; from then on the game
-// collects every whole fill of the camp's stores whenever it loads the
-// player's character, so production never stands, and what the next fill
-// holds so far stays in the store for "Zbierz".
+// collects the camp's stores as it goes (753 A): all they made, whenever it
+// loads the player's character, at most about once a minute for a store,
+// so production never stands.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -60,6 +60,7 @@ describe('Zbieracz Systemu', () => {
       art: 'collector-spirit',
       name: 'Zbieracz Systemu',
       price: 10000,
+      everySeconds: content.camp.collector.everySeconds,
       owned: false,
       texts: { offer: content.camp.collector.texts.offer, bought: content.camp.collector.texts.bought, hint: content.camp.collector.texts.hint },
     });
@@ -91,33 +92,42 @@ describe('Zbieracz Systemu', () => {
     assert.equal((await row()).gold, 2 * price);
   });
 
-  test('collects two and a half fills as two full stores, and the half stays for "Zbierz"', async () => {
+  test('collects all the stores made, whole fills and the rest, and each piece once', async () => {
     await boughtAgo(6);
     const start = await character();
+    assert.equal(start.camp.collector.everySeconds, content.camp.collector.everySeconds);
     // Five hours of the Tartak and four and a half of the Staw Midasa: two
-    // whole fills each.
+    // whole fills each and the part of the third made so far.
     await stand('sawmill', 1, 5);
     await stand('midas-lake', 1, 4.5);
     const view = await character();
-    assert.equal(view.resources.wood, start.resources.wood + 2 * SAWMILL.capacity);
-    assert.equal(view.gold, start.gold + 2 * LAKE.capacity);
-    // The third fill goes on: an hour of the Tartak's and half an hour of
-    // the Staw's, which the page counts on from `since`.
-    assert.deepEqual([store(view).amount, store(view).capacity], [SAWMILL.perHour, SAWMILL.capacity]);
-    assert.equal(store(view, 'midas-lake').amount, LAKE.perHour / 2);
+    assert.equal(view.resources.wood, start.resources.wood + 2 * SAWMILL.capacity + SAWMILL.perHour);
+    assert.equal(view.gold, start.gold + 2 * LAKE.capacity + LAKE.perHour / 2);
+    // The stores are empty and fill on from `since`, which the page counts on.
+    assert.deepEqual([store(view).amount, store(view, 'midas-lake').amount], [0, 0]);
     const database = await db();
     const sawmill = await database.prepare("SELECT collected_at FROM buildings WHERE building_id = 'sawmill'").first();
     assert.equal(store(view).since, sawmill.collected_at);
-    // Asked again, nothing more: each fill comes once.
+    // Asked again, nothing more: each piece comes once.
     const again = await character();
     assert.deepEqual([again.resources.wood, again.gold], [view.resources.wood, view.gold]);
+  });
 
-    // "Zbierz" still takes what the next fill holds so far.
-    const collected = await call('POST', '/api/camp/collect', { cookie, body: { buildingId: 'sawmill' } });
-    assert.equal(collected.status, 200);
-    assert.deepEqual(collected.data.collected, { resource: 'wood', amount: SAWMILL.perHour });
-    assert.equal(collected.data.character.resources.wood, start.resources.wood + 2 * SAWMILL.capacity + SAWMILL.perHour);
-    assert.equal(store(collected.data.character).amount, 0);
+  test('a store started filling less than a minute ago waits, though a unit is made', async () => {
+    await boughtAgo(6);
+    const start = await character();
+    // Level 20 of the Staw Midasa makes a unit of gold in seconds.
+    await run(
+      "INSERT INTO buildings (character_id, building_id, level, started_at, ends_at, collected_at) SELECT id, 'midas-lake', 20, 0, 1, ? FROM characters WHERE name = 'Zbieraczka'",
+      Date.now() - 30000,
+    );
+    const view = await character();
+    assert.equal(view.gold, start.gold);
+    assert.ok(store(view, 'midas-lake').amount >= 1);
+    await run("UPDATE buildings SET collected_at = ? WHERE building_id = 'midas-lake'", Date.now() - 2 * 60000);
+    const later = await character();
+    assert.ok(later.gold > start.gold);
+    assert.equal(store(later, 'midas-lake').amount, 0);
   });
 
   test('without him a full store stands, and nothing is collected', async () => {
@@ -149,19 +159,20 @@ describe('Zbieracz Systemu', () => {
     const start = await character();
     await stand('sawmill', 1, 4.2);
     // The fire spirit's trade saves only with the character as read: the
-    // collection before it moved the version on.
+    // collection before it moved the version on. 4.2 hours: 25 wood.
     const traded = await call('POST', '/api/camp/trade', { cookie, body: { resource: 'wood', amount: 2 } });
     assert.equal(traded.status, 200);
-    assert.equal(traded.data.character.resources.wood, start.resources.wood + 2 * SAWMILL.capacity + 2);
+    assert.equal(traded.data.character.resources.wood, start.resources.wood + 2 * SAWMILL.capacity + 1 + 2);
   });
 
-  test('requests at once collect each fill once', async () => {
+  test('requests at once collect each piece once', async () => {
     await boughtAgo(8);
     const start = await character();
     await stand('sawmill', 1, 7);
+    const made = 7 * SAWMILL.perHour;
     const views = await Promise.all([character(), character(), character()]);
-    assert.deepEqual(views.map((view) => view.resources.wood), Array(3).fill(start.resources.wood + 3 * SAWMILL.capacity));
-    assert.equal((await character()).resources.wood, start.resources.wood + 3 * SAWMILL.capacity);
+    assert.deepEqual(views.map((view) => view.resources.wood), Array(3).fill(start.resources.wood + made));
+    assert.equal((await character()).resources.wood, start.resources.wood + made);
   });
 
   test('a build from the queue that starts while the player is away takes the fills made by then along', async () => {
@@ -187,6 +198,6 @@ describe('Zbieracz Systemu', () => {
     assert.equal((await call('GET', '/api/profile/Zbieraczka', { cookie: other })).status, 200);
     assert.equal((await row()).resources, start.resources);
     const wood = (resources) => JSON.parse(resources).wood ?? 0;
-    assert.equal((await character()).resources.wood, wood(start.resources) + 2 * SAWMILL.capacity);
+    assert.equal((await character()).resources.wood, wood(start.resources) + 5 * SAWMILL.perHour);
   });
 });

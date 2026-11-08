@@ -106,7 +106,7 @@ import {
   cosmeticsOf,
   nameColor,
   seatLevels,
-  wholeFills,
+  collectorTakes,
 } from '../engine/index.js';
 import { mountView } from '../engine/stable.js';
 import { say } from '../engine/text.js';
@@ -410,21 +410,23 @@ export function storeCollection(db, characterId, buildingId, seen, gathered, now
 
 // The Zbieracz Systemu (camp.js: buyCollector; DECISIONS.md, „Zbieracz
 // Systemu”): once the character has him, every production building's store
-// gives its whole fills since it started filling (wholeFills in the
-// engine), each as "Zbierz" takes a store, all in one batch, and the next
-// fill goes on filling. So production never stands, also while the player
-// is away: the fills wait for the next request. `player` shows what came.
+// gives all it made by now, its whole fills and the whole units of the next
+// (collectorTakes in the engine; the author's 753 A), at most about once a
+// collector.everySeconds, as "Zbierz" takes a store, all in one batch. So
+// production never stands, also while the player is away: what was made
+// waits for the next request. `player` shows what came.
 // A store another request collected meanwhile gives nothing here: the
 // character is read again, and what is left is collected from there.
 export async function settleCollector(db, player, now) {
   for (let tries = 0; tries < 3; tries++) {
     const { row } = player;
     if (!row.collector_at) return;
+    const every = content().camp.collector.everySeconds * 1000;
     const fills = content().buildings
       .filter((building) => building.effect.kind === 'production')
       .map((building) => {
         const stored = player.buildings[building.id];
-        return { building, stored, gathered: wholeFills(building, stored, now, row.collector_at) };
+        return { building, stored, gathered: collectorTakes(building, stored, now, row.collector_at, every) };
       })
       .filter((fill) => fill.gathered);
     if (fills.length === 0) return;
@@ -1075,8 +1077,8 @@ function campView(player, levels, now) {
 // words, and whether the character has him; the board shows him by the
 // Skrzynia Konta until he is bought.
 function collectorView(row) {
-  const { art, name, price, texts } = content().camp.collector;
-  return { art, name, price, owned: Boolean(row.collector_at), texts: { offer: texts.offer, bought: texts.bought, hint: texts.hint } };
+  const { art, name, price, everySeconds, texts } = content().camp.collector;
+  return { art, name, price, everySeconds, owned: Boolean(row.collector_at), texts: { offer: texts.offer, bought: texts.bought, hint: texts.hint } };
 }
 
 // The Duch budowniczego at the Kamień węgielny Warowni (builder-spirit.js):

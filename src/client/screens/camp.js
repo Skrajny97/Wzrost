@@ -474,11 +474,14 @@ function mountBoard(container, backHash) {
   document.fonts?.ready.then(fitBoard);
 
   // The materials for building: gold and Punkty Systemu are in the top bar.
+  // With the Zbieracz Systemu he flies to and fro over them, and their
+  // frames pulse with the System's blue (753 A; styles.css).
   function materials() {
     const [, ...entries] = walletEntries();
+    const collector = state.character.camp.collector?.owned ? state.character.camp.collector : null;
     return h(
       'ul',
-      { class: 'camp-materials', 'aria-label': t('Zasoby') },
+      { class: `camp-materials${collector ? ' camp-materials--collector' : ''}`, 'aria-label': t('Zasoby') },
       entries.map((entry) =>
         h(
           'li',
@@ -488,6 +491,7 @@ function mountBoard(container, backHash) {
           h('strong', { text: formatNumber(entry.amount) }),
         ),
       ),
+      collector && h('li', { class: 'camp-collector-flyer', 'aria-hidden': 'true' }, h('span', { class: 'camp-collector-flyer-art' }, campIcon(collector.art))),
     );
   }
 
@@ -628,7 +632,7 @@ function mountBoard(container, backHash) {
       link,
       underway && timer(running),
       waiting && h('span', { class: 'camp-plot-timer camp-plot-timer--queued', 'aria-hidden': 'true' }, icon('hourglass', { size: 12 }), t('w kolejce')),
-      building.production && !building.production.paused && bubble(building, spot.bubble),
+      building.production && !building.production.paused && !state.character.camp.collector?.owned && bubble(building, spot.bubble),
     );
   }
 
@@ -653,7 +657,8 @@ function mountBoard(container, backHash) {
   }
 
   // What the store holds, counted up every second; a tap collects it.
-  // `place` 'side' puts it at the plot's side instead of its corner.
+  // `place` 'side' puts it at the plot's side instead of its corner. None
+  // with the Zbieracz Systemu, who collects as it goes (753 A).
   function bubble(building, place) {
     const store = building.production;
     const amount = h('span', {});
@@ -818,9 +823,9 @@ function mountBuilding(container, id) {
   }
 
   // The store of a production building: how full it is, when it fills up,
-  // and "Zbierz"; with the Zbieracz Systemu, that he collects it as it fills
-  // (a full store waits only for the server's next answer, app.js:
-  // watchStores).
+  // and "Zbierz"; with the Zbieracz Systemu, that he collects it as it goes
+  // (753 A), with no "Zbierz": what is made waits only for the server's next
+  // answer, at most about a minute (app.js: watchStores).
   function storeView(building) {
     const store = building.production;
     const collector = state.character.camp.collector?.owned ? state.character.camp.collector : null;
@@ -851,7 +856,7 @@ function mountBuilding(container, id) {
         : held >= store.capacity
           ? t('Magazyn pełny: produkcja stoi do zebrania.')
           : t('Pełny za {time}.', { time: formatCountdown(storeFullAt(store) - now) });
-      hint.hidden = Boolean(collector) && !store.paused && held >= store.capacity;
+      hint.hidden = Boolean(collector) && !store.paused;
       button.disabled = collecting || held < 1;
     });
     return h(
@@ -867,7 +872,7 @@ function mountBuilding(container, id) {
       h('div', { class: 'bar' }, fillBar),
       hint,
       collector && h('p', { class: 'store-hint', text: collector.texts.hint }),
-      button,
+      !collector && button,
     );
   }
 

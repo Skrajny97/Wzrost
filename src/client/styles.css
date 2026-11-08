@@ -4722,6 +4722,99 @@ a.camp-level-button {
   filter: brightness(0.8);
 }
 
+/* Once he is bought (753 A; the author: „A jeśli ktoś kupi zbieracza to
+   niech lata on nad zasobami w obozie a ramka zasobów świeci sie na
+   niebiesko pulsującym światłem”): he flies to and fro over the camp's
+   resources, bobbing as on the board, his trailing tail behind him, and
+   the frames of the resources pulse with the System's blue in his rhythm.
+   He passes over, so a tap goes through him. On a computer the resources
+   stand in the top bar, where their numbers pulse the same way. With the
+   animations off he stays at the row's right end and the frames glow
+   still (the .calm rules). */
+.camp-materials--collector {
+  position: relative;
+}
+
+.camp-materials--collector .camp-material {
+  border-color: var(--system-line);
+  animation: collector-glow 2.4s ease-in-out infinite;
+}
+
+@keyframes collector-glow {
+  0%,
+  100% {
+    border-color: var(--system-line);
+    box-shadow:
+      0 0 2px rgba(143, 227, 239, 0.2),
+      inset 0 0 2px rgba(143, 227, 239, 0.1);
+  }
+  50% {
+    border-color: var(--system);
+    box-shadow:
+      0 0 10px rgba(143, 227, 239, 0.55),
+      inset 0 0 6px rgba(143, 227, 239, 0.25);
+  }
+}
+
+.camp-collector-flyer {
+  position: absolute;
+  top: -22px;
+  left: 0;
+  z-index: 1;
+  width: 30px;
+  pointer-events: none;
+  animation: collector-fly 14s ease-in-out infinite;
+}
+
+.camp-collector-flyer-art {
+  display: block;
+  animation: collector-float 2.4s ease-in-out infinite;
+}
+
+.camp-collector-flyer-art .sprite {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 3px rgba(143, 227, 239, 0.7)) drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+@keyframes collector-fly {
+  0% {
+    left: 0;
+    transform: scaleX(-1);
+  }
+  46% {
+    left: calc(100% - 30px);
+    transform: scaleX(-1);
+  }
+  50% {
+    left: calc(100% - 30px);
+    transform: scaleX(1);
+  }
+  96% {
+    left: 0;
+    transform: scaleX(1);
+  }
+  100% {
+    left: 0;
+    transform: scaleX(-1);
+  }
+}
+
+:root[data-layout='desktop'] .gold--collector .gold-stock:not(.gold-stock--time) .gold-stock-value {
+  animation: collector-glow-text 2.4s ease-in-out infinite;
+}
+
+@keyframes collector-glow-text {
+  0%,
+  100% {
+    text-shadow: 0 0 2px rgba(143, 227, 239, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 8px rgba(143, 227, 239, 0.9);
+  }
+}
+
 /* His offer (screens/camp.js: collectorSheet): his icon beside his name. */
 .collector-head {
   display: flex;
@@ -6707,6 +6800,10 @@ a.camp-level-button {
 .calm .activity--done,
 .calm .camp-bubble--full,
 .calm .camp-collector-art,
+.calm .camp-collector-flyer,
+.calm .camp-collector-flyer-art,
+.calm .camp-materials--collector .camp-material,
+.calm .gold--collector .gold-stock-value,
 .calm .camp-fire-glow,
 .calm .camp-smoke,
 .calm .settlement-torch-glow,
@@ -6716,6 +6813,23 @@ a.camp-level-button {
 .calm .guide-note .sprite--narrator,
 .calm .quest-chest--ready .quest-chest-art {
   animation: none;
+}
+
+/* The Zbieracz Systemu over the camp's resources rests at the row's right
+   end, and the frames and the computer's numbers glow without pulsing. */
+.calm .camp-collector-flyer {
+  left: calc(100% - 30px);
+  transform: none;
+}
+
+.calm .camp-materials--collector .camp-material {
+  border-color: var(--system);
+  box-shadow: 0 0 6px rgba(143, 227, 239, 0.4);
+}
+
+:root.calm[data-layout='desktop'] .gold--collector .gold-stock:not(.gold-stock--time) .gold-stock-value {
+  animation: none;
+  text-shadow: 0 0 5px rgba(143, 227, 239, 0.7);
 }
 
 .calm .camp-smoke {

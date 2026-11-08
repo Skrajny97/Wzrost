@@ -39,9 +39,9 @@
   "collector": {
     "name": "System Collector",
     "texts": {
-      "offer": "Collects resources from the Camp's full stores for you, so nothing is lost even during a long absence.",
+      "offer": "Collects resources from the Camp's stores for you as they come, so nothing is lost even during a long absence.",
       "bought": "The System Collector will now look after the Camp's stores.",
-      "hint": "The System Collector will collect the resources when the store fills up.",
+      "hint": "The System Collector collects the resources from the store as they come.",
       "owned": "You already have the System Collector.",
       "noGold": "Not enough gold for the System Collector."
     }
