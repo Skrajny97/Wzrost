@@ -3,8 +3,9 @@
 // cards and lit places (test/helpers/narrator-page.js): the Sklep Systemu
 // at the end of the introduction, and the lines of places, each told once on
 // the first look at its place: the Gildia's page and tabs, the Drużyna, the
-// Kamień węgielny, the Trudna wyprawa, the Skrzynia Konta, the Zbieracz
-// Systemu and the report of a faint. A character that was there before the
+// Kamień węgielny, the Trudna wyprawa, the Skrzynia Konta and the report of a
+// faint. The Zbieracz Systemu has no line (0.2.26: the player finds him
+// alone). A character that was there before the
 // lines were written hears them too, as it heard the places' lines of
 // 0.1.70; with "Pomijaj objaśnienia narratora" on they go without a word.
 
@@ -24,7 +25,7 @@ before(async () => {
 });
 
 const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once === true;
-const PLACES = ['guild-tabs', 'guild-seat', 'guild-beast', 'guild-trials', 'guild-requests', 'guild-exchange', 'party-intro', 'fortress-stone', 'hard-hunt', 'account-chest', 'system-collector', 'faint-first'];
+const PLACES = ['guild-tabs', 'guild-seat', 'guild-beast', 'guild-trials', 'guild-requests', 'guild-exchange', 'party-intro', 'fortress-stone', 'hard-hunt', 'account-chest', 'faint-first'];
 // Every line kept once read but the places' of 6.11.2026: a character that
 // went through all the game had to tell before them, and heard of the Sklep
 // Systemu since; and one that has not heard of it yet.
@@ -208,9 +209,8 @@ test("the Drużyna's tab is opened and pointed at on the first look at the Społ
   assert.equal(lights().length, 0);
 });
 
-test('the Kamień węgielny comes on the camp board after the Osada is told, while the camp is no Warownia, and the Zbieracz Systemu after it', async () => {
+test('the Kamień węgielny comes on the camp board after the Osada is told, while the camp is no Warownia, and nothing of the Zbieracz Systemu after it', async () => {
   place(mark('plot-cornerstone'));
-  place(mark('camp-collector'));
   // Before the Osada's tour: its chapter first, and no place's line meanwhile.
   state.character = character({ level: 20, read: pastAll.filter((id) => !id.startsWith('settlement-')) });
   narrator.narrate('#/oboz');
@@ -224,18 +224,15 @@ test('the Kamień węgielny comes on the camp board after the Osada is told, whi
   assert.match(told(), new RegExp(words('fortress-stone')));
   assert.equal(button('guide-skip'), undefined);
   await next();
-  assert.match(told(), new RegExp(words('system-collector')));
-  await next();
-  assert.deepEqual(sent.map((one) => one.body), [{ card: 'fortress-stone' }, { card: 'system-collector' }]);
+  assert.deepEqual(sent.map((one) => one.body), [{ card: 'fortress-stone' }]);
   narrator.narrate('#/oboz');
   assert.equal(lights().length, 0);
 });
 
-test('a Warownia standing, or a Zbieracz bought, has no line on the board', () => {
+test('a Warownia standing has no line on the board', () => {
   place(mark('plot-cornerstone'));
-  place(mark('camp-collector'));
   const standing = character({ level: 20 });
-  standing.camp = { ...standing.camp, cornerstone: { fortress: { stands: true } }, collector: { owned: true } };
+  standing.camp = { ...standing.camp, cornerstone: { fortress: { stands: true } } };
   state.character = standing;
   narrator.narrate('#/oboz');
   assert.equal(lights().length, 0);
@@ -357,20 +354,18 @@ test('with the switch on, each line of a place goes without a word', async () =>
     sent.length = 0;
     reportCache.set('9', { id: 9, result: 'fainted', summary: { forfeit: 'Po omdleniu nic z tej wyprawy nie zostaje.' } });
     state.character = character(more);
-    // The Zbieracz bought, so the board has the stone's line alone.
-    state.character.camp = { ...state.character.camp, collector: { owned: true } };
     narrator.narrate(hash);
     assert.equal(lights().length, 0, chapter);
     assert.deepEqual(sent.map((one) => one.body), [{ skip: true, chapter }], chapter);
     await settled();
     assert.equal(toastBox.textContent, '', chapter);
   }
-  // The Zbieracz on the board, the stone's line read.
+  // The Zbieracz on the board, the stone's line read: nothing more to tell.
   clean();
   sent.length = 0;
   state.character = character({ read: [...pastAll, 'fortress-stone'] });
   narrator.narrate('#/oboz');
-  assert.deepEqual(sent.map((one) => one.body), [{ skip: true, chapter: 'system-collector' }]);
+  assert.deepEqual(sent.map((one) => one.body), []);
   // The Sklep Systemu, a late line of the introduction, as the quests'.
   clean();
   sent.length = 0;

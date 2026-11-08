@@ -1063,7 +1063,6 @@ async function openTutorialTests() {
       row(t('Drużyna'), t('Od 10. poziomu postaci, przy wejściu do Społeczności.'), repeatPartyTour, told && isUnlocked('party')),
       row(t('Trudna wyprawa'), t('Od 10. poziomu postaci, przy wejściu na miejsce wyprawy.'), repeatHardHuntTour, told && Boolean(state.character.hardHunt)),
       row(t('Skrzynia Konta'), t('Przy wejściu do Skrzyni Konta w obozie.'), repeatAccountChestTour, told),
-      row(t('Zbieracz Systemu'), t('Przy wejściu do obozu, dopóki Zbieracz nie jest kupiony.'), repeatSystemCollectorTour, told && Boolean(state.character.camp?.collector && !state.character.camp.collector.owned)),
       row(t('Omdlenie'), t('Przy pierwszym raporcie z wyprawy zakończonej omdleniem.'), repeatFaintTour, told),
     ),
   );
@@ -1473,24 +1472,6 @@ async function repeatAccountChestTour() {
   try {
     await call('POST', '/api/test/account-chest-tour');
     forgetPart('account-chest');
-  } catch (error) {
-    toast(error.message);
-  }
-}
-
-// Test mode: the narrator's line about the Zbieracz Systemu from the start
-// (testing.js).
-async function repeatSystemCollectorTour() {
-  const sure = await confirmAction({
-    title: t('Zbieracz Systemu od nowa?'),
-    text: t('Narrator powie o Zbieraczu Systemu przy następnym wejściu do obozu.'),
-    confirmLabel: t('Od nowa'),
-  });
-  if (!sure) return;
-  closeSheet();
-  try {
-    await call('POST', '/api/test/system-collector-tour');
-    forgetPart('system-collector');
   } catch (error) {
     toast(error.message);
   }

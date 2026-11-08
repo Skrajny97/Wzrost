@@ -3034,6 +3034,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.26 (8.11.2026): bez kwestii narratora o Zbieraczu Systemu
+
+Autor, po pytaniu 754 o nowy tekst kwestii: „Wywal w ogóle info z gry o Zbieraczu, miało być że każdy sam sobie kliknie jeśli się zaciekawi ludkiem.” (por. pierwsze słowa autora o Zbieraczu: „duchem stojącym przy Skrzyni Konta bez opisu”).
+
+1. **Kwestia narratora o Zbieraczu znika** w obu językach razem z nagraniami (`system-collector` w `data/tutorial.json`, `data/en/tutorial.json`, `audio/prompts.json`, `src/client/audio/narration/`) i z wierszem „Zbieracz Systemu” w „Testuj samouczki”. Narrator nie wskazuje już ducha na planszy. Gracz trafia na niego sam, a po stuknięciu okienko zakupu mówi, co robi (`collector.texts.offer`).
+2. **Zbieracz zostaje w grze bez zmian.** Autor zaraz potem: „w sensie te kwestie narratora”, „Nie no ma być Zbieracz”, „tylko kwestie narratora”. Znika tylko kwestia narratora, a szkic „Co nowego?” 0.2.25 zostaje. Ta wersja nie ma własnego szkicu, bo gracz nie zobaczy w niej nic nowego.
+3. **Zostaje cały Zbieracz:** duch przy Skrzyni Konta, okienko zakupu, zbieranie na bieżąco, zdanie na ekranie budynku produkcyjnego, komunikat po zakupie, ruch nad zasobami i niebieskie ramki z 0.2.25.
+4. Pytanie 754 jest tym samym rozstrzygnięte: nowego tekstu nie ma.
+
 ## Wersja 0.2.25 (8.11.2026): Zbieracz Systemu zbiera na bieżąco i lata nad zasobami
 
 Autor: „Czy da się ustawić zbieracza systemu tak by zbierał zasoby na bieżąco? Zrobić taki całkowity automat?”, a po pytaniu 753: „753 A”. Potem: „A jeśli ktoś kupi zbieracza to niech lata on nad zasobami w obozie a ramka zasobów świeci sie na niebiesko pulsującym światłem” i, ze zrzutem paska Drewno, Kamień, Ruda żelaza w Obozie: „o te ramke chodzi”.
@@ -3046,7 +3055,7 @@ Autor: „Czy da się ustawić zbieracza systemu tak by zbierał zasoby na bież
 6. **Lata nad zasobami.** Po zakupie Zbieracz lata tam i z powrotem nad paskiem zasobów Obozu (Drewno, Kamień, Ruda żelaza), co 14 sekund tam i z powrotem, i przy tym unosi się jak na planszy. Leci zawsze ogonem do tyłu: obrazek patrzy w lewo, więc w prawo leci odbity. Ma 30 px szerokości i lata tuż nad górną krawędzią ramek. Nie zasłania stuknięć.
 7. **Niebieskie ramki.** Ramki trzech zasobów pulsują niebieskim światłem Systemu w rytmie unoszenia się Zbieracza (2,4 s). Na komputerze zasoby stoją w górnym pasku (505 A), więc tam niebiesko pulsują same ich liczby, bez latającego ducha, bo nie ma na niego miejsca.
 8. **Bez animacji** (przełącznik „Animacje” w Ustawieniach): Zbieracz stoi na prawym końcu paska, a ramki i liczby świecą bez pulsowania.
-9. **Kwestia narratora** o Zbieraczu mówi jeszcze „sam zbierze zasoby z pełnych magazynów”. Nowy tekst czeka na autora (754), a nagrania przyjdą po zatwierdzeniu.
+9. **Kwestia narratora** o Zbieraczu mówiła jeszcze „sam zbierze zasoby z pełnych magazynów”. Od 0.2.26 jej nie ma (754: autor kazał usunąć).
 
 ## Wersja 0.2.24 (8.11.2026): Próby Gildii dwa razy dłuższe
 

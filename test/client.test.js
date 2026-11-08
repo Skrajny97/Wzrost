@@ -364,7 +364,6 @@ test("the narrator hears of the Gildia's tabs, also of the one the page opens on
     ['Drużyna', 'party-tour'],
     ['Trudna wyprawa', 'hard-hunt-tour'],
     ['Skrzynia Konta', 'account-chest-tour'],
-    ['Zbieracz Systemu', 'system-collector-tour'],
     ['Omdlenie', 'faint-tour'],
   ]) {
     assert.match(app, new RegExp(`row\\(t\\('${title}'\\),`));
@@ -384,7 +383,6 @@ test("the places of the narrator's lines of 6.11.2026 are marked on their screen
     [['guild-trials.js'], 'guild-trials-board'],
     [['guild-requests.js'], 'guild-requests'],
     [['guild-exchange.js'], 'guild-exchange'],
-    [['screens', 'camp.js'], 'camp-collector'],
     [['screens', 'camp.js'], 'plot-cornerstone'],
     [['screens', 'chest.js'], 'account-chest'],
     [['screens', 'combat.js'], 'hard-hunt'],

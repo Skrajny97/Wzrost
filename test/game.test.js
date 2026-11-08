@@ -2153,7 +2153,6 @@ describe('Time Points and the narrator', () => {
       ['cornerstone', ['fortress-stone']],
       ['hard-hunt', ['hard-hunt']],
       ['account-chest', ['account-chest']],
-      ['system-collector', ['system-collector']],
       ['faint', ['faint-first']],
     ]) {
       const read = (await see({ skip: true, chapter })).data.character.tutorial;
@@ -2171,7 +2170,7 @@ describe('Time Points and the narrator', () => {
     const { tutorial } = (await call('GET', '/api/content')).data;
     const line = (id) => tutorial.lines.find((one) => one.id === id);
     const at = (id) => tutorial.lines.findIndex((one) => one.id === id);
-    const fresh = ['shop-system', 'guild-tabs', 'guild-seat', 'guild-beast', 'guild-trials', 'guild-requests', 'guild-exchange', 'party-intro', 'fortress-stone', 'hard-hunt', 'account-chest', 'system-collector', 'faint-first'];
+    const fresh = ['shop-system', 'guild-tabs', 'guild-seat', 'guild-beast', 'guild-trials', 'guild-requests', 'guild-exchange', 'party-intro', 'fortress-stone', 'hard-hunt', 'account-chest', 'faint-first'];
     for (const id of fresh) {
       assert.equal(line(id).kind, 'point', id);
       assert.equal(line(id).voice, `audio/narration/${id}.mp3`, id);
@@ -2193,11 +2192,13 @@ describe('Time Points and the narrator', () => {
       ['cornerstone', 'fortress-stone'],
       ['hard-hunt', 'hard-hunt'],
       ['account-chest', 'account-chest'],
-      ['system-collector', 'system-collector'],
       ['faint', 'faint-first'],
     ]) {
       assert.deepEqual(tutorial.lines.filter((one) => one.chapter === chapter).map((one) => one.id), [id], chapter);
     }
+    // The Zbieracz Systemu has no line since 0.2.26: the player finds him alone.
+    assert.equal(line('system-collector'), undefined);
+    assert.equal(tutorial.chapters['system-collector'], undefined);
     assert.deepEqual(line('party-intro').text, ['Drużyna to do trzech wędrowców na jednej wyprawie, a ich poziomy klasy mogą się różnić najwyżej o pięć. Wyprawę wysyła lider, gdy nad „Wyrusz” zaznaczy „Z drużyną”.']);
     assert.deepEqual(line('faint-first').text, ['Po omdleniu nic z wyprawy nie zostaje, a System odbiera jeszcze część doświadczenia. Zanim znów wyruszysz, sprawdź zagrożenie i odpocznij.']);
     // The two cards changed (their recordings come anew).

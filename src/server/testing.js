@@ -232,7 +232,6 @@ export const repeatCornerstoneTour = (context) => repeatChapter(context, 'corner
 export const repeatPartyTour = (context) => repeatChapter(context, 'party');
 export const repeatHardHuntTour = (context) => repeatChapter(context, 'hard-hunt');
 export const repeatAccountChestTour = (context) => repeatChapter(context, 'account-chest');
-export const repeatSystemCollectorTour = (context) => repeatChapter(context, 'system-collector');
 export const repeatFaintTour = (context) => repeatChapter(context, 'faint');
 
 // A chapter's lines unread again, with `reset` (SQL assignments) done too.

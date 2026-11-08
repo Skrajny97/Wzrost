@@ -41,10 +41,6 @@
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Account Chest waits in the Camp tab."
     },
-    "system-collector": {
-      "skipLabel": "Skip the explanation",
-      "skippedText": "Explanation skipped. The System Collector waits in the Camp tab."
-    },
     "faint": {
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. Reports wait in the Journal, at the top of the settings under the cog."
@@ -515,12 +511,6 @@
         "This chest is shared by all the characters on your account. An item put in by one character can be taken out by another."
       ],
       "voice": "audio/narration/en/account-chest.mp3"
-    },
-    "system-collector": {
-      "text": [
-        "The System Collector keeps watch close by. For gold, once and for all, it will collect the resources from full stores on its own."
-      ],
-      "voice": "audio/narration/en/system-collector.mp3"
     },
     "faint-first": {
       "text": [

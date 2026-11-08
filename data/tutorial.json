@@ -77,10 +77,6 @@
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Skrzynia Konta czeka w zakładce Obóz."
     },
-    "system-collector": {
-      "skipLabel": "Pomiń objaśnienie",
-      "skippedText": "Objaśnienie pominięte. Zbieracz Systemu czeka w zakładce Obóz."
-    },
     "faint": {
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Raporty czekają w Dzienniku, na górze ustawień pod zębatką."
@@ -1385,15 +1381,6 @@
         "Ta skrzynia jest wspólna dla wszystkich postaci na Twoim koncie. Przedmiot włożony przez jedną postać wyjmie inna."
       ],
       "voice": "audio/narration/account-chest.mp3"
-    },
-    {
-      "id": "system-collector",
-      "kind": "point",
-      "chapter": "system-collector",
-      "text": [
-        "Obok czuwa Zbieracz Systemu. Za złoto, raz na zawsze, sam zbierze zasoby z pełnych magazynów."
-      ],
-      "voice": "audio/narration/system-collector.mp3"
     },
     {
       "id": "faint-first",

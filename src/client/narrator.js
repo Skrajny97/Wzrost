@@ -25,8 +25,9 @@
 // (`classes`). A place's line comes on the first look at its place once no
 // chapter waits, also to a character that was there before the line was
 // written: the Osada's places, the Gildia's page and tabs, the Warownia,
-// the Drużyna, the Kamień węgielny, the Trudna wyprawa, the Skrzynia Konta,
-// the Zbieracz Systemu and the report of a faint. With "Pomijaj objaśnienia
+// the Drużyna, the Kamień węgielny, the Trudna wyprawa, the Skrzynia Konta
+// and the report of a faint (the Zbieracz Systemu has no line since 0.2.26:
+// the player finds him alone). With "Pomijaj objaśnienia
 // narratora" on in the settings (the account's) nothing is told: each line
 // due is passed with its part, as its "Pomiń" would pass it, and a part
 // begun before the switch went on at once; a part's later lines and a
@@ -297,10 +298,6 @@ const partyHere = (hash, read) => onCommunityPage(hash) && isUnlocked('party') &
 // game has the Warownia.
 const stoneWaits = () => Boolean(state.character.camp.cornerstone?.fortress) && !state.character.camp.cornerstone.fortress.stands;
 const stoneHere = (hash, read) => onBoard(hash) && placesDue(read) && stoneWaits();
-
-// The Zbieracz Systemu by the Skrzynia Konta (6.11.2026), until he is
-// bought.
-const collectorHere = (hash, read) => onBoard(hash) && Boolean(state.character.camp.collector) && !state.character.camp.collector.owned && quietDue(read);
 
 // A report of an exploration that ended in a faint, under the rules of
 // 651 C, whose summary says nothing of it is left (`forfeit`), once the page
@@ -621,7 +618,6 @@ const BEATS = {
   // opens; after Szybkie Polowanie's line where both are due.
   'hard-hunt': { place: mark('hard-hunt'), tab: '.hunt-options-toggle', when: (hash, read) => onHomeArea(hash) && Boolean(state.character.hardHunt) && quietDue(read) },
   'account-chest': { place: mark('account-chest'), when: (hash, read) => hash === '#/oboz/skrzynia-konta' && quietDue(read) },
-  'system-collector': { place: mark('camp-collector'), when: collectorHere },
   // At the top of the report, where it says what the faint took, a moment
   // after the report opens: the player sees it first.
   'faint-first': { place: mark('report-summary'), delay: 2500, when: (hash, read) => faintReport(hash) && quietDue(read) },

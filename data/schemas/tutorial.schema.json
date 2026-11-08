@@ -249,7 +249,6 @@
               "fortress-stone",
               "hard-hunt",
               "account-chest",
-              "system-collector",
               "faint-first",
               "evolution-welcome",
               "evolution-lead",
@@ -398,7 +397,6 @@
               "cornerstone",
               "hard-hunt",
               "account-chest",
-              "system-collector",
               "faint"
             ],
             "description": "Część po wprowadzeniu, do której należy kwestia (chapters). Jej kwestie przychodzą dopiero po zakończeniu wprowadzenia, w swoim momencie gry."

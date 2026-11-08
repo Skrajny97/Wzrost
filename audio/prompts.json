@@ -972,7 +972,6 @@
       "shop-system": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Punkty Systemu wydasz w Sklepie Systemu. Kupisz w nim ozdoby, które zmieniają wygląd."},
       "hard-hunt": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Od dziesiątego poziomu możesz zaznaczyć Trudną wyprawę. Stwory są wtedy silniejsze, ale dają więcej doświadczenia i złota."},
       "account-chest": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Ta skrzynia jest wspólna dla wszystkich postaci na Twoim koncie. Przedmiot włożony przez jedną postać wyjmie inna."},
-      "system-collector": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses] Tak.", "text": "Obok czuwa Zbieracz Systemu. Za złoto, raz na zawsze, sam zbierze zasoby z pełnych magazynów."},
       "portals-welcome": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Piąty poziom postaci… System otworzył przed Tobą Portale."},
       "portals-lead": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "Portale czekają w zakładce Walka. Zajrzyjmy tam."},
       "portals-lands": {"voice": "Narrator", "model": "eleven_v3", "settings": {"stability": 0.5}, "ending": " [pauses]", "text": "W każdym Portalu przeniesiesz się do innej krainy, która da Ci odpowiednie surowce."},
