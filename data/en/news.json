@@ -356,6 +356,10 @@
     "0.2.33": {
       "title": "Version 0.2.33",
       "body": "- After the first lost exploration, the narrator now speaks of a defeat, just like the text."
+    },
+    "0.2.34": {
+      "title": "Version 0.2.34",
+      "body": "- The TIGER gift code (500 System Points) works a week longer, until 16 November inclusive. Enter it in the Settings, under “Gift code”."
     }
   }
 }

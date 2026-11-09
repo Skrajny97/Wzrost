@@ -450,6 +450,11 @@
       "id": "0.2.33",
       "title": "Wersja 0.2.33",
       "body": "- Narrator po pierwszej przegranej wyprawie mówi teraz o porażce, tak jak napis."
+    },
+    {
+      "id": "0.2.34",
+      "title": "Wersja 0.2.34",
+      "body": "- Kod podarunkowy TIGER (500 Punktów Systemu) działa tydzień dłużej, do 16 listopada włącznie. Wpisz go w Ustawieniach, w „Kod podarunkowy”."
     }
 ]
 }
