@@ -1,0 +1,27 @@
+{
+  "id": "rider-skin-dawn-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a calm young woman with long straight fair blond hair and a thin golden circlet, in layered white and gold vestments with golden embroidery down to the feet, a golden sash at the waist, no staff and nothing in the hands but the reins, no halo, no shield and nothing on the back, sitting upright and relaxed on a horse exactly like the white-robed rider of the reference, in the pose of the grey seated mannequin, not standing, not crouching, the legs never apart, both hands in front holding the reins, seen exactly from the side in profile, facing right, the face, chest and hips turned to the right and not towards the viewer, sitting sideways in the saddle like the finished rider, only the near leg showing and the far leg hidden behind the horse, the same size and place as the mannequin, the whole figure from the top of the head to the foot inside the image, nothing under the rider, isolated figure on a plain background, forest fantasy",
+  "style": "src/client/art/riders/priest-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/dawn-female.png",
+      "usage": "the character's look only: the face, fair hair, golden circlet, white and gold vestments and colours; not the pose and not the sun staff"
+    },
+    {
+      "path": "src/client/art/riders/priest-female.png",
+      "usage": "a finished white-robed rider of the game: copy exactly how it sits sideways on a horse that is not drawn, seen from the side, facing right, one near leg showing, both hands forward at the reins; not its face, hair or the shield on its back"
+    },
+    {
+      "path": "art/references/riders/mannequin-seated.png",
+      "usage": "the pose of the figure: sitting sideways, the near thigh forward and the lower leg hanging down, only the near leg; not its hood or cloak"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 9
+}
