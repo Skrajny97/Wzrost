@@ -1,0 +1,23 @@
+{
+  "id": "rider-skin-forest-lord-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a lean young woman with long brown hair in a loose braid, in a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak, leather bracers and soft leather boots, a quiver of green-fletched arrows and a curved bow carved from pale antler on the back, sitting astride and riding in the pose of the grey mannequin, both hands in front holding the reins, seen from the side, facing right, only the near leg showing, the same size and place as the mannequin, the whole figure from the top of the head to the foot inside the image, nothing under the rider, isolated figure on a plain background, forest fantasy",
+  "style": "src/client/art/riders/master-hunter-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/forest-lord-female.png",
+      "usage": "the character's look: face, hair, clothes, colours and what is carried"
+    },
+    {
+      "path": "art/references/riders/skeleton.png",
+      "usage": "the pose, size and place of the figure: sitting astride a saddle that is not drawn, seen from the side, facing right, both hands in front holding the reins, only the near leg showing; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 9
+}
