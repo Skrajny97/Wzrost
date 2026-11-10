@@ -7,7 +7,8 @@
 # board, drawn into the camp's by inpainting), items- and potions-pixellab,
 # "variants" are calls, of one to 64 versions each by size,
 # tools/generate-portraits-pixellab.mjs), or the
-# walks animated by PixelLab (kind walks-pixellab, tools/animate-walks.mjs),
+# walks animated by PixelLab (kind walks-pixellab, tools/animate-walks.mjs;
+# walks-skeleton-estimate reads the skeleton of their start frames),
 # the mounts posed frame by frame (mounts-skeleton, tools/animate-mounts-skeleton.mjs),
 # the Sklep Systemu's pets animated by PixelLab (pets-animate, tools/animate-mounts.mjs),
 # the professions' work scenes animated with their backgrounds (scenes-animate),
@@ -81,6 +82,7 @@ on:
           - residents
           - walks
           - walks-pixellab
+          - walks-skeleton-estimate
       ids:
         description: Identyfikatory po przecinku albo all
         required: true
@@ -133,8 +135,9 @@ jobs:
           MAX_COST: ${{ inputs.max_cost }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          if [ "$KIND" = "walks-pixellab" ]; then
+          if [ "$KIND" = "walks-pixellab" ] || [ "$KIND" = "walks-skeleton-estimate" ]; then
             args=(--ids "$IDS" --variants "$VARIANTS" --max-cost "$MAX_COST")
+            if [ "$KIND" = "walks-skeleton-estimate" ]; then args+=(--estimate); fi
             if [ "$DRY_RUN" = "true" ]; then args+=(--dry-run); fi
             node tools/animate-walks.mjs "${args[@]}"
             exit

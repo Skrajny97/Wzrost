@@ -6,12 +6,17 @@
 // its look, its hands and what they hold, and the walk loops. Run by the
 // "Grafiki (szkice)" workflow (kind walks-pixellab), which keeps the drafts
 // on the art-drafts branch for review, each frame as a PNG of its own (-1, -2…):
-//   node tools/animate-walks.mjs --ids warrior-female,inquisitor-male --variants 2 --max-cost 1 [--dry-run]
+//   node tools/animate-walks.mjs --ids warrior-female,inquisitor-male --variants 2 --max-cost 1 [--estimate] [--dry-run]
+// A figure that holds something still (art/walks.json "hold") walks on its own
+// skeletons from art/walk-poses.json (tools/walk-hold.py): the arm with the
+// staff, shield or bow keeps its pose and moves only with the body. With
+// --estimate PixelLab reads the skeleton of each start frame instead
+// (estimate-skeleton), into <id>-skeleton-<stamp>.json beside the drafts.
 // The balance is read first, and the run stops before its animations could
 // cost more than --max-cost dollars (one is 2-3 generations of PixelLab, at
 // most JOB_USD).
 
-import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { randomInt } from 'node:crypto';
 import { parseArgs } from 'node:util';
 
@@ -27,6 +32,7 @@ const { values } = parseArgs({
     ids: { type: 'string', default: 'all' },
     variants: { type: 'string', default: '1' },
     'max-cost': { type: 'string', default: '1' },
+    estimate: { type: 'boolean', default: false },
     'dry-run': { type: 'boolean', default: false },
   },
 });
@@ -45,6 +51,7 @@ if (!token) fail('Brak sekretu PIXELLAB_API_KEY. Dodaj klucz PixelLab w ustawien
 
 const config = JSON.parse(readFileSync('art/walks.json', 'utf8'));
 const skeleton = JSON.parse(readFileSync(config.skeleton, 'utf8'));
+const poses = existsSync('art/walk-poses.json') ? JSON.parse(readFileSync('art/walk-poses.json', 'utf8')) : {};
 const ids = values.ids === 'all' ? Object.keys(config.characters) : values.ids.split(',').map((id) => id.trim()).filter(Boolean);
 const unknown = ids.filter((id) => !config.characters[id]);
 if (unknown.length) fail(`Brak postaci w art/walks.json: ${unknown.join(', ')}.`);
@@ -75,9 +82,14 @@ const describeBalance = (balance) =>
     .filter(Boolean)
     .join(', ') || 'nieznane';
 
-// The frames of the walk, in the order they play.
+// The frames of the walk, in the order they play: the shared skeleton's, or
+// a figure's own when it holds something still.
 const strip = (pose) => pose.map(({ label, x, y, z_index }) => ({ label, x, y, z_index }));
 const keypoints = skeleton.frames.map(strip);
+const posesOf = (id) =>
+  poses[id]
+    ? { first: strip(poses[id].first), frames: poses[id].frames.map(strip) }
+    : { first: strip(skeleton.keys[config.characters[id].pose - 1]), frames: keypoints };
 
 // One animation: sent, then polled until PixelLab has drawn it. A full queue
 // of jobs (429) waits and tries again.
@@ -89,8 +101,8 @@ async function animate(id, seed) {
     direction: 'east',
     view: 'side',
     first_frame: { type: 'base64', base64: readFileSync(character.start).toString('base64'), format: 'png' },
-    first_frame_keypoints: strip(skeleton.keys[character.pose - 1]),
-    keypoints,
+    first_frame_keypoints: posesOf(id).first,
+    keypoints: posesOf(id).frames,
     seed,
     no_background: true,
   };
@@ -123,7 +135,20 @@ const skipped = ids.length * variants - jobs.length;
 
 const before = await request('GET', '/balance');
 if (values['dry-run']) {
-  for (const id of jobs) lines.push(`| ${id} | do zrobienia (start: ${config.characters[id].start}, poza ${config.characters[id].pose}) |`);
+  for (const id of jobs) lines.push(`| ${id} | do zrobienia (start: ${config.characters[id].start}, poza ${config.characters[id].pose}${poses[id] ? ', własny szkielet' : ''}) |`);
+} else if (values.estimate) {
+  // The skeleton PixelLab reads in each start frame, to place a figure's
+  // held arm (tools/walk-hold.py).
+  for (const id of ids) {
+    try {
+      const result = await request('POST', '/estimate-skeleton', { image: { type: 'base64', base64: readFileSync(config.characters[id].start).toString('base64'), format: 'png' } });
+      writeFileSync(`${outDir}/${id}-skeleton-${stamp}.json`, `${JSON.stringify({ id, start: config.characters[id].start, keypoints: result.keypoints, usage: result.usage ?? null }, null, 2)}\n`);
+      lines.push(`| ${id} | szkielet: ${result.keypoints?.length ?? 0} punktów |`);
+    } catch (error) {
+      failed.push(id);
+      lines.push(`| ${id} | błąd: ${error.message} |`);
+    }
+  }
 } else {
   // Four at a time; when PixelLab's queue for the account is full (429), a
   // job waits and tries again.
