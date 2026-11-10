@@ -405,12 +405,12 @@
     "skin-dawn-female": {
       "start": "art/references/walks/start/skin-dawn-female.png",
       "pose": 2,
-      "description": "a calm young woman with long fair hair and a thin golden circlet, in layered white and gold vestments down to the feet, a golden sash, a staff topped with a small golden sun held upright in the front hand, no halo, nothing on the back"
+      "description": "a calm young woman with long fair hair and a thin golden circlet, in layered white and gold vestments down to the feet, a golden sash, a staff topped with a small golden sun held upright in the front hand in every frame, the sun always above and in front of the hand, never over the face, no halo, nothing on the back"
     },
     "skin-dawn-male": {
       "start": "art/references/walks/start/skin-dawn-male.png",
       "pose": 2,
-      "description": "a calm young man with short fair hair in layered yellow and white vestments down to the ankles, a golden sash, brown boots, a book under the back arm, a staff topped with a small golden sun held upright in the front hand, no halo, nothing on the back"
+      "description": "a calm young man with short fair hair in layered yellow and white vestments down to the ankles, a golden sash, brown boots, a book under the back arm, a staff topped with a small golden sun held upright in the front hand in every frame, the sun always above and in front of the hand, never over the face, no halo, nothing on the back"
     },
     "skin-eclipse-female": {
       "start": "art/references/walks/start/skin-eclipse-female.png",
@@ -425,12 +425,12 @@
     "skin-forest-lord-female": {
       "start": "art/references/walks/start/skin-forest-lord-female.png",
       "pose": 2,
-      "description": "a lean young woman with long brown hair in a loose braid, in a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak, leather bracers and soft leather boots, a quiver of green-fletched arrows on the back, a curved bow carved from pale antler held upright in the front hand"
+      "description": "a lean young woman with long brown hair in a loose braid, in a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak, leather bracers and soft leather boots, a quiver of green-fletched arrows on the back, a curved bow carved from pale antler held upright in the front hand in every frame, the bow moving with the hand and never vanishing"
     },
     "skin-forest-lord-male": {
       "start": "art/references/walks/start/skin-forest-lord-male.png",
       "pose": 2,
-      "description": "a lean young man with short brown hair in a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak, leather bracers and soft leather boots, a quiver of green-fletched arrows on the back, a curved bow carved from pale antler held upright in the front hand"
+      "description": "a lean young man with short brown hair in a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak, leather bracers and soft leather boots, a quiver of green-fletched arrows on the back, a curved bow carved from pale antler held upright in the front hand in every frame, the bow moving with the hand and never vanishing"
     },
     "skin-night-raven-female": {
       "start": "art/references/walks/start/skin-night-raven-female.png",
@@ -445,12 +445,12 @@
     "skin-perun-female": {
       "start": "art/references/walks/start/skin-perun-female.png",
       "pose": 2,
-      "description": "a strong broad-shouldered young woman with a long dark braid falling from under the helmet, in dark blackened steel plate armour engraved with bright copper lightning bolts, a grey wolf fur cloak over the shoulders, a dark steel helmet with two curved aurochs horns, copper-trimmed gauntlets and dark steel boots, a long broad sword with a copper hilt held low in the front hand and a round dark shield with a copper lightning sign on the other arm"
+      "description": "a strong broad-shouldered young woman with a long dark braid falling from under the helmet, in dark blackened steel plate armour engraved with bright copper lightning bolts, a grey wolf fur cloak over the shoulders, a dark steel helmet with two curved aurochs horns, copper-trimmed gauntlets and dark steel boots, a long broad sword with a copper hilt held low in the front hand and a round dark shield with a copper lightning sign strapped to the far arm, the shield's rim showing behind the body in every frame, never hidden"
     },
     "skin-perun-male": {
       "start": "art/references/walks/start/skin-perun-male.png",
       "pose": 2,
-      "description": "a broad-shouldered young man with short dark hair and a short dark beard in dark blackened steel plate armour engraved with bright copper lightning bolts, a grey wolf fur cloak over the shoulders, a dark steel helmet with two curved aurochs horns, copper-trimmed gauntlets and dark steel boots, a long broad sword with a copper hilt held low in the front hand and a round dark shield with a copper lightning sign on the other arm"
+      "description": "a broad-shouldered young man with short dark hair and a short dark beard in dark blackened steel plate armour engraved with bright copper lightning bolts, a grey wolf fur cloak over the shoulders, a dark steel helmet with two curved aurochs horns, copper-trimmed gauntlets and dark steel boots, a long broad sword with a copper hilt held low in the front hand and a round dark shield with a copper lightning sign strapped to the far arm, the shield's rim showing behind the body in every frame, never hidden"
     }
   }
 }
