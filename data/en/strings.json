@@ -2583,5 +2583,6 @@
   "O punkt mniej": "One point less",
   "O punkt więcej": "One point more",
   "Dodaj {count} {points}": "Add {count} {points}",
-  "Punkt|Punkty|Punktów": "Point|Points"
+  "Punkt|Punkty|Punktów": "Point|Points",
+  "Do Wieży Drużyn nie wchodzi się w pojedynkę: obok Ciebie musi walczyć co najmniej {count} z graczy Twojej Drużyny albo towarzyszy z Kwater. Drużynę założysz w Społeczności, a towarzysza zwerbujesz w Karczmie w Osadzie.": "The Party Tower is never entered alone: at least {count} of your Party's players or of your companions from the Quarters must fight beside you. You can form a Party in the Community and hire a companion in the Tavern in the Settlement."
 }

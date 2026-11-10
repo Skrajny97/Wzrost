@@ -17,9 +17,9 @@
           "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
           "name": { "type": "string", "minLength": 1 },
           "place": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
-          "members": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "integer", "minimum": 1 } },
-          "companions": { "type": "boolean" },
-          "size": { "type": "integer", "minimum": 1 }
+          "members": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "integer", "minimum": 1 }, "description": "Najmniej i najwięcej postaci graczy, licząc postać, która wchodzi." },
+          "companions": { "type": "boolean", "description": "Czy wolne miejsca zajmują towarzysze z Kwater." },
+          "size": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "integer", "minimum": 1 }, "description": "Najmniej i najwięcej walczących po stronie postaci, licząc graczy i towarzyszy (Wieża Drużyn od 10.11.2026 także z samymi towarzyszami)." }
         }
       }
     },
