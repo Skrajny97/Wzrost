@@ -934,7 +934,7 @@
       "towers-lead": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Wieże czekają w zakładce Walka. Zajrzyjmy tam." },
       "towers-entries": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Każde wejście to jedna walka, z wynikiem od razu. Walczysz z pełnym HP, ale bez mikstur." },
       "towers-floor": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Po drodze czekają elity i czempioni, a co dziesiąte piętro za pierwsze zwycięstwo daje skrzynię Wieży." },
-      "towers-party": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Do Wieży Drużyn wejdziesz z jednym albo dwoma wędrowcami. Wolne miejsce zajmie towarzysz z Kwater." },
+      "towers-party": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Do Wieży Drużyn wejdziesz z wędrowcami ze swojej Drużyny albo z towarzyszami z Kwater." },
       "towers-ending": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Wejść masz kilkanaście na dzień, nowe od północy. Wieże pomogą Ci też uzupełnić dawne wpisy Bestiariusza." },
       "tap-region-desktop": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Kliknij Wiatrołomy." },
       "tap-start-desktop": { "voice": "Narrator", "model": "eleven_v3", "settings": { "stability": 0.5 }, "ending": " [pauses]", "text": "Suwak stoi na trzydziestu minutach. Kliknij „Wyrusz”." },
