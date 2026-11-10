@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.54 (10.11.2026): Wojny gildii w grze
+
+Wojny gildii (blok „Wojny gildii na wersji testowej” niżej, 792–800, makiety 792.1–792.4 v2 przyjęte przez autora) są włączone w grze (`GUILD_WARS` w `wrangler.jsonc`), bo skończony etap idzie od razu do gry (zasada autora z 1.11.2026).
+
+1. **Kiedy pierwsza wojna:** rywali gra losuje w poniedziałek, więc pierwsza wojna w grze zaczyna się w poniedziałek 16.11.2026, a pierwsze bitwy są tego dnia o 20:00. Do tego czasu zakładka „Wojna” pokazuje, że w tym tygodniu wojny nie ma, a członkowie mogą już zajmować miejsca w drużynach.
+2. **Gildia mieści 30 członków** (793 A), w grze od tej wersji.
+3. **„Test wojny”** zostaje tylko na wersji testowej.
+
 ## Wersja 0.2.53 (10.11.2026): Większy kuc w scenie Walka
 
 Autor 10.11.2026: „kuc jest za mały albo postacie za duże, reszta wierzchowców dobrze skaluje, ale kuc ma chyba złe skalowanie”.

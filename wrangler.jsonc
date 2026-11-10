@@ -86,8 +86,9 @@
     "ARENA": "on",
     // "on": the guild wars (src/server/guild-wars.js, 792–800): the Gildia's
     // Wojna tab, its teams and the battles every evening at 20:00 (the cron
-    // below). Off in the live game for now: first on the test version.
-    "GUILD_WARS": "off"
+    // below). In the live game from version 0.2.54, built on the accepted
+    // mock-ups 792 v2; the first war is drawn on the Monday after.
+    "GUILD_WARS": "on"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain

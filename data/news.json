@@ -540,6 +540,11 @@
       "id": "0.2.53",
       "title": "Wersja 0.2.53",
       "body": "- Kuc w scenie Walka jest większy: jeździec nie wygląda już na nim jak dorosły na kozie, a kuc dalej jest krępy i niższy od konia."
+    },
+    {
+      "id": "0.2.54",
+      "title": "Wersja 0.2.54",
+      "body": "- Wojny gildii: w Gildii jest nowa zakładka „Wojna”. Co tydzień gildia walczy z gildią podobnej wielkości, a bitwy drużyn 5 na 5 toczą się codziennie o 20:00. Zajmij miejsce w drużynie już teraz: pierwsza wojna zaczyna się w poniedziałek 16 listopada.\n- Za każdą wygraną bitwę zgarniesz złoto i 2 Punkty Systemu, a gildia, która wygra wojnę, zgarnie Sławę i skrzynię wojenną do Skrzyni gildii.\n- Gildia mieści teraz 30 członków, czyli 6 drużyn."
     }
 ]
 }
