@@ -425,7 +425,7 @@
     "skin-forest-lord-female": {
       "start": "art/references/walks/start/skin-forest-lord-female.png",
       "pose": 2,
-      "description": "a lean young woman with long brown hair in a loose braid, in a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak, leather bracers and soft leather boots, a quiver of green-fletched arrows on the back, a curved bow carved from pale antler held upright in the front hand in every frame, the bow moving with the hand and never vanishing"
+      "description": "a lean young woman with long brown hair in a loose braid, in a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak, leather bracers and soft leather boots, a curved bow carved from pale antler strapped upright on the back beside a quiver of green-fletched arrows, walking with both arms swinging naturally, both hands empty"
     },
     "skin-forest-lord-male": {
       "start": "art/references/walks/start/skin-forest-lord-male.png",
