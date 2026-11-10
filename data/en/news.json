@@ -416,6 +416,10 @@
     "0.2.50": {
       "title": "Version 0.2.50",
       "body": "- System Shop: a new Outfits tab. The Night Raven Cloak for the Shadow and the Forest Lord's Garb for the Archer, 800 System Points each. An outfit changes how the character looks at every evolution: on the portrait, in fights, on the march and in the saddle, always in the character's skin tone."
+    },
+    "0.2.51": {
+      "title": "Version 0.2.51",
+      "body": "- The bonus tile in the top bar (the flask with a number of fights): tap it and a list of the bonuses at work unfolds under it, with what they do and how many fights they have left."
     }
   }
 }

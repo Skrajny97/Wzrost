@@ -525,6 +525,11 @@
       "id": "0.2.50",
       "title": "Wersja 0.2.50",
       "body": "- Sklep Systemu: nowy dział „Skórki”. Płaszcz Nocnego Kruka dla Cienia i Strój Leśnego Pana dla Łucznika, po 800 Punktów Systemu. Skórka zmienia wygląd postaci przy każdej ewolucji: na portrecie, w walkach, w marszu i w siodle, zawsze w odcieniu skóry postaci."
+    },
+    {
+      "id": "0.2.51",
+      "title": "Wersja 0.2.51",
+      "body": "- Kafelek bonusów w górnym pasku (kolba z liczbą walk): dotknij go, a pod spodem rozwinie się lista działających bonusów, z tym, co dają, i ile walk im zostało."
     }
 ]
 }

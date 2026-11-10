@@ -9,7 +9,7 @@
 
 import { encyclopediaArt, goldArt, narratorFace, resourceArt, timePointsArt } from './art.js';
 import { bestiaryReady } from './bestiary.js';
-import { activeBuffs, fightsLeft } from './bonuses.js';
+import { activeBuffs, bonusList, fightsLeft } from './bonuses.js';
 import { communityNews, communityNewsText } from './chat-news.js';
 import { $, fill, h, icon } from './dom.js';
 import { formatCountdown, formatMinutes, formatNumber, formatShort } from './format.js';
@@ -139,9 +139,17 @@ export function buildTopbar(onSettings) {
   const activityTime = h('span', { class: 'activity-time' });
   const activity = h('a', { class: 'activity', href: '#/walka' }, activityLabel, activityTime);
   // The potions for a time drunk from the bag (potions.js): how long the
-  // longest of them still works on explorations.
+  // longest of them still works on explorations. A tap unfolds under the
+  // row what the bonuses are, as on Postać (the author: „niech po kliknięciu
+  // w kafelek bonusów wyświetla się pod spodem co to za bonusy”).
   const speedTime = h('span', { class: 'speed-chip-time' });
-  const speed = h('a', { class: 'speed-chip', href: '#/postac', hidden: true }, icon('flask', { size: 16 }), speedTime);
+  const bonusDrop = h('div', { class: 'bonus-drop', id: 'bonus-drop', hidden: true });
+  const speed = h(
+    'button',
+    { type: 'button', class: 'speed-chip', hidden: true, 'aria-expanded': 'false', 'aria-controls': 'bonus-drop', onClick: () => showBonuses(bonusDrop.hidden) },
+    icon('flask', { size: 16 }),
+    speedTime,
+  );
 
   // The settings, with a dot for the author when players' bug reports wait.
   // A class of its own, which the narrator points at: the label changes with
@@ -170,7 +178,7 @@ export function buildTopbar(onSettings) {
     wallet,
     // Two rows: HP over mana, character XP over class XP.
     h('div', { class: 'meters' }, hp.element, xp.element, mana.element, classXp.element),
-    h('div', { class: 'activity-row' }, encyclopedia, speed, activity),
+    h('div', { class: 'activity-row' }, encyclopedia, speed, activity, bonusDrop),
   );
   topbar = {
     settings,
@@ -198,6 +206,7 @@ export function buildTopbar(onSettings) {
     activityTime,
     speed,
     speedTime,
+    bonusDrop,
   };
   updateTopbar();
 }
@@ -243,15 +252,29 @@ function refreshWallet(now = serverNow()) {
   fill(topbar.wallet, ...walletRows(points));
 }
 
-// A tap anywhere else, or Escape, closes the list.
+// Opens or closes the bonuses at work under the bonus tile.
+function showBonuses(open) {
+  if (!topbar) return;
+  const list = open ? bonusList(state.character) : null;
+  topbar.bonusDrop.hidden = !list;
+  topbar.speed.setAttribute('aria-expanded', String(Boolean(list)));
+  topbar.bonusKey = list ? JSON.stringify(activeBuffs(state.character)) : null;
+  fill(topbar.bonusDrop, list);
+}
+
+// A tap anywhere else, or Escape, closes the lists.
 document.addEventListener('click', (event) => {
   if (topbar && !topbar.wallet.hidden && !topbar.wallet.contains(event.target) && !topbar.goldButton.contains(event.target)) {
     showWallet(false);
+  }
+  if (topbar && !topbar.bonusDrop.hidden && !topbar.bonusDrop.contains(event.target) && !topbar.speed.contains(event.target)) {
+    showBonuses(false);
   }
 });
 document.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape' || !topbar) return;
   if (!topbar.wallet.hidden) showWallet(false);
+  if (!topbar.bonusDrop.hidden) showBonuses(false);
 });
 
 export function updateTopbar(now = serverNow()) {
@@ -323,6 +346,9 @@ export function updateTopbar(now = serverNow()) {
     topbar.speedTime.textContent = fightsLeft(left);
     topbar.speed.setAttribute('aria-label', buffs.map((buff) => t('{name}, jeszcze {fights}', { name: buff.label, fights: fightsLeft(buff.fights) })).join('; '));
   }
+  // The open list follows the bonuses: redrawn when one changes, closed
+  // when none is left.
+  if (!topbar.bonusDrop.hidden && JSON.stringify(buffs) !== topbar.bonusKey) showBonuses(left > 0);
 
   const activity = character.activity;
   const { activityLabel, activityTime } = topbar;

@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.51 (10.11.2026): Bonusy pod kafelkiem w górnym pasku
+
+Autor 10.11.2026: „niech po kliknięciu w kafelek bonusów wyświetla się pod spodem co to za bonusy”.
+
+1. **Kafelek bonusów** (kolba i „6 walk” obok Encyklopedii) nie przenosi już na Postać. Dotknięcie rozwija pod paskiem listę „Aktywne bonusy”: obrazek mikstury, nazwa bonusu z tym, co daje, i ile walk mu zostało, tak jak nad postacią na Postaci. Drugie dotknięcie kafelka, dotknięcie obok albo Escape zwija listę.
+2. **Wygląd**: ramka i cień listy pod złotem, lista na całą szerokość paska na telefonie i do 420 px na komputerze; otwarty kafelek jest podświetlony. Gdy bonus się skończy, lista sama się odświeża, a bez bonusów znika razem z kafelkiem.
+
 ## Wersja 0.2.50 (10.11.2026): Skórki w Sklepie Systemu
 
 Makiety 801.1 (Płaszcz Nocnego Kruka) i 801.2 (Strój Leśnego Pana) przyjęte przez autora 10.11.2026.
