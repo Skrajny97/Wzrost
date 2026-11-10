@@ -1,0 +1,14 @@
+{
+  "id": "dawn-female-face",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art face of a beautiful young woman in three-quarter view under a golden circlet, long straight fair blond hair framing the face, two clear dark eyes of the same size and shape, a small white highlight in each eye, thin light eyebrows, a small nose with a soft shadow, a gentle closed-mouth smile, warm light skin with soft shading, a clean dark outline, the same pixel size and shading as the rest of the figure",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": "art/inputs/skins/dawn-female-face.png",
+  "mask": "art/inputs/skins/dawn-female-face-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

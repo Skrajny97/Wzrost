@@ -1,0 +1,23 @@
+{
+  "id": "dawn-male-new",
+  "tool": "pixellab generate-image-v2",
+  "description": "young man cleric in the Vestments of Dawn, a handsome friendly face with big clear eyes, a big head like the reference face, short fair blond hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, layered white and gold vestments down to the ankles, a golden sash, holding a staff topped with a small golden sun in one hand and a small book in the other, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/dawn-male.png",
+      "usage": "the same white and gold vestments, golden sash, sun staff, book and pose as this character"
+    },
+    {
+      "path": "src/client/art/portraits/cleric-male.png",
+      "usage": "the same face, eyes and big head size as this character, with short fair blond hair instead of dark hair"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

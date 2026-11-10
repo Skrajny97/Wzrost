@@ -1,0 +1,14 @@
+{
+  "id": "dawn-male-face",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art head of a handsome young man in three-quarter view, short neat fair blond hair, a well-drawn face with two clear dark eyes of the same size and shape, a small white highlight in each eye, light eyebrows, a small straight nose with a soft shadow, a calm friendly closed-mouth smile, warm light skin with soft shading, a clean dark outline around the head, the same pixel size and shading as the rest of the figure",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": "art/inputs/skins/dawn-male-face.png",
+  "mask": "art/inputs/skins/dawn-male-face-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
