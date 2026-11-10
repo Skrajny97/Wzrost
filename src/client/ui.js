@@ -327,7 +327,9 @@ export const voiceSwitch = (labelId) => switchButton(labelId, narratorVoiceOn, s
 // "Animacje" in the settings (motion.js).
 export const motionSwitch = (labelId) => switchButton(labelId, motionOn, setMotion, [t('Włączone'), t('Wyłączone')]);
 
-function switchButton(labelId, read, write, [onText, offText]) {
+// An on/off switch of the settings, as these two and "Muzyka" (app.js):
+// `read` and `write` keep the choice, the words say it.
+export function switchButton(labelId, read, write, [onText, offText]) {
   const button = h('button', { type: 'button', class: 'toggle', role: 'switch', 'aria-labelledby': labelId });
   const show = () => {
     button.setAttribute('aria-checked', String(read()));

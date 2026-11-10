@@ -46,11 +46,26 @@ export function setEffectsVolume(value) {
     // Without storage the choice lasts until the page is closed.
   }
   if (master) master.gain.value = volumeGain(volume);
+  // Raised from 0 with a finger on the slider: the effects get their audio
+  // context now (unlockSound).
+  else if (volume > 0) unlockSound();
 }
 
-// Browsers play sound only after the player has touched the page. Returns
-// the audio context, or null where the browser has none.
+// Browsers play sound only after the player has touched the page; every
+// touch calls this. The audio context is made only once the effects can be
+// heard: at 0% the game makes none for them, so a player listening to their
+// own music has none of the game's sound in the phone's audio (the author,
+// 10.11.2026, on the music off: „by można było słuchać swojej”). The music
+// makes it when it plays (audioContext, music.js). Returns the audio
+// context, or null.
 export function unlockSound() {
+  if (!context && volume === 0) return null;
+  return audioContext();
+}
+
+// The audio context of the effects, the narrator and the music, made at its
+// first need and woken at each. Null where the browser has none.
+export function audioContext() {
   if (!context) {
     const AudioContext = window.AudioContext ?? window.webkitAudioContext;
     if (!AudioContext) return null;
@@ -70,6 +85,40 @@ export function unlockSound() {
   // Safari also has the state "interrupted", e.g. after a phone call.
   if (context.state !== 'running') context.resume().catch(() => {});
   return context;
+}
+
+// The phone's other audio, such as the player's own music in another app,
+// while the game plays none of its own (the music off or at 0%, music.js):
+// the game's effects and narrator should mix with it rather than stop it
+// (the author, 10.11.2026: „Opcja wyłączenia nie tylko wyciszenia
+// głośności muzyki, by można było słuchać swojej.”). Best effort, platform
+// by platform:
+// - Safari on iPhone and iPad from iOS 16.4 (and on a Mac) has the Audio
+//   Session API. navigator.audioSession.type = 'ambient' mixes the page's
+//   sound with the other apps' audio, silenced by the silent switch as the
+//   game's sound always was; 'auto', the default, lets a playing <audio>
+//   element (the music) take over the phone's audio, as before. It is set
+//   before the audio context is made, and again at each change.
+// - Older iOS has no such setting: there sound made with the Web Audio API
+//   alone (the effects, the narrator) mixes with other audio, and only an
+//   <audio> element took the phone's audio over, which the game does not
+//   make while the music is off.
+// - Chrome on Android (and the app from Google Play, which runs in it) takes
+//   the phone's audio focus, which pauses other music, for <audio> and
+//   <video> elements, not for the Web Audio API: with the music off there is
+//   no element, so the player's music plays on under the effects.
+// - On a computer every app's sound mixes anyway.
+// Where the API is missing or refuses, nothing changes and the sound works
+// as before.
+export function mixWithOtherAudio(mix) {
+  try {
+    const session = navigator.audioSession;
+    if (!session || !('type' in session)) return;
+    const type = mix ? 'ambient' : 'auto';
+    if (session.type !== type) session.type = type;
+  } catch {
+    // As above.
+  }
 }
 
 // One oscillator note. `lowpass` softens the brighter waves (triangle,

@@ -42,7 +42,7 @@ import { mountReport } from './screens/report.js';
 import { mountSkills } from './screens/skills.js';
 import { mountStats } from './screens/stats.js';
 import { mountTrade, offerTrade } from './screens/trade.js';
-import { musicVolume, prefetchMusic, setMusicConfig, setMusicPlace, setMusicVolume, startMusic } from './music.js';
+import { musicOn, musicVolume, prefetchMusic, setMusicConfig, setMusicOn, setMusicPlace, setMusicVolume, startMusic } from './music.js';
 import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
 import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from './zoom.js';
@@ -54,7 +54,7 @@ import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound 
 import { call, filledForCollector, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn, unlockInfo } from './state.js';
 import { offerPointsReset, openEvolutionTests } from './evolution.js';
 import { giftCodeRow } from './gift-code.js';
-import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, skinSwatches, toast, voiceSwitch, withButton } from './ui.js';
+import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, skinSwatches, switchButton, toast, voiceSwitch, withButton } from './ui.js';
 
 const views = {
   loading: $('#view-loading'),
@@ -601,6 +601,34 @@ function volumeRow(id, label, value, change, preview) {
   return h('div', { class: 'status-row status-row--volume' }, h('dt', {}, h('label', { for: id, text: label })), h('dd', {}, slider, output));
 }
 
+// "Muzyka": a switch that turns the music off for good, not only down (the
+// author, 10.11.2026: „Opcja wyłączenia nie tylko wyciszenia głośności
+// muzyki, by można było słuchać swojej.”), with a line on what it is for,
+// and under it, while the music is on, its volume. Off, no track downloads
+// or plays (music.js) and the game's sounds leave the phone's other audio
+// playing where the phone lets them (sound.js).
+function musicRows() {
+  const volume = volumeRow('music-volume', t('Głośność muzyki'), musicVolume(), setMusicVolume);
+  volume.hidden = !musicOn();
+  // The same switch as "Głos narratora" and "Animacje" (ui.js).
+  const toggle = switchButton('music-label', musicOn, setMusicOn, [t('Włączona'), t('Wyłączona')]);
+  toggle.setAttribute('aria-describedby', 'music-hint');
+  // After the switch's own listener, which has set it.
+  toggle.addEventListener('click', () => {
+    volume.hidden = !musicOn();
+  });
+  return [
+    h(
+      'div',
+      { class: 'status-row status-row--hinted' },
+      h('dt', { id: 'music-label', text: t('Muzyka') }),
+      h('dd', {}, toggle),
+      h('dd', { class: 'status-hint', id: 'music-hint', text: t('Wyłącz, żeby słuchać własnej muzyki: gra nie będzie wtedy pobierać ani odtwarzać swojej.') }),
+    ),
+    volume,
+  ];
+}
+
 // The size of the game on the screen (zoom.js): "−" takes it farther, "+"
 // closer, 5% at a time.
 // "Układ ekranu" (473 A): the computer's layout on its own on a wide screen
@@ -875,7 +903,7 @@ function openSettings() {
       lookRow(),
       skinRow(),
       googleRow(),
-      volumeRow('music-volume', t('Muzyka'), musicVolume(), setMusicVolume),
+      musicRows(),
       volumeRow('effects-volume', t('Efekty dźwiękowe'), effectsVolume(), setEffectsVolume, () => playSound('system')),
       h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: t('Głos narratora') }), h('dd', {}, voiceSwitch('voice-label'))),
       tutorialsRow(),

@@ -2583,5 +2583,7 @@
   "O punkt mniej": "One point less",
   "O punkt więcej": "One point more",
   "Dodaj {count} {points}": "Add {count} {points}",
-  "Punkt|Punkty|Punktów": "Point|Points"
+  "Punkt|Punkty|Punktów": "Point|Points",
+  "Głośność muzyki": "Music volume",
+  "Wyłącz, żeby słuchać własnej muzyki: gra nie będzie wtedy pobierać ani odtwarzać swojej.": "Turn it off to listen to your own music: the game then neither downloads nor plays its own."
 }

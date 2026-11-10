@@ -7,13 +7,24 @@
 // starts again after a short pause. The volume is set in the settings and
 // kept in this browser.
 //
+// The music can also be switched off in the settings, for good and not only
+// turned down, so the player can listen to their own (the author,
+// 10.11.2026: „Opcja wyłączenia nie tylko wyciszenia głośności muzyki, by
+// można było słuchać swojej.”). Off, kept in this browser like the volume:
+// no track is downloaded or played and no <audio> element is made for it;
+// switched off while it plays, the element goes with its files. While the
+// game plays no music, off or at 0%, its effects and the narrator mix with
+// the phone's other audio where the browser lets the page say so
+// (mixWithOtherAudio, sound.js).
+//
 // A track is downloaded whole and played from memory: Safari plays sound
 // files only from servers that send them in parts, which the game's static
 // files do not. The <audio> element goes through the shared audio context
 // (sound.js), because Safari on iPhone ignores the element's own volume.
 
-import { clampVolume, unlockSound, volumeGain } from './sound.js';
+import { audioContext, clampVolume, mixWithOtherAudio, volumeGain } from './sound.js';
 
+const ON_KEY = 'insight.music';
 const VOLUME_KEY = 'insight.musicVolume';
 // 100% at first: with effects at 40% the author found the two best balanced.
 const DEFAULT_VOLUME = 100;
@@ -22,12 +33,14 @@ const DEFAULT_VOLUME = 100;
 const MUSIC_LEVEL = 0.5;
 
 let config = null; // content.music
+let on = readOn();
 let volume = readVolume();
 let wanted = null; // the track for the screen on show
 let playing = null; // the track in the element
 let touched = false; // browsers play sound only after a touch
 let gameShown = false; // the game's own screen is up (prefetchMusic)
 let audio = null;
+let element = null; // the audio context's source for the element
 let level = null; // gain: the player's volume
 let fade = null; // gain: the end of a track and the change of tracks
 let duck = null; // gain: lower while the narrator speaks
@@ -37,6 +50,15 @@ let restart = null; // the pause between two plays of a track
 let switching = false;
 const sources = new Map(); // track id → a promise of its file in memory
 const positions = new Map(); // track id → the second it stopped at
+let downloads = new AbortController(); // stops the downloads when switched off
+
+function readOn() {
+  try {
+    return localStorage.getItem(ON_KEY) !== 'off';
+  } catch {
+    return true;
+  }
+}
 
 function readVolume() {
   try {
@@ -48,6 +70,14 @@ function readVolume() {
 }
 
 export const musicVolume = () => volume;
+export const musicOn = () => on;
+
+// Whether the game plays music at all: switched on and above 0%.
+const heard = () => on && volume > 0;
+
+// Before any sound is made: an audio context made later takes the phone's
+// audio as this says (sound.js).
+mixWithOtherAudio(!heard());
 
 export function setMusicVolume(value) {
   volume = clampVolume(value);
@@ -56,7 +86,21 @@ export function setMusicVolume(value) {
   } catch {
     // Without storage the choice lasts until the page is closed.
   }
+  mixWithOtherAudio(!heard());
   applyVolume();
+  update();
+}
+
+// "Muzyka" in the settings: on, or off for good (above).
+export function setMusicOn(value) {
+  on = Boolean(value);
+  try {
+    localStorage.setItem(ON_KEY, on ? 'on' : 'off');
+  } catch {
+    // Without storage the choice lasts until the page is closed.
+  }
+  mixWithOtherAudio(!heard());
+  if (!on) tearDown();
   update();
 }
 
@@ -74,7 +118,7 @@ export function prefetchMusic() {
   if (gameShown) return;
   gameShown = true;
   setTimeout(() => {
-    if (config && volume > 0) source(wanted).catch(() => {});
+    if (config && heard()) source(wanted).catch(() => {});
   }, PREFETCH_DELAY);
 }
 
@@ -93,7 +137,7 @@ export function setMusicPlace(places, report = null) {
 // The report tracks load while an exploration lasts, so the music can change
 // as soon as its report opens.
 export function preloadReportMusic() {
-  if (!config || volume === 0) return;
+  if (!config || !heard()) return;
   for (const id of new Set(Object.values(config.reports))) source(id).catch(() => {});
 }
 
@@ -109,23 +153,28 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function source(id) {
+  // Nothing downloads while the music is off.
+  if (!on) return Promise.reject(new Error('music off'));
   if (!sources.has(id)) {
     const track = config.tracks.find((candidate) => candidate.id === id);
-    const loading = fetch(`/${track.file}`)
+    const loading = fetch(`/${track.file}`, { signal: downloads.signal })
       .then((response) => {
         if (!response.ok) throw new Error(`music ${response.status}`);
         return response.blob();
       })
       .then((blob) => URL.createObjectURL(blob));
-    // A failed download is tried again later.
-    loading.catch(() => sources.delete(id));
+    // A failed download is tried again later (one stopped by the switch
+    // leaves the downloads begun after it alone).
+    loading.catch(() => {
+      if (sources.get(id) === loading) sources.delete(id);
+    });
     sources.set(id, loading);
   }
   return sources.get(id);
 }
 
 function update() {
-  if (!config || !touched || volume === 0 || document.hidden) {
+  if (!config || !touched || !heard() || document.hidden) {
     pause();
     return;
   }
@@ -135,7 +184,7 @@ function update() {
 }
 
 function setUp() {
-  const context = unlockSound();
+  const context = audioContext();
   audio = new Audio();
   audio.addEventListener('timeupdate', fadeOutNearEnd);
   audio.addEventListener('ended', pauseThenRestart);
@@ -144,9 +193,36 @@ function setUp() {
     fade = context.createGain();
     duck = context.createGain();
     duck.gain.value = ducked ? DUCK_LEVEL : 1;
-    context.createMediaElementSource(audio).connect(fade).connect(level).connect(duck).connect(context.destination);
+    element = context.createMediaElementSource(audio);
+    element.connect(fade).connect(level).connect(duck).connect(context.destination);
   }
   applyVolume();
+}
+
+// Switched off: the element goes, unhooked from the audio context, with the
+// files downloaded and the downloads under way, and the phone's lock screen
+// no longer names a track of the game. Switched on again, all starts anew.
+function tearDown() {
+  pause();
+  downloads.abort();
+  downloads = new AbortController();
+  for (const loading of sources.values()) loading.then((url) => URL.revokeObjectURL(url), () => {});
+  sources.clear();
+  positions.clear();
+  if (audio) {
+    audio.removeEventListener('timeupdate', fadeOutNearEnd);
+    audio.removeEventListener('ended', pauseThenRestart);
+    audio.removeAttribute('src');
+    audio.load();
+  }
+  for (const node of [element, fade, level, duck]) node?.disconnect();
+  audio = element = level = fade = duck = null;
+  playing = null;
+  try {
+    if ('mediaSession' in navigator) navigator.mediaSession.metadata = null;
+  } catch {
+    // Only the lock screen's words.
+  }
 }
 
 // While the narrator speaks, the music steps back to a quarter of its level,
@@ -181,8 +257,8 @@ function setFade(value, seconds = 0) {
 }
 
 function play() {
-  if (!audio.src) return;
-  unlockSound();
+  if (!audio?.src) return;
+  audioContext();
   fading = false;
   if (audio.ended) audio.currentTime = 0;
   const id = playing;
@@ -217,6 +293,7 @@ async function changeTrack() {
     if (playing && !audio.paused) {
       setFade(0, config.switchSeconds);
       await new Promise((resolve) => setTimeout(resolve, config.switchSeconds * 1000));
+      if (!audio) return;
     }
     let id;
     let url;
@@ -224,6 +301,8 @@ async function changeTrack() {
       id = wanted;
       url = await source(id);
     } while (id !== wanted);
+    // Switched off while the file came (tearDown).
+    if (!audio) return;
     // Back to the same track within the fade: it simply fades in again.
     if (id !== playing) {
       if (playing) keepPosition();
@@ -254,7 +333,7 @@ async function changeTrack() {
   } finally {
     switching = false;
   }
-  if (playing === wanted && touched && volume > 0 && !document.hidden) play();
+  if (audio && playing === wanted && touched && heard() && !document.hidden) play();
 }
 
 // Where the leaving track stopped. From its fading end it would start over.
@@ -281,8 +360,9 @@ function pauseThenRestart() {
   fading = false;
   restart = setTimeout(() => {
     restart = null;
+    if (!audio) return;
     audio.currentTime = 0;
     setFade(1);
-    if (!document.hidden && volume > 0) play();
+    if (!document.hidden && heard()) play();
   }, config.pauseSeconds * 1000);
 }
