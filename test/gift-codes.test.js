@@ -106,6 +106,26 @@ describe('gift codes in the engine', () => {
     assert.equal(giftCodeOf('PC', Date.parse('2026-11-05T12:00:00+01:00'), [], content, key('Kodowiec')).reason, 'unknown');
   });
 
+  test('KAWA50, KAWA150 and KAWA100 give their Punkty Systemu once, each to one character only, until the end of 10 December in Warsaw', () => {
+    // The author, 10.11.2026: one-time codes for the players who bought
+    // him a coffee; the data keeps their names' keys only.
+    for (const [id, code, points] of [
+      ['coffee-2026-11-a', 'KAWA50', 50],
+      ['coffee-2026-11-b', 'KAWA150', 150],
+      ['coffee-2026-11-c', 'KAWA100', 100],
+    ]) {
+      const gift = content.giftCodes.find((each) => each.id === id);
+      assert.equal(gift.code, code);
+      assert.match(gift.for, /^[0-9a-f]{64}$/);
+      assert.deepEqual(gift.rewards, { systemPoints: points });
+      assert.equal(gift.until, '2026-12-11T00:00:00+01:00');
+      assert.equal(giftCodeOf(code.toLowerCase(), Date.parse('2026-12-10T23:59:00+01:00'), [], content, gift.for).gift, gift);
+      assert.equal(giftCodeOf(code, Date.parse('2026-12-11T00:00:00+01:00'), [], content, gift.for).reason, 'expired');
+      assert.equal(giftCodeOf(code, Date.parse('2026-11-11T12:00:00+01:00'), [id], content, gift.for).reason, 'used');
+      assert.equal(giftCodeOf(code, Date.parse('2026-11-11T12:00:00+01:00'), [], content, key('Kodowiec')).reason, 'unknown');
+    }
+  });
+
   test('the rewards in words, and the resources added to what the character has', () => {
     assert.equal(giftRewardsText(tester.rewards, content), 'Punkty Systemu +100, Punkty Czasu +100, złoto +1000, drewno +100, kamień +100, ruda żelaza +100');
     assert.deepEqual(withGiftResources({ wood: 5 }, tester.rewards), { wood: 105, stone: 100, 'iron-ore': 100 });

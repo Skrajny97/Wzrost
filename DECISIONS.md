@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.35 (10.11.2026): kody za kawę
+
+Autor: „Dodaj kody podarunkowe jednorazowe na Punkty Systemu, dedykowane dla konkretnych graczy, którzy postawili mi kawę”. Trzy kody, każdy tylko dla jednej postaci (w danych skrót SHA-256 imienia zamiast imienia, jak przy kodzie PC): `KAWA50` (50 Punktów Systemu), `KAWA150` (150) i `KAWA100` (100). Każdy działa raz, do 10.12.2026 włącznie (brakujący szczegół: miesiąc, jak przy kodzie 100). Kody nie trafiają do „Co nowego?”, bo są dla tych trzech postaci; autor przekazuje je sam.
+
 ## Wersja 0.2.34 (9.11.2026): kod TIGER tydzień dłużej
 
 Pytanie 756 (kod TIGER wygasał 10.11 o 00:00), autor: „756 B”. Kod `TIGER` (500 Punktów Systemu, raz na konto) działa do poniedziałku 16.11 włącznie (`until` 2026-11-17T00:00:00+01:00 w `data/gift-codes.json`). Kto już go odebrał, nie odbierze drugi raz.

@@ -78,6 +78,27 @@
       "for": "e7da9769f19118cab21a9bae79893df98543899b8af45126195c3a4bc34627f0",
       "until": "2026-11-18T00:00:00+01:00",
       "rewards": { "timePoints": 60 }
+    },
+    {
+      "id": "coffee-2026-11-a",
+      "code": "KAWA50",
+      "for": "8cb1a49cf463b32920ab8b48938b19d73b6d04c18d156f2518a94ef00f6658e4",
+      "until": "2026-12-11T00:00:00+01:00",
+      "rewards": { "systemPoints": 50 }
+    },
+    {
+      "id": "coffee-2026-11-b",
+      "code": "KAWA150",
+      "for": "cc4ad2c601d0f29b9327da89da827408f602a9b6ea1a0f183acdaf10ed95956b",
+      "until": "2026-12-11T00:00:00+01:00",
+      "rewards": { "systemPoints": 150 }
+    },
+    {
+      "id": "coffee-2026-11-c",
+      "code": "KAWA100",
+      "for": "bab0b06ff825c848fe81efa6c314c97148bcfa6928141c12f11f8663ff9b1c7d",
+      "until": "2026-12-11T00:00:00+01:00",
+      "rewards": { "systemPoints": 100 }
     }
   ],
   "moves": [
