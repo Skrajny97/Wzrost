@@ -301,7 +301,11 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       fill(fightBox, header, systemPanel(t('Ta walka nie ma zapisu do odtworzenia: raport powstał przed tą aktualizacją gry.')), pager);
       return;
     }
-    arena = createArena(data, { autoplay: autoplay ?? (firstPlayback ? 'visible' : 'now') });
+    // An exploration's fights play on its land's board (data/regions.json,
+    // fightBoard); a tower's, a portal's and the Sala prób's keep the plain
+    // ground of the playback.
+    const board = report.tower || report.portal || report.hall ? null : (state.content.regions.find((region) => region.id === report.regionId)?.fightBoard ?? null);
+    arena = createArena(data, { autoplay: autoplay ?? (firstPlayback ? 'visible' : 'now'), board });
     firstPlayback = false;
     // The narrator lights the fight playing here together with the tabs.
     arena.arena.dataset.guide = 'report-fight';

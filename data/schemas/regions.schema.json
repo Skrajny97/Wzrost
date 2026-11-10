@@ -45,6 +45,11 @@
       "safe": {
         "type": "boolean"
       },
+      "fightBoard": {
+        "type": "string",
+        "pattern": "^[a-z0-9-]+$",
+        "description": "Tło planszy walk wypraw w tej krainie (src/client/art/boards), pod szykiem w powtórce walki w raporcie, jak piasek Areny (790 B)."
+      },
       "description": {
         "type": "string",
         "minLength": 1

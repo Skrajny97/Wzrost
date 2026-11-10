@@ -14,6 +14,7 @@
     },
     "elite": "wisp",
     "resources": { "wood": 5, "stone": 3, "iron-ore": 2 },
+    "fightBoard": "board-windfalls",
     "areas": [
       {
         "id": "windfalls-edge",
@@ -146,6 +147,7 @@
     },
     "elite": "likho",
     "resources": { "wood": 3, "stone": 5, "iron-ore": 2 },
+    "fightBoard": "board-stone-glade",
     "areas": [
       {
         "id": "mossy-boulders",
@@ -283,6 +285,7 @@
     },
     "elite": "drowned-maiden",
     "resources": { "wood": 4, "stone": 2, "iron-ore": 4 },
+    "fightBoard": "board-backwaters",
     "areas": [
       {
         "id": "reed-beds",
@@ -404,6 +407,7 @@
     },
     "elite": "kikimora",
     "resources": { "wood": 2, "stone": 3, "iron-ore": 5 },
+    "fightBoard": "board-peat-bogs",
     "areas": [
       {
         "id": "crane-meadows",
@@ -537,6 +541,7 @@
     },
     "elite": "mamuna",
     "resources": { "wood": 3, "stone": 1, "iron-ore": 6 },
+    "fightBoard": "board-black-bog",
     "areas": [
       {
         "id": "black-alder-carr",
@@ -659,6 +664,7 @@
     },
     "elite": "noon-wraith",
     "resources": { "wood": 6, "stone": 2, "iron-ore": 2 },
+    "fightBoard": "board-pine-dunes",
     "areas": [
       {
         "id": "heather-dunes",
@@ -780,6 +786,7 @@
     },
     "elite": "nightingale-robber",
     "resources": { "wood": 5, "stone": 3, "iron-ore": 2 },
+    "fightBoard": "board-silent-wilds",
     "areas": [
       {
         "id": "spruce-dusk",
@@ -903,6 +910,7 @@
     },
     "elite": "plague-maiden",
     "resources": { "wood": 4, "stone": 4, "iron-ore": 2 },
+    "fightBoard": "board-new-moon-depths",
     "areas": [
       {
         "id": "creaking-pines",

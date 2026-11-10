@@ -223,8 +223,8 @@ test('every sprite on the list has its file at its size, and every class has its
     // The Sklep Systemu's frames and backgrounds.
     cosmetics: data('cosmetics').items.filter((item) => item.kind !== 'mountSkin').map((item) => item.art),
     riders: [...data('classes'), ...data('evolutions').evolutions, ...outfits].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
-    // The fights' boards of the places (790 B).
-    boards: data('settlement').places.flatMap((place) => place.fightBoard ?? []),
+    // The fights' boards of the places (790 B) and of the lands (802).
+    boards: [...data('settlement').places.flatMap((place) => place.fightBoard ?? []), ...data('regions').flatMap((region) => region.fightBoard ?? [])],
   };
   for (const [kind, { size, width = size, height = size, fit = false, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);

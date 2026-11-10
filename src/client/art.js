@@ -357,11 +357,11 @@ export const SPRITES = {
   },
   // The fights' boards under the formation of a fight's playback (arena.js;
   // 790 B, the Arena's sand), 192×160, a place's fightBoard in
-  // data/settlement.json.
+  // data/settlement.json and a land's in data/regions.json.
   boards: {
     width: 192,
     height: 160,
-    ids: ['arena-board'],
+    ids: ['arena-board', 'board-windfalls', 'board-stone-glade', 'board-backwaters', 'board-peat-bogs', 'board-black-bog', 'board-pine-dunes', 'board-silent-wilds', 'board-new-moon-depths'],
   },
   // The buildings of the Siedziba Gildii (data/guilds.json, seat), by the
   // building's id, 128×96 on a transparent ground: the first look the

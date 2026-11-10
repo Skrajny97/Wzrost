@@ -314,6 +314,9 @@ export function publicContent() {
       safe: region.safe,
       description: region.description,
       trait: { name: region.trait.name, description: region.trait.description },
+      // The board under the formation of the land's fights in a report's
+      // playback (src/client/art/boards).
+      fightBoard: region.fightBoard ?? null,
       // The land's Bestiariusz: every creature of its inner regions, with
       // a chest of its own.
       dangers: regionDangers(region, game).map(dangerView(game)),
