@@ -22,6 +22,7 @@ let evolutions = true;
 let settlement = false;
 let fortress = false;
 let english = false;
+let arena = false;
 
 export function readFeatures(env) {
   professions = env.PROFESSIONS === 'on';
@@ -33,6 +34,7 @@ export function readFeatures(env) {
   settlement = env.SETTLEMENT === 'on';
   fortress = env.FORTRESS === 'on';
   english = env.ENGLISH === 'on';
+  arena = env.ARENA === 'on';
 }
 
 export const professionsOn = () => professions;
@@ -52,6 +54,12 @@ export const fortressOn = () => fortress;
 // The English beta (i18n.js): the language of each request and the choice
 // of it, first only where ENGLISH is "on".
 export const englishOn = () => english;
+// The Arena in the Osada (pvp-arena.js), only where ARENA is "on": off in
+// the live game until its building's picture is drawn and approved. Off,
+// nothing of it shows: not its place on the Osada's board (`feature` in
+// data/settlement.json), its unlock nor its System message.
+export const arenaOn = () => arena;
+export const placeOn = (place) => place.feature !== 'arena' || arena;
 // A camp building of the Osada's (Kwatery, `settlement` in buildings.json)
 // stands only where the Osada is on, and one of the Warownia's (`fortress`)
 // only where the Warownia is; the others everywhere.

@@ -8,7 +8,7 @@
 // content (skill-demo.js, encyclopedia.js) is kept for each language apart.
 
 import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, evolutionArt, landBestiaryChest, meetingChances, ordinaryMaterial, overlayTexts, regionDangers } from '../engine/index.js';
-import { buildingOn, craftingOn, evolutionsOn, settlementOn } from './features.js';
+import { arenaOn, buildingOn, craftingOn, evolutionsOn, placeOn, settlementOn } from './features.js';
 import { language, languageOffered, pageDictionary } from './i18n.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
@@ -187,7 +187,7 @@ function prepare(built, lang) {
   // The parts of the game this deployment has on, for the System's messages
   // about them (unlocks.json `feature`): read when asked, as the switches are
   // read for each request (features.js).
-  Object.defineProperty(built, 'features', { get: () => [...(craftingOn() ? ['crafting'] : []), ...(settlementOn() ? ['settlement'] : [])] });
+  Object.defineProperty(built, 'features', { get: () => [...(craftingOn() ? ['crafting'] : []), ...(settlementOn() ? ['settlement'] : []), ...(arenaOn() ? ['arena'] : [])] });
 
   // The class evolutions, where the deployment has them on (features.js).
   // Where they are off the game plays as before them: the class grows past
@@ -197,8 +197,12 @@ function prepare(built, lang) {
     on: { evolutions: built.evolutions, evolutionsById: built.evolutionsById, evolutionSkills: built.evolutionSkills, unlocks: built.unlocks },
     off: { evolutions: [], evolutionsById: {}, evolutionSkills: [], unlocks: built.unlocks.filter((unlock) => unlock.id !== 'evolution') },
   };
+  // The Arena's unlock only where the Arena is on (features.js), so its
+  // level shows nowhere else.
+  const unlocksWithout = Object.fromEntries(Object.entries(evolutionParts).map(([state, parts]) => [state, parts.unlocks.filter((unlock) => unlock.id !== 'arena')]));
+  const state = () => (evolutionsOn() ? 'on' : 'off');
   for (const key of Object.keys(evolutionParts.on)) {
-    Object.defineProperty(built, key, { get: () => evolutionParts[evolutionsOn() ? 'on' : 'off'][key] });
+    Object.defineProperty(built, key, { get: () => (key === 'unlocks' && !arenaOn() ? unlocksWithout[state()] : evolutionParts[state()][key]) });
   }
   return built;
 }
@@ -331,7 +335,7 @@ export function publicContent() {
     buildings: game.buildings.filter(buildingOn).map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
     // The places of the Osada's board, for their shortcuts under the Osada
     // in the computer's menu (src/client/layout.js).
-    settlementPlaces: (game.settlement?.places ?? []).map(({ id, name, soon }) => ({ id, name, ...(soon && { soon: true }) })),
+    settlementPlaces: (game.settlement?.places ?? []).filter(placeOn).map(({ id, name, soon }) => ({ id, name, ...(soon && { soon: true }) })),
     // With the family of the creature that leaves it, for its icon, and
     // `trophy` for an elite's or a champion's, which no order for any
     // materials takes ("Poproś gildię", src/client/guild-requests.js).

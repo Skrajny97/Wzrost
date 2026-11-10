@@ -57,10 +57,11 @@ describe('content', () => {
   });
 
   // The shortcuts under the Osada in the computer's menu (507 A) name its
-  // places as its board does.
+  // places as its board does; the Arena's only where ARENA is on
+  // (pvp-arena.test.js).
   test("names the Osada's places for the computer's menu", async () => {
     const { data } = await call('GET', '/api/content');
-    assert.deepEqual(data.settlementPlaces, content.settlement.places.map(({ id, name }) => ({ id, name })));
+    assert.deepEqual(data.settlementPlaces, content.settlement.places.filter((place) => !place.feature).map(({ id, name }) => ({ id, name })));
   });
 });
 

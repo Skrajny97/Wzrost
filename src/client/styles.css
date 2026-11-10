@@ -15573,3 +15573,132 @@ a.discord-button {
   justify-content: flex-end;
   min-width: 0;
 }
+
+/* The Arena in the Osada (src/client/pvp-arena.js, 762 A): the rating in
+   the System's letters over the place and the fights left; each rival a
+   card with its bust, its words beside it and "Walcz" under them on a
+   phone, at their right on a wider screen; the last fight's card edged by
+   its result; the defences in their colours; the rewards of the places
+   in rows. Long names and big numbers wrap instead of leaving the card. */
+.pvp-arena-status p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.pvp-arena-rating {
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 22px;
+}
+
+.pvp-arena-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pvp-arena-heading {
+  margin: 4px 0 0;
+  font-size: 17px;
+}
+
+.pvp-arena-rival {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px 12px;
+}
+
+.pvp-arena-rival-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.pvp-arena-rival-text p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.pvp-arena-rival-name .chat-name {
+  max-width: 100%;
+  font-size: 17px;
+}
+
+.pvp-arena-fight {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 600px) {
+  .pvp-arena-rival {
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+  }
+
+  .pvp-arena-fight {
+    grid-column: auto;
+  }
+}
+
+.pvp-arena-last p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.pvp-arena-result {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.pvp-arena-last--win {
+  border-color: rgba(167, 196, 127, 0.6);
+}
+
+.pvp-arena-last--win .pvp-arena-result {
+  color: var(--leaf);
+}
+
+.pvp-arena-last--loss {
+  border-color: rgba(239, 154, 133, 0.6);
+}
+
+.pvp-arena-last--loss .pvp-arena-result {
+  color: var(--danger);
+}
+
+.pvp-arena-defence {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: anywhere;
+}
+
+.pvp-arena-defence:last-child {
+  border-bottom: 0;
+}
+
+.pvp-arena-defence--win {
+  color: var(--leaf);
+}
+
+.pvp-arena-defence--loss {
+  color: var(--danger);
+}
+
+.pvp-arena-due p,
+.pvp-arena-season {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.pvp-arena-tier {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.pvp-arena-tier:last-child {
+  border-bottom: 0;
+}

@@ -2601,5 +2601,11 @@
   "Do Wieży Drużyn nie wchodzi się w pojedynkę: obok Ciebie musi walczyć co najmniej {count} z graczy Twojej Drużyny albo towarzyszy z Kwater. Drużynę założysz w Społeczności, a towarzysza zwerbujesz w Karczmie w Osadzie.": "The Party Tower is never entered alone: at least {count} of your Party's players or of your companions from the Quarters must fight beside you. You can form a Party in the Community and hire a companion in the Tavern in the Settlement.",
   "{name} musi najpierw wybrać w zdarzeniu z poprzedniej wyprawy.": "{name} must first choose in the event of the previous exploration.",
   "Twój czekający raport został odebrany, gdy drużyna wyruszała.": "Your waiting report was claimed as the party set out.",
-  "Zobacz raport": "See the report"
+  "Zobacz raport": "See the report",
+  "Remis": "Draw",
+  "Arena": "Arena",
+  "Ocena": "Rating",
+  "Wczytywanie Areny…": "Loading the Arena…",
+  "Arena zmieniła się w międzyczasie. Spróbuj jeszcze raz.": "The Arena changed in the meantime. Try once more.",
+  "Areny jeszcze nie ma.": "There is no Arena yet."
 }

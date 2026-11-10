@@ -35,6 +35,9 @@
     },
     "trial-hall": {
       "name": "Trial Hall"
+    },
+    "arena": {
+      "name": "Arena"
     }
   },
   "residents": {
@@ -389,6 +392,53 @@
       "lost": [
         "The trial failed. The next one tomorrow."
       ]
+    }
+  },
+  "arena": {
+    "texts": {
+      "intro": "In the Arena you face other players' characters. Your rival need not be in the game: their character defends itself.",
+      "rules": "Fights a day: {perDay}, from midnight. You pick one of three rivals with a similar rating, and the fight takes place at once: your character against the rival's character as it is saved now, with its stats, gear, skills and evolution, but without companions, mercenaries and potions. Both sides have more HP than usual, so that the fight lasts a few rounds: {hpFactor} times as much for two characters of your level. After {moves} moves the judge ends the fight: whoever has more HP left wins, and when both have almost the same left, it is a draw.",
+      "ratingRules": "The rating starts at {start}. A win raises it and a loss lowers it, the more so the bigger the gap between the ratings: a win against a higher-rated rival brings you more. When someone challenges your character, its rating moves less. On the first day of each month a new season begins: every rating then moves {share}% of the way back to {start}.",
+      "tableRules": "The week's table lists the characters that fought in the Arena at least once this week, by rating. On Monday at midnight the table closes, and your place in it brings you System Points and gold. You claim the reward here.",
+      "rating": "Rating: {rating}",
+      "place": "Place {place} on the week's table",
+      "noPlace": "Fight once, and you join the week's table.",
+      "fightsLeft": "Fights today: {left} of {perDay}",
+      "used": "Today's fights are behind you. The next ones from midnight.",
+      "mercenary": "A character serving as a mercenary does not fight in the Arena.",
+      "rivals": "Choose a rival",
+      "noRivals": "There are no rivals in the Arena yet. Look in later.",
+      "rival": "{className} · lvl {level} · rating {rating}",
+      "stake": "Win, and you gain {win} rating points; lose, and you drop {loss}.",
+      "fight": "Fight",
+      "last": "Last fight",
+      "win": "Fight with {name}: won.",
+      "loss": "Fight with {name}: lost.",
+      "draw": "Fight with {name}: a draw.",
+      "change": "Rating: {before} → {after} ({change})",
+      "limitWin": ["After {moves} moves the judge ends the fight: {name} has more HP left."],
+      "limitDraw": ["After {moves} moves the judge ends the fight: both sides have almost the same HP left, so it is a draw."],
+      "defences": "Defences since your last visit",
+      "noDefences": "No one has challenged your character since your last visit.",
+      "defenceWin": "{name} ({className}, lvl {level}): defence won, rating {change}.",
+      "defenceLoss": "{name} ({className}, lvl {level}): defence lost, rating {change}.",
+      "defenceDraw": "{name} ({className}, lvl {level}): a draw, rating {change}.",
+      "tabFights": "Fights",
+      "tabTable": "Week's table",
+      "tableEnds": "The table closes in {time}.",
+      "tableEmpty": "No one has fought in the Arena this week yet.",
+      "ownPlace": "Your place: {place} · rating {rating}",
+      "rewards": "Weekly rewards",
+      "tierOne": "Place {from}",
+      "tierMany": "Places {from}–{to}",
+      "tierRest": "From place {from}",
+      "due": "For place {place} in the week from {date} you get:",
+      "claim": "Claim",
+      "claimed": "Arena reward claimed.",
+      "season": "The season lasts {time} more. Then every rating moves {share}% of the way back to {start}.",
+      "locked": "You unlock the Arena at character level {level}.",
+      "gone": "This rival is no longer on the list. Choose another.",
+      "noReward": "This reward is no longer there to claim."
     }
   },
   "tavern": {
