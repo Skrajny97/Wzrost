@@ -26,3 +26,17 @@ export const inCategory = (entries, categoryOf, id) => (id === ALL ? entries : e
 
 // The category to show: the one chosen while it holds something, else all.
 export const shownCategory = (chosen, categories) => (categories.some(({ id }) => id === chosen) ? chosen : ALL);
+
+// The filters for the character over the players' offers, with the
+// categories above under each (the author, 10.11.2026: "Wywalić aktualne
+// filtry Targowiska i zrobić bardziej przydatne - Licytowane przeze mnie, Do
+// założenia przeze mnie (czy tam moją klasę). Aktualne czyli podzial na
+// rodzaj przedmiotu może pozostać jako podkategorie."): "Dla mnie", the
+// items the character could wear now, as "Załóż" asks (`equipBlock` null:
+// its class and the item's Tier, src/engine/items.js), and "Licytuję", the
+// auctions with its bid (`myBid`), leading or outbid.
+export const FOR_ME = 'for-me';
+export const BIDDING = 'bidding';
+export const forMe = (offer) => offer.goods.kind === 'item' && offer.equipBlock === null;
+export const bidding = (offer) => offer.myBid !== null && offer.myBid !== undefined;
+export const inOfferFilter = (offers, id) => (id === FOR_ME ? offers.filter(forMe) : id === BIDDING ? offers.filter(bidding) : offers);

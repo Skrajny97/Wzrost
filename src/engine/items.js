@@ -130,6 +130,20 @@ export const baseClassLevel = (baseId, content) => content.basesById[baseId].cla
 export const canUse = (baseId, classId, content, classLevel) =>
   (baseClasses(baseId, content)?.includes(classId) ?? true) && (classLevel === undefined || classLevel >= baseClassLevel(baseId, content));
 
+// Why a character of `classId` at `classLevel` cannot wear `item` now, as
+// the Postać's "Załóż" refuses it (src/server/inventory.js): its slot is
+// still locked ('slot_locked'), its class cannot use the base
+// ('wrong_class'), or the base's Tier asks for a higher class level
+// ('class_level'), whatever the item's own level; null when it can. The
+// Targowisko's "Dla mnie" and the slot's list of items to wear (the author,
+// 10.11.2026) ask the same.
+export function equipBlock(item, classId, classLevel, content) {
+  if (content.slotsById[item.slot]?.locked) return 'slot_locked';
+  if (!canUse(item.base, classId, content)) return 'wrong_class';
+  if (!canUse(item.base, classId, content, classLevel)) return 'class_level';
+  return null;
+}
+
 // Loot favours the slots the character has empty, only ever holds what its
 // class can use, and while it has no weapon a weapon is always one of its
 // class. It picks a family, as often as if each had one base, and then one
@@ -198,8 +212,13 @@ export function sellPrice(item, content, bonus = 0) {
 // items: those the class cannot use first, upgraded ones and those with a
 // gem set in them (Jubilerstwo) last, then by rarity
 // and level, a new find before an item already in the bag (it has an id).
+// An item the owner marked as a favourite (`favorites`, the ids of its
+// items; the author, 10.11.2026: "Do tego opcja dodawania do ulubionych, by
+// przypadkiem nie rozebrać czegoś na później") is never sold: the weakest of
+// the others go in its place, and with no other left the bag stays fuller
+// than its places.
 // Returns the indices of the items to sell.
-export function bagOverflow(items, capacity, classId, content) {
+export function bagOverflow(items, capacity, classId, content, favorites = new Set()) {
   const extra = items.length - capacity;
   if (extra <= 0) return [];
   const usable = (item) => (canUse(item.base, classId, content) ? 1 : 0);
@@ -207,6 +226,7 @@ export function bagOverflow(items, capacity, classId, content) {
   const kept = (item) => (item.id === undefined ? 0 : 1);
   return items
     .map((item, index) => ({ item, index }))
+    .filter(({ item }) => item.id === undefined || !favorites.has(item.id))
     .sort(
       (a, b) =>
         usable(a.item) - usable(b.item) ||

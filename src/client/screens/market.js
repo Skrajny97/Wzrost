@@ -1,29 +1,47 @@
 // The Targowisko in the Osada (src/server/market.js, questions 237–242): the
 // players' offers as auctions, the character's own offers with "Wystaw" and
-// what waits to be collected, and the residents' offers: the merchant's
-// goods of the day and the wandering trader on his day of the week. The
-// players' offers and the goods to put up have filters by category.
+// what waits to be collected, the residents' offers: the merchant's goods
+// of the day and the wandering trader on his day of the week, and the
+// Rejestr of the character's trade. The players' offers have filters for
+// the character ("Wszystko", "Dla mnie", "Licytuję") with the categories
+// under them, and the goods to put up filters by category.
 //
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, so a redraw never asks the server again.
 
 import { herbSprite, mineralSprite, potionSprite } from '../art.js';
-import { ALL, categoriesOf, goodsCategory, inCategory, shownCategory } from '../categories.js';
+import { ALL, BIDDING, FOR_ME, categoriesOf, goodsCategory, inCategory, inOfferFilter, shownCategory } from '../categories.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
-import { countOf, formatDecimal, formatNumber, tradePace } from '../format.js';
+import { countOf, dateTimeFormat, formatDecimal, formatNumber, tradePace } from '../format.js';
 import { t } from '../i18n.js';
 import { call, serverNow, state } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { compareTable, itemSummary } from './character.js';
 
 // The tabs and the names of kinds and reasons below are Polish, shown
-// through t().
+// through t(). The Rejestr of the character's trade (the author,
+// 10.11.2026: "Zbudować rejestr na targowisku sprzedanych i odebranych
+// przedmiotów (oraz wygranych w licytacjach)") has a tab of its own.
 const TABS = [
   ['offers', 'Oferty graczy'],
   ['mine', 'Moje'],
   ['residents', 'Mieszkańcy'],
+  ['log', 'Rejestr'],
 ];
+// The filters over the players' offers (the author, 10.11.2026: "Wywalić
+// aktualne filtry Targowiska i zrobić bardziej przydatne - Licytowane przeze
+// mnie, Do założenia przeze mnie (czy tam moją klasę)"): what each shows when
+// it holds nothing.
+const OFFER_FILTERS = [
+  [ALL, 'Wszystko'],
+  [FOR_ME, 'Dla mnie'],
+  [BIDDING, 'Licytuję'],
+];
+const NO_OFFERS = {
+  [FOR_ME]: 'Nikt nie wystawia teraz przedmiotu, który możesz założyć.',
+  [BIDDING]: 'Nie licytujesz teraz żadnej oferty.',
+};
 const KIND_NAMES = { herb: 'zioło', potion: 'mikstura', material: 'materiał', part: 'część', mineral: 'minerał' };
 // The same kinds as the filters name them, in their order.
 const KIND_GROUPS = { herb: 'Zioła', potion: 'Mikstury', material: 'Materiały', part: 'Części', mineral: 'Minerały' };
@@ -127,13 +145,15 @@ export const stackButton = (goods, options, actions) =>
 // porównywarka z aktualnym przedmiotem"), and when the character can wear
 // it: from its Tier, as every item. `opened` keeps the unfolded ones by
 // `key` through the panel's redraws. The Salon Gier shows its prizes so too.
-export function itemEntry(item, key, opened) {
+// `notes: false` leaves out when the character can wear it, as the
+// Rejestr's goods already traded.
+export function itemEntry(item, key, opened, { notes: noted = true } = {}) {
   const character = state.character;
   const usable = !item.classIds || item.classIds.includes(character.classId);
   const worn = character.equipment?.[item.slot] ?? null;
   const notes = [
-    !usable && t('Twoja klasa nie może go używać.'),
-    character.classLevel < (item.classLevel ?? 1) && t('Założysz go od poziomu klasy {level}.', { level: item.classLevel }),
+    noted && !usable && t('Twoja klasa nie może go używać.'),
+    noted && character.classLevel < (item.classLevel ?? 1) && t('Założysz go od poziomu klasy {level}.', { level: item.classLevel }),
   ].filter(Boolean);
   return [
     h(
@@ -233,8 +253,13 @@ export function mountMarket(holder) {
   let gone = false;
   const opened = new Set();
   // The category chosen over the players' offers and over the goods to put
-  // up, for this visit to the Targowisko.
-  const filters = { offers: { id: ALL }, sellable: { id: ALL } };
+  // up, and the filter over the offers for the character (`top`), for this
+  // visit to the Targowisko.
+  const filters = { top: { id: ALL }, offers: { id: ALL }, sellable: { id: ALL } };
+  // The Rejestr, asked each time its tab opens: { since, limit, log }, or
+  // null while on its way.
+  let register = null;
+  let registerFailure = null;
   // The times left on the screen, moved on each half minute in place.
   let clocks = [];
   const clock = (at) => {
@@ -260,6 +285,18 @@ export function mountMarket(holder) {
       failure = error;
     }
     if (!gone) render();
+    if (tab === 'log') loadRegister();
+  }
+
+  // The Rejestr, from the server anew: what ended meanwhile is in it.
+  async function loadRegister() {
+    try {
+      register = await call('GET', '/api/market/log');
+      registerFailure = null;
+    } catch (error) {
+      if (!register) registerFailure = error;
+    }
+    if (!gone && tab === 'log') render();
   }
 
   // An action's answer is the Targowisko after it.
@@ -337,6 +374,9 @@ export function mountMarket(holder) {
             : h('button', { type: 'button', class: 'button button--small', text: t('Wycofaj'), onClick: (event) => cancel(offer, event.currentTarget) }),
         ]
       : [
+          // An auction it bids on says whether it leads or was outbid
+          // ("Licytuję").
+          !offer.leading && offer.myBid !== null && offer.myBid !== undefined && h('span', { class: 'market-outbid', text: t('Przebito Cię') }),
           offer.leading
             ? h('span', { class: 'market-leading', text: t('Prowadzisz') })
             : h('button', {
@@ -360,6 +400,7 @@ export function mountMarket(holder) {
       { class: 'card market-offer' },
       goodsEntry(offer.goods, `offer:${offer.id}`),
       h('p', { class: 'market-price', text: price }),
+      !offer.own && !offer.leading && offer.myBid && h('p', { class: 'muted', text: t('Twoja ostatnia oferta: {gold} zł', { gold: formatNumber(offer.myBid) }) }),
       offer.own && offer.buyNow && h('p', { class: 'muted', text: t('„Kup teraz”: {gold} zł', { gold: formatNumber(offer.buyNow) }) }),
       h('p', { class: 'muted' }, offer.own ? t('Twoja oferta · koniec za ') : t('Wystawia: {name} · koniec za ', { name: offer.seller }), clock(offer.endsAt)),
       h('div', { class: 'settlement-actions' }, actions),
@@ -654,6 +695,87 @@ export function mountMarket(holder) {
     ];
   }
 
+  // The players' offers: the filter for the character over them ("Dla
+  // mnie": the items it could wear now, its class and Tier as "Załóż" asks;
+  // "Licytuję": the auctions with its bid, leading or outbid), each with how
+  // many it holds, and under it the categories of what it shows as chips
+  // (the author: "Aktualne czyli podzial na rodzaj przedmiotu może pozostać
+  // jako podkategorie").
+  function offersTab() {
+    if (market.offers.length === 0) return h('p', { class: 'muted', text: t('Nikt nic teraz nie wystawia.') });
+    const shown = inOfferFilter(market.offers, filters.top.id);
+    return [
+      h(
+        'div',
+        { class: 'segmented segmented--three market-top', role: 'group', 'aria-label': t('Które oferty') },
+        OFFER_FILTERS.map(([id, label]) =>
+          h(
+            'button',
+            {
+              type: 'button',
+              class: 'segmented-option',
+              'aria-pressed': String(id === filters.top.id),
+              onClick: () => {
+                if (id === filters.top.id) return;
+                filters.top.id = id;
+                render();
+              },
+            },
+            h('span', { class: 'market-top-name', text: t(label) }),
+            h('span', { class: 'market-filter-count', text: formatNumber(inOfferFilter(market.offers, id).length) }),
+          ),
+        ),
+      ),
+      shown.length === 0
+        ? h('p', { class: 'muted', text: t(NO_OFFERS[filters.top.id]) })
+        : filtered(shown, (offer) => goodsCategory(offer.goods), filters.offers, (list) => h('ul', { class: 'stack market-list' }, list.map(offerCard))),
+    ];
+  }
+
+  // A line of the Rejestr: what happened and for how much, the goods (an
+  // item in its rarity's colour, its card under a tap, as on the offers; a
+  // stack's card too), the other side and when.
+  function registerLine(line) {
+    const gold = (value) => formatNumber(value);
+    const said = {
+      sold: () => {
+        const sold = t('Sprzedane za {gold} zł', { gold: gold(line.price) });
+        return line.gold !== null && line.gold !== line.price ? `${sold} · ${t('po opłacie: {gold} zł', { gold: gold(line.gold) })}` : sold;
+      },
+      bought: () => t('Kupione za {gold} zł', { gold: gold(line.price) }),
+      won: () => t('Wygrana licytacja za {gold} zł', { gold: gold(line.price) }),
+      expired: () => t('Bez kupca: wróciło do Ciebie'),
+      withdrawn: () => t('Wycofane z Targowiska: wróciło do Ciebie'),
+    }[line.event];
+    const who = !line.with ? null : line.event === 'sold' ? t('Kupuje: {name}', { name: line.with }) : line.event === 'bought' || line.event === 'won' ? t('Sprzedaje: {name}', { name: line.with }) : null;
+    return h(
+      'li',
+      { class: `card market-offer market-log market-log--${line.event}` },
+      h('p', { class: 'market-log-event', text: said ? said() : line.event }),
+      line.goods.kind === 'item' && line.goods.item ? itemEntry(line.goods.item, `log:${line.id}`, opened, { notes: false }) : stackButton(line.goods),
+      h('p', { class: 'muted', text: [who, dateTimeFormat.format(new Date(line.at))].filter(Boolean).join(' · ') }),
+    );
+  }
+
+  // The Rejestr (the author, 10.11.2026: "Zbudować rejestr na targowisku
+  // sprzedanych i odebranych przedmiotów (oraz wygranych w licytacjach)"),
+  // the newest first, kept from the version that brought it.
+  function registerTab() {
+    if (!register) return registerFailure ? systemPanel(registerFailure.message) : h('p', { class: 'muted', text: t('Wczytywanie rejestru…') });
+    if (register.log.length === 0) {
+      return h('p', {
+        class: 'muted',
+        text: t('Rejestr jest pusty. Targowisko zapisuje tu Twój handel od wersji {version}: co sprzedajesz, kupujesz i wygrywasz w licytacjach oraz co wraca do Ciebie bez kupca.', {
+          version: register.since,
+        }),
+      });
+    }
+    return [
+      h('p', { class: 'muted', text: t('Najnowsze na górze, do {count} ostatnich wpisów. Rejestr działa od wersji {version}.', { count: formatNumber(register.limit), version: register.since }) }),
+      h('ul', { class: 'stack market-list' }, register.log.map(registerLine)),
+    ];
+  }
+
   // The times it shows: when one of them passes, the Targowisko is asked
   // again, as an offer ended or a resident came or went.
   const deadlines = () => [
@@ -691,14 +813,7 @@ export function mountMarket(holder) {
       holder.replaceChildren(h('p', { class: 'muted', text: t('Wczytywanie Targowiska…') }));
       return;
     }
-    const body =
-      tab === 'offers'
-        ? market.offers.length === 0
-          ? h('p', { class: 'muted', text: t('Nikt nic teraz nie wystawia.') })
-          : filtered(market.offers, (offer) => goodsCategory(offer.goods), filters.offers, (shown) => h('ul', { class: 'stack market-list' }, shown.map(offerCard)))
-        : tab === 'mine'
-          ? mineTab()
-          : residentsTab();
+    const body = tab === 'offers' ? offersTab() : tab === 'mine' ? mineTab() : tab === 'log' ? registerTab() : residentsTab();
     holder.replaceChildren(
       h(
         'div',
@@ -716,7 +831,7 @@ export function mountMarket(holder) {
         ),
         h(
           'div',
-          { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': t('Targowisko') },
+          { class: 'chat-tabs market-tabs market-tabs--four', role: 'tablist', 'aria-label': t('Targowisko') },
           TABS.map(([id, label]) =>
             h(
               'button',
@@ -729,6 +844,8 @@ export function mountMarket(holder) {
                 onClick: () => {
                   tab = id;
                   render();
+                  // The Rejestr is asked anew each time its tab opens.
+                  if (id === 'log') loadRegister();
                 },
               },
               h('span', { class: 'chat-tab-name', text: t(label) }),

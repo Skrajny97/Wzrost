@@ -12,6 +12,7 @@
 import { bagCapacity, campLevels, canUse, itemView } from '../engine/index.js';
 import { bagPlaces, characterView, loadPlayer, requireOffRack, requirePlayer } from './characters.js';
 import { content } from './content.js';
+import { withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
 
 const slots = () => content().balance.account.chestSlots;
@@ -76,6 +77,11 @@ export async function putInChest(context) {
     db
       .prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND slot IS NULL AND EXISTS (SELECT 1 FROM chest_items WHERE user_id = ? AND item_id = ? AND put_at = ?)')
       .bind(item.id, player.row.id, session.userId, item.id, now),
+    // A favourite no longer, once in the chest (favorites.js): it comes
+    // out as a new item, of whichever character takes it.
+    db
+      .prepare(`UPDATE characters SET favorites = ${withoutFavorites} WHERE id = ? AND EXISTS (SELECT 1 FROM chest_items WHERE user_id = ? AND item_id = ? AND put_at = ?)`)
+      .bind(JSON.stringify([item.id]), player.row.id, session.userId, item.id, now),
   ]);
   if (put.meta.changes !== 1) throw full();
   return answer(context, session);

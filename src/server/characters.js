@@ -109,12 +109,14 @@ import {
   collectorTakes,
   weekAt,
   weekRest,
+  equipBlock,
 } from '../engine/index.js';
 import { mountView } from '../engine/stable.js';
 import { say } from '../engine/text.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
 import { content, contentIn } from './content.js';
+import { favoriteIds } from './favorites.js';
 import { craftingOn, fortressOn, professionsOn, settlementOn, weeksOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
@@ -1457,7 +1459,15 @@ export function characterView(player, now) {
   const anvilDiscount = anvilDiscountOf(player);
   // The chance of an upgrade with the week's share of it (weeks.js).
   const anvilWeek = weekFactorNow(now, 'upgrade');
-  const toItem = (item) => ({ id: item.id, ...itemView(item, content(), { sellBonus, upgradeCap, materials, anvilDiscount, anvilWeek }), salvage: salvage(item) });
+  // The items the player marked with a star (favorites.js), which are not
+  // taken apart nor sold to the scrapper.
+  const favorites = favoriteIds(row);
+  const toItem = (item) => ({
+    id: item.id,
+    ...itemView(item, content(), { sellBonus, upgradeCap, materials, anvilDiscount, anvilWeek }),
+    salvage: salvage(item),
+    ...(favorites.has(item.id) && { favorite: true }),
+  });
   // Whether a bag item would make the character stronger in place of what
   // its slot holds (preview.js), for the marks on the bag and on finds; null
   // for an item the class cannot wear.
@@ -1586,9 +1596,14 @@ export function characterView(player, now) {
         return [slot.id, item ? toItem(item) : null];
       }),
     ),
+    // With why the character cannot wear one now, if it cannot, as "Załóż"
+    // refuses it (equipBlock in the engine): for the list of a slot's items.
     bag: bagItems(player)
       .reverse()
-      .map((item) => ({ ...toItem(item), verdict: verdict(item) })),
+      .map((item) => {
+        const block = equipBlock(item, row.class_id, row.class_level, content());
+        return { ...toItem(item), verdict: verdict(item), ...(block && { equipBlock: block }) };
+      }),
     // The herbs and the potions in the bag, which take its places by the stack.
     herbs: bagHerbs(row, sellBonus),
     potions: bagPotions(row, sellBonus),

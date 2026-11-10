@@ -64,9 +64,10 @@ import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
 import { englishOn, readFeatures, registrationOpen, settlementOn } from './features.js';
 import { language, pageDictionary, requestLanguage, runInLanguage, t } from './i18n.js';
-import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, getMarket, listOffer, settleMarket } from './market.js';
+import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, getMarket, getMarketLog, listOffer, settleMarket } from './market.js';
 import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunts.js';
 import { discardItem, equipItem, previewItem, sellItem, sellItems, unequipItem, upgradeItem } from './inventory.js';
+import { markFavorite } from './favorites.js';
 import { discardHerbs, sellHerbs, startGathering } from './professions.js';
 import { discardMinerals, sellMinerals, startMining } from './mining.js';
 import { startJewelcraft } from './jewelcraft.js';
@@ -180,6 +181,8 @@ const routes = [
   ['POST', '/api/items/:id/equip', equipItem],
   ['POST', '/api/items/:id/unequip', unequipItem],
   ['POST', '/api/items/:id/discard', discardItem],
+  // The star of a favourite item (favorites.js).
+  ['POST', '/api/items/:id/favorite', markFavorite],
   ['GET', '/api/items/:id/preview', previewItem],
   ['POST', '/api/items/:id/upgrade', upgradeItem],
   ['POST', '/api/items/sell', sellItems],
@@ -254,6 +257,8 @@ const routes = [
   ['POST', '/api/mercenary/claim', claimMercenary],
   ['POST', '/api/settlement/stable', buyMount],
   ['GET', '/api/market', getMarket],
+  // The Targowisko's Rejestr (market.js).
+  ['GET', '/api/market/log', getMarketLog],
   ['POST', '/api/market/list', listOffer],
   ['POST', '/api/market/bid', bidOnOffer],
   ['POST', '/api/market/buy', buyOffer],

@@ -82,6 +82,8 @@ export const ICONS = {
   // band and its lock.
   coffer: [path('M3.5 10.5V9c0-2.5 2-4.5 4.5-4.5h8c2.5 0 4.5 2 4.5 4.5v1.5'), ['rect', { x: 3.5, y: 10.5, width: 17, height: 9.5, rx: 1 }], path('M3.5 14h17'), path('M10.5 12.5h3v3.5h-3z')],
   check: [path('M5 12.5l4.5 4.5L19 7.5')],
+  // A favourite item's star (screens/character.js), filled in by CSS.
+  star: [path('M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z')],
   'bell-off': [path('M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z'), path('M10 20.5a2 2 0 0 0 4 0'), path('M3.5 3.5l17 17')],
   tent: [path('M2.5 20L12 4l9.5 16'), path('M2.5 20h19'), path('M9 20l3-6 3 6'), path('M12 4l1.5-2')],
   hammer: [path('M13 4.5l6.5 6.5-2.5 2.5L10.5 7z'), path('M12 9L4 17l3 3 8-8')],

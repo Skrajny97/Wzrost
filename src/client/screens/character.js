@@ -29,6 +29,9 @@ export const itemTitle = (item) => (item.upgrade > 0 ? `${item.name} +${item.upg
 // The number in the corner of a slot: the upgrade level.
 const upgradeBadge = (item) => item.upgrade > 0 && h('span', { class: 'slot-level', text: `+${item.upgrade}` });
 
+// The star in the other bottom corner of a favourite's tile (favorites.js).
+const favoriteBadge = (item) => item.favorite && h('span', { class: 'slot-favorite', 'aria-hidden': 'true' }, icon('star', { size: 12 }));
+
 // Whether an item would make the character stronger in place of what its
 // slot holds, as the server counts it (valueChanges in preview.js): a word
 // for the lists of items and a line for the item's card.
@@ -287,7 +290,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     if (!item) {
       return h(
         'button',
-        { type: 'button', class: 'slot slot--empty', 'data-guide': `slot-${slot.id}`, 'aria-label': t('{slot}: pusty slot', { slot: slot.name }), onClick: () => emptySlotSheet(slot) },
+        { type: 'button', class: 'slot slot--empty', 'data-guide': `slot-${slot.id}`, 'aria-label': t('{slot}: pusty slot', { slot: slot.name }), onClick: () => slotSheet(slot) },
         icon(SLOT_ICONS[slot.id], { size: 24 }),
       );
     }
@@ -300,7 +303,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
           'data-guide': `slot-${slot.id}`,
           vars: { '--rarity': item.color },
           'aria-label': `${slot.name}: ${itemTitle(item)}, ${item.rarityName}`,
-          onClick: () => itemSheet(item, { equipped: true }),
+          onClick: () => slotSheet(slot),
         },
         itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
         upgradeBadge(item),
@@ -424,7 +427,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
   // to the camp (320 A), and taking several items apart on the Stół
   // rozbiórki, once it stands.
   function bagActions(bag) {
-    const sell = bag.some((item) => !(item.upgrade > 0) && !item.gem);
+    const sell = bag.some((item) => !(item.upgrade > 0) && !item.gem && !item.favorite);
     const salvage = state.character.crafting.pace > 0 && bag.some((item) => item.salvage);
     if (!sell && !salvage) return null;
     return h(
@@ -654,7 +657,14 @@ export function mountCharacter(container, { switchCharacter } = {}) {
                 type: 'button',
                 class: 'slot slot--bag',
                 vars: { '--rarity': item.color },
-                'aria-label': [itemTitle(item), item.rarityName, item.slotName, t('poziom {level}', { level: item.level }), verdictMark(item.verdict) && t(VERDICTS[item.verdict].text)]
+                'aria-label': [
+                  itemTitle(item),
+                  item.rarityName,
+                  item.slotName,
+                  t('poziom {level}', { level: item.level }),
+                  verdictMark(item.verdict) && t(VERDICTS[item.verdict].text),
+                  item.favorite && t('ulubiony'),
+                ]
                   .filter(Boolean)
                   .join(', '),
                 onClick: () => itemSheet(item, { equipped: false }),
@@ -662,6 +672,7 @@ export function mountCharacter(container, { switchCharacter } = {}) {
               itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
               verdictMark(item.verdict, { tile: true }),
               upgradeBadge(item),
+              favoriteBadge(item),
             ),
             item,
           ),
@@ -764,35 +775,160 @@ export function mountCharacter(container, { switchCharacter } = {}) {
     );
   }
 
-  function emptySlotSheet(slot) {
-    const fitting = state.character.bag.filter((item) => item.slot === slot.id);
-    openSheet(
-      h('h2', { class: 'sheet-title', text: slot.name }),
-      h('p', { class: 'sheet-text', text: t('Pusty slot.') }),
-      fitting.length === 0
-        ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotu do tego slotu.') })
-        : h(
-            'ul',
-            { class: 'item-list' },
-            fitting.map((item) =>
-              h(
-                'li',
-                {},
-                h(
-                  'button',
-                  { type: 'button', class: 'item-row', onClick: () => itemSheet(item, { equipped: false }) },
-                  itemSummary(item),
-                  verdictMark(item.verdict),
-                  icon('chevron', { size: 18 }),
-                ),
-              ),
-            ),
-          ),
-    );
-  }
-
   render();
   return { update: render, tick: (now) => switchTicks.forEach((update) => update(now)) };
+}
+
+// What the page says when a favourite item is refused, as the server does
+// (src/server/favorites.js), by what was asked.
+const FAVORITE_REFUSALS = {
+  salvage: 'Ulubiony przedmiot: zdejmij gwiazdkę, żeby go rozebrać.',
+  sell: 'Ulubiony przedmiot: zdejmij gwiazdkę, żeby go sprzedać.',
+  discard: 'Ulubiony przedmiot: zdejmij gwiazdkę, żeby go wyrzucić.',
+};
+const refuseFavorite = (action) => toast(t(FAVORITE_REFUSALS[action]));
+
+// The gem set in an item the character loses falls out and goes back to its
+// minerals (the author's 757 B, 10.11.2026: „kamień wypada i wraca do
+// Twoich minerałów”): the warning before, and the words after, for each gem
+// the server gave back ({ id, name }).
+const gemFallsText = (item) => item.gem && t('Kamień wypadnie i wróci do Twoich minerałów: {gem}.', { gem: item.gem.name });
+const gemsBackText = (gems) => (gems ?? []).map((gem) => t('Kamień {gem} wypadł i wrócił do zapasu.', { gem: gem.name })).join(' ');
+
+// The order of the bag's items for a slot: those that make the character
+// stronger first, then the trade-offs, those that change nothing and the
+// weaker; the rarer and higher first among them.
+const VERDICT_ORDER = ['better', 'mixed', 'same', 'worse'];
+function bestFirst(items) {
+  const rank = (item) => (VERDICT_ORDER.includes(item.verdict) ? VERDICT_ORDER.indexOf(item.verdict) : VERDICT_ORDER.length);
+  const rarity = (item) => state.content.rarities.findIndex((one) => one.id === item.rarity);
+  return [...items].sort((a, b) => rank(a) - rank(b) || rarity(b) - rarity(a) || b.level - a.level);
+}
+
+// Why the character cannot wear a bag item yet, as "Załóż" refuses it
+// (equipBlock in src/engine/items.js, sent with the bag).
+function equipBlockText(item) {
+  if (item.equipBlock === 'wrong_class') return t('Twoja klasa nie może go używać.');
+  if (item.equipBlock === 'class_level') return t('Założysz go od poziomu klasy {level}.', { level: item.classLevel });
+  return t('Ten slot jest jeszcze zablokowany.');
+}
+
+// An equipment slot under a tap (the author, 10.11.2026: "Niech klikanie w
+// slot ekwipunku wyświetla zakładkę z możliwymi do założenia z plecaka
+// przedmiotami na to miejsce. Z porównywarką itp."): the item worn there on
+// top, with its card ("Zdejmij", its star and the Kowadło; "Karta
+// przedmiotu" opens the whole card, with what taking it off changes), then
+// the bag's items for this place. Those the character can wear first, the
+// strongest first, each unfolding its comparison with the one worn (as the
+// Kwatery's "Załóż z plecaka" and the Targowisko) with "Załóż"; those it
+// cannot wear yet greyed, with why: its class, or the class level of its
+// Tier, as "Załóż" refuses them (equipBlock in the engine). An item goes
+// only to its own slot, in the place of the one there, as "Załóż" puts it
+// on: the game has one ring, one talisman, the off hand as a slot of its
+// own and no two-handed weapons. An empty slot opens the same, without an
+// item worn.
+function slotSheet(slot) {
+  const character = state.character;
+  const busy = onExploration(character);
+  const worn = character.equipment[slot.id] ?? null;
+  const fitting = character.bag.filter((item) => item.slot === slot.id);
+  const wearable = bestFirst(fitting.filter((item) => !item.equipBlock));
+  const later = bestFirst(fitting.filter((item) => item.equipBlock));
+  const card = worn && itemCard(worn, { equipped: true, preview: false, reopen: () => reopenSlot(slot) });
+  const put = (item) => (event) =>
+    withButton(event.currentTarget, async () => {
+      await call('POST', `/api/items/${item.id}/equip`);
+      closeSheet();
+    });
+  const choice = (item) =>
+    h(
+      'details',
+      { class: 'wear-choice', open: wearable.length === 1 },
+      h(
+        'summary',
+        {},
+        h('span', { class: 'item-row wear-choice-row' }, itemSummary(item, { stats: true }), verdictMark(item.verdict), h('span', { class: 'wear-choice-mark', 'aria-hidden': 'true' })),
+      ),
+      h(
+        'div',
+        { class: 'wear-choice-body' },
+        worn ? compareTable(item, worn) : h('p', { class: 'muted', text: t('W tym miejscu postać nic teraz nie nosi.') }),
+        h(
+          'div',
+          { class: 'sheet-actions' },
+          h('button', { type: 'button', class: 'button button--world', text: t('Karta przedmiotu'), onClick: () => itemSheet(item, { equipped: false }) }),
+          h('button', { type: 'button', class: 'button button--system', text: t('Załóż'), disabled: busy, onClick: put(item) }),
+        ),
+      ),
+    );
+  const greyed = (item) =>
+    h(
+      'button',
+      { type: 'button', class: 'item-row slot-later', onClick: () => itemSheet(item, { equipped: false }) },
+      h('span', { class: 'slot-later-text' }, itemSummary(item, { stats: true }), h('span', { class: 'slot-later-why', text: equipBlockText(item) })),
+      icon('chevron', { size: 18 }),
+    );
+  openSheet(
+    h('h2', { class: 'sheet-title', text: slot.name }),
+    card ? card.nodes : h('p', { class: 'sheet-text', text: t('Pusty slot.') }),
+    h(
+      'section',
+      { class: 'slot-choices', 'aria-label': t('Z plecaka na to miejsce') },
+      h('p', { class: 'compare-title', text: t('Z plecaka na to miejsce') }),
+      fitting.length === 0
+        ? h('p', { class: 'muted', text: t('W plecaku nie ma przedmiotu do tego slotu.') })
+        : [
+            wearable.length > 0 && h('ul', { class: 'item-list' }, wearable.map((item) => h('li', {}, choice(item)))),
+            wearable.length > 0 && busy && h('p', { class: 'muted', text: busyText(character) }),
+            later.length > 0 && [
+              h('p', { class: 'muted slot-later-title', text: t('Jeszcze ich nie założysz:') }),
+              h('ul', { class: 'item-list' }, later.map((item) => h('li', {}, greyed(item)))),
+            ],
+          ],
+    ),
+  );
+}
+
+// The slot's sheet again, as the character is now (after a star changed).
+function reopenSlot(slot) {
+  if (state.content.slots.some((one) => one.id === slot.id)) slotSheet(slot);
+}
+
+// The card of a character's item again, as it is now (after its star
+// changed), or none when it is gone.
+function reopenItem(id) {
+  const owned = ownedItem(id);
+  if (owned) itemSheet(owned.item, { equipped: owned.equipped });
+  else closeSheet();
+}
+
+// The star of a favourite item in its card (the author, 10.11.2026: "Do
+// tego opcja dodawania do ulubionych, by przypadkiem nie rozebrać czegoś na
+// później"): a favourite is not taken apart on the Stół rozbiórki nor sold
+// to the scrapper, by hand, by the handful or when the bag overflows
+// (src/server/favorites.js). `reopen` shows the card again after a change.
+function favoriteToggle(item, reopen) {
+  const on = Boolean(item.favorite);
+  return h(
+    'div',
+    { class: 'favorite-row' },
+    h(
+      'button',
+      {
+        type: 'button',
+        class: 'favorite-toggle',
+        'aria-pressed': String(on),
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            await call('POST', `/api/items/${item.id}/favorite`, { favorite: !on });
+            reopen();
+          }),
+      },
+      icon('star', { size: 18 }),
+      h('span', { text: t('Ulubiony') }),
+    ),
+    on && h('p', { class: 'muted favorite-note', text: t('Z gwiazdką nie trafi na Stół rozbiórki ani do złomiarza, także gdy plecak się przepełni.') }),
+  );
 }
 
 // An item from the bag or the equipment: its properties, what wearing it
@@ -800,6 +936,17 @@ export function mountCharacter(container, { switchCharacter } = {}) {
 // its slot, and the actions.
 // `anvil`: the Kowadło part open, as after an upgrade.
 export function itemSheet(item, { equipped, anvil = false }) {
+  const card = itemCard(item, { equipped, anvil, reopen: () => reopenItem(item.id) });
+  openSheet(...card.nodes);
+  card.shown();
+}
+
+// The parts of an item's card, for its own sheet and for the top of its
+// slot's (slotSheet): `nodes`, and `shown()` to call once they are on the
+// screen. `preview: false` leaves out what wearing or taking it off
+// changes, and "Karta przedmiotu" by "Zdejmij" opens the whole card with
+// it; `reopen` shows the sheet again after its star changed.
+function itemCard(item, { equipped, anvil = false, preview: withPreview = true, reopen }) {
   const character = state.character;
   // On an exploration the bag stays at hand: only wearing and taking off
   // wait, and an item worn is changed at home or at a profession's work
@@ -817,25 +964,32 @@ export function itemSheet(item, { equipped, anvil = false }) {
     });
 
   const discard = async (event) => {
+    if (item.favorite) return refuseFavorite('discard');
     const button = event.currentTarget;
     const sure = await confirmAction({
       title: t('Wyrzucić przedmiot?'),
-      text: t('{item} zniknie na zawsze.', { item: itemTitle(item) }),
+      text: [t('{item} zniknie na zawsze.', { item: itemTitle(item) }), gemFallsText(item)].filter(Boolean).join(' '),
       confirmLabel: t('Wyrzuć'),
       danger: true,
     });
-    if (sure) await withButton(button, () => call('POST', `/api/items/${item.id}/discard`));
+    if (!sure) return;
+    await withButton(button, async () => {
+      const { discarded } = await call('POST', `/api/items/${item.id}/discard`);
+      if (discarded?.gem) toast(gemsBackText([discarded.gem]));
+    });
   };
 
-  // The scrapper buys a bag item from its card, an upgraded one too.
+  // The scrapper buys a bag item from its card, an upgraded one too; a
+  // favourite once its star is off.
   const sell = async (event) => {
+    if (item.favorite) return refuseFavorite('sell');
     const button = event.currentTarget;
     const sure = await confirmAction({
       title: t('Sprzedać przedmiot?'),
       text: [
         t('Złomiarz kupi: {item} za {gold} złota.', { item: itemTitle(item), gold: formatNumber(item.price) }),
         item.upgrade > 0 && t('W tej cenie jest też część złota wydanego na ulepszenia.'),
-        item.gem && t('Kamień w nim przepadnie: {gem}.', { gem: item.gem.name }),
+        gemFallsText(item),
       ]
         .filter(Boolean)
         .join(' '),
@@ -845,35 +999,44 @@ export function itemSheet(item, { equipped, anvil = false }) {
     await withButton(button, async () => {
       const { sold } = await call('POST', `/api/items/${item.id}/sell`);
       closeSheet();
-      toast(t('Sprzedano za {gold} złota.', { gold: formatNumber(sold.gold) }));
+      toast([t('Sprzedano za {gold} złota.', { gold: formatNumber(sold.gold) }), gemsBackText(sold.gem && [sold.gem])].filter(Boolean).join(' '));
     });
   };
 
-  const preview = usable && h('div', { class: 'preview', 'aria-live': 'polite' }, h('p', { class: 'muted', text: t('Liczenie zmian…') }));
-  openSheet(
-    itemDetails(item),
-    preview,
-    usable && worn && compareTable(item, worn),
-    anvilSection(item, busy && equipped, anvil),
-    !equipped && salvageSection(item, false),
-    busy && h('p', { class: 'muted', text: busyText(state.character) }),
-    !usable && h('p', { class: 'region-warning', text: t('Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.') }),
-    early && h('p', { class: 'region-warning', text: t('Ten przedmiot założysz od poziomu klasy {level}.', { level: item.classLevel }) }),
-    !equipped &&
-      item.price !== undefined &&
-      h('button', { type: 'button', class: 'button button--world', onClick: sell, text: t('Sprzedaj za {gold} złota', { gold: formatNumber(item.price) }) }),
-    h(
-      'div',
-      { class: 'sheet-actions' },
-      equipped
-        ? h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: t('Zdejmij') })
-        : [
-            h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }),
-            h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early, onClick: act('equip'), text: t('Załóż') }),
-          ],
-    ),
-  );
-  if (preview) showPreview(preview, item, equipped);
+  const preview = withPreview && usable && h('div', { class: 'preview', 'aria-live': 'polite' }, h('p', { class: 'muted', text: t('Liczenie zmian…') }));
+  return {
+    nodes: [
+      itemDetails(item),
+      // A report's copy of an item has no id: no star for it.
+      item.id !== undefined && favoriteToggle(item, reopen),
+      preview,
+      usable && worn && compareTable(item, worn),
+      anvilSection(item, busy && equipped, anvil),
+      !equipped && salvageSection(item, false),
+      busy && h('p', { class: 'muted', text: busyText(state.character) }),
+      !usable && h('p', { class: 'region-warning', text: t('Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.') }),
+      early && h('p', { class: 'region-warning', text: t('Ten przedmiot założysz od poziomu klasy {level}.', { level: item.classLevel }) }),
+      !equipped &&
+        item.price !== undefined &&
+        h('button', { type: 'button', class: 'button button--world', onClick: sell, text: t('Sprzedaj za {gold} złota', { gold: formatNumber(item.price) }) }),
+      h(
+        'div',
+        { class: 'sheet-actions' },
+        equipped
+          ? [
+              !withPreview && h('button', { type: 'button', class: 'button button--world', text: t('Karta przedmiotu'), onClick: () => itemSheet(item, { equipped: true }) }),
+              h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: t('Zdejmij') }),
+            ]
+          : [
+              h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }),
+              h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early, onClick: act('equip'), text: t('Załóż') }),
+            ],
+      ),
+    ],
+    shown: () => {
+      if (preview) showPreview(preview, item, equipped);
+    },
+  };
 }
 
 // The item beside the one worn in its slot, number by number: the damage of
@@ -966,6 +1129,7 @@ function salvageSection(item, busy) {
   const needs = salvage.needs;
   const full = crafting.queue.length >= crafting.limit;
   const takeApart = async (event) => {
+    if (item.favorite) return refuseFavorite('salvage');
     const button = event.currentTarget;
     const sure = await confirmAction({
       title: t('Rozebrać przedmiot?'),
@@ -978,7 +1142,7 @@ function salvageSection(item, busy) {
         }),
         salvage.minerals && t('Od razu dostaniesz do Jubilerstwa: {minerals}.', { minerals: mineralsLine(salvage.minerals) }),
         salvage.pattern && t('System odsłoni Ci wzór {at}: {pattern}.', { at: salvage.patternAt, pattern: salvage.pattern }),
-        item.gem && t('Kamień w nim przepadnie: {gem}.', { gem: item.gem.name }),
+        gemFallsText(item),
       ]
         .filter(Boolean)
         .join(' '),
@@ -994,6 +1158,7 @@ function salvageSection(item, busy) {
           t('Na stole: {item}. {part} ×{count} będą gotowe o {time}.', { item: order.name, part: order.part, count: order.parts, time: timeFormat.format(new Date(order.endsAt)) }),
           order.minerals && t('Do Jubilerstwa: {minerals}.', { minerals: mineralsLine(order.minerals) }),
           order.pattern && t('Nowy wzór {at}: {pattern}.', { at: order.patternAt, pattern: order.pattern }),
+          gemsBackText(order.gems),
         ]
           .filter(Boolean)
           .join(' '),
@@ -1030,12 +1195,22 @@ function salvageSection(item, busy) {
 // shows the sheet again after the question "Rozebrać?" was turned down,
 // with the marks still there. Returns the picker's nodes and the update of
 // its sum, to call once they are in place.
+// A marked item stands out with a frame and a glow, and the bar under the
+// grid (at the sheet's bottom, in sight) describes the item marked last as
+// its card does and names all the marked ones (the author, 10.11.2026: "Dodac
+// podświetlenie przedmiotu i jego opis przy stole do rozbiórki, bo nie
+// pokazuje wcale i można się pomylić"); the question before taking them
+// apart names them too. A favourite is not taken apart (favorites.js): its
+// tile is dim, with its star, and a tap on it says why.
 export function salvagePicker(marked, { inline = false, back = null } = {}) {
   const { crafting } = state.character;
   const bag = state.character.bag.filter((item) => item.salvage);
+  for (const item of bag) if (item.favorite) marked.delete(item.id);
   const takes = (item) => item.salvage.minutes !== null;
   const room = Math.max(0, crafting.limit - crafting.queue.length);
-  const chosen = () => bag.filter((item) => marked.has(item.id));
+  // The marked items in the order they were marked, and the one marked last.
+  const chosen = () => [...marked].map((id) => bag.find((item) => item.id === id)).filter(Boolean);
+  let last = null;
   // The parts the items make, by kind: [name, { color, count }].
   const partsOf = (items) => {
     const parts = new Map();
@@ -1052,9 +1227,22 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
   const summary = h('p', { class: 'sheet-text', role: 'status' });
   const roomNote = h('p', { class: 'region-warning', hidden: true });
   const takeApart = h('button', { type: 'button', class: 'button button--world', onClick: (event) => go(event.currentTarget) });
+  const described = h('div', { class: 'salvage-last', 'aria-live': 'polite', hidden: true });
+  const named = h('p', { class: 'salvage-names', hidden: true });
   const update = () => {
     const items = chosen();
     const parts = partsOf(items);
+    const shown = items.find((item) => item.id === last) ?? items.at(-1);
+    described.hidden = !shown;
+    fill(described, shown && salvageCard(shown));
+    named.hidden = items.length < 2;
+    fill(
+      named,
+      items.length > 1 && [
+        `${t('Do rozbiórki:')} `,
+        items.map((item, index) => [index > 0 && ', ', h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: itemTitle(item) })]),
+      ],
+    );
     fill(
       summary,
       items.length === 0
@@ -1079,13 +1267,15 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
     takeApart.disabled = items.length === 0 || tooMany;
   };
   const tile = (item) => {
+    const favorite = Boolean(item.favorite);
     const button = h(
       'button',
       {
         type: 'button',
-        class: 'slot slot--bag salvage-pick',
+        class: `slot slot--bag salvage-pick${favorite ? ' salvage-pick--favorite' : ''}`,
         vars: { '--rarity': item.color },
         disabled: !takes(item),
+        'aria-disabled': favorite ? 'true' : null,
         'aria-pressed': String(marked.has(item.id)),
         'aria-label': [
           itemTitle(item),
@@ -1093,10 +1283,20 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
           item.slotName,
           t('poziom {level}', { level: item.level }),
           t('daje: {what}', { what: `${item.salvage.part} ×${item.salvage.parts}${item.salvage.minerals ? `, ${mineralsLine(item.salvage.minerals)}` : ''}` }),
-        ].join(', '),
+          favorite && t('ulubiony'),
+        ]
+          .filter(Boolean)
+          .join(', '),
         onClick: () => {
+          if (favorite) {
+            refuseFavorite('salvage');
+            return;
+          }
           if (marked.has(item.id)) marked.delete(item.id);
-          else marked.add(item.id);
+          else {
+            marked.add(item.id);
+            last = item.id;
+          }
           button.setAttribute('aria-pressed', String(marked.has(item.id)));
           update();
         },
@@ -1104,6 +1304,7 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
       itemSprite(item) ?? icon(itemIcon(item), { size: 24 }),
       verdictMark(item.verdict, { tile: true }),
       upgradeBadge(item),
+      favoriteBadge(item),
       h('span', { class: 'salvage-check', 'aria-hidden': 'true' }, icon('check', { size: 14 })),
     );
     return h('li', {}, button);
@@ -1111,11 +1312,12 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
   const go = async (button) => {
     const items = chosen();
     const upgraded = items.filter((item) => item.upgrade > 0).length;
-    const gems = items.filter((item) => item.gem).length;
+    const gems = items.filter((item) => item.gem).map((item) => item.gem.name);
     const patterns = patternsByPlace(items.filter((item) => item.salvage.pattern).map((item) => ({ name: item.salvage.pattern, at: item.salvage.patternAt })));
     const sure = await confirmAction({
       title: t('Rozebrać przedmioty?'),
       text: [
+        t('Do rozbiórki: {names}.', { names: items.map(itemTitle).join(', ') }),
         t('{items} {vanish} z plecaka, a stół zrobi z nich: {parts}, w {time}.', {
           items: countOf(items.length, 'przedmiot', 'przedmioty', 'przedmiotów'),
           vanish: plural(items.length, 'zniknie', 'znikną', 'zniknie'),
@@ -1126,7 +1328,7 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
         }),
         mineralsOf(items).length > 0 && t('Od razu dostaniesz do Jubilerstwa: {minerals}.', { minerals: mineralsLine(mineralsOf(items)) }),
         upgraded > 0 && t('Ulepszone wśród nich: {count}.', { count: formatNumber(upgraded) }),
-        gems > 0 && t('Z kamieniem wśród nich: {count}.', { count: formatNumber(gems) }),
+        gems.length > 0 && t('Kamienie z nich wypadną i wrócą do Twoich minerałów: {gems}.', { gems: gems.join(', ') }),
         ...patterns.map(([at, names]) => t('System odsłoni Ci {patterns} {at}: {names}.', { patterns: plural(names.length, 'wzór', 'wzory', 'wzory'), at, names: names.join(', ') })),
       ]
         .filter(Boolean)
@@ -1158,6 +1360,7 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
           }),
           salvaged.minerals && t('Do Jubilerstwa: {minerals}.', { minerals: mineralsLine(salvaged.minerals) }),
           ...patternsByPlace(salvaged.patterns).map(([at, names]) => `${plural(names.length, 'Nowy wzór', 'Nowe wzory', 'Nowe wzory')} ${at}: ${names.join(', ')}.`),
+          gemsBackText(salvaged.gems),
         ]
           .filter(Boolean)
           .join(' '),
@@ -1169,10 +1372,28 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
     nodes: [
       h('ul', { class: 'bag-grid salvage-grid' }, bag.map(tile)),
       dim && h('p', { class: 'muted', text: t('Przyciemnionych stół jeszcze nie bierze: ich rzadkość wymaga wyższego poziomu Stołu rozbiórki.') }),
-      h('div', { class: `salvage-bar${inline ? ' salvage-bar--inline' : ''}` }, summary, roomNote, takeApart),
+      bag.some((item) => item.favorite) && h('p', { class: 'muted', text: t('Przedmiotów z gwiazdką stół nie rozbierze: to Twoje ulubione. Gwiazdkę zdejmiesz w karcie przedmiotu.') }),
+      h('div', { class: `salvage-bar${inline ? ' salvage-bar--inline' : ''}` }, described, named, summary, roomNote, takeApart),
     ],
     update,
   };
+}
+
+// A marked item in the bar of "Rozbierz kilka", as its card describes it:
+// its picture, its name with its upgrade in its rarity's colour, its rarity,
+// slot, level and Tier, its numbers and the gem set in it.
+function salvageCard(item) {
+  return [
+    h('span', { class: 'salvage-last-art', vars: { '--rarity': item.color } }, itemSprite(item) ?? icon(itemIcon(item), { size: 24 })),
+    h(
+      'span',
+      { class: 'salvage-last-text' },
+      h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: itemTitle(item) }),
+      h('span', { class: 'item-meta', text: [item.rarityName, item.slotName, t('poz. {level}', { level: item.level }), item.tier].filter(Boolean).join(' · ') }),
+      item.properties.length > 0 && h('span', { class: 'item-stats', text: item.properties.join(' · ') }),
+      item.gem && h('span', { class: 'salvage-last-gem', vars: { '--rarity': item.gem.color } }, mineralSprite(item.gem.id), ` ${item.gem.line}`),
+    ),
+  ];
 }
 
 // "Rozbierz kilka" in a sheet from the bag.
@@ -1233,7 +1454,12 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
     anvil.level === 0
       ? t('Porażka zabiera tylko {paid}.', { paid })
       : next.breakChance > 0
-        ? t('Porażka zabiera {paid}, a przedmiot spada do +{level}. Z szansą {chance} przedmiot rozpada się.', { paid, level: anvil.level - 1, chance: percent(next.breakChance) })
+        ? [
+            t('Porażka zabiera {paid}, a przedmiot spada do +{level}. Z szansą {chance} przedmiot rozpada się.', { paid, level: anvil.level - 1, chance: percent(next.breakChance) }),
+            item.gem && t('Kamień z niego wróci wtedy do Twoich minerałów.'),
+          ]
+            .filter(Boolean)
+            .join(' ')
         : t('Porażka zabiera {paid}, a przedmiot spada do +{level}.', { paid, level: anvil.level - 1 });
   const materialLine =
     need &&
@@ -1270,7 +1496,11 @@ export function anvilSection(item, busy, open = false, { send = (choices) => cal
         toast(t('Udało się: {name} +{level}.', { name: done.name, level: done.to }));
       } else {
         playSound('defeat');
-        toast(done.result === 'broken' ? t('Przedmiot rozpadł się na kowadle: {name} +{level}.', { name: done.name, level: done.from }) : failed(done));
+        toast(
+          done.result === 'broken'
+            ? [t('Przedmiot rozpadł się na kowadle: {name} +{level}.', { name: done.name, level: done.from }), gemsBackText(done.gem && [done.gem])].filter(Boolean).join(' ')
+            : failed(done),
+        );
       }
       reopen(done, answer);
     });
@@ -1441,7 +1671,13 @@ export function itemSummary(item, { stats = false } = {}) {
   const text = h(
     'span',
     { class: 'item-summary' },
-    h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: itemTitle(item) }),
+    h(
+      'span',
+      { class: 'item-name', vars: { '--rarity': item.color } },
+      itemTitle(item),
+      // A favourite's star after its name (favorites.js).
+      item.favorite && h('span', { class: 'item-favorite', role: 'img', 'aria-label': t('ulubiony') }, icon('star', { size: 14 })),
+    ),
     h('span', { class: 'item-meta', text: `${item.rarityName} · ${item.slotName} · ${t('poz. {level}', { level: item.level })}` }),
     // With `stats`, its numbers in one line too, to tell items of one name apart.
     stats && item.properties?.length > 0 && h('span', { class: 'item-stats', text: item.properties.join(' · ') }),

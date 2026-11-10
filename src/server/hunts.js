@@ -89,13 +89,15 @@ import {
 import { toHex } from './encoding.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
+import { t } from './i18n.js';
 import { eventDraftsOn, eventsOn, fortressOn, settlementOn } from './features.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { expeditionMinutes } from './guild-expedition.js';
 import { huntFamePoints } from './fame.js';
-import { soldGold } from './inventory.js';
+import { favoriteIds } from './favorites.js';
+import { fallenGems, gemNamed, soldGold } from './inventory.js';
 import { perkOf } from './perks.js';
-import { finishGathering } from './professions.js';
+import { addTo, finishGathering } from './professions.js';
 import { herbsOf, knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
 import { leaveTrip, tripOf } from './trips.js';
@@ -829,7 +831,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const sellBonus = campBonus(levels, 'sellPrice', content());
   const toBag = hunt.items.map((item, index) => index).filter((index) => !autoEquipped.includes(index));
   const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
-  const sold = bagOverflow(candidates, capacity, row.class_id, content());
+  // The favourites stay (favorites.js): the weakest of the others go. The
+  // claim holds only while the character is as read, its stars too.
+  const sold = bagOverflow(candidates, capacity, row.class_id, content(), favoriteIds(row));
   const storedSold = sold.filter((index) => index < bag.length).map((index) => bag[index]);
   const soldStored = storedSold.map((item) => item.id);
   const soldFound = sold.filter((index) => index >= bag.length).map((index) => toBag[index - bag.length]);
@@ -853,6 +857,11 @@ export async function finishHunt(db, player, now, { choice } = {}) {
     ...((options.skips ?? []).some((skip) => skip.id !== row.id) && { skips: options.skips.filter((skip) => skip.id !== row.id) }),
   };
   if (taught) report.system = [...report.system, taught];
+  // The gems of the bag's items the scrapper bought fall out and go back to
+  // the minerals (the author's 757 B, 10.11.2026: „kamień wypada i wraca do
+  // Twoich minerałów”), and the report says so.
+  const gemsBack = fallenGems(storedSold);
+  if (Object.keys(gemsBack).length > 0) report.system = [...report.system, ...gemLines(gemsBack)];
   const summary = {
     areaName: report.areaName,
     regionName: report.regionName,
@@ -919,6 +928,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // An event's herbs that found their places.
   const storedHerbs = Object.entries(herbs.stored);
   const setHerbs = storedHerbs.length ? `, herbs = json_set(herbs, ${storedHerbs.map(() => '?, COALESCE(json_extract(herbs, ?), 0) + ?').join(', ')})` : '';
+  const setGems = addTo('minerals', gemsBack);
   let results;
   try {
     results = await db.batch([
@@ -938,7 +948,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       ),
       db
         .prepare(
-          `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setResources}${setMaterials}${setHerbs},
+          `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setResources}${setMaterials}${setHerbs}${setGems.sql},
              time_points = time_points + ?, hp = ?, hp_at = ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${potionsChanged ? ', potions = ?' : ''}${event ? ', event_test = NULL' : ''}${eventBuffs ? ', buffs = ?' : ''}${eventPoints > 0 ? ', bonus_points = bonus_points + ?' : ''}${settlementAfter ? ', settlement = ?' : ''}${fortressAfter ? ', fortress = ?' : ''},
              version = version + 1
            WHERE id = ?`,
@@ -955,6 +965,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
           ...found.flatMap(([id, amount]) => [resourcePath(id), resourcePath(id), amount]),
           ...left.flatMap(([key, count]) => [resourcePath(key), resourcePath(key), count]),
           ...storedHerbs.flatMap(([id, count]) => [resourcePath(id), resourcePath(id), count]),
+          ...setGems.binds,
           applied.timePoints,
           hp,
           activity.ends_at,
@@ -999,3 +1010,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
 
   return { id: results[1].meta.last_row_id, report };
 }
+
+// The report's line of the gems that fell out of items the scrapper bought
+// when the bag overflowed (757 B), one line for each gem.
+export const gemLines = (gems) => Object.entries(gems).flatMap(([id, count]) => Array.from({ length: count }, () => t('Kamień {gem} wypadł i wrócił do zapasu.', { gem: gemNamed(id).name })));

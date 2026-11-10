@@ -32,6 +32,7 @@ import {
   rewardedQuest,
   settleCrafting,
   saleGold,
+  salvageMinerals,
   salvageYield,
   tableBuilding,
   takeOffQueue,
@@ -42,6 +43,7 @@ import { atomically, sameVersion } from './atomic.js';
 import { content } from './content.js';
 import { bagPlaces, characterView, craftingState, loadPlayer, questsNow, requireOffRack, requirePlayer, settleTable, taughtPattern } from './characters.js';
 import { toHex } from './encoding.js';
+import { requireUnmarked } from './favorites.js';
 import { tableTrials, trialTakenBack } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { testMode, testModeFor } from './test-mode.js';
@@ -114,15 +116,26 @@ const withPatterns = (state, before, taught) => ({
 
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 
-// The gem and the ore that jewellery taken apart gives at once, added to the
-// character's minerals, or null for other items (salvageYield).
+// The minerals items taken apart give at once, added to the character's
+// minerals, or null without any (salvageMinerals in the engine): the gem
+// and the ore of jewellery (`found`, for the page's "Do Jubilerstwa"), and
+// the gem set in any item, which falls out and goes back to them (the
+// author's 757 B, 10.11.2026: „kamień wypada i wraca do Twoich minerałów”;
+// `gems`, its ids, one for each item).
 function withMinerals(row, items) {
+  const all = items.reduce((sum, item) => addCounts(sum, salvageMinerals(item, content()) ?? {}), {});
+  if (Object.keys(all).length === 0) return null;
   const found = items.reduce((sum, item) => addCounts(sum, salvageYield(item, content()).minerals ?? {}), {});
-  return Object.keys(found).length > 0 ? { found, minerals: addCounts(JSON.parse(row.minerals ?? '{}'), found) } : null;
+  const gems = items.filter((item) => item.gem && content().mineralsById[item.gem]).map((item) => item.gem);
+  return { found, gems, minerals: addCounts(JSON.parse(row.minerals ?? '{}'), all) };
 }
 
 // Minerals as the page lists them: name and count.
 export const mineralList = (minerals) => Object.entries(minerals ?? {}).map(([id, count]) => ({ id, name: content().mineralsById[id].name, count }));
+
+// The gems that fell out of items as the page names them (757 B): one for
+// each item, with its id.
+export const gemList = (gems) => gems.map((id) => ({ id, name: content().mineralsById[id].name }));
 
 // The scrapper buys `count` pieces of a stack of materials ({ key, count }),
 // for their price with the camp's Skup złomu (proposal 1: "Skup złomu
@@ -196,6 +209,9 @@ export async function salvageItem(context) {
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
   requireOffRack(player, item);
+  // A favourite is not taken apart (favorites.js); a star put on meanwhile
+  // changes the character's version, which the order is saved with.
+  requireUnmarked(player, 'salvage', item);
   const now = context.now;
   const table = tableOf(player, now);
   if (!craftTakes(table, item.rarity, content())) throw tooRare(item.rarity);
@@ -232,7 +248,8 @@ export async function salvageItem(context) {
       parts: order.parts,
       endsAt: order.endsAt,
       ...(pattern && { pattern: pattern.name, patternAt: pattern.at }),
-      ...(jewel && { minerals: mineralList(jewel.found) }),
+      ...(jewel && Object.keys(jewel.found).length > 0 && { minerals: mineralList(jewel.found) }),
+      ...(jewel?.gems.length > 0 && { gems: gemList(jewel.gems) }),
     },
     character: characterView(await loadPlayer(db, session.userId), now),
   });
@@ -254,6 +271,8 @@ export async function salvageItems(context) {
   if (items.includes(undefined)) throw new ApiError(404, 'item_not_found', 'Któregoś z tych przedmiotów nie masz już w plecaku.');
   if (items.some((item) => item.equippedSlot)) throw new ApiError(409, 'equipped', 'Założonych przedmiotów nie rozbierzesz. Najpierw je zdejmij.');
   requireOffRack(player, ...items);
+  // None of them a favourite (favorites.js), as for one item above.
+  requireUnmarked(player, 'salvage', ...items);
   const now = context.now;
   const table = tableOf(player, now);
   const rare = items.find((item) => !craftTakes(table, item.rarity, content()));
@@ -304,7 +323,8 @@ export async function salvageItems(context) {
       count: items.length,
       orders: orders.map((order) => ({ part: content().partsById[order.partId].name, parts: order.parts, endsAt: order.endsAt })),
       patterns: taught.map(({ name, at }) => ({ name, at })),
-      ...(jewels && { minerals: mineralList(jewels.found) }),
+      ...(jewels && Object.keys(jewels.found).length > 0 && { minerals: mineralList(jewels.found) }),
+      ...(jewels?.gems.length > 0 && { gems: gemList(jewels.gems) }),
     },
     character: characterView(await loadPlayer(db, session.userId), now),
   });

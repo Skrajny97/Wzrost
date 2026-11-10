@@ -500,7 +500,8 @@
     "wanderer": { "items": 3, "rarities": { "rare": 3, "epic": 1 }, "priceFactor": 6 },
     "testSeller": "Handlarz próbny",
     "testMinutes": 15,
-    "resident": "merchant"
+    "resident": "merchant",
+    "log": { "entries": 100, "since": "0.2.36" }
   },
   "companions": {
     "priceByStanding": { "stranger": 2, "acquaintance": 1.6, "regular": 1.3, "trusted": 1.1, "friend": 1 },

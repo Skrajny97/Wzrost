@@ -5,9 +5,9 @@ import {
   baseClassLevel,
   campBonus,
   campLevels,
-  canUse,
   combatValues,
   createRng,
+  equipBlock,
   gearSetIds,
   valueChanges,
   heldOfRarity,
@@ -36,12 +36,14 @@ import {
 } from './characters.js';
 import { atomically, sameVersion } from './atomic.js';
 import { toHex } from './encoding.js';
+import { favoriteIds, favoriteRefusal, requireUnmarked, unmarked } from './favorites.js';
 import { trialProgress } from './guild-trials.js';
 import { upgradeFamePoints } from './fame.js';
 import { ApiError, json, readJson } from './http.js';
 import { takenOff } from './market.js';
 import { weekFactorNow } from './weeks.js';
 import { anvilDiscountOf } from './perks.js';
+import { addTo } from './professions.js';
 
 // The scrapper's price for the stored `items`, summed in SQL over the items
 // still there, so an item sold twice at the same moment pays once. Each price
@@ -62,6 +64,40 @@ export function soldGold(characterId, items, bonus) {
 
 const sellBonusOf = (player, now) => campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content());
 
+// The gem set in an item the character loses with it, by id, or null (the
+// author's 757 B, 10.11.2026: „kamień wypada i wraca do Twoich
+// minerałów”): it goes back to the character's minerals in the batch that
+// takes the item, and the answer names it. A gem the data no longer knows
+// goes with the item.
+export const fallenGem = (item) => (item.gem && content().mineralsById[item.gem] ? item.gem : null);
+
+// A fallen gem as the page names it.
+export const gemNamed = (id) => ({ id, name: content().mineralsById[id].name });
+
+// The gems of `items` the character loses, counted by id, for addTo
+// ('minerals', …) in professions.js.
+export function fallenGems(items) {
+  const gems = {};
+  for (const item of items) {
+    const gem = fallenGem(item);
+    if (gem) gems[gem] = (gems[gem] ?? 0) + 1;
+  }
+  return gems;
+}
+
+// The change of the characters row that gives back the gem of `item` while
+// the item is still the character's, before the statement that takes it:
+// so an item sold or thrown away twice at the same moment gives it once.
+function gemBack(item, characterId) {
+  const gem = fallenGem(item);
+  if (!gem) return { sql: '', binds: [] };
+  const path = `$."${gem}"`;
+  return {
+    sql: ', minerals = CASE WHEN EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ?) THEN json_set(minerals, ?, COALESCE(json_extract(minerals, ?), 0) + 1) ELSE minerals END',
+    binds: [item.id, characterId, path, path],
+  };
+}
+
 function findItem(player, id) {
   const item = player.items.find((candidate) => String(candidate.id) === id);
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
@@ -79,17 +115,16 @@ export async function equipItem(context) {
   requireNotExploring(player, context.now);
   const item = findItem(player, context.params.id);
   if (item.equippedSlot) throw new ApiError(409, 'already_equipped', 'Ten przedmiot jest już założony.');
-  if (content().slotsById[item.slot].locked) throw new ApiError(403, 'slot_locked', 'Ten slot jest jeszcze zablokowany.');
-  if (!canUse(item.base, player.row.class_id, content())) {
-    throw new ApiError(403, 'wrong_class', 'Twoja klasa nie może używać tego przedmiotu.');
-  }
   // Every item, an own find or one from a Wymiana, the Targowisko or the
   // Skrzynia Konta, is worn from its Tier, the class level its base asks
   // for, whatever its own level (the author: "Niech przedmioty z Wymian i
   // Targowiska działają w oparciu o Tiery a nie poziomy samej broni").
-  if (!canUse(item.base, player.row.class_id, content(), player.row.class_level)) {
-    throw new ApiError(403, 'class_level', `Ten przedmiot założysz od poziomu klasy ${baseClassLevel(item.base, content())}.`);
-  }
+  // The rules are equipBlock's in the engine, which the Targowisko's "Dla
+  // mnie" and the slot's list of items to wear ask too.
+  const block = equipBlock(item, player.row.class_id, player.row.class_level, content());
+  if (block === 'slot_locked') throw new ApiError(403, 'slot_locked', 'Ten slot jest jeszcze zablokowany.');
+  if (block === 'wrong_class') throw new ApiError(403, 'wrong_class', 'Twoja klasa nie może używać tego przedmiotu.');
+  if (block === 'class_level') throw new ApiError(403, 'class_level', `Ten przedmiot założysz od poziomu klasy ${baseClassLevel(item.base, content())}.`);
 
   // Whatever was in the slot goes back to the bag first; an item taken from
   // a Zbrojownia's rack frees no place there, so one the sets do not keep
@@ -123,13 +158,31 @@ export async function unequipItem(context) {
   return respond(context, session);
 }
 
+// A favourite stays (favorites.js): its star comes off first. So it does
+// below, at the scrapper's. The gem set in the item falls out and goes
+// back to the minerals (757 B), as from an item sold.
 export async function discardItem(context) {
   const { session, player } = await requirePlayer(context);
   const item = findItem(player, context.params.id);
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
   requireOffRack(player, item);
-  await context.env.DB.prepare('DELETE FROM items WHERE id = ? AND character_id = ?').bind(item.id, player.row.id).run();
-  return respond(context, session);
+  requireUnmarked(player, 'discard', item);
+  const db = context.env.DB;
+  const gem = gemBack(item, player.row.id);
+  const results = await atomically(
+    db,
+    [
+      unmarked(db, player.row.id, [item.id]),
+      ...(gem.sql ? [db.prepare(`UPDATE characters SET version = version + 1${gem.sql} WHERE id = ?`).bind(...gem.binds, player.row.id)] : []),
+      db.prepare('DELETE FROM items WHERE id = ? AND character_id = ?').bind(item.id, player.row.id),
+    ],
+    () => favoriteRefusal('discard'),
+  );
+  const gone = results.at(-1).meta.changes === 1;
+  return json({
+    ...(gone && fallenGem(item) && { discarded: { gem: gemNamed(fallenGem(item)) } }),
+    character: characterView(await loadPlayer(db, session.userId), context.now),
+  });
 }
 
 // The scrapper buys every item in the bag of a rarity up to the chosen one.
@@ -140,22 +193,29 @@ export async function sellItems(context) {
   if (limit === -1) throw new ApiError(400, 'invalid_rarity', 'Wybierz rzadkość.');
   const rank = (item) => content().rarities.findIndex((rarity) => rarity.id === item.rarity);
   // Upgraded items, and those with a gem set in them, are not sold by the
-  // handful: too much went into them.
-  const sold = bagItems(player).filter((item) => !(item.upgrade > 0) && !item.gem && rank(item) <= limit);
+  // handful: too much went into them. Nor are the favourites (favorites.js).
+  const marked = favoriteIds(player.row);
+  const sold = bagItems(player).filter((item) => !(item.upgrade > 0) && !item.gem && !marked.has(item.id) && rank(item) <= limit);
   let count = 0;
   if (sold.length > 0) {
     // One transaction: the gold is counted from the items still there, then
-    // they go, so a second tap at the same moment pays nothing twice.
+    // they go, so a second tap at the same moment pays nothing twice; and
+    // none of them is sold if it became a favourite meanwhile.
     const db = context.env.DB;
     const ids = sold.map((item) => item.id);
     const price = soldGold(player.row.id, sold, sellBonusOf(player, context.now));
-    const results = await db.batch([
-      db
-        .prepare(`UPDATE characters SET gold = gold + ${price.sql}, version = version + 1 WHERE id = ?`)
-        .bind(...price.binds, player.row.id),
-      db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${ids.map(() => '?').join(', ')})`).bind(player.row.id, ...ids),
-    ]);
-    count = results[1].meta.changes;
+    const results = await atomically(
+      db,
+      [
+        unmarked(db, player.row.id, ids),
+        db
+          .prepare(`UPDATE characters SET gold = gold + ${price.sql}, version = version + 1 WHERE id = ?`)
+          .bind(...price.binds, player.row.id),
+        db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${ids.map(() => '?').join(', ')})`).bind(player.row.id, ...ids),
+      ],
+      () => favoriteRefusal('sell'),
+    );
+    count = results[2].meta.changes;
   }
   const bonus = sellBonusOf(player, context.now);
   const gold = count === sold.length ? sold.reduce((sum, item) => sum + sellPrice(item, content(), bonus), 0) : 0;
@@ -167,22 +227,31 @@ export async function sellItems(context) {
 
 // The scrapper buys one item from the bag, an upgraded one too: the "Sprzedaj"
 // of its card (the author: "nie mogę sprzedać ulepszonych ... ani w skupie
-// ani nigdzie"). The price is counted from the item still there, as above.
+// ani nigdzie"). The price is counted from the item still there, as above,
+// and so is the gem set in it, which falls out and goes back to the
+// minerals (757 B).
 export async function sellItem(context) {
   const { session, player } = await requirePlayer(context);
   const item = findItem(player, context.params.id);
   if (item.equippedSlot) throw new ApiError(409, 'equipped', 'Najpierw zdejmij ten przedmiot.');
   requireOffRack(player, item);
+  requireUnmarked(player, 'sell', item);
   const db = context.env.DB;
   const bonus = sellBonusOf(player, context.now);
   const price = soldGold(player.row.id, [item], bonus);
-  const results = await db.batch([
-    db.prepare(`UPDATE characters SET gold = gold + ${price.sql}, version = version + 1 WHERE id = ?`).bind(...price.binds, player.row.id),
-    db.prepare('DELETE FROM items WHERE id = ? AND character_id = ?').bind(item.id, player.row.id),
-  ]);
-  const count = results[1].meta.changes;
+  const gem = gemBack(item, player.row.id);
+  const results = await atomically(
+    db,
+    [
+      unmarked(db, player.row.id, [item.id]),
+      db.prepare(`UPDATE characters SET gold = gold + ${price.sql}${gem.sql}, version = version + 1 WHERE id = ?`).bind(...price.binds, ...gem.binds, player.row.id),
+      db.prepare('DELETE FROM items WHERE id = ? AND character_id = ?').bind(item.id, player.row.id),
+    ],
+    () => favoriteRefusal('sell'),
+  );
+  const count = results[2].meta.changes;
   return json({
-    sold: { count, gold: count === 1 ? sellPrice(item, content(), bonus) : 0 },
+    sold: { count, gold: count === 1 ? sellPrice(item, content(), bonus) : 0, ...(count === 1 && fallenGem(item) && { gem: gemNamed(fallenGem(item)) }) },
     character: characterView(await loadPlayer(context.env.DB, session.userId), context.now),
   });
 }
@@ -295,6 +364,10 @@ export async function upgradeItem(context) {
 
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const outcome = rollUpgrade(item, createRng(roll), content(), { warded, steady, week: plan.week });
+  // A broken item's gem falls out and goes back to the minerals (757 B),
+  // with the payment of this try, which holds only with the item broken.
+  const gem = outcome.result === 'broken' ? fallenGem(item) : null;
+  const gemSet = gem ? addTo('minerals', { [gem]: 1 }) : { sql: '', binds: [] };
   const forget =
     outcome.result === 'broken' && inSet
       ? JSON.stringify({ ...JSON.parse(row.fortress ?? '{}'), sets: sets.map((set) => set && { ...set, items: set.items.filter((id) => id !== item.id) }) })
@@ -315,9 +388,9 @@ export async function upgradeItem(context) {
       .bind(outcome.upgrade, roll, item.id, row.id, view.level, item.lastRoll ?? '', row.id, ...pay.enoughBinds),
     db
       .prepare(
-        `UPDATE characters SET ${pay.set}${forget ? ', fortress = ?' : ''}, version = version + 1 WHERE id = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
+        `UPDATE characters SET ${pay.set}${gemSet.sql}${forget ? ', fortress = ?' : ''}, version = version + 1 WHERE id = ? AND EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)`,
       )
-      .bind(...pay.binds, ...(forget ? [forget] : []), row.id, item.id, roll),
+      .bind(...pay.binds, ...gemSet.binds, ...(forget ? [forget] : []), row.id, item.id, roll),
     // An upgrade that came off moves the Próby Gildii's trial on, only with
     // this roll saved (guild-trials.js).
     ...trialProgress(db, row.id, { upgrades: outcome.result === 'success' ? 1 : 0 }, context.now, {
@@ -352,6 +425,7 @@ export async function upgradeItem(context) {
       ...(outcome.saved && { saved: true }),
       ...(steady && { steadied: true }),
       ...(outcome.kept && { kept: true }),
+      ...(gem && { gem: gemNamed(gem) }),
     },
     character: characterView(await loadPlayer(db, session.userId), context.now),
   });
