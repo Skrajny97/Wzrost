@@ -12,8 +12,11 @@ import { publicContent } from '../src/server/content.js';
 import { runInLanguage } from '../src/server/i18n.js';
 import { loadData, validateData } from '../tools/validate-data.mjs';
 
-test('the invite link starts empty, and only a Discord invite link may stand there', () => {
-  assert.equal(loadData().community.discord.invite, '');
+// The server's invite link, which the author sent on 10.11.2026.
+const INVITE = 'https://discord.gg/K5tueUDhd2';
+
+test('the invite link is the server\'s, and only a Discord invite link may stand there', () => {
+  assert.equal(loadData().community.discord.invite, INVITE);
   const errors = (invite) => {
     const data = structuredClone(loadData());
     data.community.discord.invite = invite;
@@ -28,8 +31,8 @@ test('the invite link starts empty, and only a Discord invite link may stand the
 test("the page gets the link and the button's words in its language", () => {
   const pl = runInLanguage('pl', () => publicContent()).community.discord;
   const en = runInLanguage('en', () => publicContent()).community.discord;
-  assert.deepEqual(pl, { invite: '', texts: { join: 'Dołącz do serwera Discord' } });
-  assert.deepEqual(en, { invite: '', texts: { join: 'Join the Discord server' } });
+  assert.deepEqual(pl, { invite: INVITE, texts: { join: 'Dołącz do serwera Discord' } });
+  assert.deepEqual(en, { invite: INVITE, texts: { join: 'Join the Discord server' } });
 });
 
 // Just enough of a document for dom.js's h() and the mark's SVG.
@@ -69,8 +72,9 @@ test('the mark and the row show only with an invite link, and open it in a new c
   const { discordButton, discordRow } = await import('../src/client/discord.js');
   const { state } = await import('../src/client/state.js');
 
-  // As the game is now: no link, nothing to show.
-  state.content = { community: runInLanguage('pl', () => publicContent()).community };
+  // Without a link, nothing to show.
+  const community = runInLanguage('pl', () => publicContent()).community;
+  state.content = { community: { ...community, discord: { ...community.discord, invite: '' } } };
   assert.equal(discordButton(), null);
   assert.equal(discordRow(), null);
   // No content yet (the start screen): nothing either.
