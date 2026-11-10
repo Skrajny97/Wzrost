@@ -1,0 +1,14 @@
+{
+  "id": "skin-perun-female-bare2",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, a woman warrior in dark blackened steel plate armour with thin copper trims seen exactly from the side facing right: her front thigh and knee in dark steel plate greaves with thin copper trims, her near hand an empty fist at her hip, no sword, no blade, no hilt, nothing in front of her legs, empty transparent background around her",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": "art/inputs/walk-starts/skin-perun-female-bare1.png",
+  "mask": "art/inputs/walk-starts/skin-perun-female-bare2-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
