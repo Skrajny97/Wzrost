@@ -3041,6 +3041,7 @@ Autor: „Kliknięcie "Co nowego?" będąc w zakładce wojen gildii wykrzacza ek
 1. **Przyczyna.** iPhone przybliża stronę, gdy fokus dostaje pole mniejsze niż 16 px, i zostawia ją przybliżoną. W zakładce „Wojna” na wersji testowej jest lista „Drużyny rywala” z karty „Test wojny”, a miała domyślne 13 px. Po wyborze iPhone zostawia na niej fokus, a okno takie jak „Co nowego?” po zamknięciu oddaje fokus temu polu. Tak samo mała (14 px) była lista katalizatora u Jagny.
 2. **Każde pole ma co najmniej 16 px.** Pola do pisania i listy wyboru bez własnej wielkości mają 16 px (`styles.css`, reguła z `:where`, więc własna wielkość pola wygrywa), a lista katalizatora 16 px zamiast 14 px. Pola z własną wielkością już miały 16 px.
 3. **Okno nie oddaje fokusu polu.** Gdy otwiera się okno gry (`openSheet` w `ui.js`), pole, które ma fokus, najpierw go traci. Po zamknięciu okna telefon nie przybliża więc strony do tego pola i nie otwiera znów klawiatury ani listy.
+4. **0.2.56 trafia do gry z tą wersją.** Jej wdrożenie zatrzymał test tłumaczeń: wpis „Co nowego?” 0.2.56 nie miał zapisanego skrótu polskiego tekstu (`data/en/sources.json`). Skrót jest dopisany, więc Pancerz Peruna i poprawka konia wchodzą do gry razem z 0.2.57.
 
 ## Wersja 0.2.56 (10.11.2026): Pancerz Peruna w Sklepie i poprawka konia
 
