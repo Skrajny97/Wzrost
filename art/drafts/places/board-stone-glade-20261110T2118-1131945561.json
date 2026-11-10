@@ -1,0 +1,14 @@
+{
+  "id": "board-stone-glade",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art, top-down view straight from above of a mossy glade floor inside a ring of old stones: short grass and thick moss patches, flat grey stones half sunk in the ground, a few fern sprigs, muted dark palette of moss green and stone grey, a faint pale strip of trampled ground across the middle dividing two halves, slightly darker edges, soft even dusk light, flat ground seen from above for a dim background behind game cards, very low contrast, no standing trees, no people, no animals, no weapons, no text, no border",
+  "style": "src/client/art/boards/arena-board.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

@@ -1,0 +1,14 @@
+{
+  "id": "board-new-moon-depths",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art, top-down view straight from above of a moonless pine forest floor in the dead of night: grey moss, old rotting pine needles, crooked roots and a few small pale stones, muted very dark palette of grey, black and cold violet, a faint pale strip of trampled ground across the middle dividing two halves, slightly darker edges, soft even dusk light, flat ground seen from above for a dim background behind game cards, very low contrast, no standing trees, no people, no animals, no weapons, no text, no border",
+  "style": "src/client/art/boards/arena-board.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
