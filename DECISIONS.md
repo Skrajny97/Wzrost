@@ -3034,6 +3034,29 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.37 (10.11.2026): Cień silniejszy, Arena wyrównana (772)
+
+Autor (772): „Jakoś trzeba to obejść, żeby to miało ręce i nogi, nie chcemy sztucznie wzmacniać klas na pvp, ale jeśli ogólnie są słabsze, także w wyprawach, to trzeba je wzmocnić.” Zgodnie z tym najpierw zmierzono siłę klas na wyprawach. Klasa słabsza także tam dostała wzmocnienie ogólne, a różnice widoczne tylko w pojedynkach wyrównuje zasada pojedynku, jednakowa dla wszystkich klas.
+
+1. **Pomiar na wyprawach** (`tools/class-balance-sim.mjs`). Realistyczny gracz z `tools/difficulty-sim.mjs`, każda klasa i każda ścieżka ewolucji, wyprawy 1 h i 4 h w najnowszym miejscu poziomów 25, 50, 75, 100, 150 i 200, po 240 wypraw na komórkę, z towarzyszami i bez nich. Porażka zabiera całą wyprawę i kosztuje karę XP, jak w grze.
+    - Z towarzyszami żadna klasa nie odstaje: porażki 0–4%, XP i złoto na godzinę w granicach ±5% średniej.
+    - Bez towarzyszy najsłabszy był Cień: porażki 69% / 91% na 50. poziomie, 60% / 86% na 75. i 16% / 46% na 200. (1 h / 4 h), przy średniej pięciu klas 32% / 62%, 26% / 53% i 6% / 20%. Łucznik mieścił się w średniej.
+    - Przyczyna: poziomy Cienia, Skrytobójcy i Królobójcy dawały Siłę, a sztylet korzysta ze Zręczności. Siła nie działa w walce ani w zdarzeniach, więc Cień miał najmniej HP ze wszystkich klas.
+2. **Cień silniejszy wszędzie** (`data/classes.json`, `data/evolutions.json`).
+    - Poziomy Cienia, Skrytobójcy i Królobójcy dają Witalność zamiast Siły. Dodatek +5 HP za poziom klasy zostaje, więc Cień ma na poziom klasy tyle HP co Łucznik albo trochę więcej.
+    - Egzekucja i Ścięcie działają najwyżej co 3. ruch zamiast co 4., jak główne ciosy pozostałych ścieżek.
+    - Bez towarzyszy (1 h / 4 h): 50. poziom 32% / 69%, 75. 15% / 50%, 100. 1% / 13%, 150. 0% / 5%, 200. 3% / 11%. Z towarzyszami wynik mieści się w granicach losowości.
+    - Zmiana działa od razu u wszystkich postaci i towarzyszy klasy Cień: więcej maks. HP i tyle samo mniej Siły na ekranie Statystyk (np. +245 HP od 50. poziomu klasy).
+3. **Arena: pancerz liczy się w części** (`duel.armorCurve` w `data/settlement.json`).
+    - Postacie noszą o wiele więcej pancerza niż stwory, do których dobrano ciosy broni, a odporności mają podobnie małe jak one. W pojedynku cios broni tracił więc połowę tego, co traci na stworze, a zaklęcie prawie nic. Od 50. poziomu Łucznik wygrywał 26–44% pojedynków, a Mag i Kleryk 58–89%.
+    - Pancerz obu stron liczy się w części zależnej od średniego poziomu obu postaci: 100% na 25. poziomie, 70% na 50., 45% na 100. i 35% na 300., między punktami liniowo. Zasada jest ta sama dla każdej klasy.
+    - Brakujący szczegół: na 25. poziomie liczy się cały pancerz, bo tam różnica jest najmniejsza, a każda obniżka zostawiała Kleryka z 0–5% wygranych.
+    - Walki się skróciły, więc mnożnik HP wynosi 3 na 100. poziomie i 3,25 na 300. (wcześniej 2,75 i 3).
+    - Zasady Areny podają tę część dla dwóch postaci na poziomie gracza, gdy jest mniejsza niż 100%: „Pancerz chroni tu słabiej niż na wyprawach, bo postacie noszą go o wiele więcej niż stwory: dla dwóch postaci na Twoim poziomie liczy się {armor}% pancerza.” Tekst jest też po angielsku.
+4. **Pojedynki** (`tools/pvp-arena-sim.mjs`, główne ścieżki, odsetek wygranych z pozostałymi klasami, przed → po): Wojownik 48–71% → 46–76%, Łucznik 26–81% → 34–78%, Mag 50–89% → 40–60%, Kleryk 31–75% → 19–51%, Cień 6–29% → 45–58%. Na 50., 75., 100. i 200. poziomie każda klasa wygrywa 38–61% (sprawdza to test).
+5. **Arena zostaje tylko na wersji testowej**, a autor dostaje pytania 777–781: Wojownik na 150. i 300. poziomie (71–76% wygranych, najsilniejszy także bez towarzyszy na wyprawach), Łucznik i Kleryk na 25. poziomie (78% i 19%), ścieżki Inkwizytora w pojedynkach (Wielki Inkwizytor 0–1%, Inkwizytor 13–16%), ścieżki słabsze na wyprawach (Arkanista i Druid, Bastion na 200. poziomie, Elementalista bez towarzyszy) oraz włączenie Areny w grze.
+6. **Sprawdzone:** pełne testy 1561 z 1561 (nowe: krzywa pancerza, każda klasa wygrywa 30–70% na 50., 75., 100. i 200. poziomie, liczby Areny w odpowiedzi serwera, żadna klasa nie rośnie w cechę, której jej broń nie używa, Egzekucja i Ścięcie co 3. ruch), ekran Areny na 9 rozmiarach ekranu.
+
 ## Wersja 0.2.36 (10.11.2026): duża paczka od autora i graczy
 
 Autor przysłał 10.11 rano listę zmian („preferowane jedno duże wdrożenie”) i uwagi graczy, a potem odpowiedzi na pytania 757–768: „757 B / 758 A, tylko musi być jakaś informacja o takich obszarówkach dla gracza / 759 to mają być powtarzalne rzeczy czyli Wieże nie wchodzą, ale tygodniowo liczone git / 760 A / 761 C tygodniowe cele x2 nagrody x1,5, miesięczne cele x4 nagrody x2 / 762 A, ale niech otwiera się od 25 poziomu postaci / 763 A / 764-768 wszystko git”. Potem: „Dodaj tez aktualny stopien Portalu obok jego nazwy tak by nie trzeba bylo wchodzic i sprawdzac czy jest maksymalny” i „chowańce to tylko przedmiot kosmetyczny”.

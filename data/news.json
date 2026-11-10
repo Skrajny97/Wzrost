@@ -460,6 +460,11 @@
       "id": "0.2.36",
       "title": "Wersja 0.2.36",
       "body": "- Targowisko: zakładka „Rejestr” z tym, co postać sprzedała, kupiła i wygrała na licytacjach, oraz filtry „Dla mnie” i „Licytuję”.\n- Postać: stuknięcie miejsca na ekwipunek pokazuje przedmioty z plecaka na to miejsce, z porównaniem.\n- Stół rozbiórki: zaznaczony przedmiot jest podświetlony i opisany. Gwiazdka „Ulubiony” w karcie przedmiotu chroni go przed rozbiórką, sprzedażą, wyrzuceniem i oddaniem w zleceniu Osady.\n- Kamień z przedmiotu, który pęknie na Kowadle, pójdzie do rozbiórki, zostanie sprzedany, wyrzucony albo oddany w zleceniu Osady, wraca do Twoich minerałów.\n- Tygodnie roku: każdy tydzień daje drobną premię, np. +5% złota z walk. Pasek nad Walką mówi, jaki jest teraz tydzień.\n- Punkty Sławy za wyprawy, profesje, zadania i inne zajęcia, w nowej zakładce „Sława” w Społeczności. Trzy najlepsze konta tygodnia dzielą 150 Punktów Systemu, a pierwsze miejsce ma przez tydzień złote imię.\n- Wieża Drużyn także z towarzyszami z Kwater, bez Drużyny.\n- Drużyna: członek z czekającym raportem rusza z drużyną, a jego raport odbiera się sam.\n- Awatar Systemu daje teraz ćwierć doświadczenia postaci i ćwierć postępu profesji.\n- Poszukiwani przychodzą z niższych krain, a na wyprawie Drużyny trafia się poszukiwany z listu kogokolwiek z drużyny.\n- Gildia: Skrzynia Gildii na przedmioty dla wszystkich albo dla jednego członka. Imiona przy Bestii Gildii otwierają kartę postaci.\n- Ranking po 50 miejsc na stronę, z przyciskiem „Moje miejsce”. Znajomi od najwyższego poziomu, z czasem ostatniej wizyty.\n- Misje tygodniowe wymagają dwa razy więcej i dają półtora raza więcej, a miesięczne wymagają cztery razy więcej i dają dwa razy więcej. Nowe liczby od następnego tygodnia i miesiąca.\n- Portale: przy nazwie widać najwyżej pokonany stopień.\n- Ustawienia: muzykę gry można wyłączyć, żeby słuchać własnej. Przycisk Discorda stoi przy Społeczności i w Ustawieniach.\n- Poprawka: członek drużyny zawsze widzi, że jest na wyprawie."
+    },
+    {
+      "id": "0.2.37",
+      "title": "Wersja 0.2.37",
+      "body": "- Cień jest silniejszy: poziomy Cienia, Skrytobójcy i Królobójcy dają teraz Witalność zamiast Siły, z której ta klasa nie korzystała, więc postać ma więcej zdrowia. Egzekucja i Ścięcie uderzają co trzeci ruch zamiast co czwarty."
     }
 ]
 }
