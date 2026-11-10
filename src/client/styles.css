@@ -12139,18 +12139,6 @@ a.profession-square:active {
   font-size: 12px;
 }
 
-/* The Ranking's gap and "Pokaż całą setkę" (ranking.js). */
-.ranking-gap td {
-  padding: 2px 0;
-  color: var(--text-muted);
-  text-align: center;
-}
-
-.ranking-whole {
-  width: 100%;
-  margin-top: 10px;
-}
-
 /* The Dziennik's filter and its days (journal.js). */
 .journal-filters {
   display: flex;
@@ -15315,4 +15303,205 @@ a.profession-square:active {
 
 .status-row--language {
   align-items: center;
+}
+
+/* The batch of 10.11.2026: the Ranking in pages, the Znajomi's last time
+   online, the allies of the Bestia Gildii and the Skrzynia Gildii. */
+
+/* The Ranking's pages (screens/ranking.js; the author: „Ranking max 50
+   postaci + przewijanie listy na dalsze pozycje strona po stronie”): the
+   own place with "Moje miejsce" beside it, and over and under the table
+   "‹ Poprzednie", the places shown and "Następne ›"; on a narrow phone the
+   places stand over the two buttons. */
+.ranking-place-box:empty {
+  display: none;
+}
+
+.ranking-place-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 10px;
+}
+
+.ranking-mine {
+  flex: none;
+}
+
+.ranking-pager {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px 8px;
+  margin: 2px 0 8px;
+}
+
+.ranking-table + .ranking-pager {
+  margin: 10px 0 2px;
+}
+
+.ranking-range {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.ranking-turn {
+  white-space: nowrap;
+}
+
+@media (max-width: 479px) {
+  .ranking-pager {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ranking-range {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .ranking-turn--back {
+    justify-self: start;
+  }
+
+  .ranking-turn--on {
+    justify-self: end;
+  }
+}
+
+/* A friend's last time online beside its level (screens/friends.js). */
+.friend-seen {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* The allies in the Bestia's "Wkład tygodnia", their names to tap for their
+   cards (guild-beast.js), the own one in the System's light. */
+.guild-beast-row {
+  align-items: center;
+}
+
+.guild-beast-ally {
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.guild-beast-row--own .guild-beast-ally {
+  color: var(--system-text);
+}
+
+/* The Skrzynia Gildii (guild-chest.js): the chest's picture with its count
+   and what waits for the character, the items as in the Skrzynia Konta
+   (those for the character lit at the edge), "Włóż z plecaka" and the log
+   of the last moves; in "Włóż" the members to pick in a scrolling box. */
+.guild-stash p {
+  margin: 0;
+}
+
+.guild-stash .how-more > p + p {
+  margin-top: 6px;
+}
+
+.guild-stash-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.guild-stash-counts {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.guild-stash-count {
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.guild-stash-waiting {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.guild-stash-list {
+  margin: 4px 0;
+}
+
+.guild-stash-row--yours {
+  margin-left: -8px;
+  padding-left: 6px;
+  border-left: 2px solid var(--gold);
+}
+
+.guild-stash-row .button,
+.guild-stash-waits {
+  flex: none;
+}
+
+.guild-stash-waits {
+  max-width: 40%;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: right;
+}
+
+.guild-stash-sheet-note {
+  margin: 10px 0;
+  color: var(--text-muted);
+}
+
+.guild-stash-picker {
+  max-height: 40vh;
+}
+
+.guild-stash-choice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.guild-stash-choice-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.guild-stash-log {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guild-stash-move {
+  display: grid;
+  gap: 1px;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+}
+
+.guild-stash-move:first-child {
+  border-top: 0;
+}
+
+.guild-stash-move-item {
+  overflow-wrap: anywhere;
+  color: var(--rarity, var(--text));
+  font-family: var(--font-world);
+  font-weight: 700;
+}
+
+.guild-stash-move-who {
+  color: var(--text-muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
 }

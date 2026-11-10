@@ -1,5 +1,5 @@
 {
-  "$comment": "English texts of data/guilds.json (src/engine/overlay.js): the Guild's tabs, the Guild Hall (Siedziba) with its buildings, the Guild Expedition, the Guild Beast, the Guild Trials, the Guild Requests, the Resource exchange and the guilds' Fame in the Ranking. A Hall building's `accusative` is its plain name; the sentences put \"the\" before it (\"Donate to the Banner?\"). The forms after a number (attackForms, trialForms, counted, pieceForms…) are [one, other, other] for the Polish [one, few, many]. Guild roles: lider leader, zastępca deputy. The Exchange's button „Wymień” is “Exchange”.",
+  "$comment": "English texts of data/guilds.json (src/engine/overlay.js): the Guild's tabs, the Guild Hall (Siedziba) with its buildings, the Guild Expedition, the Guild Beast, the Guild Trials, the Guild Requests, the Resource exchange, the Guild Chest and the guilds' Fame in the Ranking. A Hall building's `accusative` is its plain name; the sentences put \"the\" before it (\"Donate to the Banner?\"). The forms after a number (attackForms, trialForms, counted, pieceForms…) are [one, other, other] for the Polish [one, few, many]. Guild roles: lider leader, zastępca deputy. The Exchange's button „Wymień” is “Exchange”.",
   "tabs": {
     "guild": { "name": "Guild" },
     "seat": { "name": "Hall" },
@@ -7,7 +7,8 @@
     "beast": { "name": "Beast" },
     "trials": { "name": "Trials" },
     "requests": { "name": "Requests" },
-    "exchange": { "name": "Exchange" }
+    "exchange": { "name": "Exchange" },
+    "chest": { "name": "Chest" }
   },
   "seat": {
     "buildings": {
@@ -411,6 +412,65 @@
         "closed": "This offer is already closed.",
         "sameAccount": "Characters of one account do not exchange with each other.",
         "short": "Missing: {missing} {genitive}.",
+        "changed": "Something changed in the meantime. Try once more."
+      }
+    }
+  },
+  "chest": {
+    "texts": {
+      "title": "Guild Chest",
+      "intro": "Leave an item in the chest, and someone from the guild takes it when they look in. You do not have to play at the same time.",
+      "how": [
+        "Put an item from your bag in for everyone or for one character of the guild. A worn item cannot go in.",
+        "An item for everyone can be taken by any guild member. An item for one character can be taken only by them, and while it waits, you can take it back.",
+        "The chest holds {capacity}. To take an item, you need room in your bag.",
+        "An item keeps its upgrade, gem, rarity and Tier. The Encyclopedia does not count an item from another character.",
+        "“Recent moves” show up to {log}: who puts in or takes out what, and when.",
+        "When someone leaves the guild, the items for them are for everyone from then on. The last character can leave the guild only once the chest is empty."
+      ],
+      "itemForms": ["item", "items", "items"],
+      "moveForms": ["move", "moves", "moves"],
+      "inside": "In the chest: {count} of {capacity}",
+      "forMe": "Waiting for you: {count}.",
+      "empty": "The chest is empty. Put an item from your bag in it.",
+      "from": "From: {name}",
+      "forAll": "For everyone",
+      "forOne": "For: {name}",
+      "forYou": "For you",
+      "take": "Take",
+      "takeBack": "Take back",
+      "waitsFor": "Waiting for: {name}",
+      "bagFull": "The bag is full.",
+      "bag": "Put in from the bag",
+      "bagLine": "In the bag: {count}.",
+      "bagEmpty": "There are no items in the bag.",
+      "full": "The chest is full. A new item will fit once someone takes something out.",
+      "put": "Put in",
+      "putTitle": "Put in the Guild Chest",
+      "putLead": "Who are you leaving the item for?",
+      "setting": "a gem is being set",
+      "log": "Recent moves",
+      "logLine": "Moves: {count}.",
+      "logEmpty": "Nothing has happened in the chest yet.",
+      "logPut": "{name} puts in · {at}",
+      "logPutFor": "{name} puts in for: {for} · {at}",
+      "logTake": "{name} takes out · {at}",
+      "noGuild": "The Guild Chest is for guild members. Join a guild or found your own.",
+      "putDone": "{item}: in the Guild Chest.",
+      "takeDone": "{item}: in the bag.",
+      "errors": {
+        "locked": "You will unlock guilds at character level {level}.",
+        "noGuild": "You are not in a guild.",
+        "noItem": "You have no such item in your bag.",
+        "worn": "A worn item cannot go in. Take it off first.",
+        "setting": "A gem is being set in this item. You can put it in once that is done.",
+        "full": "The Guild Chest holds {capacity}. A new item will fit once someone takes something out.",
+        "noMember": "This character is not in your guild.",
+        "self": "Keep an item for yourself in your bag.",
+        "gone": "This item is no longer in the chest.",
+        "notYours": "This item is waiting for {name}.",
+        "bagFull": "The bag is full. Make room in it to take the item.",
+        "leave": "There are items left in the Guild Chest. Take them before you leave: without you, the guild disappears along with the chest.",
         "changed": "Something changed in the meantime. Try once more."
       }
     }

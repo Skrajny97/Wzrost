@@ -35,6 +35,7 @@ import { claimGuildTrialChest, dropGuildTrial, getGuildTrials, openGuildTrials, 
 import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, thankForGuildGift } from './guild-requests.js';
 import { getGuildTodo } from './guild-todo.js';
 import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } from './guild-exchange.js';
+import { getGuildChest, putInGuildChest, takeFromGuildChest } from './guild-chest.js';
 import { donateToGuildSeat, getGuildSeat, preferGuildSeat } from './guild-seat.js';
 import { guildRanking } from './guild-fame.js';
 import { cancelOrders, craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
@@ -345,6 +346,10 @@ const routes = [
   ['POST', '/api/guild/exchange', postGuildOffer],
   ['POST', '/api/guild/exchange/take', takeGuildOffer],
   ['POST', '/api/guild/exchange/withdraw', withdrawGuildOffer],
+  // The Skrzynia Gildii (guild-chest.js).
+  ['GET', '/api/guild/chest', getGuildChest],
+  ['POST', '/api/guild/chest/put', putInGuildChest],
+  ['POST', '/api/guild/chest/take', takeFromGuildChest],
   // The guilds' ranking by their Sława (guild-fame.js, 381 A).
   ['GET', '/api/ranking/guilds', guildRanking],
   ['POST', '/api/towers/enter', enterTower],
