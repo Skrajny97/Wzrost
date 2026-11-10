@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.48 (10.11.2026): Kwatery 3. poziomu nie droższe niż Warownia; zaległe 0.2.45–0.2.47 w grze
+
+1. Autor: „Mówisz 0.2.47 wysłane, a w grze dalej 0.2.44”. Wersje 0.2.45, 0.2.46 i 0.2.47 doszły tylko do wersji testowej: przed wdrożeniem do gry zatrzymał je test, który pilnuje, żeby każdy budynek Warowni kosztował więcej niż najdroższy poziom budynku obozu. 3. poziom Kwater z 0.2.45 kosztował 20 480 złota, 5 698 drewna, 3 799 kamienia i 3 165 rudy żelaza, a 1. poziom budynku Warowni 8 000 złota, 3 000 drewna, 1 500 kamienia i 1 500 rudy żelaza.
+2. 3. poziom Kwater kosztuje teraz 7 680 złota, 2 370 drewna, 1 440 kamienia i 1 300 rudy żelaza: złota tyle co najdroższy poziom obozu (Kowadło na 10. poziomie), wszystkiego mniej niż Warownia. Poziomy 1 i 2 bez zmian, budowa nadal 48 h.
+3. Na przyszłość: przed wdrożeniem zmiany budynków obozu uruchamiam też testy Warowni (test/fortress.test.js), a po każdym wypchnięciu sprawdzam wynik wdrożenia do gry, nie tylko wersji testowej.
+4. Ta wersja wnosi do gry wszystko z 0.2.45–0.2.47: Kwatery 3. poziomu z rezerwowym towarzyszem, „Losuj innych” i powtórki obron na Arenie oraz krótszy napis przy Wieżach.
+
 ## Wersja 0.2.47 (10.11.2026): krótszy napis przy Wieżach w trakcie wyprawy
 
 1. Autor: „Zmień na "Postać jest na wyprawie. Wejdziesz do Wież po jej powrocie."”. Gdy postać jest na wyprawie, ekran Wież mówi teraz tylko: „Postać jest na wyprawie. Wejdziesz do Wież po jej powrocie.” (po angielsku: „The character is on an exploration. You can enter the Towers once it returns.”). Zasada się nie zmienia: do Wież wchodzi się dopiero po powrocie z wyprawy.

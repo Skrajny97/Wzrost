@@ -207,7 +207,11 @@
       { "resource": "gold", "base": 1280, "growth": 4 },
       { "resource": "wood", "base": 439.65, "growth": 3.6 },
       { "resource": "stone", "base": 293.1, "growth": 3.6 },
-      { "resource": "iron-ore", "base": 244.25, "growth": 3.6 }
+      { "resource": "iron-ore", "base": 244.25, "growth": 3.6 },
+      { "resource": "gold", "base": 7680, "growth": 1, "fromLevel": 3 },
+      { "resource": "wood", "base": 2370, "growth": 1, "fromLevel": 3 },
+      { "resource": "stone", "base": 1440, "growth": 1, "fromLevel": 3 },
+      { "resource": "iron-ore", "base": 1300, "growth": 1, "fromLevel": 3 }
     ],
     "minutes": { "levels": [240, 1200, 2880] }
   },
