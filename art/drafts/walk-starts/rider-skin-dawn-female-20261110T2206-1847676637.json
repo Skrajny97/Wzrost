@@ -1,0 +1,27 @@
+{
+  "id": "rider-skin-dawn-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a calm young woman with long straight fair blond hair falling down her back and a thin golden circlet, in layered white and gold vestments with golden embroidery and a long skirt, a golden sash at the waist, soft brown shoes, no staff and nothing in the hands but the reins, no halo, no shield and nothing on the back, sitting upright and relaxed on a horse exactly like the leaf-cloaked rider of the reference, astride, seen exactly from the side in a strict profile, facing right, the face, chest and hips turned fully to the right and not towards the viewer, only the near leg showing and the far leg hidden behind the horse, the near thigh lying forward along the saddle and the lower leg hanging straight down from the knee, the skirt falling straight down along the horse's side and the shoe straight under the knee, not slanting forward or backward, not spread diagonally, both hands in front holding the reins, the same size and place as the reference rider, the whole figure from the top of the head to the foot inside the image, nothing under the rider, isolated figure on a plain background, forest fantasy",
+  "style": "src/client/art/riders/skin-forest-lord-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/dawn-female.png",
+      "usage": "the character's look only: the face, fair hair, white and gold vestments and colours; not the pose and not the sun staff or the book"
+    },
+    {
+      "path": "src/client/art/riders/skin-forest-lord-female.png",
+      "usage": "a finished rider of the game in the right pose, which the author accepted: copy exactly how it sits, seen exactly from the side in profile, the near thigh forward along the saddle and the lower leg hanging straight down to the foot, one leg showing, both hands forward at the reins; not its clothes, hood, antlers, bow or colours"
+    },
+    {
+      "path": "art/references/riders/mannequin-seated.png",
+      "usage": "the pose of the figure: sitting sideways, the near thigh forward and the lower leg hanging straight down, only the near leg; not its hood or cloak"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 9
+}

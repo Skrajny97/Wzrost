@@ -1,0 +1,27 @@
+{
+  "id": "rider-skin-dawn-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a calm young man with short wavy fair blond hair in layered white and gold vestments with golden embroidery that open at the sides over white trousers, a golden sash at the waist, brown boots, no staff, no book and nothing in the hands but the reins, no halo, no shield and nothing on the back, sitting upright and relaxed on a horse exactly like the leaf-cloaked rider of the reference, seen exactly from the side in a strict profile, facing right, the face, chest and hips turned fully to the right and not towards the viewer, only the near leg showing and the far leg hidden behind the horse, the near thigh lying forward along the saddle and the lower leg hanging straight down from the knee to a brown boot, one normal slim leg, not tucked up, not slanting, not bulging, the vestments falling behind the leg and not over the knee, both hands in front holding the reins, the same size and place as the reference rider, the whole figure from the top of the head to the foot inside the image, nothing under the rider, isolated figure on a plain background, forest fantasy",
+  "style": "src/client/art/riders/skin-forest-lord-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/dawn-male.png",
+      "usage": "the character's look only: the face, fair hair, white and gold vestments and colours; not the pose and not the sun staff or the book"
+    },
+    {
+      "path": "src/client/art/riders/skin-forest-lord-male.png",
+      "usage": "a finished rider of the game in the right pose, which the author accepted: copy exactly how it sits, seen exactly from the side in profile, the near thigh forward along the saddle and the lower leg hanging straight down to the foot, one leg showing, both hands forward at the reins; not its clothes, hood, antlers, bow or colours"
+    },
+    {
+      "path": "art/references/riders/mannequin-seated.png",
+      "usage": "the pose of the figure: sitting sideways, the near thigh forward and the lower leg hanging straight down, only the near leg; not its hood or cloak"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 9
+}
