@@ -117,7 +117,10 @@ export function mountFriends(container) {
         person.nameColor,
       ),
       guildTag(person.guildTag),
-      h('span', { class: 'chat-level', text: t('poz. {level}', { level: person.level }) }),
+      // A friend's level and its last time online stay together on a line.
+      Object.hasOwn(person, 'lastSeen')
+        ? h('span', { class: 'friend-level' }, h('span', { class: 'chat-level', text: t('poz. {level}', { level: person.level }) }), seenLine(person))
+        : h('span', { class: 'chat-level', text: t('poz. {level}', { level: person.level }) }),
       more,
     );
 
@@ -211,7 +214,7 @@ export function mountFriends(container) {
               h(
                 'li',
                 { class: 'friend' },
-                who(person, seenLine(person), person.waiting > 0 && h('span', { class: 'friend-waiting', title: t('Upominek od tej postaci czeka') }, icon('gift', { size: 14 }))),
+                who(person, person.waiting > 0 && h('span', { class: 'friend-waiting', title: t('Upominek od tej postaci czeka') }, icon('gift', { size: 14 }))),
                 h(
                   'div',
                   { class: 'friend-actions' },

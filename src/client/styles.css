@@ -15372,12 +15372,28 @@ a.profession-square:active {
   }
 }
 
-/* A friend's last time online beside its level (screens/friends.js). */
+/* A friend's last time online beside its level (screens/friends.js), both
+   on one line with a dot between them, so "poz. 239" and "6 min temu" never
+   read as one number; the dot is not read aloud where the browser allows
+   it. */
+.friend-level {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
 .friend-seen {
   color: var(--text-muted);
   font-family: var(--font-system);
   font-size: 12px;
   white-space: nowrap;
+}
+
+.friend-seen::before {
+  content: '·';
+  content: '·' / '';
+  margin-right: 6px;
 }
 
 /* The allies in the Bestia's "Wkład tygodnia", their names to tap for their
