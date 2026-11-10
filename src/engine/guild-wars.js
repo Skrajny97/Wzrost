@@ -172,7 +172,7 @@ export function warBattle({ sideA, sideB, seed }, content) {
   const allies = sideA.map((one, index) => duelist(one, `a${index}`, 'ally', shape, content));
   const enemies = sideB.map((one, index) => duelist(one, `e${index}`, 'enemy', shape, content));
   const moves = battle.movesPerFighter * (allies.length + enemies.length);
-  const fight = simulateFight({ allies, enemies, rng: createRng(`guild-war:${seed}`), content, record: true, maxActions: moves });
+  const fight = simulateFight({ allies, enemies, rng: createRng(`guild-war:${seed}`), content, record: true, maxActions: moves, even: true });
   const hpOf = new Map(fight.units.map((unit) => [unit.id, unit.hp]));
   const left = (units) => units.reduce((sum, unit) => sum + Math.max(0, hpOf.get(unit.id) ?? 0), 0) / units.reduce((sum, unit) => sum + unit.maxHp, 0);
   const limit = fight.won === null;

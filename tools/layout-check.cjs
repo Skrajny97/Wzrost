@@ -86,6 +86,7 @@ const SCREENS = [
   '#/gildia/requests',
   '#/gildia/exchange',
   '#/gildia/chest',
+  '#/gildia/war',
   '#/sklep',
   '#/encyklopedia',
   '#/dziennik',
@@ -126,6 +127,7 @@ const TRANSLATED = new Set([
   '#/gildia/requests',
   '#/gildia/exchange',
   '#/gildia/chest',
+  '#/gildia/war',
   '#/sklep',
   '#/encyklopedia',
   '#/dziennik',
@@ -135,11 +137,15 @@ const TRANSLATED = new Set([
 // the Tablica zleceń's Poszukiwani and the Ranking's guilds.
 // The Ranking's guilds tab is named in data/guilds.json (fame.tabs), so its
 // English comes from data/en/guilds.json, not from strings.json.
-const GUILDS_TAB = LANG === 'en' ? JSON.parse(fs.readFileSync(path.join(__dirname, '../data/en/guilds.json'), 'utf8')).fame.texts.tabs.guilds : 'Gildie';
+const GUILDS = JSON.parse(fs.readFileSync(path.join(__dirname, `../data/${LANG === 'en' ? 'en/' : ''}guilds.json`), 'utf8'));
+const GUILDS_TAB = GUILDS.fame.texts.tabs.guilds;
+// The Wojna's "Drużyny" (guild-war.js), which opens the war's teams, so
+// named in data/guilds.json (war.texts) too.
+const WAR_TEAMS = GUILDS.war.texts.teams;
 // Folds opened on a screen after its tabs, all at once: the Portale's
 // cards, each its picture till a tap shows its stage (7.11.2026).
 const FOLDS = { '#/portale': '.portal-toggle[aria-expanded="false"]' };
-const TABS = { '#/oboz/craft-table': [said('Kolejka ({count}/{limit})').replace(/\s*\(.*$/, '')], '#/osada/board': [said('Poszukiwani')], '#/spolecznosc/ranking': [GUILDS_TAB] };
+const TABS = { '#/oboz/craft-table': [said('Kolejka ({count}/{limit})').replace(/\s*\(.*$/, '')], '#/osada/board': [said('Poszukiwani')], '#/spolecznosc/ranking': [GUILDS_TAB], '#/gildia/war': [WAR_TEAMS] };
 // Sheets opened over a screen after its tabs, each from the one before (a
 // tap on `tap`, or a picture given to the file field `pick`), looked at
 // alone once `ready` shows in it, and closed at the end with "Zamknij". The
@@ -396,12 +402,16 @@ async function main() {
       for (const tab of TABS[screen] ?? []) {
         // A tab the screen does not show (as Poszukiwani with no posters)
         // is named and skipped.
-        const button = view.locator('button.segmented-option, [role="tab"]', { hasText: tab }).first();
+        const button = view.locator('button.segmented-option, [role="tab"], button.war-button', { hasText: tab }).first();
         if ((await button.count()) === 0) {
           console.log(`  – ${size.name} ${screen}: brak zakładki „${tab}”`);
           continue;
         }
-        await button.click();
+        // A button in the screen itself (the Wojna's "Drużyny") may stand
+        // under the bars fixed over a short phone's page wherever the
+        // browser scrolls it: it is tapped as a script would.
+        if (await button.evaluate((element) => element.matches('[role="tab"], .segmented-option'))) await button.click();
+        else await button.evaluate((element) => element.click());
         await view.waitForTimeout(500);
         await check(`${screen} › ${tab}`, null, TRANSLATED.has(screen));
       }

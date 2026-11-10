@@ -167,7 +167,11 @@ const openersFirst = (skills) =>
 
 // `maxActions`: the moves after which a fight ends undecided (won: null),
 // balance.combat's unless a fight has its own (an Arena duel, pvp-arena.js).
-export function simulateFight({ allies, enemies, rng, content, record = false, trait = null, ambush = false, maxActions = null }) {
+// `even`: both sides are players' characters and pick their targets as the
+// allies do (the guild wars' battles of five on five, guild-wars.js); else
+// the foes, creatures, pick theirs at random by position, and two equal
+// teams of characters were not equal: the allies won four battles in five.
+export function simulateFight({ allies, enemies, rng, content, record = false, trait = null, ambush = false, maxActions = null, even = false }) {
   const balance = content.balance;
   const tuning = balance.combat;
   const actionLimit = maxActions ?? tuning.maxActions;
@@ -539,7 +543,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const taunt = evolving ? challenger(opponents) : null;
     if (taunt) return taunt;
     const seen = inSight(opponents);
-    if (actor.side === 'ally') return quickestKill(actor, seen);
+    if (actor.side === 'ally' || even) return quickestKill(actor, seen);
     // Atak na tył szyku (463: a monster's attack with `target: "back"`):
     // the one standing furthest back, by the same draw among equals.
     return rng.weighted(actor.weapon.target === 'back' ? hindmost(seen) : seen, weightOf);

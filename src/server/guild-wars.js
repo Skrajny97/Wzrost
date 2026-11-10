@@ -369,7 +369,7 @@ function battleLine(row, side, characterId) {
     result: row.result === 'draw' ? 'draw' : row.result === side ? 'win' : 'loss',
     fought: Boolean(own),
     reward: own?.gold !== undefined ? { gold: own.gold, systemPoints: own.systemPoints } : null,
-    replay: row.log !== null,
+    replay: Boolean(row.replay),
     _fighters: { ours: fighters[side], theirs: fighters[other], standing: { ours: fighters.standing[side], theirs: fighters.standing[other] } },
   };
 }
@@ -386,7 +386,7 @@ async function warOf(db, guild, ours, week, characterId, now) {
   const theirId = side === 'a' ? war.guild_b : war.guild_a;
   const mirror = war.guild_b === null;
   const [{ results: rows }, theirs] = await Promise.all([
-    db.prepare('SELECT * FROM guild_war_battles WHERE war_id = ? ORDER BY day DESC, number DESC').bind(war.id).all(),
+    db.prepare('SELECT id, day, number, team_a, team_b, result, at, fighters, log IS NOT NULL AS replay FROM guild_war_battles WHERE war_id = ? ORDER BY day DESC, number DESC').bind(war.id).all(),
     mirror ? null : db.prepare('SELECT g.name, g.tag, (SELECT COUNT(*) FROM guild_members m WHERE m.guild_id = g.id) AS members FROM guilds g WHERE g.id = ?').bind(theirId).first(),
   ]);
   const battles = rows.map((row) => battleLine(row, side, characterId));
@@ -513,7 +513,7 @@ export async function getGuildWarBattle(context) {
   const missing = () => new ApiError(404, 'no_battle', errors().noBattle);
   if (!Number.isSafeInteger(id)) throw missing();
   const row = await db
-    .prepare('SELECT b.*, w.guild_a, w.guild_b, w.name_a, w.tag_a, w.name_b, w.tag_b FROM guild_war_battles b JOIN guild_wars w ON w.id = b.war_id WHERE b.id = ? AND (w.guild_a = ? OR w.guild_b = ?)')
+    .prepare('SELECT b.*, b.log IS NOT NULL AS replay, w.guild_a, w.guild_b, w.name_a, w.tag_a, w.name_b, w.tag_b FROM guild_war_battles b JOIN guild_wars w ON w.id = b.war_id WHERE b.id = ? AND (w.guild_a = ? OR w.guild_b = ?)')
     .bind(id, guild.id, guild.id)
     .first();
   if (!row?.log) throw missing();

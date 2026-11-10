@@ -184,6 +184,14 @@ describe("the guild wars' rules", () => {
     assert.equal(warFightFor(battle.fight, 'a'), battle.fight);
   });
 
+  test('two equal teams win about as often on either side: both pick their targets alike', () => {
+    const team = ['warrior', 'cleric', 'shadow', 'archer', 'mage'].map((classId, index) => fighter(classId, 100, `Nasz${index}`, index));
+    const mirror = team.map((one, index) => ({ ...one, name: `Ich${index}` }));
+    let first = 0;
+    for (let seed = 0; seed < 80; seed++) if (warBattle({ sideA: team, sideB: mirror, seed: `even-${seed}` }, content).result === 'a') first += 1;
+    assert.ok(first >= 26 && first <= 54, `side A won ${first} of 80`);
+  });
+
   test("a battle won brings gold by the character's level and Punkty Systemu; the guild that won more battles wins the war (799 A)", () => {
     assert.deepEqual(warReward(100, content), { gold: war.reward.gold.base + war.reward.gold.perLevel * 100, systemPoints: war.reward.systemPoints });
     assert.deepEqual([warResult(4, 3), warResult(2, 5), warResult(3, 3), warResult(0, 0)], ['a', 'b', 'draw', 'draw']);

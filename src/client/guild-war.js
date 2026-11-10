@@ -400,7 +400,7 @@ export function mountGuildWar(container) {
   }
 
   // The war's end: how it went and what the guild got.
-  function endPart() {
+  function endPart(small) {
     const { war } = view;
     const words = texts();
     const text =
@@ -421,6 +421,7 @@ export function mountGuildWar(container) {
           h('div', { class: 'pvp-arena-plaque-text' }, h('p', { class: 'war-end', text: words.lead[{ win: 'won', loss: 'lost', draw: 'draw' }[war.result]] }), h('p', { class: 'war-clock-note', text })),
         ),
         h('p', { class: 'muted', text: words.next }),
+        !small && teamsButton(),
       ),
     ];
   }
@@ -665,7 +666,6 @@ export function mountGuildWar(container) {
       { class: 'card war-hero war-none' },
       heading(words.title),
       h('p', { class: 'war-hero-date', text: weekDates(view.week.startsAt) }),
-      h('div', { class: 'war-versus' }, banner(view.banner, false), h('div', { class: 'war-score' }, h('p', { class: 'war-score-line' }, h('span', { class: 'war-score-ours', text: '–' }))), banner(view.banner, true)),
       h('p', { class: 'war-none-text', text: words.none[view.none] }),
       h('p', { class: 'war-lead' }, icon('hourglass', { size: 18 }), h('span', { text: words.noneNext })),
     );
@@ -679,7 +679,7 @@ export function mountGuildWar(container) {
     if (!war) return [noWar(), teamsPart(), nextTeamPart(), howItWorks(null, texts().how), testPart()];
     return [
       hero(),
-      war.next ? eveningPart(small) : endPart(),
+      war.next ? eveningPart(small) : endPart(small),
       small && [teamsPart(), nextTeamPart(), fewerPart()],
       !small && fewerPart(),
       recentPart(),
