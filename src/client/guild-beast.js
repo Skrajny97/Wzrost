@@ -2,7 +2,8 @@
 // DECISIONS.md, "Bestia Gildii"; the author: "344 A"): the guild's beast of
 // the week with its sprite, name, level and region and its HP bar, shared
 // by the whole guild; "Atakuj" with the attacks left today, the last
-// attack's damage and the lines of its fight; the "Wkład tygodnia"; the
+// attack's damage and the lines of its fight; the "Wkład tygodnia", whose
+// names open the allies' character cards (profile.js); the
 // Skrzynie Bestii to open, and what one held as icons to tap, which open
 // the item's and the materials' cards as in the bag (the author: "ikonki
 // przedmiotów do kliknięcia sprawdzenia po otworzeniu a nie same nazwy");
@@ -20,6 +21,7 @@ import { checkGuildTodo } from './chat-news.js';
 import { fill, h, icon } from './dom.js';
 import { dateTimeFormat, formatNumber, plural } from './format.js';
 import { language, t } from './i18n.js';
+import { openProfile } from './profile.js';
 import { call, onCharacterChange, state } from './state.js';
 import { foldPart, howItWorks, openSheet, toast, withButton } from './ui.js';
 import { itemSheet } from './screens/character.js';
@@ -235,7 +237,11 @@ export function mountGuildBeast(container) {
   }
 
   // The "Wkład tygodnia": who hit the beast, how much and how often, folded
-  // under the number of them once someone has.
+  // under the number of them once someone has. A tap on an ally's name
+  // opens its character card, as in the Ranking or the chat (profile.js),
+  // with what that card offers (the author, 10.11.2026: „Przy bossie
+  // gildii opcja kliknięcia i podejrzenia sojusznika - jego karty
+  // postaci.”).
   function contributionPart() {
     const { contribution, own, texts } = view;
     const [one, few, many] = texts.attackForms;
@@ -250,7 +256,17 @@ export function mountGuildBeast(container) {
               h(
                 'li',
                 { class: `guild-beast-row${entry.own ? ' guild-beast-row--own' : ''}` },
-                h('span', { class: 'guild-beast-row-name', text: entry.name }),
+                h(
+                  'span',
+                  { class: 'guild-beast-row-name' },
+                  h('button', {
+                    type: 'button',
+                    class: 'chat-name guild-beast-ally',
+                    text: entry.name,
+                    'aria-label': t('{name}: zobacz postać', { name: entry.name }),
+                    onClick: (event) => withButton(event.currentTarget, () => openProfile(entry.name)),
+                  }),
+                ),
                 h('span', { class: 'guild-beast-row-damage', text: `${formatNumber(entry.damage)} HP · ${formatNumber(entry.hits)} ${plural(entry.hits, one, few, many)}` }),
               ),
             ),

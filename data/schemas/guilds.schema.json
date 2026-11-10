@@ -15,6 +15,7 @@
     "trials",
     "requests",
     "exchange",
+    "chest",
     "fame"
   ],
   "properties": {
@@ -60,8 +61,8 @@
     "tabs": {
       "description": "Zakładki strony Gildii (src/client/screens/guild.js), w tej kolejności.",
       "type": "array",
-      "minItems": 7,
-      "maxItems": 7,
+      "minItems": 8,
+      "maxItems": 8,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -78,7 +79,8 @@
               "beast",
               "trials",
               "requests",
-              "exchange"
+              "exchange",
+              "chest"
             ]
           },
           "name": {
@@ -244,6 +246,292 @@
     },
     "exchange": {
       "$ref": "#/definitions/exchange"
+    },
+    "chest": {
+      "description": "Skrzynia Gildii (src/server/guild-chest.js, src/client/guild-chest.js; autor, 10.11.2026: wspólna skrzynia na przedmioty dla wszystkich albo dla jednego członka).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capacity",
+        "log",
+        "texts"
+      ],
+      "properties": {
+        "$comment": {
+          "type": "string"
+        },
+        "capacity": {
+          "description": "Ile przedmiotów mieści skrzynia gildii naraz.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "log": {
+          "description": "Ile ostatnich ruchów (włożeń i wyjęć) pokazują „Ostatnie ruchy”.",
+          "type": "integer",
+          "minimum": 1
+        },
+        "texts": {
+          "type": "object",
+          "required": [
+            "title",
+            "intro",
+            "how",
+            "itemForms",
+            "moveForms",
+            "inside",
+            "forMe",
+            "empty",
+            "from",
+            "forAll",
+            "forOne",
+            "forYou",
+            "take",
+            "takeBack",
+            "waitsFor",
+            "bagFull",
+            "bag",
+            "bagLine",
+            "bagEmpty",
+            "full",
+            "put",
+            "putTitle",
+            "putLead",
+            "setting",
+            "log",
+            "logLine",
+            "logEmpty",
+            "logPut",
+            "logPutFor",
+            "logTake",
+            "noGuild",
+            "putDone",
+            "takeDone",
+            "errors"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "intro": {
+              "type": "string",
+              "minLength": 1
+            },
+            "how": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "itemForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "moveForms": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "inside": {
+              "type": "string",
+              "pattern": "\\{count\\}"
+            },
+            "forMe": {
+              "type": "string",
+              "minLength": 1
+            },
+            "empty": {
+              "type": "string",
+              "minLength": 1
+            },
+            "from": {
+              "type": "string",
+              "minLength": 1
+            },
+            "forAll": {
+              "type": "string",
+              "minLength": 1
+            },
+            "forOne": {
+              "type": "string",
+              "minLength": 1
+            },
+            "forYou": {
+              "type": "string",
+              "minLength": 1
+            },
+            "take": {
+              "type": "string",
+              "minLength": 1
+            },
+            "takeBack": {
+              "type": "string",
+              "minLength": 1
+            },
+            "waitsFor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "bagFull": {
+              "type": "string",
+              "minLength": 1
+            },
+            "bag": {
+              "type": "string",
+              "minLength": 1
+            },
+            "bagLine": {
+              "type": "string",
+              "minLength": 1
+            },
+            "bagEmpty": {
+              "type": "string",
+              "minLength": 1
+            },
+            "full": {
+              "type": "string",
+              "minLength": 1
+            },
+            "put": {
+              "type": "string",
+              "minLength": 1
+            },
+            "putTitle": {
+              "type": "string",
+              "minLength": 1
+            },
+            "putLead": {
+              "type": "string",
+              "minLength": 1
+            },
+            "setting": {
+              "type": "string",
+              "minLength": 1
+            },
+            "log": {
+              "type": "string",
+              "minLength": 1
+            },
+            "logLine": {
+              "type": "string",
+              "minLength": 1
+            },
+            "logEmpty": {
+              "type": "string",
+              "minLength": 1
+            },
+            "logPut": {
+              "type": "string",
+              "minLength": 1
+            },
+            "logPutFor": {
+              "type": "string",
+              "pattern": "\\{for\\}"
+            },
+            "logTake": {
+              "type": "string",
+              "minLength": 1
+            },
+            "noGuild": {
+              "type": "string",
+              "minLength": 1
+            },
+            "putDone": {
+              "type": "string",
+              "minLength": 1
+            },
+            "takeDone": {
+              "type": "string",
+              "minLength": 1
+            },
+            "errors": {
+              "type": "object",
+              "required": [
+                "locked",
+                "noGuild",
+                "noItem",
+                "worn",
+                "setting",
+                "full",
+                "noMember",
+                "self",
+                "gone",
+                "notYours",
+                "bagFull",
+                "leave",
+                "changed"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "locked": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "noGuild": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "noItem": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "worn": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "setting": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "full": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "noMember": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "self": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "gone": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "notYours": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "bagFull": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "leave": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "changed": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        }
+      }
     },
     "fame": {
       "$ref": "#/definitions/fame"

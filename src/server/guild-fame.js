@@ -21,6 +21,7 @@ import { countedForm, questPeriod } from '../engine/index.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { json } from './http.js';
+import { askedPage, lastOffset } from './ranking-pages.js';
 
 const rules = () => content().guilds.fame;
 const words = () => rules().texts;
@@ -136,12 +137,14 @@ function rankingTexts() {
   return { ...texts, how: texts.how.map((line) => filled(line, vars)) };
 }
 
-// GET /api/ranking/guilds?period=week|all: the guilds by their Sława of
-// this week or of all weeks ("Od początku": those frozen and this one), of
-// two with as much the older first, each with its tag, name and members;
-// the first `size` of them (as the Ranking postaci), the place of the guild
-// of the one who asks among all, and the tag of the best guild of the week
-// before.
+// GET /api/ranking/guilds?period=week|all&offset=…&limit=…: the guilds by
+// their Sława of this week or of all weeks ("Od początku": those frozen and
+// this one), of two with as much the older first, each with its tag, name
+// and members; one page of them, as the Ranking postaci's (the author,
+// 10.11.2026: „Ranking max 50 postaci + przewijanie listy na dalsze pozycje
+// strona po stronie”; ranking-pages.js), with how many guilds there are,
+// the place of the guild of the one who asks among all, and the tag of the
+// best guild of the week before.
 export async function guildRanking(context) {
   const { character, db } = await requireChatter(context);
   const now = context.now;
@@ -160,10 +163,16 @@ export async function guildRanking(context) {
   ]);
   const ownId = own.results[0]?.guild_id ?? null;
   const place = rows.results.findIndex((row) => row.id === ownId);
+  const guilds = rows.results.length;
+  const { limit, offset: asked } = askedPage(context.request.url);
+  const offset = Math.min(asked, lastOffset(guilds, limit));
   return json({
     period,
-    rows: rows.results.slice(0, content().community.ranking.size).map((row, index) => ({
-      place: index + 1,
+    offset,
+    limit,
+    total: guilds,
+    rows: rows.results.slice(offset, offset + limit).map((row, index) => ({
+      place: offset + index + 1,
       id: row.id,
       name: row.name,
       tag: row.tag,

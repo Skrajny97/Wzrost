@@ -7,26 +7,30 @@
 // chest to open; an attack left today on the Wyprawa's guardian barring the
 // way, for one who added minutes this week, or a guardian's chest to open
 // (no attack while the character offers itself or serves as a mercenary);
-// a gift to its request not thanked for yet. The page asks
+// a gift to its request not thanked for yet; an item waiting for it in the
+// Skrzynia Gildii (guild-chest.js; the author, 10.11.2026: an item left
+// for one member lights its dot). The page asks
 // for it about once a minute (src/client/chat-news.js) and after its
 // actions in the guild.
 
 import { beastView } from './guild-beast.js';
+import { chestWaiting } from './guild-chest.js';
 import { expeditionView } from './guild-expedition.js';
 import { requestsView } from './guild-requests.js';
 import { guildPlayer, trialsView } from './guild-trials.js';
 import { json } from './http.js';
 
-// GET /api/guild/todo: {todo: {trials, beast, expedition, requests}}, or
-// {todo: null} outside a guild.
+// GET /api/guild/todo: {todo: {trials, beast, expedition, requests,
+// chest}}, or {todo: null} outside a guild.
 export async function getGuildTodo(context) {
   const { player, guild, db } = await guildPlayer(context);
   if (!guild) return json({ todo: null });
-  const [trials, beast, expedition, requests] = await Promise.all([
+  const [trials, beast, expedition, requests, chest] = await Promise.all([
     trialsView(db, player, guild, context.now),
     beastView(db, player.row, context.now, player.activity),
     expeditionView(db, player.row, guild, context.now, player.activity),
     requestsView(db, player, guild, context.now),
+    chestWaiting(db, player.row.id, guild.id),
   ]);
   const ready = (bar) => Boolean(bar?.thresholds.some((threshold) => threshold.ready));
   // An attack it may make now: none while it offers itself or serves as a
@@ -39,6 +43,7 @@ export async function getGuildTodo(context) {
       beast: Boolean(beast.beast && !beast.beast.fallen && canAttack(beast.attacks)) || beast.chests.length > 0,
       expedition: Boolean(expedition.expedition?.barred && expedition.contributor && canAttack(expedition.attacks)) || expedition.chests.length > 0,
       requests: Boolean(requests.mine?.gifts.some((gift) => !gift.thanked)),
+      chest,
     },
   });
 }

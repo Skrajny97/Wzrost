@@ -7,8 +7,9 @@
 // leader names and unnames deputies and hands the lead over; a deputy
 // invites and removes members, the leader anyone. A leader who leaves
 // passes the lead to the first deputy, else to the member there longest,
-// and a guild nobody is in goes with its invitations, its channel and its
-// Siedziba (guild-seat.js). A
+// and a guild nobody is in goes with its invitations, its channel, its
+// Siedziba (guild-seat.js) and its Skrzynia (guild-chest.js), so its last
+// member leaves only with the Skrzynia empty. A
 // character that leaves or is removed gets back the pieces of its open
 // offers in the Wymiana (guild-exchange.js) at once. The best guild of last
 // week says so on its page (guild-fame.js).
@@ -18,6 +19,7 @@ import { atomically, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
+import { chestReleased, chestsGone, lastLeavesEmpty, lastLeavesEmptyError } from './guild-chest.js';
 import { offersReturned, settleOffers } from './guild-exchange.js';
 import { championFrom, championOf, championStatement } from './guild-fame.js';
 import { ApiError, json, readJson } from './http.js';
@@ -335,15 +337,18 @@ export async function cancelGuildInvite(context) {
 
 // The statements that take characters out of their guilds (`characters`:
 // SQL for their ids, with `binds`) at `now`: their open offers in the
-// Wymiana close with the pieces back to them (guild-exchange.js), a guild
-// left without its leader gets its first deputy as leader, else the member
-// there longest, and a guild left empty goes with its invitations, its
-// channel's messages and its Siedziba's buildings (guild-seat.js). Also for
-// a deleted character or account (characters.js, accounts.js).
+// Wymiana close with the pieces back to them (guild-exchange.js), the
+// items left for them in the Skrzynia Gildii are for all and those they put
+// in no longer theirs to take back (guild-chest.js), a guild left without
+// its leader gets its first deputy as leader, else the member there
+// longest, and a guild left empty goes with its invitations, its channel's
+// messages, its Siedziba's buildings (guild-seat.js) and its chest. Also
+// for a deleted character or account (characters.js, accounts.js).
 export function guildRemoval(db, characters, binds, now) {
   const gone = "channel LIKE 'guild:%' AND channel NOT IN (SELECT 'guild:' || guild_id FROM guild_members)";
   return [
     ...offersReturned(db, characters, binds, now),
+    ...chestReleased(db, characters, binds),
     db.prepare(`DELETE FROM guild_members WHERE character_id IN (${characters})`).bind(...binds),
     db.prepare(`DELETE FROM guild_invites WHERE character_id IN (${characters}) OR invited_by IN (${characters})`).bind(...binds, ...binds),
     db.prepare(
@@ -357,17 +362,20 @@ export function guildRemoval(db, characters, binds, now) {
     db.prepare(`DELETE FROM chat_mentions WHERE message_id IN (SELECT id FROM chat_messages WHERE ${gone})`),
     db.prepare(`DELETE FROM chat_messages WHERE ${gone}`),
     db.prepare('DELETE FROM guild_seat WHERE guild_id NOT IN (SELECT guild_id FROM guild_members)'),
+    ...chestsGone(db),
     db.prepare('DELETE FROM guilds WHERE id NOT IN (SELECT guild_id FROM guild_members)'),
   ];
 }
 
 // POST /api/guild/leave: with the character, whose offers in the Wymiana
-// gave their pieces back.
+// gave their pieces back. The last member leaves only with the Skrzynia
+// Gildii empty, since the guild goes with it (guild-chest.js: also of two
+// members leaving at once, the batch's assertion holds for one of them).
 export async function leaveGuild(context) {
   const { session, player } = await requireGuildPlayer(context);
   const db = context.env.DB;
   const guild = await ownGuild(db, player.row.id);
-  await db.batch(guildRemoval(db, '?', [player.row.id], context.now));
+  await atomically(db, [lastLeavesEmpty(db, guild.id, player.row.id), ...guildRemoval(db, '?', [player.row.id], context.now)], lastLeavesEmptyError);
   return answer(db, player.row.id, context.now, { text: t('Opuszczasz gildię {name}.', { name: guild.name }), character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 

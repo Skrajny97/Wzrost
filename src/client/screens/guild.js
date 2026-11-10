@@ -14,7 +14,8 @@
 // guild's "Siedziba" with its buildings (guild-seat.js, 616 A) and its
 // activities, "Wyprawa" (guild-expedition.js, 621 A), "Bestia"
 // (guild-beast.js), "Próby" (guild-trials.js), "Prośby"
-// (guild-requests.js) and "Wymiana" (guild-exchange.js). The
+// (guild-requests.js), "Wymiana" (guild-exchange.js) and "Skrzynia"
+// (guild-chest.js, the author, 10.11.2026: „Wspólna skrzynia Gildii”). The
 // address keeps the tab (#/gildia/<id>), and the page opens on the one
 // shown last on the device, or on "Gildia" outside a guild. Its own words
 // are shown in the page's language (t(), i18n.js); the tabs' names and the
@@ -26,6 +27,7 @@ import { $, fill, h, icon } from '../dom.js';
 import { formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { mountGuildBeast } from '../guild-beast.js';
+import { mountGuildChest } from '../guild-chest.js';
 import { mountGuildExchange } from '../guild-exchange.js';
 import { mountGuildExpedition } from '../guild-expedition.js';
 import { mountGuildRequests } from '../guild-requests.js';
@@ -40,7 +42,7 @@ import { lockedScreen } from './locked.js';
 
 const PAGE = '#/gildia';
 const TAB_KEY = 'insight-guild-tab';
-const TAB_ICONS = { guild: 'banner', seat: 'keep', expedition: 'tent', beast: 'beast', trials: 'trophy', requests: 'gift', exchange: 'swap' };
+const TAB_ICONS = { guild: 'banner', seat: 'keep', expedition: 'tent', beast: 'beast', trials: 'trophy', requests: 'gift', exchange: 'swap', chest: 'coffer' };
 const TAB_MOUNTS = {
   guild: mountGuild,
   seat: mountGuildSeat,
@@ -49,6 +51,7 @@ const TAB_MOUNTS = {
   trials: mountGuildTrials,
   requests: mountGuildRequests,
   exchange: mountGuildExchange,
+  chest: mountGuildChest,
 };
 
 // The tab to open: the address's, else the one shown last on the device
@@ -131,7 +134,8 @@ export function mountGuildPage(container, context) {
           h('span', { class: 'community-name', text: tab.name }),
           // Something to do in this part: a trial's chest, an attack on the
           // Bestia or on the Wyprawa's guardian or a chest, a gift to thank
-          // for (chat-news.js, guild-todo.js).
+          // for, an item waiting in the Skrzynia (chat-news.js,
+          // guild-todo.js).
           guildTodoNews(tab.id) && h('span', { class: 'community-dot', role: 'img', 'aria-label': t('do zrobienia') }),
         );
         button.style.setProperty('--guild-span', String(second ? (index < first ? second : first) : 1));

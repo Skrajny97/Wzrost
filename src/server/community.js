@@ -14,6 +14,7 @@ import { nameColorOf } from './cosmetics.js';
 import { guildTagSql } from './guilds.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
+import { askedPage, lastOffset } from './ranking-pages.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const DAY = 86400000;
@@ -34,31 +35,50 @@ const ORDERS = {
   profession: { order: `${PROFESSION_LEVEL} DESC, c.level DESC, c.xp DESC, c.id`, where: ` AND ${PROFESSION_LEVEL} > 0` },
 };
 
-// GET /api/ranking?by=level|class|profession: the characters highest by
-// the level of the character, of its class or of its highest profession,
-// each with these levels, and the player's own place among all of them.
+// GET /api/ranking?by=level|class|profession&offset=…&limit=…: one page of
+// the characters highest by the level of the character, of its class or of
+// its highest profession (the author, 10.11.2026: „Ranking max 50 postaci +
+// przewijanie listy na dalsze pozycje strona po stronie”), at most
+// ranking.page of them from `offset` (ranking-pages.js), each with these
+// levels and its place; how many characters the order has in all, and the
+// player's own place among all of them, for "Moje miejsce". A page past the
+// end, as when the list got shorter meanwhile, comes as the last one.
 export async function ranking(context) {
   const { character, db } = await requireChatter(context);
   const asked = new URL(context.request.url).searchParams.get('by');
   const by = Object.hasOwn(ORDERS, asked) ? asked : 'level';
   const { order, where } = ORDERS[by];
-  const [rows, own] = await db.batch([
+  const page = askedPage(context.request.url);
+  const rowsFrom = (offset) =>
     db
       .prepare(
         `SELECT c.id, c.name, c.class_id, c.evolution, c.appearance, c.level, c.class_level, c.professions, u.login, u.google_sub, u.chat_moderator,
                 c.cosmetics, ${guildTagSql('c.id')} AS guild_tag
          FROM characters c JOIN users u ON u.id = c.user_id
-         WHERE c.${OWN_CHARACTERS}${where} ORDER BY ${order} LIMIT ?`,
+         WHERE c.${OWN_CHARACTERS}${where} ORDER BY ${order} LIMIT ? OFFSET ?`,
       )
-      .bind(content().community.ranking.size),
+      .bind(page.limit, offset);
+  const [first, own, counted] = await db.batch([
+    rowsFrom(page.offset),
     db
       .prepare(`SELECT place FROM (SELECT c.id, ROW_NUMBER() OVER (ORDER BY ${order}) AS place FROM characters c WHERE c.${OWN_CHARACTERS}${where}) WHERE id = ?`)
       .bind(character.id),
+    db.prepare(`SELECT COUNT(*) AS total FROM characters c WHERE c.${OWN_CHARACTERS}${where}`),
   ]);
+  const { total } = counted.results[0];
+  let offset = page.offset;
+  let rows = first;
+  if (rows.results.length === 0 && offset > 0) {
+    offset = lastOffset(total, page.limit);
+    rows = await rowsFrom(offset).all();
+  }
   return json({
     by,
+    offset,
+    limit: page.limit,
+    total,
     rows: rows.results.map((row, index) => ({
-      place: index + 1,
+      place: offset + index + 1,
       name: row.name,
       guildTag: row.guild_tag ?? null,
       nameColor: nameColorOf(row.cosmetics),
@@ -110,7 +130,7 @@ async function friendsOf(db, id, now) {
          FROM friends f JOIN characters o ON o.id = CASE WHEN f.character_id = ? THEN f.friend_id ELSE f.character_id END
          JOIN users u ON u.id = o.user_id
          WHERE (f.character_id = ? OR f.friend_id = ?) AND o.${OWN_CHARACTERS}
-         ORDER BY o.name_key`,
+         ORDER BY o.level DESC, o.name_key`,
       )
       .bind(now - proposalSeconds * 1000, now - idleMinutes * 60000, id, id, id, id, id),
     db.prepare('SELECT receiver_id FROM gifts WHERE sender_id = ? AND day = ?').bind(id, day),
@@ -135,9 +155,14 @@ async function friendsOf(db, id, now) {
   const { max } = content().community.friends;
   const { claimsPerDay } = content().community.gift;
   return {
+    // The friends by their level, the highest first, and of one level by
+    // name, each with when its player last had the game open (the author,
+    // 10.11.2026: „Sortowanie listy znajomych po poziomach oraz wskazywanie
+    // u każdego kiedy ostatnio był online.”): the account's seen_at, which
+    // its dot follows too, null for one never seen since it was kept.
     friends: rows.results
       .filter((row) => row.accepted_at !== null)
-      .map((row) => ({ ...person(row), status: friendStatus(row, now), sentToday: sentTo.has(row.other), waiting: from.get(row.other) ?? 0 })),
+      .map((row) => ({ ...person(row), status: friendStatus(row, now), lastSeen: row.seen_at ?? null, sentToday: sentTo.has(row.other), waiting: from.get(row.other) ?? 0 })),
     incoming: pending.filter((row) => row.friend_id === id).map(person),
     outgoing: pending.filter((row) => row.character_id === id).map(person),
     gifts: {

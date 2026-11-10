@@ -22,7 +22,8 @@
     { "id": "beast", "name": "Bestia" },
     { "id": "trials", "name": "Próby" },
     { "id": "requests", "name": "Prośby" },
-    { "id": "exchange", "name": "Wymiana" }
+    { "id": "exchange", "name": "Wymiana" },
+    { "id": "chest", "name": "Skrzynia" }
   ],
   "seat": {
     "$comment": "Siedziba Gildii (src/engine/guild-seat.js, src/server/guild-seat.js, src/client/guild-seat.js; DECISIONS.md, „Siedziba Gildii (616 A)”). Autor: „616 A - akcept, ale muszą być zwijalne budynki i ludzie muszą móc wpłacać na co chcą, lider i zastępca może tylko oznaczyć co jest preferowane”. Cztery budynki całej gildii (buildings), każdy od poziomu 0 do maxLevel. Wspólnej skarbnicy nie ma: każdy członek wpłaca złoto i zasób obozu budynku (resource, id z data/resources.json) na budynek, który sam wybierze. Poziom n kosztuje max(cost.gold.min, cost.gold.perLevel × n) złota i max(cost.resource.min, cost.resource.perLevel × n) zasobu (liczby z makiety 616). Budynek wchodzi na poziom, gdy wpłaty na niego pokryją cały koszt poziomu, w złocie i w zasobie; nadwyżka przechodzi na następny poziom, więc poziom wynika z sumy wszystkich wpłat na budynek. Ponad koszt maxLevel nie da się wpłacić. Każdy poziom daje każdemu członkowi gildii premię bonus, perLevel za poziom: xp: więcej XP z walk na wyprawach; gold: więcej złota z walk i znalezisk na wyprawach; anvil: Kowadło bierze o tyle mniej złota (po upuście Bractwa Kowali); rarity: przedmioty z wypraw w rzadkościach z afiksami częściej (ich wagi razy 1 + premia, jak przy błogosławieństwie szczęścia Ołtarza Systemu). Wyprawa bierze premie z chwili wyruszenia, Kowadło z chwili ulepszenia; kto opuści gildię, traci premie. Lider i zastępcy oznaczają budynki jako preferowane i tylko o tym decydują. name: nazwa budynku, accusative: jej biernik („wpłać na Kuźnię Gildii”), effect: premia na karcie ({value}: procent na danym poziomie). Obrazek budynku to src/client/art/guild/<id>.png, na razie jeden wygląd na wszystkie poziomy (623). quick: szybkie kwoty w formularzu wpłaty. texts: słowa zakładki Siedziba i odpowiedzi gry; {…} wypełnia gra.",
@@ -493,6 +494,68 @@
         "closed": "Ta oferta jest już zamknięta.",
         "sameAccount": "Postacie jednego konta nie wymieniają się ze sobą.",
         "short": "Brakuje: {missing} {genitive}.",
+        "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz."
+      }
+    }
+  },
+  "chest": {
+    "$comment": "Skrzynia Gildii (src/server/guild-chest.js, src/client/guild-chest.js; DECISIONS.md, „Skrzynia Gildii”). Autor (10.11.2026): „Wspólna skrzynia Gildii, w której można równocześnie zostawiać przedmioty bez przypisania do jakiegokolwiek gracza, zeby kazdy mogl wziąć lub z przypisaniem do konkretnego gracza w Gildii. Cel takiego rozwiązania to brak konieczności bycia online przez obydwu członków Gildii na raz.” Członek gildii wkłada przedmiot z plecaka „Dla wszystkich” albo „Dla:” wybranego członka. Nie wkłada przedmiotu założonego, wiszącego na stojaku Zbrojowni ani takiego, w którym trwa oprawianie kamienia (jak przy Skrzyni Konta i Wymianie). Przedmiot dla wszystkich bierze każdy członek; przypisany bierze tylko ten członek, a dopóki czeka, także ten, kto go włożył. Wzięcie potrzebuje miejsca w plecaku. Przedmiot zachowuje wszystkie dane (ulepszenie, kamień, rzadkość, Tier); postać, która go nie włożyła, dostaje go jako z wymiany, więc Encyklopedia go nie zalicza. Przedmiot przypisany komuś, kto opuścił gildię, jest odtąd dla wszystkich, a kto opuści gildię, nie zabiera już swoich przedmiotów z powrotem. Ostatni członek opuści gildię dopiero przy pustej skrzyni, bo gildia bez członków znika razem ze skrzynią (usunięcie postaci albo konta zabiera ją mimo to). capacity: ile przedmiotów mieści skrzynia gildii naraz. log: ile ostatnich ruchów (włożeń i wyjęć) pokazują „Ostatnie ruchy”. texts: słowa zakładki Skrzynia i odpowiedzi gry; {…} wypełnia gra (itemForms: rzeczownik po liczbie przedmiotów, moveForms: po liczbie ruchów).",
+    "capacity": 50,
+    "log": 50,
+    "texts": {
+      "title": "Skrzynia Gildii",
+      "intro": "Zostaw przedmiot w skrzyni, a ktoś z gildii weźmie go, gdy zajrzy. Nie musicie grać w tym samym czasie.",
+      "how": [
+        "Włóż przedmiot z plecaka dla wszystkich albo dla jednej postaci z gildii. Założonego przedmiotu nie włożysz.",
+        "Przedmiot dla wszystkich weźmie każdy członek gildii. Przedmiot dla jednej postaci weźmie tylko ona, a dopóki czeka, możesz go zabrać z powrotem.",
+        "Skrzynia mieści {capacity}. Żeby wziąć przedmiot, potrzebujesz miejsca w plecaku.",
+        "Przedmiot zachowuje ulepszenie, kamień, rzadkość i Tier. Encyklopedia nie zaliczy przedmiotu od innej postaci.",
+        "„Ostatnie ruchy” pokazują do {log}: kto, co i kiedy wkłada albo wyjmuje.",
+        "Gdy ktoś opuści gildię, przedmioty dla niego są odtąd dla wszystkich. Ostatnia postać opuści gildię dopiero przy pustej skrzyni."
+      ],
+      "itemForms": ["przedmiot", "przedmioty", "przedmiotów"],
+      "moveForms": ["ruch", "ruchy", "ruchów"],
+      "inside": "W skrzyni: {count} z {capacity}",
+      "forMe": "Czeka na Ciebie: {count}.",
+      "empty": "Skrzynia jest pusta. Włóż do niej przedmiot z plecaka.",
+      "from": "Od: {name}",
+      "forAll": "Dla wszystkich",
+      "forOne": "Dla: {name}",
+      "forYou": "Dla Ciebie",
+      "take": "Weź",
+      "takeBack": "Zabierz",
+      "waitsFor": "Czeka na: {name}",
+      "bagFull": "Plecak jest pełny.",
+      "bag": "Włóż z plecaka",
+      "bagLine": "W plecaku: {count}.",
+      "bagEmpty": "W plecaku nie ma przedmiotów.",
+      "full": "Skrzynia jest pełna. Nowy przedmiot zmieści się, gdy ktoś coś z niej weźmie.",
+      "put": "Włóż",
+      "putTitle": "Włóż do Skrzyni Gildii",
+      "putLead": "Dla kogo zostawiasz przedmiot?",
+      "setting": "trwa oprawianie kamienia",
+      "log": "Ostatnie ruchy",
+      "logLine": "Ruchów: {count}.",
+      "logEmpty": "W skrzyni nic się jeszcze nie działo.",
+      "logPut": "{name} wkłada · {at}",
+      "logPutFor": "{name} wkłada dla: {for} · {at}",
+      "logTake": "{name} wyjmuje · {at}",
+      "noGuild": "Ze Skrzyni Gildii korzystają członkowie gildii. Dołącz do gildii albo załóż własną.",
+      "putDone": "{item}: w Skrzyni Gildii.",
+      "takeDone": "{item}: w plecaku.",
+      "errors": {
+        "locked": "Gildie odblokujesz na poziomie postaci {level}.",
+        "noGuild": "Nie należysz do gildii.",
+        "noItem": "Nie masz takiego przedmiotu w plecaku.",
+        "worn": "Założonego przedmiotu nie włożysz. Najpierw go zdejmij.",
+        "setting": "W tym przedmiocie trwa oprawianie kamienia. Włożysz go, gdy się skończy.",
+        "full": "Skrzynia Gildii mieści {capacity}. Nowy przedmiot zmieści się, gdy ktoś coś z niej weźmie.",
+        "noMember": "Tej postaci nie ma w Twojej gildii.",
+        "self": "Przedmiot dla siebie zostaw w plecaku.",
+        "gone": "Tego przedmiotu nie ma już w skrzyni.",
+        "notYours": "Ten przedmiot czeka na postać {name}.",
+        "bagFull": "Plecak jest pełny. Zrób w nim miejsce, żeby wziąć przedmiot.",
+        "leave": "W Skrzyni Gildii zostały przedmioty. Weź je, zanim wyjdziesz: bez Ciebie gildia zniknie razem ze skrzynią.",
         "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz."
       }
     }

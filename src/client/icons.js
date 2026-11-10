@@ -74,6 +74,9 @@ export const ICONS = {
   gift: [['rect', { x: 4, y: 10.5, width: 16, height: 10, rx: 1 }], path('M3 7h18v3.5H3z'), path('M12 7v13.5'), path('M12 7c-1.5-3.5-5.5-4.2-5.5-1.6C6.5 7 10 7 12 7zM12 7c1.5-3.5 5.5-4.2 5.5-1.6C17.5 7 14 7 12 7z')],
   bell: [path('M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z'), path('M10 20.5a2 2 0 0 0 4 0')],
   swap: [path('M4 8h14M14.5 4.5L18 8l-3.5 3.5'), path('M20 16H6M9.5 12.5L6 16l3.5 3.5')],
+  // The Skrzynia Gildii (guild-chest.js): a chest with a rounded lid, its
+  // band and its lock.
+  coffer: [path('M3.5 10.5V9c0-2.5 2-4.5 4.5-4.5h8c2.5 0 4.5 2 4.5 4.5v1.5'), ['rect', { x: 3.5, y: 10.5, width: 17, height: 9.5, rx: 1 }], path('M3.5 14h17'), path('M10.5 12.5h3v3.5h-3z')],
   check: [path('M5 12.5l4.5 4.5L19 7.5')],
   'bell-off': [path('M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z'), path('M10 20.5a2 2 0 0 0 4 0'), path('M3.5 3.5l17 17')],
   tent: [path('M2.5 20L12 4l9.5 16'), path('M2.5 20h19'), path('M9 20l3-6 3 6'), path('M12 4l1.5-2')],

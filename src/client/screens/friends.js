@@ -1,7 +1,10 @@
 // The Znajomi in the Społeczność (src/server/community.js): the Upominki
 // waiting to be collected, the invitations to accept, the friends with a
 // Wymiana to propose (trade.js) and today's Upominek to send to each, a
-// name to invite and the invitations sent. A tap on a name shows that
+// name to invite and the invitations sent. The friends stand by their
+// level, the highest first, each with when it was last online (the author,
+// 10.11.2026: „Sortowanie listy znajomych po poziomach oraz wskazywanie u
+// każdego kiedy ostatnio był online.”). A tap on a name shows that
 // character (profile.js), where a friendship also ends.
 
 import { friendsSeen } from '../chat-news.js';
@@ -9,9 +12,10 @@ import { fill, h, icon } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
+import { lastSeen } from '../last-seen.js';
 import { openProfile } from '../profile.js';
 import { playSound } from '../sound.js';
-import { call, state, walletEntries } from '../state.js';
+import { call, serverNow, state, walletEntries } from '../state.js';
 import { framedName, guildTag, howItWorks, toast, withButton } from '../ui.js';
 import { proposeTrade } from './trade.js';
 
@@ -19,6 +23,15 @@ const resourceName = (id) => walletEntries().find((entry) => entry.id === id)?.n
 // A friend's dot in words: green, yellow and red (styles.css), shown in
 // the page's language (t()).
 const STATUS = { online: 'online', busy: 'zajęty, teraz bez wymiany', offline: 'offline' };
+// When a friend was last online (last-seen.js), in the page's language.
+const SEEN = { now: 'teraz', minutes: '{count} min temu', hours: '{count} godz. temu', yesterday: 'wczoraj', days: '{count} dni temu' };
+
+// A friend's last time online, beside its level: "teraz" while its dot is
+// green or yellow, else how long ago; nothing for one never seen.
+function seenLine(person) {
+  const seen = lastSeen(person.lastSeen, serverNow(), person.status !== 'offline');
+  return seen && h('span', { class: 'friend-seen', title: t('Ostatnio online'), text: t(SEEN[seen.unit], { count: formatNumber(seen.count) }) });
+}
 
 // What the Upominki collected held: "Punkty Czasu +3, Złoto +40, Drewno +5".
 export const giftText = (reward) =>
@@ -104,7 +117,10 @@ export function mountFriends(container) {
         person.nameColor,
       ),
       guildTag(person.guildTag),
-      h('span', { class: 'chat-level', text: t('poz. {level}', { level: person.level }) }),
+      // A friend's level and its last time online stay together on a line.
+      Object.hasOwn(person, 'lastSeen')
+        ? h('span', { class: 'friend-level' }, h('span', { class: 'chat-level', text: t('poz. {level}', { level: person.level }) }), seenLine(person))
+        : h('span', { class: 'chat-level', text: t('poz. {level}', { level: person.level }) }),
       more,
     );
 

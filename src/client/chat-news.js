@@ -41,8 +41,8 @@ let guildSeenId = 0;
 // Invitations to guilds waiting.
 let guildInvites = 0;
 // What waits in the character's guild (src/server/guild-todo.js): {trials,
-// beast, expedition, requests}, each true when there is something to do,
-// or null.
+// beast, expedition, requests, chest}, each true when there is something to
+// do, or null.
 let guildTodo = null;
 let todoAskedAt = 0;
 const TODO_EVERY_MS = 60000;
