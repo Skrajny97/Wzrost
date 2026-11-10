@@ -86,6 +86,30 @@ export function wantedPosters(classLevel, day, seed, content, early = null, { la
   return [...creatures, poster(day, rng.pick(places), outlaw, content)];
 }
 
+// The wanted target a Drużyna's trip seeks (src/server/parties.js), since
+// 10.11.2026 (the author: „chcemy zrobić większy focus na drużynę, ergo
+// poszukiwanych powinno moc sie znajdywac nawet w drużynie, szczególnie
+// mając tych samych”): of the posters in hand for the trip's place of those
+// who go (`posters`, one for each, or null), the target most of them hold,
+// a creature's variant or an outlaw in that place; of targets held alike,
+// one drawn from the trip's seed. The target alone, without a poster's id
+// or trophy, which stay each holder's own; null when nobody holds one.
+export function tripWanted(posters, seed) {
+  const held = new Map();
+  for (const poster of posters.filter(Boolean)) {
+    const key = `${poster.areaId}:${poster.monsterId}`;
+    held.set(key, { poster: held.get(key)?.poster ?? poster, count: (held.get(key)?.count ?? 0) + 1 });
+  }
+  if (held.size === 0) return null;
+  const most = Math.max(...[...held.values()].map((one) => one.count));
+  const top = [...held.values()].filter((one) => one.count === most);
+  const { poster } = top.length === 1 ? top[0] : top[createRng(`${seed}:wanted-target`).int(0, top.length - 1)];
+  return { kind: poster.kind, areaId: poster.areaId, monsterId: poster.monsterId, name: poster.name, female: poster.female === true, level: poster.level };
+}
+
+// Whether a poster in hand is for the trip's wanted target (tripWanted).
+export const wantedTarget = (poster, target) => Boolean(poster && target) && poster.areaId === target.areaId && poster.monsterId === target.monsterId;
+
 // The trophy a beaten variant leaves: its creature's material in the first
 // grade of its trophy (encyclopedia.js) the character has not found yet,
 // but never the rarest of them: the poster brings the trophy closer, and

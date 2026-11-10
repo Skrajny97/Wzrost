@@ -101,7 +101,7 @@ import { leaveTrip, tripOf } from './trips.js';
 import { finishCrafting } from './workshop.js';
 import { finishJewels } from './jewelcraft.js';
 import { finishMining } from './mining.js';
-import { wantedAfterHunt, wantedGoing } from './wanted.js';
+import { wantedAfterHunt, wantedGoing, wantedOnTrip } from './wanted.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
 const resourcePath = (id) => `$."${id}"`;
@@ -406,9 +406,11 @@ export async function beginHunt(
   // A mercenary from the Karczma takes one companion's place (633.3 A).
   const party = kept && !crew ? companionsGoing(player, now).slice(0, mercenary === null ? undefined : content().balance.parties.size - 2) : [];
   // The sołtys's wanted poster in hand, for this place (wanted.js): its
-  // target may come on the way. Not on a Szybkie Polowanie, nor on a
-  // Drużyna's trip.
-  const sought = kept && !quick && !crew ? wantedGoing(player.row, kept, area) : null;
+  // target may come on the way. Not on a Szybkie Polowanie. On a Drużyna's
+  // trip too since 10.11.2026: the trip seeks the target most of those who
+  // go hold, and a member keeps its poster only for that one (parties.js,
+  // tripWanted).
+  const sought = kept && !quick ? wantedGoing(player.row, kept, area) : null;
   const settlement =
     rumor > 1 || healed
       ? JSON.stringify({
@@ -519,7 +521,7 @@ export async function beginHunt(
     throw error;
   }
   // What it set out with, for the roster of a Drużyna's trip (parties.js).
-  return { windows, trophies, taken, healBelow: healBelow ?? content().potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare };
+  return { windows, trophies, taken, healBelow: healBelow ?? content().potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare, wanted: sought };
 }
 
 // Calling the character back early gives nothing and costs nothing. A
@@ -703,7 +705,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       trophies: options.trophies ?? {},
       blessing: trip ? null : (options.blessing ?? null),
       scouted: trip ? null : (options.scouted ?? null),
-      wanted: trip ? null : (options.wanted ?? null),
+      // A trip's wanted target (parties.js), the member's own poster for it
+      // or a foe only (wanted.js: wantedOnTrip).
+      wanted: trip ? wantedOnTrip(trip, options) : (options.wanted ?? null),
       hard: !trip && options.hard === true,
     },
     content(),

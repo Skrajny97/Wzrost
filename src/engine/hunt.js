@@ -443,7 +443,9 @@ export function resourceBundle(area, total) {
 // before 0.1.26, for its first `ms`), and `speed` the same for a speed potion
 // alone, as explorations started before the other kinds kept it
 // (potions.js). `wanted`: the Osada's wanted poster the character set out
-// with (wanted.js), its target met in its place's explorations. `seat`: the
+// with (wanted.js), its target met in its place's explorations; on a
+// Drużyna's trip the trip's target, with `own` false when the character
+// holds no poster for it (tripWanted). `seat`: the
 // Siedziba Gildii's bonuses for the character as it set out (guild-seat.js,
 // seatHuntBonus): { xp, gold, rarity } shares, or null. `hard`: a Trudna
 // wyprawa (629 A), from the challenge's level: its creatures are
@@ -602,8 +604,14 @@ export function simulateHunt(
   // The Osada's wanted poster (wanted.js): in its place, each fight is the
   // fight with its target by the rules' chance, once. Its own seed draws it,
   // so an exploration that does not meet it goes as it would without it.
+  // On a Drużyna's trip (since 10.11.2026) the target is the trip's
+  // (tripWanted), drawn from the trip's seed, so it comes in the same fight
+  // of every member's report; a member whose poster it is not (`own` false)
+  // fights it as a strong foe, paid as its fight is, with no trophy, no
+  // spoils and no poster fulfilled.
   const rules = wantedOf(content);
   const sought = rules && wanted && wanted.areaId === area.id && !first ? wanted : null;
+  const own = Boolean(sought) && sought.own !== false;
   const wantedRng = sought ? createRng(`${seed}:wanted`) : null;
   const sighting = { met: false, beaten: false };
   const told = (text) => (sought ? gendered(text, sought.female ? 'female' : 'male') : text);
@@ -747,10 +755,10 @@ export function simulateHunt(
         chests.push([randomItem(enemies[0].level, lootRng, content, { ...loot, rarityId }), 'championChest']);
       }
       // A beaten outlaw leaves a rarer item, and a variant its trophy.
-      const spoils = meeting && sought.kind === 'outlaw' ? randomItem(enemies[0].level, lootRng, content, { ...loot, rarityId: wantedLootRarity(lootRng, content) }) : null;
+      const spoils = meeting && own && sought.kind === 'outlaw' ? randomItem(enemies[0].level, lootRng, content, { ...loot, rarityId: wantedLootRarity(lootRng, content) }) : null;
       if (spoils) chests.push([spoils, null]);
-      const trophy = meeting && sought.trophy ? { [sought.trophy]: 1 } : null;
-      if (meeting) sighting.beaten = true;
+      const trophy = meeting && own && sought.trophy ? { [sought.trophy]: 1 } : null;
+      if (meeting && own) sighting.beaten = true;
       for (const [item] of chests) summary.chests.push(take(item));
       summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1) * seatXp * hardXp);
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
@@ -774,7 +782,7 @@ export function simulateHunt(
         materials = addCounts(materials, trophy);
         lines.push(say(rules.texts, 'trophy', step, { material: materialsText(trophy, content) }));
       }
-      if (meeting) lines.push(told(say(rules.texts, 'won', step)));
+      if (meeting && own) lines.push(told(say(rules.texts, 'won', step)));
       if (summary.recovered > 0) lines.push(say(texts, 'recover', step, { hp: summary.recovered }));
       entries.push({ t: event.t, type: 'fight', fight: summary.index, text: lines.join(' ') });
       continue;
@@ -827,8 +835,9 @@ export function simulateHunt(
     buffFights: me.buffFights,
     // The fights the Ołtarz's blessing worked in.
     blessingFights: blessing ? Math.min(fights.length, blessing.fights) : 0,
-    // The wanted poster's target: met on the way, and beaten.
-    ...(sought && { wanted: { id: sought.id, ...sighting } }),
+    // The wanted poster's target: met on the way, and beaten (of a poster of
+    // the character's own).
+    ...(own && { wanted: { id: sought.id, ...sighting } }),
     ...(harder && { hard: true }),
     // The companions at the end: their HP and whether they fell on the way;
     // the party's players too.

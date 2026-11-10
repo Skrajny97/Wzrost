@@ -8,7 +8,7 @@
 // and `lands` once drawn without the newest land, 10.11.2026), the posters
 // done that day and the poster taken (`beaten` once its target fell).
 
-import { questPeriod, wantedOf, wantedPosters, wantedTrophy } from '../engine/index.js';
+import { questPeriod, wantedOf, wantedPosters, wantedTarget, wantedTrophy } from '../engine/index.js';
 import { characterView, loadPlayer, requirePlayer, settlementBoard } from './characters.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
@@ -108,6 +108,23 @@ export function wantedGoing(row, stored, area) {
   if (!wantedOf(content()) || !taken || taken.beaten || taken.areaId !== area.id) return null;
   const trophy = taken.kind === 'creature' ? wantedTrophy(taken.monsterId, JSON.parse(row.discovered ?? '{}'), content()) : null;
   return { id: taken.id, kind: taken.kind, areaId: taken.areaId, monsterId: taken.monsterId, name: posterName(taken), female: taken.female, level: taken.level, ...(trophy && { trophy }) };
+}
+
+// The wanted target of a Drużyna's trip for one member's claim (hunts.js:
+// finishHunt), as simulateHunt takes it (the author, 10.11.2026: „chcemy
+// zrobić większy focus na drużynę, ergo poszukiwanych powinno moc sie
+// znajdywac nawet w drużynie, szczególnie mając tych samych”): the trip's
+// target as the trip keeps it, so it is the same foe in every member's
+// fights, its name in the claim's language; with the id and the trophy of
+// the member's own poster in hand for it (kept with its exploration at the
+// start), which the target's fall fulfils, or, held by others only, as a
+// foe (`own` false), paid as its fight is and nothing more. Null when the
+// trip seeks none (tripWanted in the engine; parties.js).
+export function wantedOnTrip(trip, options) {
+  const target = trip.encounter?.wanted;
+  if (!wantedOf(content()) || !target) return null;
+  const own = wantedTarget(options.wanted, target) ? options.wanted : null;
+  return { ...target, name: posterName(target), ...(own ? { id: own.id, ...(own.trophy && { trophy: own.trophy }) } : { own: false }) };
 }
 
 // The Osada's record after an exploration whose wanted target fell: the

@@ -43,7 +43,7 @@
 // (companionStays in the engine), also one of a character that was in a
 // party before this rule came.
 
-import { areaFor, areaOpenFor, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyRefusal } from '../engine/index.js';
+import { areaFor, areaOpenFor, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyRefusal, tripWanted, wantedTarget } from '../engine/index.js';
 import { characterView, currentHp, earlyAreaOf, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer, settleCharacter } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf, wayLook } from './cosmetics.js';
@@ -533,13 +533,25 @@ export async function partyHunt(context) {
   // alone goes as on its own.
   const actual = [player, ...went];
   const lead = setups.get(player.row.id);
+  const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
+  // The wanted target the trip seeks (since 10.11.2026; the author:
+  // „chcemy zrobić większy focus na drużynę, ergo poszukiwanych powinno moc
+  // sie znajdywac nawet w drużynie, szczególnie mając tych samych”): of the
+  // posters in hand for its place of those who went, the one most of them
+  // hold, drawn from the trip's seed among those held alike (tripWanted in
+  // the engine). Its fights may meet it as an exploration meets a poster's
+  // target; every holder of a poster for it fulfils its own when it falls,
+  // and the others fight it as a strong foe (wanted.js: wantedOnTrip). A
+  // member keeps its poster with its exploration only for that target, so
+  // one for another is not carried and may be given back on the way.
+  const target = tripWanted(actual.map((member) => setups.get(member.row.id).wanted), seed);
   const crew = {
     ...party_,
     names: actual.map((member) => member.row.name),
     // How each looks on the way, for the others' Walka scene (640 A;
     // cosmetics.js).
     looks: actual.map((member) => ({ id: member.row.id, name: member.row.name, ...wayLook(member.row) })),
-    seed: toHex(crypto.getRandomValues(new Uint8Array(16))),
+    seed,
     roster: actual.map((member) => {
       const setup = setups.get(member.row.id);
       return { ...shots.get(member.row.id), windows: setup.windows, trophies: setup.trophies, ...(member === player && { potions: setup.taken, healBelow: setup.healBelow }) };
@@ -553,6 +565,7 @@ export async function partyHunt(context) {
       tracked: lead.tracked,
       unknown: lead.unknown,
       met: JSON.parse(player.row.met ?? '[]'),
+      ...(target && { wanted: target }),
     },
   };
   // A member whose report was claimed for this trip keeps where it is
@@ -561,9 +574,13 @@ export async function partyHunt(context) {
   await db.batch(
     actual.map((member) => {
       const report = claimed.get(member.row.id);
+      const poster = setups.get(member.row.id).wanted;
+      const other = Boolean(poster) && !wantedTarget(poster, target);
       return went.length > 0
         ? db
-            .prepare(`UPDATE activities SET options = json_remove(json_set(options, '$.party', json(?)${report ? ", '$.claimed', json(?)" : ''}), '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`)
+            .prepare(
+              `UPDATE activities SET options = json_remove(json_set(options, '$.party', json(?)${report ? ", '$.claimed', json(?)" : ''}), '$.partners'${other ? ", '$.wanted'" : ''}) WHERE character_id = ? AND kind = 'hunt' AND ${trip}`,
+            )
             .bind(JSON.stringify(crew), ...(report ? [JSON.stringify(report)] : []), member.row.id, now, party.id)
         : db.prepare(`UPDATE activities SET options = json_remove(options, '$.party', '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`).bind(member.row.id, now, party.id);
     }),
