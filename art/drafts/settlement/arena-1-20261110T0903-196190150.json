@@ -1,0 +1,14 @@
+{
+  "id": "arena-1",
+  "tool": "pixellab generate-image-v2",
+  "description": "isometric pixel art building for a fantasy village builder game, bright vivid saturated colours, crisp dark outlines, a single isolated object on a plain background, part of an old slavic village of log houses at the edge of a forest, made of logs, planks, thatch and wooden shingles, no stone houses and no tiled roofs, standing directly on bare ground with no ground tile, base or platform under it, the village arena where champions duel: a round open-air ring of sharpened log palisade with tiers of log benches for the onlookers inside, a sand-covered fighting circle in the middle, a tall carved wooden gate with two crossed swords and a round painted shield above it, red and gold banners on poles around the ring, two torches by the gate",
+  "style": "src/client/art/settlement/tavern.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
