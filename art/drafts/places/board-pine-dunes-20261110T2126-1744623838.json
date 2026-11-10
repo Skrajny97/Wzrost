@@ -1,0 +1,14 @@
+{
+  "id": "board-pine-dunes",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art, top-down view straight from above of a pine dune floor: pale sand with small tufts of heather and dry grass, fallen pine needles and a few pine cones, muted dark palette of sand, heather purple and pine green, a faint pale strip of trampled ground across the middle dividing two halves, slightly darker edges, soft even dusk light, flat ground seen from above for a dim background behind game cards, very low contrast, no standing trees, no people, no animals, no weapons, no text, no border",
+  "style": "src/client/art/boards/arena-board.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
