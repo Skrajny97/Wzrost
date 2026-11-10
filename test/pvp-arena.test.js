@@ -18,6 +18,7 @@ import {
   arenaSeason,
   arenaWeek,
   drawRivals,
+  duelArmorShare,
   duelHpFactor,
   expectedScore,
   playerCombatant,
@@ -80,6 +81,29 @@ describe("the Arena's rules", () => {
     for (let i = 1; i < curve.length; i++) assert.ok(curve[i][0] > curve[i - 1][0], 'the curve goes up by level');
   });
 
+  test("both sides' armour counts at the armour curve's share for their average level, less the higher they are (772)", () => {
+    const attacker = fighter('warrior', 100, 'Ala');
+    const defender = fighter('cleric', 120, 'Bolek', 1);
+    const share = duelArmorShare(100, 120, content);
+    assert.ok(share > 0 && share < 1);
+    const duel = arenaDuel({ attacker, defender, seed: 'armour' }, content);
+    assert.equal(duel.fight.allies[0].armor, Math.round(playerCombatant({ ...attacker }, content).armor * share));
+    assert.equal(duel.fight.enemies[0].armor, Math.round(playerCombatant({ ...defender }, content).armor * share));
+    // The curve as the HP curve: by level, as its first point below it and
+    // its last past it, straight between; a share of at most all of it,
+    // smaller the higher the level, as the characters' armour outgrows the
+    // creatures' hides. Without a curve, all the armour.
+    const curve = rules.duel.armorCurve;
+    assert.equal(duelArmorShare(1, 1, content), curve[0][1]);
+    assert.equal(duelArmorShare(1000, 1000, content), curve.at(-1)[1]);
+    const [[fromLevel, from], [toLevel, to]] = curve;
+    assert.ok(Math.abs(duelArmorShare(fromLevel, toLevel, content) - (from + to) / 2) < 1e-9);
+    for (let i = 1; i < curve.length; i++) assert.ok(curve[i][0] > curve[i - 1][0] && curve[i][1] <= curve[i - 1][1]);
+    assert.ok(curve.every(([, value]) => value > 0 && value <= 1));
+    assert.equal(duelArmorShare(100, 120, withDuel({ armorCurve: undefined })), 1);
+    assert.equal(arenaDuel({ attacker, defender, seed: 'armour' }, withDuel({ armorCurve: undefined })).fight.allies[0].armor, playerCombatant({ ...attacker }, content).armor);
+  });
+
   test('after the move limit the judge ends the duel: more HP left wins, about as much is a draw', () => {
     const attacker = fighter('warrior', 100, 'Ala');
     const defender = fighter('cleric', 100, 'Bolek');
@@ -109,6 +133,15 @@ describe("the Arena's rules", () => {
       assert.ok(result.median >= 16 && result.median <= 40, `level ${level}: median ${result.median} moves`);
       assert.ok(result.limits <= 0.12, `level ${level}: the judge ended ${result.limits}`);
       assert.ok(result.short <= 0.15, `level ${level}: ${result.short} ended in a few moves`);
+    }
+  });
+
+  test('no class loses most of its duels: each wins 30–70% of them against the other classes from the first evolution on (772)', () => {
+    // Before 772 the Cień won 6–24% of them and the Łucznik 26–44%, while
+    // the Mag and the Kleryk won 65–89% (tools/pvp-arena-sim.mjs).
+    for (const level of [50, 75, 100, 200]) {
+      const { wins } = measure({ level, seeds: 1, model: 'realistic' }, content);
+      for (const [classId, share] of Object.entries(wins)) assert.ok(share >= 0.3 && share <= 0.7, `level ${level}: ${classId} wins ${share}`);
     }
   });
 
@@ -209,6 +242,12 @@ describe('the Arena through the API', () => {
     assert.ok(open.data.arena.texts.fight);
     const settlement = (await call('GET', '/api/settlement', { cookie: ala.cookie })).data.settlement;
     assert.ok(settlement.places.some((place) => place.id === 'arena'));
+    // The rules name the share of armour a duel counts at the character's
+    // level (772): all of it at the 25th, less higher up.
+    assert.equal(open.data.arena.numbers.armor, 100);
+    assert.match(open.data.arena.texts.armorRule, /\{armor\}%/);
+    await run('UPDATE characters SET level = 100 WHERE id = ?', ala.id);
+    assert.equal((await arena(ala)).data.arena.numbers.armor, Math.round(duelArmorShare(100, 100, content) * 100));
   });
 
   test("rivals are other accounts' characters at the Arena's level, never the player's own", async () => {

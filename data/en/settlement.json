@@ -398,6 +398,7 @@
     "texts": {
       "intro": "In the Arena you face other players' characters. Your rival need not be in the game: their character defends itself.",
       "rules": "Fights a day: {perDay}, from midnight. You pick one of three rivals with a similar rating, and the fight takes place at once: your character against the rival's character as it is saved now, with its stats, gear, skills and evolution, but without companions, mercenaries and potions. Both sides have more HP than usual, so that the fight lasts a few rounds: {hpFactor} times as much for two characters of your level. After {moves} moves the judge ends the fight: whoever has more HP left wins, and when both have almost the same left, it is a draw.",
+      "armorRule": "Armour protects less here than on explorations, as characters wear far more of it than creatures do: for two characters of your level, {armor}% of the armour counts.",
       "ratingRules": "The rating starts at {start}. A win raises it and a loss lowers it, the more so the bigger the gap between the ratings: a win against a higher-rated rival brings you more. When someone challenges your character, its rating moves less. On the first day of each month a new season begins: every rating then moves {share}% of the way back to {start}.",
       "tableRules": "The week's table lists the characters that fought in the Arena at least once this week, by rating. On Monday at midnight the table closes, and your place in it brings you System Points and gold. You claim the reward here.",
       "rating": "Rating: {rating}",
