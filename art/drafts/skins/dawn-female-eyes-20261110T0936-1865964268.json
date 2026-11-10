@@ -1,0 +1,14 @@
+{
+  "id": "dawn-female-eyes",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art face of a young woman in three-quarter view, two clearly visible dark eyes of the same size, both looking in the same direction toward the viewer, a tiny white highlight in each eye, thin light golden eyebrows above them, a calm gentle expression, warm light skin, long fair blond hair framing the face, not covering the eyes",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": "art/inputs/skins/dawn-female.png",
+  "mask": "art/inputs/skins/dawn-female-eyes-mask.png",
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 1
+}
