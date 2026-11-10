@@ -99,7 +99,7 @@ export function mountTowers(container, { navigate }) {
     if (activity?.kind !== 'hunt') return null;
     return activityFinished(activity)
       ? t('Wyprawa się skończyła. Odbierz raport w Walce, a potem wejdź do Wieży.')
-      : t('Postać jest na wyprawie. Wieże poczekają na jej powrót, bo raport z wyprawy liczy się z postacią taką, jaka jest na jej końcu.');
+      : t('Postać jest na wyprawie. Wejdziesz do Wież po jej powrocie.');
   }
 
   // A tower's floor: the first one not won yet, whatever the character's

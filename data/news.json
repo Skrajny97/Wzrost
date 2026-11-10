@@ -510,6 +510,11 @@
       "id": "0.2.46",
       "title": "Wersja 0.2.46",
       "body": "- Arena: pod rywalami jest przycisk „Losuj innych”. 5 razy dziennie wylosujesz innych rywali o podobnej ocenie, a walka na dziś zostaje.\n- Arena: „Ostatnie obrony” pokazują 10 ostatnich obron Twojej postaci. Każdą obejrzysz przyciskiem „Obejrzyj walkę”, od strony obrońcy."
+    },
+    {
+      "id": "0.2.47",
+      "title": "Wersja 0.2.47",
+      "body": "- Wieże: gdy postać jest na wyprawie, napis mówi krótko: „Postać jest na wyprawie. Wejdziesz do Wież po jej powrocie.”"
     }
 ]
 }

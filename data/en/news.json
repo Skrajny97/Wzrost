@@ -404,6 +404,10 @@
     "0.2.46": {
       "title": "Version 0.2.46",
       "body": "- Arena: a “Reroll rivals” button under the rivals. 5 times a day you can draw other rivals with a similar rating, and it does not use up a fight.\n- Arena: “Recent defences” shows your character's last 10 defences. Watch any of them with “Watch the fight”, from the defender's side."
+    },
+    "0.2.47": {
+      "title": "Version 0.2.47",
+      "body": "- Towers: while the character is on an exploration, the note is short: “The character is on an exploration. You can enter the Towers once it returns.”"
     }
   }
 }

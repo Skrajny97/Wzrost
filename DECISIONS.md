@@ -3034,6 +3034,10 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.47 (10.11.2026): krótszy napis przy Wieżach w trakcie wyprawy
+
+1. Autor: „Zmień na "Postać jest na wyprawie. Wejdziesz do Wież po jej powrocie."”. Gdy postać jest na wyprawie, ekran Wież mówi teraz tylko: „Postać jest na wyprawie. Wejdziesz do Wież po jej powrocie.” (po angielsku: „The character is on an exploration. You can enter the Towers once it returns.”). Zasada się nie zmienia: do Wież wchodzi się dopiero po powrocie z wyprawy.
+
 ## Wersja 0.2.46 (10.11.2026): Arena — inni rywale i powtórki obron (874, 875)
 
 1. **„Losuj innych” (874).** Gracze na czacie chcieli móc zmienić wylosowanych rywali. Autor: „dwie celne uwagi, losowanie powinno losować z podobnych Punktami Areny ludzi spośród puli”. Pod rywalami jest przycisk „Losuj innych (n)”: 5 razy na dzień (od północy) losuje trzech innych rywali z tej samej puli 12 postaci o najbliższej ocenie, najpierw spośród tych, których teraz nie ma na liście. Losowanie nie zabiera walki. Gdy w puli nie ma nikogo nowego, gra to mówi i nie liczy losowania.
