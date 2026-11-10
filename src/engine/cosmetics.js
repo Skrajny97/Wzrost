@@ -9,14 +9,18 @@
 // "417 akcept", "418 akcept") leaves glowing footprints behind it there,
 // and a pet ("chowaniec": the fox, the raven and the will-o'-the-wisp; 413,
 // 414, "415 A") goes with the character in the Walka scene and keeps it
-// company on the portrait.
+// company on the portrait. An outfit (skórka; 763 A, 764–768) dresses a
+// character of its starting class in another look at every evolution: its
+// own portrait, walk and ride, in the character's skin tone, for both
+// genders with one purchase (the author: "Niech kupno przedmiotu
+// kosmetycznego odblokowuje wersję i męską i żeńską").
 //
 // Stored state (characters.cosmetics): {"owned": [ids], "frame": id,
 // "background": id, "mountSkin": id, "aura": id, "trail": id, "pet": id,
-// "nameFromFrame": true}.
+// "outfit": id, "nameFromFrame": true}.
 
 // The places a cosmetic is worn in, one of each kind at a time.
-export const COSMETIC_KINDS = ['frame', 'background', 'mountSkin', 'aura', 'trail', 'pet'];
+export const COSMETIC_KINDS = ['frame', 'background', 'mountSkin', 'aura', 'trail', 'pet', 'outfit'];
 
 const itemOf = (id, content) => (typeof id === 'string' ? (content.cosmeticsById?.[id] ?? null) : null);
 
@@ -36,18 +40,21 @@ export function cosmeticsOf(stored, content) {
     aura: worn('aura'),
     trail: worn('trail'),
     pet: worn('pet'),
+    outfit: worn('outfit'),
     nameFromFrame: stored?.nameFromFrame === true,
   };
 }
 
-// Why the character, with its Punkty Systemu and its Stajnia's mount (null
-// for none), cannot buy the cosmetic `id` now, as { code, message }, or null
-// when it can. A mount's look needs a mount to change.
-export function cosmeticBlock(id, stored, { systemPoints, mount }, content) {
+// Why the character, with its Punkty Systemu, its Stajnia's mount (null for
+// none) and its class, cannot buy the cosmetic `id` now, as { code,
+// message }, or null when it can. A mount's look needs a mount to change,
+// and an outfit is for the characters of its class.
+export function cosmeticBlock(id, stored, { systemPoints, mount, classId }, content) {
   const item = itemOf(id, content);
   if (!item) return { code: 'invalid_cosmetic', message: 'Nie ma takiego przedmiotu.' };
   if (cosmeticsOf(stored, content).owned.includes(item.id)) return { code: 'owned', message: 'Masz już ten przedmiot.' };
   if (item.kind === 'mountSkin' && !mount) return { code: 'no_mount', message: 'Najpierw kup wierzchowca w Stajni.' };
+  if (item.kind === 'outfit' && item.classId !== classId) return { code: 'other_class', message: 'Ta skórka jest dla innej klasy.' };
   if (systemPoints < item.price) return { code: 'not_enough_points', message: 'Brakuje Punktów Systemu.' };
   return null;
 }

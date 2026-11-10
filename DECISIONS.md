@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Skórki w Sklepie Systemu (10.11.2026, wersja testowa, makiety 801)
+
+- Nowy dział „Skórki” w Sklepie Systemu (763 A): kosmetyk rodzaju `outfit`, każdy dla jednej klasy (`classId` w `data/cosmetics.json`), po 800 Punktów Systemu. Postać innej klasy nie widzi tego działu, a serwer nie sprzeda jej skórki („Ta skórka jest dla innej klasy.”).
+- Założona skórka zastępuje wygląd postaci przy każdej jej ewolucji: portret (Postać, wybór postaci, karta gracza, podgląd w Sklepie), popiersie w walkach, marsz i jazda w scenie Walka, zawsze w odcieniu skóry postaci. Drużyna, najemnik i karta gracza pokazują ją innym tak samo.
+- Grafiki skórki to `<look>-<płeć>` w `src/client/art/portraits`, `walkers` i `riders`, z plikami odcieni (`tools/evolution-tones.json`, `tools/walk-tones.py`, `tools/rider-tones.py`).
+- Na start dwie skórki z pełną, przyjętą grafiką: Płaszcz Nocnego Kruka (Cień; chody 775.3 v5 i 775.4 v4, jazda 776.9 v3 i 776.10 v3) i Strój Leśnego Pana (Łucznik; chody 775.9 v2 i 775.10 v2, jazda 776.3 i 776.4). Pancerz Peruna, Szata Zaćmienia i Szaty Świtu dojdą, gdy ich chody i jazda zostaną przyjęte.
+- Do gry trafi po akceptacji makiet 801 (zrzuty z telefonu na stronie ocen).
+
 ## Wersja 0.2.49 (10.11.2026): Punkty Czasu za złoto u Pustelnika
 
 Autor: „Dodaj w Chacie Pustelnika opcję kupienia Punktów Czasu za złoto - do 30 dziennie, 3000 złota za sztukę. Czasem nadwyżkę złota szczególnie później bedzie mozna tak pożytkować. Chyba że cena za wysoka/za niska.”

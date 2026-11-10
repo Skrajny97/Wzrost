@@ -55,8 +55,9 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     classId: character.classId,
     appearance: character.appearance,
     skin: character.skin,
-    // The evolution's portrait in the playback.
+    // The evolution's portrait in the playback, and the skórka's over it.
     ...(character.evolution && { evolution: character.evolution }),
+    ...(character.outfit && { outfit: character.outfit }),
     family: 'player',
     elite: false,
     position: character.position,
@@ -282,6 +283,7 @@ export function combatantView(unit, opponentLevel, content) {
     appearance: unit.appearance,
     skin: unit.skin,
     evolution: unit.evolution,
+    ...(unit.outfit && { outfit: unit.outfit }),
     monsterId: unit.monsterId,
     // A companion from the Karczma shows its own bust (question 107 B).
     ...(unit.companion && { companion: true }),

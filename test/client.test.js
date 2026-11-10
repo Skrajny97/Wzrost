@@ -137,14 +137,16 @@ test('every sprite on the list has its file at its size, and every class has its
   const { classArtIds } = await import('../src/client/class-art.js');
   const data = (name) => JSON.parse(readFileSync(new URL(`../data/${name}.json`, import.meta.url), 'utf8'));
   const looks = data('appearances').map((look) => look.id);
+  const outfits = data('cosmetics').items.filter((item) => item.kind === 'outfit').map((item) => ({ id: item.look }));
   const known = {
     // The people of the events fight as monsters do.
     monsters: [...data('monsters'), ...data('events').foes].map((monster) => monster.id),
     items: data('item-bases').map((base) => base.id),
-    // The classes' portraits and their evolutions' (data/evolutions.json).
-    portraits: [...data('classes'), ...data('evolutions').evolutions].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
+    // The classes' portraits and their evolutions' (data/evolutions.json),
+    // and the outfits' of the Sklep Systemu (skórki, their `look`).
+    portraits: [...data('classes'), ...data('evolutions').evolutions, ...outfits].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
     // The character walking on the Walka scene, one sheet for each portrait.
-    walkers: [...data('classes'), ...data('evolutions').evolutions].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
+    walkers: [...data('classes'), ...data('evolutions').evolutions, ...outfits].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
     // The introduction's one narrator (narrator.js).
     narrator: ['narrator'],
     // Materials, parts and the treasure chest of the report.
@@ -220,7 +222,7 @@ test('every sprite on the list has its file at its size, and every class has its
     ],
     // The Sklep Systemu's frames and backgrounds.
     cosmetics: data('cosmetics').items.filter((item) => item.kind !== 'mountSkin').map((item) => item.art),
-    riders: [...data('classes'), ...data('evolutions').evolutions].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
+    riders: [...data('classes'), ...data('evolutions').evolutions, ...outfits].flatMap((owner) => looks.map((look) => `${owner.id}-${look}`)),
     // The fights' boards of the places (790 B).
     boards: data('settlement').places.flatMap((place) => place.fightBoard ?? []),
   };
@@ -241,11 +243,11 @@ test('every sprite on the list has its file at its size, and every class has its
     SPRITES.portraits.toned,
     data('classes').flatMap((cls) => looks.map((look) => `${cls.id}-${look}`)).filter((id) => SPRITES.portraits.ids.includes(id)),
   );
-  // So has every evolution's portrait, and every walking figure has its
-  // file for each tone too.
+  // So has every evolution's portrait and every outfit's, and every walking
+  // figure has its file for each tone too.
   assert.deepEqual(
     [...SPRITES.portraits.tonedEvolutions].sort(),
-    data('evolutions').evolutions.flatMap((evolution) => looks.map((look) => `${evolution.id}-${look}`)).filter((id) => SPRITES.portraits.ids.includes(id)).sort(),
+    [...data('evolutions').evolutions, ...outfits].flatMap((evolution) => looks.map((look) => `${evolution.id}-${look}`)).filter((id) => SPRITES.portraits.ids.includes(id)).sort(),
   );
   const tones = data('skins').skins.filter((tone) => tone.ramp).map((tone) => tone.id);
   for (const [kind, ids] of [['portraits', [...SPRITES.portraits.toned, ...SPRITES.portraits.tonedEvolutions]], ['walkers', SPRITES.walkers.ids], ['riders', SPRITES.riders.ids]]) {

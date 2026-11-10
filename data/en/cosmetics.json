@@ -52,6 +52,14 @@
     "wisp": {
       "name": "Familiar: Will-o'-the-Wisp",
       "description": "A tamed will-o'-the-wisp floats behind the character in the Combat scene, and on the portrait it glows with a blue light by their shoulder."
+    },
+    "night-raven": {
+      "name": "Night Raven Cloak",
+      "description": "A black cloak of raven feathers and a raven mask. The Shadow wears it on the portrait, on the march and in the saddle, at every evolution."
+    },
+    "forest-lord": {
+      "name": "Forest Lord's Garb",
+      "description": "A green hooded cloak with antlers, a tunic of leaves and an antler bow. The Archer wears it on the portrait, on the march and in the saddle, at every evolution."
     }
   },
   "texts": {
@@ -62,7 +70,8 @@
       "With a frame on, the character's name can take the frame's colour: in the chat, in the Ranking, among Friends, in the Party and in the Guild.",
       "A mount changes only the look of the one bought at the Stable, so only a character who already has a mount can buy it.",
       "An aura shines around the character on the portrait, on the character card and in the Combat scene. The Luminous Trail stays behind the character in the Combat scene, behind their mount too.",
-      "A familiar keeps the character company on the portrait, on the character card and in the Combat scene, beside their mount too. A character has one familiar with them at a time."
+      "A familiar keeps the character company on the portrait, on the character card and in the Combat scene, beside their mount too. A character has one familiar with them at a time.",
+      "An outfit changes the look of a character of its class at every evolution: on the portrait, on the character card, in the Combat scene and in the saddle, in the character's skin tone. The Outfits tab is in the shop when there is an outfit for the character's class."
     ]
   }
 }

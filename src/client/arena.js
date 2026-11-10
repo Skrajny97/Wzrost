@@ -94,7 +94,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       ? summonSprite(unit.summon, unit.figure)
       : person
         ? ((unit.companion ? (companionPortrait(unit.classId, unit.appearance ?? 'male') ?? companionBust(unit.classId, unit.appearance ?? 'male')) : null) ??
-          portraitSprite(unit.classId, unit.appearance ?? 'male', { bust: true, skin: unit.skin, evolution: unit.evolution }) ??
+          portraitSprite(unit.classId, unit.appearance ?? 'male', { bust: true, skin: unit.skin, evolution: unit.evolution, outfit: unit.outfit }) ??
           classArt(unit.classId))
         : monsterSprite(unit.monsterId);
     const card = h(

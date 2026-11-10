@@ -23,7 +23,7 @@ function doing(activity) {
 }
 
 export const bust = (character) =>
-  portraitSprite(character.classId, character.appearance, { bust: true, skin: character.skin, evolution: character.evolution }) ??
+  portraitSprite(character.classId, character.appearance, { bust: true, skin: character.skin, evolution: character.evolution, outfit: character.outfit }) ??
   classArt(character.classId) ??
   icon(CLASS_ICONS[character.classId] ?? 'person', { size: 26 });
 

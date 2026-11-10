@@ -36,14 +36,16 @@ export const characterLook = (character) => ({
   appearance: character.appearance,
   skin: character.skin,
   evolution: character.evolution?.current?.id,
+  // The outfit worn (skórka), by the cosmetic's id.
+  outfit: character.cosmetics?.outfit ?? null,
 });
 
 // The layers of a portrait of `look` ({ classId, appearance, skin,
-// evolution }): the forest, or the background worn, with the figure over it,
+// evolution, outfit }): the forest, or the background worn, with the figure over it,
 // lit by the aura worn, and the pet worn by the figure; with a frame worn,
 // all this in its window and the frame over it.
 export function portraitLayers(look, { frame = null, background = null, aura = null, pet = null } = {}) {
-  const figure = portraitSprite(look.classId, look.appearance, { skin: look.skin, evolution: look.evolution });
+  const figure = portraitSprite(look.classId, look.appearance, { skin: look.skin, evolution: look.evolution, outfit: look.outfit });
   const back = cosmeticArt(cosmeticOf(background)?.art);
   // A look without its figure keeps the drawn stand-in, with its own forest.
   const scenery = !figure
@@ -149,10 +151,10 @@ export function light(art, figure, { glow, spark, sparks }) {
 // as the scenes' sheets do; with the animations off it stands on the first.
 function petLayer({ file, size, frames, fps, x, y, anchor }, look, petId) {
   const { width, height } = SPRITES.portraits;
-  const [fromX, fromY] = anchor === 'shoulder' ? portraitPerch(look.classId, look.appearance, look.evolution) : [0, 0];
+  const [fromX, fromY] = anchor === 'shoulder' ? portraitPerch(look.classId, look.appearance, look.evolution, look.outfit) : [0, 0];
   // Some portraits hold something where the pet would be; there it has a
   // place of its own (art.js petSpots).
-  const [left, top] = portraitPetSpot(petId, look.classId, look.appearance, look.evolution) ?? [fromX + x, fromY + y];
+  const [left, top] = portraitPetSpot(petId, look.classId, look.appearance, look.evolution, look.outfit) ?? [fromX + x, fromY + y];
   const pet = h('span', { class: 'portrait-pet' });
   Object.assign(pet.style, {
     left: `${(left / width) * 100}%`,

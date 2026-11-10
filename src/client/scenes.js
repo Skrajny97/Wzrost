@@ -128,6 +128,10 @@ function companionWalker({ classId, appearance }) {
   return { classId, appearance, companion: true };
 }
 
+// The outfit a walker wears (skórka, 763 A): the player's own character
+// has it among its cosmetics, another's look on the way (wayLook) by itself.
+const outfitOf = (character) => character?.outfit ?? character?.cosmetics?.outfit ?? null;
+
 // One walker on the way, in a holder of its own with its light, its trail
 // and its pet. With others on the way (`count` over one: a Drużyna, a
 // mercenary, the companions) the holders stand in a line (styles.css,
@@ -136,7 +140,7 @@ function companionWalker({ classId, appearance }) {
 // One on foot (.scene-member--afoot) walks smaller beside a rider.
 function member(walk, character, index, count) {
   const { classId, appearance, skin, evolution } = character ?? {};
-  const own = character?.companion ? companionWalkerSheet(classId, appearance) : walkerSheet(classId, appearance, skin, evolution?.current?.id);
+  const own = character?.companion ? companionWalkerSheet(classId, appearance) : walkerSheet(classId, appearance, skin, evolution?.current?.id, outfitOf(character));
   const ridden = ride(walk, character);
   const figure = ridden ?? (own ? frames({ ...walk.walker, file: own }, 'scene-walker scene-walker--own') : frames(walk.figure, 'scene-walker'));
   const holder = h('div', { class: `scene-member${count > 1 ? ' scene-member--party' : ''}${ridden ? '' : ' scene-member--afoot'}` }, figure);
@@ -263,7 +267,7 @@ function companion(figure, { walk, foot, ride: riding }, box) {
 function ride(walk, character) {
   const id = mountLook(walk, character);
   const trot = id && walk.mounts?.[id];
-  const file = trot && riderFile(character.classId, character.appearance, character.skin, character.evolution?.current?.id);
+  const file = trot && riderFile(character.classId, character.appearance, character.skin, character.evolution?.current?.id, outfitOf(character));
   if (!file) return null;
   const [x, y] = trot.seats[0];
   const [seatX, seatY] = walk.rider.seat;

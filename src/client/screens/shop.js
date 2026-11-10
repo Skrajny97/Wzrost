@@ -1,7 +1,9 @@
 // The Sklep Systemu (src/server/cosmetics.js; DECISIONS.md, "Sklep Systemu:
 // ramki, tła i tygrys szablozębny"), from the stall in the top bar: frames,
 // backgrounds, auras, trails, the mount's look and pets (chowańce) for
-// Punkty Systemu, in six tabs. Each shows itself on the character's own
+// Punkty Systemu, in six tabs, and a seventh, Skórki, for a class with an
+// outfit (763 A), across the row under them. Each shows itself on the
+// character's own
 // portrait, with what else it wears (a trail behind the character walking on
 // the path, the mount's look its picture, once it has one), its words and
 // its price. "Kup" asks first; what is owned has "Załóż" or "Zdejmij" in its
@@ -26,7 +28,11 @@ const TABS = [
   { id: 'slady', kind: 'trail', name: 'Ślady' },
   { id: 'wierzchowiec', kind: 'mountSkin', name: 'Wierzchowiec' },
   { id: 'chowance', kind: 'pet', name: 'Chowańce' },
+  { id: 'skorki', kind: 'outfit', name: 'Skórki' },
 ];
+
+// An item the character can wear: an outfit only for its own class.
+const forCharacter = (item, character) => item.kind !== 'outfit' || item.classId === character.classId;
 
 export function mountShop(container, { params }) {
   let tab = TABS.find((each) => each.id === params.tab) ?? TABS[0];
@@ -34,6 +40,10 @@ export function mountShop(container, { params }) {
   function render() {
     const character = state.character;
     const { items, texts } = state.content.cosmetics;
+    // The tabs with something for the character: Skórki only for a class
+    // with an outfit.
+    const tabs = TABS.filter((each) => items.some((item) => item.kind === each.kind && forCharacter(item, character)));
+    if (!tabs.includes(tab)) tab = TABS[0];
     fill(
       container,
       pageHeading(t('Sklep Systemu')),
@@ -45,12 +55,12 @@ export function mountShop(container, { params }) {
         h('strong', { text: formatNumber(character.systemPoints) }),
       ),
       howItWorks(texts.lead, texts.rules),
-      h('div', { class: 'segmented shop-tabs', role: 'group', 'aria-label': t('Działy Sklepu Systemu') }, TABS.map(tabButton)),
+      h('div', { class: 'segmented shop-tabs', role: 'group', 'aria-label': t('Działy Sklepu Systemu') }, tabs.map(tabButton)),
       tab.kind === 'frame' && character.cosmetics.frame && nameSwitch(character),
       h(
         'ul',
         { class: 'shop-items' },
-        items.filter((item) => item.kind === tab.kind).map((item) => card(item, character)),
+        items.filter((item) => item.kind === tab.kind && forCharacter(item, character)).map((item) => card(item, character)),
       ),
     );
   }
@@ -96,13 +106,15 @@ export function mountShop(container, { params }) {
     if (item.kind === 'mountSkin') return mountArt(item.art);
     if (item.kind === 'trail') return trailPreview(item, character);
     const { frame, background, aura, pet } = character.cosmetics;
+    // An outfit on the character itself, in its skin tone and evolution.
+    if (item.kind === 'outfit') return portraitBox({ ...characterLook(character), outfit: item.id }, { frame, background, aura, pet }, 'shop-preview');
     return portraitBox(characterLook(character), { frame, background, aura, pet, [item.kind]: item.id }, 'shop-preview');
   }
 
   // A trail as the Walka scene shows it: the character on a bit of the path,
   // still, with its footprints glowing behind it, fainter the further.
   function trailPreview(item, character) {
-    const sheet = walkerSheet(character.classId, character.appearance, character.skin, character.evolution?.current?.id);
+    const sheet = walkerSheet(character.classId, character.appearance, character.skin, character.evolution?.current?.id, character.cosmetics?.outfit);
     const box = h('div', { class: 'shop-trail', 'aria-hidden': 'true' });
     box.style.setProperty('--trail', item.trail.color);
     box.style.setProperty('--path', `url("/${state.content.animations.walk.path}")`);

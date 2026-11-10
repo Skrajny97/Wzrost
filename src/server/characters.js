@@ -834,6 +834,7 @@ export function earlyAreaOf(row) {
 }
 
 export function engineCharacter(row) {
+  const outfit = row.cosmetics ? cosmeticsOf(JSON.parse(row.cosmetics), content()).outfit : null;
   return {
     classId: row.class_id,
     level: row.level,
@@ -852,6 +853,8 @@ export function engineCharacter(row) {
     evolution: row.evolution ?? null,
     // The professions' levels and XP (professions.js).
     professions: JSON.parse(row.professions ?? '{}'),
+    // The Sklep Systemu's skórka worn (cosmetics.js), for the fights' busts.
+    ...(outfit && { outfit }),
   };
 }
 
@@ -1718,6 +1721,8 @@ export async function characterProfile(context) {
       background: view.cosmetics.background,
       aura: view.cosmetics.aura,
       pet: view.cosmetics.pet,
+      // The outfit worn (skórka), in place of its class's look.
+      outfit: view.cosmetics.outfit,
       nameColor: view.nameColor,
       level: view.level,
       classLevel: view.classLevel,
@@ -1847,6 +1852,8 @@ export async function listCharacters(context) {
       appearance: row.appearance,
       skin: row.skin ?? content().defaultSkin,
       evolution: content().evolutionsById[row.evolution] ? row.evolution : null,
+      // The outfit worn (skórka), for its bust.
+      outfit: cosmeticsOf(JSON.parse(row.cosmetics ?? '{}'), content()).outfit,
       level: row.level,
       classLevel: row.class_level,
       played: row.role === 'player',

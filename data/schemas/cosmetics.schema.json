@@ -30,14 +30,15 @@
             "pattern": "^[a-z0-9-]+$"
           },
           "kind": {
-            "description": "frame: ramka portretu, background: tło portretu, mountSkin: wygląd wierzchowca ze Stajni, aura: światło wokół postaci, trail: świecące ślady za postacią w scenie Walki, pet: chowaniec przy postaci w scenie Walki i na portrecie.",
+            "description": "frame: ramka portretu, background: tło portretu, mountSkin: wygląd wierzchowca ze Stajni, aura: światło wokół postaci, trail: świecące ślady za postacią w scenie Walki, pet: chowaniec przy postaci w scenie Walki i na portrecie, outfit: skórka, inny wygląd postaci jednej klasy przy każdej ewolucji.",
             "enum": [
               "frame",
               "background",
               "mountSkin",
               "aura",
               "trail",
-              "pet"
+              "pet",
+              "outfit"
             ]
           },
           "name": {
@@ -228,6 +229,16 @@
                 }
               }
             }
+          },
+          "classId": {
+            "description": "Skórka: klasa startowa, dla której jest.",
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
+          },
+          "look": {
+            "description": "Skórka: przedrostek grafik, <look>-<płeć> w src/client/art/portraits, walkers i riders.",
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$"
           }
         },
         "allOf": [

@@ -177,7 +177,7 @@ describe('mercenaries through the API', () => {
     assert.equal((await row('Zleceniodawca')).gold, goldBefore - 300);
     // It walks beside the character on the way, in its own look (654 A); on
     // foot, for the Osada and its Stajnia are off here.
-    const plain = { classId: 'warrior', appearance: 'female', skin: content.defaultSkin, evolution: null, mount: null, mountSkin: null, aura: null, trail: null, pet: null };
+    const plain = { classId: 'warrior', appearance: 'female', skin: content.defaultSkin, evolution: null, mount: null, mountSkin: null, aura: null, trail: null, pet: null, outfit: null };
     assert.deepEqual(started.data.character.activity.mercenary, { name: 'Najemna', gold: 300, walker: plain });
     const hunt = await activityOf('Zleceniodawca');
     const options = JSON.parse(hunt.options);
@@ -373,7 +373,7 @@ describe('a mercenary on the way (654 A)', () => {
     // Sklep Systemu's look, an aura, a trail and a pet.
     const worn = { owned: ['sabertooth', 'aura-ember', 'trail-light', 'fox'], mountSkin: 'sabertooth', aura: 'aura-ember', trail: 'trail-light', pet: 'fox' };
     await update("UPDATE characters SET evolution = 'sniper', skin = 'dark', settlement = ?, cosmetics = ? WHERE name = 'Najemny'", JSON.stringify({ mount: 2 }), JSON.stringify(worn));
-    const look = { classId: 'archer', appearance: 'male', skin: 'dark', evolution: 'sniper', mount: 'horse', mountSkin: 'sabertooth', aura: 'aura-ember', trail: 'trail-light', pet: 'fox' };
+    const look = { classId: 'archer', appearance: 'male', skin: 'dark', evolution: 'sniper', mount: 'horse', mountSkin: 'sabertooth', aura: 'aura-ember', trail: 'trail-light', pet: 'fox', outfit: null };
     // The one who hires has two companions in the Kwatery.
     await update("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'quarters', 2, 0, 0 FROM characters WHERE name = 'Zleceniodawca'");
     const { candidates } = (await as('zlecenie', 'GET', '/api/settlement')).data.settlement.companions;

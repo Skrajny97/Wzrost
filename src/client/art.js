@@ -78,6 +78,8 @@ export const SPRITES = {
       'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
+      // The outfits of the Sklep Systemu (skórki, 763 A), <look>-<appearance>.
+      'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
     ],
     faces: {
       'archer-female': 49, 'archer-male': 52, 'cleric-male': 49, 'shadow-male': 51, 'warrior-male': 50,
@@ -90,6 +92,7 @@ export const SPRITES = {
       'archmage-female': 49, 'archmage-male': 51, 'winter-lord-female': 51, 'winter-lord-male': 49, 'druid-female': 50, 'druid-male': 49,
       'miracle-worker-female': 47, 'miracle-worker-male': 43, 'grand-inquisitor-female': 50, 'high-priest-female': 50, 'kingslayer-female': 55,
       'kingslayer-male': 54, 'necromancer-female': 44, 'necromancer-male': 49, 'phantom-male': 45,
+      'skin-night-raven-female': 50, 'skin-night-raven-male': 51, 'skin-forest-lord-female': 51, 'skin-forest-lord-male': 52,
     },
     perches: {
       'warrior-female': [32, 38], 'warrior-male': [34, 40], 'archer-female': [34, 41], 'archer-male': [35, 36], 'mage-female': [34, 41],
@@ -107,6 +110,7 @@ export const SPRITES = {
       'miracle-worker-female': [33, 35], 'miracle-worker-male': [31, 34], 'grand-inquisitor-female': [34, 30], 'grand-inquisitor-male': [33, 29],
       'high-priest-female': [34, 35], 'high-priest-male': [32, 35], 'kingslayer-female': [37, 33], 'kingslayer-male': [34, 30],
       'necromancer-female': [30, 38], 'necromancer-male': [37, 32], 'phantom-female': [36, 35], 'phantom-male': [39, 42],
+      'skin-night-raven-female': [33, 40], 'skin-night-raven-male': [33, 38], 'skin-forest-lord-female': [37, 41], 'skin-forest-lord-male': [38, 40],
     },
     // `petSpots`: a pet's own place on a portrait where its usual one would
     // cover what the figure holds at the shoulder (a falcon, a staff's head,
@@ -136,6 +140,7 @@ export const SPRITES = {
       'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
+      'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
     ],
   },
   items: {
@@ -224,6 +229,7 @@ export const SPRITES = {
       'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
+      'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
     ],
   },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
@@ -491,6 +497,7 @@ export const SPRITES = {
       'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
+      'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
     ],
   },
 };
@@ -654,23 +661,29 @@ function toneFile(id, skin) {
 
 const toned = new Set([...SPRITES.portraits.toned, ...SPRITES.portraits.tonedEvolutions]);
 
-// The ids a look is drawn under, best first: the evolution's, then for a
-// second form without its own art yet its first evolution's (the server's
-// evolutionArt), then the class's.
-export function lookIds(classId, appearance, evolution) {
-  const ids = [];
-  for (let id = evolution; id && ids.length < 4; id = state.content?.evolutionArt?.forms?.[id]) ids.push(`${id}-${appearance}`);
+// The art of an outfit of the Sklep Systemu (skórka, 763 A) by the
+// cosmetic's id: its `look`, the prefix of its pictures, or null.
+const outfitLook = (id) => (id ? (state.content?.cosmetics?.items.find((item) => item.id === id && item.kind === 'outfit')?.look ?? null) : null);
+
+// The ids a look is drawn under, best first: the outfit's worn (`outfit`,
+// the cosmetic's id), the evolution's, then for a second form without its
+// own art yet its first evolution's (the server's evolutionArt), then the
+// class's.
+export function lookIds(classId, appearance, evolution, outfit = null) {
+  const look = outfitLook(outfit);
+  const ids = look ? [`${look}-${appearance}`] : [];
+  for (let id = evolution, n = 0; id && n < 4; id = state.content?.evolutionArt?.forms?.[id], n += 1) ids.push(`${id}-${appearance}`);
   ids.push(`${classId}-${appearance}`);
   return ids;
 }
 // The first of a look's ids that has art of `kind`, or null.
-const lookId = (kind, classId, appearance, evolution) => lookIds(classId, appearance, evolution).find((id) => available[kind].has(id)) ?? null;
+const lookId = (kind, classId, appearance, evolution, outfit) => lookIds(classId, appearance, evolution, outfit).find((id) => available[kind].has(id)) ?? null;
 
 // A class's figure for a look, or its evolution's once it has one. `bust`
 // shows the head and shoulders at the image's own size, cut by the box it
 // sits in (the arena, the class cards).
-export function portraitSprite(classId, appearance, { bust = false, skin, evolution } = {}) {
-  const id = lookId('portraits', classId, appearance, evolution);
+export function portraitSprite(classId, appearance, { bust = false, skin, evolution, outfit } = {}) {
+  const id = lookId('portraits', classId, appearance, evolution, outfit);
   if (!id) return null;
   const file = toned.has(id) ? toneFile(id, skin) : id;
   const { width, height, faces } = SPRITES.portraits;
@@ -690,22 +703,22 @@ export function portraitSprite(classId, appearance, { bust = false, skin, evolut
 // Where a pet perches on the portrait of a look (SPRITES.portraits.perches),
 // in the portrait's pixels: on the portrait shown, its evolution's or its
 // class's, or, for a look without one, about where most shoulders are.
-export function portraitPerch(classId, appearance, evolution) {
-  return SPRITES.portraits.perches[lookId('portraits', classId, appearance, evolution)] ?? [34, 34];
+export function portraitPerch(classId, appearance, evolution, outfit) {
+  return SPRITES.portraits.perches[lookId('portraits', classId, appearance, evolution, outfit)] ?? [34, 34];
 }
 
 // A pet's own place on the portrait of a look (SPRITES.portraits.petSpots):
 // the top left corner of its frame in the portrait's pixels, or null where
 // the pet keeps its usual place.
-export function portraitPetSpot(petId, classId, appearance, evolution) {
-  return SPRITES.portraits.petSpots[petId]?.[lookId('portraits', classId, appearance, evolution)] ?? null;
+export function portraitPetSpot(petId, classId, appearance, evolution, outfit) {
+  return SPRITES.portraits.petSpots[petId]?.[lookId('portraits', classId, appearance, evolution, outfit)] ?? null;
 }
 
 // The sheet of the character walking in its look and skin tone, or its
 // evolution's once it has one, as a path from the site's root like the
 // scenes' sheets (data/animations.json), or null for a look without one.
-export function walkerSheet(classId, appearance, skin, evolution) {
-  const id = lookId('walkers', classId, appearance, evolution);
+export function walkerSheet(classId, appearance, skin, evolution, outfit) {
+  const id = lookId('walkers', classId, appearance, evolution, outfit);
   return id ? `art/walkers/${toneFile(id, skin)}.png` : null;
 }
 
@@ -726,8 +739,8 @@ export const mountArt = (id) =>
 
 // The character riding, in its look and skin tone (or its evolution's), as a
 // path from the site's root, or null for a look without one.
-export function riderFile(classId, appearance, skin, evolution) {
-  const id = lookId('riders', classId, appearance, evolution);
+export function riderFile(classId, appearance, skin, evolution, outfit) {
+  const id = lookId('riders', classId, appearance, evolution, outfit);
   return id ? `art/riders/${toneFile(id, skin)}.png` : null;
 }
 

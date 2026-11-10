@@ -13604,6 +13604,12 @@ a.profession-square:active {
   border-top: 1px solid var(--system-line);
 }
 
+/* The seventh tab, Skórki, for a class with an outfit: across the row under
+   the six. */
+.shop-tabs > :nth-child(7) {
+  grid-column: 1 / -1;
+}
+
 .shop-items {
   display: grid;
   gap: 12px;

@@ -42,6 +42,7 @@ export function wayLook(row) {
     aura: worn.aura,
     trail: worn.trail,
     pet: worn.pet,
+    outfit: worn.outfit,
   };
 }
 
@@ -68,7 +69,7 @@ export async function buyCosmetic(context) {
   const body = await readJson(context.request);
   const stored = cosmeticsOfRow(row);
   const mount = settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content()) : null;
-  const block = cosmeticBlock(body.id, stored, { systemPoints: row.system_points, mount }, content());
+  const block = cosmeticBlock(body.id, stored, { systemPoints: row.system_points, mount, classId: row.class_id }, content());
   if (block) throw refuse(block);
   const item = content().cosmeticsById[body.id];
   const after = await save(context, session, row, { ...stored, owned: [...stored.owned, item.id] }, item.price);

@@ -11,7 +11,8 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import { cosmeticBlock, cosmeticsOf, nameColor, wearBlock } from '../src/engine/index.js';
-import { content } from './helpers/content.js';
+import { combatantView, playerCombatant } from '../src/engine/combatant.js';
+import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
 const item = (id) => content.cosmeticsById[id];
@@ -36,6 +37,9 @@ describe('the Sklep Systemu in the engine', () => {
         ['fox', 'pet', 'Chowaniec: Lis', 600],
         ['raven', 'pet', 'Chowaniec: Kruk', 600],
         ['wisp', 'pet', 'Chowaniec: Błędny ognik', 800],
+        // The outfits (skórki, 763 A: about 800 PS), the Cień's first.
+        ['night-raven', 'outfit', 'Płaszcz Nocnego Kruka', 800],
+        ['forest-lord', 'outfit', 'Strój Leśnego Pana', 800],
       ],
     );
     // A name in its frame's colour: gold brighter than the names' own gold.
@@ -46,7 +50,7 @@ describe('the Sklep Systemu in the engine', () => {
   });
 
   test('the stored state holds only what the data has, owned once, worn only when owned and of its kind', () => {
-    assert.deepEqual(cosmeticsOf(null, content), { owned: [], frame: null, background: null, mountSkin: null, aura: null, trail: null, pet: null, nameFromFrame: false });
+    assert.deepEqual(cosmeticsOf(null, content), { owned: [], frame: null, background: null, mountSkin: null, aura: null, trail: null, pet: null, outfit: null, nameFromFrame: false });
     assert.deepEqual(cosmeticsOf({}, content), cosmeticsOf(null, content));
     const stored = {
       owned: ['frame-gold', 'frame-gold', 'nope', 'bg-camp', 'constructor'],
@@ -55,7 +59,7 @@ describe('the Sklep Systemu in the engine', () => {
       mountSkin: 'bg-camp',
       nameFromFrame: 'tak',
     };
-    assert.deepEqual(cosmeticsOf(stored, content), { owned: ['frame-gold', 'bg-camp'], frame: 'frame-gold', background: null, mountSkin: null, aura: null, trail: null, pet: null, nameFromFrame: false });
+    assert.deepEqual(cosmeticsOf(stored, content), { owned: ['frame-gold', 'bg-camp'], frame: 'frame-gold', background: null, mountSkin: null, aura: null, trail: null, pet: null, outfit: null, nameFromFrame: false });
     assert.deepEqual(cosmeticsOf({ owned: 'frame-gold', frame: 'frame-gold' }, content).owned, []);
   });
 
@@ -125,6 +129,25 @@ describe('the Sklep Systemu in the engine', () => {
     assert.deepEqual(['fox', 'raven', 'wisp'].map((id) => [item(id).pet.foot.behind ?? false, item(id).pet.ride.behind ?? false]), [[false, false], [false, false], [true, true]]);
   });
 
+  test('an outfit is for the characters of its class, and worn in its own place (763 A)', () => {
+    const none = cosmeticsOf(null, content);
+    assert.equal(item('night-raven').classId, 'shadow');
+    assert.equal(cosmeticBlock('night-raven', none, { systemPoints: 1000, mount: null, classId: 'warrior' }, content).code, 'other_class');
+    assert.equal(cosmeticBlock('night-raven', none, { systemPoints: 1000, mount: null, classId: 'shadow' }, content), null);
+    assert.equal(cosmeticBlock('night-raven', none, { systemPoints: 799, mount: null, classId: 'shadow' }, content).code, 'not_enough_points');
+    assert.equal(wearBlock('outfit', 'night-raven', none, content).code, 'not_owned');
+    assert.equal(wearBlock('outfit', 'night-raven', { owned: ['night-raven'] }, content), null);
+    assert.equal(wearBlock('pet', 'night-raven', { owned: ['night-raven'] }, content).code, 'invalid_cosmetic');
+    assert.equal(cosmeticsOf({ owned: ['night-raven'], outfit: 'night-raven' }, content).outfit, 'night-raven');
+    assert.equal(cosmeticsOf({ owned: [], outfit: 'night-raven' }, content).outfit, null);
+    // The fights' busts wear it too, and without one nothing changes.
+    const raven = playerCombatant({ character: { ...newCharacter('shadow'), outfit: 'night-raven' }, equipped: [], name: 'Kruk' }, content);
+    assert.equal(raven.outfit, 'night-raven');
+    assert.equal(combatantView(raven, 1, content).outfit, 'night-raven');
+    const plain = playerCombatant({ character: newCharacter('shadow'), equipped: [], name: 'Kruk' }, content);
+    assert.equal('outfit' in plain || 'outfit' in combatantView(plain, 1, content), false);
+  });
+
   test("the name takes the frame's colour only with a frame worn and the switch on", () => {
     const owned = ['frame-gold', 'frame-forest'];
     assert.equal(nameColor({ owned, frame: 'frame-gold' }, content), null);
@@ -156,7 +179,7 @@ describe('the Sklep Systemu through the API', () => {
 
   test('a new character owns nothing and wears nothing', async () => {
     const { character } = (await as('kupiec', 'GET', '/api/character')).data;
-    assert.deepEqual(character.cosmetics, { owned: [], frame: null, background: null, mountSkin: null, aura: null, trail: null, pet: null, nameFromFrame: false });
+    assert.deepEqual(character.cosmetics, { owned: [], frame: null, background: null, mountSkin: null, aura: null, trail: null, pet: null, outfit: null, nameFromFrame: false });
     assert.equal(character.nameColor, null);
     // The page has the cosmetics and the words of the shop.
     const { cosmetics } = (await call('GET', '/api/content')).data;
@@ -274,6 +297,24 @@ describe('the Sklep Systemu through the API', () => {
     assert.equal((await wear('kupiec', 'pet', null)).data.character.cosmetics.pet, null);
     assert.equal((await as('sasiad', 'GET', '/api/profile/Kupiec')).data.profile.pet, null);
     assert.equal((await stored('Kupiec')).system_points, 0);
+  });
+
+  test('an outfit is bought only by a character of its class, worn, and seen on its card and in the list of characters', async () => {
+    await player('sasiad', 'Sasiad');
+    await points('Kupiec', 1000);
+    const { character } = (await as('kupiec', 'GET', '/api/character')).data;
+    if (character.classId !== 'shadow') assert.equal((await buy('kupiec', 'night-raven')).data.error.code, 'other_class');
+    await (await db()).prepare("UPDATE characters SET class_id = 'shadow' WHERE name = 'Kupiec'").run();
+    const bought = await buy('kupiec', 'night-raven');
+    assert.equal(bought.status, 200, JSON.stringify(bought.data));
+    assert.equal(bought.data.character.systemPoints, 200);
+    assert.equal(bought.data.character.cosmetics.outfit, null);
+    assert.equal((await wear('kupiec', 'outfit', 'night-raven')).data.character.cosmetics.outfit, 'night-raven');
+    assert.equal((await as('sasiad', 'GET', '/api/profile/Kupiec')).data.profile.outfit, 'night-raven');
+    const listed = (await as('kupiec', 'GET', '/api/characters')).data.characters.find((one) => one.name === 'Kupiec');
+    assert.equal(listed.outfit, 'night-raven');
+    assert.equal((await wear('kupiec', 'outfit', null)).data.character.cosmetics.outfit, null);
+    assert.equal((await as('sasiad', 'GET', '/api/profile/Kupiec')).data.profile.outfit, null);
   });
 
   test("the name takes the frame's colour with the switch on, while a frame is worn", async () => {
