@@ -420,6 +420,10 @@
     "0.2.51": {
       "title": "Version 0.2.51",
       "body": "- The bonus tile in the top bar (the flask with a number of fights): tap it and a list of the bonuses at work unfolds under it, with what they do and how many fights they have left."
+    },
+    "0.2.52": {
+      "title": "Version 0.2.52",
+      "body": "- Every land has a fight background of its own: in an exploration's report the fights take place on that land's ground, from the trampled earth of the Windfalls and the stone circle of the Stone Glade to the mud of the Black Bog and the gloom of the New Moon Depths."
     }
   }
 }

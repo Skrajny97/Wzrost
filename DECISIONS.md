@@ -3034,6 +3034,13 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.52 (10.11.2026): Tła walk w krainach
+
+Makiety 802.1–802.8 ocenione przez autora 10.11.2026: wersje B, a dla Głuchej Kniei (802.7) wersja A.
+
+1. **Każda kraina ma własną planszę walki** (`fightBoard` w `data/regions.json`, obrazki 192×160 w `src/client/art/boards`): Wiatrołomy ubita ziemia z połamanymi gałęziami w rogach, Uroczysko Kamieni szeroki krąg kamieni na zielonej polanie, Zarośnięte Rozlewiska rozlewiska przy brzegach, Torfowe Mszary mech z rdzawym torfem, Czarne Bagno ciemnozielone błoto, Sosnowe Wydmy szarobrązowy piasek, Głucha Knieja ciemne poszycie z korzeniami, Ostępy Nowiu fioletowoszara ziemia w mroku. Wszystkie z PixelLab, w stylu piasku Areny (790 B), przygaszone tak jak on.
+2. **Gdzie**: powtórka walki w raporcie z wyprawy (także z Drużyną) staje na planszy krainy, w której była wyprawa. Wieże, Portale Systemu i Sala prób zostają przy zwykłym tle, bo walka nie toczy się tam w krainie; Arena ma swój piasek.
+
 ## Wersja 0.2.51 (10.11.2026): Bonusy pod kafelkiem w górnym pasku
 
 Autor 10.11.2026: „niech po kliknięciu w kafelek bonusów wyświetla się pod spodem co to za bonusy”.

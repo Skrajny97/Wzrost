@@ -530,6 +530,11 @@
       "id": "0.2.51",
       "title": "Wersja 0.2.51",
       "body": "- Kafelek bonusów w górnym pasku (kolba z liczbą walk): dotknij go, a pod spodem rozwinie się lista działających bonusów, z tym, co dają, i ile walk im zostało."
+    },
+    {
+      "id": "0.2.52",
+      "title": "Wersja 0.2.52",
+      "body": "- Każda kraina ma własne tło walki: w raporcie z wyprawy walki toczą się na ziemi tej krainy, od ubitej ziemi Wiatrołomów i kręgu kamieni na Uroczysku po błoto Czarnego Bagna i mrok Ostępów Nowiu."
     }
 ]
 }
