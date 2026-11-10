@@ -410,7 +410,7 @@
     "skin-dawn-male": {
       "start": "art/references/walks/start/skin-dawn-male.png",
       "pose": 2,
-      "description": "a calm young man with short fair hair in layered yellow and white vestments down to the ankles, a golden sash, brown boots, a book under the back arm, a staff topped with a small golden sun held upright in the front hand in every frame, the sun always above and in front of the hand, never over the face, no halo, nothing on the back"
+      "description": "a calm young man with short fair hair in layered yellow and white vestments down to the ankles, a golden sash, brown boots, the back hand empty and swinging, no book, a staff topped with a small golden sun held upright in the front hand in every frame, the sun always above and in front of the hand, never over the face, no halo, nothing on the back"
     },
     "skin-eclipse-female": {
       "start": "art/references/walks/start/skin-eclipse-female.png",
@@ -435,7 +435,7 @@
     "skin-night-raven-female": {
       "start": "art/references/walks/start/skin-night-raven-female.png",
       "pose": 2,
-      "description": "a wiry young woman with short black hair in a black cloak of layered raven feathers, a black raven-beak half mask over the upper face, a dark fitted leather jerkin, dark trousers and soft dark boots, a silver dagger in each hand"
+      "description": "a wiry young woman with short black hair in a black cloak of layered raven feathers, a black raven-beak half mask over the upper face, a dark fitted leather jerkin, dark trousers and soft dark boots, empty gloved hands, no daggers and no other weapons"
     },
     "skin-night-raven-male": {
       "start": "art/references/walks/start/skin-night-raven-male.png",
