@@ -520,6 +520,11 @@
       "id": "0.2.49",
       "title": "Wersja 0.2.49",
       "body": "- Chata Pustelnika: Punkty Czasu za złoto, do 30 dziennie, po 3000 złota za sztukę. Kupisz je także w czasie wyprawy."
+    },
+    {
+      "id": "0.2.50",
+      "title": "Wersja 0.2.50",
+      "body": "- Sklep Systemu: nowy dział „Skórki”. Płaszcz Nocnego Kruka dla Cienia i Strój Leśnego Pana dla Łucznika, po 800 Punktów Systemu. Skórka zmienia wygląd postaci przy każdej ewolucji: na portrecie, w walkach, w marszu i w siodle, zawsze w odcieniu skóry postaci."
     }
 ]
 }
