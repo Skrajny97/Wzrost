@@ -20,9 +20,15 @@ start frame has grey only above that row (the cleric's hair and beard), so a
 grey streak between the robe and the staff goes. A second run of the tool
 changes nothing.
 
+--dark-edges: every edge pixel on the solid body darker than LIGHT but not
+black takes the outline colour too, for a dark figure (a navy robe, a black
+cloak) that PixelLab draws without its outline here and there, so its edge
+blinks between black and the robe's colour from frame to frame (the author
+on a Night Raven walk, 10.11.2026: „migają piksele obrysu”).
+
 Only palette indices change; the palette and the transparent index stay.
 
-usage: python3 -I tools/walk-dark-outline.py <sheet.png> <out.png> [--grey-below Y] [frame width]
+usage: python3 -I tools/walk-dark-outline.py <sheet.png> <out.png> [--grey-below Y] [--dark-edges] [frame width]
 """
 import sys
 from collections import Counter
@@ -41,6 +47,9 @@ def lum(rgb):
 def main(argv):
     args = list(argv)
     below = None
+    dark_edges = '--dark-edges' in args
+    if dark_edges:
+        args.remove('--dark-edges')
     if '--grey-below' in args:
         at = args.index('--grey-below')
         below = int(args[at + 1])
@@ -61,6 +70,7 @@ def main(argv):
     outline, dark = dark_ids[0], set(dark_ids)
     light = {i for i in used if i != trans and lum(colours[i]) >= LIGHT}
     grey = {i for i in used if i != trans and max(colours[i]) - min(colours[i]) <= 16 and lum(colours[i]) >= LIGHT}
+    darkish = {i for i in used if i != trans and i not in dark and lum(colours[i]) < LIGHT} if dark_edges else set()
     counts = []
     for f in range(W // fw):
         x0 = f * fw
@@ -106,6 +116,11 @@ def main(argv):
                 if any(a in dark and b in dark for a, b in pairs):
                     px[x, y] = outline
         changed += len(final)
+        edges = [(x, y) for y in range(H) for x in range(x0, x0 + fw)
+                 if px[x, y] in darkish and any(get(x + dx, y + dy) == trans and solid(x - dx, y - dy) for dx, dy in DIRS)]
+        for x, y in edges:
+            px[x, y] = outline
+        changed += len(edges)
         counts.append(changed)
     im.save(out, transparency=trans)
     print(f'{src}: {sum(counts)} pixels changed {counts}')
