@@ -1,0 +1,23 @@
+{
+  "id": "skin-forest-lord-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a lean young man with short brown hair in a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak hanging behind, leather bracers and soft leather boots, a curved bow carved from pale antler slung across the back with a quiver of green-fletched arrows, nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right so the belt buckle is at the right edge of the body, only the near arm showing, hanging relaxed beside the body, the far arm hidden behind the body, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the antlers to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/archer-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/riders/skin-forest-lord-male.png",
+      "usage": "the same character seen exactly from the side: hood with antlers, face, hair, leaf jerkin, cloak, colours, and the bow and quiver on the back; the seated pose and the horse do not matter"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
