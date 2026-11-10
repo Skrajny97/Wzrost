@@ -198,11 +198,12 @@ function realisticGear(classId, level, classLevel, plan, content, set = 0) {
 export const GEAR_SETS = 8;
 
 // The main path's evolution at the class level: the first from class level
-// 50, its second form from 100.
-export function mainEvolution(classId, classLevel, content) {
+// 50, its second form from 100. `path`: the skill that leads another path
+// of the class (tools/class-balance-sim.mjs measures all three).
+export function mainEvolution(classId, classLevel, content, path = null) {
   const [levelOne, levelTwo] = content.balance.progression.classEvolutionLevels;
   if (classLevel < levelOne) return null;
-  const main = content.skills.find((skill) => skill.classId === classId);
+  const main = path ? content.skillsById[path] : content.skills.find((skill) => skill.classId === classId);
   const first = content.evolutions.find((evolution) => evolution.classId === classId && !evolution.from && evolution.path === main.id);
   // Without the second evolution in the game the first form stays.
   return classLevel >= levelTwo ? (engine.nextFormOf?.(first, content) ?? first) : first;
@@ -211,7 +212,8 @@ export function mainEvolution(classId, classLevel, content) {
 // The character and gear of a model: `typical` (tools/simulate.mjs) or a
 // realistic plan (`realistic`, `low`, or `realistic` without a part:
 // `realistic-nocomp`, `-noevo`, `-noupg`, `-nopot`, `-notier`, `-norarity`).
-export function playerOf(model, classId, level, content, set = 0) {
+// `path`: the evolution of another path than the main one (mainEvolution).
+export function playerOf(model, classId, level, content, set = 0, path = null) {
   const typical = typicalCharacter(classId, level, content);
   if (model === 'typical') return { ...typical, plan: null };
   const [variant, ...without] = model.split('-');
@@ -225,7 +227,7 @@ export function playerOf(model, classId, level, content, set = 0) {
   if (without.includes('notrophy')) plan = { ...plan, trophies: false };
   const base = typical.character;
   let character = { ...base };
-  const evolution = plan.evolution ? mainEvolution(classId, base.classLevel, content) : null;
+  const evolution = plan.evolution ? mainEvolution(classId, base.classLevel, content, path) : null;
   if (evolution) {
     character = { ...base, points: {}, evolution: evolution.id, skills: evolvedSkills(evolution, base.classLevel, content) };
     character.points = engine.autoDistribute(character, content);
@@ -286,7 +288,7 @@ export function companionsOf(plan, level, index, content) {
 }
 
 // The exploration's options for a model: potions, the mark and trophies.
-function roadKit(plan, area, minutes, content) {
+export function roadKit(plan, area, minutes, content) {
   if (!plan) return {};
   const fights = engine.potionsPerKind(minutes, content);
   const potions = plan.potion ? { [plan.potion]: Math.min(fights, plan.potionCount(minutes)) } : {};
