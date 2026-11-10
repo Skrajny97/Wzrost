@@ -128,7 +128,11 @@ describe('brewing in the engine', () => {
     assert.equal(questText(daily[0], content), 'Uwarz 3 Mniejsze mikstury leczenia.');
     assert.equal(questText({ ...daily[0], count: 1 }, content), 'Uwarz 1 Mniejszą miksturę leczenia.');
     // The week's 40 at level 12's share (weekly.curve).
-    const week = Math.round(40 * weekShare(12, 7, content));
+    // …times the week's targetFactor, to the kind's step (761 C).
+    const tuning = content.quests.kinds.find((kind) => kind.id === 'brewAny').weekly;
+    const step = tuning.step ?? 1;
+    const factor = content.quests.periods.weekly.targetFactor ?? 1;
+    const week = Math.max(step, Math.round((Math.round(40 * weekShare(12, 7, content)) * factor) / step) * step);
     const weekly = drawn(true, 'weekly').filter((quest) => quest.kind.startsWith('brew'));
     assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'brewAny' && quest.count === week));
     assert.equal(questText(weekly[0], content), `Uwarz łącznie ${week} mikstur.`);

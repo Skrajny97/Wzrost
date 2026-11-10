@@ -303,6 +303,16 @@
             }
           }
         },
+        "targetFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Tyle razy więcej trzeba zrobić w zadaniach okresu (po udziale z krzywej, do kroku rodzaju, nie więcej niż most); brak: 1."
+        },
+        "rewardFactor": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Tyle razy większa nagroda za zadanie okresu (razem z rewardFactor rodzaju); brak: 1."
+        },
         "late": {
           "type": "string",
           "pattern": "\\{days\\}",

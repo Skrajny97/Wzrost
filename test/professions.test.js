@@ -190,7 +190,11 @@ describe('herbalism in the engine', () => {
     assert.ok(daily.every((quest) => quest.target === 'comfrey' && quest.count === 12));
     assert.equal(questText(daily[0], content), 'Zbierz 12 sztuk Żywokostu.');
     // The week's 150 at level 12's share (weekly.curve).
-    const week = Math.round(150 * weekShare(12, 7, content));
+    // …times the week's targetFactor, to the kind's step (761 C).
+    const tuning = content.quests.kinds.find((kind) => kind.id === 'gatherAny').weekly;
+    const step = tuning.step ?? 1;
+    const factor = content.quests.periods.weekly.targetFactor ?? 1;
+    const week = Math.max(step, Math.round((Math.round(150 * weekShare(12, 7, content)) * factor) / step) * step);
     const weekly = drawn(true, 'weekly').filter((quest) => quest.kind.startsWith('gather'));
     assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'gatherAny' && quest.count === week));
     assert.equal(questText(weekly[0], content), `Zbierz łącznie ${week} ziół.`);

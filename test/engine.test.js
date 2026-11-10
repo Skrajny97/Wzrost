@@ -2584,7 +2584,10 @@ describe('quests from the narrator', () => {
   const iso = (ms) => new Date(ms).toISOString();
   // The data with the week's whole numbers at every level, for what the
   // drawing does before the level's share (weekShare).
-  const wholeWeek = { ...content, quests: { ...content.quests, periods: { ...content.quests.periods, weekly: { ...content.quests.periods.weekly, curve: [[1, 1]] } } } };
+  // The quests' own numbers, without the periods' targetFactor and
+  // rewardFactor (761 C), for the tests of those numbers themselves.
+  const unfactored = { ...content, quests: { ...content.quests, periods: Object.fromEntries(Object.entries(content.quests.periods).map(([id, period]) => [id, { ...period, targetFactor: 1, rewardFactor: 1 }])) } };
+  const wholeWeek = { ...unfactored, quests: { ...unfactored.quests, periods: { ...unfactored.quests.periods, weekly: { ...unfactored.quests.periods.weekly, curve: [[1, 1]] } } } };
 
   test('a day starts at midnight Polish time and a week on Monday, also when the clocks change', () => {
     // 25 October 2026: the clocks go back an hour, so the day has 25 hours.
@@ -2624,7 +2627,7 @@ describe('quests from the narrator', () => {
     // Drawn on its first day: four weeks' worth at the level's share, of the
     // kinds the week has.
     const first = at('2026-11-01T08:00:00Z');
-    const drawn = currentQuests({}, context, first, content);
+    const drawn = currentQuests({}, context, first, unfactored);
     const whole = drawn.monthly;
     assert.equal(whole.days, undefined);
     assert.deepEqual(whole.quests.map((quest) => quest.kind).sort(), drawn.weekly.quests.map((quest) => quest.kind).sort());
@@ -2642,9 +2645,10 @@ describe('quests from the narrator', () => {
     const view = questsView(october, late, content, null, 50);
     assert.equal(view.monthly.late, 'Zadania są na 7 z 31 dni tego miesiąca.');
     assert.equal(view.monthly.name, 'Miesięczne');
-    assert.equal(view.monthly.chest.gold, 1000 + 200 * 50);
-    assert.equal(view.monthly.chest.timePoints, 240);
-    assert.equal(view.monthly.chest.systemPoints, 50);
+    // The month's chest twice what it was (761 C).
+    assert.equal(view.monthly.chest.gold, 2000 + 400 * 50);
+    assert.equal(view.monthly.chest.timePoints, 480);
+    assert.equal(view.monthly.chest.systemPoints, 100);
     assert.equal(view.weekly.chest.gold, 0);
     assert.deepEqual(view.monthly.texts, { rerolled: 'Zadania tego miesiąca są już przelosowane.', rerollWhen: 'raz na miesiąc' });
     // The month's rewards: four weeks'.
@@ -2697,7 +2701,7 @@ describe('quests from the narrator', () => {
 
   test('a new character is asked to open inner regions: only in the week, fewer as its class grows, only while new', () => {
     const unlock = content.quests.kinds.find((kind) => kind.id === 'unlock');
-    const asked = (character, periodId, data = content) =>
+    const asked = (character, periodId, data = unfactored) =>
       Array.from({ length: 40 }, (_, seed) => drawQuests(periodId, { character, hasTable: true, seed }, data))
         .flat()
         .filter((quest) => quest.kind === 'unlock')
@@ -2742,7 +2746,7 @@ describe('quests from the narrator', () => {
     assert.equal(share(50, 1), 0.5 / 7);
     // The minutes of explorations a week asks for, at level 10 and at 200.
     const minutes = (level) =>
-      Array.from({ length: 40 }, (_, seed) => drawQuests('weekly', { character: newCharacter('cleric', { level, classLevel: level }), hasTable: false, seed }, content))
+      Array.from({ length: 40 }, (_, seed) => drawQuests('weekly', { character: newCharacter('cleric', { level, classLevel: level }), hasTable: false, seed }, unfactored))
         .flat()
         .filter((quest) => quest.kind === 'explore')
         .map((quest) => quest.count);
@@ -2751,6 +2755,37 @@ describe('quests from the narrator', () => {
     assert.ok(low.length > 0 && high.length > 0);
     assert.ok(low.every((count) => count % 60 === 0 && count >= 240 && count <= 600), String(low));
     assert.ok(high.every((count) => count >= 900 && count <= 1800), String(high));
+  });
+
+  test('761 C: the week asks for twice as much and gives half as much more, the month four times as much and twice the rewards', () => {
+    // The author, 10.11.2026, after a player's note that a week's and a
+    // month's quests take two days: „761 C tygodniowe cele x2 nagrody x1,5,
+    // miesięczne cele x4 nagrody x2”.
+    assert.deepEqual(
+      ['daily', 'weekly', 'monthly'].map((id) => [content.quests.periods[id].targetFactor ?? 1, content.quests.periods[id].rewardFactor ?? 1]),
+      [[1, 1], [2, 1.5], [4, 2]],
+    );
+    const character = newCharacter('cleric', { level: 60, classLevel: 60 });
+    for (const [periodId, targets, rewards] of [['weekly', 2, 1.5], ['monthly', 4, 2]]) {
+      for (let seed = 0; seed < 20; seed++) {
+        const base = drawQuests(periodId, { character, hasTable: true, seed }, unfactored);
+        const now = drawQuests(periodId, { character, hasTable: true, seed }, content);
+        assert.deepEqual(now.map((quest) => quest.kind), base.map((quest) => quest.kind));
+        now.forEach((quest, index) => {
+          const was = base[index];
+          const tuning = content.quests.kinds.find((kind) => kind.id === quest.kind)[periodId];
+          const step = tuning.fights ? 1 : (tuning.step ?? 1);
+          if (quest.kind !== 'unlock') assert.ok(Math.abs(quest.count - was.count * targets) <= step, `${periodId} ${quest.kind} ${was.count} → ${quest.count}`);
+          assert.equal(quest.reward.kind, was.reward.kind);
+          assert.ok(Math.abs(quest.reward.amount - was.reward.amount * rewards) <= rewards, `${periodId} ${was.reward.amount} → ${quest.reward.amount}`);
+        });
+      }
+    }
+    // The daily quests stay as they were.
+    assert.deepEqual(drawQuests('daily', { character, hasTable: true, seed: 3 }, content), drawQuests('daily', { character, hasTable: true, seed: 3 }, unfactored));
+    // The chests: the week's 180 Punktów Czasu and 30 Punktów Systemu, the month's 480 and 100.
+    assert.deepEqual([content.quests.periods.weekly.chest.timePoints, content.quests.periods.weekly.chest.systemPoints], [180, 30]);
+    assert.deepEqual([content.quests.periods.monthly.chest.timePoints, content.quests.periods.monthly.chest.systemPoints], [480, 100]);
   });
 
   test('the quests not done yet are drawn anew once a period; done and claimed ones stay', () => {
@@ -2920,9 +2955,9 @@ describe('quests from the narrator', () => {
     // "ustaw na robienie do końca czasu pozostałego"): 1320 minutes of
     // explorations with 15 hours left.
     const context = { character: newCharacter('cleric'), hasTable: false, seed: 11 };
-    const monday = currentQuests({}, context, at('2026-10-26T08:00:00Z'), content).weekly;
-    const sunday = currentQuests({}, context, at('2026-11-01T08:00:00Z'), content).weekly;
-    const thursday = currentQuests({}, context, at('2026-10-29T08:00:00Z'), content).weekly;
+    const monday = currentQuests({}, context, at('2026-10-26T08:00:00Z'), unfactored).weekly;
+    const sunday = currentQuests({}, context, at('2026-11-01T08:00:00Z'), unfactored).weekly;
+    const thursday = currentQuests({}, context, at('2026-10-29T08:00:00Z'), unfactored).weekly;
     assert.deepEqual([monday.days, monday.scaled], [undefined, true]);
     assert.equal(sunday.days, 1);
     assert.equal(thursday.days, 4);

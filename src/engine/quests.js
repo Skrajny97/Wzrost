@@ -238,13 +238,17 @@ const unlockMost = (tuning, classLevel) => tuning.most?.findLast((band) => band.
 
 // How much a quest asks for: for creatures, as many as `fights` fights
 // bring on average, and never more than `most`; for a week, its `share`
-// (weekShare).
-function questCount({ kind, perFight, most = Infinity }, periodId, rng, share = 1) {
+// (weekShare); then `factor` times that (the period's targetFactor), to the
+// kind's step and never past `most` (the author, 10.11.2026, after a
+// player's note that a week's and a month's quests take two days: „761 C
+// tygodniowe cele x2 nagrody x1,5, miesięczne cele x4 nagrody x2”).
+function questCount({ kind, perFight, most = Infinity }, periodId, rng, share = 1, factor = 1) {
   const tuning = kind[periodId];
-  if (tuning.fights) return shareCount(Math.max(1, Math.round(rng.int(...tuning.fights) * perFight)), tuning, share);
+  if (tuning.fights) return Math.max(1, Math.round(shareCount(Math.max(1, Math.round(rng.int(...tuning.fights) * perFight)), tuning, share) * factor));
   const [min, max] = tuning.count;
   const step = tuning.step ?? 1;
-  return shareCount(Math.min(most, min + step * rng.int(0, Math.floor((max - min) / step))), tuning, share);
+  const count = shareCount(Math.min(most, min + step * rng.int(0, Math.floor((max - min) / step))), tuning, share);
+  return factor === 1 ? count : Math.min(most, Math.max(step, Math.round((count * factor) / step) * step));
 }
 
 // A count cut to its `share`: to the kind's step, at least one step.
@@ -273,16 +277,20 @@ function questReward(periodId, level, rng, content, factor = 1) {
   return { kind, id: questLevel(level, content).part, amount: amount() };
 }
 
-// A quest of a drawn option, with its count (`share` of it, for a week)
-// and its reward, always whole.
-const newQuest = (option, periodId, character, rng, content, share = 1) => ({
-  kind: option.kind.id,
-  ...(option.target && { target: option.target }),
-  count: questCount(option, periodId, rng, share),
-  progress: 0,
-  reward: questReward(periodId, character.level, rng, content, option.kind.rewardFactor),
-  claimed: false,
-});
+// A quest of a drawn option, with its count (`share` of it, for a week,
+// times the period's targetFactor) and its reward (times the kind's and the
+// period's rewardFactor), always whole.
+const newQuest = (option, periodId, character, rng, content, share = 1) => {
+  const period = content.quests.periods[periodId];
+  return {
+    kind: option.kind.id,
+    ...(option.target && { target: option.target }),
+    count: questCount(option, periodId, rng, share, period.targetFactor ?? 1),
+    progress: 0,
+    reward: questReward(periodId, character.level, rng, content, (option.kind.rewardFactor ?? 1) * (period.rewardFactor ?? 1)),
+    claimed: false,
+  };
+};
 
 // A period's quests, drawn from `seed` for the character as it is: no
 // option twice, in the order of the kinds; a week's by the character's

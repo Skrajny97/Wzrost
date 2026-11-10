@@ -12,7 +12,7 @@
     "weekly": {
       "name": "Weekly",
       "chest": {
-        "text": "The weekly quest chest gives a random item, +120 Time Points and +20 System Points."
+        "text": "The weekly quest chest gives a random item, +180 Time Points and +30 System Points."
       },
       "late": "This week began later for you, so the quests are for {days} of its 7 days.",
       "rerolled": "This week's quests have already been rerolled.",
@@ -21,7 +21,7 @@
     "monthly": {
       "name": "Monthly",
       "chest": {
-        "text": "The monthly quest chest gives gold based on your level, +240 Time Points and +50 System Points."
+        "text": "The monthly quest chest gives gold based on your level, +480 Time Points and +100 System Points."
       },
       "late": "The quests are for {days} of this month's {total} days.",
       "rerolled": "This month's quests have already been rerolled.",

@@ -259,10 +259,14 @@ describe('the Warsztat in the engine', () => {
     assert.ok(gold(made).every((amount) => amount >= 92), gold(made).join());
     assert.ok(gold(daily.filter((quest) => quest.kind === 'explore')).every((amount) => amount <= 70));
     // The week's 10 at level 12's share (weekly.curve).
-    const week = Math.round(10 * weekShare(12, 7, content));
+    // …times the week's targetFactor, to the kind's step (761 C).
+    const tuning = content.quests.kinds.find((kind) => kind.id === 'makeAny').weekly;
+    const step = tuning.step ?? 1;
+    const factor = content.quests.periods.weekly.targetFactor ?? 1;
+    const week = Math.max(step, Math.round((Math.round(10 * weekShare(12, 7, content)) * factor) / step) * step);
     const weekly = drawn(true, 'weekly').filter((quest) => quest.kind.startsWith('make'));
     assert.ok(weekly.length > 0 && weekly.every((quest) => quest.kind === 'makeAny' && quest.count === week));
-    assert.equal(questText(weekly[0], content), `Wykonaj łącznie ${week} przedmioty.`);
+    assert.match(questText(weekly[0], content), new RegExp(`^Wykonaj łącznie ${week} przedmiot(y|ów)\\.$`));
     const quests = {
       daily: { period: 'd', chest: false, quests: [{ kind: 'make', count: 1, progress: 0, claimed: false }] },
       weekly: { period: 'w', chest: false, quests: [{ kind: 'makeAny', count: 5, progress: 1, claimed: false }] },
