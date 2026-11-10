@@ -75,8 +75,10 @@ for cid, character in walks['characters'].items():
         'frames': [held(frame, key, hold, swing - key_swing, scale) for frame, swing in zip(skeleton['frames'], swings)],
     }
 
+# One line per character after the comment, so the file stays valid JSON
+# also with no walk holding anything.
+comment = '"Skeletons of the walks whose figure holds something still: written by tools/walk-hold.py from art/walks.json (hold) and the shared skeleton; used by tools/animate-walks.mjs."'
+entries = [f'  "$comment": {comment}'] + [f'  {json.dumps(cid)}: {json.dumps(pose)}' for cid, pose in poses.items()]
 with open('art/walk-poses.json', 'w', encoding='utf-8') as f:
-    f.write('{\n  "$comment": "Skeletons of the walks whose figure holds something still: written by tools/walk-hold.py from art/walks.json (hold) and the shared skeleton; used by tools/animate-walks.mjs.",\n')
-    entries = [f'  {json.dumps(cid)}: {json.dumps(pose)}' for cid, pose in poses.items()]
-    f.write(',\n'.join(entries) + '\n}\n')
+    f.write('{\n' + ',\n'.join(entries) + '\n}\n')
 print(len(poses), 'skeletons:', ', '.join(poses))

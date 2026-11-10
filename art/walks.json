@@ -420,9 +420,7 @@
     "skin-eclipse-male": {
       "start": "art/references/walks/bare/skin-eclipse-male.png",
       "pose": 2,
-      "description": "a thin young man with long straight black hair in a deep navy blue robe down to the feet patterned with small silver constellations, a silver crescent moon emblem on the chest, a high stiff collar, the near arm held forward at chest height with the hand closed in a fist, holding nothing",
-      "hold": { "right": { "elbow": [71, 55], "hand": [86, 59] } },
-      "swing": { "left": 0.6 }
+      "description": "a thin young man with long straight black hair in a deep navy blue robe down to the feet patterned with small silver constellations, a silver crescent moon emblem on the chest, a high stiff collar, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
     "skin-forest-lord-female": {
       "start": "art/references/walks/start/skin-forest-lord-female.png",
@@ -432,7 +430,7 @@
     "skin-forest-lord-male": {
       "start": "art/references/walks/start/skin-forest-lord-male.png",
       "pose": 2,
-      "description": "a lean young man with short brown hair in a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak, leather bracers and soft leather boots, a quiver of green-fletched arrows on the back, a curved bow carved from pale antler held upright in the front hand in every frame, the bow moving with the hand and never vanishing"
+      "description": "a lean young man with short brown hair in a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak, leather bracers and soft leather boots, a curved bow carved from pale antler strapped upright on the back beside a quiver of green-fletched arrows, walking with both arms swinging naturally, both hands empty"
     },
     "skin-night-raven-female": {
       "start": "art/references/walks/start/skin-night-raven-female.png",
