@@ -1,9 +1,6 @@
 {
   "$comment": "English texts of data/community.json (src/engine/overlay.js): the sections of the Community's drop-down list, the name of the daily Gift to a friend and the Discord texts.",
   "sections": {
-    "chat": {
-      "name": "Chat"
-    },
     "friends": {
       "name": "Friends"
     },

@@ -475,6 +475,11 @@
       "id": "0.2.39",
       "title": "Wersja 0.2.39",
       "body": "- Czat w kółku: na telefonie nad grą stoi okrągły przycisk czatu. Stuknij, a czat otworzy się na osobnym ekranie. Przeciągnij go palcem w inne miejsce przy krawędzi albo upuść na ×, żeby go schować. Wróci po włączeniu „Kółko czatu” w Ustawieniach."
+    },
+    {
+      "id": "0.2.40",
+      "title": "Wersja 0.2.40",
+      "body": "- Czatu nie ma już w zakładkach Społeczności. Na telefonie otwierasz go okrągłym przyciskiem nad grą, a na komputerze jest w kolumnie z boku. Dzwonek do wyciszania powiadomień stoi teraz obok tytułu czatu.\n- „Prywatna wiadomość” w karcie postaci od razu otwiera rozmowę w czacie."
     }
 ]
 }

@@ -5,21 +5,26 @@
 // under its title, which stay under the top bar while the page scrolls, the
 // messages and the line to write in, without the Społeczność's list above
 // them (the author: „nawet się nie wyświetla ta nadkarta Społeczności przy
-// nim”). The Społeczność keeps its Czat too, for those who hid the button.
+// nim”). The Społeczność has no Czat of its own any more (the author: „Czat
+// miał zniknąć z zakładki Społeczność a dalej tam jest”, „tylko z
+// zakładki”): with the button hidden, the chat waits for the Ustawienia's
+// "Kółko czatu". By the title a bell mutes the Globalny's light
+// (community.js, chatBell).
 
 import { $, fill, h } from '../dom.js';
 import { onChatNews, takeConversation, takeMention } from '../chat-news.js';
 import { t } from '../i18n.js';
 import { isUnlocked } from '../state.js';
 import { pageHeading } from '../ui.js';
-import { mountChat } from './community.js';
+import { chatBell, mountChat } from './community.js';
 import { lockedScreen } from './locked.js';
 
 export function mountChatScreen(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Społeczność')(container, context);
   const bar = h('div', { class: 'community-picker chat-screen-bar' });
   const body = h('div', { class: 'community-body' });
-  fill(container, pageHeading(t('Czat')), bar, body);
+  const bell = chatBell();
+  fill(container, h('div', { class: 'community-heading' }, pageHeading(t('Czat')), bell.element), bar, body);
 
   // The rooms' tabs stay under the top bar, as the Społeczność's list does.
   const topbar = $('.topbar');
@@ -41,6 +46,7 @@ export function mountChatScreen(container, context) {
     unmount() {
       chat.unmount();
       stopAsking();
+      bell.unmount();
       watcher?.disconnect();
     },
   };

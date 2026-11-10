@@ -1,10 +1,12 @@
-// What waits in the Społeczność: messages someone wrote in the Globalny or
-// in a private conversation since the player last read them, invitations
-// to the Znajomi, Upominki to collect or to send today and a Wymiana
-// proposed or going on.
-// The Społeczność tab lights up then (layout.js), as Postać does for free
-// points, and so do their parts in its list and the chat's tabs
-// (screens/community.js). While the game is in front, the page asks for
+// What waits in the chat and in the Społeczność: messages someone wrote in
+// the Globalny or in a private conversation since the player last read
+// them, invitations to the Znajomi, Upominki to collect or to send today and
+// a Wymiana proposed or going on.
+// The chat's news light the round chat button (chat-bubble.js) and the
+// chat's tabs (screens/community.js, mountChat); the rest lights the
+// Społeczność tab (layout.js), as Postać does for free points, and its parts
+// in its list. The chat is no part of the Społeczność any more (the author,
+// 10.11.2026: „tylko z zakładki”). While the game is in front, the page asks for
 // them every 15 seconds (/api/chat/latest in src/server/chat.js), which
 // also keeps the player online for a Wymiana. The newest messages read go
 // to the server too (/api/chat/seen), so a message read on the computer
@@ -87,7 +89,8 @@ export function mentionNews(id, other = null) {
   if (id === 'guild') return Boolean(guild) && (tagged.guild ?? 0) > guildSeenId;
   return (tagged[id] ?? 0) > channelMark(id);
 }
-const anyMentionNews = () =>
+// A tag of the character waiting in any channel or conversation.
+export const anyMentionNews = () =>
   Object.keys(tagged).some((id) => id !== 'private' && mentionNews(id)) || Object.keys(tagged.private).some((other) => mentionNews(null, Number(other)));
 export const globalNews = () => open() && ((!muted && latest > seen) || mentionNews(globalId()));
 export const conversationNews = (id, newest = conversations.find((entry) => entry.id === id)?.latest ?? 0) => open() && newest > (privateSeen[id] ?? 0);
@@ -117,7 +120,7 @@ export const tradeNews = () => Boolean(liveTrade()) && !(trade.state === 'propos
 // A reward of the Punkty Sławy waiting (state.fame, src/server/fame.js),
 // until it is taken in the Sława.
 export const fameNews = () => open() && Boolean(state.fame?.reward);
-export const communityNews = () => chatNews() || friendNews() || partyNews() || guildNews() || guildTodoNews() || tradeNews() || fameNews();
+export const communityNews = () => friendNews() || partyNews() || guildNews() || guildTodoNews() || tradeNews() || fameNews();
 export const chatMuted = () => muted;
 
 // The tab's light in words, for a screen reader.
@@ -126,11 +129,7 @@ export const communityNewsText = () =>
     ? trade.state === 'proposed'
       ? t('propozycja wymiany czeka')
       : t('trwa wymiana')
-    : anyMentionNews()
-      ? (state.content?.chat?.mentions?.texts.news ?? t('nowe wiadomości na czacie'))
-    : chatNews()
-      ? t('nowe wiadomości na czacie')
-      : partyNews()
+    : partyNews()
         ? t('zaproszenie do drużyny czeka')
         : guildNews()
           ? t('zaproszenie do gildii czeka')
@@ -204,12 +203,15 @@ export function privateRead(other, id) {
   keep({ with: Number(other), id });
 }
 
-// A private conversation asked for on a character's sheet (profile.js),
-// for the Społeczność to open.
+// A private conversation asked for on a character's sheet (profile.js), for
+// the chat to open: the side column's on a computer (side.js), else the
+// Czat's own screen (screens/chat.js). Whether a chat on the screen took it
+// at once; if not, the Czat takes it when it opens.
 let wanted = null;
 export function wantConversation(person) {
   wanted = person;
   for (const listener of listeners) listener();
+  return wanted === null;
 }
 export function takeConversation() {
   const person = wanted;
@@ -218,9 +220,8 @@ export function takeConversation() {
 }
 
 // "Oznacz" on a character's sheet opened away from the chat (profile.js):
-// the name for the Globalny's line in the Społeczność. Whether the
-// Społeczność on the screen took it at once; if not, it takes it when it
-// opens.
+// the name for the Globalny's line of the chat. Whether a chat on the
+// screen took it at once; if not, the Czat takes it when it opens.
 let wantedTag = null;
 export function wantMention(name) {
   wantedTag = name;
@@ -275,7 +276,7 @@ export function channelRead(channelId, id) {
 }
 
 // "Wycisz powiadomienia czatu": new messages of the Globalny no longer
-// light the tab.
+// light the round chat button nor the chat's tab.
 export function setChatMuted(value) {
   update(() => {
     muted = value;

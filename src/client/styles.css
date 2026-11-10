@@ -14302,6 +14302,20 @@ a.profession-square:active {
   font-size: 18px;
 }
 
+/* The chat's title in the side column, with the bell muting the Globalny's
+   light at its right end (side.js). */
+.side-chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.side-chat-head .chat-bell {
+  width: 40px;
+  min-height: 40px;
+}
+
 .side-chat-scroll {
   flex: 1;
   min-height: 0;

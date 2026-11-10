@@ -376,6 +376,10 @@
     "0.2.39": {
       "title": "Version 0.2.39",
       "body": "- Chat bubble: on a phone, a round chat button floats over the game. Tap it and the chat opens on its own screen. Drag it with your finger to another spot by the edge, or drop it on the × to hide it. Turn on “Chat bubble” in the Settings to bring it back."
+    },
+    "0.2.40": {
+      "title": "Version 0.2.40",
+      "body": "- The chat is no longer among the Community's tabs. On a phone you open it with the round button over the game, and on a computer it sits in the column at the side. The bell for muting notifications now stands next to the chat's title.\n- “Private message” on a character's card opens the conversation in the chat right away."
     }
   }
 }

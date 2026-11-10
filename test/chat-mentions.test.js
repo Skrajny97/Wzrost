@@ -300,8 +300,8 @@ describe('Oznaczanie na czacie', () => {
     assert.deepEqual(
       shown.map(({ title, body, url, tag }) => [title, body, url, tag]).sort(),
       [
-        ['Czat: Globalny', `Ala oznaczyła Cię na czacie: ${long.slice(0, pushLength - 1).trimEnd()}…`, '#/spolecznosc/czat', `mention-${await idOf('Ala')}`],
-        ['Czat: Globalny', 'Olek oznaczył Cię na czacie: Cześć @Ola', '#/spolecznosc/czat', `mention-${await idOf('Olek')}`],
+        ['Czat: Globalny', `Ala oznaczyła Cię na czacie: ${long.slice(0, pushLength - 1).trimEnd()}…`, '#/czat', `mention-${await idOf('Ala')}`],
+        ['Czat: Globalny', 'Olek oznaczył Cię na czacie: Cześć @Ola', '#/czat', `mention-${await idOf('Olek')}`],
       ].sort(),
     );
     assert.deepEqual(pushService.received.map((message) => message.headers.topic).sort(), [`mention-${await idOf('Ala')}`, `mention-${await idOf('Olek')}`].sort());

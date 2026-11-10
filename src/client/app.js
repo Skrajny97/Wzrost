@@ -88,10 +88,14 @@ const ROUTES = [
   // The Osada's board, or one of its places, the Karczma at one of its
   // tabs (settlement.js).
   { pattern: /^#\/osada(?:\/(?<place>[a-z0-9-]+)(?:\/(?<tab>[a-z]+))?)?$/, nav: 'main', tab: 'osada', part: ({ place }) => place, mount: mountSettlement },
+  // The Czat's address of the days it was a part of the Społeczność, in the
+  // notifications sent before 0.2.40: the Czat's own screen now.
+  { pattern: /^#\/spolecznosc\/czat$/, redirect: '#/czat' },
   // The Społeczność, or one of its parts (the computer menu's shortcuts).
   { pattern: /^#\/spolecznosc(?:\/(?<section>[a-z]+))?$/, nav: 'main', tab: 'spolecznosc', mount: mountCommunity },
   // The Czat on a screen of its own, from the round chat button over the
-  // game on a phone (782 C, chat-bubble.js, screens/chat.js).
+  // game on a phone (782 C, chat-bubble.js, screens/chat.js), the only place
+  // of the chat there since it left the Społeczność (0.2.40).
   // No tab of the bottom bar lights on it (`lit` names none).
   { pattern: /^#\/czat$/, nav: 'main', tab: null, lit: 'czat', mount: mountChatScreen },
   // The Gildia's own page, from its tab in the Społeczność, at one of its
@@ -468,6 +472,10 @@ function route() {
     return;
   }
   const { candidate, match } = found;
+  if (candidate.redirect) {
+    location.replace(candidate.redirect);
+    return;
+  }
   current?.screen.unmount?.();
   closeSheet();
   showWallet(false);

@@ -209,6 +209,53 @@ test("the Drużyna's tab is opened and pointed at on the first look at the Społ
   assert.equal(lights().length, 0);
 });
 
+// The Społeczność chapter since 0.2.40: the chat is no part of the
+// Społeczność any more (the author: „tylko z zakładki”), so after its tabs
+// the narrator opens the Czat himself and points at the chat's rules there,
+// and from the Czat he takes the player on to Szybkie Polowanie. On a
+// computer the chat stands in the side column, and he points at it from the
+// Społeczność.
+test("after the Społeczność's tabs the narrator opens the Czat and points at the chat's rules there", async () => {
+  place(mark('community-tabs'));
+  place(mark('community-rules'));
+  const read = [...pastAll.filter((id) => !id.startsWith('community-')), 'community-welcome'];
+  state.character = character({ level: 5, read });
+  // The lead to the Społeczność is no line for the Czat.
+  narrator.narrate('#/czat');
+  assert.equal(lights().length, 0);
+  globalThis.location.hash = '#/spolecznosc';
+  narrator.narrate('#/spolecznosc');
+  assert.match(told(), new RegExp(words('community-tabs')));
+  await next();
+  assert.equal(globalThis.location.hash, '#/czat');
+  narrator.narrate('#/czat');
+  assert.match(told(), new RegExp(words('community-rules')));
+  await next();
+  assert.deepEqual(
+    sent.map((one) => one.body),
+    [{ card: 'community-tabs' }, { card: 'community-rules' }],
+  );
+  // Szybkie Polowanie's line waits in the inner region the player hunts in.
+  assert.equal(globalThis.location.hash, '#/walka/windfalls/windfalls-edge');
+});
+
+test("on a computer the narrator points at the side column's chat for the chat's rules, from the Społeczność", async () => {
+  place(mark('community-rules'));
+  const lookUp = globalThis.document.getElementById;
+  globalThis.document.getElementById = (id) => (id === 'side' ? { hidden: false } : lookUp(id));
+  try {
+    const read = [...pastAll.filter((id) => !id.startsWith('community-')), 'community-welcome', 'community-tabs'];
+    state.character = character({ level: 5, read });
+    globalThis.location.hash = '#/spolecznosc';
+    narrator.narrate('#/spolecznosc');
+    assert.match(told(), new RegExp(words('community-rules')));
+    await next();
+    assert.equal(globalThis.location.hash, '#/walka/windfalls/windfalls-edge');
+  } finally {
+    globalThis.document.getElementById = lookUp;
+  }
+});
+
 test('the Kamień węgielny comes on the camp board after the Osada is told, while the camp is no Warownia, and nothing of the Zbieracz Systemu after it', async () => {
   place(mark('plot-cornerstone'));
   // Before the Osada's tour: its chapter first, and no place's line meanwhile.

@@ -6,13 +6,14 @@
 // and, let go, sticks to the nearer side edge at the height it was let go,
 // which the device remembers. Dragged onto the × that shows at the bottom
 // while it moves, it hides until "Kółko czatu" is turned on again in the
-// Ustawienia (app.js). It lights like the Społeczność tab when the chat has
-// something new (chat-news.js). It is not there on a computer with the
-// chat's column (side.js), before the narrator has told the chat's rules,
-// on the Czat and the Społeczność themselves, nor while the narrator points
-// at a place on the screen, which it could cover.
+// Ustawienia (app.js). It lights when the chat has something new
+// (chat-news.js); the Społeczność tab does not light for the chat any more,
+// which is no part of it (the author: „tylko z zakładki”). It is not there on
+// a computer with the chat's column (side.js), before the narrator has told
+// the chat's rules, on the Czat itself, nor while the narrator points at a
+// place on the screen, which it could cover.
 
-import { chatNews, onChatNews } from './chat-news.js';
+import { anyMentionNews, chatNews, onChatNews } from './chat-news.js';
 import { $, h, icon } from './dom.js';
 import { t } from './i18n.js';
 import { isUnlocked, state } from './state.js';
@@ -90,7 +91,9 @@ function light() {
   if (!shown) return;
   const news = chatNews();
   shown.button.classList.toggle('chat-bubble--news', news);
-  shown.button.setAttribute('aria-label', news ? t('Czat, nowe wiadomości') : t('Czat'));
+  // A tag waiting says so (data/chat.json, mentions.texts.news).
+  const tag = news && anyMentionNews() ? state.content?.chat?.mentions?.texts.news : null;
+  shown.button.setAttribute('aria-label', tag ? `${t('Czat')}, ${tag}` : news ? t('Czat, nowe wiadomości') : t('Czat'));
 }
 
 // The middles of the button and the × within reach of each other.
@@ -174,11 +177,11 @@ function hide() {
 // The narrator pointing at a place on the screen (narrator.js), which the
 // button could stand over.
 const narratorPoints = () => Boolean(document.querySelector('.guide'));
-// The Czat and the Społeczność have the chat right there.
-const chatInSight = () => /^#\/(czat|spolecznosc)(\/|$)/.test(location.hash);
-// The narrator tells the chat's rules on the first visit to the Społeczność
-// (screens/community.js); a character made before his introduction has no
-// list of his lines.
+// The Czat has the chat right there.
+const chatInSight = () => location.hash === '#/czat';
+// The narrator tells the chat's rules in his Społeczność chapter, on the
+// Czat, where he takes the player from the Społeczność's tabs (narrator.js);
+// a character made before his introduction has no list of his lines.
 const rulesTold = () => !state.character?.tutorial || state.character.tutorial.includes('community-rules');
 
 // The button as the game wants it now (app.js calls it with the side column).

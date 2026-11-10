@@ -731,7 +731,7 @@
     },
     "community-tabs": {
       "text": [
-        "At the top you switch between the tabs: Chat, Friends, Ranking and Guild. You can form a Party from level 10."
+        "At the top you switch between the tabs: Friends, Ranking and Guild. You can form a Party from level 10."
       ],
       "voice": "audio/narration/en/community-tabs.mp3"
     },

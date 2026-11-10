@@ -358,8 +358,9 @@ export function updateTopbar(now = serverNow()) {
 // Builds a bottom bar; `active` is the id of the highlighted tab.
 // Free stat points light Postać and Statystyki with a gold dot, a skill to
 // choose or a Skill Point to spend lights Postać and Umiejętności, an
-// evolution to choose lights Postać and Ewolucja, and a message someone wrote
-// in the chat lights Społeczność (chat-news.js), an order of the Osada that
+// evolution to choose lights Postać and Ewolucja, an invitation, an Upominek
+// or a Wymiana lights Społeczność (chat-news.js; a message in the chat lights
+// the round chat button instead, chat-bubble.js), an order of the Osada that
 // can be delivered lights Osada, as a quest's reward lights the narrator's
 // face in the top bar.
 const pointsWaiting = () => (state.character?.freePoints ?? 0) > 0 && isUnlocked('stats');

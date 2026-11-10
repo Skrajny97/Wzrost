@@ -728,12 +728,15 @@ function checkReferences(data) {
   const { pollSeconds, page, keep } = data.chat.rules;
   if (pollSeconds.min > pollSeconds.max) errors.push('chat.json: rules.pollSeconds.min nie może być większe niż max');
   if (page > keep) errors.push('chat.json: rules.page nie może być większe niż keep');
-  // The Społeczność's list needs the parts the page draws.
+  // The Społeczność's list needs the parts the page draws, and has no Czat
+  // since 0.2.40 (the author: „tylko z zakładki”): the page draws no Czat
+  // among them.
   uniqueIds(errors, 'community', data.community.sections);
-  for (const id of ['chat', 'friends', 'ranking']) {
+  for (const id of ['friends', 'ranking']) {
     const section = data.community.sections.find((candidate) => candidate.id === id);
     if (!section || section.soon) errors.push(`community.json: brak otwartego działu ${id}`);
   }
+  if (data.community.sections.some((section) => section.id === 'chat')) errors.push('community.json: Czat nie jest działem Społeczności (otwiera go kółko czatu)');
   errors.push(...checkEvents(data, { monsters, rarities }));
   errors.push(...checkEncyclopedia(data));
   errors.push(...checkSettlement(data, { rarities }));

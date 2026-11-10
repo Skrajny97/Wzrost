@@ -1,15 +1,17 @@
 // The Społeczność tab, from character level 5. A list at its top, folded to
-// the part shown, picks one of its parts (data/community.json): the Czat,
-// the Znajomi with their daily Upominek (friends.js), the Ranking postaci
-// (ranking.js), the Drużyna (party.js), the Gildia (guild.js) and the
-// Sława, the character's Punkty Sławy (fame.js).
+// the part shown, picks one of its parts (data/community.json): the Znajomi
+// with their daily Upominek (friends.js), the Ranking postaci (ranking.js),
+// the Drużyna (party.js), the Gildia (guild.js) and the Sława, the
+// character's Punkty Sławy (fame.js). The Czat is not among them (the
+// author, 10.11.2026: „Czat miał zniknąć z zakładki Społeczność a dalej tam
+// jest”, „tylko z zakładki”): on a phone it opens from the round button
+// over the game (../chat-bubble.js, screens/chat.js), on a computer it
+// stands in the side column (../side.js); mountChat below draws it there.
 // It opens on the part its address names (#/spolecznosc/znajomi, from the
 // shortcuts in the computer's menu), else on the part with news
-// (chat-news.js), else on the one last shown on the device; while the
-// narrator has not shown the chat's rules yet (narrator.js), on the Czat
-// unless the address names another. News in a part not shown lights the folded
-// list too. By the list a bell mutes the Globalny's light on the tab. Under
-// it waits a Wymiana proposed or going on (trade.js).
+// (chat-news.js), else on the one last shown on the device. News in a part
+// not shown lights the folded list too. Under it waits a Wymiana proposed or
+// going on (trade.js).
 //
 // The chat (src/server/chat.js) has a tab for each channel, Globalny and
 // Wymiana, the Gildia's of the character's guild, which only its members
@@ -45,7 +47,6 @@ import {
   channelNews,
   channelRead,
   chatMuted,
-  chatNews,
   conversationNews,
   conversationsSeen,
   fameNews,
@@ -60,8 +61,6 @@ import {
   onChatNews,
   privateRead,
   setChatMuted,
-  takeConversation,
-  takeMention,
 } from '../chat-news.js';
 import { discordButton } from '../discord.js';
 import { language, t } from '../i18n.js';
@@ -125,24 +124,21 @@ const SECTION_KEY = 'insight-community-section';
 const GUILD_PAGE_SECTION = 'guilds';
 // The parts' icons and lights of news, also for their shortcuts under
 // Społeczność in the computer's menu (layout.js).
-export const SECTION_ICONS = { chat: 'chat', friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords', fame: 'star' };
-export const SECTION_NEWS = { chat: chatNews, friends: friendNews, party: partyNews, guilds: () => guildNews() || guildTodoNews(), fame: fameNews };
+export const SECTION_ICONS = { friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords', fame: 'star' };
+export const SECTION_NEWS = { friends: friendNews, party: partyNews, guilds: () => guildNews() || guildTodoNews(), fame: fameNews };
 // The address that opens the tab at a part (app.js), for those shortcuts;
 // the Gildia has its page.
-const SECTION_SLUGS = { chat: 'czat', friends: 'znajomi', ranking: 'ranking', party: 'druzyna', fame: 'slawa' };
+const SECTION_SLUGS = { friends: 'znajomi', ranking: 'ranking', party: 'druzyna', fame: 'slawa' };
 export const sectionHash = (id) => (id === GUILD_PAGE_SECTION ? '#/gildia' : SECTION_SLUGS[id] ? `#/spolecznosc/${SECTION_SLUGS[id]}` : '#/spolecznosc');
 
 export function mountCommunity(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Społeczność')(container, context);
-  const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking, party: mountParty, fame: mountFame };
+  const MOUNTS = { friends: mountFriends, ranking: mountRanking, party: mountParty, fame: mountFame };
   const sections = state.content.community.sections;
-  const asked = takeConversation();
-  // "Oznacz" on a character's sheet opened away from the chat (profile.js).
-  const tagging = takeMention();
   // A part named in the address (a shortcut in the computer's menu), when
   // it is open.
   const named = Object.keys(SECTION_SLUGS).find((id) => SECTION_SLUGS[id] === context.params?.section && sections.some((section) => section.id === id && !section.soon));
-  let current = asked || tagging ? 'chat' : (named ?? firstSection(sections));
+  let current = named ?? firstSection(sections);
   let part = null;
   const body = h('div', { class: 'community-body' });
   const picker = sectionPicker(sections, () => current, show);
@@ -162,10 +158,8 @@ export function mountCommunity(container, context) {
   watcher?.observe(topbar);
   stick();
 
-  // A part shown, with the bar under the list for its own row (the chat's
-  // tabs); `person` is the private conversation for the chat to open, and
-  // `mention` a name to tag in its Globalny.
-  function show(id, person = null, mention = null) {
+  // A part shown, with the bar under the list for a row of its own.
+  function show(id) {
     // The Gildia has a page of its own (the author: "ona powinna uruchamiać
     // osobną stronę"), so its tab leads there.
     if (id === GUILD_PAGE_SECTION) {
@@ -183,39 +177,25 @@ export function mountCommunity(container, context) {
     part?.unmount();
     fill(body);
     fill(picker.bar);
-    part = MOUNTS[id](body, { bar: picker.bar, person, mention, news: picker.render });
+    part = MOUNTS[id](body, { bar: picker.bar, news: picker.render });
     picker.render();
   }
 
-  // "Prywatna wiadomość" and "Oznacz" on a character's sheet, shown over
-  // this screen, and the Wymiana as it is now.
-  const stopAsking = onChatNews(() => {
-    fill(trade, tradeBanner());
-    const person = takeConversation();
-    const mention = takeMention();
-    if (!person && !mention) return;
-    if (current !== 'chat') show('chat', person, mention);
-    else {
-      if (person) part.talkTo(person);
-      if (mention) part.mention(mention);
-    }
-  });
+  // The Wymiana as it is now.
+  const stopTrade = onChatNews(() => fill(trade, tradeBanner()));
 
-  show(current, asked, tagging);
+  show(current);
   return {
     unmount() {
       part?.unmount();
       picker.unmount();
-      stopAsking();
+      stopTrade();
       watcher?.disconnect();
     },
   };
 }
 
 function firstSection(sections) {
-  // A character made before the narrator's introduction has no list of his
-  // lines (null) and never hears the chat's rules from him.
-  if (state.character.tutorial && !state.character.tutorial.includes('community-rules')) return 'chat';
   const open = sections.filter((section) => !section.soon && section.id !== GUILD_PAGE_SECTION).map((section) => section.id);
   const news = open.find((id) => SECTION_NEWS[id]?.());
   if (news) return news;
@@ -229,23 +209,13 @@ function firstSection(sections) {
 }
 
 // The parts as a row of tabs scrolling sideways, each with its light of
-// news, one tap away (the author: 321 A, instead of a list to unfold), and
-// the bell muting the chat's light beside them. The parts still to come
-// cannot be picked yet.
+// news, one tap away (the author: 321 A, instead of a list to unfold). The
+// parts still to come cannot be picked yet.
 function sectionPicker(sections, current, choose) {
   // The row the narrator's Społeczność chapter points at (narrator.js).
   const tabs = h('div', { class: 'community-tabs', role: 'tablist', 'aria-label': t('Części Społeczności'), 'data-guide': 'community-tabs' });
-  const bell = h('button', {
-    type: 'button',
-    class: 'community-bell',
-    onClick: () => {
-      setChatMuted(!chatMuted());
-      toast(chatMuted() ? t('Powiadomienia czatu wyciszone: nowe wiadomości nie zapalą kropki na Społeczności.') : t('Powiadomienia czatu włączone.'));
-      render();
-    },
-  });
   const bar = h('div', { class: 'community-bar' });
-  const element = h('div', { class: 'community-picker' }, h('div', { class: 'community-picker-row' }, tabs, bell), bar);
+  const element = h('div', { class: 'community-picker' }, h('div', { class: 'community-picker-row' }, tabs), bar);
 
   const label = (section) => [
     icon(SECTION_ICONS[section.id] ?? 'unknown', { size: 20, className: 'community-icon' }),
@@ -280,12 +250,6 @@ function sectionPicker(sections, current, choose) {
     );
     // The part shown stays in sight in the row.
     tabs.querySelector('[aria-selected="true"]')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
-    const muted = chatMuted();
-    bell.hidden = shown.id !== 'chat';
-    bell.setAttribute('aria-pressed', String(muted));
-    bell.setAttribute('aria-label', t('Wycisz powiadomienia czatu'));
-    bell.title = muted ? t('Powiadomienia czatu wyciszone') : t('Powiadomienia czatu włączone');
-    fill(bell, icon(muted ? 'bell-off' : 'bell', { size: 20 }));
   }
 
   const stop = onChatNews(render);
@@ -297,6 +261,31 @@ function sectionPicker(sections, current, choose) {
       stop();
     },
   };
+}
+
+// The bell by the chat's title (screens/chat.js, ../side.js): it mutes the
+// Globalny's light, on the round chat button and on the chat's tab
+// (chat-news.js), on this device; private messages and tags light them
+// still. `unmount` stops it following another bell's change.
+export function chatBell() {
+  const bell = h('button', {
+    type: 'button',
+    class: 'community-bell chat-bell',
+    onClick: () => {
+      setChatMuted(!chatMuted());
+      render();
+      toast(chatMuted() ? t('Powiadomienia czatu wyciszone: nowe wiadomości nie zapalą kropki.') : t('Powiadomienia czatu włączone.'));
+    },
+  });
+  function render() {
+    const muted = chatMuted();
+    bell.setAttribute('aria-pressed', String(muted));
+    bell.setAttribute('aria-label', t('Wycisz powiadomienia czatu'));
+    bell.title = muted ? t('Powiadomienia czatu wyciszone') : t('Powiadomienia czatu włączone');
+    fill(bell, icon(muted ? 'bell-off' : 'bell', { size: 20 }));
+  }
+  render();
+  return { element: bell, unmount: onChatNews(render) };
 }
 
 // The Czat: its tabs, its notices, the players hidden and the room of

@@ -159,8 +159,10 @@ function friendship(profile, onChange, mention) {
 }
 
 // "Oznacz": "@" and the character's name in the line of the chat the sheet
-// was opened from, else in the Globalny's in the Społeczność (taken at once
-// when it is on the screen). Only for a character that reads the chat.
+// was opened from, else in the Globalny's of the chat in sight (the side
+// column on a computer, taken at once), else of the Czat's own screen
+// (screens/chat.js), which it opens. Only for a character that reads the
+// chat.
 function tagButton(profile, mention) {
   const level = state.content.unlocks.find((unlock) => unlock.id === 'community')?.level ?? 0;
   if (!isUnlocked('community') || profile.level < level) return null;
@@ -171,7 +173,7 @@ function tagButton(profile, mention) {
     onClick: () => {
       closeSheet();
       if (mention) mention(profile.name);
-      else if (!wantMention(profile.name)) location.hash = '#/spolecznosc/czat';
+      else if (!wantMention(profile.name)) location.hash = '#/czat';
     },
   });
 }
@@ -202,8 +204,9 @@ function tradeBlock(profile, again) {
   });
 }
 
-// "Prywatna wiadomość": the chat of the Społeczność opens the conversation
-// with the character (screens/community.js).
+// "Prywatna wiadomość": the chat opens the conversation with the character,
+// the side column's on a computer at once, else the Czat's own screen
+// (screens/chat.js), which it opens.
 function whisper(profile) {
   return h('button', {
     type: 'button',
@@ -211,8 +214,7 @@ function whisper(profile) {
     text: t('Prywatna wiadomość'),
     onClick: () => {
       closeSheet();
-      wantConversation({ id: profile.id, name: profile.name });
-      if (location.hash !== '#/spolecznosc') location.hash = '#/spolecznosc';
+      if (!wantConversation({ id: profile.id, name: profile.name })) location.hash = '#/czat';
     },
   });
 }

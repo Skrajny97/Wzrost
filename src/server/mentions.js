@@ -202,7 +202,9 @@ export async function mentionNotices(db, from, to) {
       return {
         // One writer's newer tag takes the place of its older one on the phone.
         tag: `mention-${row.writer_id}`,
-        url: '#/spolecznosc/czat',
+        // The Czat's own screen (the chat is no part of the Społeczność
+        // since 0.2.40).
+        url: '#/czat',
         at: row.created_at,
         title: filled(texts.pushTitle, words),
         body: filled(gendered(texts.pushBody, row.appearance), words),

@@ -85,20 +85,31 @@ const professionsHere = (hash, read) => onProfessions(hash) && professionsTour(h
 // The Społeczność chapter: once the character reaches level 5, after the
 // report that brought it there, and only when the Umiejętności and the
 // Profesje chapters are not waiting. Not on the character's screens either.
-// It leads to the Społeczność tab, points at its tabs and at the chat's
-// rules, and ends there. Its Szybkie Polowanie, under "Wyrusz", is then told
-// as a place's line, as the Osada's are, so that a character always away
-// does not hold up the chapters after it (664): right after the rules the
-// narrator itself opens the inner region the player hunts in and points
-// there, with nothing to tap but "Dalej". While the character is away the
-// line waits, and goes there from the Walka tab once the character is back
-// and no chapter waits.
+// It leads to the Społeczność tab and points at its tabs. The chat is no
+// part of it (the author, 10.11.2026: „tylko z zakładki”), so the narrator
+// then opens the Czat itself and points at the chat's rules there; on a
+// computer the chat stands in the side column, in sight already, and he
+// points there from the Społeczność. Its Szybkie Polowanie, under "Wyrusz",
+// is then told as a place's line, as the Osada's are, so that a character
+// always away does not hold up the chapters after it (664): right after the
+// rules the narrator itself opens the inner region the player hunts in and
+// points there, with nothing to tap but "Dalej". While the character is away
+// the line waits, and goes there from the Walka tab once the character is
+// back and no chapter waits.
 const onCommunity = (hash) => hash === '#/spolecznosc';
+// The Czat on a screen of its own (screens/chat.js).
+const onChat = (hash) => hash === '#/czat';
+// The chat in the side column beside the game (side.js), on a computer.
+const sideChat = () => document.getElementById('side')?.hidden === false;
 const professionsWaiting = (read) => Boolean(state.character.professions) && !read.has('professions-ending');
 const communityDue = (hash, read) =>
   isUnlocked('community') && !onReport(hash) && !onCharacter(hash) && !skillsWaiting(read) && !professionsWaiting(read) && !read.has('community-rules');
 const communityTour = (hash, read) => communityDue(hash, read) && read.has('community-welcome');
 const communityHere = (hash, read) => onCommunity(hash) && communityTour(hash, read);
+// The chat's rules, after the tabs: on the Czat, or by the side column's chat
+// from the Społeczność.
+const rulesHere = (hash, read) => communityTour(hash, read) && read.has('community-tabs') && (onChat(hash) || (onCommunity(hash) && sideChat()));
+const rulesTrip = (hash, read) => (onCommunity(hash) && communityTour(hash, read) && read.has('community-tabs') && !sideChat() ? '#/czat' : null);
 // An inner region the class has opened, while the character is at home: its
 // screen has "Wyrusz" with the exploration's options (screens/combat.js),
 // and Szybkie Polowanie once the character has it.
@@ -329,7 +340,7 @@ const mineTrip = (hash, read) => (hash === '#/profesje' && miningTour(hash, read
 const lapidaryTrip = (hash, read) => ((hash === '#/profesje' || onMine(hash)) && miningTour(hash, read) && read.has('mining-dig') ? '#/profesje/jubilerstwo' : null);
 // From the chat only right after its rules, so a later visit stays there.
 const quickHuntTrip = (hash, read, passed) =>
-  ((onCommunity(hash) && passed === 'community-rules') || hash.startsWith('#/walka')) && quickHuntDue(read) ? huntingGround() : null;
+  (((onChat(hash) || onCommunity(hash)) && passed === 'community-rules') || hash.startsWith('#/walka')) && quickHuntDue(read) ? huntingGround() : null;
 
 // The inner region the player hunts in now: of the open ones the character
 // has reached, the one with the highest level.
@@ -484,12 +495,12 @@ const BEATS = {
   'community-welcome': { when: communityDue },
   'community-lead': {
     place: '.nav-item[href="#/spolecznosc"]',
-    when: (hash, read) => communityTour(hash, read) && !onCommunity(hash) && !read.has('community-rules'),
+    when: (hash, read) => communityTour(hash, read) && !onCommunity(hash) && !onChat(hash) && !read.has('community-rules'),
   },
   // The tabs first (the author: "Przebuduj Samouczek społecznosci pod nowy
-  // tryb zakładek"), then the chat's rules.
+  // tryb zakładek"), then the chat's rules on the Czat.
   'community-tabs': { place: mark('community-tabs'), when: communityHere },
-  'community-rules': { place: mark('community-rules'), when: communityHere },
+  'community-rules': { place: mark('community-rules'), go: rulesTrip, when: rulesHere },
   'community-ending': { place: mark('quick-hunt'), go: quickHuntTrip, when: quickHuntHere },
   // The Rzemieślnictwo chapter, after all the others.
   'crafting-welcome': { when: craftingDue },
