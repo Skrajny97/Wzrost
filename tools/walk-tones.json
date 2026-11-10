@@ -52,6 +52,8 @@
   "priest-female": { "only": ["head", "hands"] },
   "priest-male": { "only": ["head", "hands"] },
   "shadow-male": { "not_pixels": { "1": [[64, 64], [67, 64], [67, 65]], "4": [[66, 66], [67, 66]] } },
+  "skin-perun-female": { "add": ["debab0", "d3a08a", "ca9981", "cf9272", "b2816d", "a9725a"], "only": [[62, 25, 80, 43]] },
+  "skin-perun-male": { "add": ["d09779", "c78768", "ab7054", "82523f"], "only": [[62, 22, 80, 42]] },
   "sniper-female": { "only": ["head", "hands"] },
   "sniper-male": { "only": ["head", "hands"] },
   "storm-archer-female": { "only": ["head", "hands"] },

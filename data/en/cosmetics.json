@@ -60,6 +60,10 @@
     "forest-lord": {
       "name": "Forest Lord's Garb",
       "description": "A green hooded cloak with antlers, a tunic of leaves and an antler bow. The Archer wears it on the portrait, on the march and in the saddle, at every evolution."
+    },
+    "perun": {
+      "name": "Armour of Perun",
+      "description": "Blackened steel armour with copper lightning, a wolf fur over the shoulders and a helmet with aurochs horns. The Warrior wears it on the portrait, on the march and in the saddle, at every evolution."
     }
   },
   "texts": {

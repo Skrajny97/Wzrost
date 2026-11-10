@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.56 (10.11.2026): Pancerz Peruna w Sklepie i poprawka konia
+
+Wszystkie grafiki Pancerza Peruna są przyjęte: portrety (769), chody 775.7 v2 i 775.8 v2, jazda 776.1 i 776.2.
+
+1. **Trzecia skórka** w dziale „Skórki”: Pancerz Peruna dla Wojownika (`classId: warrior`), 800 Punktów Systemu, tak jak dwie pierwsze. Grafiki to `skin-perun-<płeć>` w `src/client/art/portraits`, `walkers` i `riders`.
+2. **Odcienie skóry.** Kolory twarzy Peruna są te same co miedziane zdobienia zbroi i rogi hełmu, więc skóra jest tylko w prostokącie twarzy: na portrecie (`tools/evolution-tones.json`), w chodzie (`tools/walk-tones.json`, bez jasnego pasa hełmu, który przy podskoku głowy wchodzi w ten prostokąt) i w siodle (`tools/rider-tones.json`). Wszystkie osiem odcieni sprawdzone klatka po klatce.
+3. **Koń w scenie Walka.** W siódmej klatce kłusa nad zadem konia była szara smuga (9 × 2 piksele), a w trzeciej szary kosmyk przy łęku siodła: resztki jeźdźca, którego kiedyś zmazano z grafiki konia. Smuga i kosmyk usunięte, kontur grzbietu domknięty jak w sąsiednich klatkach (`src/client/art/scenes/mounts/horse.png`).
+
 ## Wersja 0.2.55 (10.11.2026): Większe wierzchowce w scenie Walka
 
 Autor po 0.2.53: „to konia tez odrobine zwieksz jak kuca zwiększyłeś” i „i reszte wierzchów”.

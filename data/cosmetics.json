@@ -146,6 +146,15 @@
       "price": 800,
       "classId": "archer",
       "look": "skin-forest-lord"
+    },
+    {
+      "id": "perun",
+      "kind": "outfit",
+      "name": "Pancerz Peruna",
+      "description": "Czerniona stalowa zbroja z miedzianymi błyskawicami, wilcze futro na ramionach i hełm z rogami tura. Wojownik nosi go na portrecie, w marszu i w siodle, przy każdej ewolucji.",
+      "price": 800,
+      "classId": "warrior",
+      "look": "skin-perun"
     }
   ],
   "texts": {

@@ -80,6 +80,7 @@ export const SPRITES = {
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
       // The outfits of the Sklep Systemu (skórki, 763 A), <look>-<appearance>.
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
+      'skin-perun-female', 'skin-perun-male',
     ],
     faces: {
       'archer-female': 49, 'archer-male': 52, 'cleric-male': 49, 'shadow-male': 51, 'warrior-male': 50,
@@ -93,6 +94,7 @@ export const SPRITES = {
       'miracle-worker-female': 47, 'miracle-worker-male': 43, 'grand-inquisitor-female': 50, 'high-priest-female': 50, 'kingslayer-female': 55,
       'kingslayer-male': 54, 'necromancer-female': 44, 'necromancer-male': 49, 'phantom-male': 45,
       'skin-night-raven-female': 50, 'skin-night-raven-male': 51, 'skin-forest-lord-female': 51, 'skin-forest-lord-male': 52,
+      'skin-perun-female': 49, 'skin-perun-male': 49,
     },
     perches: {
       'warrior-female': [32, 38], 'warrior-male': [34, 40], 'archer-female': [34, 41], 'archer-male': [35, 36], 'mage-female': [34, 41],
@@ -111,6 +113,7 @@ export const SPRITES = {
       'high-priest-female': [34, 35], 'high-priest-male': [32, 35], 'kingslayer-female': [37, 33], 'kingslayer-male': [34, 30],
       'necromancer-female': [30, 38], 'necromancer-male': [37, 32], 'phantom-female': [36, 35], 'phantom-male': [39, 42],
       'skin-night-raven-female': [33, 40], 'skin-night-raven-male': [33, 38], 'skin-forest-lord-female': [37, 41], 'skin-forest-lord-male': [38, 40],
+      'skin-perun-female': [32, 38], 'skin-perun-male': [34, 40],
     },
     // `petSpots`: a pet's own place on a portrait where its usual one would
     // cover what the figure holds at the shoulder (a falcon, a staff's head,
@@ -141,6 +144,7 @@ export const SPRITES = {
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
+      'skin-perun-female', 'skin-perun-male',
     ],
   },
   items: {
@@ -230,6 +234,7 @@ export const SPRITES = {
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
+      'skin-perun-female', 'skin-perun-male',
     ],
   },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
@@ -498,6 +503,7 @@ export const SPRITES = {
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
+      'skin-perun-female', 'skin-perun-male',
     ],
   },
 };
