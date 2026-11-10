@@ -667,7 +667,7 @@ export function mountGuildWar(container) {
       heading(words.title),
       h('p', { class: 'war-hero-date', text: weekDates(view.week.startsAt) }),
       h('p', { class: 'war-none-text', text: words.none[view.none] }),
-      h('p', { class: 'war-lead' }, icon('hourglass', { size: 18 }), h('span', { text: words.noneNext })),
+      h('p', { class: 'war-none-next' }, icon('hourglass', { size: 18 }), h('span', { text: words.noneNext })),
     );
     setArt(card);
     return card;

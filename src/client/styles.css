@@ -16799,12 +16799,30 @@ a.discord-button {
   flex: none;
 }
 
-/* No war this week: why, on the war's picture. */
+/* No war this week: why, on the war's picture, and when the next draw is,
+   in gold under it. */
 .war-none-text {
   color: var(--text);
   font-size: 16px;
   line-height: 1.4;
   text-shadow: 0 1px 3px #000;
+}
+
+.war-none-next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-top: 1px solid rgba(217, 180, 90, 0.45);
+  color: var(--gold);
+  font-size: 15px;
+  line-height: 1.35;
+  text-shadow: 0 1px 3px #000;
+}
+
+.war-none-next svg {
+  flex: none;
 }
 
 /* The week: a tile for each day, its battles won and lost. */
@@ -17500,6 +17518,31 @@ a.discord-button {
 .war-standing-one .select-portrait {
   width: 56px;
   height: 56px;
+}
+
+.war-standing-one > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* On the narrowest phones two of those standing to a row, a little
+   smaller, so a flawless win does not push the playback far down. */
+@media (max-width: 359px) {
+  .war-standing {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 10px;
+  }
+
+  .war-standing-one {
+    gap: 6px;
+    font-size: 15px;
+  }
+
+  .war-standing-one .select-portrait {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 .war-reward {
