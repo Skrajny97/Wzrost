@@ -121,7 +121,7 @@ import {
   salvageYield,
   settleCrafting,
   simulateHunt,
-  statEffects,
+  statShares,
   extraValues,
   combatValues,
   equipChange,
@@ -1249,21 +1249,28 @@ describe('tutorial unlocks', () => {
 });
 
 describe('stat previews', () => {
-  test('show in numbers what one more point gives', () => {
-    const warrior = statEffects(newCharacter('warrior'), kit('warrior'), content);
-    assert.equal(warrior.vitality.maxHp, content.balance.character.hpPerVitality);
+  test('show in numbers what the whole of each stat gives now', () => {
+    const character = newCharacter('warrior');
+    const worn = kit('warrior');
+    const warrior = statShares(character, worn, content);
+    const { totals } = computeStats(character, worn, content);
+    const values = combatValues(character, worn, content);
+    // All of a stat, against none of it: Witalność's HP is all its points'.
+    assert.equal(warrior.vitality.maxHp, content.balance.character.hpPerVitality * totals.vitality);
     assert.ok(warrior.vitality.regen > 0);
-    assert.ok(warrior.strength.damage > 0.02 && warrior.strength.damage < 0.03);
-    assert.ok(warrior.dexterity.dodge > 0 && warrior.dexterity.speed > 0);
+    assert.ok(Math.abs(warrior.strength.damage - (damageScale(totals.strength, character.level, content.balance) - 1)) < 1e-9);
+    // Without Zręczność there is no dodge and the speed is the base one.
+    assert.ok(Math.abs(warrior.dexterity.dodge - values.dodge) < 1e-9);
+    assert.ok(Math.abs(warrior.dexterity.speed - (values.speed - 1)) < 1e-9);
     assert.ok(warrior.endurance.reduction > 0);
     assert.ok(warrior.perception.crit > 0);
     assert.ok(warrior.will.effectResist > 0);
     assert.equal(warrior.intellect.damage, undefined);
 
-    const mage = statEffects(newCharacter('mage'), kit('mage'), content);
+    const mage = statShares(newCharacter('mage'), kit('mage'), content);
     assert.ok(mage.intellect.damage > 0);
     assert.equal(mage.strength.damage, undefined);
-    const cleric = statEffects(newCharacter('cleric'), kit('cleric'), content);
+    const cleric = statShares(newCharacter('cleric'), kit('cleric'), content);
     assert.ok(cleric.wisdom.recovery > 0 && cleric.wisdom.mana > 0);
   });
 });

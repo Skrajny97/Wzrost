@@ -15663,6 +15663,16 @@ a.discord-button {
   font-weight: 700;
 }
 
+/* The last fight folded to its result; "Obejrzyj walkę" opens its playback
+   in a sheet (787 B). */
+.pvp-arena-watch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  align-self: flex-start;
+}
+
 .pvp-arena-last--win {
   border-color: rgba(167, 196, 127, 0.6);
 }

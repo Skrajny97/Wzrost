@@ -1,6 +1,6 @@
-// Numbers for the stats screen: the character's combat values and what one
-// more point of each stat would change in them. Chances and reductions are
-// measured against an opponent of the character's own level.
+// Numbers for the stats screen: the character's combat values and what each
+// stat gives in them now. Chances and reductions are measured against an
+// opponent of the character's own level.
 
 import { playerCombatant } from './combatant.js';
 import { evolutionOf } from './evolutions.js';
@@ -73,20 +73,23 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
   };
 }
 
-// For each stat, the changes one more point brings. Damage is a relative
-// change (0.03 is +3%), everything else an absolute one.
-export function statEffects(character, equipped, content) {
+// For each stat, what its whole total gives now: the combat values as they
+// are against those with the stat at nothing (the author: „lepiej pisz ile
+// daja aktualne staty a nie jeden punkt”). Damage is a relative change (0.92
+// is +92%), everything else an absolute one.
+export function statShares(character, equipped, content) {
   const now = combatValues(character, equipped, content);
+  const { totals } = computeStats(character, equipped, content);
   return Object.fromEntries(
     content.statIds.map((stat) => {
-      const points = { ...character.points, [stat]: (character.points[stat] ?? 0) + 1 };
-      const next = combatValues({ ...character, points }, equipped, content);
-      const changes = {};
+      const points = { ...character.points, [stat]: (character.points[stat] ?? 0) - totals[stat] };
+      const without = combatValues({ ...character, points }, equipped, content);
+      const shares = {};
       for (const key of ['damage', 'reduction', 'dodge', 'crit', 'effectResist', 'speed', 'maxHp', 'mana', 'regen', 'recovery']) {
-        const change = key === 'damage' ? next.damage / now.damage - 1 : next[key] - now[key];
-        if (Math.abs(change) > 1e-9) changes[key] = change;
+        const share = key === 'damage' ? now.damage / without.damage - 1 : now[key] - without[key];
+        if (Math.abs(share) > 1e-9) shares[key] = share;
       }
-      return [stat, changes];
+      return [stat, shares];
     }),
   );
 }

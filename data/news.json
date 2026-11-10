@@ -480,6 +480,11 @@
       "id": "0.2.40",
       "title": "Wersja 0.2.40",
       "body": "- Czatu nie ma już w zakładkach Społeczności. Na telefonie otwierasz go okrągłym przyciskiem nad grą, a na komputerze jest w kolumnie z boku. Dzwonek do wyciszania powiadomień stoi teraz obok tytułu czatu.\n- „Prywatna wiadomość” w karcie postaci od razu otwiera rozmowę w czacie."
+    },
+    {
+      "id": "0.2.41",
+      "title": "Wersja 0.2.41",
+      "body": "- Statystyki pokazują, ile daje cała statystyka, a nie jeden punkt. Stuknij statystykę, a zobaczysz na przykład: „Zręczność 690 daje teraz: obrażenia +92,2%, unik +16,2%, szybkość +1,01”.\n- Arena: ostatnia walka nie odtwarza się już sama. Zobaczysz jej wynik, a powtórkę otworzysz przyciskiem „Obejrzyj walkę”."
     }
 ]
 }

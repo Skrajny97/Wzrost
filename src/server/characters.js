@@ -92,7 +92,7 @@ import {
   spentPoints,
   spiritLeast,
   pointSources,
-  statEffects,
+  statShares,
   unlockedFeatures,
   upgradeCost,
   buildMinutes,
@@ -1427,7 +1427,7 @@ export function characterView(player, now) {
   const { totals, sources } = computeStats(character, equipped, content());
   const { hp, maxHp, combatant, rest } = currentHp(player, now);
   const values = combatValues(character, equipped, content());
-  const perPoint = statEffects(character, equipped, content());
+  const shares = statShares(character, equipped, content());
   const levels = campLevels(player.buildings, now, content());
   const sellBonus = campBonus(levels, 'sellPrice', content());
   // The Kowadło's level is the highest upgrade it allows.
@@ -1576,7 +1576,7 @@ export function characterView(player, now) {
       effect: stat.combat,
       total: totals[stat.id],
       sources: sources[stat.id],
-      perPoint: perPoint[stat.id],
+      gives: shares[stat.id],
     })),
     combat: {
       damage: `${values.damageMin}–${values.damageMax}`,

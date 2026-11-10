@@ -125,7 +125,8 @@ describe('character creation', () => {
     assert.deepEqual(character.bag, []);
     assert.match(character.combat.damage, /^\d+–\d+$/);
     assert.equal(character.stats.find((stat) => stat.id === 'strength').sources.class, 8);
-    assert.equal(character.stats.find((stat) => stat.id === 'vitality').perPoint.maxHp, 5);
+    const vitality = character.stats.find((stat) => stat.id === 'vitality');
+    assert.equal(vitality.gives.maxHp, 5 * vitality.total);
     // The first level takes about 4 minutes of exploring.
     // The first levels take about 20 minutes of exploring each.
     assert.ok(character.hoursToNext * 60 > 15 && character.hoursToNext * 60 <= 25);

@@ -3,8 +3,11 @@
 // its place's heading on the Osada's place screen (screens/settlement.js),
 // in two tabs as the Salon Gier's. "Walki": the character's rating, its
 // place on the week's table and the fights left today; its last fight with
-// the result, the rating's move and its playback (arena.js, the playback of
-// every fight, not this Arena); the defences since the last visit; the
+// the result and the rating's move, its playback (arena.js, the playback of
+// every fight, not this Arena) folded behind "Obejrzyj walkę", which opens
+// it in a sheet (787 B; the author: „jakieś ciągle odtwarzane poprzednie
+// walki, których nie da się schować”), at once only after a fight just
+// fought; the defences since the last visit; the
 // three rivals, each with its bust, class, level and rating, what a win or
 // a loss with it would bring and "Walcz", a tap on its name opening the
 // character's card (profile.js). "Tabela tygodnia": the rewards waiting
@@ -24,10 +27,9 @@ import { countOf, formatDecimal, formatHours, formatNumber } from './format.js';
 import { chestContents } from './guild-trials.js';
 import { language, t } from './i18n.js';
 import { CLASS_ICONS } from './icons.js';
-import { motionOn } from './motion.js';
 import { openProfile } from './profile.js';
 import { call, serverNow } from './state.js';
-import { howItWorks, systemPanel, toast, withButton } from './ui.js';
+import { afterSheet, howItWorks, openSheet, systemPanel, toast, withButton } from './ui.js';
 import { bust } from './screens/select.js';
 
 const TABS = ['fights', 'table'];
@@ -72,12 +74,10 @@ export function mountPvpArena(holder) {
   // The defences shown at this look, kept while the panel lives: the server
   // shows each once.
   let defences = null;
-  // The fight just fought: its playback starts at once, and its card comes
-  // into sight.
+  // The fight just fought: its playback opens at once.
   let fresh = false;
-  // The playback of the last fight, kept while it is the same fight, so a
-  // redraw does not start it again.
-  let playback = null;
+  // The playback open in the sheet, stopped when the panel goes.
+  let watching = null;
   // The newest answer's number, so an older one never draws over it.
   let asked = 0;
 
@@ -165,21 +165,30 @@ export function mountPvpArena(holder) {
   function lastCard() {
     const { last, texts } = view;
     if (!last) return null;
-    if (!playback || playback.at !== last.at) {
-      playback?.view.stop();
-      playback = { at: last.at, view: createArena(last.fight, { autoplay: fresh ? 'now' : 'visible' }) };
-    }
+    const watch = () => {
+      const playback = createArena(last.fight, { autoplay: 'now' });
+      watching = playback;
+      openSheet(
+        h('h2', { class: 'sheet-title', text: texts.last }),
+        h('p', { class: 'pvp-arena-result' }, say(texts[last.result], { name: last.rival.name })),
+        playback.element,
+      );
+      afterSheet(() => {
+        playback.stop();
+        if (watching === playback) watching = null;
+      });
+    };
     const card = h(
       'section',
       { class: `card stack pvp-arena-last pvp-arena-last--${last.result}`, 'aria-labelledby': 'pvp-arena-last-title', 'data-guide': 'arena-last' },
       h('h2', { class: 'card-title', id: 'pvp-arena-last-title', text: texts.last }),
       h('p', { class: 'pvp-arena-result' }, say(texts[last.result], { name: last.rival.name })),
       h('p', { class: 'muted', text: say(texts.change, { before: last.before, after: last.after, change: signed(last.change) }) }),
-      playback.view.element,
+      h('button', { type: 'button', class: 'button button--world button--small pvp-arena-watch', onClick: watch }, icon('eye', { size: 16 }), h('span', { text: t('Obejrzyj walkę') })),
     );
     if (fresh) {
       fresh = false;
-      requestAnimationFrame(() => card.scrollIntoView({ block: 'start', behavior: motionOn() ? 'smooth' : 'auto' }));
+      requestAnimationFrame(watch);
     }
     return card;
   }
@@ -383,7 +392,7 @@ export function mountPvpArena(holder) {
     unmount() {
       gone = true;
       clearTimeout(timer);
-      playback?.view.stop();
+      watching?.stop();
     },
   };
 }

@@ -18,7 +18,8 @@ const SOURCES = [
   { id: 'core', label: 'Rdzeń', unlock: 'core' },
 ];
 
-// How one more point shows in numbers. Chances and reductions grow by
+// What a stat's whole total gives now, in numbers (the author: „lepiej pisz
+// ile daja aktualne staty a nie jeden punkt”). Chances and reductions are
 // percentage points, shown simply as "%".
 const EFFECTS = [
   { key: 'damage', label: 'obrażenia', format: (v) => `+${formatDecimal(v * 100)}%` },
@@ -34,7 +35,7 @@ const EFFECTS = [
 ];
 
 function percentPoints(value) {
-  return `+${formatPrecise(value * 100)}%`;
+  return `+${formatDecimal(value * 100)}%`;
 }
 
 const percent = (value) => `${formatDecimal(value * 100)}%`;
@@ -386,20 +387,22 @@ export function mountStats(container) {
   }
 
   function statDetail(stat, sources, id) {
-    const effects = EFFECTS.filter((effect) => stat.perPoint[effect.key] !== undefined);
+    const effects = EFFECTS.filter((effect) => stat.gives[effect.key] !== undefined);
     return h(
       'div',
       { class: 'stat-detail', id },
       h(
         'p',
         { class: 'stat-detail-title' },
-        effects.length > 0 ? t('Jeden punkt więcej:') : t('Jeden punkt więcej nie zmieni dziś Twoich wartości bojowych.'),
+        effects.length > 0
+          ? t('{name} {total} daje teraz:', { name: stat.name, total: formatNumber(stat.total) })
+          : t('{name} nie zmienia dziś Twoich wartości bojowych.', { name: stat.name }),
       ),
       effects.length > 0 &&
         h(
           'ul',
           { class: 'stat-detail-list' },
-          effects.map((effect) => h('li', {}, h('span', { text: t(effect.label) }), h('span', { class: 'num', text: effect.format(stat.perPoint[effect.key]) }))),
+          effects.map((effect) => h('li', {}, h('span', { text: t(effect.label) }), h('span', { class: 'num', text: effect.format(stat.gives[effect.key]) }))),
         ),
       h(
         'p',
