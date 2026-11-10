@@ -69,8 +69,9 @@ export function duelArmorShare(levelA, levelB, content) {
 // blows it takes (Nieugięty, Niezłomny, Wyzwanie, Lustro many) counts in
 // the same share (question 780): a rival's blows are far bigger than a
 // creature's, the reflections were measured against, and a reflection
-// passes any armour, so a Bastion won most of its duels on them alone.
-function duelist({ character, equipped, name }, id, side, { factor, armor }, content) {
+// passes any armour, so a Bastion won most of its duels on them alone. The
+// guild wars' battles (guild-wars.js) make their fighters so too.
+export function duelist({ character, equipped, name }, id, side, { factor, armor }, content) {
   const unit = playerCombatant({ character, equipped, name, id, side }, content);
   const maxHp = Math.max(1, Math.round(unit.maxHp * factor));
   return { ...unit, maxHp, hp: maxHp, armor: Math.round(unit.armor * armor), reflectShare: armor };

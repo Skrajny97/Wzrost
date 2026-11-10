@@ -232,12 +232,13 @@ export function mountGuildChest(container) {
   }
 
   // The last moves: each item's name in its rarity's colour, who put it in
-  // (and for whom) or took it out, and when; folded under their number.
+  // (and for whom) or took it out, or the war chest of a war won
+  // (guild-war.js), and when; folded under their number.
   function logPart() {
     const { log, texts } = view;
     if (log.length === 0) return h('div', { class: 'guild-part' }, h('h3', { class: 'guild-subtitle', text: texts.log }), h('p', { class: 'muted', text: texts.logEmpty }));
-    const line = (move) =>
-      filled(move.kind === 'put' ? (move.forName ? texts.logPutFor : texts.logPut) : texts.logTake, { name: move.name, for: move.forName, at: when(move.at) });
+    const kinds = { put: (move) => (move.forName ? texts.logPutFor : texts.logPut), take: () => texts.logTake, war: () => texts.logWar };
+    const line = (move) => filled((kinds[move.kind] ?? kinds.take)(move), { name: move.name, for: move.forName, at: when(move.at) });
     return h(
       'div',
       { class: 'guild-part' },

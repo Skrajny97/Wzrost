@@ -9,7 +9,9 @@
 // passes the lead to the first deputy, else to the member there longest,
 // and a guild nobody is in goes with its invitations, its channel, its
 // Siedziba (guild-seat.js) and its Skrzynia (guild-chest.js), so its last
-// member leaves only with the Skrzynia empty. A
+// member leaves only with the Skrzynia empty. A guild holds up to 30
+// characters from the guild wars on (793 A: six teams of five,
+// guild-wars.js). A
 // character that leaves or is removed gets back the pieces of its open
 // offers in the Wymiana (guild-exchange.js) at once. The best guild of last
 // week says so on its page (guild-fame.js).
@@ -342,14 +344,16 @@ export async function cancelGuildInvite(context) {
 // in no longer theirs to take back (guild-chest.js), a guild left without
 // its leader gets its first deputy as leader, else the member there
 // longest, and a guild left empty goes with its invitations, its channel's
-// messages, its Siedziba's buildings (guild-seat.js) and its chest. Also
-// for a deleted character or account (characters.js, accounts.js).
+// messages, its Siedziba's buildings (guild-seat.js) and its chest. Their
+// places in the guild's war teams (guild-wars.js) go too. Also for a
+// deleted character or account (characters.js, accounts.js).
 export function guildRemoval(db, characters, binds, now) {
   const gone = "channel LIKE 'guild:%' AND channel NOT IN (SELECT 'guild:' || guild_id FROM guild_members)";
   return [
     ...offersReturned(db, characters, binds, now),
     ...chestReleased(db, characters, binds),
     db.prepare(`DELETE FROM guild_members WHERE character_id IN (${characters})`).bind(...binds),
+    db.prepare(`DELETE FROM guild_war_slots WHERE character_id IN (${characters})`).bind(...binds),
     db.prepare(`DELETE FROM guild_invites WHERE character_id IN (${characters}) OR invited_by IN (${characters})`).bind(...binds, ...binds),
     db.prepare(
       `UPDATE guild_members SET role = 'leader' WHERE character_id IN (

@@ -24,6 +24,10 @@
 // the deletion of a character or an account, which ends a guild too,
 // takes its chest and log with it (chestsGone).
 //
+// The guild that wins a war (guild-wars.js, 799 A) gets its war chest's
+// items here, for all, from the war chest rather than from a member
+// (`source` 'war'), and the log tells of them in the page's language.
+//
 // Every put and take is one batch with assertions at its head (atomic.js):
 // the character as read, still in the guild, the item still in its bag or
 // still in the chest, so two taps at once move an item once, and none is
@@ -97,7 +101,7 @@ export async function chestView(db, player, guild) {
   const [items, log, members] = await db.batch([
     db
       .prepare(
-        `SELECT c.id, c.data, c.put_by, c.put_by_name, c.put_at, p.name AS put_by_now, ${FOR_MEMBER} AS for_member, f.name AS for_name
+        `SELECT c.id, c.data, c.put_by, c.put_by_name, c.put_at, c.source, p.name AS put_by_now, ${FOR_MEMBER} AS for_member, f.name AS for_name
          FROM guild_chest c
          LEFT JOIN guild_members pm ON pm.character_id = c.put_by AND pm.guild_id = c.guild_id
          LEFT JOIN characters p ON p.id = pm.character_id
@@ -122,7 +126,7 @@ export async function chestView(db, player, guild) {
     return {
       ...view,
       id: stored.id,
-      from: stored.put_by_now ?? stored.put_by_name,
+      from: stored.source === 'war' ? words().fromWar : (stored.put_by_now ?? stored.put_by_name),
       // Put in by this character: it takes it back as it was.
       own: mine,
       forName: stored.for_member === null ? null : stored.for_name,
@@ -306,6 +310,25 @@ export async function takeFromGuildChest(context) {
   );
   const after = await loadPlayer(db, session.userId);
   return answer(db, after, guild, { character: characterView(after, now), text: filled(words().takeDone, { item: titleOf(item) }) });
+}
+
+// The statements that put a war chest's items (guild-wars.js, 799 A) in the
+// chest of the guild that won the war, for all, from the war chest, while
+// the guild is there; past the chest's capacity too, as nothing of a reward
+// may be lost (the capacity holds back only the members' own items). Each
+// is a move of the log, and the log keeps its last `log` moves.
+export function warChestStatements(db, guildId, items, now) {
+  if (items.length === 0) return [];
+  const there = 'EXISTS (SELECT 1 FROM guilds WHERE id = ?)';
+  return [
+    ...items.flatMap((item) => [
+      db
+        .prepare(`INSERT INTO guild_chest (guild_id, data, created_at, put_by, put_by_name, for_id, put_at, source) SELECT ?, ?, ?, NULL, '', NULL, ?, 'war' WHERE ${there}`)
+        .bind(guildId, JSON.stringify(item), now, now, guildId),
+      db.prepare(`INSERT INTO guild_chest_log (guild_id, kind, name, for_name, data, created_at) SELECT ?, 'war', '', NULL, ?, ? WHERE ${there}`).bind(guildId, JSON.stringify(item), now, guildId),
+    ]),
+    logKept(db, guildId),
+  ];
 }
 
 // The assertion, at the head of the batch that takes a character out of

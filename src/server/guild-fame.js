@@ -5,7 +5,8 @@
 // beast's fall, the guardians of its Wyprawa that fell (the author: "638
 // A"), the Próby its members finished, the pieces they gave in the
 // Prośby and the offers they took in the Wymiana, each member's part up to
-// its cap first, then summed for the guild. The Ranking's "Gildie" tab
+// its cap first, then summed for the guild, and the guild war it won that
+// week (guild-wars.js, 799 A). The Ranking's "Gildie" tab
 // shows the guilds by this week's Sława or by all of it ("Od początku": the
 // weeks frozen and this one). The first time a new week asks for the
 // ranking, the Gildia page or the best guild of the week before (every
@@ -20,6 +21,8 @@
 import { countedForm, questPeriod } from '../engine/index.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
+import { guildWarsOn } from './features.js';
+import { settleWars } from './guild-wars.js';
 import { json } from './http.js';
 import { askedPage, lastOffset } from './ranking-pages.js';
 
@@ -44,11 +47,12 @@ function weeksAround(now) {
 // taker's up to its cap (a taker gone leaves each exchange on its own).
 // Wyprawa: perGuardian for each guardian of its route of that week that
 // fell, and `last` instead for the last of them (638 A: 20 each and 50 for
-// the seventh, up to 170 a week).
+// the seventh, up to 170 a week). Wojna: war.won for the war of that week
+// it won (799 A), once its Sunday's battles are fought.
 function weekFame(week) {
-  const { beast, expedition, trials, requests, exchange } = rules();
+  const { beast, expedition, trials, requests, exchange, war } = rules();
   return {
-    sql: `SELECT g.id AS guild_id, COALESCE(b.points, 0) + COALESCE(t.points, 0) + COALESCE(r.points, 0) + COALESCE(x.points, 0) + COALESCE(w.points, 0) AS points
+    sql: `SELECT g.id AS guild_id, COALESCE(b.points, 0) + COALESCE(t.points, 0) + COALESCE(r.points, 0) + COALESCE(x.points, 0) + COALESCE(w.points, 0) + COALESCE(v.points, 0) AS points
       FROM guilds g
       LEFT JOIN (SELECT guild_id, SUM(CAST(MAX(0, max_hp - hp) * 100 / max_hp AS INTEGER) * ? + CASE WHEN fallen_at IS NULL THEN 0 ELSE ? END) AS points
                  FROM guild_beasts WHERE week = ? AND max_hp > 0 GROUP BY guild_id) b ON b.guild_id = g.id
@@ -63,7 +67,9 @@ function weekFame(week) {
                  GROUP BY guild_id) x ON x.guild_id = g.id
       LEFT JOIN (SELECT e.guild_id, SUM(CASE WHEN s.stage = ? THEN ? ELSE ? END) AS points
                  FROM guild_expedition_guardians s JOIN guild_expeditions e ON e.id = s.expedition_id
-                 WHERE e.week = ? AND s.fallen_at IS NOT NULL GROUP BY e.guild_id) w ON w.guild_id = g.id`,
+                 WHERE e.week = ? AND s.fallen_at IS NOT NULL GROUP BY e.guild_id) w ON w.guild_id = g.id
+      LEFT JOIN (SELECT CASE result WHEN 'a' THEN guild_a ELSE guild_b END AS guild_id, COUNT(*) * ? AS points
+                 FROM guild_wars WHERE week = ? AND result IN ('a', 'b') GROUP BY 1) v ON v.guild_id = g.id`,
     binds: [
       beast.perPercent,
       beast.fell,
@@ -82,6 +88,8 @@ function weekFame(week) {
       content().guilds.expedition.guardians.length,
       expedition.last,
       expedition.perGuardian,
+      week.key,
+      war.won,
       week.key,
     ],
   };
@@ -107,6 +115,9 @@ export async function championOf(db, now) {
   const { previous } = weeksAround(now);
   let best = await bestStatement(db, previous.key).first();
   if (!best) {
+    // The guild wars of that week end first, should the cron have missed
+    // their Sunday's battles (guild-wars.js): the war won counts.
+    if (guildWarsOn()) await settleWars(db, now).catch((error) => console.error(error));
     const fame = weekFame(previous);
     await db
       .prepare(`INSERT OR IGNORE INTO guild_fame (guild_id, week, points) SELECT guild_id, ?, points FROM (${fame.sql}) WHERE NOT EXISTS (SELECT 1 FROM guild_fame WHERE week = ?)`)
@@ -117,9 +128,10 @@ export async function championOf(db, now) {
   return championFrom(best);
 }
 
-// The words of the Ranking's "Gildie", with the rules' numbers filled in.
+// The words of the Ranking's "Gildie", with the rules' numbers filled in;
+// the war's line only where the guild wars are on.
 function rankingTexts() {
-  const { beast, expedition, trials, requests, exchange } = rules();
+  const { beast, expedition, trials, requests, exchange, war } = rules();
   const texts = words();
   const points = (count) => `${count} ${countedForm(count, texts.pointForms)}`;
   const vars = {
@@ -133,8 +145,11 @@ function rankingTexts() {
     giftCap: requests.cap,
     perExchange: points(exchange.perExchange),
     exchangeCap: exchange.cap,
+    warWon: points(war.won),
   };
-  return { ...texts, how: texts.how.map((line) => filled(line, vars)) };
+  const { howWar, ...rest } = texts;
+  const how = guildWarsOn() ? [...texts.how.slice(0, -2), howWar, ...texts.how.slice(-2)] : texts.how;
+  return { ...rest, how: how.map((line) => filled(line, vars)) };
 }
 
 // GET /api/ranking/guilds?period=week|all&offset=…&limit=…: the guilds by

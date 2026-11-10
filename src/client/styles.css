@@ -16623,3 +16623,1006 @@ a.discord-button {
 .chat-screen-bar:empty {
   display: none;
 }
+
+/* The guild wars (guild-war.js; 792.1–792.4 v2, the mock-ups the author
+   accepted): the Wojna tab of the Gildia page, from the game's own parts
+   (cards, the Arena's plaque, marks and sword headings, busts) with the
+   Arena's night picture behind the war. */
+
+/* Nine tabs of the Gildia: three rows of three, the names at full size. */
+.guild-picker .community-tabs.community-tabs--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.guild-picker .community-tabs--three > .community-tab {
+  grid-column: auto;
+  gap: 5px;
+  padding: 4px 6px;
+  font-size: 15px;
+}
+
+/* The English names are longer ("Expedition"): a step smaller on the
+   narrowest phones, so each still fits beside its icon. */
+:lang(en) .guild-picker .community-tabs--three > .community-tab {
+  font-size: clamp(12px, calc((100vw - 64px) / 21), 15px);
+}
+
+.war {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.war p {
+  margin: 0;
+}
+
+.war .muted,
+.war-sheet .muted {
+  font-size: 15px;
+}
+
+.war .card {
+  gap: 10px;
+}
+
+/* A heading between the parts, as the Arena's "Wybierz rywala". */
+.war .pvp-arena-heading,
+.war-sheet .pvp-arena-heading {
+  margin: 2px 0 -2px;
+  font-size: 19px;
+}
+
+/* The way back from the teams to the war. */
+.war-back {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 4px;
+  font-size: 17px;
+}
+
+/* The war's picture: the Arena at night, dim at the top and the bottom of
+   the picture, which is half as tall as the card is wide. */
+.war-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 12px 12px;
+  border-color: var(--bark-line);
+  text-align: center;
+}
+
+.war-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: var(--place-art) center top / 100% auto no-repeat;
+  image-rendering: pixelated;
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.war-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(13, 17, 11, 0.72) 0, rgba(13, 17, 11, 0.2) 70px, rgba(13, 17, 11, 0.25) 120px, rgba(13, 17, 11, 0.96) calc(50cqw - 4px), rgb(15, 20, 12) 100%);
+  pointer-events: none;
+}
+
+.war-hero .pvp-arena-heading {
+  margin: 0;
+  font-size: 21px;
+  text-shadow: 0 1px 3px #000;
+}
+
+.war-hero-date {
+  color: var(--text);
+  font-size: 16px;
+  text-shadow: 0 1px 3px #000;
+}
+
+/* Two banners and the score between them. */
+.war-versus {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  gap: 6px;
+}
+
+.war-banner {
+  display: block;
+  width: min(78px, 100%);
+  height: auto;
+  margin: 0 auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.75));
+}
+
+.war-score {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding-bottom: 8px;
+}
+
+.war-score-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--font-world);
+  font-size: 56px;
+  font-weight: 700;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+  text-shadow: 0 2px 4px #000, 0 0 14px rgba(0, 0, 0, 0.8);
+}
+
+.war-score-ours {
+  color: var(--gold);
+}
+
+.war-score-theirs {
+  color: var(--text);
+}
+
+.war-score-colon {
+  color: var(--text-muted);
+  font-size: 40px;
+}
+
+.war-score-label {
+  padding: 1px 10px;
+  border-radius: 4px;
+  background: rgba(13, 17, 11, 0.72);
+  color: var(--text);
+  font-size: 15px;
+}
+
+.war-names {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.war-name {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 1px;
+  min-width: 0;
+}
+
+.war-name .guild-tag {
+  font-size: 17px;
+  text-shadow: 0 1px 2px #000;
+}
+
+.war-name--theirs .guild-tag {
+  color: var(--danger);
+}
+
+.war-name-text {
+  max-width: 100%;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-shadow: 0 1px 3px #000;
+  overflow-wrap: anywhere;
+}
+
+.war-name-members {
+  color: var(--text);
+  font-size: 15px;
+  text-shadow: 0 1px 3px #000;
+}
+
+.war-lead {
+  display: inline-flex;
+  align-self: center;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 5px 14px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: rgba(13, 17, 11, 0.85);
+  color: var(--gold);
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.war-lead svg {
+  flex: none;
+}
+
+/* No war this week: why, on the war's picture, and when the next draw is,
+   in gold under it. */
+.war-none-text {
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.4;
+  text-shadow: 0 1px 3px #000;
+}
+
+.war-none-next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-top: 1px solid rgba(217, 180, 90, 0.45);
+  color: var(--gold);
+  font-size: 15px;
+  line-height: 1.35;
+  text-shadow: 0 1px 3px #000;
+}
+
+.war-none-next svg {
+  flex: none;
+}
+
+/* The week: a tile for each day, its battles won and lost. */
+.war-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.war-day {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 1px;
+  min-width: 0;
+  min-height: 56px;
+  padding: 5px 0 4px;
+  border: 1px solid var(--bark-line);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.86);
+}
+
+.war-day-name {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.war-day-score {
+  display: grid;
+  place-items: center;
+  min-height: 21px;
+  font-family: var(--font-system);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.war-day--win {
+  border-color: rgba(167, 196, 127, 0.8);
+}
+
+.war-day--win .war-day-score {
+  color: var(--leaf);
+}
+
+.war-day--loss {
+  border-color: rgba(239, 154, 133, 0.75);
+}
+
+.war-day--loss .war-day-score {
+  color: var(--danger);
+}
+
+.war-day--even .war-day-score {
+  color: var(--text);
+}
+
+.war-day--today {
+  border-color: var(--gold);
+  background: rgba(58, 46, 34, 0.92);
+  box-shadow: inset 0 0 0 1px var(--gold), 0 0 12px rgba(217, 180, 90, 0.45);
+}
+
+.war-day--today .war-day-name,
+.war-day--today .war-day-score {
+  color: var(--gold);
+}
+
+.war-day--future {
+  border-style: dashed;
+  background: rgba(13, 17, 11, 0.7);
+}
+
+.war-day--future .war-day-score,
+.war-day--none .war-day-score {
+  color: var(--text-muted);
+}
+
+/* The next evening: the plaque with the time left, the battles as the
+   Arena's marks. */
+.war-plaque {
+  align-self: stretch;
+}
+
+.war-plaque .pvp-arena-plaque-text {
+  display: grid;
+  gap: 0;
+}
+
+.war-clock {
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 28px;
+  line-height: 1.15;
+}
+
+.war-end {
+  color: var(--gold);
+  font-family: var(--font-world);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.war-clock-note {
+  color: var(--text);
+  font-size: 16px;
+}
+
+.war .pvp-arena-pips-label {
+  font-size: 16px;
+}
+
+.war-sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 10px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.war-sub-count {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.war-sub-count--short {
+  color: var(--gold);
+}
+
+.war-rule {
+  height: 1px;
+  margin: 2px 0;
+  border: 0;
+  background: var(--line);
+}
+
+/* Busts in a row: apart while there is room, a little over each other on
+   the narrowest phones, never under 56 px. */
+.war-busts {
+  display: flex;
+  justify-content: center;
+}
+
+.war-busts > .war-bust + .war-bust {
+  margin-left: max(-10px, min(10px, calc((100% - 290px) / 4)));
+}
+
+@media (max-width: 359px) {
+  .war-busts:not(.war-busts--few) {
+    margin-inline: -8px;
+  }
+
+  .war-busts > .war-bust + .war-bust {
+    margin-left: max(-10px, min(10px, calc((100% - 280px) / 4)));
+  }
+
+  .war-bust > .select-portrait {
+    width: 56px;
+    height: 56px;
+  }
+}
+
+.war-busts--few {
+  justify-content: flex-start;
+}
+
+.war-busts--few > .war-bust + .war-bust {
+  margin-left: 10px;
+}
+
+.war-bust {
+  position: relative;
+  flex: none;
+}
+
+.war-bust > .select-portrait {
+  width: 58px;
+  height: 58px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.war-bust--own {
+  z-index: 1;
+}
+
+.war-bust--own > .select-portrait {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.war-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* A part folded, its line in the body's size. */
+.war .fold-part-title {
+  font-size: 18px;
+}
+
+.war .fold-part-line {
+  font-size: 15px;
+}
+
+/* The battles fought: the result, the teams and the day, "Obejrzyj". */
+.war-battles {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.war-battle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.45);
+}
+
+.war-battle-text {
+  flex: 1 1 140px;
+  min-width: 0;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.war-watch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+/* The teams: up to six medallions, the one chosen lit. */
+.war-teams-head .pvp-arena-heading {
+  font-size: 20px;
+}
+
+.war-chips {
+  display: grid;
+  grid-template-columns: repeat(var(--war-teams, 6), minmax(0, 58px));
+  justify-content: center;
+  gap: 6px;
+}
+
+.war-chip {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 3px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+}
+
+.war-chip-disc {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  max-width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid var(--bark-line);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #3a2e22, #1f1912 75%);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.35), 0 2px 4px rgba(0, 0, 0, 0.6);
+  font-family: var(--font-world);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.war-chip-count {
+  padding: 0 4px;
+  border-radius: 3px;
+  background: rgba(13, 17, 11, 0.75);
+  font-family: var(--font-system);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.war-chip--short .war-chip-count {
+  color: var(--gold);
+}
+
+.war-chip-own {
+  color: var(--gold);
+  font-size: 15px;
+  line-height: 1.1;
+  text-shadow: 0 1px 2px #000;
+}
+
+.war-chip--chosen .war-chip-disc {
+  border-color: var(--gold);
+  background: radial-gradient(circle at 50% 35%, #5a4630, #2b2219 75%);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(217, 180, 90, 0.4), 0 0 14px rgba(217, 180, 90, 0.55);
+  color: var(--gold);
+}
+
+/* The team chosen: its members, each on its own row. */
+.war-team-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.war-team-title .card-title {
+  font-size: 22px;
+}
+
+.war-count-pill {
+  flex: none;
+  padding: 2px 10px;
+  border: 1px solid var(--bark-line);
+  border-radius: 999px;
+  font-family: var(--font-system);
+  font-size: 15px;
+}
+
+.war-count-pill--short {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.war-warn {
+  color: var(--gold);
+  font-size: 15px;
+}
+
+.war-members {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.war-loose .war-members {
+  margin-top: 8px;
+}
+
+.war-member {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.45);
+}
+
+.war-member .select-portrait {
+  width: 64px;
+  height: 64px;
+}
+
+.war-member--own {
+  border-color: rgba(217, 180, 90, 0.55);
+}
+
+.war-member-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.war-member-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  min-width: 0;
+}
+
+.war-member-name .chat-name {
+  min-height: 0;
+  max-width: 100%;
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+
+.war-member-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.war-member-line svg {
+  flex: none;
+  color: var(--gold);
+}
+
+.war-move {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  min-height: 46px;
+  padding: 0;
+}
+
+.war-slot {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  border: 2px dashed rgba(217, 180, 90, 0.55);
+  border-radius: 6px;
+  background: rgba(217, 180, 90, 0.05);
+}
+
+.war-slot-frame {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 2px dashed var(--bark-line);
+  border-radius: 4px;
+  color: var(--gold);
+}
+
+.war-slot-text {
+  min-width: 0;
+  color: var(--text);
+  font-size: 17px;
+}
+
+.war-take {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.war-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.war-hint svg {
+  flex: none;
+  color: var(--gold);
+}
+
+/* Narrow phones: the busts a little smaller, so the words keep a line. */
+@media (max-width: 359px) {
+  .war-member,
+  .war-slot {
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 6px;
+  }
+
+  .war-member .select-portrait,
+  .war-slot-frame {
+    width: 56px;
+    height: 56px;
+  }
+
+  .war-member-line svg {
+    display: none;
+  }
+
+  .war-slot {
+    grid-template-columns: 56px minmax(0, 1fr);
+    row-gap: 6px;
+  }
+
+  .war-slot-frame {
+    grid-row: span 2;
+  }
+
+  .war-take {
+    grid-column: 2;
+    justify-self: start;
+    min-height: 40px;
+    padding-inline: 12px;
+  }
+}
+
+/* Where a member goes (⇄): the other teams, each with its free place and
+   its members to swap with, and the reserve. */
+.war-move-list {
+  display: grid;
+  gap: 12px;
+}
+
+.war-move-team {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.war-move-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.war-move-options .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* The smaller guild: its teams and the reserve, the way to its next team. */
+.war-team-block {
+  display: grid;
+  gap: 8px;
+}
+
+.war-reserve {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.war-reserve p {
+  min-width: 0;
+  font-size: 15px;
+}
+
+.war-meter-marks {
+  display: grid;
+  grid-template-columns: repeat(var(--war-groups, 3), minmax(0, 1fr));
+  gap: 8px;
+}
+
+.war-meter-group {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  min-width: 0;
+}
+
+.war-meter-cells {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2px;
+  width: 100%;
+}
+
+.war-meter-group-name {
+  color: var(--text-muted);
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.war-meter-group--open .war-meter-group-name {
+  color: var(--gold);
+}
+
+.war-meter-mark {
+  height: 12px;
+  border-radius: 2px;
+  background: var(--xp-track);
+}
+
+.war-meter-mark--on {
+  background: var(--gold);
+}
+
+.war-meter-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 15px;
+}
+
+.war-meter-label b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.war-open {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px dashed rgba(143, 227, 239, 0.6);
+  border-radius: 6px;
+  background: rgba(143, 227, 239, 0.06);
+}
+
+.war-open-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.war-open-title svg {
+  flex: none;
+  color: var(--system);
+}
+
+.war-open p + p {
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+/* The battle in its sheet: the result over the playback. */
+.war-sheet {
+  display: grid;
+  gap: 12px;
+}
+
+.war-sheet p {
+  margin: 0;
+}
+
+.war-result {
+  gap: 10px;
+}
+
+.war-result--win {
+  border-color: rgba(167, 196, 127, 0.6);
+}
+
+.war-result--loss {
+  border-color: rgba(239, 154, 133, 0.55);
+}
+
+.war-result-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.war-result-teams {
+  min-width: 0;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.war-result-teams .guild-tag {
+  font-size: 15px;
+}
+
+.war-result-teams .war-their-tag {
+  color: var(--danger);
+}
+
+.war-standing {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+
+.war-standing-one {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.war-standing-one .select-portrait {
+  width: 56px;
+  height: 56px;
+}
+
+.war-standing-one > span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* On the narrowest phones two of those standing to a row, a little
+   smaller, so a flawless win does not push the playback far down. */
+@media (max-width: 359px) {
+  .war-standing {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 10px;
+  }
+
+  .war-standing-one {
+    gap: 6px;
+    font-size: 15px;
+  }
+
+  .war-standing-one .select-portrait {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.war-reward {
+  display: grid;
+  gap: 6px;
+}
+
+.war-reward .guild-chest {
+  gap: 6px 16px;
+  font-size: 16px;
+}
+
+.war-reward .guild-chest .sprite {
+  width: 20px;
+  height: 20px;
+}
+
+.war-reward .guild-chest li {
+  gap: 6px;
+}
+
+/* "Test wojny" on the test version. */
+.war-test {
+  border-style: dashed;
+  border-color: rgba(143, 227, 239, 0.6);
+}
+
+.war-test-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.war-test-teams {
+  min-height: 40px;
+  padding: 4px 8px;
+}

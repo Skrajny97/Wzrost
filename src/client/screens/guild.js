@@ -14,8 +14,10 @@
 // guild's "Siedziba" with its buildings (guild-seat.js, 616 A) and its
 // activities, "Wyprawa" (guild-expedition.js, 621 A), "Bestia"
 // (guild-beast.js), "Próby" (guild-trials.js), "Prośby"
-// (guild-requests.js), "Wymiana" (guild-exchange.js) and "Skrzynia"
-// (guild-chest.js, the author, 10.11.2026: „Wspólna skrzynia Gildii”). The
+// (guild-requests.js), "Wymiana" (guild-exchange.js), "Skrzynia"
+// (guild-chest.js, the author, 10.11.2026: „Wspólna skrzynia Gildii”) and,
+// where the guild wars are on, "Wojna" (guild-war.js, 792–800), the nine
+// tabs then in three rows of three (792 v2). The
 // address keeps the tab (#/gildia/<id>), and the page opens on the one
 // shown last on the device, or on "Gildia" outside a guild. Its own words
 // are shown in the page's language (t(), i18n.js); the tabs' names and the
@@ -33,6 +35,7 @@ import { mountGuildExpedition } from '../guild-expedition.js';
 import { mountGuildRequests } from '../guild-requests.js';
 import { mountGuildSeat } from '../guild-seat.js';
 import { mountGuildTrials } from '../guild-trials.js';
+import { mountGuildWar } from '../guild-war.js';
 import { CLASS_ICONS } from '../icons.js';
 import { narrate } from '../narrator.js';
 import { openProfile } from '../profile.js';
@@ -42,7 +45,7 @@ import { lockedScreen } from './locked.js';
 
 const PAGE = '#/gildia';
 const TAB_KEY = 'insight-guild-tab';
-const TAB_ICONS = { guild: 'banner', seat: 'keep', expedition: 'tent', beast: 'beast', trials: 'trophy', requests: 'gift', exchange: 'swap', chest: 'coffer' };
+const TAB_ICONS = { guild: 'banner', seat: 'keep', expedition: 'tent', beast: 'beast', trials: 'trophy', requests: 'gift', exchange: 'swap', chest: 'coffer', war: 'swords' };
 const TAB_MOUNTS = {
   guild: mountGuild,
   seat: mountGuildSeat,
@@ -52,6 +55,7 @@ const TAB_MOUNTS = {
   requests: mountGuildRequests,
   exchange: mountGuildExchange,
   chest: mountGuildChest,
+  war: mountGuildWar,
 };
 
 // The tab to open: the address's, else the one shown last on the device
@@ -111,9 +115,13 @@ export function mountGuildPage(container, context) {
   // rzędy"): the first half of the tabs over the rest, each row filling the
   // width (styles.css, .guild-picker): in a grid of first × second columns a
   // tab of the first row spans `second` of them, one of the second `first`.
-  const first = Math.ceil(tabs.length / 2);
-  const second = tabs.length - first;
-  row.style.setProperty('--guild-columns', String(second ? first * second : first));
+  // Nine tabs, with the Wojna (792 v2), stand in three rows of three, their
+  // names at full size: in two rows they did not fit a phone of 320 px.
+  const three = tabs.length > 8;
+  const first = three ? 1 : Math.ceil(tabs.length / 2);
+  const second = three ? 0 : tabs.length - first;
+  row.classList.toggle('community-tabs--three', three);
+  row.style.setProperty('--guild-columns', String(three ? 3 : second ? first * second : first));
 
   function render() {
     fill(

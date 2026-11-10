@@ -63,9 +63,14 @@ function zoneOffset(ms, timeZone) {
 // The moment the zone's clock shows midnight `days` after the day it shows
 // at `ms`. The offset is taken near that moment, and again at it, so a
 // change of time on that day is on the right side.
-export function zoneMidnight(ms, timeZone, days) {
+export const zoneMidnight = (ms, timeZone, days) => zoneTime(ms, timeZone, days, 0);
+
+// The moment the zone's clock shows `hour`:00 `days` after the day it shows
+// at `ms` (the guild wars' battles at 20:00 Polish time, also on the day
+// the clocks change), as zoneMidnight finds its midnight.
+export function zoneTime(ms, timeZone, days, hour) {
   const { year, month, day } = zoneClock(ms, timeZone);
-  const wall = Date.UTC(year, month - 1, day + days);
+  const wall = Date.UTC(year, month - 1, day + days, hour);
   return wall - zoneOffset(wall - zoneOffset(wall, timeZone), timeZone);
 }
 
