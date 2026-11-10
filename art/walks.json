@@ -415,7 +415,7 @@
     "skin-eclipse-female": {
       "start": "art/references/walks/start/skin-eclipse-female.png",
       "pose": 2,
-      "description": "a thin young woman with long straight black hair in a deep navy blue robe down to the feet patterned with small silver constellations, a silver crescent moon emblem on the chest, a high stiff collar, a dark wooden staff topped with a black crystal held upright in the front hand, no sparkles"
+      "description": "a thin young woman with long straight black hair in a deep navy blue robe down to the feet patterned with small silver constellations, a silver crescent moon emblem on the chest, a high stiff collar, a dark wooden staff topped with a black crystal held upright in the front hand in every frame, the staff moving with the hand and never vanishing, no sparkles"
     },
     "skin-eclipse-male": {
       "start": "art/references/walks/start/skin-eclipse-male.png",
