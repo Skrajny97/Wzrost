@@ -38,6 +38,7 @@ import {
   arenaWeek,
   classNameOf,
   drawRivals,
+  duelArmorShare,
   duelHpFactor,
   fightsLeft,
   ratingChanges,
@@ -248,11 +249,12 @@ async function arenaView(db, player, record, rivals, now, defences = null) {
       due: due.results.map((frozen) => ({ week: frozen.week, place: frozen.place, ...arenaReward(frozen.place, row.level, content()) })),
     },
     season: { endsAt: season.endsAt },
-    // The numbers the rules name: the HP factor for two characters of the
-    // character's own level.
+    // The numbers the rules name: the HP factor and the share of armour (in
+    // percent) for two characters of the character's own level.
     numbers: {
       perDay: arena.fightsPerDay,
       hpFactor: Math.round(duelHpFactor(row.level, row.level, content()) * 10) / 10,
+      armor: Math.round(duelArmorShare(row.level, row.level, content()) * 100),
       moves: arena.duel.maxMoves,
       start: arena.rating.start,
       share: Math.round(arena.season.share * 100),

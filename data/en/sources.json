@@ -4202,6 +4202,7 @@
   "resources:wood.description": "c94104fcbf40",
   "resources:wood.genitive": "e223d2725968",
   "resources:wood.name": "7d1eac910738",
+  "settlement:arena.texts.armorRule": "05ae998b2561",
   "settlement:arena.texts.change": "7aa4b08d489e",
   "settlement:arena.texts.claim": "447f6c987d81",
   "settlement:arena.texts.claimed": "22da5260e735",

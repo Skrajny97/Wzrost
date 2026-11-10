@@ -240,6 +240,23 @@ describe('skills', () => {
     assert.ok(content.classes.every((cls) => growth('warrior').hp >= cls.perClassLevel.hp && growth('mage').mana >= cls.perClassLevel.mana));
   });
 
+  test("a class's levels grow no stat of a weapon it cannot wear: the Cień's grow Vitality, not Strength (772)", () => {
+    // Strength, Dexterity and Intellect only make a weapon hit harder, so a
+    // class growing one its weapons do not use gets a point a level that does
+    // nothing in a fight; the Cień's Strength (with its dagger of Dexterity)
+    // left it with the least HP of all and the most defeats alone.
+    const weaponStats = new Set(content.bases.filter((base) => base.slot === 'weapon').map((base) => base.scaling));
+    for (const cls of content.classes) {
+      const own = new Set(cls.weapons.map((id) => content.basesById[id].scaling));
+      for (const stat of Object.keys(cls.growth)) if (weaponStats.has(stat)) assert.ok(own.has(stat), `${cls.id} grows ${stat}`);
+    }
+    const shadow = content.classesById.shadow;
+    for (const growth of [shadow.growth, content.evolutionsById.assassin.growth, content.evolutionsById.kingslayer.growth]) {
+      assert.equal(growth.strength, undefined);
+      assert.equal(growth.vitality, 1);
+    }
+  });
+
   test('a ready strike skill replaces a blow, then waits for its cooldown', () => {
     const result = fight('zamach', [withSkill('warrior', 'power-strike')], [sturdy('boar', 12, 'e0')]);
     const used = moves(result).map((event) => event.skill === 'power-strike');

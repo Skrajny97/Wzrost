@@ -34,8 +34,12 @@ const rounded = (value) => Math.sign(value) * Math.round(Math.abs(value));
 // each, and with one factor big enough for them those of level 25 went on
 // for twenty-five rounds.
 export function duelHpFactor(levelA, levelB, content) {
-  const curve = arenaRules(content).duel.hpCurve;
-  const level = (levelA + levelB) / 2;
+  return curveAt(arenaRules(content).duel.hpCurve, (levelA + levelB) / 2);
+}
+
+// A curve's value at a level: its points [level, value], straight between
+// two points, as the first point below it and as the last past it.
+function curveAt(curve, level) {
   const next = curve.findIndex(([at]) => at > level);
   if (next === 0) return curve[0][1];
   if (next === -1) return curve.at(-1)[1];
@@ -44,14 +48,28 @@ export function duelHpFactor(levelA, levelB, content) {
   return from + ((to - from) * (level - fromLevel)) / (toLevel - fromLevel);
 }
 
+// The share of its armour each side of a duel has (question 772): the
+// characters wear far more armour than the creatures their blows were
+// measured against (a whole set of upgraded items, where a creature has
+// its hide), so a blow of a weapon took half or less of what it takes
+// from a creature, while a spell, against resistances as small as the
+// creatures', took as much: the classes of weapons lost most of their
+// duels. duel.armorCurve's points [level, share] at the two characters'
+// average level, as the HP curve; the whole armour without one.
+export function duelArmorShare(levelA, levelB, content) {
+  const curve = arenaRules(content).duel.armorCurve;
+  return curve ? curveAt(curve, (levelA + levelB) / 2) : 1;
+}
+
 // One side of a duel: the character as it is saved, with its stats, gear,
 // skills and evolution, and nothing else: no companions, mercenaries or
 // potions (none are given), in no place (no place's trait), at full HP
-// times `factor` (duelHpFactor), so that the fight lasts a few rounds.
-function duelist({ character, equipped, name }, id, side, factor, content) {
+// times `factor` (duelHpFactor), so that the fight lasts a few rounds, and
+// with `armor` of its armour (duelArmorShare).
+function duelist({ character, equipped, name }, id, side, { factor, armor }, content) {
   const unit = playerCombatant({ character, equipped, name, id, side }, content);
   const maxHp = Math.max(1, Math.round(unit.maxHp * factor));
-  return { ...unit, maxHp, hp: maxHp };
+  return { ...unit, maxHp, hp: maxHp, armor: Math.round(unit.armor * armor) };
 }
 
 // A duel of the attacker's character (`attacker`: { character, equipped,
@@ -65,9 +83,11 @@ function duelist({ character, equipped, name }, id, side, factor, content) {
 // report's fight. `record: false` skips the log (the simulation).
 export function arenaDuel({ attacker, defender, seed }, content, { record = true } = {}) {
   const { duel, texts } = arenaRules(content);
-  const factor = duelHpFactor(attacker.character.level, defender.character.level, content);
-  const ally = duelist(attacker, 'a0', 'ally', factor, content);
-  const enemy = duelist(defender, 'e0', 'enemy', factor, content);
+  const levels = [attacker.character.level, defender.character.level];
+  const factor = duelHpFactor(...levels, content);
+  const shape = { factor, armor: duelArmorShare(...levels, content) };
+  const ally = duelist(attacker, 'a0', 'ally', shape, content);
+  const enemy = duelist(defender, 'e0', 'enemy', shape, content);
   const fight = simulateFight({ allies: [ally], enemies: [enemy], rng: createRng(`arena:${seed}`), content, record, maxActions: duel.maxMoves });
   const left = (unit) => Math.max(0, fight.units.find((one) => one.id === unit.id).hp) / unit.maxHp;
   const shares = { attacker: left(ally), defender: left(enemy) };

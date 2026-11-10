@@ -33,7 +33,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `forge.js` | Kuźnia w Osadzie: Zwoje ochronne i przekucie przedmiotu na wyższą rzadkość |
 | `parties.js` | Drużyna: rozpiętość poziomów klas i kto zostaje w drużynie, gdy poziomy się rozjadą |
 | `towers.js` | Wieże Systemu: podwaliny, jeszcze poza grą |
-| `pvp-arena.js` | Arena w Osadzie (walki z postaciami innych graczy): pojedynek dwóch postaci z limitem ruchów, remisem i mnożnikiem HP, ocena jak w szachach, losowanie rywali, sezon i nagrody tabeli tygodnia |
+| `pvp-arena.js` | Arena w Osadzie (walki z postaciami innych graczy): pojedynek dwóch postaci z limitem ruchów, remisem, mnożnikiem HP i częścią pancerza, ocena jak w szachach, losowanie rywali, sezon i nagrody tabeli tygodnia |
 | `guild-beast.js`, `guild-trials.js`, `guild-seat.js`, `guild-expedition.js` | Gildia: Bestia Gildii, Próby Gildii (tablica prób tygodnia, wielkość próby na poziom postaci, pasek z progami i skrzynie), Siedziba Gildii (koszty poziomów budynków, poziom z sumy wpłat z nadwyżką na następny poziom, premie dla członków) oraz Wyprawa Gildii (kraina tygodnia, siedmiu strażników, minuty etapu, HP strażnika, postęp trasy z odłożonymi minutami i skrzynie strażników) |
 | `cosmetics.js` | Sklep Systemu: ramki, tła i wygląd wierzchowca za Punkty Systemu, co postać ma i nosi, oraz kolor imienia z ramki |
 | `gifts.js`, `gift-codes.js` | Upominek między znajomymi i kody podarunkowe |

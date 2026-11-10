@@ -256,6 +256,8 @@ export function mountPvpArena(holder) {
       rivalsPart(),
       howItWorks(null, [
         say(texts.rules, { perDay: numbers.perDay, hpFactor: formatDecimal(numbers.hpFactor), moves: numbers.moves }),
+        // Where armour counts at less than all of it (772).
+        ...(numbers.armor < 100 ? [say(texts.armorRule, { armor: numbers.armor })] : []),
         say(texts.ratingRules, { start: numbers.start, share: numbers.share }),
       ]),
     ];

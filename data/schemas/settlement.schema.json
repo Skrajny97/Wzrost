@@ -679,6 +679,12 @@
               "description": "Punkty [poziom, mnożnik HP] rosnąco po poziomie: HP obu stron razy mnożnik przy średnim poziomie obu postaci, między punktami liniowo, przed pierwszym jak pierwszy, za ostatnim jak ostatni (tools/pvp-arena-sim.mjs).",
               "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "exclusiveMinimum": 0 } }
             },
+            "armorCurve": {
+              "type": "array",
+              "minItems": 1,
+              "description": "Punkty [poziom, część pancerza] rosnąco po poziomie: pancerz obu stron razy ta część przy średnim poziomie obu postaci, tak jak hpCurve (pytanie 772). Bez niej cały pancerz.",
+              "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": [{ "type": "number", "exclusiveMinimum": 0 }, { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }] }
+            },
             "maxMoves": { "type": "integer", "minimum": 2, "description": "Po tylu ruchach obu stron razem walkę kończy sędzia." },
             "drawMargin": { "type": "number", "minimum": 0, "maximum": 1, "description": "Remis, gdy części HP, które zostały obu stronom, różnią się najwyżej o tyle." }
           }
