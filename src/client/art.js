@@ -349,6 +349,14 @@ export const SPRITES = {
     height: 96,
     ids: ['system-grove', 'system-workshop', 'system-workbench', 'system-mine', 'system-lapidary', 'system-spring', 'tower-solo', 'tower-party', 'guild-keep', 'casino-hall', 'trial-hall', 'wanted-board', 'portal-gold', 'portal-wood', 'portal-stone', 'portal-ore', 'portal-materials', 'portal-parts', 'arena'],
   },
+  // The fights' boards under the formation of a fight's playback (arena.js;
+  // 790 B, the Arena's sand), 192×160, a place's fightBoard in
+  // data/settlement.json.
+  boards: {
+    width: 192,
+    height: 160,
+    ids: ['arena-board'],
+  },
   // The buildings of the Siedziba Gildii (data/guilds.json, seat), by the
   // building's id, 128×96 on a transparent ground: the first look the
   // author picked for each (623), drawn in PixelLab, for all their levels
@@ -581,6 +589,8 @@ export const encyclopediaArt = (size) => iconArt('encyclopedia', size, 'book');
 // A scroll of the Kowadło by its id (ward-scroll, steady-scroll).
 export const scrollArt = (id, size) => iconArt(id, size, 'scroll');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
+// A fight's board under its formation (arena.js), or null while it has none.
+export const boardArt = (boardId) => (available.boards.has(boardId) ? `/art/boards/${boardId}.png` : null);
 // A building of the Siedziba Gildii at its own size, or null while it has
 // no picture.
 export function guildSeatSprite(buildingId) {

@@ -3034,6 +3034,12 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.43 (10.11.2026): tło planszy walki na Arenie (790 B)
+
+1. **Plansza walki na piasku Areny (790 B).** Autor: „Trzeba też w końcu tła planszy walki zrobić, chociaż pod Arenę zacząć, bo nigdzie ich nie ma”. Powtórka walki na Arenie stoi na tle z PixelLab: ubity piasek widziany z góry, z jedną jasną linią między stronami rywali (wariant B, A z krzyżem odrzucony). Tło jest przygaszone, żeby karty walczących były czytelne.
+2. **Brakujący szczegół.** Tła plansz mają swój rodzaj grafik: `src/client/art/boards`, 192×160 px, a miejsce Osady wskazuje swoje polem `fightBoard` w `data/settlement.json`. Powtórka walki przyjmuje tło planszy jako opcję (`createArena(..., { board })`). Walki na wyprawach dostaną tła swoich krain w kolejnych etapach.
+3. Sprawdzone: powtórka walki na Arenie na 390 px z tłem B, testy klienta, danych i Areny przechodzą.
+
 ## Wersja 0.2.42 (10.11.2026): nowy wygląd Areny (788 C, 789) i Cienie przed ewolucją (786 v2 A)
 
 1. **Arena w nowym wyglądzie (789.1–789.4 zaakceptowane, tło 788 C).** Autor: „ta Arena ma takie paskudne GUI… gdzie jest jakieś tło i różne inne ozdobniki”. Karta oceny stoi na obrazku Areny z PixelLab (wybrane tło C, `backdrop` miejsca Arena w `data/settlement.json`). Ocena i miejsce w tabeli są na tabliczce z pucharem, a walki na dziś to rząd skrzyżowanych mieczy, zgaszonych po każdej walce. Ostatnia walka pokazuje plakietkę wyniku (Wygrana, Przegrana, Remis), rywala i zmianę oceny, a „Obejrzyj walkę” otwiera powtórkę w okienku (787 B z 0.2.41). Obrony od ostatniej wizyty są zwinięte pod liczbą. Przy nagłówku rywali i na przyciskach „Walcz” stoją skrzyżowane miecze. Tło planszy samej walki (790) czeka na wybór autora.

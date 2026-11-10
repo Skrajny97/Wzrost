@@ -3586,6 +3586,13 @@ summary {
   background: #141b11;
 }
 
+/* The formation on a place's picture (790 B, the Arena's sand): the
+   picture a little darkened so the cards stay clear. */
+.arena--board {
+  background: linear-gradient(rgba(16, 21, 13, 0.35), rgba(16, 21, 13, 0.35)), var(--arena-board) center / cover no-repeat, #141b11;
+  image-rendering: pixelated;
+}
+
 .arena-row {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

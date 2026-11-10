@@ -14,7 +14,7 @@
     { "id": "forge", "name": "Kuźnia", "x": 56, "y": 31, "resident": "smith" },
     { "id": "casino", "name": "Salon Gier", "x": 83, "y": 33.5, "resident": "gamehost", "backdrop": "casino-hall" },
     { "id": "trial-hall", "name": "Sala prób", "x": 14, "y": 39, "backdrop": "trial-hall" },
-    { "id": "arena", "name": "Arena", "x": 47, "y": 70, "feature": "arena", "backdrop": "arena" }
+    { "id": "arena", "name": "Arena", "x": 47, "y": 70, "feature": "arena", "backdrop": "arena", "fightBoard": "arena-board" }
   ],
   "torches": [
     { "x": 32, "y": 12.5 },

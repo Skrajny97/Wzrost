@@ -733,6 +733,7 @@
     "!settlement:places.casino.backdrop",
     "!settlement:places.trial-hall.backdrop",
     "!settlement:places.arena.backdrop",
+    "!settlement:places.arena.fightBoard",
     "!settlement:orders.partRarity",
     "!settlement:casino.wheel.fairRarities",
     "!settlement:casino.wheel.goodRarity",

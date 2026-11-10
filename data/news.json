@@ -490,6 +490,11 @@
       "id": "0.2.42",
       "title": "Wersja 0.2.42",
       "body": "- Arena w nowym wyglądzie: obrazek Areny, ocena na tabliczce, walki na dziś jako skrzyżowane miecze, a wynik ostatniej walki jako plakietka z przyciskiem „Obejrzyj walkę”.\n- Cienie przed ewolucją wyrównane, tak samo na wyprawach i na Arenie: Taniec cieni chroni przez 3 ciosy wrogów zamiast 5, a Zatrute ostrze truje częściej (45–65% ciosów zamiast 30–50%)."
+    },
+    {
+      "id": "0.2.43",
+      "title": "Wersja 0.2.43",
+      "body": "- Walki na Arenie toczą się na piasku areny: powtórka walki ma swoje tło."
     }
 ]
 }

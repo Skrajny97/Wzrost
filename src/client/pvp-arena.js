@@ -196,7 +196,7 @@ export function mountPvpArena(holder, place = null) {
     const { last, texts } = view;
     if (!last) return null;
     const watch = () => {
-      const playback = createArena(last.fight, { autoplay: 'now' });
+      const playback = createArena(last.fight, { autoplay: 'now', board: place?.fightBoard ?? null });
       watching = playback;
       openSheet(
         h('h2', { class: 'sheet-title', text: texts.last }),

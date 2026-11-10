@@ -6,7 +6,7 @@
 // written in Polish and shown in the page's language (t(), i18n.js); the
 // fight's names and lines come from the server in it.
 
-import { companionBust, companionPortrait, monsterSprite, portraitSprite, summonSprite } from './art.js';
+import { boardArt, companionBust, companionPortrait, monsterSprite, portraitSprite, summonSprite } from './art.js';
 import { classArt } from './class-art.js';
 import { h, icon } from './dom.js';
 import { language, t } from './i18n.js';
@@ -58,7 +58,9 @@ const tint = (hex, alpha) => `rgba(${[1, 3, 5].map((at) => parseInt(hex.slice(at
 // Whose voice a unit has (data/sounds.json): a creature's own, a character's by its look.
 const voiceOf = (unit) => unit.monsterId ?? unit.appearance ?? null;
 
-export function createArena(fight, { autoplay = 'visible' } = {}) {
+// `board`: a place's picture under the fight's formation (790 B, the Arena's
+// sand; the author: „tła planszy walki… chociaż pod Arenę zacząć”).
+export function createArena(fight, { autoplay = 'visible', board = null } = {}) {
   const units = [...fight.enemies, ...fight.allies];
   preloadVoices(units.map(voiceOf));
   const byId = new Map(units.map((unit) => [unit.id, unit]));
@@ -144,6 +146,11 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
   enemies.append(banner);
   const party = row('ally', fight.allies);
   const arena = h('div', { class: 'arena' }, enemies, party, fx);
+  const boardPicture = board ? boardArt(board) : null;
+  if (boardPicture) {
+    arena.classList.add('arena--board');
+    arena.style.setProperty('--arena-board', `url("${boardPicture}")`);
+  }
 
   // Animations through the Web Animations API, so they can all be cancelled.
   function animate(element, keyframes, options) {

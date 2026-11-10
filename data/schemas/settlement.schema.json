@@ -50,6 +50,7 @@
           "y": { "type": "number", "minimum": 0, "maximum": 100 },
           "resident": { "$ref": "#/definitions/id" },
           "backdrop": { "$ref": "#/definitions/id", "description": "Wnętrze miejsca (src/client/art/places), przygaszone za kartą mieszkańca, tak jak miejsca profesji za swoimi kartami." },
+          "fightBoard": { "$ref": "#/definitions/id", "description": "Tło planszy walk tego miejsca (src/client/art/boards), pod szykiem w powtórce walki: piasek Areny (790 B)." },
           "soon": { "type": "boolean", "description": "Miejsce widać na planszy, ale otwiera się w kolejnej części." },
           "flip": { "type": "boolean", "description": "Obrazek budynku odbity w poziomie, żeby wejściem patrzył na główną drogę (autor: „zrób też rotate/odbicia lustrzane budynków tak by byly skierowane ich obrazki w stronę drogi głównej”)." },
           "feature": { "enum": ["arena"], "description": "Miejsce tylko tam, gdzie ta część gry jest włączona (arena: ARENA w wrangler.jsonc, src/server/features.js); gdzie indziej nie ma go na planszy ani w menu." }
