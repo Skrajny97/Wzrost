@@ -405,7 +405,7 @@
     "skin-dawn-female": {
       "start": "art/references/walks/start/skin-dawn-female.png",
       "pose": 2,
-      "description": "a calm young woman with long fair hair and a thin golden circlet, in layered white and gold vestments down to the feet, a golden sash, a staff topped with a small golden sun held upright in the front hand in every frame, the sun always above and in front of the hand, never over the face, no halo, nothing on the back"
+      "description": "a calm young woman with long fair hair and a thin golden circlet, in layered white and gold vestments down to the feet, a golden sash, both hands empty, the arms swinging naturally and keeping their length, no staff and nothing in the hands, no halo, nothing on the back"
     },
     "skin-dawn-male": {
       "start": "art/references/walks/start/skin-dawn-male.png",
@@ -415,7 +415,7 @@
     "skin-eclipse-female": {
       "start": "art/references/walks/start/skin-eclipse-female.png",
       "pose": 2,
-      "description": "a thin young woman with long straight black hair in a deep navy blue robe down to the feet patterned with small silver constellations, a silver crescent moon emblem on the chest, a high stiff collar, a dark wooden staff topped with a black crystal held upright in the front hand in every frame, the staff moving with the hand and never vanishing, no sparkles"
+      "description": "a thin young woman with long straight black hair in a deep navy blue robe down to the feet patterned with small silver constellations, a silver crescent moon emblem on the chest, a high stiff collar, both hands empty, the arms swinging naturally and keeping their length, no staff and nothing in the hands, an even smooth stride, no sparkles"
     },
     "skin-eclipse-male": {
       "start": "art/references/walks/start/skin-eclipse-male.png",
