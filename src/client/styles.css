@@ -17048,12 +17048,18 @@ a.discord-button {
   }
 }
 
+/* The reserve's busts: as many as the guild has, so they wrap into rows
+   instead of one row wider than the screen (the author's Galaxy S23 Ultra,
+   11.11.2026: 15 in the reserve made the page three screens wide, and
+   "Co nowego?" then opened in the middle of it). */
 .war-busts--few {
+  flex-wrap: wrap;
   justify-content: flex-start;
+  gap: 8px 10px;
 }
 
 .war-busts--few > .war-bust + .war-bust {
-  margin-left: 10px;
+  margin-left: 0;
 }
 
 .war-bust {
@@ -17421,11 +17427,14 @@ a.discord-button {
 
 .war-reserve {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 8px 12px;
 }
 
+/* Beside a few busts, under the rows of many. */
 .war-reserve p {
+  flex: 1 1 140px;
   min-width: 0;
   font-size: 15px;
 }

@@ -560,6 +560,11 @@
       "id": "0.2.57",
       "title": "Wersja 0.2.57",
       "body": "- Na iPhonie strona nie przybliża się już sama po stuknięciu w listę wyboru albo po zamknięciu okna, np. „Co nowego?”. Wszystkie pola do pisania i listy mają teraz wielkość, przy której telefon nie powiększa strony."
+    },
+    {
+      "id": "0.2.58",
+      "title": "Wersja 0.2.58",
+      "body": "- Zakładka Wojna w Gildii: przy wielu osobach w rezerwie ich portrety układają się w kilka rzędów. Strona nie jest już szersza niż ekran, więc na telefonach z Androidem „Co nowego?” i inne okna otwierają się normalnie, bez przesuwania widoku w bok."
     }
 ]
 }

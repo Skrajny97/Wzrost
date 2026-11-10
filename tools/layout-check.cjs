@@ -282,6 +282,26 @@ async function main() {
   sql(`UPDATE fame_points SET points = 123456 WHERE character_id = (SELECT id FROM characters WHERE name = '${name}')`);
   // A guild of its own, with a long name, for the Gildia's tabs.
   if ((await api('POST', '/api/guild/found', { name: `Bractwo Żelaznych ${stamp}`, tag: `W${stamp.slice(-3).toUpperCase()}` })) >= 400) throw new Error('Nie powstała gildia.');
+  // Fifteen more members, all in the Wojna's reserve: the author's guild had
+  // as many, and one row of their busts made the page three screens wide on
+  // a Galaxy S23 Ultra (11.11.2026). They are characters of an account of
+  // their own, made in the database, so the session stays the first one's.
+  const reserveLogin = `rezerwa${stamp}`;
+  const reserveClasses = ['warrior', 'archer', 'mage', 'cleric', 'shadow'];
+  sql(
+    [
+      `INSERT INTO users (login, password_hash, created_at) VALUES ('${reserveLogin}', 'x', 1)`,
+      ...Array.from({ length: 15 }, (_, index) => {
+        const member = `Rezerwowy${stamp}${index}`;
+        return `INSERT INTO characters (user_id, role, name, name_key, class_id, appearance, level, class_level, position, hp, hp_at, created_at)
+          SELECT u.id, 'aside', '${member}', '${member.toLowerCase()}', '${reserveClasses[index % 5]}', '${index % 2 ? 'male' : 'female'}', 120, 80, c.position, c.hp, c.hp_at, 1
+          FROM users u, characters c WHERE u.login = '${reserveLogin}' AND c.name = '${name}'`;
+      }),
+      `INSERT INTO guild_members (character_id, guild_id, role, joined_at)
+        SELECT c.id, m.guild_id, 'member', 2 FROM characters c, guild_members m
+        WHERE c.user_id = (SELECT id FROM users WHERE login = '${reserveLogin}') AND m.character_id = (SELECT id FROM characters WHERE name = '${name}')`,
+    ].join('; '),
+  );
   // The Stół rozbiórki built, with long names and big numbers: three orders
   // in its queue, one at work, and a stack left on the Materiały tab.
   const materials = { 'tick-shell:common': 12345, 'black-stork-feather:rare': 9876, 'night-heron-plume:mythic': 1234, 'goblin-trinket:epic': 987 };

@@ -444,6 +444,10 @@
     "0.2.57": {
       "title": "Version 0.2.57",
       "body": "- On an iPhone the page no longer zooms in by itself after a tap on a list or after a window such as What's new? closes. Every text field and list now has a size at which the phone does not enlarge the page."
+    },
+    "0.2.58": {
+      "title": "Version 0.2.58",
+      "body": "- The Guild's War tab: with many members in the reserve, their portraits now wrap into several rows. The page is no longer wider than the screen, so on Android phones What's new? and other windows open normally, without the view sliding sideways."
     }
   }
 }

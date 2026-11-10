@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.58 (11.11.2026): rezerwa w zakładce Wojna nie rozpycha strony
+
+Autor 11.11.2026, ze zrzutami z telefonu: „to nie dzieje sie na IPhonie a na Samsung Galaxy S23 Ultra i dalej sie to dzieje w takiej kolejności jak pisałem, styl strony sie rozwala w ogóle”.
+
+1. **Przyczyna.** W zakładce Wojna portrety rezerwy stały w jednym rzędzie, którego nic nie zawijało. Gildia autora ma 15 osób w rezerwie, więc rząd miał ponad 1000 px i cała strona była ponad trzy razy szersza niż ekran telefonu. Android otwierał wtedy „Co nowego?” na środku tej szerokiej strony i przesuwał widok w bok, a oddalenie nie przywracało zwykłego wyglądu. Na telefonie 384 px (jak Galaxy S23 Ultra) strona miała 1259 px szerokości, a widok po otwarciu okna uciekał o 628 px w bok. Poprawka 0.2.57 (pola 16 px na iPhonie) tego błędu nie dotyczyła.
+2. **Poprawka.** Portrety rezerwy zawijają się do kolejnych rzędów. Zdanie „Przed bitwą zajmą wolne miejsca w drużynach.” stoi obok kilku portretów, a przy wielu pod nimi.
+3. **Sprawdzanie układu** (`tools/layout-check.cjs`): gildia postaci testowej ma teraz 15 osób w rezerwie, więc tak długi rząd wyjdzie przy sprawdzaniu na każdej szerokości ekranu.
+
 ## Wersja 0.2.57 (10.11.2026): bez przybliżania strony przez pola na iPhonie
 
 Autor: „Kliknięcie "Co nowego?" będąc w zakładce wojen gildii wykrzacza ekran mocno (przybliża się a oddalenie nie pomaga)”.
