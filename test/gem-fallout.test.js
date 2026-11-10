@@ -100,6 +100,28 @@ describe('a gem falls out of an item lost, through the API', () => {
     assert.deepEqual(await minerals(), { emerald: 3 });
   });
 
+  test("an Osada's order never takes a favourite, and a delivered item's gem goes back (10.11.2026)", async () => {
+    // A board with a crafted sword wanted in its first place.
+    await call('GET', '/api/settlement', { cookie });
+    await (await db())
+      .prepare("UPDATE characters SET settlement = json_set(settlement, '$.board.slots[0].order.kind', 'craft', '$.board.slots[0].order.key', 'sword', '$.board.slots[0].order.count', 1) WHERE id = ?")
+      .bind(id)
+      .run();
+    const order = (await call('GET', '/api/settlement', { cookie })).data.settlement.board.slots[0].order;
+    assert.equal(order.kind, 'craft');
+    // The weakest crafted sword is a favourite: it stays, and alone it is not enough.
+    const favourite = await inBag(sword({ crafted: true, gem: 'emerald' }));
+    assert.equal((await call('POST', `/api/items/${favourite}/favorite`, { cookie, body: { favorite: true } })).status, 200);
+    const short = await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } });
+    assert.equal(short.status, 409, JSON.stringify(short.data));
+    const other = await inBag(sword({ crafted: true, rarity: 'rare', gem: 'emerald' }));
+    const done = await call('POST', '/api/settlement/deliver', { cookie, body: { orderId: order.id } });
+    assert.equal(done.status, 200, JSON.stringify(done.data));
+    const left = (await (await db()).prepare('SELECT id FROM items WHERE character_id = ?').bind(id).all()).results.map((item) => item.id);
+    assert.ok(left.includes(favourite) && !left.includes(other), JSON.stringify(left));
+    assert.deepEqual(await minerals(), { emerald: 3 });
+  });
+
   test('thrown away, its gem goes back too', async () => {
     const item = await inBag(sword({ gem: 'emerald' }));
     const thrown = await call('POST', `/api/items/${item}/discard`, { cookie });

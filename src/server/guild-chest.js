@@ -35,6 +35,7 @@ import { bagPlaces, characterView, loadPlayer, requireOffRack } from './characte
 import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
 import { guildPlayer, requireMember } from './guild-trials.js';
+import { withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
 import { numberText } from './i18n.js';
 
@@ -232,7 +233,9 @@ export async function putInGuildChest(context) {
         .prepare("INSERT INTO guild_chest_log (guild_id, kind, name, for_name, data, created_at) SELECT ?, 'put', ?, ?, data, ? FROM items WHERE id = ? AND character_id = ? AND slot IS NULL")
         .bind(guild.id, row.name, forMember?.name ?? null, now, item.id, row.id),
       db.prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND slot IS NULL').bind(item.id, row.id),
-      db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(row.id),
+      // A favourite no longer, once in the chest (favorites.js), as in the
+      // Skrzynia Konta: it comes out as an item without the star.
+      db.prepare(`UPDATE characters SET favorites = ${withoutFavorites}, version = version + 1 WHERE id = ?`).bind(JSON.stringify([item.id]), row.id),
       logKept(db, guild.id),
     ],
     async () => {

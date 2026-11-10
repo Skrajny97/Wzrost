@@ -649,12 +649,13 @@ export const buildingOpen = (building, row, stored = null, now = 0) =>
 // What the character holds of the goods the Osada's orders ask for, by the
 // column each kind is kept in, the parts of the Stół rozbiórki's orders
 // done by `now` among them, and the Warsztat's items in the bag by pattern
-// (`crafted`).
+// (`crafted`), but for its favourites, which no order takes (favorites.js).
 export function settlementGoods(row, items, now) {
   const stocks = Object.fromEntries(['herbs', 'potions', 'materials', 'resources'].map((column) => [column, JSON.parse(row[column] ?? '{}')]));
   stocks.parts = settleCrafting(craftingState(row), now).parts;
+  const favorites = favoriteIds(row);
   const crafted = {};
-  for (const item of bagItems({ row, items })) if (item.crafted) crafted[item.base] = (crafted[item.base] ?? 0) + 1;
+  for (const item of bagItems({ row, items })) if (item.crafted && !favorites.has(item.id)) crafted[item.base] = (crafted[item.base] ?? 0) + 1;
   return { ...stocks, crafted };
 }
 

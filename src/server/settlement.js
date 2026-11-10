@@ -118,7 +118,8 @@ import { wantedToKeep, wantedView } from './wanted.js';
 import { forgeView } from './forge.js';
 import { trialProgress } from './guild-trials.js';
 import { sourceFamePoints, upgradeFamePoints } from './fame.js';
-import { fallenGem, gemNamed, upgradePayment, upgradePlan } from './inventory.js';
+import { favoriteIds } from './favorites.js';
+import { fallenGem, fallenGems, gemNamed, upgradePayment, upgradePlan } from './inventory.js';
 import { addTo } from './professions.js';
 import { counted, foreign, takenOff, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
@@ -969,24 +970,30 @@ export async function deliverSettlementOrder(context) {
 }
 
 // Delivering the Warsztat's items: they leave the bag, the weakest first,
-// and the order pays, all of it or nothing. The payment goes only if the
-// character is as read and every item is still in the bag, and the Próby
-// Gildii's `trial` (a function of that condition) only with it; the items
-// go only if that payment was saved (its new Osada is unique to it).
+// and the order pays, all of it or nothing. A favourite is never taken
+// (favorites.js), and a gem set in a delivered item falls out and goes back
+// to the minerals (757 B), in the payment's statement. The payment goes only
+// if the character is as read (a star set meanwhile changes it) and every
+// item is still in the bag, and the Próby Gildii's `trial` (a function of
+// that condition) only with it; the items go only if that payment was saved
+// (its new Osada is unique to it).
 async function deliverCrafted(db, player, done, { settlement, quests, trial = () => [] }) {
   const { row } = player;
-  const ids = craftedFor(bagItems(player), done.take.key, done.take.count, content()).map((item) => item.id);
+  const favorites = favoriteIds(row);
+  const items = craftedFor(bagItems(player).filter((item) => !favorites.has(item.id)), done.take.key, done.take.count, content());
+  const ids = items.map((item) => item.id);
   if (ids.length < done.take.count) throw new ApiError(409, 'not_enough', 'Brakuje Ci jeszcze tego, o co proszą.');
+  const gems = addTo('minerals', fallenGems(items));
   const list = ids.map(() => '?').join(', ');
   const inBag = `(SELECT COUNT(*) FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${list})) = ?`;
   await db.batch([
     ...trial({ sql: `(SELECT version FROM characters WHERE id = ?) = ? AND ${inBag}`, binds: [row.id, row.version, row.id, ...ids, ids.length] }),
     db
       .prepare(
-        `UPDATE characters SET gold = gold + ?, system_points = system_points + ?, settlement = ?, quests = ?, version = version + 1
+        `UPDATE characters SET gold = gold + ?, system_points = system_points + ?, settlement = ?, quests = ?${gems.sql}, version = version + 1
          WHERE id = ? AND version = ? AND ${inBag}`,
       )
-      .bind(done.gold, done.systemPoints, settlement, quests, row.id, row.version, row.id, ...ids, ids.length),
+      .bind(done.gold, done.systemPoints, settlement, quests, ...gems.binds, row.id, row.version, row.id, ...ids, ids.length),
     db
       .prepare(`DELETE FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${list}) AND (SELECT settlement FROM characters WHERE id = ?) = ?`)
       .bind(row.id, ...ids, row.id, settlement),
