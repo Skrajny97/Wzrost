@@ -172,6 +172,22 @@ export function mountPortals(container, { navigate }) {
         }),
       ];
 
+    // The stage reached beside the name, so a closed card tells whether
+    // there is anything to climb (the author, 10.11.2026: „Dodaj tez
+    // aktualny stopien Portalu obok jego nazwy tak by nie trzeba bylo
+    // wchodzic i sprawdzac czy jest maksymalny”): the highest stage won of
+    // those open now (up to the character's level and the portal's last),
+    // and „maks.” in gold once there is none higher to fight for.
+    const stageBadge = ({ best }) => {
+      const limit = Math.min(view.maxStage, state.character.level);
+      const top = best >= limit;
+      return h('span', {
+        class: `portal-reached${top ? ' portal-reached--max' : ''}`,
+        'aria-label': t('Najwyżej pokonany stopień: {best} z {limit} dostępnych teraz.', { best: formatNumber(best), limit: formatNumber(limit) }),
+        text: top ? t('{stage} · maks.', { stage: formatNumber(best) }) : `${formatNumber(best)}/${formatNumber(limit)}`,
+      });
+    };
+
     // The picture with the portal's name; a tap anywhere on it shows or
     // hides the rest (the button's ::after spans the picture).
     const open = openPortals.has(portal.id);
@@ -201,7 +217,8 @@ export function mountPortals(container, { navigate }) {
           else openPortals.delete(portal.id);
         },
       },
-      h('span', { text: portal.name }),
+      h('span', { class: 'portal-name', text: portal.name }),
+      stageBadge(portal),
       h('span', { class: 'portal-marker', 'aria-hidden': 'true' }),
     );
     const art = portal.art && placeArt(portal.art);
