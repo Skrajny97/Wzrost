@@ -2583,5 +2583,7 @@
   "O punkt mniej": "One point less",
   "O punkt więcej": "One point more",
   "Dodaj {count} {points}": "Add {count} {points}",
-  "Punkt|Punkty|Punktów": "Point|Points"
+  "Punkt|Punkty|Punktów": "Point|Points",
+  "Najwyżej pokonany stopień: {best} z {limit} dostępnych teraz.": "Highest stage won: {best} of {limit} open now.",
+  "{stage} · maks.": "{stage} · max"
 }
