@@ -269,26 +269,33 @@ function ride(walk, character) {
   const trot = id && walk.mounts?.[id];
   const file = trot && riderFile(character.classId, character.appearance, character.skin, character.evolution?.current?.id, outfitOf(character));
   if (!file) return null;
-  const [x, y] = trot.seats[0];
+  // A mount drawn small beside the rider stands bigger (`scale`, the pony:
+  // the author, „kuc jest za mały albo postacie za duże”), its saddle with
+  // it; the rider keeps its own size.
+  const scale = trot.scale ?? 1;
+  const width = Math.round(trot.width * scale);
+  const height = Math.round(trot.height * scale);
+  const seats = trot.seats.map(([seatXi, seatYi]) => [Math.round(seatXi * scale), Math.round(seatYi * scale)]);
+  const [x, y] = seats[0];
   const [seatX, seatY] = walk.rider.seat;
-  const top = Math.max(0, seatY - Math.min(...trot.seats.map((seat) => seat[1])));
+  const top = Math.max(0, seatY - Math.min(...seats.map((seat) => seat[1])));
   const element = h(
     'div',
     { class: 'scene-ride' },
     h('div', { class: 'scene-ride-mount' }),
     h('img', { src: `/${file}`, alt: '', width: walk.rider.width, height: walk.rider.height, class: 'scene-ride-rider', draggable: 'false' }),
   );
-  element.style.setProperty('--ride-width', `${trot.width}px`);
-  element.style.setProperty('--ride-height', `${trot.height + top}px`);
-  element.style.setProperty('--mount-height', `${trot.height}px`);
+  element.style.setProperty('--ride-width', `${width}px`);
+  element.style.setProperty('--ride-height', `${height + top}px`);
+  element.style.setProperty('--mount-height', `${height}px`);
   element.style.setProperty('--sheet', `url("/${trot.file}")`);
-  element.style.setProperty('--sheet-width', `${trot.width * trot.frames}px`);
+  element.style.setProperty('--sheet-width', `${width * trot.frames}px`);
   element.style.setProperty('--frames', String(trot.frames));
   element.style.setProperty('--duration', `${trot.frames / trot.fps}s`);
   element.style.setProperty('--rider-x', `${x - seatX}px`);
   element.style.setProperty('--rider-y', `${top + y - seatY}px`);
   // The rider follows the saddle frame by frame (ride-<frames> in styles.css).
-  trot.seats.forEach(([seatXi, seatYi], i) => {
+  seats.forEach(([seatXi, seatYi], i) => {
     element.style.setProperty(`--rx${i}`, `${seatXi - x}px`);
     element.style.setProperty(`--ry${i}`, `${seatYi - y}px`);
   });

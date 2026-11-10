@@ -78,6 +78,7 @@
               "file": { "type": "string", "pattern": "^art/scenes/.+\\.png$" },
               "width": { "type": "integer", "minimum": 8 },
               "height": { "type": "integer", "minimum": 8 },
+              "scale": { "type": "number", "exclusiveMinimum": 0, "description": "Ile razy większy wierzchowiec stoi w scenie niż na arkuszu, z siodłem w tej samej skali; jeździec zostaje w swojej. Kuc 1,2 (autor 10.11.2026: „kuc jest za mały albo postacie za duże”)." },
               "frames": { "type": "integer", "minimum": 1 },
               "fps": { "type": "number", "exclusiveMinimum": 0 },
               "seats": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/point" } }

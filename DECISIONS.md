@@ -3034,6 +3034,12 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.53 (10.11.2026): Większy kuc w scenie Walka
+
+Autor 10.11.2026: „kuc jest za mały albo postacie za duże, reszta wierzchowców dobrze skaluje, ale kuc ma chyba złe skalowanie”.
+
+1. **Kuc w scenie Walka jest 1,2 raza większy** (`scale` w `walk.mounts` w `data/animations.json`): 125×108 zamiast 104×90, prawie wzrost konia (126×108), ale krępy, więc dalej wygląda na kuca. Siodło przesuwa się razem z nim, a jeździec zostaje w swojej wielkości, tej samej co na koniu, rumaku i tygrysie. Wcześniej jeździec był na kucu za duży jak dorosły na kozie, bo kuc był narysowany mniejszy niż reszta, a jeździec ma jedną wielkość dla wszystkich wierzchowców.
+
 ## Wersja 0.2.52 (10.11.2026): Tła walk w krainach
 
 Makiety 802.1–802.8 ocenione przez autora 10.11.2026: wersje B, a dla Głuchej Kniei (802.7) wersja A.

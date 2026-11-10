@@ -535,6 +535,11 @@
       "id": "0.2.52",
       "title": "Wersja 0.2.52",
       "body": "- Każda kraina ma własne tło walki: w raporcie z wyprawy walki toczą się na ziemi tej krainy, od ubitej ziemi Wiatrołomów i kręgu kamieni na Uroczysku po błoto Czarnego Bagna i mrok Ostępów Nowiu."
+    },
+    {
+      "id": "0.2.53",
+      "title": "Wersja 0.2.53",
+      "body": "- Kuc w scenie Walka jest większy: jeździec nie wygląda już na nim jak dorosły na kozie, a kuc dalej jest krępy i niższy od konia."
     }
 ]
 }
