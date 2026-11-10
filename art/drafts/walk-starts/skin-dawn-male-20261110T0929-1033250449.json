@@ -1,0 +1,23 @@
+{
+  "id": "skin-dawn-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a calm young man with short fair hair in layered white and gold vestments down to the ankles, a golden sash, brown boots, a book under the other arm, a staff topped with a small golden sun held upright in the front hand, no halo, nothing on the back, seen from the side, facing and walking to the right, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/dawn-male.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
