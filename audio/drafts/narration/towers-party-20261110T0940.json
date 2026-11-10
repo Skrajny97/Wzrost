@@ -1,0 +1,17 @@
+{
+  "id": "towers-party",
+  "payload": {
+    "text": "Do Wieży Drużyn wejdziesz z jednym albo dwoma wędrowcami. Wolne miejsce zajmie towarzysz z Kwater. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/towers-party-20261110T0940-0.mp3",
+    "audio/drafts/narration/towers-party-20261110T0940-1.mp3"
+  ],
+  "credits": 214
+}
