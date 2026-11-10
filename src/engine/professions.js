@@ -26,11 +26,12 @@ export const professionXpToNext = (profession, level) => level * profession.leve
 // The profession after `minutes` of work, with the levels gained. At its top
 // level the XP stays at 0. `factor`: the share more (or less) of the XP of
 // the week the work began in (profession-xp, weeks.js), the XP rounded; the
-// XP gained (`gained`) for the report.
+// XP gained (`gained`) for the report, where the week made it other than the
+// minutes.
 export function workProfession(profession, state, minutes, factor = 1) {
   const gained = factor === 1 ? minutes : Math.round(minutes * factor);
   const next = gainXp(state.level, state.xp, gained, (level) => professionXpToNext(profession, level), profession.maxLevel);
-  return { level: next.level, xp: next.xp, levels: next.levels, gained };
+  return { level: next.level, xp: next.xp, levels: next.levels, ...(gained !== minutes && { gained }) };
 }
 
 // What a profession at a level adds to each of its two stats: statPerLevel

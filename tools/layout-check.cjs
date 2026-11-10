@@ -147,7 +147,7 @@ const SHEETS = {
   ],
   // The sheet Tygodnie from the week's line on the Walka screen (weeks.js),
   // its whole year left as the player left it.
-  '#/walka': [{ name: 'Tygodnie', tap: '.week-line', ready: '.week-cards', words: true }],
+  '#/walka': [{ name: 'Tygodnie', tap: '.week-line', ready: '.week-card--now', words: true }],
   '#/postac': [
     { name: 'Ustawienia', tap: '.topbar .settings-button', ready: `h2.sheet-title:text-is("${said('Ustawienia')}")`, words: true },
     { name: 'Zgłoś błąd', tap: `#sheet button:text-is("${said('Zgłoś błąd')}")`, ready: `h2.sheet-title:text-is("${said('Zgłoś błąd')}")`, words: true },

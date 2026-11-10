@@ -289,7 +289,8 @@ describe('the week outside fights', () => {
     const after = workProfession(herbalism, before, 60, 1.05);
     assert.equal(after.gained, 63);
     assert.equal(professionProgress(herbalism, before, after, 60).xp, 63);
-    assert.equal(workProfession(herbalism, before, 60).gained, 60);
+    assert.deepEqual(workProfession(herbalism, before, 60), workProfession(herbalism, before, 60, 1));
+    assert.equal(workProfession(herbalism, before, 60).gained, undefined);
     assert.equal(professionProgress(herbalism, before, { level: 1, xp: 60 }, 60).xp, 60);
     close(expectedHerbs(['comfrey'], 60, 1, content, 0, 1.05).comfrey.expected, expectedHerbs(['comfrey'], 60, 1, content).comfrey.expected * 1.05);
     const herbs = (factor) => [...Array(20).keys()].reduce((sum, index) => sum + gatherHerbs({ herbIds: ['comfrey'], minutes: 120, level: 1, seed: `zioła-${index}`, week: factor }, content).comfrey, 0);
