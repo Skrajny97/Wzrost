@@ -794,11 +794,15 @@ export function mountSettlement(container, { params = {} } = {}) {
         disabled: full || state.character.gold < candidate.price,
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
-            apply(await call('POST', '/api/settlement/hire', { candidateId: candidate.id }));
+            const answer = await call('POST', '/api/settlement/hire', { candidateId: candidate.id });
+            apply(answer);
+            // A reserve, hired while two go on the explorations, has the
+            // server's words (the third bed of the Kwatery's 3rd level).
             toast(
-              candidate.appearance === 'female'
-                ? t('{name} zamieszkała w Kwaterach w obozie.', { name: candidate.name })
-                : t('{name} zamieszkał w Kwaterach w obozie.', { name: candidate.name }),
+              answer.text ??
+                (candidate.appearance === 'female'
+                  ? t('{name} zamieszkała w Kwaterach w obozie.', { name: candidate.name })
+                  : t('{name} zamieszkał w Kwaterach w obozie.', { name: candidate.name })),
             );
           }),
       });

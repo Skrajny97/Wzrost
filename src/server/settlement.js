@@ -26,6 +26,8 @@ import {
   companionGift,
   companionSkillLevel,
   companionStays,
+  companionsGoingMost,
+  companionsSetToGo,
   companionText,
   companionPlace,
   companionWearBlock,
@@ -694,7 +696,7 @@ function companionsView(player, stored, now) {
         away: away ? companionText('away', companion, content()) : null,
         // The line of its item's card: who wears it and who pays.
         wornBy: companionText('wornBy', companion, content()),
-        stay: stayView(companion, player.inParty, away),
+        stay: stayView(companion, hired, player.inParty, away),
       };
     }),
     candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content(), points) })),
@@ -721,10 +723,13 @@ function requireCompanionHome(player, companion, now) {
 // author: "[Zostań w kwaterze]"), in its words, with the switch to the
 // other (`action`: the label and the `stays` to send). In a Drużyna every
 // companion stays, with no switch. One set to stay while out on an
-// exploration stays from its return on.
-function stayView(companion, inParty, away) {
+// exploration stays from its return on. One who stays while as many as may
+// go already go (`hired`: all the hired) is the reserve of the Kwatery's
+// third bed, with no switch until one of them stays.
+function stayView(companion, hired, inParty, away) {
   if (inParty) return { stays: true, text: companionText('inParty', companion, content()), action: null };
   const stays = companionStays(companion);
+  if (stays && companionsSetToGo(hired) >= companionsGoingMost(content())) return { stays: true, reserve: true, text: companionText('reserve', companion, content()), action: null };
   return {
     stays,
     text: companionText(stays ? (away ? 'stayingAfter' : 'staying') : 'going', companion, content()),
@@ -1028,7 +1033,8 @@ export async function buyMug(context) {
 
 // { candidateId }: hires one of this week's candidates for gold, when the
 // camp's Kwatery have a free bed. Any standing with the innkeeper may hire,
-// a lower one for more gold. The companion goes on the next exploration.
+// a lower one for more gold. The companion goes on the next exploration,
+// unless as many as may go already go: then it is the Kwatery's reserve.
 export async function hireCompanion(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -1042,13 +1048,20 @@ export async function hireCompanion(context) {
   if (!candidate) throw new ApiError(404, 'no_candidate', 'Tego kandydata już nie ma w Karczmie.');
   const gold = hireCost(candidate, content(), innkeeperPoints(stored));
   if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota na werbunek.');
-  const next = { ...stored, companions: [...hired, candidate] };
+  // One hired while as many as may go already go waits in the Kwatery as
+  // their reserve (the third bed of their 3rd level).
+  const reserve = companionsSetToGo(hired) >= companionsGoingMost(content());
+  const next = { ...stored, companions: [...hired, reserve ? staying(candidate, true) : candidate] };
   const result = await context.env.DB.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?')
     .bind(gold, JSON.stringify(next), row.id, row.version, gold)
     .run();
   if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(context.env.DB, session.userId);
-  return json({ settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now), character: characterView(after, context.now) });
+  return json({
+    ...(reserve && { text: companionText('hiredReserve', candidate, content()) }),
+    settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
+    character: characterView(after, context.now),
+  });
 }
 
 // { companionId }: the companion leaves for good and does not come back as
@@ -1264,6 +1277,10 @@ export async function setCompanionStay(context) {
   if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
   if (typeof body.stays !== 'boolean') throw new ApiError(400, 'invalid_stay', companionText('invalidStay', companion, content()));
   if (!body.stays && player.inParty) throw new ApiError(409, 'in_party', companionText('inParty', companion, content()));
+  // At most as many go as a party has places beside the character; the
+  // others wait in the Kwatery as reserves.
+  if (!body.stays && companionStays(companion) && companionsSetToGo(hired) >= companionsGoingMost(content()))
+    throw new ApiError(409, 'full_going', companionText('fullGoing', companion, content()));
   const next = { ...stored, companions: hired.map((one) => (one === companion ? staying(one, body.stays) : one)) };
   const result = await context.env.DB.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
     .bind(JSON.stringify(next), row.id, row.version)

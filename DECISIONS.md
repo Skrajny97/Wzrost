@@ -3034,6 +3034,17 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.45 (10.11.2026): trzeci towarzysz w Kwaterach (876)
+
+1. **Kwatery na 3. poziomie.** Autor: „Zrób też tak żeby można było rekrutować więcej towarzyszy o 1 (ale zabierać na wyprawy dalej max 2), czyli dodatkowy rezerwowy do werbunku w rozbudowanych Kwaterach na poziom 3 (muszą mieć nowego sprite'a)”. Kwatery mają 3. poziom: 20 480 złota, 5 698 drewna, 3 799 kamienia i 3 165 rudy żelaza (koszty rosną jak dotąd), budowa 48 h. Dają trzecie posłanie. Na wyprawy nadal chodzi najwyżej dwóch towarzyszy, a trzeci czeka w kwaterze jako rezerwowy.
+2. **Wygląd 3. poziomu.** Kwatery stają się drewnianą chatą z trzema posłaniami: to trzeci wygląd budynku z PixelLab, zatwierdzony razem z pozostałymi w 253 A, ale dotąd nieużywany, bo Kwatery miały dwa poziomy. Pozycja 791 na stronie ocen pyta, czy zostaje; jeśli nie, powstanie nowy.
+3. **Brakujące szczegóły.**
+    - Towarzysz zwerbowany, gdy dwóch już chodzi na wyprawy, od razu zostaje w kwaterze jako rezerwowy, a komunikat po werbunku mówi to wprost.
+    - Rezerwowy nie ma przycisku „Idź na wyprawy”, dopóki chodzi dwóch; jego karta mówi, że wystarczy zostawić kogoś z nich w kwaterze. Zamiana nie dzieje się sama.
+    - Wieża Drużyn bierze najpierw towarzyszy, którzy chodzą na wyprawy, a rezerwowego tylko na wolne miejsce; Portale biorą najwyżej dwóch.
+    - Rezerwowy rozmawia z postacią i przynosi prezent tygodnia jak każdy towarzysz w kwaterze, ale nie zdobywa XP ani relacji z wypraw.
+4. Sprawdzone w przeglądarce na 390 px (trzech towarzyszy, rezerwowy bez przycisku, chata na planszy obozu) i testami towarzyszy, Wież, Portali, Drużyny, obozu i danych.
+
 ## Wersja 0.2.44 (10.11.2026): z plecaka do Zaklinaczki
 
 1. **Zaklinanie z karty przedmiotu.** Autor: „Zrób też zaklinanie w plecaku (niech przenosi do Zaklinaczki) jak już Osada jest odblokowana”. Gdy Osada jest otwarta, karta przedmiotu (w plecaku i na postaci) ma sekcję „Zaklinaczka” z jednym zdaniem o tym, co ona zrobi z tym przedmiotem, i przyciskiem „Zaklnij u Zaklinaczki”. Przycisk prowadzi do Pracowni Zaklinaczki, gdzie przedmiot czeka w polu „Przyniesiony przedmiot”, a „Zaklnij afiks” i „Zaklnij żywioł” otwierają się od razu na nim, bez wybierania z listy („Inny przedmiot” wraca do listy).

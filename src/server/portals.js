@@ -13,7 +13,7 @@
 // full HP with no potions and its HP stays as it was. Everything is saved
 // in one batch only while the character is as read (atomic.js).
 
-import { applyHunt, areaDangers, companionReady, companionStays, huntReport, isUnlocked, portalAmount, portalArea, portalById, portalFight, portalNext, portalSweep, portalSweepAll, questPeriod } from '../engine/index.js';
+import { applyHunt, areaDangers, companionReady, companionsGoingMost, companionStays, huntReport, isUnlocked, portalAmount, portalArea, portalById, portalFight, portalNext, portalSweep, portalSweepAll, questPeriod } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
 import { characterView, engineCharacter, equippedItems, loadPlayer, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
@@ -49,8 +49,9 @@ const today = (now) => questPeriod('daily', now, content()).key;
 // The companions a character may take into a portal: those hired who do not
 // stay in the Kwatery, a wounded one too (a portal takes nobody's HP), but
 // never its Drużyna (the author: "Możliwość zabrania towarzyszy, ale w tym
-// przypadku - nie drużyn").
-const companionsOf = (row) => (JSON.parse(row.settlement ?? '{}').companions ?? []).filter((companion) => !companionStays(companion) && companionReady(companion, true));
+// przypadku - nie drużyn"); at most as many as go on explorations.
+const companionsOf = (row) =>
+  (JSON.parse(row.settlement ?? '{}').companions ?? []).filter((companion) => !companionStays(companion) && companionReady(companion, true)).slice(0, companionsGoingMost(content()));
 const sweptToday = (record, portalId, now) => (record.day === today(now) ? (record.swept[portalId] ?? 0) : 0);
 
 // The portals for the page: the last stage, the companions the character may take, and each portal with the

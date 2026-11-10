@@ -244,6 +244,17 @@ export const companionStays = (companion, inParty = false) => inParty || compani
 // does not stay, a wounded one once the character has rested to full HP.
 export const companionGoes = (companion, { rested, inParty = false }) => !companionStays(companion, inParty) && companionReady(companion, rested);
 
+// How many hired companions go on the explorations at most: the places of
+// a party beside the character (parties.size). The Kwatery at their 3rd
+// level give a third bed, and the third companion waits there as a reserve
+// (the author, 10.11.2026: „rekrutować więcej towarzyszy o 1 (ale zabierać
+// na wyprawy dalej max 2)”).
+export const companionsGoingMost = (content) => content.balance.parties.size - 1;
+
+// How many of the hired companions are set to go on the explorations (not
+// told to stay in the Kwatery).
+export const companionsSetToGo = (companions) => companions.filter((companion) => !companionStays(companion)).length;
+
 // The companion told to stay in the Kwatery (`stays`) or to go on the
 // explorations again.
 export function staying(companion, stays) {

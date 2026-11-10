@@ -198,10 +198,10 @@
   {
     "id": "quarters",
     "name": "Kwatery",
-    "description": "Namiot z posłaniami dla ludzi zwerbowanych w Karczmie w Osadzie. Każdy poziom Kwater to miejsce dla jednego towarzysza.",
-    "maxLevel": 2,
+    "description": "Namioty z posłaniami dla ludzi zwerbowanych w Karczmie w Osadzie, a na 3. poziomie drewniana chata. Każdy poziom Kwater to miejsce dla jednego towarzysza. Na wyprawy chodzi najwyżej dwóch, a trzeci czeka w kwaterze jako rezerwowy.",
+    "maxLevel": 3,
     "settlement": true,
-    "looks": [1, 2],
+    "looks": [1, 2, 3],
     "effect": { "kind": "companionPlaces", "perLevel": 1, "unit": "count", "text": "Miejsca dla towarzyszy: {value}" },
     "costs": [
       { "resource": "gold", "base": 1280, "growth": 4 },
@@ -209,7 +209,7 @@
       { "resource": "stone", "base": 293.1, "growth": 3.6 },
       { "resource": "iron-ore", "base": 244.25, "growth": 3.6 }
     ],
-    "minutes": { "levels": [240, 1200] }
+    "minutes": { "levels": [240, 1200, 2880] }
   },
   {
     "id": "training-yard",

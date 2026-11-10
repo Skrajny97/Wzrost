@@ -96,7 +96,7 @@
   },
   "quarters": {
     "name": "Quarters",
-    "description": "A tent with bedrolls for the people recruited in the Tavern in the Settlement. Each level of the Quarters is a place for one companion.",
+    "description": "Tents with bedrolls for the people recruited in the Tavern in the Settlement, and at level 3 a timber hall. Each level of the Quarters is a place for one companion. At most two go on explorations, and the third waits in the quarters as a reserve.",
     "effect": { "text": "Companion places: {value}" }
   },
   "training-yard": {

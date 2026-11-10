@@ -500,6 +500,11 @@
       "id": "0.2.44",
       "title": "Wersja 0.2.44",
       "body": "- Gdy masz Osadę, karta przedmiotu ma przycisk „Zaklnij u Zaklinaczki”. Zabiera przedmiot prosto do jej Pracowni, gdzie zaklęcie afiksu i żywiołu otwiera się od razu na nim."
+    },
+    {
+      "id": "0.2.45",
+      "title": "Wersja 0.2.45",
+      "body": "- Kwatery mają 3. poziom: drewnianą chatę z trzecim posłaniem. Zwerbujesz trzeciego towarzysza, ale na wyprawy dalej chodzi najwyżej dwóch, a trzeci czeka w kwaterze jako rezerwowy."
     }
 ]
 }

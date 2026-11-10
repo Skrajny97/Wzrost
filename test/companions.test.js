@@ -185,7 +185,7 @@ describe('companions through the API', () => {
   test('each companion needs a bed in the camp\'s Kwatery, a level of them for each (104 A)', async () => {
     await quarters(0);
     const camp = (await call('GET', '/api/character', { cookie })).data.character.camp.buildings.find((building) => building.id === 'quarters');
-    assert.deepEqual([camp.level, camp.maxLevel, camp.look, camp.next.effect], [0, 2, 1, 'Miejsca dla towarzyszy: 1']);
+    assert.deepEqual([camp.level, camp.maxLevel, camp.look, camp.next.effect], [0, 3, 1, 'Miejsca dla towarzyszy: 1']);
     let view = (await settlement()).companions;
     assert.deepEqual([view.places, view.moreBeds], [0, true]);
     const [first, second] = view.candidates;
@@ -199,6 +199,42 @@ describe('companions through the API', () => {
     // The second look of the Kwatery stands at their second level.
     const built = (await call('GET', '/api/character', { cookie })).data.character.camp.buildings.find((building) => building.id === 'quarters');
     assert.deepEqual([built.level, built.look, built.effect], [2, 2, 'Miejsca dla towarzyszy: 2']);
+  });
+
+  test('the third bed of the Kwatery\'s 3rd level takes a reserve: at most two go on the explorations (author, 10.11.2026)', async () => {
+    await quarters(3);
+    const built = (await call('GET', '/api/character', { cookie })).data.character.camp.buildings.find((building) => building.id === 'quarters');
+    assert.deepEqual([built.level, built.look, built.effect], [3, 3, 'Miejsca dla towarzyszy: 3']);
+    const [first, second, third] = (await settlement()).companions.candidates;
+    for (const one of [first, second]) {
+      const answer = await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: one.id } });
+      assert.deepEqual([answer.status, answer.data.text], [200, undefined]);
+    }
+    // The third, hired while two go, waits in the Kwatery as the reserve.
+    const hired = await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: third.id } });
+    assert.equal(hired.status, 200);
+    assert.ok(hired.data.text.startsWith(`${third.name} zamieszka w Kwaterach jako rezerwow`));
+    const view = (id, companions) => companions.hired.find((companion) => companion.id === id).stay;
+    let companions = hired.data.settlement.companions;
+    assert.deepEqual([companions.places, companions.moreBeds], [3, false]);
+    assert.deepEqual([view(first.id, companions).stays, view(second.id, companions).stays], [false, false]);
+    assert.deepEqual([view(third.id, companions).stays, view(third.id, companions).reserve, view(third.id, companions).action], [true, true, null]);
+    // A third may not go while two go.
+    const refused = await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: third.id, stays: false } });
+    assert.deepEqual([refused.status, refused.data.error.code], [409, 'full_going']);
+    // An exploration takes the two who go.
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    const options = JSON.parse((await (await db()).prepare('SELECT options FROM activities').first()).options);
+    assert.deepEqual(options.companions.map((companion) => companion.id).sort(), [first.id, second.id].sort());
+    await (await db()).prepare('DELETE FROM activities').run();
+    // One of them left in the Kwatery, the reserve may go in its place.
+    await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: first.id, stays: true } });
+    companions = (await settlement()).companions;
+    assert.deepEqual([view(third.id, companions).reserve, view(third.id, companions).action.stays], [undefined, false]);
+    const goes = await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: third.id, stays: false } });
+    assert.equal(goes.status, 200);
+    companions = goes.data.settlement.companions;
+    assert.deepEqual([view(first.id, companions).reserve, view(second.id, companions).stays, view(third.id, companions).stays], [true, false, false]);
   });
 
   test('candidates wait in the Karczma, and a stranger to the innkeeper hires one too, for more gold', async () => {

@@ -28,6 +28,7 @@ import {
   campBonus,
   campLevels,
   companionReady,
+  companionStays,
   hpAfterHunt,
   huntKills,
   huntReport,
@@ -116,7 +117,9 @@ async function climbersFor(db, player, tower) {
   const others = party ? (await Promise.all(party.memberIds.filter((id) => id !== row.id).map((id) => loadCharacter(db, id)))).filter(Boolean) : [];
   const partners = others.slice(0, Math.min(tower.members[1], most) - 1).map((other) => ({ id: other.row.id, name: other.row.name, level: other.row.level, character: engineCharacter(other.row), equipped: equippedItems(other) }));
   const places = Math.max(0, most - 1 - partners.length);
-  const hired = tower.companions ? (JSON.parse(row.settlement ?? '{}').companions ?? []).filter((companion) => companionReady(companion, true)) : [];
+  // Those who go on explorations first, then the Kwatery's reserves.
+  const ready = tower.companions ? (JSON.parse(row.settlement ?? '{}').companions ?? []).filter((companion) => companionReady(companion, true)) : [];
+  const hired = [...ready.filter((companion) => !companionStays(companion)), ...ready.filter((companion) => companionStays(companion))];
   const companions = hired.slice(0, places);
   const missing =
     1 + partners.length < tower.members[0]

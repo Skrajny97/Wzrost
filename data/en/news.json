@@ -396,6 +396,10 @@
     "0.2.44": {
       "title": "Version 0.2.44",
       "body": "- Once you have the Settlement, an item's card has an “Enchant at the Enchantress” button. It takes the item straight to her workshop, where the affix and element enchantments open on it right away."
+    },
+    "0.2.45": {
+      "title": "Version 0.2.45",
+      "body": "- The Quarters have a 3rd level: a timber hall with a third bed. You can recruit a third companion, but at most two still go on explorations, and the third waits in the quarters as a reserve."
     }
   }
 }
