@@ -38,6 +38,7 @@ import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } 
 import { getGuildChest, putInGuildChest, takeFromGuildChest } from './guild-chest.js';
 import { donateToGuildSeat, getGuildSeat, preferGuildSeat } from './guild-seat.js';
 import { guildRanking } from './guild-fame.js';
+import { claimFame, getFame } from './fame.js';
 import { cancelOrders, craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
 import { confirmEmail, requestLink } from './email.js';
@@ -359,6 +360,9 @@ const routes = [
   ['POST', '/api/guild/chest/take', takeFromGuildChest],
   // The guilds' ranking by their Sława (guild-fame.js, 381 A).
   ['GET', '/api/ranking/guilds', guildRanking],
+  // The characters' Punkty Sławy, the Sława tab of the Społeczność (fame.js, 760 A).
+  ['GET', '/api/fame', getFame],
+  ['POST', '/api/fame/claim', claimFame],
   ['POST', '/api/towers/enter', enterTower],
   ['POST', '/api/portals/enter', enterPortal],
   ['POST', '/api/portals/sweep', sweepPortal],

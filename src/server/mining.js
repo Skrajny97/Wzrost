@@ -12,6 +12,7 @@ import { toHex } from './encoding.js';
 import { raced } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
+import { workFamePoints } from './fame.js';
 import { mineralsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
 import { keptWeek, weekNow } from './weeks.js';
@@ -119,6 +120,8 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
       db
         .prepare(`UPDATE characters SET gold = gold + ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END${sets.sql}${minerals.sql}, version = version + 1 WHERE id = ?`)
         .bind(mined.gold, row.quests, quests, ...sets.binds, ...minerals.binds, row.id),
+      // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
+      ...workFamePoints(db, row.id, activity.minutes, avatar, now),
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {

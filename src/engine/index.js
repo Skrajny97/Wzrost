@@ -60,3 +60,4 @@ export * from './cosmetics.js';
 export * from './wanted.js';
 export * from './mercenaries.js';
 export * from './weeks.js';
+export * from './fame.js';

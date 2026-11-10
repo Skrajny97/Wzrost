@@ -43,6 +43,7 @@ import { craftingOn, professionsOn, settlementOn } from './features.js';
 import { guildOf } from './guilds.js';
 import { ApiError, json, readJson } from './http.js';
 import { counted } from './market.js';
+import { trialFame } from './fame.js';
 
 const rules = () => content().guilds.trials;
 const words = () => rules().texts;
@@ -100,6 +101,8 @@ export function trialProgress(db, characterId, progress, now, guard = null) {
            AND guild_id = (SELECT guild_id FROM guild_members WHERE character_id = ?)${guard ? ` AND ${guard.sql}` : ''}`,
       )
       .bind(...binds, ...binds, ...binds, ...binds, now, characterId, week, ...gains.map(([kind]) => kind), characterId, ...(guard?.binds ?? [])),
+    // The Punkty Sławy of the trials done, each once (fame.js).
+    ...trialFame(db, characterId, week),
   ];
 }
 

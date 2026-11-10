@@ -21,6 +21,7 @@ import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { trimReports } from './reports.js';
 import { weekNow } from './weeks.js';
+import { sourceFamePoints } from './fame.js';
 
 const rules = () => content().portals;
 const path = (key) => `$."${key}"`;
@@ -217,6 +218,8 @@ export async function sweepAllPortals(context) {
   await atomically(db, [
     sameVersion(db, row),
     db.prepare(`UPDATE characters SET gold = gold + ?${stores.sql}, portals = ?, version = version + 1 WHERE id = ?`).bind(loot.gold, ...stores.binds, JSON.stringify(next), row.id),
+    // The Punkty Sławy of every sweep (fame.js); a new stage brings none.
+    ...sourceFamePoints(db, row.id, 'sweep', left.reduce((sum, one) => sum + one.count, 0), now),
   ]);
   const after = await loadPlayer(db, session.userId);
   return json({
@@ -246,6 +249,8 @@ export async function sweepPortal(context) {
   await atomically(db, [
     sameVersion(db, row),
     db.prepare(`UPDATE characters SET gold = gold + ?${stores.sql}, portals = ?, version = version + 1 WHERE id = ?`).bind(loot.gold, ...stores.binds, JSON.stringify(next), row.id),
+    // The sweep's Punkty Sławy (fame.js); a new stage brings none.
+    ...sourceFamePoints(db, row.id, 'sweep', 1, now),
   ]);
   const after = await loadPlayer(db, session.userId);
   return json({

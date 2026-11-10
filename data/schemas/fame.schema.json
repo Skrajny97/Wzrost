@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Punkty Sławy",
+  "description": "Punkty Sławy postaci za powtarzalne zajęcia w tygodniu i nagrody trzech najlepszych postaci trzech różnych kont (src/engine/fame.js, src/server/fame.js, src/client/screens/fame.js; autor: „760 A”).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["sources", "rewards", "table", "texts"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "sources": {
+      "description": "Za co Sława, w kolejności listy „Za co Sława”: każde źródło raz.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "label", "points"],
+        "properties": {
+          "id": { "enum": ["explore", "elite", "champion", "wanted", "sweep", "work", "avatar", "daily", "weekly", "monthly", "order", "beast", "trial", "upgrade", "upgrade-high", "sale"] },
+          "label": { "type": "string", "minLength": 1 },
+          "points": { "type": "integer", "minimum": 0 },
+          "minutes": { "description": "Co ile pełnych minut wyprawy albo pracy przychodzą punkty.", "type": "integer", "minimum": 1 },
+          "from": { "description": "Od którego poziomu ulepszenia (cel udanej próby) liczy się upgrade-high.", "type": "integer", "minimum": 1 }
+        },
+        "allOf": [
+          { "if": { "properties": { "id": { "enum": ["explore", "work", "avatar"] } } }, "then": { "required": ["minutes"] } },
+          { "if": { "properties": { "id": { "const": "upgrade-high" } } }, "then": { "required": ["from"] } }
+        ]
+      },
+      "allOf": [
+        { "contains": { "properties": { "id": { "const": "explore" } } } },
+        { "contains": { "properties": { "id": { "const": "elite" } } } },
+        { "contains": { "properties": { "id": { "const": "champion" } } } },
+        { "contains": { "properties": { "id": { "const": "wanted" } } } },
+        { "contains": { "properties": { "id": { "const": "sweep" } } } },
+        { "contains": { "properties": { "id": { "const": "work" } } } },
+        { "contains": { "properties": { "id": { "const": "avatar" } } } },
+        { "contains": { "properties": { "id": { "const": "daily" } } } },
+        { "contains": { "properties": { "id": { "const": "weekly" } } } },
+        { "contains": { "properties": { "id": { "const": "monthly" } } } },
+        { "contains": { "properties": { "id": { "const": "order" } } } },
+        { "contains": { "properties": { "id": { "const": "beast" } } } },
+        { "contains": { "properties": { "id": { "const": "trial" } } } },
+        { "contains": { "properties": { "id": { "const": "upgrade" } } } },
+        { "contains": { "properties": { "id": { "const": "upgrade-high" } } } },
+        { "contains": { "properties": { "id": { "const": "sale" } } } }
+      ]
+    },
+    "rewards": {
+      "description": "Nagrody tygodnia: `places` najlepszych postaci różnych kont dzieli `pool` Punktów Systemu proporcjonalnie do punktów; goldName: pierwsza ma złote imię przez cały następny tydzień.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["places", "pool", "goldName"],
+      "properties": {
+        "places": { "type": "integer", "minimum": 1 },
+        "pool": { "type": "integer", "minimum": 0 },
+        "goldName": { "type": "boolean" }
+      }
+    },
+    "table": { "description": "Ile najlepszych postaci tygodnia pokazuje tabela.", "type": "integer", "minimum": 1 },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lead",
+        "how",
+        "sources",
+        "notes",
+        "you",
+        "place",
+        "noPoints",
+        "left",
+        "week",
+        "last",
+        "lastNone",
+        "empty",
+        "columns",
+        "reward",
+        "rewardLine",
+        "claim",
+        "claimed",
+        "champion",
+        "pointForms",
+        "systemPointForms",
+        "nothing",
+        "raced"
+      ],
+      "properties": {
+        "lead": { "type": "string" },
+        "how": { "type": "array", "items": { "type": "string" } },
+        "sources": { "type": "string" },
+        "notes": { "type": "array", "items": { "type": "string" } },
+        "you": { "type": "string" },
+        "place": { "type": "string" },
+        "noPoints": { "type": "string" },
+        "left": { "type": "string" },
+        "week": { "type": "string" },
+        "last": { "type": "string" },
+        "lastNone": { "type": "string" },
+        "empty": { "type": "string" },
+        "columns": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["place", "character", "points", "share"],
+          "properties": {
+            "place": { "type": "string" },
+            "character": { "type": "string" },
+            "points": { "type": "string" },
+            "share": { "type": "string" }
+          }
+        },
+        "reward": { "type": "string" },
+        "rewardLine": { "type": "string" },
+        "claim": { "type": "string" },
+        "claimed": { "type": "string" },
+        "champion": { "type": "string" },
+        "pointForms": { "type": "array", "items": { "type": "string" }, "minItems": 3, "maxItems": 3 },
+        "systemPointForms": { "type": "array", "items": { "type": "string" }, "minItems": 3, "maxItems": 3 },
+        "nothing": { "type": "string" },
+        "raced": { "type": "string" }
+      }
+    }
+  }
+}

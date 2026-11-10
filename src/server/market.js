@@ -50,6 +50,7 @@ import { ApiError, json, readJson } from './http.js';
 import { herbsOf, mineralsOf, potionsOf } from './professions-view.js';
 import { requireOpen, settlementOf } from './settlement.js';
 import { weekNow } from './weeks.js';
+import { sourceFamePoints } from './fame.js';
 
 const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', part: 'parts', mineral: 'minerals' };
 const STACKS = Object.keys(COLUMNS);
@@ -134,7 +135,8 @@ const goodsParcel = (db, offer, characterId, reason, price, now) =>
 
 // The seller's parcel of a sale's gold, without the Targowisko's fee, the
 // one the offer was put up with (lower with the Kompania Kupców, 592); the
-// test version's own offers have no seller to get it.
+// test version's own offers have no seller to get it. With the seller's
+// Punkty Sławy for the sale (fame.js).
 const goldParcel = (db, offer, price, now) =>
   offer.seller_id === null
     ? []
@@ -142,6 +144,7 @@ const goldParcel = (db, offer, price, now) =>
         db
           .prepare("INSERT INTO market_parcels (character_id, offer_id, kind, count, reason, price, created_at) VALUES (?, ?, 'gold', ?, 'sold', ?, ?)")
           .bind(offer.seller_id, offer.id, sellerShare(price, content(), offer.fee ?? tuning().fee), price, now),
+        ...sourceFamePoints(db, offer.seller_id, 'sale', 1, now),
       ];
 
 // The offers whose time ran out (questions 238 A, 239 A): a sold one gives

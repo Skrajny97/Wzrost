@@ -15886,3 +15886,151 @@ a.discord-button {
   color: var(--text-muted);
   font-size: 13px;
 }
+
+/* Punkty Sławy (screens/fame.js, src/server/fame.js; 760 A). The best
+   character of last week's Punkty Sławy has its name in bright gold with a
+   soft glow and a solid line under it wherever names show (ui.js
+   framedName), over its frame's colour: apart from the other names, which
+   are gold already, as the best guild's tag (380 C). The Sława part of the
+   Społeczność: the character's points large, its reward in the System's
+   look, the week's tables as the Ranking's, and "Za co Sława" as a list of
+   each source and its points, the words wrapping on a narrow phone. */
+.name--fame {
+  color: var(--champion-gold);
+  text-decoration-color: rgba(247, 211, 106, 0.85);
+  text-decoration-style: solid;
+  text-shadow: 0 0 6px rgba(247, 211, 106, 0.6), 0 0 1px rgba(247, 211, 106, 0.9);
+}
+
+.fame {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fame-own .card-title,
+.fame-reward .card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fame-own .card-title svg {
+  flex: none;
+  color: var(--champion-gold);
+}
+
+.fame-points {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 8px;
+  margin: 2px 0 0;
+}
+
+.fame-points-number {
+  min-width: 0;
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 32px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.fame-points-noun {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.fame-place {
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 15px;
+}
+
+.fame-left {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.fame-reward {
+  border-color: var(--system-line);
+  background: var(--system-fill);
+}
+
+.fame-reward .card-title {
+  color: var(--system-text);
+}
+
+.fame-reward-line {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.fame-reward .button {
+  align-self: stretch;
+  margin-top: 4px;
+}
+
+.fame-dates {
+  margin: 0;
+  font-size: 14px;
+}
+
+.fame-share-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.fame-share-value svg {
+  flex: none;
+  color: var(--system);
+}
+
+.fame-source-list {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.fame-source {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.fame-source + .fame-source {
+  border-top: 1px solid var(--line);
+}
+
+.fame-source-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.fame-source-points {
+  flex: none;
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.fame-note {
+  margin: 8px 0 0;
+  font-size: 14px;
+}
+
+/* The gap before the own row under the Sława table (screens/fame.js). */
+.fame-week .ranking-gap td {
+  color: var(--text-muted);
+  text-align: center;
+}

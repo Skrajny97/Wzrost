@@ -1,0 +1,98 @@
+{
+  "$comment": "English texts of data/fame.json (src/engine/overlay.js): the Fame Points of the characters, their sources for the list “What earns Fame”, and the words of the Fame tab.",
+  "sources": {
+    "explore": {
+      "label": "Exploration, for every {minutes} minutes"
+    },
+    "elite": {
+      "label": "Elite defeated on an exploration"
+    },
+    "champion": {
+      "label": "Champion defeated on an exploration"
+    },
+    "wanted": {
+      "label": "Wanted poster reward from the headman"
+    },
+    "sweep": {
+      "label": "Portal sweep"
+    },
+    "work": {
+      "label": "Work in the Professions, for every {minutes} minutes"
+    },
+    "avatar": {
+      "label": "System Avatar's work, for every {minutes} minutes"
+    },
+    "daily": {
+      "label": "Daily quest"
+    },
+    "weekly": {
+      "label": "Weekly quest"
+    },
+    "monthly": {
+      "label": "Monthly quest"
+    },
+    "order": {
+      "label": "Settlement order"
+    },
+    "beast": {
+      "label": "Attack on the Guild Beast"
+    },
+    "trial": {
+      "label": "Guild Trial completed"
+    },
+    "upgrade": {
+      "label": "Successful upgrade on the Anvil, up to +{to}"
+    },
+    "upgrade-high": {
+      "label": "Successful upgrade on the Anvil, from +{from}"
+    },
+    "sale": {
+      "label": "Offer sold at the Marketplace"
+    }
+  },
+  "texts": {
+    "lead": "You earn Fame Points for ordinary things you can do again and again. They count from Monday midnight to the end of Sunday.",
+    "how": [
+      "When the week closes, the three best characters of three different players share {pool} by the points they earned. Only the best character of an account gets a reward.",
+      "The best character of the week has a gold name for the whole next week, wherever names show.",
+      "You take the reward here with “Claim”. It waits until you take it.",
+      "With equal points, the older character stands higher.",
+      "Guild Fame is something else: the whole guild earns it, and it shows in the Ranking, on the Guilds tab."
+    ],
+    "sources": "What earns Fame",
+    "notes": [
+      "Explorations and work in the Professions count when you claim the report. An exploration that ends in defeat gives nothing.",
+      "The Towers and new Portal stages give no Fame Points: only things you can repeat count."
+    ],
+    "you": "Your Fame this week",
+    "place": "Place: {place}",
+    "noPoints": "No points yet this week.",
+    "left": "Until the end of the week: {time}",
+    "week": "This week",
+    "last": "Last week",
+    "lastNone": "Nobody earned Fame Points last week.",
+    "empty": "Nobody has earned Fame Points this week yet.",
+    "columns": {
+      "character": "Character",
+      "points": "Fame",
+      "share": "Reward"
+    },
+    "reward": "Fame reward",
+    "rewardLine": "Place {place} in the week of {week}: {share}.",
+    "claim": "Claim",
+    "claimed": "Claimed {share}.",
+    "champion": "Best character of the previous week in Fame",
+    "pointForms": [
+      "point",
+      "points",
+      "points"
+    ],
+    "systemPointForms": [
+      "System Point",
+      "System Points",
+      "System Points"
+    ],
+    "nothing": "You have no Fame reward to claim.",
+    "raced": "The reward changed in the meantime. Try again."
+  }
+}

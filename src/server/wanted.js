@@ -9,8 +9,10 @@
 // done that day and the poster taken (`beaten` once its target fell).
 
 import { questPeriod, wantedOf, wantedPosters, wantedTarget, wantedTrophy, weekCount } from '../engine/index.js';
+import { atomically, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer, settlementBoard } from './characters.js';
 import { content } from './content.js';
+import { sourceFamePoints } from './fame.js';
 import { ApiError, json, readJson } from './http.js';
 import { requireOpen, settlementOf, settlementView } from './settlement.js';
 import { hallRecord } from './trial-hall.js';
@@ -144,11 +146,22 @@ export function wantedAfterHunt(stored, hunt) {
   return record.day === day && !done.includes(sighting.id) ? { ...record, done: [...done, sighting.id] } : null;
 }
 
-async function save(context, session, row, next, extra = { gold: 0, time: 0 }) {
-  const result = await context.env.DB.prepare('UPDATE characters SET gold = gold + ?, time_points = time_points + ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
-    .bind(extra.gold, extra.time, JSON.stringify(next), row.id, row.version)
-    .run();
-  if (result.meta.changes !== 1) throw new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
+// The Osada saved only while the character is as read, with `also`, what
+// comes with the change (a bounty's Punkty Sławy, fame.js), in one batch
+// (atomic.js).
+async function save(context, session, row, next, extra = { gold: 0, time: 0 }, also = []) {
+  const db = context.env.DB;
+  const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
+  const [, result] = await atomically(
+    db,
+    [
+      sameVersion(db, row),
+      db.prepare('UPDATE characters SET gold = gold + ?, time_points = time_points + ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ?').bind(extra.gold, extra.time, JSON.stringify(next), row.id, row.version),
+      ...also,
+    ],
+    changed,
+  );
+  if (result.meta.changes !== 1) throw changed();
   const after = await loadPlayer(context.env.DB, session.userId);
   return { settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now), character: characterView(after, context.now) };
 }
@@ -209,6 +222,6 @@ export async function claimWanted(context) {
     relations: add(stored.relations, rules.resident, rules.relationGain),
     wanted: { ...record, done: taken.id.startsWith(`${day}:`) ? [...done, taken.id] : done, taken: null },
   };
-  const saved = await save(context, session, row, next, { gold: taken.gold, time: rules.timePoints });
+  const saved = await save(context, session, row, next, { gold: taken.gold, time: rules.timePoints }, sourceFamePoints(context.env.DB, row.id, 'wanted', 1, context.now));
   return json({ ...saved, claimed: { gold: taken.gold, timePoints: rules.timePoints, reputation } });
 }

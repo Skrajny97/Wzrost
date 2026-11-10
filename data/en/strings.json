@@ -2609,5 +2609,6 @@
   "Arena zmieniła się w międzyczasie. Spróbuj jeszcze raz.": "The Arena changed in the meantime. Try once more.",
   "Areny jeszcze nie ma.": "There is no Arena yet.",
   "Najwyżej pokonany stopień: {best} z {limit} dostępnych teraz.": "Highest stage won: {best} of {limit} open now.",
-  "{stage} · maks.": "{stage} · max"
+  "{stage} · maks.": "{stage} · max",
+  "nagroda Sławy czeka": "a Fame reward is waiting"
 }

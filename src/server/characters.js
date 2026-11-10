@@ -122,6 +122,7 @@ import { assertion, characterChanged, raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
 import { mercenaryBusy, mercenaryPlace, mercenaryRules, serviceEnded } from './mercenaries.js';
 import { championOf } from './guild-fame.js';
+import { fameNotice } from './fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { guildSeatSql } from './guild-seat.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
@@ -1632,11 +1633,13 @@ export function characterView(player, now) {
 
 // With the tag of last week's best guild, in gold wherever a guild's tag
 // shows (380 C): asking for it the first time in a new week freezes the
-// Sława of the week before (guild-fame.js).
+// Sława of the week before (guild-fame.js). And the Punkty Sławy's best
+// character of last week, its name in gold, with the character's reward
+// waiting (fame.js, 760 A), the week before closed the same way.
 export async function getCharacter(context) {
   const { player } = await requirePlayer(context);
-  const champion = await championOf(context.env.DB, context.now);
-  return json({ character: characterView(player, context.now), championTag: champion?.tag ?? null });
+  const [champion, fame] = await Promise.all([championOf(context.env.DB, context.now), fameNotice(context.env.DB, player.row.id, context.now)]);
+  return json({ character: characterView(player, context.now), championTag: champion?.tag ?? null, fame });
 }
 
 // GET /api/profile/:name: another player's character as everyone may see

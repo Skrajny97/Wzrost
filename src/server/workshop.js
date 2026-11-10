@@ -37,6 +37,7 @@ import { ApiError, json, readJson } from './http.js';
 import { craftingOn } from './features.js';
 import { perkOf } from './perks.js';
 import { addTo, insertWork, requireProfessions, workClaim, workClaimFailed, workGains } from './professions.js';
+import { workFamePoints } from './fame.js';
 import { trimReports } from './reports.js';
 import { say } from '../engine/text.js';
 
@@ -289,6 +290,8 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
         .bind(row.quests, quests, ...sets.binds, ...back.flatMap((each) => each.binds), ...(scroll ? [done] : []), row.id, row.id, activity.started_at),
       // The Próby Gildii's trial too (guild-trials.js).
       ...trialProgress(db, row.id, { made: made.length }, now),
+      // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
+      ...workFamePoints(db, row.id, worked, avatar, now),
       // The items made go to the bag; the room was there at the start.
       ...made.map((item) => insertItem.bind(row.id, JSON.stringify(item), now)),
       end,

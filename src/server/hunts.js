@@ -92,6 +92,7 @@ import { ApiError, json, readJson } from './http.js';
 import { eventDraftsOn, eventsOn, fortressOn, settlementOn } from './features.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { expeditionMinutes } from './guild-expedition.js';
+import { huntFamePoints } from './fame.js';
 import { soldGold } from './inventory.js';
 import { perkOf } from './perks.js';
 import { finishGathering } from './professions.js';
@@ -979,6 +980,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       // minutes for the guild the character is in now, as the report is
       // claimed (621 A), whenever the exploration set out.
       ...expeditionMinutes(db, row.id, credited, now),
+      // The Punkty Sławy of the exploration, a Drużyna's trip too (fame.js):
+      // its minutes and the elites and champions beaten, none for a lost one.
+      ...huntFamePoints(db, row.id, hunt, activity.minutes, now),
       // Bag items the scrapper bought: paid for above, while they were still there.
       ...(soldStored.length > 0
         ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${soldStored.map(() => '?').join(', ')})`).bind(row.id, ...soldStored)]

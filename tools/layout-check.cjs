@@ -75,6 +75,7 @@ const SCREENS = [
   '#/osada/trial-hall',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
+  '#/spolecznosc/slawa',
   '#/gildia',
   '#/gildia/seat',
   '#/gildia/expedition',
@@ -112,6 +113,7 @@ const TRANSLATED = new Set([
   '#/osada/trial-hall',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
+  '#/spolecznosc/slawa',
   '#/gildia',
   '#/gildia/seat',
   '#/gildia/expedition',
@@ -264,6 +266,10 @@ async function main() {
   // The Portale high up, and one entry for the Dziennik's row.
   sql(`UPDATE characters SET portals = '${JSON.stringify({ best: { gold: 100, wood: 99, materials: 95, parts: 12 } })}' WHERE name = '${name}'`);
   if ((await api('POST', '/api/portals/enter', { portal: 'materials' })) >= 400) throw new Error('Nie udało się wejść do Portalu.');
+  // Punkty Sławy of this week in six digits (fame.js), their row made by a
+  // sweep in the week the server counts.
+  if ((await api('POST', '/api/portals/sweep', { portal: 'gold' })) >= 400) throw new Error('Nie udało się wyczyścić Portalu.');
+  sql(`UPDATE fame_points SET points = 123456 WHERE character_id = (SELECT id FROM characters WHERE name = '${name}')`);
   // A guild of its own, with a long name, for the Gildia's tabs.
   if ((await api('POST', '/api/guild/found', { name: `Bractwo Żelaznych ${stamp}`, tag: `W${stamp.slice(-3).toUpperCase()}` })) >= 400) throw new Error('Nie powstała gildia.');
   // The Stół rozbiórki built, with long names and big numbers: three orders
