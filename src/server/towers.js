@@ -90,23 +90,38 @@ function recordOf(row) {
 const entriesUsed = (record, now) => (record.day === questPeriod('daily', now, content()).key ? record.used : 0);
 
 // Who climbs a tower beside the character: in the Wieża Drużyn the other
-// players of its Drużyna as they are (within the class levels' spread, as
-// every party is: parties.js), and its companions in the places left (a
-// wounded one too: the tower takes nobody's HP); in the Wieża Solo nobody.
-// `top` is the highest floor open (one above the highest the character has
-// won in this tower), `missing` why the tower is shut.
+// players of its Drużyna first, as they are (within the class levels'
+// spread, as every party is: parties.js), then its companions in the
+// places left (a wounded one too: the tower takes nobody's HP), up to the
+// most fighters of `size`; in the Wieża Solo nobody. Since 10.11.2026 the
+// character goes in with its companions alone too (the author: „Wieża
+// Drużyn niech będzie możliwa także z towarzyszami.”): the tower asks only
+// for the fewest fighters of `size` on its side, players and companions
+// together, and the fewest players of `members`, itself counted; before,
+// two players of a Drużyna at least, and the companions only filled the
+// places left. The creatures' strength still grows with every fighter
+// (towerFight in the engine). `top` is the highest floor open (one above
+// the highest the character has won in this tower), `missing` why the
+// tower is shut.
 async function climbersFor(db, player, tower) {
   const row = player.row;
   const top = towerTop(recordOf(row).best[tower.id]);
-  if (tower.members[1] === 1) return { partners: [], companions: [], top, missing: null };
-  const party = await partyOf(db, row.id);
+  const [least, most] = tower.size;
+  if (most === 1) return { partners: [], companions: [], top, missing: null };
+  const party = tower.members[1] > 1 ? await partyOf(db, row.id) : null;
   const others = party ? (await Promise.all(party.memberIds.filter((id) => id !== row.id).map((id) => loadCharacter(db, id)))).filter(Boolean) : [];
-  const partners = others.slice(0, tower.members[1] - 1).map((other) => ({ id: other.row.id, name: other.row.name, level: other.row.level, character: engineCharacter(other.row), equipped: equippedItems(other) }));
-  const places = Math.max(0, tower.size - 1 - partners.length);
+  const partners = others.slice(0, Math.min(tower.members[1], most) - 1).map((other) => ({ id: other.row.id, name: other.row.name, level: other.row.level, character: engineCharacter(other.row), equipped: equippedItems(other) }));
+  const places = Math.max(0, most - 1 - partners.length);
   const hired = tower.companions ? (JSON.parse(row.settlement ?? '{}').companions ?? []).filter((companion) => companionReady(companion, true)) : [];
   const companions = hired.slice(0, places);
   const missing =
-    1 + partners.length < tower.members[0] ? t('Do Wieży Drużyn wchodzi się z drużyną: co najmniej {count} postacie graczy. Drużynę założysz w Społeczności.', { count: tower.members[0] }) : null;
+    1 + partners.length < tower.members[0]
+      ? t('Do Wieży Drużyn wchodzi się z drużyną: co najmniej {count} postacie graczy. Drużynę założysz w Społeczności.', { count: tower.members[0] })
+      : 1 + partners.length + companions.length < least
+        ? t('Do Wieży Drużyn nie wchodzi się w pojedynkę: obok Ciebie musi walczyć co najmniej {count} z graczy Twojej Drużyny albo towarzyszy z Kwater. Drużynę założysz w Społeczności, a towarzysza zwerbujesz w Karczmie w Osadzie.', {
+            count: least - 1,
+          })
+        : null;
   return { partners, companions, top, missing };
 }
 

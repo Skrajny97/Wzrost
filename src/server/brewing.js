@@ -38,7 +38,7 @@ import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
-import { addTo, insertWork, requireProfessions, takeFromBag, workGains } from './professions.js';
+import { addTo, insertWork, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
 import { herbsOf, potionKnown, potionsOf, settlementPointsOf } from './professions-view.js';
 import { perkOf } from './perks.js';
 import { trimReports } from './reports.js';
@@ -126,7 +126,7 @@ export async function startBrewing(context) {
 // the herbs for the rest back in the bag. Stopped before the first potion,
 // it only gives the herbs back and makes no report (null). With `avatar`,
 // the brewing of the Awatar Systemu (avatar.js), whose work brings the
-// potions alone.
+// potions and its share of the XP and of the levels (workGains).
 export async function finishBrewing(db, player, now, { stop = false, avatar = false } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
@@ -206,7 +206,8 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
   let results;
   try {
     results = await db.batch([
-      stillThere,
+      // The work still there and the character as read (workClaim).
+      workClaim(db, row, table, activity),
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'potions', now, JSON.stringify(summary), JSON.stringify(report)),
@@ -223,7 +224,8 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
       end,
     ]);
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE') || raced(error)) throw alreadyDone();
+    if (String(error?.message).includes('UNIQUE')) throw alreadyDone();
+    if (raced(error)) throw await workClaimFailed(db, row, table, activity);
     throw error;
   }
   return { id: results[1].meta.last_row_id, report };

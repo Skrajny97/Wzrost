@@ -2,10 +2,11 @@
 // "Poszukiwani"; the author's 619 B: „nazwane, silniejsze odmiany stworów z
 // tych miejsc” and „wyjęci spod prawa”). Every day the sołtys posts wanted
 // posters for each character: one for the named variant of the creatures of
-// each of a few of its highest open places, and one for an outlaw in one of
-// them. A poster taken brings its target into the explorations of its place
-// (simulateHunt): as strong as the place's elite, by the rules' strength
-// more. Pure: the day and the seed are the server's.
+// each of a few of its highest open places below its newest land
+// (wantedPlaces), and one for an outlaw in one of them. A poster taken
+// brings its target into the explorations of its place (simulateHunt): as
+// strong as the place's elite, by the rules' strength more. Pure: the day
+// and the seed are the server's.
 
 import { monsterCombatant } from './combatant.js';
 import { stackKey } from './crafting.js';
@@ -38,15 +39,36 @@ function poster(day, area, target, content) {
   };
 }
 
+// The places open to a character (`open`, in the game's order) that its
+// posters come from, since 10.11.2026 not those of its newest land, the
+// land (region) of its highest open place, where it has just come and
+// falls at once (the author: „zbalansowanie poszukiwanych pod nowy poziom
+// trudności, zeby nie pokazywało zleceń z ostatniej odblokowanej krainy, bo
+// często tam się wejdzie i od razu padnie”): the places of the lands below
+// it; with no land below it, those of the first land but its newest place,
+// or the only one open.
+export function wantedPlaces(open, content) {
+  if (open.length === 0) return [];
+  const land = (area) => content.regions.findIndex((region) => region.id === area.regionId);
+  const newest = land(open.at(-1));
+  const below = open.filter((area) => land(area) < newest);
+  if (below.length > 0) return below;
+  return open.length > 1 ? open.slice(0, -1) : open;
+}
+
 // The posters of `day` for a character of `classLevel` (`seed`: the
 // character's own; `early`: the place the Sala prób opened for it, if any):
-// from the rules' `places` highest places open to it, `creatures` of them
-// drawn, each with its variant, the highest first, then an outlaw drawn in
-// one of them.
-export function wantedPosters(classLevel, day, seed, content, early = null) {
+// from the rules' `places` highest of its places wantedPlaces gives,
+// `creatures` of them drawn, each with its variant, the highest first, then
+// an outlaw drawn in one of them. `lands` false: a day whose posters were
+// drawn before that rule (its basis kept before 10.11.2026, server
+// wanted.js), from the highest places open of all, so the day's posters
+// stay as they were drawn.
+export function wantedPosters(classLevel, day, seed, content, early = null, { lands = true } = {}) {
   const rules = wantedOf(content);
   if (!rules) return [];
-  const places = content.areas.filter((area) => areaOpenFor(area, classLevel, early, content)).slice(-rules.places);
+  const open = content.areas.filter((area) => areaOpenFor(area, classLevel, early, content));
+  const places = (lands ? wantedPlaces(open, content) : open).slice(-rules.places);
   if (places.length === 0) return [];
   const rng = createRng(`${seed}:${day}:wanted`);
   const order = [...places];
@@ -63,6 +85,30 @@ export function wantedPosters(classLevel, day, seed, content, early = null) {
   const outlaw = content.monstersById[rng.pick(rules.outlaws)];
   return [...creatures, poster(day, rng.pick(places), outlaw, content)];
 }
+
+// The wanted target a Drużyna's trip seeks (src/server/parties.js), since
+// 10.11.2026 (the author: „chcemy zrobić większy focus na drużynę, ergo
+// poszukiwanych powinno moc sie znajdywac nawet w drużynie, szczególnie
+// mając tych samych”): of the posters in hand for the trip's place of those
+// who go (`posters`, one for each, or null), the target most of them hold,
+// a creature's variant or an outlaw in that place; of targets held alike,
+// one drawn from the trip's seed. The target alone, without a poster's id
+// or trophy, which stay each holder's own; null when nobody holds one.
+export function tripWanted(posters, seed) {
+  const held = new Map();
+  for (const poster of posters.filter(Boolean)) {
+    const key = `${poster.areaId}:${poster.monsterId}`;
+    held.set(key, { poster: held.get(key)?.poster ?? poster, count: (held.get(key)?.count ?? 0) + 1 });
+  }
+  if (held.size === 0) return null;
+  const most = Math.max(...[...held.values()].map((one) => one.count));
+  const top = [...held.values()].filter((one) => one.count === most);
+  const { poster } = top.length === 1 ? top[0] : top[createRng(`${seed}:wanted-target`).int(0, top.length - 1)];
+  return { kind: poster.kind, areaId: poster.areaId, monsterId: poster.monsterId, name: poster.name, female: poster.female === true, level: poster.level };
+}
+
+// Whether a poster in hand is for the trip's wanted target (tripWanted).
+export const wantedTarget = (poster, target) => Boolean(poster && target) && poster.areaId === target.areaId && poster.monsterId === target.monsterId;
 
 // The trophy a beaten variant leaves: its creature's material in the first
 // grade of its trophy (encyclopedia.js) the character has not found yet,

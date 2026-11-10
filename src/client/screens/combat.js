@@ -42,7 +42,7 @@ import {
 import { playSound } from '../sound.js';
 import { skipControl, timePoints } from '../time.js';
 import { formatWait, stableNote, stableWait } from '../stable.js';
-import { confirmAction, lockLabel, openSheet, systemPanel, toast, withButton } from '../ui.js';
+import { confirmAction, lockLabel, openSheet, systemLink, systemPanel, toast, withButton } from '../ui.js';
 import { openEvent } from '../event.js';
 import { BUSY, skipLines } from './party.js';
 import { mercenaryChoice, servicePanel } from '../mercenaries.js';
@@ -473,6 +473,7 @@ export function mountCombat(container, { params, navigate }) {
         'div',
         { class: 'stack' },
         partySkips(activity),
+        partyClaimed(activity),
         systemPanel(t('Eksploracja zakończona: {area}, {time}.', { area: activity.areaName, time: formatMinutes(activity.minutes) }), t('Raport czeka na odbiór.'), claim),
       );
     }
@@ -501,6 +502,7 @@ export function mountCombat(container, { params, navigate }) {
       'div',
       { class: 'stack' },
       partySkips(activity),
+      partyClaimed(activity),
       ...(scene ? [scene.element] : []),
       systemPanel(
         t('Eksploracja w toku: {area}, {time}.', { area: activity.areaName, time: formatMinutes(activity.minutes) }),
@@ -976,8 +978,12 @@ export function mountCombat(container, { params, navigate }) {
           // meanwhile. A mercenary chosen stays home, chosen for a plain
           // exploration (mercenaries.js).
           if (along) {
-            const went =
-              answer.went?.length > 0 ? t('Drużyna wyrusza: {names}.', { names: answer.went.join(', ') }) : t('Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.');
+            // With who must first choose in the event of its exploration
+            // (`notes`, parties.js): it stays home.
+            const went = [
+              answer.went?.length > 0 ? t('Drużyna wyrusza: {names}.', { names: answer.went.join(', ') }) : t('Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.'),
+              ...(answer.notes ?? []),
+            ].join(' ');
             toast(mercenary?.chosen() ? `${went} ${character.mercenaries.texts.plainOnly}` : went);
           } else if (hiring) {
             toast(t('{name} idzie z Tobą. Zapłacono {gold} zł.', { name: mercenary.hired().name, gold: formatNumber(mercenary.hired().gold) }));
@@ -1058,6 +1064,14 @@ export function mountCombat(container, { params, navigate }) {
   function partySkips(activity) {
     const lines = skipLines(activity.party?.skips);
     return lines.length > 0 ? systemPanel(...lines) : null;
+  }
+
+  // On a Drużyna's trip that set out with the character's waiting report
+  // claimed (parties.js, since 10.11.2026), the word of it and the way to
+  // that report, in the Dziennik as any other.
+  function partyClaimed(activity) {
+    const claimed = activity.party?.claimed;
+    return claimed ? systemPanel(t('Twój czekający raport został odebrany, gdy drużyna wyruszała.'), systemLink(`#/raport/${claimed.id}`, t('Zobacz raport'))) : null;
   }
 
   // The box "Z drużyną" over "Wyrusz", for a party's leader with members

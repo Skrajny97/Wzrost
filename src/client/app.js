@@ -29,6 +29,7 @@ import { mountPortals } from './screens/portals.js';
 import { mountCommunity } from './screens/community.js';
 import { mountGuildPage } from './screens/guild.js';
 import { checkChat, onActivityEnds, onChatNews } from './chat-news.js';
+import { activityMoved } from './activity-sync.js';
 import { checkOnline, mountOnline } from './online.js';
 import { enableHold } from './hold.js';
 import { renderCreate } from './screens/create.js';
@@ -557,11 +558,14 @@ document.addEventListener('visibilitychange', () => {
 });
 
 // A Drużyna's exploration moved by another member's "Przewiń" (the trip's
-// shared timer, src/server/time.js): the chat's check hears its new end, and
-// the character is fetched again, so the timers and the Walka screen follow.
+// shared timer, src/server/time.js), or one the leader sent the character
+// on (parties.js): the chat's check hears its end, and the character is
+// fetched again whenever it is not the activity the page shows
+// (activity-sync.js), so the timers and the Walka screen follow. Before
+// 10.11.2026 only a trip the page showed already was followed, and a
+// member sent out while its page showed it at home stayed there.
 onActivityEnds((endsAt) => {
-  const activity = state.character?.activity;
-  if (!activity?.party || endsAt === null || endsAt === activity.endsAt) return;
+  if (!state.character || !activityMoved(state.character.activity, endsAt)) return;
   call('GET', '/api/character').catch(() => {});
 });
 

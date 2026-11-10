@@ -508,7 +508,7 @@ describe('the Wieże through the API', () => {
     assert.equal(await stays('old-tower-1'), true);
   });
 
-  test('the Wieża Drużyn needs a Drużyna of two players; its floors open as the character entering climbs them', async () => {
+  test('the Wieża Drużyn is shut to one alone (companions too: party-tower-companions.test.js); with a Drużyna its floors open as the character entering climbs them', async () => {
     const shut = await enter('wspinacz', { tower: 'party', floor: 1 });
     assert.equal(shut.data.error.code, 'no_party');
     await player('druh', 'Druh', 55);

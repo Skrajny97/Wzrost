@@ -1412,6 +1412,21 @@ function checkTowers(data) {
   if (unlock && unlock.level !== data.towers.firstFloorLevel) {
     errors.push(`towers.json: firstFloorLevel ${data.towers.firstFloorLevel} różny od poziomu odblokowania Wież (${unlock.level}, unlocks.json)`);
   }
+  // Who climbs (src/server/towers.js, climbersFor): `members` the players,
+  // the character entering counted, `size` all the fighters on its side,
+  // players and companions together, each from the fewest to the most. The
+  // players fit among the fighters, and without companions the fighters
+  // are the players alone (the Wieża Drużyn with companions alone since
+  // 10.11.2026: size [2, 3], members [1, 3]).
+  for (const tower of data.towers.towers) {
+    const [fewest, most] = tower.members;
+    const [least, largest] = tower.size;
+    if (fewest > most) errors.push(`towers.json: ${tower.id}: members od ${fewest} do ${most}`);
+    if (least > largest) errors.push(`towers.json: ${tower.id}: size od ${least} do ${largest}`);
+    if (most > largest) errors.push(`towers.json: ${tower.id}: members[1] (${most}) większe niż size[1] (${largest})`);
+    if (fewest > least) errors.push(`towers.json: ${tower.id}: members[0] (${fewest}) większe niż size[0] (${least})`);
+    if (!tower.companions && (least !== fewest || largest !== most)) errors.push(`towers.json: ${tower.id}: bez towarzyszy size musi być równe members`);
+  }
   return errors;
 }
 

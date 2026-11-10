@@ -4,11 +4,11 @@
 // met on the explorations of its place (hunts.js), and the bounty claimed
 // from the sołtys once it has fallen. The Osada's record keeps `wanted`:
 // the day, what the day's posters are drawn from (`basis`: the class level
-// and the place the Sala prób opened, as the day's first look found them),
-// the posters done that day and the poster taken (`beaten` once its target
-// fell).
+// and the place the Sala prób opened, as the day's first look found them,
+// and `lands` once drawn without the newest land, 10.11.2026), the posters
+// done that day and the poster taken (`beaten` once its target fell).
 
-import { questPeriod, wantedOf, wantedPosters, wantedTrophy } from '../engine/index.js';
+import { questPeriod, wantedOf, wantedPosters, wantedTarget, wantedTrophy } from '../engine/index.js';
 import { characterView, loadPlayer, requirePlayer, settlementBoard } from './characters.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
@@ -22,20 +22,22 @@ const today = (now) => questPeriod('daily', now, content()).key;
 // (wantedToKeep), so a class level or a place the Sala prób opens later that
 // day hangs no new ones (the code review: a place opened after the day's
 // four bounties brought more); without a basis kept for the day, it is the
-// character as it is now.
+// character as it is now. A basis drawn since 10.11.2026 says so (`lands`):
+// its posters leave out the newest land (wantedPlaces in the engine), while
+// a day drawn before keeps the posters it was drawn with.
 function recordOf(row, stored, day) {
   const record = stored.wanted ?? {};
   const same = record.day === day;
   return {
     day,
-    basis: same && record.basis ? record.basis : { classLevel: row.class_level, early: hallRecord(row).early },
+    basis: same && record.basis ? record.basis : { classLevel: row.class_level, early: hallRecord(row).early, lands: true },
     done: same ? (record.done ?? []) : [],
     taken: record.taken ?? null,
   };
 }
 
 // The day's posters, from the record's basis.
-const postersOf = (row, record) => wantedPosters(record.basis.classLevel, record.day, row.id, content(), record.basis.early);
+const postersOf = (row, record) => wantedPosters(record.basis.classLevel, record.day, row.id, content(), record.basis.early, { lands: record.basis.lands === true });
 
 // The record the Osada's first look of a day keeps (getSettlement in
 // settlement.js), as the Koło Fortuny keeps its pool's basis; null when the
@@ -106,6 +108,23 @@ export function wantedGoing(row, stored, area) {
   if (!wantedOf(content()) || !taken || taken.beaten || taken.areaId !== area.id) return null;
   const trophy = taken.kind === 'creature' ? wantedTrophy(taken.monsterId, JSON.parse(row.discovered ?? '{}'), content()) : null;
   return { id: taken.id, kind: taken.kind, areaId: taken.areaId, monsterId: taken.monsterId, name: posterName(taken), female: taken.female, level: taken.level, ...(trophy && { trophy }) };
+}
+
+// The wanted target of a Drużyna's trip for one member's claim (hunts.js:
+// finishHunt), as simulateHunt takes it (the author, 10.11.2026: „chcemy
+// zrobić większy focus na drużynę, ergo poszukiwanych powinno moc sie
+// znajdywac nawet w drużynie, szczególnie mając tych samych”): the trip's
+// target as the trip keeps it, so it is the same foe in every member's
+// fights, its name in the claim's language; with the id and the trophy of
+// the member's own poster in hand for it (kept with its exploration at the
+// start), which the target's fall fulfils, or, held by others only, as a
+// foe (`own` false), paid as its fight is and nothing more. Null when the
+// trip seeks none (tripWanted in the engine; parties.js).
+export function wantedOnTrip(trip, options) {
+  const target = trip.encounter?.wanted;
+  if (!wantedOf(content()) || !target) return null;
+  const own = wantedTarget(options.wanted, target) ? options.wanted : null;
+  return { ...target, name: posterName(target), ...(own ? { id: own.id, ...(own.trophy && { trophy: own.trophy }) } : { own: false }) };
 }
 
 // The Osada's record after an exploration whose wanted target fell: the

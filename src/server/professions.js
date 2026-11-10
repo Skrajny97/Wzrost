@@ -26,7 +26,7 @@ import { content } from './content.js';
 import { bagPlaces, characterView, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { professionsOn } from './features.js';
-import { assertion, raced } from './atomic.js';
+import { assertion, characterChanged, raced } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { herbsOf } from './professions-view.js';
@@ -51,24 +51,52 @@ export function addTo(column, amounts) {
 // What `minutes` of a profession's work give the character: the XP and the
 // level it brings, the profession's new level and, at a new level, full HP;
 // and what the claim sets for that. The Awatar Systemu's work (`avatar`)
-// gives none of it.
+// gives avatar.share of it since 10.11.2026, as if the character had done
+// the work: that share of the profession's XP (its minutes) and of the
+// character's XP, each rounded, with the levels, the HP and the Time
+// Points they bring (the author: „Awatar niech od teraz daje 1/4 tego co
+// zdobyłaby postać - XPa i wpływ na level Profesji w podobnej ilości - tak
+// jakby gracz robił te czynności. Tak, pamiętam pierwotne założenia, ale
+// wszystko ewoluuje.”); before, none of it. All of it is computed from
+// the row read, so a claim saves it only while the row is as read
+// (workClaim).
 export function workGains(player, profession, before, minutes, avatar, now) {
   const { row } = player;
   const character = engineCharacter(row);
-  const after = avatar ? before : workProfession(profession, before, minutes);
-  const xp = avatar ? 0 : workXp(row.level, minutes, content());
+  const share = avatar ? content().avatar.share : 1;
+  const after = workProfession(profession, before, Math.round(minutes * share));
+  const xp = Math.round(workXp(row.level, minutes, content()) * share);
   const work = applyWork(character, xp, content());
   // A new level heals fully; otherwise resting simply goes on.
   const levelled = { ...character, level: work.level, xp: work.xp };
   const hp = work.levelled ? playerCombatant({ character: levelled, equipped: equippedItems(player), name: row.name }, content()).maxHp : null;
   const professions = { ...character.professions, [profession.id]: { level: after.level, xp: after.xp } };
-  const sets = avatar
-    ? { sql: '', binds: [] }
-    : {
-        sql: `, level = ?, xp = ?, time_points = time_points + ?, professions = ?${hp === null ? '' : ', hp = ?, hp_at = ?'}`,
-        binds: [work.level, work.xp, work.timePoints, JSON.stringify(professions), ...(hp === null ? [] : [hp, now])],
-      };
+  const sets = {
+    sql: `, level = ?, xp = ?, time_points = time_points + ?, professions = ?${hp === null ? '' : ', hp = ?, hp_at = ?'}`,
+    binds: [work.level, work.xp, work.timePoints, JSON.stringify(professions), ...(hp === null ? [] : [hp, now])],
+  };
   return { character, after, xp, work, sets };
+}
+
+// The head of the batch of a work's claim that brings a report (atomic.js):
+// the work is still there in `table` and the character's row is as read.
+// The claim writes the character's level, XP and professions as workGains
+// computed them from that row, and since 10.11.2026 its Awatar's claim
+// writes them too, so neither claim may undo what the other or an entry of
+// the Wieże gave meanwhile; a retry claims anew.
+export const workClaim = (db, row, table, activity) =>
+  assertion(db, `EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ?) AND (SELECT version FROM characters WHERE id = ?) = ?`, [
+    row.id,
+    activity.started_at,
+    row.id,
+    row.version,
+  ]);
+
+// Why such a claim failed on its head: the work claimed or called back by
+// another request a moment ago, or the character changed meanwhile.
+export async function workClaimFailed(db, row, table, activity) {
+  const still = await db.prepare(`SELECT 1 AS found FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at).first();
+  return still ? characterChanged() : new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
 }
 
 // The start of a work that takes things from the bag or the camp (brewing.js,
@@ -155,7 +183,8 @@ export async function startGathering(context) {
 
 // The report of a finished gathering (claimHunt sends a gathering here), of
 // the character or, with `avatar`, of its Awatar Systemu (avatar.js), whose
-// work brings the herbs alone.
+// work brings the herbs and its share of the XP and of the levels
+// (workGains).
 export async function finishGathering(db, player, now, { avatar = false } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
@@ -195,8 +224,9 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
   try {
     results = await db.batch([
       // Only while the gathering is still there (atomic.js): one called
-      // back a moment ago brings no report (the code review).
-      assertion(db, `EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ?)`, [row.id, activity.started_at]),
+      // back a moment ago brings no report (the code review); and while the
+      // character is as read (workClaim).
+      workClaim(db, row, table, activity),
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'herbs', now, JSON.stringify(summary), JSON.stringify(report)),
@@ -210,7 +240,8 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE') || raced(error)) throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+    if (String(error?.message).includes('UNIQUE')) throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+    if (raced(error)) throw await workClaimFailed(db, row, table, activity);
     throw error;
   }
   return { id: results[1].meta.last_row_id, report };

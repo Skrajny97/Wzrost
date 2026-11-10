@@ -1,11 +1,13 @@
 // Awatar Systemu: bought once for gold on the Profesje tab, it does one
 // profession's work at a time beside the character, with the character's
-// levels of the professions, and brings no XP and no levels.
+// levels of the professions, and brings a quarter of the XP and of the
+// profession's progress the character's own work would (10.11.2026; before,
+// none: avatar-share.test.js).
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { notificationsDue } from '../src/engine/index.js';
+import { notificationsDue, workProfession, workXp } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -47,7 +49,7 @@ describe('Awatar Systemu', () => {
     assert.equal((await buy()).data.error.code, 'owned');
   });
 
-  test('gathers herbs while the character explores, and brings them without XP or levels', async () => {
+  test('gathers herbs while the character explores, and brings them with a quarter of the XP and of the profession\'s progress', async () => {
     await bought();
     assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 1 } })).status, 201);
     assert.equal((await gather({ herbs: ['comfrey'], minutes: 60 })).data.error.code, 'busy');
@@ -67,13 +69,13 @@ describe('Awatar Systemu', () => {
     const { report, character: after } = claimed.data;
     assert.equal(report.kind, 'herbs');
     assert.equal(report.avatar, true);
-    assert.equal(report.summary.xp, 0);
+    assert.equal(report.summary.xp, Math.round(workXp(10, 60, content) * content.avatar.share));
     assert.equal(report.profession.levelAfter, 1);
     const found = report.herbs.find((herb) => herb.id === 'comfrey').count;
     assert.ok(found > 0);
     assert.equal(after.herbs.find((herb) => herb.id === 'comfrey').count, found);
-    assert.equal(after.xp, 0);
-    assert.deepEqual([after.professions.list[0].level, after.professions.list[0].xp], [1, 0]);
+    assert.equal(after.xp, report.summary.xp);
+    assert.deepEqual([after.professions.list[0].level, after.professions.list[0].xp], [1, Math.round(60 * content.avatar.share)]);
     assert.equal(after.professions.avatar.activity, null);
     assert.equal(after.activity.kind, 'hunt');
     assert.equal((await call('POST', '/api/avatar/claim', { cookie })).status, 409);
@@ -100,7 +102,7 @@ describe('Awatar Systemu', () => {
     assert.equal(report.kind, 'potions');
     assert.equal(report.avatar, true);
     assert.equal(report.potion.count, 10 + report.potion.bonus);
-    assert.equal(report.summary.xp, 0);
+    assert.equal(report.summary.xp, Math.round(workXp(10, 100, content) * content.avatar.share));
     assert.equal(after.potions[0].count, report.potion.count);
     assert.equal(after.professions.list[1].level, 1);
     assert.equal(after.activity.kind, 'herbs');
@@ -118,7 +120,8 @@ describe('Awatar Systemu', () => {
     const after = stopped.data.character;
     assert.equal(after.professions.avatar.activity, null);
     assert.deepEqual(after.herbs.map((herb) => [herb.id, herb.count]), [['comfrey', 24]]);
-    assert.equal(after.xp, 0);
+    // The share of the 25 minutes worked.
+    assert.equal(after.xp, Math.round(workXp(10, 25, content) * content.avatar.share));
     // A gathering called back brings nothing.
     await gather({ herbs: ['comfrey'], minutes: 60, avatar: true });
     const back = await call('POST', '/api/avatar/cancel', { cookie });
@@ -139,9 +142,9 @@ describe('Awatar Systemu', () => {
     const { report, character: after } = (await call('POST', '/api/avatar/claim', { cookie })).data;
     assert.equal(report.kind, 'items');
     assert.equal(report.avatar, true);
-    assert.equal(report.summary.xp, 0);
+    assert.equal(report.summary.xp, Math.round(workXp(15, report.minutes, content) * content.avatar.share));
     assert.equal(after.bag.length, report.items.length);
-    assert.equal(after.professions.list[2].level, 1);
+    assert.equal(after.professions.list[2].level, workProfession(content.professionsById.crafting, { level: 1, xp: 0 }, Math.round(report.minutes * content.avatar.share)).level);
   });
 
   test('the phone hears of the end of its work under its own title', () => {

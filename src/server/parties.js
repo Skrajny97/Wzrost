@@ -23,7 +23,12 @@
 // An exploration of the party: every member free now (its character played,
 // at home, with nothing going on) goes with the leader to the place and for
 // the length the leader chose, if each of them has them open; the others
-// stay in the party and go the next time they are free. Each one gets
+// stay in the party and go the next time they are free. Since 10.11.2026 a
+// member whose exploration or work has ended goes too: its report is
+// claimed first, as its own "Odbierz raport" would claim it (claimForTrip;
+// the author: „Koniecznie musimy zrobić jakieś obejście odbierania raportu
+// przez każdego członka drużyny zanim wyruszy się w kolejną wyprawę.”).
+// Each one gets
 // an exploration of its own (hunts.js), with the others fighting beside it
 // as they are when they set out, and its own report and finds. The
 // explorations of one trip share their timer: a "Przewiń" of any of them
@@ -38,16 +43,16 @@
 // (companionStays in the engine), also one of a character that was in a
 // party before this rule came.
 
-import { areaFor, areaOpenFor, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyRefusal } from '../engine/index.js';
-import { characterView, currentHp, earlyAreaOf, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer } from './characters.js';
+import { areaFor, areaOpenFor, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyRefusal, tripWanted, wantedTarget } from '../engine/index.js';
+import { characterView, currentHp, earlyAreaOf, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer, settleCharacter } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf, wayLook } from './cosmetics.js';
 import { settlementOn } from './features.js';
 import { guildTagSql } from './guilds.js';
-import { beginHunt } from './hunts.js';
+import { beginHunt, finishActivity } from './hunts.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
-import { t } from './i18n.js';
+import { accountLanguage, runInLanguage, t } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 // The most invitations one party may have waiting.
@@ -133,12 +138,19 @@ export async function partyOf(db, characterId) {
   return { id: row.id, leaderId: row.leader_id, memberIds: list.filter((member) => !apart.includes(member)).map((member) => member.id) };
 }
 
+// Whether a member's activity has ended with a report to claim: an
+// exploration or a profession's work, not a mercenary's offer or service,
+// whose close waits in the Karczma (mercenaries.js).
+const reportWaits = (kind, endsAt, now) => kind !== 'mercenary' && endsAt <= now;
+
 // A member's state for the party's list: free (its character played and at
-// home), away (on an exploration), working (at a profession's work) or
-// aside (its player plays another character). Only the free go along.
-function memberStatus(row) {
+// home, or back with its report waiting, which the party's setting out
+// claims: partyHunt), away (on an exploration), working (at a profession's
+// work) or aside (its player plays another character). Only the free go
+// along.
+function memberStatus(row, now) {
   if (row.role !== 'player') return 'aside';
-  if (!row.activity) return 'free';
+  if (!row.activity || reportWaits(row.activity, row.activity_ends, now)) return 'free';
   return row.activity === 'hunt' ? 'away' : 'working';
 }
 
@@ -155,7 +167,7 @@ export async function partyView(db, characterId, now) {
     db
       .prepare(
         `SELECT c.id, c.name, c.class_id, c.level, c.class_level, c.role, c.settlement, c.cosmetics, u.seen_at, ${guildTagSql('c.id')} AS guild_tag,
-                (SELECT a.kind FROM activities a WHERE a.character_id = c.id) AS activity
+                (SELECT a.kind FROM activities a WHERE a.character_id = c.id) AS activity, (SELECT a.ends_at FROM activities a WHERE a.character_id = c.id) AS activity_ends
          FROM party_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id
          WHERE m.party_id = ? ORDER BY m.joined_at, m.character_id`,
       )
@@ -183,7 +195,7 @@ export async function partyView(db, characterId, now) {
     classLevel: row.class_level,
     leader: row.id === party?.leaderId,
     own: row.id === characterId,
-    status: memberStatus(row),
+    status: memberStatus(row, now),
     online: row.role === 'player' && (row.seen_at ?? 0) >= now - onlineSeconds * 1000,
     mount: mountOfRow(row),
   }));
@@ -404,12 +416,48 @@ function snapshot(member, now) {
   return { id: member.row.id, name: member.row.name, character: engineCharacter(member.row), equipped: equippedItems(member), hp: currentHp(member, now).hp };
 }
 
+// The report of a member whose exploration or work has ended, claimed as
+// its party sets out, exactly as its own "Odbierz raport" would claim it
+// (finishActivity in hunts.js): after what every request of its player
+// settles first, in its account's language, with its rewards, the potions
+// used up, the quests and all, the report in its Dziennik as any other.
+// Gives { member } as it is after it, with { report } (the report's id and
+// kind) unless the work made none; { event } when its exploration ends in
+// an event, which waits for the member's own choice (nothing is saved);
+// {} when the member is still not free. A claim that failed because the
+// member claimed it at the same moment, or changed meanwhile, is fine: the
+// member is read again, and goes if free by then.
+async function claimForTrip(db, member, now) {
+  const id = member.row.id;
+  const user = await db.prepare('SELECT language FROM users WHERE id = ?').bind(member.row.user_id).first();
+  try {
+    return await runInLanguage(accountLanguage(user?.language), async () => {
+      await settleCharacter(db, member, now);
+      // Its player went over to another character meanwhile.
+      if (member.row.id !== id || !member.activity) return {};
+      const kind = member.activity.kind;
+      const done = await finishActivity(db, member, now);
+      if (done?.event) return { event: true };
+      const after = await loadCharacter(db, id);
+      return after?.row.role === 'player' ? { member: after, report: done ? { id: done.id, kind } : null } : {};
+    });
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    const again = await loadCharacter(db, id);
+    return again?.row.role === 'player' && !again.activity ? { member: again } : {};
+  }
+}
+
 // POST /api/party/hunt { areaId, minutes, ... as "Wyrusz" }: the leader
-// sends the party out. The members free now go; each of them, the leader
-// too, must have the place and the length open, so the party goes only as
-// far and as long as its lowest member may, and waits as long as its slowest
+// sends the party out. The members free now go, and those back with their
+// report waiting, claimed first (claimForTrip) once the leader is on its
+// way; one whose exploration ends in an event stays home, and the answer
+// says it must choose there first (`notes`). Each of them, the leader too,
+// must have the place and the length open, so the party goes only as far
+// and as long as its lowest member may, and waits as long as its slowest
 // mount (the Stajnia, 327 A). The leader's choices of potions and tracking
-// are its own; the others go without them.
+// are its own; the others go without them. A member busy with something
+// still running is left alone, its activity untouched.
 export async function partyHunt(context) {
   const { session, player } = await requireIdlePlayer(context);
   requireUnlocked(player.row);
@@ -420,7 +468,7 @@ export async function partyHunt(context) {
   if (!party) throw new ApiError(409, 'no_party', 'Nie masz drużyny.');
   if (party.leaderId !== player.row.id) throw new ApiError(403, 'not_leader', 'Na wyprawę drużynę wysyła lider.');
   const others = (await Promise.all(party.memberIds.filter((id) => id !== player.row.id).map((id) => loadCharacter(db, id)))).filter(Boolean);
-  const going = others.filter((other) => other.row.role === 'player' && !other.activity);
+  const going = others.filter((other) => other.row.role === 'player' && (!other.activity || reportWaits(other.activity.kind, other.activity.ends_at, now)));
   if (going.length === 0) throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
   const area = typeof body.areaId === 'string' ? areaFor(body.areaId, player.row.level, content()) : undefined;
   if (!area) throw new ApiError(400, 'invalid_area', 'Wybierz miejsce wyprawy.');
@@ -437,17 +485,31 @@ export async function partyHunt(context) {
   const mount = Math.min(...everyone.map((member) => mountOfRow(member.row)));
   const shots = new Map(everyone.map((member) => [member.row.id, snapshot(member, now)]));
   const names = everyone.map((member) => member.row.name);
-  const partnersOf = (member, list) => list.filter((other) => other !== member).map((other) => shots.get(other.row.id));
+  const partnersOf = (member, list) => list.filter((other) => other.row.id !== member.row.id).map((other) => shots.get(other.row.id));
   // `trip` marks the explorations of this setting out, for their shared
   // timer (time.js).
   const party_ = { id: party.id, leader: player.row.name, names, trip: now };
   // The leader first, with its own choices checked there (potions, the
-  // healing mark, tracking), so a wrong one sends nobody (the code review);
-  // then the members, each without the leader's choices. One that got busy
-  // meanwhile stays home.
+  // healing mark, tracking), so a wrong one sends nobody (the code review)
+  // and claims nobody's report; then the members, each without the
+  // leader's choices, one back from its exploration or work with its report
+  // claimed first, as it is after that (its snapshot too). One that got
+  // busy meanwhile stays home, and so does one whose exploration's event
+  // waits for its choice.
   const setups = new Map([[player.row.id, await beginHunt(db, player, body, now, { party: party_, partners: partnersOf(player, everyone), mount })]]);
   const went = [];
-  for (const member of going) {
+  const choosing = [];
+  const claimed = new Map();
+  for (const listed of going) {
+    let member = listed;
+    if (member.activity) {
+      const done = await claimForTrip(db, member, now);
+      if (done.event) choosing.push(member.row.name);
+      if (!done.member) continue;
+      member = done.member;
+      if (done.report) claimed.set(member.row.id, done.report);
+      shots.set(member.row.id, snapshot(member, now));
+    }
     try {
       const setup = await beginHunt(db, member, { areaId: area.id, minutes: body.minutes, avoidRare: body.avoidRare === true, seekRare: body.seekRare === true && body.avoidRare !== true }, now, {
         party: party_,
@@ -471,13 +533,25 @@ export async function partyHunt(context) {
   // alone goes as on its own.
   const actual = [player, ...went];
   const lead = setups.get(player.row.id);
+  const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
+  // The wanted target the trip seeks (since 10.11.2026; the author:
+  // „chcemy zrobić większy focus na drużynę, ergo poszukiwanych powinno moc
+  // sie znajdywac nawet w drużynie, szczególnie mając tych samych”): of the
+  // posters in hand for its place of those who went, the one most of them
+  // hold, drawn from the trip's seed among those held alike (tripWanted in
+  // the engine). Its fights may meet it as an exploration meets a poster's
+  // target; every holder of a poster for it fulfils its own when it falls,
+  // and the others fight it as a strong foe (wanted.js: wantedOnTrip). A
+  // member keeps its poster with its exploration only for that target, so
+  // one for another is not carried and may be given back on the way.
+  const target = tripWanted(actual.map((member) => setups.get(member.row.id).wanted), seed);
   const crew = {
     ...party_,
     names: actual.map((member) => member.row.name),
     // How each looks on the way, for the others' Walka scene (640 A;
     // cosmetics.js).
     looks: actual.map((member) => ({ id: member.row.id, name: member.row.name, ...wayLook(member.row) })),
-    seed: toHex(crypto.getRandomValues(new Uint8Array(16))),
+    seed,
     roster: actual.map((member) => {
       const setup = setups.get(member.row.id);
       return { ...shots.get(member.row.id), windows: setup.windows, trophies: setup.trophies, ...(member === player && { potions: setup.taken, healBelow: setup.healBelow }) };
@@ -491,20 +565,34 @@ export async function partyHunt(context) {
       tracked: lead.tracked,
       unknown: lead.unknown,
       met: JSON.parse(player.row.met ?? '[]'),
+      ...(target && { wanted: target }),
     },
   };
+  // A member whose report was claimed for this trip keeps where it is
+  // (`claimed`), for its Walka to tell it and open it.
   const trip = `json_extract(options, '$.party.trip') = ? AND json_extract(options, '$.party.id') = ?`;
   await db.batch(
-    actual.map((member) =>
-      went.length > 0
+    actual.map((member) => {
+      const report = claimed.get(member.row.id);
+      const poster = setups.get(member.row.id).wanted;
+      const other = Boolean(poster) && !wantedTarget(poster, target);
+      return went.length > 0
         ? db
-            .prepare(`UPDATE activities SET options = json_remove(json_set(options, '$.party', json(?)), '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`)
-            .bind(JSON.stringify(crew), member.row.id, now, party.id)
-        : db.prepare(`UPDATE activities SET options = json_remove(options, '$.party', '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`).bind(member.row.id, now, party.id),
-    ),
+            .prepare(
+              `UPDATE activities SET options = json_remove(json_set(options, '$.party', json(?)${report ? ", '$.claimed', json(?)" : ''}), '$.partners'${other ? ", '$.wanted'" : ''}) WHERE character_id = ? AND kind = 'hunt' AND ${trip}`,
+            )
+            .bind(JSON.stringify(crew), ...(report ? [JSON.stringify(report)] : []), member.row.id, now, party.id)
+        : db.prepare(`UPDATE activities SET options = json_remove(options, '$.party', '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`).bind(member.row.id, now, party.id);
+    }),
   );
   return json(
-    { character: characterView(await loadPlayer(db, session.userId), now), ...(await partyView(db, player.row.id, now)), went: went.map((member) => member.row.name) },
+    {
+      character: characterView(await loadPlayer(db, session.userId), now),
+      ...(await partyView(db, player.row.id, now)),
+      went: went.map((member) => member.row.name),
+      // Those whose exploration ended in an event: it waits for their choice.
+      notes: choosing.map((name) => t('{name} musi najpierw wybrać w zdarzeniu z poprzedniej wyprawy.', { name })),
+    },
     201,
   );
 }

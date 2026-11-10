@@ -238,7 +238,15 @@ export async function requirePlayer(context) {
   const session = await requirePlayable(context);
   const player = await loadPlayer(context.env.DB, session.userId);
   if (!player) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
-  await settleBuilds(context.env.DB, player, context.now);
+  await settleCharacter(context.env.DB, player, context.now);
+  return { session, player };
+}
+
+// What every request of the player settles first, of what time brought
+// (requirePlayer); also for a Drużyna's member whose report its party's
+// setting out claims, as its own "Odbierz raport" would (parties.js).
+export async function settleCharacter(db, player, now) {
+  await settleBuilds(db, player, now);
   // The Zbieracz Systemu collects here, where every request of the player
   // settles what time brought: so GET /api/character and every action see
   // the stores collected, and the answers built from a character read again
@@ -246,12 +254,11 @@ export async function requirePlayer(context) {
   // other side of a Wymiana, and loadCharacter the members of a Drużyna:
   // their stores wait for their own requests. After the builds, as a build
   // that began meanwhile took its store along at its start.
-  await settleCollector(context.env.DB, player, context.now);
-  await settleTimePoints(context.env.DB, player.row, context.now);
-  await settleTable(context.env.DB, player, context.now);
-  await settleQuests(context.env.DB, player, context.now);
-  await settleDiscoveries(context.env.DB, player, context.now);
-  return { session, player };
+  await settleCollector(db, player, now);
+  await settleTimePoints(db, player.row, now);
+  await settleTable(db, player, now);
+  await settleQuests(db, player, now);
+  await settleDiscoveries(db, player, now);
 }
 
 // The Encyklopedia's record with what the character holds now: its items,
@@ -1324,6 +1331,9 @@ function activityView(activity, level, now) {
           // the character in the Walka scene (640 A). A trip that set out
           // before 0.1.69 has none.
           walkers: (options.party.looks ?? []).filter((look) => look.id !== activity.character_id).map(({ id, ...look }) => look),
+          // The report that waited, claimed as the party set out
+          // (parties.js), for the Walka to tell and open: { id, kind }.
+          ...(options.claimed && { claimed: options.claimed }),
         },
       }),
       // The companions from the Kwatery who went along, as the exploration

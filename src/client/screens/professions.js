@@ -629,7 +629,7 @@ export function mountProfessions(container, { params, navigate }) {
         const button = event.currentTarget;
         const sure = await confirmAction({
           title: t('Przerwać zbieranie?'),
-          text: avatar ? t('Awatar wróci od razu, bez ziół.') : t('Postać wróci od razu, bez ziół i bez doświadczenia.'),
+          text: avatar ? t('Awatar wróci od razu, bez ziół i bez doświadczenia.') : t('Postać wróci od razu, bez ziół i bez doświadczenia.'),
           confirmLabel: t('Przerwij'),
           danger: true,
         });
@@ -1601,7 +1601,7 @@ export function mountProfessions(container, { params, navigate }) {
         const button = event.currentTarget;
         const sure = await confirmAction({
           title: t('Przerwać kopanie?'),
-          text: avatar ? t('Awatar wróci od razu, bez urobku.') : t('Postać wróci od razu, bez urobku, złota i doświadczenia.'),
+          text: avatar ? t('Awatar wróci od razu, bez urobku, złota i doświadczenia.') : t('Postać wróci od razu, bez urobku, złota i doświadczenia.'),
           confirmLabel: t('Przerwij'),
           danger: true,
         });
@@ -1998,21 +1998,23 @@ export function mountProfessions(container, { params, navigate }) {
 }
 
 // The XP, the profession's levels and the Time Points of a work's report.
-// The Awatar Systemu's work brings no XP and no levels.
+// The Awatar Systemu's work names it, and since 10.11.2026 brings its share
+// of the XP and of the levels too (src/server/professions.js, workGains);
+// its report from before, with none, names only it.
 function workSummary(report) {
   const { summary, profession } = report;
-  const rows = report.avatar
-    ? [[t('Wykonawca'), t('Awatar Systemu')]]
-    : [
-        [t('XP postaci'), `+${formatNumber(summary.xp)} XP`],
-        [
-          profession.name,
-          profession.levelAfter > profession.levelBefore
-            ? t('poziom {before} → {after}', { before: profession.levelBefore, after: profession.levelAfter })
-            : t('poziom {level}', { level: profession.levelAfter }),
-        ],
-        summary.timePoints > 0 && [t('Punkty Czasu'), `+${formatNumber(summary.timePoints)}`],
-      ].filter(Boolean);
+  const gains = !report.avatar || summary.xp > 0 || profession.levelAfter > profession.levelBefore;
+  const rows = [
+    report.avatar && [t('Wykonawca'), t('Awatar Systemu')],
+    gains && [t('XP postaci'), `+${formatNumber(summary.xp)} XP`],
+    gains && [
+      profession.name,
+      profession.levelAfter > profession.levelBefore
+        ? t('poziom {before} → {after}', { before: profession.levelBefore, after: profession.levelAfter })
+        : t('poziom {level}', { level: profession.levelAfter }),
+    ],
+    gains && summary.timePoints > 0 && [t('Punkty Czasu'), `+${formatNumber(summary.timePoints)}`],
+  ].filter(Boolean);
   return h(
     'dl',
     { class: 'status-list' },

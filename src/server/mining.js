@@ -9,9 +9,9 @@ import { addQuestProgress, campBonus, campLevels, mineMinerals, miningMinutes, m
 import { content } from './content.js';
 import { characterView, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
-import { assertion, raced } from './atomic.js';
+import { raced } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
-import { addTo, requireProfessions, takeFromBag, workGains } from './professions.js';
+import { addTo, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
 import { mineralsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
 
@@ -69,7 +69,8 @@ export async function startMining(context) {
 
 // The report of a finished digging (claimHunt sends one here), of the
 // character or, with `avatar`, of its Awatar Systemu (avatar.js), whose work
-// brings the minerals and the gold alone. The Górnictwo level of the claim
+// brings the minerals, the gold and its share of the XP and of the levels
+// (workGains). The Górnictwo level of the claim
 // decides the minerals, as the Zielarstwo level decides the herbs.
 export async function finishMining(db, player, now, { avatar = false } = {}) {
   const { row } = player;
@@ -104,8 +105,9 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
   try {
     results = await db.batch([
       // Only while the digging is still there (atomic.js): one called back
-      // a moment ago brings no report.
-      assertion(db, `EXISTS (SELECT 1 FROM ${table} WHERE character_id = ? AND started_at = ?)`, [row.id, activity.started_at]),
+      // a moment ago brings no report; and while the character is as read
+      // (workClaim).
+      workClaim(db, row, table, activity),
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'minerals', now, JSON.stringify(summary), JSON.stringify(report)),
@@ -116,7 +118,8 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE') || raced(error)) throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+    if (String(error?.message).includes('UNIQUE')) throw new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
+    if (raced(error)) throw await workClaimFailed(db, row, table, activity);
     throw error;
   }
   return { id: results[1].meta.last_row_id, report };

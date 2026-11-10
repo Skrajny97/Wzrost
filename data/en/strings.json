@@ -187,7 +187,7 @@
   "Raport czeka na odbiór.": "The report is waiting to be claimed.",
   "Przerwij zbieranie": "Stop gathering",
   "Przerwać zbieranie?": "Stop gathering?",
-  "Awatar wróci od razu, bez ziół.": "The Avatar will come back at once, without herbs.",
+  "Awatar wróci od razu, bez ziół i bez doświadczenia.": "The Avatar will come back at once, without herbs or experience.",
   "Postać wróci od razu, bez ziół i bez doświadczenia.": "The character will come back at once, without herbs or experience.",
   "Przerwij": "Stop",
   "Zbieranie w toku: {herbs}, {time}.": "Gathering under way: {herbs}, {time}.",
@@ -298,7 +298,7 @@
   "Kopanie zakończone: {place}, {time}.": "Digging finished: {place}, {time}.",
   "Przerwij kopanie": "Stop digging",
   "Przerwać kopanie?": "Stop digging?",
-  "Awatar wróci od razu, bez urobku.": "The Avatar will come back at once, without the yield.",
+  "Awatar wróci od razu, bez urobku, złota i doświadczenia.": "The Avatar will come back at once, without the yield, gold or experience.",
   "Postać wróci od razu, bez urobku, złota i doświadczenia.": "The character will come back at once, without the yield, gold or experience.",
   "Kopanie w toku: {place}, {time}.": "Digging under way: {place}, {time}.",
   "Postać {doing}. Praca w Szlifierni możliwa po powrocie.": "The character {doing}. It can work in the Gem Workshop after it returns.",
@@ -2597,5 +2597,9 @@
   "{count} dni temu": "{count} days ago",
   "Nie udało się wczytać Skrzyni Gildii.": "The Guild Chest could not be loaded.",
   "Głośność muzyki": "Music volume",
-  "Wyłącz, żeby słuchać własnej muzyki: gra nie będzie wtedy pobierać ani odtwarzać swojej.": "Turn it off to listen to your own music: the game then neither downloads nor plays its own."
+  "Wyłącz, żeby słuchać własnej muzyki: gra nie będzie wtedy pobierać ani odtwarzać swojej.": "Turn it off to listen to your own music: the game then neither downloads nor plays its own.",
+  "Do Wieży Drużyn nie wchodzi się w pojedynkę: obok Ciebie musi walczyć co najmniej {count} z graczy Twojej Drużyny albo towarzyszy z Kwater. Drużynę założysz w Społeczności, a towarzysza zwerbujesz w Karczmie w Osadzie.": "The Party Tower is never entered alone: at least {count} of your Party's players or of your companions from the Quarters must fight beside you. You can form a Party in the Community and hire a companion in the Tavern in the Settlement.",
+  "{name} musi najpierw wybrać w zdarzeniu z poprzedniej wyprawy.": "{name} must first choose in the event of the previous exploration.",
+  "Twój czekający raport został odebrany, gdy drużyna wyruszała.": "Your waiting report was claimed as the party set out.",
+  "Zobacz raport": "See the report"
 }
