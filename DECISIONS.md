@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.57 (10.11.2026): bez przybliżania strony przez pola na iPhonie
+
+Autor: „Kliknięcie "Co nowego?" będąc w zakładce wojen gildii wykrzacza ekran mocno (przybliża się a oddalenie nie pomaga)”.
+
+1. **Przyczyna.** iPhone przybliża stronę, gdy fokus dostaje pole mniejsze niż 16 px, i zostawia ją przybliżoną. W zakładce „Wojna” na wersji testowej jest lista „Drużyny rywala” z karty „Test wojny”, a miała domyślne 13 px. Po wyborze iPhone zostawia na niej fokus, a okno takie jak „Co nowego?” po zamknięciu oddaje fokus temu polu. Tak samo mała (14 px) była lista katalizatora u Jagny.
+2. **Każde pole ma co najmniej 16 px.** Pola do pisania i listy wyboru bez własnej wielkości mają 16 px (`styles.css`, reguła z `:where`, więc własna wielkość pola wygrywa), a lista katalizatora 16 px zamiast 14 px. Pola z własną wielkością już miały 16 px.
+3. **Okno nie oddaje fokusu polu.** Gdy otwiera się okno gry (`openSheet` w `ui.js`), pole, które ma fokus, najpierw go traci. Po zamknięciu okna telefon nie przybliża więc strony do tego pola i nie otwiera znów klawiatury ani listy.
+
 ## Wersja 0.2.56 (10.11.2026): Pancerz Peruna w Sklepie i poprawka konia
 
 Wszystkie grafiki Pancerza Peruna są przyjęte: portrety (769), chody 775.7 v2 i 775.8 v2, jazda 776.1 i 776.2.

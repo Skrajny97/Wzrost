@@ -2420,7 +2420,8 @@ a.segmented-option {
   background: var(--bg-deep);
   color: var(--text);
   font-family: var(--font-system);
-  font-size: 14px;
+  /* 16 px: a smaller list makes an iPhone zoom the page in. */
+  font-size: 16px;
 }
 
 .anvil .preview-list li {
@@ -3154,6 +3155,15 @@ select,
 label,
 summary {
   touch-action: manipulation;
+}
+
+/* An iPhone zooms the page in on a field smaller than 16 px as soon as it
+   takes the focus, also when a closed sheet gives the focus back, and the
+   page stays zoomed (the author, 10.11.2026: „przybliża się a oddalenie nie
+   pomaga”, with "Test wojny"'s list in the Wojna tab). Every field that
+   takes typing or a choice is 16 px at least; a size of its own wins. */
+:where(input:not([type='checkbox'], [type='radio'], [type='range'], [type='file']), select, textarea) {
+  font-size: 16px;
 }
 
 .duration-step,

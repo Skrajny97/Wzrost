@@ -153,6 +153,11 @@ export function openSheet(...children) {
     ),
   ]);
   if (!dialog.open) {
+    // A field still focused under the sheet (an iPhone keeps a list's focus
+    // after the choice) would get the focus back when the sheet closes: the
+    // phone would zoom to it and open its keyboard or list again.
+    const field = document.activeElement;
+    if (field instanceof HTMLElement && field.matches('input, select, textarea')) field.blur();
     dialog.showModal();
     playSound('open');
   }

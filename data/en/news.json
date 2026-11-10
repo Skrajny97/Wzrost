@@ -440,6 +440,10 @@
     "0.2.56": {
       "title": "Version 0.2.56",
       "body": "- A new outfit in the System Shop: the Armour of Perun for the Warrior. Blackened armour with copper lightning, a wolf fur and a helmet with aurochs horns, on the portrait, on the march and in the saddle, at every evolution and in your character's skin tone.\n- The horse in the Combat scene no longer shows a grey streak above its back that flashed every few steps."
+    },
+    "0.2.57": {
+      "title": "Version 0.2.57",
+      "body": "- On an iPhone the page no longer zooms in by itself after a tap on a list or after a window such as What's new? closes. Every text field and list now has a size at which the phone does not enlarge the page."
     }
   }
 }
