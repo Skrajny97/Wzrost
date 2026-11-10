@@ -61,6 +61,7 @@ import {
   takeConversation,
   takeMention,
 } from '../chat-news.js';
+import { discordButton } from '../discord.js';
 import { language, t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
 import { appendMention, matchingPeople, taggedParts, typedMention, withMention } from '../mentions.js';
@@ -143,7 +144,12 @@ export function mountCommunity(container, context) {
   const body = h('div', { class: 'community-body' });
   const picker = sectionPicker(sections, () => current, show);
   const trade = h('div', { class: 'community-trade' }, tradeBanner());
-  fill(container, pageHeading(t('Społeczność')), picker.element, trade, body);
+  // The Discord mark by the title, opening the game's server by its invite
+  // link, when there is one (the author, 10.11.2026: „Musimy dodać ikonkę
+  // Discorda do gry.”, ../discord.js).
+  const heading = pageHeading(t('Społeczność'));
+  const discord = discordButton();
+  fill(container, discord ? h('div', { class: 'community-heading' }, heading, discord) : heading, picker.element, trade, body);
 
   // The list stays under the top bar while the page scrolls, so it is at
   // hand under a long chat too (styles.css).

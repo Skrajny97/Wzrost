@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Społeczność",
-  "description": "Działy listy rozwijanej Społeczności, Ranking postaci, Znajomi i codzienny Upominek (src/server/community.js).",
+  "description": "Działy listy rozwijanej Społeczności, Ranking postaci, Znajomi, codzienny Upominek (src/server/community.js) i link zaproszenia na serwer Discord (src/client/discord.js).",
   "type": "object",
   "additionalProperties": false,
-  "required": ["sections", "ranking", "friends", "gift", "trade"],
+  "required": ["sections", "ranking", "friends", "gift", "trade", "discord"],
   "properties": {
     "$comment": { "type": "string" },
     "sections": {
@@ -58,6 +58,24 @@
         "rejectionsInRow": { "type": "integer", "minimum": 1 },
         "pauseMinutes": { "type": "integer", "minimum": 1 },
         "maxItems": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "discord": {
+      "description": "Serwer gry na Discordzie: link zaproszenia (pusty, dopóki go nie ma) i słowa przycisku.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["invite", "texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "invite": { "type": "string", "pattern": "^(https://(discord\\.gg|discord\\.com/invite)/[A-Za-z0-9-]+)?$" },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["join"],
+          "properties": {
+            "join": { "type": "string", "minLength": 1 }
+          }
+        }
       }
     }
   },

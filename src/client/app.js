@@ -54,6 +54,7 @@ import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound 
 import { call, filledForCollector, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn, unlockInfo } from './state.js';
 import { offerPointsReset, openEvolutionTests } from './evolution.js';
 import { giftCodeRow } from './gift-code.js';
+import { discordRow } from './discord.js';
 import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, skinSwatches, switchButton, toast, voiceSwitch, withButton } from './ui.js';
 
 const views = {
@@ -903,6 +904,8 @@ function openSettings() {
       lookRow(),
       skinRow(),
       googleRow(),
+      // The game's Discord server, by its invite link (discord.js).
+      discordRow(),
       musicRows(),
       volumeRow('effects-volume', t('Efekty dźwiękowe'), effectsVolume(), setEffectsVolume, () => playSound('system')),
       h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: t('Głos narratora') }), h('dd', {}, voiceSwitch('voice-label'))),

@@ -25,5 +25,12 @@
     "rejectionsInRow": 12,
     "pauseMinutes": 15,
     "maxItems": 10
+  },
+  "discord": {
+    "$comment": "Discord (src/client/discord.js): invite is the game's server invite link (https://discord.gg/… or https://discord.com/invite/…), empty while there is none. With a link, the Discord mark by the Społeczność's title and a Discord row in the Ustawienia open it in a new card; without one, neither shows. texts.join: the words of the row's button and of the mark.",
+    "invite": "",
+    "texts": {
+      "join": "Dołącz do serwera Discord"
+    }
   }
 }
