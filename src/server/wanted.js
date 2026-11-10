@@ -4,9 +4,9 @@
 // met on the explorations of its place (hunts.js), and the bounty claimed
 // from the sołtys once it has fallen. The Osada's record keeps `wanted`:
 // the day, what the day's posters are drawn from (`basis`: the class level
-// and the place the Sala prób opened, as the day's first look found them),
-// the posters done that day and the poster taken (`beaten` once its target
-// fell).
+// and the place the Sala prób opened, as the day's first look found them,
+// and `lands` once drawn without the newest land, 10.11.2026), the posters
+// done that day and the poster taken (`beaten` once its target fell).
 
 import { questPeriod, wantedOf, wantedPosters, wantedTrophy } from '../engine/index.js';
 import { characterView, loadPlayer, requirePlayer, settlementBoard } from './characters.js';
@@ -22,20 +22,22 @@ const today = (now) => questPeriod('daily', now, content()).key;
 // (wantedToKeep), so a class level or a place the Sala prób opens later that
 // day hangs no new ones (the code review: a place opened after the day's
 // four bounties brought more); without a basis kept for the day, it is the
-// character as it is now.
+// character as it is now. A basis drawn since 10.11.2026 says so (`lands`):
+// its posters leave out the newest land (wantedPlaces in the engine), while
+// a day drawn before keeps the posters it was drawn with.
 function recordOf(row, stored, day) {
   const record = stored.wanted ?? {};
   const same = record.day === day;
   return {
     day,
-    basis: same && record.basis ? record.basis : { classLevel: row.class_level, early: hallRecord(row).early },
+    basis: same && record.basis ? record.basis : { classLevel: row.class_level, early: hallRecord(row).early, lands: true },
     done: same ? (record.done ?? []) : [],
     taken: record.taken ?? null,
   };
 }
 
 // The day's posters, from the record's basis.
-const postersOf = (row, record) => wantedPosters(record.basis.classLevel, record.day, row.id, content(), record.basis.early);
+const postersOf = (row, record) => wantedPosters(record.basis.classLevel, record.day, row.id, content(), record.basis.early, { lands: record.basis.lands === true });
 
 // The record the Osada's first look of a day keeps (getSettlement in
 // settlement.js), as the Koło Fortuny keeps its pool's basis; null when the
