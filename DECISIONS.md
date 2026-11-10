@@ -3034,6 +3034,16 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.49 (10.11.2026): Punkty Czasu za złoto u Pustelnika
+
+Autor: „Dodaj w Chacie Pustelnika opcję kupienia Punktów Czasu za złoto - do 30 dziennie, 3000 złota za sztukę. Czasem nadwyżkę złota szczególnie później bedzie mozna tak pożytkować. Chyba że cena za wysoka/za niska.”
+
+1. **Zakup.** W Chacie Pustelnika jest przycisk „Kup Punkty Czasu (3000 zł/szt.)”. Okno wybiera liczbę suwakiem, przyciskami „−” i „+” albo „najwięcej”: od 1 do tego, co zostało z dziennego limitu i na co starczy złota. Kupuje się przyciskiem „Kup za N zł”. Limit to 30 na dobę zadań narratora (do północy czasu polskiego). Liczby są w `data/settlement.json` (`hermit.timePoints`).
+2. **Zmienia odpowiedź G** z „Wprowadzenia narratora i Punktów Czasu” (punkt 8: Punkty Czasu „nigdy nie są na sprzedaż”). Od teraz kupuje się je za złoto, tylko u Pustelnika i tylko w tym limicie. Za Punkty Systemu ani za prawdziwe pieniądze nadal nie.
+3. **Także w czasie wyprawy** (brakujący szczegół): wtedy przydają się najbardziej, a zakup nie zmienia niczego, z czym liczy się raport. Inne usługi Pustelnika (zerowanie i zmiana ewolucji) nadal tylko po powrocie.
+4. **Relacja** (brakujący szczegół): każdy zakup daje 10 punktów relacji z Pustelnikiem, jak jego inne usługi.
+5. **Cena 3000 zł zostaje.** Punkt Czasu skraca o minutę wyprawę, pracę albo budowę. Wyprawa daje ok. 800 zł na godzinę na 50. poziomie, 1225 na 100. i ok. 2100 na 150. Jeden Punkt kosztuje więc tyle, ile przynosi od ok. 4 godzin wypraw (50. poziom) do ok. 1,5 godziny (150. poziom). Złota z przewiniętej minuty nigdy się nie odzyska, a pełny limit (90 000 zł) daje najwyżej pół godziny wypraw więcej na dobę. Na niższych poziomach to drogo, a przy nadwyżce złota później w sam raz, tak jak chciał autor.
+
 ## Wojny gildii: odpowiedzi autora 792–800 (10.11.2026, przed budową, 873)
 
 Autor: „chcemy też powoli budować wojny gildii”, drużyny 5 na 5, „jeśli jest pełna gildia to 6 takich drużyn, a jeśli mniej to mniej i częściej muszą walczyć”. Odpowiedzi ze strony ocen:

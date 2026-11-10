@@ -29,6 +29,7 @@ import { mountPvpArena } from '../pvp-arena.js';
 import { stableCard } from '../stable.js';
 import { tanneryCard } from '../tannery.js';
 import { wantedCard } from '../wanted.js';
+import { timePointsButton } from '../hermit-time.js';
 import { itemSummary, piecesText } from './character.js';
 import { mountMarket, numberField, stackArt, stackButton } from './market.js';
 
@@ -1300,6 +1301,7 @@ export function mountSettlement(container, { params = {} } = {}) {
               : t('Zmień ewolucję (pierwszy raz darmo)'),
           onClick: evolutionSheet,
         }),
+      data.hermit.time && timePointsButton(data.hermit.time, load),
     );
   }
 

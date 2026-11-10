@@ -2658,5 +2658,16 @@
   "Czat, nowe wiadomości": "Chat, new messages",
   "Kółko czatu schowane. Włączysz je z powrotem w Ustawieniach.": "Chat bubble hidden. You can turn it back on in the Settings.",
   "Kółko czatu": "Chat bubble",
-  "Okrągły przycisk czatu nad grą. Przesuń go palcem w inne miejsce przy krawędzi ekranu albo upuść na ×, żeby go schować.": "A round chat button over the game. Drag it with your finger to another spot by the edge of the screen, or drop it on the × to hide it."
+  "Okrągły przycisk czatu nad grą. Przesuń go palcem w inne miejsce przy krawędzi ekranu albo upuść na ×, żeby go schować.": "A round chat button over the game. Drag it with your finger to another spot by the edge of the screen, or drop it on the × to hide it.",
+  "Punkty Czasu: dziś kupione wszystkie ({daily})": "Time Points: all {daily} bought today",
+  "Kup Punkty Czasu ({gold} zł/szt.)": "Buy Time Points ({gold} gold each)",
+  "Ile Punktów Czasu kupić": "How many Time Points to buy",
+  "Kup za {gold} zł": "Buy for {gold} gold",
+  "Pustelnik wziął {gold} złota. Punkty Czasu: +{count}.": "The Hermit took {gold} gold. Time Points: +{count}.",
+  "Punkty Czasu od Pustelnika": "Time Points from the Hermit",
+  "{gold} zł za Punkt Czasu. Każdy skraca o minutę wyprawę, pracę albo budowę. Dziś kupisz jeszcze {left} z {daily}.": "{gold} gold per Time Point. Each one cuts a minute off an exploration, a work or a build. You can buy {left} more of {daily} today.",
+  "najwięcej": "most",
+  "Wybierz, ile Punktów Czasu kupić.": "Choose how many Time Points to buy.",
+  "Na dziś to już wszystkie Punkty Czasu od Pustelnika. Wróć jutro.": "That's all the Time Points the Hermit sells today. Come back tomorrow.",
+  "Tyle Punktów Czasu Pustelnik dziś już nie sprzeda.": "The Hermit won't sell that many Time Points today."
 }

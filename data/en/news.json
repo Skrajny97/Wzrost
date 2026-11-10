@@ -408,6 +408,10 @@
     "0.2.47": {
       "title": "Version 0.2.47",
       "body": "- Towers: while the character is on an exploration, the note is short: “The character is on an exploration. You can enter the Towers once it returns.”"
+    },
+    "0.2.49": {
+      "title": "Version 0.2.49",
+      "body": "- Hermit's Hut: Time Points for gold, up to 30 a day, 3000 gold each. You can buy them during an exploration too."
     }
   }
 }

@@ -76,6 +76,7 @@ import {
   standingOf,
   standingRewardsDue,
   statResetCost,
+  timePointsOffer,
   taughtWords,
   staying,
   talkWith,
@@ -182,6 +183,9 @@ export function settlementOf(row) {
     // The sołtys's wanted posters: the day's done and the one in hand
     // (wanted.js).
     ...(stored.wanted && { wanted: stored.wanted }),
+    // The Punkty Czasu bought at the Pustelnik's on the day of the last buy
+    // (timePointsOffer).
+    ...(stored.timePoints && { timePoints: stored.timePoints }),
     ...(stored.test && { test: true }),
   };
 }
@@ -337,6 +341,7 @@ export function settlementView(player, stored, board, now) {
       path: player.row.evolution ? null : pathResetCost(player.row.level, content()),
       stats: statResetCost(player.row.level, content()),
       evolution: evolutionChangeView(player.row, stored),
+      time: timePointsView(stored, now),
     },
     now,
   };
@@ -1493,10 +1498,11 @@ export async function chooseReforged(context) {
 // the start and the free reset of the stat points as after the first one.
 // At home only, like the stat points and the skills.
 export async function hermitService(context) {
+  const body = await readJson(context.request);
+  if (body.service === 'time') return buyTimePoints(context, body);
   const { session, player } = await requireBuildPlayer(context);
   const { row } = player;
   requireOpen(row);
-  const body = await readJson(context.request);
   const character = engineCharacter(row);
   if (body.service === 'evolution') return changeEvolution(context, session, player, body);
   let gold;
@@ -1528,6 +1534,39 @@ export async function hermitService(context) {
     .run();
   if (result.meta.changes !== 1) throw changed();
   return json({ gold, character: characterView(await loadPlayer(db, session.userId), context.now) });
+}
+
+// The Pustelnik's Punkty Czasu for the page: the price of one, the day's
+// limit and what is left of it today (timePointsOffer).
+function timePointsView(stored, now) {
+  const { gold, daily, left } = timePointsOffer(stored.timePoints, now, content());
+  return { gold, daily, left };
+}
+
+// { service: "time", count }: Punkty Czasu for gold at the Pustelnik's (the
+// author, 10.11.2026: "do 30 dziennie, 3000 złota za sztukę"), up to what
+// is left of the day's limit. Also on an exploration, where they are of most
+// use: they change nothing the report is counted with.
+async function buyTimePoints(context, body) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const { count } = body;
+  if (!Number.isInteger(count) || count < 1) throw new ApiError(400, 'invalid_count', 'Wybierz, ile Punktów Czasu kupić.');
+  const stored = settlementOf(row);
+  const offer = timePointsOffer(stored.timePoints, context.now, content());
+  if (offer.left < 1) throw new ApiError(409, 'daily_limit', 'Na dziś to już wszystkie Punkty Czasu od Pustelnika. Wróć jutro.');
+  if (count > offer.left) throw new ApiError(409, 'daily_limit', 'Tyle Punktów Czasu Pustelnik dziś już nie sprzeda.');
+  const gold = count * offer.gold;
+  if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota.');
+  const next = { ...stored, timePoints: offer.after(count), relations: grow(stored.relations, content().settlement.hermit) };
+  const db = context.env.DB;
+  const result = await db
+    .prepare('UPDATE characters SET gold = gold - ?, time_points = time_points + ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?')
+    .bind(gold, count, JSON.stringify(next), row.id, row.version, gold)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  return json({ gold, timePoints: count, character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
 // The Pustelnik's change of evolution (hermitService).

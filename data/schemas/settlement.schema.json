@@ -342,7 +342,7 @@
     "hermit": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["resident", "pathGoldPerLevel", "evolutionGold", "evolutionGrowth", "statsFromLevel", "statsGoldPerLevel", "relationGain"],
+      "required": ["resident", "pathGoldPerLevel", "evolutionGold", "evolutionGrowth", "statsFromLevel", "statsGoldPerLevel", "relationGain", "timePoints"],
       "properties": {
         "pathGoldPerLevel": { "type": "number", "exclusiveMinimum": 0 },
         "evolutionGold": { "type": "integer", "minimum": 1 },
@@ -350,7 +350,17 @@
         "statsFromLevel": { "type": "integer", "minimum": 1 },
         "statsGoldPerLevel": { "type": "number", "exclusiveMinimum": 0 },
         "resident": { "type": "string", "description": "Mieszkaniec tej usługi; relationGain to przyrost relacji z nim." },
-        "relationGain": { "type": "integer", "minimum": 0 }
+        "relationGain": { "type": "integer", "minimum": 0 },
+        "timePoints": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Punkty Czasu za złoto u Pustelnika (autor 10.11.2026): gold złota za sztukę, najwyżej daily na dobę zadań narratora.",
+          "required": ["gold", "daily"],
+          "properties": {
+            "gold": { "type": "integer", "minimum": 1 },
+            "daily": { "type": "integer", "minimum": 1 }
+          }
+        }
       }
     },
     "stable": {

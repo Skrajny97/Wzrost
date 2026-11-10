@@ -580,6 +580,19 @@ export function evolutionChanges(character, content) {
 export const statResetCost = (level, content) =>
   level >= content.settlement.hermit.statsFromLevel ? level * content.settlement.hermit.statsGoldPerLevel : null;
 
+// The Pustelnik's Punkty Czasu for gold (the author, 10.11.2026: "do 30
+// dziennie, 3000 złota za sztukę"): timePoints.gold gold apiece, at most
+// timePoints.daily a narrator's day. `bought` is what the Osada keeps of
+// the buys ({ day, count }: the day of the last one and how many fell on
+// it); the answer has the price, the limit, what is left of it today and
+// the record after `count` more.
+export function timePointsOffer(bought, now, content) {
+  const { gold, daily } = content.settlement.hermit.timePoints;
+  const day = questPeriod('daily', now, content).key;
+  const today = bought?.day === day ? bought.count : 0;
+  return { gold, daily, left: Math.max(0, daily - today), after: (count) => ({ day, count: today + count }) };
+}
+
 // The Karczma (part II, question 116): a mug costs mugGoldPerLevel gold for
 // each level of the character, and with it the innkeeper tells where an
 // elite or a champion lurks today. The place is one of the `newest` inner

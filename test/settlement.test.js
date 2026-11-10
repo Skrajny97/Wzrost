@@ -795,6 +795,40 @@ describe('the Osada through the API', () => {
     assert.deepEqual(JSON.parse(row.points), {});
   });
 
+  test('the Pustelnik sells Punkty Czasu for gold, up to the day\'s limit, also during an exploration', async () => {
+    const { timePoints, resident, relationGain } = content.settlement.hermit;
+    const row = async () => (await db()).prepare('SELECT gold, time_points, settlement FROM characters').first();
+    const buy = (count) => call('POST', '/api/settlement/hermit', { cookie, body: { service: 'time', count } });
+    assert.deepEqual((await view()).hermit.time, { gold: timePoints.gold, daily: timePoints.daily, left: timePoints.daily });
+    const before = await row();
+    const bought = await buy(5);
+    assert.equal(bought.status, 200);
+    assert.equal(bought.data.gold, 5 * timePoints.gold);
+    assert.equal(bought.data.timePoints, 5);
+    let after = await row();
+    assert.equal(after.gold, before.gold - 5 * timePoints.gold);
+    assert.equal(after.time_points, before.time_points + 5);
+    assert.equal(JSON.parse(after.settlement).relations[resident], relationGain);
+    assert.equal((await view()).hermit.time.left, timePoints.daily - 5);
+    // More than is left today, none, a part of one: refused.
+    assert.equal((await buy(timePoints.daily)).data.error.code, 'daily_limit');
+    assert.equal((await buy(0)).data.error.code, 'invalid_count');
+    assert.equal((await buy(1.5)).data.error.code, 'invalid_count');
+    await set('gold = ?', timePoints.gold - 1);
+    assert.equal((await buy(1)).data.error.code, 'not_enough_gold');
+    await set('gold = 100000');
+    // On an exploration too, where the points are of most use.
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: content.areas[0].id, minutes: 5 } })).status, 201);
+    const rest = await buy(timePoints.daily - 5);
+    assert.equal(rest.status, 200);
+    assert.equal((await buy(1)).data.error.code, 'daily_limit');
+    assert.equal((await view()).hermit.time.left, 0);
+    // A day's buys kept from an earlier day do not count.
+    after = await row();
+    await set('settlement = ?', JSON.stringify({ ...JSON.parse(after.settlement), timePoints: { day: '2026-01-01', count: timePoints.daily } }));
+    assert.equal((await view()).hermit.time.left, timePoints.daily);
+  });
+
   test('the Zaklinaczka reforges one affix for gold and materials', async () => {
     const database = await db();
     const { id } = await database.prepare('SELECT id FROM characters').first();
