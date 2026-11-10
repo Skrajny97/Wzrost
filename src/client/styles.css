@@ -5760,6 +5760,22 @@ a.camp-level-button {
   background: linear-gradient(#24301f, #141b11);
 }
 
+/* A skórka's portrait is the whole figure in a wide cloak, so its bust is cut
+   at the sides of its box: there it fades out instead of ending in a hard
+   edge (the author: "portret w walce Krukomira widzę przycięty"), and in a
+   fight card at the bottom too, like every character's. */
+.sprite--bust.sprite--outfit {
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+
+.unit-art .sprite--bust.sprite--outfit {
+  -webkit-mask-image: linear-gradient(#000 72%, transparent), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(#000 72%, transparent), linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-composite: intersect;
+}
+
 .status-row--look {
   align-items: center;
 }

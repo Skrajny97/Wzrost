@@ -688,12 +688,16 @@ export function portraitSprite(classId, appearance, { bust = false, skin, evolut
   const file = toned.has(id) ? toneFile(id, skin) : id;
   const { width, height, faces } = SPRITES.portraits;
   const off = bust ? (faces[id] ?? width / 2) - width / 2 : 0;
+  // A skórka's portrait is the whole figure in a wide cloak: its bust fades
+  // out at the sides instead of ending in a hard cut (styles.css).
+  const look = outfitLook(outfit);
+  const whole = bust && look && id.startsWith(`${look}-`);
   return h('img', {
     src: `/art/portraits/${file}.png`,
     alt: '',
     width,
     height,
-    class: `sprite sprite--portrait${bust ? ' sprite--bust' : ''}`,
+    class: `sprite sprite--portrait${bust ? ' sprite--bust' : ''}${whole ? ' sprite--outfit' : ''}`,
     style: off ? { objectPosition: `calc(50% - ${off}px) 0` } : undefined,
     decoding: 'async',
     draggable: 'false',
