@@ -16,8 +16,9 @@ import { say } from './text.js';
 // The minerals the System shows at a level of Górnictwo.
 export const knownMinerals = (level, content) => content.minerals.filter((mineral) => mineral.level <= level);
 
-// Pieces of a mineral an hour at a level: more with each level.
-export const mineralsPerHour = (mineral, level, content) => mineral.perHour * (1 + content.mining.yieldPerLevel * (level - 1));
+// Pieces of a mineral an hour at a level: more with each level, and `week`
+// the factor of the week the digging began in (minerals, weeks.js).
+export const mineralsPerHour = (mineral, level, content, week = 1) => mineral.perHour * (1 + content.mining.yieldPerLevel * (level - 1)) * week;
 
 // The slider's times: the shortest, then every step up to the longest.
 export function miningMinutes(content) {
@@ -68,14 +69,16 @@ export function expectedMining(minutes, level, characterLevel, content) {
 // count ± the spread, made whole, and at least one piece of the commonest,
 // as a gathering always brings a herb; then the veins of gold, as many as
 // come on average, each with its share of the hour's gold ± its spread.
-export function mineMinerals({ minutes, level, characterLevel, seed }, content) {
+// `week`: the factor of the week the digging began in (minerals, weeks.js),
+// for the minerals, not the veins' gold.
+export function mineMinerals({ minutes, level, characterLevel, seed, week = 1 }, content) {
   const rng = createRng(seed);
   const { spread, veins } = content.mining;
   const known = knownMinerals(level, content);
   const hours = minutes / 60;
   const found = {};
   for (const mineral of known) {
-    const count = countEvents(mineralsPerHour(mineral, level, content) * hours * rng.float(1 - spread, 1 + spread), rng);
+    const count = countEvents(mineralsPerHour(mineral, level, content, week) * hours * rng.float(1 - spread, 1 + spread), rng);
     if (count > 0) found[mineral.id] = count;
   }
   if (Object.keys(found).length === 0 && known.length > 0) {

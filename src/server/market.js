@@ -49,6 +49,7 @@ import { assertion, atomically as atomicBatch, raced } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { herbsOf, mineralsOf, potionsOf } from './professions-view.js';
 import { requireOpen, settlementOf } from './settlement.js';
+import { weekNow } from './weeks.js';
 
 const COLUMNS = { herb: 'herbs', potion: 'potions', material: 'materials', part: 'parts', mineral: 'minerals' };
 const STACKS = Object.keys(COLUMNS);
@@ -459,11 +460,12 @@ export function foreign(adds) {
 // buying at the merchant's stall (`relation`) brings as many points of the
 // relation with him (question 278 A).
 function marketReputation(row, stored, value, now, { relation = false } = {}) {
-  const { points, trade } = tradePoints(value, row.level, stored.marketTrade, now, content(), tuning().reputation);
+  // The reputation with the week's share (weeks.js).
+  const { points, reputation: gained, trade } = tradePoints(value, row.level, stored.marketTrade, now, content(), tuning().reputation, weekNow(now));
   const { brotherhood, resident } = tuning();
   return {
     ...stored,
-    reputation: { ...stored.reputation, [brotherhood]: (stored.reputation[brotherhood] ?? 0) + points },
+    reputation: { ...stored.reputation, [brotherhood]: (stored.reputation[brotherhood] ?? 0) + gained },
     ...(relation && { relations: { ...stored.relations, [resident]: (stored.relations[resident] ?? 0) + points } }),
     marketTrade: trade,
   };

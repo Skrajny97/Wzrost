@@ -23,6 +23,7 @@ import { partPrice, shopBuilding } from './shop.js';
 import { countedForm, decimalText, say, word } from './text.js';
 import { areaUnlocked } from './unlocks.js';
 import { craftCost, knownPatterns } from './workshop.js';
+import { weekCount, weekFactor, weekGains } from './weeks.js';
 
 const rarityIndex = (rarityId, content) => content.rarities.findIndex((rarity) => rarity.id === rarityId);
 
@@ -459,7 +460,9 @@ export function orderGold(order, sellBonus, content) {
   return Math.max(order.gold, Math.ceil(scrap * content.settlement.orders.overScrap));
 }
 
-export function deliverOrder(board, orderId, now, content, sellBonus = 0) {
+// The brotherhood's reputation with the week's share of reputation (`week`,
+// the week of the delivery, weeks.js), made whole fairly.
+export function deliverOrder(board, orderId, now, content, sellBonus = 0, week = null) {
   const { orders } = content.settlement;
   const order = findOrder(board, orderId);
   const weekly = orderId === 'weekly';
@@ -476,7 +479,7 @@ export function deliverOrder(board, orderId, now, content, sellBonus = 0) {
     },
     take: { kind: order.kind, key: order.key, count: order.count },
     gold: orderGold(order, sellBonus, content),
-    reputation: { [order.brotherhood]: order.reputation },
+    reputation: weekGains({ [order.brotherhood]: order.reputation }, week, 'reputation', `order:${order.id}:${now}`),
     relation: { [orders.resident]: orders.relationGain },
     systemPoints,
   };
@@ -705,8 +708,11 @@ export function relationDiscount(points, content) {
 // gold }); the answer has the points now and the day's count after them.
 // The gold short of the next point waits for the day's next trade, so small
 // trades add up (the author: "Kupiłem dwa materiały jednego typu i nie
-// wzrosła relacja"); with the day's points all given, none is kept.
-export function tradePoints(gold, level, stored, now, content, tuning = content.settlement.herbalist.reputation) {
+// wzrosła relacja"); with the day's points all given, none is kept. The
+// brotherhood's reputation takes the points with the week's share of
+// reputation (`reputation`; `week`, the week of the trade, weeks.js), made
+// whole fairly, while the resident's relation takes the points as they are.
+export function tradePoints(gold, level, stored, now, content, tuning = content.settlement.herbalist.reputation, week = null) {
   const { daily } = tuning;
   const per = goldPerPoint(level, tuning);
   const day = questPeriod('daily', now, content).key;
@@ -715,7 +721,7 @@ export function tradePoints(gold, level, stored, now, content, tuning = content.
   const total = (today ? (stored.gold ?? 0) : 0) + Math.max(0, gold);
   const points = Math.max(0, Math.min(daily - before, Math.floor(total / per)));
   const left = before + points >= daily ? 0 : total - points * per;
-  return { points, trade: { day, points: before + points, gold: left } };
+  return { points, reputation: weekCount(points, weekFactor(week, 'reputation'), `trade:${now}:${gold}`), trade: { day, points: before + points, gold: left } };
 }
 
 // The gold of trade a point takes at the character's level.

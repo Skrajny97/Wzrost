@@ -102,6 +102,7 @@ import { finishCrafting } from './workshop.js';
 import { finishJewels } from './jewelcraft.js';
 import { finishMining } from './mining.js';
 import { wantedAfterHunt, wantedGoing, wantedOnTrip } from './wanted.js';
+import { keptWeek, weekNow } from './weeks.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
 const resourcePath = (id) => `$."${id}"`;
@@ -396,6 +397,10 @@ export async function beginHunt(
   // (guild-seat.js), on a Drużyna's trip too, each member its own guild's;
   // a character that left its guild sets out without them.
   const seat = seatHuntBonus(player.guildSeat, content());
+  // The week of the year it sets out in (weeks.js), as the line on the Walka
+  // screen shows it: its effects work for the whole exploration, whenever
+  // its report is claimed; every member of a Drużyna's trip sets out now.
+  const week = weekNow(now);
   // The companions hired in the Osada who do not stay in the Kwatery go
   // along, as they are now (companions.js), so the report comes out the same
   // whenever claimed; a wounded one once the character has rested to full
@@ -455,6 +460,7 @@ export async function beginHunt(
     ...(rareMore > 0 && { rareMore }),
     ...(materialsMore > 0 && { materialsMore }),
     ...(seat && { seat }),
+    ...(week && { week }),
     ...(party.length > 0 && { companions: party }),
     ...(crew && { party: crew }),
     ...(partners.length > 0 && { partners }),
@@ -631,7 +637,7 @@ function settlementAfterHunt(row, hunt, kept, minutes) {
   if (went) {
     next.companions = (stored.companions ?? []).map((companion) => {
       const one = hunt.companions.find((member) => member.id === companion.id);
-      return one ? companionAfterHunt(companion, { xp: hunt.xp, fainted: one.fainted, minutes }, row.level, content()) : companion;
+      return one ? companionAfterHunt(companion, { xp: hunt.xp, fainted: one.fainted, minutes, week: hunt.week }, row.level, content()) : companion;
     });
   }
   if (reward?.reputation) {
@@ -709,6 +715,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       // or a foe only (wanted.js: wantedOnTrip).
       wanted: trip ? wantedOnTrip(trip, options) : (options.wanted ?? null),
       hard: !trip && options.hard === true,
+      // The week it set out in (weeks.js), none before the weeks.
+      week: keptWeek(options),
     },
     content(),
   );

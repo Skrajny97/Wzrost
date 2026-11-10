@@ -27,6 +27,7 @@ import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { takenOff } from './market.js';
 import { requireOpen, settlementOf, settlementView } from './settlement.js';
+import { weekNow } from './weeks.js';
 
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 const forge = () => content().settlement.forge;
@@ -86,11 +87,12 @@ export function forgeView(player, stored, now) {
   };
 }
 
-// The relation and the reputation a trade of `gold` grows, as at Jagna's.
+// The relation and the reputation a trade of `gold` grows, as at Jagna's;
+// the reputation with the week's share (weeks.js).
 function grown(stored, gold, level, now) {
-  const { points, trade } = tradePoints(gold, level, stored.forgeTrade, now, content(), forge().reputation);
-  const add = (counts, id) => ({ ...counts, [id]: (counts?.[id] ?? 0) + points });
-  return { points, next: { ...stored, relations: add(stored.relations, forge().resident), reputation: add(stored.reputation, forge().brotherhood), forgeTrade: trade } };
+  const { points, reputation: gained, trade } = tradePoints(gold, level, stored.forgeTrade, now, content(), forge().reputation, weekNow(now));
+  const add = (counts, id, gain = points) => ({ ...counts, [id]: (counts?.[id] ?? 0) + gain });
+  return { points, next: { ...stored, relations: add(stored.relations, forge().resident), reputation: add(stored.reputation, forge().brotherhood, gained), forgeTrade: trade } };
 }
 
 // POST /api/settlement/forge/scrolls { count, kind }: Zwoje ochronne, or

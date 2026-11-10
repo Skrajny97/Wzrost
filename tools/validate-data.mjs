@@ -15,6 +15,7 @@ export const DATA_FILES = [
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
   'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'portals', 'guilds', 'cosmetics', 'news',
+  'weeks',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'portals', 'core'];
@@ -744,6 +745,25 @@ function checkReferences(data) {
   errors.push(...checkPortals(data));
   errors.push(...checkGuildSeat(data, { resources }));
   errors.push(...checkGuildExpedition(data));
+  errors.push(...checkWeeks(data, { stats }));
+  return errors;
+}
+
+// The weeks of the year (weeks.json; the author, 10.11.2026): all 52 in
+// their order, each number once, a stat effect of a known stat, no other
+// effect with one, and every stat named in the effects' words.
+function checkWeeks(data, { stats }) {
+  const errors = [];
+  uniqueIds(errors, 'weeks', data.weeks.weeks);
+  for (const [index, week] of data.weeks.weeks.entries()) {
+    if (week.number !== index + 1) errors.push(`weeks.json: ${week.id} powinien mieć numer ${index + 1}`);
+    for (const effect of week.effects) {
+      if ((effect.kind === 'stat') !== (effect.stat !== undefined)) errors.push(`weeks.json: ${week.id}: statystyka (stat) tylko przy rodzaju stat, i tam koniecznie`);
+      else if (effect.stat !== undefined && !stats.has(effect.stat)) errors.push(`weeks.json: ${week.id} ma nieznaną statystykę "${effect.stat}"`);
+    }
+  }
+  for (const stat of stats) if (!data.weeks.stats[stat]) errors.push(`weeks.json: stats nie ma statystyki "${stat}"`);
+  for (const stat of Object.keys(data.weeks.stats)) if (!stats.has(stat)) errors.push(`weeks.json: stats ma nieznaną statystykę "${stat}"`);
   return errors;
 }
 

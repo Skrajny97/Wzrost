@@ -42,6 +42,7 @@ import { classNameOf, evolutionOf } from './evolutions.js';
 import { evolutionBlock, skillPoints } from './skills.js';
 import { companionCombatant, gendered } from './companions.js';
 import { wantedEncounter, wantedLootRarity, wantedOf, wantedStrength } from './wanted.js';
+import { raisedOutcome, weekChance, weekFactor, weekFighter, weekLine } from './weeks.js';
 
 // Value of [minutes, value] pairs at `minutes`, rising with the logarithm of
 // the time between pairs.
@@ -433,6 +434,19 @@ export function resourceBundle(area, total) {
   return [[top, 1]];
 }
 
+// A player as it sets out (`one`: its character, gear, HP and name) in the
+// week the exploration keeps (weeks.js): its character with the week's
+// stats (`fighter`, weekFighter) and its combatant; in a week that changes
+// its Witalność, with the same share of its HP as it had, so a player at
+// full HP sets out at full HP.
+function settingOut(one, week, area, id, content) {
+  const fighter = weekFighter(one.character, week);
+  const unit = playerCombatant({ character: fighter, equipped: one.equipped, hp: one.hp, name: one.name, area, id }, content);
+  if (one.hp === undefined || one.hp === null || !fighter.weekStats?.vitality) return { fighter, unit };
+  const plain = playerCombatant({ character: one.character, equipped: one.equipped, name: one.name, area, id }, content).maxHp;
+  return { fighter, unit: { ...unit, hp: Math.min(unit.maxHp, Math.round((Math.min(one.hp, plain) * unit.maxHp) / plain)) } };
+}
+
 // `unknown`: the creatures not met yet that the exploration tracks.
 // `first`: the character's very first exploration, which goes one way:
 // regular encounters only, no chests among the finds, and the one treasure
@@ -450,9 +464,14 @@ export function resourceBundle(area, total) {
 // seatHuntBonus): { xp, gold, rarity } shares, or null. `hard`: a Trudna
 // wyprawa (629 A), from the challenge's level: its creatures are
 // challenge.hard times stronger, and its fights and finds give that much
-// more XP and gold.
+// more XP and gold. `week`: the week of the year the exploration set out in
+// (weeks.js), kept with it, or null: its share more (or less) of the fights'
+// XP and gold, of the chance of a chest among the finds and of a champion's
+// chest, of the materials the creatures leave, and of the players' stats in
+// the fights; on a Drużyna's trip every member's is the same, as they set
+// out at once.
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null, seat = null, hard = false },
+  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null, seat = null, hard = false, week = null },
   content,
 ) {
   // A Drużyna's trip (src/server/trips.js) gives `roster`, its players in
@@ -476,8 +495,8 @@ export function simulateHunt(
   // potions it still carries and drank, and the fights its potions for a
   // time worked in: the trip's roster, or the character alone.
   const fighters = (roster ?? [{ id: null, character, equipped, hp, name, potions, healBelow, windows: { ...(speed && { speed }), ...buffs }, trophies }]).map((one, index) => {
-    const unit = playerCombatant({ character: one.character, equipped: one.equipped, hp: one.hp, name: one.name, area, id: index === 0 ? 'a0' : `p${index}` }, content);
-    return { ...one, worn: one.equipped, unit, hp: unit.hp, left: { ...(one.potions ?? {}) }, potionsUsed: {}, buffFights: {}, windows: one.windows ?? {}, trophies: one.trophies ?? {} };
+    const { fighter, unit } = settingOut(one, week, area, index === 0 ? 'a0' : `p${index}`, content);
+    return { ...one, character: fighter, worn: one.equipped, unit, hp: unit.hp, left: { ...(one.potions ?? {}) }, potionsUsed: {}, buffFights: {}, windows: one.windows ?? {}, trophies: one.trophies ?? {} };
   });
   const me = (roster && fighters.find((one) => one.id === self)) || fighters[0];
   // The trip's encounters follow its leader (its level and the creatures it
@@ -506,8 +525,8 @@ export function simulateHunt(
   // Before the trips' roster, the other players fought beside the character
   // as mates, out once fallen; on a trip they fight as the character does.
   const friends = (roster ? [] : partners).map((partner, index) => {
-    const unit = playerCombatant({ character: partner.character, equipped: partner.equipped, hp: partner.hp, name: partner.name, area, id: `p${index + 1}` }, content);
-    return { id: partner.id, unit, hp: Math.min(unit.maxHp, partner.hp ?? unit.maxHp), out: false };
+    const { unit } = settingOut(partner, week, area, `p${index + 1}`, content);
+    return { id: partner.id, unit, hp: unit.hp, out: false };
   });
   const mates = [
     ...friends,
@@ -576,7 +595,10 @@ export function simulateHunt(
   // Tropiciel (an evolution's trait), and the Bractwo Łowców: more materials
   // from creatures.
   const tracker = evolutionOf(character, content)?.trait;
-  const moreMaterials = (tracker?.kind === 'tracker' ? 1 + tracker.params.materials : 1) * (1 + materialsMore);
+  const moreMaterials = (tracker?.kind === 'tracker' ? 1 + tracker.params.materials : 1) * (1 + materialsMore) * weekFactor(week, 'materials');
+  // The week's shares of the fights' XP and gold (weeks.js).
+  const weekXp = weekFactor(week, 'xp');
+  const weekGold = weekFactor(week, 'gold');
   const fights = [];
   const entries = [];
   let key = null;
@@ -588,7 +610,7 @@ export function simulateHunt(
     items.push(item);
     if (!roster && item.slot === 'weapon' && !me.worn.some((held) => held.slot === 'weapon') && canUse(item.base, character.classId, content, character.classLevel)) {
       me.worn = [...me.worn, item];
-      me.unit = playerCombatant({ character, equipped: me.worn, hp: me.hp, name, area }, content);
+      me.unit = playerCombatant({ character: me.character, equipped: me.worn, hp: me.hp, name, area }, content);
     }
     return items.length - 1;
   };
@@ -622,7 +644,12 @@ export function simulateHunt(
       // resources for the camp, nothing of interest or, rarely, a shard of
       // time (Time Points).
       const findLevel = areaLevel(area, lootRng, content);
-      const outcomes = Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest'));
+      // The week's share more (or less) of the chance of a chest (items).
+      const outcomes = raisedOutcome(
+        Object.entries(rewards.findOutcomes).filter(([kind]) => !(first && kind === 'chest')),
+        'chest',
+        weekFactor(week, 'items'),
+      );
       const outcome = lootRng.weighted(outcomes, ([, weight]) => weight)[0];
       if (outcome === 'gold') {
         const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length) * seatGold * hardGold));
@@ -731,7 +758,7 @@ export function simulateHunt(
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
-        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * hardGold;
+        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * hardGold * weekGold;
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * lootRng.float(0.5, 1.5) * goldFactor;
         const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials;
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, lootRng, content));
@@ -750,7 +777,7 @@ export function simulateHunt(
       if (encounter.elite) {
         chests.push([randomItem(enemies[0].level, lootRng, content, blessedLoot({ ...loot, rarityBonus: rewards.eliteRarityBonus * seatRarity }, fights.length - 1)), 'eliteChest']);
       }
-      if (encounter.champion && lootRng.chance(rewards.championItemChance)) {
+      if (encounter.champion && lootRng.chance(weekChance(rewards.championItemChance, week, 'items'))) {
         const rarityId = championItemRarity(enemies[0].level, lootRng, content);
         chests.push([randomItem(enemies[0].level, lootRng, content, { ...loot, rarityId }), 'championChest']);
       }
@@ -760,7 +787,7 @@ export function simulateHunt(
       const trophy = meeting && own && sought.trophy ? { [sought.trophy]: 1 } : null;
       if (meeting && own) sighting.beaten = true;
       for (const [item] of chests) summary.chests.push(take(item));
-      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1) * seatXp * hardXp);
+      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1) * seatXp * hardXp * weekXp);
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
       xp += summary.xp;
       reached = gainXp(reached.level, reached.xp, summary.xp, (level) => xpToNext(level, content), maxLevel);
@@ -839,6 +866,9 @@ export function simulateHunt(
     // the character's own).
     ...(own && { wanted: { id: sought.id, ...sighting } }),
     ...(harder && { hard: true }),
+    // The week it set out in, for its event's fight and the report's line
+    // (weeks.js).
+    ...(week && { week }),
     // The companions at the end: their HP and whether they fell on the way;
     // the party's players too.
     ...(companions.length > 0 && {
@@ -1047,6 +1077,9 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
         return say(content.texts, 'autoEquip', i, { item: itemName(item, content), slot: content.slotsById[item.slot].name });
       }),
       ...(overflow && overflow.count > 0 ? [say(content.texts, 'bagOverflow', 0, overflow)] : []),
+      // The week it set out in, where its effects changed the result
+      // ("Tydzień Kuny: +5% złota z walk.", weeks.js).
+      ...[weekLine(hunt, content)].filter(Boolean),
     ],
     items: hunt.items.map((item, index) => ({ ...itemView(item, content), ...(overflow?.sold.includes(index) && { sold: true }) })),
     fights: hunt.fights.map((fight) => ({

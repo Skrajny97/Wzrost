@@ -25,8 +25,9 @@ import { simulateFight } from './combat.js';
 import { companionCombatant } from './companions.js';
 import { materialsText, raisedRarity, rarityUpChances, stackKey } from './crafting.js';
 import { encounterCombatants, encountersFor, expectedExploration } from './hunt.js';
-import { createRng } from './rng.js';
+import { countEvents, createRng } from './rng.js';
 import { nameInText, say, word } from './text.js';
+import { weekFactor, weekFighter } from './weeks.js';
 
 export const portalById = (id, content) => content.portals.portals.find((portal) => portal.id === id) ?? null;
 
@@ -72,9 +73,14 @@ function stageCreatures(area, stage, content) {
 // the Portal Materiałów pays pieces of the materials of the stage's
 // ordinary creatures, the Portal Części pieces of its part; a material or a
 // part, piece by piece, is now and then rarer, as the explorations' finds
-// at the stage's level (rarityUpChances).
-export function portalLoot(portal, stage, first, rng, content) {
-  const pieces = portalAmount(portal, stage, first, content);
+// at the stage's level (rarityUpChances). A fight's loot takes the week of
+// its entry (`week`, weeks.js): its share more (or less) of a Portal
+// Złota's gold and a Portal Materiałów's pieces, made whole with the loot's
+// draws; a sweep, no fight, keeps the stage's loot as it is.
+export function portalLoot(portal, stage, first, rng, content, week = null) {
+  const amount = portalAmount(portal, stage, first, content);
+  const factor = weekFactor(week, { gold: 'gold', material: 'materials' }[portal.loot]);
+  const pieces = factor === 1 ? amount : countEvents(amount * factor, rng);
   const loot = { gold: 0, resources: {}, materials: {}, parts: {} };
   if (portal.loot === 'gold') return { ...loot, gold: pieces };
   if (portal.loot === 'resource') return { ...loot, resources: { [portal.resource]: pieces } };
@@ -155,14 +161,16 @@ export function portalStage(stage, seed, content) {
 // level times the portals' strength. `first`: whether the stage was never
 // won in this portal (the server's fights are all for a new stage).
 // Returns a hunt of one fight, for huntReport, with `portal` and the
-// `parts` it pays; its XP is none, for the companions too.
-export function portalFight({ character, equipped, name, portalId, stage, first = false, seed, trophies = {}, companions = [] }, content) {
+// `parts` it pays; its XP is none, for the companions too. `week`: the
+// week of the year of the entry (weeks.js), or null: its share of the loot
+// (portalLoot) and of the character's stats in the fight.
+export function portalFight({ character, equipped, name, portalId, stage, first = false, seed, trophies = {}, companions = [], week = null }, content) {
   const portal = portalById(portalId, content);
   const plan = portalStage(stage, seed, content);
   const area = content.areasById[plan.areaId];
   const rng = createRng(`${seed}:fight`);
   const { texts } = content.portals;
-  const player = playerCombatant({ character, equipped, name, area }, content);
+  const player = playerCombatant({ character: weekFighter(character, week), equipped, name, area }, content);
   const allies = [
     { ...player, ...(Object.keys(trophies).length > 0 && { trophies }) },
     ...companions.map((companion, index) => companionCombatant(companion, { area, id: `a${index + 1}` }, content)),
@@ -171,7 +179,7 @@ export function portalFight({ character, equipped, name, portalId, stage, first 
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
   const won = fight.won === true;
   const hpAfter = Math.max(0, fight.units.find((unit) => unit.id === player.id).hp);
-  const loot = won ? portalLoot(portal, stage, first, createRng(`${seed}:loot`), content) : { gold: 0, resources: {}, materials: {}, parts: {} };
+  const loot = won ? portalLoot(portal, stage, first, createRng(`${seed}:loot`), content, week) : { gold: 0, resources: {}, materials: {}, parts: {} };
 
   const enemyList = enemies.map((enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
   const lines = [say(texts, 'fightStart', stage, { enemies: enemyList })];
@@ -219,6 +227,8 @@ export function portalFight({ character, equipped, name, portalId, stage, first 
     keyFight: { index: 0 },
     potionsUsed: {},
     buffFights: {},
+    // The week of the entry, for the report's line (weeks.js).
+    ...(week && { week }),
     portal: { id: portal.id, stage, level: plan.level, won, first: won && first, loot: portalLootText(loot, content), companions: companions.map((companion) => companion.name), text: say(texts, won ? 'won' : 'lost', stage, { stage }) },
   };
 }

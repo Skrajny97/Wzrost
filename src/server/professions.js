@@ -21,6 +21,7 @@ import {
   workProfession,
   workXp,
   saleGold,
+  weekFactor,
 } from '../engine/index.js';
 import { content } from './content.js';
 import { bagPlaces, characterView, currentHp, engineCharacter, equippedItems, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
@@ -32,6 +33,7 @@ import { ApiError, json, readJson } from './http.js';
 import { herbsOf } from './professions-view.js';
 import { perkOf } from './perks.js';
 import { trimReports } from './reports.js';
+import { keptWeek, weekNow } from './weeks.js';
 
 // A JSON path for an id with a hyphen.
 const path = (id) => `$."${id}"`;
@@ -57,14 +59,16 @@ export function addTo(column, amounts) {
 // Points they bring (the author: „Awatar niech od teraz daje 1/4 tego co
 // zdobyłaby postać - XPa i wpływ na level Profesji w podobnej ilości - tak
 // jakby gracz robił te czynności. Tak, pamiętam pierwotne założenia, ale
-// wszystko ewoluuje.”); before, none of it. All of it is computed from
-// the row read, so a claim saves it only while the row is as read
-// (workClaim).
+// wszystko ewoluuje.”); before, none of it. The profession's XP takes the
+// share of the week the work began in (profession-xp, weeks.js), kept with
+// it, the Awatar's as the character's. All of it is computed from the row
+// read, so a claim saves it only while the row is as read (workClaim).
 export function workGains(player, profession, before, minutes, avatar, now) {
   const { row } = player;
   const character = engineCharacter(row);
   const share = avatar ? content().avatar.share : 1;
-  const after = workProfession(profession, before, Math.round(minutes * share));
+  const week = weekFactor(keptWeek(workOf(player, avatar).activity?.options), 'profession-xp');
+  const after = workProfession(profession, before, Math.round(minutes * share), week);
   const xp = Math.round(workXp(row.level, minutes, content()) * share);
   const work = applyWork(character, xp, content());
   // A new level heals fully; otherwise resting simply goes on.
@@ -104,10 +108,12 @@ export async function workClaimFailed(db, row, table, activity) {
 // for its Awatar Systemu, saved only once the statement before has taken
 // them, so two taps at once start one work. Its batch begins with the
 // assertion that the row is as read (atomic.js), so the version one higher
-// here is the statement before's own.
+// here is the statement before's own. The work keeps the week of the year
+// it begins in (`week`, weeks.js), whose share of its XP it gets.
 export function insertWork(db, avatar, row, { kind, placeId, minutes, now, seed, hp, options }) {
+  const week = weekNow(now);
   const columns = ['character_id', 'kind', 'region_id', 'minutes', 'started_at', 'ends_at', 'seed', ...(avatar ? [] : ['hp_at_start']), 'options'];
-  const values = [row.id, kind, placeId, minutes, now, now + minutes * 60000, seed, ...(avatar ? [] : [hp]), JSON.stringify(options)];
+  const values = [row.id, kind, placeId, minutes, now, now + minutes * 60000, seed, ...(avatar ? [] : [hp]), JSON.stringify(week ? { ...options, week } : options)];
   return db
     .prepare(
       `INSERT INTO ${avatar ? 'avatar_activities' : 'activities'} (${columns.join(', ')})
@@ -152,9 +158,11 @@ export async function startGathering(context) {
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const db = context.env.DB;
   // `begun`: when it really began, for the Próby Gildii (takenBefore);
-  // `more`: the Bractwo Zielarzy's share of herbs more (589 A), as now.
+  // `more`: the Bractwo Zielarzy's share of herbs more (589 A), as now;
+  // `week`: the week of the year it begins in (weeks.js).
   const more = perkOf(player.row, 'herbYield');
-  const options = JSON.stringify({ herbs: herbIds, begun: now, ...(more > 0 && { more }) });
+  const week = weekNow(now);
+  const options = JSON.stringify({ herbs: herbIds, begun: now, ...(more > 0 && { more }), ...(week && { week }) });
   const ends = now + body.minutes * 60000;
   try {
     await db.batch(
@@ -194,7 +202,9 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
   // Herbs the data no longer has are left out.
   const herbIds = (JSON.parse(activity.options ?? '{}').herbs ?? []).filter((id) => content().herbsById[id]);
   const more = JSON.parse(activity.options ?? '{}').more ?? 0;
-  const found = herbIds.length > 0 ? gatherHerbs({ herbIds, minutes: activity.minutes, level: before.level, seed: activity.seed, more }, content()) : {};
+  // The week it began in: its share of the herbs (weeks.js).
+  const week = weekFactor(keptWeek(activity.options), 'herbs');
+  const found = herbIds.length > 0 ? gatherHerbs({ herbIds, minutes: activity.minutes, level: before.level, seed: activity.seed, more, week }, content()) : {};
   const capacity = bagCapacity(campLevels(player.buildings, now, content()), content());
   const { stored, lost } = storeStacks(herbsOf(row), found, capacity - bagPlaces(player), content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);

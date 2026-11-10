@@ -123,6 +123,7 @@ import { settlementTestsFor } from './test-mode.js';
 import { stableView } from './stable.js';
 import { tanneryView } from './tannery.js';
 import { say } from '../engine/text.js';
+import { weekFactorNow, weekNow } from './weeks.js';
 
 // A JSON path for a key with a hyphen or a colon ("iron-ore", "wolf-pelt:rare").
 const jsonPath = (key) => `$."${key}"`;
@@ -497,9 +498,10 @@ export async function sellToHerbalist(context) {
   const stored = settlementOf(row);
   const gold = saleGold(herbalistPrices(player, stored, context.now).price(body.kind, body.id), body.count);
   const { herbalist } = content().settlement;
-  const { points, trade } = tradePoints(gold, row.level, stored.trade, context.now, content());
-  const add = (counts, id) => ({ ...counts, [id]: (counts[id] ?? 0) + points });
-  const next = { ...stored, relations: add(stored.relations, herbalist.resident), reputation: add(stored.reputation, herbalist.brotherhood), trade };
+  // The brotherhood's reputation with the week's share (weeks.js).
+  const { points, reputation: gained, trade } = tradePoints(gold, row.level, stored.trade, context.now, content(), herbalist.reputation, weekNow(context.now));
+  const add = (counts, id, gain = points) => ({ ...counts, [id]: (counts[id] ?? 0) + gain });
+  const next = { ...stored, relations: add(stored.relations, herbalist.resident), reputation: add(stored.reputation, herbalist.brotherhood, gained), trade };
   const key = jsonPath(body.id);
   const result = await context.env.DB.prepare(
     `UPDATE characters SET gold = gold + ?, settlement = ?,
@@ -541,9 +543,10 @@ export async function buyFromHerbalist(context) {
   if (bagStacks({ ...held, [good.id]: (held[good.id] ?? 0) + body.count }, content()) - bagStacks(held, content()) > free) {
     throw new ApiError(409, 'bag_full', 'Tyle nie zmieści się w plecaku.');
   }
-  const { points, trade } = tradePoints(gold, row.level, stored.trade, context.now, content());
-  const add = (counts, id) => ({ ...counts, [id]: (counts[id] ?? 0) + points });
-  const next = { ...stored, relations: add(stored.relations, herbalist.resident), reputation: add(stored.reputation, herbalist.brotherhood), trade };
+  // The brotherhood's reputation with the week's share (weeks.js).
+  const { points, reputation: gained, trade } = tradePoints(gold, row.level, stored.trade, context.now, content(), herbalist.reputation, weekNow(context.now));
+  const add = (counts, id, gain = points) => ({ ...counts, [id]: (counts[id] ?? 0) + gain });
+  const next = { ...stored, relations: add(stored.relations, herbalist.resident), reputation: add(stored.reputation, herbalist.brotherhood, gained), trade };
   const herbs = counted('herbs', { [good.id]: body.count });
   const others = foreign({ herb: { [good.id]: body.count } });
   const result = await context.env.DB.prepare(
@@ -582,8 +585,9 @@ function tavernView(row, stored, now) {
 // how long it is still wounded. With `upgradeCap` (the Kowadło's level,
 // for a hired one) each item it wears has the Kowadło's part of its card,
 // paid from the character's `materials` too, and `roll`, the seed of its
-// last try on the Kowadło, which the next try names (upgradeCompanionItem).
-function companionView(companion, { upgradeCap, materials, anvilDiscount = 0 } = {}) {
+// last try on the Kowadło, which the next try names (upgradeCompanionItem);
+// `anvilWeek`, the factor of the week's upgrade chance (weeks.js).
+function companionView(companion, { upgradeCap, materials, anvilDiscount = 0, anvilWeek = 1 } = {}) {
   const unit = companionCombatant(companion, {}, content());
   const female = companion.appearance === 'female';
   const { traits, professions, stories } = content().settlement.companions;
@@ -609,7 +613,7 @@ function companionView(companion, { upgradeCap, materials, anvilDiscount = 0 } =
     // Jewellery is one place, for an amulet, a ring or a talisman.
     wear: COMPANION_PLACES.map((slot) => {
       const worn = companion.gear.find((item) => companionPlace(item.slot) === slot);
-      const shown = worn && { ...itemView(worn, content(), { upgradeCap, materials, anvilDiscount }), given: Boolean(worn.given), ...(upgradeCap !== undefined && { roll: worn.lastRoll ?? '' }) };
+      const shown = worn && { ...itemView(worn, content(), { upgradeCap, materials, anvilDiscount, anvilWeek }), given: Boolean(worn.given), ...(upgradeCap !== undefined && { roll: worn.lastRoll ?? '' }) };
       return { slot, slotName: content().slotsById[slot]?.name ?? content().settlement.companions.texts.jewelry, item: shown || null };
     }),
     profession: professions.find((one) => one.id === companion.profession)?.name ?? null,
@@ -676,7 +680,7 @@ function companionsView(player, stored, now) {
       return {
         // The Kowadło's price with the Bractwo Kowali (590) and the guild's
         // Kuźnia Gildii (616 A), as for the character's own items.
-        ...companionView(companion, { upgradeCap, materials, anvilDiscount: withSeatDiscount(brotherhoodPerk('anvilDiscount', stored.reputation, content()), seatBonuses(player.guildSeat, content()).anvil) }),
+        ...companionView(companion, { upgradeCap, materials, anvilDiscount: withSeatDiscount(brotherhoodPerk('anvilDiscount', stored.reputation, content()), seatBonuses(player.guildSeat, content()).anvil), anvilWeek: weekFactorNow(now, 'upgrade') }),
         // Wounded until the character rests to full HP, and when that is.
         ...(companion.wounded && rested !== now && { wounded: true, healsAt: rested }),
         gift: giftOf(companion, row, now),
@@ -892,7 +896,8 @@ export async function deliverSettlementOrder(context) {
   const goods = settlementGoods(row, player.items, context.now);
   const block = deliverBlock(board, body.orderId, goods, content());
   if (block) throw new ApiError(block.code === 'no_order' ? 404 : 409, block.code, block.message);
-  const done = deliverOrder(board, body.orderId, context.now, content(), sellBonusOf(player, context.now));
+  // The brotherhood's reputation with the week's share (weeks.js).
+  const done = deliverOrder(board, body.orderId, context.now, content(), sellBonusOf(player, context.now), weekNow(context.now));
   const add = (counts, more) => ({ ...counts, ...Object.fromEntries(Object.entries(more).map(([id, gain]) => [id, (counts[id] ?? 0) + gain])) });
   const next = { ...stored, reputation: add(stored.reputation, done.reputation), relations: add(stored.relations, done.relation), board: done.board };
   // The narrator's quests "Wykonaj N zleceń w Osadzie" (question 95).
@@ -1185,7 +1190,7 @@ export async function upgradeCompanionItem(context) {
   const plan = upgradePlan(player, item, body, context.now);
   const pay = upgradePayment(plan);
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const outcome = rollUpgrade(item, createRng(roll), content(), { warded: plan.warded, steady: plan.steady });
+  const outcome = rollUpgrade(item, createRng(roll), content(), { warded: plan.warded, steady: plan.steady, week: plan.week });
   const next = { ...stored, companions: hired.map((one) => (one === companion ? upgradedOnCompanion(one, body.slot, outcome, roll) : one)) };
   const saved = JSON.stringify(next);
   const db = context.env.DB;
@@ -1309,7 +1314,8 @@ export async function talkWithCompanion(context) {
   const companion = hired.find((one) => one.id === body.companionId);
   if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
   if (talkedToday(companion, context.now, content())) throw new ApiError(409, 'talked', 'Na dziś wystarczy. Porozmawiacie jutro.');
-  const { talk, companion: after } = talkWith(companion, { seed: `${row.id}:settlement`, now: context.now }, content());
+  // The relation with the week's share (weeks.js).
+  const { talk, companion: after } = talkWith(companion, { seed: `${row.id}:settlement`, now: context.now, week: weekNow(context.now) }, content());
   const next = { ...stored, companions: hired.map((one) => (one === companion ? after : one)) };
   const result = await context.env.DB.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND version = ?')
     .bind(JSON.stringify(next), row.id, row.version)

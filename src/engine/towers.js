@@ -33,6 +33,7 @@ import { itemName, randomItem } from './items.js';
 import { lowLevelMultiplier, monsterXp } from './progression.js';
 import { createRng } from './rng.js';
 import { say, word } from './text.js';
+import { weekChance, weekFactor, weekFighter } from './weeks.js';
 
 // The level of floor `floor`: floor 1 at firstFloorLevel, each next one a
 // level higher.
@@ -143,8 +144,11 @@ export function towerMaterials(floor, enemies, rng, content, more = 1) {
 // knows; the author: 483 A), and then for certain, else none. A win of a
 // chestEvery floor the first time in this tower (`chest`, the server
 // knows) brings the tower's chest too: one more such item. Returns a hunt
-// of one fight, for applyHunt and huntReport, with `tower`.
-export function towerFight({ character, equipped, name, floor, seed, partners = [], companions = [], trophies = {}, chest = false, championTrophy = false }, content) {
+// of one fight, for applyHunt and huntReport, with `tower`. `week`: the
+// week of the year of the entry (weeks.js), or null: its share more (or
+// less) of the win's XP and gold, of the chance of the loot's item, of the
+// materials and of the players' stats in the fight.
+export function towerFight({ character, equipped, name, floor, seed, partners = [], companions = [], trophies = {}, chest = false, championTrophy = false, week = null }, content) {
   const plan = towerFloor(floor, seed, content);
   const area = content.areasById[plan.areaId];
   const rng = createRng(`${seed}:fight`);
@@ -154,11 +158,11 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   const lengthed = pace.timeFactor * (1 + pace.lengthBonus);
   const partyXp = 1 - companions.length * content.settlement.companions.xpCost - partners.length * content.balance.parties.xpCost;
   const tracker = evolutionOf(character, content)?.trait;
-  const moreMaterials = tracker?.kind === 'tracker' ? 1 + tracker.params.materials : 1;
-  const player = playerCombatant({ character, equipped, name, area }, content);
+  const moreMaterials = (tracker?.kind === 'tracker' ? 1 + tracker.params.materials : 1) * weekFactor(week, 'materials');
+  const player = playerCombatant({ character: weekFighter(character, week), equipped, name, area }, content);
   const allies = [
     { ...player, ...(Object.keys(trophies).length > 0 && { trophies }) },
-    ...partners.map((partner, index) => playerCombatant({ character: partner.character, equipped: partner.equipped, name: partner.name, area, id: `p${index + 1}` }, content)),
+    ...partners.map((partner, index) => playerCombatant({ character: weekFighter(partner.character, week), equipped: partner.equipped, name: partner.name, area, id: `p${index + 1}` }, content)),
     ...companions.map((companion, index) => companionCombatant(companion, { area, id: `a${index + 1}` }, content)),
   ];
   // Alone on a floor (the Wieża Solo), the monsters have only a share of the
@@ -189,13 +193,13 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
       // A champion's trophy, its own material (483 A).
       if (monster.champion) materials = addCounts(materials, materialDrops(enemy.monsterId, enemy.level, 1, rng, content, championTrophy));
     }
-    xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * lengthed * partyXp);
+    xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * lengthed * partyXp * weekFactor(week, 'xp'));
     // The tower's loot (towerGold, towerMaterials), far above a portal's.
-    gold = towerGold(floor, content);
+    gold = Math.round(towerGold(floor, content) * weekFactor(week, 'gold'));
     materials = addCounts(materials, towerMaterials(floor, enemies, rng, content, moreMaterials));
     const classItem = () => randomItem(plan.level, rng, content, { classId: character.classId, maxClassLevel: character.classLevel, rarityId: championItemRarity(plan.level, rng, content), area });
     // The loot's item drawn first, so the chest changes nothing else.
-    const lucky = rng.chance(content.towers.loot.itemChance);
+    const lucky = rng.chance(weekChance(content.towers.loot.itemChance, week, 'items'));
     if (chest) items.push(classItem());
     if (lucky) {
       lootItem = classItem();
@@ -252,6 +256,8 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
     keyFight: { index: 0 },
     potionsUsed: {},
     buffFights: {},
+    // The week of the entry, for the report's line (weeks.js).
+    ...(week && { week }),
     tower: {
       floor,
       level: plan.level,

@@ -20,6 +20,7 @@ import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { trimReports } from './reports.js';
+import { weekNow } from './weeks.js';
 
 const rules = () => content().portals;
 const path = (key) => `$."${key}"`;
@@ -133,7 +134,8 @@ export async function enterPortal(context) {
   // The Encyklopedia's trophies for the creatures of the stage's region.
   const trophies = trophiesFor(player, now, areaDangers(area, content()).map((danger) => danger.monsterId));
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const hunt = portalFight({ character, equipped: equippedItems(player), name: row.name, portalId: portal.id, stage, first: true, seed, trophies, companions }, content());
+  // The week of the year of the entry (weeks.js).
+  const hunt = portalFight({ character, equipped: equippedItems(player), name: row.name, portalId: portal.id, stage, first: true, seed, trophies, companions, week: weekNow(now) }, content());
   const { won } = hunt.portal;
   const applied = applyHunt(character, hunt, content());
 

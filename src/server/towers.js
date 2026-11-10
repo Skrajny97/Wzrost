@@ -62,6 +62,7 @@ import { t } from './i18n.js';
 import { soldGold } from './inventory.js';
 import { partyOf } from './parties.js';
 import { trimReports } from './reports.js';
+import { weekNow } from './weeks.js';
 
 const rules = () => content().towers;
 const path = (key) => `$."${key}"`;
@@ -213,7 +214,8 @@ export async function enterTower(context) {
   // The Encyklopedia's trophies for the creatures of the floor's region.
   const trophies = trophiesFor(player, now, areaDangers(area, content()).map((danger) => danger.monsterId));
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const hunt = towerFight({ character, equipped, name: row.name, floor, seed, partners: climbers.partners, companions: climbers.companions, trophies, chest, championTrophy }, content());
+  // The week of the year of the entry (weeks.js).
+  const hunt = towerFight({ character, equipped, name: row.name, floor, seed, partners: climbers.partners, companions: climbers.companions, trophies, chest, championTrophy, week: weekNow(now) }, content());
   const won = hunt.tower.won;
   const applied = applyHunt(character, hunt, content());
 

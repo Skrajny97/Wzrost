@@ -15,11 +15,15 @@ import { computeStats } from './stats.js';
 export const challengeAt = (level, content) => (level >= content.balance.challenge.fromLevel ? content.balance.challenge : null);
 
 // `statBoost`: shares some stats are raised by for a while, by stat (a
-// potion of focus, potions.js).
+// potion of focus, potions.js). A character in a fight of a week that
+// raises or lowers a stat (`weekStats`, weekFighter in weeks.js) has those
+// shares too.
 export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally', statBoost = null }, content) {
   const balance = content.balance;
   const { totals: stats, bonuses } = computeStats(character, equipped, content);
-  const totals = statBoost ? Object.fromEntries(Object.entries(stats).map(([stat, value]) => [stat, Math.round(value * (1 + (statBoost[stat] ?? 0)))])) : stats;
+  const week = character.weekStats ?? null;
+  const shares = week && statBoost ? Object.fromEntries([...new Set([...Object.keys(week), ...Object.keys(statBoost)])].map((stat) => [stat, (week[stat] ?? 0) + (statBoost[stat] ?? 0)])) : (week ?? statBoost);
+  const totals = shares ? Object.fromEntries(Object.entries(stats).map(([stat, value]) => [stat, Math.round(value * (1 + (shares[stat] ?? 0)))])) : stats;
   const weaponItem = equipped.find((item) => item.slot === 'weapon');
   const weapon = weaponItem ? itemWeapon(weaponItem, content) : unarmed(character.level, content);
   let armor = bonuses.armor + totals.endurance * balance.combat.armorPerEndurance;

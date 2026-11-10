@@ -47,6 +47,7 @@ import { openEvent } from '../event.js';
 import { BUSY, skipLines } from './party.js';
 import { mercenaryChoice, servicePanel } from '../mercenaries.js';
 import { combatModes } from './towers.js';
+import { weekLine } from '../weeks.js';
 
 // Shown through t(), as the page loads its English after this module.
 const THREAT_NAMES = { low: 'niskie', moderate: 'umiarkowane', high: 'wysokie', 'very-high': 'bardzo wysokie' };
@@ -337,10 +338,12 @@ export function mountCombat(container, { params, navigate }) {
     showThreat = null;
     potions = null;
 
-    // While the character is away, every view shows the exploration.
+    // While the character is away, every view shows the exploration. The
+    // main view has the week of the year under the top bar (weeks.js).
     if (activity || !region) {
       fill(
         container,
+        weekLine(character),
         h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Walka') })),
         modeTabs(),
         testTools(),

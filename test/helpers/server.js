@@ -14,8 +14,10 @@ export function useServer(vars = {}) {
   // is the Warownia (FORTRESS), on in the game from 0.1.49. English is off
   // unless a test asks for it (ENGLISH), as the tests were written before
   // it came into the game (0.1.97): Polish answers and no English channel.
+  // The weeks of the year are off unless a test asks for them (WEEKS), so
+  // no test's numbers hang on the week it runs in (weeks.test.js).
   const server = createTestHarness({
-    workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', ...vars } }],
+    workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', WEEKS: '', ...vars } }],
   });
   before(() => server.listen());
   beforeEach(async () => {

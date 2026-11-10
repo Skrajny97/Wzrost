@@ -17,6 +17,7 @@ import { updateSide } from './side.js';
 import './keys.js';
 import { showQuests, watchQuests } from './quests.js';
 import { offerNameNotice, offerRename, openNameChange } from './rename.js';
+import { offerWeekNotice } from './weeks.js';
 import { screenshotPicker } from './screenshot.js';
 import { mountAuthor } from './screens/author.js';
 import { mountEncyclopedia } from './screens/encyclopedia.js';
@@ -390,6 +391,8 @@ function openGame() {
     offerPointsReset();
     offerRename();
     offerNameNotice();
+    // A new week of the year, named once (weeks.js).
+    offerWeekNotice();
   }, 1000);
   checkChat({ now: true });
 }
