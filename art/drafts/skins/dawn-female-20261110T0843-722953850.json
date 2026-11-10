@@ -1,0 +1,14 @@
+{
+  "id": "dawn-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman cleric in the Vestments of Dawn, calm, long fair hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, layered white and gold vestments down to the ankles, a large golden sun disc on the back rising above the shoulders, a halo of thin golden rays around the head, a golden sash, holding a staff topped with a small golden sun, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

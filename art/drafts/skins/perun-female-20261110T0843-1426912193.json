@@ -1,0 +1,14 @@
+{
+  "id": "perun-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman warrior in the Armour of Perun, strong and broad-shouldered, a long dark braid falling from under the helmet, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, dark blackened steel plate armour engraved with bright copper lightning bolts, a grey wolf fur cloak over the shoulders, a dark steel helmet with two curved aurochs horns, copper-trimmed gauntlets and dark steel boots, holding a long broad sword with a copper hilt and a round dark shield bearing a copper lightning sign, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

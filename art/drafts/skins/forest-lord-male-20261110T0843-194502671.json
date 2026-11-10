@@ -1,0 +1,14 @@
+{
+  "id": "forest-lord-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "young man archer in the garb of the Forest Lord, lean, short brown hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak, leather bracers and soft leather boots, a quiver of green-fletched arrows on the back, holding a curved bow carved from pale antler, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

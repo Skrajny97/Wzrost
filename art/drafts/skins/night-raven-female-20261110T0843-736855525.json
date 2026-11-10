@@ -1,0 +1,14 @@
+{
+  "id": "night-raven-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman rogue in the Cloak of the Night Raven, wiry, short black hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a black cloak of layered raven feathers, a black raven-beak half mask over the upper face, a dark fitted leather jerkin, dark trousers and soft dark boots, a silver dagger in each hand, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}

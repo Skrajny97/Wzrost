@@ -1,0 +1,14 @@
+{
+  "id": "eclipse-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman mage in the Robe of the Eclipse, thin, long straight black hair, standing in the middle of the image, small full body figure from the top of the head to the feet, empty space above the head and below the feet, a deep navy blue robe down to the feet patterned with small silver constellations, a silver crescent moon emblem on the chest, a high stiff collar, holding a dark wooden staff topped with a black crystal ringed by a faint silver glow, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "generations",
+    "generations": 10
+  },
+  "images": 4
+}
