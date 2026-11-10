@@ -78,7 +78,12 @@
     // "on": the weeks of the year (data/weeks.json, src/server/weeks.js),
     // each with its small bonus for every player (the author, 10.11.2026);
     // "off" plays as before them.
-    "WEEKS": "on"
+    "WEEKS": "on",
+    // "on": the Arena PvP in the Osada (src/server/pvp-arena.js, 762 A,
+    // building 770.2 D) from character level 25. In the live game from
+    // version 0.2.38, once the classes were evened out in its duels and the
+    // weaker paths strengthened (772, 780 A; the author: "781 B").
+    "ARENA": "on"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain
@@ -136,8 +141,8 @@
         "ENGLISH": "on",
         // The weeks of the year, as in the game.
         "WEEKS": "on",
-        // The Arena PvP in the Osada (src/server/pvp-arena.js, 762 A), only
-        // here until the classes are evened out in its duels (772).
+        // The Arena PvP in the Osada (src/server/pvp-arena.js, 762 A), as in
+        // the game.
         "ARENA": "on"
       },
       "triggers": {

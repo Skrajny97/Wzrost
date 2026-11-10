@@ -15,9 +15,11 @@ export function useServer(vars = {}) {
   // unless a test asks for it (ENGLISH), as the tests were written before
   // it came into the game (0.1.97): Polish answers and no English channel.
   // The weeks of the year are off unless a test asks for them (WEEKS), so
-  // no test's numbers hang on the week it runs in (weeks.test.js).
+  // no test's numbers hang on the week it runs in (weeks.test.js). So is the
+  // Arena (ARENA), in the game from 0.2.38: its unlock and its place on the
+  // Osada's board would change the other tests' (pvp-arena.test.js).
   const server = createTestHarness({
-    workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', WEEKS: '', ...vars } }],
+    workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', WEEKS: '', ARENA: '', ...vars } }],
   });
   before(() => server.listen());
   beforeEach(async () => {

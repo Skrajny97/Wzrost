@@ -467,7 +467,7 @@
       "kind": "strike",
       "mana": 14,
       "cooldown": 3,
-      "params": { "power": [1.45, 2.3], "category": "magical", "element": "fire", "dotEffect": "burning", "dotChance": [0.6, 0.85], "dotPower": [0.17, 0.25], "dotTicks": 3, "splash": [0.1, 0.3] }
+      "params": { "power": [1.45, 2.3], "category": "magical", "element": "fire", "dotEffect": "burning", "dotChance": [0.6, 0.85], "dotPower": [0.17, 0.25], "dotTicks": 3, "splash": [0.8, 1.6] }
     },
     {
       "id": "elemental-ray",
@@ -528,7 +528,7 @@
       "kind": "summon",
       "mana": 18,
       "cooldown": 8,
-      "params": { "turns": 4, "hp": 0.3, "power": [0.2, 0.5], "summon": "elemental", "summonName": "Żywiołak" }
+      "params": { "turns": 5, "hp": 0.3, "power": [0.4, 0.9], "summon": "elemental", "summonName": "Żywiołak" }
     },
     {
       "id": "renewal",
@@ -744,11 +744,11 @@
       "name": "Mur tarcz",
       "style": "obrona",
       "description": "Bastion wbija tarczę w ziemię, a drużyna staje za nią ramię w ramię.",
-      "effect": "Przez {turns} swoje ruchy cała drużyna ma o {wall%} więcej pancerza.",
+      "effect": "Przez {turns} swoje ruchy cała drużyna ma o {wall%} więcej pancerza, a postać zadaje o {damage%} więcej obrażeń.",
       "kind": "stance",
       "mana": 16,
       "cooldown": 5,
-      "params": { "turns": 4, "wall": [0.5, 1.0], "words": "stanceWall" }
+      "params": { "turns": 4, "wall": [0.5, 1.0], "damage": [0.4, 0.8], "words": "stanceWall" }
     },
     {
       "id": "heart-shot",
@@ -884,7 +884,7 @@
       "kind": "summon",
       "mana": 20,
       "cooldown": 10,
-      "params": { "turns": 4, "hp": [0.3, 0.45], "power": [0.5, 0.9], "physical": true, "summon": "ent", "summonName": "Ent" }
+      "params": { "turns": 4, "hp": [0.3, 0.45], "power": [0.9, 1.5], "physical": true, "summon": "ent", "summonName": "Ent" }
     },
     {
       "id": "bear-summon",
@@ -896,7 +896,7 @@
       "kind": "summon",
       "mana": 20,
       "cooldown": 10,
-      "params": { "turns": 4, "hp": [0.25, 0.35], "power": [0.7, 1.2], "physical": true, "summon": "bear", "summonName": "Niedźwiedź" }
+      "params": { "turns": 4, "hp": [0.25, 0.35], "power": [1.2, 1.9], "physical": true, "summon": "bear", "summonName": "Niedźwiedź" }
     },
     {
       "id": "great-renewal",

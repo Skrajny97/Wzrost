@@ -482,7 +482,7 @@
       "name": "Shield Wall",
       "style": "defence",
       "description": "The Bastion drives the shield into the ground, and the party stands behind it shoulder to shoulder.",
-      "effect": "For {turns} of the character's turns, the whole party has {wall%} more armour."
+      "effect": "For {turns} of the character's turns, the whole party has {wall%} more armour, and the character deals {damage%} more damage."
     },
     "heart-shot": {
       "name": "Heart Shot",

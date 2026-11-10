@@ -163,7 +163,7 @@
   "duel": ["{actor}: {skill}! {target} is challenged to a duel: takes {damage}% more damage from the challenger and deals {guard}% less in return."],
   "locked": ["{actor}: {skill}. {target} is targeted: takes {damage}% more damage and cannot dodge blows."],
   "stanceRoar": ["{actor}: {skill}! For {turns} turns the enemies deal {weaken}% less damage, and the character {damage}% more."],
-  "stanceWall": ["{actor}: {skill}. For {turns} turns the whole party has {wall}% more armour."],
+  "stanceWall": ["{actor}: {skill}. For {turns} turns the whole party has {wall}% more armour, and the character deals {damage}% more damage."],
   "stanceOrb": ["{actor}: {skill}. For {turns} turns a ball of lightning strikes the enemies."],
   "stanceAura": ["{actor}: {skill}. For {turns} turns the whole party recovers {heal}% of max HP each turn."],
   "stancePyre": ["{actor}: {skill}. For {turns} turns holy fire burns beneath the enemies."],

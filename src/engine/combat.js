@@ -653,11 +653,12 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
   };
 
   // The share of a blow its target throws back: a guard's, a challenge's,
-  // and a mirror shield's of what it took.
+  // and a mirror shield's of what it took; in a duel only a part of it, as
+  // of the armour (`reflectShare`, pvp-arena.js).
   const throwBack = (target, actor, amount, absorbed, t) => {
     let share = target.guard?.reflect ?? 0;
     for (const stance of target.stances) if (stance.reflect) share += stance.reflect;
-    const back = Math.round(amount * share + absorbed * (target.shield?.reflect ?? 0));
+    const back = Math.round((amount * share + absorbed * (target.shield?.reflect ?? 0)) * (target.reflectShare ?? 1));
     if (back <= 0 || target.hp <= 0 || actor.hp <= 0) return;
     damage(actor, back, target.id);
     const vars = { actor: target.name, target: actor.name, damage: back };

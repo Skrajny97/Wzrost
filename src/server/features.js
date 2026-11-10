@@ -59,10 +59,10 @@ export const fortressOn = () => fortress;
 // The English beta (i18n.js): the language of each request and the choice
 // of it, first only where ENGLISH is "on".
 export const englishOn = () => english;
-// The Arena in the Osada (pvp-arena.js), only where ARENA is "on": off in
-// the live game until its building's picture is drawn and approved. Off,
-// nothing of it shows: not its place on the Osada's board (`feature` in
-// data/settlement.json), its unlock nor its System message.
+// The Arena in the Osada (pvp-arena.js), only where ARENA is "on": in the
+// live game from version 0.2.38 (781 B). Off, nothing of it shows: not its
+// place on the Osada's board (`feature` in data/settlement.json), its unlock
+// nor its System message.
 export const arenaOn = () => arena;
 export const placeOn = (place) => place.feature !== 'arena' || arena;
 // The weeks of the year (weeks.js), where WEEKS is "on".

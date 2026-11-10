@@ -162,7 +162,7 @@
   "duel": ["{actor}: {skill}! {target} staje do pojedynku: dostaje o {damage}% więcej obrażeń od wyzywającego i zadaje mu o {guard}% mniej."],
   "locked": ["{actor}: {skill}. {target} jest na celowniku: dostaje o {damage}% więcej obrażeń i nie uniknie ciosów."],
   "stanceRoar": ["{actor}: {skill}! Przez {turns} ruchy wrogowie zadają o {weaken}% mniej obrażeń, a postać o {damage}% więcej."],
-  "stanceWall": ["{actor}: {skill}. Przez {turns} ruchy cała drużyna ma o {wall}% więcej pancerza."],
+  "stanceWall": ["{actor}: {skill}. Przez {turns} ruchy cała drużyna ma o {wall}% więcej pancerza, a postać zadaje o {damage}% więcej obrażeń."],
   "stanceOrb": ["{actor}: {skill}. Przez {turns} ruchy kula piorunów razi wrogów."],
   "stanceAura": ["{actor}: {skill}. Przez {turns} ruchy cała drużyna odzyskuje co ruch po {heal}% maks. HP."],
   "stancePyre": ["{actor}: {skill}. Przez {turns} ruchy pod wrogami płonie święty ogień."],

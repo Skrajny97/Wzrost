@@ -368,6 +368,10 @@
     "0.2.37": {
       "title": "Version 0.2.37",
       "body": "- The Shadow is stronger: levels of the Shadow, the Assassin and the Kingslayer now give Vitality instead of Strength, which the class never used, so the character has more health. Execution and Beheading strike every third move instead of every fourth."
+    },
+    "0.2.38": {
+      "title": "Version 0.2.38",
+      "body": "- The Arena is open in the Settlement from character level 25: duels with other players' characters, with a ranking and weekly rewards. Armour and reflected damage count only in part there, the same for every class.\n- Weaker evolution paths are stronger on explorations. Elementalist: Fire Burst scorches the other enemies harder. Arcanist: the elemental hits harder and stays longer. Druid: the ent and the bear hit harder. Bastion: Shield Wall also raises its damage.\n- Shadows that put points into Strength got them back to spend again, since Strength gives this class nothing."
     }
   }
 }

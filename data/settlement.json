@@ -368,7 +368,7 @@
     "texts": {
       "intro": "Na Arenie mierzysz się z postaciami innych graczy. Rywal nie musi być w grze: jego postać broni się sama.",
       "rules": "Walki dziennie: {perDay}, od północy. Wybierasz jednego z trzech rywali o podobnej ocenie, a walka toczy się od razu: Twoja postać przeciw postaci rywala takiej, jaka jest zapisana teraz, ze statystykami, ekwipunkiem, umiejętnościami i ewolucją, ale bez towarzyszy, najemników i mikstur. HP obu stron jest większe niż zwykle, żeby walka trwała kilka rund: dla dwóch postaci na Twoim poziomie {hpFactor} razy. Po {moves} ruchach walkę kończy sędzia: wygrywa ten, komu zostało więcej HP, a gdy obu zostało prawie tyle samo, jest remis.",
-      "armorRule": "Pancerz chroni tu słabiej niż na wyprawach, bo postacie noszą go o wiele więcej niż stwory: dla dwóch postaci na Twoim poziomie liczy się {armor}% pancerza.",
+      "armorRule": "Pancerz chroni tu słabiej niż na wyprawach, bo postacie noszą go o wiele więcej niż stwory: dla dwóch postaci na Twoim poziomie liczy się {armor}% pancerza. Tyle samo liczy się z obrażeń odbitych przez umiejętności.",
       "ratingRules": "Ocena zaczyna się od {start}. Wygrana ją podnosi, a przegrana obniża, tym mocniej, im większa różnica ocen: za wygraną z wyżej ocenionym rywalem zgarniesz więcej. Gdy ktoś wyzwie Twoją postać, jej ocena zmienia się mniej. Pierwszego dnia miesiąca zaczyna się nowy sezon: każda ocena przesuwa się wtedy o {share}% drogi z powrotem do {start}.",
       "tableRules": "W tabeli tygodnia są postacie, które w tym tygodniu stoczyły na Arenie choć jedną walkę, według oceny. W poniedziałek o północy tabela się zamyka, a za miejsce w niej zgarniesz Punkty Systemu i złoto. Nagrodę odbierzesz tutaj.",
       "rating": "Ocena: {rating}",

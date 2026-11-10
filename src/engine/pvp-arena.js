@@ -65,11 +65,15 @@ export function duelArmorShare(levelA, levelB, content) {
 // skills and evolution, and nothing else: no companions, mercenaries or
 // potions (none are given), in no place (no place's trait), at full HP
 // times `factor` (duelHpFactor), so that the fight lasts a few rounds, and
-// with `armor` of its armour (duelArmorShare).
+// with `armor` of its armour (duelArmorShare). What it throws back of the
+// blows it takes (Nieugięty, Niezłomny, Wyzwanie, Lustro many) counts in
+// the same share (question 780): a rival's blows are far bigger than a
+// creature's, the reflections were measured against, and a reflection
+// passes any armour, so a Bastion won most of its duels on them alone.
 function duelist({ character, equipped, name }, id, side, { factor, armor }, content) {
   const unit = playerCombatant({ character, equipped, name, id, side }, content);
   const maxHp = Math.max(1, Math.round(unit.maxHp * factor));
-  return { ...unit, maxHp, hp: maxHp, armor: Math.round(unit.armor * armor) };
+  return { ...unit, maxHp, hp: maxHp, armor: Math.round(unit.armor * armor), reflectShare: armor };
 }
 
 // A duel of the attacker's character (`attacker`: { character, equipped,

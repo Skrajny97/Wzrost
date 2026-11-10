@@ -3034,6 +3034,33 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.38 (10.11.2026): słabsze ścieżki silniejsze, Arena w grze (780 A, 781 B)
+
+Autor (10.11.2026): „771 zatwierdzone juz zaznaczone / Cienia popraw statystyki tym ktorzy rozdawali wedlug klasy zatem / 777 A / 778 A / 779 A / 780 A / 781 B”.
+
+1. **771:** kwestia narratora o Wieży Drużyn ma głos. To nagrania A, polskie i angielskie, zaakceptowane przez autora na stronie odsłuchu. Polskie jest ściszone do głośności pozostałych kwestii rozdziału Wież.
+2. **Punkty Cienia w Sile** (migracja `0108_shadow_strength_points.sql`).
+    - „Rozdaj według klasy” nigdy nie dawało Cieniowi Siły (wagi: Zręczność 4, Percepcja 2, Witalność 2). Siła z poziomów Cienia, Skrytobójcy i Królobójcy zmieniła się w Witalność sama w 0.2.37.
+    - W Sile zostały więc tylko punkty rozdane ręcznie. Cień walczy wyłącznie sztyletem, a zdarzenia nie sprawdzają cech, więc te punkty nic mu nie dają.
+    - Brakujący szczegół: punkty rozdane w Siłę wracają każdemu Cieniowi do wolnych punktów, także z kopii dla „Cofnij ewolucję” na wersji testowej. Pozostałe punkty zostają. Gracz rozdaje zwrócone punkty od nowa, ręcznie albo przez „Rozdaj według klasy”.
+3. **777 A, 778 A i 779 A:** bez zmian (Wojownik na 150. i 300. poziomie, Łucznik i Kleryk na 25. poziomie, ścieżki Inkwizytora).
+4. **780 A: słabsze ścieżki silniejsze** (`data/evolutions.json`). Opisy umiejętności same podają nowe liczby, po polsku i po angielsku.
+    - Elementalista: Ognisty wybuch parzy pozostałych wrogów za 80–160% zamiast 10–30%. Rozprysk trafia tylko pozostałych wrogów, więc pojedynków nie zmienia.
+    - Arkanista: żywiołak bije za 40–90% zamiast 20–50% i zostaje na 5 ruchów zamiast 4.
+    - Druid: ent bije za 90–150% zamiast 50–90%, a niedźwiedź za 120–190% zamiast 70–120%.
+    - Bastion: Mur tarcz daje też samemu Bastionowi 40–80% więcej obrażeń przez 4 ruchy. Ta liczba doszła do opisu Muru tarcz i do dziennika walki.
+    - Brakujący szczegół: częstsze przywołania (Druid co 7–8 ruchów, Arkanista co 6) pomagały na wyprawach najbardziej, ale w pojedynku przywołaniec przyjmuje wszystkie ciosy jedynego rywala. Druid wygrywał wtedy 61–91% pojedynków, a Arkanista 66–84%. Z tego samego powodu Promień Żywiołów zostaje co 4. ruch: co 3. ruch dawał Magowi 68% wygranych na 75. poziomie. Wzmocnienia idą więc w siłę ciosów, a nie w ich częstość.
+5. **Arena: odbicie liczy się w części** (`src/engine/pvp-arena.js`, `src/engine/combat.js`).
+    - Pomiar pojedynków pokazał, że Bastion wygrywał 84–85% pojedynków (przed 0.2.37: 77–78%). Nieugięty odbija 200–300% przyjętych ciosów, a odbicie omija pancerz. Gracze biją o wiele mocniej niż stwory, do których dobrano te liczby, więc w pojedynku rywal ginął od własnych ciosów.
+    - Brakujący szczegół, jak przy pancerzu w 0.2.37: w pojedynku odbicie liczy się w tej samej części co pancerz (100% na 25. poziomie, 70% na 50., 45% na 100. i 35% na 300.). Zasada jest ta sama dla każdej klasy i umiejętności (Nieugięty, Niezłomny, Wyzwanie, Lustro many). Na wyprawach nic się nie zmienia.
+    - Zasady Areny mówią o tym jednym zdaniem: „Tyle samo liczy się z obrażeń odbitych przez umiejętności.” Zdanie jest też po angielsku.
+6. **781 B: Arena w grze** od 25. poziomu postaci (`ARENA` w `wrangler.jsonc`). Testy dalej mają ją domyślnie wyłączoną, jak przed jej wejściem do gry.
+7. **Wyniki** (`tools/class-balance-sim.mjs` i `tools/pvp-arena-sim.mjs`, przed → po).
+    - Wyprawy 4-godzinne z towarzyszami: Druid przegrywa 0–2% zamiast 3–10% na 100., 150. i 200. poziomie (XP na godzinę −5–0% zamiast −22–−6% wobec średniej). Bastion na 200. poziomie przegrywa 4% zamiast 11% (XP −10% zamiast −29%). Arkanista na 75. poziomie przegrywa 6% zamiast 9% (720 wypraw, XP −12% zamiast −19%), a na 50. tak jak dotąd 3%. Elementalista dalej 0%.
+    - Bez towarzyszy (1 h / 4 h): Elementalista 38% / 71% zamiast 53% / 89% na 50. poziomie i 23% / 50% zamiast 40% / 67% na 75. Arkanista 8% / 36% zamiast 15% / 61% i 16% / 43% zamiast 25% / 54%. Bastion 1% / 4% zamiast 13% / 44% na 100. poziomie i 6% / 21% zamiast 46% / 73% na 200. Druid na 150. poziomie 11% / 30% zamiast 21% / 47%.
+    - Pojedynki, odsetek wygranych ścieżki z pozostałymi: Bastion 69%, 70%, 62% i 54% zamiast 84%, 85%, 85% i 81% (100., 150., 200. i 300. poziom). Druid 51%, 30%, 48% i 59% zamiast 31%, 21%, 33% i 40%. Arkanista 65% i 50% zamiast 58% i 41% (50. i 75. poziom). Elementalista 54% i 63% zamiast 53% i 60%.
+    - Główne ścieżki w ustawieniu testu: każda klasa wygrywa 36–61% pojedynków na 50., 75., 100. i 200. poziomie.
+
 ## Wersja 0.2.37 (10.11.2026): Cień silniejszy, Arena wyrównana (772)
 
 Autor (772): „Jakoś trzeba to obejść, żeby to miało ręce i nogi, nie chcemy sztucznie wzmacniać klas na pvp, ale jeśli ogólnie są słabsze, także w wyprawach, to trzeba je wzmocnić.” Zgodnie z tym najpierw zmierzono siłę klas na wyprawach. Klasa słabsza także tam dostała wzmocnienie ogólne, a różnice widoczne tylko w pojedynkach wyrównuje zasada pojedynku, jednakowa dla wszystkich klas.
