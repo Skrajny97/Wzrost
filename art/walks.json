@@ -410,7 +410,7 @@
     "skin-dawn-male": {
       "start": "art/references/walks/start/skin-dawn-male.png",
       "pose": 2,
-      "description": "a calm young man with short fair hair in layered yellow and white vestments down to the ankles, a golden sash, brown boots, the back hand empty and swinging, no book, a staff topped with a small golden sun held upright in the front hand in every frame, the sun always above and in front of the hand, never over the face, no halo, nothing on the back"
+      "description": "a calm young man with short fair hair in layered white and gold vestments down to the ankles, a golden sash, brown boots, both hands empty, the arms swinging naturally at the sides and keeping their length, no staff, no book and nothing in the hands, no halo, nothing on the back"
     },
     "skin-eclipse-female": {
       "start": "art/references/walks/start/skin-eclipse-female.png",
