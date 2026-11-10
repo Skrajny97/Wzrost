@@ -816,15 +816,17 @@ function equipBlockText(item) {
 // An equipment slot under a tap (the author, 10.11.2026: "Niech klikanie w
 // slot ekwipunku wyświetla zakładkę z możliwymi do założenia z plecaka
 // przedmiotami na to miejsce. Z porównywarką itp."): the item worn there on
-// top, with its card ("Zdejmij", its star and the Kowadło), then the bag's
-// items for this place. Those the character can wear first, the strongest
-// first, each unfolding its comparison with the one worn (as the Kwatery's
-// "Załóż z plecaka" and the Targowisko) with "Załóż"; those it cannot wear
-// yet greyed, with why: its class, or the class level of its Tier, as
-// "Załóż" refuses them (equipBlock in the engine). An item goes only to its
-// own slot, in the place of the one there, as "Załóż" puts it on: the game
-// has one ring, one talisman, the off hand as a slot of its own and no
-// two-handed weapons. An empty slot opens the same, without an item worn.
+// top, with its card ("Zdejmij", its star and the Kowadło; "Karta
+// przedmiotu" opens the whole card, with what taking it off changes), then
+// the bag's items for this place. Those the character can wear first, the
+// strongest first, each unfolding its comparison with the one worn (as the
+// Kwatery's "Załóż z plecaka" and the Targowisko) with "Załóż"; those it
+// cannot wear yet greyed, with why: its class, or the class level of its
+// Tier, as "Załóż" refuses them (equipBlock in the engine). An item goes
+// only to its own slot, in the place of the one there, as "Załóż" puts it
+// on: the game has one ring, one talisman, the off hand as a slot of its
+// own and no two-handed weapons. An empty slot opens the same, without an
+// item worn.
 function slotSheet(slot) {
   const character = state.character;
   const busy = onExploration(character);
@@ -942,7 +944,8 @@ export function itemSheet(item, { equipped, anvil = false }) {
 // The parts of an item's card, for its own sheet and for the top of its
 // slot's (slotSheet): `nodes`, and `shown()` to call once they are on the
 // screen. `preview: false` leaves out what wearing or taking it off
-// changes; `reopen` shows the sheet again after its star changed.
+// changes, and "Karta przedmiotu" by "Zdejmij" opens the whole card with
+// it; `reopen` shows the sheet again after its star changed.
 function itemCard(item, { equipped, anvil = false, preview: withPreview = true, reopen }) {
   const character = state.character;
   // On an exploration the bag stays at hand: only wearing and taking off
@@ -1020,7 +1023,10 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
         'div',
         { class: 'sheet-actions' },
         equipped
-          ? h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: t('Zdejmij') })
+          ? [
+              !withPreview && h('button', { type: 'button', class: 'button button--world', text: t('Karta przedmiotu'), onClick: () => itemSheet(item, { equipped: true }) }),
+              h('button', { type: 'button', class: 'button button--world', disabled: busy, onClick: act('unequip'), text: t('Zdejmij') }),
+            ]
           : [
               h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }),
               h('button', { type: 'button', class: 'button button--system', disabled: busy || !usable || early, onClick: act('equip'), text: t('Załóż') }),
