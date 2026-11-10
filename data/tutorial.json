@@ -1184,7 +1184,7 @@
       "kind": "point",
       "chapter": "towers",
       "text": [
-        "Do Wieży Drużyn wejdziesz z jednym albo dwoma wędrowcami. Wolne miejsce zajmie towarzysz z Kwater."
+        "Do Wieży Drużyn wejdziesz z wędrowcami ze swojej Drużyny albo z towarzyszami z Kwater."
       ],
       "voice": "audio/narration/towers-party.mp3"
     },

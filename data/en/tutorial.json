@@ -436,7 +436,7 @@
     },
     "towers-party": {
       "text": [
-        "You enter the Party Tower with one or two other wanderers. A companion from the Quarters will take a free place."
+        "You enter the Party Tower with wanderers from your Party or with companions from the Quarters."
       ],
       "voice": "audio/narration/en/towers-party.mp3"
     },
