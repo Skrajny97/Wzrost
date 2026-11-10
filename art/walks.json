@@ -418,7 +418,7 @@
       "description": "a thin young woman with long straight black hair in a deep navy blue robe down to the feet patterned with small silver constellations, a silver crescent moon emblem on the chest, a high stiff collar, both hands empty, the arms swinging naturally and keeping their length, no staff and nothing in the hands, an even smooth stride, no sparkles"
     },
     "skin-eclipse-male": {
-      "start": "art/references/walks/bare/skin-eclipse-male.png",
+      "start": "art/references/walks/start/skin-eclipse-male.png",
       "pose": 2,
       "description": "a thin young man with long straight black hair in a deep navy blue robe down to the feet patterned with small silver constellations, a silver crescent moon emblem on the chest, a high stiff collar, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
