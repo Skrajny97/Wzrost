@@ -2595,5 +2595,7 @@
   "{count} godz. temu": "{count} h ago",
   "wczoraj": "yesterday",
   "{count} dni temu": "{count} days ago",
-  "Nie udało się wczytać Skrzyni Gildii.": "The Guild Chest could not be loaded."
+  "Nie udało się wczytać Skrzyni Gildii.": "The Guild Chest could not be loaded.",
+  "Głośność muzyki": "Music volume",
+  "Wyłącz, żeby słuchać własnej muzyki: gra nie będzie wtedy pobierać ani odtwarzać swojej.": "Turn it off to listen to your own music: the game then neither downloads nor plays its own."
 }

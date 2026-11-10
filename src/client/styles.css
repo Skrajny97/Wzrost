@@ -15521,3 +15521,55 @@ a.profession-square:active {
   font-size: 13px;
   overflow-wrap: anywhere;
 }
+
+/* Discord (10.11.2026): the game's server by its invite link
+   (discord.js). Its mark, white on its Blurple tile as Discord's brand
+   asks, sits in a button of the game: right after the Społeczność's title,
+   as the camp's level by its own, clear of the players-online tab on the
+   right edge, and in the "Discord" row of the Ustawienia. */
+.community-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.community-heading .page-heading {
+  min-width: 0;
+}
+
+.community-discord {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  background: var(--bark);
+}
+
+.community-discord:active {
+  background: #3a2e22;
+}
+
+.discord-mark {
+  display: block;
+  flex: none;
+}
+
+a.discord-button {
+  gap: 10px;
+}
+
+.status-row--discord {
+  align-items: center;
+}
+
+/* The button keeps to the right of the label; on a narrow phone its words
+   wrap inside it rather than past the sheet's edge. */
+.status-row--discord dd {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+}

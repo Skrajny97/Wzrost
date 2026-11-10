@@ -395,6 +395,9 @@ export function publicContent() {
       friendsMax: game.community.friends.max,
       gift: { name: game.community.gift.name, claimsPerDay: game.community.gift.claimsPerDay, timePoints: game.community.gift.timePoints },
       trade: { proposalSeconds: game.community.trade.proposalSeconds, maxItems: game.community.trade.maxItems },
+      // The game's Discord server: its invite link and the page's words
+      // (src/client/discord.js).
+      discord: { invite: game.community.discord.invite, texts: game.community.discord.texts },
     },
   };
 }
