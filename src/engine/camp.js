@@ -8,6 +8,7 @@
 // Systemu, once bought, collects every store as it goes (collectorTakes).
 
 import { countedForm, decimalText, word } from './text.js';
+import { weekCount } from './weeks.js';
 
 // The level a stored building has at `now`: an upgrade counts once it ends.
 export function buildingLevel(stored, now) {
@@ -212,13 +213,21 @@ export function production(building, stored, now) {
   return { resource: building.effect.resource, perHour, capacity, amount, since, fullAt: since + (capacity / perHour) * HOUR };
 }
 
+// What a collection gives with the week's `factor` of what the camp's
+// buildings give (camp, weeks.js; the week of the moment it is collected,
+// which the server gives): the store's units times it, made whole fairly
+// with a seed of the building and the collection, so on average just the
+// share more (or less); production goes on from the units made, as ever.
+const weekUnits = (amount, factor, building, collectedAt) => weekCount(amount, factor, `camp:${building.id}:${collectedAt}`);
+
 // Collecting the store: what it gives, and the new start of production. The
 // part of a unit already made is kept, unless the store was full and stood.
-export function collect(building, stored, now) {
+// `factor`: the week's share of it (weekUnits).
+export function collect(building, stored, now, factor = 1) {
   const store = production(building, stored, now);
   if (!store || store.amount < 1) return null;
   const collectedAt = store.amount >= store.capacity ? now : store.since + Math.round((store.amount / store.perHour) * HOUR);
-  return { resource: store.resource, amount: store.amount, collectedAt };
+  return { resource: store.resource, amount: weekUnits(store.amount, factor, building, collectedAt), collectedAt };
 }
 
 // The Zbieracz Systemu (DECISIONS.md, „Zbieracz Systemu”), there since
@@ -244,12 +253,14 @@ export function wholeFills(building, stored, now, from = null) {
 
 // Collecting the store at `now` with the Zbieracz Systemu there since
 // `from`: his whole fills and what the next one holds so far, as a build
-// that begins takes the store along (characters.js: settleBuilds).
-export function collectWithFills(building, stored, now, from = null) {
+// that begins takes the store along (characters.js: settleBuilds), with the
+// week's share of it all (`factor`, weekUnits).
+export function collectWithFills(building, stored, now, from = null, factor = 1) {
   const fills = wholeFills(building, stored, now, from);
-  if (!fills) return collect(building, stored, now);
+  if (!fills) return collect(building, stored, now, factor);
   const rest = collect(building, { ...stored, collectedAt: fills.collectedAt }, now);
-  return { resource: fills.resource, amount: fills.amount + (rest?.amount ?? 0), collectedAt: rest?.collectedAt ?? fills.collectedAt };
+  const collectedAt = rest?.collectedAt ?? fills.collectedAt;
+  return { resource: fills.resource, amount: weekUnits(fills.amount + (rest?.amount ?? 0), factor, building, collectedAt), collectedAt };
 }
 
 // The Zbieracz Systemu collecting as it goes (the author's 753 A), there
@@ -257,10 +268,11 @@ export function collectWithFills(building, stored, now, from = null) {
 // the whole units of the next one (collectWithFills), once `every` ms have
 // passed since it started filling, or at once when a fill is whole; null
 // when nothing is due yet. So a store never stands, and the server writes
-// at most about once in `every` for each building.
-export function collectorTakes(building, stored, now, from, every) {
+// at most about once in `every` for each building. `factor`: the week's
+// share of what he collects (weekUnits).
+export function collectorTakes(building, stored, now, from, every, factor = 1) {
   const store = production(building, stored, now);
   if (!store || stored.endsAt > now) return null;
   if (!wholeFills(building, stored, now, from) && now - store.since < every) return null;
-  return collectWithFills(building, stored, now, from);
+  return collectWithFills(building, stored, now, from, factor);
 }

@@ -74,7 +74,11 @@
     // "715 wszystko OK, wdrażaj angielski bez pytania"); the chat's
     // translations there need Workers AI, which the deploy adds
     // (tools/prepare-cloudflare.mjs).
-    "ENGLISH": "on"
+    "ENGLISH": "on",
+    // "on": the weeks of the year (data/weeks.json, src/server/weeks.js),
+    // each with its small bonus for every player (the author, 10.11.2026);
+    // "off" plays as before them.
+    "WEEKS": "on"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain
@@ -129,7 +133,9 @@
         // The Warownia (src/server/fortress.js), as in the game.
         "FORTRESS": "on",
         // The English beta, only here (490–497 A).
-        "ENGLISH": "on"
+        "ENGLISH": "on",
+        // The weeks of the year, as in the game.
+        "WEEKS": "on"
       },
       "triggers": {
         "crons": ["* * * * *"]

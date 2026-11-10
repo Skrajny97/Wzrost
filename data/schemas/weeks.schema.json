@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Tygodnie roku",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["texts", "stats", "kinds", "weeks"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "intro", "start", "now", "next", "year", "until", "report", "notice"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "description": "Nagłówek okienka Tygodnie." },
+        "intro": { "type": "string", "minLength": 1, "description": "Zdanie pod nagłówkiem okienka." },
+        "start": { "type": "string", "minLength": 1, "description": "Zdanie o wyprawach i pracach, które biorą tydzień swojego początku." },
+        "now": { "type": "string", "minLength": 1, "description": "Ten tydzień." },
+        "next": { "type": "string", "minLength": 1, "description": "Trzy kolejne tygodnie." },
+        "year": { "type": "string", "minLength": 1, "description": "Rozwijana lista całego roku." },
+        "until": { "type": "string", "minLength": 1, "description": "Koniec paska na ekranie Walki." },
+        "report": { "type": "string", "minLength": 1, "description": "Linijka Systemu w raporcie wyprawy: {week} i {effects}." },
+        "notice": { "type": "string", "minLength": 1, "description": "Komunikat przy pierwszej wizycie postaci w nowym tygodniu: {week} i {effects}." }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "description": "Statystyka w dopełniaczu do {stat} w słowach skutku, po id ze stats.json.",
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "kinds": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["xp", "gold", "items", "materials", "profession-xp", "herbs", "minerals", "camp", "rest", "upgrade", "reputation", "stat"],
+      "properties": {
+        "xp": { "$ref": "#/definitions/words" },
+        "gold": { "$ref": "#/definitions/words" },
+        "items": { "$ref": "#/definitions/words" },
+        "materials": { "$ref": "#/definitions/words" },
+        "profession-xp": { "$ref": "#/definitions/words" },
+        "herbs": { "$ref": "#/definitions/words" },
+        "minerals": { "$ref": "#/definitions/words" },
+        "camp": { "$ref": "#/definitions/words" },
+        "rest": { "$ref": "#/definitions/words" },
+        "upgrade": { "$ref": "#/definitions/words" },
+        "reputation": { "$ref": "#/definitions/words" },
+        "stat": { "$ref": "#/definitions/words" }
+      }
+    },
+    "weeks": {
+      "type": "array",
+      "minItems": 52,
+      "maxItems": 52,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "number", "name", "effects"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "number": { "type": "integer", "minimum": 1, "maximum": 52, "description": "Numer tygodnia ISO (53. bierze wpis 52.)." },
+          "name": { "type": "string", "minLength": 1 },
+          "effects": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["kind", "value"],
+              "properties": {
+                "kind": { "enum": ["xp", "gold", "items", "materials", "profession-xp", "herbs", "minerals", "camp", "rest", "upgrade", "reputation", "stat"] },
+                "value": { "type": "number", "minimum": -50, "maximum": 100, "not": { "const": 0 }, "description": "Procent więcej (ujemny: mniej)." },
+                "stat": { "type": "string", "pattern": "^[a-z]+$", "description": "Statystyka przy rodzaju stat." }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "words": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["up", "down", "short"],
+      "properties": {
+        "up": { "type": "string", "minLength": 1, "description": "Premia: {value} bez znaku." },
+        "down": { "type": "string", "minLength": 1, "description": "Kara: {value} bez znaku." },
+        "short": { "type": "string", "minLength": 1, "description": "W raporcie i na liście roku: {value} ze znakiem." }
+      }
+    }
+  }
+}

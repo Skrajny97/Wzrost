@@ -30,10 +30,11 @@ import { areasOpened, areaUnlocked } from './unlocks.js';
 export const QUEST_PERIODS = ['daily', 'weekly', 'monthly'];
 
 // The zone's wall clock. Intl knows the zone's rules (summer time), so the
-// days turn at the zone's midnight all year.
+// days turn at the zone's midnight all year. The weeks of the year count
+// their weeks by it too (weeks.js).
 const clocks = new Map();
 
-function zoneClock(ms, timeZone) {
+export function zoneClock(ms, timeZone) {
   let clock = clocks.get(timeZone);
   if (!clock) {
     clock = new Intl.DateTimeFormat('en-GB', {
@@ -62,14 +63,14 @@ function zoneOffset(ms, timeZone) {
 // The moment the zone's clock shows midnight `days` after the day it shows
 // at `ms`. The offset is taken near that moment, and again at it, so a
 // change of time on that day is on the right side.
-function zoneMidnight(ms, timeZone, days) {
+export function zoneMidnight(ms, timeZone, days) {
   const { year, month, day } = zoneClock(ms, timeZone);
   const wall = Date.UTC(year, month - 1, day + days);
   return wall - zoneOffset(wall - zoneOffset(wall, timeZone), timeZone);
 }
 
 // Days since Monday on the zone's clock at `ms`.
-function sinceMonday(ms, timeZone) {
+export function sinceMonday(ms, timeZone) {
   const { year, month, day } = zoneClock(ms, timeZone);
   return (new Date(Date.UTC(year, month - 1, day)).getUTCDay() + 6) % 7;
 }

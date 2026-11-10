@@ -61,6 +61,7 @@ import {
 } from './characters.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
+import { weekFactorNow } from './weeks.js';
 
 // A JSON path for a resource id with a hyphen ("iron-ore").
 const path = (id) => `$."${id}"`;
@@ -124,9 +125,10 @@ export async function beginBuilding(db, player, buildingId, now) {
   const resources = Object.keys(cost).filter((id) => id !== 'gold');
   const endsAt = now + buildMinutes(building, target, campLevel(player.buildings, now, content()), content()) * 60000;
   // A production building stops during the upgrade: what its store holds goes
-  // to the resources now, and it fills again from the end of the upgrade.
+  // to the resources now, with the week's share (weeks.js), and it fills
+  // again from the end of the upgrade.
   const producing = building.effect?.kind === 'production';
-  const gathered = producing ? collect(building, stored, now) : null;
+  const gathered = producing ? collect(building, stored, now, weekFactorNow(now, 'camp')) : null;
   const changes = Object.fromEntries(resources.map((id) => [id, -cost[id]]));
   // A store of gold (Staw Midasa) pays part of the cost.
   const gatheredGold = gathered?.resource === 'gold' ? gathered.amount : 0;
@@ -493,7 +495,8 @@ export async function collectProduction(context) {
   }
   const now = context.now;
   const stored = player.buildings[building.id];
-  const gathered = collect(building, stored, now);
+  // With the week's share of what the buildings give (weeks.js).
+  const gathered = collect(building, stored, now, weekFactorNow(now, 'camp'));
   if (!gathered) throw new ApiError(409, 'nothing_to_collect', 'Magazyn jest jeszcze pusty.');
 
   const db = context.env.DB;

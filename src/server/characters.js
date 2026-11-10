@@ -107,13 +107,15 @@ import {
   nameColor,
   seatLevels,
   collectorTakes,
+  weekAt,
+  weekRest,
 } from '../engine/index.js';
 import { mountView } from '../engine/stable.js';
 import { say } from '../engine/text.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
 import { content, contentIn } from './content.js';
-import { craftingOn, fortressOn, professionsOn, settlementOn } from './features.js';
+import { craftingOn, fortressOn, professionsOn, settlementOn, weeksOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { assertion, characterChanged, raced, sameVersion } from './atomic.js';
@@ -130,6 +132,7 @@ import { OWN_CHARACTERS } from './roles.js';
 import { requirePlayable } from './sessions.js';
 import { tradeBlockOf, tradesEnded } from './trades.js';
 import { skipIntroduction } from './tutorial.js';
+import { weekFactorNow, weekOfCharacter } from './weeks.js';
 
 // 2 to 20 characters: letters and digits, spaces, hyphens, apostrophes and
 // underscores ("Justi_725"), from a letter to a letter or a digit. What a
@@ -426,7 +429,8 @@ export async function settleCollector(db, player, now) {
       .filter((building) => building.effect.kind === 'production')
       .map((building) => {
         const stored = player.buildings[building.id];
-        return { building, stored, gathered: collectorTakes(building, stored, now, row.collector_at, every) };
+        // With the week's share of what the buildings give (weeks.js).
+        return { building, stored, gathered: collectorTakes(building, stored, now, row.collector_at, every, weekFactorNow(now, 'camp')) };
       })
       .filter((fill) => fill.gathered);
     if (fills.length === 0) return;
@@ -463,7 +467,9 @@ async function settleBuilds(db, player, now) {
     const building = content().buildingsById[entry.buildingId];
     const producing = building?.effect?.kind === 'production';
     const stored = player.buildings[building?.id];
-    const gathered = !producing ? null : row.collector_at ? collectWithFills(building, stored, at, row.collector_at) : collect(building, stored, at);
+    // The store goes as the build begins, with that week's share (weeks.js).
+    const week = weekFactorNow(at, 'camp');
+    const gathered = !producing ? null : row.collector_at ? collectWithFills(building, stored, at, row.collector_at, week) : collect(building, stored, at, week);
     const resting = restsDuring(player.activity);
     const hp = resting ? currentHp(player, at).hp : null;
     const gain = gathered && gainSql(gathered.resource, gathered.amount);
@@ -841,12 +847,16 @@ export function engineCharacter(row) {
 export const equippedItems = (player) => player.items.filter((item) => item.equippedSlot);
 
 // HP now: frozen at the start of an exploration, otherwise rested since
-// hp_at (also while gathering herbs), faster with the camp's Ognisko.
+// hp_at (also while gathering herbs), faster with the camp's Ognisko, and
+// faster or slower in a week of resting (weekRest in weeks.js): `rest`
+// gives the pace from hp_at and from its last change on, for the page and
+// the pace of now too.
 export function currentHp(player, now) {
   const character = engineCharacter(player.row);
   const { totals } = computeStats(character, equippedItems(player), content());
   const combatant = playerCombatant({ character, equipped: equippedItems(player), name: player.row.name }, content());
-  const rest = restBonus(player.buildings, player.row.hp_at, now, content());
+  const camp = restBonus(player.buildings, player.row.hp_at, now, content());
+  const rest = weeksOn() ? weekRest(camp, player.row.hp_at, now, content()) : camp;
   const hp = !restsDuring(player.activity)
     ? player.activity.hp_at_start
     : restedHp(
@@ -1434,7 +1444,9 @@ export function characterView(player, now) {
   // Less gold on the Kowadło with the Bractwo Kowali (590) and the guild's
   // Kuźnia Gildii (616 A).
   const anvilDiscount = anvilDiscountOf(player);
-  const toItem = (item) => ({ id: item.id, ...itemView(item, content(), { sellBonus, upgradeCap, materials, anvilDiscount }), salvage: salvage(item) });
+  // The chance of an upgrade with the week's share of it (weeks.js).
+  const anvilWeek = weekFactorNow(now, 'upgrade');
+  const toItem = (item) => ({ id: item.id, ...itemView(item, content(), { sellBonus, upgradeCap, materials, anvilDiscount, anvilWeek }), salvage: salvage(item) });
   // Whether a bag item would make the character stronger in place of what
   // its slot holds (preview.js), for the marks on the bag and on finds; null
   // for an item the class cannot wear.
@@ -1600,6 +1612,10 @@ export function characterView(player, now) {
     // the introduction (tutorial.js).
     tutorial: row.tutorial === null ? null : JSON.parse(row.tutorial),
     activity: activityView(activity, row.level, now),
+    // The week of the year and the three after it, for the line on the
+    // Walka screen and the sheet Tygodnie, with the notice of a new week not
+    // told yet (weeks.js), or null where the weeks are off.
+    week: weekOfCharacter(row, now),
     serverTime: now,
   };
 }
@@ -1869,6 +1885,16 @@ export async function renameCharacter(context) {
 export async function nameNoticeSeen(context) {
   const { session, player } = await requirePlayer(context);
   await context.env.DB.prepare('UPDATE characters SET name_notice = NULL WHERE id = ?').bind(player.row.id).run();
+  return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
+}
+
+// The new week of the year told on the page (weekOfCharacter in weeks.js):
+// not told again until the next one. The character's version stays, as
+// for the name's notice, so no action of the same moment is refused.
+export async function weekNoticeSeen(context) {
+  const { session, player } = await requirePlayer(context);
+  const { startsAt } = weekAt(context.now, content());
+  await context.env.DB.prepare('UPDATE characters SET week_seen = ? WHERE id = ? AND COALESCE(week_seen, 0) < ?').bind(startsAt, player.row.id, startsAt).run();
   return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
 }
 

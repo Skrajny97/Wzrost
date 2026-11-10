@@ -33,6 +33,7 @@ import { countList, knownHerbs, professionOpen, professionState } from './profes
 import { monsterXp } from './progression.js';
 import { createRng } from './rng.js';
 import { say, word } from './text.js';
+import { weekChance, weekFactor, weekFighter } from './weeks.js';
 
 // The chance an exploration of `minutes` that ended as planned brings an
 // event: `chance` at fullChanceMinutes and a share of it below, so a very
@@ -258,7 +259,11 @@ const resourceLoss = (lost, content) =>
 // exploration's reference fights does, the foes leave gold and, with
 // itemChance, now and then an item, and `win` adds gold or an item of its
 // rarities (told by its text, {item}); lost, the character faints (or, in a
-// safe place, only gets away) as after a lost fight on the way.
+// safe place, only gets away) as after a lost fight on the way. The week
+// the exploration set out in (`hunt.week`, weeks.js) works in the fight as
+// on the way: its share of the foes' XP and gold, of the chance of their
+// item and of the character's stats; a reward with no fight gives just what
+// its text names ("+15 reputacji u Kompanii Kupców").
 export function resolveEvent(
   {
     hunt,
@@ -433,8 +438,9 @@ export function resolveEvent(
   for (const [kind, window] of Object.entries(buffs)) {
     if (Number.isFinite(window.fights) ? hunt.fights.length < window.fights : t < window.ms) on[kind] = window.bonus;
   }
-  const player = playerCombatant({ character, equipped, hp: hunt.hpEnd, name, area }, content);
-  const armed = fightingPlayer({ unit: player, character, equipped, name, area, hp: hunt.hpEnd, on, kit, trophies }, content);
+  const fighter = weekFighter(character, hunt.week);
+  const player = playerCombatant({ character: fighter, equipped, hp: hunt.hpEnd, name, area }, content);
+  const armed = fightingPlayer({ unit: player, character: fighter, equipped, name, area, hp: hunt.hpEnd, on, kit, trophies }, content);
   const ally = { ...armed, ...(outcome.speedBonus && { speed: armed.speed * (1 + outcome.speedBonus) }) };
   const allies = [ally, ...mates.map((mate) => mate.unit)];
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait, ambush: outcome.ambush === true });
@@ -485,14 +491,14 @@ export function resolveEvent(
     for (const enemy of enemies) {
       const foe = content.monstersById[enemy.monsterId];
       fightXp += monsterXp(foe, enemy.level, content) * enemy.groupFactor;
-      fightGold += rewards.goldPerLevel * enemy.level * foe.reward.gold * rng.float(0.5, 1.5) * enemy.groupFactor;
-      if (rng.chance(outcome.itemChance ?? 0)) summary.chests.push(items.push(randomItem(enemy.level, rng, content, loot)) - 1);
+      fightGold += rewards.goldPerLevel * enemy.level * foe.reward.gold * rng.float(0.5, 1.5) * enemy.groupFactor * weekFactor(hunt.week, 'gold');
+      if (rng.chance(weekChance(outcome.itemChance ?? 0, hunt.week, 'items'))) summary.chests.push(items.push(randomItem(enemy.level, rng, content, loot)) - 1);
     }
     // What the win leaves besides: the offerings' silver, the leshy's gift.
     if (outcome.win?.gold) fightGold += goldOf(outcome.win.gold);
     const won = outcome.win?.itemRarities ? itemOf(outcome.win.itemRarities) : null;
     // Each companion who fought takes its share, as on the exploration.
-    summary.xp = Math.round(fightXp * (1 + content.balance.hunt.soloXpBonus) * (1 - mates.length * content.settlement.companions.xpCost));
+    summary.xp = Math.round(fightXp * (1 + content.balance.hunt.soloXpBonus) * (1 - mates.length * content.settlement.companions.xpCost) * weekFactor(hunt.week, 'xp'));
     summary.gold = Math.round(fightGold);
     summary.recovered = Math.round((player.maxHp - hpNow) * player.recovery);
     hpNow += summary.recovered;

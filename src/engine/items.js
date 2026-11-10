@@ -326,7 +326,13 @@ export function itemUpgradeCost(item, target, content) {
   };
 }
 
-export const upgradeChance = (target, content) => content.balance.upgrades.chances[target - 1];
+// The chance of an upgrade to `target`, `factor` times as large in a week
+// that raises (or lowers) it (upgrade, weeks.js; the week of the try, which
+// the server gives), at most certain.
+export const upgradeChance = (target, content, factor = 1) => {
+  const chance = content.balance.upgrades.chances[target - 1];
+  return factor === 1 ? chance : Math.min(1, chance * factor);
+};
 
 // A Kowadło price with `discount` of its gold off, at least one gold.
 const discounted = (cost, discount) => (discount > 0 ? { ...cost, gold: Math.max(1, Math.round(cost.gold * (1 - discount))) } : cost);
@@ -353,9 +359,10 @@ export function breakChance(current, content) {
 // Kowadło, and a break is a failure (`saved`), with its lost level too.
 // `steady`: a Zwój utrwalenia lies there, and a failure keeps the level
 // (`kept`; the author's of 4.11.2026). The draws are the same either way.
-export function rollUpgrade(item, rng, content, { warded = false, steady = false } = {}) {
+// `week`: the factor of the week's upgrade chance (upgradeChance).
+export function rollUpgrade(item, rng, content, { warded = false, steady = false, week = 1 } = {}) {
   const current = item.upgrade ?? 0;
-  if (rng.chance(upgradeChance(current + 1, content))) return { result: 'success', upgrade: current + 1 };
+  if (rng.chance(upgradeChance(current + 1, content, week))) return { result: 'success', upgrade: current + 1 };
   const kept = steady && current > 0;
   const failure = { result: 'failure', upgrade: kept ? current : Math.max(0, current - 1), ...(kept && { kept: true }) };
   if (rng.chance(breakChance(current, content))) return warded ? { ...failure, saved: true } : { result: 'broken', upgrade: current };
@@ -368,8 +375,9 @@ export function rollUpgrade(item, rng, content, { warded = false, steady = false
 // materials, the materials the next level takes come as the pages show
 // them: the pieces held and those it would take (rarityNeedView).
 // `discount`: the share of the gold the Bractwo Kowali takes off (590), the
-// ore and the materials as they are.
-export function upgradeView(item, cap, content, stock = null, discount = 0) {
+// ore and the materials as they are. `week`: the factor of the week's
+// upgrade chance (upgradeChance).
+export function upgradeView(item, cap, content, stock = null, discount = 0, week = 1) {
   const level = item.upgrade ?? 0;
   const max = maxUpgrade(content);
   const reach = Math.min(cap, max);
@@ -385,7 +393,7 @@ export function upgradeView(item, cap, content, stock = null, discount = 0) {
             level: target,
             cost: discounted(itemUpgradeCost(item, target, content), discount),
             materials: need && stock ? rarityNeedView(stock, need, content) : need,
-            chance: upgradeChance(target, content),
+            chance: upgradeChance(target, content, week),
             breakChance: breakChance(level, content),
             properties: itemProperties({ ...item, upgrade: target }, content),
           }
@@ -456,8 +464,9 @@ export function autoEquip(equipped, items, content, classId, classLevel) {
 
 // `upgradeCap`: the level of the camp's Kowadło, for the upgrade part of the
 // item card; left out where the card cannot upgrade (a report). `materials`:
-// the character's stock, which pays for the upgrades (upgradeView).
-export function itemView(item, content, { sellBonus = 0, upgradeCap, materials = null, anvilDiscount = 0 } = {}) {
+// the character's stock, which pays for the upgrades (upgradeView);
+// `anvilWeek`, the factor of the week's upgrade chance.
+export function itemView(item, content, { sellBonus = 0, upgradeCap, materials = null, anvilDiscount = 0, anvilWeek = 1 } = {}) {
   const rarity = content.raritiesById[item.rarity];
   const classIds = baseClasses(item.base, content);
   const classLevel = baseClassLevel(item.base, content);
@@ -491,6 +500,6 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     // Konta: worn from its own level on (src/server/inventory.js).
     ...(item.traded ? { traded: true } : {}),
     ...(item.chest ? { chest: true } : {}),
-    ...(upgradeCap === undefined ? {} : { anvil: upgradeView(item, upgradeCap, content, materials, anvilDiscount) }),
+    ...(upgradeCap === undefined ? {} : { anvil: upgradeView(item, upgradeCap, content, materials, anvilDiscount, anvilWeek) }),
   };
 }

@@ -8,12 +8,13 @@
 // the posters done that day and the poster taken (`beaten` once its target
 // fell).
 
-import { questPeriod, wantedOf, wantedPosters, wantedTrophy } from '../engine/index.js';
+import { questPeriod, wantedOf, wantedPosters, wantedTrophy, weekCount } from '../engine/index.js';
 import { characterView, loadPlayer, requirePlayer, settlementBoard } from './characters.js';
 import { content } from './content.js';
 import { ApiError, json, readJson } from './http.js';
 import { requireOpen, settlementOf, settlementView } from './settlement.js';
 import { hallRecord } from './trial-hall.js';
+import { weekFactorNow } from './weeks.js';
 
 const today = (now) => questPeriod('daily', now, content()).key;
 
@@ -181,12 +182,14 @@ export async function claimWanted(context) {
   const { day, done, taken } = record;
   if (!taken?.beaten) throw new ApiError(409, 'not_beaten', rules.texts.notBeaten);
   const add = (points, id, gain) => ({ ...points, [id]: (points[id] ?? 0) + gain });
+  // The brotherhood's reputation with the week's share (weeks.js).
+  const reputation = weekCount(rules.reputation, weekFactorNow(context.now, 'reputation'), `wanted:${taken.id}`);
   const next = {
     ...stored,
-    reputation: add(stored.reputation, rules.brotherhood, rules.reputation),
+    reputation: add(stored.reputation, rules.brotherhood, reputation),
     relations: add(stored.relations, rules.resident, rules.relationGain),
     wanted: { ...record, done: taken.id.startsWith(`${day}:`) ? [...done, taken.id] : done, taken: null },
   };
   const saved = await save(context, session, row, next, { gold: taken.gold, time: rules.timePoints });
-  return json({ ...saved, claimed: { gold: taken.gold, timePoints: rules.timePoints, reputation: rules.reputation } });
+  return json({ ...saved, claimed: { gold: taken.gold, timePoints: rules.timePoints, reputation } });
 }

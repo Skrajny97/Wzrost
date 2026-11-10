@@ -24,10 +24,13 @@ export const professionOpen = (profession, level, content) => level >= professio
 export const professionXpToNext = (profession, level) => level * profession.levelMinutes;
 
 // The profession after `minutes` of work, with the levels gained. At its top
-// level the XP stays at 0.
-export function workProfession(profession, state, minutes) {
-  const next = gainXp(state.level, state.xp, minutes, (level) => professionXpToNext(profession, level), profession.maxLevel);
-  return { level: next.level, xp: next.xp, levels: next.levels };
+// level the XP stays at 0. `factor`: the share more (or less) of the XP of
+// the week the work began in (profession-xp, weeks.js), the XP rounded; the
+// XP gained (`gained`) for the report.
+export function workProfession(profession, state, minutes, factor = 1) {
+  const gained = factor === 1 ? minutes : Math.round(minutes * factor);
+  const next = gainXp(state.level, state.xp, gained, (level) => professionXpToNext(profession, level), profession.maxLevel);
+  return { level: next.level, xp: next.xp, levels: next.levels, gained };
 }
 
 // What a profession at a level adds to each of its two stats: statPerLevel
@@ -67,8 +70,9 @@ export const knownHerbs = (level, content) => content.herbs.filter((herb) => her
 export const herbSlots = (level, content) => content.gathering.slots.findLast((slot) => slot.level <= level).herbs;
 
 // Herbs of one kind an hour at a level: more with each level, and `more`
-// more with the Bractwo Zielarzy (589 A, herbYield).
-export const herbsPerHour = (herb, level, content, more = 0) => herb.perHour * (1 + content.gathering.yieldPerLevel * (level - 1)) * (1 + more);
+// more with the Bractwo Zielarzy (589 A, herbYield); `week`, the factor of
+// the week the gathering began in (herbs, weeks.js).
+export const herbsPerHour = (herb, level, content, more = 0, week = 1) => herb.perHour * (1 + content.gathering.yieldPerLevel * (level - 1)) * (1 + more) * week;
 
 // The slider's times: the shortest, then every step up to the longest.
 export function gatheringMinutes(content) {
@@ -79,11 +83,11 @@ export function gatheringMinutes(content) {
 // What a gathering of `minutes` should bring of each herb, the time shared
 // evenly among them: the expected count, and the lowest and highest the
 // spread allows.
-export function expectedHerbs(herbIds, minutes, level, content, more = 0) {
+export function expectedHerbs(herbIds, minutes, level, content, more = 0, week = 1) {
   const { spread } = content.gathering;
   return Object.fromEntries(
     herbIds.map((id) => {
-      const expected = (herbsPerHour(content.herbsById[id], level, content, more) * minutes) / 60 / herbIds.length;
+      const expected = (herbsPerHour(content.herbsById[id], level, content, more, week) * minutes) / 60 / herbIds.length;
       return [id, { expected, low: Math.floor(expected * (1 - spread)), high: Math.ceil(expected * (1 + spread)) }];
     }),
   );
@@ -91,11 +95,12 @@ export function expectedHerbs(herbIds, minutes, level, content, more = 0) {
 
 // The herbs found, by id: each herb's expected count, ± the spread, made
 // whole with the seed. A gathering always brings at least one herb. `more`:
-// the Bractwo Zielarzy's share more, kept with the gathering when it began.
-export function gatherHerbs({ herbIds, minutes, level, seed, more = 0 }, content) {
+// the Bractwo Zielarzy's share more, kept with the gathering when it began;
+// `week`, the factor of the week it began in (herbs, weeks.js).
+export function gatherHerbs({ herbIds, minutes, level, seed, more = 0, week = 1 }, content) {
   const rng = createRng(seed);
   const { spread } = content.gathering;
-  const expected = expectedHerbs(herbIds, minutes, level, content, more);
+  const expected = expectedHerbs(herbIds, minutes, level, content, more, week);
   const found = Object.fromEntries(herbIds.map((id) => [id, countEvents(expected[id].expected * rng.float(1 - spread, 1 + spread), rng)]));
   if (Object.values(found).every((count) => count === 0)) found[herbIds[0]] = 1;
   return found;
@@ -162,13 +167,14 @@ export function professionLevelLines(profession, before, after, content) {
 }
 
 // A profession in a report: its levels before and after, the XP of the
-// `minutes` worked and what the next level needs.
+// `minutes` worked (with the week's share, workProfession's `gained`) and
+// what the next level needs.
 export const professionProgress = (profession, before, after, minutes) => ({
   id: profession.id,
   name: profession.name,
   levelBefore: before.level,
   levelAfter: after.level,
-  xp: minutes,
+  xp: after.gained ?? minutes,
   xpAfter: after.xp,
   xpToNext: after.level < profession.maxLevel ? professionXpToNext(profession, after.level) : 0,
 });

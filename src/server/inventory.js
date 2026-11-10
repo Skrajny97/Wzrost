@@ -39,6 +39,7 @@ import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { takenOff } from './market.js';
+import { weekFactorNow } from './weeks.js';
 import { anvilDiscountOf } from './perks.js';
 
 // The scrapper's price for the stored `items`, summed in SQL over the items
@@ -223,12 +224,14 @@ export async function previewItem(context) {
 // key: piecesOfRarity in the engine; nothing below materialFrom), and a
 // Zwój ochronny where the item may break and the player asked for it
 // (`body.ward`). The same for an item a companion wears, paid by the
-// character (settlement.js).
+// character (settlement.js). `week`: the factor of the week's upgrade
+// chance now (weeks.js), for the try (rollUpgrade).
 export function upgradePlan(player, item, body, now) {
   const cap = campBonus(campLevels(player.buildings, now, content()), 'upgradeCap', content());
+  const week = weekFactorNow(now, 'upgrade');
   // Less gold with the Bractwo Kowali (590) and the guild's Kuźnia Gildii
   // (616 A), as the item card shows.
-  const view = upgradeView(item, cap, content(), null, anvilDiscountOf(player));
+  const view = upgradeView(item, cap, content(), null, anvilDiscountOf(player), week);
   if (view.level >= view.max) throw new ApiError(409, 'max_upgrade', 'Ten przedmiot ma już najwyższe ulepszenie.');
   if (!view.next) {
     throw new ApiError(
@@ -254,7 +257,7 @@ export function upgradePlan(player, item, body, now) {
     const short = need.count - heldOfRarity(materials, need.rarity, content());
     throw new ApiError(409, 'no_material', `Brakuje ${short} szt. materiałów tej samej rzadkości co przedmiot (${content().raritiesById[need.rarity].name}).`);
   }
-  return { view, cost, warded, steady, taken };
+  return { view, cost, warded, steady, taken, week };
 }
 
 // A try's payment (upgradePlan) as the characters row's SQL: gold, iron ore,
@@ -290,7 +293,7 @@ export async function upgradeItem(context) {
   const inSet = sets.some((set) => set?.items.includes(item.id));
 
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
-  const outcome = rollUpgrade(item, createRng(roll), content(), { warded, steady });
+  const outcome = rollUpgrade(item, createRng(roll), content(), { warded, steady, week: plan.week });
   const forget =
     outcome.result === 'broken' && inSet
       ? JSON.stringify({ ...JSON.parse(row.fortress ?? '{}'), sets: sets.map((set) => set && { ...set, items: set.items.filter((id) => id !== item.id) }) })

@@ -5,7 +5,7 @@
 // character brings nothing, as from the Zagajnik. Minerals take no room in
 // the bag; they sell to the scrapper or go away.
 
-import { addQuestProgress, campBonus, campLevels, mineMinerals, miningMinutes, miningReport, professionOpen, professionState, professionUnlockLevel, saleGold } from '../engine/index.js';
+import { addQuestProgress, campBonus, campLevels, mineMinerals, miningMinutes, miningReport, professionOpen, professionState, professionUnlockLevel, saleGold, weekFactor } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
@@ -14,6 +14,7 @@ import { ApiError, json, readJson } from './http.js';
 import { addTo, requireProfessions, takeFromBag, workGains } from './professions.js';
 import { mineralsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
+import { keptWeek, weekNow } from './weeks.js';
 
 // A profession that opens later than the Profesje tab waits for its level.
 export function requireOpen(player, profession) {
@@ -39,8 +40,10 @@ export async function startMining(context) {
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const db = context.env.DB;
   const { row } = player;
-  // The character's level sets the veins' gold; `begun`, when it really began.
-  const options = JSON.stringify({ level: row.level, begun: now });
+  // The character's level sets the veins' gold; `begun`, when it really
+  // began; `week`, the week of the year it begins in (weeks.js).
+  const week = weekNow(now);
+  const options = JSON.stringify({ level: row.level, begun: now, ...(week && { week }) });
   const ends = now + body.minutes * 60000;
   try {
     await db.batch(
@@ -78,7 +81,8 @@ export async function finishMining(db, player, now, { avatar = false } = {}) {
   const profession = content().professionsById[mining.profession];
   const before = professionState(JSON.parse(row.professions ?? '{}'), profession.id);
   const options = JSON.parse(activity.options ?? '{}');
-  const mined = mineMinerals({ minutes: activity.minutes, level: before.level, characterLevel: options.level ?? row.level, seed: activity.seed }, content());
+  // The week it began in: its share of the minerals (weeks.js).
+  const mined = mineMinerals({ minutes: activity.minutes, level: before.level, characterLevel: options.level ?? row.level, seed: activity.seed, week: weekFactor(keptWeek(options), 'minerals') }, content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, activity.minutes, avatar, now);
   const report = {
     ...miningReport({ minutes: activity.minutes, startedAt: activity.started_at, endsAt: activity.ends_at, seed: activity.seed, mined, before, after, character, xp, work }, content()),

@@ -9,7 +9,10 @@
 // EVOLUTIONS is "off", which plays as before them (the live game hid them
 // in versions 0.0.58–0.0.60). English (ENGLISH "on", i18n.js) is on
 // everywhere from version 0.1.97; where it is off, the game answers in
-// Polish and offers no choice of language. The env is the same for every
+// Polish and offers no choice of language. The weeks of the year
+// (src/server/weeks.js) give their effects where WEEKS is "on"; the API
+// tests turn them off, so a test's numbers do not hang on the week it runs
+// in. The env is the same for every
 // request of a deployment, so the switches are read once per request
 // (index.js) and kept here for the rest of the code.
 
@@ -22,6 +25,7 @@ let evolutions = true;
 let settlement = false;
 let fortress = false;
 let english = false;
+let weeks = false;
 
 export function readFeatures(env) {
   professions = env.PROFESSIONS === 'on';
@@ -33,6 +37,7 @@ export function readFeatures(env) {
   settlement = env.SETTLEMENT === 'on';
   fortress = env.FORTRESS === 'on';
   english = env.ENGLISH === 'on';
+  weeks = env.WEEKS === 'on';
 }
 
 export const professionsOn = () => professions;
@@ -52,6 +57,8 @@ export const fortressOn = () => fortress;
 // The English beta (i18n.js): the language of each request and the choice
 // of it, first only where ENGLISH is "on".
 export const englishOn = () => english;
+// The weeks of the year (weeks.js), where WEEKS is "on".
+export const weeksOn = () => weeks;
 // A camp building of the Osada's (Kwatery, `settlement` in buildings.json)
 // stands only where the Osada is on, and one of the Warownia's (`fortress`)
 // only where the Warownia is; the others everywhere.

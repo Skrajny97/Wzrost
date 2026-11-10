@@ -7,7 +7,7 @@
 // language has its own content, so what the engine keeps once for a
 // content (skill-demo.js, encyclopedia.js) is kept for each language apart.
 
-import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, evolutionArt, landBestiaryChest, meetingChances, ordinaryMaterial, overlayTexts, regionDangers } from '../engine/index.js';
+import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, evolutionArt, landBestiaryChest, meetingChances, ordinaryMaterial, overlayTexts, regionDangers, weeksContent } from '../engine/index.js';
 import { buildingOn, craftingOn, evolutionsOn, settlementOn } from './features.js';
 import { language, languageOffered, pageDictionary } from './i18n.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
@@ -47,6 +47,7 @@ import towers from '../../data/towers.json' with { type: 'json' };
 import portals from '../../data/portals.json' with { type: 'json' };
 import guilds from '../../data/guilds.json' with { type: 'json' };
 import cosmetics from '../../data/cosmetics.json' with { type: 'json' };
+import weeks from '../../data/weeks.json' with { type: 'json' };
 // The English texts (data/en/), by the data file they translate. A file
 // added there is named here too (tools/i18n-check.mjs checks it).
 import enAffixes from '../../data/en/affixes.json' with { type: 'json' };
@@ -85,6 +86,7 @@ import enTowers from '../../data/en/towers.json' with { type: 'json' };
 import enPortals from '../../data/en/portals.json' with { type: 'json' };
 import enTutorial from '../../data/en/tutorial.json' with { type: 'json' };
 import enUnlocks from '../../data/en/unlocks.json' with { type: 'json' };
+import enWeeks from '../../data/en/weeks.json' with { type: 'json' };
 
 // The data files by their names, as data/en/ names its translations.
 const polishData = {
@@ -125,6 +127,7 @@ const polishData = {
   music,
   sounds,
   animations,
+  weeks,
 };
 
 export const OVERLAYS = {
@@ -166,6 +169,7 @@ export const OVERLAYS = {
     tutorial: enTutorial,
     portals: enPortals,
     unlocks: enUnlocks,
+    weeks: enWeeks,
   },
 };
 
@@ -388,6 +392,9 @@ export function publicContent() {
         texts: { button: game.chat.mentions.texts.button, suggestions: game.chat.mentions.texts.suggestions, tagged: game.chat.mentions.texts.tagged, news: game.chat.mentions.texts.news },
       },
     },
+    // The weeks of the year (weeks.js): the words of the line on the Walka
+    // screen and of the sheet Tygodnie, and every week with its effects.
+    weeks: weeksContent(game),
     // The Społeczność's drop-down list, and the limits of the Znajomi, the
     // Upominek and the Wymiana the page tells of (community.js, trade.js).
     community: {

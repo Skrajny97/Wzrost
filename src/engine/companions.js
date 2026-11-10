@@ -21,6 +21,7 @@ import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { topLevel } from './skills.js';
 import { autoDistribute } from './stats.js';
+import { weekCount, weekFactor } from './weeks.js';
 
 const tuning = (content) => content.settlement.companions;
 
@@ -165,18 +166,21 @@ function chatterLine(index, rng, content) {
 // swojej historii, kolejne kawałki odsłaniają się z relacją, a rozmowa ją
 // podnosi"): the next piece of its story once the relation has reached
 // that piece's standing, else a word of chatter of its standing, picked by
-// the day; and the companion after it, `talk` points closer.
-export function talkWith(companion, { seed, now }, content) {
+// the day; and the companion after it, `talk` points closer, with the share
+// of the week (`week`, the week of the talk; reputation, weeks.js), made
+// whole fairly.
+export function talkWith(companion, { seed, now, week = null }, content) {
   const t = tuning(content);
   const day = questPeriod('daily', now, content).key;
+  const points = weekCount(t.relation.talk, weekFactor(week, 'reputation'), `${seed}:talk:${companion.id}:${day}:week`);
   const pieces = t.talks.stories[companion.story % t.talks.stories.length];
   const told = companion.told ?? 0;
   const { index } = companionStanding(companion, content);
   const story = told < pieces.length && told <= index;
   const text = story ? pieces[told] : chatterLine(index, createRng(`${seed}:talk:${companion.id}:${day}`), content);
   return {
-    talk: { text: gendered(text, companion.appearance), story, points: t.relation.talk },
-    companion: { ...companion, relation: (companion.relation ?? 0) + t.relation.talk, ...(story && { told: told + 1 }), talkedOn: day },
+    talk: { text: gendered(text, companion.appearance), story, points },
+    companion: { ...companion, relation: (companion.relation ?? 0) + points, ...(story && { told: told + 1 }), talkedOn: day },
   };
 }
 
@@ -212,11 +216,12 @@ export function companionXp(companion, xp, characterLevel, content) {
 }
 
 // The companion after an exploration of `minutes`: its XP and levels, the
-// relation the time together brings (296 A), and wounded when it fainted,
-// until the character rests to full HP (companionReady).
-export function companionAfterHunt(companion, { xp, fainted, minutes }, characterLevel, content) {
+// relation the time together brings (296 A), with the share of the week
+// the exploration set out in (`week`, reputation, weeks.js), and wounded
+// when it fainted, until the character rests to full HP (companionReady).
+export function companionAfterHunt(companion, { xp, fainted, minutes, week = null }, characterLevel, content) {
   const next = gainXp(companion.level, companion.xp ?? 0, companionXp(companion, xp, characterLevel, content), (level) => xpToNext(level, content), content.balance.progression.maxLevel);
-  const relation = minutes ? { relation: (companion.relation ?? 0) + bondPoints(minutes, content) } : {};
+  const relation = minutes ? { relation: (companion.relation ?? 0) + bondPoints(minutes, content) * weekFactor(week, 'reputation') } : {};
   const { woundedUntil: _, ...after } = { ...companion, level: next.level, xp: next.xp, ...relation };
   return fainted ? { ...after, wounded: true } : after;
 }

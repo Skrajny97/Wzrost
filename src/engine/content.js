@@ -219,5 +219,8 @@ export function buildContent(raw) {
     cosmeticsById: byId(raw.cosmetics?.items ?? []),
     cosmeticTexts: raw.cosmetics?.texts ?? null,
     residentsById: byId(raw.settlement?.residents ?? []),
+    // The weeks of the year with their effects (weeks.js), by their number.
+    weeks: raw.weeks ?? null,
+    weeksByNumber: lookup((raw.weeks?.weeks ?? []).map((week) => [week.number, week])),
   };
 }
