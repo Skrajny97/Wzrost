@@ -1,0 +1,14 @@
+{
+  "id": "rider-skin-eclipse-female-face",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, the face of a young woman seen exactly from the side, facing right: smooth light skin, one dark eye, a thin dark eyebrow, a small straight nose, soft pink lips, a rounded feminine chin that sits forward under the lips, a clean smooth jaw, no beard, no stubble, no dark shadow on the cheek or jaw, long straight black hair falling behind the face",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": "art/inputs/walk-starts/rider-skin-eclipse-female.png",
+  "mask": "art/inputs/walk-starts/rider-skin-eclipse-female-face-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

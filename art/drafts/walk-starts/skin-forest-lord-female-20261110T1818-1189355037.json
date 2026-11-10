@@ -1,0 +1,27 @@
+{
+  "id": "skin-forest-lord-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a lean young woman with long brown hair in a loose braid down the back in a green and gold hood crowned with small deer antlers, a jerkin of overlapping green leaves and bark, a moss-green cloak hanging behind, leather bracers and soft leather boots, a curved bow carved from pale antler strapped upright on the back behind the shoulder beside a quiver of green-fletched arrows, the whole bow above the waist and behind the body, never in front of the legs, nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right so the belt buckle is at the right edge of the body, only the near arm showing, hanging relaxed beside the body, the far arm hidden behind the body, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the antlers to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/archer-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/riders/skin-forest-lord-female.png",
+      "usage": "the same character seen exactly from the side: hood with antlers, face, hair, leaf jerkin, cloak, colours, and the bow and quiver on the back; the seated pose and the horse do not matter"
+    },
+    {
+      "path": "art/references/walks/start/skin-forest-lord-male.png",
+      "usage": "the same outfit, drawing style and composition as this man of the same costume: strict side view, the antler bow upright on the back behind the shoulder next to the quiver, empty hands; she is a woman with a long braid"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
