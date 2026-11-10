@@ -104,7 +104,7 @@ import {
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
 import { enterTrialHall } from './trial-hall.js';
-import { arenaFight, claimArenaReward, getArena } from './pvp-arena.js';
+import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
 import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, unequipCompanion, upgradeCompanionItem } from './settlement.js';
 import { claimWanted, dropWanted, takeWanted } from './wanted.js';
 import { claimMercenary, listMercenaries, offerMercenary, withdrawMercenary } from './mercenaries.js';
@@ -285,6 +285,9 @@ const routes = [
   // The Arena: fights with other players' characters (pvp-arena.js, 762 A).
   ['GET', '/api/settlement/arena', getArena],
   ['POST', '/api/settlement/arena/fight', arenaFight],
+  // Other rivals ("Losuj innych", 874) and a defence's playback (875).
+  ['POST', '/api/settlement/arena/reroll', rerollArenaRivals],
+  ['GET', '/api/settlement/arena/defences/:id', getArenaDefence],
   ['POST', '/api/settlement/arena/claim', claimArenaReward],
   ['POST', '/api/settlement/casino/ticket', buyTicket],
   ['POST', '/api/settlement/casino/spin', spinCasinoWheel],

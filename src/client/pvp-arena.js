@@ -8,11 +8,13 @@
 // (arena.js, the playback of every fight, not this Arena) folded behind
 // "Obejrzyj walkę", which opens it in a sheet (787 B; the author: „jakieś
 // ciągle odtwarzane poprzednie walki, których nie da się schować”), at once
-// only after a fight just fought; the defences since the last visit, folded
-// under their count; the
+// only after a fight just fought; the character's last defences, folded
+// under their title with the count of the new ones, each with "Obejrzyj
+// walkę" while its log is kept (875), played from the defender's side; the
 // three rivals, each with its bust, class, level and rating, what a win or
 // a loss with it would bring and "Walcz", a tap on its name opening the
-// character's card (profile.js). "Tabela tygodnia": the rewards waiting
+// character's card (profile.js), and under them "Losuj innych" with the
+// draws left today (874). "Tabela tygodnia": the rewards waiting
 // for "Odbierz", this week's table (all of its places, at most 50, the
 // character's own row lit, as a page of the Ranking), the rewards of the
 // places and the season. The rules wait under "Jak to
@@ -21,12 +23,12 @@
 //
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, as the Salon Gier's, so a redraw never asks the server
-// again; the defences shown at the look stay while the panel lives.
+// again; the defences new at a look stay marked while the panel lives.
 
 import { createArena } from './arena.js';
 import { placeArt } from './art.js';
 import { h, icon } from './dom.js';
-import { countOf, formatDecimal, formatHours, formatNumber } from './format.js';
+import { countOf, dateTimeFormat, formatDecimal, formatHours, formatNumber } from './format.js';
 import { chestContents } from './guild-trials.js';
 import { language, t } from './i18n.js';
 import { CLASS_ICONS } from './icons.js';
@@ -44,6 +46,9 @@ const say = (text, values = {}) =>
 
 // A rating's move with its sign: "+16", "−9", "0".
 const signed = (change) => (change > 0 ? `+${formatNumber(change)}` : change < 0 ? `−${formatNumber(-change)}` : '0');
+
+// The words of a defence by its result, from the defender's side.
+const DEFENCE_TEXTS = { win: 'defenceWin', loss: 'defenceLoss', draw: 'defenceDraw' };
 
 // What is left of a week or a month: days, then hours.
 function timeLeft(ms) {
@@ -76,9 +81,13 @@ export function mountPvpArena(holder, place = null) {
   let gone = false;
   let timer = null;
   let tab = 'fights';
-  // The defences shown at this look, kept while the panel lives: the server
-  // shows each once.
+  // The last defences of the newest look, and the ids of those new at any
+  // look while the panel lives: the server tells each one new only once,
+  // so a look again at midnight keeps them marked. Whether their fold is
+  // open, kept over the redraws after a fight or a draw of other rivals.
   let defences = null;
+  const unseen = new Set();
+  let defencesOpen = false;
   // The fight just fought: its playback opens at once.
   let fresh = false;
   // The playback open in the sheet, stopped when the panel goes.
@@ -86,11 +95,14 @@ export function mountPvpArena(holder, place = null) {
   // The newest answer's number, so an older one never draws over it.
   let asked = 0;
 
-  // A later look's defences (the Arena asked again at midnight) join those
-  // shown before.
+  // A look's answer brings the defences; an action's answer has none, and
+  // those of the look stay.
   function take(answer) {
     view = answer.arena;
-    if (answer.arena.defences) defences = [...answer.arena.defences, ...(defences ?? [])];
+    if (answer.arena.defences) {
+      defences = answer.arena.defences;
+      for (const one of defences) if (one.unseen) unseen.add(one.id);
+    }
   }
 
   async function load() {
@@ -188,6 +200,18 @@ export function mountPvpArena(holder, place = null) {
     return card;
   }
 
+  // A fight played back in a sheet (787 B) under its title and result, on
+  // the Arena's sand (790 B), stopped once the sheet closes or the panel goes.
+  function playInSheet(title, result, fight) {
+    const playback = createArena(fight, { autoplay: 'now', board: place?.fightBoard ?? null });
+    watching = playback;
+    openSheet(h('h2', { class: 'sheet-title', text: title }), h('p', { class: 'pvp-arena-result', text: result }), playback.element);
+    afterSheet(() => {
+      playback.stop();
+      if (watching === playback) watching = null;
+    });
+  }
+
   // The last fight: who with, how it went and the rating's move, folded to
   // one line; "Obejrzyj walkę" plays it back in a sheet, at once after a
   // fight just fought, else only at a tap (the author: „jakieś ciągle
@@ -195,19 +219,7 @@ export function mountPvpArena(holder, place = null) {
   function lastCard() {
     const { last, texts } = view;
     if (!last) return null;
-    const watch = () => {
-      const playback = createArena(last.fight, { autoplay: 'now', board: place?.fightBoard ?? null });
-      watching = playback;
-      openSheet(
-        h('h2', { class: 'sheet-title', text: texts.last }),
-        h('p', { class: 'pvp-arena-result' }, say(texts[last.result], { name: last.rival.name })),
-        playback.element,
-      );
-      afterSheet(() => {
-        playback.stop();
-        if (watching === playback) watching = null;
-      });
-    };
+    const watch = () => playInSheet(texts.last, say(texts[last.result], { name: last.rival.name }), last.fight);
     const badge = { win: t('Wygrana'), loss: t('Przegrana'), draw: t('Remis') }[last.result];
     const card = h(
       'section',
@@ -233,26 +245,69 @@ export function mountPvpArena(holder, place = null) {
     return card;
   }
 
-  // The defences since the last visit, as the server told them at the look,
-  // folded under their count.
+  // A defence in words, from the defender's side: who challenged the
+  // character, how it went and the rating's move.
+  const defenceLine = (one) => say(view.texts[DEFENCE_TEXTS[one.result]], { name: one.name, className: one.className, level: one.level, change: signed(one.change) });
+
+  // A defence's playback (875; players in the chat: a replay of a defence,
+  // won or not): its log fetched at the tap and played in a sheet as the
+  // last fight's, from the defender's side, its character among the allies
+  // at the bottom (the server turns the log, defenderFight).
+  async function watchDefence(one) {
+    const { defence } = await call('GET', `/api/settlement/arena/defences/${one.id}`);
+    if (gone) return;
+    playInSheet(say(view.texts.defenceTitle, { name: defence.name }), defenceLine(defence), defence.fight);
+  }
+
+  // A defence: its words, when it was, "Nowa" while it came after the look
+  // before, and "Obejrzyj walkę" while its log is kept (not for the fights
+  // from before 875).
+  function defenceRow(one) {
+    const { texts } = view;
+    return h(
+      'li',
+      { class: `pvp-arena-defence pvp-arena-defence--${one.result}` },
+      h(
+        'div',
+        { class: 'pvp-arena-defence-text' },
+        h('p', {}, unseen.has(one.id) && h('span', { class: 'pvp-arena-new', text: texts.defenceNew }), defenceLine(one)),
+        h('p', { class: 'muted pvp-arena-defence-time', text: dateTimeFormat.format(new Date(one.at)) }),
+      ),
+      one.replay &&
+        h(
+          'button',
+          {
+            type: 'button',
+            class: 'button button--world button--small pvp-arena-watch',
+            'aria-label': `${t('Obejrzyj walkę')}: ${one.name}`,
+            onClick: (event) => withButton(event.currentTarget, () => watchDefence(one)),
+          },
+          icon('eye', { size: 16 }),
+          h('span', { text: t('Obejrzyj walkę') }),
+        ),
+    );
+  }
+
+  // The character's last defences, as the server told them at the look (at
+  // most defences.shown of the data, the newest first), folded under their
+  // title with the count of the new ones.
   function defencesCard() {
     if (!defences) return null;
     const { texts } = view;
-    const key = { win: 'defenceWin', loss: 'defenceLoss', draw: 'defenceDraw' };
-    return h(
+    const newOnes = defences.filter((one) => unseen.has(one.id)).length;
+    const fold = h(
       'details',
-      { class: 'card fold-part pvp-arena-defences' },
-      h('summary', { class: 'fold-part-summary', text: `${texts.defences} (${formatNumber(defences.length)})` }),
-      defences.length === 0
-        ? h('p', { class: 'muted', text: texts.noDefences })
-        : h(
-            'ul',
-            { class: 'pvp-arena-list' },
-            defences.map((one) =>
-              h('li', { class: `pvp-arena-defence pvp-arena-defence--${one.result}`, text: say(texts[key[one.result]], { name: one.name, className: one.className, level: one.level, change: signed(one.change) }) }),
-            ),
-          ),
+      {
+        class: 'card fold-part pvp-arena-defences',
+        open: defencesOpen,
+        onToggle: () => {
+          defencesOpen = fold.open;
+        },
+      },
+      h('summary', { class: 'fold-part-summary', text: newOnes > 0 ? say(texts.defencesNew, { count: newOnes }) : texts.defences }),
+      defences.length === 0 ? h('p', { class: 'muted', text: texts.noDefences }) : h('ul', { class: 'pvp-arena-list' }, defences.map(defenceRow)),
     );
+    return fold;
   }
 
   // A rival: its bust, its name (its card at a tap), class, level and
@@ -286,13 +341,40 @@ export function mountPvpArena(holder, place = null) {
     );
   }
 
+  // "Losuj innych" (874; players in the chat, and the author: „losowanie
+  // powinno losować z podobnych Punktami Areny ludzi spośród puli”): other
+  // rivals of a similar rating instead of those offered, with the draws left
+  // today; with none left, a muted line says when they come back.
+  function rerollPart() {
+    const { texts, rerolls } = view;
+    return h(
+      'div',
+      { class: 'pvp-arena-reroll' },
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'button button--world button--small pvp-arena-reroll-button',
+          disabled: rerolls.left === 0,
+          onClick: (event) =>
+            withButton(event.currentTarget, async () => {
+              apply(await call('POST', '/api/settlement/arena/reroll'));
+            }),
+        },
+        icon('dice', { size: 16 }),
+        h('span', { text: say(texts.reroll, { left: rerolls.left }) }),
+      ),
+      rerolls.left === 0 && h('p', { class: 'muted', text: texts.rerollsUsed }),
+    );
+  }
+
   function rivalsPart() {
     const { texts } = view;
     return h(
       'section',
       { class: 'stack pvp-arena-rivals', 'aria-labelledby': 'pvp-arena-rivals-title', 'data-guide': 'arena-rivals' },
       h('h2', { class: 'pvp-arena-heading', id: 'pvp-arena-rivals-title' }, icon('swords', { size: 18, className: 'pvp-arena-ornament' }), h('span', { text: texts.rivals }), icon('swords', { size: 18, className: 'pvp-arena-ornament' })),
-      view.rivals.length === 0 ? h('p', { class: 'muted', text: texts.noRivals }) : h('ul', { class: 'pvp-arena-list stack' }, view.rivals.map(rivalCard)),
+      view.rivals.length === 0 ? h('p', { class: 'muted', text: texts.noRivals }) : [h('ul', { class: 'pvp-arena-list stack' }, view.rivals.map(rivalCard)), rerollPart()],
     );
   }
 
@@ -305,6 +387,7 @@ export function mountPvpArena(holder, place = null) {
       rivalsPart(),
       howItWorks(null, [
         say(texts.rules, { perDay: numbers.perDay, hpFactor: formatDecimal(numbers.hpFactor), moves: numbers.moves }),
+        say(texts.rerollRule, { rerolls: numbers.rerolls }),
         // Where armour counts at less than all of it (772).
         ...(numbers.armor < 100 ? [say(texts.armorRule, { armor: numbers.armor })] : []),
         say(texts.ratingRules, { start: numbers.start, share: numbers.share }),

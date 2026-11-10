@@ -15601,9 +15601,10 @@ a.discord-button {
    result with "Obejrzyj walkę"; crossed swords by the rivals' heading and on
    "Walcz"; each rival a
    card with its bust, its words beside it and "Walcz" under them on a
-   phone, at their right on a wider screen; the last fight's card edged by
-   its result; the defences in their colours; the rewards of the places
-   in rows. Long names and big numbers wrap instead of leaving the card. */
+   phone, at their right on a wider screen, and "Losuj innych" under them;
+   the last fight's card edged by its result; the defences in their
+   colours, each with its playback; the rewards of the places in rows.
+   Long names and big numbers wrap instead of leaving the card. */
 .pvp-arena-status p {
   margin: 0;
   overflow-wrap: anywhere;
@@ -15817,14 +15818,75 @@ a.discord-button {
   color: var(--danger);
 }
 
+/* The last defences (875): each its words, when it was and "Nowa" while it
+   is new, with "Obejrzyj walkę" beside them where the row has room and
+   under them on a narrow phone. */
 .pvp-arena-defence {
-  padding: 6px 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  padding: 8px 0;
   border-bottom: 1px solid var(--line);
   overflow-wrap: anywhere;
 }
 
 .pvp-arena-defence:last-child {
   border-bottom: 0;
+}
+
+.pvp-arena-defence-text {
+  flex: 1 1 16em;
+  min-width: 0;
+}
+
+.pvp-arena-defence-text p {
+  margin: 0;
+}
+
+.pvp-arena-defence-time {
+  font-size: 13px;
+}
+
+.pvp-arena-defence .pvp-arena-watch {
+  flex: none;
+  align-self: center;
+}
+
+.pvp-arena-new {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 6px;
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  color: var(--gold);
+  font-size: 12px;
+  line-height: 18px;
+  vertical-align: 1px;
+}
+
+/* "Losuj innych" (874) under the rivals, with the draws left today; a
+   muted line under it once none are left. */
+.pvp-arena-reroll {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.pvp-arena-reroll p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.pvp-arena-reroll-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  max-width: 100%;
 }
 
 .pvp-arena-defence--win {

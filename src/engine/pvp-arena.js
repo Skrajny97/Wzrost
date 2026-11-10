@@ -150,16 +150,31 @@ export function ratingStakes(rating, rivalRating, content) {
 // The rivals offered: rivals.count of the `candidates` (the server's,
 // nearest ratings first, at most rivals.pool of them, none of the player's
 // own account), drawn with `seed`, the highest rating first. Those in
-// `recent` (the rival of the fight just fought) only when there are not
-// enough others.
+// `recent` (the rival of the fight just fought, or the rivals offered
+// before "Losuj innych", 874) come in only to fill the places no other
+// candidate is left for, so a new draw brings every other one there is.
 export function drawRivals(candidates, seed, content, recent = []) {
   const { count } = arenaRules(content).rivals;
   const rng = createRng(`arena-rivals:${seed}`);
-  const fresh = candidates.filter((one) => !recent.includes(one.id));
-  const left = [...(fresh.length >= count ? fresh : candidates)];
-  const picked = [];
-  while (picked.length < count && left.length > 0) picked.push(...left.splice(rng.int(0, left.length - 1), 1));
-  return picked.sort((a, b) => b.rating - a.rating || a.id - b.id);
+  const draw = (list, many) => {
+    const left = [...list];
+    const picked = [];
+    while (picked.length < many && left.length > 0) picked.push(...left.splice(rng.int(0, left.length - 1), 1));
+    return picked;
+  };
+  const fresh = draw(candidates.filter((one) => !recent.includes(one.id)), count);
+  const again = draw(candidates.filter((one) => recent.includes(one.id)), count - fresh.length);
+  return [...fresh, ...again].sort((a, b) => b.rating - a.rating || a.id - b.id);
+}
+
+// A duel's fight (arenaDuel's `fight`, the attacker's character among the
+// allies) as its defender watches it (875): the defender's character among
+// the allies at the bottom of the playback, the attacker's among the foes
+// at the top, and the result the defender's own, a won defence a victory.
+// The events name the two by their ids, which stay as they are.
+export function defenderFight(fight) {
+  const turned = (unit) => ({ ...unit, side: unit.side === 'ally' ? 'enemy' : 'ally' });
+  return { ...fight, allies: fight.enemies.map(turned), enemies: fight.allies.map(turned), won: fight.won === null ? null : !fight.won };
 }
 
 // The day of the fights (from Polish midnight) and the week of the table
@@ -167,10 +182,18 @@ export function drawRivals(candidates, seed, content, recent = []) {
 export const arenaDay = (now, content) => questPeriod('daily', now, content);
 export const arenaWeek = (now, content) => questPeriod('weekly', now, content);
 
+// What is left today of `perDay` uses counted by the Polish day: `day` is
+// the day of the last use and `used` how many fell on it.
+const leftToday = (perDay, day, used, now, content) => Math.max(0, perDay - (day === arenaDay(now, content).key ? (used ?? 0) : 0));
+
 // The fights left today of a record ({ day, fights }: the day of the last
 // fight and how many fell on it).
-export const fightsLeft = (record, now, content) =>
-  Math.max(0, arenaRules(content).fightsPerDay - (record?.day === arenaDay(now, content).key ? (record.fights ?? 0) : 0));
+export const fightsLeft = (record, now, content) => leftToday(arenaRules(content).fightsPerDay, record?.day, record?.fights, now, content);
+
+// The draws of other rivals ("Losuj innych", 874) left today of a record
+// ({ reroll_day, rerolls }: the day of the last draw and how many fell on
+// it), rivals.rerollsPerDay a day.
+export const rerollsLeft = (record, now, content) => leftToday(arenaRules(content).rivals.rerollsPerDay, record?.reroll_day, record?.rerolls, now, content);
 
 // The season around `now`: a month (Polish time), numbered so that the next
 // month is one more, and when it ends.

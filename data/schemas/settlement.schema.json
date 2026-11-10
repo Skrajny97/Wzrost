@@ -656,17 +656,18 @@
       "type": "object",
       "additionalProperties": false,
       "description": "Arena (762 A; src/engine/pvp-arena.js, src/server/pvp-arena.js): walki z postaciami innych graczy, pięć dziennie, ocena jak w szachach, tabela tygodnia z nagrodami i sezon miesięczny. Opis zasad w $comment bloku w data/settlement.json.",
-      "required": ["fightsPerDay", "rivals", "duel", "rating", "season", "table", "keepDays", "rewards", "texts"],
+      "required": ["fightsPerDay", "rivals", "duel", "rating", "season", "table", "keepDays", "defences", "rewards", "texts"],
       "properties": {
         "$comment": { "type": "string" },
         "fightsPerDay": { "type": "integer", "minimum": 1 },
         "rivals": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["count", "pool"],
+          "required": ["count", "pool", "rerollsPerDay"],
           "properties": {
             "count": { "type": "integer", "minimum": 1, "description": "Ilu rywali do wyboru." },
-            "pool": { "type": "integer", "minimum": 1, "description": "Spośród ilu postaci o najbliższej ocenie się ich losuje." }
+            "pool": { "type": "integer", "minimum": 1, "description": "Spośród ilu postaci o najbliższej ocenie się ich losuje." },
+            "rerollsPerDay": { "type": "integer", "minimum": 1, "description": "Ile razy dziennie (od północy czasu polskiego) gracz może wylosować innych rywali przyciskiem „Losuj innych” (874)." }
           }
         },
         "duel": {
@@ -715,6 +716,12 @@
           "properties": { "size": { "type": "integer", "minimum": 1 } }
         },
         "keepDays": { "type": "integer", "minimum": 1 },
+        "defences": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["shown"],
+          "properties": { "shown": { "type": "integer", "minimum": 1, "description": "Ile ostatnich obron (z keepDays dni) postać widzi na Arenie, każdą z przyciskiem „Obejrzyj walkę” (875)." } }
+        },
         "rewards": {
           "type": "array",
           "minItems": 1,
@@ -738,8 +745,9 @@
         "texts": {
           "type": "object",
           "required": [
-            "intro", "rules", "ratingRules", "tableRules", "rating", "place", "noPlace", "fightsLeft", "used", "mercenary", "rivals", "noRivals", "rival", "stake", "fight",
-            "last", "win", "loss", "draw", "change", "limitWin", "limitDraw", "defences", "noDefences", "defenceWin", "defenceLoss", "defenceDraw", "tabFights", "tabTable",
+            "intro", "rules", "rerollRule", "ratingRules", "tableRules", "rating", "place", "noPlace", "fightsLeft", "used", "mercenary", "rivals", "noRivals", "rival", "stake", "fight",
+            "reroll", "rerollsUsed", "noOthers", "last", "win", "loss", "draw", "change", "limitWin", "limitDraw", "defences", "defencesNew", "noDefences", "defenceNew",
+            "defenceTitle", "noReplay", "defenceWin", "defenceLoss", "defenceDraw", "tabFights", "tabTable",
             "tableEnds", "tableEmpty", "ownPlace", "rewards", "tierOne", "tierMany", "tierRest", "due", "claim", "claimed", "season", "locked", "gone", "noReward"
           ],
           "additionalProperties": {

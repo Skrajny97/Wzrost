@@ -8,9 +8,12 @@
 // day: the player picks one of three rivals of a similar rating (other
 // accounts' characters, played or set aside, at the Arena's level at least)
 // and fights the rival's character as it is saved now, with the result and
-// its log at once. Nothing of either character changes but its rating; the
-// rival's character defends itself, and at its next visit to the Arena its
-// player sees who challenged it, how it went and how its rating moved.
+// its log at once. A few times a day it may draw other rivals instead
+// ("Losuj innych", 874), from the same pool around its rating. Nothing of
+// either character changes but its rating; the rival's character defends
+// itself, and at the Arena its player sees its last defences, who
+// challenged it, how it went and how its rating moved, those since its last
+// visit marked new, and watches each from its own side (875).
 // Like the Bestia Gildii's attacks, a fight goes in whatever the character
 // is doing (an exploration too: it changes nothing of the character, and
 // the gear it fights with is the one the exploration keeps), but not while
@@ -24,9 +27,10 @@
 // every rating halfway back to the start (the season). Every request of
 // the Arena catches up so before anything else (catchUp). A fight is one
 // batch that holds only while the attacker's record is as read
-// (atomic.js), so two taps make one fight; the rival's rating moves by
-// what the fight changed, also if another fight moved it meanwhile.
-// Tables: migrations/0107_pvp_arena.sql.
+// (atomic.js), so two taps make one fight, as a draw of other rivals is;
+// the rival's rating moves by what the fight changed, also if another
+// fight moved it meanwhile. Tables: migrations/0107_pvp_arena.sql and
+// 0109_arena_rerolls_and_defences.sql.
 
 import {
   arenaDay,
@@ -37,12 +41,14 @@ import {
   arenaSeason,
   arenaWeek,
   classNameOf,
+  defenderFight,
   drawRivals,
   duelArmorShare,
   duelHpFactor,
   fightsLeft,
   ratingChanges,
   ratingStakes,
+  rerollsLeft,
   seasonFactor,
 } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
@@ -177,41 +183,53 @@ function rivalView(rival, rating) {
   };
 }
 
-// The defences since the last visit (the author's 762 A: who, how it went,
-// how the rating moved), the newest first, from the defender's side: a
-// rival's win is a lost defence. They are seen once shown: the newest one's
-// id is kept (seen_id), also over a defence that came meanwhile, which
-// waits for the next visit.
-async function freshDefences(db, row, record) {
+// A fight's result from its defender's side: a rival's win is a lost defence.
+const DEFENDER = { win: 'loss', loss: 'win', draw: 'draw' };
+
+// What a defence is told by (defenceView): the fight's row in arena_fights,
+// whether its log is kept, and its attacker's character.
+const DEFENCE_COLUMNS = 'f.id, f.created_at, f.result, f.defender_change, f.defender_rating, f.fight IS NOT NULL AS replay, c.name, c.class_id, c.level, c.evolution, c.appearance';
+
+// A defence as its defender sees it: who challenged the character, how it
+// went from its side and how its rating moved, and `replay` while the
+// fight's log is kept to watch it (the fights before 875 have none).
+const defenceView = (fight) => ({
+  id: fight.id,
+  at: fight.created_at,
+  name: fight.name,
+  classId: fight.class_id,
+  className: classNameOf({ classId: fight.class_id, evolution: fight.evolution, appearance: fight.appearance }, content()),
+  level: fight.level,
+  result: DEFENDER[fight.result],
+  change: fight.defender_change,
+  rating: fight.defender_rating,
+  replay: Boolean(fight.replay),
+});
+
+// The character's last defences (the author's 762 A: who, how it went, how
+// the rating moved; 875: the last few, each to watch again), the newest
+// first, at most defences.shown of those kept (keepDays). Those since the
+// last visit are `unseen`, and seen once shown: the newest one's id is kept
+// (seen_id), also over a defence that came meanwhile, which is new at the
+// next visit.
+async function recentDefences(db, row, record) {
   const { results } = await db
-    .prepare(
-      `SELECT f.id, f.created_at, f.result, f.defender_change, f.defender_rating, c.name, c.class_id, c.level, c.evolution, c.appearance
-       FROM arena_fights f JOIN characters c ON c.id = f.attacker_id
-       WHERE f.defender_id = ? AND f.id > ? ORDER BY f.id DESC LIMIT 50`,
-    )
-    .bind(row.id, record.seen_id)
+    .prepare(`SELECT ${DEFENCE_COLUMNS} FROM arena_fights f JOIN characters c ON c.id = f.attacker_id WHERE f.defender_id = ? ORDER BY f.id DESC LIMIT ?`)
+    .bind(row.id, rules().defences.shown)
     .all();
-  if (results.length > 0) await db.prepare('UPDATE arena_ratings SET seen_id = MAX(seen_id, ?) WHERE character_id = ?').bind(results[0].id, row.id).run();
-  const SIDE = { win: 'loss', loss: 'win', draw: 'draw' };
-  return results.map((fight) => ({
-    at: fight.created_at,
-    name: fight.name,
-    classId: fight.class_id,
-    className: classNameOf({ classId: fight.class_id, evolution: fight.evolution, appearance: fight.appearance }, content()),
-    level: fight.level,
-    result: SIDE[fight.result],
-    change: fight.defender_change,
-    rating: fight.defender_rating,
-  }));
+  if (results.length > 0 && results[0].id > record.seen_id) {
+    await db.prepare('UPDATE arena_ratings SET seen_id = MAX(seen_id, ?) WHERE character_id = ?').bind(results[0].id, row.id).run();
+  }
+  return results.map((fight) => ({ ...defenceView(fight), unseen: fight.id > record.seen_id }));
 }
 
 // The Arena for the page: the character's rating and place on this week's
 // table, the fights left today (or why it cannot fight: a mercenary's
-// service), the rivals offered, its last fight with its log, the defences
-// since the last visit (`defences`, at a look), this week's table (the
-// first table.size and its own place), the rewards of the places and those
-// waiting for "Odbierz", the season's end, the numbers of the rules and
-// the words of the screen.
+// service), the rivals offered and the draws of others left today, its last
+// fight with its log, its last defences (`defences`, at a look), this
+// week's table (the first table.size and its own place), the rewards of the
+// places and those waiting for "Odbierz", the season's end, the numbers of
+// the rules and the words of the screen.
 async function arenaView(db, player, record, rivals, now, defences = null) {
   const { row } = player;
   const arena = rules();
@@ -237,6 +255,7 @@ async function arenaView(db, player, record, rivals, now, defences = null) {
     fights: { left: fightsLeft(record, now, content()), perDay: arena.fightsPerDay, endsAt: arenaDay(now, content()).endsAt },
     blocked: attackBlocked(player.activity, arena.texts.mercenary),
     rivals: rivals.map((rival) => rivalView(rival, record.rating)),
+    rerolls: { left: rerollsLeft(record, now, content()), perDay: arena.rivals.rerollsPerDay },
     last,
     defences,
     table: {
@@ -253,6 +272,7 @@ async function arenaView(db, player, record, rivals, now, defences = null) {
     // percent) for two characters of the character's own level.
     numbers: {
       perDay: arena.fightsPerDay,
+      rerolls: arena.rivals.rerollsPerDay,
       hpFactor: Math.round(duelHpFactor(row.level, row.level, content()) * 10) / 10,
       armor: Math.round(duelArmorShare(row.level, row.level, content()) * 100),
       moves: arena.duel.maxMoves,
@@ -264,8 +284,9 @@ async function arenaView(db, player, record, rivals, now, defences = null) {
   };
 }
 
-// GET /api/settlement/arena: the Arena at a look, with the defences since
-// the last one; rivals are drawn when fewer than rivals.count wait.
+// GET /api/settlement/arena: the Arena at a look, with the last defences,
+// those since the look before marked; rivals are drawn when fewer than
+// rivals.count wait.
 export async function getArena(context) {
   const { player } = await requirePlayer(context);
   requireArena(player.row);
@@ -273,7 +294,7 @@ export async function getArena(context) {
   const now = context.now;
   await catchUp(db, now);
   const offered = await offeredRivals(db, player.row, await recordOf(db, player.row, now));
-  const defences = await freshDefences(db, player.row, offered.record);
+  const defences = await recentDefences(db, player.row, offered.record);
   return json({ arena: await arenaView(db, player, offered.record, offered.rivals, now, defences) });
 }
 
@@ -284,10 +305,11 @@ const fighterOf = (player) => ({ character: engineCharacter(player.row), equippe
 // POST /api/settlement/arena/fight { rivalId }: one of today's fights with
 // one of the rivals offered. The duel and both ratings' moves (the
 // attacker's by rating.attackK, the defender's by rating.defenceK), the
-// fight written down for the defender's notice, the day's count, this
-// week's table and new rivals around the new rating (the one just fought
-// only when no other is there) are saved in one batch over the record as
-// read. Gives the fight, with its log, and the Arena after it.
+// fight written down with its log for the defender's notice and playback,
+// the day's count, this week's table and new rivals around the new rating
+// (the one just fought only when no other is there) are saved in one batch
+// over the record as read. Gives the fight, with its log, and the Arena
+// after it.
 export async function arenaFight(context) {
   const { player } = await requirePlayer(context);
   const { row } = player;
@@ -342,15 +364,78 @@ export async function arenaFight(context) {
       db.prepare('UPDATE arena_ratings SET rating = MAX(?, rating + ?) WHERE character_id = ?').bind(floor, changes.defender, rivalId),
       db
         .prepare(
-          `INSERT INTO arena_fights (attacker_id, defender_id, created_at, result, attacker_change, defender_change, attacker_rating, defender_rating, seed)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO arena_fights (attacker_id, defender_id, created_at, result, attacker_change, defender_change, attacker_rating, defender_rating, seed, fight)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         )
-        .bind(row.id, rivalId, now, duel.result, changes.attacker, changes.defender, after.attacker, after.defender, seed),
+        .bind(row.id, rivalId, now, duel.result, changes.attacker, changes.defender, after.attacker, after.defender, seed, JSON.stringify(duel.fight)),
     ],
     changed,
   );
   const saved = await recordOf(db, row, now);
   return json({ fight: last, arena: await arenaView(db, player, saved, await rivalsOf(db, row, saved), now) });
+}
+
+// POST /api/settlement/arena/reroll: other rivals instead of those offered
+// ("Losuj innych"; players in the chat, and the author: „losowanie powinno
+// losować z podobnych Punktami Areny ludzi spośród puli”, 874),
+// rivals.rerollsPerDay times a Polish day, without using up a fight. They
+// are drawn from the same pool around the character's rating as any
+// rivals (rivalCandidates), those not offered now first (drawRivals). A
+// draw that brings nobody new, with too few characters around the rating,
+// is refused and not counted. The rivals and the day's count are saved in
+// one batch over the record as read, so two taps make one draw. Gives the
+// Arena after it.
+export async function rerollArenaRivals(context) {
+  const { player } = await requirePlayer(context);
+  const { row } = player;
+  requireArena(row);
+  const db = context.env.DB;
+  const now = context.now;
+  await catchUp(db, now);
+  const record = await recordOf(db, row, now);
+  if (rerollsLeft(record, now, content()) <= 0) throw new ApiError(409, 'no_rerolls', texts().rerollsUsed);
+  const offered = JSON.parse(record.rivals);
+  const seed = newSeed();
+  const drawn = drawRivals(await rivalCandidates(db, row, record.rating, seed), seed, content(), offered).map((one) => one.id);
+  if (drawn.every((id) => offered.includes(id))) throw new ApiError(409, 'no_others', texts().noOthers);
+  const today = arenaDay(now, content()).key;
+  await atomically(
+    db,
+    [
+      assertion(db, "(SELECT COALESCE(reroll_day, '') || ':' || rerolls || ':' || rivals FROM arena_ratings WHERE character_id = ?) = ?", [
+        row.id,
+        `${record.reroll_day ?? ''}:${record.rerolls}:${record.rivals}`,
+      ]),
+      db
+        .prepare('UPDATE arena_ratings SET rivals = ?, rerolls = CASE WHEN reroll_day = ? THEN rerolls + 1 ELSE 1 END, reroll_day = ? WHERE character_id = ?')
+        .bind(JSON.stringify(drawn), today, today, row.id),
+    ],
+    changed,
+  );
+  const saved = await recordOf(db, row, now);
+  return json({ arena: await arenaView(db, player, saved, await rivalsOf(db, row, saved), now) });
+}
+
+// GET /api/settlement/arena/defences/:id: one of the character's defences
+// with its log, for the playback (875; players in the chat: a replay of a
+// defence, won or not), from the defender's side (defenderFight). Only the
+// defender's own, and only while the fight is kept (keepDays) with its log:
+// the fights before 875 have none, and the Arena offers no playback of them.
+export async function getArenaDefence(context) {
+  const { player } = await requirePlayer(context);
+  const { row } = player;
+  requireArena(row);
+  const id = Number(context.params.id);
+  const missing = () => new ApiError(404, 'no_replay', texts().noReplay);
+  if (!Number.isSafeInteger(id)) throw missing();
+  const db = context.env.DB;
+  await catchUp(db, context.now);
+  const fight = await db
+    .prepare(`SELECT ${DEFENCE_COLUMNS}, f.fight FROM arena_fights f JOIN characters c ON c.id = f.attacker_id WHERE f.id = ? AND f.defender_id = ?`)
+    .bind(id, row.id)
+    .first();
+  if (!fight?.fight) throw missing();
+  return json({ defence: { ...defenceView(fight), fight: defenderFight(JSON.parse(fight.fight)) } });
 }
 
 // POST /api/settlement/arena/claim { week }: the reward of the character's

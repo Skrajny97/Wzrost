@@ -2,21 +2,26 @@
 // the author's 762 A): its rules in the engine (the unlock, the duel's
 // determinism, its move limit and draw, the HP factor that keeps a duel a
 // few rounds long at every level, the ratings, the season, the rivals and
-// the rewards) and through the API (the 25th level, five fights a day,
-// rivals never of the player's own account, both ratings moved, the
-// defender's notice once, the week's table frozen once and its reward
-// claimed once, the season's move, a character's Arena gone with it), and
-// nothing of it where ARENA is off.
+// their draws anew, a defence's log from the defender's side and the
+// rewards) and through the API (the 25th level, five fights a day, rivals
+// never of the player's own account, "Losuj innych" five times a day and
+// only when it brings someone new (874), both ratings moved, the
+// defender's last defences, new once, each with its log for the defender
+// alone (875), the week's table frozen once and its reward claimed once,
+// the season's move, a character's Arena gone with it), and nothing of it
+// where ARENA is off.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import {
+  arenaDay,
   arenaDuel,
   arenaReward,
   arenaRewardTiers,
   arenaSeason,
   arenaWeek,
+  defenderFight,
   drawRivals,
   duelArmorShare,
   duelHpFactor,
@@ -24,6 +29,7 @@ import {
   playerCombatant,
   ratingChanges,
   ratingStakes,
+  rerollsLeft,
   seasonRating,
   unlockMessages,
 } from '../src/engine/index.js';
@@ -190,6 +196,58 @@ describe("the Arena's rules", () => {
     assert.deepEqual(drawRivals([], 'x', content), []);
   });
 
+  test('"Losuj innych" draws those not offered first, and those offered only fill the places left (874)', () => {
+    const candidates = Array.from({ length: 10 }, (_, index) => ({ id: index + 1, rating: 1000 + index * 7 }));
+    const offered = [2, 5, 9];
+    const ids = (drawn) => drawn.map((one) => one.id).sort((a, b) => a - b);
+    for (let seed = 0; seed < 20; seed++) {
+      const drawn = drawRivals(candidates, `r${seed}`, content, offered);
+      assert.equal(drawn.length, rules.rivals.count);
+      assert.ok(drawn.every((one) => !offered.includes(one.id)), `seed ${seed}: ${ids(drawn)}`);
+    }
+    // One other only: it comes every time, and those offered fill the rest.
+    const few = candidates.filter((one) => [...offered, 7].includes(one.id));
+    for (let seed = 0; seed < 20; seed++) {
+      const drawn = ids(drawRivals(few, `r${seed}`, content, offered));
+      assert.ok(drawn.includes(7), `seed ${seed}: ${drawn}`);
+      assert.equal(drawn.filter((id) => offered.includes(id)).length, rules.rivals.count - 1);
+    }
+    // Nobody else: those offered once more.
+    assert.deepEqual(ids(drawRivals(candidates.filter((one) => offered.includes(one.id)), 'r', content, offered)), offered);
+  });
+
+  test('the draws of other rivals come back at Polish midnight, apart from the fights (874)', () => {
+    const now = Date.UTC(2026, 10, 10, 12);
+    const today = arenaDay(now, content).key;
+    const yesterday = arenaDay(now - 24 * 60 * 60 * 1000, content).key;
+    const { rerollsPerDay } = rules.rivals;
+    assert.equal(rerollsPerDay, 5);
+    assert.equal(rerollsLeft(null, now, content), rerollsPerDay);
+    assert.equal(rerollsLeft({ reroll_day: today, rerolls: 2 }, now, content), rerollsPerDay - 2);
+    assert.equal(rerollsLeft({ reroll_day: today, rerolls: rerollsPerDay + 3 }, now, content), 0);
+    assert.equal(rerollsLeft({ reroll_day: yesterday, rerolls: rerollsPerDay }, now, content), rerollsPerDay);
+    assert.equal(rerollsLeft({ day: today, fights: rules.fightsPerDay, reroll_day: null, rerolls: 0 }, now, content), rerollsPerDay);
+  });
+
+  test("a defence's log as its defender watches it: its character among the allies, the result its own (875)", () => {
+    const attacker = fighter('warrior', 60, 'Ala');
+    const defender = fighter('mage', 62, 'Bolek', 1);
+    for (const seed of ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) {
+      const { fight } = arenaDuel({ attacker, defender, seed }, content);
+      const turned = defenderFight(fight);
+      assert.deepEqual(turned.allies, [{ ...fight.enemies[0], side: 'ally' }]);
+      assert.deepEqual(turned.enemies, [{ ...fight.allies[0], side: 'enemy' }]);
+      assert.equal(turned.allies[0].name, 'Bolek');
+      assert.equal(turned.won, fight.won === null ? null : !fight.won);
+      // The events name the two by their ids, which stay.
+      assert.equal(turned.events, fight.events);
+    }
+    // A draw stays a draw.
+    const draw = defenderFight(arenaDuel({ attacker, defender, seed: 'limit' }, withDuel({ maxMoves: 0 })).fight);
+    assert.equal(draw.won, null);
+    assert.equal(draw.draw, true);
+  });
+
   test('a place on the week\'s table brings its tier\'s Punkty Systemu and gold for the level', () => {
     const tiers = arenaRewardTiers(40, content);
     assert.equal(tiers[0].from, 1);
@@ -222,7 +280,10 @@ describe('the Arena through the API', () => {
   }
   const arena = (who) => call('GET', '/api/settlement/arena', { cookie: who.cookie });
   const fight = (who, rivalId) => call('POST', '/api/settlement/arena/fight', { cookie: who.cookie, body: { rivalId } });
+  const reroll = (who) => call('POST', '/api/settlement/arena/reroll', { cookie: who.cookie });
+  const defence = (who, id) => call('GET', `/api/settlement/arena/defences/${id}`, { cookie: who.cookie });
   const ratingOf = async (who) => (await first('SELECT rating FROM arena_ratings WHERE character_id = ?', who.id))?.rating;
+  const rivalIds = (view) => view.rivals.map((rival) => rival.id);
 
   beforeEach(async () => {
     ala = await player('arenaala', 'Ala', 'warrior', 30);
@@ -272,7 +333,7 @@ describe('the Arena through the API', () => {
     assert.equal(refused.data.error.code, 'gone');
   });
 
-  test('a fight moves both ratings, the defender\'s by less, and the defender hears of it once', async () => {
+  test('a fight moves both ratings, the defender\'s by less, and the defender sees it, new once', async () => {
     await arena(ala);
     const fought = await fight(ala, bolek.id);
     assert.equal(fought.status, 200, JSON.stringify(fought.data).slice(0, 300));
@@ -291,13 +352,161 @@ describe('the Arena through the API', () => {
     // On this week's table, first or second.
     assert.ok([1, 2].includes(after.place));
     assert.equal(after.table.rows.length, 1);
-    // Bolek's next visit tells him, from his side, once.
+    // Bolek's next visit tells him, from his side, as new; the one after
+    // still shows it among his last defences, no longer new (875).
     const seen = (await arena(bolek)).data.arena;
     assert.equal(seen.defences.length, 1);
     assert.equal(seen.defences[0].name, 'Ala');
     assert.equal(seen.defences[0].result, { win: 'loss', loss: 'win', draw: 'draw' }[last.result]);
     assert.equal(seen.defences[0].change, expected[1]);
-    assert.deepEqual((await arena(bolek)).data.arena.defences, []);
+    assert.equal(seen.defences[0].unseen, true);
+    const again = (await arena(bolek)).data.arena.defences;
+    assert.deepEqual(again, [{ ...seen.defences[0], unseen: false }]);
+  });
+
+  test("the last defences: the newest first, at most the data's number, those since the last visit new (875)", async () => {
+    const cezary = await player('arenacezary', 'Cezary', 'archer', 30);
+    const { shown } = content.settlement.arena.defences;
+    // Ala and Cezary challenge Bolek more times than the list holds, each
+    // fight as on a day of its own.
+    await arena(ala);
+    await arena(cezary);
+    const total = shown + 2;
+    for (let i = 0; i < total; i++) {
+      const who = i % 2 === 0 ? ala : cezary;
+      await run("UPDATE arena_ratings SET day = '2000-01-01' WHERE character_id = ?", who.id);
+      const fought = await fight(who, bolek.id);
+      assert.equal(fought.status, 200, `fight ${i + 1}: ${JSON.stringify(fought.data).slice(0, 200)}`);
+      // Bolek looks in after the first five.
+      if (i === 4) assert.equal((await arena(bolek)).data.arena.defences.length, 5);
+    }
+    const { defences } = (await arena(bolek)).data.arena;
+    const ids = (await (await db()).prepare('SELECT id FROM arena_fights WHERE defender_id = ? ORDER BY id DESC').bind(bolek.id).all()).results.map((one) => one.id);
+    assert.equal(ids.length, total);
+    assert.deepEqual(
+      defences.map((one) => one.id),
+      ids.slice(0, shown),
+    );
+    // New: those after the fifth, the last he saw.
+    const fifth = ids[total - 5];
+    assert.deepEqual(
+      defences.map((one) => one.unseen),
+      ids.slice(0, shown).map((id) => id > fifth),
+    );
+    assert.ok(defences.some((one) => one.unseen) && defences.some((one) => !one.unseen));
+    assert.ok(defences.every((one) => one.replay));
+  });
+
+  test('a defence keeps its log, which only its defender may watch, from its own side (875)', async () => {
+    await arena(ala);
+    const { fight: last } = (await fight(ala, bolek.id)).data;
+    const stored = await first('SELECT id, fight FROM arena_fights WHERE attacker_id = ? AND defender_id = ?', ala.id, bolek.id);
+    assert.deepEqual(JSON.parse(stored.fight), last.fight);
+    const [seen] = (await arena(bolek)).data.arena.defences;
+    assert.equal(seen.id, stored.id);
+    assert.equal(seen.replay, true);
+    const watched = await defence(bolek, seen.id);
+    assert.equal(watched.status, 200, JSON.stringify(watched.data).slice(0, 300));
+    const played = watched.data.defence;
+    assert.equal(played.name, 'Ala');
+    assert.equal(played.result, seen.result);
+    assert.equal(played.change, seen.change);
+    // From Bolek's side: his character among the allies at the bottom, Ala's
+    // among the foes, the result his own; the same blows.
+    assert.deepEqual(played.fight.allies.map((unit) => [unit.name, unit.side]), [['Bolek', 'ally']]);
+    assert.deepEqual(played.fight.enemies.map((unit) => [unit.name, unit.side]), [['Ala', 'enemy']]);
+    assert.equal(played.fight.won, last.fight.won === null ? null : !last.fight.won);
+    assert.deepEqual(played.fight.events, last.fight.events);
+    // Nobody else's: not the attacker's, not a third character's, nor a fight
+    // that is not there.
+    const cezary = await player('arenacezary', 'Cezary', 'archer', 30);
+    for (const [who, id] of [
+      [ala, seen.id],
+      [cezary, seen.id],
+      [bolek, seen.id + 1000],
+      [bolek, 'abc'],
+    ]) {
+      const refused = await defence(who, id);
+      assert.equal(refused.status, 404, `${id}: ${JSON.stringify(refused.data)}`);
+      assert.equal(refused.data.error.code, 'no_replay');
+    }
+    // A fight from before the logs were kept: on the list, without its playback.
+    await run('UPDATE arena_fights SET fight = NULL WHERE id = ?', seen.id);
+    const [old] = (await arena(bolek)).data.arena.defences;
+    assert.equal(old.id, seen.id);
+    assert.equal(old.replay, false);
+    const none = await defence(bolek, seen.id);
+    assert.equal(none.status, 404);
+    assert.equal(none.data.error.message, content.settlement.arena.texts.noReplay);
+  });
+
+  test('"Losuj innych" draws other rivals of the pool five times a day, those not offered first, without a fight (874)', async () => {
+    const others = [bolek];
+    for (const [login, name, classId] of [
+      ['arenacezary', 'Cezary', 'archer'],
+      ['arenadarek', 'Darek', 'cleric'],
+      ['arenaedek', 'Edek', 'shadow'],
+      ['arenafranek', 'Franek', 'warrior'],
+    ]) {
+      others.push(await player(login, name, classId, 30));
+    }
+    const { rerollsPerDay, count } = content.settlement.arena.rivals;
+    const look = (await arena(ala)).data.arena;
+    assert.deepEqual(look.rerolls, { left: rerollsPerDay, perDay: rerollsPerDay });
+    let offered = rivalIds(look);
+    assert.equal(offered.length, count);
+    for (let i = 0; i < rerollsPerDay; i++) {
+      const rolled = await reroll(ala);
+      assert.equal(rolled.status, 200, `draw ${i + 1}: ${JSON.stringify(rolled.data).slice(0, 300)}`);
+      const now = rivalIds(rolled.data.arena);
+      // Both characters not offered before come, and one of those offered
+      // fills the third place.
+      for (const one of others) if (!offered.includes(one.id)) assert.ok(now.includes(one.id), `draw ${i + 1}: ${one.id} not in ${now}`);
+      assert.equal(now.length, count);
+      assert.equal(now.filter((id) => offered.includes(id)).length, 1);
+      assert.deepEqual(rolled.data.arena.rerolls, { left: rerollsPerDay - i - 1, perDay: rerollsPerDay });
+      assert.equal(rolled.data.arena.fights.left, content.settlement.arena.fightsPerDay);
+      offered = now;
+    }
+    const tired = await reroll(ala);
+    assert.equal(tired.status, 409);
+    assert.equal(tired.data.error.code, 'no_rerolls');
+    assert.equal(tired.data.error.message, content.settlement.arena.texts.rerollsUsed);
+    assert.deepEqual(rivalIds((await arena(ala)).data.arena), offered);
+    // A fight draws the rivals anew without using up a draw, and the draws
+    // come back on a new day.
+    assert.equal((await fight(ala, offered[0])).data.arena.rerolls.left, 0);
+    await run("UPDATE arena_ratings SET reroll_day = '2000-01-01' WHERE character_id = ?", ala.id);
+    assert.equal((await arena(ala)).data.arena.rerolls.left, rerollsPerDay);
+    const rolled = await reroll(ala);
+    assert.equal(rolled.status, 200);
+    assert.equal(rolled.data.arena.rerolls.left, rerollsPerDay - 1);
+  });
+
+  test('a draw that brings nobody new is refused and not counted (874)', async () => {
+    // Bolek alone: the only rival there is.
+    assert.deepEqual(rivalIds((await arena(ala)).data.arena), [bolek.id]);
+    const alone = await reroll(ala);
+    assert.equal(alone.status, 409);
+    assert.equal(alone.data.error.code, 'no_others');
+    assert.equal(alone.data.error.message, content.settlement.arena.texts.noOthers);
+    // Three in all, all of them offered: still nobody new.
+    await player('arenacezary', 'Cezary', 'archer', 30);
+    await player('arenadarek', 'Darek', 'cleric', 30);
+    const three = rivalIds((await arena(ala)).data.arena);
+    assert.equal(three.length, 3);
+    const same = await reroll(ala);
+    assert.equal(same.status, 409);
+    assert.equal(same.data.error.code, 'no_others');
+    assert.deepEqual(rivalIds((await arena(ala)).data.arena), three);
+    assert.equal((await arena(ala)).data.arena.rerolls.left, content.settlement.arena.rivals.rerollsPerDay);
+    assert.equal((await first('SELECT rerolls FROM arena_ratings WHERE character_id = ?', ala.id)).rerolls, 0);
+    // A fourth comes: the draw brings it, and counts.
+    const edek = await player('arenaedek', 'Edek', 'shadow', 30);
+    const rolled = await reroll(ala);
+    assert.equal(rolled.status, 200, JSON.stringify(rolled.data).slice(0, 300));
+    assert.ok(rivalIds(rolled.data.arena).includes(edek.id));
+    assert.equal(rolled.data.arena.rerolls.left, content.settlement.arena.rivals.rerollsPerDay - 1);
   });
 
   test('five fights a day, then none until midnight', async () => {
@@ -393,5 +602,7 @@ describe('the Arena where ARENA is off', () => {
     assert.equal(look.status, 404);
     assert.equal((await call('POST', '/api/settlement/arena/fight', { cookie, body: { rivalId: 1 } })).status, 404);
     assert.equal((await call('POST', '/api/settlement/arena/claim', { cookie, body: { week: '2000-01-03' } })).status, 404);
+    assert.equal((await call('POST', '/api/settlement/arena/reroll', { cookie })).status, 404);
+    assert.equal((await call('GET', '/api/settlement/arena/defences/1', { cookie })).status, 404);
   });
 });
