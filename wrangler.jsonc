@@ -135,7 +135,10 @@
         // The English beta, only here (490–497 A).
         "ENGLISH": "on",
         // The weeks of the year, as in the game.
-        "WEEKS": "on"
+        "WEEKS": "on",
+        // The Arena PvP in the Osada (src/server/pvp-arena.js, 762 A), only
+        // here until the classes are evened out in its duels (772).
+        "ARENA": "on"
       },
       "triggers": {
         "crons": ["* * * * *"]

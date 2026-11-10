@@ -390,7 +390,7 @@ export const SPRITES = {
     width: 192,
     height: 144,
     fit: true,
-    ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist', 'forge', 'tannery', 'stable', 'casino', 'trial-hall', 'torch', 'torch-off'],
+    ids: ['board', 'enchanter', 'hermitage', 'tavern', 'market', 'herbalist', 'forge', 'tannery', 'stable', 'casino', 'trial-hall', 'arena', 'torch', 'torch-off'],
   },
   // The Salon Gier's games on the screen (data/settlement.json, casino.show;
   // PixelLab, 550.1 C, 550.2 B): the Koło Fortuny and the Loteria's drum,
