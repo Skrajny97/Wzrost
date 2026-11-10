@@ -3034,6 +3034,20 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wojny gildii: odpowiedzi autora 792–800 (10.11.2026, przed budową, 873)
+
+Autor: „chcemy też powoli budować wojny gildii”, drużyny 5 na 5, „jeśli jest pełna gildia to 6 takich drużyn, a jeśli mniej to mniej i częściej muszą walczyć”. Odpowiedzi ze strony ocen:
+
+1. **793 A:** gildia mieści 30 członków, czyli 6 drużyn po 5 osób (dotąd 20).
+2. **794 A:** wojna trwa tydzień, od poniedziałku do niedzieli, a bitwy są codziennie o 20:00.
+3. **796 A:** każdy członek sam zajmuje miejsce w drużynie, a lider i zastępcy mogą każdego przesunąć.
+4. **797 B:** przeciwnik losowany spośród gildii o podobnej liczbie członków. Wariant A (według Mocy z Rankingu) odrzucony: „Za mało gildii jeszcze na to”.
+5. **798 A:** bitwa 5 na 5, postacie takie, jakie są zapisane (jak na Arenie), bez towarzyszy i najemników. Wygrywa drużyna, której ktoś zostanie na nogach.
+6. **799 A:** zwycięska gildia dostaje Sławę i skrzynię wojenną do Skrzyni gildii, a każdy, kto walczył, dostaje złoto i Punkty Systemu za każdą wygraną bitwę.
+7. **800 C:** drużyna, której brakuje ludzi, walczy w niepełnym składzie (np. 3 na 5).
+8. **792 (makiety):** przegląd i mała gildia odrzucone jako „nieczytelne kompletnie i brzydkie GUI”; drużyny bez „Mocy”, bo gra jej nie liczy („dodaj jeśli dodasz Moc”); raport bitwy „może być, ale niech te walki symulacyjne rzeczywiście można oglądać”. Nowe makiety: czytelne, w wyglądzie reszty gry, bez Mocy, z prawdziwą powtórką bitwy 5 na 5.
+9. **795** (ile razy walczy drużyna małej gildii): oba warianty odrzucone („zbyt skomplikowane”, „niezrozumiałe, pisz po ludzku”). Pytanie wraca prostszymi słowami, z przykładami w tabelce.
+
 ## Wersja 0.2.48 (10.11.2026): Kwatery 3. poziomu nie droższe niż Warownia; zaległe 0.2.45–0.2.47 w grze
 
 1. Autor: „Mówisz 0.2.47 wysłane, a w grze dalej 0.2.44”. Wersje 0.2.45, 0.2.46 i 0.2.47 doszły tylko do wersji testowej: przed wdrożeniem do gry zatrzymał je test, który pilnuje, żeby każdy budynek Warowni kosztował więcej niż najdroższy poziom budynku obozu. 3. poziom Kwater z 0.2.45 kosztował 20 480 złota, 5 698 drewna, 3 799 kamienia i 3 165 rudy żelaza, a 1. poziom budynku Warowni 8 000 złota, 3 000 drewna, 1 500 kamienia i 1 500 rudy żelaza.
