@@ -1,0 +1,27 @@
+{
+  "id": "rider-skin-night-raven-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a wiry young woman with short black hair in a black cloak of layered raven feathers, a black raven-beak half mask over the upper face, a dark fitted leather jerkin, dark trousers and soft dark boots, no weapons, sitting upright and relaxed on a horse in the pose of the grey seated mannequin, not standing, not crouching, the legs never apart, both hands in front holding the reins, seen exactly from the side in profile, facing right, the face, chest and hips turned to the right and not towards the viewer, sitting sideways in the saddle like the finished rider, only the near leg showing and the far leg hidden behind the horse, the same size and place as the mannequin, the whole figure from the top of the head to the foot inside the image, nothing under the rider, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/riders/skin-forest-lord-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/skins/night-raven-female.png",
+      "usage": "the character's look: face, hair, clothes, colours and what is carried"
+    },
+    {
+      "path": "art/references/riders/mannequin-seated.png",
+      "usage": "the pose, size and place of the figure: a rider sitting sideways on a horse that is not drawn, seen exactly from the side, facing right, the thigh forward, the knee bent and the lower leg hanging down, only the near leg, both forearms forward holding the reins; copy the pose exactly, not its hood or cloak"
+    },
+    {
+      "path": "art/references/riders/skin-forest-lord-female.png",
+      "usage": "a finished rider of the game in the right pose: copy how it sits, seen exactly from the side in profile, the head, chest and hips turned to the right, one leg showing; not its clothes or colours"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 9
+}
