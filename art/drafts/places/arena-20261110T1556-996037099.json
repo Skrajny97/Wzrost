@@ -1,0 +1,14 @@
+{
+  "id": "arena",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, a round village fighting arena at dusk at the edge of a dark forest: a ring of trampled sand enclosed by a low fence of sharpened wooden stakes and rough stones, tiered wooden spectator stands on the far side hung with red and gold banners with crossed swords, burning torches on tall poles, a weapon rack with spears and round shields by the gate, two great old trees framing the scene, wide panorama for a dim background behind text, low contrast, muted dark palette of browns, moss green and sand with crimson and gold accents, no text, no border, no people, no animals",
+  "style": "src/client/art/places/trial-hall.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
