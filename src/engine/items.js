@@ -520,6 +520,11 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     // Konta: worn from its own level on (src/server/inventory.js).
     ...(item.traded ? { traded: true } : {}),
     ...(item.chest ? { chest: true } : {}),
+    // What the Zaklinaczka in the Osada can do with it, for the card's way
+    // to her (the author: „Zrób też zaklinanie w plecaku (niech przenosi do
+    // Zaklinaczki)”): reforge an affix of an item that has them, and enchant
+    // an element into the slots her zaklęcie żywiołu takes.
+    enchant: { reforge: (item.affixes?.length ?? 0) > 0, imbue: Boolean(content.settlement?.imbue?.slots?.includes(item.slot)) },
     ...(upgradeCap === undefined ? {} : { anvil: upgradeView(item, upgradeCap, content, materials, anvilDiscount, anvilWeek) }),
   };
 }

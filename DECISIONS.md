@@ -3034,6 +3034,12 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.44 (10.11.2026): z plecaka do Zaklinaczki
+
+1. **Zaklinanie z karty przedmiotu.** Autor: „Zrób też zaklinanie w plecaku (niech przenosi do Zaklinaczki) jak już Osada jest odblokowana”. Gdy Osada jest otwarta, karta przedmiotu (w plecaku i na postaci) ma sekcję „Zaklinaczka” z jednym zdaniem o tym, co ona zrobi z tym przedmiotem, i przyciskiem „Zaklnij u Zaklinaczki”. Przycisk prowadzi do Pracowni Zaklinaczki, gdzie przedmiot czeka w polu „Przyniesiony przedmiot”, a „Zaklnij afiks” i „Zaklnij żywioł” otwierają się od razu na nim, bez wybierania z listy („Inny przedmiot” wraca do listy).
+2. **Brakujący szczegół.** Sekcja jest tylko przy przedmiotach, z którymi Zaklinaczka coś zrobi: przy przedmiocie z afiksami (zaklęcie afiksu) i przy broni albo pancerzu (zaklęcie żywiołu, `slots` w `data/settlement.json`). Przedmiot przyniesiony z karty zostaje wybrany, dopóki postać jest w Pracowni; inne miejsce Osady go odkłada.
+3. Sprawdzone w przeglądarce na 390 px: miecz z afiksem, kurtka (tylko żywioł) i pierścień bez afiksów (bez sekcji). Testy klienta, Osady, zaklęcia żywiołu i tłumaczeń przechodzą.
+
 ## Wersja 0.2.43 (10.11.2026): tło planszy walki na Arenie (790 B)
 
 1. **Plansza walki na piasku Areny (790 B).** Autor: „Trzeba też w końcu tła planszy walki zrobić, chociaż pod Arenę zacząć, bo nigdzie ich nie ma”. Powtórka walki na Arenie stoi na tle z PixelLab: ubity piasek widziany z góry, z jedną jasną linią między stronami rywali (wariant B, A z krzyżem odrzucony). Tło jest przygaszone, żeby karty walczących były czytelne.

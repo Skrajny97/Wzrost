@@ -392,6 +392,10 @@
     "0.2.43": {
       "title": "Version 0.2.43",
       "body": "- Arena fights take place on the arena's sand: the fight's replay has its own background."
+    },
+    "0.2.44": {
+      "title": "Version 0.2.44",
+      "body": "- Once you have the Settlement, an item's card has an “Enchant at the Enchantress” button. It takes the item straight to her workshop, where the affix and element enchantments open on it right away."
     }
   }
 }

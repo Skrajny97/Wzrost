@@ -1012,6 +1012,7 @@ function itemCard(item, { equipped, anvil = false, preview: withPreview = true, 
       preview,
       usable && worn && compareTable(item, worn),
       anvilSection(item, busy && equipped, anvil),
+      enchanterLink(item),
       !equipped && salvageSection(item, false),
       busy && h('p', { class: 'muted', text: busyText(state.character) }),
       !usable && h('p', { class: 'region-warning', text: t('Twoja klasa nie może używać tego przedmiotu. Sprzedasz go złomiarzowi.') }),
@@ -1413,6 +1414,36 @@ function reopenOwned(done) {
   const owned = ownedItem(done.itemId);
   if (owned) itemSheet(owned.item, { equipped: owned.equipped, anvil: true });
   else closeSheet();
+}
+
+// The way from the item card to the Zaklinaczka in the Osada, once the Osada
+// is open (the author: „Zrób też zaklinanie w plecaku (niech przenosi do
+// Zaklinaczki) jak już Osada jest odblokowana”): her place opens with the
+// item chosen for the zaklęcie afiksu and the zaklęcie żywiołu.
+function enchanterLink(item) {
+  const { reforge, imbue } = item.enchant ?? {};
+  if (!state.character.settlementOpen || !(reforge || imbue) || item.id === undefined) return null;
+  const hint =
+    reforge && imbue
+      ? t('W Osadzie wylosuje od nowa jeden afiks tego przedmiotu albo zaklnie w niego żywioł.')
+      : reforge
+        ? t('W Osadzie wylosuje od nowa jeden afiks tego przedmiotu.')
+        : t('W Osadzie zaklnie w ten przedmiot żywioł.');
+  return h(
+    'div',
+    { class: 'compare' },
+    h('p', { class: 'compare-title', text: t('Zaklinaczka') }),
+    h('p', { class: 'system-hint', text: hint }),
+    h('a', {
+      class: 'link-button',
+      href: '#/osada/enchanter',
+      onClick: () => {
+        state.enchantItem = item.id;
+        closeSheet();
+      },
+      text: t('Zaklnij u Zaklinaczki'),
+    }),
+  );
 }
 
 // The Kowadło part of the item card: the next upgrade with its price, chance

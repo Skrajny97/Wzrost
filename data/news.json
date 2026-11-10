@@ -495,6 +495,11 @@
       "id": "0.2.43",
       "title": "Wersja 0.2.43",
       "body": "- Walki na Arenie toczą się na piasku areny: powtórka walki ma swoje tło."
+    },
+    {
+      "id": "0.2.44",
+      "title": "Wersja 0.2.44",
+      "body": "- Gdy masz Osadę, karta przedmiotu ma przycisk „Zaklnij u Zaklinaczki”. Zabiera przedmiot prosto do jej Pracowni, gdzie zaklęcie afiksu i żywiołu otwiera się od razu na nim."
     }
 ]
 }

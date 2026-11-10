@@ -67,6 +67,8 @@ const SIDE_GAP = 20;
 
 export function mountSettlement(container, { params = {} } = {}) {
   const placeId = params.place ?? null;
+  // The item brought from its card stays brought only at the Zaklinaczka's.
+  if (placeId !== 'enchanter') delete state.enchantItem;
   let data = null;
   let failure = null;
   let gone = false;
@@ -434,7 +436,9 @@ export function mountSettlement(container, { params = {} } = {}) {
     const body = h('div', { class: 'settlement-reforge' });
     const capital = (text) => text.charAt(0).toUpperCase() + text.slice(1);
     openSheet(h('h2', { class: 'sheet-title', text: t('Zaklęcie żywiołu') }), body);
-    pickItem();
+    const chosen = cardItem(data.imbue.items);
+    if (chosen) pickElement(chosen.id);
+    else pickItem();
 
     function pickItem() {
       const { items } = data.imbue;
@@ -506,7 +510,9 @@ export function mountSettlement(container, { params = {} } = {}) {
   function reforgeSheet() {
     const body = h('div', { class: 'settlement-reforge' });
     openSheet(h('h2', { class: 'sheet-title', text: t('Zaklęcie afiksu') }), body);
+    const chosen = cardItem(data.reforge.items);
     if (data.reforge.pending) choose(data.reforge.pending);
+    else if (chosen) pickAffix(chosen.id);
     else pickItem();
 
     function pickItem() {
@@ -1235,12 +1241,26 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
+  // The item brought from its card (character.js, "Zaklnij u Zaklinaczki"),
+  // among those a service takes, while it is still there to enchant.
+  function cardItem(items) {
+    return state.enchantItem === undefined ? null : (items.find((one) => String(one.id) === String(state.enchantItem)) ?? null);
+  }
+
   // A resident's services, on their place's screen.
   function services(resident) {
     if (resident.service === 'reforge')
       return h(
         'div',
         { class: 'stack', 'data-guide': 'enchanter-services' },
+        // The item brought from its card, which both zaklęcia take first.
+        (cardItem(data.reforge.items) || cardItem(data.imbue?.items ?? [])) &&
+          h(
+            'div',
+            { class: 'settlement-reforge-item' },
+            h('p', { class: 'field-label', text: t('Przyniesiony przedmiot') }),
+            itemHead(cardItem(data.reforge.items) ?? cardItem(data.imbue.items)),
+          ),
         data.reforge.pending ? choiceCard(data.reforge.pending) : h('button', { type: 'button', class: 'button button--world', text: t('Zaklnij afiks'), onClick: reforgeSheet }),
         data.imbue && h('button', { type: 'button', class: 'button button--world', text: t('Zaklnij żywioł'), onClick: imbueSheet }),
       );
