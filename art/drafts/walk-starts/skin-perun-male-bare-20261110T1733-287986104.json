@@ -1,0 +1,14 @@
+{
+  "id": "skin-perun-male-bare",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, a warrior in dark blackened steel plate armour with thin copper trims seen exactly from the side facing right: the front of his armoured chest and belly and the top of his front thigh, his far arm hidden behind his body, nothing in front of him, no shield, empty transparent background around him",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": "art/references/walks/start/skin-perun-male.png",
+  "mask": "art/inputs/walk-starts/skin-perun-male-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
