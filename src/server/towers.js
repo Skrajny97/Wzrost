@@ -59,7 +59,10 @@ import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
-import { soldGold } from './inventory.js';
+import { favoriteIds } from './favorites.js';
+import { fallenGems, soldGold } from './inventory.js';
+import { gemLines } from './hunts.js';
+import { addTo } from './professions.js';
 import { partyOf } from './parties.js';
 import { trimReports } from './reports.js';
 
@@ -212,7 +215,8 @@ export async function enterTower(context) {
   const sellBonus = campBonus(levels, 'sellPrice', content());
   const toBag = hunt.items.map((_, index) => index).filter((index) => !autoEquipped.includes(index));
   const candidates = [...bag, ...toBag.map((index) => hunt.items[index])];
-  const sold = toBag.length > 0 ? bagOverflow(candidates, capacity, row.class_id, content()) : [];
+  // The favourites stay, as after an exploration (favorites.js).
+  const sold = toBag.length > 0 ? bagOverflow(candidates, capacity, row.class_id, content(), favoriteIds(row)) : [];
   const storedSold = sold.filter((index) => index < bag.length).map((index) => bag[index]);
   const soldFound = sold.filter((index) => index >= bag.length).map((index) => toBag[index - bag.length]);
   const soldFoundGold = soldFound.reduce((sum, index) => sum + sellPrice(hunt.items[index], content(), sellBonus), 0);
@@ -234,6 +238,11 @@ export async function enterTower(context) {
       companions: climbers.companions.map((companion) => companion.name),
     },
   };
+  // The gems of the bag's items the scrapper bought fall out and go back to
+  // the minerals (757 B), as after an exploration (hunts.js).
+  const gemsBack = fallenGems(storedSold);
+  if (Object.keys(gemsBack).length > 0) report.system = [...report.system, ...gemLines(gemsBack)];
+  const setGems = addTo('minerals', gemsBack);
   const summary = {
     tower: { name: tower.name, floor },
     areaName: report.areaName,
@@ -282,7 +291,7 @@ export async function enterTower(context) {
     ...hunt.items.flatMap((item, index) => (soldFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)])),
     db
       .prepare(
-        `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setMaterials},
+        `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setMaterials}${setGems.sql},
            time_points = time_points + ?, met = ?, quests = CASE WHEN quests = ? THEN ? ELSE quests END, towers = ?${healed !== null ? ', hp = ?, hp_at = ?' : ''},
            version = version + 1
          WHERE id = ?`,
@@ -295,6 +304,7 @@ export async function enterTower(context) {
         hunt.gold + soldFoundGold,
         ...storedPrice.binds,
         ...found.flatMap(([key, count]) => [path(key), path(key), count]),
+        ...setGems.binds,
         applied.timePoints,
         JSON.stringify(met),
         row.quests,

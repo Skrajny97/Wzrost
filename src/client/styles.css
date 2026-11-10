@@ -15316,3 +15316,245 @@ a.profession-square:active {
 .status-row--language {
   align-items: center;
 }
+
+/* The Targowisko's Rejestr and filters, the slot's list of items to wear,
+   the Stół rozbiórki's marks and the favourite items (the author,
+   10.11.2026; screens/market.js, screens/character.js). */
+
+/* The Targowisko's four tabs, all in sight: two by two on a phone, in one
+   row from a tablet on. */
+.market-tabs--four {
+  flex-wrap: wrap;
+  overflow-x: visible;
+}
+
+.market-tabs--four .chat-tab {
+  flex: 1 1 calc(50% - 3px);
+  justify-content: center;
+  min-width: 0;
+  max-width: none;
+}
+
+@media (min-width: 640px) {
+  .market-tabs--four .chat-tab {
+    flex-basis: 0;
+  }
+}
+
+/* "Wszystko", "Dla mnie" and "Licytuję" over the offers, each with how
+   many it holds under its name; the category chips go under them. */
+.market-top .segmented-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+  padding: 4px;
+  line-height: 1.15;
+}
+
+.market-top-name {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.market-top .market-filter-count {
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+/* An auction it bids on and leads no longer ("Licytuję"). */
+.market-outbid {
+  align-self: center;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+/* A line of the Rejestr: what happened and for how much, over the goods. */
+.market-log-event {
+  color: var(--text);
+  font-family: var(--font-system);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.market-log--sold .market-log-event,
+.market-log--won .market-log-event {
+  color: var(--gold);
+}
+
+.market-log--expired .market-log-event,
+.market-log--withdrawn .market-log-event {
+  color: var(--text-muted);
+}
+
+/* A favourite item: a gold star in the bottom left corner of its tile,
+   after its name in a list, and the star in its card. */
+.slot-favorite {
+  position: absolute;
+  bottom: -5px;
+  left: -5px;
+  display: flex;
+  padding: 1px;
+  border: 1px solid var(--bark-line);
+  background: var(--bg-deep);
+  color: var(--gold);
+}
+
+.slot-favorite svg path,
+.item-favorite svg path,
+.favorite-toggle[aria-pressed='true'] svg path {
+  fill: currentColor;
+}
+
+.item-favorite {
+  display: inline-flex;
+  margin-left: 4px;
+  color: var(--gold);
+  vertical-align: -2px;
+}
+
+.favorite-row {
+  display: grid;
+  gap: 4px;
+}
+
+.favorite-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 8px;
+  min-height: 40px;
+  padding: 4px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.favorite-toggle[aria-pressed='true'] {
+  border-color: var(--gold);
+  background: rgba(217, 180, 90, 0.14);
+  color: var(--gold);
+}
+
+.favorite-note {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* A slot's sheet: the bag's items for it, those not to be worn yet dim. */
+.slot-choices {
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.slot-choices .compare-title,
+.slot-later-title {
+  margin: 0;
+}
+
+.slot-choices .item-row > .item-summary-art,
+.slot-choices .item-row > .item-summary {
+  flex: 1 1 auto;
+}
+
+.slot-later {
+  opacity: 0.6;
+}
+
+.slot-later-text {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 4px;
+  min-width: 0;
+}
+
+.slot-later-why {
+  color: var(--gold);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+/* "Rozbierz kilka" and the Stół rozbiórki's Przedmioty: a marked item in a
+   bright frame with a glow, still, also with the animations off; a
+   favourite dim, with its star. */
+.salvage-pick[aria-pressed='true'] {
+  border-color: var(--system);
+  background:
+    radial-gradient(circle at 50% 55%, rgba(143, 227, 239, 0.32), transparent 72%),
+    rgba(18, 40, 44, 0.95);
+  box-shadow:
+    0 0 0 2px var(--system),
+    0 0 12px 3px rgba(143, 227, 239, 0.55);
+}
+
+.salvage-pick[aria-pressed='true'] .salvage-check {
+  width: 20px;
+  height: 20px;
+  box-shadow: 0 0 0 2px var(--bg-deep);
+}
+
+.salvage-pick--favorite {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+/* In the bar under the grid: the item marked last, as its card describes
+   it, and all the marked ones by name. */
+.salvage-last {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--system-line);
+  border-radius: 4px;
+  background: var(--system-fill);
+}
+
+.salvage-last-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1.5px solid var(--rarity, var(--bark-line));
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.85);
+}
+
+.salvage-last-art .sprite--item {
+  width: 36px;
+  height: 36px;
+}
+
+.salvage-last-text {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.salvage-last-gem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--rarity, var(--text));
+  font-size: 14px;
+}
+
+.salvage-names {
+  max-height: 4.4em;
+  margin: 0;
+  overflow-y: auto;
+  font-size: 14px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}

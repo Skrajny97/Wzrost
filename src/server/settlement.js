@@ -117,7 +117,8 @@ import { t } from './i18n.js';
 import { wantedToKeep, wantedView } from './wanted.js';
 import { forgeView } from './forge.js';
 import { trialProgress } from './guild-trials.js';
-import { upgradePayment, upgradePlan } from './inventory.js';
+import { fallenGem, gemNamed, upgradePayment, upgradePlan } from './inventory.js';
+import { addTo } from './professions.js';
 import { counted, foreign, takenOff, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
 import { stableView } from './stable.js';
@@ -1187,11 +1188,16 @@ export async function upgradeCompanionItem(context) {
   const outcome = rollUpgrade(item, createRng(roll), content(), { warded: plan.warded, steady: plan.steady });
   const next = { ...stored, companions: hired.map((one) => (one === companion ? upgradedOnCompanion(one, body.slot, outcome, roll) : one)) };
   const saved = JSON.stringify(next);
+  // A broken item's gem falls out and goes back to the character's
+  // minerals (the author's 757 B, 10.11.2026: „kamień wypada i wraca do
+  // Twoich minerałów”), as from its own items (inventory.js).
+  const gem = outcome.result === 'broken' ? fallenGem(item) : null;
+  const gemSet = gem ? addTo('minerals', { [gem]: 1 }) : { sql: '', binds: [] };
   const db = context.env.DB;
   const [result] = await db.batch([
     db
-      .prepare(`UPDATE characters SET settlement = ?, ${pay.set}, version = version + 1 WHERE id = ? AND version = ? AND ${pay.enough}`)
-      .bind(saved, ...pay.binds, row.id, row.version, ...pay.enoughBinds),
+      .prepare(`UPDATE characters SET settlement = ?, ${pay.set}${gemSet.sql}, version = version + 1 WHERE id = ? AND version = ? AND ${pay.enough}`)
+      .bind(saved, ...pay.binds, ...gemSet.binds, row.id, row.version, ...pay.enoughBinds),
     // An upgrade that came off moves the Próby Gildii's trial on, as one of
     // the character's own items does, only with this try saved (its seed
     // makes the Osada saved its own).
@@ -1217,6 +1223,7 @@ export async function upgradeCompanionItem(context) {
       ...(outcome.saved && { saved: true }),
       ...(plan.steady && { steadied: true }),
       ...(outcome.kept && { kept: true }),
+      ...(gem && { gem: gemNamed(gem) }),
     },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),

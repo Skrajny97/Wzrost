@@ -1,7 +1,9 @@
 // The scrapper's sale by the handful: every item in the bag up to a rarity,
 // from a report or at the Skup złomu. Worn and upgraded items stay, and so
 // do those with a gem set in them; such an item sells alone, from its card
-// in the bag.
+// in the bag. The favourites stay too (the author, 10.11.2026: "Do tego
+// opcja dodawania do ulubionych, by przypadkiem nie rozebrać czegoś na
+// później"), until their star comes off.
 
 import { h } from './dom.js';
 import { countOf, formatNumber } from './format.js';
@@ -10,7 +12,7 @@ import { call, state } from './state.js';
 import { confirmAction, openSheet, toast } from './ui.js';
 
 export function scrapperSheet() {
-  const bag = state.character.bag.filter((item) => !(item.upgrade > 0) && !item.gem);
+  const bag = state.character.bag.filter((item) => !(item.upgrade > 0) && !item.gem && !item.favorite);
   const rarities = state.content.rarities;
   const rank = (item) => rarities.findIndex((rarity) => rarity.id === item.rarity);
   openSheet(
@@ -37,6 +39,7 @@ export function scrapperSheet() {
       }),
     ),
     h('p', { class: 'muted', text: t('Założone i ulepszone przedmioty oraz te z kamieniem zostają. Sprzedasz je bezpośrednio z pozycji plecaka.') }),
+    state.character.bag.some((item) => item.favorite) && h('p', { class: 'muted', text: t('Ulubione, z gwiazdką, też zostają, dopóki jej nie zdejmiesz.') }),
   );
 }
 

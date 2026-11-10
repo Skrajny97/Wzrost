@@ -18,6 +18,7 @@ import { bagCapacity, bagStacks, campLevels, isUnlocked, itemView, knownStack, m
 import { bagItems, characterView, loadPlayer, requireOffRack } from './characters.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
+import { withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
@@ -388,12 +389,14 @@ function exchange(db, trade, now, sides) {
         got.push(path(`${FOREIGN[kind]}:${stack}`), path(`${FOREIGN[kind]}:${stack}`), count);
       }
     }
+    // The items given keep their ids, so they come off the giver's
+    // favourites: one that comes back is no favourite (favorites.js).
     moves.push(
       db
         .prepare(
-          `UPDATE characters SET gold = gold + ?, ${changes.map(([kind, { sql }]) => `${kind} = ${sql}`).join(', ')}, foreign_stacks = ${foreign}, version = version + 1 WHERE id = ?`,
+          `UPDATE characters SET gold = gold + ?, ${changes.map(([kind, { sql }]) => `${kind} = ${sql}`).join(', ')}, foreign_stacks = ${foreign}, favorites = ${withoutFavorites}, version = version + 1 WHERE id = ?`,
         )
-        .bind(taker.offer.gold - giver.offer.gold, ...changes.flatMap(([, { values }]) => values), ...got, giver.id),
+        .bind(taker.offer.gold - giver.offer.gold, ...changes.flatMap(([, { values }]) => values), ...got, JSON.stringify(giver.offer.items), giver.id),
     );
   }
   const emptied = (kind) => `(SELECT COALESCE(json_group_object(key, value), '{}') FROM json_each(characters.${kind}) WHERE value > 0)`;

@@ -22,6 +22,7 @@ import {
   campBonus,
   campLevels,
   createRng,
+  equipBlock,
   itemName,
   itemView,
   listBlock,
@@ -46,7 +47,9 @@ import {
 import { bagItems, bagPlaces, characterView, loadPlayer, requireOffRack, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { assertion, atomically as atomicBatch, raced } from './atomic.js';
+import { favoriteIds, withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
+import { t } from './i18n.js';
 import { herbsOf, mineralsOf, potionsOf } from './professions-view.js';
 import { requireOpen, settlementOf } from './settlement.js';
 
@@ -107,8 +110,14 @@ const offerOf = (row) => ({
 
 // An offer for the page. The test version's own trader (no seller) is
 // named in the page's language, as its offers keep the name they were put
-// up with.
-function offerView(row, characterId) {
+// up with. For the filters over the offers (the author, 10.11.2026:
+// "Wywalić aktualne filtry Targowiska i zrobić bardziej przydatne -
+// Licytowane przeze mnie, Do założenia przeze mnie (czy tam moją klasę)"):
+// `myBid`, the character's own last bid on it (market_bids), or null, so
+// "Licytuję" shows whether it leads or was outbid; and for an item,
+// `equipBlock`, why `wearer` cannot wear it now, or null, as "Załóż" asks
+// (equipBlock in the engine), for "Dla mnie".
+function offerView(row, wearer) {
   const offer = offerOf(row);
   return {
     id: row.id,
@@ -120,8 +129,10 @@ function offerView(row, characterId) {
     bids: row.bids,
     endsAt: row.ends_at,
     minBid: minimumBid(offer, content()),
-    leading: row.bidder_id === characterId,
-    own: row.seller_id === characterId,
+    leading: row.bidder_id === wearer.id,
+    own: row.seller_id === wearer.id,
+    myBid: row.my_bid ?? null,
+    ...(row.kind === 'item' && { equipBlock: equipBlock(JSON.parse(row.item), wearer.class_id, wearer.class_level, content()) }),
   };
 }
 
@@ -143,13 +154,55 @@ const goldParcel = (db, offer, price, now) =>
           .bind(offer.seller_id, offer.id, sellerShare(price, content(), offer.fee ?? tuning().fee), price, now),
       ];
 
+// The Rejestr (the author, 10.11.2026: "Zbudować rejestr na targowisku
+// sprzedanych i odebranych przedmiotów (oraz wygranych w licytacjach)"): a
+// line of a character's trade, written in the batch of the trade itself,
+// and its oldest lines past the data's number (market.log.entries) gone,
+// as the design lets nothing run out with time. `event`: sold, bought,
+// won, expired or withdrawn; `other` the other side, a player's character
+// (`name`, as it is called then) or 'merchant', 'wanderer' or 'test' (the
+// test version's own trader), named in the page's language when the
+// Rejestr is shown.
+function logLine(db, characterId, { event, other = 'player', name = null, kind, good = null, count = 1, item = null, price = 0, gold = null }, now) {
+  return [
+    db
+      .prepare('INSERT INTO market_log (character_id, event, other, other_name, kind, good, count, item, price, gold, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(characterId, event, other, name, kind, good, count, item, price, gold, now),
+    db.prepare('DELETE FROM market_log WHERE character_id = ? AND id NOT IN (SELECT id FROM market_log WHERE character_id = ? ORDER BY id DESC LIMIT ?)').bind(characterId, characterId, tuning().log.entries),
+  ];
+}
+
+// The Rejestr's line of an offer's goods for `characterId`.
+const offerLine = (db, offer, characterId, line, now) => logLine(db, characterId, { kind: offer.kind, good: offer.good, count: offer.count, item: offer.item, ...line }, now);
+
+// The seller's side of an offer, for the buyer's line: a player's
+// character, or the test version's own trader.
+const sellerSide = (offer) => (offer.seller_id === null ? { other: 'test' } : { name: offer.seller_name });
+
+// The lines of an offer sold for `price` to `buyerId`, named `buyerName`:
+// the buyer's (`event`: won or bought) and the seller's, with the gold it
+// gets after the fee (none for the test version's own trader).
+const soldLines = (db, offer, event, buyerId, buyerName, price, now) => [
+  ...offerLine(db, offer, buyerId, { event, price, ...sellerSide(offer) }, now),
+  ...(offer.seller_id === null
+    ? []
+    : offerLine(db, offer, offer.seller_id, { event: 'sold', price, name: buyerName, gold: sellerShare(price, content(), offer.fee ?? tuning().fee) }, now)),
+];
+
+// The bids kept for "Licytuję" go once their offer is settled.
+const bidsGone = (db, offer) => db.prepare('DELETE FROM market_bids WHERE offer_id = ?').bind(offer.id);
+
 // The offers whose time ran out (questions 238 A, 239 A): a sold one gives
 // its bidder the goods and its seller the gold, and one without a bid goes
 // back to its seller (the test version's own trader just takes it away).
 // Each settles once, in a batch of its own; one that fails waits for the
-// next time and keeps the others from nothing.
+// next time and keeps the others from nothing. The Rejestr writes it down
+// for both sides.
 export async function settleMarket(db, now) {
-  const ended = await db.prepare("SELECT * FROM market_offers WHERE state = 'open' AND ends_at <= ? ORDER BY ends_at LIMIT 100").bind(now).all();
+  const ended = await db
+    .prepare("SELECT *, (SELECT name FROM characters WHERE id = market_offers.bidder_id) AS bidder_name FROM market_offers WHERE state = 'open' AND ends_at <= ? ORDER BY ends_at LIMIT 100")
+    .bind(now)
+    .all();
   for (const offer of ended.results) {
     const sold = offer.bidder_id !== null;
     const goods = sold
@@ -157,12 +210,19 @@ export async function settleMarket(db, now) {
       : offer.seller_id === null
         ? []
         : [goodsParcel(db, offer, offer.seller_id, 'returned', 0, now)];
+    const lines = sold
+      ? soldLines(db, offer, 'won', offer.bidder_id, offer.bidder_name, offer.bid, now)
+      : offer.seller_id === null
+        ? []
+        : offerLine(db, offer, offer.seller_id, { event: 'expired' }, now);
     try {
       await db.batch([
         assertion(db, "EXISTS (SELECT 1 FROM market_offers WHERE id = ? AND state = 'open' AND version = ?)", [offer.id, offer.version]),
         db.prepare('UPDATE market_offers SET state = ?, settled_at = ?, version = version + 1 WHERE id = ?').bind(sold ? 'sold' : 'expired', now, offer.id),
         ...goods,
         ...(sold ? goldParcel(db, offer, offer.bid, now) : []),
+        ...lines,
+        bidsGone(db, offer),
       ]);
     } catch (error) {
       if (!raced(error)) console.error(error);
@@ -191,8 +251,11 @@ function sellable(player, now) {
   const sellBonus = campBonus(campLevels(player.buildings, now, content()), 'sellPrice', content());
   const stacks = { herb: herbsOf(row), potion: potionsOf(row), material: JSON.parse(row.materials ?? '{}'), part: JSON.parse(row.parts ?? '{}'), mineral: mineralsOf(row) };
   const withBonus = (goods) => (typeof goods.scrap === 'number' ? { ...goods, scrap: goods.scrap * (1 + sellBonus) } : goods);
+  // A favourite may go up too, and is no favourite after it (favorites.js);
+  // its star shows on the list.
+  const favorites = favoriteIds(row);
   return {
-    items: bagItems(player).map((item) => ({ id: item.id, ...itemView(item, content(), { sellBonus }) })),
+    items: bagItems(player).map((item) => ({ id: item.id, ...itemView(item, content(), { sellBonus }), ...(favorites.has(item.id) && { favorite: true }) })),
     stacks: STACKS.flatMap((kind) =>
       Object.entries(stacks[kind])
         .filter(([key, count]) => count > 0 && knownGood(kind, key))
@@ -236,12 +299,29 @@ function residentsView(player, stored, now) {
 async function marketView(db, player, now) {
   const { row } = player;
   const stored = settlementOf(row);
-  const [others, mine, parcels] = await db.batch([
-    // `IS NOT`: the test version's own offers have no seller.
-    db.prepare("SELECT * FROM market_offers WHERE state = 'open' AND ends_at > ? AND seller_id IS NOT ? ORDER BY ends_at LIMIT 100").bind(now, row.id),
+  const [others, mine, parcels, bidding] = await db.batch([
+    // `IS NOT`: the test version's own offers have no seller. With the
+    // character's own last bid on each (market_bids).
+    db
+      .prepare(
+        `SELECT market_offers.*, market_bids.amount AS my_bid FROM market_offers
+         LEFT JOIN market_bids ON market_bids.offer_id = market_offers.id AND market_bids.character_id = ?
+         WHERE state = 'open' AND ends_at > ? AND seller_id IS NOT ? ORDER BY ends_at LIMIT 100`,
+      )
+      .bind(row.id, now, row.id),
     db.prepare("SELECT * FROM market_offers WHERE state = 'open' AND seller_id = ? ORDER BY ends_at").bind(row.id),
     db.prepare('SELECT * FROM market_parcels WHERE character_id = ? ORDER BY id').bind(row.id),
+    // Every open offer it bids on, also past the first hundred, for
+    // "Licytuję".
+    db
+      .prepare(
+        `SELECT market_offers.*, market_bids.amount AS my_bid FROM market_bids JOIN market_offers ON market_offers.id = market_bids.offer_id
+         WHERE market_bids.character_id = ? AND state = 'open' AND ends_at > ?`,
+      )
+      .bind(row.id, now),
   ]);
+  const listed = new Set(others.results.map((offer) => offer.id));
+  const offers = [...others.results, ...bidding.results.filter((offer) => !listed.has(offer.id))].sort((a, b) => a.ends_at - b.ends_at);
   const day = questPeriod('daily', now, content()).key;
   const { minHours, reputation, maxPrice } = tuning();
   return {
@@ -253,8 +333,8 @@ async function marketView(db, player, now) {
     minHours,
     maxPrice,
     limit: offerLimit(stored.reputation, content()),
-    offers: others.results.map((offer) => offerView(offer, row.id)),
-    mine: mine.results.map((offer) => offerView(offer, row.id)),
+    offers: offers.map((offer) => offerView(offer, row)),
+    mine: mine.results.map((offer) => offerView(offer, row)),
     parcels: parcels.results.map((parcel) => ({ id: parcel.id, reason: parcel.reason, goods: goodsView(parcel.kind, parcel.good, parcel.count, parcel.item) })),
     sellable: sellable(player, now),
     trade: tradeView(stored.marketTrade, row.level, now, content(), reputation),
@@ -278,6 +358,52 @@ async function requireMarket(context) {
 export async function getMarket(context) {
   const { session, db } = await requireMarket(context);
   return respond(db, session, context.now);
+}
+
+// The other side of a line of the Rejestr, named in the page's language.
+function otherName(line) {
+  if (line.other === 'merchant') return content().residentsById[tuning().resident]?.name ?? null;
+  if (line.other === 'wanderer') return t('Wędrowny handlarz');
+  if (line.other === 'test') return tuning().testSeller;
+  return line.other_name;
+}
+
+// The goods of a line as an offer shows them; ones the game no longer
+// knows by their name alone, as the line may be older than a change of the
+// data.
+function lineGoods(line) {
+  try {
+    return goodsView(line.kind, line.good, line.count, line.item);
+  } catch {
+    return { kind: line.kind, key: line.good, count: line.count, name: line.good ?? '?' };
+  }
+}
+
+// GET /api/market/log: the character's Rejestr, the newest first (the
+// author, 10.11.2026: "Zbudować rejestr na targowisku sprzedanych i
+// odebranych przedmiotów (oraz wygranych w licytacjach)"): what it sold, to
+// whom and for how much (with the gold it got after the fee), what it
+// bought or won and from whom, and what came back without a buyer or was
+// taken back; `since`, the version of the game it is kept from, and
+// `limit`, how many lines it keeps. The offers that ended are settled
+// first, so their lines are there.
+export async function getMarketLog(context) {
+  const { player, db } = await requireMarket(context);
+  const { log } = tuning();
+  const lines = await db.prepare('SELECT * FROM market_log WHERE character_id = ? ORDER BY id DESC LIMIT ?').bind(player.row.id, log.entries).all();
+  return json({
+    since: log.since,
+    limit: log.entries,
+    log: lines.results.map((line) => ({
+      id: line.id,
+      event: line.event,
+      at: line.created_at,
+      goods: lineGoods(line),
+      price: line.price,
+      gold: line.gold,
+      with: otherName(line),
+    })),
+  });
 }
 
 // POST /api/market/list { kind, key or itemId, count, startPrice, buyNow, hours }:
@@ -325,7 +451,8 @@ export async function listOffer(context) {
             `UPDATE characters SET ${column} = CASE WHEN json_extract(${column}, ?) > ? THEN json_set(${column}, ?, json_extract(${column}, ?) - ?) ELSE json_remove(${column}, ?) END WHERE id = ?`,
           )
           .bind(jsonPath(key), count, jsonPath(key), jsonPath(key), count, jsonPath(key), row.id),
-    db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(row.id),
+    // An item put up is no favourite any more (favorites.js).
+    db.prepare(`UPDATE characters SET favorites = ${withoutFavorites}, version = version + 1 WHERE id = ?`).bind(JSON.stringify(item ? [item.id] : []), row.id),
     db
       .prepare(
         `INSERT INTO market_offers (seller_id, seller_user_id, seller_name, kind, good, count, item, start_price, buy_now, created_at, ends_at, fee)
@@ -365,6 +492,12 @@ export async function bidOnOffer(context) {
     db.prepare('UPDATE market_offers SET bid = ?, bidder_id = ?, bidder_user_id = ?, bids = bids + 1, version = version + 1 WHERE id = ?').bind(body.amount, row.id, row.user_id, offer.id),
     db.prepare('UPDATE characters SET gold = gold - ?, version = version + 1 WHERE id = ?').bind(body.amount, row.id),
     ...refund(db, offer),
+    // The bid kept for "Licytuję", which shows it also once outbid.
+    db
+      .prepare(
+        'INSERT INTO market_bids (offer_id, character_id, amount, created_at) VALUES (?, ?, ?, ?) ON CONFLICT (offer_id, character_id) DO UPDATE SET amount = excluded.amount, created_at = excluded.created_at',
+      )
+      .bind(offer.id, row.id, body.amount, now),
   ]);
   return respond(db, session, now, { bid: { amount: body.amount } });
 }
@@ -395,6 +528,8 @@ export async function buyOffer(context) {
     ...refund(db, offer),
     goodsParcel(db, offer, row.id, 'bought', price, now),
     ...goldParcel(db, offer, price, now),
+    ...soldLines(db, offer, 'bought', row.id, row.name, price, now),
+    bidsGone(db, offer),
   ]);
   return respond(db, session, now, { bought: { price } });
 }
@@ -413,6 +548,8 @@ export async function cancelOffer(context) {
     assertion(db, "EXISTS (SELECT 1 FROM market_offers WHERE id = ? AND state = 'open' AND version = ? AND bidder_id IS NULL)", [offer.id, offer.version]),
     db.prepare("UPDATE market_offers SET state = 'cancelled', settled_at = ?, version = version + 1 WHERE id = ?").bind(now, offer.id),
     goodsParcel(db, offer, row.id, 'returned', 0, now),
+    ...offerLine(db, offer, row.id, { event: 'withdrawn' }, now),
+    bidsGone(db, offer),
   ]);
   return respond(db, session, now);
 }
@@ -578,6 +715,7 @@ export async function buyFromResident(context) {
       assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT gold FROM characters WHERE id = ?) >= ?', [row.id, row.version, row.id, good.price]),
       db.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ?').bind(good.price, JSON.stringify(next), row.id),
       db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)').bind(row.id, JSON.stringify({ ...good.item, traded: 1 }), now),
+      ...logLine(db, row.id, { event: 'bought', other: 'wanderer', kind: 'item', item: JSON.stringify({ ...good.item, traded: 1 }), price: good.price }, now),
     ]);
     return respond(db, session, now, { bought: { name: itemName(good.item, content()), price: good.price } });
   }
@@ -603,6 +741,7 @@ export async function buyFromResident(context) {
     db
       .prepare(`UPDATE characters SET gold = gold - ?, ${column} = ${change.sql}, foreign_stacks = ${others.sql}, settlement = ?, version = version + 1 WHERE id = ?`)
       .bind(price, ...change.binds, ...others.binds, JSON.stringify(next), row.id),
+    ...logLine(db, row.id, { event: 'bought', other: 'merchant', kind: good.kind, good: good.key, count, price }, now),
   ]);
   return respond(db, session, now, { bought: { name: goodsView(good.kind, good.key, count).name, count, price } });
 }
@@ -663,6 +802,9 @@ export function marketRemoval(db, who, binds) {
       .bind(...binds, ...binds),
     db.prepare(`UPDATE market_offers SET bid = NULL, bidder_id = NULL, bidder_user_id = NULL, version = version + 1 WHERE state = 'open' AND bidder_id IN (${who})`).bind(...binds),
     db.prepare(`DELETE FROM market_parcels WHERE character_id IN (${who})`).bind(...binds),
+    // Their Rejestr and bids, and the bids on their offers.
+    db.prepare(`DELETE FROM market_log WHERE character_id IN (${who})`).bind(...binds),
+    db.prepare(`DELETE FROM market_bids WHERE character_id IN (${who}) OR offer_id IN (SELECT id FROM market_offers WHERE seller_id IN (${who}))`).bind(...binds, ...binds),
     db.prepare(`DELETE FROM market_offers WHERE seller_id IN (${who})`).bind(...binds),
   ];
 }

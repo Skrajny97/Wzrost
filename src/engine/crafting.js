@@ -339,13 +339,25 @@ export function orderMaterials(state, keys, table, now, rng, content, counts = {
   return { state: { ...state, materials, queue }, ordered, tooRare };
 }
 
+// The minerals an item taken apart gives at once: jewellery's ore and gem
+// (salvageYield), and the gem set in any item in Jubilerstwo, which falls
+// out and goes back to the character's minerals (the author's 757 B,
+// 10.11.2026: „kamień wypada i wraca do Twoich minerałów”); a gem the data
+// no longer knows is not given. Null when there are none.
+export function salvageMinerals(item, content) {
+  const { minerals } = salvageYield(item, content);
+  const gem = item.gem && content.mineralsById[item.gem] ? { [item.gem]: 1 } : null;
+  return minerals || gem ? addCounts(minerals ?? {}, gem ?? {}) : null;
+}
+
 // An order to take an item apart. `state` is settled at `now`; the caller
 // checks that the table takes the item's rarity and the queue has room, and
-// removes the item. The order keeps the item, and the minerals jewellery
-// gives at once (`minerals`), to give back and take back if it leaves the
-// queue.
+// removes the item. The order keeps the item, and the minerals it gives at
+// once (`minerals`, salvageMinerals), to give back and take back if it
+// leaves the queue: the item comes back with its gem in it.
 export function orderSalvage(state, item, name, table, now, rng, content) {
-  const { partId, count, minerals } = salvageYield(item, content);
+  const { partId, count } = salvageYield(item, content);
+  const minerals = salvageMinerals(item, content);
   const order = {
     kind: 'item',
     name,
@@ -370,7 +382,8 @@ export function orderSalvage(state, item, name, table, now, rng, content) {
 export function orderSalvageMany(state, entries, table, now, rng, content) {
   const groups = new Map();
   for (const { item, name } of entries) {
-    const { partId, count, minerals } = salvageYield(item, content);
+    const { partId, count } = salvageYield(item, content);
+    const minerals = salvageMinerals(item, content);
     const group = groups.get(partId) ?? { name, rarity: item.rarity, items: [], parts: 0, minutes: 0, minerals: null };
     groups.set(partId, {
       ...group,
