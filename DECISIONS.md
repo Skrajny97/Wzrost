@@ -3034,6 +3034,16 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.46 (10.11.2026): Arena — inni rywale i powtórki obron (874, 875)
+
+1. **„Losuj innych” (874).** Gracze na czacie chcieli móc zmienić wylosowanych rywali. Autor: „dwie celne uwagi, losowanie powinno losować z podobnych Punktami Areny ludzi spośród puli”. Pod rywalami jest przycisk „Losuj innych (n)”: 5 razy na dzień (od północy) losuje trzech innych rywali z tej samej puli 12 postaci o najbliższej ocenie, najpierw spośród tych, których teraz nie ma na liście. Losowanie nie zabiera walki. Gdy w puli nie ma nikogo nowego, gra to mówi i nie liczy losowania.
+2. **Powtórki obron (875).** Gracze na czacie chcieli obejrzeć obronę swojej postaci, udaną i nie. Sekcja „Ostatnie obrony” pokazuje 10 ostatnich obron, nowe od poprzedniej wizyty z plakietką „Nowa”, każdą z datą i przyciskiem „Obejrzyj walkę”. Powtórka pokazuje walkę od strony obrońcy: jego postać stoi na dole, a wygrana obrona kończy się zwycięstwem. Walka zostaje do obejrzenia przez 14 dni, tak długo jak zapis walk Areny. Walki sprzed tej wersji nie mają zapisu, więc nie mają przycisku. To zmienia zasadę 44 Areny: obrońca nie widzi już każdej obrony tylko raz, lecz 10 ostatnich.
+3. **Brakujące szczegóły.**
+    - Losować można także bez walk na dziś i w służbie najemnika; służba blokuje tylko walki.
+    - Liczba losowań na dzień (5) i liczba pokazanych obron (10) są w danych Areny.
+    - Zapis jednej walki zajmuje zwykle około 5 KB, najwięcej około 26 KB (walka dwóch Kleryków do 80 ruchów).
+4. Sprawdzone testami Areny, towarzyszy, danych i klienta oraz w przeglądarce na wszystkich dziewięciu rozmiarach ekranu (320–1920 px).
+
 ## Wersja 0.2.45 (10.11.2026): trzeci towarzysz w Kwaterach (876)
 
 1. **Kwatery na 3. poziomie.** Autor: „Zrób też tak żeby można było rekrutować więcej towarzyszy o 1 (ale zabierać na wyprawy dalej max 2), czyli dodatkowy rezerwowy do werbunku w rozbudowanych Kwaterach na poziom 3 (muszą mieć nowego sprite'a)”. Kwatery mają 3. poziom: 20 480 złota, 5 698 drewna, 3 799 kamienia i 3 165 rudy żelaza (koszty rosną jak dotąd), budowa 48 h. Dają trzecie posłanie. Na wyprawy nadal chodzi najwyżej dwóch towarzyszy, a trzeci czeka w kwaterze jako rezerwowy.
@@ -3238,7 +3248,7 @@ Autor: „762 A, ale niech otwiera się od 25 poziomu postaci”, a o budynku: �
 41. Pojedynek to dwie postacie same, bez towarzyszy, najemników, mikstur i chowańców, poza miejscami wypraw, z pełnym HP razy mnożnik z krzywej (1,5 na 25. poziomie, 2 na 75., 2,75 na 100., 3 od 300., przy średnim poziomie obu postaci), żeby walka trwała około 12 rund na każdym poziomie. Po 80 ruchach obu stron walkę kończy sędzia: wygrywa ten, komu zostało więcej HP (część pełnego), a przy różnicy do 2 punktów procentowych jest remis.
 42. Ocena startowa to 1000, jak w szachach (skala 400): atakujący zmienia ją o 32 × (wynik − oczekiwany wynik), obrońca o 16 ×, remis to pół punktu, a ocena nie spada poniżej 100. 5 walk dziennie. Trzech rywali losuje się spośród 12 postaci innych kont (od 25. poziomu) o ocenie najbliższej własnej. Przy każdym rywalu ekran podaje, ile oceny zgarniesz za wygraną i ile stracisz za przegraną.
 43. Nagrody tygodnia (złoto według poziomu w chwili odbioru, nieodebrane czekają): 1. miejsce 30 Punktów Systemu i 600 + 120 × poziom złota, 2. 25 i 500 + 100 × poziom, 3. 20 i 400 + 80 × poziom, 4.–10. 15 i 300 + 60 × poziom, 11.–25. 10 i 200 + 40 × poziom, 26.–50. 6 i 120 + 24 × poziom, dalej 3 i 60 + 12 × poziom.
-44. W tabeli tygodnia są postacie, które w tym tygodniu same stoczyły walkę, według oceny, a przy równej starsza postać; ekran pokazuje całą tabelę (najwyżej 50 miejsc) z wyróżnionym własnym wierszem, jak strona Rankingu. Sezon to miesiąc: przy pierwszym wejściu na Arenę w nowym miesiącu każda ocena przesuwa się o połowę drogi do 1000. Obrońca przy następnym wejściu widzi obrony od ostatniej wizyty, każdą raz. Walczyć można też w trakcie wyprawy i pracy w profesji, ale nie w służbie najemnika.
+44. W tabeli tygodnia są postacie, które w tym tygodniu same stoczyły walkę, według oceny, a przy równej starsza postać; ekran pokazuje całą tabelę (najwyżej 50 miejsc) z wyróżnionym własnym wierszem, jak strona Rankingu. Sezon to miesiąc: przy pierwszym wejściu na Arenę w nowym miesiącu każda ocena przesuwa się o połowę drogi do 1000. Obrońca przy następnym wejściu widzi obrony od ostatniej wizyty, każdą raz. (Od 0.2.46 obrońca widzi 10 ostatnich obron, nowe oznaczone, i każdą może obejrzeć: 875.) Walczyć można też w trakcie wyprawy i pracy w profesji, ale nie w służbie najemnika.
 
 ### Skórki postaci (763 A, 764–768, 769)
 

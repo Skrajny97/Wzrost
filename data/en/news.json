@@ -400,6 +400,10 @@
     "0.2.45": {
       "title": "Version 0.2.45",
       "body": "- The Quarters have a 3rd level: a timber hall with a third bed. You can recruit a third companion, but at most two still go on explorations, and the third waits in the quarters as a reserve."
+    },
+    "0.2.46": {
+      "title": "Version 0.2.46",
+      "body": "- Arena: a “Reroll rivals” button under the rivals. 5 times a day you can draw other rivals with a similar rating, and it does not use up a fight.\n- Arena: “Recent defences” shows your character's last 10 defences. Watch any of them with “Watch the fight”, from the defender's side."
     }
   }
 }

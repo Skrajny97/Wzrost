@@ -505,6 +505,11 @@
       "id": "0.2.45",
       "title": "Wersja 0.2.45",
       "body": "- Kwatery mają 3. poziom: drewnianą chatę z trzecim posłaniem. Zwerbujesz trzeciego towarzysza, ale na wyprawy dalej chodzi najwyżej dwóch, a trzeci czeka w kwaterze jako rezerwowy."
+    },
+    {
+      "id": "0.2.46",
+      "title": "Wersja 0.2.46",
+      "body": "- Arena: pod rywalami jest przycisk „Losuj innych”. 5 razy dziennie wylosujesz innych rywali o podobnej ocenie, a walka na dziś zostaje.\n- Arena: „Ostatnie obrony” pokazują 10 ostatnich obron Twojej postaci. Każdą obejrzysz przyciskiem „Obejrzyj walkę”, od strony obrońcy."
     }
 ]
 }
