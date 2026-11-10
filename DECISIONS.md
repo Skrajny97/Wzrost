@@ -3034,6 +3034,154 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.36 (10.11.2026): duża paczka od autora i graczy
+
+Autor przysłał 10.11 rano listę zmian („preferowane jedno duże wdrożenie”) i uwagi graczy, a potem odpowiedzi na pytania 757–768: „757 B / 758 A, tylko musi być jakaś informacja o takich obszarówkach dla gracza / 759 to mają być powtarzalne rzeczy czyli Wieże nie wchodzą, ale tygodniowo liczone git / 760 A / 761 C tygodniowe cele x2 nagrody x1,5, miesięczne cele x4 nagrody x2 / 762 A, ale niech otwiera się od 25 poziomu postaci / 763 A / 764-768 wszystko git”. Potem: „Dodaj tez aktualny stopien Portalu obok jego nazwy tak by nie trzeba bylo wchodzic i sprawdzac czy jest maksymalny” i „chowańce to tylko przedmiot kosmetyczny”.
+
+### Misje tygodniowe i miesięczne (761 C)
+
+Uwaga gracza: „tygodniowe nieznacznie a miesięczne kilkukrotnie cięższe. Żeby chociaż 7/10 dni aktywnego grania było porzebne. Tym samym lepsze nagrody.”
+
+1. **Cele.** Misje tygodniowe wymagają dwa razy więcej niż dotąd, a miesięczne cztery razy więcej (`targetFactor` 2 i 4 przy okresach w `data/quests.json`). Liczba po pomnożeniu trzyma krok misji (np. pełne dziesiątki) i jej górną granicę.
+2. **Nagrody.** Nagrody misji tygodniowych są półtora raza większe, a miesięcznych dwa razy większe (`rewardFactor` 1,5 i 2). Skrzynia tygodnia daje 180 Punktów Czasu i 30 Punktów Systemu, a skrzynia miesiąca 480 Punktów Czasu, 100 Punktów Systemu i dwa razy więcej złota (2000 zł + 400 zł za poziom postaci).
+3. **Od kiedy.** Misje, które już trwają, zostają przy swoich liczbach do końca tygodnia albo miesiąca. Nowe liczby mają misje losowane od poniedziałku 16.11, a miesięczne od 1.12.
+
+### Stopień Portalu przy nazwie
+
+4. Na zwiniętej liście Portali przy nazwie każdego Portalu stoi najwyżej pokonany stopień i liczba stopni dostępnych teraz, np. „37/45” (dostępne: najmniejsza z liczb: stopnie Portalu i poziom postaci). Gdy pokonany stopień to najwyższy dostępny, napis jest złoty: „45 · maks.”, po angielsku „45 · max”.
+
+### Ranking, Znajomi, Bestia Gildii, Skrzynia Gildii
+
+5. Ranking postaci i ranking gildii pokazują po 50 pozycji na stronę (`ranking.page` w `data/community.json` zastępuje `size: 100`), więc da się dojść do ostatniego miejsca. Przy jednej stronie nie ma przycisków stron ani „Moje miejsce”.
+6. „Moje miejsce” („Moja gildia” w zakładce Gildie) stoi obok „Twoje miejsce: N.” i otwiera stronę z własnym wierszem. Okno „…” i „Pokaż całą listę” znikają, więc wpis „Ranking: „…” tylko przy pominiętych miejscach” i zdanie o „100 najwyższych postaciach” są nieaktualne.
+7. Zmiana porządku albo okresu wraca na pierwszą stronę. Strona za końcem listy pokazuje ostatnią stronę.
+8. Znajomi idą od najwyższego poziomu postaci, przy równym poziomie alfabetycznie. Tak samo zaproszenia, bo to jedno zapytanie.
+9. Przy znajomym stoi „teraz” przy kropce zielonej albo żółtej. W innym razie czas od ostatniej wizyty konta: co najmniej „1 min temu”, potem godziny, „wczoraj” (24–48 h) i dni. Konto nigdy niewidziane nie ma dopisku.
+10. Imiona w „Wkład tygodnia” Bestii Gildii wyglądają jak imiona na czacie i otwierają kartę postaci. Własne jest w barwie Systemu. „Ostatni cios: X” zostaje tekstem.
+11. Skrzynia Gildii to ósma zakładka Gildii, „Skrzynia”. Mieści 50 przedmiotów (`chest.capacity` w `data/guilds.json`). Wchodzą tylko przedmioty z plecaka: nie założone, nie ze stojaka Zbrojowni i nie te, w których postać albo Awatar oprawia kamień.
+12. Przedmiot zostawia się dla wszystkich (domyślnie) albo dla jednego z pozostałych członków, nie dla siebie. Przedmiot dla wszystkich bierze każdy członek. Przypisany bierze tylko ten członek, a dopóki czeka, także wkładający („Zabierz”). Wzięcie wymaga miejsca w plecaku.
+13. Przedmiot zachowuje wszystkie dane i datę wytworzenia. Wkładający dostaje go z powrotem bez zmian, każda inna postać jako z wymiany, więc Encyklopedia go nie zalicza. Postacie jednego konta mogą sobie przekazywać przedmioty przez Skrzynię Gildii, jak przez Skrzynię Konta.
+14. Najpierw stoją przedmioty dla Ciebie (złoty pasek, „Czeka na Ciebie: N.”), potem dla wszystkich, potem dla innych, od najnowszego. Przy każdym widać: od kogo, dla kogo, kiedy i czy klasa go założy. „Ostatnie ruchy” to 50 ostatnich włożeń i wyjęć (`chest.log`), z imionami z chwili ruchu.
+15. Gdy ktoś opuści gildię albo zostanie z niej usunięty, przedmioty dla niego są odtąd dla wszystkich. Nie zabierze też już tego, co sam włożył. Ostatni członek wyjdzie z gildii dopiero przy pustej skrzyni („W Skrzyni Gildii zostały przedmioty…”). Usunięcie postaci albo konta ostatniego członka zabiera gildię razem ze skrzynią.
+16. Żółta kropka przy Gildii świeci tylko przy przedmiocie przypisanym tej postaci, nie przy przedmiotach dla wszystkich.
+
+### Muzyka i Discord
+
+17. „Muzyka” w Ustawieniach to przełącznik Włączona/Wyłączona (ten sam co „Głos narratora”) z linijką „Wyłącz, żeby słuchać własnej muzyki: gra nie będzie wtedy pobierać ani odtwarzać swojej.” Pod nim jest suwak „Głośność muzyki”, widoczny tylko przy włączonej muzyce. Wybór pamięta przeglądarka, a na start muzyka jest włączona.
+18. Wyłączona muzyka nic nie pobiera (także utworów raportu) i nie tworzy odtwarzacza. Wyłączona w trakcie gry milknie od razu, a po ponownym włączeniu utwór pobiera się od nowa.
+19. Gdy gra nie gra muzyki (wyłączona albo na 0%), strona prosi przeglądarkę o dźwięk mieszany z innymi aplikacjami (Audio Session API „ambient”, Safari na iPhonie od iOS 16.4): efekty i narrator grają razem z muzyką gracza, zamiast ją zatrzymywać. Gdzie przeglądarka tego nie ma, nic się nie zmienia.
+20. Efekty na 0% nie uruchamiają dźwięku strony; uruchamia go dopiero podniesienie suwaka efektów albo grająca muzyka.
+21. Ikonka Discorda (oficjalny znak, biały na #5865F2) stoi w przycisku gry tuż za tytułem „Społeczność”. Razem z wierszem „Discord” w Ustawieniach (pod „Google”, przycisk „Dołącz do serwera Discord”) otwiera link zaproszenia serwera gry w nowej karcie. Link przysłał autor 10.11 (`discord.invite` w `data/community.json`); nie wygasa. Sprawdzanie danych przyjmuje tylko linki https://discord.gg/… albo https://discord.com/invite/…
+22. Łączenia konta Discord z kontem w grze nie ma (autor: „Widzę że to trzeba być deweloperem i mieć firme zeby tego Discorda podpiac a jak chce tylko przycisk linku z zaproszeniem zrobić?”).
+
+### Wieża Drużyn z towarzyszami
+
+Autor: „Wieża Drużyn niech będzie możliwa także z towarzyszami.”
+
+23. Do Wieży Drużyn wchodzi się także bez Drużyny: po stronie postaci walczy co najmniej dwóch, najwyżej trzech, licząc graczy z Drużyny i towarzyszy z Kwater. Najpierw idą gracze, wolne miejsca zajmują towarzysze (także ranni). Stwory są silniejsze o każdego walczącego, towarzysz liczy się jak gracz. W danych `members` [1, 3] i `size` [2, 3] w `data/towers.json`.
+24. Samotna postać bez towarzysza widzi: „Do Wieży Drużyn nie wchodzi się w pojedynkę: obok Ciebie musi walczyć co najmniej 1 z graczy Twojej Drużyny albo towarzyszy z Kwater. Drużynę założysz w Społeczności, a towarzysza zwerbujesz w Karczmie w Osadzie.” Zmienia to punkt 8 „Wież Systemu i Gildii”.
+
+### Raport członka drużyny odbierany przy wyruszeniu
+
+Autor: „Koniecznie musimy zrobić jakieś obejście odbierania raportu przez każdego członka drużyny zanim wyruszy się w kolejną wyprawę.”
+
+25. Członek, którego wyprawa albo praca w profesji się skończyła, idzie z drużyną. Serwer najpierw odbiera jego raport tak jak „Odbierz raport”, w języku jego konta, a raport trafia do jego Dziennika. Członek widzi w Walce: „Twój czekający raport został odebrany, gdy drużyna wyruszała.” z przyciskiem „Zobacz raport”. Na liście Drużyny ma stan „może iść na wyprawę”.
+26. Gdy wyprawa członka kończy się zdarzeniem, członek zostaje w domu (nic się nie zapisuje), a lider słyszy: „{imię} musi najpierw wybrać w zdarzeniu z poprzedniej wyprawy.” Gdy przez to nikt nie idzie, lider rusza sam, jak gdy ktoś nie zdąży.
+27. Raporty członków odbiera się dopiero po starcie wyprawy lidera, więc błędny wybór lidera nikomu raportu nie odbiera. Zajęci czymś, co trwa, i najemnicy zostają jak dotąd.
+
+### Awatar Systemu daje ćwierć
+
+Autor: „Awatar niech od teraz daje 1/4 tego co zdobyłaby postać - XPa i wpływ na level Profesji w podobnej ilości - tak jakby gracz robił te czynności. Tak, pamiętam pierwotne założenia, ale wszystko ewoluuje.”
+
+28. Odebrana praca Awatara daje ćwierć XP postaci i ćwierć postępu profesji tej samej pracy postaci (`avatar.share` 0,25 w `data/professions.json`), z awansami, HP, Punktami Czasu i statystykami. Zmienia to punkt 3 „Awatara Systemu w grze” i zdanie z 0.1.61 „Awatar Systemu dalej nie daje statystyk”.
+29. Ćwiartki zaokrągla się do pełnych punktów (godzina zbierania: 15 punktów Zielarstwa). XP przychodzi przy odbiorze, także w czasie wyprawy postaci.
+30. Raport Awatara pokazuje wykonawcę, XP postaci i poziom profesji; stare raporty tylko wykonawcę. Opis na karcie zakupu mówi o ćwierci. Przerwane zbieranie i kopanie: „Awatar wróci od razu, bez ziół i bez doświadczenia.” i „…bez urobku, złota i doświadczenia.”
+31. Odbiór pracy (postaci i Awatara) zapisuje się tylko przy niezmienionej postaci, więc dwa odbiory naraz nie zacierają sobie XP. Drugi prosi: „Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.”
+
+### Poszukiwani
+
+Autor: „I zbalansowanie poszukiwanych pod nowy poziom trudności, zeby nie pokazywało zleceń z ostatniej odblokowanej krainy, bo często tam się wejdzie i od razu padnie.” Potem: „chcemy zrobić większy focus na drużynę, ergo poszukiwanych powinno moc sie znajdywac nawet w drużynie, szczególnie mając tych samych”.
+
+32. Listy gończe są z najwyższych otwartych miejsc krain poniżej krainy najwyższego otwartego miejsca postaci (także z Sali prób). Z samą pierwszą krainą: z jej miejsc bez najnowszego, a z jednym miejscem z niego. Listy dnia wylosowane przed zmianą zostają do końca dnia.
+33. Na wyprawie Drużyny cel jest z listów idących na jej miejsce: ten, na który list ma najwięcej z nich; z równych losuje ziarno wyprawy. Cel spotyka się z tą samą szansą, najwyżej raz, w tej samej walce w raporcie każdego. Gdy padnie, każdy z listem na niego wypełnia swój (nagroda i trofeum jak dotąd), a pozostali mają tylko to, co daje walka. Wcześniejsze zdanie, że poszukiwanych nie ma na wyprawach drużyny, jest nieaktualne.
+34. Członek zabiera na wyprawę tylko list na jej cel (nie porzuci go w trakcie); list na inny cel może porzucić. „Jak to działa?”: „Na wyprawie Drużyny możesz trafić na poszukiwanego z listu kogoś z drużyny, a nagrodę dostaje każdy, kto ma na niego list.”
+
+### Błąd: członek drużyny nie widział, że jest na wyprawie
+
+Autor: „czasem robi sie błąd i nie pokazuje jednemu z graczy ze jest na wyprawie mimo ze jest drużynowo”.
+
+35. Strona członka pobierała postać od nowa tylko wtedy, gdy już pokazywała wyprawę drużyny. Członek w domu albo czekający na raport widział się dalej w domu, aż wyszedł i wrócił na stronę. Teraz każda zmiana końca zajęcia odświeża postać, najpóźniej po ok. 15 s.
+
+### Tygodnie roku (758 A)
+
+Autor: „buffy i debuffy obszarowe tygodniowe dla każdego gracza w zależności jaki tydzień jest. Trzeba by było przygotować 52 takie na cały rok. Drobne +5% do różnych rzeczy […] Skupienie bardziej na buffach niż debuffach. Tygodniowe bonusy ustawione na stało na sztywno.” Po liście 758: „758 A, tylko musi być jakaś informacja o takich obszarówkach dla gracza”.
+
+36. Tydzień roku to numer tygodnia ISO według czasu polskiego, od poniedziałku 00:00, jak zadania tygodniowe; 53. tydzień bierze wpis 52. Lista 52 tygodni (758 A) leży w `data/weeks.json`, a jej zmiana to sama zmiana danych. Przełącznik `WEEKS` jest w grze i na wersji testowej włączony; testy API mają go wyłączonego, żeby ich liczby nie zależały od tygodnia.
+37. Informacja dla gracza (758): w Walce nad nagłówkiem cienki pasek „Tydzień Sarny · odpoczynek szybszy o 5% · do niedzieli”, który po stuknięciu otwiera arkusz „Tygodnie” (objaśnienie, ten tydzień, trzy następne z datami i cały rok zwinięty). Raport wyprawy, Wieży i Portalu ma linijkę Systemu o tym, co tydzień zmienił, np. „Tydzień Kuny: +5% złota z walk.”. Przy pierwszym wejściu postaci w nowym tygodniu pojawia się raz komunikat „Zaczął się Tydzień Sarny: odpoczynek szybszy o 5%.” (nie dla postaci założonej w tym tygodniu i nie w trakcie narratora).
+38. Wyprawy (też drużyny i Szybkie/Błyskawiczne Polowania) i prace profesji (też Awatara) biorą tydzień, w którym się zaczęły. Zdarzenie wyprawy i relacja z towarzyszami z wyprawy też. Reszta bierze tydzień chwili działania.
+39. Co dokładnie zmienia tydzień: XP i złoto z walk wypraw, walki zdarzenia, Wież i złoto Portalu Złota (złoto znalezisk, czyszczenia Portali i nagrody zdarzeń bez walki bez zmian); szansa na przedmiot (skrzynia wśród znalezisk, skrzynia czempiona, przedmiot ze zdarzenia i z Wieży, najwyżej pewność); materiały ze stworów, Wież i Portalu Materiałów; statystyka w walkach wypraw (każdy gracz drużyny), zdarzeń, Wież i Portali, ale nie w ocenie zagrożenia ani na ekranie Statystyk; XP profesji (minuty razy premia), zioła i minerały; zasoby Obozu przy zbieraniu (magazyn pokazuje sztuki bez premii); tempo odpoczynku w każdej chwili według jej tygodnia; szansa Kowadła razy (1 + premia), najwyżej 100%, a karta przedmiotu pokazuje szansę z premią; reputacja bractw z handlu, zleceń i listów gończych oraz relacja z towarzyszami. Bestia Gildii, Próby, Sala prób i Wyprawa Gildii nie dostają premii do statystyk.
+
+### Arena PvP (762 A, 770.2 D)
+
+Autor: „762 A, ale niech otwiera się od 25 poziomu postaci”, a o budynku: „770.2 D wybieramy jesli chodzi o Arenę”.
+
+40. Arena otwiera się od 25. poziomu postaci i stoi w Osadzie jako budynek 770.2 D (owalna arena z zadaszoną galerią i głową tura nad bramą). W grze jest wyłączona (przełącznik `ARENA`), dopóki nie zapadnie decyzja 772 o wyrównaniu klas; na wersji testowej włączona.
+41. Pojedynek to dwie postacie same, bez towarzyszy, najemników, mikstur i chowańców, poza miejscami wypraw, z pełnym HP razy mnożnik z krzywej (1,5 na 25. poziomie, 2 na 75., 2,75 na 100., 3 od 300., przy średnim poziomie obu postaci), żeby walka trwała około 12 rund na każdym poziomie. Po 80 ruchach obu stron walkę kończy sędzia: wygrywa ten, komu zostało więcej HP (część pełnego), a przy różnicy do 2 punktów procentowych jest remis.
+42. Ocena startowa to 1000, jak w szachach (skala 400): atakujący zmienia ją o 32 × (wynik − oczekiwany wynik), obrońca o 16 ×, remis to pół punktu, a ocena nie spada poniżej 100. 5 walk dziennie. Trzech rywali losuje się spośród 12 postaci innych kont (od 25. poziomu) o ocenie najbliższej własnej. Przy każdym rywalu ekran podaje, ile oceny zgarniesz za wygraną i ile stracisz za przegraną.
+43. Nagrody tygodnia (złoto według poziomu w chwili odbioru, nieodebrane czekają): 1. miejsce 30 Punktów Systemu i 600 + 120 × poziom złota, 2. 25 i 500 + 100 × poziom, 3. 20 i 400 + 80 × poziom, 4.–10. 15 i 300 + 60 × poziom, 11.–25. 10 i 200 + 40 × poziom, 26.–50. 6 i 120 + 24 × poziom, dalej 3 i 60 + 12 × poziom.
+44. W tabeli tygodnia są postacie, które w tym tygodniu same stoczyły walkę, według oceny, a przy równej starsza postać; ekran pokazuje całą tabelę (najwyżej 50 miejsc) z wyróżnionym własnym wierszem, jak strona Rankingu. Sezon to miesiąc: przy pierwszym wejściu na Arenę w nowym miesiącu każda ocena przesuwa się o połowę drogi do 1000. Obrońca przy następnym wejściu widzi obrony od ostatniej wizyty, każdą raz. Walczyć można też w trakcie wyprawy i pracy w profesji, ale nie w służbie najemnika.
+
+### Skórki postaci (763 A, 764–768, 769)
+
+45. Autor wybrał portrety: 769.1 B, 769.2 C, 769.3 A, 769.4 A, 769.5 D, 769.6 A bez iskierek wokół kostura, 769.7 B bez aureoli, 769.8 A bez aureoli i tego za plecami, 769.9 C, 769.10 A. Z poprawionych portretów 773.1 jest przyjęty, a 773.2 i 773.3 też, z oczami do poprawy; oczy domalowane w PixelLab czekają na ocenę (774.1, 774.2).
+46. Autor: „Niech kupno przedmiotu kosmetycznego odblokowuje wersję i męską i żeńską, pamiętaj o konieczności wygenerowania odcieni skóry, chodów i jazdy na wierzchowcu”. Kupiona skórka działa dla obu płci. Do gry trafi w osobnej wersji, dopiero z chodem, jazdą wierzchem i odcieniami skóry; chody i jeźdźców rysuje PixelLab (jeźdźcy od 3.11 też w PixelLab, nie w Retro Diffusion).
+
+### Kwestia narratora o Wieży Drużyn (771)
+
+47. Autor podał nowe słowa: „Do Wieży Drużyn wejdziesz z wędrowcami ze swojej Drużyny albo z towarzyszami z Kwater.” i tyle. Po angielsku: „You enter the Party Tower with wanderers from your Party or with companions from the Quarters.” Polskie nagranie powstaje z `audio/prompts.json` (tam też trzeba było zmienić słowa), angielskie z `data/en/tutorial.json`. Nagrania obu wersji czekają na stronie odsłuchu; do czasu wyboru kwestia jest w grze bez głosu, bo stare nagranie mówiło o „jednym albo dwóch wędrowcach”.
+
+### Arena: wyrównanie klas (772)
+
+48. Autor: „Jakoś trzeba to obejść, żeby to miało ręce i nogi, nie chcemy sztucznie wzmacniać klas na pvp, ale jeśli ogólnie są słabsze, także w wyprawach, to trzeba je wzmocnić.” Bez premii klas tylko na Arenie: najpierw pomiar siły klas na wyprawach; klasa słabsza także tam dostaje wzmocnienie ogólne, a różnice tylko z pojedynków wyrównują zasady pojedynku jednakowe dla wszystkich klas. Arena w grze zostaje wyłączona do tego czasu.
+
+### Poprawki portretów skórek (773)
+
+49. 773.1 OK. 773.2 i 773.3 OK, „tylko twarz chyba jeszcze do poprawy (oczy)”: PixelLab domalowuje oczy w masce, jak przy portrecie Kleryka.
+
+### Punkty Sławy (759, 760 A)
+
+Autor: „Przydałyby się Punkty Sławy dla postaci, gdzieś jako osobny moduł, zdobywane przez wszelakie aktywności, opisane. Niech trójka graczy z najwyższą aktywnością dostaje proporcjonalnie jakieś nagrody.” Potem: „759 to mają być powtarzalne rzeczy czyli Wieże nie wchodzą, ale tygodniowo liczone git” i „760 A”.
+
+50. Za co Sława (`data/fame.json`): wyprawa 1 pkt za każde pełne 10 minut odebranego raportu (także wyprawa drużyny, porażka nic), elita 5, czempion 15, poszukiwany 20, czyszczenie Portalu 3 (nowy stopień Portalu nic, Wieże nic), praca w profesji 1 pkt za pełne 15 minut (Awatar 1 pkt za 60 minut, czyli ćwierć), zadania dzienne 3, tygodniowe 15, miesięczne 40, zlecenie Osady 10, atak na Bestię Gildii 5, Próba Gildii 10, udane ulepszenie na Kowadle 2 (5 od +5), sprzedaż na Targowisku 2 dla sprzedającego.
+51. Punkty dochodzą w tym samym zapisie co czynność i liczą się do tygodnia, w którym odbierasz raport albo nagrodę. Wyprawa i praca dają punkty za każde pełne 10 albo 15 minut jednego raportu, reszta minut przepada; Szybkie i Błyskawiczne polowanie liczą się jak wyprawa, przerwana praca liczy przepracowane minuty. Wyprawa zakończona porażką nie daje nic, także za elity i czempionów pokonanych przed porażką.
+52. Kowadło: udane ulepszenie na +5 i wyżej daje 5 punktów, niższe 2, nieudane nic; liczy się też ulepszanie przedmiotu towarzysza. Targowisko: sprzedający dostaje 2 punkty za każdą sprzedaną ofertę, kupioną od razu albo wygraną na aukcji. Próba Gildii daje 10 punktów raz za każdą próbę. „Wyczyść wszystkie” daje 3 punkty za każde czyszczenie.
+53. Tydzień trwa od poniedziałku 00:00 do końca niedzieli czasu polskiego. Poprzedni tydzień zamyka się raz, przy pierwszym wejściu do gry albo do Sławy w nowym tygodniu. Przy równej liczbie punktów wyżej stoi starsza postać.
+54. Nagrody (760 A): z każdego konta liczy się jego najlepsza postać; trójka najlepszych kont dzieli 150 Punktów Systemu proporcjonalnie do punktów, w liczbach całkowitych (metoda największych reszt, przy równych resztach brakujący punkt dostaje wyższe miejsce; przy mniej niż trzech kontach z punktami dzielą całą pulę). 1. miejsce ma przez następny tydzień złote imię: jasnozłote, z poświatą i podkreśleniem, wszędzie tam, gdzie imię ma kolor ramki (czat, Ranking, Sława, Znajomi, Drużyna, gildia, karta postaci), z podpisem „Najlepsza postać poprzedniego tygodnia w Sławie”. Nagrody nie wygasają; kilka nieodebranych tygodni odbiera się jednym „Odbierz”.
+55. Zakładka „Sława” stoi w Społeczności na końcu rzędu, po Drużynie; gdy czeka nagroda, Społeczność otwiera się na Sławie, a kropka świeci na Społeczności, na zakładce i w menu komputera. Tabela tygodnia pokazuje całą tabelę (najwyżej 50 miejsc) i własny wiersz pod nią, gdy stoi niżej. Liczą się postacie grane i odłożone; postacie z „Testuj …” nie. Usunięta postać zabiera swoje punkty i nagrody. Punkty liczą się od wdrożenia, więc pierwsze zamknięcie tygodnia nie ma zwycięzców.
+
+### Targowisko: Rejestr i filtry
+
+Autor: „Zbudować rejestr na targowisku sprzedanych i odebranych przedmiotów (oraz wygranych w licytacjach)” i „Wywalić aktualne filtry Targowiska i zrobić bardziej przydatne - Licytowane przeze mnie, Do założenia przeze mnie (czy tam moją klasę). Aktualne czyli podzial na rodzaj przedmiotu może pozostać jako podkategorie.”
+
+56. Targowisko ma czwartą zakładkę „Rejestr” (na telefonie zakładki stoją dwie na dwie, od 640 px w jednym rzędzie). Pokazuje od najnowszych: co postać sprzedała (komu, za ile i ile dostała po opłacie), co kupiła („Kup teraz”, u Gościwita i u wędrownego handlarza), wygrane licytacje oraz oferty bez kupca i wycofane. Przedmiot ma kolor rzadkości i rozwija kartę z porównaniem, jak oferta.
+57. Wpis powstaje w tym samym zapisie co transakcja; odebranie paczki nie tworzy osobnego wpisu. Rejestr trzyma 100 ostatnich wpisów postaci (`market.log.entries` w `data/settlement.json`), bez limitu czasu, bo nic w grze nie wygasa z upływem czasu. Pusty rejestr mówi, że działa od wersji 0.2.36 (`market.log.since`).
+58. Nad ofertami stoi przełącznik „Wszystko / Dla mnie / Licytuję” z liczbą przy każdej opcji, a dotychczasowe kategorie są pod nim podkategoriami. „Dla mnie” pokazuje przedmioty, które postać może teraz założyć, według tych samych zasad co „Załóż” (klasa i Tier), bez ziół, mikstur, materiałów i części. „Licytuję” pokazuje licytacje z ofertą postaci; przy przebitej stoi „Przebito Cię” i „Twoja ostatnia oferta: N zł”. Przebite licytacje gra zna od tej wersji; licytacje prowadzone w chwili wdrożenia przenosi migracja.
+
+### Karta slotu w Postaci
+
+Autor: „Niech klikanie w slot ekwipunku wyświetla zakładkę z możliwymi do założenia z plecaka przedmiotami na to miejsce. Z porównywarką itp.”
+
+59. Stuknięcie slotu, pełnego albo pustego, otwiera kartę slotu. Na górze stoi założony przedmiot (opis, gwiazdka, Kowadło, „Karta przedmiotu”, „Zdejmij”), niżej „Z plecaka na to miejsce”: najpierw przedmioty do założenia, od najlepszych, każdy z porównaniem i „Załóż”, a na końcu wyszarzone „Jeszcze ich nie założysz:” z powodem (klasa albo poziom klasy Tieru). Lista ma tylko przedmioty tego slotu, jak „Załóż”. „Po zdjęciu” jest w pełnej karcie przedmiotu, żeby lista z plecaka stała wyżej.
+
+### Stół rozbiórki, ulubione i kamienie (757 B)
+
+Autor: „Dodac podświetlenie przedmiotu i jego opis przy stole do rozbiórki, bo nie pokazuje wcale i można się pomylić. Do tego opcja dodawania do ulubionych, by przypadkiem nie rozebrać czegoś na później.” Oraz: „Trzeba tez sprawdzić czy oprawianie przedmiotu nie koliduje z ulepszaniem go na kowadle - bo może się przecież rozpaść powyżej +7” i odpowiedź „757 B”.
+
+60. Na Stole rozbiórki i w „Rozbierz kilka” zaznaczony przedmiot ma jasną ramkę z poświatą, bez animacji. Pasek pod siatką opisuje ostatnio zaznaczony przedmiot (nazwa z ulepszeniem, rzadkość, slot, poziom, Tier, liczby, kamień), a „Do rozbiórki: …” wymienia wszystkie zaznaczone; pytanie przed rozbiórką też. Na ekranie Stołu pasek stoi pod siatką (przyklejony do dołu zasłaniał pół ekranu 320 × 640), w okienku „Rozbierz kilka” zostaje przyklejony.
+61. Gwiazdka „Ulubiony” jest w karcie przedmiotu (z plecaka i założonego) i na kafelku w Plecaku; lista leży w `characters.favorites`. Ulubionego nie da się rozebrać, sprzedać ręcznie ani hurtem, wyrzucić ani oddać na zlecenie Osady; gra mówi np. „Ulubiony przedmiot: zdejmij gwiazdkę, żeby go rozebrać.” Złomiarz przy przepełnionym plecaku pomija ulubione, a gdy zostały same ulubione, plecak zostaje ponad limitem.
+62. Gwiazdka jest znakiem właściciela: przedmiot wystawiony na Targowisku, włożony do Skrzyni Konta albo Skrzyni Gildii, oddany w Wymianie albo założony towarzyszowi traci ją i nie odzyskuje po powrocie.
+63. 757 B: kamień oprawiony w przedmiot, który przepada, wypada i wraca do minerałów w tym samym zapisie. Dotyczy to sprzedaży ręcznej, wyrzucenia, rozbiórki (pojedynczej i „Rozbierz kilka”; biżuteria daje dodatkowo swój kamień i kruszec), rozpadu na Kowadle (także przedmiotu towarzysza), sprzedaży przy przepełnionym plecaku (złomiarz bierze przedmioty z kamieniem na końcu) i oddania wyrobu na zlecenie Osady. Gra pisze „Kamień {gem} wypadł i wrócił do zapasu.”, a wcześniej ostrzega: „Kamień wypadnie i wróci do Twoich minerałów: {gem}.” Usunięcie zlecenia rozbiórki z kolejki oddaje przedmiot z kamieniem, a kamień schodzi z minerałów. Wymiana kamienia w Jubilerstwie dalej niszczy stary kamień, bo przedmiot zostaje.
+
 ## Wersja 0.2.35 (10.11.2026): kody za kawę
 
 Autor: „Dodaj kody podarunkowe jednorazowe na Punkty Systemu, dedykowane dla konkretnych graczy, którzy postawili mi kawę”. Trzy kody, każdy tylko dla jednej postaci (w danych skrót SHA-256 imienia zamiast imienia, jak przy kodzie PC): `KAWA50` (50 Punktów Systemu), `KAWA150` (150) i `KAWA100` (100). Każdy działa raz, do 10.12.2026 włącznie (brakujący szczegół: miesiąc, jak przy kodzie 100). Kody nie trafiają do „Co nowego?”, bo są dla tych trzech postaci; autor przekazuje je sam.

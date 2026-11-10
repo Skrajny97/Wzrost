@@ -437,8 +437,7 @@
     "towers-party": {
       "text": [
         "You enter the Party Tower with wanderers from your Party or with companions from the Quarters."
-      ],
-      "voice": "audio/narration/en/towers-party.mp3"
+      ]
     },
     "towers-ending": {
       "text": [
