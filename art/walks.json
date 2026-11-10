@@ -445,12 +445,12 @@
     "skin-perun-female": {
       "start": "art/references/walks/start/skin-perun-female.png",
       "pose": 2,
-      "description": "a strong broad-shouldered young woman with a long dark braid falling from under the helmet, in dark blackened steel plate armour engraved with bright copper lightning bolts, a grey wolf fur cloak over the shoulders, a dark steel helmet with two curved aurochs horns, copper-trimmed gauntlets and dark steel boots, a long broad sword with a copper hilt held low in the front hand and a round dark shield with a copper lightning sign strapped to the far arm, the shield's rim showing behind the body in every frame, never hidden"
+      "description": "a strong broad-shouldered young woman with a long dark braid falling from under the helmet down the back, in dark blackened steel plate armour engraved with thin copper lightning lines, a grey wolf fur cloak over the shoulders falling behind, a dark steel helmet with two curved aurochs horns, copper-trimmed gauntlets and dark steel boots, no shield and no sword, both hands empty, the near arm swinging naturally"
     },
     "skin-perun-male": {
       "start": "art/references/walks/start/skin-perun-male.png",
       "pose": 2,
-      "description": "a broad-shouldered young man with short dark hair and a short dark beard in dark blackened steel plate armour engraved with bright copper lightning bolts, a grey wolf fur cloak over the shoulders, a dark steel helmet with two curved aurochs horns, copper-trimmed gauntlets and dark steel boots, a long broad sword with a copper hilt held low in the front hand and a round dark shield with a copper lightning sign strapped to the far arm, the shield's rim showing behind the body in every frame, never hidden"
+      "description": "a broad-shouldered young man with a short dark beard in dark blackened steel plate armour engraved with thin copper lightning lines, a grey wolf fur cloak over the shoulders falling behind, a dark steel helmet with two curved aurochs horns, copper-trimmed gauntlets and dark steel boots, no shield and no sword, both hands empty, the near arm swinging naturally"
     }
   }
 }
