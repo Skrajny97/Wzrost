@@ -432,6 +432,10 @@
     "0.2.54": {
       "title": "Version 0.2.54",
       "body": "- Guild wars: the Guild has a new War tab. Every week your guild fights a guild of a similar size, and battles of teams of 5 against 5 are fought every day at 20:00 (Polish time). Take your place in a team now: the first war starts on Monday, 16 November.\n- For every battle you win you get gold and 2 System Points, and the guild that wins the war gets Fame and a war chest in the Guild Chest.\n- A guild now holds 30 members, that is 6 teams."
+    },
+    "0.2.55": {
+      "title": "Version 0.2.55",
+      "body": "- The horse, the steed and the sabre-toothed tiger in the Combat scene are a little bigger, as the pony is now, so the rider sits on them in the right proportions."
     }
   }
 }

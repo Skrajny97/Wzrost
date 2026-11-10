@@ -3034,6 +3034,12 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.55 (10.11.2026): Większe wierzchowce w scenie Walka
+
+Autor po 0.2.53: „to konia tez odrobine zwieksz jak kuca zwiększyłeś” i „i reszte wierzchów”.
+
+1. **Koń, rumak i tygrys szablozębny stoją w scenie Walka 1,1 raza większe** (`scale` w `walk.mounts`), kuc zostaje przy 1,2. Jeździec dalej ma swoją wielkość, więc na każdym wierzchowcu siedzi jak dorosły na koniu, a kuc pozostaje najniższy.
+
 ## Wersja 0.2.54 (10.11.2026): Wojny gildii w grze
 
 Wojny gildii (blok „Wojny gildii na wersji testowej” niżej, 792–800, makiety 792.1–792.4 v2 przyjęte przez autora) są włączone w grze (`GUILD_WARS` w `wrangler.jsonc`), bo skończony etap idzie od razu do gry (zasada autora z 1.11.2026).
