@@ -211,6 +211,21 @@ describe('class evolutions in fights', () => {
     assert.ok(echo && echo.damage > 0);
   });
 
+  test('Egzekucja and Ścięcie strike every third move of the character, as the other paths\' strikes (772)', () => {
+    for (const [evolutionId, skillId] of [
+      ['assassin', 'execution'],
+      ['kingslayer', 'beheading'],
+    ]) {
+      assert.equal(content.skillsById[skillId].cooldown, 3);
+      const result = fight(`egzekucja:${skillId}`, [evolved(evolutionId, { only: [skillId], classLevel: evolutionId === 'kingslayer' ? 110 : 60 })], [sturdy('boar', 58, 'e0')]);
+      // The character's own moves: a blow of the skill or a plain one each.
+      const own = blows(result, 'a0').concat(result.events.filter((event) => event.actor === 'a0' && event.kind === 'dodge')).sort((a, b) => a.t - b.t);
+      const used = own.map((event) => event.skill === skillId);
+      assert.ok(used.length >= 10, `${skillId}: ${used.length} moves`);
+      for (let i = 0; i < 10; i++) assert.equal(used[i], i % 3 === 0, `${skillId}: move ${i}`);
+    }
+  });
+
   test('traits shape the character too: Opoka\'s armour, Arkana\'s mana, Krok cienia\'s speed, Zimowy oddech\'s shelter', () => {
     const plain = (classId) => {
       const { character, equipped } = typicalCharacter(classId, 60, content);

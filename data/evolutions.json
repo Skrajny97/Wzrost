@@ -119,7 +119,7 @@
       "classId": "shadow",
       "path": "backstab",
       "name": "Skrytobójca",
-      "growth": { "dexterity": 3, "perception": 1, "strength": 1 },
+      "growth": { "dexterity": 3, "perception": 1, "vitality": 1 },
       "trait": { "name": "Zabójcza precyzja", "text": "Krytyki zadają o 30% więcej, a zatruty cel dostaje o 10% więcej.", "kind": "precision", "params": { "critDamage": 0.3, "poisoned": 0.1 } },
       "skills": ["execution", "death-mark"]
     },
@@ -280,7 +280,7 @@
       "name": "Królobójca",
       "nameFemale": "Królobójczyni",
       "description": "Mówią, że nie ma takiej straży, której by nie ominął. Jeden cios zwykle wystarcza.",
-      "growth": { "dexterity": 4, "perception": 2, "strength": 1 },
+      "growth": { "dexterity": 4, "perception": 2, "vitality": 1 },
       "trait": { "name": "Śmiertelna precyzja", "text": "Krytyki zadają o 45% więcej, a zatruty cel dostaje o 15% więcej.", "kind": "precision", "params": { "critDamage": 0.45, "poisoned": 0.15 } },
       "skills": ["beheading", "vanish"]
     },
@@ -613,7 +613,7 @@
       "effect": "Cios za {power%} obrażeń, zawsze krytyczny (razem {critPower%}), we wroga stojącego najdalej z tyłu. Cel z mniej niż {executeBelow%} HP dostaje o {executeBonus%} więcej.",
       "kind": "strike",
       "mana": 12,
-      "cooldown": 4,
+      "cooldown": 3,
       "params": { "power": [1.45, 2.3], "alwaysCrit": true, "target": "back", "executeBelow": 0.3, "executeBonus": [0.5, 1.0] }
     },
     {
@@ -982,7 +982,7 @@
       "effect": "Cios za {power%} obrażeń, zawsze krytyczny (razem {critPower%}), we wroga stojącego najdalej z tyłu. Cel z mniej niż {executeBelow%} HP dostaje o {executeBonus%} więcej.",
       "kind": "strike",
       "mana": 14,
-      "cooldown": 4,
+      "cooldown": 3,
       "params": { "power": [2.2, 3.0], "alwaysCrit": true, "target": "back", "executeBelow": 0.35, "executeBonus": [1.0, 1.6] }
     },
     {
