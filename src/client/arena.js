@@ -23,7 +23,8 @@ const FIELDS = [
   ['middle', 'środek'],
   ['back', 'tył'],
 ];
-const RESULTS = { true: 'Zwycięstwo', false: 'Porażka', null: 'Odwrót' };
+// A draw ends only an Arena duel (src/engine/pvp-arena.js, `draw`).
+const RESULTS = { true: 'Zwycięstwo', false: 'Porażka', null: 'Odwrót', draw: 'Remis' };
 // The events of a unit's own move, as its actor (a counter is not one).
 const MOVES = new Set(['hit', 'crit', 'dodge']);
 const SPEED_KEY = 'wzrost.fight-speed';
@@ -84,10 +85,12 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
     // The character's head and shoulders (older reports have no look: male),
     // the monster's sprite or a summon's figure, with the level in its
     // corner; without one, the vector bust or the old line icon beside the
-    // level.
+    // level. A character among the foes (the Arena's rival, pvp-arena.js)
+    // has its own bust too.
+    const person = unit.side === 'ally' || Boolean(unit.classId);
     const art = unit.summon
       ? summonSprite(unit.summon, unit.figure)
-      : unit.side === 'ally'
+      : person
         ? ((unit.companion ? (companionPortrait(unit.classId, unit.appearance ?? 'male') ?? companionBust(unit.classId, unit.appearance ?? 'male')) : null) ??
           portraitSprite(unit.classId, unit.appearance ?? 'male', { bust: true, skin: unit.skin, evolution: unit.evolution }) ??
           classArt(unit.classId))
@@ -106,7 +109,7 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
         : h(
             'span',
             { class: 'unit-top' },
-            h('span', { class: 'unit-icon' }, icon(unit.side === 'ally' ? CLASS_ICONS[unit.classId] ?? 'person' : unit.family, { size: 24 })),
+            h('span', { class: 'unit-icon' }, icon(person ? CLASS_ICONS[unit.classId] ?? 'person' : unit.family, { size: 24 })),
             level,
           ),
       h('span', { class: 'unit-name', text: unit.name }),
@@ -769,8 +772,9 @@ export function createArena(fight, { autoplay = 'visible' } = {}) {
   }
 
   function showResult(withSound) {
-    banner.textContent = t(RESULTS[String(fight.won)]);
-    banner.dataset.result = String(fight.won);
+    const result = fight.draw ? 'draw' : String(fight.won);
+    banner.textContent = t(RESULTS[result]);
+    banner.dataset.result = result;
     banner.classList.add('arena-banner--shown');
     if (withSound) playSound(fight.won === true ? 'victory' : 'defeat');
   }

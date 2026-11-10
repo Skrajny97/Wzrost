@@ -44,6 +44,10 @@
     "name": "Settlement",
     "message": "Settlement unlocked. The residents wait in the Settlement tab."
   },
+  "arena": {
+    "name": "Arena",
+    "message": "Arena unlocked. In the Settlement tab you can face other players' characters there."
+  },
   "party": {
     "name": "Party",
     "message": "Party unlocked. Form one or accept an invitation in the Community tab, in the Party section, and set out on explorations together."

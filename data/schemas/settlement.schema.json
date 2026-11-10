@@ -51,7 +51,8 @@
           "resident": { "$ref": "#/definitions/id" },
           "backdrop": { "$ref": "#/definitions/id", "description": "Wnętrze miejsca (src/client/art/places), przygaszone za kartą mieszkańca, tak jak miejsca profesji za swoimi kartami." },
           "soon": { "type": "boolean", "description": "Miejsce widać na planszy, ale otwiera się w kolejnej części." },
-          "flip": { "type": "boolean", "description": "Obrazek budynku odbity w poziomie, żeby wejściem patrzył na główną drogę (autor: „zrób też rotate/odbicia lustrzane budynków tak by byly skierowane ich obrazki w stronę drogi głównej”)." }
+          "flip": { "type": "boolean", "description": "Obrazek budynku odbity w poziomie, żeby wejściem patrzył na główną drogę (autor: „zrób też rotate/odbicia lustrzane budynków tak by byly skierowane ich obrazki w stronę drogi głównej”)." },
+          "feature": { "enum": ["arena"], "description": "Miejsce tylko tam, gdzie ta część gry jest włączona (arena: ARENA w wrangler.jsonc, src/server/features.js); gdzie indziej nie ma go na planszy ani w menu." }
         }
       }
     },
@@ -646,6 +647,99 @@
                 "minLength": 1
               }
             }
+          }
+        }
+      }
+    },
+    "arena": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Arena (762 A; src/engine/pvp-arena.js, src/server/pvp-arena.js): walki z postaciami innych graczy, pięć dziennie, ocena jak w szachach, tabela tygodnia z nagrodami i sezon miesięczny. Opis zasad w $comment bloku w data/settlement.json.",
+      "required": ["fightsPerDay", "rivals", "duel", "rating", "season", "table", "keepDays", "rewards", "texts"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "fightsPerDay": { "type": "integer", "minimum": 1 },
+        "rivals": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count", "pool"],
+          "properties": {
+            "count": { "type": "integer", "minimum": 1, "description": "Ilu rywali do wyboru." },
+            "pool": { "type": "integer", "minimum": 1, "description": "Spośród ilu postaci o najbliższej ocenie się ich losuje." }
+          }
+        },
+        "duel": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["hpCurve", "maxMoves", "drawMargin"],
+          "properties": {
+            "hpCurve": {
+              "type": "array",
+              "minItems": 1,
+              "description": "Punkty [poziom, mnożnik HP] rosnąco po poziomie: HP obu stron razy mnożnik przy średnim poziomie obu postaci, między punktami liniowo, przed pierwszym jak pierwszy, za ostatnim jak ostatni (tools/pvp-arena-sim.mjs).",
+              "items": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "exclusiveMinimum": 0 } }
+            },
+            "maxMoves": { "type": "integer", "minimum": 2, "description": "Po tylu ruchach obu stron razem walkę kończy sędzia." },
+            "drawMargin": { "type": "number", "minimum": 0, "maximum": 1, "description": "Remis, gdy części HP, które zostały obu stronom, różnią się najwyżej o tyle." }
+          }
+        },
+        "rating": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["start", "floor", "scale", "attackK", "defenceK"],
+          "properties": {
+            "start": { "type": "integer", "minimum": 0 },
+            "floor": { "type": "integer", "minimum": 0 },
+            "scale": { "type": "number", "exclusiveMinimum": 0 },
+            "attackK": { "type": "number", "minimum": 0 },
+            "defenceK": { "type": "number", "minimum": 0 }
+          }
+        },
+        "season": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["share"],
+          "properties": { "share": { "type": "number", "minimum": 0, "maximum": 1, "description": "O jaką część drogi do oceny startowej przesuwa się każda ocena na początku miesiąca." } }
+        },
+        "table": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["size"],
+          "properties": { "size": { "type": "integer", "minimum": 1 } }
+        },
+        "keepDays": { "type": "integer", "minimum": 1 },
+        "rewards": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Nagrody za miejsce w zamkniętej tabeli tygodnia, rosnąco po upTo; ostatnia bez upTo dla reszty tabeli.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["systemPoints", "gold"],
+            "properties": {
+              "upTo": { "type": "integer", "minimum": 1 },
+              "systemPoints": { "type": "integer", "minimum": 0 },
+              "gold": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["base", "perLevel"],
+                "properties": { "base": { "type": "integer", "minimum": 0 }, "perLevel": { "type": "integer", "minimum": 0 } }
+              }
+            }
+          }
+        },
+        "texts": {
+          "type": "object",
+          "required": [
+            "intro", "rules", "ratingRules", "tableRules", "rating", "place", "noPlace", "fightsLeft", "used", "mercenary", "rivals", "noRivals", "rival", "stake", "fight",
+            "last", "win", "loss", "draw", "change", "limitWin", "limitDraw", "defences", "noDefences", "defenceWin", "defenceLoss", "defenceDraw", "tabFights", "tabTable",
+            "tableEnds", "tableEmpty", "ownPlace", "rewards", "tierOne", "tierMany", "tierRest", "due", "claim", "claimed", "season", "locked", "gone", "noReward"
+          ],
+          "additionalProperties": {
+            "anyOf": [
+              { "type": "string", "minLength": 1 },
+              { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+            ]
           }
         }
       }

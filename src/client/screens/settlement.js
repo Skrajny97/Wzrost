@@ -25,6 +25,7 @@ import { mercenariesCard, mountMercenaryHire, serviceWaiting } from '../mercenar
 import { askGuildButton } from '../guild-requests.js';
 import { mountCasino } from '../casino.js';
 import { trialHallCards } from '../trial-hall.js';
+import { mountPvpArena } from '../pvp-arena.js';
 import { stableCard } from '../stable.js';
 import { tanneryCard } from '../tannery.js';
 import { wantedCard } from '../wanted.js';
@@ -116,6 +117,15 @@ export function mountSettlement(container, { params = {} } = {}) {
       casino = { holder, ...mountCasino(holder) };
     } else casino.refresh();
     return casino.holder;
+  };
+  // The Arena (pvp-arena.js, 762 A), kept so too.
+  let pvpArena = null;
+  const pvpArenaPanel = () => {
+    if (!pvpArena) {
+      const holder = h('div', { class: 'pvp-arena-holder' });
+      pvpArena = { holder, ...mountPvpArena(holder) };
+    } else pvpArena.refresh();
+    return pvpArena.holder;
   };
 
   async function load() {
@@ -1520,6 +1530,8 @@ export function mountSettlement(container, { params = {} } = {}) {
       place.id === 'casino' && !place.soon && casinoPanel(),
       // The Sala prób's trial of the day (620 B), its report at once.
       place.id === 'trial-hall' && !place.soon && trialHallCards(data.trialHall, place, (hash) => (location.hash = hash)),
+      // The Arena's fights, table and rewards (762 A).
+      place.id === 'arena' && !place.soon && pvpArenaPanel(),
     );
   }
 
@@ -1556,6 +1568,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       stopLayout();
       market?.unmount();
       casino?.unmount();
+      pvpArena?.unmount();
       hire?.unmount();
     },
   };

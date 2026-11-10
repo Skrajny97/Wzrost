@@ -68,6 +68,13 @@
     "message": "Odblokowano Osadę. Mieszkańcy czekają w zakładce Osada."
   },
   {
+    "id": "arena",
+    "name": "Arena",
+    "level": 25,
+    "feature": "arena",
+    "message": "Odblokowano Arenę. W zakładce Osada zmierzysz się na niej z postaciami innych graczy."
+  },
+  {
     "id": "party",
     "name": "Drużyna",
     "level": 10,

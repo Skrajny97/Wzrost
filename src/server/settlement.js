@@ -111,7 +111,7 @@ import {
   settlementGoods,
 } from './characters.js';
 import { toHex } from './encoding.js';
-import { evolutionsOn, settlementOn } from './features.js';
+import { evolutionsOn, placeOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { wantedToKeep, wantedView } from './wanted.js';
@@ -282,7 +282,8 @@ export function settlementView(player, stored, board, now) {
   return {
     name,
     description,
-    places,
+    // The Arena's place only where the Arena is on (features.js).
+    places: places.filter(placeOn),
     torches,
     // The Sala prób's trial of the day (trial-hall.js; 620 B).
     trialHall: trialHallView(player.row, now),

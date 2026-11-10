@@ -165,9 +165,12 @@ function marksOf(move) {
 const openersFirst = (skills) =>
   skills.some((skill) => skill.params.opener) ? [...skills.filter((skill) => skill.params.opener), ...skills.filter((skill) => !skill.params.opener)] : skills;
 
-export function simulateFight({ allies, enemies, rng, content, record = false, trait = null, ambush = false }) {
+// `maxActions`: the moves after which a fight ends undecided (won: null),
+// balance.combat's unless a fight has its own (an Arena duel, pvp-arena.js).
+export function simulateFight({ allies, enemies, rng, content, record = false, trait = null, ambush = false, maxActions = null }) {
   const balance = content.balance;
   const tuning = balance.combat;
+  const actionLimit = maxActions ?? tuning.maxActions;
   const texts = content.texts;
   // An evolved character's trait and skills get their code and state only in
   // a fight with one.
@@ -1345,7 +1348,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const alive = units.filter((unit) => unit.hp > 0);
     const enemiesLeft = alive.some((unit) => unit.side === 'enemy');
     const alliesLeft = alive.some((unit) => unit.side === 'ally');
-    if (!enemiesLeft || !alliesLeft || actions >= tuning.maxActions) {
+    if (!enemiesLeft || !alliesLeft || actions >= actionLimit) {
       return {
         // null: the fight dragged on for too long and the allies withdrew.
         won: !enemiesLeft ? true : !alliesLeft ? false : null,

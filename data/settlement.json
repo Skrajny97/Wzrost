@@ -13,7 +13,8 @@
     { "id": "herbalist", "name": "Chata zielarki", "x": 17, "y": 68, "resident": "herbalist", "flip": true },
     { "id": "forge", "name": "Kuźnia", "x": 56, "y": 31, "resident": "smith" },
     { "id": "casino", "name": "Salon Gier", "x": 83, "y": 33.5, "resident": "gamehost", "backdrop": "casino-hall" },
-    { "id": "trial-hall", "name": "Sala prób", "x": 14, "y": 39, "backdrop": "trial-hall" }
+    { "id": "trial-hall", "name": "Sala prób", "x": 14, "y": 39, "backdrop": "trial-hall" },
+    { "id": "arena", "name": "Arena", "x": 47, "y": 70, "feature": "arena" }
   ],
   "torches": [
     { "x": 32, "y": 12.5 },
@@ -344,6 +345,70 @@
       "lost": [
         "Próba nie powiodła się. Następna jutro."
       ]
+    }
+  },
+  "arena": {
+    "$comment": "Arena (autor 10.11.2026: „Musimy zacząć też pracować nad Areną PvP, bo rośnie baza graczy”, po słowach gracza „Więcej rywalizacji między graczami”; wybór 762 A; src/engine/pvp-arena.js, src/server/pvp-arena.js). Asynchroniczna: gracz nigdy nie czeka na rywala. Od poziomu postaci z unlocks.json (arena), tylko tam, gdzie ARENA jest włączona (miejsce z feature: arena). fightsPerDay walk dziennie na postać, od północy czasu polskiego. Do walki gracz wybiera jednego z rivals.count rywali, wylosowanych spośród rivals.pool postaci o ocenie najbliższej jego własnej (postacie co najmniej z poziomem Areny, nigdy z tego samego konta; gdy graczy jest mało, po prostu najbliższe). Rywale czekają do następnej walki; rywal z ostatniej walki wraca od razu tylko wtedy, gdy innych brak. Walka: postać i postać rywala takie, jakie są zapisane teraz (statystyki, ekwipunek, umiejętności, ewolucja), same, bez towarzyszy, najemników i mikstur, poza miejscami wypraw (bez cechy miejsca), z pełnym HP razy mnożnik z duel.hpCurve (punkty [poziom, mnożnik] przy średnim poziomie obu postaci, między punktami liniowo), żeby walka na każdym poziomie trwała kilka rund (sprawdza to tools/pvp-arena-sim.mjs). Po duel.maxMoves ruchach obu stron razem walkę kończy sędzia: wygrywa ten, komu zostało więcej HP (część pełnego HP), a gdy te części różnią się najwyżej o duel.drawMargin, jest remis. Ocena (rating): na start start; jak w szachach (Elo): oczekiwany wynik to 1 / (1 + 10^((ocena rywala − ocena) / scale)), zmiana oceny to K razy (wynik − oczekiwany wynik), gdzie wynik to 1 za wygraną, 0 za przegraną i 0,5 za remis; K atakującego to attackK, a obrońcy defenceK (obrona zmienia ocenę obrońcy mniej); ocena nie spada poniżej floor. Postać rywala broni się sama, a przy następnej wizycie na Arenie widzi, kto ją wyzwał, z jakim wynikiem i o ile zmieniła się jej ocena (walki z ostatnich keepDays dni). Tabela tygodnia: postacie, które w tym tygodniu stoczyły walkę, według oceny (przy równej starsza postać); ekran pokazuje table.size pierwszych i własne miejsce. W poniedziałek o północy czasu polskiego tabela zamyka się raz dla wszystkich, jak Sława gildii, a za miejsce w niej jest nagroda (rewards: do miejsca upTo włącznie; ostatni wpis bez upTo dla reszty tabeli): systemPoints Punktów Systemu i gold.base + gold.perLevel × poziom postaci w chwili odbioru złota, odbierana raz przyciskiem „Odbierz”; nieodebrana czeka. Sezon to miesiąc: pierwszego dnia miesiąca każda ocena przesuwa się o season.share drogi z powrotem do start. texts: słowa ekranu; {…} wypełnia gra.",
+    "fightsPerDay": 5,
+    "rivals": { "count": 3, "pool": 12 },
+    "duel": { "hpCurve": [[25, 1.5], [75, 2], [100, 2.75], [300, 3]], "maxMoves": 80, "drawMargin": 0.02 },
+    "rating": { "start": 1000, "floor": 100, "scale": 400, "attackK": 32, "defenceK": 16 },
+    "season": { "share": 0.5 },
+    "table": { "size": 50 },
+    "keepDays": 14,
+    "rewards": [
+      { "upTo": 1, "systemPoints": 30, "gold": { "base": 600, "perLevel": 120 } },
+      { "upTo": 2, "systemPoints": 25, "gold": { "base": 500, "perLevel": 100 } },
+      { "upTo": 3, "systemPoints": 20, "gold": { "base": 400, "perLevel": 80 } },
+      { "upTo": 10, "systemPoints": 15, "gold": { "base": 300, "perLevel": 60 } },
+      { "upTo": 25, "systemPoints": 10, "gold": { "base": 200, "perLevel": 40 } },
+      { "upTo": 50, "systemPoints": 6, "gold": { "base": 120, "perLevel": 24 } },
+      { "systemPoints": 3, "gold": { "base": 60, "perLevel": 12 } }
+    ],
+    "texts": {
+      "intro": "Na Arenie mierzysz się z postaciami innych graczy. Rywal nie musi być w grze: jego postać broni się sama.",
+      "rules": "Walki dziennie: {perDay}, od północy. Wybierasz jednego z trzech rywali o podobnej ocenie, a walka toczy się od razu: Twoja postać przeciw postaci rywala takiej, jaka jest zapisana teraz, ze statystykami, ekwipunkiem, umiejętnościami i ewolucją, ale bez towarzyszy, najemników i mikstur. HP obu stron jest większe niż zwykle, żeby walka trwała kilka rund: dla dwóch postaci na Twoim poziomie {hpFactor} razy. Po {moves} ruchach walkę kończy sędzia: wygrywa ten, komu zostało więcej HP, a gdy obu zostało prawie tyle samo, jest remis.",
+      "ratingRules": "Ocena zaczyna się od {start}. Wygrana ją podnosi, a przegrana obniża, tym mocniej, im większa różnica ocen: za wygraną z wyżej ocenionym rywalem zgarniesz więcej. Gdy ktoś wyzwie Twoją postać, jej ocena zmienia się mniej. Pierwszego dnia miesiąca zaczyna się nowy sezon: każda ocena przesuwa się wtedy o {share}% drogi z powrotem do {start}.",
+      "tableRules": "W tabeli tygodnia są postacie, które w tym tygodniu stoczyły na Arenie choć jedną walkę, według oceny. W poniedziałek o północy tabela się zamyka, a za miejsce w niej zgarniesz Punkty Systemu i złoto. Nagrodę odbierzesz tutaj.",
+      "rating": "Ocena: {rating}",
+      "place": "{place}. miejsce w tabeli tygodnia",
+      "noPlace": "Stocz walkę, a trafisz do tabeli tygodnia.",
+      "fightsLeft": "Walki na dziś: {left} z {perDay}",
+      "used": "Dzisiejsze walki za Tobą. Następne od północy.",
+      "mercenary": "Postać na służbie najemnika nie walczy na Arenie.",
+      "rivals": "Wybierz rywala",
+      "noRivals": "Na Arenie nie ma jeszcze rywali. Zajrzyj później.",
+      "rival": "{className} · poz. {level} · ocena {rating}",
+      "stake": "Za wygraną zgarniesz {win} pkt oceny, za przegraną stracisz {loss} pkt.",
+      "fight": "Walcz",
+      "last": "Ostatnia walka",
+      "win": "Walka z postacią {name}: wygrana.",
+      "loss": "Walka z postacią {name}: przegrana.",
+      "draw": "Walka z postacią {name}: remis.",
+      "change": "Ocena: {before} → {after} ({change})",
+      "limitWin": ["Po {moves} ruchach walkę kończy sędzia: więcej HP zostało postaci {name}."],
+      "limitDraw": ["Po {moves} ruchach walkę kończy sędzia: obu stronom zostało prawie tyle samo HP, więc jest remis."],
+      "defences": "Obrony od ostatniej wizyty",
+      "noDefences": "Od ostatniej wizyty nikt nie wyzwał Twojej postaci.",
+      "defenceWin": "{name} ({className}, poz. {level}): obrona wygrana, ocena {change}.",
+      "defenceLoss": "{name} ({className}, poz. {level}): obrona przegrana, ocena {change}.",
+      "defenceDraw": "{name} ({className}, poz. {level}): remis, ocena {change}.",
+      "tabFights": "Walki",
+      "tabTable": "Tabela tygodnia",
+      "tableEnds": "Tabela zamyka się za {time}.",
+      "tableEmpty": "W tym tygodniu nikt jeszcze nie walczył na Arenie.",
+      "ownPlace": "Twoje miejsce: {place}. · ocena {rating}",
+      "rewards": "Nagrody tygodnia",
+      "tierOne": "{from}. miejsce",
+      "tierMany": "{from}.–{to}. miejsce",
+      "tierRest": "Od {from}. miejsca",
+      "due": "Za {place}. miejsce w tygodniu od {date} zgarniesz:",
+      "claim": "Odbierz",
+      "claimed": "Nagroda Areny odebrana.",
+      "season": "Sezon trwa jeszcze {time}. Potem każda ocena przesuwa się o {share}% drogi z powrotem do {start}.",
+      "locked": "Arenę odblokujesz na poziomie postaci {level}.",
+      "gone": "Tego rywala nie ma już na liście. Wybierz innego.",
+      "noReward": "Tej nagrody nie ma już do odebrania."
     }
   },
   "tavern": {
