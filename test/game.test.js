@@ -2754,7 +2754,7 @@ describe('Zadania od narratora', () => {
     // the week's, to the end of the month; its chest's gold by the level.
     assert.deepEqual(view.monthly.quests.map((quest) => quest.kind).sort(), ['explore', 'killAny']);
     assert.equal(view.monthly.endsAt, questPeriod('monthly', now, content).endsAt);
-    assert.equal(view.monthly.chest.gold, 1000 + 200 * 1);
+    assert.equal(view.monthly.chest.gold, 2000 + 400 * 1);
     // Drawn once and saved: the next request shows the same quests.
     assert.equal((await stored()).daily.period, questPeriod('daily', now, content).key);
     assert.deepEqual((await character()).quests, view);
@@ -2946,18 +2946,18 @@ describe('Zadania od narratora', () => {
     assert.equal((await call('POST', '/api/quests/reroll', { cookie, body: { period: 'yearly' } })).data.error.code, 'invalid_period');
   });
 
-  test('the monthly chest holds gold by the level, 240 Punktów Czasu and 50 Punktów Systemu (the author)', async () => {
+  test('the monthly chest holds gold by the level, 480 Punktów Czasu and 100 Punktów Systemu (the author, 761 C)', async () => {
     await (await db()).prepare('UPDATE characters SET level = 40, class_level = 30').run();
     await finishAll('monthly');
     const before = await character();
     assert.equal(before.quests.monthly.chest.ready, true);
     const opened = await chest('monthly');
     assert.equal(opened.status, 200, JSON.stringify(opened.data).slice(0, 300));
-    assert.deepEqual(opened.data.chest, { gold: 1000 + 200 * 40, timePoints: 240, systemPoints: 50, item: null });
+    assert.deepEqual(opened.data.chest, { gold: 2000 + 400 * 40, timePoints: 480, systemPoints: 100, item: null });
     const after = opened.data.character;
-    assert.equal(after.gold, before.gold + 1000 + 200 * 40);
-    assert.equal(after.timePoints, before.timePoints + 240);
-    assert.equal(after.systemPoints, before.systemPoints + 50);
+    assert.equal(after.gold, before.gold + 2000 + 400 * 40);
+    assert.equal(after.timePoints, before.timePoints + 480);
+    assert.equal(after.systemPoints, before.systemPoints + 100);
     assert.equal(after.quests.monthly.chest.opened, true);
     assert.equal((await chest('monthly')).data.error.code, 'opened');
   });
@@ -2976,8 +2976,8 @@ describe('Zadania od narratora', () => {
     const opened = await chest('weekly');
     assert.equal(opened.status, 200);
     const { chest: inside, character: after } = opened.data;
-    assert.equal(after.timePoints, before.timePoints + 120);
-    assert.equal(after.systemPoints, before.systemPoints + 20);
+    assert.equal(after.timePoints, before.timePoints + 180);
+    assert.equal(after.systemPoints, before.systemPoints + 30);
     const found = after.bag.find((item) => item.name === inside.item.name && item.level === 14);
     assert.ok(found, 'the item is in the backpack');
     assert.ok(Object.keys(content.quests.levels[0].chestRarities).includes(found.rarity));
