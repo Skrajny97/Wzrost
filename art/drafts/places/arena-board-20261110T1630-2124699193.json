@@ -1,0 +1,14 @@
+{
+  "id": "arena-board",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art, top-down view straight from above of the trampled sand floor of a village fighting arena: packed sand and dirt with scuffs, footprints, a few small stones and bits of straw, a faint pale line drawn across the middle dividing two halves, slightly darker edges, soft even dusk light, flat ground seen from above for a dim background behind game cards, very low contrast, muted dark palette of sand, brown and moss green, no fence, no walls, no people, no animals, no weapons, no text, no border",
+  "style": "src/client/art/places/trial-hall.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
