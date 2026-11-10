@@ -3,7 +3,7 @@
   "intro": "While working, the character does not set out on explorations, and their wounds heal. Each profession level strengthens two stats. You can develop every profession, but you work in only one at a time.",
   "avatar": {
     "name": "System Avatar",
-    "description": "A reflection of the character that the System will weave in their likeness. It works at the professions alongside them, even while the character is on an exploration or working too. It knows their herbs, recipes and patterns and works just as efficiently, but gains no experience, profession levels or stats.",
+    "description": "A reflection of the character that the System will weave in their likeness. It works at the professions alongside them, even while the character is on an exploration or working too. It knows their herbs, recipes and patterns and works just as efficiently. From its work the character gets a quarter of the experience and profession progress the same work would give them.",
     "texts": {
       "bought": [
         "The System has woven the Avatar. It waits for work in the Professions."

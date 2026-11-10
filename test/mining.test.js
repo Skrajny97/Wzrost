@@ -41,6 +41,8 @@ import {
   setMinutes,
   upgradedItem,
   veinGoldPerHour,
+  workProfession,
+  workXp,
 } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -723,7 +725,7 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.deepEqual(sold.data.character.bag.map((item) => item.gem?.id ?? null), ['quartz']);
   });
 
-  test('the Awatar Systemu digs while the character explores and brings the minerals and the gold, without XP or levels', async () => {
+  test('the Awatar Systemu digs while the character explores and brings the minerals, the gold and a quarter of the XP and of the profession\'s progress (10.11.2026)', async () => {
     await set('gold = 10000');
     await call('POST', '/api/avatar/buy', { cookie });
     assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 1 } })).status, 201);
@@ -734,9 +736,9 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     const claimed = await call('POST', '/api/avatar/claim', { cookie });
     const { report, character: after } = claimed.data;
     assert.equal(report.avatar, true);
-    assert.equal(report.summary.xp, 0);
+    assert.equal(report.summary.xp, Math.round(workXp(25, 120, content) * content.avatar.share));
     assert.equal(after.gold, report.gold);
-    assert.equal(after.professions.list.find((profession) => profession.id === 'mining').level, 1);
+    assert.equal(after.professions.list.find((profession) => profession.id === 'mining').level, workProfession(content.professionsById.mining, { level: 1, xp: 0 }, Math.round(120 * content.avatar.share)).level);
     assert.ok(after.minerals.length > 0);
   });
 });

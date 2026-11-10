@@ -30,7 +30,7 @@ import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { requireOpen } from './mining.js';
-import { addTo, insertWork, requireProfessions, workGains } from './professions.js';
+import { addTo, insertWork, requireProfessions, workClaim, workClaimFailed, workGains } from './professions.js';
 import { mineralsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
 
@@ -143,7 +143,8 @@ const alreadyDone = () => new ApiError(409, 'already_claimed', 'Ten raport zosta
 // here), or with `stop` of the part done before now (cancelHunt). Stopped
 // before the first jewel, or a setting called back, it only gives everything
 // back and makes no report (null). With `avatar`, the work of the Awatar
-// Systemu (avatar.js), which brings no XP, levels or stats.
+// Systemu (avatar.js), which brings its share of the XP and of the levels
+// since 10.11.2026 (workGains).
 export async function finishJewels(db, player, now, { stop = false, avatar = false } = {}) {
   const { row } = player;
   const { table, activity, key } = workOf(player, avatar);
@@ -263,7 +264,8 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
     let saved;
     try {
       saved = await db.batch([
-        stillThere,
+        // The work still there and the character as read (workClaim).
+        workClaim(db, row, table, activity),
         // The item is still the character's: one gone a moment ago is told
         // at the next claim, and its gem comes back then.
         ...(item ? [assertion(db, 'EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ?)', [item.id, row.id])] : []),
@@ -281,8 +283,11 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
         end,
       ]);
     } catch (error) {
-      if (item && raced(error)) throw new ApiError(409, 'conflict', 'Coś zmieniło się w międzyczasie. Spróbuj ponownie.');
-      if (String(error?.message).includes('UNIQUE') || raced(error)) throw alreadyDone();
+      if (String(error?.message).includes('UNIQUE')) throw alreadyDone();
+      if (raced(error)) {
+        const failed = await workClaimFailed(db, row, table, activity);
+        throw item && failed.code !== 'already_claimed' ? new ApiError(409, 'conflict', 'Coś zmieniło się w międzyczasie. Spróbuj ponownie.') : failed;
+      }
       throw error;
     }
     return { id: saved[item ? 2 : 1].meta.last_row_id, report };

@@ -4,8 +4,16 @@
 // patterns, and as well as the character does it. Its work sits in
 // avatar_activities as the character's own sits in activities, so the same
 // code starts it (with `avatar` in the request), skips it with Time Points
-// (time.js) and ends it here; it brings no XP, no levels of the professions
-// and no stats.
+// (time.js) and ends it here. Since 10.11.2026 its work brings the
+// character avatar.share (a quarter) of the character's XP and of the
+// profession's XP the same work of the character would, with the levels
+// they bring (workGains in professions.js; the author: „Awatar niech od
+// teraz daje 1/4 tego co zdobyłaby postać - XPa i wpływ na level Profesji w
+// podobnej ilości - tak jakby gracz robił te czynności. Tak, pamiętam
+// pierwotne założenia, ale wszystko ewoluuje.”); before, no XP, no levels
+// of the professions and no stats. Its claim writes them only while the
+// character is as read (workClaim), so it never undoes the character's own
+// claim made meanwhile, nor that one its.
 
 import { finishBrewing } from './brewing.js';
 import { content } from './content.js';

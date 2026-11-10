@@ -36,7 +36,7 @@ import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { craftingOn } from './features.js';
 import { perkOf } from './perks.js';
-import { addTo, insertWork, requireProfessions, workGains } from './professions.js';
+import { addTo, insertWork, requireProfessions, workClaim, workClaimFailed, workGains } from './professions.js';
 import { trimReports } from './reports.js';
 import { say } from '../engine/text.js';
 
@@ -183,7 +183,7 @@ function scrollOrder(row, level, count, steady = false) {
 // `stop` of the part done before now (cancelHunt). Stopped before the first
 // item, it only gives everything back and makes no report (null). With
 // `avatar`, the order of the Awatar Systemu (avatar.js), whose work brings
-// the items alone.
+// the items and its share of the XP and of the levels (workGains).
 // A work claimed or called back by another request a moment ago.
 const alreadyDone = () => new ApiError(409, 'already_claimed', 'Ten raport został już odebrany.');
 
@@ -275,7 +275,8 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
   let saved;
   try {
     saved = await db.batch([
-      stillThere,
+      // The work still there and the character as read (workClaim).
+      workClaim(db, row, table, activity),
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
         .bind(row.id, key, 'items', now, JSON.stringify(summary), JSON.stringify(report)),
@@ -293,7 +294,8 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
       end,
     ]);
   } catch (error) {
-    if (String(error?.message).includes('UNIQUE') || raced(error)) throw alreadyDone();
+    if (String(error?.message).includes('UNIQUE')) throw alreadyDone();
+    if (raced(error)) throw await workClaimFailed(db, row, table, activity);
     throw error;
   }
   return { id: saved[1].meta.last_row_id, report };

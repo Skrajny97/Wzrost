@@ -450,11 +450,12 @@
     "avatar": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["name", "price", "description", "texts"],
-      "description": "Awatar Systemu: kupiony raz na zawsze za price złota wykonuje jedną pracę naraz obok postaci, z jej poziomami profesji, ziołami, przepisami i wzorami. Nie daje XP, poziomów profesji ani statystyk.",
+      "required": ["name", "price", "share", "description", "texts"],
+      "description": "Awatar Systemu: kupiony raz na zawsze za price złota wykonuje jedną pracę naraz obok postaci, z jej poziomami profesji, ziołami, przepisami i wzorami. Od 10.11.2026 daje postaci share tego XP postaci i XP profesji, które dałaby ta sama praca postaci.",
       "properties": {
         "name": { "type": "string", "minLength": 1 },
         "price": { "type": "integer", "minimum": 1, "description": "Cena w złocie, płacona raz." },
+        "share": { "type": "number", "minimum": 0, "maximum": 1, "description": "Udział XP postaci i XP profesji z pracy Awatara względem tej samej pracy postaci (0.25: ćwierć)." },
         "description": { "type": "string", "minLength": 1, "description": "Opis na karcie zakupu w zakładce Profesje." },
         "texts": {
           "type": "object",
