@@ -384,6 +384,10 @@
     "0.2.41": {
       "title": "Version 0.2.41",
       "body": "- The stats show what a whole stat gives, not one point. Tap a stat to see, for example: “Dexterity 690 now gives: damage +92.2%, dodge +16.2%, speed +1.01”.\n- Arena: the last fight no longer plays by itself. You see its result, and “Watch the fight” opens the replay."
+    },
+    "0.2.42": {
+      "title": "Version 0.2.42",
+      "body": "- The Arena has a new look: its picture, your rating on a plaque, the day's fights as crossed swords, and the last fight's result as a badge with “Watch the fight”.\n- Shadows before evolution are evened out, the same on explorations and in the Arena: Shadow Dance protects for 3 enemy blows instead of 5, and Poisoned Blade poisons more often (45–65% of blows instead of 30–50%)."
     }
   }
 }

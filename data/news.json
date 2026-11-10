@@ -485,6 +485,11 @@
       "id": "0.2.41",
       "title": "Wersja 0.2.41",
       "body": "- Statystyki pokazują, ile daje cała statystyka, a nie jeden punkt. Stuknij statystykę, a zobaczysz na przykład: „Zręczność 690 daje teraz: obrażenia +92,2%, unik +16,2%, szybkość +1,01”.\n- Arena: ostatnia walka nie odtwarza się już sama. Zobaczysz jej wynik, a powtórkę otworzysz przyciskiem „Obejrzyj walkę”."
+    },
+    {
+      "id": "0.2.42",
+      "title": "Wersja 0.2.42",
+      "body": "- Arena w nowym wyglądzie: obrazek Areny, ocena na tabliczce, walki na dziś jako skrzyżowane miecze, a wynik ostatniej walki jako plakietka z przyciskiem „Obejrzyj walkę”.\n- Cienie przed ewolucją wyrównane, tak samo na wyprawach i na Arenie: Taniec cieni chroni przez 3 ciosy wrogów zamiast 5, a Zatrute ostrze truje częściej (45–65% ciosów zamiast 30–50%)."
     }
 ]
 }

@@ -353,7 +353,8 @@ function* strayLeaves(polish, english, path) {
   } else yield path;
 }
 
-const placeholders = (text) => (text.match(/\{\w+\}/g) ?? []).sort().join(' ');
+// "{hits|cios|ciosy|ciosów}" (counted, src/engine/text.js) counts as {hits}.
+const placeholders = (text) => (text.match(/\{\w+(?:\|[^|{}]*){0,3}\}/g) ?? []).map((one) => one.replace(/\|.*\}$/, '}')).sort().join(' ');
 const shape = (text) => text.replace(/\{\w*\}/g, '{}');
 export const hashOf = (text) => createHash('sha1').update(text).digest('hex').slice(0, 12);
 

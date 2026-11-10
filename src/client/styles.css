@@ -15588,8 +15588,11 @@ a.discord-button {
   min-width: 0;
 }
 
-/* The Arena in the Osada (src/client/pvp-arena.js, 762 A): the rating in
-   the System's letters over the place and the fights left; each rival a
+/* The Arena in the Osada (src/client/pvp-arena.js, 762 A): on its picture
+   (788 C), the rating in the System's letters on a plaque and the fights
+   left as crossed swords (789); the last fight folded to a badge of its
+   result with "Obejrzyj walkę"; crossed swords by the rivals' heading and on
+   "Walcz"; each rival a
    card with its bust, its words beside it and "Walcz" under them on a
    phone, at their right on a wider screen; the last fight's card edged by
    its result; the defences in their colours; the rewards of the places
@@ -15605,6 +15608,112 @@ a.discord-button {
   font-size: 22px;
 }
 
+.pvp-arena-status.place-card--art {
+  min-height: 190px;
+  justify-content: flex-end;
+}
+
+.pvp-arena-intro {
+  margin: 0;
+  max-width: 42ch;
+  color: var(--text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.pvp-arena-plaque {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  align-self: flex-start;
+  padding: 8px 14px;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.78);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.45);
+}
+
+.pvp-arena-plaque-icon {
+  flex: none;
+  color: var(--gold);
+}
+
+.pvp-arena-pips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pvp-arena-pips-label {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(13, 17, 11, 0.7);
+  font-size: 14px;
+}
+
+.pvp-arena-pips-row {
+  display: flex;
+  gap: 4px;
+}
+
+.pvp-arena-pip {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--bark-line);
+  border-radius: 50%;
+  background: rgba(13, 17, 11, 0.75);
+  color: var(--text-muted);
+  opacity: 0.55;
+}
+
+.pvp-arena-pip--on {
+  border-color: var(--gold);
+  color: var(--gold);
+  opacity: 1;
+}
+
+.pvp-arena-last {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pvp-arena-last-title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.pvp-arena-last-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pvp-arena-last-text {
+  min-width: 0;
+}
+
+.pvp-arena-badge {
+  flex: none;
+  padding: 6px 10px;
+  border: 1px solid var(--bark-line);
+  border-radius: 4px;
+  font-family: var(--font-world);
+  font-size: 16px;
+}
+
+.pvp-arena-badge--win {
+  border-color: var(--success, #7fd17f);
+  color: var(--success, #7fd17f);
+}
+
+.pvp-arena-badge--loss {
+  border-color: var(--danger, #f08a7a);
+  color: var(--danger, #f08a7a);
+}
+
 .pvp-arena-list {
   margin: 0;
   padding: 0;
@@ -15612,8 +15721,16 @@ a.discord-button {
 }
 
 .pvp-arena-heading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   margin: 4px 0 0;
   font-size: 17px;
+}
+
+.pvp-arena-ornament {
+  color: var(--gold);
 }
 
 .pvp-arena-rival {
@@ -15640,6 +15757,10 @@ a.discord-button {
 }
 
 .pvp-arena-fight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   grid-column: 1 / -1;
 }
 

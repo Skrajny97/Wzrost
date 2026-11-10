@@ -4,7 +4,19 @@
 export function say(texts, key, index, vars = {}) {
   const variants = texts[key];
   const template = variants[index % variants.length];
-  return template.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
+  return counted(template, vars).replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
+}
+
+// "{hits|cios|ciosy|ciosów}" in a text: the number and after it the words
+// in their form for it (countedForm), "3 ciosy", "5 ciosów"; English needs
+// none of it ("{hits} blows").
+export function counted(template, vars) {
+  return template.replace(/\{(\w+)\|([^|{}]*)\|([^|{}]*)\|([^|{}]*)\}/g, (whole, name, one, few, many) => {
+    const value = vars[name];
+    if (typeof value !== 'number') return whole;
+    const count = Math.round(value);
+    return `${count} ${countedForm(count, [one, few, many])}`;
+  });
 }
 
 // A noun after a number, in Polish: 1, then 2–4 (but not 12–14), then the rest.

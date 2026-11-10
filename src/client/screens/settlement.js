@@ -120,10 +120,10 @@ export function mountSettlement(container, { params = {} } = {}) {
   };
   // The Arena (pvp-arena.js, 762 A), kept so too.
   let pvpArena = null;
-  const pvpArenaPanel = () => {
+  const pvpArenaPanel = (place) => {
     if (!pvpArena) {
       const holder = h('div', { class: 'pvp-arena-holder' });
-      pvpArena = { holder, ...mountPvpArena(holder) };
+      pvpArena = { holder, ...mountPvpArena(holder, place) };
     } else pvpArena.refresh();
     return pvpArena.holder;
   };
@@ -1531,7 +1531,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       // The Sala prób's trial of the day (620 B), its report at once.
       place.id === 'trial-hall' && !place.soon && trialHallCards(data.trialHall, place, (hash) => (location.hash = hash)),
       // The Arena's fights, table and rewards (762 A).
-      place.id === 'arena' && !place.soon && pvpArenaPanel(),
+      place.id === 'arena' && !place.soon && pvpArenaPanel(place),
     );
   }
 

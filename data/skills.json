@@ -211,7 +211,7 @@
     "effect": "Na początku walki, do jej końca: każdy cios ma {dotChance%} szans na Zatrucie. Zatruty przez {dotTicks} swoje ruchy traci po {dotPower%} obrażeń ciosu.",
     "kind": "coat",
     "mana": 12,
-    "params": { "dotEffect": "poisoned", "dotChance": [0.3, 0.5], "dotPower": [0.15, 0.25], "dotTicks": 3 }
+    "params": { "dotEffect": "poisoned", "dotChance": [0.45, 0.65], "dotPower": [0.15, 0.25], "dotTicks": 3 }
   },
   {
     "id": "shadow-dance",
@@ -222,9 +222,9 @@
     "style": "unik",
     "rarity": "common",
     "description": "Cień rozmywa się w ruchu. Ciosy wrogów tną powietrze.",
-    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}: przez {hits} następnych ciosów wrogów unik rośnie o {dodge pp}. Każdy unik daje kontrę za {counter%} obrażeń.",
+    "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}: przez {hits|następny cios wroga|następne ciosy wrogów|następnych ciosów wrogów} unik rośnie o {dodge pp}. Każdy unik daje kontrę za {counter%} obrażeń.",
     "kind": "evade",
     "mana": 12,
-    "params": { "below": 0.5, "dodge": [0.4, 0.6], "counter": [0.8, 1.2], "hits": 5 }
+    "params": { "below": 0.5, "dodge": [0.4, 0.6], "counter": [0.8, 1.2], "hits": 3 }
   }
 ]

@@ -17,7 +17,7 @@
 // the evolution bring more points for them. The second form (class level
 // 100) does the same once more, with a higher top level.
 
-import { decimalText, word } from './text.js';
+import { counted, decimalText, word } from './text.js';
 
 // Kinds used instead of a plain blow on the character's move, at the start of
 // a fight, and the moment its HP falls below the skill's mark; a stance
@@ -189,12 +189,13 @@ export function raiseBlock(character, skillId, content, count = 1) {
 
 // The skill's effect in words at its numbers. {name} is a whole number,
 // {name%} a percent, {name%.1} a percent with one decimal, {name pp}
-// percentage points, {name.1} one decimal, {cooldown} the cooldown and
-// {critPower%} the power with a critical hit; the decimals and the points
-// as the content's language writes them ("2,5", "2.5"; word()).
+// percentage points, {name.1} one decimal, {cooldown} the cooldown,
+// {critPower%} the power with a critical hit and {name|one|few|many} the
+// number with its words in their form (counted, text.js); the decimals and
+// the points as the content's language writes them ("2,5", "2.5"; word()).
 export function skillText(template, skill, params, content) {
   const values = { ...params, cooldown: skill.cooldown, critPower: (params.power ?? 0) * content.balance.combat.critMultiplier };
-  return template.replace(/\{(\w+)(%\.1|%| pp|\.1)?\}/g, (whole, name, format) => {
+  return counted(template, values).replace(/\{(\w+)(%\.1|%| pp|\.1)?\}/g, (whole, name, format) => {
     const value = values[name];
     if (typeof value !== 'number') return whole;
     if (format === '%.1') return `${decimalText(value * 100, content)}%`;

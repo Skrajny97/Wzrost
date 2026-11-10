@@ -2,12 +2,14 @@
 // „Musimy zacząć też pracować nad Areną PvP, bo rośnie baza graczy”), under
 // its place's heading on the Osada's place screen (screens/settlement.js),
 // in two tabs as the Salon Gier's. "Walki": the character's rating, its
-// place on the week's table and the fights left today; its last fight with
-// the result and the rating's move, its playback (arena.js, the playback of
-// every fight, not this Arena) folded behind "Obejrzyj walkę", which opens
-// it in a sheet (787 B; the author: „jakieś ciągle odtwarzane poprzednie
-// walki, których nie da się schować”), at once only after a fight just
-// fought; the defences since the last visit; the
+// place on the week's table and the fights left today, on the Arena's
+// picture with the rating on a plaque and the fights as crossed swords (789,
+// 788 C); its last fight with the result and the rating's move, its playback
+// (arena.js, the playback of every fight, not this Arena) folded behind
+// "Obejrzyj walkę", which opens it in a sheet (787 B; the author: „jakieś
+// ciągle odtwarzane poprzednie walki, których nie da się schować”), at once
+// only after a fight just fought; the defences since the last visit, folded
+// under their count; the
 // three rivals, each with its bust, class, level and rating, what a win or
 // a loss with it would bring and "Walcz", a tap on its name opening the
 // character's card (profile.js). "Tabela tygodnia": the rewards waiting
@@ -22,6 +24,7 @@
 // again; the defences shown at the look stay while the panel lives.
 
 import { createArena } from './arena.js';
+import { placeArt } from './art.js';
 import { h, icon } from './dom.js';
 import { countOf, formatDecimal, formatHours, formatNumber } from './format.js';
 import { chestContents } from './guild-trials.js';
@@ -65,7 +68,9 @@ const nameButton = (name) =>
     onClick: (event) => withButton(event.currentTarget, () => openProfile(name)),
   });
 
-export function mountPvpArena(holder) {
+// `place`: the Arena's place of the Osada, whose backdrop (788 C) is the
+// status card's picture.
+export function mountPvpArena(holder, place = null) {
   let view = null;
   let failure = null;
   let gone = false;
@@ -145,23 +150,48 @@ export function mountPvpArena(holder) {
   }
 
   // The character's rating, its place this week and the fights left today,
-  // or why it cannot fight now.
+  // or why it cannot fight now, on the Arena's picture (its place's backdrop
+  // in data/settlement.json): the rating on a plaque, the fights as marks.
   function statusCard() {
     const { texts, fights } = view;
-    return h(
+    const art = place?.backdrop ? placeArt(place.backdrop) : null;
+    const left = say(texts.fightsLeft, { left: fights.left, perDay: fights.perDay });
+    const card = h(
       'section',
-      { class: 'card stack pvp-arena-status', 'data-guide': 'arena-status' },
-      h('p', { class: 'muted', text: texts.intro }),
-      h('p', { class: 'pvp-arena-rating', text: say(texts.rating, { rating: view.rating }) }),
-      h('p', { class: 'pvp-arena-place', text: view.place ? say(texts.place, { place: view.place }) : texts.noPlace }),
-      h('p', {}, h('span', { class: `chip${fights.left > 0 ? ' chip--success' : ''}`, text: say(texts.fightsLeft, { left: fights.left, perDay: fights.perDay }) })),
+      { class: `card stack pvp-arena-status${art ? ' place-card place-card--art' : ''}`, 'data-guide': 'arena-status' },
+      h('p', { class: 'pvp-arena-intro', text: texts.intro }),
+      h(
+        'div',
+        { class: 'pvp-arena-plaque' },
+        icon('trophy', { size: 30, className: 'pvp-arena-plaque-icon' }),
+        h(
+          'div',
+          { class: 'pvp-arena-plaque-text' },
+          h('p', { class: 'pvp-arena-rating', text: say(texts.rating, { rating: view.rating }) }),
+          h('p', { class: 'pvp-arena-place', text: view.place ? say(texts.place, { place: view.place }) : texts.noPlace }),
+        ),
+      ),
+      h(
+        'div',
+        { class: 'pvp-arena-pips' },
+        h('span', { class: 'pvp-arena-pips-label', text: left }),
+        h(
+          'span',
+          { class: 'pvp-arena-pips-row', 'aria-hidden': 'true' },
+          Array.from({ length: fights.perDay }, (_, index) => h('span', { class: `pvp-arena-pip${index < fights.left ? ' pvp-arena-pip--on' : ''}` }, icon('swords', { size: 14 }))),
+        ),
+      ),
       fights.left === 0 && h('p', { class: 'muted', text: texts.used }),
       view.blocked && h('p', { class: 'region-warning', text: view.blocked }),
     );
+    if (art) card.style.setProperty('--place-art', `url("${art}")`);
+    return card;
   }
 
-  // The last fight: who with, how it went, the rating's move, and the fight
-  // itself played back.
+  // The last fight: who with, how it went and the rating's move, folded to
+  // one line; "Obejrzyj walkę" plays it back in a sheet, at once after a
+  // fight just fought, else only at a tap (the author: „jakieś ciągle
+  // odtwarzane poprzednie walki, których nie da się schować”).
   function lastCard() {
     const { last, texts } = view;
     if (!last) return null;
@@ -178,12 +208,22 @@ export function mountPvpArena(holder) {
         if (watching === playback) watching = null;
       });
     };
+    const badge = { win: t('Wygrana'), loss: t('Przegrana'), draw: t('Remis') }[last.result];
     const card = h(
       'section',
-      { class: `card stack pvp-arena-last pvp-arena-last--${last.result}`, 'aria-labelledby': 'pvp-arena-last-title', 'data-guide': 'arena-last' },
-      h('h2', { class: 'card-title', id: 'pvp-arena-last-title', text: texts.last }),
-      h('p', { class: 'pvp-arena-result' }, say(texts[last.result], { name: last.rival.name })),
-      h('p', { class: 'muted', text: say(texts.change, { before: last.before, after: last.after, change: signed(last.change) }) }),
+      { class: `card pvp-arena-last pvp-arena-last--${last.result}`, 'aria-labelledby': 'pvp-arena-last-title', 'data-guide': 'arena-last' },
+      h('h2', { class: 'pvp-arena-last-title', id: 'pvp-arena-last-title', text: texts.last }),
+      h(
+        'div',
+        { class: 'pvp-arena-last-row' },
+        h('span', { class: `pvp-arena-badge pvp-arena-badge--${last.result}`, text: badge }),
+        h(
+          'div',
+          { class: 'pvp-arena-last-text' },
+          h('p', { class: 'pvp-arena-last-rival' }, t('z postacią'), ' ', nameButton(last.rival.name)),
+          h('p', { class: 'muted', text: say(texts.change, { before: last.before, after: last.after, change: signed(last.change) }) }),
+        ),
+      ),
       h('button', { type: 'button', class: 'button button--world button--small pvp-arena-watch', onClick: watch }, icon('eye', { size: 16 }), h('span', { text: t('Obejrzyj walkę') })),
     );
     if (fresh) {
@@ -193,15 +233,16 @@ export function mountPvpArena(holder) {
     return card;
   }
 
-  // The defences since the last visit, as the server told them at the look.
+  // The defences since the last visit, as the server told them at the look,
+  // folded under their count.
   function defencesCard() {
     if (!defences) return null;
     const { texts } = view;
     const key = { win: 'defenceWin', loss: 'defenceLoss', draw: 'defenceDraw' };
     return h(
-      'section',
-      { class: 'card stack pvp-arena-defences', 'aria-labelledby': 'pvp-arena-defences-title' },
-      h('h2', { class: 'card-title', id: 'pvp-arena-defences-title', text: texts.defences }),
+      'details',
+      { class: 'card fold-part pvp-arena-defences' },
+      h('summary', { class: 'fold-part-summary', text: `${texts.defences} (${formatNumber(defences.length)})` }),
       defences.length === 0
         ? h('p', { class: 'muted', text: texts.noDefences })
         : h(
@@ -233,7 +274,6 @@ export function mountPvpArena(holder) {
       h('button', {
         type: 'button',
         class: 'button button--world pvp-arena-fight',
-        text: texts.fight,
         disabled: shut,
         'aria-label': `${texts.fight}: ${rival.name}`,
         onClick: (event) =>
@@ -242,7 +282,7 @@ export function mountPvpArena(holder) {
             fresh = true;
             apply(answer);
           }),
-      }),
+      }, icon('swords', { size: 18 }), h('span', { text: texts.fight })),
     );
   }
 
@@ -251,7 +291,7 @@ export function mountPvpArena(holder) {
     return h(
       'section',
       { class: 'stack pvp-arena-rivals', 'aria-labelledby': 'pvp-arena-rivals-title', 'data-guide': 'arena-rivals' },
-      h('h2', { class: 'pvp-arena-heading', id: 'pvp-arena-rivals-title', text: texts.rivals }),
+      h('h2', { class: 'pvp-arena-heading', id: 'pvp-arena-rivals-title' }, icon('swords', { size: 18, className: 'pvp-arena-ornament' }), h('span', { text: texts.rivals }), icon('swords', { size: 18, className: 'pvp-arena-ornament' })),
       view.rivals.length === 0 ? h('p', { class: 'muted', text: texts.noRivals }) : h('ul', { class: 'pvp-arena-list stack' }, view.rivals.map(rivalCard)),
     );
   }

@@ -64,7 +64,7 @@
   "skillBuffShared": ["Premia dzieli się na drużynę: każdy z {count} dostaje swoją część."],
   "skillCoat": ["{actor}: {skill}. Do końca walki każdy cios ma {chance}% szans na {effect}: {power}% obrażeń ciosu co ruch przez {ticks} ruchy."],
   "skillShield": ["{actor}: {skill}. Osłona za {mana} many przyjmie {shield} obrażeń."],
-  "skillEvade": ["{actor}: {skill}. Przez {hits} ciosów wrogów unik rośnie o {dodge} pkt proc., a każdy unik daje kontrę za {counter}% obrażeń."],
+  "skillEvade": ["{actor}: {skill}. Przez {hits|cios|ciosy|ciosów} wrogów unik rośnie o {dodge} pkt proc., a każdy unik daje kontrę za {counter}% obrażeń."],
   "skillHeal": [
     "{actor} używa umiejętności {skill} i odzyskuje {amount} HP.",
     "{actor}: {skill}. Wraca {amount} HP."
