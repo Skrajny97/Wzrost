@@ -5,7 +5,8 @@
     { "id": "friends", "name": "Znajomi" },
     { "id": "ranking", "name": "Ranking" },
     { "id": "guilds", "name": "Gildia" },
-    { "id": "party", "name": "Drużyna" }
+    { "id": "party", "name": "Drużyna" },
+    { "id": "fame", "name": "Sława" }
   ],
   "ranking": { "size": 100 },
   "friends": { "max": 30 },

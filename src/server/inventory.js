@@ -37,6 +37,7 @@ import {
 import { atomically, sameVersion } from './atomic.js';
 import { toHex } from './encoding.js';
 import { trialProgress } from './guild-trials.js';
+import { upgradeFamePoints } from './fame.js';
 import { ApiError, json, readJson } from './http.js';
 import { takenOff } from './market.js';
 import { anvilDiscountOf } from './perks.js';
@@ -320,6 +321,8 @@ export async function upgradeItem(context) {
       sql: "EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)",
       binds: [item.id, roll],
     }),
+    // Its Punkty Sławy (fame.js), the same way.
+    ...upgradeFamePoints(db, row.id, outcome, context.now, { sql: "EXISTS (SELECT 1 FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?)", binds: [item.id, roll] }),
   ];
   if (outcome.result === 'broken') {
     statements.push(db.prepare("DELETE FROM items WHERE id = ? AND json_extract(data, '$.lastRoll') = ?").bind(item.id, roll));

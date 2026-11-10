@@ -114,7 +114,10 @@ export const guildTodoNews = (part) => open() && Boolean(guild) && Boolean(guild
 export const liveTrade = () => (open() ? trade : null);
 // A proposal to this character, or a trade going on.
 export const tradeNews = () => Boolean(liveTrade()) && !(trade.state === 'proposed' && trade.proposer);
-export const communityNews = () => chatNews() || friendNews() || partyNews() || guildNews() || guildTodoNews() || tradeNews();
+// A reward of the Punkty Sławy waiting (state.fame, src/server/fame.js),
+// until it is taken in the Sława.
+export const fameNews = () => open() && Boolean(state.fame?.reward);
+export const communityNews = () => chatNews() || friendNews() || partyNews() || guildNews() || guildTodoNews() || tradeNews() || fameNews();
 export const chatMuted = () => muted;
 
 // The tab's light in words, for a screen reader.
@@ -133,6 +136,8 @@ export const communityNewsText = () =>
           ? t('zaproszenie do gildii czeka')
           : guildTodoNews()
             ? t('w gildii czeka coś do zrobienia')
+          : fameNews()
+            ? t('nagroda Sławy czeka')
           : invites > 0
         ? t('zaproszenie do znajomych czeka')
         : gifts > 0

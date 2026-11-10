@@ -1,7 +1,8 @@
 // The Społeczność tab, from character level 5. A list at its top, folded to
 // the part shown, picks one of its parts (data/community.json): the Czat,
 // the Znajomi with their daily Upominek (friends.js), the Ranking postaci
-// (ranking.js), the Drużyna (party.js) and the Gildia (guild.js).
+// (ranking.js), the Drużyna (party.js), the Gildia (guild.js) and the
+// Sława, the character's Punkty Sławy (fame.js).
 // It opens on the part its address names (#/spolecznosc/znajomi, from the
 // shortcuts in the computer's menu), else on the part with news
 // (chat-news.js), else on the one last shown on the device; while the
@@ -47,6 +48,7 @@ import {
   chatNews,
   conversationNews,
   conversationsSeen,
+  fameNews,
   friendNews,
   guildChannel,
   guildNews,
@@ -68,6 +70,7 @@ import { openProfile } from '../profile.js';
 import { call, isUnlocked, serverNow, state } from '../state.js';
 import { closeSheet, framedName, guildTag, openSheet, pageHeading, toast, withButton } from '../ui.js';
 import { itemDetails, itemSummary } from './character.js';
+import { mountFame } from './fame.js';
 import { mountFriends } from './friends.js';
 import { mountParty } from './party.js';
 import { lockedScreen } from './locked.js';
@@ -121,16 +124,16 @@ const SECTION_KEY = 'insight-community-section';
 const GUILD_PAGE_SECTION = 'guilds';
 // The parts' icons and lights of news, also for their shortcuts under
 // Społeczność in the computer's menu (layout.js).
-export const SECTION_ICONS = { chat: 'chat', friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords' };
-export const SECTION_NEWS = { chat: chatNews, friends: friendNews, party: partyNews, guilds: () => guildNews() || guildTodoNews() };
+export const SECTION_ICONS = { chat: 'chat', friends: 'people', ranking: 'trophy', guilds: 'banner', party: 'swords', fame: 'star' };
+export const SECTION_NEWS = { chat: chatNews, friends: friendNews, party: partyNews, guilds: () => guildNews() || guildTodoNews(), fame: fameNews };
 // The address that opens the tab at a part (app.js), for those shortcuts;
 // the Gildia has its page.
-const SECTION_SLUGS = { chat: 'czat', friends: 'znajomi', ranking: 'ranking', party: 'druzyna' };
+const SECTION_SLUGS = { chat: 'czat', friends: 'znajomi', ranking: 'ranking', party: 'druzyna', fame: 'slawa' };
 export const sectionHash = (id) => (id === GUILD_PAGE_SECTION ? '#/gildia' : SECTION_SLUGS[id] ? `#/spolecznosc/${SECTION_SLUGS[id]}` : '#/spolecznosc');
 
 export function mountCommunity(container, context) {
   if (!isUnlocked('community')) return lockedScreen('community', 'Społeczność')(container, context);
-  const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking, party: mountParty };
+  const MOUNTS = { chat: mountChat, friends: mountFriends, ranking: mountRanking, party: mountParty, fame: mountFame };
   const sections = state.content.community.sections;
   const asked = takeConversation();
   // "Oznacz" on a character's sheet opened away from the chat (profile.js).
@@ -174,7 +177,7 @@ export function mountCommunity(container, context) {
     part?.unmount();
     fill(body);
     fill(picker.bar);
-    part = MOUNTS[id](body, { bar: picker.bar, person, mention });
+    part = MOUNTS[id](body, { bar: picker.bar, person, mention, news: picker.render });
     picker.render();
   }
 

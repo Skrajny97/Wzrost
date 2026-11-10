@@ -31,6 +31,7 @@ import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { requireOpen } from './mining.js';
 import { addTo, insertWork, requireProfessions, workGains } from './professions.js';
+import { workFamePoints } from './fame.js';
 import { mineralsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
 
@@ -278,6 +279,8 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
         ...(item ? [db.prepare("UPDATE items SET data = json_set(data, '$.gem', ?) WHERE id = ? AND character_id = ?").bind(made.set.gem, item.id, row.id)] : []),
         // The jewels made go to the bag; the room was there at the start.
         ...jewels.map((jewel) => insertItem.bind(row.id, JSON.stringify(jewel), now)),
+        // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
+        ...workFamePoints(db, row.id, minutes, avatar, now),
         end,
       ]);
     } catch (error) {

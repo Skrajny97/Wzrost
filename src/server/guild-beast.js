@@ -39,6 +39,7 @@ import { attackBlocked, bagPlaces, characterView, engineCharacter, equippedItems
 import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { guildOf } from './guilds.js';
+import { sourceFamePoints } from './fame.js';
 import { ApiError, json, readJson } from './http.js';
 
 const rules = () => content().guilds.beast;
@@ -237,6 +238,8 @@ export async function attackGuildBeast(context) {
         )
         .bind(fight.damage, fight.damage, now, fight.damage, row.id, beast.id),
       db.prepare('SELECT hp FROM guild_beasts WHERE id = ?').bind(beast.id),
+      // The attack's Punkty Sławy (fame.js).
+      ...sourceFamePoints(db, row.id, 'beast', 1, now),
     ],
     () => new ApiError(409, 'raced', errors().raced),
   );

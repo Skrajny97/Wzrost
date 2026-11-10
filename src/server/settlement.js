@@ -117,6 +117,7 @@ import { t } from './i18n.js';
 import { wantedToKeep, wantedView } from './wanted.js';
 import { forgeView } from './forge.js';
 import { trialProgress } from './guild-trials.js';
+import { sourceFamePoints, upgradeFamePoints } from './fame.js';
 import { upgradePayment, upgradePlan } from './inventory.js';
 import { counted, foreign, takenOff, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
@@ -901,7 +902,8 @@ export async function deliverSettlementOrder(context) {
   // batch just before its save, under that save's own condition (`where`,
   // about the character as read), so it moves only with the save, once for
   // two taps at once (the week's order makes the same Osada for both).
-  const trial = (where) => trialProgress(db, row.id, { orders: 1 }, context.now, where);
+  // The order's Punkty Sławy too (fame.js), under the same condition.
+  const trial = (where) => [...trialProgress(db, row.id, { orders: 1 }, context.now, where), ...sourceFamePoints(db, row.id, 'order', 1, context.now, where)];
   if (done.take.kind === 'craft') {
     await deliverCrafted(db, player, done, { settlement: JSON.stringify(next), quests, trial });
     const after = await loadPlayer(db, session.userId);
@@ -1199,6 +1201,8 @@ export async function upgradeCompanionItem(context) {
       sql: '(SELECT settlement FROM characters WHERE id = ?) = ?',
       binds: [row.id, saved],
     }),
+    // Its Punkty Sławy (fame.js), the same way.
+    ...upgradeFamePoints(db, row.id, outcome, context.now, { sql: '(SELECT settlement FROM characters WHERE id = ?) = ?', binds: [row.id, saved] }),
   ]);
   if (result.meta.changes !== 1) throw changedItem();
   const after = await loadPlayer(db, session.userId);

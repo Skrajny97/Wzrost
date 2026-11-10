@@ -47,6 +47,7 @@ import towers from '../../data/towers.json' with { type: 'json' };
 import portals from '../../data/portals.json' with { type: 'json' };
 import guilds from '../../data/guilds.json' with { type: 'json' };
 import cosmetics from '../../data/cosmetics.json' with { type: 'json' };
+import fame from '../../data/fame.json' with { type: 'json' };
 // The English texts (data/en/), by the data file they translate. A file
 // added there is named here too (tools/i18n-check.mjs checks it).
 import enAffixes from '../../data/en/affixes.json' with { type: 'json' };
@@ -63,6 +64,7 @@ import enElements from '../../data/en/elements.json' with { type: 'json' };
 import enEncyclopedia from '../../data/en/encyclopedia.json' with { type: 'json' };
 import enEvents from '../../data/en/events.json' with { type: 'json' };
 import enEvolutions from '../../data/en/evolutions.json' with { type: 'json' };
+import enFame from '../../data/en/fame.json' with { type: 'json' };
 import enGiftCodes from '../../data/en/gift-codes.json' with { type: 'json' };
 import enGuilds from '../../data/en/guilds.json' with { type: 'json' };
 import enItemBases from '../../data/en/item-bases.json' with { type: 'json' };
@@ -121,6 +123,7 @@ const polishData = {
   portals,
   guilds,
   cosmetics,
+  fame,
   tutorial,
   music,
   sounds,
@@ -143,6 +146,7 @@ export const OVERLAYS = {
     encyclopedia: enEncyclopedia,
     events: enEvents,
     evolutions: enEvolutions,
+    fame: enFame,
     'gift-codes': enGiftCodes,
     guilds: enGuilds,
     'item-bases': enItemBases,
@@ -281,6 +285,9 @@ export function publicContent() {
     // The Ranking's tabs and the periods of its "Gildie", and the words of
     // the best guild of last week by its gold tag (guild-fame.js, 380 C).
     guildFame: { tabs: game.guilds.fame.texts.tabs, periods: game.guilds.fame.texts.periods, champion: game.guilds.fame.texts.champion },
+    // The words of the best character of last week's Punkty Sławy by its
+    // gold name (fame.js, 760 A).
+    fame: { champion: game.fame.texts.champion },
     // The Sklep Systemu (cosmetics.js): its cosmetics with their prices and
     // looks, for the shop and for every portrait and name that wears one,
     // and the words of its page.

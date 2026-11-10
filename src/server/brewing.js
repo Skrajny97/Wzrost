@@ -39,6 +39,7 @@ import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, insertWork, requireProfessions, takeFromBag, workGains } from './professions.js';
+import { workFamePoints } from './fame.js';
 import { herbsOf, potionKnown, potionsOf, settlementPointsOf } from './professions-view.js';
 import { perkOf } from './perks.js';
 import { trimReports } from './reports.js';
@@ -220,6 +221,8 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
       // The Próby Gildii's trial too (guild-trials.js).
       // A trial taken before the brewing began (takenBefore).
       ...trialProgress(db, row.id, { potions: { [potion.id]: made.count } }, now, takenBefore(options.begun)),
+      // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
+      ...workFamePoints(db, row.id, worked, avatar, now),
       end,
     ]);
   } catch (error) {

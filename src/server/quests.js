@@ -8,6 +8,7 @@ import { QUEST_PERIODS, bagCapacity, campLevels, chestGold, chestItem, chestRead
 import { content } from './content.js';
 import { bagPlaces, characterView, equippedItems, loadPlayer, questContext, questsNow, requirePlayer } from './characters.js';
 import { atomically, sameVersion } from './atomic.js';
+import { questFamePoints } from './fame.js';
 import { ApiError, json, readJson } from './http.js';
 
 // A JSON path for an id with a hyphen ("iron-ore").
@@ -41,17 +42,23 @@ function rewardsSql(rewards) {
 }
 
 // Saves the rewards of the quests at the indexes, with the quests marked as
-// claimed, and answers with the rewards and the character.
+// claimed and their Punkty Sławy (fame.js), and answers with the rewards
+// and the character.
 async function saveClaims(context, session, player, quests, periodId, indexes) {
   const rewards = indexes.map((index) => quests[periodId].quests[index].reward);
   const claimed = indexes.reduce((next, index) => withClaimed(next, periodId, index), quests);
   const { sql, binds } = rewardsSql(rewards);
   const db = context.env.DB;
   const row = player.row;
-  const result = await db
-    .prepare(`UPDATE characters SET ${sql}, quests = ?, version = version + 1 WHERE id = ? AND version = ?`)
-    .bind(...binds, JSON.stringify(claimed), row.id, row.version)
-    .run();
+  const [, result] = await atomically(
+    db,
+    [
+      sameVersion(db, row),
+      db.prepare(`UPDATE characters SET ${sql}, quests = ?, version = version + 1 WHERE id = ? AND version = ?`).bind(...binds, JSON.stringify(claimed), row.id, row.version),
+      ...questFamePoints(db, row.id, periodId, indexes.length, context.now),
+    ],
+    changed,
+  );
   if (result.meta.changes !== 1) throw changed();
   return { rewards, character: characterView(await loadPlayer(db, session.userId), context.now) };
 }

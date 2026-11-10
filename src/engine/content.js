@@ -214,6 +214,8 @@ export function buildContent(raw) {
     portals: raw.portals ?? null,
     // The players' Gildie (src/server/guilds.js).
     guilds: raw.guilds ?? null,
+    // The characters' Punkty Sławy (fame.js).
+    fame: raw.fame ?? null,
     // The Sklep Systemu's cosmetics (cosmetics.js) and the words of its page.
     cosmetics: raw.cosmetics?.items ?? [],
     cosmeticsById: byId(raw.cosmetics?.items ?? []),

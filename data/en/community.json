@@ -15,6 +15,9 @@
     },
     "party": {
       "name": "Party"
+    },
+    "fame": {
+      "name": "Fame"
     }
   },
   "gift": {

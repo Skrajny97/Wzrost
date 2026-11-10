@@ -101,11 +101,17 @@ export function guildTag(tag) {
 
 // A character's name in its frame's colour, with a soft glow (the Sklep
 // Systemu's "Kolor imienia jak ramka"), wherever its guild's tag goes with
-// it; without a colour, as it was.
+// it; without a colour, as it was. The best character of last week's
+// Punkty Sławy has its name in gold instead, the whole week (760 A,
+// src/server/fame.js), its words under a pointer, as the best guild's tag.
 export function framedName(element, color) {
   if (color) {
     element.classList.add('name--framed');
     element.style.setProperty('--name-color', color);
+  }
+  if (state.fame?.champion && element.textContent === state.fame.champion) {
+    element.classList.add('name--fame');
+    element.title = state.content?.fame?.champion ?? '';
   }
   return element;
 }
@@ -116,11 +122,13 @@ export function guided(element, guide) {
   return element;
 }
 
-export function pageHeading(title, subtitle, { tag = null, nameColor = null } = {}) {
+// A title that is a character's name comes with its `nameColor` (null for
+// none), so it shows as names do (framedName).
+export function pageHeading(title, subtitle, { tag = null, nameColor } = {}) {
   return h(
     'div',
     { class: 'page-heading' },
-    h('h1', { class: 'page-title', tabindex: '-1' }, nameColor ? framedName(h('span', { text: title }), nameColor) : title, tag && [' ', guildTag(tag)]),
+    h('h1', { class: 'page-title', tabindex: '-1' }, nameColor !== undefined ? framedName(h('span', { text: title }), nameColor) : title, tag && [' ', guildTag(tag)]),
     subtitle && h('p', { class: 'page-subtitle', text: subtitle }),
   );
 }

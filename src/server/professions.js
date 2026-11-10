@@ -28,6 +28,7 @@ import { toHex } from './encoding.js';
 import { professionsOn } from './features.js';
 import { assertion, raced } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
+import { workFamePoints } from './fame.js';
 import { ApiError, json, readJson } from './http.js';
 import { herbsOf } from './professions-view.js';
 import { perkOf } from './perks.js';
@@ -207,6 +208,8 @@ export async function finishGathering(db, player, now, { avatar = false } = {}) 
       // The Próby Gildii's trial too (guild-trials.js).
       // A trial taken before the gathering set out (takenBefore).
       ...trialProgress(db, row.id, { herbs: found }, now, takenBefore(JSON.parse(activity.options ?? '{}').begun)),
+      // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
+      ...workFamePoints(db, row.id, activity.minutes, avatar, now),
       db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at),
     ]);
   } catch (error) {
