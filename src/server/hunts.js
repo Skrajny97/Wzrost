@@ -587,8 +587,7 @@ export async function claimHunt(context) {
   if (player.activity?.kind === 'mercenary') requireIdle(player, now);
   // The option chosen in the event at the exploration's end, if one came.
   const body = (context.request.headers.get('Content-Type') ?? '').startsWith('application/json') ? await readJson(context.request) : {};
-  const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels }[player.activity?.kind];
-  const done = finish && player.activity.ends_at <= now ? await finish(context.env.DB, player, now) : await finishHunt(context.env.DB, player, now, { choice: body.choice });
+  const done = await finishActivity(context.env.DB, player, now, { choice: body.choice });
   // A work whose recipe or pattern the game no longer has gave back what it
   // took and made no report.
   if (!done) return json({ character: characterView(await loadPlayer(context.env.DB, session.userId), now) });
@@ -599,6 +598,15 @@ export async function claimHunt(context) {
     report: { id, createdAt: now, ...report },
     character: characterView(await loadPlayer(context.env.DB, session.userId), now),
   });
+}
+
+// The claim of the activity that ended, as "Odbierz raport" makes it: a
+// profession's work by its own finish, an exploration by finishHunt (with
+// the option chosen in the event at its end, if one came). Also the claim
+// of a Drużyna's member as its party sets out (parties.js).
+export function finishActivity(db, player, now, { choice } = {}) {
+  const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels }[player.activity?.kind];
+  return finish && player.activity.ends_at <= now ? finish(db, player, now) : finishHunt(db, player, now, { choice });
 }
 
 // The Osada after an exploration of `minutes`: each companion who went
