@@ -8,7 +8,7 @@
 // content (skill-demo.js, encyclopedia.js) is kept for each language apart.
 
 import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, evolutionArt, landBestiaryChest, meetingChances, ordinaryMaterial, overlayTexts, regionDangers, weeksContent } from '../engine/index.js';
-import { arenaOn, buildingOn, craftingOn, evolutionsOn, placeOn, settlementOn } from './features.js';
+import { arenaOn, buildingOn, craftingOn, evolutionsOn, guildWarsOn, placeOn, settlementOn } from './features.js';
 import { language, languageOffered, pageDictionary } from './i18n.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
@@ -285,8 +285,9 @@ export function publicContent() {
     // The picture behind the Gildia page's heading, once one is chosen.
     guildPlace: game.guilds.place ?? null,
     // The tabs of the Gildia page: its members, the Siedziba, the Wyprawa,
-    // the Bestia, the Próby, the Prośby Gildii and the Wymiana.
-    guildTabs: game.guilds.tabs,
+    // the Bestia, the Próby, the Prośby Gildii, the Wymiana, the Skrzynia
+    // and, where the guild wars are on (features.js), the Wojna.
+    guildTabs: game.guilds.tabs.filter((tab) => tab.id !== 'war' || guildWarsOn()),
     // The words of "Poproś gildię", shown where pieces are missing, before
     // the Prośby Gildii answer (src/client/guild-requests.js).
     guildAsk: game.guilds.requests.texts.ask,

@@ -2671,5 +2671,19 @@
   "Na dziś to już wszystkie Punkty Czasu od Pustelnika. Wróć jutro.": "That's all the Time Points the Hermit sells today. Come back tomorrow.",
   "Tyle Punktów Czasu Pustelnik dziś już nie sprzeda.": "The Hermit won't sell that many Time Points today.",
   "Skórki": "Outfits",
-  "Ta skórka jest dla innej klasy.": "This outfit is for another class."
+  "Ta skórka jest dla innej klasy.": "This outfit is for another class.",
+  "Drużyny rywala": "Rival's teams",
+  "Test wojny": "War test",
+  "Na wersji testowej rozpoczniesz tu wojnę od razu, z lustrzaną gildią: jej drużyny walczą jak drużyny Twojej gildii, pod innymi imionami. Bitwy wieczoru rozegrasz od razu, dzień po dniu, aż do niedzieli i końca wojny.": "On the test version you can start a war here at once, against a mirror guild: its teams fight like your guild's teams, under other names. You fight an evening's battles at once, day after day, up to Sunday and the end of the war.",
+  "Rozpocznij wojnę teraz": "Start the war now",
+  "Wojna testowa trwa.": "The test war is on.",
+  "Rozegraj bitwy: {day}": "Fight the battles: {day}",
+  "Bitwy rozegrane.": "The battles are fought.",
+  "Zakończ wojnę testową": "End the test war",
+  "Wojna testowa zakończona.": "The test war is over.",
+  "Nie udało się wczytać wojny.": "The war could not be loaded.",
+  "W tym tygodniu gildia już ma wojnę.": "The guild already has a war this week.",
+  "Wybierz od 1 do 6 drużyn.": "Choose from 1 to 6 teams.",
+  "Nie ma wojny, której bitwy można by teraz rozegrać.": "There is no war whose battles could be fought now.",
+  "Nie ma wojny testowej do zakończenia.": "There is no test war to end."
 }

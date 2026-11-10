@@ -83,7 +83,11 @@
     // building 770.2 D) from character level 25. In the live game from
     // version 0.2.38, once the classes were evened out in its duels and the
     // weaker paths strengthened (772, 780 A; the author: "781 B").
-    "ARENA": "on"
+    "ARENA": "on",
+    // "on": the guild wars (src/server/guild-wars.js, 792–800): the Gildia's
+    // Wojna tab, its teams and the battles every evening at 20:00 (the cron
+    // below). Off in the live game for now: first on the test version.
+    "GUILD_WARS": "off"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain
@@ -91,7 +95,8 @@
   // the console.
   "send_email": [{ "name": "EMAIL" }],
   // Every minute the server sends the phone notifications whose time has
-  // come (src/server/push.js).
+  // come (src/server/push.js), and fights the guild wars' battles whose
+  // evening has come (src/server/guild-wars.js).
   "triggers": {
     "crons": ["* * * * *"]
   },
@@ -143,7 +148,10 @@
         "WEEKS": "on",
         // The Arena PvP in the Osada (src/server/pvp-arena.js, 762 A), as in
         // the game.
-        "ARENA": "on"
+        "ARENA": "on",
+        // The guild wars (src/server/guild-wars.js, 792–800), only here for
+        // now, with "Test wojny" in the Wojna tab (TUTORIAL_TESTS).
+        "GUILD_WARS": "on"
       },
       "triggers": {
         "crons": ["* * * * *"]

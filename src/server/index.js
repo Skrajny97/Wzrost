@@ -36,6 +36,7 @@ import { askGuild, cancelGuildRequest, getGuildRequests, giveToGuildRequest, tha
 import { getGuildTodo } from './guild-todo.js';
 import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } from './guild-exchange.js';
 import { getGuildChest, putInGuildChest, takeFromGuildChest } from './guild-chest.js';
+import { getGuildWar, getGuildWarBattle, placeInWarTeam, settleWars, testGuildWar } from './guild-wars.js';
 import { donateToGuildSeat, getGuildSeat, preferGuildSeat } from './guild-seat.js';
 import { guildRanking } from './guild-fame.js';
 import { claimFame, getFame } from './fame.js';
@@ -62,7 +63,7 @@ import {
 import { publicContent } from './content.js';
 import { googleCallback, googleConfigured, startGoogle } from './google.js';
 import { ApiError, errorResponse, json } from './http.js';
-import { englishOn, readFeatures, registrationOpen, settlementOn } from './features.js';
+import { englishOn, guildWarsOn, readFeatures, registrationOpen, settlementOn } from './features.js';
 import { language, pageDictionary, requestLanguage, runInLanguage, t } from './i18n.js';
 import { bidOnOffer, buyFromResident, buyOffer, cancelOffer, collectParcels, getMarket, getMarketLog, listOffer, settleMarket } from './market.js';
 import { cancelHunt, claimHunt, huntOptions, quickHunt, startHunt } from './hunts.js';
@@ -366,6 +367,11 @@ const routes = [
   ['GET', '/api/guild/chest', getGuildChest],
   ['POST', '/api/guild/chest/put', putInGuildChest],
   ['POST', '/api/guild/chest/take', takeFromGuildChest],
+  // The guild wars (guild-wars.js, 792–800), where GUILD_WARS is on.
+  ['GET', '/api/guild/war', getGuildWar],
+  ['GET', '/api/guild/war/battles/:id', getGuildWarBattle],
+  ['POST', '/api/guild/war/place', placeInWarTeam],
+  ['POST', '/api/test/guild-war', testGuildWar],
   // The guilds' ranking by their Sława (guild-fame.js, 381 A).
   ['GET', '/api/ranking/guilds', guildRanking],
   // The characters' Punkty Sławy, the Sława tab of the Społeczność (fame.js, 760 A).
@@ -477,6 +483,9 @@ export default {
       // The guilds' boards of the Próby Gildii drawn as the week starts and
       // their trials of the day opened for every member (guild-trials.js).
       () => openGuildTrials(env.DB, controller.scheduledTime),
+      // The guild wars' rivals drawn as the week starts and their battles
+      // fought every evening at 20:00 (guild-wars.js), where they are on.
+      () => guildWarsOn() && settleWars(env.DB, controller.scheduledTime),
     ];
     for (const job of jobs) {
       try {

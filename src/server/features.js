@@ -12,7 +12,8 @@
 // Polish and offers no choice of language. The weeks of the year
 // (src/server/weeks.js) give their effects where WEEKS is "on"; the API
 // tests turn them off, so a test's numbers do not hang on the week it runs
-// in. The env is the same for every
+// in. The guild wars (guild-wars.js) are only where GUILD_WARS is "on":
+// first on the test version. The env is the same for every
 // request of a deployment, so the switches are read once per request
 // (index.js) and kept here for the rest of the code.
 
@@ -27,6 +28,7 @@ let fortress = false;
 let english = false;
 let arena = false;
 let weeks = false;
+let guildWars = false;
 
 export function readFeatures(env) {
   professions = env.PROFESSIONS === 'on';
@@ -40,6 +42,7 @@ export function readFeatures(env) {
   english = env.ENGLISH === 'on';
   arena = env.ARENA === 'on';
   weeks = env.WEEKS === 'on';
+  guildWars = env.GUILD_WARS === 'on';
 }
 
 export const professionsOn = () => professions;
@@ -67,6 +70,10 @@ export const arenaOn = () => arena;
 export const placeOn = (place) => place.feature !== 'arena' || arena;
 // The weeks of the year (weeks.js), where WEEKS is "on".
 export const weeksOn = () => weeks;
+// The guild wars (guild-wars.js; 792–800), where GUILD_WARS is "on": first
+// on the test version. Off, nothing of them shows: not the Gildia's Wojna
+// tab, the routes, the evening's battles nor their Sława.
+export const guildWarsOn = () => guildWars;
 // A camp building of the Osada's (Kwatery, `settlement` in buildings.json)
 // stands only where the Osada is on, and one of the Warownia's (`fortress`)
 // only where the Warownia is; the others everywhere.
