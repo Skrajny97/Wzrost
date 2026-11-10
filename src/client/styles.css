@@ -16276,3 +16276,85 @@ a.discord-button {
   line-height: 1.4;
   overflow-wrap: anywhere;
 }
+
+/* The round chat button over the game on a phone (782 C, chat-bubble.js):
+   above the screen, under the toasts (50) and the narrator's pointing (60);
+   it follows the finger while dragged and glides to the side edge after.
+   The × it can be dropped on to hide it shows at the bottom meanwhile. */
+.chat-bubble {
+  position: fixed;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  background: var(--bg-deep);
+  color: var(--text);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    left 0.18s ease,
+    top 0.18s ease;
+}
+
+.chat-bubble--dragging,
+.calm .chat-bubble {
+  transition: none;
+}
+
+.chat-bubble--dragging {
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6);
+}
+
+.chat-bubble-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  display: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--bg-deep);
+}
+
+.chat-bubble--news .chat-bubble-dot {
+  display: block;
+}
+
+.chat-bubble-bin {
+  position: fixed;
+  z-index: 39;
+  bottom: calc(var(--nav-height) + 18px + env(safe-area-inset-bottom));
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-left: -28px;
+  border: 2px solid rgba(231, 220, 194, 0.7);
+  border-radius: 50%;
+  background: rgba(13, 17, 11, 0.8);
+  color: var(--text);
+  pointer-events: none;
+  transition: transform 0.12s ease;
+}
+
+.chat-bubble-bin--near {
+  border-color: var(--danger);
+  background: rgba(120, 36, 26, 0.9);
+  transform: scale(1.18);
+}
+
+/* The Czat's own screen (screens/chat.js): its rooms' tabs in the
+   Społeczność's sticky strip under the title. */
+.chat-screen-bar:empty {
+  display: none;
+}

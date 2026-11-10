@@ -372,6 +372,10 @@
     "0.2.38": {
       "title": "Version 0.2.38",
       "body": "- The Arena is open in the Settlement from character level 25: duels with other players' characters, with a ranking and weekly rewards. Armour and reflected damage count only in part there, the same for every class.\n- Weaker evolution paths are stronger on explorations. Elementalist: Fire Burst scorches the other enemies harder. Arcanist: the elemental hits harder and stays longer. Druid: the ent and the bear hit harder. Bastion: Shield Wall also raises its damage.\n- Shadows that put points into Strength got them back to spend again, since Strength gives this class nothing."
+    },
+    "0.2.39": {
+      "title": "Version 0.2.39",
+      "body": "- Chat bubble: on a phone, a round chat button floats over the game. Tap it and the chat opens on its own screen. Drag it with your finger to another spot by the edge, or drop it on the × to hide it. Turn on “Chat bubble” in the Settings to bring it back."
     }
   }
 }

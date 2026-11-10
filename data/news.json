@@ -470,6 +470,11 @@
       "id": "0.2.38",
       "title": "Wersja 0.2.38",
       "body": "- Arena jest otwarta w Osadzie od 25. poziomu postaci: pojedynki z postaciami innych graczy, z rankingiem i nagrodami tygodnia. Pancerz i odbite obrażenia liczą się w nich w części, tak samo dla każdej klasy.\n- Słabsze ścieżki ewolucji są silniejsze na wyprawach. Elementalista: Ognisty wybuch mocniej parzy pozostałych wrogów. Arkanista: żywiołak bije mocniej i zostaje dłużej. Druid: ent i niedźwiedź biją mocniej. Bastion: Mur tarcz zwiększa też jego obrażenia.\n- Cienie, które rozdały punkty w Siłę, dostały je z powrotem do rozdania, bo Siła tej klasie nic nie daje."
+    },
+    {
+      "id": "0.2.39",
+      "title": "Wersja 0.2.39",
+      "body": "- Czat w kółku: na telefonie nad grą stoi okrągły przycisk czatu. Stuknij, a czat otworzy się na osobnym ekranie. Przeciągnij go palcem w inne miejsce przy krawędzi albo upuść na ×, żeby go schować. Wróci po włączeniu „Kółko czatu” w Ustawieniach."
     }
 ]
 }

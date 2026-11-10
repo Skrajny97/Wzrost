@@ -13,6 +13,7 @@ import { inAppBrowser, installBlock, installButton } from './install.js';
 import { buildTopbar, showWallet, updateNav, updateTopbar } from './layout.js';
 import { desktopLayout, layoutChoice, layoutOffered, onLayoutChange, setLayoutChoice } from './layout-mode.js';
 import { updateSide } from './side.js';
+import { chatBubbleOn, setChatBubbleOn, updateChatBubble } from './chat-bubble.js';
 // The computer's keys 1–6 for the main tabs (477 A, 508 A).
 import './keys.js';
 import { showQuests, watchQuests } from './quests.js';
@@ -28,6 +29,7 @@ import { mountCombat } from './screens/combat.js';
 import { mountTowers } from './screens/towers.js';
 import { mountPortals } from './screens/portals.js';
 import { mountCommunity } from './screens/community.js';
+import { mountChatScreen } from './screens/chat.js';
 import { mountGuildPage } from './screens/guild.js';
 import { checkChat, onActivityEnds, onChatNews } from './chat-news.js';
 import { activityMoved } from './activity-sync.js';
@@ -88,6 +90,10 @@ const ROUTES = [
   { pattern: /^#\/osada(?:\/(?<place>[a-z0-9-]+)(?:\/(?<tab>[a-z]+))?)?$/, nav: 'main', tab: 'osada', part: ({ place }) => place, mount: mountSettlement },
   // The Społeczność, or one of its parts (the computer menu's shortcuts).
   { pattern: /^#\/spolecznosc(?:\/(?<section>[a-z]+))?$/, nav: 'main', tab: 'spolecznosc', mount: mountCommunity },
+  // The Czat on a screen of its own, from the round chat button over the
+  // game on a phone (782 C, chat-bubble.js, screens/chat.js).
+  // No tab of the bottom bar lights on it (`lit` names none).
+  { pattern: /^#\/czat$/, nav: 'main', tab: null, lit: 'czat', mount: mountChatScreen },
   // The Gildia's own page, from its tab in the Społeczność, at one of its
   // tabs (data/guilds.json, tabs).
   { pattern: /^#\/gildia(?:\/(?<tab>[a-z]+))?$/, nav: 'main', tab: null, lit: 'spolecznosc', part: () => 'guilds', mount: mountGuildPage },
@@ -117,6 +123,7 @@ let ticker = null;
 function show(name) {
   for (const [key, view] of Object.entries(views)) view.hidden = key !== name;
   updateSide();
+  updateChatBubble();
 }
 
 // Another layout (the settings, or the window grown or shrunk past a
@@ -124,6 +131,7 @@ function show(name) {
 onLayoutChange(() => {
   renderNav();
   updateSide();
+  updateChatBubble();
 });
 
 // How a return from Google sign-in went: the server sends the browser to
@@ -528,8 +536,10 @@ onCharacterChange(() => {
   if (views.game.hidden || !current) return;
   updateTopbar();
   renderNav();
-  // The chat in the side column once the Społeczność opens.
+  // The chat in the side column once the Społeczność opens, or its round
+  // button on a phone.
   updateSide();
+  updateChatBubble();
   current.screen.update?.();
   // A moment later, at the page's address then: a chapter the claim of a
   // report brings begins after the report, not over it (664).
@@ -856,6 +866,31 @@ function tutorialsRow() {
   );
 }
 
+// "Kółko czatu" (782 C): the round chat button over the game on this
+// device (chat-bubble.js), which dragging it onto its × turns off. Not on a
+// computer with the chat's column, where there is no button.
+function chatBubbleRow() {
+  if (!isUnlocked('community') || !$('#side').hidden) return null;
+  const toggle = h('button', { type: 'button', class: 'toggle', role: 'switch', 'aria-labelledby': 'chat-bubble-label', 'aria-describedby': 'chat-bubble-hint' });
+  const show = () => {
+    const on = chatBubbleOn();
+    toggle.setAttribute('aria-checked', String(on));
+    toggle.textContent = on ? t('Włączone') : t('Wyłączone');
+  };
+  toggle.addEventListener('click', () => {
+    setChatBubbleOn(!chatBubbleOn());
+    show();
+  });
+  show();
+  return h(
+    'div',
+    { class: 'status-row status-row--hinted' },
+    h('dt', { id: 'chat-bubble-label', text: t('Kółko czatu') }),
+    h('dd', {}, toggle),
+    h('dd', { class: 'status-hint', id: 'chat-bubble-hint', text: t('Okrągły przycisk czatu nad grą. Przesuń go palcem w inne miejsce przy krawędzi ekranu albo upuść na ×, żeby go schować.') }),
+  );
+}
+
 // An account with test mode opens only with Google once linked, so the
 // player is asked first.
 async function confirmGoogleOnly(event) {
@@ -918,6 +953,7 @@ function openSettings() {
       h('div', { class: 'status-row' }, h('dt', { id: 'voice-label', text: t('Głos narratora') }), h('dd', {}, voiceSwitch('voice-label'))),
       tutorialsRow(),
       h('div', { class: 'status-row' }, h('dt', { id: 'motion-label', text: t('Animacje') }), h('dd', {}, motionSwitch('motion-label'))),
+      chatBubbleRow(),
       pushRow(),
       tradeRows(),
       zoomOffered() && zoomRow(),

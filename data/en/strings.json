@@ -2645,5 +2645,9 @@
   "Kamień wypadnie i wróci do Twoich minerałów: {gem}.": "The gem will fall out and go back to your minerals: {gem}.",
   "Kamień {gem} wypadł i wrócił do zapasu.": "The gem {gem} fell out and went back to your stock.",
   "Kamienie z nich wypadną i wrócą do Twoich minerałów: {gems}.": "Their gems will fall out and go back to your minerals: {gems}.",
-  "Kamień z niego wróci wtedy do Twoich minerałów.": "Its gem then goes back to your minerals."
+  "Kamień z niego wróci wtedy do Twoich minerałów.": "Its gem then goes back to your minerals.",
+  "Czat, nowe wiadomości": "Chat, new messages",
+  "Kółko czatu schowane. Włączysz je z powrotem w Ustawieniach.": "Chat bubble hidden. You can turn it back on in the Settings.",
+  "Kółko czatu": "Chat bubble",
+  "Okrągły przycisk czatu nad grą. Przesuń go palcem w inne miejsce przy krawędzi ekranu albo upuść na ×, żeby go schować.": "A round chat button over the game. Drag it with your finger to another spot by the edge of the screen, or drop it on the × to hide it."
 }
