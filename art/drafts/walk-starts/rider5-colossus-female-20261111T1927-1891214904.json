@@ -1,0 +1,19 @@
+{
+  "id": "rider5-colossus-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the woman knight of the reference picture riding: the same open-faced dark steel helmet with gold trim and a tall blue plume, the same dark steel plate armour with gold trim and rounded pauldrons, the same deep blue tabard with the golden tower falling over the thigh, dark steel gauntlets and boots, a slim woman, not bulky; no shield and no mace, nothing in the hands but the reins; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding the reins; only the near leg showing: the thigh lying forward and level from the hip to the knee, the lower leg hanging straight down from the knee, a whole armoured foot at the bottom with the toes pointing right; the whole figure from the top of the plume to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/colossus-female.png",
+      "usage": "the character's look: this same woman, her face, helmet with the blue plume, armour, tabard and colours, drawn the same way; not her standing pose, not her shield and not her mace"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
