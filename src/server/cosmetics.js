@@ -50,12 +50,17 @@ const refuse = (block) => new ApiError(STATUS[block.code] ?? 409, block.code, bl
 
 // Saves the cosmetics only on the row as it was read (its version), with
 // `spent` Punkty Systemu taken, never below none: a second tap, or a
-// change in between, finds the version moved and changes nothing.
+// change in between, finds the version moved and changes nothing. The
+// points won in the game go first, the bought ones last (payments.js in the
+// engine, spentFrom): the bought ones never outnumber the rest.
 async function save(context, session, row, next, spent = 0) {
   const db = context.env.DB;
   const result = await db
-    .prepare('UPDATE characters SET system_points = system_points - ?, cosmetics = ?, version = version + 1 WHERE id = ? AND version = ? AND system_points >= ?')
-    .bind(spent, JSON.stringify(next), row.id, row.version, spent)
+    .prepare(
+      `UPDATE characters SET system_points = system_points - ?, system_points_paid = MAX(0, MIN(system_points_paid, system_points - ?)), cosmetics = ?, version = version + 1
+       WHERE id = ? AND version = ? AND system_points >= ?`,
+    )
+    .bind(spent, spent, JSON.stringify(next), row.id, row.version, spent)
     .run();
   if (result.meta.changes !== 1) throw characterChanged();
   return loadPlayer(db, session.userId);

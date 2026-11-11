@@ -15,7 +15,7 @@ export const DATA_FILES = [
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
   'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'portals', 'guilds', 'cosmetics', 'news', 'fame',
-  'weeks',
+  'weeks', 'payments',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'portals', 'core'];
@@ -750,6 +750,20 @@ function checkReferences(data) {
   errors.push(...checkGuildExpedition(data));
   errors.push(...checkGuildWar(data));
   errors.push(...checkWeeks(data, { stats }));
+  errors.push(...checkPayments(data));
+  return errors;
+}
+
+// The payments for Punkty Systemu (payments.json): each pack once, more
+// points for more money, and the limit lets the dearest pack be bought.
+function checkPayments(data) {
+  const errors = [];
+  const { packs, monthlyLimit } = data.payments;
+  uniqueIds(errors, 'payments', packs);
+  for (let i = 1; i < packs.length; i += 1) {
+    if (packs[i].points <= packs[i - 1].points || packs[i].price <= packs[i - 1].price) errors.push(`payments.json: pakiet ${packs[i].id} musi dawać więcej punktów za więcej pieniędzy niż ${packs[i - 1].id}`);
+  }
+  if (packs.some((pack) => pack.price > monthlyLimit)) errors.push('payments.json: limit miesięczny mniejszy niż cena pakietu');
   return errors;
 }
 

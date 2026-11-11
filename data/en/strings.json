@@ -2685,5 +2685,15 @@
   "W tym tygodniu gildia już ma wojnę.": "The guild already has a war this week.",
   "Wybierz od 1 do 6 drużyn.": "Choose from 1 to 6 teams.",
   "Nie ma wojny, której bitwy można by teraz rozegrać.": "There is no war whose battles could be fought now.",
-  "Nie ma wojny testowej do zakończenia.": "There is no test war to end."
+  "Nie ma wojny testowej do zakończenia.": "There is no test war to end.",
+  "Nie ma takiego pakietu.": "There is no such pack.",
+  "Zakupy na tym koncie są wstrzymane. Napisz do nas, a wyjaśnimy sprawę.": "Purchases on this account are on hold. Write to us and we will sort it out.",
+  "Zaakceptuj regulamin, żeby kupić.": "Accept the terms to buy.",
+  "Punkty Systemu mogą kupować tylko osoby pełnoletnie.": "Only adults can buy System Points.",
+  "Limit zakupów to {limit} na {days} dni. Do wykorzystania zostało {left}.": "The purchase limit is {limit} per {days} days. {left} is left to use.",
+  "Tego zakupu nie można już zwrócić.": "This purchase can no longer be returned.",
+  "Zwrot jest możliwy przez {days} dni od zapłaty.": "A purchase can be returned for {days} days after payment.",
+  "Punkty z tego zakupu zostały już wydane, więc nie można go zwrócić.": "The points from this purchase have already been spent, so it cannot be returned.",
+  "Powiadomienie bez ważnego podpisu.": "A notification without a valid signature.",
+  "Nieczytelne powiadomienie.": "An unreadable notification."
 }

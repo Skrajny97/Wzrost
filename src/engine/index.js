@@ -58,6 +58,7 @@ export * from './guild-seat.js';
 export * from './guild-expedition.js';
 export * from './guild-wars.js';
 export * from './cosmetics.js';
+export * from './payments.js';
 export * from './wanted.js';
 export * from './mercenaries.js';
 export * from './weeks.js';

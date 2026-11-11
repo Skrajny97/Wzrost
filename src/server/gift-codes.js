@@ -57,7 +57,9 @@ export async function moveGiftRewards(env, now, moves = content().giftMoves ?? [
     if (!pair.from) continue;
     await db.batch([
       db.prepare('INSERT INTO gift_moves_done (id, done_at, from_character, to_character) VALUES (?, ?, ?, ?)').bind(move.id, now, pair.from.id, pair.to.id),
-      db.prepare('UPDATE characters SET system_points = MAX(system_points - ?, 0), version = version + 1 WHERE id = ?').bind(move.systemPoints, pair.from.id),
+      db
+        .prepare('UPDATE characters SET system_points = MAX(system_points - ?, 0), system_points_paid = MIN(system_points_paid, MAX(system_points - ?, 0)), version = version + 1 WHERE id = ?')
+        .bind(move.systemPoints, move.systemPoints, pair.from.id),
       db.prepare('UPDATE characters SET system_points = system_points + ?, version = version + 1 WHERE id = ?').bind(move.systemPoints, pair.to.id),
       db
         .prepare('UPDATE gift_codes_used SET character_id = ? WHERE user_id = ? AND gift_id = ? AND character_id = ?')

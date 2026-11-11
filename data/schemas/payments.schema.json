@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Płatności za Punkty Systemu",
+  "description": "Pakiety Punktów Systemu za pieniądze i zasady zakupu (src/engine/payments.js, src/server/payments.js; DECISIONS.md, „Płatności za Punkty Systemu: podwaliny”). Kwoty w groszach, brutto.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["currency", "packs", "monthlyLimit", "limitDays", "withdrawalDays", "adultOnly", "termsVersion", "pendingHours"],
+  "properties": {
+    "$comment": { "type": "string" },
+    "currency": { "description": "Waluta cen (ISO 4217).", "type": "string", "pattern": "^[A-Z]{3}$" },
+    "packs": {
+      "description": "Pakiety w kolejności sklepu, od najmniejszego.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "points", "price"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+          "points": { "description": "Ile Punktów Systemu daje pakiet.", "type": "integer", "minimum": 1 },
+          "price": { "description": "Cena brutto w groszach.", "type": "integer", "minimum": 100 }
+        }
+      }
+    },
+    "monthlyLimit": { "description": "Najwięcej, ile konto płaci w ostatnich limitDays dniach, w groszach.", "type": "integer", "minimum": 100 },
+    "limitDays": { "type": "integer", "minimum": 1 },
+    "withdrawalDays": { "description": "Dni od zapłaty, w których niewydane kupione punkty można zwrócić.", "type": "integer", "minimum": 0 },
+    "adultOnly": { "description": "Kupują tylko osoby, które potwierdzą pełnoletność.", "type": "boolean" },
+    "termsVersion": { "description": "Wersja regulaminu, którą przyjmuje kupujący.", "type": "string", "minLength": 1 },
+    "pendingHours": { "description": "Ile godzin zamówienie czeka na zapłatę.", "type": "integer", "minimum": 1 }
+  }
+}

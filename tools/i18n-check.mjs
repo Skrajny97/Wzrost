@@ -305,8 +305,9 @@ const ID_KEYS = new Set(
   keys type types mode condition feature features flag start column default renameAt language`.split(/\s+/),
 );
 // Keys never read as texts, the swear filter's lists among them
-// (data/chat.json `words` and `wordsEn`).
-const SKIP_KEYS = new Set(['words', 'wordsEn', 'code', 'for', 'until', 'ramp', 'swatch', 'color', 'files', 'file', 'voice']);
+// (data/chat.json `words` and `wordsEn`), and a currency's code
+// (data/payments.json).
+const SKIP_KEYS = new Set(['words', 'wordsEn', 'code', 'for', 'until', 'ramp', 'swatch', 'color', 'files', 'file', 'voice', 'currency']);
 
 // Whether a Polish string of the data is a text to translate.
 export function dataText(value, key) {

@@ -42,6 +42,7 @@ import { guildRanking } from './guild-fame.js';
 import { claimFame, getFame } from './fame.js';
 import { cancelOrders, craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
+import { authorPayments, getPayments, orderPoints, paymentNotice, withdrawPurchase } from './payments.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
   autoPoints,
@@ -139,6 +140,8 @@ const routes = [
   ['POST', '/api/bug-reports', reportBug],
   ['GET', '/api/author/skills', authorSkills],
   ['GET', '/api/author/news', authorNews],
+  // The sales of Punkty Systemu for the bookkeeping (payments.js), where PAYMENTS is on.
+  ['GET', '/api/author/payments', authorPayments],
   ['POST', '/api/author/news', publishNews],
   ['POST', '/api/author/news/edit', editNews],
   ['POST', '/api/author/news/delete', deleteNews],
@@ -179,6 +182,12 @@ const routes = [
   ['POST', '/api/cosmetics/buy', buyCosmetic],
   ['POST', '/api/cosmetics/wear', wearCosmetic],
   ['POST', '/api/cosmetics/name-color', setNameColor],
+  // Punkty Systemu bought for money (payments.js), only where PAYMENTS names
+  // a gateway; the gateway's own news comes to /notify/<its name>.
+  ['GET', '/api/payments', getPayments],
+  ['POST', '/api/payments/order', orderPoints],
+  ['POST', '/api/payments/withdraw', withdrawPurchase],
+  ['POST', '/api/payments/notify/:provider', paymentNotice],
   ['POST', '/api/items/:id/equip', equipItem],
   ['POST', '/api/items/:id/unequip', unequipItem],
   ['POST', '/api/items/:id/discard', discardItem],

@@ -3034,6 +3034,19 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Płatności za Punkty Systemu: podwaliny (11.11.2026)
+
+Autor 11.11.2026: „Przygotuj natomiast pełną instrukcję włączenia płatności za Punkty Systemu w grze […] Spisz to lub zacznij budować podwaliny tak, by odbyło się to bezpiecznie” i „Tak, wdrażamy płatności przed Sklepem Play”. Instrukcja, regulamin i ryzyka są w dokumencie „Płatności za Punkty Systemu” (https://claude.ai/artifact/8kgnbXhVbDHzo1NFwHdKLi), a decyzje autora w pytaniach 804–808 na stronie ocen.
+
+1. **Za flagą.** Wszystko działa tylko tam, gdzie zmienna `PAYMENTS` wskazuje bramkę (`src/server/features.js`). Dziś nie ma jej nigdzie, więc w grze i na wersji testowej nic się nie zmienia, a trasy odpowiadają „nie znaleziono”. Bramka „test” służy tylko testom: nie bierze pieniędzy, a jej powiadomienia są podpisane kluczem `PAYMENTS_TEST_SECRET`; bez tego klucza nie wierzy żadnemu. Prawdziwa bramka (Tpay, PayU, Autopay albo Paynow, pytanie 805) dojdzie w `src/server/payment-providers.js`, z kluczami w sekretach.
+2. **Księga zakupów** (`purchases`, migracja 0111). Zamówienie zapisuje serwer przed zapłatą: własny numer, konto, postać, pakiet z ceną z danych (grosze, brutto), kraj połączenia (do VAT w OSS), bramkę, wersję regulaminu i zgodę 18+. Punkty dopisuje tylko podpisane powiadomienie bramki o zapłacie tej samej kwoty i waluty. Każda zmiana zakupu i punktów idzie jedną paczką z jednorazowym znacznikiem, więc to samo powiadomienie dwa razy ani dwa naraz nie dopiszą punktów podwójnie.
+3. **Punkty kupione osobno od zdobytych** (`characters.system_points_paid`). Wydawanie w Sklepie Systemu bierze najpierw punkty zdobyte w grze, a kupione na końcu, żeby dało się je zwrócić. Kupione nigdy nie przewyższają wszystkich.
+4. **Zwrot** (`POST /api/payments/withdraw`). Przez `withdrawalDays` dni od zapłaty, gdy punkty z zakupu są niewydane: punkty znikają od razu, pieniądze wracają przez bramkę. Zwrot zrobiony w panelu bramki albo obciążenie zwrotne zabierają punkty, nigdy poniżej zera. Po obciążeniu zwrotnym konto nie kupuje, dopóki autor tego nie wyjaśni (`users.purchases_blocked`).
+5. **Limit i wiek.** Zamówienie wymaga zaznaczenia regulaminu i pełnoletności. Konto płaci najwyżej `monthlyLimit` w ostatnich `limitDays` dniach; liczą się zakupy zapłacone i czekające.
+6. **Panel autora** (`GET /api/author/payments`): sprzedaż z 30 dni według polskich dni (liczba, kwota brutto, zwroty) i zakupy czekające na ręczne załatwienie: zwrot niepotwierdzony przez bramkę albo zapłacony zakup postaci, której już nie ma. To podstawa dziennego zestawienia sprzedaży dla księgowości.
+7. **Wartości tymczasowe** w `data/payments.json` to polecane odpowiedzi na 806 A (tylko 18+, limit 400 zł na 30 dni), 807 A (zwrot przez 14 dni) i 808 A (100 PS = 2 zł). Zmienią się według odpowiedzi autora.
+8. **Co jeszcze przed włączeniem:** bramka z jej podpisem i sprawdzaniem stanu transakcji w jej API (805), ekran zakupu (najpierw makiety), e-mail z potwierdzeniem zakupu i zgód, rozdział regulaminu o PS z danymi sprzedawcy z sekretów, ukrycie sklepu w aplikacji ze Sklepu Play, a w niej później Google Play Billing.
+
 ## Wersja 0.2.59 (11.11.2026): Szaty Świtu i Szata Zaćmienia w Sklepie Systemu
 
 Autor 11.11.2026: „Te płatności jutro (a właściwie dzisiaj) ogarniemy po wprowadzeniu wszystkich nowych skórek.” Ostatnie grafiki obu skórek autor przyjął na stronie ocen 10.11 po 23:00 (775.5 v5, 776.7 v5, 776.8 v5 i 776.6 v6 B).

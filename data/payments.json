@@ -1,0 +1,16 @@
+{
+  "$comment": "Payments for Punkty Systemu (src/server/payments.js, src/engine/payments.js; DECISIONS.md, the payments foundations of 11.11.2026). Off until the author picks the gateway (805) and answers 804–808; the values below are the recommended answers (806 A, 807 A, 808 A) until then. `price`: gross, in grosze, in `currency`. `monthlyLimit`: the most an account pays in the last `limitDays` days, in grosze. `withdrawalDays`: the days after a payment in which unspent bought points can be given back. `adultOnly`: buying only by those who declare they are of age. `termsVersion`: the version of the terms a purchase is accepted under; a new one when the terms change. `pendingHours`: how long an unpaid order waits before it is closed.",
+  "currency": "PLN",
+  "packs": [
+    { "id": "ps-250", "points": 250, "price": 499 },
+    { "id": "ps-500", "points": 500, "price": 999 },
+    { "id": "ps-1000", "points": 1000, "price": 1999 },
+    { "id": "ps-2500", "points": 2500, "price": 4999 }
+  ],
+  "monthlyLimit": 40000,
+  "limitDays": 30,
+  "withdrawalDays": 14,
+  "adultOnly": true,
+  "termsVersion": "2026-11-11",
+  "pendingHours": 24
+}

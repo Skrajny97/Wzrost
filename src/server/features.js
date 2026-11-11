@@ -13,8 +13,11 @@
 // (src/server/weeks.js) give their effects where WEEKS is "on"; the API
 // tests turn them off, so a test's numbers do not hang on the week it runs
 // in. The guild wars (guild-wars.js) are only where GUILD_WARS is "on":
-// first on the test version. The env is the same for every
-// request of a deployment, so the switches are read once per request
+// first on the test version. The payments for Punkty Systemu (payments.js)
+// are only where PAYMENTS names the gateway they go through ("test": the
+// tests' own, signed with PAYMENTS_TEST_SECRET); off everywhere else. The
+// env is the same for every request of a deployment, so the switches are
+// read once per request
 // (index.js) and kept here for the rest of the code.
 
 let professions = false;
@@ -29,6 +32,7 @@ let english = false;
 let arena = false;
 let weeks = false;
 let guildWars = false;
+let payments = '';
 
 export function readFeatures(env) {
   professions = env.PROFESSIONS === 'on';
@@ -43,6 +47,7 @@ export function readFeatures(env) {
   arena = env.ARENA === 'on';
   weeks = env.WEEKS === 'on';
   guildWars = env.GUILD_WARS === 'on';
+  payments = typeof env.PAYMENTS === 'string' ? env.PAYMENTS.trim() : '';
 }
 
 export const professionsOn = () => professions;
@@ -74,6 +79,9 @@ export const weeksOn = () => weeks;
 // on the test version. Off, nothing of them shows: not the Gildia's Wojna
 // tab, the routes, the evening's battles nor their Sława.
 export const guildWarsOn = () => guildWars;
+// The payments for Punkty Systemu (payments.js): the gateway they go through,
+// or '' where they are off. Off, nothing of them answers.
+export const paymentsProvider = () => payments;
 // A camp building of the Osada's (Kwatery, `settlement` in buildings.json)
 // stands only where the Osada is on, and one of the Warownia's (`fortress`)
 // only where the Warownia is; the others everywhere.
