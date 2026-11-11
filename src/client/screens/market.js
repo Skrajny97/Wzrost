@@ -4,13 +4,19 @@
 // of the day and the wandering trader on his day of the week, and the
 // Rejestr of the character's trade. The players' offers have filters for
 // the character ("Wszystko", "Dla mnie", "Licytuję") with the categories
-// under them, and the goods to put up filters by category.
+// under them, and the goods to put up filters by category. The search over
+// the players' offers is the server's (browseOffers in the engine), over
+// all of them, a page at a time (a player's remarks passed on by the
+// author, 11.11.2026: "za chwilę każdy będzie wystawiał coś i strasznie
+// ciężko będzie coś znaleźć"): the kinds of goods as tabs of their own, the
+// class an item is for, who of the character's own can put it on, the
+// rarity and the order by price.
 //
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, so a redraw never asks the server again.
 
 import { herbSprite, mineralSprite, potionSprite } from '../art.js';
-import { ALL, BIDDING, FOR_ME, categoriesOf, goodsCategory, inCategory, inOfferFilter, shownCategory } from '../categories.js';
+import { ALL, BIDDING, FOR_ME, categoriesOf, goodsCategory, inCategory, shownCategory } from '../categories.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatDecimal, formatNumber, tradePace } from '../format.js';
@@ -45,6 +51,49 @@ const NO_OFFERS = {
 const KIND_NAMES = { herb: 'zioło', potion: 'mikstura', material: 'materiał', part: 'część', mineral: 'minerał' };
 // The same kinds as the filters name them, in their order.
 const KIND_GROUPS = { herb: 'Zioła', potion: 'Mikstury', material: 'Materiały', part: 'Części', mineral: 'Minerały' };
+// The kinds of goods as tabs of their own under "Wszystko", items first (a
+// player's remark, 11.11.2026: "osobne zakładki na mikstury, zioła i
+// materiały"), each with what it holds when it holds nothing.
+const KIND_TABS = [
+  ['item', 'Przedmioty'],
+  ['herb', 'Zioła'],
+  ['potion', 'Mikstury'],
+  ['material', 'Materiały'],
+  ['mineral', 'Minerały'],
+  ['part', 'Części'],
+];
+const NO_KIND = {
+  item: 'Nikt nie wystawia teraz przedmiotów.',
+  herb: 'Nikt nie wystawia teraz ziół.',
+  potion: 'Nikt nie wystawia teraz mikstur.',
+  material: 'Nikt nie wystawia teraz materiałów.',
+  mineral: 'Nikt nie wystawia teraz minerałów.',
+  part: 'Nikt nie wystawia teraz części.',
+};
+// The order of the offers (a player's remark, 11.11.2026: "od najtańszych i
+// od najdroższych"): the soonest to end first, as before, or by the price
+// of a piece. The choice stays on the device, as the bag's order.
+const SORTS = [
+  ['ends', 'Kończące się'],
+  ['cheap', 'Najtańsze'],
+  ['dear', 'Najdroższe'],
+];
+const SORT_KEY = 'insight-market-sort';
+function savedSort() {
+  try {
+    const saved = localStorage.getItem(SORT_KEY);
+    return SORTS.some(([id]) => id === saved) ? saved : 'ends';
+  } catch {
+    return 'ends';
+  }
+}
+function saveSort(sort) {
+  try {
+    localStorage.setItem(SORT_KEY, sort);
+  } catch {
+    // The order then lasts for this visit only.
+  }
+}
 const REASONS = { won: 'wygrana licytacja', bought: 'kupione', returned: 'wraca do Ciebie', sold: 'zapłata za sprzedaż' };
 const kindName = (kind) => (KIND_NAMES[kind] ? t(KIND_NAMES[kind]) : null);
 const rarityOf = (id) => state.content?.rarities?.find((rarity) => rarity.id === id);
@@ -146,15 +195,24 @@ export const stackButton = (goods, options, actions) =>
 // it: from its Tier, as every item. `opened` keeps the unfolded ones by
 // `key` through the panel's redraws. The Salon Gier shows its prizes so too.
 // `notes: false` leaves out when the character can wear it, as the
-// Rejestr's goods already traded.
-export function itemEntry(item, key, opened, { notes: noted = true } = {}) {
+// Rejestr's goods already traded. `wearers` (the server's, wearersOf in the
+// engine) names the companions of `team` who can put it on now: the card
+// compares it with what each of them wears there too (a player's remark
+// passed on by the author, 11.11.2026), the one shopped for (`first`, "Dla
+// mnie" for a companion) before the character, whose notes then say
+// nothing.
+export function itemEntry(item, key, opened, { notes: noted = true, wearers = null, team = [], first = 'me' } = {}) {
   const character = state.character;
   const usable = !item.classIds || item.classIds.includes(character.classId);
   const worn = character.equipment?.[item.slot] ?? null;
+  const own = first === 'me';
   const notes = [
-    noted && !usable && t('Twoja klasa nie może go używać.'),
-    noted && character.classLevel < (item.classLevel ?? 1) && t('Założysz go od poziomu klasy {level}.', { level: item.classLevel }),
+    noted && own && !usable && t('Twoja klasa nie może go używać.'),
+    noted && own && character.classLevel < (item.classLevel ?? 1) && t('Założysz go od poziomu klasy {level}.', { level: item.classLevel }),
   ].filter(Boolean);
+  const companions = (wearers ?? []).map((id) => team.find((companion) => companion.id === id)).filter(Boolean);
+  const chosen = companions.find((companion) => companion.id === first);
+  const others = companions.filter((companion) => companion !== chosen);
   return [
     h(
       'details',
@@ -175,10 +233,22 @@ export function itemEntry(item, key, opened, { notes: noted = true } = {}) {
           }),
         item.price !== undefined && h('li', { class: 'item-price', text: t('U złomiarza: {gold} złota', { gold: formatNumber(item.price) }) }),
       ),
+      chosen && companionCompare(chosen, item),
       usable && (worn ? compareTable(item, worn) : h('p', { class: 'muted', text: t('W miejscu „{slot}” postać nic teraz nie nosi.', { slot: item.slotName }) })),
+      others.map((companion) => companionCompare(companion, item)),
     ),
     notes.map((note) => h('p', { class: 'region-warning trade-note', text: note })),
   ];
+}
+
+// An item beside what a companion who can put it on wears in its place
+// (its weapon, its armour, or its one piece of jewellery for an amulet, a
+// ring or a talisman), as "Załóż z plecaka" in the Kwatery compares them.
+function companionCompare(companion, item) {
+  const worn = (companion.wear.find((place) => place.slot === item.slot) ?? companion.wear.find((place) => place.slot === 'jewelry'))?.item ?? null;
+  return worn
+    ? compareTable(item, worn, { title: t('Porównanie z tym, co nosi {name}', { name: companion.name }), wornLabel: t('Nosi') })
+    : h('p', { class: 'muted', text: t('W tym miejscu {name} nic teraz nie nosi.', { name: companion.name }) });
 }
 
 // The categories of goods in their order: the items by their slot, named as
@@ -252,10 +322,39 @@ export function mountMarket(holder) {
   let timer = null;
   let gone = false;
   const opened = new Set();
-  // The category chosen over the players' offers and over the goods to put
-  // up, and the filter over the offers for the character (`top`), for this
-  // visit to the Targowisko.
-  const filters = { top: { id: ALL }, offers: { id: ALL }, sellable: { id: ALL } };
+  // The category chosen over the goods to put up, for this visit to the
+  // Targowisko.
+  const filters = { sellable: { id: ALL } };
+  // The search over the players' offers, for this visit to the Targowisko
+  // but its order (savedSort): which offers (`show`: "Wszystko", "Dla mnie"
+  // or "Licytuję"), the tab of the kind of goods, the class an item is for,
+  // who of the character's own shops ("Dla mnie": 'me' or a companion's
+  // id), the rarity, the category, the order and how many offers (null: a
+  // page). The server answers with the search as it made it (`view`), a
+  // choice with nothing left in it given way.
+  const view = { show: ALL, kind: 'item', classId: null, who: 'me', rarity: null, category: ALL, sort: savedSort(), limit: null };
+  // The search as the server takes it, in a query or an action's body.
+  const asked = () => {
+    const search = { show: view.show, sort: view.sort };
+    if (view.show === ALL) search.kind = view.kind;
+    if (view.show === ALL && view.kind === 'item' && view.classId) search.classId = view.classId;
+    if (view.show === FOR_ME) search.who = view.who;
+    if (view.rarity) search.rarity = view.rarity;
+    if (view.category !== ALL) search.category = view.category;
+    if (view.limit) search.limit = String(view.limit);
+    return search;
+  };
+  // The answer's search over the page's: the choices that gave way.
+  const answered = (made) => {
+    view.rarity = made.rarity;
+    view.category = made.category;
+    view.limit = made.limit;
+    if (made.show === FOR_ME) view.who = made.who;
+    if (made.show === ALL && made.kind === 'item') view.classId = made.classId;
+  };
+  // The answer asked for last; one overtaken by a later choice is left.
+  let asks = 0;
+  let searching = false;
   // The Rejestr, asked each time its tab opens: { since, limit, log }, or
   // null while on its way.
   let register = null;
@@ -267,25 +366,50 @@ export function mountMarket(holder) {
     clocks.push({ element, at });
     return element;
   };
-  const goodsEntry = (goods, key) => (goods.kind === 'item' ? itemEntry(goods.item, key, opened) : stackButton(goods));
+  // An offer's goods; an item compared with what the character and each of
+  // its companions who can put it on wear (among the players' offers "Dla
+  // mnie" for a companion: that one first).
+  const goodsEntry = (goods, key, wearers = null) =>
+    goods.kind === 'item'
+      ? itemEntry(goods.item, key, opened, { wearers, team: market?.team ?? [], first: tab === 'offers' && view.show === FOR_ME ? view.who : 'me' })
+      : stackButton(goods);
 
   async function load() {
+    const ask = ++asks;
+    searching = true;
     try {
-      ({ market } = await call('GET', '/api/market'));
+      const answer = await call('GET', `/api/market?${new URLSearchParams(asked())}`);
+      if (ask !== asks) return;
+      market = answer.market;
+      answered(market.view);
       failure = null;
     } catch (error) {
+      if (ask !== asks) return;
+      searching = false;
       // With the Targowisko already on the screen, it stays and the game
       // asks again in half a minute (as the Osada does).
       if (market) {
         if (gone) return;
+        render();
         clearTimeout(timer);
         timer = setTimeout(load, 30000);
         return;
       }
       failure = error;
     }
+    searching = false;
     if (!gone) render();
     if (tab === 'log') loadRegister();
+  }
+
+  // A choice of the search: the controls show it at once over the list as
+  // it was, dimmed, until the server's answer; "Pokaż kolejne" asks for a
+  // page more of the same.
+  function search(changes) {
+    Object.assign(view, { limit: null }, changes);
+    searching = true;
+    render();
+    load();
   }
 
   // The Rejestr, from the server anew: what ended meanwhile is in it.
@@ -299,11 +423,14 @@ export function mountMarket(holder) {
     if (!gone && tab === 'log') render();
   }
 
-  // An action's answer is the Targowisko after it.
+  // An action's answer is the Targowisko after it, with the page's search.
   const act = (button, path, body, done) =>
     withButton(button, async () => {
-      const answer = await call('POST', path, body);
+      const answer = await call('POST', path, { ...body, view: asked() });
+      asks += 1;
+      searching = false;
       market = answer.market;
+      answered(market.view);
       closeSheet();
       if (done) toast(typeof done === 'function' ? done(answer) : done);
       if (!gone) render();
@@ -325,7 +452,7 @@ export function mountMarket(holder) {
     const field = numberField('market-bid', t('Twoja oferta (zł)'), offer.minBid, offer.minBid, Math.max(offer.minBid, state.character.gold));
     openSheet(
       h('h2', { class: 'sheet-title', text: t('Licytuj') }),
-      goodsEntry(offer.goods, `bid:${offer.id}`),
+      goodsEntry(offer.goods, `bid:${offer.id}`, offer.wearers),
       h(
         'p',
         { class: 'sheet-text' },
@@ -395,11 +522,14 @@ export function mountMarket(holder) {
               onClick: (event) => buyNow(offer, event.currentTarget),
             }),
         ];
+    // A stack's price for a piece, as the order by price counts it.
+    const pieces = offer.goods.kind !== 'item' && offer.goods.count > 1 ? (offer.bid ?? offer.startPrice) / offer.goods.count : null;
     return h(
       'li',
       { class: 'card market-offer' },
-      goodsEntry(offer.goods, `offer:${offer.id}`),
+      goodsEntry(offer.goods, `offer:${offer.id}`, offer.wearers),
       h('p', { class: 'market-price', text: price }),
+      pieces !== null && h('p', { class: 'muted market-piece', text: t('Za sztukę: {gold} zł', { gold: formatDecimal(Math.round(pieces * 10) / 10) }) }),
       !offer.own && !offer.leading && offer.myBid && h('p', { class: 'muted', text: t('Twoja ostatnia oferta: {gold} zł', { gold: formatNumber(offer.myBid) }) }),
       offer.own && offer.buyNow && h('p', { class: 'muted', text: t('„Kup teraz”: {gold} zł', { gold: formatNumber(offer.buyNow) }) }),
       h('p', { class: 'muted' }, offer.own ? t('Twoja oferta · koniec za ') : t('Wystawia: {name} · koniec za ', { name: offer.seller }), clock(offer.endsAt)),
@@ -674,7 +804,7 @@ export function mountMarket(holder) {
                   h(
                     'li',
                     { class: 'card market-offer' },
-                    itemEntry(good.item, `wanderer:${good.id}`, opened),
+                    itemEntry(good.item, `wanderer:${good.id}`, opened, { wearers: good.wearers, team: market.team ?? [] }),
                     h('p', { class: 'market-price', text: t('{gold} zł', { gold: formatNumber(good.price) }) }),
                     h(
                       'div',
@@ -695,40 +825,164 @@ export function mountMarket(holder) {
     ];
   }
 
-  // The players' offers: the filter for the character over them ("Dla
-  // mnie": the items it could wear now, its class and Tier as "Załóż" asks;
-  // "Licytuję": the auctions with its bid, leading or outbid), each with how
-  // many it holds, and under it the categories of what it shows as chips
-  // (the author: "Aktualne czyli podzial na rodzaj przedmiotu może pozostać
-  // jako podkategorie").
-  function offersTab() {
-    if (market.offers.length === 0) return h('p', { class: 'muted', text: t('Nikt nic teraz nie wystawia.') });
-    const shown = inOfferFilter(market.offers, filters.top.id);
+  // A row of buttons, each with how many it holds under its name, one of
+  // them pressed: the filter for the character over the offers and the
+  // tabs of the kinds of goods.
+  const switchRow = (classes, label, options, chosen, choose) =>
+    h(
+      'div',
+      { class: `segmented market-top ${classes}`, role: 'group', 'aria-label': label },
+      options.map(({ id, name, count }) =>
+        h(
+          'button',
+          { type: 'button', class: `segmented-option${count === 0 ? ' market-top--empty' : ''}`, 'aria-pressed': String(id === chosen), onClick: () => id !== chosen && choose(id) },
+          h('span', { class: 'market-top-name', text: name }),
+          h('span', { class: 'market-filter-count', text: formatNumber(count) }),
+        ),
+      ),
+    );
+
+  // A list to choose from with its name over it; '' is "any".
+  const choice = (id, label, value, options, choose) =>
+    h(
+      'div',
+      { class: 'market-choice' },
+      h('label', { class: 'bag-sort-label', for: id, text: label }),
+      h(
+        'select',
+        { id, class: 'anvil-material market-choice-list', onChange: (event) => choose(event.currentTarget.value || null) },
+        options.map((option) => h('option', { value: option.value, selected: option.value === (value ?? ''), text: option.text })),
+      ),
+    );
+
+  // The search's controls over the players' offers (a player's remarks
+  // passed on by the author, 11.11.2026): under "Wszystko" the kinds of
+  // goods as tabs, and for items the class they are for (the player looks
+  // for items for companions of other classes); under "Dla mnie" who of the
+  // character's own shops, the character or one of its companions; the
+  // rarity, the categories as chips (2.11.2026) and the order.
+  function searchControls() {
+    const { counts, team = [] } = market;
+    const companion = view.show === FOR_ME ? team.find((one) => one.id === view.who) : null;
+    const rarities = (state.content?.rarities ?? []).filter((rarity) => counts.rarities?.[rarity.id] > 0);
+    const categories = [...state.content.slots.map(({ id, name }) => ({ id, name })), ...Object.entries(KIND_GROUPS).map(([id, name]) => ({ id, name: t(name) }))]
+      .filter(({ id }) => counts.categories?.[id] > 0)
+      .map((category) => ({ ...category, count: counts.categories[category.id] }));
+    const lists = [
+      view.show === ALL &&
+        view.kind === 'item' &&
+        choice('market-class', t('Klasa'), view.classId, [{ value: '', text: t('Każda klasa') }, ...state.content.classes.map((cls) => ({ value: cls.id, text: `${cls.name} (${formatNumber(counts.classes?.[cls.id] ?? 0)})` }))], (classId) =>
+          search({ classId }),
+        ),
+      view.show === FOR_ME &&
+        team.length > 0 &&
+        choice(
+          'market-who',
+          t('Dla kogo'),
+          view.who,
+          [{ value: 'me', text: `${t('Ty')} (${formatNumber(counts.people?.me ?? 0)})` }, ...team.map((one) => ({ value: one.id, text: `${one.name} (${formatNumber(counts.people?.[one.id] ?? 0)})` }))],
+          (who) => search({ who: who ?? 'me' }),
+        ),
+      (rarities.length > 1 || view.rarity) &&
+        choice('market-rarity', t('Rzadkość'), view.rarity, [{ value: '', text: t('Każda rzadkość') }, ...rarities.map((rarity) => ({ value: rarity.id, text: `${rarity.name} (${formatNumber(counts.rarities[rarity.id])})` }))], (rarity) =>
+          search({ rarity }),
+        ),
+    ].filter(Boolean);
+    const total = categories.reduce((sum, category) => sum + category.count, 0);
     return [
+      view.show === ALL &&
+        switchRow(
+          'market-kinds',
+          t('Rodzaj towaru'),
+          KIND_TABS.map(([id, name]) => ({ id, name: t(name), count: counts.kinds?.[id] ?? 0 })),
+          view.kind,
+          (kind) => search({ kind, category: ALL, rarity: null }),
+        ),
+      lists.length > 0 && h('div', { class: 'market-choices' }, lists),
+      // Who a companion is and what it wears, as the list holds only what
+      // it can put on now.
+      companion && h('p', { class: 'muted market-who', text: t('{className}, poz. {level}. Nosi broń, pancerz i jedną sztukę biżuterii.', { className: companion.className, level: companion.level }) }),
+      (categories.length > 1 || view.category !== ALL) &&
+        h(
+          'div',
+          { class: 'market-filters', role: 'group', 'aria-label': t('Kategoria towaru') },
+          [{ id: ALL, name: t('Wszystko'), count: total }, ...categories].map(({ id, name, count }) =>
+            h(
+              'button',
+              { type: 'button', class: 'market-filter', 'aria-pressed': String(id === view.category), onClick: () => id !== view.category && search({ category: id }) },
+              name,
+              ' ',
+              h('span', { class: 'market-filter-count', text: formatNumber(count) }),
+            ),
+          ),
+        ),
       h(
         'div',
-        { class: 'segmented segmented--three market-top', role: 'group', 'aria-label': t('Które oferty') },
-        OFFER_FILTERS.map(([id, label]) =>
-          h(
-            'button',
-            {
+        { class: 'bag-sort market-sort' },
+        h('span', { class: 'bag-sort-label', text: t('Sortuj:') }),
+        h(
+          'div',
+          { class: 'segmented bag-sort-options bag-sort-options--3', role: 'group', 'aria-label': t('Kolejność ofert') },
+          SORTS.map(([id, label]) =>
+            h('button', {
               type: 'button',
               class: 'segmented-option',
-              'aria-pressed': String(id === filters.top.id),
+              'aria-pressed': String(id === view.sort),
+              text: t(label),
               onClick: () => {
-                if (id === filters.top.id) return;
-                filters.top.id = id;
-                render();
+                if (id === view.sort) return;
+                saveSort(id);
+                search({ sort: id });
               },
-            },
-            h('span', { class: 'market-top-name', text: t(label) }),
-            h('span', { class: 'market-filter-count', text: formatNumber(inOfferFilter(market.offers, id).length) }),
+            }),
           ),
         ),
       ),
-      shown.length === 0
-        ? h('p', { class: 'muted', text: t(NO_OFFERS[filters.top.id]) })
-        : filtered(shown, (offer) => goodsCategory(offer.goods), filters.offers, (list) => h('ul', { class: 'stack market-list' }, list.map(offerCard))),
+    ];
+  }
+
+  // What the search shows when it finds nothing.
+  function nothingFound() {
+    if (view.show === FOR_ME) {
+      const companion = market.team?.find((one) => one.id === view.who);
+      return companion ? t('Nikt nie wystawia teraz przedmiotu, który {name} może założyć.', { name: companion.name }) : t(NO_OFFERS[FOR_ME]);
+    }
+    if (view.show === BIDDING) return t(NO_OFFERS[BIDDING]);
+    if (view.classId || view.rarity || view.category !== ALL) return t('Nic tu nie pasuje do wybranych filtrów.');
+    return t(NO_KIND[view.kind] ?? 'Nikt nic teraz nie wystawia.');
+  }
+
+  // The players' offers: the filter for the character over them ("Dla
+  // mnie": the items it could wear now, its class and Tier as "Załóż" asks,
+  // or one of its companions; "Licytuję": the auctions with its bid,
+  // leading or outbid), each with how many it holds, and under it the
+  // search (searchControls), the page of offers it found and "Pokaż
+  // kolejne", up to the most the server gives at once.
+  function offersTab() {
+    const { counts, offers, found, most } = market;
+    if (counts.shows.all === 0) return h('p', { class: 'muted', text: t('Nikt nic teraz nie wystawia.') });
+    const more = found > offers.length;
+    return [
+      switchRow(
+        'segmented--three',
+        t('Które oferty'),
+        OFFER_FILTERS.map(([id, label]) => ({ id, name: t(label), count: counts.shows[id] ?? 0 })),
+        view.show,
+        (show) => search({ show, category: ALL }),
+      ),
+      searchControls(),
+      h(
+        'div',
+        { class: `market-results${searching ? ' market-results--busy' : ''}`, 'aria-busy': String(searching) },
+        offers.length === 0 ? h('p', { class: 'muted', text: nothingFound() }) : h('ul', { class: 'stack market-list' }, offers.map(offerCard)),
+        more &&
+          (offers.length < most
+            ? [
+                h('p', { class: 'muted market-more', text: t('Widać {shown} z {found} ofert.', { shown: formatNumber(offers.length), found: formatNumber(found) }) }),
+                h('button', { type: 'button', class: 'button button--world', text: t('Pokaż kolejne'), onClick: () => search({ limit: offers.length + market.page }) }),
+              ]
+            : h('p', { class: 'muted market-more', text: t('Widać pierwsze {shown} z {found} ofert. Zawęź wyszukiwanie, żeby zobaczyć resztę.', { shown: formatNumber(offers.length), found: formatNumber(found) }) })),
+      ),
     ];
   }
 

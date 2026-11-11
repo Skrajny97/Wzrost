@@ -16576,6 +16576,101 @@ a.discord-button {
   letter-spacing: 0;
 }
 
+/* The search over the players' offers (a player's remarks, 11.11.2026;
+   screens/market.js): the kinds of goods as tabs under "Wszystko", three
+   in a row; a kind nobody puts up now dimmed, still a tap away. */
+.market-kinds {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.market-kinds .segmented-option {
+  padding: 4px 2px;
+  font-size: 12px;
+  letter-spacing: 0.03em;
+}
+
+.market-kinds .segmented-option:nth-child(3n + 1) {
+  border-left: 0;
+}
+
+.market-kinds .segmented-option:nth-child(n + 4) {
+  border-top: 1px solid var(--system-line);
+}
+
+.market-kinds .market-top--empty:not([aria-pressed='true']) {
+  opacity: 0.55;
+}
+
+/* In one row from a tablet on, as the Targowisko's tabs. */
+@media (min-width: 640px) {
+  .market-kinds {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .market-kinds .segmented-option:nth-child(3n + 1) {
+    border-left: 1px solid var(--system-line);
+  }
+
+  .market-kinds .segmented-option:first-child {
+    border-left: 0;
+  }
+
+  .market-kinds .segmented-option:nth-child(n + 4) {
+    border-top: 0;
+  }
+}
+
+/* The class, who shops and the rarity: lists side by side where two fit,
+   one under another on a narrow phone. */
+.market-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 8px 10px;
+}
+
+.market-choice {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.market-choice-list {
+  min-width: 0;
+  margin-top: 0;
+}
+
+.market-who {
+  margin: -4px 0 0;
+  font-size: 14px;
+}
+
+.market-sort {
+  margin: 0;
+}
+
+/* The offers found, dimmed while the next search is on its way, and how
+   many more there are. */
+.market-results {
+  display: grid;
+  gap: 12px;
+  transition: opacity 0.15s;
+}
+
+.market-results--busy {
+  opacity: 0.5;
+}
+
+.market-more {
+  margin: 0;
+  text-align: center;
+}
+
+/* A stack's price for a piece, under its price. */
+.market-offer .market-piece {
+  margin-top: -4px;
+  font-size: 14px;
+}
+
 /* An auction it bids on and leads no longer ("Licytuję"). */
 .market-outbid {
   align-self: center;

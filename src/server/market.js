@@ -14,13 +14,16 @@
 // buyers never both get through.
 
 import {
+  COMPANION_PLACES,
   bagCapacity,
   bidBlock,
   bagStacks,
   brotherhoodPerk,
+  browseOffers,
   buyCeiling,
   campBonus,
   campLevels,
+  companionPlace,
   createRng,
   equipBlock,
   itemName,
@@ -43,6 +46,7 @@ import {
   tradePoints,
   tradeView,
   wandererGoods,
+  wearersOf,
 } from '../engine/index.js';
 import { bagItems, bagPlaces, characterView, loadPlayer, requireOffRack, requirePlayer } from './characters.js';
 import { content } from './content.js';
@@ -118,9 +122,14 @@ const offerOf = (row) => ({
 // `myBid`, the character's own last bid on it (market_bids), or null, so
 // "Licytuję" shows whether it leads or was outbid; and for an item,
 // `equipBlock`, why `wearer` cannot wear it now, or null, as "Załóż" asks
-// (equipBlock in the engine), for "Dla mnie".
-function offerView(row, wearer) {
+// (equipBlock in the engine), for "Dla mnie"; and `wearers`, who of the
+// character's own can put it on now ('me' and its companions' ids,
+// wearersOf), so its card compares it with what each of them wears (a
+// player's remark, 11.11.2026: compared with what a companion wears, as
+// with what the character wears).
+function offerView(row, wearer, team = teamOf(wearer)) {
   const offer = offerOf(row);
+  const item = row.kind === 'item' ? JSON.parse(row.item) : null;
   return {
     id: row.id,
     seller: row.seller_id === null ? tuning().testSeller : row.seller_name,
@@ -134,8 +143,42 @@ function offerView(row, wearer) {
     leading: row.bidder_id === wearer.id,
     own: row.seller_id === wearer.id,
     myBid: row.my_bid ?? null,
-    ...(row.kind === 'item' && { equipBlock: equipBlock(JSON.parse(row.item), wearer.class_id, wearer.class_level, content()) }),
+    ...(item && { equipBlock: equipBlock(item, wearer.class_id, wearer.class_level, content()), wearers: wearersOf(item, team, content()) }),
   };
+}
+
+// The character and its hired companions, for who can put an item on.
+function teamOf(row) {
+  return { classId: row.class_id, classLevel: row.class_level, companions: settlementOf(row).companions ?? [] };
+}
+
+// The companions for the cards' comparisons: each with its class and level
+// and what it wears in its places (a weapon, armour and one piece of
+// jewellery, an amulet, a ring or a talisman), as the Kwatery show it.
+function teamView(team) {
+  return team.companions.map((companion) => ({
+    id: companion.id,
+    name: companion.name,
+    appearance: companion.appearance,
+    className: content().classesById[companion.classId]?.name ?? companion.classId,
+    level: companion.level,
+    wear: COMPANION_PLACES.map((place) => {
+      const worn = companion.gear.find((item) => companionPlace(item.slot) === place);
+      return { slot: place, slotName: content().slotsById[place]?.name ?? content().settlement.companions.texts.jewelry, item: worn ? itemView(worn, content()) : null };
+    }),
+  }));
+}
+
+// The search the page asks for (GET /api/market's query, or `view` in an
+// action's body, so its answer shows the same list): which offers, the
+// kind of goods, the class, who of the character's own, the rarity, the
+// category, the order and how many (browseOffers in the engine checks
+// each).
+function askedView(source) {
+  const read = source instanceof URLSearchParams ? (key) => source.get(key) : (key) => source?.[key];
+  const text = (key) => (typeof read(key) === 'string' && read(key) !== '' ? read(key) : null);
+  const limit = Number(read('limit'));
+  return { show: text('show'), kind: text('kind'), classId: text('classId'), who: text('who'), rarity: text('rarity'), category: text('category'), sort: text('sort'), limit: Number.isInteger(limit) && limit > 0 ? limit : null };
 }
 
 // A parcel for `characterId` of an offer's goods.
@@ -295,39 +338,83 @@ function residentsView(player, stored, now) {
     wanderer: {
       startsAt: wanderer.comes.startsAt,
       endsAt: wanderer.comes.endsAt,
-      goods: wanderer.goods?.map((good) => ({ id: good.id, name: itemName(good.item, content()), rarity: good.item.rarity, level: good.item.level, item: itemView(good.item, content()), price: good.price, bought: taken.includes(good.id) })) ?? null,
+      goods:
+        wanderer.goods?.map((good) => ({
+          id: good.id,
+          name: itemName(good.item, content()),
+          rarity: good.item.rarity,
+          level: good.item.level,
+          item: itemView(good.item, content()),
+          price: good.price,
+          bought: taken.includes(good.id),
+          wearers: wearersOf(good.item, teamOf(row), content()),
+        })) ?? null,
     },
   };
 }
 
-async function marketView(db, player, now) {
+// The other players' open offers in a light form, with the character's own
+// last bid on each (market_bids), for the search's filters and counts.
+const lightOffers = (db, row, now) =>
+  db
+    .prepare(
+      // `IS NOT`: the test version's own offers have no seller.
+      `SELECT market_offers.id, kind, good, count, start_price, bid, ends_at, json_extract(item, '$.base') AS base, json_extract(item, '$.slot') AS slot,
+         json_extract(item, '$.rarity') AS rarity, market_bids.amount AS my_bid
+       FROM market_offers LEFT JOIN market_bids ON market_bids.offer_id = market_offers.id AND market_bids.character_id = ?
+       WHERE state = 'open' AND ends_at > ? AND seller_id IS NOT ?`,
+    )
+    .bind(row.id, now, row.id);
+
+// The offers the search `asked` shows (browseOffers in the engine) among
+// the `light` ones, and the views of the page's offers only, in the page's
+// order.
+async function browsed(db, row, team, asked, light) {
+  const found = browseOffers(
+    light.map((offer) => ({
+      id: offer.id,
+      kind: offer.kind,
+      key: offer.good,
+      count: offer.count,
+      item: offer.kind === 'item' ? { base: offer.base, slot: offer.slot, rarity: offer.rarity } : null,
+      startPrice: offer.start_price,
+      bid: offer.bid,
+      endsAt: offer.ends_at,
+      myBid: offer.my_bid,
+    })),
+    asked,
+    team,
+    content(),
+  );
+  const rows =
+    found.ids.length === 0
+      ? []
+      : (
+          await db
+            .prepare(
+              `SELECT market_offers.*, market_bids.amount AS my_bid FROM market_offers
+               LEFT JOIN market_bids ON market_bids.offer_id = market_offers.id AND market_bids.character_id = ?
+               WHERE market_offers.id IN (SELECT value FROM json_each(?)) AND state = 'open'`,
+            )
+            .bind(row.id, JSON.stringify(found.ids))
+            .all()
+        ).results;
+  const byId = new Map(rows.map((offer) => [offer.id, offer]));
+  return { ...found, offers: found.ids.map((id) => byId.get(id)).filter(Boolean) };
+}
+
+async function marketView(db, player, now, asked = {}) {
   const { row } = player;
   const stored = settlementOf(row);
-  const [others, mine, parcels, bidding] = await db.batch([
-    // `IS NOT`: the test version's own offers have no seller. With the
-    // character's own last bid on each (market_bids).
-    db
-      .prepare(
-        `SELECT market_offers.*, market_bids.amount AS my_bid FROM market_offers
-         LEFT JOIN market_bids ON market_bids.offer_id = market_offers.id AND market_bids.character_id = ?
-         WHERE state = 'open' AND ends_at > ? AND seller_id IS NOT ? ORDER BY ends_at LIMIT 100`,
-      )
-      .bind(row.id, now, row.id),
+  const team = teamOf(row);
+  const [light, mine, parcels] = await db.batch([
+    lightOffers(db, row, now),
     db.prepare("SELECT * FROM market_offers WHERE state = 'open' AND seller_id = ? ORDER BY ends_at").bind(row.id),
     db.prepare('SELECT * FROM market_parcels WHERE character_id = ? ORDER BY id').bind(row.id),
-    // Every open offer it bids on, also past the first hundred, for
-    // "Licytuję".
-    db
-      .prepare(
-        `SELECT market_offers.*, market_bids.amount AS my_bid FROM market_bids JOIN market_offers ON market_offers.id = market_bids.offer_id
-         WHERE market_bids.character_id = ? AND state = 'open' AND ends_at > ?`,
-      )
-      .bind(row.id, now),
   ]);
-  const listed = new Set(others.results.map((offer) => offer.id));
-  const offers = [...others.results, ...bidding.results.filter((offer) => !listed.has(offer.id))].sort((a, b) => a.ends_at - b.ends_at);
+  const found = await browsed(db, row, team, asked, light.results);
   const day = questPeriod('daily', now, content()).key;
-  const { minHours, reputation, maxPrice } = tuning();
+  const { minHours, reputation, maxPrice, browse } = tuning();
   return {
     // The character's own fee and longest auction, by the Kompania Kupców
     // (592), and the longest without it, which the hours start at.
@@ -337,8 +424,18 @@ async function marketView(db, player, now) {
     minHours,
     maxPrice,
     limit: offerLimit(stored.reputation, content()),
-    offers: offers.map((offer) => offerView(offer, row)),
-    mine: mine.results.map((offer) => offerView(offer, row)),
+    // The page of the search (browseOffers): the offers in its order, how
+    // many it found in all, how many each choice holds, the search as made,
+    // and how many more "Pokaż kolejne" adds, up to the most.
+    offers: found.offers.map((offer) => offerView(offer, row, team)),
+    found: found.found,
+    counts: found.counts,
+    view: found.view,
+    page: browse.page,
+    most: browse.most,
+    // The companions, for the comparison with what each wears.
+    team: teamView(team),
+    mine: mine.results.map((offer) => offerView(offer, row, team)),
     parcels: parcels.results.map((parcel) => ({ id: parcel.id, reason: parcel.reason, goods: goodsView(parcel.kind, parcel.good, parcel.count, parcel.item) })),
     sellable: sellable(player, now),
     trade: tradeView(stored.marketTrade, row.level, now, content(), reputation),
@@ -346,9 +443,11 @@ async function marketView(db, player, now) {
   };
 }
 
-async function respond(db, session, now, extra = {}) {
+// The answer: the Targowisko after the request, with the search the page
+// asked for (askedView).
+async function respond(db, session, now, extra = {}, asked = {}) {
   const player = await loadPlayer(db, session.userId);
-  return json({ ...extra, market: await marketView(db, player, now), character: characterView(player, now) });
+  return json({ ...extra, market: await marketView(db, player, now, asked), character: characterView(player, now) });
 }
 
 async function requireMarket(context) {
@@ -358,10 +457,11 @@ async function requireMarket(context) {
   return { session, player, db: context.env.DB };
 }
 
-// GET /api/market: the Targowisko for the page.
+// GET /api/market?show=&kind=&classId=&who=&rarity=&category=&sort=&limit=:
+// the Targowisko for the page, the players' offers as the search asks.
 export async function getMarket(context) {
   const { session, db } = await requireMarket(context);
-  return respond(db, session, context.now);
+  return respond(db, session, context.now, {}, askedView(new URL(context.request.url).searchParams));
 }
 
 // The other side of a line of the Rejestr, named in the page's language.
@@ -464,7 +564,7 @@ export async function listOffer(context) {
       )
       .bind(row.id, row.user_id, row.name, kind, item ? null : key, count, data, body.startPrice, buyNow, now, endsAt, fee),
   ]);
-  return respond(db, session, now);
+  return respond(db, session, now, {}, askedView(body.view));
 }
 
 async function offerRow(db, id) {
@@ -503,7 +603,7 @@ export async function bidOnOffer(context) {
       )
       .bind(offer.id, row.id, body.amount, now),
   ]);
-  return respond(db, session, now, { bid: { amount: body.amount } });
+  return respond(db, session, now, { bid: { amount: body.amount } }, askedView(body.view));
 }
 
 // POST /api/market/buy { offerId }: "Kup teraz": the offer is sold at once,
@@ -535,7 +635,7 @@ export async function buyOffer(context) {
     ...soldLines(db, offer, 'bought', row.id, row.name, price, now),
     bidsGone(db, offer),
   ]);
-  return respond(db, session, now, { bought: { price } });
+  return respond(db, session, now, { bought: { price } }, askedView(body.view));
 }
 
 // POST /api/market/cancel { offerId }: the seller takes back an offer no one
@@ -555,7 +655,7 @@ export async function cancelOffer(context) {
     ...offerLine(db, offer, row.id, { event: 'withdrawn' }, now),
     bidsGone(db, offer),
   ]);
-  return respond(db, session, now);
+  return respond(db, session, now, {}, askedView(body.view));
 }
 
 // One change of a JSON column of counts: `adds` by key, each its own
@@ -631,6 +731,8 @@ export async function collectParcels(context) {
   const { session, player, db } = await requireMarket(context);
   const { row } = player;
   const now = context.now;
+  // Its body carries only the page's search, so it may come without one.
+  const body = (context.request.headers.get('Content-Type') ?? '').toLowerCase().startsWith('application/json') ? await readJson(context.request) : {};
   const parcels = (await db.prepare('SELECT * FROM market_parcels WHERE character_id = ? ORDER BY id').bind(row.id).all()).results;
   if (parcels.length === 0) throw new ApiError(409, 'nothing', 'Nic tu na Ciebie nie czeka.');
   const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
@@ -693,7 +795,7 @@ export async function collectParcels(context) {
     ...items.map((item) => db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)').bind(row.id, JSON.stringify(item), now)),
     db.prepare(`DELETE FROM market_parcels WHERE character_id = ? AND id IN (${list})`).bind(row.id, ...taken),
   ]);
-  return respond(db, session, now, { collected: { count: taken.length, left: parcels.length - taken.length, gold } });
+  return respond(db, session, now, { collected: { count: taken.length, left: parcels.length - taken.length, gold } }, askedView(body?.view));
 }
 
 // POST /api/market/resident { from: merchant, id, count } or { from:
@@ -722,7 +824,7 @@ export async function buyFromResident(context) {
       db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)').bind(row.id, JSON.stringify({ ...good.item, traded: 1 }), now),
       ...logLine(db, row.id, { event: 'bought', other: 'wanderer', kind: 'item', item: JSON.stringify({ ...good.item, traded: 1 }), price: good.price }, now),
     ]);
-    return respond(db, session, now, { bought: { name: itemName(good.item, content()), price: good.price } });
+    return respond(db, session, now, { bought: { name: itemName(good.item, content()), price: good.price } }, askedView(body.view));
   }
   const stock = merchantStock(now, content());
   const good = stock.goods.find((one) => one.id === body.id);
@@ -748,7 +850,7 @@ export async function buyFromResident(context) {
       .bind(price, ...change.binds, ...others.binds, JSON.stringify(next), row.id),
     ...logLine(db, row.id, { event: 'bought', other: 'merchant', kind: good.kind, good: good.key, count, price }, now),
   ]);
-  return respond(db, session, now, { bought: { name: goodsView(good.kind, good.key, count).name, count, price } });
+  return respond(db, session, now, { bought: { name: goodsView(good.kind, good.key, count).name, count, price } }, askedView(body.view));
 }
 
 // "Testuj Osadę" on the test version, where one account has no one to trade

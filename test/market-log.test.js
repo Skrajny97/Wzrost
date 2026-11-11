@@ -10,27 +10,14 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { ALL, BIDDING, FOR_ME, inOfferFilter } from '../src/client/categories.js';
 import { merchantStock, sellerShare } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
 const tuning = content.settlement.market;
 
-describe('the filters over the offers, on the page', () => {
-  test('"Dla mnie": the items the character could wear now; "Licytuję": the auctions with its bid, leading or outbid', () => {
-    const offers = [
-      { id: 1, goods: { kind: 'item' }, equipBlock: null, myBid: null },
-      { id: 2, goods: { kind: 'item' }, equipBlock: 'wrong_class', myBid: 50 },
-      { id: 3, goods: { kind: 'item' }, equipBlock: 'class_level', myBid: null },
-      { id: 4, goods: { kind: 'herb' }, myBid: 20 },
-    ];
-    assert.deepEqual(inOfferFilter(offers, ALL).map((offer) => offer.id), [1, 2, 3, 4]);
-    assert.deepEqual(inOfferFilter(offers, FOR_ME).map((offer) => offer.id), [1]);
-    assert.deepEqual(inOfferFilter(offers, BIDDING).map((offer) => offer.id), [2, 4]);
-  });
-});
-
+// "Dla mnie" and "Licytuję" are the server's search now, over all the
+// offers (test/market-search.test.js).
 describe('the Rejestr and the filters through the API', () => {
   const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'on', SETTLEMENT: 'on' });
   const cookies = {};
@@ -47,7 +34,7 @@ describe('the Rejestr and the filters through the API', () => {
     return made.meta.last_row_id;
   }
   const item = (base, slot, level = 20) => ({ base, slot, level, rarity: 'rare', affixes: [], implicit: { stat: 'will', value: 2 } });
-  const market = async (name) => (await call('GET', '/api/market', { cookie: cookies[name] })).data.market;
+  const market = async (name, query = '') => (await call('GET', `/api/market${query}`, { cookie: cookies[name] })).data.market;
   const register = async (name) => (await call('GET', '/api/market/log', { cookie: cookies[name] })).data;
   const act = (name, path, body) => call('POST', `/api/market/${path}`, { cookie: cookies[name], body });
   const endAll = async () => (await db()).prepare("UPDATE market_offers SET ends_at = ? WHERE state = 'open'").bind(Date.now() - 1).run();
@@ -70,7 +57,10 @@ describe('the Rejestr and the filters through the API', () => {
     // "Licytuję": the outbid sees its last bid, the one who leads too.
     const outbid = (await market('Kupiec')).offers.find((one) => one.id === offer.id);
     assert.deepEqual([outbid.myBid, outbid.leading], [100, false]);
-    assert.deepEqual(inOfferFilter((await market('Kupiec')).offers, BIDDING).map((one) => one.id), [offer.id]);
+    assert.deepEqual(
+      (await market('Kupiec', '?show=bidding')).offers.map((one) => one.id),
+      [offer.id],
+    );
     const leading = (await market('Druga')).offers.find((one) => one.id === offer.id);
     assert.deepEqual([leading.myBid, leading.leading], [105, true]);
     // Kupiec bids again: one line of its bids, the last amount.
@@ -154,7 +144,10 @@ describe('the Rejestr and the filters through the API', () => {
     const offers = (await market('Kupiec')).offers;
     const blocks = Object.fromEntries(Object.entries(offered).map(([base, id]) => [base, offers.find((one) => one.id === id).equipBlock]));
     assert.deepEqual(blocks, { kalkan: null, 'heraldic-shield': 'class_level', staff: 'wrong_class' });
-    assert.deepEqual(inOfferFilter(offers, FOR_ME).map((one) => one.id), [offered.kalkan]);
+    assert.deepEqual(
+      (await market('Kupiec', '?show=for-me')).offers.map((one) => one.id),
+      [offered.kalkan],
+    );
   });
 
   test('a character removed takes its Rejestr and bids with it', async () => {

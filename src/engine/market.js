@@ -15,8 +15,9 @@
 // The server passes the time and the seeds.
 
 import { potionPrice } from './brewing.js';
+import { companionWearBlock } from './companions.js';
 import { materialPrice, ordinaryMaterial, parseStack, stackKey } from './crafting.js';
-import { randomItem, sellPrice } from './items.js';
+import { canUse, equipBlock, randomItem, sellPrice } from './items.js';
 import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { relationDiscount, standingOf } from './settlement.js';
@@ -207,3 +208,130 @@ export function wandererGoods(character, now, content, day = wandererDay(now, co
 // The ceiling the wandering trader's prices keep above: the scrapper with
 // the Skup złomu at its top.
 export const itemBuyCeiling = (item, content) => sellPrice(item, content, topSellBonus(content));
+
+// The search over the players' offers (a player's remarks passed on by the
+// author, 11.11.2026: "za chwilę każdy będzie wystawiał coś i strasznie
+// ciężko będzie coś znaleźć"): which offers the Targowisko shows (`show`:
+// all of them, "Dla mnie" or "Licytuję"), the kind of goods as a tab of
+// its own (items, potions, herbs, materials, minerals or parts; "any" mixes
+// them), the class that can use an item (any class, for a companion of
+// another class), who of the character's own can put an item on now
+// ("Dla mnie": the character, or one of its companions), the rarity, the
+// category (an item's slot, as before), and the order: the soonest to end
+// first, as before, or by the price of a piece, the cheapest or the
+// dearest first. The server reads the open offers in a light form and asks
+// for the views of the page only, so the filters see every offer, not
+// just the first hundred.
+export const OFFER_SHOWS = ['all', 'for-me', 'bidding'];
+export const OFFER_SORTS = ['ends', 'cheap', 'dear'];
+
+// What a piece of an offer's goods costs now: its highest bid, or its
+// starting price, over its count (an item is one piece).
+export const piecePrice = (offer) => (offer.bid ?? offer.startPrice) / Math.max(1, offer.count ?? 1);
+
+// The rarity of an offer's goods (`kind`, `key`, and `item` of an item), or
+// null: herbs and potions have none.
+export function goodsRarity({ kind, key, item }, content) {
+  if (kind === 'item') return item?.rarity ?? null;
+  if (kind === 'material') return parseStack(key).rarityId ?? null;
+  if (kind === 'part') return content.partsById[key]?.rarity ?? null;
+  if (kind === 'mineral') {
+    const mineral = content.mineralsById[key];
+    return mineral ? (mineral.rarity ?? mineral.for?.[0] ?? null) : null;
+  }
+  return null;
+}
+
+// Who of `team` can put `item` ({ base, slot }) on now: 'me', the character,
+// as "Załóż" asks (equipBlock: its class and the item's Tier), and the ids
+// of its hired companions who can, as "Załóż z plecaka" in the Kwatery asks
+// (companionWearBlock: one of their places, their class and their level).
+// `team`: { classId, classLevel, companions }.
+export function wearersOf(item, team, content) {
+  return [
+    ...(equipBlock(item, team.classId, team.classLevel, content) === null ? ['me'] : []),
+    ...(team.companions ?? []).filter((companion) => companionWearBlock(companion, item, content) === null).map((companion) => companion.id),
+  ];
+}
+
+// How many entries of `list` fall on each key `keyOf` gives (null left out).
+function tally(list, keyOf) {
+  const counts = {};
+  for (const entry of list) {
+    const key = keyOf(entry);
+    if (key !== null && key !== undefined) counts[key] = (counts[key] ?? 0) + 1;
+  }
+  return counts;
+}
+
+// An offer's category, as the chips over a mixed list name it: an item's
+// slot, a stack's kind.
+const offerCategory = (offer) => (offer.kind === 'item' ? offer.item?.slot : offer.kind);
+
+const ORDERS = {
+  ends: (a, b) => a.endsAt - b.endsAt || a.id - b.id,
+  cheap: (a, b) => piecePrice(a) - piecePrice(b) || a.endsAt - b.endsAt || a.id - b.id,
+  dear: (a, b) => piecePrice(b) - piecePrice(a) || a.endsAt - b.endsAt || a.id - b.id,
+};
+
+// The offers (`offers`: { id, kind, key, count, item: { base, slot, rarity }
+// of an item, startPrice, bid, endsAt, myBid }, the character's own left
+// out) the search `asked` shows, for the character and its companions
+// (`team`, as wearersOf). Each choice that does not fit what is there gives
+// way: an unknown show, kind, class or person, a rarity or a category with
+// nothing in it (as the category chips did, 2.11.2026), an unknown order.
+// `limit` offers at most, `browse.page` without one, never past
+// `browse.most`. Returns `view`, the search as it was made; `counts`, how
+// many each choice holds where it stands (`shows` over all the offers,
+// `people` the items each of the team can put on now, `kinds` and
+// `classes` under "Wszystko", `rarities` and `categories` under the
+// choices before them); `found`, how many it shows in all; `ids`, the
+// offers of the page in their order; `wearers`, who can put each item of
+// the page on.
+export function browseOffers(offers, asked, team, content) {
+  const { page, most } = tuning(content).browse;
+  const items = offers.filter((offer) => offer.kind === 'item' && offer.item);
+  const wearers = new Map(items.map((offer) => [offer.id, wearersOf(offer.item, team, content)]));
+  const wears = (offer, who) => wearers.get(offer.id)?.includes(who) ?? false;
+  const bidding = offers.filter((offer) => offer.myBid !== null && offer.myBid !== undefined);
+  const people = Object.fromEntries(['me', ...(team.companions ?? []).map((companion) => companion.id)].map((who) => [who, items.filter((offer) => wears(offer, who)).length]));
+  const counts = { shows: { all: offers.length, 'for-me': people.me, bidding: bidding.length }, people };
+  const show = OFFER_SHOWS.includes(asked?.show) ? asked.show : 'all';
+  const view = { show, kind: 'any', classId: null, who: null, rarity: null, category: 'all', sort: OFFER_SORTS.includes(asked?.sort) ? asked.sort : 'ends' };
+  let shown;
+  if (show === 'for-me') {
+    view.kind = 'item';
+    view.who = Object.hasOwn(people, asked?.who ?? '') ? asked.who : 'me';
+    shown = items.filter((offer) => wears(offer, view.who));
+  } else if (show === 'bidding') {
+    shown = bidding;
+  } else {
+    counts.kinds = { ...Object.fromEntries(tuning(content).kinds.map((kind) => [kind, 0])), ...tally(offers, (offer) => offer.kind) };
+    if (Object.hasOwn(counts.kinds, asked?.kind ?? '')) view.kind = asked.kind;
+    shown = view.kind === 'any' ? offers : offers.filter((offer) => offer.kind === view.kind);
+    if (view.kind === 'item') {
+      counts.classes = Object.fromEntries(content.classes.map((cls) => [cls.id, shown.filter((offer) => offer.item && canUse(offer.item.base, cls.id, content)).length]));
+      if (Object.hasOwn(counts.classes, asked?.classId ?? '')) {
+        view.classId = asked.classId;
+        shown = shown.filter((offer) => offer.item && canUse(offer.item.base, view.classId, content));
+      }
+    }
+  }
+  counts.rarities = tally(shown, (offer) => goodsRarity(offer, content));
+  if (counts.rarities[asked?.rarity] > 0) {
+    view.rarity = asked.rarity;
+    shown = shown.filter((offer) => goodsRarity(offer, content) === view.rarity);
+  }
+  // The category chips stand over a list of items, or one that mixes kinds.
+  if (view.kind === 'item' || view.kind === 'any') {
+    counts.categories = tally(shown, offerCategory);
+    if (counts.categories[asked?.category] > 0) {
+      view.category = asked.category;
+      shown = shown.filter((offer) => offerCategory(offer) === view.category);
+    }
+  }
+  const limit = Number.isInteger(asked?.limit) && asked.limit > 0 ? Math.min(asked.limit, most) : page;
+  view.limit = limit;
+  const ids = [...shown].sort(ORDERS[view.sort]).slice(0, limit).map((offer) => offer.id);
+  return { view, counts, found: shown.length, ids, wearers: Object.fromEntries(ids.filter((id) => wearers.has(id)).map((id) => [id, wearers.get(id)])) };
+}
