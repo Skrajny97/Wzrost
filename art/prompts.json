@@ -1140,6 +1140,7 @@
     "width": 96,
     "height": 128,
     "references": [],
+    "pixellab": {"style": "src/client/art/events/treasure-hunter.png", "references": {"bog-herbalist": [{"path": "src/client/art/residents/herbalist.png", "usage": "the woman's face, hair and clothes: she is this herbalist"}]}},
     "prompts": {
       "wounded-woman": "a wounded young peasant woman slumped against an old tree root, torn grey linen dress and a brown wool shawl, pale exhausted face, dark loose hair, one hand pressed to a bloodied cloth bandage at her side, looking up weakly, full body, three-quarter view, muted forest colours",
       "fern-flower": "a glowing crimson fern flower in full bloom among dark green fern fronds, magical red light and tiny sparks rising from its petals, small mossy stones at its foot, full plant",
@@ -1156,7 +1157,13 @@
       "forest-ambush": {"prompt": "pixel art landscape, a narrow forest path at dusk between dense bushes and old crooked trees, a fallen wicker basket lying on the path, deep shadows in the undergrowth where someone could hide, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and browns, no text, no border, no people, no animals", "width": 192, "height": 96, "removeBackground": false},
       "bandit-thug": {"prompt": "burly forest bandit with a heavy knotted wooden club, ragged leather jerkin and a dark hood, unshaven scowling face, full body, three-quarter view", "width": 48, "height": 48},
       "bandit-knifer": {"prompt": "lean forest bandit holding two long knives, patched dark cloak, a cloth mask over the lower face, crouched ready to strike, full body, three-quarter view", "width": 48, "height": 48},
-      "bandit-crossbow": {"prompt": "forest bandit aiming a wooden crossbow, leather cap, ragged green cloak and a quiver of bolts at the hip, full body, three-quarter view", "width": 48, "height": 48}
+      "bandit-crossbow": {"prompt": "forest bandit aiming a wooden crossbow, leather cap, ragged green cloak and a quiver of bolts at the hip, full body, three-quarter view", "width": 48, "height": 48},
+      "bog-herbalist": "a young village herbalist woman with long light brown braids, a green linen dress and a brown shawl, sunk waist-deep in black marsh mud with dark water around her, both arms reaching out for help, a wicker basket of herbs floating beside her on the water, muddy and frightened, the whole figure and the mud around her inside the image, three-quarter view, isolated on a plain background, muted forest colours",
+      "star-iron": "a young apprentice smith with short tousled hair, a leather apron over a linen shirt with rolled sleeves, kneeling beside a small smoking crater with a glowing black lump of meteoric iron, sparks and thin smoke rising, an eager hopeful face, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+      "ferryman": "an old ferryman with a long grey beard and a wide-brimmed hat, a patched dark coat, standing in a small wooden river boat and leaning on a long punting pole, a little dark river water around the boat, the whole boat and pole inside the image, three-quarter view, isolated figure on a plain background, muted forest colours",
+      "fireside-dice": "a mysterious stranger in a black hooded cloak sitting cross-legged beside a small campfire, the face hidden in shadow except a sly grin, shaking a wooden cup of dice in one hand, a few bone dice on a flat stone before him, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+      "refugees": "a poor peasant family of refugees at the roadside: a father with a cloth bundle on his back, a mother holding a small child in her arms and an older child beside them, ragged grey and brown clothes smeared with soot, tired sad faces, all four figures whole and close together, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+      "old-soldier": "a grey-haired old soldier with a long scar across his whole face and a short grey beard, a worn padded gambeson and an old leather belt with a brass buckle, sitting on a stone with an old notched sword across his knees, calm and tough, full body, three-quarter view, isolated figure on a plain background, muted forest colours"
     }
   },
   "icons": {
