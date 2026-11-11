@@ -1,0 +1,27 @@
+{
+  "id": "rider-prophet-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a woman prophetess with long golden hair, a sheer golden blindfold over the eyes and her face clearly drawn in profile below it: the nose, the mouth and the chin, a golden circlet with a small sun, a flowing white and gold robe with golden sun and star embroidery down to the feet, a long golden stole, no staff, nothing in the hands but the reins, sitting upright and relaxed in the middle of the saddle exactly like the rider of the reference, seen exactly from the side in a strict profile, facing right, the face, chest and hips turned fully to the right and not towards the viewer, only the near leg showing and the far leg hidden behind the horse, the near thigh lying forward along the saddle and the lower leg hanging straight down from the knee to the foot, one normal slim leg, not tucked up, not slanting, both upper arms down along the body and both forearms reaching forward, the two hands close together in front of the body above the horse's neck holding the reins, the same size and place as the reference rider, the whole figure from the top of the head to the foot inside the image, nothing under the rider, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/riders/skin-dawn-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/prophet-female.png",
+      "usage": "the character's look only: the face, hair, headwear, clothes and colours; not the pose and not the staff"
+    },
+    {
+      "path": "art/references/riders/skin-dawn-female.png",
+      "usage": "a rider of this game which the author accepted: copy exactly its seat in the saddle seen from the side in a strict profile: the near thigh forward along the saddle and the lower leg hanging straight down, one leg showing, the back straight and upright, both hands together at the reins, and its size and place in the picture; not its face, clothes or colours"
+    },
+    {
+      "path": "art/references/riders/mannequin-seated.png",
+      "usage": "the pose of the figure: sitting sideways, the near thigh forward and the lower leg hanging straight down, only the near leg; not its hood or cloak"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 9
+}

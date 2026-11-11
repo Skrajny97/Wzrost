@@ -1,0 +1,27 @@
+{
+  "id": "rider-colossus-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a tall slim athletic woman guardian with a narrow waist and slender arms and legs, not bulky and not fat, in dark steel plate armour with gold trim fitted close to her body, rounded pauldrons of normal size, an open-faced heavy helmet with a small blue crest, dark hair tied back, a deep blue tabard with a golden fortress, no shield, no mace, nothing in the hands but the reins, sitting upright and relaxed in the middle of the saddle exactly like the rider of the reference, seen exactly from the side in a strict profile, facing right, the face, chest and hips turned fully to the right and not towards the viewer, only the near leg showing and the far leg hidden behind the horse, the near thigh lying forward along the saddle and the lower leg hanging straight down from the knee to the foot, one normal slim leg, not tucked up, not slanting, both upper arms down along the body and both forearms reaching forward, the two hands close together in front of the body above the horse's neck holding the reins, the same size and place as the reference rider, the whole figure from the top of the crest to the foot inside the image, nothing under the rider, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/riders/colossus-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/colossus-female.png",
+      "usage": "the character's look only: the face, hair, headwear, clothes and colours; not the pose and not the shield and the mace"
+    },
+    {
+      "path": "art/references/riders/colossus-male.png",
+      "usage": "the same character's other gender, a rider of this game which the author accepted: the same clothes, armour and colours, and exactly the same seat in the saddle seen from the side in a strict profile: the near thigh forward along the saddle and the lower leg hanging straight down, one leg showing, the back straight and upright, both hands together at the reins, and its size and place in the picture; only the face, hair and body are a woman's, slim and athletic"
+    },
+    {
+      "path": "art/references/riders/mannequin-seated.png",
+      "usage": "the pose of the figure: sitting sideways, the near thigh forward and the lower leg hanging straight down, only the near leg; not its hood or cloak"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 9
+}
