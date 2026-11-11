@@ -1,0 +1,14 @@
+{
+  "id": "refugees",
+  "tool": "pixellab generate-image-v2",
+  "description": "a poor peasant family of refugees at the roadside: a father with a cloth bundle on his back, a mother holding a small child in her arms and an older child beside them, ragged grey and brown clothes smeared with soot, tired sad faces, all four figures whole and close together, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "star-iron",
+  "tool": "pixellab generate-image-v2",
+  "description": "a young apprentice smith with short tousled hair, a leather apron over a linen shirt with rolled sleeves, kneeling beside a small smoking crater with a glowing black lump of meteoric iron, sparks and thin smoke rising, an eager hopeful face, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

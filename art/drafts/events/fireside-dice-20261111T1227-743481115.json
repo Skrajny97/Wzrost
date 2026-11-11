@@ -1,0 +1,14 @@
+{
+  "id": "fireside-dice",
+  "tool": "pixellab generate-image-v2",
+  "description": "a mysterious stranger in a black hooded cloak sitting cross-legged beside a small campfire, the face hidden in shadow except a sly grin, shaking a wooden cup of dice in one hand, a few bone dice on a flat stone before him, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

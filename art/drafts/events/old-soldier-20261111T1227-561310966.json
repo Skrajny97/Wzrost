@@ -1,0 +1,14 @@
+{
+  "id": "old-soldier",
+  "tool": "pixellab generate-image-v2",
+  "description": "a grey-haired old soldier with a long scar across his whole face and a short grey beard, a worn padded gambeson and an old leather belt with a brass buckle, sitting on a stone with an old notched sword across his knees, calm and tough, full body, three-quarter view, isolated figure on a plain background, muted forest colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

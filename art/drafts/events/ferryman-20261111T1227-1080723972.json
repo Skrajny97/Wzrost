@@ -1,0 +1,14 @@
+{
+  "id": "ferryman",
+  "tool": "pixellab generate-image-v2",
+  "description": "an old ferryman with a long grey beard and a wide-brimmed hat, a patched dark coat, standing in a small wooden river boat and leaning on a long punting pole, a little dark river water around the boat, the whole boat and pole inside the image, three-quarter view, isolated figure on a plain background, muted forest colours",
+  "style": "src/client/art/events/treasure-hunter.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
