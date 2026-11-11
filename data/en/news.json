@@ -476,6 +476,10 @@
     "0.2.67": {
       "title": "Version 0.2.67",
       "body": "- Jagna from the marsh comes once, and then only the Drowned Maiden, even if you visit the Settlement in between.\n- Settlement events (Jagna, the Drowned Maiden, companions' errands) come only once your character has the Settlement.\n- A companion's errand in which you fight together closes whatever the fight's result. Win it and you get the next stage of your bond and a rarer item.\n- A party left with only its leader and no invitation waiting ends, so the leader's companions go back on explorations at once."
+    },
+    "0.2.69": {
+      "title": "Version 0.2.69",
+      "body": "- Arena: a fight sent just before midnight between Sunday and Monday no longer drops out of the week's table, and the Arena open in two tabs at once shows the right rivals.\n- Guild wars: the Fame for a war won always reaches the week's ranking, and characters of one account on both sides of a war do not fight each other.\n- Account Chest: the items of a removed character stay in the chest as items of another character."
     }
   }
 }

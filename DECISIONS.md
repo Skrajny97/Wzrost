@@ -3092,6 +3092,35 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.69 (11.11.2026): poprawki Areny i wojen gildii z przeglądu kodu, resztki po usuniętych postaciach
+
+Przegląd kodu Areny i wojen gildii znalazł kilka rzadkich błędów. Każda poprawka ma test, który bez niej nie przechodzi.
+
+**Arena** (src/server/pvp-arena.js, test/pvp-arena.test.js):
+
+1. **Walka tuż przed północą z niedzieli na poniedziałek.** Walkę wysłaną przed północą gra mogła zapisać już po zamrożeniu jej tygodnia przez inne zapytanie. Postać wypadała wtedy z tabeli tego tygodnia na zawsze i traciła nagrodę. Teraz taka walka zostaje odrzucona („Arena zmieniła się w międzyczasie”), a powtórzona liczy się w nowym tygodniu.
+2. **Arena w dwóch kartach naraz.** Dwa spojrzenia naraz mogły pokazać rywali, których gra nie zapisała, i każde „Walcz” na nich było odrzucane. Teraz każde spojrzenie pokazuje rywali zapisanych, a ekran Areny po każdej odmowie wczytuje się na nowo.
+3. **Rywal usunięty w trakcie walki**: odmowa zamiast błędu serwera.
+4. **Ostatnia walka** pokazuje punkty zapisane, także gdy obrona przesunęła je w międzyczasie.
+
+**Wojny gildii** (src/server/guild-wars.js i guild-fame.js, test/guild-wars.test.js):
+
+5. **Sława tygodnia czeka na koniec jego wojen.** Gdy zaległe wieczory wojny nadrabiały naraz dwa zapytania, jedno z nich mogło zamrozić Sławę tygodnia przed niedzielną bitwą, a 100 Sławy za wygraną wojnę przepadało. Teraz Sława tygodnia zamraża się dopiero wtedy, gdy żadna jego wojna nie jest w toku, a zapytanie, które przegrało wieczór z innym, walczy dalej.
+6. **Jedno konto po obu stronach wojny.** Losowanie nie łączy gildii z postaciami jednego konta (punkt 3 wojen). Postać założona albo przeniesiona po losowaniu mogła jednak walczyć przeciw innej postaci swojego konta i zgarniać nagrodę za darmo. Teraz postacie takiego konta nie walczą po żadnej stronie.
+7. **Błąd jednej wojny nie wstrzymuje innych** i trafia do dziennika. Za wyścig uchodzi już tylko powtórzony zapis samych wojen.
+8. **(brakujący szczegół)** Postać, która w trakcie wojny przejdzie do gildii przeciwnika, walczy od następnego wieczoru za nową gildię, jak dotąd. Zakaz dotyczy tylko jednego konta po obu stronach naraz.
+
+**Resztki po usuniętych postaciach** (src/server/characters.js i accounts.js, migracja 0113, test/chest.test.js):
+
+9. Baza nadaje numer usuniętej postaci ponownie, gdy był najwyższy. Nowa postać z tym numerem:
+   - brała przedmioty usuniętej ze Skrzyni Konta jako swoje, bez znacznika skrzyni;
+   - widziała ostatnią wygraną Loterii jako swoją;
+   - widziała bitwy wojny gildii i nagrody za nie jako swoje.
+
+   Teraz usunięcie postaci albo konta odpina jej wiersze w Skrzyni Konta, Loterii i kodach podarunkowych (numer ujemny, jak zakupy w 0.2.68). Migracja 0113 odpina tak samo wiersze postaci usuniętych wcześniej, a bitwa wojny zapisuje przy walczącym czas założenia postaci. Przejrzane i w porządku: Arena (baza usuwa jej wiersze razem z postacią), Bestia i Wyprawa Gildii (liczą tylko od założenia postaci), Targowisko, Drużyna i gildia (czyszczone przy usunięciu postaci).
+
+10. **Sprawdzanie typów (650 A)** obejmuje teraz 31 z 65 plików silnika.
+
 ## Wersja 0.2.68 (11.11.2026): poprawki płatności z przeglądu kodu
 
 Płatności za Punkty Systemu działają na razie tylko dla konta autora (`PAYMENTS_FOR: "authors"`), więc gracze nie widzą żadnej zmiany. Przegląd kodu 0.2.60–0.2.66 znalazł w nich sześć rzeczy do poprawy przed otwarciem płatności dla wszystkich. Każda ma test w `test/payments.test.js`.
