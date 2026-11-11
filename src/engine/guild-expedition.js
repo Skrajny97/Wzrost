@@ -1,3 +1,4 @@
+// @ts-check
 // The Wyprawa Gildii (the author's 621 A, mock-up 624; data/guilds.json
 // `expedition`; src/server/guild-expedition.js; DECISIONS.md, "Wyprawa
 // Gildii (621 A)"): a guild's route of the week through one land, in seven
@@ -17,13 +18,27 @@ import { championItemRarity } from './hunt.js';
 import { randomItem } from './items.js';
 import { createRng } from './rng.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {{ monsterId: string, areaId: string }} Guardian */
+/** @typedef {{ attacks: number, materials: number, item?: boolean, gold: { base: number, perLevel: number } }} GuardianTuning A guardian of data/guilds.json `expedition.guardians`. */
+/** @typedef {{ id: string, minLevel: number, maxLevel: number }} Land */
+
+/**
+ * @param {Content} content
+ * @returns {{ guardians: GuardianTuning[], stageMinutes: { perMember: number, step: number, min: number } }}
+ */
 const rules = (content) => content.guilds.expedition;
 
 // How many stages (and guardians) a route has.
+/** @param {Content} content */
 export const expeditionStages = (content) => rules(content).guardians.length;
 
 // The members' rounded average character level, at least 1 (as the
 // Bestia's).
+/**
+ * @param {number[]} levels
+ * @returns {number}
+ */
 export function expeditionLevel(levels) {
   if (levels.length === 0) return 1;
   return Math.max(1, Math.round(levels.reduce((sum, level) => sum + level, 0) / levels.length));
@@ -31,12 +46,20 @@ export function expeditionLevel(levels) {
 
 // The land of the week for the members' average level: the one whose
 // levels hold it, the highest land for a level above them all.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {Land}
+ */
 export function expeditionLand(level, content) {
+  /** @type {Land[]} */
   const lands = [...content.regions].sort((a, b) => a.minLevel - b.minLevel);
-  return lands.find((land) => level >= land.minLevel && level <= land.maxLevel) ?? (level > lands.at(-1).maxLevel ? lands.at(-1) : lands[0]);
+  const highest = lands[lands.length - 1];
+  return lands.find((land) => level >= land.minLevel && level <= land.maxLevel) ?? (level > highest.maxLevel ? highest : lands[0]);
 }
 
 // How strong a creature is by its own make: its HP and its blows.
+/** @param {{ hpFactor: number, attack: { damageFactor: number } }} monster */
 const make = (monster) => monster.hpFactor * monster.attack.damageFactor;
 
 // The seven guardians of a land, the weakest first, each creature once:
@@ -47,11 +70,18 @@ const make = (monster) => monster.hpFactor * monster.attack.damageFactor;
 // is a champion where the land has one. Each with its highest place in the
 // land: the land's trait counts in the fight, and the place's creatures
 // name the affixes of the last chest's item.
+/**
+ * @param {string} landId
+ * @param {Content} content
+ * @returns {Guardian[]}
+ */
 export function expeditionGuardians(landId, content) {
   const land = content.regionsById[landId];
   const count = expeditionStages(content);
+  /** @type {Map<string, { monsterId: string, areaId: string, place: number, rank: number, make: number }>} */
   const found = new Map();
-  land.areas.forEach((area, place) => {
+  land.areas.forEach((/** @type {Record<string, any>} */ area, /** @type {number} */ place) => {
+    /** @type {string[]} */
     const ids = [...area.encounters, ...area.tough].flatMap((encounter) => encounter.monsters).concat(area.elite ?? [], area.champion ?? []);
     for (const id of new Set(ids)) {
       const monster = content.monstersById[id];
@@ -74,6 +104,10 @@ export function expeditionGuardians(landId, content) {
 // The route of a guild's week, made when the week's first look comes: the
 // land of the members' average level (`levels`), that level, and its
 // guardians.
+/**
+ * @param {{ levels: number[] }} guild
+ * @param {Content} content
+ */
 export function guildExpedition({ levels }, content) {
   const level = expeditionLevel(levels);
   const land = expeditionLand(level, content);
@@ -84,6 +118,11 @@ export function guildExpedition({ levels }, content) {
 // active ones and the shares of those who joined later, as the Próby
 // Gildii count them): perMember for each, rounded up to `step`, at least
 // `min`.
+/**
+ * @param {number} members
+ * @param {Content} content
+ * @returns {number}
+ */
 export function expeditionStageMinutes(members, content) {
   const { perMember, step, min } = rules(content).stageMinutes;
   return Math.max(min, Math.ceil((Math.max(1, members) * perMember - 1e-9) / step) * step);
@@ -93,6 +132,10 @@ export function expeditionStageMinutes(members, content) {
 // its creature, its level (the route's, one more for each stage before),
 // and its most HP for the `members` it comes for, as the Bestia's: the
 // stage's attacks of a typical character of its level for each of them.
+/**
+ * @param {{ stage: number, level: number, members: number, guardians: Guardian[] }} route
+ * @param {Content} content
+ */
 export function expeditionGuardian({ stage, level, members, guardians }, content) {
   const tuning = rules(content).guardians[stage - 1];
   const at = level + stage - 1;
@@ -107,6 +150,10 @@ export function expeditionGuardian({ stage, level, members, guardians }, content
 // guardian has come. The stage now (1 to 7), the minutes walked in it (to
 // its need), whether its guardian bars the way, and the minutes kept
 // meanwhile, which walk the route on as it falls; `done` once all fell.
+/**
+ * @param {{ minutes: number, walked?: number, beaten?: number, need: number, standing?: boolean }} route
+ * @param {Content} content
+ */
 export function expeditionProgress({ minutes, walked = 0, beaten = 0, need, standing = false }, content) {
   const stages = expeditionStages(content);
   const into = Math.max(0, minutes - walked);
@@ -130,13 +177,19 @@ export function expeditionProgress({ minutes, walked = 0, beaten = 0, need, stan
 // item of the character's class it can wear, at its level, of a champion's
 // rarity, favouring its empty slots, as in the Skrzynia Bestii. The same
 // seed, the same chest.
+/**
+ * @param {{ stage: number, level: number, classId: string, classLevel: number, wornSlots?: string[], guardian: Guardian & { level: number }, seed: unknown }} chest
+ * @param {Content} content
+ * @returns {{ gold: number, materials: Record<string, number>, item: Record<string, any> | null }}
+ */
 export function expeditionChest({ stage, level, classId, classLevel, wornSlots = [], guardian, seed }, content) {
   const tuning = rules(content).guardians[stage - 1];
   const rng = createRng(`${seed}:chest`);
   const area = content.areasById[guardian.areaId];
   const item = tuning.item
-    ? randomItem(level, rng, content, { classId, maxClassLevel: classLevel, rarityId: championItemRarity(level, rng, content), filled: new Set(wornSlots), area })
+    ? randomItem(level, rng, content, /** @type {any} */ ({ classId, maxClassLevel: classLevel, rarityId: championItemRarity(level, rng, content), filled: new Set(wornSlots), area }))
     : null;
+  /** @type {Record<string, number>} */
   let materials = {};
   for (let draw = 0; draw < tuning.materials; draw++) materials = addCounts(materials, materialDrops(guardian.monsterId, guardian.level, 1, rng, content));
   const material = content.materialsByMonster[guardian.monsterId];
