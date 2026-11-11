@@ -228,8 +228,8 @@ export function setMinutes(gemId, level, content) {
  * @property {number} endsAt
  * @property {string} seed
  * @property {boolean} [stopped]
- * @property {{ level: number } & Record<string, any>} before The profession before the work.
- * @property {{ level: number } & Record<string, any>} after The profession after it.
+ * @property {{ level: number }} before The profession before the work.
+ * @property {{ level: number, xp: number, gained?: number }} after The profession after it (workProfession).
  * @property {{ level: number } & Record<string, any>} character The character before the work.
  * @property {number} xp
  * @property {{ level: number, timePoints: number, messages: string[] } & Record<string, any>} work The character's gains (workGains).
