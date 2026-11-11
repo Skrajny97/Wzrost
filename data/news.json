@@ -580,6 +580,11 @@
       "id": "0.2.63",
       "title": "Wersja 0.2.63",
       "body": "- Wymiana między graczami działa od 20. poziomu postaci, po obu stronach."
+    },
+    {
+      "id": "0.2.64",
+      "title": "Wersja 0.2.64",
+      "body": "- Siedem nowych zdarzeń na wyprawach: Jagna na mokradłach, Gwiazda z nieba, Przewoźnik, Kości przy ognisku, Pogorzelcy, Stary wojak i sprawa towarzysza z jego przeszłości, gdy macie relację od Zaufania.\n- Pomoc mieszkańcom Osady w zdarzeniach podnosi relację z nimi, a odmowa nic nie kosztuje.\n- Podarunki w Osadzie: raz dziennie możesz dać każdemu mieszkańcowi coś, co lubi. Mieszkaniec z relacją Przyjaciel raz w tygodniu zostawia Ci podarek."
     }
 ]
 }

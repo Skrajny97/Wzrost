@@ -98,7 +98,12 @@ jobs:
         if: steps.main.outputs.same != 'true'
         run: |
           npm install --no-save playwright@1.56.1
-          npx playwright install --with-deps chromium
+          # The browser's system packages come from Ubuntu's mirrors, whose
+          # names did not resolve for 0.2.62 and 0.2.63 (11.11.2026): the
+          # browser then installs without them, as the runner already holds
+          # what Chromium needs (only fonts were missing). A browser that
+          # cannot start still stops the walk below.
+          npx playwright install --with-deps chromium || npx playwright install chromium
           npx wrangler d1 migrations apply DB --local
           npx wrangler dev --port 8787 > first-steps.log 2>&1 &
           for i in $(seq 1 90); do curl -sf http://localhost:8787/api/health > /dev/null && break; sleep 2; done

@@ -460,6 +460,10 @@
     "0.2.63": {
       "title": "Version 0.2.63",
       "body": "- Trading between players works from character level 20, on both sides."
+    },
+    "0.2.64": {
+      "title": "Version 0.2.64",
+      "body": "- Seven new events on expeditions: Jagna in the Marsh, A Star from the Sky, The Ferryman, Dice by the Fire, Burnt Out, The Old Soldier, and a companion's errand from their past once your relationship reaches Trust.\n- Helping the Settlement's residents in events raises your relationship with them, and saying no costs nothing.\n- Gifts in the Settlement: once a day you can give each resident something they like. A resident who is your Friend leaves you a present once a week."
     }
   }
 }
