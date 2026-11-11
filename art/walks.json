@@ -536,6 +536,61 @@
       "start": "art/references/walks/start/wild-lord-female.png",
       "pose": 2,
       "description": "a strong woman lady of the wild forest with light brown hair in braids, a huge white wolf pelt worn as a hooded mantle with the white wolf's head over her head, leather armour embossed with golden animal motifs and fur trim, a golden eagle perched on her shoulder, brown trousers and fur-topped boots, one single long horn bow held upright in her right hand at her side, only one bow, no arrow on the string"
+    },
+    "bow-master-male": {
+      "start": "art/references/walks/start/bow-master-male.png",
+      "pose": 2,
+      "description": "a lean young man master archer with black hair tied back and a silver diadem with a green gem, elegant black leather armour with silver plates and silver filigree, a silver pauldron shaped like a hawk's wing, a long dark green cloak, black trousers and tall black boots, one single long black recurve bow with silver tips held upright in his right hand at his side, only one bow, no arrow on the string, the left hand empty, no dagger, no knife and no arrow in the hands"
+    },
+    "perun-chosen-female": {
+      "start": "art/references/walks/start/perun-chosen-female.png",
+      "pose": 2,
+      "description": "an athletic young woman archer of the thunder god with a long fair blond braid and a silver circlet, a long dark blue coat with gold embroidered thunder symbols, a silver breastplate with a golden six-petal thunder rosette, silver pauldrons with lightning-shaped edges, brown boots, a quiver of blue-fletched arrows on her back seen from the side, one single long oak bow held upright in her right hand at her side, only one bow, no second bow, no arrow on the string, the left hand empty"
+    },
+    "wild-lord-male": {
+      "start": "art/references/walks/start/wild-lord-male.png",
+      "pose": 2,
+      "description": "a strong man lord of the wild forest with a short light brown beard, a huge white wolf pelt worn as a hooded mantle with the white wolf's head over his head, leather armour embossed with golden animal motifs and fur trim, a golden eagle sitting on the back of his left shoulder with its talons on the shoulder, never on his hand or arm, brown trousers and fur-topped boots, one single long horn bow held upright and vertical in his right hand at his side, only one bow, no arrow on the string, the left hand empty"
+    },
+    "demon-slayer-male": {
+      "start": "art/references/walks/start/demon-slayer-male.png",
+      "pose": 2,
+      "description": "a broad strong man holy demon hunter with short dark hair and a stern scarred face, gleaming silver plate armour with golden sun engravings, a long white tabard with a golden sun, a short white cape with gold trim, a horned demon skull hanging at the belt, one single huge greatsword with glowing golden runes held in his right hand at his side with the blade pointing down, only one sword, the left hand empty"
+    },
+    "demon-slayer-female": {
+      "start": "art/references/walks/start/demon-slayer-female.png",
+      "pose": 2,
+      "description": "a broad strong woman holy demon hunter with dark hair in a long braid and a stern scarred face, gleaming silver plate armour with golden sun engravings, a long white tabard with a golden sun, a short white cape with gold trim, a horned demon skull hanging at the belt, one single huge greatsword with glowing golden runes held in her right hand at her side with the blade pointing down, only one sword, the left hand empty"
+    },
+    "prophet-female": {
+      "start": "art/references/walks/start/prophet-female.png",
+      "pose": 2,
+      "description": "a woman prophetess with long golden hair, a sheer golden blindfold over the eyes, a golden circlet with a small sun, a flowing white and gold robe with golden sun and star embroidery down to the feet, a long golden stole, one single tall golden staff topped with a radiant sun disc with an open eye held upright in her right hand at her side, the left hand empty"
+    },
+    "godslayer-male": {
+      "start": "art/references/walks/start/godslayer-male.png",
+      "pose": 2,
+      "description": "a lean hooded man assassin in a black and deep crimson hooded cloak with torn edges, a black mask over the lower face, ornate black leather armour with dark red plates and gold filigree, a shattered golden halo hanging at the belt, one single long curved dagger glowing with red light in his right hand, only one dagger, the left hand empty"
+    },
+    "godslayer-female": {
+      "start": "art/references/walks/start/godslayer-female.png",
+      "pose": 2,
+      "description": "a lean hooded woman assassin in a black and deep crimson hooded cloak with torn edges, a black mask over the lower face, ornate black leather armour with dark red plates and gold filigree, a shattered golden halo hanging at the belt, one single long curved dagger glowing with red light in her right hand, only one dagger, the left hand empty"
+    },
+    "lich-female": {
+      "start": "art/references/walks/start/lich-female.png",
+      "pose": 2,
+      "description": "a gaunt pale woman lich with glowing green eyes and long black hair, a crown of black iron spikes, tattered black and purple robes with glowing green runes and silver trim down to the feet, a high collar, a glowing green gem on a chain on the chest, one single tall staff of black bone topped with a horned skull with glowing green eyes held upright in her right hand at her side, a small wisp of green mist above her left hand held before her chest"
+    },
+    "shadow-lord-male": {
+      "start": "art/references/walks/start/shadow-lord-male.png",
+      "pose": 2,
+      "description": "a pale young man lord of shadows with silver hair and glowing violet eyes, a silver circlet, dark grey and black fitted armour with silver edges, a long black cloak of shadow dissolving into dark smoke at the edges, one single long thin curved blade of black steel with a glowing violet edge in his right hand, pointing down, only one blade, the left hand empty"
+    },
+    "shadow-lord-female": {
+      "start": "art/references/walks/start/shadow-lord-female.png",
+      "pose": 2,
+      "description": "a pale young woman lady of shadows with long silver hair and glowing violet eyes, a silver circlet, dark grey and black fitted armour with silver edges, a long black cloak of shadow dissolving into dark smoke at the edges, one single long thin curved blade of black steel with a glowing violet edge in her right hand, pointing down, only one blade, the left hand empty"
     }
   }
 }
