@@ -393,7 +393,7 @@ export const SPRITES = {
   events: {
     width: 96,
     height: 128,
-    ids: ['wounded-woman', 'fern-flower', 'blue-mushroom', 'wandering-beggar', 'wayside-shrine', 'stuck-merchant', 'leshy', 'lost-child', 'forest-wedding', 'treasure-hunter'],
+    ids: ['wounded-woman', 'fern-flower', 'blue-mushroom', 'wandering-beggar', 'wayside-shrine', 'stuck-merchant', 'leshy', 'lost-child', 'forest-wedding', 'treasure-hunter', 'bog-herbalist', 'star-iron', 'ferryman', 'fireside-dice', 'refugees', 'old-soldier'],
   },
   'event-scenes': {
     width: 192,
