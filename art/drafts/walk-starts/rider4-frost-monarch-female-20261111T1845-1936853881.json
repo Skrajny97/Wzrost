@@ -1,0 +1,14 @@
+{
+  "id": "rider4-frost-monarch-female",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, the lower half of a tall regal queen of eternal ice in a long deep blue gown with silver frost embroidery and a long white fur mantle, riding: seated astride a horse that is not drawn, seen strictly from the side and facing right; the hips sit on the saddle, the deep blue gown falls over the near thigh which lies forward along the horse's back and hangs straight down from the knee along the horse's side, one pale blue slipper shows below its hem resting in a stirrup that is not drawn; the white fur mantle hangs down behind over the horse's back; only the near leg is seen; the same colours, outline, pixel size and shading as the upper half above, which stays as it is; nothing else: no horse, no saddle, no reins, no ground, transparent background",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": "art/inputs/riders4/frost-monarch-female.png",
+  "mask": "art/inputs/riders4/frost-monarch-female-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
