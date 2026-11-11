@@ -1,0 +1,23 @@
+{
+  "id": "arena-legend-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "an athletic man arena legend with a golden helmet with a tall crimson crest and a golden laurel wreath, a lion pelt over the shoulders, a golden muscle cuirass with a lion's head, golden pauldrons, a crimson cape, a crimson and gold pleated skirt, golden greaves and sandals, a round golden shield with a lion's head on his left arm and a short sword in his right hand, seen from the side in strict profile: the face, chest, hips and feet all turned fully to the right, only one eye visible, facing and walking to the right, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/arena-legend-male.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

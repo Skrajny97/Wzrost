@@ -1,0 +1,23 @@
+{
+  "id": "wild-lord-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a strong man lord of the wild forest with a short light brown beard, a huge white wolf pelt worn as a hooded mantle with the white wolf's head over his head, leather armour embossed with golden animal motifs and fur trim, a golden eagle perched on his shoulder, brown trousers and fur-topped boots, one single long horn bow held upright in his right hand at his side, only one bow, no arrow on the string, seen from the side in strict profile: the face, chest, hips and feet all turned fully to the right, only one eye visible, facing and walking to the right, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/wild-lord-male.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

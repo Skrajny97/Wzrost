@@ -1,0 +1,23 @@
+{
+  "id": "horde-slayer-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a tall muscular barbarian woman with long red-brown hair in thick braids, the horned skull of a giant beast worn as a helmet with two long curved horns, a thick black fur mantle over the shoulders, a fitted leather and fur top, glowing red war paint runes on her arms, a fur kilt with a wide belt, fur-wrapped boots, one single big axe with a red rune on the blade in her right hand, only one axe, seen from the side in strict profile: the face, chest, hips and feet all turned fully to the right, only one eye visible, facing and walking to the right, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/horde-slayer-female.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

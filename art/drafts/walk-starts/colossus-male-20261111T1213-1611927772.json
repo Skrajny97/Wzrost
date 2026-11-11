@@ -1,0 +1,23 @@
+{
+  "id": "colossus-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "an enormous broad man guardian in massive dark steel plate armour with gold trim, huge layered pauldrons, an open-faced heavy helmet with a small blue crest, a short dark beard, a deep blue tabard with a golden fortress, a tall dark steel tower shield with a golden fortress on his left arm and a heavy flanged mace in his right hand, seen from the side in strict profile: the face, chest, hips and feet all turned fully to the right, only one eye visible, facing and walking to the right, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/colossus-male.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
