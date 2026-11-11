@@ -7,7 +7,7 @@
 // on; thanks once; the week's ranking; a request's time running out; herbs
 // and potions only with room in the bag; a member who left has no request
 // hanging, and old requests go with their gifts; characters of one account
-// give each other nothing.
+// give each other nothing; both sides from character level 20 (830 A).
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -38,7 +38,7 @@ describe('the Prośby Gildii through the API', () => {
 
   beforeEach(async () => {
     await player('mistrz', 'Mistrz');
-    await player('druh', 'Druh', { level: 12 });
+    await player('druh', 'Druh', { level: content.community.trade.minLevel });
     await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' });
     const guildId = (await as('mistrz', 'GET', '/api/guild')).data.guild.id;
     await as('mistrz', 'POST', '/api/guild/invite', { name: 'Druh' });
@@ -272,5 +272,37 @@ describe('the Prośby Gildii through the API', () => {
     const seen = (await as('mistrz', 'GET', '/api/guild/requests')).data.requests[0];
     assert.deepEqual([seen.sameAccount, seen.give], [true, 0]);
     assert.equal((await give('mistrz', mine.id, 1)).data.error.code, 'same_account');
+  });
+
+  test('asking and giving open at character level 20 for both sides; a request made before by one below it shows to no one else', async () => {
+    const { minLevel } = content.community.trade;
+    const lockedText = `Prośby w gildii otworzą się na ${minLevel}. poziomie postaci.`;
+    await setStacks('Mistrz', 'materials', { 'wolf-pelt:common': 5 });
+    await setStacks('Druh', 'materials', { 'wolf-pelt:common': 5 });
+    // Druh below the level: no request of its own, no gift, and the card says why.
+    await run("UPDATE characters SET level = ? WHERE name = 'Druh'", minLevel - 1);
+    const early = await ask('druh', { kind: 'material', key: 'wolf-pelt:common', count: 2 });
+    assert.deepEqual([early.status, early.data.error.code, early.data.error.message], [403, 'requests_level', lockedText]);
+    const { mine } = (await ask('mistrz', { kind: 'material', key: 'wolf-pelt:common', count: 3 })).data;
+    const seen = (await as('druh', 'GET', '/api/guild/requests')).data;
+    assert.deepEqual([seen.locked, seen.texts.level, seen.requests.map((one) => [one.id, one.give])], [true, lockedText, [[mine.id, 0]]]);
+    assert.equal((await as('mistrz', 'GET', '/api/guild/requests')).data.locked, false);
+    const gift = await give('druh', mine.id, 1);
+    assert.deepEqual([gift.status, gift.data.error.code], [403, 'requests_level']);
+    assert.deepEqual([await stacks('Mistrz', 'materials'), await stacks('Druh', 'materials')], [{ 'wolf-pelt:common': 5 }, { 'wolf-pelt:common': 5 }]);
+    assert.equal((await as('mistrz', 'POST', '/api/guild/requests/cancel')).status, 200);
+    // A request Druh made at the level, and Druh below it now (as one made
+    // before the rule): no one else sees it or fills it; Druh still sees it
+    // and takes it back.
+    await run("UPDATE characters SET level = ? WHERE name = 'Druh'", minLevel);
+    const own = (await ask('druh', { kind: 'material', key: 'wolf-pelt:common', count: 2 })).data.mine;
+    await run("UPDATE characters SET level = ? WHERE name = 'Druh'", minLevel - 1);
+    assert.deepEqual((await as('mistrz', 'GET', '/api/guild/requests')).data.requests, []);
+    const other = await give('mistrz', own.id, 1);
+    assert.deepEqual([other.status, other.data.error.code, other.data.error.message], [409, 'requests_level_other', `Postać Druh dostanie dary dopiero od ${minLevel}. poziomu.`]);
+    assert.deepEqual([await stacks('Mistrz', 'materials'), await stacks('Druh', 'materials')], [{ 'wolf-pelt:common': 5 }, { 'wolf-pelt:common': 5 }]);
+    const card = (await as('druh', 'GET', '/api/guild/requests')).data;
+    assert.deepEqual([card.mine.id, card.mine.state], [own.id, 'open']);
+    assert.equal((await as('druh', 'POST', '/api/guild/requests/cancel')).status, 200);
   });
 });

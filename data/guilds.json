@@ -338,7 +338,7 @@
     }
   },
   "requests": {
-    "$comment": "Prośby Gildii (src/server/guild-requests.js, src/client/guild-requests.js; DECISIONS.md, „Próby i Prośby Gildii”). Autor: „346 A”: pomoc materiałami. Członek gildii prosi o materiał, zioło, miksturę albo minerał Górnictwa (kinds), od 1 do most sztuk; przedmiotów i złota prosić nie można, żeby majątek nie przechodził między kontami. Naraz jedna otwarta prośba na postać; kolejną doda waitHours godzin po dodaniu poprzedniej. Prośba wisi, aż ktoś ją spełni, aż proszący ją wycofa albo przez openHours godzin. Inni członkowie dają ze swoich zapasów, kiedy chcą, najwyżej tyle, ile brakuje; sztuki trafiają od razu do proszącego (zioła i mikstury do plecaka, jeśli jest w nim miejsce), z imieniem dającego, a proszący raz dziękuje za każdy dar. Postacie jednego konta nic sobie nie dają. Dawanie nie daje złota ani nagród Systemu: liczy się do rankingu Dobroczyńcy tygodnia (sztuki dane od poniedziałku) i do Prób Gildii (rodzaj gifts). Encyklopedia nie zalicza danych sztuk, jak towarów z Wymiany. Prośba wycofana znika z karty, zostaje tylko czas do następnej, a dary, za które proszący jeszcze nie podziękował, dostają podziękowanie przy wycofaniu. Prośby zamknięte przed początkiem poprzedniego tygodnia znikają razem z darami przy kolejnej prośbie. texts: słowa karty Próśb, okna prośby i odpowiedzi gry; {…} wypełnia gra.",
+    "$comment": "Prośby Gildii (src/server/guild-requests.js, src/client/guild-requests.js; DECISIONS.md, „Próby i Prośby Gildii”). Autor: „346 A”: pomoc materiałami. Członek gildii prosi o materiał, zioło, miksturę albo minerał Górnictwa (kinds), od 1 do most sztuk; przedmiotów i złota prosić nie można, żeby majątek nie przechodził między kontami. Naraz jedna otwarta prośba na postać; kolejną doda waitHours godzin po dodaniu poprzedniej. Prośba wisi, aż ktoś ją spełni, aż proszący ją wycofa albo przez openHours godzin. Inni członkowie dają ze swoich zapasów, kiedy chcą, najwyżej tyle, ile brakuje; sztuki trafiają od razu do proszącego (zioła i mikstury do plecaka, jeśli jest w nim miejsce), z imieniem dającego, a proszący raz dziękuje za każdy dar. Postacie jednego konta nic sobie nie dają. Dawanie nie daje złota ani nagród Systemu: liczy się do rankingu Dobroczyńcy tygodnia (sztuki dane od poniedziałku) i do Prób Gildii (rodzaj gifts). Encyklopedia nie zalicza danych sztuk, jak towarów z Wymiany. Prośba wycofana znika z karty, zostaje tylko czas do następnej, a dary, za które proszący jeszcze nie podziękował, dostają podziękowanie przy wycofaniu. Prośby zamknięte przed początkiem poprzedniego tygodnia znikają razem z darami przy kolejnej prośbie. Od 0.2.66 prosi i daje postać od poziomu trade.minLevel z community.json, jak w obu Wymianach (830 A, autor 11.11.2026: Prośby od 20. poziomu postaci po obu stronach), a postać poniżej niego widzi na karcie zdanie texts.level zamiast „Poproś gildię”. Próśb wystawionych wcześniej przez postać poniżej tego poziomu nikt inny nie widzi ani nie spełnia; ona sama dalej dziękuje za dary i wycofuje prośbę. texts: słowa karty Próśb, okna prośby i odpowiedzi gry; {…} wypełnia gra (texts.level i errors.levelOther: {level} i {name}).",
     "kinds": ["material", "herb", "potion", "mineral"],
     "most": 10,
     "waitHours": 8,
@@ -397,6 +397,7 @@
       "thankedToast": "Podziękowanie poszło.",
       "cancelled": "Prośba wycofana.",
       "cancelledFree": "Prośba wycofana. Nikt nic jeszcze nie dał, więc nową dodasz od razu.",
+      "level": "Prośby w gildii otworzą się na {level}. poziomie postaci.",
       "errors": {
         "locked": "Gildie odblokujesz na poziomie postaci {level}.",
         "noGuild": "Nie należysz do gildii.",
@@ -419,7 +420,8 @@
         "askerFull": "Plecak postaci {name} jest pełny.",
         "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz.",
         "noGift": "Nie ma takiego daru.",
-        "thanked": "Za ten dar podziękowanie już poszło."
+        "thanked": "Za ten dar podziękowanie już poszło.",
+        "levelOther": "Postać {name} dostanie dary dopiero od {level}. poziomu."
       }
     }
   },

@@ -12,7 +12,12 @@
 // gains nothing by it. One open request for a character at a time, a new
 // one `waitHours` after the last one was made. No items and no gold, so
 // wealth cannot move between accounts, and characters of one account give
-// each other nothing, as in a Wymiana (177 A). Herbs and potions go into
+// each other nothing, as in a Wymiana (177 A). A character asks and gives
+// from the players' Wymiana's level (community.json trade.minLevel; the
+// author's 830 A: „Prośby od 20. poziomu postaci po obu stronach, jak obie
+// Wymiany”), so new characters of other accounts move no finds to a main
+// one; a request made before by one below it shows to no one but its
+// maker, who may still thank for gifts and take it back. Herbs and potions go into
 // the bag, so a request for them, and each gift, needs room there; the bag
 // stays at hand during an exploration and a profession's work
 // (DECISIONS.md, "Plecak poza obozem i mikstury na drogę"), so giving and
@@ -41,6 +46,8 @@ const COLUMNS = { material: 'materials', herb: 'herbs', potion: 'potions', miner
 const jsonPath = (key) => `$."${key}"`;
 const changed = () => new ApiError(409, 'changed', errors().changed);
 const member = (context) => requireMember(context, errors());
+// The character level both sides ask and give from: the players' Wymiana's (830 A).
+const minLevel = () => content().community.trade.minLevel;
 
 // Whether the game has the goods: a material at a rarity, a herb, a potion
 // or a gem or an ore.
@@ -117,6 +124,7 @@ function cardTexts() {
     ...texts,
     how: texts.how.map((line) => filled(line, { most, wait: waitHours, open: openHours })),
     cancelText: filled(texts.cancelText, { wait: waitHours }),
+    level: filled(texts.level, { level: minLevel() }),
   };
 }
 
@@ -125,7 +133,9 @@ function cardTexts() {
 // give now), its own last request still in sight (open, or made within
 // openHours) with its gifts and thanks, when it may ask again, the goods it
 // knows to ask for, the week's Dobroczyńcy tygodnia (pieces given in the
-// guild since Monday, with the thanks they brought), and the words.
+// guild since Monday, with the thanks they brought), whether it is below the
+// level to ask and give (`locked`, 830 A), and the words. Only requests of
+// members at that level hang on the card.
 export async function requestsView(db, player, guild, now) {
   const { row } = player;
   const { most, waitHours, openHours } = rules();
@@ -136,9 +146,9 @@ export async function requestsView(db, player, guild, now) {
         `SELECT r.*, c.name, c.class_id, c.user_id FROM guild_requests r
          JOIN characters c ON c.id = r.character_id
          JOIN guild_members m ON m.character_id = r.character_id AND m.guild_id = r.guild_id
-         WHERE r.guild_id = ? AND r.state = 'open' AND r.ends_at > ? ORDER BY r.created_at, r.id`,
+         WHERE r.guild_id = ? AND r.state = 'open' AND r.ends_at > ? AND c.level >= ? ORDER BY r.created_at, r.id`,
       )
-      .bind(guild.id, now),
+      .bind(guild.id, now, minLevel()),
     db.prepare('SELECT * FROM guild_requests WHERE character_id = ? ORDER BY created_at DESC, id DESC LIMIT 1').bind(row.id),
     db
       .prepare(
@@ -167,6 +177,7 @@ export async function requestsView(db, player, guild, now) {
   const shown = kept && !(kept.state === 'filled' && gifts.every((gift) => gift.thanked_at !== null)) ? kept : null;
   const waiting = last && stateOf(last, now) === 'open' && last.guild_id === guild.id;
   const nextAt = last ? last.created_at + waitHours * HOUR : 0;
+  const locked = row.level < minLevel();
   return {
     guild: { name: guild.name, tag: guild.tag },
     requests: open.results.map((request) => {
@@ -187,7 +198,7 @@ export async function requestsView(db, player, guild, now) {
         own,
         sameAccount,
         have,
-        give: own || sameAccount ? 0 : Math.min(left, have),
+        give: own || sameAccount || locked ? 0 : Math.min(left, have),
       };
     }),
     mine: shown && {
@@ -204,6 +215,7 @@ export async function requestsView(db, player, guild, now) {
     // hangs, it is taken back first.
     nextAt: !waiting && nextAt > now ? nextAt : null,
     waiting: Boolean(waiting),
+    locked,
     known: knownGoods(row),
     ranking: ranking.results.map((one) => ({ id: one.giver_id, name: one.name, classId: one.class_id, pieces: one.pieces, thanks: one.thanks, own: one.giver_id === row.id })),
     rules: { most, waitHours, openHours, kinds: rules().kinds },
@@ -224,7 +236,8 @@ export async function getGuildRequests(context) {
 // POST /api/guild/requests { kind: material | herb | potion | mineral, key, count }:
 // the character asks its guild for pieces of the goods, 1 to `most`; while
 // no request of its own hangs, `waitHours` after the last one was made, and
-// for herbs and potions only with room for them in the bag. A request of
+// for herbs and potions only with room for them in the bag, and from the
+// level (830 A). A request of
 // its own whose time is up, or one left in a guild it left, closes first.
 // The requests of every guild closed before last week began, which no
 // card, wait, thanks or ranking needs any more, go with their gifts.
@@ -233,6 +246,7 @@ export async function askGuild(context) {
   const { row } = player;
   const body = await readJson(context.request);
   const { most, waitHours, openHours } = rules();
+  if (row.level < minLevel()) throw new ApiError(403, 'requests_level', cardTexts().level);
   if (!rules().kinds.includes(body.kind)) throw new ApiError(400, 'invalid_kind', errors().invalidKind);
   if (!realGood(body.kind, body.key)) throw new ApiError(400, 'invalid_goods', errors().invalidGoods);
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > most) throw new ApiError(400, 'invalid_count', filled(errors().invalidCount, { most }));
@@ -288,12 +302,14 @@ export async function cancelGuildRequest(context) {
 // POST /api/guild/requests/give { requestId, count }: a member gives pieces
 // of its own to another one's open request in its guild, up to what is
 // still missing, what it holds and, for herbs and potions, what the asker's
-// bag takes. The System pays nothing for it (346 A).
+// bag takes, both from the level (830 A). The System pays nothing for it
+// (346 A).
 export async function giveToGuildRequest(context) {
   const { session, player, guild, db } = await member(context);
   const { row } = player;
   const body = await readJson(context.request);
   const now = context.now;
+  if (row.level < minLevel()) throw new ApiError(403, 'requests_level', cardTexts().level);
   const request = Number.isInteger(body.requestId) ? await db.prepare('SELECT * FROM guild_requests WHERE id = ?').bind(body.requestId).first() : null;
   if (!request || request.guild_id !== guild.id) throw new ApiError(404, 'no_request', errors().gone);
   if (request.character_id === row.id) throw new ApiError(400, 'own', errors().own);
@@ -304,6 +320,7 @@ export async function giveToGuildRequest(context) {
   ]);
   if (!asker || !inGuild) throw new ApiError(409, 'closed', errors().closed);
   if (asker.row.user_id === row.user_id) throw new ApiError(409, 'same_account', errors().sameAccount);
+  if (asker.row.level < minLevel()) throw new ApiError(409, 'requests_level_other', filled(errors().levelOther, { name: asker.row.name, level: minLevel() }));
   const count = body.count;
   if (!Number.isInteger(count) || count < 1) throw new ApiError(400, 'invalid_count', errors().giveCount);
   const left = request.count - request.given;

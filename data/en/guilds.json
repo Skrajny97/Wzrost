@@ -321,6 +321,7 @@
       "thankedToast": "Thanks sent.",
       "cancelled": "Request withdrawn.",
       "cancelledFree": "Request withdrawn. No one had given anything yet, so you can add a new one at once.",
+      "level": "Guild Requests open at character level {level}.",
       "errors": {
         "locked": "You will unlock guilds at character level {level}.",
         "noGuild": "You are not in a guild.",
@@ -343,7 +344,8 @@
         "askerFull": "{name}'s bag is full.",
         "changed": "Something changed in the meantime. Try once more.",
         "noGift": "There is no such gift.",
-        "thanked": "Thanks for this gift have already been sent."
+        "thanked": "Thanks for this gift have already been sent.",
+        "levelOther": "{name} can receive gifts only from level {level}."
       }
     }
   },

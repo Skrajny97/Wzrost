@@ -126,6 +126,8 @@ export function openAskSheet(ask = {}, onAsked = null) {
 function fillAskSheet(body, view, ask, onAsked) {
   const { texts, rules } = view;
   if (!view.guild) return fill(body, h('p', { class: 'sheet-text', text: texts.noGuild }));
+  // Below the level to ask and give (830 A): only the words why.
+  if (view.locked) return fill(body, h('p', { class: 'sheet-text', text: texts.level }));
   const toCard = () => h('a', { class: 'button button--world', href: '#/gildia/requests', onClick: closeSheet, text: texts.title });
   if (view.waiting) return fill(body, h('p', { class: 'sheet-text', text: texts.askWaiting }), view.mine && h('p', { class: 'guild-mine-goods' }, goodsLine(view.mine.goods, h('span', { class: 'muted', text: ` × ${formatNumber(view.mine.count)}` }))), toCard());
   if (view.nextAt) return fill(body, h('p', { class: 'sheet-text', text: filled(texts.waitNext, { at: dateTimeFormat.format(new Date(view.nextAt)) }) }), toCard());
@@ -275,7 +277,8 @@ export function mountGuildRequests(container) {
     );
 
   // The character's own request: its goods, the gifts with "Podziękuj",
-  // "Wycofaj" while it hangs; then when it may ask again, or "Poproś gildię".
+  // "Wycofaj" while it hangs; then when it may ask again, or "Poproś gildię";
+  // below the level to ask and give (830 A), the words why instead.
   function minePart() {
     const { mine, texts } = view;
     const ask = h('button', {
@@ -329,7 +332,9 @@ export function mountGuildRequests(container) {
             }),
           ),
       ],
-      !view.waiting && (view.nextAt ? h('p', { class: 'muted', text: filled(texts.waitNext, { at: dateTimeFormat.format(new Date(view.nextAt)) }) }) : ask),
+      view.locked
+        ? h('p', { class: 'muted', text: texts.level })
+        : !view.waiting && (view.nextAt ? h('p', { class: 'muted', text: filled(texts.waitNext, { at: dateTimeFormat.format(new Date(view.nextAt)) }) }) : ask),
     );
   }
 
