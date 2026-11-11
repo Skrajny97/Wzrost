@@ -1,0 +1,23 @@
+{
+  "id": "lich-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a gaunt pale man lich with sunken cheeks, glowing green eyes and long black hair, a crown of black iron spikes, tattered black and purple robes with glowing green runes and silver trim down to the feet, a high collar, a glowing green gem on a chain on the chest, one single tall staff of black bone topped with a horned skull with glowing green eyes held upright in his right hand at his side, a small wisp of green mist above his left hand held before his chest, seen from the side in strict profile: the face, chest, hips and feet all turned fully to the right, only one eye and one shoulder visible, the chest and the robe seen from the side, the staff at the front of the body, never towards the viewer, facing and walking to the right, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/lich-male.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
