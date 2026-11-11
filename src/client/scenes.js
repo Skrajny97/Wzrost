@@ -8,7 +8,7 @@
 // the way the character's aura lights it, its trail glows behind it and its
 // pet goes with it (the Sklep Systemu).
 
-import { companionWalkerSheet, herbSprite, itemSprite, monsterSprite, placeArt, potionSprite, riderFile, walkerSheet } from './art.js';
+import { companionWalkerSheet, herbSprite, itemSprite, monsterSprite, placeArt, potionSprite, riderFile, riderLook, walkerSheet } from './art.js';
 import { cosmeticOf } from './cosmetics.js';
 import { h } from './dom.js';
 import { motionOn } from './motion.js';
@@ -269,6 +269,10 @@ function ride(walk, character) {
   const trot = id && walk.mounts?.[id];
   const file = trot && riderFile(character.classId, character.appearance, character.skin, character.evolution?.current?.id, outfitOf(character));
   if (!file) return null;
+  // A rider whose helmet, bow or cloak needs more room is drawn on the larger
+  // canvas (walk.rider.large), with its own place of the seat.
+  const look = riderLook(character.classId, character.appearance, character.evolution?.current?.id, outfitOf(character));
+  const box = walk.rider.large?.ids.includes(look) ? walk.rider.large : walk.rider;
   // A mount drawn small beside the rider stands bigger (`scale`, the pony:
   // the author, „kuc jest za mały albo postacie za duże”), its saddle with
   // it; the rider keeps its own size.
@@ -277,13 +281,13 @@ function ride(walk, character) {
   const height = Math.round(trot.height * scale);
   const seats = trot.seats.map(([seatXi, seatYi]) => [Math.round(seatXi * scale), Math.round(seatYi * scale)]);
   const [x, y] = seats[0];
-  const [seatX, seatY] = walk.rider.seat;
+  const [seatX, seatY] = box.seat;
   const top = Math.max(0, seatY - Math.min(...seats.map((seat) => seat[1])));
   const element = h(
     'div',
     { class: 'scene-ride' },
     h('div', { class: 'scene-ride-mount' }),
-    h('img', { src: `/${file}`, alt: '', width: walk.rider.width, height: walk.rider.height, class: 'scene-ride-rider', draggable: 'false' }),
+    h('img', { src: `/${file}`, alt: '', width: box.width, height: box.height, class: 'scene-ride-rider', draggable: 'false' }),
   );
   element.style.setProperty('--ride-width', `${width}px`);
   element.style.setProperty('--ride-height', `${height + top}px`);

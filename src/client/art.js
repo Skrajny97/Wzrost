@@ -769,10 +769,14 @@ export const cosmeticArt = (art) => (available.cosmetics.has(art) ? `/art/cosmet
 export const mountArt = (id) =>
   available.mounts.has(id) ? h('img', { src: `/art/mounts/${id}.png`, alt: '', class: 'sprite mount-art', decoding: 'async', draggable: 'false' }) : null;
 
+// The rider's look id (<class>-<look>, an evolution's or an outfit's), or
+// null for a look without one.
+export const riderLook = (classId, appearance, evolution, outfit) => lookId('riders', classId, appearance, evolution, outfit);
+
 // The character riding, in its look and skin tone (or its evolution's), as a
 // path from the site's root, or null for a look without one.
 export function riderFile(classId, appearance, skin, evolution, outfit) {
-  const id = lookId('riders', classId, appearance, evolution, outfit);
+  const id = riderLook(classId, appearance, evolution, outfit);
   return id ? `art/riders/${toneFile(id, skin)}.png` : null;
 }
 

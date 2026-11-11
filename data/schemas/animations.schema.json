@@ -60,11 +60,22 @@
           "type": "object",
           "additionalProperties": false,
           "required": ["width", "height", "seat"],
-          "description": "Jeździec (tools/ride-skeleton.py): rozmiar obrazka i punkt, którym siedzi w siodle.",
+          "description": "Jeździec (tools/ride-skeleton.py): rozmiar obrazka i punkt, którym siedzi w siodle. large: większe płótno dla jeźdźców z listy ids (wysoki hełm, łuk albo peleryna nie mieszczą się w zwykłym), z własnym punktem siodła.",
           "properties": {
             "width": { "type": "integer", "minimum": 8 },
             "height": { "type": "integer", "minimum": 8 },
-            "seat": { "$ref": "#/definitions/point" }
+            "seat": { "$ref": "#/definitions/point" },
+            "large": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["width", "height", "seat", "ids"],
+              "properties": {
+                "width": { "type": "integer", "minimum": 8 },
+                "height": { "type": "integer", "minimum": 8 },
+                "seat": { "$ref": "#/definitions/point" },
+                "ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z]+(-[a-z]+)*$" } }
+              }
+            }
           }
         },
         "mounts": {

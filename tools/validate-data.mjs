@@ -625,6 +625,20 @@ function checkReferences(data) {
   for (const id of Object.keys(animations.walk.lands)) {
     if (!data.regions.some((region) => region.id === id)) errors.push(`animations.json: nieznany region ${id}`);
   }
+  // A rider on the larger canvas (walk.rider.large) is drawn at its size, in
+  // every skin tone, and its seat lies within it.
+  const large = animations.walk.rider.large;
+  if (large) {
+    const [seatX, seatY] = large.seat;
+    if (seatX >= large.width || seatY >= large.height) errors.push('animations.json: siodło dużego jeźdźca poza płótnem');
+    for (const id of large.ids) {
+      for (const tone of ['', ...data.skins.skins.filter((skin) => skin.ramp).map((skin) => `-${skin.id}`)]) {
+        const size = pngSize(`art/riders/${id}${tone}.png`);
+        if (!size) errors.push(`animations.json: brak jeźdźca src/client/art/riders/${id}${tone}.png`);
+        else if (size.width !== large.width || size.height !== large.height) errors.push(`animations.json: jeździec ${id}${tone} ma ${size.width} × ${size.height}, a nie ${large.width} × ${large.height}`);
+      }
+    }
+  }
   for (const range of [animations.moments.firstSeconds, animations.moments.seconds]) {
     if (range[1] < range[0]) errors.push('animations.json: przedział czasu rzadkich zdarzeń od większej liczby');
   }
