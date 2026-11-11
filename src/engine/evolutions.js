@@ -1,3 +1,4 @@
+// @ts-check
 // Class evolutions (data/evolutions.json; DECISIONS.md, "Ewolucje: odpowiedzi
 // autora" and "Ewolucje: budowa"). At the first class level of
 // balance.progression.classEvolutionLevels the character chooses the
@@ -18,11 +19,26 @@
 
 import { pointsLeft, skillParams, skillText, skillsBlock } from './skills.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {Record<string, any>} Character A character, as its row keeps it. */
+/** @typedef {Record<string, any>} Evolution An evolution or a later form (data/evolutions.json). */
+/** @typedef {{ owner: Record<string, any>, from: number, to: number }} Span Class levels and the class or form that grows them. */
+
+/**
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {Evolution | null}
+ */
 export const evolutionOf = (character, content) => (character.evolution ? (content.evolutionsById[character.evolution] ?? null) : null);
 
 // The forms the character's class went through, the first evolution first
 // and the one it has now last; none without an evolution.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ */
 export function evolutionLine(character, content) {
+  /** @type {Evolution[]} */
   const line = [];
   for (let evolution = evolutionOf(character, content); evolution && line.length < 10; evolution = evolution.from ? content.evolutionsById[evolution.from] : null) {
     line.unshift(evolution);
@@ -31,12 +47,27 @@ export function evolutionLine(character, content) {
 }
 
 // The form an evolution grows into at the next evolution level, or null.
-export const nextFormOf = (evolution, content) => (evolution ? (content.evolutions.find((other) => other.from === evolution.id) ?? null) : null);
+/**
+ * @param {Evolution | null | undefined} evolution
+ * @param {Content} content
+ * @returns {Evolution | null}
+ */
+export const nextFormOf = (evolution, content) => (evolution ? (content.evolutions.find((/** @type {Evolution} */ other) => other.from === evolution.id) ?? null) : null);
 
 // An evolution's name for a look: a woman's where it has one.
+/**
+ * @param {Evolution} evolution
+ * @param {string | null | undefined} appearance
+ * @returns {string}
+ */
 export const evolutionName = (evolution, appearance) => (appearance === 'female' && evolution.nameFemale) || evolution.name;
 
 // The name the class goes by: its evolution's, else its own.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {string}
+ */
 export function classNameOf(character, content) {
   const evolution = evolutionOf(character, content);
   return evolution ? evolutionName(evolution, character.appearance) : content.classesById[character.classId].name;
@@ -46,12 +77,21 @@ export function classNameOf(character, content) {
 // main one first. `all` (Testuj ewolucję, the test version only): every
 // evolution of its class. Only first evolutions: a second form is not
 // chosen, it grows out of one.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ * @param {{ all?: boolean }} [options]
+ * @returns {Evolution[]}
+ */
 export function evolutionChoices(character, content, { all = false } = {}) {
-  const ofClass = content.evolutions.filter((evolution) => evolution.classId === character.classId && !evolution.from);
+  /** @type {Evolution[]} */
+  const ofClass = content.evolutions.filter((/** @type {Evolution} */ evolution) => evolution.classId === character.classId && !evolution.from);
   if (all) return ofClass;
-  return Object.keys(character.skills ?? {})
-    .map((id) => ofClass.find((evolution) => evolution.path === id))
-    .filter(Boolean);
+  return /** @type {Evolution[]} */ (
+    Object.keys(character.skills ?? {})
+      .map((id) => ofClass.find((evolution) => evolution.path === id))
+      .filter(Boolean)
+  );
 }
 
 // Why a character cannot take an evolution, or null when it can: it has
@@ -61,6 +101,13 @@ export function evolutionChoices(character, content, { all = false } = {}) {
 // evolution it grows out of, stands at the second evolution level and has
 // no Skill Point left that a skill could take. `test` lifts the level and
 // the skills and opens every first evolution of the class.
+/**
+ * @param {Character} character
+ * @param {string} evolutionId
+ * @param {Content} content
+ * @param {{ test?: boolean }} [options]
+ * @returns {{ code: string, message: string } | null}
+ */
 export function evolveBlock(character, evolutionId, content, { test = false } = {}) {
   const levels = content.balance.progression.classEvolutionLevels;
   const target = content.evolutionsById[evolutionId];
@@ -88,27 +135,47 @@ export function evolveBlock(character, evolutionId, content, { test = false } = 
 
 // The skills after the evolution: the evolution's two at level 0, so the
 // points of the class's come back for them.
-export const evolvedSkills = (evolutionId, content) => Object.fromEntries(content.evolutionsById[evolutionId].skills.map((id) => [id, 0]));
+/**
+ * @param {string} evolutionId
+ * @param {Content} content
+ * @returns {Record<string, number>}
+ */
+export const evolvedSkills = (evolutionId, content) => Object.fromEntries(content.evolutionsById[evolutionId].skills.map((/** @type {string} */ id) => [id, 0]));
 
 // The stretches of class levels and who grows the class over each: the
 // class up to the first evolution's level, each form of the line from the
 // level after its own evolution level up to the next one's, and the last
 // form on from there.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ */
 export function classSpans(character, content) {
   const cls = content.classesById[character.classId];
   const line = evolutionLine(character, content);
   const levels = content.balance.progression.classEvolutionLevels;
+  /** @type {Span[]} */
   const spans = [{ owner: cls, from: 1, to: line.length > 0 ? levels[0] : Infinity }];
   line.forEach((evolution, index) => spans.push({ owner: evolution, from: levels[index] + 1, to: index < line.length - 1 ? levels[index + 1] : Infinity }));
   return spans;
 }
 
 // How many class levels from `lowest` up to `classLevel` fall in a span.
+/**
+ * @param {{ from: number, to: number }} span
+ * @param {number} lowest
+ * @param {number} classLevel
+ */
 export const levelsIn = (span, lowest, classLevel) => Math.max(0, Math.min(span.to, classLevel) - Math.max(span.from, lowest) + 1);
 
 // HP and mana per class level as a whole: the class's up to the evolution,
 // each form's own (perClassLevel, else the form's before it, or the
 // class's) after it, so the formulas (formulas.js) give the sum of all.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {{ hp: number, mana: number }}
+ */
 export function perClassLevelOf(character, content) {
   const cls = content.classesById[character.classId];
   let rate = cls.perClassLevel;
@@ -129,6 +196,10 @@ export function perClassLevelOf(character, content) {
 // or, once it may take one (class level 50 and the skills ready), the cards
 // of its two to choose from. With an evolution, the form it grows into
 // (`next`) once that can be taken, and the class level it comes at.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ */
 export function evolutionPanel(character, content) {
   const current = evolutionOf(character, content);
   if (current) {
@@ -148,6 +219,11 @@ export function evolutionPanel(character, content) {
 // description, path or the evolution it grows out of, growth per class
 // level, trait and skills with their numbers at the top level (the author:
 // the numbers in their descriptions are those of the top level).
+/**
+ * @param {Evolution} evolution
+ * @param {Content} content
+ * @param {Character | null} [character]
+ */
 export function evolutionView(evolution, content, character = null) {
   const top = (content.evolutionStages?.[(evolution.stage ?? 1) - 1] ?? content.evolutionRules).skillMaxLevel;
   const appearance = character?.appearance;
@@ -164,7 +240,7 @@ export function evolutionView(evolution, content, character = null) {
     fromName: from ? evolutionName(from, appearance) : null,
     growth: Object.entries(evolution.growth).map(([stat, value]) => ({ stat, name: content.statsById[stat].name, value })),
     trait: { name: evolution.trait.name, text: evolution.trait.text },
-    skills: evolution.skills.map((id) => {
+    skills: evolution.skills.map((/** @type {string} */ id) => {
       const skill = content.skillsById[id];
       return {
         id,
@@ -184,18 +260,21 @@ export function evolutionView(evolution, content, character = null) {
 // sound and look of the skill it grew from, and a new one those of its first
 // evolution's skill in the same place, or, where the grown skill came from
 // that one, of the other (`skills`). Real art only needs its files and ids.
+/** @param {Content} content */
 export function evolutionArt(content) {
+  /** @type {Record<string, string>} */
   const forms = {};
+  /** @type {Record<string, string[]>} */
   const skills = {};
   for (const evolution of content.evolutions) {
     const parent = evolution.from ? content.evolutionsById[evolution.from] : null;
     if (!parent) continue;
     forms[evolution.id] = parent.id;
     const grownFrom = content.skillsById[evolution.skills[0]]?.from;
-    evolution.skills.forEach((id, index) => {
+    evolution.skills.forEach((/** @type {string} */ id, /** @type {number} */ index) => {
       const from = content.skillsById[id]?.from;
       const same = parent.skills[index];
-      skills[id] = [from ?? (same === grownFrom ? (parent.skills.find((other) => other !== grownFrom) ?? same) : same)];
+      skills[id] = [from ?? (same === grownFrom ? (parent.skills.find((/** @type {string} */ other) => other !== grownFrom) ?? same) : same)];
     });
   }
   return { forms, skills };

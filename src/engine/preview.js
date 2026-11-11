@@ -71,7 +71,8 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
   const { totals, bonuses } = computeStats(character, equipped, content);
   const level = character.level;
   const feat = unit.feat;
-  const trait = feat?.kind === 'bulwark' ? { name: evolutionOf(character, content).trait.name, share: feat.armor } : null;
+  // A feat comes with an evolution (combatant.js).
+  const trait = feat?.kind === 'bulwark' ? { name: /** @type {Record<string, any>} */ (evolutionOf(character, content)).trait.name, share: feat.armor } : null;
   /**
    * @param {number} rating
    * @param {number} cap
