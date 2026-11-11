@@ -19,9 +19,16 @@ export function useServer(vars = {}) {
   // Arena (ARENA), in the game from 0.2.38: its unlock and its place on the
   // Osada's board would change the other tests' (pvp-arena.test.js). So are
   // the guild wars (GUILD_WARS, guild-wars.test.js), first on the test
-  // version: their Wojna tab and their evening's battles.
+  // version: their Wojna tab and their evening's battles. So are the payments
+  // for Punkty Systemu (PAYMENTS, payments.test.js), for every player when a
+  // test turns them on (PAYMENTS_FOR).
   const server = createTestHarness({
-    workers: [{ configPath: './wrangler.jsonc', vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', WEEKS: '', ARENA: '', GUILD_WARS: '', ...vars } }],
+    workers: [
+      {
+        configPath: './wrangler.jsonc',
+        vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', WEEKS: '', ARENA: '', GUILD_WARS: '', PAYMENTS: '', PAYMENTS_FOR: '', ...vars },
+      },
+    ],
   });
   before(() => server.listen());
   beforeEach(async () => {

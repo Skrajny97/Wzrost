@@ -301,10 +301,21 @@ export async function paymentNotice(context) {
 // GET /api/payments/return: the player back from the gateway's page, sent on
 // to the shop's page of the points, which shows the order waiting until the
 // gateway's news comes (what the gateway adds to this address says nothing
-// of the payment, so nothing of it is read).
-export function paymentReturn({ request }) {
-  return new Response(null, { status: 302, headers: { Location: new URL('/#/sklep/punkty', request.url).toString(), 'Cache-Control': 'no-store' } });
+// of the payment, so nothing of it is read). A page that answers 200 and
+// moves on by itself, so a check of the address in the gateway's panel finds
+// it working whether or not it follows a redirect.
+const RETURN_PAGE = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="0;url=/#/sklep/punkty"><title>Insight</title></head>
+<body><p><a href="/#/sklep/punkty">Insight</a></p><script>location.replace('/#/sklep/punkty');</script></body></html>`;
+
+export function paymentReturn() {
+  return new Response(RETURN_PAGE, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }
+
+// GET /api/payments/notify/:provider: the address of the gateway's news
+// answers that it is there (a panel may check it when it is set); the news
+// itself comes by POST.
+export const paymentNoticeAddress = () => new Response('OK', { status: 200, headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' } });
 
 // POST /api/payments/withdraw { orderId }: one of the account's purchases
 // given back within the days, its points still unspent: they go at once,

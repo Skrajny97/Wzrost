@@ -3034,6 +3034,14 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.60 (11.11.2026): obsługa płatności Autopay w grze, na razie tylko dla konta autora
+
+Autor 11.11.2026, ze zrzutem z portalu Autopay: „klikam Zapisz i nic sie nie dzieje”. Adresy z instrukcji (ITN i powrót) były dotąd tylko na wersji testowej, a w grze odpowiadały „nie znaleziono”. Ta wersja wnosi do gry całą obsługę płatności, opisaną w dwóch częściach niżej.
+
+1. **Adresy dla portalu Autopay działają w grze.** `GET /api/payments/return` odpowiada stroną (200), która od razu prowadzi do sklepu. `GET /api/payments/notify/autopay` odpowiada „OK”. Gdyby portal sprawdzał adresy przy zapisie, oba je znajdzie.
+2. **Płatności są włączone tylko dla konta autora** (`PAYMENTS: "autopay"`, `PAYMENTS_FOR: "authors"`) i działają dopiero z kluczami Autopay w sekretach GitHuba. Do tego czasu trasy zakupu odpowiadają „nie znaleziono”. Gracze nic nie widzą. Ekran zakupu dojdzie, gdy autor przyjmie jego makiety.
+3. **Migracja 0111** dodaje tabelę zakupów i kolumny `characters.system_points_paid` oraz `users.purchases_blocked`. W Sklepie Systemu zdobyte w grze punkty wydają się przed kupionymi. Dopóki nikt nie kupuje, nic się dla graczy nie zmienia.
+
 ## Płatności: odpowiedzi autora 804–808 i limit kwartału (11.11.2026)
 
 Autor odpowiedział na stronie ocen 11.11.2026 o 6:36: 804 A, 805 D, 806 A, 807 A i 808 A. Tego samego ranka autor przyjął też ostatecznie wszystkie pięć skórek w każdym odcieniu skóry (809.1–809.10: portrety, chód i jazda konno).

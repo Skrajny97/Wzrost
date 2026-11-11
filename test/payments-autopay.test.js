@@ -177,9 +177,12 @@ describe('payments through Autopay, on the server', () => {
     assert.match((await itn('ffff')).text, /NOTCONFIRMED/);
   });
 
-  test('the player comes back from Autopay to the shop page of the points', async () => {
-    const response = await server.fetch('/api/payments/return?ServiceID=123456&OrderID=a1b2c3&Hash=x', { redirect: 'manual' });
-    assert.equal(response.status, 302);
-    assert.match(response.headers.get('Location'), /\/#\/sklep\/punkty$/);
+  test('the player comes back from Autopay to the shop page of the points, and both addresses answer a check', async () => {
+    const back = await server.fetch('/api/payments/return?ServiceID=123456&OrderID=a1b2c3&Hash=x');
+    assert.equal(back.status, 200);
+    assert.match(await back.text(), /location\.replace\('\/#\/sklep\/punkty'\)/);
+    const notify = await server.fetch('/api/payments/notify/autopay');
+    assert.equal(notify.status, 200);
+    assert.equal(await notify.text(), 'OK');
   });
 });

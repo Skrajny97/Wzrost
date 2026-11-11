@@ -42,7 +42,7 @@ import { guildRanking } from './guild-fame.js';
 import { claimFame, getFame } from './fame.js';
 import { cancelOrders, craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
-import { authorPayments, getPayments, orderPoints, paymentNotice, paymentReturn, withdrawPurchase } from './payments.js';
+import { authorPayments, getPayments, orderPoints, paymentNotice, paymentNoticeAddress, paymentReturn, withdrawPurchase } from './payments.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
   autoPoints,
@@ -188,6 +188,7 @@ const routes = [
   ['POST', '/api/payments/order', orderPoints],
   ['POST', '/api/payments/withdraw', withdrawPurchase],
   ['POST', '/api/payments/notify/:provider', paymentNotice],
+  ['GET', '/api/payments/notify/:provider', paymentNoticeAddress],
   // Where the gateway sends the player back after paying: the shop's page of
   // the points, which waits for the gateway's news.
   ['GET', '/api/payments/return', paymentReturn],

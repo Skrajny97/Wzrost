@@ -90,11 +90,16 @@
     // mock-ups 792 v2; the first war is drawn on the Monday after.
     "GUILD_WARS": "on",
     // The gateway of the payments for Punkty Systemu (src/server/payments.js,
-    // src/server/payment-providers.js): "autopay" (805 D), or empty: off, as
-    // now, until the author has the Autopay account and the purchase screen
-    // is accepted. Its keys, AUTOPAY_SERVICE_ID and AUTOPAY_SHARED_KEY, are
-    // Worker secrets the deploy workflow sets from the GitHub secrets.
-    "PAYMENTS": "",
+    // src/server/payment-providers.js): "autopay" (805 D), or empty: off. Its
+    // keys, AUTOPAY_SERVICE_ID and AUTOPAY_SHARED_KEY, are Worker secrets the
+    // deploy workflow sets from the GitHub secrets; without them the
+    // purchases stay off ("not found").
+    "PAYMENTS": "autopay",
+    // "authors": the purchases only for the author's accounts, while the
+    // first real purchase is tried (the author, 11.11.2026: no test
+    // environment); empty: for every player, once the purchase screen is
+    // accepted and the terms name the seller and Autopay.
+    "PAYMENTS_FOR": "authors",
     // Autopay's gateway: the real one in the game.
     "AUTOPAY_HOST": "https://pay.autopay.eu"
   },
