@@ -201,9 +201,14 @@ export function wheelPrizes(basis, seed, day, content) {
 // Kept in the Osada for the day, so the stakes and the prizes stay what they
 // were when the character levels up; a new day starts from `basis`, the
 // character now. A day kept with a pool for each stake (up to 0.1.34) starts
-// its one pool anew.
+// its one pool anew. A Wheel kept for a later day than `now`'s (a request
+// begun before midnight, done after another one of the new day) stays, so
+// the day never goes back (the code review, 0.2.71).
 export function wheelDay(stored, basis, now, content) {
   const day = casinoDay(now, content).key;
+  if (stored?.basis && typeof stored.day === 'string' && stored.day > day) {
+    return { day: stored.day, basis: stored.basis, won: Array.isArray(stored.won) ? stored.won : [] };
+  }
   return stored?.day === day && stored.basis ? { day, basis: stored.basis, won: Array.isArray(stored.won) ? stored.won : [] } : { day, basis, won: [] };
 }
 

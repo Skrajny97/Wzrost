@@ -70,14 +70,28 @@ export async function moveGiftRewards(env, now, moves = content().giftMoves ?? [
   return moved;
 }
 
+// The codes an account may take no more: those it took, and a code for one
+// character (`for`, by the key of its name) once any account took it, as a
+// name freed by a rename could else take it again on another account (the
+// code review, 0.2.71).
+export async function usedCodes(db, userId) {
+  const personal = content()
+    .giftCodes.filter((gift) => gift.for)
+    .map((gift) => gift.id);
+  const { results } = await db
+    .prepare('SELECT gift_id FROM gift_codes_used WHERE user_id = ? UNION SELECT gift_id FROM gift_codes_used WHERE gift_id IN (SELECT value FROM json_each(?))')
+    .bind(userId, JSON.stringify(personal))
+    .all();
+  return results.map((row) => row.gift_id);
+}
+
 // POST /api/gift-code { code }
 export async function redeemGiftCode(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const db = context.env.DB;
   const texts = content().giftTexts;
-  const { results } = await db.prepare('SELECT gift_id FROM gift_codes_used WHERE user_id = ?').bind(session.userId).all();
-  const found = giftCodeOf(body.code, context.now, results.map((row) => row.gift_id), content(), await characterKey(player.row.name));
+  const found = giftCodeOf(body.code, context.now, await usedCodes(db, session.userId), content(), await characterKey(player.row.name));
   if (found.reason === 'unknown') throw new ApiError(404, 'unknown_code', texts.unknown);
   if (found.reason === 'expired') throw new ApiError(400, 'expired_code', texts.expired);
   if (found.reason === 'used') throw new ApiError(409, 'used_code', usedText());

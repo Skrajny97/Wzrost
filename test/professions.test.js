@@ -244,7 +244,7 @@ describe('herbalism in the engine', () => {
 });
 
 describe('herbalism through the API', () => {
-  const { call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'off' });
+  const { server, call, db, signUp } = useServer({ PROFESSIONS: 'on', CRAFTING: 'off' });
   let cookie;
 
   beforeEach(async () => {
@@ -279,6 +279,30 @@ describe('herbalism through the API', () => {
       'Żywokost',
       ...[3, 5, 8, 12, 16, 22, 28, 34, 40, 50, 65, 90].map((level) => `Ukryte przez System do ${level}. poziomu Zielarstwa.`),
     ]);
+  });
+
+  // The code review (0.2.71): a body sent slowly gave the handler the time
+  // of its first byte, so a gathering held from before an exploration ran
+  // beside it, and a request held over midnight worked in the day gone.
+  test('a request sent slowly works at the time it has come, not at its first byte', async () => {
+    await atLevel(10);
+    const encoder = new TextEncoder();
+    let controller;
+    const body = new ReadableStream({
+      start(stream) {
+        controller = stream;
+        stream.enqueue(encoder.encode(' '));
+      },
+    });
+    const held = server.fetch('/api/professions/gather', { method: 'POST', headers: { 'Content-Type': 'application/json', Cookie: cookie }, body, duplex: 'half' });
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const sent = Date.now();
+    controller.enqueue(encoder.encode(JSON.stringify({ herbs: ['comfrey'], minutes: 60 })));
+    controller.close();
+    const answer = await held;
+    assert.equal(answer.status, 201, await answer.clone().text());
+    const { started_at: startedAt } = await (await db()).prepare('SELECT started_at FROM activities').first();
+    assert.ok(startedAt >= sent - 100, `started ${sent - startedAt} ms before its body had come`);
   });
 
   test('a gathering checks the herbs and the time', async () => {

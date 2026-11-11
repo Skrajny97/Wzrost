@@ -148,6 +148,7 @@ import {
   questText,
   questsStale,
   questsView,
+  timePointsOffer,
   rerolledQuests,
   unknownCreatures,
   weekShare,
@@ -3051,6 +3052,32 @@ describe('quests from the narrator', () => {
     assert.equal(next.daily.period, '2026-10-22');
     assert.ok(next.daily.quests.every((quest) => quest.progress === 0));
     assert.equal(next.weekly, busy.weekly);
+  });
+
+  // The code review (0.2.71): a request begun before midnight and done after
+  // another one of the new day drew the day before anew over the new day's
+  // quests, which opened their rewards and chest again.
+  test('the quests of a later period stay when a request\'s clock is earlier', () => {
+    const context = { character: newCharacter('cleric'), hasTable: false, seed: 5 };
+    const newDay = addQuestProgress(currentQuests({}, context, at('2026-10-21T22:30:00Z'), content), { minutes: 15 });
+    assert.equal(newDay.daily.period, '2026-10-22');
+    const late = at('2026-10-21T21:59:00Z');
+    assert.ok(!questsStale(newDay, late, content));
+    assert.deepEqual(currentQuests(newDay, context, late, content), newDay);
+    // Missing quests still are stale.
+    assert.ok(questsStale({ daily: newDay.daily }, late, content));
+  });
+
+  // The same for the Pustelnik's Punkty Czasu: a record of a later day
+  // leaves nothing to buy, so it never goes back a day and opens the limit.
+  test('the Pustelnik\'s record of a later day leaves nothing to buy when a request\'s clock is earlier', () => {
+    const { daily } = content.settlement.hermit.timePoints;
+    const late = at('2026-10-21T21:59:00Z');
+    assert.equal(timePointsOffer({ day: '2026-10-22', count: daily }, late, content).left, 0);
+    assert.equal(timePointsOffer({ day: '2026-10-22', count: 1 }, late, content).left, 0);
+    assert.equal(timePointsOffer({ day: '2026-10-21', count: 10 }, late, content).left, daily - 10);
+    assert.equal(timePointsOffer({ day: '2026-10-20', count: daily }, late, content).left, daily);
+    assert.equal(timePointsOffer(null, late, content).left, daily);
   });
 
   test('a week drawn while it is under way asks for the days left of it, its rewards whole', () => {

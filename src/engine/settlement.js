@@ -585,11 +585,15 @@ export const statResetCost = (level, content) =>
 // timePoints.daily a narrator's day. `bought` is what the Osada keeps of
 // the buys ({ day, count }: the day of the last one and how many fell on
 // it); the answer has the price, the limit, what is left of it today and
-// the record after `count` more.
+// the record after `count` more. A record of a day later than `now`'s (a
+// request begun before midnight and done after another one of the new day)
+// leaves nothing to buy, so the record never goes back a day (the code
+// review, 0.2.71: going back, it opened the limit anew).
 export function timePointsOffer(bought, now, content) {
   const { gold, daily } = content.settlement.hermit.timePoints;
   const day = questPeriod('daily', now, content).key;
-  const today = bought?.day === day ? bought.count : 0;
+  const ahead = typeof bought?.day === 'string' && bought.day > day;
+  const today = ahead ? daily : bought?.day === day ? bought.count : 0;
   return { gold, daily, left: Math.max(0, daily - today), after: (count) => ({ day, count: today + count }) };
 }
 

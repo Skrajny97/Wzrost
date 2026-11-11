@@ -7,7 +7,7 @@ import { beforeEach, describe, test } from 'node:test';
 import { createHash } from 'node:crypto';
 
 import { giftCodeOf, giftMovePair, giftRewardsText, normalCode, withGiftResources } from '../src/engine/index.js';
-import { characterKey, looseKey, moveGiftRewards } from '../src/server/gift-codes.js';
+import { characterKey, looseKey, moveGiftRewards, usedCodes } from '../src/server/gift-codes.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -199,6 +199,24 @@ describe('a code\'s rewards moved by the scheduled run', () => {
     assert.deepEqual([await points(giver.id), await points(taker.id) - before], [30, 500]);
     // The player sees it on the character's card.
     assert.equal((await call('GET', '/api/character', { cookie })).data.character.name, 'Obdarowana');
+  });
+
+  // The code review (0.2.71): a code for one character is keyed by its
+  // name, and the one free rename frees the name for another account.
+  test('a code for one character, once taken on one account, is taken for every account; a code for all stays per account', async () => {
+    const personal = content.giftCodes.find((gift) => gift.for);
+    const open = content.giftCodes.find((gift) => !gift.for);
+    const first = await signUp('pierwsze-konto');
+    const second = await signUp('drugie-konto');
+    const database = await db();
+    const userOf = async (login) => (await database.prepare('SELECT id FROM users WHERE login = ?').bind(login).first()).id;
+    const [one, two] = [await userOf('pierwsze-konto'), await userOf('drugie-konto')];
+    assert.ok(first.cookie && second.cookie);
+    for (const gift of [personal, open]) {
+      await database.prepare('INSERT INTO gift_codes_used (user_id, gift_id, character_id, used_at) VALUES (?, ?, 1, ?)').bind(one, gift.id, minute).run();
+    }
+    assert.deepEqual((await usedCodes(database, one)).sort(), [open.id, personal.id].sort());
+    assert.deepEqual(await usedCodes(database, two), [personal.id]);
   });
 
   test('a giver with fewer points than the move keeps none, never below none', async () => {

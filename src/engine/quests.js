@@ -365,6 +365,12 @@ export function currentQuests(stored, { character, hasTable, hasProfessions, has
     QUEST_PERIODS.map((periodId) => {
       const { key, startsAt } = questPeriod(periodId, now, content);
       const kept = stored?.[periodId];
+      // Quests of a later period (a request begun before midnight, done
+      // after another one of the new day) stay as they are: a period never
+      // goes back, which drew the day before anew over the new day's and
+      // opened its rewards again (the code review, 0.2.71). Period keys are
+      // dates (2026-11-12), so later is greater.
+      if (typeof kept?.period === 'string' && kept.period > key) return [periodId, kept];
       if (kept?.period === key) {
         const scaled = periodId === 'weekly' ? scaledWeek(kept, character, createdAt, startsAt, content) : kept;
         return [periodId, healedPeriod(scaled, periodId, context, now, content)];
@@ -463,8 +469,10 @@ export function rerolledQuests(quests, periodId, { character, hasTable, hasProfe
   };
 }
 
+// Whether a period's quests are missing or of an earlier period than
+// `now`'s; a later one is kept (currentQuests).
 export const questsStale = (stored, now, content) =>
-  QUEST_PERIODS.some((periodId) => stored?.[periodId]?.period !== questPeriod(periodId, now, content).key);
+  QUEST_PERIODS.some((periodId) => !(stored?.[periodId]?.period >= questPeriod(periodId, now, content).key));
 
 // The creatures beaten in an exploration's won fights, by id. People beaten
 // in an event's fight (events.js) are no creatures, but a creature met in

@@ -484,6 +484,10 @@
     "0.2.70": {
       "title": "Version 0.2.70",
       "body": "- Exchange: trading many kinds of goods at once (such as a dozen or more materials) no longer fails.\n- Guild Chest: items go in and come out from character level 20, as in the Exchange. You can always take your own item back.\n- Gifts: in the week after the clocks change, they no longer disappear an hour early."
+    },
+    "0.2.71": {
+      "title": "Version 0.2.71",
+      "body": "- Security fixes: daily limits (the Hermit's Time Points, daily quests, profession work) always count by the right day, also just before midnight.\n- A gift code for one character works only once."
     }
   }
 }

@@ -327,6 +327,15 @@ describe('the Salon Gier in the engine', () => {
     assert.deepEqual(next, { day: '2026-11-04', basis: grown, won: [] });
     assert.equal(dayStakes(next, content).at(-1), 900);
   });
+
+  // The code review (0.2.71): a request begun before midnight and done after
+  // another one of the new day wrote the day before over the new day's Wheel.
+  test("a Wheel kept for a later day stays when a request's clock is earlier", () => {
+    const basis = { ...character(30), sellBonus: 0, tanneryPremium: 0.1 };
+    const tomorrow = wheelWon(wheelDay(null, basis, NOW + 86400000, content), 3);
+    assert.equal(tomorrow.day, '2026-11-04');
+    assert.deepEqual(wheelDay(JSON.parse(JSON.stringify(tomorrow)), { ...basis, level: 60 }, NOW, content), tomorrow);
+  });
 });
 
 describe('the Salon Gier through the API', () => {

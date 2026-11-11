@@ -4,7 +4,7 @@
 import { confirmAge, deleteAccount, login, logout, me, register, setLanguage } from './accounts.js';
 import { authorPanel, authorSkillDemo, authorSkills, bugReportImage, resolveBugReport } from './author.js';
 import { authorNews, deleteNews, dismissDraft, editNews, listNews, publishNews, seeNews } from './news.js';
-import { reportBug } from './bugs.js';
+import { BUG_IMAGE, reportBug } from './bugs.js';
 import { getOnline } from './online.js';
 import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
@@ -534,7 +534,9 @@ async function answer(request, env, url) {
     // The gateway's news comes from its own server and carries its own
     // signature (payments.js), not a page's origin.
     if (request.method !== 'GET' && !url.pathname.startsWith('/api/payments/notify/')) checkOrigin(request, url);
-    // The server clock is the only source of truth about time.
+    // The server clock is the only source of truth about time: the moment
+    // the whole request has come (bodyCome).
+    await bodyCome(request);
     return await found.route.handler({ request, env, now: Date.now(), params: found.params });
   } catch (error) {
     if (error instanceof ApiError) return errorResponse(error);
@@ -542,6 +544,33 @@ async function answer(request, env, url) {
     return errorResponse(
       new ApiError(500, 'internal', 'Wystąpił błąd serwera. Spróbuj ponownie za chwilę.'),
     );
+  }
+}
+
+// The most of a body read before the clock: as much as the biggest that a
+// route takes, a bug report's picture (bugs.js). A bigger one is the
+// route's to refuse, as before.
+const BODY_WAIT_BYTES = BUG_IMAGE.form + 64 * 1024;
+
+// Waits until the request's body has come, up to BODY_WAIT_BYTES, reading a
+// copy of it: a body sent slowly (its first byte before midnight, the rest
+// after) would else give a handler that reads it before the character the
+// time of its first byte, not of its end (the code review, 0.2.71: such a
+// request bought the Pustelnik's Punkty Czasu of the day gone, redrew the
+// quests of the day before over the new day's, and started a profession's
+// work back in time, alongside an exploration). The handler then reads the
+// body from memory.
+async function bodyCome(request) {
+  const reader = request.body ? request.clone().body?.getReader() : null;
+  let size = 0;
+  while (reader) {
+    const { done, value } = await reader.read();
+    if (done) return;
+    size += value.byteLength;
+    if (size > BODY_WAIT_BYTES) {
+      await reader.cancel().catch(() => {});
+      return;
+    }
   }
 }
 

@@ -3092,6 +3092,26 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.71 (12.11.2026): czas żądania od nadejścia całej treści, dzień, który się nie cofa, kody dla jednej postaci
+
+Przegląd kodu Salonu Gier, Sklepu Systemu, zadań narratora, Pustelnika i kodów podarunkowych. Każda poprawka ma test, który bez niej nie przechodzi.
+
+1. **Czas żądania liczony od nadejścia całej treści** (src/server/index.js, test/professions.test.js). Serwer brał czas w chwili pierwszego bajtu żądania, a część żądań czyta treść dopiero potem. Gracz mógł więc wysłać początek żądania przed północą, a resztę po niej, i gra działała jak w dniu, który minął. Przegląd potwierdził to na lokalnym serwerze:
+   - u Pustelnika 150 Punktów Czasu po północy zamiast 30;
+   - zadania dnia losowane od nowa, a z nimi drugi raz nagrody, skrzynia (+5 Punktów Systemu, +30 Punktów Czasu) i ponowne losowanie;
+   - praca w profesji zaczęta „wstecz”, w czasie trwającej wyprawy, więc obie szły naraz.
+
+   Teraz serwer najpierw czeka na całą treść żądania (najwyżej tyle, ile waży zrzut ekranu w „Zgłoś błąd”), a dopiero potem bierze czas.
+2. **Dzień nigdy się nie cofa** (src/engine/quests.js, settlement.js i casino.js; test/engine.test.js i test/casino.test.js). Na wypadek dwóch żądań w tej samej chwili około północy:
+   - zadania późniejszego dnia, tygodnia albo miesiąca zostają, jakie są;
+   - zapis zakupów u Pustelnika z późniejszego dnia nie pozwala już nic kupić;
+   - Koło Fortuny późniejszego dnia zostaje.
+3. **Kod podarunkowy dla jednej postaci** (src/server/gift-codes.js, test/gift-codes.test.js). Taki kod rozpoznaje imię postaci, a jednorazowa zmiana imienia zwalnia je dla innych kont. Teraz kod dla jednej postaci odebrany na jednym koncie jest odebrany dla wszystkich kont.
+4. **Przejrzane i bez zmian:**
+   - zakupy w Sklepie Systemu, u Pustelnika, Loteria, Koło Fortuny, zadania i kody przy kilku kartach naraz dają nagrodę raz;
+   - przeniesienie nagrody kodu TIGER daje drugiej postaci pełne 500 Punktów Systemu, także gdy pierwsza wydała ich część, tak jak polecił autor („odjąć 500 PS pierwszej i dać je drugiej”); przeniesienia są tylko na polecenie autora.
+5. **Odpowiedź autora 832 A** (11.11.2026, bez uwag): gracz raz wybiera nazwę konta w Ustawieniach (unikalna, z tym samym filtrem słów co imię postaci, zmiana najwyżej raz na 30 dni), a czat pokazuje „Nazwa konta (imię postaci)”. Makiety Ustawień i czatu trafią na stronę ocen przed wdrożeniem.
+
 ## Wersja 0.2.70 (12.11.2026): Wymiana wielu rodzajów towarów, Skrzynia Gildii od 20. poziomu, Upominki przy zmianie czasu
 
 Przegląd kodu Wymiany, Upominków i Skrzyni Gildii znalazł trzy błędy. Każda poprawka ma test, który bez niej nie przechodzi.
