@@ -364,10 +364,17 @@ def main():
         fix = fixes.get(name, {})
         colours = skin_colours(im, name, fix)
         skin = skin_pixels(im, colours, fix)
-        lums = [luminance(im.getpixel(p)[:3]) for p in skin]
+        # Pixels listed by hand (pixels) are skin, but they do not set its
+        # darkest and lightest colour, so a fist in deep shadow does not pale
+        # the face; those darker than the rest of the skin are shaded as its
+        # rims are.
+        listed = {(int(frame) * FRAME + x, y) for frame, points in fix.get('pixels', {}).items() for x, y in points} & skin
+        lums = [luminance(im.getpixel(p)[:3]) for p in (skin - listed or skin)]
         low, high = (min(lums), max(lums)) if lums else (1, 1)
         span = fix.get('span', [0, 1])
-        rims = rim_pixels(im, skin, low, fix.get('rims_below', 1))
+        shaded = {p for p in listed if luminance(im.getpixel(p)[:3]) < low}
+        skin -= shaded
+        rims = rim_pixels(im, skin, low, fix.get('rims_below', 1)) | shaded
         toned = {}
         for tone in tones:
             out = recolour(im, skin, rims, low, high, [rgb(code) for code in tone['ramp']], span)
