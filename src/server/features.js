@@ -33,6 +33,7 @@ let arena = false;
 let weeks = false;
 let guildWars = false;
 let payments = '';
+let paymentsForAuthors = false;
 
 export function readFeatures(env) {
   professions = env.PROFESSIONS === 'on';
@@ -48,6 +49,7 @@ export function readFeatures(env) {
   weeks = env.WEEKS === 'on';
   guildWars = env.GUILD_WARS === 'on';
   payments = typeof env.PAYMENTS === 'string' ? env.PAYMENTS.trim() : '';
+  paymentsForAuthors = env.PAYMENTS_FOR === 'authors';
 }
 
 export const professionsOn = () => professions;
@@ -82,6 +84,10 @@ export const guildWarsOn = () => guildWars;
 // The payments for Punkty Systemu (payments.js): the gateway they go through,
 // or '' where they are off. Off, nothing of them answers.
 export const paymentsProvider = () => payments;
+// "authors" in PAYMENTS_FOR: the purchases only for the author's accounts
+// (author.js), as the first, real purchase is tried before the players get
+// them (the author, 11.11.2026: no test environment).
+export const paymentsOnlyForAuthors = () => paymentsForAuthors;
 // A camp building of the Osada's (Kwatery, `settlement` in buildings.json)
 // stands only where the Osada is on, and one of the Warownia's (`fortress`)
 // only where the Warownia is; the others everywhere.

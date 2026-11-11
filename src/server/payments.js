@@ -31,7 +31,7 @@ import { orderBlock, packOf, quarterAt, quarterBlock, quarterFits, spentLately, 
 import { isAuthor } from './author.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { toHex } from './encoding.js';
-import { paymentsProvider } from './features.js';
+import { paymentsOnlyForAuthors, paymentsProvider } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { providerFor } from './payment-providers.js';
 import { requireSession } from './sessions.js';
@@ -60,6 +60,15 @@ function requireGateway(env) {
   const gateway = providerFor(paymentsProvider(), env);
   if (!gateway) throw notFound();
   return gateway;
+}
+
+// The player's purchases, or "not found" for an account that may not buy yet
+// (PAYMENTS_FOR "authors": only the author's accounts, while the first real
+// purchase is tried).
+async function requireBuyer(context) {
+  const found = await requirePlayer(context);
+  if (paymentsOnlyForAuthors() && !isAuthor(context.env, found.session.user)) throw notFound();
+  return found;
 }
 
 const purchaseOf = (row) => ({ status: row.status, price: row.price, points: row.points, createdAt: row.created_at, paidAt: row.paid_at });
@@ -107,7 +116,7 @@ async function quarterTaken(db, quarter, now) {
 // when the next quarter sells it again.
 export async function getPayments(context) {
   requireGateway(context.env);
-  const { session } = await requirePlayer(context);
+  const { session } = await requireBuyer(context);
   const db = context.env.DB;
   await expireOrders(db, session.userId, context.now);
   const quarter = quarterAt(context.now, rules);
@@ -138,7 +147,7 @@ export async function getPayments(context) {
 // gateway has a page). `terms` and `adult` are the player's own ticks.
 export async function orderPoints(context) {
   const gateway = requireGateway(context.env);
-  const { session, player } = await requirePlayer(context);
+  const { session, player } = await requireBuyer(context);
   const body = await readJson(context.request);
   const db = context.env.DB;
   await expireOrders(db, session.userId, context.now);
@@ -302,7 +311,7 @@ export function paymentReturn({ request }) {
 // the money back through the gateway.
 export async function withdrawPurchase(context) {
   const gateway = requireGateway(context.env);
-  const { session } = await requirePlayer(context);
+  const { session } = await requireBuyer(context);
   const body = await readJson(context.request);
   const db = context.env.DB;
   const row = await db.prepare('SELECT * FROM purchases WHERE public_id = ? AND user_id = ?').bind(String(body.orderId ?? ''), session.userId).first();

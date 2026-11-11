@@ -115,6 +115,22 @@ describe('payments off', () => {
   });
 });
 
+describe('payments only for the author first', () => {
+  const { call, db, signUp } = useServer({ PAYMENTS: 'test', PAYMENTS_TEST_SECRET: 'tajny', PAYMENTS_FOR: 'authors', AUTHOR_LOGINS: 'szef' });
+
+  test("a player does not see them yet, the author's account does", async () => {
+    const { cookie } = await signUp('kupiec');
+    await call('POST', '/api/character', { cookie, body: { name: 'Kupiec', classId: 'warrior', appearance: 'male' } });
+    assert.equal((await call('GET', '/api/payments', { cookie })).status, 404);
+    assert.equal((await call('POST', '/api/payments/order', { cookie, body: { packId: 'ps-250', terms: true, adult: true } })).status, 404);
+    const { cookie: author } = await signUp('szef');
+    await (await db()).prepare("UPDATE users SET google_sub = 'szef' WHERE login = 'szef'").run();
+    await call('POST', '/api/character', { cookie: author, body: { name: 'Szef', classId: 'mage', appearance: 'female' } });
+    assert.equal((await call('GET', '/api/payments', { cookie: author })).status, 200);
+    assert.equal((await call('POST', '/api/payments/order', { cookie: author, body: { packId: 'ps-250', terms: true, adult: true } })).status, 201);
+  });
+});
+
 describe('payments through the test gateway', () => {
   const SECRET = 'tajny-klucz-testowy';
   const { server, call, db, signUp } = useServer({ PAYMENTS: 'test', PAYMENTS_TEST_SECRET: SECRET, AUTHOR_LOGINS: 'szef', SETTLEMENT: 'on' });

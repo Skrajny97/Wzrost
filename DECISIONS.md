@@ -3051,6 +3051,7 @@ Autor odpowiedział na stronie ocen 11.11.2026 o 6:36: 804 A, 805 D, 806 A, 807 
 4. **807 A: zwrot niewydanych PS przez 14 dni.** Przycisk „Odstąp od umowy” w historii zakupów, jak w podwalinach.
 5. **808 A: 100 PS = 2 zł.** 250 PS za 4,99 zł, 500 PS za 9,99 zł, 1000 PS za 19,99 zł i 2500 PS za 49,99 zł.
 6. **Nieopłacone zamówienie** zamyka się jako „expired” po `pendingHours` (24 godziny) i przestaje się liczyć do limitów. Jeśli zapłata przyjdzie później, i tak dopisuje punkty.
+7. **Bez środowiska testowego** (autor 11.11.2026: „mam konto w autopay, żeby nie bawić się w jakieś testowe środowiska, bo to szkoda życia”). Płatności włączą się w grze najpierw tylko dla konta autora (`PAYMENTS_FOR: "authors"`, konto z `AUTHOR_LOGINS` połączone z Google). Dla innych graczy trasy zakupu odpowiadają „nie znaleziono”. Próbą będzie prawdziwy zakup 250 PS za 4,99 zł, który można zwrócić. Dla wszystkich płatności włączą się po akceptacji ekranu zakupu i po uzupełnieniu regulaminu i polityki prywatności. Sekrety `AUTOPAY_TEST_*` i bramka testpay na wersji testowej zostają nieużywane.
 
 ## Płatności za Punkty Systemu: podwaliny (11.11.2026)
 
