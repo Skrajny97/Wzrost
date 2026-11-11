@@ -6,7 +6,12 @@
 // and, let go, sticks to the nearer side edge at the height it was let go,
 // which the device remembers. Dragged onto the × that shows at the bottom
 // while it moves, it hides until "Kółko czatu" is turned on again in the
-// Ustawienia (app.js). It lights when the chat has something new
+// Ustawienia (app.js), or until a tap on the small chat tab that stands
+// meanwhile under the players online by the right edge (online.js; the
+// author, 11.11.2026, after a player could not find a hidden one: „wrzucić
+// trzeba gdzieś opcję czatu na główny ekran, może dodatkowo pod ilość
+// graczy online, żeby wskoczył dymek”), which brings it back popping in at
+// its place. It lights when the chat has something new
 // (chat-news.js); the Społeczność tab does not light for the chat any more,
 // which is no part of it (the author: „tylko z zakładki”). It is not there on
 // a computer with the chat's column (side.js), before the narrator has told
@@ -77,6 +82,7 @@ function room() {
 
 let shown = null; // { button, bin, dragged } while the button is there
 let place = null;
+let back = null; // the tab that brings a hidden button back, while it is there
 
 function stand() {
   // A finger moving the button keeps it where the finger is.
@@ -88,8 +94,12 @@ function stand() {
 }
 
 function light() {
-  if (!shown) return;
   const news = chatNews();
+  if (back) {
+    back.classList.toggle('chat-back--news', news);
+    back.setAttribute('aria-label', news ? t('Przywróć kółko czatu, nowe wiadomości') : t('Przywróć kółko czatu'));
+  }
+  if (!shown) return;
   shown.button.classList.toggle('chat-bubble--news', news);
   // A tag waiting says so (data/chat.json, mentions.texts.news).
   const tag = news && anyMentionNews() ? state.content?.chat?.mentions?.texts.news : null;
@@ -145,7 +155,7 @@ function show() {
     bin.classList.remove('chat-bubble-bin--near');
     if (hide) {
       setChatBubbleOn(false);
-      toast(t('Kółko czatu schowane. Włączysz je z powrotem w Ustawieniach.'));
+      toast(t('Kółko czatu schowane. Wróci po dotknięciu dymka przy prawej krawędzi ekranu.'));
       return;
     }
     const rect = button.getBoundingClientRect();
@@ -174,6 +184,27 @@ function hide() {
   shown = null;
 }
 
+// A tap on the tab: the button is back, popping in at its place.
+function bringBack() {
+  setChatBubbleOn(true);
+  if (!shown) return;
+  shown.button.classList.add('chat-bubble--back');
+  shown.button.focus({ preventScroll: true });
+}
+
+// The tab under the players online (#edge-tabs, online.js) while the
+// button is hidden.
+function showBack(wanted) {
+  const edge = $('#edge-tabs');
+  if (wanted && edge && !back) {
+    back = h('button', { type: 'button', class: 'chat-back', onClick: bringBack }, icon('chat', { size: 16 }), h('span', { class: 'chat-back-dot', 'aria-hidden': 'true' }));
+    edge.append(back);
+  } else if (!wanted && back) {
+    back.remove();
+    back = null;
+  }
+}
+
 // The narrator pointing at a place on the screen (narrator.js), which the
 // button could stand over.
 const narratorPoints = () => Boolean(document.querySelector('.guide'));
@@ -186,21 +217,21 @@ const rulesTold = () => !state.character?.tutorial || state.character.tutorial.i
 
 // The button as the game wants it now (app.js calls it with the side column).
 export function updateChatBubble() {
-  const wanted =
+  // Where the button may stand; turned off, its tab stands there instead.
+  const allowed =
     Boolean(state.character) &&
     !$('#view-game')?.hidden &&
     Boolean($('#side')?.hidden) &&
     isUnlocked('community') &&
-    chatBubbleOn() &&
     rulesTold() &&
     !chatInSight() &&
     !narratorPoints();
+  const wanted = allowed && chatBubbleOn();
+  showBack(allowed && !chatBubbleOn());
   if (wanted && !shown) show();
   else if (!wanted && !shown?.dragged()) hide();
-  else {
-    stand();
-    light();
-  }
+  else stand();
+  light();
 }
 
 onChatNews(light);

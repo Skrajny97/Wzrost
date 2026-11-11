@@ -452,6 +452,10 @@
     "0.2.59": {
       "title": "Version 0.2.59",
       "body": "- Two new outfits in the System Shop: the Vestments of Dawn for the Cleric and the Robe of the Eclipse for the Mage. Your character wears them on the portrait, on the march and in the saddle, at every evolution and in their own skin tone."
+    },
+    "0.2.62": {
+      "title": "Version 0.2.62",
+      "body": "- The chat bubble is easy to bring back: once you hide it, a small speech bubble shows under the players online count by the right edge of the screen. Tap it and the chat bubble returns to its place."
     }
   }
 }

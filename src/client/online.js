@@ -3,7 +3,9 @@
 // right edge of the game, at the edge of the main column on a computer,
 // that slides out with the count of players online and back in at the next
 // tap. The count is asked once a minute while the page is in sight
-// (src/server/online.js), and at once when the tab slides out.
+// (src/server/online.js), and at once when the tab slides out. The tabs on
+// that edge stand in one column (#edge-tabs), where the way back to a hidden
+// round chat button comes under this one (chat-bubble.js).
 
 import { request } from './api.js';
 import { h } from './dom.js';
@@ -50,7 +52,7 @@ export function mountOnline(view) {
     h('span', { class: 'online-dot', 'aria-hidden': 'true' }),
     h('span', { class: 'online-body' }, h('strong', { class: 'online-count', text: '…' }), h('span', { class: 'online-label', text: t('graczy online') })),
   );
-  view.append(tab);
+  view.append(h('div', { class: 'edge-tabs', id: 'edge-tabs' }, tab));
   ask();
 }
 

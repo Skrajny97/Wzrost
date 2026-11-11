@@ -380,9 +380,11 @@ function showConfirm() {
 }
 
 function openGame() {
+  // The players online first: the way back to a hidden chat button stands
+  // under them (chat-bubble.js), which showing the game already asks for.
+  mountOnline($('#view-game'));
   show('game');
   buildTopbar(openSettings);
-  mountOnline($('#view-game'));
   route();
   // An older account without a confirmed e-mail is invited to confirm it,
   // once the narrator is done (email.js).

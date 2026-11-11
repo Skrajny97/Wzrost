@@ -3054,6 +3054,12 @@ Autor przekazał zrzuty z czatu z uwagami gracza (poz. 47): „same mądre uwagi
 4. **Towarzysze sami zostają w Kwaterach, gdy postać idzie w Drużynie.** Dziś trzeba ich zostawić ręcznie (zasada autora z 2.11.2026: „nie może być w drużynie, dopóki nie kliknie na nim [Zostań w kwaterze]”), więc to zmiana zasady: pytanie do autora.
 5. **„Dokupienie” poziomów towarzyszowi**, który został w tyle za postacią, żeby nie wymieniać go na nowego i nie przekładać całego sprzętu: pytanie do autora o cenę i zasady.
 
+## Wersja 0.2.62 (11.11.2026): dymek, który przywraca kółko czatu
+
+1. **Co wchodzi do gry:** gdy kółko czatu jest schowane (upuszczone na ×), pod licznikiem graczy online przy prawej krawędzi ekranu stoi mała zakładka z dymkiem czatu, z żółtą kropką przy nowych wiadomościach. Stuknięcie przywraca kółko, które wskakuje na swoje miejsce, a zakładka znika. Autor, po zgłoszeniu gracza, który schował kółko i nie umiał go potem znaleźć: „jest nieintuicyjne wiec wrzucic trzeba gdzies opcje czatu na główny ekran moze dodatkowo pod ilość graczy online zeby wskoczył dymek”. Komunikat po schowaniu kółka mówi teraz o dymku przy prawej krawędzi ekranu. Przełącznik „Kółko czatu” w Ustawieniach zostaje. Licznik graczy online i dymek stoją w jednej kolumnie (`#edge-tabs`), więc rozwinięty licznik nie nachodzi na dymek.
+2. **Baza danych:** bez migracji.
+3. **Sprawdzone:** w przeglądarce na telefonie (320, 360 i 430 px) i na komputerze (1366 px): schowanie kółka na ×, dymek pod licznikiem (także przy rozwiniętym liczniku), przywrócenie stuknięciem, bez przewijania na boki; tłumaczenia.
+
 ## Wersja 0.2.61 (11.11.2026): ekran zakupu Punktów Systemu (810), na razie tylko dla konta autora
 
 1. **Co wchodzi do gry:** ekran „Kup Punkty Systemu” ze Sklepu Systemu (`#/sklep/punkty`), jak na przyjętych makietach 810.1–810.7: cztery pakiety po dwa w rzędzie, pola regulaminu i 18+, przycisk „Kupuję i płacę …”, oczekiwanie na płatność po powrocie z Autopay, historia zakupów z „Odstąp od umowy” przez 14 dni i wyszarzone pakiety ponad limit kwartału. Widzi go tylko konto autora (`PAYMENTS_FOR` „authors”); bez kluczy Autopay w sekretach gra pisze, że zakup nie jest jeszcze dostępny.

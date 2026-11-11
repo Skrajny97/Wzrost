@@ -10334,15 +10334,30 @@ a.profession-square:active {
   background: #d9534f;
 }
 
-/* The players online (online.js): a tab on the right edge of the game (at
-   the main column's edge on a computer, beside the chat), only its green
-   dot until tapped; then it slides out with the count. It grows leftwards
-   inside the screen, so nothing ever sticks out past its edge. */
-.online-tab {
+/* The tabs on the right edge of the game (online.js; at the main column's
+   edge on a computer, beside the chat), one under another: the players
+   online and, while the round chat button is hidden, the way back to it
+   (chat-bubble.js). Only the tabs themselves take taps. */
+.edge-tabs {
   position: fixed;
   top: 38%;
   right: calc(var(--side-width, 0px) + env(safe-area-inset-right, 0px));
   z-index: 15;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.edge-tabs > * {
+  pointer-events: auto;
+}
+
+/* The players online: only its green dot until tapped; then it slides out
+   with the count. It grows leftwards inside the screen, so nothing ever
+   sticks out past its edge. */
+.online-tab {
   display: flex;
   align-items: center;
   min-width: 30px;
@@ -10397,6 +10412,41 @@ a.profession-square:active {
 /* With the game's animations off, it opens at once. */
 .calm .online-body {
   transition: none;
+}
+
+/* The way back to the hidden round chat button (chat-bubble.js): a tab like
+   the players online, with the chat's bubble, and the gold dot of news. */
+.chat-back {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  min-height: 44px;
+  padding: 8px 6px 8px 7px;
+  border: 1px solid var(--line);
+  border-right: 0;
+  border-radius: 10px 0 0 10px;
+  background: var(--bg-deep);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+.chat-back-dot {
+  position: absolute;
+  top: 5px;
+  left: 4px;
+  display: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 0 2px var(--bg-deep);
+}
+
+.chat-back--news .chat-back-dot {
+  display: block;
 }
 
 .profile-friend {
@@ -16741,6 +16791,31 @@ a.discord-button {
 
 .chat-bubble--dragging {
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.6);
+}
+
+/* Brought back from its tab, the button pops in. */
+.chat-bubble--back {
+  animation: chat-bubble-back 0.35s ease-out;
+}
+
+@keyframes chat-bubble-back {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  70% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.calm .chat-bubble--back {
+  animation: none;
 }
 
 .chat-bubble-dot {
