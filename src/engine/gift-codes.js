@@ -1,3 +1,4 @@
+// @ts-check
 // Gift codes (data/gift-codes.json; DECISIONS.md, "Kod podarunkowy"): a code
 // typed in the settings gives its rewards to the character, once per account,
 // until the code expires. The server says which codes the account has used
@@ -5,8 +6,14 @@
 
 import { nameInText } from './text.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {{ systemPoints?: number, timePoints?: number, gold?: number, resources?: Record<string, number> }} Rewards */
+/** @typedef {{ id: string, code: string, from?: string, until: string, for?: string, rewards: Rewards }} GiftCode A code of data/gift-codes.json. */
+/** @typedef {{ id: number, userId: number, key: string }} CodeCharacter */
+
 // A code as typed, the way the codes are written: capitals and digits, no
 // spaces or dashes.
+/** @param {unknown} typed */
 export const normalCode = (typed) =>
   String(typed ?? '')
     .toUpperCase()
@@ -20,9 +27,19 @@ export const normalCode = (typed) =>
 // entry each (the author: "na stałe może być ten kod, ale dostępny tylko dla
 // danej konkretnej postaci i tylko na moje polecenie"). A code with `from`
 // is unknown before that moment, like the 11 November code "1111".
+/**
+ * @param {unknown} typed
+ * @param {number} now
+ * @param {string[]} used
+ * @param {Content} content
+ * @param {string | null} [characterKey]
+ * @returns {{ gift: GiftCode, reason?: undefined } | { reason: 'unknown' | 'expired' | 'used', gift?: undefined }}
+ */
 export function giftCodeOf(typed, now, used, content, characterKey = null) {
   const code = normalCode(typed);
+  /** @param {GiftCode} each */
   const known = (each) => each.code === code && (!each.for || each.for === characterKey) && (!each.from || now >= Date.parse(each.from));
+  /** @type {GiftCode[]} */
   const gifts = code ? content.giftCodes.filter(known) : [];
   if (gifts.length === 0) return { reason: 'unknown' };
   const open = gifts.filter((each) => now < Date.parse(each.until));
@@ -35,8 +52,13 @@ export function giftCodeOf(typed, now, used, content, characterKey = null) {
 // The rewards in words: "Punkty Systemu +100, Punkty Czasu +100, złoto
 // +1000, drewno +100…" (in English the resources with their capitals,
 // "Wood +100": nameInText).
+/**
+ * @param {Rewards} rewards
+ * @param {Content} content
+ */
 export function giftRewardsText(rewards, content) {
   const texts = content.giftTexts;
+  /** @type {string[]} */
   const parts = [];
   if (rewards.systemPoints) parts.push(`${texts.systemPoints} +${rewards.systemPoints}`);
   if (rewards.timePoints) parts.push(`${texts.timePoints} +${rewards.timePoints}`);
@@ -46,6 +68,11 @@ export function giftRewardsText(rewards, content) {
 }
 
 // The resources after a gift (`resources`: the character's stock by id).
+/**
+ * @param {Record<string, number>} resources
+ * @param {Rewards} rewards
+ * @returns {Record<string, number>}
+ */
 export function withGiftResources(resources, rewards) {
   const next = { ...resources };
   for (const [id, amount] of Object.entries(rewards.resources ?? {})) next[id] = (next[id] ?? 0) + amount;
@@ -58,7 +85,13 @@ export function withGiftResources(resources, rewards) {
 // `used` the { userId, characterId, giftId } of the codes taken. The giving
 // character must be the one that took the code, and the receiving one on the
 // same account; anything else, or more than one such pair, moves nothing.
+/**
+ * @param {{ from: string, to: string, gift: string }} move
+ * @param {CodeCharacter[]} characters
+ * @param {{ userId: number, characterId: number, giftId: string }[]} used
+ */
 export function giftMovePair(move, characters, used) {
+  /** @type {{ from: CodeCharacter, to: CodeCharacter }[]} */
   const pairs = [];
   for (const from of characters.filter((one) => one.key === move.from)) {
     const took = used.some((one) => one.userId === from.userId && one.characterId === from.id && one.giftId === move.gift);

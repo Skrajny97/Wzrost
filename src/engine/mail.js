@@ -15,7 +15,7 @@ const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (char) => ESCAPES[
 // a button: a mail app shows one or the other.
 /**
  * @param {{ login: string, link: string }} account
- * @param {{ texts: object, balance: { account: { emailSystemPoints: number } }, language?: string }} content
+ * @param {{ texts: Record<string, string[]>, balance: { account: { emailSystemPoints: number } }, language?: string }} content
  * @returns {{ subject: string, text: string, html: string }}
  */
 export function confirmationEmail({ login, link }, content) {

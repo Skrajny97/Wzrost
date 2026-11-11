@@ -1,3 +1,4 @@
+// @ts-check
 // A translation laid over the game's data (the English beta, 490–497 A):
 // data/en/<file>.json has the texts of data/<file>.json in English, at the
 // same places. An object's keys, an array's items by their id (by
@@ -7,19 +8,34 @@
 // number, an id, a key the Polish data has not got or the shape of the
 // data. What has nothing translated is the Polish data itself, shared.
 
+/** @typedef {Record<string, any>} Data A piece of the game's data: an object, an array, a text or a number. */
+
+/**
+ * @param {unknown} value
+ * @returns {value is Data}
+ */
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 // The key an array's items are known by in an overlay, or null for an
 // array taken by position: `id`, or `monster`, when every item has its own.
+/**
+ * @param {unknown[]} list
+ * @returns {'id' | 'monster' | null}
+ */
 export function overlayKey(list) {
-  for (const key of ['id', 'monster']) {
-    if (list.length > 0 && list.every((item) => isObject(item) && typeof item[key] === 'string') && new Set(list.map((item) => item[key])).size === list.length) {
+  for (const key of /** @type {const} */ (['id', 'monster'])) {
+    if (list.length > 0 && list.every((item) => isObject(item) && typeof item[key] === 'string') && new Set(list.map((item) => /** @type {Data} */ (item)[key])).size === list.length) {
       return key;
     }
   }
   return null;
 }
 
+/**
+ * @param {any} base
+ * @param {any} over
+ * @returns {any}
+ */
 export function overlayTexts(base, over) {
   if (over === undefined || over === null) return base;
   if (typeof base === 'string') return typeof over === 'string' && over !== '' ? over : base;
@@ -28,14 +44,15 @@ export function overlayTexts(base, over) {
     let items;
     if (key) {
       if (!isObject(over)) return base;
-      items = base.map((item) => overlayTexts(item, Object.hasOwn(over, item[key]) ? over[item[key]] : undefined));
+      items = base.map((/** @type {Data} */ item) => overlayTexts(item, Object.hasOwn(over, item[key]) ? over[item[key]] : undefined));
     } else {
       if (!Array.isArray(over)) return base;
-      items = base.map((item, index) => overlayTexts(item, over[index]));
+      items = base.map((/** @type {unknown} */ item, /** @type {number} */ index) => overlayTexts(item, over[index]));
     }
-    return items.every((item, index) => item === base[index]) ? base : items;
+    return items.every((/** @type {unknown} */ item, /** @type {number} */ index) => item === base[index]) ? base : items;
   }
   if (!isObject(base) || !isObject(over)) return base;
+  /** @type {Data | null} */
   let merged = null;
   for (const [name, value] of Object.entries(over)) {
     if (name.startsWith('$') || !Object.hasOwn(base, name)) continue;
