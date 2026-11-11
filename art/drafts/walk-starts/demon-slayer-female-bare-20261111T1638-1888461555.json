@@ -1,0 +1,14 @@
+{
+  "id": "demon-slayer-female-bare",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, the back of a strong woman in gleaming silver plate armour seen exactly from the side, facing right: the silver back plate and the shoulder guard with gold trim, the top of a short white cape with gold trim falling behind her back, no hair and no braid down the back, nothing hanging down, transparent background around the figure",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": "art/references/walks/start/demon-slayer-female.png",
+  "mask": "art/inputs/walk-starts/demon-slayer-female-bare-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
