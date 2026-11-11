@@ -4,7 +4,7 @@
   "description": "Pakiety Punktów Systemu za pieniądze i zasady zakupu (src/engine/payments.js, src/server/payments.js; DECISIONS.md, „Płatności za Punkty Systemu: podwaliny”). Kwoty w groszach, brutto.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["currency", "packs", "monthlyLimit", "limitDays", "withdrawalDays", "adultOnly", "termsVersion", "pendingHours"],
+  "required": ["currency", "packs", "monthlyLimit", "limitDays", "withdrawalDays", "adultOnly", "termsVersion", "pendingHours", "timeZone", "quarterLimit"],
   "properties": {
     "$comment": { "type": "string" },
     "currency": { "description": "Waluta cen (ISO 4217).", "type": "string", "pattern": "^[A-Z]{3}$" },
@@ -28,6 +28,8 @@
     "withdrawalDays": { "description": "Dni od zapłaty, w których niewydane kupione punkty można zwrócić.", "type": "integer", "minimum": 0 },
     "adultOnly": { "description": "Kupują tylko osoby, które potwierdzą pełnoletność.", "type": "boolean" },
     "termsVersion": { "description": "Wersja regulaminu, którą przyjmuje kupujący.", "type": "string", "minLength": 1 },
-    "pendingHours": { "description": "Ile godzin zamówienie czeka na zapłatę.", "type": "integer", "minimum": 1 }
+    "pendingHours": { "description": "Ile godzin zamówienie czeka na zapłatę.", "type": "integer", "minimum": 1 },
+    "timeZone": { "description": "Strefa czasu, w której liczą się kwartały (limit działalności nierejestrowanej) i dni zestawienia sprzedaży.", "type": "string", "minLength": 1 },
+    "quarterLimit": { "description": "Najwięcej, ile gra przyjmie w kwartale, w groszach: limit przychodu działalności nierejestrowanej (804 A). null: bez limitu (firma).", "type": ["integer", "null"], "minimum": 100 }
   }
 }

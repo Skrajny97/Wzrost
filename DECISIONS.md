@@ -3034,6 +3034,17 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Płatności: odpowiedzi autora 804–808 i limit kwartału (11.11.2026)
+
+Autor odpowiedział na stronie ocen 11.11.2026 o 6:36: 804 A, 805 D, 806 A, 807 A i 808 A. Tego samego ranka autor przyjął też ostatecznie wszystkie pięć skórek w każdym odcieniu skóry (809.1–809.10: portrety, chód i jazda konno).
+
+1. **804 A: na start działalność nierejestrowana.** Przychód takiej działalności ma limit w każdym kwartale: 225% płacy minimalnej, w 2026 roku 10 813,50 zł. Gra pilnuje go sama (`quarterLimit` w `data/payments.json`, kwartały według polskiego zegara z `timeZone`). Zamówienie zapisuje się tylko wtedy, gdy przychód z kwartału razem z nim mieści się w limicie. Liczą się zakupy zapłacone i niezwrócone oraz zamówienia czekające na zapłatę. Serwer sprawdza to w tym samym poleceniu, które zapisuje zamówienie, więc dwa zamówienia naraz nie przekroczą limitu. Pakiet, który się nie mieści, ma w sklepie datę początku następnego kwartału („Ten pakiet będzie można kupić od 1.01.2027.”). Płaca minimalna tylko rośnie, więc limit z 2026 roku jest bezpieczny także w 2027, dopóki się go nie podniesie. `quarterLimit: null` wyłącza limit, gdy autor założy firmę. Panel autora pokazuje kwartał: zapłacone, czekające i limit.
+2. **805 D: Autopay.** To jedyna bramka dla działalności nierejestrowanej. Opłata na start 199 zł, BLIK i przelewy, bez kart. Adapter w `src/server/payment-providers.js`, klucze w sekretach.
+3. **806 A: kupują tylko pełnoletni.** Przed zakupem pole „Mam ukończone 18 lat” i limit 400 zł na 30 dni na konto, jak w podwalinach.
+4. **807 A: zwrot niewydanych PS przez 14 dni.** Przycisk „Odstąp od umowy” w historii zakupów, jak w podwalinach.
+5. **808 A: 100 PS = 2 zł.** 250 PS za 4,99 zł, 500 PS za 9,99 zł, 1000 PS za 19,99 zł i 2500 PS za 49,99 zł.
+6. **Nieopłacone zamówienie** zamyka się jako „expired” po `pendingHours` (24 godziny) i przestaje się liczyć do limitów. Jeśli zapłata przyjdzie później, i tak dopisuje punkty.
+
 ## Płatności za Punkty Systemu: podwaliny (11.11.2026)
 
 Autor 11.11.2026: „Przygotuj natomiast pełną instrukcję włączenia płatności za Punkty Systemu w grze […] Spisz to lub zacznij budować podwaliny tak, by odbyło się to bezpiecznie” i „Tak, wdrażamy płatności przed Sklepem Play”. Instrukcja, regulamin i ryzyka są w dokumencie „Płatności za Punkty Systemu” (https://claude.ai/artifact/8kgnbXhVbDHzo1NFwHdKLi), a decyzje autora w pytaniach 804–808 na stronie ocen.

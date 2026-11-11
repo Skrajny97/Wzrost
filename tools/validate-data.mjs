@@ -755,7 +755,8 @@ function checkReferences(data) {
 }
 
 // The payments for Punkty Systemu (payments.json): each pack once, more
-// points for more money, and the limit lets the dearest pack be bought.
+// points for more money, the limits let the dearest pack be bought, and the
+// quarters' time zone is one the clock knows.
 function checkPayments(data) {
   const errors = [];
   const { packs, monthlyLimit } = data.payments;
@@ -764,6 +765,13 @@ function checkPayments(data) {
     if (packs[i].points <= packs[i - 1].points || packs[i].price <= packs[i - 1].price) errors.push(`payments.json: pakiet ${packs[i].id} musi dawać więcej punktów za więcej pieniędzy niż ${packs[i - 1].id}`);
   }
   if (packs.some((pack) => pack.price > monthlyLimit)) errors.push('payments.json: limit miesięczny mniejszy niż cena pakietu');
+  const { quarterLimit, timeZone } = data.payments;
+  if (quarterLimit !== null && packs.some((pack) => pack.price > quarterLimit)) errors.push('payments.json: limit kwartalny mniejszy niż cena pakietu');
+  try {
+    new Intl.DateTimeFormat('pl-PL', { timeZone });
+  } catch {
+    errors.push(`payments.json: nieznana strefa czasu ${timeZone}`);
+  }
   return errors;
 }
 

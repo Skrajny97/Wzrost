@@ -2695,5 +2695,7 @@
   "Zwrot jest możliwy przez {days} dni od zapłaty.": "A purchase can be returned for {days} days after payment.",
   "Punkty z tego zakupu zostały już wydane, więc nie można go zwrócić.": "The points from this purchase have already been spent, so it cannot be returned.",
   "Powiadomienie bez ważnego podpisu.": "A notification without a valid signature.",
-  "Nieczytelne powiadomienie.": "An unreadable notification."
+  "Nieczytelne powiadomienie.": "An unreadable notification.",
+  "Ten pakiet będzie można kupić od {date}.": "This pack can be bought from {date}.",
+  "Tego pakietu nie można teraz kupić.": "This pack cannot be bought right now."
 }

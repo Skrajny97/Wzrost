@@ -4,18 +4,20 @@
 // points only from the gateway's signed news, once however often it comes,
 // for the order's own amount; the won points spent first; a purchase given
 // back within the days while its points are unspent; a chargeback taking
-// back what is left and stopping the account's purchases; the limit; and
-// the author's record of the sales.
+// back what is left and stopping the account's purchases; the limits, of
+// an account and of the quarter (804 A, an unregistered activity); an
+// unpaid order closing after a day; and the author's record of the sales.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import rules from '../data/payments.json' with { type: 'json' };
-import { chargedBack, credited, orderBlock, packOf, spentFrom, spentLately, withdrawalBlock, withdrawn } from '../src/engine/index.js';
+import { chargedBack, credited, orderBlock, packOf, quarterAt, quarterFits, spentFrom, spentLately, withdrawalBlock, withdrawn } from '../src/engine/index.js';
 import { testSignature } from '../src/server/payment-providers.js';
 import { useServer } from './helpers/server.js';
 
-const DAY = 24 * 3600000;
+const HOUR = 3600000;
+const DAY = 24 * HOUR;
 const pack = (id) => packOf(rules, id);
 
 describe('payments in the engine', () => {
@@ -40,16 +42,38 @@ describe('payments in the engine', () => {
     assert.match(zl(40000), /^400,00\s+zł$/);
   });
 
-  test('the limit counts the paid and waiting purchases of the last days, not the refunded or failed', () => {
+  test('the limit counts the paid and waiting purchases of the last days, not the refunded, failed or long unpaid', () => {
     const now = 100 * DAY;
     const purchases = [
       { status: 'paid', price: 999, createdAt: now - DAY },
-      { status: 'pending', price: 499, createdAt: now - 2 * DAY },
+      { status: 'pending', price: 499, createdAt: now - 2 * HOUR },
+      { status: 'pending', price: 1999, createdAt: now - 2 * DAY },
       { status: 'refunded', price: 1999, createdAt: now - DAY },
       { status: 'failed', price: 4999, createdAt: now - DAY },
       { status: 'paid', price: 4999, createdAt: now - 31 * DAY },
     ];
     assert.equal(spentLately(purchases, now, rules), 1498);
+  });
+
+  test('a quarter of the year on the Polish clock', () => {
+    const quarter = quarterAt(Date.UTC(2026, 10, 11, 6), rules);
+    assert.equal(new Date(quarter.startsAt).toISOString(), '2026-09-30T22:00:00.000Z');
+    assert.equal(new Date(quarter.endsAt).toISOString(), '2026-12-31T23:00:00.000Z');
+    // Half an hour into the new year in Poland is the next quarter, which
+    // ends on the Polish summer time.
+    const next = quarterAt(Date.UTC(2026, 11, 31, 23, 30), rules);
+    assert.equal(next.startsAt, quarter.endsAt);
+    assert.equal(new Date(next.endsAt).toISOString(), '2027-03-31T22:00:00.000Z');
+  });
+
+  test('a pack is sold while the quarter has room for it, and again from the next quarter', () => {
+    const quarter = quarterAt(Date.UTC(2026, 10, 11, 6), rules);
+    const ok = { rules, pack: pack('ps-500'), consents: { terms: true, adult: true }, spent: 0, blocked: false, quarter };
+    assert.equal(orderBlock({ ...ok, taken: rules.quarterLimit - 999 }), null);
+    const paused = orderBlock({ ...ok, taken: rules.quarterLimit - 998 });
+    assert.equal(paused.code, 'sales_paused');
+    assert.equal(paused.message, 'Ten pakiet będzie można kupić od 1.01.2027.');
+    assert.equal(quarterFits({ ...rules, quarterLimit: null }, 10 ** 9, pack('ps-2500')), true);
   });
 
   test('spending takes the won points first, the bought last', () => {
@@ -119,7 +143,8 @@ describe('payments through the test gateway', () => {
   test('the shop shows the packs, the limit and nothing bought yet', async () => {
     const { status, data } = await call('GET', '/api/payments', { cookie });
     assert.equal(status, 200);
-    assert.deepEqual(data.packs, rules.packs);
+    assert.deepEqual(data.packs, rules.packs.map((one) => ({ ...one, available: true })));
+    assert.equal(data.resumesAt, null);
     assert.equal(data.spent, 0);
     assert.equal(data.blocked, false);
     assert.deepEqual(data.purchases, []);
@@ -203,6 +228,44 @@ describe('payments through the test gateway', () => {
     assert.equal(over.data.error.code, 'monthly_limit');
   });
 
+  test("the quarter's limit stops the packs that no longer fit until the next quarter", async () => {
+    // Others' purchases paid this quarter, 6 zł short of the limit.
+    const now = Date.now();
+    await (await db())
+      .prepare(
+        `INSERT INTO purchases (public_id, user_id, character_id, pack_id, points, price, currency, provider, status, consents, created_at, paid_at)
+         VALUES ('inni', 999, 999, 'ps-2500', 2500, ?, 'PLN', 'test', 'paid', '{}', ?, ?)`,
+      )
+      .bind(rules.quarterLimit - 600, now, now)
+      .run();
+    const shop = (await call('GET', '/api/payments', { cookie })).data;
+    assert.deepEqual(
+      shop.packs.map((one) => one.available),
+      [true, false, false, false],
+    );
+    assert.ok(shop.resumesAt > now);
+    assert.equal((await order()).status, 201);
+    // The first order waits for its payment, so it counts.
+    const over = await order();
+    assert.equal(over.status, 409);
+    assert.equal(over.data.error.code, 'sales_paused');
+    assert.match(over.data.error.message, /^Ten pakiet będzie można kupić od \d{1,2}\.\d{2}\.\d{4}\.$/);
+  });
+
+  test('an order unpaid for longer than it waits closes, and a payment that still comes credits it', async () => {
+    const { data } = await order();
+    await (await db())
+      .prepare('UPDATE purchases SET created_at = created_at - ? WHERE public_id = ?')
+      .bind((rules.pendingHours + 1) * HOUR, data.orderId)
+      .run();
+    const shop = (await call('GET', '/api/payments', { cookie })).data;
+    assert.equal(shop.purchases[0].status, 'expired');
+    assert.equal(shop.spent, 0);
+    assert.equal(await paid(data.orderId), 200);
+    assert.equal((await purchase(data.orderId)).status, 'paid');
+    assert.deepEqual(await points(), { system_points: 350, system_points_paid: 250 });
+  });
+
   test('only the author sees the record of the sales', async () => {
     const { data } = await order();
     await paid(data.orderId);
@@ -214,5 +277,8 @@ describe('payments through the test gateway', () => {
     assert.equal(record.days[0].sales, 1);
     assert.equal(record.days[0].gross, 499);
     assert.equal(record.purchases[0].status, 'paid');
+    assert.equal(record.quarter.paid, 499);
+    assert.equal(record.quarter.waiting, 0);
+    assert.equal(record.quarter.limit, rules.quarterLimit);
   });
 });

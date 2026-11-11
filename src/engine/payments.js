@@ -1,7 +1,8 @@
 // Payments for Punkty Systemu (data/payments.json; DECISIONS.md, "Płatności
-// za Punkty Systemu: podwaliny"): the rules of a purchase, worked out on a
-// character's points and an account's purchases, without the ledger or the
-// gateway, which the server keeps (src/server/payments.js).
+// za Punkty Systemu: podwaliny" and the author's answers 804–808): the rules
+// of a purchase, worked out on a character's points and an account's
+// purchases, without the ledger or the gateway, which the server keeps
+// (src/server/payments.js).
 //
 // A character's points are a total (system_points) and the part of it that
 // was bought (system_points_paid); the rest was won in the game. Spending
@@ -9,27 +10,62 @@
 // to be given back within the withdrawal's days (the EU consumer
 // authorities' principles on in-game currencies, 21.03.2025).
 //
+// To start, the author sells as an unregistered activity (804 A), whose
+// revenue has a limit in each quarter of the year: the game sells a pack
+// only while what it took in the quarter, with the pack, stays within
+// rules.quarterLimit, and the next quarter sells again.
+//
 // `rules` is data/payments.json; amounts are in grosze, times in ms.
 
-const DAY = 24 * 60 * 60 * 1000;
+import { zoneClock, zoneMidnight } from './quests.js';
+
+const HOUR = 60 * 60 * 1000;
+const DAY = 24 * HOUR;
 
 export const packOf = (rules, id) => (typeof id === 'string' ? (rules.packs.find((pack) => pack.id === id) ?? null) : null);
 
+// Whether an order still waits for its payment: unpaid, and younger than
+// the hours an order waits; an older one is closed as unpaid.
+export const waiting = (purchase, now, rules) => purchase.status === 'pending' && purchase.createdAt > now - rules.pendingHours * HOUR;
+
 // What an account paid for the purchases that still count against its
 // limit: the paid ones and the ones waiting for the payment, of the last
-// `limitDays` days; refunds and failed ones do not count.
+// `limitDays` days; given back, failed and unpaid ones do not count.
 export function spentLately(purchases, now, rules) {
   const since = now - rules.limitDays * DAY;
   return purchases
-    .filter((one) => one.createdAt > since && (one.status === 'pending' || one.status === 'paid'))
+    .filter((one) => one.createdAt > since && (one.status === 'paid' || waiting(one, now, rules)))
     .reduce((sum, one) => sum + one.price, 0);
 }
+
+// The quarter of the year on the clock of rules.timeZone at `now`: when it
+// began and when the next one begins.
+export function quarterAt(now, rules) {
+  const { year, month, day } = zoneClock(now, rules.timeZone);
+  const today = Date.UTC(year, month - 1, day);
+  const first = Math.floor((month - 1) / 3) * 3;
+  const daysTo = (monthIndex) => Math.round((Date.UTC(year, monthIndex, 1) - today) / DAY);
+  return { startsAt: zoneMidnight(now, rules.timeZone, daysTo(first)), endsAt: zoneMidnight(now, rules.timeZone, daysTo(first + 3)) };
+}
+
+// Whether the game may sell `pack` in the quarter in which it took `taken`
+// (the purchases paid in it and kept, and the orders waiting): always
+// without a limit.
+export const quarterFits = (rules, taken, pack) => rules.quarterLimit === null || taken + pack.price <= rules.quarterLimit;
+
+// A date as Polish writes it on the clock of rules.timeZone ("1.01.2027").
+const dateText = (ms, rules) => {
+  const { year, month, day } = zoneClock(ms, rules.timeZone);
+  return `${day}.${String(month).padStart(2, '0')}.${year}`;
+};
 
 // An amount in grosze as Polish writes it, with its currency ("400,00 zł").
 const money = (grosze, currency) => new Intl.NumberFormat('pl-PL', { style: 'currency', currency }).format(grosze / 100);
 
-// Why the account cannot order `pack` now, or null.
-export function orderBlock({ rules, pack, consents, spent, blocked }) {
+// Why the account cannot order `pack` now, or null. `taken` and `quarter`
+// (quarterAt) are the game's quarter, for the limit of an unregistered
+// activity.
+export function orderBlock({ rules, pack, consents, spent, blocked, taken = 0, quarter = null }) {
   if (!pack) return { code: 'invalid_pack', message: 'Nie ma takiego pakietu.' };
   if (blocked) return { code: 'purchases_blocked', message: 'Zakupy na tym koncie są wstrzymane. Napisz do nas, a wyjaśnimy sprawę.' };
   if (consents?.terms !== true) return { code: 'terms_required', message: 'Zaakceptuj regulamin, żeby kupić.' };
@@ -38,8 +74,16 @@ export function orderBlock({ rules, pack, consents, spent, blocked }) {
     const left = money(Math.max(0, rules.monthlyLimit - spent), rules.currency);
     return { code: 'monthly_limit', message: `Limit zakupów to ${money(rules.monthlyLimit, rules.currency)} na ${rules.limitDays} dni. Do wykorzystania zostało ${left}.` };
   }
+  if (!quarterFits(rules, taken, pack)) return quarterBlock(rules, quarter);
   return null;
 }
+
+// The answer to an order the quarter has no room for: the pack is sold
+// again from the next quarter.
+export const quarterBlock = (rules, quarter) => ({
+  code: 'sales_paused',
+  message: quarter ? `Ten pakiet będzie można kupić od ${dateText(quarter.endsAt, rules)}.` : 'Tego pakietu nie można teraz kupić.',
+});
 
 // The points after a paid purchase.
 export const credited = (balance, points) => ({ systemPoints: balance.systemPoints + points, systemPointsPaid: balance.systemPointsPaid + points });

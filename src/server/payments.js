@@ -17,9 +17,17 @@
 // points go at once, the money through the gateway. A refund or a
 // chargeback the gateway reports takes the points back, never below none;
 // after a chargeback the account buys nothing until the author clears it.
+//
+// The game sells as the author's unregistered activity (804 A), whose
+// revenue has a limit in each quarter: an order is written only while what
+// the game took in the quarter (paid and kept, or waiting for its payment),
+// with the order, stays within data/payments.json's quarterLimit, checked
+// in the same statement that writes it, so two orders at once cannot both
+// pass. An order unpaid after pendingHours closes as expired; a payment
+// that still comes for it credits it.
 
 import rules from '../../data/payments.json' with { type: 'json' };
-import { orderBlock, packOf, spentLately, withdrawalBlock } from '../engine/index.js';
+import { orderBlock, packOf, quarterAt, quarterBlock, quarterFits, spentLately, withdrawalBlock } from '../engine/index.js';
 import { isAuthor } from './author.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { toHex } from './encoding.js';
@@ -28,8 +36,19 @@ import { ApiError, json, readJson } from './http.js';
 import { providerFor } from './payment-providers.js';
 import { requireSession } from './sessions.js';
 
-const DAY = 24 * 3600000;
-const STATUS = { invalid_pack: 400, terms_required: 400, adult_required: 403, purchases_blocked: 403, monthly_limit: 409, not_withdrawable: 409, withdrawal_expired: 409, points_spent: 409 };
+const HOUR = 3600000;
+const DAY = 24 * HOUR;
+const STATUS = {
+  invalid_pack: 400,
+  terms_required: 400,
+  adult_required: 403,
+  purchases_blocked: 403,
+  monthly_limit: 409,
+  sales_paused: 409,
+  not_withdrawable: 409,
+  withdrawal_expired: 409,
+  points_spent: 409,
+};
 
 const notFound = () => new ApiError(404, 'not_found', 'Nie znaleziono.');
 const refuse = (block) => new ApiError(STATUS[block.code] ?? 409, block.code, block.message);
@@ -60,19 +79,47 @@ async function accountPurchases(db, userId) {
   return results;
 }
 
+// The account's orders left unpaid longer than an order waits, closed as
+// unpaid.
+const expireOrders = (db, userId, now) =>
+  db
+    .prepare("UPDATE purchases SET status = 'expired', closed_at = ? WHERE user_id = ? AND status = 'pending' AND created_at <= ?")
+    .bind(now, userId, now - rules.pendingHours * HOUR)
+    .run();
+
+// What the game took in the quarter, as SQL with its three values (the
+// quarter's start, twice, and the moment before which an order no longer
+// waits): the purchases paid in it and kept or being given back, and the
+// orders made in it still waiting for their payment.
+const TAKEN = `SELECT COALESCE(SUM(price), 0) FROM purchases
+  WHERE (status IN ('paid', 'refunding') AND paid_at >= ?) OR (status = 'pending' AND created_at >= ? AND created_at > ?)`;
+const takenValues = (quarter, now) => [quarter.startsAt, quarter.startsAt, now - rules.pendingHours * HOUR];
+
+async function quarterTaken(db, quarter, now) {
+  const row = await db.prepare(`SELECT (${TAKEN}) AS taken`).bind(...takenValues(quarter, now)).first();
+  return row?.taken ?? 0;
+}
+
 // GET /api/payments: the packs and their prices, what the account may still
 // spend, and its purchases, newest first.
+// A pack the quarter has no room for is not `available`, and `resumesAt` is
+// when the next quarter sells it again.
 export async function getPayments(context) {
   requireGateway();
   const { session } = await requirePlayer(context);
   const db = context.env.DB;
-  const [rows, user] = await Promise.all([
+  await expireOrders(db, session.userId, context.now);
+  const quarter = quarterAt(context.now, rules);
+  const [rows, user, taken] = await Promise.all([
     accountPurchases(db, session.userId),
     db.prepare('SELECT purchases_blocked FROM users WHERE id = ?').bind(session.userId).first(),
+    quarterTaken(db, quarter, context.now),
   ]);
+  const packs = rules.packs.map(({ id, points, price }) => ({ id, points, price, available: quarterFits(rules, taken, { price }) }));
   return json({
     currency: rules.currency,
-    packs: rules.packs.map(({ id, points, price }) => ({ id, points, price })),
+    packs,
+    resumesAt: packs.every((pack) => pack.available) ? null : quarter.endsAt,
     monthlyLimit: rules.monthlyLimit,
     limitDays: rules.limitDays,
     spent: spentLately(rows.map(purchaseOf), context.now, rules),
@@ -93,9 +140,12 @@ export async function orderPoints(context) {
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const db = context.env.DB;
-  const [rows, user] = await Promise.all([
+  await expireOrders(db, session.userId, context.now);
+  const quarter = quarterAt(context.now, rules);
+  const [rows, user, taken] = await Promise.all([
     accountPurchases(db, session.userId),
     db.prepare('SELECT purchases_blocked FROM users WHERE id = ?').bind(session.userId).first(),
+    quarterTaken(db, quarter, context.now),
   ]);
   const pack = packOf(rules, body.packId);
   const block = orderBlock({
@@ -104,6 +154,8 @@ export async function orderPoints(context) {
     consents: { terms: body.terms, adult: body.adult },
     spent: spentLately(rows.map(purchaseOf), context.now, rules),
     blocked: Boolean(user?.purchases_blocked),
+    taken,
+    quarter,
   });
   if (block) throw refuse(block);
   const orderId = newToken();
@@ -111,20 +163,41 @@ export async function orderPoints(context) {
   // place for the VAT across the EU (OSS).
   const country = typeof context.request.cf?.country === 'string' ? context.request.cf.country : null;
   const consents = JSON.stringify({ terms: rules.termsVersion, adult: body.adult === true, at: context.now });
-  await db
+  // Written only if the quarter still has room for it, counted in the same
+  // statement.
+  const written = await db
     .prepare(
       `INSERT INTO purchases (public_id, user_id, character_id, pack_id, points, price, currency, country, provider, status, consents, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
+       SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?
+       WHERE ? IS NULL OR (${TAKEN}) + ? <= ?`,
     )
-    .bind(orderId, session.userId, player.row.id, pack.id, pack.points, pack.price, rules.currency, country, paymentsProvider(), consents, context.now)
+    .bind(
+      orderId,
+      session.userId,
+      player.row.id,
+      pack.id,
+      pack.points,
+      pack.price,
+      rules.currency,
+      country,
+      paymentsProvider(),
+      consents,
+      context.now,
+      rules.quarterLimit,
+      ...takenValues(quarter, context.now),
+      pack.price,
+      rules.quarterLimit,
+    )
     .run();
+  if (written.meta.changes !== 1) throw refuse(quarterBlock(rules, quarter));
   const payment = await gateway.create({ env: context.env, orderId, amount: pack.price, currency: rules.currency, points: pack.points });
   if (payment.ref) await db.prepare('UPDATE purchases SET provider_ref = ? WHERE public_id = ?').bind(payment.ref, orderId).run();
   return json({ orderId, url: payment.url ?? null }, 201);
 }
 
 // A payment the gateway confirmed: the purchase paid (also one closed as
-// unpaid, as the money came after all) and its points added, once. The
+// failed or expired, as the money came after all) and its points added,
+// once. The
 // amount and currency must be the purchase's own. Whether the points
 // reached a character (none, if it was deleted in between) is returned.
 async function markPaid(db, row, notice, now) {
@@ -135,7 +208,7 @@ async function markPaid(db, row, notice, now) {
   const token = newToken();
   const [moved, added] = await db.batch([
     db
-      .prepare("UPDATE purchases SET status = 'paid', paid_at = ?, closed_at = NULL, provider_ref = COALESCE(provider_ref, ?), credit_token = ? WHERE id = ? AND status IN ('pending', 'failed')")
+      .prepare("UPDATE purchases SET status = 'paid', paid_at = ?, closed_at = NULL, provider_ref = COALESCE(provider_ref, ?), credit_token = ? WHERE id = ? AND status IN ('pending', 'failed', 'expired')")
       .bind(now, notice.ref || null, token, row.id),
     db
       .prepare(
@@ -232,17 +305,28 @@ export async function withdrawPurchase(context) {
 }
 
 // The day in Poland a time falls on, as YYYY-MM-DD.
-const polishDay = (ms) => new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Warsaw' }).format(new Date(ms));
+const polishDay = (ms) => new Intl.DateTimeFormat('sv-SE', { timeZone: rules.timeZone }).format(new Date(ms));
 
 // GET /api/author/payments: for the author only, the sales of the last 30
 // days by Polish day (the record the bookkeeping needs: number, gross
-// amount, country, gateway, refunds) and the purchases that wait for a hand:
-// refunds the gateway has not confirmed, paid ones whose character is gone.
+// amount, country, gateway, refunds), the quarter against the limit of an
+// unregistered activity (paid and kept, waiting for the payment, the
+// limit), and the purchases that wait for a hand: refunds the gateway has
+// not confirmed, paid ones whose character is gone.
 export async function authorPayments(context) {
   const session = await requireSession(context);
   if (!isAuthor(context.env, session.user)) throw notFound();
   const db = context.env.DB;
   const since = context.now - 30 * DAY;
+  const quarter = quarterAt(context.now, rules);
+  const sums = await db
+    .prepare(
+      `SELECT COALESCE(SUM(CASE WHEN status IN ('paid', 'refunding') AND paid_at >= ? THEN price ELSE 0 END), 0) AS paid,
+              COALESCE(SUM(CASE WHEN status = 'pending' AND created_at >= ? AND created_at > ? THEN price ELSE 0 END), 0) AS waiting
+       FROM purchases`,
+    )
+    .bind(...takenValues(quarter, context.now))
+    .first();
   const { results } = await db
     .prepare(
       `SELECT p.public_id, p.pack_id, p.points, p.price, p.currency, p.country, p.provider, p.status, p.created_at, p.paid_at, p.closed_at,
@@ -267,6 +351,7 @@ export async function authorPayments(context) {
   }
   return json({
     currency: rules.currency,
+    quarter: { startsAt: quarter.startsAt, endsAt: quarter.endsAt, limit: rules.quarterLimit, paid: sums?.paid ?? 0, waiting: sums?.waiting ?? 0 },
     days: [...days.values()].sort((a, b) => b.date.localeCompare(a.date)),
     waiting: results.filter((row) => row.status === 'refunding' || (row.status === 'paid' && !row.character_kept)).map(purchaseView),
     purchases: results.map((row) => ({ ...purchaseView(row), country: row.country, provider: row.provider })),

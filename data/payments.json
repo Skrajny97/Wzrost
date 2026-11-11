@@ -1,5 +1,5 @@
 {
-  "$comment": "Payments for Punkty Systemu (src/server/payments.js, src/engine/payments.js; DECISIONS.md, the payments foundations of 11.11.2026). Off until the author picks the gateway (805) and answers 804–808; the values below are the recommended answers (806 A, 807 A, 808 A) until then. `price`: gross, in grosze, in `currency`. `monthlyLimit`: the most an account pays in the last `limitDays` days, in grosze. `withdrawalDays`: the days after a payment in which unspent bought points can be given back. `adultOnly`: buying only by those who declare they are of age. `termsVersion`: the version of the terms a purchase is accepted under; a new one when the terms change. `pendingHours`: how long an unpaid order waits before it is closed.",
+  "$comment": "Payments for Punkty Systemu (src/server/payments.js, src/engine/payments.js; DECISIONS.md, the payments foundations and the author's answers of 11.11.2026: 804 A an unregistered activity to start, 805 D the Autopay gateway, 806 A adults only, 807 A unspent bought points given back within the days, 808 A 100 PS for 2 PLN). `price`: gross, in grosze, in `currency`. `monthlyLimit`: the most an account pays in the last `limitDays` days, in grosze. `withdrawalDays`: the days after a payment in which unspent bought points can be given back. `adultOnly`: buying only by those who declare they are of age. `termsVersion`: the version of the terms a purchase is accepted under; a new one when the terms change. `pendingHours`: how long an unpaid order waits for its payment before it is closed. `quarterLimit`: the most the game takes in a quarter of the year on the clock of `timeZone`, in grosze: an unregistered activity's revenue limit (225% of the minimum wage a quarter, 10 813.50 PLN in 2026; the minimum wage only grows, so the year's old value stays safe until it is raised); the packs that would cross it are not sold until the next quarter. null: no limit (a registered business).",
   "currency": "PLN",
   "packs": [
     { "id": "ps-250", "points": 250, "price": 499 },
@@ -12,5 +12,7 @@
   "withdrawalDays": 14,
   "adultOnly": true,
   "termsVersion": "2026-11-11",
-  "pendingHours": 24
+  "pendingHours": 24,
+  "timeZone": "Europe/Warsaw",
+  "quarterLimit": 1081350
 }
