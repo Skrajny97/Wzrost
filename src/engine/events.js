@@ -24,7 +24,7 @@
 // may tell a further choice its own way while its options stay.
 
 import { simulateFight } from './combat.js';
-import { companionCombatant } from './companions.js';
+import { companionCombatant, gendered } from './companions.js';
 import { combatantView, playerCombatant } from './combatant.js';
 import { encounterCombatants, fightingPlayer } from './hunt.js';
 import { itemName, randomItem } from './items.js';
@@ -75,17 +75,40 @@ export const eventsIn = (areaId, drafts, content, settlement = false) =>
 // The event an exploration brings, or null. `forced` (an event's id, from
 // "Testuj zdarzenia" on the test version) brings that one without the draw,
 // in any region, still only after an exploration that ended as planned.
-export function eventFor({ hunt, seed, first = false, quick = false, forced = null, drafts = false, settlement = false }, content) {
+// A companion's errand (`companion`, 817.7) comes only with a companion
+// who can have it (errandMates).
+export function eventFor({ hunt, seed, first = false, quick = false, forced = null, drafts = false, settlement = false, mates = [] }, content) {
   if (!content.events || first || quick || hunt.result !== 'success') return null;
+  const withMate = (event) => !event.companion || errandMates(event, mates).length > 0;
   if (forced) {
     const event = content.eventsById[forced];
-    return event && (drafts || !event.draft) && (settlement || !event.settlement) ? event : null;
+    return event && (drafts || !event.draft) && (settlement || !event.settlement) && withMate(event) ? event : null;
   }
   const rng = createRng(`${seed}:event`);
   if (!rng.chance(eventChance(content, hunt.minutes))) return null;
-  const open = eventsIn(hunt.areaId, drafts, content, settlement);
+  const open = eventsIn(hunt.areaId, drafts, content, settlement).filter(withMate);
   return open.length ? rng.weighted(open, (event) => event.weight ?? 1) : null;
 }
+
+// The companions of the exploration a companion's errand (817.7: „Gdy
+// towarzysz z relacją co najmniej Zaufanie idzie na wyprawę”) may come
+// with: those who went and are still standing, at `companion.minRelation`
+// points of relation or more, whose errand has not been settled yet (a
+// companion sent on alone or gone with settles it, one told to go on not).
+// `mates`: { id, name, appearance, classId, story, relation, errand, fainted }.
+export const errandMates = (event, mates = []) =>
+  event.companion ? mates.filter((mate) => !mate.fainted && (mate.relation ?? 0) >= event.companion.minRelation && !mate.errand) : [];
+
+// The companion an errand comes with, drawn from the exploration's seed, or
+// null for an event of no companion.
+export function eventMate(event, seed, mates = []) {
+  const open = errandMates(event, mates);
+  return open.length > 0 ? createRng(`${seed}:event:mate`).pick(open) : null;
+}
+
+// A text of a companion's errand in its words: {name} its name, [a|b] the
+// form for her and for him.
+const personal = (text, mate) => (mate && typeof text === 'string' ? gendered(text.replaceAll('{name}', mate.name), mate.appearance) : text);
 
 // An option's price in gold (`goldPerLevel` for each level of the
 // character: the beggar's coins, the leshy's bread and coins), paid from the
@@ -109,8 +132,11 @@ export const pathCost = (steps, level) => steps.reduce((sum, step) => sum + opti
 
 // The choices made so far as the player reads them: each option and what it
 // led to, its price so far as {cost}.
-const stepsView = (steps, level) =>
-  steps.map((step, index) => ({ label: step.option.label, text: step.outcome.text.replaceAll('{cost}', String(pathCost(steps.slice(0, index + 1), level))) }));
+const stepsView = (steps, level, mate = null) =>
+  steps.map((step, index) => ({
+    label: personal(step.option.label, mate),
+    text: personal(step.outcome.text.replaceAll('{cost}', String(pathCost(steps.slice(0, index + 1), level))), mate),
+  }));
 
 // An event as the player sees it: who, where, the text and the options. An
 // event of any land (scene "land") stands in the land of the exploration's
@@ -120,31 +146,46 @@ const stepsView = (steps, level) =>
 // eventChoices), the choices made so far come with their texts, and the
 // options are those of the last one; what they cost is already out of the
 // purse.
-export const eventView = (event, area = null, who = null, content = null, walk = null) => {
+// A companion's errand (`mate`, eventMate) tells its story's title and text
+// in the companion's words, and shows the companion instead of a figure.
+export const eventView = (event, area = null, who = null, content = null, walk = null, mate = null) => {
   const level = who?.level ?? 1;
   const spent = walk && who ? pathCost(walk.steps, level) : 0;
+  const story = event.companion && mate ? event.cases[mate.story % event.cases.length] : null;
   return {
     id: event.id,
-    title: event.title,
+    title: personal(story?.title ?? event.title, mate),
     art: event.art,
     scene: event.scene === 'land' ? null : event.scene,
     ...(event.scene === 'land' && { land: area?.regionId ?? null }),
     figure: event.figure,
-    text: event.text,
-    ...(walk?.steps.length > 0 && { steps: stepsView(walk.steps, level) }),
+    text: personal(story?.text ?? event.text, mate),
+    ...(story && { companion: { id: mate.id, name: mate.name, classId: mate.classId, appearance: mate.appearance } }),
+    ...(walk?.steps.length > 0 && { steps: stepsView(walk.steps, level, mate) }),
     options: (walk?.options ?? event.options).map((option) => {
       const cost = who ? optionCost(option, who.level) : 0;
       const lock = who && content ? optionLock(option, { ...who, purse: who.purse - spent }, content) : null;
-      return { id: option.id, label: option.label, ...(cost > 0 && { cost }), ...(lock && { locked: lock.text }) };
+      return { id: option.id, label: personal(option.label, mate), ...(cost > 0 && { cost }), ...(lock && { locked: lock.text }) };
     }),
   };
 };
 
 // The case behind an event, drawn from the exploration's seed, or the one
-// "Testuj zdarzenia" chose (`forced`); null for an event without cases.
-export function eventCase(event, seed, forced = null) {
+// "Testuj zdarzenia" chose (`forced`); null for an event without cases. A
+// companion's errand is the case of the companion's story (`mate`). An event
+// with a first case (`firstCase`: Jagna in the bog, 817.1: „Jagnę spotkamy
+// jednorazowo tylko, a reszta przypadków to będzie Topielica”) comes in it
+// the first time the character meets the event (`met`: the ids of the events
+// met before), and in one of the others after.
+export function eventCase(event, seed, forced = null, { met = [], mate = null } = {}) {
   if (!event.cases) return null;
   if (forced) return event.cases.find((candidate) => candidate.id === forced) ?? null;
+  if (event.companion) return mate ? event.cases[mate.story % event.cases.length] : null;
+  if (event.firstCase) {
+    if (!met.includes(event.id)) return event.cases.find((candidate) => candidate.id === event.firstCase) ?? null;
+    const rest = event.cases.filter((candidate) => candidate.id !== event.firstCase);
+    return createRng(`${seed}:event:case`).weighted(rest, (candidate) => candidate.weight);
+  }
   return createRng(`${seed}:event:case`).weighted(event.cases, (candidate) => candidate.weight);
 }
 
@@ -164,8 +205,8 @@ export function eventOutcome(option, chosen, key = option.id) {
 // once it has ended (its last outcome is not a further choice). Null for a
 // path the event does not have. Each step's outcome of a list is drawn as
 // at the event's end (resolveEvent), the same each time.
-export function eventChoices(event, path, { seed, caseId = null, endingId = null, drafts = false }) {
-  const chosen = eventCase(event, seed, caseId);
+export function eventChoices(event, path, { seed, caseId = null, endingId = null, drafts = false, met = [], mate = null }) {
+  const chosen = eventCase(event, seed, caseId, { met, mate });
   let options = event.options;
   const steps = [];
   for (const id of path) {
@@ -283,13 +324,15 @@ export function resolveEvent(
     healBelow,
     buffs = {},
     trophies = {},
+    met = [],
+    mate = null,
   },
   content,
 ) {
   // `optionId` is the option chosen, or the path of options to it when the
   // event led to further choices (eventChoices).
   const path = [optionId].flat();
-  const before = eventChoices(event, path.slice(0, -1), { seed, caseId, endingId, drafts });
+  const before = eventChoices(event, path.slice(0, -1), { seed, caseId, endingId, drafts, met, mate });
   const option = before.options.find((candidate) => candidate.id === path.at(-1));
   const chosen = before.chosen;
   const key = path.join('/');
@@ -302,16 +345,27 @@ export function resolveEvent(
   // gold another way.
   const cost = outcome.free ? 0 : pathCost(before.steps, character.level) + optionCost(option, character.level);
   const spent = (hunt.spent ?? 0) + cost;
-  const fill = (text, values = {}) => Object.entries({ cost, ...values }).reduce((done, [key, value]) => done.replaceAll(`{${key}}`, String(value)), text);
-  const steps = stepsView(before.steps, character.level);
-  const tell = (text) => ({ t, type: 'event', text: `${event.title}. ${[...steps.map((step) => `${step.label}: ${step.text}`), `${option.label}: ${text}`].join(' ')}` });
+  // A companion's errand speaks of the companion (`mate`) in its words.
+  const fill = (text, values = {}) => personal(Object.entries({ cost, ...values }).reduce((done, [key, value]) => done.replaceAll(`{${key}}`, String(value)), text), mate);
+  const steps = stepsView(before.steps, character.level, mate);
+  const shown = eventView(event, area, null, null, null, mate);
+  const label = personal(option.label, mate);
+  const tell = (text) => ({ t, type: 'event', text: `${shown.title}. ${[...steps.map((step) => `${step.label}: ${step.text}`), `${label}: ${text}`].join(' ')}` });
   const view = (text) => ({
-    ...eventView(event, area),
+    ...shown,
     case: chosen?.id ?? null,
     ...(steps.length > 0 && { steps }),
-    option: { id: option.id, label: option.label, text },
+    option: { id: option.id, label, text },
     fight: null,
     ...(cost > 0 && { cost }),
+  });
+  // What an event gives besides (818.3, 818.4): relation with residents of
+  // the Osada (`relation`, points by resident), and for a companion's errand
+  // the companion's relation (`companion.relation`: points, or "next", its
+  // next standing at once) and its errand settled (`companion.errand`).
+  const ties = (gives) => ({
+    ...(gives?.relation && { relation: gives.relation }),
+    ...(gives?.companion && mate && { companion: { id: mate.id, ...gives.companion } }),
   });
   const goldOf = (times) => Math.round(content.balance.rewards.goldPerLevel * character.level * times * rng.float(0.75, 1.25));
   const itemOf = (rarities) => {
@@ -353,7 +407,9 @@ export function resolveEvent(
   }
 
   if (outcome.kind === 'reward') {
-    let gold = outcome.gold ? goldOf(outcome.gold) : 0;
+    // A stake won back (`stakeBack` times what the option cost: the dice by
+    // the fire, 817.5: „Za wygraną zgarniesz podwójną stawkę”).
+    let gold = (outcome.gold ? goldOf(outcome.gold) : 0) + (outcome.stakeBack ? Math.round(cost * outcome.stakeBack) : 0);
     const items = [...hunt.items];
     const item = outcome.itemRarities ? itemOf(outcome.itemRarities) : null;
     if (item) items.push(item);
@@ -404,6 +460,7 @@ export function resolveEvent(
           ...(outcome.points && { points: outcome.points }),
           ...(outcome.reputation && { reputation: outcome.reputation }),
           ...(heard && { rumor: heard }),
+          ...ties(outcome),
         },
       },
     };
@@ -478,7 +535,7 @@ export function resolveEvent(
     events: fight.events,
   };
   const enemyList = enemies.map((enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
-  const lines = [outcome.start.replace('{enemies}', enemyList)];
+  const lines = [fill(outcome.start.replace('{enemies}', enemyList))];
   for (const mate of mates.filter((one) => hpOf(one.unit) <= 0)) lines.push(say(texts, 'companionDown', index, { name: mate.unit.name }));
   const items = [...hunt.items];
   let { result } = hunt;
@@ -506,8 +563,8 @@ export function resolveEvent(
     summary.chests.forEach((itemIndex, i) => lines.push(say(content.events.texts, 'loot', i, { item: itemName(items[itemIndex], content) })));
     if (won) {
       summary.chests.push(items.push(won) - 1);
-      lines.push(outcome.win.text.replace('{item}', itemName(won, content)));
-    }
+      lines.push(fill(outcome.win.text.replace('{item}', itemName(won, content))));
+    } else if (outcome.win?.text) lines.push(fill(outcome.win.text));
     if (summary.recovered > 0) lines.push(say(texts, 'recover', index, { hp: summary.recovered }));
   } else {
     result = fight.won === false && !area.safe ? 'fainted' : 'escaped';
@@ -517,6 +574,8 @@ export function resolveEvent(
   }
 
   const told = fill(outcome.text);
+  // A won fight gives what its win names besides (ties).
+  const given = fight.won === true ? ties(outcome.win) : {};
   return {
     ...hunt,
     spent,
@@ -532,6 +591,6 @@ export function resolveEvent(
     entries: [...hunt.entries, tell(told), { t, type: 'fight', fight: index, text: lines.join(' ') }],
     // The report opens on the event's fight.
     keyFight: { index },
-    event: { ...view(told), fight: index },
+    event: { ...view(told), fight: index, ...(Object.keys(given).length > 0 && { reward: given }) },
   };
 }

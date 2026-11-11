@@ -6,7 +6,7 @@
 // without a choice, the event waits where it stopped: the next "Odbierz
 // raport" brings it again.
 
-import { eventFigure, eventScene, landArt } from './art.js';
+import { companionFigure, eventFigure, eventScene, landArt } from './art.js';
 import { h } from './dom.js';
 import { formatNumber } from './format.js';
 import { t } from './i18n.js';
@@ -18,7 +18,8 @@ import { closeSheet, openSheet, withButton } from './ui.js';
 export function openEvent(event, done) {
   // An event of any land stands on the background of the land explored.
   const scene = event.land ? landArt(event.land) : eventScene(event.scene);
-  const figure = eventFigure(event.art);
+  // A companion's errand shows the companion itself.
+  const figure = event.companion ? companionFigure(event.companion.classId, event.companion.appearance) : eventFigure(event.art);
   // An option with a price shows it; one the character cannot take (of
   // another class, or above the purse) stays in sight, greyed out, with why.
   const options = event.options.map((option) =>

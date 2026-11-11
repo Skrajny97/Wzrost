@@ -20,9 +20,10 @@ import { countedForm } from './text.js';
 // The kinds of a potion that works by itself in fights and of a potion for a
 // time, as keys of its effect; a curse of an event (the god chased off, the
 // soul robbed of its offerings) weakens the blows for a time as a potion
-// strengthens them, and no potion has it.
+// strengthens them, and so do the wounds of an event (the river swum across,
+// 817.4), and no potion has either.
 export const FIGHT_KINDS = ['heal', 'mana', 'cure', 'revive'];
-export const TIMED_KINDS = ['speed', 'armor', 'damage', 'focus', 'poison', 'ward', 'curse'];
+export const TIMED_KINDS = ['speed', 'armor', 'damage', 'focus', 'poison', 'ward', 'curse', 'wounds'];
 
 // The kind of a potion that works by itself in fights, or null for one drunk
 // from the bag.

@@ -343,7 +343,8 @@
       "focus": "Focus: Intellect and Wisdom +{bonus}%",
       "poison": "Poisoned Weapon: {bonus}% chance of Poison per blow",
       "ward": "Magic Ward: magic damage −{bonus}%",
-      "curse": "Curse: damage −{bonus}%"
+      "curse": "Curse: damage −{bonus}%",
+      "wounds": "Wounds: damage −{bonus}%"
     },
     "texts": {
       "drinkHeal": [
@@ -405,6 +406,9 @@
       ],
       "curseFights": [
         "The Curse weakened the blows in {fights} of {all} fights."
+      ],
+      "woundsFights": [
+        "Wounds weakened the blows in {fights} of {all} fights."
       ]
     }
   },

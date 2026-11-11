@@ -1156,6 +1156,872 @@
           }
         }
       ]
+    },
+    {
+      "id": "bog-herbalist",
+      "minLevel": 20,
+      "settlement": true,
+      "firstCase": "jagna",
+      "title": "Jagna na mokradłach",
+      "art": "bog-herbalist",
+      "scene": "land",
+      "figure": {
+        "left": 40,
+        "bottom": 0,
+        "height": 62
+      },
+      "text": "Na skraju mokradeł ktoś woła o pomoc. To Jagna, zielarka z Osady: zapadła się po pas w czarne błoto, a jej koszyk z ziołami kołysze się obok na wodzie. „Pomóż, bo mnie wciąga!”",
+      "options": [
+        {
+          "id": "pull",
+          "label": "Wyciągnij ją"
+        },
+        {
+          "id": "stick",
+          "label": "Podaj jej kij z brzegu"
+        },
+        {
+          "id": "leave",
+          "label": "Odejdź"
+        }
+      ],
+      "cases": [
+        {
+          "id": "jagna",
+          "name": "Jagna",
+          "weight": 1,
+          "outcomes": {
+            "pull": {
+              "kind": "reward",
+              "herbsKnown": {
+                "count": 4,
+                "gold": 1.5,
+                "goldText": "Chwytasz Jagnę pod ramiona i ciągniesz, aż błoto puszcza z głośnym mlaśnięciem. Zielarka łapie oddech i wciska ci kilka monet (+{gold} złota): „Nie zapomnę ci tego” (+25 relacji z Jagną)."
+              },
+              "relation": {
+                "herbalist": 25
+              },
+              "text": "Chwytasz Jagnę pod ramiona i ciągniesz, aż błoto puszcza z głośnym mlaśnięciem. Zielarka łapie oddech, wyławia koszyk i wciska ci garść ziół ({herbs}): „Nie zapomnę ci tego” (+25 relacji z Jagną)."
+            },
+            "stick": {
+              "kind": "reward",
+              "herbsKnown": {
+                "count": 2,
+                "gold": 0.75,
+                "goldText": "Podajesz Jagnie długi kij i zapierasz się na twardym gruncie. Zielarka powoli wypełza na brzeg, a koszyk odpływa w trzciny. Wciska ci kilka monet (+{gold} złota): „Dziękuję. Nie zapomnę ci tego” (+25 relacji z Jagną)."
+              },
+              "relation": {
+                "herbalist": 25
+              },
+              "text": "Podajesz Jagnie długi kij i zapierasz się na twardym gruncie. Zielarka powoli wypełza na brzeg, ale koszyk odpływa w trzciny. Z tego, co zostało, dzieli się z tobą ({herbs}): „Dziękuję. Nie zapomnę ci tego” (+25 relacji z Jagną)."
+            },
+            "leave": {
+              "kind": "none",
+              "text": "Odchodzisz. Za plecami jeszcze długo słychać chlupot i wołanie. Wieczorem Jagna wraca do Osady cała w błocie: wydostała się sama."
+            }
+          }
+        },
+        {
+          "id": "drowned-maiden",
+          "name": "Topielica",
+          "weight": 1,
+          "outcomes": {
+            "pull": {
+              "kind": "fight",
+              "text": "Chwytasz ją za ręce, a one są zimne jak lód. „Jagna” uśmiecha się szeroko: zęby ma ostre jak igły, a we włosach rzęsę. To Topielica! Szarpie cię w głąb bagna.",
+              "foes": [
+                "drowned-maiden",
+                "drowner"
+              ],
+              "ambush": true,
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2
+              },
+              "start": "Topielica wciąga cię w błoto: {enemies}."
+            },
+            "stick": {
+              "kind": "fight",
+              "text": "Podajesz jej kij, a ona szarpie go z nieludzką siłą. Puszczasz w porę. Z błota wynurza się Topielica, a za nią Utopiec.",
+              "foes": [
+                "drowned-maiden",
+                "drowner"
+              ],
+              "speedBonus": 0.25,
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2
+              },
+              "start": "Topielica i Utopiec wyłażą na brzeg, ale nie dajesz się zaskoczyć: {enemies}."
+            },
+            "leave": {
+              "kind": "none",
+              "text": "Odchodzisz. Wołanie za plecami zamienia się w chichot, a potem w bulgot. Przecież Jagna jest teraz w Osadzie…"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "star-iron",
+      "minLevel": 25,
+      "settlement": true,
+      "title": "Gwiazda z nieba",
+      "art": "star-iron",
+      "scene": "land",
+      "figure": {
+        "left": 38,
+        "bottom": 2,
+        "height": 66
+      },
+      "text": "Nocą przez niebo przelatuje jasna gwiazda i spada tuż za wzgórzem. W świeżym kraterze dymi czarna bryła żelaza z nieba, a obok kręci się chłopak w skórzanym fartuchu: „Jestem czeladnikiem Żelisława. Mistrz da za to każde pieniądze. Pomożesz mi to zanieść?”",
+      "options": [
+        {
+          "id": "carry",
+          "label": "Pomóż zanieść żelazo do kuźni"
+        },
+        {
+          "id": "take",
+          "label": "Zabierz bryłę dla siebie"
+        },
+        {
+          "id": "leave",
+          "label": "Odejdź"
+        }
+      ],
+      "cases": [
+        {
+          "id": "apprentice",
+          "name": "Czeladnik",
+          "weight": 2,
+          "outcomes": {
+            "carry": {
+              "kind": "reward",
+              "itemRarities": {
+                "rare": 50,
+                "unique": 40,
+                "epic": 10
+              },
+              "relation": {
+                "smith": 25
+              },
+              "text": "Dźwigacie bryłę na zmianę aż do Osady. Żelisław obraca ją w dłoniach jak skarb, a potem wykuwa z niej coś dla ciebie: {item}. „Takiego żelaza nie miałem w rękach od lat” (+25 relacji z Żelisławem)."
+            },
+            "take": {
+              "kind": "reward",
+              "gold": 2,
+              "text": "Odpychasz chłopaka i zabierasz bryłę. Kupiec na trakcie płaci za żelazo z nieba bez targowania się (+{gold} złota). Czeladnik długo patrzy za tobą."
+            },
+            "leave": {
+              "kind": "none",
+              "text": "Zostawiasz chłopaka z jego gwiazdą. Kiedy się oglądasz, wciąż mocuje się z gorącą bryłą."
+            }
+          }
+        },
+        {
+          "id": "robber",
+          "name": "Zbój",
+          "weight": 1,
+          "outcomes": {
+            "carry": {
+              "kind": "fight",
+              "text": "Ledwie unosicie bryłę, chłopak gwiżdże przez palce. Z krzaków wypadają jego kompani: żaden z niego czeladnik!",
+              "foes": [
+                "bandit-thug",
+                "bandit-knifer",
+                "bandit-crossbow"
+              ],
+              "ambush": true,
+              "itemChance": 0.35,
+              "start": "Zasadzka! Zbóje atakują pierwsi: {enemies}."
+            },
+            "take": {
+              "kind": "fight",
+              "text": "Sięgasz po bryłę, a chłopak gwiżdże przez palce. Z krzaków wypadają jego kompani, ale broń masz już w ręku.",
+              "foes": [
+                "bandit-thug",
+                "bandit-knifer",
+                "bandit-crossbow"
+              ],
+              "speedBonus": 0.25,
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2
+              },
+              "start": "Zbóje wypadają z krzaków, ale nie dajesz się zaskoczyć: {enemies}."
+            },
+            "leave": {
+              "kind": "none",
+              "text": "Odchodzisz. Za plecami słychać gwizd i szelest w krzakach: ktoś tu na kogoś czekał."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "ferryman",
+      "minLevel": 10,
+      "title": "Przewoźnik",
+      "art": "ferryman",
+      "scene": "land",
+      "figure": {
+        "left": 38,
+        "bottom": 2,
+        "height": 70
+      },
+      "text": "Rzeka wezbrała po ulewie i zalała bród. Przy brzegu kołysze się łódź, a w niej stary przewoźnik z długą tyczką: „Przewiozę na drugi brzeg. Ale nie za darmo”.",
+      "options": [
+        {
+          "id": "pay",
+          "label": "Zapłać za przeprawę",
+          "goldPerLevel": 2
+        },
+        {
+          "id": "swim",
+          "label": "Przepłyń wpław"
+        },
+        {
+          "id": "ford",
+          "label": "Poszukaj brodu"
+        }
+      ],
+      "cases": [
+        {
+          "id": "ferryman",
+          "name": "Przewoźnik",
+          "weight": 2,
+          "outcomes": {
+            "pay": {
+              "kind": "reward",
+              "rumor": true,
+              "text": "Przewoźnik odpycha łódź od brzegu i po drodze opowiada, co słyszał od podróżnych: „{area}. Podobno widzieli tam {creature}, a przy nim niejeden skarb”.",
+              "noRumorText": "Przewoźnik w milczeniu przewozi cię na drugi brzeg. Woda jest spokojniejsza, niż się zdawało."
+            },
+            "swim": {
+              "kind": "reward",
+              "buff": {
+                "kind": "wounds",
+                "bonus": 0.1,
+                "fights": 2
+              },
+              "text": "Rzucasz się w lodowaty nurt. Prąd ciska tobą o kamienie, ale w końcu wypełzasz na drugi brzeg. Siniaki będą bolały jeszcze długo (rany: obrażenia −10% przez 2 walki)."
+            },
+            "ford": [
+              {
+                "id": "drowner",
+                "name": "Utopiec w brodzie",
+                "weight": 50,
+                "kind": "fight",
+                "text": "Brodzisz po pas w mętnej wodzie, gdy coś chwyta cię za kostkę. Utopiec!",
+                "foes": [
+                  "drowner"
+                ],
+                "ambush": true,
+                "itemChance": 0.35,
+                "start": "Utopiec wciąga cię pod wodę: {enemies}."
+              },
+              {
+                "id": "safe",
+                "name": "Bezpieczny bród",
+                "weight": 50,
+                "kind": "none",
+                "text": "Długo szukasz płycizny, aż w końcu znajdujesz bród. Przechodzisz na drugi brzeg mokro, ale bez szwanku."
+              }
+            ]
+          }
+        },
+        {
+          "id": "nix",
+          "name": "Wodnik",
+          "weight": 1,
+          "outcomes": {
+            "pay": {
+              "kind": "fight",
+              "text": "Na środku rzeki przewoźnik wstaje i śmieje się bulgotliwie. Spod kapelusza cieknie mu woda, a palce ma spięte błoną. To Wodnik! Jednym ruchem wywraca łódź.",
+              "foes": [
+                "water-spirit",
+                "drowner"
+              ],
+              "ambush": true,
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2
+              },
+              "start": "Wodnik wciąga cię pod wodę: {enemies}."
+            },
+            "swim": {
+              "kind": "reward",
+              "buff": {
+                "kind": "wounds",
+                "bonus": 0.1,
+                "fights": 2
+              },
+              "text": "Rzucasz się w lodowaty nurt. Prąd ciska tobą o kamienie, a coś śmieje się pod wodą. W końcu wypełzasz na drugi brzeg, z siniakami aż do kości (rany: obrażenia −10% przez 2 walki)."
+            },
+            "ford": {
+              "kind": "none",
+              "text": "Przewoźnik patrzy na ciebie spod kapelusza dziwnie długo. Znajdujesz bród niżej rzeki i przechodzisz bez przeszkód. Kiedy się oglądasz, łodzi już nie ma, a po wodzie rozchodzą się kręgi."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "fireside-dice",
+      "minLevel": 15,
+      "title": "Kości przy ognisku",
+      "art": "fireside-dice",
+      "scene": "land",
+      "figure": {
+        "left": 40,
+        "bottom": 2,
+        "height": 58
+      },
+      "text": "Przy ognisku siedzi nieznajomy w czarnym kapturze. Potrząsa kubkiem z kośćmi, aż grzechoczą: „Zagrasz, wędrowcze? Kto wie, może szczęście dziś ci sprzyja”.",
+      "options": [
+        {
+          "id": "small",
+          "label": "Zagraj o małą stawkę",
+          "goldPerLevel": 3
+        },
+        {
+          "id": "big",
+          "label": "Zagraj o dużą stawkę",
+          "goldPerLevel": 10
+        },
+        {
+          "id": "refuse",
+          "label": "Odmów"
+        }
+      ],
+      "cases": [
+        {
+          "id": "stranger",
+          "name": "Nieznajomy",
+          "weight": 2,
+          "outcomes": {
+            "small": [
+              {
+                "id": "win",
+                "name": "Wygrana",
+                "weight": 50,
+                "kind": "reward",
+                "stakeBack": 2,
+                "text": "Kości toczą się po kamieniu… Wygrywasz! Nieznajomy bez słowa odlicza ci podwójną stawkę (+{gold} złota)."
+              },
+              {
+                "id": "loss",
+                "name": "Przegrana",
+                "weight": 50,
+                "kind": "none",
+                "text": "Kości toczą się po kamieniu. Przegrywasz. Nieznajomy zgarnia monety i uśmiecha się spod kaptura (−{cost} złota)."
+              }
+            ],
+            "big": [
+              {
+                "id": "win",
+                "name": "Wygrana",
+                "weight": 50,
+                "kind": "reward",
+                "stakeBack": 2,
+                "text": "Kości długo wirują… Wygrywasz! Nieznajomy krzywi się, ale odlicza ci podwójną stawkę (+{gold} złota)."
+              },
+              {
+                "id": "loss",
+                "name": "Przegrana",
+                "weight": 50,
+                "kind": "none",
+                "text": "Kości długo wirują. Przegrywasz. Nieznajomy zgarnia twoje złoto do sakiewki (−{cost} złota)."
+              }
+            ],
+            "refuse": {
+              "kind": "none",
+              "text": "Kręcisz głową. Nieznajomy wzrusza ramionami i wraca do swoich kości."
+            }
+          }
+        },
+        {
+          "id": "fiend",
+          "name": "Bies",
+          "weight": 1,
+          "outcomes": {
+            "small": {
+              "kind": "none",
+              "text": "Kości toczą się dziwnie długo i zawsze wypada na korzyść nieznajomego. Gdy zgarnia stawkę (−{cost} złota), w blasku ogniska widzisz kopyto zamiast buta. To Bies ze znaczonymi kośćmi!"
+            },
+            "big": {
+              "kind": "reward",
+              "buff": {
+                "kind": "curse",
+                "bonus": 0.1,
+                "fights": 4
+              },
+              "text": "Kości toczą się dziwnie długo i zawsze wypada na korzyść nieznajomego. Gdy zgarnia stawkę (−{cost} złota), zrzuca kaptur, a spod niego wyrastają rogi. Bies śmieje się, a od jego śmiechu słabną ci ręce (klątwa: obrażenia −10% przez 4 walki)."
+            },
+            "refuse": {
+              "kind": "none",
+              "text": "Kręcisz głową. Nieznajomy syczy coś pod nosem, a kiedy odchodzisz, za plecami słychać stukot kopyt."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "refugees",
+      "minLevel": 20,
+      "settlement": true,
+      "title": "Pogorzelcy",
+      "art": "refugees",
+      "scene": "land",
+      "figure": {
+        "left": 34,
+        "bottom": 2,
+        "height": 64
+      },
+      "text": "Na skraju traktu siedzi rodzina z węzełkami: ojciec, matka i dwoje dzieci, wszyscy umorusani sadzą. „Wieś nam spłonęła. Nie mamy dokąd iść”.",
+      "options": [
+        {
+          "id": "give",
+          "label": "Daj im złoto na nowy początek",
+          "goldPerLevel": 3
+        },
+        {
+          "id": "escort",
+          "label": "Odprowadź ich do Osady"
+        },
+        {
+          "id": "point",
+          "label": "Wskaż im drogę do Osady"
+        }
+      ],
+      "cases": [
+        {
+          "id": "family",
+          "name": "Pogorzelcy",
+          "weight": 3,
+          "outcomes": {
+            "give": {
+              "kind": "reward",
+              "relation": {
+                "headman": 25
+              },
+              "text": "Ojciec długo ściska twoją dłoń. Kilka dni później sołtys Bogumił opowiada w Osadzie o pogorzelcach, którzy dzięki tobie osiedli przy młynie (+25 relacji z Bogumiłem)."
+            },
+            "escort": {
+              "kind": "fight",
+              "text": "Ruszacie razem traktem. Przy rozwidleniu drogę zastępują maruderzy, którzy szli za rodziną od spalonej wsi.",
+              "foes": [
+                "bandit-thug",
+                "bandit-knifer"
+              ],
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2,
+                "relation": {
+                  "headman": 40
+                },
+                "text": "Rodzina bezpiecznie dochodzi do Osady, a sołtys Bogumił sam wychodzi wam naprzeciw (+40 relacji z Bogumiłem)."
+              },
+              "start": "Maruderzy atakują: {enemies}."
+            },
+            "point": {
+              "kind": "none",
+              "text": "Rysujesz patykiem w piasku drogę do Osady. Rodzina dziękuje i rusza w drogę."
+            }
+          }
+        },
+        {
+          "id": "bandits",
+          "name": "Przebrani zbóje",
+          "weight": 1,
+          "outcomes": {
+            "give": {
+              "kind": "none",
+              "text": "Ojciec chowa złoto za pazuchę (−{cost} złota), a gdy się odwracasz, rodziny już nie ma. Na trakcie zostają tylko węzełki wypchane słomą."
+            },
+            "escort": {
+              "kind": "fight",
+              "text": "Za pierwszym zakrętem „ojciec” wyciąga nóż spod łachmanów, a „matka” kuszę. To zbóje przebrani za pogorzelców!",
+              "foes": [
+                "bandit-thug",
+                "bandit-knifer",
+                "bandit-crossbow"
+              ],
+              "ambush": true,
+              "itemChance": 0.35,
+              "start": "Zasadzka! Zbóje atakują pierwsi: {enemies}."
+            },
+            "point": {
+              "kind": "none",
+              "text": "Rysujesz drogę do Osady. „Ojciec” dziękuje, ale dziwnie zerka na twoją sakiewkę. Kiedy odchodzisz, słyszysz za sobą śmiech."
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "old-soldier",
+      "minLevel": 30,
+      "title": "Stary wojak",
+      "art": "old-soldier",
+      "scene": "land",
+      "figure": {
+        "left": 40,
+        "bottom": 2,
+        "height": 64
+      },
+      "text": "Przy przydrożnej kapliczce odpoczywa siwy wojak z blizną przez całą twarz. Na kolanach trzyma stary, wyszczerbiony miecz. „Mogę cię czegoś nauczyć, za drobną opłatą. Albo stań ze mną do sparingu, jeśli się nie boisz”.",
+      "options": [
+        {
+          "id": "learn",
+          "label": "Zapłać za naukę",
+          "goldPerLevel": 3,
+          "outcome": {
+            "kind": "reward",
+            "buff": {
+              "kind": "damage",
+              "bonus": 0.15,
+              "fights": 6
+            },
+            "text": "Wojak przez godzinę pokazuje ci pchnięcia, zwody i to, jak trzymać broń, żeby nie pękł nadgarstek (siła: obrażenia +15% przez 6 walk)."
+          }
+        },
+        {
+          "id": "spar",
+          "label": "Stań do sparingu",
+          "outcome": [
+            {
+              "id": "won",
+              "name": "Wygrany sparing",
+              "weight": 50,
+              "kind": "reward",
+              "itemRarities": {
+                "rare": 55,
+                "unique": 35,
+                "epic": 10
+              },
+              "text": "Po długiej wymianie ciosów wojak opuszcza miecz i śmieje się: „Dawno nikt mnie tak nie przegonił”. Odpina od pasa starą sakwę i oddaje ci to, co nosił w niej od lat: {item}."
+            },
+            {
+              "id": "lost",
+              "name": "Przegrany sparing",
+              "weight": 50,
+              "kind": "reward",
+              "buff": {
+                "kind": "focus",
+                "bonus": 0.1,
+                "fights": 2
+              },
+              "text": "Wojak kładzie cię na ziemi trzy razy, zanim zdążysz mrugnąć. Pomaga ci wstać i tłumaczy, co robisz źle. Guz zostanie na długo, a rada jeszcze dłużej (skupienie +10% przez 2 walki)."
+            }
+          ]
+        },
+        {
+          "id": "leave",
+          "label": "Odejdź",
+          "outcome": {
+            "kind": "none",
+            "text": "Kłaniasz się wojakowi i ruszasz dalej. Za plecami słychać, jak ostrzy miecz."
+          }
+        }
+      ]
+    },
+    {
+      "id": "companion-errand",
+      "companion": {
+        "minRelation": 250
+      },
+      "title": "Sprawa [towarzyszki|towarzysza]",
+      "art": "companion",
+      "scene": "land",
+      "figure": {
+        "left": 42,
+        "bottom": 2,
+        "height": 68
+      },
+      "text": "{name} nagle staje na trakcie: „Poczekaj. Muszę coś sprawdzić”.",
+      "options": [
+        {
+          "id": "together",
+          "label": "Pójdę z tobą"
+        },
+        {
+          "id": "alone",
+          "label": "Idź [sama|sam], poczekam"
+        },
+        {
+          "id": "later",
+          "label": "Nie teraz, idziemy dalej",
+          "outcome": {
+            "kind": "none",
+            "text": "„Rozumiem”, mówi {name} i rusza za tobą, ale jeszcze długo ogląda się za siebie."
+          }
+        }
+      ],
+      "cases": [
+        {
+          "id": "road",
+          "name": "Skrzynka ojca",
+          "weight": 1,
+          "text": "Przy starym kamieniu milowym {name} nagle staje: „Poczekaj. Tu ojciec zakopał kiedyś skrzynkę na czarną godzinę. Muszę sprawdzić, czy jeszcze tu jest”.",
+          "outcomes": {
+            "together": {
+              "kind": "reward",
+              "itemRarities": {
+                "rare": 40,
+                "unique": 45,
+                "epic": 15
+              },
+              "companion": {
+                "relation": "next",
+                "errand": "together"
+              },
+              "text": "Kopiecie razem pod kamieniem. Jest! Stara skrzynka ojca, a w niej {item}. {name} długo trzyma w dłoniach jego nóż i w końcu chowa go za pas (relacja wchodzi na kolejny stopień)."
+            },
+            "alone": {
+              "kind": "reward",
+              "gold": 1,
+              "companion": {
+                "relation": 30,
+                "errand": "alone"
+              },
+              "text": "{name} wraca po godzinie z ziemią pod paznokciami i uśmiechem: skrzynka była na miejscu. Dzieli się z tobą tym, co w niej było (+{gold} złota, +30 relacji)."
+            }
+          }
+        },
+        {
+          "id": "debts",
+          "name": "Ludzie lichwiarza",
+          "weight": 1,
+          "text": "{name} zatrzymuje się i patrzy na świeże ślady na trakcie: „Ktoś za nami idzie. To ludzie lichwiarza z grodu. Muszę to wreszcie załatwić”.",
+          "outcomes": {
+            "together": {
+              "kind": "fight",
+              "text": "Czekacie razem za zakrętem. Ludzie lichwiarza wychodzą prosto na was.",
+              "foes": [
+                "bandit-thug",
+                "bandit-knifer",
+                "bandit-crossbow"
+              ],
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2,
+                "companion": {
+                  "relation": "next",
+                  "errand": "together"
+                },
+                "text": "Ludzie lichwiarza uciekają i gubią po drodze weksle. {name} drze je na strzępy i pierwszy raz od dawna się śmieje (relacja wchodzi na kolejny stopień)."
+              },
+              "start": "Ludzie lichwiarza sięgają po broń: {enemies}."
+            },
+            "alone": {
+              "kind": "reward",
+              "gold": 1,
+              "companion": {
+                "relation": 30,
+                "errand": "alone"
+              },
+              "text": "{name} wraca z rozciętą wargą, ale [spokojniejsza|spokojniejszy]: „Już nie będą mnie szukać”. Wciska ci kilka monet, które zostały po spłacie (+{gold} złota, +30 relacji)."
+            }
+          }
+        },
+        {
+          "id": "farmstead",
+          "name": "Ziemia przy strumieniu",
+          "weight": 1,
+          "text": "{name} wskazuje dolinę przy strumieniu: „Tam. Ten kawałek ziemi jest na sprzedaż. Pomożesz mi go obejrzeć, zanim kupi go ktoś inny?”",
+          "outcomes": {
+            "together": {
+              "kind": "reward",
+              "itemRarities": {
+                "rare": 50,
+                "unique": 40,
+                "epic": 10
+              },
+              "companion": {
+                "relation": "next",
+                "errand": "together"
+              },
+              "text": "Obchodzicie razem pole i las przy strumieniu. Ziemia jest dobra. {name} wbija w nią kij na znak, a w starym płocie znajdujecie coś, co ktoś tu dawno ukrył: {item} (relacja wchodzi na kolejny stopień)."
+            },
+            "alone": {
+              "kind": "reward",
+              "gold": 1,
+              "companion": {
+                "relation": 30,
+                "errand": "alone"
+              },
+              "text": "{name} wraca z błyszczącymi oczami: ziemia jest dobra, a stary gospodarz obniżył cenę. Z radości oddaje ci dawny dług (+{gold} złota, +30 relacji)."
+            }
+          }
+        },
+        {
+          "id": "wolves",
+          "name": "Basior z rozdartym uchem",
+          "weight": 1,
+          "text": "{name} przyklęka nad śladami w błocie: „To on. Basior z rozdartym uchem, ten sam, który wybił nasze stado. Jest blisko”.",
+          "outcomes": {
+            "together": {
+              "kind": "fight",
+              "text": "Idziecie razem tropem aż do wykrotu. Basior czeka tam ze swoją watahą.",
+              "foes": [
+                "alpha-wolf",
+                "wolf",
+                "she-wolf"
+              ],
+              "itemChance": 0.35,
+              "win": {
+                "gold": 1,
+                "companion": {
+                  "relation": "next",
+                  "errand": "together"
+                },
+                "text": "Basior pada. {name} długo stoi nad nim w milczeniu, a potem kiwa ci głową: „Dziękuję” (relacja wchodzi na kolejny stopień)."
+              },
+              "start": "Wataha rzuca się na was: {enemies}."
+            },
+            "alone": {
+              "kind": "reward",
+              "gold": 1,
+              "companion": {
+                "relation": 30,
+                "errand": "alone"
+              },
+              "text": "{name} wraca o zmroku z wilczą skórą przewieszoną przez ramię. Sprzedaje ją w Osadzie i oddaje ci część zapłaty (+{gold} złota, +30 relacji)."
+            }
+          }
+        },
+        {
+          "id": "manor",
+          "name": "Posłaniec z dworu",
+          "weight": 1,
+          "text": "Na trakcie czeka posłaniec w barwach możnego pana. {name} blednie: „To po mnie. Pan chce, żebym [wróciła|wrócił] na dwór”.",
+          "outcomes": {
+            "together": {
+              "kind": "reward",
+              "itemRarities": {
+                "rare": 40,
+                "unique": 45,
+                "epic": 15
+              },
+              "companion": {
+                "relation": "next",
+                "errand": "together"
+              },
+              "text": "Idziecie razem do posłańca. {name} odmawia twardo, ale grzecznie, a posłaniec wzrusza ramionami i oddaje to, co pan kazał przekazać na pożegnanie: {item}. „Wolę las niż jego dwór” (relacja wchodzi na kolejny stopień)."
+            },
+            "alone": {
+              "kind": "reward",
+              "gold": 1,
+              "companion": {
+                "relation": 30,
+                "errand": "alone"
+              },
+              "text": "{name} długo rozmawia z posłańcem, ale wraca: „Nie wrócę tam”. Na pożegnanie posłaniec zostawił sakiewkę, którą {name} dzieli z tobą (+{gold} złota, +30 relacji)."
+            }
+          }
+        },
+        {
+          "id": "oath",
+          "name": "Obietnica",
+          "weight": 1,
+          "text": "{name} zatrzymuje się przy ścieżce do starej kapliczki: „[Obiecałam|Obiecałem] umierającemu przyjacielowi, że zaniosę tam jego miecz. Ale coś odpędza każdego, kto tam idzie”.",
+          "outcomes": {
+            "together": {
+              "kind": "fight",
+              "text": "Przy kapliczce czeka Upiór. To on odpędzał każdego, kto tu przychodził.",
+              "foes": [
+                "upior"
+              ],
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2,
+                "companion": {
+                  "relation": "next",
+                  "errand": "together"
+                },
+                "text": "Upiór rozwiewa się w porannej mgle. {name} kładzie miecz przyjaciela pod kapliczką: „Słowo dotrzymane” (relacja wchodzi na kolejny stopień)."
+              },
+              "start": "Upiór rzuca się na was: {enemies}."
+            },
+            "alone": {
+              "kind": "reward",
+              "gold": 1,
+              "companion": {
+                "relation": 30,
+                "errand": "alone"
+              },
+              "text": "{name} wraca [pobladła|pobladły], ale z lekkim sercem: miecz przyjaciela leży już pod kapliczką. W drodze powrotnej oddaje ci dawny dług (+{gold} złota, +30 relacji)."
+            }
+          }
+        },
+        {
+          "id": "brother",
+          "name": "Zaginiony brat",
+          "weight": 1,
+          "text": "{name} podnosi z ziemi strzęp czerwonej chusty: „To chusta mojego brata! Był tu niedawno”. Dalej, w głąb puszczy, prowadzą ślady kilku ludzi.",
+          "outcomes": {
+            "together": {
+              "kind": "fight",
+              "text": "Idziecie razem po śladach aż do obozu kłusowników. Brat siedzi przywiązany do drzewa, a kłusownicy sięgają po broń.",
+              "foes": [
+                "poacher",
+                "bandit-thug",
+                "bandit-crossbow"
+              ],
+              "itemChance": 0.35,
+              "win": {
+                "gold": 2,
+                "companion": {
+                  "relation": "next",
+                  "errand": "together"
+                },
+                "text": "Kłusownicy uciekają. {name} przecina więzy brata i długo się z nim ściska. Brat rusza do Osady, a ty masz teraz dwoje przyjaciół (relacja wchodzi na kolejny stopień)."
+              },
+              "start": "Kłusownicy atakują: {enemies}."
+            },
+            "alone": {
+              "kind": "reward",
+              "gold": 1,
+              "companion": {
+                "relation": 30,
+                "errand": "alone"
+              },
+              "text": "{name} wraca o zmroku z wieściami: brat żyje i pracuje u węglarzy w głębi puszczy. Z radości wciska ci sakiewkę od brata (+{gold} złota, +30 relacji)."
+            }
+          }
+        },
+        {
+          "id": "treasure",
+          "name": "Stara mapa",
+          "weight": 1,
+          "text": "{name} rozkłada na kolanie starą, wystrzępioną mapę: „Krzyżyk jest tuż za tym wzgórzem. Albo to skarb, albo ktoś zrobił ze mnie głupca”.",
+          "outcomes": {
+            "together": {
+              "kind": "reward",
+              "itemRarities": {
+                "rare": 30,
+                "unique": 50,
+                "epic": 20
+              },
+              "companion": {
+                "relation": "next",
+                "errand": "together"
+              },
+              "text": "Kopiecie razem pod korzeniem starego dębu. Łopata uderza w kufer, a w środku jest {item}. {name} śmieje się na głos: „Jednak prawda!” (relacja wchodzi na kolejny stopień)."
+            },
+            "alone": {
+              "kind": "reward",
+              "gold": 1.5,
+              "companion": {
+                "relation": 30,
+                "errand": "alone"
+              },
+              "text": "{name} wraca i śmieje się z siebie: krzyżyk prowadził do wydrążonego pnia, a na dnie leżało tylko kilka starych monet. Dzieli się nimi z tobą (+{gold} złota, +30 relacji)."
+            }
+          }
+        }
+      ]
     }
   ],
   "foes": [

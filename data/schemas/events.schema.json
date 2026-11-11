@@ -34,10 +34,12 @@
           "type": "object",
           "additionalProperties": false,
           "minProperties": 1,
-          "description": "Co zostaje po wygranej walce oprócz łupu przeciwników: złoto (gold, jak w nagrodzie) albo przedmiot (itemRarities, ze zdaniem text z {item}).",
+          "description": "Co zostaje po wygranej walce oprócz łupu przeciwników: złoto (gold, jak w nagrodzie) albo przedmiot (itemRarities, ze zdaniem text z {item}), relacja z mieszkańcami (relation) i sprawa towarzysza (companion), jak w nagrodzie, ze zdaniem text.",
           "properties": {
             "gold": { "type": "number", "exclusiveMinimum": 0 },
             "itemRarities": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 } },
+            "relation": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "integer", "minimum": 1 }, "description": "Relacja z mieszkańcami Osady, po id mieszkańca (818.3: pomoc ją podnosi, odmowa nigdy nie obniża); tylko w zdarzeniu Osady." },
+            "companion": { "type": "object", "additionalProperties": false, "required": ["relation", "errand"], "description": "Sprawa towarzysza (817.7): relacja z towarzyszem, z którym przyszła (punkty albo \"next\": od razu kolejny stopień, 818.4), i jak się skończyła (errand: together albo alone), żeby nie wróciła.", "properties": { "relation": { "oneOf": [{ "type": "integer", "minimum": 1 }, { "const": "next" }] }, "errand": { "enum": ["together", "alone"] } } },
             "text": { "type": "string", "minLength": 1 }
           }
         },
@@ -60,7 +62,7 @@
           "required": ["kind", "bonus", "fights"],
           "description": "Nagroda: wzmocnienie jak po miksturze wzmacniającej (szybkość, pancerz, obrażenia albo skupienie) na tyle walk wypraw, albo klątwa (curse: obrażenia mniejsze o bonus).",
           "properties": {
-            "kind": { "enum": ["speed", "armor", "damage", "focus", "curse"] },
+            "kind": { "enum": ["speed", "armor", "damage", "focus", "curse", "wounds"] },
             "bonus": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
             "fights": { "type": "integer", "minimum": 1 }
           }
@@ -89,6 +91,9 @@
           "additionalProperties": { "type": "integer", "minimum": 1 },
           "description": "Nagroda: punkty reputacji bractw Osady, po id z settlement.json (pytanie 225)."
         },
+        "relation": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "integer", "minimum": 1 }, "description": "Relacja z mieszkańcami Osady, po id mieszkańca (818.3: pomoc ją podnosi, odmowa nigdy nie obniża); tylko w zdarzeniu Osady." },
+        "companion": { "type": "object", "additionalProperties": false, "required": ["relation", "errand"], "description": "Sprawa towarzysza (817.7): relacja z towarzyszem, z którym przyszła (punkty albo \"next\": od razu kolejny stopień, 818.4), i jak się skończyła (errand: together albo alone), żeby nie wróciła.", "properties": { "relation": { "oneOf": [{ "type": "integer", "minimum": 1 }, { "const": "next" }] }, "errand": { "enum": ["together", "alone"] } } },
+        "stakeBack": { "type": "number", "exclusiveMinimum": 0, "description": "Nagroda: tyle razy cena opcji wraca do sakiewki (kości przy ognisku, 817.5: „Za wygraną zgarniesz podwójną stawkę”)." },
         "rumor": { "type": "boolean", "description": "Nagroda: dzisiejsza plotka o elicie albo czempionie, jak z Karczmy ({area}, {creature}); bez plotki zdanie noRumorText." },
         "noRumorText": { "type": "string", "minLength": 1, "description": "Tekst skutku z plotką, gdy postać nie ma miejsca z elitą ani czempionem do plotki." },
         "goldLoss": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Przy omdleniu: taka część złota z wyprawy przepada." },
@@ -185,6 +190,8 @@
           "name": { "type": "string", "minLength": 1, "description": "Nazwa w „Testuj zdarzenia”, gdy tytuł jest taki sam jak innego zdarzenia." },
           "draft": { "type": "boolean", "description": "Zdarzenie, którego autor jeszcze nie zatwierdził: przychodzi tylko w wersji testowej." },
           "settlement": { "type": "boolean", "description": "Zdarzenie Osady (np. z reputacją bractwa): przychodzi tylko tam, gdzie Osada jest otwarta." },
+          "firstCase": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Przypadek pierwszego spotkania (817.1: Jagnę spotkamy tylko raz, potem zawsze Topielica): przychodzi, gdy postać jeszcze nie spotkała zdarzenia, a później losuje się jeden z pozostałych." },
+          "companion": { "type": "object", "additionalProperties": false, "required": ["minRelation"], "description": "Sprawa towarzysza (817.7): przychodzi tylko z towarzyszem z wyprawy, który ma co najmniej minRelation punktów relacji i nie miał jeszcze swojej sprawy. Przypadki to jego historie, po jednym na historię z settlement.json, w tej samej kolejności, a {name} i [a|b] mówią o nim.", "properties": { "minRelation": { "type": "integer", "minimum": 0 } } },
           "options": {
             "type": "array",
             "minItems": 2,
@@ -222,6 +229,7 @@
                 "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
                 "name": { "type": "string", "minLength": 1, "description": "Nazwa przypadku w „Testuj zdarzenia”." },
                 "weight": { "type": "number", "exclusiveMinimum": 0 },
+                "text": { "type": "string", "minLength": 1, "description": "Tekst zdarzenia w tym przypadku (sprawa towarzysza: jego historia)." },
                 "outcomes": { "type": "object", "additionalProperties": { "$ref": "#/definitions/outcomes" } }
               }
             }

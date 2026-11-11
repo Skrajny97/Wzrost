@@ -627,6 +627,14 @@ export function guildSeatSprite(buildingId) {
 export const eventFigure = (id) =>
   available.events.has(id) ? h('img', { src: `/art/events/${id}.png`, alt: '', width: 96, height: 128, class: 'sprite event-figure', decoding: 'async', draggable: 'false' }) : null;
 export const eventScene = (id) => (available['event-scenes'].has(id) ? `/art/event-scenes/${id}.png` : null);
+// A companion as the figure of its errand (817.7): its whole figure for
+// fights, standing in the scene like an event's person.
+export function companionFigure(classId, appearance) {
+  const id = `${classId}-${appearance}`;
+  return available['companion-portraits'].has(id)
+    ? h('img', { src: `/art/companion-portraits/${id}.png`, alt: '', width: 96, height: 128, class: 'sprite event-figure', decoding: 'async', draggable: 'false' })
+    : null;
+}
 // The Osada's place on its board, a resident's bust and the board's ground,
 // or null while there is none.
 export const settlementPlaceArt = (placeId) =>

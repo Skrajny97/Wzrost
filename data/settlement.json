@@ -619,6 +619,16 @@
         ]
       ],
       "lowerChance": 0.25,
+      "memories": [
+        "Pamiętasz skrzynkę ojca pod kamieniem milowym? Noszę teraz jego nóż. Czasem mam wrażenie, że idzie z nami.",
+        "Od kiedy przegoniliśmy ludzi lichwiarza, śpię spokojnie. Pierwszy raz od lat.",
+        "[Postawiłam|Postawiłem] już płot na tej ziemi przy strumieniu. Kiedyś zaproszę cię tam na wieczerzę.",
+        "Śni mi się czasem ten basior z rozdartym uchem. Ale już się go nie boję.",
+        "Posłaniec pewnie dalej opowiada na dworze, jak [odmówiłam|odmówiłem] panu. Nie żałuję ani dnia.",
+        "Miecz przyjaciela leży pod kapliczką. Słowo dotrzymane, a to także dzięki tobie.",
+        "Brat pozdrawia cię z Osady. Mówi, że ma u ciebie dług do końca życia.",
+        "Ten kufer spod dębu… Wciąż nie mogę uwierzyć. Następną mapę też sprawdzimy razem?"
+      ],
       "chatter": {
         "stranger": [
           "Dobrze się dziś szło. Nogi bolą, ale głowa spokojna.",

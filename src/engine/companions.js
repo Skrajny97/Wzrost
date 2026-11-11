@@ -176,12 +176,27 @@ export function talkWith(companion, { seed, now, week = null }, content) {
   const pieces = t.talks.stories[companion.story % t.talks.stories.length];
   const told = companion.told ?? 0;
   const { index } = companionStanding(companion, content);
-  const story = told < pieces.length && told <= index;
-  const text = story ? pieces[told] : chatterLine(index, createRng(`${seed}:talk:${companion.id}:${day}`), content);
+  // After an errand gone on together (817.7) the next talk recalls it, once
+  // (818.4: „wspomina ją w rozmowach w Kwaterach”): one line for each story.
+  const memories = t.talks.memories ?? [];
+  const memory = companion.errand === 'together' && !companion.recalled && memories.length > 0 ? memories[companion.story % memories.length] : null;
+  const story = !memory && told < pieces.length && told <= index;
+  const text = memory ?? (story ? pieces[told] : chatterLine(index, createRng(`${seed}:talk:${companion.id}:${day}`), content));
   return {
-    talk: { text: gendered(text, companion.appearance), story, points },
-    companion: { ...companion, relation: (companion.relation ?? 0) + points, ...(story && { told: told + 1 }), talkedOn: day },
+    talk: { text: gendered(text, companion.appearance), story, points, ...(memory && { memory: true }) },
+    companion: { ...companion, relation: (companion.relation ?? 0) + points, ...(story && { told: told + 1 }), ...(memory && { recalled: true }), talkedOn: day },
   };
+}
+
+// A companion after its errand (817.7): its relation `relation` points
+// closer, or at once at its next standing ("next"; 818.4: „towarzysz od
+// razu wchodzi na kolejny stopień relacji”), and the errand settled
+// (`errand`: how it went, so it does not come again).
+export function companionAfterErrand(companion, { relation, errand }, content) {
+  const points = companion.relation ?? 0;
+  const { next } = companionStanding(companion, content);
+  const raised = relation === 'next' ? Math.max(points, next?.points ?? points) : points + (relation ?? 0);
+  return { ...companion, relation: raised, ...(errand && { errand }) };
 }
 
 // The companion in a fight: a character of its class with its gear, its
