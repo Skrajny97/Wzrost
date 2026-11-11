@@ -1,0 +1,19 @@
+{
+  "id": "rider5-bow-master-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the young man archer of the reference picture riding: the same black hair tied back and silver diadem with a green gem, the same black leather armour with silver plates and silver filigree, the silver pauldron shaped like a wing, the dark green cloak with silver trim hanging behind, black trousers and brown fur-topped boots, the black and silver recurve bow strapped upright on the back, the whole bow behind the body, nothing in the hands but the reins; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one boot in the whole picture: the thigh lying forward and level from the hip to the knee, the lower leg hanging straight down from the knee, one whole booted foot at the bottom with the toes pointing right; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the head to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/bow-master-male.png",
+      "usage": "the character's look: this same young man, his face, hair, diadem, armour, cloak, bow and colours, drawn the same way; not his standing pose and not the bow in his hand"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
