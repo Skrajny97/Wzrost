@@ -1,3 +1,4 @@
+// @ts-check
 // The e-mail with the link that confirms an account's address
 // (src/server/email.js sends it). The words come from data/texts.json, in
 // the content's language, which the page names too (`language`, from
@@ -5,11 +6,18 @@
 
 import { say } from './text.js';
 
-const escapeHtml = (text) =>
-  String(text).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+/** @type {Record<string, string>} */
+const ESCAPES = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+/** @param {unknown} text */
+const escapeHtml = (text) => String(text).replace(/[&<>"']/g, (char) => ESCAPES[char]);
 
 // The subject, and the same message as plain text and as a simple page with
 // a button: a mail app shows one or the other.
+/**
+ * @param {{ login: string, link: string }} account
+ * @param {{ texts: object, balance: { account: { emailSystemPoints: number } }, language?: string }} content
+ * @returns {{ subject: string, text: string, html: string }}
+ */
 export function confirmationEmail({ login, link }, content) {
   const { texts } = content;
   const words = {
@@ -19,6 +27,7 @@ export function confirmationEmail({ login, link }, content) {
     link: say(texts, 'emailConfirmLink', 0),
     ignore: say(texts, 'emailConfirmIgnore', 0),
   };
+  /** @param {string} text */
   const paragraph = (text, style = '') => `<p style="margin:0 0 16px;${style}">${escapeHtml(text)}</p>`;
   const href = escapeHtml(link);
   return {
