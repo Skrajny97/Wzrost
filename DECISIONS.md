@@ -3034,6 +3034,25 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Oceny autora 811.11 v2–815 i 819 (11.11.2026, po 12:55)
+
+1. **Portrety trzecich form przyjęte:** Pogromca i Pogromczyni Demonów (811.11 v2, srebrna zbroja i miecz), Prorokini (811.12), Bogobójca i Bogobójczyni (811.13), Licz w obu wersjach (811.14) oraz Władca i Władczyni Cieni (811.15). Trafiają do `art/references/evolutions` jako wzory klatek startowych chodu i jazdy.
+2. **Prorok (811.12, mężczyzna) odrzucony:** „zbyt niewyraźna twarz, opaska na twarzy zlana z twarzą”. Rysuję go od nowa, z wyraźną twarzą i przepaską, która odcina się od skóry.
+3. **815.4 v2 przyjęte:** Mistrz Łuku bez Gradu strzał. Umiejętności: 1. Mistrzowski strzał (ze Strzału w serce): mocniejszy, przebija wszystkich wrogów w kolejnych rzędach za celem. 2. Spokojna ręka (nowa): przez kilka ruchów każdy strzał trafia, bo wróg nie może go uniknąć, i częściej trafia krytycznie.
+4. **815.5 v2 przyjęte:** Wybraniec Peruna zamiast Kamienia piorunowego dostaje Znak gromu (nowa): postać kreśli w powietrzu znak gromu, jaki dawniej rzeźbiono nad drzwiami chat dla ochrony przed piorunem; przez kilka ruchów każdy cios drużyny może porazić wroga piorunem.
+5. **819 A:** nazwy trzecich form nie powtarzają nazw z gry: umiejętność Zamieć Lodowego Króla (815.8) to **Lodowa nawałnica**, cecha Cud Świętego (466, 815.10) to **Cudowne ocalenie**, cecha Egzorcyzm Pogromcy Demonów (466, 815.11) to **Wielki egzorcyzm**, a umiejętność Owacja tłumu Legendy Areny (815.2) to **Wiwaty**.
+6. **Chody trzecich form:** z 20 szkiców klatek startowych (po 4 wersje z PixelLab) wybrałem 17 i oddałem je do animacji na szkielecie. Mistrz Łuku, Wybranka Peruna i Władca Puszczy dostają po jednej nowej próbie z dokładniejszym opisem: w pierwszych wersjach Mistrz Łuku trzymał też sztylet, Wybranka szła przodem, a Władca Puszczy trzymał orła na ręce i łuk poziomo. Gotowe chody trafią na stronę ocen jako filmy MP4, po przejrzeniu klatka po klatce.
+
+## Uwagi gracza o Targowisku i towarzyszach, przekazane przez autora (11.11.2026): na później
+
+Autor przekazał zrzuty z czatu z uwagami gracza (poz. 47): „same mądre uwagi dał chłop”. Gracz pisze „najemnicy” o towarzyszach z Kwater. Do zrobienia po bieżącym etapie (trzecia ewolucja, zdarzenia 817 i relacje 818), z makietami dla każdej zmiany wyglądu i pytaniami tam, gdzie zmieniają się ustalone zasady:
+
+1. **Targowisko łatwiejsze do przeszukania**, bo „za chwilę każdy będzie wystawiał coś i strasznie ciężko będzie coś znaleźć”: wybór dowolnej klasy (gracz szuka przedmiotów dla towarzyszy innych klas), filtr rzadkości i osobne zakładki na mikstury, zioła i materiały.
+2. **Porównanie przedmiotu z Targowiska z tym, co nosi towarzysz**, tak jak dziś z tym, co nosi postać.
+3. **Sortowanie Targowiska od najtańszych i od najdroższych.**
+4. **Towarzysze sami zostają w Kwaterach, gdy postać idzie w Drużynie.** Dziś trzeba ich zostawić ręcznie (zasada autora z 2.11.2026: „nie może być w drużynie, dopóki nie kliknie na nim [Zostań w kwaterze]”), więc to zmiana zasady: pytanie do autora.
+5. **„Dokupienie” poziomów towarzyszowi**, który został w tyle za postacią, żeby nie wymieniać go na nowego i nie przekładać całego sprzętu: pytanie do autora o cenę i zasady.
+
 ## Wersja 0.2.61 (11.11.2026): ekran zakupu Punktów Systemu (810), na razie tylko dla konta autora
 
 1. **Co wchodzi do gry:** ekran „Kup Punkty Systemu” ze Sklepu Systemu (`#/sklep/punkty`), jak na przyjętych makietach 810.1–810.7: cztery pakiety po dwa w rzędzie, pola regulaminu i 18+, przycisk „Kupuję i płacę …”, oczekiwanie na płatność po powrocie z Autopay, historia zakupów z „Odstąp od umowy” przez 14 dni i wyszarzone pakiety ponad limit kwartału. Widzi go tylko konto autora (`PAYMENTS_FOR` „authors”); bez kluczy Autopay w sekretach gra pisze, że zakup nie jest jeszcze dostępny.
