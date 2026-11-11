@@ -1,3 +1,4 @@
+// @ts-check
 // The Portale Systemu (data/portals.json; DECISIONS.md, "Portale Systemu";
 // the author: "coś bardziej natychmiastowego trochę jak Wieże ale prawie od
 // samego początku […] pokonujesz kolejne stopnie", 731–735, and then "Tu
@@ -29,16 +30,39 @@ import { countEvents, createRng } from './rng.js';
 import { nameInText, say, word } from './text.js';
 import { weekFactor, weekFighter } from './weeks.js';
 
-export const portalById = (id, content) => content.portals.portals.find((portal) => portal.id === id) ?? null;
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {{ id: string, minLevel: number, maxLevel: number, encounters: { monsters: string[], weight?: number }[] } & Record<string, any>} Area An inner region (data/areas.json). */
+/** @typedef {{ id: string, name: string, loot: 'gold' | 'resource' | 'material' | 'part', resource?: string, part?: string } & Record<string, any>} Portal A portal of data/portals.json. */
+/** @typedef {{ gold: number, resources: Record<string, number>, materials: Record<string, number>, parts: Record<string, number> }} Loot */
+/** @typedef {import('./rng.js').Rng} Rng */
+
+/**
+ * @param {string} id
+ * @param {Content} content
+ * @returns {Portal | null}
+ */
+export const portalById = (id, content) => content.portals.portals.find((/** @type {Portal} */ portal) => portal.id === id) ?? null;
 
 // The stage a portal's next fight is for: the one above the highest won,
 // or null while that is above the character's level or the last stage.
+/**
+ * @param {number} best
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number | null}
+ */
 export const portalNext = (best, level, content) => (best + 1 <= Math.min(level, content.portals.maxStage) ? best + 1 : null);
 
 // The inner region of stage `stage`: the one whose levels hold it, past the
 // last land its last place.
+/**
+ * @param {number} stage
+ * @param {Content} content
+ * @returns {Area}
+ */
 export function portalArea(stage, content) {
-  const { areas } = content;
+  /** @type {Area[]} */
+  const areas = content.areas;
   return areas.find((area) => area.minLevel <= stage && stage <= area.maxLevel) ?? areas.reduce((last, area) => (area.maxLevel > last.maxLevel ? area : last));
 }
 
@@ -49,11 +73,23 @@ export function portalArea(stage, content) {
 // and of the finds, the camp's resources gathered and found (all kinds
 // together), the materials the creatures leave, and the parts the finds'
 // chests give when taken apart (salvageYield).
+/**
+ * @param {number} stage
+ * @param {Content} content
+ * @returns {{ gold: number, resources: number, materials: number, parts: number } & Record<string, any>}
+ */
 export const portalExpected = (stage, content) => expectedExploration(portalArea(stage, content), stage, content.portals.lootMinutes, content);
 
 // How much a portal pays on `stage`: its part of portalExpected, in whole
 // pieces, at least one, firstWinMultiplier times as much at the stage's
 // first win.
+/**
+ * @param {Portal} portal
+ * @param {number} stage
+ * @param {boolean} first
+ * @param {Content} content
+ * @returns {number}
+ */
 export function portalAmount(portal, stage, first, content) {
   const expected = portalExpected(stage, content);
   const value = { gold: expected.gold, resource: expected.resources, material: expected.materials, part: expected.parts }[portal.loot];
@@ -62,9 +98,16 @@ export function portalAmount(portal, stage, first, content) {
 
 // The ordinary creatures of a stage's region that its level lets come
 // (encountersFor), whose materials the Portal Materiałów pays.
+/**
+ * @param {Area} area
+ * @param {number} stage
+ * @param {Content} content
+ * @returns {string[]}
+ */
 function stageCreatures(area, stage, content) {
   const open = encountersFor(area, stage);
-  const ids = [...new Set((open.length > 0 ? open : area.encounters).flatMap((encounter) => encounter.monsters))];
+  /** @type {string[]} */
+  const ids = [...new Set((open.length > 0 ? open : area.encounters).flatMap((/** @type {{ monsters: string[] }} */ encounter) => encounter.monsters))];
   return ids.filter((id) => content.materialsByMonster[id]);
 }
 
@@ -77,14 +120,28 @@ function stageCreatures(area, stage, content) {
 // its entry (`week`, weeks.js): its share more (or less) of a Portal
 // Złota's gold and a Portal Materiałów's pieces, made whole with the loot's
 // draws; a sweep, no fight, keeps the stage's loot as it is.
+/**
+ * @param {Portal} portal
+ * @param {number} stage
+ * @param {boolean} first
+ * @param {Rng} rng
+ * @param {Content} content
+ * @param {Record<string, any> | null} [week]
+ * @returns {Loot}
+ */
 export function portalLoot(portal, stage, first, rng, content, week = null) {
   const amount = portalAmount(portal, stage, first, content);
-  const factor = weekFactor(week, { gold: 'gold', material: 'materials' }[portal.loot]);
+  /** @type {Record<string, string>} */
+  const kinds = { gold: 'gold', material: 'materials' };
+  const factor = weekFactor(/** @type {any} */ (week), kinds[portal.loot]);
   const pieces = factor === 1 ? amount : countEvents(amount * factor, rng);
+  /** @type {Loot} */
   const loot = { gold: 0, resources: {}, materials: {}, parts: {} };
   if (portal.loot === 'gold') return { ...loot, gold: pieces };
-  if (portal.loot === 'resource') return { ...loot, resources: { [portal.resource]: pieces } };
+  if (portal.loot === 'resource') return { ...loot, resources: { [String(portal.resource)]: pieces } };
+  /** @type {number[]} */
   const chances = rarityUpChances(stage, content);
+  /** @param {string} rarityId */
   const raise = (rarityId) => {
     const roll = rng.next();
     return raisedRarity(rarityId, chances.filter((chance) => roll < chance).length, content);
@@ -98,7 +155,7 @@ export function portalLoot(portal, stage, first, rng, content, week = null) {
     }
     return loot;
   }
-  const base = content.partsById[portal.part];
+  const base = content.partsById[String(portal.part)];
   for (let i = 0; i < pieces; i++) {
     const id = content.partsByRarity[raise(base.rarity)]?.id ?? base.id;
     loot.parts[id] = (loot.parts[id] ?? 0) + 1;
@@ -108,7 +165,13 @@ export function portalLoot(portal, stage, first, rng, content, week = null) {
 
 // The loot in a sentence: "30 złota", "drewno +90", "skóra wilka ×2",
 // "ścinki ×2".
+/**
+ * @param {Loot} loot
+ * @param {Content} content
+ * @returns {string}
+ */
 export function portalLootText(loot, content) {
+  /** @type {string[]} */
   const parts = [];
   if (loot.gold > 0) parts.push(word(content, '{gold} złota', { gold: loot.gold }));
   for (const [id, count] of Object.entries(loot.resources)) parts.push(`${nameInText(content.resourcesById[id].name, content)} +${count}`);
@@ -121,9 +184,14 @@ export function portalLootText(loot, content) {
 }
 
 // Loot `loot` added into `sum` (both { gold, resources, materials, parts }).
+/**
+ * @param {Loot} sum
+ * @param {Loot} loot
+ * @returns {Loot}
+ */
 function addLoot(sum, loot) {
   sum.gold += loot.gold;
-  for (const store of ['resources', 'materials', 'parts']) for (const [key, count] of Object.entries(loot[store])) sum[store][key] = (sum[store][key] ?? 0) + count;
+  for (const store of /** @type {const} */ (['resources', 'materials', 'parts'])) for (const [key, count] of Object.entries(loot[store])) sum[store][key] = (sum[store][key] ?? 0) + count;
   return sum;
 }
 
@@ -132,27 +200,39 @@ function addLoot(sum, loot) {
 // `left` lists each portal's id, its highest stage won and its sweeps left,
 // each sweep drawn on its own as a single one. The loot of all, each
 // portal's in words, and one line naming them.
+/**
+ * @param {{ portalId: string, stage: number, count: number }[]} left
+ * @param {string | number} seed
+ * @param {Content} content
+ */
 export function portalSweepAll(left, seed, content) {
+  /** @type {Loot} */
   const total = { gold: 0, resources: {}, materials: {}, parts: {} };
   const swept = left.map(({ portalId, stage, count }) => {
+    /** @type {Loot} */
     const sum = { gold: 0, resources: {}, materials: {}, parts: {} };
     for (let i = 0; i < count; i++) addLoot(sum, portalSweep(portalId, stage, `${seed}:${portalId}:${i}`, content));
     addLoot(total, sum);
     return { portal: portalId, stage, count, loot: portalLootText(sum, content) };
   });
-  const list = swept.map((one) => `${portalById(one.portal, content).name} ×${one.count}: ${one.loot}`).join('; ');
+  const list = swept.map((one) => `${portalById(one.portal, content)?.name} ×${one.count}: ${one.loot}`).join('; ');
   return { ...total, swept, text: say(content.portals.texts, 'sweptAll', swept.length, { list }) };
 }
 
 // What waits on stage `stage` of an entry with `seed`: the region, the
 // level and the encounter, a group of ordinary creatures the stage's level
 // lets come (encountersFor), never an elite or a champion.
+/**
+ * @param {number} stage
+ * @param {string | number} seed
+ * @param {Content} content
+ */
 export function portalStage(stage, seed, content) {
   const area = portalArea(stage, content);
   const rng = createRng(`${seed}:stage:${stage}`);
   const open = encountersFor(area, stage);
-  const group = rng.weighted(open.length > 0 ? open : area.encounters, (encounter) => encounter.weight ?? 1);
-  return { stage, level: stage, areaId: area.id, encounter: { elite: false, members: group.monsters.map((monsterId) => ({ monsterId, level: stage })) } };
+  const group = rng.weighted(open.length > 0 ? open : area.encounters, (/** @type {{ monsters: string[], weight?: number }} */ encounter) => encounter.weight ?? 1);
+  return { stage, level: stage, areaId: area.id, encounter: { elite: false, members: group.monsters.map((/** @type {string} */ monsterId) => ({ monsterId, level: stage })) } };
 }
 
 // One entry: a fight on stage `stage` of portal `portalId`, the character
@@ -164,24 +244,43 @@ export function portalStage(stage, seed, content) {
 // `parts` it pays; its XP is none, for the companions too. `week`: the
 // week of the year of the entry (weeks.js), or null: its share of the loot
 // (portalLoot) and of the character's stats in the fight.
+/**
+ * @param {{
+ *   character: Record<string, any>,
+ *   equipped: Record<string, any>[],
+ *   name: string,
+ *   portalId: string,
+ *   stage: number,
+ *   first?: boolean,
+ *   seed: string | number,
+ *   trophies?: Record<string, any>,
+ *   companions?: Record<string, any>[],
+ *   week?: Record<string, any> | null,
+ * }} options
+ * @param {Content} content
+ * @returns {Record<string, any>}
+ */
 export function portalFight({ character, equipped, name, portalId, stage, first = false, seed, trophies = {}, companions = [], week = null }, content) {
-  const portal = portalById(portalId, content);
+  const portal = /** @type {Portal} */ (portalById(portalId, content));
   const plan = portalStage(stage, seed, content);
   const area = content.areasById[plan.areaId];
   const rng = createRng(`${seed}:fight`);
   const { texts } = content.portals;
-  const player = playerCombatant({ character: weekFighter(character, week), equipped, name, area }, content);
+  // combatant.js and companions.js are not checked yet: their options are
+  // typed by their defaults alone (hp, area).
+  const player = playerCombatant(/** @type {any} */ ({ character: weekFighter(/** @type {any} */ (character), /** @type {any} */ (week)), equipped, name, area }), content);
   const allies = [
     { ...player, ...(Object.keys(trophies).length > 0 && { trophies }) },
-    ...companions.map((companion, index) => companionCombatant(companion, { area, id: `a${index + 1}` }, content)),
+    ...companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}` }), content)),
   ];
   const enemies = encounterCombatants(plan.encounter, content, { strength: content.portals.strength });
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
   const won = fight.won === true;
-  const hpAfter = Math.max(0, fight.units.find((unit) => unit.id === player.id).hp);
+  const hpAfter = Math.max(0, fight.units.find((/** @type {{ id: string }} */ unit) => unit.id === player.id)?.hp ?? 0);
+  /** @type {Loot} */
   const loot = won ? portalLoot(portal, stage, first, createRng(`${seed}:loot`), content, week) : { gold: 0, resources: {}, materials: {}, parts: {} };
 
-  const enemyList = enemies.map((enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
+  const enemyList = enemies.map((/** @type {{ name: string, level: number }} */ enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
   const lines = [say(texts, 'fightStart', stage, { enemies: enemyList })];
   if (won) {
     lines.push(say(content.texts, 'victory', stage), say(texts, 'loot', stage, { loot: portalLootText(loot, content) }));
@@ -194,7 +293,7 @@ export function portalFight({ character, equipped, name, portalId, stage, first 
     elite: false,
     champion: false,
     tough: false,
-    enemies: enemies.map((enemy) => ({ name: enemy.name, level: enemy.level, monsterId: enemy.monsterId })),
+    enemies: enemies.map((/** @type {{ name: string, level: number, monsterId: string }} */ enemy) => ({ name: enemy.name, level: enemy.level, monsterId: enemy.monsterId })),
     won: fight.won,
     hpBefore: player.maxHp,
     hpAfter,
@@ -204,7 +303,7 @@ export function portalFight({ character, equipped, name, portalId, stage, first 
     chests: [],
     recovered: 0,
     allies: allies.map((unit) => combatantView(unit, enemies[0].level, content)),
-    enemiesView: enemies.map((enemy) => combatantView(enemy, player.level, content)),
+    enemiesView: enemies.map((/** @type {any} */ enemy) => combatantView(enemy, player.level, content)),
     events: fight.events,
   };
   return {
@@ -236,8 +335,14 @@ export function portalFight({ character, equipped, name, portalId, stage, first 
 // A sweep of a won stage (the author: "Na czyszczenia (swipe'y) będzie
 // ograniczona ilość - do 5 dziennie"): its plain loot at once, with no
 // fight, and its line.
+/**
+ * @param {string} portalId
+ * @param {number} stage
+ * @param {string | number} seed
+ * @param {Content} content
+ */
 export function portalSweep(portalId, stage, seed, content) {
-  const portal = portalById(portalId, content);
+  const portal = /** @type {Portal} */ (portalById(portalId, content));
   const loot = portalLoot(portal, stage, false, createRng(`${seed}:sweep`), content);
   const text = portalLootText(loot, content);
   return { ...loot, loot: text, text: say(content.portals.texts, 'swept', stage, { stage, loot: text }) };
