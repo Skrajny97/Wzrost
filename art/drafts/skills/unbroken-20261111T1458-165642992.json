@@ -1,0 +1,19 @@
+{
+  "id": "unbroken",
+  "tool": "pixellab generate-image-v2",
+  "description": "a massive tower shield glowing with golden light, a green healing aura around it and small arrows bouncing off, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/skills/indomitable.png",
+      "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

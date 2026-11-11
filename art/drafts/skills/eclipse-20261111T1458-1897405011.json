@@ -1,0 +1,14 @@
+{
+  "id": "eclipse",
+  "tool": "pixellab generate-image-v2",
+  "description": "a black moon covering the sun in an eclipse, a thin ring of violet and gold light around its edge, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

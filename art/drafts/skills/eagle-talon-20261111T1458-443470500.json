@@ -1,0 +1,19 @@
+{
+  "id": "eagle-talon",
+  "tool": "pixellab generate-image-v2",
+  "description": "a golden eagle diving down with its talons outstretched in front, sharp claws, dynamic downward motion, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/skills/falcon.png",
+      "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

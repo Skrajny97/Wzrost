@@ -1,0 +1,14 @@
+{
+  "id": "death-touch",
+  "tool": "pixellab generate-image-v2",
+  "description": "a bony hand reaching out with green poison smoke, red drops of life flowing back into its palm, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

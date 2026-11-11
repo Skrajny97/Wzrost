@@ -1,0 +1,14 @@
+{
+  "id": "oak-awakening",
+  "tool": "pixellab generate-image-v2",
+  "description": "an ancient oak tree with a stern face in its bark, glowing green eyes and mighty root arms rising from the ground, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

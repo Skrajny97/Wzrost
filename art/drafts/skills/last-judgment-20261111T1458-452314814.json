@@ -1,0 +1,19 @@
+{
+  "id": "last-judgment",
+  "tool": "pixellab generate-image-v2",
+  "description": "a great golden sword pointing down, wreathed in white holy flames, a radiant halo behind it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/skills/verdict.png",
+      "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

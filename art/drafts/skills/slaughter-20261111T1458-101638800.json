@@ -1,0 +1,14 @@
+{
+  "id": "slaughter",
+  "tool": "pixellab generate-image-v2",
+  "description": "a giant blood-stained battle axe cleaving in a wide red arc, splatters of blood and a dark red rage glow, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

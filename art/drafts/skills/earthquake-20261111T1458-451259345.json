@@ -1,0 +1,14 @@
+{
+  "id": "earthquake",
+  "tool": "pixellab generate-image-v2",
+  "description": "a heavy shield slammed into the ground, the earth cracking open in jagged lines with flying rocks and a dust shockwave, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

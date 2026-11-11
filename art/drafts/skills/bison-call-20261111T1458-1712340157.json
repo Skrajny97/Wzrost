@@ -1,0 +1,14 @@
+{
+  "id": "bison-call",
+  "tool": "pixellab generate-image-v2",
+  "description": "a charging European bison with lowered horns and a dark brown shaggy mane, clouds of dust behind it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

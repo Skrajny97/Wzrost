@@ -1,0 +1,19 @@
+{
+  "id": "perun-wrath",
+  "tool": "pixellab generate-image-v2",
+  "description": "several jagged lightning bolts striking down from a dark storm cloud and arcing from one to the next, bright white and blue, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "src/client/art/skills/storm-cloud.png",
+      "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

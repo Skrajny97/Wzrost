@@ -1,0 +1,14 @@
+{
+  "id": "steady-hand",
+  "tool": "pixellab generate-image-v2",
+  "description": "a fully drawn bow with an arrow aimed at the centre of a bullseye target, a calm green glow and a small white star of a critical hit, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

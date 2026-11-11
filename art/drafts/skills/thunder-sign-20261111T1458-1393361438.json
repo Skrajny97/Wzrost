@@ -1,0 +1,14 @@
+{
+  "id": "thunder-sign",
+  "tool": "pixellab generate-image-v2",
+  "description": "a glowing six-petal Slavic thunder rosette (hexafoil) drawn in the air with crackling blue lightning lines, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+  "style": "src/client/art/skills/riposte.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}
