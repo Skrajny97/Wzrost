@@ -50,14 +50,15 @@
     "trade": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["onlineSeconds", "proposalSeconds", "idleMinutes", "rejectionsInRow", "pauseMinutes", "maxItems"],
+      "required": ["onlineSeconds", "proposalSeconds", "idleMinutes", "rejectionsInRow", "pauseMinutes", "maxItems", "minLevel"],
       "properties": {
         "onlineSeconds": { "type": "integer", "minimum": 30 },
         "proposalSeconds": { "type": "integer", "minimum": 10 },
         "idleMinutes": { "type": "integer", "minimum": 1 },
         "rejectionsInRow": { "type": "integer", "minimum": 1 },
         "pauseMinutes": { "type": "integer", "minimum": 1 },
-        "maxItems": { "type": "integer", "minimum": 1 }
+        "maxItems": { "type": "integer", "minimum": 1 },
+        "minLevel": { "type": "integer", "minimum": 1 }
       }
     },
     "discord": {

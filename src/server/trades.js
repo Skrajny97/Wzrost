@@ -5,7 +5,10 @@
 // or turns it down. Both then put their offers together; once one confirms,
 // neither offer changes any more, and the other confirms too, when all of it
 // moves at once, or rejects it. A proposal unanswered, or a trade left
-// alone, lapses (data/community.json "trade"). Who proposes to the same
+// alone, lapses (data/community.json "trade"). Both characters trade from
+// a level (trade.minLevel; the author, 11.11.2026: „Wymiana od 20 levelu
+// postaci”, so the gold and finds of a new account's gift codes do not go
+// at once to another account). Who proposes to the same
 // player too many times in a row, each time turned down, waits a while; a
 // player may take no trades from one player, or from anyone. The bags stay
 // at hand while the characters are away, on an exploration or at a
@@ -49,6 +52,13 @@ const sideOf = (trade, characterId) => (trade.from_id === characterId ? 'from' :
 const offerColumn = (side) => (side === 'from' ? 'from_offer' : 'to_offer');
 
 const PLAYED = "SELECT id FROM characters WHERE user_id = ? AND role = 'player'";
+
+// The character's own level for the Wymiana (trade.minLevel): checked at
+// every step, so a trade begun before the rule moves nothing below it.
+function requireTradeLevel(character) {
+  const level = rules().minLevel;
+  if (character.level < level) throw new ApiError(403, 'trade_level', `Wymiana otworzy się na ${level}. poziomie postaci.`);
+}
 
 // The statement that ends the live Wymiana of the character the account
 // plays, when another one takes its place (characters.js): a trade is for
@@ -195,6 +205,9 @@ export async function proposeTrade(context) {
   if (!isUnlocked('community', other.level, content())) {
     throw new ApiError(409, 'locked', `${other.name} nie ma jeszcze Społeczności. Otworzy się na ${content().unlocksById.community.level}. poziomie.`);
   }
+  requireTradeLevel(character);
+  const level = rules().minLevel;
+  if (other.level < level) throw new ApiError(409, 'trade_level_other', `Postać ${other.name} wymieni się dopiero od ${level}. poziomu.`);
   const [blocking, blocked] = await db.batch([
     db.prepare('SELECT 1 FROM trade_blocks WHERE user_id = ? AND blocked_id = ?').bind(session.userId, other.user_id),
     db.prepare('SELECT 1 FROM trade_blocks WHERE user_id = ? AND blocked_id = ?').bind(other.user_id, session.userId),
@@ -232,6 +245,7 @@ export async function answerTrade(context) {
     const rejected = await close(db, trade, 'rejected', now);
     return json({ trade: await tradeView(db, rejected, character, now) });
   }
+  requireTradeLevel(character);
   const proposer = await db.prepare('SELECT c.name, c.role, u.seen_at FROM characters c JOIN users u ON u.id = c.user_id WHERE c.id = ?').bind(trade.from_id).first();
   if (!playedOnline(proposer, now)) {
     await close(db, trade, 'expired', now);
@@ -293,6 +307,7 @@ export async function setOffer(context) {
   requireLive(trade);
   if (trade.state === 'proposed') throw new ApiError(409, 'not_open', 'Wymiana jeszcze się nie zaczęła.');
   if (trade.state === 'locked') throw new ApiError(409, 'locked', 'Wymiana jest już zatwierdzona. Można ją tylko przyjąć albo odrzucić.');
+  requireTradeLevel(character);
   const player = await loadPlayer(db, session.userId);
   const offer = cleanOffer(body.offer, player);
   // Each offered item as stored now, so the exchange gives exactly this
@@ -422,8 +437,15 @@ export async function confirmTrade(context) {
   const to = offerOf(trade.to_offer);
   if (isEmpty(from) && isEmpty(to)) throw new ApiError(400, 'empty', 'Wymiana jest pusta. Dodajcie coś do ofert.');
   if (trade.locked_by === character.id) throw new ApiError(409, 'waiting', 'Wymiana czeka na drugą stronę.');
+  requireTradeLevel(character);
   // Both characters as they are played now, at home or away.
-  const owners = await db.prepare('SELECT id, user_id FROM characters WHERE id IN (?, ?)').bind(trade.from_id, trade.to_id).all();
+  const owners = await db.prepare('SELECT id, user_id, level FROM characters WHERE id IN (?, ?)').bind(trade.from_id, trade.to_id).all();
+  // The other side too: a trade begun before the rule moves nothing below it.
+  const level = rules().minLevel;
+  if (owners.results.some((row) => row.level < level)) {
+    await close(db, trade, 'cancelled', now);
+    throw new ApiError(409, 'trade_level_other', `Wymiana działa od ${level}. poziomu postaci po obu stronach. Ta wymiana przepadła.`);
+  }
   const userOf = (id) => owners.results.find((row) => row.id === id).user_id;
   const [fromPlayer, toPlayer] = await Promise.all([loadPlayer(db, userOf(trade.from_id)), loadPlayer(db, userOf(trade.to_id))]);
   // A trade is for the characters played: one set aside meanwhile ends it.

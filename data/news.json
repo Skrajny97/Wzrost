@@ -575,6 +575,11 @@
       "id": "0.2.62",
       "title": "Wersja 0.2.62",
       "body": "- Kółko czatu łatwo przywrócić: gdy je schowasz, pod licznikiem graczy online przy prawej krawędzi ekranu pojawia się mały dymek. Stuknij go, a kółko czatu wróci na swoje miejsce."
+    },
+    {
+      "id": "0.2.63",
+      "title": "Wersja 0.2.63",
+      "body": "- Wymiana między graczami działa od 20. poziomu postaci, po obu stronach."
     }
 ]
 }

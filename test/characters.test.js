@@ -112,7 +112,8 @@ describe('five characters on one account', () => {
     await create('Druga');
     const { cookie: other } = await signUp('sasiad');
     await create('Sąsiad', 'archer', other);
-    await (await db()).prepare('UPDATE characters SET level = 6').run();
+    // The Wymiana's level (data/community.json trade.minLevel).
+    await (await db()).prepare('UPDATE characters SET level = 20').run();
     const ranking = (await call('GET', '/api/ranking', { cookie: other })).data;
     assert.deepEqual(ranking.rows.map((row) => row.name).sort(), ['Druga', 'Mira', 'Sąsiad']);
     // The profile of one's own character set aside, with no actions.

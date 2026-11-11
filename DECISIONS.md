@@ -3054,6 +3054,12 @@ Autor przekazał zrzuty z czatu z uwagami gracza (poz. 47): „same mądre uwagi
 4. **Towarzysze sami zostają w Kwaterach, gdy postać idzie w Drużynie.** Dziś trzeba ich zostawić ręcznie (zasada autora z 2.11.2026: „nie może być w drużynie, dopóki nie kliknie na nim [Zostań w kwaterze]”), więc to zmiana zasady: pytanie do autora.
 5. **„Dokupienie” poziomów towarzyszowi**, który został w tyle za postacią, żeby nie wymieniać go na nowego i nie przekładać całego sprzętu: pytanie do autora o cenę i zasady.
 
+## Wersja 0.2.63 (11.11.2026): Wymiana od 20. poziomu postaci
+
+1. **Co wchodzi do gry:** Wymiana między graczami działa od 20. poziomu postaci, po obu stronach (`data/community.json`, `trade.minLevel`). Autor, po propozycji gracza na Discordzie: nowe konta z kodami podarunkowymi na start (ponad 10 000 złota i kilkadziesiąt wypraw) przekazują złoto i łupy na jedno główne konto. Autor: „mądra uwaga - Wymiana od 20 levelu postaci”. Postać poniżej progu nie zaproponuje wymiany i nie przyjmie propozycji, a do postaci poniżej progu nie da się jej wysłać. Wymiana zaczęta wcześniej przepada przy zatwierdzeniu, jeśli któraś strona ma mniej niż 20. poziom, i nic nie przechodzi. Targowisko jest w Osadzie, która otwiera się na 20. poziomie, więc tam próg już był.
+2. **Baza danych:** bez migracji.
+3. **Sprawdzone:** testy Wymiany (próg po obu stronach, wymiana zaczęta poniżej progu przepada bez przeniesienia złota), postaci i Społeczności; tłumaczenia i dane.
+
 ## Wersja 0.2.62 (11.11.2026): dymek, który przywraca kółko czatu
 
 1. **Co wchodzi do gry:** gdy kółko czatu jest schowane (upuszczone na ×), pod licznikiem graczy online przy prawej krawędzi ekranu stoi mała zakładka z dymkiem czatu, z żółtą kropką przy nowych wiadomościach. Stuknięcie przywraca kółko, które wskakuje na swoje miejsce, a zakładka znika. Autor, po zgłoszeniu gracza, który schował kółko i nie umiał go potem znaleźć: „jest nieintuicyjne wiec wrzucic trzeba gdzies opcje czatu na główny ekran moze dodatkowo pod ilość graczy online zeby wskoczył dymek”. Komunikat po schowaniu kółka mówi teraz o dymku przy prawej krawędzi ekranu. Przełącznik „Kółko czatu” w Ustawieniach zostaje. Licznik graczy online i dymek stoją w jednej kolumnie (`#edge-tabs`), więc rozwinięty licznik nie nachodzi na dymek.

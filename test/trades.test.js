@@ -15,8 +15,9 @@ describe('Wymiana', () => {
   const { call, db, signUp } = useServer();
   const players = {};
 
-  // An account with a character at `level`, 500 gold, online.
-  async function player(login, { level = 12 } = {}) {
+  // An account with a character at `level` (the Wymiana's, 20, by
+  // default), 500 gold, online.
+  async function player(login, { level = 20 } = {}) {
     const { cookie } = await signUp(login);
     await call('POST', '/api/character', { cookie, body: { name: login, classId: 'mage', appearance: 'female' } });
     await (await db()).prepare('UPDATE characters SET level = ?, gold = 500 WHERE name = ?').bind(level, login).run();
@@ -282,6 +283,33 @@ describe('Wymiana', () => {
     assert.equal((await trade(players.ala, 'propose', { id: ola })).data.error.code, 'refused');
     // The sheet tells Ola she blocks no one now.
     assert.equal((await call('GET', '/api/profile/Ala', { cookie: players.ola })).data.profile.tradeBlocked, false);
+  });
+
+  test('opens at character level 20 for both sides, and a trade begun below it moves nothing', async () => {
+    const { minLevel } = content.community.trade;
+    const ola = (await row('Ola')).id;
+    // Ala below the level: no proposal.
+    await (await db()).prepare("UPDATE characters SET level = ? WHERE name = 'Ala'").bind(minLevel - 1).run();
+    const early = await trade(players.ala, 'propose', { id: ola });
+    assert.equal(early.data.error.code, 'trade_level');
+    assert.equal(early.data.error.message, `Wymiana otworzy się na ${minLevel}. poziomie postaci.`);
+    // Ola below it: no proposal to her either.
+    await (await db()).prepare('UPDATE characters SET level = ?').bind(minLevel).run();
+    await (await db()).prepare("UPDATE characters SET level = ? WHERE name = 'Ola'").bind(minLevel - 1).run();
+    const other = await trade(players.ala, 'propose', { id: ola });
+    assert.equal(other.data.error.code, 'trade_level_other');
+    assert.equal(other.data.error.message, `Postać Ola wymieni się dopiero od ${minLevel}. poziomu.`);
+    // A trade begun with both at the level, when one is below it (as one
+    // begun before the rule): offers wait, a confirmation ends it unmoved.
+    await (await db()).prepare('UPDATE characters SET level = ?').bind(minLevel).run();
+    const id = await opened();
+    const offered = await trade(players.ala, 'offer', { id, offer: { gold: 100 } });
+    await (await db()).prepare("UPDATE characters SET level = ? WHERE name = 'Ala'").bind(minLevel - 1).run();
+    assert.equal((await trade(players.ala, 'offer', { id, offer: { gold: 50 } })).data.error.code, 'trade_level');
+    const confirmed = await trade(players.ola, 'confirm', { id, version: offered.data.trade.version });
+    assert.equal(confirmed.data.error.code, 'trade_level_other');
+    assert.equal((await (await db()).prepare('SELECT state FROM trades WHERE id = ?').bind(id).first()).state, 'cancelled');
+    assert.deepEqual([(await row('Ala')).gold, (await row('Ola')).gold], [500, 500]);
   });
 
   test('a potion from a trade waits for its recipe, an item for its Tier, whatever its own level', async () => {

@@ -456,6 +456,10 @@
     "0.2.62": {
       "title": "Version 0.2.62",
       "body": "- The chat bubble is easy to bring back: once you hide it, a small speech bubble shows under the players online count by the right edge of the screen. Tap it and the chat bubble returns to its place."
+    },
+    "0.2.63": {
+      "title": "Version 0.2.63",
+      "body": "- Trading between players works from character level 20, on both sides."
     }
   }
 }
