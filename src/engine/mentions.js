@@ -1,3 +1,4 @@
+// @ts-check
 // Mentions in the chat (DECISIONS.md, "Oznaczanie na czacie (634 A)"): "@"
 // right before a character's whole name tags that character. A name has 2
 // to 20 signs, letters, digits, spaces, hyphens, apostrophes and
@@ -17,16 +18,26 @@ const FIRST_SIGN = /^\p{L}$/u;
 const LAST_SIGN = /^[\p{L}\p{N}]$/u;
 
 // The key a name is kept under (name_key), whatever its letter case.
+/** @param {unknown} name */
 export const mentionKey = (name) => String(name).toLowerCase();
+
+/** @typedef {{ written: string, key: string }} MentionName */
+/** @typedef {{ at: number, names: MentionName[] }} MentionPlace */
 
 // The places in `text` where "@" may start a name, in their order, each
 // with the names it may be there, the longest first: { at, names: [{
 // written, key }] }, `written` as the text has it and `key` for the lookup.
+/**
+ * @param {unknown} text
+ * @returns {MentionPlace[]}
+ */
 export function mentionPlaces(text) {
   const signs = Array.from(String(text ?? ''));
+  /** @type {MentionPlace[]} */
   const places = [];
   signs.forEach((sign, at) => {
     if (sign !== '@' || (at > 0 && WORD_SIGN.test(signs[at - 1])) || !FIRST_SIGN.test(signs[at + 1] ?? '')) return;
+    /** @type {MentionName[]} */
     const names = [];
     for (let end = at + 1; end < signs.length && end - at <= NAME_LENGTH.max && NAME_SIGN.test(signs[end]); end += 1) {
       if (end - at >= NAME_LENGTH.min && LAST_SIGN.test(signs[end]) && !WORD_SIGN.test(signs[end + 1] ?? '')) {
@@ -44,14 +55,21 @@ export function mentionPlaces(text) {
 // character) has, as { character, written }. Which of them may be tagged
 // is for the caller to say after this choice, so a longer name nobody may
 // tag never hands its place to a shorter one ("@Anna Maria" is never Anna).
+/**
+ * @template C
+ * @param {readonly MentionPlace[]} places
+ * @param {ReadonlyMap<string, C>} known
+ * @returns {{ character: C, written: string }[]}
+ */
 export function pickMentions(places, known) {
+  /** @type {{ character: C, written: string }[]} */
   const picked = [];
   const taken = new Set();
   for (const place of places) {
     const name = place.names.find((candidate) => known.has(candidate.key));
     if (!name || taken.has(name.key)) continue;
     taken.add(name.key);
-    picked.push({ character: known.get(name.key), written: name.written });
+    picked.push({ character: /** @type {C} */ (known.get(name.key)), written: name.written });
   }
   return picked;
 }
