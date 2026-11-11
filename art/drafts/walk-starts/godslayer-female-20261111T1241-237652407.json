@@ -1,0 +1,23 @@
+{
+  "id": "godslayer-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a lean hooded woman assassin in a black and deep crimson hooded cloak with torn edges, a black mask over the lower face, ornate black leather armour with dark red plates and gold filigree, a shattered golden halo hanging at the belt, one single long curved dagger glowing with red light in her right hand, only one dagger, the left hand empty, seen from the side in strict profile: the face, chest, hips and feet all turned fully to the right, only one eye visible, never towards the viewer, facing and walking to the right, standing tall, not crouching, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/godslayer-female.png",
+      "usage": "the character's look: face, hair, clothes, colours and what the hands hold"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen from the side, facing right, upright mid-step; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
