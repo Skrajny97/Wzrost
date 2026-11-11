@@ -1,0 +1,19 @@
+{
+  "id": "prophet-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "old man prophet with a clearly drawn face, a long white beard and long white hair, the nose, cheeks and mouth clearly visible, the beard starting below the mouth, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a narrow dark blue cloth blindfold embroidered with small golden stars tied across the eyes, with a dark outline, clearly separate from the pale skin and the white hair, never the colour of the skin, a flowing white and gold robe covered with golden sun and star embroidery, a long golden stole, a golden circlet with a small sun, golden jewelry, holding a tall golden staff topped with a radiant sun disc with an open eye in the middle, the whole sun disc inside the image, wise and calm, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/prophet-female.png",
+      "usage": "the same robe, golden stole, circlet, jewelry, colours and the same golden staff with the sun disc; the figure is an old man with a white beard, not this woman"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
