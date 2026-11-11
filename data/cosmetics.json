@@ -155,6 +155,24 @@
       "price": 800,
       "classId": "warrior",
       "look": "skin-perun"
+    },
+    {
+      "id": "dawn",
+      "kind": "outfit",
+      "name": "Szaty Świtu",
+      "description": "Białe szaty ze złotym haftem i kostur zwieńczony złotym słońcem. Kleryk nosi je na portrecie, w marszu i w siodle, przy każdej ewolucji.",
+      "price": 800,
+      "classId": "cleric",
+      "look": "skin-dawn"
+    },
+    {
+      "id": "eclipse",
+      "kind": "outfit",
+      "name": "Szata Zaćmienia",
+      "description": "Granatowa szata z wysokim kołnierzem, srebrnym półksiężycem i gwiazdami oraz kostur z czarnym kryształem. Mag nosi ją na portrecie, w marszu i w siodle, przy każdej ewolucji.",
+      "price": 800,
+      "classId": "mage",
+      "look": "skin-eclipse"
     }
   ],
   "texts": {

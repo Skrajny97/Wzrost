@@ -3034,6 +3034,15 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.59 (11.11.2026): Szaty Świtu i Szata Zaćmienia w Sklepie Systemu
+
+Autor 11.11.2026: „Te płatności jutro (a właściwie dzisiaj) ogarniemy po wprowadzeniu wszystkich nowych skórek.” Ostatnie grafiki obu skórek autor przyjął na stronie ocen 10.11 po 23:00 (775.5 v5, 776.7 v5, 776.8 v5 i 776.6 v6 B).
+
+1. **Dwie nowe skórki** w dziale „Skórki” Sklepu Systemu, po 800 Punktów Systemu, jak poprzednie (0.2.50, 0.2.56): Szaty Świtu dla Kleryka (białe szaty ze złotym haftem i kostur zwieńczony złotym słońcem) i Szata Zaćmienia dla Maga (granatowa szata z wysokim kołnierzem, półksiężycem i gwiazdami oraz kostur z czarnym kryształem). Tym samym w grze jest całe pięć skórek z pierwszej listy (763 A).
+2. **Odcienie skóry.** Maski portretów są w `tools/evolution-tones.json`, chodów w `tools/walk-tones.json`, a jazdy w `tools/rider-tones.json`. W chodzie Kleryczki Świtu skórą w każdej klatce są tylko twarz i dłonie: lista pikseli zdejmuje przypadkowe trafienia na złotych lamówkach, rękawach i butach, a dodaje dłoń w cieniu, której kolorów nie ma na portrecie.
+3. **Chowańce na portretach.** Obie skórki trzymają głowicę kostura przy ramieniu, na którym zwykle siada kruk, więc kruk siada na drugim ramieniu (`petSpots` w `src/client/art.js`), z dala od tego, co postać trzyma (zasada z 0.1.77). Błędny ognik unosi się jak zwykle po drugiej stronie głowy.
+4. **803 A (autor 10.11.2026): leczenie bez trafień krytycznych.** Percepcja daje szansę na trafienie krytyczne tylko przy ciosach. Siłę leczenia podnosi Mądrość, a nie Percepcja.
+
 ## Wersja 0.2.58 (11.11.2026): rezerwa w zakładce Wojna nie rozpycha strony
 
 Autor 11.11.2026, ze zrzutami z telefonu: „to nie dzieje sie na IPhonie a na Samsung Galaxy S23 Ultra i dalej sie to dzieje w takiej kolejności jak pisałem, styl strony sie rozwala w ogóle”.

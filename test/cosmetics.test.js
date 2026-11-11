@@ -41,6 +41,8 @@ describe('the Sklep Systemu in the engine', () => {
         ['night-raven', 'outfit', 'Płaszcz Nocnego Kruka', 800],
         ['forest-lord', 'outfit', 'Strój Leśnego Pana', 800],
         ['perun', 'outfit', 'Pancerz Peruna', 800],
+        ['dawn', 'outfit', 'Szaty Świtu', 800],
+        ['eclipse', 'outfit', 'Szata Zaćmienia', 800],
       ],
     );
     // A name in its frame's colour: gold brighter than the names' own gold.

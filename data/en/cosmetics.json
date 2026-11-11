@@ -64,6 +64,14 @@
     "perun": {
       "name": "Armour of Perun",
       "description": "Blackened steel armour with copper lightning, a wolf fur over the shoulders and a helmet with aurochs horns. The Warrior wears it on the portrait, on the march and in the saddle, at every evolution."
+    },
+    "dawn": {
+      "name": "Vestments of Dawn",
+      "description": "White vestments with gold embroidery and a staff crowned with a golden sun. The Cleric wears them on the portrait, on the march and in the saddle, at every evolution."
+    },
+    "eclipse": {
+      "name": "Robe of the Eclipse",
+      "description": "A navy robe with a high collar, a silver crescent and stars, and a staff with a black crystal. The Mage wears it on the portrait, on the march and in the saddle, at every evolution."
     }
   },
   "texts": {

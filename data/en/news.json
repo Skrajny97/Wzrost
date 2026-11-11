@@ -448,6 +448,10 @@
     "0.2.58": {
       "title": "Version 0.2.58",
       "body": "- The Guild's War tab: with many members in the reserve, their portraits now wrap into several rows. The page is no longer wider than the screen, so on Android phones What's new? and other windows open normally, without the view sliding sideways."
+    },
+    "0.2.59": {
+      "title": "Version 0.2.59",
+      "body": "- Two new outfits in the System Shop: the Vestments of Dawn for the Cleric and the Robe of the Eclipse for the Mage. Your character wears them on the portrait, on the march and in the saddle, at every evolution and in their own skin tone."
     }
   }
 }

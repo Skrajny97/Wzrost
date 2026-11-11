@@ -81,6 +81,7 @@ export const SPRITES = {
       // The outfits of the Sklep Systemu (skórki, 763 A), <look>-<appearance>.
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
+      'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
     ],
     faces: {
       'archer-female': 49, 'archer-male': 52, 'cleric-male': 49, 'shadow-male': 51, 'warrior-male': 50,
@@ -95,6 +96,7 @@ export const SPRITES = {
       'kingslayer-male': 54, 'necromancer-female': 44, 'necromancer-male': 49, 'phantom-male': 45,
       'skin-night-raven-female': 50, 'skin-night-raven-male': 51, 'skin-forest-lord-female': 51, 'skin-forest-lord-male': 52,
       'skin-perun-female': 49, 'skin-perun-male': 49,
+      'skin-dawn-female': 48, 'skin-dawn-male': 52, 'skin-eclipse-female': 50, 'skin-eclipse-male': 50,
     },
     perches: {
       'warrior-female': [32, 38], 'warrior-male': [34, 40], 'archer-female': [34, 41], 'archer-male': [35, 36], 'mage-female': [34, 41],
@@ -114,6 +116,7 @@ export const SPRITES = {
       'necromancer-female': [30, 38], 'necromancer-male': [37, 32], 'phantom-female': [36, 35], 'phantom-male': [39, 42],
       'skin-night-raven-female': [33, 40], 'skin-night-raven-male': [33, 38], 'skin-forest-lord-female': [37, 41], 'skin-forest-lord-male': [38, 40],
       'skin-perun-female': [32, 38], 'skin-perun-male': [34, 40],
+      'skin-dawn-female': [36, 40], 'skin-dawn-male': [36, 38], 'skin-eclipse-female': [38, 36], 'skin-eclipse-male': [38, 34],
     },
     // `petSpots`: a pet's own place on a portrait where its usual one would
     // cover what the figure holds at the shoulder (a falcon, a staff's head,
@@ -122,7 +125,12 @@ export const SPRITES = {
     // są źle ustawione przy Łowcy"). The wisp floats there, mostly behind the
     // head; the raven perches beside the Łowca's head, not on its hair.
     petSpots: {
-      raven: { 'hunter-female': [5, 13], 'hunter-male': [9, 12] },
+      // The Szaty Świtu and the Szata Zaćmienia hold a staff's head at the
+      // shoulder where the raven perches: it sits on the other shoulder.
+      raven: {
+        'hunter-female': [5, 13], 'hunter-male': [9, 12],
+        'skin-dawn-female': [51, 14], 'skin-dawn-male': [50, 12], 'skin-eclipse-female': [49, 10], 'skin-eclipse-male': [49, 8],
+      },
       wisp: {
         'arcanist-female': [-3, 52], 'arcanist-male': [-3, 52], 'archmage-female': [-1, 11], 'archmage-male': [-1, 11],
         'druid-female': [64, 4], 'druid-male': [2, 8], 'elementalist-female': [1, 14], 'healer-female': [-2, 16], 'healer-male': [-3, 14],
@@ -145,6 +153,7 @@ export const SPRITES = {
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
+      'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
     ],
   },
   items: {
@@ -235,6 +244,7 @@ export const SPRITES = {
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
+      'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
     ],
   },
   // The ethereal narrator of the introduction, reading its scroll (narrator.js).
@@ -504,6 +514,7 @@ export const SPRITES = {
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
+      'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
     ],
   },
 };
