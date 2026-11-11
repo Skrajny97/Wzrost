@@ -1,0 +1,14 @@
+{
+  "id": "rider4-shadow-lord-female",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, the lower half of a pale young woman lady of shadows in dark grey and black fitted armour with silver edges and a long black cloak, riding: seated astride a horse that is not drawn, seen strictly from the side and facing right; the black cloak that ends at the bottom of the upper half continues on without a break, flowing back and down behind her over the back of the horse that is not drawn, to the level of the knee, its whole edge a clean smooth curve with a crisp dark outline, solid, no smoke, no tatters, no holes; the hips sit on the saddle, the near thigh in black armour lies forward along the horse's back, the near lower leg in a dark armoured boot hangs straight down from the knee, the boot rests level in a stirrup that is not drawn; only the near leg is seen; the same colours, outline, pixel size and shading as the upper half above, which stays as it is; nothing else: no horse, no saddle, no reins, no ground, no loose or scattered pixels, transparent background",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": "art/inputs/riders4/shadow-lord-female.png",
+  "mask": "art/inputs/riders4/shadow-lord-female-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

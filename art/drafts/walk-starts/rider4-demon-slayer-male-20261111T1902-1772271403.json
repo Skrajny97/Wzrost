@@ -1,0 +1,14 @@
+{
+  "id": "rider4-demon-slayer-male",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, the lower half of a broad strong man holy demon hunter in gleaming silver plate armour with golden sun engravings, a long white tabard with a golden sun and a long pale grey and white cloak hanging from his shoulders, nothing at the belt, riding: seated astride a horse that is not drawn, seen strictly from the side and facing right; the pale cloak that ends at the bottom of the upper half continues on without a break, straight down behind his back and hips over the back of the horse that is not drawn, to the level of the knee, its lower edge clean and outlined; the hips sit on the saddle, the white tabard falls over the near thigh, the near thigh in silver plate lies forward along the horse's back, the near lower leg in a silver greave hangs straight down from the knee, the silver sabaton rests level in a stirrup that is not drawn; only the near leg is seen; the same colours, outline, pixel size and shading as the upper half above, which stays as it is; nothing else: no horse, no saddle, no reins, no ground, no loose or scattered pixels, transparent background",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": "art/inputs/riders4/demon-slayer-male.png",
+  "mask": "art/inputs/riders4/demon-slayer-male-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
