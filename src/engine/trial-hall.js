@@ -1,3 +1,4 @@
+// @ts-check
 // The Sala prób in the Osada (data/settlement.json, trialHall; DECISIONS.md,
 // "Sala prób"). The author: „jakieś miejsce w Osadzie "Sala prób", którego
 // przejście odblokowuje dostęp do wyższej instancji niż dopuszczalna” and
@@ -22,17 +23,39 @@ import { createRng } from './rng.js';
 import { say, word } from './text.js';
 import { areaUnlocked } from './unlocks.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {{ id: string, minLevel: number } & Record<string, any>} Area An inner region (data/areas.json). */
+/** @typedef {{ elite: boolean, members: { monsterId: string, level: number }[] }} Encounter */
+
+/**
+ * @param {Content} content
+ * @returns {Record<string, any> | null}
+ */
 export const trialHallOf = (content) => content.settlement?.trialHall ?? null;
 
 // Whether a place is open to a character: by its class level, or opened
 // early in the Sala prób.
+/**
+ * @param {Area} area
+ * @param {number} classLevel
+ * @param {string | null | undefined} early
+ * @param {Content} content
+ * @returns {boolean}
+ */
 export const areaOpenFor = (area, classLevel, early, content) => areaUnlocked(area, classLevel, content) || (Boolean(early) && area.id === early);
 
 // The place the Sala prób tests a character of `classLevel` for: the first
 // one its class level has not opened yet, with whether it has passed that
 // trial already (`passed`); null once every place is open.
+/**
+ * @param {number} classLevel
+ * @param {string | null | undefined} early
+ * @param {Content} content
+ * @returns {{ area: Area, passed: boolean } | null}
+ */
 export function trialTarget(classLevel, early, content) {
-  const area = content.areas.find((one) => !areaUnlocked(one, classLevel, content));
+  /** @type {Area | undefined} */
+  const area = content.areas.find((/** @type {Area} */ one) => !areaUnlocked(one, classLevel, content));
   return area ? { area, passed: area.id === early } : null;
 }
 
@@ -40,14 +63,21 @@ export function trialTarget(classLevel, early, content) {
 // own (those its first level lets come), then its elite (a third encounter
 // where it has none), every creature at the place's first level, the elite
 // as many levels above as on an exploration.
+/**
+ * @param {Area} area
+ * @param {unknown} seed
+ * @param {Content} content
+ * @returns {Encounter[]}
+ */
 export function trialEncounters(area, seed, content) {
   const rng = createRng(`${seed}:encounters`);
   const level = area.minLevel;
   const open = encountersFor(area, level);
   const pool = open.length > 0 ? open : area.encounters;
+  /** @returns {Encounter} */
   const regular = () => {
-    const group = rng.weighted(pool, (encounter) => encounter.weight ?? 1);
-    return { elite: false, members: group.monsters.map((monsterId) => ({ monsterId, level })) };
+    const group = rng.weighted(/** @type {{ weight?: number, monsters: string[] }[]} */ (pool), (encounter) => encounter.weight ?? 1);
+    return { elite: false, members: group.monsters.map((/** @type {string} */ monsterId) => ({ monsterId, level })) };
   };
   const elite = area.elite
     ? { elite: true, members: [{ monsterId: area.elite, level: level + content.balance.hunt.eliteLevelBonus }] }
@@ -65,31 +95,41 @@ export function trialEncounters(area, seed, content) {
 // it knows; the healing ones are drunk below `healBelow`, one at a time, as
 // on an exploration. Returns a hunt for applyHunt and huntReport, with
 // `hall`.
+/**
+ * @param {{ character: Record<string, any>, equipped: Record<string, any>[], name: string, area: Area, seed: unknown, potions?: Record<string, number>, healBelow?: number, companions?: Record<string, any>[], trophies?: Record<string, any> }} trial
+ * @param {Content} content
+ */
 export function trialHallFights({ character, equipped, name, area, seed, potions = {}, healBelow, companions = [], trophies = {} }, content) {
-  const hall = trialHallOf(content);
+  const hall = /** @type {Record<string, any>} */ (trialHallOf(content));
   const rng = createRng(`${seed}:fights`);
   const rewards = content.balance.rewards;
   const pace = explorationPace(hall.rewardMinutes, content);
   const lengthed = pace.timeFactor * (1 + pace.lengthBonus);
   const partyXp = 1 - companions.length * content.settlement.companions.xpCost;
   const strength = exploreStrength(area, character.level, content);
-  const player = playerCombatant({ character, equipped, name, area }, content);
+  const player = playerCombatant(/** @type {any} */ ({ character, equipped, name, area }), content);
+  /** @type {Record<string, number>} */
   const left = { ...potions };
+  /** @type {Record<string, number>} */
   const potionsUsed = {};
   let hp = player.hp;
   const mates = companions.map((companion, index) => {
-    const unit = companionCombatant(companion, { area, id: `a${index + 1}` }, content);
+    const unit = companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}` }), content);
     return { unit, hp: unit.hp };
   });
 
+  /** @type {Record<string, any>[]} */
   const fights = [];
+  /** @type {string[]} */
   const lines = [];
   let xp = 0;
   let gold = 0;
+  /** @type {Record<string, number>} */
   let materials = {};
   let won = true;
   for (const [index, encounter] of trialEncounters(area, seed, content).entries()) {
-    const enemies = encounterCombatants(encounter, content, { strength });
+    /** @type {Record<string, any>[]} */
+    const enemies = encounterCombatants(encounter, content, /** @type {any} */ ({ strength }));
     const kit = fightPotions(left, healBelow ?? content.potionUse?.healBelow, content);
     const ally = {
       ...player,
@@ -101,8 +141,10 @@ export function trialHallFights({ character, equipped, name, area, seed, potions
     const allies = [ally, ...fighting.map((mate) => ({ ...mate.unit, hp: mate.hp }))];
     const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
     const hpBefore = hp;
-    hp = Math.max(0, fight.units.find((unit) => unit.id === player.id).hp);
-    for (const mate of fighting) mate.hp = Math.max(0, fight.units.find((unit) => unit.id === mate.unit.id).hp);
+    /** @param {string} id */
+    const unitHp = (id) => /** @type {{ hp: number }} */ (fight.units.find((/** @type {{ id: string }} */ unit) => unit.id === id)).hp;
+    hp = Math.max(0, unitHp(player.id));
+    for (const mate of fighting) mate.hp = Math.max(0, unitHp(mate.unit.id));
     for (const id of fight.drunk) {
       left[id] = (left[id] ?? 0) - 1;
       potionsUsed[id] = (potionsUsed[id] ?? 0) + 1;
@@ -112,6 +154,7 @@ export function trialHallFights({ character, equipped, name, area, seed, potions
 
     let fightXp = 0;
     let fightGold = 0;
+    /** @type {Record<string, number>} */
     let fightMaterials = {};
     if (fight.won === true) {
       for (const enemy of enemies) {

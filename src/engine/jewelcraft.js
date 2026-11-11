@@ -1,3 +1,4 @@
+// @ts-check
 // Jubilerstwo (data/professions.json: jewelcrafting and minerals): the
 // character makes rings, amulets and talismans in the Systemowa Szlifiernia
 // the way Rzemieślnictwo makes the rest of the gear (workshop.js, 537 A). The
@@ -19,12 +20,27 @@ import { createRng } from './rng.js';
 import { say } from './text.js';
 import { metNames } from './workshop.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {Record<string, any>} Base An item base (data/item-bases.json). */
+/** @typedef {Record<string, any>} Mineral An ore or a gem (data/professions.json: minerals). */
+/** @typedef {Record<string, any>} Item An item, as items.js makes it. */
+/** @typedef {{ made: boolean, item?: Item }} JewelResult One jewel of an order: whether it came out, and the item if so. */
+
 // The bases of the slots Jubilerstwo makes (its `ores`), in the data's order.
-export const jewelBases = (content) => content.bases.filter((base) => content.jewelcrafting.ores[base.slot]);
+/**
+ * @param {Content} content
+ * @returns {Base[]}
+ */
+export const jewelBases = (content) => content.bases.filter((/** @type {Base} */ base) => content.jewelcrafting.ores[base.slot]);
 
 // The profession level a base's pattern opens at, as in the Warsztat: the
 // first base of a family at once, a later one from laterPatternLevel, and
 // not before the class level it asks for.
+/**
+ * @param {Base} base
+ * @param {Content} content
+ * @returns {number}
+ */
 export const jewelPatternLevel = (base, content) => (base.classLevel ? Math.max(content.jewelcrafting.laterPatternLevel, base.classLevel) : 1);
 
 // Whether the character knows a jewel's pattern: by the profession's level,
@@ -32,29 +48,67 @@ export const jewelPatternLevel = (base, content) => (base.classLevel ? Math.max(
 // as the Warsztat's), as in the Warsztat (the author: "Rozbieranie
 // przedmiotów jak pierścienie czy talizmany też powinny dawać dostępy do
 // wyższych tierów jeśli chodzi o jubilerstwo tak jak w Rzemiośle jest").
+/**
+ * @param {Base} base
+ * @param {number} level
+ * @param {string[]} learned
+ * @param {Content} content
+ */
 export const knowsJewelPattern = (base, level, learned, content) => jewelPatternLevel(base, content) <= level || learned.includes(base.id);
 
 // The patterns the character knows at a level of Jubilerstwo.
+/**
+ * @param {number} level
+ * @param {string[]} learned
+ * @param {Content} content
+ */
 export const knownJewelPatterns = (level, learned, content) => jewelBases(content).filter((base) => knowsJewelPattern(base, level, learned, content));
 
 // The pattern a jewel taken apart teaches, or null: its base's, if the
 // profession's first level does not show it already and the character has
 // not learned it yet (patternFrom in workshop.js for the Warsztat).
+/**
+ * @param {Item} item
+ * @param {string[]} learned
+ * @param {Content} content
+ * @returns {string | null}
+ */
 export function jewelPatternFrom(item, learned, content) {
   const base = content.basesById[item.base];
   return base && content.jewelcrafting.ores[base.slot] && jewelPatternLevel(base, content) > 1 && !learned.includes(base.id) ? base.id : null;
 }
 
 // The gem that gives jewellery a rarity, and the ore its setting takes.
-export const gemOf = (rarityId, content) => content.minerals.find((mineral) => mineral.kind === 'gem' && mineral.rarity === rarityId);
-export const oreOf = (rarityId, content) => content.minerals.find((mineral) => mineral.kind === 'ore' && mineral.for.includes(rarityId));
+/**
+ * @param {string} rarityId
+ * @param {Content} content
+ * @returns {Mineral | undefined}
+ */
+export const gemOf = (rarityId, content) => content.minerals.find((/** @type {Mineral} */ mineral) => mineral.kind === 'gem' && mineral.rarity === rarityId);
+/**
+ * @param {string} rarityId
+ * @param {Content} content
+ * @returns {Mineral | undefined}
+ */
+export const oreOf = (rarityId, content) => content.minerals.find((/** @type {Mineral} */ mineral) => mineral.kind === 'ore' && mineral.for.includes(rarityId));
 
 // The gems a level of Jubilerstwo cuts and sets: those Górnictwo finds by
 // the same level of its own.
-export const knownGems = (level, content) => content.minerals.filter((mineral) => mineral.kind === 'gem' && mineral.level <= level);
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {Mineral[]}
+ */
+export const knownGems = (level, content) => content.minerals.filter((/** @type {Mineral} */ mineral) => mineral.kind === 'gem' && mineral.level <= level);
 
 // The chance a jewel of a rarity comes out at a level: every level adds
 // chancePerLevel, up to maxChance, unless the rarity always comes out.
+/**
+ * @param {string} rarityId
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
 export function jewelChance(rarityId, level, content) {
   const { chances, chancePerLevel, maxChance } = content.jewelcrafting;
   const chance = chances[rarityId];
@@ -62,43 +116,81 @@ export function jewelChance(rarityId, level, content) {
 }
 
 // A rarity's step: 1 for common, 2 for rare and so on.
-const rarityStep = (rarityId, content) => content.rarities.findIndex((rarity) => rarity.id === rarityId) + 1;
+/**
+ * @param {string} rarityId
+ * @param {Content} content
+ * @returns {number}
+ */
+const rarityStep = (rarityId, content) => content.rarities.findIndex((/** @type {{ id: string }} */ rarity) => rarity.id === rarityId) + 1;
 
 // The share of the first level's time a level takes: each level takes
 // speedPerLevel of it off, down to `fastest` of it.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
 const pace = (level, content) => Math.max(content.jewelcrafting.fastest, 1 - content.jewelcrafting.speedPerLevel * (level - 1));
 
 // Minutes rounded up to whole ones (and to a thousandth first, as the
 // Warsztat's orders).
+/** @param {number} minutes */
 const wholeMinutes = (minutes) => Math.ceil(Math.round(minutes * 1000) / 1000);
 
 // The minutes of one jewel of a rarity at a level: rarityTime times longer
 // for each rarity up, at the level's pace; and an order of `count` in whole
 // minutes.
+/**
+ * @param {string} rarityId
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
 export function jewelMinutes(rarityId, level, content) {
   const { itemMinutes, rarityTime } = content.jewelcrafting;
   return itemMinutes * rarityTime ** (rarityStep(rarityId, content) - 1) * pace(level, content);
 }
+/**
+ * @param {number} count
+ * @param {string} rarityId
+ * @param {number} level
+ * @param {Content} content
+ */
 export const jewelOrderMinutes = (count, rarityId, level, content) => wholeMinutes(count * jewelMinutes(rarityId, level, content));
 
 // What `count` jewels of a base and rarity take, by mineral id: a gem of
 // the rarity each, and the ore of its setting, as much as the slot takes.
+/**
+ * @param {Base} base
+ * @param {string} rarityId A rarity that has a gem and an ore.
+ * @param {number} count
+ * @param {Content} content
+ * @returns {Record<string, number>}
+ */
 export function jewelCost(base, rarityId, count, content) {
-  return { [gemOf(rarityId, content).id]: count, [oreOf(rarityId, content).id]: content.jewelcrafting.ores[base.slot] * count };
+  const gem = /** @type {Mineral} */ (gemOf(rarityId, content));
+  const ore = /** @type {Mineral} */ (oreOf(rarityId, content));
+  return { [gem.id]: count, [ore.id]: content.jewelcrafting.ores[base.slot] * count };
 }
 
 // The `count` jewels of an order, one after another from the seed: whether
 // each came out and, if so, the item, of the gem's rarity at the
 // character's level, with affixes named by the creatures met. An order
 // stopped early keeps the draws of the jewels it made.
+/**
+ * @param {{ baseId: string, rarityId: string, count: number, level: number, professionLevel: number, met?: string[], seed: string }} order
+ * @param {Content} content
+ * @returns {JewelResult[]}
+ */
 export function craftJewels({ baseId, rarityId, count, level, professionLevel, met = [], seed }, content) {
   const rng = createRng(seed);
   const chance = jewelChance(rarityId, professionLevel, content);
   const area = metNames(met, content);
+  /** @type {JewelResult[]} */
   const results = [];
   for (let index = 0; index < count; index += 1) {
     const made = rng.chance(chance);
-    results.push(made ? { made, item: generateItem({ baseId, level, rarityId, area }, rng, content) } : { made });
+    results.push(made ? { made, item: generateItem(/** @type {any} */ ({ baseId, level, rarityId, area }), rng, content) } : { made });
   }
   return results;
 }
@@ -106,6 +198,11 @@ export function craftJewels({ baseId, rarityId, count, level, professionLevel, m
 // The minutes of setting a gem at a level of Jubilerstwo: setting.minutes
 // for the commonest gem, rarityTime times longer for each rarity up, at the
 // level's pace, in whole minutes.
+/**
+ * @param {string} gemId
+ * @param {number} level
+ * @param {Content} content
+ */
 export function setMinutes(gemId, level, content) {
   const { minutes, rarityTime } = content.jewelcrafting.setting;
   return wholeMinutes(minutes * rarityTime ** (rarityStep(content.mineralsById[gemId].rarity, content) - 1) * pace(level, content));
@@ -119,13 +216,37 @@ export function setMinutes(gemId, level, content) {
 // it, or null when the item was gone and the gem came back, and the gem
 // that was in it before). `learned`: the patterns the character learned by
 // taking jewels apart, which a new level does not reveal again.
+/**
+ * @typedef {object} JewelWork A finished work of the Szlifiernia, as the server hands it over.
+ * @property {Base} [base] The pattern of an order of jewellery (none for a gem set).
+ * @property {string} [rarityId] The rarity of the order's jewels.
+ * @property {JewelResult[]} [results] The order's jewels.
+ * @property {{ gem: string, item: Item | null, replaced?: string | null }} [set] A gem set instead of an order.
+ * @property {string[]} [learned]
+ * @property {number} minutes
+ * @property {number} startedAt
+ * @property {number} endsAt
+ * @property {string} seed
+ * @property {boolean} [stopped]
+ * @property {{ level: number } & Record<string, any>} before The profession before the work.
+ * @property {{ level: number } & Record<string, any>} after The profession after it.
+ * @property {{ level: number } & Record<string, any>} character The character before the work.
+ * @property {number} xp
+ * @property {{ level: number, timePoints: number, messages: string[] } & Record<string, any>} work The character's gains (workGains).
+ */
+/**
+ * @param {JewelWork} done
+ * @param {Content} content
+ */
 export function jewelReport({ base, rarityId, results = [], set, learned = [], minutes, startedAt, endsAt, seed, stopped, before, after, character, xp, work }, content) {
   const { jewelcrafting } = content;
   const texts = jewelcrafting.texts;
   const profession = content.professionsById[jewelcrafting.profession];
+  /** @param {number} level */
   const opened = (level) => level > before.level && level <= after.level;
   const patterns = jewelBases(content).filter((candidate) => opened(jewelPatternLevel(candidate, content)) && !learned.includes(candidate.id));
-  const gems = content.minerals.filter((mineral) => mineral.kind === 'gem' && opened(mineral.level));
+  /** @type {Mineral[]} */
+  const gems = content.minerals.filter((/** @type {Mineral} */ mineral) => mineral.kind === 'gem' && opened(mineral.level));
   const report = {
     kind: 'jewels',
     placeName: jewelcrafting.place.name,
@@ -157,15 +278,16 @@ export function jewelReport({ base, rarityId, results = [], set, learned = [], m
       },
     };
   }
-  const made = results.filter((result) => result.made).map((result) => result.item);
+  const pattern = /** @type {Base} */ (base);
+  const made = results.filter((result) => result.made).map((result) => /** @type {Item} */ (result.item));
   const failed = results.length - made.length;
   return {
     ...report,
-    base: { id: base.id, name: base.name },
-    rarity: { id: rarityId, name: content.raritiesById[rarityId].name },
+    base: { id: pattern.id, name: pattern.name },
+    rarity: { id: rarityId, name: content.raritiesById[/** @type {string} */ (rarityId)].name },
     items: made.map((item) => itemView(item, content)),
     failed,
-    made: made.length > 0 ? say(texts, 'made', 0, { items: countList({ [base.id]: made.length }, content.basesById) }) : null,
-    failedText: failed > 0 ? say(texts, 'failed', 0, { items: countList({ [base.id]: failed }, content.basesById) }) : null,
+    made: made.length > 0 ? say(texts, 'made', 0, { items: countList({ [pattern.id]: made.length }, content.basesById) }) : null,
+    failedText: failed > 0 ? say(texts, 'failed', 0, { items: countList({ [pattern.id]: failed }, content.basesById) }) : null,
   };
 }
