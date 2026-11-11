@@ -1,0 +1,14 @@
+{
+  "id": "prophet-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman prophetess, long golden hair, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a sheer golden blindfold over the eyes, a flowing white and gold robe covered with golden sun and star embroidery, a long golden stole, a golden circlet with a small sun, golden jewelry, holding a tall golden staff topped with a radiant sun disc with an open eye in the middle, the whole sun disc inside the image, wise and calm, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

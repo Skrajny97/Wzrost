@@ -1,0 +1,14 @@
+{
+  "id": "demon-slayer-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman legendary holy demon hunter, strong, dark hair in a long braid, a stern scarred face, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, gleaming silver plate armour with golden sun engravings and glowing golden runes, a long white tabard with a golden sun, a short white cape with gold trim, chains with sealed parchment prayer scrolls on the pauldrons, a pair of broken black demon horns hanging at the belt as a trophy, holding a huge two-handed greatsword engraved with glowing golden runes, the blade pointing down and resting in front of the feet, the whole sword inside the image, stern and fearless, no hammer, no black armour, no red cloak, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

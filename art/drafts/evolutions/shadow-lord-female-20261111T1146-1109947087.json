@@ -1,0 +1,14 @@
+{
+  "id": "shadow-lord-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman lady of shadows, pale skin, long silver hair, glowing violet eyes, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, dark grey and black fitted armour with silver edges, a silver circlet, a long flowing cloak of black shadow that dissolves into dark smoke at the edges, holding two long thin curved blades of black steel with glowing violet edges, faint violet afterimages of the blades, the whole cloak and both blades inside the image, solid figure, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
