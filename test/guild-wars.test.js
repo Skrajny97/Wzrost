@@ -440,6 +440,77 @@ describe('the guild wars through the API', () => {
     assert.deepEqual([none.war, none.none], [null, made.created_at > drawn.drawn_at ? 'late' : 'noRival']);
   });
 
+  // A character of an account that has one in the rival guild too (made or
+  // moved there after the draw) fights on neither side, so nobody fights
+  // itself and takes the reward for free (11.11.2026).
+  test('an account with characters on both sides of a war fights on neither', async () => {
+    await player('alfa', 'Alfa', { level: 60 });
+    await player('beta', 'Beta', { level: 30, classId: 'mage' });
+    await makeClimber(await db(), ids.alfa);
+    await guild('alfa', 'Mocarze', 'MOC');
+    const weak = await guild('beta', 'Słabi', 'SŁ');
+    await cron(week().startsAt + 60000);
+    assert.equal((await all('SELECT * FROM guild_wars WHERE week = ?', week().key)).length, 1);
+    await clone(ids.alfa, 'Bliźniak', weak);
+    const before = await first('SELECT gold, system_points FROM characters WHERE id = ?', ids.alfa);
+    await cron(week().battles[0]);
+    const war = await first('SELECT days_done FROM guild_wars WHERE week = ?', week().key);
+    assert.equal(war.days_done, 1);
+    assert.equal((await all('SELECT * FROM guild_war_battles')).length, 0);
+    assert.deepEqual(await first('SELECT gold, system_points FROM characters WHERE id = ?', ids.alfa), before);
+  });
+
+  // The database gives the highest id of a removed character again: a
+  // character made after a battle did not fight it, whatever its id.
+  test("a battle is a character's own only when it was there to fight it", async () => {
+    await player('alfa', 'Alfa', { level: 60 });
+    await player('beta', 'Beta', { level: 30, classId: 'mage' });
+    await makeClimber(await db(), ids.alfa);
+    await guild('alfa', 'Mocarze', 'MOC');
+    await guild('beta', 'Słabi', 'SŁ');
+    await cron(week().startsAt + 60000);
+    await cron(week().battles[0]);
+    const [battle] = await all('SELECT id, at FROM guild_war_battles');
+    const line = async () => (await as('alfa', 'GET', '/api/guild/war')).data.war.battles[0];
+    assert.equal((await line()).fought, true);
+    await run('UPDATE characters SET created_at = ? WHERE id = ?', battle.at + 1, ids.alfa);
+    assert.deepEqual([(await line()).fought, (await line()).reward], [false, null]);
+    const replay = (await as('alfa', 'GET', `/api/guild/war/battles/${battle.id}`)).data.battle;
+    assert.deepEqual([replay.fought, replay.reward], [false, null]);
+  });
+
+  // Last week's Sława is frozen once none of its wars is unfinished: a war
+  // that cannot be fought now (here a member's broken row) holds it, and
+  // once fought its win counts (11.11.2026).
+  test("last week's Sława waits for its wars to end, and the war won counts in it", async () => {
+    await player('alfa', 'Alfa', { level: 60 });
+    await player('beta', 'Beta', { level: 30, classId: 'mage' });
+    await makeClimber(await db(), ids.alfa);
+    const strong = await guild('alfa', 'Mocarze', 'MOC');
+    const weak = await guild('beta', 'Słabi', 'SŁ');
+    const broken = await clone(ids.alfa, 'Zepsuty', strong);
+    const previous = warWeek(week().startsAt - 1, content).key;
+    await run(
+      "INSERT INTO guild_wars (week, guild_a, guild_b, name_a, tag_a, members_a, name_b, tag_b, members_b, seed, created_at) VALUES (?, ?, ?, 'Mocarze', 'MOC', 2, 'Słabi', 'SŁ', 1, 'ziarno', 0)",
+      previous,
+      strong,
+      weak,
+    );
+    await run("UPDATE characters SET points = 'x' WHERE id = ?", broken);
+    // The week not frozen yet, as at its first request (the guilds' pages
+    // above froze it, before the war was there).
+    await run('DELETE FROM guild_fame');
+    const champion = async () => (await as('beta', 'GET', '/api/character')).data.championTag;
+    assert.equal(await champion(), null);
+    assert.equal((await first('SELECT COUNT(*) AS n FROM guild_fame WHERE week = ?', previous)).n, 0);
+    assert.equal((await first('SELECT days_done FROM guild_wars WHERE week = ?', previous)).days_done, 0);
+    await run("UPDATE characters SET points = '{}' WHERE id = ?", broken);
+    assert.equal(await champion(), 'MOC');
+    const war = await first('SELECT days_done, result FROM guild_wars WHERE week = ?', previous);
+    assert.deepEqual([war.days_done, war.result], [7, 'a']);
+    assert.equal((await first('SELECT points FROM guild_fame WHERE week = ? AND guild_id = ?', previous, strong)).points, content.guilds.fame.war.won);
+  });
+
   test("a week's rivals are drawn once, and not after its first battles; guilds of one account never meet", async () => {
     await player('alfa', 'Alfa');
     await player('beta', 'Beta');

@@ -18,7 +18,7 @@
 // best guild of the week before (the most Sława, if any; of two with as
 // much, the older) has its tag in gold the whole week (380 C).
 
-import { countedForm, questPeriod } from '../engine/index.js';
+import { WAR_DAYS, countedForm, questPeriod } from '../engine/index.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { guildWarsOn } from './features.js';
@@ -116,12 +116,18 @@ export async function championOf(db, now) {
   let best = await bestStatement(db, previous.key).first();
   if (!best) {
     // The guild wars of that week end first, should the cron have missed
-    // their Sunday's battles (guild-wars.js): the war won counts.
-    if (guildWarsOn()) await settleWars(db, now).catch((error) => console.error(error));
+    // their Sunday's battles (guild-wars.js): the war won counts. Where the
+    // wars are on, the week is frozen only once none of its wars is
+    // unfinished (11.11.2026: else a war still being fought by another run,
+    // or one that failed, lost its Sława for good); until then the next
+    // request tries again.
+    const wars = guildWarsOn();
+    if (wars) await settleWars(db, now).catch((error) => console.error(error));
     const fame = weekFame(previous);
+    const finished = wars ? ' AND NOT EXISTS (SELECT 1 FROM guild_wars WHERE week = ? AND days_done < ?)' : '';
     await db
-      .prepare(`INSERT OR IGNORE INTO guild_fame (guild_id, week, points) SELECT guild_id, ?, points FROM (${fame.sql}) WHERE NOT EXISTS (SELECT 1 FROM guild_fame WHERE week = ?)`)
-      .bind(previous.key, ...fame.binds, previous.key)
+      .prepare(`INSERT OR IGNORE INTO guild_fame (guild_id, week, points) SELECT guild_id, ?, points FROM (${fame.sql}) WHERE NOT EXISTS (SELECT 1 FROM guild_fame WHERE week = ?)${finished}`)
+      .bind(previous.key, ...fame.binds, previous.key, ...(wars ? [previous.key, WAR_DAYS] : []))
       .run();
     best = await bestStatement(db, previous.key).first();
   }

@@ -60,8 +60,10 @@ const errors = () => words().errors;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 const newSeed = () => toHex(crypto.getRandomValues(new Uint8Array(16)));
 const changed = () => new ApiError(409, 'war_changed', errors().changed);
-// A batch that failed on its assertion or on a place taken meanwhile.
-const lost = (error) => raced(error) || /UNIQUE|constraint/i.test(String(error?.message ?? error));
+// A batch that failed on its assertion or on a row of the wars another run
+// wrote meanwhile (a place taken, the week drawn); any other error is one
+// (11.11.2026: a constraint of another kind is no race, and is told).
+const lost = (error) => raced(error) || /UNIQUE constraint failed: guild_war/i.test(String(error?.message ?? error));
 
 // The wars are there where GUILD_WARS is on.
 function requireWars() {
@@ -119,12 +121,14 @@ async function fightersOf(db, rows) {
   return new Map(rows.map((row) => [row.id, { row, character: engineCharacter(row), equipped: worn.get(row.id), name: row.name }]));
 }
 
-// A fighter as a battle keeps it: who, its look and levels, and (on the
-// side that won) what it got.
+// A fighter as a battle keeps it: who (with when its character was made,
+// `since`, as the database gives the id of a removed one again), its look
+// and levels, and (on the side that won) what it got.
 function fighterRecord(fighter, reward = null) {
   const { character } = fighter;
   return {
     id: fighter.row?.id ?? null,
+    ...(fighter.row && { since: fighter.row.created_at }),
     name: fighter.name,
     classId: character.classId,
     level: character.level,
@@ -151,8 +155,11 @@ async function warSides(db, war) {
 // no draws). The rewards of each battle won go to its fighters (799 A). In
 // one batch that holds only while the war is as read, with the war's days
 // and score; after Sunday's battles also its end, and the war chest of the
-// guild that won it. Gives the war after it, or null when another run was
-// first.
+// guild that won it. A character whose account has one on the other side
+// too (a character made or one that changed its guild after the draw, which
+// kept such guilds apart, 3) fights on neither, so nobody fights itself
+// and takes the reward for free (11.11.2026). Gives the war after it, or
+// null when another run was first.
 async function fightEvening(db, war, day, at, now) {
   const polish = contentIn('pl');
   const english = englishOn() ? contentIn('en') : null;
@@ -161,7 +168,9 @@ async function fightEvening(db, war, day, at, now) {
     ...(a ? await fightersOf(db, a.members) : new Map()),
     ...(b && !b.mirror ? await fightersOf(db, b.members) : new Map()),
   ]);
-  const lineup = (side, team) => side.lineups[team - 1].map((id) => fighters.get(id)).filter(Boolean);
+  const accounts = (side) => new Set(side.members.map((row) => row.user_id));
+  const both = a && b && !b.mirror ? new Set([...accounts(a)].filter((user) => accounts(b).has(user))) : new Set();
+  const lineup = (side, team) => side.lineups[team - 1].map((id) => fighters.get(id)).filter((one) => one && !both.has(one.row.user_id));
   const pairings = a && b ? warPairings(a.count, b.count) : [];
   const battles = [];
   const rewards = new Map();
@@ -234,12 +243,24 @@ async function warFighters(db, warId, side, evening) {
 }
 
 // The evenings a war owes (`due` of them on its week, `week`), fought in
-// turn; it stops where another run was first.
+// turn. An evening another run fought first is not fought again: the war
+// is read as it is then and the evenings after it go on, so a run ends only
+// once all the evenings owed are fought, by it or by another (11.11.2026:
+// else last week's Sława could be frozen before its war's Sunday was
+// fought, guild-fame.js). It stops when the war did not move.
 async function settleWar(db, war, week, due, now) {
+  const owed = Math.min(due, WAR_DAYS);
   let current = war;
-  for (let day = current.days_done; day < Math.min(due, WAR_DAYS); day++) {
-    current = await fightEvening(db, current, day, week.battles[day], now);
-    if (!current) return;
+  while (current.days_done < owed) {
+    const day = current.days_done;
+    const fought = await fightEvening(db, current, day, week.battles[day], now);
+    if (fought) {
+      current = fought;
+      continue;
+    }
+    const stored = await db.prepare('SELECT * FROM guild_wars WHERE id = ?').bind(current.id).first();
+    if (!stored || stored.days_done <= day) return;
+    current = stored;
   }
 }
 
@@ -301,10 +322,19 @@ export async function settleWars(db, now, { guildId = null } = {}) {
     .prepare(`SELECT * FROM guild_wars WHERE ((week = ? AND days_done < ?) OR (week = ? AND days_done < ?))${only} ORDER BY id`)
     .bind(week.key, due, previous.key, WAR_DAYS, ...(guildId === null ? [] : [guildId, guildId]))
     .all();
+  // One war's error leaves the others to be fought; it is thrown after them
+  // (the cron writes it in the log, guild-fame.js does not freeze the week
+  // while a war of it is unfinished).
+  let failure = null;
   for (const war of results) {
-    if (war.week === week.key) await settleWar(db, war, week, due, now);
-    else await settleWar(db, war, previous, WAR_DAYS, now);
+    try {
+      if (war.week === week.key) await settleWar(db, war, week, due, now);
+      else await settleWar(db, war, previous, WAR_DAYS, now);
+    } catch (error) {
+      failure ??= error;
+    }
   }
+  if (failure) throw failure;
 }
 
 // The words of the tab, with the rules' numbers in its "Jak to działa?"
@@ -350,15 +380,18 @@ function memberView(row) {
 
 // A fighter of a battle as kept (fighterRecord), with its class's name in
 // the page's language.
-const fighterView = (one) => ({ ...one, className: classNameOf({ classId: one.classId, evolution: one.evolution, appearance: one.appearance, level: one.level }, content()) });
+const fighterView = ({ since: _, ...one }) => ({ ...one, className: classNameOf({ classId: one.classId, evolution: one.evolution, appearance: one.appearance, level: one.level }, content()) });
 
 // A battle in the list of the war's battles, from the side of guild `side`:
 // its day, number and time, the teams, the result ('win', 'loss' or
 // 'draw') and what the character who looks got in it, if it fought.
-function battleLine(row, side, characterId) {
+function battleLine(row, side, viewer) {
   const fighters = JSON.parse(row.fighters);
   const other = side === 'a' ? 'b' : 'a';
-  const own = fighters[side].find((one) => one.id === characterId);
+  // A character given the id of one removed (the database gives the
+  // highest again) did not fight its battles: the one that fought was made
+  // at another time (battles from before 0.2.69 have no `since`).
+  const own = fighters[side].find((one) => one.id === viewer.id && (one.since === undefined || one.since === viewer.created_at));
   return {
     id: row.id,
     day: row.day,
@@ -379,7 +412,7 @@ function battleLine(row, side, characterId) {
 // evenings (each with its battles won and lost), the battles fought, the
 // next evening with how many battles and how often each of the guild's
 // teams fights, and its end with what the guild got; null without a war.
-async function warOf(db, guild, ours, week, characterId, now) {
+async function warOf(db, guild, ours, week, viewer, now) {
   const war = await db.prepare('SELECT * FROM guild_wars WHERE week = ? AND (guild_a = ? OR guild_b = ?)').bind(week.key, guild.id, guild.id).first();
   if (!war) return null;
   const side = war.guild_a === guild.id ? 'a' : 'b';
@@ -389,7 +422,7 @@ async function warOf(db, guild, ours, week, characterId, now) {
     db.prepare('SELECT id, day, number, team_a, team_b, result, at, fighters, log IS NOT NULL AS replay FROM guild_war_battles WHERE war_id = ? ORDER BY day DESC, number DESC').bind(war.id).all(),
     mirror ? null : db.prepare('SELECT g.name, g.tag, (SELECT COUNT(*) FROM guild_members m WHERE m.guild_id = g.id) AS members FROM guilds g WHERE g.id = ?').bind(theirId).first(),
   ]);
-  const battles = rows.map((row) => battleLine(row, side, characterId));
+  const battles = rows.map((row) => battleLine(row, side, viewer));
   const theirMembers = mirror ? ours.members.length : (theirs?.members ?? 0);
   const theirTeams = mirror ? war.mirror_teams : theirMembers > 0 ? warTeams(theirMembers, content()) : 0;
   const mirrorWords = rules().mirror;
@@ -454,7 +487,7 @@ async function noWarReason(db, guild, week) {
 async function warView(db, player, guild, now, tester) {
   const week = warWeek(now, content());
   const ours = await teamsOf(db, guild.id);
-  const war = await warOf(db, guild, ours, week, player.row.id, now);
+  const war = await warOf(db, guild, ours, week, player.row, now);
   const { teamSize, maxTeams } = rules();
   const lineupTeam = ours.lineups.findIndex((lineup) => lineup.includes(player.row.id));
   const assignedTeam = ours.assigned.findIndex((team) => team.includes(player.row.id));
@@ -518,7 +551,7 @@ export async function getGuildWarBattle(context) {
     .first();
   if (!row?.log) throw missing();
   const side = row.guild_a === guild.id ? 'a' : 'b';
-  const { _fighters, ...line } = battleLine(row, side, player.row.id);
+  const { _fighters, ...line } = battleLine(row, side, player.row);
   const mirror = row.guild_b === null;
   const tags = { a: row.tag_a, b: mirror ? rules().mirror.tag : row.tag_b };
   const fight = warFightFor(await unpack(language() === 'en' && row.log_en ? row.log_en : row.log), side);
