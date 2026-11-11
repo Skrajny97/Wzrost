@@ -1,3 +1,4 @@
+// @ts-check
 // The Ognisko's fire spirit (`trade` of the building in data/buildings.json):
 // gold thrown into the fire comes back as wood, stone or iron ore, for
 // goldPerUnit gold a piece, 1 gold less for every cheaperEvery levels of the
@@ -11,11 +12,23 @@
 
 import { questPeriod } from './quests.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {{ goldPerUnit: number, cheaperEvery: number, unitsPerDay: number, moreUnits: number, moreUnitsEvery: number, resources: string[] }} FireTrade */
+
 // The one building with a trade, if any.
-export const fireBuilding = (content) => content.buildings.find((building) => building.trade) ?? null;
+/**
+ * @param {Content} content
+ * @returns {{ name: string, trade: FireTrade } | null}
+ */
+export const fireBuilding = (content) => content.buildings.find((/** @type {{ trade?: FireTrade }} */ building) => building.trade) ?? null;
 
 // The trade at the building's level: the gold a piece costs (`unitGold`)
 // and the pieces a day takes in all (`perDay`); null before it is built.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {{ unitGold: number, perDay: number, resources: string[] } | null}
+ */
 export function fireTrade(level, content) {
   const building = fireBuilding(content);
   if (!building || level < 1) return null;
@@ -28,14 +41,30 @@ export function fireTrade(level, content) {
 }
 
 // The day of `now` on the quests' clock ("2026-10-26").
+/**
+ * @param {number} now
+ * @param {Content} content
+ * @returns {string}
+ */
 export const fireDay = (now, content) => questPeriod('daily', now, content).key;
 
 // The pieces traded on the day of `now`: a count kept for an earlier day is
 // none today.
-export const fireUnitsMade = ({ day, units }, now, content) => (day === fireDay(now, content) ? units : 0);
+/**
+ * @param {{ day?: string, units?: number }} made
+ * @param {number} now
+ * @param {Content} content
+ * @returns {number}
+ */
+export const fireUnitsMade = ({ day, units }, now, content) => (day === fireDay(now, content) ? (units ?? 0) : 0);
 
 // Why a trade of `amount` pieces cannot be made now, or null: `made` is
 // fireUnitsMade.
+/**
+ * @param {{ level: number, gold: number, made: number, resource: string, amount: number }} trade
+ * @param {Content} content
+ * @returns {{ code: string, message: string } | null}
+ */
 export function fireTradeBlock({ level, gold, made, resource, amount }, content) {
   const trade = fireTrade(level, content);
   if (!trade) return { code: 'not_built', message: `Najpierw zbuduj: ${fireBuilding(content)?.name ?? 'Ognisko'}.` };
