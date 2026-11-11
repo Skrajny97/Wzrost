@@ -582,6 +582,126 @@
         "text": "a whirlwind of shadows spinning fast, a dark swirling whoosh with a soft ghostly whisper and three quick blade slashes inside it, fantasy, no music",
         "seconds": 1.6
       },
+      "skill-smashing-blow": {
+        "text": "a colossal war axe smashing down into stone: a heavy crushing impact, cracking rock and rumbling debris rolling outward, deep and powerful, close up, no music",
+        "seconds": 1.5
+      },
+      "skill-slaughter": {
+        "text": "a furious wide axe swing cleaving through several foes: a fierce battle roar, a deep whoosh and a quick series of heavy meaty chops, brutal, no music",
+        "seconds": 1.6
+      },
+      "skill-steel-hurricane": {
+        "text": "a sword whirling twice in a fast spinning storm of steel: two quick swooshing spins with sharp metallic rings and slicing hits, fantasy, no music",
+        "seconds": 1.6
+      },
+      "skill-cheers": {
+        "text": "a roaring arena crowd cheering and applauding, with a short triumphant horn call over it, energetic, no music",
+        "seconds": 1.8
+      },
+      "skill-unbroken": {
+        "text": "a massive shield braced firmly: a deep metallic clang, arrows clinking off the steel, then a warm shimmering healing glow, fantasy, no music",
+        "seconds": 1.6
+      },
+      "skill-earthquake": {
+        "text": "a heavy shield slammed into the ground: a deep booming thud, the earth cracking and rumbling, rocks tumbling, a powerful low rumble fading out, no music",
+        "seconds": 1.8
+      },
+      "skill-master-shot": {
+        "text": "a mighty bow loosed: a sharp twang, an arrow whistling fast and piercing through three targets with three quick thuds, crisp, no music",
+        "seconds": 1.4
+      },
+      "skill-steady-hand": {
+        "text": "a bowstring drawn slowly with a creak, a calm breath, then a precise release with a clean sharp twang, quiet and focused, no music",
+        "seconds": 1.5
+      },
+      "skill-perun-wrath": {
+        "text": "several lightning bolts striking down one after another: loud cracking thunderclaps and electric crackles jumping between targets, a rolling thunder, no music",
+        "seconds": 1.8
+      },
+      "skill-thunder-sign": {
+        "text": "a glowing rune drawn in the air: a rising electric hum, crackling sparks and a short deep thunder rumble as the sign flares, fantasy, no music",
+        "seconds": 1.6
+      },
+      "skill-pack-leader": {
+        "text": "a great white wolf howling long and loud at night, echoing, wild and proud, no music",
+        "seconds": 2.0
+      },
+      "skill-eagle-talon": {
+        "text": "a golden eagle diving: a sharp piercing eagle screech, a fast rushing wing whoosh and a quick tearing slash of talons, no music",
+        "seconds": 1.5
+      },
+      "skill-cataclysm": {
+        "text": "fire, ice and lightning crashing down at once: a roaring blaze, shattering ice and a loud thunder crack merging into one huge explosion, fantasy, no music",
+        "seconds": 2.0
+      },
+      "skill-elemental-shield": {
+        "text": "a magic shield forming: a rising shimmering hum, crackling flames, tinkling ice and small electric zaps swirling around, fantasy, no music",
+        "seconds": 1.6
+      },
+      "skill-ice-storm": {
+        "text": "a storm of ice: howling icy wind and a hail of sharp ice shards shattering on the ground, cold and crisp, no music",
+        "seconds": 1.8
+      },
+      "skill-ice-tomb": {
+        "text": "a body frozen solid: rapidly crackling and creaking ice growing and locking with a hard crystalline crunch, cold, no music",
+        "seconds": 1.5
+      },
+      "skill-oak-awakening": {
+        "text": "an ancient oak waking up: deep creaking and groaning wood, roots tearing out of the earth, a low rumbling growl, fantasy, no music",
+        "seconds": 2.0
+      },
+      "skill-bison-call": {
+        "text": "a European bison charging: heavy thundering hooves, a deep snorting bellow and a powerful head-butt impact, no music",
+        "seconds": 1.8
+      },
+      "skill-miraculous-healing": {
+        "text": "a miraculous healing: a warm angelic choir swell, soft shimmering chimes and a gentle glowing whoosh, fantasy, no music",
+        "seconds": 2.0
+      },
+      "skill-holy-light": {
+        "text": "a burst of holy light: a bright radiant flash with a soaring angelic tone and shimmering sparkles spreading outward, fantasy, no music",
+        "seconds": 1.6
+      },
+      "skill-last-judgment": {
+        "text": "a holy greatsword striking down: a ringing heavenly tone, a burning holy flame whoosh and a massive heavy impact, fantasy, no music",
+        "seconds": 1.6
+      },
+      "skill-holy-seal": {
+        "text": "a holy seal stamped onto a foe: a heavy stamp thud, a sizzling burn and a clear ringing bell tone, fantasy, no music",
+        "seconds": 1.4
+      },
+      "skill-hymn": {
+        "text": "a short solemn choir hum rising in warm harmony, sacred voices only, no instruments, no music",
+        "seconds": 2.4
+      },
+      "skill-vision": {
+        "text": "a mystic vision: a deep soft whoosh, an ethereal shimmering tone and whispering echoes, dreamlike, fantasy, no music",
+        "seconds": 1.6
+      },
+      "skill-final-blow": {
+        "text": "a finishing blow: a heavy executioner blade whoosh and a brutal chop, then a body collapsing to the ground with a thud, close up, no music",
+        "seconds": 1.3
+      },
+      "skill-blood-mark": {
+        "text": "a blood curse mark: a wet slicing cut, dripping blood and a low dark whisper, eerie, no music",
+        "seconds": 1.4
+      },
+      "skill-army-of-dead": {
+        "text": "skeletons rising from graves: rattling bones, scraping rusty armour and a sword being drawn, with a ghostly wind moaning, eerie, no music",
+        "seconds": 2.0
+      },
+      "skill-death-touch": {
+        "text": "a deathly touch: a cold hiss of poison smoke and a sucking, draining whoosh of life essence, dark and eerie, no music",
+        "seconds": 1.6
+      },
+      "skill-shadow-storm": {
+        "text": "a storm of shadow blades: a fast flurry of many dark whooshing slashes and metallic rings swirling around, fantasy, no music",
+        "seconds": 1.8
+      },
+      "skill-eclipse": {
+        "text": "the sun swallowed by darkness: a deep ominous swelling drone, a cold wind and a fading ghostly hum, fantasy, no music",
+        "seconds": 2.0
+      },
       "potion": {
         "text": "a person drinks from a small glass bottle: two big gulps, the sound of liquid swallowed in the throat, close up, realistic foley, no music",
         "seconds": 1.5,
