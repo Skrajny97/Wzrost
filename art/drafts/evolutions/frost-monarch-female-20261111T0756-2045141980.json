@@ -1,0 +1,14 @@
+{
+  "id": "frost-monarch-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman queen of eternal ice, tall and regal, long white hair, fair natural skin with rosy cheeks and a warm human face, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a long deep blue velvet gown with intricate silver frost embroidery, ornate plates of clear pale blue ice crystals on the shoulders and bodice, a tall jagged crown of ice crystals, a long white fur mantle with silver clasps, holding a tall sceptre-staff of carved ice topped with a large glowing frost crystal, solid opaque figure, not translucent, not a ghost, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

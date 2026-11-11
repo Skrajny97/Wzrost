@@ -1,0 +1,14 @@
+{
+  "id": "saint-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman saint, gentle, long dark hair under a white veil, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a thin golden halo ring behind the head, pure white robes with fine golden embroidery, a long pale gold mantle with golden trim, a golden sash, a small golden pendant with a dove, soft holy light around the figure, holding a tall golden staff topped with a white dove with spread wings, the whole staff and halo inside the image, kind and serene, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

@@ -1,0 +1,14 @@
+{
+  "id": "perun-chosen-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman chosen archer of the Slavic thunder god Perun, athletic, long fair blond hair in a braid, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a long dark blue coat with silver and gold embroidered thunder symbols, a silver breastplate with a golden six-petal thunder rosette on the chest, silver pauldrons with lightning-shaped edges, a silver circlet shaped like a lightning bolt, a short white fur collar, a quiver of arrows with blue feathers, holding a long bow of carved oak with silver lightning inlays and small crackling blue sparks at its tips, small blue lightning around the hands, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

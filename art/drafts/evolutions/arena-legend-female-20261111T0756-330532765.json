@@ -1,0 +1,14 @@
+{
+  "id": "arena-legend-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman legendary arena champion, athletic and strong, dark hair in a long braid, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, an ornate golden muscle cuirass engraved with laurel wreaths and a lion's head, golden pauldrons, a golden helmet with a tall flowing crimson crest and a golden laurel wreath around it, the face visible under the helmet, a lion pelt draped over one shoulder, a long crimson cape with golden trim, a crimson pleated skirt with golden studded leather strips, golden greaves and sandals, golden victory medallions on the belt, holding a gleaming short sword and a round golden shield with a roaring lion's head in relief, proud victorious stance, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

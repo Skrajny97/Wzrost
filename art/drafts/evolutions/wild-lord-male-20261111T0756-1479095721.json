@@ -1,0 +1,14 @@
+{
+  "id": "wild-lord-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man legendary lord of the wild forest and its hunters, strong, light brown hair and a short beard, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a huge white wolf pelt worn as a hooded mantle with the white wolf's head over the head, leather armour embossed with golden animal motifs and fur trim, a necklace of bear claws and fangs, a golden eagle perched on the shoulder with folded wings, the whole eagle inside the image, a quiver of arrows at the hip, holding a long dark horn bow with golden tips and a long hunting knife, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

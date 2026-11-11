@@ -1,0 +1,14 @@
+{
+  "id": "horde-slayer-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult man legendary horde slayer berserker, huge and very muscular, long wild dark brown hair and a thick braided beard with iron rings, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, a bare chest covered with old battle scars and glowing red war paint runes, the horned skull of a giant beast worn as a helmet with two long curved horns, a heavy black and brown fur mantle over the shoulders, a massive spiked iron pauldron on one shoulder, iron and bronze bracers, a wide belt hung with small trophies, a heavy fur kilt, fur-wrapped boots with iron greaves, holding a huge notched battle axe in each hand with faintly glowing red runes on the blades, fierce and furious, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

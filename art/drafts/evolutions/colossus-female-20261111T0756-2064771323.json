@@ -1,0 +1,14 @@
+{
+  "id": "colossus-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman colossal armoured guardian, tall and broad-shouldered, dark hair tied back, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, massive full plate armour of dark steel with gold trim and engravings, huge layered pauldrons, an open-faced heavy helmet showing the face with a small blue crest, a deep blue tabard with a golden fortress emblem, heavy plated gauntlets and sabatons, holding a huge rectangular tower shield of steel with a golden fortress emblem in one hand, the shield as tall as half of the figure, and a heavy flanged mace in the other hand, immovable and steadfast, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

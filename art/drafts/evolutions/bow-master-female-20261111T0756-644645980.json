@@ -1,0 +1,14 @@
+{
+  "id": "bow-master-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "young woman legendary master archer, lean and tall, long black hair in a high ponytail, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, elegant black leather armour with intricate silver plates and silver filigree, a silver pauldron shaped like a hawk's wing, a long dark green cloak lined with silver embroidery and a high collar, a silver diadem with a small glowing green gem, a quiver of arrows with white feathers on the back, holding a tall ornate recurve bow of black wood with silver inlays and a faintly glowing green bowstring, the whole bow inside the image, calm and focused, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

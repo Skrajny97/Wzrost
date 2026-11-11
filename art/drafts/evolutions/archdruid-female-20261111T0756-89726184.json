@@ -1,0 +1,14 @@
+{
+  "id": "archdruid-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "adult woman archdruid, tall, long auburn hair braided with green leaves and small flowers, standing in the middle of the image, the whole figure from the top of the head to the feet and the whole weapon inside the image, about four fifths of the image height, empty space on every side, nothing touching the edges of the image, highly detailed pixel art with fine details, rich textures and ornaments, crisp clean outlines, legendary and majestic, far more powerful and richly equipped than an ordinary hero, robes of living moss, bark and oak leaves with small white flowers, a mantle of oak leaves and ivy, a grand crown of tall antlers entwined with ivy and glowing green leaves, a belt of roots with small pouches and a carved wooden amulet, holding a tall staff of living wood with leafy branches and a glowing green light at the top, a few small glowing green spirit lights close to the staff, the whole staff and antlers inside the image, facing the viewer, three-quarter view, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
