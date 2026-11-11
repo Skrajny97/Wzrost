@@ -453,9 +453,9 @@
       "description": "a broad-shouldered young man with a short dark beard in dark blackened steel plate armour engraved with thin copper lightning lines, a grey wolf fur cloak over the shoulders falling behind, a dark steel helmet with two curved aurochs horns, copper-trimmed gauntlets and dark steel boots, no shield and no sword, both hands empty, the near arm swinging naturally"
     },
     "archdruid-female": {
-      "start": "art/references/walks/start/archdruid-female.png",
+      "start": "art/references/walks/bare/archdruid-female.png",
       "pose": 2,
-      "description": "a woman archdruid with long auburn hair braided with green leaves and small flowers, a grand crown of tall antlers entwined with ivy and glowing green leaves, robes of moss, bark and oak leaves, a mantle of oak leaves and ivy, a belt of roots, a gnarled living-wood staff with a glowing green light held upright in her right hand"
+      "description": "a woman archdruid with long auburn hair braided with green leaves and small flowers, a grand crown of tall antlers entwined with ivy and glowing green leaves, robes of moss, bark and oak leaves, a mantle of oak leaves and ivy, a belt of roots, the near arm held forward at chest height with the hand closed in an empty fist, holding nothing, no staff, nothing in the hands"
     },
     "archdruid-male": {
       "start": "art/references/walks/start/archdruid-male.png",
