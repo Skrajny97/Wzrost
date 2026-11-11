@@ -582,6 +582,16 @@
       ]
     },
     "talks": {
+      "memories": [
+        "Remember Father’s box under the milestone? I carry his knife now. Sometimes it feels like he’s walking with us.",
+        "Since we chased off the moneylender’s men, I sleep soundly. For the first time in years.",
+        "I’ve already put up a fence on that land by the stream. One day I’ll invite you there for supper.",
+        "Sometimes I dream of that wolf with the torn ear. But I’m not afraid of him anymore.",
+        "That messenger is probably still telling the manor how I turned the lord down. I don’t regret a single day.",
+        "My friend’s sword lies beneath the shrine. Promise kept, and partly thanks to you.",
+        "My brother sends his greetings from the Settlement. He says he owes you for the rest of his life.",
+        "That chest under the oak… I still can’t believe it. Shall we check the next map together too?"
+      ],
       "stories": [
         [
           "The road? I know it like the back of my hand. My father hauled salt along it, and I sat on the cart from the day I learned to walk.",
@@ -969,6 +979,39 @@
       "hireOwnOffer": "You can hire a mercenary once you take down your notice or claim the pay for your service.",
       "dotPay": "pay to claim",
       "dotClose": "notice to close"
+    }
+  },
+  "gifts": {
+    "texts": {
+      "give": "Give a gift",
+      "title": "Gift",
+      "likes": "{name} likes {likes}.",
+      "likesGold": "{name} will gladly take gold.",
+      "kinds": {
+        "herb": "herbs",
+        "potion": "potions",
+        "ore": "ores",
+        "gem": "gems",
+        "material": "hides and other creature materials"
+      },
+      "rule": "One gift a day: an ordinary one gives +{relation} relationship, a rarer one more.",
+      "relation": "Relationship +{relation}",
+      "gold": "Gift: {gold} gold. Relationship +{relation}.",
+      "giveGold": "Give {gold} gold",
+      "given": "Today's gift is given. The next one from midnight.",
+      "nothing": "You have none now.",
+      "noGold": "Not enough gold for the gift.",
+      "done": "Gift given: {gift}. Relationship +{relation}.",
+      "present": "{name} has a gift for you: {gift}.",
+      "claim": "Claim",
+      "claimed": "Gift claimed: {gift}.",
+      "noPresent": "There is no gift to claim now.",
+      "bagFull": "The gift will not fit in the bag. Make room in it.",
+      "notLiked": "{name} will not take that.",
+      "notHeld": "You do not have that.",
+      "unknown": "There is no such resident.",
+      "goldAmount": "{gold} gold",
+      "timePoints": "Time Points"
     }
   }
 }

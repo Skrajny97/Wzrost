@@ -619,6 +619,16 @@
         ]
       ],
       "lowerChance": 0.25,
+      "memories": [
+        "Pamiętasz skrzynkę ojca pod kamieniem milowym? Noszę teraz jego nóż. Czasem mam wrażenie, że idzie z nami.",
+        "Od kiedy przegoniliśmy ludzi lichwiarza, śpię spokojnie. Pierwszy raz od lat.",
+        "[Postawiłam|Postawiłem] już płot na tej ziemi przy strumieniu. Kiedyś zaproszę cię tam na wieczerzę.",
+        "Śni mi się czasem ten basior z rozdartym uchem. Ale już się go nie boję.",
+        "Posłaniec pewnie dalej opowiada na dworze, jak [odmówiłam|odmówiłem] panu. Nie żałuję ani dnia.",
+        "Miecz przyjaciela leży pod kapliczką. Słowo dotrzymane, a to także dzięki tobie.",
+        "Brat pozdrawia cię z Osady. Mówi, że ma u ciebie dług do końca życia.",
+        "Ten kufer spod dębu… Wciąż nie mogę uwierzyć. Następną mapę też sprawdzimy razem?"
+      ],
       "chatter": {
         "stranger": [
           "Dobrze się dziś szło. Nogi bolą, ale głowa spokojna.",
@@ -881,6 +891,55 @@
       "hireOwnOffer": "Najemnika weźmiesz, gdy zdejmiesz swoje ogłoszenie albo odbierzesz zapłatę za usługę.",
       "dotPay": "zapłata do odebrania",
       "dotClose": "ogłoszenie do zamknięcia"
+    }
+  },
+  "gifts": {
+    "$comment": "Podarunki dla mieszkańców i podarki od przyjaciół (odpowiedzi autora 818.1 i 818.2, 11.11.2026: „Raz dziennie każdemu mieszkańcowi Osady możesz dać z plecaka coś, co lubi” i „Mieszkaniec z relacją Przyjaciel raz w tygodniu zostawia ci drobny podarek w swoim miejscu w Osadzie”; src/engine/resident-gifts.js, src/server/resident-gifts.js). Raz na dobę zadań narratora (do północy czasu polskiego) każdemu mieszkańcowi można dać jeden podarunek, przyciskiem „Podaruj” w jego miejscu: jedną sztukę tego, co lubi (residents: kind; herb zioła, potion mikstury, ore rudy i gem kamienie szlachetne z Górnictwa, material materiały zwykłych stworów, te same, którymi handluje Garbarnia, bez trofeów elit i czempionów), albo złoto (kind gold): goldPerLevel złota za poziom postaci. Sztuka znika z zapasów postaci, także w czasie wyprawy, jak przy handlu u Jagny. Podarunek daje relation[stopień] punktów relacji z mieszkańcem: złoto i najtańsze sztuki to stopień 0, a sztuka jest o stopień rzadsza za każde podwojenie ceny złomiarza ponad cenę najtańszej sztuki swojego rodzaju (u kamieni szlachetnych i materiałów to po prostu ich rzadkość, bo ich cena podwaja się z rzadkością); rzadsze niż ostatnia liczba dają ostatnią. Mieszkaniec ze stopniem relacji from (Przyjaciel) raz w tygodniu zadań narratora (od poniedziałku) zostawia podarek (weekly), z przyciskiem „Odbierz”: herb zioło, które zna Zielarstwo postaci, potion miksturę znaną w Alchemii (przed otwarciem profesji te z jej pierwszego poziomu, jak prezent towarzysza), material materiał zwykłego stwora, którego postać spotkała, w rzadkości jego gatunku, każde po min do max sztuk i perTenLevels więcej na każde 10 poziomów postaci; gold perLevel złota za poziom postaci; time-points count Punktów Czasu. Podarek jest ten sam przez cały tydzień. Zioła i mikstury zajmują miejsce w plecaku, więc gdy się nie mieszczą, podarek czeka; to, co przyszło, Encyklopedia pomija jak towar kupiony. texts: słowa przycisków, okienka i komunikatów; kinds: nazwy tego, co lubi mieszkaniec, według rodzaju; {…} wypełnia gra.",
+    "from": "friend",
+    "relation": [10, 15, 20, 25, 30, 35, 40],
+    "goldPerLevel": 5,
+    "residents": [
+      { "resident": "herbalist", "kind": "herb", "weekly": { "kind": "herb", "min": 3, "max": 6, "perTenLevels": 1 } },
+      { "resident": "hermit", "kind": "herb", "weekly": { "kind": "time-points", "count": 10 } },
+      { "resident": "smith", "kind": "ore", "weekly": { "kind": "material", "min": 2, "max": 4 } },
+      { "resident": "enchantress", "kind": "gem", "weekly": { "kind": "material", "min": 2, "max": 4 } },
+      { "resident": "tanner", "kind": "material", "weekly": { "kind": "material", "min": 2, "max": 4 } },
+      { "resident": "innkeeper", "kind": "potion", "weekly": { "kind": "potion", "min": 1, "max": 2, "perTenLevels": 0.5 } },
+      { "resident": "headman", "kind": "gold", "weekly": { "kind": "gold", "perLevel": 20 } },
+      { "resident": "groom", "kind": "gold", "weekly": { "kind": "gold", "perLevel": 20 } },
+      { "resident": "merchant", "kind": "gold", "weekly": { "kind": "gold", "perLevel": 20 } },
+      { "resident": "gamehost", "kind": "gold", "weekly": { "kind": "gold", "perLevel": 20 } }
+    ],
+    "texts": {
+      "give": "Podaruj",
+      "title": "Podarunek",
+      "likes": "{name} lubi {likes}.",
+      "likesGold": "{name} chętnie przyjmie złoto.",
+      "kinds": {
+        "herb": "zioła",
+        "potion": "mikstury",
+        "ore": "rudy",
+        "gem": "kamienie szlachetne",
+        "material": "skóry i inne materiały ze stworów"
+      },
+      "rule": "Raz dziennie jeden podarunek: zwykły daje +{relation} relacji, rzadszy więcej.",
+      "relation": "Relacja +{relation}",
+      "gold": "Podarunek: {gold} zł. Relacja +{relation}.",
+      "giveGold": "Podaruj {gold} zł",
+      "given": "Dzisiejszy podarunek już dany. Następny od północy.",
+      "nothing": "Nie masz teraz żadnych.",
+      "noGold": "Brakuje złota na podarunek.",
+      "done": "Podarunek dany: {gift}. Relacja +{relation}.",
+      "present": "{name} ma dla Ciebie podarek: {gift}.",
+      "claim": "Odbierz",
+      "claimed": "Odebrano podarek: {gift}.",
+      "noPresent": "Nie ma teraz podarku do odebrania.",
+      "bagFull": "Podarek nie zmieści się w plecaku. Zrób w nim miejsce.",
+      "notLiked": "{name} tego nie przyjmie.",
+      "notHeld": "Nie masz tego.",
+      "unknown": "Nie ma takiego mieszkańca.",
+      "goldAmount": "{gold} zł",
+      "timePoints": "Punkty Czasu"
     }
   }
 }

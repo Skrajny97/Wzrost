@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, drawCandidates, encounterCombatants, eventCase, eventChance, eventFor, huntKills, playerCombatant, resolveEvent, simulateFight, simulateHunt } from '../src/engine/index.js';
+import { createRng, drawCandidates, encounterCombatants, eventCase, eventChance, eventFor, eventOutcomes, huntKills, playerCombatant, resolveEvent, simulateFight, simulateHunt } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -15,7 +15,24 @@ const bandits = ['bandit-thug', 'bandit-knifer', 'bandit-crossbow'];
 const woman = content.eventsById['wounded-woman'];
 // The events with tests of their own that come anywhere, or in the whole
 // forest (the leshy), left out where another event's places are checked.
-const elsewhere = new Set(['blue-mushroom', 'wandering-beggar', 'haunted-shrine', 'stuck-merchant', 'leshy', 'lost-child', 'forest-wedding', 'treasure-hunter']);
+const elsewhere = new Set([
+  'blue-mushroom',
+  'wandering-beggar',
+  'haunted-shrine',
+  'stuck-merchant',
+  'leshy',
+  'lost-child',
+  'forest-wedding',
+  'treasure-hunter',
+  // 817 (test/events-817.test.js).
+  'bog-herbalist',
+  'star-iron',
+  'ferryman',
+  'fireside-dice',
+  'refugees',
+  'old-soldier',
+  'companion-errand',
+]);
 const placed = (list) => list.filter((event) => !elsewhere.has(event.id));
 
 // Whether every enemy moved before the first move of `allyId`.
@@ -452,6 +469,18 @@ describe('events (API)', () => {
           cases: content.eventsById[id].cases.map(({ id: caseId, name }) => ({ id: caseId, name })),
           endings: [],
         })),
+        // The events of 817 that come anywhere (those of the Osada only where it is open).
+        ...['ferryman', 'fireside-dice', 'old-soldier', 'companion-errand'].map((id) => {
+          const event = content.eventsById[id];
+          const endings = new Map(eventOutcomes(event).filter((outcome) => outcome?.id).map((outcome) => [outcome.id, outcome]));
+          return {
+            id,
+            title: event.title,
+            draft: false,
+            cases: (event.cases ?? []).map(({ id: caseId, name }) => ({ id: caseId, name })),
+            endings: [...endings.values()].map(({ id: endingId, name }) => ({ id: endingId, name })),
+          };
+        }),
       ],
       next: null,
     });

@@ -742,6 +742,7 @@ function checkReferences(data) {
   errors.push(...checkSettlement(data, { rarities }));
   errors.push(...checkStable(data));
   errors.push(...checkTannery(data));
+  errors.push(...checkResidentGifts(data));
   errors.push(...checkCasino(data));
   errors.push(...checkCosmetics(data));
   errors.push(...checkTowers(data));
@@ -853,7 +854,16 @@ function checkEvents(data, { monsters, rarities }) {
   const herbs = new Set(data.professions.herbs.map((herb) => herb.id));
   const classes = new Set(data.classes.map((cls) => cls.id));
   const brotherhoods = new Set(data.settlement.brotherhoods.map((brotherhood) => brotherhood.id));
+  const residents = new Set(data.settlement.residents.map((resident) => resident.id));
   uniqueIds(errors, 'events', events.list);
+  // The relation with residents of the Osada (818.3) and a companion's
+  // errand (817.7) an outcome or a won fight brings: residents of the Osada
+  // in an event of the Osada, and the errand only in a companion's.
+  const checkTies = (where, gives, event) => {
+    for (const id of Object.keys(gives?.relation ?? {})) if (!residents.has(id)) errors.push(`events.json: ${where} ma nieznanego mieszkańca "${id}"`);
+    if (gives?.relation && !event.settlement) errors.push(`events.json: ${where} daje relację z mieszkańcem, a zdarzenie nie ma settlement`);
+    if (gives?.companion && !event.companion) errors.push(`events.json: ${where} rozstrzyga sprawę towarzysza, a zdarzenie nie jest sprawą towarzysza`);
+  };
   const checkRarities = (where, weights) => {
     for (const id of Object.keys(weights ?? {})) if (!rarities.has(id)) errors.push(`events.json: ${where} ma nieznaną rzadkość "${id}"`);
   };
@@ -871,7 +881,10 @@ function checkEvents(data, { monsters, rarities }) {
       outcome.herbsKnown ||
       outcome.xpFoes ||
       outcome.reputation ||
-      outcome.rumor;
+      outcome.rumor ||
+      outcome.relation ||
+      outcome.companion ||
+      outcome.stakeBack;
     const losing = outcome.goldShare !== undefined || outcome.goldCapPerLevel !== undefined || outcome.resourcesShare !== undefined;
     if (outcome.kind === 'fight') {
       if (!outcome.foes) errors.push(`events.json: ${where} ma walkę bez przeciwników`);
@@ -880,6 +893,8 @@ function checkEvents(data, { monsters, rarities }) {
       if (!outcome.start?.includes('{enemies}')) errors.push(`events.json: ${where} potrzebuje zdania start z {enemies}`);
       checkRarities(where, outcome.win?.itemRarities);
       if (outcome.win?.itemRarities && !outcome.win.text?.includes('{item}')) errors.push(`events.json: ${where} potrzebuje zdania win.text z {item}`);
+      if ((outcome.win?.relation || outcome.win?.companion) && !outcome.win.text) errors.push(`events.json: ${where} potrzebuje zdania win.text o relacji`);
+      checkTies(where, outcome.win, event);
     } else if (fighting) {
       errors.push(`events.json: ${where} ma ustawienia walki bez walki`);
     }
@@ -898,6 +913,10 @@ function checkEvents(data, { monsters, rarities }) {
       for (const id of Object.keys(outcome.reputation ?? {})) if (!brotherhoods.has(id)) errors.push(`events.json: ${where} ma nieznane bractwo "${id}"`);
       if (outcome.reputation && !event.settlement) errors.push(`events.json: ${where} daje reputację Osady, a zdarzenie nie ma settlement`);
       if (outcome.rumor && !(outcome.text.includes('{area}') && outcome.noRumorText)) errors.push(`events.json: ${where} potrzebuje plotki z {area} w tekście i zdania noRumorText`);
+      // A stake won back is the option's price times stakeBack, told as {gold}.
+      if (outcome.stakeBack && !priced) errors.push(`events.json: ${where} zwraca stawkę opcji, która nie ma ceny`);
+      if (outcome.stakeBack && !outcome.text.includes('{gold}')) errors.push(`events.json: ${where} potrzebuje {gold} w tekście`);
+      checkTies(where, outcome, event);
     } else if (rewarding) {
       errors.push(`events.json: ${where} ma nagrodę bez kind reward`);
     }
@@ -963,6 +982,16 @@ function checkEvents(data, { monsters, rarities }) {
       .flatMap((outcome) => [outcome, ...(outcome.kind === 'choice' ? (outcome.options ?? []).flatMap((next) => deep(next.outcome)) : [])]);
   const outcomesOf = (event) => [...event.options.flatMap((option) => deep(option.outcome)), ...(event.cases ?? []).flatMap((eventCase) => Object.values(eventCase.outcomes).flatMap(deep))];
   for (const event of events.list) {
+    // An event met first in one case comes in it once, then in the others.
+    if (event.firstCase && !(event.cases ?? []).some((one) => one.id === event.firstCase)) errors.push(`events.json: ${event.id} ma nieznany przypadek pierwszego spotkania "${event.firstCase}"`);
+    if (event.firstCase && (event.cases ?? []).length < 2) errors.push(`events.json: ${event.id} ma przypadek pierwszego spotkania i żadnego innego`);
+    // A companion's errand: one case for each companion's story, in order.
+    if (event.companion && (event.cases ?? []).length !== data.settlement.companions.stories.length) {
+      errors.push(`events.json: ${event.id} potrzebuje po jednym przypadku na każdą historię towarzysza (${data.settlement.companions.stories.length})`);
+    }
+    if (event.companion && (data.settlement.companions.talks.memories ?? []).length !== data.settlement.companions.stories.length) {
+      errors.push(`settlement.json: companions.talks.memories potrzebuje po jednym zdaniu na każdą historię towarzysza`);
+    }
     for (const id of event.exceptAreas ?? []) {
       if (!living.has(id)) errors.push(`events.json: ${event.id} ma nieznany region wewnętrzny "${id}" w exceptAreas`);
     }
@@ -1440,6 +1469,35 @@ function checkTannery(data) {
   if (stock.length > standings.length) errors.push('settlement.json: tannery.sell.stock ma więcej liczb niż stopni');
   if (stock.some((share, index) => index > 0 && share < stock[index - 1])) errors.push('settlement.json: tannery.sell.stock nie może maleć ze stopniem');
   if (stock.at(-1) !== 1) errors.push('settlement.json: tannery.sell.stock na ostatnim stopniu musi być 1 (wszystkie materiały)');
+  return errors;
+}
+
+// The gifts for the Osada's residents and the friends' presents (818.1 and
+// 818.2): every resident likes something, once, and leaves a present of
+// goods in a count that makes sense, from a standing that exists; a rarer
+// piece never gives less than a commoner one.
+function checkResidentGifts(data) {
+  const errors = [];
+  const { gifts, residents, standings } = data.settlement;
+  if (!gifts) return errors;
+  const residentIds = new Set(residents.map((resident) => resident.id));
+  const seen = new Set();
+  for (const entry of gifts.residents) {
+    if (!residentIds.has(entry.resident)) errors.push(`settlement.json: gifts.residents ma nieznanego mieszkańca ${entry.resident}`);
+    if (seen.has(entry.resident)) errors.push(`settlement.json: gifts.residents ma mieszkańca ${entry.resident} dwa razy`);
+    seen.add(entry.resident);
+    const { weekly } = entry;
+    const where = `settlement.json: gifts.residents ${entry.resident}.weekly`;
+    if (['herb', 'potion', 'material'].includes(weekly.kind)) {
+      if (!weekly.min || !weekly.max) errors.push(`${where}: podarek ${weekly.kind} potrzebuje min i max`);
+      else if (weekly.min > weekly.max) errors.push(`${where}: min nie może być większe niż max`);
+    }
+    if (weekly.kind === 'gold' && !weekly.perLevel) errors.push(`${where}: podarek w złocie potrzebuje perLevel`);
+    if (weekly.kind === 'time-points' && !weekly.count) errors.push(`${where}: podarek w Punktach Czasu potrzebuje count`);
+  }
+  for (const resident of residents) if (!seen.has(resident.id)) errors.push(`settlement.json: gifts.residents nie mówi, co lubi ${resident.id}`);
+  if (!standings.some((standing) => standing.id === gifts.from)) errors.push(`settlement.json: gifts.from to nieznany stopień ${gifts.from}`);
+  if (gifts.relation.some((points, index) => index > 0 && points < gifts.relation[index - 1])) errors.push('settlement.json: gifts.relation nie może maleć z rzadkością');
   return errors;
 }
 

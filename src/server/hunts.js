@@ -18,6 +18,7 @@ import {
   buffWindows,
   campBonus,
   claimWindows,
+  companionAfterErrand,
   companionAfterHunt,
   companionGoes,
   campLevels,
@@ -41,6 +42,7 @@ import {
   huntKills,
   eventChoices,
   eventFor,
+  eventMate,
   eventView,
   huntReport,
   longestHunt,
@@ -628,14 +630,16 @@ export function finishActivity(db, player, now, { choice } = {}) {
 // the beggar's song tells today's rumor where the Karczma has not told it
 // yet (`kept`), marked as the song's, so the mug still pays the innkeeper's
 // relation and tells the same. Null when nothing changed.
-function settlementAfterHunt(row, hunt, kept, minutes) {
+function settlementAfterHunt(row, hunt, kept, minutes, event = null) {
   const reward = hunt.event?.reward;
   const went = hunt.companions?.length > 0;
   const heard = reward?.rumor && !kept ? reward.rumor : null;
   const stored = JSON.parse(row.settlement ?? '{}');
   // The wanted poster in hand whose target fell (wanted.js).
   const wanted = wantedAfterHunt(stored, hunt);
-  if (!went && !reward?.reputation && !heard && !wanted) return null;
+  // An event met first in one case is remembered (events.js: eventCase).
+  const metNow = Boolean(event?.firstCase) && !(stored.events ?? []).includes(event.id);
+  if (!went && !reward?.reputation && !reward?.relation && !reward?.companion && !heard && !wanted && !metNow) return null;
   const next = { ...stored, ...(wanted && { wanted }) };
   if (went) {
     next.companions = (stored.companions ?? []).map((companion) => {
@@ -647,8 +651,34 @@ function settlementAfterHunt(row, hunt, kept, minutes) {
     next.reputation = { ...stored.reputation };
     for (const [id, points] of Object.entries(reward.reputation)) next.reputation[id] = (next.reputation[id] ?? 0) + points;
   }
+  // The relation with residents an event brings (818.3: help raises it, a
+  // refusal never lowers it), and a companion's errand (817.7, 818.4).
+  if (reward?.relation) {
+    next.relations = { ...stored.relations };
+    for (const [id, points] of Object.entries(reward.relation)) next.relations[id] = (next.relations[id] ?? 0) + points;
+  }
+  if (reward?.companion) {
+    next.companions = (next.companions ?? stored.companions ?? []).map((companion) =>
+      companion.id === reward.companion.id ? companionAfterErrand(companion, reward.companion, content()) : companion,
+    );
+  }
+  if (metNow) next.events = [...(stored.events ?? []), event.id];
   if (heard) next.rumor = { ...heard, song: true };
   return JSON.stringify(next);
+}
+
+// The companions who went on an exploration, as an errand needs them
+// (events.js: errandMates): their names, looks, stories, relations and
+// errands from the Osada, and whether they fell on the way. A trip goes
+// without them.
+function huntMates(stored, hunt) {
+  const kept = new Map((stored.companions ?? []).map((companion) => [companion.id, companion]));
+  return (hunt.companions ?? []).flatMap((one) => {
+    const companion = kept.get(one.id);
+    if (!companion) return [];
+    const { id, name, appearance, classId, story, relation, errand } = companion;
+    return [{ id, name, appearance, classId, story, relation: relation ?? 0, errand: errand ?? null, fainted: Boolean(one.fainted) }];
+  });
 }
 
 // The report of a finished exploration: the engine runs it with the seed
@@ -727,9 +757,15 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // and the ending chosen for it if any ("event:case:ending"), without the
   // draw.
   const [forcedEvent = null, forcedCase = null, forcedEnding = null] = row.event_test ? row.event_test.split(':').map((part) => part || null) : [];
+  // The events the character met before (an event met first in one case,
+  // events.js: eventCase) and the companions who went (a companion's errand).
+  const storedSettlement = JSON.parse(row.settlement ?? '{}');
+  const metEvents = storedSettlement.events ?? [];
+  const mates = trip ? [] : huntMates(storedSettlement, hunt);
   const event = eventsOn()
-    ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn(), settlement: settlementOn() }, content())
+    ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn(), settlement: settlementOn(), mates }, content())
     : null;
+  const mate = event?.companion ? eventMate(event, activity.seed, mates) : null;
   // An option's price comes from the purse, the character's gold with the
   // exploration's; an option of one class is greyed out for the others.
   const who = { classId: row.class_id, level: row.level, purse: row.gold + hunt.gold };
@@ -737,10 +773,10 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // the options chosen so far): the choice made stays made, whether the
   // sheet was closed or the page reloaded.
   const eventArea = content().areasById[hunt.areaId];
-  const walkOptions = { seed: activity.seed, caseId: forcedCase, endingId: forcedEnding, drafts: eventDraftsOn() };
+  const walkOptions = { seed: activity.seed, caseId: forcedCase, endingId: forcedEnding, drafts: eventDraftsOn(), met: metEvents, mate };
   const storedPath = event && Array.isArray(options.eventPath) ? options.eventPath : [];
   const before = event && (eventChoices(event, storedPath, walkOptions)?.options ? storedPath : []);
-  if (event && choice === undefined) return { event: eventView(event, eventArea, who, content(), before.length > 0 ? eventChoices(event, before, walkOptions) : null) };
+  if (event && choice === undefined) return { event: eventView(event, eventArea, who, content(), before.length > 0 ? eventChoices(event, before, walkOptions) : null, mate) };
   // Today's rumor, as the Karczma told it, or as the beggar's song may.
   const kept = rumorToday(JSON.parse(row.settlement ?? '{}').rumor, now, content());
   if (event) {
@@ -758,7 +794,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
         .bind(JSON.stringify({ ...options, eventPath: path }), row.id, activity.options ?? '{}')
         .run();
       if (saved.meta.changes !== 1) throw new ApiError(409, 'character_changed', 'Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz.');
-      return { event: eventView(event, eventArea, who, content(), walk) };
+      return { event: eventView(event, eventArea, who, content(), walk, mate) };
     }
     const rumor = kept ?? drawRumor({ character, seed: `${row.id}:settlement` }, now, content());
     hunt = resolveEvent(
@@ -783,6 +819,8 @@ export async function finishHunt(db, player, now, { choice } = {}) {
         healBelow: options.healBelow,
         buffs: claimed.windows,
         trophies: options.trophies ?? {},
+        met: metEvents,
+        mate,
       },
       content(),
     );
@@ -796,7 +834,7 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // older trip's, only in its leader's report.
   // A faint brings the companions no relation either (faintForfeit).
   const credited = hunt.forfeit ? 0 : activity.minutes;
-  const settlementAfter = settlementAfterHunt(row, trip && trip.roster[0].id !== row.id ? { ...hunt, companions: [] } : hunt, kept, credited);
+  const settlementAfter = settlementAfterHunt(row, trip && trip.roster[0].id !== row.id ? { ...hunt, companions: [] } : hunt, kept, credited, event);
   // An event's reputation of the Bractwo Zielarzy may make Jagna teach rare
   // recipes (682 A and C): the report tells them among its System's lines.
   const taught = settlementAfter ? taughtWords(JSON.parse(row.settlement ?? '{}'), JSON.parse(settlementAfter), content()) : null;

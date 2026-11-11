@@ -333,7 +333,8 @@
       "focus": "Skupienie: Intelekt i Mądrość +{bonus}%",
       "poison": "Trucizna na broni: {bonus}% szans na Zatrucie przy ciosie",
       "ward": "Osłona przed magią: obrażenia od magii −{bonus}%",
-      "curse": "Klątwa: obrażenia −{bonus}%"
+      "curse": "Klątwa: obrażenia −{bonus}%",
+      "wounds": "Rany: obrażenia −{bonus}%"
     },
     "texts": {
       "drinkHeal": ["{actor} wypija {potion}: +{amount} HP."],
@@ -355,7 +356,8 @@
       "focusFights": ["Skupienie działało w walkach: {fights} z {all}."],
       "poisonFights": ["Olejek z tojadu działał w walkach: {fights} z {all}."],
       "wardFights": ["Osłona przed magią działała w walkach: {fights} z {all}."],
-      "curseFights": ["Klątwa osłabiała ciosy w walkach: {fights} z {all}."]
+      "curseFights": ["Klątwa osłabiała ciosy w walkach: {fights} z {all}."],
+      "woundsFights": ["Rany osłabiały ciosy w walkach: {fights} z {all}."]
     }
   },
   "herbs": [

@@ -745,6 +745,433 @@
           }
         }
       }
+    },
+    "bog-herbalist": {
+      "title": "Jagna in the Marsh",
+      "text": "At the edge of the marsh someone is crying for help. It is Jagna, the herbalist from the Settlement: she has sunk waist-deep in black mud, and her basket of herbs bobs on the water beside her. “Help me, it’s pulling me under!”",
+      "options": {
+        "pull": {
+          "label": "Pull her out"
+        },
+        "stick": {
+          "label": "Hold out a stick from the bank"
+        },
+        "leave": {
+          "label": "Walk away"
+        }
+      },
+      "cases": {
+        "jagna": {
+          "name": "Jagna",
+          "outcomes": {
+            "pull": {
+              "text": "You grab Jagna under the arms and pull until the mud lets go with a loud squelch. The herbalist catches her breath, fishes out her basket and presses a handful of herbs into your hands ({herbs}): “I won’t forget this” (+25 relation with Jagna).",
+              "herbsKnown": {
+                "goldText": "You grab Jagna under the arms and pull until the mud lets go with a loud squelch. The herbalist catches her breath and presses a few coins into your hand (+{gold} gold): “I won’t forget this” (+25 relation with Jagna)."
+              }
+            },
+            "stick": {
+              "text": "You hold out a long stick to Jagna and brace yourself on firm ground. Slowly the herbalist crawls out onto the bank, but her basket drifts off into the reeds. She shares what is left with you ({herbs}): “Thank you. I won’t forget this” (+25 relation with Jagna).",
+              "herbsKnown": {
+                "goldText": "You hold out a long stick to Jagna and brace yourself on firm ground. Slowly the herbalist crawls out onto the bank while her basket drifts off into the reeds. She presses a few coins into your hand (+{gold} gold): “Thank you. I won’t forget this” (+25 relation with Jagna)."
+              }
+            },
+            "leave": {
+              "text": "You walk away. Behind you the splashing and calling go on for a long while. In the evening Jagna comes back to the Settlement covered in mud: she got out on her own."
+            }
+          }
+        },
+        "drowned-maiden": {
+          "name": "Drowned Maiden",
+          "outcomes": {
+            "pull": {
+              "text": "You take her hands, and they are cold as ice. “Jagna” smiles wide: her teeth are sharp as needles and her hair is full of duckweed. A Drowned Maiden! She drags you down into the bog.",
+              "start": "The Drowned Maiden pulls you into the mud: {enemies}."
+            },
+            "stick": {
+              "text": "You hold out the stick, and she yanks it with inhuman strength. You let go just in time. A Drowned Maiden rises from the mud, a Drowner close behind her.",
+              "start": "The Drowned Maiden and the Drowner crawl onto the bank, but they cannot take you by surprise: {enemies}."
+            },
+            "leave": {
+              "text": "You walk away. The cries behind you turn into giggling, then into gurgling. Jagna is back at the Settlement right now, isn’t she…"
+            }
+          }
+        }
+      }
+    },
+    "star-iron": {
+      "title": "A Star from the Sky",
+      "text": "At night a bright star streaks across the sky and falls just beyond the hill. In the fresh crater smokes a black lump of sky-iron, and next to it hovers a lad in a leather apron: “I’m Żelisław’s apprentice. The master will pay any price for this. Will you help me carry it?”",
+      "options": {
+        "carry": {
+          "label": "Help carry the iron to the forge"
+        },
+        "take": {
+          "label": "Take the lump for yourself"
+        },
+        "leave": {
+          "label": "Walk away"
+        }
+      },
+      "cases": {
+        "apprentice": {
+          "name": "Apprentice",
+          "outcomes": {
+            "carry": {
+              "text": "You take turns carrying the lump all the way to the Settlement. Żelisław turns it in his hands like a treasure, then forges something from it for you: {item}. “I haven’t held iron like this in years” (+25 relation with Żelisław)."
+            },
+            "take": {
+              "text": "You push the lad aside and take the lump. A merchant on the road pays for the sky-iron without haggling (+{gold} gold). The apprentice watches you go for a long time."
+            },
+            "leave": {
+              "text": "You leave the lad with his star. When you look back, he is still wrestling with the hot lump."
+            }
+          }
+        },
+        "robber": {
+          "name": "Robber",
+          "outcomes": {
+            "carry": {
+              "text": "You have barely lifted the lump when the lad whistles through his fingers. His friends burst out of the bushes: he is no apprentice!",
+              "start": "Ambush! The robbers strike first: {enemies}."
+            },
+            "take": {
+              "text": "You reach for the lump, and the lad whistles through his fingers. His friends burst out of the bushes, but your weapon is already in your hand.",
+              "start": "The robbers burst out of the bushes, but they cannot take you by surprise: {enemies}."
+            },
+            "leave": {
+              "text": "You walk away. Behind you there is a whistle and a rustle in the bushes: someone was waiting for someone here."
+            }
+          }
+        }
+      }
+    },
+    "ferryman": {
+      "title": "The Ferryman",
+      "text": "The river has swollen after the downpour and flooded the ford. A boat rocks by the bank, and in it an old ferryman with a long pole: “I’ll take you across. But not for free.”",
+      "options": {
+        "pay": {
+          "label": "Pay for the crossing"
+        },
+        "swim": {
+          "label": "Swim across"
+        },
+        "ford": {
+          "label": "Look for a ford"
+        }
+      },
+      "cases": {
+        "ferryman": {
+          "name": "Ferryman",
+          "outcomes": {
+            "pay": {
+              "text": "The ferryman pushes off from the bank and on the way tells you what he has heard from travellers: “{area}. They say {creature} was seen there, and many a treasure with it.”",
+              "noRumorText": "The ferryman takes you across in silence. The water is calmer than it looked."
+            },
+            "swim": {
+              "text": "You throw yourself into the icy current. It slams you against the rocks, but at last you crawl out onto the far bank. The bruises will ache for a long while (wounds: damage −10% for 2 fights)."
+            },
+            "ford": {
+              "drowner": {
+                "name": "Drowner in the ford",
+                "text": "You wade waist-deep through the murky water when something grabs your ankle. A Drowner!",
+                "start": "The Drowner drags you under: {enemies}."
+              },
+              "safe": {
+                "name": "Safe ford",
+                "text": "You search for shallows for a long time until you find a ford at last. You reach the far bank wet, but unharmed."
+              }
+            }
+          }
+        },
+        "nix": {
+          "name": "Nix",
+          "outcomes": {
+            "pay": {
+              "text": "In the middle of the river the ferryman stands up and laughs a bubbling laugh. Water drips from under his hat, and his fingers are webbed. A Nix! With one move he overturns the boat.",
+              "start": "The Nix drags you under: {enemies}."
+            },
+            "swim": {
+              "text": "You throw yourself into the icy current. It slams you against the rocks, and something laughs under the water. At last you crawl out onto the far bank, bruised to the bone (wounds: damage −10% for 2 fights)."
+            },
+            "ford": {
+              "text": "The ferryman watches you from under his hat for a strangely long time. You find a ford downstream and cross without trouble. When you look back, the boat is gone, and rings spread across the water."
+            }
+          }
+        }
+      }
+    },
+    "fireside-dice": {
+      "title": "Dice by the Fire",
+      "text": "A stranger in a black hood sits by the fire, shaking a cup of dice until they rattle: “Fancy a game, traveller? Who knows, maybe luck is on your side today.”",
+      "options": {
+        "small": {
+          "label": "Play for a small stake"
+        },
+        "big": {
+          "label": "Play for a big stake"
+        },
+        "refuse": {
+          "label": "Refuse"
+        }
+      },
+      "cases": {
+        "stranger": {
+          "name": "Stranger",
+          "outcomes": {
+            "small": {
+              "win": {
+                "name": "Win",
+                "text": "The dice roll across the stone… You win! Without a word the stranger counts out double your stake (+{gold} gold)."
+              },
+              "loss": {
+                "name": "Loss",
+                "text": "The dice roll across the stone. You lose. The stranger sweeps up the coins and smiles from under his hood (−{cost} gold)."
+              }
+            },
+            "big": {
+              "win": {
+                "name": "Win",
+                "text": "The dice spin for a long time… You win! The stranger grimaces but counts out double your stake (+{gold} gold)."
+              },
+              "loss": {
+                "name": "Loss",
+                "text": "The dice spin for a long time. You lose. The stranger sweeps your gold into his purse (−{cost} gold)."
+              }
+            },
+            "refuse": {
+              "text": "You shake your head. The stranger shrugs and goes back to his dice."
+            }
+          }
+        },
+        "fiend": {
+          "name": "Fiend",
+          "outcomes": {
+            "small": {
+              "text": "The dice roll strangely long and always land in the stranger’s favour. As he sweeps up the stake (−{cost} gold), the firelight shows a hoof instead of a boot. A Fiend with loaded dice!"
+            },
+            "big": {
+              "text": "The dice roll strangely long and always land in the stranger’s favour. As he sweeps up the stake (−{cost} gold), he throws back his hood, and horns grow from beneath it. The Fiend laughs, and his laughter drains the strength from your arms (curse: damage −10% for 4 fights)."
+            },
+            "refuse": {
+              "text": "You shake your head. The stranger hisses something under his breath, and as you walk away you hear the clatter of hooves behind you."
+            }
+          }
+        }
+      }
+    },
+    "refugees": {
+      "title": "Burnt Out",
+      "text": "At the side of the road sits a family with bundles: father, mother and two children, all smeared with soot. “Our village burned down. We have nowhere to go.”",
+      "options": {
+        "give": {
+          "label": "Give them gold for a fresh start"
+        },
+        "escort": {
+          "label": "Walk them to the Settlement"
+        },
+        "point": {
+          "label": "Show them the way to the Settlement"
+        }
+      },
+      "cases": {
+        "family": {
+          "name": "Burnt-out family",
+          "outcomes": {
+            "give": {
+              "text": "The father shakes your hand for a long time. A few days later headman Bogumił tells everyone in the Settlement about the burnt-out family who, thanks to you, settled by the mill (+25 relation with Bogumił)."
+            },
+            "escort": {
+              "text": "You set off down the road together. At the fork, the way is blocked by marauders who have followed the family from the burned village.",
+              "win": {
+                "text": "The family reaches the Settlement safely, and headman Bogumił himself comes out to meet you (+40 relation with Bogumił)."
+              },
+              "start": "The marauders attack: {enemies}."
+            },
+            "point": {
+              "text": "You draw the way to the Settlement in the sand with a stick. The family thanks you and sets off."
+            }
+          }
+        },
+        "bandits": {
+          "name": "Robbers in disguise",
+          "outcomes": {
+            "give": {
+              "text": "The father tucks the gold inside his coat (−{cost} gold), and when you turn around, the family is gone. Only bundles stuffed with straw are left on the road."
+            },
+            "escort": {
+              "text": "Around the first bend the “father” pulls a knife from under his rags, and the “mother” a crossbow. Robbers disguised as a burnt-out family!",
+              "start": "Ambush! The robbers strike first: {enemies}."
+            },
+            "point": {
+              "text": "You draw the way to the Settlement. The “father” thanks you, but eyes your purse strangely. As you walk away, you hear laughter behind you."
+            }
+          }
+        }
+      }
+    },
+    "old-soldier": {
+      "title": "The Old Soldier",
+      "text": "By a wayside shrine rests a grey-haired soldier with a scar across his whole face. An old, notched sword lies across his knees. “I can teach you a thing or two, for a small fee. Or spar with me, if you’re not afraid.”",
+      "options": {
+        "learn": {
+          "label": "Pay for a lesson",
+          "outcome": {
+            "text": "For an hour the soldier shows you thrusts, feints and how to hold your weapon so your wrist doesn’t snap (strength: damage +15% for 6 fights)."
+          }
+        },
+        "spar": {
+          "label": "Spar with him",
+          "outcome": {
+            "won": {
+              "name": "Sparring won",
+              "text": "After a long exchange of blows the soldier lowers his sword and laughs: “Nobody has pushed me like that in years.” He unhooks an old pouch from his belt and gives you what he has carried in it for years: {item}."
+            },
+            "lost": {
+              "name": "Sparring lost",
+              "text": "The soldier puts you on the ground three times before you can blink. He helps you up and explains what you are doing wrong. The bump will last a long time, and the advice even longer (focus +10% for 2 fights)."
+            }
+          }
+        },
+        "leave": {
+          "label": "Walk away",
+          "outcome": {
+            "text": "You bow to the soldier and move on. Behind you, you hear him sharpening his sword."
+          }
+        }
+      }
+    },
+    "companion-errand": {
+      "title": "[Her|His] errand",
+      "text": "{name} suddenly stops on the road: “Wait. There’s something I have to check.”",
+      "options": {
+        "together": {
+          "label": "I’ll come with you"
+        },
+        "alone": {
+          "label": "Go on, I’ll wait"
+        },
+        "later": {
+          "label": "Not now, let’s keep going",
+          "outcome": {
+            "text": "“I understand,” says {name}, and follows you, but keeps looking back for a long while."
+          }
+        }
+      },
+      "cases": {
+        "road": {
+          "name": "Father’s box",
+          "text": "By an old milestone {name} suddenly stops: “Wait. My father once buried a box here for a rainy day. I have to see if it’s still here.”",
+          "outcomes": {
+            "together": {
+              "text": "You dig together under the stone. There it is! Father’s old box, and in it {item}. {name} holds his knife for a long time and finally tucks it into [her|his] belt (your bond reaches its next stage)."
+            },
+            "alone": {
+              "text": "{name} comes back an hour later with dirt under [her|his] nails and a smile: the box was there. [She|He] shares what was in it with you (+{gold} gold, +30 relation)."
+            }
+          }
+        },
+        "debts": {
+          "name": "The moneylender’s men",
+          "text": "{name} stops and looks at fresh tracks on the road: “Someone is following us. The moneylender’s men from town. I have to settle this at last.”",
+          "outcomes": {
+            "together": {
+              "text": "You wait together around the bend. The moneylender’s men walk straight into you.",
+              "win": {
+                "text": "The moneylender’s men flee and drop the promissory notes on the way. {name} tears them to shreds and laughs for the first time in ages (your bond reaches its next stage)."
+              },
+              "start": "The moneylender’s men reach for their weapons: {enemies}."
+            },
+            "alone": {
+              "text": "{name} comes back with a split lip, but calmer: “They won’t be looking for me anymore.” [She|He] presses a few coins left over from the debt into your hand (+{gold} gold, +30 relation)."
+            }
+          }
+        },
+        "farmstead": {
+          "name": "Land by the stream",
+          "text": "{name} points to a valley by a stream: “There. That piece of land is for sale. Will you help me look at it before someone else buys it?”",
+          "outcomes": {
+            "together": {
+              "text": "You walk the field and the woods by the stream together. The land is good. {name} drives a stick into it as a mark, and in an old fence you find something someone hid here long ago: {item} (your bond reaches its next stage)."
+            },
+            "alone": {
+              "text": "{name} comes back with shining eyes: the land is good, and the old farmer lowered the price. Overjoyed, [she|he] pays back an old debt to you (+{gold} gold, +30 relation)."
+            }
+          }
+        },
+        "wolves": {
+          "name": "The torn-eared wolf",
+          "text": "{name} kneels over tracks in the mud: “It’s him. The big wolf with the torn ear, the one that killed our flock. He’s close.”",
+          "outcomes": {
+            "together": {
+              "text": "You follow the tracks together to a windfall. The wolf waits there with his pack.",
+              "win": {
+                "text": "The wolf falls. {name} stands over him in silence for a long time, then nods to you: “Thank you” (your bond reaches its next stage)."
+              },
+              "start": "The pack leaps at you: {enemies}."
+            },
+            "alone": {
+              "text": "{name} comes back at dusk with a wolf pelt over [her|his] shoulder, sells it at the Settlement and gives you part of the price (+{gold} gold, +30 relation)."
+            }
+          }
+        },
+        "manor": {
+          "name": "Messenger from the manor",
+          "text": "A messenger in a great lord’s colours waits on the road. {name} turns pale: “He’s here for me. The lord wants me back at the manor.”",
+          "outcomes": {
+            "together": {
+              "text": "You go to the messenger together. {name} refuses firmly but politely, and the messenger shrugs and hands over what the lord sent as a farewell: {item}. “I prefer the forest to his manor” (your bond reaches its next stage)."
+            },
+            "alone": {
+              "text": "{name} talks with the messenger for a long time, but comes back: “I’m not going back there.” The messenger left a purse as a farewell, and {name} shares it with you (+{gold} gold, +30 relation)."
+            }
+          }
+        },
+        "oath": {
+          "name": "The promise",
+          "text": "{name} stops by the path to an old shrine: “I promised a dying friend I would carry his sword there. But something drives away everyone who goes.”",
+          "outcomes": {
+            "together": {
+              "text": "A Revenant waits at the shrine. It is what drove everyone away.",
+              "win": {
+                "text": "The Revenant fades into the morning mist. {name} lays the friend’s sword beneath the shrine: “Promise kept” (your bond reaches its next stage)."
+              },
+              "start": "The Revenant lunges at you: {enemies}."
+            },
+            "alone": {
+              "text": "{name} comes back pale, but with a light heart: the friend’s sword now lies beneath the shrine. On the way back [she|he] pays back an old debt to you (+{gold} gold, +30 relation)."
+            }
+          }
+        },
+        "brother": {
+          "name": "The lost brother",
+          "text": "{name} picks up a scrap of red scarf: “This is my brother’s scarf! He was here not long ago.” Further on, deep into the wilds, lead the tracks of several men.",
+          "outcomes": {
+            "together": {
+              "text": "You follow the tracks together to a poachers’ camp. The brother sits tied to a tree, and the poachers reach for their weapons.",
+              "win": {
+                "text": "The poachers flee. {name} cuts the brother free and hugs him for a long time. The brother heads for the Settlement, and now you have two friends (your bond reaches its next stage)."
+              },
+              "start": "The poachers attack: {enemies}."
+            },
+            "alone": {
+              "text": "{name} comes back at dusk with news: the brother is alive and works with the charcoal burners deep in the wilds. Overjoyed, [she|he] presses the brother’s purse into your hand (+{gold} gold, +30 relation)."
+            }
+          }
+        },
+        "treasure": {
+          "name": "The old map",
+          "text": "{name} spreads an old, frayed map across [her|his] knee: “The cross is just beyond that hill. Either it’s treasure, or someone has made a fool of me.”",
+          "outcomes": {
+            "together": {
+              "text": "You dig together under the root of an old oak. The shovel strikes a chest, and inside is {item}. {name} laughs out loud: “It was true after all!” (your bond reaches its next stage)."
+            },
+            "alone": {
+              "text": "{name} comes back laughing at [herself|himself]: the cross led to a hollow stump with only a few old coins at the bottom. [She|He] shares them with you (+{gold} gold, +30 relation)."
+            }
+          }
+        }
+      }
     }
   },
   "foes": {

@@ -302,7 +302,7 @@ const ID_KEYS = new Set(
   offhands kinds elite champion profession catalyst outlaws rows topRarity bonus exceptAreas families requires summon edge strike dotEffect skills
   evolution effect gender until for code base bases item items next prev after before areaId regionId region sprite icon image music track tracks loop
   frames anchor mood pose look looks drawn tone tones skin skins target goods trigger when screen tab anchorTo points pointer highlight route hash key
-  keys type types mode condition feature features flag start column default renameAt language`.split(/\s+/),
+  keys type types mode condition feature features flag start column default renameAt language firstCase errand relation`.split(/\s+/),
 );
 // Keys never read as texts, the swear filter's lists among them
 // (data/chat.json `words` and `wordsEn`), and a currency's code

@@ -128,6 +128,7 @@ import { counted, foreign, takenOff, testMarket } from './market.js';
 import { settlementTestsFor } from './test-mode.js';
 import { stableView } from './stable.js';
 import { tanneryView } from './tannery.js';
+import { giftWords, residentGiftsView } from './resident-gifts.js';
 import { say } from '../engine/text.js';
 import { weekFactorNow, weekNow } from './weeks.js';
 
@@ -186,6 +187,9 @@ export function settlementOf(row) {
     // The Punkty Czasu bought at the Pustelnik's on the day of the last buy
     // (timePointsOffer).
     ...(stored.timePoints && { timePoints: stored.timePoints }),
+    // The day of the last gift to each resident and the week of the last
+    // present taken from each (resident-gifts.js, 818.1 and 818.2).
+    ...(stored.gifts && { gifts: stored.gifts }),
     ...(stored.test && { test: true }),
   };
 }
@@ -289,6 +293,9 @@ export function settlementView(player, stored, board, now) {
   const stocks = settlementGoods(player.row, player.items, now);
   const sellBonus = sellBonusOf(player, now);
   const { name, description, places, torches = [], residents, brotherhoods } = content().settlement;
+  // Each resident's gift of the day and a friend's present of the week
+  // (resident-gifts.js, 818.1 and 818.2).
+  const gifts = residentGiftsView(player, stored, now);
   return {
     name,
     description,
@@ -299,8 +306,10 @@ export function settlementView(player, stored, board, now) {
     trialHall: trialHallView(player.row, now),
     residents: residents.map((resident) => {
       const standing = standingOf(stored.relations[resident.id] ?? 0, content());
-      return { ...resident, service: serviceOf(resident.id), standing, greeting: resident.greetings[Math.min(standing.index, resident.greetings.length - 1)] };
+      return { ...resident, service: serviceOf(resident.id), standing, greeting: resident.greetings[Math.min(standing.index, resident.greetings.length - 1)], ...gifts(resident.id) };
     }),
+    // The words of "Podaruj" and "Odbierz" on the residents' places.
+    gifts: giftWords(),
     // Each brotherhood's standing, its points, and what the standing gives
     // now and what the next one adds (the panel on the board).
     brotherhoods: brotherhoods.map((brotherhood) => {

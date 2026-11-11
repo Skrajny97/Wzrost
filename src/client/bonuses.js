@@ -38,7 +38,7 @@ export function bonusList(character) {
         return h(
           'li',
           { class: 'bonus-row' },
-          h('span', { class: 'bonus-art', 'aria-hidden': 'true' }, potionSprite(buff.potion) ?? icon(buff.kind === 'curse' ? 'spirit' : 'flask', { size: 24 })),
+          h('span', { class: 'bonus-art', 'aria-hidden': 'true' }, potionSprite(buff.potion) ?? icon(buff.kind === 'curse' || buff.kind === 'wounds' ? 'spirit' : 'flask', { size: 24 })),
           h(
             'span',
             { class: 'bonus-text' },
