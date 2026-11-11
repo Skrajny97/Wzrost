@@ -760,9 +760,13 @@
       "away": "The companion is on an exploration. Items are equipped and upgraded after the return.",
       "wornBy": "{name} wears this item. You pay for the upgrade from your own supplies.",
       "noItem": "The companion wears nothing in this slot.",
-      "partyOne": "First leave the companion in the quarters: {names}. The party hunts without companions from the Quarters.",
-      "partyMany": "First leave the companions in the quarters: {names}. The party hunts without companions from the Quarters.",
-      "toQuarters": "Go to the Quarters",
+      "inPartyGoing": "While the character is in a party, the companion stays in the quarters: the party hunts without companions from the Quarters. Once the character leaves the party, the companion goes on explorations again.",
+      "partyStayOne": "{names} will stay in the Quarters while you are in a party and will gain no XP or relation from explorations.",
+      "partyStayMany": "{names} will stay in the Quarters while you are in a party and will gain no XP or relation from explorations.",
+      "partyMakeTitle": "Start a party?",
+      "partyMake": "Start",
+      "partyJoinTitle": "Join the party?",
+      "partyJoin": "Join",
       "jewelry": "Jewellery"
     }
   },

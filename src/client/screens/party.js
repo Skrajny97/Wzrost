@@ -19,6 +19,9 @@ import { confirmAction, framedName, guildTag, howItWorks, toast, withButton } fr
 // language (t()).
 const GOERS =
   'Na wyprawę ruszają członkowie bez zajęć w trakcie, z dopasowaniem do najniższego poziomu klasy z drużyny. Kto zajmuje się profesją albo jest na solo wyprawie, zostaje w drużynie, ale nie uczestniczy we wspólnej wyprawie.';
+// The companions from the Kwatery in a party: the sentence of 828 A, which
+// 828 B goes like (11.11.2026), under "Jak to działa?".
+const COMPANIONS_STAY = 'Póki jesteś w drużynie, towarzysze zostają w Kwaterach i nie zdobywają XP ani relacji z wypraw.';
 
 // A member's dot (the Znajomi's colours, styles.css) and its words; the
 // busy ones say it beside the name too, as they stay home when the party
@@ -81,7 +84,7 @@ export function mountParty(container) {
         event.preventDefault();
         withButton(inviteButton, async () => {
           const value = name.value.trim();
-          if (!value) return;
+          if (!value || !(await companionsAgree('make'))) return;
           await act('/api/party/invite', { name: value })();
           name.value = '';
         });
@@ -95,29 +98,24 @@ export function mountParty(container) {
     if (gone) return;
     view = next;
     partySeen(view);
-    // No party is made or joined while a companion goes on explorations.
-    inviteButton.disabled = Boolean(view.companions);
-    fill(body, companionsCard(), invitesCard(), partyCard(), inviteCard(), sentCard(), leaveCard());
+    fill(body, invitesCard(), partyCard(), inviteCard(), sentCard(), leaveCard());
   }
 
-  // While a companion goes on the character's explorations, it neither
-  // makes a party nor joins one (the author: "nie może być w drużynie,
-  // dopóki nie kliknie na nim [Zostań w kwaterze]"): why, and the way to
-  // the Kwatery, where the companion is told to stay.
-  function companionsCard() {
-    if (!view.companions) return null;
-    return h(
-      'section',
-      { class: 'card party-companions', role: 'status' },
-      h('p', { class: 'region-warning', text: view.companions.text }),
-      h('a', { class: 'button button--world button--small', href: '#/oboz/quarters', text: view.companions.link }),
-    );
-  }
-
-  // "Dołącz" and "Zaproś" wait for the companions to stay (companionsCard).
-  const unlessCompanions = (element) => {
-    element.disabled = Boolean(view.companions);
-    return element;
+  // Before a party is made (`way` 'make': the first invitation) or joined
+  // ('join'), one question naming the companions who go on the character's
+  // explorations: they stay in the Kwatery while it is in the party (828 B,
+  // 11.11.2026: „Dobrogost i Dobrosława zostaną w Kwaterach, póki jesteś w
+  // drużynie: nie zdobędą XP ani relacji z wypraw.” [Dołącz] [Anuluj]).
+  // None when no companion goes, nor in a party (the server's `companions`
+  // is then null). Before 828 such companions kept it out of every party.
+  const companionsAgree = async (way) => {
+    const asked = view.companions;
+    if (!asked) return true;
+    return confirmAction({ title: asked[way].title, text: asked.text, confirmLabel: asked[way].confirm });
+  };
+  // An action that makes or joins a party, once the question is answered.
+  const agreed = (way, run) => async () => {
+    if (await companionsAgree(way)) await run();
   };
 
   // An action answered with the Drużyna anew, its words in a toast.
@@ -174,7 +172,7 @@ export function mountParty(container) {
             h(
               'div',
               { class: 'friend-actions' },
-              unlessCompanions(button(t('Dołącz'), act('/api/party/accept', { partyId: invite.partyId }), 'system')),
+              button(t('Dołącz'), agreed('join', act('/api/party/accept', { partyId: invite.partyId })), 'system'),
               button(t('Odrzuć'), act('/api/party/decline', { partyId: invite.partyId }, t('Zaproszenie odrzucone.'))),
             ),
           ),
@@ -233,11 +231,13 @@ export function mountParty(container) {
             spreadText(view.range.spread),
             t('Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.'),
             t('Bez „Z drużyną” wyprawa jest tylko Twoja, a członkowie też mogą wyruszać na własne wyprawy.'),
+            t(COMPANIONS_STAY),
           ])
         : howItWorks(t('Wyprawy wybiera lider. Gdy nie masz innych zajęć, lider zabierze Cię ze sobą, a raport odbierzesz w Walce jak zwykle.'), [
             t(GOERS),
             spreadText(view.range.spread),
             t('Wyprawa drużyny ma wspólny czas: gdy ktokolwiek ją przewinie, skraca się wszystkim.'),
+            t(COMPANIONS_STAY),
           ]),
     );
   }
@@ -264,7 +264,7 @@ export function mountParty(container) {
         h(
           'ul',
           { class: 'friends-list' },
-          ready.map((friend) => h('li', { class: 'friend' }, who(friend), h('div', { class: 'friend-actions' }, unlessCompanions(button(t('Zaproś'), act('/api/party/invite', { name: friend.name }), 'system'))))),
+          ready.map((friend) => h('li', { class: 'friend' }, who(friend), h('div', { class: 'friend-actions' }, button(t('Zaproś'), agreed('make', act('/api/party/invite', { name: friend.name })), 'system')))),
         ),
       inviteForm,
     );

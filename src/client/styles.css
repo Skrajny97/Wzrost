@@ -12075,18 +12075,6 @@ a.profession-square:active {
   margin: 0;
 }
 
-/* The Drużyna's word that a companion going on explorations keeps the
-   character out of a party, with the way to the Kwatery. */
-.party-companions {
-  display: grid;
-  gap: 8px;
-  justify-items: start;
-}
-
-.party-companions p {
-  margin: 0;
-}
-
 .settlement-companion-talks ul {
   padding-left: 18px;
   display: grid;

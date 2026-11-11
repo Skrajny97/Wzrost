@@ -16,12 +16,15 @@ import {
   companionGoes,
   companionReady,
   companionStays,
+  companionTrained,
+  companionTraining,
   companionXp,
   createRng,
   drawCandidates,
   generateItem,
   hireCost,
-  partyRefusal,
+  partyStayText,
+  questPeriod,
   simulateHunt,
   staying,
   upgradedOnCompanion,
@@ -115,17 +118,49 @@ describe('companions in the engine', () => {
     assert.deepEqual([companionGoes({ ...candidate, wounded: true }, { rested: false }), companionGoes({ ...candidate, wounded: true }, { rested: true })], [false, true]);
   });
 
-  test('the companions going on explorations keep the character out of a Drużyna, named in their forms', () => {
+  test('before a Drużyna, one question names the companions going on explorations, who stay in the Kwatery meanwhile (828 B)', () => {
     const [candidate] = drawCandidates({ character, seed: 's' }, NOW, content);
-    const she = { ...candidate, name: 'Milena', appearance: 'female' };
-    const he = { ...candidate, name: 'Bogdan', appearance: 'male' };
-    const tail = 'Drużyna poluje bez towarzyszy z Kwater.';
-    assert.equal(partyRefusal([], content), null);
-    assert.equal(partyRefusal([staying(she, true), staying(he, true)], content), null);
-    assert.equal(partyRefusal([she], content), `Najpierw zostaw towarzyszkę w kwaterze: Milena. ${tail}`);
-    assert.equal(partyRefusal([he, staying(she, true)], content), `Najpierw zostaw towarzysza w kwaterze: Bogdan. ${tail}`);
-    assert.equal(partyRefusal([she, he], content), `Najpierw zostaw towarzyszy w kwaterze: Milena, Bogdan. ${tail}`);
-    assert.equal(partyRefusal([she, { ...she, name: 'Bogna' }], content), `Najpierw zostaw towarzyszki w kwaterze: Milena, Bogna. ${tail}`);
+    const she = { ...candidate, name: 'Dobrosława', appearance: 'female' };
+    const he = { ...candidate, name: 'Dobrogost', appearance: 'male' };
+    const third = { ...candidate, name: 'Milena', appearance: 'female' };
+    const one = 'zostanie w Kwaterach, póki jesteś w drużynie: nie zdobędzie XP ani relacji z wypraw.';
+    const many = 'zostaną w Kwaterach, póki jesteś w drużynie: nie zdobędą XP ani relacji z wypraw.';
+    // None asked when no companion goes: none hired, or all told to stay.
+    assert.equal(partyStayText([], content), null);
+    assert.equal(partyStayText([staying(she, true), staying(he, true)], content), null);
+    assert.equal(partyStayText([she], content), `Dobrosława ${one}`);
+    assert.equal(partyStayText([he, staying(she, true)], content), `Dobrogost ${one}`);
+    assert.equal(partyStayText([he, she], content), `Dobrogost i Dobrosława ${many}`);
+    assert.equal(partyStayText([he, she, third], content), `Dobrogost, Dobrosława i Milena ${many}`);
+    // The question leaves the player's own setting as it was.
+    assert.deepEqual([he.stays, companionStays(he), companionStays(he, true)], [undefined, false, true]);
+  });
+
+  test('training: a level for 25 gold times the level it goes up to, three times a day, up to the character\'s level less three (829 B)', () => {
+    const { goldPerLevel, perDay, belowCharacter } = tuning.training;
+    assert.deepEqual([goldPerLevel, perDay, belowCharacter], [25, 3, 3]);
+    const [candidate] = drawCandidates({ character, seed: 's' }, NOW, content);
+    const companion = { ...candidate, level: 50, xp: 1234 };
+    // From 50 to 51: 1275 gold (the author's example, 829).
+    assert.deepEqual(companionTraining(companion, 60, NOW, content), { price: 1275, level: 51, cap: 57, left: 3, perDay: 3, below: 3, block: null });
+    // A level the same as one earned, its XP to the next from nothing, the
+    // day's trainings counted.
+    const day = questPeriod('daily', NOW, content).key;
+    let trained = companionTrained(companion, NOW, content);
+    assert.deepEqual(trained.trained, { day, count: 1 });
+    assert.deepEqual([trained.level, trained.xp, trained.trained.count], [51, 0, 1]);
+    assert.deepEqual({ ...trained, level: 50, xp: 1234, trained: undefined }, { ...companion, trained: undefined });
+    trained = companionTrained(companionTrained(trained, NOW, content), NOW, content);
+    assert.deepEqual([trained.level, trained.trained], [53, { day, count: 3 }]);
+    assert.deepEqual(companionTraining(trained, 60, NOW, content), { price: 1350, level: 54, cap: 57, left: 0, perDay: 3, below: 3, block: 'day' });
+    // The next day three more.
+    const tomorrow = companionTraining(trained, 60, NOW + 86400000, content);
+    assert.deepEqual([tomorrow.left, tomorrow.block], [3, null]);
+    assert.equal(companionTrained(trained, NOW + 86400000, content).trained.count, 1);
+    // At the character's level less three, no more.
+    assert.equal(companionTraining({ ...companion, level: 57 }, 60, NOW, content).block, 'cap');
+    assert.equal(companionTraining({ ...companion, level: 59 }, 60, NOW, content).block, 'cap');
+    assert.equal(companionTraining({ ...companion, level: 56 }, 60, NOW, content).block, null);
   });
 
   test("an upgrade on a companion changes only the item in its place: the level and the try's seed, or the item gone when it broke", () => {
@@ -661,5 +696,69 @@ describe('companions through the API', () => {
     const alone = await activity();
     assert.equal(alone.kind, 'hunt');
     assert.ok(!('companions' in alone));
+  });
+
+  test('"Trenuj": a level for 25 gold times the level it goes up to, three times a day, up to the character\'s level less three, at home (829 B)', async () => {
+    const candidate = await hireFirst();
+    const database = await db();
+    const train = () => call('POST', '/api/settlement/companion-train', { cookie, body: { companionId: candidate.id } });
+    const write = async (change) => {
+      const saved = await stored();
+      saved.companions[0] = { ...saved.companions[0], ...change(saved.companions[0]) };
+      await database.prepare('UPDATE characters SET settlement = ?').bind(JSON.stringify(saved)).run();
+    };
+    // Fallen behind: the companion at 50, some XP towards 51, the character at 60.
+    await write(() => ({ level: 50, xp: 500 }));
+    await database.prepare('UPDATE characters SET level = 60, gold = 1274').run();
+    const before = (await settlement()).companions.hired[0];
+    assert.deepEqual(before.training, { price: 1275, level: 51, cap: 57, left: 3, perDay: 3, below: 3, block: null });
+    // Not enough gold: nothing changes.
+    const poor = await train();
+    assert.deepEqual([poor.status, poor.data.error.code, poor.data.error.message], [409, 'not_enough_gold', 'Brakuje złota na trening.']);
+    assert.deepEqual([(await stored()).companions[0].level, (await database.prepare('SELECT gold FROM characters').first()).gold], [50, 1274]);
+    // From 50 to 51 for 1275 gold: a level as one earned, its numbers grow
+    // and its XP towards 52 starts from nothing; the gold shows at once.
+    await database.prepare('UPDATE characters SET gold = 10000').run();
+    const first = await train();
+    assert.equal(first.status, 200, JSON.stringify(first.data));
+    assert.deepEqual(first.data.trained, { name: candidate.name, level: 51, price: 1275 });
+    assert.equal(first.data.character.gold, 10000 - 1275);
+    let card = first.data.settlement.companions.hired[0];
+    assert.deepEqual([card.level, card.xp, card.training.price, card.training.left], [51, 0, 1300, 2]);
+    assert.ok(card.maxHp > before.maxHp, `${card.maxHp} > ${before.maxHp}`);
+    // Two more today, for 1300 and 1325; then the day's trainings are used.
+    assert.equal((await train()).status, 200);
+    const third = await train();
+    assert.equal(third.status, 200);
+    card = third.data.settlement.companions.hired[0];
+    assert.deepEqual([card.level, card.training.left, card.training.block], [53, 0, 'day']);
+    assert.equal(third.data.character.gold, 10000 - 1275 - 1300 - 1325);
+    const fourth = await train();
+    assert.deepEqual([fourth.status, fourth.data.error.code, fourth.data.error.message], [409, 'trained_today', 'Dziś już 3 razy. Kolejny trening jutro.']);
+    assert.equal((await stored()).companions[0].level, 53);
+    // Another day: up to 57, the character's level less three, and no higher.
+    await write((companion) => ({ level: 56, trained: { ...companion.trained, day: '2026-01-01' } }));
+    const last = await train();
+    assert.equal(last.status, 200, JSON.stringify(last.data));
+    assert.deepEqual([last.data.trained.level, last.data.settlement.companions.hired[0].training.block], [57, 'cap']);
+    const capped = await train();
+    assert.deepEqual([capped.status, capped.data.error.code, capped.data.error.message], [409, 'level_cap', 'Trening najwyżej do poziomu postaci −3.']);
+    // Not while it is out on the character's exploration; at home, while
+    // the character explores without it, it trains.
+    await database.prepare('UPDATE characters SET level = 70').run();
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.equal((await settlement()).companions.hired[0].training.block, null);
+    const away = await train();
+    assert.deepEqual([away.status, away.data.error.code], [409, 'busy']);
+    await call('POST', '/api/hunts/cancel', { cookie });
+    assert.equal((await call('POST', '/api/settlement/companion-stay', { cookie, body: { companionId: candidate.id, stays: true } })).status, 200);
+    await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 5 } });
+    assert.equal((await train()).status, 200);
+    await call('POST', '/api/hunts/cancel', { cookie });
+    // Two taps at once buy one level.
+    const gold = (await database.prepare('SELECT gold FROM characters').first()).gold;
+    const taps = await Promise.all([train(), train()]);
+    assert.deepEqual(taps.map((tap) => tap.status).sort(), [200, 409]);
+    assert.deepEqual([(await stored()).companions[0].level, (await database.prepare('SELECT gold FROM characters').first()).gold], [59, gold - 25 * 59]);
   });
 });

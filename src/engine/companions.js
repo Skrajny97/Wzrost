@@ -10,9 +10,10 @@
 // HP (the author: "Niech rany towarzyszy goją się wraz z ranami postaci").
 //
 // Stored in the Osada: { id, name, appearance, classId, level, xp, traits,
-// skills, profession, story, gear: [items], wounded, giftWeek, stays }. An
-// item of `gear` the player gave from the bag is marked `given`; `stays`
-// marks one told to stay in the Kwatery (companionStays).
+// skills, profession, story, gear: [items], wounded, giftWeek, stays,
+// trained }. An item of `gear` the player gave from the bag is marked
+// `given`; `stays` marks one told to stay in the Kwatery (companionStays);
+// `trained` counts the day's trainings ({ day, count }, companionTraining).
 
 import { playerCombatant } from './combatant.js';
 import { baseClassLevel, canUse, generateItem } from './items.js';
@@ -21,6 +22,7 @@ import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { topLevel } from './skills.js';
 import { autoDistribute } from './stats.js';
+import { word } from './text.js';
 import { weekCount, weekFactor } from './weeks.js';
 
 const tuning = (content) => content.settlement.companions;
@@ -246,13 +248,15 @@ export function companionAfterHunt(companion, { xp, fainted, minutes, week = nul
 // the character's.
 export const companionReady = (companion, rested) => Boolean(companion) && (!companion.wounded || rested);
 
-// Whether a hired companion stays in the Kwatery (the author: "jeśli ktoś
-// ma zwerbowanego towarzysza to nie może być w drużynie, dopóki nie kliknie
-// na nim [Zostań w kwaterze]; wtedy nie poluje się z towarzyszem, tylko
-// samemu/z drużyną"): told to stay (`stays`), or while the character is in
-// a Drużyna (`inParty`), whose explorations go without companions. One who
-// stays goes on no exploration, so it gains no XP and no relation from
-// them; its talks, its gift and the healing of its wounds go on.
+// Whether a hired companion stays in the Kwatery: told to stay (`stays`,
+// "Zostań w kwaterze"), or while the character is in a Drużyna (`inParty`),
+// whose explorations go without companions (the author: "wtedy nie poluje
+// się z towarzyszem, tylko samemu/z drużyną"). One who stays goes on no
+// exploration, so it gains no XP and no relation from them; its talks, its
+// gift and the healing of its wounds go on. Since 828 B (11.11.2026) the
+// companions no longer keep the character out of a Drużyna: they stay by
+// themselves while it is in one, and `stays`, the player's own setting, is
+// left as it was, so out of the party each goes back to it.
 export const companionStays = (companion, inParty = false) => inParty || companion.stays === true;
 
 // Whether the companion goes on the character's exploration now: one who
@@ -284,15 +288,53 @@ export function companionText(key, companion, content, vars = {}) {
   return gendered(tuning(content).texts[key], companion.appearance).replace(/\{(\w+)\}/g, (_, name) => String(words[name] ?? ''));
 }
 
-// Why a character cannot make or join a Drużyna, or null: its companions
-// who do not stay in the Kwatery, named ("Najpierw zostaw towarzysza w
-// kwaterze"), "towarzyszki" for women only.
-export function partyRefusal(companions, content) {
-  const going = companions.filter((companion) => !companionStays(companion));
-  if (going.length === 0) return null;
+// The one question before a character makes or joins a Drużyna (828 B,
+// 11.11.2026: „Dobrogost i Dobrosława zostaną w Kwaterach, póki jesteś w
+// drużynie: nie zdobędą XP ani relacji z wypraw.”), or null when no
+// companion goes on the explorations: those who go, named ("A", "A i B",
+// "A, B i C"), stay in the Kwatery while it is in the party. Before 828
+// they kept it out of every party until told to stay.
+export function partyStayText(companions, content) {
+  const names = companions.filter((companion) => !companionStays(companion)).map((companion) => companion.name);
+  if (names.length === 0) return null;
   const { texts } = tuning(content);
-  const look = going.every((companion) => companion.appearance === 'female') ? 'female' : 'male';
-  return gendered(going.length === 1 ? texts.partyOne : texts.partyMany, look).replace('{names}', going.map((companion) => companion.name).join(', '));
+  const listed = names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')}${word(content, ' i ')}${names.at(-1)}`;
+  return (names.length === 1 ? texts.partyStayOne : texts.partyStayMany).replace('{names}', listed);
+}
+
+// Training a hired companion in the Kwatery (829 B, 11.11.2026; `training`
+// in data/settlement.json): a level for goldPerLevel gold times the level it
+// goes up to, at most perDay times a day for each companion (the day of the
+// quests, as every daily limit) and only up to the character's level less
+// belowCharacter. `block`: 'cap' at that level, 'day' after the day's
+// trainings, or null; `price` and `level` of the next one, how many are
+// `left` today and the `cap`.
+export function companionTraining(companion, characterLevel, now, content) {
+  const { goldPerLevel, perDay, belowCharacter } = tuning(content).training;
+  const day = questPeriod('daily', now, content).key;
+  const done = companion.trained?.day === day ? companion.trained.count : 0;
+  const cap = Math.min(content.balance.progression.maxLevel, characterLevel - belowCharacter);
+  const level = companion.level + 1;
+  return {
+    price: Math.round(goldPerLevel * level),
+    level,
+    cap,
+    left: Math.max(0, perDay - done),
+    perDay,
+    below: belowCharacter,
+    block: companion.level >= cap ? 'cap' : done >= perDay ? 'day' : null,
+  };
+}
+
+// The companion after a training (companionTraining): a level up, the same
+// as one earned on the explorations (its numbers and skills follow its
+// level), with its XP towards the next level from nothing, as after a
+// level reached with just the XP it needed, and the day's trainings
+// counted (`trained`).
+export function companionTrained(companion, now, content) {
+  const day = questPeriod('daily', now, content).key;
+  const done = companion.trained?.day === day ? companion.trained.count : 0;
+  return { ...companion, level: companion.level + 1, xp: 0, trained: { day, count: done + 1 } };
 }
 
 // The companion after a try at upgrading the item it wears in `place` on

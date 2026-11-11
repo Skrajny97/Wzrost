@@ -46,26 +46,32 @@ function recordOf(row) {
 
 const today = (now) => questPeriod('daily', now, content()).key;
 
-// The companions a character may take into a portal: those hired who do not
-// stay in the Kwatery, a wounded one too (a portal takes nobody's HP), but
-// never its Drużyna (the author: "Możliwość zabrania towarzyszy, ale w tym
-// przypadku - nie drużyn"); at most as many as go on explorations.
-const companionsOf = (row) =>
-  (JSON.parse(row.settlement ?? '{}').companions ?? []).filter((companion) => !companionStays(companion) && companionReady(companion, true)).slice(0, companionsGoingMost(content()));
+// The companions a character (`player`) may take into a portal: those hired
+// who do not stay in the Kwatery, a wounded one too (a portal takes
+// nobody's HP), but never its Drużyna (the author: "Możliwość zabrania
+// towarzyszy, ale w tym przypadku - nie drużyn"); at most as many as go on
+// explorations. While the character is in a Drużyna its companions stay in
+// the Kwatery (828 B), so none comes along, as before, when every one of
+// them had to be told to stay first.
+const companionsOf = (player) =>
+  (JSON.parse(player.row.settlement ?? '{}').companions ?? [])
+    .filter((companion) => !companionStays(companion, player.inParty) && companionReady(companion, true))
+    .slice(0, companionsGoingMost(content()));
 const sweptToday = (record, portalId, now) => (record.day === today(now) ? (record.swept[portalId] ?? 0) : 0);
 
 // The portals for the page: the last stage, the companions the character may take, and each portal with the
 // highest stage won, the stage of its next fight (null above the
 // character's level or the last stage) with what its win pays, and the
 // sweeps left today with what a sweep pays.
-function portalsView(row, now) {
+function portalsView(player, now) {
+  const { row } = player;
   const record = recordOf(row);
   const { sweeps, portals } = rules();
   return {
     sweepsPerDay: sweeps.perDay,
     maxStage: rules().maxStage,
     lootMinutes: rules().lootMinutes,
-    companions: companionsOf(row).map((companion) => companion.name),
+    companions: companionsOf(player).map((companion) => companion.name),
     portals: portals.map((portal) => {
       const best = record.best[portal.id] ?? 0;
       const next = portalNext(best, row.level, content());
@@ -90,7 +96,7 @@ function portalsView(row, now) {
 export async function getPortals(context) {
   const { player } = await requirePlayer(context);
   requireUnlocked(player.row);
-  return json({ portals: portalsView(player.row, context.now) });
+  return json({ portals: portalsView(player, context.now) });
 }
 
 function portalOf(body) {
@@ -129,7 +135,7 @@ export async function enterPortal(context) {
   const stage = portalNext(best, row.level, content());
   if (stage === null && best >= rules().maxStage) throw new ApiError(409, 'last_stage', 'To ostatni stopień tego portalu. Kolejne stopnie przyjdą później.');
   if (stage === null) throw new ApiError(409, 'level', `Kolejny stopień otworzy się na poziomie postaci ${best + 1}.`);
-  const companions = body.companions === false ? [] : companionsOf(row);
+  const companions = body.companions === false ? [] : companionsOf(player);
 
   const character = engineCharacter(row);
   const area = portalArea(stage, content());
@@ -188,7 +194,7 @@ export async function enterPortal(context) {
   const after = await loadPlayer(db, session.userId);
   return json({
     report: { id: results[1].meta.last_row_id, createdAt: now, ...report },
-    portals: portalsView(after.row, now),
+    portals: portalsView(after, now),
     character: characterView(after, now),
   });
 }
@@ -225,7 +231,7 @@ export async function sweepAllPortals(context) {
   const after = await loadPlayer(db, session.userId);
   return json({
     sweep: { swept: loot.swept, text: loot.text },
-    portals: portalsView(after.row, now),
+    portals: portalsView(after, now),
     character: characterView(after, now),
   });
 }
@@ -256,7 +262,7 @@ export async function sweepPortal(context) {
   const after = await loadPlayer(db, session.userId);
   return json({
     sweep: { portal: portal.id, stage: best, loot: loot.loot, text: loot.text },
-    portals: portalsView(after.row, now),
+    portals: portalsView(after, now),
     character: characterView(after, now),
   });
 }

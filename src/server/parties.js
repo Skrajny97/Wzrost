@@ -35,15 +35,19 @@
 // moves them all, and the others hear who skipped (time.js; the author:
 // "Musi być wspólny timer").
 //
-// A party hunts without companions (the author: "jeśli ktoś ma zwerbowanego
-// towarzysza to nie może być w drużynie, dopóki nie kliknie na nim [Zostań w
-// kwaterze]; wtedy nie poluje się z towarzyszem, tylko samemu/z drużyną"): a
-// character whose companion still goes on explorations neither makes a
-// party nor joins one, and in a party every companion stays in the Kwatery
-// (companionStays in the engine), also one of a character that was in a
-// party before this rule came.
+// A party hunts without companions (the author: "wtedy nie poluje się z
+// towarzyszem, tylko samemu/z drużyną"): in a party every companion stays in
+// the Kwatery (companionStays in the engine). Since 828 B (11.11.2026) the
+// companions no longer keep a character out of a party: before it makes or
+// joins one the page asks once, naming those who go on the explorations
+// (partyView's `companions`), and they stay by themselves while it is in
+// the party. The player's own setting of each ("Zostań w kwaterze") is not
+// touched, so out of the party, left, sent out or broken up, each goes
+// back to it. Before, a character whose companion still went on the
+// explorations neither made a party nor joined one until it was told to
+// stay, and stayed so after the party too.
 
-import { areaFor, areaOpenFor, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyRefusal, tripWanted, wantedTarget } from '../engine/index.js';
+import { areaFor, areaOpenFor, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyStayText, tripWanted, wantedTarget } from '../engine/index.js';
 import { characterView, currentHp, earlyAreaOf, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer, settleCharacter } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf, wayLook } from './cosmetics.js';
@@ -96,14 +100,16 @@ async function requirePartyPlayer(context) {
   return found;
 }
 
-// Why a character of `row` cannot make or join a party, or null: its
-// companions who do not stay in the Kwatery, where the Osada is on.
-const companionsOut = (row) => (settlementOn() ? partyRefusal(JSON.parse(row.settlement ?? '{}').companions ?? [], content()) : null);
-
-// A character makes or joins a party only once its companions stay.
-function requireCompanionsStay(row) {
-  const refusal = companionsOut(row);
-  if (refusal) throw new ApiError(409, 'companion_goes', refusal);
+// The question before a character of `row` makes or joins a party (828 B):
+// the words naming its companions who go on the explorations and will stay
+// in the Kwatery meanwhile, with the title and the button of the question
+// for making one (the first invitation) and for joining one; null when
+// none goes, or without the Osada.
+function companionsQuestion(row) {
+  const text = settlementOn() ? partyStayText(JSON.parse(row.settlement ?? '{}').companions ?? [], content()) : null;
+  if (!text) return null;
+  const { texts } = content().settlement.companions;
+  return { text, make: { title: texts.partyMakeTitle, confirm: texts.partyMake }, join: { title: texts.partyJoinTitle, confirm: texts.partyJoin } };
 }
 
 // The party a character is in: its id, leader and members (character ids
@@ -226,18 +232,10 @@ export async function partyView(db, characterId, now) {
     range: { ...partyRange(levels, content()), spread: content().balance.parties.classSpread },
     invites: invites.results.map((row) => ({ partyId: row.party_id, invitedBy: row.invited_by, members: row.members ?? '', at: row.created_at })),
     unlockLevel: unlock().level,
-    // Out of a party, the companions who still go on explorations keep the
-    // character from making or joining one: why, and the way to the
-    // Kwatery, where they are told to stay.
-    companions: !party && self.results[0] ? companionsBlock(self.results[0]) : null,
+    // Out of a party, the one question before making or joining one, when
+    // a companion goes on the explorations (companionsQuestion).
+    companions: !party && self.results[0] ? companionsQuestion(self.results[0]) : null,
   };
-}
-
-// The words of a character kept out of a party by its companions, with the
-// link to the Kwatery, or null.
-function companionsBlock(row) {
-  const text = companionsOut(row);
-  return text && { text, link: content().settlement.companions.texts.toQuarters };
 }
 
 const answer = async (db, characterId, now, extra = {}) => json({ ...(await partyView(db, characterId, now)), ...extra });
@@ -275,9 +273,6 @@ export async function inviteToParty(context) {
   if (blocked) throw new ApiError(409, 'blocked', `${target.name} nie przyjmuje teraz zaproszeń od Ciebie.`);
   let party = await partyOf(db, player.row.id);
   if (party && party.leaderId !== player.row.id) throw new ApiError(403, 'not_leader', 'Do drużyny zaprasza lider.');
-  // The first invitation makes the party: not while a companion goes on
-  // the inviting character's explorations.
-  if (!party) requireCompanionsStay(player.row);
   if (party?.memberIds.includes(target.id)) throw new ApiError(409, 'member', `${target.name} jest już w Twojej drużynie.`);
   if (party && party.memberIds.length >= size()) throw new ApiError(409, 'full', `Drużyna jest pełna: ${size()} postacie.`);
   const gap = levelGap(target.name, target.class_level, party ? await classLevels(db, party.id) : [player.row.class_level]);
@@ -320,7 +315,6 @@ export async function acceptPartyInvite(context) {
   const invite = await db.prepare('SELECT party_id FROM party_invites WHERE party_id = ? AND character_id = ?').bind(partyIdOf(body), player.row.id).first();
   if (!invite) throw new ApiError(404, 'no_invite', 'Tego zaproszenia już nie ma.');
   if (await partyOf(db, player.row.id)) throw new ApiError(409, 'in_party', 'Najpierw opuść swoją drużynę.');
-  requireCompanionsStay(player.row);
   // Joins only while the party has a place and the character's class level
   // keeps the party within the spread (both in the same statement), so two
   // invitations accepted at once join one party.

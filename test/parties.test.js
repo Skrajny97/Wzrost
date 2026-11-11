@@ -427,9 +427,11 @@ describe("a Drużyna's trip and the Stajnia's mounts", () => {
   });
 });
 
-// A party hunts without companions (the author: "jeśli ktoś ma zwerbowanego
-// towarzysza to nie może być w drużynie, dopóki nie kliknie na nim [Zostań w
-// kwaterze]; wtedy nie poluje się z towarzyszem, tylko samemu/z drużyną").
+// A party hunts without companions (the author: "wtedy nie poluje się z
+// towarzyszem, tylko samemu/z drużyną"). Since 828 B (11.11.2026) the
+// companions stay in the Kwatery by themselves while the character is in a
+// party, after one question, and go back to their own settings after it;
+// before, they kept the character out of every party until told to stay.
 describe('a Drużyna and the companions from the Kwatery', () => {
   const { call, db, signUp } = useServer({ PROFESSIONS: 'on', SETTLEMENT: 'on' });
   const cookies = {};
@@ -458,35 +460,66 @@ describe('a Drużyna and the companions from the Kwatery', () => {
     await player('druh', 'Druh');
   });
 
-  test('one whose companion goes on explorations neither joins a party nor makes one, and is told why; once it stays, it joins', async () => {
+  test('one whose companion goes on explorations joins a party and makes one at once, asked first; meanwhile the companion stays in the Kwatery, and out of the party it goes again (828 B)', async () => {
     const companion = await hire('druh');
-    const form = companion.appearance === 'female' ? 'towarzyszkę' : 'towarzysza';
-    const why = `Najpierw zostaw ${form} w kwaterze: ${companion.name}. Drużyna poluje bez towarzyszy z Kwater.`;
-    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
-    // The Drużyna screen says why, with the way to the Kwatery.
-    assert.deepEqual((await as('druh', 'GET', '/api/party')).data.companions, { text: why, link: 'Przejdź do Kwater' });
+    const own = await hire('lider');
+    assert.equal((await stay('lider', own, true)).status, 200);
+    const stored = async (name) => JSON.parse((await (await db()).prepare('SELECT settlement FROM characters WHERE name = ?').bind(name).first()).settlement).companions[0];
+    const card = async (login) => (await as(login, 'GET', '/api/settlement')).data.settlement.companions.hired[0];
+    const portalCompanions = async (login) => (await as(login, 'GET', '/api/portals')).data.portals.companions;
+    const alone = async (login) => {
+      assert.equal((await as(login, 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+      const went = (await hunts()).find((one) => one.name === (login === 'druh' ? 'Druh' : 'Lider')).options.companions?.map((one) => one.id) ?? [];
+      await as(login, 'POST', '/api/hunts/cancel');
+      return went;
+    };
+    // The one question, for Druh, whose companion goes on its explorations:
+    // the Drużyna screen has its words. None for Lider, whose companion was
+    // told to stay.
+    const question = {
+      text: `${companion.name} zostanie w Kwaterach, póki jesteś w drużynie: nie zdobędzie XP ani relacji z wypraw.`,
+      make: { title: 'Założyć drużynę?', confirm: 'Załóż' },
+      join: { title: 'Dołączyć do drużyny?', confirm: 'Dołącz' },
+    };
+    assert.deepEqual((await as('druh', 'GET', '/api/party')).data.companions, question);
     assert.equal((await as('lider', 'GET', '/api/party')).data.companions, null);
-    const refused = await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
-    assert.equal(refused.status, 409);
-    assert.deepEqual(refused.data.error, { code: 'companion_goes', message: why });
-    // Nor does its first invitation make a party.
-    const making = await as('druh', 'POST', '/api/party/invite', { name: 'Lider' });
-    assert.deepEqual([making.status, making.data.error.code], [409, 'companion_goes']);
-    assert.equal((await (await db()).prepare('SELECT COUNT(*) AS count FROM parties').first()).count, 1);
-    // "Zostań w kwaterze": now it joins.
-    assert.equal((await stay('druh', companion, true)).status, 200);
-    assert.equal((await as('druh', 'GET', '/api/party')).data.companions, null);
+    assert.deepEqual(await alone('druh'), [companion.id]);
+    // "Dołącz": Druh joins at once, its companion going.
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
     const joined = await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
     assert.equal(joined.status, 200, JSON.stringify(joined.data));
-    // In the party it is not sent out again: the Kwatery say why instead of the button.
+    assert.equal(joined.data.companions, null);
+    // In the party the companion stays in the Kwatery: no exploration, nor
+    // a portal, takes it, and it is not sent out; the card says it goes
+    // again after the party. The player's own setting is as it was.
+    assert.deepEqual(await alone('druh'), []);
+    assert.deepEqual(await portalCompanions('druh'), []);
     const back = await stay('druh', companion, false);
     assert.deepEqual([back.status, back.data.error.code], [409, 'in_party']);
-    const card = (await as('druh', 'GET', '/api/settlement')).data.settlement.companions.hired[0];
-    assert.deepEqual([card.stay.stays, card.stay.action], [true, null]);
-    assert.match(card.stay.text, /^Póki postać jest w drużynie, towarzysz(ka)? zostaje w kwaterze/);
-    // Out of the party, it may go out again.
-    await as('druh', 'POST', '/api/party/leave');
-    assert.equal((await stay('druh', companion, false)).status, 200);
+    let view = await card('druh');
+    assert.deepEqual([view.stay.stays, view.stay.action], [true, null]);
+    assert.match(view.stay.text, /^Póki postać jest w drużynie, towarzysz(ka)? zostaje w kwaterze: drużyna poluje bez towarzyszy z Kwater\. Po wyjściu z drużyny sam(a)? wróci na wyprawy\.$/);
+    assert.equal((await stored('Druh')).stays, undefined);
+    // Lider's companion, told to stay, has the words without the return.
+    assert.equal((await card('lider')).stay.text.endsWith('drużyna poluje bez towarzyszy z Kwater.'), true);
+    // Sent out of the party, Druh's companion goes along again by itself.
+    const druhId = joined.data.party.members.find((member) => member.own).id;
+    assert.equal((await as('lider', 'POST', '/api/party/kick', { characterId: druhId })).status, 200);
+    assert.deepEqual(await alone('druh'), [companion.id]);
+    assert.deepEqual(await portalCompanions('druh'), [companion.name]);
+    view = await card('druh');
+    assert.deepEqual([view.stay.stays, view.stay.action.stays], [false, true]);
+    // "Załóż": its first invitation makes a party at once too; leaving it,
+    // the companion goes again, and Lider's stays, as it was told.
+    const made = await as('druh', 'POST', '/api/party/invite', { name: 'Lider' });
+    assert.equal(made.status, 200, JSON.stringify(made.data));
+    assert.equal(made.data.party.members.length, 1);
+    assert.deepEqual(await alone('druh'), []);
+    assert.equal((await as('druh', 'POST', '/api/party/leave')).status, 200);
+    assert.deepEqual(await alone('druh'), [companion.id]);
+    await as('lider', 'POST', '/api/party/leave');
+    assert.deepEqual(await alone('lider'), []);
+    assert.equal((await stored('Lider')).stays, true);
   });
 
   test("a party's trip goes without companions, and in a party a companion stays even if it was never told to", async () => {

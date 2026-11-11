@@ -198,6 +198,41 @@ function stayBlock(companion, apply) {
   );
 }
 
+// "Trenuj" (829 B, 11.11.2026): a level for gold (src/server/settlement.js,
+// trainCompanion), a few times a day and up to the character's level less
+// a few; the reason in place of the button at the highest level and after
+// the day's trainings, the button greyed while the companion is out on an
+// exploration or the gold is short. The new level and gold show at once.
+function trainBlock(companion, apply) {
+  const { training } = companion;
+  const reason =
+    training.block === 'cap'
+      ? t('Trening najwyżej do poziomu postaci −{below}.', { below: training.below })
+      : training.block === 'day'
+        ? t('Dziś już {count} razy. Kolejny trening jutro.', { count: training.perDay })
+        : companion.away
+          ? t('Trening po powrocie z wyprawy.')
+          : t('Trening: dziś jeszcze {left} z {perDay}, najwyżej do poziomu {cap}.', { left: training.left, perDay: training.perDay, cap: training.cap });
+  return h(
+    'div',
+    { class: 'settlement-companion-stay' },
+    h('p', { class: 'muted', text: reason }),
+    !training.block &&
+      h('button', {
+        type: 'button',
+        class: 'button button--world button--small',
+        text: t('Trenuj: +1 poziom za {gold} zł', { gold: formatNumber(training.price) }),
+        disabled: Boolean(companion.away) || state.character.gold < training.price,
+        onClick: (event) =>
+          withButton(event.currentTarget, async () => {
+            const answer = await call('POST', '/api/settlement/companion-train', { companionId: companion.id });
+            apply(answer);
+            toast(t('{name} wchodzi na {level}. poziom.', { name: answer.trained.name, level: answer.trained.level }));
+          }),
+      }),
+  );
+}
+
 // The relation with a hired companion (296 A) and what it told in talks
 // (295 A): its standing, its bonus in a fight, the points to the next
 // standing, and the pieces of its story, folded.
@@ -269,6 +304,7 @@ export function companionCard(companion, action, apply) {
     companion.gift && giftRow(companion, apply),
     wounded && h('p', { class: 'region-warning', text: wounded }),
     companion.stay && stayBlock(companion, apply),
+    companion.training && trainBlock(companion, apply),
     action,
   );
 }

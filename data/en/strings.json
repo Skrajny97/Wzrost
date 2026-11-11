@@ -2755,5 +2755,13 @@
   "Nikt nie wystawia teraz części.": "Nobody is selling parts now.",
   "Kończące się": "Ending soon",
   "Najtańsze": "Cheapest",
-  "Najdroższe": "Most expensive"
+  "Najdroższe": "Most expensive",
+  "Póki jesteś w drużynie, towarzysze zostają w Kwaterach i nie zdobywają XP ani relacji z wypraw.": "While you are in a party, your companions stay in the Quarters and gain no XP or relation from explorations.",
+  "Trenuj: +1 poziom za {gold} zł": "Train: +1 level for {gold} gold",
+  "Trening: dziś jeszcze {left} z {perDay}, najwyżej do poziomu {cap}.": "Training: {left} of {perDay} left today, up to level {cap}.",
+  "Trening najwyżej do poziomu postaci −{below}.": "Training goes only up to the character's level −{below}.",
+  "Dziś już {count} razy. Kolejny trening jutro.": "Already {count} times today. The next training is tomorrow.",
+  "Trening po powrocie z wyprawy.": "Training after the return from the exploration.",
+  "{name} wchodzi na {level}. poziom.": "{name} reaches level {level}.",
+  "Brakuje złota na trening.": "Not enough gold for the training."
 }

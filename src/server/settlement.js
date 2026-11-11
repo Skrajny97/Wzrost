@@ -29,6 +29,8 @@ import {
   companionsGoingMost,
   companionsSetToGo,
   companionText,
+  companionTrained,
+  companionTraining,
   companionPlace,
   companionWearBlock,
   deliverOrder,
@@ -711,6 +713,9 @@ function companionsView(player, stored, now) {
         // The line of its item's card: who wears it and who pays.
         wornBy: companionText('wornBy', companion, content()),
         stay: stayView(companion, hired, player.inParty, away),
+        // "Trenuj" (829 B): the next level's price, the trainings left
+        // today, the highest level and why not (companionTraining).
+        training: companionTraining(companion, row.level, now, content()),
       };
     }),
     candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content(), points) })),
@@ -736,12 +741,14 @@ function requireCompanionHome(player, companion, now) {
 // Whether a companion goes on the explorations or stays in the Kwatery (the
 // author: "[Zostań w kwaterze]"), in its words, with the switch to the
 // other (`action`: the label and the `stays` to send). In a Drużyna every
-// companion stays, with no switch. One set to stay while out on an
-// exploration stays from its return on. One who stays while as many as may
-// go already go (`hired`: all the hired) is the reserve of the Kwatery's
-// third bed, with no switch until one of them stays.
+// companion stays, with no switch; one the player sends out goes again
+// once the character is out of it (828 B), and its card says so. One set
+// to stay while out on an exploration stays from its return on. One who
+// stays while as many as may go already go (`hired`: all the hired) is the
+// reserve of the Kwatery's third bed, with no switch until one of them
+// stays.
 function stayView(companion, hired, inParty, away) {
-  if (inParty) return { stays: true, text: companionText('inParty', companion, content()), action: null };
+  if (inParty) return { stays: true, text: companionText(companionStays(companion) ? 'inParty' : 'inPartyGoing', companion, content()), action: null };
   const stays = companionStays(companion);
   if (stays && companionsSetToGo(hired) >= companionsGoingMost(content())) return { stays: true, reserve: true, text: companionText('reserve', companion, content()), action: null };
   return {
@@ -1276,10 +1283,10 @@ export async function upgradeCompanionItem(context) {
 
 // { companionId, stays }: the companion stays in the Kwatery (`stays`
 // true, "Zostań w kwaterze") or goes on the explorations again ("Idź na
-// wyprawy"), from the next one on. In a Drużyna every companion stays (the
-// author: "nie może być w drużynie, dopóki nie kliknie na nim [Zostań w
-// kwaterze]"), so none goes out again while the character is in one.
-// Saved only while the character is as read.
+// wyprawy"), from the next one on. In a Drużyna every companion stays by
+// itself (828 B), so none is sent out again while the character is in one;
+// out of it each goes back to the setting kept here. Saved only while the
+// character is as read.
 export async function setCompanionStay(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -1303,6 +1310,40 @@ export async function setCompanionStay(context) {
   const after = await loadPlayer(context.env.DB, session.userId);
   return json({
     text: companionText(body.stays ? 'stayed' : 'goes', companion, content()),
+    settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
+    character: characterView(after, context.now),
+  });
+}
+
+// { companionId }: "Trenuj" (829 B, 11.11.2026): the companion goes a level
+// up for gold (companionTraining in the engine: the price of the level it
+// goes up to, a few times a day, up to the character's level less a few),
+// a level the same as one earned (companionTrained). At home only, as "Załóż
+// z plecaka": one out on the character's exploration waits for its return.
+// The gold and the Osada are saved at once, only while the character is as
+// read and has the gold, so two taps buy one level.
+export async function trainCompanion(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const body = await readJson(context.request);
+  const stored = settlementOf(row);
+  const hired = stored.companions ?? [];
+  const companion = hired.find((one) => one.id === body.companionId);
+  if (!companion) throw new ApiError(404, 'no_companion', 'Nie masz takiego towarzysza.');
+  requireCompanionHome(player, companion, context.now);
+  const training = companionTraining(companion, row.level, context.now, content());
+  if (training.block === 'cap') throw new ApiError(409, 'level_cap', `Trening najwyżej do poziomu postaci −${training.below}.`);
+  if (training.block === 'day') throw new ApiError(409, 'trained_today', `Dziś już ${training.perDay} razy. Kolejny trening jutro.`);
+  if (row.gold < training.price) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota na trening.');
+  const next = { ...stored, companions: hired.map((one) => (one === companion ? companionTrained(one, context.now, content()) : one)) };
+  const result = await context.env.DB.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?')
+    .bind(training.price, JSON.stringify(next), row.id, row.version, training.price)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(context.env.DB, session.userId);
+  return json({
+    trained: { name: companion.name, level: training.level, price: training.price },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
   });
