@@ -213,15 +213,15 @@ function checkReferences(data) {
     // A family (a category in the game, as the talismans) is named by its
     // first base, of the same slot and kind; only its later bases ask for a
     // class level. A later base is a better version: a slightly higher factor
-    // than the first base's (up to a quarter more, as Tier VI's x1.25 rounded
-    // up to hundredths, never a big multiplier) and a flat bonus on top.
+    // than the first base's (up to 30% more, as Tier VII's x1.30 rounded up
+    // to hundredths, never a big multiplier) and a flat bonus on top.
     if (base.family !== undefined) {
       const first = basesById.get(base.family);
       const factor = { weapon: 'damageFactor', armor: 'armorFactor', implicit: 'statFactor' }[base.kind];
       if (!first || first.family !== undefined) errors.push(`item-bases.json: ${base.id} ma rodzinę "${base.family}", która nie jest pierwszą bazą kategorii`);
       else if (first.slot !== base.slot || first.kind !== base.kind) errors.push(`item-bases.json: ${base.id} ma inny slot albo rodzaj niż kategoria "${base.family}"`);
-      else if (!(base[factor] > first[factor]) || base[factor] > Math.ceil(first[factor] * 125 - 1e-9) / 100) {
-        errors.push(`item-bases.json: ${base.id} ma mieć trochę wyższy ${factor} niż kategoria "${base.family}" (więcej niż ${first[factor]}, najwyżej o 25%)`);
+      else if (!(base[factor] > first[factor]) || base[factor] > Math.ceil(first[factor] * 130 - 1e-9) / 100) {
+        errors.push(`item-bases.json: ${base.id} ma mieć trochę wyższy ${factor} niż kategoria "${base.family}" (więcej niż ${first[factor]}, najwyżej o 30%)`);
       }
       if (base.classLevel === undefined) errors.push(`item-bases.json: ${base.id} w kategorii "${base.family}" nie ma poziomu klasy (classLevel)`);
       if (base.bonus === undefined) errors.push(`item-bases.json: ${base.id} w kategorii "${base.family}" nie ma premii (bonus)`);

@@ -44,9 +44,9 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(mergeDiscoveries({ 'item:sword': 2, 'herb:comfrey': 1 }, held), held);
   });
 
-  test('items come in six tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
+  test('items come in seven tiers by the class level they are worn from, each with a set for every class and one with the accessories', () => {
     const sets = itemSets(content);
-    assert.equal(sets.length, 36);
+    assert.equal(sets.length, 42);
     assert.deepEqual(
       sets.filter((set) => set.tier === 0).map((set) => [set.name, set.bases.length]),
       [
@@ -63,6 +63,8 @@ describe('the Encyklopedia in the engine', () => {
     assert.deepEqual(sets.find((set) => set.id === 'items:5:warrior').bases.slice(0, 3), ['karabela', 'halberd', 'hussar-shield']);
     // Tier VI (665), from class level 100.
     assert.deepEqual(sets.find((set) => set.id === 'items:6:warrior').bases.slice(0, 3), ['flamberge', 'double-axe', 'jousting-shield']);
+    // Tier VII (814), from class level 125.
+    assert.deepEqual(sets.find((set) => set.id === 'items:7:warrior').bases.slice(0, 3), ['coronation-sword', 'nadziak', 'royal-shield']);
     const covered = new Set(sets.flatMap((set) => set.bases));
     assert.equal(covered.size, content.bases.length);
   });
@@ -72,7 +74,7 @@ describe('the Encyklopedia in the engine', () => {
   test('Tier VI: its items from class level 100 with a set for every class and the accessories, its chest, and the materials of creatures above level 125', () => {
     const levels = { level: 130, classLevel: 100, professions: {} };
     const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
-    const sixth = view.items.tiers.at(-1);
+    const sixth = view.items.tiers.find((tier) => tier.name === 'Tier VI');
     assert.deepEqual([sixth.name, sixth.range, sixth.current, sixth.entries.length], ['Tier VI', 'od 100. poziomu klasy', true, 22]);
     assert.deepEqual(
       sixth.sets.map((set) => [set.name, set.bases]),
@@ -87,7 +89,7 @@ describe('the Encyklopedia in the engine', () => {
     );
     // A full set opens the sixth chest, more than Tier V's.
     for (const set of sixth.sets) assert.deepEqual(set.chest, content.encyclopedia.chests[5], set.name);
-    assert.deepEqual(content.encyclopedia.chests.slice(4), [
+    assert.deepEqual(content.encyclopedia.chests.slice(4, 6), [
       { gold: 2500, timePoints: 80, systemPoints: 32 },
       { gold: 6250, timePoints: 160, systemPoints: 64 },
     ]);
@@ -105,14 +107,68 @@ describe('the Encyklopedia in the engine', () => {
     ]);
     assert.ok(sixth.entries.find((entry) => entry.id === 'cameo').sources.includes('Szlifiernia: wzór od 100. poziomu Jubilerstwa.'));
     // Materials by the highest level of their creature: up to 125 in Tier V,
-    // above it in Tier VI (Sosnowe Wydmy, and the creatures of Rokitowe
-    // Bezdno that come a level or two above its 125).
-    assert.deepEqual(view.materials.tiers.slice(-2).map((tier) => [tier.name, tier.range, tier.current]), [
+    // 126–150 in Tier VI (Sosnowe Wydmy, and the creatures of Rokitowe
+    // Bezdno that come a level or two above its 125); Tier VII takes those
+    // above 150.
+    assert.deepEqual(view.materials.tiers.slice(-3, -1).map((tier) => [tier.name, tier.range, tier.current]), [
       ['Tier V', 'poziomy 101–125', false],
       ['Tier VI', 'poziomy 126–150', true],
     ]);
     const tierOf = (materialId) => view.materials.tiers.find((tier) => tier.entries.some((entry) => entry.id === materialId)).name;
-    assert.deepEqual(['glassy-sand', 'rarog-feather', 'cyrograf', 'bog-lantern-eye', 'veles-scale'].map(tierOf), ['Tier VI', 'Tier VI', 'Tier VI', 'Tier V', 'Tier V']);
+    assert.deepEqual(['glassy-sand', 'latawiec-membrane', 'cyrograf', 'bog-lantern-eye', 'veles-scale'].map(tierOf), ['Tier VI', 'Tier VI', 'Tier VI', 'Tier V', 'Tier V']);
+  });
+
+  // The author's 814: Tier VII from class level 125, as Tier VI came from
+  // 100 (DECISIONS.md, "Tier VII przedmiotów").
+  test('Tier VII: its items from class level 125 with a set for every class and the accessories, its chest, and the materials of creatures above level 150', () => {
+    const levels = { level: 160, classLevel: 125, professions: {} };
+    const view = encyclopediaView({ discovered: {}, claimed: [], met: [], levels }, content);
+    const seventh = view.items.tiers.at(-1);
+    assert.deepEqual([seventh.name, seventh.range, seventh.current, seventh.entries.length], ['Tier VII', 'od 125. poziomu klasy', true, 22]);
+    assert.deepEqual(
+      seventh.sets.map((set) => [set.name, set.bases]),
+      [
+        ['Wojownik', ['coronation-sword', 'nadziak', 'royal-shield', 'armet', 'maximilian-armor']],
+        ['Łucznik', ['persian-bow', 'crown-quiver', 'magnate-cap', 'czamara']],
+        ['Mag', ['archmage-staff', 'hourglass', 'magnate-cap', 'szuba']],
+        ['Kleryk', ['pacifical', 'royal-shield', 'hourglass', 'prophet-crown', 'pallium']],
+        ['Cień', ['baselard', 'rondel', 'magnate-cap', 'czamara']],
+        ['Dodatki', ['hetman-gloves', 'safian-boots', 'pectoral', 'ancestors-ring', 'grzywna']],
+      ],
+    );
+    // A full set opens the seventh chest: Tier VI's gold x2.5 and points x2,
+    // as each Tier's before it.
+    for (const set of seventh.sets) assert.deepEqual(set.chest, content.encyclopedia.chests[6], set.name);
+    assert.deepEqual(content.encyclopedia.chests.slice(5), [
+      { gold: 6250, timePoints: 160, systemPoints: 64 },
+      { gold: 15625, timePoints: 320, systemPoints: 128 },
+    ]);
+    const warrior = itemSets(content).find((set) => set.id === 'items:7:warrior');
+    const found = Object.fromEntries(warrior.bases.map((id) => [`item:${id}`, 1]));
+    assert.deepEqual(encyclopediaChest('items:7:warrior', found, [], content).chest, { gold: 15625, timePoints: 320, systemPoints: 128 });
+    // Where it comes from: explorations from Rokitowe Bezdno (121–125), the
+    // last place of Czarne Bagno, worn from class level 125, the Warsztat's
+    // and the Szlifiernia's patterns from level 125 of their professions.
+    assert.deepEqual(seventh.entries.find((entry) => entry.id === 'coronation-sword').sources, [
+      'Wyprawy: wypada od regionu Rokitowe Bezdno (poz. 121–125).',
+      'Dla klasy: Wojownik.',
+      'Założysz od 125. poziomu klasy.',
+      'Warsztat: wzór od 125. poziomu Rzemieślnictwa.',
+    ]);
+    assert.ok(seventh.entries.find((entry) => entry.id === 'pectoral').sources.includes('Szlifiernia: wzór od 125. poziomu Jubilerstwa.'));
+    // Materials of creatures above level 150 in Tier VII: Głucha Knieja's,
+    // Ostępy Nowiu's (above its 175 too, as the last Tier), and those of
+    // Sosnowe Wydmy that come a level or two above its 150 (the Południca,
+    // the Raróg and Pogorzelisko's).
+    assert.deepEqual(view.materials.tiers.slice(-2).map((tier) => [tier.name, tier.range, tier.current]), [
+      ['Tier VI', 'poziomy 126–150', false],
+      ['Tier VII', 'poziomy 151–175', true],
+    ]);
+    const tierOf = (materialId) => view.materials.tiers.find((tier) => tier.entries.some((entry) => entry.id === materialId)).name;
+    assert.deepEqual(
+      ['black-needle', 'hunting-horn', 'moon-bite', 'noon-sickle', 'rarog-feather', 'ruin-ash', 'latawiec-membrane', 'glassy-sand'].map(tierOf),
+      ['Tier VII', 'Tier VII', 'Tier VII', 'Tier VII', 'Tier VII', 'Tier VII', 'Tier VI', 'Tier VI'],
+    );
   });
 
   test('a full set opens the chest of its tier, a count of discoveries its own chest in turn, each once', () => {

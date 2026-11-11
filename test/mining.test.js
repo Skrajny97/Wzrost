@@ -198,18 +198,21 @@ describe('Górnictwo in the engine', () => {
       ['Medalion', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
       ['Kolia', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
       ['Kamea', 'Tier VI', 'Dodatki', 'Szlifiernia: wzór od 100. poziomu Jubilerstwa.'],
+      ['Pektorał', 'Tier VII', 'Dodatki', 'Szlifiernia: wzór od 125. poziomu Jubilerstwa.'],
       ['Pierścień', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
       ['Sygnet', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
       ['Obrączka', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
       ['Pierścień rodowy', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
       ['Pierścień koronny', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
       ['Pierścień wieczności', 'Tier VI', 'Dodatki', 'Szlifiernia: wzór od 100. poziomu Jubilerstwa.'],
+      ['Pierścień przodków', 'Tier VII', 'Dodatki', 'Szlifiernia: wzór od 125. poziomu Jubilerstwa.'],
       ['Talizman', 'Tier I', 'Dodatki', 'Szlifiernia: wzór od 1. poziomu Jubilerstwa.'],
       ['Otoczak', 'Tier II', 'Dodatki', 'Szlifiernia: wzór od 10. poziomu Jubilerstwa.'],
       ['Kieł', 'Tier III', 'Dodatki', 'Szlifiernia: wzór od 25. poziomu Jubilerstwa.'],
       ['Bursztyn', 'Tier IV', 'Dodatki', 'Szlifiernia: wzór od 50. poziomu Jubilerstwa.'],
       ['Róg tura', 'Tier V', 'Dodatki', 'Szlifiernia: wzór od 75. poziomu Jubilerstwa.'],
       ['Lunula', 'Tier VI', 'Dodatki', 'Szlifiernia: wzór od 100. poziomu Jubilerstwa.'],
+      ['Grzywna', 'Tier VII', 'Dodatki', 'Szlifiernia: wzór od 125. poziomu Jubilerstwa.'],
     ]);
     // A jewel's card names the same Tier, and no Warsztat base says Szlifiernia.
     for (const base of jewelBases(content)) {
@@ -258,7 +261,7 @@ describe('Górnictwo in the engine', () => {
 });
 
 describe('Jubilerstwo in the engine', () => {
-  test('rings, amulets and talismans, the first of each family at once and the later ones from 10, 25, 50, 75 and 100; the Warsztat makes none of them', () => {
+  test('rings, amulets and talismans, the first of each family at once and the later ones from 10, 25, 50, 75, 100 and 125; the Warsztat makes none of them', () => {
     assert.deepEqual(knownJewelPatterns(1, [], content).map((base) => base.id), ['amulet', 'ring', 'talisman']);
     assert.equal(knownJewelPatterns(10, [], content).length, 6);
     assert.ok(knownJewelPatterns(25, [], content).some((base) => base.id === 'band-ring'));
@@ -290,6 +293,15 @@ describe('Jubilerstwo in the engine', () => {
       content,
     );
     assert.deepEqual(report.revealed, ['cameo', 'eternity-ring', 'lunula']);
+    // Tier VII (814): the Pektorał, the Pierścień przodków and the Grzywna at
+    // the 125th level. Jubilerstwo ends at the 100th for now, so till it goes
+    // on only a jewel taken apart teaches them (DECISIONS.md, "Tier VII
+    // przedmiotów").
+    assert.equal(knownJewelPatterns(124, [], content).length, 18);
+    const at125 = knownJewelPatterns(125, [], content).map((base) => base.id);
+    assert.deepEqual([at125.length, ['pectoral', 'ancestors-ring', 'grzywna'].every((id) => at125.includes(id))], [21, true]);
+    assert.equal(content.professionsById[content.jewelcrafting.profession].maxLevel, 100);
+    assert.ok(knownJewelPatterns(100, ['grzywna'], content).some((base) => base.id === 'grzywna'));
     assert.ok(jewelBases(content).every((base) => !content.workshop.parts[base.slot]));
   });
 
@@ -300,6 +312,8 @@ describe('Jubilerstwo in the engine', () => {
     const jewelOf = (base) => ({ base, slot: content.basesById[base].slot, level: 30, rarity: 'common', affixes: [] });
     assert.equal(jewelPatternFrom(jewelOf('signet-ring'), [], content), 'signet-ring');
     assert.equal(jewelPatternFrom(jewelOf('amber-charm'), [], content), 'amber-charm');
+    // Tier VII's too (814), the one way to them while Jubilerstwo ends at the 100th level.
+    assert.equal(jewelPatternFrom(jewelOf('grzywna'), [], content), 'grzywna');
     // The first of a family is known from the start, a pattern once learned stays, and the Warsztat's items are the Warsztat's.
     assert.equal(jewelPatternFrom(jewelOf('ring'), [], content), null);
     assert.equal(jewelPatternFrom(jewelOf('signet-ring'), ['signet-ring'], content), null);

@@ -153,6 +153,15 @@ import {
   weekShare,
   withChest,
   withClaimed,
+  beastChest,
+  beastChestTier,
+  expeditionChest,
+  expeditionGuardian,
+  guildBeast,
+  guildExpedition,
+  wandererGoods,
+  warChest,
+  wheelPrizes,
 } from '../src/engine/index.js';
 import { simulateMany, typicalCharacter } from '../tools/simulate.mjs';
 import { content, newCharacter } from './helpers/content.js';
@@ -356,10 +365,10 @@ describe('items', () => {
       const before = content.bases
         .filter((other) => (other.family ?? other.id) === base.family && (other.classLevel ?? 1) < base.classLevel)
         .reduce((best, other) => ((other.classLevel ?? 1) > (best.classLevel ?? 1) ? other : best));
-      assert.ok([10, 25, 50, 75, 100].includes(base.classLevel), base.id);
-      // At most a quarter above the first base's (Tier VI: x1.25, rounded up
-      // to hundredths).
-      assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= Math.ceil(first[key[base.kind]] * 125 - 1e-9) / 100, base.id);
+      assert.ok([10, 25, 50, 75, 100, 125].includes(base.classLevel), base.id);
+      // At most 30% above the first base's (Tier VII: x1.30, rounded up to
+      // hundredths).
+      assert.ok(base[key[base.kind]] > before[key[base.kind]] && base[key[base.kind]] <= Math.ceil(first[key[base.kind]] * 130 - 1e-9) / 100, base.id);
       for (const cls of content.classes) {
         assert.equal(canUse(base.id, cls.id, content), canUse(first.id, cls.id, content), `${base.id} for ${cls.id}`);
       }
@@ -373,11 +382,11 @@ describe('items', () => {
     }
   });
 
-  test('every category has bases from class levels 10, 25, 50, 75 and 100, dropping from those levels', () => {
+  test('every category has bases from class levels 10, 25, 50, 75, 100 and 125, dropping from those levels', () => {
     const firsts = content.bases.filter((base) => !base.family);
     for (const first of firsts) {
       const levels = content.bases.filter((base) => base.family === first.id).map((base) => base.classLevel);
-      assert.deepEqual(levels, [10, 25, 50, 75, 100], first.id);
+      assert.deepEqual(levels, [10, 25, 50, 75, 100, 125], first.id);
     }
     assert.equal(canUse('saber', 'warrior', content, 24), false);
     assert.equal(canUse('saber', 'warrior', content, 25), true);
@@ -391,6 +400,10 @@ describe('items', () => {
     assert.equal(canUse('flamberge', 'warrior', content, 99), false);
     assert.equal(canUse('flamberge', 'warrior', content, 100), true);
     assert.equal(canUse('flamberge', 'mage', content, 100), false);
+    // Tier VII (814): the Miecz koronacyjny from class level 125.
+    assert.equal(canUse('coronation-sword', 'warrior', content, 124), false);
+    assert.equal(canUse('coronation-sword', 'warrior', content, 125), true);
+    assert.equal(canUse('coronation-sword', 'mage', content, 125), false);
     const rng = createRng('trzecie-bazy');
     const swords = (maxClassLevel) => {
       const found = new Set();
@@ -408,6 +421,10 @@ describe('items', () => {
     // from 100 (Stare Wyrobisko, 96–100, reaches it).
     assert.deepEqual(swords(99), ['broadsword', 'estoc', 'karabela', 'saber']);
     assert.deepEqual(swords(100), ['broadsword', 'estoc', 'flamberge', 'karabela', 'saber']);
+    // The Miecz koronacyjny from 125 (Rokitowe Bezdno, 121–125, the last
+    // place of Czarne Bagno, reaches it).
+    assert.deepEqual(swords(124), ['broadsword', 'estoc', 'flamberge', 'karabela', 'saber']);
+    assert.deepEqual(swords(125), ['broadsword', 'coronation-sword', 'estoc', 'flamberge', 'karabela', 'saber']);
   });
 
   // The author's 570 A and 665: Tier VI from class level 100, one base in
@@ -455,6 +472,85 @@ describe('items', () => {
         const best = Math.max(...rolls(fifth.id, level));
         assert.ok(weakest > best, `${base.id} at level ${level}: ${weakest} against ${fifth.id} ${best}`);
       }
+    }
+  });
+
+  // The author's 814: Tier VII from class level 125, one base in each
+  // family, by the rule of Tiers V and VI with x1.30. Its bonus stops at half
+  // again Tier VI's best, a half rounded down, as the author's example has
+  // it: the Miecz koronacyjny 82–121, the Flamberg's 81 half again 121.5
+  // (DECISIONS.md, "Tier VII przedmiotów").
+  test('Tier VII follows the Tier rule: the first base\'s factor x1.30 rounded up to hundredths, the bonus from one above Tier VI\'s best up to half again it, rounded down', () => {
+    const key = { weapon: 'damageFactor', armor: 'armorFactor', implicit: 'statFactor' };
+    const seventh = content.bases.filter((base) => base.classLevel === 125);
+    assert.deepEqual(
+      seventh.map((base) => base.name),
+      [
+        'Miecz koronacyjny', 'Nadziak', 'Baselard', 'Łuk perski', 'Laska arcymaga', 'Pacyfikał', 'Tarcza królewska', 'Kołczan koronny', 'Rondel',
+        'Klepsydra', 'Czapka magnacka', 'Armet', 'Czamara', 'Zbroja maksymiliańska', 'Szuba', 'Korona proroka', 'Paliusz',
+        'Rękawice hetmańskie', 'Buty safianowe', 'Pektorał', 'Pierścień przodków', 'Grzywna',
+      ],
+    );
+    const sixthOf = (base) => content.bases.find((one) => one.family === base.family && one.classLevel === 100);
+    for (const base of seventh) {
+      const first = content.basesById[base.family];
+      const sixth = sixthOf(base);
+      assert.equal(base[key[base.kind]], Math.ceil(first[key[base.kind]] * 130 - 1e-9) / 100, base.id);
+      assert.deepEqual(base.bonus, { min: sixth.bonus.max + 1, max: Math.floor(sixth.bonus.max * 1.5) }, base.id);
+      // All else as the family's Tier VI base has it: the slot and the kind,
+      // a weapon's attack, damage, elements and sound, a jewel's statistic.
+      const own = new Set(['id', 'name', 'gender', 'classLevel', 'bonus', key[base.kind]]);
+      const rest = (one) => Object.fromEntries(Object.entries(one).filter(([field]) => !own.has(field)));
+      assert.deepEqual(rest(base), rest(sixth), base.id);
+    }
+    // The author's: the Miecz koronacyjny 1.2 x 1.3 = 1.56 and 82–121; the
+    // Baselard 0.85 x 1.3 = 1.105, so 1.11, and 59–87 (the Cinquedea's 58).
+    assert.deepEqual([content.basesById['coronation-sword'].damageFactor, content.basesById['coronation-sword'].bonus], [1.56, { min: 82, max: 121 }]);
+    assert.deepEqual([content.basesById.baselard.damageFactor, content.basesById.baselard.bonus], [1.11, { min: 59, max: 87 }]);
+    // The weakest Tier VII piece beats the best of Tier VI at the levels it
+    // drops at, and well past them.
+    const number = (item) => (item.damage ? (item.damage.min + item.damage.max) / 2 : item.armor ?? item.implicit.value);
+    const rng = createRng('siodmy-tier');
+    const rolls = (baseId, level) => Array.from({ length: 24 }, () => number(generateItem({ baseId, level }, rng, content)));
+    for (const base of seventh) {
+      const sixth = sixthOf(base);
+      for (const level of [125, 150, 300]) {
+        const weakest = Math.min(...rolls(base.id, level));
+        const best = Math.max(...rolls(sixth.id, level));
+        assert.ok(weakest > best, `${base.id} at level ${level}: ${weakest} against ${sixth.id} ${best}`);
+      }
+    }
+  });
+
+  // The author's 814: wherever an item goes by the character's class level,
+  // Tier VII comes from 125 and not before, as Tier VI from 100. The Wieże:
+  // test/towers.test.js.
+  test('Tier VII from class level 125 in the weekly chest, from the wandering trader, in the Salon Gier and in the chests of the Bestia, the Wyprawa and the war of the guilds', () => {
+    const seventh = new Set(content.bases.filter((base) => base.classLevel === 125).map((base) => base.id));
+    const beast = guildBeast({ seed: 'siodmy', levels: [130] }, content);
+    const route = guildExpedition({ levels: [130] }, content);
+    const stage = content.guilds.expedition.guardians.findIndex((tuning) => tuning.item) + 1;
+    const guardian = expeditionGuardian({ stage, level: route.level, members: 2, guardians: route.guardians }, content);
+    const day = { key: 'siodmy', startsAt: 0, endsAt: 1 };
+    const warrior = (classLevel, seed) => ({ level: 130, classId: 'warrior', classLevel, seed });
+    const sources = {
+      weekly: (classLevel, seed) => [chestItem(warrior(classLevel), [], createRng(seed), content)],
+      trader: (classLevel, seed) => wandererGoods(warrior(classLevel, seed), 0, content, day).goods.map((good) => good.item),
+      salon: (classLevel, seed) =>
+        wheelPrizes({ ...warrior(classLevel), sellBonus: 0, tanneryPremium: 0 }, seed, day.key, content)
+          .filter((prize) => prize.kind === 'item')
+          .map((prize) => prize.item),
+      beast: (classLevel, seed) => [beastChest({ ...warrior(classLevel, seed), wornSlots: ['weapon'], beast, tier: beastChestTier({ hp: 0, maxHp: 1 }, content) }, content).item],
+      expedition: (classLevel, seed) => [expeditionChest({ ...warrior(classLevel, seed), stage, wornSlots: ['weapon'], guardian }, content).item],
+      war: (classLevel, seed) => warChest({ fighters: [warrior(classLevel)], teams: 2, seed }, content),
+    };
+    for (const [name, draw] of Object.entries(sources)) {
+      const found = (classLevel) =>
+        Array.from({ length: 60 }, (_, index) => draw(classLevel, `${name}${index}`))
+          .flat()
+          .filter((item) => seventh.has(item.base)).length;
+      assert.equal(found(124), 0, `${name} at class level 124`);
+      assert.ok(found(125) > 0, `${name} at class level 125`);
     }
   });
 

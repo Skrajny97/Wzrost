@@ -73,9 +73,17 @@ describe('the Warsztat in the engine', () => {
     assert.equal(knownPatterns(99, [], content).length, 95);
     const at100 = knownPatterns(100, [], content).map((pattern) => pattern.id);
     assert.ok(at100.length === 114 && at100.includes('flamberge') && at100.includes('sabatons') && !at100.includes('cameo'));
+    // Tier VII (814) at the 125th, past the profession's last for now: till
+    // Rzemieślnictwo goes on, only an item taken apart teaches it
+    // (DECISIONS.md, "Tier VII przedmiotów").
+    assert.equal(knownPatterns(124, [], content).length, 114);
+    const at125 = knownPatterns(125, [], content).map((pattern) => pattern.id);
+    assert.ok(at125.length === 133 && at125.includes('coronation-sword') && at125.includes('safian-boots') && !at125.includes('pectoral'));
+    assert.equal(content.professionsById[content.workshop.profession].maxLevel, 100);
     // Taking one apart teaches it earlier.
     assert.ok(knownPatterns(10, ['estoc'], content).some((pattern) => pattern.id === 'estoc'));
     assert.ok(knownPatterns(50, ['gothic-armor'], content).some((pattern) => pattern.id === 'gothic-armor'));
+    assert.ok(knownPatterns(100, ['maximilian-armor'], content).some((pattern) => pattern.id === 'maximilian-armor'));
   });
 
   test('the rarities open with the level: rare at 5, unique at 15 and divine at 80', () => {
@@ -240,7 +248,7 @@ describe('the Warsztat in the engine', () => {
       content,
     );
     assert.equal(last.revealed.length, 19);
-    assert.ok(last.revealed.includes('flamberge') && last.revealed.includes('cassock') && !last.revealed.includes('cameo'));
+    assert.ok(last.revealed.includes('flamberge') && last.revealed.includes('cassock') && !last.revealed.includes('cameo') && !last.revealed.includes('coronation-sword'));
     assert.ok(last.system.some((line) => line.startsWith('System odsłania nowe wzory: Flamberg, Topór dwusieczny, Cinquedea')), last.system.join(' | '));
   });
 
@@ -614,6 +622,7 @@ describe('the Warsztat, step 2, in the engine', () => {
 
   test('taking apart an item of a later pattern teaches it once, and only for gear the Warsztat makes', () => {
     assert.equal(patternFrom({ base: 'broadsword' }, [], content), 'broadsword');
+    assert.equal(patternFrom({ base: 'coronation-sword' }, [], content), 'coronation-sword');
     assert.equal(patternFrom({ base: 'broadsword' }, ['broadsword'], content), null);
     assert.equal(patternFrom({ base: 'sword' }, [], content), null);
     assert.equal(patternFrom({ base: 'ring' }, [], content), null);

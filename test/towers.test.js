@@ -246,6 +246,18 @@ describe('an entry\'s fight', () => {
     assert.ok(content.rarities.findIndex((rarity) => rarity.id === item.rarity) >= content.rarities.findIndex((rarity) => rarity.id === 'epic'));
   });
 
+  // The author's 814: the items of the Wieże go by the class level, so Tier
+  // VII comes from 125 and not before, whatever the floor.
+  test('the items of a win are of the class level: Tier VII from 125 (814)', () => {
+    const seventh = new Set(content.bases.filter((base) => base.classLevel === 125).map((base) => base.id));
+    const found = (classLevel) =>
+      Array.from({ length: 30 }, (_, index) => towerFight({ character: { ...climber, classLevel }, equipped: gear, name: 'Wspinacz', floor: 10, seed: `siodmy${index}`, chest: true }, content))
+        .flatMap((entry) => entry.items)
+        .filter((item) => seventh.has(item.base)).length;
+    assert.equal(found(124), 0);
+    assert.ok(found(125) > 0);
+  });
+
   // The author: "zmodyfikować Wieże by dawały więcej niż Portale, o wiele
   // więcej - rzadkie łupy i materiały szczególnie legendarne i mityczne na
   // odpowiednich poziomach".
