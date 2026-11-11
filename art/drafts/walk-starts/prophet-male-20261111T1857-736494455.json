@@ -1,0 +1,27 @@
+{
+  "id": "prophet-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "an old man prophet with long flowing white hair and a long white beard down to the chest, a golden blindfold over the eyes, a golden circlet with a small sun and a thin golden halo above the head, a flowing white and gold robe with golden sun and star embroidery down to the feet, wide sleeves, a long golden stole, no staff and nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and the golden blindfold over the eyes, the long white beard hanging in front of the chest, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the halo to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/skin-dawn-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/prophet-male.png",
+      "usage": "the character's look in detail: an old man with long white hair and a long white beard, the golden blindfold, the golden circlet and halo, the white and gold robe and stole and their colours; the hands empty, without the staff"
+    },
+    {
+      "path": "art/references/walks/start/prophet-female.png",
+      "usage": "the same robe, stole, circlet and drawing style seen from the side, as a woman of this game wears them; the character is the old bearded man of the portrait, not this woman"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
