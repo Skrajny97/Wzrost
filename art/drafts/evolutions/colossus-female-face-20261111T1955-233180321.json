@@ -1,0 +1,14 @@
+{
+  "id": "colossus-female-face",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art face of a young woman in three-quarter view facing right, under an open-faced dark steel helmet, two clearly visible eyes of the same size with white and dark brown irises and a tiny highlight, both looking the same way, thin dark eyebrows above them, a small straight nose, closed lips, warm light skin, a calm determined expression, the face well lit and the eyes not hidden in the shadow of the helmet",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": "art/inputs/portraits/colossus-female.png",
+  "mask": "art/inputs/portraits/colossus-female-face-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
