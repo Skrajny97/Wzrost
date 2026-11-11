@@ -1,6 +1,23 @@
+// @ts-check
 // Seeded pseudo-random numbers: sfc32 seeded by the cyrb128 string hash.
 // The same seed always gives the same sequence, on the server and in the browser.
 
+/**
+ * A seeded generator; every draw moves its sequence on.
+ * @typedef {object} Rng
+ * @property {() => number} next A number from 0 (inclusive) to 1 (exclusive).
+ * @property {(min: number, max: number) => number} float A number from min to max.
+ * @property {(min: number, max: number) => number} int A whole number from min to max, both included.
+ * @property {(probability: number) => boolean} chance True with the given probability.
+ * @property {<T>(list: readonly T[]) => T} pick One element, all equally likely.
+ * @property {<T>(list: readonly T[], weightOf?: (item: T) => number) => T} weighted One element, by
+ *   weight (the element's `weight` unless `weightOf` says otherwise).
+ */
+
+/**
+ * @param {unknown} seed Anything; its text is the seed.
+ * @returns {Rng}
+ */
 export function createRng(seed) {
   let [a, b, c, d] = cyrb128(String(seed));
   const next = () => {
@@ -25,7 +42,7 @@ export function createRng(seed) {
     int: (min, max) => min + Math.floor(next() * (max - min + 1)),
     chance: (probability) => next() < probability,
     pick: (list) => list[Math.floor(next() * list.length)],
-    weighted(list, weightOf = (item) => item.weight) {
+    weighted(list, weightOf = (item) => /** @type {any} */ (item).weight) {
       const total = list.reduce((sum, item) => sum + weightOf(item), 0);
       let roll = next() * total;
       for (const item of list) {
@@ -38,11 +55,20 @@ export function createRng(seed) {
 }
 
 // An expected count like 2.4 becomes 2 or 3, with the right average.
+/**
+ * @param {number} expected
+ * @param {Rng} rng
+ * @returns {number}
+ */
 export function countEvents(expected, rng) {
   const whole = Math.floor(expected);
   return whole + (rng.chance(expected - whole) ? 1 : 0);
 }
 
+/**
+ * @param {string} text
+ * @returns {[number, number, number, number]}
+ */
 function cyrb128(text) {
   let h1 = 1779033703;
   let h2 = 3144134277;

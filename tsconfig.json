@@ -1,0 +1,20 @@
+{
+  // Type checking only, no build (650 A): the game stays plain JavaScript. A
+  // file is checked once it starts with `// @ts-check`; the types come from
+  // its JSDoc comments and from what TypeScript can infer. `npm run
+  // typecheck` runs before every deployment (.github/workflows/deploy.yml).
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "lib": ["ES2023"],
+    "types": [],
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/engine/**/*.js"]
+}

@@ -63,6 +63,10 @@ jobs:
       - name: Walidacja danych gry
         if: steps.main.outputs.same != 'true' && matrix.shard == 1
         run: npm run validate
+      # Type checking of the files that start with // @ts-check (650 A).
+      - name: Sprawdzanie typów
+        if: steps.main.outputs.same != 'true' && matrix.shard == 2
+        run: npm run typecheck
       - name: Testy, część ${{ matrix.shard }} z 4
         if: steps.main.outputs.same != 'true'
         run: node --test --test-reporter=spec --test-shard=${{ matrix.shard }}/4 'test/**/*.test.js'

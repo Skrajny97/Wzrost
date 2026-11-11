@@ -10,11 +10,13 @@
     "dev": "wrangler d1 migrations apply DB --local && wrangler dev --var TEST_LOGINS: --var PROFESSIONS:on --var CRAFTING:on --var EVOLUTIONS:on --var ENGLISH:on --var GUILD_WARS:on --var FAKE_TRANSLATOR:on",
     "test": "node --test --test-reporter=spec 'test/**/*.test.js'",
     "validate": "node tools/validate-data.mjs",
+    "typecheck": "tsc -p tsconfig.json",
     "simulate": "node tools/simulate.mjs",
     "progression": "node tools/progression/run.mjs"
   },
   "devDependencies": {
     "ajv": "8.20.0",
+    "typescript": "5.9.3",
     "wrangler": "4.151.3"
   }
 }
