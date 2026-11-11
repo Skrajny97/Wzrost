@@ -1,0 +1,27 @@
+{
+  "id": "rider-saint-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a gentle man saint with short dark brown hair and a short beard, a thin golden halo ring behind the head, pure white robes with fine golden embroidery, a long pale gold mantle, a golden sash, no staff, nothing in the hands but the reins, sitting upright and relaxed in the middle of the saddle exactly like the rider of the reference, seen exactly from the side in a strict profile, facing right, the face, chest and hips turned fully to the right and not towards the viewer, only the near leg showing and the far leg hidden behind the horse, the near thigh lying forward along the saddle and the lower leg hanging straight down from the knee to the foot, one normal slim leg, not tucked up, not slanting, both upper arms down along the body and both forearms reaching forward, the two hands close together in front of the body above the horse's neck holding the reins, the same size and place as the reference rider, the whole figure from the top of the halo to the foot inside the image, nothing under the rider, isolated figure on a plain background, forest fantasy The rider is small: exactly the size of the reference rider, the whole figure with the head and anything on it inside the picture with room around it, the body upright over the middle of the saddle, not leaning forward and not sitting on the horse's neck.",
+  "style": "art/references/riders/skin-dawn-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/walks/start/saint-male.png",
+      "usage": "the same character as this walking figure of the game, whose walk the author accepted: copy exactly its face, hair, headwear, clothes, armour and colours, drawn the same way; not its walking pose and nothing it does not have"
+    },
+    {
+      "path": "art/references/riders/skin-dawn-male.png",
+      "usage": "a rider of this game which the author accepted: copy exactly its seat in the saddle seen from the side in a strict profile: the near thigh forward along the saddle and the lower leg hanging straight down, one leg showing, the back straight and upright, both hands together at the reins, and its size and place in the picture; not its face, clothes or colours; the new rider is exactly as big as this one, with the head, the body and the leg of the same size, and sits on the same spot of the saddle"
+    },
+    {
+      "path": "art/references/riders/mannequin-seated.png",
+      "usage": "the pose of the figure: sitting sideways, the near thigh forward and the lower leg hanging straight down, only the near leg; not its hood or cloak"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 9
+}
