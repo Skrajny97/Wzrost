@@ -1,3 +1,4 @@
+// @ts-check
 // The author's preview of a skill's animation: a short recorded fight of a
 // character of its class, at level 20 with the skill at level 10 (an
 // evolution's skill: of the evolution, at level 60 with the skill at 20; a
@@ -22,33 +23,55 @@ const EVOLVED = [
 // Kinds whose show needs a group of foes.
 const GROUP_KINDS = new Set(['sweep', 'whirl']);
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {{ kind: string, skill?: string } & Record<string, any>} FightEvent */
+
 // The foes of a preview show a skill, not the balance: they come without
 // the growth of the late game and the end game (balance.monsters), which a
 // character in common gear and without companions would not stand long
 // enough to show its skill. Made once per content.
+/** @type {WeakMap<Content, Content>} */
 const plainContents = new WeakMap();
+/**
+ * @param {Content} content
+ * @returns {Content}
+ */
 function plainMonsters(content) {
   if (!plainContents.has(content)) {
     const { lateGame, endGame } = content.balance.monsters;
     const monsters = { ...content.balance.monsters, lateGame: { ...lateGame, damage: 0, hp: 0 }, endGame: { ...endGame, damage: 0, hp: 0 } };
     plainContents.set(content, { ...content, balance: { ...content.balance, monsters } });
   }
-  return plainContents.get(content);
+  return /** @type {Content} */ (plainContents.get(content));
 }
 
 // Who the skill is shown against: a group for a sweep, a front and a back
 // foe for a blow aimed at the back, a single strong foe otherwise.
+/**
+ * @param {Record<string, any>} skill
+ * @param {Content} content
+ * @param {number} level
+ */
 function foesFor(skill, content, level) {
   const groupFactors = content.balance.hunt.groupFactors;
   const plain = plainMonsters(content);
+  /**
+   * @param {string} monsterId
+   * @param {number} index
+   * @param {number} count
+   */
   const foe = (monsterId, index, count, at = level - 2) =>
-    monsterCombatant({ monsterId, level: at, id: `e${index}`, groupFactor: groupFactors[count - 1] }, plain);
+    monsterCombatant(/** @type {any} */ ({ monsterId, level: at, id: `e${index}`, groupFactor: groupFactors[count - 1] }), plain);
   if (GROUP_KINDS.has(skill.kind) || skill.params.cloud || skill.params.splash) return ['wolf', 'wolf', 'fox'].map((id, index) => foe(id, index, 3));
   if (skill.params.target === 'back' || skill.params.pierce) return [foe('wolf', 0, 2), foe('crow', 1, 2)];
   if (WOUND_KINDS.has(skill.kind) || skill.kind === 'heal') return [foe('boar', 0, 1, level + 2)];
   return [foe('boar', 0, 1)];
 }
 
+/**
+ * @param {string} skillId
+ * @param {Content} content
+ */
 export function skillDemo(skillId, content) {
   const skill = content.skillsById[skillId];
   const cls = content.classesById[skill.classId];
@@ -68,7 +91,7 @@ export function skillDemo(skillId, content) {
   character.points = autoDistribute(character, content);
   const gear = createRng(`demo-gear:${cls.id}`);
   const bases = [cls.weapons[0], cls.offhands[0], ...cls.armor];
-  const equipped = bases.map((baseId) => generateItem({ baseId, level: level - 4 }, gear, content));
+  const equipped = bases.map((/** @type {string} */ baseId) => generateItem(/** @type {any} */ ({ baseId, level: level - 4 }), gear, content));
   // A wound skill wakes below its mark, so the character starts just above
   // it; a heal starts below it (a song with no mark, Chór, wounded too), a
   // miracle near fainting.
@@ -79,20 +102,25 @@ export function skillDemo(skillId, content) {
       : skill.kind === 'miracle'
         ? 0.2
         : 1;
-  const full = playerCombatant({ character, equipped, name: evolution?.name ?? cls.name }, content);
+  const full = playerCombatant(/** @type {any} */ ({ character, equipped, name: evolution?.name ?? cls.name }), content);
   const player = { ...full, hp: Math.max(1, Math.round(full.maxHp * Math.min(1, below))) };
   // The first fight that shows the skill whole: what it may cause by chance
   // (a burn, a paralysis), a guard's end and a miracle's won fight too; else
   // the first that shows the skill at all.
+  /** @param {FightEvent[]} events */
   const used = (events) => events.some((event) => event.skill === skillId);
+  /** @param {{ events: FightEvent[], won?: boolean | null }} fight */
   const whole = ({ events, won }) =>
     used(events) &&
     (!skill.params.dotEffect || events.some((event) => event.kind === 'effect')) &&
     (!skill.params.stunChance || events.some((event) => event.kind === 'stun')) &&
     (skill.kind !== 'guard' || events.some((event) => event.kind === 'fade')) &&
     (skill.kind !== 'miracle' || won === true);
+  /** @type {any} */
   let result = null;
+  /** @type {any} */
   let enemies = null;
+  /** @type {{ result: any, enemies: any } | null} */
   let fallback = null;
   for (let attempt = 0; attempt < 30; attempt++) {
     enemies = foesFor(skill, content, level);
@@ -103,7 +131,7 @@ export function skillDemo(skillId, content) {
   }
   return {
     allies: [combatantView(player, enemies[0].level, content)],
-    enemies: enemies.map((enemy) => combatantView(enemy, player.level, content)),
+    enemies: enemies.map((/** @type {any} */ enemy) => combatantView(enemy, player.level, content)),
     events: result.events,
     won: result.won,
   };

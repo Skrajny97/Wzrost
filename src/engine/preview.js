@@ -1,3 +1,4 @@
+// @ts-check
 // Numbers for the stats screen: the character's combat values and what each
 // stat gives in them now. Chances and reductions are measured against an
 // opponent of the character's own level.
@@ -8,10 +9,25 @@ import { cappedChance, reduction } from './formulas.js';
 import { regenPerMinute } from './progression.js';
 import { computeStats } from './stats.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {Record<string, any>} Character A character, as its row keeps it. */
+/** @typedef {Record<string, any>} Item An item, as items.js makes it. */
+/**
+ * @typedef {{ damageMin: number, damageMax: number, damage: number, reduction: number, dodge: number, crit: number, effectResist: number,
+ *   speed: number, maxHp: number, mana: number, regen: number, recovery: number, resist: Record<string, number> }} CombatValues
+ */
+/** @typedef {'damage' | 'reduction' | 'dodge' | 'crit' | 'effectResist' | 'speed' | 'maxHp' | 'mana' | 'regen' | 'recovery'} ValueKey */
+
+/**
+ * @param {Character} character
+ * @param {Item[]} equipped
+ * @param {Content} content
+ * @returns {CombatValues}
+ */
 export function combatValues(character, equipped, content) {
   const balance = content.balance;
   const tuning = balance.combat;
-  const unit = playerCombatant({ character, equipped, name: '' }, content);
+  const unit = playerCombatant(/** @type {any} */ ({ character, equipped, name: '' }), content);
   const { totals } = computeStats(character, equipped, content);
   const level = character.level;
   const scale = unit.damageScale;
@@ -29,7 +45,7 @@ export function combatValues(character, equipped, content) {
     regen: regenPerMinute(unit.maxHp, totals.vitality, content),
     recovery: unit.recovery,
     // Each element's resistance as the share of its damage it takes away.
-    resist: Object.fromEntries(content.elements.map(({ id }) => [id, reduction(unit.resist[id] ?? 0, level, balance)])),
+    resist: Object.fromEntries(content.elements.map((/** @type {{ id: string }} */ { id }) => [id, reduction(unit.resist[id] ?? 0, level, balance)])),
   };
 }
 
@@ -42,14 +58,24 @@ export function combatValues(character, equipped, content) {
 // the speed, the HP at rest (with `rest`, the share the Ognisko adds, as the
 // character rests now) and after each fight, and each element's resistance,
 // with the share less of its damage a trait shelters from.
+/**
+ * @param {Character} character
+ * @param {Item[]} equipped
+ * @param {Content} content
+ * @param {{ rest?: number }} [options]
+ */
 export function extraValues(character, equipped, content, { rest = 0 } = {}) {
   const balance = content.balance;
   const tuning = balance.combat;
-  const unit = playerCombatant({ character, equipped, name: '' }, content);
+  const unit = playerCombatant(/** @type {any} */ ({ character, equipped, name: '' }), content);
   const { totals, bonuses } = computeStats(character, equipped, content);
   const level = character.level;
   const feat = unit.feat;
   const trait = feat?.kind === 'bulwark' ? { name: evolutionOf(character, content).trait.name, share: feat.armor } : null;
+  /**
+   * @param {number} rating
+   * @param {number} cap
+   */
   const chance = (rating, cap) => ({ rating: Math.round(rating), chance: cappedChance(rating, level, cap, balance), cap });
   return {
     level,
@@ -66,7 +92,7 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
     speed: unit.speed,
     regen: regenPerMinute(unit.maxHp, totals.vitality, content, rest),
     recovery: unit.recovery,
-    resist: content.elements.map(({ id, name }) => {
+    resist: content.elements.map((/** @type {{ id: string, name: string }} */ { id, name }) => {
       const rating = unit.resist[id] ?? 0;
       return { id, name, rating, reduction: reduction(rating, level, balance), shelter: unit.shelter?.[id] ?? 0 };
     }),
@@ -77,15 +103,24 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
 // are against those with the stat at nothing (the author: „lepiej pisz ile
 // daja aktualne staty a nie jeden punkt”). Damage is a relative change (0.92
 // is +92%), everything else an absolute one.
+/**
+ * @param {Character} character
+ * @param {Item[]} equipped
+ * @param {Content} content
+ * @returns {Record<string, Partial<Record<ValueKey, number>>>}
+ */
 export function statShares(character, equipped, content) {
   const now = combatValues(character, equipped, content);
   const { totals } = computeStats(character, equipped, content);
+  /** @type {ValueKey[]} */
+  const keys = ['damage', 'reduction', 'dodge', 'crit', 'effectResist', 'speed', 'maxHp', 'mana', 'regen', 'recovery'];
   return Object.fromEntries(
-    content.statIds.map((stat) => {
+    content.statIds.map((/** @type {string} */ stat) => {
       const points = { ...character.points, [stat]: (character.points[stat] ?? 0) - totals[stat] };
       const without = combatValues({ ...character, points }, equipped, content);
+      /** @type {Partial<Record<ValueKey, number>>} */
       const shares = {};
-      for (const key of ['damage', 'reduction', 'dodge', 'crit', 'effectResist', 'speed', 'maxHp', 'mana', 'regen', 'recovery']) {
+      for (const key of keys) {
         const share = key === 'damage' ? now.damage / without.damage - 1 : now[key] - without[key];
         if (Math.abs(share) > 1e-9) shares[key] = share;
       }
@@ -99,6 +134,7 @@ export function statShares(character, equipped, content) {
 // whole: "better" when some go up and none goes down, "worse" when some go
 // down and none up, "mixed" when some go up and some down, and "same" when
 // none changes.
+/** @type {Record<string, (value: number) => number>} */
 const shown = {
   damage: (value) => Math.round(value * 10) / 10,
   reduction: percent,
@@ -112,11 +148,17 @@ const shown = {
   recovery: percent,
 };
 
+/** @param {number} value */
 function percent(value) {
   return Math.round(value * 1000) / 10;
 }
 
+/**
+ * @param {Record<string, any>} now The combat values before (combatValues).
+ * @param {Record<string, any>} after The combat values after.
+ */
 export function valueChanges(now, after) {
+  /** @type {Record<string, number>} */
   const changes = {};
   for (const [key, round] of Object.entries(shown)) {
     const change = Math.round((round(after[key]) - round(now[key])) * 100) / 100;
@@ -133,6 +175,13 @@ export function valueChanges(now, after) {
 
 // What putting an item on changes, in place of what its slot holds. `now`:
 // the values as worn, when they are counted already.
+/**
+ * @param {Character} character
+ * @param {Item[]} equipped
+ * @param {Item} item
+ * @param {Content} content
+ * @param {CombatValues} [now]
+ */
 export function equipChange(character, equipped, item, content, now = combatValues(character, equipped, content)) {
   const worn = equipped.filter((candidate) => candidate.slot !== item.slot);
   return valueChanges(now, combatValues(character, [...worn, item], content));
