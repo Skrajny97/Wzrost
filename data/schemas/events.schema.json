@@ -43,6 +43,16 @@
             "text": { "type": "string", "minLength": 1 }
           }
         },
+        "lose": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["companion", "text"],
+          "description": "Sprawa towarzysza z walką, która nie skończyła się wygraną (817.7: „Każda sprawa zdarza się jeden raz”): sprawa się zamyka, bez kolejnego stopnia relacji, ze zdaniem text o tym.",
+          "properties": {
+            "companion": { "type": "object", "additionalProperties": false, "required": ["errand"], "properties": { "errand": { "const": "lost" } } },
+            "text": { "type": "string", "minLength": 1 }
+          }
+        },
         "gold": { "type": "number", "exclusiveMinimum": 0, "description": "Złoto nagrody: tyle razy rewards.goldPerLevel × poziom postaci, ±25%." },
         "itemRarities": {
           "type": "object",

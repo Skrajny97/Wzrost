@@ -369,23 +369,64 @@ describe('Drużyna through the API', () => {
 
   test('a leader who grows out of the spread keeps the lead; the members it no longer fits leave', async () => {
     const { classSpread } = content.balance.parties;
+    await player('trzeci', 'Trzeci', { classLevel: 30 + classSpread });
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    assert.equal((await as('trzeci', 'POST', '/api/party/accept', { partyId: data.party.id })).status, 200);
     await (await db()).prepare('UPDATE characters SET class_level = ? WHERE name = ?').bind(30 + classSpread + 1, 'Lider').run();
-    // Seen first from the member's side: the member is out, the leader alone.
+    // Seen first from the member's side: Druh is out; Trzeci, who still
+    // fits, stays with the leader.
     assert.equal((await as('druh', 'GET', '/api/party')).data.party, null);
     const view = (await as('lider', 'GET', '/api/party')).data.party;
-    assert.deepEqual(view.members.map((one) => [one.name, one.leader]), [['Lider', true]]);
-    assert.equal((await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 })).data.error.code, 'nobody_free');
+    assert.deepEqual(view.members.map((one) => [one.name, one.leader]), [['Lider', true], ['Trzeci', false]]);
+  });
+
+  test('a party of one is a party only while an invitation of it waits: alone after the others went, the leader is in none', async () => {
+    const { classSpread } = content.balance.parties;
+    const parties = async () => (await (await db()).prepare('SELECT COUNT(*) AS count FROM parties').first()).count;
+    await player('trzeci', 'Trzeci');
+    // The first invitation makes the party, its leader and the invitation at once.
+    const made = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    assert.equal(made.status, 200, JSON.stringify(made.data));
+    assert.deepEqual([made.data.party.members.map((one) => one.name), made.data.party.invited.map((one) => one.name)], [['Lider'], ['Druh']]);
+    // Declined: no party is left.
+    await as('druh', 'POST', '/api/party/decline', { partyId: made.data.party.id });
+    assert.equal((await as('lider', 'GET', '/api/party')).data.party, null);
+    assert.equal(await parties(), 0);
+    // While another invitation waits, the party stays; withdrawn, it ends.
+    const again = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
+    await as('druh', 'POST', '/api/party/decline', { partyId: again.data.party.id });
+    assert.deepEqual((await as('lider', 'GET', '/api/party')).data.party.invited.map((one) => one.name), ['Trzeci']);
+    const withdrawn = await as('lider', 'POST', '/api/party/cancel', { characterId: await idOf('Trzeci') });
+    assert.equal(withdrawn.data.party, null);
+    assert.equal(await parties(), 0);
+    // The last member gone, by leaving or by growing out of the spread:
+    // the leader is in no party, and its next invitation makes a new one.
+    const third = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: third.data.party.id });
+    await as('druh', 'POST', '/api/party/leave');
+    assert.equal((await as('lider', 'GET', '/api/party')).data.party, null);
+    assert.equal((await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 })).data.error.code, 'no_party');
+    const fourth = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('druh', 'POST', '/api/party/accept', { partyId: fourth.data.party.id });
+    await (await db()).prepare('UPDATE characters SET class_level = ? WHERE name = ?').bind(30 + classSpread + 1, 'Lider').run();
+    assert.equal((await as('lider', 'GET', '/api/party')).data.party, null);
+    assert.equal((await as('druh', 'GET', '/api/party')).data.party, null);
+    assert.equal(await parties(), 0);
   });
 
   test('a deleted account leaves its party', async () => {
+    await player('trzeci', 'Trzeci');
     const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    await as('lider', 'POST', '/api/party/invite', { name: 'Trzeci' });
     await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id });
+    await as('trzeci', 'POST', '/api/party/accept', { partyId: data.party.id });
     const gone = await as('druh', 'DELETE', '/api/me', { login: 'druh' });
     assert.equal(gone.status, 200, JSON.stringify(gone.data));
     const view = (await as('lider', 'GET', '/api/party')).data.party;
-    assert.deepEqual(view.members.map((one) => one.name), ['Lider']);
+    assert.deepEqual(view.members.map((one) => one.name), ['Lider', 'Trzeci']);
   });
 });
 
@@ -520,6 +561,33 @@ describe('a Drużyna and the companions from the Kwatery', () => {
     await as('lider', 'POST', '/api/party/leave');
     assert.deepEqual(await alone('lider'), []);
     assert.equal((await stored('Lider')).stays, true);
+  });
+
+  test('a declined invitation leaves no party of one behind: the companion goes on the explorations again at once', async () => {
+    const companion = await hire('lider');
+    const goes = async () => {
+      assert.equal((await as('lider', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+      const went = (await hunts()).find((one) => one.name === 'Lider').options.companions?.map((one) => one.id) ?? [];
+      await as('lider', 'POST', '/api/hunts/cancel');
+      return went;
+    };
+    const made = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    assert.equal(made.status, 200, JSON.stringify(made.data));
+    // While the invitation waits, the party is there and the companion stays.
+    assert.deepEqual(await goes(), []);
+    await as('druh', 'POST', '/api/party/decline', { partyId: made.data.party.id });
+    // No look at the Drużyna first: the exploration itself sees the party gone.
+    assert.deepEqual(await goes(), [companion.id]);
+  });
+
+  test('one whose class level grows out of its party has its companion on the explorations again at once', async () => {
+    const companion = await hire('druh');
+    const { data } = await as('lider', 'POST', '/api/party/invite', { name: 'Druh' });
+    assert.equal((await as('druh', 'POST', '/api/party/accept', { partyId: data.party.id })).status, 200);
+    await (await db()).prepare('UPDATE characters SET class_level = ? WHERE name = ?').bind(30 + content.balance.parties.classSpread + 1, 'Druh').run();
+    // Before anyone opens the Drużyna, the exploration knows Druh is out.
+    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+    assert.deepEqual((await hunts()).find((one) => one.name === 'Druh').options.companions?.map((one) => one.id), [companion.id]);
   });
 
   test("a party's trip goes without companions, and in a party a companion stays even if it was never told to", async () => {

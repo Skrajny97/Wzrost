@@ -86,6 +86,7 @@ import {
   requireIdle,
   requireIdlePlayer,
   requirePlayer,
+  settlementOpen,
   trophiesFor,
 } from './characters.js';
 import { toHex } from './encoding.js';
@@ -671,13 +672,20 @@ function settlementAfterHunt(row, hunt, kept, minutes, event = null) {
 // (events.js: errandMates): their names, looks, stories, relations and
 // errands from the Osada, and whether they fell on the way. A trip goes
 // without them.
-function huntMates(stored, hunt) {
+function huntMates(stored, hunt, setOut = []) {
   const kept = new Map((stored.companions ?? []).map((companion) => [companion.id, companion]));
+  const started = new Map(setOut.map((companion) => [companion.id, companion]));
   return (hunt.companions ?? []).flatMap((one) => {
-    const companion = kept.get(one.id);
-    if (!companion) return [];
+    // A companion dismissed meanwhile is left out. The others count as
+    // they set out (`setOut`, the exploration's options.companions), so the
+    // event drawn stays the same however often the report is opened, even
+    // after a talk in the Kwatery raised a relation; one that set out
+    // before they were kept counts as it is now.
+    const now = kept.get(one.id);
+    if (!now) return [];
+    const companion = started.get(one.id) ?? now;
     const { id, name, appearance, classId, story, relation, errand } = companion;
-    return [{ id, name, appearance, classId, story, relation: relation ?? 0, errand: errand ?? null, fainted: Boolean(one.fainted) }];
+    return [{ id, name, appearance, classId, story, relation: relation ?? 0, errand: now.errand ?? errand ?? null, fainted: Boolean(one.fainted) }];
   });
 }
 
@@ -761,9 +769,9 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // events.js: eventCase) and the companions who went (a companion's errand).
   const storedSettlement = JSON.parse(row.settlement ?? '{}');
   const metEvents = storedSettlement.events ?? [];
-  const mates = trip ? [] : huntMates(storedSettlement, hunt);
+  const mates = trip ? [] : huntMates(storedSettlement, hunt, options.companions ?? []);
   const event = eventsOn()
-    ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn(), settlement: settlementOn(), mates }, content())
+    ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn(), settlement: settlementOpen(row), mates }, content())
     : null;
   const mate = event?.companion ? eventMate(event, activity.seed, mates) : null;
   // An option's price comes from the purse, the character's gold with the

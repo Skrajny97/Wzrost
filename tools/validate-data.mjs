@@ -909,6 +909,12 @@ function checkEvents(data, { monsters, rarities }) {
       if (outcome.win?.itemRarities && !outcome.win.text?.includes('{item}')) errors.push(`events.json: ${where} potrzebuje zdania win.text z {item}`);
       if ((outcome.win?.relation || outcome.win?.companion) && !outcome.win.text) errors.push(`events.json: ${where} potrzebuje zdania win.text o relacji`);
       checkTies(where, outcome.win, event);
+      // A companion's errand fought: settled whatever the fight's end (817.7),
+      // so one not won names the errand too, with a sentence about it.
+      if (outcome.win?.companion && !outcome.lose?.companion?.errand) errors.push(`events.json: ${where} potrzebuje lose.companion.errand: sprawa zamyka się też po przegranej`);
+      if (outcome.lose?.companion?.relation !== undefined) errors.push(`events.json: ${where} nie daje relacji po przegranej (lose.companion.relation)`);
+      if (outcome.lose && !outcome.lose.text) errors.push(`events.json: ${where} potrzebuje zdania lose.text`);
+      checkTies(where, outcome.lose, event);
     } else if (fighting) {
       errors.push(`events.json: ${where} ma ustawienia walki bez walki`);
     }

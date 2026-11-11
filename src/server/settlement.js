@@ -154,7 +154,9 @@ const serviceOf = (residentId) =>
 // What the row keeps of the Osada: reputation and relations by id, the
 // board, a reforging's affixes waiting for the player's choice (`pending`),
 // the changes of evolution made at the Pustelnik's and `test` once "Testuj
-// Osadę" opened it below its level.
+// Osadę" opened it below its level. Every key the game writes into the
+// Osada must be named here, or the next save of the Osada drops it (a test
+// in test/settlement-keys.test.js checks the keys hunts.js writes).
 export function settlementOf(row) {
   const stored = JSON.parse(row.settlement ?? '{}');
   return {
@@ -192,6 +194,9 @@ export function settlementOf(row) {
     // The day of the last gift to each resident and the week of the last
     // present taken from each (resident-gifts.js, 818.1 and 818.2).
     ...(stored.gifts && { gifts: stored.gifts }),
+    // The events met first in one case, so the next brings the other
+    // (events.js: eventCase; Jagna once, then the Topielica, 817.1).
+    ...(stored.events && { events: stored.events }),
     ...(stored.test && { test: true }),
   };
 }

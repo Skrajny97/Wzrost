@@ -18,7 +18,10 @@
 // The leader invites a character by its name; a party comes with the first
 // invitation. The invited one accepts or declines; a member leaves when it
 // wants, and the leader may send one out. A leader who leaves passes the
-// lead to the member who joined first, and a party nobody is in is gone.
+// lead to the member who joined first, and a party nobody is in is gone. A
+// party of one is a party only while an invitation of it waits: declined,
+// withdrawn, or with the others gone, it ends (partyOf, 11.11.2026), so its
+// companions do not stay in the Kwatery for a party that is not there.
 //
 // An exploration of the party: every member free now (its character played,
 // at home, with nothing going on) goes with the leader to the place and for
@@ -141,7 +144,16 @@ export async function partyOf(db, characterId) {
     await db.batch(partyRemoval(db, ids.map(() => '?').join(', '), ids));
     if (ids.includes(characterId)) return null;
   }
-  return { id: row.id, leaderId: row.leader_id, memberIds: list.filter((member) => !apart.includes(member)).map((member) => member.id) };
+  const staying = list.filter((member) => !apart.includes(member)).map((member) => member.id);
+  // A party of one with no invitation waiting is no party: after a declined
+  // or withdrawn invitation, or once the others have left, it ends, so its
+  // last member's companions go on the explorations again at once (828 B:
+  // they stay in the Kwatery only while there is a party).
+  if (staying.length < 2 && !(await db.prepare('SELECT 1 AS one FROM party_invites WHERE party_id = ? LIMIT 1').bind(row.id).first())) {
+    if (staying.length > 0) await db.batch(partyRemoval(db, staying.map(() => '?').join(', '), staying));
+    return null;
+  }
+  return { id: row.id, leaderId: row.leader_id, memberIds: staying };
 }
 
 // Whether a member's activity has ended with a report to claim: an
@@ -278,18 +290,22 @@ export async function inviteToParty(context) {
   const gap = levelGap(target.name, target.class_level, party ? await classLevels(db, party.id) : [player.row.class_level]);
   if (gap) throw gap;
   if (!party) {
-    // The party and its leader at once, in one transaction.
-    let made;
+    // The party, its leader and the first invitation at once, in one
+    // transaction: a party of one is a party only while an invitation waits
+    // (partyOf).
     try {
-      [made] = await db.batch([
+      await db.batch([
         db.prepare('INSERT INTO parties (leader_id, created_at) VALUES (?, ?)').bind(player.row.id, context.now),
         db.prepare('INSERT INTO party_members (character_id, party_id, joined_at) VALUES (?, last_insert_rowid(), ?)').bind(player.row.id, context.now),
+        db
+          .prepare('INSERT INTO party_invites (party_id, character_id, invited_by, created_at) SELECT party_id, ?, ?, ? FROM party_members WHERE character_id = ?')
+          .bind(target.id, player.row.id, context.now, player.row.id),
       ]);
     } catch {
       // Another request made one meanwhile.
       throw new ApiError(409, 'changed', 'Drużyna zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
     }
-    party = { id: made.meta.last_row_id, leaderId: player.row.id, memberIds: [player.row.id] };
+    return answer(db, player.row.id, context.now, { text: t('Zaproszenie wysłane. {name} przyjmie je w Społeczności, w Drużynie.', { name: target.name }) });
   }
   const waiting = await db.prepare('SELECT COUNT(*) AS count FROM party_invites WHERE party_id = ?').bind(party.id).first();
   if (waiting.count >= MAX_INVITES) throw new ApiError(409, 'too_many_invites', `Na odpowiedź czeka już ${MAX_INVITES} zaproszeń.`);

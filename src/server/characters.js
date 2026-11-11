@@ -128,7 +128,7 @@ import { fameNotice } from './fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { guildSeatSql } from './guild-seat.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
-import { partyRemoval } from './parties.js';
+import { partyOf, partyRemoval } from './parties.js';
 import { anvilDiscountOf } from './perks.js';
 import { bagHerbs, bagMinerals, bagPotions, herbsOf, potionsOf, professionsView, settlementPointsOf } from './professions-view.js';
 import { OWN_CHARACTERS } from './roles.js';
@@ -213,7 +213,9 @@ async function playerOf(db, row) {
     // What waits to be collected at the Targowisko (market.js).
     marketWaiting: parcels.results[0]?.waiting ?? 0,
     guildTag: parcels.results[0]?.guild_tag ?? null,
-    inParty: Boolean(parcels.results[0]?.in_party),
+    // A membership the spread of class levels or a party of one has ended
+    // ends here too (partyOf), so the companions go again at once (828 B).
+    inParty: Boolean(parcels.results[0]?.in_party) && Boolean(await partyOf(db, row.id)),
     // The levels of its guild's Siedziba, by building, all 0 outside a guild
     // (guild-seat.js): the bonuses it has as a member.
     guildSeat: seatLevels(JSON.parse(parcels.results[0]?.guild_seat ?? '{}'), content()),

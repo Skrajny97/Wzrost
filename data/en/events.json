@@ -1078,7 +1078,10 @@
             "together": {
               "text": "You wait together around the bend. The moneylender’s men walk straight into you.",
               "win": {
-                "text": "The moneylender’s men flee and drop the promissory notes on the way. {name} tears them to shreds and laughs for the first time in ages (your bond reaches its next stage)."
+                "text": "The moneylender’s men flee and drop the promissory notes on the way, and one of them leaves {item} behind. {name} tears the notes to shreds and laughs for the first time in ages (your bond reaches its next stage)."
+              },
+              "lose": {
+                "text": "The moneylender’s men have the upper hand. {name} wipes the blood from a split lip: “Never mind. I’ll pay him off my own way.” And never brings it up again."
               },
               "start": "The moneylender’s men reach for their weapons: {enemies}."
             },
@@ -1106,7 +1109,10 @@
             "together": {
               "text": "You follow the tracks together to a windfall. The wolf waits there with his pack.",
               "win": {
-                "text": "The wolf falls. {name} stands over him in silence for a long time, then nods to you: “Thank you” (your bond reaches its next stage)."
+                "text": "The wolf falls. In his lair lies {item}, lost by someone the pack caught earlier. {name} stands over the wolf in silence for a long time, then nods to you: “Thank you” (your bond reaches its next stage)."
+              },
+              "lose": {
+                "text": "The pack vanishes into the thicket. {name} sighs: “The old wolf is smarter than I thought.” And never mentions him again."
               },
               "start": "The pack leaps at you: {enemies}."
             },
@@ -1134,7 +1140,10 @@
             "together": {
               "text": "A Revenant waits at the shrine. It is what drove everyone away.",
               "win": {
-                "text": "The Revenant fades into the morning mist. {name} lays the friend’s sword beneath the shrine: “Promise kept” (your bond reaches its next stage)."
+                "text": "The Revenant fades into the morning mist, and {item} is left on the shrine’s step. {name} lays the friend’s sword beneath the shrine: “Promise kept” (your bond reaches its next stage)."
+              },
+              "lose": {
+                "text": "The Revenant drives you away from the shrine. {name} leaves the friend’s sword at the edge of the path: “That’s all I can do for him.” And never brings it up again."
               },
               "start": "The Revenant lunges at you: {enemies}."
             },
@@ -1150,7 +1159,10 @@
             "together": {
               "text": "You follow the tracks together to a poachers’ camp. The brother sits tied to a tree, and the poachers reach for their weapons.",
               "win": {
-                "text": "The poachers flee. {name} cuts the brother free and hugs him for a long time. The brother heads for the Settlement, and now you have two friends (your bond reaches its next stage)."
+                "text": "The poachers flee and leave {item} in their camp. {name} cuts the brother free and hugs him for a long time. The brother heads for the Settlement, and now you have two friends (your bond reaches its next stage)."
+              },
+              "lose": {
+                "text": "The poachers drive you away from their camp, but in the confusion the brother slips off into the forest. {name} breathes with relief: “He’s alive. That’s what matters.” And never brings it up again."
               },
               "start": "The poachers attack: {enemies}."
             },

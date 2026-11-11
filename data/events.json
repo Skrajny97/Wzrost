@@ -1806,11 +1806,22 @@
               "itemChance": 0.35,
               "win": {
                 "gold": 2,
+                "itemRarities": {
+                  "rare": 40,
+                  "unique": 45,
+                  "epic": 15
+                },
                 "companion": {
                   "relation": "next",
                   "errand": "together"
                 },
-                "text": "Ludzie lichwiarza uciekają i gubią po drodze weksle. {name} drze je na strzępy i pierwszy raz od dawna się śmieje (relacja wchodzi na kolejny stopień)."
+                "text": "Ludzie lichwiarza uciekają i gubią po drodze weksle, a jeden z nich zostawia {item}. {name} drze weksle na strzępy i pierwszy raz od dawna się śmieje (relacja wchodzi na kolejny stopień)."
+              },
+              "lose": {
+                "companion": {
+                  "errand": "lost"
+                },
+                "text": "Ludzie lichwiarza odchodzą górą. {name} ociera krew z wargi: „Trudno. Spłacę go po swojemu”. Więcej o tym nie wspomina."
               },
               "start": "Ludzie lichwiarza sięgają po broń: {enemies}."
             },
@@ -1872,11 +1883,22 @@
               "itemChance": 0.35,
               "win": {
                 "gold": 1,
+                "itemRarities": {
+                  "rare": 40,
+                  "unique": 45,
+                  "epic": 15
+                },
                 "companion": {
                   "relation": "next",
                   "errand": "together"
                 },
-                "text": "Basior pada. {name} długo stoi nad nim w milczeniu, a potem kiwa ci głową: „Dziękuję” (relacja wchodzi na kolejny stopień)."
+                "text": "Basior pada. W jego legowisku leży {item}, zgubione przez kogoś, kogo wataha dopadła wcześniej. {name} długo stoi nad basiorem w milczeniu, a potem kiwa ci głową: „Dziękuję” (relacja wchodzi na kolejny stopień)."
+              },
+              "lose": {
+                "companion": {
+                  "errand": "lost"
+                },
+                "text": "Wataha znika w gęstwinie. {name} wzdycha: „Basior jest sprytniejszy, niż [myślałam|myślałem]”. Więcej o nim nie wspomina."
               },
               "start": "Wataha rzuca się na was: {enemies}."
             },
@@ -1936,11 +1958,22 @@
               "itemChance": 0.35,
               "win": {
                 "gold": 2,
+                "itemRarities": {
+                  "rare": 40,
+                  "unique": 45,
+                  "epic": 15
+                },
                 "companion": {
                   "relation": "next",
                   "errand": "together"
                 },
-                "text": "Upiór rozwiewa się w porannej mgle. {name} kładzie miecz przyjaciela pod kapliczką: „Słowo dotrzymane” (relacja wchodzi na kolejny stopień)."
+                "text": "Upiór rozwiewa się w porannej mgle, a na stopniu kapliczki zostaje {item}. {name} kładzie miecz przyjaciela pod kapliczką: „Słowo dotrzymane” (relacja wchodzi na kolejny stopień)."
+              },
+              "lose": {
+                "companion": {
+                  "errand": "lost"
+                },
+                "text": "Upiór przegania was spod kapliczki. {name} zostawia miecz przyjaciela na skraju ścieżki: „Tyle mogę dla niego zrobić”. Więcej o tym nie wspomina."
               },
               "start": "Upiór rzuca się na was: {enemies}."
             },
@@ -1972,11 +2005,22 @@
               "itemChance": 0.35,
               "win": {
                 "gold": 2,
+                "itemRarities": {
+                  "rare": 40,
+                  "unique": 45,
+                  "epic": 15
+                },
                 "companion": {
                   "relation": "next",
                   "errand": "together"
                 },
-                "text": "Kłusownicy uciekają. {name} przecina więzy brata i długo się z nim ściska. Brat rusza do Osady, a ty masz teraz dwoje przyjaciół (relacja wchodzi na kolejny stopień)."
+                "text": "Kłusownicy uciekają i zostawiają w obozie {item}. {name} przecina więzy brata i długo się z nim ściska. Brat rusza do Osady, a ty masz teraz dwoje przyjaciół (relacja wchodzi na kolejny stopień)."
+              },
+              "lose": {
+                "companion": {
+                  "errand": "lost"
+                },
+                "text": "Kłusownicy przeganiają was od obozu, ale w zamieszaniu brat wymyka się w las. {name} oddycha z ulgą: „Żyje. To najważniejsze”. Więcej o tym nie wspomina."
               },
               "start": "Kłusownicy atakują: {enemies}."
             },

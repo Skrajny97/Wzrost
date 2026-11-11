@@ -472,6 +472,10 @@
     "0.2.66": {
       "title": "Version 0.2.66",
       "body": "- The Marketplace is easier to search: each kind of goods has its own tab, and for items you can choose a class and a rarity. The search covers all the offers, not only those ending first.\n- \"For me\" also shows what a chosen companion from the Quarters can equip now, and an unfolded item compares with what your character and every companion who can equip it wear.\n- Sorting the offers: ending soon, cheapest or most expensive, by the price of a piece.\n- Parties and companions: you no longer have to leave your companions in the quarters before you start or join a party. The game asks once, and while you are in a party your companions wait in the Quarters by themselves. After the party each goes back to how it was set.\n- Training in the Quarters: \"Train\" raises a companion's level by one for 25 gold times the level they reach, up to three times a day and at most to your character's level minus 3. A companion does not train while out on an exploration.\n- Guild Requests work from character level 20, on both sides, just like trading between players and the guild Exchange."
+    },
+    "0.2.67": {
+      "title": "Version 0.2.67",
+      "body": "- Jagna from the marsh comes once, and then only the Drowned Maiden, even if you visit the Settlement in between.\n- Settlement events (Jagna, the Drowned Maiden, companions' errands) come only once your character has the Settlement.\n- A companion's errand in which you fight together closes whatever the fight's result. Win it and you get the next stage of your bond and a rarer item.\n- A party left with only its leader and no invitation waiting ends, so the leader's companions go back on explorations at once."
     }
   }
 }

@@ -570,12 +570,16 @@ export function resolveEvent(
     result = fight.won === false && !area.safe ? 'fainted' : 'escaped';
     hpNow = fight.won === false ? Math.max(1, Math.round(player.maxHp * content.balance.hunt.hpAfterFaint)) : Math.max(1, hpNow);
     lines.push(say(texts, fight.won === null ? 'draw' : result === 'fainted' ? 'defeat' : 'escape', index, { target: name }));
+    // A companion's errand fought and not won is settled too, without the
+    // next standing (`lose`; 817.7: „Każda sprawa zdarza się jeden raz”).
+    if (outcome.lose?.text) lines.push(fill(outcome.lose.text));
     summary.hpAfter = hpNow;
   }
 
   const told = fill(outcome.text);
-  // A won fight gives what its win names besides (ties).
-  const given = fight.won === true ? ties(outcome.win) : {};
+  // A won fight gives what its win names besides (ties), and one not won
+  // what its `lose` names (a companion's errand settled).
+  const given = ties(fight.won === true ? outcome.win : outcome.lose);
   return {
     ...hunt,
     spent,

@@ -132,6 +132,36 @@ describe('events of 817 in the engine', () => {
     const next = talkWith({ ...talk.companion, talkedOn: null }, { seed, now: NOW + 86400000 }, content);
     assert.equal(next.talk.memory, undefined);
   });
+
+  test('an errand fought together: a win gives the next standing and an item of a rarer kind; a fight not won settles it, without the standing', () => {
+    const errand = event('companion-errand');
+    const debts = { together: true, mate: mate({ story: 1 }) };
+    assert.equal(eventCase(errand, seed, null, { mate: debts.mate }).id, 'debts');
+    // A character strong enough for the moneylender's three men.
+    const strong = newCharacter('warrior', { level: 30, classLevel: 30, points: { strength: 300, vitality: 300 } });
+    const hunt = simulateHunt({ character: strong, equipped, hp: 99999, name: 'Mira', areaId: 'windfalls-edge', minutes: 60, seed }, content);
+    const won = resolveEvent({ hunt, event: errand, optionId: 'together', character: strong, equipped, name: 'Mira', seed, mate: debts.mate }, content);
+    const fight = won.fights.at(-1);
+    assert.equal(fight.won, true);
+    assert.deepEqual(won.event.reward.companion, { id: candidate.id, relation: 'next', errand: 'together' });
+    const item = won.items[fight.chests.at(-1)];
+    assert.ok(['rare', 'unique', 'epic'].includes(item.rarity), item.rarity);
+    assert.match(won.entries.at(-1).text, /jeden z nich zostawia .+\. Bogna drze weksle/);
+    // Not won (the character comes to it with 1 HP): the errand is settled
+    // all the same, with its sentence, and the relation stays as it was.
+    const lost = resolveEvent({ hunt: { ...base, hpEnd: 1 }, event: errand, optionId: 'together', character, equipped, name: 'Mira', seed, mate: debts.mate }, content);
+    assert.notEqual(lost.fights.at(-1).won, true);
+    assert.deepEqual(lost.event.reward.companion, { id: candidate.id, errand: 'lost' });
+    assert.match(lost.entries.at(-1).text, /Bogna ociera krew z wargi: „Trudno\. Spłacę go po swojemu”\. Więcej o tym nie wspomina\./);
+    const companion = { ...candidate, appearance: 'female', story: 1, relation: 300 };
+    assert.deepEqual(companionAfterErrand(companion, lost.event.reward.companion, content), { ...companion, relation: 300, errand: 'lost' });
+    // Every errand fought together closes either way: no case without its `lose`.
+    for (const one of errand.cases) {
+      const together = one.outcomes?.together;
+      if (together?.kind === 'fight') assert.deepEqual(together.lose?.companion, { errand: 'lost' }, one.id);
+    }
+    assert.equal(errandMates(errand, [mate({ errand: 'lost' })]).length, 0);
+  });
 });
 
 describe('events of 817 (API)', () => {
@@ -171,5 +201,79 @@ describe('events of 817 (API)', () => {
     stored = await settlement();
     assert.equal(stored.relations.herbalist, 25);
     assert.deepEqual(stored.events, ['bog-herbalist']);
+  });
+
+  test('Jagna is met once even when the Osada is saved between the meetings', async () => {
+    await explore();
+    await claim();
+    await (await db()).prepare(`UPDATE characters SET level = 30, gold = 100000, points = '{"strength":150,"vitality":140}', hp_at = 0`).run();
+    await choose('bog-herbalist');
+    await explore();
+    await claim();
+    assert.equal((await claim('stick')).data.report.event.case, 'jagna');
+    // A look at the Osada saves it anew with its board, as every action
+    // there does: what the events remember stays.
+    assert.equal((await call('GET', '/api/settlement', { cookie })).status, 200);
+    const stored = await settlement();
+    assert.ok(stored.board);
+    assert.deepEqual(stored.events, ['bog-herbalist']);
+    await choose('bog-herbalist');
+    await explore();
+    await claim();
+    assert.equal((await claim('leave')).data.report.event.case, 'drowned-maiden');
+  });
+
+  test('an event of the Osada does not come before the character has its Osada', async () => {
+    await explore();
+    await claim();
+    const { level } = content.unlocksById.settlement;
+    await (await db()).prepare(`UPDATE characters SET level = ?, gold = 100000, points = '{"strength":150,"vitality":140}', hp_at = 0`).bind(level - 1).run();
+    await choose('bog-herbalist');
+    await explore();
+    const report = await claim();
+    assert.equal(report.status, 200, JSON.stringify(report.data).slice(0, 300));
+    assert.equal(report.data.event ?? null, null);
+    assert.equal(report.data.report.event ?? null, null);
+    assert.deepEqual((await settlement()).relations ?? {}, {});
+    // From the Osada's level on, it comes.
+    await (await db()).prepare('UPDATE characters SET level = ?, hp_at = 0').bind(level).run();
+    await choose('bog-herbalist');
+    await explore();
+    assert.equal((await claim()).data.event.id, 'bog-herbalist');
+  });
+
+  test('the companions count as they set out: a relation grown before the choice does not change whose errand it is', async () => {
+    await explore();
+    await claim();
+    await (await db()).prepare(`UPDATE characters SET level = 30, class_level = 30, gold = 100000, points = '{"strength":300,"vitality":300}', hp_at = 0`).run();
+    await (await db()).prepare("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'quarters', 2, 0, 0 FROM characters").run();
+    const hire = async () => {
+      const [candidate] = (await call('GET', '/api/settlement', { cookie })).data.settlement.companions.candidates;
+      const hired = await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: candidate.id } });
+      assert.equal(hired.status, 200, JSON.stringify(hired.data).slice(0, 300));
+      return candidate;
+    };
+    const first = await hire();
+    const second = await hire();
+    const relate = async (relations) => {
+      const stored = await settlement();
+      stored.companions = stored.companions.map((one) => ({ ...one, relation: relations[one.id] ?? one.relation }));
+      await (await db()).prepare('UPDATE characters SET settlement = ?').bind(JSON.stringify(stored)).run();
+    };
+    // Only the first has the relation an errand needs when they set out.
+    const { minRelation } = content.eventsById['companion-errand'].companion;
+    await relate({ [first.id]: minRelation, [second.id]: 0 });
+    await choose('companion-errand');
+    await explore();
+    const shown = await claim();
+    assert.equal(shown.data.event?.id, 'companion-errand', JSON.stringify(shown.data).slice(0, 300));
+    assert.equal(shown.data.event.companion.id, first.id);
+    // The second one's relation grows before the choice: the errand stays the
+    // first one's, however often the report is opened.
+    await relate({ [second.id]: minRelation });
+    for (let i = 0; i < 3; i += 1) assert.equal((await claim()).data.event.companion.id, first.id);
+    const done = await claim('later');
+    assert.equal(done.status, 200, JSON.stringify(done.data).slice(0, 300));
+    assert.equal(done.data.report.event.companion?.id ?? first.id, first.id);
   });
 });
