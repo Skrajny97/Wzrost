@@ -42,7 +42,7 @@ import { guildRanking } from './guild-fame.js';
 import { claimFame, getFame } from './fame.js';
 import { cancelOrders, craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
-import { authorPayments, getPayments, orderPoints, paymentNotice, withdrawPurchase } from './payments.js';
+import { authorPayments, getPayments, orderPoints, paymentNotice, paymentReturn, withdrawPurchase } from './payments.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
   autoPoints,
@@ -188,6 +188,9 @@ const routes = [
   ['POST', '/api/payments/order', orderPoints],
   ['POST', '/api/payments/withdraw', withdrawPurchase],
   ['POST', '/api/payments/notify/:provider', paymentNotice],
+  // Where the gateway sends the player back after paying: the shop's page of
+  // the points, which waits for the gateway's news.
+  ['GET', '/api/payments/return', paymentReturn],
   ['POST', '/api/items/:id/equip', equipItem],
   ['POST', '/api/items/:id/unequip', unequipItem],
   ['POST', '/api/items/:id/discard', discardItem],
@@ -519,7 +522,9 @@ async function answer(request, env, url) {
         Allow: matching.map(({ route }) => route.method).join(', '),
       });
     }
-    if (request.method !== 'GET') checkOrigin(request, url);
+    // The gateway's news comes from its own server and carries its own
+    // signature (payments.js), not a page's origin.
+    if (request.method !== 'GET' && !url.pathname.startsWith('/api/payments/notify/')) checkOrigin(request, url);
     // The server clock is the only source of truth about time.
     return await found.route.handler({ request, env, now: Date.now(), params: found.params });
   } catch (error) {

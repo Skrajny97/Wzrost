@@ -2697,5 +2697,6 @@
   "Powiadomienie bez ważnego podpisu.": "A notification without a valid signature.",
   "Nieczytelne powiadomienie.": "An unreadable notification.",
   "Ten pakiet będzie można kupić od {date}.": "This pack can be bought from {date}.",
-  "Tego pakietu nie można teraz kupić.": "This pack cannot be bought right now."
+  "Tego pakietu nie można teraz kupić.": "This pack cannot be bought right now.",
+  "Bramka płatności nie przyjęła zamówienia. Spróbuj za chwilę.": "The payment gateway did not accept the order. Try again in a moment."
 }

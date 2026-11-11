@@ -169,6 +169,16 @@ jobs:
           else
             echo "Logowanie Google: brak sekretów, przycisk Google zostaje ukryty."
           fi
+      # The keys of the Autopay gateway (payments for Punkty Systemu, 805 D),
+      # added to the Worker's secrets beside Google's when both GitHub secrets
+      # exist. The payments stay off until PAYMENTS in wrangler.jsonc names the
+      # gateway.
+      - name: Klucze bramki Autopay
+        shell: bash
+        env:
+          AUTOPAY_SERVICE_ID: ${{ secrets.AUTOPAY_SERVICE_ID }}
+          AUTOPAY_SHARED_KEY: ${{ secrets.AUTOPAY_SHARED_KEY }}
+        run: node tools/worker-secrets.mjs "$RUNNER_TEMP/worker-secrets.json" AUTOPAY_SERVICE_ID AUTOPAY_SHARED_KEY
       - name: Wdrożenie Workera
         shell: bash
         run: |
@@ -214,6 +224,14 @@ jobs:
         run: node tools/prepare-cloudflare.mjs wzrost-test
       - name: Migracje bazy D1
         run: npx wrangler d1 migrations apply DB --remote --env test
+      # The keys of Autopay's test account, where no money moves, as the
+      # Worker's AUTOPAY_SERVICE_ID and AUTOPAY_SHARED_KEY.
+      - name: Klucze testowej bramki Autopay
+        shell: bash
+        env:
+          AUTOPAY_SERVICE_ID: ${{ secrets.AUTOPAY_TEST_SERVICE_ID }}
+          AUTOPAY_SHARED_KEY: ${{ secrets.AUTOPAY_TEST_SHARED_KEY }}
+        run: node tools/worker-secrets.mjs "$RUNNER_TEMP/worker-secrets.json" AUTOPAY_SERVICE_ID AUTOPAY_SHARED_KEY
       - name: Wdrożenie wersji testowej
         shell: bash
         run: |
@@ -225,6 +243,9 @@ jobs:
           # iPhone, 2.11.2026). Only this checkout's index.html changes.
           sed -i "s|href=\"/styles.css\"|href=\"/styles.css?v=${GITHUB_SHA::7}\"|" src/client/index.html
           grep -q "href=\"/styles.css?v=${GITHUB_SHA::7}\"" src/client/index.html
-          npx wrangler deploy --env test --var "APP_VERSION:$APP_VERSION" | tee deploy.log
+          secrets=()
+          if [ -f "$RUNNER_TEMP/worker-secrets.json" ]; then secrets=(--secrets-file "$RUNNER_TEMP/worker-secrets.json"); fi
+          npx wrangler deploy --env test --var "APP_VERSION:$APP_VERSION" "${secrets[@]}" | tee deploy.log
+          rm -f "$RUNNER_TEMP/worker-secrets.json"
       - name: Sprawdzenie działania wersji testowej
         run: node tools/smoke-test.mjs deploy.log "$APP_VERSION"

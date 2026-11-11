@@ -88,7 +88,15 @@
     // Wojna tab, its teams and the battles every evening at 20:00 (the cron
     // below). In the live game from version 0.2.54, built on the accepted
     // mock-ups 792 v2; the first war is drawn on the Monday after.
-    "GUILD_WARS": "on"
+    "GUILD_WARS": "on",
+    // The gateway of the payments for Punkty Systemu (src/server/payments.js,
+    // src/server/payment-providers.js): "autopay" (805 D), or empty: off, as
+    // now, until the author has the Autopay account and the purchase screen
+    // is accepted. Its keys, AUTOPAY_SERVICE_ID and AUTOPAY_SHARED_KEY, are
+    // Worker secrets the deploy workflow sets from the GitHub secrets.
+    "PAYMENTS": "",
+    // Autopay's gateway: the real one in the game.
+    "AUTOPAY_HOST": "https://pay.autopay.eu"
   },
   // Cloudflare Email Service: the mail with the link that confirms an
   // account's e-mail (src/server/email.js), from the insightrpg.com domain
@@ -152,7 +160,13 @@
         "ARENA": "on",
         // The guild wars (src/server/guild-wars.js, 792–800), only here for
         // now, with "Test wojny" in the Wojna tab (TUTORIAL_TESTS).
-        "GUILD_WARS": "on"
+        "GUILD_WARS": "on",
+        // The payments for Punkty Systemu: off until the Autopay test
+        // account's keys are in the GitHub secrets (AUTOPAY_TEST_SERVICE_ID,
+        // AUTOPAY_TEST_SHARED_KEY), then "autopay" with Autopay's test
+        // gateway, where no money moves.
+        "PAYMENTS": "",
+        "AUTOPAY_HOST": "https://testpay.autopay.eu"
       },
       "triggers": {
         "crons": ["* * * * *"]

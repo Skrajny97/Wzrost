@@ -54,9 +54,10 @@ const notFound = () => new ApiError(404, 'not_found', 'Nie znaleziono.');
 const refuse = (block) => new ApiError(STATUS[block.code] ?? 409, block.code, block.message);
 const newToken = () => toHex(crypto.getRandomValues(new Uint8Array(12)));
 
-// The gateway the payments go through here, or "not found" where they are off.
-function requireGateway() {
-  const gateway = providerFor(paymentsProvider());
+// The gateway the payments go through here, or "not found" where they are
+// off or the gateway's keys are missing.
+function requireGateway(env) {
+  const gateway = providerFor(paymentsProvider(), env);
   if (!gateway) throw notFound();
   return gateway;
 }
@@ -105,7 +106,7 @@ async function quarterTaken(db, quarter, now) {
 // A pack the quarter has no room for is not `available`, and `resumesAt` is
 // when the next quarter sells it again.
 export async function getPayments(context) {
-  requireGateway();
+  requireGateway(context.env);
   const { session } = await requirePlayer(context);
   const db = context.env.DB;
   await expireOrders(db, session.userId, context.now);
@@ -136,7 +137,7 @@ export async function getPayments(context) {
 // gateway's payment for it (`url`: where the player pays, where the
 // gateway has a page). `terms` and `adult` are the player's own ticks.
 export async function orderPoints(context) {
-  const gateway = requireGateway();
+  const gateway = requireGateway(context.env);
   const { session, player } = await requirePlayer(context);
   const body = await readJson(context.request);
   const db = context.env.DB;
@@ -144,7 +145,7 @@ export async function orderPoints(context) {
   const quarter = quarterAt(context.now, rules);
   const [rows, user, taken] = await Promise.all([
     accountPurchases(db, session.userId),
-    db.prepare('SELECT purchases_blocked FROM users WHERE id = ?').bind(session.userId).first(),
+    db.prepare('SELECT purchases_blocked, email FROM users WHERE id = ?').bind(session.userId).first(),
     quarterTaken(db, quarter, context.now),
   ]);
   const pack = packOf(rules, body.packId);
@@ -190,16 +191,35 @@ export async function orderPoints(context) {
     )
     .run();
   if (written.meta.changes !== 1) throw refuse(quarterBlock(rules, quarter));
-  const payment = await gateway.create({ env: context.env, orderId, amount: pack.price, currency: rules.currency, points: pack.points });
+  // The gateway's payment, valid as long as the order waits; one the gateway
+  // does not take closes the order at once, so it holds no limit.
+  let payment;
+  try {
+    payment = await gateway.create({
+      env: context.env,
+      orderId,
+      amount: pack.price,
+      currency: rules.currency,
+      points: pack.points,
+      email: user?.email ?? null,
+      ip: context.request.headers.get('CF-Connecting-IP'),
+      validUntil: context.now + rules.pendingHours * HOUR,
+    });
+  } catch (error) {
+    await db.prepare("UPDATE purchases SET status = 'failed', closed_at = ? WHERE public_id = ? AND status = 'pending'").bind(context.now, orderId).run();
+    throw error;
+  }
   if (payment.ref) await db.prepare('UPDATE purchases SET provider_ref = ? WHERE public_id = ?').bind(payment.ref, orderId).run();
   return json({ orderId, url: payment.url ?? null }, 201);
 }
 
 // A payment the gateway confirmed: the purchase paid (also one closed as
 // failed or expired, as the money came after all) and its points added,
-// once. The
-// amount and currency must be the purchase's own. Whether the points
-// reached a character (none, if it was deleted in between) is returned.
+// once. The amount and currency must be the purchase's own. The gateway's
+// number of the payment that succeeded is kept (a player can try another way
+// of paying within one order, each with its own number), as a refund needs
+// it. Whether the points reached a character (none, if it was deleted in
+// between) is returned.
 async function markPaid(db, row, notice, now) {
   if (notice.amount !== row.price || notice.currency !== row.currency) {
     console.error(`payment ${row.public_id}: the amount or the currency differs from the order`);
@@ -208,7 +228,7 @@ async function markPaid(db, row, notice, now) {
   const token = newToken();
   const [moved, added] = await db.batch([
     db
-      .prepare("UPDATE purchases SET status = 'paid', paid_at = ?, closed_at = NULL, provider_ref = COALESCE(provider_ref, ?), credit_token = ? WHERE id = ? AND status IN ('pending', 'failed', 'expired')")
+      .prepare("UPDATE purchases SET status = 'paid', paid_at = ?, closed_at = NULL, provider_ref = COALESCE(?, provider_ref), credit_token = ? WHERE id = ? AND status IN ('pending', 'failed', 'expired')")
       .bind(now, notice.ref || null, token, row.id),
     db
       .prepare(
@@ -246,31 +266,42 @@ async function takeBack(db, row, status, now) {
 }
 
 // POST /api/payments/notify/:provider: the gateway's signed news of a
-// payment. News of an order the ledger does not know, or not of this
-// gateway's, is acknowledged and changes nothing.
+// payment, answered as the gateway expects: confirmed, or, for news of an
+// order the ledger does not know or of another amount, not confirmed (the
+// gateway sends it again later, and the log tells of it). News that a way of
+// paying was chosen (pending) changes nothing.
 export async function paymentNotice(context) {
   const name = paymentsProvider();
-  const gateway = providerFor(name);
+  const gateway = providerFor(name, context.env);
   if (!gateway || context.params.provider !== name) throw notFound();
   const notice = await gateway.verify(context.request, context.env);
   const db = context.env.DB;
   const row = await db.prepare('SELECT * FROM purchases WHERE public_id = ? AND provider = ?').bind(notice.orderId, name).first();
   if (!row) {
     console.error('payment news of an unknown order');
-    return gateway.answer();
+    return gateway.answer(notice, context.env, false);
   }
-  if (notice.status === 'paid') await markPaid(db, row, notice, context.now);
+  let confirmed = true;
+  if (notice.status === 'paid') confirmed = (await markPaid(db, row, notice, context.now)) !== 'mismatch';
   else if (notice.status === 'failed') {
     await db.prepare("UPDATE purchases SET status = 'failed', closed_at = ? WHERE id = ? AND status = 'pending'").bind(context.now, row.id).run();
-  } else await takeBack(db, row, notice.status, context.now);
-  return gateway.answer();
+  } else if (notice.status === 'refunded' || notice.status === 'charged_back') await takeBack(db, row, notice.status, context.now);
+  return gateway.answer(notice, context.env, confirmed);
+}
+
+// GET /api/payments/return: the player back from the gateway's page, sent on
+// to the shop's page of the points, which shows the order waiting until the
+// gateway's news comes (what the gateway adds to this address says nothing
+// of the payment, so nothing of it is read).
+export function paymentReturn({ request }) {
+  return new Response(null, { status: 302, headers: { Location: new URL('/#/sklep/punkty', request.url).toString(), 'Cache-Control': 'no-store' } });
 }
 
 // POST /api/payments/withdraw { orderId }: one of the account's purchases
 // given back within the days, its points still unspent: they go at once,
 // the money back through the gateway.
 export async function withdrawPurchase(context) {
-  const gateway = requireGateway();
+  const gateway = requireGateway(context.env);
   const { session } = await requirePlayer(context);
   const body = await readJson(context.request);
   const db = context.env.DB;
