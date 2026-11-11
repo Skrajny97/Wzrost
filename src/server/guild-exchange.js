@@ -16,7 +16,12 @@
 // as in the Prośby (177 A). The camp's resources, and gold on one side of
 // an offer, never both (4.11.2026, the author: "Daj też mozliwość wymiany i
 // wystawiania ofert w Gildii zasoby za złoto"): gold given is set aside and
-// comes back as the pieces do. No items or goods of the bag.
+// comes back as the pieces do. No items or goods of the bag. Both sides
+// exchange from the players' Wymiana's level (community.json
+// trade.minLevel; the author's 826 A: „Wymiana w Gildii od 20. poziomu
+// postaci po obu stronach, jak Wymiana między graczami”): a character
+// below it posts and takes nothing, and the offers it posted before the
+// rule show to no one, wait for their time and give their pieces back.
 //
 // Every change runs as one batch: the pieces back counted from the offers
 // still open before they close, and a take only with an assertion at its
@@ -48,6 +53,8 @@ const genitiveOf = (id) => (isGold(id) ? rules().gold.genitive : content().resou
 const mostOf = (id) => (isGold(id) ? rules().gold.most : rules().most);
 const changed = () => new ApiError(409, 'changed', errors().changed);
 const member = (context) => requireMember(context, errors());
+// The character level both sides exchange from: the players' Wymiana's (826 A).
+const minLevel = () => content().community.trade.minLevel;
 
 // An open offer whose poster is no longer in its guild (never, as leaving
 // returns the pieces at once; settled all the same).
@@ -115,8 +122,15 @@ function cardTexts() {
     counts: sameCount ? texts.countsSame : texts.countsFree,
     offers: `${offers} ${countedForm(offers, texts.offerForms)}`,
     open: `${openHours} ${countedForm(openHours, texts.hourForms)}`,
+    level: minLevel(),
   };
-  return { ...texts, how: texts.how.map((line) => filled(line, vars)), full: filled(texts.full, vars) };
+  return { ...texts, how: texts.how.map((line) => filled(line, vars)), full: filled(texts.full, vars), level: filled(texts.level, vars) };
+}
+
+// The character's own level for posting and taking (826 A), as the
+// players' Wymiana checks it (requireTradeLevel, trades.js).
+function requireExchangeLevel(row) {
+  if (row.level < minLevel()) throw new ApiError(403, 'exchange_level', cardTexts().level);
 }
 
 // The character's resources, freshly read (the view after a change).
@@ -128,12 +142,13 @@ const resourcesOf = (row) => {
 // What the character holds of a side's good: pieces of a resource, or gold.
 const holding = (row, id) => walletOf(row)[id] ?? 0;
 
-// The Wymiana for the page: the guild's open offers (each with its poster,
-// what it gives and wants, and whether this character can take it: not its
-// own, not of its account, and the pieces or the gold wanted held), this
-// character's own offers in the guild (the open ones and its last
-// `closedShown` closed, a taken one with its taker), its resources and gold,
-// the rules and the words.
+// The Wymiana for the page: the guild's open offers of posters at the
+// level (each with its poster, what it gives and wants, and whether this
+// character can take it: not its own, not of its account, and the pieces
+// or the gold wanted held), this character's own offers in the guild (the
+// open ones and its last `closedShown` closed, a taken one with its taker),
+// whether it is below the level to post and take (`locked`, 826 A), its
+// resources and gold, the rules and the words.
 async function exchangeView(db, player, guild, now) {
   const { row } = player;
   const { most, gold, offers, openHours, sameCount, closedShown } = rules();
@@ -143,9 +158,9 @@ async function exchangeView(db, player, guild, now) {
         `SELECT o.*, c.name, c.class_id, c.user_id, c.cosmetics FROM guild_offers o
          JOIN characters c ON c.id = o.character_id
          JOIN guild_members m ON m.character_id = o.character_id AND m.guild_id = o.guild_id
-         WHERE o.guild_id = ? AND o.state = 'open' AND o.ends_at > ? ORDER BY o.created_at, o.id`,
+         WHERE o.guild_id = ? AND o.state = 'open' AND o.ends_at > ? AND c.level >= ? ORDER BY o.created_at, o.id`,
       )
-      .bind(guild.id, now),
+      .bind(guild.id, now, minLevel()),
     db
       .prepare(
         `SELECT o.*, t.name AS taker_name, t.class_id AS taker_class FROM guild_offers o LEFT JOIN characters t ON t.id = o.taker_id
@@ -180,6 +195,7 @@ async function exchangeView(db, player, guild, now) {
       taker: offer.state === 'taken' ? { name: offer.taker_name, classId: offer.taker_class } : null,
     })),
     open: mine.results.filter((offer) => offer.state === 'open').length,
+    locked: row.level < minLevel(),
     resources,
     gold: row.gold,
     rules: { most, offers, openHours, sameCount, resources: resourceIds(), gold: { id: GOLD, name: gold.name, most: gold.most } },
@@ -254,9 +270,11 @@ function adding(changes) {
 // what it gives leaves it at once, by a statement that takes it only while
 // it holds it, and the offer hangs for `openHours`. Up to `offers` open offers. Its offers whose time is up
 // close first, their pieces back. The offers of every guild closed before
-// last week began, which no card or ranking needs any more, go.
+// last week began, which no card or ranking needs any more, go. Only from
+// the level (826 A).
 export async function postGuildOffer(context) {
   const found = await member(context);
+  requireExchangeLevel(found.player.row);
   const { guild, db } = found;
   const now = context.now;
   const body = await readJson(context.request);
@@ -324,9 +342,11 @@ export async function withdrawGuildOffer(context) {
 // takes the whole offer: it pays the pieces or the gold wanted and gets
 // what is given, and the poster gets what it wanted, in one batch that
 // holds only while the offer is open, unexpired and in the taker's guild,
-// both are members and the taker has what is wanted.
+// both are members and the taker has what is wanted. Both from the level
+// (826 A): an offer posted below it, before the rule, is not taken.
 export async function takeGuildOffer(context) {
   const found = await member(context);
+  requireExchangeLevel(found.player.row);
   const { guild, db } = found;
   const now = context.now;
   const body = await readJson(context.request);
@@ -335,9 +355,10 @@ export async function takeGuildOffer(context) {
   const offer = await offerOf(db, guild, body);
   if (offer.character_id === row.id) throw new ApiError(400, 'own', errors().own);
   if (stateOf(offer, now) !== 'open') throw new ApiError(409, 'closed', errors().closed);
-  const poster = await db.prepare('SELECT name, user_id FROM characters WHERE id = ?').bind(offer.character_id).first();
+  const poster = await db.prepare('SELECT name, user_id, level FROM characters WHERE id = ?').bind(offer.character_id).first();
   if (!poster) throw new ApiError(409, 'closed', errors().closed);
   if (poster.user_id === row.user_id) throw new ApiError(409, 'same_account', errors().sameAccount);
+  if (poster.level < minLevel()) throw new ApiError(409, 'exchange_level_other', filled(errors().levelOther, { name: poster.name, level: minLevel() }));
   const have = holding(row, offer.want);
   if (have < offer.want_count) {
     throw new ApiError(409, 'not_enough', filled(errors().short, { missing: offer.want_count - have, genitive: genitiveOf(offer.want) }));

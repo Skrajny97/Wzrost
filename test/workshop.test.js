@@ -73,13 +73,13 @@ describe('the Warsztat in the engine', () => {
     assert.equal(knownPatterns(99, [], content).length, 95);
     const at100 = knownPatterns(100, [], content).map((pattern) => pattern.id);
     assert.ok(at100.length === 114 && at100.includes('flamberge') && at100.includes('sabatons') && !at100.includes('cameo'));
-    // Tier VII (814) at the 125th, past the profession's last for now: till
-    // Rzemieślnictwo goes on, only an item taken apart teaches it
-    // (DECISIONS.md, "Tier VII przedmiotów").
+    // Tier VII (814) at the 125th, which Rzemieślnictwo reaches since it goes
+    // on to the 200th (825).
     assert.equal(knownPatterns(124, [], content).length, 114);
     const at125 = knownPatterns(125, [], content).map((pattern) => pattern.id);
     assert.ok(at125.length === 133 && at125.includes('coronation-sword') && at125.includes('safian-boots') && !at125.includes('pectoral'));
-    assert.equal(content.professionsById[content.workshop.profession].maxLevel, 100);
+    assert.equal(content.professionsById[content.workshop.profession].maxLevel, 200);
+    assert.equal(knownPatterns(200, [], content).length, 133);
     // Taking one apart teaches it earlier.
     assert.ok(knownPatterns(10, ['estoc'], content).some((pattern) => pattern.id === 'estoc'));
     assert.ok(knownPatterns(50, ['gothic-armor'], content).some((pattern) => pattern.id === 'gothic-armor'));
@@ -110,6 +110,8 @@ describe('the Warsztat in the engine', () => {
     near(itemMinutes('common', 11, content), 27);
     assert.equal(itemMinutes('common', 51, content), 15);
     assert.equal(itemMinutes('common', 100, content), 15);
+    // Past the 100th (825) still half.
+    assert.equal(itemMinutes('common', 200, content), 15);
     assert.equal(orderMinutes(5, 'common', 1, content), 150);
     assert.equal(orderMinutes(3, 'common', 11, content), 81);
     assert.equal(orderMinutes(1, 'rare', 5, content), 58);
@@ -122,6 +124,9 @@ describe('the Warsztat in the engine', () => {
     near(craftChance('epic', 25, content), 0.67);
     near(craftChance('divine', 80, content), 0.495);
     assert.equal(craftChance('rare', 100, content), 0.95);
+    // Past the 100th (825) never above 95%.
+    assert.equal(craftChance('divine', 200, content), 0.95);
+    assert.equal(craftChance('common', 200, content), 1);
   });
 
   test('the items come from the seed one after another, as loot of the base, rarity and level, named by the creatures met', () => {
@@ -154,6 +159,9 @@ describe('the Warsztat in the engine', () => {
     near(craftLuck(20, content).twoUp, 0.02);
     near(craftLuck(100, content).oneUp, 0.1);
     near(craftLuck(100, content).twoUp, 0.06);
+    // The author's rule goes on past the 100th (825): a point every 20 levels.
+    near(craftLuck(200, content).oneUp, 0.15);
+    near(craftLuck(200, content).twoUp, 0.11);
     const counts = { common: 0, rare: 0, unique: 0 };
     for (let index = 0; index < 400; index++) {
       for (const { item } of craftItems({ baseId: 'sword', rarityId: 'common', count: 5, level: 12, professionLevel: 1, seed: `l${index}` }, content)) counts[item.rarity] += 1;
@@ -250,6 +258,16 @@ describe('the Warsztat in the engine', () => {
     assert.equal(last.revealed.length, 19);
     assert.ok(last.revealed.includes('flamberge') && last.revealed.includes('cassock') && !last.revealed.includes('cameo') && !last.revealed.includes('coronation-sword'));
     assert.ok(last.system.some((line) => line.startsWith('System odsłania nowe wzory: Flamberg, Topór dwusieczny, Cinquedea')), last.system.join(' | '));
+    // And at the 125th Tier VII (814), now that Rzemieślnictwo goes on to the 200th (825).
+    const seventh = workshopReport(
+      { base: base('axe'), rarityId: 'common', results: [], minutes: 30, startedAt: 0, endsAt: 1, seed: 'r', stopped: false, before: { level: 124, xp: 0 }, after: { level: 125, xp: 0 }, character, xp: 0, work },
+      content,
+    );
+    assert.equal(seventh.revealed.length, 19);
+    assert.ok(seventh.revealed.includes('coronation-sword') && seventh.revealed.includes('safian-boots') && !seventh.revealed.includes('pectoral'));
+    assert.ok(seventh.system.includes('Osiągnięto poziom Rzemieślnictwa: 125'), seventh.system.join(' | '));
+    assert.ok(seventh.system.some((line) => line.startsWith('System odsłania nowe wzory: Miecz koronacyjny, Nadziak, Baselard')), seventh.system.join(' | '));
+    assert.ok(seventh.profession.xpToNext > 0);
   });
 
   test('narrator quests ask for items only where Rzemieślnictwo works, count the ones made and pay twice as much', () => {
@@ -565,6 +583,8 @@ describe('the Warsztat, step 2, in the engine', () => {
     near(top[4].chance, 0.02);
     near(top[3].chance, 0.98 * 0.05);
     assert.ok(top.reduce((sum, tier) => sum + tier.chance, 0) < 0.65);
+    // Every tier has reached its max by the 100th, so the 200th (825) adds nothing.
+    assert.deepEqual(craftUpgrades(200, content), top);
 
     // Below level 10 nothing comes out upgraded; each item keeps its parts
     // and the upgrade it came with.

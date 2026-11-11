@@ -35,11 +35,13 @@ export function workProfession(profession, state, minutes, factor = 1) {
 }
 
 // What a profession at a level adds to each of its two stats: statPerLevel
-// for each level after the first, so level 1 adds nothing, and on the last
-// level maxLevelBonus on top, the reward for mastering it (the author: "taka
-// sowita nagroda za zamknięcie trudnego działu").
+// for each level after the first, so level 1 adds nothing, and from its
+// masteryLevel on maxLevelBonus on top, the reward for mastering it (the
+// author: "taka sowita nagroda za zamknięcie trudnego działu"). The reward
+// stays at the 100th level, the last one until the professions went on to
+// the 200th (825), so no character lost any of it.
 export const professionStatBonus = (profession, level) =>
-  (level - 1) * profession.statPerLevel + (level >= profession.maxLevel ? profession.maxLevelBonus : 0);
+  (level - 1) * profession.statPerLevel + (level >= profession.masteryLevel ? profession.maxLevelBonus : 0);
 
 // What the professions add to the stats.
 export function professionStats(professions, content) {

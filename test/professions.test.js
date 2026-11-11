@@ -46,18 +46,29 @@ function hoursTo(level) {
 }
 
 describe('herbalism in the engine', () => {
-  test('a level takes half an hour more of work than the one before, up to 100', () => {
+  test('a level takes half an hour more of work than the one before, up to 200 (825)', () => {
+    // Every profession goes on to the 200th (the author: „Profesje zyskują sufit na 200 poziomie.”), the mastery staying at the 100th.
+    assert.deepEqual(
+      content.professions.map((profession) => [profession.maxLevel, profession.masteryLevel]),
+      content.professions.map(() => [200, 100]),
+    );
     assert.equal(professionXpToNext(herbalism, 1), 30);
     assert.equal(professionXpToNext(herbalism, 9), 270);
+    assert.equal(professionXpToNext(herbalism, 150), 4500);
     assert.equal(hoursTo(3), 1.5);
     assert.equal(hoursTo(5), 5);
     assert.equal(hoursTo(10), 22.5);
     assert.equal(hoursTo(100), 2475);
-    const top = workProfession(herbalism, { level: 100, xp: 0 }, 600);
-    assert.deepEqual(top, { level: 100, xp: 0, levels: 0 });
+    assert.equal(hoursTo(200), 9950);
+    // The 100th is no longer the top: its work counts towards the 101st.
+    assert.deepEqual(workProfession(herbalism, { level: 100, xp: 0 }, 600), { level: 100, xp: 600, levels: 0 });
+    assert.deepEqual(workProfession(herbalism, { level: 100, xp: 2900 }, 600), { level: 101, xp: 500, levels: 1 });
+    const top = workProfession(herbalism, { level: 200, xp: 0 }, 600);
+    assert.deepEqual(top, { level: 200, xp: 0, levels: 0 });
+    assert.deepEqual(workProfession(herbalism, { level: 199, xp: 0 }, 6000), { level: 200, xp: 0, levels: 1 });
   });
 
-  test('level 1 gives no stats, each level after it its statPerLevel to Mądrość and Percepcja, and level 100 its maxLevelBonus more', () => {
+  test('level 1 gives no stats, each level after it its statPerLevel to Mądrość and Percepcja, and level 100 its maxLevelBonus more, kept to the 200th', () => {
     // Three times what they were until 0.1.61 (the author, 5.11.2026: „Zwiększmy też bonus ze statystyk z Profesji x3”).
     const { statPerLevel: per, maxLevelBonus: bonus } = herbalism;
     assert.deepEqual([per, bonus], [3, 153]);
@@ -68,6 +79,11 @@ describe('herbalism in the engine', () => {
     assert.equal(professionStats({ herbalism: { level: 99, xp: 0 } }, content).wisdom, 98 * per);
     const master = professionStats({ herbalism: { level: 100, xp: 0 } }, content);
     assert.deepEqual([master.wisdom, master.perception], [450, 450]);
+    // The levels past the 100th (825) go on adding statPerLevel, the mastery's reward kept.
+    const wisdomAt = (level) => professionStats({ herbalism: { level, xp: 0 } }, content).wisdom;
+    assert.deepEqual([101, 150, 200].map(wisdomAt), [453, 600, 750]);
+    const top = professionStats({ herbalism: { level: 200, xp: 0 } }, content);
+    assert.deepEqual([top.wisdom, top.perception], [750, 750]);
     const character = newCharacter('warrior', { professions: { herbalism: { level: 4, xp: 0 } } });
     const { sources, totals } = computeStats(character, [], content);
     assert.equal(sources.perception.professions, 3 * per);
@@ -170,7 +186,7 @@ describe('herbalism in the engine', () => {
     assert.equal(after.level, 3);
     assert.deepEqual(report.revealed, ['mugwort']);
     assert.deepEqual(report.system, ['Osiągnięto poziom Zielarstwa: 3', `Zdobyto Mądrość: +${herbalism.statPerLevel}`, `Zdobyto Percepcję: +${herbalism.statPerLevel}`, 'System odsłania nowe zioło: Bylica']);
-    // The last level brings the master's bonus with it.
+    // The 100th level brings the master's bonus with it; the next ones their statPerLevel alone, up to the 200th (825).
     const top = { level: 99, xp: 0 };
     const mastered = gatheringReport(
       { minutes: 480, startedAt: 0, endsAt: 1, seed: 'm', found: { comfrey: 1 }, stored: { comfrey: 1 }, lost: {}, before: top, after: workProfession(herbalism, top, 99 * 30), character, xp: 0, work },
@@ -178,6 +194,17 @@ describe('herbalism in the engine', () => {
     );
     const last = herbalism.statPerLevel + herbalism.maxLevelBonus;
     assert.deepEqual(mastered.system.slice(0, 3), ['Osiągnięto poziom Zielarstwa: 100', `Zdobyto Mądrość: +${last}`, `Zdobyto Percepcję: +${last}`]);
+    assert.ok(mastered.profession.xpToNext > 0);
+    const past = (before) =>
+      gatheringReport(
+        { minutes: 480, startedAt: 0, endsAt: 1, seed: 'm', found: { comfrey: 1 }, stored: { comfrey: 1 }, lost: {}, before, after: workProfession(herbalism, before, before.level * 30), character, xp: 0, work },
+        content,
+      );
+    const per = herbalism.statPerLevel;
+    assert.deepEqual(past({ level: 100, xp: 0 }).system.slice(0, 3), ['Osiągnięto poziom Zielarstwa: 101', `Zdobyto Mądrość: +${per}`, `Zdobyto Percepcję: +${per}`]);
+    const ceiling = past({ level: 199, xp: 0 });
+    assert.deepEqual(ceiling.system.slice(0, 3), ['Osiągnięto poziom Zielarstwa: 200', `Zdobyto Mądrość: +${per}`, `Zdobyto Percepcję: +${per}`]);
+    assert.equal(ceiling.profession.xpToNext, 0);
   });
 
   test('herb quests come with the professions, name only known herbs and count what was gathered', () => {

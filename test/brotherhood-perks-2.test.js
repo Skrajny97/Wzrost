@@ -144,7 +144,7 @@ describe('the Bractwo Zielarzy and the Bractwo Łowców through the API', () => 
   test('Alchemia: a brewing takes a share less time, and a potion for a time drunk works longer', async () => {
     const potion = content.potions.find((candidate) => candidate.level === 1 && !candidate.catalyst) ?? content.potions[0];
     const herbs = JSON.stringify(Object.fromEntries(Object.keys(potion.herbs).map((id) => [id, 200])));
-    // Alchemia at its top, so every recipe is known.
+    // Alchemia at the 100th, so every recipe is known.
     await set('herbs = ?, professions = ?', herbs, JSON.stringify({ [content.brewing.profession]: { level: 100, xp: 0 } }));
     const plain = (await character()).professions.brewing.potionMinutes;
     await repute(friend('herbalists'));

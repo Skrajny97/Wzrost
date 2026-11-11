@@ -372,6 +372,7 @@
       "have": "You have: {have}",
       "send": "Post",
       "full": "You can post at most {offers} at a time. Withdraw one or wait for an exchange.",
+      "level": "The guild Exchange opens at character level {level}.",
       "mine": "Your offers",
       "mineEmpty": "You have no offers now.",
       "states": {
@@ -412,6 +413,7 @@
         "own": "This is your offer.",
         "closed": "This offer is already closed.",
         "sameAccount": "Characters of one account do not exchange with each other.",
+        "levelOther": "{name} can trade only from level {level}.",
         "short": "Missing: {missing} {genitive}.",
         "changed": "Something changed in the meantime. Try once more."
       }

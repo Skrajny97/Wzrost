@@ -464,6 +464,10 @@
     "0.2.64": {
       "title": "Version 0.2.64",
       "body": "- Seven new events on expeditions: Jagna in the Marsh, A Star from the Sky, The Ferryman, Dice by the Fire, Burnt Out, The Old Soldier, and a companion's errand from their past once your relationship reaches Trust.\n- Helping the Settlement's residents in events raises your relationship with them, and saying no costs nothing.\n- Gifts in the Settlement: once a day you can give each resident something they like. A resident who is your Friend leaves you a present once a week."
+    },
+    "0.2.65": {
+      "title": "Version 0.2.65",
+      "body": "- From class level 125, 22 new Tier VII items await, from the Coronation Sword to the Torc. They drop on explorations from the Marsh Devil's Abyss on, and you will also find them in the weekly chest, at the travelling merchant's, in the Games Parlour, in the Towers, in the Guild Beast's chests, on the Guild Expedition and in the guild war chest.\n- The Encyclopedia has a Tier VII section with six sets. Each full set gives a chest: 15,625 gold, 320 Time Points and 128 System Points.\n- Professions now go up to level 200, and every level past 100 keeps strengthening both of the profession's stats. The bonus for mastering a profession at level 100 stays.\n- Tier VII Workshop and Gem Workshop patterns are revealed at Crafting and Jewelcrafting level 125, and taking an item apart teaches its pattern earlier.\n- The guild Exchange works from character level 20, on both sides, just like trading between players."
     }
   }
 }

@@ -50,7 +50,8 @@ describe('the Wymiana in the Gildia through the API', () => {
 
   beforeEach(async () => {
     await player('mistrz', 'Mistrz');
-    await player('druh', 'Druh', { level: 12 });
+    // At the level both sides exchange from (826 A: as the players' Wymiana, 20).
+    await player('druh', 'Druh', { level: content.community.trade.minLevel });
     await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' });
     await join('druh', 'Druh');
   });
@@ -200,6 +201,38 @@ describe('the Wymiana in the Gildia through the API', () => {
     assert.deepEqual(await held('Druh'), { ...NONE, wood: 79 });
     assert.deepEqual(await held('Mistrz'), NONE);
     assert.equal((await first('SELECT state FROM guild_offers WHERE id = ?', offer.id)).state, 'open');
+  });
+
+  test('opens at character level 20 for both sides: below it nothing is posted or taken, and an offer posted before shows to no one', async () => {
+    const { minLevel } = content.community.trade;
+    const lockedText = `Wymiana w gildii otworzy się na ${minLevel}. poziomie postaci.`;
+    await setResources('Mistrz', { stone: 50 });
+    await setResources('Druh', { wood: 100 });
+    // Druh below the level: no offer of its own, and none taken.
+    await run("UPDATE characters SET level = ? WHERE name = 'Druh'", minLevel - 1);
+    const early = await post('druh', 'wood', 10, 'stone', 10);
+    assert.deepEqual([early.status, early.data.error.code, early.data.error.message], [403, 'exchange_level', lockedText]);
+    const [offer] = (await post('mistrz', 'stone', 50, 'wood', 80)).data.mine;
+    const seen = (await as('druh', 'GET', '/api/guild/exchange')).data;
+    assert.deepEqual([seen.locked, seen.texts.level, seen.offers.map((one) => one.id)], [true, lockedText, [offer.id]]);
+    assert.equal((await as('mistrz', 'GET', '/api/guild/exchange')).data.locked, false);
+    const taken = await take('druh', offer.id);
+    assert.deepEqual([taken.status, taken.data.error.code], [403, 'exchange_level']);
+    assert.deepEqual([await held('Mistrz'), await held('Druh')], [NONE, { ...NONE, wood: 100 }]);
+    assert.equal((await first('SELECT state FROM guild_offers WHERE id = ?', offer.id)).state, 'open');
+    // An offer Druh posted at the level, and Druh below it now (as one posted
+    // before the rule): no one sees it or takes it, and nothing moves.
+    assert.equal((await withdraw('mistrz', offer.id)).status, 200);
+    await run("UPDATE characters SET level = ? WHERE name = 'Druh'", minLevel);
+    const [own] = (await post('druh', 'wood', 30, 'stone', 20)).data.mine;
+    await run("UPDATE characters SET level = ? WHERE name = 'Druh'", minLevel - 1);
+    assert.deepEqual((await as('mistrz', 'GET', '/api/guild/exchange')).data.offers, []);
+    const other = await take('mistrz', own.id);
+    assert.deepEqual([other.status, other.data.error.code, other.data.error.message], [409, 'exchange_level_other', `Postać Druh wymieni się dopiero od ${minLevel}. poziomu.`]);
+    assert.deepEqual([await held('Mistrz'), await held('Druh')], [{ ...NONE, stone: 50 }, { ...NONE, wood: 70 }]);
+    // Its own offer it still withdraws, the pieces back.
+    assert.equal((await withdraw('druh', own.id)).status, 200);
+    assert.deepEqual(await held('Druh'), { ...NONE, wood: 100 });
   });
 
   test("an offer of one's own, or of another character of the account, is not taken", async () => {

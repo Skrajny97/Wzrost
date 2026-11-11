@@ -1657,6 +1657,7 @@
             "have",
             "send",
             "full",
+            "level",
             "mine",
             "mineEmpty",
             "states",
@@ -1750,6 +1751,7 @@
                 "own",
                 "closed",
                 "sameAccount",
+                "levelOther",
                 "short",
                 "changed"
               ],

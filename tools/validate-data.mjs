@@ -1038,9 +1038,10 @@ function checkEvents(data, { monsters, rarities }) {
   return errors;
 }
 
-// Professions: stats that exist, a gathering profession that gathers, herbs
-// known within its levels, the herbs at once from level 1 on and growing, and
-// a slider that reaches its longest time in whole steps.
+// Professions: stats that exist, the mastery within the levels, a gathering
+// profession that gathers, herbs known within its levels, the herbs at once
+// from level 1 on and growing, and a slider that reaches its longest time in
+// whole steps.
 function checkProfessions(data, { stats }) {
   const errors = [];
   const { professions, gathering, herbs } = data.professions;
@@ -1052,6 +1053,8 @@ function checkProfessions(data, { stats }) {
       if (!stats.has(stat)) errors.push(`professions.json: ${profession.id} ma nieznaną statystykę "${stat}"`);
     }
     if (profession.unlockLevel < tabLevel) errors.push(`professions.json: ${profession.id} otwiera się na poziomie ${profession.unlockLevel}, przed zakładką Profesje (${tabLevel})`);
+    // The mastery reward comes on a level the profession has (825: kept at the 100th of 200).
+    if (profession.masteryLevel > profession.maxLevel) errors.push(`professions.json: ${profession.id} ma masteryLevel ${profession.masteryLevel} ponad maxLevel ${profession.maxLevel}`);
     // A profession that opens later has its System message in unlocks.json, at the same level.
     const own = data.unlocks.find((unlock) => unlock.id === profession.id);
     if (own && own.level !== (profession.unlockLevel ?? tabLevel)) errors.push(`unlocks.json: ${profession.id} ma poziom ${own.level}, a profesja otwiera się na ${profession.unlockLevel ?? tabLevel}`);

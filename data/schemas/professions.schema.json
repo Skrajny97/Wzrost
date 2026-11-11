@@ -64,6 +64,7 @@
           "kind",
           "stats",
           "maxLevel",
+          "masteryLevel",
           "levelMinutes",
           "statPerLevel",
           "maxLevelBonus",
@@ -104,6 +105,11 @@
             "type": "integer",
             "minimum": 2
           },
+          "masteryLevel": {
+            "type": "integer",
+            "minimum": 2,
+            "description": "Poziom opanowania profesji, najwyżej maxLevel: od niego postać ma maxLevelBonus."
+          },
           "levelMinutes": {
             "type": "integer",
             "minimum": 1,
@@ -116,7 +122,7 @@
           "maxLevelBonus": {
             "type": "integer",
             "minimum": 0,
-            "description": "Dodatek do obu statystyk na ostatnim poziomie: nagroda za opanowanie profesji."
+            "description": "Dodatek do obu statystyk od poziomu masteryLevel: nagroda za opanowanie profesji."
           },
           "soon": {
             "type": "boolean",

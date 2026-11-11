@@ -32,6 +32,10 @@ describe('brewing in the engine', () => {
     assert.equal(potionMinutes(11, content), 9);
     assert.equal(potionMinutes(51, content), 5);
     assert.equal(potionMinutes(100, content), 5);
+    // Alchemia goes on to the 200th (825), still at half the time.
+    assert.equal(content.professionsById[content.brewing.profession].maxLevel, 200);
+    assert.equal(potionMinutes(150, content), 5);
+    assert.equal(potionMinutes(200, content), 5);
     assert.equal(brewMinutes(10, 2, content), 99);
     assert.equal(brewMinutes(1, 2, content), 10);
     assert.equal(brewMinutes(48, 1, content), 480);

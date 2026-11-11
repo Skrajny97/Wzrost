@@ -71,6 +71,10 @@ describe('Górnictwo in the engine', () => {
       endurance: 10 * mining.statPerLevel,
       will: mastered,
     });
+    // Both go on to the 200th (825), the mastery's reward kept from the 100th.
+    const past = professionStats({ mining: { level: 150, xp: 0 }, jewelcrafting: { level: 200, xp: 0 } }, content);
+    assert.deepEqual([past.vitality, past.endurance, past.will, past.perception], [600, 600, 750, 750]);
+    assert.deepEqual([mining.maxLevel, jewels.maxLevel, mining.masteryLevel, jewels.masteryLevel], [200, 200, 100, 100]);
   });
 
   test('the System shows Kwarc and the silver ore first, a gem for each rarity from the levels of 535 A, the gold ore at 25 and the star ore at 60', () => {
@@ -97,6 +101,8 @@ describe('Górnictwo in the engine', () => {
     const quartz = content.mineralsById.quartz;
     assert.equal(mineralsPerHour(quartz, 1, content), 2);
     assert.ok(Math.abs(mineralsPerHour(quartz, 51, content) - 4) < 1e-9);
+    // Past the 100th (825) it keeps growing: almost five times level 1's at the 200th.
+    assert.ok(Math.abs(mineralsPerHour(quartz, 200, content) - 9.96) < 1e-9);
     let found = 0;
     for (let index = 0; index < 400; index += 1) found += mineMinerals({ minutes: 60, level: 1, characterLevel: 25, seed: `q${index}` }, content).found.quartz ?? 0;
     near(found / 400, 2, 0.1);
@@ -273,34 +279,35 @@ describe('Jubilerstwo in the engine', () => {
     const at100 = knownJewelPatterns(100, [], content).map((base) => base.id);
     assert.deepEqual([at100.length, ['cameo', 'eternity-ring', 'lunula'].every((id) => at100.includes(id))], [18, true]);
     assert.ok(knownJewelPatterns(99, ['lunula'], content).some((base) => base.id === 'lunula'));
-    const report = jewelReport(
-      {
-        base: content.basesById.ring,
-        rarityId: 'common',
-        results: [],
-        learned: [],
-        minutes: 30,
-        startedAt: 0,
-        endsAt: 1,
-        seed: 'r',
-        stopped: false,
-        before: { level: 99, xp: 0 },
-        after: { level: 100, xp: 0 },
-        character: { level: 130 },
-        xp: 0,
-        work: { level: 130, timePoints: 0, messages: [] },
-      },
-      content,
-    );
+    const reportOf = {
+      base: content.basesById.ring,
+      rarityId: 'common',
+      results: [],
+      learned: [],
+      minutes: 30,
+      startedAt: 0,
+      endsAt: 1,
+      seed: 'r',
+      stopped: false,
+      before: { level: 99, xp: 0 },
+      after: { level: 100, xp: 0 },
+      character: { level: 130 },
+      xp: 0,
+      work: { level: 130, timePoints: 0, messages: [] },
+    };
+    const report = jewelReport(reportOf, content);
     assert.deepEqual(report.revealed, ['cameo', 'eternity-ring', 'lunula']);
     // Tier VII (814): the Pektorał, the Pierścień przodków and the Grzywna at
-    // the 125th level. Jubilerstwo ends at the 100th for now, so till it goes
-    // on only a jewel taken apart teaches them (DECISIONS.md, "Tier VII
-    // przedmiotów").
+    // the 125th level, which Jubilerstwo reaches since it goes on to the
+    // 200th (825), or earlier when taken apart.
     assert.equal(knownJewelPatterns(124, [], content).length, 18);
     const at125 = knownJewelPatterns(125, [], content).map((base) => base.id);
     assert.deepEqual([at125.length, ['pectoral', 'ancestors-ring', 'grzywna'].every((id) => at125.includes(id))], [21, true]);
-    assert.equal(content.professionsById[content.jewelcrafting.profession].maxLevel, 100);
+    assert.equal(content.professionsById[content.jewelcrafting.profession].maxLevel, 200);
+    assert.equal(knownJewelPatterns(200, [], content).length, 21);
+    const seventh = jewelReport({ ...reportOf, before: { level: 124, xp: 0 }, after: { level: 125, xp: 0 } }, content);
+    assert.deepEqual(seventh.revealed, ['pectoral', 'ancestors-ring', 'grzywna']);
+    assert.ok(seventh.system.includes('Osiągnięto poziom Jubilerstwa: 125'), seventh.system.join(' | '));
     assert.ok(knownJewelPatterns(100, ['grzywna'], content).some((base) => base.id === 'grzywna'));
     assert.ok(jewelBases(content).every((base) => !content.workshop.parts[base.slot]));
   });

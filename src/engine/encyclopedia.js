@@ -417,10 +417,13 @@ export function encyclopediaView({ discovered, claimed, met, levels = null }, co
   const jewels = new Set(jewelBases(content).map((base) => base.id));
   const ranges = creatureRanges(content);
   const fromEvents = eventHerbs(content);
-  const byTier = (entries, tierOf, headings, tab) =>
-    headings
-      .map((heading) => ({ ...heading, current: heading.index === current[tab], entries: entries.filter((entry) => tierOf(entry) === heading.index) }))
-      .filter((tier) => tier.entries.length > 0);
+  // A level past the last tier with entries, as a profession above the 100th
+  // (825) on the potions, herbs and minerals, is in that last one.
+  const byTier = (entries, tierOf, headings, tab) => {
+    const tiers = headings.map((heading) => ({ ...heading, entries: entries.filter((entry) => tierOf(entry) === heading.index) })).filter((tier) => tier.entries.length > 0);
+    const at = current[tab] === undefined ? undefined : Math.min(current[tab], tiers.at(-1)?.index ?? current[tab]);
+    return tiers.map(({ entries: own, ...tier }) => ({ ...tier, current: tier.index === at, entries: own }));
+  };
   const count = (entries) => ({ found: entries.filter((entry) => entry.found).length, all: entries.length });
 
   const items = content.bases.map((base) => ({ ...itemEntry(base, discovered, content, patterns, jewels), tier: baseTier(base.id, content) }));

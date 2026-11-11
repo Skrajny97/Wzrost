@@ -10,9 +10,10 @@
 // "Poproś gildię" does, guild-requests.js), or gold for one side (the
 // author: "Daj też mozliwość wymiany i wystawiania ofert w Gildii zasoby za
 // złoto"), and takes the two counts; with the rules' sameCount the second
-// one follows the first. The words come with the answer (data/guilds.json,
-// exchange.texts), in the page's language; the card's own few go through
-// t() (i18n.js).
+// one follows the first. Below the players' Wymiana's level (826 A) both
+// "Wystaw ofertę" and "Wymień" only say so in a toast. The words come with
+// the answer (data/guilds.json, exchange.texts), in the page's language;
+// the card's own few go through t() (i18n.js).
 // mountGuildExchange(container) adds the card to the container and gives
 // { unmount() }, which takes it away.
 
@@ -196,6 +197,13 @@ export function mountGuildExchange(container) {
     );
   }
 
+  // Below the level to post and take (826 A), the words why in a toast, as
+  // the players' Wymiana tells it (trade.js), before any sheet or question.
+  const levelLocked = () => {
+    if (view.locked) toast(view.texts.level);
+    return view.locked;
+  };
+
   // The character's own offers: the open ones with "Wycofaj", then the last
   // closed ones with how they ended; "Wystaw ofertę" under them, or why
   // there is no room for another.
@@ -235,7 +243,7 @@ export function mountGuildExchange(container) {
             ),
           ),
       view.open < rules.offers
-        ? h('button', { type: 'button', class: 'button button--system guild-offer-post', text: texts.post, onClick: openPostSheet })
+        ? h('button', { type: 'button', class: 'button button--system guild-offer-post', text: texts.post, onClick: () => levelLocked() || openPostSheet() })
         : h('p', { class: 'muted', text: texts.full }),
     );
   }
@@ -250,6 +258,7 @@ export function mountGuildExchange(container) {
       text: texts.take,
       onClick: (event) =>
         withButton(event.currentTarget, async () => {
+          if (levelLocked()) return;
           if (!(await confirmAction({ title: texts.takeTitle, text: filled(texts.takeText, { give: sideText(offer.give), want: sideText(offer.want) }), confirmLabel: texts.take }))) return;
           await act('/api/guild/exchange/take', { offerId: offer.id });
         }),
