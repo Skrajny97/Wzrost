@@ -3034,6 +3034,17 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Trzecia ewolucja, Tier VII i nowa kraina: propozycje do oceny (11.11.2026)
+
+Autor: „No to lecisz z makietami, a później trzeba wrócić do trzeciej ewolucji i tego co pisałem wczoraj wszystkiego” (11.11.2026), a w nocy: „zacznij generować wszystko pod trzecią ewolucję klas. Jeśli to też zdążysz to kolejne tiery przedmiotów, krainy i stwory w nich. Wszystko będzie do zatwierdzenia.”
+
+1. **Portrety trzecich form (811).** Rysuje je PixelLab tak jak portrety drugiej ewolucji: 96 × 128, wzorem stylu jest Mistrzyni Łowów, opisy są w `art/prompts.json` (rodzaj `evolutions`, id `<forma>-<płeć>`). Trzecia forma ma być wyraźnie bogatsza i bardziej epicka od drugiej, więc na stronie ocen każdy portret stoi obok drugiej formy, z której wyrasta. W wybranych wersjach usunięte są luźne iskry (grupy mniejsze niż 20 pikseli z dala od postaci), a Pogromca Hord jest przesunięty o 2 piksele do środka. Święty i Święta mają aureolę dorysowaną w kodzie (złoty pierścień za głową), bo PixelLab narysował ją tylko w jednej, słabej wersji.
+2. **PixelLab bez środków.** Plan autora wyczerpał się w trakcie rysowania (0 z 5000 generacji w miesiącu, saldo −0,03 USD). Prorok, Bogobójca, Licz i Władca Cieni (811.12–811.15) oraz ikony Tieru VII (813) czekają na doładowanie. Jedno wywołanie (cztery wersje) kosztuje ok. 0,08 USD.
+3. **Nazwa „Żywiołak” (812).** Tak samo nazywa się przywołaniec Elementalisty (Przywołanie żywiołaka), więc nazwa trzeciej formy Arcymaga Żywiołów idzie do autora jako pytanie z wariantami.
+4. **Opisy i umiejętności (815).** Jak przy drugiej ewolucji: pierwsza umiejętność rozwija jedną z umiejętności drugiej formy, druga jest nowa, a obie poprzednie ustępują im po ewolucji. Arcydruid zamiast niedźwiedzia przywołuje żubra, bo jego cecha daje drugiego przywołańca naraz. Liczby umiejętności ustawi symulacja po zatwierdzeniu opisów.
+5. **Tier VII (814).** 22 bazy od 125. poziomu klasy według zasad Tierów V i VI: współczynnik pierwszej bazy rodziny ×1,30 w górę do setnych, premia od najwyższej premii Tieru VI +1 do półtora raza tej premii (Miecz koronacyjny 1,56 i 82–121). Skrzynia za pełny zestaw: 15 625 złota, 320 Punktów Czasu i 128 Punktów Systemu. Walidator pozwala dziś późniejszej bazie być najwyżej o 25% mocniejszą od pierwszej; z Tierem VII ten próg musi wzrosnąć do 30%.
+6. **Nowa kraina 201–275 (816).** Trzy motywy do wyboru (Łysogóry, Wierchy, Nawia). Regiony, stwory i grafiki powstaną po wyborze.
+
 ## Wersja 0.2.60 (11.11.2026): obsługa płatności Autopay w grze, na razie tylko dla konta autora
 
 Autor 11.11.2026, ze zrzutem z portalu Autopay: „klikam Zapisz i nic sie nie dzieje”. Adresy z instrukcji (ITN i powrót) były dotąd tylko na wersji testowej, a w grze odpowiadały „nie znaleziono”. Ta wersja wnosi do gry całą obsługę płatności, opisaną w dwóch częściach niżej.
