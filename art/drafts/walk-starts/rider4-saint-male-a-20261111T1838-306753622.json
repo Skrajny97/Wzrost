@@ -1,0 +1,14 @@
+{
+  "id": "rider4-saint-male-a",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, the lower half of a gentle man saint in pure white robes with fine golden embroidery, a golden sash and a long pale gold mantle, riding: he sits astride a horse that is not drawn, seen strictly from the side and facing right; his hips sit on the saddle, the white robe falls over the near thigh which lies forward along the horse's back, from the knee the robe hangs straight down and one brown leather boot shows below its hem, resting level in a stirrup that is not drawn; the pale gold mantle hangs down behind his back; only the near leg is seen; the same colours, outline, pixel size and shading as the upper half above, which stays as it is; nothing else: no horse, no saddle, no reins, no ground, transparent background",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": "art/inputs/riders4/saint-male-a.png",
+  "mask": "art/inputs/riders4/saint-male-a-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

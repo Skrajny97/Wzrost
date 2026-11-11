@@ -1,0 +1,14 @@
+{
+  "id": "rider4-colossus-female-b",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, the lower half of a tall woman guardian in massive dark steel plate armour with gold trim and a deep blue tabard with a golden fortress, riding: she sits astride a horse that is not drawn, seen strictly from the side and facing right; her hips sit on the saddle, the blue tabard falls over the near thigh, the near thigh in dark steel plate lies forward along the horse's back, the near lower leg in a dark steel greave hangs straight down from the knee to the foot, the steel sabaton rests level in a stirrup that is not drawn; only the near leg is seen; the same colours, outline, pixel size and shading as the upper half above, which stays as it is; nothing else: no horse, no saddle, no reins, no ground, transparent background",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": "art/inputs/riders4/colossus-female-b.png",
+  "mask": "art/inputs/riders4/colossus-female-b-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
