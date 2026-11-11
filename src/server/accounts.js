@@ -6,6 +6,7 @@ import { googleConfigured } from './google.js';
 import { ApiError, json, readJson } from './http.js';
 import { LANGUAGES, language } from './i18n.js';
 import { englishOn } from './features.js';
+import { detachedRows } from './characters.js';
 import { marketRemoval } from './market.js';
 import { guildRemoval } from './guilds.js';
 import { partyRemoval } from './parties.js';
@@ -258,6 +259,8 @@ async function removeAccount(db, session, now) {
     db
       .prepare('UPDATE purchases SET user_id = -user_id, character_id = CASE WHEN character_id > 0 THEN -character_id ELSE character_id END WHERE user_id = ?')
       .bind(id),
+    // The Loteria draws its characters won, detached the same way.
+    ...detachedRows(db, `IN (${characters})`, [id]),
     db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(id),

@@ -2016,6 +2016,14 @@ export async function deleteCharacter(context) {
   return json({ ok: true });
 }
 
+// The rows that outlive the characters `which` (SQL after `character_id`,
+// with `binds`), kept with the id made negative, as the purchases are: the
+// database gives the highest id of a removed character again.
+export const detachedRows = (db, which, binds) =>
+  ['chest_items', 'lottery_draws', 'gift_codes_used'].map((table) =>
+    db.prepare(`UPDATE ${table} SET character_id = -character_id WHERE character_id ${which}`).bind(...binds),
+  );
+
 // The statements that remove a character with all it has, at `now`.
 export function characterRemoval(db, id, now) {
   return [
@@ -2040,6 +2048,11 @@ export function characterRemoval(db, id, now) {
     // Its purchases of Punkty Systemu stay for the bookkeeping, detached
     // (the id made negative), as its id may be given again (payments.js).
     db.prepare('UPDATE purchases SET character_id = -character_id WHERE character_id = ?').bind(id),
+    // So do the items it put in the Skrzynia Konta (for the account's other
+    // characters, no one's own any more: chest.js), the Loteria draw it won
+    // and the gift codes it took for the account (11.11.2026): else a new
+    // character given its id would take them as its own.
+    ...detachedRows(db, '= ?', [id]),
     db.prepare('DELETE FROM characters WHERE id = ?').bind(id),
   ];
 }

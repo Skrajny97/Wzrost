@@ -121,4 +121,29 @@ describe('Skrzynia Konta', () => {
     assert.equal((await call('DELETE', '/api/me', { cookie, body: { login: 'skrzynia' } })).status, 200);
     assert.equal(await count(), 0);
   });
+
+  // The database gives the highest id of a removed character again
+  // (characters.js: detachedRows): the next character takes the first one's
+  // items from the chest as another's, and the draw it won is not its own.
+  test("a removed character's items stay in the chest as no one's, also for a new character given its id", async () => {
+    await create('Mira');
+    const given = await inBag('Mira', amulet(30));
+    assert.equal((await put(given)).status, 200);
+    const database = await db();
+    const { id: first } = await database.prepare("SELECT id FROM characters WHERE name = 'Mira'").first();
+    await database
+      .prepare("INSERT INTO lottery_draws (day, tickets, pot, character_id, name, appearance, seed, drawn_at) VALUES ('2026-11-10', 3, 300, ?, 'Mira', 'female', 's', 0)")
+      .bind(first)
+      .run();
+    assert.equal((await call('DELETE', '/api/character', { cookie })).status, 200);
+    await create('Druga');
+    const { id: second } = await database.prepare("SELECT id FROM characters WHERE name = 'Druga'").first();
+    assert.equal(second, first);
+    const [seen] = (await chest()).items;
+    assert.deepEqual([seen.own, seen.from], [false, null]);
+    const item = (await take(seen.id)).data.character.bag[0];
+    assert.equal(item.chest, true);
+    const draw = await database.prepare("SELECT character_id FROM lottery_draws WHERE day = '2026-11-10'").first();
+    assert.equal(draw.character_id, -first);
+  });
 });
