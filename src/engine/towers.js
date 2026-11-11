@@ -1,3 +1,4 @@
+// @ts-check
 // The Wieże Systemu (data/towers.json; DECISIONS.md, "Wieże i Gildia:
 // podwaliny" and "Wieże Systemu i Gildia"; the author: "Wieże Systemu które
 // będzie robić się niezależnie od wypraw, profesji. Bedzie podział na Wieże
@@ -35,15 +36,32 @@ import { createRng } from './rng.js';
 import { say, word } from './text.js';
 import { weekChance, weekFactor, weekFighter } from './weeks.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {{ id: string, champion?: string, elite?: string, encounters: { monsters: string[], weight?: number }[] } & Record<string, any>} Area An inner region (data/areas.json). */
+/** @typedef {{ elite: boolean, champion?: boolean, members: { monsterId: string, level: number }[] }} Encounter */
+/** @typedef {{ floor: number, level: number, areaId: string, encounter: Encounter }} TowerFloor */
+/** @typedef {import('./rng.js').Rng} Rng */
+
 // The level of floor `floor`: floor 1 at firstFloorLevel, each next one a
 // level higher.
+/**
+ * @param {number} floor
+ * @param {Content} content
+ * @returns {number}
+ */
 export const towerLevel = (floor, content) => floor + content.towers.firstFloorLevel - 1;
 
 // The highest floor open in a tower: the one above the highest won there
 // (`best`), whatever the character's level.
+/** @param {number | null | undefined} best */
 export const towerTop = (best) => Math.max(0, best ?? 0) + 1;
 
 // The inner region whose creatures live on floor `floor`.
+/**
+ * @param {number} floor
+ * @param {Content} content
+ * @returns {Area}
+ */
 export function towerArea(floor, content) {
   const { areas } = content;
   return areas[(floor - 1) % areas.length];
@@ -54,6 +72,11 @@ export function towerArea(floor, content) {
 // the first lap (floors 1–20 with 20 regions), so in the laps between,
 // those floors are their region's usual ones (the author: "stałe elity co
 // 5. piętro tylko w co drugim okrążeniu regionów", 484 A).
+/**
+ * @param {number} floor
+ * @param {Content} content
+ * @returns {boolean}
+ */
 export function towerEliteFloor(floor, content) {
   const { floors } = content.towers;
   const lap = Math.floor((floor - 1) / content.areas.length);
@@ -64,6 +87,12 @@ export function towerEliteFloor(floor, content) {
 // and the encounter, as the hunt's encounters are (hunt.js), regular,
 // elite or champion. A regular one is of those the floor's level lets come
 // (the pairs at the end of the first land from level 5, encountersFor).
+/**
+ * @param {number} floor
+ * @param {string | number} seed
+ * @param {Content} content
+ * @returns {TowerFloor}
+ */
 export function towerFloor(floor, seed, content) {
   const { floors } = content.towers;
   const area = towerArea(floor, content);
@@ -71,17 +100,22 @@ export function towerFloor(floor, seed, content) {
   const rng = createRng(`${seed}:floor:${floor}`);
   const champion = floor % floors.championEvery === 0 && area.champion;
   const elite = !champion && (towerEliteFloor(floor, content) || floor % floors.championEvery === 0 || rng.chance(floors.eliteChance)) && area.elite;
-  if (champion) return { floor, level, areaId: area.id, encounter: { elite: false, champion: true, members: [{ monsterId: area.champion, level }] } };
-  if (elite) return { floor, level, areaId: area.id, encounter: { elite: true, members: [{ monsterId: area.elite, level }] } };
+  if (champion) return { floor, level, areaId: area.id, encounter: { elite: false, champion: true, members: [{ monsterId: champion, level }] } };
+  if (elite) return { floor, level, areaId: area.id, encounter: { elite: true, members: [{ monsterId: elite, level }] } };
   const open = encountersFor(area, level);
-  const group = rng.weighted(open.length > 0 ? open : area.encounters, (encounter) => encounter.weight ?? 1);
-  return { floor, level, areaId: area.id, encounter: { elite: false, members: group.monsters.map((monsterId) => ({ monsterId, level })) } };
+  const group = rng.weighted(open.length > 0 ? open : area.encounters, (/** @type {{ monsters: string[], weight?: number }} */ encounter) => encounter.weight ?? 1);
+  return { floor, level, areaId: area.id, encounter: { elite: false, members: group.monsters.map((/** @type {string} */ monsterId) => ({ monsterId, level })) } };
 }
 
 // The gold a win on floor `floor` pays: what a whole exploration of
 // rewardMinutes brings on average at the floor's level in its region,
 // loot.goldMultiplier times (the author: "zmodyfikować Wieże by dawały
 // więcej niż Portale, o wiele więcej").
+/**
+ * @param {number} floor
+ * @param {Content} content
+ * @returns {number}
+ */
 export function towerGold(floor, content) {
   const { rewardMinutes, loot } = content.towers;
   return Math.round(expectedExploration(towerArea(floor, content), towerLevel(floor, content), rewardMinutes, content).gold * loot.goldMultiplier);
@@ -89,7 +123,13 @@ export function towerGold(floor, content) {
 
 // The rarity weights of a tower material on floor `floor`: those of the
 // highest loot.materials.rarities step its level has reached.
+/**
+ * @param {number} floor
+ * @param {Content} content
+ * @returns {Record<string, number>}
+ */
 export function towerMaterialRarities(floor, content) {
+  /** @type {{ fromLevel: number, rarities: Record<string, number> }[]} */
   const steps = content.towers.loot.materials.rarities;
   const level = towerLevel(floor, content);
   return (steps.filter((step) => step.fromLevel <= level).at(-1) ?? steps[0]).rarities;
@@ -103,17 +143,28 @@ export function towerMaterialRarities(floor, content) {
 // level (towerMaterialRarities) and never below its species' own. `more`:
 // the share more of the Tropiciel's trait (tracker), a part of a piece by
 // chance.
+/**
+ * @param {number} floor
+ * @param {{ monsterId: string }[]} enemies
+ * @param {Rng} rng
+ * @param {Content} content
+ * @param {number} [more]
+ * @returns {Record<string, number>}
+ */
 export function towerMaterials(floor, enemies, rng, content, more = 1) {
+  /** @param {string[]} ids */
   const ordinary = (ids) => [...new Set(ids)].filter((id) => content.materialsByMonster[id] && !content.monstersById[id]?.champion);
   let creatures = ordinary(enemies.map((enemy) => enemy.monsterId));
   if (creatures.length === 0) {
     const area = towerArea(floor, content);
     const open = encountersFor(area, towerLevel(floor, content));
-    creatures = ordinary((open.length > 0 ? open : area.encounters).flatMap((encounter) => encounter.monsters));
+    creatures = ordinary((open.length > 0 ? open : area.encounters).flatMap((/** @type {{ monsters: string[] }} */ encounter) => encounter.monsters));
   }
+  /** @type {Record<string, number>} */
   const found = {};
   if (creatures.length === 0) return found;
-  const index = (id) => content.rarities.findIndex((rarity) => rarity.id === id);
+  /** @param {string} id */
+  const index = (id) => content.rarities.findIndex((/** @type {{ id: string }} */ rarity) => rarity.id === id);
   const weights = Object.entries(towerMaterialRarities(floor, content));
   const pieces = content.towers.loot.materials.pieces * more;
   const count = Math.floor(pieces) + (rng.chance(pieces - Math.floor(pieces)) ? 1 : 0);
@@ -148,6 +199,23 @@ export function towerMaterials(floor, enemies, rng, content, more = 1) {
 // week of the year of the entry (weeks.js), or null: its share more (or
 // less) of the win's XP and gold, of the chance of the loot's item, of the
 // materials and of the players' stats in the fight.
+/**
+ * @param {{
+ *   character: Record<string, any>,
+ *   equipped: Record<string, any>[],
+ *   name: string,
+ *   floor: number,
+ *   seed: string | number,
+ *   partners?: { character: Record<string, any>, equipped: Record<string, any>[], name: string }[],
+ *   companions?: Record<string, any>[],
+ *   trophies?: Record<string, any>,
+ *   chest?: boolean,
+ *   championTrophy?: boolean,
+ *   week?: Record<string, any> | null,
+ * }} options
+ * @param {Content} content
+ * @returns {Record<string, any>}
+ */
 export function towerFight({ character, equipped, name, floor, seed, partners = [], companions = [], trophies = {}, chest = false, championTrophy = false, week = null }, content) {
   const plan = towerFloor(floor, seed, content);
   const area = content.areasById[plan.areaId];
@@ -159,11 +227,13 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   const partyXp = 1 - companions.length * content.settlement.companions.xpCost - partners.length * content.balance.parties.xpCost;
   const tracker = evolutionOf(character, content)?.trait;
   const moreMaterials = (tracker?.kind === 'tracker' ? 1 + tracker.params.materials : 1) * weekFactor(week, 'materials');
-  const player = playerCombatant({ character: weekFighter(character, week), equipped, name, area }, content);
+  // combatant.js and companions.js are not checked yet: their options are
+  // typed by their defaults alone (hp, area).
+  const player = playerCombatant(/** @type {any} */ ({ character: weekFighter(character, week), equipped, name, area }), content);
   const allies = [
     { ...player, ...(Object.keys(trophies).length > 0 && { trophies }) },
-    ...partners.map((partner, index) => playerCombatant({ character: weekFighter(partner.character, week), equipped: partner.equipped, name: partner.name, area, id: `p${index + 1}` }, content)),
-    ...companions.map((companion, index) => companionCombatant(companion, { area, id: `a${index + 1}` }, content)),
+    ...partners.map((partner, index) => playerCombatant(/** @type {any} */ ({ character: weekFighter(partner.character, week), equipped: partner.equipped, name: partner.name, area, id: `p${index + 1}` }), content)),
+    ...companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}` }), content)),
   ];
   // Alone on a floor (the Wieża Solo), the monsters have only a share of the
   // late and end game's growth, as no companion helps (the author: 438.3 A).
@@ -178,11 +248,13 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   const enemies = encounterCombatants(plan.encounter, content, { growth: alone ? content.balance.monsters.soloGrowth : 1, strength });
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait });
   const won = fight.won === true;
-  const hpAfter = Math.max(0, fight.units.find((unit) => unit.id === player.id).hp);
+  const hpAfter = Math.max(0, fight.units.find((/** @type {{ id: string }} */ unit) => unit.id === player.id)?.hp ?? 0);
 
   let xp = 0;
   let gold = 0;
+  /** @type {Record<string, number>} */
   let materials = {};
+  /** @type {Record<string, any>[]} */
   const items = [];
   let lootItem = null;
   if (won) {
@@ -191,13 +263,15 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
       const monster = content.monstersById[enemy.monsterId];
       fightXp += monsterXp({ ...monster, elite: false, champion: false }, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(character.level, enemy.level, content);
       // A champion's trophy, its own material (483 A).
-      if (monster.champion) materials = addCounts(materials, materialDrops(enemy.monsterId, enemy.level, 1, rng, content, championTrophy));
+      if (monster.champion) materials = addCounts(materials, materialDrops(enemy.monsterId, enemy.level, 1, rng, content, /** @type {any} */ (championTrophy)));
     }
     xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * lengthed * partyXp * weekFactor(week, 'xp'));
     // The tower's loot (towerGold, towerMaterials), far above a portal's.
     gold = Math.round(towerGold(floor, content) * weekFactor(week, 'gold'));
     materials = addCounts(materials, towerMaterials(floor, enemies, rng, content, moreMaterials));
-    const classItem = () => randomItem(plan.level, rng, content, { classId: character.classId, maxClassLevel: character.classLevel, rarityId: championItemRarity(plan.level, rng, content), area });
+    // items.js is not checked yet: its options are typed by their defaults
+    // alone (classId, rarityId and area have none).
+    const classItem = () => randomItem(plan.level, rng, content, /** @type {any} */ ({ classId: character.classId, maxClassLevel: character.classLevel, rarityId: championItemRarity(plan.level, rng, content), area }));
     // The loot's item drawn first, so the chest changes nothing else.
     const lucky = rng.chance(weekChance(content.towers.loot.itemChance, week, 'items'));
     if (chest) items.push(classItem());
@@ -207,7 +281,7 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
     }
   }
 
-  const enemyList = enemies.map((enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
+  const enemyList = enemies.map((/** @type {{ name: string, level: number }} */ enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
   const start = plan.encounter.champion ? 'championStart' : plan.encounter.elite ? 'eliteStart' : 'fightStart';
   // The towers' own words for the start, not the forest's and the road's.
   const lines = [say(texts, start, floor, { enemies: enemyList })];
@@ -224,7 +298,7 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
     elite: plan.encounter.elite,
     champion: plan.encounter.champion ?? false,
     tough: false,
-    enemies: enemies.map((enemy) => ({ name: enemy.name, level: enemy.level, monsterId: enemy.monsterId })),
+    enemies: enemies.map((/** @type {{ name: string, level: number, monsterId: string }} */ enemy) => ({ name: enemy.name, level: enemy.level, monsterId: enemy.monsterId })),
     won: fight.won,
     hpBefore: player.maxHp,
     hpAfter,
@@ -234,7 +308,7 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
     chests: items.map((_, index) => index),
     recovered: 0,
     allies: allies.map((unit) => combatantView(unit, enemies[0].level, content)),
-    enemiesView: enemies.map((enemy) => combatantView(enemy, player.level, content)),
+    enemiesView: enemies.map((/** @type {any} */ enemy) => combatantView(enemy, player.level, content)),
     events: fight.events,
   };
   return {
