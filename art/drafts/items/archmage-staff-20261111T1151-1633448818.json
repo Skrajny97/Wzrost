@@ -1,0 +1,14 @@
+{
+  "id": "archmage-staff",
+  "tool": "pixellab generate-image-v2",
+  "description": "an archmage's staff: a tall staff of dark polished wood spiralled with silver bands and small engraved runes, topped with a silver claw cage holding a large glowing violet orb, upright, single inventory item icon",
+  "style": "src/client/art/items/caduceus.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

@@ -1,0 +1,14 @@
+{
+  "id": "szuba",
+  "tool": "pixellab generate-image-v2",
+  "description": "a szuba: a long luxurious coat of deep purple velvet lined and trimmed with thick brown sable fur, a wide fur collar, golden clasps and golden embroidered patterns on the hem, an empty coat with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/ferezja.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

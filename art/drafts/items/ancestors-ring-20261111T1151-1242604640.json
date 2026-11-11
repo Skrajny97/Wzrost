@@ -1,0 +1,14 @@
+{
+  "id": "ancestors-ring",
+  "tool": "pixellab generate-image-v2",
+  "description": "an ancestral ring: a heavy dark silver ring engraved with a slavic sun symbol and small runes around the band, a deep red garnet set in the middle, single inventory item icon",
+  "style": "src/client/art/items/eternity-ring.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

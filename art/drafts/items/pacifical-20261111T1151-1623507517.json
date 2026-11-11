@@ -1,0 +1,14 @@
+{
+  "id": "pacifical",
+  "tool": "pixellab generate-image-v2",
+  "description": "a pacifical: a golden reliquary cross on a short ornate handle, a small round crystal window in the middle, the arms ending in trefoils set with small red gems, soft golden glow, single inventory item icon",
+  "style": "src/client/art/items/processional-cross.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

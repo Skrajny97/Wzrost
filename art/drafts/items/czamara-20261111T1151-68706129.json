@@ -1,0 +1,14 @@
+{
+  "id": "czamara",
+  "tool": "pixellab generate-image-v2",
+  "description": "a polish czamara coat: a long fitted dark navy coat with a high standing collar, a row of golden frog fastenings across the chest, gold braid along the edges and cuffs, an empty coat with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/kontusz.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

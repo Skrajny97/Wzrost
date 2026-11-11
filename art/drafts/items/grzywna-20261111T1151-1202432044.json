@@ -1,0 +1,14 @@
+{
+  "id": "grzywna",
+  "tool": "pixellab generate-image-v2",
+  "description": "a grzywna: a heavy twisted slavic neck torc of silver with thick ends shaped like wolf heads, single inventory item icon",
+  "style": "src/client/art/items/lunula.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

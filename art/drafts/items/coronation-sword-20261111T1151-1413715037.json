@@ -1,0 +1,14 @@
+{
+  "id": "coronation-sword",
+  "tool": "pixellab generate-image-v2",
+  "description": "a coronation sword: a long straight double-edged steel blade with a gilded fuller engraved with tiny runes, a wide golden crossguard set with small rubies, a grip wrapped in red velvet and gold wire, a large round golden pommel with a jewel, diagonal, single inventory item icon",
+  "style": "src/client/art/items/flamberge.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

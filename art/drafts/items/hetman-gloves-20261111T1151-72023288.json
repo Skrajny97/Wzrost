@@ -1,0 +1,14 @@
+{
+  "id": "hetman-gloves",
+  "tool": "pixellab generate-image-v2",
+  "description": "hetman's gauntlets: a pair of long red leather gauntlets with wide flared cuffs embroidered with gold thread and pearls, gilded steel plates on the backs of the hands, single inventory item icon",
+  "style": "src/client/art/items/falconry-gloves.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

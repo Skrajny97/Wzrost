@@ -1,0 +1,14 @@
+{
+  "id": "maximilian-armor",
+  "tool": "pixellab generate-image-v2",
+  "description": "maximilian plate armour: a polished steel breastplate covered all over with parallel fluted ridges, a rounded chest with gilded etched bands, fluted round shoulder plates and a short skirt of steel lames, an empty armor with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/gothic-armor.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

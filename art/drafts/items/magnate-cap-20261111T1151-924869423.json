@@ -1,0 +1,14 @@
+{
+  "id": "magnate-cap",
+  "tool": "pixellab generate-image-v2",
+  "description": "a polish magnate's cap: a tall fur cap of dark sable with a crimson velvet crown, a large golden brooch with a ruby at the front holding a tall plume of white heron feathers, single inventory item icon",
+  "style": "src/client/art/items/diadem.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

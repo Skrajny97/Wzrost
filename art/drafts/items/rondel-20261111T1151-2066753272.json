@@ -1,0 +1,14 @@
+{
+  "id": "rondel",
+  "tool": "pixellab generate-image-v2",
+  "description": "a rondel dagger: a long narrow triangular steel blade, a round disc-shaped steel guard and a round disc-shaped steel pommel, a black grip wound with silver wire, diagonal, single inventory item icon",
+  "style": "src/client/art/items/swordbreaker.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

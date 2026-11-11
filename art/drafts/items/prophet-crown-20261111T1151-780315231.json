@@ -1,0 +1,14 @@
+{
+  "id": "prophet-crown",
+  "tool": "pixellab generate-image-v2",
+  "description": "a prophet's crown: a golden crown shaped like a rising sun, seven pointed golden rays rising from a band set with white pearls, an open eye emblem in the middle, soft golden glow, single inventory item icon",
+  "style": "src/client/art/items/halo.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

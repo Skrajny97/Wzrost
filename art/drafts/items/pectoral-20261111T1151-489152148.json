@@ -1,0 +1,14 @@
+{
+  "id": "pectoral",
+  "tool": "pixellab generate-image-v2",
+  "description": "a pectoral: a large ornate golden breast medallion shaped like a sunburst with a big blue sapphire in the middle and small pearls around the edge, hanging on a heavy golden chain, single inventory item icon",
+  "style": "src/client/art/items/cameo.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

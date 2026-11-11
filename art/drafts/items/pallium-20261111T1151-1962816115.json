@@ -1,0 +1,14 @@
+{
+  "id": "pallium",
+  "tool": "pixellab generate-image-v2",
+  "description": "a pallium: a white woolen ring-shaped stole with two long hanging bands embroidered with small black crosses and three golden pins, lying over an ornate white and gold vestment, an empty vestment with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/cassock.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

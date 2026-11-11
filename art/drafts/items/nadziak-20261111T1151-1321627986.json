@@ -1,0 +1,14 @@
+{
+  "id": "nadziak",
+  "tool": "pixellab generate-image-v2",
+  "description": "a polish nadziak war hammer: a long dark wooden haft with steel langets, a steel head with a short square hammer face on one side and a long curved sharp pick on the other, gilded decorations at the socket, diagonal, single inventory item icon",
+  "style": "src/client/art/items/double-axe.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

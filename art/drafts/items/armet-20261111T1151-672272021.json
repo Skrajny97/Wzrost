@@ -1,0 +1,14 @@
+{
+  "id": "armet",
+  "tool": "pixellab generate-image-v2",
+  "description": "an armet: a polished steel closed knight's helmet with a pointed visor with a narrow eye slit and small breathing holes, gilded edges, a small crest of red feathers on top, an empty helmet with nobody wearing it, single inventory item icon",
+  "style": "src/client/art/items/great-helm.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

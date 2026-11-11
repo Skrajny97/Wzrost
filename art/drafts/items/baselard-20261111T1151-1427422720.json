@@ -1,0 +1,14 @@
+{
+  "id": "baselard",
+  "tool": "pixellab generate-image-v2",
+  "description": "a baselard dagger: a long straight double-edged steel blade, an H-shaped hilt with a short crossguard and a matching crossbar pommel, a dark wooden grip with brass rivets, diagonal, single inventory item icon",
+  "style": "src/client/art/items/cinquedea.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

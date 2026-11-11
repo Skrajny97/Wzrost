@@ -1,0 +1,14 @@
+{
+  "id": "royal-shield",
+  "tool": "pixellab generate-image-v2",
+  "description": "a royal shield: a tall heater shield of polished steel with a gilded rim, a deep red field with a golden crown above two crossed swords, small golden rivets, single inventory item icon",
+  "style": "src/client/art/items/jousting-shield.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

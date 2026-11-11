@@ -1,0 +1,14 @@
+{
+  "id": "hourglass",
+  "tool": "pixellab generate-image-v2",
+  "description": "a magical hourglass: a tall hourglass in an ornate brass frame of twisted pillars, glass bulbs with glowing blue starry sand flowing down, small runes engraved on the round top and base, single inventory item icon",
+  "style": "src/client/art/items/astrolabe.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

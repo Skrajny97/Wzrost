@@ -1,0 +1,14 @@
+{
+  "id": "persian-bow",
+  "tool": "pixellab generate-image-v2",
+  "description": "a persian recurve bow: a short strongly recurved composite bow with lacquered red limbs painted with golden floral patterns, ivory tips, a taut bowstring, upright, single inventory item icon",
+  "style": "src/client/art/items/scythian-bow.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

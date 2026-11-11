@@ -1,0 +1,14 @@
+{
+  "id": "crown-quiver",
+  "tool": "pixellab generate-image-v2",
+  "description": "a royal quiver: a tall quiver of dark red leather covered with golden embroidery and a small golden crown emblem, a gilded rim and tip, full of arrows with white and red feathers, a strap with a golden buckle, single inventory item icon",
+  "style": "src/client/art/items/parade-quiver.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}
