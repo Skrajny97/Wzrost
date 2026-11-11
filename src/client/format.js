@@ -35,6 +35,9 @@ const shortFormat = () => format('short', (locale) => new Intl.NumberFormat(loca
 export const formatShort = (value) => (Math.abs(value) >= 1e6 ? shortFormat().format(value) : integerFormat().format(value));
 export const formatDecimal = (value) => decimalFormat().format(value);
 export const formatPrecise = (value) => preciseFormat().format(value);
+// Real money, in grosze, as the page's language writes it with its currency
+// ("4,99 zł", "PLN 4.99"): the price of the Punkty Systemu bought for money.
+export const formatMoney = (grosze, currency) => format(`money:${currency}`, (locale) => new Intl.NumberFormat(locale, { style: 'currency', currency })).format(grosze / 100);
 
 // Polish has three plural forms: 1 punkt, 2–4 punkty, 5 punktów (and 12–14
 // punktów). English has two, one and the rest, under the three Polish ones

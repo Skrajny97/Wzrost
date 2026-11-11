@@ -895,6 +895,7 @@
     "src/client/screens/party.js",
     "src/client/screens/ranking.js",
     "src/client/screens/shop.js",
+    "src/client/screens/shop-points.js",
     "src/client/screens/trade.js",
     "src/client/screens/settlement.js",
     "src/client/screens/market.js",

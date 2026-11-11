@@ -7,7 +7,9 @@
 // portrait, with what else it wears (a trail behind the character walking on
 // the path, the mount's look its picture, once it has one), its words and
 // its price. "Kup" asks first; what is owned has "Załóż" or "Zdejmij" in its
-// place. With a frame worn, the switch "Kolor imienia jak ramka".
+// place. With a frame worn, the switch "Kolor imienia jak ramka". Where the
+// account can buy Punkty Systemu (the server's payments answer), "Kup Punkty
+// Systemu" by the points opens their page, #/sklep/punkty (shop-points.js).
 
 import { mountArt, walkerSheet } from '../art.js';
 import { characterLook, portraitBox } from '../cosmetics.js';
@@ -18,6 +20,7 @@ import { SYSTEM_POINTS_ICON } from '../icons.js';
 import { systemPoints } from '../quests.js';
 import { call, state } from '../state.js';
 import { confirmAction, howItWorks, pageHeading, toast, withButton } from '../ui.js';
+import { mountShopPoints } from './shop-points.js';
 
 const HOME = '#/sklep';
 // The tabs, their names shown in the page's language (t()).
@@ -34,8 +37,21 @@ const TABS = [
 // An item the character can wear: an outfit only for its own class.
 const forCharacter = (item, character) => item.kind !== 'outfit' || item.classId === character.classId;
 
+// Whether this account can buy Punkty Systemu here, asked once a page load:
+// null until the server answers.
+let paymentsOpen = null;
+
 export function mountShop(container, { params }) {
+  if (params.tab === 'punkty') return mountShopPoints(container);
   let tab = TABS.find((each) => each.id === params.tab) ?? TABS[0];
+  if (paymentsOpen === null) {
+    call('GET', '/api/payments')
+      .then(() => true, () => false)
+      .then((open) => {
+        paymentsOpen = open;
+        if (open && container.isConnected) render();
+      });
+  }
 
   function render() {
     const character = state.character;
@@ -54,6 +70,7 @@ export function mountShop(container, { params }) {
         h('span', { text: t('Punkty Systemu:') }),
         h('strong', { text: formatNumber(character.systemPoints) }),
       ),
+      paymentsOpen && h('a', { class: 'button button--system shop-buy-points', href: '#/sklep/punkty' }, icon(SYSTEM_POINTS_ICON, { size: 18 }), h('span', { text: t('Kup Punkty Systemu') })),
       howItWorks(texts.lead, texts.rules),
       h('div', { class: 'segmented shop-tabs', role: 'group', 'aria-label': t('Działy Sklepu Systemu') }, tabs.map(tabButton)),
       tab.kind === 'frame' && character.cosmetics.frame && nameSwitch(character),

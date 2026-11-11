@@ -41,6 +41,7 @@ import { mountJournal } from './screens/journal.js';
 import { lockedScreen } from './screens/locked.js';
 import { mountSettlement } from './screens/settlement.js';
 import { mountShop } from './screens/shop.js';
+import { takePaymentReturn } from './screens/shop-points.js';
 import { mountProfessions } from './screens/professions.js';
 import { mountReport } from './screens/report.js';
 import { mountSkills } from './screens/skills.js';
@@ -465,6 +466,12 @@ function watchCrafting(now) {
 
 function route() {
   if (!state.character) return;
+  // Back from the payment gateway's page at the game's own address, the page
+  // of the order, once (screens/shop-points.js).
+  if (!location.hash && takePaymentReturn()) {
+    location.replace('#/sklep/punkty');
+    return;
+  }
   const hash = location.hash || HOME;
   const found = ROUTES.map((candidate) => ({ candidate, match: candidate.pattern.exec(hash) })).find(({ match }) => match);
   if (!found) {
