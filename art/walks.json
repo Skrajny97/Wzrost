@@ -599,6 +599,11 @@
       "start": "art/references/walks/start/lich-male.png",
       "pose": 2,
       "description": "a gaunt pale man lich with sunken cheeks, glowing green eyes and long black hair, a crown of black iron spikes, tattered black and purple robes with glowing green runes and silver trim down to the feet, a high collar, a glowing green gem on a chain on the chest, no staff, no green mist, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
+    },
+    "prophet-male": {
+      "start": "art/references/walks/start/prophet-male.png",
+      "pose": 2,
+      "description": "an old man prophet with long flowing white hair and a long white beard, a golden blindfold over the eyes, a golden circlet with a small sun and a thin golden halo, a flowing white and gold robe with golden sun and star embroidery down to the feet, a long golden stole, no staff, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     }
   }
 }
