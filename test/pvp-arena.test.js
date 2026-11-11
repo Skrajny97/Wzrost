@@ -364,6 +364,45 @@ describe('the Arena through the API', () => {
     assert.deepEqual(again, [{ ...seen.defences[0], unseen: false }]);
   });
 
+  // A fight sent just before Monday's midnight, saved after another look
+  // froze its week, would miss that week's table for good: it is refused
+  // and nothing of it kept, and fought again it counts in the new week. The
+  // last fight shows the ratings saved (11.11.2026).
+  test('a fight is refused once its week is frozen, and the last fight shows the ratings saved', async () => {
+    await arena(ala);
+    const { start } = content.settlement.arena.rating;
+    await run('INSERT INTO arena_weeks (character_id, week, place, rating) VALUES (?, ?, 1, ?)', bolek.id, arenaWeek(Date.now(), content).key, start);
+    const refused = await fight(ala, bolek.id);
+    assert.equal(refused.status, 409);
+    assert.equal(refused.data.error.code, 'arena_changed');
+    const record = await first('SELECT fights, week, rating FROM arena_ratings WHERE character_id = ?', ala.id);
+    assert.deepEqual([record.fights, record.week, record.rating], [0, null, start]);
+    assert.equal((await first('SELECT COUNT(*) AS n FROM arena_fights')).n, 0);
+    await run('DELETE FROM arena_weeks');
+    const fought = await fight(ala, bolek.id);
+    assert.equal(fought.status, 200, JSON.stringify(fought.data).slice(0, 300));
+    const { fight: last, arena: view } = fought.data;
+    assert.equal(last.before, start);
+    assert.equal(last.after, view.rating);
+    assert.equal(last.after - last.before, last.change);
+    assert.deepEqual(view.last, last);
+    const kept = await first('SELECT attacker_rating, defender_rating FROM arena_fights');
+    assert.deepEqual([kept.attacker_rating, kept.defender_rating], [await ratingOf(ala), await ratingOf(bolek)]);
+  });
+
+  // Looks at once (two tabs, a look still on its way) when new rivals are
+  // due: each shows the draw kept, so every rival shown can be fought.
+  test('looks at once show the rivals stored, whichever look drew them', async () => {
+    for (const name of ['Cezary', 'Darek', 'Ewa', 'Franek']) await player(`arena${name.toLowerCase()}`, name, 'archer', 30);
+    for (let round = 0; round < 4; round += 1) {
+      if (round > 0) await run("UPDATE arena_ratings SET rivals = '[]' WHERE character_id = ?", ala.id);
+      const answers = await Promise.all([arena(ala), arena(ala), arena(ala)]);
+      const stored = JSON.parse((await first('SELECT rivals FROM arena_ratings WHERE character_id = ?', ala.id)).rivals).sort();
+      assert.equal(stored.length, content.settlement.arena.rivals.count);
+      for (const answer of answers) assert.deepEqual(rivalIds(answer.data.arena).sort(), stored);
+    }
+  });
+
   test("the last defences: the newest first, at most the data's number, those since the last visit new (875)", async () => {
     const cezary = await player('arenacezary', 'Cezary', 'archer', 30);
     const { shown } = content.settlement.arena.defences;

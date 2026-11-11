@@ -128,6 +128,19 @@ export function mountPvpArena(holder, place = null) {
     if (!gone) render();
   }
 
+  // An action refused because the Arena changed meanwhile (a rival gone, a
+  // draw or a fight in another tab, a reward taken: 409): its message shows,
+  // and the Arena comes again as it is now, so the rivals offered and the
+  // rewards are those stored (11.11.2026).
+  const orAgain = async (action) => {
+    try {
+      await action();
+    } catch (error) {
+      if (error.status === 409) load();
+      throw error;
+    }
+  };
+
   // An action's answer is the Arena after it, newer than any on its way.
   const apply = (answer) => {
     asked += 1;
@@ -332,11 +345,13 @@ export function mountPvpArena(holder, place = null) {
         disabled: shut,
         'aria-label': `${texts.fight}: ${rival.name}`,
         onClick: (event) =>
-          withButton(event.currentTarget, async () => {
-            const answer = await call('POST', '/api/settlement/arena/fight', { rivalId: rival.id });
-            fresh = true;
-            apply(answer);
-          }),
+          withButton(event.currentTarget, () =>
+            orAgain(async () => {
+              const answer = await call('POST', '/api/settlement/arena/fight', { rivalId: rival.id });
+              fresh = true;
+              apply(answer);
+            }),
+          ),
       }, icon('swords', { size: 18 }), h('span', { text: texts.fight })),
     );
   }
@@ -357,9 +372,11 @@ export function mountPvpArena(holder, place = null) {
           class: 'button button--world button--small pvp-arena-reroll-button',
           disabled: rerolls.left === 0,
           onClick: (event) =>
-            withButton(event.currentTarget, async () => {
-              apply(await call('POST', '/api/settlement/arena/reroll'));
-            }),
+            withButton(event.currentTarget, () =>
+              orAgain(async () => {
+                apply(await call('POST', '/api/settlement/arena/reroll'));
+              }),
+            ),
         },
         icon('dice', { size: 16 }),
         h('span', { text: say(texts.reroll, { left: rerolls.left }) }),
@@ -408,11 +425,13 @@ export function mountPvpArena(holder, place = null) {
         class: 'button button--system',
         text: texts.claim,
         onClick: (event) =>
-          withButton(event.currentTarget, async () => {
-            const answer = await call('POST', '/api/settlement/arena/claim', { week: due.week });
-            apply(answer);
-            toast(texts.claimed);
-          }),
+          withButton(event.currentTarget, () =>
+            orAgain(async () => {
+              const answer = await call('POST', '/api/settlement/arena/claim', { week: due.week });
+              apply(answer);
+              toast(texts.claimed);
+            }),
+          ),
       }),
     );
   }

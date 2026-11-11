@@ -152,7 +152,10 @@ async function rivalsOf(db, row, record) {
 
 // The rivals offered at a look at the Arena: those stored, or, while fewer
 // than rivals.count of them are still fair, new ones drawn around the
-// character's rating, kept only over the record as read.
+// character's rating, kept only over the record as read. When another
+// look drew first (two tabs, or a look still on its way), its draw is the
+// one kept, so the one shown (11.11.2026: else rivals not stored were shown,
+// and each "Walcz" on them was refused).
 async function offeredRivals(db, row, record) {
   const kept = await rivalsOf(db, row, record);
   if (kept.length >= rules().rivals.count) return { record, rivals: kept };
@@ -160,7 +163,11 @@ async function offeredRivals(db, row, record) {
   const drawn = drawRivals(await rivalCandidates(db, row, record.rating, seed), seed, content()).map((one) => one.id);
   if (drawn.length <= kept.length) return { record, rivals: kept };
   const next = { ...record, rivals: JSON.stringify(drawn) };
-  await db.prepare('UPDATE arena_ratings SET rivals = ? WHERE character_id = ? AND rivals = ?').bind(next.rivals, row.id, record.rivals).run();
+  const saved = await db.prepare('UPDATE arena_ratings SET rivals = ? WHERE character_id = ? AND rivals = ?').bind(next.rivals, row.id, record.rivals).run();
+  if (saved.meta.changes !== 1) {
+    const stored = await db.prepare('SELECT * FROM arena_ratings WHERE character_id = ?').bind(row.id).first();
+    if (stored) return { record: stored, rivals: await rivalsOf(db, row, stored) };
+  }
   return { record: next, rivals: await rivalsOf(db, row, next) };
 }
 
@@ -308,8 +315,13 @@ const fighterOf = (player) => ({ character: engineCharacter(player.row), equippe
 // fight written down with its log for the defender's notice and playback,
 // the day's count, this week's table and new rivals around the new rating
 // (the one just fought only when no other is there) are saved in one batch
-// over the record as read. Gives the fight, with its log, and the Arena
-// after it.
+// over the record as read, while the rival is still there and the fight's
+// week is not frozen yet: a fight sent just before Monday's midnight and
+// saved after another look froze its week would miss that week's table for
+// good (11.11.2026); it is refused, and fought again it counts in the new
+// week. The ratings the last fight shows and those the fight keeps are the
+// ones saved, also when a defence moved the character's rating meanwhile.
+// Gives the fight, with its log, and the Arena after it.
 export async function arenaFight(context) {
   const { player } = await requirePlayer(context);
   const { row } = player;
@@ -347,6 +359,8 @@ export async function arenaFight(context) {
     change: changes.attacker,
     fight: duel.fight,
   };
+  const week = arenaWeek(now, content()).key;
+  const ratingNow = '(SELECT rating FROM arena_ratings WHERE character_id = ?)';
   await atomically(
     db,
     [
@@ -354,25 +368,27 @@ export async function arenaFight(context) {
         row.id,
         `${record.day ?? ''}:${record.fights}:${record.rivals}`,
       ]),
+      assertion(db, 'EXISTS (SELECT 1 FROM characters WHERE id = ?) AND NOT EXISTS (SELECT 1 FROM arena_weeks WHERE week = ?)', [rivalId, week]),
       recordStatement(db, rivalId, now),
       db
         .prepare(
-          `UPDATE arena_ratings SET rating = MAX(?, rating + ?), fights = CASE WHEN day = ? THEN fights + 1 ELSE 1 END, day = ?, week = ?, rivals = ?, last_fight = ?
+          `UPDATE arena_ratings SET rating = MAX(?, rating + ?), fights = CASE WHEN day = ? THEN fights + 1 ELSE 1 END, day = ?, week = ?, rivals = ?,
+             last_fight = json_set(?, '$.before', rating, '$.after', MAX(?, rating + ?), '$.change', MAX(?, rating + ?) - rating)
            WHERE character_id = ?`,
         )
-        .bind(floor, changes.attacker, today, today, arenaWeek(now, content()).key, JSON.stringify(next), JSON.stringify(last), row.id),
+        .bind(floor, changes.attacker, today, today, week, JSON.stringify(next), JSON.stringify(last), floor, changes.attacker, floor, changes.attacker, row.id),
       db.prepare('UPDATE arena_ratings SET rating = MAX(?, rating + ?) WHERE character_id = ?').bind(floor, changes.defender, rivalId),
       db
         .prepare(
           `INSERT INTO arena_fights (attacker_id, defender_id, created_at, result, attacker_change, defender_change, attacker_rating, defender_rating, seed, fight)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+           VALUES (?, ?, ?, ?, ?, ?, ${ratingNow}, ${ratingNow}, ?, ?)`,
         )
-        .bind(row.id, rivalId, now, duel.result, changes.attacker, changes.defender, after.attacker, after.defender, seed, JSON.stringify(duel.fight)),
+        .bind(row.id, rivalId, now, duel.result, changes.attacker, changes.defender, row.id, rivalId, seed, JSON.stringify(duel.fight)),
     ],
     changed,
   );
   const saved = await recordOf(db, row, now);
-  return json({ fight: last, arena: await arenaView(db, player, saved, await rivalsOf(db, row, saved), now) });
+  return json({ fight: JSON.parse(saved.last_fight), arena: await arenaView(db, player, saved, await rivalsOf(db, row, saved), now) });
 }
 
 // POST /api/settlement/arena/reroll: other rivals instead of those offered
