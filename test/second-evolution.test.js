@@ -4,7 +4,8 @@
 // and grow to level 95, the stats grow over three spans, the names have a
 // woman's form, the Pustelnik changes it with the first evolution, the art
 // stands in with the first evolution's until it has its own, and every new
-// skill and trait works in fights.
+// skill and trait works in fights. The third forms that grow out of them at
+// 200 have their own tests (third-evolution.test.js).
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -45,7 +46,7 @@ const FORMS = [
   'druid', 'miracle-worker', 'grand-inquisitor', 'high-priest', 'kingslayer', 'necromancer', 'phantom',
 ];
 const firsts = content.evolutions.filter((evolution) => !evolution.from);
-const seconds = content.evolutions.filter((evolution) => evolution.from);
+const seconds = content.evolutions.filter((evolution) => evolution.stage === 2);
 
 // A Barbarzyńca at a class level, its skills at their top by default.
 const barbarian = (classLevel, skills = { 'crushing-blow': 45, 'blood-frenzy': 45 }, extra = {}) => ({
@@ -91,7 +92,7 @@ describe('the second evolution in the engine', () => {
     assert.equal(content.evolutionsById.necromancer.description, 'Trucizna to był tylko początek. Nekromanta nabywa cech nekrotycznych.');
   });
 
-  test('the class waits at 100 while a Skill Point is left, then until the second form is taken; after it only for points at 200', () => {
+  test('the class waits at 100 while a Skill Point is left, then until the second form is taken; after it at 200 for points, then for its third form', () => {
     assert.deepEqual(evolutionBlock(barbarian(99, { 'crushing-blow': 45, 'blood-frenzy': 40 }), content), { code: 'skill_points', level: 100 });
     assert.deepEqual(evolutionBlock(barbarian(100, { 'crushing-blow': 45, 'blood-frenzy': 44 }), content), { code: 'skill_points', level: 100 });
     assert.deepEqual(evolutionBlock(barbarian(100), content), { code: 'evolve', level: 100 });
@@ -109,7 +110,7 @@ describe('the second evolution in the engine', () => {
     const berserker = (classLevel, skills) => barbarian(classLevel, skills, { evolution: 'berserker' });
     assert.ok(applyHunt(berserker(100, { 'shattering-blow': 1, 'berserker-roar': 0 }), hunt, content).classLevel > 100);
     assert.deepEqual(evolutionBlock(berserker(200, { 'shattering-blow': 95, 'berserker-roar': 90 }), content), { code: 'skill_points', level: 200 });
-    assert.equal(evolutionBlock(berserker(200, { 'shattering-blow': 95, 'berserker-roar': 95 }), content), null);
+    assert.deepEqual(evolutionBlock(berserker(200, { 'shattering-blow': 95, 'berserker-roar': 95 }), content), { code: 'evolve', level: 200 });
   });
 
   test('the second form asks for its first evolution, class level 100 and the points spent; the test lifts the level', () => {
@@ -190,8 +191,9 @@ describe('the second evolution in the engine', () => {
     assert.equal(ready.next.skills[0].from, 'Druzgocący cios');
     assert.equal(ready.next.skills[0].effect, 'Cios za 400% obrażeń, który pomija 70% pancerza celu. Cel ma 40% szans stracić 2 najbliższe ruchy.');
     assert.deepEqual(ready.next.growth.map((entry) => `${entry.name} ${entry.value}`), ['Siła 4', 'Witalność 3', 'Wytrzymałość 2']);
+    // The third form comes at 200 (third-evolution.test.js).
     const after = evolutionPanel({ ...barbarian(100), evolution: 'berserker' }, content);
-    assert.deepEqual([after.current.id, after.next, after.nextLevel], ['berserker', null, null]);
+    assert.deepEqual([after.current.id, after.next, after.nextLevel], ['berserker', null, 200]);
   });
 
   test('the Pustelnik changes a second form for another path\'s second form', () => {
@@ -201,7 +203,7 @@ describe('the second evolution in the engine', () => {
 
   test('a second form stands in with its first evolution\'s art, and its skills with those they grow from, until they have their own', async () => {
     const art = evolutionArt(content);
-    assert.equal(Object.keys(art.forms).length, 15);
+    assert.equal(Object.keys(art.forms).filter((id) => content.evolutionsById[id].stage === 2).length, 15);
     assert.equal(art.forms.berserker, 'barbarian');
     assert.equal(art.forms.necromancer, 'poisoner');
     assert.deepEqual(art.skills['shattering-blow'], ['crushing-blow']);
@@ -212,8 +214,11 @@ describe('the second evolution in the engine', () => {
     assert.deepEqual(art.skills['divine-shield'], ['great-blessing']);
     const { SPRITES, artChain, lookIds, riderFile, walkerSheet } = await import('../src/client/art.js');
     const { state } = await import('../src/client/state.js');
-    // Every stand-in has its art already.
-    for (const [id, [stand]] of Object.entries(art.skills)) assert.ok(SPRITES.skills.ids.includes(stand), `${id}: ${stand}`);
+    // Every second form's stand-in has its art already (a third form's
+    // further down its line: third-evolution.test.js).
+    for (const [id, [stand]] of Object.entries(art.skills).filter(([id]) => content.evolutionsById[content.skillsById[id].evolution].stage === 2)) {
+      assert.ok(SPRITES.skills.ids.includes(stand), `${id}: ${stand}`);
+    }
     for (const [form, first] of Object.entries(art.forms)) {
       for (const look of ['female', 'male']) {
         for (const kind of ['portraits', 'walkers', 'riders']) assert.ok(SPRITES[kind].ids.includes(`${first}-${look}`), `${form}: ${kind} ${first}-${look}`);
@@ -601,7 +606,8 @@ describe('the second evolution through the API', () => {
     assert.equal(taken.status, 200, JSON.stringify(taken.data));
     assert.equal(taken.data.character.className, 'Berserker');
     assert.equal(taken.data.character.evolutionUndo, true);
-    assert.deepEqual((await call('GET', '/api/evolution/test', { cookie })).data.evolutions, []);
+    // The test goes on to its third form (third-evolution.test.js).
+    assert.deepEqual((await call('GET', '/api/evolution/test', { cookie })).data.evolutions.map((evolution) => evolution.id), ['horde-slayer']);
     const undone = await call('POST', '/api/evolution/undo', { cookie });
     assert.equal(undone.status, 200, JSON.stringify(undone.data));
     assert.equal(undone.data.character.className, 'Barbarzyńca');

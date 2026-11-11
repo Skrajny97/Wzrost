@@ -63,20 +63,27 @@ function uniqueIds(errors, file, list) {
 // class, of a known class and path, with stats there are and two skills of
 // its own, the first the path's skill grown (from). Each has one second form
 // (from: the evolution it grows out of), of the same class, whose first
-// skill grows one of that evolution's two. Their skills have the numbers
+// skill grows one of that evolution's two, and each second form one third
+// form the same way (where the data has any). Their skills have the numbers
 // their kind needs, an effect text naming only numbers they have, and the
 // points of the class levels after each evolution fill both to the top
 // level with none left (the author's 40 + 50 = 45 + 45, then 90 + 100 =
-// 95 + 95).
+// 95 + 95, then 190 + 100 = 145 + 145).
 function checkEvolutions(data, { classIds, effectIds, elements, stats }) {
   const errors = [];
   const where = (id) => `evolutions.json: ${id}`;
-  const { evolutions, skills, skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms } = data.evolutions;
+  const { evolutions, skills, skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms, thirdForms } = data.evolutions;
   const evolutionIds = uniqueIds(errors, 'evolutions', evolutions);
   const skillIds = uniqueIds(errors, 'evolutions (umiejętności)', skills);
   for (const id of skillIds) if (data.skills.some((skill) => skill.id === id)) errors.push(`${where(id)}: to id ma już umiejętność klasy`);
   const baseById = new Map(data.skills.map((skill) => [skill.id, skill]));
   const evolutionById = new Map(evolutions.map((evolution) => [evolution.id, evolution]));
+  // A form's stage: 1 for a first evolution, one more for each form it
+  // grows out of.
+  const stageOf = (evolution, depth = 0) => {
+    const parent = evolution?.from !== undefined ? evolutionById.get(evolution.from) : null;
+    return parent && depth < 5 ? stageOf(parent, depth + 1) + 1 : 1;
+  };
   const paths = new Set();
   const grown = new Set();
   for (const evolution of evolutions) {
@@ -87,9 +94,10 @@ function checkEvolutions(data, { classIds, effectIds, elements, stats }) {
     if (!ownOk) errors.push(`${where(evolution.id)} ma umiejętność, która nie jest jego`);
     if (evolution.from !== undefined) {
       // A second form: of the class of the evolution it grows out of, one
-      // for each, and only out of a first evolution.
+      // for each, and only out of a first evolution; a third form the same
+      // out of a second one.
       const parent = evolutionById.get(evolution.from);
-      if (!parent || parent.from !== undefined) errors.push(`${where(evolution.id)} wyrasta z "${evolution.from}", a to nie jest pierwsza ewolucja`);
+      if (!parent || stageOf(parent) > 2) errors.push(`${where(evolution.id)} wyrasta z "${evolution.from}", a to nie jest pierwsza ani druga ewolucja`);
       else {
         if (parent.classId !== evolution.classId) errors.push(`${where(evolution.id)} ma inną klasę niż "${evolution.from}"`);
         if (grown.has(evolution.from)) errors.push(`${where(evolution.id)}: z "${evolution.from}" wyrasta już inna ewolucja`);
@@ -106,6 +114,10 @@ function checkEvolutions(data, { classIds, effectIds, elements, stats }) {
   }
   for (const skill of data.skills) if (!paths.has(skill.id)) errors.push(`skills.json: ścieżka ${skill.id} nie ma ewolucji`);
   for (const evolution of evolutions) if (evolution.from === undefined && !grown.has(evolution.id)) errors.push(`${where(evolution.id)} nie ma drugiej ewolucji`);
+  // With third forms in the data, every second form has one.
+  if (evolutions.some((evolution) => stageOf(evolution) === 3)) {
+    for (const evolution of evolutions) if (stageOf(evolution) === 2 && !grown.has(evolution.id)) errors.push(`${where(evolution.id)} nie ma trzeciej ewolucji`);
+  }
   const evolutionSkillIds = new Set(skills.map((skill) => skill.id));
   for (const skill of skills) {
     const at = where(skill.id);
@@ -133,6 +145,22 @@ function checkEvolutions(data, { classIds, effectIds, elements, stats }) {
     errors.push(`evolutions.json: ${before + after} punktów sprzed drugiej ewolucji i ${later} po niej nie dają dwóch umiejętności po ${secondForms.skillMaxLevel} poziomów`);
   }
   if (secondForms.lastPointClassLevel >= (data.balance.progression.classEvolutionLevels[2] ?? Infinity)) errors.push('evolutions.json: ostatni Punkt Umiejętności drugiej ewolucji przychodzi dopiero z trzecią');
+  // The third forms the same: every point back and those of the class
+  // levels after them, up to their last, fill both of their skills.
+  if (thirdForms) {
+    const third = (thirdForms.lastPointClassLevel - secondForms.lastPointClassLevel) * thirdForms.pointsPerClassLevel;
+    if (before + after + later + third !== 2 * thirdForms.skillMaxLevel) {
+      errors.push(`evolutions.json: ${before + after + later} punktów sprzed trzeciej ewolucji i ${third} po niej nie dają dwóch umiejętności po ${thirdForms.skillMaxLevel} poziomów`);
+    }
+    if (thirdForms.lastPointClassLevel >= (data.balance.progression.classEvolutionLevels[3] ?? Infinity)) errors.push('evolutions.json: ostatni Punkt Umiejętności trzeciej ewolucji przychodzi dopiero z czwartą');
+    for (const skill of skills) {
+      const evolution = evolutionById.get(skill.evolution);
+      const rules = [null, null, secondForms, thirdForms][evolution ? stageOf(evolution) : 1];
+      if (rules && skill.from !== undefined && evolutionById.get(evolution.from)?.skills.includes(skill.from) === false) {
+        errors.push(`${where(skill.id)} rozwija "${skill.from}", a to nie jest umiejętność ewolucji "${evolution.from}"`);
+      }
+    }
+  }
   return errors;
 }
 

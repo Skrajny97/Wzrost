@@ -60,6 +60,12 @@
     // class grows past class level 50 as before them. Hidden in the live
     // game in versions 0.0.58–0.0.60, in it from version 0.0.61.
     "EVOLUTIONS": "on",
+    // "on" adds the evolutions' third forms at class level 200
+    // ("Trzecia ewolucja klas", src/server/content.js); "off" keeps the
+    // second forms the last, as before them. Off in the live game until the
+    // author has accepted all their art (portraits, walks, rides, skill
+    // icons and sounds); on in tests and `npm run dev`.
+    "THIRD_EVOLUTION": "off",
     // "on" opens the Osada (src/server/settlement.js) from character level
     // 20: parts I–III, in the live game from version 0.0.68 (the author:
     // "Wdrażaj 0.0.68 z Osadą"). Its auctions settle with the cron below.
@@ -152,6 +158,9 @@
         "EVENTS": "test",
         // The class evolutions, with "Testuj ewolucję" (TUTORIAL_TESTS).
         "EVOLUTIONS": "on",
+        // Their third forms at class level 200, only here until the author
+        // has accepted all their art.
+        "THIRD_EVOLUTION": "on",
         // The Osada (src/server/settlement.js), only here until it is ready.
         "SETTLEMENT": "on",
         // The Warownia (src/server/fortress.js), as in the game.

@@ -15,7 +15,8 @@
 // evolution's two: they start at level 0, take the points back, grow to the
 // evolutions' own top level (a skill's maxLevel) and the class levels after
 // the evolution bring more points for them. The second form (class level
-// 100) does the same once more, with a higher top level.
+// 100) does the same once more, with a higher top level, and so does the
+// third (class level 200).
 
 import { counted, decimalText, word } from './text.js';
 
@@ -35,8 +36,8 @@ export const skillsOfClass = (classId, content) => content.skills.filter((skill)
 export const topLevel = (skill, content) => skill.maxLevel ?? content.balance.skills.maxLevel;
 
 // The stage of the character's evolution: 0 without one, 1 after the first,
-// 2 after its second form. An evolution the deployment has off counts as a
-// first one.
+// 2 after its second form, 3 after its third. An evolution the deployment
+// has off counts as a first one.
 export const evolutionStage = (character, content) => (character.evolution ? (content.evolutionsById[character.evolution]?.stage ?? 1) : 0);
 
 // The rules of each evolution stage's skills and points, the first one's
@@ -65,7 +66,8 @@ export function skillPoints(character, content) {
   let earned = Math.max(0, Math.min(character.classLevel, lastPointClassLevel) - unlockClassLevel + 1) * pointsPerClassLevel;
   // After each evolution the class levels up to its last point bring more
   // (the author: 40 back and 50 of class levels 50–99, 45 + 45; after the
-  // second form 90 back and 100 of class levels 100–199, 95 + 95).
+  // second form 90 back and 100 of class levels 100–199, 95 + 95; after the
+  // third 190 back and 100 of class levels 200–299, 145 + 145).
   let last = lastPointClassLevel;
   for (const rules of stagesOf(content).slice(0, evolutionStage(character, content))) {
     earned += Math.max(0, Math.min(character.classLevel, rules.lastPointClassLevel) - last) * rules.pointsPerClassLevel;
@@ -154,9 +156,10 @@ export function skillsBlock(character, content) {
 // (skillsBlock), and when they are, until the evolution is chosen (evolve).
 // After it, at the next evolution level while a Skill Point is left (the
 // author, E8), and then until the second form is taken (evolve); after the
-// second form, at the level after it while a point is left. The class
-// waits there (applyHunt); a class already past the level waits for
-// nothing.
+// second form the same at 200 for its third form, where the deployment has
+// one, and after the last form, at the level after it while a point is
+// left. The class waits there (applyHunt); a class already past the level
+// waits for nothing.
 export function evolutionBlock(character, content) {
   const levels = content.balance.progression.classEvolutionLevels;
   if (character.evolution) {

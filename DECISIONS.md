@@ -3034,6 +3034,35 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Trzecia ewolucja klas: mechanika (11.11.2026, na wersji testowej)
+
+Opisy, cechy i umiejętności trzecich form zatwierdził autor (815 z 815.4 v2 i 815.5 v2, 812 A i 819 A). Dane są w `data/evolutions.json` (trzecia forma ma w `from` drugą formę, a `thirdForms` podaje zasady punktów), zasady w `src/engine/evolutions.js` i `src/engine/combat.js`. Liczby umiejętności i cech to brakujące szczegóły, ustawione w symulacji (punkt 9).
+
+1. **Na razie tylko na wersji testowej.** Trzecie formy włącza zmienna `THIRD_EVOLUTION` (`wrangler.jsonc`): „off” w grze, „on” na wersji testowej, w `npm run dev` i w testach. Wyłączona chowa trzecie formy z treści gry, a druga forma czeka wtedy na 200. poziomie klasy tylko na rozdanie punktów, jak dotąd. Do gry trzecia ewolucja wejdzie dopiero z pełną grafiką: chodami, jazdą, ikonami, dźwiękami i portretem Proroka.
+2. **Jedna dalsza forma na 200. poziomie klasy.** Każda z 15 drugich form ma jedną trzecią formę, bez wyboru: Pogromca Hord, Legenda Areny, Kolos, Mistrz Łuku, Wybraniec Peruna, Władca Puszczy, Awatar Żywiołów, Lodowy Król, Arcydruid, Święty, Pogromca Demonów, Prorok, Bogobójca, Licz i Władca Cieni. Legenda Areny, Kolos, Awatar Żywiołów i Licz mają jedną nazwę dla obu płci. Zakładka Ewolucja, potwierdzenie, ceremonia, czekanie klasy na 200. poziomie (dopóki zostaje Punkt Umiejętności, a potem do przyjęcia formy), nazwy żeńskie, Pustelnik i brak darmowego zerowania statystyk działają jak przy drugiej ewolucji.
+3. **Umiejętności i punkty.** Obie umiejętności drugiej formy ustępują dwóm nowym na poziomie 0, a ich 190 punktów wraca. Poziomy klasy od 200. do 299. dają po punkcie, razem 290 na dwie umiejętności po 145 poziomów. Po trzeciej formie klasa czeka na 300. poziomie tylko na rozdanie punktów, a dalej rośnie bez czekania.
+4. **Statystyki.** Od 201. poziomu klasy rośnie przyrost trzeciej formy, o 2 punkty na poziom większy niż drugiej. Arcydruid ma 5 HP i 6 many na poziom klasy, a pozostałe formy mają HP i manę formy przed nimi. Pogromca Demonów rośnie w Witalność zamiast w Siłę, bo Siła nic Klerykowi w walce nie daje.
+5. **Testuj ewolucję.** Na wersji testowej postać z drugą formą wypróbuje trzecią na dowolnym poziomie klasy, a „Ustaw 200. poziom klasy” podnosi jej poziom klasy i zostawia drugą formę. „Cofnij ewolucję” wraca do stanu sprzed pierwszego testu.
+6. **Grafika zastępcza.** Portrety 29 trzecich form są w grze, a Prorok ma na razie portret Arcykapłana. Dopóki chody i jazda nie są gotowe, trzecia forma ma te drugiej formy. Umiejętność ma ikonę, dźwięk i wygląd w walce umiejętności drugiej formy, z której wyrasta albo na której miejscu stoi, a gdy tamta ich nie ma, umiejętności pierwszej ewolucji. Gotowe pliki wystarczy dopisać do list w `src/client/art.js` i do `data/sounds.json`.
+7. **Walka: szczegóły, których opisy nie rozstrzygały.**
+   - Miażdżący cios i Trzęsienie ziemi ogłuszają z szansą, jak Kruszący cios. Trzęsienie ziemi ogłusza tylko wrogów z pierwszego rzędu.
+   - Lodowy grobowiec, Pieczęć świętości i Krwawy znak zadają też cios, bo sam znak marnował ruch postaci. Grobowiec zamyka w lodzie wroga z największym HP, a ten dostaje więcej obrażeń, dopóki znów się nie ruszy.
+   - Lodowa nawałnica także spowalnia trafionych. Wieczny lód: każdy ruch wychłodzonego wroga przepada z szansą 30%. Bez tego Lodowy Król bronił się słabiej od Pana Zimy, który ma Lodową zbroję.
+   - Niezdobyty: Kolos przyjmuje 35% ciosów wymierzonych w innych z drużyny. Blok tarczą z Twierdzy odpada, bo opis Kolosa go nie podaje.
+   - Serce puszczy: Arcydruid ma naraz dąb i żubra, a w odtwarzaniu walki każdy przywołaniec ma swoją kartę.
+   - Armia umarłych przywołuje jednego szkieletowego rycerza na 4 ruchy, z większym HP i mocniejszym ciosem niż szkielet wojownik.
+   - Cudowne ocalenie podnosi poległego z 40% maks. HP. Proroctwo daje drużynie na start +24% pancerza i odporności oraz +13% obrażeń.
+   - Ostatni cios: po zabiciu wroga własnym ciosem postać od razu rusza się jeszcze raz.
+   - Opisy cech podają liczby, których brakowało (np. „35% ciosów”, „z szansą 30%”), i to, co forma dziedziczy po drugiej formie.
+8. **Arena.** Gdy w pojedynku stoi trzecia forma, obie strony mają 1,4 raza więcej HP pojedynku (`arena.duel.thirdFormHp` w `data/settlement.json`). Bez tego pojedynki z trzecimi formami trwały średnio 13 ruchów.
+9. **Balans.** Gracz realistyczny z `tools/difficulty-sim.mjs` z drugą formą (dane bez trzecich form) i z trzecią, na tej samej ścieżce i tym samym poziomie.
+   - Wyprawy (`tools/class-balance-sim.mjs`): 120 czterogodzinnych wypraw na ścieżkę w najnowszym miejscu na 200. poziomie. Bez towarzyszy trzecie formy mdleją w 0–10% wypraw (drugie formy w 0–34%) i kończą je z 68–100% HP (drugie z 46–93%). Z towarzyszami mdleją w 0–2% wypraw i kończą je z 84–100% HP.
+   - Arena (`tools/pvp-arena-sim.mjs`): na 200. poziomie każda trzecia forma wygrywa 29–67% pojedynków z pozostałymi ścieżkami (drugie formy 0–69%), a klasy na głównych ścieżkach 36–63%. Pojedynek trwa średnio 19–25 ruchów, a sędzia kończy 4–7% z nich.
+   - Wyjątki. Lodowy Król bez towarzyszy kończy wyprawy z mniejszym HP niż Pan Zimy (73% wobec 79%), ale nie mdleje i zabija o 71% szybciej, a z towarzyszami kończy je z większym HP. Pogromca Demonów wygrywa najmniej pojedynków (29% na 200. poziomie, 20% na 300.), bo ścieżka Inkwizytora zostaje słabsza w pojedynkach (779 A); Wielki Inkwizytor wygrywał 0%. Prorok bez towarzyszy mdleje tylko trochę rzadziej od Arcykapłana (9% wobec 11% wypraw).
+   - `test/third-evolution.test.js` pilnuje, by każda trzecia forma mdlała nie częściej niż jej druga forma i kończyła wyprawy z większym HP albo zabijała co najmniej o 15% szybciej, a w Arenie wygrywała 25–75% pojedynków.
+10. **Teksty.** Zdania fabularne pod nazwami 30 umiejętności i nowe zdania dziennika walki są robocze. Angielskie powstały razem z polskimi.
+11. **Migracja bazy:** brak.
+
 ## Wersja 0.2.61 (11.11.2026): ekran zakupu Punktów Systemu (810), na razie tylko dla konta autora
 
 1. **Co wchodzi do gry:** ekran „Kup Punkty Systemu” ze Sklepu Systemu (`#/sklep/punkty`), jak na przyjętych makietach 810.1–810.7: cztery pakiety po dwa w rzędzie, pola regulaminu i 18+, przycisk „Kupuję i płacę …”, oczekiwanie na płatność po powrocie z Autopay, historia zakupów z „Odstąp od umowy” przez 14 dni i wyszarzone pakiety ponad limit kwartału. Widzi go tylko konto autora (`PAYMENTS_FOR` „authors”); bez kluczy Autopay w sekretach gra pisze, że zakup nie jest jeszcze dostępny.

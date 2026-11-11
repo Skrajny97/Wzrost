@@ -78,6 +78,13 @@ export const SPRITES = {
       'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
+      // The third forms at class level 200 (DECISIONS.md, „Trzecia ewolucja
+      // klas”), as the author accepted them (811); the Prorok waits for his.
+      'horde-slayer-female', 'horde-slayer-male', 'arena-legend-female', 'arena-legend-male', 'colossus-female', 'colossus-male',
+      'bow-master-female', 'bow-master-male', 'perun-chosen-female', 'perun-chosen-male', 'wild-lord-female', 'wild-lord-male',
+      'elemental-avatar-female', 'elemental-avatar-male', 'frost-monarch-female', 'frost-monarch-male', 'archdruid-female', 'archdruid-male',
+      'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'godslayer-female', 'godslayer-male',
+      'lich-female', 'lich-male', 'shadow-lord-female', 'shadow-lord-male',
       // The outfits of the Sklep Systemu (skórki, 763 A), <look>-<appearance>.
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
@@ -94,6 +101,11 @@ export const SPRITES = {
       'archmage-female': 49, 'archmage-male': 51, 'winter-lord-female': 51, 'winter-lord-male': 49, 'druid-female': 50, 'druid-male': 49,
       'miracle-worker-female': 47, 'miracle-worker-male': 43, 'grand-inquisitor-female': 50, 'high-priest-female': 50, 'kingslayer-female': 55,
       'kingslayer-male': 54, 'necromancer-female': 44, 'necromancer-male': 49, 'phantom-male': 45,
+      'horde-slayer-male': 50, 'arena-legend-female': 50, 'arena-legend-male': 50, 'colossus-female': 49, 'bow-master-male': 50,
+      'perun-chosen-female': 50, 'perun-chosen-male': 51, 'wild-lord-female': 50, 'wild-lord-male': 50, 'elemental-avatar-female': 54,
+      'elemental-avatar-male': 52, 'frost-monarch-female': 51, 'frost-monarch-male': 50, 'archdruid-female': 53, 'archdruid-male': 49,
+      'saint-female': 47, 'saint-male': 51, 'demon-slayer-female': 51, 'demon-slayer-male': 52, 'prophet-female': 49, 'godslayer-female': 50,
+      'godslayer-male': 52, 'lich-female': 52, 'lich-male': 50, 'shadow-lord-female': 50, 'shadow-lord-male': 50,
       'skin-night-raven-female': 50, 'skin-night-raven-male': 51, 'skin-forest-lord-female': 51, 'skin-forest-lord-male': 52,
       'skin-perun-female': 49, 'skin-perun-male': 49,
       'skin-dawn-female': 48, 'skin-dawn-male': 52, 'skin-eclipse-female': 50, 'skin-eclipse-male': 50,
@@ -114,6 +126,13 @@ export const SPRITES = {
       'miracle-worker-female': [33, 35], 'miracle-worker-male': [31, 34], 'grand-inquisitor-female': [34, 30], 'grand-inquisitor-male': [33, 29],
       'high-priest-female': [34, 35], 'high-priest-male': [32, 35], 'kingslayer-female': [37, 33], 'kingslayer-male': [34, 30],
       'necromancer-female': [30, 38], 'necromancer-male': [37, 32], 'phantom-female': [36, 35], 'phantom-male': [39, 42],
+      'horde-slayer-female': [33, 30], 'horde-slayer-male': [35, 27], 'arena-legend-female': [36, 30], 'arena-legend-male': [37, 30],
+      'colossus-female': [34, 32], 'colossus-male': [33, 29], 'bow-master-female': [35, 32], 'bow-master-male': [37, 31],
+      'perun-chosen-female': [38, 30], 'perun-chosen-male': [36, 30], 'wild-lord-female': [36, 30], 'wild-lord-male': [35, 30],
+      'elemental-avatar-female': [40, 32], 'elemental-avatar-male': [39, 30], 'frost-monarch-female': [36, 32], 'frost-monarch-male': [35, 29],
+      'archdruid-female': [40, 41], 'archdruid-male': [35, 35], 'saint-female': [37, 34], 'saint-male': [38, 31], 'demon-slayer-female': [38, 21],
+      'demon-slayer-male': [37, 25], 'prophet-female': [40, 35], 'godslayer-female': [35, 37], 'godslayer-male': [37, 37], 'lich-female': [40, 30],
+      'lich-male': [38, 32], 'shadow-lord-female': [38, 34], 'shadow-lord-male': [38, 31],
       'skin-night-raven-female': [33, 40], 'skin-night-raven-male': [33, 38], 'skin-forest-lord-female': [37, 41], 'skin-forest-lord-male': [38, 40],
       'skin-perun-female': [32, 38], 'skin-perun-male': [34, 40],
       'skin-dawn-female': [36, 40], 'skin-dawn-male': [36, 38], 'skin-eclipse-female': [38, 36], 'skin-eclipse-male': [38, 34],
@@ -129,6 +148,9 @@ export const SPRITES = {
       // shoulder where the raven perches: it sits on the other shoulder.
       raven: {
         'hunter-female': [5, 13], 'hunter-male': [9, 12],
+        // The Władczyni Puszczy's eagle sits on the shoulder where the raven
+        // perches: it sits on the other one, on the white wolf's pelt.
+        'wild-lord-female': [56, 14],
         'skin-dawn-female': [51, 14], 'skin-dawn-male': [50, 12], 'skin-eclipse-female': [49, 10], 'skin-eclipse-male': [49, 8],
       },
       wisp: {
@@ -151,6 +173,11 @@ export const SPRITES = {
       'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
+      'horde-slayer-female', 'horde-slayer-male', 'arena-legend-female', 'arena-legend-male', 'colossus-female', 'colossus-male',
+      'bow-master-female', 'bow-master-male', 'perun-chosen-female', 'perun-chosen-male', 'wild-lord-female', 'wild-lord-male',
+      'elemental-avatar-female', 'elemental-avatar-male', 'frost-monarch-female', 'frost-monarch-male', 'archdruid-female', 'archdruid-male',
+      'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'godslayer-female', 'godslayer-male',
+      'lich-female', 'lich-male', 'shadow-lord-female', 'shadow-lord-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
@@ -535,9 +562,11 @@ function sprite(kind, id, className) {
   });
 }
 
-// The ids a second form's skill stands in with until it has its own art
-// (the server's evolutionArt): the skill itself first, then the skill it grew
-// from, or the first evolution's skill in its place. Any other skill: itself.
+// The ids a second or third form's skill stands in with until it has its
+// own art (the server's evolutionArt): the skill itself first, then the
+// skill it grew from, or the earlier form's skill in its place, and so on
+// back to the first evolution's (a third form's through its second form's).
+// Any other skill: itself.
 export const artChain = (skillId) => [skillId, ...(state.content?.evolutionArt?.skills?.[skillId] ?? [])];
 
 // The first of `ids` with a sprite of `kind`.
@@ -551,8 +580,9 @@ const firstSprite = (kind, ids, className) => {
 
 export const monsterSprite = (monsterId) => sprite('monsters', monsterId, 'sprite--monster');
 // The figure a summoning skill puts in fights: its own, else the creature
-// it calls (`figure`: a wolf, a bear, a skeleton, as the creatures are
-// drawn), else that of the skill it stands in with.
+// it calls (`figure`: a wolf, a bear, a skeleton, the white wolf as the
+// Basior, the bison as the Tur, as the creatures are drawn), else that of
+// the skill it stands in with (the ancient oak: the ent's, the elemental).
 export function summonSprite(skillId, figure) {
   const [own, ...stand] = artChain(skillId);
   return sprite('summons', own, 'sprite--summon') ?? (figure ? sprite('monsters', figure, 'sprite--summon') : null) ?? firstSprite('summons', stand, 'sprite--summon');
@@ -560,7 +590,8 @@ export function summonSprite(skillId, figure) {
 export const itemSprite = (item) => sprite('items', item.base, 'sprite--item');
 // A material, a part ("scraps") or the chest ("chest").
 export const materialSprite = (id) => sprite('materials', id, 'sprite--item');
-// A skill's icon, a second form's skill's stand-in until it has its own.
+// A skill's icon, a second or third form's skill's stand-in until it has
+// its own.
 export const skillSprite = (id) => firstSprite('skills', artChain(id), 'sprite--skill');
 export const areaSprite = (areaId) => sprite('areas', areaId, 'area-art');
 // The address of a land's background, or null while it has none.
@@ -683,9 +714,9 @@ const toned = new Set([...SPRITES.portraits.toned, ...SPRITES.portraits.tonedEvo
 const outfitLook = (id) => (id ? (state.content?.cosmetics?.items.find((item) => item.id === id && item.kind === 'outfit')?.look ?? null) : null);
 
 // The ids a look is drawn under, best first: the outfit's worn (`outfit`,
-// the cosmetic's id), the evolution's, then for a second form without its
-// own art yet its first evolution's (the server's evolutionArt), then the
-// class's.
+// the cosmetic's id), the evolution's, then for a second or third form
+// without its own art yet the forms it grew out of, the nearest first (the
+// server's evolutionArt), then the class's.
 export function lookIds(classId, appearance, evolution, outfit = null) {
   const look = outfitLook(outfit);
   const ids = look ? [`${look}-${appearance}`] : [];

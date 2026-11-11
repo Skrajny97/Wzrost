@@ -1,8 +1,8 @@
 // The author's preview of a skill's animation: a short recorded fight of a
 // character of its class, at level 20 with the skill at level 10 (an
 // evolution's skill: of the evolution, at level 60 with the skill at 20; a
-// second form's: at level 110 with the skill at 40), against foes that show
-// the skill off. It is never part of the game: the author's panel plays it
+// second form's: at level 110 with the skill at 40; a third form's: at level
+// 210 with the skill at 60), against foes that show the skill off. It is never part of the game: the author's panel plays it
 // to check how each skill looks.
 
 import { simulateFight } from './combat.js';
@@ -18,6 +18,7 @@ const SKILL_LEVEL = 10;
 const EVOLVED = [
   { level: 60, skill: 20 },
   { level: 110, skill: 40 },
+  { level: 210, skill: 60 },
 ];
 // Kinds whose show needs a group of foes.
 const GROUP_KINDS = new Set(['sweep', 'whirl']);

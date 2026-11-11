@@ -5,7 +5,8 @@
 // paths' evolutions to choose one from, for good; after the choice, the
 // evolution's card and when the next one comes. At class level 100, once
 // the points are spent, the card of the one form the evolution grows into,
-// to take; after it, that form's card. The choice and the ceremony are in
+// to take; after it, that form's card; at 200 the same for the third form,
+// where the deployment has it. The choice and the ceremony are in
 // evolution.js.
 
 import { placeArt } from '../art.js';
