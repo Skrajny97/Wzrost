@@ -793,7 +793,127 @@
       "black-venom": "dagger dripping thick black venom with dark green smoke, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
       "toxic-slime": "bubbling green toxic slime blob with glowing eyes and dripping poison, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
       "blade-dance": "two steel daggers spinning around each other in a circle, leaving bright violet trails, dynamic whirling motion, fantasy RPG skill icon, bold readable shape, no background, isolated on a plain flat background",
-      "shadow-whirl": "dark violet whirlwind of shadows with small blades spinning inside, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background"
+      "shadow-whirl": "dark violet whirlwind of shadows with small blades spinning inside, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "smashing-blow": "a huge double-bladed war axe smashing down into cracked stone, rubble flying and an orange shockwave ring rolling through two rows, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "slaughter": "a giant blood-stained battle axe cleaving in a wide red arc, splatters of blood and a dark red rage glow, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "steel-hurricane": "a sword spinning twice inside a double whirlwind of steel, red drops of blood flying off its edges, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "cheers": "a golden laurel wreath above a raised gladiator sword, golden rays and sparks bursting up like a cheering crowd, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "unbroken": "a massive tower shield glowing with golden light, a green healing aura around it and small arrows bouncing off, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "earthquake": "a heavy shield slammed into the ground, the earth cracking open in jagged lines with flying rocks and a dust shockwave, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "master-shot": "a glowing arrow flying straight through three targets in a row, leaving a long bright white and blue trail, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "steady-hand": "a fully drawn bow with an arrow aimed at the centre of a bullseye target, a calm green glow and a small white star of a critical hit, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "perun-wrath": "several jagged lightning bolts striking down from a dark storm cloud and arcing from one to the next, bright white and blue, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "thunder-sign": "a glowing six-petal Slavic thunder rosette (hexafoil) drawn in the air with crackling blue lightning lines, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "pack-leader": "a great white wolf howling at the moon, pale blue sound waves around its head, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "eagle-talon": "a golden eagle diving down with its talons outstretched in front, sharp claws, dynamic downward motion, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "cataclysm": "three comets of fire, ice and lightning crashing down together, red, blue and yellow trails, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "elemental-shield": "a round glowing magic shield with a flame, ice crystals and lightning swirling around its rim, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "ice-storm": "a storm of sharp ice shards and hail falling from a frosty swirl, pale blue and white, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "ice-tomb": "a dark figure frozen solid inside a tall block of blue ice, cracks of frost around it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "oak-awakening": "an ancient oak tree with a stern face in its bark, glowing green eyes and mighty root arms rising from the ground, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "bison-call": "a charging European bison with lowered horns and a dark brown shaggy mane, clouds of dust behind it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "miraculous-healing": "two open hands holding a glowing green sprout, golden rays of light and small sparkles of healing, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "holy-light": "a burst of radiant white and gold holy light with a four-pointed star in the middle and rays spreading in all directions, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "last-judgment": "a great golden sword pointing down, wreathed in white holy flames, a radiant halo behind it, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "holy-seal": "a round golden seal with a sun symbol pressed into red wax, glowing with holy light, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "hymn": "an open hymn book with glowing golden music notes rising above it like a choir of light, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "vision": "a single wide open eye glowing gold inside a sun-like halo with rays, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "final-blow": "a dark executioner blade cutting through a red crosshair with a flash shaped like a skull, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "blood-mark": "a bloody red rune dripping blood inside a thin red target circle, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "army-of-dead": "a skeleton knight with a rusty helmet, shield and sword rising from a grave in green glowing mist, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "death-touch": "a bony hand reaching out with green poison smoke, red drops of life flowing back into its palm, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "shadow-storm": "many dark violet daggers whirling in a storm of shadows with purple trails, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background",
+      "eclipse": "a black moon covering the sun in an eclipse, a thin ring of violet and gold light around its edge, fantasy RPG skill icon, bold readable shape, isolated on a plain flat background"
+    },
+    "pixellab": {
+      "$comment": "Ikony umiejętności trzecich form (PixelLab, rodzaj skills-pixellab): wzorem stylu jest przyjęta ikona umiejętności z pierwszej ewolucji, a rozwinięta umiejętność ma za wzór ikonę umiejętności, z której wyrasta, mocniejszą i okazalszą.",
+      "style": "src/client/art/skills/riposte.png",
+      "references": {
+        "smashing-blow": [
+          {
+            "path": "src/client/art/skills/crushing-blow.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "steel-hurricane": [
+          {
+            "path": "src/client/art/skills/millstone.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "unbroken": [
+          {
+            "path": "src/client/art/skills/indomitable.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "master-shot": [
+          {
+            "path": "src/client/art/skills/piercing-shot.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "perun-wrath": [
+          {
+            "path": "src/client/art/skills/storm-cloud.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "eagle-talon": [
+          {
+            "path": "src/client/art/skills/falcon.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "cataclysm": [
+          {
+            "path": "src/client/art/skills/elemental-ray.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "elemental-shield": [
+          {
+            "path": "src/client/art/skills/mana-mirror.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "ice-storm": [
+          {
+            "path": "src/client/art/skills/blizzard.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "miraculous-healing": [
+          {
+            "path": "src/client/art/skills/renewal.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "last-judgment": [
+          {
+            "path": "src/client/art/skills/verdict.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "hymn": [
+          {
+            "path": "src/client/art/skills/psalm.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "final-blow": [
+          {
+            "path": "src/client/art/skills/execution.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ],
+        "shadow-storm": [
+          {
+            "path": "src/client/art/skills/shadow-whirl.png",
+            "usage": "the same motif and colours as this skill icon, drawn grander and more powerful as its upgraded form"
+          }
+        ]
+      }
     }
   },
   "areas": {
