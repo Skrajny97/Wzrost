@@ -155,6 +155,12 @@ describe('payments through the test gateway', () => {
     return response.status;
   }
   const paid = (orderId, more = {}) => notify({ orderId, ref: `test-${orderId}`, status: 'paid', amount: 499, currency: 'PLN', ...more });
+  // The author's account (AUTHOR_LOGINS, signed in with Google).
+  async function authorCookie() {
+    const { cookie: author } = await signUp('szef');
+    await (await db()).prepare("UPDATE users SET google_sub = 'szef' WHERE login = 'szef'").run();
+    return author;
+  }
 
   test('the shop shows the packs, the limit and nothing bought yet', async () => {
     const { status, data } = await call('GET', '/api/payments', { cookie });
@@ -274,12 +280,125 @@ describe('payments through the test gateway', () => {
       .prepare('UPDATE purchases SET created_at = created_at - ? WHERE public_id = ?')
       .bind((rules.pendingHours + 1) * HOUR, data.orderId)
       .run();
+    // The character was there before its order, as it always is.
+    await (await db()).prepare("UPDATE characters SET created_at = created_at - ? WHERE name = 'Kupiec'").bind((rules.pendingHours + 2) * HOUR).run();
     const shop = (await call('GET', '/api/payments', { cookie })).data;
     assert.equal(shop.purchases[0].status, 'expired');
     assert.equal(shop.spent, 0);
     assert.equal(await paid(data.orderId), 200);
     assert.equal((await purchase(data.orderId)).status, 'paid');
     assert.deepEqual(await points(), { system_points: 350, system_points_paid: 250 });
+  });
+
+  test('orders at once never pass the limit of the last days together', async () => {
+    const all = await Promise.all(Array.from({ length: 16 }, () => order({ packId: 'ps-2500' })));
+    const made = all.filter((one) => one.status === 201).length;
+    const refused = all.filter((one) => one.status === 409);
+    assert.equal(made + refused.length, 16);
+    assert.ok(refused.every((one) => one.data.error.code === 'monthly_limit'), JSON.stringify(refused.map((one) => one.data.error.code)));
+    const { sum } = await (await db()).prepare("SELECT SUM(price) AS sum FROM purchases WHERE status = 'pending'").first();
+    assert.ok(sum <= rules.monthlyLimit, `${sum} > ${rules.monthlyLimit}`);
+    assert.equal(made, Math.floor(rules.monthlyLimit / 4999));
+  });
+
+  test('an order whose try of paying failed still counts against the limits while it can be paid', async () => {
+    const made = [];
+    for (let i = 0; i < 8; i += 1) made.push((await order({ packId: 'ps-2500' })).data.orderId);
+    for (const id of made) assert.equal(await notify({ orderId: id, ref: `f-${id}`, status: 'failed', amount: 4999, currency: 'PLN' }), 200);
+    assert.ok((await Promise.all(made.map(purchase))).every((one) => one.status === 'failed'));
+    assert.equal((await order({ packId: 'ps-2500' })).data.error.code, 'monthly_limit');
+    assert.equal((await call('GET', '/api/payments', { cookie })).data.spent, 8 * 4999);
+    // Paid another way after all: each once.
+    for (const id of made) await paid(id, { ref: `s-${id}`, amount: 4999 });
+    assert.deepEqual(await points(), { system_points: 100 + 8 * 2500, system_points_paid: 8 * 2500 });
+  });
+
+  test("a second payment of an order already paid credits nothing and waits for the author to give it back", async () => {
+    const { data } = await order();
+    assert.equal(await paid(data.orderId, { ref: 'R1' }), 200);
+    assert.equal(await paid(data.orderId, { ref: 'R2' }), 200);
+    assert.equal(await paid(data.orderId, { ref: 'R2' }), 200);
+    assert.deepEqual(await points(), { system_points: 350, system_points_paid: 250 });
+    assert.equal((await purchase(data.orderId)).provider_ref, 'R1');
+    const author = await authorCookie();
+    let record = (await call('GET', '/api/author/payments', { cookie: author })).data;
+    assert.equal(record.extras.length, 1);
+    assert.deepEqual([record.extras[0].orderId, record.extras[0].ref, record.extras[0].amount, record.extras[0].status], [data.orderId, 'R2', 499, 'paid']);
+    // Given back through the gateway (the test gateway does it at once).
+    record = (await call('POST', '/api/author/payments/action', { cookie: author, body: { orderId: data.orderId, action: 'extra_refund', extraId: record.extras[0].id } })).data;
+    assert.deepEqual([record.extras[0].status, record.extras[0].refundState], ['refunded', 'done']);
+    assert.equal((await purchase(data.orderId)).status, 'paid');
+    assert.equal((await call('POST', '/api/author/payments/action', { cookie, body: { orderId: data.orderId, action: 'refund_done' } })).status, 404);
+  });
+
+  test('a refund the gateway does not take waits for the author: asked again, restored or marked done', async () => {
+    const author = await authorCookie();
+    const act = (orderId, action) => call('POST', '/api/author/payments/action', { cookie: author, body: { orderId, action } });
+    const { data } = await order();
+    await paid(data.orderId, { ref: 'refuse-1' });
+    const back = await call('POST', '/api/payments/withdraw', { cookie, body: { orderId: data.orderId } });
+    assert.equal(back.data.purchase.status, 'refunding');
+    assert.deepEqual(await points(), { system_points: 100, system_points_paid: 0 });
+    let record = (await call('GET', '/api/author/payments', { cookie: author })).data;
+    assert.deepEqual(
+      record.waiting.map((one) => [one.id, one.status, one.refundState]),
+      [[data.orderId, 'refunding', 'refused']],
+    );
+    record = (await act(data.orderId, 'refund_again')).data;
+    assert.equal(record.waiting[0].refundState, 'refused');
+    // The refund cannot be made: the purchase stays, its points back.
+    record = (await act(data.orderId, 'restore')).data;
+    assert.deepEqual(record.waiting, []);
+    assert.equal((await purchase(data.orderId)).status, 'paid');
+    assert.deepEqual(await points(), { system_points: 350, system_points_paid: 250 });
+    assert.equal((await act(data.orderId, 'restore')).data.error.code, 'wrong_state');
+    // Taken by the gateway and done later: the author marks it done.
+    const later = (await order()).data.orderId;
+    await paid(later, { ref: 'later-1' });
+    await call('POST', '/api/payments/withdraw', { cookie, body: { orderId: later } });
+    assert.equal((await purchase(later)).refund_state, 'asked');
+    await act(later, 'refund_done');
+    assert.equal((await purchase(later)).status, 'refunded');
+  });
+
+  test("a purchase refunded in the gateway's own panel has its points taken back by the author", async () => {
+    const author = await authorCookie();
+    const { data } = await order();
+    await paid(data.orderId);
+    const record = (await call('POST', '/api/author/payments/action', { cookie: author, body: { orderId: data.orderId, action: 'take_back' } })).data;
+    assert.equal(record.purchases.find((one) => one.id === data.orderId).status, 'refunded');
+    assert.deepEqual(await points(), { system_points: 100, system_points_paid: 0 });
+    assert.equal((await call('POST', '/api/author/payments/action', { cookie: author, body: { orderId: data.orderId, action: 'take_back' } })).data.error.code, 'wrong_state');
+  });
+
+  test('a payment never credits a character or an account that took the id of a deleted one', async () => {
+    // Alicja's character is the newest; deleted, its id is given again.
+    const { cookie: alicja } = await signUp('alicja');
+    await call('POST', '/api/character', { cookie: alicja, body: { name: 'Alicja', classId: 'warrior', appearance: 'female' } });
+    const ordered = await call('POST', '/api/payments/order', { cookie: alicja, body: { packId: 'ps-250', terms: true, adult: true } });
+    assert.equal(ordered.status, 201);
+    const old = await (await db()).prepare("SELECT id, user_id FROM characters WHERE name = 'Alicja'").first();
+    assert.equal((await call('DELETE', '/api/character', { cookie: alicja })).status, 200);
+    assert.equal((await call('POST', '/api/character', { cookie: alicja, body: { name: 'Alicja Druga', classId: 'mage', appearance: 'female' } })).status, 201);
+    const second = await (await db()).prepare("SELECT id FROM characters WHERE name = 'Alicja Druga'").first();
+    assert.equal(second.id, old.id);
+    assert.equal(await paid(ordered.data.orderId), 200);
+    assert.deepEqual(await (await db()).prepare("SELECT system_points, system_points_paid FROM characters WHERE name = 'Alicja Druga'").first(), { system_points: 0, system_points_paid: 0 });
+    const stored = await purchase(ordered.data.orderId);
+    assert.deepEqual([stored.status, stored.character_id], ['paid', -old.id]);
+    // Alicja's account deleted: a new account with its id sees none of it.
+    assert.equal((await call('DELETE', '/api/me', { cookie: alicja, body: { login: 'alicja' } })).status, 200);
+    const { cookie: bartek } = await signUp('bartek');
+    const user = await (await db()).prepare("SELECT id FROM users WHERE login = 'bartek'").first();
+    assert.equal(user.id, old.user_id);
+    await call('POST', '/api/character', { cookie: bartek, body: { name: 'Bartek', classId: 'mage', appearance: 'male' } });
+    const shop = (await call('GET', '/api/payments', { cookie: bartek })).data;
+    assert.deepEqual([shop.purchases, shop.spent], [[], 0]);
+    assert.equal((await call('POST', '/api/payments/withdraw', { cookie: bartek, body: { orderId: ordered.data.orderId } })).data.error.code, 'not_withdrawable');
+    assert.equal((await purchase(ordered.data.orderId)).user_id, -old.user_id);
+    // The author sees it waiting: paid, its character gone.
+    const author = await authorCookie();
+    assert.ok((await call('GET', '/api/author/payments', { cookie: author })).data.waiting.some((one) => one.id === ordered.data.orderId));
   });
 
   test('only the author sees the record of the sales', async () => {

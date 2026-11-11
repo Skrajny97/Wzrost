@@ -253,6 +253,11 @@ async function removeAccount(db, session, now) {
     ...marketRemoval(db, characters, [id]),
     ...partyRemoval(db, characters, [id]),
     ...guildRemoval(db, characters, [id], now),
+    // Its purchases of Punkty Systemu stay for the bookkeeping, detached
+    // (the ids made negative), as its ids may be given again (payments.js).
+    db
+      .prepare('UPDATE purchases SET user_id = -user_id, character_id = CASE WHEN character_id > 0 THEN -character_id ELSE character_id END WHERE user_id = ?')
+      .bind(id),
     db.prepare('DELETE FROM characters WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
     db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(id),

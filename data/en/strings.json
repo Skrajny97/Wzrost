@@ -2763,5 +2763,8 @@
   "Dziś już {count} razy. Kolejny trening jutro.": "Already {count} times today. The next training is tomorrow.",
   "Trening po powrocie z wyprawy.": "Training after the return from the exploration.",
   "{name} wchodzi na {level}. poziom.": "{name} reaches level {level}.",
-  "Brakuje złota na trening.": "Not enough gold for the training."
+  "Brakuje złota na trening.": "Not enough gold for the training.",
+  "Nie ma takiego zakupu.": "There is no such purchase.",
+  "Ten zakup jest już w innym stanie. Odśwież listę.": "This purchase is already in another state. Refresh the list.",
+  "Nie ma takiego działania.": "There is no such action."
 }

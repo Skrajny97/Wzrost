@@ -3092,6 +3092,29 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.68 (11.11.2026): poprawki płatności z przeglądu kodu
+
+Płatności za Punkty Systemu działają na razie tylko dla konta autora (`PAYMENTS_FOR: "authors"`), więc gracze nie widzą żadnej zmiany. Przegląd kodu 0.2.60–0.2.66 znalazł w nich sześć rzeczy do poprawy przed otwarciem płatności dla wszystkich. Każda ma test w `test/payments.test.js`.
+
+1. **Limit 400 zł na 30 dni nie przepuszcza dwóch zamówień naraz.** Limit konta liczy się teraz w tym samym zapisie co zamówienie, tak jak wcześniej limit kwartalny. Szesnaście zamówień po 49,99 zł wysłanych jednocześnie daje najwyżej osiem.
+2. **Nieudana próba zapłaty nie zwalnia limitów.** Wiadomość z Autopay, że jedna próba się nie udała (FAILURE), zamyka zamówienie jako „Nieudany”. Takie zamówienie przestawało się liczyć do obu limitów, choć gracz dalej mógł je opłacić z tego samego linku przez 24 godziny. Tak dało się zapłacić ponad 400 zł w 30 dni. Teraz zamówienie „Nieudany” dalej liczy się do obu limitów, dopóki da się je opłacić (24 godziny od zamówienia). Gdy mimo wszystko przyjdzie zapłata, punkty i tak się dopiszą.
+   - (brakujący szczegół) Zamówienie, którego bramka w ogóle nie przyjęła, zamyka się od razu jako „Nieopłacony” (`expired`), bo nie da się go opłacić, więc nie zabiera limitu.
+3. **Druga zapłata tego samego zamówienia jest zapisana.** Gdy gracz zapłacił dwa razy (Autopay przysyła wtedy drugie potwierdzenie z innym numerem płatności), druga zapłata nie dopisywała punktów i nigdzie nie zostawała. Teraz trafia do tabeli `purchase_extras` (migracja 0112) i do dziennika (log), a panel autora (`GET /api/author/payments`, pole `extras`) pokazuje ją do zwrotu.
+4. **Punkty idą tylko do postaci, dla której było zamówienie.** Baza nadaje numer usuniętej postaci albo usuniętego konta ponownie, gdy były najwyższe. Spóźniona zapłata mogła wtedy dopisać punkty postaci innego gracza, a nowe konto widziało cudze zakupy i mogło je zwrócić. Teraz:
+   - punkty dostaje tylko postać tego samego konta, założona przed zamówieniem;
+   - usunięcie postaci albo konta odpina jej zakupy (numer zmieniony na ujemny); zapisy zostają dla księgowości;
+   - migracja 0112 odpina tak samo zakupy usuniętych wcześniej kont i postaci.
+5. **Zwroty pod ręką autora.** Gra zapisuje, czy bramka przyjęła zwrot (`refund_state`: przyjęty, odrzucony, zrobiony od razu) i kiedy o niego proszono. Na każdą rozmowę z bramką serwer czeka najwyżej 15 sekund. Nowa trasa tylko dla autora, `POST /api/author/payments/action`, pozwala:
+   - poprosić bramkę o zwrot jeszcze raz; ta sama wiadomość nigdy nie odda pieniędzy dwa razy;
+   - oznaczyć zwrot jako zrobiony, gdy pieniądze wróciły w panelu Autopay;
+   - przywrócić zakup, gdy zwrotu nie da się zrobić; punkty wracają wtedy do postaci;
+   - zabrać punkty zakupu zwróconego w samym panelu Autopay (wcześniej zostawały u gracza);
+   - zwrócić drugą zapłatę albo oznaczyć ją jako zwróconą.
+6. **Odrzucone powiadomienia w dzienniku.** Powiadomienie o płatności z błędnym podpisem albo nieczytelne trafia teraz do dziennika (log), żeby było widać próby podrobienia albo zmianę formatu po stronie Autopay.
+7. **(brakujący szczegół) Panel autora bez ekranu.** Zestawienie sprzedaży i działania przy zwrotach są na razie tylko w API. Ekran w Panelu Autora powstanie po przyjęciu makiet na stronie ocen, przed otwarciem płatności dla graczy.
+8. **Przed otwarciem płatności dla wszystkich** dochodzi do listy z podwalin: polityka prywatności musi mówić, że zapisy zakupów zostają po usunięciu konta (dla księgowości, bez powiązania z kontem).
+9. **Sprawdzanie typów (650 A)** obejmuje teraz też zasady płatności, najemników, wymiany na Stole rozbiórki i rozpiętości poziomów w Drużynie (`payments.js`, `mercenaries.js`, `exchange.js` i `parties.js` w `src/engine/`).
+
 ## Wersja 0.2.67 (11.11.2026): poprawki z przeglądu kodu (Jagna raz, sprawy towarzyszy, Drużyna) i sprawdzanie typów
 
 Autor: „Ty masz co robić na pewno w kontekście kodowania (…) Jeśli nie - przejrzyj kod szukaj luk, popraw błędy.” Przegląd kodu wersji 0.2.60–0.2.66 znalazł w grze te błędy; każdy ma teraz test, który na starym kodzie nie przechodzi (poza punktem 4, gdzie stary błąd zależał od losowania).

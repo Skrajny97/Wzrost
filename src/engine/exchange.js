@@ -1,3 +1,4 @@
+// @ts-check
 // The Stół rozbiórki's exchange (`exchange` of the building in
 // data/buildings.json): pieces of one of the camp's resources for a piece
 // of another, rates[L − 1] pieces for one at the building's level L, the
@@ -7,10 +8,14 @@
 // character does, as the camp does.
 
 // The one building with an exchange, if any.
-export const exchangeBuilding = (content) => content.buildings.find((building) => building.exchange) ?? null;
+/** @typedef {Record<string, any>} Content */
+
+/** @param {Content} content */
+export const exchangeBuilding = (content) => content.buildings.find((/** @type {Content} */ building) => building.exchange) ?? null;
 
 // The exchange at the building's level: the pieces given for one (`rate`)
 // and the resources it takes and gives; null before it is built.
+/** @param {number} level @param {Content} content @returns {{ rate: number, resources: string[] } | null} */
 export function resourceExchange(level, content) {
   const building = exchangeBuilding(content);
   if (!building || level < 1) return null;
@@ -20,6 +25,11 @@ export function resourceExchange(level, content) {
 
 // Why `amount` pieces of `to` cannot be had for pieces of `from` now, or
 // null: `resources` is what the character has, by id.
+/**
+ * @param {{ level: number, resources: Record<string, number>, from: string, to: string, amount: number }} asked
+ * @param {Content} content
+ * @returns {{ code: string, message: string } | null}
+ */
 export function exchangeBlock({ level, resources, from, to, amount }, content) {
   const exchange = resourceExchange(level, content);
   if (!exchange) return { code: 'not_built', message: `Najpierw zbuduj: ${exchangeBuilding(content)?.name ?? 'Stół rozbiórki'}.` };

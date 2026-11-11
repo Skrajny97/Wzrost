@@ -2037,6 +2037,9 @@ export function characterRemoval(db, id, now) {
     ...marketRemoval(db, '?', [id]),
     ...partyRemoval(db, '?', [id]),
     ...guildRemoval(db, '?', [id], now),
+    // Its purchases of Punkty Systemu stay for the bookkeeping, detached
+    // (the id made negative), as its id may be given again (payments.js).
+    db.prepare('UPDATE purchases SET character_id = -character_id WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM characters WHERE id = ?').bind(id),
   ];
 }

@@ -1,3 +1,4 @@
+// @ts-check
 // Payments for Punkty Systemu (data/payments.json; DECISIONS.md, "Płatności
 // za Punkty Systemu: podwaliny" and the author's answers 804–808): the rules
 // of a purchase, worked out on a character's points and an account's
@@ -19,18 +20,37 @@
 
 import { zoneClock, zoneMidnight } from './quests.js';
 
+/** @typedef {{ id: string, points: number, price: number }} Pack */
+/**
+ * @typedef {{ currency: string, monthlyLimit: number, limitDays: number, withdrawalDays: number, adultOnly: boolean,
+ *   termsVersion: string, pendingHours: number, timeZone: string, quarterLimit: number | null, packs: Pack[] }} Rules
+ */
+/** @typedef {{ status: string, price: number, points?: number, createdAt: number, paidAt?: number | null }} Purchase */
+/** @typedef {{ systemPoints: number, systemPointsPaid: number }} Balance */
+/** @typedef {{ code: string, message: string }} Block */
+/** @typedef {{ startsAt: number, endsAt: number }} Quarter */
+
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
+// The day on the clock of a time zone (quests.js, not checked for types).
+const clockAt = /** @type {(ms: number, timeZone: string) => { year: number, month: number, day: number }} */ (zoneClock);
+
+/** @type {(rules: Rules, id: unknown) => Pack | null} */
 export const packOf = (rules, id) => (typeof id === 'string' ? (rules.packs.find((pack) => pack.id === id) ?? null) : null);
 
-// Whether an order still waits for its payment: unpaid, and younger than
-// the hours an order waits; an older one is closed as unpaid.
-export const waiting = (purchase, now, rules) => purchase.status === 'pending' && purchase.createdAt > now - rules.pendingHours * HOUR;
+// Whether an order can still be paid: unpaid, and younger than the hours
+// an order waits; an older one is closed as unpaid. One whose try of paying
+// failed can still be paid another way from the same page, so it counts
+// too until then (11.11.2026: else a failed try freed the limits of an
+// order paid after all).
+/** @type {(purchase: Purchase, now: number, rules: Rules) => boolean} */
+export const waiting = (purchase, now, rules) => (purchase.status === 'pending' || purchase.status === 'failed') && purchase.createdAt > now - rules.pendingHours * HOUR;
 
 // What an account paid for the purchases that still count against its
-// limit: the paid ones and the ones waiting for the payment, of the last
-// `limitDays` days; given back, failed and unpaid ones do not count.
+// limit: the paid ones and the ones that can still be paid (waiting), of
+// the last `limitDays` days; given back and long unpaid ones do not count.
+/** @param {Purchase[]} purchases @param {number} now @param {Rules} rules */
 export function spentLately(purchases, now, rules) {
   const since = now - rules.limitDays * DAY;
   return purchases
@@ -40,31 +60,39 @@ export function spentLately(purchases, now, rules) {
 
 // The quarter of the year on the clock of rules.timeZone at `now`: when it
 // began and when the next one begins.
+/** @param {number} now @param {Rules} rules @returns {Quarter} */
 export function quarterAt(now, rules) {
-  const { year, month, day } = zoneClock(now, rules.timeZone);
+  const { year, month, day } = clockAt(now, rules.timeZone);
   const today = Date.UTC(year, month - 1, day);
   const first = Math.floor((month - 1) / 3) * 3;
-  const daysTo = (monthIndex) => Math.round((Date.UTC(year, monthIndex, 1) - today) / DAY);
+  const daysTo = (/** @type {number} */ monthIndex) => Math.round((Date.UTC(year, monthIndex, 1) - today) / DAY);
   return { startsAt: zoneMidnight(now, rules.timeZone, daysTo(first)), endsAt: zoneMidnight(now, rules.timeZone, daysTo(first + 3)) };
 }
 
 // Whether the game may sell `pack` in the quarter in which it took `taken`
 // (the purchases paid in it and kept, and the orders waiting): always
 // without a limit.
+/** @type {(rules: Rules, taken: number, pack: { price: number }) => boolean} */
 export const quarterFits = (rules, taken, pack) => rules.quarterLimit === null || taken + pack.price <= rules.quarterLimit;
 
 // A date as Polish writes it on the clock of rules.timeZone ("1.01.2027").
+/** @param {number} ms @param {Rules} rules */
 const dateText = (ms, rules) => {
-  const { year, month, day } = zoneClock(ms, rules.timeZone);
+  const { year, month, day } = clockAt(ms, rules.timeZone);
   return `${day}.${String(month).padStart(2, '0')}.${year}`;
 };
 
 // An amount in grosze as Polish writes it, with its currency ("400,00 zł").
+/** @param {number} grosze @param {string} currency */
 const money = (grosze, currency) => new Intl.NumberFormat('pl-PL', { style: 'currency', currency }).format(grosze / 100);
 
 // Why the account cannot order `pack` now, or null. `taken` and `quarter`
 // (quarterAt) are the game's quarter, for the limit of an unregistered
 // activity.
+/**
+ * @param {{ rules: Rules, pack: Pack | null, consents?: { terms?: unknown, adult?: unknown }, spent: number, blocked: boolean, taken?: number, quarter?: Quarter | null }} order
+ * @returns {Block | null}
+ */
 export function orderBlock({ rules, pack, consents, spent, blocked, taken = 0, quarter = null }) {
   if (!pack) return { code: 'invalid_pack', message: 'Nie ma takiego pakietu.' };
   if (blocked) return { code: 'purchases_blocked', message: 'Zakupy na tym koncie są wstrzymane. Napisz do nas, a wyjaśnimy sprawę.' };
@@ -80,16 +108,19 @@ export function orderBlock({ rules, pack, consents, spent, blocked, taken = 0, q
 
 // The answer to an order the quarter has no room for: the pack is sold
 // again from the next quarter.
+/** @type {(rules: Rules, quarter: Quarter | null) => Block} */
 export const quarterBlock = (rules, quarter) => ({
   code: 'sales_paused',
   message: quarter ? `Ten pakiet będzie można kupić od ${dateText(quarter.endsAt, rules)}.` : 'Tego pakietu nie można teraz kupić.',
 });
 
 // The points after a paid purchase.
+/** @type {(balance: Balance, points: number) => Balance} */
 export const credited = (balance, points) => ({ systemPoints: balance.systemPoints + points, systemPointsPaid: balance.systemPointsPaid + points });
 
 // The points after spending `cost` of them: the won ones go first, the
 // bought ones last.
+/** @param {Balance} balance @param {number} cost @returns {Balance} */
 export function spentFrom(balance, cost) {
   const systemPoints = balance.systemPoints - cost;
   return { systemPoints, systemPointsPaid: Math.max(0, Math.min(balance.systemPointsPaid, systemPoints)) };
@@ -98,9 +129,13 @@ export function spentFrom(balance, cost) {
 // Why a paid purchase can no longer be withdrawn from (its points given
 // back for the money), or null: only within the days after the payment,
 // and only while its points are still unspent among the bought ones.
+/**
+ * @param {{ rules: Rules, purchase: { status: string, points: number, paidAt?: number | null } | null, balance: Balance | null, now: number }} asked
+ * @returns {Block | null}
+ */
 export function withdrawalBlock({ rules, purchase, balance, now }) {
-  if (!purchase || purchase.status !== 'paid') return { code: 'not_withdrawable', message: 'Tego zakupu nie można już zwrócić.' };
-  if (now > purchase.paidAt + rules.withdrawalDays * DAY) {
+  if (!purchase || purchase.status !== 'paid' || !balance) return { code: 'not_withdrawable', message: 'Tego zakupu nie można już zwrócić.' };
+  if (now > (purchase.paidAt ?? 0) + rules.withdrawalDays * DAY) {
     return { code: 'withdrawal_expired', message: `Zwrot jest możliwy przez ${rules.withdrawalDays} dni od zapłaty.` };
   }
   if (balance.systemPointsPaid < purchase.points) {
@@ -111,12 +146,14 @@ export function withdrawalBlock({ rules, purchase, balance, now }) {
 
 // The points after a withdrawal or a refund: the purchase's points taken
 // back from the bought ones.
+/** @type {(balance: Balance, points: number) => Balance} */
 export const withdrawn = (balance, points) => ({ systemPoints: balance.systemPoints - points, systemPointsPaid: balance.systemPointsPaid - points });
 
 // The points after a chargeback (the bank gave the money back): as many of
 // the purchase's points as there still are, never below none. What is
 // missing (`debt`, already spent) stays spent; the account stops buying
 // until the author clears it.
+/** @param {Balance} balance @param {number} points */
 export function chargedBack(balance, points) {
   const taken = Math.min(points, balance.systemPoints);
   return {

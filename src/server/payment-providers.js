@@ -50,6 +50,11 @@ const gatewayDown = () => new ApiError(502, 'gateway_error', 'Bramka płatności
 
 const STATUSES = ['paid', 'failed', 'refunded', 'charged_back'];
 
+// How long the server waits for the gateway's answer to a start or a
+// refund: a player's tap never hangs on a gateway that does not answer (a
+// refund not answered waits for the author, payments.js).
+const GATEWAY_WAIT_MS = 15000;
+
 const testGateway = {
   ready: () => true,
   async create({ orderId }) {
@@ -75,7 +80,12 @@ const testGateway = {
       currency: String(notice.currency ?? ''),
     };
   },
-  async refund() {
+  // A refund is done at once, but for a payment whose number begins with
+  // "refuse-" (not taken) or "later-" (taken, done later), so a test plays
+  // a gateway that refunds later or not at all.
+  async refund({ ref } = {}) {
+    if (String(ref ?? '').startsWith('refuse-')) return { ok: false, done: false };
+    if (String(ref ?? '').startsWith('later-')) return { ok: true, done: false };
     return { ok: true, done: true };
   },
   answer: (notice, env, confirmed) => json({ ok: confirmed }),
@@ -155,6 +165,7 @@ export const autopayGateway = {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded', BmHeader: 'pay-bm-continue-transaction-url' },
         body: new URLSearchParams(fields).toString(),
+        signal: AbortSignal.timeout(GATEWAY_WAIT_MS),
       });
       text = await response.text();
     } catch (error) {
@@ -219,6 +230,7 @@ export const autopayGateway = {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams(fields).toString(),
+        signal: AbortSignal.timeout(GATEWAY_WAIT_MS),
       });
       text = await response.text();
     } catch (error) {

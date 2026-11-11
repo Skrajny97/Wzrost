@@ -17,14 +17,29 @@
 // points go at once, the money through the gateway. A refund or a
 // chargeback the gateway reports takes the points back, never below none;
 // after a chargeback the account buys nothing until the author clears it.
+// Whether the gateway took the refund is kept (refund_state); one it did
+// not take waits for the author (authorPaymentAction), who asks again,
+// marks it given back or restores the purchase, and who also takes back the
+// points of a purchase refunded in the gateway's own panel.
 //
 // The game sells as the author's unregistered activity (804 A), whose
 // revenue has a limit in each quarter: an order is written only while what
 // the game took in the quarter (paid and kept, or waiting for its payment),
-// with the order, stays within data/payments.json's quarterLimit, checked
-// in the same statement that writes it, so two orders at once cannot both
-// pass. An order unpaid after pendingHours closes as expired; a payment
-// that still comes for it credits it.
+// with the order, stays within data/payments.json's quarterLimit, and while
+// the account's purchases of the last limitDays, with it, stay within
+// monthlyLimit; both are checked in the same statement that writes it, so
+// two orders at once cannot both pass. An order unpaid after pendingHours
+// closes as expired; a payment that still comes for it credits it. An
+// order whose try of paying failed is shown as failed, but keeps counting
+// against both limits until it expires, as the player may still pay it.
+//
+// The points go only to the character the order was made for, of the same
+// account, made before the order: the ids of a deleted account or character
+// may be given again to new ones, so a deletion makes the ids in its
+// purchases negative (accounts.js, characters.js), and a payment that comes
+// after it credits nobody and waits for the author. A second payment of an
+// order already paid (another number of the gateway's) credits nothing
+// either: it is kept (purchase_extras) for the author to give back.
 
 import rules from '../../data/payments.json' with { type: 'json' };
 import { orderBlock, packOf, quarterAt, quarterBlock, quarterFits, spentLately, withdrawalBlock } from '../engine/index.js';
@@ -100,10 +115,27 @@ const expireOrders = (db, userId, now) =>
 // What the game took in the quarter, as SQL with its three values (the
 // quarter's start, twice, and the moment before which an order no longer
 // waits): the purchases paid in it and kept or being given back, and the
-// orders made in it still waiting for their payment.
+// orders made in it that can still be paid (waiting, or a try failed).
 const TAKEN = `SELECT COALESCE(SUM(price), 0) FROM purchases
-  WHERE (status IN ('paid', 'refunding') AND paid_at >= ?) OR (status = 'pending' AND created_at >= ? AND created_at > ?)`;
+  WHERE (status IN ('paid', 'refunding') AND paid_at >= ?) OR (status IN ('pending', 'failed') AND created_at >= ? AND created_at > ?)`;
 const takenValues = (quarter, now) => [quarter.startsAt, quarter.startsAt, now - rules.pendingHours * HOUR];
+
+// What an account paid lately, as SQL with its three values (the account,
+// the start of the last limitDays, the moment before which an order no
+// longer waits): its paid purchases and its orders that can still be
+// paid, as the engine's spentLately counts them.
+const SPENT = `SELECT COALESCE(SUM(price), 0) FROM purchases
+  WHERE user_id = ? AND created_at > ? AND (status = 'paid' OR (status IN ('pending', 'failed') AND created_at > ?))`;
+const spentValues = (userId, now) => [userId, now - rules.limitDays * DAY, now - rules.pendingHours * HOUR];
+
+// The character a purchase's points go to, as SQL with the purchase's id
+// three times: the purchase's own, of the same account, made before the
+// order (the ids of deleted ones are given again).
+const BUYER = `id = (SELECT character_id FROM purchases WHERE id = ?)
+  AND user_id = (SELECT user_id FROM purchases WHERE id = ?) AND created_at <= (SELECT created_at FROM purchases WHERE id = ?)`;
+
+// The gateway's word on a refund, as the ledger keeps it.
+const refundState = (refund) => (refund.ok ? (refund.done ? 'done' : 'asked') : 'refused');
 
 async function quarterTaken(db, quarter, now) {
   const row = await db.prepare(`SELECT (${TAKEN}) AS taken`).bind(...takenValues(quarter, now)).first();
@@ -173,13 +205,13 @@ export async function orderPoints(context) {
   // place for the VAT across the EU (OSS).
   const country = typeof context.request.cf?.country === 'string' ? context.request.cf.country : null;
   const consents = JSON.stringify({ terms: rules.termsVersion, adult: body.adult === true, at: context.now });
-  // Written only if the quarter still has room for it, counted in the same
-  // statement.
+  // Written only if the quarter and the account's limit still have room for
+  // it, counted in the same statement: two orders at once never both pass.
   const written = await db
     .prepare(
       `INSERT INTO purchases (public_id, user_id, character_id, pack_id, points, price, currency, country, provider, status, consents, created_at)
        SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?
-       WHERE ? IS NULL OR (${TAKEN}) + ? <= ?`,
+       WHERE (? IS NULL OR (${TAKEN}) + ? <= ?) AND (${SPENT}) + ? <= ?`,
     )
     .bind(
       orderId,
@@ -197,9 +229,18 @@ export async function orderPoints(context) {
       ...takenValues(quarter, context.now),
       pack.price,
       rules.quarterLimit,
+      ...spentValues(session.userId, context.now),
+      pack.price,
+      rules.monthlyLimit,
     )
     .run();
-  if (written.meta.changes !== 1) throw refuse(quarterBlock(rules, quarter));
+  if (written.meta.changes !== 1) {
+    // Another order took the room meanwhile: the account's limit or the
+    // quarter's, whichever it now is.
+    const [now, takenNow] = await Promise.all([accountPurchases(db, session.userId), quarterTaken(db, quarter, context.now)]);
+    const spent = spentLately(now.map(purchaseOf), context.now, rules);
+    throw refuse(orderBlock({ rules, pack, consents: { terms: true, adult: true }, spent, blocked: false, taken: takenNow, quarter }) ?? quarterBlock(rules, quarter));
+  }
   // The gateway's payment, valid as long as the order waits; one the gateway
   // does not take closes the order at once, so it holds no limit.
   let payment;
@@ -215,7 +256,9 @@ export async function orderPoints(context) {
       validUntil: context.now + rules.pendingHours * HOUR,
     });
   } catch (error) {
-    await db.prepare("UPDATE purchases SET status = 'failed', closed_at = ? WHERE public_id = ? AND status = 'pending'").bind(context.now, orderId).run();
+    // Never payable, it is closed as unpaid at once ('expired'), so it
+    // holds no limit.
+    await db.prepare("UPDATE purchases SET status = 'expired', closed_at = ? WHERE public_id = ? AND status = 'pending'").bind(context.now, orderId).run();
     throw error;
   }
   if (payment.ref) await db.prepare('UPDATE purchases SET provider_ref = ? WHERE public_id = ?').bind(payment.ref, orderId).run();
@@ -224,11 +267,13 @@ export async function orderPoints(context) {
 
 // A payment the gateway confirmed: the purchase paid (also one closed as
 // failed or expired, as the money came after all) and its points added,
-// once. The amount and currency must be the purchase's own. The gateway's
-// number of the payment that succeeded is kept (a player can try another way
-// of paying within one order, each with its own number), as a refund needs
-// it. Whether the points reached a character (none, if it was deleted in
-// between) is returned.
+// once, to the character it was made for (BUYER). The amount and currency
+// must be the purchase's own. The gateway's number of the payment that
+// succeeded is kept (a player can try another way of paying within one
+// order, each with its own number), as a refund needs it. A payment of an
+// order already paid under another number is the player's second one: it
+// is kept for the author to give back ('extra'). Returned: 'credited',
+// 'already' (the same news again), 'extra' or 'mismatch'.
 async function markPaid(db, row, notice, now) {
   if (notice.amount !== row.price || notice.currency !== row.currency) {
     console.error(`payment ${row.public_id}: the amount or the currency differs from the order`);
@@ -242,11 +287,20 @@ async function markPaid(db, row, notice, now) {
     db
       .prepare(
         `UPDATE characters SET system_points = system_points + ?, system_points_paid = system_points_paid + ?, version = version + 1
-         WHERE id = (SELECT character_id FROM purchases WHERE id = ? AND credit_token = ?)`,
+         WHERE ${BUYER} AND (SELECT credit_token FROM purchases WHERE id = ?) = ?`,
       )
-      .bind(row.points, row.points, row.id, token),
+      .bind(row.points, row.points, row.id, row.id, row.id, row.id, token),
   ]);
-  if (moved.meta.changes !== 1) return 'already';
+  if (moved.meta.changes !== 1) {
+    const current = await db.prepare('SELECT provider_ref FROM purchases WHERE id = ?').bind(row.id).first();
+    if (!notice.ref || notice.ref === current?.provider_ref) return 'already';
+    const kept = await db
+      .prepare('INSERT OR IGNORE INTO purchase_extras (purchase_id, provider, provider_ref, amount, currency, created_at) VALUES (?, ?, ?, ?, ?, ?)')
+      .bind(row.id, row.provider, notice.ref, notice.amount, notice.currency, now)
+      .run();
+    if (kept.meta.changes === 1) console.error(`payment ${row.public_id}: a second payment (${notice.ref}) of an order already paid; it waits for the author to give it back`);
+    return 'extra';
+  }
   if (added.meta.changes !== 1) console.error(`payment ${row.public_id}: paid, but its character is gone`);
   return 'credited';
 }
@@ -263,27 +317,38 @@ async function takeBack(db, row, status, now) {
     db
       .prepare(
         `UPDATE characters SET system_points = MAX(system_points - ?, 0), system_points_paid = MAX(system_points_paid - ?, 0), version = version + 1
-         WHERE id = (SELECT character_id FROM purchases WHERE id = ? AND credit_token = ?)`,
+         WHERE ${BUYER} AND (SELECT credit_token FROM purchases WHERE id = ?) = ?`,
       )
-      .bind(row.points, row.points, row.id, token),
+      .bind(row.points, row.points, row.id, row.id, row.id, row.id, token),
     db.prepare("UPDATE purchases SET status = ?, closed_at = ? WHERE id = ? AND status = 'refunding'").bind(status, now, row.id),
   ];
   if (status === 'charged_back') {
     statements.push(db.prepare('UPDATE users SET purchases_blocked = 1 WHERE id = (SELECT user_id FROM purchases WHERE id = ? AND status = ?)').bind(row.id, status));
   }
-  await db.batch(statements);
+  const [moved] = await db.batch(statements);
+  return moved.meta.changes === 1;
 }
 
 // POST /api/payments/notify/:provider: the gateway's signed news of a
 // payment, answered as the gateway expects: confirmed, or, for news of an
 // order the ledger does not know or of another amount, not confirmed (the
 // gateway sends it again later, and the log tells of it). News that a way of
-// paying was chosen (pending) changes nothing.
+// paying was chosen (pending) changes nothing. News that a try of paying
+// failed shows the order as failed, but it still counts against the limits
+// until it expires, as the player may still pay it another way from the
+// same page (and it is credited then). News the server cannot read or whose
+// signature is wrong is refused and written in the log.
 export async function paymentNotice(context) {
   const name = paymentsProvider();
   const gateway = providerFor(name, context.env);
   if (!gateway || context.params.provider !== name) throw notFound();
-  const notice = await gateway.verify(context.request, context.env);
+  let notice;
+  try {
+    notice = await gateway.verify(context.request, context.env);
+  } catch (error) {
+    console.error(`payment news refused: ${error?.code ?? error?.message ?? error}`);
+    throw error;
+  }
   const db = context.env.DB;
   const row = await db.prepare('SELECT * FROM purchases WHERE public_id = ? AND provider = ?').bind(notice.orderId, name).first();
   if (!row) {
@@ -342,17 +407,33 @@ export async function withdrawPurchase(context) {
     db
       .prepare(
         `UPDATE characters SET system_points = system_points - ?, system_points_paid = system_points_paid - ?, version = version + 1
-         WHERE id = (SELECT character_id FROM purchases WHERE id = ? AND credit_token = ?)`,
+         WHERE ${BUYER} AND (SELECT credit_token FROM purchases WHERE id = ?) = ?`,
       )
-      .bind(row.points, row.points, row.id, token),
+      .bind(row.points, row.points, row.id, row.id, row.id, row.id, token),
   ]);
   if (moved.meta.changes !== 1) throw refuse({ code: 'not_withdrawable', message: 'Tego zakupu nie można już zwrócić.' });
-  const refund = await gateway.refund({ env: context.env, ref: row.provider_ref, orderId: row.public_id, amount: row.price, currency: row.currency });
-  if (refund.ok && refund.done) {
-    await db.prepare("UPDATE purchases SET status = 'refunded', closed_at = ? WHERE id = ? AND status = 'refunding'").bind(context.now, row.id).run();
-  } else if (!refund.ok) console.error(`refund of ${row.public_id} not accepted by the gateway; it waits as refunding`);
+  await askRefund(db, gateway, context.env, row, context.now);
   const after = await db.prepare('SELECT * FROM purchases WHERE id = ?').bind(row.id).first();
   return json({ purchase: purchaseView(after), character: characterView(await loadPlayer(db, session.userId), context.now) });
+}
+
+// The money of a purchase being given back ('refunding') asked of the
+// gateway, and its word kept: done at once closes it as refunded; taken
+// ('asked') or not taken ('refused', also no answer) leaves it refunding,
+// the latter for the author to ask again.
+async function askRefund(db, gateway, env, row, now) {
+  const refund = await gateway.refund({ env, ref: row.provider_ref, orderId: row.public_id, amount: row.price, currency: row.currency });
+  const state = refundState(refund);
+  if (!refund.ok) console.error(`refund of ${row.public_id} not taken by the gateway; it waits for the author`);
+  await db
+    .prepare(
+      `UPDATE purchases SET refund_state = ?, refund_at = ?, status = CASE WHEN ? = 'done' THEN 'refunded' ELSE status END,
+         closed_at = CASE WHEN ? = 'done' THEN ? ELSE closed_at END
+       WHERE id = ? AND status = 'refunding'`,
+    )
+    .bind(state, now, state, state, now, row.id)
+    .run();
+  return state;
 }
 
 // The day in Poland a time falls on, as YYYY-MM-DD.
@@ -373,14 +454,14 @@ export async function authorPayments(context) {
   const sums = await db
     .prepare(
       `SELECT COALESCE(SUM(CASE WHEN status IN ('paid', 'refunding') AND paid_at >= ? THEN price ELSE 0 END), 0) AS paid,
-              COALESCE(SUM(CASE WHEN status = 'pending' AND created_at >= ? AND created_at > ? THEN price ELSE 0 END), 0) AS waiting
+              COALESCE(SUM(CASE WHEN status IN ('pending', 'failed') AND created_at >= ? AND created_at > ? THEN price ELSE 0 END), 0) AS waiting
        FROM purchases`,
     )
     .bind(...takenValues(quarter, context.now))
     .first();
   const { results } = await db
     .prepare(
-      `SELECT p.public_id, p.pack_id, p.points, p.price, p.currency, p.country, p.provider, p.status, p.created_at, p.paid_at, p.closed_at,
+      `SELECT p.public_id, p.pack_id, p.points, p.price, p.currency, p.country, p.provider, p.status, p.refund_state, p.created_at, p.paid_at, p.closed_at,
               (SELECT COUNT(*) FROM characters c WHERE c.id = p.character_id) AS character_kept
        FROM purchases p WHERE p.created_at >= ? OR p.status = 'refunding' ORDER BY p.created_at DESC LIMIT 1000`,
     )
@@ -400,11 +481,116 @@ export async function authorPayments(context) {
       one.refunded += row.price;
     }
   }
+  const extras = await db
+    .prepare(
+      `SELECT e.id, e.provider_ref, e.amount, e.currency, e.status, e.refund_state, e.created_at, e.closed_at, p.public_id
+       FROM purchase_extras e JOIN purchases p ON p.id = e.purchase_id
+       WHERE e.status != 'refunded' OR e.created_at >= ? ORDER BY e.created_at DESC LIMIT 200`,
+    )
+    .bind(since)
+    .all();
+  const authorView = (row) => ({ ...purchaseView(row), country: row.country, provider: row.provider, refundState: row.refund_state ?? null });
   return json({
     currency: rules.currency,
     quarter: { startsAt: quarter.startsAt, endsAt: quarter.endsAt, limit: rules.quarterLimit, paid: sums?.paid ?? 0, waiting: sums?.waiting ?? 0 },
     days: [...days.values()].sort((a, b) => b.date.localeCompare(a.date)),
-    waiting: results.filter((row) => row.status === 'refunding' || (row.status === 'paid' && !row.character_kept)).map(purchaseView),
-    purchases: results.map((row) => ({ ...purchaseView(row), country: row.country, provider: row.provider })),
+    waiting: results.filter((row) => row.status === 'refunding' || (row.status === 'paid' && !row.character_kept)).map(authorView),
+    // Second payments of orders already paid, to give back (markPaid).
+    extras: extras.results.map((row) => ({
+      id: row.id,
+      orderId: row.public_id,
+      ref: row.provider_ref,
+      amount: row.amount,
+      currency: row.currency,
+      status: row.status,
+      refundState: row.refund_state ?? null,
+      createdAt: row.created_at,
+      closedAt: row.closed_at,
+    })),
+    purchases: results.map(authorView),
   });
+}
+
+// POST /api/author/payments/action { orderId, action, extraId }: for the
+// author only, what a purchase waiting for a hand needs:
+// - 'refund_again': a purchase being given back whose refund the gateway did
+//   not take (or that waits too long) is asked of the gateway again; the
+//   same purchase's refund is the same message, so it is never done twice;
+// - 'refund_done': the author saw the money go back in the gateway's panel,
+//   and the purchase closes as refunded;
+// - 'restore': a purchase being given back stays after all (the refund
+//   cannot be made, or the player asked to keep it): paid again, with its
+//   points back to its character;
+// - 'take_back': the money of a paid purchase was given back in the
+//   gateway's own panel, so its points go back, as a refund the gateway
+//   reports takes them;
+// - 'extra_refund' and 'extra_done' (with `extraId`): a second payment of
+//   the order asked back of the gateway, or marked given back.
+// Answers with the record, as GET /api/author/payments does.
+export async function authorPaymentAction(context) {
+  const session = await requireSession(context);
+  if (!isAuthor(context.env, session.user)) throw notFound();
+  const body = await readJson(context.request);
+  const db = context.env.DB;
+  const row = await db.prepare('SELECT * FROM purchases WHERE public_id = ?').bind(String(body.orderId ?? '')).first();
+  if (!row) throw new ApiError(404, 'no_purchase', 'Nie ma takiego zakupu.');
+  const wrong = () => new ApiError(409, 'wrong_state', 'Ten zakup jest już w innym stanie. Odśwież listę.');
+  const now = context.now;
+  switch (body.action) {
+    case 'refund_again': {
+      if (row.status !== 'refunding') throw wrong();
+      await askRefund(db, requireGateway(context.env), context.env, row, now);
+      break;
+    }
+    case 'refund_done': {
+      const done = await db.prepare("UPDATE purchases SET status = 'refunded', closed_at = ? WHERE id = ? AND status = 'refunding'").bind(now, row.id).run();
+      if (done.meta.changes !== 1) throw wrong();
+      break;
+    }
+    case 'restore': {
+      const token = newToken();
+      const [moved] = await db.batch([
+        db
+          .prepare("UPDATE purchases SET status = 'paid', closed_at = NULL, refund_state = NULL, refund_at = NULL, credit_token = ? WHERE id = ? AND status = 'refunding'")
+          .bind(token, row.id),
+        db
+          .prepare(
+            `UPDATE characters SET system_points = system_points + ?, system_points_paid = system_points_paid + ?, version = version + 1
+             WHERE ${BUYER} AND (SELECT credit_token FROM purchases WHERE id = ?) = ?`,
+          )
+          .bind(row.points, row.points, row.id, row.id, row.id, row.id, token),
+      ]);
+      if (moved.meta.changes !== 1) throw wrong();
+      break;
+    }
+    case 'take_back': {
+      if (row.status !== 'paid' || !(await takeBack(db, row, 'refunded', now))) throw wrong();
+      break;
+    }
+    case 'extra_refund':
+    case 'extra_done': {
+      const extra = await db.prepare('SELECT * FROM purchase_extras WHERE id = ? AND purchase_id = ?').bind(Number(body.extraId), row.id).first();
+      if (!extra || extra.status === 'refunded') throw wrong();
+      if (body.action === 'extra_done') {
+        await db.prepare("UPDATE purchase_extras SET status = 'refunded', closed_at = ? WHERE id = ? AND status != 'refunded'").bind(now, extra.id).run();
+        break;
+      }
+      // Its own message, apart from the purchase's refund.
+      const refund = await requireGateway(context.env).refund({ env: context.env, ref: extra.provider_ref, orderId: `${row.public_id}:${extra.provider_ref}`, amount: extra.amount, currency: extra.currency });
+      const state = refundState(refund);
+      if (!refund.ok) console.error(`refund of the second payment ${extra.provider_ref} of ${row.public_id} not taken by the gateway`);
+      await db
+        .prepare(
+          `UPDATE purchase_extras SET refund_state = ?, refund_at = ?, status = CASE WHEN ? = 'done' THEN 'refunded' ELSE 'refunding' END,
+             closed_at = CASE WHEN ? = 'done' THEN ? ELSE closed_at END
+           WHERE id = ? AND status != 'refunded'`,
+        )
+        .bind(state, now, state, state, now, extra.id)
+        .run();
+      break;
+    }
+    default:
+      throw new ApiError(400, 'invalid_action', 'Nie ma takiego działania.');
+  }
+  return authorPayments(context);
 }

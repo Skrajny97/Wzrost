@@ -42,7 +42,7 @@ import { guildRanking } from './guild-fame.js';
 import { claimFame, getFame } from './fame.js';
 import { cancelOrders, craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
-import { authorPayments, getPayments, orderPoints, paymentNotice, paymentNoticeAddress, paymentReturn, withdrawPurchase } from './payments.js';
+import { authorPaymentAction, authorPayments, getPayments, orderPoints, paymentNotice, paymentNoticeAddress, paymentReturn, withdrawPurchase } from './payments.js';
 import { confirmEmail, requestLink } from './email.js';
 import {
   autoPoints,
@@ -143,6 +143,10 @@ const routes = [
   ['GET', '/api/author/news', authorNews],
   // The sales of Punkty Systemu for the bookkeeping (payments.js), where PAYMENTS is on.
   ['GET', '/api/author/payments', authorPayments],
+  // The author's hand on a purchase that waits for it: a refund asked again
+  // or marked done, a purchase restored, points taken back after a refund
+  // in the gateway's panel, a second payment given back (payments.js).
+  ['POST', '/api/author/payments/action', authorPaymentAction],
   ['POST', '/api/author/news', publishNews],
   ['POST', '/api/author/news/edit', editNews],
   ['POST', '/api/author/news/delete', deleteNews],
