@@ -13,7 +13,12 @@ figure facing right) with its elbow and hand in the start frame's pixels:
 and may sway the hand a few pixels back and forth with the step
 ("sway": 2), so the arm is not stiff. The other arm may swing less than the
 shared skeleton's ("swing": {"left": 0.6}), so the free hand does not reach
-the held thing. Needs Python 3:
+the held thing. A figure with a big pauldron may also turn its shoulders
+with the step ("shoulders": 2.5, pixels of the 128-pixel frame, with or
+without a hold): the near shoulder goes forward as the near hand does and
+the far one back, so the pauldron moves with the arm instead of standing
+still while the arm slides under it (the author on 822.7, 822.9 and 822.21:
+„barki się nie ruszają i się dziwnie ramię przesuwa”). Needs Python 3:
   python3 tools/walk-hold.py"""
 import json
 
@@ -31,7 +36,7 @@ def mean_of(label):
     return sum(p['x'] for p in points) / len(points), sum(p['y'] for p in points) / len(points)
 
 
-def held(pose, key, hold, swing, scale):
+def held(pose, key, hold, swing, scale, shoulders=0):
     # The arm keeps its start-frame pose, moved as the neck moves from the key
     # pose, and sways with the step if asked; a free arm swings `scale` times
     # as far about its middle as the shared skeleton's.
@@ -45,6 +50,11 @@ def held(pose, key, hold, swing, scale):
                 mx, my = mean_of(point['label'])
                 point['x'] = round(mx + (point['x'] - mx) * k, 4)
                 point['y'] = round(my + (point['y'] - my) * k, 4)
+        # The shoulders turn with the step: the near one forward with the near
+        # hand, the far one back.
+        for side, sign in (('RIGHT', 1), ('LEFT', -1)):
+            if shoulders and point['label'] == f'{side} SHOULDER':
+                point['x'] = round(point['x'] + sign * shoulders * swing / size, 4)
         for side, arm in hold.items():
             sway = arm.get('sway', 0) * swing / size
             if point['label'] == f'{side.upper()} ELBOW':
@@ -59,8 +69,9 @@ def held(pose, key, hold, swing, scale):
 
 poses = {}
 for cid, character in walks['characters'].items():
-    hold = character.get('hold')
-    if not hold:
+    hold = character.get('hold', {})
+    shoulders = character.get('shoulders', 0)
+    if not hold and not shoulders:
         continue
     key = skeleton['keys'][character['pose'] - 1]
     # The swing of the free near hand in each frame, -1 (back) to 1 (forward),
@@ -71,8 +82,8 @@ for cid, character in walks['characters'].items():
     key_swing = (joint(key, 'RIGHT ARM')['x'] - mid) / half
     scale = character.get('swing', {})
     poses[cid] = {
-        'first': held(key, key, hold, 0, scale),
-        'frames': [held(frame, key, hold, swing - key_swing, scale) for frame, swing in zip(skeleton['frames'], swings)],
+        'first': held(key, key, hold, 0, scale, shoulders),
+        'frames': [held(frame, key, hold, swing - key_swing, scale, shoulders) for frame, swing in zip(skeleton['frames'], swings)],
     }
 
 # One line per character after the comment, so the file stays valid JSON

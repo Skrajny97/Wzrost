@@ -520,6 +520,7 @@
     "perun-chosen-male": {
       "start": "art/references/walks/start/perun-chosen-male.png",
       "pose": 2,
+      "shoulders": 2.5,
       "description": "an athletic young man archer of the thunder god with long fair blond hair and a silver circlet, a long dark blue coat with gold embroidered thunder symbols, a silver breastplate with a golden six-petal thunder rosette, silver pauldrons with lightning-shaped edges, brown boots, one long oak bow strapped upright on the back behind the shoulder, the whole bow above the waist and behind the body, never in front of the legs, beside a quiver of blue-fletched arrows, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
     "saint-female": {
@@ -540,6 +541,7 @@
     "bow-master-male": {
       "start": "art/references/walks/start/bow-master-male.png",
       "pose": 2,
+      "shoulders": 2.5,
       "description": "a lean young man master archer with black hair tied back and a silver diadem with a green gem, elegant black leather armour with silver plates and silver filigree, a silver pauldron shaped like a hawk's wing, a long dark green cloak hanging behind, black trousers and tall black boots, one long black recurve bow with silver tips strapped upright on the back behind the shoulder, the whole bow above the waist and behind the body, never in front of the legs, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
     "perun-chosen-female": {
@@ -555,6 +557,7 @@
     "demon-slayer-male": {
       "start": "art/references/walks/start/demon-slayer-male.png",
       "pose": 2,
+      "shoulders": 2.5,
       "description": "a broad strong man holy demon hunter with short dark hair and a stern scarred face, gleaming silver plate armour with golden sun engravings, a long white tabard with a golden sun, a short white cape with gold trim, a horned demon skull hanging at the belt, no sword, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
     "demon-slayer-female": {
