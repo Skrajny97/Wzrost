@@ -429,6 +429,7 @@
         "Put an item from your bag in for everyone or for one character of the guild. A worn item cannot go in.",
         "An item for everyone can be taken by any guild member. An item for one character can be taken only by them, and while it waits, you can take it back.",
         "The chest holds {capacity}. To take an item, you need room in your bag.",
+        "Items go in and come out from character level {level}, as in the Exchange. You can take your own item back before that too.",
         "An item keeps its upgrade, gem, rarity and Tier. The Encyclopedia does not count an item from another character.",
         "“Recent moves” show up to {log}: who puts in or takes out what, and when.",
         "When someone leaves the guild, the items for them are for everyone from then on. The last character can leave the guild only once the chest is empty."
@@ -463,6 +464,7 @@
       "logWar": "War chest for the war won · {at}",
       "fromWar": "the war chest",
       "noGuild": "The Guild Chest is for guild members. Join a guild or found your own.",
+      "level": "The Guild Chest opens for you at character level {level}.",
       "putDone": "{item}: in the Guild Chest.",
       "takeDone": "{item}: in the bag.",
       "errors": {
@@ -478,7 +480,8 @@
         "notYours": "This item is waiting for {name}.",
         "bagFull": "The bag is full. Make room in it to take the item.",
         "leave": "There are items left in the Guild Chest. Take them before you leave: without you, the guild disappears along with the chest.",
-        "changed": "Something changed in the meantime. Try once more."
+        "changed": "Something changed in the meantime. Try once more.",
+        "levelOther": "{name} can take items from the chest only from level {level}."
       }
     }
   },

@@ -605,6 +605,11 @@
       "id": "0.2.69",
       "title": "Wersja 0.2.69",
       "body": "- Arena: walka wysłana tuż przed północą z niedzieli na poniedziałek nie wypada już z tabeli tygodnia, a Arena otwarta w dwóch kartach naraz pokazuje właściwych rywali.\n- Wojny gildii: Sława za wygraną wojnę zawsze trafia do rankingu tygodnia, a postacie jednego konta po obu stronach wojny nie walczą przeciw sobie.\n- Skrzynia Konta: przedmioty usuniętej postaci zostają w skrzyni jako przedmioty innej postaci."
+    },
+    {
+      "id": "0.2.70",
+      "title": "Wersja 0.2.70",
+      "body": "- Wymiana: wymiana wielu rodzajów towarów naraz (np. kilkunastu materiałów) już nie przepada.\n- Skrzynia Gildii: przedmioty wkłada się i bierze od 20. poziomu postaci, jak w Wymianie. Swój przedmiot zabierzesz zawsze.\n- Upominki: w tygodniu po zmianie czasu nie znikają już godzinę za wcześnie."
     }
   ]
 }

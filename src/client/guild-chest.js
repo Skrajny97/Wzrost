@@ -11,6 +11,9 @@
 // for; a tap on an item opens its card. Under them "Włóż z plecaka", the
 // bag's items with "Włóż", which asks in a sheet for whom: "Dla wszystkich"
 // or one of the guild's members; and "Ostatnie ruchy", the chest's log.
+// Below the Wymiana's level (the server's `locked`) a line says from which
+// level, and "Włóż" and "Weź" only say it again (as the Wymiana w Gildii);
+// "Zabierz" of its own items still works.
 // The words come with the answer (data/guilds.json, chest.texts), in the
 // page's language; the card's own few go through t() (i18n.js).
 // mountGuildChest(container) adds the card to the container and gives
@@ -75,11 +78,13 @@ export function mountGuildChest(container) {
       type: 'button',
       class: 'button button--system button--small',
       text: item.own ? texts.takeBack : texts.take,
-      onClick: (event) =>
-        withButton(event.currentTarget, async () => {
+      onClick: (event) => {
+        if (view.locked && !item.own) return toast(texts.level);
+        return withButton(event.currentTarget, async () => {
           await act('/api/guild/chest/take', { id: item.id });
           if (closing) closeSheet();
-        }),
+        });
+      },
     });
   }
 
@@ -110,6 +115,7 @@ export function mountGuildChest(container) {
         h('p', { class: 'guild-stash-count', text: filled(texts.inside, { count: formatNumber(count), capacity: formatNumber(capacity) }) }),
         waiting > 0 && h('p', { class: 'guild-stash-waiting', text: filled(texts.forMe, { count: formatNumber(waiting) }) }),
         bagFull && h('p', { class: 'muted', text: texts.bagFull }),
+        view.locked && h('p', { class: 'muted', text: texts.level }),
       ),
     );
   }
@@ -222,7 +228,7 @@ export function mountGuildChest(container) {
                     class: 'button button--world button--small',
                     text: texts.put,
                     disabled: room <= 0 || busy.has(item.id),
-                    onClick: () => openPutSheet(item),
+                    onClick: () => (view.locked ? toast(texts.level) : openPutSheet(item)),
                   }),
                 ),
               ),

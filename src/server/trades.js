@@ -36,8 +36,6 @@ const rules = () => content().community.trade;
 // so is the character the player plays; one set aside waits offline.
 const onlineSince = (now) => now - rules().onlineSeconds * 1000;
 const playedOnline = (row, now) => row?.role === 'player' && (row.seen_at ?? 0) >= onlineSince(now);
-const path = (id) => `$."${id}"`;
-
 // Materials (keys "materialId:rarityId"), minerals and the camp's resources
 // (wood, stone, ore: the author's "Konieczne", 4.11.2026) take no places in
 // the bag.
@@ -341,9 +339,23 @@ function placesAfter(player, give, get) {
   return items + bagStacks(merged(herbsOf(player.row), give.herbs, get.herbs), content()) + bagStacks(merged(potionsOf(player.row), give.potions, get.potions), content());
 }
 
+// SQL for the JSON path to the key `json_each` gives as `alias`.key: a
+// stack's id, quoted ($."herb-id").
+const keyPath = (alias) => `'$."' || ${alias}.key || '"'`;
+
+// SQL for a column of stacks (`column`, of the characters' row being
+// updated) with the counts of `?` (a JSON object, stack id → count) added
+// to its own: one bound value however many stacks there are (D1 takes at
+// most 100 in a statement, which a Wymiana of many kinds of goods went past,
+// the code review), and the column's other stacks untouched.
+const addedStacks = (column) =>
+  `json_patch(${column}, (SELECT json_group_object(d.key, COALESCE(json_extract(characters.${column}, ${keyPath('d')}), 0) + d.value) FROM json_each(?) AS d))`;
+
 // Everything moves at once, or nothing: one statement fails the whole
 // batch (json() of a state is no JSON) unless both still have what they
-// offered and the trade is as both saw it.
+// offered and the trade is as both saw it. The stacks of a kind go into
+// each statement as one JSON object, so a Wymiana of any number of kinds
+// of goods stays within D1's 100 bound values.
 function exchange(db, trade, now, sides) {
   const conditions = ["t.state = 'locked'", 't.version = ?'];
   const binds = [trade.version];
@@ -363,10 +375,9 @@ function exchange(db, trade, now, sides) {
       binds.push(id, offer.gold);
     }
     for (const kind of STACKS) {
-      for (const [stack, count] of Object.entries(offer[kind])) {
-        conditions.push(`COALESCE((SELECT json_extract(${kind}, ?) FROM characters WHERE id = ?), 0) >= ?`);
-        binds.push(path(stack), id, count);
-      }
+      if (Object.keys(offer[kind]).length === 0) continue;
+      conditions.push(`NOT EXISTS (SELECT 1 FROM json_each(?) AS s WHERE COALESCE((SELECT json_extract(${kind}, ${keyPath('s')}) FROM characters WHERE id = ?), 0) < s.value)`);
+      binds.push(JSON.stringify(offer[kind]), id);
     }
   }
   const [one, two] = sides;
@@ -385,33 +396,25 @@ function exchange(db, trade, now, sides) {
     // What the character gets and gives, as one change of each column.
     const change = (kind) => {
       const ids = new Set([...Object.keys(giver.offer[kind]), ...Object.keys(taker.offer[kind])]);
-      let sql = kind;
-      const values = [];
-      for (const stack of ids) {
-        sql = `json_set(${sql}, ?, COALESCE(json_extract(${kind}, ?), 0) + ?)`;
-        values.push(path(stack), path(stack), (taker.offer[kind][stack] ?? 0) - (giver.offer[kind][stack] ?? 0));
-      }
-      return { sql, values };
+      if (ids.size === 0) return { sql: kind, values: [] };
+      const counts = Object.fromEntries([...ids].map((stack) => [stack, (taker.offer[kind][stack] ?? 0) - (giver.offer[kind][stack] ?? 0)]));
+      return { sql: addedStacks(kind), values: [JSON.stringify(counts)] };
     };
     const changes = STACKS.map((kind) => [kind, change(kind)]);
     // The pieces got are from a trade, which the Encyklopedia leaves out
     // (ownDiscoveries in the engine).
-    let foreign = 'foreign_stacks';
-    const got = [];
-    for (const kind of STACKS.filter((one) => FOREIGN[one])) {
-      for (const [stack, count] of Object.entries(taker.offer[kind])) {
-        foreign = `json_set(${foreign}, ?, COALESCE(json_extract(foreign_stacks, ?), 0) + ?)`;
-        got.push(path(`${FOREIGN[kind]}:${stack}`), path(`${FOREIGN[kind]}:${stack}`), count);
-      }
-    }
+    const got = Object.fromEntries(
+      STACKS.filter((one) => FOREIGN[one]).flatMap((kind) => Object.entries(taker.offer[kind]).map(([stack, count]) => [`${FOREIGN[kind]}:${stack}`, count])),
+    );
+    const foreign = Object.keys(got).length > 0 ? { sql: addedStacks('foreign_stacks'), values: [JSON.stringify(got)] } : { sql: 'foreign_stacks', values: [] };
     // The items given keep their ids, so they come off the giver's
     // favourites: one that comes back is no favourite (favorites.js).
     moves.push(
       db
         .prepare(
-          `UPDATE characters SET gold = gold + ?, ${changes.map(([kind, { sql }]) => `${kind} = ${sql}`).join(', ')}, foreign_stacks = ${foreign}, favorites = ${withoutFavorites}, version = version + 1 WHERE id = ?`,
+          `UPDATE characters SET gold = gold + ?, ${changes.map(([kind, { sql }]) => `${kind} = ${sql}`).join(', ')}, foreign_stacks = ${foreign.sql}, favorites = ${withoutFavorites}, version = version + 1 WHERE id = ?`,
         )
-        .bind(taker.offer.gold - giver.offer.gold, ...changes.flatMap(([, { values }]) => values), ...got, JSON.stringify(giver.offer.items), giver.id),
+        .bind(taker.offer.gold - giver.offer.gold, ...changes.flatMap(([, { values }]) => values), ...foreign.values, JSON.stringify(giver.offer.items), giver.id),
     );
   }
   const emptied = (kind) => `(SELECT COALESCE(json_group_object(key, value), '{}') FROM json_each(characters.${kind}) WHERE value > 0)`;

@@ -310,7 +310,8 @@
             "takeDone",
             "errors",
             "logWar",
-            "fromWar"
+            "fromWar",
+            "level"
           ],
           "additionalProperties": false,
           "properties": {
@@ -452,6 +453,11 @@
               "type": "string",
               "minLength": 1
             },
+            "level": {
+              "description": "Postać poniżej progu Wymiany (community.json trade.minLevel): od którego poziomu włoży i weźmie przedmioty; {level} wypełnia gra.",
+              "type": "string",
+              "pattern": "\\{level\\}"
+            },
             "putDone": {
               "type": "string",
               "minLength": 1
@@ -475,7 +481,8 @@
                 "notYours",
                 "bagFull",
                 "leave",
-                "changed"
+                "changed",
+                "levelOther"
               ],
               "additionalProperties": false,
               "properties": {
@@ -530,6 +537,11 @@
                 "changed": {
                   "type": "string",
                   "minLength": 1
+                },
+                "levelOther": {
+                  "description": "Przedmiot dla członka poniżej progu Wymiany; {name} i {level} wypełnia gra.",
+                  "type": "string",
+                  "pattern": "\\{name\\}.*\\{level\\}"
                 }
               }
             },

@@ -30,7 +30,7 @@ export async function getGuildTodo(context) {
     beastView(db, player.row, context.now, player.activity),
     expeditionView(db, player.row, guild, context.now, player.activity),
     requestsView(db, player, guild, context.now),
-    chestWaiting(db, player.row.id, guild.id),
+    chestWaiting(db, player.row, guild.id),
   ]);
   const ready = (bar) => Boolean(bar?.thresholds.some((threshold) => threshold.ready));
   // An attack it may make now: none while it offers itself or serves as a

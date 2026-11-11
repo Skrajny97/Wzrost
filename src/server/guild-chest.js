@@ -28,6 +28,15 @@
 // items here, for all, from the war chest rather than from a member
 // (`source` 'war'), and the log tells of them in the page's language.
 //
+// Items go in and come out from the players' Wymiana's level
+// (community.json trade.minLevel), the character's own and that of the
+// member an item is left for, as in both Wymiany and the Prośby Gildii (826 A,
+// 830 A: „żeby nowe postacie z innych kont nie przekazywały zdobyczy głównej
+// postaci”): a guild takes members from the 5th level, so without it a new
+// character of another account passed its loot to the main one through the
+// chest (the code review, 0.2.70). A character below it still takes back
+// what it put in itself, and its yellow dot waits for the level.
+//
 // Every put and take is one batch with assertions at its head (atomic.js):
 // the character as read, still in the guild, the item still in its bag or
 // still in the chest, so two taps at once move an item once, and none is
@@ -44,6 +53,7 @@ import { ApiError, json, readJson } from './http.js';
 import { numberText } from './i18n.js';
 
 const rules = () => content().guilds.chest;
+const minLevel = () => content().community.trade.minLevel;
 const words = () => rules().texts;
 const errors = () => words().errors;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
@@ -64,8 +74,8 @@ const titleOf = (item) => {
 // answers' errors).
 function cardTexts() {
   const { errors: _, ...texts } = words();
-  const vars = { capacity: capacityText(), log: counted(rules().log, texts.moveForms) };
-  return { ...texts, how: texts.how.map((line) => filled(line, vars)), full: filled(texts.full, vars) };
+  const vars = { capacity: capacityText(), log: counted(rules().log, texts.moveForms), level: minLevel() };
+  return { ...texts, how: texts.how.map((line) => filled(line, vars)), full: filled(texts.full, vars), level: filled(texts.level, vars) };
 }
 
 // Whether a gem is being set in the item now, by the character or by its
@@ -142,6 +152,8 @@ export async function chestView(db, player, guild) {
   return {
     guild: { name: guild.name, tag: guild.tag },
     capacity: rules().capacity,
+    // Below the Wymiana's level: no "Włóż", and only its own items to take.
+    locked: row.level < minLevel(),
     count: entries.length,
     waiting: entries.filter((entry) => entry.forYou).length,
     items: entries,
@@ -158,11 +170,13 @@ export async function chestView(db, player, guild) {
 
 const answer = async (db, player, guild, extra = {}) => json({ ...(await chestView(db, player, guild)), ...extra });
 
-// Whether an item waits in the guild's chest for this character, for the
-// yellow dot of the Gildia's "Skrzynia" (guild-todo.js).
-export async function chestWaiting(db, characterId, guildId) {
-  const row = await db.prepare('SELECT 1 AS waiting FROM guild_chest WHERE guild_id = ? AND for_id = ? LIMIT 1').bind(guildId, characterId).first();
-  return Boolean(row);
+// Whether an item waits in the guild's chest for this character (`row`),
+// for the yellow dot of the Gildia's "Skrzynia" (guild-todo.js): not below
+// the level it takes items from.
+export async function chestWaiting(db, row, guildId) {
+  if (row.level < minLevel()) return false;
+  const found = await db.prepare('SELECT 1 AS waiting FROM guild_chest WHERE guild_id = ? AND for_id = ? LIMIT 1').bind(guildId, row.id).first();
+  return Boolean(found);
 }
 
 // GET /api/guild/chest: outside a guild, only the card's words (as the
@@ -195,6 +209,7 @@ export async function putInGuildChest(context) {
   const { row } = player;
   const now = context.now;
   const body = await readJson(context.request);
+  if (row.level < minLevel()) throw new ApiError(403, 'chest_level', cardTexts().level);
   const item = player.items.find((candidate) => candidate.id === body.itemId);
   if (!item) throw new ApiError(404, 'item_not_found', errors().noItem);
   if (item.equippedSlot) throw new ApiError(409, 'equipped', errors().worn);
@@ -205,10 +220,11 @@ export async function putInGuildChest(context) {
     if (!Number.isInteger(body.forId)) throw new ApiError(400, 'invalid_member', errors().noMember);
     if (body.forId === row.id) throw new ApiError(400, 'self', errors().self);
     forMember = await db
-      .prepare('SELECT c.id, c.name FROM guild_members m JOIN characters c ON c.id = m.character_id WHERE m.guild_id = ? AND m.character_id = ?')
+      .prepare('SELECT c.id, c.name, c.level FROM guild_members m JOIN characters c ON c.id = m.character_id WHERE m.guild_id = ? AND m.character_id = ?')
       .bind(guild.id, body.forId)
       .first();
     if (!forMember) throw new ApiError(404, 'no_member', errors().noMember);
+    if (forMember.level < minLevel()) throw new ApiError(409, 'chest_level_other', filled(errors().levelOther, { name: forMember.name, level: minLevel() }));
   }
   const { capacity } = rules();
   const full = () => new ApiError(409, 'chest_full', filled(errors().full, { capacity: capacityText() }));
@@ -278,6 +294,7 @@ export async function takeFromGuildChest(context) {
   if (stored.for_member !== null && stored.for_member !== row.id && stored.put_by !== row.id) {
     throw new ApiError(403, 'not_yours', filled(errors().notYours, { name: stored.for_name }));
   }
+  if (stored.put_by !== row.id && row.level < minLevel()) throw new ApiError(403, 'chest_level', cardTexts().level);
   if (bagPlaces(player) >= bagCapacity(campLevels(player.buildings, now, content()), content())) throw new ApiError(409, 'bag_full', errors().bagFull);
   const item = JSON.parse(stored.data);
   await guarded(

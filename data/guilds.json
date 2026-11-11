@@ -514,6 +514,7 @@
         "Włóż przedmiot z plecaka dla wszystkich albo dla jednej postaci z gildii. Założonego przedmiotu nie włożysz.",
         "Przedmiot dla wszystkich weźmie każdy członek gildii. Przedmiot dla jednej postaci weźmie tylko ona, a dopóki czeka, możesz go zabrać z powrotem.",
         "Skrzynia mieści {capacity}. Żeby wziąć przedmiot, potrzebujesz miejsca w plecaku.",
+        "Wkładać i brać przedmioty można od {level}. poziomu postaci, jak w Wymianie. Swój przedmiot zabierzesz z powrotem także wcześniej.",
         "Przedmiot zachowuje ulepszenie, kamień, rzadkość i Tier. Encyklopedia nie zaliczy przedmiotu od innej postaci.",
         "„Ostatnie ruchy” pokazują do {log}: kto, co i kiedy wkłada albo wyjmuje.",
         "Gdy ktoś opuści gildię, przedmioty dla niego są odtąd dla wszystkich. Ostatnia postać opuści gildię dopiero przy pustej skrzyni."
@@ -548,6 +549,7 @@
       "logWar": "Skrzynia wojenna za wygraną wojnę · {at}",
       "fromWar": "skrzynia wojenna",
       "noGuild": "Ze Skrzyni Gildii korzystają członkowie gildii. Dołącz do gildii albo załóż własną.",
+      "level": "Skrzynia Gildii otworzy się dla Ciebie na {level}. poziomie postaci.",
       "putDone": "{item}: w Skrzyni Gildii.",
       "takeDone": "{item}: w plecaku.",
       "errors": {
@@ -563,7 +565,8 @@
         "notYours": "Ten przedmiot czeka na postać {name}.",
         "bagFull": "Plecak jest pełny. Zrób w nim miejsce, żeby wziąć przedmiot.",
         "leave": "W Skrzyni Gildii zostały przedmioty. Weź je, zanim wyjdziesz: bez Ciebie gildia zniknie razem ze skrzynią.",
-        "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz."
+        "changed": "Coś zmieniło się w międzyczasie. Spróbuj jeszcze raz.",
+        "levelOther": "Postać {name} weźmie przedmioty ze skrzyni dopiero od {level}. poziomu."
       }
     }
   },

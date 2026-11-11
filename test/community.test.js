@@ -7,8 +7,24 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import { giftReward, questPeriod } from '../src/engine/index.js';
+import { firstKept } from '../src/server/community.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
+
+// The code review: going back keepDays times 24 hours came a day too late
+// at 23:00–24:00 in the week after the autumn change of the clocks, and an
+// Upominek of the first day kept was gone an hour early.
+test('the Upominki kept are counted in calendar days, also around a change of the clocks', () => {
+  const back = (year, month, day) => new Date(Date.UTC(year, month - 1, day - (content.community.gift.keepDays - 1))).toISOString().slice(0, 10);
+  // 30.10.2026 at 23:30 and at 22:30 in Warsaw (CET), the week after the
+  // autumn change.
+  assert.equal(firstKept(Date.UTC(2026, 9, 30, 22, 30)), back(2026, 10, 30));
+  assert.equal(firstKept(Date.UTC(2026, 9, 30, 21, 30)), back(2026, 10, 30));
+  // 2.4.2026 at 00:30 in Warsaw (CEST), the week after the spring change.
+  assert.equal(firstKept(Date.UTC(2026, 3, 1, 22, 30)), back(2026, 4, 2));
+  // 15.11.2026 at noon.
+  assert.equal(firstKept(Date.UTC(2026, 10, 15, 11)), back(2026, 11, 15));
+});
 
 describe('Społeczność: Ranking, Znajomi i Upominek', () => {
   const { call, db, signUp } = useServer({ AUTHOR_LOGINS: 'szef' });

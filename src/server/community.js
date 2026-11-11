@@ -6,7 +6,7 @@
 // collects at most claimsPerDay a day, all waiting ones at once, and one not
 // collected goes after keepDays days.
 
-import { classNameOf, giftReward, highestProfession, isUnlocked, questPeriod } from '../engine/index.js';
+import { classNameOf, giftReward, highestProfession, isUnlocked, questPeriod, zoneMidnight } from '../engine/index.js';
 import { characterView, loadPlayer } from './characters.js';
 import { chatRole, requireChatter } from './chat.js';
 import { content } from './content.js';
@@ -17,10 +17,13 @@ import { t } from './i18n.js';
 import { askedPage, lastOffset } from './ranking-pages.js';
 import { OWN_CHARACTERS } from './roles.js';
 
-const DAY = 86400000;
 const today = (now) => questPeriod('daily', now, content()).key;
-// The first day whose Upominek still waits to be collected.
-const firstKept = (now) => questPeriod('daily', now - (content().community.gift.keepDays - 1) * DAY, content()).key;
+// The first day whose Upominek still waits to be collected: keepDays Warsaw
+// days, today's among them, counted by the calendar. Going back keepDays
+// times 24 hours (as before 0.2.70) came a day too late at 23:00–24:00 in
+// the week after the autumn change of the clocks, so the Upominek of the
+// first day kept was gone an hour early (the code review).
+export const firstKept = (now) => questPeriod('daily', zoneMidnight(now, content().quests.timeZone, 1 - content().community.gift.keepDays), content()).key;
 
 // The highest level of the character's professions (characters.professions,
 // {"herbalism": {"level": 3, ...}}), 0 before its first work.

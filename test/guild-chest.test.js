@@ -269,6 +269,49 @@ describe('Skrzynia Gildii', () => {
     assert.equal((await all('SELECT id FROM guild_chest_log WHERE guild_id = ?', guild)).length, rules.log);
   });
 
+  // The code review (0.2.70): a guild takes members from the 5th level, so
+  // a new character of another account passed its loot to the main one
+  // through the chest. Items go in and come out from the Wymiana's level,
+  // as in both Wymiany and the Prośby Gildii (826 A, 830 A).
+  test("items go in and come out from the Wymiana's level, and a character below it takes back only its own", async () => {
+    const level = content.community.trade.minLevel;
+    const druh = await idOf('Druh');
+    // Put in while Druh was at the level: one of its own, one for it, one
+    // for all.
+    const own = await put('druh', await inBag('Druh', amulet(21)));
+    assert.equal(own.status, 200, JSON.stringify(own.data).slice(0, 300));
+    assert.equal((await put('mistrz', await inBag('Mistrz', amulet(22)), druh)).status, 200);
+    assert.equal((await put('mistrz', await inBag('Mistrz', amulet(23)))).status, 200);
+    await run('UPDATE characters SET level = ? WHERE name = ?', level - 1, 'Druh');
+    const words = `Skrzynia Gildii otworzy się dla Ciebie na ${level}. poziomie postaci.`;
+    const seen = await view('druh');
+    assert.deepEqual([seen.locked, seen.texts.level, seen.waiting], [true, words, 1]);
+    assert.match(seen.texts.how.join(' '), new RegExp(`od ${level}\\. poziomu postaci`));
+    assert.equal((await view('mistrz')).locked, false);
+    // No yellow dot for an item it cannot take yet.
+    assert.equal((await todo('druh')).chest, false);
+    const byLevel = Object.fromEntries(seen.items.map((item) => [item.level, item.id]));
+    for (const itemLevel of [22, 23]) {
+      const refused = await take('druh', byLevel[itemLevel]);
+      assert.deepEqual([refused.status, refused.data.error.code, refused.data.error.message], [403, 'chest_level', words]);
+    }
+    // Its own item comes back.
+    assert.equal((await take('druh', byLevel[21])).status, 200);
+    // Nothing goes in from it, and nothing for it.
+    const refused = await put('druh', await inBag('Druh', amulet(24)));
+    assert.deepEqual([refused.status, refused.data.error.code], [403, 'chest_level']);
+    const forDruh = await put('mistrz', await inBag('Mistrz', amulet(25)), druh);
+    assert.deepEqual(
+      [forDruh.status, forDruh.data.error.code, forDruh.data.error.message],
+      [409, 'chest_level_other', `Postać Druh weźmie przedmioty ze skrzyni dopiero od ${level}. poziomu.`],
+    );
+    // At the level all of it opens again.
+    await run('UPDATE characters SET level = ? WHERE name = ?', level, 'Druh');
+    assert.equal((await todo('druh')).chest, true);
+    for (const itemLevel of [22, 23]) assert.equal((await take('druh', byLevel[itemLevel])).status, 200);
+    assert.deepEqual((await bag('Druh')).map((item) => item.level).sort(), [21, 22, 23, 24]);
+  });
+
   test('outside a guild only the words, and nothing goes in', async () => {
     await player('obcy', 'Obcy');
     const outside = await view('obcy');

@@ -143,6 +143,44 @@ describe('Wymiana', () => {
     assert.deepEqual([(await row('Ala')).gold, (await row('Ola')).gold], [530, 470]);
   });
 
+  // The code review: each kind of goods took three bound values in each of
+  // the exchange's statements, and D1 takes at most 100 in one, so a trade
+  // of about 17 kinds or more failed every time ("Coś z ofert zmieniło się
+  // w ostatniej chwili").
+  test('a trade of many kinds of goods goes through, the other stacks untouched', async () => {
+    const set = (name, column, value) => db().then((database) => database.prepare(`UPDATE characters SET ${column} = ? WHERE name = ?`).bind(JSON.stringify(value), name).run());
+    const held = async (name) => {
+      const found = await (await db()).prepare('SELECT materials, herbs, foreign_stacks FROM characters WHERE name = ?').bind(name).first();
+      return { materials: JSON.parse(found.materials), herbs: JSON.parse(found.herbs), foreign: JSON.parse(found.foreign_stacks) };
+    };
+    const keys = content.materials.slice(0, 40).map((material) => `${material.id}:common`);
+    assert.equal(keys.length, 40);
+    const alaKeys = keys.slice(0, 22);
+    const olaKeys = keys.slice(22);
+    const each = (list, count) => Object.fromEntries(list.map((key) => [key, count]));
+    const herbs = content.herbs.slice(0, 3).map((herb) => herb.id);
+    await set('Ala', 'materials', { ...each(alaKeys, 3), 'wolf-pelt:rare': 7 });
+    await set('Ala', 'herbs', each(herbs, 4));
+    await set('Ola', 'materials', each(olaKeys, 2));
+    const id = await opened();
+    const mine = await trade(players.ala, 'offer', { id, offer: { materials: each(alaKeys, 2), herbs: { [herbs[0]]: 1 } } });
+    assert.equal(mine.status, 200, JSON.stringify(mine.data));
+    const offered = await trade(players.ola, 'offer', { id, offer: { materials: each(olaKeys, 2) } });
+    assert.equal(offered.status, 200, JSON.stringify(offered.data));
+    const locked = await trade(players.ola, 'confirm', { id, version: offered.data.trade.version });
+    const done = await trade(players.ala, 'confirm', { id, version: locked.data.trade.version });
+    assert.equal(done.data.trade.state, 'done', JSON.stringify(done.data));
+    const ala = await held('Ala');
+    const ola = await held('Ola');
+    assert.deepEqual(ala.materials, { ...each(alaKeys, 1), 'wolf-pelt:rare': 7, ...each(olaKeys, 2) });
+    assert.deepEqual(ala.herbs, { [herbs[0]]: 3, [herbs[1]]: 4, [herbs[2]]: 4 });
+    assert.deepEqual(ola.materials, each(alaKeys, 2));
+    assert.deepEqual(ola.herbs, { [herbs[0]]: 1 });
+    // What each got is from a trade, for the Encyklopedia.
+    assert.deepEqual(ala.foreign, Object.fromEntries(olaKeys.map((key) => [`material:${key}`, 2])));
+    assert.deepEqual(ola.foreign, { ...Object.fromEntries(alaKeys.map((key) => [`material:${key}`, 2])), [`herb:${herbs[0]}`]: 1 });
+  });
+
   // The author's 571 ("koniecznie"): the gems and ores of Górnictwo in the
   // Wymiana too.
   test('gems and ores go in a trade too, take no places in the bag and stay out of the Encyklopedia', async () => {

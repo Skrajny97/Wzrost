@@ -3092,6 +3092,23 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.70 (12.11.2026): Wymiana wielu rodzajów towarów, Skrzynia Gildii od 20. poziomu, Upominki przy zmianie czasu
+
+Przegląd kodu Wymiany, Upominków i Skrzyni Gildii znalazł trzy błędy. Każda poprawka ma test, który bez niej nie przechodzi.
+
+1. **Wymiana wielu rodzajów towarów** (src/server/trades.js, test/trades.test.js). Każdy rodzaj ziół, mikstur, materiałów, minerałów i zasobów dokładał do zapisu wymiany po trzy wartości, a baza przyjmuje najwyżej 100 w jednym zapytaniu. Wymiana z mniej więcej 17 rodzajami towarów albo więcej przepadała więc za każdym razem („Coś z ofert zmieniło się w ostatniej chwili”), choć nic nie ginęło. Teraz towary jednego rodzaju idą do zapytania jednym zapisem i wymiana przechodzi przy każdej liczbie rodzajów.
+2. **Skrzynia Gildii od 20. poziomu postaci (brakujący szczegół, jak 826 A i 830 A)** (src/server/guild-chest.js, src/client/guild-chest.js, data/guilds.json, test/guild-chest.test.js). Do gildii dołącza się od 5. poziomu, a Skrzynia Gildii nie miała progu Wymiany. Nowa postać z innego konta mogła więc włożyć swoje łupy „Dla:” głównej postaci, a ta je brała. To ta sama luka, którą autor zamknął w obu Wymianach i w Prośbach Gildii („żeby nowe postacie z innych kont nie przekazywały zdobyczy głównej postaci”). Teraz przedmioty wkłada się i bierze od 20. poziomu postaci (ten sam `trade.minLevel` z `data/community.json`):
+   - postać poniżej progu nie włoży przedmiotu i nie weźmie cudzego; „Włóż” i „Weź” pokazują wtedy tylko „Skrzynia Gildii otworzy się dla Ciebie na 20. poziomie postaci.”, a ta sama linijka stoi pod licznikiem skrzyni;
+   - własny przedmiot, włożony wcześniej, postać zabierze zawsze;
+   - przedmiotu nie zostawi się dla postaci poniżej progu („Postać … weźmie przedmioty ze skrzyni dopiero od 20. poziomu.”); przedmiot zostawiony dla niej wcześniej czeka, aż dojdzie do progu, a wkładający dalej może go zabrać;
+   - żółta kropka Skrzyni nie świeci postaci poniżej progu.
+
+   Postacie jednego konta przekazują sobie przedmioty przez Skrzynię Gildii od 20. poziomu, a niżej przez Skrzynię Konta (punkt 13 Skrzyni Gildii).
+3. **Upominki przy zmianie czasu** (src/server/community.js, test/community.test.js). Upominek czeka 7 dni warszawskich, licząc dzisiejszy. Gra liczyła je, cofając się 6 razy o 24 godziny, więc w tygodniu po jesiennej zmianie czasu, między 23:00 a 24:00, uznawała Upominek z pierwszego z tych dni za przeterminowany i usuwała go godzinę za wcześnie. Teraz dni liczy kalendarz.
+4. **Sprawdzanie typów (650 A)** obejmuje teraz 42 z 65 plików silnika.
+
+Pytania na stronie ocen: 834 (Upominki od postaci poniżej 20. poziomu) i 835 (datki na Siedzibę Gildii od postaci poniżej 20. poziomu).
+
 ## Wersja 0.2.69 (11.11.2026): poprawki Areny i wojen gildii z przeglądu kodu, resztki po usuniętych postaciach
 
 Przegląd kodu Areny i wojen gildii znalazł kilka rzadkich błędów. Każda poprawka ma test, który bez niej nie przechodzi.
