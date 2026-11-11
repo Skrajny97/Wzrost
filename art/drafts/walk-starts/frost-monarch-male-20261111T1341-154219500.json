@@ -1,0 +1,27 @@
+{
+  "id": "frost-monarch-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "a tall regal king of eternal ice with long white hair, a white beard and a warm human face, a tall jagged crown of ice crystals, ornate armour of pale blue ice crystals over a deep blue and silver robe, a long white fur mantle, no staff, no sceptre and nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the crown to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/skin-eclipse-male.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/walks/start/frost-monarch-male.png",
+      "usage": "the same character seen from the side: face, hair, headwear, clothes, armour, colours and drawing style; leave out the ice staff: the hands are empty"
+    },
+    {
+      "path": "art/references/evolutions/frost-monarch-male.png",
+      "usage": "the character's look in detail: face, hair, clothes and colours; the hands empty, without the ice staff"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

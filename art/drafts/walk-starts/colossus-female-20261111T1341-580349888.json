@@ -1,0 +1,27 @@
+{
+  "id": "colossus-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a tall broad-shouldered woman guardian in massive dark steel plate armour with gold trim, huge layered pauldrons, an open-faced heavy helmet with a small blue crest, dark hair tied back, a deep blue tabard with a golden fortress, no shield, no mace and nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and only one eye showing, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the crest to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/skin-perun-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/walks/start/colossus-female.png",
+      "usage": "the same character seen from the side: face, hair, headwear, clothes, armour, colours and drawing style; leave out the shield and the mace: the hands are empty"
+    },
+    {
+      "path": "art/references/evolutions/colossus-female.png",
+      "usage": "the character's look in detail: face, hair, clothes and colours; the hands empty, without the shield and the mace"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

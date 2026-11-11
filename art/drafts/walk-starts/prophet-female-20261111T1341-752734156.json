@@ -1,0 +1,27 @@
+{
+  "id": "prophet-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a woman prophetess with long golden hair, a sheer golden blindfold over the eyes, a golden circlet with a small sun, a flowing white and gold robe with golden sun and star embroidery down to the feet, a long golden stole, no staff and nothing in the hands, seen exactly from the side in a strict profile, facing and walking to the right, the nose pointing right and the golden blindfold over the eyes, the chest, belly and hips turned fully to the right and not towards the viewer, only the near arm showing, hanging relaxed beside the body with an empty loosely closed hand, the far arm hidden behind the body, the back and shoulders straight and upright, upright mid-step in the pose of the grey mannequin, the same size and place as the mannequin, the whole figure from the top of the head to the feet inside the image, isolated figure on a plain background, forest fantasy",
+  "style": "art/references/walks/start/skin-dawn-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/walks/start/prophet-female.png",
+      "usage": "the same character seen from the side: face, hair, headwear, clothes, armour, colours and drawing style; leave out the staff: the hands are empty"
+    },
+    {
+      "path": "art/references/evolutions/prophet-female.png",
+      "usage": "the character's look in detail: face, hair, clothes and colours; the hands empty, without the staff"
+    },
+    {
+      "path": "art/references/walks/mannequin-2.png",
+      "usage": "the pose, size and place of the figure: seen exactly from the side in profile, facing right, upright mid-step, not turned towards the viewer; copy it exactly"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
