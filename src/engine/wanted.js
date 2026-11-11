@@ -1,3 +1,4 @@
+// @ts-check
 // Poszukiwani in the Osada (data/settlement.json, wanted; DECISIONS.md,
 // "Poszukiwani"; the author's 619 B: „nazwane, silniejsze odmiany stworów z
 // tych miejsc” and „wyjęci spod prawa”). Every day the sołtys posts wanted
@@ -14,16 +15,42 @@ import { trophyGrades } from './encyclopedia.js';
 import { createRng } from './rng.js';
 import { areaOpenFor } from './trial-hall.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {import('./rng.js').Rng} Rng */
+/** @typedef {{ id: string, regionId: string, minLevel: number, maxLevel: number, elite?: string }} Area An inner region (data/areas.json). */
+/** @typedef {{ id: string, kind: string, areaId: string, monsterId: string, name: string, female: boolean, level: number, gold: number }} Poster */
+/** @typedef {{ kind: string, areaId: string, monsterId: string, name: string, female: boolean, level: number }} Target */
+
+/**
+ * @param {Content} content
+ * @returns {Record<string, any> | null}
+ */
 export const wantedOf = (content) => content.settlement?.wanted ?? null;
+
+// The rules where the caller knows the game has them.
+/** @param {Content} content */
+const rulesOf = (content) => /** @type {Record<string, any>} */ (wantedOf(content));
 
 // The bounty for a target in `area`: goldPerLevel × the place's first
 // level, in whole goldSteps, at least one.
+/**
+ * @param {Area} area
+ * @param {Content} content
+ * @returns {number}
+ */
 export function wantedGold(area, content) {
-  const { goldPerLevel, goldStep } = wantedOf(content);
+  const { goldPerLevel, goldStep } = rulesOf(content);
   return Math.max(goldStep, Math.round((goldPerLevel * area.minLevel) / goldStep) * goldStep);
 }
 
 // A poster: its target, at the level of the place's elite.
+/**
+ * @param {string} day
+ * @param {Area} area
+ * @param {Record<string, any>} target a creature's variant (`area`, `monster`) or an outlaw (a monster)
+ * @param {Content} content
+ * @returns {Poster}
+ */
 function poster(day, area, target, content) {
   const outlaw = !target.area;
   const monsterId = outlaw ? target.id : target.monster;
@@ -47,10 +74,16 @@ function poster(day, area, target, content) {
 // często tam się wejdzie i od razu padnie”): the places of the lands below
 // it; with no land below it, those of the first land but its newest place,
 // or the only one open.
+/**
+ * @param {Area[]} open
+ * @param {Content} content
+ * @returns {Area[]}
+ */
 export function wantedPlaces(open, content) {
   if (open.length === 0) return [];
-  const land = (area) => content.regions.findIndex((region) => region.id === area.regionId);
-  const newest = land(open.at(-1));
+  /** @param {Area} area */
+  const land = (area) => content.regions.findIndex((/** @type {{ id: string }} */ region) => region.id === area.regionId);
+  const newest = land(open[open.length - 1]);
   const below = open.filter((area) => land(area) < newest);
   if (below.length > 0) return below;
   return open.length > 1 ? open.slice(0, -1) : open;
@@ -64,10 +97,20 @@ export function wantedPlaces(open, content) {
 // drawn before that rule (its basis kept before 10.11.2026, server
 // wanted.js), from the highest places open of all, so the day's posters
 // stay as they were drawn.
+/**
+ * @param {number} classLevel
+ * @param {string} day
+ * @param {unknown} seed
+ * @param {Content} content
+ * @param {string | null} [early]
+ * @param {{ lands?: boolean }} [options]
+ * @returns {Poster[]}
+ */
 export function wantedPosters(classLevel, day, seed, content, early = null, { lands = true } = {}) {
   const rules = wantedOf(content);
   if (!rules) return [];
-  const open = content.areas.filter((area) => areaOpenFor(area, classLevel, early, content));
+  /** @type {Area[]} */
+  const open = content.areas.filter((/** @type {Area} */ area) => areaOpenFor(area, classLevel, early, content));
   const places = (lands ? wantedPlaces(open, content) : open).slice(-rules.places);
   if (places.length === 0) return [];
   const rng = createRng(`${seed}:${day}:wanted`);
@@ -78,10 +121,10 @@ export function wantedPosters(classLevel, day, seed, content, early = null, { la
   }
   const creatures = order
     .slice(0, rules.creatures)
-    .map((area) => [area, rules.variants.find((variant) => variant.area === area.id)])
+    .map((area) => /** @type {[Area, Record<string, any> | undefined]} */ ([area, rules.variants.find((/** @type {{ area: string }} */ variant) => variant.area === area.id)]))
     .filter(([, variant]) => variant)
     .sort(([a], [b]) => b.minLevel - a.minLevel)
-    .map(([area, variant]) => poster(day, area, variant, content));
+    .map(([area, variant]) => poster(day, area, /** @type {Record<string, any>} */ (variant), content));
   const outlaw = content.monstersById[rng.pick(rules.outlaws)];
   return [...creatures, poster(day, rng.pick(places), outlaw, content)];
 }
@@ -94,9 +137,15 @@ export function wantedPosters(classLevel, day, seed, content, early = null, { la
 // a creature's variant or an outlaw in that place; of targets held alike,
 // one drawn from the trip's seed. The target alone, without a poster's id
 // or trophy, which stay each holder's own; null when nobody holds one.
+/**
+ * @param {(Poster | null | undefined)[]} posters
+ * @param {unknown} seed
+ * @returns {Target | null}
+ */
 export function tripWanted(posters, seed) {
+  /** @type {Map<string, { poster: Poster, count: number }>} */
   const held = new Map();
-  for (const poster of posters.filter(Boolean)) {
+  for (const poster of /** @type {Poster[]} */ (posters.filter(Boolean))) {
     const key = `${poster.areaId}:${poster.monsterId}`;
     held.set(key, { poster: held.get(key)?.poster ?? poster, count: (held.get(key)?.count ?? 0) + 1 });
   }
@@ -108,7 +157,12 @@ export function tripWanted(posters, seed) {
 }
 
 // Whether a poster in hand is for the trip's wanted target (tripWanted).
-export const wantedTarget = (poster, target) => Boolean(poster && target) && poster.areaId === target.areaId && poster.monsterId === target.monsterId;
+/**
+ * @param {Poster | null | undefined} poster
+ * @param {Target | null | undefined} target
+ * @returns {boolean}
+ */
+export const wantedTarget = (poster, target) => Boolean(poster && target) && poster?.areaId === target?.areaId && poster?.monsterId === target?.monsterId;
 
 // The trophy a beaten variant leaves: its creature's material in the first
 // grade of its trophy (encyclopedia.js) the character has not found yet,
@@ -117,15 +171,23 @@ export const wantedTarget = (poster, target) => Boolean(poster && target) && pos
 // przesadzić z balansem jak te trofeum wlecą znowu się zrobi za łatwo”).
 // In the first grade once only the rarest is missing, or none; null for a
 // creature without a material.
+/**
+ * @param {string} monsterId
+ * @param {Record<string, unknown>} discovered
+ * @param {Content} content
+ * @returns {string | null}
+ */
 export function wantedTrophy(monsterId, discovered, content) {
   const material = content.materialsByMonster[monsterId];
   if (!material) return null;
+  /** @type {string[]} */
   const grades = trophyGrades(material.id, content);
   const missing = grades.slice(0, -1).find((rarityId) => !discovered[`material:${material.id}:${rarityId}`]);
   return stackKey(material.id, missing ?? grades[0]);
 }
 
 // The wanted's encounter: alone, at its level, by its own name.
+/** @param {Target} target */
 export const wantedEncounter = (target) => ({
   elite: false,
   wanted: true,
@@ -135,14 +197,27 @@ export const wantedEncounter = (target) => ({
 // The [damage, HP] multipliers of the wanted on an exploration of `area`
 // whose creatures have `strength` (exploreStrength): its HP and damage are
 // those of the place's elite at its level, times the rules' strength.
+/**
+ * @param {Area} area
+ * @param {Target} target
+ * @param {[number, number]} strength
+ * @param {Content} content
+ * @returns {[number, number]}
+ */
 export function wantedStrength(area, target, strength, content) {
-  const [damage, hp] = wantedOf(content).strength;
+  const [damage, hp] = rulesOf(content).strength;
   if (!area.elite) return [strength[0] * damage, strength[1] * hp];
-  const elite = monsterCombatant({ monsterId: area.elite, level: target.level, id: 'elite' }, content);
-  const own = monsterCombatant({ monsterId: target.monsterId, level: target.level, id: 'own' }, content);
+  const elite = monsterCombatant(/** @type {any} */ ({ monsterId: area.elite, level: target.level, id: 'elite' }), content);
+  const own = monsterCombatant(/** @type {any} */ ({ monsterId: target.monsterId, level: target.level, id: 'own' }), content);
+  /** @param {{ weapon: { min: number, max: number } }} unit */
   const hit = (unit) => unit.weapon.min + unit.weapon.max;
   return [strength[0] * damage * (hit(elite) / hit(own)), strength[1] * hp * (elite.maxHp / own.maxHp)];
 }
 
 // The rarity of the item a beaten outlaw leaves, by the rules' weights.
-export const wantedLootRarity = (rng, content) => rng.weighted(Object.entries(wantedOf(content).loot), ([, weight]) => weight)[0];
+/**
+ * @param {Rng} rng
+ * @param {Content} content
+ * @returns {string}
+ */
+export const wantedLootRarity = (rng, content) => rng.weighted(/** @type {[string, number][]} */ (Object.entries(rulesOf(content).loot)), ([, weight]) => weight)[0];

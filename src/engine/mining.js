@@ -1,3 +1,4 @@
+// @ts-check
 // Górnictwo (data/professions.json: mining and minerals): the character digs
 // in the Systemowa Kopalnia, with no fights and no risk, as it gathers herbs
 // in the Zagajnik (professions.js): the slider sets the time, the
@@ -13,14 +14,33 @@ import { countList, professionLevelLines, professionProgress } from './professio
 import { countEvents, createRng } from './rng.js';
 import { say } from './text.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {{ id: string, name: string, level: number, perHour: number, kind?: string }} Mineral A mineral of data/professions.json. */
+
 // The minerals the System shows at a level of Górnictwo.
-export const knownMinerals = (level, content) => content.minerals.filter((mineral) => mineral.level <= level);
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {Mineral[]}
+ */
+export const knownMinerals = (level, content) => content.minerals.filter((/** @type {Mineral} */ mineral) => mineral.level <= level);
 
 // Pieces of a mineral an hour at a level: more with each level, and `week`
 // the factor of the week the digging began in (minerals, weeks.js).
+/**
+ * @param {Mineral} mineral
+ * @param {number} level
+ * @param {Content} content
+ * @param {number} [week]
+ * @returns {number}
+ */
 export const mineralsPerHour = (mineral, level, content, week = 1) => mineral.perHour * (1 + content.mining.yieldPerLevel * (level - 1)) * week;
 
 // The slider's times: the shortest, then every step up to the longest.
+/**
+ * @param {Content} content
+ * @returns {number[]}
+ */
 export function miningMinutes(content) {
   const { min, step, max } = content.mining.minutes;
   return Array.from({ length: Math.floor((max - min) / step) + 1 }, (_, index) => min + index * step);
@@ -29,7 +49,13 @@ export function miningMinutes(content) {
 // The gold an hour of exploring gives at a character level, as measured
 // (veins.explorationGold): straight between two measured levels, and below
 // the first or past the last in proportion to the level.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
 export function explorationGold(level, content) {
+  /** @type {[number, number][]} */
   const table = content.mining.veins.explorationGold;
   const [firstLevel, firstGold] = table[0];
   if (level <= firstLevel) return (firstGold * level) / firstLevel;
@@ -40,16 +66,27 @@ export function explorationGold(level, content) {
       return fromGold + ((toGold - fromGold) * (level - fromLevel)) / (toLevel - fromLevel);
     }
   }
-  const [lastLevel, lastGold] = table.at(-1);
+  const [lastLevel, lastGold] = table[table.length - 1];
   return (lastGold * level) / lastLevel;
 }
 
 // The gold of the veins in an hour of digging at a character level.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
 export const veinGoldPerHour = (level, content) => content.mining.veins.share * explorationGold(level, content);
 
 // What a digging of `minutes` should bring: of each mineral known, the
 // expected count with the lowest and highest the spread allows, and the
 // veins of gold with their gold, at the character's level.
+/**
+ * @param {number} minutes
+ * @param {number} level
+ * @param {number} characterLevel
+ * @param {Content} content
+ */
 export function expectedMining(minutes, level, characterLevel, content) {
   const { spread, veins } = content.mining;
   const hours = minutes / 60;
@@ -71,11 +108,17 @@ export function expectedMining(minutes, level, characterLevel, content) {
 // come on average, each with its share of the hour's gold ± its spread.
 // `week`: the factor of the week the digging began in (minerals, weeks.js),
 // for the minerals, not the veins' gold.
+/**
+ * @param {{ minutes: number, level: number, characterLevel: number, seed: unknown, week?: number }} digging
+ * @param {Content} content
+ * @returns {{ found: Record<string, number>, veins: number, gold: number }}
+ */
 export function mineMinerals({ minutes, level, characterLevel, seed, week = 1 }, content) {
   const rng = createRng(seed);
   const { spread, veins } = content.mining;
   const known = knownMinerals(level, content);
   const hours = minutes / 60;
+  /** @type {Record<string, number>} */
   const found = {};
   for (const mineral of known) {
     const count = countEvents(mineralsPerHour(mineral, level, content, week) * hours * rng.float(1 - spread, 1 + spread), rng);
@@ -95,11 +138,16 @@ export function mineMinerals({ minutes, level, characterLevel, seed, week = 1 },
 // found, the veins of gold with their gold, the profession's new levels with
 // their stats and the minerals the System revealed with them, and the
 // character's XP.
+/**
+ * @param {Record<string, any>} digging
+ * @param {Content} content
+ */
 export function miningReport({ minutes, startedAt, endsAt, seed, mined, before, after, character, xp, work }, content) {
   const { mining } = content;
   const texts = mining.texts;
   const profession = content.professionsById[mining.profession];
-  const revealed = content.minerals.filter((mineral) => mineral.level > before.level && mineral.level <= after.level);
+  /** @type {Mineral[]} */
+  const revealed = content.minerals.filter((/** @type {Mineral} */ mineral) => mineral.level > before.level && mineral.level <= after.level);
   return {
     kind: 'minerals',
     placeName: mining.place.name,
@@ -107,7 +155,7 @@ export function miningReport({ minutes, startedAt, endsAt, seed, mined, before, 
     startedAt,
     endsAt,
     line: say(texts, 'report', createRng(`${seed}:line`).int(0, texts.report.length - 1)),
-    minerals: Object.entries(mined.found).map(([id, count]) => ({ id, name: content.mineralsById[id].name, count })),
+    minerals: Object.entries(/** @type {Record<string, number>} */ (mined.found)).map(([id, count]) => ({ id, name: content.mineralsById[id].name, count })),
     found: say(texts, 'found', 0, { minerals: countList(mined.found, content.mineralsById) }),
     veins: mined.veins,
     gold: mined.gold,
