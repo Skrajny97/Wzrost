@@ -520,7 +520,7 @@
     "perun-chosen-male": {
       "start": "art/references/walks/start/perun-chosen-male.png",
       "pose": 2,
-      "shoulders": 2.5,
+      "shoulders": 1.5,
       "description": "an athletic young man archer of the thunder god with long fair blond hair and a silver circlet, a long dark blue coat with gold embroidered thunder symbols, a silver breastplate with a golden six-petal thunder rosette, silver pauldrons with lightning-shaped edges, brown boots, one long oak bow strapped upright on the back behind the shoulder, the whole bow above the waist and behind the body, never in front of the legs, beside a quiver of blue-fletched arrows, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
     "saint-female": {
