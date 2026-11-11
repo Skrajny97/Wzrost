@@ -1,0 +1,14 @@
+{
+  "id": "demon-slayer-male-bare",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, a strong man in gleaming silver plate armour seen exactly from the side, facing right: the silver plates of the hip and upper thigh under a dark leather belt, beside a long white tabard with gold trim, nothing hanging at the belt, no skull, no bone, transparent background around the figure",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": "art/references/walks/start/demon-slayer-male.png",
+  "mask": "art/inputs/walk-starts/demon-slayer-male-bare-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
