@@ -451,6 +451,91 @@
       "start": "art/references/walks/start/skin-perun-male.png",
       "pose": 2,
       "description": "a broad-shouldered young man with a short dark beard in dark blackened steel plate armour engraved with thin copper lightning lines, a grey wolf fur cloak over the shoulders falling behind, a dark steel helmet with two curved aurochs horns, copper-trimmed gauntlets and dark steel boots, no shield and no sword, both hands empty, the near arm swinging naturally"
+    },
+    "archdruid-female": {
+      "start": "art/references/walks/start/archdruid-female.png",
+      "pose": 2,
+      "description": "a woman archdruid with long auburn hair braided with green leaves and small flowers, a grand crown of tall antlers entwined with ivy and glowing green leaves, robes of moss, bark and oak leaves, a mantle of oak leaves and ivy, a belt of roots, a gnarled living-wood staff with a glowing green light held upright in her right hand"
+    },
+    "archdruid-male": {
+      "start": "art/references/walks/start/archdruid-male.png",
+      "pose": 2,
+      "description": "an old man archdruid with a long white beard braided with green leaves, a grand crown of tall antlers entwined with ivy and glowing green leaves, robes of moss, bark and oak leaves, a mantle of oak leaves and ivy, a belt of roots, a gnarled living-wood staff with a glowing green light held upright in his right hand"
+    },
+    "arena-legend-female": {
+      "start": "art/references/walks/start/arena-legend-female.png",
+      "pose": 2,
+      "description": "an athletic woman arena legend with a long dark braid, a golden helmet with a tall crimson crest and a golden laurel wreath, a lion pelt over the shoulders, a golden muscle cuirass with a lion's head, golden pauldrons, a crimson cape, a crimson and gold pleated skirt, golden greaves and sandals, a round golden shield with a lion's head on her left arm and a short sword in her right hand"
+    },
+    "arena-legend-male": {
+      "start": "art/references/walks/start/arena-legend-male.png",
+      "pose": 2,
+      "description": "an athletic man arena legend with a golden helmet with a tall crimson crest and a golden laurel wreath, a lion pelt over the shoulders, a golden muscle cuirass with a lion's head, golden pauldrons, a crimson cape, a crimson and gold pleated skirt, golden greaves and sandals, a round golden shield with a lion's head on his left arm and a short sword in his right hand"
+    },
+    "bow-master-female": {
+      "start": "art/references/walks/start/bow-master-female.png",
+      "pose": 2,
+      "description": "a lean young woman master archer with long black hair in a high ponytail and a silver diadem with a green gem, elegant black leather armour with silver plates and silver filigree, a silver pauldron shaped like a hawk's wing, a long dark green cloak, black leggings and tall black boots, one single long black recurve bow with silver tips held upright in her right hand at her side, only one bow, no arrow on the string"
+    },
+    "colossus-female": {
+      "start": "art/references/walks/start/colossus-female.png",
+      "pose": 2,
+      "description": "a tall broad-shouldered woman guardian in massive dark steel plate armour with gold trim, huge layered pauldrons, an open-faced heavy helmet with a small blue crest, dark hair tied back, a deep blue tabard with a golden fortress, a tall dark steel tower shield with a golden fortress on her left arm and a heavy flanged mace in her right hand"
+    },
+    "colossus-male": {
+      "start": "art/references/walks/start/colossus-male.png",
+      "pose": 2,
+      "description": "an enormous broad man guardian in massive dark steel plate armour with gold trim, huge layered pauldrons, an open-faced heavy helmet with a small blue crest, a short dark beard, a deep blue tabard with a golden fortress, a tall dark steel tower shield with a golden fortress on his left arm and a heavy flanged mace in his right hand"
+    },
+    "elemental-avatar-female": {
+      "start": "art/references/walks/start/elemental-avatar-female.png",
+      "pose": 2,
+      "description": "a tall woman archmage one with the elements, with long dark brown hair, a flowing ornate robe in deep red, blue and gold with glowing runes, a high collar, golden shoulder ornaments, a golden staff topped with three glowing crystals, red, blue and yellow, held upright in her right hand, the other hand empty"
+    },
+    "elemental-avatar-male": {
+      "start": "art/references/walks/start/elemental-avatar-male.png",
+      "pose": 2,
+      "description": "a tall man archmage one with the elements, with long dark brown hair and a short beard, a flowing ornate robe in deep red, blue and gold with glowing runes, a high collar, golden shoulder ornaments, a golden staff topped with three glowing crystals, red, blue and yellow, held upright in his right hand, the other hand empty"
+    },
+    "frost-monarch-female": {
+      "start": "art/references/walks/start/frost-monarch-female.png",
+      "pose": 2,
+      "description": "a tall regal queen of eternal ice with long white hair, rosy cheeks and a warm human face, a tall jagged crown of ice crystals, a long deep blue gown with silver frost embroidery, plates of pale blue ice crystals on the shoulders and bodice, a long white fur mantle, a tall ice staff topped with a long ice crystal held upright in her right hand"
+    },
+    "frost-monarch-male": {
+      "start": "art/references/walks/start/frost-monarch-male.png",
+      "pose": 2,
+      "description": "a tall regal king of eternal ice with long white hair, a white beard and a warm human face, a tall jagged crown of ice crystals, ornate armour of pale blue ice crystals over a deep blue and silver robe, a long white fur mantle, a tall ice sceptre-staff topped with an ice crystal star held upright in his right hand"
+    },
+    "horde-slayer-female": {
+      "start": "art/references/walks/start/horde-slayer-female.png",
+      "pose": 2,
+      "description": "a tall muscular barbarian woman with long red-brown hair in thick braids, the horned skull of a giant beast worn as a helmet with two long curved horns, a thick black fur mantle over the shoulders, a fitted leather and fur top, glowing red war paint runes on her arms, a fur kilt with a wide belt, fur-wrapped boots, one single big axe with a red rune on the blade in her right hand, only one axe"
+    },
+    "horde-slayer-male": {
+      "start": "art/references/walks/start/horde-slayer-male.png",
+      "pose": 2,
+      "description": "a huge muscular barbarian man with a long dark brown braided beard with iron rings, the horned skull of a giant beast worn as a helmet with two long curved horns, a thick black fur mantle over the shoulders, a bare scarred chest with glowing red war paint runes, a fur kilt with a wide belt and a skull buckle, fur-wrapped boots, one single big axe with a red rune on the blade in his right hand, only one axe"
+    },
+    "perun-chosen-male": {
+      "start": "art/references/walks/start/perun-chosen-male.png",
+      "pose": 2,
+      "description": "an athletic young man archer of the thunder god with long fair blond hair and a silver circlet, a long dark blue coat with gold embroidered thunder symbols, a silver breastplate with a golden six-petal thunder rosette, silver pauldrons with lightning-shaped edges, brown boots, a quiver of blue-fletched arrows on his back, one single long oak bow held upright in his right hand at his side, only one bow, no arrow on the string"
+    },
+    "saint-female": {
+      "start": "art/references/walks/start/saint-female.png",
+      "pose": 2,
+      "description": "a gentle woman saint with long dark hair under a white veil, a thin golden halo ring behind the head, pure white robes with fine golden embroidery, a long pale gold mantle, a golden sash, a tall golden staff topped with a small white dove held upright in her right hand"
+    },
+    "saint-male": {
+      "start": "art/references/walks/start/saint-male.png",
+      "pose": 2,
+      "description": "a gentle man saint with short dark brown hair and a short beard, a thin golden halo ring behind the head, pure white robes with fine golden embroidery, a long pale gold mantle, a golden sash, a tall golden staff topped with a small white dove held upright in his right hand"
+    },
+    "wild-lord-female": {
+      "start": "art/references/walks/start/wild-lord-female.png",
+      "pose": 2,
+      "description": "a strong woman lady of the wild forest with light brown hair in braids, a huge white wolf pelt worn as a hooded mantle with the white wolf's head over her head, leather armour embossed with golden animal motifs and fur trim, a golden eagle perched on her shoulder, brown trousers and fur-topped boots, one single long horn bow held upright in her right hand at her side, only one bow, no arrow on the string"
     }
   }
 }
