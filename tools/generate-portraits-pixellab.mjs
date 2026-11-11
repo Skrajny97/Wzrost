@@ -8,7 +8,8 @@
 // false: the places' circles, the lands), in the style of the kind's style image
 // (pixellab.style: an approved picture, for its pixel size, outline, shading
 // and detail, not its colours; pixellab.styles[id] for one prompt of its
-// own, e.g. a broad creature that fills its frame), with up to four
+// own, e.g. a broad creature that fills its frame; null for none, e.g. a
+// rider drawn from its portrait alone), with up to four
 // references of its own
 // (pixellab.references[id]): a path, used as the other half of a
 // man-and-woman pair so both wear the same (or as pixellab.usage says), or
@@ -101,6 +102,9 @@ const sizeOf = (path) => {
 };
 const reference = (path) => ({ image: png(path), size: sizeOf(path) });
 const promptOf = (id) => (typeof kind.prompts[id] === 'string' ? kind.prompts[id] : kind.prompts[id].prompt);
+// The style image of a prompt: its own (styles[id]), none when that is null,
+// else the kind's.
+const styleOf = (id) => (settings.styles && id in settings.styles ? settings.styles[id] : settings.style) ?? null;
 
 // An inpainting prompt ({tool: 'inpaint', input, mask, prompt}) redraws only
 // the white of its mask in its input picture and keeps the rest (inpaint-v3,
@@ -126,7 +130,7 @@ function inpainting(entry, seed) {
 // full queue of jobs (429) waits and tries again.
 async function draw(id, seed) {
   const refs = settings.references?.[id] ?? [];
-  const style = settings.styles?.[id] ?? settings.style;
+  const style = styleOf(id);
   const entry = kind.prompts[id];
   const inpaint = entry?.tool === 'inpaint';
   const path = inpaint ? '/inpaint-v3' : '/generate-image-v2';
@@ -184,7 +188,7 @@ if (values['dry-run']) {
     lines.push(
       kind.prompts[id].tool === 'inpaint'
         ? `| ${id} | do zrobienia (domalowanie ${kind.prompts[id].input}, maska ${kind.prompts[id].mask}) |`
-        : `| ${id} | do zrobienia (wzór: ${settings.styles?.[id] ?? settings.style ?? 'brak'}, odniesienia: ${(settings.references?.[id] ?? []).length}) |`,
+        : `| ${id} | do zrobienia (wzór: ${styleOf(id) ?? 'brak'}, odniesienia: ${(settings.references?.[id] ?? []).length}) |`,
     );
 } else {
   const queue = [...jobs];
@@ -200,7 +204,7 @@ if (values['dry-run']) {
         images.forEach((image, index) => writeFileSync(`${outDir}/${id}-${stamp}-${seed}-${index}.png`, Buffer.from(image.base64.replace(/^data:[^,]*,/, ''), 'base64')));
         writeFileSync(
           `${outDir}/${id}-${stamp}-${seed}.json`,
-          `${JSON.stringify({ id, tool: `pixellab ${path.slice(1)}`, description: promptOf(id), style: settings.styles?.[id] ?? settings.style ?? null, input: kind.prompts[id].input ?? null, mask: kind.prompts[id].mask ?? null, references: refs, usage: state.usage ?? null, images: images.length }, null, 2)}\n`,
+          `${JSON.stringify({ id, tool: `pixellab ${path.slice(1)}`, description: promptOf(id), style: styleOf(id), input: kind.prompts[id].input ?? null, mask: kind.prompts[id].mask ?? null, references: refs, usage: state.usage ?? null, images: images.length }, null, 2)}\n`,
         );
         const usage = state.usage ? (state.usage.type === 'usd' ? `${Number(state.usage.usd).toFixed(3)} USD` : JSON.stringify(state.usage)) : '';
         lines.push(`| ${id} | ${images.length} obrazki ${usage} |`);
