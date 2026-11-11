@@ -315,6 +315,11 @@ describe('the Wyprawa Gildii through the API', () => {
     const refused = await attack('tropiciel');
     assert.equal(refused.status, 409);
     assert.equal(refused.data.error.code, 'not_contributor');
+    // Her points given out by class: a warrior of level 40 with none of them
+    // spent misses the guardian in about one attack in two hundred, which
+    // made this test fail now and then (11.11.2026); so trained, never in
+    // thousands of fights.
+    assert.equal((await as('lowczyni', 'POST', '/api/character/points/auto')).status, 200);
     for (let left = rules.attacksPerDay - 1; left >= 0; left--) {
       await run('UPDATE guild_expedition_guardians SET hp = max_hp');
       const hit = await attack('lowczyni');
