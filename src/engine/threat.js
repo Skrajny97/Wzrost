@@ -1,3 +1,4 @@
+// @ts-check
 // Threat level shown before an exploration, from the inner region, its length,
 // current HP and the party. Sample fights against every kind of encounter of
 // the inner region (regular, demanding, the elite and, where it lives, the
@@ -28,6 +29,21 @@ import {
 import { createRng } from './rng.js';
 import { durationsUpTo } from './unlocks.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {import('./rng.js').Rng} Rng */
+/**
+ * @typedef {{ build: () => any, weight: number, counts: number[], fought: number, lost: number, worst: number }} SampleKind
+ *   One kind of encounter and its sample fights.
+ */
+/**
+ * @typedef {{ maxHp: number, recovery: number, regular: number[], tough: number[] | null, elite: number[], champion: number[] | null, safe: boolean }} ThreatSamples
+ *   The sample fights of a build, mixed by kind (threatSamples).
+ */
+/**
+ * @typedef {{ character: Record<string, any>, equipped: Record<string, any>[], hp: number, areaId: string, avoidRare?: boolean, seekRare?: boolean,
+ *   catchUp?: any, healing?: { count: number, amount: number, below: number } | null, hard?: boolean }} ThreatInput
+ */
+
 // Sample fights per kind of encounter: each encounter of the inner region and the
 // elite. Kinds whose outcome is in doubt (some fights lost, or a close one)
 // then share more fights, in proportion to how often they are met, so one
@@ -36,6 +52,7 @@ import { durationsUpTo } from './unlocks.js';
 // would change nothing. The elite is met in at most one exploration in nine
 // and its fights are long, so it keeps the first few, as does the champion.
 const SAMPLES = 3;
+/** @type {Record<string, number>} */
 const MORE_SAMPLES = { regular: 27, tough: 18, elite: 0, champion: 0 };
 const STEPS = 25;
 const LOST = STEPS + 1;
@@ -45,9 +62,24 @@ const LIMITS = [0.01, 0.05, 0.15];
 
 // One kind of encounter: how many of its sample fights cost each amount of HP,
 // in steps, and how many were lost (the last bin).
+/**
+ * @param {() => any} build
+ * @param {number} weight
+ * @returns {SampleKind}
+ */
 const sampleKind = (build, weight) => ({ build, weight, counts: new Array(LOST + 1).fill(0), fought: 0, lost: 0, worst: 0 });
 
 // A fight that drags on ends the exploration without fainting, so it is left out.
+/**
+ * @param {SampleKind} kind
+ * @param {number} times
+ * @param {Record<string, any>} player
+ * @param {Rng} rng
+ * @param {Content} content
+ * @param {Record<string, any>} area
+ * @param {Record<string, any>[]} [mates]
+ * @param {number[]} [strength]
+ */
 function fightSamples(kind, times, player, rng, content, area, mates = [], strength = [1, 1]) {
   for (let i = 0; i < times; i++) {
     const fight = simulateFight({ allies: [{ ...player }, ...mates.map((mate) => ({ ...mate }))], enemies: encounterCombatants(kind.build(), content, { strength }), rng, content, trait: area.trait });
@@ -58,18 +90,25 @@ function fightSamples(kind, times, player, rng, content, area, mates = [], stren
       kind.lost += 1;
       continue;
     }
-    const left = fight.units.find((unit) => unit.id === player.id).hp;
+    // The player always fights.
+    const left = /** @type {{ hp: number }} */ (fight.units.find((/** @type {{ id: string }} */ unit) => unit.id === player.id)).hp;
     const steps = Math.round(((player.maxHp - left) / player.maxHp) * STEPS);
     kind.counts[steps] += 1;
     kind.worst = Math.max(kind.worst, steps);
   }
 }
 
+/** @param {SampleKind} kind */
 const inDoubt = (kind) => kind.lost < kind.fought && (kind.lost > 0 || kind.worst >= STEPS * 0.6);
 
 // Weighted mix of the kinds' shares of fights, by HP lost in steps.
+/**
+ * @param {SampleKind[]} kinds
+ * @returns {number[]}
+ */
 function mix(kinds) {
   const total = kinds.reduce((sum, kind) => sum + kind.weight, 0);
+  /** @type {number[]} */
   const shares = new Array(LOST + 1).fill(0);
   for (const kind of kinds) {
     if (kind.fought === 0) continue;
@@ -82,16 +121,26 @@ function mix(kinds) {
 // its companions (companions.js) at full HP beside it. It does not depend on
 // HP or the length, so the server can keep it until the build changes.
 // `hard`: against the stronger creatures of a Trudna wyprawa (629 A).
+/**
+ * @param {{ character: Record<string, any>, equipped: Record<string, any>[], areaId: string, companions?: Record<string, any>[], hard?: boolean }} build
+ * @param {Content} content
+ * @returns {ThreatSamples}
+ */
 export function threatSamples({ character, equipped, areaId, companions = [], hard = false }, content) {
   const area = content.areasById[areaId];
-  const player = playerCombatant({ character, equipped, name: 'próba', area }, content);
-  const mates = companions.map((companion, index) => companionCombatant(companion, { area, id: `a${index + 1}` }, content));
+  const player = playerCombatant(/** @type {any} */ ({ character, equipped, name: 'próba', area }), content);
+  const mates = companions.map((companion, index) => companionCombatant(companion, /** @type {any} */ ({ area, id: `a${index + 1}` }), content));
   const rng = createRng(`threat:${areaId}:${character.level}`);
   const strength = exploreStrength(area, character.level, content, hard);
+  /**
+   * @param {Record<string, any>[]} encounters
+   * @param {Record<string, any>} [options]
+   */
   const kinds = (encounters, options) =>
     encounters.map((encounter) =>
-      sampleKind(() => regularEncounter(encounter, area, rng, content, { ...options, characterLevel: character.level }), encounter.weight),
+      sampleKind(() => regularEncounter(encounter, area, rng, content, /** @type {any} */ ({ ...options, characterLevel: character.level })), encounter.weight),
     );
+  /** @type {Record<'regular' | 'tough' | 'elite' | 'champion', SampleKind[]>} */
   const groups = {
     regular: kinds(encountersFor(area, character.level)),
     tough: kinds(toughEncountersFor(area, character.level), { tough: true }),
@@ -99,7 +148,7 @@ export function threatSamples({ character, equipped, areaId, companions = [], ha
     champion: area.champion ? [sampleKind(() => championEncounter(area, content), 1)] : [],
   };
   for (const list of Object.values(groups)) for (const kind of list) fightSamples(kind, SAMPLES, player, rng, content, area, mates, strength);
-  if (mix(groups.regular)[LOST] < LIMITS.at(-1)) {
+  if (mix(groups.regular)[LOST] < /** @type {number} */ (LIMITS.at(-1))) {
     for (const [group, list] of Object.entries(groups)) {
       const total = list.reduce((sum, kind) => sum + kind.weight, 0);
       for (const kind of list.filter(inDoubt)) {
@@ -123,6 +172,12 @@ export function threatSamples({ character, equipped, areaId, companions = [], ha
 // Chance of fainting for every exploration length, between 0 and 1.
 // `healing`: the healing potions taken ({ count, amount, below }), at most
 // one for each fight of a length.
+/**
+ * @param {ThreatInput} input
+ * @param {Content} content
+ * @param {ThreatSamples | null} [samples]
+ * @returns {Record<string, number>}
+ */
 export function faintChances({ character, equipped, hp, areaId, avoidRare = false, seekRare = false, catchUp = null, healing = null, hard = false }, content, samples) {
   const { maxHp, recovery, regular, tough, elite, champion, safe } = samples ?? threatSamples({ character, equipped, areaId, hard }, content);
   const start = Math.round((Math.min(hp, maxHp) / maxHp) * STEPS);
@@ -130,6 +185,7 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
   // drunk. The chances are kept for each number of potions left.
   const potionSteps = healing ? Math.round(healing.amount * STEPS) : 0;
   const mark = healing ? healing.below * STEPS : 0;
+  /** @param {number} count */
   const layers = (count) => Array.from({ length: count + 1 }, () => new Float64Array(STEPS + 1));
   // Per length: the share of fights by HP lost, all kinds mixed by their odds,
   // and the chance that a fight begun with some HP ends in fainting.
@@ -139,6 +195,7 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
   // more than the HP left is survived.
   const faintWithPotion = new Float64Array(STEPS + 1);
 
+  /** @type {Record<string, number>} */
   const result = {};
   for (const minutes of durationsUpTo(content.balance.hunt.maxMinutes, content)) {
     const pace = withRareOdds(explorationPace(minutes, content, character.level), { avoidRare, seekRare, catchUp }, content);
@@ -152,16 +209,20 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
     const championShare = champion ? pace.championChance : 0;
     const eliteShare = (1 - championShare) * pace.eliteChance;
     const toughShare = tough ? pace.toughChance : 0;
+    /** @type {number[]} */
     const losses = [];
     // The elite's and the champion's share of fights that cost `steps`.
+    /** @param {number} steps */
     const rare = (steps) => eliteShare * elite[steps] + (champion ? championShare * champion[steps] : 0);
     for (let steps = 0; steps <= LOST; steps++) {
-      const fight = regular[steps] * (1 - toughShare) + (toughShare > 0 ? tough[steps] * toughShare : 0);
+      // A share of demanding fights only comes with their samples.
+      const fight = regular[steps] * (1 - toughShare) + (toughShare > 0 ? /** @type {number[]} */ (tough)[steps] * toughShare : 0);
       shares[steps] = (1 - eliteShare - championShare) * fight + rare(steps);
       if (steps < LOST && shares[steps] > 0) losses.push(steps);
     }
     // A lost fight, or one that takes all the HP left, ends in fainting, except
     // against the elite or the champion of a safe region.
+    /** @param {number} steps */
     const fainting = (steps) => shares[steps] - (safe ? rare(steps) : 0);
     let tail = fainting(LOST);
     for (let steps = STEPS; steps >= 0; steps--) {
@@ -209,11 +270,21 @@ export function faintChances({ character, equipped, hp, areaId, avoidRare = fals
   return result;
 }
 
+/**
+ * @param {number} chance
+ * @returns {string}
+ */
 export function threatLevel(chance) {
   const index = LIMITS.findIndex((limit) => chance < limit);
   return THREAT_LEVELS[index === -1 ? THREAT_LEVELS.length - 1 : index];
 }
 
+/**
+ * @param {ThreatInput} input
+ * @param {Content} content
+ * @param {ThreatSamples | null} [samples]
+ * @returns {Record<string, string>}
+ */
 export function estimateThreat(input, content, samples) {
   return Object.fromEntries(
     Object.entries(faintChances(input, content, samples)).map(([minutes, chance]) => [minutes, threatLevel(chance)]),
@@ -225,6 +296,12 @@ export function estimateThreat(input, content, samples) {
 // without them the chance of fainting can come out a shade higher, and with
 // more of them a shade lower; the threat shown for avoiding them is never
 // higher than the one without, and the one for seeking them never lower.
+/**
+ * @param {Record<string, string>} threat
+ * @param {Record<string, string>} other
+ * @param {(a: number, b: number) => number} pick
+ * @returns {Record<string, string>}
+ */
 const pickThreat = (threat, other, pick) =>
   Object.fromEntries(
     Object.entries(threat).map(([minutes, level]) => [
@@ -232,5 +309,13 @@ const pickThreat = (threat, other, pick) =>
       THREAT_LEVELS[pick(THREAT_LEVELS.indexOf(level), THREAT_LEVELS.indexOf(other[minutes] ?? level))],
     ]),
   );
+/**
+ * @param {Record<string, string>} threat
+ * @param {Record<string, string>} other
+ */
 export const lowerThreat = (threat, other) => pickThreat(threat, other, Math.min);
+/**
+ * @param {Record<string, string>} threat
+ * @param {Record<string, string>} other
+ */
 export const higherThreat = (threat, other) => pickThreat(threat, other, Math.max);
