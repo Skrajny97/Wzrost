@@ -30,6 +30,7 @@ import { stableCard } from '../stable.js';
 import { tanneryCard } from '../tannery.js';
 import { wantedCard } from '../wanted.js';
 import { timePointsButton } from '../hermit-time.js';
+import { residentGifts } from '../resident-gifts.js';
 import { itemSummary, piecesText } from './character.js';
 import { mountMarket, numberField, stackArt, stackButton } from './market.js';
 
@@ -1306,9 +1307,10 @@ export function mountSettlement(container, { params = {} } = {}) {
   }
 
   // The resident of a place (question 76): the bust, who they are, their
-  // story and how they greet the character at its relation; the place's
-  // room dim behind, where it has one (the Salon Gier's, 550.5 D), as the
-  // professions' places behind their cards.
+  // story and how they greet the character at its relation, then the gift
+  // of the day for them and a friend's present of the week (818.1 and
+  // 818.2); the place's room dim behind, where it has one (the Salon Gier's,
+  // 550.5 D), as the professions' places behind their cards.
   const residentCard = (resident, backdrop) => {
     const art = backdrop && placeArt(backdrop);
     const card = h(
@@ -1327,6 +1329,7 @@ export function mountSettlement(container, { params = {} } = {}) {
         ),
       ),
       h('p', { class: 'settlement-greeting', text: t('„{line}”', { line: resident.greeting }) }),
+      residentGifts(resident, data.gifts, apply),
     );
     if (art) card.style.setProperty('--place-art', `url("${art}")`);
     return card;

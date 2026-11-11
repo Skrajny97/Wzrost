@@ -742,6 +742,7 @@ function checkReferences(data) {
   errors.push(...checkSettlement(data, { rarities }));
   errors.push(...checkStable(data));
   errors.push(...checkTannery(data));
+  errors.push(...checkResidentGifts(data));
   errors.push(...checkCasino(data));
   errors.push(...checkCosmetics(data));
   errors.push(...checkTowers(data));
@@ -1440,6 +1441,35 @@ function checkTannery(data) {
   if (stock.length > standings.length) errors.push('settlement.json: tannery.sell.stock ma więcej liczb niż stopni');
   if (stock.some((share, index) => index > 0 && share < stock[index - 1])) errors.push('settlement.json: tannery.sell.stock nie może maleć ze stopniem');
   if (stock.at(-1) !== 1) errors.push('settlement.json: tannery.sell.stock na ostatnim stopniu musi być 1 (wszystkie materiały)');
+  return errors;
+}
+
+// The gifts for the Osada's residents and the friends' presents (818.1 and
+// 818.2): every resident likes something, once, and leaves a present of
+// goods in a count that makes sense, from a standing that exists; a rarer
+// piece never gives less than a commoner one.
+function checkResidentGifts(data) {
+  const errors = [];
+  const { gifts, residents, standings } = data.settlement;
+  if (!gifts) return errors;
+  const residentIds = new Set(residents.map((resident) => resident.id));
+  const seen = new Set();
+  for (const entry of gifts.residents) {
+    if (!residentIds.has(entry.resident)) errors.push(`settlement.json: gifts.residents ma nieznanego mieszkańca ${entry.resident}`);
+    if (seen.has(entry.resident)) errors.push(`settlement.json: gifts.residents ma mieszkańca ${entry.resident} dwa razy`);
+    seen.add(entry.resident);
+    const { weekly } = entry;
+    const where = `settlement.json: gifts.residents ${entry.resident}.weekly`;
+    if (['herb', 'potion', 'material'].includes(weekly.kind)) {
+      if (!weekly.min || !weekly.max) errors.push(`${where}: podarek ${weekly.kind} potrzebuje min i max`);
+      else if (weekly.min > weekly.max) errors.push(`${where}: min nie może być większe niż max`);
+    }
+    if (weekly.kind === 'gold' && !weekly.perLevel) errors.push(`${where}: podarek w złocie potrzebuje perLevel`);
+    if (weekly.kind === 'time-points' && !weekly.count) errors.push(`${where}: podarek w Punktach Czasu potrzebuje count`);
+  }
+  for (const resident of residents) if (!seen.has(resident.id)) errors.push(`settlement.json: gifts.residents nie mówi, co lubi ${resident.id}`);
+  if (!standings.some((standing) => standing.id === gifts.from)) errors.push(`settlement.json: gifts.from to nieznany stopień ${gifts.from}`);
+  if (gifts.relation.some((points, index) => index > 0 && points < gifts.relation[index - 1])) errors.push('settlement.json: gifts.relation nie może maleć z rzadkością');
   return errors;
 }
 

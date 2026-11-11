@@ -970,5 +970,38 @@
       "dotPay": "pay to claim",
       "dotClose": "notice to close"
     }
+  },
+  "gifts": {
+    "texts": {
+      "give": "Give a gift",
+      "title": "Gift",
+      "likes": "{name} likes {likes}.",
+      "likesGold": "{name} will gladly take gold.",
+      "kinds": {
+        "herb": "herbs",
+        "potion": "potions",
+        "ore": "ores",
+        "gem": "gems",
+        "material": "hides and other creature materials"
+      },
+      "rule": "One gift a day: an ordinary one gives +{relation} relationship, a rarer one more.",
+      "relation": "Relationship +{relation}",
+      "gold": "Gift: {gold} gold. Relationship +{relation}.",
+      "giveGold": "Give {gold} gold",
+      "given": "Today's gift is given. The next one from midnight.",
+      "nothing": "You have none now.",
+      "noGold": "Not enough gold for the gift.",
+      "done": "Gift given: {gift}. Relationship +{relation}.",
+      "present": "{name} has a gift for you: {gift}.",
+      "claim": "Claim",
+      "claimed": "Gift claimed: {gift}.",
+      "noPresent": "There is no gift to claim now.",
+      "bagFull": "The gift will not fit in the bag. Make room in it.",
+      "notLiked": "{name} will not take that.",
+      "notHeld": "You do not have that.",
+      "unknown": "There is no such resident.",
+      "goldAmount": "{gold} gold",
+      "timePoints": "Time Points"
+    }
   }
 }

@@ -111,6 +111,7 @@ import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWith
 import { claimWanted, dropWanted, takeWanted } from './wanted.js';
 import { claimMercenary, listMercenaries, offerMercenary, withdrawMercenary } from './mercenaries.js';
 import { buyFromTanner, sellToTanner } from './tannery.js';
+import { claimResidentPresent, giveToResident } from './resident-gifts.js';
 import { skipWithTimePoints } from './time.js';
 import { buyMount } from './stable.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
@@ -289,6 +290,8 @@ const routes = [
   ['POST', '/api/settlement/herbalist/buy', buyFromHerbalist],
   ['POST', '/api/settlement/tannery', sellToTanner],
   ['POST', '/api/settlement/tannery/buy', buyFromTanner],
+  ['POST', '/api/settlement/residents/gift', giveToResident],
+  ['POST', '/api/settlement/residents/present', claimResidentPresent],
   ['POST', '/api/settlement/talk', talkWithCompanion],
   ['POST', '/api/settlement/imbue', imbueAtEnchantress],
   ['POST', '/api/settlement/forge/scrolls', buyScrolls],

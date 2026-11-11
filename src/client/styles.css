@@ -11328,8 +11328,10 @@ a.profession-square:active {
   font-weight: 600;
 }
 
-/* The reward for a new standing (593 A and B): gold-edged, with "Odbierz". */
-.settlement-standing-reward {
+/* The reward for a new standing (593 A and B): gold-edged, with "Odbierz";
+   so is a friend's present of the week on a resident's place (818.2). */
+.settlement-standing-reward,
+.settlement-gift-present {
   display: grid;
   gap: 6px;
   margin: 4px 0;
@@ -11361,6 +11363,18 @@ a.profession-square:active {
 .settlement-story,
 .settlement-greeting {
   font-style: italic;
+}
+
+/* A resident's gift of the day under their greeting (818.1): a friend's
+   present first, "Podaruj", and a line on what they like or why not now. */
+.settlement-gift {
+  display: grid;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.settlement-resident .settlement-gift p {
+  margin: 0;
 }
 
 .settlement-ask {
