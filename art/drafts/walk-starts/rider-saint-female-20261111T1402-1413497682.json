@@ -1,0 +1,27 @@
+{
+  "id": "rider-saint-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "a gentle woman saint with long dark hair under a white veil, a thin golden halo ring behind the head, pure white robes with fine golden embroidery, a long pale gold mantle, a golden sash, no staff, nothing in the hands but the reins, sitting upright and relaxed in the middle of the saddle exactly like the rider of the reference, seen exactly from the side in a strict profile, facing right, the face, chest and hips turned fully to the right and not towards the viewer, only the near leg showing and the far leg hidden behind the horse, the near thigh lying forward along the saddle and the lower leg hanging straight down from the knee to the foot, one normal slim leg, not tucked up, not slanting, both upper arms down along the body and both forearms reaching forward, the two hands close together in front of the body above the horse's neck holding the reins, the same size and place as the reference rider, the whole figure from the top of the halo to the foot inside the image, nothing under the rider, isolated figure on a plain background, forest fantasy",
+  "style": "src/client/art/riders/miracle-worker-female.png",
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/saint-female.png",
+      "usage": "the character's look only: the face, hair, headwear, clothes and colours; not the pose and not the staff"
+    },
+    {
+      "path": "src/client/art/riders/miracle-worker-female.png",
+      "usage": "a finished rider of the game which the author accepted: copy how it sits in the middle of the saddle seen from the side, the near thigh forward along the saddle and the lower leg hanging straight down, one leg showing, and how both hands reach forward together to the reins; not its face, clothes, colours or what it carries"
+    },
+    {
+      "path": "art/references/riders/mannequin-seated.png",
+      "usage": "the pose of the figure: sitting sideways, the near thigh forward and the lower leg hanging straight down, only the near leg; not its hood or cloak"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 9
+}
