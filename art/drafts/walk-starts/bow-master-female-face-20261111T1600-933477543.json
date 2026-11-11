@@ -1,0 +1,14 @@
+{
+  "id": "bow-master-female-face",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, the face of a pretty young woman seen exactly from the side, facing right: smooth light tan skin, one dark eye, a thin dark eyebrow, a small straight nose, soft closed lips, a small rounded chin, a clean smooth jaw line, a calm expression, a thin silver diadem across the forehead, long black hair pulled back into a high ponytail behind the head",
+  "style": "art/references/walks/start/hunter-female.png",
+  "input": "art/references/walks/start/bow-master-female.png",
+  "mask": "art/inputs/walk-starts/bow-master-female-face-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
