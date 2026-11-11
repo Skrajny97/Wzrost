@@ -1,3 +1,4 @@
+// @ts-check
 // The Próby Gildii (the author's 345 A; data/guilds.json, `trials`): every
 // week a guild's board of trials from the whole game, drawn from a seed of
 // the guild and the week. Every trial open on the board runs for each
@@ -20,21 +21,48 @@ import { creaturesPerFight, countedForm, questArea, questPeriod, weekShare } fro
 import { createRng } from './rng.js';
 import { stackKey } from './crafting.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {{ id: string, weight: number, text: string, counted: any, step?: number, fights?: [number, number], count: [number, number], requires?: string, levelsBelow?: number, note?: string }} Kind A kind of trial (data/guilds.json). */
+/** @typedef {{ kind: string, size: number, roll: number }} Trial A trial of a week's board. */
+/** @typedef {{ key: string, startsAt: number, endsAt: number }} Period A period of the quests' clock (quests.js). */
+
+/**
+ * @param {Content} content
+ * @returns {Record<string, any>}
+ */
 const rules = (content) => content.guilds.trials;
 const DAY = 24 * 3600000;
 const WEEK_DAYS = 7;
+// quests.js is not checked yet: its periods are typed here.
+/**
+ * @param {string} periodId
+ * @param {number} now
+ * @param {Content} content
+ * @returns {Period}
+ */
+const period = (periodId, now, content) => /** @type {Period} */ (questPeriod(periodId, now, content));
 
 // The day of the week at `now` on the quests' clock: 0 on Monday to 6 on
 // Sunday (rounded, so a day of 23 or 25 hours counts as one).
+/**
+ * @param {number} now
+ * @param {Content} content
+ * @returns {number}
+ */
 export function trialDay(now, content) {
-  const week = questPeriod('weekly', now, content);
-  const day = questPeriod('daily', now, content);
+  const week = period('weekly', now, content);
+  const day = period('daily', now, content);
   return Math.min(WEEK_DAYS - 1, Math.max(0, Math.round((day.startsAt - week.startsAt) / DAY)));
 }
 
 // How many trials of the week's board are open on `day` (trialDay): the
 // first ones on Monday and more each day after (opens); all of them where
 // the data sets no such pace.
+/**
+ * @param {number} day
+ * @param {Content} content
+ * @returns {number}
+ */
 export function trialsOpen(day, content) {
   const { board, opens } = rules(content);
   if (!opens) return board;
@@ -44,6 +72,11 @@ export function trialsOpen(day, content) {
 // How many trials a character may have finished this week by the end of
 // `day`: perDay for each day of the week so far, so a day missed is made up
 // later; no limit where the data sets none.
+/**
+ * @param {number} day
+ * @param {Content} content
+ * @returns {number}
+ */
 export function trialDayLimit(day, content) {
   const { perDay } = rules(content);
   return Number.isInteger(perDay) ? perDay * (day + 1) : Infinity;
@@ -51,6 +84,11 @@ export function trialDayLimit(day, content) {
 
 // The day of the week (trialDay) on which the trial at `index` of the
 // board opens: the first ones on Monday, then perDay more each day.
+/**
+ * @param {number} index
+ * @param {Content} content
+ * @returns {number}
+ */
 export function trialOpensOn(index, content) {
   const { opens } = rules(content);
   if (!opens || index < opens.first || opens.perDay <= 0) return 0;
@@ -60,31 +98,51 @@ export function trialOpensOn(index, content) {
 // What a member who joins after the board was drawn adds to the week's
 // members: the share of the week left on `day`, that day included (all of
 // a member on Monday, a seventh on Sunday).
+/** @param {number} day */
 export const joinShare = (day) => (WEEK_DAYS - Math.min(WEEK_DAYS - 1, Math.max(0, day))) / WEEK_DAYS;
 
-export const trialKind = (kindId, content) => rules(content).kinds.find((kind) => kind.id === kindId) ?? null;
+/**
+ * @param {string} kindId
+ * @param {Content} content
+ * @returns {Kind | null}
+ */
+export const trialKind = (kindId, content) => rules(content).kinds.find((/** @type {Kind} */ kind) => kind.id === kindId) ?? null;
 
 // The board of a guild's week from its seed: `board` trials, each a kind
 // and one of its sizes, no pair twice, the likelier by the weights of both;
 // `roll` places its count within the kind's range. In the order of the
 // kinds, the smaller size first.
+/**
+ * @param {string | number} seed
+ * @param {Content} content
+ * @returns {Trial[]}
+ */
 export function drawTrialBoard(seed, content) {
-  const { board, sizes, kinds } = rules(content);
+  /** @type {{ board: number, sizes: { weight: number }[], kinds: Kind[] }} */
+  const { board, sizes, kinds } = /** @type {any} */ (rules(content));
   const rng = createRng(seed);
   let options = kinds.flatMap((kind) => sizes.map((size, index) => ({ kind: kind.id, size: index, weight: kind.weight * size.weight })));
+  /** @type {Trial[]} */
   const drawn = [];
   while (drawn.length < board && options.length > 0) {
     const option = rng.weighted(options);
     options = options.filter((other) => other !== option);
     drawn.push({ kind: option.kind, size: option.size, roll: Math.floor(rng.next() * 1000) / 1000 });
   }
+  /** @param {Trial} trial */
   const order = (trial) => kinds.findIndex((kind) => kind.id === trial.kind);
   return drawn.sort((a, b) => order(a) - order(b) || a.size - b.size);
 }
 
 // How many creatures a fight brings on average in the newest place open to
 // the character's class, at its level.
-const fightCreatures = (character, content) => [...creaturesPerFight(questArea(character, content), character.level).values()].reduce((sum, share) => sum + share, 0);
+/**
+ * @param {Record<string, any>} character
+ * @param {Content} content
+ * @returns {number}
+ */
+const fightCreatures = (character, content) =>
+  [.../** @type {Map<string, number>} */ (creaturesPerFight(questArea(character, content), character.level)).values()].reduce((sum, share) => sum + share, 0);
 
 // What a trial asks of a character as it is: its kind's count at the
 // trial's roll (for creatures, as many as that many fights bring on average
@@ -92,6 +150,12 @@ const fightCreatures = (character, content) => [...creaturesPerFight(questArea(c
 // share of the usual numbers at its level (weekShare: much less up to level
 // 50), to the kind's step and at least one. Null for a kind the data no
 // longer has.
+/**
+ * @param {Trial} trial
+ * @param {Record<string, any>} character
+ * @param {Content} content
+ * @returns {number | null}
+ */
 export function trialCount(trial, character, content) {
   const kind = trialKind(trial.kind, content);
   if (!kind) return null;
@@ -105,8 +169,14 @@ export function trialCount(trial, character, content) {
 }
 
 // A trial's words: its kind's, with the count and the noun to go with it.
+/**
+ * @param {string} kindId
+ * @param {number} count
+ * @param {Content} content
+ * @returns {string}
+ */
 export function trialText(kindId, count, content) {
-  const kind = trialKind(kindId, content);
+  const kind = /** @type {Kind} */ (trialKind(kindId, content));
   return kind.text.replace('{count}', String(count)).replace('{noun}', countedForm(count, kind.counted));
 }
 
@@ -115,13 +185,24 @@ export function trialText(kindId, count, content) {
 // its own (floor 1 is of the towers' firstFloorLevel), so a high character
 // does not do the trial on the first floor (the author: 488 A); any floor
 // when the kind sets no such limit.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
 export function trialTowerFloor(level, content) {
   const below = trialKind('towers', content)?.levelsBelow;
-  return Number.isInteger(below) ? Math.max(1, level - below - content.towers.firstFloorLevel + 1) : 1;
+  return typeof below === 'number' && Number.isInteger(below) ? Math.max(1, level - below - content.towers.firstFloorLevel + 1) : 1;
 }
 
 // A trial's note under its words, or null: its kind's, with the lowest
 // floor that counts for a character of `level` ({floor}, trialTowerFloor).
+/**
+ * @param {string} kindId
+ * @param {number} level
+ * @param {Content} content
+ * @returns {string | null}
+ */
 export function trialNote(kindId, level, content) {
   const note = trialKind(kindId, content)?.note;
   return note ? note.replace('{floor}', String(trialTowerFloor(level, content))) : null;
@@ -131,6 +212,12 @@ export function trialNote(kindId, level, content) {
 // says, for each part of the game a kind needs (`requires`), whether the
 // character has it (true), not yet (false) or whether the game has it not
 // here at all ("off").
+/**
+ * @param {string} kindId
+ * @param {Record<string, boolean | 'off'>} access
+ * @param {Content} content
+ * @returns {string | null}
+ */
 export function trialLock(kindId, access, content) {
   const need = trialKind(kindId, content)?.requires;
   if (!need || access[need] === true) return null;
@@ -146,7 +233,12 @@ export function trialLock(kindId, access, content) {
 // what they do not: tower fights won (on the floors trialTowerFloor lets
 // count, as the server says), the Kowadło's upgrades that came off and the
 // pieces given in the Prośby Gildii. Only the kinds it moves on.
+/**
+ * @param {{ kills?: Record<string, number>, minutes?: number, processed?: number, salvaged?: number, herbs?: Record<string, number>, potions?: Record<string, number>, made?: number, orders?: number, towerWins?: number, upgrades?: number, gifts?: number }} done
+ * @returns {Record<string, number>}
+ */
 export function trialGains({ kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, orders = 0, towerWins = 0, upgrades = 0, gifts = 0 }) {
+  /** @param {Record<string, number>} counts */
   const total = (counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
   const gains = {
     killAny: total(kills),
@@ -175,9 +267,19 @@ export function trialGains({ kills = {}, minutes = 0, processed = 0, salvaged = 
 // opens again when the rest falls below its count, and then the orders still
 // waiting that came after it was done count, as they would have; only later
 // orders can, as the table works one after another. Null when nothing changes.
+/** @typedef {{ kind: string, orderedAt: number, pieces: number, cancelled?: boolean }} Work An order of the Stół rozbiórki's queue (orderWork). */
+/**
+ * @param {{ kind: string, week: string, count: number, progress: number, extra: number, state: string, takenAt: number, doneAt: number | null }} row
+ * @param {Work[]} work
+ * @param {number} now
+ * @param {Content} content
+ * @returns {{ progress: number, extra: number, state: 'done' | 'active', doneAt: number | null } | null}
+ */
 export function trialAfterCancel(row, work, now, content) {
-  const own = work.filter((one) => one.kind === row.kind && one.orderedAt >= row.takenAt && questPeriod('weekly', one.orderedAt, content).key === row.week);
-  const counted = (one) => row.state !== 'done' || one.orderedAt <= row.doneAt;
+  const own = work.filter((one) => one.kind === row.kind && one.orderedAt >= row.takenAt && period('weekly', one.orderedAt, content).key === row.week);
+  /** @param {Work} one */
+  const counted = (one) => row.state !== 'done' || one.orderedAt <= /** @type {number} */ (row.doneAt);
+  /** @param {Work[]} list */
   const pieces = (list) => list.reduce((sum, one) => sum + one.pieces, 0);
   const taken = pieces(own.filter((one) => one.cancelled && counted(one)));
   if (taken === 0) return null;
@@ -198,15 +300,27 @@ export function trialAfterCancel(row, work, now, content) {
 // author: nobody does everything for the others) and up to `limit`, the
 // day's (trialDayLimit; the rest come onto the bar on the days after).
 // `perMember` lists how many each finished.
+/**
+ * @param {number[]} perMember
+ * @param {Content} content
+ * @param {number} [limit]
+ * @returns {number}
+ */
 export const trialPoints = (perMember, content, limit = Infinity) => perMember.reduce((sum, count) => sum + Math.min(count, rules(content).cap, limit), 0);
 
 // The week's thresholds: how many finished trials each needs (the week's
 // members, at least one: those active when the board was drawn and the
 // shares of those who joined later, joinShare; times its step, rounded up)
 // and whether the guild has them.
+/**
+ * @param {number} members
+ * @param {number} points
+ * @param {Content} content
+ * @returns {{ index: number, need: number, reached: boolean }[]}
+ */
 export function trialThresholds(members, points, content) {
   const counted = Math.max(1, members);
-  return rules(content).steps.map((step, index) => {
+  return rules(content).steps.map((/** @type {number} */ step, /** @type {number} */ index) => {
     const need = Math.ceil(counted * step - 1e-9);
     return { index, need, reached: points >= need };
   });
@@ -215,9 +329,17 @@ export function trialThresholds(members, points, content) {
 // The material a chest gives: one of an ordinary creature of the newest
 // place open to the character's class, at its species' rarity, drawn with
 // `rng`; null where there is none.
+/**
+ * @param {Record<string, any>} character
+ * @param {import('./rng.js').Rng} rng
+ * @param {Content} content
+ * @returns {string | null}
+ */
 function chestMaterial(character, rng, content) {
   const area = questArea(character, content);
-  const ids = [...new Set(area.encounters.flatMap((encounter) => encounter.monsters))];
+  /** @type {string[]} */
+  const ids = [...new Set(area.encounters.flatMap((/** @type {{ monsters: string[] }} */ encounter) => encounter.monsters))];
+  /** @type {{ id: string, rarity: string, monster: string }[]} */
   const materials = ids
     .map((id) => content.materialsByMonster[id])
     .filter((material) => material && !content.monstersById[material.monster]?.elite && !content.monstersById[material.monster]?.champion);
@@ -230,6 +352,13 @@ function chestMaterial(character, rng, content) {
 // pieces of one material of the creatures where its class goes now, and
 // Punkty Systemu on those that have them (the last). Drawn from `seed`, so
 // the chest holds the same whenever it is opened.
+/**
+ * @param {number} index
+ * @param {Record<string, any>} character
+ * @param {string | number} seed
+ * @param {Content} content
+ * @returns {{ gold: number, timePoints: number, systemPoints: number, materials: Record<string, number> }}
+ */
 export function trialChest(index, character, seed, content) {
   const chest = rules(content).chests[index];
   const material = chest.materials > 0 ? chestMaterial(character, createRng(seed), content) : null;
