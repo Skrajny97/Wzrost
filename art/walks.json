@@ -555,7 +555,7 @@
       "description": "a strong man lord of the wild forest with a short light brown beard, a huge white wolf pelt worn as a hooded mantle with the white wolf's head over his head, leather armour embossed with golden animal motifs and fur trim, a golden eagle sitting on the back of his shoulder with its talons on the shoulder, brown trousers and fur-topped boots, no bow, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
     },
     "demon-slayer-male": {
-      "start": "art/references/walks/start/demon-slayer-male-bare.png",
+      "start": "art/references/walks/start/demon-slayer-male-profile.png",
       "pose": 2,
       "shoulders": 2.5,
       "description": "a broad strong man holy demon hunter with short dark hair and a stern scarred face, gleaming silver plate armour with golden sun engravings, a long white tabard with a golden sun, a short white cape with gold trim, nothing hanging at the belt, no skull, no sword, walking with both arms swinging naturally at the sides, the hands empty and loosely closed, holding nothing"
