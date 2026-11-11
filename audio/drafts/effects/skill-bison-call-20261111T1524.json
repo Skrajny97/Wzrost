@@ -1,0 +1,13 @@
+{
+  "id": "skill-bison-call",
+  "payload": {
+    "text": "a European bison charging: heavy thundering hooves, a deep snorting bellow and a powerful head-butt impact, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-bison-call-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-bison-call-20261111T1524-1.mp3"
+  ],
+  "credits": 72
+}

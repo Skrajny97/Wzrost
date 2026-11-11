@@ -1,0 +1,13 @@
+{
+  "id": "skill-miraculous-healing",
+  "payload": {
+    "text": "a miraculous healing: a warm angelic choir swell, soft shimmering chimes and a gentle glowing whoosh, fantasy, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-miraculous-healing-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-miraculous-healing-20261111T1524-1.mp3"
+  ],
+  "credits": 80
+}

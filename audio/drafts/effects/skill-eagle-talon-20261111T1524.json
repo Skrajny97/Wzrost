@@ -1,0 +1,13 @@
+{
+  "id": "skill-eagle-talon",
+  "payload": {
+    "text": "a golden eagle diving: a sharp piercing eagle screech, a fast rushing wing whoosh and a quick tearing slash of talons, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-eagle-talon-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-eagle-talon-20261111T1524-1.mp3"
+  ],
+  "credits": 60
+}

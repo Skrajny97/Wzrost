@@ -1,0 +1,13 @@
+{
+  "id": "skill-cataclysm",
+  "payload": {
+    "text": "fire, ice and lightning crashing down at once: a roaring blaze, shattering ice and a loud thunder crack merging into one huge explosion, fantasy, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-cataclysm-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-cataclysm-20261111T1524-1.mp3"
+  ],
+  "credits": 80
+}

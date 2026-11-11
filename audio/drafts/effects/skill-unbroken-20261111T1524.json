@@ -1,0 +1,13 @@
+{
+  "id": "skill-unbroken",
+  "payload": {
+    "text": "a massive shield braced firmly: a deep metallic clang, arrows clinking off the steel, then a warm shimmering healing glow, fantasy, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-unbroken-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-unbroken-20261111T1524-1.mp3"
+  ],
+  "credits": 64
+}

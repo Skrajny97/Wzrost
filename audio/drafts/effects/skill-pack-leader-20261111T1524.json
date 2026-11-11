@@ -1,0 +1,13 @@
+{
+  "id": "skill-pack-leader",
+  "payload": {
+    "text": "a great white wolf howling long and loud at night, echoing, wild and proud, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-pack-leader-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-pack-leader-20261111T1524-1.mp3"
+  ],
+  "credits": 80
+}

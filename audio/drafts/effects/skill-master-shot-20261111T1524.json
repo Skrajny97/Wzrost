@@ -1,0 +1,13 @@
+{
+  "id": "skill-master-shot",
+  "payload": {
+    "text": "a mighty bow loosed: a sharp twang, an arrow whistling fast and piercing through three targets with three quick thuds, crisp, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-master-shot-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-master-shot-20261111T1524-1.mp3"
+  ],
+  "credits": 56
+}

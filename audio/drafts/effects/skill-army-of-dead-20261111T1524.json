@@ -1,0 +1,13 @@
+{
+  "id": "skill-army-of-dead",
+  "payload": {
+    "text": "skeletons rising from graves: rattling bones, scraping rusty armour and a sword being drawn, with a ghostly wind moaning, eerie, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-army-of-dead-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-army-of-dead-20261111T1524-1.mp3"
+  ],
+  "credits": 80
+}

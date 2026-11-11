@@ -1,0 +1,13 @@
+{
+  "id": "skill-holy-light",
+  "payload": {
+    "text": "a burst of holy light: a bright radiant flash with a soaring angelic tone and shimmering sparkles spreading outward, fantasy, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-holy-light-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-holy-light-20261111T1524-1.mp3"
+  ],
+  "credits": 64
+}

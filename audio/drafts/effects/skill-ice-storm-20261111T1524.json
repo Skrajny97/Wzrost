@@ -1,0 +1,13 @@
+{
+  "id": "skill-ice-storm",
+  "payload": {
+    "text": "a storm of ice: howling icy wind and a hail of sharp ice shards shattering on the ground, cold and crisp, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-ice-storm-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-ice-storm-20261111T1524-1.mp3"
+  ],
+  "credits": 72
+}

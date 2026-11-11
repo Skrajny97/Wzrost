@@ -1,0 +1,13 @@
+{
+  "id": "skill-ice-tomb",
+  "payload": {
+    "text": "a body frozen solid: rapidly crackling and creaking ice growing and locking with a hard crystalline crunch, cold, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-ice-tomb-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-ice-tomb-20261111T1524-1.mp3"
+  ],
+  "credits": 60
+}

@@ -1,0 +1,13 @@
+{
+  "id": "skill-elemental-shield",
+  "payload": {
+    "text": "a magic shield forming: a rising shimmering hum, crackling flames, tinkling ice and small electric zaps swirling around, fantasy, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-elemental-shield-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-elemental-shield-20261111T1524-1.mp3"
+  ],
+  "credits": 64
+}

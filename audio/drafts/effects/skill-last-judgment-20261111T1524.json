@@ -1,0 +1,13 @@
+{
+  "id": "skill-last-judgment",
+  "payload": {
+    "text": "a holy greatsword striking down: a ringing heavenly tone, a burning holy flame whoosh and a massive heavy impact, fantasy, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-last-judgment-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-last-judgment-20261111T1524-1.mp3"
+  ],
+  "credits": 64
+}

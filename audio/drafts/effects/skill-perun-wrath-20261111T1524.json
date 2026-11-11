@@ -1,0 +1,13 @@
+{
+  "id": "skill-perun-wrath",
+  "payload": {
+    "text": "several lightning bolts striking down one after another: loud cracking thunderclaps and electric crackles jumping between targets, a rolling thunder, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-perun-wrath-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-perun-wrath-20261111T1524-1.mp3"
+  ],
+  "credits": 72
+}

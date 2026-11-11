@@ -1,0 +1,13 @@
+{
+  "id": "skill-steel-hurricane",
+  "payload": {
+    "text": "a sword whirling twice in a fast spinning storm of steel: two quick swooshing spins with sharp metallic rings and slicing hits, fantasy, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-steel-hurricane-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-steel-hurricane-20261111T1524-1.mp3"
+  ],
+  "credits": 64
+}

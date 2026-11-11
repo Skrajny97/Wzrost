@@ -1,0 +1,13 @@
+{
+  "id": "skill-oak-awakening",
+  "payload": {
+    "text": "an ancient oak waking up: deep creaking and groaning wood, roots tearing out of the earth, a low rumbling growl, fantasy, no music",
+    "duration_seconds": 2,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-oak-awakening-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-oak-awakening-20261111T1524-1.mp3"
+  ],
+  "credits": 80
+}

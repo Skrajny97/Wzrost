@@ -1,0 +1,13 @@
+{
+  "id": "skill-earthquake",
+  "payload": {
+    "text": "a heavy shield slammed into the ground: a deep booming thud, the earth cracking and rumbling, rocks tumbling, a powerful low rumble fading out, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-earthquake-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-earthquake-20261111T1524-1.mp3"
+  ],
+  "credits": 72
+}

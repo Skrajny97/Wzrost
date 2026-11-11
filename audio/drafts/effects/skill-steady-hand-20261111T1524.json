@@ -1,0 +1,13 @@
+{
+  "id": "skill-steady-hand",
+  "payload": {
+    "text": "a bowstring drawn slowly with a creak, a calm breath, then a precise release with a clean sharp twang, quiet and focused, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-steady-hand-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-steady-hand-20261111T1524-1.mp3"
+  ],
+  "credits": 60
+}

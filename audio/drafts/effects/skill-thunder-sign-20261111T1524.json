@@ -1,0 +1,13 @@
+{
+  "id": "skill-thunder-sign",
+  "payload": {
+    "text": "a glowing rune drawn in the air: a rising electric hum, crackling sparks and a short deep thunder rumble as the sign flares, fantasy, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-thunder-sign-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-thunder-sign-20261111T1524-1.mp3"
+  ],
+  "credits": 64
+}

@@ -1,0 +1,13 @@
+{
+  "id": "skill-slaughter",
+  "payload": {
+    "text": "a furious wide axe swing cleaving through several foes: a fierce battle roar, a deep whoosh and a quick series of heavy meaty chops, brutal, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-slaughter-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-slaughter-20261111T1524-1.mp3"
+  ],
+  "credits": 64
+}

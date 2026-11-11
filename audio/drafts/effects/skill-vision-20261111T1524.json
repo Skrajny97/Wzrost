@@ -1,0 +1,13 @@
+{
+  "id": "skill-vision",
+  "payload": {
+    "text": "a mystic vision: a deep soft whoosh, an ethereal shimmering tone and whispering echoes, dreamlike, fantasy, no music",
+    "duration_seconds": 1.6,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-vision-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-vision-20261111T1524-1.mp3"
+  ],
+  "credits": 64
+}

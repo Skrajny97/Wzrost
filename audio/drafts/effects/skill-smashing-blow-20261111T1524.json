@@ -1,0 +1,13 @@
+{
+  "id": "skill-smashing-blow",
+  "payload": {
+    "text": "a colossal war axe smashing down into stone: a heavy crushing impact, cracking rock and rumbling debris rolling outward, deep and powerful, close up, no music",
+    "duration_seconds": 1.5,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-smashing-blow-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-smashing-blow-20261111T1524-1.mp3"
+  ],
+  "credits": 60
+}

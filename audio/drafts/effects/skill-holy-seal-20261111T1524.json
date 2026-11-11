@@ -1,0 +1,13 @@
+{
+  "id": "skill-holy-seal",
+  "payload": {
+    "text": "a holy seal stamped onto a foe: a heavy stamp thud, a sizzling burn and a clear ringing bell tone, fantasy, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-holy-seal-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-holy-seal-20261111T1524-1.mp3"
+  ],
+  "credits": 56
+}

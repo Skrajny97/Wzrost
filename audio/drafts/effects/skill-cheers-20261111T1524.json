@@ -1,0 +1,13 @@
+{
+  "id": "skill-cheers",
+  "payload": {
+    "text": "a roaring arena crowd cheering and applauding, with a short triumphant horn call over it, energetic, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-cheers-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-cheers-20261111T1524-1.mp3"
+  ],
+  "credits": 72
+}

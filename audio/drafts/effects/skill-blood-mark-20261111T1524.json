@@ -1,0 +1,13 @@
+{
+  "id": "skill-blood-mark",
+  "payload": {
+    "text": "a blood curse mark: a wet slicing cut, dripping blood and a low dark whisper, eerie, no music",
+    "duration_seconds": 1.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-blood-mark-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-blood-mark-20261111T1524-1.mp3"
+  ],
+  "credits": 56
+}

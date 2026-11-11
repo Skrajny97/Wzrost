@@ -1,0 +1,13 @@
+{
+  "id": "skill-shadow-storm",
+  "payload": {
+    "text": "a storm of shadow blades: a fast flurry of many dark whooshing slashes and metallic rings swirling around, fantasy, no music",
+    "duration_seconds": 1.8,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-shadow-storm-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-shadow-storm-20261111T1524-1.mp3"
+  ],
+  "credits": 72
+}

@@ -1,0 +1,13 @@
+{
+  "id": "skill-hymn",
+  "payload": {
+    "text": "a short solemn choir hum rising in warm harmony, sacred voices only, no instruments, no music",
+    "duration_seconds": 2.4,
+    "prompt_influence": 0.5
+  },
+  "files": [
+    "audio/drafts/effects/skill-hymn-20261111T1524-0.mp3",
+    "audio/drafts/effects/skill-hymn-20261111T1524-1.mp3"
+  ],
+  "credits": 96
+}
