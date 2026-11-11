@@ -3034,6 +3034,26 @@ Autor: „Co do rolki w mp4 (549) to brakuje usuniecia tła Szczęsnego + karty 
 3. **Film promocyjny (549):** w części o Salonie dojdą Szczęsny bez tła, karta Salonu taka jak w grze i animacje Koła i Loterii, gdy będą gotowe. Reszta filmu zostaje.
 4. **Dźwięki (ElevenLabs):** kręcące się Koło z grzechotką, wygrana, przegrana, los wpadający do bębna, a do filmu cichy „świst” przejścia. Autor wybiera nagrania na słuch, a wybrane grają w Salonie i w filmie.
 
+## Wersja 0.2.61 (11.11.2026): ekran zakupu Punktów Systemu (810), na razie tylko dla konta autora
+
+1. **Co wchodzi do gry:** ekran „Kup Punkty Systemu” ze Sklepu Systemu (`#/sklep/punkty`), jak na przyjętych makietach 810.1–810.7: cztery pakiety po dwa w rzędzie, pola regulaminu i 18+, przycisk „Kupuję i płacę …”, oczekiwanie na płatność po powrocie z Autopay, historia zakupów z „Odstąp od umowy” przez 14 dni i wyszarzone pakiety ponad limit kwartału. Widzi go tylko konto autora (`PAYMENTS_FOR` „authors”); bez kluczy Autopay w sekretach gra pisze, że zakup nie jest jeszcze dostępny.
+2. **Baza danych:** bez migracji.
+3. **Sprawdzone:** testy płatności, sprawdzenie tłumaczeń i danych, ekran w przeglądarce na telefonie (320 i 390 px, makiety 810) i na komputerze (1366 i 1920 px): bez przewijania na boki i bez tekstu poza ramkami.
+
+## Odpowiedzi autora 810–818 (11.11.2026)
+
+Autor: „PixelLab doładowany i wszystko zaznaczone. Pamiętaj by nie generować wiele na raz jednej rzeczy i wybierać tylko robić na przykład 4 wersje, sprawdzać, kolejne 4 itd.”. Oceny ze strony ocen:
+
+1. **810.1–810.7 przyjęte:** ekran zakupu Punktów Systemu wchodzi do gry w 0.2.61, na razie tylko dla konta autora.
+2. **Portrety trzecich form (811):** przyjęte oba portrety Pogromcy Hord, Legendy Areny, Kolosa, Mistrza Łuku, Wybrańca Peruna, Władcy Puszczy, Awatara Żywiołów, Lodowego Króla, Arcydruida i Świętego (z dorysowaną aureolą). Pogromca Demonów (811.11) odrzucony w obu wersjach: rysuję go od nowa, wyraźniej inaczej niż Wielkiego Inkwizytora. Przyjęte portrety trafiają do `art/references/evolutions` jako wzory dla chodów i jazdy.
+3. **812 A:** trzecia forma Arcymaga Żywiołów to **Awatar Żywiołów** (dla obu płci). Przywołaniec Elementalisty zostaje Żywiołakiem.
+4. **814:** zasady i nazwy Tieru VII przyjęte. Ikony (813) w drodze.
+5. **815:** opisy i umiejętności przyjęte poza dwoma. 815.4: „Grad strzał ma zwykły Łucznik, nie powtarzaj.” 815.5: „Kamień piorunowy nie brzmi poprawnie ani po polsku.” Nowe wersje wracają jako 815.4 v2 i 815.5 v2, a inne powtórzenia nazw, które znalazłem przy okazji, idą jako pytanie 819.
+6. **816 A:** nowa kraina na poziomy 201–275 to Łysogóry (Gołoborza, Jodłowa Puszcza, Łysa Góra).
+7. **817:** przyjęte 817.2 i 817.4–817.8. 817.1 z poprawką autora: „niech to będzie tak, że Jagnę spotkamy jednorazowo tylko, a reszta przypadków to będzie Topielica”. 817.3 odpada: „już chyba takie zdarzenie mamy”.
+8. **818.1–818.4 przyjęte.**
+9. **PixelLab oszczędnie:** jedna rzecz naraz jednym wywołaniem, przegląd, i dopiero potem kolejne (zasada w `CLAUDE.md`).
+
 ## Trzecia ewolucja, Tier VII i nowa kraina: propozycje do oceny (11.11.2026)
 
 Autor: „No to lecisz z makietami, a później trzeba wrócić do trzeciej ewolucji i tego co pisałem wczoraj wszystkiego” (11.11.2026), a w nocy: „zacznij generować wszystko pod trzecią ewolucję klas. Jeśli to też zdążysz to kolejne tiery przedmiotów, krainy i stwory w nich. Wszystko będzie do zatwierdzenia.”
