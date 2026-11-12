@@ -37,6 +37,8 @@ export const SPRITES = {
       // The outlaws of the Osada's wanted posters (619 B, 622), and three
       // named ones from 5.11.2026 (635.1–635.3).
       'bandit-chief', 'poacher', 'horse-thief', 'smuggler', 'arsonist', 'highwaywoman', 'grave-robber',
+      // The mimic of the party event „Zakopana skrzynia” (848.5, 849 A).
+      'mimic',
       // Czarne Bagno (101–125) from 3.11.2026.
       'pond-turtle', 'mink', 'dragonfly', 'pike', 'water-spider', 'black-tern', 'wooden-idol', 'veles-serpent', 'pagan-priest', 'bog-demon', 'tick', 'night-heron', 'bies', 'black-goat', 'klobuk', 'mamuna', 'rokita',
       // Sosnowe Wydmy (126–150) from 3.11.2026.

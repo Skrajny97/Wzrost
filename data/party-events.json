@@ -236,7 +236,6 @@
       "scene": "land",
       "text": "Pod korzeniem starego dębu drużyna wykopuje skrzynię. W środku jest złoto i jeden błyszczący kamień.",
       "auto": "share",
-      "draft": true,
       "options": [
         {
           "id": "share",
