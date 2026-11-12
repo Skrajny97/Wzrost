@@ -1,3 +1,4 @@
+// @ts-check
 // Materials and the Stół rozbiórki (data/materials.json). A creature
 // beaten in a fight may leave its own material, at the rarity of its
 // species or, sometimes, a rarity or more higher. The table
@@ -16,15 +17,37 @@ import { campBonus } from './camp.js';
 import { countEvents } from './rng.js';
 import { nameInText } from './text.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {import('./rng.js').Rng} Rng */
+/** @typedef {Record<string, number>} Counts Pieces by key: materials by stack, parts and minerals by id. */
+/** @typedef {Record<string, any>} Item An item as the bag keeps it. */
+/** @typedef {Record<string, any>} Order An order of the Stół rozbiórki's queue. */
+/** @typedef {{ materials: Counts, parts: Counts, queue: Order[] }} Crafting The table's state. */
+/** @typedef {{ level: number, pace: number, maxRarity: number, bonusChance: number }} Table The Stół rozbiórki at the camp's levels (craftTable). */
+
 // A material at one rarity, as the store keeps it: "wolf-pelt:rare".
+/**
+ * @param {string} materialId
+ * @param {string} rarityId
+ * @returns {string}
+ */
 export const stackKey = (materialId, rarityId) => `${materialId}:${rarityId}`;
 
+/**
+ * @param {string} key
+ * @returns {{ materialId: string, rarityId: string }}
+ */
 export function parseStack(key) {
   const at = key.lastIndexOf(':');
   return { materialId: key.slice(0, at), rarityId: key.slice(at + 1) };
 }
 
 // A material key the data knows: an existing material at an existing rarity.
+/**
+ * @param {unknown} key
+ * @param {Content} content
+ * @returns {boolean}
+ */
 export function knownStack(key, content) {
   if (typeof key !== 'string' || !key.includes(':')) return false;
   const { materialId, rarityId } = parseStack(key);
@@ -34,6 +57,11 @@ export function knownStack(key, content) {
 // Whether a material is an ordinary creature's, not an elite's or a
 // champion's trophy (the Garbarnia trades in these; settlement orders ask
 // for them too).
+/**
+ * @param {string} materialId
+ * @param {Content} content
+ * @returns {boolean}
+ */
 export function ordinaryMaterial(materialId, content) {
   const monster = content.monstersById[content.materialsById[materialId]?.monster];
   return Boolean(monster && !monster.elite && !monster.champion);
@@ -42,16 +70,32 @@ export function ordinaryMaterial(materialId, content) {
 // What the scrapper pays for one piece of a material, before the camp's Skup
 // złomu: sellGold times the sell factor of its rarity (proposal 1: "cena
 // rośnie z rzadkością").
+/**
+ * @param {string} rarityId
+ * @param {Content} content
+ * @returns {number}
+ */
 export const materialPrice = (rarityId, content) => content.balance.crafting.sellGold * content.raritiesById[rarityId].sell;
 
 // How many grades a stack stands above its species' own rarity.
+/**
+ * @param {string} key
+ * @param {Content} content
+ * @returns {number}
+ */
 export function gradeSteps(key, content) {
   const { materialId, rarityId } = parseStack(key);
-  const index = (id) => content.rarities.findIndex((rarity) => rarity.id === id);
+  /** @param {string} id */
+  const index = (id) => content.rarities.findIndex((/** @type {{ id: string }} */ rarity) => rarity.id === id);
   return Math.max(0, index(rarityId) - index(content.materialsById[materialId].rarity));
 }
 
 // Adds counts from `more` to `counts`, without zeros.
+/**
+ * @param {Counts} counts
+ * @param {Counts} more
+ * @returns {Counts}
+ */
 export function addCounts(counts, more) {
   const sum = { ...counts };
   for (const [key, count] of Object.entries(more)) {
@@ -65,7 +109,17 @@ export function addCounts(counts, more) {
 // A character's stacks of the materials of one rarity, in the order a need
 // of that rarity takes them (piecesOfRarity): the material it holds the
 // most pieces of first, on a tie the one first by its id.
+/**
+ * @param {Counts | null | undefined} materials
+ * @param {string} rarityId
+ * @param {Content} content
+ * @returns {[string, number][]}
+ */
 export function stacksOfRarity(materials, rarityId, content) {
+  /**
+   * @param {string} a
+   * @param {string} b
+   */
   const byId = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
   return Object.entries(materials ?? {})
     .filter(([key, count]) => count > 0 && knownStack(key, content) && parseStack(key).rarityId === rarityId)
@@ -73,6 +127,12 @@ export function stacksOfRarity(materials, rarityId, content) {
 }
 
 // How many pieces of materials of one rarity the character holds in all.
+/**
+ * @param {Counts | null | undefined} materials
+ * @param {string} rarityId
+ * @param {Content} content
+ * @returns {number}
+ */
 export const heldOfRarity = (materials, rarityId, content) => stacksOfRarity(materials, rarityId, content).reduce((sum, [, count]) => sum + count, 0);
 
 // The pieces a need of `count` materials of one rarity takes, by stack
@@ -81,7 +141,14 @@ export const heldOfRarity = (materials, rarityId, content) => stacksOfRarity(mat
 // rarity add up (the author: 481 B), and the pieces go first from the
 // material the character holds the most of (stacksOfRarity), so its single
 // rarer pieces stay. Null when all of them together are fewer.
+/**
+ * @param {Counts | null | undefined} materials
+ * @param {{ rarity: string, count: number }} need
+ * @param {Content} content
+ * @returns {Counts | null}
+ */
 export function piecesOfRarity(materials, { rarity, count }, content) {
+  /** @type {Counts} */
   const taken = {};
   let left = count;
   for (const [key, held] of stacksOfRarity(materials, rarity, content)) {
@@ -95,6 +162,11 @@ export function piecesOfRarity(materials, { rarity, count }, content) {
 // Such a need as the pages show it: the pieces of that rarity held in all
 // (`have`) and those it would take (`takes`: each stack's key, material,
 // name and pieces, as piecesOfRarity picks them), or null while too few.
+/**
+ * @param {Counts | null | undefined} materials
+ * @param {{ rarity: string, count: number } & Record<string, any>} need
+ * @param {Content} content
+ */
 export function rarityNeedView(materials, need, content) {
   const pieces = piecesOfRarity(materials, need, content);
   return {
@@ -115,6 +187,11 @@ export function rarityNeedView(materials, need, content) {
 // first grows with the level between its floor and its cap, each further
 // one is `materialRarityStepRatio` of the one before, and one more grade
 // opens every `materialRarityStepEvery` levels.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number[]}
+ */
 export function rarityUpChances(level, content) {
   const { materialRarityUpPerLevel, materialRarityUpMin, materialRarityUpMax, materialRarityStepRatio, materialRaritySteps, materialRarityStepEvery } =
     content.balance.rewards;
@@ -123,9 +200,20 @@ export function rarityUpChances(level, content) {
   return Array.from({ length: steps }, (_, step) => first * materialRarityStepRatio ** step);
 }
 
-const rarityIndex = (rarityId, content) => content.rarities.findIndex((rarity) => rarity.id === rarityId);
+/**
+ * @param {string} rarityId
+ * @param {Content} content
+ * @returns {number}
+ */
+const rarityIndex = (rarityId, content) => content.rarities.findIndex((/** @type {{ id: string }} */ rarity) => rarity.id === rarityId);
 
 // The rarity `steps` above `rarityId`, at most the last one.
+/**
+ * @param {string} rarityId
+ * @param {number} steps
+ * @param {Content} content
+ * @returns {string}
+ */
 export function raisedRarity(rarityId, steps, content) {
   return content.rarities[Math.min(rarityIndex(rarityId, content) + steps, content.rarities.length - 1)].id;
 }
@@ -138,8 +226,18 @@ export function raisedRarity(rarityId, steps, content) {
 // leaves its own material almost always, one piece, whatever the length;
 // `trophy` settles it instead of the chance, one piece for certain (true)
 // or none (false), as in the Wieże (towers.js).
+/**
+ * @param {string} monsterId
+ * @param {number} level
+ * @param {number} weight
+ * @param {Rng} rng
+ * @param {Content} content
+ * @param {boolean | null} [trophy]
+ * @returns {Counts}
+ */
 export function materialDrops(monsterId, level, weight, rng, content, trophy = null) {
   const material = content.materialsByMonster[monsterId];
+  /** @type {Counts} */
   const found = {};
   if (!material) return found;
   const count = content.monstersById[monsterId]?.champion
@@ -159,6 +257,11 @@ export function materialDrops(monsterId, level, weight, rng, content, trophy = n
 // A stack as the report and the table show it. The name has the rarity only
 // when it is above the species': "skóra wilka", "rzadka skóra wilka" (in
 // English with the name's capitals, nameInText).
+/**
+ * @param {string} key
+ * @param {number} count
+ * @param {Content} content
+ */
 export function materialView(key, count, content) {
   const { materialId, rarityId } = parseStack(key);
   const material = content.materialsById[materialId];
@@ -179,6 +282,11 @@ export function materialView(key, count, content) {
 }
 
 // "skóra wilka, pióro kruka ×2" for a line of the report.
+/**
+ * @param {Counts} found
+ * @param {Content} content
+ * @returns {string}
+ */
 export function materialsText(found, content) {
   return Object.entries(found)
     .map(([key, count]) => {
@@ -195,6 +303,11 @@ export function materialsText(found, content) {
 // rarer (the code review: a lucky item gave back rarer parts than it took),
 // and one more for each upgrade of the Kowadło above those it came with.
 // Items made before the ordered rarity was kept give their own.
+/**
+ * @param {Item} item
+ * @param {Content} content
+ * @returns {{ partId: string, count: number, minerals?: Counts }}
+ */
 export function salvageYield(item, content) {
   const { salvageBase, salvageLevelStep } = content.balance.crafting;
   const upgrade = item.upgrade ?? 0;
@@ -214,30 +327,46 @@ export function salvageYield(item, content) {
 // have given parts, and from the second rarity on a gem `gemRarityDown`
 // rarities below its own (a gem of its own would let a jewel be made, taken
 // apart and made again for nothing but time). The minerals come at once.
+/**
+ * @param {Item} item
+ * @param {number} count
+ * @param {Content} content
+ * @returns {{ parts: number, minerals: Counts } | null}
+ */
 function jewelSalvage(item, count, content) {
   const tuning = content.jewelcrafting?.salvage;
   if (!tuning || !content.jewelcrafting.ores[item.slot]) return null;
+  /** @type {Counts} */
   const minerals = {};
-  const ore = content.minerals.find((mineral) => mineral.kind === 'ore' && mineral.for.includes(item.rarity));
+  const ore = content.minerals.find((/** @type {Record<string, any>} */ mineral) => mineral.kind === 'ore' && mineral.for.includes(item.rarity));
   if (ore) minerals[ore.id] = count;
-  const gemRarity = content.rarities[content.rarities.findIndex((rarity) => rarity.id === item.rarity) - tuning.gemRarityDown];
-  const gem = gemRarity && content.minerals.find((mineral) => mineral.kind === 'gem' && mineral.rarity === gemRarity.id);
+  const gemRarity = content.rarities[content.rarities.findIndex((/** @type {{ id: string }} */ rarity) => rarity.id === item.rarity) - tuning.gemRarityDown];
+  const gem = gemRarity && content.minerals.find((/** @type {Record<string, any>} */ mineral) => mineral.kind === 'gem' && mineral.rarity === gemRarity.id);
   if (gem) minerals[gem.id] = (minerals[gem.id] ?? 0) + 1;
   return { parts: Math.max(1, Math.floor(count / tuning.partsDivisor)), minerals };
 }
 
 // The Stół rozbiórki in the data: the building whose effect is craftSpeed.
-export const tableBuilding = (content) => content.buildings.find((building) => building.effect.kind === 'craftSpeed');
+/**
+ * @param {Content} content
+ * @returns {Record<string, any> | undefined}
+ */
+export const tableBuilding = (content) => content.buildings.find((/** @type {Record<string, any>} */ building) => building.effect.kind === 'craftSpeed');
 
 // The table at the camp's levels: its level; its pace, 0 until it stands,
 // then 1 plus its bonus; the highest rarity it takes, as an index into the
 // rarities (effect.rarities names one for each level, the last one for every
 // level from there on), and the chance of an extra part for each part an
 // order makes (effect.bonusPerLevel for each level from bonusFromLevel).
+/**
+ * @param {Record<string, number>} levels
+ * @param {Content} content
+ * @returns {Table}
+ */
 export function craftTable(levels, content) {
   const building = tableBuilding(content);
   const level = building ? (levels[building.id] ?? 0) : 0;
-  if (level === 0) return { level: 0, pace: 0, maxRarity: -1, bonusChance: 0 };
+  if (!building || level === 0) return { level: 0, pace: 0, maxRarity: -1, bonusChance: 0 };
   const { rarities, bonusFromLevel, bonusPerLevel } = building.effect;
   return {
     level,
@@ -248,18 +377,41 @@ export function craftTable(levels, content) {
 }
 
 // How fast the table works at the camp's levels: 0 until it stands.
+/**
+ * @param {Record<string, number>} levels
+ * @param {Content} content
+ * @returns {number}
+ */
 export const craftPace = (levels, content) => craftTable(levels, content).pace;
 
 // The table's level that takes a rarity.
+/**
+ * @param {string} rarityId
+ * @param {Content} content
+ * @returns {number}
+ */
 export function craftLevelFor(rarityId, content) {
   const index = rarityIndex(rarityId, content);
-  return tableBuilding(content).effect.rarities.findIndex((cap) => rarityIndex(cap, content) >= index) + 1;
+  return /** @type {Record<string, any>} */ (tableBuilding(content)).effect.rarities.findIndex((/** @type {string} */ cap) => rarityIndex(cap, content) >= index) + 1;
 }
 
 // Whether the table takes a rarity.
+/**
+ * @param {{ maxRarity: number }} table
+ * @param {string} rarityId
+ * @param {Content} content
+ * @returns {boolean}
+ */
 export const craftTakes = (table, rarityId, content) => rarityIndex(rarityId, content) <= table.maxRarity;
 
 // Minutes the table needs for `count` parts of a rarity at its pace.
+/**
+ * @param {string} rarityId
+ * @param {number} count
+ * @param {number} pace
+ * @param {Content} content
+ * @returns {number}
+ */
 export function craftMinutes(rarityId, count, pace, content) {
   return Math.max(1, Math.round((count * content.raritiesById[rarityId].craftMinutes) / pace));
 }
@@ -267,8 +419,14 @@ export function craftMinutes(rarityId, count, pace, content) {
 // The state at `now`: the parts of every finished order, with its extra
 // ones, are in `parts` and the order is gone from the queue. `done` lists
 // those orders.
+/**
+ * @param {Crafting} state
+ * @param {number} now
+ * @returns {Crafting & { done: Order[] }}
+ */
 export function settleCrafting({ materials, parts, queue }, now) {
   const done = queue.filter((order) => order.endsAt <= now);
+  /** @type {Counts} */
   const made = {};
   for (const order of done) made[order.partId] = (made[order.partId] ?? 0) + order.parts + (order.bonus ?? 0);
   return { materials, parts: addCounts(parts, made), queue: queue.filter((order) => order.endsAt > now), done };
@@ -278,6 +436,13 @@ export function settleCrafting({ materials, parts, queue }, now) {
 // It keeps when it was ordered, and counts for the quests and the Próby
 // Gildii once it ends (`countsAtEnd`, countedAtEnd), so one taken off the
 // queue never counted.
+/**
+ * @param {Order[]} queue
+ * @param {Order} order
+ * @param {number} minutes
+ * @param {number} now
+ * @returns {Order[]}
+ */
 function append(queue, order, minutes, now) {
   const startsAt = Math.max(now, queue.at(-1)?.endsAt ?? now);
   return [...queue, { ...order, orderedAt: now, countsAtEnd: true, startsAt, endsAt: startsAt + minutes * 60000 }];
@@ -285,6 +450,10 @@ function append(queue, order, minutes, now) {
 
 // An item as the bag keeps it, without its place there (id, equippedSlot):
 // an order taking it apart keeps it, to give it back if it leaves the queue.
+/**
+ * @param {Item} item
+ * @returns {Item}
+ */
 const storedItem = ({ id: _id, equippedSlot: _slot, ...item }) => item;
 
 // The pieces of a stack an order takes that came from a trade: the
@@ -292,11 +461,24 @@ const storedItem = ({ id: _id, equippedSlot: _slot, ...item }) => item;
 // in encyclopedia.js, `foreign` by "material:<stack>"), and the character's
 // own pieces go first. They are marked as traded again if the order leaves
 // the queue.
+/**
+ * @param {Counts} foreign
+ * @param {string} key
+ * @param {number} held
+ * @param {number} count
+ * @returns {number}
+ */
 function tradedPieces(foreign, key, held, count) {
   return Math.max(0, Math.min(foreign[`material:${key}`] ?? 0, held) - (held - count));
 }
 
 // The extra parts of an order of `parts`, known from its start, shown when it ends.
+/**
+ * @param {number} parts
+ * @param {Table} table
+ * @param {Rng} rng
+ * @returns {number}
+ */
 const bonusParts = (parts, table, rng) => (table.bonusChance > 0 ? countEvents(parts * table.bonusChance, rng) : 0);
 
 // Orders for stacks of materials, one order each, while the queue has
@@ -307,6 +489,16 @@ const bonusParts = (parts, table, rng) => (table.bonusChance > 0 ? countEvents(p
 // take yet stays. `foreign` is the character's record of pieces from trades
 // (tradedPieces). Returns the new state, the number of stacks ordered and of
 // those too rare.
+/**
+ * @param {Crafting} state
+ * @param {string[]} keys
+ * @param {Table} table
+ * @param {number} now
+ * @param {Rng} rng
+ * @param {Content} content
+ * @param {Counts} [counts]
+ * @param {Counts} [foreign]
+ */
 export function orderMaterials(state, keys, table, now, rng, content, counts = {}, foreign = {}) {
   const limit = content.balance.crafting.queueLimit;
   let { materials, queue } = state;
@@ -344,6 +536,11 @@ export function orderMaterials(state, keys, table, now, rng, content, counts = {
 // out and goes back to the character's minerals (the author's 757 B,
 // 10.11.2026: „kamień wypada i wraca do Twoich minerałów”); a gem the data
 // no longer knows is not given. Null when there are none.
+/**
+ * @param {Item} item
+ * @param {Content} content
+ * @returns {Counts | null}
+ */
 export function salvageMinerals(item, content) {
   const { minerals } = salvageYield(item, content);
   const gem = item.gem && content.mineralsById[item.gem] ? { [item.gem]: 1 } : null;
@@ -355,6 +552,16 @@ export function salvageMinerals(item, content) {
 // removes the item. The order keeps the item, and the minerals it gives at
 // once (`minerals`, salvageMinerals), to give back and take back if it
 // leaves the queue: the item comes back with its gem in it.
+/**
+ * @param {Crafting} state
+ * @param {Item} item
+ * @param {string} name
+ * @param {Table} table
+ * @param {number} now
+ * @param {Rng} rng
+ * @param {Content} content
+ * @returns {Crafting}
+ */
 export function orderSalvage(state, item, name, table, now, rng, content) {
   const { partId, count } = salvageYield(item, content);
   const minerals = salvageMinerals(item, content);
@@ -379,7 +586,17 @@ export function orderSalvage(state, item, name, table, now, rng, content) {
 // order of one item keeps its name, one of more has `count` items and no
 // name. Each order keeps its items and their minerals, as orderSalvage's.
 // The caller checks as for orderSalvage, and room for every order.
+/**
+ * @param {Crafting} state
+ * @param {{ item: Item, name: string }[]} entries
+ * @param {Table} table
+ * @param {number} now
+ * @param {Rng} rng
+ * @param {Content} content
+ * @returns {Crafting}
+ */
 export function orderSalvageMany(state, entries, table, now, rng, content) {
+  /** @type {Map<string, { name: string, rarity: string, items: Item[], parts: number, minutes: number, minerals: Counts | null }>} */
   const groups = new Map();
   for (const { item, name } of entries) {
     const { partId, count } = salvageYield(item, content);
@@ -408,12 +625,20 @@ export function orderSalvageMany(state, entries, table, now, rng, content) {
 // Whether an order can leave the queue with all it took given back: one of
 // materials always; one taking items apart only from 0.1.65 on, when
 // orders began to keep their items (before, the item was gone at once).
+/**
+ * @param {Order} order
+ * @returns {boolean}
+ */
 export const orderCancellable = (order) => order.kind === 'material' || Array.isArray(order.items);
 
 // The work of an order for the narrator's quests and the Próby Gildii, by
 // their kind: the pieces of materials processed or the items salvaged, and
 // when it was ordered. An order from before 0.1.65 does not know when it
 // was ordered: its start stands for it.
+/**
+ * @param {Order} order
+ * @returns {{ kind: string, pieces: number, orderedAt: number }}
+ */
 export function orderWork(order) {
   const pieces = order.kind === 'material' ? order.count : (order.items?.length ?? order.count ?? 1);
   return { kind: order.kind === 'material' ? 'process' : 'salvage', pieces, orderedAt: order.orderedAt ?? order.startsAt };
@@ -425,6 +650,9 @@ export function orderWork(order) {
 // zadania rozbiórki przedmiotów liczyły się po zakończonej rozbiórce bo
 // inaczej bedzie mozna anulować rozbiórkę a zadanie zaliczone”). An older
 // order counted when it was ordered, so not again. Each as orderWork gives it.
+/**
+ * @param {Order[]} done
+ */
 export const countedAtEnd = (done) => done.filter((order) => order.countsAtEnd === true).map(orderWork);
 
 // Orders taken off the queue ("Usuń z kolejki", "Usuń wszystkie"; the
@@ -439,15 +667,23 @@ export const countedAtEnd = (done) => done.filter((order) => order.countsAtEnd =
 // queue that counted when ordered (orderWork; those made before work began
 // to count at the end), `cancelled` for those leaving. An order that
 // counts at its end has counted nothing yet, so it takes nothing back.
+/**
+ * @param {Crafting} state
+ * @param {Set<unknown>} ids
+ * @param {number} now
+ */
 export function takeOffQueue(state, ids, now) {
   const leaving = state.queue.filter((order) => ids.has(order.id));
+  /** @type {Order[]} */
   const queue = [];
   for (const order of state.queue) {
     if (ids.has(order.id)) continue;
-    const startsAt = queue.length === 0 ? Math.min(order.startsAt, now) : queue.at(-1).endsAt;
+    const startsAt = queue.length === 0 ? Math.min(order.startsAt, now) : /** @type {Order} */ (queue.at(-1)).endsAt;
     queue.push({ ...order, startsAt, endsAt: startsAt + order.endsAt - order.startsAt });
   }
+  /** @type {Counts} */
   const back = {};
+  /** @type {Counts} */
   const traded = {};
   for (const order of leaving.filter((one) => one.kind === 'material')) {
     back[order.key] = (back[order.key] ?? 0) + order.count;
@@ -456,7 +692,7 @@ export function takeOffQueue(state, ids, now) {
   return {
     state: { ...state, materials: addCounts(state.materials, back), queue },
     items: leaving.flatMap((order) => order.items ?? []),
-    minerals: leaving.reduce((sum, order) => addCounts(sum, order.minerals ?? {}), {}),
+    minerals: leaving.reduce((/** @type {Counts} */ sum, order) => addCounts(sum, order.minerals ?? {}), {}),
     patterns: [...new Set(leaving.flatMap((order) => order.patterns ?? []))],
     traded,
     work: state.queue.filter((order) => order.countsAtEnd !== true).map((order) => ({ ...orderWork(order), cancelled: ids.has(order.id) })),
@@ -470,11 +706,17 @@ export function takeOffQueue(state, ids, now) {
 // off later, that order hides it in turn (the author: a pattern "znów się
 // ukrywa, chyba że w kolejce czeka inny przedmiot tego wzoru (wtedy on go
 // odsłania)"). The others are `hidden`.
+/**
+ * @param {Order[]} queue
+ * @param {string[]} ids
+ * @returns {{ queue: Order[], hidden: string[] }}
+ */
 export function patternsKept(queue, ids) {
   let kept = queue;
+  /** @type {string[]} */
   const hidden = [];
   for (const id of ids) {
-    const at = kept.findIndex((order) => (order.items ?? []).some((item) => item.base === id));
+    const at = kept.findIndex((order) => (order.items ?? []).some((/** @type {Item} */ item) => item.base === id));
     if (at < 0) {
       hidden.push(id);
       continue;
