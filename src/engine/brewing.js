@@ -17,7 +17,7 @@ import { say } from './text.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ id: string, name: string, level: number, herbs: Record<string, number>, taught?: string }} Recipe A potion of data/professions.json, as a recipe. */
-/** @typedef {{ id: string, points: number }} Standing */
+/** @typedef {{ id: string, points: number, name: string }} Standing A standing of the relation with a resident (data/settlement.json). */
 /** @typedef {{ relations?: Record<string, number>, reputation?: Record<string, number> } | null | undefined} SettlementPoints */
 
 // The standing from which the herbalist teaches a rare recipe (121 A:
