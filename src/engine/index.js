@@ -1,5 +1,30 @@
+// @ts-check
 // The game engine: deterministic pure functions. State, time and the random
 // seed always give the same result. No Date.now(), Math.random() or I/O here.
+
+// Names of types more than one module gives its own (a loose shape of the
+// game's data, mostly): the first module's here, so that the re-exports
+// below name each once.
+/** @typedef {import('./items.js').Affix} Affix */
+/** @typedef {import('./combatant.js').Area} Area */
+/** @typedef {import('./formulas.js').Balance} Balance */
+/** @typedef {import('./workshop.js').Base} Base */
+/** @typedef {import('./skills.js').Block} Block */
+/** @typedef {import('./camp.js').Building} Building */
+/** @typedef {import('./stats.js').Character} Character */
+/** @typedef {import('./stats.js').Content} Content */
+/** @typedef {import('./crafting.js').Counts} Counts */
+/** @typedef {import('./towers.js').Encounter} Encounter */
+/** @typedef {import('./pvp-arena.js').Fighter} Fighter */
+/** @typedef {import('./items.js').Item} Item */
+/** @typedef {import('./fortress.js').Levels} Levels */
+/** @typedef {import('./mining.js').Mineral} Mineral */
+/** @typedef {import('./events.js').Option} Option */
+/** @typedef {import('./quests.js').Period} Period */
+/** @typedef {import('./items.js').Rng} Rng */
+/** @typedef {import('./evolutions.js').Span} Span */
+/** @typedef {import('./camp.js').Stored} Stored */
+/** @typedef {import('./casino.js').Tier} Tier */
 
 export { buildContent } from './content.js';
 export { overlayKey, overlayTexts } from './overlay.js';
