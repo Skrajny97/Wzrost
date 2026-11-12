@@ -203,6 +203,8 @@ export function mountProfessions(container, { params, navigate }) {
   let workshopTab = 'workshop';
   // The Szlifiernia's tab: the jewellery or the setting of gems.
   let jewelTab = 'craft';
+  // The items marked in the Przechowalnia, by id, whichever screen shows it.
+  const storageMarks = new Set();
   // The works under way on the screen, each with its countdown, bar, scene
   // and "Przewiń": the character's and the Awatar's.
   let timers = [];
@@ -215,6 +217,8 @@ export function mountProfessions(container, { params, navigate }) {
       ...works.flatMap((work) => [work?.kind ?? null, work?.startedAt ?? null, activityFinished(work, now)]),
       character.professions?.avatar?.owned ?? false,
       state.user.testMode && testModeOn(),
+      // What waits in the Przechowalnia.
+      (character.professions?.storage?.items ?? []).map((item) => item.id).join(),
     ]);
   };
 
@@ -401,7 +405,7 @@ export function mountProfessions(container, { params, navigate }) {
   // Under the works, two tabs: the Warsztat and its part exchange (the
   // author: the exchange at the top as a tab, not at the very bottom).
   function renderCrafting(character) {
-    const { list, workshop } = character.professions;
+    const { list, workshop, storage } = character.professions;
     const profession = list.find((candidate) => candidate.id === workshop.professionId);
     const tab = (id, label) =>
       h(
@@ -422,8 +426,16 @@ export function mountProfessions(container, { params, navigate }) {
       backHeading(profession.name, t('poziom {level}', { level: profession.level }), HOME),
       works(character, 'items', craftingCard, 'Postać {doing}. Wyrób możliwy po powrocie.'),
       testTools(character, 'items', t('Tryb testowy: wyrób skończy się od razu, z tym samym wynikiem.')),
-      h('div', { class: 'segmented workshop-tabs', role: 'group', 'aria-label': workshop.place.name }, tab('workshop', t('Warsztat')), tab('exchange', workshop.exchange.title)),
-      workshopTab === 'exchange'
+      h(
+        'div',
+        { class: 'segmented workshop-tabs', role: 'group', 'aria-label': workshop.place.name },
+        tab('workshop', t('Warsztat')),
+        tab('exchange', workshop.exchange.title),
+        storage && tab('storage', storageLabel(storage)),
+      ),
+      workshopTab === 'storage' && storage
+        ? storageCard(character)
+        : workshopTab === 'exchange'
         ? partExchange(character, workshop)
         : [
             placeCard(workshop.place),
@@ -1345,6 +1357,142 @@ export function mountProfessions(container, { params, navigate }) {
     );
   }
 
+  // The tab of the Przechowalnia, with how many items wait in it.
+  const storageLabel = (storage) => (storage.items.length > 0 ? t('Przechowalnia ({count})', { count: formatNumber(storage.items.length) }) : t('Przechowalnia'));
+
+  // The Przechowalnia (the author, 12.11.2026: "Niech w warsztacie będzie
+  // przechowalnia niech to nie trafia od razu do plecaka i można od razu z
+  // pozycji przechowalni rozbierać i sprzedawać wyprodukowane albo wlozyc do
+  // plecaka jesli jest miejsce"): what the Warsztat and the Szlifiernia made
+  // waits here, out of the bag, one place for both. A tap marks an item, and
+  // the marked ones go to the bag while it has room, to the scrapper for
+  // gold, or onto the Stół rozbiórki, as the bag's "Rozbierz kilka" does.
+  function storageCard(character) {
+    const { items } = character.professions.storage;
+    const free = Math.max(0, character.bagCapacity - character.bagUsed);
+    for (const id of [...storageMarks]) if (!items.some((item) => item.id === id)) storageMarks.delete(id);
+    const chosen = () => items.filter((item) => storageMarks.has(item.id));
+    let last = null;
+    const described = h('div', { class: 'salvage-last', 'aria-live': 'polite', hidden: true });
+    const summary = h('p', { class: 'sheet-text', role: 'status' });
+    const roomNote = h('p', { class: 'region-warning', hidden: true });
+    const button = (kind, className) => h('button', { type: 'button', class: `button ${className}`, onClick: (event) => storageAct(event.currentTarget, kind, chosen()) });
+    const toBag = button('take', 'button--system');
+    const sell = button('sell', 'button--world');
+    const salvage = button('salvage', 'button--world');
+    const all = h('button', {
+      type: 'button',
+      class: 'button button--world button--small',
+      onClick: () => {
+        const every = chosen().length === items.length;
+        for (const item of items) every ? storageMarks.delete(item.id) : storageMarks.add(item.id);
+        for (const tile of grid.querySelectorAll('[aria-pressed]')) tile.setAttribute('aria-pressed', String(!every));
+        update();
+      },
+    });
+    // The parts the marked items make on the Stół rozbiórki, by kind.
+    const partsOf = (marked) => {
+      const parts = new Map();
+      for (const { salvage: what } of marked) if (what) parts.set(what.part, { color: what.color, count: (parts.get(what.part)?.count ?? 0) + what.parts });
+      return [...parts];
+    };
+    function update() {
+      const marked = chosen();
+      const gold = marked.reduce((sum, item) => sum + (item.price ?? 0), 0);
+      const shown = marked.find((item) => item.id === last) ?? marked.at(-1);
+      described.hidden = !shown;
+      fill(described, shown && storageItem(shown));
+      fill(
+        summary,
+        marked.length === 0
+          ? t('Nic jeszcze nie zaznaczono.')
+          : [
+              t('Zaznaczone: {count}. Złomiarz da za nie {gold} złota, a Stół rozbiórki zrobi z nich:', { count: formatNumber(marked.length), gold: formatNumber(gold) }),
+              ' ',
+              partsOf(marked).map(([part, { color, count }], index) => [index > 0 && ', ', h('span', { class: 'item-name', vars: { '--rarity': color }, text: `${part} ×${formatNumber(count)}` })]),
+              '.',
+            ],
+      );
+      roomNote.hidden = marked.length <= free;
+      roomNote.textContent = free === 0 ? t('Plecak jest pełny. Zrób w nim miejsce albo sprzedaj lub rozbierz przedmioty stąd.') : t('W plecaku jest miejsce na {count}.', { count: countOf(free, 'przedmiot', 'przedmioty', 'przedmiotów') });
+      const count = formatNumber(marked.length);
+      toBag.textContent = t('Do plecaka ({count})', { count });
+      sell.textContent = t('Sprzedaj ({count})', { count });
+      salvage.textContent = t('Rozbierz ({count})', { count });
+      toBag.disabled = marked.length === 0 || marked.length > free;
+      sell.disabled = marked.length === 0;
+      salvage.disabled = marked.length === 0 || marked.some((item) => !item.salvage || item.salvage.minutes === null);
+      all.textContent = marked.length === items.length ? t('Odznacz wszystkie') : t('Zaznacz wszystkie');
+    }
+    const tile = (item) => {
+      const pick = h(
+        'button',
+        {
+          type: 'button',
+          class: 'slot slot--bag salvage-pick',
+          vars: { '--rarity': item.color },
+          'aria-pressed': String(storageMarks.has(item.id)),
+          'aria-label': [itemTitle(item), item.rarityName, item.slotName, t('poziom {level}', { level: item.level })].join(', '),
+          onClick: () => {
+            if (storageMarks.has(item.id)) storageMarks.delete(item.id);
+            else {
+              storageMarks.add(item.id);
+              last = item.id;
+            }
+            pick.setAttribute('aria-pressed', String(storageMarks.has(item.id)));
+            update();
+          },
+        },
+        itemSprite(item) ?? icon('sword', { size: 24 }),
+        item.upgrade > 0 && h('span', { class: 'slot-level', text: `+${item.upgrade}` }),
+        h('span', { class: 'salvage-check', 'aria-hidden': 'true' }, icon('check', { size: 14 })),
+      );
+      return h('li', {}, pick);
+    };
+    const grid = h('ul', { class: 'bag-grid salvage-grid' }, items.map(tile));
+    const body =
+      items.length === 0
+        ? [h('p', { class: 'muted', text: t('Pusto. Tu trafi to, co zrobisz w Warsztacie i w Szlifierni.') })]
+        : [
+            h('div', { class: 'storage-head' }, h('p', { class: 'muted', text: t('Przedmiotów: {count}. Nie zajmują miejsca w plecaku.', { count: formatNumber(items.length) }) }), all),
+            grid,
+            h('div', { class: 'salvage-bar salvage-bar--inline' }, described, summary, roomNote, h('div', { class: 'storage-actions' }, toBag, sell, salvage)),
+          ];
+    update();
+    return h(
+      'section',
+      { class: 'card gather-card', 'aria-labelledby': 'storage-title' },
+      h('h2', { class: 'section-title', id: 'storage-title', text: t('Przechowalnia') }),
+      h('p', { class: 'muted', text: t('Tu czekają przedmioty z Warsztatu i biżuteria ze Szlifierni. Zaznacz je i włóż do plecaka, sprzedaj złomiarzowi albo rozbierz na Stole rozbiórki.') }),
+      body,
+    );
+  }
+
+  // A marked item of the Przechowalnia as its card describes it, as the
+  // bag's "Rozbierz kilka" shows the one marked last.
+  const storageItem = (item) => [
+    h('span', { class: 'salvage-last-art', vars: { '--rarity': item.color } }, itemSprite(item) ?? icon('sword', { size: 24 })),
+    h(
+      'span',
+      { class: 'salvage-last-text' },
+      h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: itemTitle(item) }),
+      h('span', { class: 'item-meta', text: [item.rarityName, item.slotName, t('poz. {level}', { level: item.level }), item.tier].filter(Boolean).join(' · ') }),
+      item.properties?.length > 0 && h('span', { class: 'item-stats', text: item.properties.join(' · ') }),
+    ),
+  ];
+
+  // The marked items of the Przechowalnia to the bag, to the scrapper or
+  // onto the Stół rozbiórki (src/server/storage.js).
+  async function storageAct(button, kind, items) {
+    if (items.length === 0) return;
+    await withButton(button, async () => {
+      const answer = await call('POST', `/api/professions/storage/${kind}`, { ids: items.map((item) => item.id) });
+      for (const item of items) storageMarks.delete(item.id);
+      playSound(kind === 'sell' ? 'coin' : kind === 'salvage' ? 'build' : 'collect');
+      if (answer.text) toast(answer.text);
+    });
+  }
+
   // A scroll for the Kowadło, the Zwoje ochronne or with `which`
   // "steadyScroll" the Zwoje utrwalenia: what they do and how many the
   // character has, then, from the scroll's level, how many to make from the
@@ -1617,7 +1765,7 @@ export function mountProfessions(container, { params, navigate }) {
   // setting of gems), the Systemowa Szlifiernia with how the chosen work
   // goes folded under "Jak to działa?", the level and the tab's form.
   function renderJewelcraft(character) {
-    const { list, jewelcrafting } = character.professions;
+    const { list, jewelcrafting, storage } = character.professions;
     const profession = list.find((candidate) => candidate.id === jewelcrafting.professionId);
     const setting = jewelTab === 'set';
     const tab = (id, label) =>
@@ -1641,10 +1789,20 @@ export function mountProfessions(container, { params, navigate }) {
       backHeading(profession.name, t('poziom {level}', { level: profession.level }), HOME),
       works(character, 'jewels', jewelsCard, 'Postać {doing}. Praca w Szlifierni możliwa po powrocie.'),
       testTools(character, 'jewels', t('Tryb testowy: praca skończy się od razu, z tym samym wynikiem.')),
-      h('div', { class: 'segmented workshop-tabs', role: 'group', 'aria-label': jewelcrafting.place.name }, tab('craft', t('Biżuteria')), tab('set', t('Oprawianie'))),
-      placeCard(jewelcrafting.place, setting ? jewelcrafting.about.set : jewelcrafting.about.craft),
-      levelCard(profession, t('pracy')),
-      anyFree(character) && (setting ? setForm(character, jewelcrafting) : jewelForm(character, jewelcrafting)),
+      h(
+        'div',
+        { class: 'segmented workshop-tabs', role: 'group', 'aria-label': jewelcrafting.place.name },
+        tab('craft', t('Biżuteria')),
+        tab('set', t('Oprawianie')),
+        storage && tab('storage', storageLabel(storage)),
+      ),
+      jewelTab === 'storage' && storage
+        ? storageCard(character)
+        : [
+            placeCard(jewelcrafting.place, setting ? jewelcrafting.about.set : jewelcrafting.about.craft),
+            levelCard(profession, t('pracy')),
+            anyFree(character) && (setting ? setForm(character, jewelcrafting) : jewelForm(character, jewelcrafting)),
+          ],
     );
   }
 
