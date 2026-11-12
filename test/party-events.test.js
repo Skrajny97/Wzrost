@@ -74,10 +74,13 @@ describe('the event a trip brings', () => {
   });
 
   test('a draft event only where the drafts are on (the test version)', () => {
-    assert.ok(eventOf('buried-chest').draft);
+    // An event the author has not approved yet: none is now, so a copy of
+    // the data with one.
+    const list = content.partyEvents.list.map((event) => (event.id === 'campfire-tales' ? { ...event, draft: true } : event));
+    const drafted = { ...content, partyEvents: { ...content.partyEvents, list } };
     const seeds = Array.from({ length: 3000 }, (_, i) => `draft-${i}`);
-    assert.ok(seeds.every((seed) => partyEventFor({ hunt: success, seed }, content)?.id !== 'buried-chest'));
-    assert.ok(seeds.some((seed) => partyEventFor({ hunt: success, seed, drafts: true }, content)?.id === 'buried-chest'));
+    assert.ok(seeds.every((seed) => partyEventFor({ hunt: success, seed }, drafted)?.id !== 'campfire-tales'));
+    assert.ok(seeds.some((seed) => partyEventFor({ hunt: success, seed, drafts: true }, drafted)?.id === 'campfire-tales'));
   });
 });
 
@@ -107,7 +110,7 @@ describe('what each member gets, at its own level', () => {
   });
 
   test('a split reward: the gem to the leader, gold to the others', () => {
-    const result = resolve('buried-chest', 'stone', 'split', party, { drafts: true });
+    const result = resolve('buried-chest', 'stone', 'split');
     assert.deepEqual(result.members[11], { gold: 0, xp: 0, minerals: { [bestGem(30)]: 1 }, part: 'leader' });
     for (const id of [12, 13]) {
       assert.equal(result.members[id].part, 'others');
@@ -115,7 +118,7 @@ describe('what each member gets, at its own level', () => {
       assert.ok(result.members[id].gold > 0);
     }
     // A gem `step` lower, each by its own level.
-    const plain = resolve('buried-chest', 'check', seedOf('buried-chest', 'check', 'plain'), party, { drafts: true });
+    const plain = resolve('buried-chest', 'check', seedOf('buried-chest', 'check', 'plain'));
     for (const one of party) assert.deepEqual(Object.keys(plain.members[one.id].minerals), [bestGem(one.character.level, 1)]);
   });
 
