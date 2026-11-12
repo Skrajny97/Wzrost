@@ -1,3 +1,4 @@
+// @ts-check
 // The narrator's daily, weekly and monthly quests (data/quests.json). Days,
 // weeks and months follow the clock of quests.timeZone (Polish time): a day
 // starts at midnight, a week at the midnight between Sunday and Monday, a
@@ -29,11 +30,28 @@ import { areasOpened, areaUnlocked } from './unlocks.js';
 
 export const QUEST_PERIODS = ['daily', 'weekly', 'monthly'];
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {Record<string, any>} Character A character, as the engine takes it. */
+/** @typedef {{ minLevel: number } & Record<string, any>} Area An inner region (content.areas). */
+/** @typedef {Record<string, any>} Quest One quest: { kind, target?, count, progress, reward, claimed, over? }. */
+/** @typedef {Record<string, any>} Kept A period's quests as kept: { period, quests, chest, share?, scaled?, days?, total?, rerolled? }. */
+/** @typedef {Record<string, Kept>} Quests The quests of each period, by its id. */
+/** @typedef {{ key: string, startsAt: number, endsAt: number }} Period A period: the date it starts on, its start and its end. */
+/** @typedef {{ kind: Record<string, any>, weight: number, target?: string, perFight?: number, most?: number }} Option What can be drawn. */
+/** @typedef {{ character: Character, hasTable?: boolean, hasProfessions?: boolean, hasCrafting?: boolean, hasSettlement?: boolean, openProfessions?: string[], seed?: string }} Draw What the drawing of quests knows of the character. */
+/** @typedef {import('./rng.js').Rng} Rng */
+
 // The zone's wall clock. Intl knows the zone's rules (summer time), so the
 // days turn at the zone's midnight all year. The weeks of the year count
 // their weeks by it too (weeks.js).
+/** @type {Map<string, Intl.DateTimeFormat>} */
 const clocks = new Map();
 
+/**
+ * @param {number} ms
+ * @param {string} timeZone
+ * @returns {Record<string, number>}
+ */
 export function zoneClock(ms, timeZone) {
   let clock = clocks.get(timeZone);
   if (!clock) {
@@ -49,12 +67,17 @@ export function zoneClock(ms, timeZone) {
     });
     clocks.set(timeZone, clock);
   }
+  /** @type {Record<string, number>} */
   const parts = {};
   for (const { type, value } of clock.formatToParts(ms)) if (type !== 'literal') parts[type] = Number(value);
   return parts;
 }
 
 // How far the zone's clock is ahead of UTC at `ms`.
+/**
+ * @param {number} ms
+ * @param {string} timeZone
+ */
 function zoneOffset(ms, timeZone) {
   const { year, month, day, hour, minute, second } = zoneClock(ms, timeZone);
   return Date.UTC(year, month - 1, day, hour, minute, second) - Math.floor(ms / 1000) * 1000;
@@ -63,11 +86,24 @@ function zoneOffset(ms, timeZone) {
 // The moment the zone's clock shows midnight `days` after the day it shows
 // at `ms`. The offset is taken near that moment, and again at it, so a
 // change of time on that day is on the right side.
+/**
+ * @param {number} ms
+ * @param {string} timeZone
+ * @param {number} days
+ * @returns {number}
+ */
 export const zoneMidnight = (ms, timeZone, days) => zoneTime(ms, timeZone, days, 0);
 
 // The moment the zone's clock shows `hour`:00 `days` after the day it shows
 // at `ms` (the guild wars' battles at 20:00 Polish time, also on the day
 // the clocks change), as zoneMidnight finds its midnight.
+/**
+ * @param {number} ms
+ * @param {string} timeZone
+ * @param {number} days
+ * @param {number} hour
+ * @returns {number}
+ */
 export function zoneTime(ms, timeZone, days, hour) {
   const { year, month, day } = zoneClock(ms, timeZone);
   const wall = Date.UTC(year, month - 1, day + days, hour);
@@ -75,6 +111,11 @@ export function zoneTime(ms, timeZone, days, hour) {
 }
 
 // Days since Monday on the zone's clock at `ms`.
+/**
+ * @param {number} ms
+ * @param {string} timeZone
+ * @returns {number}
+ */
 export function sinceMonday(ms, timeZone) {
   const { year, month, day } = zoneClock(ms, timeZone);
   return (new Date(Date.UTC(year, month - 1, day)).getUTCDay() + 6) % 7;
@@ -82,10 +123,19 @@ export function sinceMonday(ms, timeZone) {
 
 // The days left of the week at `now`, today among them: 7 on a Monday, 1 on
 // a Sunday.
+/**
+ * @param {number} now
+ * @param {Content} content
+ * @returns {number}
+ */
 export const weekDaysLeft = (now, content) => 7 - sinceMonday(now, content.quests.timeZone);
 
 // The day of the month on the zone's clock at `ms`, and how many days the
 // month has.
+/**
+ * @param {number} ms
+ * @param {string} timeZone
+ */
 function monthDay(ms, timeZone) {
   const { year, month, day } = zoneClock(ms, timeZone);
   return { day, length: new Date(Date.UTC(year, month, 0)).getUTCDate() };
@@ -93,6 +143,11 @@ function monthDay(ms, timeZone) {
 
 // The days left of the month at `now`, today among them (all of them on its
 // first day, 1 on its last), and how many it has (`total`).
+/**
+ * @param {number} now
+ * @param {Content} content
+ * @returns {{ days: number, total: number }}
+ */
 export function monthDaysLeft(now, content) {
   const { day, length } = monthDay(now, content.quests.timeZone);
   return { days: length - day + 1, total: length };
@@ -102,10 +157,17 @@ export function monthDaysLeft(now, content) {
 // character's level on the curve (quests.json, weekly.curve: points of a
 // level and a share, straight between them, the last one's beyond it),
 // times the `days` of the week left in sevenths.
+/**
+ * @param {number} level
+ * @param {number} days
+ * @param {Content} content
+ * @returns {number}
+ */
 export function weekShare(level, days, content) {
+  /** @type {[number, number][]} */
   const curve = content.quests.periods.weekly.curve ?? [[1, 1]];
   const next = curve.findIndex(([fromLevel]) => fromLevel > level);
-  let share = curve.at(-1)[1];
+  let share = /** @type {[number, number]} */ (curve.at(-1))[1];
   if (next === 0) share = curve[0][1];
   else if (next > 0) {
     const [fromLevel, fromShare] = curve[next - 1];
@@ -120,6 +182,13 @@ export function weekShare(level, days, content) {
 // are four weeks') by the week's share at the character's level and the
 // share of the month's days left (the author: „Zrobmy jeszcze zadania
 // miesięczne od narratora”), a day's all.
+/**
+ * @param {string} periodId
+ * @param {number} level
+ * @param {number} now
+ * @param {Content} content
+ * @returns {number}
+ */
 export function periodShare(periodId, level, now, content) {
   if (periodId === 'weekly') return weekShare(level, weekDaysLeft(now, content), content);
   if (periodId === 'monthly') {
@@ -132,10 +201,17 @@ export function periodShare(periodId, level, now, content) {
 // The last period of each kind worked out: every moment inside it has the
 // same one, so it is kept (the code review: a character view asked for the
 // period dozens of times, each with some time-zone arithmetic).
+/** @type {Map<string, Period>} */
 const lastPeriods = new Map();
 
 // The period around `now`: its key (the date it starts on, on the zone's
 // clock), its start and its end.
+/**
+ * @param {string} periodId
+ * @param {number} now
+ * @param {Content} content
+ * @returns {Period}
+ */
 export function questPeriod(periodId, now, content) {
   const { timeZone } = content.quests;
   const id = `${timeZone}:${periodId}`;
@@ -154,10 +230,15 @@ export function questPeriod(periodId, now, content) {
 
 // The newest inner region open to the character's class: its creatures are
 // the ones to beat.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {Area}
+ */
 export function questArea(character, content) {
   return content.areas
-    .filter((area) => areaUnlocked(area, character.classLevel, content))
-    .reduce((newest, area) => (area.minLevel > newest.minLevel ? area : newest));
+    .filter((/** @type {Area} */ area) => areaUnlocked(area, character.classLevel, content))
+    .reduce((/** @type {Area} */ newest, /** @type {Area} */ area) => (area.minLevel > newest.minLevel ? area : newest));
 }
 
 // The inner regions whose creatures a period's quests ask for: the newest
@@ -165,20 +246,32 @@ export function questArea(character, content) {
 // before it (the author: "do zadań dziennych losuj z ostatniej otwartej
 // lokacji i jednej przed nią (bo nie muszą być bardzo trudne)"), newest
 // first, without those too easy for the character.
+/**
+ * @param {string} periodId
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {Area[]}
+ */
 function questAreas(periodId, character, content) {
   return content.areas
-    .filter((area) => areaUnlocked(area, character.classLevel, content))
-    .sort((a, b) => b.minLevel - a.minLevel)
+    .filter((/** @type {Area} */ area) => areaUnlocked(area, character.classLevel, content))
+    .sort((/** @type {Area} */ a, /** @type {Area} */ b) => b.minLevel - a.minLevel)
     .slice(0, periodId === 'daily' ? 2 : 1)
-    .filter((area) => !easyPlace(character.level, area, content));
+    .filter((/** @type {Area} */ area) => !easyPlace(character.level, area, content));
 }
 
 // How many of each creature a fight there brings on average, among the
 // regular encounters at the character's level (also the Próby Gildii's,
 // guild-trials.js).
+/**
+ * @param {Area} area
+ * @param {number} level
+ * @returns {Map<string, number>}
+ */
 export function creaturesPerFight(area, level) {
   const encounters = encountersFor(area, level);
-  const total = encounters.reduce((sum, encounter) => sum + encounter.weight, 0);
+  const total = encounters.reduce((/** @type {number} */ sum, /** @type {Record<string, any>} */ encounter) => sum + encounter.weight, 0);
+  /** @type {Map<string, number>} */
   const shares = new Map();
   for (const encounter of encounters) {
     for (const monsterId of encounter.monsters) shares.set(monsterId, (shares.get(monsterId) ?? 0) + encounter.weight / total);
@@ -189,8 +282,16 @@ export function creaturesPerFight(area, level) {
 // The herbs the character's gathering profession knows: those a gathering
 // quest can name. The same for the recipes of brewing, of the herbalist's
 // rare ones those she has taught it (by its Osada, `settlement`, brewing.js).
+/**
+ * @param {Character} character
+ * @param {Content} content
+ */
 const questHerbs = (character, content) =>
   content.gathering ? knownHerbs(professionState(character.professions, content.gathering.profession).level, content) : [];
+/**
+ * @param {Character} character
+ * @param {Content} content
+ */
 const questPotions = (character, content) =>
   content.brewing ? knownPotions(professionState(character.professions, content.brewing.profession).level, content, character.settlement) : [];
 
@@ -205,12 +306,19 @@ const questPotions = (character, content) =>
 // author: "by ktoś z wyższym levelem nie był wysyłany na niskolevelowe
 // potwory"): when its class opens nothing harder, or it has outgrown every
 // place, the other kinds remain.
+/**
+ * @param {string} periodId
+ * @param {Draw} draw
+ * @param {Content} content
+ * @returns {Option[]}
+ */
 function questOptions(periodId, { character, hasTable, hasProfessions = false, hasCrafting = false, hasSettlement = false, openProfessions = [] }, content) {
   const areas = questAreas(periodId, character, content);
   // Each creature of those places, as often as a fight of its place brings it.
+  /** @type {Map<string, number>} */
   const perFight = new Map();
   for (const area of areas) for (const [target, share] of creaturesPerFight(area, character.level)) perFight.set(target, Math.max(perFight.get(target) ?? 0, share));
-  return content.quests.kinds.flatMap((kind) => {
+  return content.quests.kinds.flatMap((/** @type {Record<string, any>} */ kind) => {
     if (!kind[periodId] || (kind.table && !hasTable) || (kind.professions && !hasProfessions) || (kind.crafting && !hasCrafting) || (kind.settlement && !hasSettlement)) return [];
     // A kind of one profession only once it is open (Górnictwo and
     // Jubilerstwo from character level 25).
@@ -228,9 +336,9 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false, h
         : kind.id === 'killAny'
           ? [{ perFight: [...creaturesPerFight(areas[0], character.level).values()].reduce((sum, share) => sum + share, 0) }]
           : kind.id === 'gather'
-            ? questHerbs(character, content).map((herb) => ({ target: herb.id }))
+            ? questHerbs(character, content).map((/** @type {Record<string, any>} */ herb) => ({ target: herb.id }))
             : kind.id === 'brew'
-              ? questPotions(character, content).map((potion) => ({ target: potion.id }))
+              ? questPotions(character, content).map((/** @type {Record<string, any>} */ potion) => ({ target: potion.id }))
               : kind.id === 'unlock'
                 ? [{ most: Math.min(ahead, unlockMost(kind[periodId], character.classLevel)) }]
                 : [{}];
@@ -240,7 +348,12 @@ function questOptions(periodId, { character, hasTable, hasProfessions = false, h
 
 // The most inner regions a period asks to open at a class level: the count
 // of the last `most` band the class has reached (quests.json), else no limit.
-const unlockMost = (tuning, classLevel) => tuning.most?.findLast((band) => band.fromClassLevel <= classLevel)?.count ?? Infinity;
+/**
+ * @param {Record<string, any>} tuning
+ * @param {number} classLevel
+ * @returns {number}
+ */
+const unlockMost = (tuning, classLevel) => tuning.most?.findLast((/** @type {Record<string, any>} */ band) => band.fromClassLevel <= classLevel)?.count ?? Infinity;
 
 // How much a quest asks for: for creatures, as many as `fights` fights
 // bring on average, and never more than `most`; for a week, its `share`
@@ -248,9 +361,17 @@ const unlockMost = (tuning, classLevel) => tuning.most?.findLast((band) => band.
 // kind's step and never past `most` (the author, 10.11.2026, after a
 // player's note that a week's and a month's quests take two days: „761 C
 // tygodniowe cele x2 nagrody x1,5, miesięczne cele x4 nagrody x2”).
+/**
+ * @param {Option} option
+ * @param {string} periodId
+ * @param {Rng} rng
+ * @param {number} [share]
+ * @param {number} [factor]
+ * @returns {number}
+ */
 function questCount({ kind, perFight, most = Infinity }, periodId, rng, share = 1, factor = 1) {
   const tuning = kind[periodId];
-  if (tuning.fights) return Math.max(1, Math.round(shareCount(Math.max(1, Math.round(rng.int(...tuning.fights) * perFight)), tuning, share) * factor));
+  if (tuning.fights) return Math.max(1, Math.round(shareCount(Math.max(1, Math.round(rng.int(.../** @type {[number, number]} */ (tuning.fights)) * /** @type {number} */ (perFight))), tuning, share) * factor));
   const [min, max] = tuning.count;
   const step = tuning.step ?? 1;
   const count = shareCount(Math.min(most, min + step * rng.int(0, Math.floor((max - min) / step))), tuning, share);
@@ -258,6 +379,12 @@ function questCount({ kind, perFight, most = Infinity }, periodId, rng, share = 
 }
 
 // A count cut to its `share`: to the kind's step, at least one step.
+/**
+ * @param {number} count
+ * @param {Record<string, any>} tuning
+ * @param {number} share
+ * @returns {number}
+ */
 function shareCount(count, tuning, share) {
   if (share >= 1) return count;
   const step = tuning.fights ? 1 : (tuning.step ?? 1);
@@ -265,19 +392,32 @@ function shareCount(count, tuning, share) {
 }
 
 // The band of levels the character is in (levels in quests.json).
-export const questLevel = (level, content) => content.quests.levels.findLast((band) => band.fromLevel <= level);
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {Record<string, any>}
+ */
+export const questLevel = (level, content) => content.quests.levels.findLast((/** @type {Record<string, any>} */ band) => band.fromLevel <= level);
 
 // A quest's reward: gold, a resource or parts, more at a higher level, and
 // `factor` times as much for a rarer kind (rewardFactor in quests.json).
+/**
+ * @param {string} periodId
+ * @param {number} level
+ * @param {Rng} rng
+ * @param {Content} content
+ * @param {number} [factor]
+ * @returns {{ kind: string, id?: string, amount: number }}
+ */
 function questReward(periodId, level, rng, content, factor = 1) {
   const { rewards } = content.quests;
-  const [kind] = rng.weighted(Object.entries(rewards.weights), ([, weight]) => weight);
+  const [kind] = rng.weighted(/** @type {[string, number][]} */ (Object.entries(rewards.weights)), ([, weight]) => weight);
   const { base, perLevel } = rewards[periodId][kind];
   const spread = rng.float(1 - rewards.spread, 1 + rewards.spread);
   const amount = (share = 1) => Math.max(1, Math.round((base + perLevel * level) * share * spread * factor));
   if (kind === 'gold') return { kind, amount: amount() };
   if (kind === 'resource') {
-    const [id, share] = rng.pick(Object.entries(rewards.resources));
+    const [id, share] = rng.pick(/** @type {[string, number][]} */ (Object.entries(rewards.resources)));
     return { kind, id, amount: amount(share) };
   }
   return { kind, id: questLevel(level, content).part, amount: amount() };
@@ -286,6 +426,15 @@ function questReward(periodId, level, rng, content, factor = 1) {
 // A quest of a drawn option, with its count (`share` of it, for a week,
 // times the period's targetFactor) and its reward (times the kind's and the
 // period's rewardFactor), always whole.
+/**
+ * @param {Option} option
+ * @param {string} periodId
+ * @param {Character} character
+ * @param {Rng} rng
+ * @param {Content} content
+ * @param {number} [share]
+ * @returns {Quest}
+ */
 const newQuest = (option, periodId, character, rng, content, share = 1) => {
   const period = content.quests.periods[periodId];
   return {
@@ -301,10 +450,17 @@ const newQuest = (option, periodId, character, rng, content, share = 1) => {
 // A period's quests, drawn from `seed` for the character as it is: no
 // option twice, in the order of the kinds; a week's by the character's
 // level and the `days` of it left, or `share` given (periodShare).
+/**
+ * @param {string} periodId
+ * @param {Draw & { days?: number, share?: number }} draw
+ * @param {Content} content
+ * @returns {Quest[]}
+ */
 export function drawQuests(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed, days = 7, share: given }, content) {
   const rng = createRng(seed);
   const share = given ?? (periodId === 'weekly' ? weekShare(character.level, days, content) : 1);
   let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions }, content);
+  /** @type {Option[]} */
   const drawn = [];
   while (drawn.length < content.quests.periods[periodId].count && options.length > 0) {
     const option = rng.weighted(options);
@@ -316,8 +472,14 @@ export function drawQuests(periodId, { character, hasTable, hasProfessions, hasC
 }
 
 // Whether a creature lives in an inner region open to the character's class.
+/**
+ * @param {string} monsterId
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {boolean}
+ */
 const reachable = (monsterId, character, content) =>
-  content.areas.some((area) => areaUnlocked(area, character.classLevel, content) && area.encounters.some((encounter) => encounter.monsters.includes(monsterId)));
+  content.areas.some((/** @type {Area} */ area) => areaUnlocked(area, character.classLevel, content) && area.encounters.some((/** @type {Record<string, any>} */ encounter) => encounter.monsters.includes(monsterId)));
 
 // A kept quest that cannot be done any more, neither done nor claimed: a
 // creature's whose creature lives nowhere the character can go (quests
@@ -326,25 +488,40 @@ const reachable = (monsterId, character, content) =>
 // poziom klasy"), or one of a kind the period no longer has, as opening the
 // daily quests' chest (the author: "nie rób otwierania skrzynek zadań jako
 // zadania / graczom przelosuj takie zadania na adekwatne").
+/**
+ * @param {Quest} quest
+ * @param {string} periodId
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {boolean}
+ */
 const lostQuest = (quest, periodId, character, content) =>
   !quest.claimed &&
   !questDone(quest) &&
-  (!content.quests.kinds.some((kind) => kind.id === quest.kind && kind[periodId]) || (quest.kind === 'kill' && !reachable(quest.target, character, content)));
+  (!content.quests.kinds.some((/** @type {Record<string, any>} */ kind) => kind.id === quest.kind && kind[periodId]) || (quest.kind === 'kill' && !reachable(quest.target, character, content)));
 
 // A kept period with each lost quest drawn anew in its place, among what the
 // character may get now and the period does not ask for yet, a week's to
 // be done in the days left of it at `now`; with nothing left to draw, one of
 // a kind gone from the data goes too, so it does not keep the chest shut.
 // The other quests stay as they are, with their progress and rewards.
+/**
+ * @param {Kept} period
+ * @param {string} periodId
+ * @param {Draw} draw
+ * @param {number} now
+ * @param {Content} content
+ * @returns {Kept}
+ */
 function healedPeriod(period, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed }, now, content) {
-  const lost = (quest) => lostQuest(quest, periodId, character, content);
+  const lost = (/** @type {Quest} */ quest) => lostQuest(quest, periodId, character, content);
   if (!period.quests.some(lost)) return period;
-  const gone = (quest) => !content.quests.kinds.some((kind) => kind.id === quest.kind && kind[periodId]);
-  const asked = (option) => period.quests.some((quest) => !lost(quest) && quest.kind === option.kind.id && quest.target === option.target);
+  const gone = (/** @type {Quest} */ quest) => !content.quests.kinds.some((/** @type {Record<string, any>} */ kind) => kind.id === quest.kind && kind[periodId]);
+  const asked = (/** @type {Option} */ option) => period.quests.some((/** @type {Quest} */ quest) => !lost(quest) && quest.kind === option.kind.id && quest.target === option.target);
   let options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions }, content).filter((option) => !asked(option));
   return {
     ...period,
-    quests: period.quests.flatMap((quest, index) => {
+    quests: period.quests.flatMap((/** @type {Quest} */ quest, /** @type {number} */ index) => {
       if (!lost(quest)) return [quest];
       if (options.length === 0) return gone(quest) ? [] : [quest];
       const rng = createRng(`${seed}:${periodId}:${period.period}:${index}`);
@@ -359,6 +536,13 @@ function healedPeriod(period, periodId, { character, hasTable, hasProfessions, h
 // the lost ones drawn anew), new ones once it has passed; a week marked
 // `scaled`, with the `days` left of it when drawn under way. `seed` is the
 // character's, `createdAt` the moment it came.
+/**
+ * @param {Quests | null | undefined} stored
+ * @param {Draw & { createdAt?: number }} draw
+ * @param {number} now
+ * @param {Content} content
+ * @returns {Quests}
+ */
 export function currentQuests(stored, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed, createdAt }, now, content) {
   const context = { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed };
   return Object.fromEntries(
@@ -405,16 +589,24 @@ export function currentQuests(stored, { character, hasTable, hasProfessions, has
 // on the day it came (the tester's new character on a Sunday: "Dzisiaj
 // kończą się tygodniowe a ten mi karze 4 dzienne skrzynki otworzyć"),
 // their progress kept. Marked `scaled`, so once.
+/**
+ * @param {Kept} period
+ * @param {Character} character
+ * @param {number | undefined} createdAt
+ * @param {number} startsAt
+ * @param {Content} content
+ * @returns {Kept}
+ */
 function scaledWeek(period, character, createdAt, startsAt, content) {
   if (period.scaled) return period;
   const days = createdAt !== undefined && createdAt >= startsAt ? weekDaysLeft(createdAt, content) : 7;
   const share = weekShare(character.level, days, content);
-  const tuning = (quest) => content.quests.kinds.find((kind) => kind.id === quest.kind)?.weekly;
+  const tuning = (/** @type {Quest} */ quest) => content.quests.kinds.find((/** @type {Record<string, any>} */ kind) => kind.id === quest.kind)?.weekly;
   return {
     ...period,
     scaled: true,
     ...(days < 7 && { days }),
-    quests: period.quests.map((quest) => {
+    quests: period.quests.map((/** @type {Quest} */ quest) => {
       if (quest.claimed || !tuning(quest)) return quest;
       const count = shareCount(quest.count, tuning(quest), share);
       return { ...quest, count, progress: Math.min(quest.progress, count) };
@@ -428,6 +620,13 @@ function scaledWeek(period, character, createdAt, startsAt, content) {
 // month drawn anew on its last day asked for a thirtieth of the work, for
 // its whole chest). A period kept before has the whole of it at the
 // character's level; a day's quests are always whole.
+/**
+ * @param {Kept} period
+ * @param {string} periodId
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
 export function drawnShare(period, periodId, level, content) {
   if (periodId === 'daily') return 1;
   return Number.isFinite(period.share) ? period.share : weekShare(level, 7, content);
@@ -440,17 +639,25 @@ export function drawnShare(period, periodId, level, content) {
 // themselves while enough are left, a week's and a month's at the share
 // they were first drawn with (drawnShare), whenever in the period. Null
 // when there is nothing to draw anew or it was done.
+/**
+ * @param {Quests} quests
+ * @param {string} periodId
+ * @param {Draw} draw
+ * @param {number} now
+ * @param {Content} content
+ * @returns {Quests | null}
+ */
 export function rerolledQuests(quests, periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions, seed }, now, content) {
   const period = quests[periodId];
   if (period.rerolled || period.chest) return null;
-  const replaced = (quest) => !quest.claimed && !questDone(quest);
+  const replaced = (/** @type {Quest} */ quest) => !quest.claimed && !questDone(quest);
   const count = period.quests.filter(replaced).length;
   if (count === 0) return null;
-  const same = (option, quest) => quest.kind === option.kind.id && quest.target === option.target;
+  const same = (/** @type {Option} */ option, /** @type {Quest} */ quest) => quest.kind === option.kind.id && quest.target === option.target;
   const options = questOptions(periodId, { character, hasTable, hasProfessions, hasCrafting, hasSettlement, openProfessions }, content).filter(
-    (option) => !period.quests.some((quest) => !replaced(quest) && same(option, quest)),
+    (option) => !period.quests.some((/** @type {Quest} */ quest) => !replaced(quest) && same(option, quest)),
   );
-  const fresh = options.filter((option) => !period.quests.some((quest) => replaced(quest) && same(option, quest)));
+  const fresh = options.filter((option) => !period.quests.some((/** @type {Quest} */ quest) => replaced(quest) && same(option, quest)));
   let pool = fresh.length >= count ? fresh : options;
   const share = drawnShare(period, periodId, character.level, content);
   const rng = createRng(`${seed}:${periodId}:${period.period}:reroll`);
@@ -459,7 +666,7 @@ export function rerolledQuests(quests, periodId, { character, hasTable, hasProfe
     [periodId]: {
       ...period,
       rerolled: true,
-      quests: period.quests.map((quest) => {
+      quests: period.quests.map((/** @type {Quest} */ quest) => {
         if (!replaced(quest) || pool.length === 0) return quest;
         const option = rng.weighted(pool);
         pool = pool.filter((other) => other !== option);
@@ -471,13 +678,25 @@ export function rerolledQuests(quests, periodId, { character, hasTable, hasProfe
 
 // Whether a period's quests are missing or of an earlier period than
 // `now`'s; a later one is kept (currentQuests).
+/**
+ * @param {Quests | null | undefined} stored
+ * @param {number} now
+ * @param {Content} content
+ * @returns {boolean}
+ */
 export const questsStale = (stored, now, content) =>
   QUEST_PERIODS.some((periodId) => !(stored?.[periodId]?.period >= questPeriod(periodId, now, content).key));
 
 // The creatures beaten in an exploration's won fights, by id. People beaten
 // in an event's fight (events.js) are no creatures, but a creature met in
 // one, as the Błędnica, counts as on the way.
+/**
+ * @param {Record<string, any>} hunt
+ * @param {Content} content
+ * @returns {Record<string, number>}
+ */
 export function huntKills(hunt, content) {
+  /** @type {Record<string, number>} */
   const kills = {};
   for (const fight of hunt.fights) {
     if (fight.won !== true) continue;
@@ -501,9 +720,15 @@ const TABLE_WORK = new Set(['process', 'salvage']);
 // Osada. A quest stops at its count; one of the Stół rozbiórki's work keeps
 // what came over it (`over`), so an order taken off the table's queue takes
 // back exactly its own (takeQuestProgress).
+/**
+ * @param {Quests} quests
+ * @param {{ kills?: Record<string, number>, minutes?: number, processed?: number, salvaged?: number, herbs?: Record<string, number>, potions?: Record<string, number>, made?: number, minerals?: number, jewels?: number, opened?: number, orders?: number }} work
+ * @returns {Quests}
+ */
 export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 0, salvaged = 0, herbs = {}, potions = {}, made = 0, minerals = 0, jewels = 0, opened = 0, orders = 0 }) {
-  const total = (counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
+  const total = (/** @type {Record<string, number>} */ counts) => Object.values(counts).reduce((sum, count) => sum + count, 0);
   const gathered = total(herbs);
+  /** @type {Record<string, (quest: Quest) => number>} */
   const gain = {
     kill: (quest) => kills[quest.target] ?? 0,
     killAny: () => total(kills),
@@ -526,7 +751,7 @@ export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 
       periodId,
       {
         ...period,
-        quests: period.quests.map((quest) => {
+        quests: period.quests.map((/** @type {Quest} */ quest) => {
           const reached = quest.progress + (gain[quest.kind]?.(quest) ?? 0);
           const over = TABLE_WORK.has(quest.kind) ? reached - quest.count : 0;
           return { ...quest, progress: Math.min(quest.count, reached), ...(over > 0 && { over: (quest.over ?? 0) + over }) };
@@ -542,10 +767,16 @@ export function addQuestProgress(quests, { kills = {}, minutes = 0, processed = 
 // orderedAt }, orderWork). Each period gives back what was ordered in it,
 // from what its quest counted, the pieces over its count first, so the rest
 // still counts in full. A period gone since keeps what it had.
+/**
+ * @param {Quests} quests
+ * @param {{ kind: string, pieces: number, orderedAt: number }[]} work
+ * @param {Content} content
+ * @returns {Quests}
+ */
 export function takeQuestProgress(quests, work, content) {
   return Object.fromEntries(
     Object.entries(quests).map(([periodId, period]) => {
-      const taken = (kind) =>
+      const taken = (/** @type {string} */ kind) =>
         QUEST_PERIODS.includes(periodId)
           ? work.filter((one) => one.kind === kind && questPeriod(periodId, one.orderedAt, content).key === period.period).reduce((sum, one) => sum + one.pieces, 0)
           : 0;
@@ -553,7 +784,7 @@ export function takeQuestProgress(quests, work, content) {
         periodId,
         {
           ...period,
-          quests: period.quests.map((quest) => {
+          quests: period.quests.map((/** @type {Quest} */ quest) => {
             const pieces = TABLE_WORK.has(quest.kind) ? taken(quest.kind) : 0;
             if (pieces === 0) return quest;
             const { over = 0, ...rest } = quest;
@@ -569,36 +800,65 @@ export function takeQuestProgress(quests, work, content) {
 // The first quest takeQuestProgress would leave undone though it has given
 // its reward already: claimed, or done when its period's chest was opened.
 // Then the work stays on the table, as it was paid for. Null when none.
+/**
+ * @param {Quests} before
+ * @param {Quests} after
+ * @returns {Quest | null}
+ */
 export function rewardedQuest(before, after) {
   for (const [periodId, period] of Object.entries(after)) {
     const was = before[periodId];
-    const quest = period.quests.find((one, index) => questDone(was.quests[index]) && !questDone(one) && (one.claimed || was.chest));
+    const quest = period.quests.find((/** @type {Quest} */ one, /** @type {number} */ index) => questDone(was.quests[index]) && !questDone(one) && (one.claimed || was.chest));
     if (quest) return quest;
   }
   return null;
 }
 
+/**
+ * @param {Quest} quest
+ * @returns {boolean}
+ */
 export const questDone = (quest) => quest.progress >= quest.count;
 
 // The creatures an exploration of an area tracks for the quests ("Trop
 // przede wszystkim stwory z zadań"): those the kill quests of both periods
 // still ask for and that the area's encounters bring (rollEncounter weighs
 // them more).
+/**
+ * @param {Quests} quests
+ * @param {Area} area
+ * @returns {string[]}
+ */
 export function questCreatures(quests, area) {
   const living = new Set([...area.encounters, ...area.tough].flatMap((encounter) => encounter.monsters));
-  const wanted = Object.values(quests).flatMap((period) => period.quests.filter((quest) => quest.kind === 'kill' && !questDone(quest)));
-  return [...new Set(wanted.map((quest) => quest.target))].filter((id) => living.has(id));
+  const wanted = Object.values(quests).flatMap((period) => period.quests.filter((/** @type {Quest} */ quest) => quest.kind === 'kill' && !questDone(quest)));
+  return [...new Set(wanted.map((/** @type {Quest} */ quest) => quest.target))].filter((id) => living.has(id));
 }
 
 // A period's chest opens once all its quests are done, their rewards
 // claimed or not.
+/**
+ * @param {Kept} period
+ * @returns {boolean}
+ */
 export const chestReady = (period) => period.quests.length > 0 && period.quests.every(questDone);
 
+/**
+ * @param {Quests} quests
+ * @param {string} periodId
+ * @param {number} index
+ * @returns {Quests}
+ */
 export const withClaimed = (quests, periodId, index) => ({
   ...quests,
-  [periodId]: { ...quests[periodId], quests: quests[periodId].quests.map((quest, at) => (at === index ? { ...quest, claimed: true } : quest)) },
+  [periodId]: { ...quests[periodId], quests: quests[periodId].quests.map((/** @type {Quest} */ quest, /** @type {number} */ at) => (at === index ? { ...quest, claimed: true } : quest)) },
 });
 
+/**
+ * @param {Quests} quests
+ * @param {string} periodId
+ * @returns {Quests}
+ */
 export const withChest = (quests, periodId) => ({ ...quests, [periodId]: { ...quests[periodId], chest: true } });
 
 // The item in the weekly chest: of the character's level, for its class and
@@ -607,8 +867,14 @@ export const withChest = (quests, periodId) => ({ ...quests, [periodId]: { ...qu
 // (questArea). Besides explorations in places of its level, this is the one
 // way to a later base of a family (the Otoczak from class level 10), whatever
 // place the character explores.
+/**
+ * @param {{ level: number, classId: string, classLevel?: number }} character
+ * @param {string[]} wornSlots
+ * @param {Rng} rng
+ * @param {Content} content
+ */
 export function chestItem({ level, classId, classLevel = 1 }, wornSlots, rng, content) {
-  const [rarityId] = rng.weighted(Object.entries(questLevel(level, content).chestRarities), ([, weight]) => weight);
+  const [rarityId] = rng.weighted(/** @type {[string, number][]} */ (Object.entries(questLevel(level, content).chestRarities)), ([, weight]) => weight);
   const area = questArea({ classLevel }, content);
   return randomItem(level, rng, content, { rarityId, filled: new Set(wornSlots), classId, maxClassLevel: classLevel, area });
 }
@@ -619,8 +885,14 @@ export { countedForm };
 // A quest's text: its kind's, with the count and the noun to go with it. A
 // creature the character has not met yet is "???", as on the list of
 // dangers: `met` holds the ids of those met.
+/**
+ * @param {Quest} quest
+ * @param {Content} content
+ * @param {string[] | null} [met]
+ * @returns {string}
+ */
 export function questText(quest, content, met = null) {
-  const kind = content.quests.kinds.find((candidate) => candidate.id === quest.kind);
+  const kind = content.quests.kinds.find((/** @type {Record<string, any>} */ candidate) => candidate.id === quest.kind);
   const unknown = quest.kind === 'kill' && met && !met.includes(quest.target);
   const forms =
     quest.kind === 'kill' ? content.monstersById[quest.target].counted : quest.kind === 'brew' ? content.potionsById[quest.target].counted : kind.counted;
@@ -631,15 +903,27 @@ export function questText(quest, content, met = null) {
 }
 
 // The gold in a period's chest for a character of `level` (the month's).
+/**
+ * @param {Record<string, any>} chest
+ * @param {number} level
+ * @returns {number}
+ */
 export const chestGold = (chest, level) => (chest.gold ? Math.round(chest.gold.base + chest.gold.perLevel * level) : 0);
 
 // The quests as the page shows them: each period with its name, its end,
 // its quests (`index`: the place to claim it by) and its chest, its gold
 // for a character of `level`. A quest of a kind or a creature no longer in
 // the data is left out.
+/**
+ * @param {Quests} quests
+ * @param {number} now
+ * @param {Content} content
+ * @param {string[] | null} [met]
+ * @param {number} [level]
+ */
 export function questsView(quests, now, content, met = null, level = 1) {
-  const known = (quest) =>
-    content.quests.kinds.some((kind) => kind.id === quest.kind) &&
+  const known = (/** @type {Quest} */ quest) =>
+    content.quests.kinds.some((/** @type {Record<string, any>} */ kind) => kind.id === quest.kind) &&
     (quest.kind !== 'kill' || Boolean(content.monstersById[quest.target])) &&
     (quest.kind !== 'gather' || Boolean(content.herbsById[quest.target])) &&
     (quest.kind !== 'brew' || Boolean(content.potionsById[quest.target]));
@@ -652,7 +936,7 @@ export function questsView(quests, now, content, met = null, level = 1) {
         {
           name,
           endsAt: questPeriod(periodId, now, content).endsAt,
-          quests: period.quests.flatMap((quest, index) =>
+          quests: period.quests.flatMap((/** @type {Quest} */ quest, /** @type {number} */ index) =>
             known(quest)
               ? [
                   {
