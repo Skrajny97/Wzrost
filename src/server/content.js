@@ -345,7 +345,7 @@ export function publicContent() {
     })),
     durations: { min: game.balance.hunt.minMinutes, step: game.balance.hunt.stepMinutes, max: game.balance.hunt.maxMinutes },
     lengths: game.texts.lengths,
-    unlocks: game.unlocks.map(({ id, name, level, classLevel, condition }) => ({ id, name, level, classLevel, condition })),
+    unlocks: game.unlocks.map(({ id, name, level, classLevel, condition, locked }) => ({ id, name, level, classLevel, condition, locked })),
     resources: game.resources.map(({ id, name, genitive, description, system }) => ({ id, name, genitive, description, system: Boolean(system) })),
     buildings: game.buildings.filter(buildingOn).map(({ id, name, description, maxLevel }) => ({ id, name, description, maxLevel })),
     // The places of the Osada's board, for their shortcuts under the Osada

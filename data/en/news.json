@@ -516,6 +516,10 @@
     "0.2.78": {
       "title": "Version 0.2.78",
       "body": "- The headman's wanted posters come from the highest place open to you and the two places below it, your newest land included. The bounty grows with the place's level.\n- Today's wanted posters have been drawn anew. A poster already in your hand stays, with its own bounty."
+    },
+    "0.2.79": {
+      "title": "Version 0.2.79",
+      "body": "- You can change your password in the Settings: “Password” → “Change”. The account's other devices are signed out.\n- Forgot your password? The login screen has “I forgot my password”. A link to a new password comes to the account's confirmed e-mail address and works for an hour.\n- By the Core: “The Core will be unlocked in one of the upcoming updates.”"
     }
   }
 }

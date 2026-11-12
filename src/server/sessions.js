@@ -36,7 +36,7 @@ export async function getSession(db, request, now) {
   const row = await db
     .prepare(
       `SELECT s.expires_at, u.id AS user_id, u.login, u.email, u.created_at, u.google_sub, u.email_confirmed_at, u.email_required, u.news_seen,
-         u.skip_tutorials, u.language, u.age_confirmed_at, u.age_required
+         u.skip_tutorials, u.language, u.age_confirmed_at, u.age_required, u.password_hash != 'google' AS has_password
        FROM sessions s JOIN users u ON u.id = s.user_id
        WHERE s.id = ?`,
     )
@@ -76,6 +76,9 @@ export function userView(row) {
     // A new account made with Google answers once that its player is 16 or
     // over before it plays (725 A, accounts.js confirmAge).
     ageRequired: row.age_required === 1 && (row.age_confirmed_at ?? null) === null,
+    // A password to change in the Ustawienia (838 A, password.js): an
+    // account made with Google has none (NO_PASSWORD in google.js).
+    password: row.has_password === 1,
     ...(englishOn() && { language: accountLanguage(row.language) }),
   };
 }

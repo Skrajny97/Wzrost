@@ -650,6 +650,11 @@
       "id": "0.2.78",
       "title": "Wersja 0.2.78",
       "body": "- Listy gończe sołtysa są z najwyższego miejsca, które masz otwarte, i z dwóch miejsc pod nim, także z najnowszej krainy. Nagroda rośnie z poziomem miejsca.\n- Dzisiejsze listy gończe wylosowały się od nowa. List, który masz już w ręku, zostaje i daje swoją nagrodę."
+    },
+    {
+      "id": "0.2.79",
+      "title": "Wersja 0.2.79",
+      "body": "- W Ustawieniach zmienisz hasło: „Hasło” → „Zmień”. Inne urządzenia konta zostaną wylogowane.\n- Zapomniane hasło? Na ekranie logowania jest „Nie pamiętam hasła”. Link do nowego hasła przyjdzie na potwierdzony adres e-mail konta i działa przez godzinę.\n- Przy Rdzeniu: „Rdzeń zostanie odblokowany podczas jednej z kolejnych aktualizacji.”"
     }
   ]
 }

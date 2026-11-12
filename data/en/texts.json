@@ -220,6 +220,11 @@
   "emailConfirmReward": ["For confirming it you will get {points} System Points. The link works for a day."],
   "emailConfirmLink": ["If the button does not work, open this address:"],
   "emailConfirmIgnore": ["If this was not you, simply ignore this message."],
+  "passwordResetSubject": ["A new password in Insight"],
+  "passwordResetIntro": ["Hi {login}! Someone asked for a new password for your account in the game Insight. Click the button below to set it."],
+  "passwordResetButton": ["Set a new password"],
+  "passwordResetTime": ["The link works for an hour and only once. Once the new password is set, every device is logged out."],
+  "passwordResetIgnore": ["If this was not you, ignore this message: your password stays as it is."],
   "lengths": [
     { "name": "very short" },
     { "name": "short" },

@@ -18,17 +18,17 @@ import { ApiError, json, readJson } from './http.js';
 import { accountLanguage } from './i18n.js';
 import { requireSession } from './sessions.js';
 
-const SENDER = { email: 'no-reply@insightrpg.com', name: 'Insight' };
+export const SENDER = { email: 'no-reply@insightrpg.com', name: 'Insight' };
 const CONFIRM_PATH = '/api/auth/confirm';
 const LINK_TTL_MS = 24 * 3600000;
 // A new link at most once a minute and five a day for one account, and the
 // same for one mailbox, whichever accounts ask for it (mail_sends, review of
 // 12.11.2026: an address got a mail from every account made with it and
 // removed again).
-const RESEND_MS = 60000;
-const LINKS_PER_DAY = 5;
-const DAY_MS = 24 * 3600000;
-const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
+export const RESEND_MS = 60000;
+export const LINKS_PER_DAY = 5;
+export const DAY_MS = 24 * 3600000;
+export const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 
 // Why a mail did not go, in the player's words, by Email Service's error code.
 const SEND_ERRORS = {
@@ -38,6 +38,8 @@ const SEND_ERRORS = {
   E_VALIDATION_ERROR: () => new ApiError(400, 'email_rejected', 'Ten adres nie przyjmuje poczty. Sprawdź go albo podaj inny.'),
 };
 const sendFailed = () => new ApiError(503, 'email_failed', 'Nie udało się wysłać maila. Spróbuj ponownie za chwilę.');
+// The player's words for a mail Email Service did not send (also password.js).
+export const mailError = (error) => (SEND_ERRORS[error?.code] ?? sendFailed)();
 
 // The key a mailbox is counted under in mail_sends: the SHA-256 hash of
 // the address without a "+tag" (most mail services deliver those to the
@@ -109,7 +111,7 @@ export async function sendLink(env, { userId, login, email, language }, origin, 
       db.prepare('DELETE FROM email_links WHERE id = ?').bind(id),
       db.prepare('DELETE FROM mail_sends WHERE rowid = (SELECT rowid FROM mail_sends WHERE address = ? AND sent_at = ? LIMIT 1)').bind(mailbox, now),
     ]);
-    throw (SEND_ERRORS[error?.code] ?? sendFailed)();
+    throw mailError(error);
   }
 }
 

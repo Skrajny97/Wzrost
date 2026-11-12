@@ -74,6 +74,6 @@
   },
   "core": {
     "name": "Core",
-    "condition": "after defeating the first dungeon boss"
+    "locked": "The Core will be unlocked in one of the upcoming updates."
   }
 }

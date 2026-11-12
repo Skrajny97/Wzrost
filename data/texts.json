@@ -219,6 +219,11 @@
   "emailConfirmReward": ["Za potwierdzenie dostaniesz {points} Punktów Systemu. Link działa przez dobę."],
   "emailConfirmLink": ["Jeśli przycisk nie działa, otwórz ten adres:"],
   "emailConfirmIgnore": ["Jeśli to nie Ty, po prostu zignoruj tę wiadomość."],
+  "passwordResetSubject": ["Nowe hasło w grze Insight"],
+  "passwordResetIntro": ["Cześć, {login}! Ktoś poprosił o nowe hasło do Twojego konta w grze Insight. Kliknij przycisk niżej, żeby je ustawić."],
+  "passwordResetButton": ["Ustaw nowe hasło"],
+  "passwordResetTime": ["Link działa przez godzinę i tylko raz. Po ustawieniu nowego hasła wszystkie urządzenia zostaną wylogowane."],
+  "passwordResetIgnore": ["Jeśli to nie Ty, zignoruj tę wiadomość: Twoje hasło się nie zmieni."],
   "lengths": [
     { "upTo": 10, "name": "bardzo krótka" },
     { "upTo": 30, "name": "krótka" },

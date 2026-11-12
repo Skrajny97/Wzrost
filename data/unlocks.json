@@ -116,6 +116,6 @@
   {
     "id": "core",
     "name": "Rdzeń",
-    "condition": "po pokonaniu pierwszego bossa lochu"
+    "locked": "Rdzeń zostanie odblokowany podczas jednej z kolejnych aktualizacji."
   }
 ]

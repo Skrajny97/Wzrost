@@ -7,6 +7,7 @@ import { ApiError, request } from './api.js';
 import { $, $$, clear, fill, h, icon } from './dom.js';
 import { legalLinks, mustConfirmAge, renderAge } from './age.js';
 import { emailRow, hideInvite, inviteToConfirm, mustConfirm, renderConfirm, takeEmailResult } from './email.js';
+import { openForgotPassword, openResetPassword, passwordRow, takeResetToken } from './password.js';
 import { countOf } from './format.js';
 import { preloadPortraits } from './art.js';
 import { inAppBrowser, installBlock, installButton } from './install.js';
@@ -233,6 +234,11 @@ async function start() {
   await languageReady;
   // How a link from the confirmation mail went (email.js).
   const emailResult = takeEmailResult();
+  // The link of "Nie pamiętam hasła" (password.js): the window for a new
+  // password, over the login screen or, for one signed in here, over the
+  // game; setting it logs every device of its account out.
+  const resetToken = takeResetToken();
+  const openReset = () => openResetPassword(resetToken, (note) => (state.user ? leaveGame(note, { ok: true }) : enterAuth(note, { ok: true })));
   try {
     if (failure) throw failure;
     // The account's language, or one picked before the sign-in for it.
@@ -241,9 +247,11 @@ async function start() {
     await enterGame({ choose: googleResult === 'signed' });
     if (googleResult && GOOGLE_NOTES[googleResult]) toast(googleNote(googleResult, user));
     if (emailResult) toast(emailResult);
+    if (resetToken) openReset();
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
       enterAuth((googleResult && GOOGLE_NOTES[googleResult] && t(GOOGLE_NOTES[googleResult])) || (emailResult && t('{note} Zaloguj się, żeby grać.', { note: emailResult })));
+      if (resetToken) openReset();
       return;
     }
     $('#loading-text').textContent = error.message;
@@ -959,6 +967,7 @@ function openSettings() {
       layoutOffered() && layoutRow(),
       h('div', { class: 'status-row' }, h('dt', { text: t('Konto') }), h('dd', { text: state.user.login })),
       emailRow(),
+      passwordRow(),
       nameRow(),
       lookRow(),
       skinRow(),
@@ -1633,7 +1642,9 @@ async function characterGone(landing = HOME) {
   await enterGame();
 }
 
-function leaveGame() {
+// `note`: the words over the login form (enterAuth), as after a new
+// password (password.js), with its `options`.
+function leaveGame(note = null, options = {}) {
   closeSheet();
   // The parchments of quests and of the e-mail go with the game (the code
   // review: they stayed over the login screen).
@@ -1648,7 +1659,7 @@ function leaveGame() {
   forgetNews();
   // The narrator leaves with the character, and gives the screen back.
   narrate();
-  enterAuth();
+  enterAuth(note, options);
 }
 
 handleSessionLost(() => {
@@ -1658,10 +1669,13 @@ handleSessionLost(() => {
 // Login and registration
 
 // `note`: how a return from Google went, if the page opened after one.
-function enterAuth(note = null) {
+// `ok`: the note is good news (a new password set, password.js), not a
+// warning.
+function enterAuth(note = null, { ok = false } = {}) {
   const googleNote = $('#google-note');
   googleNote.textContent = note ?? '';
   googleNote.hidden = !note;
+  googleNote.classList.toggle('form-note--ok', ok);
   for (const form of [$('#login-form'), $('#register-form')]) {
     form.reset();
     $('.form-error', form).hidden = true;
@@ -1805,6 +1819,8 @@ for (const toggle of $$('.password-toggle')) {
 }
 
 bindForm($('#login-form'), (data) => request('POST', '/api/auth/login', data));
+// "Nie pamiętam hasła" (838 A), with what the login field holds.
+$('#forgot-password').addEventListener('click', () => openForgotPassword($('#login-identifier').value.trim()));
 bindForm($('#register-form'), async (data) => {
   // "Mam co najmniej 16 lat" (age.js).
   const answer = await request('POST', '/api/auth/register', { ...data, adult: data.adult === 'on' });

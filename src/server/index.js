@@ -38,6 +38,7 @@ import { getGuildExchange, postGuildOffer, takeGuildOffer, withdrawGuildOffer } 
 import { getGuildChest, putInGuildChest, takeFromGuildChest } from './guild-chest.js';
 import { getGuildWar, getGuildWarBattle, placeInWarTeam, settleWars, testGuildWar } from './guild-wars.js';
 import { donateToGuildSeat, getGuildSeat, preferGuildSeat } from './guild-seat.js';
+import { changePassword, forgotPassword, resetPassword } from './password.js';
 import { guildRanking } from './guild-fame.js';
 import { claimFame, getFame } from './fame.js';
 import { cancelOrders, craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
@@ -127,6 +128,10 @@ const routes = [
   ['GET', '/api/auth/google/callback', googleCallback],
   ['GET', '/api/auth/confirm', confirmEmail],
   ['POST', '/api/auth/email', requestLink],
+  // Zmień hasło, Nie pamiętam hasła and the link's new password (838 A).
+  ['POST', '/api/auth/password', changePassword],
+  ['POST', '/api/auth/forgot', forgotPassword],
+  ['POST', '/api/auth/reset', resetPassword],
   ['GET', '/api/me', me],
   ['DELETE', '/api/me', deleteAccount],
   ['POST', '/api/me/age', confirmAge],

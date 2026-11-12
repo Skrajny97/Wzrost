@@ -15,7 +15,7 @@ export function lockedScreen(unlockId, title) {
           ? t('Dostęp zablokowany. {name}: od poziomu postaci {level}. Twój poziom: {own}.', { name: unlock.name, level: unlock.level, own: state.character.level })
           : unlock.classLevel
             ? t('Dostęp zablokowany. {name}: od poziomu klasy {level}. Twój poziom klasy: {own}.', { name: unlock.name, level: unlock.classLevel, own: state.character.classLevel })
-            : t('Dostęp zablokowany. {name} odblokuje się {condition}.', { name: unlock.name, condition: unlock.condition });
+            : (unlock.locked ?? t('Dostęp zablokowany. {name} odblokuje się {condition}.', { name: unlock.name, condition: unlock.condition }));
       fill(container,
         h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t(title) })),
         systemPanel(message),

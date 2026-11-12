@@ -696,6 +696,24 @@ button {
   text-transform: uppercase;
 }
 
+/* Good news over the login form, not a warning (a new password set,
+   password.js). */
+.form-error.form-note--ok {
+  border-color: var(--leaf);
+  background: transparent;
+  color: var(--leaf);
+}
+
+/* "Nie pamiętam hasła" under the login button (password.js, 838 A): its
+   line under the words only, the tap area above them. */
+.forgot-password {
+  align-self: center;
+  padding: 10px 0 2px;
+  color: var(--system);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
 /* The System's warning of a name the filter blocks (rename.js). */
 .rename-warning {
   font-weight: 600;

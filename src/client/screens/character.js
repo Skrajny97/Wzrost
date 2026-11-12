@@ -281,7 +281,10 @@ export function mountCharacter(container, { switchCharacter } = {}) {
           onClick: () =>
             openSheet(
               h('h2', { class: 'sheet-title', text: slot.name }),
-              systemPanel(t('{name} odblokuje się {condition}.', { name: core.name, condition: core.condition })),
+              // A part with no level or condition yet says so in full (the
+              // author, 12.11.2026: „Rdzeń zostanie odblokowany podczas
+              // jednej z kolejnych aktualizacji.”).
+              systemPanel(core.locked ?? t('{name} odblokuje się {condition}.', { name: core.name, condition: core.condition })),
             ),
         },
         icon('core', { size: 24 }),

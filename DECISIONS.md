@@ -3092,6 +3092,16 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.79 (12.11.2026): zmiana hasła, „Nie pamiętam hasła” (838 A) i napis przy Rdzeniu
+
+Autor przyjął makiety 841.1–841.11 (12.11.2026). Z przeglądu bezpieczeństwa (838): gracz, któremu ktoś poznał hasło, nie mógł odzyskać konta, a sesja na cudzym telefonie trwała dalej.
+
+1. **Zmień hasło.** W Ustawieniach pod „E-mail” jest wiersz „Hasło” z przyciskiem „Zmień”. Okno prosi o obecne hasło i nowe (od 8 do 128 znaków), oba z „Pokaż”. Po zmianie inne urządzenia konta są wylogowane, a to zostaje zalogowane. Złe obecne hasło liczy się do nieudanych prób logowania: po 10 próbach trzeba odczekać 15 minut. Konto założone przez Google loguje się bez hasła i nie ma tego wiersza.
+2. **Nie pamiętam hasła.** Link jest na ekranie logowania pod „Zaloguj się”. Okno ma pole „Login lub e-mail”, wypełnione tym, co było już wpisane. Odpowiedź jest ta sama bez względu na to, czy takie konto istnieje, żeby nikt nie sprawdzał tak cudzych loginów i adresów. Link idzie tylko na potwierdzony adres konta z hasłem, w limitach linków potwierdzających: jedna skrzynka i jedno konto najwyżej raz na minutę i 5 razy na dobę.
+3. **Link z maila.** Działa przez godzinę i tylko raz. Otwiera grę z oknem nowego hasła, a adres z linku od razu znika z paska przeglądarki. D1 trzyma tylko skrót SHA-256 tokenu, konto i koniec ważności (tabela `password_resets`, migracja 0117). Po ustawieniu nowego hasła kończą się wszystkie sesje konta i jego inne linki, a ekran logowania pokazuje zielony komunikat „Hasło zmienione. Zaloguj się nowym hasłem.”.
+4. **Rdzeń.** Gracz na 27. poziomie napisał na czacie, że przy Rdzeniu stoi „odblokuje się po pokonaniu pierwszego bossa lochu”, a lochów w grze nie ma (są Wieże). Autor: „Zmień na "Rdzeń zostanie odblokowany podczas jednej z kolejnych aktualizacji."”. Okno zablokowanego Rdzenia w Postaci pokazuje dokładnie to zdanie (`locked` w `data/unlocks.json`, po angielsku „The Core will be unlocked in one of the upcoming updates.”).
+5. Testy: test/password.test.js.
+
 ## Wersja 0.2.78 (12.11.2026): listy gończe bliżej poziomu postaci
 
 Gracz na 43. poziomie napisał na czacie, że sołtys daje mu listy gończe za stworami z pierwszej krainy, po 400 złota za list z miejsca 6–10, choć sam idzie już na 50. poziom: wypełnianie ich marnuje XP i nie jest warte zachodu. Autor: „Te listy gończe, poszukiwani powinni sięgać maksymalnie 2 stopnie niżej niż pozwala level” i „Albo generuj nowych poszukiwanych albo po prostu poustawiaj ich tez z lepszymi nagrodami w wyzszych lokacjach”.
