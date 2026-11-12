@@ -117,6 +117,9 @@ import {
   freeSockets,
   gemView,
   knownArtifact,
+  gendered,
+  wantedName,
+  wantedOf,
 } from '../engine/index.js';
 import { mountView } from '../engine/stable.js';
 import { say } from '../engine/text.js';
@@ -1451,6 +1454,29 @@ function quickHuntsView(row, now) {
     : null;
 }
 
+// The wanted poster in hand from the Osada's Tablica zleceń (wanted.js),
+// for the strip on the Walka screen (a player's remark, 12.11.2026: „w
+// okienku wypraw fajnie byłoby widzieć, które zlecenie na elitę obecnie
+// mamy wybrane z tablicy zleceń”): its target, its place and whether it
+// has fallen already, with the poster's words of the data in the page's
+// language; null with no poster in hand.
+function wantedInHand(row) {
+  const rules = settlementOn() ? wantedOf(content()) : null;
+  const taken = rules && JSON.parse(row.settlement ?? '{}').wanted?.taken;
+  const area = taken && content().areasById[taken.areaId];
+  if (!area) return null;
+  const words = (text) => gendered(text, taken.female ? 'female' : 'male');
+  return {
+    kind: taken.kind,
+    monsterId: taken.monsterId,
+    name: wantedName(taken, content()),
+    label: words(taken.kind === 'outlaw' ? rules.texts.outlaw : rules.texts.wanted),
+    areaId: area.id,
+    beaten: Boolean(taken.beaten),
+    note: words(taken.beaten ? rules.texts.beaten : rules.texts.hunting.replaceAll('{area}', area.name)),
+  };
+}
+
 // The Awatar Systemu (avatar.js): its price and words until it is bought,
 // then its work under way, or null.
 function avatarView(player, now) {
@@ -1611,6 +1637,8 @@ export function characterView(player, now) {
     // The Stajnia's mount, which shortens the wait under the slider too
     // (stable.js in the engine), or null.
     mount: settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content()) : null,
+    // The wanted poster in hand, for its strip on the Walka screen, or null.
+    wanted: wantedInHand(row),
     freePoints: freePoints(character, content()),
     // The Umiejętności tab: the choices, the skills learned and the Skill Points.
     skills: skillsView(character, content()),

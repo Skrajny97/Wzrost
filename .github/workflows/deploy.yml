@@ -30,29 +30,31 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # The suite in four parts at once, on four runners (Node's --test-shard):
+  # The suite in eight parts at once, on eight runners (Node's --test-shard):
   # whole, it took about 33 minutes on one runner (0.1.69, 5.11.2026), so the
   # game waited over half an hour for every deploy (the author: "A czemu
-  # 0.1.69 dalej nie jest wdrożone na main?"). The first steps run beside
-  # them.
+  # 0.1.69 dalej nie jest wdrożone na main?"); in four parts the longest
+  # still took 19 minutes (0.2.93, 12.11.2026; the author: "czy to
+  # wdrożenie 0.2.93 nie trwa zbyt długo?"). The first steps run beside them.
   test:
-    name: Testy ${{ matrix.shard }}/4
+    name: Testy ${{ matrix.shard }}/8
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: true
       matrix:
-        shard: [1, 2, 3, 4]
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     steps:
       - uses: actions/checkout@v6
-      # A working branch at the commit main has just tested (main merged in
-      # after a deploy of the game) skips a second run of the same tests.
-      - name: Czy main ma ten sam commit
+      # A working branch with the very files main has just tested (main
+      # merged in after a deploy of the game, as a commit of its own with
+      # main's files) skips a second run of the same tests.
+      - name: Czy main ma te same pliki
         id: main
         if: github.ref != 'refs/heads/main'
         run: |
           git fetch --quiet --depth=1 origin main
-          if [ "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)" ]; then echo "same=true" >> "$GITHUB_OUTPUT"; fi
+          if [ "$(git rev-parse 'HEAD^{tree}')" = "$(git rev-parse 'FETCH_HEAD^{tree}')" ]; then echo "same=true" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-node@v6
         if: steps.main.outputs.same != 'true'
         with:
@@ -67,9 +69,9 @@ jobs:
       - name: Sprawdzanie typów
         if: steps.main.outputs.same != 'true' && matrix.shard == 2
         run: npm run typecheck
-      - name: Testy, część ${{ matrix.shard }} z 4
+      - name: Testy, część ${{ matrix.shard }} z 8
         if: steps.main.outputs.same != 'true'
-        run: node --test --test-reporter=spec --test-shard=${{ matrix.shard }}/4 'test/**/*.test.js'
+        run: node --test --test-reporter=spec --test-shard=${{ matrix.shard }}/8 'test/**/*.test.js'
 
   # The beginning of the game walked in a browser, on a phone and on a
   # computer, from the narrator's first card to the first exploration
@@ -85,12 +87,12 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
-      - name: Czy main ma ten sam commit
+      - name: Czy main ma te same pliki
         id: main
         if: github.ref != 'refs/heads/main'
         run: |
           git fetch --quiet --depth=1 origin main
-          if [ "$(git rev-parse HEAD)" = "$(git rev-parse FETCH_HEAD)" ]; then echo "same=true" >> "$GITHUB_OUTPUT"; fi
+          if [ "$(git rev-parse 'HEAD^{tree}')" = "$(git rev-parse 'FETCH_HEAD^{tree}')" ]; then echo "same=true" >> "$GITHUB_OUTPUT"; fi
       - uses: actions/setup-node@v6
         if: steps.main.outputs.same != 'true'
         with:

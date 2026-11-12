@@ -8,7 +8,7 @@
 // the posters done that day and the poster taken (`beaten` once its target
 // fell).
 
-import { laterPeriod, questPeriod, samePeriod, wantedOf, wantedPosters, wantedTarget, wantedTrophy, weekCount } from '../engine/index.js';
+import { laterPeriod, questPeriod, samePeriod, wantedName, wantedOf, wantedPosters, wantedTarget, wantedTrophy, weekCount } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer, settlementBoard } from './characters.js';
 import { content } from './content.js';
@@ -61,18 +61,8 @@ export function wantedToKeep(row, stored, now) {
   return recordOf(row, stored, day);
 }
 
-// A poster's name in the request's language: its creature's variant's or
-// its outlaw's, as the data has it (wantedPosters in the engine), so one
-// kept in the Osada (`taken`), named in the language it was taken in,
-// reads in the page's own.
-function posterName(poster) {
-  const rules = wantedOf(content());
-  const named =
-    poster.kind === 'outlaw'
-      ? content().monstersById[poster.monsterId]
-      : rules.variants.find((variant) => variant.area === poster.areaId && variant.monster === poster.monsterId);
-  return named?.name ?? poster.name;
-}
+// A poster's name in the request's language (wantedName in the engine).
+const posterName = (poster) => wantedName(poster, content());
 
 // A poster for the page, with its place's name and levels.
 function posterView(poster, state) {

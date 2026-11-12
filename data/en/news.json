@@ -580,6 +580,10 @@
     "0.2.94": {
       "title": "Version 0.2.94",
       "body": "- Marketplace: a new “Tier” filter for items, next to class and rarity. It shows the items of one Tier and the class level they can be worn from. It works in “For me” too.\n- Tavern: “New candidates” for gold, up to 3 times a week, each draw dearer than the last. Zbylut brings four other candidates, and the companions you hired stay."
+    },
+    "0.2.95": {
+      "title": "Version 0.2.95",
+      "body": "- Combat: the wanted poster you hold now shows on the Combat screen: whom you hunt and where. A tap on the poster takes you straight to that place, and the place has a “Wanted poster” mark in its land. Once the quarry falls, the poster leads you to the headman for the reward.\n- New versions now go live faster."
     }
   }
 }

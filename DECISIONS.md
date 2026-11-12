@@ -3233,6 +3233,16 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## List gończy na ekranie Walki (uwaga gracza, 12.11.2026, w grze od 0.2.95)
+
+Autor przekazał zrzut czatu: gracz (poz. 31): „małe qol, w okienku wypraw fajnie byłoby widzieć, które zlecenie na elitę obecnie mamy wybrane z tablicy zleceń”. Autor: „kolejne wartościowe uwagi”.
+
+1. **Pasek listu.** Gdy postać ma w ręku list gończy z Tablicy zleceń, ekran Walki pokazuje go na pasku z pergaminu, jak listy na Tablicy: obrazek celu, „Poszukiwany” albo „Wyjęty spod prawa”, imię celu i zdanie z listu „Twój list. Szukaj go na zwykłych wyprawach: (miejsce).” (teksty z `wanted.texts` w `data/settlement.json`, w formie dla kobiety albo mężczyzny). Pasek stoi nad krainami, a w czasie wyprawy pod jej kartą.
+2. **Dokąd prowadzi.** Stuknięcie w pasek otwiera miejsce z listu, gotowe do wyprawy. Gdy cel już padł, pasek mówi „Pokonany! Nagroda czeka u sołtysa.” i prowadzi na Tablicę zleceń, od razu na zakładkę „Poszukiwani” (adres `#/osada/board/wanted`; zakładka Tablicy idzie teraz za adresem, jak zakładki Karczmy).
+3. **Miejsce z listu.** W widoku krainy kółko miejsca z listu ma pod spodem znaczek „List gończy”, a w widoku samego miejsca pasek stoi pod opisem i Bestiariuszem (bez strzałki, bo postać już tam jest).
+4. **Bez makiet (brakujący szczegół).** To jeden pasek i jeden znaczek na istniejących ekranach, tak jak filtr Tier na Targowisku, więc wchodzą bez makiet. Sprawdzone na 320, 390, 1366 i 1920 px, po polsku i po angielsku.
+5. **Skąd dane.** Postać ma w danych `wanted` (`wantedInHand` w `src/server/characters.js`): cel, jego miejsce, czy już padł, oraz gotowe zdania listu w języku strony. Imię celu podaje `wantedName` w `src/engine/wanted.js`, tak samo jak Tablica.
+
 ## Karczma: nowi kandydaci za złoto (890 B, 12.11.2026, w grze od 0.2.94)
 
 Autor przekazał zrzut czatu: gracze (poz. 47 i 37) chcą większego wyboru albo losowania towarzyszy, np. 2–3 razy w tygodniu, za opłatę, która „nie musi być tania” („losowanie towarzyszy za złoto! Popieram!”). Autor: „przy okazji mądra uwaga”. Autor wybrał 890 B.
@@ -5183,7 +5193,7 @@ Autor zapytał, czy przydałaby się migracja na inny język albo przegląd kodu
 
 ## Wersja 0.1.71 (5.11.2026)
 
-Towarzysze noszą też amulet i pierścień: zob. „Biżuteria towarzyszy”. Wdrożenie do gry jest szybsze: zob. „Testy przed wdrożeniem w czterech częściach”.
+Towarzysze noszą też amulet i pierścień: zob. „Biżuteria towarzyszy”. Wdrożenie do gry jest szybsze: zob. „Testy przed wdrożeniem w czterech częściach” (od 0.2.95 w ośmiu).
 
 ## Testy przed wdrożeniem w czterech częściach (5.11.2026, od 0.1.71)
 
@@ -5191,6 +5201,8 @@ Autor: „A czemu 0.1.69 dalej nie jest wdrożone na main?”. Push do `main` cz
 
 1. **Cztery części naraz.** Testy dzielą się na cztery części (`node --test --test-shard`), każda na osobnej maszynie. Pierwsze kroki nowej postaci idą obok nich, a nie po nich. Gra wdraża się, gdy przejdą wszystkie cztery części i pierwsze kroki. Spodziewany czas od pusha do gry: kilkanaście minut zamiast blisko 40.
 2. **Zasady bez zmian.** Każdy test nadal musi przejść przed wdrożeniem. Gałąź robocza na tym samym commicie co `main` dalej pomija powtórne testy, więc wersja testowa wdraża się od razu.
+3. **Osiem części (12.11.2026, od 0.2.95).** Autor: „czy to wdrożenie 0.2.93 nie trwa zbyt długo?”. Wdrożenie 0.2.93 trwało 20 minut, bo najdłuższa z czterech części testów szła 19 minut (pozostałe: 11, 15 i 17 minut). Testy dzielą się teraz na osiem części, każda na osobnej maszynie GitHuba (repozytorium jest publiczne, więc maszyny nic nie kosztują). Spodziewany czas od pusha do gry: około 10–12 minut.
+4. **Wersja testowa bez powtórnych testów (12.11.2026, od 0.2.95).** Gałąź robocza po scaleniu `main` ma te same pliki co `main`, ale własny commit, więc dotąd jej testy szły drugi raz, a wersja testowa czekała na nie tyle samo co gra. Teraz gałąź robocza pomija testy, gdy jej pliki są dokładnie takie jak na `main` (to samo drzewo plików w gicie), więc wersja testowa wdraża się w minutę lub dwie. Gdy pliki się różnią, testy idą jak dotąd.
 
 
 ## Biżuteria towarzyszy (5.11.2026, w grze od 0.1.71, jedno miejsce od 0.1.73)
@@ -5573,6 +5585,7 @@ Autor: „kolejny ciekawy pomysł w stylu "Wanted dead or alive" po polsku”, �
 6. **Trofeum, bez przesady z balansem.** Pokonana odmiana zostawia sztukę materiału swojego stwora w pierwszej rzadkości, której postaci brakuje do trofeum Encyklopedii (+5% obrażeń przeciw temu stworowi), ale nigdy w najrzadszej z trzech: list przybliża trofeum, a ostatnią sztukę trzeba znaleźć samemu. Gdy brakuje tylko najrzadszej albo trofeum już jest, list daje sztukę w pierwszej rzadkości. Wyjęty spod prawa zostawia przedmiot unikalny (70%) albo epicki (30%).
 7. **Nagroda u sołtysa.** Po pokonaniu poszukiwanego list czeka na „Odbierz nagrodę”: złoto 60 × pierwszy poziom miejsca w pełnych setkach (co najmniej 100), 10 Punktów Czasu, +20 przychylności Bractwa Łowców i +2 relacji z sołtysem. Na kafelku Osady i przy Tablicy zleceń świeci wtedy żółta kropka.
 8. Dane są w `data/settlement.json` (`wanted`), a wyjęci spod prawa w `data/events.json` (`foes`).
+9. **List w ręku na ekranie Walki (od 0.2.95).** Zob. „List gończy na ekranie Walki”.
 
 ## Progi Prób Gildii do wszystkich prób (5.11.2026, w grze od 0.1.56)
 
