@@ -1,0 +1,17 @@
+{
+  "id": "labyrinth-map",
+  "payload": {
+    "text": "A new Labyrinth waits here every day. You choose your own way from room to room, all the way to the level's guardian. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 1
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/labyrinth-map-20261112T1622-0.mp3",
+    "audio/drafts/narrationEn/labyrinth-map-20261112T1622-1.mp3"
+  ],
+  "credits": 304
+}

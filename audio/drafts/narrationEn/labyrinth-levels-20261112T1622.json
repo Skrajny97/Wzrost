@@ -1,0 +1,17 @@
+{
+  "id": "labyrinth-levels",
+  "payload": {
+    "text": "Three levels a day. Clear the third, and the Hellish level opens to you that same day. The fire crackles softly. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 1
+    },
+    "language_code": "en"
+  },
+  "ending": " The fire crackles softly. [pauses]",
+  "files": [
+    "audio/drafts/narrationEn/labyrinth-levels-20261112T1622-0.mp3",
+    "audio/drafts/narrationEn/labyrinth-levels-20261112T1622-1.mp3"
+  ],
+  "credits": 242
+}
