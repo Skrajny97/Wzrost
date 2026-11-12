@@ -490,7 +490,7 @@
         "rarityTime",
         "speedPerLevel",
         "fastest",
-        "maxCount",
+        "maxMinutes",
         "laterPatternLevel",
         "partsLevelStep",
         "upgrades",
@@ -596,10 +596,10 @@
           "maximum": 1,
           "description": "Najkrótszy czas przedmiotu, jako część czasu z 1. poziomu."
         },
-        "maxCount": {
+        "maxMinutes": {
           "type": "integer",
           "minimum": 1,
-          "description": "Najwięcej sztuk jednym zleceniem."
+          "description": "Najdłuższe zlecenie naraz, w minutach: tyle sztuk, ile się w nim zmieści (co najmniej jedna)."
         },
         "laterPatternLevel": {
           "type": "integer",
@@ -1100,7 +1100,7 @@
         "rarityTime",
         "speedPerLevel",
         "fastest",
-        "maxCount",
+        "maxMinutes",
         "laterPatternLevel",
         "chances",
         "chancePerLevel",
@@ -1168,9 +1168,10 @@
           "exclusiveMinimum": 0,
           "maximum": 1
         },
-        "maxCount": {
+        "maxMinutes": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "description": "Najdłuższe zlecenie biżuterii naraz, w minutach: tyle sztuk, ile się w nim zmieści (co najmniej jedna)."
         },
         "laterPatternLevel": {
           "type": "integer",

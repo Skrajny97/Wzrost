@@ -1,5 +1,6 @@
 // Jubilerstwo in the Systemowa Szlifiernia (src/engine/jewelcraft.js): an
-// order of up to maxCount jewels of one pattern and gem takes the gems and
+// order of as many jewels of one pattern and gem as fit in maxMinutes of
+// work (mostItems, at least one) takes the gems and
 // the ore at the start, and its report brings the jewels made into the bag,
 // the gems of the failed ones lost and their ore back. Called back early,
 // the character brings the jewels done and gets back all the rest. A setting
@@ -16,9 +17,11 @@ import {
   gemOf,
   itemName,
   jewelCost,
+  jewelMinutes,
   jewelOrderMinutes,
   jewelReport,
   knowsJewelPattern,
+  mostItems,
   potionsDone,
   professionState,
   setMinutes,
@@ -50,8 +53,10 @@ function jewelOrder(player, level, body) {
   if (!base || !jewelcrafting.ores[base.slot] || !knowsJewelPattern(base, level, learned, content())) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
   const gem = typeof body.rarity === 'string' ? gemOf(body.rarity, content()) : undefined;
   if (!gem || gem.level > level) throw new ApiError(400, 'unknown_rarity', 'Tego kamienia jeszcze nie szlifujesz.');
-  if (!Number.isInteger(body.count) || body.count < 1 || body.count > jewelcrafting.maxCount) {
-    throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${jewelcrafting.maxCount} sztuk.`);
+  // As many as fit in maxMinutes of work, at least one (mostItems).
+  const most = mostItems(jewelMinutes(gem.rarity, level, content()), jewelcrafting.maxMinutes);
+  if (!Number.isInteger(body.count) || body.count < 1 || body.count > most) {
+    throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${most} sztuk.`);
   }
   return {
     cost: jewelCost(base, gem.rarity, body.count, content()),

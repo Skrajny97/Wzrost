@@ -1109,7 +1109,8 @@ export function mountProfessions(container, { params, navigate }) {
     function affordable() {
       const byParts = Math.floor(partCount(rarity.part.id) / pattern.parts);
       const byResources = Math.min(...pattern.resources.map((resource) => Math.floor((character.resources[resource.id] ?? 0) / need(resource))));
-      return { byParts, byResources, most: Math.min(workshop.maxCount, byParts, byResources, free) };
+      // `rarity.most`: as many as fit in the order's longest time (8 h).
+      return { byParts, byResources, most: Math.min(rarity.most, byParts, byResources, free) };
     }
 
     // For whom a pattern is, from which class level, and whether it came from
@@ -1259,7 +1260,7 @@ export function mountProfessions(container, { params, navigate }) {
         h('p', { class: 'muted', text: upgradesText(workshop) }),
         h('p', { class: 'muted', text: luckText(workshop) }),
         h('p', { class: 'muted', text: t('Przedmioty dostaną poziom postaci: {level}.', { level: formatNumber(character.level) }) }),
-        free < Math.min(workshop.maxCount, byParts, byResources) &&
+        free < Math.min(rarity.most, byParts, byResources) &&
           h('p', { class: 'herb-room', text: t('Plecak ma miejsce tylko na {count}.', { count: countOf(free, 'przedmiot', 'przedmioty', 'przedmiotów') }) }),
         start,
       ];
@@ -1359,7 +1360,7 @@ export function mountProfessions(container, { params, navigate }) {
     const card = (...children) => h('section', { class: 'card gather-card', 'aria-labelledby': titleId }, head, children);
     if (scroll.hidden) return card(h('p', { class: 'system-hint', text: scroll.hint }));
     const have = character.crafting.parts.find((part) => part.id === scroll.part.id)?.count ?? 0;
-    const most = Math.min(workshop.maxCount, Math.floor(have / scroll.parts));
+    const most = Math.min(scroll.most, Math.floor(have / scroll.parts));
     const needs = t('Jeden zwój to {count} × {part} i {time}.', { count: formatNumber(scroll.parts), part: scroll.part.name, time: formatMinutes(workMinutes(1, scroll.minutes)) });
     if (most === 0) {
       return card(
@@ -1682,7 +1683,7 @@ export function mountProfessions(container, { params, navigate }) {
     function affordable() {
       const byGems = rarity.gem.have;
       const byOre = Math.floor(rarity.ore.have / slot.ores);
-      return { byGems, byOre, most: Math.min(jewelcrafting.maxCount, byGems, byOre, free) };
+      return { byGems, byOre, most: Math.min(rarity.most, byGems, byOre, free) };
     }
     // For whom, from which class level, and whether the pattern came from a
     // jewel taken apart, as in the Warsztat.
@@ -1826,7 +1827,7 @@ export function mountProfessions(container, { params, navigate }) {
           text: rarity.chance >= 1 ? t('Każda sztuka tej rzadkości się uda.') : t('Każda sztuka ma {chance} szans na powodzenie. Nieudana zabiera swój kamień, a kruszec wraca.', { chance: percentText(rarity.chance) }),
         }),
         h('p', { class: 'muted', text: t('Biżuteria dostanie poziom postaci: {level}.', { level: formatNumber(character.level) }) }),
-        free < Math.min(jewelcrafting.maxCount, byGems, byOre) && h('p', { class: 'herb-room', text: t('Plecak ma miejsce tylko na {count}.', { count: countOf(free, 'sztukę', 'sztuki', 'sztuk') }) }),
+        free < Math.min(rarity.most, byGems, byOre) && h('p', { class: 'herb-room', text: t('Plecak ma miejsce tylko na {count}.', { count: countOf(free, 'sztukę', 'sztuki', 'sztuk') }) }),
         start,
       ];
     }

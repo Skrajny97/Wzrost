@@ -25,6 +25,7 @@ import {
   materialView,
   mineralsPerHour,
   miningMinutes,
+  mostItems,
   mostPotions,
   oreOf,
   parseStack,
@@ -335,7 +336,7 @@ function jewelView(level, row) {
   return {
     professionId: jewelcrafting.profession,
     place: jewelcrafting.place,
-    maxCount: jewelcrafting.maxCount,
+    maxMinutes: jewelcrafting.maxMinutes,
     about: jewelcrafting.about,
     slots: Object.keys(jewelcrafting.ores).map((slotId) => ({
       id: slotId,
@@ -359,7 +360,14 @@ function jewelView(level, row) {
         level: gem.level,
         gem: owned(gem),
         ore: owned(oreOf(rarity.id, content())),
-        ...(gem.level <= level ? { chance: jewelChance(rarity.id, level, content()), itemMinutes: jewelMinutes(rarity.id, level, content()) } : { hidden: true, hint: hint(gem.level) }),
+        // `most`: as many jewels as fit in maxMinutes of work (mostItems).
+        ...(gem.level <= level
+          ? {
+              chance: jewelChance(rarity.id, level, content()),
+              itemMinutes: jewelMinutes(rarity.id, level, content()),
+              most: mostItems(jewelMinutes(rarity.id, level, content()), jewelcrafting.maxMinutes),
+            }
+          : { hidden: true, hint: hint(gem.level) }),
       };
     }),
     gems: content().minerals
@@ -399,14 +407,19 @@ function workshopView(level, row) {
       level: scroll.level,
       owned,
       ...(scroll.level <= level
-        ? { part: { id: part.id, name: part.name }, parts: scroll.parts, minutes: scrollMinutes(level, content(), faster, scroll) }
+        ? {
+            part: { id: part.id, name: part.name },
+            parts: scroll.parts,
+            minutes: scrollMinutes(level, content(), faster, scroll),
+            most: mostItems(scrollMinutes(level, content(), faster, scroll), workshop.maxMinutes),
+          }
         : { hidden: true, hint: hint(scroll.level) }),
     };
   };
   return {
     professionId: workshop.profession,
     place: workshop.place,
-    maxCount: workshop.maxCount,
+    maxMinutes: workshop.maxMinutes,
     upgrades: craftUpgrades(level, content()),
     // The chances of an item one or two rarities above the ordered one.
     luck: craftLuck(level, content(), perkOf(row, 'workshopLuck')),
@@ -457,7 +470,12 @@ function workshopView(level, row) {
         step: content().rarities.findIndex((candidate) => candidate.id === rarity.id) + 1,
         part: { id: part.id, name: part.name },
         ...(rarity.level <= level
-          ? { chance: craftChance(rarity.id, level, content()), itemMinutes: itemMinutes(rarity.id, level, content(), faster) }
+          ? {
+              chance: craftChance(rarity.id, level, content()),
+              itemMinutes: itemMinutes(rarity.id, level, content(), faster),
+              // As many items as fit in maxMinutes of work (mostItems).
+              most: mostItems(itemMinutes(rarity.id, level, content(), faster), workshop.maxMinutes),
+            }
           : { hidden: true, hint: hint(rarity.level) }),
       };
     }),
