@@ -1282,37 +1282,43 @@
       "id": "labyrinth-welcome",
       "kind": "card",
       "chapter": "labyrinth",
-      "text": ["Trzydziesty poziom postaci… System otworzył przed Tobą Labirynt."]
+      "text": ["Trzydziesty poziom postaci… System otworzył przed Tobą Labirynt."],
+      "voice": "audio/narration/labyrinth-welcome.mp3"
     },
     {
       "id": "labyrinth-lead",
       "kind": "lead",
       "chapter": "labyrinth",
-      "text": ["Labirynt czeka w Osadzie, w Sali prób. Zajrzyjmy tam."]
+      "text": ["Labirynt czeka w Osadzie, w Sali prób. Zajrzyjmy tam."],
+      "voice": "audio/narration/labyrinth-lead.mp3"
     },
     {
       "id": "labyrinth-map",
       "kind": "point",
       "chapter": "labyrinth",
-      "text": ["Co dzień czeka tu nowy Labirynt. Sam wybierasz drogę od komnaty do komnaty, aż do strażnika poziomu."]
+      "text": ["Co dzień czeka tu nowy Labirynt. Sam wybierasz drogę od komnaty do komnaty, aż do strażnika poziomu."],
+      "voice": "audio/narration/labyrinth-map.mp3"
     },
     {
       "id": "labyrinth-wounds",
       "kind": "point",
       "chapter": "labyrinth",
-      "text": ["Rany zostają z walki na walkę. Leczą je tylko źródła, kupiec i niektóre błogosławieństwa."]
+      "text": ["Rany zostają z walki na walkę. Leczą je tylko źródła, kupiec i niektóre błogosławieństwa."],
+      "voice": "audio/narration/labyrinth-wounds.mp3"
     },
     {
       "id": "labyrinth-levels",
       "kind": "point",
       "chapter": "labyrinth",
-      "text": ["Trzy poziomy dziennie. Kto przejdzie trzeci, temu jeszcze tego dnia otworzy się Piekielny."]
+      "text": ["Trzy poziomy dziennie. Kto przejdzie trzeci, temu jeszcze tego dnia otworzy się Piekielny."],
+      "voice": "audio/narration/labyrinth-levels.mp3"
     },
     {
       "id": "labyrinth-guardians",
       "kind": "point",
       "chapter": "labyrinth",
-      "text": ["Strażnicy strzegą Artefaktów. Pierwszy pokonany strażnik otworzy Ci Rdzeń."]
+      "text": ["Strażnicy strzegą Artefaktów. Pierwszy pokonany strażnik otworzy Ci Rdzeń."],
+      "voice": "audio/narration/labyrinth-guardians.mp3"
     },
     {
       "id": "guild-tabs",

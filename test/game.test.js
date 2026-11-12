@@ -2148,6 +2148,8 @@ describe('Time Points and the narrator', () => {
     // 878.1-878.6 as the author accepted them.
     assert.equal(lines[0].text[0], 'Trzydziesty poziom postaci… System otworzył przed Tobą Labirynt.');
     assert.equal(lines.at(-1).text[0], 'Strażnicy strzegą Artefaktów. Pierwszy pokonany strażnik otworzy Ci Rdzeń.');
+    // The takes the author accepted on the review page (880).
+    assert.ok(lines.every((line) => line.voice === `audio/narration/${line.id}.mp3`));
     const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
     assert.ok(at('labyrinth-welcome') > at('portals-sweep'));
     assert.deepEqual(tutorial.chapters.labyrinth, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Labirynt czeka w Osadzie, w Sali prób.' });

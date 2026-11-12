@@ -1719,7 +1719,9 @@ async function showPreview(box, item, equipped) {
   }
 }
 
-export function itemSummary(item, { stats = false } = {}) {
+// `tier`: its Tier too, after its level (the Targowisko's lists, the author:
+// „Na targowisku nie widać tierów przedmiotów a musi być”).
+export function itemSummary(item, { stats = false, tier = false } = {}) {
   const text = h(
     'span',
     { class: 'item-summary' },
@@ -1730,7 +1732,7 @@ export function itemSummary(item, { stats = false } = {}) {
       // A favourite's star after its name (favorites.js).
       item.favorite && h('span', { class: 'item-favorite', role: 'img', 'aria-label': t('ulubiony') }, icon('star', { size: 14 })),
     ),
-    h('span', { class: 'item-meta', text: `${item.rarityName} · ${item.slotName} · ${t('poz. {level}', { level: item.level })}` }),
+    h('span', { class: 'item-meta', text: [item.rarityName, item.slotName, t('poz. {level}', { level: item.level }), tier && item.tier].filter(Boolean).join(' · ') }),
     // With `stats`, its numbers in one line too, to tell items of one name apart.
     stats && item.properties?.length > 0 && h('span', { class: 'item-stats', text: item.properties.join(' · ') }),
   );

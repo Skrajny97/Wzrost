@@ -3103,6 +3103,12 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 Potem (12.11.2026): „Mistrz Łuku 2, pokaz teraz animacje i przypomnij chód” i „Mistrz Łuku jazda i chód OK”., „Mistrzyni Łuku jazda 1, dorób jej zielony płaszcz w portrecie zatem skoro pasuje”, „i pokaż chód Mistrzyni Łuku”, „Mistrzyni łuku jazda i chód OK”, „Płaszcz OK”, „Lodowa Królowa jazda 1”, „Lodowa królowa jazda i chód OK”, „Święty jazda 2”, „Jazda I chód świętego OK”, „Święta, jazda: 1”, „za nisko siedzi Święta moim zdaniem na wierzchowcach, chód w porządku” i „Święta podniesiona w siodle - lepiej.”, „Pogromca Demonów jazda 1”, „Pogromca Demonów jest za mały w porównaniu do tego tygrysa szablozębnego i ogólnie. Ale poza tym OK, tylko wielkość przeskaluj. Chód też OK”, „Pogromczyni Demonów: jazda 1, czekam na animacje oraz chód”, „Pogromczyni Demonów wszystko OK”, „Prorokini jazda 1, pokaż animację jazdy oraz chód”, „Prorokini w jezdzie za daleko siedzi na wierzchowcu, powinna byc blizej jego głowy -> w prawo”, „Prorokini jazda poprawiona już OK.”, „Prorokini chód OK”, „Władczyni Cieni, jazda: 1”, „Władczyni Cieni OK, tylko na Tygrysie szablozębnym za nisko i za bardzo w lewo siedzi”, „Władczyni Cieni na Tygrysie już OK”, „Prorok chód 2”, „Prorok, jazda: 1” i „Prorok jazda i chód OK”.
 
+## Wersja 0.2.89 (12.11.2026): rozdział narratora o Labiryncie i Tiery na Targowisku
+
+1. **Rozdział narratora o Labiryncie** wchodzi do gry z nagraniami wybranymi przez autora (880; zasady w „Labirynt Systemu i Rdzeń: zasady”, „Rozdział narratora o Labiryncie”).
+2. **Tiery na Targowisku.** Autor 12.11.2026: „Na targowisku nie widać tierów przedmiotów a musi być”. Wiersz przedmiotu na Targowisku (oferty, wybór przedmiotu do wystawienia, Rejestr) ma po poziomie jego Tier, np. „Rzadki · Broń · poz. 36 · Tier III” (`itemSummary` z `tier: true` w `src/client/screens/market.js`). Karta przedmiotu miała Tier już wcześniej; reszta list w grze zostaje bez zmian.
+3. **Sklep Play (879).** Autor przyjął wszystkie zrzuty (879.1–879.11, po polsku i po angielsku) i grafikę promocyjną A (wyprawa przez Sosnowe Wydmy); B i C odrzucone. Pliki poszły do autora w czacie, do wgrania w Play Console.
+
 ## Wersja 0.2.88 (12.11.2026): przekucie u kowala widać w karcie przedmiotu
 
 Autor w czacie 12.11.2026: „przedmiot po przekuciu na wyzsza rzadkosc u kowala powinien zapisywac ze byl juz przekuwany i powinno to byc dostepne dla ewentualnych kupujących na targowisku do wglądu (ze go juz nie da rady przekuc ponownie)”.
@@ -3197,7 +3203,7 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 2. **Przebieg.** Karta (878.1) gdziekolwiek, potem pergamin przy zakładce Osada (878.2). Z Osady narrator sam otwiera Salę prób na zakładce Labirynt i wskazuje mapę (878.3), drużynę z HP (878.4), poziomy dnia (878.5) i nagrody dnia (878.6, ostatnia kwestia, bez „Pomiń objaśnienie”). Znaczniki `data-guide` są w `src/client/labyrinth.js`, a warunki w `src/client/narrator.js`.
 3. **Kwestia Sali prób** o próbach (645) przychodzi, jak dotąd, przy pierwszym spojrzeniu na Salę prób, ale dopiero po rozdziale Labiryntu, bo żadna kwestia miejsca nie przychodzi, gdy czeka rozdział.
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
-5. **Nagrania:** po dwie wersje każdej kwestii po polsku i po angielsku idą na stronę ocen. Rozdział wchodzi do gry z wybranymi nagraniami, tak jak Portale.
+5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
 ## Talia Systemu: gra karciana w Salonie Gier (871–877, 12.11.2026)
 
