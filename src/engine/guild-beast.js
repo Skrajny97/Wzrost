@@ -122,7 +122,7 @@ export function guildBeastFight({ character, equipped, name, beast, seed, trophi
     // false when the character did, null when the fight dragged on.
     won: fight.won,
     actions: fight.actions,
-    log: fight.events.map((/** @type {{ text: string }} */ event) => event.text),
+    log: fight.events.map((event) => event.text),
     // The fight to play back in the arena, as a report's (the author: "Po
     // Atakuj w Bestii Gildii niech pokaże się ta walka symulacja").
     replay: {
