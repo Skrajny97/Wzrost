@@ -3103,6 +3103,13 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 Potem (12.11.2026): „Mistrz Łuku 2, pokaz teraz animacje i przypomnij chód” i „Mistrz Łuku jazda i chód OK”., „Mistrzyni Łuku jazda 1, dorób jej zielony płaszcz w portrecie zatem skoro pasuje”, „i pokaż chód Mistrzyni Łuku”, „Mistrzyni łuku jazda i chód OK”, „Płaszcz OK”, „Lodowa Królowa jazda 1”, „Lodowa królowa jazda i chód OK”, „Święty jazda 2”, „Jazda I chód świętego OK”, „Święta, jazda: 1”, „za nisko siedzi Święta moim zdaniem na wierzchowcach, chód w porządku” i „Święta podniesiona w siodle - lepiej.”, „Pogromca Demonów jazda 1”, „Pogromca Demonów jest za mały w porównaniu do tego tygrysa szablozębnego i ogólnie. Ale poza tym OK, tylko wielkość przeskaluj. Chód też OK”, „Pogromczyni Demonów: jazda 1, czekam na animacje oraz chód”, „Pogromczyni Demonów wszystko OK”, „Prorokini jazda 1, pokaż animację jazdy oraz chód”, „Prorokini w jezdzie za daleko siedzi na wierzchowcu, powinna byc blizej jego głowy -> w prawo”, „Prorokini jazda poprawiona już OK.”, „Prorokini chód OK”, „Władczyni Cieni, jazda: 1”, „Władczyni Cieni OK, tylko na Tygrysie szablozębnym za nisko i za bardzo w lewo siedzi”, „Władczyni Cieni na Tygrysie już OK”, „Prorok chód 2”, „Prorok, jazda: 1” i „Prorok jazda i chód OK”.
 
+## Wersja 0.2.88 (12.11.2026): przekucie u kowala widać w karcie przedmiotu
+
+Autor w czacie 12.11.2026: „przedmiot po przekuciu na wyzsza rzadkosc u kowala powinien zapisywac ze byl juz przekuwany i powinno to byc dostepne dla ewentualnych kupujących na targowisku do wglądu (ze go juz nie da rady przekuc ponownie)”.
+
+1. **Zapis już był.** Kowal podnosi rzadkość raz na przedmiot i zapisuje to w przedmiocie (`raised`, `src/server/forge.js`), więc drugiego przekucia odmawia („Ten przedmiot kowal już raz przekuł.”).
+2. **Teraz widać to w karcie.** Karta przedmiotu (plecak, Skrzynia Konta, Wymiana, raport, Kwatery) i jego karta na Targowisku mają wiersz „Kowal już przekuł go na wyższą rzadkość: drugi raz się nie da.” (po angielsku: „The smith has already reforged it to a higher rarity: it cannot be done again.”). Widok przedmiotu z serwera niesie znacznik `raised` (`itemView` w `src/engine/items.js`), więc kupujący widzi go przed zakupem.
+
 ## Wersja 0.2.87 (12.11.2026): Labirynt Systemu i Rdzeń w grze
 
 Autor przyjął na stronie ocen makiety Labiryntu i Rdzenia (870.1–870.7) oraz kwestie narratora o Labiryncie (878.1–878.6), a grafiki były przyjęte wcześniej (868, 869).

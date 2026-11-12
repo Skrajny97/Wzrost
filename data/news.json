@@ -695,6 +695,11 @@
       "id": "0.2.87",
       "title": "Wersja 0.2.87",
       "body": "- Labirynt Systemu od 30. poziomu postaci: w Osadzie, w Sali prób. Codziennie nowy labirynt z trzema poziomami, a po trzecim, tego samego dnia, poziom Piekielny. Wybierasz drogę przez komnaty: walki, elity, skarby, źródła, ołtarze i kupca. Rany zostają z walki na walkę, a błogosławieństwa działają do końca dnia.\n- Strażnicy Labiryntu strzegą Artefaktów. Pierwszy pokonany strażnik otwiera Rdzeń w zakładce Postać: Artefakty wchłania się na stałe, a Odłamki Rdzenia je ulepszają.\n- Czempion Wieży przy pierwszym zwycięstwie daje też Artefakt.\n- Po angielsku nazwy miejsc na planszy Osady nie wychodzą już poza jej brzeg."
+    },
+    {
+      "id": "0.2.88",
+      "title": "Wersja 0.2.88",
+      "body": "- Przedmiot przekuty u kowala na wyższą rzadkość mówi to w swojej karcie, także na Targowisku: drugi raz się go nie przekuje. Kupujący widzi to przed zakupem."
     }
   ]
 }

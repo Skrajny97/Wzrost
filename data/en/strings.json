@@ -2007,6 +2007,7 @@
   "Dziś kowal sprzeda jeszcze {count}.": "Today the smith will sell {count} more.",
   "Na dziś kowal nie ma już zwojów. Wróć jutro.": "The smith has no more scrolls today. Come back tomorrow.",
   "Ten przedmiot kowal już raz przekuł.": "The smith has already reforged this item once.",
+  "Kowal już przekuł go na wyższą rzadkość: drugi raz się nie da.": "The smith has already reforged it to a higher rarity: it cannot be done again.",
   "Wyżej tej rzadkości już nie ma.": "There is no rarity above this one.",
   "Na razie kowal przekuwa przedmioty najwyżej do rzadkości „{rarity}”. Lepsza relacja z nim pozwoli iść wyżej.": "For now the smith reforges items up to rarity “{rarity}” at most. A better relation with him will let you go higher.",
   "Tego kamienia jeszcze nie szlifujesz.": "You cannot cut this stone yet.",
