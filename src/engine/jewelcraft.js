@@ -221,7 +221,7 @@ export function setMinutes(gemId, level, content) {
  * @property {Base} [base] The pattern of an order of jewellery (none for a gem set).
  * @property {string} [rarityId] The rarity of the order's jewels.
  * @property {JewelResult[]} [results] The order's jewels.
- * @property {{ gem: string, item: Item | null, replaced?: string | null }} [set] A gem set instead of an order.
+ * @property {{ gem: string, item?: Item | null, core?: boolean, replaced?: string | null }} [set] A gem set instead of an order: in an item, or in the Rdzeń (`core`).
  * @property {string[]} [learned]
  * @property {number} minutes
  * @property {number} startedAt
@@ -267,13 +267,16 @@ export function jewelReport({ base, rarityId, results = [], set, learned = [], m
   };
   if (set) {
     const gem = content.mineralsById[set.gem];
-    const replaced = set.item && set.replaced ? content.mineralsById[set.replaced] : null;
+    const replaced = (set.item || set.core) && set.replaced ? content.mineralsById[set.replaced] : null;
+    // A gem set in the Rdzeń (core.js) names it as the item.
+    const target = set.core ? (content.slotsById.core?.name ?? null) : set.item ? itemName(set.item, content) : null;
     return {
       ...report,
       set: {
         gem: gemView(gem.id, content),
         item: set.item ? itemView(set.item, content) : null,
-        text: set.item ? say(texts, 'set', 0, { gem: gem.name, item: itemName(set.item, content) }) : say(texts, 'missing', 0, { gem: gem.name }),
+        ...(set.core && { core: true }),
+        text: target ? say(texts, 'set', 0, { gem: gem.name, item: target }) : say(texts, 'missing', 0, { gem: gem.name }),
         replaced: replaced ? say(texts, 'replaced', 0, { gem: replaced.name }) : null,
       },
     };

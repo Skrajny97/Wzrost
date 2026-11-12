@@ -15,10 +15,10 @@ export const DATA_FILES = [
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
   'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'portals', 'guilds', 'cosmetics', 'news', 'fame',
-  'weeks', 'payments', 'party-events',
+  'weeks', 'payments', 'party-events', 'labyrinth',
 ];
 // Unlocks the code refers to by id.
-const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'portals', 'core'];
+const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'portals', 'labyrinth', 'core'];
 const POSITIONS = ['front', 'middle', 'back'];
 
 function readJson(path) {
@@ -762,6 +762,7 @@ function checkReferences(data) {
   errors.push(...checkCosmetics(data));
   errors.push(...checkTowers(data));
   errors.push(...checkPortals(data));
+  errors.push(...checkLabyrinth(data, { stats, elements, rarities }));
   errors.push(...checkGuildSeat(data, { resources }));
   errors.push(...checkGuildExpedition(data));
   errors.push(...checkGuildWar(data));
@@ -1684,6 +1685,66 @@ function checkPortals(data) {
     if ((portal.loot === 'resource') !== (portal.resource !== undefined) || (portal.resource !== undefined && !resources.has(portal.resource))) errors.push(`portals.json: portal ${portal.id}: zasób tylko w portalu zasobu, i znany`);
     if ((portal.loot === 'part') !== (portal.part !== undefined) || (portal.part !== undefined && !parts.has(portal.part))) errors.push(`portals.json: portal ${portal.id}: część tylko w portalu części, i znana`);
   }
+  return errors;
+}
+
+// The Labirynt Systemu and the Rdzeń (src/engine/labyrinth.js, core.js;
+// 850–866): the three levels and Piekielny last, its creatures twice as
+// strong as the third's (854 A); the rarities of the guardians' Artefakty
+// known, every room's kind there with a weight but the guardian's, the
+// first row's kind one of them, the map's ranges in order; the Rdzeń's
+// elements exactly the game's eight, each with traits there are and its
+// resonance a trait of its own with a value for each count, growing; the
+// stat traits of a stat there is (or the class's main one, "main"); a size
+// with no more traits than every element has; a break's Odłamki for every
+// rarity, a cost for each level of upgrade, and the Wieże's Artefakt of a
+// level there is.
+function checkLabyrinth(data, { stats, elements, rarities }) {
+  const errors = [];
+  const rules = data.labyrinth;
+  const where = 'labyrinth.json';
+  const levels = rules.levels;
+  if (levels.filter((level) => level.hell).length !== 1 || !levels.at(-1).hell) errors.push(`${where}: Piekielny (hell) musi być jeden i ostatni`);
+  const third = levels[levels.length - 2];
+  const hell = levels.at(-1);
+  if (third && hell && hell.strength.some((value, index) => Math.abs(value - 2 * third.strength[index]) > 1e-9)) {
+    errors.push(`${where}: stwory Piekielnego muszą być dwa razy mocniejsze niż na poziomie ${third.id} (854 A)`);
+  }
+  const levelIds = uniqueIds(errors, where, levels);
+  for (const level of levels) {
+    for (const rarity of Object.keys(level.artifact)) if (!rarities.has(rarity)) errors.push(`${where}: poziom ${level.id} ma nieznaną rzadkość "${rarity}"`);
+  }
+  const rooms = new Map(rules.rooms.map((room) => [room.id, room]));
+  for (const id of ['fight', 'elite', 'treasure', 'spring', 'altar', 'merchant', 'guardian']) {
+    const room = rooms.get(id);
+    if (!room) errors.push(`${where}: brak komnaty "${id}"`);
+    else if ((id === 'guardian') !== (room.weight === undefined)) errors.push(`${where}: komnata ${id}: waga ma każda poza strażnikiem`);
+  }
+  if (!rooms.get(rules.map.firstRow)?.weight) errors.push(`${where}: map.firstRow "${rules.map.firstRow}" to nie komnata z wagą`);
+  for (const key of ['rooms', 'links']) if (rules.map[key][0] > rules.map[key][1]) errors.push(`${where}: map.${key} od większej do mniejszej`);
+  if (rules.map.eliteFromRow > rules.map.rows) errors.push(`${where}: map.eliteFromRow za rzędami poziomu`);
+  uniqueIds(errors, `${where} (błogosławieństwa)`, rules.blessings);
+  const core = rules.core;
+  const traits = new Map(core.traits.map((trait) => [trait.id, trait]));
+  uniqueIds(errors, `${where} (cechy)`, core.traits);
+  for (const trait of core.traits) {
+    if ((trait.kind === 'stat') !== (trait.stat !== undefined)) errors.push(`${where}: cecha ${trait.id}: statystykę ma tylko cecha kind "stat"`);
+    if (trait.stat !== undefined && trait.stat !== 'main' && !stats.has(trait.stat)) errors.push(`${where}: cecha ${trait.id} ma nieznaną statystykę "${trait.stat}"`);
+  }
+  const coreElements = uniqueIds(errors, `${where} (żywioły Rdzenia)`, core.elements);
+  for (const id of elements) if (!coreElements.has(id)) errors.push(`${where}: Rdzeń nie ma żywiołu "${id}"`);
+  for (const id of coreElements) if (!elements.has(id)) errors.push(`${where}: nieznany żywioł Rdzenia "${id}"`);
+  const fewestTraits = Math.min(...core.elements.map((element) => element.traits.length));
+  for (const element of core.elements) {
+    for (const id of element.traits) if (!traits.has(id)) errors.push(`${where}: żywioł ${element.id} ma nieznaną cechę "${id}"`);
+    if (!element.traits.includes(element.resonance.trait)) errors.push(`${where}: rezonans żywiołu ${element.id} podnosi cechę spoza jego cech`);
+    if (element.resonance.values.length !== core.resonance.counts.length) errors.push(`${where}: rezonans żywiołu ${element.id} ma ${element.resonance.values.length} progów, a counts ${core.resonance.counts.length}`);
+    if (element.resonance.values.some((value, index) => index > 0 && value <= element.resonance.values[index - 1])) errors.push(`${where}: rezonans żywiołu ${element.id} musi rosnąć`);
+  }
+  for (const size of core.sizes) if (size.traits > fewestTraits) errors.push(`${where}: rozmiar ${size.id} ma więcej cech niż żywioły`);
+  for (const id of rarities) if (core.break[id] === undefined) errors.push(`${where}: rozbicie nie ma Odłamków rzadkości "${id}"`);
+  if (core.upgrade.costs.length !== core.upgrade.max) errors.push(`${where}: upgrade.costs musi mieć ${core.upgrade.max} kosztów`);
+  if (!levelIds.has(core.tower.level)) errors.push(`${where}: tower.level "${core.tower.level}" to nie poziom Labiryntu`);
   return errors;
 }
 

@@ -2,6 +2,7 @@
 // Character statistics: where each point comes from, free points and
 // distributing them by class.
 
+import { coreEffects } from './core.js';
 import { classSpans, levelsIn } from './evolutions.js';
 import { upgradedItem } from './items.js';
 import { professionStats } from './professions.js';
@@ -52,6 +53,14 @@ export function computeStats(character, equipped, content) {
         bonuses.resist[element] = (bonuses.resist[element] ?? 0) + value;
       }
     }
+  }
+
+  // The Rdzeń's Artefakty (core.js) raise a stat by a share of its points
+  // from the class, the character, the professions and the gear.
+  const core = character.core ? coreEffects(character.core, character.classId, content) : null;
+  for (const [stat, share] of Object.entries(core?.stats ?? {})) {
+    const s = sources[stat];
+    if (s) s.core = Math.round(Math.max(0, s.class + s.character + s.professions + s.equipment) * share);
   }
 
   for (const stat of content.statIds) {

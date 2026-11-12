@@ -112,6 +112,10 @@ import {
   weekAt,
   weekRest,
   equipBlock,
+  coreSockets,
+  freeSockets,
+  gemView,
+  knownArtifact,
 } from '../engine/index.js';
 import { mountView } from '../engine/stable.js';
 import { say } from '../engine/text.js';
@@ -119,7 +123,7 @@ import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
 import { content, contentIn } from './content.js';
 import { favoriteIds } from './favorites.js';
-import { buildingOn, craftingOn, fortressOn, professionsOn, settlementOn, weeksOn } from './features.js';
+import { buildingOn, craftingOn, fortressOn, labyrinthOn, professionsOn, settlementOn, weeksOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
@@ -837,8 +841,30 @@ export function earlyAreaOf(row) {
   }
 }
 
+// The character's Rdzeń (src/server/core.js; 858–865): whether it is
+// open, the Odłamki, the gem set in it and the Artefakty absorbed, each a
+// kind the game knows (a row from before a change of the data does
+// nothing).
+export function coreOf(row) {
+  let stored;
+  try {
+    stored = JSON.parse(row.core ?? '{}');
+  } catch {
+    stored = {};
+  }
+  return {
+    open: stored.open === true,
+    shards: Number.isSafeInteger(stored.shards) && stored.shards > 0 ? stored.shards : 0,
+    gem: typeof stored.gem === 'string' ? stored.gem : null,
+    absorbed: (Array.isArray(stored.absorbed) ? stored.absorbed : []).filter((artifact) => knownArtifact(artifact, content())),
+  };
+}
+
 export function engineCharacter(row) {
   const outfit = row.cosmetics ? cosmeticsOf(JSON.parse(row.cosmetics), content()).outfit : null;
+  // The Rdzeń's Artefakty and its gem work in the character's fights and
+  // stats (core.js in the engine), where the Labirynt is on.
+  const core = labyrinthOn() ? coreOf(row) : null;
   return {
     classId: row.class_id,
     level: row.level,
@@ -859,6 +885,7 @@ export function engineCharacter(row) {
     professions: JSON.parse(row.professions ?? '{}'),
     // The Sklep Systemu's skórka worn (cosmetics.js), for the fights' busts.
     ...(outfit && { outfit }),
+    ...(core && core.absorbed.length > 0 && { core: { absorbed: core.absorbed, gem: core.gem } }),
   };
 }
 
@@ -1542,9 +1569,18 @@ export function characterView(player, now) {
     maxMana: values.mana,
     // An evolution tried below its class level on the test version opens
     // its tab too, and so does the Osada opened by "Testuj Osadę".
+    // The Rdzeń opens with the first guardian of the Labirynt beaten (855 A).
     features: [
-      ...new Set([...unlockedFeatures(row.level, content(), row.class_level), ...(row.evolution ? ['evolution'] : []), ...(settlementTest(row) ? ['settlement'] : [])]),
+      ...new Set([
+        ...unlockedFeatures(row.level, content(), row.class_level),
+        ...(row.evolution ? ['evolution'] : []),
+        ...(settlementTest(row) ? ['settlement'] : []),
+        ...(labyrinthOn() && coreOf(row).open ? ['core'] : []),
+      ]),
     ],
+    // The Rdzeń at a glance, once it is open (core.js): its sockets and how
+    // many are free, the Odłamki and the gem set in it.
+    core: labyrinthOn() && coreOf(row).open ? coreSummary(row) : null,
     // Whether the character has the Osada (the narrator's Osada chapter).
     settlementOpen: settlementOpen(row),
     // A name the filter blocks (names.js): the game asks for a new one, and
@@ -2088,6 +2124,19 @@ export const detachedRows = (db, which, binds) => [
   db.prepare(`DELETE FROM chest_goods WHERE character_id ${which}`).bind(...binds),
 ];
 
+// The Rdzeń at a glance (characterView): its sockets, those free, the
+// Odłamki and its gem.
+function coreSummary(row) {
+  const core = coreOf(row);
+  return {
+    open: true,
+    sockets: coreSockets(row.level, content()),
+    free: freeSockets(core, row.level, content()),
+    shards: core.shards,
+    gem: gemView(core.gem, content()),
+  };
+}
+
 // The statements that remove a character with all it has, at `now`.
 export function characterRemoval(db, id, now) {
   return [
@@ -2105,6 +2154,8 @@ export function characterRemoval(db, id, now) {
     db.prepare('DELETE FROM items WHERE character_id = ?').bind(id),
     // What waits in its Przechowalnia (storage.js).
     db.prepare('DELETE FROM storage_items WHERE character_id = ?').bind(id),
+    // The Artefakty of its Skrytka Rdzenia (core.js).
+    db.prepare('DELETE FROM core_artifacts WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
     // Its tickets of the Loteria not drawn yet (casino.js).
     db.prepare('DELETE FROM lottery_tickets WHERE character_id = ?').bind(id),

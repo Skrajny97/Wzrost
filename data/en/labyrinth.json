@@ -1,0 +1,97 @@
+{
+  "$comment": "English texts of data/labyrinth.json (src/engine/overlay.js): the System Labyrinth's levels, rooms, blessings and report sentences, and the Core's Artifacts, their sizes, traits, abilities and words. Each key of the texts keeps the Polish number of variants, as the engine picks one by index. An Artifact's name is \"{size} {name}\": \"Small Fire Artifact\".",
+  "levels": {
+    "first": { "name": "Level 1" },
+    "second": { "name": "Level 2" },
+    "third": { "name": "Level 3" },
+    "hell": { "name": "Hellish" }
+  },
+  "rooms": {
+    "fight": { "name": "Fight", "text": "Creatures of the Labyrinth. Win to gain XP and gold." },
+    "elite": { "name": "Elite", "text": "An elite of the Labyrinth. Win to gain Core Shards, gold and a choice of blessings." },
+    "treasure": { "name": "Treasure", "text": "A System chest, no fight: Core Shards and gold." },
+    "spring": { "name": "Spring", "text": "The spring heals every fighter by {heal}% of max HP." },
+    "altar": { "name": "Altar", "text": "A choice of one of three blessings." },
+    "merchant": { "name": "Merchant", "text": "The System merchant sells healing and a choice of blessings for gold." },
+    "guardian": { "name": "Guardian", "text": "The level's guardian. Win to gain an Artifact and a choice of blessings." }
+  },
+  "blessings": {
+    "might": { "name": "System's Might", "text": "The character deals 15% more damage." },
+    "stone-skin": { "name": "Stone Skin", "text": "The character's armour grows by 15%." },
+    "keen-eye": { "name": "Keen Eye", "text": "The character's chance of a critical hit grows by 8 percentage points." },
+    "breath": { "name": "Breath of the Labyrinth", "text": "After every won fight, every fighter still standing regains 10% of max HP." },
+    "first-blood": { "name": "First Blood", "text": "The character's first blow that lands in each fight is critical." },
+    "vigour": { "name": "Vigour", "text": "The character's max HP grows by 20%." },
+    "shoulder": { "name": "Shoulder to Shoulder", "text": "Companions deal 20% more damage." },
+    "ward": { "name": "System Ward", "text": "At the start of every fight the character has a ward of 12% of max HP." },
+    "light-step": { "name": "Light Step", "text": "The character acts 10% faster." },
+    "mist": { "name": "Mist", "text": "The character's chance to dodge grows by 6 percentage points." },
+    "common-cause": { "name": "Common Cause", "text": "Every fighter deals 8% more damage and has 8% more armour." },
+    "blood-tithe": { "name": "Blood Tithe", "text": "8% of the damage the character deals comes back to it as HP." },
+    "care": { "name": "Care", "text": "Companions have 20% more max HP and 15% more armour." }
+  },
+  "texts": {
+    "fightStart": ["Waiting in the chamber: {enemies}.", "The chamber's doors close. Foes: {enemies}.", "Out of the Labyrinth's dark come: {enemies}."],
+    "eliteStart": ["The chamber falls silent. Labyrinth elite: {enemies}.", "The flagstones tremble. Labyrinth elite: {enemies}."],
+    "guardianStart": ["The level's guardian steps out of the dark: {enemies}.", "The whole level goes quiet. The guardian comes: {enemies}."],
+    "won": ["Chamber conquered."],
+    "lost": ["The chamber was not conquered. The Labyrinth ends for today."],
+    "defeat": ["The System leads {target} out of the Labyrinth.", "Fight lost. The System leads {target} out of the Labyrinth."],
+    "shards": ["Core Shards: +{shards}."],
+    "gold": ["+{gold} gold."],
+    "artifact": ["The guardian leaves an Artifact: {artifact}. It waits in the Core Cache."],
+    "treasure": ["In the System chest: {gold} gold and Core Shards: {shards}."],
+    "spring": ["The spring heals every fighter: +{heal}% of max HP."],
+    "levelCleared": ["{level} conquered."],
+    "hellOpen": ["The Hellish level opens: creatures twice as strong as on level 3."],
+    "dayDone": ["The Labyrinth conquered to its end. A new one at midnight."],
+    "coreOpen": ["The Core opens. You absorb Artifacts in the Character tab, in the Core."],
+    "towerArtifact": ["The Tower's champion leaves an Artifact: {artifact}. It waits in the Core Cache."]
+  },
+  "core": {
+    "sizes": {
+      "small": { "name": "Small" },
+      "medium": { "name": "Medium" },
+      "large": { "name": "Large" }
+    },
+    "traits": {
+      "damage": { "name": "Damage", "text": "+{value}% damage" },
+      "main-stat": { "name": "Main stat", "text": "+{value}% of the class's main stat" },
+      "armor": { "name": "Armour", "text": "+{value}% armour" },
+      "endurance": { "name": "Endurance", "text": "+{value}% Endurance" },
+      "hp": { "name": "HP", "text": "+{value}% max HP" },
+      "vitality": { "name": "Vitality", "text": "+{value}% Vitality" },
+      "recovery": { "name": "Healing after a fight", "text": "+{value}% of the missing HP back after a won exploration fight" },
+      "resist": { "name": "Resistances", "text": "+{value}% elemental resistances" },
+      "dodge": { "name": "Dodge", "text": "+{value}% dodge" },
+      "will": { "name": "Will", "text": "+{value}% effect resistance" },
+      "speed": { "name": "Speed", "text": "+{value}% speed" },
+      "crit": { "name": "Critical", "text": "+{value}% critical hit chance" },
+      "lifesteal": { "name": "Lifesteal", "text": "{value}% of the damage dealt comes back as HP" },
+      "perception": { "name": "Perception", "text": "+{value}% Perception" },
+      "mana": { "name": "Mana", "text": "+{value}% max mana" },
+      "wisdom": { "name": "Wisdom", "text": "+{value}% Wisdom" }
+    },
+    "elements": {
+      "fire": { "name": "Fire Artifact" },
+      "frost": { "name": "Frost Artifact" },
+      "water": { "name": "Water Artifact" },
+      "lightning": { "name": "Lightning Artifact" },
+      "earth": { "name": "Earth Artifact" },
+      "nature": { "name": "Nature Artifact" },
+      "poison": { "name": "Poison Artifact" },
+      "sacred": { "name": "Sacred Artifact" }
+    },
+    "abilities": {
+      "sure-first": { "name": "Sure Strike", "text": "The character's first blow in a fight always lands." },
+      "first-strike": { "name": "First Move", "text": "The character moves first in a fight." },
+      "opening-crit": { "name": "Core Edge", "text": "The character's first blow that lands is critical." },
+      "shield": { "name": "Core Ward", "text": "At the start of a fight the character has a ward of {value}% of max HP." },
+      "rally": { "name": "Second Wind", "text": "Once a fight, when the character's HP falls below {below}% of max HP, it regains {value}% of max HP." }
+    },
+    "texts": {
+      "name": ["{size} {name}"],
+      "resonance": ["Resonance {tier}: {bonus}"]
+    }
+  }
+}

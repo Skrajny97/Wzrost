@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "wrangler d1 migrations apply DB --local && wrangler dev --var TEST_LOGINS: --var PROFESSIONS:on --var CRAFTING:on --var EVOLUTIONS:on --var ENGLISH:on --var GUILD_WARS:on --var FAKE_TRANSLATOR:on",
+    "dev": "wrangler d1 migrations apply DB --local && wrangler dev --var TEST_LOGINS: --var PROFESSIONS:on --var CRAFTING:on --var EVOLUTIONS:on --var ENGLISH:on --var GUILD_WARS:on --var FAKE_TRANSLATOR:on --var LABYRINTH:on",
     "test": "node --test --test-reporter=spec 'test/**/*.test.js'",
     "validate": "node tools/validate-data.mjs",
     "typecheck": "tsc -p tsconfig.json",

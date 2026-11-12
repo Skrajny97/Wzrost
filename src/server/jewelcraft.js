@@ -25,7 +25,8 @@ import {
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { content } from './content.js';
-import { characterView, currentHp, loadPlayer, questsNow, requireNotExploring, requireWorker, workOf } from './characters.js';
+import { characterView, coreOf, currentHp, loadPlayer, questsNow, requireNotExploring, requireWorker, workOf } from './characters.js';
+import { labyrinthOn } from './features.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
@@ -65,6 +66,9 @@ function jewelOrder(player, level, body) {
 // character's and the Awatar's, the later would break the earlier's gem
 // without asking (the code review of 3.11.2026).
 function settingOrder(player, level, body, now) {
+  // The Rdzeń takes one gem as any item does (863 A), where the Labirynt is
+  // on and the Rdzeń is open.
+  if (body.itemId === 'core') return coreSettingOrder(player, level, body, now);
   const item = player.items.find((candidate) => candidate.id === body.itemId);
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz tego przedmiotu.');
   if (item.equippedSlot) requireNotExploring(player, now);
@@ -79,6 +83,22 @@ function settingOrder(player, level, body, now) {
   if (gem.level > level) throw new ApiError(403, 'locked', say(content().jewelcrafting.texts, 'hidden', 0, { level: gem.level }));
   if (item.gem === gem.id) throw new ApiError(409, 'same_gem', `${gem.name} już tkwi w tym przedmiocie.`);
   return { cost: { [gem.id]: 1 }, minutes: setMinutes(gem.id, level, content()), options: { set: true, item: item.id, itemName: itemName(item, content()), gem: gem.id } };
+}
+
+// A gem set in the Rdzeń: as in a worn item, it waits for the character's
+// return from an exploration, as the Rdzeń counts in its fights, and one
+// setting of it at a time.
+function coreSettingOrder(player, level, body, now) {
+  if (!labyrinthOn() || !coreOf(player.row).open) throw new ApiError(404, 'item_not_found', 'Nie masz tego przedmiotu.');
+  requireNotExploring(player, now);
+  const setting = [player.activity, player.avatarActivity].some((work) => work?.kind === 'jewels' && JSON.parse(work.options ?? '{}').core === true);
+  if (setting) throw new ApiError(409, 'setting_under_way', 'W Rdzeniu trwa już oprawianie kamienia.');
+  const gem = typeof body.gem === 'string' ? content().mineralsById[body.gem] : undefined;
+  if (!gem || gem.kind !== 'gem') throw new ApiError(400, 'unknown_gem', 'Nie ma takiego kamienia.');
+  if (gem.level > level) throw new ApiError(403, 'locked', say(content().jewelcrafting.texts, 'hidden', 0, { level: gem.level }));
+  if (coreOf(player.row).gem === gem.id) throw new ApiError(409, 'same_gem', `${gem.name} już tkwi w Rdzeniu.`);
+  const name = content().slotsById.core?.name ?? 'Rdzeń';
+  return { cost: { [gem.id]: 1 }, minutes: setMinutes(gem.id, level, content()), options: { set: true, core: true, itemName: name, gem: gem.id } };
 }
 
 // A work in the Szlifiernia from now on: an order of jewels, or with `set`
@@ -167,6 +187,23 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
   const known = (amounts) => Object.fromEntries(Object.entries(amounts ?? {}).filter(([id]) => content().mineralsById[id]));
   const taken = known(options.minerals);
 
+  if (options.set && options.core) {
+    const gem = content().mineralsById[options.gem];
+    if (stop || !gem || !labyrinthOn() || !coreOf(row).open) return giveBack(taken);
+    // The Rdzeń takes its gem only once the character is back from an
+    // exploration and its report is claimed, as a worn item does.
+    if (['hunt', 'mercenary'].includes(player.activity?.kind)) {
+      throw new ApiError(
+        409,
+        'item_worn_exploring',
+        player.activity.kind === 'mercenary'
+          ? 'Kamień trafi do Rdzenia, gdy postać skończy usługę najemną albo zdejmie ogłoszenie.'
+          : 'Kamień trafi do Rdzenia, gdy postać wróci z wyprawy i odbierze jej raport.',
+      );
+    }
+    return saveReport({}, { set: { gem: gem.id, core: true, replaced: coreOf(row).gem } }, activity.minutes, null);
+  }
+
   if (options.set) {
     const gem = content().mineralsById[options.gem];
     if (stop || !gem) return giveBack(taken);
@@ -244,7 +281,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
       placeName: report.placeName,
       minutes: report.minutes,
       ...(report.set
-        ? { set: { gem: report.set.gem.name, item: report.set.item?.name ?? null } }
+        ? { set: { gem: report.set.gem.name, item: report.set.core ? options.itemName : (report.set.item?.name ?? null) } }
         : { items: report.items.length > 0 ? [{ name: report.base.name, count: report.items.length }] : [], failed: report.failed }),
       xp,
       professionName: profession.name,
@@ -275,6 +312,8 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
           .bind(row.quests, quests, ...sets.binds, ...minerals.binds, row.id, row.id, activity.started_at),
         // The gem goes into the item as it is now, so an upgrade meanwhile stays.
         ...(item ? [db.prepare("UPDATE items SET data = json_set(data, '$.gem', ?) WHERE id = ? AND character_id = ?").bind(made.set.gem, item.id, row.id)] : []),
+        // Or into the Rdzeń, the gem before it gone (core.js).
+        ...(made.set?.core ? [db.prepare("UPDATE characters SET core = json_set(core, '$.gem', ?) WHERE id = ?").bind(made.set.gem, row.id)] : []),
         // The jewels made wait in the Przechowalnia, out of the bag (842).
         ...jewels.map((jewel) => store.bind(row.id, JSON.stringify(jewel), now)),
         // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.

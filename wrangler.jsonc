@@ -166,6 +166,10 @@
         // The guild wars (src/server/guild-wars.js, 792–800), only here for
         // now, with "Test wojny" in the Wojna tab (TUTORIAL_TESTS).
         "GUILD_WARS": "on",
+        // The Labirynt Systemu and the Rdzeń with its Artefakty
+        // (src/server/labyrinth.js, src/server/core.js; 850–866), only here
+        // until the author has seen them; absent above, so off in the game.
+        "LABYRINTH": "on",
         // The payments for Punkty Systemu: off until the Autopay test
         // account's keys are in the GitHub secrets (AUTOPAY_TEST_SERVICE_ID,
         // AUTOPAY_TEST_SHARED_KEY), then "autopay" with Autopay's test

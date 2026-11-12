@@ -34,6 +34,7 @@ let weeks = false;
 let guildWars = false;
 let payments = '';
 let paymentsForAuthors = false;
+let labyrinth = false;
 
 export function readFeatures(env) {
   professions = env.PROFESSIONS === 'on';
@@ -50,6 +51,7 @@ export function readFeatures(env) {
   guildWars = env.GUILD_WARS === 'on';
   payments = typeof env.PAYMENTS === 'string' ? env.PAYMENTS.trim() : '';
   paymentsForAuthors = env.PAYMENTS_FOR === 'authors';
+  labyrinth = env.LABYRINTH === 'on';
 }
 
 export const professionsOn = () => professions;
@@ -88,6 +90,12 @@ export const paymentsProvider = () => payments;
 // (author.js), as the first, real purchase is tried before the players get
 // them (the author, 11.11.2026: no test environment).
 export const paymentsOnlyForAuthors = () => paymentsForAuthors;
+// The Labirynt Systemu and the Rdzeń with its Artefakty (labyrinth.js,
+// core.js; 850–866), only where LABYRINTH is "on": locally and on the test
+// version first. Off, nothing of them shows: not the Labirynt's part of the
+// Walka, its unlock and System message, the Rdzeń's tab, the Artefakty of
+// the Wieże's champions nor the routes, which answer "not found".
+export const labyrinthOn = () => labyrinth;
 // A camp building of the Osada's (Kwatery, `settlement` in buildings.json)
 // stands only where the Osada is on, and one of the Warownia's (`fortress`)
 // only where the Warownia is; the others everywhere.
