@@ -1,6 +1,8 @@
 // Rzemieślnictwo in the Systemowy Warsztat (src/engine/workshop.js): an
-// order of as many items of one pattern and rarity as fit in maxMinutes of
-// work (mostItems, at least one) takes its parts
+// order of as many items of one pattern and rarity as the parts, the
+// resources and the bag allow, with no cap on their number or time (the
+// author, 12.11.2026: "Zrób warsztat i szlifiernie zalezna od czesci i
+// materialow po prostu", "bez ograniczeń czasowych"), takes its parts
 // and the camp's resources at the start, and its report brings the items
 // made into the bag, the parts of the failed ones lost and their resources
 // back. Called back early, the character brings the items done and gets
@@ -16,9 +18,7 @@ import {
   craftCost,
   craftItems,
   craftRarities,
-  itemMinutes,
   knowsPattern,
-  mostItems,
   orderMinutes,
   partExchangeBlock,
   partSource,
@@ -27,7 +27,6 @@ import {
   professionState,
   professionUnlockLevel,
   scrollCost,
-  scrollMinutes,
   scrollOrderMinutes,
   settleCrafting,
   workshopReport,
@@ -65,13 +64,9 @@ export async function startCrafting(context) {
     throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content())}.`);
   }
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), workshop.profession);
-  // As many as fit in maxMinutes of work (the order's `most`), at least one.
-  const count = Number.isInteger(body.count) && body.count >= 1 ? body.count : 0;
-  const order =
-    body.scroll === true || body.scroll === 'steady'
-      ? scrollOrder(player.row, level, Math.max(1, count), body.scroll === 'steady')
-      : itemOrder(player.row, level, { ...body, count: Math.max(1, count) });
-  if (count === 0 || count > order.most) throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${order.most} sztuk.`);
+  // As many as the parts, the resources and the bag allow (checked below).
+  if (!Number.isSafeInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Wybierz co najmniej 1 sztukę.');
+  const order = body.scroll === true || body.scroll === 'steady' ? scrollOrder(player.row, level, body.count, body.scroll === 'steady') : itemOrder(player.row, level, body);
   const { cost } = order;
 
   const now = context.now;
@@ -167,11 +162,9 @@ function itemOrder(row, level, body) {
   const rarity = craftRarities(level, content()).find((candidate) => candidate.id === body.rarity);
   if (!rarity) throw new ApiError(400, 'unknown_rarity', 'Tej rzadkości jeszcze nie wykonasz.');
   const luck = perkOf(row, 'workshopLuck');
-  const faster = perkOf(row, 'workshopFaster');
   return {
     cost: craftCost(base, rarity.id, body.count, row.level, content()),
-    minutes: orderMinutes(body.count, rarity.id, level, content(), faster),
-    most: mostItems(itemMinutes(rarity.id, level, content(), faster), content().workshop.maxMinutes),
+    minutes: orderMinutes(body.count, rarity.id, level, content(), perkOf(row, 'workshopFaster')),
     room: true,
     options: { base: base.id, rarity: rarity.id, level: row.level, ...(luck > 0 && { luck }) },
   };
@@ -183,11 +176,9 @@ function scrollOrder(row, level, count, steady = false) {
   const { texts } = content().workshop;
   const scroll = steady ? content().workshop.steadyScroll : content().workshop.scroll;
   if (level < scroll.level) throw new ApiError(403, 'locked', say(texts, 'hidden', 0, { level: scroll.level }));
-  const faster = perkOf(row, 'workshopFaster');
   return {
     cost: { ...scrollCost(count, content(), scroll), resources: {} },
-    minutes: scrollOrderMinutes(count, level, content(), faster, scroll),
-    most: mostItems(scrollMinutes(level, content(), faster, scroll), content().workshop.maxMinutes),
+    minutes: scrollOrderMinutes(count, level, content(), perkOf(row, 'workshopFaster'), scroll),
     room: false,
     options: { scroll: steady ? 'steady' : true },
   };

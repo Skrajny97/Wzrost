@@ -362,7 +362,8 @@ describe('the Warsztat through the API', () => {
   test('the Warsztat shows the slots with their patterns, what one item takes, and the rarities', async () => {
     const { workshop } = (await character()).professions;
     assert.equal(workshop.place.name, 'Systemowy Warsztat');
-    assert.equal(workshop.maxCount, 5);
+    // No cap of its own on an order (the author, 12.11.2026).
+    assert.equal('maxCount' in workshop, false);
     assert.deepEqual(workshop.slots.map((slot) => slot.name), ['Broń', 'Pancerz', 'Druga ręka', 'Hełm', 'Rękawice', 'Buty']);
     const [sword, broadsword] = workshop.slots[0].patterns;
     assert.deepEqual(sword, {
@@ -386,13 +387,27 @@ describe('the Warsztat through the API', () => {
     assert.equal(rare.hint, 'Ukryte przez System do 5. poziomu Rzemieślnictwa.');
   });
 
+  test('an order has as many items as the parts, the resources and the bag allow, however long it takes', async () => {
+    // The author, 12.11.2026: "Zrób warsztat i szlifiernie zalezna od czesci
+    // i materialow po prostu", "bez ograniczeń czasowych". Before, 5 items
+    // at most, 2.5 h at the profession's first level.
+    await set(`parts = '{"scraps":140}', resources = '{"stone":360,"iron-ore":120}'`);
+    const started = await craft({ baseId: 'sword', rarity: 'common', count: 20 });
+    assert.equal(started.status, 201, JSON.stringify(started.data));
+    assert.deepEqual([started.data.character.activity.count, started.data.character.activity.minutes], [20, 600]);
+    assert.deepEqual(parts(started.data.character), {});
+    await call('POST', '/api/hunts/cancel', { cookie });
+    // One more than the parts allow is refused by the parts alone.
+    assert.equal((await craft({ baseId: 'sword', rarity: 'common', count: 21 })).data.error.code, 'no_parts');
+  });
+
   test('an order checks the pattern, the rarity, the count, the parts, the resources and the bag, and takes it all at the start', async () => {
     const error = async (body) => (await craft(body)).data.error?.code;
     assert.equal(await error({ baseId: 'broadsword', rarity: 'common', count: 1 }), 'unknown_pattern');
     assert.equal(await error({ baseId: 'ring', rarity: 'common', count: 1 }), 'unknown_pattern');
     assert.equal(await error({ baseId: 'sword', rarity: 'rare', count: 1 }), 'unknown_rarity');
     assert.equal(await error({ baseId: 'sword', rarity: 'common', count: 0 }), 'invalid_count');
-    assert.equal(await error({ baseId: 'sword', rarity: 'common', count: 6 }), 'invalid_count');
+    assert.equal(await error({ baseId: 'sword', rarity: 'common', count: 1.5 }), 'invalid_count');
     assert.equal((await craft({ baseId: 'sword', rarity: 'common', count: 1 })).data.error === undefined, true);
     await call('POST', '/api/hunts/cancel', { cookie });
     await set(`parts = '{"scraps":5}'`);

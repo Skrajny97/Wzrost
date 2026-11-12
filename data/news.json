@@ -660,6 +660,11 @@
       "id": "0.2.80",
       "title": "Wersja 0.2.80",
       "body": "- Nazwa konta: w Ustawieniach ustawisz nazwę, którą czat pokaże przed imieniem postaci, np. „Wędrowiec (Radomira)”. Jest wspólna dla wszystkich postaci na koncie i zmienisz ją najwyżej raz na 30 dni.\n- Zmiana adresu e-mail wymaga teraz obecnego hasła.\n- Po zmianie hasła telefony konta przestają dostawać powiadomienia, dopóki gra się na nich nie otworzy.\n- Imię postaci ani nazwa konta nie może już wyglądać jak cudze dzięki podobnym znakom, np. cyfrze 0 zamiast litery o."
+    },
+    {
+      "id": "0.2.81",
+      "title": "Wersja 0.2.81",
+      "body": "- Warsztat i Szlifiernia bez limitu 5 sztuk i bez limitu czasu: zlecisz tyle sztuk, na ile starczy części, materiałów i miejsca w plecaku. Na przykład 20 pospolitych mieczy na 1. poziomie Rzemieślnictwa to 10 godzin pracy."
     }
   ]
 }

@@ -150,24 +150,6 @@ const wholeMinutes = (minutes) => Math.ceil(Math.round(minutes * 1000) / 1000);
  */
 export const orderMinutes = (count, rarityId, level, content, faster = 0) => wholeMinutes(count * itemMinutes(rarityId, level, content, faster));
 
-// The most items an order may have: as many as fit in `maxMinutes` of work
-// (the Warsztat's, or the Szlifiernia's for jewels), and always one (the
-// author, 12.11.2026: "Zrób tak by na 1 poziomie profesji dało się odpalić
-// juz 8h robienia. Niech te liczby nie beda zwiazane z iloscia przedmiotow,
-// tylko ilosc przedmiotow zalezna od czasu (i materiałów)"). `each`: the
-// minutes of one item, scroll or jewel (itemMinutes, scrollMinutes,
-// jewelMinutes). The parts, the resources and the bag allow fewer, if so.
-/**
- * @param {number} each
- * @param {number} maxMinutes
- * @returns {number}
- */
-export function mostItems(each, maxMinutes) {
-  let count = Math.max(1, Math.floor(Math.round((maxMinutes / each) * 1000) / 1000));
-  while (count > 1 && wholeMinutes(count * each) > maxMinutes) count -= 1;
-  return count;
-}
-
 // The minutes of one scroll for the Kowadło at a level, and of an order of
 // `count`, as faster with the Bractwo Kowali as the items: the Zwój
 // ochronny, or the one given (`scroll`, e.g. the Zwój utrwalenia).
