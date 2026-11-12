@@ -1,3 +1,4 @@
+// @ts-check
 // Events at the end of an exploration (data/events.json): someone met on
 // the way back, a short text and a few options, and what follows, told in
 // the report (the author: "zdarzenia na koniec wyprawy: wyświetla się nagle
@@ -35,6 +36,19 @@ import { createRng } from './rng.js';
 import { say, word } from './text.js';
 import { weekChance, weekFactor, weekFighter } from './weeks.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {Record<string, any>} GameEvent An event of data/events.json. */
+/** @typedef {Record<string, any>} Option An option of an event or of a further choice. */
+/** @typedef {Record<string, any>} Outcome What an option leads to. */
+/** @typedef {Record<string, any>} Case A case behind an event. */
+/** @typedef {Record<string, any>} Hunt An exploration as simulateHunt gives it. */
+/** @typedef {Record<string, any>} Area An inner region (content.areas). */
+/** @typedef {Record<string, any>} Mate A companion of the exploration: { id, name, appearance, classId, story, relation, errand, fainted }. */
+/** @typedef {{ classId: string, level: number, purse: number }} Who The character choosing: its class, level and purse. */
+/** @typedef {{ option: Option, outcome: Outcome, key: string }} Step A choice made and what it led to. */
+/** @typedef {{ chosen: Case | null, steps: Step[], options: Option[] | null }} Walk The choices made so far and the options now. */
+/** @typedef {import('./rng.js').Rng} Rng */
+
 // The chance an exploration of `minutes` that ended as planned brings an
 // event: `chance` at fullChanceMinutes and a share of it below, so a very
 // short exploration brings no more events an hour than one of
@@ -44,6 +58,11 @@ import { weekChance, weekFactor, weekFighter } from './weeks.js';
 // 20%"), the same step at each doubling of the time: 10% at half an hour,
 // 13.3% at an hour, 16.7% at two, 20% at four. An hour of a long
 // exploration still brings fewer events than an hour of short ones.
+/**
+ * @param {Content} content
+ * @param {number} [minutes]
+ * @returns {number}
+ */
 export function eventChance(content, minutes = content.events.fullChanceMinutes) {
   const { chance, fullChanceMinutes, longChance, longChanceMinutes } = content.events;
   if (minutes <= fullChanceMinutes) return chance * (minutes / fullChanceMinutes);
@@ -62,9 +81,16 @@ export function eventChance(content, minutes = content.events.fullChanceMinutes)
 // comes only where `drafts` are on (the test version), and an event of the
 // Osada (`settlement`: the merchant who pays in the Kompania Kupców'
 // reputation) only where the Osada is open.
+/**
+ * @param {string} areaId
+ * @param {boolean} drafts
+ * @param {Content} content
+ * @param {boolean} [settlement]
+ * @returns {GameEvent[]}
+ */
 export const eventsIn = (areaId, drafts, content, settlement = false) =>
   content.events.list.filter(
-    (event) =>
+    (/** @type {GameEvent} */ event) =>
       (drafts || !event.draft) &&
       (settlement || !event.settlement) &&
       (!event.areas || event.areas.includes(areaId)) &&
@@ -77,9 +103,14 @@ export const eventsIn = (areaId, drafts, content, settlement = false) =>
 // in any region, still only after an exploration that ended as planned.
 // A companion's errand (`companion`, 817.7) comes only with a companion
 // who can have it (errandMates).
+/**
+ * @param {{ hunt: Hunt, seed: string, first?: boolean, quick?: boolean, forced?: string | null, drafts?: boolean, settlement?: boolean, mates?: Mate[] }} exploration
+ * @param {Content} content
+ * @returns {GameEvent | null}
+ */
 export function eventFor({ hunt, seed, first = false, quick = false, forced = null, drafts = false, settlement = false, mates = [] }, content) {
   if (!content.events || first || quick || hunt.result !== 'success') return null;
-  const withMate = (event) => !event.companion || errandMates(event, mates).length > 0;
+  const withMate = (/** @type {GameEvent} */ event) => !event.companion || errandMates(event, mates).length > 0;
   if (forced) {
     const event = content.eventsById[forced];
     return event && (drafts || !event.draft) && (settlement || !event.settlement) && withMate(event) ? event : null;
@@ -96,11 +127,22 @@ export function eventFor({ hunt, seed, first = false, quick = false, forced = nu
 // points of relation or more, whose errand has not been settled yet (a
 // companion sent on alone or gone with settles it, one told to go on not).
 // `mates`: { id, name, appearance, classId, story, relation, errand, fainted }.
+/**
+ * @param {GameEvent} event
+ * @param {Mate[]} [mates]
+ * @returns {Mate[]}
+ */
 export const errandMates = (event, mates = []) =>
   event.companion ? mates.filter((mate) => !mate.fainted && (mate.relation ?? 0) >= event.companion.minRelation && !mate.errand) : [];
 
 // The companion an errand comes with, drawn from the exploration's seed, or
 // null for an event of no companion.
+/**
+ * @param {GameEvent} event
+ * @param {string} seed
+ * @param {Mate[]} [mates]
+ * @returns {Mate | null}
+ */
 export function eventMate(event, seed, mates = []) {
   const open = errandMates(event, mates);
   return open.length > 0 ? createRng(`${seed}:event:mate`).pick(open) : null;
@@ -108,19 +150,35 @@ export function eventMate(event, seed, mates = []) {
 
 // A text of a companion's errand in its words: {name} its name, [a|b] the
 // form for her and for him.
+/**
+ * @param {string} text
+ * @param {Mate | null} mate
+ * @returns {string}
+ */
 const personal = (text, mate) => (mate && typeof text === 'string' ? gendered(text.replaceAll('{name}', mate.name), mate.appearance) : text);
 
 // An option's price in gold (`goldPerLevel` for each level of the
 // character: the beggar's coins, the leshy's bread and coins), paid from the
 // purse, the character's gold with the exploration's.
+/**
+ * @param {Option} option
+ * @param {number} level
+ * @returns {number}
+ */
 export const optionCost = (option, level) => (option.goldPerLevel ? Math.round(option.goldPerLevel * level) : 0);
 
 // Why the character cannot take an option, or null: one of `classes` only
 // (the exorcism, the Kleryk's and its evolutions'; the others see it greyed
 // out, question 223 B), or a price above the purse.
+/**
+ * @param {Option} option
+ * @param {Who} who
+ * @param {Content} content
+ * @returns {{ code: string, text: string } | null}
+ */
 export function optionLock(option, { classId, level, purse }, content) {
   if (option.classes && !option.classes.includes(classId)) {
-    const classes = option.classes.map((id) => content.classesById[id].name).join(word(content, ' i '));
+    const classes = option.classes.map((/** @type {string} */ id) => content.classesById[id].name).join(word(content, ' i '));
     return { code: 'class_only', text: word(content, 'tylko {classes}', { classes }) };
   }
   if (optionCost(option, level) > purse) return { code: 'not_enough_gold', text: word(content, 'za mało złota') };
@@ -128,10 +186,21 @@ export function optionLock(option, { classId, level, purse }, content) {
 }
 
 // What the options of a path cost together, at the character's level.
+/**
+ * @param {Step[]} steps
+ * @param {number} level
+ * @returns {number}
+ */
 export const pathCost = (steps, level) => steps.reduce((sum, step) => sum + optionCost(step.option, level), 0);
 
 // The choices made so far as the player reads them: each option and what it
 // led to, its price so far as {cost}.
+/**
+ * @param {Step[]} steps
+ * @param {number} level
+ * @param {Mate | null} [mate]
+ * @returns {{ label: string, text: string }[]}
+ */
 const stepsView = (steps, level, mate = null) =>
   steps.map((step, index) => ({
     label: personal(step.option.label, mate),
@@ -148,6 +217,14 @@ const stepsView = (steps, level, mate = null) =>
 // purse.
 // A companion's errand (`mate`, eventMate) tells its story's title and text
 // in the companion's words, and shows the companion instead of a figure.
+/**
+ * @param {GameEvent} event
+ * @param {Area | null} [area]
+ * @param {Who | null} [who]
+ * @param {Content | null} [content]
+ * @param {Walk | null} [walk]
+ * @param {Mate | null} [mate]
+ */
 export const eventView = (event, area = null, who = null, content = null, walk = null, mate = null) => {
   const level = who?.level ?? 1;
   const spent = walk && who ? pathCost(walk.steps, level) : 0;
@@ -160,9 +237,9 @@ export const eventView = (event, area = null, who = null, content = null, walk =
     ...(event.scene === 'land' && { land: area?.regionId ?? null }),
     figure: event.figure,
     text: personal(story?.text ?? event.text, mate),
-    ...(story && { companion: { id: mate.id, name: mate.name, classId: mate.classId, appearance: mate.appearance } }),
-    ...(walk?.steps.length > 0 && { steps: stepsView(walk.steps, level, mate) }),
-    options: (walk?.options ?? event.options).map((option) => {
+    ...(story && mate && { companion: { id: mate.id, name: mate.name, classId: mate.classId, appearance: mate.appearance } }),
+    ...(walk && walk.steps.length > 0 && { steps: stepsView(walk.steps, level, mate) }),
+    options: (walk?.options ?? event.options).map((/** @type {Option} */ option) => {
       const cost = who ? optionCost(option, who.level) : 0;
       const lock = who && content ? optionLock(option, { ...who, purse: who.purse - spent }, content) : null;
       return { id: option.id, label: personal(option.label, mate), ...(cost > 0 && { cost }), ...(lock && { locked: lock.text }) };
@@ -177,22 +254,37 @@ export const eventView = (event, area = null, who = null, content = null, walk =
 // jednorazowo tylko, a reszta przypadków to będzie Topielica”) comes in it
 // the first time the character meets the event (`met`: the ids of the events
 // met before), and in one of the others after.
+/**
+ * @param {GameEvent} event
+ * @param {string} seed
+ * @param {string | null} [forced]
+ * @param {{ met?: string[], mate?: Mate | null }} [known]
+ * @returns {Case | null}
+ */
 export function eventCase(event, seed, forced = null, { met = [], mate = null } = {}) {
   if (!event.cases) return null;
-  if (forced) return event.cases.find((candidate) => candidate.id === forced) ?? null;
-  if (event.companion) return mate ? event.cases[mate.story % event.cases.length] : null;
+  /** @type {Case[]} */
+  const cases = event.cases;
+  if (forced) return cases.find((candidate) => candidate.id === forced) ?? null;
+  if (event.companion) return mate ? cases[mate.story % cases.length] : null;
   if (event.firstCase) {
-    if (!met.includes(event.id)) return event.cases.find((candidate) => candidate.id === event.firstCase) ?? null;
-    const rest = event.cases.filter((candidate) => candidate.id !== event.firstCase);
+    if (!met.includes(event.id)) return cases.find((candidate) => candidate.id === event.firstCase) ?? null;
+    const rest = cases.filter((candidate) => candidate.id !== event.firstCase);
     return createRng(`${seed}:event:case`).weighted(rest, (candidate) => candidate.weight);
   }
-  return createRng(`${seed}:event:case`).weighted(event.cases, (candidate) => candidate.weight);
+  return createRng(`${seed}:event:case`).weighted(cases, (candidate) => candidate.weight);
 }
 
 // What an option leads to: its outcome in the case, or its own; either may
 // be a list of outcomes, drawn from by weight. Further on, the case names
 // the outcome by the option's path (`key`, "lead/look"). A case's further
 // choice without options tells it its own way, with the option's options.
+/**
+ * @param {Option} option
+ * @param {Case | null} chosen
+ * @param {string} [key]
+ * @returns {Outcome | Outcome[]}
+ */
 export function eventOutcome(option, chosen, key = option.id) {
   const own = option.outcome;
   const found = chosen?.outcomes[key] ?? own;
@@ -205,9 +297,17 @@ export function eventOutcome(option, chosen, key = option.id) {
 // once it has ended (its last outcome is not a further choice). Null for a
 // path the event does not have. Each step's outcome of a list is drawn as
 // at the event's end (resolveEvent), the same each time.
+/**
+ * @param {GameEvent} event
+ * @param {string[]} path
+ * @param {{ seed: string, caseId?: string | null, endingId?: string | null, drafts?: boolean, met?: string[], mate?: Mate | null }} walk
+ * @returns {Walk | null}
+ */
 export function eventChoices(event, path, { seed, caseId = null, endingId = null, drafts = false, met = [], mate = null }) {
   const chosen = eventCase(event, seed, caseId, { met, mate });
+  /** @type {Option[] | null} */
   let options = event.options;
+  /** @type {Step[]} */
   const steps = [];
   for (const id of path) {
     const option = options?.find((candidate) => candidate.id === id);
@@ -223,8 +323,18 @@ export function eventChoices(event, path, { seed, caseId = null, endingId = null
 
 // Every outcome a case leads to (`chosen`, or none), further choices' too,
 // each list with all its outcomes.
+/**
+ * @param {GameEvent} event
+ * @param {Case | null} chosen
+ * @returns {Outcome[]}
+ */
 export function caseOutcomes(event, chosen) {
+  /** @type {Outcome[]} */
   const all = [];
+  /**
+   * @param {Option[]} options
+   * @param {string[]} prefix
+   */
   const walk = (options, prefix) => {
     for (const option of options) {
       const path = [...prefix, option.id];
@@ -239,17 +349,33 @@ export function caseOutcomes(event, chosen) {
 }
 
 // Every outcome of an event, in each of its cases.
-export const eventOutcomes = (event) => (event.cases ? event.cases.flatMap((one) => caseOutcomes(event, one)) : caseOutcomes(event, null));
+/**
+ * @param {GameEvent} event
+ * @returns {Outcome[]}
+ */
+export const eventOutcomes = (event) => (event.cases ? event.cases.flatMap((/** @type {Case} */ one) => caseOutcomes(event, one)) : caseOutcomes(event, null));
 
 // One outcome of a list: the one "Testuj zdarzenia" chose (`endingId`), or
 // one drawn by weight. A draft, an outcome the author has not approved yet,
 // is there only where `drafts` are on (the test version).
+/**
+ * @param {Outcome[]} list
+ * @param {{ endingId?: string | null, drafts?: boolean }} chosen
+ * @param {Rng} rng
+ * @returns {Outcome}
+ */
 function listOutcome(list, { endingId, drafts }, rng) {
   const open = list.filter((one) => drafts || !one.draft);
   return open.find((one) => one.id === endingId) ?? rng.weighted(open, (one) => one.weight);
 }
 
 // What an item found on an event may be, as for the exploration's finds.
+/**
+ * @param {Record<string, any>} character
+ * @param {Record<string, any>[]} equipped
+ * @param {Area} area
+ * @param {Content} content
+ */
 function lootRules(character, equipped, area, content) {
   const { otherClass } = content.balance.items;
   const otherClassShare = character.level >= otherClass.fromLevel ? otherClass.share : 0;
@@ -257,6 +383,11 @@ function lootRules(character, equipped, area, content) {
 }
 
 // Herbs the character's Zielarstwo knows, once it is open, or none.
+/**
+ * @param {Record<string, any>} character
+ * @param {Content} content
+ * @returns {Record<string, any>[]}
+ */
 function herbsKnown(character, content) {
   const profession = content.gathering && content.professionsById[content.gathering.profession];
   if (!profession || !professionOpen(profession, character.level, content)) return [];
@@ -264,6 +395,11 @@ function herbsKnown(character, content) {
 }
 
 // Resources lost, as "Drewno −12, Kamień −5".
+/**
+ * @param {Record<string, number>} lost
+ * @param {Content} content
+ * @returns {string}
+ */
 const resourceLoss = (lost, content) =>
   Object.entries(lost)
     .map(([id, count]) => `${content.resourcesById[id].name} −${count}`)
@@ -305,6 +441,11 @@ const resourceLoss = (lost, content) =>
 // on the way: its share of the foes' XP and gold, of the chance of their
 // item and of the character's stats; a reward with no fight gives just what
 // its text names ("+15 reputacji u Kompanii Kupców").
+/**
+ * @param {{ hunt: Hunt, event: GameEvent, optionId: string | string[], caseId?: string | null, endingId?: string | null, drafts?: boolean, character: Record<string, any>, equipped: Record<string, any>[], name: string, seed: string, purse?: number, rumor?: { areaId: string, monsterId: string } | null, companions?: Record<string, any>[], potions?: Record<string, number>, healBelow?: number, buffs?: Record<string, Record<string, any>>, trophies?: Record<string, number>, met?: string[], mate?: Mate | null }} input
+ * @param {Content} content
+ * @returns {Hunt}
+ */
 export function resolveEvent(
   {
     hunt,
@@ -333,7 +474,10 @@ export function resolveEvent(
   // event led to further choices (eventChoices).
   const path = [optionId].flat();
   const before = eventChoices(event, path.slice(0, -1), { seed, caseId, endingId, drafts, met, mate });
-  const option = before.options.find((candidate) => candidate.id === path.at(-1));
+  const option = before?.options?.find((candidate) => candidate.id === path.at(-1));
+  // The server takes only a path the event has (eventChoices), so this is
+  // never met there.
+  if (!before || !option) throw new Error(`No option ${path.join('/')} in the event ${event.id}.`);
   const chosen = before.chosen;
   const key = path.join('/');
   const t = hunt.minutes * 60000;
@@ -346,12 +490,16 @@ export function resolveEvent(
   const cost = outcome.free ? 0 : pathCost(before.steps, character.level) + optionCost(option, character.level);
   const spent = (hunt.spent ?? 0) + cost;
   // A companion's errand speaks of the companion (`mate`) in its words.
+  /**
+   * @param {string} text
+   * @param {Record<string, string | number>} [values]
+   */
   const fill = (text, values = {}) => personal(Object.entries({ cost, ...values }).reduce((done, [key, value]) => done.replaceAll(`{${key}}`, String(value)), text), mate);
   const steps = stepsView(before.steps, character.level, mate);
   const shown = eventView(event, area, null, null, null, mate);
   const label = personal(option.label, mate);
-  const tell = (text) => ({ t, type: 'event', text: `${shown.title}. ${[...steps.map((step) => `${step.label}: ${step.text}`), `${label}: ${text}`].join(' ')}` });
-  const view = (text) => ({
+  const tell = (/** @type {string} */ text) => ({ t, type: 'event', text: `${shown.title}. ${[...steps.map((step) => `${step.label}: ${step.text}`), `${label}: ${text}`].join(' ')}` });
+  const view = (/** @type {string} */ text) => ({
     ...shown,
     case: chosen?.id ?? null,
     ...(steps.length > 0 && { steps }),
@@ -363,12 +511,12 @@ export function resolveEvent(
   // the Osada (`relation`, points by resident), and for a companion's errand
   // the companion's relation (`companion.relation`: points, or "next", its
   // next standing at once) and its errand settled (`companion.errand`).
-  const ties = (gives) => ({
+  const ties = (/** @type {Record<string, any> | undefined} */ gives) => ({
     ...(gives?.relation && { relation: gives.relation }),
     ...(gives?.companion && mate && { companion: { id: mate.id, ...gives.companion } }),
   });
-  const goldOf = (times) => Math.round(content.balance.rewards.goldPerLevel * character.level * times * rng.float(0.75, 1.25));
-  const itemOf = (rarities) => {
+  const goldOf = (/** @type {number} */ times) => Math.round(content.balance.rewards.goldPerLevel * character.level * times * rng.float(0.75, 1.25));
+  const itemOf = (/** @type {Record<string, number>} */ rarities) => {
     const [rarityId] = rng.weighted(Object.entries(rarities), ([, weight]) => weight);
     return randomItem(character.level, rng, content, { ...lootRules(character, equipped, area, content), rarityId });
   };
@@ -388,9 +536,11 @@ export function resolveEvent(
     const left = Math.max(0, purse + hunt.gold - spent);
     const cap = outcome.goldCapPerLevel ? outcome.goldCapPerLevel * character.level : Infinity;
     const gold = outcome.goldShare ? Math.min(left, Math.round(Math.min(left * outcome.goldShare, cap))) : 0;
+    /** @type {Record<string, number>} */
     const resources = {};
+    /** @type {Record<string, number>} */
     const lost = {};
-    for (const [id, amount] of Object.entries(hunt.resources ?? {})) {
+    for (const [id, amount] of /** @type {[string, number][]} */ (Object.entries(hunt.resources ?? {}))) {
       const taken = Math.round(amount * (outcome.resourcesShare ?? 0));
       if (taken > 0) lost[id] = taken;
       if (amount - taken > 0) resources[id] = amount - taken;
@@ -413,7 +563,9 @@ export function resolveEvent(
     const items = [...hunt.items];
     const item = outcome.itemRarities ? itemOf(outcome.itemRarities) : null;
     if (item) items.push(item);
+    /** @type {Record<string, number>} */
     const herbs = { ...hunt.herbs };
+    /** @type {Record<string, number>} */
     const given = { ...outcome.herbs };
     let told = outcome.text;
     if (outcome.herbsKnown) {
@@ -429,7 +581,7 @@ export function resolveEvent(
       }
     }
     for (const [id, count] of Object.entries(given)) herbs[id] = (herbs[id] ?? 0) + count;
-    const xp = outcome.xpFoes ? Math.round(outcome.xpFoes.reduce((sum, id) => sum + monsterXp(content.monstersById[id], character.level, content), 0) * (1 + content.balance.hunt.soloXpBonus)) : 0;
+    const xp = outcome.xpFoes ? Math.round(outcome.xpFoes.reduce((/** @type {number} */ sum, /** @type {string} */ id) => sum + monsterXp(content.monstersById[id], character.level, content), 0) * (1 + content.balance.hunt.soloXpBonus)) : 0;
     const heard = outcome.rumor ? rumor : null;
     if (outcome.rumor && !heard) told = outcome.noRumorText;
     const text = fill(told, {
@@ -472,14 +624,16 @@ export function resolveEvent(
   // (the author, 5.11.2026: "nie walczył w zdarzeniu to taki błąd"). With
   // them the foes grow as on the exploration; a character alone meets foes
   // with only a share of the late and end game's growth (438.3 A).
-  const ended = new Map((hunt.companions ?? []).map((one) => [one.id, one]));
+  /** @type {Map<string, Record<string, any>>} */
+  const ended = new Map((hunt.companions ?? []).map((/** @type {Record<string, any>} */ one) => [one.id, one]));
   const mates = companions.flatMap((companion, index) => {
     const end = ended.get(companion.id);
     if (!end || end.fainted || end.hpEnd <= 0) return [];
     return [{ id: companion.id, unit: companionCombatant(companion, { hp: end.hpEnd, area, id: `a${index + 1}` }, content) }];
   });
   const growth = mates.length > 0 ? {} : { growth: content.balance.monsters.soloGrowth };
-  const enemies = encounterCombatants({ members: outcome.foes.map((monsterId) => ({ monsterId, level: character.level })) }, content, growth);
+  /** @type {Record<string, any>[]} */
+  const enemies = encounterCombatants({ members: outcome.foes.map((/** @type {string} */ monsterId) => ({ monsterId, level: character.level })) }, content, growth);
   // The potions the character still carries of those taken along, its
   // strengthening potions still working (in their number of the first
   // fights) and its trophies work in the event's fight as on the way (the
@@ -487,10 +641,11 @@ export function resolveEvent(
   // ze zdarzeń").
   const left = Object.fromEntries(
     Object.entries(potions)
-      .map(([id, count]) => [id, count - (hunt.potionsUsed?.[id] ?? 0)])
+      .map(([id, count]) => /** @type {[string, number]} */ ([id, count - (hunt.potionsUsed?.[id] ?? 0)]))
       .filter(([, count]) => count > 0),
   );
   const kit = fightPotions(left, healBelow ?? content.potionUse?.healBelow, content);
+  /** @type {Record<string, number>} */
   const on = {};
   for (const [kind, window] of Object.entries(buffs)) {
     if (Number.isFinite(window.fights) ? hunt.fights.length < window.fights : t < window.ms) on[kind] = window.bonus;
@@ -500,20 +655,21 @@ export function resolveEvent(
   const armed = fightingPlayer({ unit: player, character: fighter, equipped, name, area, hp: hunt.hpEnd, on, kit, trophies }, content);
   const ally = { ...armed, ...(outcome.speedBonus && { speed: armed.speed * (1 + outcome.speedBonus) }) };
   const allies = [ally, ...mates.map((mate) => mate.unit)];
+  /** @type {Record<string, any>} */
   const fight = simulateFight({ allies, enemies, rng, content, record: true, trait: area.trait, ambush: outcome.ambush === true });
-  const hpOf = (unit) => Math.max(0, fight.units.find((one) => one.id === unit.id).hp);
+  const hpOf = (/** @type {Record<string, any>} */ unit) => Math.max(0, fight.units.find((/** @type {Record<string, any>} */ one) => one.id === unit.id).hp);
   // The potions drunk in it, and the fights of the strengthening ones.
   const potionsUsed = { ...(hunt.potionsUsed ?? {}) };
   for (const id of fight.drunk) potionsUsed[id] = (potionsUsed[id] ?? 0) + 1;
   const buffFights = { ...(hunt.buffFights ?? {}) };
   for (const kind of Object.keys(on)) buffFights[kind] = (buffFights[kind] ?? 0) + 1;
-  const companionsAfter = hunt.companions?.map((one) => {
+  const companionsAfter = hunt.companions?.map((/** @type {Record<string, any>} */ one) => {
     const mate = mates.find((candidate) => candidate.id === one.id);
     return mate ? { ...one, hpEnd: hpOf(mate.unit), fainted: hpOf(mate.unit) <= 0 } : one;
   });
   const index = hunt.fights.length;
   const hpBefore = hunt.hpEnd;
-  let hpNow = fight.units.find((unit) => unit.id === ally.id).hp;
+  let hpNow = fight.units.find((/** @type {Record<string, any>} */ unit) => unit.id === ally.id).hp;
   const summary = {
     index,
     t,
@@ -528,7 +684,7 @@ export function resolveEvent(
     xp: 0,
     gold: 0,
     materials: {},
-    chests: [],
+    chests: /** @type {number[]} */ ([]),
     recovered: 0,
     allies: allies.map((unit) => combatantView(unit, enemies[0].level, content)),
     enemiesView: enemies.map((enemy) => combatantView(enemy, ally.level, content)),
