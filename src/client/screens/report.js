@@ -144,7 +144,11 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
 
     fill(
       container,
-      // An entry to a Wieża (towers.js): its tower and floor, no length.
+      // A Drużyna's party event (party-events.js): its title and the land
+      // of the trip, no length.
+      report.partyEvent
+        ? heading(report.partyEvent.title, `${report.areaName ?? report.regionName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)
+        : // An entry to a Wieża (towers.js): its tower and floor, no length.
       report.tower
         ? heading(report.tower.name, t('Piętro {floor} · {area} · {date}', { floor: report.tower.floor, area: report.areaName, date: dateTimeFormat.format(new Date(report.endsAt)) }))
         : // An entry to a Portal Systemu (portals.js): its portal and stage.
@@ -389,8 +393,10 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       !below && summary.materials?.length > 0 && [t('Materiały'), capitalized(materialsText(summary.materials))],
       summary.timePoints > 0 && [t('Punkty Czasu'), `+${formatNumber(summary.timePoints)}`],
       // A Wieża's floor is one fight, and the tower keeps no HP (towers.js).
-      !report.tower && !below && [t('Walki'), formatNumber(summary.fights)],
-      !report.tower && !below && ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
+      // A party event has a fight only when its event had one, and HP only
+      // of a character at home (party-events.js).
+      !report.tower && !below && !(report.partyEvent && !summary.fights) && [t('Walki'), formatNumber(summary.fights)],
+      !report.tower && !below && summary.hpEnd !== null && ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
     ].filter(Boolean);
     const best = summary.bestFind;
     return h(
@@ -408,6 +414,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value }))),
         !lost &&
           !below &&
+          !report.partyEvent &&
           h(
             'div',
             { class: 'status-row' },

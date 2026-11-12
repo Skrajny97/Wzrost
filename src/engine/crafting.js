@@ -245,13 +245,26 @@ export function materialDrops(monsterId, level, weight, rng, content, trophy = n
     : countEvents(content.raritiesById[material.rarity].materialChance * weight, rng);
   const chances = rarityUpChances(level, content);
   for (let i = 0; i < count; i++) {
-    // One draw for each piece: under the first chance it is a rarity
-    // higher, under the second two, and so on.
-    const roll = rng.next();
-    const key = stackKey(material.id, raisedRarity(material.rarity, chances.filter((chance) => roll < chance).length, content));
+    const key = materialPiece(material, chances, rng, content);
     found[key] = (found[key] ?? 0) + 1;
   }
   return found;
+}
+
+// One piece of a material as a creature leaves it, by its stack key: one
+// draw against `chances` (rarityUpChances at the creature's level), under
+// the first a rarity higher than its species', under the second two, and so
+// on. Also a party event's materials (party-events.js).
+/**
+ * @param {Record<string, any>} material
+ * @param {number[]} chances
+ * @param {Rng} rng
+ * @param {Content} content
+ * @returns {string}
+ */
+export function materialPiece(material, chances, rng, content) {
+  const roll = rng.next();
+  return stackKey(material.id, raisedRarity(material.rarity, chances.filter((chance) => roll < chance).length, content));
 }
 
 // A stack as the report and the table show it. The name has the rarity only

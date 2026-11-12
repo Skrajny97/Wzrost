@@ -14,6 +14,8 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
+import { partyEventFor } from '../src/engine/index.js';
+import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
 function drużyna(vars) {
@@ -198,6 +200,10 @@ describe('a member whose exploration ends in an event', () => {
     const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
     assert.equal(went.status, 201, JSON.stringify(went.data).slice(0, 400));
     assert.deepEqual(went.data.went, ['Druh']);
+    // A trip's seed that brings no party event either (party-events.js),
+    // which would wait for its leader's choice.
+    const quiet = Array.from({ length: 100 }, (_, i) => `quiet-trip-${i}`).find((seed) => !partyEventFor({ hunt: { result: 'success', minutes: 5 }, seed }, content));
+    await (await sql("UPDATE activities SET options = json_set(options, '$.party.seed', ?) WHERE json_type(options, '$.party.roster') = 'array'", quiet)).run();
     await age('Lider', 5);
     await age('Druh', 5);
     // The leader's own claim brings its report, no event.

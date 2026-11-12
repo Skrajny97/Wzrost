@@ -5,6 +5,7 @@ import {
   addBuff,
   addQuestProgress,
   applyHunt,
+  boonLines,
   faintForfeit,
   areaDangers,
   areaFor,
@@ -63,6 +64,7 @@ import {
   taughtWords,
   threatSamples,
   unknownCreatures,
+  withBoon,
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { huntWait, mountStage } from '../engine/stable.js';
@@ -107,6 +109,7 @@ import { leaveTrip, tripOf } from './trips.js';
 import { finishCrafting } from './workshop.js';
 import { finishJewels } from './jewelcraft.js';
 import { finishMining } from './mining.js';
+import { applyPartyEvent, checkedChoice, leaderView, resolveAuto, resolvePartyRow, tripEvent, tripLine } from './party-events.js';
 import { wantedAfterHunt, wantedGoing, wantedOnTrip } from './wanted.js';
 import { keptWeek, weekNow } from './weeks.js';
 
@@ -328,13 +331,15 @@ export async function startHunt(context) {
 // drużyną"). `mount`: the stage of the Stajnia's mount the exploration goes
 // at, which the party code gives a Drużyna's trip. `hard`: a Trudna wyprawa
 // (629 A), from the challenge's level, on a plain "Wyrusz" only: its
-// creatures are stronger, for more XP and gold (simulateHunt).
+// creatures are stronger, for more XP and gold (simulateHunt). `haste`: the
+// share shorter a Drużyna's boon makes its trip's wait (party-events.js),
+// as a mount does.
 export async function beginHunt(
   db,
   player,
   { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, mercenary = null } = {},
   now,
-  { quick = false, flash = false, party: crew = null, partners = [], mount = null, follower = false, also = [], check = false } = {},
+  { quick = false, flash = false, party: crew = null, partners = [], mount = null, haste = 0, follower = false, also = [], check = false } = {},
 ) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
@@ -456,7 +461,7 @@ export async function beginHunt(
   // time for all who go: it takes the stage the party code gives (`mount`,
   // the slowest mount among them), and without one goes the full length.
   const stage = quick ? 0 : (mount ?? (crew ? 0 : mountStage(kept, content())));
-  const endsAt = startsAt + huntWait(minutes, stage, content());
+  const endsAt = startsAt + huntWait(minutes, stage, content(), haste);
 
   // A mercenary from the Karczma (mercenaries.js), on a plain "Wyrusz"
   // only: hired with the start, in its batch, its fee paid at once; it
@@ -633,10 +638,10 @@ export async function claimHunt(context) {
 // The claim of the activity that ended, as "Odbierz raport" makes it: a
 // profession's work by its own finish, an exploration by finishHunt (with
 // the option chosen in the event at its end, if one came). Also the claim
-// of a Drużyna's member as its party sets out (parties.js).
-export function finishActivity(db, player, now, { choice } = {}) {
+// of a Drużyna's member as its party sets out (parties.js, `forTrip`).
+export function finishActivity(db, player, now, { choice, forTrip = false } = {}) {
   const finish = { herbs: finishGathering, potions: finishBrewing, items: finishCrafting, minerals: finishMining, jewels: finishJewels }[player.activity?.kind];
-  return finish && player.activity.ends_at <= now ? finish(db, player, now) : finishHunt(db, player, now, { choice });
+  return finish && player.activity.ends_at <= now ? finish(db, player, now) : finishHunt(db, player, now, { choice, forTrip });
 }
 
 // The Osada after an exploration of `minutes`: each companion who went
@@ -709,8 +714,11 @@ function huntMates(stored, hunt, setOut = []) {
 // saved at its start, and the character gets what it brought. An event at
 // its end (events.js) comes first: without `choice` only the event is
 // returned ({ event }), and nothing is saved; with an option of it, the
-// exploration takes the option's outcome.
-export async function finishHunt(db, player, now, { choice } = {}) {
+// exploration takes the option's outcome. A Drużyna's trip's party event
+// (party-events.js) comes the same way to the trip's leader, unless its
+// report is claimed as the party sets out under another leader
+// (`forTrip`): then the event settles itself.
+export async function finishHunt(db, player, now, { choice, forTrip = false } = {}) {
   const activity = player.activity;
   if (!activity) throw new ApiError(409, 'no_activity', 'Postać nie jest na wyprawie.');
   if (activity.ends_at > now) throw new ApiError(409, 'not_finished', 'Wyprawa jeszcze trwa.');
@@ -780,6 +788,10 @@ export async function finishHunt(db, player, now, { choice } = {}) {
     },
     content(),
   );
+  // The party's boon the trip set out with (parties.js; a party event's,
+  // party-events.js): its share more of the trip's XP and gold, for each
+  // who went, before a faint takes them.
+  if (trip?.boon) hunt = withBoon(hunt, trip.boon);
   // "Testuj zdarzenia" (the test version) brings its event, and the case
   // and the ending chosen for it if any ("event:case:ending"), without the
   // draw.
@@ -811,6 +823,25 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const storedPath = event && Array.isArray(options.eventPath) ? options.eventPath : [];
   const before = event && (eventChoices(event, storedPath, walkOptions)?.options ? storedPath : []);
   if (event && choice === undefined) return { event: eventView(event, eventArea, who, content(), before.length > 0 ? eventChoices(event, before, walkOptions) : null, mate) };
+  // A trip that ended as planned may end in a party event instead (the
+  // author, 12.11.2026: „wygenerujmy specjalne drużynowe zdarzenia”;
+  // party-events.js), kept at the first claim of any member's report, the
+  // same for everyone who went. It waits for the trip's leader: without
+  // `choice` its claim returns only the event, and saves nothing more. Past
+  // its time, or claimed as the party sets out under another leader
+  // (`forTrip`), it settles itself with its `auto` option. The others choose
+  // nothing: their reports go on as ever, with a line about it.
+  let partyEvent = trip && eventsOn() ? await tripEvent(db, { row, activity, trip, hunt, area, now }) : null;
+  if (partyEvent && !partyEvent.choice && partyEvent.leader_id === row.id) {
+    // The bag as this claim leaves it, with the potions taken along and
+    // not drunk back: an option may give one away.
+    const bagPotions = potionsBack(row, options.reserved ? (options.potions ?? {}) : {}, hunt.potionsUsed);
+    const auto = forTrip || now >= partyEvent.auto_at;
+    if (!auto && choice === undefined) return { event: leaderView(partyEvent, area, bagPotions) };
+    partyEvent = auto
+      ? await resolveAuto(db, partyEvent, now)
+      : await resolvePartyRow(db, partyEvent, { optionId: checkedChoice(partyEvent, choice, bagPotions), chosenBy: 'leader', now });
+  }
   // Today's rumor, as the Karczma told it, or as the beggar's song may.
   const kept = rumorToday(JSON.parse(row.settlement ?? '{}').rumor, now, content());
   if (event) {
@@ -934,6 +965,11 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // Twoich minerałów”), and the report says so.
   const gemsBack = fallenGems(storedSold);
   if (Object.keys(gemsBack).length > 0) report.system = [...report.system, ...gemLines(gemsBack)];
+  // The trip's party event, in every member's report: waiting for the
+  // leader, or chosen, with its result in a report of its own; and the
+  // party's boon the trip set out with.
+  if (partyEvent) report.system = [...report.system, tripLine(partyEvent)];
+  if (trip?.boon) report.system = [...report.system, ...boonLines(trip.boon, content())];
   const summary = {
     areaName: report.areaName,
     regionName: report.regionName,
@@ -1096,6 +1132,19 @@ export async function finishHunt(db, player, now, { choice } = {}) {
     }
     if (raced(error)) throw characterChanged();
     throw error;
+  }
+  // The party event's result for everyone who went, given by the claim of
+  // its leader's report that settled it (or one settled before and not
+  // given to all yet), each a report of its own (party-events.js). One that
+  // fails waits for the cron: the claim stays made. Claimed as the party
+  // sets out (`forTrip`), the cron gives it a minute later: the party's
+  // start holds only while its members are as it read them (parties.js).
+  if (!forTrip && partyEvent?.choice && !partyEvent.applied && partyEvent.leader_id === row.id) {
+    try {
+      await applyPartyEvent(db, partyEvent, now);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return { id: results[1].meta.last_row_id, report };

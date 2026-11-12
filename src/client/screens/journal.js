@@ -131,7 +131,10 @@ export function mountJournal(container, { params }) {
               { class: 'report-row-main' },
               h('span', {
                 class: 'report-row-title',
-                text: report.tower
+                // A Drużyna's party event (party-events.js) by its title.
+                text: report.partyEvent
+                  ? report.partyEvent.title
+                  : report.tower
                   ? t('{tower} · piętro {floor}', { tower: report.tower.name, floor: report.tower.floor })
                   : report.portal
                     ? t('{portal} · stopień {stage}', { portal: report.portal.name, stage: report.portal.stage })

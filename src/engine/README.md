@@ -25,6 +25,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `professions.js`, `brewing.js`, `workshop.js`, `crafting.js` | profesje: Zielarstwo, Alchemia, Rzemieślnictwo oraz materiały i Stół rozbiórki |
 | `encyclopedia.js` | Encyklopedia: co postać już zdobyła, w zakładkach i Tierach |
 | `events.js` | zdarzenia na koniec wyprawy |
+| `party-events.js` | zdarzenia drużynowe na koniec wyprawy drużyny: losowanie z ziarna wyprawy, opcje lidera, wynik dla każdego na jego poziomie, jedna walka całej drużyny, premia drużyny na następną wyprawę i raport członka |
 | `quests.js` | zadania dzienne i tygodniowe narratora |
 | `settlement.js`, `companions.js`, `market.js` | Osada: reputacja, relacje, Tablica zleceń, usługi mieszkańców, towarzysze i Targowisko |
 | `stable.js` | Stajnia w Osadzie: wierzchowce kupowane na stałe, po kolei, i krótsze czekanie na koniec wyprawy |
