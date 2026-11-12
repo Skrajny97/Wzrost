@@ -564,6 +564,10 @@
     "0.2.90": {
       "title": "Version 0.2.90",
       "body": "- The System Labyrinth now sets its difficulty by the higher of two levels: your character's or your class's. Usually that is the class level, so the creatures are stronger, and a win gains you more gold and XP."
+    },
+    "0.2.91": {
+      "title": "Version 0.2.91",
+      "body": "- In the Labyrinth, the choice of a blessing and the merchant's wares open in a window as soon as you enter the chamber, with no scrolling back up the page."
     }
   }
 }
