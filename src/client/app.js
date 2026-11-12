@@ -59,6 +59,7 @@ import { pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, filledForCollector, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn, unlockInfo } from './state.js';
 import { offerPointsReset, openEvolutionTests } from './evolution.js';
+import { accountNameRow } from './account-name.js';
 import { giftCodeRow } from './gift-code.js';
 import { discordRow } from './discord.js';
 import { closeSheet, confirmAction, initSheet, motionSwitch, openSheet, skinSwatches, switchButton, toast, voiceSwitch, withButton } from './ui.js';
@@ -966,6 +967,8 @@ function openSettings() {
       languageRow(),
       layoutOffered() && layoutRow(),
       h('div', { class: 'status-row' }, h('dt', { text: t('Konto') }), h('dd', { text: state.user.login })),
+      // The account's name for the chat (832 A).
+      accountNameRow(),
       emailRow(),
       passwordRow(),
       nameRow(),

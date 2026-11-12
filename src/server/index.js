@@ -1,7 +1,7 @@
 // Worker entry point. Static files from src/client are served by Workers Static
 // Assets before this code runs; only /api/* and unknown paths reach the Worker.
 
-import { confirmAge, deleteAccount, login, logout, me, register, setLanguage } from './accounts.js';
+import { accountNameHintSeen, confirmAge, deleteAccount, login, logout, me, register, setAccountName, setLanguage } from './accounts.js';
 import { authorPanel, authorSkillDemo, authorSkills, bugReportImage, resolveBugReport } from './author.js';
 import { authorNews, deleteNews, dismissDraft, editNews, listNews, publishNews, seeNews } from './news.js';
 import { BUG_IMAGE, reportBug } from './bugs.js';
@@ -137,6 +137,8 @@ const routes = [
   ['POST', '/api/me/age', confirmAge],
   // The account's language, PL or EN, where English is on (i18n.js).
   ['POST', '/api/me/language', setLanguage],
+  ['POST', '/api/account/name', setAccountName],
+  ['POST', '/api/account/name/hint', accountNameHintSeen],
   // The English of the page's own texts, for a page in English (i18n.js).
   ['GET', '/api/strings', strings],
   ['GET', '/api/author', authorPanel],

@@ -29,6 +29,7 @@ import { friendNews } from './community.js';
 import { nameColorOf } from './cosmetics.js';
 import { guildChannel, guildNews, guildOf, guildTagSql } from './guilds.js';
 import { findMentions, mentionPeople, mentionsSaved, mentionsSql, mentionsView, newestMentions } from './mentions.js';
+import { chatAccountName } from './names.js';
 import { partyNews } from './parties.js';
 import { tradeNews } from './trades.js';
 import { ApiError, json, readJson } from './http.js';
@@ -185,6 +186,9 @@ const playerMessageView = (row, userId, env, readerId) => ({
   id: row.id,
   characterId: row.character_id,
   name: row.name,
+  // The writer's account's name now, before the character's, "Wędrowiec
+  // (Radomira)" (832 A, names.js), or null.
+  account: chatAccountName(row.account_name, row.name),
   // The writer's guild now, in square brackets beside its name (guilds.js).
   guildTag: row.guild_tag ?? null,
   // The writer's name in its frame's colour now, or null (cosmetics.js).
@@ -247,7 +251,7 @@ export async function requireChatter(context) {
   const db = context.env.DB;
   const [characters, accounts] = await db.batch([
     db.prepare("SELECT id, name, level, class_id, cosmetics FROM characters WHERE user_id = ? AND role = 'player'").bind(session.userId),
-    db.prepare('SELECT login, google_sub, chat_moderator, chat_rules_at, chat_muted_until, trade_off, seen_at, language FROM users WHERE id = ?').bind(session.userId),
+    db.prepare('SELECT login, google_sub, chat_moderator, chat_rules_at, chat_muted_until, trade_off, seen_at, language, account_name FROM users WHERE id = ?').bind(session.userId),
   ]);
   const character = characters.results[0];
   if (!character) throw new ApiError(404, 'no_character', 'Nie masz jeszcze postaci.');
@@ -298,7 +302,7 @@ export async function readChat(context) {
   const [messages, hidden, blocked, reports, conversations] = await db.batch([
     db
       .prepare(
-        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, m.system, u.login, u.google_sub, u.chat_moderator, u.language AS writer_language,
+        `SELECT m.id, m.user_id, m.character_id, m.name, COALESCE(c.level, m.level) AS level, m.class_id, m.text, m.items, m.created_at, m.system, u.login, u.google_sub, u.chat_moderator, u.language AS writer_language, u.account_name,
                 c.cosmetics, ${guildTagSql('m.character_id')} AS guild_tag, ${mentionsSql('m.id')} AS mentions
          FROM chat_messages m JOIN users u ON u.id = m.user_id LEFT JOIN characters c ON c.id = m.character_id
          WHERE ${where} AND m.id > ? AND m.hidden_at IS NULL AND (m.system = 1 OR m.user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?))

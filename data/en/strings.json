@@ -2793,5 +2793,6 @@
   "Ustaw nowe hasło do konta. Po zapisie wszystkie urządzenia zostaną wylogowane, a zalogujesz się już nowym hasłem.": "Set a new password for the account. Once it is saved, every device is signed out, and you sign in with the new password.",
   "Ustaw hasło": "Set password",
   "Zapisuję…": "Saving…",
-  "Rozumiem": "Got it"
+  "Rozumiem": "Got it",
+  "Konto zmieniło się w międzyczasie. Spróbuj jeszcze raz.": "The account changed in the meantime. Try once more."
 }

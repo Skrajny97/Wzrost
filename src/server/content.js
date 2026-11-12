@@ -400,6 +400,8 @@ export function publicContent() {
       rules: game.chat.texts.rules,
       // The window of a name the filter blocks (names.js).
       names: game.chat.names,
+      // The account's name for the chat (832 A, account-name.js).
+      accounts: game.chat.accounts,
       // Tagging with "@" (mentions.js): how many names the line suggests,
       // and the words of the page.
       mentions: {

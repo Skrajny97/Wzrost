@@ -1886,6 +1886,11 @@ a.segmented-option {
   overflow-wrap: anywhere;
 }
 
+/* Nazwa konta (832 A) without a name: "brak", muted. */
+.status-name--none {
+  color: var(--text-muted);
+}
+
 /* Postać: the name and, under it, its one change (greyed out once used). */
 .status-row--name {
   align-items: center;
@@ -7195,6 +7200,59 @@ a.camp-level-button {
 .chat-level {
   color: var(--text-muted);
   white-space: nowrap;
+}
+
+/* The account's name before the character's, "Wędrowiec (Radomira)"
+   (832 A, account-name.js), in the same colour: a long account's name ends
+   in "…" before the character's does, which stays whole. */
+.chat-name--account {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.chat-account {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+
+.chat-character {
+  flex: none;
+  white-space: pre;
+}
+
+/* The chat's one hint of where to set the account's name, over the line
+   to write in. */
+.chat-account-hint {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+/* The account name's window: the rules under the field. */
+.account-name-rules {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.chat-account-hint p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.chat-account-hint-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.chat-account-hint-actions .button {
+  width: auto;
 }
 
 /* The moderation by its names: the admin in the System's light, the

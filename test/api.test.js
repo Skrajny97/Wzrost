@@ -42,7 +42,9 @@ describe('registration', () => {
       password: 'tajnehaslo1',
     });
     assert.equal(status, 201);
-    assert.deepEqual(Object.keys(data.user).sort(), ['ageRequired', 'author', 'createdAt', 'email', 'emailConfirmed', 'emailRequired', 'google', 'login', 'password', 'skipTutorials', 'testMode', 'tutorialTests']);
+    assert.deepEqual(Object.keys(data.user).sort(), ['accountName', 'accountNameFrom', 'accountNameHint', 'ageRequired', 'author', 'createdAt', 'email', 'emailConfirmed', 'emailRequired', 'google', 'login', 'password', 'skipTutorials', 'testMode', 'tutorialTests']);
+    // No account name yet, the chat's hint to come (832 A, names.js).
+    assert.deepEqual([data.user.accountName, data.user.accountNameFrom, data.user.accountNameHint], [null, 0, true]);
     // A password to change in the Ustawienia (838 A, password.js).
     assert.equal(data.user.password, true);
     assert.equal(data.user.author, false);

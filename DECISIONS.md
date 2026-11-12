@@ -3092,6 +3092,16 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.80 (12.11.2026): nazwa konta na czacie (832 A, makiety 836)
+
+Autor przyjął 832 A (pomysł gracza: kto pisze raz z jednej, raz z drugiej postaci, ten na czacie wygląda jak dwie różne osoby) i makiety 836.1–836.6.
+
+1. **Nazwa konta w Ustawieniach.** Pod „Konto” jest wiersz „Nazwa konta” z „Zmień”, a konto bez nazwy ma „brak” i „Ustaw”. Okno ma objaśnienie z przykładem, pole i zasady: od 2 do 20 znaków, te same zasady i ten sam filtr słów co imię postaci, nie nazwa konta ani imię postaci innego gracza, zmiana najwyżej raz na 30 dni. Pierwszy wybór i zmiana nazwy zablokowanej przez filtr działają od razu. Za wczesna zmiana pokazuje datę i godzinę, od której można ją zmienić.
+2. **Czat.** Globalny, Gildia i rozmowy prywatne pokazują „Nazwa konta (imię postaci)”, np. „Wędrowiec (Radomira)”, także przy wcześniejszych wiadomościach. Konto bez nazwy pokazuje samo imię, a nazwa równa imieniu postaci stoi raz. Długa nazwa konta kończy się „…”, a imię postaci zostaje całe. Ranking, Znajomi i karta postaci bez zmian.
+3. **Podpowiedź.** Raz nad polem wiadomości: „Nowość: nazwa konta…” z „Rozumiem” (chowa ją na zawsze) i „Ustaw teraz”.
+4. **Bez podszywania się.** Postać nie weźmie imienia, które jest nazwą konta innego gracza, a nazwa konta nie weźmie imienia postaci innego gracza. Nazwę konta obowiązują też zasady imion z przeglądu bezpieczeństwa z 12.11.2026: litery jednego alfabetu (łaciński, grecki albo cyrylica), bez niewidocznych znaków, i żadna nazwa ani imię nie może wyglądać jak cudze dzięki literom innego alfabetu, które wyglądają tak samo (np. „Нора” z cyrylicy i „Hopa”).
+5. Migracja 0118 (`account_name`, unikalny `account_name_key`, `account_name_at`, `account_name_hint`). Testy: test/account-names.test.js.
+
 ## Wersja 0.2.79 (12.11.2026): zmiana hasła, „Nie pamiętam hasła” (838 A) i napis przy Rdzeniu
 
 Autor przyjął makiety 841.1–841.11 (12.11.2026). Z przeglądu bezpieczeństwa (838): gracz, któremu ktoś poznał hasło, nie mógł odzyskać konta, a sesja na cudzym telefonie trwała dalej.

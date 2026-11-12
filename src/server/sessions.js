@@ -5,6 +5,7 @@ import { ApiError } from './http.js';
 import { sha256Hex, toBase64Url } from './encoding.js';
 import { englishOn } from './features.js';
 import { accountLanguage } from './i18n.js';
+import { accountNameView } from './names.js';
 
 export const SESSION_COOKIE = '__Host-sid';
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -36,7 +37,8 @@ export async function getSession(db, request, now) {
   const row = await db
     .prepare(
       `SELECT s.expires_at, u.id AS user_id, u.login, u.email, u.created_at, u.google_sub, u.email_confirmed_at, u.email_required, u.news_seen,
-         u.skip_tutorials, u.language, u.age_confirmed_at, u.age_required, u.password_hash != 'google' AS has_password
+         u.skip_tutorials, u.language, u.age_confirmed_at, u.age_required, u.password_hash != 'google' AS has_password,
+         u.account_name, u.account_name_at, u.account_name_hint
        FROM sessions s JOIN users u ON u.id = s.user_id
        WHERE s.id = ?`,
     )
@@ -63,6 +65,8 @@ export async function getSession(db, request, now) {
 // "Pomijaj objaśnienia narratora" in the settings, for all the account's
 // characters (tutorial.js). `language`: the account's, "pl" or "en"
 // (i18n.js), only where English is on: the live game's account has none.
+// The account's name for the chat (832 A, names.js accountNameView):
+// `accountName`, `accountNameFrom` and `accountNameHint`.
 export function userView(row) {
   const google = row.google_sub !== null;
   return {
@@ -79,6 +83,7 @@ export function userView(row) {
     // A password to change in the Ustawienia (838 A, password.js): an
     // account made with Google has none (NO_PASSWORD in google.js).
     password: row.has_password === 1,
+    ...accountNameView(row),
     ...(englishOn() && { language: accountLanguage(row.language) }),
   };
 }

@@ -62,6 +62,7 @@ import {
   privateRead,
   setChatMuted,
 } from '../chat-news.js';
+import { accountNameHint } from '../account-name.js';
 import { discordButton } from '../discord.js';
 import { language, t } from '../i18n.js';
 import { CLASS_ICONS } from '../icons.js';
@@ -696,6 +697,14 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
   }
   const talkTo = (next) => switchTo(next ? channel : chat.channels[0], next);
 
+  // The tab's messages asked for anew, as after a new name of the account
+  // (../account-name.js): those shown keep the names they came with.
+  function shownAgain() {
+    messages = [];
+    fill(list);
+    ask();
+  }
+
   // A private conversation out of the tabs until a newer message comes.
   async function closeTalk(entry) {
     await call('POST', '/api/chat/close', { with: entry.id });
@@ -747,15 +756,23 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
         'div',
         { class: 'chat-head' },
         icon(CLASS_ICONS[message.classId] ?? 'person', { size: 14, className: 'chat-class' }),
+        // The account's name before the character's, "Wędrowiec
+        // (Radomira)" (832 A, ../account-name.js); the button still shows
+        // the character.
         framedName(
-          h('button', {
-            type: 'button',
-            class: 'chat-name',
-            text: message.name,
-            'aria-label': t('{name}: zobacz postać', { name: message.name }),
-            onClick: (event) => withButton(event.currentTarget, () => openProfile(message.name, { mention: tag })),
-          }),
+          h(
+            'button',
+            {
+              type: 'button',
+              class: message.account ? 'chat-name chat-name--account' : 'chat-name',
+              'aria-label': t('{name}: zobacz postać', { name: message.name }),
+              onClick: (event) => withButton(event.currentTarget, () => openProfile(message.name, { mention: tag })),
+            },
+            // A long account's name gives way, the character's stays whole.
+            message.account ? [h('span', { class: 'chat-account', text: message.account }), h('span', { class: 'chat-character', text: ` (${message.name})` })] : message.name,
+          ),
           message.nameColor,
+          message.name,
         ),
         guildTag(message.guildTag),
         message.role && h('span', { class: `chat-role chat-role--${message.role}`, text: `(${message.role})` }),
@@ -876,7 +893,10 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
         ? t('Napisz do postaci {name}. Tę rozmowę widzicie tylko Wy dwoje.', { name: talk.name })
         : t('Nikt jeszcze nic nie napisał. Zacznij rozmowę!');
     const part = !account ? 'loading' : account.mutedUntil ? `muted:${account.mutedUntil}` : account.rulesAccepted ? 'form' : 'rules';
-    if (changed('footer', part)) fill(footer, footerPart(part));
+    // The one hint of where to set the account's name (832 A), over the line
+    // to write in, where it is seen however far the messages go.
+    const hint = part === 'form' && Boolean(state.user?.accountNameHint && !state.user.accountName);
+    if (changed('footer', `${part}|${hint}`)) fill(footer, hint && accountNameHint(render, shownAgain), footerPart(part));
     if (focusLine && part === 'form') {
       focusLine = false;
       text.focus();

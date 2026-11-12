@@ -6,7 +6,7 @@ import { createServer } from 'node:http';
 import { after, describe, test } from 'node:test';
 
 import { blockedName } from '../src/engine/index.js';
-import { validateName } from '../src/server/characters.js';
+import { validateName } from '../src/server/names.js';
 import { contentIn } from '../src/server/content.js';
 import { mailboxKey } from '../src/server/email.js';
 import { ApiError, readJson } from '../src/server/http.js';

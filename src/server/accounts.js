@@ -13,11 +13,15 @@ import { partyRemoval } from './parties.js';
 import { hashPassword, needsRehash, verifyPassword } from './passwords.js';
 import { testModeFor, tutorialTestsFor } from './test-mode.js';
 import { isAuthor, openBugReports } from './author.js';
+import { content } from './content.js';
+import { ACCOUNT_NAMES, OTHER_CHARACTERS, accountNameView, checkedName, looksTaken, nameKey } from './names.js';
+import { OWN_CHARACTERS } from './roles.js';
 import {
   clearedSessionCookie,
   createSession,
   deleteSession,
   refreshSession,
+  requirePlayable,
   requireSession,
   sessionCookie,
   sessionIdFromRequest,
@@ -164,7 +168,8 @@ export async function login({ request, env, now }) {
     );
   }
 
-  const columns = "id, login, email, password_hash, password_hash != 'google' AS has_password, google_sub, created_at, email_confirmed_at, email_required, skip_tutorials, language, age_confirmed_at, age_required";
+  const columns =
+    "id, login, email, password_hash, password_hash != 'google' AS has_password, google_sub, created_at, email_confirmed_at, email_required, skip_tutorials, language, age_confirmed_at, age_required, account_name, account_name_at, account_name_hint";
   const query = identifier.includes('@') ? `SELECT ${columns} FROM users WHERE email = ?` : `SELECT ${columns} FROM users WHERE login = ?`;
   const user = await db.prepare(query).bind(identifier).first();
   // The attempt is counted already (takeLoginAttempt); a wrong password
@@ -313,4 +318,60 @@ export async function setLanguage(context) {
   const chosen = validLanguage(body.language);
   await context.env.DB.prepare('UPDATE users SET language = ? WHERE id = ?').bind(chosen, session.userId).run();
   return json({ language: chosen });
+}
+
+// The day an account's name may change again, as the request's language
+// writes it, Polish time: "12.12.2026, 01:13", in English "12/12/2026, 01:13".
+const fromOptions = { timeZone: 'Europe/Warsaw', day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' };
+const fromFormats = { pl: new Intl.DateTimeFormat('pl-PL', fromOptions), en: new Intl.DateTimeFormat('en-GB', fromOptions) };
+
+// POST /api/account/name {name}: the account's name for the chat (832 A,
+// names.js), which the chat shows before the name of the character that
+// writes, "Wędrowiec (Radomira)". By the rules of a character's name, not
+// another account's name or another player's character's (no two players
+// share a name), and it changes at most once in accounts.days days
+// (data/chat.json); the first choice, and the change of a name the filter
+// blocks now, at once. The answer is the account's name as the page sees it
+// (accountNameView).
+export async function setAccountName(context) {
+  const session = await requirePlayable(context);
+  const body = await readJson(context.request);
+  const words = content().chat.accounts;
+  const name = checkedName(body.name, words);
+  const db = context.env.DB;
+  const row = await db.prepare('SELECT account_name, account_name_at, account_name_hint FROM users WHERE id = ?').bind(session.userId).first();
+  if (row.account_name === name) throw new ApiError(409, 'same_account_name', words.same);
+  const { accountNameFrom } = accountNameView(row);
+  if (context.now < accountNameFrom) {
+    const date = (fromFormats[language()] ?? fromFormats.pl).format(new Date(accountNameFrom));
+    throw new ApiError(409, 'account_name_locked', words.locked.replace('{date}', () => date));
+  }
+  const key = nameKey(name);
+  const taken = () => new ApiError(409, 'account_name_taken', words.taken);
+  if (await db.prepare(`SELECT 1 FROM characters WHERE name_key = ? AND user_id != ? AND ${OWN_CHARACTERS}`).bind(key, session.userId).first()) throw taken();
+  // Nor one that looks like another player's character's or account's name,
+  // the same letters but for some of another alphabet (names.js looksTaken,
+  // as for the characters' names since the code review of 12.11.2026).
+  if ((await looksTaken(db, OTHER_CHARACTERS, name, [session.userId])) || (await looksTaken(db, ACCOUNT_NAMES, name, [session.userId]))) throw taken();
+  let saved;
+  try {
+    // Over the name read above only: of two changes at once one is saved.
+    saved = await db
+      .prepare('UPDATE users SET account_name = ?, account_name_key = ?, account_name_at = ?, account_name_hint = 1 WHERE id = ? AND account_name_at IS ?')
+      .bind(name, key, context.now, session.userId, row.account_name_at ?? null)
+      .run();
+  } catch (error) {
+    if (String(error?.message).includes('account_name_key')) throw taken();
+    throw error;
+  }
+  if (saved.meta.changes !== 1) throw new ApiError(409, 'account_changed', 'Konto zmieniło się w międzyczasie. Spróbuj jeszcze raz.');
+  return json(accountNameView({ account_name: name, account_name_at: context.now, account_name_hint: 1 }));
+}
+
+// POST /api/account/name/hint: the chat told the player once where to set
+// the account's name (832 A), and does not again.
+export async function accountNameHintSeen(context) {
+  const session = await requireSession(context);
+  await context.env.DB.prepare('UPDATE users SET account_name_hint = 1 WHERE id = ?').bind(session.userId).run();
+  return json({ accountNameHint: false });
 }

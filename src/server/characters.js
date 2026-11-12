@@ -2,8 +2,6 @@
 // stat points.
 
 import {
-  alphabetOf,
-  alphabetsOf,
   blockedName,
   nameLook,
   createRng,
@@ -128,6 +126,7 @@ import { t } from './i18n.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
 import { mercenaryBusy, mercenaryPlace, mercenaryRules, serviceEnded } from './mercenaries.js';
+import { ACCOUNT_NAMES, looksTaken, nameKey, validateName } from './names.js';
 import { championOf } from './guild-fame.js';
 import { fameNotice } from './fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
@@ -142,48 +141,14 @@ import { tradeBlockOf, tradesEnded } from './trades.js';
 import { skipIntroduction } from './tutorial.js';
 import { weekFactorNow, weekOfCharacter } from './weeks.js';
 
-// 2 to 20 characters: letters and digits, spaces, hyphens, apostrophes and
-// underscores ("Justi_725"), from a letter to a letter or a digit. What a
-// phone's keyboard adds unseen goes: invisible marks, letters split from
-// their accents (joined again), a curly apostrophe (made straight); wide,
-// raised or mathematical letters and digits become plain ones (NFKC). The
-// letters come from one alphabet, Latin, Greek or Cyrillic (names.js; the
-// security review of 12.11.2026: Hangul fillers made a name of nothing,
-// and one Cyrillic letter copied another player's name). The message names
-// what is wrong.
-const nameCharacter = (character) => /^[0-9_' -]$/.test(character) || alphabetOf(character) !== null;
-const ALLOWED_TEXT = 'Mogą być litery alfabetu łacińskiego, greckiego albo cyrylicy, cyfry, spacje, myślniki, apostrofy i podkreślniki.';
-
-export function validateName(value) {
-  const name =
-    typeof value === 'string'
-      ? value.normalize('NFKC').replace(/\p{Cf}/gu, '').trim().replace(/\s+/g, ' ').replace(/[\u2018\u2019\u02bc]/g, "'")
-      : '';
-  const characters = [...name];
-  const wrong = characters.find((character) => !nameCharacter(character));
-  const problem =
-    characters.length < 2 || characters.length > 20
-      ? 'Imię postaci musi mieć od 2 do 20 znaków.'
-      : wrong && /\p{Default_Ignorable_Code_Point}/u.test(wrong)
-        ? 'Imię postaci nie może zawierać niewidocznych znaków.'
-        : wrong
-          ? `Imię postaci nie może zawierać znaku „${wrong}”. ${ALLOWED_TEXT}`
-          : alphabetsOf(name).size > 1
-            ? 'Imię postaci musi być zapisane jednym alfabetem.'
-            : !/^\p{L}/u.test(name)
-              ? 'Imię postaci musi zaczynać się od litery.'
-              : !/[\p{L}0-9]$/u.test(name)
-                ? 'Imię postaci musi kończyć się literą albo cyfrą.'
-                : null;
-  if (problem) throw new ApiError(400, 'invalid_name', problem);
-  // The mildest filter of vulgar names there can be (names.js).
-  if (blockedName(name, content())) throw new ApiError(400, 'invalid_name', content().chat.names.refused);
-  return name;
-}
-
-// No two players share a name, whatever the letter case
-// (migrations/0009_unique_names.sql).
-const nameKey = (name) => name.toLowerCase();
+// A character's name (names.js): 2 to 20 signs, the filter of words, and no
+// two players share one, whatever the letter case; neither does a character
+// take the name another player chose for its account (832 A, the chat shows
+// it before the character's name).
+const accountNameTaken = async (db, name, userId) =>
+  Boolean(await db.prepare('SELECT 1 FROM users WHERE account_name_key = ? AND id != ?').bind(nameKey(name), userId).first()) ||
+  looksTaken(db, ACCOUNT_NAMES, name, [userId]);
+const accountNameError = () => new ApiError(409, 'name_taken', content().chat.accounts.takenByAccount);
 
 // Throws when the name looks like another character's: the same letters
 // but for some of another alphabet that look alike, or a dotless ı
@@ -1794,6 +1759,7 @@ export async function createCharacter(context) {
   const skin = body.skin === undefined ? content().defaultSkin : validSkin(body.skin);
 
   const db = context.env.DB;
+  if (await accountNameTaken(db, name, session.userId)) throw accountNameError();
   const max = content().balance.account.characters;
   const full = () => new ApiError(409, 'characters_full', `Masz już ${max} postaci. Usuń jedną z nich, żeby stworzyć nową.`);
   const [counted, played, parked] = await db.batch([
@@ -1958,6 +1924,7 @@ export async function renameCharacter(context) {
   const name = validateName(body.name);
   const db = context.env.DB;
   await refuseLookAlike(db, name, player.row.id);
+  if (await accountNameTaken(db, name, session.userId)) throw accountNameError();
   try {
     await db.batch([
       db
@@ -2003,7 +1970,7 @@ export async function renameBlockedNames(env, now) {
   const from = Date.parse(words.renameAt);
   if (!(now >= from) || new Date(now).getUTCMinutes() !== 0) return 0;
   const db = env.DB;
-  const { results } = await db.prepare('SELECT id, name, appearance FROM characters').all();
+  const { results } = await db.prepare('SELECT id, user_id, name, appearance FROM characters').all();
   let renamed = 0;
   for (const row of results.filter((one) => blockedName(one.name, content()))) {
     const pool = words.generated[row.appearance === 'female' ? 'female' : 'male'];
@@ -2011,7 +1978,13 @@ export async function renameBlockedNames(env, now) {
     const order = pool.map((name) => ({ name, key: rng.float(0, 1) })).sort((a, b) => a.key - b.key).map(({ name }) => name);
     let name = null;
     for (const candidate of order) {
-      if (!(await db.prepare('SELECT 1 FROM characters WHERE name_key = ?').bind(nameKey(candidate)).first())) {
+      // Free of the characters and of the other accounts' names (832 A).
+      const key = nameKey(candidate);
+      const taken = await db
+        .prepare('SELECT EXISTS (SELECT 1 FROM characters WHERE name_key = ?) OR EXISTS (SELECT 1 FROM users WHERE account_name_key = ? AND id != ?) AS taken')
+        .bind(key, key, row.user_id)
+        .first();
+      if (!taken.taken) {
         name = candidate;
         break;
       }

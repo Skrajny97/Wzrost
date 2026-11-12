@@ -104,12 +104,14 @@ export function guildTag(tag) {
 // it; without a colour, as it was. The best character of last week's
 // Punkty Sławy has its name in gold instead, the whole week (760 A,
 // src/server/fame.js), its words under a pointer, as the best guild's tag.
-export function framedName(element, color) {
+// `name`: the character's, when the element shows more than it (the chat's
+// "Wędrowiec (Radomira)", 832 A).
+export function framedName(element, color, name = element.textContent) {
   if (color) {
     element.classList.add('name--framed');
     element.style.setProperty('--name-color', color);
   }
-  if (state.fame?.champion && element.textContent === state.fame.champion) {
+  if (state.fame?.champion && name === state.fame.champion) {
     element.classList.add('name--fame');
     element.title = state.content?.fame?.champion ?? '';
   }
