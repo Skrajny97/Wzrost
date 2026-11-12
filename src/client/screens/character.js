@@ -1766,6 +1766,8 @@ export function itemDetails(item, { small = false } = {}) {
         ),
       item.classNames && h('li', { class: 'item-classes', text: t(item.classNames.length > 1 ? 'Dla klas: {classes}' : 'Dla klasy: {classes}', { classes: item.classNames.join(', ') }) }),
       item.classLevel && h('li', { class: 'item-classes', text: t('Od poziomu klasy {level}', { level: item.classLevel }) }),
+      // Raised by the Kowal, once per item (the author, 12.11.2026).
+      item.raised && h('li', { class: 'item-classes', text: t('Kowal już przekuł go na wyższą rzadkość: drugi raz się nie da.') }),
       item.price !== undefined && h('li', { class: 'item-price', text: t('U złomiarza: {gold} złota', { gold: formatNumber(item.price) }) }),
     ),
   );

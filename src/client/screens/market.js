@@ -231,6 +231,9 @@ export function itemEntry(item, key, opened, { notes: noted = true, wearers = nu
             class: 'item-classes',
             text: item.classNames.length > 1 ? t('Dla klas: {classes}', { classes: item.classNames.join(', ') }) : t('Dla klasy: {classes}', { classes: item.classNames.join(', ') }),
           }),
+        // Raised by the Kowal, once per item: a buyer sees it before buying
+        // (the author, 12.11.2026).
+        item.raised && h('li', { class: 'item-classes', text: t('Kowal już przekuł go na wyższą rzadkość: drugi raz się nie da.') }),
         item.price !== undefined && h('li', { class: 'item-price', text: t('U złomiarza: {gold} złota', { gold: formatNumber(item.price) }) }),
       ),
       chosen && companionCompare(chosen, item),

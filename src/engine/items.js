@@ -742,6 +742,10 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     // Konta: worn from its own level on (src/server/inventory.js).
     ...(item.traded ? { traded: true } : {}),
     ...(item.chest ? { chest: true } : {}),
+    // Raised one rarity step by the Kowal in the Osada, which he does once
+    // per item (src/server/forge.js): its card says so, to a buyer on the
+    // Targowisko too (the author, 12.11.2026).
+    ...(item.raised ? { raised: true } : {}),
     // What the Zaklinaczka in the Osada can do with it, for the card's way
     // to her (the author: „Zrób też zaklinanie w plecaku (niech przenosi do
     // Zaklinaczki)”): reforge an affix of an item that has them, and enchant

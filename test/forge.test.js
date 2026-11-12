@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { createRng, forgeDiscount, forgeTopRarity, generateItem, nextRarity, raiseOffer, raiseRarity, scrollPrice } from '../src/engine/index.js';
+import { createRng, forgeDiscount, forgeTopRarity, generateItem, itemView, nextRarity, raiseOffer, raiseRarity, scrollPrice } from '../src/engine/index.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -44,6 +44,12 @@ describe('the Kuźnia in the engine', () => {
     // A stranger gets his work up to unikalny, not above.
     assert.deepEqual(raiseOffer({ ...sword, rarity: 'unique' }, 0, 0, content), { reason: 'relation', next: 'epic', top: 'unique' });
     assert.equal(raiseOffer({ ...sword, rarity: 'unique' }, standings[1].points, 0, content).next, 'epic');
+  });
+
+  test('a raised item says so on its card, where its owner and a buyer on the Targowisko see it (the author, 12.11.2026)', () => {
+    const raised = raiseRarity(sword, createRng('karta'), content);
+    assert.equal(itemView(raised, content).raised, true);
+    assert.equal('raised' in itemView(sword, content), false);
   });
 
   test('a raised item keeps or grows every affix and gets one more of the kind it has fewer of', () => {
