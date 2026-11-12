@@ -352,7 +352,8 @@ export async function enterLabyrinth(context) {
       won: hunt ? hunt.labyrinth.won : null,
       gains,
       artifact: artifact ? artifactView(artifact, content()) : null,
-      lines,
+      // A fight not won says first that the day's Labirynt is over.
+      lines: hunt && !hunt.labyrinth.won ? [hunt.labyrinth.text, ...lines] : lines,
       reportId: saved,
       over: next.over,
     },

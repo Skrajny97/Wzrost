@@ -53,7 +53,7 @@
     { "id": "guardian", "name": "Strażnik", "text": "Strażnik poziomu. Za wygraną zgarniesz Artefakt i wybór błogosławieństwa." }
   ],
   "spring": { "heal": 0.35 },
-  "merchant": { "heal": 0.5, "healMinutes": 15, "blessingMinutes": 30 },
+  "merchant": { "heal": 0.5, "healMinutes": 30, "blessingMinutes": 60 },
   "rewards": { "eliteGoldMinutes": 10, "treasureGoldMinutes": 15 },
   "reportsKept": 40,
   "blessings": [
