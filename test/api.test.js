@@ -42,7 +42,9 @@ describe('registration', () => {
       password: 'tajnehaslo1',
     });
     assert.equal(status, 201);
-    assert.deepEqual(Object.keys(data.user).sort(), ['ageRequired', 'author', 'createdAt', 'email', 'emailConfirmed', 'emailRequired', 'google', 'login', 'skipTutorials', 'testMode', 'tutorialTests']);
+    assert.deepEqual(Object.keys(data.user).sort(), ['ageRequired', 'author', 'createdAt', 'email', 'emailConfirmed', 'emailRequired', 'google', 'login', 'password', 'skipTutorials', 'testMode', 'tutorialTests']);
+    // A password to change in the Ustawienia (838 A, password.js).
+    assert.equal(data.user.password, true);
     assert.equal(data.user.author, false);
     // "Pomijaj objaśnienia narratora" starts off (tutorial.js).
     assert.equal(data.user.skipTutorials, false);
