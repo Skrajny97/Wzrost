@@ -3131,6 +3131,7 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
 15. **Wieże (864 A).** Czempion Wieży (co 25. piętro) przy pierwszym zwycięstwie daje też Artefakt, obok trofeum. Główne źródło to Labirynt.
 16. **Handel (865 A).** Artefakty i Odłamki są tylko dla postaci, która je zdobyła: bez Targowiska, Wymiany i Skrzyni Konta.
 17. **Nazwa (866 A).** Labirynt Systemu.
+18. **Grafiki (868, 869).** Z PixelLab, w stylu materiałów gry, po cztery najlepsze wersje z 64 na stronie ocen. Autor przyjął 12.11.2026 o 15:41–15:43: komnaty walka D, elita B, skarb C, źródło A, ołtarz D, kupiec A, strażnik C; Artefakty ognia D, mrozu C, wody D, elektryczności B, ziemi C, natury C, trucizny C, sakrum D; Odłamki D, Rdzeń B (96 × 96) oraz oba tła (Labirynt i poziom Piekielny, 192 × 96). Pliki: `src/client/art/labyrinth/<nazwa>.png` (ikony 32 × 32 i `core.png`) i `src/client/art/places/labyrinth.png`, `labyrinth-hell.png`. Skarb i źródło filtr PixelLab odrzucił dwa razy jako „wbrew zasadom”; przeszły dopiero z innymi opisami (kupka złota z pucharem, kropla wody), a Artefakt ziemi raz (kamienne serce, potem kamień z runą).
 
 ## Wersja 0.2.85 (12.11.2026): zdarzenia drużynowe (844–849)
 
