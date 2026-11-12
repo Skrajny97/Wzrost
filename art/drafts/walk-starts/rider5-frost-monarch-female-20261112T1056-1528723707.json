@@ -1,0 +1,19 @@
+{
+  "id": "rider5-frost-monarch-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the ice queen of the reference picture riding: the same long silver-white hair and the same tall crown of ice crystals, the same pale face, the same pale blue ice-crystal spikes on the shoulders, the same long dark blue gown with silver frost patterns, the dark blue cape with white fur trim hanging behind, nothing in the hands but the reins, no staff and no sceptre; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee under the gown, the lower leg hanging straight down from the knee with the skirt of the gown falling straight down along it to the ankle, one whole foot in a dark blue boot below the hem with the toes pointing right; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the crown to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/frost-monarch-female.png",
+      "usage": "the character's look: this same woman, her face, hair, crown, shoulder spikes, gown, cape and colours, drawn the same way; not her standing pose and not the staff in her hand"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
