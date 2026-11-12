@@ -28,6 +28,10 @@ const RESULTS = { true: 'Zwycięstwo', false: 'Porażka', null: 'Odwrót', draw:
 // The events of a unit's own move, as its actor (a counter is not one).
 const MOVES = new Set(['hit', 'crit', 'dodge']);
 const SPEED_KEY = 'wzrost.fight-speed';
+// The fight's tempo, one tap to the next and back to the first; 4× since
+// 0.2.98 (a player, poz. 45, 12.11.2026: „Czy możemy wprowadzić tempo walk
+// x4?”).
+const SPEEDS = [1, 2, 4];
 const HIT_COLOR = 'rgba(239, 154, 133, 0.95)';
 
 const reducedMotion = () => !motionOn();
@@ -35,7 +39,8 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function loadSpeed() {
   try {
-    return localStorage.getItem(SPEED_KEY) === '2' ? 2 : 1;
+    const kept = Number(localStorage.getItem(SPEED_KEY));
+    return SPEEDS.includes(kept) ? kept : 1;
   } catch {
     return 1;
   }
@@ -842,7 +847,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
         'aria-label': t('Tempo animacji: {speed}×', { speed }),
         text: t('Tempo {speed}×', { speed }),
         onClick: (event) => {
-          speed = speed === 1 ? 2 : 1;
+          speed = SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length];
           saveSpeed(speed);
           event.currentTarget.textContent = t('Tempo {speed}×', { speed });
           event.currentTarget.setAttribute('aria-label', t('Tempo animacji: {speed}×', { speed }));

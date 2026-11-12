@@ -745,6 +745,16 @@
       "id": "0.2.97",
       "title": "Wersja 0.2.97",
       "body": "- Powiadomienia: gdy nie dają się włączyć, gra mówi pod przełącznikiem, dlaczego, i co zrobić (zgoda w Chrome i w ustawieniach telefonu, karta incognito, Usługi Google Play). Przy tym sama próbuje naprawić najczęstsze kłopoty.\n- „Zgłoś błąd” dołącza stan powiadomień na urządzeniu, żeby łatwiej było znaleźć przyczynę."
+    },
+    {
+      "id": "0.2.98",
+      "title": "Wersja 0.2.98",
+      "body": "- Tempo walk ×4: przycisk „Tempo” pod odtwarzaną walką przechodzi teraz 1× → 2× → 4×. Gra pamięta wybrane tempo."
+    },
+    {
+      "id": "0.2.99",
+      "title": "Wersja 0.2.99",
+      "body": "- Gra przeładowuje się do nowej wersji także wtedy, gdy przechodzisz między ekranami, a nie tylko po powrocie do gry z innej aplikacji. Poprawki docierają szybciej."
     }
   ]
 }

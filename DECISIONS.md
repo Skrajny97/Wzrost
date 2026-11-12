@@ -3269,6 +3269,14 @@ Opisy, cechy i umiejętności trzecich form zatwierdził autor (815 z 815.4 v2 i
    - Talia Systemu: bohater z trzecią formą ma liczbę umiejętności z drugiej ewolucji (dane mają trzy wartości, a późniejsza ewolucja bierze ostatnią).
    - Balans po scaleniu (`tools/class-balance-sim.mjs`, jak w punkcie 9): 14 trzecich form dalej wyraźnie przewyższa drugie. Kolos wypada na równi z Bastionem: mdleje w 15,8% wypraw (Bastion 14,2%), kończy je z 65,0% HP (Bastion 65,4%) i zabija 1,06 raza szybciej, więc `test/third-evolution.test.js` go nie przepuszcza. 11.11 było odwrotnie: Kolos 10% omdleń i 68,4% HP, Bastion 25% i 57,9%. Kolos nie ma Muru tarcz ani bloku Bastionu. Liczby umiejętności to brakujące szczegóły ustawione w symulacji (wstęp tej sekcji), więc Nieprzełamany Kolosa dostaje nowe: działa, gdy HP spadnie poniżej 80% (było 90%), leczy 20–26% maks. HP (było 12–16%) i daje 130–170% pancerza więcej (było 90–130%). Kolos mdleje wtedy w 10,0% wypraw (Bastion 14,2%) i kończy je z 74,9% HP (Bastion 65,4%), a w Arenie mieści się w 25–75% wygranych.
 
+## Tempo walk ×4 (prośba gracza, 12.11.2026, w grze od 0.2.98)
+
+Gracz (poz. 45) zapytał na czacie: „Czy możemy wprowadzić tempo walk x4?”. Autor przekazał to jako rozsądną prośbę do samodzielnego wdrożenia.
+
+1. Przycisk „Tempo” pod odtwarzaną walką przechodzi kolejno 1× → 2× → 4× → 1× (wcześniej tylko 1× i 2×). Dotyczy każdej odtwarzanej walki: raportu, Areny, wojen gildii, Bestii i Wyprawy Gildii.
+2. Wybrane tempo zostaje w przeglądarce, jak dotąd (`wzrost.fight-speed`). Dźwięki walki grają jak przy innych tempach, tylko gęściej.
+3. To mała zmiana istniejącego przycisku, bez nowego wyglądu, więc bez makiet (zasada małych dodatków).
+
 ## Powiadomienia, które nie chcą się włączyć (zgłoszenie gracza, 12.11.2026, w grze od 0.2.97)
 
 Gracz (poz. 28, Android 10, Chrome 157) zgłosił przez „Zgłoś błąd”, że w Ustawieniach gry nie może włączyć powiadomień: dostaje tylko „spróbuj ponownie”, choć powiadomienia są włączone w ustawieniach telefonu, a wylogowanie i ponowne zalogowanie nic nie zmienia. Gra mówiła wtedy jedno zdanie na każdą przyczynę, a zgłoszenie nie miało nic, po czym dałoby się ją poznać.
@@ -3281,6 +3289,7 @@ Gracz (poz. 28, Android 10, Chrome 157) zgłosił przez „Zgłoś błąd”, ż
 2. **Dwie próby naprawy po drodze.** Gdy usługi gry w przeglądarce jeszcze nie ma, gra rejestruje ją sama i czeka na nią do 15 s zamiast 5 s. Gdy przeglądarka odmówi subskrypcji, gra usuwa starą subskrypcję telefonu, jeśli jest, i prosi o nową jeszcze raz.
 3. **Stan powiadomień w zgłoszeniu.** „Zgłoś błąd” dołącza sam stan powiadomień na urządzeniu: zgodę przeglądarki, czy usługa gry działa, usługę subskrypcji, czy gra jest zainstalowana jako aplikacja, oraz ostatni błąd włączania (krok, nazwa i treść błędu przeglądarki, czas). Panel Autora pokazuje go pod opisem urządzenia (kolumna `details` w `bug_reports`, migracja 0125). Tekst jest techniczny, po angielsku, tylko dla autora. Opis w okienku zgłoszenia i polityka prywatności (PL i EN, obowiązuje od 12.11.2026) mówią o tym.
 4. **Co może zrobić gracz już teraz:** sprawdzić zgodę strony w Chrome (ikona obok adresu albo ⋮ → Ustawienia → Ustawienia witryn → Powiadomienia), w ustawieniach telefonu powiadomienia Chrome razem z pozycją gry, nie używać karty incognito, zaktualizować Chrome i Usługi Google Play. Jeśli po 0.2.97 dalej się nie da, nowe zgłoszenie poda już przyczynę.
+5. **Strona sprzed wdrożenia (od 0.2.99).** Zgłoszenie z 22:17 i odpowiedź gracza na czacie (22:19, dawne zdanie „Nie udało się włączyć powiadomień. Spróbuj ponownie za chwilę.”, którego 0.2.97 już nie mówi) przyszły ze strony gry otwartej jeszcze przed 0.2.97: gra przeładowywała się do nowej wersji tylko po powrocie do niej z innej aplikacji. Od 0.2.99 sprawdza wersję także przy przejściu na inny ekran, najwyżej raz na minutę, a zgłoszenie błędu podaje wersję strony (`page 0.2.99`) obok wersji serwera.
 
 ## Skrzynia Gildii: porównanie z ekwipunkiem i przekucie u Kowala (uwaga gracza, 12.11.2026, w grze od 0.2.96)
 
