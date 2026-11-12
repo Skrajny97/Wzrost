@@ -8,7 +8,7 @@
 // not approved yet (drafts). The class evolutions are on except where
 // EVOLUTIONS is "off", which plays as before them (the live game hid them
 // in versions 0.0.58–0.0.60); their third forms at class level 200 where
-// THIRD_EVOLUTION is "on" (everywhere from version 0.2.98, once the author
+// THIRD_EVOLUTION is "on" (everywhere from version 0.3.0, once the author
 // had accepted all their art). English (ENGLISH "on",
 // i18n.js) is on everywhere from version 0.1.97; where it is off, the game
 // answers in Polish and offers no choice of language. The weeks of the year

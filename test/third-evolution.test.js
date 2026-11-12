@@ -1,6 +1,6 @@
 // The third evolution ("Trzecia ewolucja klas"): at class level 200 each of
 // the 15 second forms grows into one further form, where the deployment has
-// the third forms on (THIRD_EVOLUTION; in the live game from 0.2.98). The
+// the third forms on (THIRD_EVOLUTION; in the live game from 0.3.0). The
 // class waits there until the form is taken, the form's skills take every
 // Skill Point back and grow to level 145, the stats grow over four spans,
 // the names have a woman's form, the Pustelnik changes it with the other

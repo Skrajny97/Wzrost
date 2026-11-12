@@ -63,7 +63,7 @@
     // "on" adds the evolutions' third forms at class level 200
     // ("Trzecia ewolucja klas", src/server/content.js); "off" keeps the
     // second forms the last, as before them. In the live game from version
-    // 0.2.98, once the author had accepted all their art (portraits, walks,
+    // 0.3.0, once the author had accepted all their art (portraits, walks,
     // rides, skill icons and sounds); on in tests and `npm run dev`.
     "THIRD_EVOLUTION": "on",
     // "on" opens the Osada (src/server/settlement.js) from character level

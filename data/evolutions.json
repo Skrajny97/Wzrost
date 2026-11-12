@@ -1270,7 +1270,7 @@
       "effect": "Raz na walkę, gdy HP spadnie poniżej {below%}, odzyskuje {heal%} maks. HP i na {turns|swój ruch|swoje ruchy|swoich ruchów} zyskuje {armor%} pancerza więcej. W tym czasie odbija {reflect%} przyjętych obrażeń.",
       "kind": "guard",
       "mana": 18,
-      "params": { "below": 0.9, "heal": [0.12, 0.16], "armor": [0.9, 1.3], "turns": [10, 12], "reflect": [3.0, 3.4] }
+      "params": { "below": 0.8, "heal": [0.2, 0.26], "armor": [1.3, 1.7], "turns": [10, 12], "reflect": [3.0, 3.4] }
     },
     {
       "id": "earthquake",
