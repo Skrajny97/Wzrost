@@ -122,7 +122,7 @@ import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
 import { content, contentIn } from './content.js';
 import { favoriteIds } from './favorites.js';
-import { craftingOn, fortressOn, professionsOn, settlementOn, weeksOn } from './features.js';
+import { buildingOn, craftingOn, fortressOn, professionsOn, settlementOn, weeksOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
@@ -1026,10 +1026,10 @@ function campView(player, levels, now) {
   // their highest level, and the camp's own level, out of all.
   // The Warownia's buildings, once they stand, count for the spirit but not
   // for the stone's rows: the transformation needs the camp's alone.
-  // Every camp building, the Osada's Kwatery too, as the transformation
-  // counts them (camp.js beginBuilding).
+  // Every camp building of the game, the Osada's Kwatery too where the
+  // Osada is, as the transformation counts them (camp.js beginBuilding).
   const built = content().buildings.filter((building) => buildingOpen(building, player.row, player.buildings, now));
-  const open = content().buildings.filter((building) => !building.fortress);
+  const open = content().buildings.filter((building) => !building.fortress && buildingOn(building));
   const finished = open.filter((building) => levels[building.id] >= building.maxLevel).length;
   return {
     cornerstone: {
