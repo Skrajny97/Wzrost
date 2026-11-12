@@ -700,6 +700,11 @@
       "id": "0.2.88",
       "title": "Wersja 0.2.88",
       "body": "- Przedmiot przekuty u kowala na wyższą rzadkość mówi to w swojej karcie, także na Targowisku: drugi raz się go nie przekuje. Kupujący widzi to przed zakupem."
+    },
+    {
+      "id": "0.2.89",
+      "title": "Wersja 0.2.89",
+      "body": "- Narrator objaśnia Labirynt Systemu: na 30. poziomie postaci prowadzi do Osady, do Sali prób, i pokazuje mapę, rany drużyny, poziomy dnia i nagrody.\n- Na Targowisku przy każdym przedmiocie widać jego Tier."
     }
   ]
 }

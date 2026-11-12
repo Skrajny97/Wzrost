@@ -2130,6 +2130,40 @@ describe('Time Points and the narrator', () => {
     assert.deepEqual(again.data.character.tutorial, before);
   });
 
+  test('the Labirynt chapter (878) comes after the Portale, as the author accepted it, and test mode starts it again', async () => {
+    const { tutorial } = (await call('GET', '/api/content')).data;
+    const kept = (line) => line.kind === 'card' || line.kind === 'point' || line.once;
+    const lines = tutorial.lines.filter((line) => line.chapter === 'labyrinth');
+    assert.deepEqual(
+      lines.map((line) => [line.id, line.kind]),
+      [
+        ['labyrinth-welcome', 'card'],
+        ['labyrinth-lead', 'lead'],
+        ['labyrinth-map', 'point'],
+        ['labyrinth-wounds', 'point'],
+        ['labyrinth-levels', 'point'],
+        ['labyrinth-guardians', 'point'],
+      ],
+    );
+    // 878.1-878.6 as the author accepted them.
+    assert.equal(lines[0].text[0], 'Trzydziesty poziom postaci… System otworzył przed Tobą Labirynt.');
+    assert.equal(lines.at(-1).text[0], 'Strażnicy strzegą Artefaktów. Pierwszy pokonany strażnik otworzy Ci Rdzeń.');
+    // The takes the author accepted on the review page (880).
+    assert.ok(lines.every((line) => line.voice === `audio/narration/${line.id}.mp3`));
+    const at = (id) => tutorial.lines.findIndex((line) => line.id === id);
+    assert.ok(at('labyrinth-welcome') > at('portals-sweep'));
+    assert.deepEqual(tutorial.chapters.labyrinth, { skipLabel: 'Pomiń objaśnienie', skippedText: 'Objaśnienie pominięte. Labirynt czeka w Osadzie, w Sali prób.' });
+    const chapter = lines.filter(kept).map((line) => line.id);
+    const see = (body) => call('POST', '/api/tutorial', { cookie, body });
+    await see({ skip: true });
+    const before = (await see({ skip: true, chapter: 'skills' })).data.character.tutorial;
+    const read = (await see({ skip: true, chapter: 'labyrinth' })).data.character.tutorial;
+    assert.deepEqual(read, [...before, ...chapter]);
+    const again = await call('POST', '/api/test/labyrinth-tour', { cookie });
+    assert.equal(again.status, 200);
+    assert.deepEqual(again.data.character.tutorial, before);
+  });
+
   test('test mode starts the Społeczność chapter again', async () => {
     const see = (body) => call('POST', '/api/tutorial', { cookie, body });
     await see({ skip: true });

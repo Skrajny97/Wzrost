@@ -21,6 +21,10 @@
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Portals wait in the Combat tab."
     },
+    "labyrinth": {
+      "skipLabel": "Skip the explanation",
+      "skippedText": "Explanation skipped. The Labyrinth waits in the Settlement, in the Trial Hall."
+    },
     "guild": {
       "skipLabel": "Skip the explanation",
       "skippedText": "Explanation skipped. The Guild waits in the Community, in the Guild tab."
@@ -1040,6 +1044,42 @@
         "You can also clear a stage you have already beaten, without a fight – five times a day, gathering the resources you need."
       ],
       "voice": "audio/narration/en/portals-sweep.mp3"
+    },
+    "labyrinth-welcome": {
+      "text": [
+        "Your character's thirtieth level… The System has opened the Labyrinth to you."
+      ],
+      "voice": "audio/narration/en/labyrinth-welcome.mp3"
+    },
+    "labyrinth-lead": {
+      "text": [
+        "The Labyrinth waits in the Settlement, in the Trial Hall. Let us look in there."
+      ],
+      "voice": "audio/narration/en/labyrinth-lead.mp3"
+    },
+    "labyrinth-map": {
+      "text": [
+        "A new Labyrinth waits here every day. You choose your own way from room to room, all the way to the level's guardian."
+      ],
+      "voice": "audio/narration/en/labyrinth-map.mp3"
+    },
+    "labyrinth-wounds": {
+      "text": [
+        "Wounds stay from fight to fight. Only springs, the merchant and some blessings heal them."
+      ],
+      "voice": "audio/narration/en/labyrinth-wounds.mp3"
+    },
+    "labyrinth-levels": {
+      "text": [
+        "Three levels a day. Clear the third, and the Hellish level opens to you that same day."
+      ],
+      "voice": "audio/narration/en/labyrinth-levels.mp3"
+    },
+    "labyrinth-guardians": {
+      "text": [
+        "The guardians hold the Artifacts. The first guardian you defeat will open the Core to you."
+      ],
+      "voice": "audio/narration/en/labyrinth-guardians.mp3"
     }
   }
 }

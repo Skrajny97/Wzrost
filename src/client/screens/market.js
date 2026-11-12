@@ -221,7 +221,7 @@ export function itemEntry(item, key, opened, { notes: noted = true, wearers = nu
         open: opened.has(key),
         onToggle: (event) => (event.currentTarget.open ? opened.add(key) : opened.delete(key)),
       },
-      h('summary', {}, itemSummary(item)),
+      h('summary', {}, itemSummary(item, { tier: true })),
       h(
         'ul',
         { class: 'item-properties' },
@@ -567,7 +567,7 @@ export function mountMarket(holder) {
             'ul',
             { class: 'market-picks' },
             bag.map(({ item }) =>
-              h('li', { class: 'market-pick' }, pickWithScrap(itemSummary(item), scrapText(item.price)), choose({ kind: 'item', itemId: item.id, name: item.name, count: 1, scrap: item.price })),
+              h('li', { class: 'market-pick' }, pickWithScrap(itemSummary(item, { tier: true }), scrapText(item.price)), choose({ kind: 'item', itemId: item.id, name: item.name, count: 1, scrap: item.price })),
             ),
           ),
         others.length > 0 &&
@@ -697,7 +697,7 @@ export function mountMarket(holder) {
                   h(
                     'li',
                     { class: 'market-pick' },
-                    parcel.goods.kind === 'item' ? itemSummary(parcel.goods.item) : stackLine(parcel.goods),
+                    parcel.goods.kind === 'item' ? itemSummary(parcel.goods.item, { tier: true }) : stackLine(parcel.goods),
                     h('span', { class: 'muted market-reason', text: REASONS[parcel.reason] ? t(REASONS[parcel.reason]) : '' }),
                   ),
                 ),

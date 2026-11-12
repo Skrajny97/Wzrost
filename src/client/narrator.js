@@ -19,8 +19,10 @@
 // character level 10, never before the Umiejętności, the Społeczność at
 // character level 5, after both when they wait, the Rzemieślnictwo at
 // character level 15, the Osada at character level 20, the Ewolucja at
-// class level 50, the Wieże at character level 50 and the Górnictwo with
-// the Jubilerstwo at character level 25, each after all the earlier ones. A chapter's own "Pomiń"
+// class level 50, the Wieże at character level 50, the Górnictwo with
+// the Jubilerstwo at character level 25, the Portale at character level 5
+// and the Labirynt Systemu at character level 30, each after all the
+// earlier ones. A chapter's own "Pomiń"
 // passes only that chapter, and a line can be told for each class
 // (`classes`). A place's line comes on the first look at its place once no
 // chapter waits, also to a character that was there before the line was
@@ -169,7 +171,8 @@ const laterHalfway = (read) =>
   (read.has('evolution-welcome') && evolutionWaiting(read)) ||
   (read.has('towers-welcome') && towersWaiting(read)) ||
   (read.has('mining-welcome') && miningWaiting(read)) ||
-  (read.has('portals-welcome') && portalsWaiting(read));
+  (read.has('portals-welcome') && portalsWaiting(read)) ||
+  (read.has('labyrinth-welcome') && labyrinthWaiting(read));
 const settlementDue = (hash, read) =>
   Boolean(state.character.settlementOpen) &&
   !onReport(hash) &&
@@ -273,6 +276,35 @@ const portalsTour = (hash, read) => portalsDue(hash, read) && read.has('portals-
 const portalsHere = (hash, read) => onPortals(hash) && portalsTour(hash, read);
 // From the Walka tab, which the lead opens, on to the Portale.
 const portalsTrip = (hash, read) => (hash === '#/walka' && portalsTour(hash, read) && !read.has('portals-lands') ? '#/portale' : null);
+// The Labirynt chapter (878): once the Labirynt Systemu opens (character
+// level 30, where the game has it), after the report that brought it there
+// and only when no other chapter waits. Not on the character's screens
+// either. It leads to the Osada tab, from where the narrator itself opens
+// the Sala prób at its Labirynt tab, points at the map, at the fighters'
+// wounds, at the day's levels and at its rewards, and ends there.
+const onLabyrinth = (hash) => hash === '#/osada/trial-hall';
+const labyrinthOpen = () => Boolean(state.character.settlementOpen) && isUnlocked('labyrinth');
+const labyrinthWaiting = (read) => labyrinthOpen() && !read.has('labyrinth-guardians');
+const labyrinthDue = (hash, read) =>
+  labyrinthOpen() &&
+  !onReport(hash) &&
+  !onCharacter(hash) &&
+  !skillsWaiting(read) &&
+  !professionsWaiting(read) &&
+  !communityWaiting(read) &&
+  !craftingWaiting(read) &&
+  !settlementWaiting(read) &&
+  !evolutionWaiting(read) &&
+  !towersWaiting(read) &&
+  !miningWaiting(read) &&
+  !portalsWaiting(read) &&
+  !read.has('labyrinth-guardians');
+const labyrinthTour = (hash, read) => labyrinthDue(hash, read) && read.has('labyrinth-welcome');
+const labyrinthHere = (hash, read) => onLabyrinth(hash) && labyrinthTour(hash, read);
+// From any of the Osada's screens, which the lead opens, on to the Sala prób
+// at its Labirynt tab (its first, screens/settlement.js).
+const labyrinthTrip = (hash, read) =>
+  hash.startsWith('#/osada') && !onLabyrinth(hash) && labyrinthTour(hash, read) && !read.has('labyrinth-map') ? '#/osada/trial-hall' : null;
 // No chapter waits: only then a line of a single place comes (the Osada's,
 // Szybkie Polowanie's, the Gildia's, the Warownia's and the other places').
 const noChapterWaits = (read) =>
@@ -284,7 +316,8 @@ const noChapterWaits = (read) =>
   !evolutionWaiting(read) &&
   !towersWaiting(read) &&
   !miningWaiting(read) &&
-  !portalsWaiting(read);
+  !portalsWaiting(read) &&
+  !labyrinthWaiting(read);
 // After the introduction, with no chapter waiting: a line of its own place
 // told on the place's first visit, as the Osada's are (641-647): the
 // Gildia's, the Warownia's, and those of 6.11.2026 below.
@@ -598,6 +631,17 @@ const BEATS = {
   'portals-lands': { place: mark('portal-gold'), go: portalsTrip, when: portalsHere },
   'portals-stages': { place: mark('portal-gold-stage'), tab: mark('portal-gold-open'), when: portalsHere },
   'portals-sweep': { when: portalsHere },
+  // The Labirynt chapter, after all the others (878): the map, the
+  // fighters with the HP they carry, the day's levels and its rewards.
+  'labyrinth-welcome': { when: labyrinthDue },
+  'labyrinth-lead': {
+    place: '.nav-item[href="#/osada"]',
+    when: (hash, read) => labyrinthTour(hash, read) && !hash.startsWith('#/osada') && !read.has('labyrinth-map'),
+  },
+  'labyrinth-map': { place: mark('labyrinth-map'), go: labyrinthTrip, when: labyrinthHere },
+  'labyrinth-wounds': { place: mark('labyrinth-party'), when: labyrinthHere },
+  'labyrinth-levels': { place: mark('labyrinth-steps'), when: labyrinthHere },
+  'labyrinth-guardians': { place: mark('labyrinth-gains'), when: labyrinthHere },
   // The Gildia, for a member (6.11.2026): its tabs on the first look at its
   // page, then each tab on its first look, the Wyprawa Gildii (646) too.
   'guild-tabs': { place: mark('guild-tabs'), when: (hash, read) => onGuildPage(hash) && inGuild(read) },

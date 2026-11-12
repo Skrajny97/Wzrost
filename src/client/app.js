@@ -1161,6 +1161,7 @@ async function openTutorialTests() {
       row(t('Objaśnienie Rzemieślnictwa'), t('Od 15. poziomu postaci. Poziomy profesji zostają.'), repeatCraftingTour, told && Boolean(state.character.professions?.workshop)),
       row(t('Objaśnienie Osady'), t('Od 20. poziomu postaci.'), repeatSettlementTour, told && Boolean(state.character.settlementOpen)),
       row(t('Objaśnienie Górnictwa i Jubilerstwa'), t('Od 25. poziomu postaci. Poziomy profesji zostają.'), repeatMiningTour, told && isUnlocked('mining')),
+      row(t('Objaśnienie Labiryntu'), t('Od 30. poziomu postaci. Dzisiejszy Labirynt zostaje.'), repeatLabyrinthTour, told && Boolean(state.character.settlementOpen) && isUnlocked('labyrinth')),
       row(t('Objaśnienie Ewolucji'), t('Od 50. poziomu klasy, dopóki ewolucja nie jest wybrana.'), repeatEvolutionTour, told && (state.character.evolution?.choices.length ?? 0) > 0),
       row(t('Objaśnienie Wież'), t('Od 50. poziomu postaci.'), repeatTowersTour, told && isUnlocked('towers')),
       // The lines of places (646, 647 and those of 6.11.2026), each told on
@@ -1454,6 +1455,23 @@ async function repeatPortalsTour() {
   try {
     await call('POST', '/api/test/portals-tour');
     forgetPart('portals');
+  } catch (error) {
+    toast(error.message);
+  }
+}
+
+// Test mode: the narrator's Labirynt chapter from the start (testing.js).
+async function repeatLabyrinthTour() {
+  const sure = await confirmAction({
+    title: t('Objaśnienie Labiryntu od nowa?'),
+    text: t('Narrator objaśni Labirynt od początku.'),
+    confirmLabel: t('Od nowa'),
+  });
+  if (!sure) return;
+  closeSheet();
+  try {
+    await call('POST', '/api/test/labyrinth-tour');
+    forgetPart('labyrinth');
   } catch (error) {
     toast(error.message);
   }

@@ -12,6 +12,9 @@
 // merchant's wares wait over the map until chosen. The words are shown in
 // the page's language (t(), i18n.js).
 //
+// The narrator's Labirynt chapter (878, narrator.js) points at the map, the
+// fighters, the day's levels and its rewards by their `data-guide` marks.
+//
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, as the Salon Gier's (casino.js), so a redraw never asks the
 // server again.
@@ -56,7 +59,7 @@ export function mountLabyrinth(container, { navigate }) {
     head.style.setProperty('--place-art', `url("/art/places/${hell ? 'labyrinth-hell' : 'labyrinth'}.png")`);
     const steps = h(
       'ol',
-      { class: 'labyrinth-steps', 'aria-label': t('Poziomy Labiryntu') },
+      { class: 'labyrinth-steps', 'aria-label': t('Poziomy Labiryntu'), 'data-guide': 'labyrinth-steps' },
       view.levels.map((level) =>
         h(
           'li',
@@ -167,7 +170,7 @@ export function mountLabyrinth(container, { navigate }) {
         : h('p', { class: 'muted', text: t('Bez błogosławieństw. Zdobędziesz je po elicie, po strażniku i na ołtarzu.') });
     return h(
       'section',
-      { class: 'card labyrinth-party', 'aria-labelledby': 'labyrinth-party-title' },
+      { class: 'card labyrinth-party', 'aria-labelledby': 'labyrinth-party-title', 'data-guide': 'labyrinth-party' },
       h('h2', { class: 'section-title', id: 'labyrinth-party-title', text: t('Drużyna') }),
       meters,
       h('p', { class: 'muted small', text: t('Rany zostają między walkami. Leczą źródła, kupiec i niektóre błogosławieństwa.') }),
@@ -237,7 +240,7 @@ export function mountLabyrinth(container, { navigate }) {
     board.style.height = `${height}px`;
     return h(
       'section',
-      { class: `card labyrinth-map-card${levelOf().hell ? ' labyrinth-map-card--hell' : ''}`, 'aria-labelledby': 'labyrinth-map-title' },
+      { class: `card labyrinth-map-card${levelOf().hell ? ' labyrinth-map-card--hell' : ''}`, 'aria-labelledby': 'labyrinth-map-title', 'data-guide': 'labyrinth-map' },
       h('h2', { class: 'section-title', id: 'labyrinth-map-title', text: t('Mapa: {level}', { level: levelOf().name }) }),
       h('p', { class: 'muted small', text: view.over ? t('Labirynt na dziś się skończył.') : view.pending ? t('Najpierw wybierz, co dalej (wyżej).') : t('Stuknij świecącą komnatę, żeby do niej wejść.') }),
       board,
@@ -352,7 +355,7 @@ export function mountLabyrinth(container, { navigate }) {
     ];
     return h(
       'section',
-      { class: 'card labyrinth-gains', 'aria-labelledby': 'labyrinth-gains-title' },
+      { class: 'card labyrinth-gains', 'aria-labelledby': 'labyrinth-gains-title', 'data-guide': 'labyrinth-gains' },
       h('h2', { class: 'section-title', id: 'labyrinth-gains-title', text: t('Nagrody dnia') }),
       h('dl', { class: 'status-list' }, rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value })))),
       isUnlocked('core') ? systemLink('#/postac/rdzen', t('Do Rdzenia')) : h('p', { class: 'muted small', text: t('Rdzeń otworzy się, gdy postać pokona pierwszego strażnika Labiryntu.') }),
