@@ -559,8 +559,8 @@ const BEATS = {
   // The Salon Gier (543.2 A): each game at its tab.
   'settlement-casino-lottery': { place: mark('casino-tab-lottery'), when: onPlace('casino') },
   'settlement-casino-wheel': { place: mark('casino-tab-wheel'), when: onPlace('casino') },
-  // The Sala prób (645).
-  'settlement-trial-hall': { place: mark('trial-hall'), when: onPlace('trial-hall') },
+  // The Sala prób (645), its trials' tab opened where it has the Labirynt.
+  'settlement-trial-hall': { place: mark('trial-hall'), tab: mark('trial-hall-tab-trials'), when: onPlace('trial-hall') },
   'settlement-quarters': { place: mark('quarters-companions'), when: onQuarters },
   // The Ewolucja chapter, after all the others.
   'evolution-welcome': { when: evolutionDue },

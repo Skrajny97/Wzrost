@@ -148,7 +148,8 @@ function cachedSamples(player, character, equipped, areaId, now, hard = false) {
   // The companions who would go along fight beside the character (companions.js).
   const companions = settlementOn() ? companionsGoing(player, now) : [];
   const party = companions.map((companion) => [companion.id, companion.level, companion.gear]);
-  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard]);
+  // The Rdzeń's Artefakty and gem too (core.js), which change the fights.
+  const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard, character.core ?? null]);
   let samples = samplesCache.get(key);
   if (!samples) {
     samples = threatSamples({ character, equipped, areaId, companions, hard }, content());

@@ -75,6 +75,12 @@
                 "seat": { "$ref": "#/definitions/point" },
                 "ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z]+(-[a-z]+)*$" } }
               }
+            },
+            "nudge": {
+              "type": "object",
+              "description": "Przesunięcie jeźdźca na jednym wierzchowcu w pikselach [x, y] (x > 0 w prawo, y < 0 w górę), po wyglądzie jeźdźca i id kłusa w walk.mounts, gdy na tym jednym siedzi źle, a na pozostałych dobrze.",
+              "propertyNames": { "pattern": "^[a-z]+(-[a-z]+)*$" },
+              "additionalProperties": { "type": "object", "additionalProperties": { "$ref": "#/definitions/point" } }
             }
           }
         },

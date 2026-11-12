@@ -17,7 +17,7 @@
       "condition": { "type": "string", "minLength": 1 },
       "locked": { "type": "string", "minLength": 1, "description": "Cały komunikat przy części gry, która nie ma jeszcze poziomu ani warunku, zamiast „{name} odblokuje się {condition}.” (Rdzeń; autor 12.11.2026: „Rdzeń zostanie odblokowany podczas jednej z kolejnych aktualizacji.”)." },
       "message": { "type": "string", "minLength": 1 },
-      "feature": { "type": "string", "enum": ["crafting", "settlement", "arena"], "description": "Komunikat Systemu tylko tam, gdzie ta część gry jest włączona (crafting: CRAFTING, settlement: SETTLEMENT, arena: ARENA w wrangler.jsonc)." },
+      "feature": { "type": "string", "enum": ["crafting", "settlement", "arena", "labyrinth"], "description": "Komunikat Systemu tylko tam, gdzie ta część gry jest włączona (crafting: CRAFTING, settlement: SETTLEMENT, arena: ARENA, labyrinth: LABYRINTH w wrangler.jsonc)." },
       "huntMinutes": { "type": "integer", "minimum": 1, "description": "Od tego poziomu eksploracja może trwać do tylu minut (najdłuższa z odblokowanych). Przed pierwszym takim wpisem: shortHuntMaxMinutes z balance.json." }
     }
   }

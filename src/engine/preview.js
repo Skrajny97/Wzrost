@@ -31,10 +31,12 @@ export function combatValues(character, equipped, content) {
   const { totals } = computeStats(character, equipped, content);
   const level = character.level;
   const scale = unit.damageScale;
+  // With the damage bonus the Rdzeń's Artefakty give (core.js).
+  const bonus = 1 + (unit.damageBonus ?? 0);
   return {
-    damageMin: Math.round(unit.weapon.min * scale),
-    damageMax: Math.round(unit.weapon.max * scale),
-    damage: ((unit.weapon.min + unit.weapon.max) / 2) * scale,
+    damageMin: Math.round(unit.weapon.min * scale * bonus),
+    damageMax: Math.round(unit.weapon.max * scale * bonus),
+    damage: ((unit.weapon.min + unit.weapon.max) / 2) * scale * bonus,
     reduction: reduction(unit.armor, level, balance),
     dodge: cappedChance(unit.dodgeRating, level, tuning.dodgeCap, balance),
     crit: cappedChance(unit.critRating, level, tuning.critCap, balance),
@@ -117,12 +119,13 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
  */
 export function statShares(character, equipped, content) {
   const now = combatValues(character, equipped, content);
-  const { totals } = computeStats(character, equipped, content);
+  const { totals, sources } = computeStats(character, equipped, content);
   /** @type {ValueKey[]} */
   const keys = ['damage', 'reduction', 'dodge', 'crit', 'effectResist', 'speed', 'maxHp', 'mana', 'regen', 'recovery'];
   return Object.fromEntries(
     content.statIds.map((/** @type {string} */ stat) => {
-      const points = { ...character.points, [stat]: (character.points[stat] ?? 0) - totals[stat] };
+      // The Rdzeń's share of a stat goes with the stat's other points.
+      const points = { ...character.points, [stat]: (character.points[stat] ?? 0) - (totals[stat] - sources[stat].core) };
       const without = combatValues({ ...character, points }, equipped, content);
       /** @type {Partial<Record<ValueKey, number>>} */
       const shares = {};

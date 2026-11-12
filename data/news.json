@@ -690,6 +690,11 @@
       "id": "0.2.86",
       "title": "Wersja 0.2.86",
       "body": "- Koło Fortuny: raz dziennie jedno zakręcenie za darmo, z szansami najniższej stawki.\n- W Garbarni, w zakładce „Sprzedaj”, nazwy materiałów mają kolor swojej rzadkości, jak w plecaku."
+    },
+    {
+      "id": "0.2.87",
+      "title": "Wersja 0.2.87",
+      "body": "- Labirynt Systemu od 30. poziomu postaci: w Osadzie, w Sali prób. Codziennie nowy labirynt z trzema poziomami, a po trzecim, tego samego dnia, poziom Piekielny. Wybierasz drogę przez komnaty: walki, elity, skarby, źródła, ołtarze i kupca. Rany zostają z walki na walkę, a błogosławieństwa działają do końca dnia.\n- Strażnicy Labiryntu strzegą Artefaktów. Pierwszy pokonany strażnik otwiera Rdzeń w zakładce Postać: Artefakty wchłania się na stałe, a Odłamki Rdzenia je ulepszają.\n- Czempion Wieży przy pierwszym zwycięstwie daje też Artefakt.\n- Po angielsku nazwy miejsc na planszy Osady nie wychodzą już poza jej brzeg."
     }
   ]
 }

@@ -548,8 +548,9 @@ export function fightingPlayer({ unit, character, equipped, name, area, hp, on =
     hp,
     ...(on.speed && { speed: base.speed * (1 + on.speed) }),
     ...(on.armor && { armor: Math.round(base.armor * (1 + on.armor)) }),
-    // A curse and wounds take off what a strength potion adds.
-    ...((on.damage || on.curse || on.wounds) && { damageBonus: (on.damage ?? 0) - (on.curse ?? 0) - (on.wounds ?? 0) }),
+    // A curse and wounds take off what a strength potion adds, both on top
+    // of what the Rdzeń gives (core.js).
+    ...((on.damage || on.curse || on.wounds) && { damageBonus: (base.damageBonus ?? 0) + (on.damage ?? 0) - (on.curse ?? 0) - (on.wounds ?? 0) }),
     ...(on.ward && { ward: on.ward }),
     ...(on.poison && oil && !base.weapon.dot && { weapon: { ...base.weapon, dot: { ...oil, chance: on.poison } } }),
     ...(Object.keys(kit).length > 0 && { potions: kit }),

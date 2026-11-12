@@ -261,6 +261,9 @@ export function buildContent(raw) {
     towers: raw.towers ?? null,
     // The Portale Systemu (portals.js).
     portals: raw.portals ?? null,
+    // The Labirynt Systemu (labyrinth.js) and the Rdzeń with its Artefakty
+    // (core.js).
+    labyrinth: raw.labyrinth ?? null,
     // The players' Gildie (src/server/guilds.js).
     guilds: raw.guilds ?? null,
     // The characters' Punkty Sławy (fame.js).

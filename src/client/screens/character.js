@@ -273,6 +273,14 @@ export function mountCharacter(container, { switchCharacter } = {}) {
   }
 
   function slotButton(slot, item) {
+    // The Rdzeń once open (screens/core.js): its slot leads to its tab.
+    if (slot.locked && isUnlocked('core')) {
+      return h(
+        'a',
+        { class: 'slot slot--core slot--open', href: '#/postac/rdzen', 'data-guide': `slot-${slot.id}`, 'aria-label': t('{slot}: otwórz', { slot: slot.name }) },
+        icon('core', { size: 24 }),
+      );
+    }
     if (slot.locked) {
       const core = unlockInfo('core');
       return h(

@@ -872,7 +872,26 @@
     "tutorial:lines.crafting-patterns",
     "tutorial:lines.crafting-ending",
     "!chat:channels.english",
-    "weeks"
+    "weeks",
+    "labyrinth",
+    "!labyrinth:map",
+    "!labyrinth:core.tower",
+    "!labyrinth:core.elements.fire.traits",
+    "!labyrinth:core.elements.fire.resonance",
+    "!labyrinth:core.elements.frost.traits",
+    "!labyrinth:core.elements.frost.resonance",
+    "!labyrinth:core.elements.water.traits",
+    "!labyrinth:core.elements.water.resonance",
+    "!labyrinth:core.elements.lightning.traits",
+    "!labyrinth:core.elements.lightning.resonance",
+    "!labyrinth:core.elements.earth.traits",
+    "!labyrinth:core.elements.earth.resonance",
+    "!labyrinth:core.elements.nature.traits",
+    "!labyrinth:core.elements.nature.resonance",
+    "!labyrinth:core.elements.poison.traits",
+    "!labyrinth:core.elements.poison.resonance",
+    "!labyrinth:core.elements.sacred.traits",
+    "!labyrinth:core.elements.sacred.resonance"
   ],
   "code": [
     "src/client/index.html",
@@ -1106,7 +1125,13 @@
     "src/server/translate.js",
     "src/engine/weeks.js",
     "src/server/weeks.js",
-    "src/client/weeks.js"
+    "src/client/weeks.js",
+    "src/engine/labyrinth.js",
+    "src/engine/core.js",
+    "src/server/labyrinth.js",
+    "src/server/core.js",
+    "src/client/labyrinth.js",
+    "src/client/screens/core.js"
   ],
   "ignore": [
     "w z na nie się sie jest że ze co jak ktoś ktos gdzie mam masz ma czy ale tak już juz jestem dla po od ja ty mi mnie tu tam jaki jakie który ktory kto ile bo też tez teraz jeszcze może moze wszyscy wszystkim proszę prosze dzięki dzieki siema hej cześć czesc elo spoko fajnie fajny dobry dobra dobre poziom poziomie mój moj twój twoj ten ta tego tym kiedy coś cos nic był byl była byla będzie bedzie trzeba warto chyba bardzo",

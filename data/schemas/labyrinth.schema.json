@@ -1,0 +1,282 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Labirynt Systemu i Rdzeń",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["rewardMinutes", "levels", "eliteStrength", "guardianStrength", "map", "rooms", "spring", "merchant", "rewards", "reportsKept", "blessings", "texts", "core"],
+  "definitions": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "pair": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "exclusiveMinimum": 0 } },
+    "range": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "integer", "minimum": 1 } },
+    "share": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+    "weights": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 } },
+    "texts": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+  },
+  "properties": {
+    "$comment": { "type": "string" },
+    "rewardMinutes": { "type": "integer", "minimum": 1, "description": "Zwykła walka płaci PD i złotem jak jedna walka wyprawy tylu minut." },
+    "levels": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "description": "Trzy poziomy dnia i Piekielny (hell), w tej kolejności.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "strength", "shards", "artifact"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "name": { "type": "string", "minLength": 1 },
+          "hell": { "type": "boolean" },
+          "strength": { "$ref": "#/definitions/pair", "description": "[obrażenia, HP] stworów razy tyle co na najnowszym miejscu eksploracji poziomu postaci." },
+          "shards": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["elite", "treasure"],
+            "properties": {
+              "elite": { "type": "integer", "minimum": 0 },
+              "treasure": { "type": "integer", "minimum": 0 }
+            }
+          },
+          "artifact": { "$ref": "#/definitions/weights", "description": "Wagi rzadkości Artefaktu strażnika (id z rarities.json)." }
+        }
+      }
+    },
+    "eliteStrength": { "$ref": "#/definitions/pair" },
+    "guardianStrength": { "$ref": "#/definitions/pair" },
+    "map": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rows", "rooms", "links", "firstRow", "eliteFromRow", "merchantMost", "springLeast"],
+      "properties": {
+        "rows": { "type": "integer", "minimum": 2 },
+        "rooms": { "$ref": "#/definitions/range", "description": "Najmniej i najwięcej komnat w rzędzie." },
+        "links": { "$ref": "#/definitions/range", "description": "Najmniej i najwięcej dróg z komnaty do następnego rzędu." },
+        "firstRow": { "$ref": "#/definitions/id" },
+        "eliteFromRow": { "type": "integer", "minimum": 1 },
+        "merchantMost": { "type": "integer", "minimum": 0 },
+        "springLeast": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "rooms": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "text"],
+        "properties": {
+          "id": { "type": "string", "enum": ["fight", "elite", "treasure", "spring", "altar", "merchant", "guardian"] },
+          "name": { "type": "string", "minLength": 1 },
+          "weight": { "type": "number", "exclusiveMinimum": 0 },
+          "text": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "spring": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heal"],
+      "properties": { "heal": { "$ref": "#/definitions/share" } }
+    },
+    "merchant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["heal", "healMinutes", "blessingMinutes"],
+      "properties": {
+        "heal": { "$ref": "#/definitions/share" },
+        "healMinutes": { "type": "integer", "minimum": 1 },
+        "blessingMinutes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "rewards": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eliteGoldMinutes", "treasureGoldMinutes"],
+      "properties": {
+        "eliteGoldMinutes": { "type": "integer", "minimum": 1 },
+        "treasureGoldMinutes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "reportsKept": { "type": "integer", "minimum": 1, "description": "Ile raportów walk Labiryntu trzyma Dziennik, osobno od innych." },
+    "blessings": {
+      "type": "array",
+      "minItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "target", "effect", "text"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "name": { "type": "string", "minLength": 1 },
+          "target": { "type": "string", "enum": ["character", "companions", "party"], "description": "Komu służy: postaci, towarzyszom albo wszystkim walczącym." },
+          "effect": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": false,
+            "properties": {
+              "damage": { "type": "number", "exclusiveMinimum": 0 },
+              "armor": { "type": "number", "exclusiveMinimum": 0 },
+              "hp": { "type": "number", "exclusiveMinimum": 0 },
+              "crit": { "type": "number", "exclusiveMinimum": 0 },
+              "speed": { "type": "number", "exclusiveMinimum": 0 },
+              "dodge": { "type": "number", "exclusiveMinimum": 0 },
+              "lifesteal": { "type": "number", "exclusiveMinimum": 0 },
+              "openingCrit": { "const": 1 },
+              "shield": { "type": "number", "exclusiveMinimum": 0 },
+              "mend": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          },
+          "text": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fightStart", "eliteStart", "guardianStart", "won", "lost", "defeat", "shards", "gold", "artifact", "treasure", "spring", "levelCleared", "hellOpen", "dayDone", "coreOpen", "towerArtifact"],
+      "properties": {
+        "fightStart": { "$ref": "#/definitions/texts" },
+        "eliteStart": { "$ref": "#/definitions/texts" },
+        "guardianStart": { "$ref": "#/definitions/texts" },
+        "won": { "$ref": "#/definitions/texts" },
+        "lost": { "$ref": "#/definitions/texts" },
+        "defeat": { "$ref": "#/definitions/texts" },
+        "shards": { "$ref": "#/definitions/texts" },
+        "gold": { "$ref": "#/definitions/texts" },
+        "artifact": { "$ref": "#/definitions/texts" },
+        "treasure": { "$ref": "#/definitions/texts" },
+        "spring": { "$ref": "#/definitions/texts" },
+        "levelCleared": { "$ref": "#/definitions/texts" },
+        "hellOpen": { "$ref": "#/definitions/texts" },
+        "dayDone": { "$ref": "#/definitions/texts" },
+        "coreOpen": { "$ref": "#/definitions/texts" },
+        "towerArtifact": { "$ref": "#/definitions/texts" }
+      }
+    },
+    "core": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sockets", "sizes", "traits", "elements", "abilities", "resonance", "upgrade", "break", "dissolveRefund", "tower", "texts"],
+      "properties": {
+        "sockets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["per", "least"],
+          "properties": {
+            "per": { "type": "integer", "minimum": 1, "description": "Jedno gniazdo na tyle poziomów postaci (858 v2 A)." },
+            "least": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "sizes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "sockets", "traits", "ability", "weight", "traitFactor", "upgradeCost"],
+            "properties": {
+              "id": { "$ref": "#/definitions/id" },
+              "name": { "type": "string", "minLength": 1 },
+              "sockets": { "type": "integer", "minimum": 1 },
+              "traits": { "type": "integer", "minimum": 1 },
+              "ability": { "type": "boolean" },
+              "weight": { "type": "number", "exclusiveMinimum": 0 },
+              "traitFactor": { "type": "number", "exclusiveMinimum": 0 },
+              "upgradeCost": { "type": "number", "exclusiveMinimum": 0 }
+            }
+          }
+        },
+        "traits": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "kind", "name", "text", "value"],
+            "properties": {
+              "id": { "$ref": "#/definitions/id" },
+              "kind": { "type": "string", "enum": ["stat", "damage", "armor", "hp", "recovery", "resist", "dodge", "will", "speed", "crit", "lifesteal", "mana"] },
+              "stat": { "type": "string", "pattern": "^[a-z]+$", "description": "Statystyka cechy kind stat (main: główna statystyka klasy)." },
+              "name": { "type": "string", "minLength": 1 },
+              "text": { "type": "string", "minLength": 1 },
+              "value": { "type": "number", "exclusiveMinimum": 0, "description": "Udział na gniazdo pospolitego Artefaktu bez ulepszenia i klejnotu." }
+            }
+          }
+        },
+        "elements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "traits", "resonance"],
+            "properties": {
+              "id": { "$ref": "#/definitions/id" },
+              "name": { "type": "string", "minLength": 1 },
+              "traits": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/id" } },
+              "resonance": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["trait", "values"],
+                "properties": {
+                  "trait": { "$ref": "#/definitions/id" },
+                  "values": { "type": "array", "minItems": 1, "items": { "type": "number", "exclusiveMinimum": 0 } }
+                }
+              }
+            }
+          }
+        },
+        "abilities": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "text"],
+            "properties": {
+              "id": { "type": "string", "enum": ["sure-first", "first-strike", "opening-crit", "shield", "rally"] },
+              "name": { "type": "string", "minLength": 1 },
+              "text": { "type": "string", "minLength": 1 },
+              "value": { "type": "number", "exclusiveMinimum": 0 },
+              "below": { "$ref": "#/definitions/share" }
+            }
+          }
+        },
+        "resonance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["counts"],
+          "properties": { "counts": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 } } }
+        },
+        "upgrade": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["max", "bonus", "costs"],
+          "properties": {
+            "max": { "type": "integer", "minimum": 1 },
+            "bonus": { "type": "number", "exclusiveMinimum": 0 },
+            "costs": { "type": "array", "minItems": 1, "items": { "type": "integer", "minimum": 1 } }
+          }
+        },
+        "break": { "$ref": "#/definitions/weights", "description": "Odłamki z rozbicia za każde gniazdo Artefaktu, po rzadkości." },
+        "dissolveRefund": { "$ref": "#/definitions/share" },
+        "tower": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["level"],
+          "properties": { "level": { "$ref": "#/definitions/id", "description": "Poziom Labiryntu, którego rzadkości ma Artefakt czempiona Wieży (864 A)." } }
+        },
+        "texts": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "resonance"],
+          "properties": {
+            "name": { "$ref": "#/definitions/texts" },
+            "resonance": { "$ref": "#/definitions/texts" }
+          }
+        }
+      }
+    }
+  }
+}

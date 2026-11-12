@@ -114,6 +114,13 @@
     "message": "Odblokowano Wieże Systemu. Wejdź do nich w zakładce Walka, w części Wieże: kilkanaście walk dziennie, między wyprawami i także w czasie pracy w profesji."
   },
   {
+    "id": "labyrinth",
+    "name": "Labirynt Systemu",
+    "level": 30,
+    "feature": "labyrinth",
+    "message": "Odblokowano Labirynt Systemu. Wejdziesz do niego w Osadzie, w Sali prób: codziennie nowy, trzy poziomy komnat ze strażnikami i Artefaktami do Rdzenia, także w czasie wyprawy."
+  },
+  {
     "id": "core",
     "name": "Rdzeń",
     "locked": "Rdzeń zostanie odblokowany podczas jednej z kolejnych aktualizacji."

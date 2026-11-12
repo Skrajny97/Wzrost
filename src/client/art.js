@@ -3,7 +3,7 @@
 // and a full-figure portrait for each class and look. Whatever has no sprite
 // yet keeps its line icon or vector art.
 
-import { h, icon } from './dom.js';
+import { append, h, icon } from './dom.js';
 import { RESOURCE_ICONS } from './icons.js';
 import { state } from './state.js';
 
@@ -618,6 +618,37 @@ export const encyclopediaArt = (size) => iconArt('encyclopedia', size, 'book');
 // A scroll of the Kowadło by its id (ward-scroll, steady-scroll).
 export const scrollArt = (id, size) => iconArt(id, size, 'scroll');
 export const placeArt = (placeId) => (available.places.has(placeId) ? `/art/places/${placeId}.png` : null);
+// The pictures of the Labirynt Systemu and the Rdzeń (art/labyrinth/, 850–866,
+// accepted in 868 and 869): its rooms (room-<type>), its Artefakty
+// (artifact-<element>), the Odłamki (shards) and the Rdzeń itself (core). A
+// picture this page has shown once shows at once; the first time it shows
+// once its file has loaded, and while it cannot load the placeholder
+// `fallback` stands in its place.
+const labyrinthLoaded = new Set();
+const labyrinthMissing = new Set();
+export function labyrinthArt(name, size, fallback) {
+  const box = h('span', { class: 'labyrinth-art' });
+  box.style.width = `${size}px`;
+  box.style.height = `${size}px`;
+  const image = () => h('img', { src: `/art/labyrinth/${name}.png`, alt: '', width: size, height: size, class: 'sprite labyrinth-art-image', decoding: 'async', draggable: 'false' });
+  if (labyrinthLoaded.has(name)) return append(box, [image()]);
+  if (labyrinthMissing.has(name)) return append(box, [fallback]);
+  const first = image();
+  first.hidden = true;
+  first.addEventListener('load', () => {
+    labyrinthLoaded.add(name);
+    first.hidden = false;
+    fallback?.remove();
+  });
+  first.addEventListener('error', () => {
+    labyrinthMissing.add(name);
+    first.remove();
+  });
+  return append(box, [fallback, first]);
+}
+// A room's placeholder: its line icon in its colour (styles.css).
+const ROOM_ICONS = { fight: 'swords', elite: 'star', treasure: 'coffer', spring: 'spirit', altar: 'skills', merchant: 'pouch', guardian: 'keep' };
+export const roomPlaceholder = (type) => h('span', { class: `room-placeholder room-placeholder--${type}` }, icon(ROOM_ICONS[type] ?? 'unknown', { size: 20 }));
 // A fight's board under its formation (arena.js), or null while it has none.
 export const boardArt = (boardId) => (available.boards.has(boardId) ? `/art/boards/${boardId}.png` : null);
 // A building of the Siedziba Gildii at its own size, or null while it has

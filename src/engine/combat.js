@@ -68,6 +68,16 @@
 // spell, set spirits on fire, and raise a foe killed by poison as a
 // skeleton that fights on the character's side.
 
+// The Rdzeń's large Artefakty (core.js) and the blessings of the Labirynt
+// Systemu (labyrinth.js) shape a unit with a few marks of its own: a share
+// of every blow's damage back as HP (`lifesteal`), a first own blow that
+// cannot be dodged (`firstSure`), the first move of the fight
+// (`firstStrike`), a first critical blow (`openingCrit`), a shield of a
+// share of the HP at the start (`openingShield`), HP back once a fight below
+// a mark (`rally`), and points more of the chances of a critical blow
+// (`critChance`) and of a dodge (`dodgeChance`). None of them draws a
+// random number, so a fight without them goes as before.
+
 import { cappedChance, reduction } from './formulas.js';
 import { ACTIVE_KINDS, START_KINDS, STANCE_KINDS, WOUND_KINDS } from './skills.js';
 import { say } from './text.js';
@@ -224,7 +234,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       Object.assign(unit, { stances: [], summon: null, riposte: null, struck: 0, nextBlow: 0, chilled: null, marked: null, doom: null, focus: null, nextCrit: null, harmony: null });
     }
   }
+  // Osłona Rdzenia and Osłona Systemu: a shield of a share of the unit's HP
+  // from the start, as a mana shield's, until its points are spent.
+  for (const unit of units) if (unit.openingShield) unit.shield = { points: Math.max(1, Math.round(unit.maxHp * unit.openingShield)) };
   for (const unit of units) unit.next = unit.interval * (0.5 + 0.5 * rng.next());
+  // Pierwszy ruch (the Rdzeń): the unit moves before every other one's first
+  // move, with no draw of its own.
+  if (units.some((unit) => unit.firstStrike)) {
+    const first = Math.min(...units.map((unit) => unit.next));
+    for (const unit of units) if (unit.firstStrike) unit.next = Math.max(0, first - 1);
+  }
   // An ambush (an event's, events.js, or Zasadzka, 464: a creature that lies
   // in wait, `ambush` in monsters.json, wherever it fights): every enemy
   // moves before the allies' first move. It draws no random numbers.
@@ -438,6 +457,15 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     }
   };
 
+  // Drugi oddech (the Rdzeń): once a fight, the moment HP falls below its
+  // mark, a share of it comes back.
+  const rally = (/** @type {Unit} */ unit, /** @type {number} */ t) => {
+    if (!unit.rally || unit.rallied || unit.hp <= 0 || unit.hp >= (unit.rallyBelow ?? 0.3) * unit.maxHp) return;
+    unit.rallied = true;
+    const amount = heal(unit, unit.rally * unit.maxHp);
+    log(() => ({ t, kind: 'heal', actor: unit.id, target: unit.id, amount, hp: unit.hp, text: say(texts, 'rally', actions, { actor: unit.name, amount }) }));
+  };
+
   const tickEffects = (/** @type {Unit} */ unit, /** @type {number} */ t) => {
     for (const dot of unit.dots) {
       if (unit.hp <= 0) break;
@@ -472,6 +500,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       if (!down) {
         if (unit.skills.length > 0) wounded(unit, t);
         if (unit.potions?.heal) healPotion(unit, t);
+        if (unit.rally) rally(unit, t);
       } else if (evolving && dot.effect === 'poisoned') rise(unit, dot.source, t);
     }
     unit.dots = unit.dots.filter((/** @type {Dot} */ dot) => dot.ticks > 0);
@@ -700,6 +729,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     // review, 12.11.2026).
     if (actor.skills.length > 0) wounded(actor, t);
     if (actor.potions?.heal) healPotion(actor, t);
+    if (actor.rally) rally(actor, t);
   };
 
   // A summon (Przywołanie żywiołaka, Trujący Szlam) stands before its
@@ -774,15 +804,22 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const attack = move.skill && !move.own ? move.skill.name : weapon.attackName;
     const vars = { actor: actor.name, target: target.name, attack, skill: move.skill?.name, ...move.vars };
     const marks = marksOf(move);
-    // Namierzenie: the foe the unit locked on cannot dodge its blows.
+    // Namierzenie: the foe the unit locked on cannot dodge its blows; Pewny
+    // cios (the Rdzeń): nor the unit's first own blow.
     const locked = evolving && target.focus?.source === actor && target.focus.sure;
-    if (category === 'physical' && !move.undodgeable && !locked) {
+    const sureFirst = Boolean(actor.firstSure) && !actor.firstSureUsed && ownBlow(move);
+    if (sureFirst) actor.firstSureUsed = true;
+    if (category === 'physical' && !move.undodgeable && !locked && !sureFirst) {
       const evading = target.evade && target.evade.hits > 0 ? target.evade : null;
       if (evading) evading.hits -= 1;
       const base = cappedChance(target.dodgeRating, actor.level, tuning.dodgeCap, balance);
       // Taniec ostrzy, Riposta and Widmowy krok raise it above the cap.
+      // Mgła (the Labirynt's blessing) too.
       const bonus =
-        (evading ? evading.dodge : 0) + (evolving && target.riposte ? target.riposte.dodge : 0) + (evolving && target.feat?.kind === 'shadowStep' ? (target.feat.dodge ?? 0) : 0);
+        (evading ? evading.dodge : 0) +
+        (evolving && target.riposte ? target.riposte.dodge : 0) +
+        (evolving && target.feat?.kind === 'shadowStep' ? (target.feat.dodge ?? 0) : 0) +
+        (target.dodgeChance ?? 0);
       const dodge = bonus ? Math.min(0.95, base + bonus) : base;
       if (rng.chance(dodge)) {
         log(() => ({ t, kind: 'dodge', actor: actor.id, target: target.id, hp: target.hp, ...marks, text: say(texts, wordsFor('dodge', move), actions, vars) }));
@@ -811,8 +848,16 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     // first two).
     const sure = feat?.kind === 'coldBlood' && actor.struck < (feat.sure ?? 1);
     if (feat) actor.struck += 1;
+    // Ostrze Rdzenia and Pierwsza krew: the unit's first own blow that lands
+    // is critical; Bystre oko: points more of the chance.
+    const opening = Boolean(actor.openingCrit) && !actor.openedCrit && ownBlow(move);
+    if (opening) actor.openedCrit = true;
     const critical =
-      move.alwaysCrit || sure || Boolean(vanished) || rng.chance(Math.min(1, cappedChance(actor.critRating, target.level, tuning.critCap, balance) + (move.critBonus ?? 0)));
+      move.alwaysCrit ||
+      sure ||
+      Boolean(vanished) ||
+      opening ||
+      rng.chance(Math.min(1, cappedChance(actor.critRating, target.level, tuning.critCap, balance) + (move.critBonus ?? 0) + (actor.critChance ?? 0)));
     const critFactor = critical ? tuning.critMultiplier * (feat?.critDamage ? 1 + feat.critDamage : 1) : 1;
     // A blow of several elements (Promień Żywiołów) is split between them
     // evenly, each against its resistance and weakness. Mur tarcz hardens
@@ -891,6 +936,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       const healed = heal(actor, amount * weapon.drain);
       if (healed > 0) log(() => ({ t, kind: 'drain', actor: actor.id, target: actor.id, amount: healed, hp: actor.hp, text: say(texts, 'drain', actions, { actor: actor.name, amount: healed }) }));
     }
+    // The Rdzeń's poison and Krwawa danina: a share of the damage back as HP.
+    if (actor.lifesteal && amount > 0 && actor.hp > 0) {
+      const healed = heal(actor, amount * actor.lifesteal);
+      if (healed > 0) log(() => ({ t, kind: 'drain', actor: actor.id, target: actor.id, amount: healed, hp: actor.hp, text: say(texts, 'lifesteal', actions, { actor: actor.name, amount: healed }) }));
+    }
     if (evolving) {
       // Krwawy szał: the frenzied heal by a share of what they dealt; so do
       // those with Szał low on HP.
@@ -947,6 +997,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     }
     if (target.skills.length > 0) wounded(target, t);
     if (target.potions?.heal) healPotion(target, t);
+    if (target.rally) rally(target, t);
     // Cień-sobowtór: the shadow repeats the unit's own blow that landed, at
     // the same target, for a share of its power.
     const double = evolving && ownBlow(move) && actor.hp > 0 && target.hp > 0 ? actor.stances.find((/** @type {Stance} */ stance) => stance.mirror) : null;
@@ -1267,6 +1318,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       // As after a blow (throwBack above).
       if (foe.skills.length > 0) wounded(foe, t);
       if (foe.potions?.heal) healPotion(foe, t);
+      if (foe.rally) rally(foe, t);
     }
     if (actor.feat?.kind === 'arcana') actor.mana = Math.min(actor.maxMana ?? 0, actor.mana + Math.round((actor.maxMana ?? 0) * actor.feat.regen));
     // Harmonia żywiołów: the elements of the unit's last move count from now.
@@ -1343,6 +1395,13 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     }
     if (actor.summon) summonActs(actor, t);
   };
+
+  // The shields from the start (above), in the playback's first moment.
+  for (const unit of units) {
+    if (!unit.openingShield || !unit.shield) continue;
+    const shield = unit.shield.points;
+    log(() => ({ t: 0, kind: 'skill', actor: unit.id, target: unit.id, skillName: say(texts, 'openingShieldName', 0), shield, text: say(texts, 'openingShield', 0, { actor: unit.name, shield }) }));
+  }
 
   // Skills that work from the start: a blessing, a coated blade, a riposte
   // and Harmonia żywiołów.

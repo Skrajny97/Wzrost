@@ -18,12 +18,13 @@ import { t } from '../i18n.js';
 import { desktopLayout, onLayoutChange } from '../layout-mode.js';
 import { setMusicPlace } from '../music.js';
 import { dayPart } from '../scenes.js';
-import { activityFinished, call, serverNow, state, unlockInfo } from '../state.js';
+import { activityFinished, call, isUnlocked, serverNow, state, unlockInfo } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, pageHeading, systemPanel, toast, withButton } from '../ui.js';
 import { companionCard } from '../companions.js';
 import { mercenariesCard, mountMercenaryHire, serviceWaiting } from '../mercenaries.js';
 import { askGuildButton } from '../guild-requests.js';
 import { mountCasino } from '../casino.js';
+import { mountLabyrinth } from '../labyrinth.js';
 import { trialHallCards } from '../trial-hall.js';
 import { mountPvpArena } from '../pvp-arena.js';
 import { stableCard } from '../stable.js';
@@ -58,6 +59,12 @@ const HISTORY_KEY = 'osada'; // a place's screen lies one view below the board
 // The Karczma's tabs, the first one opened by default; the address may
 // name another (#/osada/tavern/mercenaries).
 const TAVERN_TABS = ['mug', 'companions', 'mercenaries'];
+// The Sala prób's tabs where the character has the Labirynt Systemu: the
+// Labirynt first, opened by default, then the trials (#/osada/trial-hall/trials).
+const TRIAL_HALL_TABS = ['labyrinth', 'trials'];
+// Whether the Sala prób holds the Labirynt: where the game has it on and
+// the character has reached it (data/unlocks.json, 855 A).
+const labyrinthHere = () => Boolean(unlockInfo('labyrinth')) && isUnlocked('labyrinth');
 // The board's ground, in its pixels: a place's picture keeps its own size on it.
 const BOARD_WIDTH = 384;
 // Its shape, as styles.css draws it (.settlement-map, aspect-ratio 384 / 768).
@@ -66,6 +73,8 @@ const MAP_SIZE = { width: BOARD_WIDTH, height: 768 };
 // Akceptacja Bractw, and the gap between (styles.css, .settlement-board-view).
 const SIDE_MIN = 220;
 const SIDE_GAP = 20;
+// How close to the board's edge a place's name may come (keepNamesOnBoard).
+const NAME_EDGE = 4;
 
 export function mountSettlement(container, { params = {} } = {}) {
   const placeId = params.place ?? null;
@@ -93,6 +102,10 @@ export function mountSettlement(container, { params = {} } = {}) {
   // screen redraws. The address may name it (the top bar leads a mercenary
   // to its tab) and follows the tab chosen, as the Encyklopedia's does.
   let tavernTab = TAVERN_TABS.includes(params.tab) ? params.tab : 'mug';
+  // The Sala prób's tab (the author: "można by podzielic Salę Prób w Osadzie
+  // - na zakładkę Labiryntu i samych Prób otwarcia nowego Regiony
+  // Wewnętrznego danej Krainy"), named by the address as the Karczma's is.
+  let trialHallTab = TRIAL_HALL_TABS.includes(params.tab) ? params.tab : TRIAL_HALL_TABS[0];
   // The mercenaries waiting to be hired (mercenaries.js), mounted once their
   // tab opens and kept while the screen redraws, as the Targowisko is.
   let hire = null;
@@ -122,6 +135,17 @@ export function mountSettlement(container, { params = {} } = {}) {
     } else casino.refresh();
     return casino.holder;
   };
+  // The Labirynt Systemu in the Sala prób (labyrinth.js), kept so too; asked
+  // for together with the Osada when its tab opens first.
+  let labyrinth = null;
+  const labyrinthPanel = () => {
+    if (!labyrinth) {
+      const holder = h('div', { class: 'stack labyrinth-panel' });
+      labyrinth = { holder, ...mountLabyrinth(holder, { navigate: (hash) => (location.hash = hash) }) };
+    } else labyrinth.refresh();
+    return labyrinth.holder;
+  };
+  if (placeId === 'trial-hall' && trialHallTab === 'labyrinth' && labyrinthHere()) labyrinthPanel();
   // The Arena (pvp-arena.js, 762 A), kept so too.
   let pvpArena = null;
   const pvpArenaPanel = (place) => {
@@ -1377,6 +1401,40 @@ export function mountSettlement(container, { params = {} } = {}) {
     );
   }
 
+  // The Sala prób's two tabs, as the Tablica's and the Salon Gier's: the
+  // Labirynt Systemu and the trials that open a land's inner region early
+  // (620 B). Without the Labirynt (below its level, or where the game does
+  // not have it) the trials alone, as before.
+  function trialHallTabs(place) {
+    const trials = () => trialHallCards(data.trialHall, place, (hash) => (location.hash = hash));
+    if (!labyrinthHere()) return trials();
+    const tab = (id, label) =>
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'chat-tab',
+          role: 'tab',
+          'data-guide': `trial-hall-tab-${id}`,
+          'aria-selected': String(trialHallTab === id),
+          onClick: () => trialHallTab !== id && pickTrialHallTab(id),
+        },
+        h('span', { class: 'chat-tab-name', text: label }),
+      );
+    return h(
+      'div',
+      { class: 'stack' },
+      h('div', { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': place.name }, tab('labyrinth', t('Labirynt')), tab('trials', t('Próby'))),
+      trialHallTab === 'labyrinth' ? labyrinthPanel() : trials(),
+    );
+  }
+
+  function pickTrialHallTab(id) {
+    trialHallTab = id;
+    history.replaceState(history.state, '', id === TRIAL_HALL_TABS[0] ? `${SETTLEMENT}/trial-hall` : `${SETTLEMENT}/trial-hall/${id}`);
+    render();
+  }
+
   // The Karczma's tabs: the mug with today's rumor, the companions, and
   // from their level the mercenaries, with a dot while the pay of a
   // service, or the close of an offer nobody took, waits there (as the
@@ -1517,13 +1575,32 @@ export function mountSettlement(container, { params = {} } = {}) {
   function fitMap() {
     const view = container.querySelector('.settlement-board-view');
     const map = view?.querySelector('.settlement-map');
-    if (!map || !desktopLayout()) return;
-    const page = container.closest('.screen--game');
-    const below = (page ? parseFloat(getComputedStyle(page).paddingBottom) || 0 : 0) + (parseFloat(getComputedStyle(map).marginBottom) || 0);
-    const room = window.innerHeight - (map.getBoundingClientRect().top + window.scrollY) - below;
-    const { width, height } = MAP_SIZE;
-    const beside = view.clientWidth - SIDE_GAP - SIDE_MIN;
-    view.style.setProperty('--board-fit', `${Math.floor(Math.min((room * width) / height, beside))}px`);
+    if (!map) return;
+    if (desktopLayout()) {
+      const page = container.closest('.screen--game');
+      const below = (page ? parseFloat(getComputedStyle(page).paddingBottom) || 0 : 0) + (parseFloat(getComputedStyle(map).marginBottom) || 0);
+      const room = window.innerHeight - (map.getBoundingClientRect().top + window.scrollY) - below;
+      const { width, height } = MAP_SIZE;
+      const beside = view.clientWidth - SIDE_GAP - SIDE_MIN;
+      view.style.setProperty('--board-fit', `${Math.floor(Math.min((room * width) / height, beside))}px`);
+    }
+    keepNamesOnBoard(map);
+  }
+
+  // A place's name stays on the board: a long one near its edge (an English
+  // name, the narrowest phones) moves inwards instead of sticking out past
+  // it, as "Enchantress's Workshop" did at 360 px, and its place comes above
+  // the buildings next to it, so none covers the moved name.
+  function keepNamesOnBoard(map) {
+    const board = map.getBoundingClientRect();
+    if (!board.width) return;
+    for (const name of map.querySelectorAll('.settlement-place-label')) {
+      name.style.removeProperty('--name-shift');
+      const box = name.getBoundingClientRect();
+      const shift = Math.max(0, board.left + NAME_EDGE - box.left) - Math.max(0, box.right - (board.right - NAME_EDGE));
+      if (shift) name.style.setProperty('--name-shift', `${Math.round(shift)}px`);
+      name.parentElement?.classList.toggle('settlement-place--name-moved', Boolean(shift));
+    }
   }
   window.addEventListener('resize', fitMap);
   const stopLayout = onLayoutChange(fitMap);
@@ -1557,8 +1634,9 @@ export function mountSettlement(container, { params = {} } = {}) {
       place.id === 'stable' && !place.soon && data.stable && stableCard(data.stable, apply),
       // The Salon Gier's Loteria and Koło Fortuny (523–526), under Szczęsny's.
       place.id === 'casino' && !place.soon && casinoPanel(),
-      // The Sala prób's trial of the day (620 B), its report at once.
-      place.id === 'trial-hall' && !place.soon && trialHallCards(data.trialHall, place, (hash) => (location.hash = hash)),
+      // The Sala prób: the Labirynt Systemu, and the trial of the day (620 B)
+      // with its report at once, each in its tab.
+      place.id === 'trial-hall' && !place.soon && trialHallTabs(place),
       // The Arena's fights, table and rewards (762 A).
       place.id === 'arena' && !place.soon && pvpArenaPanel(place),
     );
@@ -1573,7 +1651,8 @@ export function mountSettlement(container, { params = {} } = {}) {
     // An unknown place in the address leads back to the board, and a tab
     // the place does not have to the place.
     if (placeId && !place) return location.replace(SETTLEMENT);
-    if (place && params.tab && (place.id !== 'tavern' || !TAVERN_TABS.includes(params.tab))) return location.replace(`${SETTLEMENT}/${place.id}`);
+    const tabs = place?.id === 'tavern' ? TAVERN_TABS : place?.id === 'trial-hall' && labyrinthHere() ? TRIAL_HALL_TABS : [];
+    if (place && params.tab && !tabs.includes(params.tab)) return location.replace(`${SETTLEMENT}/${place.id}`);
     if (place) placeView(place);
     else boardView();
     // An empty slot fills when its time comes, a wounded companion is ready
@@ -1597,6 +1676,7 @@ export function mountSettlement(container, { params = {} } = {}) {
       stopLayout();
       market?.unmount();
       casino?.unmount();
+      labyrinth?.unmount();
       pvpArena?.unmount();
       hire?.unmount();
     },

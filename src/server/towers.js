@@ -35,6 +35,9 @@ import {
   isUnlocked,
   laterPeriod,
   questPeriod,
+  artifactView,
+  createRng,
+  makeArtifact,
   sellPrice,
   towerArea,
   towerFight,
@@ -67,6 +70,9 @@ import { gemLines } from './hunts.js';
 import { partyOf } from './parties.js';
 import { trimReports } from './reports.js';
 import { weekNow } from './weeks.js';
+import { artifactData } from './core.js';
+import { labyrinthOn } from './features.js';
+import { say } from '../engine/text.js';
 
 const rules = () => content().towers;
 const path = (key) => `$."${key}"`;
@@ -230,6 +236,12 @@ export async function enterTower(context) {
   const hunt = towerFight({ character, equipped, name: row.name, floor, seed, partners: climbers.partners, companions: climbers.companions, trophies, chest, championTrophy, week: weekNow(now) }, content());
   const won = hunt.tower.won;
   const applied = applyHunt(character, hunt, content());
+  // The first win of a champion's floor brings an Artefakt for the Rdzeń
+  // too (864 A), of the rarities of a level of the Labirynt (core.tower),
+  // where the Labirynt is on; it waits in the Skrytka Rdzenia.
+  const labyrinth = labyrinthOn() ? content().labyrinth : null;
+  const towerLevel = labyrinth?.levels.find((level) => level.id === labyrinth.core.tower.level);
+  const artifact = towerLevel && won && hunt.tower.champion && championTrophy ? makeArtifact(towerLevel.artifact, createRng(`${seed}:artifact`), content()) : null;
 
   // The chest's item: in an empty slot it is worn at once, else it goes to
   // the bag, and what does not fit there the scrapper buys, the weakest
@@ -262,8 +274,10 @@ export async function enterTower(context) {
       lootItem: hunt.tower.lootItem,
       partners: climbers.partners.map((partner) => partner.name),
       companions: climbers.companions.map((companion) => companion.name),
+      ...(artifact && { artifact: artifactView(artifact, content()) }),
     },
   };
+  if (artifact) report.system = [...report.system, say(labyrinth.texts, 'towerArtifact', 0, { artifact: artifactView(artifact, content()).name })];
   // The gems of the bag's items the scrapper bought fall out and go back to
   // the minerals (757 B), as after an exploration (hunts.js).
   // Each counted from the items still in the bag as the batch runs, as their
@@ -346,6 +360,8 @@ export async function enterTower(context) {
     // (guild-trials.js; the author: 488 A).
     ...trialProgress(db, row.id, { kills: huntKills(hunt, content()), towerWins: won && floor >= trialTowerFloor(row.level, content()) ? 1 : 0 }, now),
     ...(storedSold.length > 0 ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${storedSold.map(() => '?').join(', ')})`).bind(row.id, ...storedSold.map((item) => item.id))] : []),
+    // The champion's Artefakt into the Skrytka Rdzenia (core.js).
+    ...(artifact ? [db.prepare('INSERT INTO core_artifacts (character_id, data, created_at) VALUES (?, ?, ?)').bind(row.id, artifactData(artifact), now)] : []),
     // The win's items last: the database may give a new item the id of an
     // item gone from the bag meanwhile, which the scrapper's price, gems and
     // deletion above, counted by the ids read, would then take for the one

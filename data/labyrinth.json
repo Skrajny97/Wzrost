@@ -1,0 +1,144 @@
+{
+  "$comment": "Labirynt Systemu i Rdzeń (src/engine/labyrinth.js, src/engine/core.js, src/server/labyrinth.js, src/server/core.js; DECISIONS.md, „Labirynt Systemu i Rdzeń: zasady”, 850–866). Labirynt od 30. poziomu postaci (unlocks.json, labyrinth), tylko tam, gdzie zmienna LABYRINTH jest „on”. Codziennie o północy czasu polskiego nowa mapa, ta sama dla wszystkich graczy (ziarno z samego dnia): trzy poziomy (levels), a po przejściu 3. tego samego dnia poziom Piekielny (hell: stwory dwa razy mocniejsze niż na 3. poziomie, 854 A; pilnuje tego walidator). Poziom to map.rows rzędów komnat (po map.rooms[0]–map.rooms[1] w rzędzie), z każdej komnaty map.links[0]–map.links[1] dróg do następnego rzędu, a na końcu strażnik. Rodzaje komnat (rooms) losują się z wag weight; pierwszy rząd to same walki, elity dopiero od rzędu map.eliteFromRow, najwyżej map.merchantMost kupców na poziom i co najmniej map.springLeast źródło. Stwory: z krain na poziomie postaci i niższych, na poziomie postaci z początku dnia, tak mocne jak na najnowszym miejscu eksploracji na tym poziomie, razy strength poziomu Labiryntu (elita razy eliteStrength, strażnik czempion razy guardianStrength). HP postaci i towarzyszy przechodzi z walki do walki (852 A); leczą tylko źródło (spring.heal maks. HP każdego), kupiec (merchant.heal) i błogosławieństwa. Walka nie wygrana kończy Labirynt na ten dzień. Nagrody (857): zwykła walka PD i złoto jak jedna walka wyprawy rewardMinutes minut, elita Odłamki Rdzenia (levels[].shards.elite) i złoto rewards.eliteGoldMinutes minut eksploracji, skarb Odłamki (shards.treasure) i złoto rewards.treasureGoldMinutes minut, strażnik Artefakt (rzadkość z levels[].artifact). Kupiec bierze za leczenie i za wybór błogosławieństwa złoto merchant.*Minutes minut eksploracji na poziomie postaci. Błogosławieństwa (blessings, 853 A): wybór jednego z trzech po elicie, strażniku i na ołtarzu, do końca dnia, łączą się. Rdzeń (core): gniazda floor(poziom postaci / sockets.per), co najmniej sockets.least (858 v2 A); Artefakt mały zajmuje 1 gniazdo i ma 1 cechę, średni 2 i 2 cechy, duży 3, 2 cechy i zdolność (sizes). Cechy pasują do żywiołu (elements[].traits, 860 A), ich liczby rosną z budżetem rzadkości (rarities.json), z traitFactor rozmiaru, z ulepszeniem (upgrade.bonus za stopień, do upgrade.max, koszt upgrade.costs[stopień-1] × upgradeCost rozmiaru, 862 A) i z klejnotem w Rdzeniu (setBonus, 863 A); liczba zdolności dużego Artefaktu (abilities[].value) rośnie tak samo, ale tylko z pierwiastkiem budżetu rzadkości. Rezonans (861 A): 2, 4 i 6 wchłoniętych Artefaktów jednego żywiołu (resonance.counts) dają rosnącą premię żywiołu (elements[].resonance). Rozbicie (Rozbij) daje break[rzadkość] × gniazda Odłamków i połowę włożonych w ulepszenie; rozpuszczenie (Rozpuść, 859 A) zwraca połowę Odłamków z ulepszania (dissolveRefund). Czempion Wieży przy pierwszym zwycięstwie daje Artefakt o rzadkości poziomu tower.level (864 A).",
+  "rewardMinutes": 60,
+  "levels": [
+    {
+      "id": "first",
+      "name": "Poziom 1",
+      "strength": [1.1, 1.1],
+      "shards": { "elite": 3, "treasure": 2 },
+      "artifact": { "common": 55, "rare": 35, "unique": 10 }
+    },
+    {
+      "id": "second",
+      "name": "Poziom 2",
+      "strength": [1.35, 1.35],
+      "shards": { "elite": 4, "treasure": 3 },
+      "artifact": { "common": 46, "rare": 37, "unique": 14, "epic": 3 }
+    },
+    {
+      "id": "third",
+      "name": "Poziom 3",
+      "strength": [1.65, 1.65],
+      "shards": { "elite": 5, "treasure": 4 },
+      "artifact": { "common": 37, "rare": 38, "unique": 18, "epic": 6, "legendary": 1 }
+    },
+    {
+      "id": "hell",
+      "name": "Piekielny",
+      "hell": true,
+      "strength": [3.3, 3.3],
+      "shards": { "elite": 9, "treasure": 7 },
+      "artifact": { "common": 22, "rare": 34, "unique": 25, "epic": 12, "legendary": 5, "mythic": 1.5, "divine": 0.5 }
+    }
+  ],
+  "eliteStrength": [1, 1],
+  "guardianStrength": [1, 1],
+  "map": {
+    "rows": 6,
+    "rooms": [2, 3],
+    "links": [2, 3],
+    "firstRow": "fight",
+    "eliteFromRow": 3,
+    "merchantMost": 1,
+    "springLeast": 1
+  },
+  "rooms": [
+    { "id": "fight", "name": "Walka", "weight": 46, "text": "Stwory Labiryntu. Za wygraną zgarniesz PD i złoto." },
+    { "id": "elite", "name": "Elita", "weight": 12, "text": "Elita Labiryntu. Za wygraną zgarniesz Odłamki Rdzenia, złoto i wybór błogosławieństwa." },
+    { "id": "treasure", "name": "Skarb", "weight": 12, "text": "Skrzynia Systemu, bez walki: Odłamki Rdzenia i złoto." },
+    { "id": "spring", "name": "Źródło", "weight": 12, "text": "Źródło leczy każdego walczącego o {heal}% maks. HP." },
+    { "id": "altar", "name": "Ołtarz", "weight": 10, "text": "Wybór jednego z trzech błogosławieństw." },
+    { "id": "merchant", "name": "Kupiec", "weight": 8, "text": "Kupiec Systemu sprzedaje leczenie i wybór błogosławieństwa za złoto." },
+    { "id": "guardian", "name": "Strażnik", "text": "Strażnik poziomu. Za wygraną zgarniesz Artefakt i wybór błogosławieństwa." }
+  ],
+  "spring": { "heal": 0.35 },
+  "merchant": { "heal": 0.5, "healMinutes": 30, "blessingMinutes": 60 },
+  "rewards": { "eliteGoldMinutes": 10, "treasureGoldMinutes": 15 },
+  "reportsKept": 40,
+  "blessings": [
+    { "id": "might", "name": "Moc Systemu", "target": "character", "effect": { "damage": 0.15 }, "text": "Postać zadaje o 15% więcej obrażeń." },
+    { "id": "stone-skin", "name": "Kamienna skóra", "target": "character", "effect": { "armor": 0.15 }, "text": "Pancerz postaci rośnie o 15%." },
+    { "id": "keen-eye", "name": "Bystre oko", "target": "character", "effect": { "crit": 0.08 }, "text": "Szansa postaci na cios krytyczny rośnie o 8 punktów procentowych." },
+    { "id": "breath", "name": "Oddech Labiryntu", "target": "party", "effect": { "mend": 0.1 }, "text": "Po każdej wygranej walce każdy walczący, który stoi, odzyskuje 10% maks. HP." },
+    { "id": "first-blood", "name": "Pierwsza krew", "target": "character", "effect": { "openingCrit": 1 }, "text": "Pierwszy cios postaci, który trafi, w każdej walce jest krytyczny." },
+    { "id": "vigour", "name": "Żywotność", "target": "character", "effect": { "hp": 0.2 }, "text": "Maks. HP postaci rośnie o 20%." },
+    { "id": "shoulder", "name": "Ramię w ramię", "target": "companions", "effect": { "damage": 0.2 }, "text": "Towarzysze zadają o 20% więcej obrażeń." },
+    { "id": "ward", "name": "Osłona Systemu", "target": "character", "effect": { "shield": 0.12 }, "text": "Na początku każdej walki postać ma osłonę 12% maks. HP." },
+    { "id": "light-step", "name": "Lekki krok", "target": "character", "effect": { "speed": 0.1 }, "text": "Postać działa o 10% szybciej." },
+    { "id": "mist", "name": "Mgła", "target": "character", "effect": { "dodge": 0.06 }, "text": "Szansa postaci na unik rośnie o 6 punktów procentowych." },
+    { "id": "common-cause", "name": "Wspólny cel", "target": "party", "effect": { "damage": 0.08, "armor": 0.08 }, "text": "Wszyscy walczący zadają o 8% więcej obrażeń i mają o 8% więcej pancerza." },
+    { "id": "blood-tithe", "name": "Krwawa danina", "target": "character", "effect": { "lifesteal": 0.08 }, "text": "8% obrażeń zadanych przez postać wraca jej jako HP." },
+    { "id": "care", "name": "Opieka", "target": "companions", "effect": { "hp": 0.2, "armor": 0.15 }, "text": "Towarzysze mają o 20% więcej maks. HP i o 15% więcej pancerza." }
+  ],
+  "texts": {
+    "fightStart": ["W komnacie czekają: {enemies}.", "Drzwi komnaty się zamykają. Przeciwnicy: {enemies}.", "Z mroku Labiryntu wychodzą: {enemies}."],
+    "eliteStart": ["Komnata cichnie. Elita Labiryntu: {enemies}.", "Posadzka drży. Elita Labiryntu: {enemies}."],
+    "guardianStart": ["Strażnik poziomu wychodzi z mroku: {enemies}.", "Cały poziom cichnie. Wychodzi strażnik: {enemies}."],
+    "won": ["Komnata zdobyta."],
+    "lost": ["Komnata nie została zdobyta. Labirynt na dziś się kończy."],
+    "defeat": ["System wyprowadza z Labiryntu: {target}.", "Walka przegrana. System wyprowadza z Labiryntu: {target}."],
+    "shards": ["Odłamki Rdzenia: +{shards}."],
+    "gold": ["+{gold} złota."],
+    "artifact": ["Strażnik zostawia Artefakt: {artifact}. Czeka w Skrytce Rdzenia."],
+    "treasure": ["W skrzyni Systemu: {gold} złota i Odłamki Rdzenia: {shards}."],
+    "spring": ["Źródło leczy wszystkich walczących: +{heal}% maks. HP."],
+    "levelCleared": ["{level} zdobyty."],
+    "hellOpen": ["Otwiera się poziom Piekielny: stwory dwa razy mocniejsze niż na 3. poziomie."],
+    "dayDone": ["Labirynt zdobyty do końca. Nowy o północy."],
+    "coreOpen": ["Rdzeń się otwiera. Artefakty wchłoniesz w zakładce Postać, w Rdzeniu."],
+    "towerArtifact": ["Czempion Wieży zostawia Artefakt: {artifact}. Czeka w Skrytce Rdzenia."]
+  },
+  "core": {
+    "sockets": { "per": 10, "least": 3 },
+    "sizes": [
+      { "id": "small", "name": "Mały", "sockets": 1, "traits": 1, "ability": false, "weight": 60, "traitFactor": 1, "upgradeCost": 1 },
+      { "id": "medium", "name": "Średni", "sockets": 2, "traits": 2, "ability": false, "weight": 30, "traitFactor": 1, "upgradeCost": 2 },
+      { "id": "large", "name": "Duży", "sockets": 3, "traits": 2, "ability": true, "weight": 10, "traitFactor": 1.25, "upgradeCost": 3 }
+    ],
+    "traits": [
+      { "id": "damage", "kind": "damage", "name": "Obrażenia", "text": "+{value}% obrażeń", "value": 0.005 },
+      { "id": "main-stat", "kind": "stat", "stat": "main", "name": "Główna statystyka", "text": "+{value}% głównej statystyki klasy", "value": 0.006 },
+      { "id": "armor", "kind": "armor", "name": "Pancerz", "text": "+{value}% pancerza", "value": 0.008 },
+      { "id": "endurance", "kind": "stat", "stat": "endurance", "name": "Wytrzymałość", "text": "+{value}% Wytrzymałości", "value": 0.008 },
+      { "id": "hp", "kind": "hp", "name": "HP", "text": "+{value}% maks. HP", "value": 0.006 },
+      { "id": "vitality", "kind": "stat", "stat": "vitality", "name": "Witalność", "text": "+{value}% Witalności", "value": 0.008 },
+      { "id": "recovery", "kind": "recovery", "name": "Leczenie po walce", "text": "+{value}% brakującego HP wraca po wygranej walce wyprawy", "value": 0.005 },
+      { "id": "resist", "kind": "resist", "name": "Odporności", "text": "+{value}% odporności na żywioły", "value": 0.015 },
+      { "id": "dodge", "kind": "dodge", "name": "Unik", "text": "+{value}% uniku", "value": 0.01 },
+      { "id": "will", "kind": "will", "name": "Wola", "text": "+{value}% odporności na efekty", "value": 0.015 },
+      { "id": "speed", "kind": "speed", "name": "Szybkość", "text": "+{value}% szybkości", "value": 0.003 },
+      { "id": "crit", "kind": "crit", "name": "Krytyczne", "text": "+{value}% szansy na cios krytyczny", "value": 0.01 },
+      { "id": "lifesteal", "kind": "lifesteal", "name": "Wysysanie", "text": "{value}% zadanych obrażeń wraca jako HP", "value": 0.0015 },
+      { "id": "perception", "kind": "stat", "stat": "perception", "name": "Percepcja", "text": "+{value}% Percepcji", "value": 0.01 },
+      { "id": "mana", "kind": "mana", "name": "Mana", "text": "+{value}% maks. many", "value": 0.01 },
+      { "id": "wisdom", "kind": "stat", "stat": "wisdom", "name": "Mądrość", "text": "+{value}% Mądrości", "value": 0.01 }
+    ],
+    "elements": [
+      { "id": "fire", "name": "Artefakt ognia", "traits": ["damage", "main-stat"], "resonance": { "trait": "damage", "values": [0.01, 0.02, 0.035] } },
+      { "id": "frost", "name": "Artefakt mrozu", "traits": ["dodge", "will"], "resonance": { "trait": "dodge", "values": [0.02, 0.04, 0.07] } },
+      { "id": "water", "name": "Artefakt wody", "traits": ["recovery", "resist"], "resonance": { "trait": "recovery", "values": [0.01, 0.02, 0.035] } },
+      { "id": "lightning", "name": "Artefakt elektryczności", "traits": ["speed", "crit"], "resonance": { "trait": "speed", "values": [0.008, 0.015, 0.025] } },
+      { "id": "earth", "name": "Artefakt ziemi", "traits": ["armor", "endurance"], "resonance": { "trait": "armor", "values": [0.015, 0.03, 0.05] } },
+      { "id": "nature", "name": "Artefakt natury", "traits": ["hp", "vitality"], "resonance": { "trait": "hp", "values": [0.015, 0.03, 0.05] } },
+      { "id": "poison", "name": "Artefakt trucizny", "traits": ["lifesteal", "perception"], "resonance": { "trait": "lifesteal", "values": [0.005, 0.01, 0.018] } },
+      { "id": "sacred", "name": "Artefakt sakrum", "traits": ["mana", "wisdom"], "resonance": { "trait": "mana", "values": [0.025, 0.05, 0.08] } }
+    ],
+    "abilities": [
+      { "id": "sure-first", "name": "Pewny cios", "text": "Pierwszy cios postaci w walce zawsze trafia." },
+      { "id": "first-strike", "name": "Pierwszy ruch", "text": "Postać rusza się w walce pierwsza." },
+      { "id": "opening-crit", "name": "Ostrze Rdzenia", "text": "Pierwszy cios postaci, który trafi, jest krytyczny." },
+      { "id": "shield", "name": "Osłona Rdzenia", "text": "Na początku walki postać ma osłonę {value}% maks. HP.", "value": 0.04 },
+      { "id": "rally", "name": "Drugi oddech", "text": "Raz na walkę, gdy HP postaci spadnie poniżej {below}% maks. HP, wraca jej {value}% maks. HP.", "value": 0.05, "below": 0.3 }
+    ],
+    "resonance": { "counts": [2, 4, 6] },
+    "upgrade": { "max": 10, "bonus": 0.1, "costs": [2, 3, 4, 6, 8, 11, 15, 20, 26, 34] },
+    "break": { "common": 1, "rare": 2, "unique": 3, "epic": 5, "legendary": 8, "mythic": 12, "divine": 18 },
+    "dissolveRefund": 0.5,
+    "tower": { "level": "third" },
+    "texts": {
+      "name": ["{size} {name}"],
+      "resonance": ["Rezonans {tier}: {bonus}"]
+    }
+  }
+}

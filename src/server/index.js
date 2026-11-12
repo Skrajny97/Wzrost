@@ -29,6 +29,8 @@ import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inv
 import { settlePartyEvents } from './party-events.js';
 import { enterTower, getTowers } from './towers.js';
 import { enterPortal, getPortals, sweepAllPortals, sweepPortal } from './portals.js';
+import { chooseLabyrinthBlessing, enterLabyrinth, getLabyrinth, labyrinthMerchant } from './labyrinth.js';
+import { absorbArtifact, breakArtifact, dissolveArtifact, getCore, upgradeArtifact } from './core.js';
 import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, setGuildRole } from './guilds.js';
 import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-beast.js';
 import { attackGuildGuardian, claimGuildExpeditionChest, getGuildExpedition } from './guild-expedition.js';
@@ -419,6 +421,17 @@ const routes = [
   ['POST', '/api/portals/enter', enterPortal],
   ['POST', '/api/portals/sweep', sweepPortal],
   ['POST', '/api/portals/sweep-all', sweepAllPortals],
+  // The Labirynt Systemu and the Rdzeń (labyrinth.js, core.js; 850–866),
+  // where LABYRINTH is on.
+  ['GET', '/api/labyrinth', getLabyrinth],
+  ['POST', '/api/labyrinth/room', enterLabyrinth],
+  ['POST', '/api/labyrinth/blessing', chooseLabyrinthBlessing],
+  ['POST', '/api/labyrinth/merchant', labyrinthMerchant],
+  ['GET', '/api/core', getCore],
+  ['POST', '/api/core/absorb', absorbArtifact],
+  ['POST', '/api/core/upgrade', upgradeArtifact],
+  ['POST', '/api/core/dissolve', dissolveArtifact],
+  ['POST', '/api/core/break', breakArtifact],
   ['POST', '/api/chat', sendChat],
   ['POST', '/api/chat/rules', acceptChatRules],
   ['POST', '/api/chat/seen', markChatSeen],

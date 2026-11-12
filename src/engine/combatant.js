@@ -2,6 +2,7 @@
 // Combatants: the player character and monsters reduced to the same shape, so
 // the combat code treats both alike (and later companions or other players).
 
+import { coreEffects } from './core.js';
 import { evolutionOf, perClassLevelOf } from './evolutions.js';
 import { budget, cappedChance, damageScale, maxHp, maxMana, speed, weaponDamage } from './formulas.js';
 import { upgradedItem } from './items.js';
@@ -48,7 +49,11 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
   const dodgeBonus = character.position === 'back' ? (area?.trait.backDodgeBonus ?? 0) : 0;
   const cls = content.classesById[character.classId];
   const perClassLevel = perClassLevelOf(character, content);
-  const hpMax = maxHp(totals.vitality, character.classLevel, perClassLevel, balance);
+  // The Rdzeń's Artefakty (core.js): the character's own, never a
+  // companion's (a companion's character has no core).
+  const core = character.core ? coreEffects(character.core, character.classId, content) : null;
+  const hpBase = maxHp(totals.vitality, character.classLevel, perClassLevel, balance);
+  const hpMax = core?.hp ? Math.round(hpBase * (1 + core.hp)) : hpBase;
   // The evolution's trait (evolutions.js) works in fights (combat.js); some
   // shape the character itself: Opoka's armour and resistances, Arkana's
   // mana, Krok cienia's speed, and the shelter of Zimowy oddech and Toksyny
@@ -61,6 +66,13 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     armor *= 1 + feat.armor;
     for (const element of Object.keys(resist)) resist[element] = Math.round(resist[element] * (1 + feat.resist));
   }
+  if (core) {
+    armor *= 1 + core.armor;
+    if (core.resist) for (const element of Object.keys(resist)) resist[element] = Math.round(resist[element] * (1 + core.resist));
+  }
+  const mana = feat?.kind === 'arcana' ? Math.round(manaMax * (1 + feat.mana)) : manaMax;
+  // The abilities of the Rdzeń's large Artefakty (core.js, combat.js).
+  const abilities = core?.abilities ?? {};
   // (Żniwo, the Nekromanta's trait grown from Toksyny, gives none.)
   const shelter = feat?.resist ? /** @type {Record<string, string>} */ ({ winter: 'frost', toxins: 'poison' })[feat.kind] : undefined;
   return {
@@ -86,13 +98,13 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     armor: Math.round(armor),
     resist,
     ...(shelter && { shelter: { [shelter]: feat.resist } }),
-    dodgeRating: totals.dexterity * balance.combat.dodgePerDexterity * (1 + dodgeBonus),
-    critRating: totals.perception * balance.combat.critPerPerception,
-    willRating: totals.will * balance.combat.willPerPoint,
-    speed: speed(totals.dexterity, character.level, balance) * (feat?.kind === 'shadowStep' ? 1 + feat.speed : 1),
+    dodgeRating: totals.dexterity * balance.combat.dodgePerDexterity * (1 + dodgeBonus) * (1 + (core?.dodge ?? 0)),
+    critRating: totals.perception * balance.combat.critPerPerception * (1 + (core?.crit ?? 0)),
+    willRating: totals.will * balance.combat.willPerPoint * (1 + (core?.will ?? 0)),
+    speed: speed(totals.dexterity, character.level, balance) * (feat?.kind === 'shadowStep' ? 1 + feat.speed : 1) * (1 + (core?.speed ?? 0)),
     // Skills and the mana they spend, full at the start of every fight;
     // Wisdom also strengthens healing.
-    maxMana: feat?.kind === 'arcana' ? Math.round(manaMax * (1 + feat.mana)) : manaMax,
+    maxMana: core?.mana ? Math.round(mana * (1 + core.mana)) : mana,
     wisdom: totals.wisdom,
     skills: learnedSkills(character, content),
     ...(feat && { feat }),
@@ -102,7 +114,19 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
       (challengeAt(character.level, content)?.recoveryAfterFight ?? balance.hunt.recoveryAfterFight) +
       cls.recovery.base +
       cls.recovery.perWisdom * totals.wisdom +
-      (area?.trait.recoveryBonus ?? 0),
+      (area?.trait.recoveryBonus ?? 0) +
+      (core?.recovery ?? 0),
+    // What the Rdzeń adds to the fights (combat.js): more damage, a share of
+    // it back as HP, and its large Artefakty's abilities: a first blow that
+    // always lands, the first move, a first critical blow, a shield at the
+    // start and HP back once a fight below a mark.
+    ...(core?.damage && { damageBonus: core.damage }),
+    ...(core?.lifesteal && { lifesteal: core.lifesteal }),
+    ...(abilities['sure-first'] && { firstSure: true }),
+    ...(abilities['first-strike'] && { firstStrike: true }),
+    ...(abilities['opening-crit'] && { openingCrit: true }),
+    ...(abilities.shield && { openingShield: abilities.shield }),
+    ...(abilities.rally && { rally: abilities.rally, rallyBelow: content.labyrinth.core.abilities.find((/** @type {{ id: string }} */ one) => one.id === 'rally')?.below ?? 0.3 }),
   };
 }
 

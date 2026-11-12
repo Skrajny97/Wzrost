@@ -1,6 +1,7 @@
 // The journal: past reports of the player's character, of explorations, of
-// gatherings, of brewing, of the Warsztat, of the Wieże and of the
-// Portale (`kind`: hunt, herbs, potions, items, tower or portal).
+// gatherings, of brewing, of the Warsztat, of the Wieże, of the Portale and
+// of the Labirynt Systemu (`kind`: hunt, herbs, potions, items, tower,
+// portal or labyrinth).
 
 import { gemView } from '../engine/index.js';
 import { requirePlayer } from './characters.js';
@@ -12,15 +13,19 @@ import { ApiError, json } from './http.js';
 // (explorations and professions), each group up to its own number
 // (balance.json, journal), so fights in the towers and the Portale do not
 // push the explorations out (the author: 486 A).
+// The Labirynt's fights have their own share too (data/labyrinth.json,
+// reportsKept).
 const TOWER = "kind = 'tower'";
 const PORTAL = "kind = 'portal'";
-const OTHER = "kind NOT IN ('tower', 'portal')";
+const LABYRINTH = "kind = 'labyrinth'";
+const OTHER = "kind NOT IN ('tower', 'portal', 'labyrinth')";
 const groups = () => [
   { where: OTHER, kept: content().balance.journal.reports },
   { where: TOWER, kept: content().balance.journal.towerReports },
   { where: PORTAL, kept: content().balance.journal.portalReports },
+  { where: LABYRINTH, kept: content().labyrinth?.reportsKept ?? 40 },
 ];
-const GROUP_OF = { tower: 1, portal: 2 };
+const GROUP_OF = { tower: 1, portal: 2, labyrinth: 3 };
 
 // The statement that removes the character's reports of the group of
 // `kind` beyond those the journal keeps, for the batch that saves a new

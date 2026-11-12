@@ -11355,13 +11355,20 @@ a.profession-square:active {
   top: 100%;
   left: 50%;
   padding: 2px 7px;
-  transform: translate(-50%, -6px);
+  /* --name-shift: moved inwards near the board's edge (screens/settlement.js). */
+  transform: translate(calc(-50% + var(--name-shift, 0px)), -6px);
   background: rgba(13, 17, 11, 0.86);
   border: 1px solid var(--bark-line);
   font-family: var(--font-system);
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
+}
+
+/* A place whose name moved inwards (screens/settlement.js) above its
+   neighbours, so no building covers the name. */
+.settlement-place--name-moved {
+  z-index: 3;
 }
 
 .settlement-place--soon .settlement-place-label {
@@ -18154,4 +18161,578 @@ a.discord-button {
   .storage-actions {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+}
+
+/* The pictures of the Labirynt and the Rdzeń (art.js, labyrinthArt): the
+   placeholder until the drawn picture loads. */
+.labyrinth-art {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.labyrinth-art-image {
+  width: 100%;
+  height: 100%;
+}
+
+.room-placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--room, var(--text));
+}
+
+.room-placeholder--fight {
+  --room: var(--text);
+}
+
+.room-placeholder--elite {
+  --room: #c8a0f0;
+}
+
+.room-placeholder--treasure {
+  --room: var(--gold);
+}
+
+.room-placeholder--spring {
+  --room: #7cc4f2;
+}
+
+.room-placeholder--altar {
+  --room: var(--system);
+}
+
+.room-placeholder--merchant {
+  --room: #d9b08a;
+}
+
+.room-placeholder--guardian {
+  --room: #f08a9c;
+}
+
+/* An Artefakt's placeholder: a diamond in its element's colour. */
+.artifact-placeholder {
+  display: block;
+  width: 55%;
+  height: 55%;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: var(--element, var(--system));
+  box-shadow: 0 0 6px var(--element, var(--system));
+  transform: rotate(45deg);
+}
+
+/* The Labirynt Systemu (labyrinth.js), a tab of the Sala prób: its picture
+   with the day's level, the levels of the day, the party, the map and the
+   rewards. Under the picture, and in its place until it is drawn, the
+   System's cold glow over dark stone. */
+.labyrinth-head {
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(143, 227, 239, 0.14), transparent 60%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 24px),
+    var(--bg-deep);
+}
+
+.labyrinth-hero--hell .labyrinth-head {
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(214, 69, 97, 0.2), transparent 60%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 24px),
+    var(--bg-deep);
+}
+
+.labyrinth-head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.labyrinth-level {
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.labyrinth-hero--hell {
+  border-color: rgba(214, 69, 97, 0.6);
+}
+
+.labyrinth-hero--hell .labyrinth-level {
+  color: #f08a9c;
+}
+
+.labyrinth-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.labyrinth-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 34px;
+  min-height: 30px;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.labyrinth-step--cleared {
+  border-color: rgba(167, 196, 127, 0.6);
+  color: var(--leaf);
+}
+
+.labyrinth-step--here {
+  border-color: var(--system);
+  background: rgba(143, 227, 239, 0.12);
+  color: var(--system-text);
+}
+
+.labyrinth-step--hell {
+  color: #f08a9c;
+}
+
+.labyrinth-step--shut {
+  border-style: dashed;
+  opacity: 0.55;
+}
+
+.labyrinth-subtitle {
+  margin: 6px 0 0;
+  font-size: 16px;
+}
+
+.labyrinth-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.labyrinth-chip {
+  min-height: 32px;
+  background: transparent;
+  border-color: var(--system-line);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  white-space: normal;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.meter--down .meter-label,
+.meter--down .meter-value {
+  color: var(--danger);
+}
+
+/* A choice waiting over the map: three blessings, or the merchant. */
+.labyrinth-choice {
+  border-color: var(--system-line);
+  background: linear-gradient(rgba(143, 227, 239, 0.06), rgba(143, 227, 239, 0.02)), var(--surface);
+}
+
+.labyrinth-choice .section-title,
+.labyrinth-choice p {
+  margin: 0;
+}
+
+.labyrinth-blessings-choice {
+  display: grid;
+  gap: 8px;
+}
+
+@media (min-width: 900px) {
+  .labyrinth-blessings-choice {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.labyrinth-blessing-option {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--system-line);
+  border-radius: 0;
+  background: rgba(143, 227, 239, 0.08);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.labyrinth-blessing-option:active:not(:disabled) {
+  background: rgba(143, 227, 239, 0.18);
+}
+
+.labyrinth-blessing-name {
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-weight: 600;
+}
+
+.labyrinth-blessing-text {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.labyrinth-ware {
+  white-space: normal;
+}
+
+/* The map: the rows from the entrance down to the guardian, the roads
+   behind the rooms. */
+.labyrinth-map {
+  position: relative;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.labyrinth-map-card--hell {
+  border-color: rgba(214, 69, 97, 0.45);
+}
+
+.labyrinth-roads {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.labyrinth-road {
+  stroke: var(--bark-line);
+  stroke-width: 2;
+  stroke-dasharray: 4 4;
+}
+
+.labyrinth-road--walked {
+  stroke: var(--gold);
+  stroke-dasharray: none;
+}
+
+.labyrinth-road--open {
+  stroke: var(--system);
+  stroke-dasharray: none;
+}
+
+.labyrinth-room {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 80px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+.labyrinth-room-circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1.5px solid var(--bark-line);
+  border-radius: 50%;
+  background: var(--bg-deep);
+}
+
+.labyrinth-room-name {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.labyrinth-room--guardian .labyrinth-room-circle {
+  width: 54px;
+  height: 54px;
+  border-color: rgba(240, 138, 156, 0.7);
+}
+
+.labyrinth-room--shut {
+  opacity: 0.5;
+}
+
+.labyrinth-room--done {
+  opacity: 0.8;
+}
+
+.labyrinth-room--done .labyrinth-room-circle {
+  border-color: var(--gold);
+}
+
+.labyrinth-room-check {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: flex;
+  border-radius: 50%;
+  background: var(--bg-deep);
+  color: var(--gold);
+}
+
+.labyrinth-room--here .labyrinth-room-circle {
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 10px rgba(217, 180, 90, 0.55);
+}
+
+.labyrinth-room--open .labyrinth-room-circle {
+  border: 2px solid var(--system);
+  box-shadow: 0 0 12px rgba(143, 227, 239, 0.55);
+}
+
+.labyrinth-room--open .labyrinth-room-name {
+  color: var(--system-text);
+}
+
+/* The glow breathes, unless animations are off in the game (`calm`). */
+.labyrinth-room--open .labyrinth-room-circle {
+  animation: labyrinth-glow 1.8s ease-in-out infinite;
+}
+
+.calm .labyrinth-room--open .labyrinth-room-circle {
+  animation: none;
+}
+
+@keyframes labyrinth-glow {
+  50% {
+    box-shadow: 0 0 4px rgba(143, 227, 239, 0.25);
+  }
+}
+
+.labyrinth-room:focus-visible {
+  outline: none;
+}
+
+.labyrinth-room:focus-visible .labyrinth-room-circle {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.labyrinth-artifact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.sheet-title--art {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The Rdzeń (screens/core.js): its picture over its sockets, an absorbed
+   Artefakt over as many sockets as it takes, in its element's colour. */
+.core-card {
+  align-items: center;
+  border-color: var(--system-line);
+  background:
+    radial-gradient(circle at 50% 30%, rgba(143, 227, 239, 0.12), transparent 60%),
+    var(--surface);
+}
+
+.core-picture {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0;
+}
+
+.core-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  border: 1px solid var(--system-line);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(143, 227, 239, 0.22), rgba(13, 17, 11, 0.9) 70%);
+  color: var(--system);
+}
+
+.core-sockets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  max-width: 100%;
+}
+
+.core-socket {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--system-line);
+}
+
+.core-socket--free {
+  border-style: dashed;
+  background: rgba(13, 17, 11, 0.6);
+}
+
+.core-socket--taken {
+  border-color: var(--element, var(--system));
+  background: color-mix(in srgb, var(--element, var(--system)) 28%, var(--bg-deep));
+  box-shadow: 0 0 6px color-mix(in srgb, var(--element, var(--system)) 45%, transparent);
+}
+
+.core-socket--2 {
+  width: 66px;
+}
+
+.core-socket--3 {
+  width: 102px;
+}
+
+.core-stock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 16px;
+  text-align: center;
+}
+
+.core-shards {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.shards-placeholder {
+  display: flex;
+  color: var(--system);
+}
+
+.core-gem {
+  overflow-wrap: anywhere;
+}
+
+.core-resonance .section-title,
+.core-effects .section-title,
+.core-list .section-title {
+  margin: 0;
+}
+
+.core-resonance-list,
+.core-effect-list,
+.core-artifacts,
+.core-traits {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.core-resonance-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.core-element-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--element, var(--system));
+}
+
+.core-resonance-name {
+  font-weight: 600;
+}
+
+.core-resonance-on {
+  color: var(--system-text);
+}
+
+.core-effect-list li::before {
+  content: '◆ ';
+  color: var(--system);
+}
+
+.core-artifact {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg-deep);
+}
+
+.core-artifact-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.core-artifact-title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.core-traits li {
+  font-size: 15px;
+}
+
+.core-ability {
+  color: var(--system-text);
+}
+
+.core-actions {
+  display: grid;
+  gap: 6px;
+}
+
+@media (min-width: 600px) {
+  .core-actions {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+.core-actions .button--small {
+  white-space: normal;
+}
+
+.slot--open {
+  text-decoration: none;
+}
+
+/* A smaller line of the Labirynt and the Rdzeń. */
+.labyrinth-party .small,
+.labyrinth-map-card .small,
+.labyrinth-gains .small,
+.core-artifact .small,
+.core-resonance .small {
+  margin: 0;
+  font-size: 14px;
 }

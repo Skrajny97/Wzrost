@@ -72,6 +72,10 @@
     "name": "Towers",
     "message": "System Towers unlocked. Enter them in the Combat tab, in the Towers section: a dozen or so fights a day, between explorations and even while working at a profession."
   },
+  "labyrinth": {
+    "name": "System Labyrinth",
+    "message": "System Labyrinth unlocked. Enter it in the Settlement, in the Trial Hall: a new one every day, three levels of chambers with guardians and Artifacts for the Core, even during an exploration."
+  },
   "core": {
     "name": "Core",
     "locked": "The Core will be unlocked in one of the upcoming updates."
