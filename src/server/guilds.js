@@ -17,7 +17,7 @@
 // week says so on its page (guild-fame.js).
 
 import { blockedName, isUnlocked, joinShare, questPeriod, trialDay } from '../engine/index.js';
-import { atomically, sameVersion } from './atomic.js';
+import { assertion, atomically, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf } from './cosmetics.js';
@@ -27,6 +27,7 @@ import { championFrom, championOf, championStatement } from './guild-fame.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { joinGuildTrials } from './guild-trials.js';
+import { beastJoin } from './guild-beast.js';
 import { OWN_CHARACTERS } from './roles.js';
 
 const rules = () => content().guilds;
@@ -214,6 +215,22 @@ export async function foundGuild(context) {
   return answer(db, row.id, context.now, { text: t('Gildia {name} [{tag}] założona.', { name, tag }), character: characterView(after, context.now) });
 }
 
+// The assertion heading a change of a guild: each character (`members`,
+// [id, roles]) still in the guild with one of the roles it was read with,
+// so a change read before another one landed saves nothing (the code
+// review, 0.2.72: two hand-overs of the lead at once made two leaders, a
+// removal read before a deputy lost its role still went through, and a
+// removal with a leave at once ended a guild with items in its chest).
+function stillAsRead(db, guildId, members) {
+  return assertion(
+    db,
+    members.map(([, roles]) => `EXISTS (SELECT 1 FROM guild_members WHERE guild_id = ? AND character_id = ? AND role IN (${roles.map(() => '?').join(', ')}))`).join(' AND '),
+    members.flatMap(([id, roles]) => [guildId, id, ...roles]),
+  );
+}
+
+const guildChanged = () => new ApiError(409, 'guild_changed', 'Gildia zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
+
 // The guild of the one who asks, with its role in it, or an error.
 async function ownGuild(db, characterId, roles = ['leader', 'deputy', 'member']) {
   const guild = await guildOf(db, characterId);
@@ -248,10 +265,14 @@ export async function inviteToGuild(context) {
   ]);
   if (members.results[0].count >= rules().size) throw new ApiError(409, 'full', `Gildia jest pełna: ${rules().size} postaci.`);
   if (waiting.results[0].count >= rules().invites) throw new ApiError(409, 'too_many_invites', `Na odpowiedź czeka już ${rules().invites} zaproszeń.`);
-  await db
-    .prepare('INSERT OR IGNORE INTO guild_invites (guild_id, character_id, invited_by, created_at) VALUES (?, ?, ?, ?)')
-    .bind(guild.id, target.id, player.row.id, context.now)
-    .run();
+  await atomically(
+    db,
+    [
+      stillAsRead(db, guild.id, [[player.row.id, ['leader', 'deputy']]]),
+      db.prepare('INSERT OR IGNORE INTO guild_invites (guild_id, character_id, invited_by, created_at) VALUES (?, ?, ?, ?)').bind(guild.id, target.id, player.row.id, context.now),
+    ],
+    guildChanged,
+  );
   return answer(db, player.row.id, context.now, { text: t('Zaproszenie wysłane. {name} przyjmie je w Społeczności, w Gildii.', { name: target.name }) });
 }
 
@@ -291,6 +312,8 @@ export async function acceptGuildInvite(context) {
   const invite = await db.prepare('SELECT guild_id FROM guild_invites WHERE guild_id = ? AND character_id = ?').bind(guildIdOf(body), player.row.id).first();
   if (!invite) throw new ApiError(404, 'no_invite', 'Tego zaproszenia już nie ma.');
   if (await guildOf(db, player.row.id)) throw new ApiError(409, 'in_guild', 'Najpierw opuść swoją gildię.');
+  // The Bestia Gildii of the week, made already, grows for the member too.
+  const beast = await beastJoin(db, invite.guild_id, player.row.id, context.now);
   let joined;
   try {
     [joined] = await db.batch([
@@ -304,6 +327,7 @@ export async function acceptGuildInvite(context) {
       // The Wyprawa Gildii's route of the week counts it in part too: its
       // next stages take more minutes and its next guardians more HP.
       weekJoin(db, 'guild_expeditions', invite.guild_id, player.row.id, context.now),
+      ...beast,
     ]);
   } catch {
     throw new ApiError(409, 'in_guild', 'Najpierw opuść swoją gildię.');
@@ -333,7 +357,14 @@ export async function cancelGuildInvite(context) {
   const body = await readJson(context.request);
   const guild = await ownGuild(db, player.row.id, ['leader', 'deputy']);
   if (!Number.isInteger(body.characterId)) throw new ApiError(400, 'invalid_character', 'Nie ma takiej postaci.');
-  await db.prepare('DELETE FROM guild_invites WHERE guild_id = ? AND character_id = ?').bind(guild.id, body.characterId).run();
+  await atomically(
+    db,
+    [
+      stillAsRead(db, guild.id, [[player.row.id, ['leader', 'deputy']]]),
+      db.prepare('DELETE FROM guild_invites WHERE guild_id = ? AND character_id = ?').bind(guild.id, body.characterId),
+    ],
+    guildChanged,
+  );
   return answer(db, player.row.id, context.now);
 }
 
@@ -404,7 +435,19 @@ export async function kickFromGuild(context) {
   const member = await memberOf(db, guild, body);
   if (member.character_id === player.row.id) throw new ApiError(400, 'self', 'Siebie nie usuniesz. Możesz opuścić gildię.');
   if (guild.role === 'deputy' && member.role !== 'member') throw new ApiError(403, 'not_allowed', 'Zastępca usuwa tylko członków.');
-  await db.batch(guildRemoval(db, '?', [member.character_id], context.now));
+  // Both as read: the one who removes in its role, the one removed in this
+  // guild in its role (guildRemoval takes a character out of any guild).
+  await atomically(
+    db,
+    [
+      stillAsRead(db, guild.id, [
+        [player.row.id, [guild.role]],
+        [member.character_id, [member.role]],
+      ]),
+      ...guildRemoval(db, '?', [member.character_id], context.now),
+    ],
+    guildChanged,
+  );
   return answer(db, player.row.id, context.now, { text: t('{name} nie jest już w gildii.', { name: member.name }) });
 }
 
@@ -418,7 +461,17 @@ export async function setGuildRole(context) {
   if (!['deputy', 'member'].includes(body.role)) throw new ApiError(400, 'invalid_role', 'Wybierz zastępcę albo członka.');
   const member = await memberOf(db, guild, body);
   if (member.role === 'leader') throw new ApiError(400, 'self', 'Lider zostaje liderem. Przywództwo przekażesz osobno.');
-  await db.prepare("UPDATE guild_members SET role = ? WHERE guild_id = ? AND character_id = ? AND role != 'leader'").bind(body.role, guild.id, member.character_id).run();
+  await atomically(
+    db,
+    [
+      stillAsRead(db, guild.id, [
+        [player.row.id, ['leader']],
+        [member.character_id, [member.role]],
+      ]),
+      db.prepare("UPDATE guild_members SET role = ? WHERE guild_id = ? AND character_id = ? AND role != 'leader'").bind(body.role, guild.id, member.character_id),
+    ],
+    guildChanged,
+  );
   return answer(db, player.row.id, context.now, { text: body.role === 'deputy' ? t('{name} jest teraz zastępcą.', { name: member.name }) : t('{name} jest teraz członkiem.', { name: member.name }) });
 }
 
@@ -431,10 +484,16 @@ export async function handGuildLead(context) {
   const guild = await ownGuild(db, player.row.id, ['leader']);
   const member = await memberOf(db, guild, body);
   if (member.character_id === player.row.id) throw new ApiError(400, 'self', 'Już prowadzisz tę gildię.');
-  await db.batch([
+  await atomically(db, [
+    // The one who asks still leads, and the one it names is still in the
+    // guild as read: of two hand-overs at once, one saves.
+    stillAsRead(db, guild.id, [
+      [player.row.id, ['leader']],
+      [member.character_id, [member.role]],
+    ]),
     db.prepare("UPDATE guild_members SET role = 'deputy' WHERE guild_id = ? AND character_id = ? AND role = 'leader'").bind(guild.id, player.row.id),
     db.prepare("UPDATE guild_members SET role = 'leader' WHERE guild_id = ? AND character_id = ? AND EXISTS (SELECT 1 FROM guild_members WHERE guild_id = ? AND character_id = ? AND role = 'deputy')").bind(guild.id, member.character_id, guild.id, player.row.id),
-  ]);
+  ], guildChanged);
   return answer(db, player.row.id, context.now, { text: t('{name} prowadzi teraz gildię.', { name: member.name }) });
 }
 

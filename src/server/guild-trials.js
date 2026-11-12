@@ -75,6 +75,50 @@ function weeksAround(now) {
   return { current, previous: questPeriod('weekly', current.startsAt - 1, content()) };
 }
 
+// A guild's bar of `week` for the character (barView), as its chests are
+// opened: this week's counted to the day's limit, the claims of the week
+// whatever the guild. Null when the guild had no board that week. The
+// board and the trials stay when a guild ends (0114), so a guild gone has
+// its bar too.
+async function barOf(db, guildId, week, player, now) {
+  const { current } = weeksAround(now);
+  const [board, trials, claims] = await db.batch([
+    boardRow(db, guildId, week),
+    weekTrials(db, guildId, [week]),
+    db.prepare('SELECT week, threshold FROM guild_trial_chests WHERE character_id = ? AND week = ?').bind(player.row.id, week),
+  ]);
+  if (!board.results[0]) return null;
+  const limit = week === current.key ? barLimit(JSON.parse(board.results[0].trials), trialDay(now, content())) : Infinity;
+  return barView(week, trials.results, board.results[0].active, board.results[0].joined ?? 0, claims.results, player, limit);
+}
+
+// The chests the character may still open from the guilds it finished a
+// trial in this week or the last one, other than `guildId` (the one it is
+// in now, whose bar and `previous` show its own): a guild it left or was
+// removed from, or one that ended (DECISIONS.md, "Próby i Prośby Gildii"
+// 7: a chest for each character that finished a trial in that guild that
+// week; the code review, 0.2.72: they were lost). Each bar with its
+// guild's name and tag (null for a guild gone) and whether it is this
+// week's, which waits until the end of the next.
+async function chestsElsewhere(db, player, guildId, now) {
+  const { current, previous } = weeksAround(now);
+  const { results } = await db
+    .prepare(
+      `SELECT DISTINCT t.guild_id, t.week, g.name, g.tag FROM guild_trials t LEFT JOIN guilds g ON g.id = t.guild_id
+       WHERE t.character_id = ? AND t.week IN (?, ?) AND t.state = 'done' AND t.guild_id IS NOT ? ORDER BY t.week, t.guild_id`,
+    )
+    .bind(player.row.id, previous.key, current.key, guildId)
+    .all();
+  const bars = [];
+  for (const one of results) {
+    const bar = await barOf(db, one.guild_id, one.week, player, now);
+    if (bar?.thresholds.some((threshold) => threshold.ready)) {
+      bars.push({ ...bar, guild: one.name ? { name: one.name, tag: one.tag } : null, thisWeek: one.week === current.key });
+    }
+  }
+  return bars;
+}
+
 // The statement that moves the character's trial of the week on by what an
 // action brought (trialGains in the engine), to put into that action's own
 // batch, so both land together; none when the action brings nothing a
@@ -449,6 +493,8 @@ export async function trialsView(db, player, guild, now) {
     bar: barView(current.key, rows, board.active, board.joined, claims.results, player, limit),
     // Last week's chests, while one of them waits for this character.
     previous: last?.thresholds.some((threshold) => threshold.ready) ? { ...last, until: current.endsAt } : null,
+    // Those it earned in another guild, still to open (chestsElsewhere).
+    elsewhere: await chestsElsewhere(db, player, guild.id, now),
     members: [...counts]
       .flatMap(([id, count]) => {
         const one = rows.find((other) => other.character_id === id);
@@ -462,11 +508,14 @@ export async function trialsView(db, player, guild, now) {
 
 const answer = async (db, player, guild, now, extra = {}) => json({ ...(await trialsView(db, player, guild, now)), ...extra });
 
-// GET /api/guild/trials: outside a guild, only the card's words (as the
-// Bestia Gildii's).
+// The Próby outside a guild: the card's words (as the Bestia Gildii's) and
+// the chests earned in a guild the character is no longer in.
+const outsideView = async (db, player, now) => ({ guild: null, elsewhere: await chestsElsewhere(db, player, null, now), texts: cardTexts() });
+
+// GET /api/guild/trials
 export async function getGuildTrials(context) {
   const { player, guild, db } = await guildPlayer(context);
-  if (!guild) return json({ guild: null, texts: cardTexts() });
+  if (!guild) return json(await outsideView(db, player, context.now));
   return answer(db, player, guild, context.now);
 }
 
@@ -483,11 +532,14 @@ export const dropGuildTrial = takeGuildTrial;
 // POST /api/guild/trials/claim { week, threshold }: a reached threshold's
 // chest, this week's or the last one's, for a character that finished a
 // trial in the guild that week; once a week and threshold for a character,
-// whatever its guild. The chest and its record land together, or neither.
-// It holds what suits the character as it is when opened (its level, the
-// newest place of its class), its material drawn from its own seed.
+// whatever its guild. The bar is of the guild the character is in, or of
+// one it finished a trial in that week and has left since, been removed
+// from, or that ended (chestsElsewhere; the code review, 0.2.72). The
+// chest and its record land together, or neither. It holds what suits the
+// character as it is when opened (its level, the newest place of its
+// class), its material drawn from its own seed.
 export async function claimGuildTrialChest(context) {
-  const { session, player, guild, db } = await requireMember(context);
+  const { session, player, guild, db } = await guildPlayer(context);
   const { row } = player;
   const body = await readJson(context.request);
   const now = context.now;
@@ -495,15 +547,26 @@ export async function claimGuildTrialChest(context) {
   if (![current.key, previous.key].includes(body.week)) throw new ApiError(409, 'too_late', errors().tooLate);
   const index = body.threshold;
   if (!Number.isInteger(index) || index < 0 || index >= rules().steps.length) throw new ApiError(400, 'invalid_threshold', errors().noThreshold);
-  const [board, trials, claims] = await db.batch([
-    boardRow(db, guild.id, body.week),
-    weekTrials(db, guild.id, [body.week]),
-    db.prepare('SELECT week, threshold FROM guild_trial_chests WHERE character_id = ? AND week = ?').bind(row.id, body.week),
-  ]);
-  if (!board.results[0]) throw new ApiError(404, 'no_board', errors().noBoard);
-  // This week's bar counts each member's finished trials up to the day's limit.
-  const limit = body.week === current.key ? barLimit(JSON.parse(board.results[0].trials), trialDay(now, content())) : Infinity;
-  const bar = barView(body.week, trials.results, board.results[0].active, board.results[0].joined ?? 0, claims.results, player, limit);
+  const { results: finished } = await db
+    .prepare("SELECT DISTINCT guild_id FROM guild_trials WHERE character_id = ? AND week = ? AND state = 'done' AND guild_id IS NOT ? ORDER BY guild_id")
+    .bind(row.id, body.week, guild?.id ?? null)
+    .all();
+  const guilds = [...(guild ? [guild.id] : []), ...finished.map((one) => one.guild_id)];
+  if (guilds.length === 0) throw new ApiError(409, 'no_guild', errors().noGuild);
+  // The first bar whose threshold this chest is ready on; else the first
+  // bar there is, for the answer why not.
+  let bar = null;
+  let from = null;
+  for (const guildId of guilds) {
+    const found = await barOf(db, guildId, body.week, player, now);
+    if (!found) continue;
+    if (!bar) [bar, from] = [found, guildId];
+    if (found.thresholds[index].ready) {
+      [bar, from] = [found, guildId];
+      break;
+    }
+  }
+  if (!bar) throw new ApiError(404, 'no_board', errors().noBoard);
   const threshold = bar.thresholds[index];
   if (threshold.claimed) throw new ApiError(409, 'claimed', errors().claimed);
   if (!threshold.reached) throw new ApiError(409, 'not_reached', errors().notReached);
@@ -512,7 +575,7 @@ export async function claimGuildTrialChest(context) {
   const materials = counted('materials', chest.materials);
   try {
     await db.batch([
-      db.prepare('INSERT INTO guild_trial_chests (character_id, week, threshold, guild_id, claimed_at) VALUES (?, ?, ?, ?, ?)').bind(row.id, body.week, index, guild.id, now),
+      db.prepare('INSERT INTO guild_trial_chests (character_id, week, threshold, guild_id, claimed_at) VALUES (?, ?, ?, ?, ?)').bind(row.id, body.week, index, from, now),
       db
         .prepare(`UPDATE characters SET gold = gold + ?, time_points = time_points + ?, system_points = system_points + ?, materials = ${materials.sql}, version = version + 1 WHERE id = ?`)
         .bind(chest.gold, chest.timePoints, chest.systemPoints, ...materials.binds, row.id),
@@ -523,7 +586,7 @@ export async function claimGuildTrialChest(context) {
   }
   const after = await loadPlayer(db, session.userId);
   return json({
-    ...(await trialsView(db, after, guild, now)),
+    ...(guild ? await trialsView(db, after, guild, now) : await outsideView(db, after, now)),
     chest: { ...chestView(chest), text: filled(words().opened, { contents: chestText(chest) }) },
     character: characterView(after, now),
   });

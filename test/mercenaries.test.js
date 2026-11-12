@@ -314,6 +314,44 @@ describe('mercenaries through the API', () => {
     assert.equal(paid.data.paid, 300);
   });
 
+  // The code review of 12.11.2026: a claim that read the offer as
+  // nobody's at its last moment, while a hire at that moment took it (and
+  // paid its fee), closed the hired service as an empty offer: nothing paid
+  // and the hirer's mercenary gone. The claim now holds only for the offer
+  // as it read it.
+  test('an offer hired at its last moment, while its claim closes it, still serves its hirer', async () => {
+    await as('najemna', 'POST', '/api/mercenary/offer', { hours: 1, perHour: 300 });
+    const id = (await row('Najemna')).id;
+    const database = await db();
+    // The offer's hours have just passed, as the claim reads it...
+    await database.prepare('UPDATE activities SET started_at = started_at - 3600000, ends_at = ? WHERE character_id = ?').bind(Date.now() - 1, id).run();
+    // ...and the hire, whose own request still saw them, lands between the
+    // claim's read and its batch: run here by a trigger on the claim's
+    // settling of Time Points (characters.js), which comes in between.
+    const hired = JSON.stringify({ by: (await row('Zleceniodawca')).id, name: 'Zleceniodawca', female: true, area: 'Wiatrołomy', at: Date.now(), gold: 300 });
+    await database.prepare('UPDATE characters SET time_points_at = time_points_at - 3600000 WHERE id = ?').bind(id).run();
+    await database
+      .prepare(
+        `CREATE TRIGGER hire_meanwhile AFTER UPDATE OF time_points_at ON characters WHEN NEW.id = ${id}
+         BEGIN
+           UPDATE activities SET ends_at = ends_at + 3600000, options = json_set(options, '$.hired', json('${hired}')) WHERE character_id = ${id} AND kind = 'mercenary';
+         END`,
+      )
+      .run();
+    let claimed;
+    try {
+      claimed = await as('najemna', 'POST', '/api/mercenary/claim');
+    } finally {
+      await database.prepare('DROP TRIGGER IF EXISTS hire_meanwhile').run();
+    }
+    assert.equal(claimed.status, 409, JSON.stringify(claimed.data).slice(0, 300));
+    // The service stays, hired, and its pay waits for its end.
+    const service = await activityOf('Najemna');
+    assert.ok(service, 'the hired service is gone');
+    assert.equal(JSON.parse(service.options).hired.gold, 300);
+    assert.equal((await character('najemna')).activity.service.hired.gold, 300);
+  });
+
   test('an offer nobody took closes with nothing paid', async () => {
     await as('najemna', 'POST', '/api/mercenary/offer', { hours: 1, perHour: 300 });
     await as('najemna', 'POST', '/api/test/skip-time');

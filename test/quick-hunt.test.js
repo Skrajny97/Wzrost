@@ -105,6 +105,28 @@ describe('Szybkie Polowanie', () => {
     assert.equal((await character()).quickHunts.flash.left, flash.count - 1);
   });
 
+  // The code review of 12.11.2026: the count of a Szybkie Polowanie was a
+  // statement after its start, so a start whose count failed went out
+  // uncounted. Now both are one batch: a start that cannot be counted does
+  // not start.
+  test('a start and its count are one: one that cannot be counted does not go out', async () => {
+    await set('level = 5, hp = 999');
+    const database = await db();
+    await database.prepare("CREATE TRIGGER no_count BEFORE UPDATE OF quick_hunts ON characters BEGIN SELECT RAISE(ABORT, 'no count'); END").run();
+    let refused;
+    try {
+      refused = await quick();
+    } finally {
+      await database.prepare('DROP TRIGGER IF EXISTS no_count').run();
+    }
+    assert.notEqual(refused.status, 200);
+    assert.equal(await database.prepare('SELECT 1 AS found FROM activities').first(), null);
+    assert.equal((await database.prepare('SELECT COUNT(*) AS count FROM reports').first()).count, 0);
+    assert.equal((await character()).quickHunts.left, rules.count);
+    assert.equal((await quick()).status, 200);
+    assert.equal((await character()).quickHunts.left, rules.count - 1);
+  });
+
   test('needs the character at home, and takes potions only up to its length', async () => {
     // From level 10, with the Profesje, the recipe is known.
     await set(`level = 10, potions = '{"lesser-healing":9}'`);

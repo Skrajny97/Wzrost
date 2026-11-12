@@ -488,6 +488,10 @@
     "0.2.71": {
       "title": "Version 0.2.71",
       "body": "- Security fixes: daily limits (the Hermit's Time Points, daily quests, profession work) always count by the right day, also just before midnight.\n- A gift code for one character works only once."
+    },
+    "0.2.72": {
+      "title": "Version 0.2.72",
+      "body": "- Party: a report claimed at the moment someone in the Party skips the end of the exploration pays out once. A Party member's rumor from the Tavern waits for their own exploration.\n- Trial chests and Expedition chests earned in a guild wait until the end of the next week, also after leaving the guild or after it ends. Trial chests from a former guild show in the Trials tab.\n- The Guild Beast grows with everyone who joins the guild during the week, as the Trials and the Expedition do.\n- A potion drunk at the same moment as another one or as claiming a report works properly, and several taps on “Build” at once pay once.\n- A mercenary hired at the last moment of the offer gets their pay."
     }
   }
 }

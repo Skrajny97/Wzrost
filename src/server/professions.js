@@ -273,16 +273,20 @@ function herbCount(player, body) {
 
 // The herbs or the potions (`column`) after `count` of one kind go: the key
 // goes with the last of them, and `also` ({ sql, binds }) sets more with
-// them. The change saves only if the kind is still as seen, so two taps at
-// once sell, throw away or drink once.
+// them. The change saves only if the kind is still as seen and the
+// character as read (its version), so two taps at once sell, throw away or
+// drink once, and what `also` sets from the row read (a potion's buffs or
+// HP) never undoes a change saved meanwhile: the fights an exploration's
+// claim used up, or another potion drunk at the same moment (the code
+// review, 0.2.72).
 export function takeFromBag(db, player, column, { id, have, count }, gold = 0, also = null) {
   const left = have - count;
   return db
     .prepare(
       `UPDATE characters SET ${column} = ${left === 0 ? `json_remove(${column}, ?)` : `json_set(${column}, ?, ?)`}, gold = gold + ?${also ? `, ${also.sql}` : ''}, version = version + 1
-       WHERE id = ? AND json_extract(${column}, ?) = ?`,
+       WHERE id = ? AND json_extract(${column}, ?) = ? AND version = ?`,
     )
-    .bind(path(id), ...(left === 0 ? [] : [left]), gold, ...(also?.binds ?? []), player.row.id, path(id), have)
+    .bind(path(id), ...(left === 0 ? [] : [left]), gold, ...(also?.binds ?? []), player.row.id, path(id), have, player.row.version)
     .run();
 }
 

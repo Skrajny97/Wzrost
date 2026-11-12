@@ -177,10 +177,13 @@ export async function beginBuilding(db, player, buildingId, now) {
       ...(resting ? [currentHp(player, now).hp, now] : []),
       row.id, row.id, building.id, target, now,
     );
-  const [started] = await db.batch([start, pay]);
-  if (started.meta.changes !== 1) {
-    throw new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
-  }
+  // The character as read heads the batch: taps at the same moment (the
+  // Workers clock moves only with I/O, so they may share `now`) each found
+  // the one build the first had started, and each paid for it, below zero
+  // too (the code review, 0.2.72).
+  const changed_ = () => new ApiError(409, 'conflict', 'Obóz zmienił się w międzyczasie. Spróbuj ponownie.');
+  const [, started] = await atomically(db, [sameVersion(db, row), start, pay], changed_);
+  if (started.meta.changes !== 1) throw changed_();
 }
 
 // A build while another is under way: the level after those under way and

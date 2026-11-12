@@ -296,8 +296,10 @@ export async function quickHunt(context) {
   const asked = body.potions && typeof body.potions === 'object' && !Array.isArray(body.potions) ? body.potions : null;
   const potions = asked ? Object.fromEntries(Object.entries(asked).map(([id, count]) => [id, Number.isInteger(count) ? Math.min(count, most) : count])) : body.potions;
   const db = context.env.DB;
-  await beginHunt(db, player, { ...body, potions, minutes }, now, { quick: true, flash });
-  await db.prepare('UPDATE characters SET quick_hunts = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify(next), player.row.id).run();
+  // The hunt counted in the start's own batch, so a start never lands
+  // uncounted (the code review, 0.2.72: it was a statement after it).
+  const counted = db.prepare('UPDATE characters SET quick_hunts = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify(next), player.row.id);
+  await beginHunt(db, player, { ...body, potions, minutes }, now, { quick: true, flash, also: [counted] });
   const { id, report } = await finishHunt(db, await loadPlayer(db, session.userId), now);
   return json({ report: { id, createdAt: now, ...report }, character: characterView(await loadPlayer(db, session.userId), now) });
 }
@@ -332,7 +334,7 @@ export async function beginHunt(
   player,
   { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, mercenary = null } = {},
   now,
-  { quick = false, flash = false, party: crew = null, partners = [], mount = null } = {},
+  { quick = false, flash = false, party: crew = null, partners = [], mount = null, follower = false, also = [] } = {},
 ) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
@@ -388,10 +390,13 @@ export async function beginHunt(
   // A rumor about this place, from the Karczma or from the beggar's song
   // (an event, also without the Osada; settlement.js): the exploration
   // meets its elite and champion rumor.factor times as often, and uses the
-  // rumor up. Not a Szybkie Polowanie, nor one avoiding them.
+  // rumor up. Not a Szybkie Polowanie, nor one avoiding them, nor a
+  // Drużyna member's (`follower`): the trip's fights follow its leader's
+  // rumor alone (parties.js), so a member keeps its own for another day's
+  // exploration (the code review, 0.2.72: it was used up for nothing).
   const stored = JSON.parse(player.row.settlement ?? '{}');
   const kept = settlementOn() ? stored : null;
-  const rumor = !quick && !avoidRare ? rumorFactor(stored.rumor, area.id, now, content()) : 1;
+  const rumor = !quick && !avoidRare && !follower ? rumorFactor(stored.rumor, area.id, now, content()) : 1;
   // The Bractwo Łowców (591 A, B), as at the start: more materials from the
   // character's own creatures, and the elite and the champion more often (on
   // a Drużyna's trip, its leader's, as its encounters), not on a Szybkie
@@ -481,6 +486,12 @@ export async function beginHunt(
     // The Ołtarz's blessing of the day, for this exploration's first fights;
     // not on a Drużyna's trip, whose fights are one for all (fortress.js).
     ...(!crew && blessingOf(player.row) && { blessing: blessingOf(player.row) }),
+    // The professions' levels as it sets out, whose stats its fights count:
+    // the Awatar's report claimed on the way raises them (avatar.js), and
+    // its fights would count the new levels (the code review, 0.2.72), as a
+    // gem or a training would, which wait for the report. A Drużyna's trip
+    // keeps its roster as it set out anyway.
+    ...(!crew && { professions: JSON.parse(player.row.professions ?? '{}') }),
     ...(quick && { quick }),
     ...(flash && { flash }),
   };
@@ -524,6 +535,8 @@ export async function beginHunt(
           ...(hire ? [hire.fee] : []),
           player.row.id,
         ),
+      // What goes with this start alone (`also`): a Szybkie Polowanie's count.
+      ...also,
     ]);
   } catch (error) {
     if (raced(error)) throw hire ? await hireRaced(db, hire) : characterChanged();
@@ -700,14 +713,17 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   if (activity.ends_at > now) throw new ApiError(409, 'not_finished', 'Wyprawa jeszcze trwa.');
 
   const row = player.row;
-  const character = engineCharacter(row);
+  // The potions taken along and the windows of the potions for a time
+  // (beginHunt).
+  const options = JSON.parse(activity.options ?? '{}');
+  // The fights count the professions' levels the exploration set out with
+  // (beginHunt), not those the Awatar's report brought on the way; an
+  // exploration begun before 0.2.72 keeps none and counts them as now.
+  const character = { ...engineCharacter(row), ...(options.professions && { professions: options.professions }) };
   // region_id holds the inner region (or a whole region, from before them).
   const area = areaFor(activity.region_id, row.level, content());
   // The very first exploration, before any report, goes one way (simulateHunt).
   const first = !(await db.prepare('SELECT 1 AS found FROM reports WHERE character_id = ? LIMIT 1').bind(row.id).first());
-  // The potions taken along and the windows of the potions for a time
-  // (beginHunt).
-  const options = JSON.parse(activity.options ?? '{}');
   // A Drużyna's trip: its fights from the trip's roster and seed, the same
   // for every member, as its leader leads them; what this member finds and
   // earns from its own seed (trips.js, simulateHunt).
@@ -981,8 +997,19 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       // The level, the potions, the buffs, the Osada and the rest below are
       // computed from the row read: the claim holds only while it is as
       // read, so a potion sold or an order delivered meanwhile is not undone
-      // (atomic.js); a retry claims anew.
-      sameVersion(db, row),
+      // (atomic.js); a retry claims anew. So does the exploration: another
+      // member's "Przewiń" moves a Drużyna's whole trip without this
+      // character's version (trips.js: shiftTrip), and "Wróć" ends it, so a
+      // claim of the exploration as read, moved or gone meanwhile, would
+      // pay its report and leave the moved one to be paid again (the code
+      // review, 0.2.72).
+      assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND EXISTS (SELECT 1 FROM activities WHERE character_id = ? AND started_at = ? AND ends_at = ?)', [
+        row.id,
+        row.version,
+        row.id,
+        activity.started_at,
+        activity.ends_at,
+      ]),
       // Then the report, so that a second claim of the same hunt fails as a whole.
       db
         .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')

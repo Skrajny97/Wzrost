@@ -170,6 +170,27 @@ export function mountGuildTrials(container) {
     );
   }
 
+  // The chests earned in a guild the character is no longer in (it left,
+  // was removed, or the guild ended), each guild's bar of a week with the
+  // thresholds ready: the same rows as last week's.
+  function elsewherePart() {
+    const { elsewhere, texts } = view;
+    if (!elsewhere?.length) return null;
+    return elsewhere.map((bar) =>
+      h(
+        'div',
+        { class: 'guild-part guild-previous' },
+        subtitle(bar.guild ? filled(texts.elsewhere, { guild: `${bar.guild.name} [${bar.guild.tag}]` }) : texts.elsewhereGone),
+        h('p', { class: 'muted', text: bar.thisWeek ? texts.elsewhereUntil : texts.previousUntil }),
+        h(
+          'ol',
+          { class: 'guild-thresholds' },
+          bar.thresholds.filter((threshold) => threshold.ready).map((threshold) => thresholdRow(bar, threshold)),
+        ),
+      ),
+    );
+  }
+
   // A trial's state on the board: "Wykonana", or nothing while it runs
   // (its meter shows how far it is) or is shut (its lock says why).
   function trialState(trial) {
@@ -258,11 +279,11 @@ export function mountGuildTrials(container) {
     const { texts } = view;
     const how = howItWorks(texts.intro, texts.how);
     if (!view.guild) {
-      fill(card, title(), h('p', { class: 'muted', text: texts.noGuild }), how);
+      fill(card, title(), h('p', { class: 'muted', text: texts.noGuild }), elsewherePart(), how);
       return;
     }
     // The board first (the author: "Tablicę prób w próbach daj na sam szczyt").
-    fill(card, title(), boardPart(), how, barPart(), previousPart(), membersPart());
+    fill(card, title(), boardPart(), how, barPart(), previousPart(), elsewherePart(), membersPart());
   }
 
   call('GET', '/api/guild/trials')

@@ -3092,6 +3092,35 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.72 (12.11.2026): poprawki wypraw, Drużyny, mikstur, Obozu, Warsztatu i gildii z przeglądu kodu
+
+Przegląd kodu wypraw, profesji z plecakiem i Obozem oraz zajęć gildii. Każda poprawka ma test, który bez niej nie przechodzi (test/review-explorations.test.js, test/review-professions.test.js, test/review-guilds.test.js, test/mercenaries.test.js, test/quick-hunt.test.js).
+
+1. **Raport Drużyny odebrany, gdy inny członek przewija koniec wyprawy** (src/server/hunts.js). „Przewiń” członka przesuwa wyprawę całej Drużyny, a wersja postaci, która w tej chwili odbiera raport, się nie zmienia. Odbiór wypłacał więc raport za wyprawę sprzed przesunięcia, a przesunięta zostawała do odebrania drugi raz. Teraz odbiór przechodzi tylko dla wyprawy takiej, jaką odczytał; inaczej gra prosi o ponowienie, a ono odbiera raport raz.
+2. **Plotka z Karczmy członka Drużyny (brakujący szczegół)** (src/server/hunts.js, src/server/parties.js). Walki wyprawy Drużyny idą według plotki lidera, a wyprawa zużywała też plotkę członka. Członek zachowuje teraz swoją plotkę na własną wyprawę.
+3. **Mikstury wypite w tej samej chwili** (src/server/professions.js). Wypicie zapisywało wzmocnienia odczytane wcześniej i nie sprawdzało, czy się zmieniły. Dlatego:
+   - z dwóch mikstur wypitych naraz działała jedna, choć obie znikały z plecaka;
+   - mikstura wypita w chwili odbioru raportu oddawała walki, które raport właśnie zużył, więc mikstury się nie kończyły.
+
+   Teraz wypicie przechodzi tylko wtedy, gdy postać jest taka, jak ją odczytało; inaczej gra prosi o ponowienie.
+4. **Raport Awatara w czasie wyprawy (brakujący szczegół)** (src/server/hunts.js). Raport Awatara podnosi poziom profesji, a z nim statystyki. Gdy przyszedł w czasie wyprawy, wszystkie jej walki liczyły już nowy poziom, tak jak przed poprawkami liczyły oprawiony kamień i trening. Teraz walki wyprawy liczą poziomy profesji z chwili wyruszenia; wyprawy zaczęte przed tą wersją liczą je jak dotąd.
+5. **Kilka dotknięć „Buduj” naraz** (src/server/camp.js). Każde dotknięcie w tej samej chwili płaciło za jedną budowę, także poniżej zera złota i zasobów. Teraz płaci tylko to, które budowę zaczęło; pozostałe dostają „Obóz zmienił się w międzyczasie. Spróbuj ponownie.”.
+6. **Warsztat i Próby Gildii** (src/server/workshop.js). Zamówienie w Warsztacie liczyło się do próby otwartej już po jego rozpoczęciu. Teraz, jak każda praca, która trwa (wyprawa, zbieranie, warzenie, Stół rozbiórki), liczy się tylko do prób otwartych przed jej rozpoczęciem.
+7. **Tygodnie gildii, która się rozpadła** (migrations/0114_guild_weeks_outlive_guilds.sql). Wyjście ostatniego członka kasowało razem z gildią tablice i próby Prób Gildii oraz trasy, strażników i minuty Wyprawy Gildii. Przepadały więc Skrzynie, które byli członkowie zdobyli, choć mają czekać do końca następnego tygodnia (punkt 7 „Próby i Prośby Gildii”, punkt 9 „Wyprawa Gildii (621 A)”). Teraz zostają i znikają razem z dawnymi tygodniami, jak u każdej gildii.
+8. **Skrzynie Prób poza gildią** (src/server/guild-trials.js, src/client/guild-trials.js, data/guilds.json). Skrzynię Prób odbierało się tylko w gildii, w której postać była w chwili odbioru, więc po usunięciu, wyjściu albo przejściu do innej gildii przepadała. Teraz:
+   - skrzynię z gildii, w której postać wykonała próby, odbiera się do końca następnego tygodnia, także poza nią i po rozpadzie gildii;
+   - zakładka Próby pokazuje takie skrzynie w bloku „Skrzynie z gildii [nazwa] [TAG]” (albo „Skrzynie z gildii, której już nie ma”), w tym samym wyglądzie co „Skrzynie z zeszłego tygodnia”, także postaci bez gildii;
+   - postaci w innej gildii świeci wtedy żółta kropka Prób; postać bez gildii nie ma kropek gildii, tak jak przy Skrzyniach Wyprawy.
+9. **Bestia Gildii rośnie z nowymi członkami (brakujący szczegół)** (src/server/guild-beast.js, src/engine/guild-beast.js, src/server/guilds.js). PŻ Bestii liczyła się raz, dla członków z chwili jej przyjścia, a progi Prób i etapy Wyprawy rosną z każdym, kto dołączy w tygodniu (615 A, 621 A). Teraz członek, który dołączy, gdy Bestia jeszcze stoi, dokłada jej swoją część tygodnia: tyle PŻ, ile członek zadaje jej przeciętnie, razy część tygodnia, która została. Kto wyjdzie i wróci w tym samym tygodniu, nie dokłada drugi raz. Bestie tego tygodnia liczą członków, których gildia ma w chwili wdrożenia.
+10. **Zmiany lidera i zastępców** (src/server/guilds.js). Zaproszenie, cofnięcie zaproszenia, usunięcie z gildii, zmiana roli i przekazanie przywództwa przechodzą tylko wtedy, gdy role odczytane na początku są nadal takie same; inaczej „Gildia zmieniła się w międzyczasie”. Wcześniej:
+    - dwa przekazania przywództwa naraz dawały gildii dwóch liderów;
+    - usunięcie ostatniego członka razem z wyjściem lidera kończyło gildię z przedmiotami w Skrzyni Gildii.
+11. **Szybkie Polowanie liczone razem z wyruszeniem** (src/server/hunts.js). Licznik Szybkich Polowań zapisywał się osobno, po wyruszeniu, więc wyprawa mogła wyruszyć niepoliczona. Teraz oba zapisy idą razem.
+12. **Najemnik zwerbowany w ostatniej chwili oferty** (src/server/mercenaries.js). Gdy oferta kończyła się w tej samej chwili, w której ktoś ją przyjął, odbiór zamykał służbę jako pustą ofertę. Najemnik tracił wtedy zapłatę, którą zleceniodawca już dał. Teraz odbiór przechodzi tylko dla oferty takiej, jaką odczytał, a zwerbowany najemnik służy i odbiera zapłatę po końcu wyprawy.
+13. **Sprawdzanie typów (650 A)** obejmuje teraz 59 z 65 plików silnika.
+
+Pytanie na stronie ocen: 837 (poziom Wyprawy Gildii przy członkach, którzy nie grają).
+
 ## Wersja 0.2.71 (12.11.2026): czas żądania od nadejścia całej treści, dzień, który się nie cofa, kody dla jednej postaci
 
 Przegląd kodu Salonu Gier, Sklepu Systemu, zadań narratora, Pustelnika i kodów podarunkowych. Każda poprawka ma test, który bez niej nie przechodzi.

@@ -525,6 +525,7 @@ export async function partyHunt(context) {
         party: party_,
         partners: partnersOf(member, everyone),
         mount,
+        follower: true,
       });
       setups.set(member.row.id, setup);
       went.push(member);

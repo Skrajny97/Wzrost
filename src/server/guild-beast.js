@@ -25,14 +25,17 @@ import {
   bagCapacity,
   beastChest,
   beastChestTier,
+  beastJoinHp,
   campLevels,
   guildBeast,
   guildBeastFight,
   isUnlocked,
   itemName,
+  joinShare,
   materialsText,
   materialView,
   questPeriod,
+  trialDay,
 } from '../engine/index.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
 import { attackBlocked, bagPlaces, characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
@@ -65,7 +68,9 @@ function weeksAround(now) {
 }
 
 // The guild's beast of the week, made by the first look at it or attack on
-// it: at the members' character levels now, for their number now. The
+// it: at the members' character levels now, for their number now, the
+// members it counts (`counted`) kept, as a joiner raises its HP later
+// (beastJoin). The
 // beasts of the weeks before the last one go then, with their hits and
 // chests, of every guild: nothing of them shows or opens any more.
 async function beastOf(db, guildId, now) {
@@ -73,17 +78,40 @@ async function beastOf(db, guildId, now) {
   const read = () => db.prepare('SELECT * FROM guild_beasts WHERE guild_id = ? AND week = ?').bind(guildId, current.key).first();
   const found = await read();
   if (found) return found;
-  const { results } = await db.prepare('SELECT c.level FROM guild_members m JOIN characters c ON c.id = m.character_id WHERE m.guild_id = ?').bind(guildId).all();
+  const { results } = await db.prepare('SELECT m.character_id, c.level FROM guild_members m JOIN characters c ON c.id = m.character_id WHERE m.guild_id = ?').bind(guildId).all();
   const beast = guildBeast({ seed: `${guildId}:${current.key}`, levels: results.map((member) => member.level) }, content());
   await db.batch([
     db.prepare('DELETE FROM guild_beast_hits WHERE beast_id IN (SELECT id FROM guild_beasts WHERE week < ?)').bind(previous.key),
     db.prepare('DELETE FROM guild_beasts WHERE week < ?').bind(previous.key),
     db.prepare('DELETE FROM guild_beast_chests WHERE week < ?').bind(previous.key),
     db
-      .prepare('INSERT OR IGNORE INTO guild_beasts (guild_id, week, monster_id, area_id, level, members, max_hp, hp, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-      .bind(guildId, current.key, beast.monsterId, beast.areaId, beast.level, beast.members, beast.maxHp, beast.maxHp, now),
+      .prepare('INSERT OR IGNORE INTO guild_beasts (guild_id, week, monster_id, area_id, level, members, max_hp, hp, created_at, counted) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(guildId, current.key, beast.monsterId, beast.areaId, beast.level, beast.members, beast.maxHp, beast.maxHp, now, JSON.stringify(results.map((member) => member.character_id))),
   ]);
   return read();
+}
+
+// The statement that raises the guild's beast of the week, made already and
+// still standing, for a character who has just joined the guild (at `now`,
+// its joined_at): its share of the week left of a member's attacks
+// (beastJoinHp), once a week for a character (`counted`), as weekJoin in
+// guilds.js does for the Próby and the Wyprawa. None without a beast yet:
+// the one made later counts the member anyway.
+export async function beastJoin(db, guildId, characterId, now) {
+  const { current } = weeksAround(now);
+  const beast = await db.prepare('SELECT id, level FROM guild_beasts WHERE guild_id = ? AND week = ? AND hp > 0').bind(guildId, current.key).first();
+  if (!beast) return [];
+  const added = beastJoinHp(beast.level, joinShare(trialDay(now, content())), content());
+  return [
+    db
+      .prepare(
+        `UPDATE guild_beasts SET max_hp = max_hp + ?, hp = hp + ?, counted = json_insert(counted, '$[#]', ?)
+         WHERE id = ? AND level = ? AND hp > 0
+           AND EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ? AND joined_at = ?)
+           AND NOT EXISTS (SELECT 1 FROM json_each(guild_beasts.counted) WHERE value = ?)`,
+      )
+      .bind(added, added, characterId, beast.id, beast.level, characterId, guildId, now, characterId),
+  ];
 }
 
 // The engine's beast from its row.

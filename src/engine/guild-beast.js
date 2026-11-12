@@ -78,6 +78,19 @@ export function guildBeast({ seed, levels }, content) {
   return { monsterId: /** @type {string} */ (area.champion), areaId: area.id, level, members, maxHp };
 }
 
+// The HP a member who joins the guild after its beast came adds to it: its
+// share of the week left (`share`, joinShare in guild-trials.js) of a
+// member's typical attacks at the beast's level, as the Próby's thresholds
+// and the Wyprawa's stages grow for one (the code review, 0.2.72: a beast
+// made for two stayed a two-member beast for all who joined after it).
+/**
+ * @param {number} level
+ * @param {number} share
+ * @param {Content} content
+ * @returns {number}
+ */
+export const beastJoinHp = (level, share, content) => Math.max(0, Math.round(share * rules(content).memberAttacks * beastAttackDamage(level, content)));
+
 // One attack on the beast (`beast`: its monster, region, level, HP left and
 // most HP): the character alone at full HP with no potions, the
 // Encyklopedia's trophies (`trophies`, by creature) and the region's trait

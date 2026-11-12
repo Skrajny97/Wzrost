@@ -39,7 +39,7 @@ export async function getGuildTodo(context) {
   return json({
     todo: {
       // A chest to open: the trials themselves run without taking (617).
-      trials: ready(trials.bar) || ready(trials.previous),
+      trials: ready(trials.bar) || ready(trials.previous) || trials.elsewhere.some(ready),
       beast: Boolean(beast.beast && !beast.beast.fallen && canAttack(beast.attacks)) || beast.chests.length > 0,
       expedition: Boolean(expedition.expedition?.barred && expedition.contributor && canAttack(expedition.attacks)) || expedition.chests.length > 0,
       requests: Boolean(requests.mine?.gifts.some((gift) => !gift.thanked)),

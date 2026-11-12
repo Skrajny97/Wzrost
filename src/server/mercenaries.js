@@ -136,7 +136,10 @@ export async function claimMercenary(context) {
   await atomically(
     db,
     [
-      assertion(db, `EXISTS (SELECT 1 FROM activities WHERE ${here})`, [row.id, activity.started_at]),
+      // The service as read: an offer hired at its last moment, after this
+      // claim read it as nobody's, now serves its hirer, who paid; closed as
+      // an offer, it took the fee with it (the code review, 0.2.72).
+      assertion(db, `EXISTS (SELECT 1 FROM activities WHERE ${here} AND (json_extract(options, '$.hired') IS NULL) = ?)`, [row.id, activity.started_at, offer.hired ? 0 : 1]),
       db.prepare('UPDATE characters SET gold = gold + ?, version = version + 1 WHERE id = ?').bind(gold, row.id),
       db.prepare(`DELETE FROM activities WHERE ${here}`).bind(row.id, activity.started_at),
     ],

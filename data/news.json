@@ -615,6 +615,11 @@
       "id": "0.2.71",
       "title": "Wersja 0.2.71",
       "body": "- Poprawki bezpieczeństwa: dzienne limity (Punkty Czasu u Pustelnika, zadania dnia, praca w profesjach) zawsze liczą się według właściwego dnia, także tuż przed północą.\n- Kod podarunkowy dla jednej postaci działa tylko raz."
+    },
+    {
+      "id": "0.2.72",
+      "title": "Wersja 0.2.72",
+      "body": "- Drużyna: raport odebrany w chwili, gdy ktoś z Drużyny przewija koniec wyprawy, wypłaca się raz. Plotka z Karczmy członka Drużyny czeka na jego własną wyprawę.\n- Skrzynie Prób i Skrzynie Wyprawy zdobyte w gildii czekają do końca następnego tygodnia także po wyjściu z niej albo po jej rozpadzie. Skrzynie Prób z dawnej gildii widać w zakładce Próby.\n- Bestia Gildii rośnie z każdym, kto dołączy do gildii w tygodniu, jak Próby i Wyprawa.\n- Mikstura wypita w tej samej chwili co inna albo co odbiór raportu działa poprawnie, a kilka dotknięć „Buduj” naraz płaci raz.\n- Najemnik zwerbowany w ostatniej chwili oferty dostaje swoją zapłatę."
     }
   ]
 }

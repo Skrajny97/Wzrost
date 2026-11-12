@@ -2766,5 +2766,6 @@
   "Brakuje złota na trening.": "Not enough gold for the training.",
   "Nie ma takiego zakupu.": "There is no such purchase.",
   "Ten zakup jest już w innym stanie. Odśwież listę.": "This purchase is already in another state. Refresh the list.",
-  "Nie ma takiego działania.": "There is no such action."
+  "Nie ma takiego działania.": "There is no such action.",
+  "Gildia zmieniła się w międzyczasie. Spróbuj jeszcze raz.": "The guild changed in the meantime. Try once more."
 }
