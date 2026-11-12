@@ -1,13 +1,15 @@
 // The third evolution ("Trzecia ewolucja klas"): at class level 200 each of
 // the 15 second forms grows into one further form, where the deployment has
-// the third forms on (THIRD_EVOLUTION; off in the live game for now). The
+// the third forms on (THIRD_EVOLUTION; in the live game from 0.2.98). The
 // class waits there until the form is taken, the form's skills take every
 // Skill Point back and grow to level 145, the stats grow over four spans,
 // the names have a woman's form, the Pustelnik changes it with the other
-// paths' third forms, the art stands in with the second form's until it has
-// its own, every new skill and trait works in fights, and a third form is
-// clearly stronger than its second form while the 15 stay close to each
-// other, on explorations and in the Arena.
+// paths' third forms, each form has its own portrait, walk and ride in every
+// skin tone and each skill its own icon and sound (the art of a form or a
+// skill without its own would stand in with the one before it), every new
+// skill and trait works in fights, and a third form is clearly stronger
+// than its second form while the 15 stay close to each other, on
+// explorations and in the Arena.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -52,8 +54,8 @@ const seconds = content.evolutions.filter((evolution) => evolution.stage === 2);
 const thirds = content.evolutions.filter((evolution) => evolution.stage === 3);
 
 // The game's data with the third forms taken out: the second forms as they
-// were before the third evolution (and as the live game has them while
-// THIRD_EVOLUTION is off).
+// were before the third evolution (and as a deployment has them with
+// THIRD_EVOLUTION "off").
 const secondOnly = (() => {
   const raw = loadData();
   const thirdIds = new Set(thirds.map((evolution) => evolution.id));
@@ -234,12 +236,14 @@ describe('the third evolution in the engine', () => {
     assert.deepEqual(evolutionChanges({ classId: 'warrior', evolution: 'berserker' }, content).map((evolution) => evolution.id), ['arena-champion', 'bastion']);
   });
 
-  test('a third form stands in with its second form\'s art, and its skills with those down their line, until they have their own', async () => {
+  test('every third form has its own portrait, walk and ride in every skin tone, and every skill its own icon and sound; the stand-ins wait behind them', async () => {
     const art = evolutionArt(content);
     for (const form of thirds) assert.equal(art.forms[form.id], form.from, form.id);
-    // The grown skill: the one it grew from, then that one's root; the new
-    // one: the second form's skill in its place (or the other one, where
-    // the grown skill came from that), then that one's stand-in.
+    // Where a form or a skill had no art of its own, it would stand in with
+    // the one before it: the grown skill with the one it grew from, then
+    // that one's root; the new one with the second form's skill in its place
+    // (or the other one, where the grown skill came from that), then that
+    // one's stand-in.
     assert.deepEqual(art.skills['smashing-blow'], ['shattering-blow', 'crushing-blow']);
     assert.deepEqual(art.skills.slaughter, ['berserker-roar', 'blood-frenzy']);
     assert.deepEqual(art.skills.hymn, ['choir', 'psalm']);
@@ -247,28 +251,44 @@ describe('the third evolution in the engine', () => {
     assert.deepEqual(art.skills['eagle-talon'], ['harpoon', 'barbed-arrow']);
     const { SPRITES, artChain, lookIds, riderFile, walkerSheet } = await import('../src/client/art.js');
     const { state } = await import('../src/client/state.js');
+    const { existsSync, readFileSync } = await import('node:fs');
+    const file = (path) => new URL(`../src/client/${path}`, import.meta.url);
+    const sounds = JSON.parse(readFileSync(new URL('../data/sounds.json', import.meta.url), 'utf8')).effects;
+    // The skin tones as the page has them (content.js on the server): the
+    // portrait as drawn, and the others with their own recoloured files.
+    const skins = { default: content.defaultSkin, tones: content.skins.map((skin) => ({ id: skin.id, drawn: !skin.ramp })) };
+    const tones = skins.tones.filter((tone) => !tone.drawn);
+    assert.ok(tones.length >= 8);
     const before = state.content;
-    state.content = { evolutionArt: art };
+    state.content = { evolutionArt: art, skins };
     try {
-      // Every skill of a third form has an icon down its line.
+      // Every skill of a third form has its own icon (823) and sound (824).
       for (const form of thirds) {
-        for (const id of form.skills) assert.ok(artChain(id).some((one) => SPRITES.skills.ids.includes(one)), id);
+        for (const id of form.skills) {
+          assert.equal(artChain(id).find((one) => SPRITES.skills.ids.includes(one)), id, id);
+          assert.ok(existsSync(file(`art/skills/${id}.png`)), id);
+          assert.ok(sounds[`skill-${id}`]?.files.every((sound) => existsSync(file(sound))), id);
+        }
       }
       // The look: the form's own art first, then down the line to the class.
       assert.deepEqual(lookIds('warrior', 'female', 'horde-slayer'), ['horde-slayer-female', 'berserker-female', 'barbarian-female', 'warrior-female']);
-      // The portraits of the third forms are in (the Prorok's man's still
-      // stands in with the Arcykapłan's); the walks and rides, until they
-      // have their own, are the second forms'.
+      // Each form's own portrait (811, the Prorok 811.12 v3), walk and ride
+      // (822), each in every skin tone.
       for (const form of thirds) {
         for (const look of ['female', 'male']) {
           const id = `${form.id}-${look}`;
-          const portrait = lookIds(form.classId, look, form.id).find((one) => SPRITES.portraits.ids.includes(one));
-          assert.equal(portrait, SPRITES.portraits.ids.includes(id) ? id : `${form.from}-${look}`, id);
-          if (id !== 'prophet-male') assert.ok(SPRITES.portraits.ids.includes(id), id);
-          const walk = SPRITES.walkers.ids.includes(id) ? id : `${form.from}-${look}`;
-          assert.equal(walkerSheet(form.classId, look, undefined, form.id), `art/walkers/${walk}.png`, id);
-          const ride = SPRITES.riders.ids.includes(id) ? id : `${form.from}-${look}`;
-          assert.equal(riderFile(form.classId, look, undefined, form.id), `art/riders/${ride}.png`, id);
+          assert.ok(SPRITES.portraits.ids.includes(id) && SPRITES.portraits.tonedEvolutions.includes(id), id);
+          assert.equal(lookIds(form.classId, look, form.id).find((one) => SPRITES.portraits.ids.includes(one)), id, id);
+          assert.equal(walkerSheet(form.classId, look, undefined, form.id), `art/walkers/${id}.png`, id);
+          assert.equal(riderFile(form.classId, look, undefined, form.id), `art/riders/${id}.png`, id);
+          for (const kind of ['portraits', 'walkers', 'riders']) {
+            assert.ok(existsSync(file(`art/${kind}/${id}.png`)), `${kind} ${id}`);
+            for (const tone of tones) assert.ok(existsSync(file(`art/${kind}/${id}-${tone.id}.png`)), `${kind} ${id} ${tone.id}`);
+          }
+          for (const tone of tones) {
+            assert.equal(walkerSheet(form.classId, look, tone.id, form.id), `art/walkers/${id}-${tone.id}.png`, `${id} ${tone.id}`);
+            assert.equal(riderFile(form.classId, look, tone.id, form.id), `art/riders/${id}-${tone.id}.png`, `${id} ${tone.id}`);
+          }
         }
       }
     } finally {
@@ -806,7 +826,7 @@ describe('the third evolution through the API', () => {
   });
 });
 
-describe('the third evolution where the deployment has it off (the live game for now)', () => {
+describe('the third evolution where the deployment has it off (THIRD_EVOLUTION "off", the switch kept)', () => {
   const { call, db, signUp } = useServer({ THIRD_EVOLUTION: 'off' });
   let cookie;
 

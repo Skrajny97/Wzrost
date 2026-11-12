@@ -81,11 +81,11 @@ export const SPRITES = {
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
       // The third forms at class level 200 (DECISIONS.md, „Trzecia ewolucja
-      // klas”), as the author accepted them (811); the Prorok waits for his.
+      // klas”), as the author accepted them (811, the Prorok 811.12 v3).
       'horde-slayer-female', 'horde-slayer-male', 'arena-legend-female', 'arena-legend-male', 'colossus-female', 'colossus-male',
       'bow-master-female', 'bow-master-male', 'perun-chosen-female', 'perun-chosen-male', 'wild-lord-female', 'wild-lord-male',
       'elemental-avatar-female', 'elemental-avatar-male', 'frost-monarch-female', 'frost-monarch-male', 'archdruid-female', 'archdruid-male',
-      'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'godslayer-female', 'godslayer-male',
+      'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'prophet-male', 'godslayer-female', 'godslayer-male',
       'lich-female', 'lich-male', 'shadow-lord-female', 'shadow-lord-male',
       // The outfits of the Sklep Systemu (skórki, 763 A), <look>-<appearance>.
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
@@ -106,7 +106,7 @@ export const SPRITES = {
       'horde-slayer-male': 50, 'arena-legend-female': 50, 'arena-legend-male': 50, 'colossus-female': 49, 'bow-master-male': 50,
       'perun-chosen-female': 50, 'perun-chosen-male': 51, 'wild-lord-female': 50, 'wild-lord-male': 50, 'elemental-avatar-female': 54,
       'elemental-avatar-male': 52, 'frost-monarch-female': 51, 'frost-monarch-male': 50, 'archdruid-female': 53, 'archdruid-male': 49,
-      'saint-female': 47, 'saint-male': 51, 'demon-slayer-female': 51, 'demon-slayer-male': 52, 'prophet-female': 49, 'godslayer-female': 50,
+      'saint-female': 47, 'saint-male': 51, 'demon-slayer-female': 51, 'demon-slayer-male': 52, 'prophet-female': 49, 'prophet-male': 49, 'godslayer-female': 50,
       'godslayer-male': 52, 'lich-female': 52, 'lich-male': 50, 'shadow-lord-female': 50, 'shadow-lord-male': 50,
       'skin-night-raven-female': 50, 'skin-night-raven-male': 51, 'skin-forest-lord-female': 51, 'skin-forest-lord-male': 52,
       'skin-perun-female': 49, 'skin-perun-male': 49,
@@ -133,7 +133,7 @@ export const SPRITES = {
       'perun-chosen-female': [38, 30], 'perun-chosen-male': [36, 30], 'wild-lord-female': [36, 30], 'wild-lord-male': [35, 30],
       'elemental-avatar-female': [40, 32], 'elemental-avatar-male': [39, 30], 'frost-monarch-female': [36, 32], 'frost-monarch-male': [35, 29],
       'archdruid-female': [40, 41], 'archdruid-male': [35, 35], 'saint-female': [37, 34], 'saint-male': [38, 31], 'demon-slayer-female': [38, 21],
-      'demon-slayer-male': [37, 25], 'prophet-female': [40, 35], 'godslayer-female': [35, 37], 'godslayer-male': [37, 37], 'lich-female': [40, 30],
+      'demon-slayer-male': [37, 25], 'prophet-female': [40, 35], 'prophet-male': [40, 35], 'godslayer-female': [35, 37], 'godslayer-male': [37, 37], 'lich-female': [40, 30],
       'lich-male': [38, 32], 'shadow-lord-female': [38, 34], 'shadow-lord-male': [38, 31],
       'skin-night-raven-female': [33, 40], 'skin-night-raven-male': [33, 38], 'skin-forest-lord-female': [37, 41], 'skin-forest-lord-male': [38, 40],
       'skin-perun-female': [32, 38], 'skin-perun-male': [34, 40],
@@ -178,7 +178,7 @@ export const SPRITES = {
       'horde-slayer-female', 'horde-slayer-male', 'arena-legend-female', 'arena-legend-male', 'colossus-female', 'colossus-male',
       'bow-master-female', 'bow-master-male', 'perun-chosen-female', 'perun-chosen-male', 'wild-lord-female', 'wild-lord-male',
       'elemental-avatar-female', 'elemental-avatar-male', 'frost-monarch-female', 'frost-monarch-male', 'archdruid-female', 'archdruid-male',
-      'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'godslayer-female', 'godslayer-male',
+      'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'prophet-male', 'godslayer-female', 'godslayer-male',
       'lich-female', 'lich-male', 'shadow-lord-female', 'shadow-lord-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
@@ -252,6 +252,12 @@ export const SPRITES = {
       'crushing-blow', 'blood-frenzy', 'millstone', 'riposte', 'indomitable', 'challenge', 'piercing-shot', 'ambush-shot', 'arrow-storm', 'storm-cloud',
       'barbed-arrow', 'falcon', 'fire-burst', 'elemental-ray', 'blizzard', 'ice-lance', 'mana-mirror', 'elemental-summon', 'renewal', 'miracle',
       'judgement', 'verdict', 'great-blessing', 'psalm', 'execution', 'death-mark', 'black-venom', 'toxic-slime', 'blade-dance', 'shadow-whirl',
+      // The third forms' skills at class level 200, as the author accepted
+      // them (823). The second forms' skills have none of their own yet and
+      // stand in with the skills they grew from (artChain).
+      'smashing-blow', 'slaughter', 'steel-hurricane', 'cheers', 'unbroken', 'earthquake', 'master-shot', 'steady-hand', 'perun-wrath', 'thunder-sign',
+      'pack-leader', 'eagle-talon', 'cataclysm', 'elemental-shield', 'ice-storm', 'ice-tomb', 'oak-awakening', 'bison-call', 'miraculous-healing', 'holy-light',
+      'last-judgment', 'holy-seal', 'hymn', 'vision', 'final-blow', 'blood-mark', 'army-of-dead', 'death-touch', 'shadow-storm', 'eclipse',
     ],
   },
   // The character walking in place on the Walka scene, <class>-<look> or an
@@ -274,6 +280,13 @@ export const SPRITES = {
       'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
+      // The third forms at class level 200, as the author accepted them (822,
+      // the riders drawn anew one by one; the large ones in walk.rider.large).
+      'horde-slayer-female', 'horde-slayer-male', 'arena-legend-female', 'arena-legend-male', 'colossus-female', 'colossus-male',
+      'bow-master-female', 'bow-master-male', 'perun-chosen-female', 'perun-chosen-male', 'wild-lord-female', 'wild-lord-male',
+      'elemental-avatar-female', 'elemental-avatar-male', 'frost-monarch-female', 'frost-monarch-male', 'archdruid-female', 'archdruid-male',
+      'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'prophet-male', 'godslayer-female', 'godslayer-male',
+      'lich-female', 'lich-male', 'shadow-lord-female', 'shadow-lord-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
@@ -544,6 +557,13 @@ export const SPRITES = {
       'winter-lord-female', 'winter-lord-male', 'druid-female', 'druid-male', 'miracle-worker-female', 'miracle-worker-male',
       'grand-inquisitor-female', 'grand-inquisitor-male', 'high-priest-female', 'high-priest-male', 'kingslayer-female', 'kingslayer-male',
       'necromancer-female', 'necromancer-male', 'phantom-female', 'phantom-male',
+      // The third forms at class level 200, as the author accepted them (822,
+      // the riders drawn anew one by one; the large ones in walk.rider.large).
+      'horde-slayer-female', 'horde-slayer-male', 'arena-legend-female', 'arena-legend-male', 'colossus-female', 'colossus-male',
+      'bow-master-female', 'bow-master-male', 'perun-chosen-female', 'perun-chosen-male', 'wild-lord-female', 'wild-lord-male',
+      'elemental-avatar-female', 'elemental-avatar-male', 'frost-monarch-female', 'frost-monarch-male', 'archdruid-female', 'archdruid-male',
+      'saint-female', 'saint-male', 'demon-slayer-female', 'demon-slayer-male', 'prophet-female', 'prophet-male', 'godslayer-female', 'godslayer-male',
+      'lich-female', 'lich-male', 'shadow-lord-female', 'shadow-lord-male',
       'skin-night-raven-female', 'skin-night-raven-male', 'skin-forest-lord-female', 'skin-forest-lord-male',
       'skin-perun-female', 'skin-perun-male',
       'skin-dawn-female', 'skin-dawn-male', 'skin-eclipse-female', 'skin-eclipse-male',
