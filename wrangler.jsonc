@@ -94,6 +94,12 @@
     // tab of the Sala prób from character level 30. In the live game from
     // version 0.2.87, once the author accepted the mock-ups 870.1–870.7.
     "LABYRINTH": "on",
+    // "on": Talia Systemu, the Salon Gier's card game (src/server/cards.js;
+    // 871–889): the Salon's Karty tab, the cards the creatures of an
+    // exploration leave, the collection's bonus and the Encyklopedia's
+    // Karty. In the live game from version 0.2.93, once the author accepted
+    // the mock-ups 881, the cards' look 885–888 and the Encyklopedia's 889.
+    "CARDS": "on",
     // The gateway of the payments for Punkty Systemu (src/server/payments.js,
     // src/server/payment-providers.js): "autopay" (805 D), or empty: off. Its
     // keys, AUTOPAY_SERVICE_ID and AUTOPAY_SHARED_KEY, are Worker secrets the
@@ -174,6 +180,8 @@
         // The Labirynt Systemu and the Rdzeń with its Artefakty, as in the
         // game (850–866).
         "LABYRINTH": "on",
+        // Talia Systemu, the Salon Gier's card game, as in the game (871–889).
+        "CARDS": "on",
         // The payments for Punkty Systemu: off until the Autopay test
         // account's keys are in the GitHub secrets (AUTOPAY_TEST_SERVICE_ID,
         // AUTOPAY_TEST_SHARED_KEY), then "autopay" with Autopay's test

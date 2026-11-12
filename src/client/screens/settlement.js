@@ -62,6 +62,10 @@ const TAVERN_TABS = ['mug', 'companions', 'mercenaries'];
 // The Sala prób's tabs where the character has the Labirynt Systemu: the
 // Labirynt first, opened by default, then the trials (#/osada/trial-hall/trials).
 const TRIAL_HALL_TABS = ['labyrinth', 'trials'];
+// The Salon Gier's tabs the address may name (#/osada/casino/cards): the
+// Loteria, the Koło Fortuny and Talia Systemu's "Karty" (cards.js); with
+// none named, casino.js chooses.
+const CASINO_TABS = ['lottery', 'wheel', 'cards'];
 // Whether the Sala prób holds the Labirynt: where the game has it on and
 // the character has reached it (data/unlocks.json, 855 A).
 const labyrinthHere = () => Boolean(unlockInfo('labyrinth')) && isUnlocked('labyrinth');
@@ -126,12 +130,21 @@ export function mountSettlement(container, { params = {} } = {}) {
     } else market.refresh();
     return market.holder;
   };
-  // The Salon Gier's games (casino.js), kept so too.
+  // The Salon Gier's games (casino.js), kept so too. The tab chosen goes
+  // into the address, and while Talia Systemu's match is on (cards.js) the
+  // Salon's screen shows its table without Szczęsny's card above it.
   let casino = null;
   const casinoPanel = () => {
     if (!casino) {
       const holder = h('div', { class: 'casino' });
-      casino = { holder, ...mountCasino(holder) };
+      casino = {
+        holder,
+        ...mountCasino(holder, {
+          tab: CASINO_TABS.includes(params.tab) ? params.tab : null,
+          onTab: (id) => history.replaceState(history.state, '', `${SETTLEMENT}/casino/${id}`),
+          onLayout: () => !gone && data && render(),
+        }),
+      };
     } else casino.refresh();
     return casino.holder;
   };
@@ -1625,8 +1638,9 @@ export function mountSettlement(container, { params = {} } = {}) {
         h('button', { type: 'button', class: 'button button--system back-button', onClick: () => leaveView(SETTLEMENT, 1, HISTORY_KEY) }, icon('back', { size: 20 }), t('Powrót')),
       ),
       place.soon && systemPanel(t('{name} otworzy się w jednej z kolejnych aktualizacji gry.', { name: place.name })),
-      resident && residentCard(resident, place.backdrop),
-      !place.soon && resident && services(resident),
+      // While Talia Systemu's match is on, its table instead (cards.js).
+      resident && !(place.id === 'casino' && casino?.compact()) && residentCard(resident, place.backdrop),
+      !place.soon && resident && !(place.id === 'casino' && casino?.compact()) && services(resident),
       // The sołtys's orders and Poszukiwani (619 B), each in its tab.
       place.id === 'board' && boardTabs(),
       place.id === 'market' && !place.soon && marketPanel(),
@@ -1651,7 +1665,7 @@ export function mountSettlement(container, { params = {} } = {}) {
     // An unknown place in the address leads back to the board, and a tab
     // the place does not have to the place.
     if (placeId && !place) return location.replace(SETTLEMENT);
-    const tabs = place?.id === 'tavern' ? TAVERN_TABS : place?.id === 'trial-hall' && labyrinthHere() ? TRIAL_HALL_TABS : [];
+    const tabs = place?.id === 'tavern' ? TAVERN_TABS : place?.id === 'trial-hall' && labyrinthHere() ? TRIAL_HALL_TABS : place?.id === 'casino' ? CASINO_TABS : [];
     if (place && params.tab && !tabs.includes(params.tab)) return location.replace(`${SETTLEMENT}/${place.id}`);
     if (place) placeView(place);
     else boardView();

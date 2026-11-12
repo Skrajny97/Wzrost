@@ -23,7 +23,7 @@
         "additionalProperties": false,
         "required": ["id", "name"],
         "properties": {
-          "id": { "type": "string", "enum": ["bestiary", "items", "potions", "herbs", "materials", "parts", "minerals"] },
+          "id": { "type": "string", "enum": ["bestiary", "items", "potions", "herbs", "materials", "parts", "minerals", "cards"] },
           "name": { "type": "string" }
         }
       }

@@ -1,0 +1,236 @@
+{
+  "$comment": "Talia Systemu: gra karciana w Salonie Gier (src/engine/cards.js, src/server/cards.js, src/client/cards.js; DECISIONS.md, „Talia Systemu: gra karciana w Salonie Gier”, 871 B, 872–877 A i punkty rozstrzygnięte przy budowie). Działa tylko tam, gdzie zmienna CARDS jest „on”, w trzeciej zakładce Salonu Gier („Karty”), otwartej razem z Salonem. Karty to stwory z Bestiariusza, które żyją w krainach (monsters.json, regions.json), każdy jedną kartą. Typ karty (types) to statystyka, którą stwór atakuje (attack.scaling): Siła, Zręczność albo Magia; karta bije typ target i zadaje mu typeBonus więcej. Rzadkość karty to rzadkość gatunku, czyli jego materiału (materials.json): zwykłe stwory od pospolitej do epickiej, elity legendarna albo mityczna, czempioni mityczna albo boska. Atak i Życie (stats): attack i life razy kształt stwora (jego cios do jego HP w walce na pierwszym miejscu, w którym żyje, względem mediany wszystkich stworów, w granicach shapeRange, do potęgi shapeExponent; Atak razy kształt, Życie przez kształt) razy moc karty: rarity[rzadkość], 1 + landStep za każdą kolejną krainę stwora i 1 + levelStep za każdy poziom karty ponad pierwszy. Poziom karty to liczba zdobytych sztuk, najwyżej maxLevel. Partia (871 B): talia deckSize kart, w rezerwie hand kart dobieranych z talii, trzy linie (lines); co rundę Szczęsny najpierw dokłada karty z rezerwy na swoje puste linie, potem gracz dokłada swoje (puste linie trzeba zapełnić, dopóki są karty w rezerwie; karta stoi na swojej linii, dopóki nie zostanie zbita) i raz na partię może użyć umiejętności bohatera; po „Walcz” każda karta bije kartę naprzeciw, wszystkie naraz (gdy naprzeciw nie ma karty, bije pierwszą kartę rywala od przodu), a karta z Życiem 0 jest zbita. Wygrywa ten, kto zbije wszystkie karty rywala (obie strony naraz: remis); po roundCap rundach wygrywa ten, komu zostało więcej kart, potem więcej Życia, a przy równości jest remis. Bohater (heroes, 872 A z punktem 8): umiejętność klasy postaci (id) raz na partię; power to jej liczba bez ewolucji, po pierwszej i po drugiej (późniejsza ewolucja bierze ostatnią); text i plus to jej słowa ({power} w procentach, plus tylko przy power ponad 0). Szczęsny (host, 873 A): pięć stopni (tiers), każdy ze stawką stake razy stawka podstawowa (stakes: step złota, o step więcej co levelsPerStep poziomów postaci, jak najniższa stawka Koła Fortuny), nagrodą dnia (złoto z rewardMinutes minut eksploracji na poziomie postaci, raz dziennie za pierwszą wygraną o stawkę na tym stopniu), kartą za pierwsze pokonanie stopnia (firstWin.rarity: rzadkość; najpierw stwór, którego postać nie ma), talią (cards: stwór i poziom karty) i sposobem gry (smart: 0 losowo, 1 najmocniejsze karty, 2 karty pod karty gracza). Za wygraną o stawkę zgarnia się podwójną stawkę, remis ją zwraca (875 A); najwyżej stakes.perDay partii o stawkę dziennie (od północy czasu polskiego). Trening jest bez stawki i bez nagród, bez limitu. Karty z wypraw (drops, 874 A): szansa za każdego pokonanego stwora według jego rodzaju (guardian: strażnik, na później), z osobnego ziarna wyprawy; karta, która ma już najwyższy poziom, nie wypada. Talia startowa (starter, 874 A): 12 zwykłych stworów z pierwszych krain, po cztery każdego typu, które Szczęsny daje za darmo. Kolekcja (src/engine/card-collection.js): rubryka „Karty” w Encyklopedii (texts.collection) i premia za kolekcję (bonuses, 884 A). texts: słowa gry; {…} wypełnia gra.",
+  "name": "Talia Systemu",
+  "deckSize": 12,
+  "hand": 4,
+  "roundCap": 20,
+  "lines": [
+    { "id": "front", "name": "Przód" },
+    { "id": "middle", "name": "Środek" },
+    { "id": "back", "name": "Tył" }
+  ],
+  "types": [
+    { "id": "strength", "name": "Siła", "target": "dexterity", "icon": "axe" },
+    { "id": "dexterity", "name": "Zręczność", "target": "intellect", "icon": "bow" },
+    { "id": "intellect", "name": "Magia", "target": "strength", "icon": "staff" }
+  ],
+  "typeBonus": 0.5,
+  "stats": {
+    "attack": 10,
+    "life": 24,
+    "shapeExponent": 0.4,
+    "shapeRange": [0.35, 3],
+    "landStep": 0.06,
+    "levelStep": 0.1,
+    "maxLevel": 5,
+    "rarity": { "common": 1, "rare": 1.05, "unique": 1.1, "epic": 1.15, "legendary": 1.2, "mythic": 1.25, "divine": 1.3 }
+  },
+  "drops": { "ordinary": 0.02, "elite": 0.1, "champion": 0.25, "guardian": 0.25 },
+  "starter": {
+    "monsters": ["wolf", "badger", "raccoon-dog", "capercaillie", "squirrel", "grass-snake", "fox", "viper", "phantasm", "fume-spirit", "reedling", "mistling"]
+  },
+  "heroes": [
+    {
+      "id": "warrior",
+      "kind": "fury",
+      "name": "Szarża",
+      "text": "Wybrana Twoja karta bije w tej rundzie o {power}% mocniej.",
+      "power": [0.5, 0.75, 1]
+    },
+    {
+      "id": "archer",
+      "kind": "aim",
+      "name": "Celny strzał",
+      "text": "Wybrana Twoja karta bije w tej rundzie wskazaną kartę rywala zamiast tej naprzeciw.",
+      "plus": "Bije ją też o {power}% mocniej.",
+      "power": [0, 0.25, 0.5]
+    },
+    {
+      "id": "mage",
+      "kind": "shift",
+      "name": "Przemiana",
+      "text": "Wybrana Twoja karta zmienia typ do końca partii.",
+      "plus": "W tej rundzie bije też o {power}% mocniej.",
+      "power": [0, 0.25, 0.5]
+    },
+    {
+      "id": "cleric",
+      "kind": "revive",
+      "name": "Wskrzeszenie",
+      "text": "Gdy wybrana Twoja karta padnie w tej rundzie, wraca z {power}% Życia.",
+      "power": [0.5, 0.75, 1]
+    },
+    {
+      "id": "shadow",
+      "kind": "swap",
+      "name": "Podmiana",
+      "text": "Po ustawieniu rywala zamieniasz jedną kartę z linii na kartę z rezerwy.",
+      "plus": "Nowa karta bije w tej rundzie o {power}% mocniej.",
+      "power": [0, 0.25, 0.5]
+    }
+  ],
+  "stakes": { "step": 100, "levelsPerStep": 40, "perDay": 10 },
+  "host": {
+    "resident": "gamehost",
+    "tiers": [
+      {
+        "id": "warmup",
+        "name": "Rozgrzewka",
+        "text": "Szczęsny gra na pół gwizdka: pospolite i rzadkie karty z pierwszych krain, kilka na 2. poziomie.",
+        "stake": 1,
+        "rewardMinutes": 10,
+        "firstWin": { "rarity": "rare" },
+        "smart": 1,
+        "cards": [
+          { "monster": "wolf", "level": 2 },
+          { "monster": "badger", "level": 1 },
+          { "monster": "raccoon-dog", "level": 1 },
+          { "monster": "stag-beetle", "level": 2 },
+          { "monster": "squirrel", "level": 1 },
+          { "monster": "grass-snake", "level": 2 },
+          { "monster": "hornets", "level": 1 },
+          { "monster": "antlion", "level": 2 },
+          { "monster": "phantasm", "level": 1 },
+          { "monster": "fume-spirit", "level": 1 },
+          { "monster": "reedling", "level": 2 },
+          { "monster": "mistling", "level": 2 }
+        ]
+      },
+      {
+        "id": "parlour",
+        "name": "Partyjka przy stole",
+        "text": "Rzadkie i unikalne karty na 2. i 3. poziomie. Szczęsny dobiera karty pod Twoje.",
+        "stake": 2,
+        "rewardMinutes": 15,
+        "firstWin": { "rarity": "unique" },
+        "smart": 2,
+        "cards": [
+          { "monster": "capercaillie", "level": 2 },
+          { "monster": "boar", "level": 2 },
+          { "monster": "stag", "level": 2 },
+          { "monster": "mossling", "level": 2 },
+          { "monster": "marten", "level": 3 },
+          { "monster": "crow", "level": 2 },
+          { "monster": "owl", "level": 2 },
+          { "monster": "wildcat", "level": 3 },
+          { "monster": "imp", "level": 2 },
+          { "monster": "wolf-shepherd", "level": 2 },
+          { "monster": "will-o-wisp", "level": 2 },
+          { "monster": "mine-spirit", "level": 2 }
+        ]
+      },
+      {
+        "id": "serious",
+        "name": "Gra na poważnie",
+        "text": "Unikalne i epickie stwory na 2. i 3. poziomie. Tu przyda się talia lepsza niż startowa.",
+        "stake": 3,
+        "rewardMinutes": 20,
+        "firstWin": { "rarity": "epic" },
+        "smart": 2,
+        "cards": [
+          { "monster": "she-wolf", "level": 3 },
+          { "monster": "alpha-wolf", "level": 2 },
+          { "monster": "bear", "level": 2 },
+          { "monster": "aurochs", "level": 3 },
+          { "monster": "spider", "level": 3 },
+          { "monster": "lynx", "level": 2 },
+          { "monster": "falcon", "level": 3 },
+          { "monster": "strzyga", "level": 2 },
+          { "monster": "eel", "level": 3 },
+          { "monster": "toad", "level": 2 },
+          { "monster": "wraith", "level": 2 },
+          { "monster": "sundew", "level": 3 }
+        ]
+      },
+      {
+        "id": "masters",
+        "name": "Stół mistrzów",
+        "text": "Epickie karty i elity na 3. i 4. poziomie. Tu każdy błąd kosztuje.",
+        "stake": 4,
+        "rewardMinutes": 30,
+        "firstWin": { "rarity": "legendary" },
+        "smart": 2,
+        "cards": [
+          { "monster": "crocodile", "level": 4 },
+          { "monster": "zmij", "level": 3 },
+          { "monster": "bird-eater", "level": 3 },
+          { "monster": "elk", "level": 4 },
+          { "monster": "salamander", "level": 4 },
+          { "monster": "harrier", "level": 4 },
+          { "monster": "water-spider", "level": 3 },
+          { "monster": "mud-goblin", "level": 3 },
+          { "monster": "planetnik", "level": 3 },
+          { "monster": "wisp", "level": 3 },
+          { "monster": "veles-serpent", "level": 4 },
+          { "monster": "pagan-priest", "level": 4 }
+        ]
+      },
+      {
+        "id": "host",
+        "name": "Talia Szczęsnego",
+        "text": "Jego własna talia: czempioni i elity na 4. i 5. poziomie. Mało kto wstaje od tego stołu z pełną sakiewką.",
+        "stake": 5,
+        "rewardMinutes": 40,
+        "firstWin": { "rarity": "mythic" },
+        "smart": 2,
+        "cards": [
+          { "monster": "tusker", "level": 5 },
+          { "monster": "mud-lord", "level": 4 },
+          { "monster": "bone-gnawer", "level": 5 },
+          { "monster": "charred-pine", "level": 4 },
+          { "monster": "night-huntsman", "level": 4 },
+          { "monster": "gadfly", "level": 5 },
+          { "monster": "smoke-hound", "level": 5 },
+          { "monster": "koltun", "level": 4 },
+          { "monster": "basilisk", "level": 4 },
+          { "monster": "rokita", "level": 4 },
+          { "monster": "kikimora", "level": 5 },
+          { "monster": "noon-wraith", "level": 5 }
+        ]
+      }
+    ]
+  },
+  "bonuses": {
+    "$comment": "Premia za kolekcję (884 A): co every różnych kart +xp XP i +gold złota z wypraw, z ich walk i znalezisk, najwyżej max (udziały: 0.01 to 1%; 156 kart daje +15%). Działa od chwili zdobycia karty, przy każdym odbiorze raportu. Przy xp i gold równych 0 jest wyłączona.",
+    "collection": { "every": 10, "xp": 0.01, "gold": 0.01, "max": 0.15 }
+  },
+  "texts": {
+    "intro": "Szczęsny tasuje talię kart ze stworami z Bestiariusza. „Dwanaście kart, trzy linie, jak w prawdziwej bitwie. Ułóż swoją talię i siadaj do stołu.”",
+    "starterOffer": "„Na dobry początek dam ci talię: dwanaście kart, po cztery każdego typu. Resztę zdobędziesz na wyprawach.”",
+    "starterTaken": "Szczęsny przesuwa po stole talię dwunastu kart. „Twoja. Graj nią śmiało.”",
+    "rules": [
+      "Talia to 12 kart. Każda karta to stwór z Bestiariusza z Atakiem, Życiem i typem: Siłą, Zręcznością albo Magią. Siła bije Zręczność, Zręczność bije Magię, a Magia bije Siłę: karta zadaje o połowę więcej karcie typu, który bije.",
+      "Na stole są trzy linie, jak w szyku: przód, środek i tył. Co rundę Szczęsny pierwszy dokłada karty na swoje puste linie. Potem Ty dokładasz karty z rezerwy (4 karty dobierane z talii) na swoje puste linie. Karta stoi na swojej linii, dopóki nie zostanie zbita.",
+      "Po „Walcz” każda karta bije kartę naprzeciw, wszystkie naraz. Gdy naprzeciw nie ma karty, bije pierwszą kartę rywala od przodu. Karta, której skończy się Życie, jest zbita.",
+      "Wygrywa ten, kto zbije wszystkie karty rywala. Po 20 rundach wygrywa ten, komu zostało więcej kart, a potem więcej Życia. Przy równości jest remis.",
+      "Karta bohatera to umiejętność Twojej klasy, raz na partię. Ewolucja klasy ją wzmacnia.",
+      "Partia o stawkę: za wygraną zgarniesz podwójną stawkę, a remis zwraca stawkę. Dziennie zagrasz o stawkę najwyżej 10 razy. Pierwsza wygrana dnia na każdym stopniu daje też nagrodę dnia, a pierwsze pokonanie stopnia rzadką kartę. Trening jest bez stawki i bez nagród.",
+      "Nowe karty wypadają rzadko z pokonanych stworów na wyprawach, częściej z elit i czempionów. Ta sama karta zdobyta drugi raz podnosi swój poziom, najwyżej do 5.: każdy poziom to więcej Ataku i Życia.",
+      "Kolekcja daje premię na stałe: co 10 różnych kart +1% XP i +1% złota z wypraw, najwyżej +15% za wszystkie 156 kart. Działa od chwili zdobycia karty. Kolekcję i premię widać w Encyklopedii, w rubryce „Karty”."
+    ],
+    "win": ["„Dobra partia! Nie spodziewałem się tego.”", "„Twoja wygrana. Karty dziś cię lubią.”", "„Brawo! Następnym razem nie odpuszczę.”"],
+    "loss": ["„Moja partia. Talia nie wybacza błędów.”", "„Tym razem stawka zostaje u mnie.”", "„Blisko było. Potasuj i wracaj.”"],
+    "draw": ["„Remis! Nikt nie traci, nikt nie zyskuje.”", "„Równo jak na wadze. Jeszcze jedna partia?”"],
+    "drop": ["Wśród łupu leży karta: {card}.", "Z pokonanego stwora wypada karta: {card}."],
+    "firstWin": "Za pierwsze pokonanie stopnia „{tier}” Szczęsny daje ci kartę: {card}.",
+    "collection": {
+      "summary": ["Kolekcja: {found} z {all}"],
+      "note": ["Karty wypadają z pokonanych stworów na wyprawach, częściej z elit i czempionów. Zagrasz nimi u Szczęsnego w Salonie Gier."],
+      "unknown": ["Nieznana karta"],
+      "land": ["Zebrane {found} z {all}"],
+      "meta": ["Karta {rarity} · {kind}"],
+      "kinds": { "ordinary": "zwykły stwór", "elite": "elita", "champion": "czempion" },
+      "type": ["Typ: {type}. Bije karty typu {beats} o {percent}% mocniej."],
+      "level": ["Poziom {level} z {max}: Atak {attack}, Życie {life}."],
+      "copies": ["Zdobyte sztuki: {copies}. Kolejna podniesie kartę na poziom {next}."],
+      "copiesTop": ["Zdobyte sztuki: {copies}. To najwyższy poziom: karta nie wypada już z wypraw."],
+      "places": ["Gdzie wypada: {land} ({places})."],
+      "chance": ["Pokonany stwór zostawia tę kartę z szansą {percent}%."],
+      "bonusNow": ["Premia kolekcji: +{xp}% XP i +{gold}% złota z wypraw, na stałe."],
+      "bonusNext": ["Następny próg: {next} różnych kart. Brakuje {cards|karty|kart|kart}."],
+      "bonusTop": ["To najwyższa premia kolekcji."],
+      "bonusRule": ["Co {every} różnych kart premia rośnie o {xp}% XP i {gold}% złota, najwyżej do +{max}%."],
+      "report": ["Kolekcja kart: +{xp}% XP i +{gold}% złota z wyprawy."]
+    }
+  }
+}

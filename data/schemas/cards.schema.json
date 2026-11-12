@@ -1,0 +1,220 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Talia Systemu",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "deckSize", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "host", "bonuses", "texts"],
+  "definitions": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "chance": { "type": "number", "minimum": 0, "maximum": 1 },
+    "texts": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "card": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["monster", "level"],
+      "properties": {
+        "monster": { "$ref": "#/definitions/id" },
+        "level": { "type": "integer", "minimum": 1 }
+      }
+    }
+  },
+  "properties": {
+    "$comment": { "type": "string" },
+    "name": { "type": "string", "minLength": 1 },
+    "deckSize": { "type": "integer", "minimum": 3, "description": "Kart w talii." },
+    "hand": { "type": "integer", "minimum": 1, "description": "Kart w rezerwie, dobieranych z talii." },
+    "roundCap": { "type": "integer", "minimum": 1, "description": "Najwięcej rund partii." },
+    "lines": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "Trzy linie: przód, środek i tył.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name"],
+        "properties": { "id": { "$ref": "#/definitions/id" }, "name": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "types": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "description": "Typy kart: statystyka ataku stwora (id), typ, który bije (target), i ikona.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "target", "icon"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "name": { "type": "string", "minLength": 1 },
+          "target": { "$ref": "#/definitions/id" },
+          "icon": { "$ref": "#/definitions/id" }
+        }
+      }
+    },
+    "typeBonus": { "type": "number", "exclusiveMinimum": 0, "description": "O tyle więcej bije karta typu, który bije typ rywala." },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["attack", "life", "shapeExponent", "shapeRange", "landStep", "levelStep", "maxLevel", "rarity"],
+      "properties": {
+        "attack": { "type": "number", "exclusiveMinimum": 0 },
+        "life": { "type": "number", "exclusiveMinimum": 0 },
+        "shapeExponent": { "type": "number", "minimum": 0, "maximum": 1 },
+        "shapeRange": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "exclusiveMinimum": 0 } },
+        "landStep": { "type": "number", "minimum": 0 },
+        "levelStep": { "type": "number", "minimum": 0 },
+        "maxLevel": { "type": "integer", "minimum": 1 },
+        "rarity": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "number", "exclusiveMinimum": 0 } }
+      }
+    },
+    "drops": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ordinary", "elite", "champion", "guardian"],
+      "properties": {
+        "ordinary": { "$ref": "#/definitions/chance" },
+        "elite": { "$ref": "#/definitions/chance" },
+        "champion": { "$ref": "#/definitions/chance" },
+        "guardian": { "$ref": "#/definitions/chance" }
+      }
+    },
+    "starter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["monsters"],
+      "properties": { "monsters": { "type": "array", "items": { "$ref": "#/definitions/id" } } }
+    },
+    "heroes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "kind", "name", "text", "power"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "kind": { "enum": ["fury", "aim", "shift", "revive", "swap"] },
+          "name": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 },
+          "plus": { "type": "string", "minLength": 1 },
+          "power": { "type": "array", "minItems": 1, "items": { "type": "number", "minimum": 0 } }
+        }
+      }
+    },
+    "stakes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["step", "levelsPerStep", "perDay"],
+      "properties": {
+        "step": { "type": "integer", "minimum": 1 },
+        "levelsPerStep": { "type": "integer", "minimum": 1 },
+        "perDay": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resident", "tiers"],
+      "properties": {
+        "resident": { "$ref": "#/definitions/id" },
+        "tiers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "name", "text", "stake", "rewardMinutes", "firstWin", "smart", "cards"],
+            "properties": {
+              "id": { "$ref": "#/definitions/id" },
+              "name": { "type": "string", "minLength": 1 },
+              "text": { "type": "string", "minLength": 1 },
+              "stake": { "type": "integer", "minimum": 1 },
+              "rewardMinutes": { "type": "integer", "minimum": 0 },
+              "firstWin": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["rarity"],
+                "properties": { "rarity": { "$ref": "#/definitions/id" } }
+              },
+              "smart": { "type": "integer", "minimum": 0, "maximum": 2 },
+              "cards": { "type": "array", "items": { "$ref": "#/definitions/card" } }
+            }
+          }
+        }
+      }
+    },
+    "bonuses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collection"],
+      "description": "Premia za kolekcję (884 A, src/engine/card-collection.js).",
+      "properties": {
+        "$comment": { "type": "string" },
+        "collection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["every", "xp", "gold", "max"],
+          "description": "Co every różnych kart udział xp więcej XP i gold więcej złota z wypraw, każdy najwyżej max; 0 wyłącza premię.",
+          "properties": {
+            "every": { "type": "integer", "minimum": 1 },
+            "xp": { "type": "number", "minimum": 0, "maximum": 1 },
+            "gold": { "type": "number", "minimum": 0, "maximum": 1 },
+            "max": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "firstWin", "collection"],
+      "properties": {
+        "intro": { "type": "string", "minLength": 1 },
+        "starterOffer": { "type": "string", "minLength": 1 },
+        "starterTaken": { "type": "string", "minLength": 1 },
+        "rules": { "$ref": "#/definitions/texts" },
+        "win": { "$ref": "#/definitions/texts" },
+        "loss": { "$ref": "#/definitions/texts" },
+        "draw": { "$ref": "#/definitions/texts" },
+        "drop": { "$ref": "#/definitions/texts" },
+        "firstWin": { "type": "string", "minLength": 1 },
+        "collection": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Słowa rubryki „Karty” w Encyklopedii i premii za kolekcję (src/engine/card-collection.js).",
+          "required": ["summary", "note", "unknown", "land", "kinds", "meta", "type", "level", "copies", "copiesTop", "places", "chance", "bonusNow", "bonusNext", "bonusTop", "bonusRule", "report"],
+          "properties": {
+            "kinds": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["ordinary", "elite", "champion"],
+              "properties": {
+                "ordinary": { "type": "string", "minLength": 1 },
+                "elite": { "type": "string", "minLength": 1 },
+                "champion": { "type": "string", "minLength": 1 }
+              }
+            },
+            "summary": { "$ref": "#/definitions/texts" },
+            "note": { "$ref": "#/definitions/texts" },
+            "unknown": { "$ref": "#/definitions/texts" },
+            "land": { "$ref": "#/definitions/texts" },
+            "meta": { "$ref": "#/definitions/texts" },
+            "type": { "$ref": "#/definitions/texts" },
+            "level": { "$ref": "#/definitions/texts" },
+            "copies": { "$ref": "#/definitions/texts" },
+            "copiesTop": { "$ref": "#/definitions/texts" },
+            "places": { "$ref": "#/definitions/texts" },
+            "chance": { "$ref": "#/definitions/texts" },
+            "bonusRule": { "$ref": "#/definitions/texts" },
+            "bonusNow": { "$ref": "#/definitions/texts" },
+            "bonusNext": { "$ref": "#/definitions/texts" },
+            "bonusTop": { "$ref": "#/definitions/texts" },
+            "report": { "$ref": "#/definitions/texts" }
+          }
+        }
+      }
+    }
+  }
+}

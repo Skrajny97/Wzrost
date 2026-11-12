@@ -25,6 +25,7 @@
 
 import { challengeAt, combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
+import { cardBonusLine, cardDrop, cardDropText } from './cards.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { canUse, itemName, itemRank, itemView, randomItem } from './items.js';
 import { TIMED_KINDS, fightPotions } from './potions.js';
@@ -647,13 +648,19 @@ function settingOut(one, week, area, id, content) {
 // XP and gold, of the chance of a chest among the finds and of a champion's
 // chest, of the materials the creatures leave, and of the players' stats in
 // the fights; on a Drużyna's trip every member's is the same, as they set
-// out at once.
+// out at once. `cards`: Talia Systemu's cards (cards.js), where the game has
+// it on (the server's CARDS): { maxed: the creatures whose card the
+// character has at its top level, xp and gold: the collection's shares more
+// of the XP and gold (card-collection.js, cardExplorationBonus; 884 A) };
+// each creature beaten may leave its card (874 A), drawn from a seed of its
+// own, so the rest of the exploration goes as it would without it. Null: no
+// cards.
 /**
  * @param {Record<string, any>} options
  * @param {Content} content
  */
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null, seat = null, hard = false, week = null },
+  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null, seat = null, hard = false, week = null, cards = null },
   content,
 ) {
   // A Drużyna's trip (src/server/trips.js) gives `roster`, its players in
@@ -757,6 +764,10 @@ export function simulateHunt(
   // same; without a seat nothing changes.
   const seatXp = 1 + (seat?.xp ?? 0);
   const seatGold = 1 + (seat?.gold ?? 0);
+  // Talia Systemu's collection (884 A): its shares more XP and gold, as the
+  // Siedziba's, in every fight and find; on a trip each member's own.
+  const cardsXp = 1 + (cards?.xp ?? 0);
+  const cardsGold = 1 + (cards?.gold ?? 0);
   const seatRarity = 1 + (seat?.rarity ?? 0);
   const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare, uniqueBonus, ...(seatRarity !== 1 && { rarityBonus: seatRarity }) };
   const hpStart = me.hp;
@@ -822,6 +833,11 @@ export function simulateHunt(
   const own = Boolean(sought) && sought.own !== false;
   const wantedRng = /** @type {Rng} */ (sought ? createRng(`${seed}:wanted`) : null);
   const sighting = { met: false, beaten: false };
+  // The cards the creatures left (cards.js): the member's own on a trip, as
+  // its loot, from its own seed.
+  const cardRng = cards && content.cards ? createRng(`${lootSeed ?? seed}:cards`) : null;
+  /** @type {string[]} */
+  const cardsFound = [];
   const told = (/** @type {string} */ text) => (sought ? gendered(text, sought.female ? 'female' : 'male') : text);
 
   for (const [step, event] of timeline.entries()) {
@@ -838,7 +854,7 @@ export function simulateHunt(
       );
       const outcome = lootRng.weighted(outcomes, ([, weight]) => weight)[0];
       if (outcome === 'gold') {
-        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length) * seatGold * hardGold));
+        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length) * seatGold * cardsGold * hardGold));
         gold += amount;
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findGold', step, { gold: amount }) });
       } else if (outcome === 'chest') {
@@ -914,6 +930,8 @@ export function simulateHunt(
       gold: 0,
       materials: {},
       chests: [],
+      // Talia Systemu's cards the creatures left, with `cards` only.
+      ...(cardRng && { cards: /** @type {string[]} */ ([]) }),
       recovered: 0,
       allies: allies.map((unit) => combatantView(unit, enemies[0].level, content)),
       enemiesView: enemies.map((/** @type {Record<string, any>} */ enemy) => combatantView(enemy, ally.level, content)),
@@ -947,10 +965,17 @@ export function simulateHunt(
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
-        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * hardGold * weekGold;
+        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * cardsGold * hardGold * weekGold;
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * lootRng.float(0.5, 1.5) * goldFactor;
         const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials;
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, lootRng, content));
+        // A card of the creature (874 A), not of the wanted's target nor
+        // twice of one creature in an exploration.
+        const card = cardRng && !meeting ? cardDrop(enemy.monsterId, cardRng, { maxed: [...cards.maxed ?? [], ...cardsFound] }, content) : null;
+        if (card) {
+          summary.cards.push(card);
+          cardsFound.push(card);
+        }
       }
       materials = addCounts(materials, summary.materials);
       // A character without a weapon, and with none found yet, finds a chest
@@ -977,7 +1002,7 @@ export function simulateHunt(
       const trophy = meeting && own && sought.trophy ? { [sought.trophy]: 1 } : null;
       if (meeting && own) sighting.beaten = true;
       for (const [item] of chests) summary.chests.push(take(item));
-      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1) * seatXp * hardXp * weekXp);
+      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1) * seatXp * cardsXp * hardXp * weekXp);
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
       xp += summary.xp;
       reached = gainXp(reached.level, reached.xp, summary.xp, (level) => xpToNext(level, content), maxLevel);
@@ -993,6 +1018,7 @@ export function simulateHunt(
       if (Object.keys(summary.materials).length > 0) {
         lines.push(say(texts, 'materials', step, { materials: materialsText(summary.materials, content) }));
       }
+      for (const card of summary.cards ?? []) lines.push(cardDropText(card, step, content));
       for (const [item, text] of chests) lines.push(text ? say(texts, text, step, { item: itemName(item, content) }) : say(rules.texts, 'loot', step, { item: itemName(item, content) }));
       if (trophy) {
         summary.materials = addCounts(summary.materials, trophy);
@@ -1042,6 +1068,10 @@ export function simulateHunt(
     materials,
     timePoints,
     items,
+    // Talia Systemu's cards the creatures left (cards.js), with `cards` only,
+    // and the collection's bonus, for the report's line.
+    ...(cardRng && { cards: cardsFound }),
+    ...((cardsXp > 1 || cardsGold > 1) && { cardsBonus: { xp: cards?.xp ?? 0, gold: cards?.gold ?? 0 } }),
     hpStart,
     hpEnd: me.hp,
     maxHp: me.unit.maxHp,
@@ -1091,7 +1121,8 @@ export function faintForfeit(hunt) {
     timePoints: 0,
     items: [],
     herbs: {},
-    fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({ ...fight, chests: [] })),
+    ...(hunt.cards && { cards: [] }),
+    fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({ ...fight, chests: [], ...(fight.cards && { cards: [] }) })),
     ...(hunt.wanted && { wanted: { ...hunt.wanted, beaten: false } }),
   };
 }
@@ -1305,8 +1336,9 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       }),
       ...(overflow && overflow.count > 0 ? [say(content.texts, 'bagOverflow', 0, overflow)] : []),
       // The week it set out in, where its effects changed the result
-      // ("Tydzień Kuny: +5% złota z walk.", weeks.js).
-      ...[weekLine(hunt, content)].filter(Boolean),
+      // ("Tydzień Kuny: +5% złota z walk.", weeks.js), and Talia Systemu's
+      // collection, where its bonus did (cards.js).
+      ...[weekLine(hunt, content), cardBonusLine(hunt, content)].filter(Boolean),
     ],
     items: hunt.items.map((/** @type {Item} */ item, /** @type {number} */ index) => ({ ...itemView(item, content), ...(overflow?.sold.includes(index) && { sold: true }) })),
     fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({

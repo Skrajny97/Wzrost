@@ -11165,6 +11165,109 @@ a.profession-square:active {
   border-radius: 6px;
 }
 
+/* The Encyklopedia's "Karty" (Talia Systemu, where CARDS is on): eight tabs
+   in rows of three, three and two; the count of different cards with the
+   collection's bonus in gold and a bar to its next threshold; every land's
+   cards on the faces of the Salon's table (cards.js, cardFace), of the one
+   card size (--tw); a card not found yet its creature's shadow with
+   "???" on a plain dark card; a card's sheet with its face beside its
+   name. */
+.encyclopedia-tabs--eight .segmented-option {
+  grid-column: span 4;
+}
+
+.encyclopedia-tabs--eight .segmented-option:nth-child(n + 7) {
+  grid-column: span 6;
+}
+
+.encyclopedia-tabs--eight .segmented-option:nth-child(7) {
+  border-left: 0;
+}
+
+.encyclopedia-cards-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.encyclopedia-cards-head .card-title,
+.encyclopedia-cards-head p {
+  margin: 0;
+}
+
+.encyclopedia-cards-bonus {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--bark-line);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.55);
+}
+
+.encyclopedia-cards-now {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.encyclopedia-cards-meter .meter-track {
+  background: rgba(217, 180, 90, 0.18);
+}
+
+.encyclopedia-cards-meter .meter-fill {
+  background: var(--gold);
+}
+
+/* A land's name, its levels under it, beside its count. */
+.encyclopedia-cards-land {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.encyclopedia-cards-levels {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.encyclopedia-cards {
+  margin: 0;
+  padding-inline: 0;
+  list-style: none;
+}
+
+.encyclopedia-card {
+  display: flex;
+}
+
+.encyclopedia-card--unknown .tcard {
+  background-image: linear-gradient(180deg, #1a2015, #10140d);
+  color: var(--text-muted);
+}
+
+.encyclopedia-card--unknown .tcard-type,
+.encyclopedia-card--unknown .tcard-stats {
+  visibility: hidden;
+}
+
+/* Above the card's outline of its creature (.tcard-art .sprite): a black
+   shadow, lit at its edge so it stands out of the dark card. */
+.encyclopedia-card--unknown .tcard-art .sprite {
+  filter: brightness(0) drop-shadow(0 0 1px rgba(236, 230, 214, 0.28));
+  opacity: 0.75;
+}
+
+.encyclopedia-card-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.encyclopedia-card-sheet-face {
+  display: flex;
+  flex: none;
+}
+
 /* A gift code (gift-code.js): the field and Odbierz in one row. */
 .gift-code-form {
   display: flex;
@@ -12156,6 +12259,1002 @@ a.profession-square:active {
   80% {
     transform: rotate(-2deg);
   }
+}
+
+
+/* Talia Systemu, the Salon Gier's third tab (src/client/cards.js; 871–877).
+   Szczęsny's table on the Salon's picture, as the Arena's plaque on its own:
+   his bust and words, the day's staked matches on a gold-edged plaque. A
+   card is a little frame of its rarity's colour (the design document's
+   scale) with a glow of it at the top: the type's icon in its colour and
+   the level in its corners, the creature's sprite of the Bestiariusz in the
+   middle, its name, then Atak by a sword and Życie by a heart, a bar of the
+   Życie left once hurt. The blow a card will take this round sits on its top
+   edge (−N, crimson when it falls), "nowa" and the skill's name on its
+   bottom edge. The table is a wooden board framed in bark over the Salon's
+   dim picture, the rival's lines above a gold-plaqued divider, the player's
+   under it; empty places are dashed and light up while a card waits to be
+   laid. On a computer the cards grow to twice their sprites. */
+.cards-tab {
+  --tcard-art: 48px;
+}
+
+.cards-head.place-card--art {
+  min-height: 132px;
+  justify-content: flex-end;
+}
+
+.cards-head.place-card--art::before,
+.cards-table.place-card--art::before {
+  opacity: 0.45;
+}
+
+.cards-table-bust {
+  flex: none;
+  display: grid;
+  place-items: end center;
+  overflow: hidden;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.7);
+}
+
+.cards-head-text {
+  min-width: 0;
+}
+
+.cards-title {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.cards-intro {
+  margin: 4px 0 0;
+  color: var(--text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  overflow-wrap: anywhere;
+}
+
+.cards-plaque {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.8);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.45);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.cards-plaque-icon {
+  flex: none;
+  color: var(--gold);
+}
+
+.cards-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.cards-section-head .section-title {
+  margin: 0;
+}
+
+/* A card (885 C, 886 D, 887 and 888, 12.11.2026): one size everywhere, on
+   the table, in the reserve, in the deck and the collection, 80 px wide on a
+   320 px phone (three in a row), growing with the screen to 112 px on the
+   widest phones and to 138 px on a computer. Every size on it follows its
+   width (--tw) and the frame's 92 × 124 pixels: the PixelLab frame of its
+   rarity cut in nine, the place of the creature's first home behind it
+   (--scene, cards.js), the creature with a soft black outline, type and
+   level on the frame's top corners, Atak and Życie on its bottom ones. */
+:root {
+  --tw: clamp(78px, 25vw, 112px);
+}
+
+:root[data-layout='desktop'] {
+  --tw: 138px;
+}
+
+.tcard {
+  --frame: url('/art/cards/frame-common.png');
+  --tcard-art: calc(var(--tw) * 50 / 92);
+  --tcard-name-size: calc(var(--tw) * 11.5 / 92);
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  justify-self: center;
+  align-self: center;
+  box-sizing: border-box;
+  width: var(--tw);
+  height: calc(var(--tw) * 124 / 92);
+  padding: calc(var(--tw) * 3 / 92) calc(var(--tw) * 2 / 92) calc(var(--tw) * 4 / 92);
+  border-style: solid;
+  border-color: transparent;
+  border-width: calc(var(--tw) * 18 / 92) calc(var(--tw) * 17 / 92);
+  border-image: var(--frame) 18 17 / 1 / 0 stretch;
+  background:
+    linear-gradient(180deg, transparent 52%, rgba(10, 12, 8, 0.9) 100%),
+    var(--scene, linear-gradient(180deg, #2a3322, #151b11)) center 30% / cover no-repeat;
+  background-clip: padding-box;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.55);
+  color: var(--text);
+  font: inherit;
+  text-align: center;
+  image-rendering: pixelated;
+  container-type: inline-size;
+}
+
+.tcard--rare {
+  --frame: url('/art/cards/frame-rare.png');
+}
+
+.tcard--unique {
+  --frame: url('/art/cards/frame-unique.png');
+}
+
+.tcard--epic {
+  --frame: url('/art/cards/frame-epic.png');
+}
+
+.tcard--legendary {
+  --frame: url('/art/cards/frame-legendary.png');
+}
+
+.tcard--mythic {
+  --frame: url('/art/cards/frame-mythic.png');
+}
+
+.tcard--divine {
+  --frame: url('/art/cards/frame-divine.png');
+}
+
+button.tcard {
+  cursor: pointer;
+}
+
+button.tcard:focus-visible,
+.tcard-slot:focus-visible {
+  outline: 2px solid var(--system);
+  outline-offset: 2px;
+}
+
+.tcard-top {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--tw) * -17 / 92);
+  right: calc(var(--tw) * -16 / 92);
+  left: calc(var(--tw) * -16 / 92);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tcard-type,
+.tcard-level {
+  display: grid;
+  place-items: center;
+  width: calc(var(--tw) * 17 / 92);
+  height: calc(var(--tw) * 17 / 92);
+  border-radius: 50%;
+  background: rgba(13, 17, 11, 0.92);
+}
+
+.tcard-type svg {
+  width: 62%;
+  height: 62%;
+}
+
+.tcard-type--strength {
+  color: #e0835c;
+  box-shadow: inset 0 0 0 1px rgba(224, 131, 92, 0.6);
+}
+
+.tcard-type--dexterity {
+  color: #a7c47f;
+  box-shadow: inset 0 0 0 1px rgba(167, 196, 127, 0.6);
+}
+
+.tcard-type--intellect {
+  color: #9db7f0;
+  box-shadow: inset 0 0 0 1px rgba(157, 183, 240, 0.6);
+}
+
+.tcard-level {
+  border: 1px solid var(--rarity, var(--bark-line));
+  font-family: var(--font-system);
+  font-size: calc(var(--tw) * 11 / 92);
+  font-weight: 600;
+}
+
+.tcard-art {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: var(--tcard-art);
+  height: var(--tcard-art);
+  transform: translate(-50%, -50%);
+}
+
+/* A soft black outline round the creature, a shadow fading outwards, so it
+   stands out of its place's picture (author 12.11.2026). */
+.tcard-art .sprite {
+  width: var(--tcard-art);
+  height: var(--tcard-art);
+  filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 1px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 3px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 6px rgba(0, 0, 0, 0.45));
+}
+
+.tcard-name {
+  position: relative;
+  z-index: 1;
+  display: -webkit-box;
+  overflow: hidden;
+  color: #f6eedb;
+  font-size: var(--tcard-name-size);
+  line-height: 1.05;
+  overflow-wrap: normal;
+  text-shadow:
+    0 1px 2px #000,
+    0 0 3px #000;
+  word-break: keep-all;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tcard-stats {
+  position: absolute;
+  z-index: 2;
+  right: calc(var(--tw) * -16 / 92);
+  bottom: calc(var(--tw) * -17 / 92);
+  left: calc(var(--tw) * -16 / 92);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--font-system);
+  font-size: calc(var(--tw) * 12 / 92);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tcard-attack,
+.tcard-life {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: calc(var(--tw) * 17 / 92);
+  height: calc(var(--tw) * 17 / 92);
+  padding: 0 calc(var(--tw) * 3 / 92);
+  border-radius: calc(var(--tw) * 9 / 92);
+  background: rgba(13, 17, 11, 0.92);
+  box-shadow: inset 0 0 0 1px currentColor;
+  text-shadow: 0 1px 1px #000;
+}
+
+.tcard-stats svg {
+  width: 0.8em;
+  height: 0.8em;
+}
+
+/* A name's longest word whole on its line, sized by the card's width (cqi,
+   the card is the container) and its count of letters (cards.js,
+   --name-chars; an Alegreya word of n letters is at most 0.42·n + 1.2 em
+   wide: Mamuna, Komarzysko, Niedźwiedź, 12.11.2026). */
+@supports (width: 1cqi) {
+  .tcard-name {
+    font-size: clamp(9px, calc(98cqi / (var(--name-chars, 1) * 0.42 + 1.2)), var(--tcard-name-size));
+  }
+}
+
+.tcard-attack {
+  color: var(--gold);
+}
+
+.tcard-life {
+  color: #ef9a85;
+}
+
+.tcard-bar {
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  left: 3px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.tcard-bar-fill {
+  display: block;
+  width: var(--share);
+  height: 100%;
+  background: linear-gradient(90deg, #b8503e, #ef9a85);
+}
+
+/* The blow it will take this round, over the frame's top edge. */
+.tcard-blow {
+  position: absolute;
+  top: calc(var(--tw) * -18 / 92 - 8px);
+  left: 50%;
+  z-index: 3;
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  border: 1px solid rgba(239, 154, 133, 0.75);
+  border-radius: 8px;
+  background: #2a1512;
+  color: var(--danger);
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tcard-blow--strong {
+  border-color: var(--gold);
+}
+
+.tcard-blow--down {
+  background: #8f2b2b;
+  color: #fff3ea;
+}
+
+.tcard--falling .tcard-art {
+  filter: saturate(0.4) brightness(0.8);
+}
+
+.tcard-chip {
+  position: absolute;
+  bottom: calc(var(--tw) * -18 / 92 - 10px);
+  left: 50%;
+  z-index: 3;
+  transform: translateX(-50%);
+  max-width: calc(100% + 8px);
+  padding: 0 6px;
+  overflow: hidden;
+  border: 1px solid var(--system-line);
+  border-radius: 8px;
+  background: #13222a;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tcard-chip--skill {
+  border-color: var(--gold);
+  background: #2a2312;
+  color: var(--gold);
+}
+
+.tcard-chip--shift {
+  top: 2px;
+  bottom: auto;
+}
+
+.tcard-check {
+  position: absolute;
+  right: 2px;
+  bottom: 30%;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--leaf);
+  color: #12170f;
+}
+
+.tcard--picked {
+  outline: 2px solid var(--system);
+  outline-offset: 2px;
+  box-shadow: 0 0 12px rgba(143, 227, 239, 0.55);
+}
+
+.tcard--target {
+  outline: 2px dashed var(--gold);
+  outline-offset: 2px;
+}
+
+.tcard--chosen {
+  box-shadow:
+    0 3px 6px rgba(0, 0, 0, 0.55),
+    0 0 10px color-mix(in srgb, var(--rarity, #9b9b9b) 60%, transparent);
+}
+
+.tcard--dim {
+  opacity: 0.5;
+}
+
+/* The deck, the collection and the reserve: cards of the one size in as
+   many columns as fit, three on the narrowest phone. */
+.tcard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, var(--tw));
+  justify-content: center;
+  gap: 14px 4px;
+}
+
+.tcard-grid--collection,
+.tcard-grid--reserve {
+  padding-top: 12px;
+}
+
+/* An empty place on the table, as big as a card. */
+.tcard-slot {
+  display: grid;
+  place-items: center;
+  justify-self: center;
+  align-self: center;
+  box-sizing: border-box;
+  width: var(--tw);
+  height: calc(var(--tw) * 124 / 92);
+  border: 2px dashed rgba(236, 230, 214, 0.35);
+  border-radius: 4px;
+  background: rgba(20, 22, 24, 0.55);
+  color: #ece6d6;
+  font: inherit;
+  font-size: 13px;
+}
+
+button.tcard-slot {
+  cursor: pointer;
+}
+
+.tcard-slot--ready {
+  border-color: var(--system);
+  color: var(--system-text);
+  box-shadow: 0 0 10px rgba(143, 227, 239, 0.35);
+}
+
+/* The table. */
+.cards-match {
+  gap: 12px;
+}
+
+.cards-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* The table and the reserve on it: PixelLab's grey slate slab with its
+   carved border, cut in nine so the border keeps its width at every size
+   (887, the author 12.11.2026: „plansza musi być jakimś stołem najlepiej
+   szarym, bo zbyt się zlewa wszystko”). */
+.cards-table,
+.card.cards-reserve {
+  padding: 4px 2px 8px;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 12px;
+  border-radius: 0;
+  border-image: url('/art/cards/table.png') 17 fill / 12px / 0 stretch;
+  background: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.55);
+  image-rendering: pixelated;
+}
+
+:root[data-layout='desktop'] .cards-table,
+:root[data-layout='desktop'] .card.cards-reserve {
+  padding: 6px 8px 10px;
+  border-width: 17px;
+  border-image-width: 17px;
+}
+
+.cards-table.place-card--art::before,
+.cards-table.place-card--art::after {
+  display: none;
+}
+
+.cards-table-name,
+.cards-table-tier,
+.cards-table-count,
+.cards-line-name,
+.cards-reserve .section-title,
+.cards-reserve .cards-hint {
+  color: #ece6d6;
+  text-shadow:
+    0 1px 2px #000,
+    0 0 4px rgba(0, 0, 0, 0.9);
+}
+
+.cards-table-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cards-table-bust {
+  width: 44px;
+  height: 44px;
+}
+
+.cards-table-bust img {
+  width: 44px;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.cards-table-who {
+  flex: 1;
+  min-width: 0;
+}
+
+.cards-table-who p {
+  margin: 0;
+}
+
+.cards-table-name {
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  overflow-wrap: anywhere;
+}
+
+.cards-table-tier {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  overflow-wrap: anywhere;
+}
+
+.cards-table-count {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 12px;
+  text-wrap: pretty;
+}
+
+.cards-table-count--me {
+  text-align: right;
+}
+
+/* Card backs (886 D): Szczęsny's hidden reserve, a back a card, and a
+   deck's pile, in the line before its counts. */
+.cards-backs {
+  display: inline-flex;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.cards-back {
+  width: 14px;
+  height: 20px;
+  background: url('/art/cards/back.png') center / contain no-repeat;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.8));
+}
+
+.cards-back + .cards-back {
+  margin-left: -6px;
+}
+
+.cards-round {
+  flex: none;
+  padding: 3px 8px;
+  border: 1px solid var(--system-line);
+  border-radius: 4px;
+  background: rgba(13, 17, 11, 0.8);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.cards-lines {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cards-line {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cards-lines--me .cards-line {
+  flex-direction: column-reverse;
+}
+
+.cards-line-name {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.cards-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.cards-divider::before,
+.cards-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.cards-divider span {
+  padding: 2px 10px;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  background: rgba(13, 17, 11, 0.85);
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.cards-reserve {
+  gap: 4px;
+}
+
+.cards-hint {
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.cards-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cards-types .button {
+  flex: 1;
+  gap: 6px;
+}
+
+/* The hero's card and its skill. */
+.cards-hero {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.cards-hero-portrait {
+  flex: none;
+  display: grid;
+  place-items: end center;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: radial-gradient(circle at 50% 30%, rgba(201, 161, 74, 0.25), rgba(13, 17, 11, 0.85));
+}
+
+.cards-hero-portrait img {
+  width: 64px;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.cards-hero-text {
+  min-width: 0;
+}
+
+.cards-hero-text p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.cards-hero-label {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.cards-hero-skill {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.cards-skill {
+  gap: 8px;
+}
+
+.cards-skill .cards-hero {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.cards-skill-text {
+  margin: 0;
+}
+
+.cards-skill-set {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0;
+}
+
+.cards-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.cards-fight {
+  flex: 1 1 60%;
+}
+
+.cards-actions .button--small {
+  flex: 0 1 auto;
+}
+
+.cards-account {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+.cards-hits {
+  margin: 6px 0;
+  padding-left: 18px;
+  font-size: 14px;
+}
+
+.cards-hit--foe {
+  color: var(--text-muted);
+}
+
+.cards-hit-note {
+  color: var(--gold);
+}
+
+/* Szczęsny's tiers. */
+.cards-tiers {
+  gap: 10px;
+}
+
+.cards-tiers > .section-title {
+  margin: 0;
+}
+
+.cards-tier {
+  gap: 6px;
+}
+
+.cards-tier--beaten {
+  border-color: rgba(201, 161, 74, 0.45);
+}
+
+.cards-tier-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.cards-tier-head p,
+.cards-tier-name {
+  margin: 0;
+}
+
+.cards-tier-name {
+  font-size: 18px;
+}
+
+.cards-tier-text {
+  overflow-wrap: anywhere;
+}
+
+.cards-tier-number {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #3a2e1c, #1a140d);
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cards-tier-title {
+  min-width: 0;
+}
+
+.cards-tier-text {
+  font-size: 14px;
+}
+
+/* The facts of a tier in a line or two: the stake and the win, then the
+   reward of the day and the first win's card, each whole on its line. */
+.cards-tier-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.cards-tier-facts strong {
+  font-family: var(--font-system);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cards-tier-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--leaf);
+}
+
+.cards-rarity {
+  color: var(--rarity);
+}
+
+.cards-tier-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 8px;
+}
+
+/* The end of a match. */
+.cards-end {
+  gap: 8px;
+  border-color: var(--system-line);
+}
+
+.cards-end--won {
+  border-color: var(--gold);
+  box-shadow: 0 0 18px rgba(201, 161, 74, 0.25);
+}
+
+.cards-end--lost {
+  border-color: rgba(239, 154, 133, 0.6);
+}
+
+.cards-end p {
+  margin: 0;
+}
+
+.cards-end-title {
+  font-family: var(--font-system);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--system-text);
+}
+
+.cards-end--won .cards-end-title {
+  color: var(--gold);
+}
+
+.cards-end--lost .cards-end-title {
+  color: var(--danger);
+}
+
+.cards-reward {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.cards-reward .tcard {
+  max-width: 132px;
+}
+
+.cards-reward-text {
+  text-align: center;
+}
+
+/* The deck builder. */
+.cards-builder-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.cards-count {
+  margin: 0;
+  font-family: var(--font-system);
+  font-weight: 600;
+}
+
+.cards-count--ready {
+  color: var(--leaf);
+}
+
+.cards-builder-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cards-builder-actions .button {
+  width: auto;
+}
+
+.cards-filter {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+.cards-filter .chat-tab {
+  gap: 4px;
+}
+
+.cards-filter .tcard-type {
+  width: 18px;
+  height: 18px;
+}
+
+/* The cards of an exploration, in its report. */
+.cards-dropped {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.cards-dropped-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cards-dropped-row .tcard {
+  flex: none;
+}
+
+/* On a computer the cards are 138 px wide (--tw), the table's lines keep
+   together, the reserve and the hero's card take the whole width under the
+   table, and the tiers stand two by two. */
+:root[data-layout='desktop'] .cards-lines {
+  width: min(100%, 540px);
+  margin-inline: auto;
+  gap: 14px;
+}
+
+:root[data-layout='desktop'] .cards-tiers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+:root[data-layout='desktop'] .cards-tiers > .section-title,
+:root[data-layout='desktop'] .cards-tiers > p {
+  grid-column: 1 / -1;
 }
 
 .market-pick {

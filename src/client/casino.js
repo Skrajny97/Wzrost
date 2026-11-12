@@ -29,6 +29,7 @@ import { playSound } from './sound.js';
 import { call, serverNow, state } from './state.js';
 import { guildTag, howItWorks, systemPanel, toast, withButton } from './ui.js';
 import { itemEntry, stackButton } from './screens/market.js';
+import { mountCards } from './cards.js';
 
 // One of the Salon's texts with its {…} filled in: numbers as the game
 // writes them, words as they are.
@@ -142,14 +143,28 @@ function ticketShow(show) {
 // pictures there.
 const showable = (show) => Boolean(show) && motionOn() && Boolean(salonArt(show.wheel.art));
 
-export function mountCasino(holder) {
+// `tab`: the tab the address names (#/osada/casino/cards), `onTab` follows
+// the tab chosen with the address, and `onLayout` tells the Osada's screen
+// that Talia Systemu's table took the whole tab or gave it back (cards.js),
+// so the Salon's resident card folds away while a match is on.
+export function mountCasino(holder, { tab: named = null, onTab = () => {}, onLayout = () => {} } = {}) {
   let casino = null;
   let failure = null;
   let gone = false;
   let timer = null;
-  // The tab open, kept while the panel redraws: at first the Loteria, or
-  // the Wheel once today's ticket is bought.
-  let tab = null;
+  // The tab open, kept while the panel redraws: the one the address names,
+  // at first the Loteria, or the Wheel once today's ticket is bought.
+  let tab = named;
+  // Talia Systemu's tab "Karty" (cards.js), where the game has it on:
+  // mounted once its tab opens and kept while the panel redraws.
+  let cards = null;
+  const cardsPanel = () => {
+    if (!cards) {
+      const element = h('div', { class: 'cards' });
+      cards = { element, ...mountCards(element, { onLayout }) };
+    } else cards.refresh();
+    return cards.element;
+  };
   // The stake chosen, kept while the panel redraws; at first the server's
   // (the lowest).
   let stake = null;
@@ -166,6 +181,7 @@ export function mountCasino(holder) {
   function take(answer) {
     casino = answer.casino;
     if (!casino.wheel.stakes.includes(stake)) stake = casino.wheel.stake;
+    if (tab === 'cards' && !casino.cards) tab = null;
     tab ??= casino.lottery.mine ? 'wheel' : 'lottery';
   }
 
@@ -207,13 +223,14 @@ export function mountCasino(holder) {
     render();
   }
 
-  // The tabs: the Loteria and the Koło Fortuny.
+  // The tabs: the Loteria, the Koło Fortuny and, where the game has it,
+  // Talia Systemu's "Karty" (876 A).
   function tabs() {
-    const names = { lottery: casino.lottery.name, wheel: casino.wheel.name };
+    const names = { lottery: casino.lottery.name, wheel: casino.wheel.name, cards: t('Karty') };
     return h(
       'div',
       { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': t('Salon Gier') },
-      ['lottery', 'wheel'].map((id) =>
+      ['lottery', 'wheel', ...(casino.cards ? ['cards'] : [])].map((id) =>
         h(
           'button',
           {
@@ -223,8 +240,12 @@ export function mountCasino(holder) {
             'data-guide': `casino-tab-${id}`,
             'aria-selected': String(tab === id),
             onClick: () => {
+              if (tab === id) return;
               tab = id;
+              onTab(id);
               render();
+              // The table takes the tab, or gives it back (cards.js).
+              onLayout();
             },
           },
           h('span', { class: 'chat-tab-name', text: names[id] }),
@@ -451,7 +472,7 @@ export function mountCasino(holder) {
       holder.replaceChildren(h('p', { class: 'muted', text: t('Wczytywanie Salonu Gier…') }));
       return;
     }
-    holder.replaceChildren(h('div', { class: 'stack' }, tabs(), tab === 'lottery' ? lotteryCard() : wheelCard()));
+    holder.replaceChildren(h('div', { class: 'stack' }, tabs(), tab === 'cards' ? cardsPanel() : tab === 'lottery' ? lotteryCard() : wheelCard()));
     // At midnight the draw comes and the pools are new: the Salon is asked
     // again then.
     const next = Math.min(casino.lottery.endsAt, casino.wheel.endsAt);
@@ -464,9 +485,12 @@ export function mountCasino(holder) {
     refresh: () => {
       if (!gone) render();
     },
+    // Whether Talia Systemu's match takes the whole tab now (cards.js).
+    compact: () => tab === 'cards' && Boolean(cards?.playing()),
     unmount() {
       gone = true;
       clearTimeout(timer);
+      cards?.unmount();
     },
   };
 }

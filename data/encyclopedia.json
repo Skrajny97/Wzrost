@@ -1,5 +1,5 @@
 {
-  "$comment": "Encyklopedia (DECISIONS.md, „Encyklopedia”): wszystko, co postać już zdobyła, w zakładkach i tierach, ze wskazówką, skąd to wziąć. Przedmioty mają zestawy: w każdym tierze jeden na klasę i jeden z dodatkami dla wszystkich. Biżuteria stoi w tierach jak inne przedmioty, według poziomu klasy, od którego się ją zakłada, a ten sam poziom Jubilerstwa odsłania jej wzór w Szlifierni. Mikstury, zioła i minerały Górnictwa stoją w tierach według poziomu swojej profesji (upTo), a materiały według najwyższego poziomu swojego stwora. Rzadki przepis zielarki (taught w professions.json) mówi, od którego stopnia w relacji z nią albo w reputacji Bractwa Zielarzy go zna postać (potionTaught). Mikstury, zioła, materiały, części i minerały mają progi odkryć (milestones). Pełny zestaw albo próg otwiera skrzynię: zestaw ze skrzynią swojego tieru, kolejne progi z kolejnymi skrzyniami (chests). Materiał zdobyty w stopniu swojego gatunku i w trophy.grades - 1 wyższych to trofeum: obrażenia przeciw jego stworowi rosną o trophy.damage.",
+  "$comment": "Encyklopedia (DECISIONS.md, „Encyklopedia”): wszystko, co postać już zdobyła, w zakładkach i tierach, ze wskazówką, skąd to wziąć. Przedmioty mają zestawy: w każdym tierze jeden na klasę i jeden z dodatkami dla wszystkich. Biżuteria stoi w tierach jak inne przedmioty, według poziomu klasy, od którego się ją zakłada, a ten sam poziom Jubilerstwa odsłania jej wzór w Szlifierni. Mikstury, zioła i minerały Górnictwa stoją w tierach według poziomu swojej profesji (upTo), a materiały według najwyższego poziomu swojego stwora. Rzadki przepis zielarki (taught w professions.json) mówi, od którego stopnia w relacji z nią albo w reputacji Bractwa Zielarzy go zna postać (potionTaught). Mikstury, zioła, materiały, części i minerały mają progi odkryć (milestones). Pełny zestaw albo próg otwiera skrzynię: zestaw ze skrzynią swojego tieru, kolejne progi z kolejnymi skrzyniami (chests). Materiał zdobyty w stopniu swojego gatunku i w trophy.grades - 1 wyższych to trofeum: obrażenia przeciw jego stworowi rosną o trophy.damage. Zakładka cards to karty Talii Systemu (src/engine/card-collection.js, słowa w cards.json), tylko tam, gdzie gra ma karty (CARDS).",
   "tabs": [
     { "id": "bestiary", "name": "Bestiariusz" },
     { "id": "items", "name": "Przedmioty" },
@@ -7,7 +7,8 @@
     { "id": "herbs", "name": "Zioła" },
     { "id": "materials", "name": "Materiały" },
     { "id": "parts", "name": "Części" },
-    { "id": "minerals", "name": "Minerały" }
+    { "id": "minerals", "name": "Minerały" },
+    { "id": "cards", "name": "Karty" }
   ],
   "tiers": [
     { "name": "Tier I", "classLevel": 1, "upTo": 25 },

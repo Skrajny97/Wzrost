@@ -76,6 +76,7 @@ const SCREENS = [
   '#/osada/trial-hall',
   '#/osada/trial-hall/trials',
   '#/osada/arena',
+  '#/osada/casino/cards',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
   '#/spolecznosc/slawa',
@@ -91,6 +92,7 @@ const SCREENS = [
   '#/gildia/war',
   '#/sklep',
   '#/encyklopedia',
+  '#/encyklopedia/cards',
   '#/dziennik',
 ];
 // The screens already in English (data/en/scope.json, stages 2 to 4 of
@@ -119,6 +121,7 @@ const TRANSLATED = new Set([
   '#/osada/trial-hall',
   '#/osada/trial-hall/trials',
   '#/osada/arena',
+  '#/osada/casino/cards',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
   '#/spolecznosc/slawa',
@@ -134,6 +137,7 @@ const TRANSLATED = new Set([
   '#/gildia/war',
   '#/sklep',
   '#/encyklopedia',
+  '#/encyklopedia/cards',
   '#/dziennik',
 ]);
 // Tabs opened on a screen after its first look, by the start of their
@@ -148,7 +152,8 @@ const GUILDS_TAB = GUILDS.fame.texts.tabs.guilds;
 const WAR_TEAMS = GUILDS.war.texts.teams;
 // Folds opened on a screen after its tabs, all at once: the Portale's
 // cards, each its picture till a tap shows its stage (7.11.2026).
-const FOLDS = { '#/portale': '.portal-toggle[aria-expanded="false"]' };
+// The Encyklopedia's "Karty" (where CARDS is on), every land's cards.
+const FOLDS = { '#/portale': '.portal-toggle[aria-expanded="false"]', '#/encyklopedia/cards': 'details.encyclopedia-fold:not([open]) > summary' };
 const TABS = { '#/oboz/craft-table': [said('Kolejka ({count}/{limit})').replace(/\s*\(.*$/, '')], '#/osada/board': [said('Poszukiwani')], '#/spolecznosc/ranking': [GUILDS_TAB], '#/gildia/war': [WAR_TEAMS] };
 // Sheets opened over a screen after its tabs, each from the one before (a
 // tap on `tap`, or a picture given to the file field `pick`), looked at
@@ -166,6 +171,8 @@ const SHEETS = {
   // The sheet Tygodnie from the week's line on the Walka screen (weeks.js),
   // its whole year left as the player left it.
   '#/walka': [{ name: 'Tygodnie', tap: '.week-line', ready: '.week-card--now', words: true }],
+  // A card of the starter deck in the Encyklopedia's "Karty": its sheet.
+  '#/encyklopedia/cards': [{ name: 'karta', tap: '[data-guide="encyclopedia-card"]', ready: '.encyclopedia-card-sheet', words: true }],
   '#/postac': [
     { name: 'Ustawienia', tap: '.topbar .settings-button', ready: `h2.sheet-title:text-is("${said('Ustawienia')}")`, words: true },
     { name: 'Zgłoś błąd', tap: `#sheet button:text-is("${said('Zgłoś błąd')}")`, ready: `h2.sheet-title:text-is("${said('Zgłoś błąd')}")`, words: true },
@@ -302,6 +309,13 @@ async function main() {
   for (const one of [artifact('sacred', 'large', 'epic', ['mana', 'wisdom'], 'opening-crit', 4), artifact('poison', 'medium', 'rare', ['lifesteal', 'perception'], null, 0), artifact('water', 'small', 'common', ['recovery'], null, 0)]) {
     sql(`INSERT INTO core_artifacts (character_id, data, created_at) SELECT id, '${JSON.stringify(one)}', 1 FROM characters WHERE name = '${name}'`);
   }
+  // Talia Systemu (the Salon Gier's "Karty", where CARDS is on: npm run
+  // dev): the starter deck taken and a match against Szczęsny's last tier,
+  // its strongest cards, on the table. Without the cards the Encyklopedia
+  // has no "Karty", so no card's sheet to open there.
+  if ((await api('POST', '/api/cards/starter')) < 400) {
+    if ((await api('POST', '/api/cards/match', { tier: 5, staked: false })) >= 400) throw new Error('Nie zaczęła się partia kart.');
+  } else delete SHEETS['#/encyklopedia/cards'];
   // Punkty Sławy of this week in six digits (fame.js), their row made by a
   // sweep in the week the server counts.
   if ((await api('POST', '/api/portals/sweep', { portal: 'gold' })) >= 400) throw new Error('Nie udało się wyczyścić Portalu.');
