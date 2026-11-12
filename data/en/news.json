@@ -572,6 +572,10 @@
     "0.2.92": {
       "title": "Version 0.2.92",
       "body": "- The item verdict (the arrows in the bag and the line on the item card) counts attributes as “Spend by class” does: the ones your class does not need do not count at all, and the rest count by their weight. Weapon damage, armour and resistances count as before."
+    },
+    "0.2.93": {
+      "title": "Version 0.2.93",
+      "body": "- A new card game in the Games Parlour: the System Deck (the “Cards” tab). Take the starter deck from Szczęsny, build a deck of 12 creature cards and play him at five tiers, for a stake or for practice. Win and you take double the stake, and beating a tier for the first time gives you a new card.\n- Creatures you defeat on an exploration may leave their card: ordinary ones rarely, elites and champions more often. Another copy of the same card raises its level.\n- Collection bonus: every 10 different cards give a permanent +1% XP and +1% gold from explorations, up to +15%.\n- The Encyclopedia has a new “Cards” tab: every card by land, found and still unknown, with the collection bonus."
     }
   }
 }

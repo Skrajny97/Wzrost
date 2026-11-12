@@ -98,10 +98,11 @@ export const paymentsOnlyForAuthors = () => paymentsForAuthors;
 // Walka, its unlock and System message, the Rdzeń's tab, the Artefakty of
 // the Wieże's champions nor the routes, which answer "not found".
 export const labyrinthOn = () => labyrinth;
-// Talia Systemu, the Salon Gier's card game (cards.js; 871–877), only where
-// CARDS is "on": locally and on the test version first. Off, nothing of it
-// shows: not the Salon's third tab "Karty", the routes, which answer "not
-// found", nor the cards the creatures of an exploration leave.
+// Talia Systemu, the Salon Gier's card game (cards.js; 871–889), only where
+// CARDS is "on": everywhere from version 0.2.93. Off, nothing of it shows:
+// not the Salon's third tab "Karty", the routes, which answer "not found",
+// the cards the creatures of an exploration leave, the collection's bonus,
+// nor the Encyklopedia's Karty.
 export const cardsOn = () => cards;
 // A camp building of the Osada's (Kwatery, `settlement` in buildings.json)
 // stands only where the Osada is on, and one of the Warownia's (`fortress`)

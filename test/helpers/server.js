@@ -20,8 +20,9 @@ export function useServer(vars = {}) {
   // Osada's board would change the other tests' (pvp-arena.test.js). So are
   // the guild wars (GUILD_WARS, guild-wars.test.js), first on the test
   // version: their Wojna tab and their evening's battles. So is Talia
-  // Systemu (CARDS, cards-api.test.js), which wrangler.jsonc names only for
-  // the test version. So are the payments for Punkty Systemu (PAYMENTS,
+  // Systemu (CARDS, cards-api.test.js), in the game from 0.2.93: the cards
+  // the creatures leave and the collection's bonus would change the other
+  // tests' reports. So are the payments for Punkty Systemu (PAYMENTS,
   // payments.test.js), for every player when a test turns them on
   // (PAYMENTS_FOR). So are the Labirynt Systemu and the Rdzeń (LABYRINTH,
   // labyrinth-api.test.js), in the game from 0.2.87: the Rdzeń's Artefakty
@@ -30,7 +31,7 @@ export function useServer(vars = {}) {
     workers: [
       {
         configPath: './wrangler.jsonc',
-        vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', WEEKS: '', ARENA: '', GUILD_WARS: '', LABYRINTH: '', PAYMENTS: '', PAYMENTS_FOR: '', ...vars },
+        vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', WEEKS: '', ARENA: '', GUILD_WARS: '', LABYRINTH: '', CARDS: '', PAYMENTS: '', PAYMENTS_FOR: '', ...vars },
       },
     ],
   });
