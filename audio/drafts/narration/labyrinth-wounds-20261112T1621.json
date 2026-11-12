@@ -1,0 +1,17 @@
+{
+  "id": "labyrinth-wounds",
+  "payload": {
+    "text": "Rany zostają z walki na walkę. Leczą je tylko źródła, kupiec i niektóre błogosławieństwa. [pauses]",
+    "model_id": "eleven_v3",
+    "voice_settings": {
+      "stability": 0.5
+    },
+    "language_code": "pl"
+  },
+  "ending": " [pauses]",
+  "files": [
+    "audio/drafts/narration/labyrinth-wounds-20261112T1621-0.mp3",
+    "audio/drafts/narration/labyrinth-wounds-20261112T1621-1.mp3"
+  ],
+  "credits": 196
+}
