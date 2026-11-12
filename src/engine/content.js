@@ -21,7 +21,8 @@ const byId = (list) => lookup(list.map((item) => [item.id, item]));
 
 // The evolutions with their stage: 1 for the first, chosen at the first
 // class level of balance.progression.classEvolutionLevels, 2 for the second
-// form that grows out of one (`from`), at the second.
+// form that grows out of one (`from`), at the second, and 3 for the third
+// form that grows out of a second one, at the third.
 /**
  * @param {Raw} raw
  * @returns {Entry[]}
@@ -39,15 +40,16 @@ function stagedEvolutions(raw) {
 }
 
 // The rules of each stage's skills and points: the first evolution's, then
-// the second forms' (data/evolutions.json, secondForms).
+// the second forms' and the third forms' (data/evolutions.json, secondForms
+// and thirdForms).
 /**
  * @param {Raw} raw
  * @returns {Entry[]}
  */
 function stageRules(raw) {
   if (!raw.evolutions) return [];
-  const { skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms } = raw.evolutions;
-  return [{ skillMaxLevel, lastPointClassLevel, pointsPerClassLevel }, ...(secondForms ? [secondForms] : [])];
+  const { skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms, thirdForms } = raw.evolutions;
+  return [{ skillMaxLevel, lastPointClassLevel, pointsPerClassLevel }, ...[secondForms, thirdForms].filter(Boolean)];
 }
 
 // The evolutions' skills with what they take from their evolution: its class
@@ -195,14 +197,16 @@ export function buildContent(raw) {
     // evolutions with their own skills (evolutions.js), known by id with the
     // rest: each evolution skill takes its class, the class level of its
     // evolution's stage and that stage's top skill level. The evolutions,
-    // the first ones and their second forms, carry their stage.
+    // the first ones, their second forms and the third forms, carry their
+    // stage.
     skills: raw.skills ?? [],
     skillsById: byId([...(raw.skills ?? []), ...evolved]),
     evolutions,
     evolutionsById: byId(evolutions),
     evolutionSkills: evolved,
     // The first evolution's skills and points (evolutionRules) and every
-    // stage's, the second forms' after them (evolutionStages).
+    // stage's, the second forms' and the third forms' after them
+    // (evolutionStages).
     evolutionRules: stages[0] ?? null,
     evolutionStages: stages,
     evolutionTexts: raw.evolutions?.texts ?? null,

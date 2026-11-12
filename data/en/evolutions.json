@@ -241,6 +241,143 @@
         "name": "Phantom Step",
         "text": "+15% speed, after every dodge the next blow is 80% stronger, and dodge rises by 5 percentage points."
       }
+    },
+    "horde-slayer": {
+      "name": "Horde Slayer",
+      "nameFemale": "Horde Slayer",
+      "description": "The Horde Slayer stands alone against a whole horde, and it is the horde that backs away. Wounds only enrage them.",
+      "trait": {
+        "name": "Boundless Frenzy",
+        "text": "The less HP, the more damage, up to +70% at 10% HP; below 30% HP heals by 8% of the damage dealt."
+      }
+    },
+    "arena-legend": {
+      "name": "Arena Legend",
+      "description": "Every arena chants the Legend's name. With every enemy defeated, the Legend fights better.",
+      "trait": {
+        "name": "Glory",
+        "text": "+10% damage for every enemy defeated, up to +60%, and 8% of max HP back."
+      }
+    },
+    "colossus": {
+      "name": "Colossus",
+      "description": "A mountain of iron that every attack breaks against. Whoever stands behind the Colossus is safe.",
+      "trait": {
+        "name": "Unconquered",
+        "text": "+30% armour and resistances, and takes part of the blows aimed at the party: 35% of the blows at anyone else in the party."
+      }
+    },
+    "bow-master": {
+      "name": "Bowmaster",
+      "nameFemale": "Bowmaster",
+      "description": "Never misses. An arrow loosed by the Bowmaster's hand always finds its mark.",
+      "trait": {
+        "name": "Arrow of Fate",
+        "text": "Critical hits deal 60% more, and the first three shots of a fight are always critical."
+      }
+    },
+    "perun-chosen": {
+      "name": "Chosen of Perun",
+      "nameFemale": "Chosen of Perun",
+      "description": "Perun chose them himself. Where their arrow falls, lightning strikes.",
+      "trait": {
+        "name": "Perun's Thunder",
+        "text": "Every arrow has a 25% chance to add 40% lightning damage, and the enemy hit then loses 30% of its speed. The lightning from the arrowhead jumps to a second enemy."
+      }
+    },
+    "wild-lord": {
+      "name": "Ruler of the Wilds",
+      "nameFemale": "Ruler of the Wilds",
+      "description": "Wolves follow them like the leader of the pack, and an eagle circles above their head.",
+      "trait": {
+        "name": "Law of the Wilds",
+        "text": "+30% damage against beasts and birds, and 30% more materials from creatures."
+      }
+    },
+    "elemental-avatar": {
+      "name": "Avatar of the Elements",
+      "description": "Fire, ice and lightning are no longer just spells. They have become the Avatar's body.",
+      "trait": {
+        "name": "Unity of the Elements",
+        "text": "Fire, frost and lightning spells are 35% stronger, and their effects last 3 turns longer."
+      }
+    },
+    "frost-monarch": {
+      "name": "Frost King",
+      "nameFemale": "Frost Queen",
+      "description": "Their kingdom is eternal winter. Enemies freeze before they can raise a weapon.",
+      "trait": {
+        "name": "Eternal Ice",
+        "text": "Chilled enemies deal 30% less damage and may freeze for a turn: each of their turns is lost with a 30% chance. Frost resistance rises by 30%, and every frost spell chills those hit until the end of the fight.",
+        "params": {
+          "freezeLabel": "frozen"
+        }
+      }
+    },
+    "archdruid": {
+      "name": "Archdruid",
+      "nameFemale": "Archdruid",
+      "description": "The oldest trees of the wilds wake at the Archdruid's call.",
+      "trait": {
+        "name": "Heart of the Wilds",
+        "text": "+40% mana and a second summon at once. 5% of mana returns every turn, and summons have 30% more HP and deal 30% more damage."
+      }
+    },
+    "saint": {
+      "name": "Saint",
+      "nameFemale": "Saint",
+      "description": "Where the Saint passes, wounds heal and the fallen rise.",
+      "trait": {
+        "name": "Miraculous Rescue",
+        "text": "Healing 50% stronger, and once per fight raises a fallen member of the party: they rise with 40% of max HP. Healing removes every harmful effect."
+      }
+    },
+    "demon-slayer": {
+      "name": "Demon Slayer",
+      "nameFemale": "Demon Slayer",
+      "description": "The Demon Slayer went down where no priest had gone, and came back with a fiend's skull at the belt.",
+      "trait": {
+        "name": "Great Exorcism",
+        "text": "Sacred damage 40% stronger, and 80% against spirits and demons. Spirits hit burn: for 3 turns they lose 20% of the blow's damage."
+      }
+    },
+    "prophet": {
+      "name": "Prophet",
+      "nameFemale": "Prophetess",
+      "description": "The Prophet sees the battle before it begins. The party enters the fight already blessed.",
+      "trait": {
+        "name": "Prophecy",
+        "text": "Blessings 60% stronger and not shared out in the party, and the party starts the fight blessed: armour and resistances +24%, damage +13%."
+      }
+    },
+    "godslayer": {
+      "name": "Godslayer",
+      "nameFemale": "Godslayer",
+      "description": "Kings were not enough. Now a broken halo hangs at the belt.",
+      "trait": {
+        "name": "Last Blow",
+        "text": "Critical hits deal 60% more, and after killing an enemy the character moves again at once. A poisoned target takes 15% more."
+      }
+    },
+    "lich": {
+      "name": "Lich",
+      "description": "Death came for the Lich and left empty-handed. Now the Lich rules the dead.",
+      "trait": {
+        "name": "Immortality",
+        "text": "Once per fight survives a fatal blow with 1 HP, and Poison deals 60% more. Poison lasts 2 turns longer, and an enemy killed by Poison rises as a skeleton and fights on the character's side until the end of the fight.",
+        "params": {
+          "raiseName": "Skeleton"
+        }
+      }
+    },
+    "shadow-lord": {
+      "name": "Shadow Lord",
+      "nameFemale": "Shadow Lady",
+      "description": "Darkness is their cloak. Before the enemy sees them, it is already down.",
+      "trait": {
+        "name": "Shadow Form",
+        "text": "+25% speed, and after a dodge the next blow is 120% stronger. Dodge rises by 5 percentage points."
+      }
     }
   },
   "skills": {
@@ -645,6 +782,217 @@
       "style": "attack",
       "description": "The Phantom's shadow peels off the ground and stands at its side. It repeats every move like a reflection in black water.",
       "effect": "Summons the character's shadow for {turns} of their own turns. The shadow repeats each of the character's blows on the same target for {power%} damage."
+    },
+    "smashing-blow": {
+      "name": "Smashing Blow",
+      "style": "attack",
+      "description": "The Horde Slayer's blow smashes armour and bone. Whoever stands behind the target gets hit with it.",
+      "effect": "A blow dealing {power%} damage that ignores {armorIgnore%} of the target's armour. The target may lose its next {stunMoves} turns ({stunChance%} chance). It also hits the enemy standing behind the target, for {pierce%} damage.",
+      "params": {
+        "stunLabel": "stunned"
+      }
+    },
+    "slaughter": {
+      "name": "Slaughter",
+      "style": "area",
+      "description": "The Horde Slayer charges into the middle of the horde. The deeper the wounds, the more terrible the blows.",
+      "effect": "A blow at every enemy for {power%} damage, and at a single enemy for {single%}. The less HP the character has, the harder it hits: up to {rage%} more at {rageAt%} HP."
+    },
+    "steel-hurricane": {
+      "name": "Steel Hurricane",
+      "style": "area",
+      "description": "The Legend spins twice before the enemy can blink. Steel cuts everything around.",
+      "effect": "Two spins in one turn: each attacks every enemy for {power%} damage, without a miss, and a single enemy for {single%}. Those hit bleed for {dotTicks} of their turns, losing {dotPower%} of the blow's damage each turn."
+    },
+    "cheers": {
+      "name": "Cheers",
+      "style": "empowerment",
+      "description": "The stands go wild. With every enemy that falls, the roar of the crowd lifts the party higher.",
+      "effect": "For {turns} of their own turns the whole party deals {chorus%} more damage, and {perKill%} more again for every enemy defeated."
+    },
+    "unbroken": {
+      "name": "Unbroken",
+      "style": "defence",
+      "description": "The Colossus takes blows that would bring down a wall. Wounds close, and the attacker falls by their own strength.",
+      "effect": "Once per fight, when HP falls below {below%}, recovers {heal%} of max HP and gains {armor%} more armour for {turns} of their own turns. Meanwhile, reflects {reflect%} of the damage taken."
+    },
+    "earthquake": {
+      "name": "Earthquake",
+      "style": "area",
+      "description": "The Colossus strikes the ground with the shield. The earth cracks, and the front rank of enemies is knocked off its feet.",
+      "effect": "A shield blow to the ground deals {power%} damage to every enemy, without a miss, and {single%} to a single enemy. Every enemy in front may lose its next turn ({stunChance%} chance).",
+      "params": {
+        "stunLabel": "stunned"
+      }
+    },
+    "master-shot": {
+      "name": "Master Shot",
+      "style": "attack",
+      "description": "The Bowmaster draws the string to the ear. The arrowhead passes through the whole enemy line.",
+      "effect": "A shot dealing {power%} damage that cannot be dodged, with the chance of a critical hit higher by {critBonus pp}. It pierces the target and hits every enemy in the rows behind it, each for {pierce%} damage."
+    },
+    "steady-hand": {
+      "name": "Steady Hand",
+      "style": "empowerment",
+      "description": "Breath slows, the world goes quiet. For a moment every arrow flies exactly where the Bowmaster wants.",
+      "effect": "For {turns} of their own turns no enemy can dodge the character's shots, and their chance of a critical hit rises by {critBonus pp}."
+    },
+    "perun-wrath": {
+      "name": "Perun's Wrath",
+      "style": "area",
+      "description": "The sky turns black, and Perun hurls lightning by the handful. Each bolt seeks the next target.",
+      "effect": "Lightning deals {power%} lightning damage to all enemies, and {single%} to a single enemy. Every enemy hit may lose its next turn ({stunChance%} chance), and every bolt may jump to another enemy for {chainPower%} damage ({chainChance%} chance).",
+      "params": {
+        "stunLabel": "shocked"
+      }
+    },
+    "thunder-sign": {
+      "name": "Thunder Sign",
+      "style": "empowerment",
+      "description": "The Chosen traces in the air the thunder sign that was once carved above cottage doors to ward off lightning.",
+      "effect": "For {turns} of their own turns every blow of the party has a {chance%} chance to strike the enemy with lightning for {power%} of the blow's damage."
+    },
+    "pack-leader": {
+      "name": "Pack Leader",
+      "style": "attack",
+      "description": "A white alpha wolf, the leader of the pack, comes at the call. When it howls, the whole party charges into battle.",
+      "effect": "Summons a white alpha wolf for {turns} of their own turns. The wolf stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it bites a random enemy for {power%} damage, and while it stands, its howl gives the whole party {howl%} more damage.",
+      "params": {
+        "summonName": "White Alpha Wolf"
+      }
+    },
+    "eagle-talon": {
+      "name": "Eagle's Talon",
+      "style": "control",
+      "description": "An eagle drops from the sky straight onto the weakest. Its talons strike at the eyes.",
+      "effect": "The eagle drops on the enemy with the fewest HP and deals {power%} damage. Blinded, it misses {blind%} of its blows for {blindTurns} of its turns."
+    },
+    "cataclysm": {
+      "name": "Cataclysm",
+      "style": "area",
+      "description": "The sky tears open with fire, ice and lightning at once. The ground beneath the enemies burns, freezes and sparks.",
+      "effect": "Fire, ice and lightning fall at once on all enemies for {power%} damage, and on a single enemy for {single%}, split equally between fire, frost and lightning. Every enemy hit may catch Burn ({dotChance%} chance: for {dotTicks} of its turns it loses {dotPower%} of the spell's damage each turn), is chilled, so it deals {chillWeaken%} less damage, and may lose its next turn ({stunChance%} chance).",
+      "params": {
+        "stunLabel": "shocked"
+      }
+    },
+    "elemental-shield": {
+      "name": "Elemental Shield",
+      "style": "defence",
+      "description": "Fire, ice and lightning circle the Avatar. Whoever reaches for the Avatar will feel one of them.",
+      "effect": "Once per fight, when HP falls below {below%}, turns {pool%} of max mana into an elemental shield that stops damage equal to {ratio%} of the mana taken. Whoever strikes it burns (Burn: for {burnTicks} turns it loses {burn%} of the character's blow damage each turn), slows down by {frost%} or may lose its next turn ({shock%} chance).",
+      "params": {
+        "shockLabel": "shocked"
+      }
+    },
+    "ice-storm": {
+      "name": "Ice Storm",
+      "style": "area",
+      "description": "Ice stars fall from the sky one after another. Whoever already shivers with cold shatters first.",
+      "effect": "Ice falls on all enemies for {power%} frost damage, and on a single enemy for {single%}, and chills those hit, so they slow down by {slow%}. A chilled target takes {chilledBonus%} more."
+    },
+    "ice-tomb": {
+      "name": "Ice Tomb",
+      "style": "control",
+      "description": "Ice locks the enemy in a clear coffin. All you can hear is the ice cracking under the blows.",
+      "effect": "Locks the enemy with the most HP in ice and deals it {power%} frost damage. For {stunMoves} turns, frozen, it does not strike and takes {bonus%} more damage.",
+      "params": {
+        "stunLabel": "frozen"
+      }
+    },
+    "oak-awakening": {
+      "name": "Awakening of the Oak",
+      "style": "defence",
+      "description": "The ground trembles and an ancient oak rises from it. Its roots seize anyone who comes close.",
+      "effect": "Summons an ancient oak for {turns} of their own turns. The oak stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it lashes a random enemy with its branches for {power%} damage and entangles it in roots: the enemy hit slows down by {root%}.",
+      "params": {
+        "summonName": "Ancient Oak"
+      }
+    },
+    "bison-call": {
+      "name": "Summon Bison",
+      "style": "attack",
+      "description": "A bison bursts out of the wilds, heavy as a boulder. First it rams, then it stands like a wall before the Archdruid.",
+      "effect": "Summons a bison for {turns} of their own turns. The bison charges the enemy in front for {charge%} damage and stuns it for its next turn, then stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it gores a random enemy for {power%} damage.",
+      "params": {
+        "summonName": "Bison",
+        "stunLabel": "stunned"
+      }
+    },
+    "miraculous-healing": {
+      "name": "Miraculous Healing",
+      "style": "healing",
+      "description": "The Saint raises their hands, and the party rises from its knees stronger than before the fight.",
+      "effect": "Once per fight, when HP falls below {below%}, heals the whole party by {heal%.1} of max HP, plus 1 HP for every {wisdomPerHp} points of Wisdom, and removes harmful effects from it. Then, for {hotTurns} of their own turns, heals everyone by {hot%} of max HP each turn."
+    },
+    "holy-light": {
+      "name": "Holy Light",
+      "style": "area",
+      "description": "A glow brighter than the sun shines from the Saint. It burns the enemies and gives the party strength.",
+      "effect": "The glow wounds all enemies for {power%} sacred damage, and a single enemy for {single%}. The whole party recovers {partyHeal%} of max HP each."
+    },
+    "last-judgment": {
+      "name": "Last Judgment",
+      "style": "attack",
+      "description": "Every sinner awaits the day of judgment. The Demon Slayer brings it sooner.",
+      "effect": "A sacred verdict dealing {power%} damage to an enemy with less than {below%} HP left. Spirits and demons take {familyBonus%} more."
+    },
+    "holy-seal": {
+      "name": "Holy Seal",
+      "style": "control",
+      "description": "A sign burns on the enemy's forehead that no blood can wash away. From now on, none of its wounds will heal.",
+      "effect": "Burns a sacred seal into an enemy for {power%} damage. Until the end of the fight the marked enemy takes {damage%} more damage and cannot heal."
+    },
+    "hymn": {
+      "name": "Hymn",
+      "style": "healing",
+      "description": "The Prophet's song carries far beyond the battlefield. The party hears victory in it.",
+      "effect": "For {turns} of the character's turns, the whole party recovers {heal%} of max HP every turn and deals {chorus%} more damage."
+    },
+    "vision": {
+      "name": "Vision",
+      "style": "dodge",
+      "description": "The Prophet sees every blow before it falls and warns the party before the enemy raises a weapon.",
+      "effect": "For {turns} of their own turns the whole party dodges blows {evasion pp} more often."
+    },
+    "final-blow": {
+      "name": "Deathblow",
+      "style": "attack",
+      "description": "The Godslayer leaves no wounded. Whoever is already staggering will not get up after this blow.",
+      "effect": "A blow dealing {power%} damage, always critical ({critPower%} in all). Kills an enemy with less than {killBelow%} HP at once (except champions) and seeks such an enemy first; otherwise strikes the enemy standing furthest back. A target with less than {executeBelow%} HP takes {executeBonus%} more."
+    },
+    "blood-mark": {
+      "name": "Blood Mark",
+      "style": "attack",
+      "description": "The Godslayer marks the prey with a single cut. Blood flows, and every following blade strikes truer.",
+      "effect": "A cut dealing {power%} damage marks the enemy: for {dotTicks} of its turns it bleeds, losing {dotPower%} of the blow's damage each turn, and until the end of the fight critical hits land on it {critMark pp} more often."
+    },
+    "army-of-dead": {
+      "name": "Army of the Dead",
+      "style": "poison",
+      "description": "A skeleton knight in rusted armour rises from the ground. Its sword drips with green venom.",
+      "effect": "A skeleton knight rises for {turns} of the character's turns. It stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it strikes a random enemy for {power%} damage and poisons it: for {dotTicks} turns the target loses {dotPower%} of the blow's damage each turn.",
+      "params": {
+        "summonName": "Skeleton Knight"
+      }
+    },
+    "death-touch": {
+      "name": "Touch of Death",
+      "style": "poison",
+      "description": "The Lich touches the enemy with a bony hand. Life flows out of the enemy straight into the Lich.",
+      "effect": "A touch dealing {power%} poison damage poisons the enemy: for {dotTicks} of its turns it loses {dotPower%} of the blow's damage each turn. The character heals by {drain%} of the damage dealt."
+    },
+    "shadow-storm": {
+      "name": "Shadow Storm",
+      "style": "area",
+      "description": "Shadows tear off the ground and cut together with the Shadow Lord. There are more blows than the enemy can see.",
+      "effect": "Shadow Storm: {blows} blows of {power%} damage, each at a random enemy."
+    },
+    "eclipse": {
+      "name": "Eclipse",
+      "style": "dodge",
+      "description": "The Shadow Lord puts out the sun over the battlefield. In the dark, the enemies strike blindly.",
+      "effect": "For {turns} of their own turns every enemy blow has a {eclipse%} chance to miss."
     }
   },
   "texts": {

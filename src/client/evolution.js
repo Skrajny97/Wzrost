@@ -3,9 +3,10 @@
 // choose from at class level 50 (in the Ewolucja tab), the choice for good,
 // the ceremony with the evolution's music and after it the free reset of the
 // stat points, once; at class level 100 the card of the one form the
-// evolution grows into, taken the same way, with the ceremony. On the test
+// evolution grows into, taken the same way, with the ceremony, and at 200
+// the card of the third form, where the deployment has it. On the test
 // version "Testuj ewolucję" (in the settings) opens every evolution of the
-// class, or the second form of the one the character has, at any level and
+// class, or the next form of the one the character has, at any level and
 // can undo the test.
 
 import { placeArt, portraitSprite } from './art.js';
@@ -33,7 +34,7 @@ export function evolutionCard(evolution, { onChoose = null, busy = false } = {})
   const words = texts();
   const { classId, appearance, skin } = state.character ?? {};
   const portrait = classId && portraitSprite(classId, appearance, { skin, evolution: evolution.id });
-  // A second form is taken, not chosen: its button says so.
+  // A second or third form is taken, not chosen: its button says so.
   const label = evolution.stage > 1 ? words.take : words.choose;
   return h(
     'article',
@@ -63,8 +64,9 @@ export function evolutionCard(evolution, { onChoose = null, busy = false } = {})
   );
 }
 
-// The choice for good, asked once more; the ceremony follows. A second form
-// is asked about in its own words. `test`: the test version's try.
+// The choice for good, asked once more; the ceremony follows. A second or
+// third form is asked about in its own words. `test`: the test version's
+// try.
 export async function chooseEvolution(button, evolution, { test = false } = {}) {
   const words = texts();
   const next = evolution.stage > 1;
@@ -147,7 +149,7 @@ function transformation(fromId, toId) {
 
 // The ceremony: the change in light, then the System's words over the
 // evolution's music, which gives way to the tab's own once the sheet closes.
-// `from`: the form the character had (its first evolution's id, or null).
+// `from`: the form the character had (its last form's id, or null).
 export async function ceremony(evolution, { from = null } = {}) {
   const words = texts();
   setMusicPlace(['evolution']);
@@ -221,17 +223,17 @@ export function offerPointsReset() {
 
 // The character at an evolution's class level at once (the author: "nie
 // chce mi się przeklikiwać tego"): the first's, a test evolution undone
-// first, or the second's (`second`), the first evolution kept.
-function testLevelButton({ second = false } = {}) {
+// first, or the next form's (`next`: 100 or 200), the form it has kept.
+function testLevelButton({ next = false } = {}) {
   const words = texts();
-  const level = String(second ? (state.character.evolution?.nextLevel ?? '') : (unlockInfo('evolution')?.classLevel ?? ''));
+  const level = String(next ? (state.character.evolution?.nextLevel ?? '') : (unlockInfo('evolution')?.classLevel ?? ''));
   return h('button', {
     type: 'button',
     class: 'button button--system',
     text: filled(words.testLevel, { level }),
     onClick: (event) =>
       withButton(event.currentTarget, async () => {
-        await call('POST', `/api/evolution/test-level${second ? `?level=${level}` : ''}`);
+        await call('POST', `/api/evolution/test-level${next ? `?level=${level}` : ''}`);
         closeSheet();
         toast(filled(words.testLevelDone, { level }));
       }),
@@ -239,8 +241,10 @@ function testLevelButton({ second = false } = {}) {
 }
 
 // "Testuj ewolucję" on the test version: every evolution of the class to
-// try, or the second form of the one the character has, the way back from
-// the one tried, and the class level of an evolution at once.
+// try, or the next form of the one the character has, the way back from
+// the one tried, and the class level of an evolution at once (the next
+// form's while it has one: 100 for a first evolution, 200 for a second
+// form where the third forms are on).
 export async function openEvolutionTests() {
   const words = texts();
   const character = state.character;
@@ -269,7 +273,7 @@ export async function openEvolutionTests() {
       { class: 'sheet-actions' },
       undo,
       (!current || character.evolutionUndo) && testLevelButton(),
-      current?.stage === 1 && testLevelButton({ second: true }),
+      current && character.evolution?.nextLevel && testLevelButton({ next: true }),
     ),
     evolutions.map((evolution) => evolutionCard(evolution, { onChoose: (button, chosen) => chooseEvolution(button, chosen, { test: true }) })),
   );

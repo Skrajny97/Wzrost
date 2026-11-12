@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Ewolucje klas",
-  "description": "Ewolucje klas. Pierwsza, na pierwszym poziomie z balance.progression.classEvolutionLevels, prowadzi jedną ścieżkę (path, umiejętność klasy); druga, na drugim, wyrasta z pierwszej (from), bez wyboru. Każda daje nazwę, przyrost statystyk od następnego poziomu klasy, cechę i dwie umiejętności. Umiejętności ewolucji biorą klasę i poziom z ewolucji, rosną do skillMaxLevel (druga: secondForms.skillMaxLevel), a ich liczby to [poziom 1, poziom najwyższy].",
+  "description": "Ewolucje klas. Pierwsza, na pierwszym poziomie z balance.progression.classEvolutionLevels, prowadzi jedną ścieżkę (path, umiejętność klasy); druga, na drugim, wyrasta z pierwszej (from), bez wyboru, a trzecia, na trzecim, tak samo z drugiej. Każda daje nazwę, przyrost statystyk od następnego poziomu klasy, cechę i dwie umiejętności. Umiejętności ewolucji biorą klasę i poziom z ewolucji, rosną do skillMaxLevel (druga: secondForms.skillMaxLevel, trzecia: thirdForms.skillMaxLevel), a ich liczby to [poziom 1, poziom najwyższy].",
   "type": "object",
   "additionalProperties": false,
   "required": ["skillMaxLevel", "lastPointClassLevel", "pointsPerClassLevel", "evolutions", "skills", "texts"],
@@ -22,6 +22,17 @@
       },
       "description": "Najwyższy poziom umiejętności i punkty drugiej ewolucji, jak skillMaxLevel, lastPointClassLevel i pointsPerClassLevel pierwszej."
     },
+    "thirdForms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["skillMaxLevel", "lastPointClassLevel", "pointsPerClassLevel"],
+      "properties": {
+        "skillMaxLevel": { "type": "integer", "minimum": 2 },
+        "lastPointClassLevel": { "type": "integer", "minimum": 1, "description": "Ostatni poziom klasy, który daje Punkt Umiejętności po trzeciej ewolucji." },
+        "pointsPerClassLevel": { "type": "integer", "minimum": 1 }
+      },
+      "description": "Najwyższy poziom umiejętności i punkty trzeciej ewolucji (200. poziom klasy), jak secondForms drugiej."
+    },
     "evolutions": {
       "type": "array",
       "minItems": 1,
@@ -37,7 +48,7 @@
           "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
           "classId": { "type": "string" },
           "path": { "type": "string", "description": "Pierwsza ewolucja: umiejętność klasy, której ścieżkę prowadzi." },
-          "from": { "type": "string", "description": "Druga ewolucja: ewolucja, z której wyrasta." },
+          "from": { "type": "string", "description": "Druga i trzecia ewolucja: ewolucja, z której wyrasta." },
           "name": { "type": "string", "minLength": 1 },
           "nameFemale": { "type": "string", "minLength": 1, "description": "Nazwa dla postaci kobiecej (brak: jak name)." },
           "description": { "type": "string", "minLength": 1, "description": "Opis pod nazwą na karcie ewolucji." },
@@ -60,7 +71,7 @@
               "params": { "type": "object" }
             }
           },
-          "skills": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 2, "description": "Pierwsza rozwija umiejętność (from): ścieżki u pierwszej ewolucji, jedną z umiejętności pierwszej u drugiej. Druga jest nowa." }
+          "skills": { "type": "array", "items": { "type": "string" }, "minItems": 2, "maxItems": 2, "description": "Pierwsza rozwija umiejętność (from): ścieżki u pierwszej ewolucji, jedną z umiejętności ewolucji, z której wyrasta, u drugiej i trzeciej. Druga jest nowa." }
         }
       }
     },
@@ -73,7 +84,7 @@
         "properties": {
           "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
           "evolution": { "type": "string" },
-          "from": { "type": "string", "description": "Umiejętność, którą ta rozwija: klasy (pierwsza ewolucja) albo pierwszej ewolucji (druga)." },
+          "from": { "type": "string", "description": "Umiejętność, którą ta rozwija: klasy (pierwsza ewolucja), pierwszej ewolucji (druga) albo drugiej (trzecia)." },
           "name": { "type": "string", "minLength": 1 },
           "style": { "type": "string", "minLength": 1 },
           "description": { "type": "string", "minLength": 1 },

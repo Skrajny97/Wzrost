@@ -50,7 +50,8 @@ function hiddenChosenEarly(fight, allyIds, enemies) {
   const fallen = new Set();
   for (const event of fight.events) {
     if (event.kind === 'kill') fallen.add(event.target);
-    const own = BLOWS.has(event.kind) && allyIds.has(event.actor) && !event.sweep && !event.counter;
+    // A blow at many (a sweep, a pierce going on) strikes a hidden one as any.
+    const own = BLOWS.has(event.kind) && allyIds.has(event.actor) && !event.sweep && !event.pierced && !event.counter;
     if (!own || !hidden.has(event.target)) continue;
     if (enemies.some((enemy) => !hidden.has(enemy.id) && !fallen.has(enemy.id))) return event;
   }

@@ -55,6 +55,21 @@ export function duelHpFactor(levelA, levelB, content) {
   return curveAt(arenaRules(content).duel.hpCurve, (levelA + levelB) / 2);
 }
 
+// The third forms ("Trzecia ewolucja klas") hit harder against their HP
+// again, so a duel where either side has one gives both sides that many
+// times more HP (duel.thirdFormHp), and it lasts about as many rounds as
+// one of second forms (tools/pvp-arena-sim.mjs). Characters without one
+// fight as before them.
+/**
+ * @param {Record<string, any>[]} characters
+ * @param {Content} content
+ * @returns {number}
+ */
+export function thirdFormHp(characters, content) {
+  const share = arenaRules(content).duel.thirdFormHp ?? 1;
+  return characters.some((/** @type {Record<string, any>} */ character) => (content.evolutionsById[character.evolution]?.stage ?? 0) >= 3) ? share : 1;
+}
+
 // A curve's value at a level: its points [level, value], straight between
 // two points, as the first point below it and as the last past it.
 /**
@@ -134,7 +149,7 @@ export function arenaDuel({ attacker, defender, seed }, content, { record = true
   const { duel, texts } = arenaRules(content);
   /** @type {[number, number]} */
   const levels = [attacker.character.level, defender.character.level];
-  const factor = duelHpFactor(...levels, content);
+  const factor = duelHpFactor(...levels, content) * thirdFormHp([attacker.character, defender.character], content);
   const shape = { factor, armor: duelArmorShare(...levels, content) };
   const ally = duelist(attacker, 'a0', 'ally', shape, content);
   const enemy = duelist(defender, 'e0', 'enemy', shape, content);

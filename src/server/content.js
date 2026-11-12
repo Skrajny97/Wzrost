@@ -8,7 +8,7 @@
 // content (skill-demo.js, encyclopedia.js) is kept for each language apart.
 
 import { areaDangers, areaUnlockLevel, bestiaryChest, buildContent, evolutionArt, landBestiaryChest, meetingChances, ordinaryMaterial, overlayTexts, regionDangers, weeksContent } from '../engine/index.js';
-import { arenaOn, buildingOn, craftingOn, evolutionsOn, guildWarsOn, labyrinthOn, placeOn, settlementOn } from './features.js';
+import { arenaOn, buildingOn, craftingOn, evolutionsOn, guildWarsOn, labyrinthOn, placeOn, settlementOn, thirdEvolutionOn } from './features.js';
 import { language, languageOffered, pageDictionary } from './i18n.js';
 import affixes from '../../data/affixes.json' with { type: 'json' };
 import balance from '../../data/balance.json' with { type: 'json' };
@@ -214,16 +214,26 @@ function prepare(built, lang) {
   // The class evolutions, where the deployment has them on (features.js).
   // Where they are off the game plays as before them: the class grows past
   // the first evolution level once its skills are ready, no evolution is
-  // offered and there is no Ewolucja tab (the unlock "evolution").
+  // offered and there is no Ewolucja tab (the unlock "evolution"). Their
+  // third forms (stage 3, class level 200) only where THIRD_EVOLUTION is on
+  // too; without them the second forms are the last ("second"), as before
+  // them: the class waits at 200 only for its Skill Points.
+  const second = built.evolutions.filter((evolution) => evolution.stage < 3);
   const evolutionParts = {
     on: { evolutions: built.evolutions, evolutionsById: built.evolutionsById, evolutionSkills: built.evolutionSkills, unlocks: built.unlocks },
+    second: {
+      evolutions: second,
+      evolutionsById: Object.assign(Object.create(null), Object.fromEntries(second.map((evolution) => [evolution.id, evolution]))),
+      evolutionSkills: built.evolutionSkills.filter((skill) => second.some((evolution) => evolution.id === skill.evolution)),
+      unlocks: built.unlocks,
+    },
     off: { evolutions: [], evolutionsById: {}, evolutionSkills: [], unlocks: built.unlocks.filter((unlock) => unlock.id !== 'evolution') },
   };
   // The Arena's unlock only where the Arena is on, and the Labirynt's only
   // where the Labirynt is (features.js), so their levels show nowhere else.
   const unlocksOf = (parts, without) => parts.unlocks.filter((unlock) => !without.includes(unlock.id));
   const unlocksWithout = {};
-  const state = () => (evolutionsOn() ? 'on' : 'off');
+  const state = () => (!evolutionsOn() ? 'off' : thirdEvolutionOn() ? 'on' : 'second');
   const unlocksNow = () => {
     const without = [...(arenaOn() ? [] : ['arena']), ...(labyrinthOn() ? [] : ['labyrinth'])];
     const key = `${state()}:${without.join(',')}`;
@@ -304,10 +314,11 @@ export function publicContent() {
     // picture behind the Ewolucja tab's heading.
     evolutionTexts: game.evolutionTexts,
     evolutionPlace: game.evolutionPlace,
-    // The art a second form and its skills take until they have their own
-    // (the first evolution's portrait, walk and ride; the icon, sound and
-    // look of the skill grown from, or of the first evolution's in its
-    // place): the page's art.js finds them by these ids.
+    // The art a second or third form and its skills take until they have
+    // their own (the portrait, walk and ride of the form before it; the
+    // icon, sound and look of the skill grown from, or of the earlier form's
+    // in its place, a third form's through its second form's to the first
+    // evolution's): the page's art.js finds them by these ids.
     evolutionArt: evolutionArt(game),
     // The picture behind the Gildia page's heading, once one is chosen.
     guildPlace: game.guilds.place ?? null,

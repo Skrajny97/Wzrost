@@ -414,6 +414,7 @@
   "Ewolucja z testu: {name}.": "Evolution being tested: {name}.",
   "Test ewolucji działa tylko na wersji testowej.": "The evolution test works only on the test version.",
   "Najpierw potrzebna jest pierwsza ewolucja, bez drugiej.": "A first evolution is needed first, without the second.",
+  "Najpierw potrzebna jest druga ewolucja, bez trzeciej.": "A second evolution is needed first, without the third.",
   "Ta postać przeszła już ewolucję.": "This character has already evolved.",
   "Cofnąć można tylko ewolucję z testu.": "Only an evolution from a test can be undone.",
   "Ta postać przeszła już tę ewolucję.": "This character has already been through this evolution.",

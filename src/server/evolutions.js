@@ -1,12 +1,14 @@
 // Class evolutions (evolutions.js in the engine; DECISIONS.md, "Ewolucje:
-// budowa" and "Druga ewolucja klas"): the choice at class level 50 of one of
-// the two paths' evolutions, for good, and at class level 100 the one form
-// that evolution grows into. On the test version "Testuj ewolucję" takes
-// any evolution of the class, or the second form of the one the character
-// has, at any class level and keeps the skills it had, so the test can be
-// undone. Like skills, an evolution is taken only at home, and only if the
-// character is as read (its version). After the first evolution the stat
-// points can be reset once, for free, decided at once (decidePointsReset).
+// budowa", "Druga ewolucja klas" and "Trzecia ewolucja klas"): the choice
+// at class level 50 of one of the two paths' evolutions, for good, at class
+// level 100 the one form that evolution grows into, and at 200, where the
+// deployment has the third forms on (features.js), the one third form of
+// that. On the test version "Testuj ewolucję" takes any evolution of the
+// class, or the next form of the one the character has, at any class level
+// and keeps the skills it had, so the test can be undone. Like skills, an
+// evolution is taken only at home, and only if the character is as read
+// (its version). After the first evolution the stat points can be reset
+// once, for free, decided at once (decidePointsReset).
 // Where the deployment has the evolutions off (features.js) there are none.
 
 import { evolutionChoices, evolutionOf, evolutionView, evolveBlock, evolvedSkills, nextFormOf, spentPoints } from '../engine/index.js';
@@ -27,11 +29,12 @@ function requireTests(context, session) {
 }
 
 // POST /api/evolution { evolutionId, test }: take an evolution, or the
-// second form of the one the character has; `test` only on the test
-// version. With stat points spent, the first evolution's free reset waits
-// for the player's decision; a second form keeps the points as they are (a
-// reset still waiting stays). A test keeps the skills from before the
-// first test, so "Cofnij ewolucję" goes back to them.
+// next form of the one the character has (the second, then the third);
+// `test` only on the test version. With stat points spent, the first
+// evolution's free reset waits for the player's decision; a later form
+// keeps the points as they are (a reset still waiting stays). A test keeps
+// the skills from before the first test, so "Cofnij ewolucję" goes back to
+// them.
 export async function takeEvolution(context) {
   requireEvolutions();
   const { session, player } = await requireBuildPlayer(context);
@@ -59,7 +62,7 @@ export async function takeEvolution(context) {
 }
 
 // GET /api/evolution/test: every evolution of the class to try, or the
-// second form of the one the character has (test version).
+// next form of the one the character has (test version).
 export async function testEvolutions(context) {
   requireEvolutions();
   const { session, player } = await requireIdlePlayer(context);
@@ -93,8 +96,8 @@ export async function decidePointsReset(context) {
 }
 
 // Where "Cofnij ewolucję" goes back to: the evolution whose skills were
-// kept before the test (a first evolution taken for good, before a test of
-// its second form), or the class.
+// kept before the test (a form taken for good, before a test of the next
+// one), or the class.
 function evolutionBefore(kept) {
   const skills = JSON.parse(kept ?? '{}');
   return Object.keys(skills).map((id) => content().skillsById[id]?.evolution).find(Boolean) ?? null;
@@ -107,7 +110,9 @@ function evolutionBefore(kept) {
 // as in the game. A character that took one for good stays as it is. With
 // ?level=100 (the second evolution's level), a character with a first
 // evolution, taken for good or tried, gets that class level and keeps it,
-// so its second form is then taken as in the game.
+// so its second form is then taken as in the game; with ?level=200 (the
+// third's) the same for a character with a second form, where the third
+// forms are on.
 export async function testClassLevel(context) {
   requireEvolutions();
   const { session, player } = await requireIdlePlayer(context);
@@ -116,9 +121,11 @@ export async function testClassLevel(context) {
   const levels = content().balance.progression.classEvolutionLevels;
   const db = context.env.DB;
   const asked = Number(new URL(context.request.url).searchParams.get('level'));
-  if (asked === levels[1]) {
+  const stage = levels.indexOf(asked);
+  if (stage === 1 || stage === 2) {
     const current = evolutionOf(engineCharacter(row), content());
-    if (!current || current.from) throw new ApiError(409, 'not_first', 'Najpierw potrzebna jest pierwsza ewolucja, bez drugiej.');
+    if (stage === 1 && (!current || current.from)) throw new ApiError(409, 'not_first', 'Najpierw potrzebna jest pierwsza ewolucja, bez drugiej.');
+    if (stage === 2 && (current?.stage !== 2 || !nextFormOf(current, content()))) throw new ApiError(409, 'not_second', 'Najpierw potrzebna jest druga ewolucja, bez trzeciej.');
     const raised = await db
       .prepare('UPDATE characters SET class_level = MAX(class_level, ?), class_xp = 0, version = version + 1 WHERE id = ? AND version = ?')
       .bind(asked, row.id, row.version)

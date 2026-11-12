@@ -45,6 +45,7 @@ import {
   drawRivals,
   duelArmorShare,
   duelHpFactor,
+  thirdFormHp,
   fightsLeft,
   ratingChanges,
   ratingStakes,
@@ -276,11 +277,12 @@ async function arenaView(db, player, record, rivals, now, defences = null) {
     },
     season: { endsAt: season.endsAt },
     // The numbers the rules name: the HP factor and the share of armour (in
-    // percent) for two characters of the character's own level.
+    // percent) for two characters of the character's own level (and of its
+    // evolution's stage: a third form's duel has more HP, thirdFormHp).
     numbers: {
       perDay: arena.fightsPerDay,
       rerolls: arena.rivals.rerollsPerDay,
-      hpFactor: Math.round(duelHpFactor(row.level, row.level, content()) * 10) / 10,
+      hpFactor: Math.round(duelHpFactor(row.level, row.level, content()) * thirdFormHp([{ evolution: row.evolution }], content()) * 10) / 10,
       armor: Math.round(duelArmorShare(row.level, row.level, content()) * 100),
       moves: arena.duel.maxMoves,
       start: arena.rating.start,
