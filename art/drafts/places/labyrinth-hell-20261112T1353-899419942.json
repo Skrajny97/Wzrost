@@ -1,0 +1,14 @@
+{
+  "id": "labyrinth-hell",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the deepest hellish level of an ancient labyrinth of the System: cracked walls of black stone glowing from within with red-hot seams, corridors branching into darkness, burning red runes along the walls, embers and ash in the air, a faint glow of lava under the floor, menacing and deadly, wide panorama for a dim background behind text, low contrast, muted dark palette of black, deep red and charcoal with orange and crimson accents, no text, no border, no people",
+  "style": "src/client/art/places/tower-solo.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}

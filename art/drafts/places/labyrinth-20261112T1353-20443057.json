@@ -1,0 +1,14 @@
+{
+  "id": "labyrinth",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the entrance to an ancient labyrinth of the System in a dark forest: high walls of dark grey stone blocks running into the distance, corridors branching left and right, thin ice-blue glowing runes and luminous blue lines along the walls, crystal lamps of cold blue light, mist on the stone floor, roots and moss creeping over the walls, mysterious and dangerous, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens, greys and blues with ice-blue accents, no text, no border, no people",
+  "style": "src/client/art/places/tower-solo.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
