@@ -371,6 +371,15 @@ export function requireOffRack(player, ...items) {
 // stack.
 export const bagPlaces = (player) => bagItems(player).length + bagStacks(herbsOf(player.row), content()) + bagStacks(potionsOf(player.row), content());
 
+// The Skrzynia Konta's padlock (843, the author: „miec kłódkę i być
+// zablokowana do 20 poziomu postaci”): below the character level of
+// balance.account.chestLevel a character puts nothing in and takes nothing
+// out (chest.js), and the page shows the level it opens at. Null once open.
+export function chestLock(row) {
+  const level = content().balance.account.chestLevel;
+  return row.level < level ? { level } : null;
+}
+
 // What adds a gathered store to the character: gold has its own column, the
 // other resources sit in the JSON of `resources`.
 export function gainSql(resource, amount) {
@@ -1629,6 +1638,9 @@ export function characterView(player, now) {
       }),
     },
     camp: campView(player, levels, now),
+    // The Skrzynia Konta's padlock while the character is below the level
+    // it opens at (chestLock), for the camp's board; absent once it opens.
+    ...(chestLock(row) && { chestLock: chestLock(row) }),
     // The Stół rozbiórki: materials, parts and the queue (crafting.js).
     crafting: craftingView(row, levels, now),
     // The Zwoje ochronne made in the Warsztat for the Kowadło.
@@ -2058,11 +2070,23 @@ export async function deleteCharacter(context) {
 
 // The rows that outlive the characters `which` (SQL after `character_id`,
 // with `binds`), kept with the id made negative, as the purchases are: the
-// database gives the highest id of a removed character again.
-export const detachedRows = (db, which, binds) =>
-  ['chest_items', 'lottery_draws', 'gift_codes_used'].map((table) =>
+// database gives the highest id of a removed character again. The goods
+// they put in the Skrzynia Konta join their account's no one's pieces of
+// each good (character 0, chest.js), as one character's goods are a row to
+// a good.
+export const detachedRows = (db, which, binds) => [
+  ...['chest_items', 'lottery_draws', 'gift_codes_used'].map((table) =>
     db.prepare(`UPDATE ${table} SET character_id = -character_id WHERE character_id ${which}`).bind(...binds),
-  );
+  ),
+  db
+    .prepare(
+      `INSERT INTO chest_goods (user_id, character_id, kind, good, count, traded)
+       SELECT user_id, 0, kind, good, SUM(count), SUM(traded) FROM chest_goods WHERE character_id ${which} GROUP BY user_id, kind, good
+       ON CONFLICT (user_id, character_id, kind, good) DO UPDATE SET count = count + excluded.count, traded = traded + excluded.traded`,
+    )
+    .bind(...binds),
+  db.prepare(`DELETE FROM chest_goods WHERE character_id ${which}`).bind(...binds),
+];
 
 // The statements that remove a character with all it has, at `now`.
 export function characterRemoval(db, id, now) {

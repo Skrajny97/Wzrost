@@ -169,6 +169,8 @@ describe('the code review: an item id given again', () => {
   test('a second "Sprzedaj" of a sold item does not sell the item that came meanwhile (real requests)', async () => {
     const sword = item('sword', 100, 'legendary', 'precious', { upgrade: 10 });
     const find = item('axe', 50, 'epic', 'find');
+    // At the level the Skrzynia Konta opens at (its padlock, 843).
+    await database.prepare('UPDATE characters SET level = ? WHERE id = ?').bind(content.balance.account.chestLevel, id).run();
     const outcomes = [];
     for (const delays of [[0, 1, 0], [0, 2, 1], [0, 3, 1], [0, 1, 0], [0, 2, 1], [0, 3, 1]]) {
       await database.prepare('DELETE FROM items').run();

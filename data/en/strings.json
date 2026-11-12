@@ -2839,5 +2839,12 @@
   "Skrzynia Konta mieści {items} i dowolnie wiele towarów. Jest wspólna dla wszystkich postaci na tym koncie.": "The Account Chest holds {items} and any amount of goods. It is shared by all the characters on this account.",
   "Encyklopedia nie zaliczy przedmiotu ani towaru od innej postaci: liczy się tylko to, co postać sama zdobędzie albo wytworzy.": "The Encyclopedia will not count an item or a good from another character: only what a character finds or makes on its own counts.",
   "Przedmioty · {count} / {slots}": "Items · {count} / {slots}",
-  "Towary": "Goods"
+  "Towary": "Goods",
+  "Takich towarów Skrzynia Konta nie przyjmuje.": "The Account Chest takes no such goods.",
+  "Nie ma takiego towaru.": "There are no such goods.",
+  "Nie masz tego towaru.": "You do not have these goods.",
+  "W Skrzyni Konta jest tylko {count} szt.": "There are only {count} in the Account Chest.",
+  "Tego towaru nie ma już w Skrzyni Konta.": "These goods are no longer in the Account Chest.",
+  "W plecaku zmieści się jeszcze {count} szt.": "The bag still has room for {count}.",
+  "Plecak jest pełny. Zrób w nim miejsce, żeby wyjąć ten towar.": "The bag is full. Make room in it to take these goods out."
 }
