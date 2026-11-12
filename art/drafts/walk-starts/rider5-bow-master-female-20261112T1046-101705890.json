@@ -1,0 +1,19 @@
+{
+  "id": "rider5-bow-master-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the young woman archer of the reference picture riding: the same long black hair tied in a high ponytail and the same silver diadem with a green gem, the same black leather armour with silver plates and silver filigree, the silver pauldron shaped like a wing, a dark green cloak hanging behind from the shoulders, black trousers and black boots, the black recurve bow strapped upright on the back, the whole bow behind the body, nothing in the hands but the reins; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one boot in the whole picture: the thigh lying forward and level from the hip to the knee, the lower leg hanging straight down from the knee, one whole booted foot at the bottom with the toes pointing right; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the head to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/bow-master-female.png",
+      "usage": "the character's look: this same young woman, her face, hair, diadem, armour, bow and colours, drawn the same way; not her standing pose and not the bow in her hand"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
