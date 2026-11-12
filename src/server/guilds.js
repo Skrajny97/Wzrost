@@ -16,7 +16,7 @@
 // offers in the Wymiana (guild-exchange.js) at once. The best guild of last
 // week says so on its page (guild-fame.js).
 
-import { blockedName, isUnlocked, joinShare, questPeriod, trialDay } from '../engine/index.js';
+import { alphabetOf, alphabetsOf, blockedName, isUnlocked, joinShare, nameLook, questPeriod, trialDay } from '../engine/index.js';
 import { assertion, atomically, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
@@ -156,25 +156,30 @@ export async function getGuild(context) {
 
 // A guild's name from a request: letters, digits, spaces, hyphens and
 // apostrophes, starting and ending with a letter or a digit, of the length
-// the rules allow, and past the filter of the characters' names.
+// the rules allow, and past the filter of the characters' names. As in a
+// character's name (characters.js validateName; the security review of
+// 12.11.2026), wide or mathematical letters become plain ones, and the
+// letters come from one alphabet: Latin, Greek or Cyrillic.
 function guildName(value) {
   const { min, max } = rules().name;
-  const text = typeof value === 'string' ? value.normalize('NFC').replace(/\p{Cf}/gu, '').trim().replace(/\s+/g, ' ').replace(/[‘’ʼ]/g, "'") : '';
+  const text = typeof value === 'string' ? value.normalize('NFKC').replace(/\p{Cf}/gu, '').trim().replace(/\s+/g, ' ').replace(/[‘’ʼ]/g, "'") : '';
   const length = [...text].length;
   if (length < min || length > max) throw new ApiError(400, 'invalid_name', `Nazwa gildii musi mieć od ${min} do ${max} znaków.`);
-  if (!/^[\p{L}\p{N}](?:[\p{L}\p{N} '-]*[\p{L}\p{N}])?$/u.test(text)) {
-    throw new ApiError(400, 'invalid_name', 'Nazwa gildii może mieć litery, cyfry, spacje, łączniki i apostrofy, a zaczynać i kończyć się literą albo cyfrą.');
+  const allowed = [...text].every((sign) => /^[0-9 '-]$/.test(sign) || alphabetOf(sign) !== null);
+  if (!allowed || !/^[\p{L}0-9](?:.*[\p{L}0-9])?$/u.test(text) || alphabetsOf(text).size > 1) {
+    throw new ApiError(400, 'invalid_name', 'Nazwa gildii może mieć litery jednego alfabetu (łacińskiego, greckiego albo cyrylicy), cyfry, spacje, łączniki i apostrofy, a zaczynać i kończyć się literą albo cyfrą.');
   }
   if (blockedName(text, content())) throw new ApiError(400, 'invalid_name', 'Ta nazwa łamie zasady. Wybierz inną.');
   return text;
 }
 
-// A guild's tag: letters and digits, kept in capitals.
+// A guild's tag: letters of one alphabet and digits, kept in capitals.
 function guildTag(value) {
   const { min, max } = rules().tag;
-  const text = typeof value === 'string' ? value.normalize('NFC').trim().toLocaleUpperCase('pl-PL') : '';
-  const length = [...text].length;
-  if (length < min || length > max || !/^[\p{Lu}\p{N}]+$/u.test(text)) {
+  const text = typeof value === 'string' ? value.normalize('NFKC').trim().toLocaleUpperCase('pl-PL') : '';
+  const signs = [...text];
+  const allowed = signs.every((sign) => /^[0-9]$/.test(sign) || (alphabetOf(sign) !== null && /^\p{Lu}$/u.test(sign)));
+  if (signs.length < min || signs.length > max || !allowed || alphabetsOf(text).size > 1) {
     throw new ApiError(400, 'invalid_tag', `Skrót gildii to od ${min} do ${max} liter albo cyfr.`);
   }
   if (blockedName(text, content())) throw new ApiError(400, 'invalid_tag', 'Ten skrót łamie zasady. Wybierz inny.');
@@ -194,7 +199,17 @@ export async function foundGuild(context) {
   const name = guildName(body.name);
   const tag = guildTag(body.tag);
   if (row.gold < found.gold) throw new ApiError(409, 'no_gold', `Założenie gildii kosztuje ${found.gold} złota.`);
-  const taken = await db.prepare('SELECT name_key = ? AS name, tag = ? AS tag FROM guilds WHERE name_key = ? OR tag = ? LIMIT 1').bind(name.toLowerCase(), tag, name.toLowerCase(), tag).first();
+  // A name or a tag looking like another guild's counts as it (names.js
+  // nameLook): the same letters but for some of another alphabet.
+  const nameKeys = [...new Set([name.toLowerCase(), nameLook(name)])];
+  const tags = [...new Set([tag, nameLook(tag).toLocaleUpperCase('pl-PL')])];
+  const taken = await db
+    .prepare(
+      `SELECT name_key IN (${nameKeys.map(() => '?').join(', ')}) AS name, tag IN (${tags.map(() => '?').join(', ')}) AS tag FROM guilds
+       WHERE name_key IN (${nameKeys.map(() => '?').join(', ')}) OR tag IN (${tags.map(() => '?').join(', ')}) LIMIT 1`,
+    )
+    .bind(...nameKeys, ...tags, ...nameKeys, ...tags)
+    .first();
   if (taken?.name) throw new ApiError(409, 'name_taken', 'Gildia o tej nazwie już istnieje.');
   if (taken?.tag) throw new ApiError(409, 'tag_taken', 'Gildia z tym skrótem już istnieje.');
   try {

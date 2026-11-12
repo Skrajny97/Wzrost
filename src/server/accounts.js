@@ -23,7 +23,7 @@ import {
   sessionIdFromRequest,
   userView,
 } from './sessions.js';
-import { clearLoginFailures, getLoginBlock, recordLoginFailure } from './throttle.js';
+import { clearLoginFailures, clientOf, takeLoginAttempt, takeRegistration } from './throttle.js';
 
 const LOGIN_PATTERN = /^[A-Za-z0-9_.-]{3,24}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -88,6 +88,16 @@ export async function register({ request, env, now }) {
   // where English is off.
   const chosenLanguage = englishOn() && body.language !== undefined ? validLanguage(body.language) : language();
   const db = env.DB;
+  // A limit of accounts from one network a day (throttle.js), counted
+  // before anything else is looked up.
+  const client = clientOf(request);
+  const blockedFor = client === null ? null : await takeRegistration(db, client, now);
+  if (blockedFor !== null) {
+    const hours = Math.ceil(blockedFor / 3600000);
+    throw new ApiError(429, 'too_many_accounts', `Z tej sieci założono dziś już wiele kont. Spróbuj ponownie za ${hours} h.`, {
+      'Retry-After': String(Math.ceil(blockedFor / 1000)),
+    });
+  }
 
   if (await db.prepare('SELECT 1 FROM users WHERE login = ?').bind(login).first()) throw loginTaken();
   if (email && (await db.prepare('SELECT 1 FROM users WHERE email = ?').bind(email).first())) {
@@ -144,7 +154,7 @@ export async function login({ request, env, now }) {
 
   const db = env.DB;
   const throttleKey = identifier.toLowerCase();
-  const blockedFor = await getLoginBlock(db, throttleKey, now);
+  const blockedFor = await takeLoginAttempt(db, throttleKey, now);
   if (blockedFor !== null) {
     throw new ApiError(
       429,
@@ -157,15 +167,16 @@ export async function login({ request, env, now }) {
   const columns = 'id, login, email, password_hash, google_sub, created_at, email_confirmed_at, email_required, skip_tutorials, language, age_confirmed_at, age_required';
   const query = identifier.includes('@') ? `SELECT ${columns} FROM users WHERE email = ?` : `SELECT ${columns} FROM users WHERE login = ?`;
   const user = await db.prepare(query).bind(identifier).first();
-  if (!user || !(await verifyPassword(password, user.password_hash))) {
-    await recordLoginFailure(db, throttleKey, now);
-    throw invalidCredentials;
-  }
+  // The attempt is counted already (takeLoginAttempt); a wrong password
+  // leaves it so.
+  if (!user || !(await verifyPassword(password, user.password_hash))) throw invalidCredentials;
 
   await clearLoginFailures(db, throttleKey);
-  // An account with test mode, once linked to Google, opens only with Google
-  // while Google sign-in works, so its test tools stay with its owner.
-  if (user.google_sub !== null && testModeFor(env, user.login) && googleConfigured(env)) {
+  // An account with test mode, and the author's account, once linked to
+  // Google, open only with Google while Google sign-in works, so its test
+  // tools and the Author Panel stay with its owner, also with test mode off.
+  const google = user.google_sub !== null;
+  if (google && googleConfigured(env) && (testModeFor(env, user.login) || isAuthor(env, { login: user.login, google }))) {
     throw new ApiError(403, 'google_only', 'To konto otwiera się tylko przez Google. Stuknij „Zaloguj się przez Google”.');
   }
   if (needsRehash(user.password_hash)) {
@@ -220,6 +231,10 @@ export async function confirmAge(context) {
   const session = await requireSession(context);
   const body = await readJson(context.request);
   if (typeof body.adult !== 'boolean') throw new ApiError(400, 'invalid_answer', 'Wybierz jedną z odpowiedzi.');
+  // "Nie" removes the account only while the question waits: an account
+  // that answered goes only with "Usuń konto" and its typed login (review
+  // of 12.11.2026).
+  if (!body.adult && !session.user.ageRequired) throw new ApiError(409, 'age_answered', 'Wiek jest już potwierdzony. Konto usuniesz w Ustawieniach.');
   if (!body.adult) {
     await removeAccount(context.env.DB, session, context.now);
     return json({ deleted: true }, 200, { 'Set-Cookie': clearedSessionCookie() });

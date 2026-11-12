@@ -25,7 +25,7 @@
 // to "test" by mistake credits nobody.
 
 import { toHex } from './encoding.js';
-import { ApiError, json } from './http.js';
+import { ApiError, json, readBody } from './http.js';
 
 async function hmacHex(secret, text) {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
@@ -54,6 +54,9 @@ const STATUSES = ['paid', 'failed', 'refunded', 'charged_back'];
 // refund: a player's tap never hangs on a gateway that does not answer (a
 // refund not answered waits for the author, payments.js).
 const GATEWAY_WAIT_MS = 15000;
+// A payment notice is a few kilobytes: one transaction. A bigger body is
+// refused before the rest of it is read (review of 12.11.2026).
+const NOTICE_BYTES = 64 * 1024;
 
 const testGateway = {
   ready: () => true,
@@ -62,7 +65,7 @@ const testGateway = {
   },
   async verify(request, env) {
     const secret = env.PAYMENTS_TEST_SECRET;
-    const body = await request.text();
+    const body = new TextDecoder().decode(await readBody(request, NOTICE_BYTES));
     const signature = request.headers.get('X-Test-Signature') ?? '';
     if (!secret || !sameText(signature, await hmacHex(secret, body))) throw badSignature();
     let notice;
@@ -190,7 +193,9 @@ export const autopayGateway = {
     const { serviceId, key } = autopaySettings(env);
     let xml;
     try {
-      const form = await request.formData();
+      // Read to at most NOTICE_BYTES, as every body (http.js readBody).
+      const body = await readBody(request, NOTICE_BYTES);
+      const form = await new Response(body, { headers: { 'Content-Type': request.headers.get('Content-Type') ?? '' } }).formData();
       const bytes = Uint8Array.from(atob(String(form.get('transactions') ?? '')), (char) => char.charCodeAt(0));
       xml = new TextDecoder('utf-8').decode(bytes);
     } catch {

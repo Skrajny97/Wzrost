@@ -55,17 +55,30 @@ export async function reportBug(context) {
   const text = typeof body.text === 'string' ? body.text.trim() : '';
   if (text.length < BUG_REPORTS.shortest) throw new ApiError(400, 'too_short', `Opisz błąd w co najmniej ${BUG_REPORTS.shortest} znakach.`);
   if (text.length > BUG_REPORTS.longest) throw new ApiError(400, 'too_long', `Zgłoszenie może mieć najwyżej ${BUG_REPORTS.longest} znaków.`);
+  // A picture only from an account with its e-mail confirmed, so that new
+  // accounts made for it cannot fill the database with pictures (review of
+  // 12.11.2026); the words go from any account, also about the mail itself.
+  if (image && session.user.emailRequired && !session.user.emailConfirmed) {
+    throw new ApiError(403, 'email_unconfirmed', 'Zrzut ekranu dołączysz po potwierdzeniu adresu e-mail. Samo zgłoszenie możesz wysłać już teraz.');
+  }
   const db = context.env.DB;
+  const tooMany = () => new ApiError(429, 'too_many', `Na dziś to już ${BUG_REPORTS.daily} zgłoszeń. Kolejne można wysłać jutro.`);
   const sent = await db.prepare('SELECT COUNT(*) AS count FROM bug_reports WHERE user_id = ? AND created_at > ?').bind(session.userId, context.now - DAY).first();
-  if (sent.count >= BUG_REPORTS.daily) throw new ApiError(429, 'too_many', `Na dziś to już ${BUG_REPORTS.daily} zgłoszeń. Kolejne można wysłać jutro.`);
+  if (sent.count >= BUG_REPORTS.daily) throw tooMany();
   const character = await db
     .prepare("SELECT id, name, class_id, level, class_level FROM characters WHERE user_id = ? AND role = 'player'")
     .bind(session.userId)
     .first();
   const screen = typeof body.screen === 'string' ? body.screen.slice(0, 120) : null;
   const device = (context.request.headers.get('user-agent') ?? '').slice(0, 300) || null;
+  // The day's count is checked again in the statement that writes, so
+  // reports sent at once cannot all pass the count read above.
   const report = db
-    .prepare('INSERT INTO bug_reports (user_id, character_id, character, text, screen, version, device, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+    .prepare(
+      `INSERT INTO bug_reports (user_id, character_id, character, text, screen, version, device, created_at)
+       SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8
+       WHERE (SELECT COUNT(*) FROM bug_reports WHERE user_id = ?1 AND created_at > ?9) < ?10`,
+    )
     .bind(
       session.userId,
       character?.id ?? null,
@@ -76,19 +89,21 @@ export async function reportBug(context) {
       String(context.env.APP_VERSION ?? 'dev'),
       device,
       context.now,
+      context.now - DAY,
+      BUG_REPORTS.daily,
     );
-  if (!image) {
-    await report.run();
-    return json({ ok: true }, 201);
-  }
   // The report and its picture together or not at all (a batch is one
-  // transaction): the picture goes with the account's newest report, the
-  // one just written.
-  await db.batch([
-    report,
-    db
-      .prepare('INSERT INTO bug_report_images (report_id, type, data, created_at) SELECT MAX(id), ?, ?, ? FROM bug_reports WHERE user_id = ?')
-      .bind(image.type, image.data, context.now, session.userId),
-  ]);
+  // transaction): the picture goes with the report just written, and with
+  // none when the day's count kept it out.
+  const statements = image
+    ? [
+        report,
+        db
+          .prepare('INSERT INTO bug_report_images (report_id, type, data, created_at) SELECT last_insert_rowid(), ?, ?, ? WHERE changes() = 1')
+          .bind(image.type, image.data, context.now),
+      ]
+    : [report];
+  const [written] = await db.batch(statements);
+  if (written.meta.changes !== 1) throw tooMany();
   return json({ ok: true }, 201);
 }

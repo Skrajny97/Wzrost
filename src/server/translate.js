@@ -60,6 +60,8 @@ export async function translateText(env, text, from, to) {
     }
     return null;
   }
-  if (env.FAKE_TRANSLATOR === 'on') return `[${from}→${to}] ${text}`;
+  // The stand-in for the tests gives nothing for a text without a letter or
+  // a digit, as the real one may.
+  if (env.FAKE_TRANSLATOR === 'on') return /[\p{L}\p{N}]/u.test(text) ? `[${from}→${to}] ${text}` : null;
   return null;
 }

@@ -620,6 +620,11 @@
       "id": "0.2.72",
       "title": "Wersja 0.2.72",
       "body": "- Drużyna: raport odebrany w chwili, gdy ktoś z Drużyny przewija koniec wyprawy, wypłaca się raz. Plotka z Karczmy członka Drużyny czeka na jego własną wyprawę.\n- Skrzynie Prób i Skrzynie Wyprawy zdobyte w gildii czekają do końca następnego tygodnia także po wyjściu z niej albo po jej rozpadzie. Skrzynie Prób z dawnej gildii widać w zakładce Próby.\n- Bestia Gildii rośnie z każdym, kto dołączy do gildii w tygodniu, jak Próby i Wyprawa.\n- Mikstura wypita w tej samej chwili co inna albo co odbiór raportu działa poprawnie, a kilka dotknięć „Buduj” naraz płaci raz.\n- Najemnik zwerbowany w ostatniej chwili oferty dostaje swoją zapłatę."
+    },
+    {
+      "id": "0.2.73",
+      "title": "Wersja 0.2.73",
+      "body": "- Bezpieczniejsze logowanie: limit prób hasła działa także przy próbach wysłanych naraz.\n- Imiona postaci i nazwy gildii: litery jednego alfabetu (łacińskiego, greckiego albo cyrylicy), bez niewidocznych znaków. Imienia, które tylko wygląda jak cudze, nie da się już wziąć.\n- Maile z linkiem: na jeden adres najwyżej jeden na minutę i pięć dziennie, z dowolnego konta.\n- Zrzut ekranu w „Zgłoś błąd” dołączysz po potwierdzeniu adresu e-mail; samo zgłoszenie wyślesz od razu.\n- Czat lepiej rozpoznaje linki, a nieudane tłumaczenia wracają do dziennej puli z rozsądnym limitem."
     }
   ]
 }

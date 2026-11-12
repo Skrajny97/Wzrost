@@ -186,6 +186,7 @@ describe('e-mail confirmation', () => {
     assert.ok(Number(soon.headers.get('Retry-After')) > 0);
 
     await (await db()).prepare('UPDATE email_links SET created_at = created_at - 120000').run();
+    await (await db()).prepare('UPDATE mail_sends SET sent_at = sent_at - 120000').run();
     const moved = await again({ email: 'Nowy@Example.com' });
     assert.equal(moved.status, 200);
     assert.deepEqual(moved.data, { sent: true, email: 'nowy@example.com' });
@@ -198,6 +199,7 @@ describe('e-mail confirmation', () => {
 
     for (let i = 0; i < 4; i++) await linkFor('Karol', { createdAt: Date.now() - (i + 2) * 120000 });
     await (await db()).prepare('UPDATE email_links SET created_at = created_at - 120000').run();
+    await (await db()).prepare('UPDATE mail_sends SET sent_at = sent_at - 120000').run();
     const limit = await again();
     assert.equal(limit.status, 429);
     assert.equal(limit.data.error.code, 'email_limit');

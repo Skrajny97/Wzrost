@@ -180,9 +180,17 @@ describe('payments through Autopay, on the server', () => {
   test('the player comes back from Autopay to the shop page of the points, and both addresses answer a check', async () => {
     const back = await server.fetch('/api/payments/return?ServiceID=123456&OrderID=a1b2c3&Hash=x');
     assert.equal(back.status, 200);
-    assert.match(await back.text(), /location\.replace\('\/#\/sklep\/punkty'\)/);
+    // The refresh moves it on, without a script, and the page's guards are
+    // the game pages' own (review of 12.11.2026).
+    assert.match(await back.text(), /http-equiv="refresh" content="0;url=\/#\/sklep\/punkty"/);
+    assert.match(back.headers.get('Content-Security-Policy'), /default-src 'none'.*frame-ancestors 'none'/);
+    assert.equal(back.headers.get('X-Content-Type-Options'), 'nosniff');
     const notify = await server.fetch('/api/payments/notify/autopay');
     assert.equal(notify.status, 200);
     assert.equal(await notify.text(), 'OK');
+    assert.equal(notify.headers.get('X-Content-Type-Options'), 'nosniff');
+    const missing = await server.fetch('/no-such-page');
+    assert.equal(missing.status, 404);
+    assert.equal(missing.headers.get('X-Content-Type-Options'), 'nosniff');
   });
 });

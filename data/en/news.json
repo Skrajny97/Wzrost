@@ -492,6 +492,10 @@
     "0.2.72": {
       "title": "Version 0.2.72",
       "body": "- Party: a report claimed at the moment someone in the Party skips the end of the exploration pays out once. A Party member's rumor from the Tavern waits for their own exploration.\n- Trial chests and Expedition chests earned in a guild wait until the end of the next week, also after leaving the guild or after it ends. Trial chests from a former guild show in the Trials tab.\n- The Guild Beast grows with everyone who joins the guild during the week, as the Trials and the Expedition do.\n- A potion drunk at the same moment as another one or as claiming a report works properly, and several taps on “Build” at once pay once.\n- A mercenary hired at the last moment of the offer gets their pay."
+    },
+    "0.2.73": {
+      "title": "Version 0.2.73",
+      "body": "- Safer sign-in: the limit of password attempts holds also for attempts sent at once.\n- Character and guild names: letters of one alphabet (Latin, Greek or Cyrillic), with no invisible signs. A name that only looks like someone else's can no longer be taken.\n- Mails with a link: at most one a minute and five a day to one address, from any account.\n- You can attach a screenshot to “Report a bug” once your e-mail is confirmed; the report itself you can send right away.\n- The chat recognises links better, and failed translations go back to the daily pool within a sensible limit."
     }
   }
 }

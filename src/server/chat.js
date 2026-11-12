@@ -48,7 +48,15 @@ export const FOREVER = 8.64e15;
 // direction of writing), and the control ones such as new lines.
 const INVISIBLE = /[​-‏‪-‮⁠-⁤﻿]/g;
 const CONTROL = /[\u0000-\u001f\u007f-\u009f]/g;
-const LINK = /https?:\/\/|www\.|[\p{L}\p{N}-]+\.(?:pl|com|net|org|eu|io|gg|me|tv|ly|xyz|ru|info|app|dev|link|site|online|shop|club|fun)(?![\p{L}\p{N}])/iu;
+// An address: http(s), www., a name with a known domain ending, or any
+// name with a two-letter or longer ending and a path ("gra.co/konto").
+// Endings that are words of their own in Polish ("co", "to", "no") count
+// only with a path, so "Hej.co tam?" is no link. The text is read with
+// wide letters as plain ones and every kind of full stop as a dot (review
+// of 12.11.2026: "gra．pl" with a full-width dot passed).
+const LINK =
+  /https?:\/\/|www\.|[\p{L}\p{N}-]+\.(?:pl|com|net|org|eu|io|gg|me|tv|ly|xyz|ru|info|app|dev|link|site|online|shop|club|fun|top|uk|de|us|ua|cz|sk|biz|cc|live|store|tk|ml|gq|cf|click|icu|cn|su|vip|life|world|space|website|tech|page|ws|fr|nl|au|gift|games|rocks|buzz|work|wtf|ai|gl|ink|cam|bond|cyou|sbs|cfd|mobi|asia|network|digital|email|center|news|blog|cloud|host|art|xn--[a-z0-9-]+)(?![\p{L}\p{N}])|[\p{L}\p{N}-]+\.\p{L}{2,}\//iu;
+const asRead = (text) => text.normalize('NFKC').replace(/[\u3002\uff61\uff0e]/g, '.');
 const WORD = /[\p{L}\p{N}_]+/gu;
 // An admin's link: a label in square brackets with its address in round
 // ones, or a bare address; http(s) only, the address without spaces.
@@ -144,7 +152,7 @@ export function cleanText(raw, { admin = false } = {}) {
   const words = [...content().chat.words, ...(content().chat.wordsEn ?? [])];
   const masked = (part) => part.replace(WORD, (word) => (words.some((bad) => word.toLowerCase().includes(bad)) ? '*'.repeat([...word].length) : word));
   if (!admin) {
-    if (LINK.test(text)) throw new ApiError(400, 'link', 'Linki w czacie są niedozwolone.');
+    if (LINK.test(asRead(text))) throw new ApiError(400, 'link', 'Linki w czacie są niedozwolone.');
     return masked(text);
   }
   // The admin's: the words between the links and the labels masked, the
@@ -556,18 +564,28 @@ export async function translateChat(context) {
   const most = content().chat.rules.translations;
   const day = questPeriod('daily', now, content()).key;
   // One more of the day's, only while some are left; SQLite reads the old
-  // day in both assignments.
+  // day in all assignments.
   const counted = await db
     .prepare(
-      `UPDATE users SET translations_used = CASE WHEN translations_day = ? THEN translations_used + 1 ELSE 1 END, translations_day = ?
+      `UPDATE users SET translations_used = CASE WHEN translations_day = ? THEN translations_used + 1 ELSE 1 END,
+         translations_returned = CASE WHEN translations_day = ? THEN translations_returned ELSE 0 END, translations_day = ?
        WHERE id = ? AND (translations_day IS NOT ? OR translations_used < ?)`,
     )
-    .bind(day, day, session.userId, day, most)
+    .bind(day, day, day, session.userId, day, most)
     .run();
   if (counted.meta.changes !== 1) throw new ApiError(429, 'translations_used', `Dzisiejsze tłumaczenia (${most}) są już wykorzystane. Nowe od północy.`);
   const translated = await translateText(env, text, source, target);
   if (!translated) {
-    await db.prepare('UPDATE users SET translations_used = translations_used - 1 WHERE id = ? AND translations_day = ? AND translations_used > 0').bind(session.userId, day).run();
+    // A failed one goes back to the day's, at most as many times a day as
+    // the day has (review of 12.11.2026: a text the translator answers with
+    // nothing could be sent to it without end).
+    await db
+      .prepare(
+        `UPDATE users SET translations_used = translations_used - 1, translations_returned = translations_returned + 1
+         WHERE id = ? AND translations_day = ? AND translations_used > 0 AND translations_returned < ?`,
+      )
+      .bind(session.userId, day, most)
+      .run();
     throw new ApiError(502, 'translate_failed', 'Tłumaczenie się nie udało. Spróbuj za chwilę.');
   }
   await db.prepare('INSERT OR IGNORE INTO chat_translations (message_id, language, text, created_at) VALUES (?, ?, ?, ?)').bind(id, target, translated, now).run();

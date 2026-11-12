@@ -368,19 +368,31 @@ export async function paymentNotice(context) {
 // gateway's news comes (what the gateway adds to this address says nothing
 // of the payment, so nothing of it is read). A page that answers 200 and
 // moves on by itself, so a check of the address in the gateway's panel finds
-// it working whether or not it follows a redirect.
+// it working whether or not it follows a redirect. No script and the page's
+// own guards, as the game's pages have (src/client/_headers; review of
+// 12.11.2026): the refresh and the link move it on.
 const RETURN_PAGE = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="refresh" content="0;url=/#/sklep/punkty"><title>Insight</title></head>
-<body><p><a href="/#/sklep/punkty">Insight</a></p><script>location.replace('/#/sklep/punkty');</script></body></html>`;
+<body><p><a href="/#/sklep/punkty">Insight</a></p></body></html>`;
 
 export function paymentReturn() {
-  return new Response(RETURN_PAGE, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
+  return new Response(RETURN_PAGE, {
+    status: 200,
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-store',
+      'Content-Security-Policy': "default-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'same-origin',
+    },
+  });
 }
 
 // GET /api/payments/notify/:provider: the address of the gateway's news
 // answers that it is there (a panel may check it when it is set); the news
 // itself comes by POST.
-export const paymentNoticeAddress = () => new Response('OK', { status: 200, headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' } });
+export const paymentNoticeAddress = () =>
+  new Response('OK', { status: 200, headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' } });
 
 // POST /api/payments/withdraw { orderId }: one of the account's purchases
 // given back within the days, its points still unspent: they go at once,

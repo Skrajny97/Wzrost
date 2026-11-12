@@ -34,15 +34,40 @@ export function errorResponse(error) {
 const invalidBody = () => new ApiError(400, 'invalid_json', 'Nieprawidłowe dane żądania.');
 const bodyTooLarge = () => new ApiError(413, 'payload_too_large', 'Za dużo danych w żądaniu.');
 
+// The body's bytes, read to at most `limit`; past them `tooLarge` is
+// thrown, also for a body that comes in pieces without its length, before
+// the rest is read (review of 12.11.2026: a JSON body sent in pieces was
+// read whole into memory before its size was checked).
+export async function readBody(request, limit, tooLarge = bodyTooLarge()) {
+  if (Number(request.headers.get('Content-Length') ?? 0) > limit) throw tooLarge;
+  const chunks = [];
+  let size = 0;
+  const reader = request.body?.getReader();
+  while (reader) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > limit) {
+      await reader.cancel().catch(() => {});
+      throw tooLarge;
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(size);
+  let at = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, at);
+    at += chunk.byteLength;
+  }
+  return bytes;
+}
+
 export async function readJson(request) {
   const type = request.headers.get('Content-Type') ?? '';
   if (!type.toLowerCase().startsWith('application/json')) {
     throw new ApiError(415, 'unsupported_media_type', 'Nieprawidłowy format danych.');
   }
-  if (Number(request.headers.get('Content-Length') ?? 0) > MAX_BODY_BYTES) throw bodyTooLarge();
-
-  const text = await request.text();
-  if (new TextEncoder().encode(text).length > MAX_BODY_BYTES) throw bodyTooLarge();
+  const text = new TextDecoder().decode(await readBody(request, MAX_BODY_BYTES, bodyTooLarge()));
 
   let data;
   try {
@@ -62,22 +87,9 @@ export async function readForm(request, limit, tooLarge = bodyTooLarge()) {
   if (!type.toLowerCase().startsWith('multipart/form-data')) {
     throw new ApiError(415, 'unsupported_media_type', 'Nieprawidłowy format danych.');
   }
-  if (Number(request.headers.get('Content-Length') ?? 0) > limit) throw tooLarge;
-  const chunks = [];
-  let size = 0;
-  const reader = request.body?.getReader();
-  while (reader) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    size += value.byteLength;
-    if (size > limit) {
-      await reader.cancel().catch(() => {});
-      throw tooLarge;
-    }
-    chunks.push(value);
-  }
+  const bytes = await readBody(request, limit, tooLarge);
   try {
-    return await new Response(new Blob(chunks), { headers: { 'Content-Type': type } }).formData();
+    return await new Response(bytes, { headers: { 'Content-Type': type } }).formData();
   } catch {
     throw invalidBody();
   }

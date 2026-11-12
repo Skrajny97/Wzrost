@@ -21,9 +21,13 @@ import { requireSession } from './sessions.js';
 const SENDER = { email: 'no-reply@insightrpg.com', name: 'Insight' };
 const CONFIRM_PATH = '/api/auth/confirm';
 const LINK_TTL_MS = 24 * 3600000;
-// A new link at most once a minute and five a day for one account.
+// A new link at most once a minute and five a day for one account, and the
+// same for one mailbox, whichever accounts ask for it (mail_sends, review of
+// 12.11.2026: an address got a mail from every account made with it and
+// removed again).
 const RESEND_MS = 60000;
 const LINKS_PER_DAY = 5;
+const DAY_MS = 24 * 3600000;
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 
 // Why a mail did not go, in the player's words, by Email Service's error code.
@@ -35,34 +39,65 @@ const SEND_ERRORS = {
 };
 const sendFailed = () => new ApiError(503, 'email_failed', 'Nie udało się wysłać maila. Spróbuj ponownie za chwilę.');
 
+// The key a mailbox is counted under in mail_sends: the SHA-256 hash of
+// the address without a "+tag" (most mail services deliver those to the
+// same mailbox), and for Gmail without dots, which Gmail ignores.
+export async function mailboxKey(email) {
+  const at = email.lastIndexOf('@');
+  const domain = email.slice(at + 1).toLowerCase();
+  let local = email.slice(0, at).toLowerCase().split('+')[0];
+  if (domain === 'gmail.com' || domain === 'googlemail.com') local = local.replaceAll('.', '');
+  return sha256Hex(`${local}@${domain === 'googlemail.com' ? 'gmail.com' : domain}`);
+}
+
+const tooSoon = (seconds) =>
+  new ApiError(429, 'email_wait', `Link został już wysłany. Sprawdź skrzynkę, także folder spam, albo spróbuj ponownie za ${seconds} s.`, {
+    'Retry-After': String(seconds),
+  });
+const tooMany = () => new ApiError(429, 'email_limit', 'Na dziś to już wszystkie linki. Sprawdź skrzynkę, także folder spam, albo spróbuj ponownie jutro.');
+
+// Throws when the account or the mailbox may get no link now: too soon
+// after the last one, or too many today.
+async function checkMailLimits(db, userId, mailbox, now) {
+  const [account, address] = await db.batch([
+    db.prepare('SELECT COUNT(*) AS count, MAX(created_at) AS last FROM email_links WHERE user_id = ? AND created_at > ?').bind(userId, now - LINK_TTL_MS),
+    db.prepare('SELECT COUNT(*) AS count, MAX(sent_at) AS last FROM mail_sends WHERE address = ? AND sent_at > ?').bind(mailbox, now - DAY_MS),
+  ]);
+  const last = Math.max(account.results[0].last ?? -Infinity, address.results[0].last ?? -Infinity);
+  if (now - last < RESEND_MS) throw tooSoon(Math.ceil((RESEND_MS - (now - last)) / 1000));
+  if (account.results[0].count >= LINKS_PER_DAY || address.results[0].count >= LINKS_PER_DAY) throw tooMany();
+}
+
 // Sends a new link to `email`, the account's address, in the account's
 // `language` (users.language, i18n.js), whatever the page's. Throws an
-// ApiError when it cannot: too soon after the last one, too many today, or
-// the mail failed.
+// ApiError when it cannot: too soon after the last one, too many today
+// (for the account or for the mailbox), or the mail failed.
 export async function sendLink(env, { userId, login, email, language }, origin, now) {
   const db = env.DB;
-  const recent = await db
-    .prepare('SELECT COUNT(*) AS count, MAX(created_at) AS last FROM email_links WHERE user_id = ? AND created_at > ?')
-    .bind(userId, now - LINK_TTL_MS)
-    .first();
-  if (recent.last !== null && now - recent.last < RESEND_MS) {
-    const seconds = Math.ceil((RESEND_MS - (now - recent.last)) / 1000);
-    throw new ApiError(429, 'email_wait', `Link został już wysłany. Sprawdź skrzynkę, także folder spam, albo spróbuj ponownie za ${seconds} s.`, {
-      'Retry-After': String(seconds),
-    });
-  }
-  if (recent.count >= LINKS_PER_DAY) {
-    throw new ApiError(429, 'email_limit', 'Na dziś to już wszystkie linki. Sprawdź skrzynkę, także folder spam, albo spróbuj ponownie jutro.');
-  }
+  const mailbox = await mailboxKey(email);
+  await checkMailLimits(db, userId, mailbox, now);
 
   const token = toBase64Url(crypto.getRandomValues(new Uint8Array(32)));
   const id = await sha256Hex(token);
-  await db.batch([
+  const [, , counted] = await db.batch([
     db.prepare('DELETE FROM email_links WHERE expires_at <= ?').bind(now),
+    db.prepare('DELETE FROM mail_sends WHERE sent_at <= ?').bind(now - DAY_MS),
+    // The limits read again in the statement that counts the mail, so that
+    // links asked for at once cannot all pass the reading above.
     db
-      .prepare('INSERT INTO email_links (id, user_id, email, created_at, expires_at) VALUES (?, ?, ?, ?, ?)')
+      .prepare(
+        `INSERT INTO mail_sends (address, sent_at) SELECT ?1, ?2
+         WHERE NOT EXISTS (SELECT 1 FROM mail_sends WHERE address = ?1 AND sent_at > ?2 - ?3)
+           AND (SELECT COUNT(*) FROM mail_sends WHERE address = ?1) < ?4
+           AND NOT EXISTS (SELECT 1 FROM email_links WHERE user_id = ?5 AND created_at > ?2 - ?3)
+           AND (SELECT COUNT(*) FROM email_links WHERE user_id = ?5 AND created_at > ?2 - ?6) < ?4`,
+      )
+      .bind(mailbox, now, RESEND_MS, LINKS_PER_DAY, userId, LINK_TTL_MS),
+    db
+      .prepare('INSERT INTO email_links (id, user_id, email, created_at, expires_at) SELECT ?, ?, ?, ?, ? WHERE changes() = 1')
       .bind(id, userId, email, now, now + LINK_TTL_MS),
   ]);
+  if (counted.meta.changes !== 1) throw tooSoon(Math.ceil(RESEND_MS / 1000));
   const message = confirmationEmail({ login, link: `${origin}${CONFIRM_PATH}?token=${token}` }, contentIn(accountLanguage(language)));
   try {
     if (!env.EMAIL) throw Object.assign(new Error('No EMAIL binding'), { code: 'E_NO_BINDING' });
@@ -70,7 +105,10 @@ export async function sendLink(env, { userId, login, email, language }, origin, 
   } catch (error) {
     console.error('Confirmation mail not sent:', error?.code, error?.message);
     // A mail that did not go out does not count toward the limits.
-    await db.prepare('DELETE FROM email_links WHERE id = ?').bind(id).run();
+    await db.batch([
+      db.prepare('DELETE FROM email_links WHERE id = ?').bind(id),
+      db.prepare('DELETE FROM mail_sends WHERE rowid = (SELECT rowid FROM mail_sends WHERE address = ? AND sent_at = ? LIMIT 1)').bind(mailbox, now),
+    ]);
     throw (SEND_ERRORS[error?.code] ?? sendFailed)();
   }
 }
@@ -89,6 +127,10 @@ export async function requestLink(context) {
   if (email !== user.email) {
     const taken = () => new ApiError(409, 'email_taken', 'Ten e-mail jest już przypisany do innego konta.');
     if (await db.prepare('SELECT 1 FROM users WHERE email = ? AND id != ?').bind(email, userId).first()) throw taken();
+    // The limits before the change, so that an address refused a mail is
+    // not left on the account either (review of 12.11.2026: an account took
+    // an address with no mail reaching it).
+    await checkMailLimits(db, userId, await mailboxKey(email), context.now);
     try {
       await db.prepare('UPDATE users SET email = ? WHERE id = ? AND email_confirmed_at IS NULL').bind(email, userId).run();
     } catch (error) {

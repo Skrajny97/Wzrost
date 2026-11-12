@@ -1016,13 +1016,14 @@ function languageRow() {
 // przychodzil mi w Panel Autora"): what went wrong, in the player's words;
 // the server adds the game's version and the character, and this the screen
 // the player was on under the settings. A screenshot may go with it
-// (screenshot.js), and then the report goes as a form.
+// (screenshot.js), and then the report goes as a form; not from an account
+// whose e-mail waits for confirmation, as the server takes none from it.
 function openBugReport() {
   const screen = location.hash;
   const text = h('textarea', { class: 'bug-text', id: 'bug-text', rows: '6', maxlength: '2000', placeholder: t('Np. po stuknięciu „Wyrusz” ekran przestał reagować.') });
-  const shot = screenshotPicker();
+  const shot = state.user?.emailRequired && !state.user?.emailConfirmed ? null : screenshotPicker();
   const report = async () => {
-    const image = await shot.image();
+    const image = shot ? await shot.image() : null;
     if (!image) return { text: text.value, screen };
     const form = new FormData();
     form.append('text', text.value);
@@ -1035,7 +1036,7 @@ function openBugReport() {
     h('p', { class: 'sheet-text', text: t('Opisz, co się stało i co było wtedy na ekranie. Gra sama dołączy numer wersji, ekran, na którym jesteś, i Twoją postać.') }),
     h('label', { class: 'field-label', for: 'bug-text', text: t('Opis błędu') }),
     text,
-    shot.element,
+    shot?.element ?? null,
     h(
       'div',
       { class: 'sheet-actions' },

@@ -476,7 +476,7 @@ export default {
       if (!url.pathname.startsWith('/api/')) {
         return new Response(t('Nie znaleziono strony.'), {
           status: 404,
-          headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+          headers: { 'Content-Type': 'text/plain; charset=utf-8', 'X-Content-Type-Options': 'nosniff' },
         });
       }
       return answer(request, env, url);

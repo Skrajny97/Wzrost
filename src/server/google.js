@@ -91,10 +91,22 @@ export async function googleCallback({ request, env, now }) {
       // An account with the same e-mail may belong to the same person, who
       // signs in with the password and links Google in the settings. It is
       // not linked here, because nobody confirmed that e-mail in the game.
-      if (identity.email && (await db.prepare('SELECT 1 FROM users WHERE email = ?').bind(identity.email).first())) {
-        return finish('/?google=exists');
-      }
+      const holder = identity.email
+        ? await db.prepare('SELECT id, email_confirmed_at, google_sub, email_required FROM users WHERE email = ?').bind(identity.email).first()
+        : null;
+      // An account made since e-mails are confirmed (email_required) that
+      // never confirmed it gives the address up to the one Google showed
+      // owns it: such an account cannot play yet, and anyone could have
+      // written someone else's address in (review of 12.11.2026).
+      const unconfirmed = holder && holder.email_confirmed_at === null && holder.google_sub === null && holder.email_required === 1;
+      if (holder && !unconfirmed) return finish('/?google=exists');
       if (!registrationOpen()) return finish('/?google=closed');
+      if (unconfirmed) {
+        await db.batch([
+          db.prepare('UPDATE users SET email = NULL WHERE id = ? AND email = ? AND email_confirmed_at IS NULL AND google_sub IS NULL').bind(holder.id, identity.email),
+          db.prepare('DELETE FROM email_links WHERE user_id = ?').bind(holder.id),
+        ]);
+      }
       user = await createGoogleUser(db, identity, now);
     }
     if (session) await deleteSession(db, session.id);

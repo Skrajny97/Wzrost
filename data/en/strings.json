@@ -1951,7 +1951,7 @@
   "zastępca": "deputy",
   "członek": "member",
   "Nazwa gildii musi mieć od {min} do {max} znaków.": "A guild name must have {min} to {max} characters.",
-  "Nazwa gildii może mieć litery, cyfry, spacje, łączniki i apostrofy, a zaczynać i kończyć się literą albo cyfrą.": "A guild name may have letters, digits, spaces, hyphens and apostrophes, and must start and end with a letter or a digit.",
+  "Nazwa gildii może mieć litery jednego alfabetu (łacińskiego, greckiego albo cyrylicy), cyfry, spacje, łączniki i apostrofy, a zaczynać i kończyć się literą albo cyfrą.": "A guild name may have letters of one alphabet (Latin, Greek or Cyrillic), digits, spaces, hyphens and apostrophes, and must start and end with a letter or a digit.",
   "Ta nazwa łamie zasady. Wybierz inną.": "This name breaks the rules. Choose another.",
   "Skrót gildii to od {min} do {max} liter albo cyfr.": "A guild tag is {min} to {max} letters or digits.",
   "Ten skrót łamie zasady. Wybierz inny.": "This tag breaks the rules. Choose another.",
@@ -2034,7 +2034,9 @@
   "Nieprawidłowe ustawienie.": "Invalid setting.",
   "Imię postaci musi mieć od 2 do 20 znaków.": "The character's name must have 2 to 20 characters.",
   "Imię postaci nie może zawierać znaku „{sign}”. {allowed}": "The character's name cannot contain the sign “{sign}”. {allowed}",
-  "Mogą być litery, cyfry, spacje, myślniki, apostrofy i podkreślniki.": "Letters, digits, spaces, hyphens, apostrophes and underscores are allowed.",
+  "Mogą być litery alfabetu łacińskiego, greckiego albo cyrylicy, cyfry, spacje, myślniki, apostrofy i podkreślniki.": "Letters of the Latin, Greek or Cyrillic alphabet, digits, spaces, hyphens, apostrophes and underscores are allowed.",
+  "Imię postaci nie może zawierać niewidocznych znaków.": "The character's name cannot contain invisible signs.",
+  "Imię postaci musi być zapisane jednym alfabetem.": "The character's name must be written in one alphabet.",
   "Imię postaci musi zaczynać się od litery.": "The character's name must start with a letter.",
   "Imię postaci musi kończyć się literą albo cyfrą.": "The character's name must end with a letter or a digit.",
   "Masz już {max} postaci. Usuń jedną z nich, żeby stworzyć nową.": "You already have {max} characters. Delete one of them to create a new one.",
@@ -2767,5 +2769,8 @@
   "Nie ma takiego zakupu.": "There is no such purchase.",
   "Ten zakup jest już w innym stanie. Odśwież listę.": "This purchase is already in another state. Refresh the list.",
   "Nie ma takiego działania.": "There is no such action.",
-  "Gildia zmieniła się w międzyczasie. Spróbuj jeszcze raz.": "The guild changed in the meantime. Try once more."
+  "Gildia zmieniła się w międzyczasie. Spróbuj jeszcze raz.": "The guild changed in the meantime. Try once more.",
+  "Z tej sieci założono dziś już wiele kont. Spróbuj ponownie za {hours} h.": "Many accounts have been made from this network today. Try again in {hours} h.",
+  "Wiek jest już potwierdzony. Konto usuniesz w Ustawieniach.": "Your age is already confirmed. You can delete the account in the Settings.",
+  "Zrzut ekranu dołączysz po potwierdzeniu adresu e-mail. Samo zgłoszenie możesz wysłać już teraz.": "You can attach a screenshot once your e-mail address is confirmed. The report itself you can send now."
 }

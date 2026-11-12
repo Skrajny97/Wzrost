@@ -2,7 +2,10 @@
 // stat points.
 
 import {
+  alphabetOf,
+  alphabetsOf,
   blockedName,
+  nameLook,
   createRng,
   areaFor,
   autoDistribute,
@@ -140,28 +143,36 @@ import { weekFactorNow, weekOfCharacter } from './weeks.js';
 // 2 to 20 characters: letters and digits, spaces, hyphens, apostrophes and
 // underscores ("Justi_725"), from a letter to a letter or a digit. What a
 // phone's keyboard adds unseen goes: invisible marks, letters split from
-// their accents (joined again), a curly apostrophe (made straight). The
-// message names what is wrong.
-const NAME_CHARACTER = /[\p{L}\p{N}_' -]/u;
-const ALLOWED_TEXT = 'Mogą być litery, cyfry, spacje, myślniki, apostrofy i podkreślniki.';
+// their accents (joined again), a curly apostrophe (made straight); wide,
+// raised or mathematical letters and digits become plain ones (NFKC). The
+// letters come from one alphabet, Latin, Greek or Cyrillic (names.js; the
+// security review of 12.11.2026: Hangul fillers made a name of nothing,
+// and one Cyrillic letter copied another player's name). The message names
+// what is wrong.
+const nameCharacter = (character) => /^[0-9_' -]$/.test(character) || alphabetOf(character) !== null;
+const ALLOWED_TEXT = 'Mogą być litery alfabetu łacińskiego, greckiego albo cyrylicy, cyfry, spacje, myślniki, apostrofy i podkreślniki.';
 
 export function validateName(value) {
   const name =
     typeof value === 'string'
-      ? value.normalize('NFC').replace(/\p{Cf}/gu, '').trim().replace(/\s+/g, ' ').replace(/[\u2018\u2019\u02bc]/g, "'")
+      ? value.normalize('NFKC').replace(/\p{Cf}/gu, '').trim().replace(/\s+/g, ' ').replace(/[\u2018\u2019\u02bc]/g, "'")
       : '';
   const characters = [...name];
-  const wrong = characters.find((character) => !NAME_CHARACTER.test(character));
+  const wrong = characters.find((character) => !nameCharacter(character));
   const problem =
     characters.length < 2 || characters.length > 20
       ? 'Imię postaci musi mieć od 2 do 20 znaków.'
-      : wrong
-        ? `Imię postaci nie może zawierać znaku „${wrong}”. ${ALLOWED_TEXT}`
-        : !/^\p{L}/u.test(name)
-          ? 'Imię postaci musi zaczynać się od litery.'
-          : !/[\p{L}\p{N}]$/u.test(name)
-            ? 'Imię postaci musi kończyć się literą albo cyfrą.'
-            : null;
+      : wrong && /\p{Default_Ignorable_Code_Point}/u.test(wrong)
+        ? 'Imię postaci nie może zawierać niewidocznych znaków.'
+        : wrong
+          ? `Imię postaci nie może zawierać znaku „${wrong}”. ${ALLOWED_TEXT}`
+          : alphabetsOf(name).size > 1
+            ? 'Imię postaci musi być zapisane jednym alfabetem.'
+            : !/^\p{L}/u.test(name)
+              ? 'Imię postaci musi zaczynać się od litery.'
+              : !/[\p{L}0-9]$/u.test(name)
+                ? 'Imię postaci musi kończyć się literą albo cyfrą.'
+                : null;
   if (problem) throw new ApiError(400, 'invalid_name', problem);
   // The mildest filter of vulgar names there can be (names.js).
   if (blockedName(name, content())) throw new ApiError(400, 'invalid_name', content().chat.names.refused);
@@ -171,6 +182,17 @@ export function validateName(value) {
 // No two players share a name, whatever the letter case
 // (migrations/0009_unique_names.sql).
 const nameKey = (name) => name.toLowerCase();
+
+// Throws when the name looks like another character's: the same letters
+// but for some of another alphabet that look alike, or a dotless ı
+// (names.js nameLook). Names of one alphabet that differ are told apart by
+// the unique key.
+async function refuseLookAlike(db, name, except = 0) {
+  const look = nameLook(name);
+  if (look === nameKey(name)) return;
+  const found = await db.prepare(`SELECT 1 FROM characters WHERE name_key = ? AND role IN ('player', 'aside') AND id != ?`).bind(look, except).first();
+  if (found) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');
+}
 
 // The character the account plays, with all it has, or null.
 export async function loadPlayer(db, userId) {
@@ -1769,6 +1791,7 @@ export async function createCharacter(context) {
   // own waits parked, and no other until that one is back (testing.js).
   if (played.results.length > 0 && parked.results.length > 0) throw new ApiError(409, 'parked', PARKED_TEXT);
 
+  await refuseLookAlike(db, name);
   const character = { classId: cls.id, level: 1, classLevel: 1, points: {}, position: cls.position };
   const hp = playerCombatant({ character, equipped: [], name }, content()).maxHp;
   const now = context.now;
@@ -1904,6 +1927,7 @@ export async function renameCharacter(context) {
   if (!forced && player.row.name_changed) throw new ApiError(409, 'name_locked', content().chat.names.locked);
   const name = validateName(body.name);
   const db = context.env.DB;
+  await refuseLookAlike(db, name, player.row.id);
   try {
     await db.batch([
       db

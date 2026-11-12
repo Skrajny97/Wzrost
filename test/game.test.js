@@ -176,7 +176,7 @@ describe('character creation', () => {
     const third = await signUp('trzeci');
     const message = async (name) => (await newCharacter(third, 'warrior', name)).data.error.message;
     assert.equal(await message('X'), 'Imię postaci musi mieć od 2 do 20 znaków.');
-    assert.equal(await message('Bob<script>'), 'Imię postaci nie może zawierać znaku „<”. Mogą być litery, cyfry, spacje, myślniki, apostrofy i podkreślniki.');
+    assert.equal(await message('Bob<script>'), 'Imię postaci nie może zawierać znaku „<”. Mogą być litery alfabetu łacińskiego, greckiego albo cyrylicy, cyfry, spacje, myślniki, apostrofy i podkreślniki.');
     assert.equal(await message('725'), 'Imię postaci musi zaczynać się od litery.');
     assert.equal(await message('Justi_'), 'Imię postaci musi kończyć się literą albo cyfrą.');
   });

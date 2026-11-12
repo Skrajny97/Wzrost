@@ -153,7 +153,7 @@ describe('English where ENGLISH is on (the test version)', () => {
     const sign = await ask('POST', '/api/auth/register', { body: { login: 'Gracz_en', email: 'gracz@example.com', password: 'tajnehaslo1', adult: true }, lang: 'en' });
     await (await db()).prepare('UPDATE users SET email_confirmed_at = created_at').run();
     const wrong = await ask('POST', '/api/character', { body: { name: 'Zła@nazwa', classId: 'warrior', appearance: 'female' }, cookie: sign.cookie, lang: 'en' });
-    assert.equal(wrong.data.error.message, "The character's name cannot contain the sign “@”. Letters, digits, spaces, hyphens, apostrophes and underscores are allowed.");
+    assert.equal(wrong.data.error.message, "The character's name cannot contain the sign “@”. Letters of the Latin, Greek or Cyrillic alphabet, digits, spaces, hyphens, apostrophes and underscores are allowed.");
   });
 
   test('the account keeps its language: from the page at the registration, then from the switch', async () => {
