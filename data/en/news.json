@@ -576,6 +576,10 @@
     "0.2.93": {
       "title": "Version 0.2.93",
       "body": "- A new card game in the Games Parlour: the System Deck (the “Cards” tab). Take the starter deck from Szczęsny, build a deck of 12 creature cards and play him at five tiers, for a stake or for practice. Win and you take double the stake, and beating a tier for the first time gives you a new card.\n- Creatures you defeat on an exploration may leave their card: ordinary ones rarely, elites and champions more often. Another copy of the same card raises its level.\n- Collection bonus: every 10 different cards give a permanent +1% XP and +1% gold from explorations, up to +15%.\n- The Encyclopedia has a new “Cards” tab: every card by land, found and still unknown, with the collection bonus."
+    },
+    "0.2.94": {
+      "title": "Version 0.2.94",
+      "body": "- Marketplace: a new “Tier” filter for items, next to class and rarity. It shows the items of one Tier and the class level they can be worn from. It works in “For me” too.\n- Tavern: “New candidates” for gold, up to 3 times a week, each draw dearer than the last. Zbylut brings four other candidates, and the companions you hired stay."
     }
   }
 }
