@@ -750,6 +750,11 @@
       "id": "0.2.98",
       "title": "Wersja 0.2.98",
       "body": "- Tempo walk ×4: przycisk „Tempo” pod odtwarzaną walką przechodzi teraz 1× → 2× → 4×. Gra pamięta wybrane tempo."
+    },
+    {
+      "id": "0.2.99",
+      "title": "Wersja 0.2.99",
+      "body": "- Gra przeładowuje się do nowej wersji także wtedy, gdy przechodzisz między ekranami, a nie tylko po powrocie do gry z innej aplikacji. Poprawki docierają szybciej."
     }
   ]
 }

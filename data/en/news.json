@@ -596,6 +596,10 @@
     "0.2.98": {
       "title": "Version 0.2.98",
       "body": "- Fight speed ×4: the “Speed” button under a fight being played now goes 1× → 2× → 4×. The game remembers the chosen speed."
+    },
+    "0.2.99": {
+      "title": "Version 0.2.99",
+      "body": "- The game reloads into a new version also when you move between screens, not only when you come back to it from another app. Fixes reach you sooner."
     }
   }
 }
