@@ -160,6 +160,20 @@ export function classSpans(character, content) {
   return spans;
 }
 
+// What the next class level adds to the HP and mana: the rate of the
+// latest form of the character's line that has its own (the Arkanista's,
+// the Druid's), else the class's, as perClassLevelOf counts it (the code
+// review, 12.11.2026: the stats screen told the class's).
+/**
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {{ hp: number, mana: number }}
+ */
+export function classLevelRate(character, content) {
+  const own = [...evolutionLine(character, content)].reverse().find((evolution) => evolution.perClassLevel);
+  return own?.perClassLevel ?? content.classesById[character.classId].perClassLevel;
+}
+
 // How many class levels from `lowest` up to `classLevel` fall in a span.
 /**
  * @param {{ from: number, to: number }} span

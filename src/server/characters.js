@@ -14,6 +14,7 @@ import {
   buildsUnderWay,
   campBonus,
   campLevels,
+  classLevelRate,
   addBonuses,
   blessingPlan,
   gearSetCount,
@@ -1025,8 +1026,10 @@ function campView(player, levels, now) {
   // their highest level, and the camp's own level, out of all.
   // The Warownia's buildings, once they stand, count for the spirit but not
   // for the stone's rows: the transformation needs the camp's alone.
+  // Every camp building, the Osada's Kwatery too, as the transformation
+  // counts them (camp.js beginBuilding).
   const built = content().buildings.filter((building) => buildingOpen(building, player.row, player.buildings, now));
-  const open = built.filter((building) => !building.fortress);
+  const open = content().buildings.filter((building) => !building.fortress);
   const finished = open.filter((building) => levels[building.id] >= building.maxLevel).length;
   return {
     cornerstone: {
@@ -1622,8 +1625,9 @@ export function characterView(player, now) {
       reduction: Math.round(values.reduction * 100),
       maxHp,
       maxMana: values.mana,
-      // What every class level adds to both, without any points.
-      perClassLevel: content().classesById[character.classId].perClassLevel,
+      // What the next class level adds to both, without any points: the
+      // current form's (classLevelRate in the engine).
+      perClassLevel: classLevelRate(character, content()),
       // The Parametry dodatkowe window: the total armour, the chances with
       // their ratings, the resistances (preview.js); the HP at rest at the
       // Ognisko's pace of now.

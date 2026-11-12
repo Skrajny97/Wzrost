@@ -78,6 +78,11 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
    * @param {number} cap
    */
   const chance = (rating, cap) => ({ rating: Math.round(rating), chance: cappedChance(rating, level, cap, balance), cap });
+  // Widmowy krok raises the dodge above the cap, as in the fight (combat.js;
+  // the code review, 12.11.2026: the window left it out).
+  const step = feat?.kind === 'shadowStep' ? (feat.dodge ?? 0) : 0;
+  /** @param {{ rating: number, chance: number, cap: number }} plain */
+  const dodgeOf = (plain) => (step ? { ...plain, chance: Math.min(0.95, plain.chance + step), cap: plain.cap + step } : plain);
   return {
     level,
     armor: {
@@ -87,7 +92,7 @@ export function extraValues(character, equipped, content, { rest = 0 } = {}) {
       trait,
       reduction: reduction(unit.armor, level, balance),
     },
-    dodge: chance(unit.dodgeRating, tuning.dodgeCap),
+    dodge: dodgeOf(chance(unit.dodgeRating, tuning.dodgeCap)),
     crit: { ...chance(unit.critRating, tuning.critCap), multiplier: tuning.critMultiplier * (1 + (feat?.critDamage ?? 0)) },
     effectResist: chance(unit.willRating, tuning.willCap),
     speed: unit.speed,

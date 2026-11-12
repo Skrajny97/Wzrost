@@ -10,7 +10,7 @@
 // dealer sells a character `daily` parts of each rarity at most, fewer of a
 // rarer one (the author: "30-20-10 itd.").
 
-import { questPeriod } from './quests.js';
+import { laterPeriod, questPeriod } from './quests.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ goldPerPart: number, discountPerLevel: number, rarities: string[], daily: Record<string, number>, counts: number[] }} Shop `shop` of the building in data/buildings.json. */
@@ -91,7 +91,14 @@ export const shopDay = (now, content) => questPeriod('daily', now, content).key;
  * @param {Content} content
  * @returns {Record<string, number>}
  */
-export const shopBought = ({ day, parts }, now, content) => (day === shopDay(now, content) ? parts : {});
+export const shopBought = ({ day, parts }, now, content) => {
+  const today = shopDay(now, content);
+  // Those of a later day leave none of any kind (laterPeriod in quests.js:
+  // a request still of the day gone buys no more and writes no day back;
+  // the code review, 12.11.2026).
+  if (laterPeriod(day, today)) return Object.fromEntries(content.parts.map((/** @type {Part} */ part) => [part.id, Infinity]));
+  return day === today ? parts : {};
+};
 
 // How many more parts of a kind the dealer sells today, after `bought`.
 /**

@@ -893,7 +893,7 @@ export async function claimStandingReward(context) {
   const herbs = counted('herbs', due.herbs);
   const parts = counted('parts', due.parts);
   const materials = counted('materials', due.materials);
-  const others = foreign({ herb: due.herbs, material: due.materials });
+  const others = foreign({ herb: due.herbs, material: due.materials, part: due.parts });
   const result = await context.env.DB.prepare(
     `UPDATE characters SET system_points = system_points + ?, gold = gold + ?, herbs = ${herbs.sql}, parts = ${parts.sql}, materials = ${materials.sql},
        foreign_stacks = ${others.sql}, settlement = ?, version = version + 1

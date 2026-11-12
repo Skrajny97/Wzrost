@@ -504,6 +504,10 @@
     "0.2.75": {
       "title": "Version 0.2.75",
       "body": "- Selling, throwing away, equipping and upgrading an item, and setting a gem, always hit the item you chose, even when a new one arrives at the same moment.\n- Fame Points from Sunday's last moment are no longer lost: they count toward the new week.\n- A name you choose while the System renames blocked names stays yours, and offers on the Marketplace show the seller's current name.\n- A name that looks like another character's is taken even when written in another alphabet.\n- Two characters created at once for the last free place no longer leave the account without a character."
+    },
+    "0.2.76": {
+      "title": "Version 0.2.76",
+      "body": "- Combat: when the guard of Unyielding, Unbending or Indomitable ends, armour no longer drops below what the armour tearing alone (Millstone, Curse of Decay) would leave.\n- Combat: guards, shields and evades wake at once after a reflected blow too, and a fighter killed by a reflected blow strikes no more.\n- Divine Protection no longer switches off Mana Mirror or Ice Armour.\n- Frost Gust and Elemental Ray slow only those they hit.\n- Fixed numbers on the Stats screen, on skill cards, in Advanced stats and on the fighters' cards in reports.\n- The daily limits of the Arena, the Fire Spirit, the Scrapyard, the Merchant and the travelling merchant work right at midnight too.\n- A character offered as a mercenary no longer fights in the Portals, and parts bought from others no longer count in the Encyclopedia."
     }
   }
 }

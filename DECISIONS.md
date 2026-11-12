@@ -3092,6 +3092,40 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.76 (12.11.2026): walka, progi i dzienne limity z przeglądu kodu
+
+Przegląd kodu silnika walki oraz tego, czy serwer pilnuje progów i limitów na każdej drodze, także w żądaniach wysłanych ręcznie. Każda poprawka ma test, który bez niej nie przechodzi (test/review-engine.test.js, test/review-gates.test.js).
+
+1. **Pancerz po końcu osłony** (src/engine/combat.js; Arena i wojny gildii). Osłona z umiejętności Nieugięty i Niezłomny dodawała pancerz jako stałą liczbę i tyle samo odejmowała na końcu. Gdy w międzyczasie Młyn albo Klątwa rozkładu zdarły część pancerza, po końcu osłony zostawało dużo mniej niż po samym zdzieraniu, nawet poniżej zera. Przykład z testu: Strażnikowi na 120. poziomie po Klątwie rozkładu Nekromanty zostawało ok. −220 pancerza zamiast ok. 600, więc kolejne ciosy wchodziły w pełni. Teraz osłona mnoży pancerz, a na końcu dzieli go przez tyle samo, więc zostaje dokładnie to, co zostawiłoby samo zdzieranie.
+2. **Ciosy po śmierci** (wojny gildii). Postać zabita odbitym ciosem w środku ciosu w kilku wrogów (np. Grom z nieba) dalej trafiała i spowalniała pozostałych. Teraz po śmierci nie zadaje już ciosów.
+3. **Umiejętności obronne budzą się od razu** (Arena i wojny gildii). Gdy HP spadało poniżej progu od odbitego ciosu albo od echa Znaku śmierci, osłona, tarcza albo unik budziły się dopiero po następnym ciosie, który wchodził w pełni. Teraz budzą się od razu, a mikstura lecząca jest wypijana od razu, jak po każdym ciosie.
+4. **Boska ochrona i Lustro many** (także wyprawy Drużyny i Wieża Drużyn). Boska ochrona nałożona na członka z Lustrem many albo Lodową zbroją zamieniała jego tarczę na zwykłą, która nie odbijała ciosów ani nie spowalniała. Teraz tarcza dostaje więcej punktów i działa jak przedtem.
+5. **Spowolnienie z ciosów w kilku wrogów** (Mroźny podmuch, Promień Żywiołów). Spowalniało wszystkich wrogów, także tego, kto zniknął (Zniknięcie), zablokował cios albo kogo zasłonił przywołaniec. Teraz spowalnia tylko trafionych, jak mówi opis.
+6. **Zapis walki Promienia Żywiołów** podawał słaby punkt na żywioł broni, którego promień nie używa. Teraz go nie podaje.
+7. **Walka przy wyłączonych ewolucjach.** Promień Żywiołów kończył walkę błędem, gdy ewolucje są wyłączone. W grze są włączone, więc gracze tego nie widzieli.
+8. **Liczby pokazywane graczowi:**
+   - ekran Statystyk: „z każdym poziomem klasy” pokazuje przyrost HP i many obecnej formy (Arkanista, Druid), a nie klasy podstawowej;
+   - karta umiejętności: „zawsze krytyczny (razem …%)” Egzekucji i Ścięcia liczy też premię cechy do krytyków (Egzekucja: 449% zamiast 345%);
+   - okno „Parametry dodatkowe”: unik Widma liczy +5 pkt proc. z Widmowego kroku;
+   - karta uczestnika w raporcie: obrażenia liczą premię z Mikstury siły, od towarzyszy i ze zdarzeń.
+9. **Warownia przed Osadą** (src/server/camp.js). Postać poniżej 20. poziomu, bez Osady i Kwater, mogła ręcznie wysłanym żądaniem zacząć przemianę obozu w Warownię. Teraz do Warowni liczą się wszystkie budynki, także Kwatery, jak mówi „Kamień węgielny Warowni w Obozie” 6.
+10. **Dzienne limity o północy** (jak w 0.2.71 i 0.2.74). Żądanie zaczęte przed północą i obsłużone po żądaniu nowego dnia brało zapis nowego dnia za brak zapisu: wykorzystywało limit drugi raz i zapisywało stary dzień. Teraz zapis późniejszego dnia oznacza wykorzystany limit i nie jest nadpisywany. Dotyczy to:
+    - walk na Arenie i „Losuj innych”;
+    - Ducha ognia w Ognisku;
+    - dziennego limitu Skupu złomu;
+    - Kupca i Wędrownego handlarza na Targowisku.
+11. **Najemnik w Portalach (brakujący szczegół).** Postać wystawiona jako najemnik albo w służbie walczyła w Portalach i je czyściła. Według „Najemnicy w Karczmie” 2 taka postać nic nie robi, a Arena już ją odsyłała. Teraz Portale też ją odsyłają. Wyprawa i praca w profesji nadal Portali nie zamykają.
+12. **Części kupione od innych w Encyklopedii.** Część kupiona na Targowisku od innego gracza, od Kupca albo dostana w nagrodę Bractwa liczyła się w zakładce części Encyklopedii jako własne znalezisko, choć tak samo zdobyte materiały się nie liczą. Teraz części też się nie liczą.
+13. **Przejrzane i bez zmian:**
+    - walki ze stworami, na Arenie i w wojnach gildii: zapis walki zgadza się z wynikiem, liczby są skończone i nieujemne, to samo ziarno daje tę samą walkę;
+    - wyprawy z miksturami, towarzyszami i w trudnym trybie, karty umiejętności i przedmiotów, mikstury;
+    - czasy działania, odnowienia, efekty i cechy wszystkich ewolucji;
+    - progi poziomów na ok. 65 trasach (Drużyna, Wymiana, Prośby Gildii, Wymiana gildii, Skrzynia Gildii, Targowisko, Najemnicy, Gildia, Wieże, Portale, Arena, Sala prób, profesje, ewolucje, Stajnia);
+    - zasady zakładania przedmiotów na każdej drodze, miejsce w plecaku i skrzyniach, limity drużyny, gildii i ofert;
+    - nagrody zadań i skrzyń, kody, Upominki, przełączniki funkcji i sprawdzanie danych w żądaniach.
+
+Pytanie na stronie ocen: 840 (które leczenie Uzdrowiciela i Cudotwórcy zdejmuje złe efekty).
+
 ## Wersja 0.2.75 (12.11.2026): numery przedmiotów, Punkty Sławy na przełomie tygodnia, imiona i nowe postacie z przeglądu kodu
 
 Przegląd kodu zadań serwera (co minutę i co godzinę), „Przewiń” za Punkty Czasu, rozliczania postaci przy każdym żądaniu, zakładania i zmiany postaci oraz numerów przedmiotów. Każda poprawka ma test, który bez niej nie przechodzi (test/review-settle-ids.test.js, test/review-cron-time.test.js).

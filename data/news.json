@@ -635,6 +635,11 @@
       "id": "0.2.75",
       "title": "Wersja 0.2.75",
       "body": "- Sprzedaż, wyrzucenie, założenie i ulepszenie przedmiotu oraz oprawa kamienia zawsze trafiają w przedmiot, który wybierzesz, nawet gdy w tej samej chwili przyjdzie nowy.\n- Punkty Sławy z ostatniej chwili niedzieli nie przepadają: liczą się do nowego tygodnia.\n- Imię wybrane w chwili, gdy System zmienia zablokowane imiona, zostaje Twoje, a oferty na Targowisku pokazują aktualne imię sprzedawcy.\n- Imię, które wygląda jak imię innej postaci, jest zajęte także wtedy, gdy zapiszesz je innym alfabetem.\n- Dwie postacie zakładane naraz przy ostatnim wolnym miejscu nie zostawiają konta bez postaci."
+    },
+    {
+      "id": "0.2.76",
+      "title": "Wersja 0.2.76",
+      "body": "- Walka: po końcu osłony Nieugiętego i Niezłomnego pancerz nie spada już poniżej tego, co zostawiłoby samo zdzieranie pancerza (Młyn, Klątwa rozkładu).\n- Walka: osłona, tarcza i unik budzą się od razu także po odbitym ciosie, a postać zabita odbitym ciosem nie zadaje już kolejnych ciosów.\n- Boska ochrona nie wyłącza już Lustra many ani Lodowej zbroi.\n- Mroźny podmuch i Promień Żywiołów spowalniają tylko trafionych.\n- Poprawione liczby na ekranie Statystyk, w kartach umiejętności, w „Parametrach dodatkowych” i w kartach uczestników w raporcie.\n- Dzienne limity Areny, Ducha ognia, Skupu złomu, Kupca i Wędrownego handlarza działają poprawnie także o północy.\n- Postać wystawiona jako najemnik nie walczy w Portalach, a części kupione od innych nie liczą się w Encyklopedii."
     }
   ]
 }

@@ -83,8 +83,8 @@ export function heldDiscoveries({ items = [], potions = {}, herbs = {}, material
 // author: "postac sama musi wytworzyć przedmiot albo zdobyć żeby zaliczylo w
 // Encyklopedii"): no item got in a Wymiana or from another character
 // through the Skrzynia Konta (data.traded, data.chest), and of each stack of
-// potions, herbs, materials and minerals only what is over the pieces got
-// in a trade.
+// potions, herbs, materials, parts and minerals only what is over the
+// pieces got in a trade.
 // `foreign` holds those pieces by key ("herb:comfrey": 2), used up first;
 // it comes back with what is still held of them.
 /**
@@ -114,7 +114,7 @@ export function ownDiscoveries({ items = [], potions = {}, herbs = {}, materials
       potions: own('potion', potions),
       herbs: own('herb', herbs),
       materials: own('material', materials),
-      parts,
+      parts: own('part', parts),
       minerals: own('mineral', minerals),
     },
     content,

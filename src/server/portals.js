@@ -15,7 +15,7 @@
 
 import { applyHunt, areaDangers, companionReady, companionsGoingMost, companionStays, huntReport, isUnlocked, laterPeriod, portalAmount, portalArea, portalById, portalFight, portalNext, portalSweep, portalSweepAll, questPeriod } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
-import { characterView, engineCharacter, equippedItems, loadPlayer, requirePlayer, trophiesFor } from './characters.js';
+import { characterView, engineCharacter, equippedItems, loadPlayer, requireNotExploring, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
@@ -122,6 +122,15 @@ function storesSql({ resources, materials, parts }) {
   };
 }
 
+// A character offering itself as a mercenary, or serving, fights for no
+// stage and sweeps none, as it fights no Arena duel (DECISIONS.md,
+// "Najemnicy w Karczmie" 2: it does nothing until it takes its offer down;
+// the code review, 12.11.2026). An exploration or a profession's work
+// leaves the Portale open.
+function requireFree(player, now) {
+  if (player.activity?.kind === 'mercenary') requireNotExploring(player, now);
+}
+
 // { portal, companions }: a fight for the portal's next stage, with the
 // character's companions unless `companions` is false. The report comes at
 // once; the loot and the creatures met are saved with it.
@@ -129,6 +138,7 @@ export async function enterPortal(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireUnlocked(row);
+  requireFree(player, context.now);
   const db = context.env.DB;
   const now = context.now;
   const body = await readJson(context.request);
@@ -210,6 +220,7 @@ export async function sweepAllPortals(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireUnlocked(row);
+  requireFree(player, context.now);
   const db = context.env.DB;
   const now = context.now;
   const record = recordOf(row);
@@ -243,6 +254,7 @@ export async function sweepPortal(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
   requireUnlocked(row);
+  requireFree(player, context.now);
   const db = context.env.DB;
   const now = context.now;
   const portal = portalOf(await readJson(context.request));

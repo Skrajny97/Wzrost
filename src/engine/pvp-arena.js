@@ -12,7 +12,7 @@
 
 import { simulateFight } from './combat.js';
 import { combatantView, playerCombatant } from './combatant.js';
-import { questPeriod } from './quests.js';
+import { laterPeriod, questPeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { say } from './text.js';
 
@@ -285,7 +285,9 @@ export const arenaDay = (now, content) => /** @type {Period} */ (questPeriod('da
 export const arenaWeek = (now, content) => /** @type {Period} */ (questPeriod('weekly', now, content));
 
 // What is left today of `perDay` uses counted by the Polish day: `day` is
-// the day of the last use and `used` how many fell on it.
+// the day of the last use and `used` how many fell on it. A use of a later
+// day leaves none (laterPeriod in quests.js): a request still of the day
+// gone fights no more and writes no day back (the code review, 12.11.2026).
 /**
  * @param {number} perDay
  * @param {string | null | undefined} day
@@ -293,7 +295,11 @@ export const arenaWeek = (now, content) => /** @type {Period} */ (questPeriod('w
  * @param {number} now
  * @param {Content} content
  */
-const leftToday = (perDay, day, used, now, content) => Math.max(0, perDay - (day === arenaDay(now, content).key ? (used ?? 0) : 0));
+const leftToday = (perDay, day, used, now, content) => {
+  const today = arenaDay(now, content).key;
+  if (laterPeriod(day, today)) return 0;
+  return Math.max(0, perDay - (day === today ? (used ?? 0) : 0));
+};
 
 // The fights left today of a record ({ day, fights }: the day of the last
 // fight and how many fell on it).

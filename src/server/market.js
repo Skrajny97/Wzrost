@@ -28,6 +28,7 @@ import {
   equipBlock,
   itemName,
   itemView,
+  laterPeriod,
   listBlock,
   materialPrice,
   materialView,
@@ -689,10 +690,12 @@ export function takenOff(column, taken) {
 }
 
 // The goods got from other players count as a trade's for the Encyklopedia
-// (ownDiscoveries in the engine), as those of the Wymiana do.
+// (ownDiscoveries in the engine), as those of the Wymiana do: the parts too,
+// which it has a tab of (the code review, 12.11.2026: a part bought from
+// another player was a discovery).
 export function foreign(adds) {
   const keyed = {};
-  for (const kind of ['herb', 'potion', 'material', 'mineral']) for (const [key, count] of Object.entries(adds[kind] ?? {})) keyed[`${kind}:${key}`] = count;
+  for (const kind of ['herb', 'potion', 'material', 'part', 'mineral']) for (const [key, count] of Object.entries(adds[kind] ?? {})) keyed[`${kind}:${key}`] = count;
   return counted('foreign_stacks', keyed);
 }
 
@@ -812,7 +815,10 @@ export async function buyFromResident(context) {
   if (body.from === 'wanderer') {
     const wanderer = wandererFor(row, stored, now);
     const good = wanderer.goods?.find((one) => one.id === body.id);
-    if (!good) throw new ApiError(404, 'no_goods', 'Wędrownego handlarza dziś nie ma.');
+    // A purchase of a later day leaves the day gone none (laterPeriod in
+    // quests.js): a request still of that day buys no more and writes no
+    // day back (the code review, 12.11.2026).
+    if (!good || laterPeriod(stored.market?.wandererDay, wanderer.comes.key)) throw new ApiError(404, 'no_goods', 'Wędrownego handlarza dziś nie ma.');
     const taken = stored.market?.wandererDay === wanderer.comes.key ? (stored.market.wanderer ?? []) : [];
     if (taken.includes(good.id)) throw new ApiError(409, 'sold_out', 'Ten przedmiot już kupiono.');
     if (row.gold < good.price) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota.');
@@ -828,7 +834,9 @@ export async function buyFromResident(context) {
   }
   const stock = merchantStock(now, content());
   const good = stock.goods.find((one) => one.id === body.id);
-  if (!good) throw new ApiError(404, 'no_goods', 'Kupiec ma już inny towar.');
+  // As the wandering trader's: the merchant's stock of a later day leaves
+  // the day gone none.
+  if (!good || laterPeriod(stored.market?.day, stock.day)) throw new ApiError(404, 'no_goods', 'Kupiec ma już inny towar.');
   const bought = stored.market?.day === stock.day ? (stored.market.bought ?? {}) : {};
   const count = body.count;
   if (!Number.isInteger(count) || count < 1 || count > good.stock - (bought[good.id] ?? 0)) throw new ApiError(409, 'sold_out', 'Kupiec nie ma już tyle.');

@@ -352,7 +352,9 @@ export function combatantView(unit, opponentLevel, content) {
     // The kind of hit sound (data/sounds.json).
     sound: unit.weapon.sound ?? null,
     element: unit.weapon.element ?? null,
-    damage: `${Math.round(unit.weapon.min * scale)}–${Math.round(unit.weapon.max * scale)}`,
+    // With the damage bonus of potions, companions and events, as its blows
+    // have it (combat.js; the code review, 12.11.2026).
+    damage: `${Math.round(unit.weapon.min * scale * (1 + (unit.damageBonus ?? 0)))}–${Math.round(unit.weapon.max * scale * (1 + (unit.damageBonus ?? 0)))}`,
     armor: unit.armor,
     dodge: percent(cappedChance(unit.dodgeRating, opponentLevel, balance.combat.dodgeCap, balance)),
     crit: percent(cappedChance(unit.critRating, opponentLevel, balance.combat.critCap, balance)),

@@ -284,8 +284,13 @@ export function raiseBlock(character, skillId, content, count = 1) {
  * @returns {string}
  */
 export function skillText(template, skill, params, content) {
+  // A critical hit as the fight deals it (combat.js): with the crit damage
+  // of the trait of the skill's evolution (Egzekucja: Zabójcza precyzja;
+  // the code review, 12.11.2026: the card left it out).
+  const evolution = skill.evolution ? content.evolutionsById?.[skill.evolution] : null;
+  const critDamage = evolution?.trait?.params?.critDamage ?? 0;
   /** @type {Record<string, any>} */
-  const values = { ...params, cooldown: skill.cooldown, critPower: (params.power ?? 0) * content.balance.combat.critMultiplier };
+  const values = { ...params, cooldown: skill.cooldown, critPower: (params.power ?? 0) * content.balance.combat.critMultiplier * (1 + critDamage) };
   return counted(template, values).replace(/\{(\w+)(%\.1|%| pp|\.1)?\}/g, (whole, name, format) => {
     const value = values[name];
     if (typeof value !== 'number') return whole;

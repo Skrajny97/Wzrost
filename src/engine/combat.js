@@ -380,9 +380,14 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         // A little HP back, and armour for the unit's next few moves.
         const amount = mend(unit, p.heal * unit.maxHp);
         const turns = Math.round(p.turns);
-        const armor = Math.round(unit.armor * p.armor);
-        unit.armor += armor;
-        unit.guard = { armor, until: unit.moves + turns, skill, reflect: p.reflect };
+        // A share of the armour, taken back as the same share when the
+        // guard ends: what tore or wore the armour meanwhile (Młyn, Klątwa
+        // rozkładu) or hardened it (Błogosławieństwo) stays as it did,
+        // guard or not (the code review, 12.11.2026: a sum taken back left
+        // the armour far lower than the tearing alone, even below zero).
+        const factor = 1 + p.armor;
+        unit.armor = Math.round(unit.armor * factor);
+        unit.guard = { factor, until: unit.moves + turns, skill, reflect: p.reflect };
         const percent = Math.round(p.armor * 100);
         log(() => ({
           ...base,
@@ -404,7 +409,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
           guarded = [];
           for (const member of units) {
             if (member.side !== unit.side || member.hp <= 0) continue;
-            member.shield = { points: Math.max(member.shield?.points ?? 0, Math.round(member.maxHp * p.guard * anointed)) };
+            // A shield held already keeps what it does (Lustro many throws
+            // back, Lodowa zbroja slows): the points only grow.
+            member.shield = { ...member.shield, points: Math.max(member.shield?.points ?? 0, Math.round(member.maxHp * p.guard * anointed)) };
             if (member !== unit) guarded.push({ id: member.id, shield: member.shield.points });
           }
           text = say(texts, 'skillShieldParty', actions, { ...vars, percent: Math.round(p.guard * anointed * 100) });
@@ -687,7 +694,12 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     damage(actor, back, target.id);
     const vars = { actor: target.name, target: actor.name, damage: back };
     log(() => ({ t, kind: 'reflect', actor: target.id, target: actor.id, damage: back, hp: actor.hp, text: say(texts, 'reflect', actions, vars) }));
-    if (actor.hp === 0) fell(actor, t, vars);
+    if (actor.hp === 0 && fell(actor, t, vars)) return;
+    // As after any blow: a guard, a shield or an evade wakes, and a healing
+    // potion is drunk, the moment the HP falls below its mark (the code
+    // review, 12.11.2026).
+    if (actor.skills.length > 0) wounded(actor, t);
+    if (actor.potions?.heal) healPotion(actor, t);
   };
 
   // A summon (Przywołanie żywiołaka, Trujący Szlam) stands before its
@@ -815,7 +827,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     let amount;
     if (spread) {
       const share = spread.reduce((/** @type {number} */ sum, /** @type {string} */ each) => sum + (1 - reduction(target.resist[each] ?? 0, actor.level, balance)) * (1 + (target.weak?.[each] ?? 0)), 0) / spread.length;
-      amount = Math.max(1, Math.round(raw * critFactor * share * (1 - ward) * (1 + trophy) * evolved(actor, target, move, category, spread)));
+      amount = Math.max(1, Math.round(raw * critFactor * share * (1 - ward) * (1 + trophy) * (evolving ? evolved(actor, target, move, category, spread) : 1)));
     } else {
       const plain = raw * critFactor * (1 - reduction(defense, actor.level, balance)) * (1 + weak) * (1 - ward) * (1 + trophy);
       // A weapon's zaklęcie żywiołu turns a share of the blow into its
@@ -863,7 +875,9 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       ...marks,
       text:
         say(texts, wordsFor(kind, move), actions, { ...vars, damage: amount }) +
-        (weak ? ` ${say(texts, 'weakness', actions, { element: content.elementsById[element].name, percent: Math.round(weak * 100) })}` : '') +
+        // A blow of several elements (Promień Żywiołów) uses none of the
+        // weapon's, so it names no weakness to it.
+        (weak && !spread ? ` ${say(texts, 'weakness', actions, { element: content.elementsById[element].name, percent: Math.round(weak * 100) })}` : '') +
         (spark ? ` ${say(texts, 'charged', actions, { damage: spark })}` : '') +
         (shred ? ` ${say(texts, 'armorShred', actions, { percent: Math.round(move.armorShred * 100) })}` : '') +
         (absorbed ? ` ${say(texts, 'absorbed', actions, { absorbed })}` : ''),
@@ -893,7 +907,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const swept = dot?.all && !move.counter ? foesOf(actor).filter((foe) => foe !== target) : NO_SKILLS;
     if (target.hp === 0 && fell(target, t, vars)) {
       for (const foe of swept) applyDot(actor, foe, dot, raw, t, { ...vars, target: foe.name });
-      return;
+      return true;
     }
 
     if (dot) applyDot(actor, target, dot, raw, t, vars);
@@ -939,6 +953,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     if (double) {
       strike(actor, target, t, { skill: double.skill, power: (move.power ?? 1) * double.power, category, element, undodgeable: move.undodgeable, mirror: true });
     }
+    return true;
   };
 
   // The opponent standing furthest back, the quickest kill among equals,
@@ -1178,14 +1193,21 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         // stronger single blow.
         log(() => ({ ...base, kind: 'skill', targets: opponents.map((/** @type {Unit} */ unit) => unit.id), text: say(texts, 'skillUse', actions, vars) }));
         const power = opponents.length === 1 && skill.params.single !== undefined ? skill.params.single : skill.params.power;
+        /** @type {Unit[]} */
+        const hit = [];
         for (const target of opponents) {
+          // One that fell of a blow thrown back strikes no more (the code
+          // review, 12.11.2026).
+          if (actor.hp <= 0) break;
           if (target.hp <= 0) continue;
-          strike(actor, target, t, blowOf(skill, { power, sweep: true }));
+          if (strike(actor, target, t, blowOf(skill, { power, sweep: true }))) hit.push(target);
         }
         // A slow of 50% halves a hit enemy's speed until its next move: it
-        // waits twice as long for it, 1 / (1 - slow) times.
-        if (skill.params.slow) {
-          const slowed = opponents.filter((/** @type {Unit} */ unit) => unit.hp > 0);
+        // waits twice as long for it, 1 / (1 - slow) times. Only those the
+        // sweep hit ("Każdy trafiony"): not one that vanished, blocked or
+        // dodged it, or whose summon took the blow.
+        if (skill.params.slow && actor.hp > 0) {
+          const slowed = hit.filter((/** @type {Unit} */ unit) => unit.hp > 0);
           const delay = skill.params.slow / (1 - skill.params.slow);
           for (const unit of slowed) unit.next += delay * unit.interval;
           if (slowed.length > 0) {
@@ -1241,7 +1263,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       damage(foe, echo, actor.id);
       const vars = { skill: doom.skill.name, target: foe.name, damage: echo };
       log(() => ({ t, kind: 'hit', actor: actor.id, target: foe.id, damage: echo, hp: foe.hp, skill: doom.skill.id, skillName: doom.skill.name, sweep: true, text: say(texts, 'echo', actions, vars) }));
-      if (foe.hp === 0) fell(foe, t, vars);
+      if (foe.hp === 0 && fell(foe, t, vars)) continue;
+      // As after a blow (throwBack above).
+      if (foe.skills.length > 0) wounded(foe, t);
+      if (foe.potions?.heal) healPotion(foe, t);
     }
     if (actor.feat?.kind === 'arcana') actor.mana = Math.min(actor.maxMana ?? 0, actor.mana + Math.round((actor.maxMana ?? 0) * actor.feat.regen));
     // Harmonia żywiołów: the elements of the unit's last move count from now.
@@ -1400,7 +1425,7 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     if (actor.hp <= 0) continue;
     if (actor.guard && actor.moves >= actor.guard.until) {
       const { skill } = actor.guard;
-      actor.armor -= actor.guard.armor;
+      actor.armor = Math.round(actor.armor / actor.guard.factor);
       actor.guard = null;
       log(() => ({ t, kind: 'fade', actor: actor.id, target: actor.id, skill: skill.id, skillName: skill.name, text: say(texts, 'skillEnd', actions, { actor: actor.name, skill: skill.name }) }));
     }

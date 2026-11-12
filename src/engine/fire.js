@@ -10,7 +10,7 @@
 // Suwaka"). Days follow the quests' clock (Polish time), so the pieces come
 // back at midnight.
 
-import { questPeriod } from './quests.js';
+import { laterPeriod, questPeriod } from './quests.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ goldPerUnit: number, cheaperEvery: number, unitsPerDay: number, moreUnits: number, moreUnitsEvery: number, resources: string[] }} FireTrade */
@@ -49,14 +49,19 @@ export function fireTrade(level, content) {
 export const fireDay = (now, content) => questPeriod('daily', now, content).key;
 
 // The pieces traded on the day of `now`: a count kept for an earlier day is
-// none today.
+// none today, and one of a later day leaves none, as if every piece were
+// traded (laterPeriod in quests.js: a request still of the day gone trades
+// no more and writes no day back; the code review, 12.11.2026).
 /**
  * @param {{ day?: string, units?: number }} made
  * @param {number} now
  * @param {Content} content
  * @returns {number}
  */
-export const fireUnitsMade = ({ day, units }, now, content) => (day === fireDay(now, content) ? (units ?? 0) : 0);
+export const fireUnitsMade = ({ day, units }, now, content) => {
+  const today = fireDay(now, content);
+  return laterPeriod(day, today) ? Infinity : day === today ? (units ?? 0) : 0;
+};
 
 // Why a trade of `amount` pieces cannot be made now, or null: `made` is
 // fireUnitsMade.

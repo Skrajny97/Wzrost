@@ -101,8 +101,12 @@ export async function beginBuilding(db, player, buildingId, now) {
   if (fortress) {
     const stored = player.buildings[building.id];
     if (stored && buildingLevel(stored, now) < building.maxLevel) throw new ApiError(409, 'fortress_building', 'Przemiana w Warownię już trwa.');
-    const open = content().buildings.filter((one) => !one.fortress && buildingOpen(one, player.row, player.buildings, now));
-    if (!stored && !fortressReady(player.buildings, now, open, content())) {
+    // Every camp building counts, the Osada's Kwatery too (DECISIONS.md,
+    // "Kamień węgielny Warowni w Obozie" 6), also below the Osada's level,
+    // where the board has no Kamień węgielny (the code review of 12.11.2026:
+    // there the Kwatery were left out, and the transformation began).
+    const camp = content().buildings.filter((one) => !one.fortress);
+    if (!stored && !fortressReady(player.buildings, now, camp, content())) {
       throw new ApiError(409, 'fortress_not_ready', 'Przemiana w Warownię zacznie się, gdy Obóz i wszystkie jego budynki dojdą do najwyższego poziomu.');
     }
   }
