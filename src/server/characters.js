@@ -124,7 +124,7 @@ import { favoriteIds } from './favorites.js';
 import { craftingOn, fortressOn, professionsOn, settlementOn, weeksOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
-import { assertion, characterChanged, raced, sameVersion } from './atomic.js';
+import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
 import { mercenaryBusy, mercenaryPlace, mercenaryRules, serviceEnded } from './mercenaries.js';
 import { championOf } from './guild-fame.js';
@@ -187,12 +187,22 @@ const nameKey = (name) => name.toLowerCase();
 // Throws when the name looks like another character's: the same letters
 // but for some of another alphabet that look alike, or a dotless ı
 // (names.js nameLook). Names of one alphabet that differ are told apart by
-// the unique key.
+// the unique key. Whichever of the two came first (the code review of
+// 12.11.2026: a Latin "Sasha" went through beside a Cyrillic one made
+// before it, and a Greek name beside a Cyrillic one): the names that may
+// look like it are those of plain letters that read as its look, and those
+// of as many letters with a letter outside plain Latin, whose looks are
+// compared here.
 async function refuseLookAlike(db, name, except = 0) {
   const look = nameLook(name);
-  if (look === nameKey(name)) return;
-  const found = await db.prepare(`SELECT 1 FROM characters WHERE name_key = ? AND role IN ('player', 'aside') AND id != ?`).bind(look, except).first();
-  if (found) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');
+  const { results } = await db
+    .prepare(
+      `SELECT name FROM characters WHERE role IN ('player', 'aside') AND id != ?
+         AND (name_key = ? OR (length(name) = ? AND name GLOB '*[^ -~]*'))`,
+    )
+    .bind(except, look, [...name].length)
+    .all();
+  if (results.some((row) => nameLook(row.name) === look)) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');
 }
 
 // The character the account plays, with all it has, or null.
@@ -1798,7 +1808,12 @@ export async function createCharacter(context) {
   const now = context.now;
   const supply = content().balance.startingSupply;
   try {
-    await db.batch([
+    // Only while the account has room, checked first (the code review of
+    // 12.11.2026): of two creations at once with one place left, the second
+    // set aside the character the first had just made, and made none, so
+    // the account was left with no character to play.
+    await atomically(db, [
+      assertion(db, `(SELECT COUNT(*) FROM characters WHERE user_id = ? AND ${OWN_CHARACTERS}) < ?`, [session.userId, max]),
       // The character played until now waits aside, with its exploration or
       // work going on.
       ...setAside(db, session.userId, now),
@@ -1817,7 +1832,7 @@ export async function createCharacter(context) {
           supply.gold, JSON.stringify(supply.resources), content().balance.timePoints.start, now, session.userId, session.userId, max,
         ),
       db.prepare("UPDATE users SET system_points_waiting = 0 WHERE id = ? AND EXISTS (SELECT 1 FROM characters WHERE user_id = ? AND role = 'player')").bind(session.userId, session.userId),
-    ]);
+    ], full);
   } catch (error) {
     if (String(error?.message).includes('name_key')) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');
     throw error;
@@ -1920,6 +1935,16 @@ export async function chooseCharacter(context) {
 // whose name the filter blocks (names.js) must take one, and any character
 // may change its name once in the Ustawienia (the author: "jednorazowo, po
 // czym opcja się blokuje"); the change the filter forces does not count.
+// What shows a character's name besides its own row, once it has `name`
+// (`renamed`: { sql, binds }, true only when the row took it): its chat
+// messages and its offers open on the Targowisko, whose seller everyone
+// sees (the code review, 12.11.2026: a blocked name the System renamed
+// stayed on them until the auction ended).
+const nameShown = (db, characterId, name, renamed = { sql: '1', binds: [] }) => [
+  db.prepare(`UPDATE chat_messages SET name = ? WHERE character_id = ? AND ${renamed.sql}`).bind(name, characterId, ...renamed.binds),
+  db.prepare(`UPDATE market_offers SET seller_name = ? WHERE seller_id = ? AND state = 'open' AND ${renamed.sql}`).bind(name, characterId, ...renamed.binds),
+];
+
 // The name may change during an exploration: nothing there depends on it.
 export async function renameCharacter(context) {
   const { session, player } = await requirePlayer(context);
@@ -1934,7 +1959,7 @@ export async function renameCharacter(context) {
       db
         .prepare('UPDATE characters SET name = ?, name_key = ?, name_changed = name_changed + ?, name_notice = NULL, version = version + 1 WHERE id = ?')
         .bind(name, nameKey(name), forced ? 0 : 1, player.row.id),
-      db.prepare('UPDATE chat_messages SET name = ? WHERE character_id = ?').bind(name, player.row.id),
+      ...nameShown(db, player.row.id, name),
     ]);
   } catch (error) {
     if (String(error?.message).includes('name_key')) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');
@@ -1988,13 +2013,21 @@ export async function renameBlockedNames(env, now) {
       }
     }
     name ??= `${order[0]}${row.id}`;
-    await db.batch([
-      db
-        .prepare('UPDATE characters SET name = ?, name_key = ?, name_notice = ?, version = version + 1 WHERE id = ?')
-        .bind(name, nameKey(name), words.renamed.replace('{name}', name), row.id),
-      db.prepare('UPDATE chat_messages SET name = ? WHERE character_id = ?').bind(name, row.id),
-    ]);
-    renamed += 1;
+    // Only while the character still has the name read: one its player chose
+    // meanwhile (free for a blocked name) stays (the code review,
+    // 12.11.2026). A name someone took meanwhile stops only this character's
+    // renaming, until the next hour, not the whole run.
+    try {
+      const [done] = await db.batch([
+        db
+          .prepare('UPDATE characters SET name = ?, name_key = ?, name_notice = ?, version = version + 1 WHERE id = ? AND name = ?')
+          .bind(name, nameKey(name), words.renamed.replace('{name}', name), row.id, row.name),
+        ...nameShown(db, row.id, name, { sql: 'EXISTS (SELECT 1 FROM characters WHERE id = ? AND name = ?)', binds: [row.id, name] }),
+      ]);
+      if (done.meta.changes === 1) renamed += 1;
+    } catch (error) {
+      if (!String(error?.message).includes('UNIQUE')) throw error;
+    }
   }
   return renamed;
 }

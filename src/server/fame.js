@@ -27,7 +27,7 @@
 // whole week wherever names show (the page's ui.js, framedName).
 
 import { countedForm, fameSource, fameWeek, famePointsOf, famePreviousWeek, fameWinners, huntFame, questFame, upgradeFame, workFame } from '../engine/index.js';
-import { assertion, atomically } from './atomic.js';
+import { assertion, atomically, raced } from './atomic.js';
 import { characterView, loadPlayer } from './characters.js';
 import { chatRole, requireChatter } from './chat.js';
 import { content } from './content.js';
@@ -40,20 +40,35 @@ const rules = () => content().fame;
 const words = () => rules().texts;
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? `{${name}}`));
 
+// The key of the week after the week `key` (the date its Monday falls on).
+const weekAfter = (key) => {
+  const [year, month, day] = key.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, day + 7)).toISOString().slice(0, 10);
+};
+
+// The week, in SQL, that points of the week `key` go to: that week while it
+// is open, else the one after it. A request of Sunday's last moment saved
+// after Monday's first look closed the week (a late run of the cron too)
+// brought points to a week no reward counts any more, and they were lost
+// (the code review, 12.11.2026, as the Arena's in 0.2.69).
+const openWeek = (key) => ({ sql: 'CASE WHEN EXISTS (SELECT 1 FROM fame_weeks WHERE week = ?) THEN ? ELSE ? END', binds: [key, weekAfter(key), key] });
+
 // The statements that add `points` Punkty Sławy to the character's week
-// (the one around `now`), for the action's own batch, so they land only
-// with it (atomic.js); none for no points. `guard` ({ sql, binds }) holds
-// only with the action's own change, for a batch with no assertion at its
-// head (as trialProgress's in guild-trials.js).
+// (the one around `now`, or the next one once it has closed: openWeek), for
+// the action's own batch, so they land only with it (atomic.js); none for
+// no points. `guard` ({ sql, binds }) holds only with the action's own
+// change, for a batch with no assertion at its head (as trialProgress's in
+// guild-trials.js).
 export function famePoints(db, characterId, points, now, guard = null) {
   if (!(points > 0)) return [];
+  const week = openWeek(fameWeek(now, content()).key);
   return [
     db
       .prepare(
-        `INSERT INTO fame_points (character_id, week, points) SELECT ?, ?, ? WHERE ${guard ? guard.sql : '1'}
+        `INSERT INTO fame_points (character_id, week, points) SELECT ?, ${week.sql}, ? WHERE ${guard ? guard.sql : '1'}
          ON CONFLICT (character_id, week) DO UPDATE SET points = points + excluded.points`,
       )
-      .bind(characterId, fameWeek(now, content()).key, points, ...(guard?.binds ?? [])),
+      .bind(characterId, ...week.binds, points, ...(guard?.binds ?? [])),
   ];
 }
 
@@ -76,17 +91,18 @@ export const sourceFamePoints = (db, characterId, id, count, now, guard = null) 
 // so a trial done brings its points at once and only once, whatever comes
 // after (a trial opened again, its guild gone).
 export function trialFame(db, characterId, week) {
+  const open = openWeek(week);
   return [
     db
       .prepare(
         `INSERT INTO fame_points (character_id, week, points)
-         SELECT ?, ?, n * ? FROM (
+         SELECT ?, ${open.sql}, n * ? FROM (
            SELECT COUNT(*) AS n FROM guild_trials t
            WHERE t.character_id = ? AND t.week = ? AND t.state = 'done' AND NOT EXISTS (SELECT 1 FROM fame_trials f WHERE f.trial_id = t.id))
          WHERE n > 0
          ON CONFLICT (character_id, week) DO UPDATE SET points = points + excluded.points`,
       )
-      .bind(characterId, week, famePointsOf('trial', content()), characterId, week),
+      .bind(characterId, ...open.binds, famePointsOf('trial', content()), characterId, week),
     db.prepare("INSERT OR IGNORE INTO fame_trials (trial_id, week) SELECT id, week FROM guild_trials WHERE character_id = ? AND week = ? AND state = 'done'").bind(characterId, week),
   ];
 }
@@ -95,36 +111,46 @@ export function trialFame(db, characterId, week) {
 // each account by its points, the first `places` of them with their places
 // and shares of the pool (fameWinners), and the mark that it is closed,
 // all at once. Of two requests at once the second finds the mark taken and
-// leaves it all as the first saved it; the week's points change no more,
-// as every point goes to the week it is earned in. The counted trials of
-// the weeks before it go: no trial of theirs moves any more.
+// leaves it all as the first saved it. Points that come meanwhile, between
+// the count and the close, make the close count again (the week's sum is
+// checked at its head; points only grow), and those that come after it go
+// to the next week (openWeek). The counted trials of the weeks before it
+// go: no trial of theirs moves any more.
 async function closeWeek(db, week, now) {
-  const { results } = await db
-    .prepare(
-      `SELECT character_id, user_id, points FROM (
-         SELECT f.character_id, c.user_id, f.points, ROW_NUMBER() OVER (PARTITION BY c.user_id ORDER BY f.points DESC, f.character_id) AS nth
-         FROM fame_points f JOIN characters c ON c.id = f.character_id
-         WHERE f.week = ? AND f.points > 0 AND c.${OWN_CHARACTERS})
-       WHERE nth = 1 ORDER BY points DESC, character_id LIMIT ?`,
-    )
-    .bind(week, rules().rewards.places)
-    .all();
-  const winners = fameWinners(
-    results.map((row) => ({ characterId: row.character_id, userId: row.user_id, points: row.points })),
-    content(),
-  );
-  try {
-    await db.batch([
-      db.prepare('INSERT INTO fame_weeks (week, closed_at) VALUES (?, ?)').bind(week, now),
-      ...winners.map((winner) =>
-        db
-          .prepare('INSERT INTO fame_rewards (week, place, character_id, user_id, points, share) VALUES (?, ?, ?, ?, ?, ?)')
-          .bind(week, winner.place, winner.characterId, winner.userId, winner.points, winner.share),
-      ),
-      db.prepare('DELETE FROM fame_trials WHERE week < ?').bind(week),
+  for (let tries = 0; tries < 3; tries++) {
+    const [{ results }, sum] = await db.batch([
+      db
+        .prepare(
+          `SELECT character_id, user_id, points FROM (
+             SELECT f.character_id, c.user_id, f.points, ROW_NUMBER() OVER (PARTITION BY c.user_id ORDER BY f.points DESC, f.character_id) AS nth
+             FROM fame_points f JOIN characters c ON c.id = f.character_id
+             WHERE f.week = ? AND f.points > 0 AND c.${OWN_CHARACTERS})
+           WHERE nth = 1 ORDER BY points DESC, character_id LIMIT ?`,
+        )
+        .bind(week, rules().rewards.places),
+      db.prepare('SELECT COALESCE(SUM(points), 0) AS total FROM fame_points WHERE week = ?').bind(week),
     ]);
-  } catch (error) {
-    if (!String(error?.message).includes('UNIQUE')) throw error;
+    const winners = fameWinners(
+      results.map((row) => ({ characterId: row.character_id, userId: row.user_id, points: row.points })),
+      content(),
+    );
+    try {
+      await db.batch([
+        assertion(db, '(SELECT COALESCE(SUM(points), 0) FROM fame_points WHERE week = ?) = ?', [week, sum.results[0].total]),
+        db.prepare('INSERT INTO fame_weeks (week, closed_at) VALUES (?, ?)').bind(week, now),
+        ...winners.map((winner) =>
+          db
+            .prepare('INSERT INTO fame_rewards (week, place, character_id, user_id, points, share) VALUES (?, ?, ?, ?, ?, ?)')
+            .bind(week, winner.place, winner.characterId, winner.userId, winner.points, winner.share),
+        ),
+        db.prepare('DELETE FROM fame_trials WHERE week < ?').bind(week),
+      ]);
+      return;
+    } catch (error) {
+      if (raced(error)) continue;
+      if (!String(error?.message).includes('UNIQUE')) throw error;
+      return;
+    }
   }
 }
 

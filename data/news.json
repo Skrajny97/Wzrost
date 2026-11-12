@@ -630,6 +630,11 @@
       "id": "0.2.74",
       "title": "Wersja 0.2.74",
       "body": "- Zaklinaczka: przy wyborze z kilku afiksów przedmiot od razu dostaje pierwszy z wylosowanych, a wybór może go zamienić na inny z nich.\n- Kowal nie podnosi rzadkości przedmiotu, na którym czeka wybór afiksu.\n- Dzienne i tygodniowe limity Osady, Warowni, Wież i Portali działają poprawnie także o północy.\n- Stół rozbiórki: rozbiórki przedmiotu, który nauczył wzoru, nie usuniesz z kolejki, dopóki z tego wzoru powstają przedmioty.\n- Poprawki kamieni z przedmiotów sprzedanych przy pełnym plecaku, zakładania przedmiotów, próbnych powiadomień i Próśb Gildii po zmianie gildii."
+    },
+    {
+      "id": "0.2.75",
+      "title": "Wersja 0.2.75",
+      "body": "- Sprzedaż, wyrzucenie, założenie i ulepszenie przedmiotu oraz oprawa kamienia zawsze trafiają w przedmiot, który wybierzesz, nawet gdy w tej samej chwili przyjdzie nowy.\n- Punkty Sławy z ostatniej chwili niedzieli nie przepadają: liczą się do nowego tygodnia.\n- Imię wybrane w chwili, gdy System zmienia zablokowane imiona, zostaje Twoje, a oferty na Targowisku pokazują aktualne imię sprzedawcy.\n- Imię, które wygląda jak imię innej postaci, jest zajęte także wtedy, gdy zapiszesz je innym alfabetem.\n- Dwie postacie zakładane naraz przy ostatnim wolnym miejscu nie zostawiają konta bez postaci."
     }
   ]
 }

@@ -500,6 +500,10 @@
     "0.2.74": {
       "title": "Version 0.2.74",
       "body": "- Enchantress: with a choice of several affixes, the item gets the first one rolled at once, and your choice can swap it for another of them.\n- The smith does not raise the rarity of an item whose affix choice is still waiting.\n- The daily and weekly limits of the Settlement, the Stronghold, the Towers and the Portals work right at midnight too.\n- Salvage Table: you cannot take the salvage of an item that taught a pattern off the queue while items are being made from that pattern.\n- Fixes for gems of items sold when the bag is full, for putting items on, for test notifications and for Guild Requests after changing guilds."
+    },
+    "0.2.75": {
+      "title": "Version 0.2.75",
+      "body": "- Selling, throwing away, equipping and upgrading an item, and setting a gem, always hit the item you chose, even when a new one arrives at the same moment.\n- Fame Points from Sunday's last moment are no longer lost: they count toward the new week.\n- A name you choose while the System renames blocked names stays yours, and offers on the Marketplace show the seller's current name.\n- A name that looks like another character's is taken even when written in another alphabet.\n- Two characters created at once for the last free place no longer leave the account without a character."
     }
   }
 }

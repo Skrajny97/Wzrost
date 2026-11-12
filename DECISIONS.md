@@ -3092,6 +3092,35 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.75 (12.11.2026): numery przedmiotów, Punkty Sławy na przełomie tygodnia, imiona i nowe postacie z przeglądu kodu
+
+Przegląd kodu zadań serwera (co minutę i co godzinę), „Przewiń” za Punkty Czasu, rozliczania postaci przy każdym żądaniu, zakładania i zmiany postaci oraz numerów przedmiotów. Każda poprawka ma test, który bez niej nie przechodzi (test/review-settle-ids.test.js, test/review-cron-time.test.js).
+
+1. **Nowy przedmiot dostawał numer usuniętego** (migrations/0116_items_never_reuse_ids.sql). Baza nadawała nowemu przedmiotowi numer przedmiotu, który właśnie zniknął (sprzedanego, wyrzuconego, włożonego do Skrzyni Konta, rozebranego). Żądanie, które odczytało stary przedmiot, działało więc na nowym:
+   - „Sprzedaj” (także stuknięte dwa razy) i sprzedaż „do rzadkości” płaciły za przedmiot, który leżał już w Skrzyni Konta, i oddawały jego kamień, a sprzedawały przedmiot, który właśnie przyszedł;
+   - „Wyrzuć” oddawało kamień przedmiotu, który leżał już w Skrzyni Konta;
+   - „Załóż” zakładało nowy przedmiot na miejsce starego, bez sprawdzenia wymagań klasy, poziomu i miejsca;
+   - „Ulepsz” ulepszało nowy przedmiot po cenie starego;
+   - oprawa kamienia w Szlifierni, której przedmiot sprzedano, oprawiała kamień w przedmiot, który dostał jego numer, a kamień, który ten przedmiot miał, przepadał.
+
+   Teraz numery przedmiotów tylko rosną i nigdy się nie powtarzają. Zmiana bazy przepisuje tabelę przedmiotów z ich dotychczasowymi numerami, a następne numery zaczynają się z zapasem powyżej wszystkich użytych, także numerów przedmiotów w Skrzyni Konta.
+2. **Punkty Sławy z ostatniej chwili tygodnia przepadały** (src/server/fame.js). Pierwsze wejście do gry w poniedziałek zamyka tydzień i liczy jego nagrody. Punkty z czynności z ostatniej chwili niedzieli zapisane już po zamknięciu trafiały do zamkniętego tygodnia i nie liczyły się nigdzie. Dotyczyło to sprzedaży na Targowisku rozliczonej przez spóźnione zadanie serwera, wyprawy odebranej tuż przed północą i każdego żądania zaczętego przed północą. Teraz, jak na Arenie od 0.2.69:
+   - takie punkty idą do nowego tygodnia;
+   - zamknięcie tygodnia sprawdza, czy w międzyczasie nie doszły punkty, i wtedy liczy ranking jeszcze raz.
+3. **Zmiana zablokowanych imion co godzinę nadpisywała imię wybrane przez gracza** (src/server/characters.js). Co godzinę serwer nadaje nowe imię postaciom z zablokowanym imieniem. Gracz, który w tej samej chwili sam wybrał nowe imię (za darmo przy imieniu zablokowanym), dostawał zamiast niego imię nadane przez System i wiadomość o tym. Teraz serwer zmienia imię tylko wtedy, gdy postać nadal nosi to zablokowane.
+4. **Zablokowane imię zostawało na Targowisku** (src/server/characters.js). Po zmianie imienia otwarte oferty postaci na Targowisku pokazywały dawne imię sprzedawcy do końca aukcji, także zablokowane. Teraz pokazują nowe imię, tak jak wiadomości na czacie, czy imię zmienił System, czy sam gracz.
+5. **Dwie nowe postacie naraz przy jednym wolnym miejscu** (src/server/characters.js). Gdy na koncie zostało jedno wolne miejsce, a dwa żądania „Stwórz postać” przyszły naraz, drugie odkładało na bok postać stworzoną właśnie przez pierwsze i nie tworzyło własnej. Konto zostawało bez postaci do gry. Teraz drugie żądanie odpowiada, że konto ma już komplet postaci, i niczego nie zmienia.
+6. **Imiona, które wyglądają tak samo** (src/server/characters.js; 0.2.73, punkt 9). Imię z literami innego alfabetu, podobnymi do łacińskich, było zajęte tylko wtedy, gdy wcześniej powstało imię łacińskie. Łacińskie „Sasha” przechodziło więc obok wcześniejszego cyrylickiego „Ѕаѕһа”, a cyrylickie imię obok greckiego, które wygląda tak samo. Teraz imię jest zajęte, gdy wygląda jak imię innej postaci w grze, bez względu na to, które powstało pierwsze i jakim alfabetem je zapisano.
+7. **Zostawione bez zmian (drobne):**
+   - Sława gildii: czynność gildii z ostatniej chwili niedzieli, zapisana po pierwszym wejściu w poniedziałek, nie wchodzi do Sławy tamtego tygodnia. Dotyczy to tylko złotego znacznika najlepszej gildii i rankingu gildii, bez nagród. Poprawka wymagałaby wstrzymania złotego znacznika na kilka minut po północy.
+   - Gdy członek Drużyny przewinie wyprawę do końca w pierwszych 2 sekundach minuty, pozostali członkowie nie dostają powiadomienia na telefon o jej końcu. Poprawka dawała podwójne powiadomienia przy innych wyprawach, bo telefon dzwoni przy każdym.
+8. **Przejrzane i bez zmian:**
+   - „Przewiń” za Punkty Czasu: koszt, przewinięcie części i całości, dwa stuknięcia naraz, wyprawy, profesje, Awatar, odpoczynek, budowy, wyprawa Drużyny, najemnik, Próby Gildii;
+   - zadania serwera: rozliczanie Targowiska, losowania Loterii, powiadomienia, przenoszenie nagród kodów między postaciami konta, wojny gildii, odbiór nagród za Sławę;
+   - rozliczanie postaci przy każdym żądaniu: budowy, Zbieracz Systemu, Punkty Czasu, Stół rozbiórki, zadania, odkrycia; 12 żądań naraz daje ten sam wynik co jedno;
+   - wybór, wygląd, zmiana imienia i usuwanie postaci;
+   - przedmioty w Wymianie, na Targowisku, w obu skrzyniach i w zestawach Zbrojowni.
+
 ## Wersja 0.2.74 (12.11.2026): poprawki Osady, Wież, Warowni, rzemiosła i Próśb Gildii z przeglądu kodu
 
 Przegląd kodu Osady, Wież i Portali, Warowni, rzemiosła oraz rozwoju postaci. Każda poprawka ma test, który bez niej nie przechodzi (test/review-osada.test.js, test/review-towers-crafting.test.js, test/review-days.test.js, test/review-progression.test.js).
