@@ -11355,13 +11355,20 @@ a.profession-square:active {
   top: 100%;
   left: 50%;
   padding: 2px 7px;
-  transform: translate(-50%, -6px);
+  /* --name-shift: moved inwards near the board's edge (screens/settlement.js). */
+  transform: translate(calc(-50% + var(--name-shift, 0px)), -6px);
   background: rgba(13, 17, 11, 0.86);
   border: 1px solid var(--bark-line);
   font-family: var(--font-system);
   font-size: 12px;
   font-weight: 500;
   white-space: nowrap;
+}
+
+/* A place whose name moved inwards (screens/settlement.js) above its
+   neighbours, so no building covers the name. */
+.settlement-place--name-moved {
+  z-index: 3;
 }
 
 .settlement-place--soon .settlement-place-label {

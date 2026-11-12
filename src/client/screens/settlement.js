@@ -73,6 +73,8 @@ const MAP_SIZE = { width: BOARD_WIDTH, height: 768 };
 // Akceptacja Bractw, and the gap between (styles.css, .settlement-board-view).
 const SIDE_MIN = 220;
 const SIDE_GAP = 20;
+// How close to the board's edge a place's name may come (keepNamesOnBoard).
+const NAME_EDGE = 4;
 
 export function mountSettlement(container, { params = {} } = {}) {
   const placeId = params.place ?? null;
@@ -1573,13 +1575,32 @@ export function mountSettlement(container, { params = {} } = {}) {
   function fitMap() {
     const view = container.querySelector('.settlement-board-view');
     const map = view?.querySelector('.settlement-map');
-    if (!map || !desktopLayout()) return;
-    const page = container.closest('.screen--game');
-    const below = (page ? parseFloat(getComputedStyle(page).paddingBottom) || 0 : 0) + (parseFloat(getComputedStyle(map).marginBottom) || 0);
-    const room = window.innerHeight - (map.getBoundingClientRect().top + window.scrollY) - below;
-    const { width, height } = MAP_SIZE;
-    const beside = view.clientWidth - SIDE_GAP - SIDE_MIN;
-    view.style.setProperty('--board-fit', `${Math.floor(Math.min((room * width) / height, beside))}px`);
+    if (!map) return;
+    if (desktopLayout()) {
+      const page = container.closest('.screen--game');
+      const below = (page ? parseFloat(getComputedStyle(page).paddingBottom) || 0 : 0) + (parseFloat(getComputedStyle(map).marginBottom) || 0);
+      const room = window.innerHeight - (map.getBoundingClientRect().top + window.scrollY) - below;
+      const { width, height } = MAP_SIZE;
+      const beside = view.clientWidth - SIDE_GAP - SIDE_MIN;
+      view.style.setProperty('--board-fit', `${Math.floor(Math.min((room * width) / height, beside))}px`);
+    }
+    keepNamesOnBoard(map);
+  }
+
+  // A place's name stays on the board: a long one near its edge (an English
+  // name, the narrowest phones) moves inwards instead of sticking out past
+  // it, as "Enchantress's Workshop" did at 360 px, and its place comes above
+  // the buildings next to it, so none covers the moved name.
+  function keepNamesOnBoard(map) {
+    const board = map.getBoundingClientRect();
+    if (!board.width) return;
+    for (const name of map.querySelectorAll('.settlement-place-label')) {
+      name.style.removeProperty('--name-shift');
+      const box = name.getBoundingClientRect();
+      const shift = Math.max(0, board.left + NAME_EDGE - box.left) - Math.max(0, box.right - (board.right - NAME_EDGE));
+      if (shift) name.style.setProperty('--name-shift', `${Math.round(shift)}px`);
+      name.parentElement?.classList.toggle('settlement-place--name-moved', Boolean(shift));
+    }
   }
   window.addEventListener('resize', fitMap);
   const stopLayout = onLayoutChange(fitMap);

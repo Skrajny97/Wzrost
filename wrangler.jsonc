@@ -89,6 +89,11 @@
     // below). In the live game from version 0.2.54, built on the accepted
     // mock-ups 792 v2; the first war is drawn on the Monday after.
     "GUILD_WARS": "on",
+    // "on": the Labirynt Systemu and the Rdzeń with its Artefakty
+    // (src/server/labyrinth.js, src/server/core.js; 850–866), the Labirynt
+    // tab of the Sala prób from character level 30. In the live game from
+    // version 0.2.87, once the author accepted the mock-ups 870.1–870.7.
+    "LABYRINTH": "on",
     // The gateway of the payments for Punkty Systemu (src/server/payments.js,
     // src/server/payment-providers.js): "autopay" (805 D), or empty: off. Its
     // keys, AUTOPAY_SERVICE_ID and AUTOPAY_SHARED_KEY, are Worker secrets the
@@ -166,9 +171,8 @@
         // The guild wars (src/server/guild-wars.js, 792–800), only here for
         // now, with "Test wojny" in the Wojna tab (TUTORIAL_TESTS).
         "GUILD_WARS": "on",
-        // The Labirynt Systemu and the Rdzeń with its Artefakty
-        // (src/server/labyrinth.js, src/server/core.js; 850–866), only here
-        // until the author has seen them; absent above, so off in the game.
+        // The Labirynt Systemu and the Rdzeń with its Artefakty, as in the
+        // game (850–866).
         "LABYRINTH": "on",
         // The payments for Punkty Systemu: off until the Autopay test
         // account's keys are in the GitHub secrets (AUTOPAY_TEST_SERVICE_ID,
