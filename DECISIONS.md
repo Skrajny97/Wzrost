@@ -3133,6 +3133,13 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
 16. **Handel (865 A).** Artefakty i Odłamki są tylko dla postaci, która je zdobyła: bez Targowiska, Wymiany i Skrzyni Konta.
 17. **Nazwa (866 A).** Labirynt Systemu.
 18. **Grafiki (868, 869).** Z PixelLab, w stylu materiałów gry, po cztery najlepsze wersje z 64 na stronie ocen. Autor przyjął 12.11.2026 o 15:41–15:43: komnaty walka D, elita B, skarb C, źródło A, ołtarz D, kupiec A, strażnik C; Artefakty ognia D, mrozu C, wody D, elektryczności B, ziemi C, natury C, trucizny C, sakrum D; Odłamki D, Rdzeń B (96 × 96) oraz oba tła (Labirynt i poziom Piekielny, 192 × 96). Pliki: `src/client/art/labyrinth/<nazwa>.png` (ikony 32 × 32 i `core.png`) i `src/client/art/places/labyrinth.png`, `labyrinth-hell.png`. Skarb i źródło filtr PixelLab odrzucił dwa razy jako „wbrew zasadom”; przeszły dopiero z innymi opisami (kupka złota z pucharem, kropla wody), a Artefakt ziemi raz (kamienne serce, potem kamień z runą).
+19. **Wejście: zakładka w Sali prób (uwaga autora, 12.11.2026).** Do Labiryntu wchodzi się w Osadzie, w Sali prób, a nie z Walki. Sala prób ma dwie zakładki: „Labirynt” i „Próby”, czyli dotychczasowe próby otwarcia regionu wewnętrznego krainy. Zakładki wyglądają jak w Salonie Gier (Loteria i Koło Fortuny) i na Tablicy zleceń (Zlecenia i Poszukiwani). Autor: „A co do Labiryntu to można by podzielic Salę Prób w Osadzie - na zakładkę Labiryntu i samych Prób otwarcia nowego Regiony Wewnętrznego danej Krainy”. Brakujące szczegóły:
+    - Labirynt jest pierwszą zakładką i otwiera się domyślnie (`#/osada/trial-hall`). Próby mają adres `#/osada/trial-hall/trials`.
+    - „Wróć do Labiryntu” i „Wróć do Sali prób” w raporcie prowadzą każde do swojej zakładki.
+    - Narrator w rozdziale o Sali prób sam otwiera zakładkę Prób.
+    - Poniżej 30. poziomu, i tam, gdzie gry nie ma Labiryntu, Sala prób pokazuje same Próby, bez zakładek, jak dotąd.
+    - Walka ma znów trzy części: Eksplorację, Portale i Wieże.
+    - Ekran idzie najpierw do makiet.
 
 ## Wersja 0.2.85 (12.11.2026): zdarzenia drużynowe (844–849)
 
