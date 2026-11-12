@@ -16,7 +16,7 @@ import { t } from '../i18n.js';
 import { buildLocked, buildLockedText, call, isUnlocked, state } from '../state.js';
 import { confirmAction, howItWorks, systemLink, systemPanel, withButton } from '../ui.js';
 import { lockedScreen } from './locked.js';
-import { artifactPlaceholder } from './labyrinth.js';
+import { artifactPlaceholder } from '../labyrinth.js';
 
 const ART = 32;
 const CORE_ART = 96;

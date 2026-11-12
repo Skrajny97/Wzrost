@@ -10,7 +10,7 @@ import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { t } from '../i18n.js';
 import { playSound } from '../sound.js';
-import { activityFinished, avoidRareOn, call, hardHuntOn, isUnlocked, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn } from '../state.js';
+import { activityFinished, avoidRareOn, call, hardHuntOn, isUnlocked, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn, unlockInfo } from '../state.js';
 import { guided, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { narrate } from '../narrator.js';
@@ -604,9 +604,11 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     fill(
       actionBox,
       report.tower && h('a', { class: 'button button--system', href: '#/wieze', text: t('Wróć do Wież') }),
-      report.labyrinth && h('a', { class: 'button button--system', href: '#/walka/labirynt', text: t('Wróć do Labiryntu') }),
+      // The Labirynt and the trials, each a tab of the Sala prób where the
+      // character has the Labirynt (screens/settlement.js).
+      report.labyrinth && h('a', { class: 'button button--system', href: '#/osada/trial-hall', text: t('Wróć do Labiryntu') }),
       report.portal && h('a', { class: 'button button--system', href: '#/portale', text: t('Wróć do Portali') }),
-      report.hall && h('a', { class: 'button button--system', href: '#/osada/trial-hall', text: t('Wróć do Sali prób') }),
+      report.hall && h('a', { class: 'button button--system', href: unlockInfo('labyrinth') && isUnlocked('labyrinth') ? '#/osada/trial-hall/trials' : '#/osada/trial-hall', text: t('Wróć do Sali prób') }),
       again,
       scrap,
       waiting && h('a', { class: 'button button--system', href: '#/walka', text: t('Kolejny raport czeka na odbiór') }),

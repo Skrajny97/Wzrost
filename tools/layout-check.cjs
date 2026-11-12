@@ -63,7 +63,6 @@ const SCREENS = [
   '#/walka/windfalls/windfalls-edge',
   '#/portale',
   '#/wieze',
-  '#/walka/labirynt',
   '#/postac/rdzen',
   '#/profesje',
   '#/oboz',
@@ -75,6 +74,7 @@ const SCREENS = [
   '#/osada/tavern/companions',
   '#/osada/tavern/mercenaries',
   '#/osada/trial-hall',
+  '#/osada/trial-hall/trials',
   '#/osada/arena',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
@@ -106,7 +106,6 @@ const TRANSLATED = new Set([
   '#/walka/windfalls/windfalls-edge',
   '#/portale',
   '#/wieze',
-  '#/walka/labirynt',
   '#/postac/rdzen',
   '#/profesje',
   '#/oboz',
@@ -118,6 +117,7 @@ const TRANSLATED = new Set([
   '#/osada/tavern/companions',
   '#/osada/tavern/mercenaries',
   '#/osada/trial-hall',
+  '#/osada/trial-hall/trials',
   '#/osada/arena',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
@@ -280,8 +280,9 @@ async function main() {
   // The Portale high up, and one entry for the Dziennik's row.
   sql(`UPDATE characters SET portals = '${JSON.stringify({ best: { gold: 100, wood: 99, materials: 95, parts: 12 } })}' WHERE name = '${name}'`);
   if ((await api('POST', '/api/portals/enter', { portal: 'materials' })) >= 400) throw new Error('Nie udało się wejść do Portalu.');
-  // The Labirynt Systemu on its second level, with blessings taken (one
-  // twice) and the choice of three waiting over the map, and the Rdzeń open
+  // The Labirynt Systemu (the Sala prób's first tab) on its second level,
+  // with blessings taken (one twice) and the choice of three waiting over
+  // the map, and the Rdzeń open
   // with big numbers: a large, a medium and a small Artefakt absorbed, a gem,
   // and the Skrytka with more (where LABYRINTH is on: npm run dev).
   const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Warsaw' }).format(new Date());

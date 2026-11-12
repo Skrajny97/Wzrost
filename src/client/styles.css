@@ -18156,40 +18156,6 @@ a.discord-button {
   }
 }
 
-/* The Walka's four parts with the Labirynt Systemu (screens/towers.js):
-   two by two on a phone, in one row from a tablet on. */
-.segmented--four {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.segmented--four .segmented-option {
-  padding: 0 4px;
-  font-size: 12px;
-  letter-spacing: 0.03em;
-}
-
-.segmented--four .segmented-option:nth-child(3) {
-  border-left: 0;
-}
-
-.segmented--four .segmented-option:nth-child(n + 3) {
-  border-top: 1px solid var(--system-line);
-}
-
-@media (min-width: 600px) {
-  .segmented--four {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .segmented--four .segmented-option:nth-child(3) {
-    border-left: 1px solid var(--system-line);
-  }
-
-  .segmented--four .segmented-option:nth-child(n + 3) {
-    border-top: 0;
-  }
-}
-
 /* The pictures of the Labirynt and the Rdzeń (art.js, labyrinthArt): the
    placeholder until the drawn picture loads. */
 .labyrinth-art {
@@ -18250,10 +18216,10 @@ a.discord-button {
   transform: rotate(45deg);
 }
 
-/* The Labirynt Systemu (screens/labyrinth.js): its picture with the day's
-   level, the levels of the day, the party, the map and the rewards. Under
-   the picture, and in its place until it is drawn, the System's cold glow
-   over dark stone. */
+/* The Labirynt Systemu (labyrinth.js), a tab of the Sala prób: its picture
+   with the day's level, the levels of the day, the party, the map and the
+   rewards. Under the picture, and in its place until it is drawn, the
+   System's cold glow over dark stone. */
 .labyrinth-head {
   background:
     radial-gradient(ellipse at 50% 35%, rgba(143, 227, 239, 0.14), transparent 60%),

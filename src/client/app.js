@@ -29,7 +29,6 @@ import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
 import { mountTowers } from './screens/towers.js';
 import { mountPortals } from './screens/portals.js';
-import { mountLabyrinth } from './screens/labyrinth.js';
 import { mountCore } from './screens/core.js';
 import { mountCommunity } from './screens/community.js';
 import { mountChatScreen } from './screens/chat.js';
@@ -78,8 +77,6 @@ const views = {
 // the tab in the computer's menu (layout.js, 507 A); the Społeczność tells
 // its own, as its tabs change (setPart).
 const ROUTES = [
-  // The Labirynt Systemu (screens/labyrinth.js), before a region's address.
-  { pattern: /^#\/walka\/labirynt$/, nav: 'main', tab: 'walka', part: () => 'labyrinth', mount: mountLabyrinth },
   // Walka, a region, an inner region of it.
   { pattern: /^#\/walka(?:\/(?<region>[a-z0-9-]+)(?:\/(?<area>[a-z0-9-]+))?)?$/, nav: 'main', tab: 'walka', part: () => 'explore', mount: mountCombat },
   { pattern: /^#\/wieze$/, nav: 'main', tab: 'walka', part: () => 'towers', mount: mountTowers },

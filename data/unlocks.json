@@ -118,7 +118,7 @@
     "name": "Labirynt Systemu",
     "level": 30,
     "feature": "labyrinth",
-    "message": "Odblokowano Labirynt Systemu. Wejdziesz do niego w zakładce Walka, w części Labirynt: codziennie nowy, trzy poziomy komnat ze strażnikami i Artefaktami do Rdzenia, także w czasie wyprawy."
+    "message": "Odblokowano Labirynt Systemu. Wejdziesz do niego w Osadzie, w Sali prób: codziennie nowy, trzy poziomy komnat ze strażnikami i Artefaktami do Rdzenia, także w czasie wyprawy."
   },
   {
     "id": "core",

@@ -74,7 +74,7 @@
   },
   "labyrinth": {
     "name": "System Labyrinth",
-    "message": "System Labyrinth unlocked. Enter it in the Combat tab, in the Labyrinth section: a new one every day, three levels of chambers with guardians and Artifacts for the Core, even during an exploration."
+    "message": "System Labyrinth unlocked. Enter it in the Settlement, in the Trial Hall: a new one every day, three levels of chambers with guardians and Artifacts for the Core, even during an exploration."
   },
   "core": {
     "name": "Core",

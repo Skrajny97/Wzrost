@@ -1130,7 +1130,7 @@
     "src/engine/core.js",
     "src/server/labyrinth.js",
     "src/server/core.js",
-    "src/client/screens/labyrinth.js",
+    "src/client/labyrinth.js",
     "src/client/screens/core.js"
   ],
   "ignore": [

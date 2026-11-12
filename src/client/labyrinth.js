@@ -1,22 +1,27 @@
-// The Labirynt Systemu in the Walka (src/server/labyrinth.js; DECISIONS.md,
-// "Labirynt Systemu i Rdzeń", 850–866), from character level 30, where the
-// game has it on: the day's level (1–3, then Piekielny) over its picture,
-// the fighters with the HP they carry from fight to fight, the blessings
-// taken, the map of the level (rows of rooms with the roads between them,
-// the party's place, the rooms it may enter lit) and the day's rewards. A
-// tap on a room open next tells what waits there and enters it: a fight's
-// result with its playback in the report, a spring's healing, the choice of
-// a blessing (after an elite, a guardian, at an altar) and the merchant's
-// wares wait over the map until chosen. The words are shown in the page's
-// language (t(), i18n.js).
+// The Labirynt Systemu (src/server/labyrinth.js; DECISIONS.md, "Labirynt
+// Systemu i Rdzeń", 850–866), from character level 30, where the game has it
+// on: the first tab of the Sala prób in the Osada (the author: "można by
+// podzielic Salę Prób w Osadzie - na zakładkę Labiryntu i samych Prób",
+// screens/settlement.js). The day's level (1–3, then Piekielny) over its
+// picture, the fighters with the HP they carry from fight to fight, the
+// blessings taken, the map of the level (rows of rooms with the roads
+// between them, the party's place, the rooms it may enter lit) and the day's
+// rewards. A tap on a room open next tells what waits there and enters it: a
+// fight's result with its playback in the report, a spring's healing, the
+// choice of a blessing (after an elite, a guardian, at an altar) and the
+// merchant's wares wait over the map until chosen. The words are shown in
+// the page's language (t(), i18n.js).
+//
+// The Osada's place screen mounts the panel once and keeps it while it
+// redraws itself, as the Salon Gier's (casino.js), so a redraw never asks the
+// server again.
 
-import { labyrinthArt, roomPlaceholder } from '../art.js';
-import { fill, h, icon } from '../dom.js';
-import { formatNumber } from '../format.js';
-import { t } from '../i18n.js';
-import { call, isUnlocked, reportCache, state, unlockInfo } from '../state.js';
-import { closeSheet, howItWorks, meter, openSheet, systemLink, systemPanel, withButton } from '../ui.js';
-import { combatModes } from './towers.js';
+import { labyrinthArt, roomPlaceholder } from './art.js';
+import { fill, h, icon } from './dom.js';
+import { formatNumber } from './format.js';
+import { t } from './i18n.js';
+import { call, isUnlocked, reportCache, state, unlockInfo } from './state.js';
+import { closeSheet, howItWorks, meter, openSheet, systemLink, systemPanel, withButton } from './ui.js';
 
 // The height of a row of the map, in pixels: the room's circle, its name
 // and the room between them for the roads.
@@ -27,15 +32,13 @@ export function mountLabyrinth(container, { navigate }) {
   let view = null;
   let gone = false;
 
-  const heading = () => [h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Walka') })), combatModes('labyrinth', navigate)];
-
   function show(message) {
     if (gone) return;
     if (message) {
-      fill(container, ...heading(), systemPanel(message));
+      fill(container, systemPanel(message));
       return;
     }
-    fill(container, ...heading(), hero(), overPanel(), pendingCard(), partyCard(), mapCard(), gainsCard(), aboutCard());
+    fill(container, hero(), overPanel(), pendingCard(), partyCard(), mapCard(), gainsCard(), aboutCard());
   }
 
   const levelOf = () => view.levels[view.level - 1];
@@ -379,10 +382,10 @@ export function mountLabyrinth(container, { navigate }) {
   if (!isUnlocked('labyrinth')) {
     const unlock = unlockInfo('labyrinth');
     show(unlock ? t('Labirynt Systemu odblokujesz na poziomie postaci {level}. Twój poziom: {own}.', { level: unlock.level, own: state.character.level }) : t('Nie znaleziono.'));
-    return { unmount() {} };
+    return { refresh() {}, unmount() {} };
   }
 
-  fill(container, ...heading(), h('p', { class: 'muted', text: t('Wczytywanie…') }));
+  fill(container, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   call('GET', '/api/labyrinth')
     .then(({ labyrinth }) => {
       view = labyrinth;
@@ -391,9 +394,10 @@ export function mountLabyrinth(container, { navigate }) {
     .catch((error) => show(error.message ?? t('Nie udało się wczytać Labiryntu.')));
 
   return {
-    // The character changed (its gold for the merchant, its level): the
-    // screen again, as it is now.
-    update() {
+    // The Osada redrew its screen, or the character changed (its gold for
+    // the merchant, its level): the panel again, as it is now, unless a
+    // sheet of the Labirynt is open over it.
+    refresh() {
       if (view && !document.querySelector('#sheet[open]')) show();
     },
     unmount() {
