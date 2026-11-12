@@ -9,7 +9,7 @@
   },
   "walk": {
     "figure": { "file": "art/scenes/walker.png", "size": 48, "frames": 4, "fps": 8 },
-    "rider": { "width": 64, "height": 96, "seat": [18, 59], "large": { "width": 96, "height": 104, "seat": [42, 67], "ids": ["bow-master-male", "frost-monarch-female", "saint-female"] } },
+    "rider": { "width": 64, "height": 96, "seat": [18, 59], "large": { "width": 96, "height": 104, "seat": [42, 67], "ids": ["bow-master-male", "frost-monarch-female", "saint-female", "demon-slayer-male", "demon-slayer-female"] } },
     "mounts": {
       "pony": { "file": "art/scenes/mounts/pony.png", "width": 104, "height": 90, "scale": 1.2, "frames": 8, "fps": 8, "seats": [[41, 37], [41, 36], [41, 35], [41, 36], [41, 37], [41, 36], [41, 35], [41, 36]] },
       "horse": { "file": "art/scenes/mounts/horse.png", "width": 126, "height": 108, "scale": 1.1, "frames": 8, "fps": 8, "seats": [[48, 44], [48, 43], [48, 41], [48, 43], [48, 44], [48, 43], [48, 42], [48, 43]] },
