@@ -4947,6 +4947,55 @@ a.camp-level-button {
   font-size: 14px;
 }
 
+/* A good in the Skrzynia Konta (843): its art, name and count in a row. */
+.chest-good {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.chest-good .chest-item {
+  flex: 1;
+}
+
+.chest-good-name {
+  overflow-wrap: anywhere;
+}
+
+.chest-good-count {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chest-sheet-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The padlock on the Skrzynia Konta below its level (843). */
+.camp-chest-lock {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  background: rgba(20, 16, 10, 0.88);
+  color: var(--gold);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+.camp-chest--locked .camp-chest-art {
+  opacity: 0.8;
+}
+
 .camp-plot {
   position: relative;
   display: block;
