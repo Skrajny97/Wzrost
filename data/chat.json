@@ -46,7 +46,7 @@
     "change": "Zmień",
     "example": "Wędrowiec",
     "lead": "Czat pokaże ją przed imieniem postaci, która pisze, np. „{example} ({name})”. Jest wspólna dla wszystkich postaci na Twoim koncie, więc każdy na czacie zobaczy, które postacie należą do jednego gracza.",
-    "rules": "Od 2 do 20 znaków: litery, cyfry, spacje, myślniki, apostrofy i podkreślniki. Nie może być nazwą konta ani imieniem postaci innego gracza.",
+    "rules": "Od 2 do 20 znaków: litery, cyfry, spacje, myślniki, apostrofy i podkreślniki. Nie może być Twoim loginem ani nazwą konta czy imieniem postaci innego gracza.",
     "every": "Nazwę konta zmienisz najwyżej raz na {days} dni.",
     "next": "Następna zmiana od {date}.",
     "label": "Nazwa konta",
@@ -63,6 +63,8 @@
     "start": "Nazwa konta musi zaczynać się od litery.",
     "end": "Nazwa konta musi kończyć się literą albo cyfrą.",
     "refused": "Ta nazwa łamie zasady Google Play dotyczące nieodpowiednich treści. Wybierz inną.",
+    "reserved": "Ta nazwa jest zastrzeżona. Wybierz inną.",
+    "login": "Nazwa konta nie może być Twoim loginem: czat pokazuje ją wszystkim, a login lepiej zachować dla siebie.",
     "hint": "Nowość: nazwa konta. Czat może ją pokazywać przed imieniem postaci, np. „{example} ({name})”, przy każdej postaci tego konta. Ustawisz ją teraz albo później w Ustawieniach (zębatka).",
     "hintSet": "Ustaw teraz",
     "hintSeen": "Rozumiem"

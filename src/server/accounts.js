@@ -14,7 +14,7 @@ import { hashPassword, needsRehash, verifyPassword } from './passwords.js';
 import { testModeFor, tutorialTestsFor } from './test-mode.js';
 import { isAuthor, openBugReports } from './author.js';
 import { content } from './content.js';
-import { ACCOUNT_NAMES, OTHER_CHARACTERS, accountNameView, checkedName, looksTaken, nameKey } from './names.js';
+import { ACCOUNT_NAMES, OTHER_CHARACTERS, accountNameView, checkedName, looksLike, looksTaken, nameKey } from './names.js';
 import { OWN_CHARACTERS } from './roles.js';
 import {
   clearedSessionCookie,
@@ -184,15 +184,21 @@ export async function login({ request, env, now }) {
   if (google && googleConfigured(env) && (testModeFor(env, user.login) || isAuthor(env, { login: user.login, google }))) {
     throw new ApiError(403, 'google_only', 'To konto otwiera się tylko przez Google. Stuknij „Zaloguj się przez Google”.');
   }
-  if (needsRehash(user.password_hash)) {
-    await db
-      .prepare('UPDATE users SET password_hash = ? WHERE id = ?')
-      .bind(await hashPassword(password), user.id)
-      .run();
+  // Both only over the password checked (the security review of
+  // 12.11.2026): a new password set at the same moment ("Zmień hasło",
+  // "Nie pamiętam hasła") ends every session of the account, and the old
+  // one may neither come back by an upgrade of its hash nor open a session
+  // after that.
+  let checkedHash = user.password_hash;
+  if (needsRehash(checkedHash)) {
+    const upgraded = await hashPassword(password);
+    const saved = await db.prepare('UPDATE users SET password_hash = ? WHERE id = ? AND password_hash = ?').bind(upgraded, user.id, checkedHash).run();
+    if (saved.meta.changes === 1) checkedHash = upgraded;
   }
   await db.prepare('DELETE FROM sessions WHERE expires_at <= ?').bind(now).run();
 
-  const session = await createSession(db, user.id, now);
+  const session = await createSession(db, user.id, now, checkedHash);
+  if (!session) throw invalidCredentials;
   return json(
     {
       user: {
@@ -329,18 +335,22 @@ const fromFormats = { pl: new Intl.DateTimeFormat('pl-PL', fromOptions), en: new
 // names.js), which the chat shows before the name of the character that
 // writes, "Wędrowiec (Radomira)". By the rules of a character's name, not
 // another account's name or another player's character's (no two players
-// share a name), and it changes at most once in accounts.days days
-// (data/chat.json); the first choice, and the change of a name the filter
-// blocks now, at once. The answer is the account's name as the page sees it
-// (accountNameView).
+// share a name), nor the account's login, and it changes at most once in
+// accounts.days days (data/chat.json); the first choice, and the change of
+// a name the filter blocks now, at once. The answer is the account's name
+// as the page sees it (accountNameView).
 export async function setAccountName(context) {
   const session = await requirePlayable(context);
   const body = await readJson(context.request);
   const words = content().chat.accounts;
   const name = checkedName(body.name, words);
   const db = context.env.DB;
-  const row = await db.prepare('SELECT account_name, account_name_at, account_name_hint FROM users WHERE id = ?').bind(session.userId).first();
+  const row = await db.prepare('SELECT login, account_name, account_name_at, account_name_hint FROM users WHERE id = ?').bind(session.userId).first();
   if (row.account_name === name) throw new ApiError(409, 'same_account_name', words.same);
+  // Nor the account's login, or a look of it: the chat shows the name to
+  // everyone, and with the login a stranger would need only the password
+  // (the security review of 12.11.2026).
+  if (looksLike(name, row.login)) throw new ApiError(400, 'account_name_login', words.login);
   const { accountNameFrom } = accountNameView(row);
   if (context.now < accountNameFrom) {
     const date = (fromFormats[language()] ?? fromFormats.pl).format(new Date(accountNameFrom));

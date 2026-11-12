@@ -191,12 +191,15 @@ describe('e-mail confirmation', () => {
 
     await (await db()).prepare('UPDATE email_links SET created_at = created_at - 120000').run();
     await (await db()).prepare('UPDATE mail_sends SET sent_at = sent_at - 120000').run();
-    const moved = await again({ email: 'Nowy@Example.com' });
+    // A new address only with the account's password (the security review
+    // of 12.11.2026; test/account-security.test.js).
+    assert.equal((await again({ email: 'Nowy@Example.com' })).data.error.code, 'password_required');
+    const moved = await again({ email: 'Nowy@Example.com', password: 'tajnehaslo1' });
     assert.equal(moved.status, 200);
     assert.deepEqual(moved.data, { sent: true, email: 'nowy@example.com' });
     assert.equal((await call('GET', '/api/me', { cookie })).data.user.email, 'nowy@example.com');
 
-    const taken = await again({ email: 'ola@example.com' });
+    const taken = await again({ email: 'ola@example.com', password: 'tajnehaslo1' });
     assert.equal(taken.status, 409);
     assert.equal(taken.data.error.code, 'email_taken');
     assert.equal((await again({ email: 'to nie mail' })).data.error.code, 'invalid_email');

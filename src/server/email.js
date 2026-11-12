@@ -16,6 +16,7 @@ import { content, contentIn } from './content.js';
 import { sha256Hex, toBase64Url } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { accountLanguage } from './i18n.js';
+import { checkCurrentPassword } from './password.js';
 import { requireSession } from './sessions.js';
 
 export const SENDER = { email: 'no-reply@insightrpg.com', name: 'Insight' };
@@ -116,7 +117,8 @@ export async function sendLink(env, { userId, login, email, language }, origin, 
 }
 
 // "Wyślij link": a link to the account's e-mail, or to a new address given
-// (an account without one, or a mistyped one), while it is not confirmed.
+// (an account without one, or a mistyped one) with the account's password,
+// while it is not confirmed.
 export async function requestLink(context) {
   const session = await requireSession(context);
   const { user, userId } = session;
@@ -127,6 +129,16 @@ export async function requestLink(context) {
 
   const db = context.env.DB;
   if (email !== user.email) {
+    // A new address only with the account's password, where it has one
+    // (the security review of 12.11.2026): with an address of their own
+    // and "Nie pamiętam hasła", whoever found the game open on someone's
+    // phone would set a new password and keep the account.
+    if (user.password) {
+      if (typeof body.password !== 'string' || body.password === '') {
+        throw new ApiError(400, 'password_required', 'Podaj obecne hasło, by zmienić adres e-mail.');
+      }
+      await checkCurrentPassword(db, userId, body.password, context.now);
+    }
     const taken = () => new ApiError(409, 'email_taken', 'Ten e-mail jest już przypisany do innego konta.');
     if (await db.prepare('SELECT 1 FROM users WHERE email = ? AND id != ?').bind(email, userId).first()) throw taken();
     // The limits before the change, so that an address refused a mail is

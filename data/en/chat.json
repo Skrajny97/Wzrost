@@ -28,7 +28,7 @@
     "change": "Change",
     "example": "Wanderer",
     "lead": "The chat shows it before the name of the character who writes, e.g. “{example} ({name})”. It is shared by all the characters on your account, so everyone in the chat will see which characters belong to one player.",
-    "rules": "2 to 20 characters: letters, digits, spaces, hyphens, apostrophes and underscores. It cannot be another player's account name or character name.",
+    "rules": "2 to 20 characters: letters, digits, spaces, hyphens, apostrophes and underscores. It cannot be your login, nor another player's account name or character name.",
     "every": "You can change the account name at most once every {days} days.",
     "next": "Next change from {date}.",
     "label": "Account name",
@@ -45,6 +45,8 @@
     "start": "An account name must start with a letter.",
     "end": "An account name must end with a letter or a digit.",
     "refused": "This name breaks the Google Play rules on inappropriate content. Choose another one.",
+    "reserved": "This name is reserved. Choose another one.",
+    "login": "The account name cannot be your login: the chat shows it to everyone, and your login is better kept to yourself.",
     "hint": "New: the account name. The chat can show it before the character's name, e.g. “{example} ({name})”, for every character on this account. Set it now or later in the Settings (the cog).",
     "hintSet": "Set it now",
     "hintSeen": "Got it"

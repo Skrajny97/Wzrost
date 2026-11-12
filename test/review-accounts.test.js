@@ -177,7 +177,7 @@ describe('registration and its mail', () => {
     // link to someone else's address: refused, as one link a minute.
     const response = await register('napastnik', 'napastnik@example.com');
     const cookie = response.headers.get('Set-Cookie').split(';')[0];
-    const moved = await call('POST', '/api/auth/email', { cookie, body: { email: 'ofiara@gmail.com' } });
+    const moved = await call('POST', '/api/auth/email', { cookie, body: { email: 'ofiara@gmail.com', password: 'tajnehaslo1' } });
     assert.equal(moved.status, 429);
     assert.equal(moved.data.error.code, 'email_wait');
     assert.equal((await call('GET', '/api/me', { cookie })).data.user.email, 'napastnik@example.com');

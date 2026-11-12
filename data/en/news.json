@@ -520,6 +520,10 @@
     "0.2.79": {
       "title": "Version 0.2.79",
       "body": "- You can change your password in the Settings: “Password” → “Change”. The account's other devices are signed out.\n- Forgot your password? The login screen has “I forgot my password”. A link to a new password comes to the account's confirmed e-mail address and works for an hour.\n- By the Core: “The Core will be unlocked in one of the upcoming updates.”"
+    },
+    "0.2.80": {
+      "title": "Version 0.2.80",
+      "body": "- Account name: in the Settings you can set a name the chat shows before your character's name, e.g. “Wanderer (Radomira)”. It is shared by all the characters on your account, and you can change it at most once every 30 days.\n- Changing the e-mail address now needs your current password.\n- After a password change, the account's phones stop getting notifications until the game opens on them.\n- A character's name or an account name can no longer look like someone else's through similar signs, such as the digit 0 for the letter o."
     }
   }
 }

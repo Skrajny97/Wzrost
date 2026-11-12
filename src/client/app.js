@@ -155,6 +155,9 @@ const GOOGLE_NOTES = {
   // An account with test mode (src/server/accounts.js).
   linkedOnly: 'Połączono konto Google. To konto otwiera się teraz tylko przez Google.',
   taken: 'To konto Google jest już połączone z innym kontem w grze.',
+  // The account in the game is linked to another Google account, which
+  // stays (src/server/google.js linkGoogle).
+  other: 'To konto w grze jest już połączone z innym kontem Google.',
   exists: 'Konto w grze z tym adresem e-mail już istnieje. Zaloguj się loginem i hasłem, a potem połącz Google w Ustawieniach.',
   cancelled: 'Logowanie przez Google zostało przerwane.',
   expired: 'Logowanie przez Google trwało za długo albo sesja wygasła. Spróbuj ponownie.',

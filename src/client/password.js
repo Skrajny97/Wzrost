@@ -6,14 +6,16 @@
 import { request } from './api.js';
 import { h } from './dom.js';
 import { t } from './i18n.js';
+import { syncPush } from './push.js';
 import { playSound } from './sound.js';
 import { state } from './state.js';
 import { closeSheet, openSheet, toast } from './ui.js';
 
 const MAX_PASSWORD = 128;
 
-// A password field with "Pokaż", as on the login screen.
-function passwordField(id, label, autocomplete, hint = null) {
+// A password field with "Pokaż", as on the login screen (also for a new
+// e-mail address, email.js).
+export function passwordField(id, label, autocomplete, hint = null) {
   const input = h('input', { id, type: 'password', autocomplete, maxlength: String(MAX_PASSWORD), required: true, ...(hint && { 'aria-describedby': `${id}-hint` }) });
   const toggle = h('button', {
     type: 'button',
@@ -79,6 +81,9 @@ export function openChangePassword() {
         playSound('system');
         closeSheet();
         toast(answer.text);
+        // The server forgot the account's phones for notifications with
+        // the old password (password.js); this one signs up again now.
+        syncPush();
       },
     }),
   );

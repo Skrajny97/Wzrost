@@ -48,6 +48,10 @@ export function checkedName(value, words) {
   if (problem) throw new ApiError(400, 'invalid_name', problem);
   // The mildest filter of vulgar names there can be (names.js).
   if (blockedName(name, content())) throw new ApiError(400, 'invalid_name', words.refused);
+  // Nor the words of the chat's role tags, or a look of them: "Kowal
+  // (admin)" would read as the author's message (the security review of
+  // 12.11.2026). An l there reads as the i it may stand for ("AdmIn").
+  if (RESERVED.has(lookKey(name).replaceAll('l', 'i'))) throw new ApiError(400, 'invalid_name', words.reserved);
   return name;
 }
 
@@ -62,6 +66,7 @@ export function validateName(value) {
     start: 'Imię postaci musi zaczynać się od litery.',
     end: 'Imię postaci musi kończyć się literą albo cyfrą.',
     refused: content().chat.names.refused,
+    reserved: 'To imię jest zastrzeżone. Wybierz inne.',
   });
 }
 
@@ -69,28 +74,60 @@ export function validateName(value) {
 // (migrations/0009_unique_names.sql, 0118_account_names.sql).
 export const nameKey = (name) => name.toLowerCase();
 
+// Signs that look like others beyond nameLook's letters of other
+// alphabets (the security review of 12.11.2026): a digit 0 like an o
+// (the chat's font draws its digits low), a 1 and a capital I of any of the
+// three alphabets like an l, and Latin small capitals, Greek and Cyrillic
+// letters nameLook leaves out.
+const LOOKS_MORE = {
+  0: 'o', 1: 'l', I: 'l', Ι: 'l', І: 'l', Ӏ: 'l',
+  Ϳ: 'J', ϳ: 'j', Ѵ: 'V', ѵ: 'v', ѡ: 'w',
+  ᴀ: 'a', ʙ: 'b', ᴄ: 'c', ᴅ: 'd', ᴇ: 'e', ꜰ: 'f', ɢ: 'g', ʜ: 'h', ᴊ: 'j', ᴋ: 'k', ᴍ: 'm', ɴ: 'n', ᴏ: 'o', ᴘ: 'p', ʀ: 'r', ꜱ: 's', ᴛ: 't', ᴜ: 'u', ᴠ: 'v', ᴡ: 'w', ʏ: 'y', ᴢ: 'z',
+};
+
+// A name as it looks, to compare with others: the look-alike signs folded,
+// letters of other alphabets as the Latin ones they show (nameLook in the
+// engine) and accents compared on the same letters ("Κόκα" and "Kóka"), in
+// lower case, as the names' keys keep them.
+export function lookKey(name) {
+  const folded = [...String(name).normalize('NFD')].map((sign) => LOOKS_MORE[sign] ?? sign).join('');
+  return nameLook(folded).normalize('NFC');
+}
+
+// Whether two names look alike, also in other letter case: a capital I
+// reads as an l, its small i does not ("WEDROWIEC" and "wedrowiec").
+export const looksLike = (one, other) =>
+  lookKey(one) === lookKey(other) || lookKey(one.toLowerCase()) === lookKey(other.toLowerCase());
+
+// The words of the chat's role tags and of the System, no player's name
+// (each without an l: checkedName reads an l as an i).
+const RESERVED = new Set(['admin', 'administrator', 'moderator', 'system']);
+
 // Whether a name in a column of names looks like `name`: the same letters
-// but for some of another alphabet that look alike (nameLook in the
-// engine), as characters.js refuseLookAlike asks of the characters' names
-// (the code review of 12.11.2026). The names that may look like it are
-// those whose key reads as its look, and those as long with a letter
-// outside plain Latin, whose looks are compared here. `names`: the table,
-// its column of names and of their keys, and `where`, the rows to look at,
-// with `binds` for it.
+// but for some signs that look alike (lookKey), as characters.js
+// refuseLookAlike asks of the characters' names (the code review of
+// 12.11.2026). The names that may look like it are those whose key reads
+// as its look, and those as long with a sign outside plain Latin letters
+// (another alphabet, an accent), a digit or a capital I, whose
+// looks are compared here. `names`: the table, its column of names and of
+// their keys, and `where`, the rows to look at, with `binds` for it.
 export async function looksTaken(db, names, name, binds) {
-  const look = nameLook(name);
+  const look = lookKey(name);
   const { results } = await db
     .prepare(
       `SELECT ${names.column} AS name FROM ${names.table} WHERE ${names.where}
-         AND (${names.key} = ? OR (length(${names.column}) = ? AND ${names.column} GLOB '*[^ -~]*'))`,
+         AND (${names.key} = ? OR (length(${names.column}) = ? AND (${names.column} GLOB '*[^ -~]*' OR ${names.column} GLOB '*[0-9I]*')))`,
     )
     .bind(...binds, look, [...name].length)
     .all();
-  return results.some((row) => nameLook(row.name) === look);
+  return results.some((row) => lookKey(row.name) === look);
 }
 
 // The other accounts' names (832 A), `binds`: [the account's own id].
 export const ACCOUNT_NAMES = { table: 'users', column: 'account_name', key: 'account_name_key', where: 'id != ? AND account_name IS NOT NULL' };
+
+// Every character but one, `binds`: [the character's own id, or 0].
+export const ALL_CHARACTERS = { table: 'characters', column: 'name', key: 'name_key', where: "role IN ('player', 'aside') AND id != ?" };
 
 // The characters of the other players, `binds`: [the account's own id].
 export const OTHER_CHARACTERS = { table: 'characters', column: 'name', key: 'name_key', where: "user_id != ? AND role IN ('player', 'aside')" };

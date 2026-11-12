@@ -14,13 +14,20 @@ export const SESSION_TTL_MS = 30 * DAY_MS;
 const REFRESH_BELOW_MS = 15 * DAY_MS;
 const TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
 
-export async function createSession(db, userId, now) {
+// A new session of the account. With `passwordHash`, only while the
+// account's password is still that one (accounts.js login): null when a
+// new password came in the meantime, whose change ended every session.
+export async function createSession(db, userId, now, passwordHash = null) {
   const token = toBase64Url(crypto.getRandomValues(new Uint8Array(32)));
   const expiresAt = now + SESSION_TTL_MS;
-  await db
-    .prepare('INSERT INTO sessions (id, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)')
-    .bind(await sha256Hex(token), userId, now, expiresAt)
-    .run();
+  const id = await sha256Hex(token);
+  const made = await (passwordHash === null
+    ? db.prepare('INSERT INTO sessions (id, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)').bind(id, userId, now, expiresAt)
+    : db
+        .prepare('INSERT INTO sessions (id, user_id, created_at, expires_at) SELECT ?, ?, ?, ? WHERE EXISTS (SELECT 1 FROM users WHERE id = ? AND password_hash = ?)')
+        .bind(id, userId, now, expiresAt, userId, passwordHash)
+  ).run();
+  if (made.meta.changes !== 1) return null;
   return { token, expiresAt };
 }
 

@@ -88,7 +88,7 @@
       "type": "object",
       "description": "Nazwa konta na czacie (832 A, src/server/names.js, accounts.js setAccountName): teksty Ustawień, czatu i odpowiedzi serwera; {name} imię postaci, {example} przykładowa nazwa konta, {days} dni między zmianami, {date} dzień następnej zmiany, {sign} znak niedozwolony.",
       "additionalProperties": false,
-      "required": ["days", "title", "none", "set", "change", "example", "lead", "rules", "every", "next", "label", "button", "done", "same", "taken", "takenByAccount", "locked", "length", "sign", "invisible", "alphabet", "start", "end", "refused", "hint", "hintSet", "hintSeen"],
+      "required": ["days", "title", "none", "set", "change", "example", "lead", "rules", "every", "next", "label", "button", "done", "same", "taken", "takenByAccount", "locked", "length", "sign", "invisible", "alphabet", "start", "end", "refused", "reserved", "login", "hint", "hintSet", "hintSeen"],
       "properties": {
         "days": { "type": "integer", "minimum": 1, "description": "Najwyżej jedna zmiana nazwy konta na tyle dni." },
         "title": { "type": "string", "minLength": 1 },
@@ -114,6 +114,8 @@
         "start": { "type": "string", "minLength": 1 },
         "end": { "type": "string", "minLength": 1 },
         "refused": { "type": "string", "minLength": 1 },
+        "reserved": { "type": "string", "minLength": 1, "description": "Nazwa jak słowa znaczników ról czatu (admin, moderator) albo Systemu (names.js RESERVED)." },
+        "login": { "type": "string", "minLength": 1, "description": "Nazwa konta jak login tego konta: czat pokazuje ją wszystkim." },
         "hint": { "type": "string", "minLength": 1 },
         "hintSet": { "type": "string", "minLength": 1 },
         "hintSeen": { "type": "string", "minLength": 1 }

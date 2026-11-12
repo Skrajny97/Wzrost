@@ -3,7 +3,6 @@
 
 import {
   blockedName,
-  nameLook,
   createRng,
   areaFor,
   autoDistribute,
@@ -126,7 +125,7 @@ import { t } from './i18n.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
 import { marketRemoval } from './market.js';
 import { mercenaryBusy, mercenaryPlace, mercenaryRules, serviceEnded } from './mercenaries.js';
-import { ACCOUNT_NAMES, looksTaken, nameKey, validateName } from './names.js';
+import { ACCOUNT_NAMES, ALL_CHARACTERS, looksTaken, nameKey, validateName } from './names.js';
 import { championOf } from './guild-fame.js';
 import { fameNotice } from './fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
@@ -151,24 +150,13 @@ const accountNameTaken = async (db, name, userId) =>
 const accountNameError = () => new ApiError(409, 'name_taken', content().chat.accounts.takenByAccount);
 
 // Throws when the name looks like another character's: the same letters
-// but for some of another alphabet that look alike, or a dotless ı
-// (names.js nameLook). Names of one alphabet that differ are told apart by
-// the unique key. Whichever of the two came first (the code review of
+// but for some signs that look alike, of another alphabet, a digit or a
+// capital I (names.js lookKey). Names that differ are told apart by the
+// unique key. Whichever of the two came first (the code review of
 // 12.11.2026: a Latin "Sasha" went through beside a Cyrillic one made
-// before it, and a Greek name beside a Cyrillic one): the names that may
-// look like it are those of plain letters that read as its look, and those
-// of as many letters with a letter outside plain Latin, whose looks are
-// compared here.
+// before it, and a Greek name beside a Cyrillic one).
 async function refuseLookAlike(db, name, except = 0) {
-  const look = nameLook(name);
-  const { results } = await db
-    .prepare(
-      `SELECT name FROM characters WHERE role IN ('player', 'aside') AND id != ?
-         AND (name_key = ? OR (length(name) = ? AND name GLOB '*[^ -~]*'))`,
-    )
-    .bind(except, look, [...name].length)
-    .all();
-  if (results.some((row) => nameLook(row.name) === look)) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');
+  if (await looksTaken(db, ALL_CHARACTERS, name, [except])) throw new ApiError(409, 'name_taken', 'To imię nosi już inna postać w grze. Wybierz inne.');
 }
 
 // The character the account plays, with all it has, or null.

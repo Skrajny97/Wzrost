@@ -7,6 +7,7 @@ import { ApiError, request } from './api.js';
 import { clear, h } from './dom.js';
 import { t } from './i18n.js';
 import { narratorIdle } from './narrator.js';
+import { passwordField } from './password.js';
 import { rod, roll, stopRoll } from './parchment.js';
 import { playSound } from './sound.js';
 import { state } from './state.js';
@@ -47,12 +48,29 @@ async function freshUser() {
   return user;
 }
 
-// Sends a link, to a new address if one is given; returns the address.
-async function sendLink(email) {
-  const answer = await request('POST', '/api/auth/email', email === undefined ? {} : { email });
+// Sends a link, to a new address if one is given, with the account's
+// password for a new one; returns the address.
+async function sendLink(email, password) {
+  const answer = await request('POST', '/api/auth/email', email === undefined ? {} : { email, ...(password && { password }) });
   state.user = { ...state.user, email: answer.email };
   playSound('system');
   return answer.email;
+}
+
+// The account's password, which a new address needs (the server's
+// email.js): a field shown under the address only while it is another
+// than the account's, and never for an account without a password (one
+// made with Google).
+function passwordForNew(id, emailInput) {
+  if (!state.user?.password) return { element: null, value: () => undefined, sync: () => {} };
+  const field = passwordField(id, t('Obecne hasło'), 'current-password', t('Nowy adres wymaga hasła do konta.'));
+  const isNew = () => emailInput.value.trim().toLowerCase() !== (state.user.email ?? '').toLowerCase();
+  const sync = () => {
+    field.element.hidden = !isNew();
+  };
+  emailInput.addEventListener('input', sync);
+  sync();
+  return { element: field.element, value: () => (isNew() ? field.input.value : undefined), sync };
 }
 
 // The address field, filled with the account's e-mail when it has one.
@@ -108,6 +126,7 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
   document.addEventListener('visibilitychange', onVisible);
 
   const input = emailField('confirm-email');
+  const password = passwordForNew('confirm-password', input);
   const change = h(
     'form',
     {
@@ -119,7 +138,7 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
         withButton(event.submitter ?? event.currentTarget.querySelector('button'), async () => {
           showError('');
           try {
-            await sendLink(input.value);
+            await sendLink(input.value, password.value());
             describe();
             change.hidden = true;
             toast(t('Link został wysłany na adres {email}.', { email: state.user.email }));
@@ -130,6 +149,7 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
       },
     },
     h('div', { class: 'field' }, h('label', { for: 'confirm-email', text: t('Nowy adres e-mail') }), input),
+    password.element,
     h('button', { type: 'submit', class: 'button button--system', text: t('Zapisz i wyślij link') }),
   );
 
@@ -160,6 +180,7 @@ export function renderConfirm(panel, { onConfirmed, onLogout, unsent = false }) 
       text: t('Zmień adres e-mail'),
       onClick: () => {
         change.hidden = !change.hidden;
+        password.sync();
         if (!change.hidden) input.focus();
       },
     }),
@@ -218,6 +239,7 @@ export function showInvite() {
 
 function drawAsk(page) {
   const input = emailField('invite-email');
+  const password = passwordForNew('invite-password', input);
   const error = h('p', { class: 'form-error', role: 'alert', hidden: true });
   clear(page);
   page.append(
@@ -233,7 +255,7 @@ function drawAsk(page) {
           withButton(event.submitter ?? event.currentTarget.querySelector('button[type="submit"]'), async () => {
             error.hidden = true;
             try {
-              const email = await sendLink(input.value);
+              const email = await sendLink(input.value, password.value());
               drawSent(page, email);
             } catch (failure) {
               error.textContent = failure instanceof ApiError ? failure.message : t('Nie udało się wysłać linku. Spróbuj ponownie.');
@@ -244,6 +266,7 @@ function drawAsk(page) {
       },
       h('label', { class: 'email-invite-label', for: 'invite-email', text: t('Adres e-mail') }),
       input,
+      password.element,
       error,
       h(
         'div',

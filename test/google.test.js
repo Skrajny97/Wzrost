@@ -261,6 +261,21 @@ describe('Google sign-in', () => {
     assert.equal((await users()).length, 2);
   });
 
+  test('an account linked to Google keeps that link: another Google account does not take its place', async () => {
+    // Whoever found the game open on someone's phone could link their own
+    // Google in place of the owner's and open the account with it also
+    // after a new password (the security review of 12.11.2026).
+    const owner = await signUp('karol');
+    assert.equal((await signIn(codeFor(claims('google-karol')), { cookie: owner.cookie, mode: 'link' })).location, '/?google=rewarded');
+    const stranger = await signIn(codeFor(claims('google-obcy')), { cookie: owner.cookie, mode: 'link' });
+    assert.equal(stranger.location, '/?google=other');
+    assert.equal((await users())[0].google_sub, 'google-karol');
+    // The same Google account again is no change.
+    assert.equal((await signIn(codeFor(claims('google-karol')), { cookie: owner.cookie, mode: 'link' })).location, '/?google=linked');
+    // The stranger's Google opens no account of the owner's: it makes its own.
+    assert.equal((await signIn(codeFor(claims('google-obcy')))).location, '/?google=created');
+  });
+
   test('an account with test mode opens only with Google once linked, and its other sessions end', async () => {
     const first = await signUp('szef');
     const second = await call('POST', '/api/auth/login', { body: { identifier: 'szef', password: 'tajnehaslo1' } });

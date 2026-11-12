@@ -204,13 +204,24 @@ async function createGoogleUser(db, identity, now) {
 
 // Links the Google account to the player's account, with the Punkty
 // Systemu the account has not had yet (rewardStatements); returns how it
-// went: "rewarded" when it brought them.
+// went: "rewarded" when it brought them, "other" for an account linked to
+// another Google account already, which stays linked to it (the security
+// review of 12.11.2026: whoever found the game open on someone's phone
+// could put their own Google in its place, and open the account with it
+// also after a new password).
 async function linkGoogle(db, env, session, { sub, email }, now) {
   const owner = await userByGoogle(db, sub);
   if (owner && owner.id !== session.userId) return 'taken';
-  const before = await db.prepare('SELECT email_rewarded_at FROM users WHERE id = ?').bind(session.userId).first();
+  const before = await db.prepare('SELECT email_rewarded_at, google_sub FROM users WHERE id = ?').bind(session.userId).first();
+  if (before?.google_sub && before.google_sub !== sub) return 'other';
   try {
-    await db.batch([db.prepare('UPDATE users SET google_sub = ? WHERE id = ?').bind(sub, session.userId), ...rewardStatements(db, session.userId, now)]);
+    // Over no other Google account linked a moment ago either (the
+    // Punkty Systemu are the account's once, whichever way they come).
+    const [linked] = await db.batch([
+      db.prepare('UPDATE users SET google_sub = ? WHERE id = ? AND (google_sub IS NULL OR google_sub = ?)').bind(sub, session.userId, sub),
+      ...rewardStatements(db, session.userId, now),
+    ]);
+    if (linked.meta.changes !== 1) return 'other';
   } catch (error) {
     // Linked to another account a moment ago.
     if (String(error?.message).includes('users.google_sub')) return 'taken';

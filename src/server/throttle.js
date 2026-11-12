@@ -63,6 +63,13 @@ export function clientOf(request) {
 export const takeRegistration = (db, client, now) =>
   countOne(db, { table: 'registration_counts', key: 'client', count: 'registrations' }, client, now, REGISTRATIONS_PER_DAY, DAY_MS);
 
+// Asks for a "Nie pamiętam hasła" link from one network a day (password.js),
+// counted like the registrations: enough for a household's forgotten
+// passwords, not for a script sending mails to one player after another.
+export const FORGOT_PER_DAY = 20;
+export const takeForgot = (db, client, now) =>
+  countOne(db, { table: 'forgot_counts', key: 'client', count: 'asks' }, client, now, FORGOT_PER_DAY, DAY_MS);
+
 export async function clearLoginFailures(db, identifier) {
   await db.prepare('DELETE FROM login_failures WHERE identifier = ?').bind(identifier).run();
 }

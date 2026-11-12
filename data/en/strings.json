@@ -2794,5 +2794,10 @@
   "Ustaw hasło": "Set password",
   "Zapisuję…": "Saving…",
   "Rozumiem": "Got it",
-  "Konto zmieniło się w międzyczasie. Spróbuj jeszcze raz.": "The account changed in the meantime. Try once more."
+  "Konto zmieniło się w międzyczasie. Spróbuj jeszcze raz.": "The account changed in the meantime. Try once more.",
+  "To konto w grze jest już połączone z innym kontem Google.": "This game account is already linked to another Google account.",
+  "Nowy adres wymaga hasła do konta.": "A new address needs the account's password.",
+  "Podaj obecne hasło, by zmienić adres e-mail.": "Enter your current password to change the e-mail address.",
+  "To imię jest zastrzeżone. Wybierz inne.": "This name is reserved. Choose another one.",
+  "Z tej sieci poproszono dziś już o wiele linków. Spróbuj ponownie za {hours} h.": "Many links have been asked for from this network today. Try again in {hours} h."
 }

@@ -25,7 +25,7 @@ import { ApiError, json, readJson } from './http.js';
 import { accountLanguage, t } from './i18n.js';
 import { hashPassword, verifyPassword } from './passwords.js';
 import { requireSession } from './sessions.js';
-import { clearLoginFailures, takeLoginAttempt } from './throttle.js';
+import { clearLoginFailures, clientOf, takeForgot, takeLoginAttempt } from './throttle.js';
 
 const RESET_TTL_MS = 3600000;
 const MAX_IDENTIFIER = 254;
@@ -38,6 +38,30 @@ const tooManyTries = (blockedFor) =>
     'Retry-After': String(Math.ceil(blockedFor / 1000)),
   });
 
+// The account's password now, as "Zmień hasło" and a new e-mail address
+// (email.js requestLink) ask for it: a wrong one counts toward the login's
+// failed tries (throttle.js), as at the login. The account's id, login and
+// password hash, or an error.
+export async function checkCurrentPassword(db, userId, current, now) {
+  const user = await db.prepare('SELECT id, login, password_hash FROM users WHERE id = ?').bind(userId).first();
+  if (!user || user.password_hash === NO_PASSWORD) throw noPassword();
+  const throttleKey = user.login.toLowerCase();
+  const blockedFor = await takeLoginAttempt(db, throttleKey, now);
+  if (blockedFor !== null) throw tooManyTries(blockedFor);
+  if (typeof current !== 'string' || [...current].length > MAX_PASSWORD || !(await verifyPassword(current, user.password_hash))) {
+    throw new ApiError(403, 'wrong_password', 'Obecne hasło się nie zgadza.');
+  }
+  await clearLoginFailures(db, throttleKey);
+  return user;
+}
+
+// The account's phones that get its notifications (push.js): none after a
+// new password, so a phone of someone the account was taken back from gets
+// them no more (the security review of 12.11.2026). The player's own
+// phones sign up again as the game opens there (push.js syncPush in the
+// page), this one at once.
+const forgetPhones = (db, userId) => db.prepare('DELETE FROM push_subscriptions WHERE user_id = ?').bind(userId);
+
 // POST /api/auth/password { current, password }: the account's password
 // changed, its other sessions ended (this one stays). A wrong password now
 // counts toward the login's failed tries (throttle.js), as at the login.
@@ -45,17 +69,8 @@ export async function changePassword(context) {
   const session = await requireSession(context);
   const db = context.env.DB;
   const body = await readJson(context.request);
-  const current = typeof body.current === 'string' ? body.current : '';
   const next = validatePassword(body.password);
-  const user = await db.prepare('SELECT id, login, password_hash FROM users WHERE id = ?').bind(session.userId).first();
-  if (!user || user.password_hash === NO_PASSWORD) throw noPassword();
-  const throttleKey = user.login.toLowerCase();
-  const blockedFor = await takeLoginAttempt(db, throttleKey, context.now);
-  if (blockedFor !== null) throw tooManyTries(blockedFor);
-  if ([...current].length > MAX_PASSWORD || !(await verifyPassword(current, user.password_hash))) {
-    throw new ApiError(403, 'wrong_password', 'Obecne hasło się nie zgadza.');
-  }
-  await clearLoginFailures(db, throttleKey);
+  const user = await checkCurrentPassword(db, session.userId, body.current ?? '', context.now);
   await atomically(
     db,
     [
@@ -65,6 +80,7 @@ export async function changePassword(context) {
       db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').bind(await hashPassword(next), user.id),
       db.prepare('DELETE FROM sessions WHERE user_id = ? AND id != ?').bind(user.id, session.id),
       db.prepare('DELETE FROM password_resets WHERE user_id = ?').bind(user.id),
+      forgetPhones(db, user.id),
     ],
     () => new ApiError(409, 'changed', 'Hasło zmieniło się w międzyczasie. Spróbuj jeszcze raz.'),
   );
@@ -131,6 +147,17 @@ export async function forgotPassword(context) {
   const identifier = typeof body.identifier === 'string' ? body.identifier.trim() : '';
   if (!identifier || identifier.length > MAX_IDENTIFIER) throw new ApiError(400, 'missing_identifier', 'Podaj login albo adres e-mail konta.');
   const db = context.env.DB;
+  // At most so many asks from one network a day, whatever the accounts
+  // (throttle.js; the security review of 12.11.2026: a script naming one
+  // account after another sent each of their owners five mails a day).
+  const client = clientOf(context.request);
+  const blockedFor = client === null ? null : await takeForgot(db, client, context.now);
+  if (blockedFor !== null) {
+    const hours = Math.ceil(blockedFor / 3600000);
+    throw new ApiError(429, 'too_many_resets', `Z tej sieci poproszono dziś już o wiele linków. Spróbuj ponownie za ${hours} h.`, {
+      'Retry-After': String(Math.ceil(blockedFor / 1000)),
+    });
+  }
   const user = await accountOf(db, identifier);
   if (user && user.email && user.email_confirmed_at !== null && user.password_hash !== NO_PASSWORD) {
     await sendResetLink(context.env, user, new URL(context.request.url).origin, context.now);
@@ -162,6 +189,7 @@ export async function resetPassword(context) {
       db.prepare('UPDATE users SET password_hash = ? WHERE id = ?').bind(await hashPassword(next), row.user_id),
       db.prepare('DELETE FROM sessions WHERE user_id = ?').bind(row.user_id),
       db.prepare('DELETE FROM password_resets WHERE user_id = ?').bind(row.user_id),
+      forgetPhones(db, row.user_id),
     ],
     resetInvalid,
   );
