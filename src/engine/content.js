@@ -264,6 +264,8 @@ export function buildContent(raw) {
     // The Labirynt Systemu (labyrinth.js) and the Rdzeń with its Artefakty
     // (core.js).
     labyrinth: raw.labyrinth ?? null,
+    // Talia Systemu, the Salon Gier's card game (cards.js).
+    cards: raw.cards ?? null,
     // The players' Gildie (src/server/guilds.js).
     guilds: raw.guilds ?? null,
     // The characters' Punkty Sławy (fame.js).

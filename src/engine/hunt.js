@@ -25,6 +25,7 @@
 
 import { challengeAt, combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
+import { cardDrop, cardDropText } from './cards.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { canUse, itemName, itemRank, itemView, randomItem } from './items.js';
 import { TIMED_KINDS, fightPotions } from './potions.js';
@@ -647,13 +648,17 @@ function settingOut(one, week, area, id, content) {
 // XP and gold, of the chance of a chest among the finds and of a champion's
 // chest, of the materials the creatures leave, and of the players' stats in
 // the fights; on a Drużyna's trip every member's is the same, as they set
-// out at once.
+// out at once. `cards`: Talia Systemu's cards (cards.js), where the game has
+// it on (the server's CARDS): { maxed: the creatures whose card the
+// character has at its top level }; each creature beaten may leave its card
+// (874 A), drawn from a seed of its own, so the rest of the exploration goes
+// as it would without it. Null: no cards.
 /**
  * @param {Record<string, any>} options
  * @param {Content} content
  */
 export function simulateHunt(
-  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null, seat = null, hard = false, week = null },
+  { character, equipped, hp, name, areaId, minutes, seed, lootSeed = null, roster = null, self = null, first = false, avoidRare = false, seekRare = false, rumor = 1, rareMore = 0, materialsMore = 0, tracked = [], unknown = [], met = null, potions = {}, healBelow, buffs = {}, speed = null, trophies = {}, companions = [], partners = [], blessing = null, scouted = null, wanted = null, seat = null, hard = false, week = null, cards = null },
   content,
 ) {
   // A Drużyna's trip (src/server/trips.js) gives `roster`, its players in
@@ -822,6 +827,11 @@ export function simulateHunt(
   const own = Boolean(sought) && sought.own !== false;
   const wantedRng = /** @type {Rng} */ (sought ? createRng(`${seed}:wanted`) : null);
   const sighting = { met: false, beaten: false };
+  // The cards the creatures left (cards.js): the member's own on a trip, as
+  // its loot, from its own seed.
+  const cardRng = cards && content.cards ? createRng(`${lootSeed ?? seed}:cards`) : null;
+  /** @type {string[]} */
+  const cardsFound = [];
   const told = (/** @type {string} */ text) => (sought ? gendered(text, sought.female ? 'female' : 'male') : text);
 
   for (const [step, event] of timeline.entries()) {
@@ -914,6 +924,8 @@ export function simulateHunt(
       gold: 0,
       materials: {},
       chests: [],
+      // Talia Systemu's cards the creatures left, with `cards` only.
+      ...(cardRng && { cards: /** @type {string[]} */ ([]) }),
       recovered: 0,
       allies: allies.map((unit) => combatantView(unit, enemies[0].level, content)),
       enemiesView: enemies.map((/** @type {Record<string, any>} */ enemy) => combatantView(enemy, ally.level, content)),
@@ -951,6 +963,13 @@ export function simulateHunt(
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * lootRng.float(0.5, 1.5) * goldFactor;
         const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials;
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, lootRng, content));
+        // A card of the creature (874 A), not of the wanted's target nor
+        // twice of one creature in an exploration.
+        const card = cardRng && !meeting ? cardDrop(enemy.monsterId, cardRng, { maxed: [...cards.maxed ?? [], ...cardsFound] }, content) : null;
+        if (card) {
+          summary.cards.push(card);
+          cardsFound.push(card);
+        }
       }
       materials = addCounts(materials, summary.materials);
       // A character without a weapon, and with none found yet, finds a chest
@@ -993,6 +1012,7 @@ export function simulateHunt(
       if (Object.keys(summary.materials).length > 0) {
         lines.push(say(texts, 'materials', step, { materials: materialsText(summary.materials, content) }));
       }
+      for (const card of summary.cards ?? []) lines.push(cardDropText(card, step, content));
       for (const [item, text] of chests) lines.push(text ? say(texts, text, step, { item: itemName(item, content) }) : say(rules.texts, 'loot', step, { item: itemName(item, content) }));
       if (trophy) {
         summary.materials = addCounts(summary.materials, trophy);
@@ -1042,6 +1062,8 @@ export function simulateHunt(
     materials,
     timePoints,
     items,
+    // Talia Systemu's cards the creatures left (cards.js), with `cards` only.
+    ...(cardRng && { cards: cardsFound }),
     hpStart,
     hpEnd: me.hp,
     maxHp: me.unit.maxHp,
@@ -1091,7 +1113,8 @@ export function faintForfeit(hunt) {
     timePoints: 0,
     items: [],
     herbs: {},
-    fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({ ...fight, chests: [] })),
+    ...(hunt.cards && { cards: [] }),
+    fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({ ...fight, chests: [], ...(fight.cards && { cards: [] }) })),
     ...(hunt.wanted && { wanted: { ...hunt.wanted, beaten: false } }),
   };
 }

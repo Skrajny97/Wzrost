@@ -41,6 +41,7 @@ import { assertion, atomically, raced } from './atomic.js';
 import { bagPlaces, characterView, engineCharacter, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
+import { cardsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { numberText } from './i18n.js';
 import { guildTagSql } from './guilds.js';
@@ -168,6 +169,8 @@ async function casinoView(db, player, stored, wheel, stake, now) {
     texts,
     // The games on the screen: the Wheel turning, the ticket into the drum.
     show: tuning().show,
+    // Talia Systemu's tab "Karty" (cards.js), where the game has it on.
+    cards: cardsOn() && Boolean(content().cards),
     lottery: await lotteryView(db, player.row, now),
     wheel: {
       name: tuned.name,

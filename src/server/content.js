@@ -47,6 +47,7 @@ import settlement from '../../data/settlement.json' with { type: 'json' };
 import towers from '../../data/towers.json' with { type: 'json' };
 import portals from '../../data/portals.json' with { type: 'json' };
 import labyrinth from '../../data/labyrinth.json' with { type: 'json' };
+import cards from '../../data/cards.json' with { type: 'json' };
 import guilds from '../../data/guilds.json' with { type: 'json' };
 import cosmetics from '../../data/cosmetics.json' with { type: 'json' };
 import weeks from '../../data/weeks.json' with { type: 'json' };
@@ -90,6 +91,7 @@ import enTexts from '../../data/en/texts.json' with { type: 'json' };
 import enTowers from '../../data/en/towers.json' with { type: 'json' };
 import enPortals from '../../data/en/portals.json' with { type: 'json' };
 import enLabyrinth from '../../data/en/labyrinth.json' with { type: 'json' };
+import enCards from '../../data/en/cards.json' with { type: 'json' };
 import enTutorial from '../../data/en/tutorial.json' with { type: 'json' };
 import enUnlocks from '../../data/en/unlocks.json' with { type: 'json' };
 import enWeeks from '../../data/en/weeks.json' with { type: 'json' };
@@ -129,6 +131,7 @@ const polishData = {
   towers,
   portals,
   labyrinth,
+  cards,
   guilds,
   cosmetics,
   fame,
@@ -180,6 +183,7 @@ export const OVERLAYS = {
     tutorial: enTutorial,
     portals: enPortals,
     labyrinth: enLabyrinth,
+    cards: enCards,
     unlocks: enUnlocks,
     weeks: enWeeks,
   },

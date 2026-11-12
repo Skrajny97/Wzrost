@@ -109,6 +109,7 @@ import {
 } from './testing.js';
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
+import { getCards, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter } from './cards.js';
 import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
 import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, trainCompanion, unequipCompanion, upgradeCompanionItem } from './settlement.js';
@@ -332,6 +333,14 @@ const routes = [
   ['POST', '/api/settlement/arena/claim', claimArenaReward],
   ['POST', '/api/settlement/casino/ticket', buyTicket],
   ['POST', '/api/settlement/casino/spin', spinCasinoWheel],
+  // Talia Systemu, the Salon Gier's card game (cards.js; 871–877), where
+  // CARDS is on.
+  ['GET', '/api/cards', getCards],
+  ['POST', '/api/cards/starter', takeStarter],
+  ['POST', '/api/cards/deck', saveDeck],
+  ['POST', '/api/cards/match', startMatch],
+  ['POST', '/api/cards/turn', playCardTurn],
+  ['POST', '/api/cards/surrender', surrenderCards],
   ['GET', '/api/test/settlement', settlementTests],
   ['POST', '/api/test/settlement', testSettlement],
   ['GET', '/api/chat', readChat],
