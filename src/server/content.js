@@ -281,7 +281,7 @@ export function publicContent() {
   const data = dataIn(language());
   return {
     stats: game.stats.map(({ id, name, combat }) => ({ id, name, effect: combat })),
-    classes: game.classes.map(({ id, name, short, role, start, description, position }) => ({
+    classes: game.classes.map(({ id, name, short, role, start, description, position, autoPoints }) => ({
       id,
       name,
       short,
@@ -289,6 +289,12 @@ export function publicContent() {
       start,
       description,
       position,
+      // The attributes of its path ("Rozdaj według klasy"), the main one
+      // first, which the verdict on items counts (pathItem in preview.js).
+      path: Object.entries(autoPoints ?? {})
+        .filter(([, weight]) => weight > 0)
+        .sort((a, b) => b[1] - a[1])
+        .map(([stat]) => stat),
     })),
     // The words of the class evolutions' choice and ceremony, and the
     // picture behind the Ewolucja tab's heading.

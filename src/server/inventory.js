@@ -10,6 +10,7 @@ import {
   equipBlock,
   gearSetIds,
   valueChanges,
+  gearVerdict,
   heldOfRarity,
   itemName,
   missingFor,
@@ -289,8 +290,9 @@ export async function sellItem(context) {
 }
 
 // What wearing the item (or taking it off) would change: the combat values the
-// stats screen shows, now and after, each change as the game shows it and the
-// verdict on them all (valueChanges in preview.js).
+// stats screen shows, now and after, each change as the game shows it, and
+// the verdict along the class's proposed path of points (gearVerdict in
+// preview.js), with the path's attributes for the card's note.
 export async function previewItem(context) {
   const { player } = await requirePlayer(context);
   const item = findItem(player, context.params.id);
@@ -314,7 +316,8 @@ export async function previewItem(context) {
     equipped: Boolean(item.equippedSlot),
     now: view(nowValues),
     after: view(afterValues),
-    ...valueChanges(nowValues, afterValues),
+    changes: valueChanges(nowValues, afterValues).changes,
+    verdict: gearVerdict(character, worn, after, content()),
   });
 }
 

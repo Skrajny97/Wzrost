@@ -6,6 +6,7 @@
 import { playerCombatant } from './combatant.js';
 import { evolutionOf } from './evolutions.js';
 import { cappedChance, reduction } from './formulas.js';
+import { upgradedItem } from './items.js';
 import { regenPerMinute } from './progression.js';
 import { computeStats } from './stats.js';
 
@@ -182,8 +183,108 @@ export function valueChanges(now, after) {
   return { changes, verdict: up && down ? 'mixed' : up ? 'better' : down ? 'worse' : 'same' };
 }
 
-// What putting an item on changes, in place of what its slot holds. `now`:
-// the values as worn, when they are counted already.
+// The verdict follows the class's proposed spread of points (autoPoints,
+// the path of "Rozdaj według klasy"; a player's note, the author
+// 12.11.2026: "celna uwaga"). An item's attributes count by their sum
+// weighted by the path (pathScore), so two items compare by the weighted
+// average of their main attributes and an attribute the class puts no
+// points into (the Mądrość of a Wojownik) counts for nothing. Damage, armor
+// and resistances count by the combat values they change, the attributes
+// left out of those (bareItem).
+
+/**
+ * @param {string} classId
+ * @param {Content} content
+ * @returns {Record<string, number>}
+ */
+const pathWeights = (classId, content) => content.classesById[classId]?.autoPoints ?? {};
+
+// An item for the verdict: its numbers final (its upgrade and gem in them),
+// without its attributes, and with `pathScore`, their sum weighted by the
+// class's path.
+/**
+ * @param {Item} item
+ * @param {string} classId
+ * @param {Content} content
+ * @returns {Item}
+ */
+export function bareItem(item, classId, content) {
+  const weights = pathWeights(classId, content);
+  const final = upgradedItem(item, content);
+  let pathScore = 0;
+  // Whether a property stays: anything but an attribute, which goes to the score.
+  /** @param {{ stat?: string, value?: number }} property */
+  const stays = (property) => {
+    if (!property.stat || !content.statIds.includes(property.stat)) return true;
+    pathScore += (weights[property.stat] ?? 0) * (property.value ?? 0);
+    return false;
+  };
+  const implicit = final.implicit && stays(final.implicit) ? final.implicit : null;
+  const imbue = final.imbue && stays(final.imbue) ? final.imbue : null;
+  const affixes = final.affixes.filter(stays);
+  return { ...final, upgrade: 0, gem: null, implicit, imbue, affixes, pathScore };
+}
+
+// The gear for the verdict (bareItem), for the character's class.
+/**
+ * @param {Character} character
+ * @param {Item[]} equipped
+ * @param {Content} content
+ * @returns {Item[]}
+ */
+export const pathGear = (character, equipped, content) => equipped.map((item) => bareItem(item, character.classId, content));
+
+/** @param {Item[]} items */
+const scoreOf = (items) => items.reduce((sum, item) => sum + item.pathScore, 0);
+
+// The verdict from the change in the path's score and the changes in the
+// combat values without the attributes: "better" when something goes up and
+// nothing down, "worse" the other way, "mixed" for both, "same" for none.
+/**
+ * @param {number} score
+ * @param {Record<string, number>} changes
+ */
+function verdictOf(score, changes) {
+  const values = Object.values(changes);
+  const up = score > 0 || values.some((change) => change > 0);
+  const down = score < 0 || values.some((change) => change < 0);
+  return up && down ? 'mixed' : up ? 'better' : down ? 'worse' : 'same';
+}
+
+// The verdict on the gear `after` in place of `before`, along the class's
+// path.
+/**
+ * @param {Character} character
+ * @param {Item[]} before
+ * @param {Item[]} after
+ * @param {Content} content
+ */
+export function gearVerdict(character, before, after, content) {
+  const was = pathGear(character, before, content);
+  const will = pathGear(character, after, content);
+  return verdictOf(scoreOf(will) - scoreOf(was), valueChanges(combatValues(character, was, content), combatValues(character, will, content)).changes);
+}
+
+// The verdict on putting `item` on in place of what its slot holds, along
+// the class's path. `pathWorn` and `pathNow`: the worn gear for the verdict
+// (pathGear) and its values, counted once for a whole bag.
+/**
+ * @param {Character} character
+ * @param {Item} item
+ * @param {Content} content
+ * @param {Item[]} pathWorn
+ * @param {CombatValues} [pathNow]
+ */
+export function equipVerdict(character, item, content, pathWorn, pathNow = combatValues(character, pathWorn, content)) {
+  const others = pathWorn.filter((candidate) => candidate.slot !== item.slot);
+  const leaving = scoreOf(pathWorn.filter((candidate) => candidate.slot === item.slot));
+  const coming = bareItem(item, character.classId, content);
+  return verdictOf(coming.pathScore - leaving, valueChanges(pathNow, combatValues(character, [...others, coming], content)).changes);
+}
+
+// What putting an item on changes, in place of what its slot holds: every
+// combat value as the game shows it, and the verdict for the class's path
+// (equipVerdict). `now`: the values as worn, when they are counted already.
 /**
  * @param {Character} character
  * @param {Item[]} equipped
@@ -193,5 +294,6 @@ export function valueChanges(now, after) {
  */
 export function equipChange(character, equipped, item, content, now = combatValues(character, equipped, content)) {
   const worn = equipped.filter((candidate) => candidate.slot !== item.slot);
-  return valueChanges(now, combatValues(character, [...worn, item], content));
+  const { changes } = valueChanges(now, combatValues(character, [...worn, item], content));
+  return { changes, verdict: equipVerdict(character, item, content, pathGear(character, equipped, content)) };
 }

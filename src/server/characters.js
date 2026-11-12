@@ -48,7 +48,8 @@ import {
   craftTakes,
   currentQuests,
   effectText,
-  equipChange,
+  equipVerdict,
+  pathGear,
   challengeAt,
   evolutionPanel,
   fireTrade,
@@ -1509,10 +1510,13 @@ export function characterView(player, now) {
   });
   const toItem = (item) => ({ ...itemOf(item), ...(favorites.has(item.id) && { favorite: true }) });
   // Whether a bag item would make the character stronger in place of what
-  // its slot holds (preview.js), for the marks on the bag and on finds; null
-  // for an item the class cannot wear.
+  // its slot holds, along the class's proposed path of points (equipVerdict
+  // in preview.js), for the marks on the bag and on finds; null for an item
+  // the class cannot wear.
+  const pathWorn = pathGear(character, equipped, content());
+  const pathNow = combatValues(character, pathWorn, content());
   const verdict = (item) =>
-    canUse(item.base, row.class_id, content()) && !content().slotsById[item.slot].locked ? equipChange(character, equipped, item, content(), values).verdict : null;
+    canUse(item.base, row.class_id, content()) && !content().slotsById[item.slot].locked ? equipVerdict(character, item, content(), pathWorn, pathNow) : null;
   const { gold, ...resources } = walletOf(row);
   const weapon = combatant.weapon;
   const cosmetics = JSON.parse(row.cosmetics ?? '{}');
