@@ -1,0 +1,14 @@
+{
+  "id": "bow-master-female-cloak",
+  "tool": "pixellab inpaint-v3",
+  "description": "pixel art, a long dark green cloak with a thin silver trim hanging from the shoulders behind a female archer down to her calves, seen from the front, the cloak's inner side a darker green, soft vertical folds, the same dark outline, shading and pixel art style as the figure, only the cloak behind the figure, nothing else",
+  "style": "art/references/evolutions/master-hunter-female.png",
+  "input": "art/inputs/portraits/bow-master-female.png",
+  "mask": "art/inputs/portraits/bow-master-female-cloak-mask.png",
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
