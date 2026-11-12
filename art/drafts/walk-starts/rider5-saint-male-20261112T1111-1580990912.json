@@ -1,0 +1,19 @@
+{
+  "id": "rider5-saint-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the saint of the reference picture riding: the same short dark brown curly hair and short dark brown beard, the same thin golden halo ring behind the head, the same long white robe with the golden belt and the golden embroidery at the hem, the same pale gold cloak with golden trim hanging behind from the shoulders, brown shoes, nothing in the hands but the reins, no staff and no dove; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the thigh lying forward and level from the hip to the knee under the robe, the lower leg hanging straight down from the knee with the skirt of the robe falling straight down along it to the ankle, one whole foot in a brown shoe below the hem with the toes pointing right; the far leg completely hidden and not drawn at all, no second shoe and no second foot; the whole figure from the top of the halo to the sole of the foot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/saint-male.png",
+      "usage": "the character's look: this same man, his face, hair, beard, halo, robe, belt, cloak and colours, drawn the same way; not his standing pose and not the staff in his hand"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
