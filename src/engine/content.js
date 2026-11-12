@@ -1,24 +1,49 @@
+// @ts-check
 // Turns the raw data files into lookups used by the engine. Pure: the caller
 // loads the JSON (the Worker bundles it, tools read it from disk).
+
+/** @typedef {Record<string, any>} Raw The data files by name, as loaded. */
+/** @typedef {Record<string, any>} Entry An entry of a data file's list. */
 
 // A lookup without the object prototype, so an id from a request such as
 // "constructor" or "toString" finds nothing in it (the code review: free stat
 // points through `{"points": {"constructor": 1}}`).
+/**
+ * @param {Iterable<readonly any[]>} entries
+ * @returns {Record<string, any>}
+ */
 const lookup = (entries) => Object.assign(Object.create(null), Object.fromEntries(entries));
+/**
+ * @param {Entry[]} list
+ * @returns {Record<string, any>}
+ */
 const byId = (list) => lookup(list.map((item) => [item.id, item]));
 
 // The evolutions with their stage: 1 for the first, chosen at the first
 // class level of balance.progression.classEvolutionLevels, 2 for the second
 // form that grows out of one (`from`), at the second.
+/**
+ * @param {Raw} raw
+ * @returns {Entry[]}
+ */
 function stagedEvolutions(raw) {
+  /** @type {Entry[]} */
   const list = raw.evolutions?.evolutions ?? [];
   const byOwnId = new Map(list.map((evolution) => [evolution.id, evolution]));
-  const stageOf = (evolution) => (evolution.from && byOwnId.has(evolution.from) ? stageOf(byOwnId.get(evolution.from)) + 1 : 1);
+  /**
+   * @param {Entry} evolution
+   * @returns {number}
+   */
+  const stageOf = (evolution) => (evolution.from && byOwnId.has(evolution.from) ? stageOf(/** @type {Entry} */ (byOwnId.get(evolution.from))) + 1 : 1);
   return list.map((evolution) => ({ ...evolution, stage: stageOf(evolution) }));
 }
 
 // The rules of each stage's skills and points: the first evolution's, then
 // the second forms' (data/evolutions.json, secondForms).
+/**
+ * @param {Raw} raw
+ * @returns {Entry[]}
+ */
 function stageRules(raw) {
   if (!raw.evolutions) return [];
   const { skillMaxLevel, lastPointClassLevel, pointsPerClassLevel, secondForms } = raw.evolutions;
@@ -28,11 +53,17 @@ function stageRules(raw) {
 // The evolutions' skills with what they take from their evolution: its class
 // and name (as a path), the class level of its stage and that stage's top
 // skill level.
+/**
+ * @param {Raw} raw
+ * @param {Entry[]} evolutions
+ * @param {Entry[]} stages
+ * @returns {Entry[]}
+ */
 function evolutionSkills(raw, evolutions, stages) {
   if (!raw.evolutions) return [];
   const byOwnId = byId(evolutions);
   const levels = raw.balance.progression.classEvolutionLevels;
-  return raw.evolutions.skills.map((skill) => {
+  return raw.evolutions.skills.map((/** @type {Entry} */ skill) => {
     const evolution = byOwnId[skill.evolution];
     const stage = evolution?.stage ?? 1;
     return {
@@ -50,8 +81,12 @@ function evolutionSkills(raw, evolutions, stages) {
 // what a character explores: it has its own levels and encounters, and takes
 // the safety and trait of its region, and its elite unless it has its own.
 // The region's champion lives in one area only.
+/**
+ * @param {Entry} region
+ * @returns {Entry[]}
+ */
 function areasOf(region) {
-  return region.areas.map((area) => ({
+  return region.areas.map((/** @type {Entry} */ area) => ({
     ...area,
     tough: area.tough ?? [],
     regionId: region.id,
@@ -67,9 +102,17 @@ function areasOf(region) {
 
 // The creatures living in an area, as on its list of dangers (areaDangers):
 // those of its encounters, its elite and its champion.
+/**
+ * @param {Entry} area
+ * @returns {Set<string>}
+ */
 const creaturesOf = (area) =>
-  new Set([...area.encounters, ...area.tough].flatMap((encounter) => encounter.monsters).concat(area.elite ?? [], area.champion ?? []));
+  new Set([...area.encounters, ...area.tough].flatMap((/** @type {Entry} */ encounter) => encounter.monsters).concat(area.elite ?? [], area.champion ?? []));
 
+/**
+ * @param {Raw} raw
+ * @returns {Record<string, any>}
+ */
 export function buildContent(raw) {
   const { prefixes, suffixes, names } = raw.affixes;
   const evolutions = stagedEvolutions(raw);
@@ -78,18 +121,21 @@ export function buildContent(raw) {
   // An item found in an area takes the names of its affixes from the
   // creatures living there: a prefix from those with an adjective, a suffix
   // from any of them.
+  /** @param {Set<string>} creatures */
   const affixNames = (creatures) => {
-    const here = names.filter((name) => creatures.has(name.monster));
+    /** @type {Entry[]} */
+    const here = names.filter((/** @type {Entry} */ name) => creatures.has(name.monster));
     return { prefix: here.filter((name) => name.prefix), suffix: here };
   };
-  const regions = raw.regions.map((region) => ({
+  /** @type {Entry[]} */
+  const regions = raw.regions.map((/** @type {Entry} */ region) => ({
     ...region,
     areas: areasOf(region).map((area) => ({ ...area, affixNames: affixNames(creaturesOf(area)) })),
   }));
   const areas = regions.flatMap((region) => region.areas);
   return {
     stats: raw.stats,
-    statIds: raw.stats.map((stat) => stat.id),
+    statIds: raw.stats.map((/** @type {Entry} */ stat) => stat.id),
     statsById: byId(raw.stats),
     elements: raw.elements,
     elementsById: byId(raw.elements),
@@ -106,7 +152,7 @@ export function buildContent(raw) {
     prefixes,
     suffixes,
     affixesById: byId([...prefixes, ...suffixes]),
-    affixNamesByMonster: lookup(names.map((name) => [name.monster, name])),
+    affixNamesByMonster: lookup(names.map((/** @type {Entry} */ name) => [name.monster, name])),
     // The creatures, and the foes of the events' fights (events.json), who
     // fight the same way but live in no region and have no Bestiariusz.
     monstersById: byId([...raw.monsters, ...(raw.events?.foes ?? [])]),
@@ -133,10 +179,10 @@ export function buildContent(raw) {
     // rozbiórki makes from materials and from taken-apart items, one per rarity.
     materials: raw.materials.materials,
     materialsById: byId(raw.materials.materials),
-    materialsByMonster: lookup(raw.materials.materials.map((material) => [material.monster, material])),
+    materialsByMonster: lookup(raw.materials.materials.map((/** @type {Entry} */ material) => [material.monster, material])),
     parts: raw.materials.parts,
     partsById: byId(raw.materials.parts),
-    partsByRarity: lookup(raw.materials.parts.map((part) => [part.rarity, part])),
+    partsByRarity: lookup(raw.materials.parts.map((/** @type {Entry} */ part) => [part.rarity, part])),
     appearances: raw.appearances ?? [],
     appearancesById: byId(raw.appearances ?? []),
     // The skin tones of the portrait and the one a new character starts with.
@@ -223,6 +269,6 @@ export function buildContent(raw) {
     residentsById: byId(raw.settlement?.residents ?? []),
     // The weeks of the year with their effects (weeks.js), by their number.
     weeks: raw.weeks ?? null,
-    weeksByNumber: lookup((raw.weeks?.weeks ?? []).map((week) => [week.number, week])),
+    weeksByNumber: lookup((raw.weeks?.weeks ?? []).map((/** @type {Entry} */ week) => [week.number, week])),
   };
 }
