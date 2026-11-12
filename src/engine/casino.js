@@ -1,3 +1,4 @@
+// @ts-check
 // The Salon Gier in the Osada (data/settlement.json, `casino`; the author on
 // 3.11.2026: "W Osadzie dodamy nowy budynek Salon Gier w średniowiecznym
 // klimacie", answers 523–526): Szczęsny's two games, each for the day of
@@ -38,24 +39,61 @@ import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { areaUnlocked } from './unlocks.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {{ level: number, classId: string, classLevel?: number, sellBonus?: number, tanneryPremium?: number }} Basis The character as the day's Wheel keeps it. */
+/** @typedef {{ kind: 'item', tier: string, item: Record<string, any> } | { kind: 'material' | 'resource', tier: string, key: string, count: number }} Prize A prize of the Wheel's pool. */
+/** @typedef {{ day: string, basis: Basis, won: number[] }} Wheel The character's Wheel of the day. */
+/** @typedef {{ prizes: Prize[], won: number[] }} Pool The day's pool and the places won in it. */
+/** @typedef {{ none: number, tiers: { id: string, chance: number }[] }} Odds A spin's chances at a stake. */
+/** @typedef {{ key: string, startsAt: number, endsAt: number }} Period A period of the quests' clock (quests.js). */
+/** @typedef {import('./rng.js').Rng} Rng */
+
+/**
+ * @param {Content} content
+ * @returns {Record<string, any>}
+ */
 const tuning = (content) => content.settlement.casino;
-const rarityIndex = (rarityId, content) => content.rarities.findIndex((rarity) => rarity.id === rarityId);
+/**
+ * @param {string} rarityId
+ * @param {Content} content
+ */
+const rarityIndex = (rarityId, content) => content.rarities.findIndex((/** @type {{ id: string }} */ rarity) => rarity.id === rarityId);
 
 // The day of both games: the narrator's day, from Polish midnight to the
 // next ({ key, startsAt, endsAt }).
-export const casinoDay = (now, content) => questPeriod('daily', now, content);
+/**
+ * @param {number} now
+ * @param {Content} content
+ * @returns {Period}
+ */
+export const casinoDay = (now, content) => /** @type {Period} */ (questPeriod('daily', now, content));
 
 // The Loteria's pot with `tickets` tickets of the day: the System's base and
 // every ticket's price (the author: "baza 100 sztuk złota"). It is paid only
 // when the day has a ticket.
+/**
+ * @param {number} tickets
+ * @param {Content} content
+ * @returns {number}
+ */
 export const lotteryPot = (tickets, content) => tuning(content).lottery.base + tuning(content).lottery.ticket * tickets;
 
 // The ticket that wins a day's draw among `count` (as the server lists them,
 // by character), from the draw's own seed; null with none.
+/**
+ * @param {number} count
+ * @param {string | number} seed
+ * @returns {number | null}
+ */
 export const lotteryWinner = (count, seed) => (count > 0 ? createRng(seed).int(0, count - 1) : null);
 
 // Why the character cannot buy today's ticket, or null: one a day, for its
 // price.
+/**
+ * @param {{ gold: number, has: boolean }} state
+ * @param {Content} content
+ * @returns {{ code: string, message: string } | null}
+ */
 export function ticketBlock({ gold, has }, content) {
   if (has) return { code: 'has_ticket', message: 'Masz już los na dziś. Następny kupisz jutro.' };
   if (gold < tuning(content).lottery.ticket) return { code: 'not_enough_gold', message: 'Brakuje złota na los.' };
@@ -66,10 +104,16 @@ export function ticketBlock({ gold, has }, content) {
 // lands (krainy) with an inner region open to its class, each with the
 // creatures of all its inner regions, elites and champions left out, as the
 // Garbarnia and the orders leave out their trophies. In the data's order.
+/**
+ * @param {{ classLevel?: number }} character
+ * @param {Content} content
+ * @returns {({ id: string, rarity: string } & Record<string, any>)[]}
+ */
 export function knownLandMaterials(character, content) {
-  const lands = new Set(content.areas.filter((area) => areaUnlocked(area, character.classLevel ?? 1, content)).map((area) => area.land));
+  const lands = new Set(content.areas.filter((/** @type {any} */ area) => areaUnlocked(area, character.classLevel ?? 1, content)).map((/** @type {{ land: string }} */ area) => area.land));
+  /** @type {Set<string>} */
   const known = new Set();
-  for (const area of content.areas.filter((one) => lands.has(one.land))) {
+  for (const area of content.areas.filter((/** @type {{ land: string }} */ one) => lands.has(one.land))) {
     for (const encounter of [...(area.encounters ?? []), ...(area.tough ?? [])]) {
       for (const monsterId of encounter.monsters) {
         const monster = content.monstersById[monsterId];
@@ -78,7 +122,7 @@ export function knownLandMaterials(character, content) {
       }
     }
   }
-  return content.materials.filter((material) => known.has(material.id));
+  return content.materials.filter((/** @type {{ id: string }} */ material) => known.has(material.id));
 }
 
 // What a prize is worth to the character, the most an NPC pays it for it:
@@ -86,8 +130,15 @@ export function knownLandMaterials(character, content) {
 // card says), for materials the Garbarnia's at the character's relation with
 // the tanner (the scrapper's price with the Skup and the tanner's premium),
 // for the camp's resources the Duch budowniczego's.
+/**
+ * @param {Prize} prize
+ * @param {{ sellBonus?: number, tanneryPremium?: number }} bonuses
+ * @param {Content} content
+ * @returns {number}
+ */
 export function prizeWorth(prize, { sellBonus = 0, tanneryPremium = 0 } = {}, content) {
-  if (prize.kind === 'item') return sellPrice(prize.item, content, sellBonus);
+  // items.js is not checked yet.
+  if (prize.kind === 'item') return sellPrice(/** @type {any} */ (prize.item), content, sellBonus);
   if (prize.kind === 'resource') {
     const spirit = builderSpirit(content);
     return spirit ? (prize.count * (spirit.gold[prize.key] ?? 0)) / spirit.lot : 0;
@@ -96,6 +147,11 @@ export function prizeWorth(prize, { sellBonus = 0, tanneryPremium = 0 } = {}, co
 }
 
 // The Wheel's tiers of prizes, from the weakest to the best.
+/** @typedef {{ id: string, count: number, low: number, high: number }} Tier */
+/**
+ * @param {Content} content
+ * @returns {Tier[]}
+ */
 const tiersOf = (content) => tuning(content).wheel.tiers;
 
 // The stakes the Wheel takes from the character, in steps of `step` gold:
@@ -104,10 +160,16 @@ const tiersOf = (content) => tuning(content).wheel.tiers;
 // less than it takes), to the last below what the scrapper pays it for an
 // item of topRarity at its level, with the Skup złomu (so the great prize is
 // worth more than any stake); at least the first, never past maxSteps.
+/**
+ * @param {number} level
+ * @param {number | undefined} sellBonus
+ * @param {Content} content
+ * @returns {number[]}
+ */
 export function wheelStakes(level, sellBonus, content) {
   const { step, maxSteps, topRarity, levelsPerStep } = tuning(content).wheel;
   const first = Math.max(1, Math.floor(level / levelsPerStep));
-  const top = sellPrice({ level, rarity: topRarity }, content, sellBonus);
+  const top = sellPrice(/** @type {any} */ ({ level, rarity: topRarity }), content, sellBonus);
   const last = Math.max(first, Math.min(maxSteps, Math.ceil(top / step) - 1));
   return Array.from({ length: last - first + 1 }, (_, index) => (first + index) * step);
 }
@@ -115,19 +177,38 @@ export function wheelStakes(level, sellBonus, content) {
 // The chances of a spin at `stake` among the day's `stakes`: nothing and
 // each tier from their `low` at the lowest stake to their `high` at the
 // highest, evenly between; a single stake is the highest.
+/**
+ * @param {number} stake
+ * @param {number[]} stakes
+ * @param {Content} content
+ * @returns {Odds}
+ */
 export function wheelOdds(stake, stakes, content) {
   const { none } = tuning(content).wheel;
   const at = stakes.length > 1 ? Math.max(0, stakes.indexOf(stake)) / (stakes.length - 1) : 1;
+  /** @param {{ low: number, high: number }} range */
   const along = ({ low, high }) => low + (high - low) * at;
   return { none: along(none), tiers: tiersOf(content).map((tier) => ({ id: tier.id, chance: along(tier) })) };
 }
 
 // An item prize of the character's class at its level, of `rarityId`, of a
 // base not in the pool yet (`used`) in a few draws.
+/**
+ * @param {string} tier
+ * @param {Basis} basis
+ * @param {string} rarityId
+ * @param {Rng} rng
+ * @param {Set<string>} used
+ * @param {Content} content
+ * @returns {Prize}
+ */
 function itemPrize(tier, basis, rarityId, rng, used, content) {
-  let item = null;
+  /** @type {Record<string, any>} */
+  let item = {};
   for (let draw = 0; draw < 5; draw += 1) {
-    item = randomItem(basis.level, rng, content, { classId: basis.classId, maxClassLevel: basis.classLevel ?? 1, rarityId });
+    // items.js is not checked yet: its options are typed by their defaults
+    // alone (classId and rarityId have none).
+    item = randomItem(basis.level, rng, content, /** @type {any} */ ({ classId: basis.classId, maxClassLevel: basis.classLevel ?? 1, rarityId }));
     if (!used.has(`base:${item.base}`)) break;
   }
   used.add(`base:${item.base}`);
@@ -137,6 +218,16 @@ function itemPrize(tier, basis, rarityId, rng, used, content) {
 // A material prize: `count` pieces of one of the lands' materials at
 // `rarityId`, of a species no rarer than that, one not in the pool yet
 // (`used`) while there is one; null when the lands have none.
+/**
+ * @param {string} tier
+ * @param {Basis} basis
+ * @param {string} rarityId
+ * @param {number} count
+ * @param {Rng} rng
+ * @param {Set<string>} used
+ * @param {Content} content
+ * @returns {Prize | null}
+ */
 function materialPrize(tier, basis, rarityId, count, rng, used, content) {
   const at = rarityIndex(rarityId, content);
   const fitting = knownLandMaterials(basis, content).filter((material) => rarityIndex(material.rarity, content) <= at);
@@ -149,8 +240,17 @@ function materialPrize(tier, basis, rarityId, count, rng, used, content) {
 
 // A resource prize: resourcePerLevel pieces a level of the character of one
 // of the camp's resources not in the pool yet; null when each of them is.
+/**
+ * @param {string} tier
+ * @param {Basis} basis
+ * @param {Rng} rng
+ * @param {Set<string>} used
+ * @param {Content} content
+ * @returns {Prize | null}
+ */
 function resourcePrize(tier, basis, rng, used, content) {
-  const fresh = content.resources.filter((resource) => !used.has(`resource:${resource.id}`));
+  /** @type {{ id: string }[]} */
+  const fresh = content.resources.filter((/** @type {{ id: string }} */ resource) => !used.has(`resource:${resource.id}`));
   if (fresh.length === 0) return null;
   const resource = rng.pick(fresh);
   used.add(`resource:${resource.id}`);
@@ -164,8 +264,17 @@ function resourcePrize(tier, basis, rng, used, content) {
 // resource in the pool, materials or an item instead); a fair one: a rare or
 // unique item, or a piece or two of such materials; a good one: an epic
 // item; a great one: a legendary item, at mythicChance a mythic one.
+/**
+ * @param {string} tier
+ * @param {Basis} basis
+ * @param {Rng} rng
+ * @param {Set<string>} used
+ * @param {Content} content
+ * @returns {Prize}
+ */
 function drawPrize(tier, basis, rng, used, content) {
   const wheel = tuning(content).wheel;
+  /** @param {[number, number]} range */
   const between = ([least, most]) => rng.int(least, most);
   if (tier === 'great') return itemPrize(tier, basis, rng.chance(wheel.mythicChance) ? wheel.mythicRarity : wheel.greatRarity, rng, used, content);
   if (tier === 'good') return itemPrize(tier, basis, wheel.goodRarity, rng, used, content);
@@ -175,13 +284,14 @@ function drawPrize(tier, basis, rng, used, content) {
     return material ?? itemPrize(tier, basis, rarityId, rng, used, content);
   }
   const common = content.rarities[0].id;
+  /** @type {Record<string, () => Prize | null>} */
   const draws = {
     item: () => itemPrize(tier, basis, common, rng, used, content),
     material: () => materialPrize(tier, basis, common, between(wheel.weakMaterials), rng, used, content),
     resource: () => resourcePrize(tier, basis, rng, used, content),
   };
-  const kind = rng.weighted(Object.entries(wheel.weakKinds).map(([id, weight]) => ({ id, weight }))).id;
-  return draws[kind]() ?? draws.material() ?? draws.item();
+  const kind = rng.weighted(Object.entries(/** @type {Record<string, number>} */ (wheel.weakKinds)).map(([id, weight]) => ({ id, weight }))).id;
+  return draws[kind]() ?? draws.material() ?? /** @type {Prize} */ (draws.item());
 }
 
 // The character's pool of the day (the author: "pula niezależna od stawki i
@@ -189,8 +299,16 @@ function drawPrize(tier, basis, rng, used, content) {
 // przedmioty, 1 spoko i 1 super"), the same at every stake, drawn from the
 // character's seed and the day: each tier's `count` prizes, the best first.
 // `basis` is the character as the day's Wheel keeps it (wheelDay).
+/**
+ * @param {Basis} basis
+ * @param {string | number} seed
+ * @param {string} day
+ * @param {Content} content
+ * @returns {Prize[]}
+ */
 export function wheelPrizes(basis, seed, day, content) {
   const rng = createRng(`${seed}:wheel:${day}`);
+  /** @type {Set<string>} */
   const used = new Set();
   return [...tiersOf(content)].reverse().flatMap((tier) => Array.from({ length: tier.count }, () => drawPrize(tier.id, basis, rng, used, content)));
 }
@@ -204,6 +322,13 @@ export function wheelPrizes(basis, seed, day, content) {
 // its one pool anew. A Wheel kept for a later day than `now`'s (a request
 // begun before midnight, done after another one of the new day) stays, so
 // the day never goes back (the code review, 0.2.71).
+/**
+ * @param {{ day?: unknown, basis?: Basis, won?: unknown } | null | undefined} stored
+ * @param {Basis} basis
+ * @param {number} now
+ * @param {Content} content
+ * @returns {Wheel}
+ */
 export function wheelDay(stored, basis, now, content) {
   const day = casinoDay(now, content).key;
   if (stored?.basis && typeof stored.day === 'string' && stored.day > day) {
@@ -213,26 +338,52 @@ export function wheelDay(stored, basis, now, content) {
 }
 
 // The stakes of the character's Wheel of the day.
+/**
+ * @param {Wheel} wheel
+ * @param {Content} content
+ * @returns {number[]}
+ */
 export const dayStakes = (wheel, content) => wheelStakes(wheel.basis.level, wheel.basis.sellBonus, content);
 
 // The character's pool of the day: its prizes and the places won
 // ({ prizes, won }). `seed` is the character's own.
+/**
+ * @param {Wheel} wheel
+ * @param {string | number} seed
+ * @param {Content} content
+ * @returns {Pool}
+ */
 export const wheelPool = (wheel, seed, content) => ({ prizes: wheelPrizes(wheel.basis, seed, wheel.day, content), won: wheel.won });
 
 // The Wheel of the day with a prize of the pool won.
+/**
+ * @param {Wheel} wheel
+ * @param {number} place
+ * @returns {Wheel}
+ */
 export const wheelWon = (wheel, place) => ({ ...wheel, won: [...wheel.won, place] });
 
 // The prizes still in the pool, by their place in it.
+/**
+ * @param {Pool} pool
+ * @returns {number[]}
+ */
 export const prizesLeft = (pool) => pool.prizes.map((_, index) => index).filter((index) => !pool.won.includes(index));
 
 // Why the Wheel cannot spin at `stake` now, or null: one of the character's
 // stakes (wheelStakes), a prize left, the gold for it, and a free place in
 // the bag while an item waits in the pool.
+/**
+ * @param {unknown} stake
+ * @param {{ gold: number, left: number, itemLeft: boolean, bagFree: number, stakes: number[] }} state
+ * @param {Content} content
+ * @returns {{ code: string, message: string } | null}
+ */
 export function spinBlock(stake, { gold, left, itemLeft, bagFree, stakes }, content) {
   const { step } = tuning(content).wheel;
-  if (!Number.isInteger(stake) || !stakes.includes(stake)) return { code: 'invalid_stake', message: `Postaw od ${step} do ${stakes.at(-1)} zł, setkami.` };
+  if (!Number.isInteger(stake) || !stakes.includes(/** @type {number} */ (stake))) return { code: 'invalid_stake', message: `Postaw od ${step} do ${stakes.at(-1)} zł, setkami.` };
   if (left === 0) return { code: 'empty', message: 'Koło rozdało już całą dzisiejszą pulę. Nowa przyjdzie po północy.' };
-  if (gold < stake) return { code: 'not_enough_gold', message: 'Brakuje złota na taką stawkę.' };
+  if (gold < /** @type {number} */ (stake)) return { code: 'not_enough_gold', message: 'Brakuje złota na taką stawkę.' };
   if (itemLeft && bagFree < 1) return { code: 'bag_full', message: 'Plecak jest pełny, a w puli czeka przedmiot. Zrób w plecaku miejsce.' };
   return null;
 }
@@ -241,11 +392,17 @@ export function spinBlock(stake, { gold, left, itemLeft, bagFree, stakes }, cont
 // stake's chances (wheelOdds): nothing at `none`, or else a tier; a tier
 // whose prizes are all won gives nothing either, otherwise one of its prizes
 // left, each as likely.
+/**
+ * @param {Pool} pool
+ * @param {Odds} odds
+ * @param {string | number} seed
+ * @returns {{ win: boolean, tier: string | null, prize: number | null }}
+ */
 export function spinWheel(pool, odds, seed) {
   const rng = createRng(seed);
   let roll = rng.next() - odds.none;
   if (roll < 0) return { win: false, tier: null, prize: null };
-  const tier = odds.tiers.find((one) => (roll -= one.chance) < 0) ?? odds.tiers.at(-1);
+  const tier = odds.tiers.find((one) => (roll -= one.chance) < 0) ?? odds.tiers[odds.tiers.length - 1];
   const left = prizesLeft(pool).filter((index) => pool.prizes[index].tier === tier.id);
   return left.length > 0 ? { win: true, tier: tier.id, prize: left[rng.int(0, left.length - 1)] } : { win: false, tier: tier.id, prize: null };
 }
@@ -253,6 +410,13 @@ export function spinWheel(pool, odds, seed) {
 // What a spin at the stake's chances gives back on average, at the worth of
 // the prizes left (`worthOf`), less the stake: below 0, so the Wheel gives
 // back less than it takes.
+/**
+ * @param {number} stake
+ * @param {Pool} pool
+ * @param {Odds} odds
+ * @param {(prize: Prize) => number} worthOf
+ * @returns {number}
+ */
 export function spinExpectation(stake, pool, odds, worthOf) {
   const left = prizesLeft(pool);
   const back = odds.tiers.reduce((sum, tier) => {
