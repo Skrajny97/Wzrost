@@ -31,6 +31,7 @@ import {
   huntKills,
   huntReport,
   isUnlocked,
+  labyrinthCharLevel,
   labyrinthDay,
   labyrinthFighters,
   labyrinthFoes,
@@ -100,7 +101,8 @@ function storedState(row, day) {
 }
 
 // Today's Labirynt: the one kept, or a new one with the companions going now
-// and the character's level (not saved until a room is entered). A request
+// and the higher of the character's and its class's level (not saved until
+// a room is entered). A request
 // of a day already gone for the character (laterPeriod) changes nothing.
 function todayOf(player, now) {
   const day = labyrinthDay(now, content());
@@ -111,7 +113,7 @@ function todayOf(player, now) {
     stored = {};
   }
   if (laterPeriod(stored?.day, day)) throw new ApiError(409, 'new_day', 'Labirynt właśnie zmienił się na nowy dzień. Spróbuj jeszcze raz.');
-  return storedState(player.row, day) ?? newLabyrinth({ day, charLevel: player.row.level, companions: companionsOf(player), seed: toHex(crypto.getRandomValues(new Uint8Array(16))) });
+  return storedState(player.row, day) ?? newLabyrinth({ day, charLevel: labyrinthCharLevel({ level: player.row.level, classLevel: player.row.class_level }), companions: companionsOf(player), seed: toHex(crypto.getRandomValues(new Uint8Array(16))) });
 }
 
 // What a room is, in the words of the page.
