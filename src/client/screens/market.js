@@ -246,8 +246,9 @@ export function itemEntry(item, key, opened, { notes: noted = true, wearers = nu
 
 // An item beside what a companion who can put it on wears in its place
 // (its weapon, its armour, or its one piece of jewellery for an amulet, a
-// ring or a talisman), as "Załóż z plecaka" in the Kwatery compares them.
-function companionCompare(companion, item) {
+// ring or a talisman), as "Załóż z plecaka" in the Kwatery compares them;
+// the Skrzynia Gildii's cards too (guild-chest.js).
+export function companionCompare(companion, item) {
   const worn = (companion.wear.find((place) => place.slot === item.slot) ?? companion.wear.find((place) => place.slot === 'jewelry'))?.item ?? null;
   return worn
     ? compareTable(item, worn, { title: t('Porównanie z tym, co nosi {name}', { name: companion.name }), wornLabel: t('Nosi') })

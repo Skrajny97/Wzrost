@@ -735,6 +735,11 @@
       "id": "0.2.95",
       "title": "Wersja 0.2.95",
       "body": "- Walka: list gończy, który masz w ręku, widać teraz na ekranie Walki: kogo szukasz i gdzie. Stuknięcie w list prowadzi prosto do tego miejsca, a miejsce ma w krainie znaczek „List gończy”. Gdy poszukiwany padnie, list prowadzi po nagrodę do sołtysa.\n- Wdrożenia nowych wersji są szybsze."
+    },
+    {
+      "id": "0.2.96",
+      "title": "Wersja 0.2.96",
+      "body": "- Skrzynia Gildii: karta przedmiotu porównuje go z tym, co nosisz, i z tym, co noszą Twoi towarzysze, jak na Targowisku. Na liście przy przedmiocie widać też, czy Kowal już go przekuł."
     }
   ]
 }
