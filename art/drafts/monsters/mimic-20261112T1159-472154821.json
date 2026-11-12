@@ -1,0 +1,14 @@
+{
+  "id": "mimic",
+  "tool": "pixellab generate-image-v2",
+  "description": "a mimic: an old iron-bound wooden treasure chest come alive, its lid gaping open like a huge jaw lined with jagged white teeth, a long purple tongue lolling out over spilled gold coins, small glowing yellow eyes under the lid, four short clawed legs, crouching ready to pounce, full body, three-quarter view",
+  "style": "src/client/art/monsters/strzyga.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}
