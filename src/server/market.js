@@ -172,14 +172,14 @@ function teamView(team) {
 
 // The search the page asks for (GET /api/market's query, or `view` in an
 // action's body, so its answer shows the same list): which offers, the
-// kind of goods, the class, who of the character's own, the rarity, the
-// category, the order and how many (browseOffers in the engine checks
-// each).
+// kind of goods, the class, who of the character's own, the Tier, the
+// rarity, the category, the order and how many (browseOffers in the engine
+// checks each).
 function askedView(source) {
   const read = source instanceof URLSearchParams ? (key) => source.get(key) : (key) => source?.[key];
   const text = (key) => (typeof read(key) === 'string' && read(key) !== '' ? read(key) : null);
   const limit = Number(read('limit'));
-  return { show: text('show'), kind: text('kind'), classId: text('classId'), who: text('who'), rarity: text('rarity'), category: text('category'), sort: text('sort'), limit: Number.isInteger(limit) && limit > 0 ? limit : null };
+  return { show: text('show'), kind: text('kind'), classId: text('classId'), who: text('who'), tier: text('tier'), rarity: text('rarity'), category: text('category'), sort: text('sort'), limit: Number.isInteger(limit) && limit > 0 ? limit : null };
 }
 
 // A parcel for `characterId` of an offer's goods.
@@ -437,6 +437,9 @@ async function marketView(db, player, now, asked = {}) {
     most: browse.most,
     // The companions, for the comparison with what each wears.
     team: teamView(team),
+    // The Tiers the search's Tier choice names (counts.tiers by their
+    // number), from the class level each asks for.
+    tiers: content().encyclopedia.tiers.map((/** @type {{ name: string, classLevel: number }} */ tier, index) => ({ id: String(index + 1), name: tier.name, classLevel: tier.classLevel })),
     mine: mine.results.map((offer) => offerView(offer, row, team)),
     parcels: parcels.results.map((parcel) => ({ id: parcel.id, reason: parcel.reason, goods: goodsView(parcel.kind, parcel.good, parcel.count, parcel.item) })),
     sellable: sellable(player, now),
@@ -459,7 +462,7 @@ async function requireMarket(context) {
   return { session, player, db: context.env.DB };
 }
 
-// GET /api/market?show=&kind=&classId=&who=&rarity=&category=&sort=&limit=:
+// GET /api/market?show=&kind=&classId=&who=&tier=&rarity=&category=&sort=&limit=:
 // the Targowisko for the page, the players' offers as the search asks.
 export async function getMarket(context) {
   const { session, db } = await requireMarket(context);

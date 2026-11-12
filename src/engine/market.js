@@ -18,7 +18,7 @@
 import { potionPrice } from './brewing.js';
 import { companionWearBlock } from './companions.js';
 import { materialPrice, ordinaryMaterial, parseStack, stackKey } from './crafting.js';
-import { canUse, equipBlock, randomItem, sellPrice } from './items.js';
+import { baseClassLevel, canUse, equipBlock, randomItem, sellPrice } from './items.js';
 import { questPeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { relationDiscount, standingOf } from './settlement.js';
@@ -378,6 +378,21 @@ function tally(list, keyOf) {
   return counts;
 }
 
+// An item offer's Tier, as its card names it (itemView): its number, '1' for
+// Tier I, by the class level its base asks for (encyclopedia.json); none for
+// stacks.
+/**
+ * @param {Offer} offer
+ * @param {Content} content
+ * @returns {string | null}
+ */
+export function offerTier(offer, content) {
+  if (offer.kind !== 'item' || !offer.item?.base || !content.basesById[offer.item.base]) return null;
+  const classLevel = baseClassLevel(offer.item.base, content);
+  const index = content.encyclopedia.tiers.findLastIndex((/** @type {{ classLevel: number }} */ tier) => tier.classLevel <= classLevel);
+  return index < 0 ? null : String(index + 1);
+}
+
 // An offer's category, as the chips over a mixed list name it: an item's
 // slot, a stack's kind.
 /**
@@ -399,12 +414,15 @@ const ORDERS = {
 // (`team`, as wearersOf). Each choice that does not fit what is there gives
 // way: an unknown show, kind, class or person, a rarity or a category with
 // nothing in it (as the category chips did, 2.11.2026), an unknown order.
+// Over a list of items, the Tier too (offerTier; a player's remark passed on
+// by the author, 12.11.2026: "żeby szybciej znaleźć przedmiot odpowiedni
+// dla poziomu naszej postaci"), giving way the same.
 // `limit` offers at most, `browse.page` without one, never past
 // `browse.most`. Returns `view`, the search as it was made; `counts`, how
 // many each choice holds where it stands (`shows` over all the offers,
 // `people` the items each of the team can put on now, `kinds` and
-// `classes` under "Wszystko", `rarities` and `categories` under the
-// choices before them); `found`, how many it shows in all; `ids`, the
+// `classes` under "Wszystko", `tiers` over items, `rarities` and
+// `categories` under the choices before them); `found`, how many it shows in all; `ids`, the
 // offers of the page in their order; `wearers`, who can put each item of
 // the page on.
 /**
@@ -427,8 +445,8 @@ export function browseOffers(offers, asked, team, content) {
   /** @type {Record<string, any>} */
   const counts = { shows: { all: offers.length, 'for-me': people.me, bidding: bidding.length }, people };
   const show = OFFER_SHOWS.includes(asked?.show) ? asked.show : 'all';
-  /** @type {{ show: string, kind: string, classId: string | null, who: string | null, rarity: string | null, category: string, sort: string, limit?: number }} */
-  const view = { show, kind: 'any', classId: null, who: null, rarity: null, category: 'all', sort: OFFER_SORTS.includes(asked?.sort) ? asked.sort : 'ends' };
+  /** @type {{ show: string, kind: string, classId: string | null, who: string | null, tier: string | null, rarity: string | null, category: string, sort: string, limit?: number }} */
+  const view = { show, kind: 'any', classId: null, who: null, tier: null, rarity: null, category: 'all', sort: OFFER_SORTS.includes(asked?.sort) ? asked.sort : 'ends' };
   /** @type {Offer[]} */
   let shown;
   if (show === 'for-me') {
@@ -447,6 +465,13 @@ export function browseOffers(offers, asked, team, content) {
         view.classId = asked.classId;
         shown = shown.filter((offer) => offer.item && canUse(offer.item.base, /** @type {string} */ (view.classId), content));
       }
+    }
+  }
+  if (view.kind === 'item') {
+    counts.tiers = tally(shown, (offer) => offerTier(offer, content));
+    if (counts.tiers[asked?.tier] > 0) {
+      view.tier = asked.tier;
+      shown = shown.filter((offer) => offerTier(offer, content) === view.tier);
     }
   }
   counts.rarities = tally(shown, (offer) => goodsRarity(offer, content));

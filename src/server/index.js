@@ -113,7 +113,7 @@ import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.j
 import { getCards, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter } from './cards.js';
 import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
-import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, trainCompanion, unequipCompanion, upgradeCompanionItem } from './settlement.js';
+import { buyFromHerbalist, buyMug, chooseReforged, claimStandingReward, talkWithCompanion, deliverSettlementOrder, dismissCompanion, equipCompanion, getSettlement, hermitService, hireCompanion, imbueAtEnchantress, redrawCandidates, reforgeAtEnchantress, rejectSettlementOrder, sellToHerbalist, setCompanionStay, settlementTests, takeCompanionGift, testSettlement, trainCompanion, unequipCompanion, upgradeCompanionItem } from './settlement.js';
 import { claimWanted, dropWanted, takeWanted } from './wanted.js';
 import { claimMercenary, listMercenaries, offerMercenary, withdrawMercenary } from './mercenaries.js';
 import { buyFromTanner, sellToTanner } from './tannery.js';
@@ -290,6 +290,7 @@ const routes = [
   ['POST', '/api/settlement/wanted/drop', dropWanted],
   ['POST', '/api/settlement/wanted/claim', claimWanted],
   ['POST', '/api/settlement/hire', hireCompanion],
+  ['POST', '/api/settlement/redraw', redrawCandidates],
   // The Karczma's mercenaries (mercenaries.js).
   ['GET', '/api/mercenaries', listMercenaries],
   ['POST', '/api/mercenary/offer', offerMercenary],

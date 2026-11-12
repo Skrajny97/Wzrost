@@ -725,6 +725,11 @@
       "id": "0.2.93",
       "title": "Wersja 0.2.93",
       "body": "- Nowa gra karciana w Salonie Gier: Talia Systemu (zakładka „Karty”). Weź od Szczęsnego talię startową, ułóż talię z 12 kart stworów i zagraj z nim na pięciu stopniach, o stawkę albo dla treningu. Za wygraną zgarniesz podwójną stawkę, a pierwsze pokonanie stopnia daje nową kartę.\n- Pokonane stwory mogą zostawić na wyprawie swoją kartę: zwykłe rzadko, elity i czempioni częściej. Kolejna sztuka tej samej karty podnosi jej poziom.\n- Premia za kolekcję: każde 10 różnych kart to na stałe +1% PD i +1% złota z wypraw, najwyżej +15%.\n- Encyklopedia ma nową zakładkę „Karty”: wszystkie karty krainami, zdobyte i jeszcze nieznane, z premią kolekcji."
+    },
+    {
+      "id": "0.2.94",
+      "title": "Wersja 0.2.94",
+      "body": "- Targowisko: nowy filtr „Tier” przy przedmiotach, obok klasy i rzadkości. Pokazuje przedmioty jednego Tieru i poziom klasy, od którego się je zakłada. Działa też w „Dla mnie”.\n- Karczma: „Nowi kandydaci” za złoto, do 3 razy w tygodniu, każde losowanie droższe od poprzedniego. Zbylut przyprowadza czterech innych kandydatów, a zwerbowani towarzysze zostają."
     }
   ]
 }

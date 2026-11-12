@@ -3084,6 +3084,7 @@ Uwagi gracza 1–3 z bloku wyżej, najpierw jako działający prototyp na gałę
 7. **Wybór, w którym nic nie ma (brakujący szczegół).** Rzadkość i kategoria bez ofert wracają do „Każda” i „Wszystko”, jak dotąd kategorie. Klasa i zakładka rodzaju zostają, a lista mówi np. „Nikt nie wystawia teraz mikstur.” albo „Nic tu nie pasuje do wybranych filtrów.”
 8. **API.** `GET /api/market?show=&kind=&classId=&who=&rarity=&category=&sort=&limit=`, a akcje Targowiska przyjmują to samo w `view`, więc ich odpowiedź pokazuje tę samą listę. Bez parametrów: wszystkie rodzaje, od kończących się, strona 30.
 9. **Sprawdzone:** testy Targowiska (`test/market.test.js`, `test/market-log.test.js`, nowy `test/market-search.test.js`) i powiązane, tłumaczenia i dane; ekran na 320, 360, 390, 430, 768, 1366 i 1920 px bez przewijania na boki i bez tekstu poza ramkami.
+10. **Tier (12.11.2026, w grze od 0.2.94).** Autor przekazał uwagę gracza (poz. 30) z czatu: „proponuje dodać na targowisku zakładke z lvl danego przedmiotu”, „chodzi mi o filtr tak jak klasa rzadkość itp”, „żeby szybciej znaleźć przedmiot odpowiedni dla poziomu naszej postaci”, i dopisał: „i jeszcze jeden filtr do targowiska”. Przedmiot zakłada się według Tieru (od poziomu klasy jego bazy, zob. „Przedmioty według Tieru”), więc nowy filtr to lista „Tier” obok „Klasa” i „Dla kogo”, przed rzadkością: „Każdy Tier” albo Tier z poziomem klasy, od którego się go zakłada, i liczbą przedmiotów, np. „Tier III, od poz. klasy 25 (12)”. Jest przy przedmiotach pod „Wszystko” i pod „Dla mnie” (tam z Tierami tego, co postać albo towarzysz może teraz założyć). Rzadkość i kategorie liczą się pod wybranym Tierem, Tier bez ofert wraca do „Każdy Tier” jak rzadkość, a zmiana zakładki rodzaju towaru go zeruje. API: parametr `tier` (numer Tieru, „3” to Tier III) w `GET /api/market` i w `view` akcji, liczby w `counts.tiers`, nazwy w `tiers`. To mała zmiana istniejącego rzędu list, więc wchodzi bez makiet; sprawdzona na szerokościach z `tools/layout-check.cjs`.
 
 ## Jeźdźcy trzeciej ewolucji od zera, po jednym (11.11.2026)
 
@@ -3231,6 +3232,15 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 3. **Kwestia Sali prób** o próbach (645) przychodzi, jak dotąd, przy pierwszym spojrzeniu na Salę prób, ale dopiero po rozdziale Labiryntu, bo żadna kwestia miejsca nie przychodzi, gdy czeka rozdział.
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
+
+## Karczma: nowi kandydaci za złoto (890 B, 12.11.2026, w grze od 0.2.94)
+
+Autor przekazał zrzut czatu: gracze (poz. 47 i 37) chcą większego wyboru albo losowania towarzyszy, np. 2–3 razy w tygodniu, za opłatę, która „nie musi być tania” („losowanie towarzyszy za złoto! Popieram!”). Autor: „przy okazji mądra uwaga”. Autor wybrał 890 B.
+
+1. **Losowanie.** Pod kandydatami w Karczmie stoi przycisk „Nowi kandydaci (cena)”. Zbylut przyprowadza czterech innych kandydatów na resztę tygodnia, a czwórka, która czekała, odchodzi. Zwerbowani towarzysze zostają, a nowa czwórka ma własne identyfikatory, więc nikt zwerbowany wcześniej jej nie zasłania. Pierwsza czwórka tygodnia jest taka sama jak dotąd.
+2. **Ile i za ile (890 B).** Najwyżej 3 losowania w tygodniu, coraz droższe: złoto z 2, 4 i 6 godzin eksploracji na poziomie postaci (`explorationGold`, jak nagrody gry karcianej), np. na 50. poziomie ok. 1520, 3040 i 4560 zł. Tydzień liczy się jak zadania narratora, więc w poniedziałek licznik wraca do zera i przychodzą nowi kandydaci jak dotąd. Liczby są w danych: `companions.redraws` w `data/settlement.json` (`perWeek` 3, `hours` [2, 4, 6]).
+3. **Pod przyciskiem** zdanie, ile losowań zostało w tym tygodniu i że każde kolejne jest droższe; po trzecim zdanie, że nowi przyjdą w poniedziałek. Przed losowaniem gra pyta, czy na pewno (czekający odejdą). To jeden przycisk w istniejącej karcie Karczmy, więc wchodzi bez makiet.
+4. **Zapis.** Postać trzyma w Osadzie `candidateDraws` (klucz tygodnia i liczba losowań); silnik losuje czwórkę ziarnem postaci, tygodnia i numeru losowania (`drawCandidates`, `candidateRedraw` w `src/engine/companions.js`), serwer: `POST /api/settlement/redraw`.
 
 ## Talia Systemu: gra karciana w Salonie Gier (871–877, 12.11.2026)
 

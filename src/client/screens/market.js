@@ -332,16 +332,17 @@ export function mountMarket(holder) {
   // but its order (savedSort): which offers (`show`: "Wszystko", "Dla mnie"
   // or "Licytuję"), the tab of the kind of goods, the class an item is for,
   // who of the character's own shops ("Dla mnie": 'me' or a companion's
-  // id), the rarity, the category, the order and how many offers (null: a
-  // page). The server answers with the search as it made it (`view`), a
-  // choice with nothing left in it given way.
-  const view = { show: ALL, kind: 'item', classId: null, who: 'me', rarity: null, category: ALL, sort: savedSort(), limit: null };
+  // id), the Tier of an item, the rarity, the category, the order and how
+  // many offers (null: a page). The server answers with the search as it
+  // made it (`view`), a choice with nothing left in it given way.
+  const view = { show: ALL, kind: 'item', classId: null, who: 'me', tier: null, rarity: null, category: ALL, sort: savedSort(), limit: null };
   // The search as the server takes it, in a query or an action's body.
   const asked = () => {
     const search = { show: view.show, sort: view.sort };
     if (view.show === ALL) search.kind = view.kind;
     if (view.show === ALL && view.kind === 'item' && view.classId) search.classId = view.classId;
     if (view.show === FOR_ME) search.who = view.who;
+    if (view.tier) search.tier = view.tier;
     if (view.rarity) search.rarity = view.rarity;
     if (view.category !== ALL) search.category = view.category;
     if (view.limit) search.limit = String(view.limit);
@@ -349,6 +350,7 @@ export function mountMarket(holder) {
   };
   // The answer's search over the page's: the choices that gave way.
   const answered = (made) => {
+    view.tier = made.tier ?? null;
     view.rarity = made.rarity;
     view.category = made.category;
     view.limit = made.limit;
@@ -862,12 +864,16 @@ export function mountMarket(holder) {
   // passed on by the author, 11.11.2026): under "Wszystko" the kinds of
   // goods as tabs, and for items the class they are for (the player looks
   // for items for companions of other classes); under "Dla mnie" who of the
-  // character's own shops, the character or one of its companions; the
-  // rarity, the categories as chips (2.11.2026) and the order.
+  // character's own shops, the character or one of its companions; over
+  // items their Tier (a player's remark passed on by the author, 12.11.2026:
+  // "żeby szybciej znaleźć przedmiot odpowiedni dla poziomu naszej
+  // postaci"), with the class level it asks for; the rarity, the categories
+  // as chips (2.11.2026) and the order.
   function searchControls() {
     const { counts, team = [] } = market;
     const companion = view.show === FOR_ME ? team.find((one) => one.id === view.who) : null;
     const rarities = (state.content?.rarities ?? []).filter((rarity) => counts.rarities?.[rarity.id] > 0);
+    const tiers = (market.tiers ?? []).filter((tier) => counts.tiers?.[tier.id] > 0);
     const categories = [...state.content.slots.map(({ id, name }) => ({ id, name })), ...Object.entries(KIND_GROUPS).map(([id, name]) => ({ id, name: t(name) }))]
       .filter(({ id }) => counts.categories?.[id] > 0)
       .map((category) => ({ ...category, count: counts.categories[category.id] }));
@@ -886,6 +892,17 @@ export function mountMarket(holder) {
           [{ value: 'me', text: `${t('Ty')} (${formatNumber(counts.people?.me ?? 0)})` }, ...team.map((one) => ({ value: one.id, text: `${one.name} (${formatNumber(counts.people?.[one.id] ?? 0)})` }))],
           (who) => search({ who: who ?? 'me' }),
         ),
+      (tiers.length > 1 || view.tier) &&
+        choice(
+          'market-tier',
+          t('Tier'),
+          view.tier,
+          [
+            { value: '', text: t('Każdy Tier') },
+            ...tiers.map((tier) => ({ value: tier.id, text: t('{tier}, od poz. klasy {level} ({count})', { tier: tier.name, level: tier.classLevel, count: formatNumber(counts.tiers[tier.id]) }) })),
+          ],
+          (tier) => search({ tier }),
+        ),
       (rarities.length > 1 || view.rarity) &&
         choice('market-rarity', t('Rzadkość'), view.rarity, [{ value: '', text: t('Każda rzadkość') }, ...rarities.map((rarity) => ({ value: rarity.id, text: `${rarity.name} (${formatNumber(counts.rarities[rarity.id])})` }))], (rarity) =>
           search({ rarity }),
@@ -899,7 +916,7 @@ export function mountMarket(holder) {
           t('Rodzaj towaru'),
           KIND_TABS.map(([id, name]) => ({ id, name: t(name), count: counts.kinds?.[id] ?? 0 })),
           view.kind,
-          (kind) => search({ kind, category: ALL, rarity: null }),
+          (kind) => search({ kind, category: ALL, tier: null, rarity: null }),
         ),
       lists.length > 0 && h('div', { class: 'market-choices' }, lists),
       // Who a companion is and what it wears, as the list holds only what
@@ -951,7 +968,7 @@ export function mountMarket(holder) {
       return companion ? t('Nikt nie wystawia teraz przedmiotu, który {name} może założyć.', { name: companion.name }) : t(NO_OFFERS[FOR_ME]);
     }
     if (view.show === BIDDING) return t(NO_OFFERS[BIDDING]);
-    if (view.classId || view.rarity || view.category !== ALL) return t('Nic tu nie pasuje do wybranych filtrów.');
+    if (view.classId || view.tier || view.rarity || view.category !== ALL) return t('Nic tu nie pasuje do wybranych filtrów.');
     return t(NO_KIND[view.kind] ?? 'Nikt nic teraz nie wystawia.');
   }
 
