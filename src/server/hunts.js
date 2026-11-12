@@ -98,9 +98,9 @@ import { takenBefore, trialProgress } from './guild-trials.js';
 import { expeditionMinutes } from './guild-expedition.js';
 import { huntFamePoints } from './fame.js';
 import { favoriteIds } from './favorites.js';
-import { fallenGems, gemNamed, soldGold } from './inventory.js';
+import { fallenGems, gemNamed, gemsBackSql, soldGold } from './inventory.js';
 import { perkOf } from './perks.js';
-import { addTo, finishGathering } from './professions.js';
+import { finishGathering } from './professions.js';
 import { herbsOf, knownPotionsOf, potionKnown, potionsOf } from './professions-view.js';
 import { trimReports } from './reports.js';
 import { leaveTrip, tripOf } from './trips.js';
@@ -990,7 +990,10 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   // An event's herbs that found their places.
   const storedHerbs = Object.entries(herbs.stored);
   const setHerbs = storedHerbs.length ? `, herbs = json_set(herbs, ${storedHerbs.map(() => '?, COALESCE(json_extract(herbs, ?), 0) + ?').join(', ')})` : '';
-  const setGems = addTo('minerals', gemsBack);
+  // Each gem counted from the items still in the bag as the batch runs, as
+  // their price is (the code review, 12.11.2026: one put into the Skrzynia
+  // Konta meanwhile kept its gem, which came to the minerals too).
+  const setGems = gemsBackSql(row.id, storedSold);
   let results;
   try {
     results = await db.batch([
@@ -1016,9 +1019,6 @@ export async function finishHunt(db, player, now, { choice } = {}) {
         .bind(row.id, `${row.id}:${activity.started_at}`, 'hunt', now, JSON.stringify(summary), JSON.stringify(report)),
       // A report keeps every fight (about 40 KB for 4 hours), so only those the journal shows stay.
       trimReports(db, row.id, 'hunt'),
-      ...hunt.items.flatMap((item, index) =>
-        soldFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)],
-      ),
       db
         .prepare(
           `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setResources}${setMaterials}${setHerbs}${setGems.sql},
@@ -1069,8 +1069,15 @@ export async function finishHunt(db, player, now, { choice } = {}) {
       ...huntFamePoints(db, row.id, hunt, activity.minutes, now),
       // Bag items the scrapper bought: paid for above, while they were still there.
       ...(soldStored.length > 0
-        ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${soldStored.map(() => '?').join(', ')})`).bind(row.id, ...soldStored)]
+        ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${soldStored.map(() => '?').join(', ')})`).bind(row.id, ...soldStored)]
         : []),
+      // The exploration's items after it: the database may give a new item
+      // the id of an item gone from the bag meanwhile, which the scrapper's
+      // price, gems and deletion, counted by the ids read, would then take
+      // for the one they sell (the code review, 12.11.2026).
+      ...hunt.items.flatMap((item, index) =>
+        soldFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)],
+      ),
       db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(row.id, activity.started_at),
     ]);
   } catch (error) {

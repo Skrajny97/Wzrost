@@ -19,6 +19,7 @@ import {
   huntKills,
   huntReport,
   questPeriod,
+  samePeriod,
   trialEncounters,
   trialHallFights,
   trialHallOf,
@@ -69,7 +70,7 @@ export function trialHallView(row, now) {
   const target = trialTarget(row.class_level, record.early, content());
   const { fightStart: _a, eliteStart: _b, defeat: _c, won: _d, lost: _e, ...texts } = hall.texts;
   return {
-    used: record.day === questPeriod('daily', now, content()).key,
+    used: samePeriod(record.day, questPeriod('daily', now, content()).key),
     texts,
     target: target && {
       areaId: target.area.id,
@@ -96,7 +97,10 @@ export async function enterTrialHall(context) {
   requireNotExploring(player, now);
   const record = hallRecord(row);
   const today = questPeriod('daily', now, content()).key;
-  if (record.day === today) throw new ApiError(409, 'used', hall.texts.used);
+  // Today's trial, or a later day's (laterPeriod in quests.js): a request
+  // still of the day gone, met by the record of the next day's trial, runs no
+  // other and writes no day back (the code review, 12.11.2026).
+  if (samePeriod(record.day, today)) throw new ApiError(409, 'used', hall.texts.used);
   const target = trialTarget(row.class_level, record.early, content());
   if (!target) throw new ApiError(409, 'all_open', hall.texts.allOpen);
   if (target.passed) throw new ApiError(409, 'passed', hall.texts.passed.replace('{area}', target.area.name));

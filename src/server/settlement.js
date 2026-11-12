@@ -115,6 +115,7 @@ import {
   settlementBoard,
   settlementGoods,
 } from './characters.js';
+import { atomically, sameVersion } from './atomic.js';
 import { toHex } from './encoding.js';
 import { evolutionsOn, placeOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
@@ -220,11 +221,20 @@ const choicesOf = (stored) => reforgeChoices(stored.relations[content().settleme
 
 // A reforging's affixes waiting for a choice, of an item the character
 // still has, not reforged since (the Kowadło's upgrades do not matter);
-// null without one.
-function pendingOf(stored, items) {
+// null without one. Since 12.11.2026 the item holds the first of them while
+// it waits, and `old` keeps the affix it had (the code review: with the old
+// affix kept until the choice, the item taken into the Skrzynia Konta and
+// back, a new row the choice no longer finds, kept it, and the paid
+// reforging was undone).
+export function pendingOf(stored, items) {
   const item = stored.pending && items.find((candidate) => candidate.id === stored.pending.itemId);
   return item && (item.reforged ?? 0) === stored.pending.reforged ? { item, ...stored.pending } : null;
 }
+
+// The item as it was before a reforging waiting for a choice: with the
+// affix it had (`old`), or as it is for one drawn before 12.11.2026, which
+// kept it until the choice.
+const beforeReforge = (pending, item = pending.item) => (pending.old ? withAffix(item, pending.affix, pending.old) : item);
 
 // An affix as the item card shows it, with the Kowadło's upgrade.
 const affixLabel = (item, index) => {
@@ -413,7 +423,7 @@ export async function imbueAtEnchantress(context) {
   const db = context.env.DB;
   // As the reforging: the item changes only if the character is as seen
   // here, and the payment only if the item now holds this element.
-  await db.batch([
+  const [, paid] = await db.batch([
     db
       .prepare(`UPDATE items SET data = json_set(data, '$.imbue', json(?)) WHERE id = ? AND character_id = ? AND (SELECT version FROM characters WHERE id = ?) = ?`)
       .bind(JSON.stringify(effect), item.id, row.id, row.id, row.version),
@@ -427,9 +437,12 @@ export async function imbueAtEnchantress(context) {
       )
       .bind(cost.gold, JSON.stringify(next), stack, cost.count, stack, stack, cost.count, stack, row.id, row.version, cost.gold, stack, cost.count, item.id, body.element),
   ]);
+  // Saved and paid, whatever gold came in meanwhile without a change of the
+  // version (an outbid's refund at the Targowisko, the Loteria's pot): the
+  // check of the gold after it answered "try again" to an imbue done (the
+  // code review, 12.11.2026).
+  if (paid.meta.changes !== 1) throw changed();
   const after = await loadPlayer(db, session.userId);
-  const saved = after.items.find((candidate) => candidate.id === item.id);
-  if (saved?.imbue?.element !== body.element || after.row.gold !== row.gold - cost.gold) throw changed();
   return json({
     imbued: { item: itemName(item, content()), element: content().elementsById[body.element].name },
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
@@ -516,8 +529,11 @@ export async function sellToHerbalist(context) {
   const { row } = player;
   requireOpen(row);
   const body = await readJson(context.request);
-  const column = { herb: 'herbs', potion: 'potions' }[body.kind];
-  const known = { herb: content().herbsById, potion: content().potionsById }[body.kind]?.[body.id];
+  // Only the two kinds: "constructor" found Object in a plain object's
+  // lookup (the code review, 12.11.2026: an error of the server).
+  const goods = { herb: ['herbs', content().herbsById], potion: ['potions', content().potionsById] };
+  const [column, byId] = Object.hasOwn(goods, body.kind) ? goods[body.kind] : [null, null];
+  const known = byId?.[body.id];
   if (!column || !known) throw new ApiError(400, 'invalid_goods', 'Zielarka kupuje tylko zioła i mikstury.');
   const held = JSON.parse(row[column] ?? '{}')[body.id] ?? 0;
   if (!Number.isInteger(body.count) || body.count < 1 || body.count > held) throw new ApiError(409, 'not_enough', 'Nie masz tylu w torbie.');
@@ -827,7 +843,7 @@ function pendingView(pending) {
   return {
     itemId: item.id,
     name: itemName(item, content()),
-    old: affixLabel(item, affix),
+    old: affixLabel(beforeReforge(pending), affix),
     options: options.map((option) => affixLabel(withAffix(item, affix, option), affix)),
   };
 }
@@ -1465,13 +1481,15 @@ export async function reforgeAtEnchantress(context) {
   const cost = reforgeCost(item, times, content());
   const roll = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const options = reforgeOptions(item, body.affix, choicesOf(stored), createRng(roll), content());
-  // One affix goes on the item at once; more wait for the choice.
-  const affixes = options.length === 1 ? withAffix(item, body.affix, options[0]).affixes : item.affixes;
+  // The first new affix goes on the item at once; with more, the player
+  // may take another of them instead (chooseReforged), and the old one is
+  // kept only to show what they replace.
+  const affixes = options.length > 0 ? withAffix(item, body.affix, options[0]).affixes : item.affixes;
   const { pending: _, ...rest } = stored;
   const next = {
     ...rest,
     relations: grow(stored.relations, content().settlement.reforge),
-    ...(options.length > 1 && { pending: { itemId: item.id, affix: body.affix, options, roll, reforged: times + 1 } }),
+    ...(options.length > 1 && { pending: { itemId: item.id, affix: body.affix, options, roll, reforged: times + 1, old: item.affixes[body.affix] } }),
   };
   const pay = takenOff('materials', cost.materials ? piecesOfRarity(materials, cost.materials, content()) : {});
   const db = context.env.DB;
@@ -1524,24 +1542,32 @@ export async function chooseReforged(context) {
   if (!Number.isInteger(body.option) || !option) throw new ApiError(400, 'invalid_option', 'Wybierz jeden z afiksów.');
   const { affixes } = withAffix(pending.item, pending.affix, option);
   const db = context.env.DB;
-  // Both only while this choice still waits, so it is made once.
-  await db.batch([
-    db
-      .prepare(
-        `UPDATE items SET data = json_set(data, '$.affixes', json(?))
-         WHERE id = ? AND character_id = ? AND COALESCE(json_extract(data, '$.reforged'), 0) = ?
-           AND json_extract((SELECT settlement FROM characters WHERE id = ?), '$.pending.roll') = ?`,
-      )
-      .bind(JSON.stringify(affixes), pending.item.id, row.id, pending.reforged, row.id, pending.roll),
-    db
-      .prepare(`UPDATE characters SET settlement = json_remove(settlement, '$.pending'), version = version + 1 WHERE id = ? AND json_extract(settlement, '$.pending.roll') = ?`)
-      .bind(row.id, pending.roll),
-  ]);
+  // Both only while this choice still waits, so it is made once, and while
+  // the character is as read: the item's list of affixes is written whole,
+  // so a raise at the Kuźnia saved meanwhile would lose its new affix (the
+  // code review, 12.11.2026).
+  await atomically(
+    db,
+    [
+      sameVersion(db, row),
+      db
+        .prepare(
+          `UPDATE items SET data = json_set(data, '$.affixes', json(?))
+           WHERE id = ? AND character_id = ? AND COALESCE(json_extract(data, '$.reforged'), 0) = ?
+             AND json_extract((SELECT settlement FROM characters WHERE id = ?), '$.pending.roll') = ?`,
+        )
+        .bind(JSON.stringify(affixes), pending.item.id, row.id, pending.reforged, row.id, pending.roll),
+      db
+        .prepare(`UPDATE characters SET settlement = json_remove(settlement, '$.pending'), version = version + 1 WHERE id = ? AND json_extract(settlement, '$.pending.roll') = ?`)
+        .bind(row.id, pending.roll),
+    ],
+    changed,
+  );
   const after = await loadPlayer(db, session.userId);
   if (settlementOf(after.row).pending?.roll === pending.roll) throw changed();
   const saved = after.items.find((candidate) => candidate.id === pending.item.id);
   if (JSON.stringify(saved?.affixes) !== JSON.stringify(affixes)) throw changed();
-  return json({ item: saved, result: reforgeResult(pending.item, saved, pending.affix), character: characterView(after, context.now) });
+  return json({ item: saved, result: reforgeResult(beforeReforge(pending), saved, pending.affix), character: characterView(after, context.now) });
 }
 
 // { service: "path" | "stats" | "evolution", evolutionId }: the Pustelnik's

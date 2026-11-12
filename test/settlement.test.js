@@ -957,8 +957,11 @@ describe('the Osada through the API', () => {
     await set('materials = json_set(materials, ?, ?)', `$."${stack}"`, cost.materials.count * 2);
     const done = await call('POST', '/api/settlement/reforge', { cookie, body: { itemId, affix: 0 } });
     assert.equal(done.status, 200);
-    // Paid, but the item keeps its affix until the choice.
-    assert.equal(done.data.item.affixes[0].id, item.affixes[0].id);
+    // Paid, and the item holds the first affix drawn at once (since
+    // 12.11.2026; before, it kept its own until the choice, and an item
+    // taken out of the choice's sight kept it for good): the choice may put
+    // another of them in its place.
+    assert.notEqual(done.data.item.affixes[0].id, item.affixes[0].id);
     assert.equal(done.data.pending.options.length, 3);
     assert.equal(done.data.result, null);
     assert.equal(done.data.character.gold, 100000 - cost.gold);

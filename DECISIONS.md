@@ -3092,6 +3092,44 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.74 (12.11.2026): poprawki Osady, Wież, Warowni, rzemiosła i Próśb Gildii z przeglądu kodu
+
+Przegląd kodu Osady, Wież i Portali, Warowni, rzemiosła oraz rozwoju postaci. Każda poprawka ma test, który bez niej nie przechodzi (test/review-osada.test.js, test/review-towers-crafting.test.js, test/review-days.test.js, test/review-progression.test.js).
+
+1. **Kamień z przedmiotu sprzedanego przy pełnym plecaku wracał dwa razy** (src/server/towers.js, hunts.js, inventory.js, chest.js). Gdy po wygranej w Wieży albo przy odbiorze raportu wyprawy plecak był pełny, złomiarz sprzedawał najsłabszy przedmiot, a kamień z niego wracał do minerałów bez sprawdzenia, czy przedmiot jest jeszcze w plecaku. Przedmiot włożony w tej samej chwili do Skrzyni Konta zostawał w niej z kamieniem, a drugi kamień trafiał do minerałów. Teraz:
+   - cena i kamień liczą się tylko z przedmiotów, które w chwili zapisu są jeszcze w plecaku;
+   - przedmioty zdobyte w Wieży albo na wyprawie zapisują się po sprzedaży złomiarza: baza nadaje nowemu przedmiotowi numer usuniętego, więc złomiarz mógł wziąć świeżo zdobyty przedmiot za ten, który sprzedaje;
+   - „Włóż do Skrzyni Konta”, „Wyjmij”, „Załóż”, „Zdejmij” i „Wyrzuć” zmieniają wersję postaci, więc wejście do Wieży albo odbiór raportu zaczęte wcześniej prosi o ponowienie.
+2. **Błąd serwera przy wygranej w Wieży** (src/server/inventory.js). Przedmiot założony w tej samej chwili, w której wygrana zakładała zdobyty przedmiot na to samo miejsce, kończył wejście błędem serwera. Teraz gra prosi o ponowienie.
+3. **Wybór afiksu u Zaklinaczki (brakujący szczegół)** (src/server/settlement.js, forge.js). Przy wyborze z 2–3 afiksów przedmiot zachowywał stary afiks aż do wyboru. Przedmiot włożony do Skrzyni Konta i wyjęty gubił wybór i zostawał ze starym afiksem, choć zaklęcie było opłacone, więc nieudane zaklęcia dało się cofać. Teraz przedmiot dostaje od razu pierwszy z wylosowanych afiksów, a wybór może go zamienić na inny z nich; zasada 97 („gracz zatrzymuje jeden”) zostaje. Do tego:
+   - wybór zapisuje się tylko wtedy, gdy postać jest taka, jak ją odczytał; wcześniej podniesienie rzadkości u Kowala zapisane w tej samej chwili traciło nowy afiks;
+   - Kowal nie podnosi rzadkości przedmiotu, na którym czeka wybór afiksu, bo afiksy do wyboru są wylosowane dla starej rzadkości: „Najpierw wybierz afiks z poprzedniego zaklęcia.”
+4. **Zaklęcie żywiołu** (src/server/settlement.js). Zapisane i opłacone zaklęcie odpowiadało „Spróbuj ponownie”, gdy w tej samej chwili przyszło złoto (zwrot przebitej oferty na Targowisku, pula Loterii). Teraz odpowiada sukcesem.
+5. **Dzień, który się nie cofa: Osada, Warownia, Wieże i Portale** (src/engine/quests.js: laterPeriod i samePeriod). Jak w 0.2.71 dla zadań, Pustelnika i Koła Fortuny: żądanie zaczęte przed północą, a obsłużone po żądaniu nowego dnia, brało zapis nowego dnia za brak zapisu. Działało więc jeszcze raz i zapisywało stary dzień, a limit nowego dnia otwierał się ponownie. Teraz zapis późniejszego dnia albo tygodnia liczy się jako wykorzystany limit i nigdy nie zostaje nadpisany wcześniejszym. Dotyczy to:
+   - darmowej próby dnia w Sali prób;
+   - zwojów u Kowala;
+   - listów gończych, także nagrody za list już rozliczony;
+   - podarków dla mieszkańców i prezentów od nich;
+   - punktów dnia za handel z Jagną i Wszeborem;
+   - plotki w Karczmie;
+   - rozmów, treningów i prezentów towarzyszy;
+   - tygodniowego zlecenia z Tablicy zleceń;
+   - treningu i błogosławieństwa w Warowni;
+   - wejść do Wież i czyszczeń Portali.
+6. **Stół rozbiórki i wzory** (src/server/crafting.js, data/buildings.json). Przedmiot rozebrany na Stole od razu uczy wzoru, a „Usuń z kolejki” zwraca przedmiot i chowa wzór. Praca w Warsztacie albo Szlifierni zaczęta z tym wzorem w międzyczasie, postaci albo Awatara, robiła przedmioty dalej. Wzór był więc używany bez oddania przedmiotu, który go uczy. Teraz takiej rozbiórki nie da się usunąć z kolejki, dopóki ta praca trwa: „Z wzoru „…”, którego nauczył ten przedmiot, powstają teraz przedmioty. Usuń zlecenie, gdy ta praca się skończy.”
+7. **Błędy serwera przy dziwnych nazwach towarów** (src/server/settlement.js, crafting.js). Sprzedaż Jagnie i przeróbka materiałów na Stole z nazwą towaru taką jak wbudowane nazwy języka („constructor”) kończyły się błędem serwera. Teraz odpowiadają zwykłą odmową.
+8. **Próbne powiadomienie** (src/server/push.js). „Wyślij próbne powiadomienie” stuknięte wiele razy naraz wysyłało kilka powiadomień, choć wolno jedno na pół minuty. Teraz pół minuty zapisuje się razem ze sprawdzeniem.
+9. **Prośby Gildii po zmianie gildii** (src/server/guild-requests.js). Prośba zostawiona w gildii, z której postać odeszła, zamykała się przy prośbie w nowej gildii bez podziękowania za dary, a podziękować nie mógł już nikt. Teraz dary dostają podziękowanie przy zamknięciu, jak przy „Wycofaj”.
+10. **Sprawdzanie typów (650 A)** obejmuje teraz wszystkie 65 plików silnika.
+11. **Przejrzane i bez zmian:**
+    - zadania narratora, kosmetyka, Awatar, „Co nowego?”, kropki Gildii, oznaczanie na czacie, rozdawanie punktów, usuwanie postaci;
+    - Osada: zlecenia, Garbarnia, Stajnia, Pustelnik, kufel w Karczmie, zaklęcie afiksu i przekucie u Kowala (raz na przedmiot), ceny bez zysku z kupna i sprzedaży;
+    - Portale, Wieże, Warownia (trening, błogosławieństwo, Zbrojownia, cieplarnia), warzenie, kopalnia, Szlifiernia, Stół rozbiórki, sprzedaż i ulepszanie w plecaku;
+    - umiejętności, ewolucje, skrzynie Bestiariusza i Encyklopedii, Sława postaci i gildii, Siedziba Gildii, Wymiana gildii, dary w Prośbach, ulubione, samouczek;
+    - trasy testowe są zamknięte dla zwykłych kont.
+
+Pytanie na stronie ocen: 839 (Sława za sprzedaż na Targowisku: dwa konta mogą ją zbierać, sprzedając sobie nawzajem tanie oferty).
+
 ## Wersja 0.2.73 (12.11.2026): bezpieczeństwo kont, logowania, poczty, imion i czatu z przeglądu kodu
 
 Przegląd bezpieczeństwa kont, logowania i sesji, Panelu autora, czatu i strony gry. Każda poprawka ma test, który bez niej nie przechodzi (test/review-accounts.test.js, test/review-community.test.js, test/payments-autopay.test.js). Strona gry w przeglądarce jest szczelna: tekst graczy zawsze wyświetla się jako zwykły tekst, a sesja, logowanie przez Google i przekierowania są zabezpieczone.

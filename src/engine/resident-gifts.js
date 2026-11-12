@@ -19,7 +19,7 @@
 import { knownPotions, potionPrice } from './brewing.js';
 import { materialPrice, ordinaryMaterial, parseStack, stackKey } from './crafting.js';
 import { knownHerbs } from './professions.js';
-import { questPeriod } from './quests.js';
+import { questPeriod, samePeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { orderGoods, standingOf } from './settlement.js';
 import { tannerTakes } from './tannery.js';
@@ -153,7 +153,9 @@ export function giftGoods(kind, held, content) {
  * @param {number} now
  * @param {Content} content
  */
-export const givenToday = (gifts, residentId, now, content) => gifts?.given?.[residentId] === questPeriod('daily', now, content).key;
+// A gift of a later day counts as today's (laterPeriod in quests.js): a
+// request still of the day gone gives no other one and writes no day back.
+export const givenToday = (gifts, residentId, now, content) => samePeriod(gifts?.given?.[residentId], questPeriod('daily', now, content).key);
 
 // The gifts as kept after one to the resident on the day of `now`.
 /**
@@ -222,7 +224,7 @@ export function friendPresent(residentId, { character, points, gifts, seed }, no
   const from = content.settlement.standings.findIndex((/** @type {{ id: string }} */ standing) => standing.id === rules(content).from);
   if (standingOf(points, content).index < from) return null;
   const week = questPeriod('weekly', now, content).key;
-  if (gifts?.taken?.[residentId] === week) return null;
+  if (samePeriod(gifts?.taken?.[residentId], week)) return null;
   if (weekly.kind === 'gold') return { week, kind: 'gold', count: Math.round(weekly.perLevel * character.level) };
   if (weekly.kind === 'time-points') return { week, kind: 'time-points', count: weekly.count };
   const goods = presentGoods(weekly.kind, character, content);

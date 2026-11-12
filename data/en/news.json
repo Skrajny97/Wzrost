@@ -496,6 +496,10 @@
     "0.2.73": {
       "title": "Version 0.2.73",
       "body": "- Safer sign-in: the limit of password attempts holds also for attempts sent at once.\n- Character and guild names: letters of one alphabet (Latin, Greek or Cyrillic), with no invisible signs. A name that only looks like someone else's can no longer be taken.\n- Mails with a link: at most one a minute and five a day to one address, from any account.\n- You can attach a screenshot to “Report a bug” once your e-mail is confirmed; the report itself you can send right away.\n- The chat recognises links better, and failed translations go back to the daily pool within a sensible limit."
+    },
+    "0.2.74": {
+      "title": "Version 0.2.74",
+      "body": "- Enchantress: with a choice of several affixes, the item gets the first one rolled at once, and your choice can swap it for another of them.\n- The smith does not raise the rarity of an item whose affix choice is still waiting.\n- The daily and weekly limits of the Settlement, the Stronghold, the Towers and the Portals work right at midnight too.\n- Salvage Table: you cannot take the salvage of an item that taught a pattern off the queue while items are being made from that pattern.\n- Fixes for gems of items sold when the bag is full, for putting items on, for test notifications and for Guild Requests after changing guilds."
     }
   }
 }

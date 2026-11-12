@@ -8,7 +8,7 @@
 // and `lands` once drawn without the newest land, 10.11.2026), the posters
 // done that day and the poster taken (`beaten` once its target fell).
 
-import { questPeriod, wantedOf, wantedPosters, wantedTarget, wantedTrophy, weekCount } from '../engine/index.js';
+import { laterPeriod, questPeriod, samePeriod, wantedOf, wantedPosters, wantedTarget, wantedTrophy, weekCount } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
 import { characterView, loadPlayer, requirePlayer, settlementBoard } from './characters.js';
 import { content } from './content.js';
@@ -28,11 +28,18 @@ const today = (now) => questPeriod('daily', now, content()).key;
 // character as it is now. A basis drawn since 10.11.2026 says so (`lands`):
 // its posters leave out the newest land (wantedPlaces in the engine), while
 // a day drawn before keeps the posters it was drawn with.
+//
+// A record of a later day stays the record (laterPeriod in quests.js): a
+// request still of the day before, met by the record the next day's first
+// look kept, goes by it, so it neither opens again the posters done that
+// day, whose bounties were claimed, nor writes its own day over it (the
+// code review, 12.11.2026).
 function recordOf(row, stored, day) {
   const record = stored.wanted ?? {};
-  const same = record.day === day;
+  const at = laterPeriod(record.day, day) ? record.day : day;
+  const same = record.day === at;
   return {
-    day,
+    day: at,
     basis: same && record.basis ? record.basis : { classLevel: row.class_level, early: hallRecord(row).early, lands: true },
     done: same ? (record.done ?? []) : [],
     taken: record.taken ?? null,
@@ -48,7 +55,7 @@ const postersOf = (row, record) => wantedPosters(record.basis.classLevel, record
 export function wantedToKeep(row, stored, now) {
   if (!wantedOf(content())) return null;
   const day = today(now);
-  if (stored.wanted?.day === day && stored.wanted.basis) return null;
+  if (samePeriod(stored.wanted?.day, day) && stored.wanted.basis) return null;
   return recordOf(row, stored, day);
 }
 

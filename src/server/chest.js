@@ -78,9 +78,13 @@ export async function putInChest(context) {
       .prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND slot IS NULL AND EXISTS (SELECT 1 FROM chest_items WHERE user_id = ? AND item_id = ? AND put_at = ?)')
       .bind(item.id, player.row.id, session.userId, item.id, now),
     // A favourite no longer, once in the chest (favorites.js): it comes
-    // out as a new item, of whichever character takes it.
+    // out as a new item, of whichever character takes it. And the
+    // character's version moves with its bag (the code review, 12.11.2026:
+    // the scrapper of a tower's win, which had read the bag before, sold
+    // the item put away meanwhile and gave its gem back too, so the gem
+    // was both in the chest and in the minerals).
     db
-      .prepare(`UPDATE characters SET favorites = ${withoutFavorites} WHERE id = ? AND EXISTS (SELECT 1 FROM chest_items WHERE user_id = ? AND item_id = ? AND put_at = ?)`)
+      .prepare(`UPDATE characters SET favorites = ${withoutFavorites}, version = version + 1 WHERE id = ? AND EXISTS (SELECT 1 FROM chest_items WHERE user_id = ? AND item_id = ? AND put_at = ?)`)
       .bind(JSON.stringify([item.id]), player.row.id, session.userId, item.id, now),
   ]);
   if (put.meta.changes !== 1) throw full();
@@ -106,6 +110,8 @@ export async function takeFromChest(context) {
       )
       .bind(player.row.id, player.row.id, stored.id, session.userId),
     db.prepare('DELETE FROM chest_items WHERE id = ? AND user_id = ?').bind(stored.id, session.userId),
+    // The version moves with the bag, as at "Włóż".
+    db.prepare('UPDATE characters SET version = version + 1 WHERE id = ? AND changes() = 1').bind(player.row.id),
   ]);
   return answer(context, session);
 }

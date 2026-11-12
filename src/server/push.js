@@ -107,7 +107,14 @@ export async function testPush(context) {
   if (!subscription) return json({ result: 'unknown' });
   if (subscription.gone_at !== null) return json({ result: 'gone' });
   if (subscription.tested_at !== null && context.now - subscription.tested_at < TEST_EVERY_MS) return json({ result: 'wait' });
-  await db.prepare('UPDATE push_subscriptions SET tested_at = ? WHERE endpoint = ?').bind(context.now, endpoint).run();
+  // The half minute is taken in the write itself, so of the taps sent at the
+  // same moment one sends (the code review, 12.11.2026: each of them passed
+  // the check above, and each made the server sign and send a message).
+  const taken = await db
+    .prepare('UPDATE push_subscriptions SET tested_at = ? WHERE endpoint = ? AND user_id = ? AND gone_at IS NULL AND (tested_at IS NULL OR tested_at <= ?)')
+    .bind(context.now, endpoint, session.userId, context.now - TEST_EVERY_MS)
+    .run();
+  if (taken.meta.changes !== 1) return json({ result: 'wait' });
   const message = { title: say(content().texts, 'pushTestTitle', 0), body: say(content().texts, 'pushTestBody', 0), tag: 'test', url: '#/walka', at: context.now, always: true };
   let status = 0;
   try {

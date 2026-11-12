@@ -33,6 +33,7 @@ import {
   huntKills,
   huntReport,
   isUnlocked,
+  laterPeriod,
   questPeriod,
   sellPrice,
   towerArea,
@@ -61,9 +62,8 @@ import { trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { favoriteIds } from './favorites.js';
-import { fallenGems, soldGold } from './inventory.js';
+import { fallenGems, gemsBackSql, soldGold } from './inventory.js';
 import { gemLines } from './hunts.js';
-import { addTo } from './professions.js';
 import { partyOf } from './parties.js';
 import { trimReports } from './reports.js';
 import { weekNow } from './weeks.js';
@@ -92,7 +92,13 @@ function recordOf(row) {
   return { day: stored.day ?? null, used: stored.used ?? 0, best: stored.best ?? {}, chests: stored.chests ?? {}, champions: stored.champions ?? {} };
 }
 
-const entriesUsed = (record, now) => (record.day === questPeriod('daily', now, content()).key ? record.used : 0);
+// The entries of a later day leave none for today (laterPeriod in
+// quests.js): a request still of the day gone climbs no floor and writes no
+// day back (the code review, 12.11.2026).
+function entriesUsed(record, now) {
+  const day = questPeriod('daily', now, content()).key;
+  return laterPeriod(record.day, day) ? rules().entries.perDay : record.day === day ? record.used : 0;
+}
 
 // Who climbs a tower beside the character: in the Wieża Drużyn the other
 // players of its Drużyna first, as they are (within the class levels'
@@ -260,9 +266,12 @@ export async function enterTower(context) {
   };
   // The gems of the bag's items the scrapper bought fall out and go back to
   // the minerals (757 B), as after an exploration (hunts.js).
+  // Each counted from the items still in the bag as the batch runs, as their
+  // price is (the code review, 12.11.2026: a gem given back for an item
+  // put into the Skrzynia Konta meanwhile stayed in it too).
   const gemsBack = fallenGems(storedSold);
   if (Object.keys(gemsBack).length > 0) report.system = [...report.system, ...gemLines(gemsBack)];
-  const setGems = addTo('minerals', gemsBack);
+  const setGems = gemsBackSql(row.id, storedSold);
   const summary = {
     tower: { name: tower.name, floor },
     areaName: report.areaName,
@@ -308,7 +317,6 @@ export async function enterTower(context) {
       .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
       .bind(row.id, `${row.id}:tower:${seed}`, 'tower', now, JSON.stringify(summary), JSON.stringify(report)),
     trimReports(db, row.id, 'tower'),
-    ...hunt.items.flatMap((item, index) => (soldFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)])),
     db
       .prepare(
         `UPDATE characters SET level = ?, xp = ?, class_level = ?, class_xp = ?, gold = MAX(0, gold + ? + ${storedPrice.sql})${setMaterials}${setGems.sql},
@@ -337,7 +345,12 @@ export async function enterTower(context) {
     // floor of a level at most so many below the character's
     // (guild-trials.js; the author: 488 A).
     ...trialProgress(db, row.id, { kills: huntKills(hunt, content()), towerWins: won && floor >= trialTowerFloor(row.level, content()) ? 1 : 0 }, now),
-    ...(storedSold.length > 0 ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${storedSold.map(() => '?').join(', ')})`).bind(row.id, ...storedSold.map((item) => item.id))] : []),
+    ...(storedSold.length > 0 ? [db.prepare(`DELETE FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${storedSold.map(() => '?').join(', ')})`).bind(row.id, ...storedSold.map((item) => item.id))] : []),
+    // The win's items last: the database may give a new item the id of an
+    // item gone from the bag meanwhile, which the scrapper's price, gems and
+    // deletion above, counted by the ids read, would then take for the one
+    // they sell (the code review, 12.11.2026).
+    ...hunt.items.flatMap((item, index) => (soldFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)])),
   ]);
   const after = await loadPlayer(db, session.userId);
   return json({

@@ -204,6 +204,29 @@ export function periodShare(periodId, level, now, content) {
 /** @type {Map<string, Period>} */
 const lastPeriods = new Map();
 
+// Whether a record kept with a period's key (the date the day, the week or
+// the month starts on) is of a later period than `key`: written by a
+// request of the next period that ended first, while a request still of
+// this one runs. Such a record counts as the period's limit used, and an
+// earlier key is never written over it (the code review: 0.2.71 for the
+// quests, the Pustelnik and the Koło Fortuny, 12.11.2026 for the rest). The
+// keys sort as their periods do.
+/**
+ * @param {unknown} stored
+ * @param {string} key
+ * @returns {boolean}
+ */
+export const laterPeriod = (stored, key) => typeof stored === 'string' && stored > key;
+
+// Whether a record's key is now's period or a later one (laterPeriod): the
+// period's limit is counted from it.
+/**
+ * @param {unknown} stored
+ * @param {string} key
+ * @returns {boolean}
+ */
+export const samePeriod = (stored, key) => stored === key || laterPeriod(stored, key);
+
 // The period around `now`: its key (the date it starts on, on the zone's
 // clock), its start and its end.
 /**

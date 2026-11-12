@@ -24,6 +24,7 @@ import {
   leavingRack,
   professionState,
   questPeriod,
+  samePeriod,
   storeStacks,
   trainingPlan,
   trainingXp,
@@ -49,7 +50,10 @@ export async function startTraining(context) {
   const row = player.row;
   const state = stateOf(row);
   const day = questPeriod('daily', now, content()).key;
-  if (state.training?.day === day) throw new ApiError(409, 'trained_today', 'Dzisiejszy trening już był. Następny po północy.');
+  // Today's, or a later day's (laterPeriod in quests.js): a request still of
+  // the day gone starts none and writes no day back (the code review,
+  // 12.11.2026).
+  if (samePeriod(state.training?.day, day)) throw new ApiError(409, 'trained_today', 'Dzisiejszy trening już był. Następny po północy.');
   if (state.training && !state.training.claimed) throw new ApiError(409, 'training_unclaimed', 'Najpierw odbierz poprzedni trening.');
   const training = { day, startedAt: now, endsAt: now + plan.hours * HOUR, hours: plan.hours, xp: trainingXp(row.level, plan, content()), claimed: false };
   const result = await context.env.DB.prepare('UPDATE characters SET fortress = ?, version = version + 1 WHERE id = ? AND version = ?')
@@ -98,7 +102,7 @@ export async function chooseBlessing(context) {
   const row = player.row;
   const state = stateOf(row);
   const day = questPeriod('daily', now, content()).key;
-  if (state.blessing?.day === day) throw new ApiError(409, 'blessed_today', 'Dzisiejsze błogosławieństwo już wybrane. Następne po północy.');
+  if (samePeriod(state.blessing?.day, day)) throw new ApiError(409, 'blessed_today', 'Dzisiejsze błogosławieństwo już wybrane. Następne po północy.');
   const blessing = { day, kind: choice.id, bonus: plan.bonus, left: plan.fights };
   const result = await context.env.DB.prepare('UPDATE characters SET fortress = ?, version = version + 1 WHERE id = ? AND version = ?')
     .bind(JSON.stringify({ ...state, blessing }), row.id, row.version)

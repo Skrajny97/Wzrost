@@ -111,14 +111,15 @@
           "errors": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["gone", "empty", "old", "bagFull", "minerals", "rewarded"],
+            "required": ["gone", "empty", "old", "bagFull", "minerals", "rewarded", "patternInUse"],
             "properties": {
               "gone": { "type": "string", "minLength": 1 },
               "empty": { "type": "string", "minLength": 1 },
               "old": { "type": "string", "minLength": 1 },
               "bagFull": { "type": "string", "pattern": "\\{need\\}" },
               "minerals": { "type": "string", "pattern": "\\{minerals\\}" },
-              "rewarded": { "type": "string", "pattern": "\\{quest\\}" }
+              "rewarded": { "type": "string", "pattern": "\\{quest\\}" },
+              "patternInUse": { "type": "string", "pattern": "\\{pattern\\}" }
             }
           }
         }

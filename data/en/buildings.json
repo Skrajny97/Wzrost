@@ -90,7 +90,8 @@
         "old": "This salvage from before version 0.1.65 cannot be undone, as the item is gone. It will finish on its own.",
         "bagFull": "The bag cannot hold the items from the queue (slots needed: {need}, free: {free}). Make room in it.",
         "minerals": "The gems and ores from salvage are missing: {minerals}. Without them the item will not go back to the bag.",
-        "rewarded": "The reward for the quest “{quest}” has already been collected, and without this work it would not be done. Remove fewer orders or wait until the table finishes them."
+        "rewarded": "The reward for the quest “{quest}” has already been collected, and without this work it would not be done. Remove fewer orders or wait until the table finishes them.",
+        "patternInUse": "Items are being made right now from the pattern “{pattern}” this item taught. Remove the order once that work is done."
       }
     }
   },

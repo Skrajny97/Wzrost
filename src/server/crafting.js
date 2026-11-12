@@ -177,7 +177,11 @@ export async function craftMaterials(context) {
     if (have === 0) throw new ApiError(404, 'no_materials', 'Nie masz tego materiału.');
     if (!Number.isInteger(body.count) || body.count < 1 || body.count > have) throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${have} sztuk.`);
   }
-  const keys = one ? [body.key] : body.all === true ? Object.keys(settled.materials) : Array.isArray(body.keys) ? body.keys.filter((key) => typeof key === 'string') : [];
+  // Only stacks the game knows and the character holds: a key such as
+  // "constructor" found Object's own members in the stored materials (the
+  // code review, 12.11.2026: an error of the server).
+  const asked = one ? [body.key] : body.all === true ? Object.keys(settled.materials) : Array.isArray(body.keys) ? body.keys.filter((key) => typeof key === 'string') : [];
+  const keys = asked.filter((key) => knownStack(key, content()) && Object.hasOwn(settled.materials, key));
   if (keys.length === 0) throw new ApiError(400, 'invalid_materials', 'Wybierz materiały do przeróbki.');
   checkRoom(settled.queue);
   const foreign = JSON.parse(player.row.foreign_stacks ?? '{}');
@@ -380,6 +384,13 @@ export async function cancelOrders(context) {
   // would have taught it: that order takes over its mark (patternsKept).
   const learned = JSON.parse(row.patterns ?? '[]');
   const { queue, hidden } = patternsKept(back.state.queue, back.patterns.filter((id) => learned.includes(id)));
+  // Nor while a work of the Warsztat or the Szlifiernia, the character's or
+  // the Awatar's, makes items with a pattern the order would hide: they are
+  // made without asking for it again, so the item would come back with the
+  // pattern used (the code review, 12.11.2026).
+  const working = [player.activity, player.avatarActivity].filter((work) => work && (work.kind === 'items' || work.kind === 'jewels')).map((work) => JSON.parse(work.options ?? '{}').base);
+  const inUse = hidden.find((id) => working.includes(id));
+  if (inUse) throw new ApiError(409, 'pattern_in_use', filled(errors.patternInUse, { pattern: content().basesById[inUse]?.name ?? inUse }));
   const db = context.env.DB;
   const weeks = [...new Set(cancelled.map((one) => questPeriod('weekly', one.orderedAt, content()).key))];
   const trials = (await tableTrials(db, row.id, weeks))

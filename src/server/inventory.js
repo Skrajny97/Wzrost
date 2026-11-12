@@ -45,19 +45,23 @@ import { weekFactorNow } from './weeks.js';
 import { anvilDiscountOf } from './perks.js';
 import { addTo } from './professions.js';
 
+// A number written into a query, which must be a whole one.
+const whole = (value) => {
+  if (!Number.isSafeInteger(value)) throw new Error(`Not a whole number: ${value}`);
+  return value;
+};
+
 // The scrapper's price for the stored `items`, summed in SQL over the items
-// still there, so an item sold twice at the same moment pays once. Each price
-// is sellPrice() in the engine, written into the query as a whole number (it
-// keeps the bound values under D1's limit); `bonus` is the camp's Skup złomu.
+// still in the bag, so an item sold twice at the same moment pays once, and
+// one put on, into the Skrzynia Konta or anywhere else meanwhile pays
+// nothing. Each price is sellPrice() in the engine, written into the query
+// as a whole number (it keeps the bound values under D1's limit); `bonus`
+// is the camp's Skup złomu.
 export function soldGold(characterId, items, bonus) {
-  const whole = (value) => {
-    if (!Number.isSafeInteger(value)) throw new Error(`Not a whole number: ${value}`);
-    return value;
-  };
   const prices = items.map((item) => `WHEN ${whole(item.id)} THEN ${whole(sellPrice(item, content(), bonus))}`).join(' ');
   return {
     sql: `(SELECT COALESCE(SUM(CASE id ${prices} ELSE 0 END), 0)
-           FROM items WHERE character_id = ? AND id IN (${items.map(() => '?').join(', ')}))`,
+           FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${items.map(() => '?').join(', ')}))`,
     binds: [characterId, ...items.map((item) => item.id)],
   };
 }
@@ -85,6 +89,26 @@ export function fallenGems(items) {
   return gems;
 }
 
+// The change of the characters row that gives back the gems of the stored
+// `items` the scrapper buys, each counted from the items still in the bag
+// as the batch runs, before the statement that takes them (gemBack for one
+// item): an item put into the Skrzynia Konta or on meanwhile keeps its gem
+// (the code review, 12.11.2026: a ruby in the chest and in the minerals).
+export function gemsBackSql(characterId, items) {
+  const byGem = new Map();
+  for (const item of items) {
+    const gem = fallenGem(item);
+    if (gem) byGem.set(gem, [...(byGem.get(gem) ?? []), whole(item.id)]);
+  }
+  if (byGem.size === 0) return { sql: '', binds: [] };
+  const entries = [...byGem];
+  const still = (ids) => `(SELECT COUNT(*) FROM items WHERE character_id = ${whole(characterId)} AND slot IS NULL AND id IN (${ids.join(', ')}))`;
+  return {
+    sql: `, minerals = json_set(minerals, ${entries.map(([, ids]) => `?, COALESCE(json_extract(minerals, ?), 0) + ${still(ids)}`).join(', ')})`,
+    binds: entries.flatMap(([gem]) => [`$."${gem}"`, `$."${gem}"`]),
+  };
+}
+
 // The change of the characters row that gives back the gem of `item` while
 // the item is still the character's, before the statement that takes it:
 // so an item sold or thrown away twice at the same moment gives it once.
@@ -93,7 +117,7 @@ function gemBack(item, characterId) {
   if (!gem) return { sql: '', binds: [] };
   const path = `$."${gem}"`;
   return {
-    sql: ', minerals = CASE WHEN EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ?) THEN json_set(minerals, ?, COALESCE(json_extract(minerals, ?), 0) + 1) ELSE minerals END',
+    sql: ', minerals = CASE WHEN EXISTS (SELECT 1 FROM items WHERE id = ? AND character_id = ? AND slot IS NULL) THEN json_set(minerals, ?, COALESCE(json_extract(minerals, ?), 0) + 1) ELSE minerals END',
     binds: [item.id, characterId, path, path],
   };
 }
@@ -135,9 +159,14 @@ export async function equipItem(context) {
     if (bagPlaces(player) >= bagCapacity(campLevels(player.buildings, context.now, content()), content())) throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
   }
   const db = context.env.DB;
+  // The character's version moves with what it wears (the code review,
+  // 12.11.2026): a batch of another request that counts on the worn items
+  // as read (an item of a win put on in a slot seen empty, towers.js and
+  // hunts.js) then asks for a retry instead of breaking.
   await db.batch([
     db.prepare('UPDATE items SET slot = NULL WHERE character_id = ? AND slot = ?').bind(player.row.id, item.slot),
     db.prepare('UPDATE items SET slot = ? WHERE id = ? AND character_id = ?').bind(item.slot, item.id, player.row.id),
+    db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(player.row.id),
   ]);
   return respond(context, session);
 }
@@ -152,9 +181,11 @@ export async function unequipItem(context) {
   if (!gearSetIds(gearSetsOf(player.row)).has(item.id) && bagPlaces(player) >= capacity) {
     throw new ApiError(409, 'bag_full', 'Plecak jest pełny.');
   }
-  await context.env.DB.prepare('UPDATE items SET slot = NULL WHERE id = ? AND character_id = ?')
-    .bind(item.id, player.row.id)
-    .run();
+  const db = context.env.DB;
+  await db.batch([
+    db.prepare('UPDATE items SET slot = NULL WHERE id = ? AND character_id = ?').bind(item.id, player.row.id),
+    db.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(player.row.id),
+  ]);
   return respond(context, session);
 }
 
@@ -173,8 +204,9 @@ export async function discardItem(context) {
     db,
     [
       unmarked(db, player.row.id, [item.id]),
-      ...(gem.sql ? [db.prepare(`UPDATE characters SET version = version + 1${gem.sql} WHERE id = ?`).bind(...gem.binds, player.row.id)] : []),
-      db.prepare('DELETE FROM items WHERE id = ? AND character_id = ?').bind(item.id, player.row.id),
+      // The version moves with the bag, also without a gem to give back.
+      db.prepare(`UPDATE characters SET version = version + 1${gem.sql} WHERE id = ?`).bind(...gem.binds, player.row.id),
+      db.prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND slot IS NULL').bind(item.id, player.row.id),
     ],
     () => favoriteRefusal('discard'),
   );
@@ -211,7 +243,7 @@ export async function sellItems(context) {
         db
           .prepare(`UPDATE characters SET gold = gold + ${price.sql}, version = version + 1 WHERE id = ?`)
           .bind(...price.binds, player.row.id),
-        db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (${ids.map(() => '?').join(', ')})`).bind(player.row.id, ...ids),
+        db.prepare(`DELETE FROM items WHERE character_id = ? AND slot IS NULL AND id IN (${ids.map(() => '?').join(', ')})`).bind(player.row.id, ...ids),
       ],
       () => favoriteRefusal('sell'),
     );
@@ -245,7 +277,7 @@ export async function sellItem(context) {
     [
       unmarked(db, player.row.id, [item.id]),
       db.prepare(`UPDATE characters SET gold = gold + ${price.sql}${gem.sql}, version = version + 1 WHERE id = ?`).bind(...price.binds, ...gem.binds, player.row.id),
-      db.prepare('DELETE FROM items WHERE id = ? AND character_id = ?').bind(item.id, player.row.id),
+      db.prepare('DELETE FROM items WHERE id = ? AND character_id = ? AND slot IS NULL').bind(item.id, player.row.id),
     ],
     () => favoriteRefusal('sell'),
   );

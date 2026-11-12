@@ -18,7 +18,7 @@ import { fireBuilding, fireTrade } from './fire.js';
 import { affixShare, affixValue, sellPrice } from './items.js';
 import { easyPlace } from './hunt.js';
 import { knownHerbs, professionOpen, professionState } from './professions.js';
-import { questPeriod } from './quests.js';
+import { laterPeriod, questPeriod, samePeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { partPrice, shopBuilding } from './shop.js';
 import { countedForm, decimalText, say, word } from './text.js';
@@ -458,8 +458,10 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
     }
   });
   const { key } = questPeriod('weekly', now, content);
+  // A later week's order stays as it is (laterPeriod in quests.js): a request
+  // still of the week gone draws no order of its own over it.
   const weekly =
-    board.weekly?.period === key && (board.weekly.done || !board.weekly.order || !outdated(board.weekly.order, character, content))
+    laterPeriod(board.weekly?.period, key) || (board.weekly?.period === key && (board.weekly.done || !board.weekly.order || !outdated(board.weekly.order, character, content)))
       ? board.weekly
       : { period: key, order: drawOrder({ character, reputation, seed: `${seed}:weekly:${key}`, weekly: true }, content), done: false };
   return {
@@ -865,7 +867,8 @@ export function drawRumor({ character, seed }, now, content) {
  * @param {number} now
  * @param {Content} content
  */
-export const rumorToday = (stored, now, content) => (stored?.day === questPeriod('daily', now, content).key ? stored : null);
+// A rumor of a later day counts as today's (laterPeriod in quests.js).
+export const rumorToday = (stored, now, content) => (samePeriod(stored?.day, questPeriod('daily', now, content).key) ? stored : null);
 
 // The rumor's odds for an exploration of an inner region: rumor.factor
 // times more elites and champions when it is today's, about this place and
@@ -912,7 +915,7 @@ export function rumorText(rumor, content) {
 export function companionGift(companion, { character, seed }, now, content) {
   const { professions, gifts } = content.settlement.companions;
   const week = questPeriod('weekly', now, content).key;
-  if (companion.giftWeek === week) return null;
+  if (samePeriod(companion.giftWeek, week)) return null;
   const kind = professions.find((/** @type {Record<string, any>} */ one) => one.id === companion.profession)?.goods;
   let goods = orderGoods(character, content).filter((good) => good.kind === kind);
   if (goods.length === 0 && kind === 'herb') goods = knownHerbs(1, content).map((herb) => ({ kind, key: herb.id }));
@@ -1028,6 +1031,9 @@ export function tradePoints(gold, level, stored, now, content, tuning = content.
   const { daily } = tuning;
   const per = goldPerPoint(level, tuning);
   const day = questPeriod('daily', now, content).key;
+  // A record of a later day: its points are all the day may give, and it
+  // stays (laterPeriod in quests.js).
+  if (laterPeriod(stored?.day, day)) return { points: 0, reputation: 0, trade: stored };
   const today = stored?.day === day;
   const before = today ? stored.points : 0;
   const total = (today ? (stored.gold ?? 0) : 0) + Math.max(0, gold);
@@ -1055,10 +1061,10 @@ export const goldPerPoint = (level, tuning) => tuning.goldPerPointPerLevel * lev
  */
 export function tradeView(stored, level, now, content, tuning = content.settlement.herbalist.reputation) {
   const day = questPeriod('daily', now, content).key;
-  const today = stored?.day === day;
-  const points = today ? stored.points : 0;
+  const today = samePeriod(stored?.day, day);
+  const points = today ? (stored?.points ?? 0) : 0;
   const per = goldPerPoint(level, tuning);
-  return { today: points, daily: tuning.daily, perPoint: per, toNext: points >= tuning.daily ? null : per - (today ? (stored.gold ?? 0) : 0) };
+  return { today: points, daily: tuning.daily, perPoint: per, toNext: points >= tuning.daily ? null : per - (today ? (stored?.gold ?? 0) : 0) };
 }
 
 // The Zaklinaczka's zaklęcie żywiołu (part III, question 101 A): a weapon

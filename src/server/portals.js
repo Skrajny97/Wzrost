@@ -13,7 +13,7 @@
 // full HP with no potions and its HP stays as it was. Everything is saved
 // in one batch only while the character is as read (atomic.js).
 
-import { applyHunt, areaDangers, companionReady, companionsGoingMost, companionStays, huntReport, isUnlocked, portalAmount, portalArea, portalById, portalFight, portalNext, portalSweep, portalSweepAll, questPeriod } from '../engine/index.js';
+import { applyHunt, areaDangers, companionReady, companionsGoingMost, companionStays, huntReport, isUnlocked, laterPeriod, portalAmount, portalArea, portalById, portalFight, portalNext, portalSweep, portalSweepAll, questPeriod } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
 import { characterView, engineCharacter, equippedItems, loadPlayer, requirePlayer, trophiesFor } from './characters.js';
 import { content } from './content.js';
@@ -57,7 +57,10 @@ const companionsOf = (player) =>
   (JSON.parse(player.row.settlement ?? '{}').companions ?? [])
     .filter((companion) => !companionStays(companion, player.inParty) && companionReady(companion, true))
     .slice(0, companionsGoingMost(content()));
-const sweptToday = (record, portalId, now) => (record.day === today(now) ? (record.swept[portalId] ?? 0) : 0);
+// The sweeps of a later day leave none for today (laterPeriod in quests.js):
+// a request still of the day gone sweeps nothing and writes no day back (the
+// code review, 12.11.2026).
+const sweptToday = (record, portalId, now) => (laterPeriod(record.day, today(now)) ? rules().sweeps.perDay : record.day === today(now) ? (record.swept[portalId] ?? 0) : 0);
 
 // The portals for the page: the last stage, the companions the character may take, and each portal with the
 // highest stage won, the stage of its next fight (null above the

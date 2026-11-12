@@ -269,6 +269,13 @@ export async function askGuild(context) {
            SELECT ?, ?, ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM guild_requests WHERE character_id = ? AND created_at > ?)`,
         )
         .bind(guild.id, row.id, body.kind, body.key, body.count, now, now + openHours * HOUR, row.id, now - waitHours * HOUR),
+      // The gifts to a request left in a guild the character left are
+      // thanked as it closes, as "Wycofaj" thanks them (cancelGuildRequest),
+      // so their givers keep the thanks: from another guild nobody could
+      // thank them any more (the code review, 12.11.2026).
+      db
+        .prepare("UPDATE guild_gifts SET thanked_at = ? WHERE thanked_at IS NULL AND request_id IN (SELECT id FROM guild_requests WHERE character_id = ? AND state = 'cancelled' AND closed_at = ?)")
+        .bind(now, row.id, now),
     ]);
   } catch (error) {
     if (/UNIQUE/.test(String(error?.message ?? error))) throw new ApiError(409, 'open_request', errors().open);

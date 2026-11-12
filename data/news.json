@@ -625,6 +625,11 @@
       "id": "0.2.73",
       "title": "Wersja 0.2.73",
       "body": "- Bezpieczniejsze logowanie: limit prób hasła działa także przy próbach wysłanych naraz.\n- Imiona postaci i nazwy gildii: litery jednego alfabetu (łacińskiego, greckiego albo cyrylicy), bez niewidocznych znaków. Imienia, które tylko wygląda jak cudze, nie da się już wziąć.\n- Maile z linkiem: na jeden adres najwyżej jeden na minutę i pięć dziennie, z dowolnego konta.\n- Zrzut ekranu w „Zgłoś błąd” dołączysz po potwierdzeniu adresu e-mail; samo zgłoszenie wyślesz od razu.\n- Czat lepiej rozpoznaje linki, a nieudane tłumaczenia wracają do dziennej puli z rozsądnym limitem."
+    },
+    {
+      "id": "0.2.74",
+      "title": "Wersja 0.2.74",
+      "body": "- Zaklinaczka: przy wyborze z kilku afiksów przedmiot od razu dostaje pierwszy z wylosowanych, a wybór może go zamienić na inny z nich.\n- Kowal nie podnosi rzadkości przedmiotu, na którym czeka wybór afiksu.\n- Dzienne i tygodniowe limity Osady, Warowni, Wież i Portali działają poprawnie także o północy.\n- Stół rozbiórki: rozbiórki przedmiotu, który nauczył wzoru, nie usuniesz z kolejki, dopóki z tego wzoru powstają przedmioty.\n- Poprawki kamieni z przedmiotów sprzedanych przy pełnym plecaku, zakładania przedmiotów, próbnych powiadomień i Próśb Gildii po zmianie gildii."
     }
   ]
 }

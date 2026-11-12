@@ -74,6 +74,7 @@ import {
   production,
   professionOpen,
   questPeriod,
+  samePeriod,
   questsStale,
   questsView,
   readyChests,
@@ -911,7 +912,7 @@ function trainingView(player, levels, now) {
   if (!fortressOn() || !plan) return null;
   const { training } = JSON.parse(player.row.fortress ?? '{}');
   const day = questPeriod('daily', now, content());
-  const today = training?.day === day.key;
+  const today = samePeriod(training?.day, day.key);
   return {
     hours: plan.hours,
     xp: trainingXp(player.row.level, plan, content()),
@@ -927,7 +928,7 @@ function blessingView(player, levels, now, building) {
   const plan = blessingPlan(levels, content());
   if (!fortressOn() || !plan) return null;
   const { blessing } = JSON.parse(player.row.fortress ?? '{}');
-  const today = blessing?.day === questPeriod('daily', now, content()).key;
+  const today = samePeriod(blessing?.day, questPeriod('daily', now, content()).key);
   return {
     fights: plan.fights,
     choices: building.blessings,

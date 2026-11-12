@@ -13,6 +13,7 @@ import {
   heldOfRarity,
   itemName,
   piecesOfRarity,
+  laterPeriod,
   questPeriod,
   raiseOffer,
   raiseRarity,
@@ -26,15 +27,21 @@ import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { ApiError, json, readJson } from './http.js';
 import { takenOff } from './market.js';
-import { requireOpen, settlementOf, settlementView } from './settlement.js';
+import { pendingOf, requireOpen, settlementOf, settlementView } from './settlement.js';
 import { weekNow } from './weeks.js';
 
 const changed = () => new ApiError(409, 'character_changed', 'Postać zmieniła się w międzyczasie. Spróbuj jeszcze raz.');
 const forge = () => content().settlement.forge;
 
 // The Zwoje bought today, as kept in the Osada's JSON: the Zwoje ochronne,
-// or with `steady` the Zwoje utrwalenia.
-const boughtToday = (stored, now, steady = false) => (stored.forge?.day === questPeriod('daily', now, content()).key ? (stored.forge[steady ? 'steady' : 'scrolls'] ?? 0) : 0);
+// or with `steady` the Zwoje utrwalenia. A record of a later day (a request
+// of the next day came first: laterPeriod in quests.js) leaves none to buy
+// today, so no day gone is written over it (the code review, 12.11.2026).
+function boughtToday(stored, now, steady = false) {
+  const day = questPeriod('daily', now, content()).key;
+  if (laterPeriod(stored.forge?.day, day)) return forge()[steady ? 'steadyScroll' : 'scroll'].daily;
+  return stored.forge?.day === day ? (stored.forge[steady ? 'steady' : 'scrolls'] ?? 0) : 0;
+}
 
 // The Osada after a trade at the Kuźnia, as the other places answer.
 function osada(after, now) {
@@ -139,6 +146,10 @@ export async function raiseAtForge(context) {
   if (!item) throw new ApiError(404, 'item_not_found', 'Nie masz takiego przedmiotu.');
   requireUnworn(player, item, context.now);
   const stored = settlementOf(row);
+  // Not while the Zaklinaczka's affixes wait for a choice on it: they were
+  // drawn for its rarity, so one chosen after the raise would come weaker
+  // than the raise makes its affixes (the code review, 12.11.2026).
+  if (pendingOf(stored, player.items)?.item.id === item.id) throw new ApiError(409, 'choose_first', 'Najpierw wybierz afiks z poprzedniego zaklęcia.');
   const relation = stored.relations?.[forge().resident] ?? 0;
   const reputation = stored.reputation?.[forge().brotherhood] ?? 0;
   const offer = raiseOffer(item, relation, reputation, content());

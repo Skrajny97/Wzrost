@@ -184,7 +184,8 @@
         "old": "Tej rozbiórki sprzed wersji 0.1.65 nie da się cofnąć, bo przedmiotu już nie ma. Dokończy się sama.",
         "bagFull": "Plecak nie pomieści przedmiotów z kolejki (potrzebne miejsca: {need}, wolne: {free}). Zrób w nim miejsce.",
         "minerals": "Brakuje kamieni i kruszców z rozbiórki: {minerals}. Bez nich przedmiot nie wróci do plecaka.",
-        "rewarded": "Za zadanie „{quest}” odebrano już nagrodę, a bez tej pracy nie byłoby wykonane. Usuń mniej zleceń albo poczekaj, aż stół je skończy."
+        "rewarded": "Za zadanie „{quest}” odebrano już nagrodę, a bez tej pracy nie byłoby wykonane. Usuń mniej zleceń albo poczekaj, aż stół je skończy.",
+        "patternInUse": "Z wzoru „{pattern}”, którego nauczył ten przedmiot, powstają teraz przedmioty. Usuń zlecenie, gdy ta praca się skończy."
       }
     },
     "costs": [

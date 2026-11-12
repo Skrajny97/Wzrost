@@ -19,7 +19,7 @@
 import { playerCombatant } from './combatant.js';
 import { baseClassLevel, canUse, generateItem } from './items.js';
 import { gainXp, xpToNext } from './progression.js';
-import { questPeriod } from './quests.js';
+import { laterPeriod, questPeriod, samePeriod } from './quests.js';
 import { createRng } from './rng.js';
 import { topLevel } from './skills.js';
 import { autoDistribute } from './stats.js';
@@ -244,7 +244,8 @@ export function toldPieces(companion, content) {
  * @param {Content} content
  * @returns {boolean}
  */
-export const talkedToday = (companion, now, content) => companion.talkedOn === questPeriod('daily', now, content).key;
+// A talk of a later day counts as today's (laterPeriod in quests.js).
+export const talkedToday = (companion, now, content) => samePeriod(companion.talkedOn, questPeriod('daily', now, content).key);
 
 // A word of the day for a companion at the standing `index` (the author:
 // "więcej opcji rozmów na różne stopnie"): one of that standing's chatter,
@@ -488,7 +489,9 @@ export function partyStayText(companions, content) {
 export function companionTraining(companion, characterLevel, now, content) {
   const { goldPerLevel, perDay, belowCharacter } = tuning(content).training;
   const day = questPeriod('daily', now, content).key;
-  const done = companion.trained?.day === day ? companion.trained.count : 0;
+  // The trainings of a later day leave none for today (laterPeriod in
+  // quests.js).
+  const done = laterPeriod(companion.trained?.day, day) ? perDay : companion.trained?.day === day ? companion.trained.count : 0;
   const cap = Math.min(content.balance.progression.maxLevel, characterLevel - belowCharacter);
   const level = companion.level + 1;
   return {
