@@ -1,3 +1,4 @@
+// @ts-check
 // Combatants: the player character and monsters reduced to the same shape, so
 // the combat code treats both alike (and later companions or other players).
 
@@ -8,16 +9,31 @@ import { gearLevel, midGameShare } from './progression.js';
 import { learnedSkills } from './skills.js';
 import { computeStats } from './stats.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {Record<string, any>} Character A character, as its row keeps it. */
+/** @typedef {Record<string, any>} Item An item as the character's gear keeps it. */
+/** @typedef {Record<string, any>} Area An inner region (content.areas). */
+/** @typedef {Record<string, any>} Combatant A fighter as combat.js takes it: a character, a creature or a companion. */
+
 // From the 10th level of the character the explorations are harder (the
 // author, 5.11.2026: 628 B, 629 A, "wszystkim zwiększamy stwory
 // 1,5-krotnie" and "od 10-ego poziomu postaci wchodzą te duże zmiany
 // trudności"): balance.challenge from its level on, null before it.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {Record<string, any> | null}
+ */
 export const challengeAt = (level, content) => (level >= content.balance.challenge.fromLevel ? content.balance.challenge : null);
 
 // `statBoost`: shares some stats are raised by for a while, by stat (a
 // potion of focus, potions.js). A character in a fight of a week that
 // raises or lowers a stat (`weekStats`, weekFighter in weeks.js) has those
 // shares too.
+/**
+ * @param {{ character: Character, equipped: Item[], hp?: number | null, name: string, area?: Area | null, id?: string, side?: string, statBoost?: Record<string, number> | null }} fighter
+ * @param {Content} content
+ */
 export function playerCombatant({ character, equipped, hp, name, area, id = 'a0', side = 'ally', statBoost = null }, content) {
   const balance = content.balance;
   const { totals: stats, bonuses } = computeStats(character, equipped, content);
@@ -46,7 +62,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     for (const element of Object.keys(resist)) resist[element] = Math.round(resist[element] * (1 + feat.resist));
   }
   // (Żniwo, the Nekromanta's trait grown from Toksyny, gives none.)
-  const shelter = feat?.resist ? { winter: 'frost', toxins: 'poison' }[feat.kind] : undefined;
+  const shelter = feat?.resist ? /** @type {Record<string, string>} */ ({ winter: 'frost', toxins: 'poison' })[feat.kind] : undefined;
   return {
     id,
     side,
@@ -91,8 +107,17 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
 }
 
 // How a strike looks in the fight animation: a blow, an arrow or a spell.
+/**
+ * @param {string | undefined} strike
+ * @param {string} category
+ * @returns {string}
+ */
 const strikeOf = (strike, category) => strike ?? (category === 'magical' ? 'magic' : 'melee');
 
+/**
+ * @param {Item} worn
+ * @param {Content} content
+ */
 function itemWeapon(worn, content) {
   const item = upgradedItem(worn, content);
   const base = content.basesById[item.base];
@@ -113,6 +138,10 @@ function itemWeapon(worn, content) {
 
 // Without a weapon the character fights with its fists, which hit like a weak
 // common weapon of its level.
+/**
+ * @param {number} level
+ * @param {Content} content
+ */
 function unarmed(level, content) {
   const balance = content.balance;
   const { attackName, damageFactor, variance } = balance.combat.unarmed;
@@ -129,10 +158,18 @@ function unarmed(level, content) {
 // dla okazjonalnych, średnio dla zaangażowanych" and "mocno" (611), and no
 // stronger creatures for the companions or a party along (612 C: "musi byc
 // motywacja do drużyny/towarzyszy").
+/**
+ * @param {number} level
+ * @param {number[][]} [curve]
+ * @returns {[number, number]}
+ */
 export function huntStrength(level, curve = []) {
   if (curve.length === 0 || level < curve[0][0]) return [1, 1];
   const next = curve.findIndex(([at]) => at > level);
-  if (next === -1) return [curve.at(-1)[1], curve.at(-1)[2]];
+  if (next === -1) {
+    const last = /** @type {number[]} */ (curve.at(-1));
+    return [last[1], last[2]];
+  }
   const [fromLevel, fromDamage, fromHp] = curve[next - 1];
   const [toLevel, toDamage, toHp] = curve[next];
   const share = (level - fromLevel) / (toLevel - fromLevel);
@@ -152,6 +189,13 @@ export function huntStrength(level, curve = []) {
 // in any place, are stronger again by its damage and HP (the author:
 // "wszystkim zwiększamy stwory"), and from the challenge's level those of a
 // Trudna wyprawa (`hard`, 629 A) by its hard ones on top.
+/**
+ * @param {Area} area
+ * @param {number} level
+ * @param {Content} content
+ * @param {boolean} [hard]
+ * @returns {[number, number]}
+ */
 export function exploreStrength(area, level, content, hard = false) {
   const [damage, hp] = area.maxLevel < level ? [1, 1] : huntStrength(Math.max(level, area.minLevel), content.balance.monsters.huntCurve);
   const challenge = challengeAt(level, content);
@@ -170,9 +214,14 @@ export function exploreStrength(area, level, content, hard = false) {
 // exploration of the newest place (or in the danger estimate's sample
 // fights there), exploreStrength; the Wieże, the events' fights and the
 // Bestia Gildii keep their own measure.
+/**
+ * @param {{ monsterId: string, level: number, id: string, name?: string, position?: string, side?: string, groupFactor?: number, growth?: number, strength?: number[] }} fighter
+ * @param {Content} content
+ */
 export function monsterCombatant({ monsterId, level, id, name, position, side = 'enemy', groupFactor = 1, growth = 1, strength = [1, 1] }, content) {
   const balance = content.balance;
   const monster = content.monstersById[monsterId];
+  /** @param {string} key */
   const stat = (key) => (monster.stats.base[key] ?? 0) + (monster.stats.growth[key] ?? 0) * (level - 1);
   // A monster's natural weapon and hide match the items a character usually
   // wears at its level (gearLevel), so at the fast first levels they lag
@@ -205,6 +254,7 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
     (1 + late.damage * later) *
     (1 + end.damage * latest) *
     huntDamage;
+  /** @type {Record<string, number>} */
   const resist = {};
   for (const [element, value] of Object.entries(monster.resistances ?? {})) {
     resist[element] = Math.round(value.base + value.perLevel * (level - 1));
@@ -266,9 +316,15 @@ export function monsterCombatant({ monsterId, level, id, name, position, side = 
 }
 
 // What the report shows when a participant's stats are expanded with "+".
+/**
+ * @param {Combatant} unit
+ * @param {number} opponentLevel
+ * @param {Content} content
+ */
 export function combatantView(unit, opponentLevel, content) {
   const balance = content.balance;
   const scale = unit.damageScale;
+  /** @param {number} value */
   const percent = (value) => Math.round(value * 100);
   return {
     id: unit.id,
