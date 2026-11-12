@@ -174,7 +174,7 @@ export async function loadCharacter(db, id) {
 
 // A character's row with its items, activities and camp buildings.
 async function playerOf(db, row) {
-  const [items, activities, avatarActivities, buildings, parcels] = await db.batch([
+  const [items, activities, avatarActivities, buildings, parcels, stored] = await db.batch([
     db.prepare('SELECT id, slot, data FROM items WHERE character_id = ? ORDER BY id').bind(row.id),
     db.prepare('SELECT * FROM activities WHERE character_id = ?').bind(row.id),
     db.prepare('SELECT * FROM avatar_activities WHERE character_id = ?').bind(row.id),
@@ -189,11 +189,17 @@ async function playerOf(db, row) {
            EXISTS (SELECT 1 FROM party_members WHERE character_id = ?) AS in_party, ${guildSeatSql('?')} AS guild_seat`,
       )
       .bind(row.id, row.id, row.id, row.id),
+    // What the Warsztat and the Szlifiernia made, waiting in the
+    // Przechowalnia out of the bag (storage.js).
+    db.prepare('SELECT id, data FROM storage_items WHERE character_id = ? ORDER BY id').bind(row.id),
   ]);
   return {
     row,
     // equippedSlot is where the item is worn (null in the bag); item.slot is where it can go.
     items: items.results.map((item) => ({ id: item.id, equippedSlot: item.slot, ...JSON.parse(item.data) })),
+    // The items of the Przechowalnia, the oldest first, each with its own id
+    // there (not an item's of the bag).
+    stored: stored.results.map((item) => ({ id: item.id, ...JSON.parse(item.data) })),
     activity: activities.results[0] ?? null,
     // The work of the Awatar Systemu, kept as the character's own (avatar.js).
     avatarActivity: avatarActivities.results[0] ?? null,
@@ -1264,6 +1270,8 @@ function craftingView(row, levels, now) {
         counted: order.countsAtEnd !== true,
         minerals: Object.entries(order.minerals ?? {}).map(([id, count]) => ({ name: content().mineralsById[id]?.name ?? id, count })),
         patterns: (order.patterns ?? []).map((id) => content().basesById[id]?.name).filter(Boolean),
+        // Its items came from the Przechowalnia and go back there (storage.js).
+        ...((order.items ?? []).some((item) => item.fromStorage === true) && { stored: true }),
       };
     }),
   };
@@ -1457,12 +1465,13 @@ export function characterView(player, now) {
   // The items the player marked with a star (favorites.js), which are not
   // taken apart nor sold to the scrapper.
   const favorites = favoriteIds(row);
-  const toItem = (item) => ({
+  // An item as the page shows it; one of the bag or worn also with its star.
+  const itemOf = (item) => ({
     id: item.id,
     ...itemView(item, content(), { sellBonus, upgradeCap, materials, anvilDiscount, anvilWeek }),
     salvage: salvage(item),
-    ...(favorites.has(item.id) && { favorite: true }),
   });
+  const toItem = (item) => ({ ...itemOf(item), ...(favorites.has(item.id) && { favorite: true }) });
   // Whether a bag item would make the character stronger in place of what
   // its slot holds (preview.js), for the marks on the bag and on finds; null
   // for an item the class cannot wear.
@@ -1609,8 +1618,16 @@ export function characterView(player, now) {
     bagUsed: bagPlaces(player),
     bagCapacity: bagCapacity(levels, content()),
     // The Profesje tab, or null while it is hidden or locked (professions-view.js),
-    // with the Awatar Systemu.
-    professions: professions && { ...professions, avatar: avatarView(player, now) },
+    // with the Awatar Systemu and, once the Warsztat or the Szlifiernia is
+    // open, the Przechowalnia of what they made, the newest first, each as
+    // the bag shows it (storage.js; no favourites there).
+    professions: professions && {
+      ...professions,
+      avatar: avatarView(player, now),
+      ...((professions.workshop || professions.jewelcrafting) && {
+        storage: { items: (player.stored ?? []).map(itemOf).reverse() },
+      }),
+    },
     camp: campView(player, levels, now),
     // The Stół rozbiórki: materials, parts and the queue (crafting.js).
     crafting: craftingView(row, levels, now),
@@ -2062,6 +2079,8 @@ export function characterRemoval(db, id, now) {
     db.prepare('DELETE FROM activities WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM avatar_activities WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM items WHERE character_id = ?').bind(id),
+    // What waits in its Przechowalnia (storage.js).
+    db.prepare('DELETE FROM storage_items WHERE character_id = ?').bind(id),
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
     // Its tickets of the Loteria not drawn yet (casino.js).
     db.prepare('DELETE FROM lottery_tickets WHERE character_id = ?').bind(id),

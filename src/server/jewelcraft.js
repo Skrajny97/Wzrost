@@ -1,9 +1,9 @@
 // Jubilerstwo in the Systemowa Szlifiernia (src/engine/jewelcraft.js): an
-// order of as many jewels of one pattern and gem as the gems, the ore and
-// the bag allow, with no cap on their number or time (as in the Warsztat,
-// the author, 12.11.2026), takes the gems and
-// the ore at the start, and its report brings the jewels made into the bag,
-// the gems of the failed ones lost and their ore back. Called back early,
+// order of as many jewels of one pattern and gem as the gems and the ore
+// allow, with no cap on their number or time (as in the Warsztat, the
+// author, 12.11.2026), takes the gems and the ore at the start, and its
+// report brings the jewels made into the Przechowalnia, out of the bag (842,
+// storage.js), the gems of the failed ones lost and their ore back. Called back early,
 // the character brings the jewels done and gets back all the rest. A setting
 // takes its gem at the start and sets it in the item at the end, the gem
 // that was there before gone; called back early, or with the item gone by
@@ -12,8 +12,6 @@
 
 import {
   addQuestProgress,
-  bagCapacity,
-  campLevels,
   craftJewels,
   gemOf,
   itemName,
@@ -27,7 +25,7 @@ import {
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, currentHp, loadPlayer, questsNow, requireNotExploring, requireWorker, workOf } from './characters.js';
+import { characterView, currentHp, loadPlayer, questsNow, requireNotExploring, requireWorker, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
@@ -42,9 +40,8 @@ const shareOf = (amounts, of, count) =>
   Object.fromEntries(Object.entries(amounts ?? {}).map(([id, amount]) => [id, Math.round((amount * of) / Math.max(1, count))]));
 
 // An order of jewels: a pattern the character knows, by the level or from a
-// jewel taken apart, a gem it cuts, how many, what they take, at the
-// character's level, which is also the jewels' level, and room for them in
-// the bag.
+// jewel taken apart, a gem it cuts, how many and what they take, at the
+// character's level, which is also the jewels' level.
 function jewelOrder(player, level, body) {
   const { jewelcrafting } = content();
   const base = typeof body.baseId === 'string' ? content().basesById[body.baseId] : undefined;
@@ -52,12 +49,11 @@ function jewelOrder(player, level, body) {
   if (!base || !jewelcrafting.ores[base.slot] || !knowsJewelPattern(base, level, learned, content())) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
   const gem = typeof body.rarity === 'string' ? gemOf(body.rarity, content()) : undefined;
   if (!gem || gem.level > level) throw new ApiError(400, 'unknown_rarity', 'Tego kamienia jeszcze nie szlifujesz.');
-  // As many as the gems, the ore and the bag allow (checked by the caller).
+  // As many as the gems and the ore allow (checked by the caller).
   if (!Number.isSafeInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Wybierz co najmniej 1 sztukę.');
   return {
     cost: jewelCost(base, gem.rarity, body.count, content()),
     minutes: jewelOrderMinutes(body.count, gem.rarity, level, content()),
-    room: body.count,
     options: { base: base.id, rarity: gem.rarity, count: body.count, level: player.row.level },
   };
 }
@@ -82,12 +78,13 @@ function settingOrder(player, level, body, now) {
   if (!gem || gem.kind !== 'gem') throw new ApiError(400, 'unknown_gem', 'Nie ma takiego kamienia.');
   if (gem.level > level) throw new ApiError(403, 'locked', say(content().jewelcrafting.texts, 'hidden', 0, { level: gem.level }));
   if (item.gem === gem.id) throw new ApiError(409, 'same_gem', `${gem.name} już tkwi w tym przedmiocie.`);
-  return { cost: { [gem.id]: 1 }, minutes: setMinutes(gem.id, level, content()), room: 0, options: { set: true, item: item.id, itemName: itemName(item, content()), gem: gem.id } };
+  return { cost: { [gem.id]: 1 }, minutes: setMinutes(gem.id, level, content()), options: { set: true, item: item.id, itemName: itemName(item, content()), gem: gem.id } };
 }
 
 // A work in the Szlifiernia from now on: an order of jewels, or with `set`
 // a gem set in an item. The gems and the ore go at once, only if the
-// character is still as seen, so two taps at once start one work.
+// character is still as seen, so two taps at once start one work. The
+// bag's room does not count: the jewels wait in the Przechowalnia (842).
 export async function startJewelcraft(context) {
   const body = await readJson(context.request);
   const { session, player, avatar } = await requireWorker(context, body);
@@ -100,8 +97,6 @@ export async function startJewelcraft(context) {
   const have = mineralsOf(player.row);
   const short = Object.entries(order.cost).find(([id, amount]) => (have[id] ?? 0) < amount);
   if (short) throw new ApiError(409, 'no_minerals', `Brakuje: ${content().mineralsById[short[0]].name} (potrzeba ${short[1]}).`);
-  const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
-  if (order.room > free) throw new ApiError(409, 'bag_full', `W plecaku musi być ${order.room} wolnych miejsc na całe zlecenie.`);
 
   const left = { ...have };
   for (const [id, amount] of Object.entries(order.cost)) {
@@ -221,8 +216,8 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
 
   // Saves the report of the work with what comes back to the character
   // (`back`), the profession's levels and XP (workGains), the jewels made
-  // into the bag, or the gem set in the item (`item`, as read), and ends
-  // the work.
+  // into the Przechowalnia, or the gem set in the item (`item`, as read),
+  // and ends the work.
   async function saveReport(returned, made, minutes, item) {
     const { character, after, xp, work, sets } = workGains(player, profession, before, minutes, avatar, now);
     const report = {
@@ -259,7 +254,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
       ...(avatar && { avatar: true }),
     };
     const minerals = addTo('minerals', returned);
-    const insertItem = db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)');
+    const store = db.prepare('INSERT INTO storage_items (character_id, data, created_at) VALUES (?, ?, ?)');
     const jewels = (made.results ?? []).filter((result) => result.made).map((result) => result.item);
     // The jewels that came out move the quests of jewellery (jewelAny).
     const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { jewels: jewels.length }));
@@ -280,8 +275,8 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
           .bind(row.quests, quests, ...sets.binds, ...minerals.binds, row.id, row.id, activity.started_at),
         // The gem goes into the item as it is now, so an upgrade meanwhile stays.
         ...(item ? [db.prepare("UPDATE items SET data = json_set(data, '$.gem', ?) WHERE id = ? AND character_id = ?").bind(made.set.gem, item.id, row.id)] : []),
-        // The jewels made go to the bag; the room was there at the start.
-        ...jewels.map((jewel) => insertItem.bind(row.id, JSON.stringify(jewel), now)),
+        // The jewels made wait in the Przechowalnia, out of the bag (842).
+        ...jewels.map((jewel) => store.bind(row.id, JSON.stringify(jewel), now)),
         // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
         ...workFamePoints(db, row.id, minutes, avatar, now),
         end,

@@ -316,7 +316,8 @@ async function cancelOrder(crafting, order) {
   const sure = await confirmAction({
     title: confirm.title,
     text: [
-      filled(confirm.back, { what: orderLabel(order) }),
+      // Items from the Przechowalnia go back there (storage.js).
+      filled(order.stored ? confirm.backStored : confirm.back, { what: orderLabel(order) }),
       index === 0 && confirm.running,
       index < crafting.queue.length - 1 && confirm.later,
       ...goingBack([order], confirm),
@@ -328,7 +329,7 @@ async function cancelOrder(crafting, order) {
   });
   if (!sure) return;
   await call('POST', '/api/craft/cancel', { id: order.id });
-  toast(filled(crafting.texts.done, { what: orderLabel(order) }));
+  toast(filled(order.stored ? crafting.texts.doneStored : crafting.texts.done, { what: orderLabel(order) }));
 }
 
 // "Usuń wszystkie": every order that can leave, at once, after a question.
@@ -338,7 +339,7 @@ async function cancelAll(crafting) {
   const sure = await confirmAction({
     title: confirm.titleAll,
     text: [
-      filled(confirm.backAll, { count: formatNumber(leaving.length) }),
+      filled(leaving.some((order) => order.stored) ? confirm.backAllStored : confirm.backAll, { count: formatNumber(leaving.length) }),
       crafting.queue[0].cancellable && confirm.runningAll,
       leaving.length < crafting.queue.length && confirm.kept,
       ...goingBack(leaving, confirm),
@@ -349,8 +350,8 @@ async function cancelAll(crafting) {
     cancelLabel: confirm.no,
   });
   if (!sure) return;
-  const { cancelled } = await call('POST', '/api/craft/cancel', { all: true });
-  toast(filled(crafting.texts.doneAll, { count: formatNumber(cancelled) }));
+  const { cancelled, stored } = await call('POST', '/api/craft/cancel', { all: true });
+  toast(filled(stored > 0 ? crafting.texts.doneAllStored : crafting.texts.doneAll, { count: formatNumber(cancelled) }));
 }
 
 // The orders, the first one at work with its countdown; `ticks` gets its

@@ -18073,3 +18073,29 @@ a.discord-button {
   min-height: 40px;
   padding: 4px 8px;
 }
+
+/* The Przechowalnia of the Warsztat and the Szlifiernia (professions.js
+   storageCard): the count with "Zaznacz wszystkie" beside it, and the
+   three actions under the marked items. */
+.storage-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.storage-head .muted {
+  margin: 0;
+}
+
+.storage-actions {
+  display: grid;
+  gap: 8px;
+}
+
+@media (min-width: 600px) {
+  .storage-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

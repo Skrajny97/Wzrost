@@ -583,7 +583,10 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
       ['ring', 'common', 25],
     ]);
     assert.equal(report.made, 'Wykonano: 2 × Pierścień.');
-    assert.equal(after.bag.length, 2);
+    // The jewels wait in the Przechowalnia, out of the bag (842).
+    assert.equal(report.stored, 'Gotowa biżuteria czeka w Przechowalni, poza plecakiem.');
+    assert.equal(after.bag.length, 0);
+    assert.deepEqual(after.professions.storage.items.map((item) => item.base), ['ring', 'ring']);
 
     // Stopped after the first of two: one ring, and the gem and the ore of the other back.
     await set(`minerals = '{"quartz":2,"silver-ore":4}'`);

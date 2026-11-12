@@ -665,6 +665,11 @@
       "id": "0.2.81",
       "title": "Wersja 0.2.81",
       "body": "- Warsztat i Szlifiernia bez limitu 5 sztuk i bez limitu czasu: zlecisz tyle sztuk, na ile starczy części, materiałów i miejsca w plecaku. Na przykład 20 pospolitych mieczy na 1. poziomie Rzemieślnictwa to 10 godzin pracy."
+    },
+    {
+      "id": "0.2.82",
+      "title": "Wersja 0.2.82",
+      "body": "- Przechowalnia w Warsztacie i w Szlifierni: gotowe przedmioty i biżuteria czekają tam poza plecakiem, bez limitu miejsc. Zaznacz je i włóż do plecaka, sprzedaj złomiarzowi albo rozbierz na Stole rozbiórki.\n- Pełny plecak nie wstrzymuje już zleceń w Warsztacie i w Szlifierni: liczą się tylko części i materiały."
     }
   ]
 }

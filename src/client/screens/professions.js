@@ -25,7 +25,7 @@ import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, howItWorks, splitLead, systemPanel, toast, withButton } from '../ui.js';
-import { findMark, itemSummary, itemTitle } from './character.js';
+import { findMark, itemSummary, itemTitle, salvagedText } from './character.js';
 import { lockedScreen } from './locked.js';
 
 const HOME = '#/profesje';
@@ -203,6 +203,8 @@ export function mountProfessions(container, { params, navigate }) {
   let workshopTab = 'workshop';
   // The Szlifiernia's tab: the jewellery or the setting of gems.
   let jewelTab = 'craft';
+  // The items marked in the Przechowalnia, by id, whichever screen shows it.
+  const storageMarks = new Set();
   // The works under way on the screen, each with its countdown, bar, scene
   // and "Przewiń": the character's and the Awatar's.
   let timers = [];
@@ -215,6 +217,8 @@ export function mountProfessions(container, { params, navigate }) {
       ...works.flatMap((work) => [work?.kind ?? null, work?.startedAt ?? null, activityFinished(work, now)]),
       character.professions?.avatar?.owned ?? false,
       state.user.testMode && testModeOn(),
+      // What waits in the Przechowalnia.
+      (character.professions?.storage?.items ?? []).map((item) => item.id).join(),
     ]);
   };
 
@@ -401,7 +405,7 @@ export function mountProfessions(container, { params, navigate }) {
   // Under the works, two tabs: the Warsztat and its part exchange (the
   // author: the exchange at the top as a tab, not at the very bottom).
   function renderCrafting(character) {
-    const { list, workshop } = character.professions;
+    const { list, workshop, storage } = character.professions;
     const profession = list.find((candidate) => candidate.id === workshop.professionId);
     const tab = (id, label) =>
       h(
@@ -422,8 +426,16 @@ export function mountProfessions(container, { params, navigate }) {
       backHeading(profession.name, t('poziom {level}', { level: profession.level }), HOME),
       works(character, 'items', craftingCard, 'Postać {doing}. Wyrób możliwy po powrocie.'),
       testTools(character, 'items', t('Tryb testowy: wyrób skończy się od razu, z tym samym wynikiem.')),
-      h('div', { class: 'segmented workshop-tabs', role: 'group', 'aria-label': workshop.place.name }, tab('workshop', t('Warsztat')), tab('exchange', workshop.exchange.title)),
-      workshopTab === 'exchange'
+      h(
+        'div',
+        { class: 'segmented workshop-tabs', role: 'group', 'aria-label': workshop.place.name },
+        tab('workshop', t('Warsztat')),
+        tab('exchange', workshop.exchange.title),
+        storage && tab('storage', storageLabel(storage)),
+      ),
+      workshopTab === 'storage' && storage
+        ? storageCard(character)
+        : workshopTab === 'exchange'
         ? partExchange(character, workshop)
         : [
             placeCard(workshop.place),
@@ -1082,7 +1094,6 @@ export function mountProfessions(container, { params, navigate }) {
     let pattern = known(slot).find((candidate) => candidate.id === craftChoice.pattern) ?? firstFor(slot);
     let rarity = rarities.find((candidate) => candidate.id === craftChoice.rarity) ?? rarities[0];
     let count = 1;
-    const free = Math.max(0, character.bagCapacity - character.bagUsed);
     const partCount = (id) => character.crafting.parts.find((part) => part.id === id)?.count ?? 0;
     const need = (resource) => resource.amount * rarity.step;
 
@@ -1105,13 +1116,14 @@ export function mountProfessions(container, { params, navigate }) {
       show();
     }
 
-    // How many items the parts, the camp's resources and the bag allow.
+    // How many items the parts and the camp's resources allow, with no cap
+    // of its own (the author, 12.11.2026: "Zrób warsztat i szlifiernie
+    // zalezna od czesci i materialow po prostu"); the bag's room does not
+    // count, as they wait in the Przechowalnia (842).
     function affordable() {
       const byParts = Math.floor(partCount(rarity.part.id) / pattern.parts);
       const byResources = Math.min(...pattern.resources.map((resource) => Math.floor((character.resources[resource.id] ?? 0) / need(resource))));
-      // No cap of its own (the author, 12.11.2026: "Zrób warsztat i
-      // szlifiernie zalezna od czesci i materialow po prostu").
-      return { byParts, byResources, most: Math.min(byParts, byResources, free) };
+      return { byParts, byResources, most: Math.min(byParts, byResources) };
     }
 
     // For whom a pattern is, from which class level, and whether it came from
@@ -1176,7 +1188,6 @@ export function mountProfessions(container, { params, navigate }) {
           if (have < need(resource)) lines.push(t('Brakuje zasobów: {name} (masz {have}, potrzeba {need}).', { name: resource.name, have: formatNumber(have), need: formatNumber(need(resource)) }));
         }
       }
-      if (free === 0) lines.push(t('Plecak jest pełny. Zrób w nim miejsce na przedmiot.'));
       return [
         lines.map((text) => h('p', { class: 'herb-room herb-room--full', text })),
         byParts === 0 && h('p', { class: 'muted', text: t('Części zrobisz z materiałów na Stole rozbiórki albo kupisz w Skupie złomu.') }),
@@ -1261,8 +1272,7 @@ export function mountProfessions(container, { params, navigate }) {
         h('p', { class: 'muted', text: upgradesText(workshop) }),
         h('p', { class: 'muted', text: luckText(workshop) }),
         h('p', { class: 'muted', text: t('Przedmioty dostaną poziom postaci: {level}.', { level: formatNumber(character.level) }) }),
-        free < Math.min(byParts, byResources) &&
-          h('p', { class: 'herb-room', text: t('Plecak ma miejsce tylko na {count}.', { count: countOf(free, 'przedmiot', 'przedmioty', 'przedmiotów') }) }),
+        h('p', { class: 'muted', text: t('Gotowe przedmioty poczekają w Przechowalni, poza plecakiem.') }),
         start,
       ];
     }
@@ -1343,6 +1353,151 @@ export function mountProfessions(container, { params, navigate }) {
     toast(
       t('Wymieniono {given} × {from} na {count} × {to}.', { given: formatNumber(exchanged.given), from: name(exchanged.from), count: formatNumber(exchanged.count), to: name(exchanged.partId) }),
     );
+  }
+
+  // The tab of the Przechowalnia, with how many items wait in it.
+  const storageLabel = (storage) => (storage.items.length > 0 ? t('Przechowalnia ({count})', { count: formatNumber(storage.items.length) }) : t('Przechowalnia'));
+
+  // The Przechowalnia (the author, 12.11.2026: "Niech w warsztacie będzie
+  // przechowalnia niech to nie trafia od razu do plecaka i można od razu z
+  // pozycji przechowalni rozbierać i sprzedawać wyprodukowane albo wlozyc do
+  // plecaka jesli jest miejsce"): what the Warsztat and the Szlifiernia made
+  // waits here, out of the bag, one place for both. A tap marks an item, and
+  // the marked ones go to the bag while it has room, to the scrapper for
+  // gold, or onto the Stół rozbiórki, as the bag's "Rozbierz kilka" does.
+  function storageCard(character) {
+    const { items } = character.professions.storage;
+    const free = Math.max(0, character.bagCapacity - character.bagUsed);
+    for (const id of [...storageMarks]) if (!items.some((item) => item.id === id)) storageMarks.delete(id);
+    const chosen = () => items.filter((item) => storageMarks.has(item.id));
+    let last = null;
+    const described = h('div', { class: 'salvage-last', 'aria-live': 'polite', hidden: true });
+    const summary = h('p', { class: 'sheet-text', role: 'status' });
+    const roomNote = h('p', { class: 'region-warning', hidden: true });
+    const button = (kind, className) => h('button', { type: 'button', class: `button ${className}`, onClick: (event) => storageAct(event.currentTarget, kind, chosen()) });
+    const toBag = button('take', 'button--system');
+    const sell = button('sell', 'button--world');
+    const salvage = button('salvage', 'button--world');
+    const all = h('button', {
+      type: 'button',
+      class: 'button button--world button--small',
+      onClick: () => {
+        const every = chosen().length === items.length;
+        for (const item of items) every ? storageMarks.delete(item.id) : storageMarks.add(item.id);
+        for (const tile of grid.querySelectorAll('[aria-pressed]')) tile.setAttribute('aria-pressed', String(!every));
+        update();
+      },
+    });
+    // The parts the marked items make on the Stół rozbiórki, by kind.
+    const partsOf = (marked) => {
+      const parts = new Map();
+      for (const { salvage: what } of marked) if (what) parts.set(what.part, { color: what.color, count: (parts.get(what.part)?.count ?? 0) + what.parts });
+      return [...parts];
+    };
+    function update() {
+      const marked = chosen();
+      const gold = marked.reduce((sum, item) => sum + (item.price ?? 0), 0);
+      const shown = marked.find((item) => item.id === last) ?? marked.at(-1);
+      described.hidden = !shown;
+      fill(described, shown && storageItem(shown));
+      fill(
+        summary,
+        marked.length === 0
+          ? t('Nic jeszcze nie zaznaczono.')
+          : [
+              t('Zaznaczone: {count}. Złomiarz da za nie {gold} złota, a Stół rozbiórki zrobi z nich:', { count: formatNumber(marked.length), gold: formatNumber(gold) }),
+              ' ',
+              partsOf(marked).map(([part, { color, count }], index) => [index > 0 && ', ', h('span', { class: 'item-name', vars: { '--rarity': color }, text: `${part} ×${formatNumber(count)}` })]),
+              '.',
+            ],
+      );
+      roomNote.hidden = marked.length <= free;
+      roomNote.textContent = free === 0 ? t('Plecak jest pełny. Zrób w nim miejsce albo sprzedaj lub rozbierz przedmioty stąd.') : t('W plecaku jest miejsce na {count}.', { count: countOf(free, 'przedmiot', 'przedmioty', 'przedmiotów') });
+      const count = formatNumber(marked.length);
+      toBag.textContent = t('Do plecaka ({count})', { count });
+      sell.textContent = t('Sprzedaj ({count})', { count });
+      salvage.textContent = t('Rozbierz ({count})', { count });
+      toBag.disabled = marked.length === 0 || marked.length > free;
+      sell.disabled = marked.length === 0;
+      salvage.disabled = marked.length === 0 || marked.some((item) => !item.salvage || item.salvage.minutes === null);
+      all.textContent = marked.length === items.length ? t('Odznacz wszystkie') : t('Zaznacz wszystkie');
+    }
+    const tile = (item) => {
+      const pick = h(
+        'button',
+        {
+          type: 'button',
+          class: 'slot slot--bag salvage-pick',
+          vars: { '--rarity': item.color },
+          'aria-pressed': String(storageMarks.has(item.id)),
+          'aria-label': [itemTitle(item), item.rarityName, item.slotName, t('poziom {level}', { level: item.level })].join(', '),
+          onClick: () => {
+            if (storageMarks.has(item.id)) storageMarks.delete(item.id);
+            else {
+              storageMarks.add(item.id);
+              last = item.id;
+            }
+            pick.setAttribute('aria-pressed', String(storageMarks.has(item.id)));
+            update();
+          },
+        },
+        itemSprite(item) ?? icon('sword', { size: 24 }),
+        item.upgrade > 0 && h('span', { class: 'slot-level', text: `+${item.upgrade}` }),
+        h('span', { class: 'salvage-check', 'aria-hidden': 'true' }, icon('check', { size: 14 })),
+      );
+      return h('li', {}, pick);
+    };
+    const grid = h('ul', { class: 'bag-grid salvage-grid' }, items.map(tile));
+    const body =
+      items.length === 0
+        ? [h('p', { class: 'muted', text: t('Pusto. Tu trafi to, co zrobisz w Warsztacie i w Szlifierni.') })]
+        : [
+            h('div', { class: 'storage-head' }, h('p', { class: 'muted', text: t('Przedmiotów: {count}. Nie zajmują miejsca w plecaku.', { count: formatNumber(items.length) }) }), all),
+            grid,
+            h('div', { class: 'salvage-bar salvage-bar--inline' }, described, summary, roomNote, h('div', { class: 'storage-actions' }, toBag, sell, salvage)),
+          ];
+    update();
+    return h(
+      'section',
+      { class: 'card gather-card', 'aria-labelledby': 'storage-title' },
+      h('h2', { class: 'section-title', id: 'storage-title', text: t('Przechowalnia') }),
+      h('p', { class: 'muted', text: t('Tu czekają przedmioty z Warsztatu i biżuteria ze Szlifierni. Zaznacz je i włóż do plecaka, sprzedaj złomiarzowi albo rozbierz na Stole rozbiórki.') }),
+      body,
+    );
+  }
+
+  // A marked item of the Przechowalnia as its card describes it, as the
+  // bag's "Rozbierz kilka" shows the one marked last.
+  const storageItem = (item) => [
+    h('span', { class: 'salvage-last-art', vars: { '--rarity': item.color } }, itemSprite(item) ?? icon('sword', { size: 24 })),
+    h(
+      'span',
+      { class: 'salvage-last-text' },
+      h('span', { class: 'item-name', vars: { '--rarity': item.color }, text: itemTitle(item) }),
+      h('span', { class: 'item-meta', text: [item.rarityName, item.slotName, t('poz. {level}', { level: item.level }), item.tier].filter(Boolean).join(' · ') }),
+      item.properties?.length > 0 && h('span', { class: 'item-stats', text: item.properties.join(' · ') }),
+    ),
+  ];
+
+  // The marked items of the Przechowalnia to the bag, to the scrapper or
+  // onto the Stół rozbiórki (src/server/storage.js).
+  async function storageAct(button, kind, items) {
+    if (items.length === 0) return;
+    await withButton(button, async () => {
+      const answer = await call('POST', `/api/professions/storage/${kind}`, { ids: items.map((item) => item.id) });
+      for (const item of items) storageMarks.delete(item.id);
+      const pieces = (count) => countOf(count, 'przedmiot', 'przedmioty', 'przedmiotów');
+      if (answer.salvaged) {
+        playSound('build');
+        toast(salvagedText(answer.salvaged));
+      } else if (answer.sold) {
+        playSound('coin');
+        toast(t('Złomiarz zapłacił {gold} złota za {count}.', { gold: formatNumber(answer.sold.gold), count: pieces(answer.sold.count) }));
+      } else {
+        playSound('collect');
+        toast(t('W plecaku: {count} z Przechowalni.', { count: pieces(answer.taken.count) }));
+      }
+    });
   }
 
   // A scroll for the Kowadło, the Zwoje ochronne or with `which`
@@ -1617,7 +1772,7 @@ export function mountProfessions(container, { params, navigate }) {
   // setting of gems), the Systemowa Szlifiernia with how the chosen work
   // goes folded under "Jak to działa?", the level and the tab's form.
   function renderJewelcraft(character) {
-    const { list, jewelcrafting } = character.professions;
+    const { list, jewelcrafting, storage } = character.professions;
     const profession = list.find((candidate) => candidate.id === jewelcrafting.professionId);
     const setting = jewelTab === 'set';
     const tab = (id, label) =>
@@ -1641,10 +1796,20 @@ export function mountProfessions(container, { params, navigate }) {
       backHeading(profession.name, t('poziom {level}', { level: profession.level }), HOME),
       works(character, 'jewels', jewelsCard, 'Postać {doing}. Praca w Szlifierni możliwa po powrocie.'),
       testTools(character, 'jewels', t('Tryb testowy: praca skończy się od razu, z tym samym wynikiem.')),
-      h('div', { class: 'segmented workshop-tabs', role: 'group', 'aria-label': jewelcrafting.place.name }, tab('craft', t('Biżuteria')), tab('set', t('Oprawianie'))),
-      placeCard(jewelcrafting.place, setting ? jewelcrafting.about.set : jewelcrafting.about.craft),
-      levelCard(profession, t('pracy')),
-      anyFree(character) && (setting ? setForm(character, jewelcrafting) : jewelForm(character, jewelcrafting)),
+      h(
+        'div',
+        { class: 'segmented workshop-tabs', role: 'group', 'aria-label': jewelcrafting.place.name },
+        tab('craft', t('Biżuteria')),
+        tab('set', t('Oprawianie')),
+        storage && tab('storage', storageLabel(storage)),
+      ),
+      jewelTab === 'storage' && storage
+        ? storageCard(character)
+        : [
+            placeCard(jewelcrafting.place, setting ? jewelcrafting.about.set : jewelcrafting.about.craft),
+            levelCard(profession, t('pracy')),
+            anyFree(character) && (setting ? setForm(character, jewelcrafting) : jewelForm(character, jewelcrafting)),
+          ],
     );
   }
 
@@ -1660,7 +1825,6 @@ export function mountProfessions(container, { params, navigate }) {
     let pattern = known(slot).find((candidate) => candidate.id === jewelChoice.pattern) ?? known(slot)[0];
     let rarity = rarities.find((candidate) => candidate.id === jewelChoice.rarity) ?? rarities[0];
     let count = 1;
-    const free = Math.max(0, character.bagCapacity - character.bagUsed);
 
     const slotRow = h('div', { class: 'segmented workshop-slots', role: 'group', 'aria-label': t('Rodzaj biżuterii') });
     const list = choiceList(t('Wzory'), { unknown: (count) => countOf(count, 'nieznany wzór', 'nieznane wzory', 'nieznanych wzorów') });
@@ -1684,7 +1848,7 @@ export function mountProfessions(container, { params, navigate }) {
     function affordable() {
       const byGems = rarity.gem.have;
       const byOre = Math.floor(rarity.ore.have / slot.ores);
-      return { byGems, byOre, most: Math.min(byGems, byOre, free) };
+      return { byGems, byOre, most: Math.min(byGems, byOre) };
     }
     // For whom, from which class level, and whether the pattern came from a
     // jewel taken apart, as in the Warsztat.
@@ -1749,7 +1913,6 @@ export function mountProfessions(container, { params, navigate }) {
       const lines = [];
       if (byGems === 0) lines.push(t('Brakuje kamienia: {name} (masz 0, potrzeba 1).', { name: rarity.gem.name }));
       if (byOre === 0) lines.push(t('Brakuje kruszcu: {name} (masz {have}, potrzeba {need}).', { name: rarity.ore.name, have: formatNumber(rarity.ore.have), need: formatNumber(slot.ores) }));
-      if (free === 0) lines.push(t('Plecak jest pełny. Zrób w nim miejsce na biżuterię.'));
       return [
         lines.map((text) => h('p', { class: 'herb-room herb-room--full', text })),
         (byGems === 0 || byOre === 0) && h('p', { class: 'muted', text: t('Kamienie i kruszce wydobędziesz w Górnictwie.') }),
@@ -1828,7 +1991,7 @@ export function mountProfessions(container, { params, navigate }) {
           text: rarity.chance >= 1 ? t('Każda sztuka tej rzadkości się uda.') : t('Każda sztuka ma {chance} szans na powodzenie. Nieudana zabiera swój kamień, a kruszec wraca.', { chance: percentText(rarity.chance) }),
         }),
         h('p', { class: 'muted', text: t('Biżuteria dostanie poziom postaci: {level}.', { level: formatNumber(character.level) }) }),
-        free < Math.min(byGems, byOre) && h('p', { class: 'herb-room', text: t('Plecak ma miejsce tylko na {count}.', { count: countOf(free, 'sztukę', 'sztuki', 'sztuk') }) }),
+        h('p', { class: 'muted', text: t('Gotowa biżuteria poczeka w Przechowalni, poza plecakiem.') }),
         start,
       ];
     }
@@ -2110,6 +2273,8 @@ export function itemsReport(report, heading, findSheet) {
             h('li', {}, h('button', { type: 'button', class: 'item-row', onClick: () => findSheet(item) }, itemSummary(item), findMark(item), icon('chevron', { size: 18 }))),
           ),
         ),
+      // Where they wait: the Przechowalnia (842); an older report has no such line.
+      report.stored && h('p', { class: 'muted', text: report.stored }),
       report.failedText && h('p', { class: 'herb-room herb-room--full', text: report.failedText }),
       workSummary(report),
     ),
@@ -2169,6 +2334,7 @@ export function jewelsReport(report, heading, findSheet) {
       set?.item && h('ul', { class: 'item-list' }, row(set.item)),
       !set && report.made && h('p', { class: 'herb-estimate', text: report.made }),
       !set && report.items.length > 0 && h('ul', { class: 'item-list' }, report.items.map(row)),
+      !set && report.stored && h('p', { class: 'muted', text: report.stored }),
       !set && report.failedText && h('p', { class: 'herb-room herb-room--full', text: report.failedText }),
       workSummary(report),
     ),

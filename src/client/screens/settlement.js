@@ -240,7 +240,7 @@ export function mountSettlement(container, { params = {} } = {}) {
           }),
         }),
         order.expiresAt && h('p', { class: 'muted', text: t('Termin: jeszcze {time}', { time: timeLeft(order.expiresAt - serverNow()) }) }),
-        order.kind === 'craft' && h('p', { class: 'muted', text: t('Wyroby z Warsztatu oddajesz z plecaka, najpierw najsłabsze.') }),
+        order.kind === 'craft' && h('p', { class: 'muted', text: t('Wyroby z Warsztatu oddajesz z plecaka, najpierw najsłabsze. Z Przechowalni włożysz je do plecaka w Warsztacie.') }),
         // Any materials of a rarity: what delivering takes, from the biggest stacks.
         order.forms &&
           h('p', {
