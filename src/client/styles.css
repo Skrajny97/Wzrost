@@ -12243,27 +12243,76 @@ a.profession-square:active {
   margin: 0;
 }
 
-/* A card. */
+/* A card (885 C, 886 D, 887 and 888, 12.11.2026): one size everywhere, on
+   the table, in the reserve, in the deck and the collection, 80 px wide on a
+   320 px phone (three in a row), growing with the screen to 112 px on the
+   widest phones and to 138 px on a computer. Every size on it follows its
+   width (--tw) and the frame's 92 × 124 pixels: the PixelLab frame of its
+   rarity cut in nine, the place of the creature's first home behind it
+   (--scene, cards.js), the creature with a soft black outline, type and
+   level on the frame's top corners, Atak and Życie on its bottom ones. */
+:root {
+  --tw: clamp(78px, 25vw, 112px);
+}
+
+:root[data-layout='desktop'] {
+  --tw: 138px;
+}
+
 .tcard {
+  --frame: url('/art/cards/frame-common.png');
+  --tcard-art: calc(var(--tw) * 50 / 92);
+  --tcard-name-size: calc(var(--tw) * 11.5 / 92);
   position: relative;
   display: flex;
+  flex: none;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  min-width: 0;
-  width: 100%;
-  padding: 4px 4px 5px;
-  border: 2px solid var(--rarity, var(--bark-line));
-  border-radius: 7px;
+  justify-content: flex-end;
+  justify-self: center;
+  align-self: center;
+  box-sizing: border-box;
+  width: var(--tw);
+  height: calc(var(--tw) * 124 / 92);
+  padding: calc(var(--tw) * 3 / 92) calc(var(--tw) * 2 / 92) calc(var(--tw) * 4 / 92);
+  border-style: solid;
+  border-color: transparent;
+  border-width: calc(var(--tw) * 18 / 92) calc(var(--tw) * 17 / 92);
+  border-image: var(--frame) 18 17 / 1 / 0 stretch;
   background:
-    radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--rarity, #9b9b9b) 30%, transparent), transparent 70%),
-    linear-gradient(180deg, #232c1c, #151b11);
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.55),
-    0 2px 4px rgba(0, 0, 0, 0.45);
+    linear-gradient(180deg, transparent 52%, rgba(10, 12, 8, 0.9) 100%),
+    var(--scene, linear-gradient(180deg, #2a3322, #151b11)) center 30% / cover no-repeat;
+  background-clip: padding-box;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.55);
   color: var(--text);
   font: inherit;
   text-align: center;
+  image-rendering: pixelated;
+  container-type: inline-size;
+}
+
+.tcard--rare {
+  --frame: url('/art/cards/frame-rare.png');
+}
+
+.tcard--unique {
+  --frame: url('/art/cards/frame-unique.png');
+}
+
+.tcard--epic {
+  --frame: url('/art/cards/frame-epic.png');
+}
+
+.tcard--legendary {
+  --frame: url('/art/cards/frame-legendary.png');
+}
+
+.tcard--mythic {
+  --frame: url('/art/cards/frame-mythic.png');
+}
+
+.tcard--divine {
+  --frame: url('/art/cards/frame-divine.png');
 }
 
 button.tcard {
@@ -12277,19 +12326,29 @@ button.tcard:focus-visible,
 }
 
 .tcard-top {
+  position: absolute;
+  z-index: 2;
+  top: calc(var(--tw) * -17 / 92);
+  right: calc(var(--tw) * -16 / 92);
+  left: calc(var(--tw) * -16 / 92);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  align-self: stretch;
 }
 
-.tcard-type {
+.tcard-type,
+.tcard-level {
   display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
+  width: calc(var(--tw) * 17 / 92);
+  height: calc(var(--tw) * 17 / 92);
   border-radius: 50%;
-  background: rgba(13, 17, 11, 0.75);
+  background: rgba(13, 17, 11, 0.92);
+}
+
+.tcard-type svg {
+  width: 62%;
+  height: 62%;
 }
 
 .tcard-type--strength {
@@ -12308,51 +12367,59 @@ button.tcard:focus-visible,
 }
 
 .tcard-level {
-  display: grid;
-  place-items: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 4px;
   border: 1px solid var(--rarity, var(--bark-line));
-  border-radius: 10px;
-  background: rgba(13, 17, 11, 0.8);
   font-family: var(--font-system);
-  font-size: 12px;
+  font-size: calc(var(--tw) * 11 / 92);
   font-weight: 600;
 }
 
 .tcard-art {
+  position: absolute;
+  top: 44%;
+  left: 50%;
   display: grid;
   place-items: center;
   width: var(--tcard-art);
   height: var(--tcard-art);
+  transform: translate(-50%, -50%);
 }
 
+/* A soft black outline round the creature, a shadow fading outwards, so it
+   stands out of its place's picture (author 12.11.2026). */
 .tcard-art .sprite {
   width: var(--tcard-art);
   height: var(--tcard-art);
+  filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 1px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 3px rgba(0, 0, 0, 0.75)) drop-shadow(0 0 6px rgba(0, 0, 0, 0.45));
 }
 
 .tcard-name {
+  position: relative;
+  z-index: 1;
   display: -webkit-box;
-  min-height: 2.3em;
   overflow: hidden;
-  font-size: var(--tcard-name-size, 13px);
-  line-height: 1.15;
-  overflow-wrap: anywhere;
+  color: #f6eedb;
+  font-size: var(--tcard-name-size);
+  line-height: 1.05;
+  overflow-wrap: normal;
+  text-shadow:
+    0 1px 2px #000,
+    0 0 3px #000;
+  word-break: keep-all;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
 .tcard-stats {
+  position: absolute;
+  z-index: 2;
+  right: calc(var(--tw) * -16 / 92);
+  bottom: calc(var(--tw) * -17 / 92);
+  left: calc(var(--tw) * -16 / 92);
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  align-self: stretch;
-  gap: 0 4px;
   font-family: var(--font-system);
-  font-size: var(--tcard-stats-size, 13px);
+  font-size: calc(var(--tw) * 12 / 92);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -12361,32 +12428,29 @@ button.tcard:focus-visible,
 .tcard-life {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  justify-content: center;
+  gap: 1px;
+  min-width: calc(var(--tw) * 17 / 92);
+  height: calc(var(--tw) * 17 / 92);
+  padding: 0 calc(var(--tw) * 3 / 92);
+  border-radius: calc(var(--tw) * 9 / 92);
+  background: rgba(13, 17, 11, 0.92);
+  box-shadow: inset 0 0 0 1px currentColor;
+  text-shadow: 0 1px 1px #000;
 }
 
-/* Sized by the card's width (cqi, the card is the container), up to the
-   place's sizes (--tcard-name-size, --tcard-stats-size): a name's longest
-   word whole on its line ("Trzcinownik" on a phone's reserve), by its count
-   of letters (cards.js, --name-chars; an Alegreya word of n letters is at
-   most 0.42·n + 1.2 em wide: Mamuna, Komarzysko, 12.11.2026), and Atak and
-   Życie of two digits on one line (each a sign of 0.85 em, 2 px and digits
-   of at most 1.29 em in Chakra Petch). */
+.tcard-stats svg {
+  width: 0.8em;
+  height: 0.8em;
+}
+
+/* A name's longest word whole on its line, sized by the card's width (cqi,
+   the card is the container) and its count of letters (cards.js,
+   --name-chars; an Alegreya word of n letters is at most 0.42·n + 1.2 em
+   wide: Mamuna, Komarzysko, Niedźwiedź, 12.11.2026). */
 @supports (width: 1cqi) {
-  .tcard {
-    container-type: inline-size;
-  }
-
   .tcard-name {
-    font-size: clamp(9px, calc(98cqi / (var(--name-chars, 1) * 0.42 + 1.2)), var(--tcard-name-size, 13px));
-  }
-
-  .tcard-stats {
-    font-size: clamp(10px, calc((100cqi - 8px) / 4.3), var(--tcard-stats-size, 13px));
-  }
-
-  .tcard-stats svg {
-    width: 0.85em;
-    height: 0.85em;
+    font-size: clamp(9px, calc(98cqi / (var(--name-chars, 1) * 0.42 + 1.2)), var(--tcard-name-size));
   }
 }
 
@@ -12399,8 +12463,11 @@ button.tcard:focus-visible,
 }
 
 .tcard-bar {
-  align-self: stretch;
-  height: 4px;
+  position: absolute;
+  right: 3px;
+  bottom: 1px;
+  left: 3px;
+  height: 3px;
   border-radius: 2px;
   background: rgba(0, 0, 0, 0.55);
   overflow: hidden;
@@ -12413,12 +12480,12 @@ button.tcard:focus-visible,
   background: linear-gradient(90deg, #b8503e, #ef9a85);
 }
 
-/* The blow it will take this round, on its top edge. */
+/* The blow it will take this round, over the frame's top edge. */
 .tcard-blow {
   position: absolute;
-  top: -10px;
+  top: calc(var(--tw) * -18 / 92 - 8px);
   left: 50%;
-  z-index: 1;
+  z-index: 3;
   transform: translateX(-50%);
   padding: 1px 6px;
   border: 1px solid rgba(239, 154, 133, 0.75);
@@ -12446,9 +12513,9 @@ button.tcard:focus-visible,
 
 .tcard-chip {
   position: absolute;
-  bottom: -9px;
+  bottom: calc(var(--tw) * -18 / 92 - 10px);
   left: 50%;
-  z-index: 1;
+  z-index: 3;
   transform: translateX(-50%);
   max-width: calc(100% + 8px);
   padding: 0 6px;
@@ -12470,14 +12537,15 @@ button.tcard:focus-visible,
 }
 
 .tcard-chip--shift {
+  top: 2px;
   bottom: auto;
-  top: 24px;
 }
 
 .tcard-check {
   position: absolute;
-  top: 24px;
-  right: 4px;
+  right: 2px;
+  bottom: 30%;
+  z-index: 2;
   display: grid;
   place-items: center;
   width: 20px;
@@ -12500,7 +12568,7 @@ button.tcard:focus-visible,
 
 .tcard--chosen {
   box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 3px 6px rgba(0, 0, 0, 0.55),
     0 0 10px color-mix(in srgb, var(--rarity, #9b9b9b) 60%, transparent);
 }
 
@@ -12508,94 +12576,33 @@ button.tcard:focus-visible,
   opacity: 0.5;
 }
 
-/* Small, in the deck's row and the report. */
-.tcard--compact {
-  --tcard-art: 32px;
-  gap: 1px;
-  padding: 3px 2px 4px;
-}
-
-.tcard--compact .tcard-name {
-  --tcard-name-size: 11px;
-  min-height: 0;
-  -webkit-line-clamp: 1;
-}
-
-.tcard--compact .tcard-stats {
-  justify-content: center;
-  gap: 0 3px;
-  font-size: 11px;
-}
-
-.tcard--compact .tcard-stats .icon,
-.tcard--compact .tcard-stats svg {
-  display: none;
-}
-
-.tcard--compact .tcard-type,
-.tcard--compact .tcard-level {
-  width: 16px;
-  min-width: 16px;
-  height: 16px;
-  font-size: 10px;
-}
-
+/* The deck, the collection and the reserve: cards of the one size in as
+   many columns as fit, three on the narrowest phone. */
 .tcard-grid {
   display: grid;
-  gap: 8px;
+  grid-template-columns: repeat(auto-fill, var(--tw));
+  justify-content: center;
+  gap: 14px 4px;
 }
 
-.tcard-grid--deck {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.tcard-grid--collection {
-  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-  gap: 14px 8px;
-  padding-top: 10px;
-}
-
+.tcard-grid--collection,
 .tcard-grid--reserve {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
-  padding-top: 10px;
+  padding-top: 12px;
 }
 
-/* On the narrowest phones the reserve's four names in smaller letters, so
-   a long one keeps whole. */
-@media (max-width: 359px) {
-  .tcard-grid--reserve .tcard,
-  .cards-lines .tcard {
-    padding-inline: 2px;
-  }
-
-  .tcard-grid--reserve .tcard-name,
-  .cards-lines .tcard-name {
-    --tcard-name-size: 11px;
-  }
-
-  .tcard-grid--reserve .tcard-stats {
-    gap: 0 2px;
-  }
-}
-
-@media (min-width: 360px) {
-  .tcard-grid--deck {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 6px;
-  }
-}
-
-/* An empty place on the table. */
+/* An empty place on the table, as big as a card. */
 .tcard-slot {
   display: grid;
   place-items: center;
-  width: 100%;
-  min-height: 132px;
-  border: 2px dashed var(--bark-line);
-  border-radius: 7px;
-  background: rgba(13, 17, 11, 0.55);
-  color: var(--text-muted);
+  justify-self: center;
+  align-self: center;
+  box-sizing: border-box;
+  width: var(--tw);
+  height: calc(var(--tw) * 124 / 92);
+  border: 2px dashed rgba(236, 230, 214, 0.35);
+  border-radius: 4px;
+  background: rgba(20, 22, 24, 0.55);
+  color: #ece6d6;
   font: inherit;
   font-size: 13px;
 }
@@ -12619,14 +12626,47 @@ button.tcard-slot {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 10px 8px 12px;
-  border: 2px solid var(--bark-line);
-  border-radius: 8px;
-  background: linear-gradient(180deg, #2b2219, #1c1712);
-  box-shadow:
-    inset 0 0 0 3px rgba(13, 17, 11, 0.6),
-    inset 0 0 24px rgba(0, 0, 0, 0.6),
-    0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* The table and the reserve on it: PixelLab's grey slate slab with its
+   carved border, cut in nine so the border keeps its width at every size
+   (887, the author 12.11.2026: „plansza musi być jakimś stołem najlepiej
+   szarym, bo zbyt się zlewa wszystko”). */
+.cards-table,
+.card.cards-reserve {
+  padding: 4px 2px 8px;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 12px;
+  border-radius: 0;
+  border-image: url('/art/cards/table.png') 17 fill / 12px / 0 stretch;
+  background: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.55);
+  image-rendering: pixelated;
+}
+
+:root[data-layout='desktop'] .cards-table,
+:root[data-layout='desktop'] .card.cards-reserve {
+  padding: 6px 8px 10px;
+  border-width: 17px;
+  border-image-width: 17px;
+}
+
+.cards-table.place-card--art::before,
+.cards-table.place-card--art::after {
+  display: none;
+}
+
+.cards-table-name,
+.cards-table-tier,
+.cards-table-count,
+.cards-line-name,
+.cards-reserve .section-title,
+.cards-reserve .cards-hint {
+  color: #ece6d6;
+  text-shadow:
+    0 1px 2px #000,
+    0 0 4px rgba(0, 0, 0, 0.9);
 }
 
 .cards-table-head {
@@ -12674,11 +12714,31 @@ button.tcard-slot {
   margin: 0;
   font-family: var(--font-system);
   font-size: 12px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  text-wrap: pretty;
 }
 
 .cards-table-count--me {
   text-align: right;
+}
+
+/* Card backs (886 D): Szczęsny's hidden reserve, a back a card, and a
+   deck's pile, in the line before its counts. */
+.cards-backs {
+  display: inline-flex;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.cards-back {
+  width: 14px;
+  height: 20px;
+  background: url('/art/cards/back.png') center / contain no-repeat;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.8));
+}
+
+.cards-back + .cards-back {
+  margin-left: -6px;
 }
 
 .cards-round {
@@ -12702,7 +12762,7 @@ button.tcard-slot {
 .cards-line {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
   gap: 12px;
   min-width: 0;
 }
@@ -12719,10 +12779,6 @@ button.tcard-slot {
   text-align: center;
   text-transform: uppercase;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
-}
-
-.cards-lines .tcard {
-  min-height: 132px;
 }
 
 .cards-divider {
@@ -13076,54 +13132,15 @@ button.tcard-slot {
 
 .cards-dropped-row .tcard {
   flex: none;
-  width: 72px;
 }
 
-/* On a computer the table and its cards grow, the sprites to twice their
-   pixels, and the tiers stand two by two. */
+/* On a computer the cards are 138 px wide (--tw), the table's lines keep
+   together, the reserve and the hero's card take the whole width under the
+   table, and the tiers stand two by two. */
 :root[data-layout='desktop'] .cards-lines {
   width: min(100%, 540px);
   margin-inline: auto;
   gap: 14px;
-}
-
-:root[data-layout='desktop'] .cards-lines .tcard,
-:root[data-layout='desktop'] .cards-lines .tcard-slot {
-  --tcard-art: 96px;
-  min-height: 196px;
-}
-
-:root[data-layout='desktop'] .cards-lines .tcard-name {
-  --tcard-name-size: 15px;
-}
-
-:root[data-layout='desktop'] .cards-lines .tcard-stats {
-  --tcard-stats-size: 15px;
-}
-
-/* The reserve and the hero's skill side by side under the table, so
-   "Walcz" stays near. */
-:root[data-layout='desktop'] .cards-match {
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  align-items: start;
-}
-
-:root[data-layout='desktop'] .cards-match > :not(.cards-reserve, .cards-skill) {
-  grid-column: 1 / -1;
-}
-
-:root[data-layout='desktop'] .cards-match > .cards-reserve,
-:root[data-layout='desktop'] .cards-match > .cards-skill {
-  align-self: stretch;
-}
-
-:root[data-layout='desktop'] .tcard-grid--deck {
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-}
-
-:root[data-layout='desktop'] .tcard-grid--collection {
-  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
 }
 
 :root[data-layout='desktop'] .cards-tiers {

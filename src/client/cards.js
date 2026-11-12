@@ -19,7 +19,7 @@
 // words of the data come with the server's view (data/cards.json), the rest
 // is the page's (t()).
 
-import { monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
+import { areaArtUrl, monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
 import { h, icon } from './dom.js';
 import { formatNumber } from './format.js';
 import { t } from './i18n.js';
@@ -142,13 +142,20 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
     ]
       .filter(Boolean)
       .join(' ');
+    // The place of the creature's first home behind it (12.11.2026).
+    const scene = card.area ? areaArtUrl(card.area) : null;
+    const vars = { '--rarity': card.color, ...(scene && { '--scene': scene }) };
     const ariaLabel =
       label ??
       t('{name}, {type}, poziom {level}: Atak {attack}, Życie {life}', { name: card.name, type: typeOf(card.type)?.name ?? '', level: card.level, attack: card.attack, life: card.life });
     return onClick
-      ? h('button', { type: 'button', class: className, vars: { '--rarity': card.color }, 'aria-label': ariaLabel, onClick }, body)
-      : h('span', { class: className, vars: { '--rarity': card.color }, role: 'img', 'aria-label': ariaLabel }, body);
+      ? h('button', { type: 'button', class: className, vars, 'aria-label': ariaLabel, onClick }, body)
+      : h('span', { class: className, vars, role: 'img', 'aria-label': ariaLabel }, body);
   }
+
+  // Card backs (886 D): Szczęsny's hidden reserve, a card each, and a
+  // deck's pile.
+  const backs = (count) => h('span', { class: 'cards-backs', 'aria-hidden': 'true' }, Array.from({ length: Math.max(0, Math.min(count, 4)) }, () => h('span', { class: 'cards-back' })));
 
   // An empty place on the table, a tap to lay the picked card there.
   const slot = (label, onClick = null, ready = false) =>
@@ -657,14 +664,14 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
           { class: 'cards-table-who' },
           h('p', { class: 'cards-table-name', text: t('Szczęsny') }),
           tier && h('p', { class: 'cards-table-tier', text: tier.name }),
-          h('p', { class: 'muted cards-table-count', text: t('Rezerwa {hand} · talia {deck} · zbite {out}', { hand: match.foe.hand, deck: match.foe.deck, out: match.foe.out }) }),
+          h('p', { class: 'muted cards-table-count' }, backs(match.foe.hand), h('span', { text: t('Rezerwa {hand} · talia {deck} · zbite {out}', { hand: match.foe.hand, deck: match.foe.deck, out: match.foe.out }) })),
         ),
         h('span', { class: 'cards-round', text: t('Runda {round}/{cap}', { round: match.round, cap: match.cap }) }),
       ),
       linesRow('foe', match, blowsNow),
       h('div', { class: 'cards-divider', 'aria-hidden': 'true' }, h('span', { text: match.mode === 'staked' ? t('Stawka: {gold} zł', { gold: formatNumber(match.stake) }) : t('Trening') })),
       linesRow('me', match, blowsNow),
-      h('p', { class: 'muted cards-table-count cards-table-count--me', text: t('Twoja talia {deck} · zbite {out}', { deck: match.me.deck, out: match.me.out }) }),
+      h('p', { class: 'muted cards-table-count cards-table-count--me' }, match.me.deck > 0 && backs(1), h('span', { text: t('Twoja talia {deck} · zbite {out}', { deck: match.me.deck, out: match.me.out }) })),
     );
     if (art) table.style.setProperty('--place-art', `url("${art}")`);
     const hint = aimHint() ?? (picked !== null ? t('Wskaż pustą linię dla tej karty.') : !ready ? t('Dołóż karty z rezerwy na puste linie.') : null);

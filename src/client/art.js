@@ -568,6 +568,9 @@ export const materialSprite = (id) => sprite('materials', id, 'sprite--item');
 // A skill's icon, a second form's skill's stand-in until it has its own.
 export const skillSprite = (id) => firstSprite('skills', artChain(id), 'sprite--skill');
 export const areaSprite = (areaId) => sprite('areas', areaId, 'area-art');
+// The picture of a place as a CSS url, for a card's background; null when
+// the place has none.
+export const areaArtUrl = (areaId) => (available.areas.has(areaId) ? `url("/art/areas/${areaId}.png")` : null);
 // The address of a land's background, or null while it has none.
 export const landArt = (regionId) => (available.lands.has(regionId) ? `/art/lands/${regionId}.png` : null);
 // The address of the camp board's ground and of a camp building's picture at

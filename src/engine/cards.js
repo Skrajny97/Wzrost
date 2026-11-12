@@ -37,7 +37,7 @@ import { say } from './text.js';
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {import('./rng.js').Rng} Rng */
 /** @typedef {'me' | 'foe'} Seat A side of a match: the player, or its rival. */
-/** @typedef {{ level: number, land: number, landName: string, regionId: string }} Home A creature's first home: the lowest place it lives in and its land (0 for the first). */
+/** @typedef {{ level: number, area: string, land: number, landName: string, regionId: string }} Home A creature's first home: the lowest place it lives in (its level and id, whose picture is the card's background), and its land (0 for the first). */
 /** @typedef {{ key: number, id: string, level: number, type: string, attack: number, life: number, max: number, shifted?: true }} MatchCard A card in a match: its place in its deck (`key`), creature, level, type (a Mag's skill may change it), Atak, Życie left and full. */
 /** @typedef {{ classId: string, stage: number, used: boolean }} Hero A side's hero: its class, its evolution's stage (0 for none) and whether its skill is used. */
 /** @typedef {{ cards: MatchCard[], deck: number[], hand: number[], lines: (number | null)[], out: number[], hero: Hero | null, smart: number }} Side A side of a match: its cards, those still in its deck (in draw order), in its reserve, on its three lines, and beaten. */
@@ -93,16 +93,16 @@ export function cardHomes(content) {
     const land = lands.indexOf(region.land);
     /** @type {Record<string, any>[]} */
     const areas = [...region.areas].sort((a, b) => a.minLevel - b.minLevel);
-    /** @param {string} id @param {number} level */
-    const add = (id, level) => {
-      if (id && !homes.has(id) && content.monstersById[id] && !content.eventFoesById?.[id]) homes.set(id, { level, land, landName: region.land, regionId: region.id });
+    /** @param {string} id @param {Record<string, any>} area */
+    const add = (id, area) => {
+      if (id && !homes.has(id) && content.monstersById[id] && !content.eventFoesById?.[id]) homes.set(id, { level: area.minLevel, area: area.id, land, landName: region.land, regionId: region.id });
     };
     for (const area of areas) {
-      for (const encounter of [...(area.encounters ?? []), ...(area.tough ?? [])]) for (const id of encounter.monsters) add(id, area.minLevel);
-      add(area.elite, area.minLevel);
-      add(area.champion, area.minLevel);
+      for (const encounter of [...(area.encounters ?? []), ...(area.tough ?? [])]) for (const id of encounter.monsters) add(id, area);
+      add(area.elite, area);
+      add(area.champion, area);
     }
-    if (areas.length > 0) add(region.elite, areas[0].minLevel);
+    if (areas.length > 0) add(region.elite, areas[0]);
   }
   homesBuilt.set(content, homes);
   return homes;
@@ -217,7 +217,8 @@ function typeView(type, content) {
 }
 
 // A card as the page shows it: the creature's name, type, rarity with its
-// colour, kind, level, Atak and Życie, and what else the caller gives.
+// colour, kind, level, Atak and Życie, the place of its first home (the
+// card's background, 12.11.2026) and what else the caller gives.
 /**
  * @param {string} id
  * @param {number} level
@@ -238,6 +239,7 @@ export function cardView(id, level, content, extra = {}) {
     kind: cardKind(id, content),
     level: cardLevel(level, content),
     ...cardStats(id, level, content),
+    area: cardHomes(content).get(id)?.area ?? null,
     ...extra,
   };
 }
