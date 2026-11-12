@@ -42,7 +42,7 @@
 // still in the chest, so two taps at once move an item once, and none is
 // lost or doubled; a batch that fails on them changes nothing.
 
-import { bagCapacity, campLevels, canUse, countedForm, itemName, itemView } from '../engine/index.js';
+import { bagCapacity, campLevels, canUse, countedForm, itemName, itemView, wearersOf } from '../engine/index.js';
 import { assertion, raced, sameVersion } from './atomic.js';
 import { bagPlaces, characterView, loadPlayer, requireOffRack } from './characters.js';
 import { content } from './content.js';
@@ -51,6 +51,7 @@ import { guildPlayer, requireMember } from './guild-trials.js';
 import { withoutFavorites } from './favorites.js';
 import { ApiError, json, readJson } from './http.js';
 import { numberText } from './i18n.js';
+import { teamOf, teamView } from './market.js';
 
 const rules = () => content().guilds.chest;
 const minLevel = () => content().community.trade.minLevel;
@@ -105,9 +106,16 @@ const logKept = (db, guildId) =>
 // still in the guild, else the one it had then), for whom, when, and
 // whether this character may take it; the guild's other members to leave
 // an item for; the log of the last moves; the bag's items a gem is being
-// set in (no "Włóż" for them); the rules and the words.
+// set in (no "Włóż" for them); the rules and the words. With each item,
+// who of the character's own can put it on now (`wearers`, as on the
+// Targowisko: 'me' and its companions' ids), and the companions with what
+// they wear (`team`), so its card compares it with what each of them wears
+// (a player's remark, 12.11.2026: „W oknie skrzyni gildii można by również
+// dać możliwość porównania eq swojego i swoich towarzyszy z włożonymi w
+// skrzynię gildii”).
 export async function chestView(db, player, guild) {
   const { row } = player;
+  const team = teamOf(row);
   const [items, log, members] = await db.batch([
     db
       .prepare(
@@ -146,6 +154,7 @@ export async function chestView(db, player, guild) {
       // Its class can wear it, and from which level of the class.
       usable: canUse(item.base, row.class_id, content()),
       wornFrom: view.classLevel,
+      wearers: wearersOf(item, team, content()),
     };
   });
   entries.sort((a, b) => rank(a) - rank(b) || b.putAt - a.putAt || b.id - a.id);
@@ -158,6 +167,7 @@ export async function chestView(db, player, guild) {
     waiting: entries.filter((entry) => entry.forYou).length,
     items: entries,
     members: members.results.map((one) => ({ id: one.id, name: one.name, classId: one.class_id, level: one.level, nameColor: nameColorOf(one.cosmetics) })),
+    team: teamView(team),
     log: log.results.map((move) => {
       const item = JSON.parse(move.data);
       const rarity = content().raritiesById[item.rarity];

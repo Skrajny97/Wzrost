@@ -584,6 +584,10 @@
     "0.2.95": {
       "title": "Version 0.2.95",
       "body": "- Combat: the wanted poster you hold now shows on the Combat screen: whom you hunt and where. A tap on the poster takes you straight to that place, and the place has a “Wanted poster” mark in its land. Once the quarry falls, the poster leads you to the headman for the reward.\n- New versions now go live faster."
+    },
+    "0.2.96": {
+      "title": "Version 0.2.96",
+      "body": "- Guild Chest: an item's card compares it with what you wear and with what your companions wear, as on the Marketplace. The list also shows whether the smith has already reforged an item."
     }
   }
 }

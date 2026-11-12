@@ -8,7 +8,8 @@
 // and how many wait for this character; then the items, those for it
 // first, each with its picture, name, who put it in, for whom and when,
 // and "Weź" ("Zabierz" for one it put in itself), or the member it waits
-// for; a tap on an item opens its card. Under them "Włóż z plecaka", the
+// for; a tap on an item opens its card, which compares it with what the
+// character and its companions wear (as on the Targowisko). Under them "Włóż z plecaka", the
 // bag's items with "Włóż", which asks in a sheet for whom: "Dla wszystkich"
 // or one of the guild's members; and "Ostatnie ruchy", the chest's log.
 // Below the Wymiana's level (the server's `locked`) a line says from which
@@ -27,7 +28,8 @@ import { t } from './i18n.js';
 import { CLASS_ICONS } from './icons.js';
 import { call, onCharacterChange, state } from './state.js';
 import { closeSheet, foldPart, framedName, howItWorks, openSheet, toast, withButton } from './ui.js';
-import { itemDetails, itemSheet, itemSummary } from './screens/character.js';
+import { compareTable, itemDetails, itemSheet, itemSummary } from './screens/character.js';
+import { companionCompare } from './screens/market.js';
 
 const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
 const when = (at) => dateTimeFormat.format(new Date(at));
@@ -56,8 +58,11 @@ export function mountGuildChest(container) {
   const title = () => h('h2', { class: 'card-title', id: 'guild-stash-title', text: view.texts.title });
 
   // Who put the item in, for whom and when, and whether this character
-  // wears it (as in the Skrzynia Konta, screens/chest.js).
-  function note(item) {
+  // wears it (as in the Skrzynia Konta, screens/chest.js); on the list also
+  // whether the Kowal has raised it already, once for good (a player's
+  // remark, 12.11.2026: „informacje czy było już ulepszane w kuźni”), which
+  // its card says in full.
+  function note(item, { list = false } = {}) {
     const { texts } = view;
     const forWhom = item.forYou ? texts.forYou : item.forName ? filled(texts.forOne, { name: item.forName }) : texts.forAll;
     const wear = !item.usable
@@ -65,7 +70,8 @@ export function mountGuildChest(container) {
       : item.wornFrom && item.wornFrom > state.character.classLevel
         ? t('założysz od poziomu klasy {level}', { level: item.wornFrom })
         : null;
-    return [filled(texts.from, { name: item.from }), forWhom, when(item.putAt), wear].filter(Boolean).join(' · ');
+    const raised = list && item.raised && t('przekuty u Kowala');
+    return [filled(texts.from, { name: item.from }), forWhom, when(item.putAt), wear, raised].filter(Boolean).join(' · ');
   }
 
   // "Weź", "Zabierz" for an item this character put in itself, or the
@@ -89,12 +95,20 @@ export function mountGuildChest(container) {
   }
 
   // An item's card from the chest: its properties and gem, who left it for
-  // whom, and the same "Weź". The scrapper's price stays off: it is not the
-  // bag's.
+  // whom, then how it compares with what the character wears in its place
+  // and with what each companion who can put it on wears there, as on the
+  // Targowisko (market.js; a player's remark, 12.11.2026: „W oknie skrzyni
+  // gildii można by również dać możliwość porównania eq swojego i swoich
+  // towarzyszy z włożonymi w skrzynię gildii”), and the same "Weź". The
+  // scrapper's price stays off: it is not the bag's.
   function openItem(item) {
+    const worn = state.character.equipment?.[item.slot] ?? null;
+    const companions = (item.wearers ?? []).map((id) => (view.team ?? []).find((one) => one.id === id)).filter(Boolean);
     openSheet(
       itemDetails({ ...item, price: undefined }),
       h('p', { class: 'sheet-text guild-stash-sheet-note', text: note(item) }),
+      item.usable && (worn ? compareTable(item, worn) : h('p', { class: 'muted', text: t('W miejscu „{slot}” postać nic teraz nie nosi.', { slot: item.slotName }) })),
+      companions.map((companion) => companionCompare(companion, item)),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Zamknij'), onClick: closeSheet }), takePart(item, { closing: true })),
     );
   }
@@ -130,7 +144,7 @@ export function mountGuildChest(container) {
         h(
           'li',
           { class: `chest-row guild-stash-row${item.forYou ? ' guild-stash-row--yours' : ''}` },
-          h('button', { type: 'button', class: 'chest-item chest-item--bag', onClick: () => openItem(item) }, itemSummary(item), h('span', { class: 'chest-note', text: note(item) })),
+          h('button', { type: 'button', class: 'chest-item chest-item--bag', onClick: () => openItem(item) }, itemSummary(item), h('span', { class: 'chest-note', text: note(item, { list: true }) })),
           takePart(item),
         ),
       ),

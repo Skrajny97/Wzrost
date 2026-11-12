@@ -3233,6 +3233,15 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Skrzynia Gildii: porównanie z ekwipunkiem i przekucie u Kowala (uwaga gracza, 12.11.2026, w grze od 0.2.96)
+
+Autor przekazał zrzut czatu: gracz (poz. 47): „W oknie skrzyni gildii można by również dać możliwość porównania eq swojego i swoich towarzyszy z włożonymi w skrzynię gildii, oraz informacje czy było już ulepszane w kuźni”. Autor: „kolejne wartościowe uwagi”.
+
+1. **Porównanie w karcie przedmiotu.** Karta przedmiotu ze Skrzyni Gildii pokazuje pod opisem porównanie z tym, co postać nosi w tym miejscu („Porównanie z założonym”), a pod nim porównanie z tym, co nosi każdy towarzysz, który może ten przedmiot założyć teraz („Porównanie z tym, co nosi …”), tak samo jak karta oferty na Targowisku (`companionCompare` w `src/client/screens/market.js`). Gdy postać nic w tym miejscu nie nosi, karta to mówi.
+2. **Kto może założyć (brakujący szczegół).** Serwer podaje przy każdym przedmiocie, kto z postaci i jej towarzyszy może go założyć teraz (`wearers`, `wearersOf` w silniku, jak na Targowisku), a przy skrzyni towarzyszy z tym, co noszą (`team`). Towarzysz bez prawa do tego przedmiotu (klasa, poziom, miejsce) nie ma porównania.
+3. **Przekucie u Kowala.** Karta przedmiotu mówiła to już od 0.2.88: „Kowal już przekuł go na wyższą rzadkość: drugi raz się nie da.” Teraz także na liście Skrzyni, przy wierszu przedmiotu, stoi „przekuty u Kowala”, więc widać to bez otwierania karty. Ulepszenie na Kowadle widać jak dotąd w nazwie („+3”).
+4. **Bez makiet (brakujący szczegół).** To te same porównania, które karta przedmiotu ma w plecaku i na Targowisku, i jedno słowo w istniejącym wierszu, więc wchodzą bez makiet. Sprawdzone na 320, 390 i 1366 px.
+
 ## List gończy na ekranie Walki (uwaga gracza, 12.11.2026, w grze od 0.2.95)
 
 Autor przekazał zrzut czatu: gracz (poz. 31): „małe qol, w okienku wypraw fajnie byłoby widzieć, które zlecenie na elitę obecnie mamy wybrane z tablicy zleceń”. Autor: „kolejne wartościowe uwagi”.
@@ -4077,6 +4086,7 @@ Uwaga gracza: „tygodniowe nieznacznie a miesięczne kilkukrotnie cięższe. Ż
 14. Najpierw stoją przedmioty dla Ciebie (złoty pasek, „Czeka na Ciebie: N.”), potem dla wszystkich, potem dla innych, od najnowszego. Przy każdym widać: od kogo, dla kogo, kiedy i czy klasa go założy. „Ostatnie ruchy” to 50 ostatnich włożeń i wyjęć (`chest.log`), z imionami z chwili ruchu.
 15. Gdy ktoś opuści gildię albo zostanie z niej usunięty, przedmioty dla niego są odtąd dla wszystkich. Nie zabierze też już tego, co sam włożył. Ostatni członek wyjdzie z gildii dopiero przy pustej skrzyni („W Skrzyni Gildii zostały przedmioty…”). Usunięcie postaci albo konta ostatniego członka zabiera gildię razem ze skrzynią.
 16. Żółta kropka przy Gildii świeci tylko przy przedmiocie przypisanym tej postaci, nie przy przedmiotach dla wszystkich.
+16a. Od 0.2.96 karta przedmiotu ze Skrzyni porównuje go z tym, co noszą postać i jej towarzysze, a lista mówi „przekuty u Kowala” (zob. „Skrzynia Gildii: porównanie z ekwipunkiem i przekucie u Kowala”).
 
 ### Muzyka i Discord
 

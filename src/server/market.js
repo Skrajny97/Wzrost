@@ -148,15 +148,16 @@ function offerView(row, wearer, team = teamOf(wearer)) {
   };
 }
 
-// The character and its hired companions, for who can put an item on.
-function teamOf(row) {
+// The character and its hired companions, for who can put an item on (also
+// the Skrzynia Gildii's cards, guild-chest.js).
+export function teamOf(row) {
   return { classId: row.class_id, classLevel: row.class_level, companions: settlementOf(row).companions ?? [] };
 }
 
 // The companions for the cards' comparisons: each with its class and level
 // and what it wears in its places (a weapon, armour and one piece of
 // jewellery, an amulet, a ring or a talisman), as the Kwatery show it.
-function teamView(team) {
+export function teamView(team) {
   return team.companions.map((companion) => ({
     id: companion.id,
     name: companion.name,

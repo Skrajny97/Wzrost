@@ -15,7 +15,8 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { content } from './helpers/content.js';
+import { drawCandidates } from '../src/engine/index.js';
+import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
 const rules = content.guilds.chest;
@@ -173,6 +174,25 @@ describe('Skrzynia Gildii', () => {
     assert.deepEqual([full.status, full.data.error.code], [409, 'chest_full']);
     assert.match(full.data.error.message, new RegExp(`mieści ${rules.capacity} przedmiotów`));
     assert.equal((await view('mistrz')).count, rules.capacity);
+  });
+
+  // A player's remark, 12.11.2026: „W oknie skrzyni gildii można by również
+  // dać możliwość porównania eq swojego i swoich towarzyszy z włożonymi w
+  // skrzynię gildii, oraz informacje czy było już ulepszane w kuźni”.
+  test("each item names who of the character's own can put it on now, with the companions' gear for its card, and whether the Kowal raised it", async () => {
+    const [candidate] = drawCandidates({ character: newCharacter('warrior', { level: 30 }), seed: 'skrzynia' }, Date.now(), content);
+    const companion = { ...candidate, id: 'c1', name: 'Ziemowit', classId: 'warrior', level: 30, skills: [], gear: [amulet(20, { rarity: 'common' })] };
+    await run('UPDATE characters SET settlement = ? WHERE name = ?', JSON.stringify({ companions: [companion] }), 'Druh');
+    assert.equal((await put('mistrz', await inBag('Mistrz', amulet(30, { raised: true })))).status, 200);
+    const seen = await view('druh');
+    assert.deepEqual(seen.items[0].wearers, ['me', 'c1']);
+    assert.equal(seen.items[0].raised, true);
+    const [ziemowit] = seen.team;
+    assert.deepEqual([ziemowit.id, ziemowit.name, ziemowit.level], ['c1', 'Ziemowit', 30]);
+    assert.equal(ziemowit.wear.find((place) => place.slot === 'jewelry').item.base, 'amulet');
+    // One without companions: only itself.
+    const own = await view('mistrz');
+    assert.deepEqual([own.items[0].wearers, own.team], [['me'], []]);
   });
 
   test('taking needs a place in the bag', async () => {
