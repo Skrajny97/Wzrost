@@ -588,6 +588,10 @@
     "0.2.96": {
       "title": "Version 0.2.96",
       "body": "- Guild Chest: an item's card compares it with what you wear and with what your companions wear, as on the Marketplace. The list also shows whether the smith has already reforged an item."
+    },
+    "0.2.97": {
+      "title": "Version 0.2.97",
+      "body": "- Notifications: when they cannot be switched on, the game says why under the switch and what to do (permission in Chrome and in the phone's settings, incognito tabs, Google Play services). It also tries to fix the most common troubles by itself.\n- “Report a bug” adds the state of notifications on the device, to find the cause more easily."
     }
   }
 }

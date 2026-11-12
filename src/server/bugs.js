@@ -1,7 +1,8 @@
 // "Zgłoś błąd" in the settings (the author: "Trzeba dodac przycisk Zgłoś
 // błąd i zeby przychodzil mi w Panel Autora"): a player writes what went
 // wrong, and the game adds where they were (the screen), its version, the
-// phone and the character as it is now. The report waits in the author's
+// phone, the state of its notifications there (`details`, pushDiagnosis in
+// src/client/push.js) and the character as it is now. The report waits in the author's
 // panel (author.js) until marked done. A few a day per account, so that
 // no one floods the panel.
 
@@ -37,7 +38,7 @@ async function readReport(request) {
     return { body: await readJson(request), image: null };
   }
   const form = await readForm(request, BUG_IMAGE.form, imageTooLarge());
-  const body = { text: form.get('text'), screen: form.get('screen') };
+  const body = { text: form.get('text'), screen: form.get('screen'), details: form.get('details') };
   const file = form.get('image');
   // A form without a picture, or with an empty one, is a report without it.
   if (file === null || file === '' || (typeof file !== 'string' && file.size === 0)) return { body, image: null };
@@ -71,12 +72,13 @@ export async function reportBug(context) {
     .first();
   const screen = typeof body.screen === 'string' ? body.screen.slice(0, 120) : null;
   const device = (context.request.headers.get('user-agent') ?? '').slice(0, 300) || null;
+  const details = typeof body.details === 'string' ? body.details.slice(0, 500) || null : null;
   // The day's count is checked again in the statement that writes, so
   // reports sent at once cannot all pass the count read above.
   const report = db
     .prepare(
-      `INSERT INTO bug_reports (user_id, character_id, character, text, screen, version, device, created_at)
-       SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8
+      `INSERT INTO bug_reports (user_id, character_id, character, text, screen, version, device, created_at, details)
+       SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?11
        WHERE (SELECT COUNT(*) FROM bug_reports WHERE user_id = ?1 AND created_at > ?9) < ?10`,
     )
     .bind(
@@ -91,6 +93,7 @@ export async function reportBug(context) {
       context.now,
       context.now - DAY,
       BUG_REPORTS.daily,
+      details,
     );
   // The report and its picture together or not at all (a batch is one
   // transaction): the picture goes with the report just written, and with

@@ -287,6 +287,7 @@ export function mountAuthor(container, { backHash = '#/walka' }) {
         bug.image && shot(bug),
         h('p', { class: 'author-bug-meta', text: [dateTimeFormat.format(new Date(bug.createdAt)), bug.screen && `ekran ${bug.screen}`, bug.version && `wersja ${bug.version}`].filter(Boolean).join(' · ') }),
         bug.device && h('p', { class: 'author-bug-meta', text: bug.device }),
+        bug.details && h('p', { class: 'author-bug-meta', text: bug.details }),
         small(bug.resolvedAt ? 'Przywróć' : 'Załatwione', change('/api/author/bugs/resolve', { id: bug.id, done: !bug.resolvedAt })),
       );
     return h(

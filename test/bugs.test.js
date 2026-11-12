@@ -79,6 +79,19 @@ describe('Zgłoś błąd', () => {
     assert.equal((await call('POST', '/api/author/bugs/resolve', { cookie: player, body: { id: bug.id } })).status, 404);
   });
 
+  test('the notifications\' state the page adds goes with the report, cut to its length, also in a form', async () => {
+    const state = 'push: permission granted; worker active; subscription none; installed app no; failure 2026-11-12 20:40 UTC, subscribe: AbortError: Registration failed - push service not available';
+    const sent = await call('POST', '/api/bug-reports', { cookie: player, body: { text: 'Nie mogę włączyć powiadomień.', screen: '#/czat', details: state } });
+    assert.equal(sent.status, 201, JSON.stringify(sent.data));
+    assert.equal((await reportForm(player, { text: 'Formularz ze stanem powiadomień.', screen: '#/oboz', details: 'x'.repeat(600) })).status, 201);
+    assert.equal((await report(player, 'Zgłoszenie bez stanu powiadomień.')).status, 201);
+    const bugs = (await call('GET', '/api/author', { cookie: author })).data.bugs;
+    assert.deepEqual(
+      bugs.map((bug) => bug.details),
+      [null, 'x'.repeat(500), state],
+    );
+  });
+
   test('a report has a few words at least and a limit a day, and goes with its account', async () => {
     assert.equal((await report(player, 'krótko')).data.error.code, 'too_short');
     assert.equal((await report(player, 'x'.repeat(BUG_REPORTS.longest + 1))).data.error.code, 'too_long');
