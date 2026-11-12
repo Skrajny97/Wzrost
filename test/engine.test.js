@@ -125,6 +125,10 @@ import {
   extraValues,
   combatValues,
   equipChange,
+  bareItem,
+  equipVerdict,
+  gearVerdict,
+  pathGear,
   itemLines,
   THREAT_LEVELS,
   unlockedFeatures,
@@ -1428,6 +1432,37 @@ describe('item comparisons', () => {
     assert.ok(traded.changes.damage > 0 && traded.changes.reduction < 0);
     // Into an empty slot anything that adds something is better.
     assert.equal(equipChange(character, worn.filter((item) => item !== mail), mail, content).verdict, 'better');
+  });
+
+  test("the verdict follows the class's path of points: other attributes count for nothing, the path's by their weighted average (a player's note, 12.11.2026)", () => {
+    const warrior = newCharacter('warrior');
+    const worn = kit('warrior');
+    const ring = { base: 'ring', slot: 'ring', level: 1, rarity: 'common', affixes: [] };
+    const bare = worn.filter((item) => item.slot !== 'ring');
+    // Mądrość is off a Wojownik's path: more mana, but no better.
+    const wise = equipChange(warrior, bare, { ...ring, affixes: [{ kind: 'prefix', stat: 'wisdom', value: 30 }] }, content);
+    assert.ok(wise.changes.mana > 0);
+    assert.equal(wise.verdict, 'same');
+    // For a Mag, Intelekt is the main attribute.
+    const mage = newCharacter('mage');
+    const clever = { ...ring, affixes: [{ kind: 'prefix', stat: 'intellect', value: 30 }] };
+    assert.equal(equipVerdict(mage, clever, content, pathGear(mage, kit('mage').filter((item) => item.slot !== 'ring'), content)), 'better');
+    assert.equal(equipVerdict(warrior, clever, content, pathGear(warrior, bare, content)), 'same');
+    // Siła (weight 3) against Witalność (weight 2): +10 Siły beats +12
+    // Witalności by the weighted average, so no trade-off any more.
+    const strong = { ...ring, affixes: [{ kind: 'prefix', stat: 'strength', value: 10 }] };
+    const hardy = { ...ring, affixes: [{ kind: 'prefix', stat: 'vitality', value: 12 }] };
+    assert.equal(gearVerdict(warrior, [...bare, hardy], [...bare, strong], content), 'better');
+    assert.equal(gearVerdict(warrior, [...bare, strong], [...bare, hardy], content), 'worse');
+    // Damage, armour and resistances count by the combat values they change.
+    const sword = worn.find((item) => item.slot === 'weapon');
+    assert.equal(equipChange(warrior, worn, { ...sword, damage: { min: sword.damage.min + 5, max: sword.damage.max + 5 } }, content).verdict, 'better');
+    // An item for the verdict: no attributes, their weighted sum apart, the
+    // rest as it was, upgrades already counted.
+    const seen = bareItem({ ...strong, affixes: [...strong.affixes, { kind: 'suffix', stat: 'wisdom', value: 9 }, { kind: 'suffix', stat: 'resist.fire', value: 5 }] }, 'warrior', content);
+    assert.equal(seen.pathScore, content.classesById.warrior.autoPoints.strength * 10);
+    assert.deepEqual(seen.affixes, [{ kind: 'suffix', stat: 'resist.fire', value: 5 }]);
+    assert.equal(seen.upgrade, 0);
   });
 
   test('a resistance counts as a change in combat, by its element', () => {

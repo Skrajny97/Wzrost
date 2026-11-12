@@ -715,6 +715,11 @@
       "id": "0.2.91",
       "title": "Wersja 0.2.91",
       "body": "- W Labiryncie wybór błogosławieństwa i towary kupca otwierają się w okienku od razu po wejściu do komnaty, bez przewijania strony w górę."
+    },
+    {
+      "id": "0.2.92",
+      "title": "Wersja 0.2.92",
+      "body": "- Ocena przedmiotów (strzałki w plecaku i zdanie w karcie przedmiotu) liczy atrybuty tak jak „Rozdaj według klasy”: te, których klasa nie potrzebuje, nie liczą się wcale, a pozostałe według swojej wagi. Obrażenia broni, pancerz i odporności liczą się jak dotąd."
     }
   ]
 }

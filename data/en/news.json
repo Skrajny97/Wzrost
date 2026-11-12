@@ -568,6 +568,10 @@
     "0.2.91": {
       "title": "Version 0.2.91",
       "body": "- In the Labyrinth, the choice of a blessing and the merchant's wares open in a window as soon as you enter the chamber, with no scrolling back up the page."
+    },
+    "0.2.92": {
+      "title": "Version 0.2.92",
+      "body": "- The item verdict (the arrows in the bag and the line on the item card) counts attributes as “Spend by class” does: the ones your class does not need do not count at all, and the rest count by their weight. Weapon damage, armour and resistances count as before."
     }
   }
 }

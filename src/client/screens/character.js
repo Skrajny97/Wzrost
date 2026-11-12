@@ -33,14 +33,24 @@ const upgradeBadge = (item) => item.upgrade > 0 && h('span', { class: 'slot-leve
 const favoriteBadge = (item) => item.favorite && h('span', { class: 'slot-favorite', 'aria-hidden': 'true' }, icon('star', { size: 12 }));
 
 // Whether an item would make the character stronger in place of what its
-// slot holds, as the server counts it (valueChanges in preview.js): a word
-// for the lists of items and a line for the item's card.
+// slot holds, as the server counts it along the class's path of points
+// (equipVerdict in preview.js): a word for the lists of items and a line
+// for the item's card.
 const VERDICTS = {
   better: { text: 'lepiej', line: 'Lepiej: postać będzie silniejsza.' },
   worse: { text: 'gorzej', line: 'Gorzej: postać będzie słabsza.' },
   mixed: { text: 'coś za coś', line: 'Coś za coś: jedne wartości wzrosną, inne spadną.' },
-  same: { text: 'bez zmian', line: 'Bez zmian w walce.' },
+  same: { text: 'bez zmian', line: 'Bez zmian dla klasy postaci.' },
 };
+
+// The attributes the verdict counts, as "Rozdaj według klasy" spreads the
+// points (the class's path, the main one first; a player's note, the author
+// 12.11.2026: "celna uwaga"), for the note under the card's verdict.
+function pathNames() {
+  const cls = state.content.classes.find((one) => one.id === state.character.classId);
+  const names = (cls?.path ?? []).map((id) => state.content.stats.find((stat) => stat.id === id)?.name).filter(Boolean);
+  return names.length > 0 ? names.join(', ') : null;
+}
 
 // The mark of a bag item: a green triangle up, a red one down, both for a
 // trade-off (drawn in CSS, so that no font lacks them), with the word in a
@@ -1699,6 +1709,7 @@ async function showPreview(box, item, equipped) {
       box,
       h('p', { class: 'compare-title', text: equipped ? t('Po zdjęciu') : t('Po założeniu') }),
       h('p', { class: `verdict verdict-line verdict--${verdict}`, text: t(VERDICTS[verdict].line) }),
+      pathNames() && h('p', { class: 'muted small', text: t('Ocena liczy atrybuty tak jak „Rozdaj według klasy”: {stats}.', { stats: pathNames() }) }),
       rows.length > 0 &&
         h(
           'ul',
