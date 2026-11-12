@@ -1,0 +1,19 @@
+{
+  "id": "rider5-shadow-lord-female",
+  "tool": "pixellab generate-image-v2",
+  "description": "the lady of shadows of the reference picture riding: the same long straight silver-white hair hanging straight down her back, the same pale face with glowing violet eyes, the same spiked silver crown, the same black plate armour with silver edges and a small violet gem at the collar, the same long black cloak hanging behind from the shoulders, its edge clean and outlined, black armoured boots, nothing in the hands but the reins, no glowing violet ribbons and no blade; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two gauntleted hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the armoured thigh lying forward and level from the hip to the knee, the armoured lower leg hanging straight down from the knee, one whole black armoured boot at the bottom with the toes pointing right; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the crown to the sole of the boot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/shadow-lord-female.png",
+      "usage": "the character's look: this same woman, her face, silver hair, spiked crown, black armour, cloak and colours, drawn the same way; not her standing pose and not the glowing violet ribbons"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
