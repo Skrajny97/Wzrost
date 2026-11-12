@@ -115,6 +115,7 @@ import { buyFromTanner, sellToTanner } from './tannery.js';
 import { claimResidentPresent, giveToResident } from './resident-gifts.js';
 import { skipWithTimePoints } from './time.js';
 import { buyMount } from './stable.js';
+import { salvageStored, sellStored, takeStored } from './storage.js';
 import { answerTrade, blockTrades, cancelTrade, confirmTrade, proposeTrade, readTrade, setOffer, setTradeSettings, tradeSettings } from './trades.js';
 import { seeTutorial, setTutorialSettings } from './tutorial.js';
 import { exchangeParts, startCrafting } from './workshop.js';
@@ -236,6 +237,10 @@ const routes = [
   ['POST', '/api/professions/brew', startBrewing],
   ['POST', '/api/professions/craft', startCrafting],
   ['POST', '/api/professions/exchange', exchangeParts],
+  // The Przechowalnia of the Warsztat and the Szlifiernia (842, storage.js).
+  ['POST', '/api/professions/storage/take', takeStored],
+  ['POST', '/api/professions/storage/sell', sellStored],
+  ['POST', '/api/professions/storage/salvage', salvageStored],
   ['POST', '/api/professions/mine', startMining],
   ['POST', '/api/professions/jewel', startJewelcraft],
   ['POST', '/api/minerals/sell', sellMinerals],

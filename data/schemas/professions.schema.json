@@ -723,6 +723,7 @@
           "required": [
             "report",
             "made",
+            "stored",
             "failed",
             "stopped",
             "revealed",
@@ -753,6 +754,14 @@
               }
             },
             "made": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "stored": {
               "type": "array",
               "minItems": 1,
               "items": {
@@ -1245,6 +1254,7 @@
           "required": [
             "report",
             "made",
+            "stored",
             "failed",
             "stopped",
             "set",
@@ -1271,6 +1281,14 @@
               }
             },
             "made": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "stored": {
               "type": "array",
               "minItems": 1,
               "items": {

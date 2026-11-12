@@ -3092,12 +3092,27 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.82 (12.11.2026): Przechowalnia Warsztatu i Szlifierni (842)
+
+Autor: „Niech w warsztacie będzie przechowalnia niech to nie trafia od razu do plecaka i można od razu z pozycji przechowalni rozbierać i sprzedawać wyprodukowane albo wlozyc do plecaka jesli jest miejsce”. Autor przyjął makiety 842.1–842.4 (12.11.2026).
+
+1. **Wyroby czekają w Przechowalni.** Przedmioty z Warsztatu i biżuteria ze Szlifierni, zrobione przez postać i przez Awatara Systemu, trafiają do Przechowalni, a nie do plecaka. Przechowalnia jest jedna dla Warsztatu i Szlifierni, nie ma limitu miejsc i nie zajmuje miejsca w plecaku (tabela `storage_items`, migracja 0120). Zlecenie nie sprawdza już miejsca w plecaku: liczbę sztuk ograniczają tylko części i zasoby obozu, a w Szlifierni kamienie i kruszec. Zwoje do Kowadła trafiają jak dotąd do Kowadła.
+2. **Trzecia zakładka.** W Warsztacie i w Szlifierni jest zakładka „Przechowalnia (N)”. Stuknięcie zaznacza przedmiot, a zaznaczone przedmioty można:
+   - włożyć do plecaka, wszystkie naraz i tylko wtedy, gdy plecak ma miejsce na każdy z nich;
+   - sprzedać złomiarzowi po tej samej cenie co z plecaka, z premią Skupu złomu;
+   - rozebrać na Stole rozbiórki, tak samo jak przez „Rozbierz kilka” w plecaku.
+3. **Zlecenie zdjęte ze Stołu.** „Usuń z kolejki” oddaje przedmioty tam, skąd przyszły. Te z Przechowalni wracają do Przechowalni bez względu na plecak, a te z plecaka do plecaka (przy pełnym plecaku Stół dalej odmawia).
+4. **Raport.** Raport z wyrobu mówi, że gotowe przedmioty czekają w Przechowalni. Przedmiot z raportu, który tam czeka, otwiera się z tą informacją.
+5. **Osada (założenie Claude).** Zlecenia Osady na wyroby z Warsztatu dalej biorą je z plecaka. Napis przy takim zleceniu podpowiada, że z Przechowalni wkłada się je do plecaka w Warsztacie. To najprostsze rozwiązanie: Osada nie zagląda do Przechowalni.
+6. **Usunięcie postaci albo konta** usuwa też jej Przechowalnię.
+7. Testy: test/storage.test.js, test/workshop.test.js, test/mining.test.js, test/avatar.test.js.
+
 ## Wersja 0.2.81 (12.11.2026): Warsztat i Szlifiernia bez limitu sztuk i czasu
 
 Gracz zapytał, czy w Warsztacie da się zrobić naraz tylko 5 przedmiotów, czyli 2,5 h na 1. poziomie. Autor: „Zrób tak by na 1 poziomie profesji dało się odpalić juz 8h robienia”, „Niech te liczby nie beda zwiazane z iloscia przedmiotow, tylko ilosc przedmiotow zalezna od czasu (i materiałów)”. Potem: „Zrob warsztat i szlifiernie zalezna od czesci i materialow po prostu”, „bez ograniczeń czasowych” i „nie rób limitu 8 godzin”.
 
 1. **Bez limitu sztuk i czasu.** Zlecenie w Warsztacie i w Szlifierni nie ma już limitu 5 sztuk ani limitu czasu. Gracz wybiera tyle sztuk, na ile starczy części, zasobów obozu i miejsca w plecaku (w Szlifierni: kamieni, kruszcu i miejsca w plecaku). Na 1. poziomie Rzemieślnictwa 20 pospolitych mieczy to 10 h pracy. Zwojów do Kowadła też jest tyle, na ile starczy części.
-2. **Plecak.** Miejsce w plecaku zostaje warunkiem, dopóki nie wejdzie przechowalnia Warsztatu. Autor chce, żeby wyroby czekały w przechowalni, skąd można je rozebrać, sprzedać albo włożyć do plecaka. To większa zmiana wyglądu, więc najpierw pójdą makiety na stronę ocen.
+2. **Plecak.** Miejsce w plecaku zostaje warunkiem, dopóki nie wejdzie przechowalnia Warsztatu. Autor chce, żeby wyroby czekały w przechowalni, skąd można je rozebrać, sprzedać albo włożyć do plecaka. To większa zmiana wyglądu, więc najpierw pójdą makiety na stronę ocen. *Nieaktualne od 0.2.82: zob. „Wersja 0.2.82”.*
 3. W danych znika `maxCount` Warsztatu i Szlifierni (`data/professions.json`). Test: test/workshop.test.js (20 mieczy, 600 minut).
 
 ## Wersja 0.2.80 (12.11.2026): nazwa konta na czacie (832 A, makiety 836)

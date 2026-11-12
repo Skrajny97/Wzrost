@@ -288,6 +288,8 @@ export function jewelReport({ base, rarityId, results = [], set, learned = [], m
     items: made.map((item) => itemView(item, content)),
     failed,
     made: made.length > 0 ? say(texts, 'made', 0, { items: countList({ [pattern.id]: made.length }, content.basesById) }) : null,
+    // Where the jewels made wait: the Przechowalnia, out of the bag (842).
+    stored: made.length > 0 ? say(texts, 'stored', 0) : null,
     failedText: failed > 0 ? say(texts, 'failed', 0, { items: countList({ [pattern.id]: failed }, content.basesById) }) : null,
   };
 }

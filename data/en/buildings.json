@@ -70,6 +70,8 @@
         "titleAll": "Remove all orders?",
         "back": "Back to the bag: {what}.",
         "backAll": "Orders to remove: {count}. Everything they took will go back to the bag.",
+        "backStored": "Back to the Storeroom: {what}.",
+        "backAllStored": "Orders to remove: {count}. Everything they took will go back where it came from: the bag or the Storeroom.",
         "running": "The table is already working on this, so that work will be lost.",
         "runningAll": "The work on the first order will be lost.",
         "later": "The next orders will start sooner.",
@@ -84,6 +86,8 @@
       },
       "done": "From the queue to the bag: {what}.",
       "doneAll": "Orders removed: {count}. Everything from them is back in the bag.",
+      "doneStored": "From the queue to the Storeroom: {what}.",
+      "doneAllStored": "Orders removed: {count}. Everything from them is back where it came from.",
       "errors": {
         "gone": "This order is no longer in the queue.",
         "empty": "There are no orders in the queue to remove.",

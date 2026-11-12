@@ -25,7 +25,7 @@ import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
 import { confirmAction, howItWorks, splitLead, systemPanel, toast, withButton } from '../ui.js';
-import { findMark, itemSummary, itemTitle } from './character.js';
+import { findMark, itemSummary, itemTitle, salvagedText } from './character.js';
 import { lockedScreen } from './locked.js';
 
 const HOME = '#/profesje';
@@ -1094,7 +1094,6 @@ export function mountProfessions(container, { params, navigate }) {
     let pattern = known(slot).find((candidate) => candidate.id === craftChoice.pattern) ?? firstFor(slot);
     let rarity = rarities.find((candidate) => candidate.id === craftChoice.rarity) ?? rarities[0];
     let count = 1;
-    const free = Math.max(0, character.bagCapacity - character.bagUsed);
     const partCount = (id) => character.crafting.parts.find((part) => part.id === id)?.count ?? 0;
     const need = (resource) => resource.amount * rarity.step;
 
@@ -1117,13 +1116,14 @@ export function mountProfessions(container, { params, navigate }) {
       show();
     }
 
-    // How many items the parts, the camp's resources and the bag allow.
+    // How many items the parts and the camp's resources allow, with no cap
+    // of its own (the author, 12.11.2026: "Zrób warsztat i szlifiernie
+    // zalezna od czesci i materialow po prostu"); the bag's room does not
+    // count, as they wait in the Przechowalnia (842).
     function affordable() {
       const byParts = Math.floor(partCount(rarity.part.id) / pattern.parts);
       const byResources = Math.min(...pattern.resources.map((resource) => Math.floor((character.resources[resource.id] ?? 0) / need(resource))));
-      // No cap of its own (the author, 12.11.2026: "Zrób warsztat i
-      // szlifiernie zalezna od czesci i materialow po prostu").
-      return { byParts, byResources, most: Math.min(byParts, byResources, free) };
+      return { byParts, byResources, most: Math.min(byParts, byResources) };
     }
 
     // For whom a pattern is, from which class level, and whether it came from
@@ -1188,7 +1188,6 @@ export function mountProfessions(container, { params, navigate }) {
           if (have < need(resource)) lines.push(t('Brakuje zasobów: {name} (masz {have}, potrzeba {need}).', { name: resource.name, have: formatNumber(have), need: formatNumber(need(resource)) }));
         }
       }
-      if (free === 0) lines.push(t('Plecak jest pełny. Zrób w nim miejsce na przedmiot.'));
       return [
         lines.map((text) => h('p', { class: 'herb-room herb-room--full', text })),
         byParts === 0 && h('p', { class: 'muted', text: t('Części zrobisz z materiałów na Stole rozbiórki albo kupisz w Skupie złomu.') }),
@@ -1273,8 +1272,7 @@ export function mountProfessions(container, { params, navigate }) {
         h('p', { class: 'muted', text: upgradesText(workshop) }),
         h('p', { class: 'muted', text: luckText(workshop) }),
         h('p', { class: 'muted', text: t('Przedmioty dostaną poziom postaci: {level}.', { level: formatNumber(character.level) }) }),
-        free < Math.min(byParts, byResources) &&
-          h('p', { class: 'herb-room', text: t('Plecak ma miejsce tylko na {count}.', { count: countOf(free, 'przedmiot', 'przedmioty', 'przedmiotów') }) }),
+        h('p', { class: 'muted', text: t('Gotowe przedmioty poczekają w Przechowalni, poza plecakiem.') }),
         start,
       ];
     }
@@ -1488,8 +1486,17 @@ export function mountProfessions(container, { params, navigate }) {
     await withButton(button, async () => {
       const answer = await call('POST', `/api/professions/storage/${kind}`, { ids: items.map((item) => item.id) });
       for (const item of items) storageMarks.delete(item.id);
-      playSound(kind === 'sell' ? 'coin' : kind === 'salvage' ? 'build' : 'collect');
-      if (answer.text) toast(answer.text);
+      const pieces = (count) => countOf(count, 'przedmiot', 'przedmioty', 'przedmiotów');
+      if (answer.salvaged) {
+        playSound('build');
+        toast(salvagedText(answer.salvaged));
+      } else if (answer.sold) {
+        playSound('coin');
+        toast(t('Złomiarz zapłacił {gold} złota za {count}.', { gold: formatNumber(answer.sold.gold), count: pieces(answer.sold.count) }));
+      } else {
+        playSound('collect');
+        toast(t('W plecaku: {count} z Przechowalni.', { count: pieces(answer.taken.count) }));
+      }
     });
   }
 
@@ -1818,7 +1825,6 @@ export function mountProfessions(container, { params, navigate }) {
     let pattern = known(slot).find((candidate) => candidate.id === jewelChoice.pattern) ?? known(slot)[0];
     let rarity = rarities.find((candidate) => candidate.id === jewelChoice.rarity) ?? rarities[0];
     let count = 1;
-    const free = Math.max(0, character.bagCapacity - character.bagUsed);
 
     const slotRow = h('div', { class: 'segmented workshop-slots', role: 'group', 'aria-label': t('Rodzaj biżuterii') });
     const list = choiceList(t('Wzory'), { unknown: (count) => countOf(count, 'nieznany wzór', 'nieznane wzory', 'nieznanych wzorów') });
@@ -1842,7 +1848,7 @@ export function mountProfessions(container, { params, navigate }) {
     function affordable() {
       const byGems = rarity.gem.have;
       const byOre = Math.floor(rarity.ore.have / slot.ores);
-      return { byGems, byOre, most: Math.min(byGems, byOre, free) };
+      return { byGems, byOre, most: Math.min(byGems, byOre) };
     }
     // For whom, from which class level, and whether the pattern came from a
     // jewel taken apart, as in the Warsztat.
@@ -1907,7 +1913,6 @@ export function mountProfessions(container, { params, navigate }) {
       const lines = [];
       if (byGems === 0) lines.push(t('Brakuje kamienia: {name} (masz 0, potrzeba 1).', { name: rarity.gem.name }));
       if (byOre === 0) lines.push(t('Brakuje kruszcu: {name} (masz {have}, potrzeba {need}).', { name: rarity.ore.name, have: formatNumber(rarity.ore.have), need: formatNumber(slot.ores) }));
-      if (free === 0) lines.push(t('Plecak jest pełny. Zrób w nim miejsce na biżuterię.'));
       return [
         lines.map((text) => h('p', { class: 'herb-room herb-room--full', text })),
         (byGems === 0 || byOre === 0) && h('p', { class: 'muted', text: t('Kamienie i kruszce wydobędziesz w Górnictwie.') }),
@@ -1986,7 +1991,7 @@ export function mountProfessions(container, { params, navigate }) {
           text: rarity.chance >= 1 ? t('Każda sztuka tej rzadkości się uda.') : t('Każda sztuka ma {chance} szans na powodzenie. Nieudana zabiera swój kamień, a kruszec wraca.', { chance: percentText(rarity.chance) }),
         }),
         h('p', { class: 'muted', text: t('Biżuteria dostanie poziom postaci: {level}.', { level: formatNumber(character.level) }) }),
-        free < Math.min(byGems, byOre) && h('p', { class: 'herb-room', text: t('Plecak ma miejsce tylko na {count}.', { count: countOf(free, 'sztukę', 'sztuki', 'sztuk') }) }),
+        h('p', { class: 'muted', text: t('Gotowa biżuteria poczeka w Przechowalni, poza plecakiem.') }),
         start,
       ];
     }
@@ -2268,6 +2273,8 @@ export function itemsReport(report, heading, findSheet) {
             h('li', {}, h('button', { type: 'button', class: 'item-row', onClick: () => findSheet(item) }, itemSummary(item), findMark(item), icon('chevron', { size: 18 }))),
           ),
         ),
+      // Where they wait: the Przechowalnia (842); an older report has no such line.
+      report.stored && h('p', { class: 'muted', text: report.stored }),
       report.failedText && h('p', { class: 'herb-room herb-room--full', text: report.failedText }),
       workSummary(report),
     ),
@@ -2327,6 +2334,7 @@ export function jewelsReport(report, heading, findSheet) {
       set?.item && h('ul', { class: 'item-list' }, row(set.item)),
       !set && report.made && h('p', { class: 'herb-estimate', text: report.made }),
       !set && report.items.length > 0 && h('ul', { class: 'item-list' }, report.items.map(row)),
+      !set && report.stored && h('p', { class: 'muted', text: report.stored }),
       !set && report.failedText && h('p', { class: 'herb-room herb-room--full', text: report.failedText }),
       workSummary(report),
     ),

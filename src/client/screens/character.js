@@ -66,6 +66,10 @@ export function ownedCopy(item) {
   return worn ? { item: worn, equipped: true } : null;
 }
 
+// A report's copy of an item that waits in the Przechowalnia of the
+// Warsztat and the Szlifiernia (storage.js on the server), or null.
+export const storedCopy = (item) => state.character.professions?.storage?.items.find((candidate) => sameItem(candidate, item)) ?? null;
+
 // The mark of a find in a report's list, while it waits in the bag.
 export function findMark(item) {
   const owned = ownedCopy(item);
@@ -1123,6 +1127,26 @@ function patternsByPlace(patterns) {
 // apart (salvage.minerals), as words: "Złoty kruszec ×8, Ametyst ×1".
 const mineralsLine = (minerals) => (minerals ?? []).map((one) => `${one.name} ×${formatNumber(one.count)}`).join(', ');
 
+// What the Stół rozbiórki took from "Rozbierz kilka" (the bag's, or the
+// Przechowalnia's in the Warsztat and the Szlifiernia): the items, the
+// parts and when they are ready, the gems and ores for Jubilerstwo, the
+// patterns learned and the gems that fell out.
+export function salvagedText(salvaged) {
+  const ready = Math.max(...salvaged.orders.map((order) => order.endsAt));
+  return [
+    t('Na stole: {items}. {parts} będą gotowe o {time}.', {
+      items: countOf(salvaged.count, 'przedmiot', 'przedmioty', 'przedmiotów'),
+      parts: salvaged.orders.map((order) => `${order.part} ×${formatNumber(order.parts)}`).join(', '),
+      time: timeFormat.format(new Date(ready)),
+    }),
+    salvaged.minerals && t('Do Jubilerstwa: {minerals}.', { minerals: mineralsLine(salvaged.minerals) }),
+    ...patternsByPlace(salvaged.patterns).map(([at, names]) => `${plural(names.length, 'Nowy wzór', 'Nowe wzory', 'Nowe wzory')} ${at}: ${names.join(', ')}.`),
+    gemsBackText(salvaged.gems),
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
 function salvageSection(item, busy) {
   const { salvage } = item;
   if (!salvage) return null;
@@ -1354,21 +1378,7 @@ export function salvagePicker(marked, { inline = false, back = null } = {}) {
         throw error;
       }
       playSound('build');
-      const ready = Math.max(...salvaged.orders.map((order) => order.endsAt));
-      toast(
-        [
-          t('Na stole: {items}. {parts} będą gotowe o {time}.', {
-            items: countOf(salvaged.count, 'przedmiot', 'przedmioty', 'przedmiotów'),
-            parts: salvaged.orders.map((order) => `${order.part} ×${formatNumber(order.parts)}`).join(', '),
-            time: timeFormat.format(new Date(ready)),
-          }),
-          salvaged.minerals && t('Do Jubilerstwa: {minerals}.', { minerals: mineralsLine(salvaged.minerals) }),
-          ...patternsByPlace(salvaged.patterns).map(([at, names]) => `${plural(names.length, 'Nowy wzór', 'Nowe wzory', 'Nowe wzory')} ${at}: ${names.join(', ')}.`),
-          gemsBackText(salvaged.gems),
-        ]
-          .filter(Boolean)
-          .join(' '),
-      );
+      toast(salvagedText(salvaged));
     });
   };
   const dim = bag.some((item) => !takes(item));

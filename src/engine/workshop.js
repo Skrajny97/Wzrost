@@ -432,6 +432,8 @@ export function workshopReport({ base, rarityId, results, scrolls, learned = [],
     ...(scrolls !== undefined && { scrolls }),
     failed,
     made: madeCount > 0 ? say(texts, 'made', 0, { items: countList({ [base.id]: madeCount }, { [base.id]: base }) }) : null,
+    // Where the items made wait: the Przechowalnia, out of the bag (842).
+    stored: made.length > 0 ? say(texts, 'stored', 0) : null,
     failedText: failed > 0 ? say(texts, 'failed', 0, { items: countList({ [base.id]: failed }, content.basesById) }) : null,
     stopped: stopped ? say(texts, 'stopped', 0) : null,
     profession: professionProgress(profession, before, after, minutes),

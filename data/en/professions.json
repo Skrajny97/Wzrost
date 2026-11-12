@@ -124,6 +124,9 @@
       "made": [
         "Crafted: {items}."
       ],
+      "stored": [
+        "The finished items wait in the Storeroom, outside your bag."
+      ],
       "failed": [
         "Failed: {items}. The parts were lost, and the camp's resources came back."
       ],
@@ -230,6 +233,9 @@
       ],
       "made": [
         "Made: {items}."
+      ],
+      "stored": [
+        "The finished jewellery waits in the Storeroom, outside your bag."
       ],
       "failed": [
         "Failed: {items}. The stones were lost, and the ore came back."

@@ -1,20 +1,19 @@
 // Rzemieślnictwo in the Systemowy Warsztat (src/engine/workshop.js): an
-// order of as many items of one pattern and rarity as the parts, the
-// resources and the bag allow, with no cap on their number or time (the
-// author, 12.11.2026: "Zrób warsztat i szlifiernie zalezna od czesci i
-// materialow po prostu", "bez ograniczeń czasowych"), takes its parts
-// and the camp's resources at the start, and its report brings the items
-// made into the bag, the parts of the failed ones lost and their resources
-// back. Called back early, the character brings the items done and gets
-// back all the rest. From the scroll's level an order may be of Zwoje
-// ochronne instead, from parts alone: they always come out and wait for the
-// Kowadło (`scrolls` of the character), taking no room in the bag. Parts of a
-// rarity go for one of the next at once, beside any work (exchangeParts).
+// order of as many items of one pattern and rarity as the parts and the
+// resources allow, with no cap on their number or time (the author,
+// 12.11.2026: "Zrób warsztat i szlifiernie zalezna od czesci i materialow
+// po prostu", "bez ograniczeń czasowych"), takes its parts and the camp's
+// resources at the start, and its report brings the items made into the
+// Przechowalnia, out of the bag (842, storage.js), the parts of the failed
+// ones lost and their resources back. Called back early, the character
+// brings the items done and gets back all the rest. From the scroll's
+// level an order may be of Zwoje ochronne instead, from parts alone: they
+// always come out and wait for the Kowadło (`scrolls` of the character),
+// taking no room in the bag. Parts of a rarity go for one of the next at
+// once, beside any work (exchangeParts).
 
 import {
   addQuestProgress,
-  bagCapacity,
-  campLevels,
   craftCost,
   craftItems,
   craftRarities,
@@ -32,7 +31,7 @@ import {
   workshopReport,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { bagPlaces, characterView, craftingState, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, walletOf, workOf } from './characters.js';
+import { characterView, craftingState, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, walletOf, workOf } from './characters.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
@@ -52,7 +51,8 @@ const shareOf = (amounts, of, count) =>
 // of `count` Zwoje ochronne, from now on, by the character or by its Awatar
 // Systemu (`avatar` in the request). The parts and the resources go at once,
 // only if the character is still as seen, so two taps at once start one
-// order; and items only with room in the bag for all of them.
+// order. The bag's room does not count: the items wait in the
+// Przechowalnia (842).
 export async function startCrafting(context) {
   const body = await readJson(context.request);
   const { session, player, avatar } = await requireWorker(context, body);
@@ -64,7 +64,7 @@ export async function startCrafting(context) {
     throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content())}.`);
   }
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), workshop.profession);
-  // As many as the parts, the resources and the bag allow (checked below).
+  // As many as the parts and the resources allow (checked below).
   if (!Number.isSafeInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Wybierz co najmniej 1 sztukę.');
   const order = body.scroll === true || body.scroll === 'steady' ? scrollOrder(player.row, level, body.count, body.scroll === 'steady') : itemOrder(player.row, level, body);
   const { cost } = order;
@@ -78,8 +78,6 @@ export async function startCrafting(context) {
   if ((parts[partId] ?? 0) < needed) throw new ApiError(409, 'no_parts', `Brakuje części: ${content().partsById[partId].name} (potrzeba ${needed}).`);
   const short = Object.entries(cost.resources).find(([id, amount]) => (wallet[id] ?? 0) < amount);
   if (short) throw new ApiError(409, 'no_resources', `Brakuje zasobów: ${content().resourcesById[short[0]].name} (potrzeba ${short[1]}).`);
-  const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
-  if (order.room && free < body.count) throw new ApiError(409, 'bag_full', `W plecaku musi być ${body.count} wolnych miejsc na całe zlecenie.`);
 
   const { minutes } = order;
   const partsLeft = { ...parts, [partId]: parts[partId] - needed };
@@ -151,10 +149,10 @@ export async function exchangeParts(context) {
   });
 }
 
-// An order of items: a pattern the character knows, a rarity of its level,
-// what they take at the character's level, which is also the items' level,
-// and room for them in the bag. The Bractwo Kowali shortens the work and
-// adds to the luck of a rarity up (590), the luck kept with the order.
+// An order of items: a pattern the character knows, a rarity of its level
+// and what they take at the character's level, which is also the items'
+// level. The Bractwo Kowali shortens the work and adds to the luck of a
+// rarity up (590), the luck kept with the order.
 function itemOrder(row, level, body) {
   const base = typeof body.baseId === 'string' ? content().basesById[body.baseId] : undefined;
   const learned = JSON.parse(row.patterns ?? '[]');
@@ -165,7 +163,6 @@ function itemOrder(row, level, body) {
   return {
     cost: craftCost(base, rarity.id, body.count, row.level, content()),
     minutes: orderMinutes(body.count, rarity.id, level, content(), perkOf(row, 'workshopFaster')),
-    room: true,
     options: { base: base.id, rarity: rarity.id, level: row.level, ...(luck > 0 && { luck }) },
   };
 }
@@ -179,7 +176,6 @@ function scrollOrder(row, level, count, steady = false) {
   return {
     cost: { ...scrollCost(count, content(), scroll), resources: {} },
     minutes: scrollOrderMinutes(count, level, content(), perkOf(row, 'workshopFaster'), scroll),
-    room: false,
     options: { scroll: steady ? 'steady' : true },
   };
 }
@@ -275,7 +271,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
     ...(avatar && { avatar: true }),
   };
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { made: made.length }));
-  const insertItem = db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)');
+  const store = db.prepare('INSERT INTO storage_items (character_id, data, created_at) VALUES (?, ?, ?)');
 
   let saved;
   try {
@@ -298,8 +294,8 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
       ...trialProgress(db, row.id, { made: made.length }, now, takenBefore(options.begun)),
       // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
       ...workFamePoints(db, row.id, worked, avatar, now),
-      // The items made go to the bag; the room was there at the start.
-      ...made.map((item) => insertItem.bind(row.id, JSON.stringify(item), now)),
+      // The items made wait in the Przechowalnia, out of the bag (842).
+      ...made.map((item) => store.bind(row.id, JSON.stringify(item), now)),
       end,
     ]);
   } catch (error) {

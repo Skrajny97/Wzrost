@@ -15,7 +15,7 @@ import { guided, openSheet, systemPanel, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { narrate } from '../narrator.js';
 import { scrapperSheet } from '../scrapper.js';
-import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy } from './character.js';
+import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy, storedCopy } from './character.js';
 import { skipLines } from './party.js';
 import { fightPortal } from './portals.js';
 import { herbsReport, itemsReport, jewelsReport, mineralsReport, potionsReport } from './professions.js';
@@ -431,7 +431,12 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       itemSheet(owned.item, { equipped: owned.equipped });
       return;
     }
-    openSheet(itemDetails(item), h('p', { class: 'muted', text: t('Tego przedmiotu nie ma już w plecaku ani w ekwipunku.') }));
+    // What the Warsztat and the Szlifiernia made waits in the Przechowalnia.
+    const stored = storedCopy(item);
+    openSheet(
+      itemDetails(stored ?? item),
+      h('p', { class: 'muted', text: stored ? t('Ten przedmiot czeka w Przechowalni Warsztatu i Szlifierni.') : t('Tego przedmiotu nie ma już w plecaku ani w ekwipunku.') }),
+    );
   }
 
   function itemsSection(report) {

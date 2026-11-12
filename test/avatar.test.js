@@ -143,7 +143,9 @@ describe('Awatar Systemu', () => {
     assert.equal(report.kind, 'items');
     assert.equal(report.avatar, true);
     assert.equal(report.summary.xp, Math.round(workXp(15, report.minutes, content) * content.avatar.share));
-    assert.equal(after.bag.length, report.items.length);
+    // The items wait in the Przechowalnia, out of the bag (842).
+    assert.equal(after.bag.length, 0);
+    assert.equal(after.professions.storage.items.length, report.items.length);
     assert.equal(after.professions.list[2].level, workProfession(content.professionsById.crafting, { level: 1, xp: 0 }, Math.round(report.minutes * content.avatar.share)).level);
   });
 

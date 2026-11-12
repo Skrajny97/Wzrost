@@ -387,7 +387,7 @@ describe('the Warsztat through the API', () => {
     assert.equal(rare.hint, 'Ukryte przez System do 5. poziomu Rzemieślnictwa.');
   });
 
-  test('an order has as many items as the parts, the resources and the bag allow, however long it takes', async () => {
+  test('an order has as many items as the parts and the resources allow, however long it takes', async () => {
     // The author, 12.11.2026: "Zrób warsztat i szlifiernie zalezna od czesci
     // i materialow po prostu", "bez ograniczeń czasowych". Before, 5 items
     // at most, 2.5 h at the profession's first level.
@@ -401,7 +401,7 @@ describe('the Warsztat through the API', () => {
     assert.equal((await craft({ baseId: 'sword', rarity: 'common', count: 21 })).data.error.code, 'no_parts');
   });
 
-  test('an order checks the pattern, the rarity, the count, the parts, the resources and the bag, and takes it all at the start', async () => {
+  test('an order checks the pattern, the rarity, the count, the parts and the resources, not the bag, and takes it all at the start', async () => {
     const error = async (body) => (await craft(body)).data.error?.code;
     assert.equal(await error({ baseId: 'broadsword', rarity: 'common', count: 1 }), 'unknown_pattern');
     assert.equal(await error({ baseId: 'ring', rarity: 'common', count: 1 }), 'unknown_pattern');
@@ -417,8 +417,10 @@ describe('the Warsztat through the API', () => {
     assert.equal(short.data.error.code, 'no_resources');
     assert.equal(short.data.error.message, 'Brakuje zasobów: Kamień (potrzeba 18).');
     await set(`resources = '{"wood":50,"stone":200,"iron-ore":40}'`);
-    await addItems(28);
-    assert.equal(await error({ baseId: 'sword', rarity: 'common', count: 3 }), 'bag_full');
+    // A full bag stops nothing: the items wait in the Przechowalnia (842).
+    await addItems(30);
+    assert.equal((await craft({ baseId: 'sword', rarity: 'common', count: 3 })).status, 201);
+    await call('POST', '/api/hunts/cancel', { cookie });
 
     await set('hp = 1');
     const started = await craft({ baseId: 'sword', rarity: 'common', count: 2 });
@@ -452,7 +454,7 @@ describe('the Warsztat through the API', () => {
     assert.deepEqual(started.data.character.crafting.queue.map((order) => order.id), ['b']);
   });
 
-  test('the report brings the items into the bag, the profession\'s levels, the quests and the character\'s XP', async () => {
+  test('the report brings the items into the Przechowalnia, the profession\'s levels, the quests and the character\'s XP', async () => {
     const now = Date.now();
     const quest = (kind, count) => ({ kind, count, progress: 0, reward: { kind: 'gold', amount: 10 }, claimed: false });
     // A week as drawn now (`scaled`), kept as it is.
@@ -473,7 +475,9 @@ describe('the Warsztat through the API', () => {
     assert.equal(report.profession.levelAfter, 2);
     assert.ok(report.summary.xp > 0);
     assert.equal(after.activity, null);
-    assert.equal(after.bag.filter((item) => item.base === 'axe').length, 2);
+    assert.equal(report.stored, 'Gotowe przedmioty czekają w Przechowalni, poza plecakiem.');
+    assert.equal(after.bag.filter((item) => item.base === 'axe').length, 0);
+    assert.equal(after.professions.storage.items.filter((item) => item.base === 'axe').length, 2);
     assert.equal(after.professions.list[2].level, 2);
     assert.equal(after.stats.find((stat) => stat.id === 'strength').sources.professions, content.professionsById[content.workshop.profession].statPerLevel);
     // Nothing comes back from an order made in full.
@@ -524,7 +528,7 @@ describe('the Warsztat through the API', () => {
     // 21 parts taken for the three, 14 back for the two not done.
     assert.deepEqual(parts(after), { scraps: 23 });
     assert.deepEqual(after.resources, { wood: 50, stone: 182, 'iron-ore': 34 });
-    assert.equal(after.bag.filter((item) => item.base === 'sword').length, 1);
+    assert.equal(after.professions.storage.items.filter((item) => item.base === 'sword').length, 1);
   });
 
   test('Time Points skip an order', async () => {

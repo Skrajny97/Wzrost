@@ -164,6 +164,8 @@
         "titleAll": "Usunąć wszystkie zlecenia?",
         "back": "Do plecaka wróci: {what}.",
         "backAll": "Zlecenia do usunięcia: {count}. Wszystko, co wzięły, wróci do plecaka.",
+        "backStored": "Do Przechowalni wróci: {what}.",
+        "backAllStored": "Zlecenia do usunięcia: {count}. Wszystko, co wzięły, wróci na swoje miejsce: do plecaka albo do Przechowalni.",
         "running": "Stół już nad tym pracuje, więc ta praca przepadnie.",
         "runningAll": "Praca nad pierwszym zleceniem przepadnie.",
         "later": "Następne zlecenia ruszą wcześniej.",
@@ -178,6 +180,8 @@
       },
       "done": "Z kolejki do plecaka: {what}.",
       "doneAll": "Usunięto zlecenia: {count}. Wszystko z nich wróciło do plecaka.",
+      "doneStored": "Z kolejki do Przechowalni: {what}.",
+      "doneAllStored": "Usunięto zlecenia: {count}. Wszystko z nich wróciło na swoje miejsce.",
       "errors": {
         "gone": "Tego zlecenia nie ma już w kolejce.",
         "empty": "W kolejce nie ma zleceń do usunięcia.",

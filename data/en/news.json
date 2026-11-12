@@ -528,6 +528,10 @@
     "0.2.81": {
       "title": "Version 0.2.81",
       "body": "- The Workshop and the Gem Workshop have no 5-piece cap and no time limit: order as many pieces as your parts, materials and bag room allow. For example, 20 common swords at Crafting level 1 are 10 hours of work."
+    },
+    "0.2.82": {
+      "title": "Version 0.2.82",
+      "body": "- A Storeroom in the Workshop and the Gem Workshop: finished items and jewellery wait there outside your bag, with no limit on places. Mark them and put them in the bag, sell them to the scrap dealer or salvage them on the Salvage Table.\n- A full bag no longer stops orders in the Workshop and the Gem Workshop: only parts and materials count."
     }
   }
 }

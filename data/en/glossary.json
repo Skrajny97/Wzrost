@@ -281,6 +281,11 @@
           "note": "dosłownie"
         },
         {
+          "pl": "Przechowalnia",
+          "en": "Storeroom",
+          "note": "wyroby Warsztatu i Szlifierni czekają tam poza plecakiem (842)"
+        },
+        {
           "pl": "Warownia",
           "en": "Stronghold",
           "note": "„Fortress” zgodne z id, ale „Stronghold” lepiej brzmi dla obozu, który urósł"

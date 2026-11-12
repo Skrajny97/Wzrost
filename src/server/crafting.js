@@ -259,6 +259,13 @@ export async function salvageItem(context) {
   });
 }
 
+// The ids of the items marked ({ ids: [...] }), each once, or an error.
+export function markedIds(body, none) {
+  const ids = Array.isArray(body.ids) ? [...new Set(body.ids.filter((id) => Number.isSafeInteger(id)))] : [];
+  if (ids.length === 0) throw new ApiError(400, 'invalid_items', none);
+  return ids;
+}
+
 // Several items from the bag taken apart at once, { ids: [...] } ("Rozbierz
 // kilka", the author: "zaznaczać które chcemy (i możemy) przedmioty i dać do
 // rozbiórki"): one order for each kind of part (orderSalvageMany), the parts
@@ -268,15 +275,30 @@ export async function salvageItem(context) {
 // order ends (settleTable in characters.js).
 export async function salvageItems(context) {
   const { session, player } = await requirePlayer(context);
-  const body = await readJson(context.request);
-  const ids = Array.isArray(body.ids) ? [...new Set(body.ids.filter((id) => Number.isSafeInteger(id)))] : [];
-  if (ids.length === 0) throw new ApiError(400, 'invalid_items', 'Zaznacz przedmioty do rozbiórki.');
+  const ids = markedIds(await readJson(context.request), 'Zaznacz przedmioty do rozbiórki.');
   const items = ids.map((id) => player.items.find((candidate) => candidate.id === id));
   if (items.includes(undefined)) throw new ApiError(404, 'item_not_found', 'Któregoś z tych przedmiotów nie masz już w plecaku.');
   if (items.some((item) => item.equippedSlot)) throw new ApiError(409, 'equipped', 'Założonych przedmiotów nie rozbierzesz. Najpierw je zdejmij.');
   requireOffRack(player, ...items);
   // None of them a favourite (favorites.js), as for one item above.
   requireUnmarked(player, 'salvage', ...items);
+  return json({ salvaged: await salvageOrders(context, player, items), character: characterView(await loadPlayer(context.env.DB, session.userId), context.now) });
+}
+
+// Where items taken apart wait until their orders are saved: the bag's
+// rows, or with `stored` those of the Przechowalnia (storage.js), whose
+// items the orders mark (`fromStorage`) so that an order taken off the
+// queue gives them back there (cancelOrders).
+const SOURCES = {
+  bag: { table: 'items', where: ' AND slot IS NULL' },
+  stored: { table: 'storage_items', where: '' },
+};
+
+// The orders of the Stół rozbiórki for `items` ("Rozbierz kilka" of the bag,
+// or of the Przechowalnia with `stored`), saved with the items taken from
+// where they wait, all or none: the summary for the page (`salvaged`).
+export async function salvageOrders(context, player, items, { stored = false } = {}) {
+  const ids = items.map((item) => item.id);
   const now = context.now;
   const table = tableOf(player, now);
   const rare = items.find((item) => !craftTakes(table, item.rarity, content()));
@@ -291,7 +313,7 @@ export async function salvageItems(context) {
     const pattern = taughtPattern(item, [...learned, ...list.map((one) => one.id)]);
     return pattern ? [...list, { ...pattern, partId: salvageYield(item, content()).partId }] : list;
   }, []);
-  const entries = items.map((item) => ({ item, name: itemName(item, content()) }));
+  const entries = items.map((item) => ({ item: stored ? { ...item, fromStorage: true } : item, name: itemName(item, content()) }));
   const ordered = withIds(settled.queue.length, orderSalvageMany(settled, entries, table, now, newRng(), content()));
   const state = withPatterns(ordered, settled.queue.length, taught);
   const orders = state.queue.slice(settled.queue.length);
@@ -310,28 +332,26 @@ export async function salvageItems(context) {
   const patterns = [...learned, ...taught.map((one) => one.id)];
   const jewels = withMinerals(row, items);
   const list = JSON.stringify(ids);
+  const source = SOURCES[stored ? 'stored' : 'bag'];
   const saved = `EXISTS (SELECT 1 FROM characters WHERE id = ? AND instr(crafting, ?) > 0)`;
   const marker = [row.id, `"id":"${orders[0].id}"`];
   const [result] = await db.batch([
     saveState(db, row, state, {
       ...(taught.length > 0 && { patterns }),
       ...(jewels && { minerals: jewels.minerals }),
-      condition: ' AND (SELECT COUNT(*) FROM items WHERE character_id = ? AND slot IS NULL AND id IN (SELECT value FROM json_each(?))) = ?',
+      condition: ` AND (SELECT COUNT(*) FROM ${source.table} WHERE character_id = ?${source.where} AND id IN (SELECT value FROM json_each(?))) = ?`,
       binds: [row.id, list, ids.length],
     }),
-    db.prepare(`DELETE FROM items WHERE character_id = ? AND id IN (SELECT value FROM json_each(?)) AND ${saved}`).bind(row.id, list, ...marker),
+    db.prepare(`DELETE FROM ${source.table} WHERE character_id = ? AND id IN (SELECT value FROM json_each(?)) AND ${saved}`).bind(row.id, list, ...marker),
   ]);
   if (result.meta.changes !== 1) throw changed();
-  return json({
-    salvaged: {
-      count: items.length,
-      orders: orders.map((order) => ({ part: content().partsById[order.partId].name, parts: order.parts, endsAt: order.endsAt })),
-      patterns: taught.map(({ name, at }) => ({ name, at })),
-      ...(jewels && Object.keys(jewels.found).length > 0 && { minerals: mineralList(jewels.found) }),
-      ...(jewels?.gems.length > 0 && { gems: gemList(jewels.gems) }),
-    },
-    character: characterView(await loadPlayer(db, session.userId), now),
-  });
+  return {
+    count: items.length,
+    orders: orders.map((order) => ({ part: content().partsById[order.partId].name, parts: order.parts, endsAt: order.endsAt })),
+    patterns: taught.map(({ name, at }) => ({ name, at })),
+    ...(jewels && Object.keys(jewels.found).length > 0 && { minerals: mineralList(jewels.found) }),
+    ...(jewels?.gems.length > 0 && { gems: gemList(jewels.gems) }),
+  };
 }
 
 // The words of the table's queue (data/buildings.json, the table's `queue`).
@@ -368,8 +388,13 @@ export async function cancelOrders(context) {
   if (!leaving.every(orderCancellable)) throw new ApiError(409, 'too_old', errors.old);
   const ids = new Set(leaving.map((order) => order.id));
   const back = takeOffQueue(settled, ids, now);
+  // The items go back where they came from: those of the Przechowalnia
+  // there, with no limit (storage.js), the others to the bag while it has
+  // room for all of them.
+  const stored = back.items.filter((item) => item.fromStorage === true).map(({ fromStorage: _from, ...item }) => item);
+  const carried = back.items.filter((item) => item.fromStorage !== true);
   const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
-  if (back.items.length > free) throw new ApiError(409, 'bag_full', filled(errors.bagFull, { need: back.items.length, free: Math.max(0, free) }));
+  if (carried.length > free) throw new ApiError(409, 'bag_full', filled(errors.bagFull, { need: carried.length, free: Math.max(0, free) }));
   const held = JSON.parse(row.minerals ?? '{}');
   const short = Object.entries(back.minerals)
     .filter(([id, count]) => (held[id] ?? 0) < count)
@@ -405,10 +430,11 @@ export async function cancelOrders(context) {
       ...(Object.keys(taken).length > 0 && { minerals: addCounts(held, taken) }),
       traded: back.traded,
     }),
-    ...back.items.map((item) => db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)').bind(row.id, JSON.stringify(item), now)),
+    ...carried.map((item) => db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)').bind(row.id, JSON.stringify(item), now)),
+    ...stored.map((item) => db.prepare('INSERT INTO storage_items (character_id, data, created_at) VALUES (?, ?, ?)').bind(row.id, JSON.stringify(item), now)),
     ...trials.map(([trial, next]) => trialTakenBack(db, trial, next)),
   ]);
-  return json({ cancelled: leaving.length, items: back.items.length, character: characterView(await loadPlayer(db, session.userId), now) });
+  return json({ cancelled: leaving.length, items: carried.length, stored: stored.length, character: characterView(await loadPlayer(db, session.userId), now) });
 }
 
 // "Pomiń czas" at the table in test mode: every order ends now, and then

@@ -78,8 +78,8 @@
       "queue": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["cancel", "cancelAll", "old", "confirm", "done", "doneAll", "errors"],
-        "description": "Tylko Stół rozbiórki (craftSpeed): usuwanie zleceń z kolejki („Usuń z kolejki”, „Usuń wszystkie”). Zlecenie oddaje wszystko, co wzięło, a zadania i Próby Gildii tracą to, co za nie policzyły. old: dopisek przy rozbiórce sprzed 0.1.65, której nie da się cofnąć. W tekstach: {what} to zlecenie („Skóra wilka ×12”), {count} liczba zleceń, {minerals} kamienie i kruszce, {patterns} nazwy wzorów, {need} i {free} miejsca w plecaku, {quest} treść zadania.",
+        "required": ["cancel", "cancelAll", "old", "confirm", "done", "doneAll", "doneStored", "doneAllStored", "errors"],
+        "description": "Tylko Stół rozbiórki (craftSpeed): usuwanie zleceń z kolejki („Usuń z kolejki”, „Usuń wszystkie”). Zlecenie oddaje wszystko, co wzięło, a zadania i Próby Gildii tracą to, co za nie policzyły. old: dopisek przy rozbiórce sprzed 0.1.65, której nie da się cofnąć. W tekstach: {what} to zlecenie („Skóra wilka ×12”), {count} liczba zleceń, {minerals} kamienie i kruszce, {patterns} nazwy wzorów, {need} i {free} miejsca w plecaku, {quest} treść zadania. Teksty ze Stored mówią o zleceniach z przedmiotami z Przechowalni (842), które wracają tam, a nie do plecaka.",
         "properties": {
           "cancel": { "type": "string", "minLength": 1 },
           "cancelAll": { "type": "string", "minLength": 1 },
@@ -87,12 +87,14 @@
           "confirm": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["title", "titleAll", "back", "backAll", "running", "runningAll", "later", "counted", "countedGuild", "minerals", "pattern", "patterns", "kept", "yes", "no"],
+            "required": ["title", "titleAll", "back", "backAll", "backStored", "backAllStored", "running", "runningAll", "later", "counted", "countedGuild", "minerals", "pattern", "patterns", "kept", "yes", "no"],
             "properties": {
               "title": { "type": "string", "minLength": 1 },
               "titleAll": { "type": "string", "minLength": 1 },
               "back": { "type": "string", "pattern": "\\{what\\}" },
               "backAll": { "type": "string", "pattern": "\\{count\\}" },
+              "backStored": { "type": "string", "pattern": "\\{what\\}" },
+              "backAllStored": { "type": "string", "pattern": "\\{count\\}" },
               "running": { "type": "string", "minLength": 1 },
               "runningAll": { "type": "string", "minLength": 1 },
               "later": { "type": "string", "minLength": 1 },
@@ -108,6 +110,8 @@
           },
           "done": { "type": "string", "pattern": "\\{what\\}" },
           "doneAll": { "type": "string", "pattern": "\\{count\\}" },
+          "doneStored": { "type": "string", "pattern": "\\{what\\}" },
+          "doneAllStored": { "type": "string", "pattern": "\\{count\\}" },
           "errors": {
             "type": "object",
             "additionalProperties": false,
