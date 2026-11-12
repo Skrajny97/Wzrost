@@ -3174,6 +3174,20 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
     - Oprawa klejnotu, wchłanianie, rozpuszczanie i ulepszanie wchłoniętego Artefaktu czekają do końca eksploracji. Tego samego klejnotu nie oprawia się drugi raz.
     - Zdolności rosną z pierwiastkiem budżetu rzadkości, żeby boska nie leczyła ponad 50%.
 
+## Talia Systemu: gra karciana w Salonie Gier (871–877, 12.11.2026)
+
+Autor: „A jeśli chcielibyśmy zrobić nową grę w Salonie Gier.. najlepiej karcianą, bardziej interaktywną, ale nie ultra złożoną? Z nawiązaniem do stworów i postaci, mechanik z Insight - jest to wykonalne? taka minigra w grze?”, a po odpowiedzi: „Niech ta gra karciana powstanie”. Zasady autor wybrał na stronie ocen 12.11.2026 ok. 15:55: 871 B, 872 A, 873 A, 874 A, 875 A, 876 A i 877 A.
+
+1. **Partia (871 B).** Trzy linie, jak szyk w walce: przód, środek i tył. Karty mają Atak i Życie, co rundę każda bije kartę naprzeciw, a partia trwa do zbicia wszystkich kart rywala: więcej decyzji, ok. 5 minut. Karty to stwory z Bestiariusza, a typ karty to statystyka, którą stwór atakuje (Siła, Zręczność albo Magia).
+2. **Karta bohatera (872 A).** Do partii dochodzi karta bohatera klasy postaci z jedną umiejętnością do użycia raz na partię; ewolucja klasy ją wzmacnia.
+3. **Z kim (873 A).** Na początek Szczęsny i jego talie w pięciu stopniach trudności. Każdy stopień raz dziennie daje nagrodę, a pierwsze pokonanie stopnia rzadką kartę. W drugim etapie pojedynki z taliami innych graczy (za nich gra serwer, jak na Arenie) i ranking tygodnia.
+4. **Skąd karty (874 A).** Na start Szczęsny daje talię 12 kart zwykłych stworów z pierwszych krain. Kolejne karty wypadają rzadko na wyprawach z pokonanych stworów; elity, czempioni i strażnicy dają je częściej i lepsze. Ta sama karta zdobyta drugi raz podnosi poziom karty (najwyżej 5), a każdy poziom to więcej Ataku i Życia.
+5. **Stawki (875 A).** Partie ze Szczęsnym o stawkę w złocie, rosnącą z poziomem postaci jak w Kole Fortuny. Za wygraną zgarniesz podwójną stawkę; najwyżej 10 partii o stawkę dziennie. Partie treningowe, bez stawki, bez limitu.
+6. **Gdzie (876 A).** Trzecia zakładka Salonu Gier, „Karty”, otwarta razem z Salonem.
+7. **Nazwa (877 A).** Talia Systemu.
+8. **Karta bohatera przy trzech liniach (szczegół rozstrzygnięty przy budowie).** Umiejętności z 872 A opisano pod partię z zakrytymi kartami (871 A), więc przy trzech liniach dostają najprostsze odpowiedniki: Wojownik: jedna karta w tej rundzie bije o 50% mocniej; Łucznik: jedna karta w tej rundzie bije wybraną kartę rywala zamiast tej naprzeciw; Mag: zmienia typ jednej swojej karty do końca partii; Kleryk: karta zbita w tej rundzie wraca z połową Życia; Cień: po ustawieniu rywala zamienia jedną kartę z linii na kartę z rezerwy.
+9. **Budowa.** Gra powstaje za przełącznikiem `CARDS`, włączonym lokalnie i na wersji testowej, jak Labirynt. Najpierw makiety ekranów i grafiki kart do oceny, a do gry wchodzi po ich akceptacji.
+
 ## Wersja 0.2.85 (12.11.2026): zdarzenia drużynowe (844–849)
 
 Autor: „wygenerujmy specjalne drużynowe zdarzenia”, w których „lider w nich decydował a reszta miała automatyczny wynik i raport”. Autor przyjął 844 A, 845 A, 846 A, 847 B, zdarzenia 848.1–848.5 i mimika 849 A (12.11.2026). Dane: `data/party-events.json` i `data/en/party-events.json`, silnik `src/engine/party-events.js`, serwer `src/server/party-events.js`, tabela `party_events` (migracja 0122) i premia drużyny w `parties.boon`.
