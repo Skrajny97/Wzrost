@@ -3149,6 +3149,29 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
     - Poniżej 30. poziomu, i tam, gdzie gry nie ma Labiryntu, Sala prób pokazuje same Próby, bez zakładek, jak dotąd.
     - Walka ma znów trzy części: Eksplorację, Portale i Wieże.
     - Ekran idzie najpierw do makiet.
+20. **Budowa (12.11.2026).** Labirynt i Rdzeń działają za przełącznikiem `LABYRINTH`: włączonym na serwerze lokalnym i na wersji testowej, a w grze wyłączonym do przyjęcia makiet (bez niego trasy zwracają 404, ekranów nie ma, a Wieże nie dają Artefaktów). Wszystkie liczby są w `data/labyrinth.json`; najważniejsze:
+    - Mapa: 6 rzędów po 2–3 komnaty, każda połączona z 2–3 komnatami następnego rzędu, na końcu strażnik. W 1. rzędzie same walki, elity od 3. rzędu, najwyżej 1 kupiec i najmniej 1 źródło na poziom. Wagi: walka 46, elita 12, skarb 12, źródło 12, ołtarz 10, kupiec 8.
+    - Wrogowie z krain otwartych na poziomie postaci, na jej poziomie, silni jak w najnowszej krainie: ×1,1, ×1,35 i ×1,65 na poziomach 1–3 i ×3,3 na Piekielnym. Elita to elita krainy, strażnik to czempion (albo elita, gdy czempiona nie ma).
+    - Źródło leczy 35% maks. HP i podnosi poległych. Kupiec sprzedaje raz leczenie 50% za złoto z 30 minut eksploracji i wybór błogosławieństwa za złoto z 60 minut.
+    - Nagrody: walka daje XP jak walka w Wieży i złoto jak walka na eksploracji; elita 3/4/5/9 Odłamków (poziomy 1/2/3/Piekielny) i złoto z 10 minut; skarb 2/3/4/7 Odłamków i złoto z 15 minut; strażnik Artefakt i wybór błogosławieństwa.
+    - Rzadkość Artefaktu (pospolity/rzadki/unikalny/epicki/legendarny/mityczny/boski): poziom 1: 55/35/10; poziom 2: 46/37/14/3; poziom 3: 37/38/18/6/1; Piekielny: 22/34/25/12/5/1,5/0,5. Wielkość: mały 60, średni 30, duży 10; żywioł losowy.
+    - 13 błogosławieństw, m.in. Moc Systemu (+15% obrażeń), Kamienna skóra (+15% pancerza), Bystre oko (+8 pkt proc. szansy na cios krytyczny), Pierwsza krew (pierwszy celny cios jest krytyczny), Osłona Systemu (tarcza 12% HP) i Krwawa danina (8% obrażeń wraca jako HP).
+    - Rdzeń ma gniazda: 1 na każde 10 poziomów postaci, najmniej 3. Mały Artefakt zajmuje 1 gniazdo i ma 1 cechę, średni 2 gniazda i 2 cechy, duży 3 gniazda, 2 cechy (×1,25) i zdolność. Rezonans przy 2/4/6 Artefaktach jednego żywiołu. Ulepszenie +1…+10 kosztuje 2, 3, 4, 6, 8, 11, 15, 20, 26 i 34 Odłamki razy liczba gniazd, a każdy stopień daje +10%.
+    - Symulacje (dobre wyposażenie, 2 towarzyszy): poziom 3 przechodzi ok. 34–66% postaci, Piekielny 1–10%. Pełny Rdzeń średnich Artefaktów daje wojownikowi na 100. poziomie ok. +5% obrażeń i +10% HP, a na 200. ok. +10% i +20%.
+    Brakujące szczegóły, rozstrzygnięte najprościej:
+    - HP w Labiryncie liczy się osobno: każdy dzień zaczyna się z pełnym, a prawdziwe HP postaci się nie zmienia.
+    - Skład drużyny ustala się przy pierwszej komnacie dnia, a wrogowie mają poziom postaci z początku dnia.
+    - Przegrana walka kończy dzień. Kto padnie w wygranej walce, wstaje z 1 HP; polegli towarzysze wracają tylko przez źródło albo kupca.
+    - XP przychodzi od razu, także w trakcie eksploracji (bez leczenia za awans poza domem). Elity nie dają XP. Po Piekielnym dzień się kończy, bez błogosławieństwa. Piekielny otwiera się sam po 3. poziomie.
+    - Te same błogosławieństwa się sumują.
+    - Zadania, Bestiariusz i Próby liczą stwory z Labiryntu, Sława nie.
+    - Każda walka ma raport w osobnej grupie Dziennika (zostaje 40). Działają efekty tygodnia.
+    - W trakcie służby jako najemnik Labirynt jest zamknięty. Prośba z dnia, który już minął, dostaje odmowę i strona wczytuje się na nowo.
+    - Artefakty z Wież mogą przyjść przed otwarciem Rdzenia: czekają w Skrytce.
+    - Rozbicie Artefaktu oddaje też połowę włożonych Odłamków, a koszt ulepszenia rośnie z liczbą gniazd.
+    - Rezonans liczy tylko najwyższy próg i klejnot go nie podnosi.
+    - Oprawa klejnotu, wchłanianie, rozpuszczanie i ulepszanie wchłoniętego Artefaktu czekają do końca eksploracji. Tego samego klejnotu nie oprawia się drugi raz.
+    - Zdolności rosną z pierwiastkiem budżetu rzadkości, żeby boska nie leczyła ponad 50%.
 
 ## Wersja 0.2.85 (12.11.2026): zdarzenia drużynowe (844–849)
 
