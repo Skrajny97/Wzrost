@@ -445,7 +445,7 @@ export function browseOffers(offers, asked, team, content) {
       counts.classes = Object.fromEntries(content.classes.map((/** @type {Record<string, any>} */ cls) => [cls.id, shown.filter((offer) => offer.item && canUse(offer.item.base, cls.id, content)).length]));
       if (Object.hasOwn(counts.classes, asked?.classId ?? '')) {
         view.classId = asked.classId;
-        shown = shown.filter((offer) => offer.item && canUse(offer.item.base, view.classId, content));
+        shown = shown.filter((offer) => offer.item && canUse(offer.item.base, /** @type {string} */ (view.classId), content));
       }
     }
   }
