@@ -2,8 +2,8 @@
 // guild-expedition.js has the rules, data/guilds.json `expedition` the
 // numbers and the words; DECISIONS.md, "Wyprawa Gildii (621 A)"): a
 // guild's route of the week (from Monday, midnight in Poland, as the
-// weekly quests), made by the first look at it: the land of the members'
-// average level then, with its seven guardians, for the members active then
+// weekly quests), made by the first look at it: the land of the active
+// members' average level then (837 A), with its seven guardians, for them
 // and, in part, those who join later (as the Próby Gildii). Every minute of
 // exploration a member claims a report for goes onto the route of the
 // guild it is in then (expeditionMinutes, in the claim's own batch); a
@@ -92,27 +92,29 @@ export function expeditionMinutes(db, characterId, minutes, now) {
 const routeRow = (db, guildId, week) => db.prepare('SELECT * FROM guild_expeditions WHERE guild_id = ? AND week = ?').bind(guildId, week);
 
 // The guild's route of the week: the one kept, or one made now from the
-// members' character levels, with the members whose accounts were in the
-// game in the last activeDays days counted, at least one, their ids kept
-// with it (`counted`), so one of them who leaves and joins again this week
-// adds no second share (acceptGuildInvite in guilds.js). Of two requests at
-// once, the first one's stays. A new route takes the rows of the weeks
+// character levels of the members whose accounts were in the game in the
+// last activeDays days, the ones counted for its minutes and guardians
+// (the author's 837 A, 12.11.2026: members who do not play brought the
+// route down without adding to it); of all the members only while none is
+// active. Those counted, at least one, keep their ids with it (`counted`),
+// so one of them who leaves and joins again this week adds no second share
+// (acceptGuildInvite in guilds.js). Of two requests at once, the first
+// one's stays. A new route takes the rows of the weeks
 // before the last one away, of every guild: nothing of them shows or opens
 // any more (as the Bestia's beasts).
 async function routeOf(db, guildId, now) {
   const { current, previous } = weeksAround(now);
   const found = await routeRow(db, guildId, current.key).first();
   if (found) return found;
-  const [levels, active] = await db.batch([
-    db.prepare('SELECT c.level FROM guild_members m JOIN characters c ON c.id = m.character_id WHERE m.guild_id = ?').bind(guildId),
-    db
-      .prepare(
-        `SELECT COUNT(*) AS count, json_group_array(m.character_id) AS ids
-         FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id WHERE m.guild_id = ? AND u.seen_at >= ?`,
-      )
-      .bind(guildId, now - rules().activeDays * DAY),
-  ]);
-  const route = guildExpedition({ levels: levels.results.map((member) => member.level) }, content());
+  const { results: members } = await db
+    .prepare(
+      `SELECT m.character_id AS id, c.level, COALESCE(u.seen_at, 0) >= ? AS active
+       FROM guild_members m JOIN characters c ON c.id = m.character_id JOIN users u ON u.id = c.user_id WHERE m.guild_id = ?`,
+    )
+    .bind(now - rules().activeDays * DAY, guildId)
+    .all();
+  const active = members.filter((member) => member.active);
+  const route = guildExpedition({ levels: (active.length > 0 ? active : members).map((member) => member.level) }, content());
   await db.batch([
     db.prepare('DELETE FROM guild_expedition_hits WHERE guardian_id IN (SELECT g.id FROM guild_expedition_guardians g JOIN guild_expeditions e ON e.id = g.expedition_id WHERE e.week < ?)').bind(previous.key),
     db.prepare('DELETE FROM guild_expedition_guardians WHERE expedition_id IN (SELECT id FROM guild_expeditions WHERE week < ?)').bind(previous.key),
@@ -121,7 +123,7 @@ async function routeOf(db, guildId, now) {
     db.prepare('DELETE FROM guild_expedition_chests WHERE week < ?').bind(previous.key),
     db
       .prepare('INSERT OR IGNORE INTO guild_expeditions (guild_id, week, land_id, level, guardians, active, counted, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
-      .bind(guildId, current.key, route.landId, route.level, JSON.stringify(route.guardians), Math.max(1, active.results[0].count), active.results[0].ids, now),
+      .bind(guildId, current.key, route.landId, route.level, JSON.stringify(route.guardians), Math.max(1, active.length), JSON.stringify(active.map((member) => member.id)), now),
   ]);
   return routeRow(db, guildId, current.key).first();
 }
@@ -242,6 +244,7 @@ function tabTexts() {
   const numbers = {
     stages: expeditionStages(content()),
     perMember: rules().stageMinutes.perMember,
+    days: rules().activeDays,
     attacks: rules().attacksPerDay,
     fame: points(fame.expedition.perGuardian),
     fameLast: points(fame.expedition.last),

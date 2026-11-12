@@ -22,7 +22,7 @@
       "title": "Guild Hall",
       "intro": "The Hall's buildings give bonuses to every guild member. You donate gold and resources to the building you choose yourself.",
       "how": [
-        "The guild has no common purse. Each member donates their own gold and resources to the building they choose. Donations are not returned, even after leaving the guild.",
+        "The guild has no common purse. From character level {level}, each member donates their own gold and resources to the building they choose. Donations are not returned, even after leaving the guild.",
         "Each building grows from zero to level {max}. It reaches the next level when the donations to it cover the whole cost of that level: the gold and the resource. Whatever you donate beyond the cost carries over to the next level.",
         "The first level costs {firstGold} gold and {firstResource} of the resource, and each one after it costs more, up to {lastGold} gold and {lastResource} of the resource at level {max}.",
         "The leader and deputies can mark buildings as preferred, so the guild knows what to save up for now. It is only a hint: you donate to whatever you like.",
@@ -48,6 +48,7 @@
       "have": "You have: {have}",
       "rest": "To level up",
       "donate": "Donate",
+      "donateLevel": "Donations to the Hall open for you at character level {level}.",
       "donateTitle": "Donate to the {name}?",
       "donateText": "You donate {amounts}. Donations are not returned.",
       "goldAmount": "{count} gold",
@@ -79,7 +80,7 @@
       "route": "This week's expedition: {land}",
       "lead": "The members' exploration minutes lead the guild through {stages} stages. At the end of each stage a guardian bars the way.",
       "how": [
-        "Every week, from Monday at midnight, the guild sets out on a new route through the land at the members' average level.",
+        "Every week, from Monday at midnight, the guild sets out on a new route through the land at the average level of its active members, that is, those whose account was in the game in the last {days} days.",
         "Every minute of a guild member's exploration moves the route on once they claim the report. Quick Hunts and Party explorations count too.",
         "A stage is {perMember} minutes of exploration for each active guild member.",
         "A guardian waits at the end of a stage. The route stands still until the guild defeats it. Minutes gathered in the meantime wait and move the route on right after it falls.",

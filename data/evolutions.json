@@ -93,7 +93,7 @@
       "path": "prayer-of-health",
       "name": "Uzdrowiciel",
       "growth": { "wisdom": 3, "vitality": 1, "endurance": 1 },
-      "trait": { "name": "Opiekun", "text": "Leczenie jest o 20% silniejsze i zdejmuje jeden zły efekt, np. Zatrucie.", "kind": "caretaker", "params": { "heal": 0.2 } },
+      "trait": { "name": "Opiekun", "text": "Leczenie jest o 20% silniejsze i zdejmuje jeden zły efekt, np. Zatrucie. Efekt zdejmuje uleczenie w chwili użycia umiejętności leczącej.", "kind": "caretaker", "params": { "heal": 0.2 } },
       "skills": ["renewal", "miracle"]
     },
     {
@@ -248,7 +248,7 @@
       "nameFemale": "Cudotwórczyni",
       "description": "Jego dotyk zamyka rany szybciej, niż wróg zdąży je zadać.",
       "growth": { "intellect": 3, "wisdom": 2, "vitality": 2 },
-      "trait": { "name": "Łaska", "text": "Leczenie jest o 35% silniejsze i zdejmuje wszystkie złe efekty.", "kind": "caretaker", "params": { "heal": 0.35, "cleanseAll": true } },
+      "trait": { "name": "Łaska", "text": "Leczenie jest o 35% silniejsze i zdejmuje wszystkie złe efekty. Efekty zdejmuje uleczenie w chwili użycia umiejętności leczącej.", "kind": "caretaker", "params": { "heal": 0.35, "cleanseAll": true } },
       "skills": ["great-renewal", "life-aura"]
     },
     {

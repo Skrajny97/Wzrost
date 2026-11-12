@@ -68,7 +68,7 @@
       "name": "Healer",
       "trait": {
         "name": "Caretaker",
-        "text": "Healing is 20% stronger and removes one harmful effect, such as Poison."
+        "text": "Healing is 20% stronger and removes one harmful effect, such as Poison. The effect is removed by the heal at the moment a healing skill is used."
       }
     },
     "inquisitor": {
@@ -192,7 +192,7 @@
       "description": "Their touch closes wounds faster than the enemy can deal them.",
       "trait": {
         "name": "Grace",
-        "text": "Healing is 35% stronger and removes all harmful effects."
+        "text": "Healing is 35% stronger and removes all harmful effects. The effects are removed by the heal at the moment a healing skill is used."
       }
     },
     "grand-inquisitor": {

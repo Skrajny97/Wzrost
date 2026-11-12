@@ -14,7 +14,8 @@
 // wanted poster's bounty (wanted.js), a Portal's sweep (portals.js), the
 // narrator's quests (quests.js), an order of the Osada (settlement.js), an
 // attack on the Bestia Gildii (guild-beast.js), a try on the Kowadło
-// (inventory.js, settlement.js) and a sale at the Targowisko (market.js).
+// (inventory.js, settlement.js) and a sale at the Targowisko (market.js,
+// saleFamePoints: at most `weekly` sales a week).
 // A Próba Gildii brings its points once it is done, in the batch that
 // does it (trialFame beside trialProgress in guild-trials.js), each trial
 // once by its id.
@@ -84,6 +85,21 @@ export const workFamePoints = (db, characterId, minutes, avatar, now) => famePoi
 export const questFamePoints = (db, characterId, periodId, count, now) => famePoints(db, characterId, questFame(periodId, count, content()), now);
 export const upgradeFamePoints = (db, characterId, outcome, now, guard = null) => famePoints(db, characterId, upgradeFame(outcome, content()), now, guard);
 export const sourceFamePoints = (db, characterId, id, count, now, guard = null) => famePoints(db, characterId, count * famePointsOf(id, content()), now, guard);
+
+// The seller's points for the offer `offerId` sold at the Targowisko
+// (market.js), only while the seller sold fewer than `weekly` other offers
+// since the week began (the author's 839 A, 12.11.2026: two accounts put up
+// offers at 1 zł for each other and bought them in a loop for Sława); the
+// gold comes as ever. Counted from the offers sold, which stay with their
+// settled_at (market_offers), the one sold now apart, whatever the order of
+// the batch; so the sales of the week before 0.2.77 count too.
+export function saleFamePoints(db, characterId, offerId, now) {
+  const { points, weekly } = fameSource('sale', content());
+  return famePoints(db, characterId, points, now, {
+    sql: "(SELECT COUNT(*) FROM market_offers WHERE seller_id = ? AND state = 'sold' AND settled_at >= ? AND id <> ?) < ?",
+    binds: [characterId, fameWeek(now, content()).startsAt, offerId, weekly],
+  });
+}
 
 // The points of the character's Próby Gildii of `week` (its key) done and
 // not counted yet, then those trials counted, by their ids: for the batch
@@ -186,7 +202,7 @@ const pointsText = (count, forms) => `${count} ${countedForm(count, forms)}`;
 // own numbers ({to}: the level before upgrade-high's).
 function sourcesView() {
   const to = fameSource('upgrade-high', content()).from - 1;
-  return rules().sources.map((source) => ({ id: source.id, label: filled(source.label, { minutes: source.minutes, from: source.from, to }), points: source.points }));
+  return rules().sources.map((source) => ({ id: source.id, label: filled(source.label, { minutes: source.minutes, from: source.from, to, weekly: source.weekly }), points: source.points }));
 }
 
 // The words of the Sława tab, with the pool filled in.

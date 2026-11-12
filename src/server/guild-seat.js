@@ -17,7 +17,11 @@
 // (perks.js), and a character that leaves its guild has none from then on.
 // A guild that goes takes its seat along (guildRemoval, guilds.js). No
 // yellow dot: nothing in the Siedziba waits for the player, as in the
-// Wymiana.
+// Wymiana. A member donates from the players' Wymiana's level on
+// (community.json trade.minLevel; the author's 835 A, 12.11.2026: a new
+// account's character gave its gift codes' gold to the seat of the main
+// character's guild); below it the card shows the buildings and their
+// bonuses, with a line instead of the donation.
 
 import { seatBonuses, seatBuilding, seatBuildings, seatCostTo, seatEffect, seatLevelCost, seatProgress } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
@@ -34,6 +38,7 @@ const filled = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(va
 const number = (value) => numberText(value);
 const path = (id) => `$."${id}"`;
 const changed = () => new ApiError(409, 'changed', errors().changed);
+const minLevel = () => content().community.trade.minLevel;
 
 // SQL for the donations to the buildings of the guild of the character
 // whose id `column` holds, as JSON by building ({ gold, resource }), and
@@ -61,8 +66,8 @@ function cardTexts() {
   const { errors: _, ...texts } = words();
   const first = seatLevelCost(1, content());
   const last = seatLevelCost(maxLevel, content());
-  const vars = { max: maxLevel, firstGold: number(first.gold), firstResource: number(first.resource), lastGold: number(last.gold), lastResource: number(last.resource) };
-  return { ...texts, how: texts.how.map((line) => filled(line, vars)) };
+  const vars = { max: maxLevel, firstGold: number(first.gold), firstResource: number(first.resource), lastGold: number(last.gold), lastResource: number(last.resource), level: minLevel() };
+  return { ...texts, how: texts.how.map((line) => filled(line, vars)), donateLevel: filled(texts.donateLevel, vars) };
 }
 
 // The donations to a guild's buildings, by building ({ gold, resource }),
@@ -107,6 +112,7 @@ async function seatView(db, player, guild) {
   return {
     guild: { name: guild.name, tag: guild.tag },
     canMark: guild.role !== 'member',
+    locked: player.row.level < minLevel(),
     buildings,
     bonuses: seatBonuses(Object.fromEntries(buildings.map((building) => [building.id, building.level])), content()),
     bonusesText: effects.length > 0 ? filled(words().bonuses, { bonuses: effects.join(', ') }) : words().noBonuses,
@@ -153,6 +159,7 @@ function amountOf(value) {
 // reached is told in the answer's words.
 export async function donateToGuildSeat(context) {
   const { session, player, guild, db } = await requireMember(context, errors());
+  if (player.row.level < minLevel()) throw new ApiError(403, 'seat_level', cardTexts().donateLevel);
   const body = await readJson(context.request);
   const building = buildingOf(body);
   const gold = amountOf(body.gold);

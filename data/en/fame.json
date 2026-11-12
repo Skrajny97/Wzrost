@@ -47,7 +47,7 @@
       "label": "Successful upgrade on the Anvil, from +{from}"
     },
     "sale": {
-      "label": "Offer sold at the Marketplace"
+      "label": "Offer sold at the Marketplace, up to {weekly} a week"
     }
   },
   "texts": {

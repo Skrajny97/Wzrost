@@ -184,6 +184,41 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
     assert.equal((await call('POST', '/api/friends/gift', { cookie: players.ala, body: { id } })).status, 200);
   });
 
+  // The author's 834 A (12.11.2026): a new character of another account
+  // sent the main character every day an Upominek of the main character's
+  // level. Below the Wymiana's level it is rolled for the sender's level.
+  test('an Upominek from a character below the Wymiana\'s level gives no more than its own level would', async () => {
+    const { minLevel } = content.community.trade;
+    const database = await db();
+    const rolled = async (cookie, name) => {
+      await database.prepare('DELETE FROM gifts').run();
+      const id = (await friends(cookie)).friends.find((friend) => friend.name === name).id;
+      assert.equal((await call('POST', '/api/friends/gift', { cookie, body: { id } })).status, 200);
+      return JSON.parse((await database.prepare('SELECT reward FROM gifts').first()).reward);
+    };
+    // Gold at the level it is rolled for, or that level's one resource.
+    const worth = (reward, level) => reward.gold === giftReward(level, [0, 0], content).gold || Object.values(reward.resources)[0] === Object.values(giftReward(level, [0.99, 0], content).resources)[0];
+    players.big = await player('Wielki', { level: 100 });
+    await befriend(players.ola, players.big, 'Wielki');
+    // Ola at level 7 gives Wielki an Upominek of level 7, not 100.
+    const small = await rolled(players.ola, 'Wielki');
+    assert.equal(small.timePoints, 1);
+    assert.ok(worth(small, 7) && !worth(small, 100), JSON.stringify(small));
+    // Every one of "Wyślij wszystkie" too.
+    await database.prepare('DELETE FROM gifts').run();
+    assert.equal((await call('POST', '/api/friends/gift-all', { cookie: players.ola })).status, 200);
+    assert.ok(worth(JSON.parse((await database.prepare('SELECT reward FROM gifts').first()).reward), 7));
+    // To a receiver below the sender, still the receiver's level.
+    await database.prepare('UPDATE characters SET level = 15 WHERE name = ?').bind('Ola').run();
+    await befriend(players.ala, players.ola, 'Ola');
+    await database.prepare('UPDATE characters SET level = 9 WHERE name = ?').bind('Ala').run();
+    assert.ok(worth(await rolled(players.ola, 'Ala'), 9));
+    // From the Wymiana's level on, the receiver's level as before.
+    await database.prepare('UPDATE characters SET level = ? WHERE name = ?').bind(minLevel, 'Ola').run();
+    const big = await rolled(players.ola, 'Wielki');
+    assert.ok(worth(big, 100) && !worth(big, minLevel), JSON.stringify(big));
+  });
+
   test('"Wyślij wszystkie": today\'s Upominek to every friend not given one yet', async () => {
     const accepted = await befriend(players.ala, players.ola, 'Ola');
     players.ewa = await player('Ewa');

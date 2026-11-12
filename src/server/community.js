@@ -6,7 +6,7 @@
 // collects at most claimsPerDay a day, all waiting ones at once, and one not
 // collected goes after keepDays days.
 
-import { classNameOf, giftReward, highestProfession, isUnlocked, questPeriod, zoneMidnight } from '../engine/index.js';
+import { classNameOf, giftLevel, giftReward, highestProfession, isUnlocked, questPeriod, zoneMidnight } from '../engine/index.js';
 import { characterView, loadPlayer } from './characters.js';
 import { chatRole, requireChatter } from './chat.js';
 import { content } from './content.js';
@@ -287,7 +287,8 @@ export async function removeFriend(context) {
 }
 
 // POST /api/friends/gift { id }: today's Upominek to that friend, its reward
-// rolled for the friend's level now.
+// rolled for the friend's level now (no higher than the sender's below the
+// Wymiana's level: giftLevel, the author's 834 A).
 export async function sendGift(context) {
   const { character, db } = await requireChatter(context);
   const body = await readJson(context.request);
@@ -300,7 +301,7 @@ export async function sendGift(context) {
     .first();
   if (!row) throw new ApiError(404, 'no_friend', 'Tej postaci nie ma wśród Twoich znajomych.');
   const [first, second] = crypto.getRandomValues(new Uint32Array(2));
-  const reward = giftReward(row.level, [first / 2 ** 32, second / 2 ** 32], content());
+  const reward = giftReward(giftLevel(character.level, row.level, content()), [first / 2 ** 32, second / 2 ** 32], content());
   const result = await db
     .prepare('INSERT OR IGNORE INTO gifts (sender_id, receiver_id, day, created_at, reward) VALUES (?, ?, ?, ?, ?)')
     .bind(character.id, row.id, today(context.now), context.now, JSON.stringify(reward))
@@ -310,7 +311,7 @@ export async function sendGift(context) {
 }
 
 // POST /api/friends/gift-all: today's Upominek to every friend not given
-// one today, each rolled for that friend's level now (the author: "Powinna
+// one today, each rolled as sendGift rolls it (the author: "Powinna
 // być funkcja Wyślij wszystkie w Upominkach tak jak Odbierz wszystkie").
 // INSERT OR IGNORE: one sent at the same moment by hand is not sent twice.
 export async function sendAllGifts(context) {
@@ -330,7 +331,7 @@ export async function sendAllGifts(context) {
   const results = await db.batch(
     rows.map((row) => {
       const [first, second] = crypto.getRandomValues(new Uint32Array(2));
-      const reward = giftReward(row.level, [first / 2 ** 32, second / 2 ** 32], content());
+      const reward = giftReward(giftLevel(character.level, row.level, content()), [first / 2 ** 32, second / 2 ** 32], content());
       return db
         .prepare('INSERT OR IGNORE INTO gifts (sender_id, receiver_id, day, created_at, reward) VALUES (?, ?, ?, ?, ?)')
         .bind(character.id, row.id, day, context.now, JSON.stringify(reward));

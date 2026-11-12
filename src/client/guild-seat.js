@@ -179,6 +179,13 @@ export function mountGuildSeat(container) {
     return h('div', { class: 'guild-part guild-seat-donation' }, h('h3', { class: 'guild-subtitle', text: texts.donation }), h('div', { class: 'guild-seat-fields' }, fields.map((field) => field.element)), send);
   }
 
+  // Below the players' Wymiana's level, a line in the donation's place:
+  // from which level the character donates (the author's 835 A).
+  function lockedPart() {
+    const { texts } = view;
+    return h('div', { class: 'guild-part guild-seat-donation' }, h('h3', { class: 'guild-subtitle', text: texts.donation }), h('p', { class: 'guild-seat-note', text: texts.donateLevel }));
+  }
+
   // The leader's and the deputies' mark (616 A), on or off.
   function markButton(building) {
     const { texts } = view;
@@ -223,7 +230,7 @@ export function mountGuildSeat(container) {
           'div',
           { class: 'guild-seat-body' },
           effectsPart(building),
-          building.next ? [progressPart(building), donationPart(building)] : h('p', { class: 'muted', text: texts.top }),
+          building.next ? [progressPart(building), view.locked ? lockedPart() : donationPart(building)] : h('p', { class: 'muted', text: texts.top }),
           view.canMark && markButton(building),
         ),
       ),

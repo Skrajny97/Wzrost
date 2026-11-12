@@ -508,6 +508,10 @@
     "0.2.76": {
       "title": "Version 0.2.76",
       "body": "- Combat: when the guard of Unyielding, Unbending or Indomitable ends, armour no longer drops below what the armour tearing alone (Millstone, Curse of Decay) would leave.\n- Combat: guards, shields and evades wake at once after a reflected blow too, and a fighter killed by a reflected blow strikes no more.\n- Divine Protection no longer switches off Mana Mirror or Ice Armour.\n- Frost Gust and Elemental Ray slow only those they hit.\n- Fixed numbers on the Stats screen, on skill cards, in Advanced stats and on the fighters' cards in reports.\n- The daily limits of the Arena, the Fire Spirit, the Scrapyard, the Merchant and the travelling merchant work right at midnight too.\n- A character offered as a mercenary no longer fights in the Portals, and parts bought from others no longer count in the Encyclopedia."
+    },
+    "0.2.77": {
+      "title": "Version 0.2.77",
+      "body": "- A Gift from a character below level 20 gives gold or resources by the sender's level.\n- Donations to the Guild Hall's buildings from character level 20. Younger characters see the buildings and their bonuses.\n- The land and level of the Guild Expedition count the members who played in the last 7 days.\n- At most 20 sales a week at the Marketplace bring Fame. The gold comes as usual.\n- The descriptions of the Caretaker and Grace traits say when healing removes harmful effects."
     }
   }
 }

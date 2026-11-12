@@ -19,11 +19,13 @@
           "label": { "type": "string", "minLength": 1 },
           "points": { "type": "integer", "minimum": 0 },
           "minutes": { "description": "Co ile pełnych minut wyprawy albo pracy przychodzą punkty.", "type": "integer", "minimum": 1 },
-          "from": { "description": "Od którego poziomu ulepszenia (cel udanej próby) liczy się upgrade-high.", "type": "integer", "minimum": 1 }
+          "from": { "description": "Od którego poziomu ulepszenia (cel udanej próby) liczy się upgrade-high.", "type": "integer", "minimum": 1 },
+          "weekly": { "description": "Za ile sprzedaży w tygodniu sale daje punkty (autor 839 A).", "type": "integer", "minimum": 1 }
         },
         "allOf": [
           { "if": { "properties": { "id": { "enum": ["explore", "work", "avatar"] } } }, "then": { "required": ["minutes"] } },
-          { "if": { "properties": { "id": { "const": "upgrade-high" } } }, "then": { "required": ["from"] } }
+          { "if": { "properties": { "id": { "const": "upgrade-high" } } }, "then": { "required": ["from"] } },
+          { "if": { "properties": { "id": { "const": "sale" } } }, "then": { "required": ["weekly"] } }
         ]
       },
       "allOf": [

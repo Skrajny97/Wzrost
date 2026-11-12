@@ -198,7 +198,7 @@ describe('the Siedziba Gildii through the API', () => {
 
   beforeEach(async () => {
     await player('mistrz', 'Mistrz');
-    await player('druh', 'Druh', { level: 12 });
+    await player('druh', 'Druh', { level: 22 });
     assert.equal((await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' })).status, 200);
     await setWallet('Mistrz', 100000, { wood: 5000, stone: 5000, 'iron-ore': 5000 });
     await join('druh', 'Druh');
@@ -435,6 +435,27 @@ describe('the Siedziba Gildii through the API', () => {
     assert.equal((await as('druh', 'POST', '/api/guild/leave')).status, 200);
     const bag = (await as('druh', 'GET', '/api/character')).data.character.bag;
     assert.equal(bag.find((one) => (one.upgrade ?? 0) === 0 && one.id !== itemId).anvil.next.cost.gold, Math.round(full * 0.8));
+  });
+
+  // The author's 835 A (12.11.2026): a new account's character gave its
+  // gift codes' gold to the seat of the main character's guild.
+  test('a member below the Wymiana\'s level sees the buildings and their bonuses, and donates from that level on', async () => {
+    const { minLevel } = content.community.trade;
+    await run('UPDATE characters SET level = ? WHERE name = ?', minLevel - 1, 'Druh');
+    const seen = await view('druh');
+    assert.equal(seen.locked, true);
+    assert.equal(seen.buildings.length, 4);
+    assert.equal(seen.texts.donateLevel, `Wpłaty na Siedzibę otworzą się dla Ciebie na ${minLevel}. poziomie postaci.`);
+    const tried = await as('druh', 'POST', '/api/guild/seat/donate', { buildingId: 'guild-banner', gold: 5000, resource: 0 });
+    assert.equal(tried.status, 403);
+    assert.equal(tried.data.error.code, 'seat_level');
+    assert.equal(tried.data.error.message, seen.texts.donateLevel);
+    assert.deepEqual(await wallet('Druh'), { gold: 100000, wood: 5000, stone: 5000, 'iron-ore': 5000 });
+    assert.equal((await first('SELECT COUNT(*) AS count FROM guild_seat')).count, 0);
+    // At the level, as before.
+    await run('UPDATE characters SET level = ? WHERE name = ?', minLevel, 'Druh');
+    assert.equal((await view('druh')).locked, false);
+    assert.equal(building((await donate('druh', 'guild-banner', 5000, 0)).data, 'guild-banner').next.collected.gold, 5000);
   });
 
   test('a guild that goes takes its Siedziba along', async () => {

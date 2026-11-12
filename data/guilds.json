@@ -47,7 +47,7 @@
       "title": "Siedziba Gildii",
       "intro": "Budynki Siedziby dają premie każdemu członkowi gildii. Wpłacasz złoto i zasoby na budynek, który sam wybierzesz.",
       "how": [
-        "Gildia nie ma wspólnej skarbnicy. Każdy członek wpłaca ze swojego złota i zasobów na budynek, który sam wybierze. Wpłaty nie wracają, także po wyjściu z gildii.",
+        "Gildia nie ma wspólnej skarbnicy. Każdy członek od {level}. poziomu postaci wpłaca ze swojego złota i zasobów na budynek, który sam wybierze. Wpłaty nie wracają, także po wyjściu z gildii.",
         "Każdy budynek rośnie od zera do {max}. poziomu. Wchodzi na kolejny poziom, gdy wpłaty na niego pokryją cały koszt tego poziomu: złoto i zasób. To, co wpłacisz ponad koszt, przechodzi na następny poziom.",
         "Pierwszy poziom kosztuje {firstGold} złota i {firstResource} sztuk zasobu, a każdy następny więcej, aż do {lastGold} złota i {lastResource} sztuk na {max}. poziomie.",
         "Lider i zastępcy mogą oznaczyć budynki jako preferowane, żeby gildia wiedziała, na co teraz zbierać. To tylko podpowiedź: wpłacasz, na co chcesz.",
@@ -73,6 +73,7 @@
       "have": "Masz: {have}",
       "rest": "Do poziomu",
       "donate": "Wpłać",
+      "donateLevel": "Wpłaty na Siedzibę otworzą się dla Ciebie na {level}. poziomie postaci.",
       "donateTitle": "Wpłacić na {name}?",
       "donateText": "Wpłacasz {amounts}. Wpłaty nie wracają.",
       "goldAmount": "{count} złota",
@@ -99,7 +100,7 @@
     }
   },
   "expedition": {
-    "$comment": "Wyprawa Gildii (src/engine/guild-expedition.js, src/server/guild-expedition.js, src/client/guild-expedition.js; DECISIONS.md, „Wyprawa Gildii (621 A)”). Autor: „621 A” i „624 akcept”: trasa tygodnia w 7 etapach, a na końcu każdego strażnik, który zagradza drogę, aż gildia go pokona. Tydzień jak przy Bestii i Próbach: od poniedziałku, od północy czasu polskiego. Trasa przychodzi z pierwszym spojrzeniem w tygodniu i prowadzi przez krainę, w której zakresie poziomów leży zaokrąglony średni poziom postaci członków (powyżej wszystkich krain: najwyższa). Strażnicy to stwory tej krainy, każdy inny, od najsłabszego: najsilniejsze zwykłe stwory z jej najwyższych miejsc, potem elity jej miejsc, na końcu czempion. Strażnik etapu k ma średni poziom członków z chwili przyjścia trasy plus k − 1, a HP jak Bestia: członkowie × guardians[k].attacks × typowe obrażenia ataku na jego poziomie (beast.damage). Członkowie to aktywni przy przyjściu trasy (konto w grze w ostatnich activeDays dniach, co najmniej 1) i część tygodnia tych, którzy dołączyli później, jak w Próbach. Minuty: każda minuta wyprawy członka (także Szybkie i Błyskawiczne polowanie i wyprawa Drużyny, bez najemników) liczy się przy odebraniu raportu, w gildii, w której postać wtedy jest. Etap to stageMinutes.perMember minut na członka, w górę do pełnych stageMinutes.step, co najmniej stageMinutes.min. Trasa staje u strażnika, którego gildia jeszcze nie pokonała; minuty zebrane w tym czasie czekają i przesuwają trasę od razu po jego upadku. Atakuje każdy, kto w tym tygodniu dołożył w tej gildii choć minutę, attacksPerDay razy na dobę (od północy czasu polskiego), osobno od ataków na Bestię; atak to jedna walka jak atak na Bestię. Pokonany strażnik daje każdemu, kto w tym tygodniu dołożył minut, skrzynię etapu (raz na postać, tydzień i etap, do końca następnego tygodnia): złoto gold.base + gold.perLevel × poziom postaci, materials losowań materiału strażnika (jak w Skrzyni Bestii, co najmniej jedna sztuka), a z item także przedmiot klasy postaci w rzadkości czempiona. texts: słowa zakładki Wyprawa i odpowiedzi gry; {…} wypełnia gra.",
+    "$comment": "Wyprawa Gildii (src/engine/guild-expedition.js, src/server/guild-expedition.js, src/client/guild-expedition.js; DECISIONS.md, „Wyprawa Gildii (621 A)”). Autor: „621 A” i „624 akcept”: trasa tygodnia w 7 etapach, a na końcu każdego strażnik, który zagradza drogę, aż gildia go pokona. Tydzień jak przy Bestii i Próbach: od poniedziałku, od północy czasu polskiego. Trasa przychodzi z pierwszym spojrzeniem w tygodniu i prowadzi przez krainę, w której zakresie poziomów leży zaokrąglony średni poziom postaci aktywnych członków (konto w grze w ostatnich activeDays dniach; gdy żaden nie jest aktywny, wszystkich; autor 837 A, 12.11.2026: członek, który nie gra, nie zmienia trasy; powyżej wszystkich krain: najwyższa). Strażnicy to stwory tej krainy, każdy inny, od najsłabszego: najsilniejsze zwykłe stwory z jej najwyższych miejsc, potem elity jej miejsc, na końcu czempion. Strażnik etapu k ma poziom trasy plus k − 1, a HP jak Bestia: członkowie × guardians[k].attacks × typowe obrażenia ataku na jego poziomie (beast.damage). Członkowie to aktywni przy przyjściu trasy (konto w grze w ostatnich activeDays dniach, co najmniej 1) i część tygodnia tych, którzy dołączyli później, jak w Próbach. Minuty: każda minuta wyprawy członka (także Szybkie i Błyskawiczne polowanie i wyprawa Drużyny, bez najemników) liczy się przy odebraniu raportu, w gildii, w której postać wtedy jest. Etap to stageMinutes.perMember minut na członka, w górę do pełnych stageMinutes.step, co najmniej stageMinutes.min. Trasa staje u strażnika, którego gildia jeszcze nie pokonała; minuty zebrane w tym czasie czekają i przesuwają trasę od razu po jego upadku. Atakuje każdy, kto w tym tygodniu dołożył w tej gildii choć minutę, attacksPerDay razy na dobę (od północy czasu polskiego), osobno od ataków na Bestię; atak to jedna walka jak atak na Bestię. Pokonany strażnik daje każdemu, kto w tym tygodniu dołożył minut, skrzynię etapu (raz na postać, tydzień i etap, do końca następnego tygodnia): złoto gold.base + gold.perLevel × poziom postaci, materials losowań materiału strażnika (jak w Skrzyni Bestii, co najmniej jedna sztuka), a z item także przedmiot klasy postaci w rzadkości czempiona. texts: słowa zakładki Wyprawa i odpowiedzi gry; {…} wypełnia gra.",
     "attacksPerDay": 3,
     "activeDays": 7,
     "stageMinutes": { "perMember": 150, "step": 10, "min": 150 },
@@ -117,7 +118,7 @@
       "route": "Wyprawa tygodnia: {land}",
       "lead": "Minuty wypraw członków prowadzą gildię przez {stages} etapów. Na końcu każdego etapu drogę zagradza strażnik.",
       "how": [
-        "Co tydzień, od poniedziałku od północy, gildia rusza na nową trasę przez krainę na średnim poziomie członków.",
+        "Co tydzień, od poniedziałku od północy, gildia rusza na nową trasę przez krainę na średnim poziomie aktywnych członków, czyli tych, których konto było w grze w ostatnich {days} dniach.",
         "Każda minuta wyprawy członka gildii przesuwa trasę, gdy odbierze on raport. Liczą się też Szybkie polowania i wyprawy Drużyny.",
         "Etap to {perMember} minut wypraw na każdego aktywnego członka gildii.",
         "Na końcu etapu czeka strażnik. Trasa stoi, aż gildia go pokona. Minuty zebrane w tym czasie czekają i przesuwają trasę zaraz po jego upadku.",

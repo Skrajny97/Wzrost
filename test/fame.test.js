@@ -45,6 +45,8 @@ describe('the Punkty Sławy: the rules', () => {
       sale: [2, null, null],
     });
     assert.equal(new Set(rules.sources.map((one) => one.id)).size, rules.sources.length);
+    // The sales of a week that bring Sława (the author's 839 A).
+    assert.equal(source('sale').weekly, 20);
     assert.deepEqual(rules.rewards, { places: 3, pool: 150, goldName: true });
     assert.equal(rules.table, 50);
   });
@@ -381,6 +383,48 @@ describe('the Punkty Sławy through the API', () => {
       await run("UPDATE market_offers SET ends_at = ? WHERE state = 'open'", Date.now() - 1);
       await as('kupiec', 'GET', '/api/market');
       assert.equal(await fameOf('Kramarka'), 4);
+    });
+    // The author's 839 A (12.11.2026): two accounts put up offers at 1 zł
+    // for each other and bought them in a loop for Sława.
+    test('a sale brings Sława for at most 20 sales of the seller a week; the gold comes as ever', async () => {
+      const { weekly, points } = source('sale');
+      await player('kramarka', 'Kramarka', 25, 25);
+      await player('kupiec', 'Kupiec', 25, 25);
+      const seller = await idOf('Kramarka');
+      const herb = content.herbs[0].id;
+      await run("UPDATE characters SET herbs = ? WHERE name = 'Kramarka'", JSON.stringify({ [herb]: 10 }));
+      const sell = async () => {
+        assert.equal((await as('kramarka', 'POST', '/api/market/list', { kind: 'herb', key: herb, count: 1, startPrice: 20, buyNow: 40 })).status, 200);
+        const { id } = await first("SELECT id FROM market_offers WHERE seller_id = ? AND state = 'open'", seller);
+        const bought = await as('kupiec', 'POST', '/api/market/buy', { offerId: id });
+        assert.equal(bought.status, 200, JSON.stringify(bought.data).slice(0, 300));
+        return id;
+      };
+      // Copies of a sold offer, sold at `settledAt`.
+      const columns = (await all('PRAGMA table_info(market_offers)')).map((column) => column.name).filter((column) => column !== 'id');
+      const copies = async (id, count, settledAt) => {
+        for (let i = 0; i < count; i++) {
+          await run(`INSERT INTO market_offers (${columns.join(', ')}) SELECT ${columns.map((column) => (column === 'settled_at' ? '?' : column)).join(', ')} FROM market_offers WHERE id = ?`, settledAt, id);
+        }
+      };
+      const first_ = await sell();
+      assert.equal(await fameOf('Kramarka'), points);
+      // Sales of last week count for nothing.
+      await copies(first_, weekly, fameWeek(Date.now(), content).startsAt - HOUR);
+      await sell();
+      assert.equal(await fameOf('Kramarka'), 2 * points);
+      // With weekly − 1 sold this week, the next one is the last with Sława.
+      await copies(first_, weekly - 3, Date.now());
+      assert.equal((await first("SELECT COUNT(*) AS count FROM market_offers WHERE seller_id = ? AND state = 'sold' AND settled_at >= ?", seller, fameWeek(Date.now(), content).startsAt)).count, weekly - 1);
+      await sell();
+      assert.equal(await fameOf('Kramarka'), 3 * points);
+      await sell();
+      assert.equal(await fameOf('Kramarka'), 3 * points);
+      // The gold of each sale as ever.
+      assert.equal((await first("SELECT COUNT(*) AS count FROM market_parcels WHERE character_id = ? AND kind = 'gold' AND reason = 'sold'", seller)).count, 4);
+      // The list "Za co Sława" says so.
+      const list = (await as('kramarka', 'GET', '/api/fame')).data;
+      assert.ok(JSON.stringify(list).includes(`Oferta sprzedana na Targowisku, do ${weekly} w tygodniu`), JSON.stringify(list).slice(0, 500));
     });
   });
 

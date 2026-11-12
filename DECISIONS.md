@@ -3092,6 +3092,20 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.77 (12.11.2026): odpowiedzi autora 831–840
+
+Odpowiedzi autora na stronie ocen (12.11.2026). Każda zmiana ma test (test/community.test.js, test/guild-seat.test.js, test/guild-expedition.test.js, test/fame.test.js).
+
+1. **Upominki od postaci poniżej 20. poziomu (834 A).** Upominek od postaci poniżej 20. poziomu (próg Wymiany, community.json trade.minLevel) daje złoto albo surowce według poziomu nadawcy, nie odbiorcy: od postaci na 5. poziomie 40 złota albo 6 sztuk surowca. Punkt Czasu zostaje, a Upominki dalej wysyła się od 5. poziomu. Brakujący szczegół: gdy odbiorca ma niższy poziom niż nadawca, Upominek liczy się jak dotąd z poziomu odbiorcy, żeby słabszy nadawca nie dawał więcej niż silniejszy (giftLevel w src/engine/gifts.js).
+2. **Datki na Siedzibę Gildii od 20. poziomu (835 A).** Wpłaty na budynki Siedziby od 20. poziomu postaci, jak w obu Wymianach, Prośbach i Skrzyni Gildii. Postać poniżej progu widzi budynki i ich premie, a zamiast pól wpłaty ma linijkę „Wpłaty na Siedzibę otworzą się dla Ciebie na 20. poziomie postaci.” Serwer odrzuca wpłatę także w żądaniu wysłanym ręcznie. Pierwsza linijka „Jak to działa?” mówi o progu.
+3. **Poziom Wyprawy Gildii (837 A).** Kraina i poziom trasy liczą się ze średniego poziomu członków, których konto było w grze w ostatnich 7 dniach, czyli tych samych, od których zależą minuty etapu i siła strażników. Członek, który nie gra, nie zmienia trasy. Brakujący szczegół: gdy nikt nie grał w ostatnich 7 dniach, liczą się wszyscy członkowie, jak dotąd. Trasy tego tygodnia, które już powstały, zostają bez zmian; gildia, która w tym tygodniu jeszcze nie zajrzała do Wyprawy, dostaje trasę według nowej reguły.
+4. **Sława za sprzedaż na Targowisku (839 A).** Sławę daje najwyżej 20 sprzedaży w tygodniu (40 punktów). Kolejne sprzedaże w tym tygodniu Sławy nie dają, a złoto przychodzi jak zwykle. Liczą się oferty sprzedane od początku tygodnia, także przed 0.2.77. Lista „Za co Sława” mówi: „Oferta sprzedana na Targowisku, do 20 w tygodniu”.
+5. **Opiekun i Łaska (840 A).** Walka bez zmian. Opis obu cech mówi teraz, że efekty zdejmuje uleczenie w chwili użycia umiejętności leczącej (Odnowa, Wielkie odnowienie). Leczenie w kolejnych ruchach i Aura życia efektów nie zdejmują.
+6. **Nagrody tygodnia Areny (833 C).** Zostaje jak jest: nagrodę tygodnia dostaje każda postać osobno, według swojego miejsca w tabeli.
+7. **Sklep Play (831.1–831.6).** Teksty i odpowiedzi do formularzy Play Console przyjęte bez zmian.
+8. **Nazwa konta na czacie (836).** Przyjęte makiety 836.1, 836.2, 836.3, 836.5 i 836.6. Makieta 836.4 (wiersz „Nazwa konta” w Ustawieniach) czeka na odpowiedź, więc nazwy kont wejdą do gry po niej.
+9. **Zmiana hasła i odzyskanie konta (838 A).** Wybrany wariant A: „Zmień hasło” w Ustawieniach (po zmianie wylogowanie z innych telefonów) i „Nie pamiętam hasła” na ekranie logowania (link na potwierdzony adres e-mail, ważny godzinę). Najpierw makiety na stronie ocen.
+
 ## Wersja 0.2.76 (12.11.2026): walka, progi i dzienne limity z przeglądu kodu
 
 Przegląd kodu silnika walki oraz tego, czy serwer pilnuje progów i limitów na każdej drodze, także w żądaniach wysłanych ręcznie. Każda poprawka ma test, który bez niej nie przechodzi (test/review-engine.test.js, test/review-gates.test.js).

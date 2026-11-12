@@ -256,6 +256,28 @@ describe('the Wyprawa Gildii through the API', () => {
     assert.equal((await attack('samotnik')).data.error.code, 'no_guild');
   });
 
+  // The author's 837 A (12.11.2026): members who did not play brought the
+  // route down without adding to it (two at level 40 and 50 and three at
+  // level 5 gave a route at level 21, with far weaker guardians).
+  test('members who were not in the game for a week change nothing of the route: its land and level are the active members\'', async () => {
+    for (const [login, name] of [['spioch', 'Śpioch'], ['drzemka', 'Drzemka'], ['len', 'Leń']]) {
+      await player(login, name, 5);
+      await as('lowczyni', 'POST', '/api/guild/invite', { name });
+      assert.equal((await join(login, 'SF')).status, 200);
+    }
+    const longAgo = Date.now() - (rules.activeDays + 1) * 24 * 60 * 60 * 1000;
+    await run("UPDATE users SET seen_at = ? WHERE login IN ('spioch', 'drzemka', 'len')", longAgo);
+    const { expedition } = await view('lowczyni');
+    assert.deepEqual([expedition.level, expedition.land.id, expedition.members], [45, expeditionLand(45, content).id, 2]);
+    assert.deepEqual(JSON.parse((await first('SELECT counted FROM guild_expeditions')).counted).sort(), [await idOf('Łowczyni'), await idOf('Tropiciel')].sort());
+    assert.ok((await view('lowczyni')).texts.how[0].includes(`${rules.activeDays} dniach`));
+    // With none of them in the game, all of them count, as before.
+    await run('DELETE FROM guild_expeditions');
+    await run('UPDATE users SET seen_at = ?', longAgo);
+    const all = (await view('lowczyni')).expedition;
+    assert.deepEqual([all.level, all.members], [Math.round((40 + 50 + 3 * 5) / 5), 1]);
+  });
+
   test('a claimed exploration\'s minutes go onto the route of the guild the character is in, and stay there after it leaves', async () => {
     await view('lowczyni');
     await explore('lowczyni');

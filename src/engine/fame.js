@@ -13,7 +13,7 @@
 import { questPeriod } from './quests.js';
 
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
-/** @typedef {{ id: string, points: number, minutes?: number, from?: number }} FameSource A source of data/fame.json. */
+/** @typedef {{ id: string, points: number, minutes?: number, from?: number, weekly?: number }} FameSource A source of data/fame.json. */
 /** @typedef {{ sources: FameSource[], rewards: { places: number, pool: number } }} FameRules data/fame.json. */
 /** @typedef {{ characterId: number, userId: number, points: number }} FameRow */
 
