@@ -755,6 +755,11 @@
       "id": "0.2.99",
       "title": "Wersja 0.2.99",
       "body": "- Gra przeładowuje się do nowej wersji także wtedy, gdy przechodzisz między ekranami, a nie tylko po powrocie do gry z innej aplikacji. Poprawki docierają szybciej."
+    },
+    {
+      "id": "0.3.0",
+      "title": "Wersja 0.3.0",
+      "body": "- Trzecia ewolucja klas: na 200. poziomie klasy każda druga forma przechodzi w trzecią. 15 nowych form, m.in. Pogromca Hord, Kolos, Mistrz Łuku, Lodowy Król, Arcydruid, Prorok, Licz i Władca Cieni, każda z własnym portretem, chodem i jeźdźcem w odcieniach skóry, nową cechą i dwiema nowymi umiejętnościami z ikonami i dźwiękami.\n- Punkty z umiejętności drugiej formy wracają do rozdania, a poziomy klasy od 200. do 299. dają po punkcie na nowe umiejętności."
     }
   ]
 }
