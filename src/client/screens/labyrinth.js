@@ -286,7 +286,9 @@ export function mountLabyrinth(container, { navigate }) {
     }
     openSheet(
       h('h2', { class: 'sheet-title sheet-title--art' }, roomArt(room.type), title),
-      fight && room.won && (room.gains.xp > 0 || room.gains.gold > 0) && h('p', { class: 'sheet-text', text: t('+{xp} XP, +{gold} złota.', { xp: formatNumber(room.gains.xp), gold: formatNumber(room.gains.gold) }) }),
+      // An ordinary fight's XP and gold; an elite's and a guardian's gains
+      // are in their lines.
+      room.type === 'fight' && room.won && h('p', { class: 'sheet-text', text: t('+{xp} XP, +{gold} złota.', { xp: formatNumber(room.gains.xp), gold: formatNumber(room.gains.gold) }) }),
       lines.map((line) => h('p', { class: 'sheet-text', text: line })),
       room.artifact && artifactLine(room.artifact),
       h(

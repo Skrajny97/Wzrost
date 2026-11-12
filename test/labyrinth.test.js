@@ -305,6 +305,10 @@ describe('the Artefakty', () => {
     assert.ok(Math.abs(traitValue(artifact, 'damage', 0.35, content) / base - 1.35) < 1e-9);
     assert.ok(Math.abs(traitValue({ ...artifact, size: 'large' }, 'damage', 0, content) / base - 1.25) < 1e-9);
     assert.ok(abilityValue({ ...artifact, size: 'large', ability: 'shield' }, 0, content) > 0);
+    // An ability's number grows with the square root of the budget: a boski
+    // Drugi oddech at +10 with a diamond gives back about a quarter of the HP.
+    const rally = rules.core.abilities.find((one) => one.id === 'rally').value;
+    assert.ok(Math.abs(abilityValue({ ...artifact, size: 'large', rarity: 'divine', ability: 'rally', upgrade: 10 }, 0.35, content) - rally * 2 * 2 * 1.35) < 1e-12);
     assert.equal(abilityValue({ ...artifact, size: 'large', ability: 'sure-first' }, 0, content), 0);
     assert.equal(artifactName({ ...artifact, size: 'small' }, content), 'Mały Artefakt ognia');
   });
