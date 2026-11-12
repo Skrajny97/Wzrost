@@ -55,7 +55,7 @@ import { ZOOM_MAX, ZOOM_MIN, applyZoom, stepZoom, zoomLevel, zoomOffered } from 
 import { forgetPart, narrate, narrateSoon, passTold } from './narrator.js';
 import { forgetNews, watchNews } from './news.js';
 import { LANGUAGES, LANGUAGE_NAMES, englishOffered, followAccount, language, languageSwitch, pickLanguage, prepareLanguage, t } from './i18n.js';
-import { pushRow, stopPush, syncPush } from './push.js';
+import { pushDiagnosis, pushRow, stopPush, syncPush } from './push.js';
 import { effectsVolume, playSound, setEffectsVolume, setRecordings, unlockSound } from './sound.js';
 import { call, filledForCollector, handleSessionLost, isUnlocked, loadContent, onCharacterChange, reportCache, serverNow, setTestMode, state, testModeOn, unlockInfo } from './state.js';
 import { offerPointsReset, openEvolutionTests } from './evolution.js';
@@ -1031,25 +1031,29 @@ function languageRow() {
 // "Zgłoś błąd" (the author: "Trzeba dodac przycisk Zgłoś błąd i zeby
 // przychodzil mi w Panel Autora"): what went wrong, in the player's words;
 // the server adds the game's version and the character, and this the screen
-// the player was on under the settings. A screenshot may go with it
-// (screenshot.js), and then the report goes as a form; not from an account
-// whose e-mail waits for confirmation, as the server takes none from it.
+// the player was on under the settings and the notifications' state
+// (pushDiagnosis: a report that they would not switch on, 12.11.2026, could
+// not say why). A screenshot may go with it (screenshot.js), and then the
+// report goes as a form; not from an account whose e-mail waits for
+// confirmation, as the server takes none from it.
 function openBugReport() {
   const screen = location.hash;
   const text = h('textarea', { class: 'bug-text', id: 'bug-text', rows: '6', maxlength: '2000', placeholder: t('Np. po stuknięciu „Wyrusz” ekran przestał reagować.') });
   const shot = state.user?.emailRequired && !state.user?.emailConfirmed ? null : screenshotPicker();
   const report = async () => {
+    const details = await pushDiagnosis().catch(() => null);
     const image = shot ? await shot.image() : null;
-    if (!image) return { text: text.value, screen };
+    if (!image) return { text: text.value, screen, details };
     const form = new FormData();
     form.append('text', text.value);
     form.append('screen', screen);
+    if (details) form.append('details', details);
     form.append('image', image, 'zrzut-ekranu.jpg');
     return form;
   };
   openSheet(
     h('h2', { class: 'sheet-title', text: t('Zgłoś błąd') }),
-    h('p', { class: 'sheet-text', text: t('Opisz, co się stało i co było wtedy na ekranie. Gra sama dołączy numer wersji, ekran, na którym jesteś, i Twoją postać.') }),
+    h('p', { class: 'sheet-text', text: t('Opisz, co się stało i co było wtedy na ekranie. Gra sama dołączy numer wersji, ekran, na którym jesteś, Twoją postać i stan powiadomień.') }),
     h('label', { class: 'field-label', for: 'bug-text', text: t('Opis błędu') }),
     text,
     shot?.element ?? null,

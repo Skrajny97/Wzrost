@@ -14,10 +14,36 @@ import { toast } from './ui.js';
 // The messages are written in Polish and shown in the page's language (t()).
 const BLOCKED = 'Powiadomienia gry są zablokowane. Zezwól na nie w ustawieniach telefonu albo przeglądarki i spróbuj ponownie.';
 const FAILED = 'Nie udało się włączyć powiadomień. Spróbuj ponownie za chwilę.';
+// Why switching them on failed, said so that the player knows what to do (a
+// player, poz. 28, 12.11.2026: notifications allowed in the phone's
+// settings, signed out and in, and still only „spróbuj ponownie”): the
+// browser or the phone blocks them for the game (on Android also a phone
+// that blocks Chrome's notifications, or the game's own entry among them,
+// while the site is allowed: the subscription is then refused with
+// "permission denied"), its service worker did not start, or its push
+// service refused the game.
+const onAndroid = () => /Android/i.test(navigator.userAgent);
+const blockedText = () =>
+  onAndroid()
+    ? t('Powiadomienia gry są zablokowane. W Chrome: ⋮ → Ustawienia → Ustawienia witryn → Powiadomienia → zezwól na {site}. W ustawieniach telefonu: Aplikacje → Chrome (albo Insight, gdy gra jest zainstalowana) → Powiadomienia → włącz je, także pozycję {site}. Potem spróbuj ponownie.', { site: location.hostname })
+    : t(BLOCKED);
+const CAUSES = {
+  blocked: blockedText,
+  worker: () => t('Przeglądarka nie uruchomiła usługi gry, która odbiera powiadomienia. Zamknij wszystkie karty gry, otwórz ją ponownie i spróbuj jeszcze raz. W karcie incognito powiadomienia nie działają.'),
+  refused: () =>
+    onAndroid()
+      ? t('Usługa powiadomień telefonu nie przyjęła gry. Zaktualizuj Chrome i Usługi Google Play (w Sklepie Play), otwórz grę w zwykłej karcie, nie incognito, i spróbuj ponownie. Telefony bez Usług Google Play (np. nowsze Huawei) nie dostają powiadomień ze stron.')
+      : t('Usługa powiadomień przeglądarki nie przyjęła gry. Zaktualizuj przeglądarkę, otwórz grę w zwykłej karcie, nie w trybie prywatnym, i spróbuj ponownie.'),
+};
 const LOST = 'Powiadomienia przestały docierać na ten telefon. Włącz je ponownie w Ustawieniach (zębatka).';
 // Whether the player switched the notifications on here: a phone that loses
 // its subscription by itself gets a new one at the next start.
 const WANTED = 'wzrost.push';
+// The last time switching them on failed here: the cause, the step, the
+// browser's error and when, kept until they are on. The row says the cause
+// under the switch, and "Zgłoś błąd" sends the rest to the author
+// (pushDiagnosis).
+const FAILURE = 'wzrost.push.failure';
 // What the server says of a test notification (push.js on the server).
 const TESTED = {
   sent: 'Wysłane. Powiadomienie powinno przyjść za kilka sekund. Jeśli nie przyjdzie, sprawdź w ustawieniach telefonu powiadomienia gry albo przeglądarki, w której ją otwierasz.',
@@ -45,6 +71,38 @@ function remember(on) {
   }
 }
 
+function lastFailure() {
+  try {
+    const kept = JSON.parse(localStorage.getItem(FAILURE) ?? 'null');
+    return kept && typeof kept === 'object' ? kept : null;
+  } catch {
+    return null;
+  }
+}
+
+function keepFailure(failure) {
+  try {
+    if (failure) localStorage.setItem(FAILURE, JSON.stringify(failure));
+    else localStorage.removeItem(FAILURE);
+  } catch {
+    // Without storage the cause shows in the message only.
+  }
+}
+
+// A failure of switching on at `stage` for `cause` (CAUSES, or none: the
+// message alone), kept with the browser's own error.
+function failed(stage, cause, message, error) {
+  keepFailure({ stage, cause, name: error?.name ?? null, error: error?.message ? String(error.message).slice(0, 200) : null, at: Date.now() });
+  return new Error(message);
+}
+
+// What the row says under the switch while the notifications are off: the
+// browser blocks them, or why switching them on failed last time.
+function causeText() {
+  if (Notification.permission === 'denied') return blockedText();
+  return CAUSES[lastFailure()?.cause]?.() ?? '';
+}
+
 const fromBase64Url = (text) => Uint8Array.from(atob(text.replaceAll('-', '+').replaceAll('_', '/')), (char) => char.charCodeAt(0));
 const toBase64Url = (bytes) => btoa(String.fromCharCode(...bytes)).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
 
@@ -62,32 +120,54 @@ const madeWith = (current, key) => {
   return !own || toBase64Url(new Uint8Array(own)) === key;
 };
 
-// The service worker, once active: it registers when the page has loaded.
-// Without one (a private window in some browsers) nothing comes.
-function activeWorker() {
-  return Promise.race([navigator.serviceWorker.ready, new Promise((resolve) => setTimeout(() => resolve(null), 5000))]);
+// The service worker, once active: it registers when the page has loaded
+// (app.js), and one not registered yet (the tap came first, or registering
+// failed) is registered here. A slow phone gets some seconds for it; without
+// one (a private window in some browsers) nothing comes.
+async function activeWorker() {
+  const known = await navigator.serviceWorker.getRegistration().catch(() => null);
+  if (!known) await navigator.serviceWorker.register('/sw.js').catch(() => null);
+  return Promise.race([navigator.serviceWorker.ready, new Promise((resolve) => setTimeout(() => resolve(null), 15000))]);
+}
+
+// A new subscription with the server's key. One refused is asked for once
+// more after the phone's old subscription, if any, is dropped: a browser
+// refuses a new one while one made with another key stays.
+async function subscribeWith(registration, key) {
+  const options = { userVisibleOnly: true, applicationServerKey: fromBase64Url(key) };
+  try {
+    return await registration.pushManager.subscribe(options);
+  } catch {
+    const old = await registration.pushManager.getSubscription().catch(() => null);
+    await old?.unsubscribe().catch(() => {});
+    try {
+      return await registration.pushManager.subscribe(options);
+    } catch (error) {
+      const cause = error?.name === 'NotAllowedError' || /permission/i.test(error?.message ?? '') ? 'blocked' : 'refused';
+      throw failed('subscribe', cause, CAUSES[cause](), error);
+    }
+  }
 }
 
 async function enable() {
   // Asked first, while the tap still counts: phones show the question only
   // right after one.
   const permission = await Notification.requestPermission();
-  if (permission !== 'granted') throw new Error(permission === 'denied' ? t(BLOCKED) : t('Bez zgody telefonu powiadomienia nie przyjdą.'));
+  if (permission !== 'granted') {
+    throw failed('permission', null, permission === 'denied' ? blockedText() : t('Bez zgody telefonu powiadomienia nie przyjdą.'), { name: permission });
+  }
   const registration = await activeWorker();
-  if (!registration) throw new Error(t(FAILED));
+  if (!registration) throw failed('worker', 'worker', CAUSES.worker());
   const { key } = await request('GET', '/api/push/key');
   let current = await registration.pushManager.getSubscription();
   if (current && !madeWith(current, key)) {
     await current.unsubscribe();
     current = null;
   }
-  try {
-    current ??= await registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: fromBase64Url(key) });
-  } catch {
-    throw new Error(t(FAILED));
-  }
+  current ??= await subscribeWith(registration, key);
   await request('POST', '/api/push/subscribe', current.toJSON());
   remember(true);
+  keepFailure(null);
 }
 
 async function disable() {
@@ -109,6 +189,7 @@ async function renew(dead, key) {
     const fresh = await registration?.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: fromBase64Url(key) });
     if (!fresh) return null;
     await request('POST', '/api/push/subscribe', fresh.toJSON());
+    keepFailure(null);
     return fresh;
   } catch {
     return null;
@@ -136,11 +217,12 @@ export async function syncPush() {
     }
     if (current && !(await request('POST', '/api/push/subscribe', current.toJSON())).gone) {
       remember(true);
+      keepFailure(null);
       return;
     }
     if (!(await renew(current, key))) {
       remember(false);
-      toast(Notification.permission === 'denied' ? t(BLOCKED) : t(LOST));
+      toast(Notification.permission === 'denied' ? blockedText() : t(LOST));
     }
   } catch {
     // The next start tries again.
@@ -169,6 +251,22 @@ async function sendTest() {
 // account's news.
 export async function stopPush() {
   await disable().catch(() => {});
+}
+
+// The notifications' state here, which "Zgłoś błąd" sends with a report
+// (app.js): technical words for the author's panel, never shown to the
+// player. Whether the browser allows them, whether the game's service worker
+// runs, the push service of the subscription, whether the game runs as an
+// installed app, and the last failure of switching them on.
+export async function pushDiagnosis() {
+  if (!supported()) return 'push: unsupported';
+  const registration = await navigator.serviceWorker.getRegistration().catch(() => null);
+  const current = await registration?.pushManager.getSubscription().catch(() => null);
+  const worker = registration ? (registration.active ? 'active' : 'inactive') : 'none';
+  const last = lastFailure();
+  const when = last ? new Date(last.at).toISOString().slice(0, 16).replace('T', ' ') : '';
+  const failure = last ? `; failure ${when} UTC, ${last.stage}: ${[last.name, last.error].filter(Boolean).join(': ') || '-'}` : '';
+  return `push: permission ${Notification.permission}; worker ${worker}; subscription ${current ? new URL(current.endpoint).hostname : 'none'}; installed app ${runsAsApp() ? 'yes' : 'no'}${failure}`.slice(0, 500);
 }
 
 function clearNotifications() {
@@ -220,7 +318,7 @@ export function pushRow() {
     button.disabled = busy;
     test.hidden = !on;
     test.disabled = busy;
-    hint.textContent = !on && Notification.permission === 'denied' ? t(BLOCKED) : '';
+    hint.textContent = on ? '' : causeText();
     hint.hidden = !hint.textContent;
   };
   test.addEventListener('click', async () => {

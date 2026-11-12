@@ -3233,6 +3233,19 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Powiadomienia, które nie chcą się włączyć (zgłoszenie gracza, 12.11.2026, w grze od 0.2.97)
+
+Gracz (poz. 28, Android 10, Chrome 157) zgłosił przez „Zgłoś błąd”, że w Ustawieniach gry nie może włączyć powiadomień: dostaje tylko „spróbuj ponownie”, choć powiadomienia są włączone w ustawieniach telefonu, a wylogowanie i ponowne zalogowanie nic nie zmienia. Gra mówiła wtedy jedno zdanie na każdą przyczynę, a zgłoszenie nie miało nic, po czym dałoby się ją poznać.
+
+1. **Przyczyna po imieniu.** Pod przełącznikiem i w komunikacie gra mówi, co nie działa i co zrobić:
+   - **zablokowane** (przeglądarka nie zezwala albo telefon blokuje powiadomienia Chrome lub samą pozycję gry wśród nich, a wtedy przeglądarka odmawia z „permission denied”): na Androidzie droga w Chrome (⋮ → Ustawienia → Ustawienia witryn → Powiadomienia) i w ustawieniach telefonu (Aplikacje → Chrome albo Insight → Powiadomienia, także pozycja gry);
+   - **brak usługi gry w przeglądarce** (service worker się nie uruchomił): zamknąć karty gry i otworzyć ją ponownie, bez karty incognito;
+   - **usługa powiadomień odmówiła** (np. telefon bez Usług Google Play, stary Chrome, karta incognito): zaktualizować Chrome i Usługi Google Play, otworzyć grę w zwykłej karcie; telefony bez Usług Google Play (np. nowsze Huawei) nie dostają powiadomień ze stron.
+   Przyczyna zostaje pod przełącznikiem, dopóki powiadomienia się nie włączą.
+2. **Dwie próby naprawy po drodze.** Gdy usługi gry w przeglądarce jeszcze nie ma, gra rejestruje ją sama i czeka na nią do 15 s zamiast 5 s. Gdy przeglądarka odmówi subskrypcji, gra usuwa starą subskrypcję telefonu, jeśli jest, i prosi o nową jeszcze raz.
+3. **Stan powiadomień w zgłoszeniu.** „Zgłoś błąd” dołącza sam stan powiadomień na urządzeniu: zgodę przeglądarki, czy usługa gry działa, usługę subskrypcji, czy gra jest zainstalowana jako aplikacja, oraz ostatni błąd włączania (krok, nazwa i treść błędu przeglądarki, czas). Panel Autora pokazuje go pod opisem urządzenia (kolumna `details` w `bug_reports`, migracja 0125). Tekst jest techniczny, po angielsku, tylko dla autora. Opis w okienku zgłoszenia i polityka prywatności (PL i EN, obowiązuje od 12.11.2026) mówią o tym.
+4. **Co może zrobić gracz już teraz:** sprawdzić zgodę strony w Chrome (ikona obok adresu albo ⋮ → Ustawienia → Ustawienia witryn → Powiadomienia), w ustawieniach telefonu powiadomienia Chrome razem z pozycją gry, nie używać karty incognito, zaktualizować Chrome i Usługi Google Play. Jeśli po 0.2.97 dalej się nie da, nowe zgłoszenie poda już przyczynę.
+
 ## Skrzynia Gildii: porównanie z ekwipunkiem i przekucie u Kowala (uwaga gracza, 12.11.2026, w grze od 0.2.96)
 
 Autor przekazał zrzut czatu: gracz (poz. 47): „W oknie skrzyni gildii można by również dać możliwość porównania eq swojego i swoich towarzyszy z włożonymi w skrzynię gildii, oraz informacje czy było już ulepszane w kuźni”. Autor: „kolejne wartościowe uwagi”.

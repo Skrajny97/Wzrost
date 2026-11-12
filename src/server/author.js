@@ -98,6 +98,7 @@ export async function authorPanel(context) {
       screen: bug.screen,
       version: bug.version,
       device: bug.device,
+      details: bug.details ?? null,
       createdAt: bug.created_at,
       resolvedAt: bug.resolved_at,
       image: bug.image === 1,
