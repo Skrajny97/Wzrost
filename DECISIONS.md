@@ -3103,16 +3103,6 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 Potem (12.11.2026): „Mistrz Łuku 2, pokaz teraz animacje i przypomnij chód” i „Mistrz Łuku jazda i chód OK”., „Mistrzyni Łuku jazda 1, dorób jej zielony płaszcz w portrecie zatem skoro pasuje”, „i pokaż chód Mistrzyni Łuku”, „Mistrzyni łuku jazda i chód OK”, „Płaszcz OK”, „Lodowa Królowa jazda 1”, „Lodowa królowa jazda i chód OK”, „Święty jazda 2”, „Jazda I chód świętego OK”, „Święta, jazda: 1”, „za nisko siedzi Święta moim zdaniem na wierzchowcach, chód w porządku” i „Święta podniesiona w siodle - lepiej.”, „Pogromca Demonów jazda 1”, „Pogromca Demonów jest za mały w porównaniu do tego tygrysa szablozębnego i ogólnie. Ale poza tym OK, tylko wielkość przeskaluj. Chód też OK”, „Pogromczyni Demonów: jazda 1, czekam na animacje oraz chód”, „Pogromczyni Demonów wszystko OK”, „Prorokini jazda 1, pokaż animację jazdy oraz chód”, „Prorokini w jezdzie za daleko siedzi na wierzchowcu, powinna byc blizej jego głowy -> w prawo”, „Prorokini jazda poprawiona już OK.”, „Prorokini chód OK”, „Władczyni Cieni, jazda: 1”, „Władczyni Cieni OK, tylko na Tygrysie szablozębnym za nisko i za bardzo w lewo siedzi”, „Władczyni Cieni na Tygrysie już OK”, „Prorok chód 2”, „Prorok, jazda: 1” i „Prorok jazda i chód OK”.
 
-## Rozdział narratora o Labiryncie (878, 12.11.2026)
-
-Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą bez zatwierdzania (zasada z 6.11.2026).
-
-1. **Kiedy.** Rozdział przychodzi po rozdziale Portali, gdy Labirynt jest otwarty (30. poziom postaci, przełącznik `LABYRINTH`) i Osada stoi otworem, nie na raporcie i nie na ekranach postaci, tylko gdy nie czeka żaden wcześniejszy rozdział. Postacie, które mają już 30. poziom, dostaną go przy najbliższym spojrzeniu na grę, jak każdy rozdział dopisany później.
-2. **Przebieg.** Karta (878.1) gdziekolwiek, potem pergamin przy zakładce Osada (878.2). Z Osady narrator sam otwiera Salę prób na zakładce Labirynt i wskazuje mapę (878.3), drużynę z HP (878.4), poziomy dnia (878.5) i nagrody dnia (878.6, ostatnia kwestia, bez „Pomiń objaśnienie”). Znaczniki `data-guide` są w `src/client/labyrinth.js`, a warunki w `src/client/narrator.js`.
-3. **Kwestia Sali prób** o próbach (645) przychodzi, jak dotąd, przy pierwszym spojrzeniu na Salę prób, ale dopiero po rozdziale Labiryntu, bo żadna kwestia miejsca nie przychodzi, gdy czeka rozdział.
-4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
-5. **Nagrania:** po dwie wersje każdej kwestii po polsku i po angielsku idą na stronę ocen. Rozdział wchodzi do gry z wybranymi nagraniami, tak jak Portale.
-
 ## Wersja 0.2.87 (12.11.2026): Labirynt Systemu i Rdzeń w grze
 
 Autor przyjął na stronie ocen makiety Labiryntu i Rdzenia (870.1–870.7) oraz kwestie narratora o Labiryncie (878.1–878.6), a grafiki były przyjęte wcześniej (868, 869).
@@ -3191,6 +3181,16 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
     - Rezonans liczy tylko najwyższy próg i klejnot go nie podnosi.
     - Oprawa klejnotu, wchłanianie, rozpuszczanie i ulepszanie wchłoniętego Artefaktu czekają do końca eksploracji. Tego samego klejnotu nie oprawia się drugi raz.
     - Zdolności rosną z pierwiastkiem budżetu rzadkości, żeby boska nie leczyła ponad 50%.
+
+### Rozdział narratora o Labiryncie (878, 12.11.2026)
+
+Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą bez zatwierdzania (zasada z 6.11.2026).
+
+1. **Kiedy.** Rozdział przychodzi po rozdziale Portali, gdy Labirynt jest otwarty (30. poziom postaci, przełącznik `LABYRINTH`) i Osada stoi otworem, nie na raporcie i nie na ekranach postaci, tylko gdy nie czeka żaden wcześniejszy rozdział. Postacie, które mają już 30. poziom, dostaną go przy najbliższym spojrzeniu na grę, jak każdy rozdział dopisany później.
+2. **Przebieg.** Karta (878.1) gdziekolwiek, potem pergamin przy zakładce Osada (878.2). Z Osady narrator sam otwiera Salę prób na zakładce Labirynt i wskazuje mapę (878.3), drużynę z HP (878.4), poziomy dnia (878.5) i nagrody dnia (878.6, ostatnia kwestia, bez „Pomiń objaśnienie”). Znaczniki `data-guide` są w `src/client/labyrinth.js`, a warunki w `src/client/narrator.js`.
+3. **Kwestia Sali prób** o próbach (645) przychodzi, jak dotąd, przy pierwszym spojrzeniu na Salę prób, ale dopiero po rozdziale Labiryntu, bo żadna kwestia miejsca nie przychodzi, gdy czeka rozdział.
+4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
+5. **Nagrania:** po dwie wersje każdej kwestii po polsku i po angielsku idą na stronę ocen. Rozdział wchodzi do gry z wybranymi nagraniami, tak jak Portale.
 
 ## Talia Systemu: gra karciana w Salonie Gier (871–877, 12.11.2026)
 
