@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { browseOffers, drawCandidates, goodsRarity, piecePrice, wearersOf } from '../src/engine/index.js';
+import { browseOffers, drawCandidates, goodsRarity, offerTier, piecePrice, wearersOf } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -93,6 +93,26 @@ describe('the search over the offers, in the engine', () => {
     const bidding = search({ show: 'bidding' });
     assert.deepEqual([bidding.ids, bidding.view.kind], [[6], 'any']);
     assert.deepEqual(bidding.counts.categories, { herb: 1 });
+  });
+
+  test('the Tier of an item, by the class level its base asks for, giving way once nothing is in it (a player: "żeby szybciej znaleźć przedmiot odpowiedni dla poziomu naszej postaci")', () => {
+    assert.equal(offerTier(OFFERS[0], content), '1');
+    assert.equal(offerTier(OFFERS[1], content), '3');
+    assert.equal(offerTier(OFFERS[3], content), '4');
+    assert.equal(offerTier(OFFERS[4], content), null);
+    const items = search({ show: 'all', kind: 'item' });
+    assert.deepEqual(items.counts.tiers, { 1: 1, 3: 2, 4: 1 });
+    const third = search({ show: 'all', kind: 'item', tier: '3' });
+    assert.deepEqual([third.ids, third.view.tier], [[2, 3], '3']);
+    // The rarities count under the Tier chosen; a Tier with nothing in it
+    // gives way, and stacks have none.
+    assert.deepEqual(third.counts.rarities, { epic: 1, legendary: 1 });
+    assert.deepEqual(search({ show: 'all', kind: 'item', tier: '7' }).view.tier, null);
+    assert.equal(search({ show: 'all', kind: 'herb', tier: '1' }).view.tier, null);
+    assert.equal(search({ show: 'all', kind: 'herb' }).counts.tiers, undefined);
+    // Under "Dla mnie", the Tiers of what the character can put on now.
+    const mine = search({ show: 'for-me', tier: '3' });
+    assert.deepEqual([mine.ids, mine.counts.tiers], [[2], { 1: 1, 3: 1 }]);
   });
 
   test('the rarity and the category, each giving way once nothing is in it', () => {
@@ -192,6 +212,16 @@ describe('the search over the offers, through the API', () => {
       herbs.offers.map((one) => one.id),
       [offered.comfrey, offered.nettle],
     );
+  });
+
+  test('the items of a Tier, with the Tiers the choice names', async () => {
+    const found = await market('Kupcowa', '?show=all&kind=item&tier=3&sort=dear');
+    assert.deepEqual(
+      found.offers.map((one) => one.id),
+      [offered.saber, offered['band-ring']],
+    );
+    assert.deepEqual([found.view.tier, found.counts.tiers], ['3', { 1: 1, 3: 2 }]);
+    assert.deepEqual(found.tiers[2], { id: '3', name: 'Tier III', classLevel: 25 });
   });
 
   test('"Dla mnie" for a companion: what it can put on now, and what it wears for the comparison', async () => {
