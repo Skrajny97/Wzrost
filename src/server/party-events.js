@@ -87,25 +87,25 @@ export async function tripEvent(db, { row, activity, trip, hunt, area, now }) {
       now,
     )
     .run();
-  const stored = await db.prepare('SELECT * FROM party_events WHERE trip_key = ?').bind(trip.seed).first();
-  return stored && content().partyEventsById[stored.event_id] ? stored : null;
+  const eventRow = await db.prepare('SELECT * FROM party_events WHERE trip_key = ?').bind(trip.seed).first();
+  return eventRow && content().partyEventsById[eventRow.event_id] ? eventRow : null;
 }
 
 // The event as the trip's leader sees it at its claim: whom it decides for,
 // and its options, one that gives away a healing potion greyed out while
 // the bag will hold none (`potions`: the bag's as the claim leaves it, with
 // those taken along and not drunk back).
-export function leaderView(stored, area, potions) {
-  const names = JSON.parse(stored.members)
-    .filter((one) => one.id !== stored.leader_id)
+export function leaderView(eventRow, area, potions) {
+  const names = JSON.parse(eventRow.members)
+    .filter((one) => one.id !== eventRow.leader_id)
     .map((one) => one.name);
-  return partyEventView(content().partyEventsById[stored.event_id], { area, names, potion: Boolean(carriedHealing(potions, content())) }, content());
+  return partyEventView(content().partyEventsById[eventRow.event_id], { area, names, potion: Boolean(carriedHealing(potions, content())) }, content());
 }
 
 // The leader's choice, checked: an option of the event (400) the leader may
 // take (409: one that gives away a healing potion without one in the bag).
-export function checkedChoice(stored, choice, potions) {
-  const option = typeof choice === 'string' ? content().partyEventsById[stored.event_id].options.find((one) => one.id === choice) : null;
+export function checkedChoice(eventRow, choice, potions) {
+  const option = typeof choice === 'string' ? content().partyEventsById[eventRow.event_id].options.find((one) => one.id === choice) : null;
   if (!option) throw new ApiError(400, 'invalid_choice', 'Wybierz jedną z opcji.');
   const lock = partyOptionLock(option, { potion: Boolean(carriedHealing(potions, content())) }, content());
   if (lock) throw new ApiError(409, lock.code, 'Na tę opcję potrzebujesz mikstury leczenia w plecaku.');
@@ -114,15 +114,15 @@ export function checkedChoice(stored, choice, potions) {
 
 // The line of the System about the event in a trip's report, every
 // member's: waiting for the leader, chosen, or settled by itself.
-export function tripLine(stored) {
-  const event = content().partyEventsById[stored.event_id];
-  return partyTripLine({ event, leaderName: stored.leader_name, chosenBy: stored.chosen_by, optionId: stored.choice }, content());
+export function tripLine(eventRow) {
+  const event = content().partyEventsById[eventRow.event_id];
+  return partyTripLine({ event, leaderName: eventRow.leader_name, chosenBy: eventRow.chosen_by, optionId: eventRow.choice }, content());
 }
 
 // Those who went, as the event is resolved: each still there, as it is now,
 // with its HP at the trip's end.
-async function membersNow(db, stored) {
-  const listed = JSON.parse(stored.members);
+async function membersNow(db, eventRow) {
+  const listed = JSON.parse(eventRow.members);
   const loaded = await Promise.all(listed.map((one) => loadCharacter(db, one.id)));
   return listed.flatMap((one, index) => {
     const member = loaded[index];
@@ -136,19 +136,19 @@ async function membersNow(db, stored) {
 // too (its texts take no draws), then kept only if nobody kept one first,
 // with the boon added to the party's in the same batch. Gives the row as
 // it is kept, another's result when another was first.
-export async function resolvePartyRow(db, stored, { optionId, chosenBy, now }) {
-  const members = await membersNow(db, stored);
-  const input = { optionId, seed: stored.trip_key, areaId: stored.area_id, level: stored.level, leaderId: stored.leader_id, members, drafts: eventDraftsOn() };
+export async function resolvePartyRow(db, eventRow, { optionId, chosenBy, now }) {
+  const members = await membersNow(db, eventRow);
+  const input = { optionId, seed: eventRow.trip_key, areaId: eventRow.area_id, level: eventRow.level, leaderId: eventRow.leader_id, members, drafts: eventDraftsOn() };
   const polish = contentIn('pl');
-  const result = resolvePartyEvent({ ...input, event: polish.partyEventsById[stored.event_id] }, polish);
+  const result = resolvePartyEvent({ ...input, event: polish.partyEventsById[eventRow.event_id] }, polish);
   const english = result.fight && englishOn() ? contentIn('en') : null;
   const fight = result.fight && {
     pl: result.fight,
-    ...(english && { en: resolvePartyEvent({ ...input, event: english.partyEventsById[stored.event_id] }, english).fight }),
+    ...(english && { en: resolvePartyEvent({ ...input, event: english.partyEventsById[eventRow.event_id] }, english).fight }),
   };
   const kept = JSON.stringify({ ...result, fight });
   const [claimed] = await db.batch([
-    db.prepare('UPDATE party_events SET choice = ?, chosen_by = ?, result = ?, resolved_at = ? WHERE id = ? AND choice IS NULL').bind(optionId, chosenBy, kept, now, stored.id),
+    db.prepare('UPDATE party_events SET choice = ?, chosen_by = ?, result = ?, resolved_at = ? WHERE id = ? AND choice IS NULL').bind(optionId, chosenBy, kept, now, eventRow.id),
     // The boon of the party's next trip, only with the result kept now;
     // one waiting already keeps what this one does not name.
     ...(result.boon
@@ -157,40 +157,40 @@ export async function resolvePartyRow(db, stored, { optionId, chosenBy, now }) {
             .prepare(
               "UPDATE parties SET boon = json_patch(COALESCE(boon, '{}'), ?) WHERE id = ? AND EXISTS (SELECT 1 FROM party_events WHERE id = ? AND resolved_at = ? AND chosen_by = ? AND result = ?)",
             )
-            .bind(JSON.stringify(result.boon), stored.party_id, stored.id, now, chosenBy, kept),
+            .bind(JSON.stringify(result.boon), eventRow.party_id, eventRow.id, now, chosenBy, kept),
         ]
       : []),
   ]);
-  if (claimed.meta.changes === 1) return { ...stored, choice: optionId, chosen_by: chosenBy, result: kept, resolved_at: now };
-  return db.prepare('SELECT * FROM party_events WHERE id = ?').bind(stored.id).first();
+  if (claimed.meta.changes === 1) return { ...eventRow, choice: optionId, chosen_by: chosenBy, result: kept, resolved_at: now };
+  return db.prepare('SELECT * FROM party_events WHERE id = ?').bind(eventRow.id).first();
 }
 
 // The event settled with its `auto` option: nobody chose in time.
-export const resolveAuto = (db, stored, now) => resolvePartyRow(db, stored, { optionId: content().partyEventsById[stored.event_id].auto, chosenBy: 'auto', now });
+export const resolveAuto = (db, eventRow, now) => resolvePartyRow(db, eventRow, { optionId: content().partyEventsById[eventRow.event_id].auto, chosenBy: 'auto', now });
 
 // Its result given to every member still there, each its own report once
 // (giveMember); the row marked `applied` once all of them have it. A member
 // whose character keeps changing waits for the cron's next run.
-export async function applyPartyEvent(db, stored, now) {
-  const result = JSON.parse(stored.result);
+export async function applyPartyEvent(db, eventRow, now) {
+  const result = JSON.parse(eventRow.result);
   const ids = Object.keys(result.members).map(Number);
   let given = 0;
   for (const id of ids) {
-    if (await giveTo(db, stored, result, id, now)) given += 1;
+    if (await giveTo(db, eventRow, result, id, now)) given += 1;
   }
-  if (given === ids.length) await db.prepare('UPDATE party_events SET applied = 1 WHERE id = ?').bind(stored.id).run();
+  if (given === ids.length) await db.prepare('UPDATE party_events SET applied = 1 WHERE id = ?').bind(eventRow.id).run();
 }
 
 // One member's report, in its account's language, tried again while its
 // character changed meanwhile: true once it has it (or its character is
 // gone), false when it still has not.
-async function giveTo(db, stored, result, id, now) {
+async function giveTo(db, eventRow, result, id, now) {
   for (let attempt = 0; attempt < TRIES; attempt++) {
     const member = await loadCharacter(db, id);
     if (!member) return true;
     const user = await db.prepare('SELECT language FROM users WHERE id = ?').bind(member.row.user_id).first();
     try {
-      await runInLanguage(accountLanguage(user?.language), () => giveMember(db, stored, result, member, now));
+      await runInLanguage(accountLanguage(user?.language), () => giveMember(db, eventRow, result, member, now));
       return true;
     } catch (error) {
       // Its report is there already: given before.
@@ -214,10 +214,10 @@ const healLines = () => new Set([...content().texts.levelHeal, ...content().text
 // elsewhere hears its wounds heal on the way). The leader who chose an
 // option of `leaderPotion` gives away its best healing potion. In one batch
 // while the character is as read.
-async function giveMember(db, stored, result, member, now) {
+async function giveMember(db, eventRow, result, member, now) {
   const { row } = member;
   // An event or option the game no longer has gives nothing more.
-  const event = content().partyEventsById[stored.event_id];
+  const event = content().partyEventsById[eventRow.event_id];
   const option = event?.options.find((one) => one.id === result.option);
   if (!option) return;
   const share = result.members[row.id];
@@ -244,7 +244,7 @@ async function giveMember(db, stored, result, member, now) {
   // The bag: the leader's potion given away first, then the herbs and the
   // potions of the event, into the places left (storeStacks).
   const potionsBefore = potionsOf(row);
-  const paid = option.leaderPotion && stored.leader_id === row.id && stored.chosen_by === 'leader' ? carriedHealing(potionsBefore, content()) : null;
+  const paid = option.leaderPotion && eventRow.leader_id === row.id && eventRow.chosen_by === 'leader' ? carriedHealing(potionsBefore, content()) : null;
   const potionsPaid = paid ? Object.fromEntries(Object.entries({ ...potionsBefore, [paid]: potionsBefore[paid] - 1 }).filter(([, count]) => count > 0)) : potionsBefore;
   const herbsBefore = herbsOf(row);
   const capacity = bagCapacity(campLevels(member.buildings, now, content()), content()) - bagItems(member).length;
@@ -254,7 +254,7 @@ async function giveMember(db, stored, result, member, now) {
   const potionsChanged = Boolean(paid) || Object.keys(potions.stored).length > 0;
   // The fight in the member's language, or in Polish.
   const fight = result.fight ? (result.fight[language()] ?? result.fight.pl) : null;
-  const area = content().areasById[stored.area_id];
+  const area = content().areasById[eventRow.area_id];
   const told = partyEventHunt(
     {
       event,
@@ -262,15 +262,15 @@ async function giveMember(db, stored, result, member, now) {
       fight,
       memberId: row.id,
       area,
-      chosenBy: stored.chosen_by,
+      chosenBy: eventRow.chosen_by,
       hp: busy ? { start: null, end: null, max: null, busy: true } : { start: hpNow, end: setsHp ? hp : hpNow, max: hpMax, lost },
       bagLost: { herbs: herbs.lost, potions: potions.lost },
     },
     content(),
   );
-  const names = JSON.parse(stored.members).map((one) => one.name);
+  const names = JSON.parse(eventRow.members).map((one) => one.name);
   const report = {
-    ...huntReport({ hunt: told.hunt, applied, character, areaId: area.id, startedAt: stored.ends_at, endsAt: now }, content()),
+    ...huntReport({ hunt: told.hunt, applied, character, areaId: area.id, startedAt: eventRow.ends_at, endsAt: now }, content()),
     kind: 'party-event',
     resultText: told.line,
     partyEvent: { id: event.id, title: told.title },
@@ -312,7 +312,7 @@ async function giveMember(db, stored, result, member, now) {
     // The report first, under its unique key: a second giving fails whole.
     db
       .prepare('INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) VALUES (?, ?, ?, ?, ?, ?)')
-      .bind(row.id, `${row.id}:party-event:${stored.id}`, 'party-event', now, JSON.stringify(summary), JSON.stringify(report)),
+      .bind(row.id, `${row.id}:party-event:${eventRow.id}`, 'party-event', now, JSON.stringify(summary), JSON.stringify(report)),
     trimReports(db, row.id, 'party-event'),
     db
       .prepare(
@@ -343,14 +343,14 @@ async function giveMember(db, stored, result, member, now) {
 // dropped. One row that fails stops none of the others.
 export async function settlePartyEvents(db, now) {
   const { results: due } = await db.prepare('SELECT * FROM party_events WHERE choice IS NULL AND auto_at <= ? ORDER BY auto_at LIMIT ?').bind(now, CRON_ROWS).all();
-  for (const stored of due) {
+  for (const eventRow of due) {
     try {
       // An event the game no longer has settles nothing.
-      if (!content().partyEventsById[stored.event_id]) {
-        await db.prepare('DELETE FROM party_events WHERE id = ? AND choice IS NULL').bind(stored.id).run();
+      if (!content().partyEventsById[eventRow.event_id]) {
+        await db.prepare('DELETE FROM party_events WHERE id = ? AND choice IS NULL').bind(eventRow.id).run();
         continue;
       }
-      const resolved = await resolveAuto(db, stored, now);
+      const resolved = await resolveAuto(db, eventRow, now);
       if (resolved?.choice && !resolved.applied) await applyPartyEvent(db, resolved, now);
     } catch (error) {
       console.error(error);
@@ -360,9 +360,9 @@ export async function settlePartyEvents(db, now) {
     .prepare('SELECT * FROM party_events WHERE choice IS NOT NULL AND applied = 0 AND resolved_at <= ? ORDER BY resolved_at LIMIT ?')
     .bind(now - APPLY_GRACE_MS, CRON_ROWS)
     .all();
-  for (const stored of waiting) {
+  for (const eventRow of waiting) {
     try {
-      await applyPartyEvent(db, stored, now);
+      await applyPartyEvent(db, eventRow, now);
     } catch (error) {
       console.error(error);
     }
