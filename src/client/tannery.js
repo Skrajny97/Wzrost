@@ -165,8 +165,15 @@ function sale(view, apply) {
             h(
               'li',
               { class: 'settlement-good' },
-              // The material's icon by its name, as at Jagna's.
-              h('p', { class: 'settlement-good-name' }, h('span', { class: 'potion-pick-art' }, stackArt(good)), h('strong', { text: `${good.name} × ${formatNumber(good.count)}` })),
+              // The material's icon by its name, as at Jagna's, and the name in
+              // its rarity's colour, as in the bag, so what to sell
+              // shows at a glance (a player via the author, 12.11.2026).
+              h(
+                'p',
+                { class: 'settlement-good-name' },
+                h('span', { class: 'potion-pick-art' }, stackArt(good)),
+                h('strong', { class: 'item-name', vars: { '--rarity': good.material.color }, text: `${good.name} × ${formatNumber(good.count)}` }),
+              ),
               h('p', { class: 'muted', text: t('{price} zł. za sztukę, u złomiarza {scrap} zł.', { price: formatDecimal(good.price), scrap: formatDecimal(good.scrap) }) }),
               h('button', { type: 'button', class: 'button button--world button--small', text: t('Sprzedaj'), onClick: () => sellSheet(good, apply) }),
             ),

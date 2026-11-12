@@ -304,15 +304,20 @@
       "wheelPool": "Pula na dziś: zostało {left} z {all}",
       "wheelStake": "Stawka: {stake} zł",
       "wheelSpin": "Zakręć Kołem ({stake} zł)",
+      "wheelFree": "Zakręć za darmo (raz dziennie)",
+      "wheelFreeAbout": "Darmowe zakręcenie ma szanse najniższej stawki: {stake} zł.",
       "wheelEmpty": "Koło rozdało już całą dzisiejszą pulę. Nowa przyjdzie po północy.",
       "wheelOdds": "Szanse: świetna {great}%, dobra {good}%, niezła {fair}%, słaba {weak}%, nic {none}%",
       "wheelGone": "Koło stanęło na nagrodzie, której już nie ma w puli. Stawka przepada.",
+      "wheelGoneFree": "Koło stanęło na nagrodzie, której już nie ma w puli. Kolejne darmowe zakręcenie jutro.",
       "wheelWon": "Wygrana",
       "wheelBag": "Przedmiot z puli trafi do plecaka, więc Koło ruszy, gdy w plecaku będzie wolne miejsce.",
       "won": "Wygrana: {prize}.",
       "lost": "Tym razem nic. Stawka przepada.",
+      "lostFree": "Tym razem nic. Kolejne darmowe zakręcenie jutro.",
       "win": ["Koło wybrało ciebie! Bierz, póki szczęście patrzy.", "No proszę! Nagroda twoja.", "Takie obroty lubię najbardziej. Gratuluję!"],
-      "loss": ["Koło jest dziś kapryśne. Może następnym razem.", "Blisko było. Szczęście lubi upartych.", "Tym razem stawka zostaje u mnie."]
+      "loss": ["Koło jest dziś kapryśne. Może następnym razem.", "Blisko było. Szczęście lubi upartych.", "Tym razem stawka zostaje u mnie."],
+      "lossFree": ["Koło jest dziś kapryśne. Może jutro.", "Blisko było. Szczęście lubi upartych."]
     }
   },
   "trialHall": {

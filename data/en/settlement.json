@@ -345,13 +345,17 @@
       "wheelPool": "Today's pool: {left} of {all} left",
       "wheelStake": "Stake: {stake} gold",
       "wheelSpin": "Spin the Wheel ({stake} gold)",
+      "wheelFree": "Free spin (once a day)",
+      "wheelFreeAbout": "The free spin has the odds of the lowest stake: {stake} gold.",
       "wheelEmpty": "The Wheel has given away all of today's pool. A new one comes after midnight.",
       "wheelOdds": "Odds: great {great}%, good {good}%, fair {fair}%, weak {weak}%, nothing {none}%",
       "wheelGone": "The Wheel stopped on a prize that is no longer in the pool. The stake is lost.",
+      "wheelGoneFree": "The Wheel stopped on a prize that is no longer in the pool. Another free spin tomorrow.",
       "wheelWon": "Won",
       "wheelBag": "A prize item goes into your bag, so the Wheel will turn once your bag has a free place.",
       "won": "You win: {prize}.",
       "lost": "Nothing this time. The stake is lost.",
+      "lostFree": "Nothing this time. Another free spin tomorrow.",
       "win": [
         "The Wheel chose you! Take it while luck is looking.",
         "Well, well! The prize is yours.",
@@ -361,6 +365,10 @@
         "The Wheel is fickle today. Maybe next time.",
         "That was close. Luck favours the stubborn.",
         "This time the stake stays with me."
+      ],
+      "lossFree": [
+        "The Wheel is fickle today. Maybe tomorrow.",
+        "That was close. Luck favours the stubborn."
       ]
     }
   },

@@ -1861,6 +1861,8 @@
   "Postaw od {min} do {max} zł, setkami.": "Stake {min} to {max} gold, in hundreds.",
   "Koło rozdało już całą dzisiejszą pulę. Nowa przyjdzie po północy.": "The Wheel has given out all of today's pool. A new one comes after midnight.",
   "Brakuje złota na taką stawkę.": "Not enough gold for this stake.",
+  "Darmowe zakręcenie na dziś już wykorzystane. Następne po północy.": "Today's free spin is already used. The next one comes after midnight.",
+  "Darmowe zakręcenie jest przy najniższej stawce.": "The free spin is at the lowest stake.",
   "Plecak jest pełny, a w puli czeka przedmiot. Zrób w plecaku miejsce.": "The bag is full, and an item waits in the pool. Make room in the bag.",
   "Towarzysz nosi tylko broń, pancerz i jedną sztukę biżuterii: amulet, pierścień albo talizman.": "A companion wears only a weapon, armour and one piece of jewellery: an amulet, a ring or a talisman.",
   "Klasa towarzysza nie może używać tego przedmiotu.": "The companion's class cannot use this item.",

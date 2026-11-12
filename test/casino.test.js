@@ -177,6 +177,22 @@ describe('the Salon Gier in the engine', () => {
     assert.equal(spinBlock(100, { ...fine, itemLeft: false, bagFree: 0 }, content), null);
   });
 
+  // A player via the author (12.11.2026): one free spin a day.
+  test("the day's free spin: at the lowest stake, without gold, once a day", () => {
+    const fine = { gold: 0, left: 15, itemLeft: true, bagFree: 3, stakes: [100, 200, 300] };
+    assert.equal(spinBlock(100, { ...fine, free: true }, content), null);
+    assert.equal(spinBlock(100, { ...fine, free: true, used: true }, content).code, 'free_used');
+    assert.equal(spinBlock(200, { ...fine, free: true }, content).code, 'invalid_stake');
+    assert.equal(spinBlock(100, fine, content).code, 'not_enough_gold');
+    assert.equal(spinBlock(100, { ...fine, free: true, left: 0 }, content).code, 'empty');
+    assert.equal(spinBlock(100, { ...fine, free: true, bagFree: 0 }, content).code, 'bag_full');
+    // The day's Wheel keeps the free spin used until midnight, not after.
+    const basis = { ...character(30), sellBonus: 0, tanneryPremium: 0.1 };
+    const used = { ...wheelWon(wheelDay(null, basis, NOW, content), 4), free: true };
+    assert.deepEqual(wheelDay(JSON.parse(JSON.stringify(used)), basis, NOW + 3600000, content), { day: '2026-11-03', basis, won: [4], free: true });
+    assert.equal(wheelDay(used, basis, NOW + 86400000, content).free, undefined);
+  });
+
   test('the stakes go in hundreds from 100 zł, 100 more every 40 levels, to the last below a legendary item at the scrapper', () => {
     assert.deepEqual(wheelStakes(25, 0, content), [100, 200, 300]);
     assert.deepEqual(wheelStakes(30, 0, content), [100, 200, 300, 400]);
@@ -359,6 +375,7 @@ describe('the Salon Gier through the API', () => {
   const salon = async (who = cookie, stake = null) => (await call('GET', `/api/settlement/casino${stake === null ? '' : `?stake=${stake}`}`, { cookie: who })).data.casino;
   const ticket = (who = cookie) => call('POST', '/api/settlement/casino/ticket', { cookie: who });
   const spin = (stake, who = cookie) => call('POST', '/api/settlement/casino/spin', { cookie: who, body: { stake } });
+  const freeSpin = (who = cookie) => call('POST', '/api/settlement/casino/spin', { cookie: who, body: { free: true, stake: 100 } });
   const run = (at) => server.getWorker().scheduled({ cron: '* * * * *', scheduledTime: new Date(at) });
   const today = () => casinoDay(Date.now(), content);
   const all = async (sql) => (await (await db()).prepare(sql).all()).results;
@@ -591,6 +608,28 @@ describe('the Salon Gier through the API', () => {
     const { won } = (await stored()).casino;
     assert.equal(won.length, done.filter((tap) => tap.data.spin.win).length);
     assert.equal(new Set(won).size, won.length);
+  });
+
+  test('one free spin a day at the lowest stake: no gold taken, the day keeps it used, two taps spin once', async () => {
+    const view = await salon();
+    assert.equal(view.wheel.free, true);
+    await set('gold = 0');
+    const taps = await Promise.all([freeSpin(), freeSpin()]);
+    assert.deepEqual(taps.map((tap) => tap.status).sort(), [200, 409]);
+    const done = taps.find((tap) => tap.status === 200).data;
+    assert.deepEqual([done.spin.free, done.spin.stake, done.casino.wheel.free], [true, 100, false]);
+    assert.equal((await row()).gold, 0);
+    assert.equal((await stored()).casino.free, true);
+    const again = await freeSpin();
+    assert.deepEqual([again.status, again.data.error.code], [409, 'free_used']);
+    // A paid spin still takes its stake.
+    await set('gold = 300');
+    assert.equal((await spin(100)).status, 200);
+    assert.equal((await row()).gold, 200);
+    // A new day brings the free spin back.
+    const kept = (await stored()).casino;
+    await set('settlement = ?', JSON.stringify({ ...(await stored()), casino: { ...kept, day: '2026-01-01' } }));
+    assert.equal((await salon()).wheel.free, true);
   });
 
   test('a full bag waits while an item is in the pool; a new day brings a new Wheel', async () => {

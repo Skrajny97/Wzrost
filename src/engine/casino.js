@@ -42,7 +42,7 @@ import { areaUnlocked } from './unlocks.js';
 /** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
 /** @typedef {{ level: number, classId: string, classLevel?: number, sellBonus?: number, tanneryPremium?: number }} Basis The character as the day's Wheel keeps it. */
 /** @typedef {{ kind: 'item', tier: string, item: Record<string, any> } | { kind: 'material' | 'resource', tier: string, key: string, count: number }} Prize A prize of the Wheel's pool. */
-/** @typedef {{ day: string, basis: Basis, won: number[] }} Wheel The character's Wheel of the day. */
+/** @typedef {{ day: string, basis: Basis, won: number[], free?: true }} Wheel The character's Wheel of the day; `free` once its free spin is used. */
 /** @typedef {{ prizes: Prize[], won: number[] }} Pool The day's pool and the places won in it. */
 /** @typedef {{ none: number, tiers: { id: string, chance: number }[] }} Odds A spin's chances at a stake. */
 /** @typedef {{ key: string, startsAt: number, endsAt: number }} Period A period of the quests' clock (quests.js). */
@@ -321,9 +321,12 @@ export function wheelPrizes(basis, seed, day, content) {
 // character now. A day kept with a pool for each stake (up to 0.1.34) starts
 // its one pool anew. A Wheel kept for a later day than `now`'s (a request
 // begun before midnight, done after another one of the new day) stays, so
-// the day never goes back (the code review, 0.2.71).
+// the day never goes back (the code review, 0.2.71). The day's free spin,
+// once used, stays used until midnight (`free`; a player via the author,
+// 12.11.2026: "w kole fortuny też można by dodać jedno zakręcenie darmowe
+// na dzień").
 /**
- * @param {{ day?: unknown, basis?: Basis, won?: unknown } | null | undefined} stored
+ * @param {{ day?: unknown, basis?: Basis, won?: unknown, free?: unknown } | null | undefined} stored
  * @param {Basis} basis
  * @param {number} now
  * @param {Content} content
@@ -331,10 +334,11 @@ export function wheelPrizes(basis, seed, day, content) {
  */
 export function wheelDay(stored, basis, now, content) {
   const day = casinoDay(now, content).key;
+  const used = stored?.free === true ? { free: /** @type {true} */ (true) } : {};
   if (stored?.basis && typeof stored.day === 'string' && stored.day > day) {
-    return { day: stored.day, basis: stored.basis, won: Array.isArray(stored.won) ? stored.won : [] };
+    return { day: stored.day, basis: stored.basis, won: Array.isArray(stored.won) ? stored.won : [], ...used };
   }
-  return stored?.day === day && stored.basis ? { day, basis: stored.basis, won: Array.isArray(stored.won) ? stored.won : [] } : { day, basis, won: [] };
+  return stored?.day === day && stored.basis ? { day, basis: stored.basis, won: Array.isArray(stored.won) ? stored.won : [], ...used } : { day, basis, won: [] };
 }
 
 // The stakes of the character's Wheel of the day.
@@ -372,18 +376,21 @@ export const prizesLeft = (pool) => pool.prizes.map((_, index) => index).filter(
 
 // Why the Wheel cannot spin at `stake` now, or null: one of the character's
 // stakes (wheelStakes), a prize left, the gold for it, and a free place in
-// the bag while an item waits in the pool.
+// the bag while an item waits in the pool. The day's free spin (`free`) is at
+// the lowest stake's chances and costs nothing, once a day (`used`).
 /**
  * @param {unknown} stake
- * @param {{ gold: number, left: number, itemLeft: boolean, bagFree: number, stakes: number[] }} state
+ * @param {{ gold: number, left: number, itemLeft: boolean, bagFree: number, stakes: number[], free?: boolean, used?: boolean }} state
  * @param {Content} content
  * @returns {{ code: string, message: string } | null}
  */
-export function spinBlock(stake, { gold, left, itemLeft, bagFree, stakes }, content) {
+export function spinBlock(stake, { gold, left, itemLeft, bagFree, stakes, free = false, used = false }, content) {
   const { step } = tuning(content).wheel;
+  if (free && used) return { code: 'free_used', message: 'Darmowe zakręcenie na dziś już wykorzystane. Następne po północy.' };
+  if (free && stake !== stakes[0]) return { code: 'invalid_stake', message: 'Darmowe zakręcenie jest przy najniższej stawce.' };
   if (!Number.isInteger(stake) || !stakes.includes(/** @type {number} */ (stake))) return { code: 'invalid_stake', message: `Postaw od ${step} do ${stakes.at(-1)} zł, setkami.` };
   if (left === 0) return { code: 'empty', message: 'Koło rozdało już całą dzisiejszą pulę. Nowa przyjdzie po północy.' };
-  if (gold < /** @type {number} */ (stake)) return { code: 'not_enough_gold', message: 'Brakuje złota na taką stawkę.' };
+  if (!free && gold < /** @type {number} */ (stake)) return { code: 'not_enough_gold', message: 'Brakuje złota na taką stawkę.' };
   if (itemLeft && bagFree < 1) return { code: 'bag_full', message: 'Plecak jest pełny, a w puli czeka przedmiot. Zrób w plecaku miejsce.' };
   return null;
 }
