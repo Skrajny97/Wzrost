@@ -13,6 +13,7 @@ import { playSound } from '../sound.js';
 import { activityFinished, avoidRareOn, call, hardHuntOn, isUnlocked, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn, unlockInfo } from '../state.js';
 import { guided, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
+import { droppedCardsSection } from '../cards.js';
 import { narrate } from '../narrator.js';
 import { scrapperSheet } from '../scrapper.js';
 import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy, storedCopy } from './character.js';
@@ -199,6 +200,8 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         ),
       itemsSection(report),
       materialsSection(report),
+      // Talia Systemu's cards the creatures left (cards.js).
+      droppedCardsSection(report.cards),
       accountSection(report),
       actionBox,
     );
@@ -398,6 +401,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       !lost && !below && shown(summary.gold) && [t('Złoto'), `+${formatNumber(summary.gold)}`],
       !lost && !below && resourcesRow(summary.resources),
       !below && summary.materials?.length > 0 && [t('Materiały'), capitalized(materialsText(summary.materials))],
+      report.cards?.length > 0 && [t('Karty'), report.cards.map((card) => card.name).join(', ')],
       summary.timePoints > 0 && [t('Punkty Czasu'), `+${formatNumber(summary.timePoints)}`],
       // A Wieża's floor is one fight, and the tower keeps no HP (towers.js).
       // A party event has a fight only when its event had one, and HP only

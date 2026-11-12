@@ -113,6 +113,9 @@ export const ICONS = {
   ring: [circle(12, 14, 6), path('M9 6l3-3 3 3-3 3z')],
   talisman: [path('M12 21c-5-4-7-9-4-15 1 3 4 4 4 4s3-1 4-4c3 6 1 11-4 15z'), path('M12 10v9')],
 
+  // Talia Systemu's cards (cards.js): their Życie by their Atak's sword.
+  heart: [path('M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z')],
+
   // Item bases that look different from their slot
   sword: [path('M18 3h3v3L10.5 16.5l-3-3z'), path('M5.5 12.5l6 6'), path('M7 17l-3.5 3.5')],
   axe: [path('M4 20L15.5 8.5'), path('M12 6c3-3 6.5-3 8.5-1-1 3.5-3.5 5.5-6.5 6.5z')],
