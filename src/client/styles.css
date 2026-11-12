@@ -19835,3 +19835,16 @@ a.discord-button {
   margin: 0;
   font-size: 14px;
 }
+
+/* "Nowi kandydaci" under the Karczma's candidates (890 B): the button and
+   how many draws are left this week. */
+.tavern-redraw {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.tavern-redraw p {
+  margin: 0;
+}

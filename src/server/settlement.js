@@ -95,6 +95,8 @@ import {
   saleGold,
   seatBonuses,
   withSeatDiscount,
+  candidateRedraw,
+  questPeriod,
 } from '../engine/index.js';
 import { trialHallView } from './trial-hall.js';
 import { content, contentIn } from './content.js';
@@ -169,6 +171,8 @@ export function settlementOf(row) {
     ...(stored.rumor && { rumor: stored.rumor }),
     ...(stored.companions && { companions: stored.companions }),
     ...(stored.dismissed && { dismissed: stored.dismissed }),
+    // The new draws of the Karczma's candidates paid for this week (890 B).
+    ...(stored.candidateDraws && { candidateDraws: stored.candidateDraws }),
     ...(stored.trade && { trade: stored.trade }),
     // The reputation the Garbarnia's trade gave today (tannery.js).
     ...(stored.tanneryTrade && { tanneryTrade: stored.tanneryTrade }),
@@ -694,6 +698,18 @@ function placesOf(player, now) {
 // The innkeeper's relation points, which set the price of hiring.
 const innkeeperPoints = (stored) => stored.relations[content().settlement.tavern.resident] ?? 0;
 
+// How many new draws of candidates the character paid for this week (890 B):
+// `candidateDraws` keeps the week's key with the count, so a new week starts
+// at none.
+const candidateDrawsOf = (stored, now) => {
+  const week = questPeriod('weekly', now, content()).key;
+  return stored.candidateDraws?.week === week ? stored.candidateDraws.count : 0;
+};
+
+// This week's candidates not hired yet, of the character's last draw.
+const candidatesOf = (row, stored, now) =>
+  drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, now, content(), [...(stored.companions ?? []).map((companion) => companion.id), ...(stored.dismissed ?? [])], candidateDrawsOf(stored, now));
+
 // The Karczma's werbunek (questions 104–106): the places the Kwatery give,
 // the companions hired with this week's gift and this week's candidates not
 // hired yet, each with its price at the standing with the innkeeper.
@@ -706,10 +722,7 @@ function companionsView(player, stored, now) {
   const materials = JSON.parse(row.materials ?? '{}');
   const hired = stored.companions ?? [];
   const points = innkeeperPoints(stored);
-  const candidates = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, now, content(), [
-    ...hired.map((companion) => companion.id),
-    ...(stored.dismissed ?? []),
-  ]);
+  const candidates = candidatesOf(row, stored, now);
   return {
     places,
     // Whether the Kwatery can give another bed, and whether a higher
@@ -740,6 +753,9 @@ function companionsView(player, stored, now) {
       };
     }),
     candidates: candidates.map((candidate) => ({ ...companionView(candidate), price: hireCost(candidate, content(), points) })),
+    // "Nowi kandydaci" (890 B): the next draw's gold and how many are left
+    // this week, or none left ({ left: 0 }).
+    redraw: candidateRedraw(row.level, candidateDrawsOf(stored, now), content()) ?? { gold: null, left: 0, perWeek: content().settlement.companions.redraws.perWeek },
   };
 }
 
@@ -1085,8 +1101,7 @@ export async function hireCompanion(context) {
   const stored = settlementOf(row);
   const hired = stored.companions ?? [];
   if (hired.length >= placesOf(player, context.now).places) throw new ApiError(409, 'no_bed', 'W Kwaterach w obozie nie ma wolnego posłania.');
-  const taken = [...hired.map((companion) => companion.id), ...(stored.dismissed ?? [])];
-  const candidate = drawCandidates({ character: engineCharacter(row), seed: `${row.id}:settlement` }, context.now, content(), taken).find((one) => one.id === body.candidateId);
+  const candidate = candidatesOf(row, stored, context.now).find((one) => one.id === body.candidateId);
   if (!candidate) throw new ApiError(404, 'no_candidate', 'Tego kandydata już nie ma w Karczmie.');
   const gold = hireCost(candidate, content(), innkeeperPoints(stored));
   if (row.gold < gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota na werbunek.');
@@ -1104,6 +1119,28 @@ export async function hireCompanion(context) {
     settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now),
     character: characterView(after, context.now),
   });
+}
+
+// "Nowi kandydaci" (890 B): four other candidates for the rest of the
+// week, for the gold candidateRedraw asks, up to redraws.perWeek times a
+// week. The companions hired stay; the four before are gone.
+export async function redrawCandidates(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireOpen(row);
+  const stored = settlementOf(row);
+  const week = questPeriod('weekly', context.now, content()).key;
+  const done = candidateDrawsOf(stored, context.now);
+  const redraw = candidateRedraw(row.level, done, content());
+  if (!redraw) throw new ApiError(409, 'no_redraws', 'W tym tygodniu nie wylosujesz już nowych kandydatów. Nowi przyjdą w poniedziałek.');
+  if (row.gold < redraw.gold) throw new ApiError(409, 'not_enough_gold', 'Brakuje złota na nowych kandydatów.');
+  const next = { ...stored, candidateDraws: { week, count: done + 1 } };
+  const result = await context.env.DB.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ? AND version = ? AND gold >= ?')
+    .bind(redraw.gold, JSON.stringify(next), row.id, row.version, redraw.gold)
+    .run();
+  if (result.meta.changes !== 1) throw changed();
+  const after = await loadPlayer(context.env.DB, session.userId);
+  return json({ settlement: settlementView(after, next, settlementBoard(after.row, next, context.now), context.now), character: characterView(after, context.now) });
 }
 
 // { companionId }: the companion leaves for good and does not come back as

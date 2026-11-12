@@ -803,7 +803,7 @@ export function mountSettlement(container, { params = {} } = {}) {
   // camp's Kwatery (the author: "Po zwerbowaniu postac powinna zniknąć z
   // Karczmy i pojawić się w Kwaterach"), each with a bed there.
   function companionsCard() {
-    const { places, moreBeds, hired, candidates } = data.companions;
+    const { places, moreBeds, hired, candidates, redraw } = data.companions;
     const full = hired.length >= places;
     // The author's words, the camp's Kwatery stressed in them; every
     // standing with Zbylut may hire, a lower one for more gold.
@@ -845,6 +845,39 @@ export function mountSettlement(container, { params = {} } = {}) {
             );
           }),
       });
+    // "Nowi kandydaci" (890 B; the players' idea passed on by the author,
+    // 12.11.2026): four others for the rest of the week, for gold, a few
+    // times a week, each dearer; the companions hired stay.
+    const redrawRow =
+      redraw &&
+      h(
+        'div',
+        { class: 'tavern-redraw' },
+        redraw.left > 0
+          ? [
+              h('button', {
+                type: 'button',
+                class: 'button button--world button--small',
+                text: t('Nowi kandydaci ({gold} zł.)', { gold: formatNumber(redraw.gold) }),
+                disabled: state.character.gold < redraw.gold,
+                onClick: (event) =>
+                  withButton(event.currentTarget, async () => {
+                    if (
+                      !(await confirmAction({
+                        title: t('Nowi kandydaci'),
+                        text: t('Zbylut przyprowadzi czterech innych kandydatów za {gold} zł. Ci, którzy czekają teraz, odejdą, a zwerbowani zostają.', { gold: formatNumber(redraw.gold) }),
+                        confirmLabel: t('Losuj'),
+                      }))
+                    )
+                      return;
+                    apply(await call('POST', '/api/settlement/redraw', {}));
+                    toast(t('Nowi kandydaci czekają w Karczmie.'));
+                  }),
+              }),
+              h('p', { class: 'muted', text: t('Losowania w tym tygodniu: zostało {left} z {all}. Każde kolejne jest droższe.', { left: redraw.left, all: redraw.perWeek }) }),
+            ]
+          : h('p', { class: 'muted', text: t('W tym tygodniu nie wylosujesz już nowych kandydatów. Nowi przyjdą w poniedziałek.') }),
+      );
     return h(
       'section',
       { class: 'stack', 'data-guide': 'tavern-companions' },
@@ -868,6 +901,7 @@ export function mountSettlement(container, { params = {} } = {}) {
               companionCard(candidate, hire(candidate), apply),
             ),
           ),
+      redrawRow,
     );
   }
 

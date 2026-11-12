@@ -3233,6 +3233,15 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Karczma: nowi kandydaci za złoto (890 B, 12.11.2026, w grze od 0.2.94)
+
+Autor przekazał zrzut czatu: gracze (poz. 47 i 37) chcą większego wyboru albo losowania towarzyszy, np. 2–3 razy w tygodniu, za opłatę, która „nie musi być tania” („losowanie towarzyszy za złoto! Popieram!”). Autor: „przy okazji mądra uwaga”. Autor wybrał 890 B.
+
+1. **Losowanie.** Pod kandydatami w Karczmie stoi przycisk „Nowi kandydaci (cena)”. Zbylut przyprowadza czterech innych kandydatów na resztę tygodnia, a czwórka, która czekała, odchodzi. Zwerbowani towarzysze zostają, a nowa czwórka ma własne identyfikatory, więc nikt zwerbowany wcześniej jej nie zasłania. Pierwsza czwórka tygodnia jest taka sama jak dotąd.
+2. **Ile i za ile (890 B).** Najwyżej 3 losowania w tygodniu, coraz droższe: złoto z 2, 4 i 6 godzin eksploracji na poziomie postaci (`explorationGold`, jak nagrody gry karcianej), np. na 50. poziomie ok. 1520, 3040 i 4560 zł. Tydzień liczy się jak zadania narratora, więc w poniedziałek licznik wraca do zera i przychodzą nowi kandydaci jak dotąd. Liczby są w danych: `companions.redraws` w `data/settlement.json` (`perWeek` 3, `hours` [2, 4, 6]).
+3. **Pod przyciskiem** zdanie, ile losowań zostało w tym tygodniu i że każde kolejne jest droższe; po trzecim zdanie, że nowi przyjdą w poniedziałek. Przed losowaniem gra pyta, czy na pewno (czekający odejdą). To jeden przycisk w istniejącej karcie Karczmy, więc wchodzi bez makiet.
+4. **Zapis.** Postać trzyma w Osadzie `candidateDraws` (klucz tygodnia i liczba losowań); silnik losuje czwórkę ziarnem postaci, tygodnia i numeru losowania (`drawCandidates`, `candidateRedraw` w `src/engine/companions.js`), serwer: `POST /api/settlement/redraw`.
+
 ## Talia Systemu: gra karciana w Salonie Gier (871–877, 12.11.2026)
 
 Autor: „A jeśli chcielibyśmy zrobić nową grę w Salonie Gier.. najlepiej karcianą, bardziej interaktywną, ale nie ultra złożoną? Z nawiązaniem do stworów i postaci, mechanik z Insight - jest to wykonalne? taka minigra w grze?”, a po odpowiedzi: „Niech ta gra karciana powstanie”. Zasady autor wybrał na stronie ocen 12.11.2026 ok. 15:55: 871 B, 872 A, 873 A, 874 A, 875 A, 876 A i 877 A.

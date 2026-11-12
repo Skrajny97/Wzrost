@@ -18,6 +18,7 @@
 
 import { playerCombatant } from './combatant.js';
 import { baseClassLevel, canUse, generateItem } from './items.js';
+import { explorationGold } from './mining.js';
 import { gainXp, xpToNext } from './progression.js';
 import { laterPeriod, questPeriod, samePeriod } from './quests.js';
 import { createRng } from './rng.js';
@@ -83,18 +84,22 @@ function startingGear(classId, level, rng, content) {
 
 // This week's candidates (question 106: "czterech tylko"), the same all
 // week for the character: drawn from its seed and the week. `taken` are
-// the ids already hired, who no longer wait in the Karczma.
+// the ids already hired, who no longer wait in the Karczma. `draw`: how
+// many new draws the character paid for this week (890 B, candidateRedraw);
+// each gives four others, with ids of their own, so a companion hired
+// before keeps its id and hides no one of the new four.
 /**
  * @param {{ character: Record<string, any>, seed: string }} owner
  * @param {number} now
  * @param {Content} content
  * @param {string[]} [taken]
+ * @param {number} [draw]
  * @returns {Companion[]}
  */
-export function drawCandidates({ character, seed }, now, content, taken = []) {
+export function drawCandidates({ character, seed }, now, content, taken = [], draw = 0) {
   const t = tuning(content);
   const week = questPeriod('weekly', now, content).key;
-  const rng = createRng(`${seed}:candidates:${week}`);
+  const rng = createRng(draw > 0 ? `${seed}:candidates:${week}:${draw}` : `${seed}:candidates:${week}`);
   const used = new Set();
   /** @type {Companion[]} */
   const candidates = [];
@@ -123,9 +128,27 @@ export function drawCandidates({ character, seed }, now, content, taken = []) {
     const profession = rng.pick(t.professions).id;
     const story = rng.int(0, t.stories.length - 1);
     const gear = startingGear(classId, level, rng, content);
-    candidates.push({ id: `${week}:${index}`, name, appearance, classId, level, xp: 0, traits, skills, profession, story, gear });
+    candidates.push({ id: draw > 0 ? `${week}:${draw}:${index}` : `${week}:${index}`, name, appearance, classId, level, xp: 0, traits, skills, profession, story, gear });
   }
   return candidates.filter((candidate) => !taken.includes(candidate.id));
+}
+
+// A new draw of the Karczma's candidates for gold (890 B; the players'
+// idea passed on by the author, 12.11.2026: "losowanie towarzyszy za
+// złoto", 2–3 times a week, "nie musi być tanie"): after `done` draws this
+// week, the next one's gold, the gold of redraws.hours[done] hours of
+// exploring at the character's `level` (explorationGold), and how many are
+// left with it; null once redraws.perWeek are done.
+/**
+ * @param {number} level
+ * @param {number} done
+ * @param {Content} content
+ * @returns {{ gold: number, left: number, perWeek: number } | null}
+ */
+export function candidateRedraw(level, done, content) {
+  const { perWeek, hours } = tuning(content).redraws;
+  if (done >= perWeek) return null;
+  return { gold: Math.round(explorationGold(level, content) * hours[Math.min(done, hours.length - 1)]), left: perWeek - done, perWeek };
 }
 
 // What hiring one costs: goldPerLevel for each of its levels.

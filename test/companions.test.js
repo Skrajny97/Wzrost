@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs';
 import { beforeEach, describe, test } from 'node:test';
 
 import {
+  candidateRedraw,
   companionAfterHunt,
   companionCombatant,
   companionGift,
@@ -21,6 +22,7 @@ import {
   companionXp,
   createRng,
   drawCandidates,
+  explorationGold,
   generateItem,
   hireCost,
   partyStayText,
@@ -178,6 +180,38 @@ describe('companions in the engine', () => {
   });
 });
 
+describe('new candidates for gold (890 B)', () => {
+  const owner = { character: newCharacter('warrior', { level: 50 }), seed: 'nowi' };
+  const now = Date.UTC(2026, 10, 12, 12);
+
+  test('each paid draw gives four others, with ids of its own; the week\'s first draw is as before', () => {
+    const first = drawCandidates(owner, now, content);
+    const second = drawCandidates(owner, now, content, [], 1);
+    assert.deepEqual(drawCandidates(owner, now, content, [], 0), first);
+    assert.equal(second.length, content.settlement.companions.candidates);
+    const week = questPeriod('weekly', now, content).key;
+    assert.deepEqual(
+      second.map((one) => one.id),
+      second.map((_, index) => `${week}:1:${index}`),
+    );
+    assert.notDeepEqual(
+      second.map((one) => [one.name, one.classId]),
+      first.map((one) => [one.name, one.classId]),
+    );
+    // A companion hired from the first draw hides no one of the second.
+    assert.equal(drawCandidates(owner, now, content, [first[0].id], 1).length, second.length);
+  });
+
+  test('three draws a week, the gold of 2, 4 and 6 hours of exploring at the character\'s level', () => {
+    const hour = explorationGold(50, content);
+    assert.deepEqual(candidateRedraw(50, 0, content), { gold: Math.round(hour * 2), left: 3, perWeek: 3 });
+    assert.deepEqual(candidateRedraw(50, 1, content), { gold: Math.round(hour * 4), left: 2, perWeek: 3 });
+    assert.deepEqual(candidateRedraw(50, 2, content), { gold: Math.round(hour * 6), left: 1, perWeek: 3 });
+    assert.equal(candidateRedraw(50, 3, content), null);
+    assert.ok(candidateRedraw(100, 0, content).gold > candidateRedraw(50, 0, content).gold);
+  });
+});
+
 describe('a companion\'s gift of the week', () => {
   test('its profession brings goods the character knows, the same all week, once a week', () => {
     const kinds = Object.fromEntries(tuning.professions.map((profession) => [profession.id, profession.goods]));
@@ -216,6 +250,40 @@ describe('companions through the API', () => {
   const settlement = async () => (await call('GET', '/api/settlement', { cookie })).data.settlement;
   const relation = (points) =>
     (async () => (await db()).prepare('UPDATE characters SET settlement = ?').bind(JSON.stringify({ relations: { [content.settlement.tavern.resident]: points } })).run())();
+
+  test('new candidates for gold, three times a week, each dearer; the companions hired stay (890 B)', async () => {
+    const before = await settlement();
+    const [first] = before.companions.candidates;
+    assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: first.id } })).status, 200);
+    const view = (await settlement()).companions;
+    assert.deepEqual([view.redraw.left, view.redraw.perWeek], [3, 3]);
+    const gold = async () => (await call('GET', '/api/character', { cookie })).data.character.gold;
+    const prices = [];
+    for (let draw = 1; draw <= 3; draw += 1) {
+      const had = await gold();
+      const price = (await settlement()).companions.redraw.gold;
+      const answer = await call('POST', '/api/settlement/redraw', { cookie, body: {} });
+      assert.equal(answer.status, 200, JSON.stringify(answer.data));
+      prices.push(price);
+      assert.equal(await gold(), had - price);
+      const now = answer.data.settlement.companions;
+      assert.deepEqual(
+        [now.hired.length, now.candidates.length, now.candidates.every((one) => one.id.split(':')[1] === String(draw))],
+        [draw === 1 ? 1 : 2, content.settlement.companions.candidates, true],
+      );
+      // A candidate of the new four can be hired.
+      if (draw === 1) assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: now.candidates[0].id } })).status, 200);
+    }
+    assert.ok(prices[0] < prices[1] && prices[1] < prices[2]);
+    assert.deepEqual((await settlement()).companions.redraw, { gold: null, left: 0, perWeek: 3 });
+    assert.equal((await call('POST', '/api/settlement/redraw', { cookie, body: {} })).data.error.code, 'no_redraws');
+  });
+
+  test('new candidates ask for their gold', async () => {
+    await (await db()).prepare('UPDATE characters SET gold = 10').run();
+    const answer = await call('POST', '/api/settlement/redraw', { cookie, body: {} });
+    assert.equal(answer.data.error.code, 'not_enough_gold');
+  });
 
   test('each companion needs a bed in the camp\'s Kwatery, a level of them for each (104 A)', async () => {
     await quarters(0);
