@@ -1,0 +1,14 @@
+{
+  "id": "frame",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art, an empty rectangular playing card frame in portrait orientation seen straight from the front, a thick border of dark carved wood with small carved leaf and knot patterns, a thin plain light grey steel rim along the inner and the outer edge of the wooden border, a small round steel stud in each of the four corners, the whole inside of the frame is one empty flat black window, no creature, no picture inside, no text, no numbers, symmetrical, the frame fills the whole image",
+  "style": "src/client/art/salon/fortune-wheel.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}

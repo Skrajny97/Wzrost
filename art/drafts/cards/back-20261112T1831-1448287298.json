@@ -1,0 +1,14 @@
+{
+  "id": "back",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art, the back of a playing card in portrait orientation seen straight from the front, dark brown tree bark texture filling the whole card, a thin gold border line with small gold filigree curls in the four corners, in the centre one glowing pale ice-blue faceted crystal with soft blue light around it, symmetrical, no text, no numbers, the card fills the whole image",
+  "style": "src/client/art/labyrinth/core.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
