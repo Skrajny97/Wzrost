@@ -16,6 +16,7 @@
 /** @typedef {import('./crafting.js').Counts} Counts */
 /** @typedef {import('./towers.js').Encounter} Encounter */
 /** @typedef {import('./pvp-arena.js').Fighter} Fighter */
+/** @typedef {import('./hunt.js').Hunt} Hunt */
 /** @typedef {import('./items.js').Item} Item */
 /** @typedef {import('./fortress.js').Levels} Levels */
 /** @typedef {import('./mining.js').Mineral} Mineral */
