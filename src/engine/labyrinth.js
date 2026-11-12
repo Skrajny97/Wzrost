@@ -313,8 +313,8 @@ export function blessingEffects(ids, content) {
       }
       const boon = /** @type {keyof Boons} */ (key);
       if (!(boon in character)) continue;
-      if (blessing.who !== 'companions') character[boon] += value;
-      if (blessing.who !== 'character') companions[boon] += value;
+      if (blessing.target !== 'companions') character[boon] += value;
+      if (blessing.target !== 'character') companions[boon] += value;
     }
   }
   return { character, companions, mend };

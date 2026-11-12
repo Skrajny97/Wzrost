@@ -63,6 +63,8 @@ const SCREENS = [
   '#/walka/windfalls/windfalls-edge',
   '#/portale',
   '#/wieze',
+  '#/walka/labirynt',
+  '#/postac/rdzen',
   '#/profesje',
   '#/oboz',
   '#/oboz/craft-table',
@@ -104,6 +106,8 @@ const TRANSLATED = new Set([
   '#/walka/windfalls/windfalls-edge',
   '#/portale',
   '#/wieze',
+  '#/walka/labirynt',
+  '#/postac/rdzen',
   '#/profesje',
   '#/oboz',
   '#/oboz/craft-table',
@@ -276,6 +280,27 @@ async function main() {
   // The Portale high up, and one entry for the Dziennik's row.
   sql(`UPDATE characters SET portals = '${JSON.stringify({ best: { gold: 100, wood: 99, materials: 95, parts: 12 } })}' WHERE name = '${name}'`);
   if ((await api('POST', '/api/portals/enter', { portal: 'materials' })) >= 400) throw new Error('Nie udało się wejść do Portalu.');
+  // The Labirynt Systemu on its second level, with blessings taken (one
+  // twice) and the choice of three waiting over the map, and the Rdzeń open
+  // with big numbers: a large, a medium and a small Artefakt absorbed, a gem,
+  // and the Skrytka with more (where LABYRINTH is on: npm run dev).
+  const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Warsaw' }).format(new Date());
+  const labyrinth = {
+    day, level: 2, row: 1, room: 0, path: [0, 0], cleared: 1, over: null, team: [], hp: { me: 0.62 }, charLevel: 146,
+    blessings: ['might', 'might', 'common-cause', 'blood-tithe', 'first-blood'],
+    pending: { kind: 'blessing', from: 'elite', choices: ['shoulder', 'breath', 'keen-eye'] },
+    gains: { xp: 9876543, gold: 987654, shards: 12345, artifacts: 3 }, seed: 'layout',
+  };
+  const artifact = (element, size, rarity, traits, ability, upgrade) => ({ element, size, rarity, traits, ability, upgrade, spent: 0 });
+  const absorbed = [
+    { ...artifact('lightning', 'large', 'divine', ['speed', 'crit'], 'rally', 10), id: 900001 },
+    { ...artifact('nature', 'medium', 'mythic', ['hp', 'vitality'], null, 7), id: 900002 },
+    { ...artifact('fire', 'small', 'legendary', ['main-stat'], null, 3), id: 900003 },
+  ];
+  sql(`UPDATE characters SET labyrinth = '${JSON.stringify(labyrinth)}', core = '${JSON.stringify({ open: true, shards: 123456, gem: 'diamond', absorbed })}' WHERE name = '${name}'`);
+  for (const one of [artifact('sacred', 'large', 'epic', ['mana', 'wisdom'], 'opening-crit', 4), artifact('poison', 'medium', 'rare', ['lifesteal', 'perception'], null, 0), artifact('water', 'small', 'common', ['recovery'], null, 0)]) {
+    sql(`INSERT INTO core_artifacts (character_id, data, created_at) SELECT id, '${JSON.stringify(one)}', 1 FROM characters WHERE name = '${name}'`);
+  }
   // Punkty Sławy of this week in six digits (fame.js), their row made by a
   // sweep in the week the server counts.
   if ((await api('POST', '/api/portals/sweep', { portal: 'gold' })) >= 400) throw new Error('Nie udało się wyczyścić Portalu.');

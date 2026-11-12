@@ -29,6 +29,8 @@ import { mountCharacter } from './screens/character.js';
 import { mountCombat } from './screens/combat.js';
 import { mountTowers } from './screens/towers.js';
 import { mountPortals } from './screens/portals.js';
+import { mountLabyrinth } from './screens/labyrinth.js';
+import { mountCore } from './screens/core.js';
 import { mountCommunity } from './screens/community.js';
 import { mountChatScreen } from './screens/chat.js';
 import { mountGuildPage } from './screens/guild.js';
@@ -39,7 +41,6 @@ import { enableHold } from './hold.js';
 import { renderCreate } from './screens/create.js';
 import { renderSelect } from './screens/select.js';
 import { mountJournal } from './screens/journal.js';
-import { lockedScreen } from './screens/locked.js';
 import { mountSettlement } from './screens/settlement.js';
 import { mountShop } from './screens/shop.js';
 import { takePaymentReturn } from './screens/shop-points.js';
@@ -77,6 +78,8 @@ const views = {
 // the tab in the computer's menu (layout.js, 507 A); the Społeczność tells
 // its own, as its tabs change (setPart).
 const ROUTES = [
+  // The Labirynt Systemu (screens/labyrinth.js), before a region's address.
+  { pattern: /^#\/walka\/labirynt$/, nav: 'main', tab: 'walka', part: () => 'labyrinth', mount: mountLabyrinth },
   // Walka, a region, an inner region of it.
   { pattern: /^#\/walka(?:\/(?<region>[a-z0-9-]+)(?:\/(?<area>[a-z0-9-]+))?)?$/, nav: 'main', tab: 'walka', part: () => 'explore', mount: mountCombat },
   { pattern: /^#\/wieze$/, nav: 'main', tab: 'walka', part: () => 'towers', mount: mountTowers },
@@ -85,7 +88,8 @@ const ROUTES = [
   { pattern: /^#\/postac\/statystyki$/, nav: 'character', tab: 'stats', mount: mountStats },
   { pattern: /^#\/postac\/umiejetnosci$/, nav: 'character', tab: 'skills', music: 'skills', mount: mountSkills },
   { pattern: /^#\/postac\/ewolucja$/, nav: 'character', tab: 'evolution', music: 'skills', mount: mountEvolution },
-  { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: lockedScreen('core', 'Rdzeń') },
+  // The Rdzeń (screens/core.js), its locked words until it opens.
+  { pattern: /^#\/postac\/rdzen$/, nav: 'character', tab: 'core', mount: mountCore },
   // Profesje, or one profession's screen (Zielarstwo).
   { pattern: /^#\/profesje(?:\/(?<profession>[a-z]+))?$/, nav: 'main', tab: 'profesje', part: ({ profession }) => profession, music: 'professions', mount: mountProfessions },
   // The Osada's board, or one of its places, the Karczma at one of its

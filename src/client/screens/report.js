@@ -148,6 +148,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       // of the trip, no length.
       report.partyEvent
         ? heading(report.partyEvent.title, `${report.areaName ?? report.regionName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)
+        : // A room of the Labirynt Systemu (labyrinth.js): its level and room.
+      report.labyrinth
+        ? heading(t('Labirynt Systemu'), t('{level} · {room} · {date}', { level: report.labyrinth.levelName, room: report.labyrinth.typeName, date: dateTimeFormat.format(new Date(report.endsAt)) }))
         : // An entry to a Wieża (towers.js): its tower and floor, no length.
       report.tower
         ? heading(report.tower.name, t('Piętro {floor} · {area} · {date}', { floor: report.tower.floor, area: report.areaName, date: dateTimeFormat.format(new Date(report.endsAt)) }))
@@ -174,6 +177,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           onClick: (event) => withButton(event.currentTarget, () => fightPortal(report.portal.id, navigate)),
         }),
       report.portal?.companions?.length > 0 && h('p', { class: 'report-party', text: t('Z postacią: {names}.', { names: report.portal.companions.join(', ') }) }),
+      report.labyrinth?.companions?.length > 0 && h('p', { class: 'report-party', text: t('Z postacią: {names}.', { names: report.labyrinth.companions.join(', ') }) }),
       report.tower &&
         (report.tower.partners.length > 0 || report.tower.companions.length > 0) &&
         h('p', { class: 'report-party', text: t('Z postacią: {names}.', { names: [...report.tower.partners, ...report.tower.companions].join(', ') }) }),
@@ -287,7 +291,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       ),
       h('p', {
         class: 'fight-meta',
-        text: `${report.tower ? t('Piętro {floor}', { floor: report.tower.floor }) : report.hall ? t('{number}. walka', { number: fight.index + 1 }) : formatOffset(fight.t)} · ${enemies}`,
+        text: `${report.labyrinth ? report.labyrinth.typeName : report.tower ? t('Piętro {floor}', { floor: report.tower.floor }) : report.hall ? t('{number}. walka', { number: fight.index + 1 }) : formatOffset(fight.t)} · ${enemies}`,
       }),
       h('p', { class: `fight-outcome fight-outcome--${String(fight.won)}`, text: outcome }),
     );
@@ -320,7 +324,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     // An exploration's fights play on its land's board (data/regions.json,
     // fightBoard); a tower's, a portal's and the Sala prób's keep the plain
     // ground of the playback.
-    const board = report.tower || report.portal || report.hall ? null : (state.content.regions.find((region) => region.id === report.regionId)?.fightBoard ?? null);
+    const board = report.tower || report.portal || report.hall || report.labyrinth ? null : (state.content.regions.find((region) => region.id === report.regionId)?.fightBoard ?? null);
     arena = createArena(data, { autoplay: autoplay ?? (firstPlayback ? 'visible' : 'now'), board });
     firstPlayback = false;
     // The narrator lights the fight playing here together with the tabs.
@@ -398,7 +402,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       // A Wieża's floor is one fight, and the tower keeps no HP (towers.js).
       // A party event has a fight only when its event had one, and HP only
       // of a character at home (party-events.js).
-      !report.tower && !below && !(report.partyEvent && !summary.fights) && [t('Walki'), formatNumber(summary.fights)],
+      !report.tower && !report.labyrinth && !below && !(report.partyEvent && !summary.fights) && [t('Walki'), formatNumber(summary.fights)],
       !report.tower && !below && summary.hpEnd !== null && ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
     ].filter(Boolean);
     const best = summary.bestFind;
@@ -600,6 +604,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     fill(
       actionBox,
       report.tower && h('a', { class: 'button button--system', href: '#/wieze', text: t('Wróć do Wież') }),
+      report.labyrinth && h('a', { class: 'button button--system', href: '#/walka/labirynt', text: t('Wróć do Labiryntu') }),
       report.portal && h('a', { class: 'button button--system', href: '#/portale', text: t('Wróć do Portali') }),
       report.hall && h('a', { class: 'button button--system', href: '#/osada/trial-hall', text: t('Wróć do Sali prób') }),
       again,

@@ -2016,7 +2016,10 @@ export function mountProfessions(container, { params, navigate }) {
   // gem (those the System still hides are shadows), what the gem gives,
   // the time, and the start; a gem already in the item is lost.
   function setForm(character, jewelcrafting) {
-    const worn = state.content.slots.map((slot) => character.equipment[slot.id]).filter(Boolean);
+    // The Rdzeń takes a gem too, once it is open (863 A, screens/core.js).
+    const coreSlot = state.content.slots.find((slot) => slot.id === 'core');
+    const core = character.core?.open ? { id: 'core', core: true, name: coreSlot?.name ?? t('Rdzeń'), slotName: t('Artefakty Rdzenia'), gem: character.core.gem } : null;
+    const worn = [...state.content.slots.map((slot) => character.equipment[slot.id]).filter(Boolean), ...(core ? [core] : [])];
     const head = h('h2', { class: 'section-title', id: 'set-title', text: t('Oprawianie') });
     const card = (...children) => h('section', { class: 'card gather-card', 'aria-labelledby': 'set-title', 'data-guide': 'jewel-setting' }, head, children);
     if (worn.length === 0) return card(h('p', { class: 'muted', text: t('Załóż przedmiot, żeby oprawić w nim kamień.') }));
@@ -2032,14 +2035,15 @@ export function mountProfessions(container, { params, navigate }) {
       setChoice.gem = gem.id;
       saveChoice(SET_CHOICE, setChoice);
     };
-    const itemArt = (each) => itemSprite(each) ?? icon('ring', { size: 24 });
+    const itemArt = (each) => (each.core ? icon('core', { size: 24 }) : (itemSprite(each) ?? icon('ring', { size: 24 })));
+    const titleOf = (each) => (each.core ? each.name : itemTitle(each));
     const gemNow = (each) => (each.gem ? `${each.gem.name} +${percentText(each.gem.bonus)}` : t('bez kamienia'));
     const gemMeta = (each) => `+${percentText(each.bonus)} · ${t('w plecaku: {count}', { count: formatNumber(each.have) })} · ${formatMinutes(each.minutes)}`;
 
     function show() {
       items.show(
-        { art: itemArt(item), name: itemTitle(item), meta: `${item.slotName} · ${gemNow(item)}` },
-        worn.map((each) => ({ id: each.id, art: itemArt(each), name: itemTitle(each), meta: `${each.slotName} · ${gemNow(each)}`, on: each.id === item.id })),
+        { art: itemArt(item), name: titleOf(item), meta: `${item.slotName} · ${gemNow(item)}` },
+        worn.map((each) => ({ id: each.id, art: itemArt(each), name: titleOf(each), meta: `${each.slotName} · ${gemNow(each)}`, on: each.id === item.id })),
         [],
         (id) => {
           item = worn.find((each) => each.id === id);
@@ -2068,7 +2072,7 @@ export function mountProfessions(container, { params, navigate }) {
           if (item.gem) {
             const sure = await confirmAction({
               title: t('Oprawić nowy kamień?'),
-              text: t('{old} w przedmiocie {item} rozpadnie się, a jego miejsce zajmie {gem}.', { old: item.gem.name, item: itemTitle(item), gem: gem.name }),
+              text: t('{old} w przedmiocie {item} rozpadnie się, a jego miejsce zajmie {gem}.', { old: item.gem.name, item: titleOf(item), gem: gem.name }),
               confirmLabel: t('Oprawiaj'),
               danger: true,
             });
@@ -2083,10 +2087,15 @@ export function mountProfessions(container, { params, navigate }) {
       });
       fill(
         details,
-        h('p', { class: 'herb-estimate', text: t('Wszystkie liczby przedmiotu wzrosną o {bonus}, każda co najmniej o 1.', { bonus: percentText(gem.bonus) }) }),
+        h('p', {
+          class: 'herb-estimate',
+          text: item.core
+            ? t('Wszystkie liczby wchłoniętych Artefaktów wzrosną o {bonus}.', { bonus: percentText(gem.bonus) })
+            : t('Wszystkie liczby przedmiotu wzrosną o {bonus}, każda co najmniej o 1.', { bonus: percentText(gem.bonus) }),
+        }),
         h('p', { class: 'herb-estimate', text: t('Czas oprawiania: {time}. Zużyjesz: 1 × {gem}.', { time: formatMinutes(gem.minutes), gem: gem.name }) }),
         item.gem && !same && h('p', { class: 'herb-room herb-room--full', text: t('Nowy kamień zniszczy obecny: {gem}.', { gem: gemNow(item) }) }),
-        same && h('p', { class: 'herb-room', text: t('{gem} już tkwi w tym przedmiocie.', { gem: gem.name }) }),
+        same && h('p', { class: 'herb-room', text: item.core ? t('{gem} już tkwi w Rdzeniu.', { gem: gem.name }) : t('{gem} już tkwi w tym przedmiocie.', { gem: gem.name }) }),
         gem.have === 0 && h('p', { class: 'herb-room herb-room--full', text: t('Brakuje kamienia: {gem}. Wydobędziesz go w Górnictwie.', { gem: gem.name }) }),
         gem.have === 0 && h('a', { class: 'button button--world', href: HASHES.mining, text: t('Do Górnictwa') }),
         start,

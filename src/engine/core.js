@@ -200,7 +200,9 @@ export function traitValue(artifact, traitId, gemBonus, content) {
 }
 
 // The number of a large Artefakt's ability (a share of the maximum HP),
-// or 0 for one without a number.
+// or 0 for one without a number: as a trait's, but with the square root
+// of the rarity's budget, so a boski one at +10 with a diamond heals or
+// shields about a quarter of the HP, not a half.
 /**
  * @param {Artifact} artifact
  * @param {number} gemBonus
@@ -209,7 +211,9 @@ export function traitValue(artifact, traitId, gemBonus, content) {
  */
 export function abilityValue(artifact, gemBonus, content) {
   const ability = artifact.ability ? abilityOf(artifact.ability, content) : null;
-  return ability?.value ? ability.value * artifactFactor(artifact, gemBonus, content) : 0;
+  if (!ability?.value) return 0;
+  const budget = content.raritiesById[artifact.rarity]?.budget ?? 1;
+  return (ability.value * artifactFactor(artifact, gemBonus, content) * Math.sqrt(budget)) / budget;
 }
 
 // The resonance of the absorbed Artefakty (861 A): for every element with
@@ -460,10 +464,13 @@ export function coreEffectLines(effects, content) {
   if (!effects) return [];
   /** @type {string[]} */
   const lines = [];
+  // A stat with no trait of its own is the class's main one: its trait's
+  // words with the stat's name.
+  const main = rules(content).traits.find((/** @type {Record<string, any>} */ one) => one.kind === 'stat' && one.stat === 'main');
   for (const [stat, value] of Object.entries(effects.stats)) {
     const trait = rules(content).traits.find((/** @type {Record<string, any>} */ one) => one.kind === 'stat' && one.stat === stat);
     const name = content.statsById[stat]?.name ?? stat;
-    lines.push(trait ? traitText(trait.id, value, content) : `+${percent(value, content)}% ${name}`);
+    lines.push(trait ? traitText(trait.id, value, content) : main ? `${traitText(main.id, value, content)} (${name})` : `+${percent(value, content)}% ${name}`);
   }
   for (const kind of BONUS_KINDS) {
     const value = effects[kind];

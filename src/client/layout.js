@@ -474,10 +474,13 @@ const PARTS = {
   walka: () => {
     const portals = unlockInfo('portals');
     const towers = unlockInfo('towers');
+    // The Labirynt Systemu, where the game has it.
+    const labyrinth = unlockInfo('labyrinth');
     return [
       { id: 'explore', label: t('Eksploracja'), icon: 'beast', href: '#/walka', ready: tabTime('walka').ready, readyText: t('raport czeka') },
       portals && { id: 'portals', label: t('Portale'), icon: 'coin', href: '#/portale', lock: !isUnlocked('portals') && t('poz. {level}', { level: portals.level }) },
       towers && { id: 'towers', label: t('Wieże'), icon: 'evolution', href: '#/wieze', lock: !isUnlocked('towers') && t('poz. {level}', { level: towers.level }) },
+      labyrinth && { id: 'labyrinth', label: t('Labirynt'), icon: 'core', href: '#/walka/labirynt', lock: !isUnlocked('labyrinth') && t('poz. {level}', { level: labyrinth.level }) },
     ];
   },
   // The professions as their squares on the tab (screens/professions.js),

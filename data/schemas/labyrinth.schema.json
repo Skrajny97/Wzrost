@@ -105,11 +105,11 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "name", "who", "effect", "text"],
+        "required": ["id", "name", "target", "effect", "text"],
         "properties": {
           "id": { "$ref": "#/definitions/id" },
           "name": { "type": "string", "minLength": 1 },
-          "who": { "type": "string", "enum": ["character", "companions", "party"] },
+          "target": { "type": "string", "enum": ["character", "companions", "party"], "description": "Komu służy: postaci, towarzyszom albo wszystkim walczącym." },
           "effect": {
             "type": "object",
             "minProperties": 1,

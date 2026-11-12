@@ -44,12 +44,16 @@ export function combatModes(active, navigate) {
       locked ? [label, ' ', lockLabel(t('poz. {level}', { level: info.level }))] : label,
     );
   };
+  // The Labirynt Systemu, where the game has it (its unlock in the content):
+  // four parts, two by two on a phone (styles.css).
+  const labyrinth = Boolean(unlockInfo('labyrinth'));
   return h(
     'div',
-    { class: 'segmented segmented--three', role: 'group', 'aria-label': t('Rodzaj walki') },
+    { class: `segmented ${labyrinth ? 'segmented--four combat-modes--four' : 'segmented--three'}`, role: 'group', 'aria-label': t('Rodzaj walki') },
     option(t('Eksploracja'), '#/walka', active === 'explore', null),
     option(t('Portale'), '#/portale', active === 'portals', 'portals'),
     option(t('Wieże'), '#/wieze', active === 'towers', 'towers'),
+    labyrinth && option(t('Labirynt'), '#/walka/labirynt', active === 'labyrinth', 'labyrinth'),
   );
 }
 

@@ -7,7 +7,7 @@
     "hell": { "name": "Hellish" }
   },
   "rooms": {
-    "fight": { "name": "Fight", "text": "Creatures of the Labyrinth. Win to gain XP and gold." },
+    "fight": { "name": "Combat", "text": "Creatures of the Labyrinth. Win to gain XP and gold." },
     "elite": { "name": "Elite", "text": "An elite of the Labyrinth. Win to gain Core Shards, gold and a choice of blessings." },
     "treasure": { "name": "Treasure", "text": "A System chest, no fight: Core Shards and gold." },
     "spring": { "name": "Spring", "text": "The spring heals every fighter by {heal}% of max HP." },

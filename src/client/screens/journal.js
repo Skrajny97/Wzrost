@@ -5,7 +5,7 @@
 import { fill, h, icon } from '../dom.js';
 import { dateTimeFormat, formatMinutes, formatNumber, timeFormat } from '../format.js';
 import { language, t } from '../i18n.js';
-import { call, serverNow } from '../state.js';
+import { call, serverNow, unlockInfo } from '../state.js';
 import { systemPanel } from '../ui.js';
 import { workSummaryText } from './professions.js';
 
@@ -22,10 +22,13 @@ const FILTERS = [
   ['hunts', 'Wyprawy'],
   ['portals', 'Portale'],
   ['towers', 'Wieże'],
+  ['labyrinth', 'Labirynt'],
   ['work', 'Profesje'],
 ];
+// The Labirynt's filter only where the game has it (its unlock in the content).
+const shownFilters = () => FILTERS.filter(([id]) => id !== 'labyrinth' || unlockInfo('labyrinth'));
 const FILTER_KEY = 'insight.journalFilter';
-const kindOf = (report) => (report.tower ? 'towers' : report.portal ? 'portals' : WORK_CHIPS[report.kind] ? 'work' : 'hunts');
+const kindOf = (report) => (report.labyrinth ? 'labyrinth' : report.tower ? 'towers' : report.portal ? 'portals' : WORK_CHIPS[report.kind] ? 'work' : 'hunts');
 const dayKey = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' });
 // "6 listopada", or "6 November" in English, made once for each language.
 const dayNames = new Map();
@@ -86,7 +89,7 @@ export function mountJournal(container, { params }) {
     const filters = h(
       'div',
       { class: 'journal-filters', role: 'group', 'aria-label': t('Rodzaj raportów') },
-      FILTERS.map(([id, label]) =>
+      shownFilters().map(([id, label]) =>
         h('button', {
           type: 'button',
           class: 'journal-filter',
@@ -134,6 +137,8 @@ export function mountJournal(container, { params }) {
                 // A Drużyna's party event (party-events.js) by its title.
                 text: report.partyEvent
                   ? report.partyEvent.title
+                  : report.labyrinth
+                  ? t('Labirynt · {level} · {room}', { level: report.labyrinth.levelName, room: report.labyrinth.typeName })
                   : report.tower
                   ? t('{tower} · piętro {floor}', { tower: report.tower.name, floor: report.tower.floor })
                   : report.portal
@@ -156,11 +161,13 @@ export function mountJournal(container, { params }) {
                       class: `chip chip--${report.result}`,
                       // A floor of a Wieża and a portal's stage are won or
                       // lost, not explored.
-                      text: report.tower || report.portal
+                      text: report.tower || report.portal || report.labyrinth
                         ? report.result === 'success'
                           ? report.portal
                             ? t('pokonany')
-                            : t('zdobyte')
+                            : report.labyrinth
+                              ? t('zdobyta')
+                              : t('zdobyte')
                           : t('porażka')
                         : report.hall
                           ? report.result === 'success'
