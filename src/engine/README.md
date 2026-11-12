@@ -39,6 +39,7 @@ Silnik gry to deterministyczne, czyste funkcje: ten sam stan, czas i ziarno loso
 | `guild-wars.js` | Wojny gildii: tydzień wojny z bitwami o 20:00, drużyny z pełnych piątek członków i rezerwa na wolnych miejscach, pary drużyn w bitwach wieczoru (795 B), losowanie rywali o podobnej liczbie członków, bitwa 5 na 5 jak na Arenie, wynik wojny, nagroda za wygraną bitwę, skrzynia wojenna i lustrzana gildia wersji testowej |
 | `cosmetics.js` | Sklep Systemu: ramki, tła i wygląd wierzchowca za Punkty Systemu, co postać ma i nosi, oraz kolor imienia z ramki |
 | `gifts.js`, `gift-codes.js` | Upominek między znajomymi i kody podarunkowe |
+| `account-chest.js` | towary Skrzyni Konta: ich rodzaje, które sztuki wyjmuje postać (najpierw swoje, potem innych postaci) i ile z nich Encyklopedia liczy jak sztuki z wymiany |
 | `names.js`, `text.js`, `mail.js`, `notifications.js` | filtr imion postaci, warianty tekstów raportu i własne teksty silnika w języku treści (`word()`: angielski z `data/en/strings.json`, który serwer daje razem z treścią), treść e-maila i powiadomienia na telefon |
 | `mentions.js` | oznaczanie na czacie: miejsca, w których „@” może zaczynać imię postaci, i wybór najdłuższego imienia, które ma jakaś postać |
 | `weeks.js` | tygodnie roku: numer tygodnia ISO według czasu polskiego (53. bierze wpis 52.), skutki tygodnia jako mnożniki dla walk, profesji, obozu, odpoczynku, Kowadła i reputacji, słowa skutków i linijka raportu |

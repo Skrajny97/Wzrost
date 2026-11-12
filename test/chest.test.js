@@ -32,7 +32,13 @@ describe('Skrzynia Konta', () => {
   const { call, db, signUp } = useServer();
   let cookie;
 
-  const create = (name) => call('POST', '/api/character', { cookie, body: { name, classId: 'warrior', appearance: 'female' } });
+  // At the level the chest opens at (its padlock, 843; chest-goods.test.js),
+  // its class level still the first.
+  const create = async (name) => {
+    const made = await call('POST', '/api/character', { cookie, body: { name, classId: 'warrior', appearance: 'female' } });
+    await (await db()).prepare('UPDATE characters SET level = ? WHERE name = ?').bind(content.balance.account.chestLevel, name).run();
+    return made;
+  };
   const amulet = (level) => ({ base: 'amulet', slot: 'amulet', level, rarity: 'common', affixes: [], implicit: { stat: 'will', value: 2 } });
   async function inBag(name, item) {
     const database = await db();
