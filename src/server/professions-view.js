@@ -335,7 +335,6 @@ function jewelView(level, row) {
   return {
     professionId: jewelcrafting.profession,
     place: jewelcrafting.place,
-    maxCount: jewelcrafting.maxCount,
     about: jewelcrafting.about,
     slots: Object.keys(jewelcrafting.ores).map((slotId) => ({
       id: slotId,
@@ -406,7 +405,6 @@ function workshopView(level, row) {
   return {
     professionId: workshop.profession,
     place: workshop.place,
-    maxCount: workshop.maxCount,
     upgrades: craftUpgrades(level, content()),
     // The chances of an item one or two rarities above the ordered one.
     luck: craftLuck(level, content(), perkOf(row, 'workshopLuck')),

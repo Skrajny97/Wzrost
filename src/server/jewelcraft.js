@@ -1,5 +1,7 @@
 // Jubilerstwo in the Systemowa Szlifiernia (src/engine/jewelcraft.js): an
-// order of up to maxCount jewels of one pattern and gem takes the gems and
+// order of as many jewels of one pattern and gem as the gems, the ore and
+// the bag allow, with no cap on their number or time (as in the Warsztat,
+// the author, 12.11.2026), takes the gems and
 // the ore at the start, and its report brings the jewels made into the bag,
 // the gems of the failed ones lost and their ore back. Called back early,
 // the character brings the jewels done and gets back all the rest. A setting
@@ -50,9 +52,8 @@ function jewelOrder(player, level, body) {
   if (!base || !jewelcrafting.ores[base.slot] || !knowsJewelPattern(base, level, learned, content())) throw new ApiError(400, 'unknown_pattern', 'Tego wzoru jeszcze nie znasz.');
   const gem = typeof body.rarity === 'string' ? gemOf(body.rarity, content()) : undefined;
   if (!gem || gem.level > level) throw new ApiError(400, 'unknown_rarity', 'Tego kamienia jeszcze nie szlifujesz.');
-  if (!Number.isInteger(body.count) || body.count < 1 || body.count > jewelcrafting.maxCount) {
-    throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${jewelcrafting.maxCount} sztuk.`);
-  }
+  // As many as the gems, the ore and the bag allow (checked by the caller).
+  if (!Number.isSafeInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Wybierz co najmniej 1 sztukę.');
   return {
     cost: jewelCost(base, gem.rarity, body.count, content()),
     minutes: jewelOrderMinutes(body.count, gem.rarity, level, content()),

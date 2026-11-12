@@ -1,5 +1,8 @@
 // Rzemieślnictwo in the Systemowy Warsztat (src/engine/workshop.js): an
-// order of up to maxCount items of one pattern and rarity takes its parts
+// order of as many items of one pattern and rarity as the parts, the
+// resources and the bag allow, with no cap on their number or time (the
+// author, 12.11.2026: "Zrób warsztat i szlifiernie zalezna od czesci i
+// materialow po prostu", "bez ograniczeń czasowych"), takes its parts
 // and the camp's resources at the start, and its report brings the items
 // made into the bag, the parts of the failed ones lost and their resources
 // back. Called back early, the character brings the items done and gets
@@ -61,9 +64,8 @@ export async function startCrafting(context) {
     throw new ApiError(403, 'locked', `${crafting.name} odblokujesz na poziomie postaci ${professionUnlockLevel(crafting, content())}.`);
   }
   const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), workshop.profession);
-  if (!Number.isInteger(body.count) || body.count < 1 || body.count > workshop.maxCount) {
-    throw new ApiError(400, 'invalid_count', `Wybierz od 1 do ${workshop.maxCount} sztuk.`);
-  }
+  // As many as the parts, the resources and the bag allow (checked below).
+  if (!Number.isSafeInteger(body.count) || body.count < 1) throw new ApiError(400, 'invalid_count', 'Wybierz co najmniej 1 sztukę.');
   const order = body.scroll === true || body.scroll === 'steady' ? scrollOrder(player.row, level, body.count, body.scroll === 'steady') : itemOrder(player.row, level, body);
   const { cost } = order;
 

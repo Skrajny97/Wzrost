@@ -3092,6 +3092,14 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.81 (12.11.2026): Warsztat i Szlifiernia bez limitu sztuk i czasu
+
+Gracz zapytał, czy w Warsztacie da się zrobić naraz tylko 5 przedmiotów, czyli 2,5 h na 1. poziomie. Autor: „Zrób tak by na 1 poziomie profesji dało się odpalić juz 8h robienia”, „Niech te liczby nie beda zwiazane z iloscia przedmiotow, tylko ilosc przedmiotow zalezna od czasu (i materiałów)”. Potem: „Zrob warsztat i szlifiernie zalezna od czesci i materialow po prostu”, „bez ograniczeń czasowych” i „nie rób limitu 8 godzin”.
+
+1. **Bez limitu sztuk i czasu.** Zlecenie w Warsztacie i w Szlifierni nie ma już limitu 5 sztuk ani limitu czasu. Gracz wybiera tyle sztuk, na ile starczy części, zasobów obozu i miejsca w plecaku (w Szlifierni: kamieni, kruszcu i miejsca w plecaku). Na 1. poziomie Rzemieślnictwa 20 pospolitych mieczy to 10 h pracy. Zwojów do Kowadła też jest tyle, na ile starczy części.
+2. **Plecak.** Miejsce w plecaku zostaje warunkiem, dopóki nie wejdzie przechowalnia Warsztatu. Autor chce, żeby wyroby czekały w przechowalni, skąd można je rozebrać, sprzedać albo włożyć do plecaka. To większa zmiana wyglądu, więc najpierw pójdą makiety na stronę ocen.
+3. W danych znika `maxCount` Warsztatu i Szlifierni (`data/professions.json`). Test: test/workshop.test.js (20 mieczy, 600 minut).
+
 ## Wersja 0.2.80 (12.11.2026): nazwa konta na czacie (832 A, makiety 836)
 
 Autor przyjął 832 A (pomysł gracza: kto pisze raz z jednej, raz z drugiej postaci, ten na czacie wygląda jak dwie różne osoby) i makiety 836.1–836.6.
