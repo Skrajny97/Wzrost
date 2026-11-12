@@ -760,3 +760,16 @@ test("the Duch budowniczego's part of the stone's window works without his bust"
   assert.equal(surplusOf({ ...wood, need: 0 }), null);
   assert.equal(surplusOf({ ...wood, need: 4995 }), null);
 });
+
+test('the Labirynt and the Rdzeń have a picture of every room, Artefakt, the Odłamki, the Rdzeń and both backgrounds', () => {
+  const labyrinth = JSON.parse(readFileSync(new URL('../data/labyrinth.json', import.meta.url), 'utf8'));
+  const size = (file) => {
+    assert.ok(existsSync(file), `${file} is missing`);
+    const png = readFileSync(file);
+    return `${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`;
+  };
+  const icons = [...labyrinth.rooms.map((room) => `room-${room.id}`), ...labyrinth.core.elements.map((element) => `artifact-${element.id}`), 'shards'];
+  for (const name of icons) assert.equal(size(join(CLIENT, 'art', 'labyrinth', `${name}.png`)), '32x32', name);
+  assert.equal(size(join(CLIENT, 'art', 'labyrinth', 'core.png')), '96x96');
+  for (const name of ['labyrinth', 'labyrinth-hell']) assert.equal(size(join(CLIENT, 'art', 'places', `${name}.png`)), '192x96', name);
+});
