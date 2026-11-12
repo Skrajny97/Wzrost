@@ -55,6 +55,7 @@
   "skin-dawn-female": { "not_pixels": { "0": [[30, 24], [33, 21], [33, 22], [33, 23], [34, 21], [34, 22], [34, 23], [41, 38], [40, 39], [41, 39], [42, 40], [43, 40], [42, 41]] } },
   "skin-eclipse-male": { "not_pixels": { "0": [[14, 20]] } },
   "elemental-avatar-male": { "add": ["cf955a", "b18660", "d4b071", "905a3c", "a0764a", "bb8c55", "ba743e", "996438", "ce8944", "7f5535", "eace9a", "8d6c4b", "74604f", "eabea1"], "only": [[33, 10, 43, 25], [48, 45, 58, 54]] },
+  "shadow-lord-female": { "add": ["cebbd1", "d8cfdf", "7e7190"], "only": [[46, 31, 55, 40]] },
   "shadow-lord-male": { "add": ["b2acc2", "b1afbc", "a7a5b0", "c1becb", "cdcbd5", "93909e", "7e7d8b", "6f6d7b"], "only": [[36, 9, 45, 21]] },
   "archdruid-female": { "only": [[33, 17, 42, 33], [41, 47, 55, 58]] }
 }
