@@ -1,0 +1,301 @@
+{
+  "$comment": "Zdarzenia drużynowe (src/engine/party-events.js; odpowiedzi autora 844 A, 845 A, 846 A, 847 B i zdarzenia 848.1–848.5, 12.11.2026). Na końcu wyprawy drużyny zakończonej zgodnie z planem przychodzi najwyżej jedno zdarzenie na całą wyprawę, z tą samą szansą co zwykłe zdarzenia (events.json: chance, fullChanceMinutes, longChance, longChanceMinutes). Wybiera lider wyprawy przy odbiorze swojego raportu, a reszta niczego nie wybiera: wynik wyboru trafia do każdego, kto poszedł, w osobnym raporcie, zaraz po wyborze. Gdy lider nie wybierze przez 12 godzin od końca wyprawy (autoHours), zdarzenie rozstrzyga się samo opcją auto, najostrożniejszą. Każdy dostaje pełny wynik, bez dzielenia, na swoim poziomie. list: zdarzenia, każde z tytułem (title), tekstem (text), tłem (scene: land, czyli kraina wyprawy), opcją auto i opcjami. Opcja może wymagać od lidera mikstury leczenia (leaderPotion: healing; bez niej jest wyszarzona z dopiskiem texts.noPotion), którą lider oddaje przy wyborze. Skutek opcji (outcome) to obiekt albo lista skutków z wagami weight i id, losowana raz dla całej drużyny. Skutek ma kind: none (nic), reward (nagroda), loss (strata: hpLoss to część największego zdrowia, którą traci każdy) albo fight (walka całej drużyny z foes na poziomie lidera wyprawy; ambush: wrogowie ruszają pierwsi; start ze zdaniem o {enemies}; win: złoto gold i materiały materials za wygraną, ze zdaniem text; lose: zdanie po przegranej). Nagroda dla każdego: gold (złoto za balance.rewards.goldPerLevel × poziom postaci, ±25%; w tekście {gold}), xpFoes (PD jak za pokonanie tych przeciwników na poziomie postaci; {xp}), herbsKnown (count ziół znanych w Zielarstwie postaci, {herbs}; bez Zielarstwa złoto gold ze zdaniem goldText), potions (count najlepszych mikstur leczenia do poziomu postaci; {potions}), materials (count materiałów stworów krainy wyprawy; {materials}), minerals (count kamieni: najlepszego do poziomu postaci, a ze step o tyle niższego; {minerals}), reputation (reputacja bractw Osady, po id bractwa) albo boon (premia drużyny na jej następną wyprawę: haste o tyle krótsza, xp i gold o tyle więcej PD i złota dla każdego). leader i others: osobna nagroda lidera i reszty, każda ze swoim tekstem. texts: zdania wokół zdarzenia ({names}, {title}, {leader}, {option}, {hp}).",
+  "autoHours": 12,
+  "texts": {
+    "leaderNote": "Decydujesz za całą drużynę: {names}.",
+    "noPotion": "brak mikstury leczenia",
+    "waiting": "Zdarzenie drużyny: {title}. Wybiera lider ({leader}). Wynik przyjdzie w osobnym raporcie, najpóźniej 12 godzin po końcu wyprawy.",
+    "chosen": "Zdarzenie drużyny: {title}. Wybór lidera ({leader}): {option}. Wynik jest w osobnym raporcie w Dzienniku.",
+    "auto": "Zdarzenie drużyny: {title}. Lider nie wybrał w ciągu 12 godzin, więc drużyna wybrała najostrożniej: {option}. Wynik jest w osobnym raporcie w Dzienniku.",
+    "reportChosen": "Lider wybrał: {option}.",
+    "reportAuto": "Lider nie wybrał w ciągu 12 godzin, więc drużyna wybrała najostrożniej: {option}.",
+    "reportTitle": "Zdarzenie drużyny",
+    "hpLost": "Tracisz {hp} HP.",
+    "busyHp": "Rany zagoją się po drodze, bo postać jest już zajęta czym innym.",
+    "fainted": "Drużyna przegrywa walkę. Każdy uchodzi z życiem, ale z resztką sił.",
+    "draw": "Walka nie ma zwycięzcy. Drużyna wycofuje się bez łupu.",
+    "bagFull": "W plecaku zabrakło miejsca na: {lost}."
+  },
+  "list": [
+    {
+      "id": "rope-bridge",
+      "title": "Wiszący most",
+      "scene": "land",
+      "text": "Ścieżkę przecina przepaść, a nad nią kołysze się stary most linowy. Deski skrzypią, liny są przetarte.",
+      "auto": "one-by-one",
+      "options": [
+        {
+          "id": "one-by-one",
+          "label": "Przechodzimy po jednym",
+          "outcome": {
+            "kind": "reward",
+            "xpFoes": ["bandit-thug", "bandit-knifer"],
+            "text": "Przechodzicie po jednym, powoli, deska po desce. Most trzeszczy, ale wytrzymuje, a każdy krok nad przepaścią czegoś uczy (+{xp} PD)."
+          }
+        },
+        {
+          "id": "run",
+          "label": "Biegiem, razem",
+          "outcome": [
+            {
+              "id": "across",
+              "name": "Biegiem: przebiegają",
+              "weight": 70,
+              "kind": "reward",
+              "boon": {
+                "haste": 0.1
+              },
+              "text": "Przebiegacie razem, zanim most zdąży się rozmyślić. Zyskany czas zostaje w nogach: następna wyprawa drużyny będzie o 10% krótsza."
+            },
+            {
+              "id": "breaks",
+              "name": "Biegiem: most się zarywa",
+              "weight": 30,
+              "kind": "loss",
+              "hpLoss": 0.15,
+              "text": "W połowie mostu pęka lina. Drużyna przelatuje przez ostatnie deski i ląduje na skałach po drugiej stronie. Każdy traci 15% zdrowia."
+            }
+          ]
+        },
+        {
+          "id": "ford",
+          "label": "Szukamy brodu",
+          "outcome": [
+            {
+              "id": "cache",
+              "name": "Bród: skrytka przemytników",
+              "weight": 50,
+              "kind": "reward",
+              "gold": 4,
+              "text": "Bród prowadzi do jaskini przy wodzie, a w niej leży skrytka przemytników. Każdy zgarnia złoto (+{gold} złota)."
+            },
+            {
+              "id": "nowhere",
+              "name": "Bród: donikąd",
+              "weight": 50,
+              "kind": "none",
+              "text": "Szukacie brodu do zmroku, ale rzeka nigdzie nie płycieje. W końcu przechodzicie przez most po jednym, zmęczeni i z pustymi rękami."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "smugglers-camp",
+      "title": "Obóz przemytników",
+      "scene": "land",
+      "text": "O zmroku drużyna widzi ognisko. Przy nim śpią przemytnicy, a obok stoją skrzynie z towarem.",
+      "auto": "skip",
+      "options": [
+        {
+          "id": "attack",
+          "label": "Atakujemy",
+          "outcome": {
+            "kind": "fight",
+            "text": "Drużyna wpada do obozu z bronią w ręku.",
+            "foes": ["smuggler", "smuggler", "bandit-knifer"],
+            "start": "Przemytnicy zrywają się od ogniska: {enemies}.",
+            "win": {
+              "gold": 3,
+              "materials": {
+                "count": 3
+              },
+              "text": "Wśród towaru jest złoto i materiały. Każdy zgarnia swoją część: {materials}."
+            },
+            "lose": {
+              "text": "Przemytnicy bronią swojego towaru zaciekle. Drużyna wycofuje się w las."
+            }
+          }
+        },
+        {
+          "id": "sneak",
+          "label": "Zakradamy się po skrzynię",
+          "outcome": [
+            {
+              "id": "loot",
+              "name": "Skrzynia: mikstury i zioła",
+              "weight": 70,
+              "kind": "reward",
+              "potions": {
+                "count": 2
+              },
+              "herbsKnown": {
+                "count": 3,
+                "gold": 2,
+                "goldText": "Skrzynia otwiera się bez skrzypnięcia. W środku są mikstury i sakiewka. Każdy bierze swoją część: {potions} i złoto (+{gold} złota)."
+              },
+              "text": "Skrzynia otwiera się bez skrzypnięcia. W środku są mikstury i zioła, a każdy bierze swoją część: {potions}, {herbs}."
+            },
+            {
+              "id": "wake",
+              "name": "Skrzynia: przemytnicy się budzą",
+              "weight": 30,
+              "kind": "fight",
+              "ambush": true,
+              "text": "Pod czyimś butem trzaska gałąź. Przemytnicy budzą się z bronią w ręku.",
+              "foes": ["smuggler", "smuggler", "bandit-knifer"],
+              "start": "Przemytnicy atakują pierwsi: {enemies}.",
+              "win": {
+                "gold": 2,
+                "text": "Przemytnicy uciekają w las, a drużyna dzieli się złotem z ich sakiewek."
+              },
+              "lose": {
+                "text": "Przemytnicy przeganiają drużynę od swoich skrzyń."
+              }
+            }
+          ]
+        },
+        {
+          "id": "skip",
+          "label": "Omijamy obóz",
+          "outcome": {
+            "kind": "none",
+            "text": "Drużyna obchodzi obóz szerokim łukiem. Ognisko gaśnie za plecami, a nikt nawet nie zauważył, że tu byliście."
+          }
+        }
+      ]
+    },
+    {
+      "id": "wounded-hunter",
+      "title": "Ranny łowca",
+      "scene": "land",
+      "text": "Pod drzewem siedzi ranny łowca z Bractwa Łowców i prosi o pomoc.",
+      "auto": "escort",
+      "options": [
+        {
+          "id": "escort",
+          "label": "Odprowadzamy go do osady",
+          "outcome": {
+            "kind": "reward",
+            "gold": 2,
+            "reputation": {
+              "hunters": 15
+            },
+            "text": "Drużyna odprowadza łowcę do osady. Bractwo Łowców nie zapomni tej przysługi, a łowca dzieli się z każdym tym, co miał w sakwie (+{gold} złota, +15 reputacji u Bractwa Łowców)."
+          }
+        },
+        {
+          "id": "potion",
+          "label": "Dajemy mu miksturę",
+          "leaderPotion": "healing",
+          "outcome": {
+            "kind": "reward",
+            "reputation": {
+              "hunters": 30
+            },
+            "text": "Lider oddaje łowcy miksturę leczenia. Łowca staje na nogi o własnych siłach i obiecuje opowiedzieć o was w Bractwie (+30 reputacji u Bractwa Łowców)."
+          }
+        },
+        {
+          "id": "leave",
+          "label": "Idziemy dalej",
+          "outcome": {
+            "kind": "none",
+            "text": "Drużyna idzie dalej. Łowca odprowadza was wzrokiem i nic już nie mówi."
+          }
+        }
+      ]
+    },
+    {
+      "id": "campfire-tales",
+      "title": "Ognisko opowieści",
+      "scene": "land",
+      "text": "Na postoju ktoś z drużyny zaczyna opowiadać o dawnych wyprawach i nikt nie chce iść spać.",
+      "auto": "listen",
+      "options": [
+        {
+          "id": "listen",
+          "label": "Słuchamy do świtu",
+          "outcome": {
+            "kind": "reward",
+            "boon": {
+              "xp": 0.1
+            },
+            "text": "Opowieści ciągną się do świtu. Każdy zapamiętuje coś, co przyda się w drodze: na następnej wyprawie drużyny każdy zgarnie o 10% więcej PD."
+          }
+        },
+        {
+          "id": "tell",
+          "label": "Każdy opowiada swoją",
+          "outcome": {
+            "kind": "reward",
+            "boon": {
+              "gold": 0.1
+            },
+            "text": "Każdy dorzuca swoją historię, a najlepsze z nich zdradzają, gdzie warto szukać łupów: na następnej wyprawie drużyny każdy zgarnie o 10% więcej złota."
+          }
+        }
+      ]
+    },
+    {
+      "id": "buried-chest",
+      "title": "Zakopana skrzynia",
+      "scene": "land",
+      "text": "Pod korzeniem starego dębu drużyna wykopuje skrzynię. W środku jest złoto i jeden błyszczący kamień.",
+      "auto": "share",
+      "draft": true,
+      "options": [
+        {
+          "id": "share",
+          "label": "Dzielimy po równo",
+          "outcome": {
+            "kind": "reward",
+            "gold": 4,
+            "text": "Złoto dzielicie po równo, a kamień zostaje w skrzyni dla kolejnych szczęściarzy (+{gold} złota)."
+          }
+        },
+        {
+          "id": "stone",
+          "label": "Kamień dla lidera",
+          "outcome": {
+            "kind": "reward",
+            "leader": {
+              "minerals": {
+                "count": 1
+              },
+              "text": "Kamień trafia do Ciebie: {minerals}. Reszta drużyny dzieli między siebie złoto."
+            },
+            "others": {
+              "gold": 6,
+              "text": "Kamień trafia do lidera, a reszta dzieli złoto między siebie (+{gold} złota)."
+            }
+          }
+        },
+        {
+          "id": "check",
+          "label": "Najpierw sprawdzamy skrzynię",
+          "outcome": [
+            {
+              "id": "plain",
+              "name": "Skrzynia: zwykła",
+              "weight": 60,
+              "kind": "reward",
+              "gold": 4,
+              "minerals": {
+                "count": 1,
+                "step": 1
+              },
+              "text": "To tylko skrzynia. Na dnie, pod złotem, leżą jeszcze inne kamienie, więc każdy dostaje złoto i minerał (+{gold} złota, {minerals})."
+            },
+            {
+              "id": "mimic",
+              "name": "Skrzynia: mimik",
+              "weight": 40,
+              "kind": "fight",
+              "text": "Wieko skrzyni drga, a spod złota łypią żółte ślepia. To mimik!",
+              "foes": ["mimic"],
+              "start": "Mimik rzuca się na drużynę: {enemies}.",
+              "win": {
+                "gold": 8,
+                "text": "Z pokonanego mimika sypie się złoto, które połykał przez lata. Każdy zgarnia swoją garść."
+              },
+              "lose": {
+                "text": "Mimik zatrzaskuje wieko i zakopuje się z powrotem pod dębem."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
