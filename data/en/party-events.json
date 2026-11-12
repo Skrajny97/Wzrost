@@ -13,7 +13,10 @@
     "busyHp": "The wounds will heal on the way, as the character is already busy with something else.",
     "fainted": "The party loses the fight. Everyone gets away alive, but with little strength left.",
     "draw": "The fight has no winner. The party falls back with no loot.",
-    "bagFull": "There was no room in the bag for: {lost}."
+    "bagFull": "There was no room in the bag for: {lost}.",
+    "boonHaste": "Party bonus: this trip was {percent}% shorter.",
+    "boonXp": "Party bonus: +{percent}% XP from this trip.",
+    "boonGold": "Party bonus: +{percent}% gold from this trip."
   },
   "list": {
     "rope-bridge": {
