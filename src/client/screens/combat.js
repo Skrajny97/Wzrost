@@ -358,7 +358,7 @@ export function mountCombat(container, { params, navigate }) {
         h('div', { class: 'page-heading' }, h('h1', { class: 'page-title', tabindex: '-1', text: t('Walka') })),
         modeTabs(),
         testTools(),
-        activity ? activityCard(activity) : regionList(character),
+        activity ? [activityCard(activity), wantedStrip(character)] : regionList(character),
       );
       return;
     }
@@ -557,7 +557,39 @@ export function mountCombat(container, { params, navigate }) {
       first
         ? systemPanel(t('Wiatrołomy to najbezpieczniejsze miejsce na start. Wybierz czas eksploracji i wyrusz.'))
         : unarmed && systemPanel(t('Walczysz gołymi rękami. Załóż broń z plecaka w zakładce Postać, jeśli już ją masz.')),
+      wantedStrip(character),
       state.content.regions.map((candidate) => regionLink(candidate, character)),
+    );
+  }
+
+  // The wanted poster in hand from the Osada's Tablica zleceń (the
+  // character's `wanted`, characters.js): its target and where to seek it,
+  // a tap away from its place, and once the target has fallen, the way to
+  // its bounty on the Tablica (a player's remark, 12.11.2026: „w okienku
+  // wypraw fajnie byłoby widzieć, które zlecenie na elitę obecnie mamy
+  // wybrane z tablicy zleceń”). On its own place's screen (`here`) it
+  // leads nowhere while its target stands.
+  function wantedStrip(character, here = false) {
+    const poster = character.wanted;
+    if (!poster) return null;
+    const land = state.content.regions.find((candidate) => candidate.areas.some((place) => place.id === poster.areaId));
+    const link = poster.beaten ? '#/osada/board/wanted' : !here && land ? `${HOME}/${land.id}/${poster.areaId}` : null;
+    return h(
+      link ? 'a' : 'div',
+      {
+        class: `wanted-strip${poster.beaten ? ' wanted-strip--beaten' : ''}`,
+        ...(link && { href: link }),
+        ...(link && !poster.beaten && { onClick: (event) => openView(event, link) }),
+      },
+      h('span', { class: 'wanted-strip-art' }, monsterSprite(poster.monsterId)),
+      h(
+        'span',
+        { class: 'wanted-strip-text' },
+        h('span', { class: 'wanted-strip-label', text: poster.label }),
+        h('strong', { class: 'wanted-strip-name', text: poster.name }),
+        h('span', { class: 'wanted-strip-note', text: poster.note }),
+      ),
+      link && icon('chevron', { size: 20 }),
     );
   }
 
@@ -627,12 +659,15 @@ export function mountCombat(container, { params, navigate }) {
       );
     }
     const hash = `${regionHash}/${place.id}`;
+    // The place of the wanted poster in hand, while its target stands.
+    const sought = character.wanted && !character.wanted.beaten && character.wanted.areaId === place.id;
     return h(
       'a',
       { class: 'area-tile', href: hash, 'data-guide': `area-${place.id}`, onClick: (event) => openView(event, hash) },
       circle,
       h('span', { class: 'area-tile-name', text: place.name }),
       h('span', { class: 'area-levels', text: t('poz. {min}–{max}', { min: place.minLevel, max: place.maxLevel }) }),
+      sought && h('span', { class: 'area-wanted-tag', text: t('List gończy') }),
     );
   }
 
@@ -1047,6 +1082,7 @@ export function mountCombat(container, { params, navigate }) {
         ),
         h('p', { class: 'region-description', text: area.description }),
         area.dangers?.length > 0 && bestiaryRow(area),
+        character.wanted?.areaId === area.id && wantedStrip(character, true),
         levelNote,
         // From the strong inner regions on (content.js, 438.2 A).
         area.companionsAdvice && h('p', { class: 'region-warning', text: area.companionsAdvice }),

@@ -66,6 +66,9 @@ const TRIAL_HALL_TABS = ['labyrinth', 'trials'];
 // Loteria, the Koło Fortuny and Talia Systemu's "Karty" (cards.js); with
 // none named, casino.js chooses.
 const CASINO_TABS = ['lottery', 'wheel', 'cards'];
+// The Tablica zleceń's tabs (boardTabs), the first without a name in the
+// address.
+const BOARD_TABS = ['orders', 'wanted'];
 // Whether the Sala prób holds the Labirynt: where the game has it on and
 // the character has reached it (data/unlocks.json, 855 A).
 const labyrinthHere = () => Boolean(unlockInfo('labyrinth')) && isUnlocked('labyrinth');
@@ -99,7 +102,9 @@ export function mountSettlement(container, { params = {} } = {}) {
   // The Tablica zleceń's tab: the sołtys's orders first, then Poszukiwani
   // (the author: "Podziel tablicę zleceń na dwie zakładki - zlecenia i
   // poszukiwani bo za dużo scrollowania"), kept while the screen redraws.
-  let boardTab = 'orders';
+  // The address may name it (the Walka screen's strip of a wanted poster
+  // leads to its bounty, #/osada/board/wanted) and follows the tab chosen.
+  let boardTab = BOARD_TABS.includes(params.tab) ? params.tab : BOARD_TABS[0];
   // The Karczma's tab: the mug with the rumor first, then the companions
   // and the mercenaries (the author: "Daj też opcję wynajęcia z pozycji
   // Karczmy i zrób zakładki, bo też trzeba scrollować"), kept while the
@@ -1429,6 +1434,7 @@ export function mountSettlement(container, { params = {} } = {}) {
           'aria-selected': String(boardTab === id),
           onClick: () => {
             boardTab = id;
+            history.replaceState(history.state, '', id === BOARD_TABS[0] ? `${SETTLEMENT}/board` : `${SETTLEMENT}/board/${id}`);
             render();
           },
         },
@@ -1699,7 +1705,16 @@ export function mountSettlement(container, { params = {} } = {}) {
     // An unknown place in the address leads back to the board, and a tab
     // the place does not have to the place.
     if (placeId && !place) return location.replace(SETTLEMENT);
-    const tabs = place?.id === 'tavern' ? TAVERN_TABS : place?.id === 'trial-hall' && labyrinthHere() ? TRIAL_HALL_TABS : place?.id === 'casino' ? CASINO_TABS : [];
+    const tabs =
+      place?.id === 'tavern'
+        ? TAVERN_TABS
+        : place?.id === 'trial-hall' && labyrinthHere()
+          ? TRIAL_HALL_TABS
+          : place?.id === 'casino'
+            ? CASINO_TABS
+            : place?.id === 'board' && data.wanted
+              ? BOARD_TABS
+              : [];
     if (place && params.tab && !tabs.includes(params.tab)) return location.replace(`${SETTLEMENT}/${place.id}`);
     if (place) placeView(place);
     else boardView();

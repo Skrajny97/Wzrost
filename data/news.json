@@ -730,6 +730,11 @@
       "id": "0.2.94",
       "title": "Wersja 0.2.94",
       "body": "- Targowisko: nowy filtr „Tier” przy przedmiotach, obok klasy i rzadkości. Pokazuje przedmioty jednego Tieru i poziom klasy, od którego się je zakłada. Działa też w „Dla mnie”.\n- Karczma: „Nowi kandydaci” za złoto, do 3 razy w tygodniu, każde losowanie droższe od poprzedniego. Zbylut przyprowadza czterech innych kandydatów, a zwerbowani towarzysze zostają."
+    },
+    {
+      "id": "0.2.95",
+      "title": "Wersja 0.2.95",
+      "body": "- Walka: list gończy, który masz w ręku, widać teraz na ekranie Walki: kogo szukasz i gdzie. Stuknięcie w list prowadzi prosto do tego miejsca, a miejsce ma w krainie znaczek „List gończy”. Gdy poszukiwany padnie, list prowadzi po nagrodę do sołtysa.\n- Wdrożenia nowych wersji są szybsze."
     }
   ]
 }

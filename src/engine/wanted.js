@@ -31,6 +31,23 @@ export const wantedOf = (content) => content.settlement?.wanted ?? null;
 /** @param {Content} content */
 const rulesOf = (content) => /** @type {Record<string, any>} */ (wantedOf(content));
 
+// A poster's target's name in `content`'s language: its creature's
+// variant's or its outlaw's, as the data has it, so a poster kept in the
+// Osada, named in the language it was taken in, reads in the page's own;
+// the poster's own name where the data no longer has its target.
+/**
+ * @param {{ kind: string, areaId: string, monsterId: string, name: string }} poster
+ * @param {Content} content
+ * @returns {string}
+ */
+export function wantedName(poster, content) {
+  const named =
+    poster.kind === 'outlaw'
+      ? content.monstersById[poster.monsterId]
+      : rulesOf(content).variants.find((/** @type {{ area: string, monster: string }} */ variant) => variant.area === poster.areaId && variant.monster === poster.monsterId);
+  return named?.name ?? poster.name;
+}
+
 // The bounty for a target in `area`: goldPerLevel × the place's first
 // level, in whole goldSteps, at least one.
 /**

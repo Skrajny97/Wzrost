@@ -15,6 +15,7 @@ import {
   createRng,
   encounterCombatants,
   exploreStrength,
+  gendered,
   generateItem,
   monsterCombatant,
   questPeriod,
@@ -23,6 +24,7 @@ import {
   trophyGrades,
   wantedEncounter,
   wantedGold,
+  wantedName,
   wantedPosters,
   wantedStrength,
   wantedTrophy,
@@ -82,6 +84,14 @@ describe('the wanted posters', () => {
     const early = content.areas.find((area) => !areaUnlocked(area, 47, content));
     const places = [...content.areas.filter((area) => areaUnlocked(area, 47, content)).slice(1 - rules.places).map((area) => area.id), early.id];
     assert.ok(wantedPosters(47, '2026-11-05', 'postać', content, early.id).every((poster) => places.includes(poster.areaId)));
+  });
+
+  test('a poster\'s target is named as the data names it now, its own name kept where the data has none', () => {
+    const [variant] = rules.variants;
+    const outlawId = rules.outlaws[0];
+    assert.equal(wantedName({ kind: 'creature', areaId: variant.area, monsterId: variant.monster, name: 'stara nazwa' }, content), variant.name);
+    assert.equal(wantedName({ kind: 'outlaw', areaId: variant.area, monsterId: outlawId, name: 'stara nazwa' }, content), content.monstersById[outlawId].name);
+    assert.equal(wantedName({ kind: 'creature', areaId: 'nowhere', monsterId: variant.monster, name: 'stara nazwa' }, content), 'stara nazwa');
   });
 
   test('the trophy: the first grade the character has not found, never the rarest, then the first again', () => {
@@ -189,7 +199,7 @@ describe('the wanted posters', () => {
 });
 
 describe('the wanted posters through the API', () => {
-  const { call, db, signUp } = useServer({ SETTLEMENT: 'on' });
+  const { server, call, db, signUp } = useServer({ SETTLEMENT: 'on', ENGLISH: 'on' });
   let cookie;
   const set = async (sql, ...binds) => (await db()).prepare(`UPDATE characters SET ${sql}`).bind(...binds).run();
   const row = async () => (await db()).prepare('SELECT gold, time_points, settlement FROM characters').first();
@@ -273,6 +283,42 @@ describe('the wanted posters through the API', () => {
     assert.equal(fight.enemies[0].name, poster.name);
     const after = await wanted();
     assert.equal(after.posters.find((one) => one.id === poster.id).state, fight.won ? 'beaten' : 'taken');
+  });
+
+  // A player's remark, 12.11.2026: „w okienku wypraw fajnie byłoby widzieć,
+  // które zlecenie na elitę obecnie mamy wybrane z tablicy zleceń”.
+  test('the poster in hand on the Walka screen: its target and where to seek it, then its bounty waiting; none without one', async () => {
+    const inHand = async (lang = 'pl') => {
+      const response = await server.fetch('/api/character', { headers: { Cookie: cookie, 'X-Lang': lang } });
+      return (await response.json()).character.wanted;
+    };
+    assert.equal(await inHand(), null);
+    const view = await wanted();
+    const outlaw = view.posters.find((one) => one.kind === 'outlaw');
+    await take(outlaw.id);
+    const words = (text) => gendered(text, outlaw.female ? 'female' : 'male');
+    assert.deepEqual(await inHand(), {
+      kind: 'outlaw',
+      monsterId: outlaw.monsterId,
+      name: outlaw.name,
+      label: words(rules.texts.outlaw),
+      areaId: outlaw.areaId,
+      beaten: false,
+      note: words(rules.texts.hunting.replace('{area}', outlaw.areaName)),
+    });
+    // In English: the target's name, its place and the poster's words.
+    const english = await inHand('en');
+    assert.notEqual(english.name, '');
+    assert.doesNotMatch(`${english.label} ${english.note}`, /[ąćęłńóśźż]|Twój|Szukaj/);
+    assert.match(english.note, /^Your poster\./);
+    const stored = JSON.parse((await row()).settlement);
+    stored.wanted.taken.beaten = true;
+    await set('settlement = ?', JSON.stringify(stored));
+    const beaten = await inHand();
+    assert.equal(beaten.beaten, true);
+    assert.equal(beaten.note, words(rules.texts.beaten));
+    assert.equal((await call('POST', '/api/settlement/wanted/claim', { cookie })).status, 200);
+    assert.equal(await inHand(), null);
   });
 
   test('the bounty: gold, Time Points, the hunters\' reputation; the poster is done for the day', async () => {
