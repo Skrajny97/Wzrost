@@ -628,7 +628,9 @@ const BEATS = {
   // The Trudna wyprawa, in the folded "Opcje wyprawy", which the narrator
   // opens; after Szybkie Polowanie's line where both are due.
   'hard-hunt': { place: mark('hard-hunt'), tab: '.hunt-options-toggle', when: (hash, read) => onHomeArea(hash) && Boolean(state.character.hardHunt) && quietDue(read) },
-  'account-chest': { place: mark('account-chest'), when: (hash, read) => hash === '#/oboz/skrzynia-konta' && quietDue(read) },
+  // Only once the chest opens (843: the padlock below its level); a closed
+  // chest's screen has no "W skrzyni" to point at.
+  'account-chest': { place: mark('account-chest'), when: (hash, read) => hash === '#/oboz/skrzynia-konta' && !state.character.chestLock && quietDue(read) },
   // At the top of the report, where it says what the faint took, a moment
   // after the report opens: the player sees it first.
   'faint-first': { place: mark('report-summary'), delay: 2500, when: (hash, read) => faintReport(hash) && quietDue(read) },

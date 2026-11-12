@@ -536,6 +536,10 @@
     "0.2.83": {
       "title": "Version 0.2.83",
       "body": "- A party's exploration no longer sets out with the leader alone. When nobody in the party can go, the game says why, and the leader sets out alone only after unticking “With the party”.\n- For now a party's explorations end in no events, so the members' reports are claimed by themselves when the party sets out again. Party events are on the way.\n- “Set out again” in a leader's report takes the party along.\n- The “With the party” box in Combat shows a member who has just come back by itself."
+    },
+    "0.2.84": {
+      "title": "Version 0.2.84",
+      "body": "- The Account Chest now takes goods too: potions, herbs, materials, minerals and camp resources, with no limit. They are in the new “Goods” tab.\n- The Account Chest opens at character level 20. Until then it has a padlock on it.\n- The Encyclopedia does not count goods from another character, just as with items."
     }
   }
 }

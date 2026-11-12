@@ -675,6 +675,11 @@
       "id": "0.2.83",
       "title": "Wersja 0.2.83",
       "body": "- Wyprawa drużyny nie rusza już z samym liderem. Gdy nikt z drużyny nie może iść, gra mówi dlaczego, a lider wyrusza sam dopiero po odznaczeniu „Z drużyną”.\n- Wyprawy drużyny nie kończą się na razie zdarzeniami, więc raporty członków odbierają się same przy kolejnym wyruszeniu. Zdarzenia drużynowe są w przygotowaniu.\n- „Wyrusz ponownie” w raporcie lidera zabiera drużynę.\n- Pole „Z drużyną” w Walce samo pokazuje członka, który właśnie wrócił."
+    },
+    {
+      "id": "0.2.84",
+      "title": "Wersja 0.2.84",
+      "body": "- Skrzynia Konta przyjmuje też towary: mikstury, zioła, materiały, minerały i zasoby obozu, bez limitu sztuk. Są w nowej zakładce „Towary”.\n- Skrzynia Konta otwiera się na 20. poziomie postaci. Do tego czasu wisi na niej kłódka.\n- Encyklopedia nie zalicza towarów od innej postaci, tak jak przedmiotów."
     }
   ]
 }

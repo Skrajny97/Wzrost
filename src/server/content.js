@@ -39,6 +39,7 @@ import professions from '../../data/professions.json' with { type: 'json' };
 import chat from '../../data/chat.json' with { type: 'json' };
 import community from '../../data/community.json' with { type: 'json' };
 import events from '../../data/events.json' with { type: 'json' };
+import partyEvents from '../../data/party-events.json' with { type: 'json' };
 import encyclopedia from '../../data/encyclopedia.json' with { type: 'json' };
 import evolutions from '../../data/evolutions.json' with { type: 'json' };
 import giftCodes from '../../data/gift-codes.json' with { type: 'json' };
@@ -64,6 +65,7 @@ import enEffects from '../../data/en/effects.json' with { type: 'json' };
 import enElements from '../../data/en/elements.json' with { type: 'json' };
 import enEncyclopedia from '../../data/en/encyclopedia.json' with { type: 'json' };
 import enEvents from '../../data/en/events.json' with { type: 'json' };
+import enPartyEvents from '../../data/en/party-events.json' with { type: 'json' };
 import enEvolutions from '../../data/en/evolutions.json' with { type: 'json' };
 import enFame from '../../data/en/fame.json' with { type: 'json' };
 import enGiftCodes from '../../data/en/gift-codes.json' with { type: 'json' };
@@ -117,6 +119,7 @@ const polishData = {
   chat,
   community,
   events,
+  'party-events': partyEvents,
   encyclopedia,
   evolutions,
   'gift-codes': giftCodes,
@@ -148,6 +151,7 @@ export const OVERLAYS = {
     elements: enElements,
     encyclopedia: enEncyclopedia,
     events: enEvents,
+    'party-events': enPartyEvents,
     evolutions: enEvolutions,
     fame: enFame,
     'gift-codes': enGiftCodes,
