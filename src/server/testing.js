@@ -218,6 +218,10 @@ export const repeatMiningTour = (context) => repeatChapter(context, 'mining');
 // screen with no other chapter waiting.
 export const repeatPortalsTour = (context) => repeatChapter(context, 'portals');
 
+// The narrator's Labirynt chapter (878) unread again: it comes on the next
+// screen with no other chapter waiting. The day's Labirynt stays as it is.
+export const repeatLabyrinthTour = (context) => repeatChapter(context, 'labyrinth');
+
 // The Gildia's lines unread again, its tabs' and its Wyprawa's (646): each
 // comes on the next look at its place in a guild (664).
 export const repeatGuildTour = (context) => repeatChapter(context, 'guild');

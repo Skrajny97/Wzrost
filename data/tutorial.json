@@ -53,6 +53,10 @@
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Portale czekają w zakładce Walka."
     },
+    "labyrinth": {
+      "skipLabel": "Pomiń objaśnienie",
+      "skippedText": "Objaśnienie pominięte. Labirynt czeka w Osadzie, w Sali prób."
+    },
     "guild": {
       "skipLabel": "Pomiń objaśnienie",
       "skippedText": "Objaśnienie pominięte. Gildia czeka w Społeczności, w zakładce Gildia."
@@ -1273,6 +1277,42 @@
       "chapter": "portals",
       "text": ["Możesz czyścić również pokonany wcześniej stopień bez walki – pięć razy dziennie, zgarniając niezbędne zasoby."],
       "voice": "audio/narration/portals-sweep.mp3"
+    },
+    {
+      "id": "labyrinth-welcome",
+      "kind": "card",
+      "chapter": "labyrinth",
+      "text": ["Trzydziesty poziom postaci… System otworzył przed Tobą Labirynt."]
+    },
+    {
+      "id": "labyrinth-lead",
+      "kind": "lead",
+      "chapter": "labyrinth",
+      "text": ["Labirynt czeka w Osadzie, w Sali prób. Zajrzyjmy tam."]
+    },
+    {
+      "id": "labyrinth-map",
+      "kind": "point",
+      "chapter": "labyrinth",
+      "text": ["Co dzień czeka tu nowy Labirynt. Sam wybierasz drogę od komnaty do komnaty, aż do strażnika poziomu."]
+    },
+    {
+      "id": "labyrinth-wounds",
+      "kind": "point",
+      "chapter": "labyrinth",
+      "text": ["Rany zostają z walki na walkę. Leczą je tylko źródła, kupiec i niektóre błogosławieństwa."]
+    },
+    {
+      "id": "labyrinth-levels",
+      "kind": "point",
+      "chapter": "labyrinth",
+      "text": ["Trzy poziomy dziennie. Kto przejdzie trzeci, temu jeszcze tego dnia otworzy się Piekielny."]
+    },
+    {
+      "id": "labyrinth-guardians",
+      "kind": "point",
+      "chapter": "labyrinth",
+      "text": ["Strażnicy strzegą Artefaktów. Pierwszy pokonany strażnik otworzy Ci Rdzeń."]
     },
     {
       "id": "guild-tabs",

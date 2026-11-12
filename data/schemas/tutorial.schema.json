@@ -271,7 +271,13 @@
               "portals-lead",
               "portals-lands",
               "portals-stages",
-              "portals-sweep"
+              "portals-sweep",
+              "labyrinth-welcome",
+              "labyrinth-lead",
+              "labyrinth-map",
+              "labyrinth-wounds",
+              "labyrinth-levels",
+              "labyrinth-guardians"
             ]
           },
           "kind": {
@@ -391,6 +397,7 @@
               "towers",
               "mining",
               "portals",
+              "labyrinth",
               "guild",
               "fortress",
               "party",
