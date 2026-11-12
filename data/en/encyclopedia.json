@@ -21,6 +21,9 @@
     },
     "minerals": {
       "name": "Minerals"
+    },
+    "cards": {
+      "name": "Cards"
     }
   },
   "tiers": [

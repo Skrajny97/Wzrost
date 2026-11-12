@@ -3,7 +3,7 @@
   "title": "Talia Systemu",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "deckSize", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "host", "texts"],
+  "required": ["name", "deckSize", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "host", "bonuses", "texts"],
   "definitions": {
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
     "chance": { "type": "number", "minimum": 0, "maximum": 1 },
@@ -145,10 +145,31 @@
         }
       }
     },
+    "bonuses": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collection"],
+      "description": "Premia za kolekcję (884 A, src/engine/card-collection.js).",
+      "properties": {
+        "$comment": { "type": "string" },
+        "collection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["every", "xp", "gold", "max"],
+          "description": "Co every różnych kart udział xp więcej XP i gold więcej złota z wypraw, każdy najwyżej max; 0 wyłącza premię.",
+          "properties": {
+            "every": { "type": "integer", "minimum": 1 },
+            "xp": { "type": "number", "minimum": 0, "maximum": 1 },
+            "gold": { "type": "number", "minimum": 0, "maximum": 1 },
+            "max": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "firstWin"],
+      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "firstWin", "collection"],
       "properties": {
         "intro": { "type": "string", "minLength": 1 },
         "starterOffer": { "type": "string", "minLength": 1 },
@@ -158,7 +179,41 @@
         "loss": { "$ref": "#/definitions/texts" },
         "draw": { "$ref": "#/definitions/texts" },
         "drop": { "$ref": "#/definitions/texts" },
-        "firstWin": { "type": "string", "minLength": 1 }
+        "firstWin": { "type": "string", "minLength": 1 },
+        "collection": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Słowa rubryki „Karty” w Encyklopedii i premii za kolekcję (src/engine/card-collection.js).",
+          "required": ["summary", "note", "unknown", "land", "kinds", "meta", "type", "level", "copies", "copiesTop", "places", "chance", "bonusNow", "bonusNext", "bonusTop", "bonusRule", "report"],
+          "properties": {
+            "kinds": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["ordinary", "elite", "champion"],
+              "properties": {
+                "ordinary": { "type": "string", "minLength": 1 },
+                "elite": { "type": "string", "minLength": 1 },
+                "champion": { "type": "string", "minLength": 1 }
+              }
+            },
+            "summary": { "$ref": "#/definitions/texts" },
+            "note": { "$ref": "#/definitions/texts" },
+            "unknown": { "$ref": "#/definitions/texts" },
+            "land": { "$ref": "#/definitions/texts" },
+            "meta": { "$ref": "#/definitions/texts" },
+            "type": { "$ref": "#/definitions/texts" },
+            "level": { "$ref": "#/definitions/texts" },
+            "copies": { "$ref": "#/definitions/texts" },
+            "copiesTop": { "$ref": "#/definitions/texts" },
+            "places": { "$ref": "#/definitions/texts" },
+            "chance": { "$ref": "#/definitions/texts" },
+            "bonusRule": { "$ref": "#/definitions/texts" },
+            "bonusNow": { "$ref": "#/definitions/texts" },
+            "bonusNext": { "$ref": "#/definitions/texts" },
+            "bonusTop": { "$ref": "#/definitions/texts" },
+            "report": { "$ref": "#/definitions/texts" }
+          }
+        }
       }
     }
   }

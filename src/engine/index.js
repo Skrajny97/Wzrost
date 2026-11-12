@@ -80,6 +80,7 @@ export * from './portals.js';
 export * from './labyrinth.js';
 export * from './core.js';
 export * from './cards.js';
+export * from './card-collection.js';
 export * from './trial-hall.js';
 export * from './pvp-arena.js';
 export * from './guild-beast.js';

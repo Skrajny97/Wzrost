@@ -38,12 +38,32 @@
       "Whoever beats all of the rival's cards wins. After 20 rounds the one with more cards left wins, then the one with more Life. If they are equal, it is a draw.",
       "The hero card is your class's skill, once a match. Your class's evolution strengthens it.",
       "A match for a stake: win and you take twice the stake, a draw gives the stake back. You play for a stake at most 10 times a day. The first win of the day at each tier also gives the day's reward, and the first win over a tier a rare card. Training is without a stake and without rewards.",
-      "New cards are rarely left by creatures you beat on explorations, more often by elites and champions. The same card won again raises its level, up to level 5: each level means more Attack and Life."
+      "New cards are rarely left by creatures you beat on explorations, more often by elites and champions. The same card won again raises its level, up to level 5: each level means more Attack and Life.",
+      "Your collection gives a lasting bonus: every 10 different cards add +1% XP and +1% gold from explorations, up to +15% for all 156 cards. It works from the moment you win a card. You can see your collection and its bonus in the Encyclopedia, under \"Cards\"."
     ],
     "win": ["\"A good match! I didn't see that coming.\"", "\"Your win. The cards like you today.\"", "\"Well played! Next time I won't hold back.\""],
     "loss": ["\"My match. The deck forgives no mistakes.\"", "\"This time the stake stays with me.\"", "\"That was close. Shuffle and come back.\""],
     "draw": ["\"A draw! Nobody loses, nobody gains.\"", "\"Even as on a scale. One more match?\""],
     "drop": ["Among the loot lies a card: {card}.", "The beaten creature leaves a card: {card}."],
-    "firstWin": "For your first win over the tier \"{tier}\" Szczęsny gives you a card: {card}."
+    "firstWin": "For your first win over the tier \"{tier}\" Szczęsny gives you a card: {card}.",
+    "collection": {
+      "summary": ["Collection: {found} of {all}"],
+      "note": ["Cards drop from creatures beaten on explorations, more often from elites and champions. Play them with Szczęsny in the Games Parlour."],
+      "unknown": ["Unknown card"],
+      "land": ["Collected {found} of {all}"],
+      "meta": ["Rarity: {rarity} · {kind}"],
+      "kinds": { "ordinary": "ordinary creature", "elite": "elite", "champion": "champion" },
+      "type": ["Type: {type}. Hits {beats} cards {percent}% harder."],
+      "level": ["Level {level} of {max}: Attack {attack}, Life {life}."],
+      "copies": ["Copies won: {copies}. One more raises the card to level {next}."],
+      "copiesTop": ["Copies won: {copies}. This is the top level: the card no longer drops on explorations."],
+      "places": ["Where it drops: {land} ({places})."],
+      "chance": ["A beaten creature leaves this card with a {percent}% chance."],
+      "bonusNow": ["Collection bonus: +{xp}% XP and +{gold}% gold from explorations, for good."],
+      "bonusNext": ["Next threshold: {next} different cards. Missing: {cards}."],
+      "bonusTop": ["This is the highest collection bonus."],
+      "bonusRule": ["Every {every} different cards raise the bonus by {xp}% XP and {gold}% gold, up to +{max}%."],
+      "report": ["Card collection: +{xp}% XP and +{gold}% gold from the exploration."]
+    }
   }
 }

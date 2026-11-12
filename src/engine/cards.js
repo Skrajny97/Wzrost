@@ -273,6 +273,21 @@ export function cardDrop(id, rng, { maxed = [], guardian = false }, content) {
  */
 export const cardDropText = (id, step, content) => say(cardRules(content).texts, 'drop', step, { card: content.monstersById[id].name });
 
+// The report's line of the collection's bonus (884 A: "Kolekcja kart: +3%
+// XP i +3% złota z wyprawy."), where it gave some of the exploration's XP
+// or gold; none after a faint, which loses them.
+/**
+ * @param {Record<string, any>} hunt
+ * @param {Content} content
+ * @returns {string | null}
+ */
+export function cardBonusLine(hunt, content) {
+  const bonus = hunt.cardsBonus;
+  if (!bonus || !cardRules(content) || hunt.forfeit || !(hunt.xp > 0 || hunt.gold > 0)) return null;
+  const percent = (/** @type {number} */ share) => Math.round(share * 1000) / 10;
+  return say(cardRules(content).texts.collection, 'report', 0, { xp: percent(bonus.xp), gold: percent(bonus.gold) });
+}
+
 // --- The collection and the deck ------------------------------------------
 
 // The starter deck Szczęsny gives (874 A).
