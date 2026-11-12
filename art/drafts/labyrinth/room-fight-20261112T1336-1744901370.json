@@ -1,0 +1,14 @@
+{
+  "id": "room-fight",
+  "tool": "pixellab generate-image-v2",
+  "description": "two crossed short swords with steel blades and dark leather grips, single inventory item icon, centred, no background, no text",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

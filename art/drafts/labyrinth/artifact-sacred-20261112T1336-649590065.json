@@ -1,0 +1,14 @@
+{
+  "id": "artifact-sacred",
+  "tool": "pixellab generate-image-v2",
+  "description": "a sacred halo shard, a broken piece of a golden halo ring radiating soft pale gold light, with a small sun emblem, single inventory item icon, centred, no background, no text",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

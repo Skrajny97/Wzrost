@@ -1,0 +1,14 @@
+{
+  "id": "shards",
+  "tool": "pixellab generate-image-v2",
+  "description": "three small glowing ice-blue crystal shards with thin bright light lines inside them, lying together, single inventory item icon, centred, no background, no text",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}

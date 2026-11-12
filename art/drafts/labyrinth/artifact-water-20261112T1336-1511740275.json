@@ -1,0 +1,14 @@
+{
+  "id": "artifact-water",
+  "tool": "pixellab generate-image-v2",
+  "description": "a tide pearl, a large luminous blue-green pearl set in an open silver shell with a wave pattern, single inventory item icon, centred, no background, no text",
+  "style": "src/client/art/materials/rat-tail.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 64
+}
