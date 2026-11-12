@@ -3103,6 +3103,10 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 Potem (12.11.2026): „Mistrz Łuku 2, pokaz teraz animacje i przypomnij chód” i „Mistrz Łuku jazda i chód OK”., „Mistrzyni Łuku jazda 1, dorób jej zielony płaszcz w portrecie zatem skoro pasuje”, „i pokaż chód Mistrzyni Łuku”, „Mistrzyni łuku jazda i chód OK”, „Płaszcz OK”, „Lodowa Królowa jazda 1”, „Lodowa królowa jazda i chód OK”, „Święty jazda 2”, „Jazda I chód świętego OK”, „Święta, jazda: 1”, „za nisko siedzi Święta moim zdaniem na wierzchowcach, chód w porządku” i „Święta podniesiona w siodle - lepiej.”, „Pogromca Demonów jazda 1”, „Pogromca Demonów jest za mały w porównaniu do tego tygrysa szablozębnego i ogólnie. Ale poza tym OK, tylko wielkość przeskaluj. Chód też OK”, „Pogromczyni Demonów: jazda 1, czekam na animacje oraz chód”, „Pogromczyni Demonów wszystko OK”, „Prorokini jazda 1, pokaż animację jazdy oraz chód”, „Prorokini w jezdzie za daleko siedzi na wierzchowcu, powinna byc blizej jego głowy -> w prawo”, „Prorokini jazda poprawiona już OK.”, „Prorokini chód OK”, „Władczyni Cieni, jazda: 1”, „Władczyni Cieni OK, tylko na Tygrysie szablozębnym za nisko i za bardzo w lewo siedzi”, „Władczyni Cieni na Tygrysie już OK”, „Prorok chód 2”, „Prorok, jazda: 1” i „Prorok jazda i chód OK”.
 
+## Wersja 0.2.90 (12.11.2026): Labirynt od wyższego z poziomów postaci i klasy
+
+Autor w czacie 12.11.2026: „Labirynt jest za łatwy na 63 poz postaci i 73 klasy. Niech bierze pod uwage wyzszy poziom przy skalowaniu trudnosci, bo zwykle ludzie maja wyzszy klasy niz postaci”. Stwory Labiryntu mają teraz wyższy z poziomów postaci i klasy, a razem z nimi rośnie złoto, ceny kupca i XP. Szczegóły i symulacja: „Labirynt Systemu i Rdzeń: zasady”, punkt 21.
+
 ## Wersja 0.2.89 (12.11.2026): rozdział narratora o Labiryncie i Tiery na Targowisku
 
 1. **Rozdział narratora o Labiryncie** wchodzi do gry z nagraniami wybranymi przez autora (880; zasady w „Labirynt Systemu i Rdzeń: zasady”, „Rozdział narratora o Labiryncie”).
@@ -3173,7 +3177,7 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
     - Ekran idzie najpierw do makiet. Autor przyjął makiety 870.1–870.7 (telefon 390 i 320 px, komputer 1366 i 1920 px) na stronie ocen 12.11.2026 ok. 15:51–15:53, a także kwestie narratora rozdziału o Labiryncie 878.1–878.6.
 20. **Budowa (12.11.2026).** Labirynt i Rdzeń działają za przełącznikiem `LABYRINTH`: włączonym na serwerze lokalnym i na wersji testowej, a w grze wyłączonym do przyjęcia makiet (bez niego trasy zwracają 404, ekranów nie ma, a Wieże nie dają Artefaktów). Wszystkie liczby są w `data/labyrinth.json`; najważniejsze:
     - Mapa: 6 rzędów po 2–3 komnaty, każda połączona z 2–3 komnatami następnego rzędu, na końcu strażnik. W 1. rzędzie same walki, elity od 3. rzędu, najwyżej 1 kupiec i najmniej 1 źródło na poziom. Wagi: walka 46, elita 12, skarb 12, źródło 12, ołtarz 10, kupiec 8.
-    - Wrogowie z krain otwartych na poziomie postaci, na jej poziomie, silni jak w najnowszej krainie: ×1,1, ×1,35 i ×1,65 na poziomach 1–3 i ×3,3 na Piekielnym. Elita to elita krainy, strażnik to czempion (albo elita, gdy czempiona nie ma).
+    - Wrogowie z krain otwartych na poziomie postaci, na jej poziomie, silni jak w najnowszej krainie: ×1,1, ×1,35 i ×1,65 na poziomach 1–3 i ×3,3 na Piekielnym. Elita to elita krainy, strażnik to czempion (albo elita, gdy czempiona nie ma). *Od 0.2.90 liczy się wyższy z poziomów postaci i klasy: zob. punkt 21.*
     - Źródło leczy 35% maks. HP i podnosi poległych. Kupiec sprzedaje raz leczenie 50% za złoto z 30 minut eksploracji i wybór błogosławieństwa za złoto z 60 minut.
     - Nagrody: walka daje XP jak walka w Wieży i złoto jak walka na eksploracji; elita 3/4/5/9 Odłamków (poziomy 1/2/3/Piekielny) i złoto z 10 minut; skarb 2/3/4/7 Odłamków i złoto z 15 minut; strażnik Artefakt i wybór błogosławieństwa.
     - Rzadkość Artefaktu (pospolity/rzadki/unikalny/epicki/legendarny/mityczny/boski): poziom 1: 55/35/10; poziom 2: 46/37/14/3; poziom 3: 37/38/18/6/1; Piekielny: 22/34/25/12/5/1,5/0,5. Wielkość: mały 60, średni 30, duży 10; żywioł losowy.
@@ -3182,7 +3186,7 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
     - Symulacje (dobre wyposażenie, 2 towarzyszy): poziom 3 przechodzi ok. 34–66% postaci, Piekielny 1–10%. Pełny Rdzeń średnich Artefaktów daje wojownikowi na 100. poziomie ok. +5% obrażeń i +10% HP, a na 200. ok. +10% i +20%.
     Brakujące szczegóły, rozstrzygnięte najprościej:
     - HP w Labiryncie liczy się osobno: każdy dzień zaczyna się z pełnym, a prawdziwe HP postaci się nie zmienia.
-    - Skład drużyny ustala się przy pierwszej komnacie dnia, a wrogowie mają poziom postaci z początku dnia.
+    - Skład drużyny ustala się przy pierwszej komnacie dnia, a wrogowie mają poziom postaci z początku dnia. *Od 0.2.90 wyższy z poziomów postaci i klasy (punkt 21).*
     - Przegrana walka kończy dzień. Kto padnie w wygranej walce, wstaje z 1 HP; polegli towarzysze wracają tylko przez źródło albo kupca.
     - XP przychodzi od razu, także w trakcie eksploracji (bez leczenia za awans poza domem). Elity nie dają XP. Po Piekielnym dzień się kończy, bez błogosławieństwa. Piekielny otwiera się sam po 3. poziomie.
     - Te same błogosławieństwa się sumują.
@@ -3194,6 +3198,11 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
     - Rezonans liczy tylko najwyższy próg i klejnot go nie podnosi.
     - Oprawa klejnotu, wchłanianie, rozpuszczanie i ulepszanie wchłoniętego Artefaktu czekają do końca eksploracji. Tego samego klejnotu nie oprawia się drugi raz.
     - Zdolności rosną z pierwiastkiem budżetu rzadkości, żeby boska nie leczyła ponad 50%.
+21. **Poziom stworów: wyższy z poziomów postaci i klasy (autor, 12.11.2026, 0.2.90).** Autor po pierwszym dniu Labiryntu w grze: „Labirynt jest za łatwy na 63 poz postaci i 73 klasy. Niech bierze pod uwage wyzszy poziom przy skalowaniu trudnosci, bo zwykle ludzie maja wyzszy klasy niz postaci”. Labirynt dnia liczy się od wyższego z poziomów postaci i klasy z chwili wejścia do pierwszej komnaty (`labyrinthCharLevel` w `src/engine/labyrinth.js`). Na tym poziomie są stwory, z krain do tego poziomu (krainy i tak otwierają się z poziomem klasy), tak silne jak na najnowszym miejscu tego poziomu. Tym samym poziomem mierzy się złoto walk, elit i skarbów oraz ceny kupca, a XP rośnie razem z poziomem stworów (ok. +18% przy 10 poziomach więcej). Brakujące szczegóły:
+    - Labirynt rozpoczęty przed wdrożeniem zostaje do północy na dawnym poziomie, a nowy dzień liczy się już po nowemu. Labirynt, do którego postać jeszcze nie weszła, od razu liczy się po nowemu.
+    - Odblokowanie zostaje bez zmian: od 30. poziomu postaci.
+    - Eksploracje, Portale, Wieże i Sala prób zostają przy swoich zasadach; autor mówił tylko o Labiryncie.
+    - Symulacja (`tools/labyrinth-sim.mjs` z nową zasadą, typowa postać „realistic” z dwoma towarzyszami, 12–16 dni na klasę), ile postaci przechodzi poziom 1 / 2 / 3, przed zmianą i po niej: postać 35 (klasa ok. 39) 97/72/40% → 95/52/20%; 45 (klasa 50) 100/95/85% → 70/23/7%; 63 (klasa 74) 95/70/41% → 65/20/9%; 80 (klasa 96) 78/38/20% → 55/13/8%; 100 (klasa 121) 95/78/65% → 62/28/13%. Piekielny przechodzi 0–5% i po zmianie prawie nikt. Postać z dobrym wyposażeniem, Rdzeniem i ulepszeniami ma wyraźnie łatwiej niż ten model, a według autora dawny Labirynt był dla niej za łatwy. Gdyby okazał się za trudny dla reszty graczy, łagodzi się go mnożnikami siły poziomów (`levels[].strength` w `data/labyrinth.json`).
 
 ### Rozdział narratora o Labiryncie (878, 12.11.2026)
 

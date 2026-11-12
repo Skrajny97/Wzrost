@@ -705,6 +705,11 @@
       "id": "0.2.89",
       "title": "Wersja 0.2.89",
       "body": "- Narrator objaśnia Labirynt Systemu: na 30. poziomie postaci prowadzi do Osady, do Sali prób, i pokazuje mapę, rany drużyny, poziomy dnia i nagrody.\n- Na Targowisku przy każdym przedmiocie widać jego Tier."
+    },
+    {
+      "id": "0.2.90",
+      "title": "Wersja 0.2.90",
+      "body": "- Labirynt Systemu liczy trudność od wyższego z dwóch poziomów: postaci albo klasy. Zwykle to poziom klasy, więc stwory są silniejsze, a za wygraną zgarniesz więcej złota i XP."
     }
   ]
 }

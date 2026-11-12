@@ -11,8 +11,9 @@
 // only fights, no elites before map.eliteFromRow, at most map.merchantMost
 // merchants and at least map.springLeast springs a level). The character
 // fights with up to two companions from the Kwatery, chosen as for the
-// Portale (850 A), at the character's level of the day's start, with the
-// creatures of every land at or below it, made as strong as the newest
+// Portale (850 A), against creatures at the higher of the character's and
+// its class's level of the day's start (labyrinthCharLevel; the author,
+// 12.11.2026), of every land at or below it, made as strong as the newest
 // place's creatures of that level (exploreStrength) times the Labirynt
 // level's strength. HP goes from fight to fight (852 A): only springs, the
 // merchant and some blessings heal, and a fight not won ends the day's
@@ -346,8 +347,22 @@ function blessed(unit, boons) {
 /** @param {Record<string, any>} companion */
 const companionKey = (companion) => String(companion.id);
 
-// A fresh Labirynt of `day` for a character of `charLevel` with its
-// companions of now: everyone at full HP, on the first level's entrance.
+// The level a character's Labirynt of the day is made for: the higher of
+// the character's level and its class level, as the class mostly runs
+// ahead (the author, 12.11.2026: "Niech bierze pod uwage wyzszy poziom przy
+// skalowaniu trudnosci, bo zwykle ludzie maja wyzszy klasy niz postaci").
+// The creatures stand at it, come from the lands at or below it (the lands
+// open by the class level) and are as strong as on its newest place; the
+// gold of the fights, elites, treasures and the merchant is measured by it.
+/**
+ * @param {{ level: number, classLevel?: number | null }} character
+ * @returns {number}
+ */
+export const labyrinthCharLevel = (character) => Math.max(character.level, character.classLevel ?? 0);
+
+// A fresh Labirynt of `day` for a character of `charLevel` (labyrinthCharLevel)
+// with its companions of now: everyone at full HP, on the first level's
+// entrance.
 /**
  * @param {{ day: string, charLevel: number, companions: Record<string, any>[], seed: string }} start
  * @returns {LabyrinthState}
