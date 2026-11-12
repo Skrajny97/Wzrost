@@ -1,0 +1,14 @@
+{
+  "id": "ent",
+  "tool": "pixellab generate-image-v2",
+  "description": "an ent, a tall walking tree guardian of the forest, a body of gnarled grey-brown oak bark, two long branch arms with twig fingers, a calm bark face with deep-set glowing green eyes and a beard of moss, a small crown of green leaves on its head, thick roots for feet, standing on both feet, friendly and protective, not menacing, full body, three-quarter view, isolated figure on a plain background, no scene, the whole figure inside the frame, nothing cut off at the edges",
+  "style": "src/client/art/monsters/leshy.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}

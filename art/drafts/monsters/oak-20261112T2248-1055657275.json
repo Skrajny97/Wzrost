@@ -1,0 +1,14 @@
+{
+  "id": "oak",
+  "tool": "pixellab generate-image-v2",
+  "description": "an awakened ancient oak, a huge old oak tree come alive, a thick gnarled trunk with a wise old bearded face in the bark and glowing amber eyes, a wide rounded crown of deep green oak leaves with acorns, two massive bough arms, great spreading roots it stands on, moss on its bark, friendly and protective, not menacing, the whole tree from roots to crown, three-quarter view, isolated figure on a plain background, no scene, nothing cut off at the edges",
+  "style": "src/client/art/monsters/leshy.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 25
+}
