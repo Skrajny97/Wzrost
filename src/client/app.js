@@ -580,15 +580,27 @@ onCharacterChange(() => {
 
 // Coming back to the page after a new version of the game was deployed
 // reloads it, so an open page (or the installed app) never runs old code.
-// Everything that matters is on the server; only the music starts anew.
+// A page kept in front all along (the chat, for one) looks too when the
+// player goes to another screen, at most once a minute: a report of
+// 12.11.2026 came from a page still running the code from before the fix
+// deployed four minutes earlier. Everything that matters is on the server;
+// only the music starts anew.
 let loadedVersion = null;
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState !== 'visible' || !loadedVersion) return;
+let versionLookedAt = 0;
+function reloadIfNewer() {
+  if (!loadedVersion) return;
+  versionLookedAt = Date.now();
   request('GET', '/api/health')
     .then((health) => {
       if (health.version !== loadedVersion) location.reload();
     })
     .catch(() => {});
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') reloadIfNewer();
+});
+window.addEventListener('hashchange', () => {
+  if (Date.now() - versionLookedAt > 60000) reloadIfNewer();
 });
 
 // Coming back to the page (for example after the hunt timer ran out) refreshes
@@ -1041,7 +1053,9 @@ function openBugReport() {
   const text = h('textarea', { class: 'bug-text', id: 'bug-text', rows: '6', maxlength: '2000', placeholder: t('Np. po stuknięciu „Wyrusz” ekran przestał reagować.') });
   const shot = state.user?.emailRequired && !state.user?.emailConfirmed ? null : screenshotPicker();
   const report = async () => {
-    const details = await pushDiagnosis().catch(() => null);
+    // The version this page runs, which a page kept open since before a
+    // deploy shows apart from the server's (the report's own version).
+    const details = [`page ${loadedVersion ?? '?'}`, await pushDiagnosis().catch(() => null)].filter(Boolean).join('; ');
     const image = shot ? await shot.image() : null;
     if (!image) return { text: text.value, screen, details };
     const form = new FormData();
