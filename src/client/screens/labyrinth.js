@@ -266,11 +266,30 @@ export function mountLabyrinth(container, { navigate }) {
   }
 
   async function enter(row, index) {
-    const result = await call('POST', '/api/labyrinth/room', { level: view.level, row, room: index });
+    const result = await fresh(() => call('POST', '/api/labyrinth/room', { level: view.level, row, room: index }));
     view = result.labyrinth;
     if (result.report) reportCache.set(String(result.report.id), result.report);
     show();
     resultSheet(result.room, result.report);
+  }
+
+  // A refusal because the Labirynt is not as the page shows it (a new day
+  // at midnight, a tap from another tab): the Labirynt anew, and the
+  // refusal's words in the toast (withButton).
+  async function fresh(request) {
+    try {
+      return await request();
+    } catch (error) {
+      if (error.status === 409) {
+        closeSheet();
+        const again = await call('GET', '/api/labyrinth').catch(() => null);
+        if (again) {
+          view = again.labyrinth;
+          show();
+        }
+      }
+      throw error;
+    }
   }
 
   // What a room gave: a fight's result with its playback, a spring's or a
@@ -352,7 +371,7 @@ export function mountLabyrinth(container, { navigate }) {
 
   // A choice made (a blessing, the merchant): the Labirynt as saved.
   async function act(path, body) {
-    const result = await call('POST', path, body);
+    const result = await fresh(() => call('POST', path, body));
     view = result.labyrinth;
     show();
   }
