@@ -11250,9 +11250,11 @@ a.profession-square:active {
   visibility: hidden;
 }
 
-.encyclopedia-card--unknown .sprite {
-  filter: brightness(0);
-  opacity: 0.6;
+/* Above the card's outline of its creature (.tcard-art .sprite): a black
+   shadow, lit at its edge so it stands out of the dark card. */
+.encyclopedia-card--unknown .tcard-art .sprite {
+  filter: brightness(0) drop-shadow(0 0 1px rgba(236, 230, 214, 0.28));
+  opacity: 0.75;
 }
 
 .encyclopedia-card-sheet-head {
