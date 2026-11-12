@@ -379,6 +379,33 @@ export function mountCasino(holder) {
       });
     const blocked = wheel.itemLeft && wheel.bagFree < 1;
     const short = gold < stake;
+    // One spin: at the stake, or the day's free one (`body.free`, at the
+    // lowest stake's chances; a player via the author, 12.11.2026).
+    const spinWith = (event, body) =>
+      withButton(event.currentTarget, async () => {
+        const answer = await call('POST', '/api/settlement/casino/spin', body);
+        const { win, prize, tier, free } = answer.spin;
+        // A tier with nothing left in the pool: the Wheel stopped on a prize
+        // already won. A free spin loses no stake.
+        const lost = tier ? (free ? texts.wheelGoneFree : texts.wheelGone) : free ? texts.lostFree : texts.lost;
+        result = { win, text: win ? say(texts.won, { prize: prizeName(prize) }) : lost, words: oneOf(win ? texts.win : free ? texts.lossFree : texts.loss) };
+        // The Wheel turns on the screen first; without it, a sound alone.
+        if (showable(casino.show)) await wheelShow(win, casino.show);
+        else playSound(win ? 'chest' : 'tick');
+        toast(result.text);
+        apply(answer);
+      });
+    const freeSpin = wheel.left > 0 &&
+      wheel.free && [
+        h('button', {
+          type: 'button',
+          class: 'button button--system',
+          text: texts.wheelFree,
+          disabled: blocked,
+          onClick: (event) => spinWith(event, { free: true, stake }),
+        }),
+        h('p', { class: 'muted', text: say(texts.wheelFreeAbout, { stake: stakes[0] }) }),
+      ];
     const spin =
       wheel.left === 0
         ? h('p', { class: 'muted', text: texts.wheelEmpty })
@@ -387,19 +414,7 @@ export function mountCasino(holder) {
             class: 'button button--world',
             text: short ? t('Brakuje złota') : say(texts.wheelSpin, { stake }),
             disabled: short || blocked,
-            onClick: (event) =>
-              withButton(event.currentTarget, async () => {
-                const answer = await call('POST', '/api/settlement/casino/spin', { stake });
-                const { win, prize, tier } = answer.spin;
-                // A tier with nothing left in the pool: the Wheel stopped on a prize already won.
-                const lost = tier ? texts.wheelGone : texts.lost;
-                result = { win, text: win ? say(texts.won, { prize: prizeName(prize) }) : lost, words: oneOf(win ? texts.win : texts.loss) };
-                // The Wheel turns on the screen first; without it, a sound alone.
-                if (showable(casino.show)) await wheelShow(win, casino.show);
-                else playSound(win ? 'chest' : 'tick');
-                toast(result.text);
-                apply(answer);
-              }),
+            onClick: (event) => spinWith(event, { stake }),
           });
     return [
       h(
@@ -410,6 +425,7 @@ export function mountCasino(holder) {
         // With one stake of the day there is nothing to step through.
         stakes.length > 1 && h('div', { class: 'duration-row' }, stepButton(-1, t('Mniejsza stawka')), slider, stepButton(1, t('Większa stawka'))),
         wheel.left > 0 && blocked && h('p', { class: 'region-warning', text: texts.wheelBag }),
+        freeSpin,
         spin,
         result &&
           h(

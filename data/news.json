@@ -685,6 +685,11 @@
       "id": "0.2.85",
       "title": "Wersja 0.2.85",
       "body": "- Zdarzenia drużynowe: wyprawa drużyny może skończyć się zdarzeniem dla wszystkich, którzy poszli. Wybiera lider, a każdy dostaje wynik w osobnym raporcie.\n- Gdy lider nie wybierze przez 12 godzin, drużyna idzie najbezpieczniejszą drogą.\n- Niektóre wybory dają premię na następną wyprawę drużyny: krótszy czas albo więcej PD lub złota.\n- W „Zakopanej skrzyni” może czaić się mimik."
+    },
+    {
+      "id": "0.2.86",
+      "title": "Wersja 0.2.86",
+      "body": "- Koło Fortuny: raz dziennie jedno zakręcenie za darmo, z szansami najniższej stawki.\n- W Garbarni, w zakładce „Sprzedaj”, nazwy materiałów mają kolor swojej rzadkości, jak w plecaku."
     }
   ]
 }
