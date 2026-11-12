@@ -32,7 +32,8 @@
 // The realistic player (realisticPlan), from the game's own data:
 // - class level, skills and stat points as the typical character; from
 //   class level 50 the main path's first evolution, from 100 its second
-//   form, with the Skill Points spent as they come (evolution-sim.mjs);
+//   form, from 200 its third (where the data has one), with the Skill
+//   Points spent as they come (evolution-sim.mjs);
 // - all nine slots from level 30 (two more than the typical character
 //   before), items of the typical character's level (gearLevel), each of
 //   the latest base its class level and the item's level allow (Tier II
@@ -198,15 +199,18 @@ function realisticGear(classId, level, classLevel, plan, content, set = 0) {
 export const GEAR_SETS = 8;
 
 // The main path's evolution at the class level: the first from class level
-// 50, its second form from 100. `path`: the skill that leads another path
-// of the class (tools/class-balance-sim.mjs measures all three).
+// 50, its second form from 100, its third from 200. `path`: the skill that
+// leads another path of the class (tools/class-balance-sim.mjs measures all
+// three).
 export function mainEvolution(classId, classLevel, content, path = null) {
-  const [levelOne, levelTwo] = content.balance.progression.classEvolutionLevels;
+  const [levelOne, levelTwo, levelThree] = content.balance.progression.classEvolutionLevels;
   if (classLevel < levelOne) return null;
   const main = path ? content.skillsById[path] : content.skills.find((skill) => skill.classId === classId);
   const first = content.evolutions.find((evolution) => evolution.classId === classId && !evolution.from && evolution.path === main.id);
-  // Without the second evolution in the game the first form stays.
-  return classLevel >= levelTwo ? (engine.nextFormOf?.(first, content) ?? first) : first;
+  // Without the second evolution in the game the first form stays, and
+  // without the third the second.
+  const second = classLevel >= levelTwo ? (engine.nextFormOf?.(first, content) ?? first) : first;
+  return classLevel >= levelThree ? (engine.nextFormOf?.(second, content) ?? second) : second;
 }
 
 // The character and gear of a model: `typical` (tools/simulate.mjs) or a

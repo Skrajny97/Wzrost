@@ -22,7 +22,7 @@ import { simulateFight } from './combat.js';
 import { combatantView } from './combatant.js';
 import { championItemRarity } from './hunt.js';
 import { randomItem } from './items.js';
-import { duelArmorShare, duelHpFactor, duelist } from './pvp-arena.js';
+import { duelArmorShare, duelHpFactor, duelist, thirdFormHp } from './pvp-arena.js';
 import { questPeriod, zoneTime } from './quests.js';
 import { createRng } from './rng.js';
 import { say } from './text.js';
@@ -220,7 +220,8 @@ export function drawWars(guilds, seed, content) {
 // seed, the same battle. Each fights as at the Arena (duelist): without
 // companions, mercenaries or potions, at full HP times the duel's factor and
 // with the duel's share of its armour, both at the average level of all of
-// them. The side with someone still standing wins; one that goes on and on
+// them, the factor grown as a duel's where a third form fights
+// (thirdFormHp). The side with someone still standing wins; one that goes on and on
 // is ended by the judge after battle.movesPerFighter moves for each fighter,
 // the side with the bigger share of its HP left winning, or a draw when the
 // shares differ by battle.drawMargin at most, the judge's words closing the
@@ -236,7 +237,8 @@ export function warBattle({ sideA, sideB, seed }, content) {
   /** @param {Fighter[]} side */
   const average = (side) => side.reduce((sum, one) => sum + one.character.level, 0) / side.length;
   const level = (average(sideA) + average(sideB)) / 2;
-  const shape = { factor: duelHpFactor(level, level, content), armor: duelArmorShare(level, level, content) };
+  const third = thirdFormHp([...sideA, ...sideB].map((one) => one.character), content);
+  const shape = { factor: duelHpFactor(level, level, content) * third, armor: duelArmorShare(level, level, content) };
   const allies = sideA.map((one, index) => duelist(one, `a${index}`, 'ally', shape, content));
   const enemies = sideB.map((one, index) => duelist(one, `e${index}`, 'enemy', shape, content));
   const moves = battle.movesPerFighter * (allies.length + enemies.length);

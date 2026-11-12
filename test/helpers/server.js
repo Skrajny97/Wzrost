@@ -8,10 +8,11 @@ import { createTestHarness } from 'wrangler';
 export function useServer(vars = {}) {
   // No events at the end of explorations, which would come after a tenth of
   // them, unless a test asks for them (events.test.js). The class evolutions
-  // are on, as on the test version, unless a test turns them off. The Osada
-  // is off unless a test opens it (SETTLEMENT), as before it came into the
-  // game: its companions and rumors would change the other tests' trips. So
-  // is the Warownia (FORTRESS), on in the game from 0.1.49. English is off
+  // are on, as on the test version, unless a test turns them off, and so
+  // are their third forms (THIRD_EVOLUTION). The Osada is off unless a test
+  // opens it (SETTLEMENT), as before it came into the game: its companions
+  // and rumors would change the other tests' trips. So is the Warownia
+  // (FORTRESS), on in the game from 0.1.49. English is off
   // unless a test asks for it (ENGLISH), as the tests were written before
   // it came into the game (0.1.97): Polish answers and no English channel.
   // The weeks of the year are off unless a test asks for them (WEEKS), so
@@ -31,7 +32,7 @@ export function useServer(vars = {}) {
     workers: [
       {
         configPath: './wrangler.jsonc',
-        vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', WEEKS: '', ARENA: '', GUILD_WARS: '', LABYRINTH: '', CARDS: '', PAYMENTS: '', PAYMENTS_FOR: '', ...vars },
+        vars: { TEST_LOGINS: '', TUTORIAL_TESTS: 'on', EVENTS: '', EVOLUTIONS: 'on', THIRD_EVOLUTION: 'on', SETTLEMENT: '', FORTRESS: '', ENGLISH: '', WEEKS: '', ARENA: '', GUILD_WARS: '', LABYRINTH: '', CARDS: '', PAYMENTS: '', PAYMENTS_FOR: '', ...vars },
       },
     ],
   });

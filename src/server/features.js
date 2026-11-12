@@ -7,9 +7,11 @@
 // and the test version (EVENTS "test") also has the outcomes the author has
 // not approved yet (drafts). The class evolutions are on except where
 // EVOLUTIONS is "off", which plays as before them (the live game hid them
-// in versions 0.0.58–0.0.60). English (ENGLISH "on", i18n.js) is on
-// everywhere from version 0.1.97; where it is off, the game answers in
-// Polish and offers no choice of language. The weeks of the year
+// in versions 0.0.58–0.0.60); their third forms at class level 200 where
+// THIRD_EVOLUTION is "on" (everywhere from version 0.3.0, once the author
+// had accepted all their art). English (ENGLISH "on",
+// i18n.js) is on everywhere from version 0.1.97; where it is off, the game
+// answers in Polish and offers no choice of language. The weeks of the year
 // (src/server/weeks.js) give their effects where WEEKS is "on"; the API
 // tests turn them off, so a test's numbers do not hang on the week it runs
 // in. The guild wars (guild-wars.js) are only where GUILD_WARS is "on":
@@ -26,6 +28,7 @@ let registration = true;
 let events = false;
 let eventDrafts = false;
 let evolutions = true;
+let thirdEvolution = false;
 let settlement = false;
 let fortress = false;
 let english = false;
@@ -44,6 +47,7 @@ export function readFeatures(env) {
   events = env.EVENTS === 'on' || env.EVENTS === 'test';
   eventDrafts = env.EVENTS === 'test';
   evolutions = env.EVOLUTIONS !== 'off';
+  thirdEvolution = env.THIRD_EVOLUTION === 'on';
   settlement = env.SETTLEMENT === 'on';
   fortress = env.FORTRESS === 'on';
   english = env.ENGLISH === 'on';
@@ -65,6 +69,10 @@ export const eventsOn = () => events;
 export const eventDraftsOn = () => eventDrafts;
 // The class evolutions (evolutions.js) and their Ewolucja tab.
 export const evolutionsOn = () => evolutions;
+// The third forms of the evolutions, at class level 200 ("Trzecia ewolucja
+// klas"): only where THIRD_EVOLUTION is "on", and with the evolutions on.
+// Off, the second forms are the last, as before them (content.js).
+export const thirdEvolutionOn = () => evolutions && thirdEvolution;
 // The Osada (settlement.js), first only where SETTLEMENT is "on".
 export const settlementOn = () => settlement;
 // The Warownia (fortress.js), first only where FORTRESS is "on", like the

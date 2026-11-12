@@ -600,6 +600,10 @@
     "0.2.99": {
       "title": "Version 0.2.99",
       "body": "- The game reloads into a new version also when you move between screens, not only when you come back to it from another app. Fixes reach you sooner."
+    },
+    "0.3.0": {
+      "title": "Version 0.3.0",
+      "body": "- The third class evolution: at class level 200 every second form grows into a third. 15 new forms, among them the Horde Slayer, the Colossus, the Bowmaster, the Frost King, the Archdruid, the Prophet, the Lich and the Shadow Lord, each with its own portrait, walk and rider in every skin tone, a new trait and two new skills with icons and sounds.\n- The points of the second form's skills come back to spend, and class levels 200 to 299 give a point each for the new skills."
     }
   }
 }

@@ -226,15 +226,19 @@ test('every sprite on the list has its file at its size, and every class has its
     // The fights' boards of the places (790 B) and of the lands (802).
     boards: [...data('settlement').places.flatMap((place) => place.fightBoard ?? []), ...data('regions').flatMap((region) => region.fightBoard ?? [])],
   };
+  // The riders drawn in the large box (walk.rider.large in
+  // data/animations.json: a cloak or a bow reaching out) are of its size.
+  const largeRiders = data('animations').walk.rider.large ?? { ids: [] };
   for (const [kind, { size, width = size, height = size, fit = false, ids }] of Object.entries(SPRITES)) {
     assert.deepEqual(ids.filter((id) => !known[kind].includes(id)), [], `${kind}: no such id in data/`);
     for (const id of ids) {
       const file = join(CLIENT, 'art', kind, `${id}.png`);
       assert.ok(existsSync(file), `${file} is missing`);
       const png = readFileSync(file);
+      const box = kind === 'riders' && largeRiders.ids.includes(id) ? largeRiders : { width, height };
       // A picture cut to its outline (fit) is at most that size.
       if (fit) assert.ok(png.readUInt32BE(16) <= width && png.readUInt32BE(20) <= height, file);
-      else assert.equal(`${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`, `${width}x${height}`, file);
+      else assert.equal(`${png.readUInt32BE(16)}x${png.readUInt32BE(20)}`, `${box.width}x${box.height}`, file);
     }
   }
   assert.deepEqual(data('classes').map((cls) => cls.id).filter((id) => !classArtIds.includes(id)), []);

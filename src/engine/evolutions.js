@@ -15,7 +15,9 @@
 // a stronger trait, a bigger growth from the level after it and two skills
 // of its own, the first grown out of one of the evolution's. The character
 // keeps only the latest form (`character.evolution`); the line of forms
-// before it follows from `from`.
+// before it follows from `from`. At the third level (200) the second form
+// grows the same way into its third form ("Trzecia ewolucja klas"), where
+// the deployment has the third forms on (the server's content.js).
 
 import { pointsLeft, skillParams, skillText, skillsBlock } from './skills.js';
 
@@ -97,10 +99,10 @@ export function evolutionChoices(character, content, { all = false } = {}) {
 // Why a character cannot take an evolution, or null when it can: it has
 // none yet, the evolution is one of its choices, and it is at the class
 // level of the first evolution with its skills ready for it (the second
-// path and the points, skillsBlock). A second form: the character has the
-// evolution it grows out of, stands at the second evolution level and has
-// no Skill Point left that a skill could take. `test` lifts the level and
-// the skills and opens every first evolution of the class.
+// path and the points, skillsBlock). A second or third form: the character
+// has the form it grows out of, stands at that form's evolution level (100,
+// 200) and has no Skill Point left that a skill could take. `test` lifts
+// the level and the skills and opens every first evolution of the class.
 /**
  * @param {Character} character
  * @param {string} evolutionId
@@ -144,8 +146,8 @@ export const evolvedSkills = (evolutionId, content) => Object.fromEntries(conten
 
 // The stretches of class levels and who grows the class over each: the
 // class up to the first evolution's level, each form of the line from the
-// level after its own evolution level up to the next one's, and the last
-// form on from there.
+// level after its own evolution level up to the next one's (a third form
+// from 201 on), and the last form on from there.
 /**
  * @param {Character} character
  * @param {Content} content
@@ -268,18 +270,21 @@ export function evolutionView(evolution, content, character = null) {
   };
 }
 
-// What the art of a second form and of its skills stands in with until
-// they have their own (the client's art.js): a form takes its first
-// evolution's portrait, walk and ride (`forms`); a grown skill the icon,
-// sound and look of the skill it grew from, and a new one those of its first
-// evolution's skill in the same place, or, where the grown skill came from
-// that one, of the other (`skills`). Real art only needs its files and ids.
+// What the art of a second or third form and of its skills stands in with
+// until they have their own (the client's art.js): a form takes the
+// portrait, walk and ride of the form it grows out of (`forms`; a third
+// form's chain goes on to the first evolution's); a grown skill the icon,
+// sound and look of the skill it grew from, and a new one those of the
+// skill of the form before it in the same place, or, where the grown skill
+// came from that one, of the other (`skills`: the ids in their order, a
+// third form's skill through its second form's to the first evolution's).
+// Real art only needs its files and ids.
 /** @param {Content} content */
 export function evolutionArt(content) {
   /** @type {Record<string, string>} */
   const forms = {};
-  /** @type {Record<string, string[]>} */
-  const skills = {};
+  /** @type {Record<string, string>} */
+  const stand = {};
   for (const evolution of content.evolutions) {
     const parent = evolution.from ? content.evolutionsById[evolution.from] : null;
     if (!parent) continue;
@@ -288,8 +293,17 @@ export function evolutionArt(content) {
     evolution.skills.forEach((/** @type {string} */ id, /** @type {number} */ index) => {
       const from = content.skillsById[id]?.from;
       const same = parent.skills[index];
-      skills[id] = [from ?? (same === grownFrom ? (parent.skills.find((/** @type {string} */ other) => other !== grownFrom) ?? same) : same)];
+      stand[id] = from ?? (same === grownFrom ? (parent.skills.find((/** @type {string} */ other) => other !== grownFrom) ?? same) : same);
     });
+  }
+  // Each skill's whole line of stand-ins, the nearest first.
+  /** @type {Record<string, string[]>} */
+  const skills = {};
+  for (const id of Object.keys(stand)) {
+    /** @type {string[]} */
+    const line = [];
+    for (let next = stand[id]; next && line.length < 4; next = stand[next]) line.push(next);
+    skills[id] = line;
   }
   return { forms, skills };
 }

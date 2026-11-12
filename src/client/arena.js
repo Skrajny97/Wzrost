@@ -425,8 +425,15 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   // taken, as one more card in the field right before it (in its own field,
   // ahead of it, at the front). The foes' blows meant for the summoner land
   // on it, its blows and spit start from it, fallen it stays grey like a
-  // fallen unit until it is called again, and gone, its card goes.
-  const summoned = new Map(); // summoner's id → { unit, card, skill }
+  // fallen unit until it or another is called, and gone, its card goes. With
+  // Serce puszczy two stand at once, each in its own card: a summon is known
+  // by its summoner and its skill (the events name it, `summonSkill`, once it
+  // stands; a report from before them has one summon a summoner).
+  const summoned = new Map(); // `${summoner's id} ${skill}` → { unit, card, skill, owner, down }
+  const summonKey = (owner, skill) => `${owner} ${skill}`;
+  const summonsOf = (owner) => [...summoned.values()].filter((decoy) => decoy.owner === owner);
+  // The summon an event is about: by its skill, else the summoner's only one.
+  const summonFor = (event) => summoned.get(summonKey(event.target, event.summonSkill ?? event.skill)) ?? summonsOf(event.target)[0] ?? null;
   function summonPlace(owner, card) {
     const at = FIELDS.findIndex(([position]) => position === owner.position);
     const ahead = FIELDS.slice(0, Math.max(0, at)).reverse().map(([position]) => fields.get(`${owner.side} ${position}`));
@@ -437,45 +444,54 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   function summonUp(event, quiet) {
     const owner = byId.get(event.target);
     if (!owner) return Promise.resolve();
-    let decoy = summoned.get(owner.id);
-    if (!decoy || decoy.skill !== event.skill) {
-      summonRemove(owner.id, true);
-      const unit = { id: `${owner.id}~summon`, side: owner.side, name: event.summon, level: owner.level, maxHp: event.summonHp, strike: 'magic', summon: event.skill, figure: event.figure };
-      decoy = { unit, card: unitCard(unit), skill: event.skill };
-      summoned.set(owner.id, decoy);
+    let decoy = summoned.get(summonKey(owner.id, event.skill));
+    if (!decoy) {
+      // A fallen summon's grey card gives way to the one called now.
+      for (const old of summonsOf(owner.id)) if (old.down) summonRemove(owner.id, true, old.skill);
+      const unit = { id: `${owner.id}~summon~${event.skill}`, side: owner.side, name: event.summon, level: owner.level, maxHp: event.summonHp, strike: 'magic', summon: event.skill, figure: event.figure };
+      decoy = { unit, card: unitCard(unit), skill: event.skill, owner: owner.id, down: false };
+      summoned.set(summonKey(owner.id, event.skill), decoy);
       summonPlace(owner, decoy.card);
     }
+    decoy.down = false;
     decoy.unit.maxHp = event.summonHp;
     setHp(decoy.unit.id, event.summonHp);
     setDown(decoy.unit.id, false);
     if (quiet || reducedMotion()) return Promise.resolve();
     return animate(decoy.card, [{ opacity: 0, transform: 'scale(0.4)' }, { opacity: 1, transform: 'scale(1)' }], { duration: 320, easing: 'ease-out' });
   }
-  function summonRemove(id, quiet = false) {
-    const decoy = summoned.get(id);
-    if (!decoy) return Promise.resolve();
-    summoned.delete(id);
-    cards.delete(decoy.unit.id);
-    if (quiet || reducedMotion() || !decoy.card.isConnected) {
-      decoy.card.remove();
-      return Promise.resolve();
-    }
-    return animate(decoy.card, [{ opacity: 1 }, { opacity: 0, transform: 'scale(0.6)' }], { duration: 260, easing: 'ease-in' }).then(() => decoy.card.remove());
+  // The cards of a summoner's summons go: all of them, or the one of `skill`.
+  function summonRemove(id, quiet = false, skill = null) {
+    const gone = summonsOf(id).filter((decoy) => skill === null || decoy.skill === skill);
+    return Promise.all(
+      gone.map((decoy) => {
+        summoned.delete(summonKey(id, decoy.skill));
+        cards.delete(decoy.unit.id);
+        if (quiet || reducedMotion() || !decoy.card.isConnected) {
+          decoy.card.remove();
+          return Promise.resolve();
+        }
+        return animate(decoy.card, [{ opacity: 1 }, { opacity: 0, transform: 'scale(0.6)' }], { duration: 260, easing: 'ease-in' }).then(() => decoy.card.remove());
+      }),
+    );
   }
   // The summon's state after an event, at once; `up` and `gone` move cards.
   function summonState(event) {
     if (event.state === 'up') return summonUp(event, true);
-    if (event.state === 'gone') return summonRemove(event.target, true);
-    const decoy = summoned.get(event.target);
+    const decoy = summonFor(event);
+    if (event.state === 'gone') return summonRemove(event.target, true, decoy?.skill ?? null);
     if (!decoy) return;
     setHp(decoy.unit.id, event.summonHp);
-    if (event.state === 'fell') setDown(decoy.unit.id, true);
+    if (event.state === 'fell') {
+      setDown(decoy.unit.id, true);
+      decoy.down = true;
+    }
   }
   // Who acts in an event: the summon for its own blows and spit (its
   // skill's events under its summoner's name), otherwise the unit itself.
   function actorOf(event) {
-    const decoy = summoned.get(event.actor);
-    if (decoy && event.skill === decoy.skill && (MOVES.has(event.kind) || event.kind === 'skill')) return decoy.unit;
+    const decoy = event.skill ? summoned.get(summonKey(event.actor, event.skill)) : null;
+    if (decoy && (MOVES.has(event.kind) || event.kind === 'skill')) return decoy.unit;
     return byId.get(event.actor);
   }
 
@@ -593,7 +609,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     // blows meant for the summoner, greys out when it falls and goes when its
     // time is up.
     if (event.kind === 'summon') {
-      const decoy = summoned.get(event.target);
+      const decoy = summonFor(event);
       if (event.state === 'up') {
         const appear = summonUp(event, false);
         await skills.cast(event);
@@ -603,7 +619,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       }
       if (event.state === 'gone') {
         line();
-        await summonRemove(event.target);
+        await summonRemove(event.target, false, decoy?.skill ?? null);
         return;
       }
       if (!decoy) {
@@ -623,6 +639,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       }
       const id = run;
       setHp(decoy.unit.id, 0);
+      decoy.down = true;
       line();
       await animate(
         decoy.card,
@@ -770,7 +787,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     held.clear();
     shields.clear();
     guards.clear();
-    for (const id of [...summoned.keys()]) summonRemove(id, true);
+    for (const owner of new Set([...summoned.values()].map((decoy) => decoy.owner))) summonRemove(owner, true);
     index = 0;
     log.replaceChildren();
     banner.classList.remove('arena-banner--shown');
