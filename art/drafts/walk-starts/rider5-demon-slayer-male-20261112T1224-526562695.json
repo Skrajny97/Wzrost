@@ -1,0 +1,19 @@
+{
+  "id": "rider5-demon-slayer-male",
+  "tool": "pixellab generate-image-v2",
+  "description": "the demon hunter of the reference picture riding: the same short black hair and the same stern scarred face, the same polished silver plate armour with golden trim, the same white tabard with the golden sun emblem on the chest, the same white cloak with golden trim hanging behind from the shoulders, silver armoured boots, nothing in the hands but the reins, no sword and no skull; sitting astride a saddle that is not drawn, upright, seen exactly from the side in a strict profile, facing right, the head, chest and hips turned fully to the right; both forearms reaching forward, the two gauntleted hands together in front of the body holding short reins that end just in front of the hands; only the near leg showing and only one foot in the whole picture: the armoured thigh lying forward and level from the hip to the knee, the armoured lower leg hanging straight down from the knee, one whole silver armoured boot at the bottom with the toes pointing right; the far leg completely hidden and not drawn at all, no second boot and no second foot; the whole figure from the top of the head to the sole of the boot inside the picture with room around it; nothing under the rider; isolated figure on a plain background",
+  "style": null,
+  "input": null,
+  "mask": null,
+  "references": [
+    {
+      "path": "art/references/evolutions/demon-slayer-male.png",
+      "usage": "the character's look: this same man, his face, hair, armour, tabard, cloak and colours, drawn the same way; not his standing pose and not the sword and the skull"
+    }
+  ],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 4
+}
