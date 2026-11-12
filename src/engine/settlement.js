@@ -1,3 +1,4 @@
+// @ts-check
 // The Osada (data/settlement.json), part I: the reputation with the
 // brotherhoods and the relation with the residents, the Tablica zleceń, the
 // Zaklinaczka's reforging of an affix and the Pustelnik's resets. Reputation
@@ -25,13 +26,27 @@ import { areaUnlocked } from './unlocks.js';
 import { craftCost, knownPatterns } from './workshop.js';
 import { weekCount, weekFactor, weekGains } from './weeks.js';
 
-const rarityIndex = (rarityId, content) => content.rarities.findIndex((rarity) => rarity.id === rarityId);
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {Record<string, any>} Character A character, as the engine takes it. */
+/** @typedef {Record<string, any>} Item An item as the gear keeps it. */
+/** @typedef {{ minLevel: number } & Record<string, any>} Area An inner region (content.areas). */
+/** @typedef {import('./rng.js').Rng} Rng */
+
+/**
+ * @param {string} rarityId
+ * @param {Content} content
+ */
+const rarityIndex = (rarityId, content) => content.rarities.findIndex((/** @type {Record<string, any>} */ rarity) => rarity.id === rarityId);
 
 // The standing at `points`: the last one reached, its place among the
 // standings, the next one (null at the top) and the points still to it.
+/**
+ * @param {number} points
+ * @param {Content} content
+ */
 export function standingOf(points, content) {
   const { standings } = content.settlement;
-  const index = standings.findLastIndex((standing) => standing.points <= points);
+  const index = standings.findLastIndex((/** @type {Record<string, any>} */ standing) => standing.points <= points);
   const next = standings[index + 1] ?? null;
   return { ...standings[index], index, next, toNext: next ? next.points - points : 0 };
 }
@@ -42,11 +57,16 @@ export function standingOf(points, content) {
 // Kupców, the perks of brotherhoodPerks, and for a brotherhood that posts
 // orders, quality orders for materials and special orders from their
 // standings.
+/**
+ * @param {Record<string, any>} brotherhood
+ * @param {number} index
+ * @param {Content} content
+ */
 export function brotherhoodPerks(brotherhood, index, content) {
   const { forge, market, orders, standings, brotherhoodsPanel } = content.settlement;
   const words = brotherhoodsPanel.perks;
-  const fill = (text, vars) => text.replace(/\{(\w+)\}/g, (_, name) => String(vars[name] ?? ''));
-  const from = (id) => standings.findIndex((standing) => standing.id === id);
+  const fill = (/** @type {string} */ text, /** @type {Record<string, any>} */ vars) => text.replace(/\{(\w+)\}/g, (/** @type {string} */ _, /** @type {string} */ name) => String(vars[name] ?? ''));
+  const from = (/** @type {string} */ id) => standings.findIndex((/** @type {Record<string, any>} */ standing) => standing.id === id);
   const perks = [];
   if (forge?.brotherhood === brotherhood.id) {
     const discount = forge.discount[Math.min(index, forge.discount.length - 1)];
@@ -69,12 +89,24 @@ export function brotherhoodPerks(brotherhood, index, content) {
 
 // The perks of the brotherhoods' standings (data/settlement.json
 // brotherhoodPerks, the author's 589–593), without the data's own note.
+/**
+ * @param {Content} content
+ */
 const perkEntries = (content) => Object.entries(content.settlement.brotherhoodPerks ?? {}).filter(([id]) => id !== '$comment');
+/**
+ * @param {Record<string, any>} perk
+ * @param {number} index
+ */
 const perkAt = (perk, index) => perk.byStanding[Math.min(index, perk.byStanding.length - 1)];
 
 // A perk's number as the panel says it: shares in whole percents (the
 // Targowisko's fee to a tenth, "4,5" in Polish, "4.5" in English), counts
 // as they are.
+/**
+ * @param {string} id
+ * @param {number} value
+ * @param {Content} content
+ */
 function shownPerk(id, value, content) {
   if (id === 'marketFee') return decimalText(Math.round(value * 1000) / 10, content);
   if (id === 'potionFights' || id === 'wandererItems' || id === 'auctionHours') return String(value);
@@ -86,6 +118,13 @@ function shownPerk(id, value, content) {
 // one or the other of its two, the English of the three Polish forms as
 // one key ("walkę|walki|walk": "fight|fights", word()), as the page's
 // plural() takes them.
+/**
+ * @param {number} count
+ * @param {string} one
+ * @param {string} few
+ * @param {string} many
+ * @param {Content} content
+ */
 function plural(count, one, few, many, content) {
   const key = [one, few, many].join('|');
   const english = word(content, key);
@@ -98,6 +137,11 @@ function plural(count, one, few, many, content) {
 // author's 589–593): its number at the standing the character has with
 // that brotherhood, by the Osada's reputation (settlement.reputation). An
 // unknown perk is 0.
+/**
+ * @param {string} perkId
+ * @param {Record<string, number>} reputation
+ * @param {Content} content
+ */
 export function brotherhoodPerk(perkId, reputation, content) {
   const perk = content.settlement.brotherhoodPerks?.[perkId];
   if (!perk || perkId === '$comment') return 0;
@@ -105,19 +149,33 @@ export function brotherhoodPerk(perkId, reputation, content) {
 }
 
 // Whether a brotherhood's standing has reached the one of `standingId`.
+/**
+ * @param {number} points
+ * @param {string} standingId
+ * @param {Content} content
+ */
 const reached = (points, standingId, content) =>
-  standingOf(points, content).index >= content.settlement.standings.findIndex((standing) => standing.id === standingId);
+  standingOf(points, content).index >= content.settlement.standings.findIndex((/** @type {Record<string, any>} */ standing) => standing.id === standingId);
 
 // The brotherhood that orders a kind of goods.
-const brotherhoodOf = (kind, content) => content.settlement.brotherhoods.find((brotherhood) => brotherhood.goods.includes(kind));
+/**
+ * @param {string} kind
+ * @param {Content} content
+ */
+const brotherhoodOf = (kind, content) => content.settlement.brotherhoods.find((/** @type {Record<string, any>} */ brotherhood) => brotherhood.goods.includes(kind));
 
 // What a Warsztat's item of a pattern costs to make at `level` at the
 // cheapest: its common parts at the Lada złomiarza's top level and its
 // resources at the fire spirit's.
+/**
+ * @param {string} baseId
+ * @param {number} level
+ * @param {Content} content
+ */
 export function craftBuyCost(baseId, level, content) {
   const { parts, resources } = craftCost(content.basesById[baseId], 'common', 1, level, content);
-  const partGold = Object.entries(parts).reduce((sum, [partId, count]) => sum + count * partPrice(partId, shopBuilding(content).maxLevel, content), 0);
-  const resourceGold = Object.values(resources).reduce((sum, count) => sum + count, 0) * fireTrade(fireBuilding(content).maxLevel, content).unitGold;
+  const partGold = Object.entries(parts).reduce((sum, [partId, count]) => sum + count * partPrice(partId, /** @type {Record<string, any>} */ (shopBuilding(content)).maxLevel, content), 0);
+  const resourceGold = Object.values(resources).reduce((sum, count) => sum + count, 0) * /** @type {Record<string, any>} */ (fireTrade(/** @type {Record<string, any>} */ (fireBuilding(content)).maxLevel, content)).unitGold;
   return partGold + resourceGold;
 }
 
@@ -127,6 +185,11 @@ export function craftBuyCost(baseId, level, content) {
 // sell for more. A Warsztat's item (`craft`, by its pattern) is priced at
 // what making it at `level` costs at the cheapest, so an order pays below
 // that and never for buying what it takes.
+/**
+ * @param {Record<string, any>} options
+ * @param {Content} content
+ * @param {number} [level]
+ */
 export function goodPrice({ kind, key }, content, level = 1) {
   const { orders } = content.settlement;
   if (kind === 'herb') return content.herbsById[key].price;
@@ -138,6 +201,10 @@ export function goodPrice({ kind, key }, content, level = 1) {
 }
 
 // What the scrapper pays for a common Warsztat's item of a pattern at `level`.
+/**
+ * @param {number} level
+ * @param {Content} content
+ */
 export const craftSellPrice = (level, content) => sellPrice({ level, rarity: 'common' }, content);
 
 // An order for any creatures' materials of a rarity, keyed "any:rare" (the
@@ -145,7 +212,13 @@ export const craftSellPrice = (level, content) => sellPrice({ level, rarity: 'co
 // rzadkich/unikalnych"): any material of that rarity counts but an elite's
 // or a champion's trophy.
 const ANY = 'any';
+/**
+ * @param {string} rarityId
+ */
 export const anyMaterialKey = (rarityId) => stackKey(ANY, rarityId);
+/**
+ * @param {Record<string, any>} options
+ */
 export const isAnyMaterial = ({ kind, key }) => kind === 'material' && parseStack(key).materialId === ANY;
 
 // The goods an order may ask for: only what the character can already get
@@ -155,9 +228,13 @@ export const isAnyMaterial = ({ kind, key }) => kind === 'material' && parseStac
 // rarity of the creatures it has met (no elite's or champion's trophy, and
 // only the rarities anyMaterial names), the camp's resources and the parts
 // up to the board's partRarity.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ */
 export function orderGoods(character, content) {
   const goods = [];
-  const open = (profession) => profession && professionOpen(content.professionsById[profession.profession], character.level, content);
+  const open = (/** @type {Record<string, any>} */ profession) => profession && professionOpen(content.professionsById[profession.profession], character.level, content);
   if (open(content.gathering)) {
     const level = professionState(character.professions, content.gathering.profession).level;
     for (const herb of knownHerbs(level, content)) goods.push({ kind: 'herb', key: herb.id });
@@ -191,6 +268,10 @@ export function orderGoods(character, content) {
 
 // Materials one rarity higher, for an order of quality, up to the last
 // rarity anyMaterial names.
+/**
+ * @param {string} key
+ * @param {Content} content
+ */
 function finer(key, content) {
   const { materialId, rarityId } = parseStack(key);
   const next = content.rarities[rarityIndex(rarityId, content) + 1];
@@ -201,15 +282,24 @@ function finer(key, content) {
 // also those of its slot (craftStories), so a sword is not wanted for
 // guards in rags (the author: "Strażnicy palisady chodzą bez uzbrojenia"
 // w przypadku Broni).
+/**
+ * @param {string} kind
+ * @param {string} key
+ * @param {Content} content
+ */
 export function orderStories(kind, key, content) {
   const { orders } = content.settlement;
   if (kind !== 'craft') return orders.stories[kind];
-  const slot = content.bases.find((base) => base.id === key)?.slot;
-  return [...orders.stories.craft, ...orders.craftStories.filter((story) => story.slots.includes(slot)).map((story) => story.text)];
+  const slot = content.bases.find((/** @type {Record<string, any>} */ base) => base.id === key)?.slot;
+  return [...orders.stories.craft, ...orders.craftStories.filter((/** @type {Record<string, any>} */ story) => story.slots.includes(slot)).map((/** @type {Record<string, any>} */ story) => story.text)];
 }
 
 // The hours one potion takes to make at the first level of the professions:
 // gathering its herbs at their perHour and brewing it.
+/**
+ * @param {Record<string, any>} potion
+ * @param {Content} content
+ */
 const potionHours = (potion, content) =>
   Object.entries(potion.herbs).reduce((hours, [herbId, count]) => hours + count / content.herbsById[herbId].perHour, 0) + content.brewing.potionMinutes / 60;
 
@@ -219,10 +309,14 @@ const potionHours = (potion, content) =>
 // quick one, not in as many pieces; a potion as the hours of the quickest
 // potion against its own; any materials and parts materialStep times fewer
 // for each rarity above the first, for about the same gold.
+/**
+ * @param {Record<string, any>} options
+ * @param {Content} content
+ */
 export function goodShare({ kind, key }, content) {
   const { orders } = content.settlement;
-  if (kind === 'herb') return content.herbsById[key].perHour / Math.max(...content.herbs.map((herb) => herb.perHour));
-  if (kind === 'potion') return Math.min(...content.potions.map((potion) => potionHours(potion, content))) / potionHours(content.potionsById[key], content);
+  if (kind === 'herb') return content.herbsById[key].perHour / Math.max(...content.herbs.map((/** @type {Record<string, any>} */ herb) => herb.perHour));
+  if (kind === 'potion') return Math.min(...content.potions.map((/** @type {Record<string, any>} */ potion) => potionHours(potion, content))) / potionHours(content.potionsById[key], content);
   if (kind === 'material') return orders.materialStep ** rarityIndex(parseStack(key).rarityId, content);
   if (kind === 'part') return orders.materialStep ** rarityIndex(content.partsById[key].rarity, content);
   return 1;
@@ -230,6 +324,12 @@ export function goodShare({ kind, key }, content) {
 
 // The most of a good an order asks for at the character's level, the
 // week's or another.
+/**
+ * @param {Record<string, any>} options
+ * @param {number} level
+ * @param {boolean} weekly
+ * @param {Content} content
+ */
 export function orderCeiling({ kind, key }, level, weekly, content) {
   const { orders } = content.settlement;
   const tuning = orders.counts[kind];
@@ -252,12 +352,16 @@ const REDRAWN = ['material', 'resource'];
 // reputation, a quality one from the brotherhood's quality standing on
 // (question 90 A), and one sentence of the one who orders (question 94 A).
 // `weekly` makes the week's big order.
+/**
+ * @param {{ character: Character, reputation?: Record<string, number>, seed: string, weekly?: boolean }} options
+ * @param {Content} content
+ */
 export function drawOrder({ character, reputation = {}, seed, weekly = false }, content) {
   const { orders } = content.settlement;
   const rng = createRng(seed);
   const goods = orderGoods(character, content);
   if (goods.length === 0) return null;
-  const brotherhoods = content.settlement.brotherhoods.filter((one) => goods.some((good) => one.goods.includes(good.kind)));
+  const brotherhoods = content.settlement.brotherhoods.filter((/** @type {Record<string, any>} */ one) => goods.some((good) => one.goods.includes(good.kind)));
   const brotherhood = rng.pick(brotherhoods);
   const kind = rng.pick([...new Set(goods.filter((good) => brotherhood.goods.includes(good.kind)).map((good) => good.kind))]);
   const good = rng.pick(goods.filter((one) => one.kind === kind));
@@ -312,11 +416,19 @@ export const emptyBoard = () => ({ slots: [], weekly: null, delivered: 0, turn: 
 // The week's big order is this week's (drawn when the week comes, kept
 // until delivered, then none until the next week). `seed` is the
 // character's.
+/**
+ * @param {Record<string, any> | null | undefined} stored
+ * @param {{ character: Character, reputation: Record<string, number>, seed: string }} options1
+ * @param {number} now
+ * @param {Content} content
+ */
 export function settleBoard(stored, { character, reputation, seed }, now, content) {
   const { orders } = content.settlement;
+  /** @type {Record<string, any>} */
   const board = { ...emptyBoard(), ...stored };
   const term = orders.expireDays * 86400000;
   let turn = board.turn ?? 0;
+  /** @type {Record<string, any>[]} */
   const slots = Array.from({ length: orders.open }, (_, index) => board.slots[index] ?? { readyAt: now });
   const settled = slots.map((first) => {
     let slot = first;
@@ -362,32 +474,46 @@ export function settleBoard(stored, { character, reputation, seed }, now, conten
 // or one asking for more than an order asks for now (orderCeiling), is
 // drawn anew, the week's too (the author: "Zlecenia aktualne jeśli są z
 // tych dziwacznych - przelosuj każdemu").
+/**
+ * @param {Record<string, any>} order
+ * @param {Character} character
+ * @param {Content} content
+ */
 const outdated = (order, character, content) =>
   (order.kind === 'material' && !isAnyMaterial(order)) || (REDRAWN.includes(order.kind) && (order.rules ?? 0) < ORDER_RULES) || order.count > orderCeiling(order, character.level, order.weekly === true, content);
 
 // An order hung before its sentence was rewritten takes the new sentence
 // closest to the old one (the most words alike from the start), so the
 // board reads the corrected text at once.
+/**
+ * @param {Record<string, any>} order
+ * @param {Content} content
+ */
 function freshStory(order, content) {
   const stories = orderStories(order.kind, order.key, content);
   if (!order.story || stories.includes(order.story)) return order;
   const words = order.story.split(' ');
-  const alike = (story) => {
+  const alike = (/** @type {string} */ story) => {
     const other = story.split(' ');
     let same = 0;
     while (same < words.length && words[same] === other[same]) same += 1;
     return same;
   };
-  return { ...order, story: stories.reduce((best, story) => (alike(story) > alike(best) ? story : best), stories[0]) };
+  return { ...order, story: stories.reduce((/** @type {string} */ best, /** @type {string} */ story) => (alike(story) > alike(best) ? story : best), stories[0]) };
 }
 
 // How many pieces of a good the character holds: herbs, potions, materials,
 // resources and parts by key, as the store keeps them, the Warsztat's items
 // in the bag by pattern (`crafted`), and for any materials of a rarity all
 // the stacks that count for them.
+/**
+ * @param {Record<string, any>} options
+ * @param {Record<string, any>} stocks
+ * @param {Content} content
+ */
 export function goodStock({ kind, key }, stocks, content) {
   if (isAnyMaterial({ kind, key })) return anyMaterialStacks(key, stocks.materials ?? {}, content).reduce((sum, [, count]) => sum + count, 0);
-  const store = { herb: stocks.herbs, potion: stocks.potions, material: stocks.materials, resource: stocks.resources, part: stocks.parts, craft: stocks.crafted }[kind];
+  const store = /** @type {Record<string, any>} */ ({ herb: stocks.herbs, potion: stocks.potions, material: stocks.materials, resource: stocks.resources, part: stocks.parts, craft: stocks.crafted })[kind];
   return store?.[key] ?? 0;
 }
 
@@ -395,15 +521,20 @@ export function goodStock({ kind, key }, stocks, content) {
 // order it takes them: the biggest first, so the character keeps a bit of
 // each, and the materials of the Zaklinaczka's elements last, so they stay
 // for her while anything else will do. No trophy counts.
+/**
+ * @param {string} key
+ * @param {Record<string, number>} materials
+ * @param {Content} content
+ */
 export function anyMaterialStacks(key, materials, content) {
   const { rarityId } = parseStack(key);
-  const kept = new Set(content.settlement.imbue?.elements.map((one) => one.material) ?? []);
-  const counts = (stack) => {
+  const kept = new Set(content.settlement.imbue?.elements.map((/** @type {Record<string, any>} */ one) => one.material) ?? []);
+  const counts = (/** @type {string} */ stack) => {
     if (!knownStack(stack, content) || parseStack(stack).rarityId !== rarityId) return false;
     const monster = content.monstersById[content.materialsById[parseStack(stack).materialId].monster];
     return Boolean(monster) && !monster.elite && !monster.champion;
   };
-  const last = (stack) => (kept.has(parseStack(stack).materialId) ? 1 : 0);
+  const last = (/** @type {string} */ stack) => (kept.has(parseStack(stack).materialId) ? 1 : 0);
   return Object.entries(materials)
     .filter(([stack, count]) => count > 0 && counts(stack))
     .sort(([a, x], [b, y]) => last(a) - last(b) || y - x || (a < b ? -1 : 1));
@@ -411,8 +542,14 @@ export function anyMaterialStacks(key, materials, content) {
 
 // The stacks a delivered order of materials takes, by key: its own, or for
 // any materials anyMaterialStacks in their order until the count is met.
+/**
+ * @param {Record<string, any>} options
+ * @param {Record<string, number>} materials
+ * @param {Content} content
+ */
 export function materialsTaken({ key, count }, materials, content) {
   if (parseStack(key).materialId !== ANY) return { [key]: count };
+  /** @type {Record<string, number>} */
   const taken = {};
   let left = count;
   for (const [stack, held] of anyMaterialStacks(key, materials, content)) {
@@ -425,19 +562,35 @@ export function materialsTaken({ key, count }, materials, content) {
 
 // The Warsztat's items of a pattern an order takes from the bag: the
 // weakest first (rarity, upgrade, level), never one worn.
+/**
+ * @param {Item[]} items
+ * @param {string} baseId
+ * @param {number} count
+ * @param {Content} content
+ */
 export function craftedFor(items, baseId, count, content) {
-  const rank = (item) => content.rarities.findIndex((rarity) => rarity.id === item.rarity);
+  const rank = (/** @type {Item} */ item) => content.rarities.findIndex((/** @type {Record<string, any>} */ rarity) => rarity.id === item.rarity);
   return items
-    .filter((item) => item.crafted && item.base === baseId && !item.equippedSlot)
-    .sort((a, b) => rank(a) - rank(b) || (a.upgrade ?? 0) - (b.upgrade ?? 0) || a.level - b.level || a.id - b.id)
+    .filter((/** @type {Item} */ item) => item.crafted && item.base === baseId && !item.equippedSlot)
+    .sort((/** @type {Item} */ a, /** @type {Item} */ b) => rank(a) - rank(b) || (a.upgrade ?? 0) - (b.upgrade ?? 0) || a.level - b.level || a.id - b.id)
     .slice(0, count);
 }
 
 // The order of a slot, or the week's, by its id (`weekly` for the week's).
+/**
+ * @param {Record<string, any>} board
+ * @param {string} orderId
+ */
 const findOrder = (board, orderId) =>
-  orderId === 'weekly' ? (board.weekly && !board.weekly.done ? board.weekly.order : null) : board.slots.find((slot) => slot.order?.id === orderId)?.order ?? null;
+  orderId === 'weekly' ? (board.weekly && !board.weekly.done ? board.weekly.order : null) : board.slots.find((/** @type {Record<string, any>} */ slot) => slot.order?.id === orderId)?.order ?? null;
 
 // Why an order cannot be delivered now, or null.
+/**
+ * @param {Record<string, any>} board
+ * @param {string} orderId
+ * @param {Record<string, any>} stocks
+ * @param {Content} content
+ */
 export function deliverBlock(board, orderId, stocks, content) {
   const order = findOrder(board, orderId);
   if (!order) return { code: 'no_order', message: 'Tego zlecenia nie ma już na tablicy.' };
@@ -454,6 +607,11 @@ export function deliverBlock(board, orderId, stocks, content) {
 // What an order pays now: its own gold, and for herbs, potions and
 // materials at least overScrap times what the scrapper pays the character
 // for them, with the camp's Skup bonus (`sellBonus`, question 236 A).
+/**
+ * @param {Record<string, any>} order
+ * @param {number} sellBonus
+ * @param {Content} content
+ */
 export function orderGold(order, sellBonus, content) {
   if (!['herb', 'potion', 'material'].includes(order.kind)) return order.gold;
   const scrap = goodPrice(order, content) * (1 + sellBonus) * order.count;
@@ -462,6 +620,14 @@ export function orderGold(order, sellBonus, content) {
 
 // The brotherhood's reputation with the week's share of reputation (`week`,
 // the week of the delivery, weeks.js), made whole fairly.
+/**
+ * @param {Record<string, any>} board
+ * @param {string} orderId
+ * @param {number} now
+ * @param {Content} content
+ * @param {number} [sellBonus]
+ * @param {import('./weeks.js').Week | null} [week]
+ */
 export function deliverOrder(board, orderId, now, content, sellBonus = 0, week = null) {
   const { orders } = content.settlement;
   const order = findOrder(board, orderId);
@@ -474,7 +640,7 @@ export function deliverOrder(board, orderId, now, content, sellBonus = 0, week =
     board: {
       ...board,
       delivered,
-      slots: weekly ? board.slots : board.slots.map((slot) => (slot.order?.id === orderId ? { readyAt: now + orders.refillMinutes * 60000 } : slot)),
+      slots: weekly ? board.slots : board.slots.map((/** @type {Record<string, any>} */ slot) => (slot.order?.id === orderId ? { readyAt: now + orders.refillMinutes * 60000 } : slot)),
       weekly: weekly ? { ...board.weekly, done: true } : board.weekly,
     },
     take: { kind: order.kind, key: order.key, count: order.count },
@@ -487,10 +653,16 @@ export function deliverOrder(board, orderId, now, content, sellBonus = 0, week =
 
 // Rejecting an order is free, and a new one comes after refillMinutes
 // (question 92 A); the week's cannot be rejected.
+/**
+ * @param {Record<string, any>} board
+ * @param {string} orderId
+ * @param {number} now
+ * @param {Content} content
+ */
 export function rejectOrder(board, orderId, now, content) {
   if (orderId === 'weekly' || !findOrder(board, orderId)) return null;
   const readyAt = now + content.settlement.orders.refillMinutes * 60000;
-  return { ...board, slots: board.slots.map((slot) => (slot.order?.id === orderId ? { readyAt } : slot)) };
+  return { ...board, slots: board.slots.map((/** @type {Record<string, any>} */ slot) => (slot.order?.id === orderId ? { readyAt } : slot)) };
 }
 
 // The Zaklinaczka's price of reforging an item's affix (question 99): gold
@@ -499,6 +671,11 @@ export function rejectOrder(board, orderId, now, content) {
 // item's: common ones for rare and unique items, rare ones for epic and
 // legendary; any materials of that rarity add up (481 B: piecesOfRarity
 // in crafting.js).
+/**
+ * @param {Item} item
+ * @param {number} times
+ * @param {Content} content
+ */
 export function reforgeCost(item, times, content) {
   const { goldPerLevel, growth, materials } = content.settlement.reforge;
   const rarity = content.raritiesById[item.rarity];
@@ -510,6 +687,12 @@ export function reforgeCost(item, times, content) {
 
 // Why an item's affix cannot be reforged now, or null. `materials` are the
 // character's, which pay for it.
+/**
+ * @param {Item} item
+ * @param {number} affixIndex
+ * @param {{ gold: number, materials: Record<string, number>, times: number }} options2
+ * @param {Content} content
+ */
 export function reforgeBlock(item, affixIndex, { gold, materials, times }, content) {
   if (!item || !(item.affixes?.length > 0)) return { code: 'no_affixes', message: 'Ten przedmiot nie ma afiksów do przekucia.' };
   if (!Number.isInteger(affixIndex) || !item.affixes[affixIndex]) return { code: 'invalid_affix', message: 'Wybierz afiks do przekucia.' };
@@ -526,10 +709,14 @@ export function reforgeBlock(item, affixIndex, { gold, materials, times }, conte
 // character's relation with her: one, and more from the standings in
 // reforge.choices on (question 97: "z czasem rozwoju Reputacji możliwość
 // wybrania afiksu z 2-3 dostępnych").
+/**
+ * @param {number} points
+ * @param {Content} content
+ */
 export function reforgeChoices(points, content) {
   const { index } = standingOf(points, content);
-  const at = (standingId) => content.settlement.standings.findIndex((standing) => standing.id === standingId);
-  return content.settlement.reforge.choices.reduce((count, step) => (index >= at(step.from) ? step.count : count), 1);
+  const at = (/** @type {string} */ standingId) => content.settlement.standings.findIndex((/** @type {Record<string, any>} */ standing) => standing.id === standingId);
+  return content.settlement.reforge.choices.reduce((/** @type {number} */ count, /** @type {Record<string, any>} */ step) => (index >= at(step.from) ? step.count : count), 1);
 }
 
 // The new affixes a reforging draws for the chosen one (question 97 A):
@@ -537,24 +724,42 @@ export function reforgeChoices(points, content) {
 // stays a prefix), never one the item already has, with the value its item
 // level and rarity give that stat. The creature that names it stays, so
 // the new affix comes from the place the item was found (question 98 A).
+/**
+ * @param {Item} item
+ * @param {number} affixIndex
+ * @param {number} count
+ * @param {Rng} rng
+ * @param {Content} content
+ */
 export function reforgeOptions(item, affixIndex, count, rng, content) {
   const old = item.affixes[affixIndex];
-  let pool = (old.kind === 'prefix' ? content.prefixes : content.suffixes).filter((affix) => !item.affixes.some((other) => other.id === affix.id));
+  let pool = (old.kind === 'prefix' ? content.prefixes : content.suffixes).filter((/** @type {Record<string, any>} */ affix) => !item.affixes.some((/** @type {Record<string, any>} */ other) => other.id === affix.id));
   const share = affixShare(item.level, item.rarity, content);
   const options = [];
   while (options.length < count && pool.length > 0) {
     const affix = rng.weighted(pool);
-    pool = pool.filter((other) => other.id !== affix.id);
+    pool = pool.filter((/** @type {Record<string, any>} */ other) => other.id !== affix.id);
     options.push({ ...old, id: affix.id, stat: affix.stat, value: affixValue(affix.stat, share, content.balance.items) });
   }
   return options;
 }
 
 // The item with one affix in place of the one at `affixIndex`.
-export const withAffix = (item, affixIndex, affix) => ({ ...item, affixes: item.affixes.map((other, index) => (index === affixIndex ? affix : other)) });
+/**
+ * @param {Item} item
+ * @param {number} affixIndex
+ * @param {Record<string, any>} affix
+ */
+export const withAffix = (item, affixIndex, affix) => ({ ...item, affixes: item.affixes.map((/** @type {Record<string, any>} */ other, /** @type {number} */ index) => (index === affixIndex ? affix : other)) });
 
 // Reforging with nothing to choose: the chosen affix draws anew. The other
 // affixes, the upgrade and the level stay. Always succeeds (question 100 A).
+/**
+ * @param {Item} item
+ * @param {number} affixIndex
+ * @param {Rng} rng
+ * @param {Content} content
+ */
 export function reforgeItem(item, affixIndex, rng, content) {
   const [affix] = reforgeOptions(item, affixIndex, 1, rng, content);
   return { ...withAffix(item, affixIndex, affix), reforged: (item.reforged ?? 0) + 1 };
@@ -564,19 +769,39 @@ export function reforgeItem(item, affixIndex, rng, content) {
 // evolution after the free first one (question 123 A: 100 000 gold, each
 // next one twice as much; `paid` is the paid changes before) and a stat
 // reset from statsFromLevel on (question 124 A), null before.
+/**
+ * @param {number} level
+ * @param {Content} content
+ */
 export const pathResetCost = (level, content) => level * content.settlement.hermit.pathGoldPerLevel;
+/**
+ * @param {number} paid
+ * @param {Content} content
+ */
 export const evolutionChangeCost = (paid, content) => content.settlement.hermit.evolutionGold * content.settlement.hermit.evolutionGrowth ** paid;
 // The next change of evolution after `changes` of them: the first free (the
 // author at E4: "tylko raz darmowo, a później baaaardzo baaaardzo drogo").
+/**
+ * @param {number} changes
+ * @param {Content} content
+ */
 export const evolutionChangePrice = (changes, content) => (changes > 0 ? evolutionChangeCost(changes - 1, content) : 0);
 // The evolutions a change can go to: the class's others of the same stage.
 // A character with its second form changes its first evolution and gets
 // that one's second form with it.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ */
 export function evolutionChanges(character, content) {
   const current = character.evolution ? content.evolutionsById[character.evolution] : null;
   if (!current) return [];
-  return content.evolutions.filter((evolution) => evolution.classId === character.classId && evolution.id !== current.id && (evolution.stage ?? 1) === (current.stage ?? 1));
+  return content.evolutions.filter((/** @type {Record<string, any>} */ evolution) => evolution.classId === character.classId && evolution.id !== current.id && (evolution.stage ?? 1) === (current.stage ?? 1));
 }
+/**
+ * @param {number} level
+ * @param {Content} content
+ */
 export const statResetCost = (level, content) =>
   level >= content.settlement.hermit.statsFromLevel ? level * content.settlement.hermit.statsGoldPerLevel : null;
 
@@ -589,12 +814,17 @@ export const statResetCost = (level, content) =>
 // request begun before midnight and done after another one of the new day)
 // leaves nothing to buy, so the record never goes back a day (the code
 // review, 0.2.71: going back, it opened the limit anew).
+/**
+ * @param {Record<string, any> | null | undefined} bought
+ * @param {number} now
+ * @param {Content} content
+ */
 export function timePointsOffer(bought, now, content) {
   const { gold, daily } = content.settlement.hermit.timePoints;
   const day = questPeriod('daily', now, content).key;
   const ahead = typeof bought?.day === 'string' && bought.day > day;
   const today = ahead ? daily : bought?.day === day ? bought.count : 0;
-  return { gold, daily, left: Math.max(0, daily - today), after: (count) => ({ day, count: today + count }) };
+  return { gold, daily, left: Math.max(0, daily - today), after: (/** @type {number} */ count) => ({ day, count: today + count }) };
 }
 
 // The Karczma (part II, question 116): a mug costs mugGoldPerLevel gold for
@@ -604,14 +834,23 @@ export function timePointsOffer(bought, now, content) {
 // too easy for the character; the rumor names the champion where there is
 // one, half the time, else the elite. One a day (the narrator's day), drawn
 // from the character's seed and the day, so a second mug tells the same.
+/**
+ * @param {number} level
+ * @param {Content} content
+ */
 export const mugCost = (level, content) => level * content.settlement.tavern.mugGoldPerLevel;
 
+/**
+ * @param {{ character: Character, seed: string }} options
+ * @param {number} now
+ * @param {Content} content
+ */
 export function drawRumor({ character, seed }, now, content) {
   const { rumor } = content.settlement.tavern;
   const day = questPeriod('daily', now, content);
   const areas = content.areas
-    .filter((area) => areaUnlocked(area, character.classLevel, content) && (area.elite || area.champion) && !easyPlace(character.level, area, content))
-    .sort((a, b) => b.minLevel - a.minLevel)
+    .filter((/** @type {Area} */ area) => areaUnlocked(area, character.classLevel, content) && (area.elite || area.champion) && !easyPlace(character.level, area, content))
+    .sort((/** @type {Area} */ a, /** @type {Area} */ b) => b.minLevel - a.minLevel)
     .slice(0, rumor.newest);
   if (areas.length === 0) return null;
   const rng = createRng(`${seed}:rumor:${day.key}`);
@@ -621,11 +860,22 @@ export function drawRumor({ character, seed }, now, content) {
 }
 
 // Today's rumor as kept in the Osada, or null after the day it was told.
+/**
+ * @param {Record<string, any> | null | undefined} stored
+ * @param {number} now
+ * @param {Content} content
+ */
 export const rumorToday = (stored, now, content) => (stored?.day === questPeriod('daily', now, content).key ? stored : null);
 
 // The rumor's odds for an exploration of an inner region: rumor.factor
 // times more elites and champions when it is today's, about this place and
 // not yet used by an exploration, else 1.
+/**
+ * @param {Record<string, any> | null | undefined} stored
+ * @param {string} areaId
+ * @param {number} now
+ * @param {Content} content
+ */
 export function rumorFactor(stored, areaId, now, content) {
   const rumor = rumorToday(stored, now, content);
   return rumor && !rumor.used && rumor.areaId === areaId ? content.settlement.tavern.rumor.factor : 1;
@@ -634,6 +884,10 @@ export function rumorFactor(stored, areaId, now, content) {
 // The innkeeper's words: the line with the place's name and the creature,
 // as the rumor's lines write it ({area}, {creature}: the creature as it is
 // counted once, "odyńca").
+/**
+ * @param {Record<string, any>} rumor
+ * @param {Content} content
+ */
 export function rumorText(rumor, content) {
   const area = content.areasById[rumor.areaId];
   const monster = content.monstersById[rumor.monsterId];
@@ -649,11 +903,17 @@ export function rumorText(rumor, content) {
 // `gifts` gives for the character's level. Drawn from the seed, the
 // companion and the week, so it is the same all week; null once taken this
 // week (`giftWeek`).
+/**
+ * @param {Record<string, any>} companion
+ * @param {{ character: Character, seed: string }} options1
+ * @param {number} now
+ * @param {Content} content
+ */
 export function companionGift(companion, { character, seed }, now, content) {
   const { professions, gifts } = content.settlement.companions;
   const week = questPeriod('weekly', now, content).key;
   if (companion.giftWeek === week) return null;
-  const kind = professions.find((one) => one.id === companion.profession)?.goods;
+  const kind = professions.find((/** @type {Record<string, any>} */ one) => one.id === companion.profession)?.goods;
   let goods = orderGoods(character, content).filter((good) => good.kind === kind);
   if (goods.length === 0 && kind === 'herb') goods = knownHerbs(1, content).map((herb) => ({ kind, key: herb.id }));
   if (goods.length === 0 && kind === 'potion') goods = knownPotions(1, content).map((potion) => ({ kind, key: potion.id }));
@@ -669,6 +929,10 @@ export function companionGift(companion, { character, seed }, now, content) {
 // potions for more than the scrapper (120 A: "wyspecjalizowani kupcy płacą
 // więcej niż złomiarz"): his price with the camp's Skup bonus, and
 // `premium` more by the standing of the relation with her.
+/**
+ * @param {number} points
+ * @param {Content} content
+ */
 export function herbalistPremium(points, content) {
   const { premium } = content.settlement.herbalist;
   return premium[Math.min(standingOf(points, content).index, premium.length - 1)];
@@ -681,39 +945,61 @@ export function herbalistPremium(points, content) {
 // Bractwo Zielarzy, whichever is further, 682 A and C, teachingPoints):
 // those she has taught, and the next standing that teaches more, with its
 // recipes (null once she has taught them all).
+/**
+ * @param {Record<string, any> | null | undefined} settlement
+ * @param {Content} content
+ */
 export function herbalistRecipes(settlement, content) {
   const points = teachingPoints(settlement, content);
-  const rare = content.potions.filter((potion) => potion.taught);
-  const next = content.settlement.standings.find((standing) => standing.points > points && rare.some((potion) => potion.taught === standing.id));
+  const rare = content.potions.filter((/** @type {Record<string, any>} */ potion) => potion.taught);
+  const next = content.settlement.standings.find((/** @type {Record<string, any>} */ standing) => standing.points > points && rare.some((/** @type {Record<string, any>} */ potion) => potion.taught === standing.id));
   return {
-    taught: rare.filter((potion) => recipeTaught(potion, settlement, content)),
-    next: next ? { standing: next, potions: rare.filter((potion) => potion.taught === next.id) } : null,
+    taught: rare.filter((/** @type {import('./brewing.js').Recipe} */ potion) => recipeTaught(potion, settlement, content)),
+    next: next ? { standing: next, potions: rare.filter((/** @type {Record<string, any>} */ potion) => potion.taught === next.id) } : null,
   };
 }
 
 // The recipes Jagna teaches with a change of the Osada from `before` to
 // `after` (as stored): a trade with her, an order of the Bractwo Zielarzy
 // delivered, an event's reputation.
+/**
+ * @param {Record<string, any> | null | undefined} before
+ * @param {Record<string, any> | null | undefined} after
+ * @param {Content} content
+ */
 export function recipesTaughtBetween(before, after, content) {
-  const had = new Set(herbalistRecipes(before, content).taught.map((potion) => potion.id));
-  return herbalistRecipes(after, content).taught.filter((potion) => !had.has(potion.id));
+  const had = new Set(herbalistRecipes(before, content).taught.map((/** @type {Record<string, any>} */ potion) => potion.id));
+  return herbalistRecipes(after, content).taught.filter((/** @type {Record<string, any>} */ potion) => !had.has(potion.id));
 }
 
 // "3 rzadkie przepisy Alchemii": a number of Jagna's rare recipes.
+/**
+ * @param {number} count
+ * @param {Content} content
+ */
 export const recipeCount = (count, content) => `${count} ${countedForm(count, content.settlement.herbalist.recipes.counted)}`;
 
 // What the answer to such a change says of the recipes it made Jagna teach
 // ("Jagna zdradza Ci 3 rzadkie przepisy Alchemii: …"), or null.
+/**
+ * @param {Record<string, any> | null | undefined} before
+ * @param {Record<string, any> | null | undefined} after
+ * @param {Content} content
+ */
 export function taughtWords(before, after, content) {
   const taught = recipesTaughtBetween(before, after, content);
   if (taught.length === 0) return null;
-  return say(content.settlement.herbalist.recipes, 'taught', 0, { count: recipeCount(taught.length, content), potions: taught.map((potion) => potion.name).join(', ') });
+  return say(content.settlement.herbalist.recipes, 'taught', 0, { count: recipeCount(taught.length, content), potions: taught.map((/** @type {Record<string, any>} */ potion) => potion.name).join(', ') });
 }
 
 // What a resident who sells takes off the price at `points` of the
 // relation with them (287 A: "Znajomy płaci 2,5% mniej, Stały klient 5%,
 // Zaufany 7,5%, a Przyjaciel 10%"): Gościwit on the Targowisko, Jagna and
 // Wszebor in the Garbarnia (tannery.js).
+/**
+ * @param {number} points
+ * @param {Content} content
+ */
 export function relationDiscount(points, content) {
   const discounts = content.settlement.relationDiscount;
   return discounts[Math.min(standingOf(points, content).index, discounts.length - 1)];
@@ -729,6 +1015,15 @@ export function relationDiscount(points, content) {
 // brotherhood's reputation takes the points with the week's share of
 // reputation (`reputation`; `week`, the week of the trade, weeks.js), made
 // whole fairly, while the resident's relation takes the points as they are.
+/**
+ * @param {number} gold
+ * @param {number} level
+ * @param {Record<string, any> | null | undefined} stored
+ * @param {number} now
+ * @param {Content} content
+ * @param {Record<string, any>} [tuning]
+ * @param {import('./weeks.js').Week | null} [week]
+ */
 export function tradePoints(gold, level, stored, now, content, tuning = content.settlement.herbalist.reputation, week = null) {
   const { daily } = tuning;
   const per = goldPerPoint(level, tuning);
@@ -742,11 +1037,22 @@ export function tradePoints(gold, level, stored, now, content, tuning = content.
 }
 
 // The gold of trade a point takes at the character's level.
+/**
+ * @param {number} level
+ * @param {Record<string, any>} tuning
+ */
 export const goldPerPoint = (level, tuning) => tuning.goldPerPointPerLevel * level;
 
 // What the page says of the day's trade: the points so far out of the
 // limit, the gold a point takes, and the gold still short of the next one
 // (null with the day's points all given).
+/**
+ * @param {Record<string, any> | null | undefined} stored
+ * @param {number} level
+ * @param {number} now
+ * @param {Content} content
+ * @param {Record<string, any>} [tuning]
+ */
 export function tradeView(stored, level, now, content, tuning = content.settlement.herbalist.reputation) {
   const day = questPeriod('daily', now, content).key;
   const today = stored?.day === day;
@@ -759,6 +1065,11 @@ export function tradeView(stored, level, now, content, tuning = content.settleme
 // turns weaponShare of every blow's damage into the element (combat.js), a
 // body armour gets the element's resistance of a resistRarity affix at its
 // level (stats.js). Stored on the item as `imbue`.
+/**
+ * @param {Item} item
+ * @param {string} element
+ * @param {Content} content
+ */
 export function imbueEffect(item, element, content) {
   const { weaponShare, resistRarity } = content.settlement.imbue;
   if (item.slot === 'weapon') return { element, share: weaponShare };
@@ -769,9 +1080,14 @@ export function imbueEffect(item, element, content) {
 // What the zaklęcie costs: goldPerLevel gold for each level of the item
 // times its rarity's sale multiplier, and materialCount pieces of the
 // element's material, in that material's own rarity (`stack`).
+/**
+ * @param {Item} item
+ * @param {string} element
+ * @param {Content} content
+ */
 export function imbueCost(item, element, content) {
   const { goldPerLevel, materialCount, elements } = content.settlement.imbue;
-  const material = content.materialsById[elements.find((one) => one.element === element)?.material];
+  const material = content.materialsById[elements.find((/** @type {Record<string, any>} */ one) => one.element === element)?.material];
   return {
     gold: Math.round(goldPerLevel * item.level * content.raritiesById[item.rarity].sell),
     stack: material ? stackKey(material.id, material.rarity) : null,
@@ -780,13 +1096,19 @@ export function imbueCost(item, element, content) {
 }
 
 // Why the item cannot take the element now, or null.
+/**
+ * @param {Item} item
+ * @param {string} element
+ * @param {{ gold: number, materials: Record<string, number> }} options2
+ * @param {Content} content
+ */
 export function imbueBlock(item, element, { gold, materials }, content) {
   const { slots, elements } = content.settlement.imbue;
   if (!slots.includes(item.slot)) return { code: 'wrong_slot', message: 'Żywioł da się zakląć tylko w broń i w pancerz.' };
-  if (!elements.some((one) => one.element === element)) return { code: 'invalid_element', message: 'Wybierz żywioł.' };
+  if (!elements.some((/** @type {Record<string, any>} */ one) => one.element === element)) return { code: 'invalid_element', message: 'Wybierz żywioł.' };
   if (item.imbue?.element === element) return { code: 'same_element', message: 'Ten przedmiot ma już ten żywioł.' };
   const cost = imbueCost(item, element, content);
   if (gold < cost.gold) return { code: 'not_enough_gold', message: 'Brakuje złota na zaklęcie.' };
-  if ((materials[cost.stack] ?? 0) < cost.count) return { code: 'not_enough_materials', message: 'Brakuje materiału żywiołu.' };
+  if ((materials[/** @type {string} */ (cost.stack)] ?? 0) < cost.count) return { code: 'not_enough_materials', message: 'Brakuje materiału żywiołu.' };
   return null;
 }
