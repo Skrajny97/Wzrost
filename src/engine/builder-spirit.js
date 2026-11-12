@@ -71,8 +71,8 @@ export function spiritSaleBlock({ resources, resource, amount }, content) {
 // their highest level.
 /**
  * @param {Record<string, any>[]} buildings
- * @param {Record<string, any>} stored
- * @param {Record<string, any>[]} queue
+ * @param {import('./camp.js').Camp} stored
+ * @param {import('./camp.js').Waiting[]} queue
  * @param {Content} content
  * @param {(building: Record<string, any>) => number} [top]
  * @returns {Record<string, number>}

@@ -1,3 +1,4 @@
+// @ts-check
 // The camp the player builds up alongside the character's activity
 // (data/buildings.json). A building has levels; each level costs more gold and
 // resources and takes longer to build. One building is upgraded at a time,
@@ -10,18 +11,53 @@
 import { countedForm, decimalText, word } from './text.js';
 import { weekCount } from './weeks.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {{ level: number, startedAt?: number, endsAt: number, collectedAt?: number | null }} Stored A building as the camp keeps it. */
+/** @typedef {Record<string, Stored>} Camp The camp's buildings as kept, by id. */
+/** @typedef {{ buildingId: string, level: number, startsAt: number, endsAt: number }} Waiting A build waiting in the queue. */
+/**
+ * @typedef {{
+ *   id: string,
+ *   costs: { resource: string, base: number, growth: number, fromLevel?: number }[],
+ *   minutes: { levels?: number[], base: number, growth: number },
+ *   maxLevel: number,
+ *   beyond?: { goldGrowth: number, minutesGrowth: number },
+ *   startLevel?: number,
+ *   effect: Record<string, any>,
+ *   exchange?: { levelText: string, rates: (string | number)[] },
+ * } & Record<string, any>} Building A building of data/buildings.json.
+ */
+/** @typedef {{ resource: string, perHour: number, capacity: number, amount: number, since: number, fullAt: number }} Store A production building's store. */
+/** @typedef {{ resource: string, amount: number, collectedAt: number }} Collected What a collection gives. */
+
 // The level a stored building has at `now`: an upgrade counts once it ends.
+/**
+ * @param {Stored | null | undefined} stored
+ * @param {number} now
+ * @returns {number}
+ */
 export function buildingLevel(stored, now) {
   if (!stored) return 0;
   return stored.endsAt > now ? stored.level - 1 : stored.level;
 }
 
 // Levels of every building at `now`, 0 for those not built yet.
+/**
+ * @param {Camp} stored
+ * @param {number} now
+ * @param {Content} content
+ * @returns {Record<string, number>}
+ */
 export function campLevels(stored, now, content) {
-  return Object.fromEntries(content.buildings.map((building) => [building.id, buildingLevel(stored[building.id], now)]));
+  return Object.fromEntries(content.buildings.map((/** @type {Building} */ building) => [building.id, buildingLevel(stored[building.id], now)]));
 }
 
 // The upgrade in progress, if any.
+/**
+ * @param {Camp} stored
+ * @param {number} now
+ * @returns {(Stored & { buildingId: string }) | null}
+ */
 export function construction(stored, now) {
   const entry = Object.entries(stored).find(([, building]) => building.endsAt > now);
   return entry ? { buildingId: entry[0], ...entry[1] } : null;
@@ -31,12 +67,18 @@ export function construction(stored, now) {
 // own level on, so the first levels take gold alone. Past its maxLevel, in
 // the Warownia (beyond; the author's 618): the resources of the maxLevel
 // and its gold growing by beyond.goldGrowth a level.
+/**
+ * @param {Building} building
+ * @param {number} level
+ * @returns {Record<string, number>}
+ */
 export function upgradeCost(building, level) {
   const { beyond, maxLevel } = building;
   if (beyond && level > maxLevel) {
     const top = upgradeCost(building, maxLevel);
     return { ...top, gold: Math.round((top.gold ?? 0) * beyond.goldGrowth ** (level - maxLevel)) };
   }
+  /** @type {Record<string, number>} */
   const cost = {};
   for (const part of building.costs) {
     const from = part.fromLevel ?? 1;
@@ -48,6 +90,11 @@ export function upgradeCost(building, level) {
 // How long reaching `level` takes: the building's own list, level by level,
 // or base × growth^(level − 1); past its maxLevel (beyond), the maxLevel's
 // time growing by beyond.minutesGrowth a level.
+/**
+ * @param {Building} building
+ * @param {number} level
+ * @returns {number}
+ */
 export function upgradeMinutes(building, level) {
   const { beyond, maxLevel } = building;
   if (beyond && level > maxLevel) return Math.max(1, Math.round(upgradeMinutes(building, maxLevel) * beyond.minutesGrowth ** (level - maxLevel)));
@@ -61,15 +108,33 @@ export function upgradeMinutes(building, level) {
 // { buildingId, level, startsAt, endsAt }.
 
 // How many builds the camp has at `now`: the one under way and the waiting ones.
+/**
+ * @param {Camp} stored
+ * @param {Waiting[]} queue
+ * @param {number} now
+ * @returns {number}
+ */
 export const buildsUnderWay = (stored, queue, now) => (construction(stored, now) ? 1 : 0) + queue.length;
 
 // When a build queued at `now` starts: as the last one ends, or at once.
+/**
+ * @param {Camp} stored
+ * @param {Waiting[]} queue
+ * @param {number} now
+ * @returns {number}
+ */
 export function queueEnd(stored, queue, now) {
   if (queue.length > 0) return queue[queue.length - 1].endsAt;
   return construction(stored, now)?.endsAt ?? now;
 }
 
 // The level a building has once the build under way and the waiting ones end.
+/**
+ * @param {{ id: string, startLevel?: number }} building
+ * @param {Camp} stored
+ * @param {Waiting[]} queue
+ * @returns {number}
+ */
 export function plannedLevel(building, stored, queue) {
   const waiting = queue.filter((entry) => entry.buildingId === building.id);
   if (waiting.length > 0) return waiting[waiting.length - 1].level;
@@ -78,12 +143,24 @@ export function plannedLevel(building, stored, queue) {
 
 // The waiting builds `by` milliseconds sooner, after the one under way was
 // skipped by as much.
+/**
+ * @param {Waiting[]} queue
+ * @param {number} by
+ * @returns {Waiting[]}
+ */
 export const shiftQueue = (queue, by) => queue.map((entry) => ({ ...entry, startsAt: entry.startsAt - by, endsAt: entry.endsAt - by }));
 
 // A waiting build called off ("Anuluj"): it leaves the queue with the higher
 // levels of the same building after it, which need it. Returns the builds
 // that go, whose cost comes back, and those that stay.
+/**
+ * @param {Waiting[]} queue
+ * @param {string} buildingId
+ * @param {number} level
+ * @returns {{ cancelled: Waiting[], kept: Waiting[] }}
+ */
 export function cancelFromQueue(queue, buildingId, level) {
+  /** @param {Waiting} entry */
   const gone = (entry) => entry.buildingId === buildingId && entry.level >= level;
   return { cancelled: queue.filter(gone), kept: queue.filter((entry) => !gone(entry)) };
 }
@@ -92,8 +169,16 @@ export function cancelFromQueue(queue, buildingId, level) {
 // build under way, each in the camp the builds before it leave behind: after
 // one is called off the rest come sooner, and with a camp level called off
 // the later ones build at the slower pace again.
+/**
+ * @param {Camp} stored
+ * @param {Waiting[]} queue
+ * @param {number} now
+ * @param {Content} content
+ * @returns {Waiting[]}
+ */
 export function replanQueue(stored, queue, now, content) {
   let at = construction(stored, now)?.endsAt ?? now;
+  /** @type {Waiting[]} */
   const planned = [];
   for (const entry of queue) {
     const building = content.buildingsById[entry.buildingId];
@@ -108,16 +193,34 @@ export function replanQueue(stored, queue, now, content) {
 
 // The camp's own level (data/camp.json): it starts at its first level
 // without building, and an upgrade counts once it ends.
+/**
+ * @param {Camp} stored
+ * @param {number} now
+ * @param {Content} content
+ * @returns {number}
+ */
 export function campLevel(stored, now, content) {
   return Math.max(content.camp.startLevel, buildingLevel(stored[content.camp.id], now));
 }
 
 // How much faster the buildings build in a camp of `level`: nothing on the
 // first level.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {number}
+ */
 export const buildSpeed = (level, content) => content.camp.effect.perLevel * (level - content.camp.startLevel);
 
 // How long an upgrade to `level` takes in a camp of level `camp`: the camp
 // itself grows at its own pace, the buildings faster with each camp level.
+/**
+ * @param {Building} building
+ * @param {number} level
+ * @param {number} camp
+ * @param {Content} content
+ * @returns {number}
+ */
 export function buildMinutes(building, level, camp, content) {
   const minutes = upgradeMinutes(building, level);
   // So does the transformation into a Warownia: 3 days (419 A).
@@ -126,12 +229,22 @@ export function buildMinutes(building, level, camp, content) {
 }
 
 // The camp level's effect as the page shows it.
+/**
+ * @param {number} level
+ * @param {Content} content
+ * @returns {string}
+ */
 export function campEffectText(level, content) {
   const { effect, startLevel } = content.camp;
   return level <= startLevel ? effect.startText : effect.text.replace('{value}', `${Math.round(buildSpeed(level, content) * 100)}%`);
 }
 
 // What is missing to pay a cost from a wallet of gold and resources.
+/**
+ * @param {Record<string, number>} cost
+ * @param {Record<string, number>} wallet
+ * @returns {{ resource: string, amount: number }[]}
+ */
 export function missingFor(cost, wallet) {
   return Object.entries(cost)
     .filter(([id, amount]) => (wallet[id] ?? 0) < amount)
@@ -139,6 +252,12 @@ export function missingFor(cost, wallet) {
 }
 
 // The sum of one kind of effect over the camp's buildings at their levels.
+/**
+ * @param {Record<string, number>} levels
+ * @param {string} kind
+ * @param {Content} content
+ * @returns {number}
+ */
 export function campBonus(levels, kind, content) {
   let total = 0;
   for (const building of content.buildings) {
@@ -147,24 +266,44 @@ export function campBonus(levels, kind, content) {
   return total;
 }
 
+/**
+ * @param {Record<string, number>} levels
+ * @param {Content} content
+ * @returns {number}
+ */
 export const bagCapacity = (levels, content) => content.balance.items.bagSlots + campBonus(levels, 'bagSlots', content);
 
 // The bonus to resting from `since` and, when an upgrade of a building that
 // speeds up resting ends before `now`, the bonus from then on. Only the last
 // upgrade is stored, and every start of one saves the HP rested so far, so one
 // change is enough.
+/**
+ * @param {Camp} stored
+ * @param {number} since
+ * @param {number} now
+ * @param {Content} content
+ * @returns {{ bonus: number, change?: { at: number, bonus: number } }}
+ */
 export function restBonus(stored, since, now, content) {
+  /** @param {number} time */
   const bonus = (time) => campBonus(campLevels(stored, time, content), 'restSpeed', content);
+  /** @type {number[]} */
   const ended = content.buildings
-    .filter((building) => building.effect.kind === 'restSpeed')
-    .map((building) => stored[building.id]?.endsAt)
-    .filter((at) => at > since && at <= now);
+    .filter((/** @type {Building} */ building) => building.effect.kind === 'restSpeed')
+    .map((/** @type {Building} */ building) => stored[building.id]?.endsAt)
+    .filter((/** @type {number | undefined} */ at) => at !== undefined && at > since && at <= now);
   if (ended.length === 0) return { bonus: bonus(now) };
   return { bonus: bonus(since), change: { at: Math.max(...ended), bonus: bonus(now) } };
 }
 
 // The effect of a building at a level, as the page shows it: "o 20%", or
 // for a production building "6 drewna na godzinę… na 1 h".
+/**
+ * @param {Building} building
+ * @param {number} level
+ * @param {Content} content
+ * @returns {string}
+ */
 export function effectText(building, level, content) {
   const { effect } = building;
   // The Strażnica gives only its first effect below `fromLevel`.
@@ -176,7 +315,7 @@ export function effectText(building, level, content) {
   // at the level (the author: "Dopisz na górę info o możliwości wymiany
   // zasobów i rozwoju sytuacji wraz z lvlem").
   const { exchange } = building;
-  const rate = exchange ? `, ${exchange.levelText.replace('{rate}', exchange.rates[Math.min(level, exchange.rates.length) - 1])}` : '';
+  const rate = exchange ? `, ${exchange.levelText.replace('{rate}', String(exchange.rates[Math.min(level, exchange.rates.length) - 1]))}` : '';
   if (!effect.rarities) return `${text}${rate}`;
   // The Stół rozbiórki also names the highest rarity it takes and, from
   // a level on, the chance of an extra part.
@@ -190,6 +329,12 @@ export function effectText(building, level, content) {
 // A value as the page shows it: a share with up to one decimal ("0,5%"),
 // hours ("1,5 h"), fights ("8 walk") or a count; the decimal as the
 // content's language writes it ("0.5%" in English).
+/**
+ * @param {number} value
+ * @param {string | undefined} unit
+ * @param {Content} content
+ * @returns {string}
+ */
 function shownValue(value, unit, content) {
   if (unit === 'percent') return `${decimalText(value * 100, content)}%`;
   if (unit === 'hours') return `${decimalText(value, content)}\u00a0h`;
@@ -204,6 +349,12 @@ const HOUR = 3600000;
 // each level, up to `storageHours` hours of it for each level; a full store
 // stops production. An upgrade in progress keeps `since` at its end, so the
 // building does not produce until then.
+/**
+ * @param {Building} building
+ * @param {Stored | null | undefined} stored
+ * @param {number} now
+ * @returns {Store | null}
+ */
 export function production(building, stored, now) {
   if (building.effect.kind !== 'production' || !stored) return null;
   const perHour = building.effect.perLevel * stored.level;
@@ -218,11 +369,24 @@ export function production(building, stored, now) {
 // which the server gives): the store's units times it, made whole fairly
 // with a seed of the building and the collection, so on average just the
 // share more (or less); production goes on from the units made, as ever.
+/**
+ * @param {number} amount
+ * @param {number} factor
+ * @param {Building} building
+ * @param {number} collectedAt
+ */
 const weekUnits = (amount, factor, building, collectedAt) => weekCount(amount, factor, `camp:${building.id}:${collectedAt}`);
 
 // Collecting the store: what it gives, and the new start of production. The
 // part of a unit already made is kept, unless the store was full and stood.
 // `factor`: the week's share of it (weekUnits).
+/**
+ * @param {Building} building
+ * @param {Stored | null | undefined} stored
+ * @param {number} now
+ * @param {number} [factor]
+ * @returns {Collected | null}
+ */
 export function collect(building, stored, now, factor = 1) {
   const store = production(building, stored, now);
   if (!store || store.amount < 1) return null;
@@ -239,12 +403,19 @@ export function collect(building, stored, now, factor = 1) {
 // before the first fill and while an upgrade keeps the building from
 // producing. A store that stood full before the Zbieracz came is collected
 // as he comes, and fills again from then: the time it stood brings nothing.
+/**
+ * @param {Building} building
+ * @param {Stored} stored
+ * @param {number} now
+ * @param {number | null} [from]
+ * @returns {Collected | null}
+ */
 export function wholeFills(building, stored, now, from = null) {
   const store = production(building, stored, now);
   if (!store || store.capacity <= 0 || stored.endsAt > now || (from !== null && now < from)) return null;
   const fill = Math.round((store.capacity / store.perHour) * HOUR);
   const stood = from !== null && store.since + fill <= from;
-  const start = stood ? from : store.since;
+  const start = stood ? /** @type {number} */ (from) : store.since;
   const later = Math.floor((now - start) / fill);
   const fills = later + (stood ? 1 : 0);
   if (fills < 1) return null;
@@ -255,6 +426,14 @@ export function wholeFills(building, stored, now, from = null) {
 // `from`: his whole fills and what the next one holds so far, as a build
 // that begins takes the store along (characters.js: settleBuilds), with the
 // week's share of it all (`factor`, weekUnits).
+/**
+ * @param {Building} building
+ * @param {Stored} stored
+ * @param {number} now
+ * @param {number | null} [from]
+ * @param {number} [factor]
+ * @returns {Collected | null}
+ */
 export function collectWithFills(building, stored, now, from = null, factor = 1) {
   const fills = wholeFills(building, stored, now, from);
   if (!fills) return collect(building, stored, now, factor);
@@ -270,6 +449,15 @@ export function collectWithFills(building, stored, now, from = null, factor = 1)
 // when nothing is due yet. So a store never stands, and the server writes
 // at most about once in `every` for each building. `factor`: the week's
 // share of what he collects (weekUnits).
+/**
+ * @param {Building} building
+ * @param {Stored} stored
+ * @param {number} now
+ * @param {number | null} from
+ * @param {number} every
+ * @param {number} [factor]
+ * @returns {Collected | null}
+ */
 export function collectorTakes(building, stored, now, from, every, factor = 1) {
   const store = production(building, stored, now);
   if (!store || stored.endsAt > now) return null;

@@ -116,7 +116,7 @@ export function notificationsDue({ level, activity, avatarActivity = null, build
   const full = collector
     ? []
     : content.buildings
-        .map((/** @type {Record<string, any>} */ building) => ({ building, store: production(building, buildings[building.id], to) }))
+        .map((/** @type {import('./camp.js').Building} */ building) => ({ building, store: production(building, buildings[building.id], to) }))
         .filter((/** @type {{ building: Record<string, any>, store: any }} */ { building, store }) => store && store.fullAt <= to && !queue.some((build) => build.buildingId === building.id && build.startsAt <= to));
   const filled = full.filter(({ store }) => store.fullAt > from);
   if (filled.length > 0) {
