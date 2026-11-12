@@ -25,7 +25,7 @@
 
 import { challengeAt, combatantView, exploreStrength, monsterCombatant, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
-import { cardDrop, cardDropText } from './cards.js';
+import { cardBonusLine, cardDrop, cardDropText } from './cards.js';
 import { addCounts, materialDrops, materialView, materialsText } from './crafting.js';
 import { canUse, itemName, itemRank, itemView, randomItem } from './items.js';
 import { TIMED_KINDS, fightPotions } from './potions.js';
@@ -650,9 +650,11 @@ function settingOut(one, week, area, id, content) {
 // the fights; on a Drużyna's trip every member's is the same, as they set
 // out at once. `cards`: Talia Systemu's cards (cards.js), where the game has
 // it on (the server's CARDS): { maxed: the creatures whose card the
-// character has at its top level }; each creature beaten may leave its card
-// (874 A), drawn from a seed of its own, so the rest of the exploration goes
-// as it would without it. Null: no cards.
+// character has at its top level, xp and gold: the collection's shares more
+// of the XP and gold (card-collection.js, cardExplorationBonus; 884 A) };
+// each creature beaten may leave its card (874 A), drawn from a seed of its
+// own, so the rest of the exploration goes as it would without it. Null: no
+// cards.
 /**
  * @param {Record<string, any>} options
  * @param {Content} content
@@ -762,6 +764,10 @@ export function simulateHunt(
   // same; without a seat nothing changes.
   const seatXp = 1 + (seat?.xp ?? 0);
   const seatGold = 1 + (seat?.gold ?? 0);
+  // Talia Systemu's collection (884 A): its shares more XP and gold, as the
+  // Siedziba's, in every fight and find; on a trip each member's own.
+  const cardsXp = 1 + (cards?.xp ?? 0);
+  const cardsGold = 1 + (cards?.gold ?? 0);
   const seatRarity = 1 + (seat?.rarity ?? 0);
   const loot = { filled, classId: character.classId, maxClassLevel: area.maxLevel, area, otherClassShare, uniqueBonus, ...(seatRarity !== 1 && { rarityBonus: seatRarity }) };
   const hpStart = me.hp;
@@ -848,7 +854,7 @@ export function simulateHunt(
       );
       const outcome = lootRng.weighted(outcomes, ([, weight]) => weight)[0];
       if (outcome === 'gold') {
-        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length) * seatGold * hardGold));
+        const amount = Math.max(1, Math.round(rewards.findGoldPerLevel * findLevel * lootRng.float(0.5, 1.5) * blessedBy('gold', fights.length) * seatGold * cardsGold * hardGold));
         gold += amount;
         entries.push({ t: event.t, type: 'find', text: say(texts, 'findGold', step, { gold: amount }) });
       } else if (outcome === 'chest') {
@@ -959,7 +965,7 @@ export function simulateHunt(
         fightXp +=
           monsterXp(monster, enemy.level, content) * enemy.groupFactor * lowLevelMultiplier(reached.level, enemy.level, content);
         const rank = monster.champion ? rewards.championGoldMultiplier : monster.elite ? rewards.eliteGoldMultiplier : 1;
-        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * hardGold * weekGold;
+        const goldFactor = rank * enemy.groupFactor * share * (1 + pace.lengthBonus) * blessedBy('gold', fights.length - 1) * seatGold * cardsGold * hardGold * weekGold;
         fightGold += rewards.goldPerLevel * enemy.level * monster.reward.gold * lootRng.float(0.5, 1.5) * goldFactor;
         const weight = enemy.groupFactor * share * (encounter.tough ? rewards.toughDropMultiplier : 1) * moreMaterials;
         summary.materials = addCounts(summary.materials, materialDrops(enemy.monsterId, enemy.level, weight, lootRng, content));
@@ -996,7 +1002,7 @@ export function simulateHunt(
       const trophy = meeting && own && sought.trophy ? { [sought.trophy]: 1 } : null;
       if (meeting && own) sighting.beaten = true;
       for (const [item] of chests) summary.chests.push(take(item));
-      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1) * seatXp * hardXp * weekXp);
+      summary.xp = Math.round(fightXp * (1 + tuning.soloXpBonus) * share * (1 + pace.lengthBonus) * partyXp * blessedBy('xp', fights.length - 1) * seatXp * cardsXp * hardXp * weekXp);
       summary.gold = Math.round(fightGold) - Math.round(goldBefore);
       xp += summary.xp;
       reached = gainXp(reached.level, reached.xp, summary.xp, (level) => xpToNext(level, content), maxLevel);
@@ -1062,8 +1068,10 @@ export function simulateHunt(
     materials,
     timePoints,
     items,
-    // Talia Systemu's cards the creatures left (cards.js), with `cards` only.
+    // Talia Systemu's cards the creatures left (cards.js), with `cards` only,
+    // and the collection's bonus, for the report's line.
     ...(cardRng && { cards: cardsFound }),
+    ...((cardsXp > 1 || cardsGold > 1) && { cardsBonus: { xp: cards?.xp ?? 0, gold: cards?.gold ?? 0 } }),
     hpStart,
     hpEnd: me.hp,
     maxHp: me.unit.maxHp,
@@ -1328,8 +1336,9 @@ export function huntReport({ hunt, applied, character, areaId, startedAt, endsAt
       }),
       ...(overflow && overflow.count > 0 ? [say(content.texts, 'bagOverflow', 0, overflow)] : []),
       // The week it set out in, where its effects changed the result
-      // ("Tydzień Kuny: +5% złota z walk.", weeks.js).
-      ...[weekLine(hunt, content)].filter(Boolean),
+      // ("Tydzień Kuny: +5% złota z walk.", weeks.js), and Talia Systemu's
+      // collection, where its bonus did (cards.js).
+      ...[weekLine(hunt, content), cardBonusLine(hunt, content)].filter(Boolean),
     ],
     items: hunt.items.map((/** @type {Item} */ item, /** @type {number} */ index) => ({ ...itemView(item, content), ...(overflow?.sold.includes(index) && { sold: true }) })),
     fights: hunt.fights.map((/** @type {Record<string, any>} */ fight) => ({

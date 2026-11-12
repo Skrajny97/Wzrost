@@ -6,10 +6,14 @@
 // too, with its chests (combat.js). A tab with a chest to open has a gold
 // dot, and the set, the counts or the place of that chest a gold frame.
 // Tiers and lands fold under their headings: the character's own and those
-// with a chest to open start unfolded.
+// with a chest to open start unfolded. Where the game has Talia Systemu
+// (CARDS) the last tab, "Karty", is the cards collected (card-collection.js
+// in the engine): the count and its bonus, then every land's cards, a card
+// not found yet as its creature's shadow.
 
 import { herbSprite, itemSprite, materialSprite, mineralSprite, potionSprite } from '../art.js';
 import { bestiaryReady, placeReady } from '../bestiary.js';
+import { cardFace } from '../cards.js';
 import { materialIcon } from '../craft-table.js';
 import { fill, h, icon } from '../dom.js';
 import { countOf, formatNumber } from '../format.js';
@@ -89,6 +93,8 @@ export function mountEncyclopedia(container, { params }) {
 
   function renderTabs() {
     const ready = readyTabs();
+    // With the cards' tab, eight: three, three and two (styles.css).
+    tabs.classList.toggle('encyclopedia-tabs--eight', book.tabs.length === 8);
     fill(
       tabs,
       book.tabs.map((each) =>
@@ -121,6 +127,7 @@ export function mountEncyclopedia(container, { params }) {
       materials: materialsTab,
       parts: () => flatTab('parts'),
       minerals: () => tieredTab('minerals', true),
+      cards: cardsTab,
     };
     fill(body, (views[tab] ?? itemsTab)());
   }
@@ -363,6 +370,86 @@ export function mountEncyclopedia(container, { params }) {
         ),
       );
     });
+  }
+
+  // Talia Systemu's cards (cards.js, card-collection.js in the engine): the
+  // count of different cards with the collection's bonus and the way to its
+  // next threshold, then every land's cards with its count, each found one
+  // as on the Salon's table and a tap showing its sheet, each other one its
+  // creature's shadow. The land of the character's level starts unfolded.
+  function cardsTab() {
+    const part = book.cards;
+    if (!part) return itemsTab();
+    const { level } = state.character;
+    // The first card found, marked for tools/layout-check.cjs (its sheet).
+    const first = part.lands.flatMap((land) => land.cards).find((card) => card.found) ?? null;
+    const progress = part.threshold && h('div', { class: 'meter-fill' });
+    if (progress) progress.style.width = `${Math.max(0, Math.min(1, (part.found - part.threshold.from) / (part.threshold.to - part.threshold.from))) * 100}%`;
+    return [
+      h(
+        'section',
+        { class: 'card encyclopedia-cards-head', 'data-guide': 'encyclopedia-cards' },
+        h('h2', { class: 'card-title', text: part.summary }),
+        part.bonus.length > 0 &&
+          h(
+            'div',
+            { class: 'encyclopedia-cards-bonus' },
+            h('p', { class: 'encyclopedia-cards-now', text: part.bonus[0] }),
+            part.bonus.slice(1, -1).map((line) => h('p', { text: line })),
+            progress &&
+              h(
+                'div',
+                { class: 'meter encyclopedia-cards-meter' },
+                h('div', { class: 'meter-track', role: 'progressbar', 'aria-label': part.bonus[1], 'aria-valuemin': part.threshold.from, 'aria-valuemax': part.threshold.to, 'aria-valuenow': part.found }, progress),
+              ),
+            h('p', { class: 'muted', text: part.bonus.at(-1) }),
+          ),
+        h('p', { class: 'muted', text: part.note }),
+      ),
+      part.lands.map((land) =>
+        foldable(
+          `cards:${land.id}`,
+          level >= land.minLevel && level <= land.maxLevel,
+          'card encyclopedia-land',
+          [
+            h('div', { class: 'encyclopedia-cards-land' }, h('h2', { class: 'card-title', text: land.name }), h('span', { class: 'encyclopedia-cards-levels', text: t('poz. {min}–{max}', { min: land.minLevel, max: land.maxLevel }) })),
+            h('span', { class: 'encyclopedia-fold-count', text: land.count }),
+          ],
+          h(
+            'ul',
+            { class: 'tcard-grid tcard-grid--collection encyclopedia-cards' },
+            land.cards.map((card) =>
+              h(
+                'li',
+                { class: card.found ? 'encyclopedia-card' : 'encyclopedia-card encyclopedia-card--unknown', ...(card === first && { 'data-guide': 'encyclopedia-card' }) },
+                card.found
+                  ? cardFace(card, { onClick: () => cardSheet(card) })
+                  : cardFace({ id: card.id, name: '???', type: 'unknown', rarity: 'unknown', color: null, level: '?', attack: 0, life: 0 }, { label: part.unknown }),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ];
+  }
+
+  // A card's sheet: its face, name and rarity, then its type and what it
+  // beats, its level with Atak and Życie, its copies, where it drops and its
+  // chance there.
+  function cardSheet(card) {
+    openSheet(
+      h(
+        'div',
+        { class: 'item-details encyclopedia-card-sheet' },
+        h(
+          'div',
+          { class: 'encyclopedia-card-sheet-head' },
+          h('div', { class: 'encyclopedia-card-sheet-face' }, cardFace(card, { label: card.name })),
+          h('div', {}, h('h2', { class: 'item-title', vars: { '--rarity': card.color }, text: card.name }), h('p', { class: 'item-meta', text: card.meta })),
+        ),
+        h('ul', { class: 'encyclopedia-sources' }, card.details.map((line) => h('li', { text: line }))),
+      ),
+    );
   }
 
   load();

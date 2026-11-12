@@ -11165,6 +11165,109 @@ a.profession-square:active {
   border-radius: 6px;
 }
 
+/* The Encyklopedia's "Karty" (Talia Systemu, where CARDS is on): eight tabs
+   in rows of three, three and two; the count of different cards with the
+   collection's bonus in gold and a bar to its next threshold; every land's
+   cards on the faces of the Salon's table (cards.js, cardFace), each card
+   as tall as its row; a card not found yet its creature's shadow with
+   "???" on a plain dark card; a card's sheet with its face beside its
+   name. */
+.encyclopedia-tabs--eight .segmented-option {
+  grid-column: span 4;
+}
+
+.encyclopedia-tabs--eight .segmented-option:nth-child(n + 7) {
+  grid-column: span 6;
+}
+
+.encyclopedia-tabs--eight .segmented-option:nth-child(7) {
+  border-left: 0;
+}
+
+.encyclopedia-cards-head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.encyclopedia-cards-head .card-title,
+.encyclopedia-cards-head p {
+  margin: 0;
+}
+
+.encyclopedia-cards-bonus {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--bark-line);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.55);
+}
+
+.encyclopedia-cards-now {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.encyclopedia-cards-meter .meter-track {
+  background: rgba(217, 180, 90, 0.18);
+}
+
+.encyclopedia-cards-meter .meter-fill {
+  background: var(--gold);
+}
+
+/* A land's name, its levels under it, beside its count. */
+.encyclopedia-cards-land {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.encyclopedia-cards-levels {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.encyclopedia-cards {
+  --tcard-art: 48px;
+  margin: 0;
+  padding-inline: 0;
+  list-style: none;
+}
+
+.encyclopedia-card {
+  display: flex;
+}
+
+.encyclopedia-card--unknown .tcard {
+  background: linear-gradient(180deg, #1a2015, #10140d);
+  color: var(--text-muted);
+}
+
+.encyclopedia-card--unknown .tcard-type,
+.encyclopedia-card--unknown .tcard-stats {
+  visibility: hidden;
+}
+
+.encyclopedia-card--unknown .sprite {
+  filter: brightness(0);
+  opacity: 0.6;
+}
+
+.encyclopedia-card-sheet-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.encyclopedia-card-sheet-face {
+  --tcard-art: 48px;
+  flex: none;
+  width: 104px;
+}
+
 /* A gift code (gift-code.js): the field and Odbierz in one row. */
 .gift-code-form {
   display: flex;

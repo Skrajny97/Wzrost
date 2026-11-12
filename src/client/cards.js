@@ -37,6 +37,60 @@ function cardName(name) {
   const chars = Math.max(1, ...pieces.map((piece) => [...piece].length));
   return h('span', { class: 'tcard-name', vars: { '--name-chars': String(chars) }, text: name });
 }
+
+// A card's type as its badge shows it: the data's (`types`), or the card's
+// own name and icon.
+const typeInfo = (card, types) => types.find((type) => type.id === card.type) ?? (card.typeIcon ? { id: card.type, name: card.typeName, icon: card.typeIcon } : null);
+
+// A card type's badge: its colour, icon and name.
+const typeBadge = (id, size, type) => h('span', { class: `tcard-type tcard-type--${id}`, title: type?.name, 'aria-label': type?.name }, icon(type?.icon ?? 'unknown', { size }));
+
+// A card's face: its rarity's frame, the creature's sprite, its name, Atak,
+// Życie (with its bar once hurt), type and level. `marks` adds the blow it
+// will take (−N), "nowa" and the choices of the turn. `types`: the data's
+// types, for a card without its own type's name and icon (cardView in the
+// engine gives them). Every card of the game is shown through it: the
+// Salon's tab, the report's cards and the Encyklopedia's "Karty".
+export function cardFace(card, { compact = false, marks = {}, onClick = null, label = null, types = [] } = {}) {
+  const type = typeInfo(card, types);
+  const hurt = card.max && card.life < card.max;
+  const body = [
+    h('span', { class: 'tcard-top' }, typeBadge(card.type, compact ? 12 : 14, type), h('span', { class: 'tcard-level', title: t('Poziom karty'), text: String(card.level) })),
+    h('span', { class: 'tcard-art' }, monsterSprite(card.id) ?? icon('beast', { size: 32 })),
+    cardName(card.name),
+    h(
+      'span',
+      { class: 'tcard-stats' },
+      h('span', { class: 'tcard-attack', title: t('Atak') }, icon('sword', { size: 12 }), formatNumber(card.attack)),
+      h('span', { class: 'tcard-life', title: t('Życie') }, icon('heart', { size: 12 }), formatNumber(card.life)),
+    ),
+    hurt && h('span', { class: 'tcard-bar' }, h('span', { class: 'tcard-bar-fill', vars: { '--share': `${Math.max(0, card.life / card.max) * 100}%` } })),
+    marks.blow > 0 && h('span', { class: `tcard-blow${marks.blow >= card.life ? ' tcard-blow--down' : ''}${marks.advantage ? ' tcard-blow--strong' : ''}`, text: `−${formatNumber(marks.blow)}` }),
+    marks.fresh && h('span', { class: 'tcard-chip', text: t('nowa') }),
+    marks.skill && h('span', { class: 'tcard-chip tcard-chip--skill', text: marks.skill }),
+    marks.chosen && h('span', { class: 'tcard-check' }, icon('check', { size: 14 })),
+    card.shifted && h('span', { class: 'tcard-chip tcard-chip--shift', text: t('przemiana') }),
+  ];
+  const className = [
+    'tcard',
+    `tcard--${card.rarity}`,
+    compact && 'tcard--compact',
+    marks.picked && 'tcard--picked',
+    marks.target && 'tcard--target',
+    marks.chosen && 'tcard--chosen',
+    marks.blow >= card.life && 'tcard--falling',
+    marks.dim && 'tcard--dim',
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const ariaLabel =
+    label ??
+    t('{name}, {type}, poziom {level}: Atak {attack}, Życie {life}', { name: card.name, type: type?.name ?? '', level: card.level, attack: card.attack, life: card.life });
+  return onClick
+    ? h('button', { type: 'button', class: className, vars: { '--rarity': card.color }, 'aria-label': ariaLabel, onClick }, body)
+    : h('span', { class: className, vars: { '--rarity': card.color }, role: 'img', 'aria-label': ariaLabel }, body);
+}
+
 // Szczęsny's words after a match, one of the data's.
 const oneOf = (lines) => lines[Math.floor(Math.random() * lines.length)];
 
@@ -106,49 +160,9 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
 
   const typeOf = (id) => view.types.find((type) => type.id === id);
   const beats = (a, b) => typeOf(a)?.target === b;
-  const typeIcon = (id, size = 14) => h('span', { class: `tcard-type tcard-type--${id}`, title: typeOf(id)?.name, 'aria-label': typeOf(id)?.name }, icon(typeOf(id)?.icon ?? 'unknown', { size }));
-
-  // A card's face: its rarity's frame, the creature's sprite, its name, Atak,
-  // Życie (with its bar once hurt), type and level. `marks` adds the blow it
-  // will take (−N), "nowa" and the choices of the turn.
-  function cardFace(card, { compact = false, marks = {}, onClick = null, label = null } = {}) {
-    const hurt = card.max && card.life < card.max;
-    const body = [
-      h('span', { class: 'tcard-top' }, typeIcon(card.type, compact ? 12 : 14), h('span', { class: 'tcard-level', title: t('Poziom karty'), text: String(card.level) })),
-      h('span', { class: 'tcard-art' }, monsterSprite(card.id) ?? icon('beast', { size: 32 })),
-      cardName(card.name),
-      h(
-        'span',
-        { class: 'tcard-stats' },
-        h('span', { class: 'tcard-attack', title: t('Atak') }, icon('sword', { size: 12 }), formatNumber(card.attack)),
-        h('span', { class: 'tcard-life', title: t('Życie') }, icon('heart', { size: 12 }), formatNumber(card.life)),
-      ),
-      hurt && h('span', { class: 'tcard-bar' }, h('span', { class: 'tcard-bar-fill', vars: { '--share': `${Math.max(0, card.life / card.max) * 100}%` } })),
-      marks.blow > 0 && h('span', { class: `tcard-blow${marks.blow >= card.life ? ' tcard-blow--down' : ''}${marks.advantage ? ' tcard-blow--strong' : ''}`, text: `−${formatNumber(marks.blow)}` }),
-      marks.fresh && h('span', { class: 'tcard-chip', text: t('nowa') }),
-      marks.skill && h('span', { class: 'tcard-chip tcard-chip--skill', text: marks.skill }),
-      marks.chosen && h('span', { class: 'tcard-check' }, icon('check', { size: 14 })),
-      card.shifted && h('span', { class: 'tcard-chip tcard-chip--shift', text: t('przemiana') }),
-    ];
-    const className = [
-      'tcard',
-      `tcard--${card.rarity}`,
-      compact && 'tcard--compact',
-      marks.picked && 'tcard--picked',
-      marks.target && 'tcard--target',
-      marks.chosen && 'tcard--chosen',
-      marks.blow >= card.life && 'tcard--falling',
-      marks.dim && 'tcard--dim',
-    ]
-      .filter(Boolean)
-      .join(' ');
-    const ariaLabel =
-      label ??
-      t('{name}, {type}, poziom {level}: Atak {attack}, Życie {life}', { name: card.name, type: typeOf(card.type)?.name ?? '', level: card.level, attack: card.attack, life: card.life });
-    return onClick
-      ? h('button', { type: 'button', class: className, vars: { '--rarity': card.color }, 'aria-label': ariaLabel, onClick }, body)
-      : h('span', { class: className, vars: { '--rarity': card.color }, role: 'img', 'aria-label': ariaLabel }, body);
-  }
+  const typeIcon = (id, size = 14) => typeBadge(id, size, typeOf(id));
+  // The tab's card faces, with its view's types.
+  const face = (card, options = {}) => cardFace(card, { ...options, types: view.types });
 
   // An empty place on the table, a tap to lay the picked card there.
   const slot = (label, onClick = null, ready = false) =>
@@ -208,7 +222,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
         h('span', { class: 'muted', text: t('Kolekcja: {count}', { count: formatNumber(view.collection.length) }) }),
       ),
       cards.length > 0
-        ? h('div', { class: 'tcard-grid tcard-grid--deck' }, cards.map((card) => cardFace(card, { compact: true })))
+        ? h('div', { class: 'tcard-grid tcard-grid--deck' }, cards.map((card) => face(card, { compact: true })))
         : h('p', { class: 'muted', text: t('Talia nie jest ułożona. Wybierz {count} kart z kolekcji.', { count: view.deckSize }) }),
       h('button', {
         type: 'button',
@@ -330,7 +344,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
       ended.tierName && h('p', { class: 'muted', text: t('Szczęsny, stopień {number}: {name}', { number: ROMAN[ended.tier - 1] ?? ended.tier, name: ended.tierName }) }),
       words && h('p', { class: 'settlement-greeting', text: words }),
       h('dl', { class: 'status-list' }, rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value })))),
-      ended.card && h('div', { class: 'cards-reward' }, h('p', { class: 'cards-reward-text', text: t('Za pierwsze pokonanie stopnia Szczęsny daje ci kartę:') }), cardFace(ended.card)),
+      ended.card && h('div', { class: 'cards-reward' }, h('p', { class: 'cards-reward-text', text: t('Za pierwsze pokonanie stopnia Szczęsny daje ci kartę:') }), face(ended.card)),
       h('button', {
         type: 'button',
         class: 'button button--system',
@@ -402,7 +416,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
         'div',
         { class: 'tcard-grid tcard-grid--collection' },
         cards.map((card) =>
-          cardFace(card, {
+          face(card, {
             marks: { chosen: chosen.has(card.id), dim: !chosen.has(card.id) && ready },
             label: t('{name}, poziom {level}: {state}', { name: card.name, level: card.level, state: chosen.has(card.id) ? t('w talii') : t('poza talią') }),
             onClick: () => {
@@ -599,7 +613,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
         const target = side === 'foe' ? aiming?.step === 'target' && card : aiming?.step === 'card' && card;
         const aimedAt = side === 'foe' && plan.skill?.kind === 'aim' && plan.skill.target === line;
         const content = shownCard
-          ? cardFace(shownCard, {
+          ? face(shownCard, {
               marks: { blow, advantage: blowsNow.strong[side][line], fresh, skill: skillMark ?? (aimedAt ? t('cel') : null), target },
               onClick: side === 'foe' ? (aiming?.step === 'target' ? () => tapFoe(line) : null) : () => tapMine(line),
             })
@@ -680,7 +694,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
           ? h(
               'div',
               { class: 'tcard-grid tcard-grid--reserve' },
-              reserve.map((card) => cardFace(card, { marks: { picked: picked === card.key, target: aiming?.step === 'swap' }, onClick: () => tapReserve(card) })),
+              reserve.map((card) => face(card, { marks: { picked: picked === card.key, target: aiming?.step === 'swap' }, onClick: () => tapReserve(card) })),
             )
           : h('p', { class: 'muted', text: t('Rezerwa pusta.') }),
         aiming?.step === 'type' &&
@@ -836,14 +850,7 @@ export function droppedCardsSection(cards) {
         h(
           'li',
           { class: 'cards-dropped-row' },
-          h(
-            'span',
-            { class: `tcard tcard--compact tcard--${card.rarity}`, vars: { '--rarity': card.color }, role: 'img', 'aria-label': card.name },
-            h('span', { class: 'tcard-top' }, h('span', { class: `tcard-type tcard-type--${card.type}`, title: card.typeName }, icon(card.typeIcon ?? 'unknown', { size: 12 })), h('span', { class: 'tcard-level', text: String(card.level) })),
-            h('span', { class: 'tcard-art' }, monsterSprite(card.id) ?? icon('beast', { size: 32 })),
-            cardName(card.name),
-            h('span', { class: 'tcard-stats' }, h('span', { class: 'tcard-attack' }, icon('sword', { size: 12 }), formatNumber(card.attack)), h('span', { class: 'tcard-life' }, icon('heart', { size: 12 }), formatNumber(card.life))),
-          ),
+          cardFace(card, { compact: true, label: card.name }),
           h(
             'span',
             { class: 'craft-text' },
