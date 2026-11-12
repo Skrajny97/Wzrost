@@ -182,6 +182,8 @@ async function casinoView(db, player, stored, wheel, stake, now) {
       left: left.length,
       itemLeft: left.some((index) => pool.prizes[index].kind === 'item'),
       bagFree: bagFree(player, now),
+      // Today's free spin, at the lowest stake's chances, not used yet.
+      free: wheel.free !== true,
     },
   };
 }
@@ -244,12 +246,14 @@ export async function buyTicket(context) {
   return respond(context, session, asked, { ticket: { day, gold: lottery.ticket } });
 }
 
-// POST /api/settlement/casino/spin { stake }: the Wheel at one of the day's
-// stakes, at its chances. The stake goes whatever comes; a win takes one of
-// the pool's prizes left: an item to the bag, as one from the Wymiana,
-// materials, as bought ones the Encyklopedia leaves out, or the camp's
-// resources. Also while the character is away: the bag stays at hand, as at
-// the Targowisko.
+// POST /api/settlement/casino/spin { stake } or { free: true }: the Wheel at
+// one of the day's stakes, at its chances. The stake goes whatever comes; a
+// win takes one of the pool's prizes left: an item to the bag, as one from
+// the Wymiana, materials, as bought ones the Encyklopedia leaves out, or the
+// camp's resources. Once a day the Wheel spins free, at the lowest stake's
+// chances (a player via the author, 12.11.2026); the day's Wheel keeps that
+// it was used. Also while the character is away: the bag stays at hand, as
+// at the Targowisko.
 export async function spinCasinoWheel(context) {
   const { session, player } = await requirePlayer(context);
   const { row } = player;
@@ -259,39 +263,43 @@ export async function spinCasinoWheel(context) {
   const stored = settlementOf(row);
   const wheel = wheelOf(player, stored, now);
   const stakes = dayStakes(wheel, content());
-  const stake = body.stake;
+  const free = body?.free === true;
+  const stake = free ? stakes[0] : body?.stake;
+  // What the spin costs: nothing when free.
+  const cost = free ? 0 : stake;
   const pool = wheelPool(wheel, seedOf(row), content());
   const left = prizesLeft(pool);
   const itemLeft = left.some((index) => pool.prizes[index].kind === 'item');
-  const block = spinBlock(stake, { gold: row.gold, stakes, left: left.length, itemLeft, bagFree: bagFree(player, now) }, content());
+  const block = spinBlock(stake, { gold: row.gold, stakes, left: left.length, itemLeft, bagFree: bagFree(player, now), free, used: wheel.free === true }, content());
   if (block) throw new ApiError(block.code === 'invalid_stake' ? 400 : 409, block.code, block.message);
   // The spin's own seed, which nobody knows before it.
   const result = spinWheel(pool, wheelOdds(stake, stakes, content()), newSeed());
   const prize = result.win ? pool.prizes[result.prize] : null;
-  const next = { ...stored, casino: result.win ? wheelWon(wheel, result.prize) : wheel };
+  const spun = result.win ? wheelWon(wheel, result.prize) : wheel;
+  const next = { ...stored, casino: free ? { ...spun, free: true } : spun };
   const db = context.env.DB;
-  const statements = [assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT gold FROM characters WHERE id = ?) >= ?', [row.id, row.version, row.id, stake])];
+  const statements = [assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT gold FROM characters WHERE id = ?) >= ?', [row.id, row.version, row.id, cost])];
   if (prize?.kind === 'material') {
     const materials = counted('materials', { [prize.key]: prize.count });
     const others = foreign({ material: { [prize.key]: prize.count } });
     statements.push(
       db
         .prepare(`UPDATE characters SET gold = gold - ?, materials = ${materials.sql}, foreign_stacks = ${others.sql}, settlement = ?, version = version + 1 WHERE id = ?`)
-        .bind(stake, ...materials.binds, ...others.binds, JSON.stringify(next), row.id),
+        .bind(cost, ...materials.binds, ...others.binds, JSON.stringify(next), row.id),
     );
   } else if (prize?.kind === 'resource') {
     statements.push(
       db
         .prepare('UPDATE characters SET gold = gold - ?, resources = json_set(resources, ?, COALESCE(json_extract(resources, ?), 0) + ?), settlement = ?, version = version + 1 WHERE id = ?')
-        .bind(stake, `$.${prize.key}`, `$.${prize.key}`, prize.count, JSON.stringify(next), row.id),
+        .bind(cost, `$.${prize.key}`, `$.${prize.key}`, prize.count, JSON.stringify(next), row.id),
     );
   } else {
-    statements.push(db.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ?').bind(stake, JSON.stringify(next), row.id));
+    statements.push(db.prepare('UPDATE characters SET gold = gold - ?, settlement = ?, version = version + 1 WHERE id = ?').bind(cost, JSON.stringify(next), row.id));
     if (prize) statements.push(db.prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, ?)').bind(row.id, JSON.stringify({ ...prize.item, traded: 1 }), now));
   }
   await atomically(db, statements, changed);
   const bonuses = bonusesOf(player, stored, now);
-  return respond(context, session, stake, { spin: { stake, win: result.win, tier: result.tier, prize: prize && prizeView(prize, true, bonuses) } });
+  return respond(context, session, free ? body?.stake : stake, { spin: { stake, free, win: result.win, tier: result.tier, prize: prize && prizeView(prize, true, bonuses) } });
 }
 
 // The draw of each day gone by with tickets, at the minute's cron, so at

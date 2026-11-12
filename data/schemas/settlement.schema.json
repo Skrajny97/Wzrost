@@ -500,7 +500,7 @@
         "texts": {
           "type": "object",
           "additionalProperties": false,
-          "required": ["lotteryAbout", "lotteryToday", "lotteryBuy", "lotteryHas", "lotteryBought", "lotteryYesterday", "lotteryEarlier", "lotteryMine", "lotteryNone", "lotteryPlayers", "announce", "wheelAbout", "wheelPool", "wheelPoolAbout", "wheelStake", "wheelSpin", "wheelEmpty", "wheelOdds", "wheelGone", "wheelWon", "wheelBag", "won", "lost", "win", "loss"],
+          "required": ["lotteryAbout", "lotteryToday", "lotteryBuy", "lotteryHas", "lotteryBought", "lotteryYesterday", "lotteryEarlier", "lotteryMine", "lotteryNone", "lotteryPlayers", "announce", "wheelAbout", "wheelPool", "wheelPoolAbout", "wheelStake", "wheelSpin", "wheelFree", "wheelFreeAbout", "wheelGoneFree", "lostFree", "wheelEmpty", "wheelOdds", "wheelGone", "wheelWon", "wheelBag", "won", "lost", "win", "loss", "lossFree"],
           "properties": {
             "lotteryAbout": { "type": "string", "minLength": 1 },
             "lotteryToday": { "type": "string", "minLength": 1 },
@@ -518,6 +518,10 @@
             "wheelPoolAbout": { "type": "string", "minLength": 1 },
             "wheelStake": { "type": "string", "minLength": 1 },
             "wheelSpin": { "type": "string", "minLength": 1 },
+            "wheelFree": { "type": "string", "minLength": 1, "description": "Przycisk darmowego zakręcenia raz dziennie." },
+            "wheelFreeAbout": { "type": "string", "minLength": 1, "description": "Zdanie pod przyciskiem darmowego zakręcenia; {stake} to najniższa stawka dnia, której szanse ma." },
+            "wheelGoneFree": { "type": "string", "minLength": 1 },
+            "lostFree": { "type": "string", "minLength": 1 },
             "wheelEmpty": { "type": "string", "minLength": 1 },
             "wheelOdds": { "type": "string", "minLength": 1 },
             "wheelGone": { "type": "string", "minLength": 1 },
@@ -526,7 +530,8 @@
             "won": { "type": "string", "minLength": 1 },
             "lost": { "type": "string", "minLength": 1 },
             "win": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "Słowa gospodarza po wygranej." },
-            "loss": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "Słowa gospodarza po przegranej." }
+            "loss": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "Słowa gospodarza po przegranej." },
+            "lossFree": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "Słowa gospodarza po przegranym darmowym zakręceniu (bez stawki)." }
           }
         }
       }
