@@ -680,6 +680,11 @@
       "id": "0.2.84",
       "title": "Wersja 0.2.84",
       "body": "- Skrzynia Konta przyjmuje też towary: mikstury, zioła, materiały, minerały i zasoby obozu, bez limitu sztuk. Są w nowej zakładce „Towary”.\n- Skrzynia Konta otwiera się na 20. poziomie postaci. Do tego czasu wisi na niej kłódka.\n- Encyklopedia nie zalicza towarów od innej postaci, tak jak przedmiotów."
+    },
+    {
+      "id": "0.2.85",
+      "title": "Wersja 0.2.85",
+      "body": "- Zdarzenia drużynowe: wyprawa drużyny może skończyć się zdarzeniem dla wszystkich, którzy poszli. Wybiera lider, a każdy dostaje wynik w osobnym raporcie.\n- Gdy lider nie wybierze przez 12 godzin, drużyna idzie najbezpieczniejszą drogą.\n- Niektóre wybory dają premię na następną wyprawę drużyny: krótszy czas albo więcej PD lub złota.\n- W „Zakopanej skrzyni” może czaić się mimik."
     }
   ]
 }

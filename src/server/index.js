@@ -26,6 +26,7 @@ import {
 import { acceptChatRules, blockInChat, chatPeople, chatReports, closeChat, latestChat, markChatSeen, moderateChat, readChat, reportChat, sendChat, setModerator, translateChat, unblockInChat, unmuteInChat } from './chat.js';
 import { acceptFriend, claimGifts, friendsView, inviteFriend, ranking, removeFriend, sendAllGifts, sendGift } from './community.js';
 import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inviteToParty, kickFromParty, leaveParty, partyHunt } from './parties.js';
+import { settlePartyEvents } from './party-events.js';
 import { enterTower, getTowers } from './towers.js';
 import { enterPortal, getPortals, sweepAllPortals, sweepPortal } from './portals.js';
 import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, setGuildRole } from './guilds.js';
@@ -523,6 +524,10 @@ export default {
       // The guild wars' rivals drawn as the week starts and their battles
       // fought every evening at 20:00 (guild-wars.js), where they are on.
       () => guildWarsOn() && settleWars(env.DB, controller.scheduledTime),
+      // The Drużyny's party events nobody chose in 12 hours settled with
+      // their `auto` option, the results not given to every member yet
+      // given, and the old ones dropped (party-events.js).
+      () => settlePartyEvents(env.DB, controller.scheduledTime),
     ];
     for (const job of jobs) {
       try {

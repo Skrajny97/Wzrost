@@ -144,7 +144,11 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
 
     fill(
       container,
-      // An entry to a Wieża (towers.js): its tower and floor, no length.
+      // A Drużyna's party event (party-events.js): its title and the land
+      // of the trip, no length.
+      report.partyEvent
+        ? heading(report.partyEvent.title, `${report.areaName ?? report.regionName} · ${dateTimeFormat.format(new Date(report.endsAt))}`)
+        : // An entry to a Wieża (towers.js): its tower and floor, no length.
       report.tower
         ? heading(report.tower.name, t('Piętro {floor} · {area} · {date}', { floor: report.tower.floor, area: report.areaName, date: dateTimeFormat.format(new Date(report.endsAt)) }))
         : // An entry to a Portal Systemu (portals.js): its portal and stage.
@@ -378,19 +382,24 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     // A portal pays only its loot, in one fight, and keeps no HP
     // (portals.js): its line instead of the XP, gold, goods and HP.
     const below = Boolean(report.portal);
+    // A party event's report (party-events.js) shows only what its option
+    // gave: no "+0 XP" or "+0" gold rows.
+    const shown = (value) => !report.partyEvent || value > 0;
     const rows = [
       below && report.result === 'success' && [t('Łup'), capitalized(report.portal.loot)],
-      !lost && !below && [t('XP postaci'), `+${formatNumber(summary.xp)} XP`],
+      !lost && !below && shown(summary.xp) && [t('XP postaci'), `+${formatNumber(summary.xp)} XP`],
       summary.penalty > 0 && [t('Kara za porażkę'), t('−{xp} XP postaci', { xp: formatNumber(summary.penalty) })],
       // Reports from before the split have no classXp: the class got the same XP.
-      !lost && !below && [t('XP klasy'), `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
-      !lost && !below && [t('Złoto'), `+${formatNumber(summary.gold)}`],
+      !lost && !below && shown(summary.classXp ?? summary.xp) && [t('XP klasy'), `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
+      !lost && !below && shown(summary.gold) && [t('Złoto'), `+${formatNumber(summary.gold)}`],
       !lost && !below && resourcesRow(summary.resources),
       !below && summary.materials?.length > 0 && [t('Materiały'), capitalized(materialsText(summary.materials))],
       summary.timePoints > 0 && [t('Punkty Czasu'), `+${formatNumber(summary.timePoints)}`],
       // A Wieża's floor is one fight, and the tower keeps no HP (towers.js).
-      !report.tower && !below && [t('Walki'), formatNumber(summary.fights)],
-      !report.tower && !below && ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
+      // A party event has a fight only when its event had one, and HP only
+      // of a character at home (party-events.js).
+      !report.tower && !below && !(report.partyEvent && !summary.fights) && [t('Walki'), formatNumber(summary.fights)],
+      !report.tower && !below && summary.hpEnd !== null && ['HP', `${summary.hpStart} → ${summary.hpEnd} / ${summary.maxHp}`],
     ].filter(Boolean);
     const best = summary.bestFind;
     return h(
@@ -408,6 +417,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value }))),
         !lost &&
           !below &&
+          !report.partyEvent &&
           h(
             'div',
             { class: 'status-row' },

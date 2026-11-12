@@ -1,0 +1,187 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Zdarzenia drużynowe na końcu wyprawy drużyny",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["autoHours", "texts", "list"],
+  "definitions": {
+    "gives": {
+      "description": "Co dostaje każdy, na swoim poziomie, bez dzielenia (847 B).",
+      "type": "object",
+      "properties": {
+        "gold": { "type": "number", "exclusiveMinimum": 0, "description": "Złoto: tyle razy rewards.goldPerLevel × poziom postaci, ±25% ({gold})." },
+        "xpFoes": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 }, "description": "PD jak za pokonanie tych przeciwników na poziomie postaci, bez walki ({xp})." },
+        "herbsKnown": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count", "gold", "goldText"],
+          "description": "Tyle ziół, które zna Zielarstwo postaci ({herbs}), a bez Zielarstwa złoto (gold) ze zdaniem goldText z {gold}.",
+          "properties": {
+            "count": { "type": "integer", "minimum": 1 },
+            "gold": { "type": "number", "exclusiveMinimum": 0 },
+            "goldText": { "type": "string", "minLength": 1 }
+          }
+        },
+        "potions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count"],
+          "description": "Tyle najlepszych mikstur leczenia do poziomu postaci ({potions}), do plecaka.",
+          "properties": { "count": { "type": "integer", "minimum": 1 } }
+        },
+        "materials": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count"],
+          "description": "Tyle materiałów stworów krainy wyprawy, rzadszych jak u stworów na poziomie postaci ({materials}).",
+          "properties": { "count": { "type": "integer", "minimum": 1 } }
+        },
+        "minerals": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["count"],
+          "description": "Tyle kamieni: najlepszego do poziomu postaci, a ze step o tyle kamieni niższego ({minerals}).",
+          "properties": { "count": { "type": "integer", "minimum": 1 }, "step": { "type": "integer", "minimum": 1 } }
+        },
+        "reputation": { "type": "object", "minProperties": 1, "additionalProperties": { "type": "integer", "minimum": 1 }, "description": "Reputacja bractw Osady, po id bractwa." },
+        "boon": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "description": "Premia drużyny na jej następną wyprawę: haste o tyle krótsza, xp i gold o tyle więcej PD i złota dla każdego.",
+          "properties": {
+            "haste": { "type": "number", "exclusiveMinimum": 0, "maximum": 0.5 },
+            "xp": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 },
+            "gold": { "type": "number", "exclusiveMinimum": 0, "maximum": 1 }
+          }
+        }
+      }
+    },
+    "split": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "description": "Nagroda tylko lidera albo tylko reszty drużyny, ze swoim tekstem.",
+      "properties": {
+        "gold": { "$ref": "#/definitions/gives/properties/gold" },
+        "xpFoes": { "$ref": "#/definitions/gives/properties/xpFoes" },
+        "herbsKnown": { "$ref": "#/definitions/gives/properties/herbsKnown" },
+        "potions": { "$ref": "#/definitions/gives/properties/potions" },
+        "materials": { "$ref": "#/definitions/gives/properties/materials" },
+        "minerals": { "$ref": "#/definitions/gives/properties/minerals" },
+        "reputation": { "$ref": "#/definitions/gives/properties/reputation" },
+        "text": { "type": "string", "minLength": 1 }
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "description": "Skutek opcji, ten sam dla całej drużyny.",
+      "properties": {
+        "kind": { "enum": ["none", "reward", "loss", "fight"], "description": "none: nic; reward: nagroda; loss: każdy traci hpLoss największego zdrowia; fight: walka całej drużyny z foes na poziomie lidera wyprawy." },
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Skutek z listy skutków." },
+        "name": { "type": "string", "minLength": 1, "description": "Nazwa skutku z listy." },
+        "weight": { "type": "number", "exclusiveMinimum": 0, "description": "Waga skutku na liście, losowanego raz dla całej drużyny." },
+        "draft": { "type": "boolean", "description": "Szkic, którego autor jeszcze nie zatwierdził: losuje się tylko w wersji testowej." },
+        "text": { "type": "string", "minLength": 1, "description": "Tekst skutku; przy nagrodzie z {gold}, {xp}, {herbs}, {potions}, {materials} albo {minerals}." },
+        "gold": { "$ref": "#/definitions/gives/properties/gold" },
+        "xpFoes": { "$ref": "#/definitions/gives/properties/xpFoes" },
+        "herbsKnown": { "$ref": "#/definitions/gives/properties/herbsKnown" },
+        "potions": { "$ref": "#/definitions/gives/properties/potions" },
+        "materials": { "$ref": "#/definitions/gives/properties/materials" },
+        "minerals": { "$ref": "#/definitions/gives/properties/minerals" },
+        "reputation": { "$ref": "#/definitions/gives/properties/reputation" },
+        "boon": { "$ref": "#/definitions/gives/properties/boon" },
+        "leader": { "$ref": "#/definitions/split" },
+        "others": { "$ref": "#/definitions/split" },
+        "hpLoss": { "type": "number", "exclusiveMinimum": 0, "maximum": 0.9, "description": "Przy stracie: taka część największego zdrowia, którą traci każdy." },
+        "foes": { "type": "array", "minItems": 1, "maxItems": 3, "items": { "type": "string", "minLength": 1 } },
+        "ambush": { "type": "boolean", "description": "Wrogowie ruszają pierwsi, wszyscy przed drużyną." },
+        "start": { "type": "string", "minLength": 1, "description": "Zdanie relacji przed walką, z {enemies}." },
+        "win": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text"],
+          "description": "Co zostaje po wygranej oprócz PD i złota przeciwników: złoto (gold) i materiały (materials, {materials}), ze zdaniem text.",
+          "properties": {
+            "gold": { "$ref": "#/definitions/gives/properties/gold" },
+            "materials": { "$ref": "#/definitions/gives/properties/materials" },
+            "text": { "type": "string", "minLength": 1 }
+          }
+        },
+        "lose": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["text"],
+          "description": "Zdanie po przegranej walce.",
+          "properties": { "text": { "type": "string", "minLength": 1 } }
+        }
+      }
+    },
+    "outcomes": {
+      "description": "Jeden skutek albo lista skutków z wagami, losowana raz dla całej drużyny.",
+      "oneOf": [{ "$ref": "#/definitions/outcome" }, { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/outcome" } }]
+    }
+  },
+  "properties": {
+    "$comment": { "type": "string" },
+    "autoHours": { "type": "number", "exclusiveMinimum": 0, "description": "Po tylu godzinach od końca wyprawy zdarzenie rozstrzyga się samo opcją auto." },
+    "texts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["leaderNote", "noPotion", "waiting", "chosen", "auto", "reportChosen", "reportAuto", "reportTitle", "hpLost", "busyHp", "fainted", "draw", "bagFull", "boonHaste", "boonXp", "boonGold"],
+      "properties": {
+        "leaderNote": { "type": "string", "minLength": 1, "description": "Pod tekstem zdarzenia u lidera, z {names}." },
+        "noPotion": { "type": "string", "minLength": 1, "description": "Dopisek wyszarzonej opcji leaderPotion, gdy lider nie ma mikstury leczenia." },
+        "waiting": { "type": "string", "minLength": 1, "description": "Linia Systemu w raporcie wyprawy, gdy lider jeszcze nie wybrał ({title}, {leader})." },
+        "chosen": { "type": "string", "minLength": 1, "description": "Linia Systemu w raporcie wyprawy po wyborze lidera ({title}, {leader}, {option})." },
+        "auto": { "type": "string", "minLength": 1, "description": "Linia Systemu w raporcie wyprawy, gdy zdarzenie rozstrzygnęło się samo ({title}, {option})." },
+        "reportChosen": { "type": "string", "minLength": 1, "description": "W raporcie zdarzenia: wybór lidera ({option})." },
+        "reportAuto": { "type": "string", "minLength": 1, "description": "W raporcie zdarzenia: opcja auto ({option})." },
+        "reportTitle": { "type": "string", "minLength": 1 },
+        "hpLost": { "type": "string", "minLength": 1, "description": "Ile HP traci postać ({hp})." },
+        "busyHp": { "type": "string", "minLength": 1, "description": "Postać zajęta czym innym nie traci teraz HP." },
+        "fainted": { "type": "string", "minLength": 1 },
+        "draw": { "type": "string", "minLength": 1 },
+        "bagFull": { "type": "string", "minLength": 1, "description": "Co nie zmieściło się w plecaku ({lost})." },
+        "boonHaste": { "type": "string", "minLength": 1, "description": "Linia Systemu w raporcie wyprawy z premią haste ({percent})." },
+        "boonXp": { "type": "string", "minLength": 1, "description": "Linia Systemu w raporcie wyprawy z premią xp ({percent})." },
+        "boonGold": { "type": "string", "minLength": 1, "description": "Linia Systemu w raporcie wyprawy z premią gold ({percent})." }
+      }
+    },
+    "list": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "scene", "text", "auto", "options"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "title": { "type": "string", "minLength": 1 },
+          "scene": { "const": "land", "description": "Tło: kraina wyprawy." },
+          "text": { "type": "string", "minLength": 1 },
+          "auto": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$", "description": "Opcja, która rozstrzyga zdarzenie, gdy lider nie wybierze w autoHours godzin: najostrożniejsza." },
+          "weight": { "type": "number", "exclusiveMinimum": 0, "description": "Waga losowania zdarzenia (domyślnie 1)." },
+          "draft": { "type": "boolean", "description": "Zdarzenie, którego autor jeszcze nie zatwierdził: przychodzi tylko w wersji testowej." },
+          "options": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["id", "label", "outcome"],
+              "properties": {
+                "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+                "label": { "type": "string", "minLength": 1 },
+                "leaderPotion": { "const": "healing", "description": "Lider oddaje przy wyborze jedną miksturę leczenia; bez niej opcja jest wyszarzona (texts.noPotion)." },
+                "outcome": { "$ref": "#/definitions/outcomes" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -249,6 +249,9 @@ export function buildContent(raw) {
     // The events at the end of an exploration (events.js).
     events: raw.events ?? null,
     eventsById: byId(raw.events?.list ?? []),
+    // The events at the end of a Drużyna's trip (party-events.js).
+    partyEvents: raw['party-events'] ?? null,
+    partyEventsById: byId(raw['party-events']?.list ?? []),
     // The Encyklopedia's tabs, tiers, chests and trophies (encyclopedia.js).
     encyclopedia: raw.encyclopedia ?? null,
     // The Osada: its places, residents, brotherhoods, standings, board of

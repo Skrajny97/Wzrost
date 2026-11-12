@@ -4194,6 +4194,13 @@ summary {
   font-style: normal;
 }
 
+/* A party event's note to the trip's leader (party-events.js): whom it
+   decides for, in plain type under the event's words. */
+.event-note {
+  font-style: normal;
+  color: var(--text-muted);
+}
+
 .event-options {
   display: grid;
   gap: 8px;

@@ -50,7 +50,8 @@
 // explorations neither made a party nor joined one until it was told to
 // stay, and stayed so after the party too.
 
-import { areaFor, areaOpenFor, huntDurations, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyStayText, tripWanted, wantedTarget } from '../engine/index.js';
+import { areaFor, areaOpenFor, huntDurations, huntWait, isUnlocked, longestHunt, mountOf, mountStage, partyFit, partyRange, partyStayText, tripWanted, wantedTarget } from '../engine/index.js';
+import { assertion } from './atomic.js';
 import { characterView, currentHp, earlyAreaOf, engineCharacter, equippedItems, loadCharacter, loadPlayer, requireIdlePlayer, requirePlayer, settleCharacter } from './characters.js';
 import { content } from './content.js';
 import { nameColorOf, wayLook } from './cosmetics.js';
@@ -421,6 +422,17 @@ export async function cancelPartyInvite(context) {
   return answer(db, player.row.id, context.now);
 }
 
+// A party's boon as kept (parties.boon, party-events.js): its { haste, xp,
+// gold } shares, or null for none, or one that does not read.
+function boonOf(text) {
+  try {
+    const boon = JSON.parse(text ?? 'null');
+    return boon && typeof boon === 'object' && !Array.isArray(boon) && Object.keys(boon).length > 0 ? boon : null;
+  } catch {
+    return null;
+  }
+}
+
 // What a member brings into the others' fights: itself as it is now.
 function snapshot(member, now) {
   return { id: member.row.id, name: member.row.name, character: engineCharacter(member.row), equipped: equippedItems(member), hp: currentHp(member, now).hp };
@@ -436,7 +448,10 @@ function snapshot(member, now) {
 // an event, which waits for the member's own choice (nothing is saved);
 // {} when the member is still not free. A claim that failed because the
 // member claimed it at the same moment, or changed meanwhile, is fine: the
-// member is read again, and goes if free by then.
+// member is read again, and goes if free by then. The leader of a trip
+// whose party event waits for its choice does not hold the party up: the
+// event settles itself with its `auto` option (`forTrip`, hunts.js;
+// party-events.js).
 async function claimForTrip(db, member, now) {
   const id = member.row.id;
   const user = await db.prepare('SELECT language FROM users WHERE id = ?').bind(member.row.user_id).first();
@@ -446,7 +461,7 @@ async function claimForTrip(db, member, now) {
       // Its player went over to another character meanwhile.
       if (member.row.id !== id || !member.activity) return {};
       const kind = member.activity.kind;
-      const done = await finishActivity(db, member, now);
+      const done = await finishActivity(db, member, now, { forTrip: true });
       if (done?.event) return { event: true };
       const after = await loadCharacter(db, id);
       return after?.row.role === 'player' ? { member: after, report: done ? { id: done.id, kind } : null } : {};
@@ -531,6 +546,17 @@ export async function partyHunt(context) {
   const everyone = [player, ...ready];
   // One time for the whole trip: the slowest mount of those going.
   const mount = Math.min(...everyone.map((member) => mountOfRow(member.row)));
+  // The party's boon from a party event of a trip before (party-events.js):
+  // this trip's, taken in the leader's start only as it was read (one
+  // changed meanwhile asks the leader to try again), so no boon goes on two
+  // trips. Its haste shortens every member's wait, as a mount does; its XP
+  // and gold go with the trip (`boon`) to each member's claim (hunts.js).
+  const kept = (await db.prepare('SELECT boon FROM parties WHERE id = ?').bind(party.id).first())?.boon ?? null;
+  const boon = boonOf(kept);
+  const haste = boon?.haste ?? 0;
+  const takeBoon = kept
+    ? [assertion(db, '(SELECT boon FROM parties WHERE id = ?) IS ?', [party.id, kept]), db.prepare('UPDATE parties SET boon = NULL WHERE id = ?').bind(party.id)]
+    : [];
   const shots = new Map(everyone.map((member) => [member.row.id, snapshot(member, now)]));
   const names = everyone.map((member) => member.row.name);
   const partnersOf = (member, list) => list.filter((other) => other.row.id !== member.row.id).map((other) => shots.get(other.row.id));
@@ -540,7 +566,7 @@ export async function partyHunt(context) {
   // The leader sets out, then the members, each without the leader's
   // choices. One whose start fails after all (it got busy at that very
   // moment) stays home.
-  const setups = new Map([[player.row.id, await beginHunt(db, player, body, now, { party: party_, partners: partnersOf(player, everyone), mount })]]);
+  const setups = new Map([[player.row.id, await beginHunt(db, player, body, now, { party: party_, partners: partnersOf(player, everyone), mount, haste, also: takeBoon })]]);
   const went = [];
   for (const member of ready) {
     try {
@@ -548,6 +574,7 @@ export async function partyHunt(context) {
         party: party_,
         partners: partnersOf(member, everyone),
         mount,
+        haste,
         follower: true,
       });
       setups.set(member.row.id, setup);
@@ -601,12 +628,14 @@ export async function partyHunt(context) {
       met: JSON.parse(player.row.met ?? '[]'),
       ...(target && { wanted: target }),
     },
+    // The party's boon it set out with (party-events.js).
+    ...(boon && { boon }),
   };
   // A member whose report was claimed for this trip keeps where it is
   // (`claimed`), for its Walka to tell it and open it.
   const trip = `json_extract(options, '$.party.trip') = ? AND json_extract(options, '$.party.id') = ?`;
-  await db.batch(
-    actual.map((member) => {
+  await db.batch([
+    ...actual.map((member) => {
       const report = claimed.get(member.row.id);
       const poster = setups.get(member.row.id).wanted;
       const other = Boolean(poster) && !wantedTarget(poster, target);
@@ -618,7 +647,17 @@ export async function partyHunt(context) {
             .bind(JSON.stringify(crew), ...(report ? [JSON.stringify(report)] : []), member.row.id, now, party.id)
         : db.prepare(`UPDATE activities SET options = json_remove(options, '$.party', '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`).bind(member.row.id, now, party.id);
     }),
-  );
+    // A leader left alone goes as on its own: the boon goes back to the
+    // party, and its wait to its plain length.
+    ...(went.length === 0 && boon
+      ? [
+          db.prepare("UPDATE parties SET boon = json_patch(COALESCE(boon, '{}'), ?) WHERE id = ?").bind(JSON.stringify(boon), party.id),
+          ...(haste > 0
+            ? [db.prepare('UPDATE activities SET ends_at = started_at + ? WHERE character_id = ? AND kind = ? AND started_at = ?').bind(huntWait(body.minutes, mount, content()), player.row.id, 'hunt', now)]
+            : []),
+        ]
+      : []),
+  ]);
   return json(
     {
       character: characterView(await loadPlayer(db, session.userId), now),

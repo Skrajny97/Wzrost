@@ -44,16 +44,19 @@ export const mountOf = (stage, content) => (Number.isInteger(stage) && stage > 0
 
 // How long the character waits for the end of an exploration of `minutes`
 // with the mount of `stage`, in milliseconds, to the whole second: the full
-// length without one (stage 0).
+// length without one (stage 0). `haste`: a Drużyna's boon from a party
+// event (party-events.js), a share shorter still, as a mount's is: only
+// the wait, never the minutes.
 /**
  * @param {number} minutes
  * @param {number} stage
  * @param {StableContent} content
+ * @param {number} [haste]
  * @returns {number}
  */
-export function huntWait(minutes, stage, content) {
+export function huntWait(minutes, stage, content, haste = 0) {
   const shorter = mountOf(stage, content)?.shorter ?? 0;
-  return Math.round(minutes * 60 * (1 - shorter)) * 1000;
+  return Math.round(minutes * 60 * (1 - shorter) * (1 - haste)) * 1000;
 }
 
 // The character's mount for the page: its stage, id (its pictures), name

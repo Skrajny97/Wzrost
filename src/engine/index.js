@@ -91,3 +91,4 @@ export * from './mercenaries.js';
 export * from './weeks.js';
 export * from './fame.js';
 export * from './account-chest.js';
+export * from './party-events.js';

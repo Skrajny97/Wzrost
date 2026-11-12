@@ -15,7 +15,7 @@ export const DATA_FILES = [
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
   'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'portals', 'guilds', 'cosmetics', 'news', 'fame',
-  'weeks', 'payments',
+  'weeks', 'payments', 'party-events',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'portals', 'core'];
@@ -752,6 +752,7 @@ function checkReferences(data) {
   }
   if (data.community.sections.some((section) => section.id === 'chat')) errors.push('community.json: Czat nie jest działem Społeczności (otwiera go kółko czatu)');
   errors.push(...checkEvents(data, { monsters, rarities }));
+  errors.push(...checkPartyEvents(data, { monsters }));
   errors.push(...checkEncyclopedia(data));
   errors.push(...checkSettlement(data, { rarities }));
   errors.push(...checkStable(data));
@@ -1055,6 +1056,101 @@ function checkEvents(data, { monsters, rarities }) {
       for (const key of Object.keys(eventCase.outcomes)) if (!paths.has(key)) errors.push(`events.json: ${event.id}/${eventCase.id} ma skutek nieznanej opcji "${key}"`);
     }
   }
+  return errors;
+}
+
+// The party events (party-events.json, src/engine/party-events.js): unique
+// ids, an `auto` option that names an option nobody is kept from (no
+// leader's potion), outcomes of a kind with what it needs, foes and
+// brotherhoods that exist, and each reward's value named in its text, as
+// the events' checks do.
+function checkPartyEvents(data, { monsters }) {
+  const errors = [];
+  const file = 'party-events';
+  const where = (text) => `${file}.json: ${text}`;
+  const { texts, list } = data[file];
+  const foes = new Set(data.events.foes.map((foe) => foe.id));
+  const brotherhoods = new Set(data.settlement.brotherhoods.map((brotherhood) => brotherhood.id));
+  const foeKnown = (id) => foes.has(id) || monsters.has(id);
+  // The texts around the events, each with the values it is filled with.
+  const needs = {
+    leaderNote: ['names'],
+    waiting: ['title', 'leader'],
+    chosen: ['title', 'leader', 'option'],
+    auto: ['title', 'option'],
+    reportChosen: ['option'],
+    reportAuto: ['option'],
+    hpLost: ['hp'],
+    bagFull: ['lost'],
+    boonHaste: ['percent'],
+    boonXp: ['percent'],
+    boonGold: ['percent'],
+  };
+  for (const [key, names] of Object.entries(needs)) {
+    for (const name of names) if (!texts[key].includes(`{${name}}`)) errors.push(where(`texts.${key} potrzebuje {${name}}`));
+  }
+  // What a reward gives and the value its text names.
+  const named = { gold: 'gold', xpFoes: 'xp', herbsKnown: 'herbs', potions: 'potions', materials: 'materials', minerals: 'minerals' };
+  const GIVES = ['gold', 'xpFoes', 'herbsKnown', 'potions', 'materials', 'minerals', 'reputation', 'boon'];
+  const checkGives = (at, gives, text) => {
+    for (const [key, value] of Object.entries(named)) if (gives[key] !== undefined && !text?.includes(`{${value}}`)) errors.push(where(`${at} potrzebuje {${value}} w tekście`));
+    if (gives.herbsKnown) {
+      // Without Zielarstwo the gold instead of herbs, told with the rest.
+      for (const [key, value] of Object.entries(named)) {
+        if (key !== 'herbsKnown' && gives[key] !== undefined && !gives.herbsKnown.goldText.includes(`{${value}}`)) errors.push(where(`${at} potrzebuje {${value}} w herbsKnown.goldText`));
+      }
+      if (!gives.herbsKnown.goldText.includes('{gold}')) errors.push(where(`${at} potrzebuje {gold} w herbsKnown.goldText`));
+    }
+    for (const id of gives.xpFoes ?? []) if (!foeKnown(id)) errors.push(where(`${at} ma nieznanego przeciwnika "${id}" w xpFoes`));
+    for (const id of Object.keys(gives.reputation ?? {})) if (!brotherhoods.has(id)) errors.push(where(`${at} ma nieznane bractwo "${id}"`));
+  };
+  const checkOutcome = (at, outcome) => {
+    const giving = GIVES.some((key) => outcome[key] !== undefined) || outcome.leader || outcome.others;
+    const fighting = outcome.foes || outcome.ambush !== undefined || outcome.start || outcome.win || outcome.lose;
+    const split = Boolean(outcome.leader || outcome.others);
+    if (!outcome.text && !split) errors.push(where(`${at} potrzebuje tekstu`));
+    if (outcome.kind === 'reward') {
+      if (!giving) errors.push(where(`${at} ma nagrodę bez niczego do dania`));
+      if (split && !(outcome.leader && outcome.others)) errors.push(where(`${at} potrzebuje nagrody i lidera (leader), i reszty (others)`));
+      if (split && GIVES.some((key) => outcome[key] !== undefined)) errors.push(where(`${at} ma nagrodę dla wszystkich obok nagród lidera i reszty`));
+      if (split) {
+        checkGives(`${at}/leader`, outcome.leader, outcome.leader.text);
+        checkGives(`${at}/others`, outcome.others, outcome.others.text);
+      } else checkGives(at, outcome, outcome.text);
+    } else if (giving) errors.push(where(`${at} daje nagrodę bez kind reward`));
+    if (outcome.kind === 'loss') {
+      if (outcome.hpLoss === undefined) errors.push(where(`${at} ma stratę bez hpLoss`));
+    } else if (outcome.hpLoss !== undefined) errors.push(where(`${at} ma hpLoss bez kind loss`));
+    if (outcome.kind === 'fight') {
+      if (!outcome.foes) errors.push(where(`${at} ma walkę bez przeciwników`));
+      for (const id of outcome.foes ?? []) if (!foeKnown(id)) errors.push(where(`${at} ma nieznanego przeciwnika "${id}"`));
+      if (!outcome.start?.includes('{enemies}')) errors.push(where(`${at} potrzebuje zdania start z {enemies}`));
+      if (outcome.win?.materials && !outcome.win.text.includes('{materials}')) errors.push(where(`${at} potrzebuje {materials} w win.text`));
+    } else if (fighting) errors.push(where(`${at} ma ustawienia walki bez walki`));
+  };
+  const ids = uniqueIds(errors, file, list);
+  if (ids.size === 0) errors.push(where('nie ma żadnego zdarzenia'));
+  for (const event of list) {
+    const optionIds = uniqueIds(errors, `${file} (${event.id})`, event.options);
+    // The option of an event nobody chose: one the party may always take.
+    if (!optionIds.has(event.auto)) errors.push(where(`${event.id} ma auto "${event.auto}", a nie ma takiej opcji`));
+    else if (event.options.find((option) => option.id === event.auto).leaderPotion) errors.push(where(`${event.id}: opcja auto nie może wymagać mikstury lidera`));
+    for (const option of event.options) {
+      const at = `${event.id}/${option.id}`;
+      if (!Array.isArray(option.outcome)) {
+        checkOutcome(at, option.outcome);
+        continue;
+      }
+      option.outcome.forEach((outcome, index) => {
+        if (outcome.weight === undefined) errors.push(where(`${at} [${index}] na liście skutków potrzebuje wagi`));
+        if ((outcome.id === undefined) !== (outcome.name === undefined)) errors.push(where(`${at} [${index}] potrzebuje i id, i name albo żadnego z nich`));
+        checkOutcome(`${at} [${index}]`, outcome);
+      });
+      uniqueIds(errors, `${file} (${at})`, option.outcome.filter((outcome) => outcome.id));
+      if (option.outcome.every((outcome) => outcome.draft)) errors.push(where(`${at} ma same szkice, więc w grze nie byłoby czego losować`));
+    }
+  }
+  if (list.every((event) => event.draft)) errors.push(where('ma same szkice, więc w grze nie byłoby czego losować'));
   return errors;
 }
 

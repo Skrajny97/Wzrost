@@ -4,7 +4,10 @@
 // it, and the report tells what came of it. An option may lead to a further
 // choice: the sheet then tells what happened and offers the new options. Closed
 // without a choice, the event waits where it stopped: the next "Odbierz
-// raport" brings it again.
+// raport" brings it again. A Drużyna's party event comes the same way to the
+// trip's leader (src/engine/party-events.js), with a note of whom it decides
+// for (`note`) under its words; what came of it comes to every member in a
+// report of its own.
 
 import { companionFigure, eventFigure, eventScene, landArt } from './art.js';
 import { h } from './dom.js';
@@ -63,6 +66,7 @@ export function openEvent(event, done) {
     art,
     h('h2', { class: 'sheet-title', text: event.title }),
     h('p', { class: `sheet-text event-text${steps.length > 0 ? ' event-text--before' : ''}`, text: event.text }),
+    event.note && h('p', { class: 'sheet-text event-note', text: event.note }),
     steps.map((step) => h('p', { class: 'sheet-text event-text event-step' }, h('strong', { text: `${step.label}. ` }), step.text)),
     h('div', { class: 'event-options' }, options),
   );

@@ -540,6 +540,10 @@
     "0.2.84": {
       "title": "Version 0.2.84",
       "body": "- The Account Chest now takes goods too: potions, herbs, materials, minerals and camp resources, with no limit. They are in the new “Goods” tab.\n- The Account Chest opens at character level 20. Until then it has a padlock on it.\n- The Encyclopedia does not count goods from another character, just as with items."
+    },
+    "0.2.85": {
+      "title": "Version 0.2.85",
+      "body": "- Party events: a party's trip may end in an event for everyone who went. The leader chooses, and everyone gets the result in a separate report.\n- If the leader does not choose within 12 hours, the party takes the safest way.\n- Some choices give a bonus for the party's next trip: a shorter trip, or more XP or gold.\n- A mimic may lurk in the “Buried Chest”."
     }
   }
 }
