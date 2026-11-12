@@ -4,9 +4,9 @@
 // met on the explorations of its place (hunts.js), and the bounty claimed
 // from the sołtys once it has fallen. The Osada's record keeps `wanted`:
 // the day, what the day's posters are drawn from (`basis`: the class level
-// and the place the Sala prób opened, as the day's first look found them,
-// and `lands` once drawn without the newest land, 10.11.2026), the posters
-// done that day and the poster taken (`beaten` once its target fell).
+// and the place the Sala prób opened, as the day's first look found them),
+// the posters done that day and the poster taken (`beaten` once its target
+// fell).
 
 import { laterPeriod, questPeriod, samePeriod, wantedOf, wantedPosters, wantedTarget, wantedTrophy, weekCount } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
@@ -25,9 +25,11 @@ const today = (now) => questPeriod('daily', now, content()).key;
 // (wantedToKeep), so a class level or a place the Sala prób opens later that
 // day hangs no new ones (the code review: a place opened after the day's
 // four bounties brought more); without a basis kept for the day, it is the
-// character as it is now. A basis drawn since 10.11.2026 says so (`lands`):
-// its posters leave out the newest land (wantedPlaces in the engine), while
-// a day drawn before keeps the posters it was drawn with.
+// character as it is now. The posters are drawn by the engine's rule of the
+// moment, so a day drawn before 12.11.2026, without the newest land (its
+// basis with `lands`, left out now), has them drawn anew from the same first
+// look (the author: „Albo generuj nowych poszukiwanych albo po prostu
+// poustawiaj ich tez z lepszymi nagrodami w wyzszych lokacjach”).
 //
 // A record of a later day stays the record (laterPeriod in quests.js): a
 // request still of the day before, met by the record the next day's first
@@ -40,14 +42,14 @@ function recordOf(row, stored, day) {
   const same = record.day === at;
   return {
     day: at,
-    basis: same && record.basis ? record.basis : { classLevel: row.class_level, early: hallRecord(row).early, lands: true },
+    basis: same && record.basis ? { classLevel: record.basis.classLevel, early: record.basis.early } : { classLevel: row.class_level, early: hallRecord(row).early },
     done: same ? (record.done ?? []) : [],
     taken: record.taken ?? null,
   };
 }
 
 // The day's posters, from the record's basis.
-const postersOf = (row, record) => wantedPosters(record.basis.classLevel, record.day, row.id, content(), record.basis.early, { lands: record.basis.lands === true });
+const postersOf = (row, record) => wantedPosters(record.basis.classLevel, record.day, row.id, content(), record.basis.early);
 
 // The record the Osada's first look of a day keeps (getSettlement in
 // settlement.js), as the Koło Fortuny keeps its pool's basis; null when the
@@ -93,19 +95,23 @@ const stateOf = (poster, done, taken) => (done.includes(poster.id) ? 'done' : ta
 
 // The posters of the day for the Osada's page, each open, taken, beaten
 // (its bounty waiting) or done, and a poster of an earlier day still in
-// hand; null where the game has no posters.
+// hand; null where the game has no posters. A poster of the day in hand
+// that its posters no longer have, drawn before they were drawn anew
+// (12.11.2026), stays with them, first.
 export function wantedView(row, stored, now) {
   const rules = wantedOf(content());
   if (!rules) return null;
   const record = recordOf(row, stored, today(now));
   const { done, taken } = record;
   const posters = postersOf(row, record).map((poster) => posterView(poster, stateOf(poster, done, taken)));
+  const apart = taken && !posters.some((poster) => poster.id === taken.id) ? posterView(taken, taken.beaten ? 'beaten' : 'taken') : null;
+  const ofDay = Boolean(apart) && taken.id.startsWith(`${record.day}:`);
   const { meet: _a, won: _b, trophy: _c, loot: _d, ...texts } = rules.texts;
   return {
     texts,
     backdrop: rules.backdrop ?? null,
-    posters,
-    earlier: taken && !posters.some((poster) => poster.id === taken.id) ? posterView(taken, taken.beaten ? 'beaten' : 'taken') : null,
+    posters: ofDay ? [apart, ...posters] : posters,
+    earlier: ofDay ? null : apart,
     holding: Boolean(taken),
   };
 }

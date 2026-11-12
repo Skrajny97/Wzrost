@@ -107,7 +107,7 @@ describe('Poszukiwani on a Drużyna\'s trip through the API', () => {
   }
   // A poster in hand for `name`, as the sołtys's board gives it.
   const hold = async (name, target, extra = {}) =>
-    (await sql('UPDATE characters SET settlement = ? WHERE name = ?', JSON.stringify({ wanted: { day: today(), basis: { classLevel: 30, early: null, lands: true }, done: [], taken: { ...poster(today(), target), gold: 1900, beaten: false, ...extra } } }), name)).run();
+    (await sql('UPDATE characters SET settlement = ? WHERE name = ?', JSON.stringify({ wanted: { day: today(), basis: { classLevel: 30, early: null }, done: [], taken: { ...poster(today(), target), gold: 1900, beaten: false, ...extra } } }), name)).run();
   // The trip meets its target in its first fight: a seed whose draw does.
   async function meetAtOnce() {
     let seed = 0;

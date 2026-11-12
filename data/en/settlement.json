@@ -895,7 +895,7 @@
     },
     "texts": {
       "title": "Wanted",
-      "intro": "Every day Headman Bogumił posts three wanted posters for creatures from the places open to you, and one for an outlaw. Take a poster, and on a regular exploration of that place you will meet the wanted one more often. The wanted never turn up on a Quick Hunt or a Lightning Hunt. On a Party trip you may meet the wanted one from a party member's poster, and everyone holding a poster for it gets the bounty.",
+      "intro": "Every day Headman Bogumił posts three wanted posters for creatures from the highest place open to you and the two places below it, plus one for an outlaw. Take a poster, and on a regular exploration of that place you will meet the wanted one more often. The wanted never turn up on a Quick Hunt or a Lightning Hunt. On a Party trip you may meet the wanted one from a party member's poster, and everyone holding a poster for it gets the bounty.",
       "footer": "For defeating the wanted one, the headman pays a reward: gold, Time Points and reputation with the Brotherhood of Hunters. A creature leaves a trophy: its material in the rarity you still lack in the Encyclopedia for the +5% damage bonus against it. An outlaw leaves rare loot. One poster at a time, new posters every day.",
       "wanted": "Wanted",
       "outlaw": "Outlaw",

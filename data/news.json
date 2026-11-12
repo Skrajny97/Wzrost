@@ -645,6 +645,11 @@
       "id": "0.2.77",
       "title": "Wersja 0.2.77",
       "body": "- Upominek od postaci poniżej 20. poziomu daje złoto albo surowce według poziomu nadawcy.\n- Wpłaty na budynki Siedziby Gildii od 20. poziomu postaci. Młodsze postacie widzą budynki i ich premie.\n- Kraina i poziom Wyprawy Gildii liczą się z członków, którzy grali w ostatnich 7 dniach.\n- Sławę za sprzedaż na Targowisku daje najwyżej 20 sprzedaży w tygodniu. Złoto przychodzi jak zwykle.\n- Opisy cech Opiekun i Łaska mówią, kiedy leczenie zdejmuje złe efekty."
+    },
+    {
+      "id": "0.2.78",
+      "title": "Wersja 0.2.78",
+      "body": "- Listy gończe sołtysa są z najwyższego miejsca, które masz otwarte, i z dwóch miejsc pod nim, także z najnowszej krainy. Nagroda rośnie z poziomem miejsca.\n- Dzisiejsze listy gończe wylosowały się od nowa. List, który masz już w ręku, zostaje i daje swoją nagrodę."
     }
   ]
 }

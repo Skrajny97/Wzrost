@@ -512,6 +512,10 @@
     "0.2.77": {
       "title": "Version 0.2.77",
       "body": "- A Gift from a character below level 20 gives gold or resources by the sender's level.\n- Donations to the Guild Hall's buildings from character level 20. Younger characters see the buildings and their bonuses.\n- The land and level of the Guild Expedition count the members who played in the last 7 days.\n- At most 20 sales a week at the Marketplace bring Fame. The gold comes as usual.\n- The descriptions of the Caretaker and Grace traits say when healing removes harmful effects."
+    },
+    "0.2.78": {
+      "title": "Version 0.2.78",
+      "body": "- The headman's wanted posters come from the highest place open to you and the two places below it, your newest land included. The bounty grows with the place's level.\n- Today's wanted posters have been drawn anew. A poster already in your hand stays, with its own bounty."
     }
   }
 }

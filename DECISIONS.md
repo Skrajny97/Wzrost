@@ -3092,6 +3092,16 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 
+## Wersja 0.2.78 (12.11.2026): listy gończe bliżej poziomu postaci
+
+Gracz na 43. poziomie napisał na czacie, że sołtys daje mu listy gończe za stworami z pierwszej krainy, po 400 złota za list z miejsca 6–10, choć sam idzie już na 50. poziom: wypełnianie ich marnuje XP i nie jest warte zachodu. Autor: „Te listy gończe, poszukiwani powinni sięgać maksymalnie 2 stopnie niżej niż pozwala level” i „Albo generuj nowych poszukiwanych albo po prostu poustawiaj ich tez z lepszymi nagrodami w wyzszych lokacjach”.
+
+1. **Miejsca listów.** Sołtys wywiesza listy z najwyższego miejsca otwartego dla postaci i z dwóch miejsc pod nim, z jakiejkolwiek krainy (`places` 3 w `data/settlement.json`, wcześniej 4). Miejsce otwarte w Sali prób też się liczy i jest wtedy najwyższym z trzech. Każde z trzech miejsc ma swój list za odmianą stwora, a wyjęty spod prawa jest w jednym z nich. Postać z jednym albo dwoma otwartymi miejscami dostaje listy z tych, które ma.
+2. **Zasada z 10.11.2026 przestaje obowiązywać.** Listy nie omijają już najnowszej krainy postaci (punkt 32 wersji 0.2.36). Przy 43. poziomie klasy listy są z Pajęczego Parowu (31–35), Rysiej Grani (36–40) i Wilczych Kręgów (41–45).
+3. **Nagrody.** Wzór zostaje: 60 złota za pierwszy poziom miejsca, w pełnych setkach. Wyższe miejsca dają więc wyższe nagrody: przy 43. poziomie klasy 1900, 2200 i 2500 złota zamiast 400–1300 złota. Punkty Czasu, przychylność Bractwa Łowców i relacja z sołtysem bez zmian.
+4. **Dzisiejsze listy od nowa.** Listy dnia wylosowane według starej zasady losują się od nowa, z tego samego pierwszego spojrzenia na tablicę (ten sam poziom klasy i to samo miejsce z Sali prób). Wypełnione listy zostają wypełnione. List w ręku z tamtego losowania zostaje na tablicy jako pierwszy z listów dnia i daje swoją nagrodę, a porzucony znika z tablicy.
+5. „Jak to działa?” przy listach: „Sołtys Bogumił wywiesza co dzień trzy listy gończe za stworami z najwyższego miejsca, które masz otwarte, i z dwóch miejsc pod nim, a do tego jeden za wyjętym spod prawa.” Testy: test/wanted-places.test.js (zamiast test/wanted-lands.test.js) i test/wanted.test.js.
+
 ## Wersja 0.2.77 (12.11.2026): odpowiedzi autora 831–840
 
 Odpowiedzi autora na stronie ocen (12.11.2026). Każda zmiana ma test (test/community.test.js, test/guild-seat.test.js, test/guild-expedition.test.js, test/fame.test.js).
@@ -3815,7 +3825,7 @@ Autor: „Awatar niech od teraz daje 1/4 tego co zdobyłaby postać - XPa i wpł
 
 Autor: „I zbalansowanie poszukiwanych pod nowy poziom trudności, zeby nie pokazywało zleceń z ostatniej odblokowanej krainy, bo często tam się wejdzie i od razu padnie.” Potem: „chcemy zrobić większy focus na drużynę, ergo poszukiwanych powinno moc sie znajdywac nawet w drużynie, szczególnie mając tych samych”.
 
-32. Listy gończe są z najwyższych otwartych miejsc krain poniżej krainy najwyższego otwartego miejsca postaci (także z Sali prób). Z samą pierwszą krainą: z jej miejsc bez najnowszego, a z jednym miejscem z niego. Listy dnia wylosowane przed zmianą zostają do końca dnia.
+32. Listy gończe są z najwyższych otwartych miejsc krain poniżej krainy najwyższego otwartego miejsca postaci (także z Sali prób). Z samą pierwszą krainą: z jej miejsc bez najnowszego, a z jednym miejscem z niego. Listy dnia wylosowane przed zmianą zostają do końca dnia. *Nieaktualne: zob. wersję 0.2.78, punkty 1–2.*
 33. Na wyprawie Drużyny cel jest z listów idących na jej miejsce: ten, na który list ma najwięcej z nich; z równych losuje ziarno wyprawy. Cel spotyka się z tą samą szansą, najwyżej raz, w tej samej walce w raporcie każdego. Gdy padnie, każdy z listem na niego wypełnia swój (nagroda i trofeum jak dotąd), a pozostali mają tylko to, co daje walka. Wcześniejsze zdanie, że poszukiwanych nie ma na wyprawach drużyny, jest nieaktualne.
 34. Członek zabiera na wyprawę tylko list na jej cel (nie porzuci go w trakcie); list na inny cel może porzucić. „Jak to działa?”: „Na wyprawie Drużyny możesz trafić na poszukiwanego z listu kogoś z drużyny, a nagrodę dostaje każdy, kto ma na niego list.”
 

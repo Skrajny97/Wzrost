@@ -3,11 +3,11 @@
 // "Poszukiwani"; the author's 619 B: „nazwane, silniejsze odmiany stworów z
 // tych miejsc” and „wyjęci spod prawa”). Every day the sołtys posts wanted
 // posters for each character: one for the named variant of the creatures of
-// each of a few of its highest open places below its newest land
-// (wantedPlaces), and one for an outlaw in one of them. A poster taken
-// brings its target into the explorations of its place (simulateHunt): as
-// strong as the place's elite, by the rules' strength more. Pure: the day
-// and the seed are the server's.
+// each of its highest open places (its highest and the two below it), and
+// one for an outlaw in one of them. A poster taken brings its target into
+// the explorations of its place (simulateHunt): as strong as the place's
+// elite, by the rules' strength more. Pure: the day and the seed are the
+// server's.
 
 import { monsterCombatant } from './combatant.js';
 import { stackKey } from './crafting.js';
@@ -66,52 +66,29 @@ function poster(day, area, target, content) {
   };
 }
 
-// The places open to a character (`open`, in the game's order) that its
-// posters come from, since 10.11.2026 not those of its newest land, the
-// land (region) of its highest open place, where it has just come and
-// falls at once (the author: „zbalansowanie poszukiwanych pod nowy poziom
-// trudności, zeby nie pokazywało zleceń z ostatniej odblokowanej krainy, bo
-// często tam się wejdzie i od razu padnie”): the places of the lands below
-// it; with no land below it, those of the first land but its newest place,
-// or the only one open.
-/**
- * @param {Area[]} open
- * @param {Content} content
- * @returns {Area[]}
- */
-export function wantedPlaces(open, content) {
-  if (open.length === 0) return [];
-  /** @param {Area} area */
-  const land = (area) => content.regions.findIndex((/** @type {{ id: string }} */ region) => region.id === area.regionId);
-  const newest = land(open[open.length - 1]);
-  const below = open.filter((area) => land(area) < newest);
-  if (below.length > 0) return below;
-  return open.length > 1 ? open.slice(0, -1) : open;
-}
-
 // The posters of `day` for a character of `classLevel` (`seed`: the
 // character's own; `early`: the place the Sala prób opened for it, if any):
-// from the rules' `places` highest of its places wantedPlaces gives,
-// `creatures` of them drawn, each with its variant, the highest first, then
-// an outlaw drawn in one of them. `lands` false: a day whose posters were
-// drawn before that rule (its basis kept before 10.11.2026, server
-// wanted.js), from the highest places open of all, so the day's posters
-// stay as they were drawn.
+// from the rules' `places` highest places open to it, since 12.11.2026 its
+// highest and the two below it whatever their land (the author: „Te listy
+// gończe, poszukiwani powinni sięgać maksymalnie 2 stopnie niżej niż
+// pozwala level”, after a player at level 43 got posters of the first land,
+// 400 gold each; from 10.11.2026 they left out its newest land), `creatures`
+// of them drawn, each with its variant, the highest first, then an outlaw
+// drawn in one of them.
 /**
  * @param {number} classLevel
  * @param {string} day
  * @param {unknown} seed
  * @param {Content} content
  * @param {string | null} [early]
- * @param {{ lands?: boolean }} [options]
  * @returns {Poster[]}
  */
-export function wantedPosters(classLevel, day, seed, content, early = null, { lands = true } = {}) {
+export function wantedPosters(classLevel, day, seed, content, early = null) {
   const rules = wantedOf(content);
   if (!rules) return [];
   /** @type {Area[]} */
   const open = content.areas.filter((/** @type {Area} */ area) => areaOpenFor(area, classLevel, early, content));
-  const places = (lands ? wantedPlaces(open, content) : open).slice(-rules.places);
+  const places = open.slice(-rules.places);
   if (places.length === 0) return [];
   const rng = createRng(`${seed}:${day}:wanted`);
   const order = [...places];
