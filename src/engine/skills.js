@@ -1,3 +1,4 @@
+// @ts-check
 // Skills (data/skills.json). At a class level milestone (classLevel, today
 // only 10) the character learns one of the skills of its class there for a
 // Skill Point, for good: its main development path (each skill's `path`),
@@ -19,6 +20,17 @@
 
 import { counted, decimalText, word } from './text.js';
 
+/** @typedef {Record<string, any>} Content The game's data, as content.js builds it. */
+/** @typedef {Record<string, any>} Character A character, as its row keeps it. */
+/**
+ * @typedef {{
+ *   id: string, name: string, classId: string, classLevel: number, kind: string, mana: number,
+ *   params: Record<string, any>, effect: string, cooldown?: number, once?: boolean, maxLevel?: number,
+ *   evolution?: string, from?: string, path?: string, style?: string, rarity?: string, description?: string,
+ * }} Skill A skill of data/skills.json, or an evolution's (content.js).
+ */
+/** @typedef {{ code: string, message: string }} Block Why a skill cannot be learned or raised. */
+
 // Kinds used instead of a plain blow on the character's move, at the start of
 // a fight, and the moment its HP falls below the skill's mark; a stance
 // (evolutions) wakes at the start of the character's move, besides its blow,
@@ -29,22 +41,47 @@ export const START_KINDS = new Set(['buff', 'coat', 'riposte', 'harmony']);
 export const WOUND_KINDS = new Set(['guard', 'shield', 'evade']);
 export const STANCE_KINDS = new Set(['stance']);
 
-export const skillsOfClass = (classId, content) => content.skills.filter((skill) => skill.classId === classId);
+/**
+ * @param {string} classId
+ * @param {Content} content
+ * @returns {Skill[]}
+ */
+export const skillsOfClass = (classId, content) => content.skills.filter((/** @type {Skill} */ skill) => skill.classId === classId);
 
 // The top level of a skill: an evolution's own, else that of the classes'.
+/**
+ * @param {Skill} skill
+ * @param {Content} content
+ * @returns {number}
+ */
 export const topLevel = (skill, content) => skill.maxLevel ?? content.balance.skills.maxLevel;
 
 // The stage of the character's evolution: 0 without one, 1 after the first,
 // 2 after its second form. An evolution the deployment has off counts as a
 // first one.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {number}
+ */
 export const evolutionStage = (character, content) => (character.evolution ? (content.evolutionsById[character.evolution]?.stage ?? 1) : 0);
 
 // The rules of each evolution stage's skills and points, the first one's
 // first (content.js).
+/**
+ * @param {Content} content
+ * @returns {Record<string, any>[]}
+ */
 const stagesOf = (content) => content.evolutionStages ?? (content.evolutionRules ? [content.evolutionRules] : []);
 
 // The numbers of a skill at a level: a pair grows evenly from level 1 to the
 // top level, a single value stays.
+/**
+ * @param {Skill} skill
+ * @param {number} level
+ * @param {Content} content
+ * @returns {Record<string, any>}
+ */
 export function skillParams(skill, level, content) {
   const top = topLevel(skill, content);
   const share = (Math.min(Math.max(level, 1), top) - 1) / (top - 1);
@@ -60,6 +97,11 @@ export function skillParams(skill, level, content) {
 // learned skill, the first level of the main path too (the author:
 // "żadnych bonusów na start"). So they fill both paths to the top level,
 // with none left (tools/validate-data.mjs).
+/**
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {{ earned: number, spent: number, free: number }}
+ */
 export function skillPoints(character, content) {
   const { unlockClassLevel, lastPointClassLevel, pointsPerClassLevel } = content.balance.skills;
   let earned = Math.max(0, Math.min(character.classLevel, lastPointClassLevel) - unlockClassLevel + 1) * pointsPerClassLevel;
@@ -78,19 +120,37 @@ export function skillPoints(character, content) {
 // Whether a Skill Point is left that a learned skill could take, counted
 // with the points the character has at class level `level` (an evolution
 // level ahead), so a report of several class levels cannot slip past it.
+/**
+ * @param {Character} character
+ * @param {number} level
+ * @param {Content} content
+ * @returns {boolean}
+ */
 export function pointsLeft(character, level, content) {
   const { free } = skillPoints({ ...character, classLevel: Math.max(character.classLevel, level) }, content);
   return free > 0 && Object.entries(character.skills ?? {}).some(([id, skillLevel]) => content.skillsById[id] && skillLevel < topLevel(content.skillsById[id], content));
 }
 
 // The skills of a milestone the character knows, in the order it learned them.
+/**
+ * @param {Skill[]} pool
+ * @param {Record<string, number>} learned
+ * @returns {Skill[]}
+ */
 const knownOf = (pool, learned) =>
-  Object.keys(learned)
-    .map((id) => pool.find((skill) => skill.id === id))
-    .filter(Boolean);
+  /** @type {Skill[]} */ (
+    Object.keys(learned)
+      .map((id) => pool.find((skill) => skill.id === id))
+      .filter(Boolean)
+  );
 
 // The skills a character learned, with their numbers at their levels; an
 // evolution's skill without a point yet does nothing.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {{ id: string, name: string, kind: string, mana: number, cooldown: number, once: boolean, level: number, params: Record<string, any> }[]}
+ */
 export function learnedSkills(character, content) {
   return Object.entries(character.skills ?? {})
     .filter(([id, level]) => content.skillsById[id] && level > 0)
@@ -104,6 +164,12 @@ export function learnedSkills(character, content) {
 // its class and at the milestone's class level, and each takes a Skill
 // Point. Another one than the first waits for secondClassLevel, and no more
 // than `paths` of a milestone can be known.
+/**
+ * @param {Character} character
+ * @param {string} skillId
+ * @param {Content} content
+ * @returns {Block | null}
+ */
 export function learnBlock(character, skillId, content) {
   const skill = content.skillsById[skillId];
   if (!skill || skill.classId !== character.classId) return { code: 'unknown_skill', message: 'Twoja klasa nie ma takiej umiejętności.' };
@@ -132,6 +198,11 @@ export function learnBlock(character, skillId, content) {
 // Skill Point left that a known skill could take (skill_points). Counted with
 // the points the character has at that level, so a report of several class
 // levels cannot slip past it.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {{ code: string } | null}
+ */
 export function skillsBlock(character, content) {
   const level = content.balance.progression.classEvolutionLevels[0];
   const { maxLevel, paths } = content.balance.skills;
@@ -157,6 +228,11 @@ export function skillsBlock(character, content) {
 // second form, at the level after it while a point is left. The class
 // waits there (applyHunt); a class already past the level waits for
 // nothing.
+/**
+ * @param {Character} character
+ * @param {Content} content
+ * @returns {{ code: string, level: number } | null}
+ */
 export function evolutionBlock(character, content) {
   const levels = content.balance.progression.classEvolutionLevels;
   if (character.evolution) {
@@ -164,17 +240,24 @@ export function evolutionBlock(character, content) {
     const level = levels[current?.stage ?? 1];
     if (level === undefined || character.classLevel > level) return null;
     if (pointsLeft(character, level, content)) return { code: 'skill_points', level };
-    return current && content.evolutions.some((evolution) => evolution.from === current.id) ? { code: 'evolve', level } : null;
+    return current && content.evolutions.some((/** @type {Record<string, any>} */ evolution) => evolution.from === current.id) ? { code: 'evolve', level } : null;
   }
   const level = levels[0];
   if (character.classLevel > level) return null;
   const block = skillsBlock(character, content);
   if (block) return { ...block, level };
-  return content.evolutions.some((evolution) => evolution.classId === character.classId) ? { code: 'evolve', level } : null;
+  return content.evolutions.some((/** @type {Record<string, any>} */ evolution) => evolution.classId === character.classId) ? { code: 'evolve', level } : null;
 }
 
 // Why a learned skill cannot take `count` points at once, or null when it
 // can.
+/**
+ * @param {Character} character
+ * @param {string} skillId
+ * @param {Content} content
+ * @param {number} [count]
+ * @returns {Block | null}
+ */
 export function raiseBlock(character, skillId, content, count = 1) {
   const level = character.skills?.[skillId];
   if (level === undefined || !content.skillsById[skillId]) return { code: 'not_learned', message: 'Tej umiejętności jeszcze nie znasz.' };
@@ -193,7 +276,15 @@ export function raiseBlock(character, skillId, content, count = 1) {
 // {critPower%} the power with a critical hit and {name|one|few|many} the
 // number with its words in their form (counted, text.js); the decimals and
 // the points as the content's language writes them ("2,5", "2.5"; word()).
+/**
+ * @param {string} template
+ * @param {Skill} skill
+ * @param {Record<string, any>} params
+ * @param {Content} content
+ * @returns {string}
+ */
 export function skillText(template, skill, params, content) {
+  /** @type {Record<string, any>} */
   const values = { ...params, cooldown: skill.cooldown, critPower: (params.power ?? 0) * content.balance.combat.critMultiplier };
   return counted(template, values).replace(/\{(\w+)(%\.1|%| pp|\.1)?\}/g, (whole, name, format) => {
     const value = values[name];
@@ -209,6 +300,12 @@ export function skillText(template, skill, params, content) {
 // The line about the cost and how often the skill works; a mana shield
 // costs its share of mana at the skill's level (`params`, skillParams), and
 // a skill marked `once` works once a fight.
+/**
+ * @param {Skill} skill
+ * @param {Content} content
+ * @param {Record<string, any>} [params]
+ * @returns {string}
+ */
 export function skillCost(skill, content, params = skill.params) {
   if (typeof params.pool === 'number') return content.texts.skillCostPool[0].replace('{pool}', `${Math.round(params.pool * 100)}%`);
   const key = skill.once ? 'skillCostOnce' : ACTIVE_KINDS.has(skill.kind) || STANCE_KINDS.has(skill.kind) ? 'skillCostActive' : START_KINDS.has(skill.kind) ? 'skillCostStart' : 'skillCostOnce';
@@ -216,6 +313,11 @@ export function skillCost(skill, content, params = skill.params) {
 }
 
 // A skill's card: what it does at a level and, below the top, at the next.
+/**
+ * @param {Skill} skill
+ * @param {number} level
+ * @param {Content} content
+ */
 export function skillView(skill, level, content) {
   const top = topLevel(skill, content);
   const shown = Math.max(1, level);
@@ -247,6 +349,10 @@ export function skillView(skill, level, content) {
 // something to do there: a path to pick or a point to spend. `evolution`:
 // the first evolution's class level and `need`, what the skills still need
 // before it (evolutionBlock's code, or null).
+/**
+ * @param {Character} character
+ * @param {Content} content
+ */
 export function skillsView(character, content) {
   const learned = character.skills ?? {};
   const points = skillPoints(character, content);
@@ -263,12 +369,13 @@ export function skillsView(character, content) {
           open: true,
           evolution: evolution.id,
           chosen: evolution.skills,
-          options: evolution.skills.map((id, index) => ({ ...skillView(content.skillsById[id], learned[id] ?? 0, content), path: evolutionName, state: index === 0 ? 'main' : 'second' })),
+          options: evolution.skills.map((/** @type {string} */ id, /** @type {number} */ index) => ({ ...skillView(content.skillsById[id], learned[id] ?? 0, content), path: evolutionName, state: index === 0 ? 'main' : 'second' })),
         },
       ]
     : levels.map((classLevel) => {
         const options = skillsOfClass(character.classId, content).filter((skill) => skill.classLevel === classLevel);
         const known = knownOf(options, learned).map((skill) => skill.id);
+        /** @param {Skill} skill */
         const stateOf = (skill) => {
           if (known[0] === skill.id) return 'main';
           if (known.includes(skill.id)) return 'second';
@@ -295,6 +402,6 @@ export function skillsView(character, content) {
     evolution: { level: block?.level ?? content.balance.progression.classEvolutionLevels[0], need: block?.code ?? null },
     points: points.free,
     pools,
-    ready: pools.some((pool) => pool.options.some((skill) => skill.state === 'pick')) || (points.free > 0 && raisable),
+    ready: pools.some((pool) => pool.options.some((/** @type {{ state: string }} */ skill) => skill.state === 'pick')) || (points.free > 0 && raisable),
   };
 }
