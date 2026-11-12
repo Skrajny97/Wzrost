@@ -3097,6 +3097,22 @@ Autor odrzucił wszystkie dziesięć jazd z czwartej rundy (822 v4): brak stopy,
 Autor: „rób od zera w pixellab po dwie opcje i dawaj mi je sam ocenje”, „dajesz tylko wzór portret”, „i nie generuj kilka na raz”, „dajesz sztuke ja odpowiedz”.
 Potem (12.11.2026): „Mistrz Łuku 2, pokaz teraz animacje i przypomnij chód” i „Mistrz Łuku jazda i chód OK”., „Mistrzyni Łuku jazda 1, dorób jej zielony płaszcz w portrecie zatem skoro pasuje”, „i pokaż chód Mistrzyni Łuku”, „Mistrzyni łuku jazda i chód OK”, „Płaszcz OK”, „Lodowa Królowa jazda 1” i „Lodowa królowa jazda i chód OK”.
 
+## Wersja 0.2.83 (12.11.2026): wyprawa drużyny nie rusza bez drużyny
+
+Zgłoszenie gracza (poz. 62, iPhone): „Po wyruszeniu na wyprawę z drużyną czasem nie załącza się jazda w 2 tylko solo, już się na tym złapałem z 2 razy i straciłem z 3 h pomijania xd”. Autor: „zgłoszenie błędu sprawdź”, „W ogóle przypadkiem nie jest tak ze gracz musi Odebrac raport by lider mogl wyruszyć ponownie? wez to tam ogarnij tak by nie trzeba było jakoś”, „Niech zdarzenia w drużynie nie występują albo wygenerujmy specjalne drużynowe zdarzenia” i „no ale docelowo muszą być drużynowe zdarzenia, w pierwszym kroku możemy je tylko wyłączyć, zaraz po tym będziemy nad nimi pracować tak by lider w nich decydował a reszta miała automatyczny wynik i raport, do którego można wrócić, ale nie ma konieczności by lider dalej szedł na wyprawę” (12.11.2026).
+
+Przyczyny:
+1. Wyprawa członka mogła skończyć się zdarzeniem (do 20% wypraw). Zdarzenie czeka na wybór gracza, więc przy kolejnym wyruszeniu gra nie mogła sama odebrać raportu członka. Członek zostawał w domu, a lider ruszał sam, o czym mówił tylko znikający komunikat.
+2. „Wyrusz ponownie” na ekranie raportu zawsze wysyłało samą postać, także lidera drużyny.
+3. Ekran Walki pytał o drużynę raz przy wejściu. Lider, który czekał tam na powrót członka, dalej widział „Wyprawa będzie tylko Twoja”.
+
+Zmiany:
+1. **Wyprawa drużyny nie kończy się zdarzeniem** (pierwszy krok według autora). Raport członka odbiera się więc sam przy każdym kolejnym wyruszeniu drużyny. Zdarzenia drużynowe są następnym etapem: decyduje w nich lider, a reszta dostaje wynik i raport automatycznie.
+2. **Bez drużyny nikt nie rusza.** Gdy nikt z drużyny nie może iść, lider też zostaje. Dzieje się tak, gdy np. własna wyprawa członka czeka na wybór w zdarzeniu albo członek właśnie zajął się czymś innym. Komunikat mówi, na kogo czeka wybór: „Nikt z drużyny nie może teraz wyruszyć. Wybór w zdarzeniu z poprzedniej wyprawy czeka na: …”. Lider idzie sam tylko po odznaczeniu „Z drużyną”. Raporty członków odbierają się dopiero po sprawdzeniu wyborów lidera (mikstury, próg leczenia), więc błędny wybór lidera nikogo nie wysyła i niczyjego raportu nie odbiera.
+3. **„Wyrusz ponownie” z drużyną.** Lider drużyny, w której ktoś jest wolny, widzi na raporcie „Wyrusz ponownie z drużyną: …” i rusza z drużyną, tak jak „Wyrusz” z zaznaczonym „Z drużyną”. Przycisk czeka na stan drużyny, więc stuknięcie w pierwszej chwili nie wyśle lidera samego. W pozostałych przypadkach w drużynie przycisk mówi „Wyrusz ponownie bez drużyny: …”, a poza drużyną zostaje taki jak był.
+4. **Walka odświeża drużynę.** Lider na ekranie miejsca dostaje stan drużyny co 20 sekund, więc członek, który właśnie wrócił, pojawia się w „Z drużyną”. Pole przerysowuje się tylko wtedy, gdy coś się w nim zmieniło.
+5. Testy: test/party-claim.test.js.
+
 ## Wersja 0.2.82 (12.11.2026): Przechowalnia Warsztatu i Szlifierni (842)
 
 Autor: „Niech w warsztacie będzie przechowalnia niech to nie trafia od razu do plecaka i można od razu z pozycji przechowalni rozbierać i sprzedawać wyprodukowane albo wlozyc do plecaka jesli jest miejsce”. Autor przyjął makiety 842.1–842.4 (12.11.2026).

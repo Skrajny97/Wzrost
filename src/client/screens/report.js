@@ -10,13 +10,13 @@ import { fill, h, icon } from '../dom.js';
 import { countOf, dateTimeFormat, formatMinutes, formatNumber, formatOffset } from '../format.js';
 import { t } from '../i18n.js';
 import { playSound } from '../sound.js';
-import { activityFinished, avoidRareOn, call, hardHuntOn, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn } from '../state.js';
-import { guided, openSheet, systemPanel, withButton } from '../ui.js';
+import { activityFinished, avoidRareOn, call, hardHuntOn, isUnlocked, reportCache, seekRareOn, state, trackQuestsOn, trackUnknownOn } from '../state.js';
+import { guided, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { narrate } from '../narrator.js';
 import { scrapperSheet } from '../scrapper.js';
 import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy, storedCopy } from './character.js';
-import { skipLines } from './party.js';
+import { partyFree, partyWent, skipLines } from './party.js';
 import { fightPortal } from './portals.js';
 import { herbsReport, itemsReport, jewelsReport, mineralsReport, potionsReport } from './professions.js';
 
@@ -53,6 +53,18 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
   let firstPlayback = true;
   // The report of a fight just fought (not one opened from the Dziennik).
   const fresh = state.freshReport === String(params.id);
+  // The character's Drużyna (/api/party's `party`), for "Wyrusz ponownie":
+  // null out of a party or until it is known.
+  let party = null;
+  const partyAsked = isUnlocked('party')
+    ? call('GET', '/api/party')
+        .then((answer) => {
+          party = answer.party ?? null;
+          if (!gone && report) renderActions();
+          return party;
+        })
+        .catch(() => null)
+    : Promise.resolve(null);
   const actionBox = h('div', { class: 'stack' });
   const fightBox = h('div', { class: 'fight-view' });
   // The narrator points at the tabs, or at the title of a single fight.
@@ -534,24 +546,39 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
   function renderActions() {
     const character = state.character;
     const idle = !character.activity;
+    // A party's leader with members free now sets out again with them, as
+    // "Wyrusz" with "Z drużyną" ticked; in a party otherwise the button
+    // says the trip goes without the party (a player's bug report,
+    // 12.11.2026: „Po wyruszeniu na wyprawę z drużyną czasem nie załącza
+    // się jazda w 2 tylko solo”: this button sent a leader alone).
+    const along = partyFree(party).length > 0;
+    const place = { area: report.areaName ?? report.regionName, time: formatMinutes(report.minutes) };
     const again =
       idle &&
       character.huntDurations.includes(report.minutes) &&
       h('button', {
         type: 'button',
         class: 'button button--system',
-        text: t('Wyrusz ponownie: {area}, {time}', { area: report.areaName ?? report.regionName, time: formatMinutes(report.minutes) }),
+        text: along
+          ? t('Wyrusz ponownie z drużyną: {area}, {time}', place)
+          : party
+            ? t('Wyrusz ponownie bez drużyny: {area}, {time}', place)
+            : t('Wyrusz ponownie: {area}, {time}', place),
         onClick: (event) =>
           withButton(event.currentTarget, async () => {
-            await call('POST', '/api/hunts', {
+            // Not before the Drużyna is known: a tap in the first moment
+            // would send a leader alone.
+            const withParty = partyFree(await partyAsked).length > 0;
+            const answer = await call('POST', withParty ? '/api/party/hunt' : '/api/hunts', {
               areaId: report.areaId ?? report.regionId,
               minutes: report.minutes,
               avoidRare: avoidRareOn(),
               seekRare: seekRareOn(),
               trackQuests: trackQuestsOn(),
               trackUnknown: trackUnknownOn(),
-              ...(character.hardHunt && hardHuntOn() && { hard: true }),
+              ...(!withParty && character.hardHunt && hardHuntOn() && { hard: true }),
             });
+            if (withParty) toast(partyWent(answer));
             navigate('#/walka');
           }),
       });

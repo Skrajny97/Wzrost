@@ -334,7 +334,7 @@ export async function beginHunt(
   player,
   { areaId, regionId, minutes, avoidRare = false, seekRare = false, trackQuests = false, trackUnknown = false, potions, healBelow, scout = null, hard = false, mercenary = null } = {},
   now,
-  { quick = false, flash = false, party: crew = null, partners = [], mount = null, follower = false, also = [] } = {},
+  { quick = false, flash = false, party: crew = null, partners = [], mount = null, follower = false, also = [], check = false } = {},
 ) {
   // regionId: "Wyrusz ponownie" from a report made before inner regions.
   const id = areaId ?? regionId;
@@ -495,6 +495,9 @@ export async function beginHunt(
     ...(quick && { quick }),
     ...(flash && { flash }),
   };
+  // `check`: the choices checked, nothing saved; a Drużyna's leader is
+  // checked so before its members' reports are claimed (parties.js).
+  if (check) return null;
   const { hp } = currentHp(player, now);
   const seed = toHex(crypto.getRandomValues(new Uint8Array(16)));
   const tracked = trackQuests ? questCreatures(questsNow(player, now), area) : [];
@@ -786,9 +789,16 @@ export async function finishHunt(db, player, now, { choice } = {}) {
   const storedSettlement = JSON.parse(row.settlement ?? '{}');
   const metEvents = storedSettlement.events ?? [];
   const mates = trip ? [] : huntMates(storedSettlement, hunt, options.companions ?? []);
-  const event = eventsOn()
-    ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn(), settlement: settlementOpen(row), mates }, content())
-    : null;
+  // A Drużyna's trip ends in no event (the author, 12.11.2026: „Niech
+  // zdarzenia w drużynie nie występują albo wygenerujmy specjalne drużynowe
+  // zdarzenia”): an event waits for its member's own choice, so the party
+  // could not claim that member's report as it sets out again, and its
+  // leader went alone (a player's bug report: „nie załącza się jazda w 2
+  // tylko solo”). A leader left alone has no `party` (parties.js).
+  const event =
+    eventsOn() && !options.party
+      ? eventFor({ hunt, seed: activity.seed, first, quick: options.quick === true, forced: forcedEvent, drafts: eventDraftsOn(), settlement: settlementOpen(row), mates }, content())
+      : null;
   const mate = event?.companion ? eventMate(event, activity.seed, mates) : null;
   // An option's price comes from the purse, the character's gold with the
   // exploration's; an option of one class is greyed out for the others.

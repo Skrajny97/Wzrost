@@ -460,14 +460,18 @@ async function claimForTrip(db, member, now) {
 
 // POST /api/party/hunt { areaId, minutes, ... as "Wyrusz" }: the leader
 // sends the party out. The members free now go, and those back with their
-// report waiting, claimed first (claimForTrip) once the leader is on its
-// way; one whose exploration ends in an event stays home, and the answer
-// says it must choose there first (`notes`). Each of them, the leader too,
-// must have the place and the length open, so the party goes only as far
-// and as long as its lowest member may, and waits as long as its slowest
-// mount (the Stajnia, 327 A). The leader's choices of potions and tracking
-// are its own; the others go without them. A member busy with something
-// still running is left alone, its activity untouched.
+// report waiting, claimed first (claimForTrip) once the leader's choices
+// are checked; one whose exploration ends in an event stays home, and the
+// answer says it must choose there first (`notes`). Each of them, the
+// leader too, must have the place and the length open, so the party goes
+// only as far and as long as its lowest member may, and waits as long as
+// its slowest mount (the Stajnia, 327 A). The leader's choices of potions
+// and tracking are its own; the others go without them. A member busy with
+// something still running is left alone, its activity untouched. With no
+// member able to go, nobody goes, the leader neither (a player's bug
+// report, 12.11.2026: „Po wyruszeniu na wyprawę z drużyną czasem nie
+// załącza się jazda w 2 tylko solo”, and skips spent on a trip the leader
+// took for the party's): the answer says who must choose first.
 export async function partyHunt(context) {
   const { session, player } = await requireIdlePlayer(context);
   requireUnlocked(player.row);
@@ -490,7 +494,41 @@ export async function partyHunt(context) {
       throw new ApiError(403, 'party_duration_locked', `${member.row.name} może iść najwyżej na ${longestHunt(member.row.level, content())} minut. Drużyna idzie tylko tak długo, jak może każdy z was.`);
     }
   }
-  const everyone = [player, ...going];
+  // The leader's own choices first (potions, the healing mark, tracking),
+  // checked with nothing saved, so a wrong one sends nobody (the code
+  // review) and claims nobody's report.
+  await beginHunt(db, player, body, now, { party: { id: party.id }, check: true });
+  // Then the members back from an exploration or a work: each report
+  // claimed as its own "Odbierz raport" would claim it, the member as it is
+  // after that. One that got busy meanwhile stays home, and so does one
+  // whose exploration's event waits for its own choice (an exploration of
+  // its own: a trip ends in no event, hunts.js).
+  const ready = [];
+  const choosing = [];
+  const claimed = new Map();
+  for (const listed of going) {
+    if (!listed.activity) {
+      ready.push(listed);
+      continue;
+    }
+    const done = await claimForTrip(db, listed, now);
+    if (done.event) choosing.push(listed.row.name);
+    if (!done.member) continue;
+    if (done.report) claimed.set(done.member.row.id, done.report);
+    ready.push(done.member);
+  }
+  // With nobody to go along, nobody goes: not the leader alone either.
+  if (ready.length === 0) {
+    if (choosing.length > 0) {
+      throw new ApiError(
+        409,
+        'party_choosing',
+        `Nikt z drużyny nie może teraz wyruszyć. Wybór w zdarzeniu z poprzedniej wyprawy czeka na: ${choosing.join(', ')}. Poczekaj albo odznacz „Z drużyną” w Walce, by wyruszyć bez drużyny.`,
+      );
+    }
+    throw new ApiError(409, 'nobody_free', 'Nikt z drużyny nie jest teraz wolny. Odznacz „Z drużyną” albo poczekaj, aż ktoś skończy swoje zajęcia.');
+  }
+  const everyone = [player, ...ready];
   // One time for the whole trip: the slowest mount of those going.
   const mount = Math.min(...everyone.map((member) => mountOfRow(member.row)));
   const shots = new Map(everyone.map((member) => [member.row.id, snapshot(member, now)]));
@@ -499,27 +537,12 @@ export async function partyHunt(context) {
   // `trip` marks the explorations of this setting out, for their shared
   // timer (time.js).
   const party_ = { id: party.id, leader: player.row.name, names, trip: now };
-  // The leader first, with its own choices checked there (potions, the
-  // healing mark, tracking), so a wrong one sends nobody (the code review)
-  // and claims nobody's report; then the members, each without the
-  // leader's choices, one back from its exploration or work with its report
-  // claimed first, as it is after that (its snapshot too). One that got
-  // busy meanwhile stays home, and so does one whose exploration's event
-  // waits for its choice.
+  // The leader sets out, then the members, each without the leader's
+  // choices. One whose start fails after all (it got busy at that very
+  // moment) stays home.
   const setups = new Map([[player.row.id, await beginHunt(db, player, body, now, { party: party_, partners: partnersOf(player, everyone), mount })]]);
   const went = [];
-  const choosing = [];
-  const claimed = new Map();
-  for (const listed of going) {
-    let member = listed;
-    if (member.activity) {
-      const done = await claimForTrip(db, member, now);
-      if (done.event) choosing.push(member.row.name);
-      if (!done.member) continue;
-      member = done.member;
-      if (done.report) claimed.set(member.row.id, done.report);
-      shots.set(member.row.id, snapshot(member, now));
-    }
+  for (const member of ready) {
     try {
       const setup = await beginHunt(db, member, { areaId: area.id, minutes: body.minutes, avoidRare: body.avoidRare === true, seekRare: body.seekRare === true && body.avoidRare !== true }, now, {
         party: party_,

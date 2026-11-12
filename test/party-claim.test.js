@@ -4,9 +4,12 @@
 // drużyny zanim wyruszy się w kolejną wyprawę.”): a member whose exploration
 // or work has ended goes along, its report claimed first as its own
 // "Odbierz raport" would claim it, in its Dziennik, and its Walka tells it
-// and opens it. One whose exploration ends in an event stays home, and the
-// leader hears it must choose there first; one busy with something still
-// running is left alone.
+// and opens it. One whose own exploration ends in an event stays home, and
+// with nobody else to go the party does not set out, its leader neither
+// (a player's bug report, 12.11.2026: „nie załącza się jazda w 2 tylko
+// solo”); a trip itself ends in no event (the author, 12.11.2026: „Niech
+// zdarzenia w drużynie nie występują”). One busy with something still
+// running is left alone, and a leader's wrong choice claims nobody's report.
 
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
@@ -94,6 +97,17 @@ describe('a member\'s waiting report claimed as the party sets out', () => {
     assert.deepEqual(character.activity.party.claimed, { id: report.id, kind: 'herbs' });
   });
 
+  test('a leader\'s wrong choice sends nobody and claims nobody\'s report', async () => {
+    assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
+    await age('Druh', 5);
+    const before = await activity('Druh');
+    const wrong = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 30, healBelow: 0.123 });
+    assert.equal(wrong.data.error.code, 'invalid_heal_below');
+    assert.deepEqual(await activity('Druh'), before);
+    assert.deepEqual(await reports('Druh'), []);
+    assert.equal(await activity('Lider'), null);
+  });
+
   test('a member busy with something still running is left alone', async () => {
     assert.equal((await as('druh', 'POST', '/api/professions/gather', { herbs: ['comfrey'], minutes: 60 })).status, 201);
     const before = await activity('Druh');
@@ -108,10 +122,12 @@ describe('a member\'s waiting report claimed as the party sets out', () => {
     assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
     await age('Druh', 5);
     // The member's own claim lands just as the leader sets out, after the
-    // party's request read it with its report waiting.
+    // party's request read it with its report waiting: at the first write
+    // of the party's claim of it, its Encyklopedia's record (settleCharacter).
+    await (await sql("UPDATE characters SET discovered = '{}' WHERE name = 'Druh'")).run();
     await (
       await sql(
-        `CREATE TRIGGER claimed_meanwhile AFTER INSERT ON activities WHEN NEW.character_id = (SELECT id FROM characters WHERE name = 'Lider')
+        `CREATE TRIGGER claimed_meanwhile AFTER UPDATE OF discovered ON characters WHEN NEW.name = 'Druh'
          BEGIN
            INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data)
              SELECT character_id, character_id || ':' || started_at, 'hunt', NEW.started_at, '{}', '{}' FROM activities WHERE character_id = (SELECT id FROM characters WHERE name = 'Druh');
@@ -128,10 +144,13 @@ describe('a member\'s waiting report claimed as the party sets out', () => {
     }
     assert.equal(went.status, 201, JSON.stringify(went.data).slice(0, 400));
     assert.deepEqual(went.data.went, ['Druh']);
-    // Its own report only, once.
-    assert.equal((await reports('Druh')).length, 1);
+    // Its own report only, once; its Walka may point at it (the party's
+    // claim found it claimed and took it as made, hunts.js).
+    const [only, ...more] = await reports('Druh');
+    assert.deepEqual(more, []);
     assert.equal((await activity('Druh')).kind, 'hunt');
-    assert.equal((await as('druh', 'GET', '/api/character')).data.character.activity.party.claimed, undefined);
+    const pointed = (await as('druh', 'GET', '/api/character')).data.character.activity.party.claimed;
+    assert.ok(pointed === undefined || pointed.id === only.id, JSON.stringify(pointed));
   });
 });
 
@@ -144,23 +163,53 @@ describe('a member whose exploration ends in an event', () => {
     await join();
   });
 
-  test('stays home, its event waiting for its own choice, and the leader hears why', async () => {
-    // Not its first exploration, and the event "Testuj zdarzenia" brings.
-    await (await sql("INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) SELECT id, 'earlier', 'hunt', 0, '{}', '{}' FROM characters WHERE name = 'Druh'")).run();
-    await (await sql(`UPDATE characters SET points = '{"strength":150,"vitality":140}', hp_at = 0, event_test = 'wounded-woman' WHERE name = 'Druh'`)).run();
+  // Not its first exploration, strong enough to come back, and the event
+  // "Testuj zdarzenia" brings.
+  const withEvent = async (name) => {
+    await (await sql("INSERT INTO reports (character_id, activity_key, kind, created_at, summary, data) SELECT id, 'earlier-' || id, 'hunt', 0, '{}', '{}' FROM characters WHERE name = ?", name)).run();
+    await (await sql(`UPDATE characters SET points = '{"strength":150,"vitality":140}', hp_at = 0, event_test = 'wounded-woman' WHERE name = ?`, name)).run();
+  };
+
+  test('stays home, its event waiting for its own choice, and nobody sets out: the leader hears why', async () => {
+    await withEvent('Druh');
     assert.equal((await as('druh', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 5 })).status, 201);
     await age('Druh', 5);
     const before = await activity('Druh');
-    const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 30 });
-    assert.equal(went.status, 201, JSON.stringify(went.data).slice(0, 400));
-    assert.deepEqual(went.data.went, []);
-    assert.deepEqual(went.data.notes, ['Druh musi najpierw wybrać w zdarzeniu z poprzedniej wyprawy.']);
-    // Nothing of it saved: the exploration and its event wait as they were.
+    const refused = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 30 });
+    assert.equal(refused.status, 409);
+    assert.equal(refused.data.error.code, 'party_choosing');
+    assert.equal(
+      refused.data.error.message,
+      'Nikt z drużyny nie może teraz wyruszyć. Wybór w zdarzeniu z poprzedniej wyprawy czeka na: Druh. Poczekaj albo odznacz „Z drużyną” w Walce, by wyruszyć bez drużyny.',
+    );
+    // Nothing of it saved: the exploration and its event wait as they were,
+    // and the leader stays home too.
     assert.deepEqual(await activity('Druh'), before);
     assert.equal((await reports('Druh')).length, 1);
+    assert.equal(await activity('Lider'), null);
     assert.equal((await as('druh', 'POST', '/api/hunts/claim')).data.event.id, 'wounded-woman');
-    // The leader went as on its own.
-    const lider = await activity('Lider');
-    assert.equal(JSON.parse(lider.options).party, undefined);
+    // Without the party, the leader goes on its own.
+    assert.equal((await as('lider', 'POST', '/api/hunts', { areaId: 'windfalls-edge', minutes: 30 })).status, 201);
+  });
+
+  test('a trip ends in no event: each member\'s report comes at once, so the party sets out again', async () => {
+    await withEvent('Lider');
+    await withEvent('Druh');
+    const went = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
+    assert.equal(went.status, 201, JSON.stringify(went.data).slice(0, 400));
+    assert.deepEqual(went.data.went, ['Druh']);
+    await age('Lider', 5);
+    await age('Druh', 5);
+    // The leader's own claim brings its report, no event.
+    const own = await as('lider', 'POST', '/api/hunts/claim');
+    assert.equal(own.data.event, undefined);
+    assert.equal(own.data.report.kind, 'hunt');
+    // The member's report is claimed as the party sets out again, and it goes.
+    const again = await as('lider', 'POST', '/api/party/hunt', { areaId: 'windfalls-edge', minutes: 5 });
+    assert.equal(again.status, 201, JSON.stringify(again.data).slice(0, 400));
+    assert.deepEqual(again.data.went, ['Druh']);
+    assert.deepEqual(again.data.notes, []);
+    assert.equal((await reports('Druh')).length, 2);
+    assert.deepEqual(JSON.parse((await activity('Druh')).options).party.names, ['Lider', 'Druh']);
   });
 });

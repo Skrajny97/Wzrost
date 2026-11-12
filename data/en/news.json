@@ -532,6 +532,10 @@
     "0.2.82": {
       "title": "Version 0.2.82",
       "body": "- A Storeroom in the Workshop and the Gem Workshop: finished items and jewellery wait there outside your bag, with no limit on places. Mark them and put them in the bag, sell them to the scrap dealer or salvage them on the Salvage Table.\n- A full bag no longer stops orders in the Workshop and the Gem Workshop: only parts and materials count."
+    },
+    "0.2.83": {
+      "title": "Version 0.2.83",
+      "body": "- A party's exploration no longer sets out with the leader alone. When nobody in the party can go, the game says why, and the leader sets out alone only after unticking “With the party”.\n- For now a party's explorations end in no events, so the members' reports are claimed by themselves when the party sets out again. Party events are on the way.\n- “Set out again” in a leader's report takes the party along.\n- The “With the party” box in Combat shows a member who has just come back by itself."
     }
   }
 }

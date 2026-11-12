@@ -44,7 +44,7 @@ import { skipControl, timePoints } from '../time.js';
 import { formatWait, stableNote, stableWait } from '../stable.js';
 import { confirmAction, lockLabel, openSheet, systemLink, systemPanel, toast, withButton } from '../ui.js';
 import { openEvent } from '../event.js';
-import { BUSY, skipLines } from './party.js';
+import { BUSY, partyFree, partyWent, skipLines } from './party.js';
 import { mercenaryChoice, servicePanel } from '../mercenaries.js';
 import { combatModes } from './towers.js';
 import { weekLine } from '../weeks.js';
@@ -55,6 +55,8 @@ const CHOICE_KEY = 'wzrost.hunt-choice';
 // The potions to take along and the healing mark: { potions: { [id]: count }, healBelow }.
 const POTION_KEY = 'wzrost.potion-choice';
 const HOME = '#/walka';
+// How long a party leader's box "Z drużyną" stands before it is asked again.
+const PARTY_FRESH_MS = 20000;
 
 function loadChoice(key = CHOICE_KEY) {
   try {
@@ -255,6 +257,15 @@ export function mountCombat(container, { params, navigate }) {
   // server again and ticked the box anew, also after the leader unticked it).
   let partyAsked = null;
   let partyTicked = true;
+  // When it was asked, whether the character leads a party of two or more
+  // by the last answer, and how the box on the screen asks again: a
+  // leader's box is asked again every PARTY_FRESH_MS while a place is on
+  // the screen (tick), so a member back meanwhile shows up in it (a
+  // player's bug report, 12.11.2026: a leader who waited on the screen for
+  // a member went alone, the box still saying nobody would go).
+  let partyAskedAt = 0;
+  let partyLeads = false;
+  let partyAgain = null;
 
   // HP in tenths of the maximum: resting moves the threat now and then.
   const hpStep = (character, now) => Math.floor((currentHp(character, now) / character.maxHp) * 10);
@@ -983,10 +994,7 @@ export function mountCombat(container, { params, navigate }) {
           if (along) {
             // With who must first choose in the event of its exploration
             // (`notes`, parties.js): it stays home.
-            const went = [
-              answer.went?.length > 0 ? t('Drużyna wyrusza: {names}.', { names: answer.went.join(', ') }) : t('Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.'),
-              ...(answer.notes ?? []),
-            ].join(' ');
+            const went = partyWent(answer);
             toast(mercenary?.chosen() ? `${went} ${character.mercenaries.texts.plainOnly}` : went);
           } else if (hiring) {
             toast(t('{name} idzie z Tobą. Zapłacono {gold} zł.', { name: mercenary.hired().name, gold: formatNumber(mercenary.hired().gold) }));
@@ -1082,63 +1090,83 @@ export function mountCombat(container, { params, navigate }) {
   // members busy elsewhere stay home and in the party (parties.js), and the
   // lines under the box name them; with none free, only those lines.
   // `onRide` hears the party's slowest mount while "Z drużyną" is ticked,
-  // and undefined when the trip is the character's own.
+  // and undefined when the trip is the character's own. A leader's box is
+  // asked again now and then (partyAskedAt), and drawn again only when what
+  // it says changed, so it does not jump under the finger.
   function partyChoice(onRide) {
     const element = h('div', { class: 'party-choice', hidden: true });
     let free = [];
-    if (isUnlocked('party')) {
-      partyAsked ??= call('GET', '/api/party');
-      partyAsked
-        .then(({ party }) => {
-          const own = party?.members.find((member) => member.own);
-          if (!own?.leader || party.members.length < 2) return;
-          const others = party.members.filter((member) => !member.own);
-          free = others.filter((member) => member.status === 'free').map((member) => member.name);
-          // What keeps each busy one (BUSY, screens/party.js), in the page's language.
-          const busy = others.filter((member) => member.status !== 'free').map((member) => `${member.name} (${t(BUSY[member.status] ?? 'zajęte')})`);
-          if (free.length === 0) {
-            fill(element, h('p', { class: 'muted', text: t('Z drużyny nikt teraz nie pójdzie: {names}. Wyprawa będzie tylko Twoja.', { names: busy.join(', ') }) }));
-            element.hidden = false;
-            return;
-          }
-          const box = h('input', {
-            type: 'checkbox',
-            id: 'party-along',
-            class: 'avoid-rare-box',
-            checked: partyTicked,
-            onChange: () => {
-              partyTicked = box.checked;
-              onRide(partyTicked ? party.limits.mount : undefined);
-            },
-          });
+    let said = null;
+    const show = ({ party }) => {
+      // A box of a view drawn over since is left as it is.
+      if (!element.isConnected) return;
+      const own = party?.members.find((member) => member.own);
+      partyLeads = Boolean(own?.leader && party.members.length > 1);
+      free = partyFree(party);
+      if (!partyLeads) {
+        if (said !== null) onRide(undefined);
+        said = null;
+        element.hidden = true;
+        return;
+      }
+      const others = party.members.filter((member) => !member.own);
+      // What keeps each busy one (BUSY, screens/party.js), in the page's language.
+      const busy = others.filter((member) => member.status !== 'free').map((member) => `${member.name} (${t(BUSY[member.status] ?? 'zajęte')})`);
+      const now = JSON.stringify([free, busy, party.limits]);
+      if (now === said) return;
+      said = now;
+      if (free.length === 0) {
+        onRide(undefined);
+        fill(element, h('p', { class: 'muted', text: t('Z drużyny nikt teraz nie pójdzie: {names}. Wyprawa będzie tylko Twoja.', { names: busy.join(', ') }) }));
+        element.hidden = false;
+        return;
+      }
+      const box = h('input', {
+        type: 'checkbox',
+        id: 'party-along',
+        class: 'avoid-rare-box',
+        checked: partyTicked,
+        onChange: () => {
+          partyTicked = box.checked;
           onRide(partyTicked ? party.limits.mount : undefined);
-          fill(
-            element,
-            h('label', { class: 'avoid-rare', for: 'party-along' }, box, h('span', { text: t('Z drużyną: {names}', { names: free.join(', ') }) })),
-            h('p', {
-              class: 'muted',
-              text: t('Drużyna idzie najwyżej na {time} ({timeBy}) i tylko tam, gdzie wejdzie {levelBy} (poziom klasy {level}).', {
-                time: formatMinutes(party.limits.minutes),
-                timeBy: party.limits.minutesBy,
-                levelBy: party.limits.classLevelBy,
-                level: party.limits.classLevel,
-              }),
-            }),
-            busy.length > 0 &&
-              h('p', {
-                class: 'muted',
-                text:
-                  busy.length === 1
-                    ? t('Nie idzie, ale zostaje w drużynie: {names}.', { names: busy.join(', ') })
-                    : t('Nie idą, ale zostają w drużynie: {names}.', { names: busy.join(', ') }),
-              }),
-          );
-          element.hidden = false;
-        })
-        .catch(() => {
-          partyAsked = null;
-        });
-    }
+        },
+      });
+      onRide(partyTicked ? party.limits.mount : undefined);
+      fill(
+        element,
+        h('label', { class: 'avoid-rare', for: 'party-along' }, box, h('span', { text: t('Z drużyną: {names}', { names: free.join(', ') }) })),
+        h('p', {
+          class: 'muted',
+          text: t('Drużyna idzie najwyżej na {time} ({timeBy}) i tylko tam, gdzie wejdzie {levelBy} (poziom klasy {level}).', {
+            time: formatMinutes(party.limits.minutes),
+            timeBy: party.limits.minutesBy,
+            levelBy: party.limits.classLevelBy,
+            level: party.limits.classLevel,
+          }),
+        }),
+        busy.length > 0 &&
+          h('p', {
+            class: 'muted',
+            text:
+              busy.length === 1
+                ? t('Nie idzie, ale zostaje w drużynie: {names}.', { names: busy.join(', ') })
+                : t('Nie idą, ale zostają w drużynie: {names}.', { names: busy.join(', ') }),
+          }),
+      );
+      element.hidden = false;
+    };
+    const ask = () => {
+      if (!isUnlocked('party')) return;
+      if (!partyAsked || Date.now() - partyAskedAt > PARTY_FRESH_MS) {
+        partyAsked = call('GET', '/api/party');
+        partyAskedAt = Date.now();
+      }
+      partyAsked.then(show).catch(() => {
+        partyAsked = null;
+      });
+    };
+    ask();
+    partyAgain = ask;
     return { element, along: () => (partyTicked && free.length > 0 && !element.hidden ? free : null) };
   }
 
@@ -1328,6 +1356,8 @@ export function mountCombat(container, { params, navigate }) {
     skipper?.update(now);
     if (!activity) {
       loadOptions();
+      // A party's leader on a place's screen: its box asked again now and then.
+      if (partyLeads && Date.now() - partyAskedAt > PARTY_FRESH_MS) partyAgain?.();
       return;
     }
     if (activityFinished(activity, now) !== shownFinished) {
