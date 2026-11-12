@@ -78,7 +78,7 @@ import { pushKey, sendNotifications, subscribePush, testPush, unsubscribePush } 
 import { claimAllQuests, claimQuest, openChest, rerollQuests } from './quests.js';
 import { getReport, listReports } from './reports.js';
 import { learnSkill, raiseSkill } from './skills.js';
-import { getChest, putInChest, takeFromChest } from './chest.js';
+import { getChest, putGoodsInChest, putInChest, takeFromChest, takeGoodsFromChest } from './chest.js';
 import {
   backFromTest,
   chooseTestEvent,
@@ -178,6 +178,10 @@ const routes = [
   ['GET', '/api/chest', getChest],
   ['POST', '/api/chest/put', putInChest],
   ['POST', '/api/chest/take', takeFromChest],
+  // Its goods, any number of them (843): potions, herbs, materials,
+  // minerals and the camp's resources.
+  ['POST', '/api/chest/goods/put', putGoodsInChest],
+  ['POST', '/api/chest/goods/take', takeGoodsFromChest],
   ['POST', '/api/character/points', spendPoints],
   ['POST', '/api/character/points/auto', autoPoints],
   ['POST', '/api/character/points/reset', resetPoints],

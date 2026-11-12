@@ -518,23 +518,33 @@ function mountBoard(container, backHash) {
   }
 
   // The Skrzynia Konta: the chest's picture with its name, like a plot.
+  // Below the level it opens at (`chestLock`, the author: „miec kłódkę i
+  // być zablokowana do 20 poziomu postaci”, 843) it has a padlock, and a
+  // tap only says when it opens.
   function chestLink(range = null) {
     const hash = `${CAMP}/${CHEST}`;
     const [from, to] = range ?? [0, boardHeight(tall())];
+    const lock = state.character.chestLock ?? null;
+    const lockText = lock && t('Skrzynia Konta otworzy się na {level}. poziomie postaci.', { level: lock.level });
     return h(
       'a',
       {
-        class: 'camp-chest',
+        class: ['camp-chest', lock && 'camp-chest--locked'].filter(Boolean).join(' '),
         href: hash,
-        'aria-label': t('Skrzynia Konta'),
+        'aria-label': lock ? t('Skrzynia Konta, zablokowana do {level}. poziomu postaci', { level: lock.level }) : t('Skrzynia Konta'),
         // Beside the Magazyn on either board, at the top of the taller one's band.
         style: {
           left: `${((tall() === 'fortress' ? FORTRESS_CHEST_SPOT : CHEST_SPOT).x / BOARD_WIDTH) * 100}%`,
           top: `${(((tall() === 'fortress' ? FORTRESS_CHEST_SPOT.y : stretchY(CHEST_SPOT.y, tall())) - from) / (to - from)) * 100}%`,
         },
-        onClick: (event) => openView(event, hash, HISTORY_KEY),
+        onClick: (event) => {
+          if (!lock) return openView(event, hash, HISTORY_KEY);
+          event.preventDefault();
+          toast(lockText);
+        },
       },
       h('span', { class: 'camp-chest-art' }, materialSprite('chest')),
+      lock && h('span', { class: 'camp-chest-lock', 'aria-hidden': 'true' }, icon('lock', { size: 15 })),
       h('span', { class: 'camp-plot-label' }, h('span', { text: t('Skrzynia Konta') })),
     );
   }

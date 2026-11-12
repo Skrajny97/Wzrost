@@ -1237,7 +1237,8 @@
       "required": [
         "emailSystemPoints",
         "characters",
-        "chestSlots"
+        "chestSlots",
+        "chestLevel"
       ],
       "properties": {
         "characters": {
@@ -1249,6 +1250,11 @@
           "type": "integer",
           "minimum": 1,
           "description": "Miejsca na przedmioty w Skrzyni Konta, wspólnej dla postaci na koncie (obóz)."
+        },
+        "chestLevel": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Poziom postaci, od którego otwiera się Skrzynia Konta (kłódka, 843). Niżej postać nie wkłada do niej ani nie wyjmuje z niej przedmiotów ani towarów."
         },
         "emailSystemPoints": {
           "type": "integer",

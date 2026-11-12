@@ -1187,6 +1187,7 @@
     }
   },
   "foes": {
+    "mimic": { "name": "Mimic", "counted": ["Mimic", "Mimics", "Mimics"], "attack": { "name": "Lid Bite" } },
     "bandit-thug": {
       "name": "Thug",
       "counted": [

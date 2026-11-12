@@ -1,0 +1,191 @@
+{
+  "$comment": "English texts of data/party-events.json (src/engine/overlay.js): every party event with its options and outcomes, and the texts around them.",
+  "texts": {
+    "leaderNote": "You decide for the whole party: {names}.",
+    "noPotion": "no healing potion",
+    "waiting": "Party event: {title}. The leader ({leader}) chooses. The result comes in a separate report, at the latest 12 hours after the trip ends.",
+    "chosen": "Party event: {title}. The leader's ({leader}) choice: {option}. The result is in a separate report in the Journal.",
+    "auto": "Party event: {title}. The leader did not choose within 12 hours, so the party took the safest way: {option}. The result is in a separate report in the Journal.",
+    "reportChosen": "The leader chose: {option}.",
+    "reportAuto": "The leader did not choose within 12 hours, so the party took the safest way: {option}.",
+    "reportTitle": "Party event",
+    "hpLost": "You lose {hp} HP.",
+    "busyHp": "The wounds will heal on the way, as the character is already busy with something else.",
+    "fainted": "The party loses the fight. Everyone gets away alive, but with little strength left.",
+    "draw": "The fight has no winner. The party falls back with no loot.",
+    "bagFull": "There was no room in the bag for: {lost}."
+  },
+  "list": {
+    "rope-bridge": {
+      "title": "Rope Bridge",
+      "text": "A chasm cuts across the path, and an old rope bridge sways above it. The planks creak, the ropes are frayed.",
+      "options": {
+        "one-by-one": {
+          "label": "We cross one at a time",
+          "outcome": {
+            "text": "You cross one at a time, slowly, plank by plank. The bridge creaks but holds, and every step above the chasm teaches something (+{xp} XP)."
+          }
+        },
+        "run": {
+          "label": "We run across together",
+          "outcome": {
+            "across": {
+              "name": "Run: they make it",
+              "text": "You run across together before the bridge can change its mind. The time saved stays in your legs: the party's next trip will be 10% shorter."
+            },
+            "breaks": {
+              "name": "Run: the bridge gives way",
+              "text": "Halfway across a rope snaps. The party flies over the last planks and lands on the rocks on the other side. Everyone loses 15% of their health."
+            }
+          }
+        },
+        "ford": {
+          "label": "We look for a ford",
+          "outcome": {
+            "cache": {
+              "name": "Ford: a smugglers' cache",
+              "text": "The ford leads to a cave by the water, and in it lies a smugglers' cache. Everyone takes gold (+{gold} gold)."
+            },
+            "nowhere": {
+              "name": "Ford: leads nowhere",
+              "text": "You look for a ford until dusk, but the river never gets shallow. In the end you cross the bridge one at a time, tired and empty-handed."
+            }
+          }
+        }
+      }
+    },
+    "smugglers-camp": {
+      "title": "Smugglers' Camp",
+      "text": "At dusk the party sees a campfire. Smugglers sleep around it, and next to them stand crates of goods.",
+      "options": {
+        "attack": {
+          "label": "We attack",
+          "outcome": {
+            "text": "The party bursts into the camp, weapons drawn.",
+            "start": "The smugglers leap up from the fire: {enemies}.",
+            "win": {
+              "text": "Among the goods are gold and materials. Everyone takes a share: {materials}."
+            },
+            "lose": {
+              "text": "The smugglers defend their goods fiercely. The party falls back into the forest."
+            }
+          }
+        },
+        "sneak": {
+          "label": "We sneak in for a crate",
+          "outcome": {
+            "loot": {
+              "name": "Crate: potions and herbs",
+              "herbsKnown": {
+                "goldText": "The crate opens without a creak. Inside are potions and a purse. Everyone takes a share: {potions} and gold (+{gold} gold)."
+              },
+              "text": "The crate opens without a creak. Inside are potions and herbs, and everyone takes a share: {potions}, {herbs}."
+            },
+            "wake": {
+              "name": "Crate: the smugglers wake up",
+              "text": "A twig snaps under someone's boot. The smugglers wake with weapons in hand.",
+              "start": "The smugglers strike first: {enemies}.",
+              "win": {
+                "text": "The smugglers flee into the forest, and the party shares the gold from their purses."
+              },
+              "lose": {
+                "text": "The smugglers chase the party away from their crates."
+              }
+            }
+          }
+        },
+        "skip": {
+          "label": "We go around the camp",
+          "outcome": {
+            "text": "The party goes around the camp in a wide arc. The fire fades behind your backs, and nobody even noticed you were there."
+          }
+        }
+      }
+    },
+    "wounded-hunter": {
+      "title": "Wounded Hunter",
+      "text": "A wounded hunter of the Hunters' Brotherhood sits under a tree and asks for help.",
+      "options": {
+        "escort": {
+          "label": "We walk him to the settlement",
+          "outcome": {
+            "text": "The party walks the hunter to the settlement. The Hunters' Brotherhood will not forget this favour, and the hunter shares with everyone what he had in his pouch (+{gold} gold, +15 reputation with the Hunters' Brotherhood)."
+          }
+        },
+        "potion": {
+          "label": "We give him a potion",
+          "outcome": {
+            "text": "The leader gives the hunter a healing potion. The hunter gets back on his feet on his own and promises to tell the Brotherhood about you (+30 reputation with the Hunters' Brotherhood)."
+          }
+        },
+        "leave": {
+          "label": "We move on",
+          "outcome": {
+            "text": "The party moves on. The hunter watches you go and says nothing more."
+          }
+        }
+      }
+    },
+    "campfire-tales": {
+      "title": "Campfire Tales",
+      "text": "At a halt someone in the party starts telling stories of old trips, and nobody wants to go to sleep.",
+      "options": {
+        "listen": {
+          "label": "We listen until dawn",
+          "outcome": {
+            "text": "The tales go on until dawn. Everyone remembers something useful for the road: on the party's next trip everyone will earn 10% more XP."
+          }
+        },
+        "tell": {
+          "label": "Everyone tells their own",
+          "outcome": {
+            "text": "Everyone adds a story, and the best of them reveal where loot is worth looking for: on the party's next trip everyone will earn 10% more gold."
+          }
+        }
+      }
+    },
+    "buried-chest": {
+      "title": "Buried Chest",
+      "text": "Under the root of an old oak the party digs up a chest. Inside are gold and one shining stone.",
+      "options": {
+        "share": {
+          "label": "We share it equally",
+          "outcome": {
+            "text": "You share the gold equally, and the stone stays in the chest for the next lucky ones (+{gold} gold)."
+          }
+        },
+        "stone": {
+          "label": "The stone for the leader",
+          "outcome": {
+            "leader": {
+              "text": "The stone goes to you: {minerals}. The rest of the party shares the gold."
+            },
+            "others": {
+              "text": "The stone goes to the leader, and the rest share the gold among themselves (+{gold} gold)."
+            }
+          }
+        },
+        "check": {
+          "label": "We check the chest first",
+          "outcome": {
+            "plain": {
+              "name": "Chest: an ordinary one",
+              "text": "It is just a chest. At the bottom, under the gold, lie more stones, so everyone gets gold and a mineral (+{gold} gold, {minerals})."
+            },
+            "mimic": {
+              "name": "Chest: a mimic",
+              "text": "The lid twitches, and yellow eyes peer out from under the gold. It is a mimic!",
+              "start": "The mimic lunges at the party: {enemies}.",
+              "win": {
+                "text": "Gold it swallowed over the years pours out of the beaten mimic. Everyone grabs a handful."
+              },
+              "lose": {
+                "text": "The mimic snaps its lid shut and buries itself under the oak again."
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
