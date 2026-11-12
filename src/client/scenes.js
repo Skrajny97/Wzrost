@@ -282,7 +282,10 @@ function ride(walk, character) {
   const seats = trot.seats.map(([seatXi, seatYi]) => [Math.round(seatXi * scale), Math.round(seatYi * scale)]);
   const [x, y] = seats[0];
   const [seatX, seatY] = box.seat;
-  const top = Math.max(0, seatY - Math.min(...seats.map((seat) => seat[1])));
+  // A rider sitting wrong on one mount only moves there (walk.rider.nudge:
+  // the author, „na Tygrysie szablozębnym za nisko i za bardzo w lewo siedzi”).
+  const [nudgeX, nudgeY] = walk.rider.nudge?.[look]?.[id] ?? [0, 0];
+  const top = Math.max(0, seatY - nudgeY - Math.min(...seats.map((seat) => seat[1])));
   const element = h(
     'div',
     { class: 'scene-ride' },
@@ -296,8 +299,8 @@ function ride(walk, character) {
   element.style.setProperty('--sheet-width', `${width * trot.frames}px`);
   element.style.setProperty('--frames', String(trot.frames));
   element.style.setProperty('--duration', `${trot.frames / trot.fps}s`);
-  element.style.setProperty('--rider-x', `${x - seatX}px`);
-  element.style.setProperty('--rider-y', `${top + y - seatY}px`);
+  element.style.setProperty('--rider-x', `${x - seatX + nudgeX}px`);
+  element.style.setProperty('--rider-y', `${top + y - seatY + nudgeY}px`);
   // The rider follows the saddle frame by frame (ride-<frames> in styles.css).
   seats.forEach(([seatXi, seatYi], i) => {
     element.style.setProperty(`--rx${i}`, `${seatXi - x}px`);
