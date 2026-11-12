@@ -88,14 +88,40 @@ export function mountLabyrinth(container, { navigate }) {
     return systemPanel(view.over === 'done' ? t('Labirynt na dziś zdobyty do końca. Nowy o północy.') : t('Walka przegrana. Labirynt na dziś się skończył, a zdobyte nagrody zostają. Nowy o północy.'));
   }
 
-  // A choice waiting over the map: three blessings, or the merchant.
+  // A choice waiting: three blessings (after an elite, a guardian, at an
+  // altar), or the merchant's wares. It opens in a sheet before the
+  // player's eyes the moment it comes (choiceSheet; the author, 12.11.2026:
+  // "powinny pojawiać sie graczowi przed twarzą w labiryncie a nie ze musi
+  // scrollowac na gore"), and stays as a card over the map until chosen.
   function pendingCard() {
+    if (!view.pending) return null;
+    return h('section', { class: 'card labyrinth-choice', 'aria-labelledby': 'labyrinth-choice-title' }, pendingParts(false));
+  }
+
+  // The choice in a sheet over the page; none waiting, the sheet closes.
+  function choiceSheet() {
+    if (!view?.pending) {
+      closeSheet();
+      return;
+    }
+    openSheet(pendingParts(true));
+  }
+
+  // The choice's title, words and buttons, for the card (`inSheet` false) or
+  // the sheet.
+  function pendingParts(inSheet) {
     const pending = view.pending;
-    if (!pending) return null;
     const choices = pending.choices.length > 0 && blessingChoices(pending.choices);
+    const text = (words) => h('p', { class: inSheet ? 'sheet-text' : null, text: words });
     if (pending.kind === 'blessing') {
       const title = { elite: t('Elita pokonana'), guardian: t('Strażnik pokonany'), altar: t('Ołtarz') }[pending.from] ?? t('Błogosławieństwo');
-      return h('section', { class: 'card labyrinth-choice', 'aria-labelledby': 'labyrinth-choice-title' }, h('h2', { class: 'section-title', id: 'labyrinth-choice-title', text: title }), h('p', { text: t('Wybierz jedno z trzech błogosławieństw. Działa do końca dzisiejszego Labiryntu.') }), choices);
+      return [
+        inSheet
+          ? h('h2', { class: 'sheet-title sheet-title--art' }, roomArt(['elite', 'guardian', 'altar'].includes(pending.from) ? pending.from : 'altar'), title)
+          : h('h2', { class: 'section-title', id: 'labyrinth-choice-title', text: title }),
+        blessingPrompt(inSheet),
+        choices,
+      ];
     }
     const gold = state.character.gold;
     const ware = (what, label, price, bought) =>
@@ -106,11 +132,9 @@ export function mountLabyrinth(container, { navigate }) {
         text: bought ? t('{label}: kupione', { label }) : t('{label}: {price} złota', { label, price: formatNumber(price) }),
         onClick: (event) => withButton(event.currentTarget, () => act('/api/labyrinth/merchant', { buy: what })),
       });
-    return h(
-      'section',
-      { class: 'card labyrinth-choice', 'aria-labelledby': 'labyrinth-choice-title' },
-      h('h2', { class: 'section-title section-title--art', id: 'labyrinth-choice-title' }, roomArt('merchant'), t('Kupiec Systemu')),
-      h('p', { text: t('Kupiec sprzedaje każdą rzecz raz. Twoje złoto: {gold}.', { gold: formatNumber(gold) }) }),
+    return [
+      h('h2', { class: inSheet ? 'sheet-title sheet-title--art' : 'section-title section-title--art', id: inSheet ? null : 'labyrinth-choice-title' }, roomArt('merchant'), t('Kupiec Systemu')),
+      text(t('Kupiec sprzedaje każdą rzecz raz. Twoje złoto: {gold}.', { gold: formatNumber(gold) })),
       ware('heal', t('Leczenie wszystkich o {share}% maks. HP', { share: Math.round(pending.healShare * 100) }), pending.prices.heal, pending.heal),
       ware('blessing', t('Wybór błogosławieństwa'), pending.prices.blessing, pending.blessing),
       choices,
@@ -121,8 +145,10 @@ export function mountLabyrinth(container, { navigate }) {
           text: t('Idź dalej'),
           onClick: (event) => withButton(event.currentTarget, () => act('/api/labyrinth/merchant', { leave: true })),
         }),
-    );
+    ];
   }
+
+  const blessingPrompt = (inSheet) => h('p', { class: inSheet ? 'sheet-text' : null, text: t('Wybierz jedno z trzech błogosławieństw. Działa do końca dzisiejszego Labiryntu.') });
 
   function blessingChoices(choices) {
     return h(
@@ -242,7 +268,9 @@ export function mountLabyrinth(container, { navigate }) {
       'section',
       { class: `card labyrinth-map-card${levelOf().hell ? ' labyrinth-map-card--hell' : ''}`, 'aria-labelledby': 'labyrinth-map-title', 'data-guide': 'labyrinth-map' },
       h('h2', { class: 'section-title', id: 'labyrinth-map-title', text: t('Mapa: {level}', { level: levelOf().name }) }),
-      h('p', { class: 'muted small', text: view.over ? t('Labirynt na dziś się skończył.') : view.pending ? t('Najpierw wybierz, co dalej (wyżej).') : t('Stuknij świecącą komnatę, żeby do niej wejść.') }),
+      view.pending && !view.over
+        ? h('button', { type: 'button', class: 'button button--system labyrinth-choice-open', text: t('Wybierz, co dalej'), onClick: choiceSheet })
+        : h('p', { class: 'muted small', text: view.over ? t('Labirynt na dziś się skończył.') : t('Stuknij świecącą komnatę, żeby do niej wejść.') }),
       board,
     );
   }
@@ -299,16 +327,19 @@ export function mountLabyrinth(container, { navigate }) {
   }
 
   // What a room gave: a fight's result with its playback, a spring's or a
-  // treasure's lines.
+  // treasure's lines. The altar's blessings and the merchant's wares open
+  // at once in the sheet, and an elite's or a guardian's blessings come in
+  // the same sheet as its result, so the choice is before the player's eyes.
   function resultSheet(room, report) {
     const rule = roomRule(room.type);
     const fight = room.won !== null;
     const title = !fight ? rule?.name ?? '' : room.won ? t('Komnata zdobyta') : t('Walka przegrana');
     const lines = room.lines.length > 0 ? room.lines : fight ? [] : [rule?.text ?? ''];
     if (!fight && (room.type === 'altar' || room.type === 'merchant')) {
-      closeSheet();
+      choiceSheet();
       return;
     }
+    const choosing = view.pending?.kind === 'blessing' && view.pending.choices.length > 0;
     openSheet(
       h('h2', { class: 'sheet-title sheet-title--art' }, roomArt(room.type), title),
       // An ordinary fight's XP and gold; an elite's and a guardian's gains
@@ -316,6 +347,8 @@ export function mountLabyrinth(container, { navigate }) {
       room.type === 'fight' && room.won && h('p', { class: 'sheet-text', text: t('+{xp} XP, +{gold} złota.', { xp: formatNumber(room.gains.xp), gold: formatNumber(room.gains.gold) }) }),
       lines.map((line) => h('p', { class: 'sheet-text', text: line })),
       room.artifact && artifactLine(room.artifact),
+      choosing && blessingPrompt(true),
+      choosing && blessingChoices(view.pending.choices),
       h(
         'div',
         { class: 'sheet-actions' },
@@ -330,7 +363,7 @@ export function mountLabyrinth(container, { navigate }) {
               navigate(`#/raport/${report.id}`);
             },
           }),
-        h('button', { type: 'button', class: 'button button--system', text: t('Dalej'), onClick: closeSheet }),
+        !choosing && h('button', { type: 'button', class: 'button button--system', text: t('Dalej'), onClick: closeSheet }),
       ),
     );
   }
@@ -375,11 +408,14 @@ export function mountLabyrinth(container, { navigate }) {
     );
   }
 
-  // A choice made (a blessing, the merchant): the Labirynt as saved.
+  // A choice made (a blessing, the merchant): the Labirynt as saved. Made in
+  // the sheet, the sheet shows what comes next (the merchant's wares again)
+  // or closes once nothing waits.
   async function act(path, body) {
     const result = await fresh(() => call('POST', path, body));
     view = result.labyrinth;
     show();
+    if (document.querySelector('#sheet[open]')) choiceSheet();
   }
 
   if (!isUnlocked('labyrinth')) {

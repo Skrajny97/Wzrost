@@ -710,6 +710,11 @@
       "id": "0.2.90",
       "title": "Wersja 0.2.90",
       "body": "- Labirynt Systemu liczy trudność od wyższego z dwóch poziomów: postaci albo klasy. Zwykle to poziom klasy, więc stwory są silniejsze, a za wygraną zgarniesz więcej złota i XP."
+    },
+    {
+      "id": "0.2.91",
+      "title": "Wersja 0.2.91",
+      "body": "- W Labiryncie wybór błogosławieństwa i towary kupca otwierają się w okienku od razu po wejściu do komnaty, bez przewijania strony w górę."
     }
   ]
 }
