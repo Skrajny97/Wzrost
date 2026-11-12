@@ -382,13 +382,16 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     // A portal pays only its loot, in one fight, and keeps no HP
     // (portals.js): its line instead of the XP, gold, goods and HP.
     const below = Boolean(report.portal);
+    // A party event's report (party-events.js) shows only what its option
+    // gave: no "+0 XP" or "+0" gold rows.
+    const shown = (value) => !report.partyEvent || value > 0;
     const rows = [
       below && report.result === 'success' && [t('Łup'), capitalized(report.portal.loot)],
-      !lost && !below && [t('XP postaci'), `+${formatNumber(summary.xp)} XP`],
+      !lost && !below && shown(summary.xp) && [t('XP postaci'), `+${formatNumber(summary.xp)} XP`],
       summary.penalty > 0 && [t('Kara za porażkę'), t('−{xp} XP postaci', { xp: formatNumber(summary.penalty) })],
       // Reports from before the split have no classXp: the class got the same XP.
-      !lost && !below && [t('XP klasy'), `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
-      !lost && !below && [t('Złoto'), `+${formatNumber(summary.gold)}`],
+      !lost && !below && shown(summary.classXp ?? summary.xp) && [t('XP klasy'), `+${formatNumber(summary.classXp ?? summary.xp)} XP`],
+      !lost && !below && shown(summary.gold) && [t('Złoto'), `+${formatNumber(summary.gold)}`],
       !lost && !below && resourcesRow(summary.resources),
       !below && summary.materials?.length > 0 && [t('Materiały'), capitalized(materialsText(summary.materials))],
       summary.timePoints > 0 && [t('Punkty Czasu'), `+${formatNumber(summary.timePoints)}`],

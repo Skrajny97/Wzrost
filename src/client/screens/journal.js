@@ -177,7 +177,10 @@ export function mountJournal(container, { params }) {
                         ? report.result === 'success'
                           ? ` ${report.portal.loot}`
                           : ''
-                        : t(' +{xp} XP · +{gold} złota', { xp: formatNumber(report.xp), gold: formatNumber(report.gold) }),
+                        : report.partyEvent
+                          ? // A party event shows only what it gave (party-events.js).
+                            [report.xp > 0 && ` +${formatNumber(report.xp)} XP`, report.gold > 0 && ` ${t('+{gold} złota', { gold: formatNumber(report.gold) })}`].filter(Boolean).join(' ·')
+                          : t(' +{xp} XP · +{gold} złota', { xp: formatNumber(report.xp), gold: formatNumber(report.gold) }),
                   ),
               WORK_CHIPS[report.kind] && h('span', { class: 'report-row-herbs', text: workSummaryText(report) }),
               report.bestFind && h('span', { class: 'item-name', vars: { '--rarity': report.bestFind.color }, text: report.bestFind.name }),
