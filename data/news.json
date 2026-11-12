@@ -670,6 +670,11 @@
       "id": "0.2.82",
       "title": "Wersja 0.2.82",
       "body": "- Przechowalnia w Warsztacie i w Szlifierni: gotowe przedmioty i biżuteria czekają tam poza plecakiem, bez limitu miejsc. Zaznacz je i włóż do plecaka, sprzedaj złomiarzowi albo rozbierz na Stole rozbiórki.\n- Pełny plecak nie wstrzymuje już zleceń w Warsztacie i w Szlifierni: liczą się tylko części i materiały."
+    },
+    {
+      "id": "0.2.83",
+      "title": "Wersja 0.2.83",
+      "body": "- Wyprawa drużyny nie rusza już z samym liderem. Gdy nikt z drużyny nie może iść, gra mówi dlaczego, a lider wyrusza sam dopiero po odznaczeniu „Z drużyną”.\n- Wyprawy drużyny nie kończą się na razie zdarzeniami, więc raporty członków odbierają się same przy kolejnym wyruszeniu. Zdarzenia drużynowe są w przygotowaniu.\n- „Wyrusz ponownie” w raporcie lidera zabiera drużynę.\n- Pole „Z drużyną” w Walce samo pokazuje członka, który właśnie wrócił."
     }
   ]
 }

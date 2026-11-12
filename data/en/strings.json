@@ -2815,5 +2815,8 @@
   "Wyroby z Warsztatu oddajesz z plecaka, najpierw najsłabsze. Z Przechowalni włożysz je do plecaka w Warsztacie.": "Workshop goods are handed in from the bag, the weakest first. You put them in the bag from the Storeroom, in the Workshop.",
   "Zaznacz przedmioty w Przechowalni.": "Mark items in the Storeroom.",
   "Któregoś z tych przedmiotów nie ma już w Przechowalni.": "One of these items is no longer in the Storeroom.",
-  "Na zaznaczone przedmioty ({count}) brakuje miejsca w plecaku: wolnych miejsc jest {free}.": "There is not enough room in the bag for the marked items ({count}): {free} places are free."
+  "Na zaznaczone przedmioty ({count}) brakuje miejsca w plecaku: wolnych miejsc jest {free}.": "There is not enough room in the bag for the marked items ({count}): {free} places are free.",
+  "Nikt z drużyny nie może teraz wyruszyć. Wybór w zdarzeniu z poprzedniej wyprawy czeka na: {names}. Poczekaj albo odznacz „Z drużyną” w Walce, by wyruszyć bez drużyny.": "Nobody in the party can set out now. A choice in the event of the previous exploration waits for: {names}. Wait, or untick “With the party” in Combat to set out without the party.",
+  "Wyrusz ponownie z drużyną: {area}, {time}": "Set out again with the party: {area}, {time}",
+  "Wyrusz ponownie bez drużyny: {area}, {time}": "Set out again without the party: {area}, {time}"
 }

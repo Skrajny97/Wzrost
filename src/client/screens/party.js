@@ -52,6 +52,26 @@ export function skipLines(skips = []) {
   });
 }
 
+// The members a party's leader takes along now: the others free now, by
+// name, while the character leads a party (/api/party's `party`); none
+// otherwise. "Wyrusz" with "Z drużyną" (screens/combat.js) and "Wyrusz
+// ponownie" (screens/report.js) go with them.
+export function partyFree(party) {
+  const own = party?.members.find((member) => member.own);
+  if (!own?.leader || party.members.length < 2) return [];
+  return party.members.filter((member) => !member.own && member.status === 'free').map((member) => member.name);
+}
+
+// What the toast says once a party's trip set out (POST /api/party/hunt):
+// those who went, as the server says (one may have got busy at that very
+// moment), and those who must first choose in their exploration's event.
+export function partyWent(answer) {
+  return [
+    answer.went?.length > 0 ? t('Drużyna wyrusza: {names}.', { names: answer.went.join(', ') }) : t('Nikt z drużyny nie zdążył wyruszyć. Wyprawa jest tylko Twoja.'),
+    ...(answer.notes ?? []),
+  ].join(' ');
+}
+
 export function mountParty(container) {
   let view = null;
   let friends = [];
