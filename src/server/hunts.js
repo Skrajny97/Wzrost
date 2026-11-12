@@ -95,7 +95,8 @@ import { toHex } from './encoding.js';
 import { assertion, atomically, characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
-import { eventDraftsOn, eventsOn, fortressOn, settlementOn } from './features.js';
+import { cardsOn, eventDraftsOn, eventsOn, fortressOn, settlementOn } from './features.js';
+import { cardCollection, cardUpserts, droppedCards, maxedCards } from './cards.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { expeditionMinutes } from './guild-expedition.js';
 import { huntFamePoints } from './fame.js';
@@ -745,6 +746,11 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   // whenever they were drunk (potions.js); a trip's fights keep those it set
   // out with.
   const claimed = claimWindows(options, buffsOf(row, now), Boolean(trip));
+  // Talia Systemu (cards.js), where the game has it on: the creatures beaten
+  // may leave their cards (874 A), none of a card at its top level. The
+  // collection as read; the claim holds only while the character is, and
+  // every change of the collection changes it too.
+  const collection = cardsOn() && content().cards ? await cardCollection(db, row.id) : null;
   let hunt = simulateHunt(
     {
       character,
@@ -786,6 +792,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       hard: !trip && options.hard === true,
       // The week it set out in (weeks.js), none before the weeks.
       week: keptWeek(options),
+      cards: collection && { maxed: maxedCards(collection) },
     },
     content(),
   );
@@ -961,6 +968,10 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
     ...((options.skips ?? []).some((skip) => skip.id !== row.id) && { skips: options.skips.filter((skip) => skip.id !== row.id) }),
   };
   if (taught) report.system = [...report.system, taught];
+  // The cards the creatures left (cards.js), each at its level now; none
+  // after a faint (faintForfeit).
+  const cardsWon = collection ? (hunt.cards ?? []) : [];
+  if (cardsWon.length > 0) report.cards = droppedCards(cardsWon, collection);
   // The gems of the bag's items the scrapper bought fall out and go back to
   // the minerals (the author's 757 B, 10.11.2026: „kamień wypada i wraca do
   // Twoich minerałów”), and the report says so.
@@ -987,6 +998,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
     materials: report.summary.materials.map(({ name, label, color, count }) => ({ name, label, color, count })),
     timePoints: report.summary.timePoints,
     bestFind: report.summary.bestFind && { name: report.summary.bestFind.name, color: report.summary.bestFind.color },
+    ...(report.cards && { cards: report.cards.map(({ name, color, level }) => ({ name, color, level })) }),
     levelAfter: applied.level,
     system: report.system,
   };
@@ -1125,6 +1137,8 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       ...hunt.items.flatMap((item, index) =>
         soldFound.includes(index) ? [] : [insertItem.bind(row.id, autoEquipped.includes(index) ? item.slot : null, JSON.stringify(item), now)],
       ),
+      // The cards the creatures left, a copy each (cards.js).
+      ...cardUpserts(db, row.id, cardsWon, now),
       db.prepare('DELETE FROM activities WHERE character_id = ? AND started_at = ?').bind(row.id, activity.started_at),
     ]);
   } catch (error) {

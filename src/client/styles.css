@@ -12158,6 +12158,985 @@ a.profession-square:active {
   }
 }
 
+
+/* Talia Systemu, the Salon Gier's third tab (src/client/cards.js; 871–877).
+   Szczęsny's table on the Salon's picture, as the Arena's plaque on its own:
+   his bust and words, the day's staked matches on a gold-edged plaque. A
+   card is a little frame of its rarity's colour (the design document's
+   scale) with a glow of it at the top: the type's icon in its colour and
+   the level in its corners, the creature's sprite of the Bestiariusz in the
+   middle, its name, then Atak by a sword and Życie by a heart, a bar of the
+   Życie left once hurt. The blow a card will take this round sits on its top
+   edge (−N, crimson when it falls), "nowa" and the skill's name on its
+   bottom edge. The table is a wooden board framed in bark over the Salon's
+   dim picture, the rival's lines above a gold-plaqued divider, the player's
+   under it; empty places are dashed and light up while a card waits to be
+   laid. On a computer the cards grow to twice their sprites. */
+.cards-tab {
+  --tcard-art: 48px;
+}
+
+.cards-head.place-card--art {
+  min-height: 132px;
+  justify-content: flex-end;
+}
+
+.cards-head.place-card--art::before,
+.cards-table.place-card--art::before {
+  opacity: 0.45;
+}
+
+.cards-table-bust {
+  flex: none;
+  display: grid;
+  place-items: end center;
+  overflow: hidden;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.7);
+}
+
+.cards-head-text {
+  min-width: 0;
+}
+
+.cards-title {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.cards-intro {
+  margin: 4px 0 0;
+  color: var(--text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+  overflow-wrap: anywhere;
+}
+
+.cards-plaque {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+  margin-top: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: rgba(13, 17, 11, 0.8);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.45);
+  font-family: var(--font-system);
+  font-size: 14px;
+}
+
+.cards-plaque-icon {
+  flex: none;
+  color: var(--gold);
+}
+
+.cards-section-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 12px;
+}
+
+.cards-section-head .section-title {
+  margin: 0;
+}
+
+/* A card. */
+.tcard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  width: 100%;
+  padding: 4px 4px 5px;
+  border: 2px solid var(--rarity, var(--bark-line));
+  border-radius: 7px;
+  background:
+    radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--rarity, #9b9b9b) 30%, transparent), transparent 70%),
+    linear-gradient(180deg, #232c1c, #151b11);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 2px 4px rgba(0, 0, 0, 0.45);
+  color: var(--text);
+  font: inherit;
+  text-align: center;
+}
+
+button.tcard {
+  cursor: pointer;
+}
+
+button.tcard:focus-visible,
+.tcard-slot:focus-visible {
+  outline: 2px solid var(--system);
+  outline-offset: 2px;
+}
+
+.tcard-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+}
+
+.tcard-type {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(13, 17, 11, 0.75);
+}
+
+.tcard-type--strength {
+  color: #e0835c;
+  box-shadow: inset 0 0 0 1px rgba(224, 131, 92, 0.6);
+}
+
+.tcard-type--dexterity {
+  color: #a7c47f;
+  box-shadow: inset 0 0 0 1px rgba(167, 196, 127, 0.6);
+}
+
+.tcard-type--intellect {
+  color: #9db7f0;
+  box-shadow: inset 0 0 0 1px rgba(157, 183, 240, 0.6);
+}
+
+.tcard-level {
+  display: grid;
+  place-items: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border: 1px solid var(--rarity, var(--bark-line));
+  border-radius: 10px;
+  background: rgba(13, 17, 11, 0.8);
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.tcard-art {
+  display: grid;
+  place-items: center;
+  width: var(--tcard-art);
+  height: var(--tcard-art);
+}
+
+.tcard-art .sprite {
+  width: var(--tcard-art);
+  height: var(--tcard-art);
+}
+
+.tcard-name {
+  display: -webkit-box;
+  min-height: 2.3em;
+  overflow: hidden;
+  font-size: var(--tcard-name-size, 13px);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.tcard-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  align-self: stretch;
+  gap: 0 4px;
+  font-family: var(--font-system);
+  font-size: var(--tcard-stats-size, 13px);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.tcard-attack,
+.tcard-life {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Sized by the card's width (cqi, the card is the container), up to the
+   place's sizes (--tcard-name-size, --tcard-stats-size): a name's longest
+   word whole on its line ("Trzcinownik" on a phone's reserve), by its count
+   of letters (cards.js, --name-chars; an Alegreya word of n letters is at
+   most 0.42·n + 1.2 em wide: Mamuna, Komarzysko, 12.11.2026), and Atak and
+   Życie of two digits on one line (each a sign of 0.85 em, 2 px and digits
+   of at most 1.29 em in Chakra Petch). */
+@supports (width: 1cqi) {
+  .tcard {
+    container-type: inline-size;
+  }
+
+  .tcard-name {
+    font-size: clamp(9px, calc(98cqi / (var(--name-chars, 1) * 0.42 + 1.2)), var(--tcard-name-size, 13px));
+  }
+
+  .tcard-stats {
+    font-size: clamp(10px, calc((100cqi - 8px) / 4.3), var(--tcard-stats-size, 13px));
+  }
+
+  .tcard-stats svg {
+    width: 0.85em;
+    height: 0.85em;
+  }
+}
+
+.tcard-attack {
+  color: var(--gold);
+}
+
+.tcard-life {
+  color: #ef9a85;
+}
+
+.tcard-bar {
+  align-self: stretch;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.tcard-bar-fill {
+  display: block;
+  width: var(--share);
+  height: 100%;
+  background: linear-gradient(90deg, #b8503e, #ef9a85);
+}
+
+/* The blow it will take this round, on its top edge. */
+.tcard-blow {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  z-index: 1;
+  transform: translateX(-50%);
+  padding: 1px 6px;
+  border: 1px solid rgba(239, 154, 133, 0.75);
+  border-radius: 8px;
+  background: #2a1512;
+  color: var(--danger);
+  font-family: var(--font-system);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tcard-blow--strong {
+  border-color: var(--gold);
+}
+
+.tcard-blow--down {
+  background: #8f2b2b;
+  color: #fff3ea;
+}
+
+.tcard--falling .tcard-art {
+  filter: saturate(0.4) brightness(0.8);
+}
+
+.tcard-chip {
+  position: absolute;
+  bottom: -9px;
+  left: 50%;
+  z-index: 1;
+  transform: translateX(-50%);
+  max-width: calc(100% + 8px);
+  padding: 0 6px;
+  overflow: hidden;
+  border: 1px solid var(--system-line);
+  border-radius: 8px;
+  background: #13222a;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tcard-chip--skill {
+  border-color: var(--gold);
+  background: #2a2312;
+  color: var(--gold);
+}
+
+.tcard-chip--shift {
+  bottom: auto;
+  top: 24px;
+}
+
+.tcard-check {
+  position: absolute;
+  top: 24px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--leaf);
+  color: #12170f;
+}
+
+.tcard--picked {
+  outline: 2px solid var(--system);
+  outline-offset: 2px;
+  box-shadow: 0 0 12px rgba(143, 227, 239, 0.55);
+}
+
+.tcard--target {
+  outline: 2px dashed var(--gold);
+  outline-offset: 2px;
+}
+
+.tcard--chosen {
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.55),
+    0 0 10px color-mix(in srgb, var(--rarity, #9b9b9b) 60%, transparent);
+}
+
+.tcard--dim {
+  opacity: 0.5;
+}
+
+/* Small, in the deck's row and the report. */
+.tcard--compact {
+  --tcard-art: 32px;
+  gap: 1px;
+  padding: 3px 2px 4px;
+}
+
+.tcard--compact .tcard-name {
+  --tcard-name-size: 11px;
+  min-height: 0;
+  -webkit-line-clamp: 1;
+}
+
+.tcard--compact .tcard-stats {
+  justify-content: center;
+  gap: 0 3px;
+  font-size: 11px;
+}
+
+.tcard--compact .tcard-stats .icon,
+.tcard--compact .tcard-stats svg {
+  display: none;
+}
+
+.tcard--compact .tcard-type,
+.tcard--compact .tcard-level {
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  font-size: 10px;
+}
+
+.tcard-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.tcard-grid--deck {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.tcard-grid--collection {
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: 14px 8px;
+  padding-top: 10px;
+}
+
+.tcard-grid--reserve {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  padding-top: 10px;
+}
+
+/* On the narrowest phones the reserve's four names in smaller letters, so
+   a long one keeps whole. */
+@media (max-width: 359px) {
+  .tcard-grid--reserve .tcard,
+  .cards-lines .tcard {
+    padding-inline: 2px;
+  }
+
+  .tcard-grid--reserve .tcard-name,
+  .cards-lines .tcard-name {
+    --tcard-name-size: 11px;
+  }
+
+  .tcard-grid--reserve .tcard-stats {
+    gap: 0 2px;
+  }
+}
+
+@media (min-width: 360px) {
+  .tcard-grid--deck {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+  }
+}
+
+/* An empty place on the table. */
+.tcard-slot {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 132px;
+  border: 2px dashed var(--bark-line);
+  border-radius: 7px;
+  background: rgba(13, 17, 11, 0.55);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 13px;
+}
+
+button.tcard-slot {
+  cursor: pointer;
+}
+
+.tcard-slot--ready {
+  border-color: var(--system);
+  color: var(--system-text);
+  box-shadow: 0 0 10px rgba(143, 227, 239, 0.35);
+}
+
+/* The table. */
+.cards-match {
+  gap: 12px;
+}
+
+.cards-table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 8px 12px;
+  border: 2px solid var(--bark-line);
+  border-radius: 8px;
+  background: linear-gradient(180deg, #2b2219, #1c1712);
+  box-shadow:
+    inset 0 0 0 3px rgba(13, 17, 11, 0.6),
+    inset 0 0 24px rgba(0, 0, 0, 0.6),
+    0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+.cards-table-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cards-table-bust {
+  width: 44px;
+  height: 44px;
+}
+
+.cards-table-bust img {
+  width: 44px;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.cards-table-who {
+  flex: 1;
+  min-width: 0;
+}
+
+.cards-table-who p {
+  margin: 0;
+}
+
+.cards-table-name {
+  font-weight: 700;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  overflow-wrap: anywhere;
+}
+
+.cards-table-tier {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+  overflow-wrap: anywhere;
+}
+
+.cards-table-count {
+  margin: 0;
+  font-family: var(--font-system);
+  font-size: 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+}
+
+.cards-table-count--me {
+  text-align: right;
+}
+
+.cards-round {
+  flex: none;
+  padding: 3px 8px;
+  border: 1px solid var(--system-line);
+  border-radius: 4px;
+  background: rgba(13, 17, 11, 0.8);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.cards-lines {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cards-line {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  min-width: 0;
+}
+
+.cards-lines--me .cards-line {
+  flex-direction: column-reverse;
+}
+
+.cards-line-name {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+}
+
+.cards-lines .tcard {
+  min-height: 132px;
+}
+
+.cards-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 2px 0;
+}
+
+.cards-divider::before,
+.cards-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.cards-divider span {
+  padding: 2px 10px;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  background: rgba(13, 17, 11, 0.85);
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.cards-reserve {
+  gap: 4px;
+}
+
+.cards-hint {
+  margin: 0;
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
+.cards-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cards-types .button {
+  flex: 1;
+  gap: 6px;
+}
+
+/* The hero's card and its skill. */
+.cards-hero {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.cards-hero-portrait {
+  flex: none;
+  display: grid;
+  place-items: end center;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border: 1px solid var(--gold);
+  border-radius: 6px;
+  background: radial-gradient(circle at 50% 30%, rgba(201, 161, 74, 0.25), rgba(13, 17, 11, 0.85));
+}
+
+.cards-hero-portrait img {
+  width: 64px;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.cards-hero-text {
+  min-width: 0;
+}
+
+.cards-hero-text p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.cards-hero-label {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.cards-hero-skill {
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.cards-skill {
+  gap: 8px;
+}
+
+.cards-skill .cards-hero {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.cards-skill-text {
+  margin: 0;
+}
+
+.cards-skill-set {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0;
+}
+
+.cards-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.cards-fight {
+  flex: 1 1 60%;
+}
+
+.cards-actions .button--small {
+  flex: 0 1 auto;
+}
+
+.cards-account {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+}
+
+.cards-hits {
+  margin: 6px 0;
+  padding-left: 18px;
+  font-size: 14px;
+}
+
+.cards-hit--foe {
+  color: var(--text-muted);
+}
+
+.cards-hit-note {
+  color: var(--gold);
+}
+
+/* Szczęsny's tiers. */
+.cards-tiers {
+  gap: 10px;
+}
+
+.cards-tiers > .section-title {
+  margin: 0;
+}
+
+.cards-tier {
+  gap: 6px;
+}
+
+.cards-tier--beaten {
+  border-color: rgba(201, 161, 74, 0.45);
+}
+
+.cards-tier-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.cards-tier-head p,
+.cards-tier-name {
+  margin: 0;
+}
+
+.cards-tier-name {
+  font-size: 18px;
+}
+
+.cards-tier-text {
+  overflow-wrap: anywhere;
+}
+
+.cards-tier-number {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #3a2e1c, #1a140d);
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.cards-tier-title {
+  min-width: 0;
+}
+
+.cards-tier-text {
+  font-size: 14px;
+}
+
+/* The facts of a tier in a line or two: the stake and the win, then the
+   reward of the day and the first win's card, each whole on its line. */
+.cards-tier-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 16px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.cards-tier-facts strong {
+  font-family: var(--font-system);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cards-tier-done {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--leaf);
+}
+
+.cards-rarity {
+  color: var(--rarity);
+}
+
+.cards-tier-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 8px;
+}
+
+/* The end of a match. */
+.cards-end {
+  gap: 8px;
+  border-color: var(--system-line);
+}
+
+.cards-end--won {
+  border-color: var(--gold);
+  box-shadow: 0 0 18px rgba(201, 161, 74, 0.25);
+}
+
+.cards-end--lost {
+  border-color: rgba(239, 154, 133, 0.6);
+}
+
+.cards-end p {
+  margin: 0;
+}
+
+.cards-end-title {
+  font-family: var(--font-system);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--system-text);
+}
+
+.cards-end--won .cards-end-title {
+  color: var(--gold);
+}
+
+.cards-end--lost .cards-end-title {
+  color: var(--danger);
+}
+
+.cards-reward {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.cards-reward .tcard {
+  max-width: 132px;
+}
+
+.cards-reward-text {
+  text-align: center;
+}
+
+/* The deck builder. */
+.cards-builder-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.cards-count {
+  margin: 0;
+  font-family: var(--font-system);
+  font-weight: 600;
+}
+
+.cards-count--ready {
+  color: var(--leaf);
+}
+
+.cards-builder-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cards-builder-actions .button {
+  width: auto;
+}
+
+.cards-filter {
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+.cards-filter .chat-tab {
+  gap: 4px;
+}
+
+.cards-filter .tcard-type {
+  width: 18px;
+  height: 18px;
+}
+
+/* The cards of an exploration, in its report. */
+.cards-dropped {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.cards-dropped-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cards-dropped-row .tcard {
+  flex: none;
+  width: 72px;
+}
+
+/* On a computer the table and its cards grow, the sprites to twice their
+   pixels, and the tiers stand two by two. */
+:root[data-layout='desktop'] .cards-lines {
+  width: min(100%, 540px);
+  margin-inline: auto;
+  gap: 14px;
+}
+
+:root[data-layout='desktop'] .cards-lines .tcard,
+:root[data-layout='desktop'] .cards-lines .tcard-slot {
+  --tcard-art: 96px;
+  min-height: 196px;
+}
+
+:root[data-layout='desktop'] .cards-lines .tcard-name {
+  --tcard-name-size: 15px;
+}
+
+:root[data-layout='desktop'] .cards-lines .tcard-stats {
+  --tcard-stats-size: 15px;
+}
+
+/* The reserve and the hero's skill side by side under the table, so
+   "Walcz" stays near. */
+:root[data-layout='desktop'] .cards-match {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: start;
+}
+
+:root[data-layout='desktop'] .cards-match > :not(.cards-reserve, .cards-skill) {
+  grid-column: 1 / -1;
+}
+
+:root[data-layout='desktop'] .cards-match > .cards-reserve,
+:root[data-layout='desktop'] .cards-match > .cards-skill {
+  align-self: stretch;
+}
+
+:root[data-layout='desktop'] .tcard-grid--deck {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+:root[data-layout='desktop'] .tcard-grid--collection {
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+}
+
+:root[data-layout='desktop'] .cards-tiers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+}
+
+:root[data-layout='desktop'] .cards-tiers > .section-title,
+:root[data-layout='desktop'] .cards-tiers > p {
+  grid-column: 1 / -1;
+}
+
 .market-pick {
   display: flex;
   align-items: center;

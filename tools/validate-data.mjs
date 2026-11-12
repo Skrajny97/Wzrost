@@ -15,7 +15,7 @@ export const DATA_FILES = [
   'item-bases', 'affixes', 'monsters', 'regions', 'balance', 'texts', 'unlocks',
   'resources', 'buildings', 'camp', 'music', 'sounds', 'appearances', 'tutorial', 'materials', 'quests', 'skills', 'professions', 'animations', 'skins', 'chat', 'community',
   'events', 'encyclopedia', 'evolutions', 'gift-codes', 'settlement', 'towers', 'portals', 'guilds', 'cosmetics', 'news', 'fame',
-  'weeks', 'payments', 'party-events', 'labyrinth',
+  'weeks', 'payments', 'party-events', 'labyrinth', 'cards',
 ];
 // Unlocks the code refers to by id.
 const REQUIRED_UNLOCKS = ['stats', 'quick-hunts', 'community', 'skills', 'evolution', 'professions', 'settlement', 'party', 'towers', 'portals', 'labyrinth', 'core'];
@@ -763,6 +763,7 @@ function checkReferences(data) {
   errors.push(...checkTowers(data));
   errors.push(...checkPortals(data));
   errors.push(...checkLabyrinth(data, { stats, elements, rarities }));
+  errors.push(...checkCards(data, { rarities }));
   errors.push(...checkGuildSeat(data, { resources }));
   errors.push(...checkGuildExpedition(data));
   errors.push(...checkGuildWar(data));
@@ -1745,6 +1746,76 @@ function checkLabyrinth(data, { stats, elements, rarities }) {
   for (const id of rarities) if (core.break[id] === undefined) errors.push(`${where}: rozbicie nie ma Odłamków rzadkości "${id}"`);
   if (core.upgrade.costs.length !== core.upgrade.max) errors.push(`${where}: upgrade.costs musi mieć ${core.upgrade.max} kosztów`);
   if (!levelIds.has(core.tower.level)) errors.push(`${where}: tower.level "${core.tower.level}" to nie poziom Labiryntu`);
+  return errors;
+}
+
+// Talia Systemu (src/engine/cards.js; 871–877): the three types of the
+// creatures' attacks, each beating another, all three beaten once; every
+// rarity of the game with its might; the starter deck and every tier's deck
+// a whole deck of cards, each a creature living in a land, once, at a level
+// up to the top, the starter's ordinary creatures, four of each type (874 A);
+// the tiers' first win a rarity some card has; a hero for each class, its
+// power a number for each stage, and the words of its number where it has
+// one ({power}); the host a resident of the Osada.
+function checkCards(data, { rarities }) {
+  const errors = [];
+  const rules = data.cards;
+  const where = 'cards.json';
+  if (!rules) return errors;
+  const types = uniqueIds(errors, `${where} (typy)`, rules.types);
+  const scalings = new Set(data.monsters.map((monster) => monster.attack.scaling));
+  for (const type of rules.types) {
+    if (!types.has(type.target) || type.target === type.id) errors.push(`${where}: typ ${type.id} musi bić inny typ, a bije "${type.target}"`);
+  }
+  if (new Set(rules.types.map((type) => type.target)).size !== rules.types.length) errors.push(`${where}: każdy typ musi być bity przez dokładnie jeden typ`);
+  for (const scaling of scalings) if (!types.has(scaling)) errors.push(`${where}: stwory atakują statystyką "${scaling}", której nie ma wśród typów`);
+  uniqueIds(errors, `${where} (linie)`, rules.lines);
+  for (const id of rarities) if (rules.stats.rarity[id] === undefined) errors.push(`${where}: stats.rarity nie ma rzadkości "${id}"`);
+  for (const id of Object.keys(rules.stats.rarity)) if (!rarities.has(id)) errors.push(`${where}: stats.rarity ma nieznaną rzadkość "${id}"`);
+  if (rules.stats.shapeRange[0] > rules.stats.shapeRange[1]) errors.push(`${where}: stats.shapeRange od większej do mniejszej`);
+  // The creatures living in a land: those of the regions' places, their
+  // elites and champions, and the regions' elites.
+  const living = new Set();
+  for (const region of data.regions) {
+    if (region.elite) living.add(region.elite);
+    for (const area of region.areas) {
+      for (const encounter of [...(area.encounters ?? []), ...(area.tough ?? [])]) for (const id of encounter.monsters) living.add(id);
+      for (const id of [area.elite, area.champion]) if (id) living.add(id);
+    }
+  }
+  const byId = new Map(data.monsters.map((monster) => [monster.id, monster]));
+  const deck = (owner, ids) => {
+    if (ids.length !== rules.deckSize) errors.push(`${where}: ${owner} ma ${ids.length} kart, a talia to ${rules.deckSize}`);
+    if (new Set(ids).size !== ids.length) errors.push(`${where}: ${owner} ma jakąś kartę dwa razy`);
+    for (const id of ids) if (!living.has(id)) errors.push(`${where}: ${owner}: "${id}" to nie stwór żyjący w krainach`);
+  };
+  deck('starter', rules.starter.monsters);
+  for (const id of rules.starter.monsters) {
+    const monster = byId.get(id);
+    if (monster && (monster.elite || monster.champion)) errors.push(`${where}: talia startowa ma tylko zwykłe stwory, a "${id}" nim nie jest (874 A)`);
+  }
+  for (const type of rules.types) {
+    const count = rules.starter.monsters.filter((id) => byId.get(id)?.attack.scaling === type.id).length;
+    if (count !== rules.deckSize / rules.types.length) errors.push(`${where}: talia startowa ma ${count} kart typu ${type.id}, a powinna ${rules.deckSize / rules.types.length}`);
+  }
+  const tiers = uniqueIds(errors, `${where} (stopnie)`, rules.host.tiers);
+  if (tiers.size === 0) errors.push(`${where}: Szczęsny potrzebuje choć jednego stopnia`);
+  const materialRarity = new Map(data.materials.materials.map((material) => [material.monster, material.rarity]));
+  for (const tier of rules.host.tiers) {
+    deck(`stopień ${tier.id}`, tier.cards.map((card) => card.monster));
+    for (const card of tier.cards) if (card.level > rules.stats.maxLevel) errors.push(`${where}: stopień ${tier.id}: karta ${card.monster} ponad najwyższy poziom ${rules.stats.maxLevel}`);
+    if (!rarities.has(tier.firstWin.rarity)) errors.push(`${where}: stopień ${tier.id}: nieznana rzadkość karty za pierwszą wygraną "${tier.firstWin.rarity}"`);
+    else if (![...living].some((id) => (materialRarity.get(id) ?? data.rarities[0].id) === tier.firstWin.rarity)) errors.push(`${where}: stopień ${tier.id}: żadna karta nie ma rzadkości "${tier.firstWin.rarity}"`);
+  }
+  const heroes = uniqueIds(errors, `${where} (bohaterowie)`, rules.heroes);
+  for (const cls of data.classes) if (!heroes.has(cls.id)) errors.push(`${where}: klasa ${cls.id} nie ma umiejętności bohatera (872 A)`);
+  for (const hero of rules.heroes) {
+    if (!data.classes.some((cls) => cls.id === hero.id)) errors.push(`${where}: bohater ${hero.id} to nie klasa`);
+    const words = [hero.text, hero.plus ?? ''].join(' ');
+    if (hero.power.some((power) => power > 0) && !words.includes('{power}')) errors.push(`${where}: bohater ${hero.id} ma liczbę (power), której słowa nie podają ({power})`);
+    if (hero.plus && hero.power[0] > 0) errors.push(`${where}: bohater ${hero.id}: plus jest dla umiejętności bez liczby przed ewolucją`);
+  }
+  if (!data.settlement.residents.some((resident) => resident.id === rules.host.resident)) errors.push(`${where}: host.resident "${rules.host.resident}" to nie mieszkaniec Osady`);
   return errors;
 }
 

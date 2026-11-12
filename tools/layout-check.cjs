@@ -76,6 +76,7 @@ const SCREENS = [
   '#/osada/trial-hall',
   '#/osada/trial-hall/trials',
   '#/osada/arena',
+  '#/osada/casino/cards',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
   '#/spolecznosc/slawa',
@@ -119,6 +120,7 @@ const TRANSLATED = new Set([
   '#/osada/trial-hall',
   '#/osada/trial-hall/trials',
   '#/osada/arena',
+  '#/osada/casino/cards',
   '#/spolecznosc',
   '#/spolecznosc/ranking',
   '#/spolecznosc/slawa',
@@ -301,6 +303,12 @@ async function main() {
   sql(`UPDATE characters SET labyrinth = '${JSON.stringify(labyrinth)}', core = '${JSON.stringify({ open: true, shards: 123456, gem: 'diamond', absorbed })}' WHERE name = '${name}'`);
   for (const one of [artifact('sacred', 'large', 'epic', ['mana', 'wisdom'], 'opening-crit', 4), artifact('poison', 'medium', 'rare', ['lifesteal', 'perception'], null, 0), artifact('water', 'small', 'common', ['recovery'], null, 0)]) {
     sql(`INSERT INTO core_artifacts (character_id, data, created_at) SELECT id, '${JSON.stringify(one)}', 1 FROM characters WHERE name = '${name}'`);
+  }
+  // Talia Systemu (the Salon Gier's "Karty", where CARDS is on: npm run
+  // dev): the starter deck taken and a match against Szczęsny's last tier,
+  // its strongest cards, on the table.
+  if ((await api('POST', '/api/cards/starter')) < 400) {
+    if ((await api('POST', '/api/cards/match', { tier: 5, staked: false })) >= 400) throw new Error('Nie zaczęła się partia kart.');
   }
   // Punkty Sławy of this week in six digits (fame.js), their row made by a
   // sweep in the week the server counts.

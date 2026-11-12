@@ -1,0 +1,49 @@
+{
+  "$comment": "English texts of data/cards.json (src/engine/overlay.js): the System Deck, the Games Parlour's card game: its lines, types, heroes' skills, Szczęsny's tiers and words. Each key of the texts keeps the Polish number of variants, as the game picks one by index.",
+  "name": "System Deck",
+  "lines": {
+    "front": { "name": "Front" },
+    "middle": { "name": "Middle" },
+    "back": { "name": "Back" }
+  },
+  "types": {
+    "strength": { "name": "Strength" },
+    "dexterity": { "name": "Dexterity" },
+    "intellect": { "name": "Magic" }
+  },
+  "heroes": {
+    "warrior": { "name": "Charge", "text": "A card of yours you choose hits {power}% harder this round." },
+    "archer": { "name": "True Shot", "text": "A card of yours you choose hits the rival's card you point at this round, instead of the one opposite.", "plus": "It also hits it {power}% harder." },
+    "mage": { "name": "Transmutation", "text": "A card of yours you choose changes its type for the rest of the match.", "plus": "This round it also hits {power}% harder." },
+    "cleric": { "name": "Resurrection", "text": "If a card of yours you choose falls this round, it comes back with {power}% of its Life." },
+    "shadow": { "name": "Switch", "text": "After the rival has set up, you swap one card on a line for a card from your reserve.", "plus": "The new card hits {power}% harder this round." }
+  },
+  "host": {
+    "tiers": {
+      "warmup": { "name": "Warm-up", "text": "Szczęsny plays at half throttle: common and rare cards from the first lands, a few at level 2." },
+      "parlour": { "name": "A Game at the Table", "text": "Rare and unique cards at levels 2 and 3. Szczęsny picks his cards against yours." },
+      "serious": { "name": "A Serious Game", "text": "Unique and epic creatures at levels 2 and 3. A deck better than the starter will come in handy." },
+      "masters": { "name": "The Masters' Table", "text": "Epic cards and elites at levels 3 and 4. Every mistake costs here." },
+      "host": { "name": "Szczęsny's Deck", "text": "His own deck: champions and elites at levels 4 and 5. Few rise from this table with a full purse." }
+    }
+  },
+  "texts": {
+    "intro": "Szczęsny shuffles a deck of cards with creatures of the Bestiary. \"Twelve cards, three lines, as in a real battle. Build your deck and take a seat.\"",
+    "starterOffer": "\"For a good start I'll give you a deck: twelve cards, four of each type. The rest you'll win on your explorations.\"",
+    "starterTaken": "Szczęsny slides a deck of twelve cards across the table. \"Yours. Play it boldly.\"",
+    "rules": [
+      "A deck is 12 cards. Each card is a creature of the Bestiary with Attack, Life and a type: Strength, Dexterity or Magic. Strength beats Dexterity, Dexterity beats Magic and Magic beats Strength: a card deals half again as much to a card of the type it beats.",
+      "The table has three lines, as in a formation: front, middle and back. Each round Szczęsny first puts cards on his empty lines. Then you put cards from your reserve (4 cards drawn from your deck) on your empty lines. A card stays on its line until it is beaten.",
+      "After \"Fight\" every card hits the card opposite, all at once. With no card opposite, it hits the rival's first card from the front. A card left with no Life is beaten.",
+      "Whoever beats all of the rival's cards wins. After 20 rounds the one with more cards left wins, then the one with more Life. If they are equal, it is a draw.",
+      "The hero card is your class's skill, once a match. Your class's evolution strengthens it.",
+      "A match for a stake: win and you take twice the stake, a draw gives the stake back. You play for a stake at most 10 times a day. The first win of the day at each tier also gives the day's reward, and the first win over a tier a rare card. Training is without a stake and without rewards.",
+      "New cards are rarely left by creatures you beat on explorations, more often by elites and champions. The same card won again raises its level, up to level 5: each level means more Attack and Life."
+    ],
+    "win": ["\"A good match! I didn't see that coming.\"", "\"Your win. The cards like you today.\"", "\"Well played! Next time I won't hold back.\""],
+    "loss": ["\"My match. The deck forgives no mistakes.\"", "\"This time the stake stays with me.\"", "\"That was close. Shuffle and come back.\""],
+    "draw": ["\"A draw! Nobody loses, nobody gains.\"", "\"Even as on a scale. One more match?\""],
+    "drop": ["Among the loot lies a card: {card}.", "The beaten creature leaves a card: {card}."],
+    "firstWin": "For your first win over the tier \"{tier}\" Szczęsny gives you a card: {card}."
+  }
+}

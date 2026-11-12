@@ -19,11 +19,13 @@ export function useServer(vars = {}) {
   // Arena (ARENA), in the game from 0.2.38: its unlock and its place on the
   // Osada's board would change the other tests' (pvp-arena.test.js). So are
   // the guild wars (GUILD_WARS, guild-wars.test.js), first on the test
-  // version: their Wojna tab and their evening's battles. So are the payments
-  // for Punkty Systemu (PAYMENTS, payments.test.js), for every player when a
-  // test turns them on (PAYMENTS_FOR). So are the Labirynt Systemu and the
-  // Rdzeń (LABYRINTH, labyrinth-api.test.js), in the game from 0.2.87: the
-  // Rdzeń's Artefakty would change the other tests' fights.
+  // version: their Wojna tab and their evening's battles. So is Talia
+  // Systemu (CARDS, cards-api.test.js), which wrangler.jsonc names only for
+  // the test version. So are the payments for Punkty Systemu (PAYMENTS,
+  // payments.test.js), for every player when a test turns them on
+  // (PAYMENTS_FOR). So are the Labirynt Systemu and the Rdzeń (LABYRINTH,
+  // labyrinth-api.test.js), in the game from 0.2.87: the Rdzeń's Artefakty
+  // would change the other tests' fights.
   const server = createTestHarness({
     workers: [
       {

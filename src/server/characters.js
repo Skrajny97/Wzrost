@@ -120,6 +120,7 @@ import {
 } from '../engine/index.js';
 import { mountView } from '../engine/stable.js';
 import { say } from '../engine/text.js';
+import { cardRemoval } from './cards.js';
 import { chatRole } from './chat.js';
 import { relationTo } from './community.js';
 import { content, contentIn } from './content.js';
@@ -2160,6 +2161,8 @@ export function characterRemoval(db, id, now) {
     db.prepare('DELETE FROM storage_items WHERE character_id = ?').bind(id),
     // The Artefakty of its Skrytka Rdzenia (core.js).
     db.prepare('DELETE FROM core_artifacts WHERE character_id = ?').bind(id),
+    // Its cards, deck and matches of the Talia Systemu (cards.js).
+    ...cardRemoval(db, '= ?', [id]),
     db.prepare('DELETE FROM buildings WHERE character_id = ?').bind(id),
     // Its tickets of the Loteria not drawn yet (casino.js).
     db.prepare('DELETE FROM lottery_tickets WHERE character_id = ?').bind(id),
