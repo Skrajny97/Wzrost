@@ -599,6 +599,12 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       words && h('p', { class: 'settlement-greeting', text: words }),
       h('dl', { class: 'status-list' }, rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value })))),
       ended.card && h('div', { class: 'cards-reward' }, h('p', { class: 'cards-reward-text', text: reward }), face(ended.card)),
+      // The first win's card already at its top level: its gold instead (919 B).
+      ended.cardGold > 0 &&
+        h('p', {
+          class: 'cards-reward-text',
+          text: t('Masz już wszystkie karty tej rzadkości na {level}. poziomie, więc zamiast karty zgarniasz {gold} zł.', { level: ended.maxLevel ?? 5, gold: formatNumber(ended.cardGold) }),
+        }),
       h('button', {
         type: 'button',
         class: 'button button--system',

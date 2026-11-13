@@ -535,6 +535,13 @@ async function endStatements(db, player, match, state, now) {
   const firstTier = Boolean(tier) && won && !game.beaten.includes(number);
   const firstResident = Boolean(table) && won && !game.residents.includes(table.id);
   const collection = firstTier || (table && won) ? await cardCollection(db, row.id) : new Map();
+  // The tier's card at its first win; when every card of its rarity is at
+  // its top level already, it would be lost, so the tier's stake comes once
+  // more instead (the author's 919 B, 13.11.2026: nothing else in the game
+  // prices a card of a rarity, and the stake is the tier's own number).
+  const drawn = firstTier ? firstWinCard(tier, collection, state.seed, content()) : null;
+  const spent = drawn !== null && (collection.get(drawn) ?? 0) >= rules().stats.maxLevel;
+  const cardGold = spent ? match.stake : 0;
   const payout = matchPayout({
     result: state.result,
     staked,
@@ -542,7 +549,7 @@ async function endStatements(db, player, match, state, now) {
     dailyGold: tier ? explorationGold(tier.rewardMinutes, row.level) : 0,
     rewardedToday: tier ? game.rewarded.includes(number) : true,
     beatenBefore: tier ? game.beaten.includes(number) : true,
-    firstCard: firstTier ? firstWinCard(tier, collection, state.seed, content()) : null,
+    firstCard: spent ? null : drawn,
   });
   const card =
     table && won ? residentWinCard({ table, first: firstResident, seed: state.seed, owned: collection.keys(), maxed: maxedCards(collection) }, content()) : payout.card;
@@ -553,6 +560,8 @@ async function endStatements(db, player, match, state, now) {
     gold: payout.gold,
     daily: payout.daily,
     card: card ? cardView(card, (collection.get(card) ?? 0) + 1, content(), { fresh: !collection.has(card) }) : null,
+    // The gold in place of a first win's card already at its top level (919 B).
+    ...(cardGold > 0 && { cardGold, maxLevel: rules().stats.maxLevel }),
     tierName: tier?.name ?? null,
     // At a resident's table: its deck's name, and whether the card is the
     // first win's (else its chance's).
@@ -571,7 +580,7 @@ async function endStatements(db, player, match, state, now) {
       residents: firstResident ? [...game.residents, table.id] : game.residents,
     };
     statements.unshift(assertion(db, '(SELECT version FROM characters WHERE id = ?) = ?', [row.id, row.version]));
-    statements.push(db.prepare('UPDATE characters SET gold = gold + ?, card_game = ?, version = version + 1 WHERE id = ?').bind(payout.gold + payout.daily, JSON.stringify(next), row.id));
+    statements.push(db.prepare('UPDATE characters SET gold = gold + ?, card_game = ?, version = version + 1 WHERE id = ?').bind(payout.gold + payout.daily + cardGold, JSON.stringify(next), row.id));
     if (card) statements.push(...cardUpserts(db, row.id, [card], now));
   }
   return { statements, summary };

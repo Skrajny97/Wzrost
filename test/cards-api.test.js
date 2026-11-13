@@ -17,6 +17,7 @@ import { beforeEach, describe, test } from 'node:test';
 import {
   areaLand,
   cardComes,
+  cardHomes,
   cardKind,
   cardRarity,
   cardsUpTo,
@@ -278,6 +279,36 @@ describe('Talia Systemu through the API', () => {
     match = await lastCards(99, 1);
     const again = await turn({ round: match.round, lines: match.me.lines });
     assert.deepEqual([again.data.end.gold, again.data.end.daily, again.data.end.card], [2 * stake, 0, null]);
+  });
+
+  // The author's 919 B (13.11.2026): a tier's first win whose card would be
+  // lost, every card of its rarity being at the top level already, gives
+  // the tier's stake once more instead, and says so.
+  test('a first win with every card of the tier\'s rarity at the top level gives the stake once more instead of the card', async () => {
+    await call('POST', '/api/cards/starter', { cookie });
+    const tier = hostTier(1, content);
+    const stake = tierStake(tier, 30, content);
+    const reward = explorationGold(tier.rewardMinutes, 30);
+    const { id } = await row();
+    const database = await db();
+    const fitting = [...cardHomes(content).keys()].filter((monster) => cardRarity(monster, content) === tier.firstWin.rarity);
+    assert.ok(fitting.length > 0);
+    for (const monster of fitting) {
+      await database
+        .prepare('INSERT INTO cards (character_id, monster_id, copies, created_at) VALUES (?, ?, ?, ?) ON CONFLICT (character_id, monster_id) DO UPDATE SET copies = excluded.copies')
+        .bind(id, monster, rules.stats.maxLevel, Date.now())
+        .run();
+    }
+    await start(1, true);
+    const match = await lastCards(99, 1);
+    const won = await turn({ round: match.round, lines: match.me.lines });
+    assert.equal(won.status, 200, JSON.stringify(won.data));
+    assert.equal(won.data.end.result, 'won');
+    assert.equal(won.data.end.card, null);
+    assert.equal(won.data.end.cardGold, stake);
+    assert.equal((await row()).gold, 100000 - stake + 2 * stake + reward + stake);
+    // The tier counts as beaten: the next win there is a plain one.
+    assert.equal(won.data.cards.tiers[0].beaten, true);
   });
 
   test('a draw gives the stake back, a lost match nothing', async () => {
