@@ -134,9 +134,12 @@ const DEFAULT_LOOK = { color: '#8fe3ef' };
 export const lookOf = (event) => artChain(event.skill).map((id) => SKILL_LOOKS[id]).find(Boolean) ?? DEFAULT_LOOK;
 
 // `kit` is what the arena shares: its cards, its effects layer and its
-// animation helpers, so every animation here can be cancelled with the rest.
+// animation helpers, so every animation here can be cancelled with the rest,
+// and its measures: where an element stands on the arena's stage as its box
+// (`boxOf`) or its middle (`centerOf`), by the page's layout, so the camera's
+// zoom (arena-fx.js) does not shift them.
 export function skillEffects(kit) {
-  const { animate, centerOf, cards, fx, row, reduced, wait } = kit;
+  const { animate, boxOf, centerOf, cards, fx, row, reduced, wait } = kit;
 
   // A small element in the effects layer at a point, removed when done.
   function spark(className, { x, y }, style = {}) {
@@ -219,7 +222,7 @@ export function skillEffects(kit) {
   function specks(id, color, { count = 7, rise = true } = {}) {
     const entry = cards.get(id);
     if (!entry) return Promise.resolve();
-    const box = entry.card.getBoundingClientRect();
+    const box = boxOf(entry.card);
     const { x, y } = centerOf(entry.card);
     const all = Array.from({ length: count }, (_, index) => {
       const dx = ((index + 0.5) / count - 0.5) * box.width * 0.8;
@@ -243,9 +246,8 @@ export function skillEffects(kit) {
   function overRow() {
     const target = row('enemy');
     if (!target) return null;
-    const frame = kit.arena.getBoundingClientRect();
-    const box = target.getBoundingClientRect();
-    const clip = spark('fx-clip', { x: box.left - frame.left, y: box.top - frame.top });
+    const box = boxOf(target);
+    const clip = spark('fx-clip', { x: box.x, y: box.y });
     clip.style.width = `${box.width}px`;
     clip.style.height = `${box.height}px`;
     return clip;
@@ -345,10 +347,9 @@ export function skillEffects(kit) {
         copy.classList.add('fx-ghost');
         copy.removeAttribute('aria-label');
         copy.style.setProperty('--fx', color);
-        const box = entry.card.getBoundingClientRect();
-        const frame = kit.arena.getBoundingClientRect();
-        copy.style.left = `${box.left - frame.left}px`;
-        copy.style.top = `${box.top - frame.top}px`;
+        const box = boxOf(entry.card);
+        copy.style.left = `${box.x}px`;
+        copy.style.top = `${box.y}px`;
         copy.style.width = `${box.width}px`;
         copy.style.height = `${box.height}px`;
         fx.append(copy);

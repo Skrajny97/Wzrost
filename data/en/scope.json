@@ -1017,6 +1017,7 @@
     "src/client/screens/stats.js",
     "src/client/area-art.js",
     "src/client/arena.js",
+    "src/client/arena-fx.js",
     "src/client/camp-art.js",
     "src/client/event.js",
     "src/client/narrator.js",
@@ -1138,7 +1139,8 @@
     "src/client/screens/core.js",
     "src/engine/cards.js",
     "src/server/cards.js",
-    "src/client/cards.js"
+    "src/client/cards.js",
+    "src/client/cards-fx.js"
   ],
   "ignore": [
     "w z na nie się sie jest że ze co jak ktoś ktos gdzie mam masz ma czy ale tak już juz jestem dla po od ja ty mi mnie tu tam jaki jakie który ktory kto ile bo też tez teraz jeszcze może moze wszyscy wszystkim proszę prosze dzięki dzieki siema hej cześć czesc elo spoko fajnie fajny dobry dobra dobre poziom poziomie mój moj twój twoj ten ta tego tym kiedy coś cos nic był byl była byla będzie bedzie trzeba warto chyba bardzo",

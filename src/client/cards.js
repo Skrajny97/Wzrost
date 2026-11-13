@@ -18,8 +18,15 @@
 // turn is one request; the page keeps the turn being laid until "Walcz". The
 // words of the data come with the server's view (data/cards.json), the rest
 // is the page's (t()).
+//
+// The table moves (cards-fx.js, the author's pick 895 C „Widowiskowe”): a
+// card laid flies to its line, the round plays blow by blow before the table
+// is drawn anew, Szczęsny's cards and the reserve's are dealt, and the end
+// and the cards won come in. With the game's animations off ("Animacje",
+// motion.js) every change shows at once.
 
 import { areaArtUrl, monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
+import { createCardsFx, fxDroppedCards } from './cards-fx.js';
 import { h, icon } from './dom.js';
 import { formatNumber } from './format.js';
 import { t } from './i18n.js';
@@ -116,6 +123,10 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
   let ended = null;
   // Whether the table took the whole tab last time (onLayout).
   let wasPlaying = false;
+  // The table's motion (cards-fx.js), with the game's animations on, and a
+  // redraw asked for while it plays.
+  const fx = createCardsFx(holder);
+  let deferred = false;
 
   const playing = () => Boolean(view?.match) && !building;
 
@@ -166,6 +177,86 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
   const typeIcon = (id, size = 14) => typeBadge(id, size, typeOf(id));
   // The tab's card faces, with its view's types.
   const face = (card, options = {}) => cardFace(card, { ...options, types: view.types });
+  // A card of the match marked with its side and key, for its motion.
+  const withKey = (element, side, key) => {
+    element.dataset.fx = `${side}:${key}`;
+    return element;
+  };
+
+  // A redraw after a card laid or taken back: with the animations on, the
+  // cards that changed their place fly there.
+  function renderLaid() {
+    const before = fx.on() ? fx.measure() : null;
+    render();
+    if (before) fx.lay(before);
+  }
+
+  // One run of the table's motion; a redraw asked for meanwhile follows it.
+  async function fxPlay(play) {
+    const run = fx.begin();
+    try {
+      await play(run);
+    } catch (error) {
+      // The motion never stops the game: its table is drawn as it is.
+      console.error('cards-fx', error);
+      run.skip();
+    }
+    fx.finish(run);
+    if (deferred && !gone) {
+      deferred = false;
+      render();
+    }
+  }
+
+  // "Walcz" with the animations on: the round played on the table as it
+  // stood, then the table drawn anew with what came after it (Szczęsny's new
+  // cards, the reserve dealt) or the match's end.
+  async function foughtWithFx(answer, goldBefore) {
+    const end = answer.end ?? null;
+    const words = end ? view.texts[{ won: 'win', lost: 'loss', drawn: 'draw' }[end.result]] : null;
+    const said = words ? oneOf(words) : null;
+    const played = end ? answer.played : answer.cards.match;
+    const previous = view.match;
+    const mine = myCards(previous);
+    const shown = {
+      me: new Map(
+        plan.lines
+          .filter((key) => key !== null)
+          .map((key) => {
+            const card = mine.get(key);
+            return [key, plan.skill?.kind === 'shift' && plan.skill.card === key ? { ...card, type: plan.skill.type } : card];
+          }),
+      ),
+      foe: new Map(previous.foe.lines.filter(Boolean).map((card) => [card.key, card])),
+    };
+    if (end?.mode === 'staked' && end.result !== 'lost') fx.holdGold(goldBefore, answer.character?.gold ?? goldBefore);
+    let sounded = false;
+    const endSound = () => {
+      if (sounded || !end) return;
+      sounded = true;
+      playSound(end.result === 'won' ? 'chest' : 'tick');
+    };
+    const run = fx.begin();
+    let coinsDone = false;
+    try {
+      ({ coinsDone } = await fx.round(run, { last: played?.last, shown, after: played, end: end && { ...end, words: said }, types: view.types, onEnd: endSound }));
+    } catch (error) {
+      console.error('cards-fx', error);
+      run.skip();
+    }
+    endSound();
+    if (end) ended = { ...end, words: said };
+    plan = null;
+    deferred = false;
+    // The table drawn anew in between, the run going on over it.
+    fx.finish(run);
+    apply(answer);
+    if (end) showTab();
+    await fxPlay((next) => {
+      if (run.skipped) next.skip();
+      return end ? fx.ended(next, { end, coinsDone }) : fx.enter(next, { previous, match: view.match });
+    });
+  }
 
   // Card backs (886 D): Szczęsny's hidden reserve, a card each, and a
   // deck's pile.
@@ -207,6 +298,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
               playSound('chest');
               apply(answer);
               toast(view.texts.starterTaken);
+              if (fx.on()) await fxPlay((run) => fx.dealt(run, [...holder.querySelectorAll('.cards-deck .tcard')], { show: true }));
             }),
         }),
     );
@@ -278,6 +370,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
         playSound('swing');
         apply(answer);
         showTab();
+        if (fx.on()) await fxPlay((run) => fx.enter(run, { previous: null, match: view.match }));
       });
     return h(
       'section',
@@ -519,7 +612,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
     }
     plan.skill = null;
     aiming = null;
-    render();
+    renderLaid();
   }
   function chooseOwn(key) {
     const kind = skillKind();
@@ -547,7 +640,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
       plan.lines[line] = card.key;
       plan.skill = { kind: 'swap', card: aiming.card, swap: card.key };
       aiming = null;
-      render();
+      renderLaid();
       return;
     }
     if (aiming) return;
@@ -562,7 +655,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
       plan.lines[empty[0]] = picked;
       picked = null;
     }
-    render();
+    renderLaid();
   }
 
   // A tap on one of my lines: a card laid there, a card laid this turn
@@ -586,7 +679,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
       plan.lines[line] = null;
       if (plan.skill?.card === key) plan.skill = null;
     } else return;
-    render();
+    renderLaid();
   }
 
   function tapFoe(line) {
@@ -620,10 +713,14 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
         const target = side === 'foe' ? aiming?.step === 'target' && card : aiming?.step === 'card' && card;
         const aimedAt = side === 'foe' && plan.skill?.kind === 'aim' && plan.skill.target === line;
         const content = shownCard
-          ? face(shownCard, {
-              marks: { blow, advantage: blowsNow.strong[side][line], fresh, skill: skillMark ?? (aimedAt ? t('cel') : null), target },
-              onClick: side === 'foe' ? (aiming?.step === 'target' ? () => tapFoe(line) : null) : () => tapMine(line),
-            })
+          ? withKey(
+              face(shownCard, {
+                marks: { blow, advantage: blowsNow.strong[side][line], fresh, skill: skillMark ?? (aimedAt ? t('cel') : null), target },
+                onClick: side === 'foe' ? (aiming?.step === 'target' ? () => tapFoe(line) : null) : () => tapMine(line),
+              }),
+              side,
+              shownCard.key,
+            )
           : side === 'me'
             ? slot(t('Puste'), () => tapMine(line), picked !== null)
             : slot(t('Puste'));
@@ -701,7 +798,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
           ? h(
               'div',
               { class: 'tcard-grid tcard-grid--reserve' },
-              reserve.map((card) => face(card, { marks: { picked: picked === card.key, target: aiming?.step === 'swap' }, onClick: () => tapReserve(card) })),
+              reserve.map((card) => withKey(face(card, { marks: { picked: picked === card.key, target: aiming?.step === 'swap' }, onClick: () => tapReserve(card) }), 'me', card.key)),
             )
           : h('p', { class: 'muted', text: t('Rezerwa pusta.') }),
         aiming?.step === 'type' &&
@@ -753,8 +850,13 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
           disabled: !ready || Boolean(aiming),
           onClick: (event) =>
             withButton(event.currentTarget, async () => {
+              const goldBefore = state.character.gold;
               const answer = await call('POST', '/api/cards/turn', { round: plan.round, lines: plan.lines, skill: plan.skill ? { card: plan.skill.card, target: plan.skill.target, type: plan.skill.type, swap: plan.skill.swap } : null });
               playSound('swing');
+              if (fx.on() && !gone) {
+                await foughtWithFx(answer, goldBefore);
+                return;
+              }
               if (answer.end) {
                 const words = view.texts[{ won: 'win', lost: 'loss', drawn: 'draw' }[answer.end.result]];
                 ended = { ...answer.end, words: words ? oneOf(words) : null };
@@ -796,6 +898,11 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
   // --- The tab -------------------------------------------------------------
 
   function render() {
+    // While the table's motion plays, the redraw waits for its end.
+    if (fx.holding()) {
+      deferred = true;
+      return;
+    }
     clearTimeout(timer);
     if (failure) {
       holder.replaceChildren(systemPanel(failure.message));
@@ -817,7 +924,8 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
         tiersCard(),
         h('section', { class: 'card' }, howItWorks(null, view.texts.rules)),
       ];
-    holder.replaceChildren(h('div', { class: 'stack cards-tab' }, body));
+    fx.cancelFlights();
+    holder.replaceChildren(h('div', { class: `stack cards-tab${fx.on() ? ' cfx-on' : ''}` }, body));
     // The table takes the whole tab while a match is on: the Salon's
     // resident card folds away (screens/settlement.js).
     if (playing() !== wasPlaying) {
@@ -838,6 +946,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
     unmount() {
       gone = true;
       clearTimeout(timer);
+      fx.stop();
     },
   };
 }
@@ -846,7 +955,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
 // small, new or with its level now, and the way to the Salon's tab.
 export function droppedCardsSection(cards) {
   if (!cards?.length) return null;
-  return h(
+  const section = h(
     'section',
     { class: 'report-section', 'aria-labelledby': 'cards-title', 'data-guide': 'report-cards' },
     h('h2', { class: 'section-title section-title--art', id: 'cards-title' }, icon('dice', { size: 20 }), t('Karty ({count})', { count: cards.length })),
@@ -869,4 +978,7 @@ export function droppedCardsSection(cards) {
     ),
     h('a', { class: 'button button--world', href: '#/osada/casino/cards', text: t('Talia Systemu w Salonie Gier') }),
   );
+  // With the animations on, the cards turn face up once in sight.
+  fxDroppedCards(section);
+  return section;
 }
