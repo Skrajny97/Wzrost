@@ -3111,9 +3111,7 @@ a.segmented-option {
 }
 
 .region-later-text > strong {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: break-word;
 }
 
 .region-later-text > span {
