@@ -506,6 +506,12 @@ export async function beginHunt(
     // moves back with a skip): a trial of the Próby Gildii moves on only
     // with what set out after its taking (takenBefore in guild-trials.js).
     begun: now,
+    // The character's and the class's levels as it sets out, which its fights
+    // count when the report is claimed (the author's 924 A, 13.11.2026), not
+    // a level gained on the way (the Labirynt, a party's event): the
+    // creatures, the rest after fights, the HP, the damage and the stats of
+    // the levels. Kept on a Drużyna's trip too, for each member's own part.
+    levels: { level: player.row.level, classLevel: player.row.class_level },
     ...(rumor > 1 && { rumor }),
     ...(rareMore > 0 && { rareMore }),
     ...(materialsMore > 0 && { materialsMore }),
@@ -758,8 +764,13 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   // (beginHunt), not those the Awatar's report brought on the way; an
   // exploration begun before 0.2.72 keeps none and counts them as now.
   const character = { ...engineCharacter(row), ...(options.professions && { professions: options.professions }) };
+  // The fights (and an event's at the end) count the character's and the
+  // class's levels as it set out (beginHunt, 924 A); the XP and the levels
+  // the report brings still go onto the character as it is now (applyHunt).
+  // An exploration begun before 0.3.24 keeps none and counts them as now.
+  const fighter = options.levels ? { ...character, level: options.levels.level, classLevel: options.levels.classLevel } : character;
   // region_id holds the inner region (or a whole region, from before them).
-  const area = areaFor(activity.region_id, row.level, content());
+  const area = areaFor(activity.region_id, fighter.level, content());
   // The very first exploration, before any report, goes one way (simulateHunt).
   const first = !(await db.prepare('SELECT 1 AS found FROM reports WHERE character_id = ? LIMIT 1').bind(row.id).first());
   // A Drużyna's trip: its fights from the trip's roster and seed, the same
@@ -781,7 +792,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   const collection = cardsOn() && content().cards ? await cardCollection(db, row.id) : null;
   let hunt = simulateHunt(
     {
-      character,
+      character: fighter,
       equipped: equippedItems(player),
       hp: activity.hp_at_start,
       name: row.name,
@@ -906,7 +917,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
         caseId: forcedCase,
         endingId: forcedEnding,
         drafts: eventDraftsOn(),
-        character,
+        character: fighter,
         equipped: equippedItems(player),
         name: row.name,
         seed: activity.seed,
