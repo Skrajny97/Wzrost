@@ -33,11 +33,16 @@ const introOver = (character) => !character?.tutorial || character.tutorial.incl
 
 // The free points of a report that raised a level, spent from its System
 // words (894.5 A, 13.11.2026): "Rozdaj według klasy" at once, or "Rozdaj
-// ręcznie" in the Statystyki; after the introduction only.
+// ręcznie" in the Statystyki; after the introduction only, and not while
+// the character is away on an exploration or a mercenary's service, whose
+// points wait for its return (the server says "Postać jest na wyprawie";
+// the code review, 13.11.2026: a Labirynt's or a party event's new level
+// comes then too).
 function pointsBox(report) {
   const character = state.character;
   const summary = report.summary;
   if (!introOver(character) || !isUnlocked('stats') || !(character.freePoints > 0)) return null;
+  if (['hunt', 'mercenary'].includes(character.activity?.kind)) return null;
   if (!(summary?.levelAfter > summary?.levelBefore) && !(summary?.classLevelAfter > summary?.classLevelBefore)) return null;
   const box = h('div', { class: 'report-points' });
   const auto = h('button', {

@@ -330,6 +330,9 @@ describe('the Labirynt Systemu through the API', () => {
     assert.equal(away.data.room.won, true);
     assert.equal(away.data.character.level, 61);
     assert.ok(!away.data.report.system.some((line) => heals.has(line)), away.data.report.system.join(' | '));
+    // Its free points wait for the return too, so the report offers no
+    // "Rozdaj według klasy" then (screens/report.js: pointsBox).
+    assert.equal((await call('POST', '/api/character/points/auto', { cookie })).data.error?.code, 'busy');
     // At home the same new level heals, and says so.
     await database.prepare('DELETE FROM activities').run();
     await set(`labyrinth = '{}', level = 60, xp = ?`, xpToNext(60, content) - 1);
