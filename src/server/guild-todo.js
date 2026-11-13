@@ -11,20 +11,23 @@
 // Skrzynia Gildii (guild-chest.js; the author, 10.11.2026: an item left
 // for one member lights its dot). The page asks
 // for it about once a minute (src/client/chat-news.js) and after its
-// actions in the guild.
+// actions in the guild. The cards of Talia Systemu left by the Próby
+// finished since the last look (903, trialCards in guild-trials.js) come
+// with it, for the page's toast.
 
 import { beastView } from './guild-beast.js';
 import { chestWaiting } from './guild-chest.js';
 import { expeditionView } from './guild-expedition.js';
 import { requestsView } from './guild-requests.js';
-import { guildPlayer, trialsView } from './guild-trials.js';
+import { guildPlayer, trialCards, trialsView } from './guild-trials.js';
 import { json } from './http.js';
 
 // GET /api/guild/todo: {todo: {trials, beast, expedition, requests,
-// chest}}, or {todo: null} outside a guild.
+// chest}, cards?}, or {todo: null} outside a guild.
 export async function getGuildTodo(context) {
   const { player, guild, db } = await guildPlayer(context);
   if (!guild) return json({ todo: null });
+  const cards = await trialCards(db, player, context.now);
   const [trials, beast, expedition, requests, chest] = await Promise.all([
     trialsView(db, player, guild, context.now),
     beastView(db, player.row, context.now, player.activity),
@@ -45,5 +48,6 @@ export async function getGuildTodo(context) {
       requests: Boolean(requests.mine?.gifts.some((gift) => !gift.thanked)),
       chest,
     },
+    ...(cards.length > 0 && { cards }),
   });
 }

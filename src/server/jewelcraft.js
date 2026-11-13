@@ -26,6 +26,7 @@ import {
 import { say } from '../engine/text.js';
 import { content } from './content.js';
 import { characterView, coreOf, currentHp, loadPlayer, questsNow, requireNotExploring, requireWorker, workOf } from './characters.js';
+import { cardSummary, cardUpserts, workCard } from './cards.js';
 import { labyrinthOn } from './features.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
@@ -257,6 +258,8 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
   // and ends the work.
   async function saveReport(returned, made, minutes, item) {
     const { character, after, xp, work, sets } = workGains(player, profession, before, minutes, avatar, now);
+    // A card the work may leave, by the time it lasted (903, cards.js).
+    const card = await workCard(db, row, activity, minutes);
     const report = {
       ...jewelReport(
         {
@@ -276,6 +279,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
         content(),
       ),
       ...(avatar && { avatar: true }),
+      ...(card && { cards: card.cards }),
     };
     const summary = {
       placeName: report.placeName,
@@ -289,6 +293,7 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
       levelAfter: work.level,
       system: report.system,
       ...(avatar && { avatar: true }),
+      ...(card && { cards: cardSummary(card.cards) }),
     };
     const minerals = addTo('minerals', returned);
     const store = db.prepare('INSERT INTO storage_items (character_id, data, created_at) VALUES (?, ?, ?)');
@@ -318,6 +323,8 @@ export async function finishJewels(db, player, now, { stop = false, avatar = fal
         ...jewels.map((jewel) => store.bind(row.id, JSON.stringify(jewel), now)),
         // The Punkty Sławy of the work (fame.js), the Awatar's a quarter.
         ...workFamePoints(db, row.id, minutes, avatar, now),
+        // The card the work left, a copy (cards.js).
+        ...cardUpserts(db, row.id, card?.ids ?? [], now),
         end,
       ]);
     } catch (error) {

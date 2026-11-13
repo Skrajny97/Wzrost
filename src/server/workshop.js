@@ -32,6 +32,7 @@ import {
 } from '../engine/index.js';
 import { content } from './content.js';
 import { characterView, craftingState, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, walletOf, workOf } from './characters.js';
+import { cardSummary, cardUpserts, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
@@ -235,6 +236,8 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
   }
 
   const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);
+  // A card the work may leave, by the time it lasted (903, cards.js).
+  const card = await workCard(db, row, activity, worked);
   const report = {
     ...workshopReport(
       {
@@ -257,6 +260,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
       content(),
     ),
     ...(avatar && { avatar: true }),
+    ...(card && { cards: card.cards }),
   };
   const summary = {
     placeName: report.placeName,
@@ -269,6 +273,7 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
     levelAfter: work.level,
     system: report.system,
     ...(avatar && { avatar: true }),
+    ...(card && { cards: cardSummary(card.cards) }),
   };
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { made: made.length }));
   const store = db.prepare('INSERT INTO storage_items (character_id, data, created_at) VALUES (?, ?, ?)');
@@ -296,6 +301,8 @@ export async function finishCrafting(db, player, now, { stop = false, avatar = f
       ...workFamePoints(db, row.id, worked, avatar, now),
       // The items made wait in the Przechowalnia, out of the bag (842).
       ...made.map((item) => store.bind(row.id, JSON.stringify(item), now)),
+      // The card the work left, a copy (cards.js).
+      ...cardUpserts(db, row.id, card?.ids ?? [], now),
       end,
     ]);
   } catch (error) {

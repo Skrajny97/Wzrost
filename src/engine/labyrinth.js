@@ -22,8 +22,11 @@
 // end of the day and add up. Rewards (857): a fight the XP and gold of one
 // fight of an exploration of rewardMinutes, an elite and a treasure Odłamki
 // Rdzenia and gold, a guardian an Artefakt (core.js), its rarity by the
-// level's weights. Pure: the server keeps the state, the time and the seeds.
+// level's weights; and where Talia Systemu is on, the creatures beaten may
+// leave their cards (903, cards.js). Pure: the server keeps the state, the
+// time and the seeds.
 
+import { cardDrop } from './cards.js';
 import { combatantView, exploreStrength, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
 import { companionCombatant } from './companions.js';
@@ -535,12 +538,14 @@ export function roomRefusal(state, map, target) {
 // A treasure gives Odłamki and gold, a spring heals everyone, an altar
 // offers blessings, a merchant waits with its wares. Blessing Oddech
 // Labiryntu heals those standing after each won fight. `seed`: the
-// server's, for the fight and its loot. Returns the new state, what the
-// room gave and, for a fight, the hunt.
+// server's, for the fight and its loot. `party.cards`: Talia Systemu's
+// cards where the game has them on ({ maxed }, as an exploration's): the
+// creatures beaten in a won fight may leave theirs (labyrinthFight). Returns
+// the new state, what the room gave and, for a fight, the hunt.
 /**
  * @param {LabyrinthState} state
  * @param {{ row: number, room: number }} target
- * @param {{ character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null }} party
+ * @param {{ character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null, cards?: { maxed?: string[] } | null }} party
  * @param {string} seed
  * @param {Content} content
  */
@@ -659,14 +664,20 @@ export const leaveMerchant = (state) => (state.pending?.kind === 'merchant' && !
 // level, row, room and type, whether it was won and every fighter's HP as a
 // share after it. A won ordinary fight pays as a fight of an exploration of
 // rewardMinutes (the XP as in the Wieże, less for each companion, and the
-// gold of the creatures); an elite and a guardian pay nothing here.
+// gold of the creatures); an elite and a guardian pay nothing here. With
+// `party.cards` (Talia Systemu, 903), each creature beaten in a won fight
+// may leave its own card by its kind's chance, as on an exploration (the
+// guardian's by the guardians'), at most one of a creature a fight and none
+// at its top level (`maxed`); drawn from the day's seed and the room, so
+// the fight and its loot go as without them, and the hunt has them
+// (`cards`).
 /**
- * @param {{ state: LabyrinthState, type: string, row: number, room: number, party: { character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null }, seed: string }} options
+ * @param {{ state: LabyrinthState, type: string, row: number, room: number, party: { character: Record<string, any>, equipped: Record<string, any>[], name: string, companions?: Record<string, any>[], trophies?: Record<string, any>, week?: Record<string, any> | null, cards?: { maxed?: string[] } | null }, seed: string }} options
  * @param {Content} content
  * @returns {Record<string, any>}
  */
 export function labyrinthFight({ state, type, row, room, party, seed }, content) {
-  const { character, trophies = {}, week = null } = party;
+  const { character, trophies = {}, week = null, cards = null } = party;
   const plan = labyrinthFoes({ day: state.day, level: state.level, row, room, type, charLevel: state.charLevel }, content);
   const area = content.areasById[plan.areaId];
   const rng = createRng(`${seed}:fight`);
@@ -710,6 +721,17 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
     gold = Math.round(fightGold * lengthed * weekFactor(/** @type {any} */ (week), 'gold'));
   }
 
+  // The cards the creatures beaten leave (903), from a seed of their own.
+  /** @type {string[]} */
+  const found = [];
+  if (won && cards && content.cards) {
+    const cardRng = createRng(`${state.seed}:${state.level}:${row}:${room}:cards`);
+    for (const enemy of enemies) {
+      const card = cardDrop(enemy.monsterId, cardRng, { maxed: [...(cards.maxed ?? []), ...found], guardian: type === 'guardian' }, content);
+      if (card) found.push(card);
+    }
+  }
+
   const enemyList = enemies.map((/** @type {{ name: string, level: number }} */ enemy) => word(content, '{name} (poz. {level})', { name: enemy.name, level: enemy.level })).join(', ');
   const start = type === 'guardian' ? 'guardianStart' : type === 'elite' ? 'eliteStart' : 'fightStart';
   const at = row * 3 + room;
@@ -734,6 +756,7 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
     gold,
     materials: {},
     chests: [],
+    ...(cards && { cards: found }),
     recovered: 0,
     allies: allies.map((unit) => combatantView(unit, enemies[0].level, content)),
     enemiesView: enemies.map((/** @type {any} */ enemy) => combatantView(enemy, me.unit.level, content)),
@@ -750,6 +773,8 @@ export function labyrinthFight({ state, type, row, room, party, seed }, content)
     materials: {},
     timePoints: 0,
     items: [],
+    // Talia Systemu's cards the creatures left, with `party.cards` only.
+    ...(cards && { cards: found }),
     hpStart: me.unit.hp,
     hpEnd: hpAfter,
     maxHp: me.unit.maxHp,

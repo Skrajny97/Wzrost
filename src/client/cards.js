@@ -951,8 +951,10 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
   };
 }
 
-// The cards an exploration left, in its report (hunts.js): each card's face
-// small, new or with its level now, and the way to the Salon's tab.
+// The cards an exploration, a room of the Labirynt or a profession's work
+// left, in its report (hunts.js, labyrinth.js, the professions' claims):
+// each card's face small, new or with its level now, and the way to the
+// Salon's tab.
 export function droppedCardsSection(cards) {
   if (!cards?.length) return null;
   const section = h(

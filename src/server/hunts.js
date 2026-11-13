@@ -748,11 +748,12 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   // out with.
   const claimed = claimWindows(options, buffsOf(row, now), Boolean(trip));
   // Talia Systemu (cards.js), where the game has it on: the creatures beaten
-  // may leave their cards (874 A), none of a card at its top level, and the
-  // collection's bonus gives more XP and gold (884 A, card-collection.js),
-  // from the cards won before this report. The collection as read; the
-  // claim holds only while the character is, and every change of the
-  // collection changes it too.
+  // may leave their cards (874 A), each fight won a card of a lower land's
+  // creature, one the character has not got first (902 B), none of a card
+  // at its top level, and the collection's bonus gives more XP and gold
+  // (884 A, card-collection.js), from the cards won before this report. The
+  // collection as read; the claim holds only while the character is, and
+  // every change of the collection changes it too.
   const collection = cardsOn() && content().cards ? await cardCollection(db, row.id) : null;
   let hunt = simulateHunt(
     {
@@ -795,7 +796,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
       hard: !trip && options.hard === true,
       // The week it set out in (weeks.js), none before the weeks.
       week: keptWeek(options),
-      cards: collection && { maxed: maxedCards(collection), ...cardExplorationBonus(collection.size, content()) },
+      cards: collection && { maxed: maxedCards(collection), owned: [...collection.keys()], ...cardExplorationBonus(collection.size, content()) },
     },
     content(),
   );
