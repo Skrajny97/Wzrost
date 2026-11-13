@@ -652,6 +652,10 @@
     "0.3.13": {
       "title": "Version 0.3.13",
       "body": "- An item or the Core that already holds a stone can only take a stronger one. A weaker stone no longer takes the place of a stronger one."
+    },
+    "0.3.14": {
+      "title": "Version 0.3.14",
+      "body": "- A very long character name fits in its card on the character choice screen, on narrow phones too."
     }
   }
 }
