@@ -839,14 +839,25 @@ export function mountChat(container, { bar, person = null, mention = null, id = 
     taggedParts(words, message.mentions ?? []).map((part) => (typeof part === 'string' ? part : h('span', { class: 'chat-tag', text: part.tag })));
 
   // New messages at the bottom, the oldest over the limit gone from the top.
-  // The page follows them down unless the player reads further up.
+  // The page follows them down unless the player reads further up. Each
+  // goes in by its id: an answer asked for before the player's own message
+  // was sent and come after it puts the others' messages above it, where
+  // they were written, not under it (the code review of 13.11.2026).
   function add(fresh) {
     const known = new Set(messages.map((message) => message.id));
-    const added = fresh.filter((message) => !known.has(message.id));
+    const added = fresh.filter((message) => !known.has(message.id)).sort((a, b) => a.id - b.id);
     if (added.length === 0) return false;
     const follow = messages.length === 0 || atBottom() || added.some((message) => message.own);
-    messages.push(...added);
-    list.append(...added.map(messageItem));
+    for (const message of added) {
+      const at = messages.length === 0 || message.id > messages.at(-1).id ? -1 : messages.findIndex((shown) => shown.id > message.id);
+      if (at < 0) {
+        messages.push(message);
+        list.append(messageItem(message));
+      } else {
+        messages.splice(at, 0, message);
+        list.children[at].before(messageItem(message));
+      }
+    }
     while (messages.length > SHOWN) {
       messages.shift();
       list.firstElementChild?.remove();
