@@ -36,7 +36,7 @@ const TABLE = '#/osada/casino/cards';
 const POLL_MS = 2000;
 // The answers that end a challenge before it could be accepted: its sheet
 // goes too.
-const LAPSED = ['offline', 'no_deck_other', 'no_gold_other', 'stakes_used_other', 'busy', 'answered', 'no_duel'];
+const LAPSED = ['offline', 'no_deck_other', 'no_gold_other', 'stakes_used_other', 'busy', 'answered', 'no_duel', 'withdrawn'];
 
 // The {…} of a text filled in, and its [a|b] in the form for a woman (a) or
 // a man (b).
@@ -49,7 +49,7 @@ const say = (text, vars, female = false) => gendered(filled(text, vars), female)
 // step, deadline, round }, or null.
 let news = null;
 // The table's words and shape, from the latest answer of the duel's own
-// reads: { texts, types, lines, typeBonus, turnSeconds, acceptSeconds, cut,
+// reads: { texts, types, lines, typeBonus, turnSeconds, firstMoveSeconds, acceptSeconds, cut,
 // used, limit }.
 let table = null;
 // The challenge this page sent, until its answer: { id, other }.
@@ -69,8 +69,8 @@ let followed = null;
 
 function take(answer) {
   if (answer?.texts) {
-    const { texts, types, lines, typeBonus, turnSeconds, acceptSeconds, cut, used, limit } = answer;
-    table = { texts, types, lines, typeBonus, turnSeconds, acceptSeconds, cut, used, limit };
+    const { texts, types, lines, typeBonus, turnSeconds, firstMoveSeconds, acceptSeconds, cut, used, limit } = answer;
+    table = { texts, types, lines, typeBonus, turnSeconds, firstMoveSeconds, acceptSeconds, cut, used, limit };
   }
 }
 
@@ -84,6 +84,27 @@ const tableInSight = () => [...tables].some((one) => one.inSight());
 // Nothing of the narrator's on the screen or due (a character made before
 // the introduction has none, as weeks.js counts it) and no other sheet open.
 const quiet = () => (state.character?.tutorial === null || narratorIdle()) && !document.querySelector('dialog[open]');
+
+// The character's live match while it runs, as the chat's poll or the
+// table last saw it, or null. No other match starts meanwhile (the
+// server's withoutDuel), so the residents' tables wait for it (cards.js).
+export const liveMatch = () => (news?.state === 'playing' ? news : null);
+
+// Told when a live match begins or ends (liveMatch): at once from the
+// chat's poll and the table, and from any other change within a second, as
+// the page's ticker looks (offerDuel).
+const liveWatchers = new Set();
+let wasLive = false;
+export function onLiveMatch(listener) {
+  liveWatchers.add(listener);
+  return () => liveWatchers.delete(listener);
+}
+function tellLive() {
+  const live = Boolean(liveMatch());
+  if (live === wasLive) return;
+  wasLive = live;
+  for (const listener of liveWatchers) listener();
+}
 
 // --- The chat's poll -------------------------------------------------------
 
@@ -103,6 +124,7 @@ export function duelSeen(next) {
     followed = null;
     tellEnd(id);
   }
+  tellLive();
 }
 
 // A match over while its table was not on the screen: how it ended, in a
@@ -159,6 +181,16 @@ async function openChallenge(person) {
   const open = (one) => one.stake === 0 || (one.stake <= gold && table.used < table.limit && !offer.theirsFull);
   // At first the highest stake the player can play for.
   let chosen = [...offer.stakes].reverse().find(open) ?? offer.stakes[0];
+  // „Wycofaj” (917 A): the player's own challenge waiting for its answer
+  // goes at once, and the sheet comes anew, open for a challenge.
+  const withdraw = async () => {
+    const { id } = offer.waiting;
+    take(await call('POST', '/api/cards/duel/withdraw', { id }));
+    if (waiting?.id === id) waiting = null;
+    if (news?.id === id) news = null;
+    toast(t('Wyzwanie wycofane.'));
+    await openChallenge(person);
+  };
   const send = async () => {
     const sent = await call('POST', '/api/cards/duel/challenge', { id: other.id, stake: chosen.stake });
     take(sent);
@@ -209,7 +241,16 @@ async function openChallenge(person) {
         h('p', { class: 'muted', text: forGold ? filled(texts.limits, { max: formatNumber(offer.max), used: table.used, limit: table.limit }) : filled(texts.lowLevel, { level: offer.minLevel }) }),
         forGold && offer.theirsFull && h('p', { class: 'muted', text: t('{name} nie zagra już dziś o złoto. Bez stawki możecie grać dalej.', { name: other.name }) }),
         h('p', { class: 'muted', text: filled(texts.rules, { name: other.name }) }),
-        offer.block && h('p', { class: 'region-warning', role: 'status', text: offer.block }),
+        // The player's own challenge waiting, with „Wycofaj”, in place of
+        // the words that one is waiting.
+        offer.waiting
+          ? h(
+              'div',
+              { class: 'duel-waiting' },
+              h('p', { class: 'region-warning', role: 'status', text: filled(texts.waiting, { name: offer.waiting.other.name }) }),
+              button(t('Wycofaj'), 'system', withdraw),
+            )
+          : offer.block && h('p', { class: 'region-warning', role: 'status', text: offer.block }),
         h(
           'div',
           { class: 'duel-actions' },
@@ -246,6 +287,11 @@ async function askWaiting() {
   }
   if (duel.state === 'proposed') return;
   waiting = null;
+  // Taken back, here or on another device: nothing more to say.
+  if (duel.state === 'withdrawn') {
+    if (news?.id === id) news = null;
+    return;
+  }
   const { texts } = table;
   const vars = { name: duel.other.name };
   if (duel.state === 'playing' || duel.state === 'done') {
@@ -339,12 +385,34 @@ async function showChallenge(id) {
   tickChallenge();
 }
 
-// The challenge's sheet counts down; once its time is up, it goes.
+// The challenge's sheet counts down; once its time is up, it goes. One the
+// chat's poll no longer brings before its time goes too, saying why: its
+// challenger took it back (917 A), or it lapsed.
 function tickChallenge() {
   if (!popup) return;
   if (!popup.clock.isConnected) {
     popup = null;
     return;
+  }
+  if (news?.id !== popup.id && !popup.asking) {
+    const { id } = popup;
+    popup.asking = true;
+    call('GET', `/api/cards/duel?id=${id}`)
+      .then((answer) => {
+        take(answer);
+        if (popup?.id !== id) return;
+        const duel = answer.duel;
+        if (duel?.state === 'proposed') {
+          popup.asking = false;
+          return;
+        }
+        popup = null;
+        closeSheet();
+        toast(duel?.state === 'withdrawn' ? say(table.texts.withdrawn, { name: duel.other.name }, duel.other.female) : t('Wyzwanie przepadło.'));
+      })
+      .catch(() => {
+        if (popup?.id === id) popup.asking = false;
+      });
   }
   const left = popup.endsAt - serverNow();
   popup.clock.textContent = formatCountdown(left);
@@ -383,6 +451,7 @@ function remindMove() {
 // Called every second by the page's ticker (app.js).
 export function offerDuel() {
   if (!state.character || document.hidden) return;
+  tellLive();
   askWaiting();
   tickChallenge();
   offerChallenge();
@@ -465,6 +534,9 @@ export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () =>
     ended = next;
     endMotion = true;
     followed = null;
+    // Over: the residents' tables need not wait for the chat's next poll.
+    if (news?.id === next.id) news = null;
+    tellLive();
     playSound(next.match.result === 'won' ? 'chest' : 'tick');
     if (next.gold > 0 && fx.on()) fx.holdGold(goldBefore, goldBefore + next.gold);
     if (next.stake > 0) call('GET', '/api/character').catch(() => {});
@@ -846,7 +918,8 @@ export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () =>
   }
 
   // The bar of whose move it is (908.4): „Twój ruch” or the other's name,
-  // the time left of the 30 seconds, and what happens now.
+  // the time left until the server's deadline, of the 35 seconds of a
+  // round's first move or the 30 of the answer (918 B), and what happens now.
   function turnBar(match) {
     const { texts } = table;
     const other = duel.other;
@@ -862,7 +935,8 @@ export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () =>
     ].filter(Boolean);
     const time = h('strong', { class: 'duel-clock' });
     const fill = h('span', { class: 'duel-bar-fill' });
-    clock = { time, fill, deadline: match.deadline, total: (table.turnSeconds ?? 30) * 1000 };
+    const seconds = match.step === match.lead ? (table.firstMoveSeconds ?? table.turnSeconds) : table.turnSeconds;
+    clock = { time, fill, deadline: match.deadline, total: (seconds ?? 30) * 1000 };
     tickClock();
     return h(
       'div',
@@ -938,7 +1012,7 @@ export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () =>
           h('p', { class: 'cards-table-name', text: other.name }),
           h('p', { class: 'cards-table-tier', text: duel.stake > 0 ? filled(texts.tableStaked, { stake: formatNumber(duel.stake) }) : texts.tableFree }),
           h('p', { class: 'muted cards-table-count' }, backs(match.foe.hand), h('span', { text: t('Rezerwa {hand} · talia {deck} · zbite {out}', { hand: match.foe.hand, deck: match.foe.deck, out: match.foe.out }) })),
-          foeHero && h('p', { class: 'muted cards-table-count', text: match.foe.hero.used ? t('Bohater rywala: {skill} (użyta)', { skill: foeHero.name }) : t('Bohater rywala: {skill}', { skill: foeHero.name }) }),
+          foeHero && h('p', { class: 'muted cards-table-count', text: match.foe.hero.used ? t('Bohater rywala: {skill} (już użyty)', { skill: foeHero.name }) : t('Bohater rywala: {skill}', { skill: foeHero.name }) }),
         ),
         h('span', { class: 'cards-round', text: t('Runda {round}/{cap}', { round: match.round, cap: match.cap }) }),
       ),

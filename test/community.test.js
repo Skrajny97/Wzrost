@@ -7,8 +7,9 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import { giftReward, questPeriod } from '../src/engine/index.js';
-import { firstKept } from '../src/server/community.js';
+import { acceptFriend, firstKept, inviteFriend } from '../src/server/community.js';
 import { content } from './helpers/content.js';
+import { meanwhile, posted } from './helpers/meanwhile.js';
 import { useServer } from './helpers/server.js';
 
 // The code review: going back keepDays times 24 hours came a day too late
@@ -109,6 +110,26 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
     assert.equal((await call('GET', '/api/profile/Ola', { cookie: players.ala })).data.profile.relation, null);
   });
 
+  // The author's 921 A (13.11.2026): as with a guild's and a party's
+  // invitation, none while either of the two has hidden the other in chat.
+  test('no friend invitation while either of the two has hidden the other in the chat', async () => {
+    const database = await db();
+    const account = async (name) => (await database.prepare('SELECT user_id FROM characters WHERE name = ?').bind(name).first()).user_id;
+    const [ala, ola] = [await account('Ala'), await account('Ola')];
+    const hide = (who, whom) => database.prepare('INSERT INTO chat_blocks (user_id, blocked_id, name, created_at) VALUES (?, ?, ?, ?)').bind(who, whom, 'x', Date.now()).run();
+    // Ola hid Ala: Ala's invitation is refused, and so is Ola's own.
+    await hide(ola, ala);
+    const refused = await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'Ola' } });
+    assert.equal(refused.status, 409);
+    assert.equal(refused.data.error.code, 'blocked');
+    assert.equal(refused.data.error.message, 'Ola nie przyjmuje teraz zaproszeń od Ciebie.');
+    assert.equal((await call('POST', '/api/friends/invite', { cookie: players.ola, body: { name: 'Ala' } })).data.error.code, 'blocked');
+    assert.deepEqual((await friends(players.ola)).incoming, []);
+    // Hidden no more: the invitation goes.
+    await database.prepare('DELETE FROM chat_blocks').run();
+    assert.equal((await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'Ola' } })).status, 200);
+  });
+
   test('an invitation both ways is a friendship, and nobody below the Społeczność can be invited', async () => {
     await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'Ola' } });
     const back = await call('POST', '/api/friends/invite', { cookie: players.ola, body: { name: 'Ala' } });
@@ -155,6 +176,77 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
     assert.equal((await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'Ola' } })).status, 200);
     await player('Ewa');
     assert.equal((await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'Ewa' } })).data.error.code, 'full');
+  });
+
+  // Characters of Ola's account set aside, made straight in the database:
+  // `count` of them, to fill a list at once. Their ids.
+  async function others(count) {
+    const database = await db();
+    const { id: _, ...ola } = await database.prepare("SELECT * FROM characters WHERE name = 'Ola'").first();
+    const ids = [];
+    for (let index = 0; index < count; index += 1) {
+      const data = { ...ola, name: `Inna${index}`, name_key: `inna${index}`, role: 'aside' };
+      const columns = Object.keys(data);
+      const made = await database
+        .prepare(`INSERT INTO characters (${columns.join(', ')}) VALUES (${columns.map(() => '?').join(', ')})`)
+        .bind(...columns.map((column) => data[column]))
+        .run();
+      ids.push(made.meta.last_row_id);
+    }
+    return ids;
+  }
+  const friendRow = async (from, to, acceptedAt = null) =>
+    (await db()).prepare('INSERT INTO friends (character_id, friend_id, created_at, accepted_at) VALUES (?, ?, 0, ?)').bind(from, to, acceptedAt).run();
+  const idOf = async (name) => (await (await db()).prepare('SELECT id FROM characters WHERE name = ?').bind(name).first()).id;
+  const listOf = async (id) => (await (await db()).prepare('SELECT COUNT(*) AS count FROM friends WHERE character_id = ? OR friend_id = ?').bind(id, id).first()).count;
+
+  // The code review: the cap was counted before the invitation was written,
+  // so two sent at the same moment both went in. Here another invitation of
+  // Ala's lands just before hers is written.
+  test('invitations sent at the same moment never take a list past the cap; the same one twice goes once', async () => {
+    const { max } = content.community.friends;
+    const database = await db();
+    const ala = await idOf('Ala');
+    const filler = await others(max);
+    // One place left: max - 2 friends and an invitation waiting.
+    for (const id of filler.slice(0, max - 2)) await friendRow(ala, id, 0);
+    await friendRow(ala, filler[max - 2]);
+    const invite = (racing) => inviteFriend({ request: posted('/api/friends/invite', players.ala, { name: 'Ola' }), env: { DB: racing }, now: Date.now() });
+    let racing = meanwhile(database, /INTO friends\b/, () => friendRow(ala, filler[max - 1]));
+    await assert.rejects(invite(racing), (error) => error.code === 'full' && error.message === `Masz już ${max} znajomych i zaproszeń. Usuń kogoś, żeby zaprosić nową postać.`);
+    assert.ok(racing.done);
+    assert.equal(await listOf(ala), max);
+    // The same invitation sent twice at once: once, and the second tap
+    // hears it waits (it ended in an error of the server).
+    await database.prepare('DELETE FROM friends WHERE character_id = ? AND friend_id = ?').bind(ala, filler[max - 1]).run();
+    racing = meanwhile(database, /INTO friends\b/, async () => friendRow(ala, await idOf('Ola')));
+    await assert.rejects(invite(racing), (error) => error.code === 'invited' && error.message === 'Zaproszenie dla postaci Ola już czeka.');
+    assert.equal(await listOf(ala), max);
+  });
+
+  test('invitations accepted at the same moment never take a list past the cap; one accepted twice is accepted', async () => {
+    const { max } = content.community.friends;
+    const database = await db();
+    const ala = await idOf('Ala');
+    const filler = await others(max);
+    // One place left: max - 1 friends, and two invitations waiting for her.
+    for (const id of filler.slice(0, max - 1)) await friendRow(ala, id, 0);
+    await friendRow(filler[max - 1], ala);
+    assert.equal((await call('POST', '/api/friends/invite', { cookie: players.ola, body: { name: 'Ala' } })).status, 200);
+    const { id } = await database.prepare('SELECT id FROM friends WHERE character_id = ? AND friend_id = ?').bind(await idOf('Ola'), ala).first();
+    const accept = (racing) => acceptFriend({ request: posted('/api/friends/accept', players.ala, { id }), env: { DB: racing }, now: Date.now() });
+    // The other one accepted just before Ola's is written.
+    let racing = meanwhile(database, /UPDATE friends SET accepted_at/, () => database.prepare('UPDATE friends SET accepted_at = 0 WHERE character_id = ? AND friend_id = ?').bind(filler[max - 1], ala).run());
+    await assert.rejects(accept(racing), (error) => error.code === 'full' && error.message === `Masz już ${max} znajomych. Usuń kogoś, żeby przyjąć zaproszenie.`);
+    assert.ok(racing.done);
+    assert.equal((await database.prepare('SELECT COUNT(*) AS count FROM friends WHERE (character_id = ? OR friend_id = ?) AND accepted_at IS NOT NULL').bind(ala, ala).first()).count, max);
+    assert.equal((await database.prepare('SELECT accepted_at FROM friends WHERE id = ?').bind(id).first()).accepted_at, null);
+    // With a place again, Ola's accepted twice at once: both taps hear it is.
+    await database.prepare('DELETE FROM friends WHERE character_id = ? AND friend_id = ?').bind(filler[max - 1], ala).run();
+    racing = meanwhile(database, /UPDATE friends SET accepted_at/, () => database.prepare('UPDATE friends SET accepted_at = 0 WHERE id = ?').bind(id).run());
+    const answer = await accept(racing);
+    assert.equal(answer.status, 200);
+    assert.equal((await answer.json()).text, 'Ola jest teraz wśród Twoich znajomych.');
   });
 
   test('one Upominek a day to each friend, with its reward for the friend\'s level', async () => {

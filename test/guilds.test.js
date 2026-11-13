@@ -8,7 +8,9 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
+import { inviteToGuild } from '../src/server/guilds.js';
 import { content } from './helpers/content.js';
+import { meanwhile, posted } from './helpers/meanwhile.js';
 import { useServer } from './helpers/server.js';
 
 describe('the Gildia through the API', () => {
@@ -49,6 +51,42 @@ describe('the Gildia through the API', () => {
     await player('trzeci', 'Trzeci');
     assert.equal((await as('trzeci', 'POST', '/api/guild/found', { name: 'leśni bracia', tag: 'XY' })).data.error.code, 'name_taken');
     assert.equal((await as('trzeci', 'POST', '/api/guild/found', { name: 'Inni', tag: 'Lb' })).data.error.code, 'tag_taken');
+  });
+
+  // The code review: the members and the invitations were counted before
+  // the invitation was written, so two sent at the same moment both went
+  // in. Here another write of the guild's lands just before it.
+  test('invitations sent at the same moment never take a guild past its invitations or its members', async () => {
+    const database = await db();
+    assert.equal((await as('mistrz', 'POST', '/api/guild/found', { name: 'Leśni Bracia', tag: 'LB' })).status, 200);
+    const guildId = (await as('mistrz', 'GET', '/api/guild')).data.guild.id;
+    const mistrz = await idOf('Mistrz');
+    const invite = (racing) => inviteToGuild({ request: posted('/api/guild/invite', cookies.mistrz, { name: 'Druh' }), env: { DB: racing }, now: Date.now() });
+    // Others' invitations and members, made straight in the database, by
+    // ids of no character: those from `from` up to `to`.
+    const ids = (from, to) => Array.from({ length: to - from }, (_, index) => 100000 + from + index);
+    const waiting = (from, to) =>
+      database.batch(ids(from, to).map((id) => database.prepare('INSERT INTO guild_invites (guild_id, character_id, invited_by, created_at) VALUES (?, ?, ?, 0)').bind(guildId, id, mistrz)));
+    const members = (from, to) =>
+      database.batch(ids(from, to).map((id) => database.prepare("INSERT INTO guild_members (character_id, guild_id, role, joined_at) VALUES (?, ?, 'member', 0)").bind(id, guildId)));
+    // One invitation fits, and another one lands just before Druh's.
+    const { invites } = content.guilds;
+    await waiting(0, invites - 1);
+    let racing = meanwhile(database, /INTO guild_invites/, () => waiting(invites - 1, invites));
+    await assert.rejects(invite(racing), (error) => error.code === 'too_many_invites' && error.message === `Na odpowiedź czeka już ${invites} zaproszeń.`);
+    assert.ok(racing.done);
+    assert.equal(await count('guild_invites'), invites);
+    // One member fits, and another one joins just before Druh's invitation.
+    await database.prepare('DELETE FROM guild_invites').run();
+    await members(0, size - 2);
+    racing = meanwhile(database, /INTO guild_invites/, () => members(size - 2, size - 1));
+    await assert.rejects(invite(racing), (error) => error.code === 'full' && error.message === `Gildia jest pełna: ${size} postaci.`);
+    assert.equal(await count('guild_invites'), 0);
+    // An invitation that waits already: sent again, the leader hears it went.
+    await database.prepare("DELETE FROM guild_members WHERE role = 'member'").run();
+    racing = meanwhile(database, /INTO guild_invites/, async () => database.prepare('INSERT INTO guild_invites (guild_id, character_id, invited_by, created_at) VALUES (?, ?, ?, 0)').bind(guildId, await idOf('Druh'), mistrz).run());
+    assert.equal((await invite(racing)).status, 200);
+    assert.equal(await count('guild_invites'), 1);
   });
 
   test('a character in a guild cannot be invited, and sees no invitations left from before (0.2.22)', async () => {

@@ -22410,6 +22410,14 @@ a.discord-button {
   flex: 1 1 140px;
 }
 
+/* The player's own challenge waiting for its answer, with „Wycofaj” (917 A). */
+.duel-waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
 .duel-turn {
   display: flex;
   flex-direction: column;

@@ -461,7 +461,7 @@ describe('the Salon Gier through the API', () => {
     assert.equal((await all('SELECT * FROM lottery_tickets')).length, 1);
   });
 
-  test('at midnight the System draws once: the winner takes the whole pot and the Globalny hears it', async () => {
+  test('at midnight the System draws once: the winner takes the whole pot, the Globalny hears it in Polish and the English channel in English', async () => {
     const others = { Ala: await player('Ala'), Ola: await player('Ola') };
     for (const who of [cookie, ...Object.values(others)]) assert.equal((await ticket(who)).status, 200);
     const { endsAt, key } = today();
@@ -477,7 +477,11 @@ describe('the Salon Gier through the API', () => {
     for (const name of ['Gracz', 'Ala', 'Ola']) assert.equal((await row(name)).gold, 100000 - 50 + (name === draw.name ? 250 : 0), name);
     assert.deepEqual(await all('SELECT * FROM lottery_tickets'), []);
     const text = `Loterię wygrała ${draw.name}: 250 zł.`;
-    assert.deepEqual(await all('SELECT channel, text, system FROM chat_messages'), [{ channel: 'global', text, system: 1 }]);
+    // 922 A: each channel in its own language, whatever the minute speaks.
+    assert.deepEqual(await all('SELECT channel, text, system FROM chat_messages ORDER BY id'), [
+      { channel: 'global', text, system: 1 },
+      { channel: 'english', text: `${draw.name} won the Lottery: 250 gold.`, system: 1 },
+    ]);
     // Once a day: the next minutes draw nothing more.
     await run(endsAt + 90000);
     await run(endsAt + 3600000);

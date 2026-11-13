@@ -353,6 +353,63 @@ describe('the guild wars through the API', () => {
     assert.equal(await slotOf(ids.druh), null);
   });
 
+  // The code review: a deputy demoted while its move was on the way still
+  // moved a member once, as only the role read at the start counted. The
+  // move is called here as the worker calls it, over a database that lets
+  // the leader's demotion in just before the places are saved (a body held
+  // back cannot do it: the server reads the whole body before the role).
+  test('a deputy demoted while its move or swap is on the way moves nobody', async () => {
+    const { placeInWarTeam } = await import('../src/server/guild-wars.js');
+    const { readFeatures } = await import('../src/server/features.js');
+    readFeatures({ GUILD_WARS: 'on' });
+    await player('lider', 'Lider');
+    await player('zast', 'Zast');
+    await player('druh', 'Druh');
+    await guild('lider', 'Leśni Bracia', 'LB', ['zast', 'druh']);
+    const database = await db();
+    const role = (value) => run('UPDATE guild_members SET role = ? WHERE character_id = ?', value, ids.zast);
+    let placing = false;
+    const racing = {
+      prepare(sql) {
+        if (/^\s*(INSERT INTO|DELETE FROM) guild_war_slots/i.test(sql)) placing = true;
+        return database.prepare(sql);
+      },
+      async batch(statements) {
+        if (placing) {
+          placing = false;
+          await role('member');
+        }
+        return database.batch(statements);
+      },
+    };
+    const move = (body) =>
+      placeInWarTeam({
+        request: new Request('https://test.insightrpg.com/api/guild/war/place', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Cookie: cookies.zast },
+          body: JSON.stringify(body),
+        }),
+        env: { DB: racing },
+        now: Date.now(),
+        params: {},
+      });
+    assert.equal((await place('zast', { team: 1 })).status, 200);
+    for (const body of [
+      { characterId: ids.druh, team: 1 },
+      { characterId: ids.druh, team: 1, swapWith: ids.zast },
+    ]) {
+      await role('deputy');
+      await assert.rejects(move(body), (error) => error.status === 409 && error.code === 'war_changed', JSON.stringify(body));
+      assert.deepEqual([await slotOf(ids.druh), await slotOf(ids.zast)], [null, { team: 1, slot: 0 }]);
+      // Asked again, the member is refused for its role.
+      assert.equal((await place('zast', body)).data.error.code, 'not_allowed');
+    }
+    // A member's own move needs no role: one lost meanwhile changes nothing.
+    await role('deputy');
+    assert.equal((await move({ team: 0 })).status, 200);
+    assert.equal(await slotOf(ids.zast), null);
+  });
+
   test("the cron draws the rivals on Monday and fights each evening's battles once at 20:00, their rewards given once; each battle to watch from either side; the war won brings Sława and the war chest", async () => {
     await player('alfa', 'Alfa', { level: 60 });
     await player('beta', 'Beta', { level: 30, classId: 'mage' });

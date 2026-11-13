@@ -12,8 +12,9 @@
 // The match's state (the seed, both decks and reserves) never leaves the
 // server; each player sees it from its side (duelView). A row of
 // `card_duels` is a challenge and then its match: `proposed` → `declined`,
-// `expired` or `playing` → `done`, with a version that every change raises,
-// so two requests at once never apply a move twice nor pay twice.
+// `expired`, `withdrawn` (taken back by the challenger, 917 A) or `playing`
+// → `done`, with a version that every change raises, so two requests at
+// once never apply a move twice nor pay twice.
 //
 // The server cannot push, so every deadline is kept when the row is read
 // next (settled): a challenge past its time expires, and the moves missed in
@@ -22,7 +23,8 @@
 // chat.js) and the table every two seconds while it is on the screen. Who
 // wins takes both stakes but the System's cut; a draw gives each its own
 // back. One challenge or match a character at a time; a challenge turned
-// down or expired goes to the same player again after live.repeatSeconds.
+// down, expired or withdrawn goes to the same player again after
+// live.repeatSeconds, and to anyone else at once.
 // While a character's match runs, Szczęsny's waits (withoutDuel).
 
 import { cardLevel, casinoDay, classNameOf } from '../engine/index.js';
@@ -243,6 +245,8 @@ async function tableData(db, characterId, now) {
     lines: data.lines,
     typeBonus: data.typeBonus,
     turnSeconds: live().turnSeconds,
+    // The first move of a round has more (918 B): the page's bar counts it.
+    firstMoveSeconds: live().firstMoveSeconds,
     acceptSeconds: live().acceptSeconds,
     cut: Math.round(live().systemCut * 100),
     used: await stakedToday(db, characterId, now),
@@ -287,7 +291,9 @@ async function challengeBlock(db, row, other, now) {
   if (busySelf) return { status: 409, code: 'busy_self', message: 'Masz już wyzwanie albo partię na żywo.' };
   if (busy) return { status: 409, code: 'busy', message: t('{name} ma już wyzwanie albo gra partię na żywo.', { name: other.name }) };
   const last = await db.prepare('SELECT state, updated_at FROM card_duels WHERE from_id = ? AND to_id = ? ORDER BY id DESC LIMIT 1').bind(row.id, other.id).first();
-  const wait = last && ['declined', 'expired'].includes(last.state) ? last.updated_at + live().repeatSeconds * 1000 - now : 0;
+  // A challenge withdrawn pauses as one turned down, so the same player
+  // does not get one sheet after another.
+  const wait = last && ['declined', 'expired', 'withdrawn'].includes(last.state) ? last.updated_at + live().repeatSeconds * 1000 - now : 0;
   if (wait > 0) return { status: 429, code: 'paused', message: t('Kolejne wyzwanie dla postaci {name} wyślesz za {seconds} s.', { name: other.name, seconds: Math.ceil(wait / 1000) }) };
   return null;
 }
@@ -312,11 +318,15 @@ export async function duelOffer(context) {
   const now = context.now;
   const other = await requireOther(db, session, row, Number(new URL(context.request.url).searchParams.get('id')));
   const stakes = duelStakes([row.level, other.level], content());
-  const [block, theirs] = await Promise.all([challengeBlock(db, row, other, now), stakedToday(db, other.id, now)]);
+  const [block, theirs, own] = await Promise.all([challengeBlock(db, row, other, now), stakedToday(db, other.id, now), liveRowOf(db, row.id, now)]);
   const data = await tableData(db, row.id, now);
+  // The viewer's own challenge waiting for its answer, which „Wycofaj”
+  // takes back (917 A): its id and whom it went to.
+  const waiting = own?.state === 'proposed' && own.from_id === row.id ? { id: own.id, other: personView(await targetOf(db, own.to_id)) } : null;
   return json({
     offer: {
       other: { ...personView(other), online: playsNow(other, now) },
+      waiting,
       stakes: stakes.map((stake) => ({ stake, pot: duelPot(stake, content()) })),
       max: stakes.at(-1),
       minLevel: live().minLevel,
@@ -384,6 +394,7 @@ export async function answerDuel(context) {
   if (!named) throw new ApiError(404, 'no_duel', 'Nie ma takiego wyzwania.');
   const found = await settled(db, named, now);
   if (!found) throw new ApiError(404, 'no_duel', 'Nie ma takiego wyzwania.');
+  if (found.state === 'withdrawn') throw new ApiError(409, 'withdrawn', 'To wyzwanie zostało wycofane.');
   if (found.state !== 'proposed') throw new ApiError(409, 'answered', found.state === 'expired' ? 'To wyzwanie już przepadło.' : 'Na to wyzwanie już nie odpowiesz.');
   if (body.accept !== true) {
     await db.prepare("UPDATE card_duels SET state = 'declined', updated_at = ?, version = version + 1 WHERE id = ? AND state = 'proposed'").bind(now, found.id).run();
@@ -429,6 +440,32 @@ export async function answerDuel(context) {
   );
   await atomically(db, statements, () => new ApiError(409, 'duel_changed', 'Wyzwanie zmieniło się w międzyczasie. Spróbuj jeszcze raz.'));
   return respond(db, await rowById(db, found.id), row.id, now, stake > 0 ? await characterNow(db, session, now) : {});
+}
+
+// POST /api/cards/duel/withdraw { id }: the challenger takes back its
+// challenge while it still waits for its answer (917 A): it goes at once, so
+// the challenger may challenge another player right away. Nothing was paid
+// for it (a stake is paid only as a challenge is accepted). The one
+// challenged hears it on accepting (answerDuel: `withdrawn`), and its sheet
+// goes with the chat's next poll. Taken back twice, the second answer is
+// the first's.
+export async function withdrawDuel(context) {
+  const { row, db } = await requireDuelist(context);
+  const body = await readJson(context.request);
+  const now = context.now;
+  const named = Number.isInteger(body?.id) ? await db.prepare('SELECT * FROM card_duels WHERE id = ? AND from_id = ?').bind(body.id, row.id).first() : null;
+  if (!named) throw new ApiError(404, 'no_duel', 'Nie ma takiego wyzwania.');
+  const found = await settled(db, named, now);
+  if (found?.state === 'proposed') {
+    await db
+      .prepare("UPDATE card_duels SET state = 'withdrawn', updated_at = ?, version = version + 1 WHERE id = ? AND state = 'proposed' AND version = ?")
+      .bind(now, found.id, found.version)
+      .run();
+  }
+  // As it stands now: accepted or answered meanwhile, it stays so.
+  const after = await rowById(db, named.id);
+  if (after?.state !== 'withdrawn') throw new ApiError(409, 'answered', 'Tego wyzwania nie da się już wycofać.');
+  return respond(db, after, row.id, now);
 }
 
 // The character's match going on, named by its id, settled first.

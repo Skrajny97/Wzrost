@@ -30,6 +30,9 @@ import { content } from './helpers/content.js';
 const rules = content.cards;
 const live = liveRules(content);
 const TURN = live.turnSeconds * 1000;
+// A round's first move, the leader's, has more (918 B): the round before
+// still plays on both screens as it becomes due.
+const FIRST = live.firstMoveSeconds * 1000;
 const GRACE = live.graceSeconds * 1000;
 const starter = () => starterDeck(content).map((id) => ({ id, level: 1 }));
 const fresh = (seed = 'stol', now = 0, heroes = {}) => newDuel({ seed, now, me: { cards: starter(), hero: heroes.me ?? null }, foe: { cards: starter(), hero: heroes.foe ?? null } }, content);
@@ -69,12 +72,13 @@ function laidOut({ me, foe, meLines, foeLines, meHand = [], foeHand = [], lead =
     step: lead,
     moves: { me: null, foe: null },
     missed: { me: 0, foe: 0 },
-    deadline: TURN,
+    deadline: FIRST,
   };
 }
 
 describe('Partie na żywo: the table and the turns', () => {
-  test('both decks are dealt as with Szczęsny, from the seed; the first leader comes from the seed; its move is due in 30 seconds', () => {
+  test('both decks are dealt as with Szczęsny, from the seed; the first leader comes from the seed; its move is due in 35 seconds (918 B), 5 more than for the answer', () => {
+    assert.equal(live.firstMoveSeconds - live.turnSeconds, 5);
     const duel = fresh('stol', 1000);
     assert.deepEqual(duel.me, newMatch({ seed: 'stol:me', me: { cards: starter() }, foe: { cards: [] } }, content).me);
     assert.deepEqual(duel.foe, newMatch({ seed: 'stol:foe', me: { cards: starter() }, foe: { cards: [] } }, content).me);
@@ -83,7 +87,7 @@ describe('Partie na żywo: the table and the turns', () => {
       assert.deepEqual(duel[seat].lines, [null, null, null]);
     }
     assert.notDeepEqual(duel.me.hand.map((key) => duel.me.cards[key].id), duel.foe.hand.map((key) => duel.foe.cards[key].id));
-    assert.equal(duel.deadline, 1000 + TURN);
+    assert.equal(duel.deadline, 1000 + FIRST);
     assert.equal(duel.step, duel.lead);
     assert.equal(duel.round, 1);
     assert.deepEqual(fresh('stol', 1000), duel);
@@ -129,7 +133,8 @@ describe('Partie na żywo: the table and the turns', () => {
     assert.deepEqual(duelView(duel, first, content).last.before.foe, duel.last.before[second]);
     assert.equal(duel.lead, second);
     assert.equal(duel.step, second);
-    assert.equal(duel.deadline, 9000 + TURN);
+    // The next round's first move, the new leader's, has the 35 seconds.
+    assert.equal(duel.deadline, 9000 + FIRST);
     for (const seat of ['me', 'foe']) assert.equal(duel[seat].hand.length + duel[seat].lines.filter((key) => key !== null).length + duel[seat].out.length + duel[seat].deck.length, rules.deckSize);
     // And so on: the leaders take turns.
     const leads = [first, second];
@@ -212,14 +217,16 @@ describe('Partie na żywo: moves missed', () => {
     const first = duel.lead;
     const second = otherSeat(first);
     // Within the grace nothing happens.
-    assert.equal(duelCatchUp(duel, TURN + GRACE, content), duel);
-    duel = duelCatchUp(duel, TURN + GRACE + 1, content);
+    assert.equal(duelCatchUp(duel, FIRST + GRACE, content), duel);
+    duel = duelCatchUp(duel, FIRST + GRACE + 1, content);
     assert.equal(duel.moves[first].auto, true);
     assert.deepEqual(duel.moves[first].filled, [0, 1, 2]);
     assert.equal(duel.missed[first], 1);
     assert.equal(duel.step, second);
-    assert.equal(duel.deadline, TURN + GRACE + TURN);
-    duel = move(duel, second, TURN + GRACE + 5000);
+    // The game's move for the leader at its deadline (and grace): the
+    // answer is due 30 seconds after it.
+    assert.equal(duel.deadline, FIRST + GRACE + TURN);
+    duel = move(duel, second, FIRST + GRACE + 5000);
     assert.equal(duel.missed[second], 0);
     assert.equal(duel.missed[first], 1);
     assert.equal(duel.lead, second);
@@ -247,7 +254,7 @@ describe('Partie na żywo: moves missed', () => {
     assert.equal(end.missed[duel.lead], 1);
     assert.equal(end.result, loser === 'me' ? 'lost' : 'won');
     let step = duel;
-    for (const now of [TURN + GRACE + 1, 2 * (TURN + GRACE) + 1, 5 * 60000, 10 * 60000]) step = duelCatchUp(step, now, content);
+    for (const now of [FIRST + GRACE + 1, FIRST + TURN + 2 * GRACE + 1, 5 * 60000, 10 * 60000]) step = duelCatchUp(step, now, content);
     assert.deepEqual(step, end);
   });
 });

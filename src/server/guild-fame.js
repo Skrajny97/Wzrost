@@ -111,11 +111,15 @@ export const championStatement = (db, now) => bestStatement(db, weeksAround(now)
 // The best guild of the week before `now` (380 C), the Sława of that week
 // frozen for every guild first when the new week asks for the first time: a
 // row for each guild there is, and none twice (also of two requests at
-// once). Of two guilds with as much Sława, the older one.
+// once). Of two guilds with as much Sława, the older one. With no guild at
+// all there is nothing to freeze and no best guild, so the week waits for
+// the first one: the freeze leaves no row then, and every character's load
+// ran it again (the code review).
 export async function championOf(db, now) {
   const { previous } = weeksAround(now);
-  let best = await bestStatement(db, previous.key).first();
-  if (!best) {
+  const [found, guilds] = await db.batch([bestStatement(db, previous.key), db.prepare('SELECT EXISTS (SELECT 1 FROM guilds) AS any')]);
+  let best = found.results[0] ?? null;
+  if (!best && guilds.results[0].any) {
     // The guild wars of that week end first, should the cron have missed
     // their Sunday's battles (guild-wars.js): the war won counts. Where the
     // wars are on, the week is frozen only once none of its wars is

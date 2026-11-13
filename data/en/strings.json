@@ -3143,6 +3143,7 @@
   "Najpierw weź talię od Szczęsnego w Salonie Gier.": "First take Szczęsny's deck in the Games Parlour.",
   "Trwa Twoja partia {with}. Dokończ ją, zanim zaczniesz następną.": "Your match {with} is still on. Finish it before you start another.",
   "Trwa Twoja partia ze Szczęsnym. Dokończ ją, zanim zaczniesz następną.": "Your match with Szczęsny is still on. Finish it before you start another.",
+  "Trwa Twoja partia na żywo. Dokończ ją, zanim zaczniesz następną.": "Your live match is still on. Finish it before you start another.",
   "Wróć do partii": "Back to the match",
   "Wskaż kartę {of}, w którą uderzy Twoja karta.": "Point at {of}'s card your card will hit.",
   "Partia przepada, a stawka zostaje u {of}.": "The match is lost and the stake stays with {of}.",
@@ -3188,7 +3189,7 @@
   "Wskaż kartę rywala, w którą uderzy Twoja karta.": "Point at the rival's card your card will hit.",
   "Twój ruch": "Your move",
   "Ruch: {name}": "Move: {name}",
-  "Bohater rywala: {skill} (użyta)": "Rival's hero: {skill} (used)",
+  "Bohater rywala: {skill} (już użyty)": "Rival's hero: {skill} (already used)",
   "Bohater rywala: {skill}": "Rival's hero: {skill}",
   "Czekasz na ruch rywala.": "Waiting for the rival's move.",
   "Wyłóż karty": "Lay the cards",
@@ -3220,6 +3221,9 @@
   "Nie ma takiego wyzwania.": "There is no such challenge.",
   "To wyzwanie już przepadło.": "This challenge is already gone.",
   "Na to wyzwanie już nie odpowiesz.": "You can no longer answer this challenge.",
+  "To wyzwanie zostało wycofane.": "This challenge was withdrawn.",
+  "Tego wyzwania nie da się już wycofać.": "This challenge can no longer be withdrawn.",
+  "Wyzwanie wycofane.": "Challenge withdrawn.",
   "Najpierw ułóż talię z 12 kart w Salonie Gier.": "First build a deck of 12 cards in the Games Parlour.",
   "Najpierw dokończ partię na żywo.": "First finish your live match.",
   "Wyzwanie zmieniło się w międzyczasie. Spróbuj jeszcze raz.": "The challenge changed in the meantime. Try again.",
@@ -3250,5 +3254,6 @@
   "Kolejne krainy ({count})": "Further lands ({count})",
   "Twój poziom": "Your level",
   "Karta na linię: {line}": "Card for the line: {line}",
-  "Stuknij kartę z rezerwy.": "Tap a card from your reserve."
+  "Stuknij kartę z rezerwy.": "Tap a card from your reserve.",
+  "Masz już wszystkie karty tej rzadkości na {level}. poziomie, więc zamiast karty zgarniasz {gold} zł.": "You already have every card of this rarity at level {level}, so you get {gold} gold instead."
 }

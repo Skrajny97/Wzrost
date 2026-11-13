@@ -254,9 +254,24 @@ async function ownGuild(db, characterId, roles = ['leader', 'deputy', 'member'])
   return guild;
 }
 
+// What stops a guild's next invitation: the guild full, or as many
+// invitations waiting as it may have. Null when one more fits.
+async function inviteRefusal(db, guildId) {
+  const [members, waiting] = await db.batch([
+    db.prepare('SELECT COUNT(*) AS count FROM guild_members WHERE guild_id = ?').bind(guildId),
+    db.prepare('SELECT COUNT(*) AS count FROM guild_invites WHERE guild_id = ?').bind(guildId),
+  ]);
+  if (members.results[0].count >= rules().size) return new ApiError(409, 'full', `Gildia jest pełna: ${rules().size} postaci.`);
+  if (waiting.results[0].count >= rules().invites) return new ApiError(409, 'too_many_invites', `Na odpowiedź czeka już ${rules().invites} zaproszeń.`);
+  return null;
+}
+
 // POST /api/guild/invite { name }: the leader or a deputy invites a
 // character by its name: another player's, with the Społeczność, not in a
-// guild, and not one whose player hid the inviting one's in the chat.
+// guild, and not one whose player hid the inviting one's in the chat. The
+// members and the invitations are counted in the write too, so two
+// invitations sent at the same moment never take the guild past either cap
+// (the code review: both were counted before either was written).
 export async function inviteToGuild(context) {
   const { session, player } = await requireGuildPlayer(context);
   const db = context.env.DB;
@@ -274,20 +289,26 @@ export async function inviteToGuild(context) {
     .first();
   if (blocked) throw new ApiError(409, 'blocked', `${target.name} nie przyjmuje teraz zaproszeń od Ciebie.`);
   if (await guildOf(db, target.id)) throw new ApiError(409, 'in_guild', `${target.name} jest już w gildii.`);
-  const [members, waiting] = await db.batch([
-    db.prepare('SELECT COUNT(*) AS count FROM guild_members WHERE guild_id = ?').bind(guild.id),
-    db.prepare('SELECT COUNT(*) AS count FROM guild_invites WHERE guild_id = ?').bind(guild.id),
-  ]);
-  if (members.results[0].count >= rules().size) throw new ApiError(409, 'full', `Gildia jest pełna: ${rules().size} postaci.`);
-  if (waiting.results[0].count >= rules().invites) throw new ApiError(409, 'too_many_invites', `Na odpowiedź czeka już ${rules().invites} zaproszeń.`);
-  await atomically(
+  const refused = await inviteRefusal(db, guild.id);
+  if (refused) throw refused;
+  const [, invited] = await atomically(
     db,
     [
       stillAsRead(db, guild.id, [[player.row.id, ['leader', 'deputy']]]),
-      db.prepare('INSERT OR IGNORE INTO guild_invites (guild_id, character_id, invited_by, created_at) VALUES (?, ?, ?, ?)').bind(guild.id, target.id, player.row.id, context.now),
+      db
+        .prepare(
+          `INSERT OR IGNORE INTO guild_invites (guild_id, character_id, invited_by, created_at)
+           SELECT ?, ?, ?, ? WHERE (SELECT COUNT(*) FROM guild_members WHERE guild_id = ?) < ? AND (SELECT COUNT(*) FROM guild_invites WHERE guild_id = ?) < ?`,
+        )
+        .bind(guild.id, target.id, player.row.id, context.now, guild.id, rules().size, guild.id, rules().invites),
     ],
     guildChanged,
   );
+  // Not written: an invitation of the character waits already (as before,
+  // the leader hears it went), or another sent meanwhile filled a cap.
+  if (invited.meta.changes !== 1 && !(await db.prepare('SELECT 1 AS waiting FROM guild_invites WHERE guild_id = ? AND character_id = ?').bind(guild.id, target.id).first())) {
+    throw (await inviteRefusal(db, guild.id)) ?? guildChanged();
+  }
   return answer(db, player.row.id, context.now, { text: t('Zaproszenie wysłane. {name} przyjmie je w Społeczności, w Gildii.', { name: target.name }) });
 }
 
