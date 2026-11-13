@@ -13685,6 +13685,53 @@ button.tcard-slot {
   flex: 1 1 60%;
 }
 
+/* On a phone the turn's buttons stay at the bottom of the screen over the
+   table, on a strip of the table's slate (993). */
+:root:not([data-layout='desktop']) .cards-match .cards-actions:not(.cards-actions--more) {
+  position: sticky;
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + 8px);
+  z-index: 6;
+  flex-wrap: nowrap;
+  padding: 6px 8px;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 12px;
+  border-image: url('/art/cards/table.png') 17 fill / 12px / 0 stretch;
+  box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.55);
+  image-rendering: pixelated;
+}
+
+:root:not([data-layout='desktop']) .cards-match .cards-actions .cards-fight {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+:root:not([data-layout='desktop']) .cards-match .cards-actions .button--small {
+  flex: none;
+}
+
+/* The round chat button stands over the bar's right end: the bar leaves it
+   room. */
+:root.with-chat-bubble:not([data-layout='desktop']) .cards-match .cards-actions:not(.cards-actions--more) {
+  margin-right: 60px;
+}
+
+/* The reserve in a sheet for one empty line (993). */
+.cards-pick {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tcard-grid--pick {
+  padding: 8px 0 4px;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 12px;
+  border-image: url('/art/cards/table.png') 17 fill / 12px / 0 stretch;
+  image-rendering: pixelated;
+}
+
 .cards-actions .button--small {
   flex: 0 1 auto;
 }
