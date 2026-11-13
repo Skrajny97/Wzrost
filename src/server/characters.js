@@ -2155,6 +2155,17 @@ export const detachedRows = (db, which, binds) => [
     )
     .bind(...binds),
   db.prepare(`DELETE FROM chest_goods WHERE character_id ${which}`).bind(...binds),
+  // Its donations to the Siedziba Gildii stay with the guild (guild-seat.js),
+  // no one's own: summed with those of a character removed before with the
+  // same id.
+  db
+    .prepare(
+      `INSERT INTO guild_seat_donations (guild_id, character_id, week, building_id, gold, resource)
+       SELECT guild_id, -character_id, week, building_id, gold, resource FROM guild_seat_donations WHERE character_id ${which}
+       ON CONFLICT (guild_id, character_id, week, building_id) DO UPDATE SET gold = gold + excluded.gold, resource = resource + excluded.resource`,
+    )
+    .bind(...binds),
+  db.prepare(`DELETE FROM guild_seat_donations WHERE character_id ${which}`).bind(...binds),
 ];
 
 // The Rdzeń at a glance (characterView): its sockets, those free, the

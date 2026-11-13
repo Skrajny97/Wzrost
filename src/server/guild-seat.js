@@ -11,7 +11,9 @@
 // pieces leave the character only while it holds them and is in the guild,
 // and the building takes no more than its top level needs, so two taps at
 // once never take what is not there. What was donated stays with the
-// building, also when the member leaves. The members' bonuses come with the
+// building, also when the member leaves, and so does the record of who gave
+// it in which week (guild_seat_donations, for the members' ranking, 897).
+// The members' bonuses come with the
 // character (guildSeatSql, loaded in characters.js): an exploration keeps
 // those of its start (hunts.js), the Kowadło takes those of the upgrade
 // (perks.js), and a character that leaves its guild has none from then on.
@@ -23,7 +25,7 @@
 // character's guild); below it the card shows the buildings and their
 // bonuses, with a line instead of the donation.
 
-import { seatBonuses, seatBuilding, seatBuildings, seatCostTo, seatEffect, seatLevelCost, seatProgress } from '../engine/index.js';
+import { questPeriod, seatBonuses, seatBuilding, seatBuildings, seatCostTo, seatEffect, seatLevelCost, seatProgress } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
 import { characterView, loadPlayer, walletOf } from './characters.js';
 import { content } from './content.js';
@@ -199,6 +201,13 @@ export async function donateToGuildSeat(context) {
            ON CONFLICT (guild_id, building_id) DO UPDATE SET gold = gold + excluded.gold, resource = resource + excluded.resource`,
         )
         .bind(guild.id, building.id, gold, resource),
+      // Who gave it, and in which week (the members' ranking, 897).
+      db
+        .prepare(
+          `INSERT INTO guild_seat_donations (guild_id, character_id, week, building_id, gold, resource) VALUES (?, ?, ?, ?, ?, ?)
+           ON CONFLICT (guild_id, character_id, week, building_id) DO UPDATE SET gold = gold + excluded.gold, resource = resource + excluded.resource`,
+        )
+        .bind(guild.id, row.id, questPeriod('weekly', context.now, content()).key, building.id, gold, resource),
     ],
     changed,
   );
