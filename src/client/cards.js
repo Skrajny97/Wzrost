@@ -41,7 +41,8 @@ import { countOf, formatNumber } from './format.js';
 import { t } from './i18n.js';
 import { playSound } from './sound.js';
 import { call, serverNow, state } from './state.js';
-import { confirmAction, howItWorks, systemPanel, toast, withButton } from './ui.js';
+import { desktopLayout } from './layout-mode.js';
+import { closeSheet, confirmAction, howItWorks, openSheet, systemPanel, toast, withButton } from './ui.js';
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
 
@@ -937,6 +938,12 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     }
     const standing = standingKeys(view.match)[line];
     if (key === null) {
+      // On a phone the reserve comes up from the bottom of the screen for
+      // the empty line tapped, so the table stays in sight (993).
+      if (picked === null && !desktopLayout()) {
+        pickForLine(line);
+        return;
+      }
       if (picked === null) {
         toast(t('Najpierw wybierz kartę z rezerwy.'));
         return;
@@ -949,6 +956,38 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       if (plan.skill?.card === key) plan.skill = null;
     } else return;
     renderLaid();
+  }
+
+  // The reserve in a sheet for one empty line: a card tapped goes there.
+  function pickForLine(line) {
+    const reserve = reserveLeft(view.match);
+    if (reserve.length === 0) {
+      toast(t('Rezerwa pusta.'));
+      return;
+    }
+    openSheet(
+      h(
+        'div',
+        { class: 'cards-pick' },
+        h('h2', { class: 'sheet-title', text: t('Karta na linię: {line}', { line: view.lines[line].name }) }),
+        h('p', { class: 'muted', text: t('Stuknij kartę z rezerwy.') }),
+        h(
+          'div',
+          { class: 'tcard-grid tcard-grid--pick' },
+          reserve.map((card) =>
+            face(card, {
+              onClick: () => {
+                plan.lines[line] = card.key;
+                picked = null;
+                closeSheet();
+                renderLaid();
+              },
+            }),
+          ),
+        ),
+      ),
+      h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', text: t('Anuluj'), onClick: closeSheet })),
+    );
   }
 
   function tapFoe(line) {
@@ -1057,6 +1096,35 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     );
     if (art) table.style.setProperty('--place-art', `url("${art}")`);
     const hint = aimHint() ?? (picked !== null ? t('Wskaż pustą linię dla tej karty.') : !ready ? t('Dołóż karty z rezerwy na puste linie.') : null);
+    const giveUp = () =>
+      h('button', {
+        type: 'button',
+        class: 'button button--system button--small',
+        text: t('Poddaj partię'),
+        onClick: async (event) => {
+          const button = event.currentTarget;
+          const sure = await confirmAction({
+            title: t('Poddać partię?'),
+            text:
+              match.mode !== 'staked'
+                ? t('Trening skończy się przegraną.')
+                : who.of
+                  ? t('Partia przepada, a stawka zostaje u {of}.', { of: who.of })
+                  : t('Partia przepada, a stawka zostaje u Szczęsnego.'),
+            confirmLabel: t('Poddaj'),
+            danger: true,
+          });
+          if (!sure) return;
+          await withButton(button, () =>
+            orAgain(async () => {
+              const answer = await call('POST', '/api/cards/surrender');
+              ended = { ...answer.end, words: wordsFor(answer.end) };
+              apply(answer);
+              showTab();
+            }),
+          );
+        },
+      });
     return h(
       'div',
       { class: 'stack cards-match', 'data-guide': 'cards-match' },
@@ -1140,35 +1208,10 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
               }),
             ),
         }),
-        h('button', {
-          type: 'button',
-          class: 'button button--system button--small',
-          text: t('Poddaj partię'),
-          onClick: async (event) => {
-            const button = event.currentTarget;
-            const sure = await confirmAction({
-              title: t('Poddać partię?'),
-              text:
-                match.mode !== 'staked'
-                  ? t('Trening skończy się przegraną.')
-                  : who.of
-                    ? t('Partia przepada, a stawka zostaje u {of}.', { of: who.of })
-                    : t('Partia przepada, a stawka zostaje u Szczęsnego.'),
-              confirmLabel: t('Poddaj'),
-              danger: true,
-            });
-            if (!sure) return;
-            await withButton(button, () =>
-              orAgain(async () => {
-                const answer = await call('POST', '/api/cards/surrender');
-                ended = { ...answer.end, words: wordsFor(answer.end) };
-                apply(answer);
-                showTab();
-              }),
-            );
-          },
-        }),
+        desktopLayout() && giveUp(),
       ),
+      // On a phone the bar at the bottom holds only "Walcz" (993).
+      !desktopLayout() && h('div', { class: 'cards-actions cards-actions--more' }, giveUp()),
       roundAccount(match),
     );
   }

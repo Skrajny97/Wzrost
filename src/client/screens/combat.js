@@ -559,7 +559,57 @@ export function mountCombat(container, { params, navigate }) {
         ? systemPanel(t('Wiatrołomy to najbezpieczniejsze miejsce na start. Wybierz czas eksploracji i wyrusz.'))
         : unarmed && systemPanel(t('Walczysz gołymi rękami. Załóż broń z plecaka w zakładce Postać, jeśli już ją masz.')),
       wantedStrip(character),
-      state.content.regions.map((candidate) => regionLink(candidate, character)),
+      landList(character),
+    );
+  }
+
+  // The lands open to the character as cards, the one of its level marked,
+  // and the lands still shut folded into one row under them (993).
+  function landList(character) {
+    const lands = state.content.regions;
+    const open = lands.filter((candidate) => candidate.areas.some((place) => areaOpen(place, character)));
+    const shut = lands.filter((candidate) => !open.includes(candidate));
+    const yours =
+      open.find((candidate) => character.level >= candidate.minLevel && character.level <= candidate.maxLevel) ?? open.at(-1);
+    return [
+      ...open.map((candidate) => regionLink(candidate, character, candidate === yours)),
+      shut.length > 0 && laterLands(shut),
+    ];
+  }
+
+  function laterLands(shut) {
+    return h(
+      'details',
+      { class: 'card region-later' },
+      h(
+        'summary',
+        { class: 'region-later-head' },
+        h('span', { class: 'region-later-title', text: t('Kolejne krainy ({count})', { count: shut.length }) }),
+        h('span', { class: 'region-later-from', text: t('od poz. klasy {level}', { level: shut[0].areas[0].unlockClassLevel }) }),
+        icon('chevron', { size: 20 }),
+      ),
+      h(
+        'div',
+        { class: 'region-later-list' },
+        shut.map((candidate) => {
+          const hash = `${HOME}/${candidate.id}`;
+          const art = landArt(candidate.id);
+          const thumb = h('span', { class: 'region-later-art' });
+          if (art) thumb.style.setProperty('--land-art', `url("${art}")`);
+          return h(
+            'a',
+            { class: 'region-later-row', href: hash, onClick: (event) => openView(event, hash) },
+            thumb,
+            h(
+              'span',
+              { class: 'region-later-text' },
+              h('strong', { text: candidate.name }),
+              h('span', { text: t('poz. {min}–{max}', { min: candidate.minLevel, max: candidate.maxLevel }) }),
+            ),
+            lockLabel(t('poz. klasy {level}', { level: candidate.areas[0].unlockClassLevel })),
+          );
+        }),
+      ),
     );
   }
 
@@ -594,14 +644,14 @@ export function mountCombat(container, { params, navigate }) {
     );
   }
 
-  function regionLink(candidate, character) {
+  function regionLink(candidate, character, yours = false) {
     const hash = `${HOME}/${candidate.id}`;
     const open = candidate.areas.filter((place) => areaOpen(place, character)).length;
     const art = landArt(candidate.id);
     const card = h(
       'a',
       {
-        class: `card region-card region-link${art ? ' region-card--art' : ''}`,
+        class: `card region-card region-link${art ? ' region-card--art' : ''}${yours ? ' region-card--yours' : ''}`,
         href: hash,
         'data-guide': `region-${candidate.id}`,
         onClick: (event) => openView(event, hash),
@@ -613,11 +663,11 @@ export function mountCombat(container, { params, navigate }) {
         h(
           'span',
           { class: 'region-chips' },
+          yours && chip(t('Twój poziom'), 'chip--yours'),
           chip(t('poz. {min}–{max}', { min: candidate.minLevel, max: candidate.maxLevel })),
           candidate.safe && chip(t('bezpieczny'), 'chip--safe'),
         ),
       ),
-      h('p', { class: 'region-description', text: candidate.description }),
       h('p', { class: 'region-trait' }, h('strong', { text: `${candidate.trait.name}. ` }), candidate.trait.description),
       h(
         'p',
