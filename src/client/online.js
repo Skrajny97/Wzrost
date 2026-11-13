@@ -9,7 +9,7 @@
 
 import { request } from './api.js';
 import { h } from './dom.js';
-import { formatNumber } from './format.js';
+import { formatNumber, plural } from './format.js';
 import { t } from './i18n.js';
 
 const EVERY_MS = 60000;
@@ -31,6 +31,9 @@ async function ask() {
 function show() {
   if (!tab) return;
   tab.querySelector('.online-count').textContent = count === null ? '…' : formatNumber(count);
+  // The words in the count's form: "1 gracz", "2 gracze", "5 graczy" (the
+  // code review of 13.11.2026: "1 graczy online" when one played).
+  if (count !== null) tab.querySelector('.online-label').textContent = plural(count, 'gracz online', 'gracze online', 'graczy online');
 }
 
 // Puts the tab into the game view once; `checkOnline` keeps it fresh.
