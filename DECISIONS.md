@@ -3248,6 +3248,24 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.20 (13.11.2026): premia obrony na Arenie kart (915 B) i poprawki z przeglądu kodu
+
+1. **Premia obrony na Arenie kart (915 B):** talia, która się broni, ma +12% Ataku i Życia, bo wykłada karty pierwsza, jawnie. Szczegóły: „Premia obrony na Arenie kart: zbudowane (915 B, 13.11.2026)”, w sekcji „Karty z innymi graczami, z mieszkańcami Osady i z nowych źródeł”.
+2. **Poprawki z przeglądu kodu (993):**
+   - Stół kart w Salonie Gier i u mieszkańców wczytuje się na nowo, gdy serwer odrzuci ruch, bo partia poszła dalej w innej karcie albo na innym urządzeniu. Wcześniej „Walcz” w kółko wysyłał starą rundę.
+   - Wysłane wyzwanie do partii na żywo przestaje być sprawdzane co 2 sekundy, gdy go już nie ma, np. po zmianie postaci.
+   - Usunięta postać zostaje w zapisach wygranych partii na żywo pod ujemnym numerem, jak w pozostałych zapisach tych partii.
+   - Kody upominkowe wykorzystane przez konto zostają zapisane po usunięciu konta, więc kod dla jednej postaci nie zadziała drugi raz dla nowej postaci o tym imieniu.
+   - Licznik tłumaczeń czatu nie zaczyna się od nowa, gdy prośba sprzed północy skończy się po prośbie z nowego dnia.
+   - Wiadomości czatu stoją w kolejności, w jakiej je napisano, także gdy własna wiadomość wróci w trakcie pobierania cudzych.
+   - Licznik graczy online mówi „1 gracz online”, „2 gracze online”, „5 graczy online”.
+   - Awans zdobyty w Labiryncie albo w zdarzeniu drużyny w czasie wyprawy nie mówi już, że HP i Mana się odnowiły: nie odnawiają się, póki trwa wyprawa.
+   - Zagrożenie na ekranie Walki uwzględnia relację z towarzyszem (każdy stopień relacji daje mu więcej HP i obrażeń); wcześniej po zmianie relacji zostawało stare.
+   - Raport bez czasu wyprawy (Portal, Labirynt, zdarzenie drużyny) nie pisze przy walkach „po 1 min”, a raport w czasie wyprawy albo służby najemnika nie proponuje „Rozdaj według klasy”, którego serwer i tak by nie przyjął.
+   - Raport pracy Awatara Systemu podaje doświadczenie profesji, które naprawdę dała jego praca (jego część), a nie pełne minuty.
+   - Warsztat otwiera się na wzorze dla klasy postaci także po ewolucji.
+   - Usunięte nieużywane teksty kart, Próśb i wojen gildii, style starej mapy Labiryntu i powtórzony kod (karta bohatera, liczby Sławy, wejście do Labiryntu i Portali, odbiór prac profesji).
+
 ## Wersja 0.3.19 (13.11.2026): partie kart na żywo (901 B)
 
 1. **Partie na żywo (901 B):** w karcie postaci innego gracza, który jest w grze, wyzwanie na partię Talii Systemu, bez stawki albo o złoto; ruchy na zmianę, 30 sekund na ruch, a za wygraną obie stawki bez 5%.
@@ -3478,7 +3496,17 @@ Autor przyjął makiety 907.1–907.3: zakładkę „Karty” na Arenie, partię
    - Partie kart nie dają Punktów Sławy, tak jak pojedynki.
    - Liczby są w `data/settlement.json` (`arena.cards`), a angielskie słowa w `data/en/settlement.json`. Nagrody liczą się z nagród pojedynków (`rewards.share`: 0,5), więc zmiana nagród pojedynków zmienia też nagrody za karty.
    - Kod: silnik `src/engine/card-arena.js` i karta bohatera rywala w `src/engine/cards.js` (`rivalSkill`), serwer `src/server/card-arena.js` (trasy `/api/cards/arena…`), strona `src/client/card-arena.js` i przełącznik w `src/client/pvp-arena.js`, migracja 0128 (tabele `card_arena_ratings`, `card_arena_matches`, `card_arena_results`, `card_arena_weeks`), testy `test/card-arena.test.js`. Usunięta postać zabiera swoje Karty ze sobą.
-10. **Balans (symulacja: talia startowa przeciw tej samej talii, gracz bez umiejętności bohatera).** Gracz, który odpowiada na jawnie wyłożone karty, wygrywa z równą talią 84–98% partii (najmniej z Klerykiem rywala). Z talią mocniejszą o 9% (karty na 2. poziomie) wygrywa 33–81%, o 20% (3. poziom) 3–27%, a o 30% prawie nigdy. O wyniku decyduje więc głównie siła talii pokazana przy rywalu. Czy obrońca ma dostać przewagę, to pytanie 915 do autora.
+10. **Balans (symulacja: talia startowa przeciw tej samej talii, gracz bez umiejętności bohatera).** Gracz, który odpowiada na jawnie wyłożone karty, wygrywa z równą talią 84–98% partii (najmniej z Klerykiem rywala). Z talią mocniejszą o 9% (karty na 2. poziomie) wygrywa 33–81%, o 20% (3. poziom) 3–27%, a o 30% prawie nigdy. O wyniku decyduje więc głównie siła talii pokazana przy rywalu. Autor wybrał premię obrony (915 B, niżej).
+
+### Premia obrony na Arenie kart: zbudowane (915 B, 13.11.2026)
+
+Autor wybrał wariant B pytania 915: obrona dostaje premię, tak żeby równe talie wygrywały mniej więcej po połowie.
+
+1. Karty talii, która się broni, mają o 12% więcej Ataku i Życia, zaokrąglone (`arena.cards.defenceBonus` w `data/settlement.json`). Karty atakującego zostają bez zmian, a stół pokazuje już podniesione liczby rywala.
+2. Wartość dobrana symulacją (`node tools/card-arena-sim.mjs`, ta sama talia w ataku i w obronie: startowa i talie stopni Szczęsnego). Bez premii atakujący wygrywa 89–96% partii. Przy +12% wygrywa 56%, gdy żadna strona nie ma karty bohatera, i 42%, gdy kartę ma tylko obrońca (symulowany atakujący nie używa umiejętności). W prawdziwej partii karty bohatera mają obie strony, więc wynik leży pomiędzy, około połowy.
+3. Najsłabsze talie (startowa i stopnia I) zyskują mniej, bo przy małych liczbach +12% to 1–3 punkty: atakujący wygrywa nimi dalej 76–82%. Mocniejszymi taliami: 38–53%.
+4. Zasady Areny (rozwijane „Jak to działa?”) mówią o premii: „Za to talia, która się broni, ma +12% Ataku i Życia.”
+5. Siła talii przy rywalu dalej pokazuje liczby bez premii.
 
 ### Partie kart na żywo: zbudowane (901 B, makiety 908.1–908.4, 13.11.2026)
 
