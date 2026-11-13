@@ -3252,6 +3252,20 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Sklep Play: instrukcja na jednej stronie (13.11.2026)
+
+Autor 13.11.2026: „teraz instrukcja włączenia gry do Sklepu Play, bo znowu gdzies sie zgubiła”.
+
+1. **Jedna strona.** Cała instrukcja wydania gry w Sklepie Play jest na stronie „Insight w Sklepie Play”: https://claude.ai/artifact/CDcmcfH32ucHPDk71Myc9n. Ma dziewięć kroków z telefonu (konto deweloperskie, aplikacja w Play Console, karta sklepu, formularze, paczka z PWABuilder, test zamknięty, odciski SHA-256, wersja produkcyjna, później płatności), przyjęte teksty i odpowiedzi 831.1–831.6 z przyciskiem „Kopiuj” oraz przyjęte grafiki 879 i ikonę 512 × 512 z przyciskiem „Zapisz” (pojedynczo albo wszystkie zrzuty jednego języka w zipie). „Zrobione” przy kroku zapamiętuje telefon autora. Link jest też na górze strony ocen i w CLAUDE.md. Zmiany w krokach, tekstach i grafikach sklepu trafiają na tę stronę.
+2. **Szczegóły rozstrzygnięte najprościej:**
+   - konto deweloperskie osobiste, a status przedsiębiorcy „nie”, dopóki gra nie ma płatności; zmiana przed płatnościami (867 A);
+   - formularz „Identyfikator wyświetlania reklam”: Nie, bo gra go nie używa;
+   - pierwsza paczka z PWABuilder bez Google Play Billing, z powiadomieniami (Notification delegation); płatności przyjdą z nową paczką podpisaną tym samym kluczem;
+   - w PWABuilder App name i Launcher name „Insight”, Version code 1, Version name 1.0.0, Package ID com.insightrpg.app;
+   - w kroku 7 autor przysyła oba odciski SHA-256, klucza podpisywania aplikacji i klucza przesyłania, żeby `assetlinks.json` działał i dla gry ze Sklepu Play, i dla pliku APK z paczki;
+   - wiadomość do testerów po polsku i po angielsku, do skopiowania.
+3. **Opis sklepu (936).** Opis z 11.11 nie mówi o trzeciej ewolucji, Labiryncie Systemu z Rdzeniem i Talii Systemu. Uzupełnienie czeka na stronie ocen jako 936; po akceptacji trafi na stronę instrukcji.
+
 ## Wersja 0.3.25 (13.11.2026): odpowiedzi 917–922, 924 A, 926 B i 927 A, poprawki z przeglądu kodu, część 2
 
 1. **917 A:** przy wysłanym wyzwaniu do partii kart na żywo jest „Wycofaj”. Wycofane wyzwanie znika u obu graczy („{name} wycofał[a|] wyzwanie.”), a ponowić je do tej samej postaci można, jak po odrzuceniu, po `repeatSeconds`.
