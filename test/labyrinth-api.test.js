@@ -443,7 +443,9 @@ describe('the Rdzeń through the API', () => {
     assert.deepEqual(started.data.character.activity.set, { gem: 'Kwarc', item: 'Rdzeń' });
     await (await db()).prepare('UPDATE activities SET started_at = started_at - ?, ends_at = ends_at - ?').bind(3600000, 3600000).run();
     const claimed = (await call('POST', '/api/hunts/claim', { cookie })).data;
-    assert.equal(claimed.report.set.text, 'Kwarc tkwi teraz w przedmiocie: Rdzeń.');
+    // A line of its own for the Rdzeń (the code review, 13.11.2026: "…
+    // tkwi teraz w przedmiocie: Rdzeń.").
+    assert.equal(claimed.report.set.text, 'Kwarc tkwi teraz w Rdzeniu.');
     assert.equal((await coreRow()).gem, 'quartz');
     const core = (await call('GET', '/api/core', { cookie })).data.core;
     assert.equal(core.gem.id, 'quartz');

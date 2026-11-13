@@ -250,6 +250,9 @@
       "set": [
         "{gem} is now set in the item: {item}."
       ],
+      "setCore": [
+        "{gem} is now set in the Core."
+      ],
       "replaced": [
         "The previous stone, {gem}, crumbled during the setting."
       ],

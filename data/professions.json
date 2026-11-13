@@ -307,6 +307,7 @@
       "failed": ["Nie udało się: {items}. Kamienie przepadły, a kruszec wrócił."],
       "stopped": ["Wyrób przerwany. Kamienie i kruszec na resztę wróciły."],
       "set": ["{gem} tkwi teraz w przedmiocie: {item}."],
+      "setCore": ["{gem} tkwi teraz w Rdzeniu."],
       "replaced": ["Poprzedni kamień, {gem}, rozpadł się przy oprawianiu."],
       "missing": ["Tego przedmiotu już nie ma. Kamień wrócił do plecaka: {gem}."],
       "revealed": ["System odsłania nowe wzory: {patterns}"],

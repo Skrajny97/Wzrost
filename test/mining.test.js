@@ -534,6 +534,12 @@ describe('Jubilerstwo in the engine', () => {
     const missing = jewelReport({ ...base, set: { gem: 'agate', item: null, replaced: null } }, content);
     assert.equal(missing.set.text, 'Tego przedmiotu już nie ma. Kamień wrócił do plecaka: Agat.');
     assert.equal(missing.set.item, null);
+    // The Rdzeń has a line of its own (the code review, 13.11.2026: "…
+    // tkwi teraz w przedmiocie: Rdzeń.").
+    const core = jewelReport({ ...base, set: { gem: 'agate', core: true, replaced: 'quartz' } }, content);
+    assert.equal(core.set.text, 'Agat tkwi teraz w Rdzeniu.');
+    assert.equal(core.set.replaced, 'Poprzedni kamień, Kwarc, rozpadł się przy oprawianiu.');
+    assert.equal(core.set.core, true);
   });
 });
 
