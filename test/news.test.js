@@ -124,6 +124,24 @@ describe('Co nowego?', () => {
     assert.ok(next.data.entries[0].id > entry.id);
     assert.equal(await unseen(player), 1);
   });
+
+  // The code review: an edit or a deletion without a whole number ended in
+  // an error 500, as the database cannot take such a value.
+  test('an edit or a deletion that names no entry by its number is refused, and the entry stays', async () => {
+    const made = await publish({ title: 'Turniej', body: 'Od 18:00.' });
+    const [entry] = made.data.entries;
+    for (const id of [undefined, null, 'abc', 1.5, 0, {}, [entry.id]]) {
+      for (const path of ['/api/author/news/edit', '/api/author/news/delete']) {
+        const refused = await call('POST', path, { cookie: author, body: { id, title: 'Inny', body: 'Inna treść.' } });
+        assert.deepEqual([refused.status, refused.data.error?.code, refused.data.error?.message], [400, 'invalid_id', 'Nie ma takiego wpisu.'], `${path} ${JSON.stringify(id)}`);
+      }
+    }
+    const kept = (await call('GET', '/api/author/news', { cookie: author })).data.entries;
+    assert.deepEqual(
+      kept.map(({ id, title }) => [id, title]),
+      [[entry.id, 'Turniej']],
+    );
+  });
 });
 
 // "Co nowego?" in English (0.2.2): a draft published as written reads in its
