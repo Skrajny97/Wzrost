@@ -1092,8 +1092,11 @@ export function mountProfessions(container, { params, navigate }) {
   function craftForm(character, workshop) {
     const who = workerPicker(character);
     const known = (slot) => slot.patterns.filter((pattern) => !pattern.hidden);
-    // A slot's pattern for the character's class comes first.
-    const firstFor = (slot) => known(slot).find((pattern) => !pattern.classNames || pattern.classNames.includes(character.className)) ?? known(slot)[0];
+    // A slot's pattern for the character's class comes first. The patterns
+    // name the classes themselves, so an evolved character goes by its
+    // class (baseClassName), not by its evolution's name (className).
+    const firstFor = (slot) =>
+      known(slot).find((pattern) => !pattern.classNames || pattern.classNames.includes(character.baseClassName ?? character.className)) ?? known(slot)[0];
     const rarities = workshop.rarities.filter((rarity) => !rarity.hidden);
     const next = workshop.rarities.find((rarity) => rarity.hidden);
     let slot = workshop.slots.find((candidate) => candidate.id === craftChoice.slot) ?? workshop.slots[0];

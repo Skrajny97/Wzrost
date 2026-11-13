@@ -70,7 +70,11 @@ export function workGains(player, profession, before, minutes, avatar, now) {
   const character = engineCharacter(row);
   const share = avatar ? content().avatar.share : 1;
   const week = weekFactor(keptWeek(workOf(player, avatar).activity?.options), 'profession-xp');
-  const after = workProfession(profession, before, Math.round(minutes * share), week);
+  const worked = Math.round(minutes * share);
+  const progress = workProfession(profession, before, worked, week);
+  // The report's XP of the profession (professionProgress) is what the work
+  // gave: the Awatar's share too, not the minutes the report counts.
+  const after = { ...progress, gained: progress.gained ?? worked };
   const xp = Math.round(workXp(row.level, minutes, content()) * share);
   const work = applyWork(character, xp, content());
   // A new level heals fully; otherwise resting simply goes on.
