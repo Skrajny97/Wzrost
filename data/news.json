@@ -825,6 +825,11 @@
       "id": "0.3.14",
       "title": "Wersja 0.3.14",
       "body": "- Bardzo długie imię postaci mieści się w karcie na ekranie wyboru postaci, także na wąskim telefonie."
+    },
+    {
+      "id": "0.3.15",
+      "title": "Wersja 0.3.15",
+      "body": "- Oprawianie w Szlifierni pokazuje Twoją postać z ekwipunkiem: stuknij przedmiot albo Rdzeń, żeby oprawić w nim kamień. Przy każdym przedmiocie widać, jaki kamień w nim tkwi.\n- Nowa przemiana kamieni: 10 kamieni daje od razu jeden kamień o stopień rzadszy, np. 10 Kwarców daje Agat. Znajdziesz ją w zakładce „Przemiana” w Szlifierni i w karcie kamienia w Plecaku."
     }
   ]
 }

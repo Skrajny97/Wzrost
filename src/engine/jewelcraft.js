@@ -226,6 +226,60 @@ export function weakerGem(gemId, current, content) {
   return Boolean(now && next && next.setBonus < now.setBonus);
 }
 
+// The gem one rarity up from a gem (Kwarc → Agat → … → Diament), or null
+// for the rarest and for a mineral that is no gem.
+/**
+ * @param {string} gemId
+ * @param {Content} content
+ * @returns {Mineral | null}
+ */
+export function nextGem(gemId, content) {
+  const gem = content.mineralsById[gemId];
+  if (gem?.kind !== 'gem') return null;
+  const step = rarityStep(gem.rarity, content);
+  const up = content.minerals.filter((/** @type {Mineral} */ mineral) => mineral.kind === 'gem' && rarityStep(mineral.rarity, content) > step);
+  up.sort((/** @type {Mineral} */ a, /** @type {Mineral} */ b) => rarityStep(a.rarity, content) - rarityStep(b.rarity, content));
+  return up[0] ?? null;
+}
+
+// The przemiana of gems (913, the author 13.11.2026: „zrób droższą
+// przemianę (chociaż 10 słabszych kamieni na lepszy)”): `count` times
+// transmute.cost gems of one kind give `count` gems one rarity up, at once,
+// with no work. Only into a gem the System shows at the level of
+// Jubilerstwo (as its setting). Why it cannot be done, or null.
+/**
+ * @param {{ gemId: string, count: unknown, have: number, level: number }} ask
+ * @param {Content} content
+ * @returns {{ code: string, message: string } | null}
+ */
+export function transmuteBlock({ gemId, count, have, level }, content) {
+  const gem = content.mineralsById[gemId];
+  if (gem?.kind !== 'gem') return { code: 'unknown_gem', message: 'Nie ma takiego kamienia.' };
+  const next = nextGem(gemId, content);
+  if (!next) return { code: 'top_gem', message: `${gem.name} to najrzadszy kamień. Nie ma go w co przemienić.` };
+  if (next.level > level) return { code: 'locked', message: say(content.jewelcrafting.texts, 'hidden', 0, { level: next.level }) };
+  if (!Number.isInteger(count) || /** @type {number} */ (count) < 1) return { code: 'invalid_count', message: 'Podaj, ile przemian.' };
+  const cost = content.jewelcrafting.transmute.cost;
+  if (have < /** @type {number} */ (count) * cost) return { code: 'no_minerals', message: `Brakuje: ${gem.name} (potrzeba ${/** @type {number} */ (count) * cost}).` };
+  return null;
+}
+
+// The minerals after `count` przemiany of a gem: transmute.cost of it fewer
+// for each, and one gem one rarity up more (a mineral at none goes away).
+/**
+ * @param {Record<string, number>} minerals
+ * @param {string} gemId
+ * @param {number} count
+ * @param {Content} content
+ * @returns {Record<string, number>}
+ */
+export function transmuteGems(minerals, gemId, count, content) {
+  const next = /** @type {Mineral} */ (nextGem(gemId, content));
+  const left = { ...minerals, [gemId]: (minerals[gemId] ?? 0) - count * content.jewelcrafting.transmute.cost, [next.id]: (minerals[next.id] ?? 0) + count };
+  if (left[gemId] <= 0) delete left[gemId];
+  return left;
+}
+
 // The report of a work in the Szlifiernia: a line about the place from the
 // seed, whether the player called it back early, the profession's new levels
 // with their stats and the patterns and gems the System opened with them,

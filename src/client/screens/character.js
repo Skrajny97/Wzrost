@@ -18,6 +18,7 @@ import { scrapperSheet } from '../scrapper.js';
 import { itemTip, setTipRenderer } from '../item-tip.js';
 import { afterSheet, closeSheet, confirmAction, openSheet, pageHeading, systemLink, systemPanel, toast, withButton } from '../ui.js';
 import { bust } from './select.js';
+import { transmutePart } from '../transmute.js';
 
 // The words of these tables are written in Polish and shown in the page's
 // language (t(), i18n.js).
@@ -613,6 +614,8 @@ export function mountCharacter(container, { switchCharacter } = {}) {
       h('div', { class: 'herb-count' }, less, value, more, all),
       jeweller && h('a', { class: 'button button--world', href: '#/profesje/jubilerstwo', onClick: closeSheet, text: t('Do Szlifierni') }),
       h('div', { class: 'sheet-actions' }, h('button', { type: 'button', class: 'button button--world', onClick: discard, text: t('Wyrzuć') }), sell),
+      // The przemiana of this gem into the next one (913 B), under selling.
+      transmutePart(mineral, { onDone: closeSheet }),
     );
   }
 

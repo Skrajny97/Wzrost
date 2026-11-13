@@ -656,6 +656,10 @@
     "0.3.14": {
       "title": "Version 0.3.14",
       "body": "- A very long character name fits in its card on the character choice screen, on narrow phones too."
+    },
+    "0.3.15": {
+      "title": "Version 0.3.15",
+      "body": "- Setting in the Gem Workshop shows your character with their equipment: tap an item or the Core to set a stone in it. Each item shows which stone it holds.\n- New stone transmutation: 10 stones give one stone a rarity higher at once, e.g. 10 Quartz give an Agate. You'll find it in the Transmutation tab of the Gem Workshop and on a stone's card in your Bag."
     }
   }
 }

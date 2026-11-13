@@ -21927,3 +21927,209 @@ a.discord-button {
     display: none;
   }
 }
+
+/* Oprawianie (912 A): the character's figure with its worn items, a gem's
+   mark on each (its picture in a ring of its colour) or an empty socket,
+   and the sheet's item line. */
+.set-hint {
+  margin: 0;
+  text-align: center;
+}
+
+.set-doll {
+  display: grid;
+  justify-items: center;
+}
+
+.set-doll .portrait-wrap {
+  width: 100%;
+  max-width: 420px;
+}
+
+.set-gem {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--gem, var(--system));
+  border-radius: 50%;
+  background: rgba(8, 12, 14, 0.92);
+  box-shadow: 0 0 6px var(--gem, var(--system));
+}
+
+.set-gem img,
+.set-gem canvas {
+  width: 16px !important;
+  height: 16px !important;
+  image-rendering: pixelated;
+}
+
+.set-socket {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  border: 2px dashed rgba(230, 230, 220, 0.55);
+  border-radius: 50%;
+  background: rgba(8, 12, 14, 0.85);
+}
+
+.set-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 14px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.set-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.set-legend .set-gem,
+.set-legend .set-socket {
+  position: static;
+}
+
+.set-chosen {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.set-chosen > div {
+  min-width: 0;
+}
+
+.set-chosen .item-title {
+  margin: 0;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.set-chosen p {
+  margin: 0;
+}
+
+.set-chosen-art {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+}
+
+.set-chosen-art img,
+.set-chosen-art canvas {
+  width: 40px;
+  height: 40px;
+  image-rendering: pixelated;
+}
+
+/* Przemiana kamieni (913 A and B): the steps as choices, the gems in a
+   line, the hidden next gem as a shadow, and the part under a gem's card
+   in the Plecak. */
+.transmute-pairs {
+  display: grid;
+  gap: 8px;
+}
+
+.transmute-pair {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 4px 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.transmute-pair[aria-pressed='true'] {
+  border-color: var(--system);
+  box-shadow: 0 0 10px rgba(143, 227, 239, 0.35);
+}
+
+.transmute-pair--shadow {
+  opacity: 0.55;
+}
+
+.transmute-radio {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.transmute-pair[aria-pressed='true'] .transmute-radio {
+  border-color: var(--system);
+  background: var(--system);
+}
+
+.transmute-gems {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 6px;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.transmute-gem {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.transmute-gem img,
+.transmute-gem canvas {
+  width: 24px !important;
+  height: 24px !important;
+  image-rendering: pixelated;
+}
+
+.transmute-shadow-art {
+  filter: brightness(0) saturate(0);
+  opacity: 0.55;
+}
+
+.transmute-meta {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.transmute-part {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.transmute-part-title {
+  margin: 0;
+  font-size: 16px;
+}
+
+.transmute-line {
+  margin: 0;
+}

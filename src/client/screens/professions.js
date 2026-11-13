@@ -25,7 +25,10 @@ import { workScene } from '../scenes.js';
 import { playSound } from '../sound.js';
 import { activityFinished, call, reportCache, serverNow, state, testModeOn } from '../state.js';
 import { skipControl } from '../time.js';
-import { confirmAction, howItWorks, splitLead, systemPanel, toast, withButton } from '../ui.js';
+import { closeSheet, confirmAction, howItWorks, openSheet, splitLead, systemPanel, toast, withButton } from '../ui.js';
+import { transmuteForm } from '../transmute.js';
+import { characterLook, portraitLayers } from '../cosmetics.js';
+import { SLOT_ICONS } from '../icons.js';
 import { compareTable, findMark, itemSummary, itemTitle, salvagedText } from './character.js';
 import { lockedScreen } from './locked.js';
 
@@ -204,6 +207,8 @@ export function mountProfessions(container, { params, navigate }) {
   let workshopTab = 'workshop';
   // The Szlifiernia's tab: the jewellery or the setting of gems.
   let jewelTab = 'craft';
+  // The step of przemiana chosen in the Szlifiernia's tab (913 A), by its gem.
+  let transmuteChoice = null;
   // The items marked in the Przechowalnia, by id, whichever screen shows it.
   const storageMarks = new Set();
   // The works under way on the screen, each with its countdown, bar, scene
@@ -1817,15 +1822,28 @@ export function mountProfessions(container, { params, navigate }) {
         { class: 'segmented workshop-tabs', role: 'group', 'aria-label': jewelcrafting.place.name },
         tab('craft', t('Biżuteria')),
         tab('set', t('Oprawianie')),
+        // The przemiana of gems (913 A): at once, so with no free worker too.
+        jewelcrafting.transmute && tab('transmute', t('Przemiana')),
         storage && tab('storage', storageLabel(storage)),
       ),
       jewelTab === 'storage' && storage
         ? storageCard(character)
-        : [
-            placeCard(jewelcrafting.place, setting ? jewelcrafting.about.set : jewelcrafting.about.craft),
-            levelCard(profession, t('pracy')),
-            anyFree(character) && (setting ? setForm(character, jewelcrafting) : jewelForm(character, jewelcrafting)),
-          ],
+        : jewelTab === 'transmute' && jewelcrafting.transmute
+          ? [
+              placeCard(jewelcrafting.place, jewelcrafting.about.transmute),
+              transmuteForm({
+                chosen: transmuteChoice,
+                onChoose: (id) => {
+                  transmuteChoice = id;
+                  render();
+                },
+              }),
+            ]
+          : [
+              placeCard(jewelcrafting.place, setting ? jewelcrafting.about.set : jewelcrafting.about.craft),
+              levelCard(profession, t('pracy')),
+              anyFree(character) && (setting ? setForm(character, jewelcrafting) : jewelForm(character, jewelcrafting)),
+            ],
     );
   }
 
@@ -2028,108 +2046,181 @@ export function mountProfessions(container, { params, navigate }) {
     );
   }
 
-  // Setting a gem in an item worn: the item (and the gem in it now), the
-  // gem (those the System still hides are shadows), what the gem gives,
-  // the time, and the start; a gem already in the item is lost, and only a
-  // stronger one takes its place (the author, 13.11.2026).
+  // Setting a gem (912 A, the author 13.11.2026: „Przy oprawianiu
+  // przedmiotów powinna wyświetlać się karta postaci z ekwipunkiem w
+  // odpowiednich miejscach i po prostu powinno się klikać przedmiot i
+  // oprawiać”): the character's figure with its worn items in their places,
+  // each with a mark of the gem set in it or an empty socket, and the Rdzeń
+  // once open; a tap opens a sheet with the item and its gem now, the gem to
+  // set (those the System still hides are shadows), what it gives, the time
+  // and „Oprawiaj”. A gem already in the item is lost, and only a stronger
+  // one takes its place (the author, 13.11.2026).
   function setForm(character, jewelcrafting) {
     // The Rdzeń takes a gem too, once it is open (863 A, screens/core.js).
     const coreSlot = state.content.slots.find((slot) => slot.id === 'core');
-    const core = character.core?.open ? { id: 'core', core: true, name: coreSlot?.name ?? t('Rdzeń'), slotName: t('Artefakty Rdzenia'), gem: character.core.gem } : null;
+    const allGems = jewelcrafting.gems;
+    const coreGem = character.core?.gem ? (typeof character.core.gem === 'string' ? allGems.find((gem) => gem.id === character.core.gem) : character.core.gem) : null;
+    const core = character.core?.open ? { id: 'core', core: true, name: coreSlot?.name ?? t('Rdzeń'), slotName: t('Artefakty Rdzenia'), gem: coreGem } : null;
     const worn = [...state.content.slots.map((slot) => character.equipment[slot.id]).filter(Boolean), ...(core ? [core] : [])];
     const head = h('h2', { class: 'section-title', id: 'set-title', text: t('Oprawianie') });
     const card = (...children) => h('section', { class: 'card gather-card', 'aria-labelledby': 'set-title', 'data-guide': 'jewel-setting' }, head, children);
     if (worn.length === 0) return card(h('p', { class: 'muted', text: t('Załóż przedmiot, żeby oprawić w nim kamień.') }));
-    const gems = jewelcrafting.gems.filter((gem) => !gem.hidden);
+    const gems = allGems.filter((gem) => !gem.hidden);
     const who = workerPicker(character);
-    let item = worn.find((candidate) => candidate.id === setChoice.item) ?? worn[0];
-    let gem = gems.find((candidate) => candidate.id === setChoice.gem) ?? gems.find((candidate) => candidate.have > 0) ?? gems[0];
-    const items = choiceList(t('Przedmiot'), { unknown: (count) => countOf(count, 'przedmiot', 'przedmioty', 'przedmiotów') });
-    const stones = choiceList(t('Kamienie'), { unknown: (count) => countOf(count, 'nieznany kamień', 'nieznane kamienie', 'nieznanych kamieni') });
-    const details = h('div', { class: 'stack' });
-    const remember = () => {
-      setChoice.item = item.id;
-      setChoice.gem = gem.id;
-      saveChoice(SET_CHOICE, setChoice);
-    };
     const itemArt = (each) => (each.core ? icon('core', { size: 24 }) : (itemSprite(each) ?? icon('ring', { size: 24 })));
     const titleOf = (each) => (each.core ? each.name : itemTitle(each));
     const gemNow = (each) => (each.gem ? `${each.gem.name} +${percentText(each.gem.bonus)}` : t('bez kamienia'));
     const gemMeta = (each) => `+${percentText(each.bonus)} · ${t('w plecaku: {count}', { count: formatNumber(each.have) })} · ${formatMinutes(each.minutes)}`;
+    // A gem's mark on a slot: its picture in a ring of its colour, or a
+    // dashed socket when the item has none.
+    const gemMark = (gem) => {
+      if (!gem) return h('span', { class: 'set-socket', 'aria-hidden': 'true' });
+      const mark = h('span', { class: 'set-gem', title: gem.name, 'aria-hidden': 'true' }, mineralSprite(gem.id));
+      if (gem.color) mark.style.setProperty('--gem', gem.color);
+      return mark;
+    };
 
-    function show() {
-      items.show(
-        { art: itemArt(item), name: titleOf(item), meta: `${item.slotName} · ${gemNow(item)}` },
-        worn.map((each) => ({ id: each.id, art: itemArt(each), name: titleOf(each), meta: `${each.slotName} · ${gemNow(each)}`, on: each.id === item.id })),
-        [],
-        (id) => {
-          item = worn.find((each) => each.id === id);
-          remember();
-          show();
+    // The figure as the Postać tab draws it: the forest (or the bought
+    // background) with the class's figure in the character's look, the
+    // slots in two columns, and over each worn item its gem's mark.
+    const slotButton = (slot) => {
+      if (slot.locked) {
+        if (!core) return h('span', { class: 'slot slot--core slot--locked', 'aria-hidden': 'true' }, icon('core', { size: 24 }));
+        return h(
+          'button',
+          { type: 'button', class: 'slot slot--core slot--open', 'data-guide': `set-slot-${slot.id}`, 'aria-label': t('{slot}: {gem}', { slot: core.name, gem: gemNow(core) }), onClick: () => openSetting(core) },
+          icon('core', { size: 24 }),
+          gemMark(core.gem),
+        );
+      }
+      const item = character.equipment[slot.id];
+      if (!item) return h('span', { class: 'slot slot--empty', 'aria-hidden': 'true' }, icon(SLOT_ICONS[slot.id], { size: 24 }));
+      return h(
+        'button',
+        {
+          type: 'button',
+          class: 'slot',
+          'data-guide': `set-slot-${slot.id}`,
+          vars: { '--rarity': item.color },
+          'aria-label': t('{slot}: {item}, {gem}', { slot: slot.name, item: itemTitle(item), gem: gemNow(item) }),
+          onClick: () => openSetting(item),
         },
+        itemSprite(item) ?? icon(SLOT_ICONS[slot.id], { size: 24 }),
+        gemMark(item.gem),
       );
-      stones.show(
-        { art: mineralIcon(gem.id), name: gem.name, meta: gemMeta(gem) },
-        gems.map((each) => ({ id: each.id, art: mineralIcon(each.id), name: each.name, meta: gemMeta(each), on: each.id === gem.id })),
-        jewelcrafting.gems.filter((each) => each.hidden).map((each) => ({ art: mineralIcon(each.id), level: each.level, hint: each.hint })),
-        (id) => {
-          gem = gems.find((each) => each.id === id);
-          remember();
-          show();
-        },
-      );
-      const same = item.gem?.id === gem.id;
-      // A gem weaker than the one in the item never takes its place.
-      const weaker = !same && Boolean(item.gem) && gem.bonus < item.gem.bonus;
-      const start = h('button', {
-        type: 'button',
-        class: 'button button--system',
-        text: t('Oprawiaj'),
-        disabled: same || weaker || gem.have === 0,
-        onClick: async (event) => {
-          const button = event.currentTarget;
-          if (item.gem) {
-            const sure = await confirmAction({
-              title: t('Oprawić nowy kamień?'),
-              text: t('{old} w przedmiocie {item} rozpadnie się, a jego miejsce zajmie {gem}.', { old: item.gem.name, item: titleOf(item), gem: gem.name }),
-              confirmLabel: t('Oprawiaj'),
-              danger: true,
-            });
-            if (!sure) return;
-          }
-          await withButton(button, async () => {
+    };
+    const column = (side) => h('div', { class: `slots slots--${side}` }, state.content.slots.filter((slot) => slot.column === side).map(slotButton));
+    const layers = portraitLayers(characterLook(character), character.cosmetics);
+    const frame = h('div', { class: `portrait${layers.length > 1 ? ' portrait--framed' : ''}` }, layers, column('left'), column('right'));
+    const example = gems[0];
+    const legend = h(
+      'p',
+      { class: 'set-legend muted' },
+      example && h('span', {}, gemMark(example), t('oprawiony kamień')),
+      h('span', {}, gemMark(null), t('bez kamienia')),
+    );
+
+    // The sheet of one item: the item and its gem now, the gem to set and
+    // the start, as the tab's form was before.
+    function openSetting(item) {
+      setChoice.item = item.id;
+      // The gem remembered, unless weaker than the one in the item; else the
+      // first one the item can take that is in the bag, else the first it can take.
+      const fits = (gem) => !(item.gem && (gem.id === item.gem.id || gem.bonus < item.gem.bonus));
+      let gem =
+        gems.find((candidate) => candidate.id === setChoice.gem && fits(candidate)) ??
+        gems.find((candidate) => fits(candidate) && candidate.have > 0) ??
+        gems.find(fits) ??
+        gems.find((candidate) => candidate.id === setChoice.gem) ??
+        gems[0];
+      const stones = choiceList(t('Kamienie'), { unknown: (count) => countOf(count, 'nieznany kamień', 'nieznane kamienie', 'nieznanych kamieni') });
+      const details = h('div', { class: 'stack' });
+      const remember = () => {
+        setChoice.gem = gem.id;
+        saveChoice(SET_CHOICE, setChoice);
+      };
+      function show() {
+        stones.show(
+          { art: mineralIcon(gem.id), name: gem.name, meta: gemMeta(gem) },
+          gems.map((each) => ({ id: each.id, art: mineralIcon(each.id), name: each.name, meta: gemMeta(each), on: each.id === gem.id })),
+          allGems.filter((each) => each.hidden).map((each) => ({ art: mineralIcon(each.id), level: each.level, hint: each.hint })),
+          (id) => {
+            gem = gems.find((each) => each.id === id);
             remember();
-            await call('POST', '/api/professions/jewel', { set: true, itemId: item.id, gem: gem.id, ...who.body() });
-            window.scrollTo(0, 0);
-          });
-        },
-      });
-      fill(
-        details,
-        h('p', {
-          class: 'herb-estimate',
-          text: item.core
-            ? t('Wszystkie liczby wchłoniętych Artefaktów wzrosną o {bonus}.', { bonus: percentText(gem.bonus) })
-            : t('Wszystkie liczby przedmiotu wzrosną o {bonus}, każda co najmniej o 1.', { bonus: percentText(gem.bonus) }),
-        }),
-        h('p', { class: 'herb-estimate', text: t('Czas oprawiania: {time}. Zużyjesz: 1 × {gem}.', { time: formatMinutes(gem.minutes), gem: gem.name }) }),
-        item.gem && !same && !weaker && h('p', { class: 'herb-room herb-room--full', text: t('Nowy kamień zniszczy obecny: {gem}.', { gem: gemNow(item) }) }),
-        same && h('p', { class: 'herb-room', text: item.core ? t('{gem} już tkwi w Rdzeniu.', { gem: gem.name }) : t('{gem} już tkwi w tym przedmiocie.', { gem: gem.name }) }),
-        weaker &&
+            show();
+          },
+        );
+        const same = item.gem?.id === gem.id;
+        // A gem weaker than the one in the item never takes its place.
+        const weaker = !same && Boolean(item.gem) && gem.bonus < item.gem.bonus;
+        const start = h('button', {
+          type: 'button',
+          class: 'button button--system',
+          text: t('Oprawiaj'),
+          disabled: same || weaker || gem.have === 0,
+          onClick: async (event) => {
+            const button = event.currentTarget;
+            if (item.gem) {
+              const sure = await confirmAction({
+                title: t('Oprawić nowy kamień?'),
+                text: t('{old} w przedmiocie {item} rozpadnie się, a jego miejsce zajmie {gem}.', { old: item.gem.name, item: titleOf(item), gem: gem.name }),
+                confirmLabel: t('Oprawiaj'),
+                danger: true,
+              });
+              if (!sure) return;
+            }
+            await withButton(button, async () => {
+              remember();
+              await call('POST', '/api/professions/jewel', { set: true, itemId: item.id, gem: gem.id, ...who.body() });
+              closeSheet();
+              window.scrollTo(0, 0);
+            });
+          },
+        });
+        fill(
+          details,
           h('p', {
-            class: 'herb-room',
+            class: 'herb-estimate',
             text: item.core
-              ? t('W Rdzeniu tkwi {gem}. Oprawisz w nim tylko mocniejszy kamień.', { gem: item.gem.name })
-              : t('W tym przedmiocie tkwi {gem}. Oprawisz w nim tylko mocniejszy kamień.', { gem: item.gem.name }),
+              ? t('Wszystkie liczby wchłoniętych Artefaktów wzrosną o {bonus}.', { bonus: percentText(gem.bonus) })
+              : t('Wszystkie liczby przedmiotu wzrosną o {bonus}, każda co najmniej o 1.', { bonus: percentText(gem.bonus) }),
           }),
-        !weaker && gem.have === 0 && h('p', { class: 'herb-room herb-room--full', text: t('Brakuje kamienia: {gem}. Wydobędziesz go w Górnictwie.', { gem: gem.name }) }),
-        !weaker && gem.have === 0 && h('a', { class: 'button button--world', href: HASHES.mining, text: t('Do Górnictwa') }),
-        start,
+          h('p', { class: 'herb-estimate', text: t('Czas oprawiania: {time}. Zużyjesz: 1 × {gem}.', { time: formatMinutes(gem.minutes), gem: gem.name }) }),
+          item.gem && !same && !weaker && h('p', { class: 'herb-room herb-room--full', text: t('Nowy kamień zniszczy obecny: {gem}.', { gem: gemNow(item) }) }),
+          same && h('p', { class: 'herb-room', text: item.core ? t('{gem} już tkwi w Rdzeniu.', { gem: gem.name }) : t('{gem} już tkwi w tym przedmiocie.', { gem: gem.name }) }),
+          weaker &&
+            h('p', {
+              class: 'herb-room',
+              text: item.core
+                ? t('W Rdzeniu tkwi {gem}. Oprawisz w nim tylko mocniejszy kamień.', { gem: item.gem.name })
+                : t('W tym przedmiocie tkwi {gem}. Oprawisz w nim tylko mocniejszy kamień.', { gem: item.gem.name }),
+            }),
+          !weaker && gem.have === 0 && h('p', { class: 'herb-room herb-room--full', text: t('Brakuje kamienia: {gem}. Wydobędziesz go w Górnictwie.', { gem: gem.name }) }),
+          !weaker && gem.have === 0 && h('a', { class: 'button button--world', href: HASHES.mining, onClick: closeSheet, text: t('Do Górnictwa') }),
+          start,
+        );
+      }
+      show();
+      openSheet(
+        h('h2', { class: 'sheet-title', text: t('Oprawianie') }),
+        h(
+          'div',
+          { class: 'set-chosen' },
+          h('span', { class: 'set-chosen-art', vars: item.core ? {} : { '--rarity': item.color } }, itemArt(item)),
+          h('div', {}, h('p', { class: 'item-title', vars: item.core ? {} : { '--rarity': item.color }, text: titleOf(item) }), h('p', { class: 'muted small', text: `${item.slotName} · ${gemNow(item)}` })),
+        ),
+        h('p', { class: 'duration-title', text: t('Kamień') }),
+        stones.element,
+        details,
       );
     }
 
-    show();
-    return card(who.element, h('p', { class: 'duration-title', text: t('Przedmiot') }), items.element, h('p', { class: 'duration-title', text: t('Kamień') }), stones.element, details);
+    return card(
+      who.element,
+      h('p', { class: 'herb-estimate set-hint', text: t('Stuknij przedmiot albo Rdzeń, żeby oprawić w nim kamień.') }),
+      h('div', { class: 'set-doll' }, h('div', { class: 'portrait-wrap' }, frame)),
+      legend,
+    );
   }
 
   // A work of the Szlifiernia under way, or its report waiting. Called back

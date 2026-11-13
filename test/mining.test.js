@@ -31,6 +31,7 @@ import {
   knownMinerals,
   mineMinerals,
   mineralsPerHour,
+  nextGem,
   miningMinutes,
   miningReport,
   notificationsDue,
@@ -40,6 +41,8 @@ import {
   questText,
   addQuestProgress,
   setMinutes,
+  transmuteBlock,
+  transmuteGems,
   upgradedItem,
   veinGoldPerHour,
   weakerGem,
@@ -500,6 +503,25 @@ describe('Jubilerstwo in the engine', () => {
     assert.equal(weakerGem('quartz', 'nothing', content), false);
   });
 
+  test('przemiana: ten gems give one a rarity up, at once, only into a gem the System shows (913, the author 13.11.2026)', () => {
+    assert.equal(content.jewelcrafting.transmute.cost, 10);
+    assert.deepEqual(
+      ['quartz', 'agate', 'amethyst', 'emerald', 'sapphire', 'ruby', 'diamond'].map((id) => nextGem(id, content)?.id ?? null),
+      ['agate', 'amethyst', 'emerald', 'sapphire', 'ruby', 'diamond', null],
+    );
+    assert.equal(nextGem('silver-ore', content), null);
+    // Agat shows from the 5th level of Jubilerstwo, Diament has none above.
+    assert.equal(transmuteBlock({ gemId: 'quartz', count: 1, have: 10, level: 4 }, content).code, 'locked');
+    assert.equal(transmuteBlock({ gemId: 'quartz', count: 1, have: 10, level: 5 }, content), null);
+    assert.equal(transmuteBlock({ gemId: 'quartz', count: 2, have: 19, level: 5 }, content).message, 'Brakuje: Kwarc (potrzeba 20).');
+    assert.equal(transmuteBlock({ gemId: 'quartz', count: 0, have: 19, level: 5 }, content).code, 'invalid_count');
+    assert.equal(transmuteBlock({ gemId: 'quartz', count: 1.5, have: 19, level: 5 }, content).code, 'invalid_count');
+    assert.equal(transmuteBlock({ gemId: 'diamond', count: 1, have: 10, level: 200 }, content).code, 'top_gem');
+    assert.equal(transmuteBlock({ gemId: 'silver-ore', count: 1, have: 10, level: 200 }, content).code, 'unknown_gem');
+    assert.deepEqual(transmuteGems({ quartz: 23, agate: 1 }, 'quartz', 2, content), { quartz: 3, agate: 3 });
+    assert.deepEqual(transmuteGems({ quartz: 20 }, 'quartz', 2, content), { agate: 2 });
+  });
+
   test('the report of a setting names the gem, the item and the gem it destroyed, or the gem that came back', () => {
     const work = { level: 30, timePoints: 0, messages: [] };
     const base = { minutes: 15, startedAt: 0, endsAt: 900000, seed: 's', before: { level: 1, xp: 0 }, after: { level: 1, xp: 15 }, character: { level: 30 }, xp: 5, work };
@@ -766,6 +788,37 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.deepEqual(minerals(await character()), {});
     assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).data.report, null);
     assert.deepEqual(minerals(await character()), { quartz: 1 });
+  });
+
+  test('przemiana through the API: 10 gems into 1 a rarity up at once, also while the character explores; refused when locked, short or the rarest (913)', async () => {
+    await set(`minerals = '{"quartz":25,"silver-ore":4}'`);
+    const transmute = (body) => call('POST', '/api/professions/transmute', { cookie, body });
+    // Agat is hidden until the 5th level of Jubilerstwo.
+    const locked = await transmute({ gem: 'quartz', count: 1 });
+    assert.deepEqual([locked.status, locked.data.error.code, locked.data.error.message], [409, 'locked', 'Ukryte przez System do 5. poziomu Jubilerstwa.']);
+    await set(`professions = '{"jewelcrafting":{"level":5,"xp":0}}'`);
+    assert.equal((await character()).professions.jewelcrafting.transmute.cost, 10);
+    const short = await transmute({ gem: 'quartz', count: 3 });
+    assert.deepEqual([short.status, short.data.error.code, short.data.error.message], [409, 'no_minerals', 'Brakuje: Kwarc (potrzeba 30).']);
+    assert.equal((await transmute({ gem: 'quartz', count: 0 })).status, 400);
+    assert.equal((await transmute({ gem: 'silver-ore', count: 1 })).data.error.code, 'unknown_gem');
+    // While the character explores, the bag's gems change all the same.
+    assert.equal((await call('POST', '/api/hunts', { cookie, body: { areaId: 'windfalls-edge', minutes: 30 } })).status, 201);
+    const done = await transmute({ gem: 'quartz', count: 2 });
+    assert.equal(done.status, 200);
+    assert.deepEqual(done.data.transmuted, { from: 'quartz', to: 'agate', count: 2 });
+    assert.deepEqual(minerals(done.data.character), { quartz: 5, agate: 2, 'silver-ore': 4 });
+    // The rarest gem has nothing above it.
+    await set(`minerals = '{"diamond":10}', professions = '{"jewelcrafting":{"level":200,"xp":0}}'`);
+    assert.equal((await transmute({ gem: 'diamond', count: 1 })).data.error.code, 'top_gem');
+  });
+
+  test('two przemiany at once never use the same gems twice', async () => {
+    await set(`minerals = '{"quartz":10}', professions = '{"jewelcrafting":{"level":5,"xp":0}}'`);
+    const body = { gem: 'quartz', count: 1 };
+    const answers = await Promise.all([call('POST', '/api/professions/transmute', { cookie, body }), call('POST', '/api/professions/transmute', { cookie, body })]);
+    assert.deepEqual(answers.map((answer) => answer.status).sort(), [200, 409]);
+    assert.deepEqual(minerals(await character()), { agate: 1 });
   });
 
   // A setting's report keeps its item's card as it was made, and the card

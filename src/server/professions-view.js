@@ -336,6 +336,8 @@ function jewelView(level, row) {
     professionId: jewelcrafting.profession,
     place: jewelcrafting.place,
     about: jewelcrafting.about,
+    // The przemiana of gems (913): how many gems give one a rarity up.
+    transmute: jewelcrafting.transmute,
     slots: Object.keys(jewelcrafting.ores).map((slotId) => ({
       id: slotId,
       name: content().slotsById[slotId].name,

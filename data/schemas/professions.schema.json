@@ -1108,6 +1108,7 @@
         "chancePerLevel",
         "maxChance",
         "setting",
+        "transmute",
         "salvage",
         "about",
         "texts"
@@ -1222,12 +1223,28 @@
             }
           }
         },
+        "transmute": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Przemiana kamieni (913 A i B): ile kamieni jednego rodzaju daje jeden kamień o stopień rzadszy, od razu (autor 13.11.2026: co najmniej 10).",
+          "required": [
+            "cost"
+          ],
+          "properties": {
+            "cost": {
+              "type": "integer",
+              "minimum": 2,
+              "description": "Ile kamieni idzie na jeden kamień o stopień rzadszy."
+            }
+          }
+        },
         "about": {
           "type": "object",
           "additionalProperties": false,
           "required": [
             "craft",
-            "set"
+            "set",
+            "transmute"
           ],
           "properties": {
             "craft": {
@@ -1239,6 +1256,14 @@
               }
             },
             "set": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "transmute": {
               "type": "array",
               "minItems": 1,
               "items": {
