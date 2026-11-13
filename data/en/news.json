@@ -628,6 +628,10 @@
     "0.3.7": {
       "title": "Version 0.3.7",
       "body": "- The Labyrinth is easier: its creatures sit roughly halfway between the old Labyrinth and the latest one.\n- After you collect an expedition's report, “Back” leads to the expeditions of the same place, not to the start of Combat.\n- Another character's card shows the gem set in an item."
+    },
+    "0.3.8": {
+      "title": "Version 0.3.8",
+      "body": "- The locked Core says how to open it: defeat the first guardian of the System Labyrinth. The Labyrinth is in the Settlement, in the Trial Hall, from character level 30."
     }
   }
 }

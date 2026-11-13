@@ -15,7 +15,7 @@
       "level": { "type": "integer", "minimum": 2 },
       "classLevel": { "type": "integer", "minimum": 2, "description": "Moduł otwiera poziom klasy zamiast poziomu postaci, a komunikat pojawia się po osiągnięciu tego poziomu klasy." },
       "condition": { "type": "string", "minLength": 1 },
-      "locked": { "type": "string", "minLength": 1, "description": "Cały komunikat przy części gry, która nie ma jeszcze poziomu ani warunku, zamiast „{name} odblokuje się {condition}.” (Rdzeń; autor 12.11.2026: „Rdzeń zostanie odblokowany podczas jednej z kolejnych aktualizacji.”)." },
+      "locked": { "type": "string", "minLength": 1, "description": "Cały komunikat przy zablokowanej części gry zamiast „{name} odblokuje się {condition}.” (Rdzeń: najpierw zdanie autora z 12.11.2026, „Rdzeń zostanie odblokowany podczas jednej z kolejnych aktualizacji.”, a od 0.3.8, gdy Rdzeń jest już w grze, zdanie o pierwszym strażniku Labiryntu; autor 13.11.2026: „Dalej pokazuje sie zły napis”)." },
       "message": { "type": "string", "minLength": 1 },
       "feature": { "type": "string", "enum": ["crafting", "settlement", "arena", "labyrinth"], "description": "Komunikat Systemu tylko tam, gdzie ta część gry jest włączona (crafting: CRAFTING, settlement: SETTLEMENT, arena: ARENA, labyrinth: LABYRINTH w wrangler.jsonc)." },
       "huntMinutes": { "type": "integer", "minimum": 1, "description": "Od tego poziomu eksploracja może trwać do tylu minut (najdłuższa z odblokowanych). Przed pierwszym takim wpisem: shortHuntMaxMinutes z balance.json." }
