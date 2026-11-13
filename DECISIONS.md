@@ -3233,12 +3233,15 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
-## Oceny autora 892–895 (13.11.2026; 893 i 894 w grze od 0.3.1)
+## Oceny autora 892–895 (13.11.2026; 893 i 894 w grze od 0.3.1, 892 i 895 od 0.3.3)
 
 Autor zaznaczył oceny na stronie ocen: „oceny zaznaczone”.
 
-1. **892: animacje ciosów w walkach, C „Kinowe”.** Wariant C wchodzi do gry jako jedyny wygląd walk, bez przełącznika i bez plików pracowni efektów. Wejdzie w następnym etapie.
-2. **895: animacje gry w karty, C „Widowiskowe”.** Też jako jedyny wygląd, bez przełącznika, w następnym etapie.
+1. **892: animacje ciosów w walkach, C „Kinowe”.** Od 0.3.3 wariant C jest jedynym wyglądem walk, bez przełącznika i bez plików pracowni efektów (`src/client/arena-fx.js`). Dotyczy każdej walki odtwarzanej w grze: raportów wypraw, Areny, wojen gildii, Bestii i Wyprawy Gildii oraz podglądu umiejętności w Panelu Autora. Brakujące szczegóły:
+   - Przy wyłączonych Animacjach (Ustawienia) nic się nie trzęsie, nie przybliża ani nie zwalnia. Zostają kolory i błysk krytyka, napis „KRYTYK!” (po angielsku „CRIT!”) i liczby, które tylko gasną.
+   - Pierścień przy pojawieniu się przywołańca odpadł. W prototypie szukał przywołańca pod złym kluczem, więc nie było go w filmach, które autor ocenił.
+   - iPhone'y z systemem starszym niż iOS 16 nie przycinają efektów przy brzegach pola walki, jak w prototypie.
+2. **895: animacje gry w karty, C „Widowiskowe”.** Od 0.3.3 jedyny wygląd gry w karty, bez przełącznika (`src/client/cards-fx.js`). Dotknięcie stołu w trakcie rundy kończy jej animację. Przy wyłączonych Animacjach stół zmienia się od razu, jak dawniej.
 3. **893: przywołańce Druida i Arcydruida.** Ent (Przywołanie enta) w wersji B i Prastary dąb (Przebudzenie dębu) w wersji C mają w walkach własne postacie zamiast zastępczych (zob. „Grafika zastępcza”).
 4. **894: łatwiejszy start.**
    - 894.1 C, 894.3 C i 894.6 C: zostaje jak jest (bez paska zadania i „Następnego kroku”, bez karty „Nowe miejsce”, powiadomienia włącza się w Ustawieniach).
