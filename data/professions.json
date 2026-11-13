@@ -311,7 +311,7 @@
       "busy": ["Postać pracuje w Szlifierni. Poczekaj na koniec pracy."],
       "claimFirst": ["Praca w Szlifierni się skończyła. Najpierw odbierz raport."],
       "pushTitle": ["Koniec pracy w Szlifierni"],
-      "pushBody": ["Praca zakończona: {place}. Raport czeka na odbiór."], "gemLine": ["{gem}: +{percent}% do wszystkich wartości"], "gemHelp": ["Kamień oprawiony w Szlifierni podnosi o {percent}% każdą wartość tego przedmiotu: obrażenia, pancerz i każdą cechę z listy, każdą co najmniej o 1. Wartości na tej karcie już to uwzględniają."]
+      "pushBody": ["Praca zakończona: {place}. Raport czeka na odbiór."], "gemLine": ["{gem}: +{percent}% do wszystkich wartości"], "gemHelp": ["Kamień oprawiony w Szlifierni podnosi o {percent}% każdą wartość tego przedmiotu: obrażenia, pancerz i każdą cechę z listy, każdą co najmniej o 1. Wartości w kolorze kamienia już to uwzględniają."]
     }
   },
   "minerals": [

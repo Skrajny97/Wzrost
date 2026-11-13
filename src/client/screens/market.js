@@ -23,7 +23,7 @@ import { countOf, dateTimeFormat, formatDecimal, formatNumber, tradePace } from 
 import { t } from '../i18n.js';
 import { call, serverNow, state } from '../state.js';
 import { closeSheet, confirmAction, howItWorks, openSheet, systemPanel, toast, withButton } from '../ui.js';
-import { compareTable, itemSummary } from './character.js';
+import { compareTable, gemFold, itemSummary, propertyLines } from './character.js';
 
 // The tabs and the names of kinds and reasons below are Polish, shown
 // through t(). The Rejestr of the character's trade (the author,
@@ -226,7 +226,10 @@ export function itemEntry(item, key, opened, { notes: noted = true, wearers = nu
       h(
         'ul',
         { class: 'item-properties' },
-        item.properties.map((line) => h('li', { text: line })),
+        // Its numbers and the gem set in it, as on the item's own card: with
+        // a gem, each number without it and with it (906 B).
+        propertyLines(item),
+        item.gem && gemFold(item.gem),
         item.classNames &&
           h('li', {
             class: 'item-classes',

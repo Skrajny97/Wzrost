@@ -639,7 +639,7 @@
     },
     "0.3.10": {
       "title": "Version 0.3.10",
-      "body": "- After a lost fight in the Labyrinth you can start it again once a day: from level 1, with your party at full HP. It costs a lot of gold, and the rewards you gained earlier that day stay."
+      "body": "- After a lost fight in the Labyrinth you can start it again once a day: from level 1, with your party at full HP. It costs a lot of gold, and the rewards you gained earlier that day stay.\n- An item card with a stone set in it shows each value without the stone and, beside it in brackets in the stone's colour, the value with it."
     }
   }
 }

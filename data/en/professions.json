@@ -280,7 +280,7 @@
         "{gem}: +{percent}% to all values"
       ],
       "gemHelp": [
-        "A stone set in the Gem Workshop raises every value of this item by {percent}%: damage, armour and every property on the list, each by at least 1. The values on this card already include it."
+        "A stone set in the Gem Workshop raises every value of this item by {percent}%: damage, armour and every property on the list, each by at least 1. The values in the stone's colour already include it."
       ]
     }
   },

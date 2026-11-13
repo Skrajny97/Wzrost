@@ -3241,7 +3241,7 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
-## Wersja 0.3.10 (13.11.2026): Labirynt od nowa po przegranej walce
+## Wersja 0.3.10 (13.11.2026): Labirynt od nowa po przegranej walce, wartości z kamieniem w nawiasie (906 B)
 
 Autor 13.11.2026: „Pozwól, w przypadku porażki zresetować Labirynt raz dziennie za naprawdę srogą opłatą (ale uzasadnioną, czyli górna granica balansu)”. Zasady i rozstrzygnięte szczegóły: „Labirynt Systemu i Rdzeń: zasady”, punkt 23.
 
@@ -3249,6 +3249,20 @@ Autor 13.11.2026: „Pozwól, w przypadku porażki zresetować Labirynt raz dzie
 2. **Opłata:** złoto 150 minut eksploracji na poziomie stworów Labiryntu (np. 2643 zł na poziomie 71), raz dziennie.
 3. **Serwer:** `POST /api/labyrinth/reset` (`resetLabyrinthDay` w `src/server/labyrinth.js`) zapisuje zmianę tylko wtedy, gdy postać jest taka, jak ją odczytał, a złoto schodzi tylko wtedy, gdy postać je ma. Widok Labiryntu po przegranej ma `reset: { price, left }`.
 4. **Sprawdzone:** testy Labiryntu w silniku i przez API (37 testów), typy, dane i tłumaczenia, a w przeglądarce na 320, 390, 1366 i 1920 px: przycisk, brak złota, wykorzystany reset, potwierdzenie i sam reset.
+5. **Kamień w karcie przedmiotu (906 B):** karta przedmiotu z oprawionym kamieniem pokazuje każdą wartość bez kamienia, a obok w nawiasie, w kolorze kamienia, wartość z kamieniem. Zasady: „Kamień w karcie przedmiotu: wartości bez kamienia i z kamieniem (906 B, 13.11.2026)”.
+6. **Sprawdzone razem:** testy Górnictwa i Jubilerstwa, postaci, Targowiska, Wymiany, Skrzyni Gildii, wypadania kamieni, klienta, silnika i tłumaczeń (371 testów), typy, dane i tłumaczenia.
+
+## Kamień w karcie przedmiotu: wartości bez kamienia i z kamieniem (906 B, 13.11.2026)
+
+Autor, ze zrzutem epickiego Długiego łuku +9 z Agatem: „Niech pokazują itemki bazowe statystyki i obok w kolorze oprawionego kamienia zmienione statystyki”. Z dwóch makiet autor wybrał B.
+
+1. **Wartość bez kamienia, a w nawiasie z kamieniem.** W karcie przedmiotu z oprawionym kamieniem każdy wiersz z liczbą pokazuje wartość bez kamienia, a obok w nawiasie, w kolorze rzadkości kamienia, wartość z kamieniem, np. „Obrażenia: 58–90 (64–99) (fizyczne)”, „Percepcja: +26 (+29)”. Wartość bez kamienia jest już po ulepszeniu z Kowadła. Wiersz, którego kamień nie zmienia (zaklęcie żywiołu Zaklinaczki), zostaje bez nawiasu. Nawias nie łamie się w środku: na wąskim ekranie przechodzi w całości do następnej linii.
+2. **Gdzie.** Każda pełna karta przedmiotu: plecak i ekwipunek (także karta pod kursorem na komputerze), Skrzynia Gildii, przedmiot towarzysza, raport ze Szlifierni, karta postaci innego gracza, Targowisko i Wymiana. Karty Targowiska i Wymiany pokazują teraz też wiersz kamienia z objaśnieniem, bo bez niego liczby w kolorze nie miałyby wyjaśnienia (brakujący szczegół). Krótkie listy (np. wybór przedmiotu do założenia, „Rozbierz kilka”, Przechowalnia, Skrzynia Konta), porównania („Po założeniu”, „Porównanie z założonym”) i podgląd ulepszenia na Kowadle pokazują jak dotąd same wartości z kamieniem.
+3. **Objaśnienie kamienia** kończy się zdaniem „Wartości w kolorze kamienia już to uwzględniają.” (po angielsku „The values in the stone's colour already include it.”): `gemHelp` w `data/professions.json` i `data/en/professions.json`.
+4. **Zapis.** Pary liczy silnik: `gemProperties` w `src/engine/items.js` daje dla każdego wiersza `itemProperties` tekst bez kamienia do końca liczby, liczbę z kamieniem (null, gdy kamień jej nie zmienia) i resztę wiersza. `itemView` dodaje je tylko przy kamieniu, który gra zna, a karta postaci innego gracza (`/api/profile/:name`) je przekazuje. Strona nie rozbiera tekstów: wiersze rysuje `propertyLines`, a wiersz kamienia `gemFold` w `src/client/screens/character.js`.
+5. **Stare raporty (brakujący szczegół).** Raport ze Szlifierni sprzed tej wersji ma zapisaną kartę bez par. Otwarty z Dziennika, gdy przedmiotu już nie ma w tej postaci, pokazuje jak dotąd same wartości z kamieniem, choć objaśnienie kamienia mówi już o wartościach w jego kolorze.
+6. **Kwarc** ma szary kolor rzadkości, więc jego wartości w nawiasie są szare i pogrubione.
+7. **Sprawdzone:** nowy test silnika (bez kamienia i z kamieniem, po ulepszeniu +5, obrażenia fizyczne i magiczne, odporność, cecha podniesiona o co najmniej 1, pancerz z ulepszenia talizmanu, zaklęcie żywiołu, po angielsku), karta postaci innego gracza z parami, a w przeglądarce karta w plecaku, karta pod kursorem, cudza karta postaci i Targowisko na 320, 390, 1366 i 1920 px, po polsku i po angielsku: bez przewijania na boki i bez tekstu wychodzącego z ramek. `tools/layout-check.cjs` przechodzi (9 rozmiarów × 45 ekranów).
 
 ## Wersja 0.3.9 (13.11.2026): karty z niższych krain i z nowych źródeł (902 B, 903)
 
