@@ -32,6 +32,7 @@ import { findMentions, mentionPeople, mentionsSaved, mentionsSql, mentionsView, 
 import { chatAccountName } from './names.js';
 import { partyNews } from './parties.js';
 import { tradeNews } from './trades.js';
+import { duelNews } from './card-duel.js';
 import { ApiError, json, readJson } from './http.js';
 import { language, t } from './i18n.js';
 import { OWN_CHARACTERS } from './roles.js';
@@ -360,7 +361,8 @@ function seenOf(text) {
 // Społeczność tab, a Wymiana proposed or going on (trades.js), what the
 // character has read on any of its devices, and when its activity ends: a
 // Drużyna's trip moves when another member skips its time (time.js), and
-// the page follows.
+// the page follows. Also a live card match challenged or going on
+// (card-duel.js), its deadlines kept as it is read.
 export async function latestChat(context) {
   const { session, character, db } = await requireChatter(context);
   // The guild's channel and the invitations to guilds (guilds.js).
@@ -368,7 +370,7 @@ export async function latestChat(context) {
   // The System's messages light it for everyone, the winner too.
   const newest = `SELECT MAX(id) AS id FROM chat_messages
          WHERE channel = ? AND hidden_at IS NULL AND (system = 1 OR (user_id != ? AND user_id NOT IN (SELECT blocked_id FROM chat_blocks WHERE user_id = ?)))`;
-  const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites, activity, mentions] = await Promise.all([
+  const [row, conversations, friends, trade, read, partyInvites, guildRow, guildInvites, activity, mentions, duel] = await Promise.all([
     db.prepare(newest).bind(chatChannels({ own: true })[0].id, session.userId, session.userId).first(),
     conversationsOf(db, session.userId, character.id).all(),
     friendNews(db, character.id, context.now),
@@ -379,6 +381,7 @@ export async function latestChat(context) {
     guildNews(db, character.id),
     db.prepare('SELECT ends_at FROM activities WHERE character_id = ?').bind(character.id).first(),
     newestMentions(db, character.id, session.userId, guild ? guildChannel(guild.id) : null),
+    duelNews(db, character.id, context.now),
   ]);
   return json({
     latest: row.id ?? 0,
@@ -387,6 +390,7 @@ export async function latestChat(context) {
     ...friends,
     partyInvites,
     trade,
+    duel,
     guild: guild && { name: guild.name, tag: guild.tag, latest: guildRow?.id ?? 0 },
     guildInvites,
     seen: seenOf(read?.chat_seen),

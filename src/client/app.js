@@ -49,6 +49,7 @@ import { mountReport } from './screens/report.js';
 import { mountSkills } from './screens/skills.js';
 import { mountStats } from './screens/stats.js';
 import { mountTrade, offerTrade } from './screens/trade.js';
+import { offerDuel } from './card-duel.js';
 import { musicOn, musicVolume, prefetchMusic, setMusicConfig, setMusicOn, setMusicPlace, setMusicVolume, startMusic } from './music.js';
 import { resetCamera } from './camera.js';
 import { applyMotion } from './motion.js';
@@ -420,6 +421,8 @@ function openGame() {
     checkChat();
     checkOnline();
     offerTrade();
+    // A live card match: a challenge to answer, one sent, the move (card-duel.js).
+    offerDuel();
     offerPointsReset();
     offerRename();
     offerNameNotice();

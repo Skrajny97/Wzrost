@@ -71,6 +71,17 @@
   ],
   "stakes": { "step": 100, "levelsPerStep": 40, "perDay": 10 },
   "pack": { "cards": 3, "goldMinutes": 60 },
+  "live": {
+    "$comment": "Partie na żywo z innymi graczami (901 B; src/engine/card-duel.js, src/server/card-duel.js, src/client/card-duel.js). Wyzwanie czeka acceptSeconds sekund na przyjęcie. Ruchy na zmianę: kto pierwszy, zmienia się co rundę; na ruch jest turnSeconds sekund i graceSeconds sekund zapasu na drogę do serwera; ruch nie zrobiony robi gra (najmocniejsze karty z rezerwy), a missedRounds rund z rzędu bez ruchu to przegrana. Obaj płacą stawkę na początku; za wygraną zgarnia się obie stawki bez systemCut (udział, 0.05 to 5%), w dół do pełnego złota, a remis zwraca stawki. Stawka najwyżej taka jak stawka najwyższego stopnia Szczęsnego przy niższym z poziomów obu postaci; o złoto od minLevel poziomu obu postaci, najwyżej perDay partii o złoto dziennie na postać (dzień Salonu Gier). Wyzwanie odrzucone albo przeterminowane do tej samej postaci można powtórzyć po repeatSeconds sekundach. texts.live: słowa partii; {…} wypełnia gra, [a|b] to forma dla kobiety i dla mężczyzny.",
+    "acceptSeconds": 120,
+    "turnSeconds": 30,
+    "graceSeconds": 2,
+    "missedRounds": 2,
+    "systemCut": 0.05,
+    "perDay": 10,
+    "minLevel": 20,
+    "repeatSeconds": 60
+  },
   "host": {
     "resident": "gamehost",
     "tiers": [
@@ -478,7 +489,8 @@
       "Każda wygrana walka na wyprawie może też dać kartę stwora z niższej krainy. Czasem karta wpada za pracę w profesji, za atak na Bestię albo strażnika Wyprawy Gildii i za ukończoną Próbę Gildii: to karta stwora z krain na Twoim poziomie albo niższych. Z tych źródeł wpadają najpierw karty, których jeszcze nie masz.",
       "Raz dziennie Szczęsny sprzedaje pakiet trzech kart stworów z krain niższych niż Twoja, za tyle złota, ile daje godzina wyprawy na Twoim poziomie. Najpierw wypadają karty, których jeszcze nie masz.",
       "Kolekcja daje premię na stałe: co 10 różnych kart +1% XP i +1% złota z wypraw, najwyżej +15% za wszystkie 156 kart. Działa od chwili zdobycia karty. Kolekcję i premię widać w Encyklopedii, w rubryce „Karty”.",
-      "W Osadzie zagrasz też z mieszkańcami: każdy gra u siebie, własną talią. Ich talie wypełniają przerwy między stopniami Szczęsnego, a talia pustelnika Sambora jest mocniejsza nawet od V stopnia. Partie o stawkę z mieszkańcami liczą się do tych samych 10 dziennie. Pierwsza wygrana o stawkę z mieszkańcem daje kartę z jego talii, której nie masz, a każda następna 10% szansy na kartę z jego talii."
+      "W Osadzie zagrasz też z mieszkańcami: każdy gra u siebie, własną talią. Ich talie wypełniają przerwy między stopniami Szczęsnego, a talia pustelnika Sambora jest mocniejsza nawet od V stopnia. Partie o stawkę z mieszkańcami liczą się do tych samych 10 dziennie. Pierwsza wygrana o stawkę z mieszkańcem daje kartę z jego talii, której nie masz, a każda następna 10% szansy na kartę z jego talii.",
+      "Partie na żywo: w karcie postaci innego gracza, który jest teraz w grze, wyzwiesz go na partię kart, bez stawki albo o złoto (od 20. poziomu obu postaci, najwyżej 10 dziennie). Ruchy robicie na zmianę, 30 sekund na ruch. Za wygraną zgarniesz obie stawki bez 5%, które zabiera System."
     ],
     "win": ["„Dobra partia! Nie spodziewałem się tego.”", "„Twoja wygrana. Karty dziś cię lubią.”", "„Brawo! Następnym razem nie odpuszczę.”"],
     "loss": ["„Moja partia. Talia nie wybacza błędów.”", "„Tym razem stawka zostaje u mnie.”", "„Blisko było. Potasuj i wracaj.”"],
@@ -491,6 +503,54 @@
     "pack": {
       "offer": "Trzy losowe karty stworów z krain niższych niż Twoja. Najpierw wypadają te, których jeszcze nie masz.",
       "opened": "Szczęsny rozkłada na stole trzy karty."
+    },
+    "live": {
+      "challengeTitle": "Partia kart z: {name}",
+      "online": "{className} · poz. {level} · w grze",
+      "staked": "Na początku partii każda strona płaci {stake} zł. Za wygraną zgarniesz {pot} zł: obie stawki bez {cut}%, które zabiera System. Remis zwraca stawki.",
+      "free": "Bez stawki nikt nic nie płaci i nic nie zgarnia. Takie partie gracie bez limitu.",
+      "limits": "Najwyższa stawka to {max} zł, tyle co najwyższa stawka u Szczęsnego przy niższym z Waszych poziomów. Partie na żywo dziś: {used} z {limit}.",
+      "lowLevel": "O złoto gracie od {level}. poziomu obu postaci, więc teraz tylko bez stawki.",
+      "rules": "{name} ma 2 minuty, żeby przyjąć wyzwanie. Ruchy robicie na zmianę, 30 sekund na ruch. Dwie rundy z rzędu bez ruchu to przegrana.",
+      "sent": "Wyzwanie wysłane. {name} ma 2 minuty, żeby je przyjąć.",
+      "incomingTitle": "Wyzwanie do partii kart",
+      "incoming": "{name} ({className}, poz. {level}) wyzywa Cię na partię kart na żywo.",
+      "incomingStake": "Stawka: {stake} zł z każdej strony. Za wygraną zgarniesz {pot} zł.",
+      "incomingFree": "Partia bez stawki: nikt nic nie płaci i nic nie zgarnia.",
+      "incomingGold": "Masz {gold} zł. Partie na żywo dziś: {used} z {limit}.",
+      "accepted": "{name} przyjmuje wyzwanie. Partia się zaczyna!",
+      "declined": "{name} odrzuca wyzwanie.",
+      "expired": "{name} nie odpowiada. Wyzwanie przepadło.",
+      "tableStaked": "Partia na żywo · stawka {stake} zł",
+      "tableFree": "Partia na żywo · bez stawki",
+      "dividerStaked": "Na żywo · {stake} zł",
+      "dividerFree": "Na żywo · bez stawki",
+      "lead": "Zaczynasz tę rundę: {name} zobaczy Twoje karty i odpowie.",
+      "answer": "{name} dołożył[a|] karty pierwsz[a|y]. W następnej rundzie Ty zaczynasz.",
+      "theirLead": "{name} zaczyna tę rundę. Gdy dołoży karty, odpowiesz na nie.",
+      "theirAnswer": "{name} widzi Twoje karty i odpowiada.",
+      "missedMe": "Gra zrobiła ruch za Ciebie. Jeszcze jedna runda bez ruchu i przegrywasz.",
+      "missedFoe": "{name} nie zdążył[a|] z ruchem, więc zrobiła go gra.",
+      "yourMove": "Twój ruch w partii kart z: {name}.",
+      "ends": {
+        "won": {
+          "out": "Wszystkie karty rywala zbite.",
+          "cap": "Po {rounds} rundach masz więcej kart albo więcej Życia.",
+          "surrender": "{name} poddał[a|] partię.",
+          "missed": "{name} nie zrobił[a|] ruchu przez dwie rundy z rzędu.",
+          "gone": "Rywal opuścił grę."
+        },
+        "lost": {
+          "out": "Wszystkie Twoje karty zbite.",
+          "cap": "Po {rounds} rundach {name} ma więcej kart albo więcej Życia.",
+          "surrender": "Poddajesz partię.",
+          "missed": "Dwie rundy z rzędu bez Twojego ruchu."
+        },
+        "drawn": {
+          "out": "Obie strony straciły ostatnie karty naraz.",
+          "cap": "Po {rounds} rundach jest równo."
+        }
+      }
     },
     "collection": {
       "summary": ["Kolekcja: {found} z {all}"],

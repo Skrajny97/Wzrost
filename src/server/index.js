@@ -112,6 +112,7 @@ import {
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
 import { buyPack, getCards, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter } from './cards.js';
+import { answerDuel, challengeDuel, duelOffer, duelTurn, readDuel, surrenderDuelMatch, withoutDuel } from './card-duel.js';
 import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
 import { claimCardArenaReward, getCardArena, playCardArenaTurn, rerollCardArena, startCardArenaMatch, surrenderCardArena } from './card-arena.js';
@@ -340,7 +341,8 @@ const routes = [
   // The Arena's Karty: matches of Talia Systemu with other players' decks
   // (card-arena.js, 900 A), where both the Arena and the cards are on.
   ['GET', '/api/cards/arena', getCardArena],
-  ['POST', '/api/cards/arena/match', startCardArenaMatch],
+  // While a live card match runs (901 B), no Arena match starts either.
+  ['POST', '/api/cards/arena/match', withoutDuel(startCardArenaMatch)],
   ['POST', '/api/cards/arena/turn', playCardArenaTurn],
   ['POST', '/api/cards/arena/surrender', surrenderCardArena],
   ['POST', '/api/cards/arena/reroll', rerollCardArena],
@@ -352,10 +354,18 @@ const routes = [
   ['GET', '/api/cards', getCards],
   ['POST', '/api/cards/starter', takeStarter],
   ['POST', '/api/cards/deck', saveDeck],
-  ['POST', '/api/cards/match', startMatch],
+  // Szczęsny's match waits while a live one runs (card-duel.js).
+  ['POST', '/api/cards/match', withoutDuel(startMatch)],
   ['POST', '/api/cards/turn', playCardTurn],
   ['POST', '/api/cards/surrender', surrenderCards],
   ['POST', '/api/cards/pack', buyPack],
+  // Live matches with other players (card-duel.js; 901 B).
+  ['GET', '/api/cards/duel', readDuel],
+  ['GET', '/api/cards/duel/offer', duelOffer],
+  ['POST', '/api/cards/duel/challenge', challengeDuel],
+  ['POST', '/api/cards/duel/answer', answerDuel],
+  ['POST', '/api/cards/duel/turn', duelTurn],
+  ['POST', '/api/cards/duel/surrender', surrenderDuelMatch],
   ['GET', '/api/test/settlement', settlementTests],
   ['POST', '/api/test/settlement', testSettlement],
   ['GET', '/api/chat', readChat],

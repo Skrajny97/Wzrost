@@ -201,7 +201,7 @@ export const cardGains = (db, row, ids, now) => [db.prepare('UPDATE characters S
 
 // The character's deck: its twelve cards, or null when it has none whole
 // (a card gone from the collection or from the data).
-async function deckOf(db, characterId, collection) {
+export async function deckOf(db, characterId, collection) {
   const row = await db.prepare('SELECT cards FROM card_decks WHERE character_id = ?').bind(characterId).first();
   if (!row) return null;
   let ids;
@@ -217,7 +217,7 @@ const runningMatch = (db, characterId) => db.prepare('SELECT * FROM card_matches
 
 // The character's hero (872 A): its class and its evolution's stage (0
 // before the first).
-const heroOf = (row) => ({ classId: row.class_id, stage: row.evolution ? (content().evolutionsById[row.evolution]?.stage ?? 1) : 0 });
+export const heroOf = (row) => ({ classId: row.class_id, stage: row.evolution ? (content().evolutionsById[row.evolution]?.stage ?? 1) : 0 });
 
 // The gold of `minutes` of exploring at a character level, as the Labirynt's
 // rewards count it: a tier's reward of the day.

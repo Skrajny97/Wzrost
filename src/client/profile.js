@@ -23,6 +23,7 @@ import { call, isUnlocked, state } from './state.js';
 import { closeSheet, confirmAction, framedName, guildTag, openSheet, toast, withButton } from './ui.js';
 import { gemFold, itemSummary, propertyLines } from './screens/character.js';
 import { proposeTrade } from './screens/trade.js';
+import { duelButton } from './card-duel.js';
 
 // Shown in the page's language (t(), i18n.js).
 const PATHS = { main: 'ścieżka główna', second: 'ścieżka poboczna' };
@@ -158,7 +159,7 @@ function friendship(profile, onChange, mention) {
       : profile.guildInvite === 'sent'
         ? note(t('Zaproszenie do gildii wysłane.'))
         : null;
-  return h('div', { class: 'profile-friend' }, whisper(profile), tagButton(profile, mention), tradeButton(profile), parts, guildInvite, tradeBlock(profile, again));
+  return h('div', { class: 'profile-friend' }, whisper(profile), tagButton(profile, mention), tradeButton(profile), duelButton(profile), parts, guildInvite, tradeBlock(profile, again));
 }
 
 // "Oznacz": "@" and the character's name in the line of the chat the sheet

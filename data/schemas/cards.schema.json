@@ -3,11 +3,23 @@
   "title": "Talia Systemu",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "deckSize", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "pack", "host", "residents", "bonuses", "texts"],
+  "required": ["name", "deckSize", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "pack", "live", "host", "residents", "bonuses", "texts"],
   "definitions": {
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
     "chance": { "type": "number", "minimum": 0, "maximum": 1 },
     "texts": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+    "endTexts": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Jak skończyła się partia na żywo: wszystkie karty zbite, koniec rund, poddanie, rundy bez ruchu albo rywal, który opuścił grę.",
+      "properties": {
+        "out": { "type": "string", "minLength": 1 },
+        "cap": { "type": "string", "minLength": 1 },
+        "surrender": { "type": "string", "minLength": 1 },
+        "missed": { "type": "string", "minLength": 1 },
+        "gone": { "type": "string", "minLength": 1 }
+      }
+    },
     "card": {
       "type": "object",
       "additionalProperties": false,
@@ -128,6 +140,23 @@
         "goldMinutes": { "type": "integer", "minimum": 1 }
       }
     },
+    "live": {
+      "description": "Partie na żywo z innymi graczami (901 B, src/engine/card-duel.js): wyzwanie czeka acceptSeconds sekund, ruch turnSeconds sekund (i graceSeconds zapasu), missedRounds rund z rzędu bez ruchu to przegrana; zwycięzca zgarnia obie stawki bez udziału systemCut; o złoto od minLevel poziomu obu postaci, najwyżej perDay partii o złoto dziennie; wyzwanie odrzucone albo przeterminowane do tej samej postaci znów po repeatSeconds sekundach.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["acceptSeconds", "turnSeconds", "graceSeconds", "missedRounds", "systemCut", "perDay", "minLevel", "repeatSeconds"],
+      "properties": {
+        "$comment": { "type": "string" },
+        "acceptSeconds": { "type": "integer", "minimum": 10 },
+        "turnSeconds": { "type": "integer", "minimum": 5 },
+        "graceSeconds": { "type": "integer", "minimum": 0 },
+        "missedRounds": { "type": "integer", "minimum": 1 },
+        "systemCut": { "type": "number", "minimum": 0, "maximum": 0.5 },
+        "perDay": { "type": "integer", "minimum": 1 },
+        "minLevel": { "type": "integer", "minimum": 1 },
+        "repeatSeconds": { "type": "integer", "minimum": 0 }
+      }
+    },
     "host": {
       "type": "object",
       "additionalProperties": false,
@@ -220,7 +249,7 @@
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "lower", "guild", "trial", "firstWin", "pack", "collection"],
+      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "lower", "guild", "trial", "firstWin", "pack", "live", "collection"],
       "properties": {
         "intro": { "type": "string", "minLength": 1 },
         "starterOffer": { "type": "string", "minLength": 1 },
@@ -230,6 +259,25 @@
           "additionalProperties": false,
           "required": ["offer", "opened"],
           "properties": { "offer": { "type": "string", "minLength": 1 }, "opened": { "type": "string", "minLength": 1 } }
+        },
+        "live": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Słowa partii na żywo (901 B, src/client/card-duel.js): {…} wypełnia gra, [a|b] to forma dla kobiety i dla mężczyzny.",
+          "required": ["challengeTitle", "online", "staked", "free", "limits", "lowLevel", "rules", "sent", "incomingTitle", "incoming", "incomingStake", "incomingFree", "incomingGold", "accepted", "declined", "expired", "tableStaked", "tableFree", "dividerStaked", "dividerFree", "lead", "answer", "theirLead", "theirAnswer", "missedMe", "missedFoe", "yourMove", "ends"],
+          "patternProperties": { "^(?!ends$)[a-zA-Z]+$": { "type": "string", "minLength": 1 } },
+          "properties": {
+            "ends": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["won", "lost", "drawn"],
+              "properties": {
+                "won": { "$ref": "#/definitions/endTexts" },
+                "lost": { "$ref": "#/definitions/endTexts" },
+                "drawn": { "$ref": "#/definitions/endTexts" }
+              }
+            }
+          }
         },
         "rules": { "$ref": "#/definitions/texts" },
         "win": { "$ref": "#/definitions/texts" },
