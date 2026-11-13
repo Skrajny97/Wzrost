@@ -43,7 +43,7 @@ import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { cardsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
-import { numberText } from './i18n.js';
+import { numberText, runInLanguage } from './i18n.js';
 import { guildTagSql } from './guilds.js';
 import { counted, foreign } from './market.js';
 import { requireOpen, settlementOf } from './settlement.js';
@@ -320,8 +320,8 @@ export async function drawLotteries(db, now) {
 
 // One day's draw, written once (524 A): a ticket of the day, from the draw's
 // own seed, wins the whole pot; the draw is written down, the winner gets
-// the gold, the Globalny gets the System's message, and the day's tickets
-// go. All of it or nothing, and only while the day is not drawn yet and its
+// the gold, the Globalny gets the System's message in Polish and the
+// English channel the same in English (922 A), and the day's tickets go. All of it or nothing, and only while the day is not drawn yet and its
 // tickets are the ones counted here; otherwise the next minute tries again.
 async function drawLottery(db, day, now) {
   const { results: tickets } = await db
@@ -332,7 +332,13 @@ async function drawLottery(db, day, now) {
   const seed = newSeed();
   const winner = tickets[lotteryWinner(tickets.length, seed)];
   const pot = lotteryPot(tickets.length, content());
-  const text = announcement({ ...winner, pot });
+  // Each channel's message in the channel's own language, whatever the
+  // language of the minute that draws it.
+  const channels = content().chat.channels;
+  const said = [{ channel: channels[0].id, language: 'pl' }, ...channels.filter((one) => one.language && one.language !== 'pl').map((one) => ({ channel: one.id, language: one.language }))].map(
+    (one) => ({ channel: one.channel, text: runInLanguage(one.language, () => announcement({ ...winner, pot })) }),
+  );
+  const text = said[0].text;
   try {
     await db.batch([
       assertion(
@@ -345,12 +351,14 @@ async function drawLottery(db, day, now) {
         .prepare('INSERT INTO lottery_draws (day, tickets, pot, character_id, name, appearance, seed, drawn_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
         .bind(day, tickets.length, pot, winner.character_id, winner.name, winner.appearance, seed, now),
       db.prepare('UPDATE characters SET gold = gold + ? WHERE id = ?').bind(pot, winner.character_id),
-      db
-        .prepare(
-          `INSERT INTO chat_messages (channel, user_id, character_id, name, level, class_id, text, created_at, system)
-           SELECT ?, user_id, id, name, level, class_id, ?, ?, 1 FROM characters WHERE id = ?`,
-        )
-        .bind(content().chat.channels[0].id, text, now, winner.character_id),
+      ...said.map(({ channel, text: words }) =>
+        db
+          .prepare(
+            `INSERT INTO chat_messages (channel, user_id, character_id, name, level, class_id, text, created_at, system)
+             SELECT ?, user_id, id, name, level, class_id, ?, ?, 1 FROM characters WHERE id = ?`,
+          )
+          .bind(channel, words, now, winner.character_id),
+      ),
       db.prepare('DELETE FROM lottery_tickets WHERE day = ?').bind(day),
     ]);
   } catch (error) {
