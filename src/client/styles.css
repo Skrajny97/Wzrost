@@ -18481,6 +18481,87 @@ a.discord-button {
   border-bottom: 0;
 }
 
+/* The Arena's Karty (src/client/card-arena.js, 900 A, the mock-ups 907.1–
+   907.3), in the Arena's own look: the day's matches as card backs in the
+   rings of the duels' crossed swords; the deck with its hero card beside
+   its words and its cards of each type in a row that wraps; on the table,
+   the rival's hero card under its counts and, in the round its skill
+   works, a gold line over the rival's cards; the week's table's switch
+   under the Arena's tabs. */
+.card-arena-pip-card {
+  display: block;
+  width: 11px;
+  height: 15px;
+  background: url('/art/cards/back.png') center / contain no-repeat;
+  image-rendering: pixelated;
+}
+
+.pvp-arena-pip:not(.pvp-arena-pip--on) .card-arena-pip-card {
+  filter: grayscale(1);
+}
+
+.card-arena-hero {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.card-arena-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 0;
+}
+
+.card-arena-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.card-arena-type .tcard-type {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+
+.card-arena-deck > p,
+.card-arena-defences p {
+  margin: 0;
+}
+
+.card-arena-rival-hero {
+  margin: 0;
+  color: #ece6d6;
+  font-family: var(--font-system);
+  font-size: 12px;
+  text-shadow:
+    0 1px 2px #000,
+    0 0 4px rgba(0, 0, 0, 0.9);
+  overflow-wrap: anywhere;
+}
+
+.card-arena-rival-now {
+  align-self: center;
+  max-width: 100%;
+  margin: 0;
+  padding: 2px 10px;
+  border: 1px solid var(--gold);
+  border-radius: 10px;
+  background: rgba(13, 17, 11, 0.85);
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-size: 12px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.pvp-arena-board {
+  margin-top: 0;
+}
+
 /* Portale: the stage reached beside the portal's name (the author,
    10.11.2026), gold once it is the highest open now. */
 .portal-name {

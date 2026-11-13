@@ -840,6 +840,11 @@
       "id": "0.3.17",
       "title": "Wersja 0.3.17",
       "body": "- Mieszkańcy Osady grają w karty, każdy u siebie: w karcie mieszkańca dotknij „Zagraj w karty”. Każdy ma własną talię w swoim stylu, a ich talie wypełniają przerwy między stopniami Szczęsnego. Pustelnik Sambor gra mocniej niż sam Szczęsny.\n- Partie o stawkę z mieszkańcami liczą się do tych samych 10 dziennie co u Szczęsnego. Za pierwszą wygraną o stawkę z mieszkańcem zgarniesz kartę z jego talii, której nie masz, a każda następna wygrana daje 10% szansy na kartę z jego talii."
+    },
+    {
+      "id": "0.3.18",
+      "title": "Wersja 0.3.18",
+      "body": "- Na Arenie jest nowa zakładka „Karty”. Od 25. poziomu grasz w niej w karty z taliami innych graczy, 5 partii dziennie. Gdy Ciebie nie ma, Twoja talia z Salonu Gier broni się sama.\n- Za nieobecnego rywala gra System: wykłada jego karty jawnie, a raz na partię używa umiejętności jego karty bohatera.\n- Ocena kart jest osobna od oceny pojedynków. W „Tabeli tygodnia” przełączysz się na tabelę kart, a za miejsce w niej zgarniesz złoto i Punkty Systemu, o połowę mniej niż za pojedynki."
     }
   ]
 }

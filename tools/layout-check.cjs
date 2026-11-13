@@ -163,9 +163,20 @@ const MEMBERS = GUILDS.members;
 // cards, each its picture till a tap shows its stage (7.11.2026).
 // The Encyklopedia's "Karty" (where CARDS is on), every land's cards.
 const FOLDS = { '#/portale': '.portal-toggle[aria-expanded="false"]', '#/encyklopedia/cards': 'details.encyclopedia-fold:not([open]) > summary' };
+// The Arena's Karty (card-arena.js, 900 A, where CARDS is on): its tab, the
+// week's table, and on it the switch to the cards' table, named in
+// data/settlement.json; the tab and the switch found by their marks (the
+// switch's "Karty" is the tab's name too), each given the time the Karty
+// take to come from the server the first time.
+const ARENA = JSON.parse(fs.readFileSync(path.join(__dirname, `../data/${LANG === 'en' ? 'en/' : ''}settlement.json`), 'utf8')).arena;
 const TABS = {
   '#/oboz/craft-table': [said('Kolejka ({count}/{limit})').replace(/\s*\(.*$/, '')],
   '#/osada/board': [said('Poszukiwani')],
+  '#/osada/arena': [
+    { name: ARENA.cards.texts.tab, tap: '[data-guide="arena-tab-cards"]', wait: 2000 },
+    ARENA.texts.tabTable,
+    { name: `${ARENA.texts.tabTable} › ${ARENA.cards.texts.boardCards}`, tap: '[data-guide="arena-board-cards"]', wait: 1000 },
+  ],
   '#/spolecznosc/ranking': [GUILDS_TAB],
   '#/gildia': [MEMBERS.views.donations, MEMBERS.periods.all],
   '#/gildia/war': [WAR_TEAMS],
@@ -359,6 +370,30 @@ async function main() {
         WHERE c.user_id = (SELECT id FROM users WHERE login = '${reserveLogin}') AND m.character_id = (SELECT id FROM characters WHERE name = '${name}')`,
     ].join('; '),
   );
+  // The Arena's Karty (where CARDS is on): the first reserve's deck, the
+  // starter cards at their top level, so it is a rival there; a match it
+  // lost against the character's deck, among its deck's defences; and the
+  // character's card rating in five digits, on this week's card table (its
+  // Monday and month in Polish time, as src/engine/quests.js counts them).
+  if (!SHEETS['#/encyklopedia/cards']) delete TABS['#/osada/arena'];
+  else {
+    const starter = JSON.parse(fs.readFileSync(path.join(__dirname, '../data/cards.json'), 'utf8')).starter.monsters;
+    const rival = `(SELECT id FROM characters WHERE name = 'Rezerwowy${stamp}0')`;
+    const own = `(SELECT id FROM characters WHERE name = '${name}')`;
+    const sinceMonday = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].indexOf(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Warsaw', weekday: 'short' }).format(new Date()));
+    const monday = new Date(`${day}T12:00:00Z`);
+    monday.setUTCDate(monday.getUTCDate() - sinceMonday);
+    const [year, month] = day.split('-').map(Number);
+    sql(
+      [
+        ...starter.map((monster) => `INSERT INTO cards (character_id, monster_id, copies, created_at) VALUES (${rival}, '${monster}', 5, 1)`),
+        `INSERT INTO card_decks (character_id, cards, updated_at) VALUES (${rival}, '${JSON.stringify(starter)}', 1)`,
+        `INSERT INTO card_arena_ratings (character_id, rating, season, week) VALUES (${own}, 12345, ${year * 12 + month - 1}, '${monday.toISOString().slice(0, 10)}')`,
+        `INSERT INTO card_arena_results (attacker_id, defender_id, created_at, result, rounds, attacker_change, defender_change, attacker_rating, defender_rating)
+          VALUES (${rival}, ${own}, ${Date.now()}, 'loss', 12, -16, 8, 9984, 12345)`,
+      ].join('; '),
+    );
+  }
   // The Stół rozbiórki built, with long names and big numbers: three orders
   // in its queue, one at work, and a stack left on the Materiały tab.
   const materials = { 'tick-shell:common': 12345, 'black-stork-feather:rare': 9876, 'night-heron-plume:mythic': 1234, 'goblin-trinket:epic': 987 };
@@ -478,10 +513,12 @@ async function main() {
       await check(screen, null, TRANSLATED.has(screen));
       for (const tab of TABS[screen] ?? []) {
         // A tab the screen does not show (as Poszukiwani with no posters)
-        // is named and skipped.
-        const button = view.locator('button.segmented-option, [role="tab"], button.war-button', { hasText: tab }).first();
+        // is named and skipped. A tab given as { name, tap } is found by
+        // `tap`, a selector (the Arena's switch to the cards' table).
+        const named = typeof tab === 'string' ? tab : tab.name;
+        const button = typeof tab === 'string' ? view.locator('button.segmented-option, [role="tab"], button.war-button', { hasText: tab }).first() : view.locator(tab.tap).first();
         if ((await button.count()) === 0) {
-          console.log(`  – ${size.name} ${screen}: brak zakładki „${tab}”`);
+          console.log(`  – ${size.name} ${screen}: brak zakładki „${named}”`);
           continue;
         }
         // A button in the screen itself (the Wojna's "Drużyny", the Ranking
@@ -491,8 +528,8 @@ async function main() {
         if (await button.evaluate((element) => element.matches('[role="tab"], .segmented-option'))) {
           await button.click({ timeout: 3000 }).catch(() => button.evaluate((element) => element.click()));
         } else await button.evaluate((element) => element.click());
-        await view.waitForTimeout(500);
-        await check(`${screen} › ${tab}`, null, TRANSLATED.has(screen));
+        await view.waitForTimeout(typeof tab === 'string' ? 500 : (tab.wait ?? 500));
+        await check(`${screen} › ${named}`, null, TRANSLATED.has(screen));
       }
       if (FOLDS[screen]) {
         // Each one opened leaves the selector, so always the first closed one.

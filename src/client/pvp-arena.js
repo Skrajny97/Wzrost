@@ -24,9 +24,16 @@
 // The Osada's place screen mounts the panel once and keeps it while it
 // redraws itself, as the Salon Gier's, so a redraw never asks the server
 // again; the defences new at a look stay marked while the panel lives.
+//
+// Where the Arena has its Karty (card-arena.js, 900 A; the server's
+// `cards`), a third tab "Karty" stands between the two, and the week's
+// table has a switch "Pojedynki | Karty" (907.3); the Karty's panel is
+// mounted at the first look at either and kept while this one lives, so a
+// match being laid survives the tabs.
 
 import { createArena } from './arena.js';
 import { placeArt } from './art.js';
+import { mountCardArena } from './card-arena.js';
 import { h, icon } from './dom.js';
 import { countOf, dateTimeFormat, formatDecimal, formatHours, formatNumber } from './format.js';
 import { chestContents } from './guild-trials.js';
@@ -37,7 +44,8 @@ import { call, serverNow } from './state.js';
 import { afterSheet, howItWorks, openSheet, systemPanel, toast, withButton } from './ui.js';
 import { bust } from './screens/select.js';
 
-const TABS = ['fights', 'table'];
+// The Arena's tabs: its Karty in the middle where it has them (907.1).
+const tabsOf = (view) => (view.cards ? ['fights', 'cards', 'table'] : ['fights', 'table']);
 
 // One of the Arena's texts with its {…} filled in: numbers as the game
 // writes them, words as they are.
@@ -94,11 +102,17 @@ export function mountPvpArena(holder, place = null) {
   let watching = null;
   // The newest answer's number, so an older one never draws over it.
   let asked = 0;
+  // The Karty (card-arena.js), once looked at; the week's table shown
+  // ("duels" or "cards"); the weeks whose card rewards wait.
+  let cardArena = null;
+  let board = 'duels';
+  let cardsDue = 0;
 
   // A look's answer brings the defences; an action's answer has none, and
   // those of the look stay.
   function take(answer) {
     view = answer.arena;
+    cardsDue = answer.arena.cards?.due ?? 0;
     if (answer.arena.defences) {
       defences = answer.arena.defences;
       for (const one of defences) if (one.unseen) unseen.add(one.id);
@@ -149,11 +163,11 @@ export function mountPvpArena(holder, place = null) {
   };
 
   function tabs() {
-    const names = { fights: view.texts.tabFights, table: view.texts.tabTable };
+    const names = { fights: view.texts.tabFights, cards: view.cards?.texts.tab, table: view.texts.tabTable };
     return h(
       'div',
       { class: 'chat-tabs market-tabs', role: 'tablist', 'aria-label': t('Arena') },
-      TABS.map((id) =>
+      tabsOf(view).map((id) =>
         h(
           'button',
           {
@@ -168,9 +182,57 @@ export function mountPvpArena(holder, place = null) {
             },
           },
           h('span', { class: 'chat-tab-name', text: names[id] }),
-          id === 'table' && view.rewards.due.length > 0 && h('span', { class: 'community-dot', role: 'img', 'aria-label': t('czeka do odebrania') }),
+          id === 'table' && (view.rewards.due.length > 0 || cardsDue > 0) && h('span', { class: 'community-dot', role: 'img', 'aria-label': t('czeka do odebrania') }),
         ),
       ),
+    );
+  }
+
+  // The Karty's panel (card-arena.js), mounted at the first look at its tab
+  // or its table and kept; `part`: "play" for the tab, "table" for the
+  // week's card table. It tells the weeks whose card rewards wait, for the
+  // dots on the table's tab and switch.
+  function cardsPart(part) {
+    if (!cardArena) {
+      cardArena = mountCardArena(h('div', { class: 'card-arena-holder' }), {
+        place,
+        onDue: (count) => {
+          const changed = (count > 0) !== (cardsDue > 0);
+          cardsDue = count;
+          if (changed) queueMicrotask(() => !gone && render());
+        },
+      });
+    }
+    cardArena.show(part);
+    return cardArena.holder;
+  }
+
+  // The week's table's switch (907.3): the duels' table or the cards', each
+  // with a dot while its reward waits.
+  function boardSwitch() {
+    const words = view.cards.texts;
+    const option = (id, label, dot) =>
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'chat-tab',
+          role: 'tab',
+          'data-guide': `arena-board-${id}`,
+          'aria-selected': String(board === id),
+          onClick: () => {
+            board = id;
+            render();
+          },
+        },
+        h('span', { class: 'chat-tab-name', text: label }),
+        dot && h('span', { class: 'community-dot', role: 'img', 'aria-label': t('czeka do odebrania') }),
+      );
+    return h(
+      'div',
+      { class: 'chat-tabs market-tabs pvp-arena-board', role: 'tablist', 'aria-label': view.texts.tabTable },
+      option('duels', words.duels, view.rewards.due.length > 0),
+      option('cards', words.cards, cardsDue > 0),
     );
   }
 
@@ -499,7 +561,11 @@ export function mountPvpArena(holder, place = null) {
 
   function tableTab() {
     const { texts, numbers } = view;
+    // With the Karty, the switch over the table, and the cards' table under
+    // it (card-arena.js) when it is chosen.
+    if (view.cards && board === 'cards') return [boardSwitch(), cardsPart('table')];
     return [
+      view.cards && boardSwitch(),
       ...view.rewards.due.map(dueCard),
       tableCard(),
       rewardsCard(),
@@ -518,7 +584,10 @@ export function mountPvpArena(holder, place = null) {
       holder.replaceChildren(h('p', { class: 'muted', text: t('Wczytywanie Areny…') }));
       return;
     }
-    holder.replaceChildren(h('div', { class: 'stack pvp-arena' }, tabs(), tab === 'fights' ? fightsTab() : tableTab()));
+    // A tab the Arena no longer has (its Karty switched off) leads back.
+    if (!tabsOf(view).includes(tab)) tab = 'fights';
+    const body = tab === 'fights' ? fightsTab() : tab === 'cards' ? cardsPart('play') : tableTab();
+    holder.replaceChildren(h('div', { class: 'stack pvp-arena' }, tabs(), body));
     // At midnight the fights come back, on Monday the table closes: the
     // Arena is asked again then.
     const next = Math.min(view.fights.endsAt, view.table.endsAt);
@@ -535,6 +604,7 @@ export function mountPvpArena(holder, place = null) {
       gone = true;
       clearTimeout(timer);
       watching?.stop();
+      cardArena?.unmount();
     },
   };
 }
