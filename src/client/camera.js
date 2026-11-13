@@ -34,7 +34,8 @@ const mix = (from, to, done) => from + (to - from) * done;
 
 // The window between the top bar and the bottom one; on a computer the
 // menu is down the left, so the window reaches the bottom of the screen.
-function sight() {
+// Also where a row dragged by its ≡ scrolls the page (reorder.js).
+export function sight() {
   const top = document.getElementById('topbar')?.getBoundingClientRect().bottom ?? 0;
   const bar = desktopLayout() ? null : [...document.querySelectorAll('.nav')].find((nav) => !nav.hidden);
   const bottom = bar ? bar.getBoundingClientRect().top : window.innerHeight;

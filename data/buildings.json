@@ -159,6 +159,8 @@
       "cancel": "Usuń z kolejki",
       "cancelAll": "Usuń wszystkie",
       "old": "Rozbiórka sprzed wersji 0.1.65 dokończy się sama.",
+      "move": "Przesuń w kolejce: {what}",
+      "moveHint": "Przytrzymaj ≡ i przeciągnij zlecenie na nowe miejsce. Zlecenie w pracy zostaje pierwsze, a godziny „Gotowe o” liczą się od nowa.",
       "confirm": {
         "title": "Usunąć z kolejki?",
         "titleAll": "Usunąć wszystkie zlecenia?",
@@ -189,7 +191,10 @@
         "bagFull": "Plecak nie pomieści przedmiotów z kolejki (potrzebne miejsca: {need}, wolne: {free}). Zrób w nim miejsce.",
         "minerals": "Brakuje kamieni i kruszców z rozbiórki: {minerals}. Bez nich przedmiot nie wróci do plecaka.",
         "rewarded": "Za zadanie „{quest}” odebrano już nagrodę, a bez tej pracy nie byłoby wykonane. Usuń mniej zleceń albo poczekaj, aż stół je skończy.",
-        "patternInUse": "Z wzoru „{pattern}”, którego nauczył ten przedmiot, powstają teraz przedmioty. Usuń zlecenie, gdy ta praca się skończy."
+        "patternInUse": "Z wzoru „{pattern}”, którego nauczył ten przedmiot, powstają teraz przedmioty. Usuń zlecenie, gdy ta praca się skończy.",
+        "atWork": "Stół już nad tym pracuje, więc to zlecenie zostaje pierwsze.",
+        "beforeWork": "Zlecenie w pracy zostaje pierwsze. Inne możesz wstawić dopiero za nim.",
+        "changed": "Kolejka zmieniła się w międzyczasie. Spróbuj jeszcze raz."
       }
     },
     "costs": [

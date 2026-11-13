@@ -668,6 +668,54 @@ export function orderWork(order) {
  */
 export const countedAtEnd = (done) => done.filter((order) => order.countsAtEnd === true).map(orderWork);
 
+// Orders one after another, each as long as it was: the first starts at its
+// own start, or now when that was still to come (an order waiting whose
+// turn came early), and each next one as the one before it ends.
+/**
+ * @param {Order[]} orders
+ * @param {number} now
+ * @returns {Order[]}
+ */
+function inLine(orders, now) {
+  /** @type {Order[]} */
+  const queue = [];
+  for (const order of orders) {
+    const startsAt = queue.length === 0 ? Math.min(order.startsAt, now) : /** @type {Order} */ (queue.at(-1)).endsAt;
+    queue.push({ ...order, startsAt, endsAt: startsAt + order.endsAt - order.startsAt });
+  }
+  return queue;
+}
+
+// A waiting order moved to another place in the queue (the author's 905 C,
+// after a player's note: „Do zrobienia w stole do rozbiórki jakiś shuffle w
+// kolejce”): the order `id` goes right before the order `before`, or last
+// with null. The order at work stays first: it does not move, and nothing
+// goes before it. The orders after it run one after another from its end
+// again (inLine), each as long as it was, so their "Gotowe o" are counted
+// anew and the queue ends when it did; nothing else of them changes.
+// `state` is settled at `now`. A move the queue does not allow gives its
+// `reason`: `gone` for an order not in the queue (done, taken off or never
+// there), `running` for the order at work, `first` for a place before it
+// and `changed` when the order `before` is no longer there.
+/**
+ * @param {Crafting} state
+ * @param {unknown} id
+ * @param {unknown} before
+ * @param {number} now
+ * @returns {{ state: Crafting, reason?: undefined } | { reason: 'gone' | 'running' | 'first' | 'changed', state?: undefined }}
+ */
+export function moveInQueue(state, id, before, now) {
+  const at = typeof id === 'string' ? state.queue.findIndex((order) => order.id === id) : -1;
+  if (at < 0) return { reason: 'gone' };
+  if (at === 0) return { reason: 'running' };
+  if (before === id) return { state };
+  const others = state.queue.filter((_, index) => index !== at);
+  const to = before === null ? others.length : others.findIndex((order) => order.id === before);
+  if (to < 0) return { reason: 'changed' };
+  if (to === 0) return { reason: 'first' };
+  return { state: { ...state, queue: inLine([...others.slice(0, to), state.queue[at], ...others.slice(to)], now) } };
+}
+
 // Orders taken off the queue ("Usuń z kolejki", "Usuń wszystkie"; the
 // author: „nie wiem czy jest sens karania za takie pomyłki”), `ids` of
 // orderCancellable ones in `state`, settled at `now`: their materials are
@@ -687,13 +735,7 @@ export const countedAtEnd = (done) => done.filter((order) => order.countsAtEnd =
  */
 export function takeOffQueue(state, ids, now) {
   const leaving = state.queue.filter((order) => ids.has(order.id));
-  /** @type {Order[]} */
-  const queue = [];
-  for (const order of state.queue) {
-    if (ids.has(order.id)) continue;
-    const startsAt = queue.length === 0 ? Math.min(order.startsAt, now) : /** @type {Order} */ (queue.at(-1)).endsAt;
-    queue.push({ ...order, startsAt, endsAt: startsAt + order.endsAt - order.startsAt });
-  }
+  const queue = inLine(state.queue.filter((order) => !ids.has(order.id)), now);
   /** @type {Counts} */
   const back = {};
   /** @type {Counts} */
