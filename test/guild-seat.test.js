@@ -458,6 +458,35 @@ describe('the Siedziba Gildii through the API', () => {
     assert.equal(building((await donate('druh', 'guild-banner', 5000, 0)).data, 'guild-banner').next.collected.gold, 5000);
   });
 
+  test('every donation is kept with its giver and its week; a character removed leaves it as no one\'s (897)', async () => {
+    await donate('druh', 'guild-banner', 5000, 300);
+    await donate('druh', 'guild-banner', 1000, 0);
+    await donate('druh', 'guild-forge', 0, 200);
+    await donate('mistrz', 'guild-banner', 2000, 100);
+    const rows = (await (await db()).prepare('SELECT c.name, d.building_id, d.gold, d.resource, d.week FROM guild_seat_donations d JOIN characters c ON c.id = d.character_id ORDER BY c.name, d.building_id').all()).results;
+    const week = rows[0].week;
+    assert.match(week, /^\d{4}-/);
+    assert.deepEqual(
+      rows.map((one) => [one.name, one.building_id, one.gold, one.resource, one.week]),
+      [
+        ['Druh', 'guild-banner', 6000, 300, week],
+        ['Druh', 'guild-forge', 0, 200, week],
+        ['Mistrz', 'guild-banner', 2000, 100, week],
+      ],
+    );
+    // A refused donation leaves no record.
+    assert.equal((await donate('druh', 'guild-banner', 10000000, 0)).status, 409);
+    assert.equal((await first('SELECT gold FROM guild_seat_donations WHERE building_id = ? AND character_id = (SELECT id FROM characters WHERE name = ?)', 'guild-banner', 'Druh')).gold, 6000);
+    // A member who leaves leaves its record with the guild.
+    const druhId = (await first('SELECT id FROM characters WHERE name = ?', 'Druh')).id;
+    await as('druh', 'POST', '/api/guild/leave');
+    assert.equal((await first('SELECT COUNT(*) AS count FROM guild_seat_donations WHERE character_id = ?', druhId)).count, 2);
+    // Removed, its record is no one's: the id made negative.
+    assert.equal((await as('druh', 'DELETE', '/api/character')).status, 200);
+    assert.equal((await first('SELECT COUNT(*) AS count FROM guild_seat_donations WHERE character_id = ?', druhId)).count, 0);
+    assert.equal((await first('SELECT SUM(gold) AS gold FROM guild_seat_donations WHERE character_id = ?', -druhId)).gold, 6000);
+  });
+
   test('a guild that goes takes its Siedziba along', async () => {
     await donate('druh', 'guild-banner', 8000, 600);
     await prefer('mistrz', 'guild-forge', true);
@@ -470,5 +499,6 @@ describe('the Siedziba Gildii through the API', () => {
     await as('mistrz', 'POST', '/api/guild/leave');
     assert.equal((await first('SELECT COUNT(*) AS count FROM guilds')).count, 0);
     assert.equal((await first('SELECT COUNT(*) AS count FROM guild_seat')).count, 0);
+    assert.equal((await first('SELECT COUNT(*) AS count FROM guild_seat_donations')).count, 0);
   });
 });
