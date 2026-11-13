@@ -9904,6 +9904,71 @@ a.profession-square:active {
   margin-top: 16px;
 }
 
+/* "Rozpocznij" held at the bottom of the creation (894.7 A, 13.11.2026),
+   beside what is still missing or what was chosen; on a computer the class
+   cards stand in two columns, so the form is shorter. */
+.create-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 calc(-1 * var(--gutter));
+  padding: 10px var(--gutter) max(10px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: linear-gradient(to top, var(--bg-deep) 75%, rgba(13, 17, 11, 0.92));
+}
+
+.create-status {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 0;
+  border: none;
+  background: transparent;
+  color: var(--gold);
+  font-family: var(--font-world);
+  font-size: 15px;
+  line-height: 1.3;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.create-status--ready {
+  color: var(--system-text);
+}
+
+.create-bar .button {
+  flex: none;
+  width: auto;
+  padding: 12px 18px;
+}
+
+.create-missing {
+  outline: 2px solid var(--champion-gold);
+  outline-offset: 4px;
+  animation: create-missing 0.8s ease-in-out 3;
+}
+
+@keyframes create-missing {
+  50% {
+    outline-color: rgba(247, 211, 106, 0.2);
+  }
+}
+
+:root[data-layout='desktop'] #create-screen {
+  max-width: 820px;
+}
+
+:root[data-layout='desktop'] #create-screen .class-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+:root[data-layout='desktop'] #create-screen .class-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 /* The choice of the character to play (screens/select.js): a card a
    character, its bust beside its name, levels and what it is doing, the one
    played now in the System's light. */
@@ -13268,6 +13333,23 @@ button.tcard-slot {
   flex: 1;
 }
 
+/* An item to put up (listSheet): its card unfolds under a tap across the
+   whole row, "Wybierz" stays beside its name. */
+.market-pick--item {
+  position: relative;
+  display: block;
+}
+
+.market-pick--item > .profile-item > summary {
+  padding-right: 108px;
+}
+
+.market-pick--item > .button {
+  position: absolute;
+  top: 2px;
+  right: 0;
+}
+
 /* The goods with what the scrapper pays for them, under their name. */
 .market-pick-goods {
   flex: 1;
@@ -13421,6 +13503,34 @@ button.tcard-slot {
   z-index: 4;
   padding: 6px 0;
   background: linear-gradient(to top, var(--surface) 70%, transparent);
+}
+
+/* A report's "Wyrusz ponownie" held the same way (894.4 A, 13.11.2026). */
+.report-again-bar[hidden] {
+  display: none;
+}
+
+/* The free points spent from a report's System words (894.5 A). */
+.report-points {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--system-line);
+}
+
+.report-points-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.report-points-buttons .system-action {
+  margin-top: 0;
+}
+
+.report-points-done {
+  color: var(--leaf);
 }
 
 /* The bag's heading with "Sprzedaj zbędne" (character.js). */

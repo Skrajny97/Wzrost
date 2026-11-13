@@ -14,6 +14,28 @@ import { skinSwatches, systemPanel, toast, voiceSwitch } from '../ui.js';
 const POSITION_NAMES = { front: 'przód', middle: 'środek', back: 'tył' };
 const START_BADGES = { gentle: 'łagodniejszy start', hard: 'trudniejszy start' };
 
+// What is still missing in the form, beside "Rozpocznij" (894.7 A,
+// 13.11.2026): "Brakuje: wyglądu, klasy i imienia."
+const MISSING_WORDS = { look: 'wyglądu', class: 'klasy', name: 'imienia' };
+
+function missingText(missing) {
+  const words = missing.map((id) => t(MISSING_WORDS[id]));
+  return t('Brakuje: {what}.', { what: words.length > 1 ? `${words.slice(0, -1).join(', ')}${t(' i ')}${words.at(-1)}` : words[0] });
+}
+
+// The part of the form still to fill, in the middle of the screen and
+// framed for a moment; the name's field takes the focus (the keyboard
+// opens).
+function showMissing(element) {
+  if (!element) return;
+  element.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  element.classList.remove('create-missing');
+  void element.offsetWidth;
+  element.classList.add('create-missing');
+  setTimeout(() => element.classList.remove('create-missing'), 2400);
+  if (element instanceof HTMLInputElement) setTimeout(() => element.focus({ preventScroll: true }), 450);
+}
+
 const inGame = (count) => (count > 0 ? t('W grze: {count} tej klasy', { count: countOf(count, 'postać', 'postacie', 'postaci') }) : t('Nikt jeszcze nie gra tą klasą.'));
 
 // `counts`: the game's characters of each class (GET /api/characters).
@@ -74,6 +96,7 @@ export function renderCreate(container, onCreated, counts = null) {
     selected = classId;
     for (const card of cards) card.setAttribute('aria-checked', String(card.dataset.classId === classId));
     error.hidden = true;
+    updateBar();
   }
 
   const looks = state.content.appearances.map((appearance) =>
@@ -88,6 +111,7 @@ export function renderCreate(container, onCreated, counts = null) {
         for (const button of looks) button.setAttribute('aria-pressed', String(button.dataset.look === look));
         for (const card of cards) fill($('.class-icons', card), classIcons(card.dataset.classId));
         error.hidden = true;
+        updateBar();
       },
     }),
   );
@@ -99,6 +123,28 @@ export function renderCreate(container, onCreated, counts = null) {
     return true;
   });
 
+  // "Rozpocznij" held at the bottom of the screen (894.7 A, 13.11.2026),
+  // beside what is still missing (a tap goes there) or what was chosen.
+  const status = h('button', { type: 'button', class: 'create-status' });
+  const lookField = h('div', { class: 'segmented', role: 'group', 'aria-labelledby': 'look-label' }, looks);
+  const classList = h('div', { class: 'class-list', role: 'radiogroup', 'aria-label': t('Klasa postaci') }, cards);
+  const fields = { look: lookField, class: classList, name: nameInput };
+  let firstMissing = null;
+  status.addEventListener('click', () => firstMissing && showMissing(fields[firstMissing]));
+  function updateBar() {
+    const name = nameInput.value.trim();
+    const missing = [!look && 'look', !selected && 'class', !name && 'name'].filter(Boolean);
+    firstMissing = missing[0] ?? null;
+    status.classList.toggle('create-status--ready', missing.length === 0);
+    if (missing.length > 0) {
+      status.textContent = missingText(missing);
+      return;
+    }
+    const className = state.content.classes.find((cls) => cls.id === selected)?.name ?? '';
+    const lookName = state.content.appearances.find((one) => one.id === look)?.name ?? '';
+    status.textContent = `${className} · ${lookName} · ${name}`;
+  }
+
   const form = h(
     'form',
     { class: 'form', novalidate: true },
@@ -106,7 +152,7 @@ export function renderCreate(container, onCreated, counts = null) {
       'div',
       { class: 'field' },
       h('span', { class: 'field-label', id: 'look-label', text: t('Wygląd') }),
-      h('div', { class: 'segmented', role: 'group', 'aria-labelledby': 'look-label' }, looks),
+      lookField,
     ),
     h(
       'div',
@@ -114,11 +160,7 @@ export function renderCreate(container, onCreated, counts = null) {
       h('span', { class: 'field-label', id: 'skin-label', text: t('Kolor skóry') }),
       h('div', { class: 'skin-swatches', role: 'radiogroup', 'aria-labelledby': 'skin-label' }, tones),
     ),
-    h(
-      'div',
-      { class: 'class-list', role: 'radiogroup', 'aria-label': t('Klasa postaci') },
-      cards,
-    ),
+    classList,
     h(
       'div',
       { class: 'field' },
@@ -134,17 +176,21 @@ export function renderCreate(container, onCreated, counts = null) {
       h('p', { class: 'field-hint', text: t('Narrator czyta wprowadzenie na głos. Zmienisz to też w ustawieniach.') }),
     ),
     error,
-    submit,
+    h('div', { class: 'create-bar' }, status, submit),
   );
+  updateBar();
 
   form.addEventListener('input', () => {
     error.hidden = true;
+    updateBar();
   });
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (!look || !selected) {
       error.textContent = look ? t('Wybierz klasę postaci.') : t('Wybierz wygląd postaci.');
       error.hidden = false;
+      // The screen goes to the choice still missing.
+      showMissing(look ? classList : lookField);
       return;
     }
     submit.disabled = true;
@@ -159,6 +205,9 @@ export function renderCreate(container, onCreated, counts = null) {
     } catch (failure) {
       error.textContent = failure.message;
       error.hidden = false;
+      // The words of the refusal (a name taken, too short) stand above the
+      // bar, maybe out of sight: the screen goes to them, by the name.
+      error.scrollIntoView({ block: 'center', behavior: 'smooth' });
     } finally {
       submit.disabled = false;
       submit.textContent = t('Rozpocznij');

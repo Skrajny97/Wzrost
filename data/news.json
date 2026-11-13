@@ -760,6 +760,11 @@
       "id": "0.3.0",
       "title": "Wersja 0.3.0",
       "body": "- Trzecia ewolucja klas: na 200. poziomie klasy każda druga forma przechodzi w trzecią. 15 nowych form, m.in. Pogromca Hord, Kolos, Mistrz Łuku, Lodowy Król, Arcydruid, Prorok, Licz i Władca Cieni, każda z własnym portretem, chodem i jeźdźcem w odcieniach skóry, nową cechą i dwiema nowymi umiejętnościami z ikonami i dźwiękami.\n- Punkty z umiejętności drugiej formy wracają do rozdania, a poziomy klasy od 200. do 299. dają po punkcie na nowe umiejętności."
+    },
+    {
+      "id": "0.3.1",
+      "title": "Wersja 0.3.1",
+      "body": "- Ent Druida i Prastary dąb Arcydruida mają w walkach własne postacie.\n- „Wyrusz ponownie” w raporcie trzyma się nad dolnymi zakładkami, tak jak „Wyrusz” na ekranie miejsca.\n- Raport z awansem pozwala od razu rozdać wolne punkty: „Rozdaj według klasy” albo „Rozdaj ręcznie”.\n- Przy tworzeniu postaci „Rozpocznij” jest zawsze pod ręką, a obok widać, czego jeszcze brakuje. Na komputerze klasy stoją w dwóch kolumnach.\n- Targowisko: przy wystawianiu stuknij w przedmiot, a rozwinie się jego pełna karta z porównaniem do noszonego."
     }
   ]
 }

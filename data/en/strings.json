@@ -3076,5 +3076,11 @@
   "Szczęsny": "Szczęsny",
   "Wszystkie Twoje linie są zajęte.": "All your lines are taken.",
   "List gończy": "Wanted poster",
-  "przekuty u Kowala": "reforged by the smith"
+  "przekuty u Kowala": "reforged by the smith",
+  "Rozdano według klasy: {count}. Zmienisz je w Statystykach.": "Spent by class: {count}. You can change them in Stats.",
+  "Punkty rozdane według klasy.": "Points spent by class.",
+  "Wolne punkty statystyk: {count}.": "Free stat points: {count}.",
+  "wyglądu": "look",
+  "klasy": "class",
+  "imienia": "name"
 }
