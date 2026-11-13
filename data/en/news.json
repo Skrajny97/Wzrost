@@ -680,6 +680,10 @@
     "0.3.20": {
       "title": "Version 0.3.20",
       "body": "- Arena, Cards tab: the defending deck now has +12% Attack and Life, since it lays its cards first, face up. Equal decks now win about half of their matches each.\n- Fixes: the card table reloads when the match moved on on another device, chat messages stay in the order they were written, the players online count reads \"1 player\", \"2 players\", and the threat on the Fight screen counts your bond with your companions."
+    },
+    "0.3.21": {
+      "title": "Version 0.3.21",
+      "body": "- Chat, Trade channel: an offer can now show not only items from your bag but also materials, minerals, herbs, potions and camp resources, up to 5 kinds at once, with the number of pieces. Tap such goods in someone else's offer to see what they are and how many you have."
     }
   }
 }
