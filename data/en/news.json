@@ -660,6 +660,10 @@
     "0.3.15": {
       "title": "Version 0.3.15",
       "body": "- Setting in the Gem Workshop shows your character with their equipment: tap an item or the Core to set a stone in it. Each item shows which stone it holds.\n- New stone transmutation: 10 stones give one stone a rarity higher at once, e.g. 10 Quartz give an Agate. You'll find it in the Transmutation tab of the Gem Workshop and on a stone's card in your Bag."
+    },
+    "0.3.16": {
+      "title": "Version 0.3.16",
+      "body": "- A weapon with an elemental enchantment shows in a fight how much damage its element dealt: over the creature a second number in the element's colour pops up under the damage, and in the fight log the blow says, e.g., \"Cormorant loses 231 HP, 35 of it from nature\". The creature's resistance and weakness to that element work on this part of the blow."
     }
   }
 }

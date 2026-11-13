@@ -830,6 +830,11 @@
       "id": "0.3.15",
       "title": "Wersja 0.3.15",
       "body": "- Oprawianie w Szlifierni pokazuje Twoją postać z ekwipunkiem: stuknij przedmiot albo Rdzeń, żeby oprawić w nim kamień. Przy każdym przedmiocie widać, jaki kamień w nim tkwi.\n- Nowa przemiana kamieni: 10 kamieni daje od razu jeden kamień o stopień rzadszy, np. 10 Kwarców daje Agat. Znajdziesz ją w zakładce „Przemiana” w Szlifierni i w karcie kamienia w Plecaku."
+    },
+    {
+      "id": "0.3.16",
+      "title": "Wersja 0.3.16",
+      "body": "- Broń z zaklęciem żywiołu pokazuje w walce, ile obrażeń zadał żywioł: nad stworem pod liczbą obrażeń wyskakuje druga, w kolorze żywiołu, a w przebiegu walki przy ciosie jest dopisek, np. „Kormoran traci 231 HP, w tym 35 od natury”. Na tę część ciosu działają odporność i słabość stwora na ten żywioł."
     }
   ]
 }
