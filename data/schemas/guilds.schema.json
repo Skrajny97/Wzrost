@@ -1596,7 +1596,6 @@
             "ask",
             "askLead",
             "askWaiting",
-            "kindNames",
             "kindGroups",
             "goods",
             "count",
@@ -1640,34 +1639,6 @@
               "items": {
                 "type": "string",
                 "minLength": 1
-              }
-            },
-            "kindNames": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "material",
-                "herb",
-                "potion",
-                "mineral"
-              ],
-              "properties": {
-                "material": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "herb": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "potion": {
-                  "type": "string",
-                  "minLength": 1
-                },
-                "mineral": {
-                  "type": "string",
-                  "minLength": 1
-                }
               }
             },
             "states": {
@@ -2426,7 +2397,6 @@
             "hintSelf",
             "move",
             "noTeam",
-            "noTeamEmpty",
             "moveLead",
             "moveSelf",
             "swap",
@@ -2896,10 +2866,6 @@
             "noTeam": {
               "type": "string",
               "pattern": "\\{count\\}"
-            },
-            "noTeamEmpty": {
-              "type": "string",
-              "minLength": 1
             },
             "moveLead": {
               "type": "string",

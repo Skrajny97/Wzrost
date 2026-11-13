@@ -1,10 +1,11 @@
 // The machine translation of chat messages, "A→ Przetłumacz" (714 A,
 // DECISIONS.md, „Tłumaczenie na czacie”): Cloudflare Workers AI with the
-// m2m100 model, where English is on. The binding (AI) is only in the test
-// version's settings (wrangler.jsonc): it has no local stand-in and always
-// calls the Cloudflare account, so tests and local work use a stand-in
-// that marks the text instead (FAKE_TRANSLATOR "on"), and without either
-// the chat shows no button.
+// m2m100 model, where English is on. The binding (AI) is in the test
+// version's settings (wrangler.jsonc), and the deploy adds it to the game's
+// (tools/prepare-cloudflare.mjs): it has no local stand-in and always calls
+// the Cloudflare account, so tests and local work use a stand-in that marks
+// the text instead (FAKE_TRANSLATOR "on"), and without either the chat
+// shows no button.
 
 import { englishOn } from './features.js';
 

@@ -187,10 +187,20 @@ function amountsText(gold, resources) {
 // The ranking's words, with the rules' numbers filled in; the war's line
 // only where the guild wars are on.
 function rankingTexts() {
-  const { beast, expedition, trials, requests, exchange, war } = rules();
   const texts = words();
-  const points = (count) => `${count} ${countedForm(count, rules().texts.pointForms)}`;
-  const vars = {
+  const vars = fameNumbers();
+  const { $comment: _comment, howWar, list: _list, ...rest } = texts;
+  const how = guildWarsOn() ? [...texts.how.slice(0, 5), howWar, ...texts.how.slice(5)] : texts.how;
+  return { ...rest, how: how.map((line) => filled(line, vars)) };
+}
+
+// The numbers of the Sława's sources in words ("2 punkty"), and the caps,
+// for the "Jak to działa?" of both rankings, the guilds' (guild-fame.js)
+// and this one.
+export function fameNumbers() {
+  const { beast, expedition, trials, requests, exchange, war, texts } = rules();
+  const points = (count) => `${count} ${countedForm(count, texts.pointForms)}`;
+  return {
     beastPercent: points(beast.perPercent),
     beastFell: points(beast.fell),
     perGuardian: points(expedition.perGuardian),
@@ -203,9 +213,6 @@ function rankingTexts() {
     exchangeCap: exchange.cap,
     warWon: points(war.won),
   };
-  const { $comment: _comment, howWar, list: _list, ...rest } = texts;
-  const how = guildWarsOn() ? [...texts.how.slice(0, 5), howWar, ...texts.how.slice(5)] : texts.how;
-  return { ...rest, how: how.map((line) => filled(line, vars)) };
 }
 
 // The resources of the Siedziba's buildings, each once, in their order.
