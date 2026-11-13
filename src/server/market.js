@@ -23,6 +23,7 @@ import {
   buyCeiling,
   campBonus,
   campLevels,
+  companionClassName,
   companionPlace,
   createRng,
   equipBlock,
@@ -162,7 +163,7 @@ export function teamView(team) {
     id: companion.id,
     name: companion.name,
     appearance: companion.appearance,
-    className: content().classesById[companion.classId]?.name ?? companion.classId,
+    className: companionClassName(companion, content()).name,
     level: companion.level,
     wear: COMPANION_PLACES.map((place) => {
       const worn = companion.gear.find((item) => companionPlace(item.slot) === place);

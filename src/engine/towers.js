@@ -26,9 +26,8 @@
 
 import { combatantView, playerCombatant } from './combatant.js';
 import { simulateFight } from './combat.js';
-import { companionCombatant } from './companions.js';
+import { companionCombatant, trackerMaterials } from './companions.js';
 import { addCounts, materialDrops, materialsText, stackKey } from './crafting.js';
-import { evolutionOf } from './evolutions.js';
 import { championItemRarity, encounterCombatants, encountersFor, expectedExploration, explorationPace } from './hunt.js';
 import { itemName, randomItem } from './items.js';
 import { lowLevelMultiplier, monsterXp } from './progression.js';
@@ -225,8 +224,7 @@ export function towerFight({ character, equipped, name, floor, seed, partners = 
   const pace = explorationPace(content.towers.rewardMinutes, content);
   const lengthed = pace.timeFactor * (1 + pace.lengthBonus);
   const partyXp = 1 - companions.length * content.settlement.companions.xpCost - partners.length * content.balance.parties.xpCost;
-  const tracker = evolutionOf(character, content)?.trait;
-  const moreMaterials = (tracker?.kind === 'tracker' ? 1 + tracker.params.materials : 1) * weekFactor(week, 'materials');
+  const moreMaterials = (1 + trackerMaterials(character, companions, content)) * weekFactor(week, 'materials');
   // combatant.js and companions.js are not checked yet: their options are
   // typed by their defaults alone (hp, area).
   const player = playerCombatant(/** @type {any} */ ({ character: weekFighter(character, week), equipped, name, area }), content);

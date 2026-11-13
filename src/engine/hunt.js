@@ -40,9 +40,9 @@ import {
 import { countEvents, createRng } from './rng.js';
 import { nameInText, say, word } from './text.js';
 import { classUnlockMessages, unlockMessages } from './unlocks.js';
-import { classNameOf, evolutionOf } from './evolutions.js';
+import { classNameOf } from './evolutions.js';
 import { evolutionBlock, skillPoints } from './skills.js';
-import { companionCombatant, gendered } from './companions.js';
+import { companionCombatant, gendered, trackerMaterials } from './companions.js';
 import { wantedEncounter, wantedLootRarity, wantedOf, wantedStrength } from './wanted.js';
 import { raisedOutcome, weekChance, weekFactor, weekFighter, weekLine } from './weeks.js';
 
@@ -788,10 +788,9 @@ export function simulateHunt(
   const resources = {}; // { wood: 12, … } found for the camp
   /** @type {Record<string, number>} */
   let materials = {}; // { "wolf-pelt:common": 2, … } from beaten creatures
-  // Tropiciel (an evolution's trait), and the Bractwo Łowców: more materials
-  // from creatures.
-  const tracker = evolutionOf(character, content)?.trait;
-  const moreMaterials = (tracker?.kind === 'tracker' ? 1 + tracker.params.materials : 1) * (1 + materialsMore) * weekFactor(week, 'materials');
+  // Tropiciel (an evolution's trait, the character's or a companion's form's),
+  // and the Bractwo Łowców: more materials from creatures.
+  const moreMaterials = (1 + trackerMaterials(character, companions, content)) * (1 + materialsMore) * weekFactor(week, 'materials');
   // The week's shares of the fights' XP and gold (weeks.js).
   const weekXp = weekFactor(week, 'xp');
   const weekGold = weekFactor(week, 'gold');

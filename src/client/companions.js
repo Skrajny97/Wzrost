@@ -282,7 +282,15 @@ export function companionCard(companion, action, apply) {
       h(
         'div',
         {},
-        h('p', { class: 'settlement-resident-name', text: t('{name}, {className}, poz. {level}', { name: companion.name, className: companion.className, level: companion.level }) }),
+        h('p', {
+          class: 'settlement-resident-name',
+          text: t('{name}, {className}, poz. {level}', {
+            name: companion.name,
+            // An evolved companion (896 A): its form's name, its class's beside it.
+            className: companion.baseClassName ? t('{name} (z klasy: {base})', { name: companion.className, base: companion.baseClassName }) : companion.className,
+            level: companion.level,
+          }),
+        }),
         h('p', {
           class: 'muted',
           text: `${t('HP {hp} · pancerz {armor}', { hp: formatNumber(companion.maxHp), armor: formatNumber(companion.armor) })}${companion.profession ? ` · ${companion.profession}` : ''}`,

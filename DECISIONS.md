@@ -3233,7 +3233,7 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
-## Oceny autora 892–895 (13.11.2026, w grze od 0.3.1)
+## Oceny autora 892–895 (13.11.2026; 893 i 894 w grze od 0.3.1)
 
 Autor zaznaczył oceny na stronie ocen: „oceny zaznaczone”.
 
@@ -3248,6 +3248,23 @@ Autor zaznaczył oceny na stronie ocen: „oceny zaznaczone”.
    - 894.7 A: w tworzeniu postaci „Rozpocznij” trzyma się dołu ekranu, a obok stoi, czego brakuje („Brakuje: wyglądu, klasy i imienia.”, stuknięcie przenosi do brakującego pola i na chwilę obwodzi je złotą ramką), albo co wybrano (klasa · wygląd · imię). „Rozpocznij” bez wyglądu albo klasy przewija ekran do brakującego wyboru. Na komputerze karty klas stoją w dwóch kolumnach, a ekran jest szerszy (820 px).
    - 894.8: zdanie przy zamkniętym Rdzeniu zostaje.
 5. **Odmowa przy tworzeniu postaci (brakujący szczegół).** Gdy serwer odmówi po „Rozpocznij” (np. imię zajęte), ekran przewija się do słów odmowy nad paskiem, bo przy przyklejonym przycisku mogłyby zostać poza ekranem.
+
+## Towarzysze ewoluują (896 A, 13.11.2026, w grze od 0.3.2)
+
+Autor: „Czy towarzyszom ewoluuje klasa i zmieniaja sie umiejetnosci? Bo powinny... skarżą sie ludzie ze najęci Klerycy nie leczą ich”. Modlitwa o zdrowie leczy tylko samego Kleryka, a całą drużynę leczy dopiero Odnowa Uzdrowiciela, czyli umiejętność ewolucji. Na stronie ocen autor wybrał 896 A i odrzucił 896 B. Zasady są w `src/engine/companions.js` (`companionForm`, `companionSkills`, `companionClassName`, `trackerMaterials`).
+
+1. **Kiedy i w co.** Towarzysz ewoluuje sam, bez wyboru, na swoim 50., 100. i 200. poziomie, ścieżką pierwszej umiejętności ze swojej karty (gdyby ta nie miała ewolucji, drugiej). Na przykład Kleryk z Modlitwą o zdrowie zostaje na 50. poziomie Uzdrowicielem, na 100. Cudotwórcą, a na 200. Świętym. Trzecia forma przychodzi tylko tam, gdzie gra ma trzecie formy włączone.
+2. **Co daje forma.** Nazwę formy (żeńską, gdy forma ją ma) i jej cechę, która działa w walce jak u postaci. Statystyki rosną z przyrostem formy od poziomu po ewolucji. Dwie umiejętności formy zastępują dawne.
+3. **Poziom umiejętności formy (brakujący szczegół).** Rośnie z poziomem towarzysza jak dotąd: jeden poziom co 4 poziomy towarzysza. Liczy się jednak od 10. poziomu, tak jak dawne umiejętności, bo u postaci punkty dawnych umiejętności wracają na umiejętności formy. Dzięki temu umiejętności nie spadają po ewolucji do 1. poziomu: na 50. poziomie towarzysza mają 11. poziom, na 100. mają 23., a na 200. mają 48. Postać z rozdanymi punktami ma ok. 20, 45 i 95, więc towarzysz zostaje słabszy od postaci, jak dotąd.
+4. **Wygląd zostaje własny towarzysza:** popiersie w Kwaterach i w walce oraz chód w scenie Walka. Odtwarzanie walki nie dostaje portretu formy.
+5. **Od razu, bez zapisu.** Forma wynika z poziomu i pierwszej umiejętności, więc nic się nie zapisuje. Towarzysze, którzy mają już 50. poziom, ewoluują od razu po wdrożeniu. Kandydaci w Karczmie od 50. poziomu przychodzą już w formie.
+6. **Karta w Kwaterach i w Karczmie, bez nowego ekranu.** Nagłówek brzmi np. „Imię, Uzdrowiciel (z klasy: Kleryk), poz. 52”. Pod cechami towarzysza stoi cecha formy, a w umiejętnościach dwie umiejętności formy z poziomem. Porównania na Targowisku i w Skrzyni Gildii nazywają towarzysza nazwą formy.
+7. **Tropiciel u towarzysza (brakujący szczegół).** Cecha Łowcy, Mistrza Łowów i Władcy Puszczy daje też więcej materiałów ze stworów. U towarzysza działa tak samo, na eksploracji i w Wieżach. Liczy się raz: najwyższa z cech postaci i towarzyszy, którzy poszli.
+8. **Symulacja, bez wyrównywania trudności.**
+   - Eksploracje (`tools/difficulty-sim.mjs`, poziomy 50–150, 150 wypraw na klasę) w modelu „realistic” (dobre wyposażenie, dwóch towarzyszy poziom niżej): omdlenia zostają przy 0%, a HP na końcu rośnie o 1–4 pkt proc.
+   - W modelu „casualcomp” (towarzysze tacy, jacy przychodzą z Karczmy) omdlenia na 4-godzinnych wyprawach maleją na 100. poziomie z 46% do 38%, na 125. z 50% do 28%, a na 150. z 53% do 27%. Na 50. poziomie nic się nie zmienia, bo towarzysze są tam jeszcze poniżej 50. poziomu.
+   - Labirynt (`tools/labyrinth-sim.mjs`, „realistic”, 24 dni na klasę) przechodzi poziomy 1/2/3 częściej: na 100. poziomie 70/28/16% → 82/42/27%, a na 150. 75/32/18% → 91/57/40%. To bliżej celu z założeń Labiryntu (1 prawie zawsze, 2 zwykle, 3 mniej więcej co drugi raz).
+   - Trudność zostaje bez zmian: wyprawy dobrze wyposażonej postaci prawie się nie zmieniają, a słabszym graczom ewolucja towarzyszy pomaga tam, gdzie mdleli najczęściej. Trudność Labiryntu i tak ustawi się na nowo przy jego przebudowie w osobną planszę (uwaga autora z 13.11.2026).
 
 ## Przechowalnia: porównanie z założonym (13.11.2026, w grze od 0.3.2)
 
