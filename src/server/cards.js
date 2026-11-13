@@ -427,11 +427,35 @@ export async function saveDeck(context) {
   return respond(context, session, { saved: true });
 }
 
+// The server's own key for the card draws whose seed would otherwise come
+// only from numbers anyone can read in the public code (the day, the
+// character's id, a trial's id): Szczęsny's pack and the Próby Gildii's
+// cards (the author's 920 B, 13.11.2026). Made by the first draw that needs
+// it and kept in the database (server_settings, 'card_seed'); when two calls
+// meet, the key saved first stays, as with the push keys (push.js).
+async function cardSeedKey(db) {
+  const read = () => db.prepare("SELECT value FROM server_settings WHERE key = 'card_seed'").first('value');
+  let stored = await read();
+  if (stored === null) {
+    await db.prepare("INSERT INTO server_settings (key, value) VALUES ('card_seed', ?) ON CONFLICT (key) DO NOTHING").bind(toHex(crypto.getRandomValues(new Uint8Array(32)))).run();
+    stored = await read();
+  }
+  return stored;
+}
+
+// The seed of a draw from its public parts and the server's key (HMAC-SHA256,
+// in hex): the same parts give the same draw on every try, as before, and
+// nobody without the key can work it out from the code.
+export async function keyedSeed(db, parts) {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(await cardSeedKey(db)), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  return toHex(new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(parts))));
+}
+
 // POST /api/cards/pack: the day's pack at Szczęsny's (902 C), once a day:
 // three cards of the creatures of the lands lower than the character's own,
 // those it has not got first (packCards), for the gold of an hour of
-// exploring at its level. Drawn from the day's seed, so asking again draws
-// the same; saved only over the character as read and while it has the
+// exploring at its level. Drawn from the day's seed with the server's key
+// (keyedSeed, 920 B), so asking again draws the same; saved only over the character as read and while it has the
 // gold. Answers with the cards as they are now in the collection.
 export async function buyPack(context) {
   const { session, player } = await requirePlayer(context);
@@ -445,7 +469,7 @@ export async function buyPack(context) {
   if (game.pack) throw new ApiError(409, 'pack_bought', 'Pakiet na dziś już kupiony. Następny jutro.');
   const collection = await cardCollection(db, row.id);
   const land = characterLand(row);
-  const cards = packCards({ land, owned: collection.keys(), maxed: maxedCards(collection), seed: `${day}:${row.id}`, count: rules().pack.cards }, content());
+  const cards = packCards({ land, owned: collection.keys(), maxed: maxedCards(collection), seed: await keyedSeed(db, `${day}:${row.id}`), count: rules().pack.cards }, content());
   if (cards.length === 0) throw new ApiError(409, 'pack_empty', lowerLandCards(land, content()).length === 0 ? 'W pierwszej krainie nie ma krain niższych, więc nie ma pakietu.' : 'Masz już wszystkie karty z niższych krain na najwyższym poziomie.');
   const price = explorationGold(rules().pack.goldMinutes, row.level);
   if (row.gold < price) throw new ApiError(409, 'no_gold', t('Brakuje złota: potrzeba {price}.', { price }));
@@ -535,6 +559,13 @@ async function endStatements(db, player, match, state, now) {
   const firstTier = Boolean(tier) && won && !game.beaten.includes(number);
   const firstResident = Boolean(table) && won && !game.residents.includes(table.id);
   const collection = firstTier || (table && won) ? await cardCollection(db, row.id) : new Map();
+  // The tier's card at its first win; when every card of its rarity is at
+  // its top level already, it would be lost, so the tier's stake comes once
+  // more instead (the author's 919 B, 13.11.2026: nothing else in the game
+  // prices a card of a rarity, and the stake is the tier's own number).
+  const drawn = firstTier ? firstWinCard(tier, collection, state.seed, content()) : null;
+  const spent = drawn !== null && (collection.get(drawn) ?? 0) >= rules().stats.maxLevel;
+  const cardGold = spent ? match.stake : 0;
   const payout = matchPayout({
     result: state.result,
     staked,
@@ -542,7 +573,7 @@ async function endStatements(db, player, match, state, now) {
     dailyGold: tier ? explorationGold(tier.rewardMinutes, row.level) : 0,
     rewardedToday: tier ? game.rewarded.includes(number) : true,
     beatenBefore: tier ? game.beaten.includes(number) : true,
-    firstCard: firstTier ? firstWinCard(tier, collection, state.seed, content()) : null,
+    firstCard: spent ? null : drawn,
   });
   const card =
     table && won ? residentWinCard({ table, first: firstResident, seed: state.seed, owned: collection.keys(), maxed: maxedCards(collection) }, content()) : payout.card;
@@ -553,6 +584,8 @@ async function endStatements(db, player, match, state, now) {
     gold: payout.gold,
     daily: payout.daily,
     card: card ? cardView(card, (collection.get(card) ?? 0) + 1, content(), { fresh: !collection.has(card) }) : null,
+    // The gold in place of a first win's card already at its top level (919 B).
+    ...(cardGold > 0 && { cardGold, maxLevel: rules().stats.maxLevel }),
     tierName: tier?.name ?? null,
     // At a resident's table: its deck's name, and whether the card is the
     // first win's (else its chance's).
@@ -571,7 +604,7 @@ async function endStatements(db, player, match, state, now) {
       residents: firstResident ? [...game.residents, table.id] : game.residents,
     };
     statements.unshift(assertion(db, '(SELECT version FROM characters WHERE id = ?) = ?', [row.id, row.version]));
-    statements.push(db.prepare('UPDATE characters SET gold = gold + ?, card_game = ?, version = version + 1 WHERE id = ?').bind(payout.gold + payout.daily, JSON.stringify(next), row.id));
+    statements.push(db.prepare('UPDATE characters SET gold = gold + ?, card_game = ?, version = version + 1 WHERE id = ?').bind(payout.gold + payout.daily + cardGold, JSON.stringify(next), row.id));
     if (card) statements.push(...cardUpserts(db, row.id, [card], now));
   }
   return { statements, summary };

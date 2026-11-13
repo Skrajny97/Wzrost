@@ -273,6 +273,42 @@ describe('brewing through the API', () => {
     assert.equal((await call('GET', '/api/reports', { cookie })).data.reports[0].kind, 'potions');
   });
 
+  // The author's 927 A (13.11.2026): "Przerwij warzenie" gave the herbs for
+  // the rest back even with no room for them (a test ended at 33 of 30
+  // places). It waits now until they fit, as the Bractwo's herbs and a
+  // companion's present do.
+  test('stopped with no room for the herbs for the rest, the brewing goes on until room is made', async () => {
+    await set(`herbs = '{"comfrey":6}'`);
+    assert.equal((await brew({ recipe: 'lesser-healing', count: 2 })).status, 201);
+    // The brewing took all the Żywokost: its place is free, and the bag fills it.
+    const view = await character();
+    assert.deepEqual(view.herbs, []);
+    const database = await db();
+    const { id } = await database.prepare('SELECT id FROM characters').first();
+    for (let left = view.bagCapacity - view.bagUsed; left > 0; left--) {
+      await database
+        .prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, 0)')
+        .bind(id, JSON.stringify({ base: 'ring', slot: 'ring', level: 1, rarity: 'common', affixes: [] }))
+        .run();
+    }
+    const full = await call('POST', '/api/hunts/cancel', { cookie });
+    assert.deepEqual([full.status, full.data.error.code], [409, 'bag_full']);
+    assert.equal(full.data.error.message, 'Zioła na resztę warzenia nie zmieszczą się w plecaku. Zrób w nim miejsce.');
+    // Nothing is lost: the brewing goes on, its herbs in the cauldron.
+    const waiting = await character();
+    assert.equal(waiting.activity.kind, 'potions');
+    assert.deepEqual(waiting.herbs, []);
+    assert.equal(waiting.bagUsed, waiting.bagCapacity);
+    // With a place made, it stops, and the herbs come back into it.
+    await database.prepare('DELETE FROM items WHERE id = (SELECT MAX(id) FROM items)').run();
+    const stopped = await call('POST', '/api/hunts/cancel', { cookie });
+    assert.equal(stopped.status, 200, JSON.stringify(stopped.data));
+    assert.equal(stopped.data.report, null);
+    assert.equal(stopped.data.character.activity, null);
+    assert.deepEqual(stopped.data.character.herbs.map((herb) => herb.count), [6]);
+    assert.equal(stopped.data.character.bagUsed, stopped.data.character.bagCapacity);
+  });
+
   test('a recipe with a catalyst takes a piece of it a potion, of the grade chosen, and gives back the rest when stopped', async () => {
     await set(`professions = '{"alchemy":{"level":18,"xp":0}}', herbs = '{"calamus":60}', materials = '{"viper-scales:common":2,"viper-scales:rare":5,"wolf-pelt:rare":9}'`);
     const materials = async () => JSON.parse((await (await db()).prepare('SELECT materials FROM characters').first()).materials);

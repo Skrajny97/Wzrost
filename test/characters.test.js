@@ -46,6 +46,10 @@ describe('five characters on one account', () => {
     const back = await played();
     assert.equal(back.name, 'Mira');
     assert.equal(back.activity.kind, 'hunt');
+    // Each by its id, which the page keeps its own things on the device by
+    // (the chat's marks of what was read, src/client/chat-news.js).
+    assert.equal(back.id, await idOf('Mira'));
+    assert.notEqual(back.id, await idOf('Druga'));
     assert.deepEqual((await list()).characters.map((character) => character.played), [true, false]);
     // The character played already: nothing changes.
     assert.equal((await choose('Mira')).status, 200);

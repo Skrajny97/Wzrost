@@ -26,6 +26,7 @@ import {
   companionGoes,
   campLevels,
   challengeAt,
+  createRng,
   faintShare,
   scoutChances,
   scoutedCreature,
@@ -136,10 +137,27 @@ export function restedNow(player, now) {
 // those who do not stay in the Kwatery, and none while the character is in
 // a Drużyna (companionGoes in the engine), a wounded one once the character
 // has rested to full HP; with the character, at most parties.size.
-export function companionsGoing(player, now) {
-  const rested = restedNow(player, now);
+// `rested`: whether it has, when the caller knows it already.
+export function companionsGoing(player, now, rested = restedNow(player, now)) {
   const hired = JSON.parse(player.row.settlement ?? '{}').companions ?? [];
   return hired.filter((companion) => companionGoes(companion, { rested, inParty: player.inParty })).slice(0, content().balance.parties.size - 1);
+}
+
+// The companions going along as their fights count them: each with its
+// level, its gear and what its relation's standing gives it in a fight
+// (the code review, 13.11.2026: a closer bond kept the threat of before).
+const companionsInFights = (companions) => companions.map((companion) => [companion.id, companion.level, companion.gear, bondBonus(companion, content())]);
+
+// A short mark of the companions who would go along on an exploration now,
+// as the threat counts them (cachedSamples), or null for none: the same
+// companions give the same mark, the first number drawn with them as the
+// seed. The Walka screen asks for the threat again when it changes (its
+// buildKey), with a hire, a dismissal, a wound, a closer bond, a level or
+// an item given (characterView; the code review, 13.11.2026: it kept the
+// threat of before until the screen was opened again).
+export function companionsKey(player, now, rested) {
+  const fighting = settlementOn() ? companionsInFights(companionsGoing(player, now, rested)) : [];
+  return fighting.length > 0 ? createRng(JSON.stringify(fighting)).int(0, 2 ** 30).toString(36) : null;
 }
 
 // `hard`: against the creatures of a Trudna wyprawa (629 A).
@@ -149,11 +167,9 @@ function cachedSamples(player, character, equipped, areaId, now, hard = false) {
   // stats (the code review: the threat stayed as before them).
   const gear = [...equipped].sort((a, b) => a.id - b.id).map((item) => JSON.stringify(item));
   // The companions who would go along fight beside the character
-  // (companions.js), each with what its relation's standing gives it in a
-  // fight (the code review, 13.11.2026: a closer bond kept the threat of
-  // before).
+  // (companions.js).
   const companions = settlementOn() ? companionsGoing(player, now) : [];
-  const party = companions.map((companion) => [companion.id, companion.level, companion.gear, bondBonus(companion, content())]);
+  const party = companionsInFights(companions);
   // The Rdzeń's Artefakty and gem too (core.js), which change the fights.
   const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard, character.core ?? null]);
   let samples = samplesCache.get(key);
@@ -474,11 +490,28 @@ export async function beginHunt(
   // only: hired with the start, in its batch, its fee paid at once; it
   // fights beside the character as a Drużyna's member would.
   const hire = mercenary === null ? null : await hireMercenary(db, player, mercenary, { area, minutes, startsAt, endsAt, now, plain: !quick && !crew });
+  // What an exploration of its own keeps and a Drużyna's trip does not. The
+  // Ołtarz's blessing of the day, for its first fights; a trip's fights are
+  // one for all (fortress.js). The professions' levels as it sets out, whose
+  // stats its fights count: the Awatar's report claimed on the way raises
+  // them (avatar.js), and its fights would count the new levels (the code
+  // review, 0.2.72), as a gem or a training would, which wait for the
+  // report; a trip keeps its roster as it set out anyway. A leader whose
+  // members all stayed home after all goes as on its own, and its
+  // exploration gets them then (parties.js).
+  const blessing = blessingOf(player.row);
+  const own = { ...(blessing && { blessing }), professions: JSON.parse(player.row.professions ?? '{}') };
   const options = {
     // When it really set out, which a "Przewiń" leaves as it was (started_at
     // moves back with a skip): a trial of the Próby Gildii moves on only
     // with what set out after its taking (takenBefore in guild-trials.js).
     begun: now,
+    // The character's and the class's levels as it sets out, which its fights
+    // count when the report is claimed (the author's 924 A, 13.11.2026), not
+    // a level gained on the way (the Labirynt, a party's event): the
+    // creatures, the rest after fights, the HP, the damage and the stats of
+    // the levels. Kept on a Drużyna's trip too, for each member's own part.
+    levels: { level: player.row.level, classLevel: player.row.class_level },
     ...(rumor > 1 && { rumor }),
     ...(rareMore > 0 && { rareMore }),
     ...(materialsMore > 0 && { materialsMore }),
@@ -495,15 +528,7 @@ export async function beginHunt(
     ...(sought && { wanted: sought }),
     ...(hard && { hard: true }),
     ...(hire && { partners: [hire.partner], mercenary: hire.view }),
-    // The Ołtarz's blessing of the day, for this exploration's first fights;
-    // not on a Drużyna's trip, whose fights are one for all (fortress.js).
-    ...(!crew && blessingOf(player.row) && { blessing: blessingOf(player.row) }),
-    // The professions' levels as it sets out, whose stats its fights count:
-    // the Awatar's report claimed on the way raises them (avatar.js), and
-    // its fights would count the new levels (the code review, 0.2.72), as a
-    // gem or a training would, which wait for the report. A Drużyna's trip
-    // keeps its roster as it set out anyway.
-    ...(!crew && { professions: JSON.parse(player.row.professions ?? '{}') }),
+    ...(!crew && own),
     ...(quick && { quick }),
     ...(flash && { flash }),
   };
@@ -560,8 +585,9 @@ export async function beginHunt(
     }
     throw error;
   }
-  // What it set out with, for the roster of a Drużyna's trip (parties.js).
-  return { windows, trophies, taken, healBelow: healBelow ?? content().potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare, wanted: sought };
+  // What it set out with, for the roster of a Drużyna's trip (parties.js),
+  // and what it keeps should its leader go alone after all (`own`).
+  return { windows, trophies, taken, healBelow: healBelow ?? content().potionUse.healBelow, tracked, unknown, rumor, rareMore, avoidRare, seekRare, wanted: sought, own };
 }
 
 // Calling the character back early gives nothing and costs nothing. A
@@ -738,8 +764,13 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   // (beginHunt), not those the Awatar's report brought on the way; an
   // exploration begun before 0.2.72 keeps none and counts them as now.
   const character = { ...engineCharacter(row), ...(options.professions && { professions: options.professions }) };
+  // The fights (and an event's at the end) count the character's and the
+  // class's levels as it set out (beginHunt, 924 A); the XP and the levels
+  // the report brings still go onto the character as it is now (applyHunt).
+  // An exploration begun before 0.3.24 keeps none and counts them as now.
+  const fighter = options.levels ? { ...character, level: options.levels.level, classLevel: options.levels.classLevel } : character;
   // region_id holds the inner region (or a whole region, from before them).
-  const area = areaFor(activity.region_id, row.level, content());
+  const area = areaFor(activity.region_id, fighter.level, content());
   // The very first exploration, before any report, goes one way (simulateHunt).
   const first = !(await db.prepare('SELECT 1 AS found FROM reports WHERE character_id = ? LIMIT 1').bind(row.id).first());
   // A Drużyna's trip: its fights from the trip's roster and seed, the same
@@ -761,7 +792,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
   const collection = cardsOn() && content().cards ? await cardCollection(db, row.id) : null;
   let hunt = simulateHunt(
     {
-      character,
+      character: fighter,
       equipped: equippedItems(player),
       hp: activity.hp_at_start,
       name: row.name,
@@ -886,7 +917,7 @@ export async function finishHunt(db, player, now, { choice, forTrip = false } = 
         caseId: forcedCase,
         endingId: forcedEnding,
         drafts: eventDraftsOn(),
-        character,
+        character: fighter,
         equipped: equippedItems(player),
         name: row.name,
         seed: activity.seed,

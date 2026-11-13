@@ -112,7 +112,7 @@ import {
 import { buyScrolls, raiseAtForge } from './forge.js';
 import { buyTicket, drawLotteries, getCasino, spinCasinoWheel } from './casino.js';
 import { buyPack, getCards, playCardTurn, saveDeck, startMatch, surrenderCards, takeStarter } from './cards.js';
-import { answerDuel, challengeDuel, duelOffer, duelTurn, readDuel, surrenderDuelMatch, withoutDuel } from './card-duel.js';
+import { answerDuel, challengeDuel, duelOffer, duelTurn, readDuel, surrenderDuelMatch, withdrawDuel, withoutDuel } from './card-duel.js';
 import { enterTrialHall } from './trial-hall.js';
 import { arenaFight, claimArenaReward, getArena, getArenaDefence, rerollArenaRivals } from './pvp-arena.js';
 import { claimCardArenaReward, getCardArena, playCardArenaTurn, rerollCardArena, startCardArenaMatch, surrenderCardArena } from './card-arena.js';
@@ -364,6 +364,7 @@ const routes = [
   ['GET', '/api/cards/duel/offer', duelOffer],
   ['POST', '/api/cards/duel/challenge', challengeDuel],
   ['POST', '/api/cards/duel/answer', answerDuel],
+  ['POST', '/api/cards/duel/withdraw', withdrawDuel],
   ['POST', '/api/cards/duel/turn', duelTurn],
   ['POST', '/api/cards/duel/surrender', surrenderDuelMatch],
   ['GET', '/api/test/settlement', settlementTests],

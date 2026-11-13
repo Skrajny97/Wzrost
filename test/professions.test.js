@@ -316,6 +316,39 @@ describe('herbalism through the API', () => {
     assert.equal((await gather({ herbs: ['nettle'], minutes: 480 })).status, 201);
   });
 
+  // The code review, 13.11.2026: the start saved the HP rested so far with
+  // no check that the character was still as read, so a healing potion
+  // drunk at the same moment (or an Awatar's level that heals) was undone.
+  // Here the potion lands right after the request read the character, at
+  // its first write (the Encyklopedia's record, settleDiscoveries).
+  test('a healing potion drunk while a gathering starts is not undone', async () => {
+    await atLevel(10);
+    const database = await db();
+    // A herb in the bag the Encyklopedia has not written down yet: the
+    // request writes it down first, before the start.
+    await database.prepare(`UPDATE characters SET hp = 1, hp_at = ?, herbs = '{"comfrey":1}', discovered = '{}'`).bind(Date.now()).run();
+    await database
+      .prepare(
+        `CREATE TRIGGER drunk_meanwhile AFTER UPDATE OF discovered ON characters
+         BEGIN
+           UPDATE characters SET hp = 40, version = version + 1 WHERE id = NEW.id;
+         END`,
+      )
+      .run();
+    try {
+      const raced = await gather({ herbs: ['comfrey'], minutes: 60 });
+      assert.equal(raced.status, 409, JSON.stringify(raced.data));
+      assert.equal(raced.data.error.code, 'character_changed');
+    } finally {
+      await database.prepare('DROP TRIGGER IF EXISTS drunk_meanwhile').run();
+    }
+    assert.equal((await database.prepare('SELECT hp FROM characters').first()).hp, 40);
+    assert.equal(await database.prepare('SELECT 1 FROM activities').first(), null);
+    // Tried again, it starts, with the HP the potion gave.
+    assert.equal((await gather({ herbs: ['comfrey'], minutes: 60 })).status, 201);
+    assert.ok((await database.prepare('SELECT hp FROM characters').first()).hp >= 40);
+  });
+
   test('while gathering the character rests, cannot explore, and the report brings herbs, XP and levels', async () => {
     await atLevel(10);
     await (await db()).prepare('UPDATE characters SET hp = 1').run();

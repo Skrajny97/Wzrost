@@ -18,6 +18,7 @@
 // worn is traded.
 
 import { bagCapacity, bagStacks, campLevels, isUnlocked, itemView, knownStack, materialView } from '../engine/index.js';
+import { characterChanged } from './atomic.js';
 import { bagItems, characterView, loadPlayer, requireOffRack } from './characters.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
@@ -353,13 +354,16 @@ const addedStacks = (column) =>
 
 // Everything moves at once, or nothing: one statement fails the whole
 // batch (json() of a state is no JSON) unless both still have what they
-// offered and the trade is as both saw it. The stacks of a kind go into
-// each statement as one JSON object, so a Wymiana of any number of kinds
-// of goods stays within D1's 100 bound values.
+// offered, both characters are as read (`version`: their bags were
+// counted from them) and the trade is as both saw it. The stacks of a kind
+// go into each statement as one JSON object, so a Wymiana of any number of
+// kinds of goods stays within D1's 100 bound values.
 function exchange(db, trade, now, sides) {
   const conditions = ["t.state = 'locked'", 't.version = ?'];
   const binds = [trade.version];
-  for (const { id, offer } of sides) {
+  for (const { id, offer, version } of sides) {
+    conditions.push('(SELECT version FROM characters WHERE id = ?) = ?');
+    binds.push(id, version);
     if (offer.items.length > 0) {
       // Each item as it was offered (setOffer), where the offer keeps it.
       const exact = Array.isArray(offer.itemData) && offer.itemData.length === offer.items.length;
@@ -488,10 +492,17 @@ export async function confirmTrade(context) {
   }
   try {
     await exchange(db, trade, now, [
-      { id: trade.from_id, offer: from },
-      { id: trade.to_id, offer: to },
+      { id: trade.from_id, offer: from, version: fromPlayer.row.version },
+      { id: trade.to_id, offer: to, version: toPlayer.row.version },
     ]);
   } catch {
+    // A character changed since it was read, and its bag may hold more by
+    // now (the code review: the bags were checked before the exchange, not
+    // in it, so a bag filled meanwhile got more than it holds). The trade
+    // waits for another try, which checks the bags and the offers anew.
+    const versions = await db.prepare('SELECT id, version FROM characters WHERE id IN (?, ?)').bind(trade.from_id, trade.to_id).all();
+    const versionOf = (id) => versions.results.find((row) => row.id === id)?.version;
+    if (versionOf(trade.from_id) !== fromPlayer.row.version || versionOf(trade.to_id) !== toPlayer.row.version) throw characterChanged();
     await close(db, trade, 'cancelled', now);
     throw new ApiError(409, 'stale', 'Coś z ofert zmieniło się w ostatniej chwili. Wymiana przepadła.');
   }

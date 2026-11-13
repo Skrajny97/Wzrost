@@ -95,6 +95,10 @@ export function mountSettlement(container, { params = {} } = {}) {
   let failure = null;
   let gone = false;
   let timer = null;
+  // The countdowns of the empty slots on the Tablica zleceń, each with its
+  // line and when its order comes, kept right every second (tick; the code
+  // review, 13.11.2026: they stood still until the screen was drawn again).
+  let slotClocks = [];
   // The orders the player unfolded: the Tablica lists them folded to their
   // names (the author: "powinny być zwinięte do nazw").
   const unfolded = new Set();
@@ -293,12 +297,15 @@ export function mountSettlement(container, { params = {} } = {}) {
         { class: 'settlement-fold-body' },
         h('p', { class: 'settlement-story', text: t('„{line}”', { line: order.story }) }),
         h('p', { class: 'settlement-ask', text: t('Masz {have} z {count}', { have: formatNumber(order.have), count: formatNumber(order.count) }) }),
+        // With the Punkty Systemu it pays: a special order's, the week's
+        // order's (the server's orderView).
         h('p', {
           class: 'muted',
-          text: t(order.special ? 'Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}, +1 PS' : 'Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}', {
+          text: t(order.systemPoints > 0 ? 'Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}, +{points} PS' : 'Zapłata: {gold} złota, +{reputation} reputacji: {brotherhood}', {
             gold: formatNumber(order.gold),
             reputation: order.reputation,
             brotherhood: order.brotherhoodName,
+            points: order.systemPoints,
           }),
         }),
         order.expiresAt && h('p', { class: 'muted', text: t('Termin: jeszcze {time}', { time: timeLeft(order.expiresAt - serverNow()) }) }),
@@ -328,12 +335,17 @@ export function mountSettlement(container, { params = {} } = {}) {
     return order.forms ? askGuildButton({ kind: 'material', rarity, ordinary: true, missing }) : askGuildButton({ kind: 'material', key: order.key, name: order.label, missing });
   }
 
+  // An empty slot's line: when its new order comes.
+  const showSlotClock = ({ line, readyAt }, now) => (line.textContent = t('Nowe zlecenie za {time}.', { time: formatCountdown(readyAt - now) }));
+
   function boardCard() {
-    const slots = data.board.slots.map((slot) =>
-      slot.order
-        ? orderCard(slot.order)
-        : h('div', { class: 'card settlement-order settlement-order--empty' }, h('p', { class: 'muted', text: t('Nowe zlecenie za {time}.', { time: formatCountdown(slot.readyAt - serverNow()) }) })),
-    );
+    const slots = data.board.slots.map((slot) => {
+      if (slot.order) return orderCard(slot.order);
+      const clock = { line: h('p', { class: 'muted' }), readyAt: slot.readyAt };
+      showSlotClock(clock, serverNow());
+      slotClocks.push(clock);
+      return h('div', { class: 'card settlement-order settlement-order--empty' }, clock.line);
+    });
     const weekly = data.board.weekly ? orderCard({ ...data.board.weekly, weekly: true }) : data.board.weeklyDone && h('p', { class: 'muted', text: t('Zlecenie tygodnia oddane. Następne w poniedziałek.') });
     return h('section', { class: 'settlement-board' }, h('h2', { class: 'section-title', text: t('Tablica zleceń') }), slots, weekly);
   }
@@ -1742,6 +1754,7 @@ export function mountSettlement(container, { params = {} } = {}) {
 
   function render() {
     clearTimeout(timer);
+    slotClocks = [];
     if (failure && (failure.status === 403 || failure.status === 404)) return locked();
     if (failure) return fill(container, pageHeading(t('Osada')), systemPanel(failure.message));
     if (!data) return fill(container, pageHeading(t('Osada')), h('p', { class: 'muted', text: t('Wczytywanie…') }));
@@ -1778,6 +1791,7 @@ export function mountSettlement(container, { params = {} } = {}) {
   load();
   return {
     update: render,
+    tick: (now) => slotClocks.forEach((clock) => showSlotClock(clock, now)),
     unmount() {
       gone = true;
       clearTimeout(timer);

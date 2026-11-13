@@ -222,6 +222,40 @@ describe('the Sława of the guilds through the API', () => {
     assert.equal((await first('SELECT COUNT(*) AS count FROM guild_fame WHERE guild_id = ?', stone)).count, 0);
   });
 
+  // The code review: with no guild at all the freeze left no row, so every
+  // character's load froze the week before anew. It waits for the first
+  // guild now, which still gets that week frozen, once.
+  test('with no guild the week before is not frozen at every look, and the first guild still gets it frozen once', async () => {
+    const { championOf } = await import('../src/server/guild-fame.js');
+    const database = await db();
+    // The database as championOf sees it, with what it would write.
+    const writes = [];
+    const watched = {
+      prepare: (sql) => {
+        if (/^\s*INSERT/i.test(sql)) writes.push(sql);
+        return database.prepare(sql);
+      },
+      batch: (statements) => database.batch(statements),
+    };
+    const now = Date.now();
+    for (let look = 0; look < 3; look += 1) assert.equal(await championOf(watched, now), null);
+    assert.deepEqual(writes, []);
+    // A guild founded later in the week: its Sława of the week before is
+    // frozen at the next look, and then no more.
+    const forest = await guild('ala', 'Leśni Bracia', 'LB', [['ola', 'Ola']]);
+    await run('DELETE FROM guild_fame');
+    const last = questPeriod('weekly', questPeriod('weekly', now, content).startsAt - 1, content);
+    await exchanges(forest, ids.ala, ids.ola, 2, last.startsAt + HOUR);
+    assert.deepEqual(await championOf(watched, now), { id: forest, tag: 'LB' });
+    assert.equal(writes.filter((sql) => /INTO guild_fame /.test(sql)).length, 1);
+    assert.equal(await championOf(watched, now).then((best) => best?.tag), 'LB');
+    assert.equal(writes.filter((sql) => /INTO guild_fame /.test(sql)).length, 1);
+    assert.deepEqual(
+      (await database.prepare('SELECT guild_id, points FROM guild_fame WHERE week = ?').bind(last.key).all()).results,
+      [{ guild_id: forest, points: 2 * fame.exchange.perExchange }],
+    );
+  });
+
   test('the best guild of the week before has its tag in gold, and its Gildia page says so', async () => {
     const forest = await guild('ala', 'Leśni Bracia', 'LB', [['ola', 'Ola']]);
     const stone = await guild('ewa', 'Kamienny Krąg', 'KK', [['iza', 'Iza']]);

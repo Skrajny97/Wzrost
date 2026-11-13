@@ -614,6 +614,21 @@ export function orderGold(order, sellBonus, content) {
   return Math.max(order.gold, Math.ceil(scrap * content.settlement.orders.overScrap));
 }
 
+// The Punkty Systemu an order pays whenever it is delivered, for its
+// "Zapłata" line too: the week's order (`weekly`) its systemPoints.weekly,
+// a special one its special.systemPoints, others none. Every
+// systemPoints.every delivered order adds its points besides (deliverOrder),
+// whichever it is.
+/**
+ * @param {Record<string, any>} order
+ * @param {boolean} weekly
+ * @param {Content} content
+ */
+export function orderSystemPoints(order, weekly, content) {
+  const { orders } = content.settlement;
+  return weekly ? orders.systemPoints.weekly : order.special ? orders.special.systemPoints : 0;
+}
+
 // Delivering an order (deliverBlock first): what it takes, what it gives (the
 // gold, orderGold; the brotherhood's reputation, with the week's share of
 // reputation, `week`, the week of the delivery, weeks.js, made whole
@@ -634,9 +649,7 @@ export function deliverOrder(board, orderId, now, content, sellBonus = 0, week =
   const order = findOrder(board, orderId);
   const weekly = orderId === 'weekly';
   const delivered = board.delivered + (weekly ? 0 : 1);
-  const systemPoints = weekly
-    ? orders.systemPoints.weekly
-    : (delivered % orders.systemPoints.every === 0 ? orders.systemPoints.points : 0) + (order.special ? orders.special.systemPoints : 0);
+  const systemPoints = orderSystemPoints(order, weekly, content) + (!weekly && delivered % orders.systemPoints.every === 0 ? orders.systemPoints.points : 0);
   return {
     board: {
       ...board,

@@ -340,15 +340,22 @@ export function jewelReport({ base, rarityId, results = [], set, learned = [], m
   if (set) {
     const gem = content.mineralsById[set.gem];
     const replaced = (set.item || set.core) && set.replaced ? content.mineralsById[set.replaced] : null;
-    // A gem set in the Rdzeń (core.js) names it as the item.
-    const target = set.core ? (content.slotsById.core?.name ?? null) : set.item ? itemName(set.item, content) : null;
+    // A gem set in the Rdzeń (core.js) has a line of its own, "… tkwi teraz
+    // w Rdzeniu." (setCore; the code review, 13.11.2026: it said "…
+    // w przedmiocie: Rdzeń.").
+    const target = set.item ? itemName(set.item, content) : null;
+    const text = set.core
+      ? say(texts, 'setCore', 0, { gem: gem.name })
+      : target
+        ? say(texts, 'set', 0, { gem: gem.name, item: target })
+        : say(texts, 'missing', 0, { gem: gem.name });
     return {
       ...report,
       set: {
         gem: gemView(gem.id, content),
         item: set.item ? itemView(set.item, content) : null,
         ...(set.core && { core: true }),
-        text: target ? say(texts, 'set', 0, { gem: gem.name, item: target }) : say(texts, 'missing', 0, { gem: gem.name }),
+        text,
         replaced: replaced ? say(texts, 'replaced', 0, { gem: replaced.name }) : null,
       },
     };

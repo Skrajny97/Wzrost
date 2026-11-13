@@ -204,6 +204,49 @@ describe('Partie kart na żywo', () => {
     assert.equal((await challenge('Karciarka', 'Szuler', 100)).data.error.code, 'paused');
   });
 
+  // 917 A: a challenge waiting for its answer is taken back at once by its
+  // challenger, who may then challenge another player; the one challenged
+  // hears it on accepting, and nothing is paid nor played.
+  test('a challenge withdrawn: the challenger is free at once, an acceptance after it is refused, and only the challenger withdraws', async () => {
+    cookies.Gracz = await player('Gracz');
+    const sent = await challenge('Karciarka', 'Szuler', 100);
+    const { id } = sent.data.duel;
+    const sheet = async () => (await call('GET', `/api/cards/duel/offer?id=${(await row('Gracz')).id}`, { cookie: cookies.Karciarka })).data.offer;
+    // The sheet for another player shows the challenge waiting.
+    assert.deepEqual([(await sheet()).waiting.id, (await sheet()).waiting.other.name], [id, 'Szuler']);
+    assert.equal((await challenge('Karciarka', 'Gracz')).data.error.code, 'busy_self');
+    // Only the challenger takes it back.
+    const withdraw = (name, which = id) => call('POST', '/api/cards/duel/withdraw', { cookie: cookies[name], body: { id: which } });
+    const theirs = await withdraw('Szuler');
+    assert.deepEqual([theirs.status, theirs.data.error.code], [404, 'no_duel']);
+    assert.equal((await duelRow()).state, 'proposed');
+    const taken = await withdraw('Karciarka');
+    assert.equal(taken.status, 200, JSON.stringify(taken.data));
+    assert.equal(taken.data.duel.state, 'withdrawn');
+    // Taken back twice: the same answer.
+    assert.equal((await withdraw('Karciarka')).data.duel.state, 'withdrawn');
+    // Free at once: a challenge to another player.
+    assert.equal((await sheet()).waiting, null);
+    const next = await challenge('Karciarka', 'Gracz');
+    assert.equal(next.status, 200, JSON.stringify(next.data));
+    // The one challenged before hears it on accepting: no match, nothing paid.
+    assert.equal((await call('GET', '/api/chat/latest', { cookie: cookies.Szuler })).data.duel, null);
+    const late = await answer('Szuler', id);
+    assert.deepEqual([late.status, late.data.error.code, late.data.error.message], [409, 'withdrawn', 'To wyzwanie zostało wycofane.']);
+    const stored = await (await db()).prepare('SELECT state, game FROM card_duels WHERE id = ?').bind(id).first();
+    assert.deepEqual([stored.state, stored.game], ['withdrawn', null]);
+    assert.deepEqual([(await row('Karciarka')).gold, (await row('Szuler')).gold], [10000, 10000]);
+    // The same player again only after the pause, as after one turned down.
+    await answer('Gracz', next.data.duel.id, false);
+    assert.equal((await challenge('Karciarka', 'Szuler', 100)).data.error.code, 'paused');
+    // A challenge accepted is no longer taken back.
+    await sql('UPDATE card_duels SET updated_at = updated_at - ?', live.repeatSeconds * 1000 + 1000);
+    const match = await started(100);
+    const refused = await withdraw('Karciarka', match);
+    assert.deepEqual([refused.status, refused.data.error.code, refused.data.error.message], [409, 'answered', 'Tego wyzwania nie da się już wycofać.']);
+    assert.equal((await duelRow()).state, 'playing');
+  });
+
   test('a move not made in 30 seconds is made by the game; two in a row lose the match, kept by the chat\'s poll too', async () => {
     const id = await started(500);
     const { name: slow, duel } = await mover(['Karciarka', 'Szuler']);

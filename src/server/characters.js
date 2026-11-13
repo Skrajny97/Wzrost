@@ -140,6 +140,7 @@ import { championOf } from './guild-fame.js';
 import { fameNotice } from './fame.js';
 import { guildOf, guildRemoval, guildTagSql } from './guilds.js';
 import { guildSeatSql } from './guild-seat.js';
+import { companionsKey } from './hunts.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { partyOf, partyRemoval } from './parties.js';
 import { anvilDiscountOf } from './perks.js';
@@ -1551,6 +1552,9 @@ export function characterView(player, now) {
   const cosmetics = JSON.parse(row.cosmetics ?? '{}');
 
   return {
+    // Its id: what the page keeps on the device for one character (the
+    // chat's marks of what it read, chat-news.js) goes with it.
+    id: row.id,
     name: row.name,
     // Its guild's tag, in square brackets beside its name (guilds.js).
     guildTag: player.guildTag ?? null,
@@ -1639,6 +1643,10 @@ export function characterView(player, now) {
     // The Stajnia's mount, which shortens the wait under the slider too
     // (stable.js in the engine), or null.
     mount: settlementOn() ? mountView(JSON.parse(row.settlement ?? '{}'), content()) : null,
+    // A short mark of the companions who would go along on an exploration
+    // now, for the Walka screen to ask for the threat again when they
+    // change (companionsKey in hunts.js), or null for none.
+    companionsKey: companionsKey(player, now, !activity && hp >= maxHp),
     // The wanted poster in hand, for its strip on the Walka screen, or null.
     wanted: wantedInHand(row),
     freePoints: freePoints(character, content()),

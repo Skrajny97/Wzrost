@@ -60,6 +60,7 @@ import {
   mugCost,
   orderGold,
   orderStories,
+  orderSystemPoints,
   parseStack,
   pathResetCost,
   piecesOfRarity,
@@ -299,6 +300,9 @@ function orderView(order, stocks, sellBonus) {
     ...(takes && { takes }),
     story: storyOf(order),
     brotherhoodName: content().settlement.brotherhoods.find((one) => one.id === order.brotherhood).name,
+    // The Punkty Systemu it pays, for its "Zapłata" line: the week's order
+    // its own too (the code review, 13.11.2026: its line left them out).
+    systemPoints: orderSystemPoints(order, order.id === 'weekly', content()),
     have,
   };
 }
@@ -941,11 +945,15 @@ export async function claimStandingReward(context) {
 }
 
 // Saves a board drawn anew (new orders came), and the day's wanted record
-// first kept, if the row is still as read.
+// first kept, if the Osada is still as read. It moves the character's
+// version, as every other write of the Osada does, so an Osada action that
+// read the character before it is refused instead of writing its older
+// Osada over the record, which the next look would draw anew (the code
+// review, 13.11.2026).
 async function saveBoard(db, row, stored, board) {
   const next = JSON.stringify({ ...stored, board });
   if (next === (row.settlement ?? '{}')) return;
-  await db.prepare('UPDATE characters SET settlement = ? WHERE id = ? AND settlement IS ?').bind(next, row.id, row.settlement ?? null).run();
+  await db.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND settlement IS ?').bind(next, row.id, row.settlement ?? null).run();
 }
 
 export async function getSettlement(context) {

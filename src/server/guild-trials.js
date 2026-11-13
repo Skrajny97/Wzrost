@@ -41,7 +41,7 @@ import {
   trialThresholds,
 } from '../engine/index.js';
 import { atomically, sameVersion } from './atomic.js';
-import { cardGameOf, cardsHere, cardUpserts, sourceCards } from './cards.js';
+import { cardGameOf, cardsHere, cardUpserts, keyedSeed, sourceCards } from './cards.js';
 import { characterView, engineCharacter, loadPlayer, questContext, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { craftingOn, professionsOn, settlementOn } from './features.js';
@@ -540,11 +540,13 @@ export async function trialCards(db, player, now) {
     .all();
   const game = cardGameOf(row, casinoDay(now, content()).key);
   const done = results.map((trial) => trial.id);
-  const seedOf = (id) => `${row.id}:trial:${id}:cards`;
   const due = done.filter((id) => !game.trials.includes(id));
-  const found = due.length > 0 ? await sourceCards(db, row, due.map(seedOf), content().cards.drops.guild) : null;
+  // Each trial's seed with the server's key (keyedSeed, 920 B): the same on
+  // every look, and not to be worked out from the code.
+  const seeds = new Map(await Promise.all(due.map(async (id) => [id, await keyedSeed(db, `${row.id}:trial:${id}:cards`)])));
+  const found = due.length > 0 ? await sourceCards(db, row, due.map((id) => seeds.get(id)), content().cards.drops.guild) : null;
   if (!found) return [];
-  const given = due.filter((id) => found.seeds.includes(seedOf(id)));
+  const given = due.filter((id) => found.seeds.includes(seeds.get(id)));
   const next = { ...game, trials: [...game.trials.filter((id) => done.includes(id)), ...given] };
   try {
     await atomically(db, [

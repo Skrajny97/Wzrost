@@ -216,8 +216,12 @@ export async function relationTo(db, id, otherId, now) {
   return { state: row.character_id === id ? 'sent' : 'received', id: row.id };
 }
 
-const friendCount = (db, id) =>
-  db.prepare('SELECT COUNT(*) AS count FROM friends WHERE (character_id = ? OR friend_id = ?) AND accepted_at IS NOT NULL').bind(id, id).first();
+// SQL for how many friends the character `?` has (its id bound twice), and
+// how many of its invitations wait (its id once).
+const FRIENDS = '(SELECT COUNT(*) FROM friends WHERE (character_id = ? OR friend_id = ?) AND accepted_at IS NOT NULL)';
+const SENT = '(SELECT COUNT(*) FROM friends WHERE character_id = ? AND accepted_at IS NULL)';
+
+const friendCount = (db, id) => db.prepare(`SELECT ${FRIENDS} AS count`).bind(id, id).first();
 
 // POST /api/friends/invite { name }: an invitation to that character, which
 // accepts it in its Znajomi. One the other character sent first is accepted.
@@ -236,6 +240,14 @@ export async function inviteFriend(context) {
   if (!isUnlocked('community', target.level, content())) {
     throw new ApiError(409, 'locked', `${target.name} nie ma jeszcze Społeczności. Otworzy się na ${content().unlocksById.community.level}. poziomie.`);
   }
+  // Refused when either of the two has hidden the other in the chat, as an
+  // invitation to a guild or a party is (the author's 921 A, 13.11.2026: a
+  // hidden player could invite again after every "Odrzuć").
+  const blocked = await db
+    .prepare('SELECT 1 FROM chat_blocks WHERE (user_id = ? AND blocked_id = ?) OR (user_id = ? AND blocked_id = ?)')
+    .bind(target.user_id, session.userId, session.userId, target.user_id)
+    .first();
+  if (blocked) throw new ApiError(409, 'blocked', `${target.name} nie przyjmuje teraz zaproszeń od Ciebie.`);
   const existing = await db
     .prepare('SELECT id, character_id, accepted_at FROM friends WHERE (character_id = ? AND friend_id = ?) OR (character_id = ? AND friend_id = ?)')
     .bind(character.id, target.id, target.id, character.id)
@@ -244,15 +256,19 @@ export async function inviteFriend(context) {
   if (existing?.character_id === character.id) throw new ApiError(409, 'invited', `Zaproszenie dla postaci ${target.name} już czeka.`);
   if (existing) return accept(context, db, character.id, existing.id);
   const { max } = content().community.friends;
-  const taken = await db
-    .prepare(
-      `SELECT (SELECT COUNT(*) FROM friends WHERE (character_id = ? OR friend_id = ?) AND accepted_at IS NOT NULL)
-            + (SELECT COUNT(*) FROM friends WHERE character_id = ? AND accepted_at IS NULL) AS count`,
-    )
-    .bind(character.id, character.id, character.id)
-    .first();
-  if (taken.count >= max) throw new ApiError(409, 'full', `Masz już ${max} znajomych i zaproszeń. Usuń kogoś, żeby zaprosić nową postać.`);
-  await db.prepare('INSERT INTO friends (character_id, friend_id, created_at) VALUES (?, ?, ?)').bind(character.id, target.id, context.now).run();
+  // The friends and invitations are counted in the write itself, so two
+  // invitations sent at the same moment never go past the cap (the code
+  // review: both were counted before either was written). One sent twice at
+  // once goes once, and the second tap hears it waits.
+  const sent = await db
+    .prepare(`INSERT OR IGNORE INTO friends (character_id, friend_id, created_at) SELECT ?, ?, ? WHERE ${FRIENDS} + ${SENT} < ?`)
+    .bind(character.id, target.id, context.now, character.id, character.id, character.id, max)
+    .run();
+  if (sent.meta.changes !== 1) {
+    const waiting = await db.prepare('SELECT 1 AS waiting FROM friends WHERE character_id = ? AND friend_id = ?').bind(character.id, target.id).first();
+    if (waiting) throw new ApiError(409, 'invited', `Zaproszenie dla postaci ${target.name} już czeka.`);
+    throw new ApiError(409, 'full', `Masz już ${max} znajomych i zaproszeń. Usuń kogoś, żeby zaprosić nową postać.`);
+  }
   return json({ ...(await friendsOf(db, character.id, context.now)), text: t('Zaproszenie wysłane. {name} przyjmie je w Znajomych.', { name: target.name }) });
 }
 
@@ -270,10 +286,21 @@ async function accept(context, db, id, friendshipId) {
     .first();
   if (!row) throw new ApiError(404, 'no_invitation', 'Tego zaproszenia już nie ma.');
   const { max } = content().community.friends;
-  const [own, theirs] = await Promise.all([friendCount(db, id), friendCount(db, row.character_id)]);
-  if (own.count >= max) throw new ApiError(409, 'full', `Masz już ${max} znajomych. Usuń kogoś, żeby przyjąć zaproszenie.`);
-  if (theirs.count >= max) throw new ApiError(409, 'full', `${row.name} ma już ${max} znajomych.`);
-  await db.prepare('UPDATE friends SET accepted_at = ? WHERE id = ?').bind(context.now, row.id).run();
+  // Both lists are counted in the write itself, so two invitations accepted
+  // at the same moment never take either past the cap (the code review:
+  // both were counted before either was written). Refused, it says why as
+  // before; accepted meanwhile by a second tap, it is accepted.
+  const accepted = await db
+    .prepare(`UPDATE friends SET accepted_at = ? WHERE id = ? AND accepted_at IS NULL AND ${FRIENDS} < ? AND ${FRIENDS} < ?`)
+    .bind(context.now, row.id, id, id, max, row.character_id, row.character_id, max)
+    .run();
+  const stored = accepted.meta.changes === 1 ? null : await db.prepare('SELECT accepted_at FROM friends WHERE id = ?').bind(row.id).first();
+  if (accepted.meta.changes !== 1 && (stored?.accepted_at ?? null) === null) {
+    const [own, theirs] = await Promise.all([friendCount(db, id), friendCount(db, row.character_id)]);
+    if (own.count >= max) throw new ApiError(409, 'full', `Masz już ${max} znajomych. Usuń kogoś, żeby przyjąć zaproszenie.`);
+    if (theirs.count >= max) throw new ApiError(409, 'full', `${row.name} ma już ${max} znajomych.`);
+    throw new ApiError(404, 'no_invitation', 'Tego zaproszenia już nie ma.');
+  }
   return json({ ...(await friendsOf(db, id, context.now)), text: t('{name} jest teraz wśród Twoich znajomych.', { name: row.name }) });
 }
 

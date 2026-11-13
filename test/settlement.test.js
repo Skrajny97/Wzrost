@@ -626,6 +626,16 @@ describe('the Osada through the API', () => {
     assert.deepEqual(JSON.parse(row.crafting), []);
   });
 
+  // The code review, 13.11.2026: the week's order's "Zapłata" line left out
+  // the Punkty Systemu it pays, while a special order's said "+1 PS".
+  test('each order tells the Punkty Systemu it pays, the week\'s order its own', async () => {
+    const { board } = await view();
+    const { systemPoints, special } = content.settlement.orders;
+    assert.equal(board.weekly.systemPoints, systemPoints.weekly);
+    assert.ok(systemPoints.weekly > 0);
+    for (const { order } of board.slots) assert.equal(order.systemPoints, order.special ? special.systemPoints : 0);
+  });
+
   test('the Osada tab lights up when an order on the board can be delivered', async () => {
     await set(`herbs = '{}', potions = '{}', materials = '{}', resources = '{}', parts = '{}'`);
     const { order } = columnOrder(await view());

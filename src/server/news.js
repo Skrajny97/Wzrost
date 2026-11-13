@@ -109,13 +109,21 @@ export async function listNews(context) {
   return json({ entries: results.map((row) => entryView(row, lang)), seen: session.newsSeen ?? 0, since: session.user.createdAt });
 }
 
+// The entry a request names by its number. Anything else is refused here,
+// as D1 cannot bind it and the request would end in an error 500 (the
+// code review: an edit or a deletion without a number).
+function entryId(body) {
+  if (!Number.isSafeInteger(body.id) || body.id < 1) throw new ApiError(400, 'invalid_id', 'Nie ma takiego wpisu.');
+  return body.id;
+}
+
 // POST /api/news/seen { id }: the window was seen up to this entry.
 export async function seeNews(context) {
   const session = await requireSession(context);
   const body = await readJson(context.request);
-  if (!Number.isInteger(body.id) || body.id < 1) throw new ApiError(400, 'invalid_id', 'Nie ma takiego wpisu.');
+  const id = entryId(body);
   const db = context.env.DB;
-  await db.prepare('UPDATE users SET news_seen = ? WHERE id = ? AND news_seen < ? AND EXISTS (SELECT 1 FROM news WHERE id = ?)').bind(body.id, session.userId, body.id, body.id).run();
+  await db.prepare('UPDATE users SET news_seen = ? WHERE id = ? AND news_seen < ? AND EXISTS (SELECT 1 FROM news WHERE id = ?)').bind(id, session.userId, id, id).run();
   return json({ ok: true });
 }
 
@@ -194,11 +202,12 @@ export async function dismissDraft(context) {
 export async function editNews(context) {
   await requireAuthor(context);
   const body = await readJson(context.request);
+  const id = entryId(body);
   const { title, text } = written(body);
   const db = context.env.DB;
   const result = await db
     .prepare('UPDATE news SET title = ?, body = ?, edited_at = ?, title_en = NULL, body_en = NULL WHERE id = ? RETURNING id, draft, title, body')
-    .bind(title, text, context.now, body.id)
+    .bind(title, text, context.now, id)
     .all();
   if (result.results.length !== 1) throw new ApiError(404, 'not_found', 'Nie ma takiego wpisu.');
   // The correction in English too.
@@ -211,8 +220,9 @@ export async function editNews(context) {
 export async function deleteNews(context) {
   await requireAuthor(context);
   const body = await readJson(context.request);
+  const id = entryId(body);
   const db = context.env.DB;
-  const result = await db.prepare('DELETE FROM news WHERE id = ?').bind(body.id).run();
+  const result = await db.prepare('DELETE FROM news WHERE id = ?').bind(id).run();
   if (result.meta.changes !== 1) throw new ApiError(404, 'not_found', 'Nie ma takiego wpisu.');
   return json(await authorView(db));
 }

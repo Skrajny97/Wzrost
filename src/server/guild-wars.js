@@ -573,8 +573,9 @@ export async function getGuildWarBattle(context) {
 // itself (characterId left out, or its own): into a free place ("Zajmij")
 // or the reserve; the leader and the deputies place anyone, also into the
 // place of another member of the team (`swapWith`), who takes the moved
-// one's place, or the reserve. One batch over the places as read: two taps
-// at once take a place once, and none is lost or doubled.
+// one's place, or the reserve. One batch over the places as read, and over
+// the role of one who moves another: two taps at once take a place once,
+// none is lost or doubled, and a deputy demoted meanwhile moves nobody.
 export async function placeInWarTeam(context) {
   requireWars();
   const { session, player, guild, db } = await requireMember(context, errors());
@@ -601,6 +602,10 @@ export async function placeInWarTeam(context) {
   // Its place now: one of a team the guild has, else the reserve.
   const current = own && own.team <= ours.count ? own : null;
   const statements = [kept(characterId, own), inGuild(characterId)];
+  // Who moves another member, or swaps two, does it as the leader or a
+  // deputy, and must still be one as the places are saved (the code
+  // review: a deputy demoted at the same moment still moved someone once).
+  let byLead = characterId !== player.row.id;
   let text;
   if (team === 0) {
     if (!current) throw new ApiError(409, 'same', errors().same);
@@ -610,6 +615,7 @@ export async function placeInWarTeam(context) {
     throw new ApiError(409, 'same', errors().same);
   } else if (body.swapWith !== undefined && body.swapWith !== null) {
     if (!lead) throw new ApiError(403, 'not_allowed', errors().notAllowed);
+    byLead = true;
     const partner = ours.members.find((row) => row.id === body.swapWith);
     const there = partner && rowOf(partner.id);
     if (!there || there.team !== team) throw changed();
@@ -622,6 +628,9 @@ export async function placeInWarTeam(context) {
     if (slot === undefined) throw new ApiError(409, 'full', errors().full);
     statements.push(remove(characterId), insert(characterId, { team, slot }));
     text = characterId === player.row.id ? filled(words().taken, { team: roman(team) }) : filled(words().moved, { name: mover.name, team: roman(team) });
+  }
+  if (byLead) {
+    statements.unshift(assertion(db, "EXISTS (SELECT 1 FROM guild_members WHERE character_id = ? AND guild_id = ? AND role IN ('leader', 'deputy'))", [player.row.id, guild.id]));
   }
   try {
     await db.batch(statements);
