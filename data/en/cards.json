@@ -158,6 +158,8 @@
       "accepted": "{name} accepts the challenge. The match begins!",
       "declined": "{name} turns the challenge down.",
       "expired": "{name} does not answer. The challenge is gone.",
+      "withdrawn": "{name} withdrew the challenge.",
+      "waiting": "Your challenge is waiting for {name} to answer.",
       "tableStaked": "Live match · stake {stake} gold",
       "tableFree": "Live match · no stake",
       "dividerStaked": "Live · {stake} gold",

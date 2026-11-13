@@ -72,7 +72,7 @@
   "stakes": { "step": 100, "levelsPerStep": 40, "perDay": 10 },
   "pack": { "cards": 3, "goldMinutes": 60 },
   "live": {
-    "$comment": "Partie na żywo z innymi graczami (901 B; src/engine/card-duel.js, src/server/card-duel.js, src/client/card-duel.js). Wyzwanie czeka acceptSeconds sekund na przyjęcie. Ruchy na zmianę: kto pierwszy, zmienia się co rundę; na ruch jest turnSeconds sekund i graceSeconds sekund zapasu na drogę do serwera; ruch nie zrobiony robi gra (najmocniejsze karty z rezerwy), a missedRounds rund z rzędu bez ruchu to przegrana. Obaj płacą stawkę na początku; za wygraną zgarnia się obie stawki bez systemCut (udział, 0.05 to 5%), w dół do pełnego złota, a remis zwraca stawki. Stawka najwyżej taka jak stawka najwyższego stopnia Szczęsnego przy niższym z poziomów obu postaci; o złoto od minLevel poziomu obu postaci, najwyżej perDay partii o złoto dziennie na postać (dzień Salonu Gier). Wyzwanie odrzucone albo przeterminowane do tej samej postaci można powtórzyć po repeatSeconds sekundach. texts.live: słowa partii; {…} wypełnia gra, [a|b] to forma dla kobiety i dla mężczyzny.",
+    "$comment": "Partie na żywo z innymi graczami (901 B; src/engine/card-duel.js, src/server/card-duel.js, src/client/card-duel.js). Wyzwanie czeka acceptSeconds sekund na przyjęcie. Ruchy na zmianę: kto pierwszy, zmienia się co rundę; na ruch jest turnSeconds sekund i graceSeconds sekund zapasu na drogę do serwera; ruch nie zrobiony robi gra (najmocniejsze karty z rezerwy), a missedRounds rund z rzędu bez ruchu to przegrana. Obaj płacą stawkę na początku; za wygraną zgarnia się obie stawki bez systemCut (udział, 0.05 to 5%), w dół do pełnego złota, a remis zwraca stawki. Stawka najwyżej taka jak stawka najwyższego stopnia Szczęsnego przy niższym z poziomów obu postaci; o złoto od minLevel poziomu obu postaci, najwyżej perDay partii o złoto dziennie na postać (dzień Salonu Gier). Wyzwanie odrzucone, przeterminowane albo wycofane (917 A) do tej samej postaci można powtórzyć po repeatSeconds sekundach, do innej od razu. texts.live: słowa partii; {…} wypełnia gra, [a|b] to forma dla kobiety i dla mężczyzny.",
     "acceptSeconds": 120,
     "turnSeconds": 30,
     "graceSeconds": 2,
@@ -520,6 +520,8 @@
       "accepted": "{name} przyjmuje wyzwanie. Partia się zaczyna!",
       "declined": "{name} odrzuca wyzwanie.",
       "expired": "{name} nie odpowiada. Wyzwanie przepadło.",
+      "withdrawn": "{name} wycofał[a|] wyzwanie.",
+      "waiting": "Twoje wyzwanie czeka, aż {name} na nie odpowie.",
       "tableStaked": "Partia na żywo · stawka {stake} zł",
       "tableFree": "Partia na żywo · bez stawki",
       "dividerStaked": "Na żywo · {stake} zł",

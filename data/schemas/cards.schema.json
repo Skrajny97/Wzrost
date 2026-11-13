@@ -264,7 +264,7 @@
           "type": "object",
           "additionalProperties": false,
           "description": "Słowa partii na żywo (901 B, src/client/card-duel.js): {…} wypełnia gra, [a|b] to forma dla kobiety i dla mężczyzny.",
-          "required": ["challengeTitle", "online", "staked", "free", "limits", "lowLevel", "rules", "sent", "incomingTitle", "incoming", "incomingStake", "incomingFree", "incomingGold", "accepted", "declined", "expired", "tableStaked", "tableFree", "dividerStaked", "dividerFree", "lead", "answer", "theirLead", "theirAnswer", "missedMe", "missedFoe", "yourMove", "ends"],
+          "required": ["challengeTitle", "online", "staked", "free", "limits", "lowLevel", "rules", "sent", "incomingTitle", "incoming", "incomingStake", "incomingFree", "incomingGold", "accepted", "declined", "expired", "withdrawn", "waiting", "tableStaked", "tableFree", "dividerStaked", "dividerFree", "lead", "answer", "theirLead", "theirAnswer", "missedMe", "missedFoe", "yourMove", "ends"],
           "patternProperties": { "^(?!ends$)[a-zA-Z]+$": { "type": "string", "minLength": 1 } },
           "properties": {
             "ends": {

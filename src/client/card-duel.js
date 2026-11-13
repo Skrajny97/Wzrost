@@ -36,7 +36,7 @@ const TABLE = '#/osada/casino/cards';
 const POLL_MS = 2000;
 // The answers that end a challenge before it could be accepted: its sheet
 // goes too.
-const LAPSED = ['offline', 'no_deck_other', 'no_gold_other', 'stakes_used_other', 'busy', 'answered', 'no_duel'];
+const LAPSED = ['offline', 'no_deck_other', 'no_gold_other', 'stakes_used_other', 'busy', 'answered', 'no_duel', 'withdrawn'];
 
 // The {…} of a text filled in, and its [a|b] in the form for a woman (a) or
 // a man (b).
@@ -181,6 +181,16 @@ async function openChallenge(person) {
   const open = (one) => one.stake === 0 || (one.stake <= gold && table.used < table.limit && !offer.theirsFull);
   // At first the highest stake the player can play for.
   let chosen = [...offer.stakes].reverse().find(open) ?? offer.stakes[0];
+  // „Wycofaj” (917 A): the player's own challenge waiting for its answer
+  // goes at once, and the sheet comes anew, open for a challenge.
+  const withdraw = async () => {
+    const { id } = offer.waiting;
+    take(await call('POST', '/api/cards/duel/withdraw', { id }));
+    if (waiting?.id === id) waiting = null;
+    if (news?.id === id) news = null;
+    toast(t('Wyzwanie wycofane.'));
+    await openChallenge(person);
+  };
   const send = async () => {
     const sent = await call('POST', '/api/cards/duel/challenge', { id: other.id, stake: chosen.stake });
     take(sent);
@@ -231,7 +241,16 @@ async function openChallenge(person) {
         h('p', { class: 'muted', text: forGold ? filled(texts.limits, { max: formatNumber(offer.max), used: table.used, limit: table.limit }) : filled(texts.lowLevel, { level: offer.minLevel }) }),
         forGold && offer.theirsFull && h('p', { class: 'muted', text: t('{name} nie zagra już dziś o złoto. Bez stawki możecie grać dalej.', { name: other.name }) }),
         h('p', { class: 'muted', text: filled(texts.rules, { name: other.name }) }),
-        offer.block && h('p', { class: 'region-warning', role: 'status', text: offer.block }),
+        // The player's own challenge waiting, with „Wycofaj”, in place of
+        // the words that one is waiting.
+        offer.waiting
+          ? h(
+              'div',
+              { class: 'duel-waiting' },
+              h('p', { class: 'region-warning', role: 'status', text: filled(texts.waiting, { name: offer.waiting.other.name }) }),
+              button(t('Wycofaj'), 'system', withdraw),
+            )
+          : offer.block && h('p', { class: 'region-warning', role: 'status', text: offer.block }),
         h(
           'div',
           { class: 'duel-actions' },
@@ -268,6 +287,11 @@ async function askWaiting() {
   }
   if (duel.state === 'proposed') return;
   waiting = null;
+  // Taken back, here or on another device: nothing more to say.
+  if (duel.state === 'withdrawn') {
+    if (news?.id === id) news = null;
+    return;
+  }
   const { texts } = table;
   const vars = { name: duel.other.name };
   if (duel.state === 'playing' || duel.state === 'done') {
@@ -361,12 +385,34 @@ async function showChallenge(id) {
   tickChallenge();
 }
 
-// The challenge's sheet counts down; once its time is up, it goes.
+// The challenge's sheet counts down; once its time is up, it goes. One the
+// chat's poll no longer brings before its time goes too, saying why: its
+// challenger took it back (917 A), or it lapsed.
 function tickChallenge() {
   if (!popup) return;
   if (!popup.clock.isConnected) {
     popup = null;
     return;
+  }
+  if (news?.id !== popup.id && !popup.asking) {
+    const { id } = popup;
+    popup.asking = true;
+    call('GET', `/api/cards/duel?id=${id}`)
+      .then((answer) => {
+        take(answer);
+        if (popup?.id !== id) return;
+        const duel = answer.duel;
+        if (duel?.state === 'proposed') {
+          popup.asking = false;
+          return;
+        }
+        popup = null;
+        closeSheet();
+        toast(duel?.state === 'withdrawn' ? say(table.texts.withdrawn, { name: duel.other.name }, duel.other.female) : t('Wyzwanie przepadło.'));
+      })
+      .catch(() => {
+        if (popup?.id === id) popup.asking = false;
+      });
   }
   const left = popup.endsAt - serverNow();
   popup.clock.textContent = formatCountdown(left);
