@@ -413,6 +413,8 @@ export function guildRemoval(db, characters, binds, now) {
     db.prepare(`DELETE FROM chat_messages WHERE ${gone}`),
     db.prepare('DELETE FROM guild_seat WHERE guild_id NOT IN (SELECT guild_id FROM guild_members)'),
     db.prepare('DELETE FROM guild_seat_donations WHERE guild_id NOT IN (SELECT guild_id FROM guild_members)'),
+    // The members' Sława of the weeks gone (guild-members.js).
+    db.prepare('DELETE FROM guild_member_fame WHERE guild_id NOT IN (SELECT guild_id FROM guild_members)'),
     ...chestsGone(db),
     db.prepare('DELETE FROM guilds WHERE id NOT IN (SELECT guild_id FROM guild_members)'),
   ];

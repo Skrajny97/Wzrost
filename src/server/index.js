@@ -43,6 +43,7 @@ import { getGuildWar, getGuildWarBattle, placeInWarTeam, settleWars, testGuildWa
 import { donateToGuildSeat, getGuildSeat, preferGuildSeat } from './guild-seat.js';
 import { changePassword, forgotPassword, resetPassword } from './password.js';
 import { guildRanking } from './guild-fame.js';
+import { getGuildRanking } from './guild-members.js';
 import { claimFame, getFame } from './fame.js';
 import { cancelOrders, craftMaterials, salvageItem, salvageItems, sellMaterials, skipCrafting } from './crafting.js';
 import { buyCosmetic, setNameColor, wearCosmetic } from './cosmetics.js';
@@ -386,6 +387,8 @@ const routes = [
   ['POST', '/api/guild/kick', kickFromGuild],
   ['POST', '/api/guild/role', setGuildRole],
   ['POST', '/api/guild/lead', handGuildLead],
+  // The Ranking członków of the Gildia tab (guild-members.js, 897 A).
+  ['GET', '/api/guild/ranking', getGuildRanking],
   // The Siedziba Gildii (guild-seat.js, 616 A).
   ['GET', '/api/guild/seat', getGuildSeat],
   ['POST', '/api/guild/seat/donate', donateToGuildSeat],

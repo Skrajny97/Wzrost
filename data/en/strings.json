@@ -1103,6 +1103,8 @@
   "Twoje miejsce: {place}.": "Your place: {place}.",
   "Miejsce": "Place",
   "Okres rankingu gildii": "Guild ranking period",
+  "Okres rankingu członków": "Members' ranking period",
+  "Nie udało się wczytać rankingu członków.": "Could not load the members' ranking.",
   "Propozycja odrzucona.": "Proposal declined.",
   "Propozycja wymiany": "Trade proposal",
   "{name} proponuje Ci wymianę przedmiotów, ziół, mikstur, materiałów albo złota.": "{name} offers you a trade of items, herbs, potions, materials or gold.",

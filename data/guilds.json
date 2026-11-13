@@ -77,6 +77,7 @@
       "donateTitle": "Wpłacić na {name}?",
       "donateText": "Wpłacasz {amounts}. Wpłaty nie wracają.",
       "goldAmount": "{count} złota",
+      "whoGave": "Kto ile wpłacił",
       "goldGenitive": "złota",
       "enough": "{what} na ten budynek starczy już do najwyższego poziomu.",
       "resourceAmount": "{count} {genitive}",
@@ -753,5 +754,29 @@
       "empty": "Nie ma jeszcze żadnej gildii.",
       "champion": "Najlepsza gildia poprzedniego tygodnia"
     }
+  },
+  "members": {
+    "$comment": "Ranking członków w zakładce Gildia (src/server/guild-members.js, src/client/guild-ranking.js; DECISIONS.md, „Ranking członków gildii (897 A)”). Autor: „Powinno być gdzieś wyszczególnione kto ile i czego wpłacił w Siedzibie Gildii oraz jakiś ranking” (13.11.2026); makiety 897.1 i 897.2 przyjęte z wariantem 897 A. Sława członka liczy się jak Sława gildii (fame), część po części, z liczbami z fame. how: linijki pod „Jak to działa?”; howWar wchodzi po piątej, tylko gdy wojny gildii są włączone; {…} wypełnia gra, {since} to dzień, od którego liczy się „Od początku”. earlier: wiersz wpłat sprzed 0.3.4, gdy gra nie zapisywała, kto wpłacił; {amounts} to kwoty złota i surowców (seat.texts.goldAmount i resourceAmount) złączone słowami list.",
+    "title": "Ranking członków",
+    "views": { "activity": "Aktywność", "donations": "Wpłaty" },
+    "periods": { "week": "Ten tydzień", "all": "Od początku" },
+    "columns": { "place": "#", "member": "Członek", "fame": "Sława", "gold": "Złoto" },
+    "parts": { "beast": "Bestia", "expedition": "Wyprawa", "trials": "Próby", "requests": "Prośby", "exchange": "Wymiana", "war": "Wojna" },
+    "own": "Twoje miejsce: {place}. z {count}.",
+    "tap": "Stuknij w członka, by zobaczyć, skąd ma Sławę.",
+    "lead": "Tu widać, ile Sławy każdy członek wniósł do gildii i ile wpłacił do Siedziby. Ranking niczego nie daje, tylko pokazuje.",
+    "how": [
+      "Bestia Gildii: {beastPercent} za każdy pełny 1% paska, który członek zbił, i {beastFell} za ostatni cios.",
+      "Wyprawa Gildii: {perGuardian} za każdego pokonanego strażnika, a za siódmego {lastGuardian}. Punkty dzielą się według obrażeń zadanych strażnikowi.",
+      "Próby Gildii: {perTrial} za każdą wykonaną próbę, najwyżej {trialCap} prób w tygodniu.",
+      "Prośby Gildii: {perPiece} za każdą daną sztukę, najwyżej {giftCap} sztuk w tygodniu.",
+      "Wymiana: {perExchange} za każdą wziętą ofertę, najwyżej {exchangeCap} wymian w tygodniu.",
+      "Członek dostaje tylko pełne punkty, więc Sława wszystkich członków razem bywa trochę mniejsza niż Sława gildii.",
+      "Wpłaty to złoto i surowce wpłacone do budynków Siedziby.",
+      "„Ten tydzień” zaczyna się w poniedziałek o północy. „Od początku” liczy się od {since}."
+    ],
+    "howWar": "Wojna gildii: {warWon} za wygraną wojnę, po równo dla wszystkich, którzy w niej walczyli.",
+    "earlier": "Wcześniejsze wpłaty, zanim gra zaczęła zapisywać, kto wpłacił: {amounts}.",
+    "list": { "comma": ", ", "and": " i " }
   }
 }

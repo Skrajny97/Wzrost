@@ -52,6 +52,7 @@
       "donateTitle": "Donate to the {name}?",
       "donateText": "You donate {amounts}. Donations are not returned.",
       "goldAmount": "{count} gold",
+      "whoGave": "Who gave what",
       "goldGenitive": "gold",
       "enough": "{what} for this building is already enough for the highest level.",
       "resourceAmount": "{count} {genitive}",
@@ -650,5 +651,28 @@
       "empty": "There are no guilds yet.",
       "champion": "Best guild of the previous week"
     }
+  },
+  "members": {
+    "title": "Members' ranking",
+    "views": { "activity": "Activity", "donations": "Donations" },
+    "periods": { "week": "This week", "all": "All time" },
+    "columns": { "member": "Member", "fame": "Fame", "gold": "Gold" },
+    "parts": { "beast": "Beast", "expedition": "Expedition", "trials": "Trials", "requests": "Requests", "exchange": "Exchange", "war": "War" },
+    "own": "Your place: {place} of {count}.",
+    "tap": "Tap a member to see where their Fame comes from.",
+    "lead": "Here you can see how much Fame each member brought the guild and how much they donated to the Hall. The ranking gives nothing; it only shows.",
+    "how": [
+      "Guild Beast: {beastPercent} for each full 1% of the bar the member knocked off, and {beastFell} for the final blow.",
+      "Guild Expedition: {perGuardian} for each guardian defeated, and {lastGuardian} for the seventh. The points are shared by the damage dealt to the guardian.",
+      "Guild Trials: {perTrial} for each trial completed, at most {trialCap} trials a week.",
+      "Guild Requests: {perPiece} for each piece given, at most {giftCap} pieces a week.",
+      "Exchange: {perExchange} for each offer taken, at most {exchangeCap} exchanges a week.",
+      "A member gets whole points only, so all the members' Fame together may be a little lower than the guild's.",
+      "Donations are the gold and resources given to the Hall's buildings.",
+      "“This week” starts on Monday at midnight. “All time” counts from {since}."
+    ],
+    "howWar": "Guild war: {warWon} for a war won, shared equally by everyone who fought in it.",
+    "earlier": "Earlier donations, from before the game recorded who gave them: {amounts}.",
+    "list": { "comma": ", ", "and": " and " }
   }
 }

@@ -780,6 +780,11 @@
       "id": "0.3.5",
       "title": "Wersja 0.3.5",
       "body": "- Labirynt ma własną planszę: drzwi w Sali prób otwierają ją na cały ekran. Widać na niej wszystkie komnaty poziomu, drogi między nimi i drużynę, która idzie do wybranej komnaty.\n- Płyty z walką mają kolorową obwódkę: zielona to łatwa walka, żółta wyrównana, a czerwona groźna. Kolor zmienia się razem z drużyną, więc rany i błogosławieństwa też się liczą.\n- Elita i skarb pokazują, ile Odłamków Rdzenia dają."
+    },
+    {
+      "id": "0.3.6",
+      "title": "Wersja 0.3.6",
+      "body": "- W zakładce Gildia jest nowa karta „Ranking członków”. W „Aktywności” widać, ile Sławy każdy członek wniósł do gildii w tym tygodniu albo od początku. Stuknij w członka, a zobaczysz, skąd ma Sławę: z Bestii, Wyprawy, Prób, Próśb, Wymiany czy Wojny.\n- W „Wpłatach” widać, ile złota i surowców każdy członek wpłacił do Siedziby. Wpłaty sprzed zapisywania stoją razem pod listą.\n- W Siedzibie przycisk „Kto ile wpłacił” otwiera od razu te wpłaty.\n- Na wąskich telefonach nagrody dnia przy wejściu do Labiryntu nie są już ucinane."
     }
   ]
 }

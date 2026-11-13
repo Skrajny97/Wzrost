@@ -152,11 +152,20 @@ const GUILDS_TAB = GUILDS.fame.texts.tabs.guilds;
 // The Wojna's "Drużyny" (guild-war.js), which opens the war's teams, so
 // named in data/guilds.json (war.texts) too.
 const WAR_TEAMS = GUILDS.war.texts.teams;
+// The Ranking członków of the Gildia tab (guild-ranking.js, 897 A): its
+// "Wpłaty" from the start, the line of the donations of before under all.
+const MEMBERS = GUILDS.members;
 // Folds opened on a screen after its tabs, all at once: the Portale's
 // cards, each its picture till a tap shows its stage (7.11.2026).
 // The Encyklopedia's "Karty" (where CARDS is on), every land's cards.
 const FOLDS = { '#/portale': '.portal-toggle[aria-expanded="false"]', '#/encyklopedia/cards': 'details.encyclopedia-fold:not([open]) > summary' };
-const TABS = { '#/oboz/craft-table': [said('Kolejka ({count}/{limit})').replace(/\s*\(.*$/, '')], '#/osada/board': [said('Poszukiwani')], '#/spolecznosc/ranking': [GUILDS_TAB], '#/gildia/war': [WAR_TEAMS] };
+const TABS = {
+  '#/oboz/craft-table': [said('Kolejka ({count}/{limit})').replace(/\s*\(.*$/, '')],
+  '#/osada/board': [said('Poszukiwani')],
+  '#/spolecznosc/ranking': [GUILDS_TAB],
+  '#/gildia': [MEMBERS.views.donations, MEMBERS.periods.all],
+  '#/gildia/war': [WAR_TEAMS],
+};
 // Sheets opened over a screen after its tabs, each from the one before (a
 // tap on `tap`, or a picture given to the file field `pick`), looked at
 // alone once `ready` shows in it, and closed at the end with "Zamknij". The
@@ -469,11 +478,13 @@ async function main() {
           console.log(`  – ${size.name} ${screen}: brak zakładki „${tab}”`);
           continue;
         }
-        // A button in the screen itself (the Wojna's "Drużyny") may stand
-        // under the bars fixed over a short phone's page wherever the
-        // browser scrolls it: it is tapped as a script would.
-        if (await button.evaluate((element) => element.matches('[role="tab"], .segmented-option'))) await button.click();
-        else await button.evaluate((element) => element.click());
+        // A button in the screen itself (the Wojna's "Drużyny", the Ranking
+        // członków's "Wpłaty" low on the Gildia) may stand under the bars
+        // fixed over a short phone's page wherever the browser scrolls it:
+        // it is tapped as a script would, when a finger cannot reach it.
+        if (await button.evaluate((element) => element.matches('[role="tab"], .segmented-option'))) {
+          await button.click({ timeout: 3000 }).catch(() => button.evaluate((element) => element.click()));
+        } else await button.evaluate((element) => element.click());
         await view.waitForTimeout(500);
         await check(`${screen} › ${tab}`, null, TRANSLATED.has(screen));
       }
