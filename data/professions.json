@@ -129,6 +129,7 @@
       "lucky": ["Szczęśliwe warzenie, dodatkowo: {potions}."],
       "lost": ["Plecak był pełny. Nie zmieściło się: {potions}."],
       "stopped": ["Warzenie przerwane. Zioła na resztę wróciły do plecaka."],
+      "bagFull": ["Zioła na resztę warzenia nie zmieszczą się w plecaku. Zrób w nim miejsce."],
       "revealed": ["System odsłania nowy przepis: {potion}"],
       "hidden": ["Ukryte przez System do {level}. poziomu Alchemii."],
       "herbalistHidden": ["Rzadki przepis Jagny: od stopnia {standing} w relacji z Jagną albo w reputacji Bractwa Zielarzy, i od {level}. poziomu Alchemii."],

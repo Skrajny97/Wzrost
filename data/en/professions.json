@@ -75,6 +75,9 @@
       "stopped": [
         "Brewing stopped. The herbs for the rest went back to the bag."
       ],
+      "bagFull": [
+        "The herbs for the rest of the brewing will not fit in your bag. Make room in it."
+      ],
       "revealed": [
         "The System reveals a new recipe: {potion}"
       ],

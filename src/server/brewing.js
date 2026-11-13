@@ -33,10 +33,10 @@ import {
   saleGold,
 } from '../engine/index.js';
 import { content } from './content.js';
-import { bagItems, buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf } from './characters.js';
+import { bagItems, bagPlaces, buffsOf, characterView, currentHp, loadPlayer, questsNow, requireIdle, requirePlayer, requireWorker, workOf } from './characters.js';
 import { cardSummary, cardUpserts, workCard } from './cards.js';
 import { toHex } from './encoding.js';
-import { assertion, atomically, raced, sameVersion } from './atomic.js';
+import { atomically, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, alreadyClaimed, insertWork, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
@@ -151,6 +151,13 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
   );
   const herbs = herbsOf(row);
   for (const [id, amount] of Object.entries(back)) if (amount > 0) herbs[id] = (herbs[id] ?? 0) + amount;
+  // The herbs for the rest wait while the bag has no room for the places
+  // they take, as the Bractwo's herbs and a companion's present do: the
+  // brewing goes on, and nothing is lost (the author's 927 A, 13.11.2026: a
+  // brewing stopped with a full bag filled it past its places, 33 of 30).
+  const capacity = bagCapacity(campLevels(player.buildings, now, content()), content());
+  const needed = bagStacks(herbs, content()) - bagStacks(herbsOf(row), content());
+  if (needed > 0 && needed > capacity - bagPlaces(player)) throw new ApiError(409, 'bag_full', say(brewing.texts, 'bagFull', 0));
   const herbsBack = addTo('herbs', back);
   // The catalyst: a piece a potion brewed, the rest back; its grade raises
   // every potion's chance of an extra one (catalystChance).
@@ -161,25 +168,26 @@ export async function finishBrewing(db, player, now, { stop = false, avatar = fa
   const end = db.prepare(`DELETE FROM ${table} WHERE character_id = ? AND started_at = ?`).bind(row.id, activity.started_at);
   // Each batch holds only while the work is still there (atomic.js), so a
   // "Wróć wcześniej" and a claim at once never leave a report without its
-  // potions (the code review, as in the Warsztat).
-  const stillThere = assertion(db, ongoing, [row.id, activity.started_at]);
+  // potions (the code review, as in the Warsztat), and while the character
+  // is as read (workClaim), so the room counted for the herbs is the bag's
+  // now (927 A).
   if (done === 0) {
-    await atomically(
-      db,
-      [
-        stillThere,
+    try {
+      await db.batch([
+        workClaim(db, row, table, activity),
         db
           .prepare(`UPDATE characters SET version = version + 1${herbsBack.sql}${catalystsBack.sql} WHERE id = ? AND ${ongoing}`)
           .bind(...herbsBack.binds, ...catalystsBack.binds, row.id, row.id, activity.started_at),
         end,
-      ],
-      alreadyClaimed,
-    );
+      ]);
+    } catch (error) {
+      if (raced(error)) throw await workClaimFailed(db, row, table, activity);
+      throw error;
+    }
     return null;
   }
 
   const made = brewPotions({ count: done, seed: activity.seed, extraChance: catalystChance(catalyst?.key, content()) }, content());
-  const capacity = bagCapacity(campLevels(player.buildings, now, content()), content());
   const taken = bagItems(player).length + bagStacks(herbs, content()) + bagStacks(potionsOf(row), content());
   const { stored, lost } = storeStacks(potionsOf(row), { [potion.id]: made.count }, capacity - taken, content());
   const { character, after, xp, work, sets } = workGains(player, profession, before, worked, avatar, now);
