@@ -87,6 +87,31 @@ describe('the Przechowalnia', () => {
     assert.equal((await character()).gold, before.gold + price);
   });
 
+  // The code review, 13.11.2026: with one of the marked items gone at the
+  // same moment (sold or taken in another tab), the scrapper paid for the
+  // other, but the answer said 0 gold. Here the first goes right after the
+  // request read the Przechowalnia, at its first write (the Encyklopedia's
+  // record of a herb in the bag, settleDiscoveries).
+  test('"Sprzedaj" says the gold paid when one of the marked items went at the same moment', async () => {
+    const items = [helmet('p'), helmet('q')];
+    const ids = [await store(items[0]), await store(items[1])];
+    const before = await character();
+    await run(`UPDATE characters SET herbs = '{"comfrey":1}', discovered = '{}'`);
+    await run(`CREATE TRIGGER sold_meanwhile AFTER UPDATE OF discovered ON characters BEGIN DELETE FROM storage_items WHERE id = ${ids[0]}; END`);
+    let sold;
+    try {
+      sold = await act('sell', ids);
+    } finally {
+      await run('DROP TRIGGER IF EXISTS sold_meanwhile');
+    }
+    assert.equal(sold.status, 200, JSON.stringify(sold.data));
+    const price = sellPrice(items[1], content);
+    assert.ok(price > 0);
+    assert.deepEqual(sold.data.sold, { count: 1, gold: price });
+    assert.equal(sold.data.character.gold, before.gold + price);
+    assert.deepEqual(stored(sold.data.character), []);
+  });
+
   test('"Rozbierz" puts them on the Stół rozbiórki; taken off its queue, they come back here, whatever the bag', async () => {
     await run("INSERT INTO buildings (character_id, building_id, level, started_at, ends_at) SELECT id, 'craft-table', 1, 0, 1 FROM characters");
     const ids = [await store(helmet('p')), await store(helmet('q'))];
