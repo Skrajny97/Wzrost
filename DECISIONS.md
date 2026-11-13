@@ -3248,6 +3248,11 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.14 (13.11.2026): bardzo długie imię w karcie wyboru postaci
+
+1. **Wybór postaci (z listy na później, #990):** bardzo długie imię bez spacji (np. 18 liter) wychodziło na telefonie o szerokości 320 px poza kartę postaci (198 px w ramce 186 px; wykrył to `tools/layout-check.cjs`). Teraz łamie się w środku karty (`overflow-wrap: anywhere` przy `.select-name`).
+2. **Sprawdzone** w przeglądarce na 320, 390 i 1366 px: imię mieści się w karcie, bez przewijania na boki.
+
 ## Wersja 0.3.13 (13.11.2026): słabszego kamienia nie da się oprawić w miejsce mocniejszego
 
 1. **Oprawianie (autor, 13.11.2026):** „Trzeba uniemożliwić oprawianie niższym - słabszym kamieniem niż aktualnie jest w przedmiocie.” Zasady: „Oprawianie: tylko mocniejszy kamień w miejsce obecnego (13.11.2026)”.

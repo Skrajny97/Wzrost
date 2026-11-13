@@ -820,6 +820,11 @@
       "id": "0.3.13",
       "title": "Wersja 0.3.13",
       "body": "- W przedmiocie albo w Rdzeniu, w którym tkwi już kamień, oprawisz tylko mocniejszy kamień. Słabszy nie zajmie już miejsca mocniejszego."
+    },
+    {
+      "id": "0.3.14",
+      "title": "Wersja 0.3.14",
+      "body": "- Bardzo długie imię postaci mieści się w karcie na ekranie wyboru postaci, także na wąskim telefonie."
     }
   ]
 }
