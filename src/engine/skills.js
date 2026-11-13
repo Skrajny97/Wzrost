@@ -25,7 +25,7 @@ import { counted, decimalText, word } from './text.js';
 /** @typedef {Record<string, any>} Character A character, as its row keeps it. */
 /**
  * @typedef {{
- *   id: string, name: string, classId: string, classLevel: number, kind: string, mana: number,
+ *   id: string, name: string, classId: string, classLevel: number, kind: string, mana: number, manaShare?: number,
  *   params: Record<string, any>, effect: string, cooldown?: number, once?: boolean, maxLevel?: number,
  *   evolution?: string, from?: string, path?: string, style?: string, rarity?: string, description?: string,
  * }} Skill A skill of data/skills.json, or an evolution's (content.js).
@@ -151,14 +151,27 @@ const knownOf = (pool, learned) =>
 /**
  * @param {Character} character
  * @param {Content} content
- * @returns {{ id: string, name: string, kind: string, mana: number, cooldown: number, once: boolean, level: number, params: Record<string, any> }[]}
+ * @returns {{ id: string, name: string, kind: string, mana: number, manaShare?: number, cooldown: number, once: boolean, level: number, params: Record<string, any> }[]}
  */
 export function learnedSkills(character, content) {
   return Object.entries(character.skills ?? {})
     .filter(([id, level]) => content.skillsById[id] && level > 0)
     .map(([id, level]) => {
       const def = content.skillsById[id];
-      return { id, name: def.name, kind: def.kind, mana: def.mana, cooldown: def.cooldown ?? 1, once: def.once === true, level, params: skillParams(def, level, content) };
+      // A skill priced in a share of the maximum mana (manaShare: the
+      // Arkanista's line, 934 A and 935 A) gets its cost with the unit
+      // (combatant.js), which knows the mana.
+      return {
+        id,
+        name: def.name,
+        kind: def.kind,
+        mana: def.mana,
+        ...(def.manaShare ? { manaShare: def.manaShare } : {}),
+        cooldown: def.cooldown ?? 1,
+        once: def.once === true,
+        level,
+        params: skillParams(def, level, content),
+      };
     });
 }
 
@@ -316,6 +329,11 @@ export function skillText(template, skill, params, content) {
  */
 export function skillCost(skill, content, params = skill.params) {
   if (typeof params.pool === 'number') return content.texts.skillCostPool[0].replace('{pool}', `${Math.round(params.pool * 100)}%`);
+  // The Arkanista's line summons out of a share of its maximum mana (934 A,
+  // 935 A).
+  if (typeof skill.manaShare === 'number') {
+    return content.texts.skillCostShare[0].replace('{share}', `${Math.round(skill.manaShare * 100)}%`).replace('{cooldown}', String(skill.cooldown ?? 1));
+  }
   const key = skill.once ? 'skillCostOnce' : ACTIVE_KINDS.has(skill.kind) || STANCE_KINDS.has(skill.kind) ? 'skillCostActive' : START_KINDS.has(skill.kind) ? 'skillCostStart' : 'skillCostOnce';
   return content.texts[key][0].replace('{mana}', String(skill.mana)).replace('{cooldown}', String(skill.cooldown ?? 1));
 }

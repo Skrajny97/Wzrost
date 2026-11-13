@@ -692,6 +692,10 @@
     "0.3.23": {
       "title": "Version 0.3.23",
       "body": "- The Labyrinth is easier: its creatures stand halfway between your character's level and your class level, and every Labyrinth level is weaker. Level 1 should now be easy.\n- Exploration report: the fight numbers show the kind of fight: a crown for a champion, a diamond for an elite, a triangle for a tough fight and a dot for an event."
+    },
+    "0.3.24": {
+      "title": "Version 0.3.24",
+      "body": "- Arcanist: the elemental is made of mana. Summoning it costs 25% of max mana, and it has HP equal to 40% of the character's max mana. Wisdom now gives a sturdier elemental, and Arcana's mana regeneration refills the cost between summons.\n- Druid and Archdruid: the Ent, Bear, Ancient Oak and Bison also take their HP from max mana and cost 25% of max mana.\n- A new login screen background: the edge of the forest at dusk."
     }
   }
 }

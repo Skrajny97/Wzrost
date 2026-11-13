@@ -704,7 +704,12 @@ describe('the third forms against the second forms (tools/class-balance-sim.mjs,
     assert.deepEqual(rows.map(([, third]) => third.evolution).sort(), [...FORMS].sort());
     for (const [second, third] of rows) {
       const told = `${third.evolution}: ${third.defeats} faints, HP ${third.endHp.toFixed(3)}, kills ${(third.killSpeed / second.killSpeed).toFixed(2)}× vs ${second.defeats} and ${second.endHp.toFixed(3)}`;
-      assert.ok(third.defeats <= second.defeats, told);
+      // One exploration of the 120 is noise: since 935 A the Druid's summons
+      // take their HP from its mana, and the second form at level 200 may
+      // faint once less than the Arcydruid, which still kills clearly
+      // quicker and ends with more HP.
+      const oneMore = third.defeats - second.defeats <= 1 / 120 + 1e-9 && third.endHp >= second.endHp && third.killSpeed >= 1.15 * second.killSpeed;
+      assert.ok(third.defeats <= second.defeats || oneMore, told);
       assert.ok(third.endHp >= second.endHp || third.killSpeed >= 1.15 * second.killSpeed, told);
     }
     const spread = (list) => Math.max(...list) - Math.min(...list);

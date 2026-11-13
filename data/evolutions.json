@@ -687,11 +687,12 @@
       "name": "Przywołanie żywiołaka",
       "style": "atak",
       "description": "Z wiru many wyłania się żywiołak. Słucha tylko Arkanisty.",
-      "effect": "Przywołuje żywiołaka na {turns} swoje ruchy. Żywiołak staje przed postacią z {hp%} jej maks. HP i przyjmuje ciosy wrogów. Co ruch uderza losowego wroga za {power%} obrażeń żywiołem, na który ten jest najsłabszy.",
+      "effect": "Przywołuje żywiołaka z many na {turns} swoje ruchy. Żywiołak staje przed postacią z HP równym {hp%} jej maks. many i przyjmuje ciosy wrogów. Co ruch uderza losowego wroga za {power%} obrażeń postaci żywiołem, na który ten jest najsłabszy.",
       "kind": "summon",
       "mana": 18,
+      "manaShare": 0.25,
       "cooldown": 8,
-      "params": { "turns": 5, "hp": 0.3, "power": [0.4, 0.9], "summon": "elemental", "summonName": "Żywiołak" }
+      "params": { "hpFrom": "mana", "turns": 5, "hp": 0.4, "power": [0.4, 0.9], "summon": "elemental", "summonName": "Żywiołak" }
     },
     {
       "id": "renewal",
@@ -1043,11 +1044,12 @@
       "name": "Przywołanie enta",
       "style": "obrona",
       "description": "Z ziemi wyrasta drzewiec o korze twardej jak kamień. Ściąga na siebie ciosy i oddaje gałęziami.",
-      "effect": "Przywołuje enta na {turns} swoje ruchy. Ent staje przed postacią z {hp%} jej maks. HP i przyjmuje ciosy wrogów. Co ruch bije gałęziami losowego wroga za {power%} obrażeń.",
+      "effect": "Przywołuje enta na {turns} swoje ruchy. Ent staje przed postacią z HP równym {hp%} jej maks. many i przyjmuje ciosy wrogów. Co ruch bije gałęziami losowego wroga za {power%} obrażeń.",
       "kind": "summon",
       "mana": 20,
+      "manaShare": 0.25,
       "cooldown": 10,
-      "params": { "turns": 4, "hp": [0.3, 0.45], "power": [0.9, 1.5], "physical": true, "summon": "ent", "summonName": "Ent" }
+      "params": { "hpFrom": "mana", "turns": 4, "hp": [0.3, 0.45], "power": [0.9, 1.5], "physical": true, "summon": "ent", "summonName": "Ent" }
     },
     {
       "id": "bear-summon",
@@ -1055,11 +1057,12 @@
       "name": "Przywołanie niedźwiedzia",
       "style": "atak",
       "description": "Z gęstwiny wychodzi niedźwiedź i staje między Druidem a wrogami. Kto podejdzie bliżej, poczuje jego pazury.",
-      "effect": "Przywołuje niedźwiedzia na {turns} swoje ruchy. Niedźwiedź staje przed postacią z {hp%} jej maks. HP i przyjmuje ciosy wrogów. Co ruch rwie pazurami losowego wroga za {power%} obrażeń.",
+      "effect": "Przywołuje niedźwiedzia na {turns} swoje ruchy. Niedźwiedź staje przed postacią z HP równym {hp%} jej maks. many i przyjmuje ciosy wrogów. Co ruch rwie pazurami losowego wroga za {power%} obrażeń.",
       "kind": "summon",
       "mana": 20,
+      "manaShare": 0.25,
       "cooldown": 10,
-      "params": { "turns": 4, "hp": [0.25, 0.35], "power": [1.2, 1.9], "physical": true, "summon": "bear", "summonName": "Niedźwiedź" }
+      "params": { "hpFrom": "mana", "turns": 4, "hp": [0.25, 0.35], "power": [1.2, 1.9], "physical": true, "summon": "bear", "summonName": "Niedźwiedź" }
     },
     {
       "id": "great-renewal",
@@ -1415,11 +1418,12 @@
       "name": "Przebudzenie dębu",
       "style": "obrona",
       "description": "Ziemia drży i spod niej wstaje prastary dąb. Jego korzenie chwytają każdego, kto podejdzie.",
-      "effect": "Przywołuje prastary dąb na {turns|swój ruch|swoje ruchy|swoich ruchów}. Dąb staje przed postacią z {hp%} jej maks. HP i przyjmuje ciosy wrogów. Co ruch bije gałęziami losowego wroga za {power%} obrażeń i oplata go korzeniami: trafiony zwalnia o {root%}.",
+      "effect": "Przywołuje prastary dąb na {turns|swój ruch|swoje ruchy|swoich ruchów}. Dąb staje przed postacią z HP równym {hp%} jej maks. many i przyjmuje ciosy wrogów. Co ruch bije gałęziami losowego wroga za {power%} obrażeń i oplata go korzeniami: trafiony zwalnia o {root%}.",
       "kind": "summon",
       "mana": 22,
+      "manaShare": 0.25,
       "cooldown": 10,
-      "params": { "turns": 5, "hp": [0.45, 0.6], "power": [1.5, 2.2], "physical": true, "summon": "oak", "summonName": "Prastary dąb", "root": [0.3, 0.5] }
+      "params": { "hpFrom": "mana", "turns": 5, "hp": [0.45, 0.6], "power": [1.5, 2.2], "physical": true, "summon": "oak", "summonName": "Prastary dąb", "root": [0.3, 0.5] }
     },
     {
       "id": "bison-call",
@@ -1427,11 +1431,12 @@
       "name": "Przywołanie żubra",
       "style": "atak",
       "description": "Z puszczy wypada żubr, ciężki jak głaz. Najpierw taranuje, potem staje murem przed Arcydruidem.",
-      "effect": "Przywołuje żubra na {turns|swój ruch|swoje ruchy|swoich ruchów}. Żubr szarżuje na wroga z przodu za {charge%} obrażeń i ogłusza go na najbliższy ruch, a potem staje przed postacią z {hp%} jej maks. HP i przyjmuje ciosy wrogów. Co ruch bodzie losowego wroga za {power%} obrażeń.",
+      "effect": "Przywołuje żubra na {turns|swój ruch|swoje ruchy|swoich ruchów}. Żubr szarżuje na wroga z przodu za {charge%} obrażeń i ogłusza go na najbliższy ruch, a potem staje przed postacią z HP równym {hp%} jej maks. many i przyjmuje ciosy wrogów. Co ruch bodzie losowego wroga za {power%} obrażeń.",
       "kind": "summon",
       "mana": 22,
+      "manaShare": 0.25,
       "cooldown": 10,
-      "params": { "turns": 4, "hp": [0.35, 0.5], "power": [1.9, 2.7], "charge": [2.5, 3.5], "physical": true, "summon": "aurochs", "summonName": "Żubr", "stunLabel": "ogłuszony" }
+      "params": { "hpFrom": "mana", "turns": 4, "hp": [0.35, 0.5], "power": [1.9, 2.7], "charge": [2.5, 3.5], "physical": true, "summon": "aurochs", "summonName": "Żubr", "stunLabel": "ogłuszony" }
     },
     {
       "id": "miraculous-healing",

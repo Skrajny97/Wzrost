@@ -206,6 +206,7 @@
   "skillCostStart": ["Koszt: {mana} many, na początku walki."],
   "skillCostOnce": ["Koszt: {mana} many, raz na walkę."],
   "skillCostPool": ["Koszt: {pool} maks. many, raz na walkę."],
+  "skillCostShare": ["Koszt: {share} maks. many, najwyżej co {cooldown}. ruch."],
   "classWaitsPath": ["{className}: klasa czeka na {level}. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach wybierzesz ścieżkę poboczną. Zdobyte XP klasy nie przepada."],
   "classWaitsPoints": ["{className}: klasa czeka na {level}. poziomie, u progu ewolucji. Urośnie dalej, gdy w Umiejętnościach rozdasz Punkty Umiejętności. Zdobyte XP klasy nie przepada."],
   "classWaitsEvolution": ["{className}: klasa czeka na {level}. poziomie, u progu ewolucji. Urośnie dalej, gdy w zakładce Ewolucja wybierzesz ewolucję. Zdobyte XP klasy nie przepada."],

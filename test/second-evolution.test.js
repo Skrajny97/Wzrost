@@ -308,7 +308,8 @@ describe('the second forms in fights', () => {
     const weak = fight('druid', [plain], [sturdy('boar', 88, 'e0')]);
     const upOf = (result) => result.events.find((event) => event.kind === 'summon' && event.state === 'up');
     assert.equal(upOf(strong).skill, 'ent-summon');
-    assert.equal(upOf(strong).summonHp, Math.max(1, Math.round(druid.maxHp * skillParams(content.skillsById['ent-summon'], 40, content).hp * 1.3)));
+    // 935 A: out of the Druid's mana, not its HP.
+    assert.equal(upOf(strong).summonHp, Math.max(1, Math.round(druid.maxMana * skillParams(content.skillsById['ent-summon'], 40, content).hp * 1.3)));
     assert.ok(Math.abs(upOf(strong).summonHp / upOf(weak).summonHp - 1.3) < 0.01);
     const firstBlow = (result) => result.events.find((event) => event.skill === 'ent-summon' && event.kind === 'hit');
     assert.ok(Math.abs(firstBlow(strong).damage / firstBlow(weak).damage - 1.3) < 0.03, `${firstBlow(strong).damage} / ${firstBlow(weak).damage}`);

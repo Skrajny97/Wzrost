@@ -1547,7 +1547,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
       } else if (skill.kind === 'summon') {
         // Moc puszczy: summons with more HP and stronger blows.
         const grove = evolving && actor.feat?.kind === 'arcana' ? actor.feat : null;
-        const hp = Math.max(1, Math.round(actor.maxHp * p.hp * (1 + (grove?.summonHp ?? 0))));
+        // The Arkanista's line calls its summons out of mana (934 A, 935 A):
+        // their HP is a share of the summoner's maximum mana, not its HP.
+        const pool = p.hpFrom === 'mana' ? (actor.maxMana ?? 0) : actor.maxHp;
+        const hp = Math.max(1, Math.round(pool * p.hp * (1 + (grove?.summonHp ?? 0))));
         const name = p.summonName;
         const stronger = 1 + (grove?.summonPower ?? 0);
         // The slime's poison: a share of the summoner's average blow a move.
