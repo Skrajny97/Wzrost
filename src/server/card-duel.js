@@ -245,6 +245,8 @@ async function tableData(db, characterId, now) {
     lines: data.lines,
     typeBonus: data.typeBonus,
     turnSeconds: live().turnSeconds,
+    // The first move of a round has more (918 B): the page's bar counts it.
+    firstMoveSeconds: live().firstMoveSeconds,
     acceptSeconds: live().acceptSeconds,
     cut: Math.round(live().systemCut * 100),
     used: await stakedToday(db, characterId, now),

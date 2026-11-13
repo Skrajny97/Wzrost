@@ -49,7 +49,7 @@ const say = (text, vars, female = false) => gendered(filled(text, vars), female)
 // step, deadline, round }, or null.
 let news = null;
 // The table's words and shape, from the latest answer of the duel's own
-// reads: { texts, types, lines, typeBonus, turnSeconds, acceptSeconds, cut,
+// reads: { texts, types, lines, typeBonus, turnSeconds, firstMoveSeconds, acceptSeconds, cut,
 // used, limit }.
 let table = null;
 // The challenge this page sent, until its answer: { id, other }.
@@ -69,8 +69,8 @@ let followed = null;
 
 function take(answer) {
   if (answer?.texts) {
-    const { texts, types, lines, typeBonus, turnSeconds, acceptSeconds, cut, used, limit } = answer;
-    table = { texts, types, lines, typeBonus, turnSeconds, acceptSeconds, cut, used, limit };
+    const { texts, types, lines, typeBonus, turnSeconds, firstMoveSeconds, acceptSeconds, cut, used, limit } = answer;
+    table = { texts, types, lines, typeBonus, turnSeconds, firstMoveSeconds, acceptSeconds, cut, used, limit };
   }
 }
 
@@ -918,7 +918,8 @@ export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () =>
   }
 
   // The bar of whose move it is (908.4): „Twój ruch” or the other's name,
-  // the time left of the 30 seconds, and what happens now.
+  // the time left until the server's deadline, of the 35 seconds of a
+  // round's first move or the 30 of the answer (918 B), and what happens now.
   function turnBar(match) {
     const { texts } = table;
     const other = duel.other;
@@ -934,7 +935,8 @@ export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () =>
     ].filter(Boolean);
     const time = h('strong', { class: 'duel-clock' });
     const fill = h('span', { class: 'duel-bar-fill' });
-    clock = { time, fill, deadline: match.deadline, total: (table.turnSeconds ?? 30) * 1000 };
+    const seconds = match.step === match.lead ? (table.firstMoveSeconds ?? table.turnSeconds) : table.turnSeconds;
+    clock = { time, fill, deadline: match.deadline, total: (seconds ?? 30) * 1000 };
     tickClock();
     return h(
       'div',

@@ -148,7 +148,7 @@
       "free": "Without a stake nobody pays and nobody takes anything. You can play such matches without a limit.",
       "limits": "The highest stake is {max} gold, as much as Szczęsny's highest stake at the lower of your levels. Live matches today: {used} of {limit}.",
       "lowLevel": "You play for gold once both characters are at level {level}, so for now only without a stake.",
-      "rules": "{name} has 2 minutes to accept the challenge. You take turns, 30 seconds a move. Two rounds in a row without a move lose the match.",
+      "rules": "{name} has 2 minutes to accept the challenge. You take turns: 35 seconds for the first move of a round, 30 for the answer. Two rounds in a row without a move lose the match.",
       "sent": "Challenge sent. {name} has 2 minutes to accept it.",
       "incomingTitle": "A challenge to a card match",
       "incoming": "{name} ({className}, lvl {level}) challenges you to a live card match.",

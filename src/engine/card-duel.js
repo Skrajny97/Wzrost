@@ -18,7 +18,9 @@
 // hits at once as with Szczęsny, each side's skill working for its own
 // cards. Who leads changes every round; the first round's leader comes from
 // the match's seed. A move is due turnSeconds after it became due (by the
-// server's clock), with graceSeconds more for its way to the server; a move
+// server's clock), the first move of a round, the leader's, firstMoveSeconds
+// (918 B: the round before still plays on both screens for a few seconds as
+// it becomes due), with graceSeconds more for its way to the server; a move
 // missed is made by the game (autoTurn: the strongest cards of the reserve,
 // no skill), and missedRounds missed in a row lose the match. Every deadline
 // missed is applied in its order when the match is next read (duelCatchUp),
@@ -82,12 +84,13 @@ export const otherSeat = (seat) => (seat === 'me' ? 'foe' : 'me');
 export const liveRules = (content) => cardRules(content).live;
 
 const turnMs = (/** @type {Content} */ content) => liveRules(content).turnSeconds * 1000;
+const firstMoveMs = (/** @type {Content} */ content) => liveRules(content).firstMoveSeconds * 1000;
 const graceMs = (/** @type {Content} */ content) => liveRules(content).graceSeconds * 1000;
 
 // A new live match at `now`: each side dealt as newMatch deals the player's
 // (its deck shuffled by the match's seed and its seat, its reserve drawn),
-// the first round's leader drawn from the seed, its move due turnSeconds
-// from now. `seed` is the server's, never shown.
+// the first round's leader drawn from the seed, its move due
+// firstMoveSeconds from now. `seed` is the server's, never shown.
 /**
  * @param {{ seed: string, now: number, me: SideSpec, foe: SideSpec }} setup
  * @param {Content} content
@@ -112,7 +115,7 @@ export function newDuel({ seed, now, me, foe }, content) {
     step: lead,
     moves: { me: null, foe: null },
     missed: { me: 0, foe: 0 },
-    deadline: now + turnMs(content),
+    deadline: now + firstMoveMs(content),
   };
 }
 
@@ -168,7 +171,8 @@ export function duelTurnBlock(duel, seat, turn, content) {
 // new type at once, a Cień's card swapped goes back to the reserve). The
 // leader's move passes the move to the other, due turnSeconds after; the
 // other's plays the round (playRound) and, unless the match is over, draws
-// both reserves up and gives the next round to the other leader. `auto`:
+// both reserves up and gives the next round to the other leader, its move
+// due firstMoveSeconds after. `auto`:
 // the game's move for a player who missed it, which keeps its count of
 // moves missed; a player's own move clears it.
 /**
@@ -203,10 +207,9 @@ export function duelMove(current, seat, turn, at, content, { auto = false } = {}
     auto,
   };
   if (!auto) duel.missed[seat] = 0;
-  const due = at + turnMs(content);
   if (seat === duel.lead) {
     duel.step = otherSeat(seat);
-    duel.deadline = due;
+    duel.deadline = at + turnMs(content);
     return duel;
   }
   playRound(duel, content);
@@ -220,7 +223,7 @@ export function duelMove(current, seat, turn, at, content, { auto = false } = {}
   duel.lead = otherSeat(duel.lead);
   duel.step = duel.lead;
   duel.moves = { me: null, foe: null };
-  duel.deadline = due;
+  duel.deadline = at + firstMoveMs(content);
   return duel;
 }
 
@@ -305,7 +308,7 @@ function playRound(duel, content) {
 // their order: at each deadline passed (its grace too) the player whose move
 // it was misses it, and the game makes it for that player at that moment
 // (autoTurn: the strongest cards of its reserve, no skill), so the next move
-// is due turnSeconds after it; the missedRounds-th move missed in a row loses
+// is due from it as any (duelMove); the missedRounds-th move missed in a row loses
 // the match. The same match back when nothing was missed.
 /**
  * @param {Duel} duel

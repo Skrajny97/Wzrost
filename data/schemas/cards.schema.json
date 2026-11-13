@@ -141,14 +141,15 @@
       }
     },
     "live": {
-      "description": "Partie na żywo z innymi graczami (901 B, src/engine/card-duel.js): wyzwanie czeka acceptSeconds sekund, ruch turnSeconds sekund (i graceSeconds zapasu), missedRounds rund z rzędu bez ruchu to przegrana; zwycięzca zgarnia obie stawki bez udziału systemCut; o złoto od minLevel poziomu obu postaci, najwyżej perDay partii o złoto dziennie; wyzwanie odrzucone albo przeterminowane do tej samej postaci znów po repeatSeconds sekundach.",
+      "description": "Partie na żywo z innymi graczami (901 B, src/engine/card-duel.js): wyzwanie czeka acceptSeconds sekund, pierwszy ruch rundy firstMoveSeconds sekund, odpowiedź turnSeconds sekund (i graceSeconds zapasu), missedRounds rund z rzędu bez ruchu to przegrana; zwycięzca zgarnia obie stawki bez udziału systemCut; o złoto od minLevel poziomu obu postaci, najwyżej perDay partii o złoto dziennie; wyzwanie odrzucone, przeterminowane albo wycofane do tej samej postaci znów po repeatSeconds sekundach.",
       "type": "object",
       "additionalProperties": false,
-      "required": ["acceptSeconds", "turnSeconds", "graceSeconds", "missedRounds", "systemCut", "perDay", "minLevel", "repeatSeconds"],
+      "required": ["acceptSeconds", "turnSeconds", "firstMoveSeconds", "graceSeconds", "missedRounds", "systemCut", "perDay", "minLevel", "repeatSeconds"],
       "properties": {
         "$comment": { "type": "string" },
         "acceptSeconds": { "type": "integer", "minimum": 10 },
         "turnSeconds": { "type": "integer", "minimum": 5 },
+        "firstMoveSeconds": { "type": "integer", "minimum": 5 },
         "graceSeconds": { "type": "integer", "minimum": 0 },
         "missedRounds": { "type": "integer", "minimum": 1 },
         "systemCut": { "type": "number", "minimum": 0, "maximum": 0.5 },
