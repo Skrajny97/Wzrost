@@ -3,7 +3,7 @@
   "title": "Talia Systemu",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "deckSize", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "host", "bonuses", "texts"],
+  "required": ["name", "deckSize", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "host", "residents", "bonuses", "texts"],
   "definitions": {
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
     "chance": { "type": "number", "minimum": 0, "maximum": 1 },
@@ -144,6 +144,42 @@
                 "properties": { "rarity": { "$ref": "#/definitions/id" } }
               },
               "smart": { "type": "integer", "minimum": 0, "maximum": 2 },
+              "cards": { "type": "array", "items": { "$ref": "#/definitions/card" } }
+            }
+          }
+        }
+      }
+    },
+    "residents": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shown", "chance", "tables"],
+      "description": "Partie z mieszkańcami Osady (904 B, src/engine/card-residents.js): każdy mieszkaniec gra u siebie własną talią, między stopniami Szczęsnego.",
+      "properties": {
+        "$comment": { "type": "string" },
+        "shown": { "type": "integer", "minimum": 1, "description": "Ile pierwszych kart talii mieszkańca widać przy jego stole." },
+        "chance": { "$ref": "#/definitions/chance", "description": "Szansa na kartę z talii mieszkańca przy każdej wygranej o stawkę po pierwszej." },
+        "tables": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "after", "stake", "smart", "icon", "gender", "with", "of", "name", "style", "win", "loss", "draw", "cards"],
+            "properties": {
+              "id": { "$ref": "#/definitions/id", "description": "Mieszkaniec Osady (settlement.json, residents), który ma swoje miejsce." },
+              "after": { "type": "integer", "minimum": 1, "description": "Stopień Szczęsnego, od którego talia jest mocniejsza; liczba stopni: mocniejsza od wszystkich." },
+              "stake": { "type": "number", "exclusiveMinimum": 0, "description": "Stawka razy stawka podstawowa, między stawkami sąsiednich stopni." },
+              "smart": { "type": "integer", "minimum": 0, "maximum": 2, "description": "Sposób gry, jak u Szczęsnego." },
+              "icon": { "$ref": "#/definitions/id", "description": "Ikona talii (src/client/icons.js)." },
+              "gender": { "enum": ["f", "m"], "description": "Rodzaj mieszkańca w słowach gry." },
+              "with": { "type": "string", "minLength": 1, "description": "„z Jagną”: w tytule „Karty z Jagną”." },
+              "of": { "type": "string", "minLength": 1, "description": "„Jagny”: w słowach „z talii Jagny”." },
+              "name": { "type": "string", "minLength": 1, "description": "Nazwa talii." },
+              "style": { "type": "string", "minLength": 1, "description": "Styl talii." },
+              "win": { "$ref": "#/definitions/texts" },
+              "loss": { "$ref": "#/definitions/texts" },
+              "draw": { "$ref": "#/definitions/texts" },
               "cards": { "type": "array", "items": { "$ref": "#/definitions/card" } }
             }
           }

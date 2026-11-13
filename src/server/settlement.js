@@ -100,6 +100,7 @@ import {
   withSeatDiscount,
   candidateRedraw,
   questPeriod,
+  residentTable,
 } from '../engine/index.js';
 import { trialHallView } from './trial-hall.js';
 import { content, contentIn } from './content.js';
@@ -122,7 +123,7 @@ import {
 } from './characters.js';
 import { atomically, sameVersion } from './atomic.js';
 import { toHex } from './encoding.js';
-import { evolutionsOn, placeOn, settlementOn } from './features.js';
+import { cardsOn, evolutionsOn, placeOn, settlementOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
 import { t } from './i18n.js';
 import { wantedToKeep, wantedView } from './wanted.js';
@@ -330,7 +331,10 @@ export function settlementView(player, stored, board, now) {
     trialHall: trialHallView(player.row, now),
     residents: residents.map((resident) => {
       const standing = standingOf(stored.relations[resident.id] ?? 0, content());
-      return { ...resident, service: serviceOf(resident.id), standing, greeting: resident.greetings[Math.min(standing.index, resident.greetings.length - 1)], ...gifts(resident.id) };
+      // `cards`: the resident plays Talia Systemu at its place (904 B), where
+      // the game has the cards.
+      const cards = cardsOn() && Boolean(content().cards) && Boolean(residentTable(resident.id, content()));
+      return { ...resident, service: serviceOf(resident.id), standing, greeting: resident.greetings[Math.min(standing.index, resident.greetings.length - 1)], cards, ...gifts(resident.id) };
     }),
     // The words of "Podaruj" and "Odbierz" on the residents' places.
     gifts: giftWords(),

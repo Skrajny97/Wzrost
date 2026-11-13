@@ -1138,6 +1138,7 @@
     "src/client/labyrinth.js",
     "src/client/screens/core.js",
     "src/engine/cards.js",
+    "src/engine/card-residents.js",
     "src/server/cards.js",
     "src/client/cards.js",
     "src/client/cards-fx.js"
