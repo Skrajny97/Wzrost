@@ -1,11 +1,13 @@
 // A fight of a report, played back: enemies in a line at the top, the party
 // at the bottom, fields labelled przód, środek and tył. Every strike travels
 // between the portraits: a blow lunges at the target, an arrow or a spell
-// flies to it, and the hit flashes with the damage. The text log runs
+// flies to it, and the hit flashes with the damage (the blows' look and the
+// camera over the arena: arena-fx.js). The text log runs
 // underneath and "+" opens the participants' stats. Its own words are
 // written in Polish and shown in the page's language (t(), i18n.js); the
 // fight's names and lines come from the server in it.
 
+import { createFx } from './arena-fx.js';
 import { boardArt, companionBust, companionPortrait, monsterSprite, portraitSprite, summonSprite } from './art.js';
 import { classArt } from './class-art.js';
 import { h, icon } from './dom.js';
@@ -32,7 +34,6 @@ const SPEED_KEY = 'wzrost.fight-speed';
 // 0.2.98 (a player, poz. 45, 12.11.2026: „Czy możemy wprowadzić tempo walk
 // x4?”).
 const SPEEDS = [1, 2, 4];
-const HIT_COLOR = 'rgba(239, 154, 133, 0.95)';
 
 const reducedMotion = () => !motionOn();
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -74,6 +75,12 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   let run = 0;
   let index = 0;
   let speed = loadSpeed();
+  // The fight's clock: the tempo shortens every duration, and the slow
+  // motion of the fight's last blow (arena-fx.js) stretches it by
+  // 1 / dilation.
+  let dilation = 1;
+  const pace = () => speed * dilation;
+  const later = (ms) => wait(ms / pace());
 
   const fx = h('div', { class: 'arena-fx', 'aria-hidden': 'true' });
   const banner = h('div', { class: 'arena-banner', 'aria-hidden': 'true' });
@@ -150,7 +157,11 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   const enemies = row('enemy', fight.enemies);
   enemies.append(banner);
   const party = row('ally', fight.allies);
-  const arena = h('div', { class: 'arena' }, enemies, party, fx);
+  // The rows and the effects stand on a stage inside the arena, which the
+  // camera (arena-fx.js) shakes and zooms while the arena's box stays and
+  // cuts off what reaches past it.
+  const stage = h('div', { class: 'arena-stage' }, enemies, party, fx);
+  const arena = h('div', { class: 'arena' }, stage);
   const boardPicture = board ? boardArt(board) : null;
   if (boardPicture) {
     arena.classList.add('arena--board');
@@ -159,15 +170,16 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
 
   // Animations through the Web Animations API, so they can all be cancelled.
   function animate(element, keyframes, options) {
-    const animation = element.animate(keyframes, { ...options, duration: options.duration / speed, delay: (options.delay ?? 0) / speed });
+    const animation = element.animate(keyframes, { ...options, duration: options.duration / pace(), delay: (options.delay ?? 0) / pace() });
     running.add(animation);
     return animation.finished.catch(() => {}).finally(() => running.delete(animation));
   }
 
-  function centerOf(element) {
-    const box = element.getBoundingClientRect();
-    const frame = arena.getBoundingClientRect();
-    return { x: box.left - frame.left + box.width / 2, y: box.top - frame.top + box.height / 2 };
+  // An animation made elsewhere, cancelled with the rest.
+  function track(animation) {
+    running.add(animation);
+    animation.finished.catch(() => {}).finally(() => running.delete(animation));
+    return animation;
   }
 
   function setHp(id, hp) {
@@ -181,26 +193,8 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     cards.get(id)?.card.classList.toggle('unit--down', down);
   }
 
-  function float(id, text, kind, delay = 0, color = null) {
-    const entry = cards.get(id);
-    if (!entry) return;
-    const { x, y } = centerOf(entry.card);
-    const bubble = h('span', { class: `float float--${kind}`, text });
-    if (color) bubble.style.color = color;
-    bubble.style.left = `${x}px`;
-    bubble.style.top = `${y - 18}px`;
-    fx.append(bubble);
-    animate(
-      bubble,
-      [
-        { transform: 'translate(-50%, 0) scale(0.7)', opacity: 0 },
-        { transform: 'translate(-50%, -8px) scale(1.15)', opacity: 1, offset: 0.2 },
-        { transform: 'translate(-50%, -34px) scale(1)', opacity: 0 },
-      ],
-      { duration: 1000, delay, easing: 'ease-out', fill: 'backwards' },
-    ).then(() => bubble.remove());
-  }
-
+  // A card's frame and face lit in a colour: an effect and its ticks, a
+  // pin, a slow, a blow thrown back.
   function flash(id, color, background = 'rgba(200, 85, 61, 0.45)') {
     const entry = cards.get(id);
     if (!entry) return Promise.resolve();
@@ -215,125 +209,39 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     );
   }
 
-  function shake(id, distance) {
-    const entry = cards.get(id);
-    if (!entry || reducedMotion()) return Promise.resolve();
-    return animate(
-      entry.card,
-      [
-        { transform: 'translateX(0)' },
-        { transform: `translateX(${-distance}px)` },
-        { transform: `translateX(${distance * 0.8}px)` },
-        { transform: `translateX(${-distance * 0.4}px)` },
-        { transform: 'translateX(0)' },
-      ],
-      { duration: 300 },
-    );
-  }
-
-  function slash(id, strong) {
-    const entry = cards.get(id);
-    if (!entry) return;
-    const { x, y } = centerOf(entry.card);
-    const mark = h('span', { class: `slash${strong ? ' slash--strong' : ''}` });
-    mark.style.left = `${x}px`;
-    mark.style.top = `${y}px`;
-    fx.append(mark);
-    animate(
-      mark,
-      [
-        { transform: 'translate(-50%, -50%) scale(0.4) rotate(-20deg)', opacity: 0 },
-        { transform: 'translate(-50%, -50%) scale(1.1) rotate(0deg)', opacity: 1, offset: 0.35 },
-        { transform: 'translate(-50%, -50%) scale(1.25) rotate(8deg)', opacity: 0 },
-      ],
-      { duration: 360, easing: 'ease-out' },
-    ).then(() => mark.remove());
-  }
-
-  // The attacker reaches the target: a lunge for blows, a projectile otherwise.
-  // A strike cut short (Pomiń, Powtórz) lands nowhere: the arena already shows
-  // another moment of the fight.
-  async function strike(actor, target, onImpact, style = {}) {
-    const id = run;
-    const from = cards.get(actor.id).card;
-    const to = cards.get(target.id).card;
-    const a = centerOf(from);
-    const b = centerOf(to);
-    // A strike out of the shadows: the attacker fades and the blow lands
-    // from nowhere.
-    if (style.teleport && !reducedMotion()) {
-      playSound('swing');
-      await animate(from, [{ opacity: 1 }, { opacity: 0.15 }], { duration: 220 });
-      if (id !== run) return;
-      onImpact();
-      await animate(from, [{ opacity: 0.15 }, { opacity: 1 }], { duration: 260 });
-      await wait(200 / speed);
-      return;
-    }
-    if (actor.strike === 'melee') {
-      const reach = reducedMotion() ? 0.3 : 0.62;
-      const dx = (b.x - a.x) * reach;
-      const dy = (b.y - a.y) * reach;
-      from.classList.add('unit--acting');
-      playSound('swing');
-      const out = from.animate(
-        [{ transform: 'translate(0, 0) scale(1)' }, { transform: `translate(${dx}px, ${dy}px) scale(1.07)` }],
-        { duration: 190 / speed, easing: 'cubic-bezier(0.5, 0, 0.75, 0.4)', fill: 'forwards' },
-      );
-      // The lunge holds its end until the way back has finished; cancelling
-      // everything (Pomiń) also cancels it, so the card never stays out.
-      running.add(out);
-      await out.finished.catch(() => {});
-      if (id !== run) return;
-      onImpact();
-      await Promise.all([
-        animate(from, [{ transform: `translate(${dx}px, ${dy}px) scale(1.07)` }, { transform: 'translate(0, 0) scale(1)' }], {
-          duration: 240,
-          easing: 'ease-out',
-        }).then(() => {
-          out.cancel();
-          running.delete(out);
-        }),
-        wait(260 / speed),
-      ]);
-      if (id === run) from.classList.remove('unit--acting');
-      return;
-    }
-
-    const magic = actor.strike === 'magic';
-    playSound(magic ? 'magic' : 'shot');
-    await animate(from, [{ transform: 'scale(1)' }, { transform: 'scale(1.08)' }, { transform: 'scale(1)' }], { duration: 160 });
-    if (id !== run) return;
-    const bolt = h('span', {
-      class: ['projectile', `projectile--${magic ? 'magic' : 'arrow'}`, style.big && 'projectile--big', style.glow && 'projectile--glow'].filter(Boolean).join(' '),
-    });
-    if (magic || style.color) bolt.style.setProperty('--fx', style.color ?? elementColor(actor.element));
-    fx.append(bolt);
-    const angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
-    await animate(
-      bolt,
-      [
-        { transform: `translate(${a.x}px, ${a.y}px) rotate(${angle}deg) scale(0.6)`, opacity: 0 },
-        { opacity: 1, offset: 0.15 },
-        { transform: `translate(${b.x}px, ${b.y}px) rotate(${angle}deg) scale(1)`, opacity: 1 },
-      ],
-      { duration: magic ? 340 : 260, easing: 'ease-in' },
-    );
-    bolt.remove();
-    if (id !== run) return;
-    onImpact();
-    await wait(300 / speed);
-  }
+  // The blows' look (arena-fx.js, the author's pick 892 C „Kinowe”): the
+  // strikes and their impacts, the numbers, dodges, heals and falls, and the
+  // camera over the stage.
+  const fxs = createFx({
+    arena,
+    stage,
+    fx,
+    cards,
+    animate,
+    track,
+    later,
+    pace,
+    run: () => run,
+    reduced: reducedMotion,
+    playSound,
+    elementColor,
+    setDilation: (value) => {
+      dilation = value;
+    },
+  });
+  // A number over a card: a blow's damage, a heal, a dodge, an effect.
+  const float = fxs.number;
 
   const skills = skillEffects({
     animate,
-    centerOf,
+    boxOf: fxs.boxOf,
+    centerOf: fxs.centerOf,
     cards,
     fx,
-    arena,
+    arena: stage,
     row: (side) => (side === 'enemy' ? enemies : party),
     reduced: reducedMotion,
-    wait: (ms) => wait(ms / speed),
+    wait: later,
     setHp,
     float,
   });
@@ -358,6 +266,8 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
   // tick of an effect that opens its move. Then its card shows again what it
   // showed before.
   const held = new Map(); // unit id → { text, before }
+  // The fight's last blow is playing in slow motion until its fall.
+  let finale = false;
   function hold(id, text) {
     const entry = cards.get(id);
     if (!entry) return;
@@ -539,12 +449,19 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       // A skill wakes: a sweep's wave over the foes, or an aura on its user.
       if (!event.targets) skills.status(event.actor, event.skillName);
       if (event.shield !== undefined) shieldUp(event);
-      await skills.cast(acting);
+      const casting = skills.cast(acting);
+      const look = lookOf(acting);
+      fxs.cast(acting, look);
+      if (!event.targets) fxs.glint(acting.actor, look.color);
+      await casting;
       line();
       return;
     }
     if (event.kind === 'heal') {
       if (event.armor) guardUp(event);
+      const look = lookOf(event);
+      if (look.cast === 'guard') fxs.glint(event.target, look.color);
+      else fxs.heal(event.target);
       await skills.heal(event);
       line();
       return;
@@ -559,13 +476,14 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       const text = { mana: t('+{amount} many', { amount: event.amount }), cure: `−${event.cleared}` }[event.effect] ?? `+${event.amount}`;
       float(event.target, text, 'heal', 0, color === '#a7c47f' ? null : color);
       line();
-      await flash(event.target, color, tint(color, 0.25));
+      fxs.heal(event.target, color === '#a7c47f' ? null : color);
+      await later(420);
       return;
     }
     if (event.kind === 'fade') {
       stanceDown(event);
       line();
-      await wait(200 / speed);
+      await later(200);
       return;
     }
     if (event.kind === 'stun') {
@@ -585,7 +503,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
         flash(id, color, tint(color, 0.25));
       }
       line();
-      await wait(320 / speed);
+      await later(320);
       return;
     }
     // Wysysanie: the monster takes back HP from the wound it made.
@@ -593,7 +511,8 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       setHp(event.target, event.hp);
       float(event.target, `+${event.amount}`, 'heal');
       line();
-      await flash(event.target, '#a7c47f', 'rgba(167, 196, 127, 0.25)');
+      fxs.heal(event.target);
+      await later(420);
       return;
     }
     // A share of a blow thrown back (Niezłomny, Wyzwanie, Lustro many).
@@ -627,28 +546,26 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
         return;
       }
       if (event.state === 'hit') {
-        await strike(actor, decoy.unit, () => {
-          playHit(actor.sound, false);
-          summonState(event);
-          flash(decoy.unit.id, HIT_COLOR);
-          shake(decoy.unit.id, 5);
-          float(decoy.unit.id, `−${event.damage}`, 'hit');
-          line();
-        });
+        const blow = fxs.blow(event, actor, decoy.unit, null);
+        await fxs.strike(
+          actor,
+          decoy.unit,
+          () => {
+            playHit(actor.sound, false);
+            summonState(event);
+            fxs.hit(blow);
+            float(decoy.unit.id, `−${event.damage}`, 'hit');
+            line();
+          },
+          { blow },
+        );
         return;
       }
       const id = run;
       setHp(decoy.unit.id, 0);
       decoy.down = true;
       line();
-      await animate(
-        decoy.card,
-        [
-          { opacity: 1, filter: 'grayscale(0)', transform: 'scale(1)' },
-          { opacity: 0.4, filter: 'grayscale(1)', transform: 'scale(0.93)' },
-        ],
-        { duration: 420, easing: 'ease-in' },
-      );
+      await fxs.fall(decoy.card);
       if (id === run) setDown(decoy.unit.id, true);
       return;
     }
@@ -657,33 +574,42 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       effectOver(event);
       float(event.target, `−${event.cleared}`, 'heal');
       line();
-      await wait(240 / speed);
+      await later(240);
       return;
     }
     // A skill's blow shows its look; a sweep's blows land at once, as its
     // wave has already crossed the foes.
     const look = event.skill ? lookOf(event) : null;
     const style = look ? { color: look.color, big: look.big, glow: look.glow, teleport: look.teleport } : {};
+    // The blow: its kind, whether it fells its target and whether it ends
+    // the fight (that one plays in slow motion).
+    const blow = MOVES.has(event.kind) && target ? fxs.blow(event, actor, target, look, endingOf(event)) : null;
+    if (blow) style.blow = blow;
     const land = async (onImpact) => {
       if (event.sweep) {
         onImpact();
-        await wait(240 / speed);
+        await later(240);
         return;
       }
       if (event.counter) skills.callout(actor.id, t('Kontra'), '#a690e8');
-      if (look) skills.before(acting);
-      await strike(actor, target, onImpact, style);
+      if (look) {
+        skills.before(acting);
+        fxs.charge(actor.id, look.color);
+      }
+      await fxs.strike(actor, target, onImpact, style);
     };
     if (event.kind === 'hit' || event.kind === 'crit') {
       const strong = event.kind === 'crit';
+      if (blow?.final) {
+        finale = true;
+        fxs.slowMotion(true);
+      }
       await land(() => {
         playHit(actor.sound, strong);
         // Not every blow draws a cry: every critical one, half of the others.
         if (strong || Math.random() < 0.5) playVoice(voiceOf(target), 'hurt');
         setHp(target.id, event.hp);
-        flash(target.id, strong ? '#e0a03c' : HIT_COLOR, strong ? 'rgba(224, 160, 60, 0.45)' : undefined);
-        shake(target.id, strong || look?.impact === 'heavy' ? 8 : 5);
-        slash(target.id, strong);
+        fxs.hit(blow);
         if (look && !event.sweep) skills.impact(event);
         float(target.id, strong ? `−${event.damage}!` : `−${event.damage}`, strong ? 'crit' : 'hit');
         if (event.absorbed) float(target.id, t('osłona {amount}', { amount: event.absorbed }), 'absorb');
@@ -697,7 +623,10 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
         playMoment('dodge');
         float(target.id, event.blocked ? t('blok') : t('unik'), 'dodge');
         const card = cards.get(target.id).card;
-        if (!reducedMotion()) {
+        // A dodge steps aside; a blocked blow only nudges its target.
+        if (!event.blocked) {
+          fxs.dodge(target, actor);
+        } else if (!reducedMotion()) {
           animate(card, [{ transform: 'translateX(0)' }, { transform: 'translateX(16px)' }, { transform: 'translateX(0)' }], {
             duration: 300,
             easing: 'ease-out',
@@ -714,6 +643,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       playSound('effect');
       cards.get(target.id).status.textContent = event.effect;
       float(target.id, event.effect, 'effect', 0, effectColor(event.effect));
+      fxs.tick(target.id, effectColor(event.effect));
       line();
       await flash(target.id, color, tint(effectColor(event.effect), 0.25));
       return;
@@ -723,6 +653,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       playSound('tick');
       setHp(target.id, event.hp);
       float(target.id, `−${event.damage}`, 'tick', 0, effectColor(event.effect));
+      fxs.tick(target.id, effectColor(event.effect));
       if (event.absorbed) float(target.id, t('osłona {amount}', { amount: event.absorbed }), 'absorb');
       shieldLeft(target.id, event.shield);
       effectOver(event);
@@ -737,19 +668,31 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       setHp(target.id, 0);
       fallen(target.id);
       line();
-      const card = cards.get(target.id).card;
-      await animate(
-        card,
-        [
-          { opacity: 1, filter: 'grayscale(0)', transform: 'scale(1)' },
-          { opacity: 0.4, filter: 'grayscale(1)', transform: 'scale(0.93)' },
-        ],
-        { duration: 420, easing: 'ease-in' },
-      );
-      if (id === run) setDown(target.id, true);
+      await fxs.fall(cards.get(target.id).card);
+      if (id !== run) return;
+      setDown(target.id, true);
+      if (finale) {
+        finale = false;
+        fxs.slowMotion(false);
+        await later(300);
+      }
       return;
     }
     line();
+  }
+
+  // Whether a blow fells its target (its kill follows in the same moment)
+  // and whether it is the fight's last blow (no move and no kill after it).
+  function endingOf(event) {
+    const at = fight.events.indexOf(event);
+    for (let next = at + 1; next < fight.events.length; next++) {
+      const coming = fight.events[next];
+      if (coming.t !== event.t || MOVES.has(coming.kind)) break;
+      if (coming.kind === 'kill' && coming.target === event.target) {
+        return { killing: true, final: !fight.events.slice(next + 1).some((rest) => MOVES.has(rest.kind) || rest.kind === 'kill') };
+      }
+    }
+    return { killing: false, final: false };
   }
 
   // The state right after an event, without animation (for "Pomiń").
@@ -779,6 +722,8 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     for (const animation of running) animation.cancel();
     running.clear();
     fx.replaceChildren();
+    fxs.cancel();
+    finale = false;
     for (const { card } of cards.values()) card.classList.remove('unit--acting');
   }
 
@@ -819,7 +764,7 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
       index += 1;
       await show(event);
       if (id !== run) return;
-      await wait(140 / speed);
+      await later(140);
     }
     if (id !== run) return;
     showResult(true);
