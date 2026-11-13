@@ -875,6 +875,11 @@
       "id": "0.3.24",
       "title": "Wersja 0.3.24",
       "body": "- Arkanista: żywiołak powstaje z many. Przywołanie kosztuje 25% maks. many, a żywiołak ma tyle HP, ile wynosi 40% maks. many postaci. Mądrość daje teraz trwalszego żywiołaka, a regeneracja many z Arkany odnawia koszt między przywołaniami.\n- Druid i Arcydruid: Ent, Niedźwiedź, Prastary dąb i Żubr też biorą HP z maks. many i kosztują 25% maks. many.\n- Nowe tło ekranu logowania: skraj puszczy o zmroku."
+    },
+    {
+      "id": "0.3.25",
+      "title": "Wersja 0.3.25",
+      "body": "- Karty na żywo: wysłane wyzwanie możesz wycofać, a na pierwszy ruch każdej rundy masz 35 sekund.\n- Szczęsny: gdy wszystkie karty danej rzadkości masz już na 5. poziomie, za pierwszą wygraną na stopniu zgarniasz jego stawkę w złocie.\n- Wynik Loterii pojawia się też na kanale English, po angielsku.\n- Wyprawy: walki liczą Twój poziom z chwili wyruszenia, nawet gdy w trakcie awansujesz.\n- Walka: przy zaznaczonym „Z drużyną” widać, że zagrożenie jest liczone dla Ciebie samego.\n- Warzenie: przerwane warzenie czeka, aż zioła zmieszczą się w plecaku.\n- Wiele drobnych poprawek: drużyna, Tablica zleceń, Przechowalnia, Labirynt, gildie i znajomi."
     }
   ]
 }
