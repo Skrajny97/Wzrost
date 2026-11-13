@@ -3252,6 +3252,15 @@ Autor zaznaczył oceny na stronie ocen: „oceny zaznaczone”.
    - 894.8: zdanie przy zamkniętym Rdzeniu zostaje.
 5. **Odmowa przy tworzeniu postaci (brakujący szczegół).** Gdy serwer odmówi po „Rozpocznij” (np. imię zajęte), ekran przewija się do słów odmowy nad paskiem, bo przy przyklejonym przycisku mogłyby zostać poza ekranem.
 
+## Wpłaty do Siedziby Gildii zapisywane z osobna (897, 13.11.2026, w grze od 0.3.4)
+
+Autor: „Powinno być gdzieś wyszczególnione kto ile i czego wpłacił w Siedzibie Gildii oraz jakiś ranking”. Makiety rankingu członków czekają na stronie ocen (897). Gra zapisywała dotąd tylko sumy wpłat na każdy budynek, więc spis wpłat zaczyna się od zapisu, i to zapis wchodzi pierwszy, bez zmian na ekranie:
+
+1. Każda wpłata dopisuje się do wiersza członka, budynku i tygodnia (polski tydzień od poniedziałkowej północy, jak zadania tygodniowe): złoto i sztuki surowca budynku, sumowane (tabela `guild_seat_donations`).
+2. Członek, który odchodzi, zostawia swoje wiersze gildii, tak jak jego wpłaty zostają w budynkach. Gildia, która znika, zabiera wiersze ze sobą.
+3. Usunięta postać zostawia wiersze z ujemnym numerem, czyli niczyje, bo jej numer może dostać nowa postać.
+4. Wpłaty sprzed 0.3.4 są tylko w sumach budynków. Ranking pokaże je razem w ostatnim wierszu, jak na makiecie 897.2.
+
 ## Towarzysze ewoluują (896 A, 13.11.2026, w grze od 0.3.2)
 
 Autor: „Czy towarzyszom ewoluuje klasa i zmieniaja sie umiejetnosci? Bo powinny... skarżą sie ludzie ze najęci Klerycy nie leczą ich”. Modlitwa o zdrowie leczy tylko samego Kleryka, a całą drużynę leczy dopiero Odnowa Uzdrowiciela, czyli umiejętność ewolucji. Na stronie ocen autor wybrał 896 A i odrzucił 896 B. Zasady są w `src/engine/companions.js` (`companionForm`, `companionSkills`, `companionClassName`, `trackerMaterials`).
