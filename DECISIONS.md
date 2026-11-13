@@ -3233,6 +3233,24 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Labirynt jako osobna plansza i siła stworów na płytach (898, 899 A, 13.11.2026, w grze od 0.3.5)
+
+Autor: „tu miała się otwierać osobna plansza coś jak w AFK Arena Labirynt Arkanów” oraz „dużo scrollowania, nieintuicyjne... słabe wyzwanie”. Na stronie ocen autor przyjął makiety 898.1–898.4, grafiki 898.5–898.12 (płyta B, źródło C, reszta A) i wybrał 899 A. Plansza ma własny wygląd, nie kopię cudzej gry.
+
+1. **Wejście w Sali prób na jeden ekran.** Obraz z drzwiami („Wejdź do Labiryntu”, „Wróć do Labiryntu”), drużyna z HP i nagrody dnia. Drzwi otwierają planszę na cały ekran (`#/labirynt`).
+2. **Plansza.** Pasek z poziomem i czasem do nowego Labiryntu, posadzka z PixelLab (Piekielny ma własną), płyty komnat w rzędach od wejścia u dołu do strażnika na górze, drogi między nimi i drużyna, która idzie do wybranej komnaty. Na telefonie drużyna, błogosławieństwa, nagrody i zasady są w pasku na dole, na komputerze w bocznych kolumnach.
+3. **Płyty.** Na płycie z walką stoi pierwszy stwór komnaty (×N, gdy jest ich więcej), elita ma gwiazdkę, a pozostałe komnaty mają własne pionki: skarb, źródło, ołtarz i kupiec. Komnaty, do których można wejść, świecą i mają nazwę pod płytą. Stuknięcie otwiera kartę komnaty z przeciwnikami i przyciskiem „Wejdź”.
+4. **Obwódki siły stworów (899 A).** Płyta z walką, do której drużyna może jeszcze dojść, ma obwódkę: zieloną (łatwa), żółtą (wyrównana) albo czerwoną (groźna). Serwer liczy ją próbnymi walkami drużyny w jej obecnym stanie (HP, błogosławieństwa, towarzysze, trofea) z tymi samymi stworami i w tej samej sile co prawdziwa walka (`roomDanger` w `src/engine/labyrinth.js`): najpierw 3 walki, a gdy wynik jest niepewny, jeszcze 3.
+    - Czerwona: drużyna przegrywa co najmniej co czwartą próbną walkę (walka bez rozstrzygnięcia liczy się jak przegrana, tak jak w Labiryncie).
+    - Żółta: przegrywa rzadziej albo wygrywa kosztem co najmniej 40% HP, które miała przed walką.
+    - Zielona: pozostałe.
+    - Próbne walki mają własne ziarno (dzień i postać), więc obwódka nie miga przy odświeżeniu i nie zdradza wyniku prawdziwej walki, która ma ziarno osobne.
+    - Siła stworów się nie zmienia; obwódka tylko ją pokazuje.
+5. **Odłamki na płytach.** Elita i skarb pokazują, ile Odłamków Rdzenia dają na tym poziomie.
+6. **Teksty obwódek.** Autor napisał pierwszy: „Łatwa walka: Twoja drużyna powinna poradzić sobie bez problemu.” Pozostałe w tym samym stylu: „Wyrównana walka: Twoja drużyna raczej wygra, ale może stracić sporo HP.” i „Groźna walka: Twoja drużyna może przegrać, a porażka kończy dzisiejszy Labirynt.” Autor o wcześniejszej wersji: „Strasznie czasem kaleczysz ten język polski” (zasada w `CLAUDE.md`).
+7. **Wejście niżej (brakujący szczegół).** Wejście stoi niżej pod pierwszym rzędem, niż rzędy stoją od siebie, żeby czekająca tam drużyna nie zasłaniała nazw komnat.
+8. **Koszt (brakujący szczegół).** Obwódki liczą się tylko dla komnat przed drużyną. Lokalnie to ok. 2 ms na komnatę, czyli kilkadziesiąt ms na widok Labiryntu.
+
 ## Oceny autora 892–895 (13.11.2026; 893 i 894 w grze od 0.3.1, 892 i 895 od 0.3.3)
 
 Autor zaznaczył oceny na stronie ocen: „oceny zaznaczone”.

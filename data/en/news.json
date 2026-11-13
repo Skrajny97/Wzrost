@@ -616,6 +616,10 @@
     "0.3.3": {
       "title": "Version 0.3.3",
       "body": "- Fights have new hit animations: a blow lands on its target with force, the target is knocked back, a crit flashes with \"CRIT!\", and the fight's last blow slows down. Every fight in the game looks like this. With Animations off (Settings) nothing shakes or slows down.\n- The card game in the Games Parlour has animations: cards fly out and turn over on the table, blows come one by one with sparks, beaten cards crack, and the end of a match is a scene with Szczęsny and coins flying into your gold. Tapping the table ends a round's animation."
+    },
+    "0.3.5": {
+      "title": "Version 0.3.5",
+      "body": "- The Labyrinth has a board of its own: the door in the Trial Hall opens it full screen. It shows every chamber of the level, the roads between them and your party walking to the chamber you pick.\n- Fight platforms have a coloured ring: green is an easy fight, yellow an even one, red a dangerous one. The colour changes with your party, so wounds and blessings count too.\n- Elites and treasures show how many Core Shards they give."
     }
   }
 }

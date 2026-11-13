@@ -46,6 +46,20 @@ export const LABYRINTH_BOARD = '#/labirynt';
 // How long the party's figure walks from one platform to the next, in ms.
 const WALK_MS = 650;
 
+// The danger of a fight room against the party as it is now (899 A, the
+// server's roomDanger): the ring's colour, its name and words.
+const DANGER = {
+  get easy() {
+    return { name: t('łatwa walka'), text: t('Łatwa walka: Twoja drużyna powinna poradzić sobie bez problemu.') };
+  },
+  get even() {
+    return { name: t('wyrównana walka'), text: t('Wyrównana walka: Twoja drużyna raczej wygra, ale może stracić sporo HP.') };
+  },
+  get deadly() {
+    return { name: t('groźna walka'), text: t('Groźna walka: Twoja drużyna może przegrać, a porażka kończy dzisiejszy Labirynt.') };
+  },
+};
+
 // The entrance in the Sala prób.
 export function mountLabyrinth(container, { navigate }) {
   return mountView(container, { navigate, board: false });
@@ -177,7 +191,9 @@ function mountView(container, { navigate, board }) {
   function gainsRow(compact = false) {
     const { xp, gold, shards, artifacts } = view.gains;
     const number = compact ? formatCompact : formatNumber;
-    const cell = (art, label, value, whole = value) => h('span', { class: 'labyrinth-gain', title: `${label}: ${whole}` }, art, h('span', { class: 'labyrinth-gain-value', text: value }), h('span', { class: 'labyrinth-gain-label', text: label }));
+    // In the entrance's compact row the names stay for screen readers only.
+    const cell = (art, label, value, whole = value) =>
+      h('span', { class: 'labyrinth-gain', title: `${label}: ${whole}` }, art, h('span', { class: 'labyrinth-gain-value', text: value }), h('span', { class: `labyrinth-gain-label${compact ? ' visually-hidden' : ''}`, text: label }));
     return h(
       'div',
       { class: 'labyrinth-gains-row' },
@@ -322,18 +338,24 @@ function mountView(container, { navigate, board }) {
     const rule = roomRule(room.type);
     const guardian = room.type === 'guardian';
     const status = here ? t('tu stoi drużyna') : open ? t('można wejść') : done ? t('zdobyta') : past ? t('ominięta') : null;
+    // The danger of a fight still ahead (899 A) and the Odłamki of an elite or
+    // a treasure not taken yet.
+    const ring = !here && !done && !past && DANGER[room.danger] ? room.danger : null;
+    const shards = !here && !done && !past && room.shards > 0;
     const button = h(
       'button',
       {
         type: 'button',
         class: ['lab-tile', `lab-tile--${room.type}`, here && 'lab-tile--here', open && 'lab-tile--open', done && 'lab-tile--done', past && 'lab-tile--past'].filter(Boolean).join(' '),
-        'aria-label': [rule?.name ?? room.type, room.foes?.length > 0 && room.foes.map((foe) => foe.name).join(', '), status].filter(Boolean).join(', '),
+        'aria-label': [rule?.name ?? room.type, room.foes?.length > 0 && room.foes.map((foe) => foe.name).join(', '), ring && DANGER[room.danger].name, shards && t('Odłamki Rdzenia: {count}', { count: room.shards }), status].filter(Boolean).join(', '),
         onClick: () => (open ? roomSheet(row, index, room) : roomInfo(room)),
       },
       h('span', { class: 'lab-tile-base', 'aria-hidden': 'true' }),
+      ring && h('span', { class: `lab-tile-ring lab-tile-ring--${ring}`, 'aria-hidden': 'true' }),
       !here && !done && h('span', { class: `lab-tile-piece${fightRoom(room.type) && room.foes?.length > 0 ? '' : ' lab-tile-piece--art'}`, 'aria-hidden': 'true' }, piece(room)),
       !here && !done && room.foes?.length > 1 && h('span', { class: 'lab-tile-count', 'aria-hidden': 'true', text: `×${room.foes.length}` }),
       room.type === 'elite' && !done && !here && h('span', { class: 'lab-tile-mark', 'aria-hidden': 'true' }, icon('star', { size: 12 })),
+      shards && h('span', { class: 'lab-tile-shards', 'aria-hidden': 'true' }, labyrinthArt('shards', 14, icon('core', { size: 12 })), formatNumber(room.shards)),
       open && h('span', { class: 'lab-tile-name', text: rule?.name ?? room.type }),
       done && !here && h('span', { class: 'lab-tile-check', 'aria-hidden': 'true' }, icon('check', { size: 14 })),
     );
@@ -465,6 +487,12 @@ function mountView(container, { navigate, board }) {
     return h(
       'ul',
       { class: 'lab-legend', 'aria-label': t('Komnaty') },
+      h(
+        'li',
+        { class: 'lab-legend-danger' },
+        h('span', { class: 'lab-danger-swatches', 'aria-hidden': 'true' }, Object.keys(DANGER).map((level) => h('span', { class: `lab-danger-swatch lab-danger-swatch--${level}` }))),
+        h('span', null, h('strong', { text: t('Kolor obwódki') }), ' ', h('span', { class: 'muted', text: t('Pokazuje, jak trudna będzie walka dla Twojej drużyny: zielona – łatwa, żółta – wyrównana, czerwona – groźna.') })),
+      ),
       types.map((type) => {
         const rule = roomRule(type);
         return h('li', null, roomArt(type), h('span', null, h('strong', { text: rule?.name ?? type }), ' ', h('span', { class: 'muted', text: rule?.text ?? '' })));
@@ -552,11 +580,17 @@ function mountView(container, { navigate, board }) {
   const foesLine = (room) =>
     room.foes?.length > 0 && h('p', { class: 'sheet-text', text: t('Przeciwnicy: {foes}.', { foes: room.foes.map((foe) => t('{name} (poz. {level})', { name: foe.name, level: foe.level })).join(', ') }) });
 
+  // How the room's creatures stand against the party now (899 A), and the
+  // Odłamki an elite or a treasure gives.
+  const dangerLine = (room) =>
+    DANGER[room.danger] && h('p', { class: `sheet-text lab-danger lab-danger--${room.danger}` }, h('span', { class: 'lab-danger-dot', 'aria-hidden': 'true' }), DANGER[room.danger].text);
+  const shardsLine = (room) => room.shards > 0 && h('p', { class: 'sheet-text', text: t('Odłamki Rdzenia: {count}.', { count: formatNumber(room.shards) }) });
+
   // A room not open now: what it is, and who waits in it.
   function roomInfo(room) {
     const rule = roomRule(room.type);
     if (!rule) return;
-    openSheet(h('h2', { class: 'sheet-title sheet-title--art' }, roomArt(room.type), rule.name), h('p', { class: 'sheet-text', text: rule.text }), foesLine(room));
+    openSheet(h('h2', { class: 'sheet-title sheet-title--art' }, roomArt(room.type), rule.name), h('p', { class: 'sheet-text', text: rule.text }), shardsLine(room), foesLine(room), dangerLine(room));
   }
 
   // A room open next: what waits there, and the way in.
@@ -565,7 +599,9 @@ function mountView(container, { navigate, board }) {
     openSheet(
       h('h2', { class: 'sheet-title sheet-title--art' }, roomArt(room.type), rule?.name ?? room.type),
       h('p', { class: 'sheet-text', text: rule?.text ?? '' }),
+      shardsLine(room),
       foesLine(room),
+      dangerLine(room),
       h(
         'div',
         { class: 'sheet-actions' },
@@ -717,7 +753,11 @@ function mountView(container, { navigate, board }) {
 // Where the middle of a lane of the board is, in % of its height from the
 // top: the lanes between a margin above the guardian's (its tall piece and
 // platform) and one below the entrance (the words over the board's foot).
-const laneY = (lane, lanes) => 9 + ((lane + 0.5) / lanes) * 82;
+// The entrance, the last lane, stands ENTRANCE_GAP of a lane further below
+// the first row than the rows stand apart, so the party waiting there
+// leaves the first row's names in sight.
+const ENTRANCE_GAP = 0.8;
+const laneY = (lane, lanes) => 9 + ((lane + 0.5 + (lane === lanes - 1 ? ENTRANCE_GAP : 0)) / (lanes + ENTRANCE_GAP)) * 82;
 
 // The time to the next Polish midnight, when a new Labirynt comes: "5 h 12
 // min", "40 min".

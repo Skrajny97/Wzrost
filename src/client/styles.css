@@ -20602,8 +20602,10 @@ a.discord-button {
   margin: 0;
 }
 
+/* The day's rewards one under another beside the party: big numbers
+   (+987,7 tys.) keep the whole width of the column. */
 .labyrinth-entry .labyrinth-gains-row {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 4px;
 }
 
@@ -20614,12 +20616,17 @@ a.discord-button {
   padding: 4px 6px;
 }
 
-.labyrinth-entry .labyrinth-gain-label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
+/* On the narrowest phones the party stands over the day's rewards, two
+   by two, so the rewards' numbers keep their room (+9,9 mln was cut at
+   320 px). */
+@media (max-width: 379px) {
+  .labyrinth-entry {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .labyrinth-entry .labyrinth-gains-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .labyrinth-over {
@@ -20935,7 +20942,7 @@ a.discord-button {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: calc(var(--lanes) * 68px);
+  min-height: calc((var(--lanes) + 0.8) * 68px);
   background:
     radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.55)),
     url('/art/labyrinth/board-floor.png') center / cover no-repeat,
@@ -21136,6 +21143,124 @@ a.discord-button {
   left: 8%;
   border-color: rgba(255, 88, 88, 0.8);
   color: #ff9a9a;
+}
+
+/* The danger of a fight room still ahead (899 A): a ring over the
+   platform's inlay in the colour of how its creatures stand against the
+   party now. The box is the platform's (.lab-tile-base), the ring on its
+   top face; outside the base, so the Piekielny's hue turn leaves it be. */
+.lab-tile-ring {
+  --ring: var(--lab-easy);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 66%;
+  pointer-events: none;
+}
+
+.lab-tile-ring::before {
+  content: '';
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  width: 80%;
+  height: 41%;
+  border: 2px solid var(--ring);
+  border-radius: 50%;
+  box-shadow:
+    0 0 6px var(--ring),
+    inset 0 0 5px var(--ring);
+  transform: translate(-50%, -50%);
+}
+
+.lab-tile--guardian .lab-tile-ring::before {
+  top: 51%;
+  width: 62%;
+  height: 27%;
+}
+
+.lab-tile-ring--even {
+  --ring: var(--lab-even);
+}
+
+.lab-tile-ring--deadly {
+  --ring: var(--lab-deadly);
+}
+
+:root {
+  --lab-easy: #6ee07a;
+  --lab-even: #f5cf4e;
+  --lab-deadly: #ff5b52;
+}
+
+/* The Odłamki of an elite or a treasure not taken yet. */
+.lab-tile-shards {
+  position: absolute;
+  top: 6%;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 18px;
+  padding: 0 6px 0 3px;
+  border: 1px solid var(--system-line);
+  border-radius: 9px;
+  background: rgba(6, 12, 15, 0.9);
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 11px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.lab-tile-shards .labyrinth-art,
+.lab-tile-shards .labyrinth-art img {
+  width: 14px !important;
+  height: 14px !important;
+}
+
+/* The danger in a room's sheet and the rings in the legend. */
+.lab-danger {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.lab-danger-dot,
+.lab-danger-swatch {
+  flex: none;
+  width: 14px;
+  height: 9px;
+  margin-top: 0.3em;
+  border: 2px solid var(--lab-easy);
+  border-radius: 50%;
+  box-shadow: 0 0 4px var(--lab-easy);
+}
+
+.lab-danger--even .lab-danger-dot,
+.lab-danger-swatch--even {
+  border-color: var(--lab-even);
+  box-shadow: 0 0 4px var(--lab-even);
+}
+
+.lab-danger--deadly .lab-danger-dot,
+.lab-danger-swatch--deadly {
+  border-color: var(--lab-deadly);
+  box-shadow: 0 0 4px var(--lab-deadly);
+}
+
+.lab-danger-swatches {
+  display: inline-flex;
+  flex: none;
+  gap: 3px;
+  width: 32px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.lab-danger-swatches .lab-danger-swatch {
+  margin-top: 0;
 }
 
 .lab-tile-name {
