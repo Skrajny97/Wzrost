@@ -5,7 +5,7 @@ import { accountNameHintSeen, confirmAge, deleteAccount, login, logout, me, regi
 import { authorPanel, authorSkillDemo, authorSkills, bugReportImage, resolveBugReport } from './author.js';
 import { authorNews, deleteNews, dismissDraft, editNews, listNews, publishNews, seeNews } from './news.js';
 import { BUG_IMAGE, reportBug } from './bugs.js';
-import { getOnline } from './online.js';
+import { getOnline, getOnlinePlayers } from './online.js';
 import { buyAvatar, cancelAvatar, claimAvatar } from './avatar.js';
 import { openBestiaryChest } from './bestiary.js';
 import { openEncyclopediaChest, readEncyclopedia } from './encyclopedia.js';
@@ -169,6 +169,7 @@ const routes = [
   ['POST', '/api/author/news/dismiss', dismissDraft],
   ['GET', '/api/news', listNews],
   ['GET', '/api/online', getOnline],
+  ['GET', '/api/online/players', getOnlinePlayers],
   ['POST', '/api/news/seen', seeNews],
   ['GET', '/api/author/skills/:id', authorSkillDemo],
   ['POST', '/api/author/chat/unmute', unmuteInChat],

@@ -11278,6 +11278,62 @@ a.profession-square:active {
   transition: none;
 }
 
+/* Under the slid-out count, "Lista" opens the list of the players online
+   (online.js): a tab like the count's, with the players' icon. */
+.online-list-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 6px 10px 6px 10px;
+  border: 1px solid var(--line);
+  border-right: 0;
+  border-radius: 10px 0 0 10px;
+  background: var(--bg-deep);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  color: var(--gold);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* The list in its sheet: one player a line, as the chat names its writer;
+   a long account's name gives way first, the level stays at the right. */
+.online-players {
+  display: grid;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.online-player {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  min-width: 0;
+  padding: 6px 4px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+}
+
+.online-player .chat-name {
+  max-width: 100%;
+}
+
+.online-player-level {
+  margin-left: auto;
+}
+
+/* The player's own line, lit as the own row of the Ranking. */
+.online-player--own {
+  background: rgba(143, 227, 239, 0.08);
+}
+
+.online-more {
+  margin-top: 8px;
+}
+
 /* The way back to the hidden round chat button (chat-bubble.js): a tab like
    the players online, with the chat's bubble, and the gold dot of news. */
 .chat-back {
