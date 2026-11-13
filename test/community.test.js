@@ -110,6 +110,26 @@ describe('Społeczność: Ranking, Znajomi i Upominek', () => {
     assert.equal((await call('GET', '/api/profile/Ola', { cookie: players.ala })).data.profile.relation, null);
   });
 
+  // The author's 921 A (13.11.2026): as with a guild's and a party's
+  // invitation, none while either of the two has hidden the other in chat.
+  test('no friend invitation while either of the two has hidden the other in the chat', async () => {
+    const database = await db();
+    const account = async (name) => (await database.prepare('SELECT user_id FROM characters WHERE name = ?').bind(name).first()).user_id;
+    const [ala, ola] = [await account('Ala'), await account('Ola')];
+    const hide = (who, whom) => database.prepare('INSERT INTO chat_blocks (user_id, blocked_id, name, created_at) VALUES (?, ?, ?, ?)').bind(who, whom, 'x', Date.now()).run();
+    // Ola hid Ala: Ala's invitation is refused, and so is Ola's own.
+    await hide(ola, ala);
+    const refused = await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'Ola' } });
+    assert.equal(refused.status, 409);
+    assert.equal(refused.data.error.code, 'blocked');
+    assert.equal(refused.data.error.message, 'Ola nie przyjmuje teraz zaproszeń od Ciebie.');
+    assert.equal((await call('POST', '/api/friends/invite', { cookie: players.ola, body: { name: 'Ala' } })).data.error.code, 'blocked');
+    assert.deepEqual((await friends(players.ola)).incoming, []);
+    // Hidden no more: the invitation goes.
+    await database.prepare('DELETE FROM chat_blocks').run();
+    assert.equal((await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'Ola' } })).status, 200);
+  });
+
   test('an invitation both ways is a friendship, and nobody below the Społeczność can be invited', async () => {
     await call('POST', '/api/friends/invite', { cookie: players.ala, body: { name: 'Ola' } });
     const back = await call('POST', '/api/friends/invite', { cookie: players.ola, body: { name: 'Ala' } });

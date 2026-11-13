@@ -240,6 +240,14 @@ export async function inviteFriend(context) {
   if (!isUnlocked('community', target.level, content())) {
     throw new ApiError(409, 'locked', `${target.name} nie ma jeszcze Społeczności. Otworzy się na ${content().unlocksById.community.level}. poziomie.`);
   }
+  // Refused when either of the two has hidden the other in the chat, as an
+  // invitation to a guild or a party is (the author's 921 A, 13.11.2026: a
+  // hidden player could invite again after every "Odrzuć").
+  const blocked = await db
+    .prepare('SELECT 1 FROM chat_blocks WHERE (user_id = ? AND blocked_id = ?) OR (user_id = ? AND blocked_id = ?)')
+    .bind(target.user_id, session.userId, session.userId, target.user_id)
+    .first();
+  if (blocked) throw new ApiError(409, 'blocked', `${target.name} nie przyjmuje teraz zaproszeń od Ciebie.`);
   const existing = await db
     .prepare('SELECT id, character_id, accepted_at FROM friends WHERE (character_id = ? AND friend_id = ?) OR (character_id = ? AND friend_id = ?)')
     .bind(character.id, target.id, target.id, character.id)
