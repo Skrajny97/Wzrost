@@ -10,7 +10,7 @@ import { content } from './content.js';
 import { characterView, currentHp, loadPlayer, questsNow, requirePlayer, requireWorker, workOf } from './characters.js';
 import { cardSummary, cardUpserts, workCard } from './cards.js';
 import { toHex } from './encoding.js';
-import { raced } from './atomic.js';
+import { characterChanged, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
 import { addTo, alreadyClaimed, requireProfessions, takeFromBag, workClaim, workClaimFailed, workGains } from './professions.js';
 import { workFamePoints } from './fame.js';
@@ -56,6 +56,11 @@ export async function startMining(context) {
               .bind(row.id, 'minerals', mining.place.id, body.minutes, now, ends, seed, options),
           ]
         : [
+            // The HP rested so far is computed from the row read: the start
+            // holds only while it is as read, so a healing potion drunk or a
+            // level that heals at the same moment is not undone (the code
+            // review, 13.11.2026; atomic.js).
+            sameVersion(db, row),
             db
               .prepare(
                 'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -66,6 +71,7 @@ export async function startMining(context) {
           ],
     );
   } catch (error) {
+    if (raced(error)) throw characterChanged();
     if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', avatar ? content().avatar.texts.busy[0] : 'Postać jest już zajęta.');
     throw error;
   }
