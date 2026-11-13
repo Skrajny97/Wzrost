@@ -340,7 +340,7 @@ export function publicContent() {
     // and the words of its page.
     cosmetics: { items: game.cosmetics, texts: game.cosmeticTexts },
     giftTexts: game.giftTexts,
-    elements: game.elements.map(({ id, name, resistance, color }) => ({ id, name, resistance, color })),
+    elements: game.elements.map(({ id, name, resistance, from, color }) => ({ id, name, resistance, from, color })),
     effects: game.effects.map(({ id, name, color }) => ({ id, name, color })),
     slots: game.slots,
     rarities: game.rarities.map(({ id, name, forms, color }) => ({ id, name, forms, color })),

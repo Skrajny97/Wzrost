@@ -2,34 +2,42 @@
   "$comment": "English texts of data/elements.json, by the element's id (src/engine/overlay.js).",
   "fire": {
     "name": "fire",
-    "resistance": "Fire resistance"
+    "resistance": "Fire resistance",
+    "from": "from fire"
   },
   "frost": {
     "name": "frost",
-    "resistance": "Frost resistance"
+    "resistance": "Frost resistance",
+    "from": "from frost"
   },
   "water": {
     "name": "water",
-    "resistance": "Water resistance"
+    "resistance": "Water resistance",
+    "from": "from water"
   },
   "lightning": {
     "name": "lightning",
-    "resistance": "Lightning resistance"
+    "resistance": "Lightning resistance",
+    "from": "from lightning"
   },
   "earth": {
     "name": "earth",
-    "resistance": "Earth resistance"
+    "resistance": "Earth resistance",
+    "from": "from earth"
   },
   "nature": {
     "name": "nature",
-    "resistance": "Nature resistance"
+    "resistance": "Nature resistance",
+    "from": "from nature"
   },
   "poison": {
     "name": "poison",
-    "resistance": "Poison resistance"
+    "resistance": "Poison resistance",
+    "from": "from poison"
   },
   "sacred": {
     "name": "sacred",
-    "resistance": "Sacred resistance"
+    "resistance": "Sacred resistance",
+    "from": "from the sacred"
   }
 }

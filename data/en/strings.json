@@ -2362,6 +2362,7 @@
   "spowolniony": "slowed",
   "Odbicie": "Reflect",
   "Kontra": "Counter",
+  ", w tym {damage} {from}": ", {damage} of it {from}",
   "osłona {amount}": "shield {amount}",
   "blok": "block",
   "Pomiń": "Skip",
