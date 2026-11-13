@@ -612,6 +612,10 @@
     "0.3.2": {
       "title": "Version 0.3.2",
       "body": "- Companions evolve: at their 50th, 100th and 200th level they take the form of the path of the first skill on their card by themselves, with its name, trait and two skills. A hired Cleric with Prayer for Health becomes a Healer and heals the whole party with Renewal. Their look stays their own, and those already at level 50 have evolved at once.\n- The Storeroom in the Workshop and the Gem Workshop: the marked item shows a comparison with what the character wears in that place."
+    },
+    "0.3.3": {
+      "title": "Version 0.3.3",
+      "body": "- Fights have new hit animations: a blow lands on its target with force, the target is knocked back, a crit flashes with \"CRIT!\", and the fight's last blow slows down. Every fight in the game looks like this. With Animations off (Settings) nothing shakes or slows down.\n- The card game in the Games Parlour has animations: cards fly out and turn over on the table, blows come one by one with sparks, beaten cards crack, and the end of a match is a scene with Szczęsny and coins flying into your gold. Tapping the table ends a round's animation."
     }
   }
 }

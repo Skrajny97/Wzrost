@@ -3641,18 +3641,35 @@ summary {
 .arena {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 10px 8px;
+  overflow: clip;
   border: 1px solid var(--bark-line);
   border-radius: 4px;
   background: #141b11;
 }
 
+/* The rows and the effects stand on a stage inside the arena, which the
+   camera of the blows' look (arena-fx.js) shakes and zooms while the
+   arena's box stays and cuts off what reaches past it. */
+.arena-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 10px 8px;
+  border-radius: inherit;
+  transform-origin: 0 0;
+}
+
 /* The formation on a place's picture (790 B, the Arena's sand): the
-   picture a little darkened so the cards stay clear. */
+   picture a little darkened so the cards stay clear. The stage carries the
+   picture, so it moves with the cards. */
 .arena--board {
   background: linear-gradient(rgba(16, 21, 13, 0.35), rgba(16, 21, 13, 0.35)), var(--arena-board) center / cover no-repeat, #141b11;
   image-rendering: pixelated;
+}
+
+.arena--board > .arena-stage {
+  background: inherit;
 }
 
 .arena-row {
@@ -3823,9 +3840,11 @@ summary {
   display: none;
 }
 
+/* A fallen unit: grey, and as small as its fall left it. */
 .unit--down {
   filter: grayscale(1);
   opacity: 0.4;
+  transform: scale(0.94);
 }
 
 .unit--down::after {
@@ -3909,8 +3928,8 @@ summary {
   height: 3px;
   margin-top: -1.5px;
   border-radius: 2px;
-  background: #ffd8cc;
-  box-shadow: 0 0 6px rgba(239, 154, 133, 0.9);
+  background: color-mix(in srgb, var(--fx, #ffd8cc) 35%, #fff);
+  box-shadow: 0 0 7px var(--fx, #ef9a85);
   transform: rotate(-35deg);
 }
 
@@ -3923,8 +3942,6 @@ summary {
 .slash--strong::before,
 .slash--strong::after {
   height: 4px;
-  background: #ffe2a8;
-  box-shadow: 0 0 10px rgba(224, 160, 60, 0.95);
 }
 
 .slash--strong::before {
@@ -3935,37 +3952,6 @@ summary {
   display: block;
   margin-top: 4px;
   opacity: 0.75;
-}
-
-.float {
-  position: absolute;
-  z-index: 5;
-  font-family: var(--font-system);
-  font-size: 17px;
-  font-weight: 700;
-  pointer-events: none;
-  text-shadow: 0 1px 3px #000;
-  white-space: nowrap;
-}
-
-.float--hit {
-  color: #ffb3a3;
-}
-
-.float--crit {
-  color: var(--gold);
-  font-size: 22px;
-}
-
-.float--tick,
-.float--effect {
-  color: #c5e38f;
-  font-size: 13px;
-}
-
-.float--dodge {
-  color: var(--system);
-  font-size: 14px;
 }
 
 /* The result over the middle of the enemies' row, clear of our labels. */
@@ -8603,19 +8589,215 @@ button.skill-row {
   box-shadow: 0 0 0 2px var(--shield, #6fb6ff), 0 0 16px var(--shield, #6fb6ff);
 }
 
-.float--heal {
-  color: #b6e388;
+/* The blows' look (arena-fx.js, the author's pick 892 C „Kinowe”): the
+   specks' canvas over the stage, a card's light, the numbers, "KRYTYK!",
+   a blade's arc, lightning, the trails of arrows and spells, a dodge's
+   afterimage and swish, and the arena's darkened edges. */
+.arena-specks {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* A card lit for a moment in the colour of the blow. */
+.fx-tint {
+  position: absolute;
+  inset: -1px;
+  z-index: 2;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 42%, var(--fx) 0, color-mix(in srgb, var(--fx) 55%, transparent) 55%, transparent 100%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* The numbers: outlined, so they read over any picture. */
+.fx-num {
+  position: absolute;
+  z-index: 5;
+  color: #ffc9bb;
+  font-family: var(--font-system);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+  text-shadow:
+    1px 1px 0 #1a0f0b,
+    -1px 1px 0 #1a0f0b,
+    1px -1px 0 #1a0f0b,
+    -1px -1px 0 #1a0f0b,
+    0 2px 4px rgba(0, 0, 0, 0.8);
+  white-space: nowrap;
+}
+
+.fx-num--crit {
+  color: #ffd25e;
+  font-size: 26px;
+  text-shadow:
+    1px 1px 0 #3a1d00,
+    -1px 1px 0 #3a1d00,
+    1px -1px 0 #3a1d00,
+    -1px -1px 0 #3a1d00,
+    0 0 10px rgba(255, 170, 60, 0.85);
+}
+
+.fx-num--heal {
+  color: #c4ef93;
   font-size: 18px;
 }
 
-.float--absorb {
-  color: #9cc3e6;
+.fx-num--dodge {
+  color: var(--system-text);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fx-num--tick,
+.fx-num--effect,
+.fx-num--absorb {
   font-size: 13px;
 }
 
-.float--guard {
+.fx-num--tick,
+.fx-num--effect {
+  color: #c5e38f;
+}
+
+.fx-num--absorb {
+  color: #9cc3e6;
+}
+
+.fx-num--guard {
   color: var(--gold);
   font-size: 15px;
+}
+
+/* "KRYTYK!" stamped over a critical blow, gold on a sharp plate. */
+.fx-crit {
+  position: absolute;
+  z-index: 6;
+  padding: 2px 7px 3px;
+  border: 1px solid #ffe2a8;
+  background: linear-gradient(180deg, rgba(232, 168, 64, 0.96), rgba(150, 82, 18, 0.96));
+  box-shadow: 0 0 14px rgba(242, 193, 78, 0.75), 0 2px 0 rgba(0, 0, 0, 0.55);
+  color: #fff4d6;
+  font-family: var(--font-system);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  pointer-events: none;
+  text-shadow: 0 1px 0 #5a2d00;
+  white-space: nowrap;
+}
+
+/* A blade's arc, drawn along its line. */
+.fx-slash,
+.fx-bolts {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.fx-slash {
+  filter: drop-shadow(0 0 4px var(--fx));
+}
+
+.fx-slash path,
+.fx-bolts path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.fx-slash-glow {
+  stroke: var(--fx);
+  opacity: 0.6;
+}
+
+.fx-slash-core {
+  stroke: #fffaf0;
+}
+
+/* Lightning's jagged bolts. */
+.fx-bolts {
+  filter: drop-shadow(0 0 5px #f2e36b);
+}
+
+.fx-bolt-glow {
+  stroke: #f2e36b;
+  opacity: 0.65;
+}
+
+.fx-bolt-core {
+  stroke: #ffffff;
+}
+
+/* The path an arrow or a spell lit, and a tail behind it in flight. */
+.fx-trail {
+  position: absolute;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--fx) 60%, transparent) 55%, var(--fx));
+  pointer-events: none;
+  transform-origin: 0 50%;
+}
+
+.fx-trail--magic {
+  height: 4px;
+  box-shadow: 0 0 10px var(--fx);
+}
+
+.projectile--tail::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 50%;
+  width: 46px;
+  height: 4px;
+  margin-top: -2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--fx, #efe3c8));
+  opacity: 0.85;
+}
+
+.projectile--arrow.projectile--tail::before {
+  width: 34px;
+  height: 2px;
+  margin-top: -1px;
+}
+
+/* A dodge's afterimage: the card's light only, in the System's blue. */
+.fx-afterimage {
+  position: absolute;
+  margin: 0;
+  filter: grayscale(1) brightness(1.35) drop-shadow(0 0 6px #8fe3ef);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* The swish of a blow that found nobody. */
+.fx-swish {
+  position: absolute;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, rgba(223, 247, 255, 0.95) 60%, transparent);
+  box-shadow: 0 0 8px rgba(143, 227, 239, 0.8);
+  pointer-events: none;
+}
+
+/* The arena's edges darkening, a little in the blow's colour. */
+.fx-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  background: radial-gradient(ellipse 75% 70% at 50% 50%, transparent 45%, color-mix(in srgb, var(--fx, #000) 22%, rgba(5, 7, 4, 0.92)) 100%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* The author's preview of the skills: buttons by class, the arena below. */
@@ -13320,6 +13502,368 @@ button.tcard-slot {
 :root[data-layout='desktop'] .cards-tiers > .section-title,
 :root[data-layout='desktop'] .cards-tiers > p {
   grid-column: 1 / -1;
+}
+
+/* Talia Systemu's motion (cards-fx.js, the author's pick 895 C
+   „Widowiskowe”; none with the game's animations off): a layer over the
+   table for the blows' numbers, flashes and sparks, which the table clips;
+   the cards in flight over the page; Szczęsny's scene at the match's end;
+   the coins flying to the gold. */
+.cfx-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cfx-sparks {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cfx-hidden {
+  visibility: hidden !important;
+}
+
+.cfx-faded {
+  opacity: 0;
+}
+
+.cfx-raised {
+  z-index: 3;
+}
+
+/* A card picked in the reserve rises a little. */
+.cfx-on .tcard--picked {
+  animation: cfx-pick 160ms ease-out both;
+}
+
+@keyframes cfx-pick {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-5px);
+  }
+}
+
+/* A blow's number, "−N": in the type's colour at an advantage, gold by the
+   hero's skill, bigger when it beats the card. */
+.cfx-num {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  color: #ffd9cf;
+  font-family: var(--font-system);
+  font-size: calc(var(--tw) * 0.21);
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  text-shadow:
+    1px 0 0 #000,
+    -1px 0 0 #000,
+    0 1px 0 #000,
+    0 -1px 0 #000,
+    0 2px 5px rgba(0, 0, 0, 0.85);
+  opacity: 0;
+}
+
+.cfx-num--strength {
+  color: #ffb08f;
+}
+
+.cfx-num--dexterity {
+  color: #d3eaa9;
+}
+
+.cfx-num--intellect {
+  color: #c6d6ff;
+}
+
+.cfx-num--boost {
+  color: #ffe08a;
+  font-size: calc(var(--tw) * 0.24);
+}
+
+.cfx-num--lethal {
+  font-size: calc(var(--tw) * 0.25);
+}
+
+.cfx-num-type {
+  flex: none;
+  width: 0.78em;
+  height: 0.78em;
+  filter: drop-shadow(0 0 1px #000) drop-shadow(0 1px 1px #000);
+}
+
+.cfx-flash {
+  position: absolute;
+  border-radius: 8px;
+  background: radial-gradient(closest-side, var(--cfx-color, #ef9a85), transparent);
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+
+.cfx-ring {
+  position: absolute;
+  width: calc(var(--tw) * 0.62);
+  height: calc(var(--tw) * 0.62);
+  border: 3px solid var(--cfx-color, #f2c14e);
+  border-radius: 50%;
+  box-shadow:
+    0 0 10px var(--cfx-color, #f2c14e),
+    inset 0 0 8px var(--cfx-color, #f2c14e);
+  opacity: 0;
+}
+
+.cfx-halo {
+  position: absolute;
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 2px rgba(242, 193, 78, 0.9),
+    0 0 18px 6px rgba(242, 193, 78, 0.55);
+  opacity: 0;
+}
+
+/* The table's edges darkened while two cards are in focus, under the
+   cards. */
+.cfx-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(ellipse farthest-side at 50% 50%, transparent 40%, rgba(5, 7, 5, 0.55));
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* The crack over a card beaten. */
+.cfx-crack {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.cfx-crack-shade,
+.cfx-crack-line {
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.cfx-crack-shade {
+  stroke: rgba(0, 0, 0, 0.8);
+  stroke-width: 3.4;
+}
+
+.cfx-crack-line {
+  stroke: #fff4dc;
+  stroke-width: 1.4;
+}
+
+/* A card won: a shine across it, and a glow round a legendary,
+   mythic or divine one in its rarity's colour. */
+.cfx-shine {
+  position: absolute;
+  inset: calc(var(--tw) * -18 / 92) calc(var(--tw) * -17 / 92);
+  z-index: 4;
+  overflow: hidden;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.cfx-shine-band {
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: 0;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 252, 235, 0.6), transparent);
+  mix-blend-mode: screen;
+}
+
+.cfx-aura {
+  position: absolute;
+  inset: calc(var(--tw) * -18 / 92 - 4px) calc(var(--tw) * -17 / 92 - 4px);
+  z-index: 4;
+  border-radius: 8px;
+  box-shadow:
+    0 0 14px 4px var(--rarity, #f2c14e),
+    0 0 2px 1px var(--rarity, #f2c14e);
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* The cards in flight over the page (laid, dealt), and the coins. */
+.cfx-fly {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cfx-fly--top {
+  z-index: 75;
+}
+
+.cfx-fly .cfx-ghost {
+  position: absolute;
+  margin: 0;
+  pointer-events: none;
+}
+
+.cfx-card-back {
+  display: block;
+  border-radius: 4px;
+  background: url('/art/cards/back.png') center / 100% 100% no-repeat;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.55);
+  image-rendering: pixelated;
+}
+
+.cfx-coin {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff3b8, #f2c14e 45%, #b07a1e 80%);
+  box-shadow:
+    0 0 0 1px #6b4a12,
+    0 0 6px rgba(242, 193, 78, 0.7);
+}
+
+.cfx-gold-hold {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  background: var(--bg-deep);
+  white-space: nowrap;
+}
+
+/* The match's end as Szczęsny's scene over the table. */
+.cfx-end {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: radial-gradient(ellipse at 50% 45%, rgba(46, 34, 16, 0.9), rgba(6, 8, 6, 0.96) 75%);
+  opacity: 0;
+}
+
+.cfx-end-panel {
+  position: absolute;
+  right: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  text-align: center;
+}
+
+.cfx-end-panel p {
+  margin: 0;
+}
+
+.cfx-end-bust {
+  display: grid;
+  place-items: end center;
+  width: 112px;
+  height: 128px;
+  background: radial-gradient(ellipse 50% 46% at 50% 46%, rgba(242, 193, 78, 0.32), transparent);
+}
+
+.cfx-end-bust img {
+  width: 96px;
+  height: auto;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+  image-rendering: pixelated;
+}
+
+.cfx-end-name {
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cfx-end-title {
+  color: var(--system-text);
+  font-family: var(--font-system);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-shadow: 0 2px 4px #000;
+}
+
+.cfx-end--won .cfx-end-title {
+  color: var(--gold);
+  text-shadow:
+    0 0 16px rgba(242, 193, 78, 0.65),
+    0 2px 4px #000;
+}
+
+.cfx-end--lost .cfx-end-title {
+  color: var(--danger);
+}
+
+.cfx-end-words {
+  max-width: 30em;
+  color: var(--text);
+  font-size: 15px;
+  font-style: italic;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.cfx-end-rows {
+  display: grid;
+  gap: 2px;
+}
+
+.cfx-end-row {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.cfx-end-row strong {
+  color: var(--gold);
+  font-family: var(--font-system);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+:root[data-layout='desktop'] .cfx-end-bust {
+  width: 150px;
+  height: 171px;
+}
+
+:root[data-layout='desktop'] .cfx-end-bust img {
+  width: 128px;
+}
+
+:root[data-layout='desktop'] .cfx-end-title {
+  font-size: 42px;
+}
+
+:root[data-layout='desktop'] .cfx-end-words,
+:root[data-layout='desktop'] .cfx-end-row {
+  font-size: 17px;
 }
 
 .market-pick {

@@ -770,6 +770,11 @@
       "id": "0.3.2",
       "title": "Wersja 0.3.2",
       "body": "- Towarzysze ewoluują: na swoim 50., 100. i 200. poziomie sami przechodzą w formę ścieżki pierwszej umiejętności ze swojej karty, z jej nazwą, cechą i dwiema umiejętnościami. Najęty Kleryk z Modlitwą o zdrowie zostaje Uzdrowicielem i leczy całą drużynę Odnową. Wygląd zostaje ich własny, a ci, którzy mają już 50. poziom, ewoluowali od razu.\n- Przechowalnia w Warsztacie i w Szlifierni: pod zaznaczonym przedmiotem stoi porównanie z tym, co postać nosi w tym miejscu."
+    },
+    {
+      "id": "0.3.3",
+      "title": "Wersja 0.3.3",
+      "body": "- Walki mają nowe animacje ciosów: cios spada na cel z impetem, trafiony odskakuje, krytyk błyska napisem „KRYTYK!”, a ostatni cios walki zwalnia. Tak wygląda każda walka w grze. Przy wyłączonych Animacjach (Ustawienia) nic się nie trzęsie ani nie zwalnia.\n- Gra w karty w Salonie Gier ma animacje: karty wylatują i odwracają się na stole, ciosy idą po kolei z iskrami, zbite karty pękają, a koniec partii to scena ze Szczęsnym i monetami lecącymi do złota. Dotknięcie stołu kończy animację rundy."
     }
   ]
 }
