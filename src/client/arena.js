@@ -56,6 +56,8 @@ function saveSpeed(speed) {
 }
 
 const elementColor = (id) => state.content?.elements?.find((element) => element.id === id)?.color ?? '#8fe3ef';
+// „od natury”: an element after the part of a blow it made (914).
+const elementFrom = (id) => state.content?.elements?.find((element) => element.id === id)?.from ?? '';
 // An effect over time in its own colour (data/effects.json), by the name the
 // fight's events carry: a burn red, poison green.
 const effectColor = (name) => state.content?.effects?.find((effect) => effect.name === name)?.color ?? '#c5e38f';
@@ -246,7 +248,25 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
     float,
   });
 
-  const logLine = (event) => h('li', { class: `log-line log-line--${event.kind}`, text: event.text });
+  // A line of the log. A blow of a weapon with a zaklęcie żywiołu says,
+  // right after its damage and in the element's colour, how much of it the
+  // element made: „Kormoran traci 231 HP, w tym 35 od natury.” (914).
+  const logLine = (event) => {
+    const line = h('li', { class: `log-line log-line--${event.kind}` });
+    const part = event.imbued;
+    const words = part && elementFrom(part.element);
+    const after = words ? `${event.damage} HP` : '';
+    const at = after ? event.text.indexOf(after) : -1;
+    if (at < 0) {
+      line.textContent = event.text;
+      return line;
+    }
+    const cut = at + after.length;
+    const clause = h('span', { class: 'log-elemental', text: t(', w tym {damage} {from}', { damage: part.damage, from: words }) });
+    clause.style.color = elementColor(part.element);
+    line.append(event.text.slice(0, cut), clause, event.text.slice(cut));
+    return line;
+  };
 
   // The log has the height of the whole fight from the start, so what lies
   // below the arena (and the narrator's place there) does not move down line
@@ -612,6 +632,9 @@ export function createArena(fight, { autoplay = 'visible', board = null } = {}) 
         fxs.hit(blow);
         if (look && !event.sweep) skills.impact(event);
         float(target.id, strong ? `−${event.damage}!` : `−${event.damage}`, strong ? 'crit' : 'hit');
+        // The part of the blow from the weapon's element, in its colour,
+        // under the damage (914).
+        if (event.imbued) float(target.id, `−${event.imbued.damage}`, 'element', 0, elementColor(event.imbued.element));
         if (event.absorbed) float(target.id, t('osłona {amount}', { amount: event.absorbed }), 'absorb');
         shieldLeft(target.id, event.shield);
         line();

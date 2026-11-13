@@ -8767,6 +8767,12 @@ button.skill-row {
   font-size: 15px;
 }
 
+/* The part of a blow from the weapon's element (914), under its damage:
+   coloured by the element in the code. */
+.fx-num--element {
+  font-size: 15px;
+}
+
 /* "KRYTYK!" stamped over a critical blow, gold on a sharp plate. */
 .fx-crit {
   position: absolute;

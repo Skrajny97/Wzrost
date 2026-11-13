@@ -1094,6 +1094,10 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     // A trophy of the Encyklopedia: blows against its creature hit harder.
     const trophy = actor.trophies?.[target.monsterId] ?? 0;
     let amount;
+    // The weapon's zaklęcie żywiołu: its element and what share of the blow
+    // it made, for the part shown over the target and in the log (914).
+    let imbuedElement = null;
+    let imbuedShare = 0;
     if (spread) {
       const share = spread.reduce((/** @type {number} */ sum, /** @type {string} */ each) => sum + (1 - reduction(target.resist[each] ?? 0, actor.level, balance)) * (1 + (target.weak?.[each] ?? 0)), 0) / spread.length;
       amount = Math.max(1, Math.round(raw * critFactor * share * (1 - ward) * (1 + trophy) * (evolving ? evolved(actor, target, move, category, spread) : 1)));
@@ -1106,6 +1110,11 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
         ? raw * critFactor * (1 - reduction(target.resist[imbue.element] ?? 0, actor.level, balance)) * (1 + (target.weak?.[imbue.element] ?? 0)) * (1 - ward) * (1 + trophy)
         : 0;
       amount = Math.max(1, Math.round(imbue ? plain * (1 - imbue.share) + imbued * imbue.share : plain));
+      if (imbue) {
+        const whole = plain * (1 - imbue.share) + imbued * imbue.share;
+        imbuedElement = imbue.element;
+        imbuedShare = whole > 0 ? (imbued * imbue.share) / whole : 0;
+      }
       if (evolving) {
         const shelter = target.shelter?.[element] ? 1 - target.shelter[element] : 1;
         amount = Math.max(1, Math.round(amount * evolved(actor, target, move, category, [element]) * shelter));
@@ -1152,12 +1161,17 @@ export function simulateFight({ allies, enemies, rng, content, record = false, t
     const shred = move.armorShred && target.hp > 0 ? Math.round(target.armor * move.armorShred) : 0;
     if (shred) target.armor -= shred;
     const kind = critical ? 'crit' : 'hit';
+    // The part of the damage from the weapon's element (914), the spark and
+    // the lightning aside: a number of its own over the target and „w tym N
+    // od natury” in the log, both drawn by the client.
+    const elemental = imbuedElement ? Math.round(imbuedShare * Math.max(0, amount - spark - thunder)) : 0;
     log(() => ({
       t,
       kind,
       actor: actor.id,
       target: target.id,
       damage: amount,
+      ...(elemental > 0 && { imbued: { element: imbuedElement, damage: elemental } }),
       absorbed: absorbed || undefined,
       shield: shieldLeft(target),
       hp: target.hp,

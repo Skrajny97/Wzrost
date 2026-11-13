@@ -3248,6 +3248,20 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.16 (13.11.2026): część ciosu od żywiołu w walce (914 A i B)
+
+1. **Część ciosu od żywiołu (914 A i B):** cios bronią z zaklęciem żywiołu pokazuje, ile obrażeń zadał żywioł: nad stworem druga liczba w kolorze żywiołu pod liczbą obrażeń, a w przebiegu walki dopisek „…traci 231 HP, w tym 35 od natury.”.
+2. Zasady i rozstrzygnięte szczegóły: „Część ciosu od żywiołu: zbudowane (914 A i B, 13.11.2026)”.
+
+## Część ciosu od żywiołu: zbudowane (914 A i B, 13.11.2026)
+
+Pytanie gracza przekazane przez autora: „a jak mam w broni 15% obrażeń np od natury to gdzie w walce mi to pokazuje”. Na stronie ocen autor przyjął makiety 914.1 i 914.2 oraz warianty A, B i „A i B”; C („zostaje jak jest”) odrzucone.
+
+1. **Silnik.** Cios bronią z zaklęciem żywiołu (`imbue`) zapisuje w zdarzeniu walki `imbued: { element, damage }`: ile z obrażeń, które dostał cel, przypada na żywioł broni. Liczba to udział żywiołu w ciosie (część od żywiołu po odporności i słabości celu na ten żywioł, podzielona przez cały cios po pancerzu albo odporności) razy obrażenia zadane, bez iskry Naelektryzowanych grotów i pioruna Znaku gromu, które mają w przebiegu walki własne zdania. Cios bez zaklęcia, cios kilku żywiołów (Promień Żywiołów) i cios, z którego żywioł nie zadał nic, nie mają tego pola. Wynik walki się nie zmienia: to tylko zapis.
+2. **Nad stworem (914 A):** pod liczbą obrażeń wyskakuje druga, mniejsza (15 px), w kolorze żywiołu z `data/elements.json`, np. zielone „−35”.
+3. **W przebiegu walki (914 B):** zaraz po „{damage} HP” w zdaniu ciosu dopisek w kolorze żywiołu: „, w tym 35 od natury”. Po angielsku: „, 35 of it from nature”. Słowa po liczbie są w nowym polu `from` żywiołu w `data/elements.json` (i `data/en/elements.json`): „od ognia”, „od mrozu”, „od wody”, „od elektryczności”, „od ziemi”, „od natury”, „od trucizny”, „od sakrum”. Zdanie bez „{damage} HP” (żadne zdanie zwykłego ciosu) zostaje bez dopisku.
+4. **Stare raporty** nie mają tego pola, więc ich walki wyglądają jak dotąd.
+
 ## Wersja 0.3.15 (13.11.2026): oprawianie z postacią (912 A) i przemiana kamieni 10 : 1 (913 A i B)
 
 1. **Oprawianie (912 A):** w zakładce „Oprawianie” Szlifierni stoi postać z ekwipunkiem, a stuknięcie przedmiotu albo Rdzenia otwiera okienko oprawiania.

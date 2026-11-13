@@ -6,11 +6,12 @@
   "items": {
     "type": "object",
     "additionalProperties": false,
-    "required": ["id", "name", "resistance", "color"],
+    "required": ["id", "name", "resistance", "from", "color"],
     "properties": {
       "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
       "name": { "type": "string", "minLength": 1 },
       "resistance": { "type": "string", "minLength": 1 },
+      "from": { "type": "string", "minLength": 1, "description": "Część ciosu od żywiołu w przebiegu walki: „w tym 35 od natury” (914)." },
       "color": { "type": "string", "pattern": "^#[0-9a-f]{6}$" }
     }
   }

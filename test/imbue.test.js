@@ -47,6 +47,27 @@ describe('the zaklęcie żywiołu in the engine', () => {
     for (let i = 0; i < 5; i++) assert.ok(fiery[i] > plain[i], `${plain[i]} → ${fiery[i]}`);
   });
 
+  // 914: each blow of an imbued weapon names the part its element made,
+  // for the number over the target and „w tym N od ognia” in the log.
+  test('a blow of an imbued weapon names the part its element made', () => {
+    const character = newCharacter('warrior', { level: 20, classLevel: 20 });
+    const fight = (weapon) => {
+      const ally = playerCombatant({ character, equipped: [weapon], hp: 5000, name: 'Mira' }, content);
+      const enemy = { ...monsterCombatant({ monsterId: 'peatling', level: 20, id: 'e0' }, content), maxHp: 100000, hp: 100000 };
+      return simulateFight({ allies: [ally], enemies: [enemy], rng: createRng('ogien'), content, record: true }).events.filter((event) => (event.kind === 'hit' || event.kind === 'crit') && event.actor === ally.id);
+    };
+    assert.ok(fight(sword).every((event) => event.imbued === undefined));
+    const share = tuning.weaponShare;
+    const blows = fight({ ...sword, imbue: imbueEffect(sword, 'fire', content) }).slice(0, 5);
+    assert.equal(blows.length, 5);
+    for (const event of blows) {
+      assert.equal(event.imbued.element, 'fire');
+      assert.ok(event.imbued.damage > 0 && event.imbued.damage < event.damage, JSON.stringify(event.imbued));
+      // A creature weak to fire takes more from it than its plain share.
+      assert.ok(event.imbued.damage >= Math.round(event.damage * share), `${event.imbued.damage} of ${event.damage}`);
+    }
+  });
+
   test('it asks for gold and three pieces of the material, and not twice the same element', () => {
     const cost = imbueCost(sword, 'fire', content);
     assert.equal(cost.count, tuning.materialCount);
