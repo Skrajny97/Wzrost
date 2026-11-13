@@ -70,6 +70,7 @@
     }
   ],
   "stakes": { "step": 100, "levelsPerStep": 40, "perDay": 10 },
+  "pack": { "cards": 3, "goldMinutes": 60 },
   "host": {
     "resident": "gamehost",
     "tiers": [
@@ -207,6 +208,7 @@
       "Partia o stawkę: za wygraną zgarniesz podwójną stawkę, a remis zwraca stawkę. Dziennie zagrasz o stawkę najwyżej 10 razy. Pierwsza wygrana dnia na każdym stopniu daje też nagrodę dnia, a pierwsze pokonanie stopnia rzadką kartę. Trening jest bez stawki i bez nagród.",
       "Nowe karty wypadają rzadko z pokonanych stworów na wyprawach i w Labiryncie, częściej z elit, czempionów i strażników. Ta sama karta zdobyta drugi raz podnosi swój poziom, najwyżej do 5.: każdy poziom to więcej Ataku i Życia.",
       "Każda wygrana walka na wyprawie może też dać kartę stwora z niższej krainy. Czasem karta wpada za pracę w profesji, za atak na Bestię albo strażnika Wyprawy Gildii i za ukończoną Próbę Gildii: to karta stwora z krain na Twoim poziomie albo niższych. Z tych źródeł wpadają najpierw karty, których jeszcze nie masz.",
+      "Raz dziennie Szczęsny sprzedaje pakiet trzech kart stworów z krain niższych niż Twoja, za tyle złota, ile daje godzina wyprawy na Twoim poziomie. Najpierw wypadają karty, których jeszcze nie masz.",
       "Kolekcja daje premię na stałe: co 10 różnych kart +1% XP i +1% złota z wypraw, najwyżej +15% za wszystkie 156 kart. Działa od chwili zdobycia karty. Kolekcję i premię widać w Encyklopedii, w rubryce „Karty”."
     ],
     "win": ["„Dobra partia! Nie spodziewałem się tego.”", "„Twoja wygrana. Karty dziś cię lubią.”", "„Brawo! Następnym razem nie odpuszczę.”"],
@@ -217,6 +219,10 @@
     "guild": ["Wpadła karta: {card}."],
     "trial": ["Za ukończoną Próbę Gildii wpadła karta: {card}."],
     "firstWin": "Za pierwsze pokonanie stopnia „{tier}” Szczęsny daje ci kartę: {card}.",
+    "pack": {
+      "offer": "Trzy losowe karty stworów z krain niższych niż Twoja. Najpierw wypadają te, których jeszcze nie masz.",
+      "opened": "Szczęsny rozkłada na stole trzy karty."
+    },
     "collection": {
       "summary": ["Kolekcja: {found} z {all}"],
       "note": ["Karty wypadają z pokonanych stworów na wyprawach i w Labiryncie, częściej z elit, czempionów i strażników. Czasem karta wpada też za pracę w profesji i za walki i Próby w Gildii. Zagrasz nimi u Szczęsnego w Salonie Gier."],

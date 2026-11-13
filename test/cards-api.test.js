@@ -15,6 +15,7 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import {
+  areaLand,
   cardComes,
   cardKind,
   cardRarity,
@@ -25,6 +26,8 @@ import {
   hostTier,
   labyrinthDay,
   labyrinthFoes,
+  lowerLandCards,
+  lowerLandNames,
   newLabyrinth,
   portalArea,
   questPeriod,
@@ -136,6 +139,35 @@ describe('Talia Systemu through the API', () => {
     await Promise.all([call('POST', '/api/cards/starter', { cookie }), call('POST', '/api/cards/starter', { cookie })]);
     const copies = await (await db()).prepare('SELECT SUM(copies) AS copies FROM cards').first();
     assert.equal(copies.copies, 12);
+  });
+
+  test('the day\'s pack at Szczęsny\'s (902 C): three cards of the lower lands, those not got first, for the gold of an hour of exploring, once a day', async () => {
+    await set('level = 64, class_level = 64, gold = 100000');
+    assert.equal((await tab()).pack, null);
+    assert.equal((await call('POST', '/api/cards/pack', { cookie })).data.error.code, 'no_starter');
+    await call('POST', '/api/cards/starter', { cookie });
+    const land = areaLand(portalArea(64, content).id, content);
+    const pool = lowerLandCards(land, content);
+    const offer = (await tab()).pack;
+    assert.equal(offer.price, explorationGold(rules.pack.goldMinutes, 64));
+    assert.deepEqual([offer.bought, offer.count, offer.empty], [false, rules.pack.cards, false]);
+    assert.deepEqual(offer.lands, lowerLandNames(land, content));
+    const before = (await row()).gold;
+    const bought = await call('POST', '/api/cards/pack', { cookie });
+    assert.equal(bought.status, 200);
+    const ids = bought.data.pack.map((card) => card.id);
+    assert.equal(new Set(ids).size, rules.pack.cards);
+    assert.ok(ids.every((id) => pool.includes(id)));
+    assert.ok(bought.data.pack.every((card) => card.fresh && card.level === 1));
+    assert.equal((await row()).gold, before - offer.price);
+    assert.deepEqual([bought.data.cards.pack.bought, bought.data.cards.pack.missing], [true, offer.missing - rules.pack.cards]);
+    assert.ok(ids.every((id) => bought.data.cards.collection.some((card) => card.id === id)));
+    assert.equal((await call('POST', '/api/cards/pack', { cookie })).data.error.code, 'pack_bought');
+    // A new day, a new pack, for the gold the character has.
+    const game = JSON.parse((await row()).card_game);
+    await set('card_game = ?, gold = 1', JSON.stringify({ ...game, day: '2020-01-01' }));
+    assert.equal((await tab()).pack.bought, false);
+    assert.equal((await call('POST', '/api/cards/pack', { cookie })).data.error.code, 'no_gold');
   });
 
   test('a deck is twelve different cards of the collection', async () => {

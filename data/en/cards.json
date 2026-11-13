@@ -40,6 +40,7 @@
       "A match for a stake: win and you take twice the stake, a draw gives the stake back. You play for a stake at most 10 times a day. The first win of the day at each tier also gives the day's reward, and the first win over a tier a rare card. Training is without a stake and without rewards.",
       "New cards are rarely left by creatures you beat on explorations and in the Labyrinth, more often by elites, champions and guardians. The same card won again raises its level, up to level 5: each level means more Attack and Life.",
       "Every fight you win on an exploration may also give a card of a creature from a lower land. Now and then a card drops for work in a profession, for an attack on the Beast or a Guild Expedition guardian and for a completed Guild Trial: a card of a creature from the lands at your level or lower. From these sources, the cards you do not have yet come first.",
+      "Once a day Szczęsny sells a pack of three cards of creatures from lands lower than yours, for as much gold as an hour of exploring brings at your level. Cards you do not have yet come first.",
       "Your collection gives a lasting bonus: every 10 different cards add +1% XP and +1% gold from explorations, up to +15% for all 156 cards. It works from the moment you win a card. You can see your collection and its bonus in the Encyclopedia, under \"Cards\"."
     ],
     "win": ["\"A good match! I didn't see that coming.\"", "\"Your win. The cards like you today.\"", "\"Well played! Next time I won't hold back.\""],
@@ -50,6 +51,10 @@
     "guild": ["You got a card: {card}."],
     "trial": ["A completed Guild Trial brought you a card: {card}."],
     "firstWin": "For your first win over the tier \"{tier}\" Szczęsny gives you a card: {card}.",
+    "pack": {
+      "offer": "Three random cards of creatures from lands lower than yours. Cards you do not have yet come first.",
+      "opened": "Szczęsny lays three cards on the table."
+    },
     "collection": {
       "summary": ["Collection: {found} of {all}"],
       "note": ["Cards drop from creatures beaten on explorations and in the Labyrinth, more often from elites, champions and guardians. Now and then a card also comes for work in a profession and for the Guild's fights and Trials. Play them with Szczęsny in the Games Parlour."],

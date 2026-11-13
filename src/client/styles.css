@@ -13298,6 +13298,36 @@ button.tcard-slot {
   text-align: right;
 }
 
+/* The day's pack at Szczęsny's (902 C): its backs beside its words. */
+.cards-pack-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cards-pack-row p {
+  margin: 0;
+  min-width: 0;
+}
+
+.cards-pack-backs {
+  display: inline-flex;
+  flex: none;
+}
+
+.cards-pack-backs .cards-back {
+  width: 28px;
+  height: 40px;
+}
+
+.cards-pack-backs .cards-back + .cards-back {
+  margin-left: -12px;
+}
+
+.cards-pack > .muted {
+  margin: 0;
+}
+
 /* Card backs (886 D): Szczęsny's hidden reserve, a back a card, and a
    deck's pile, in the line before its counts. */
 .cards-backs {

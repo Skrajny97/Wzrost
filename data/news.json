@@ -810,6 +810,11 @@
       "id": "0.3.11",
       "title": "Wersja 0.3.11",
       "body": "- Labirynt jest trudniejszy z każdym poziomem: poziom 1 jest łatwy, poziom 2 średni, poziom 3 trudny, a Piekielny bardzo trudny.\n- Na Stole rozbiórki zmienisz kolejność zleceń: przytrzymaj ≡ przy czekającym zleceniu i przeciągnij je na nowe miejsce. Zlecenie w pracy zostaje pierwsze, a godziny „Gotowe o” liczą się od nowa."
+    },
+    {
+      "id": "0.3.12",
+      "title": "Wersja 0.3.12",
+      "body": "- Raz dziennie Szczęsny sprzedaje w Salonie Gier pakiet trzech kart stworów z krain niższych niż Twoja, za tyle złota, ile daje godzina wyprawy na Twoim poziomie. Najpierw wypadają karty, których jeszcze nie masz. Pakiet znajdziesz w zakładce Karty, pod kartą bohatera."
     }
   ]
 }
