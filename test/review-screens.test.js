@@ -126,3 +126,33 @@ describe("the Sala prób's trial and the Wieże wait for a mercenary too, and sa
     });
   });
 });
+
+// A room of the Labirynt fought, its report's "Wróć do Labiryntu" leads to
+// the board, where the next room waits, not to the Sala prób's door a tap
+// away from it (labyrinth.js, LABYRINTH_BOARD).
+describe('the report of a room of the Labirynt', () => {
+  test('"Wróć do Labiryntu" opens the board', async () => {
+    const { mountReport } = await import('../src/client/screens/report.js');
+    const { reportCache } = await import('../src/client/state.js');
+    state.content = { ...state.content, resources: [] };
+    state.character = { ...character(null), features: [], huntDurations: [5], bag: [], camp: { buildings: [] }, tutorial: null };
+    reportCache.set('labirynt-1', {
+      labyrinth: { levelName: 'Poziom I', typeName: 'Walka', companions: [] },
+      endsAt: Date.now(),
+      minutes: 0,
+      result: 'success',
+      resultText: 'Wygrana.',
+      summary: { xp: 10, classXp: 10, gold: 5, resources: {}, materials: [], fights: 1, hpStart: 90, hpEnd: 80, maxHp: 100, timePoints: 0, bestFind: null },
+      system: [],
+      fights: [],
+      items: [],
+      entries: [],
+    });
+    const screen = globalThis.document.createElement('main');
+    const mounted = mountReport(screen, { params: { id: 'labirynt-1' }, navigate() {} });
+    const back = screen.find((node) => node.tagName === 'A' && node.textContent === 'Wróć do Labiryntu');
+    assert.equal(back.length, 1);
+    assert.equal(back[0].getAttribute('href'), '#/labirynt');
+    mounted.unmount();
+  });
+});
