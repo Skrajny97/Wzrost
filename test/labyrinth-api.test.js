@@ -86,11 +86,11 @@ describe('the Labirynt Systemu through the API', () => {
     for (const row of labyrinth.map.slice(0, -1)) assert.ok(row.length >= 2 && row.length <= 3);
     assert.ok(labyrinth.map[0].every((room) => room.type === 'fight'));
     assert.deepEqual(labyrinth.reachable, labyrinth.map[0].map((_, index) => index));
-    // The creatures of the rooms that can be entered are named, at the
-    // higher of the character's level (30) and its class level (50): the
-    // author, 12.11.2026.
-    assert.equal(labyrinth.charLevel, 50);
-    assert.ok(labyrinth.map[0].every((room) => room.foes.length > 0 && room.foes.every((foe) => foe.level === 50)));
+    // The creatures of the rooms that can be entered are named, halfway
+    // between the character's level (30) and its class level (50): the
+    // author, 13.11.2026.
+    assert.equal(labyrinth.charLevel, 40);
+    assert.ok(labyrinth.map[0].every((room) => room.foes.length > 0 && room.foes.every((foe) => foe.level === 40)));
     // At the entrance every fight of the level has its danger against the
     // party (899 A), the other rooms none; the elites and the treasures
     // show the level's Odłamki.
@@ -107,12 +107,12 @@ describe('the Labirynt Systemu through the API', () => {
     assert.deepEqual(labyrinth.map.map((row) => row.map((room) => room.type)), labyrinthMap(today(), 1, content).rows.map((row) => row.map((room) => room.type)));
     const unlock = content.unlocks.find((one) => one.id === 'labyrinth');
     assert.equal(unlock.level, 30);
-    // With the class below the character, the character's level counts; a
+    // With the class below the character, halfway too, rounded down; a
     // Labirynt not yet entered follows the levels of now.
-    await set('class_level = 20');
+    await set('class_level = 21');
     const lower = await get();
-    assert.equal(lower.charLevel, 30);
-    assert.ok(lower.map[0].every((room) => room.foes.every((foe) => foe.level === 30)));
+    assert.equal(lower.charLevel, 25);
+    assert.ok(lower.map[0].every((room) => room.foes.every((foe) => foe.level === 25)));
   });
 
   test('a fight in the first row: its report at once, the HP carried on, the XP and gold given; only rooms the room leads to', async () => {
