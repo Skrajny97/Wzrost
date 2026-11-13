@@ -3175,7 +3175,6 @@
   "Stopień pokonany": "Tier beaten",
   "Szczęsny": "Szczęsny",
   "Wszystkie Twoje linie są zajęte.": "All your lines are taken.",
-  "Zagraj w karty": "Play cards",
   "Bez stawki": "No stake",
   "{name} nie zagra już dziś o złoto. Bez stawki możecie grać dalej.": "{name} won't play for gold any more today. You can still play without a stake.",
   "Wyzwij o {gold} zł": "Challenge for {gold} gold",
@@ -3246,5 +3245,9 @@
   "Minerał": "Mineral",
   "Zioło": "Herb",
   "Mikstura": "Potion",
-  "Zasób obozu": "Camp resource"
+  "Zasób obozu": "Camp resource",
+  "Kolejne krainy ({count})": "Further lands ({count})",
+  "Twój poziom": "Your level",
+  "Karta na linię: {line}": "Card for the line: {line}",
+  "Stuknij kartę z rezerwy.": "Tap a card from your reserve."
 }

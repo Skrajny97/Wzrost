@@ -380,6 +380,42 @@ describe('the Targowisko through the API', () => {
     );
   });
 
+  test('goods back without a buyer come as they were before the offer: an own item stays own, a traded one traded, of a stack only the pieces from others (923 A)', async () => {
+    const own = await inBag('Kramarka', amulet(20));
+    const traded = await inBag('Kramarka', { ...amulet(21), traded: 1 });
+    for (const itemId of [own, traded]) {
+      const listed = await act('Kramarka', 'list', { kind: 'item', itemId, startPrice: 10 });
+      assert.equal(listed.status, 200, JSON.stringify(listed.data));
+    }
+    for (const offer of (await market('Kramarka')).mine) assert.equal((await act('Kramarka', 'cancel', { offerId: offer.id })).status, 200);
+    const collected = await act('Kramarka', 'collect', {});
+    assert.equal(collected.status, 200, JSON.stringify(collected.data));
+    assert.deepEqual(collected.data.character.bag.map((item) => [item.level, item.traded ?? false]).sort(), [
+      [20, false],
+      [21, true],
+    ]);
+    // Ten herbs, three of them from other players: the own ones leave first.
+    const herb = content.herbs[0].id;
+    await (await db())
+      .prepare('UPDATE characters SET herbs = ?, foreign_stacks = ? WHERE name = ?')
+      .bind(JSON.stringify({ [herb]: 10 }), JSON.stringify({ [`herb:${herb}`]: 3 }), 'Kramarka')
+      .run();
+    for (const count of [5, 4]) assert.equal((await act('Kramarka', 'list', { kind: 'herb', key: herb, count, startPrice: 10 })).status, 200);
+    const offers = (await (await db()).prepare("SELECT count, foreign_count FROM market_offers WHERE kind = 'herb' ORDER BY id").all()).results;
+    assert.deepEqual(
+      offers.map((offer) => [offer.count, offer.foreign_count]),
+      [
+        [5, 0],
+        [4, 2],
+      ],
+    );
+    await endAll();
+    assert.equal((await act('Kramarka', 'collect', {})).status, 200);
+    const after = await row('Kramarka');
+    assert.equal(JSON.parse(after.herbs)[herb], 10);
+    assert.equal(JSON.parse(after.foreign_stacks)[`herb:${herb}`], 3);
+  });
+
   test('the characters of one account do not buy from one another (241)', async () => {
     const itemId = await inBag('Druga', amulet(20));
     await act('Druga', 'list', { kind: 'item', itemId, startPrice: 10, buyNow: 50 });

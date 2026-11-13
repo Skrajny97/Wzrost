@@ -184,11 +184,12 @@ function askedView(source) {
   return { show: text('show'), kind: text('kind'), classId: text('classId'), who: text('who'), tier: text('tier'), rarity: text('rarity'), category: text('category'), sort: text('sort'), limit: Number.isInteger(limit) && limit > 0 ? limit : null };
 }
 
-// A parcel for `characterId` of an offer's goods.
+// A parcel for `characterId` of an offer's goods. Goods coming back to the
+// seller carry how many of the stack came from other players (923 A).
 const goodsParcel = (db, offer, characterId, reason, price, now) =>
   db
-    .prepare('INSERT INTO market_parcels (character_id, offer_id, kind, good, count, item, reason, price, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
-    .bind(characterId, offer.id, offer.kind, offer.good, offer.count, offer.item, reason, price, now);
+    .prepare('INSERT INTO market_parcels (character_id, offer_id, kind, good, count, item, reason, price, foreign_count, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    .bind(characterId, offer.id, offer.kind, offer.good, offer.count, offer.item, reason, price, reason === 'returned' ? (offer.foreign_count ?? 0) : 0, now);
 
 // The seller's parcel of a sale's gold, without the Targowisko's fee, the
 // one the offer was put up with (lower with the Kompania Kupców, 592); the
@@ -541,6 +542,12 @@ export async function listOffer(context) {
   const block = listBlock({ kind, count, startPrice: body.startPrice, buyNow, hours }, held, open, limit, content(), brotherhoodPerk('auctionHours', reputation, content()));
   const fee = brotherhoodPerk('marketFee', reputation, content());
   if (block) throw new ApiError(block.code === 'too_many' || block.code === 'not_enough' ? 409 : 400, block.code, block.message);
+  // How many of the stack's pieces came from other players: they go along
+  // with the offer and come back so if nobody buys it (923 A). The
+  // character's own pieces leave first, as wherever stacks leave the bag
+  // (settleDiscoveries counts the trade's pieces out of what stays).
+  const foreignHeld = item ? 0 : Math.min(held, JSON.parse(row.foreign_stacks ?? '{}')[`${kind}:${key}`] ?? 0);
+  const foreignCount = item ? 0 : Math.max(0, count - (held - foreignHeld));
   const now = context.now;
   const endsAt = now + hours * 3600000;
   const data = item ? JSON.stringify(Object.fromEntries(Object.entries(item).filter(([field]) => field !== 'id' && field !== 'equippedSlot'))) : null;
@@ -566,10 +573,10 @@ export async function listOffer(context) {
     db.prepare(`UPDATE characters SET favorites = ${withoutFavorites}, version = version + 1 WHERE id = ?`).bind(JSON.stringify(item ? [item.id] : []), row.id),
     db
       .prepare(
-        `INSERT INTO market_offers (seller_id, seller_user_id, seller_name, kind, good, count, item, start_price, buy_now, created_at, ends_at, fee)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO market_offers (seller_id, seller_user_id, seller_name, kind, good, count, item, start_price, buy_now, created_at, ends_at, fee, foreign_count)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
-      .bind(row.id, row.user_id, row.name, kind, item ? null : key, count, data, body.startPrice, buyNow, now, endsAt, fee),
+      .bind(row.id, row.user_id, row.name, kind, item ? null : key, count, data, body.startPrice, buyNow, now, endsAt, fee, foreignCount),
   ]);
   return respond(db, session, now, {}, askedView(body.view));
 }
@@ -747,6 +754,13 @@ export async function collectParcels(context) {
   const free = bagCapacity(campLevels(player.buildings, now, content()), content()) - bagPlaces(player);
   const held = { herb: herbsOf(row), potion: potionsOf(row) };
   const adds = { herb: {}, potion: {}, material: {}, part: {}, mineral: {} };
+  // Of those, the pieces got from other players: all of a purchase or a
+  // win, of goods back only what came from others before (923 A).
+  const traded = { herb: {}, potion: {}, material: {}, part: {}, mineral: {} };
+  const fromOthers = (parcel) => {
+    const count = parcel.reason === 'returned' ? Math.min(parcel.count, parcel.foreign_count ?? 0) : parcel.count;
+    if (count > 0) traded[parcel.kind][parcel.good] = (traded[parcel.kind][parcel.good] ?? 0) + count;
+  };
   const items = [];
   const taken = [];
   let gold = 0;
@@ -756,17 +770,21 @@ export async function collectParcels(context) {
     if (parcel.kind === 'item') {
       if (used + 1 > free) continue;
       used += 1;
-      items.push({ ...JSON.parse(parcel.item), traded: 1 });
+      // An item back without a buyer is as it was before the offer (923 A):
+      // the character's own find stays its own.
+      items.push(parcel.reason === 'returned' ? JSON.parse(parcel.item) : { ...JSON.parse(parcel.item), traded: 1 });
     } else if (parcel.kind === 'herb' || parcel.kind === 'potion') {
       const before = stackPlaces(held[parcel.kind], adds[parcel.kind]);
       const after = stackPlaces(held[parcel.kind], { ...adds[parcel.kind], [parcel.good]: (adds[parcel.kind][parcel.good] ?? 0) + parcel.count });
       if (used + after - before > free) continue;
       used += after - before;
       adds[parcel.kind][parcel.good] = (adds[parcel.kind][parcel.good] ?? 0) + parcel.count;
+      fromOthers(parcel);
     } else if (parcel.kind === 'gold') {
       gold += parcel.count;
     } else {
       adds[parcel.kind][parcel.good] = (adds[parcel.kind][parcel.good] ?? 0) + parcel.count;
+      fromOthers(parcel);
     }
     // A purchase or a sale counts for the reputation, goods back do not.
     if (parcel.reason !== 'returned') value += parcel.price;
@@ -775,7 +793,7 @@ export async function collectParcels(context) {
   if (taken.length === 0) throw new ApiError(409, 'bag_full', 'Plecak jest pełny. Zrób w nim miejsce, żeby odebrać towar.');
   const next = marketReputation(row, settlementOf(row), value, now);
   const changes = Object.fromEntries(STACKS.map((kind) => [kind, counted(COLUMNS[kind], adds[kind])]));
-  const others = foreign(adds);
+  const others = foreign(traded);
   const list = taken.map(() => '?').join(', ');
   await atomically(db, [
     assertion(db, `(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT COUNT(*) FROM market_parcels WHERE character_id = ? AND id IN (${list})) = ?`, [
