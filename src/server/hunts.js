@@ -26,6 +26,7 @@ import {
   companionGoes,
   campLevels,
   challengeAt,
+  createRng,
   faintShare,
   scoutChances,
   scoutedCreature,
@@ -136,10 +137,27 @@ export function restedNow(player, now) {
 // those who do not stay in the Kwatery, and none while the character is in
 // a Drużyna (companionGoes in the engine), a wounded one once the character
 // has rested to full HP; with the character, at most parties.size.
-export function companionsGoing(player, now) {
-  const rested = restedNow(player, now);
+// `rested`: whether it has, when the caller knows it already.
+export function companionsGoing(player, now, rested = restedNow(player, now)) {
   const hired = JSON.parse(player.row.settlement ?? '{}').companions ?? [];
   return hired.filter((companion) => companionGoes(companion, { rested, inParty: player.inParty })).slice(0, content().balance.parties.size - 1);
+}
+
+// The companions going along as their fights count them: each with its
+// level, its gear and what its relation's standing gives it in a fight
+// (the code review, 13.11.2026: a closer bond kept the threat of before).
+const companionsInFights = (companions) => companions.map((companion) => [companion.id, companion.level, companion.gear, bondBonus(companion, content())]);
+
+// A short mark of the companions who would go along on an exploration now,
+// as the threat counts them (cachedSamples), or null for none: the same
+// companions give the same mark, the first number drawn with them as the
+// seed. The Walka screen asks for the threat again when it changes (its
+// buildKey), with a hire, a dismissal, a wound, a closer bond, a level or
+// an item given (characterView; the code review, 13.11.2026: it kept the
+// threat of before until the screen was opened again).
+export function companionsKey(player, now, rested) {
+  const fighting = settlementOn() ? companionsInFights(companionsGoing(player, now, rested)) : [];
+  return fighting.length > 0 ? createRng(JSON.stringify(fighting)).int(0, 2 ** 30).toString(36) : null;
 }
 
 // `hard`: against the creatures of a Trudna wyprawa (629 A).
@@ -149,11 +167,9 @@ function cachedSamples(player, character, equipped, areaId, now, hard = false) {
   // stats (the code review: the threat stayed as before them).
   const gear = [...equipped].sort((a, b) => a.id - b.id).map((item) => JSON.stringify(item));
   // The companions who would go along fight beside the character
-  // (companions.js), each with what its relation's standing gives it in a
-  // fight (the code review, 13.11.2026: a closer bond kept the threat of
-  // before).
+  // (companions.js).
   const companions = settlementOn() ? companionsGoing(player, now) : [];
-  const party = companions.map((companion) => [companion.id, companion.level, companion.gear, bondBonus(companion, content())]);
+  const party = companionsInFights(companions);
   // The Rdzeń's Artefakty and gem too (core.js), which change the fights.
   const key = JSON.stringify([player.row.id, areaId, character.level, character.classLevel, character.points, character.skills, character.evolution, character.professions, gear, party, hard, character.core ?? null]);
   let samples = samplesCache.get(key);

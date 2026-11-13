@@ -210,4 +210,34 @@ describe('talks with a companion through the API', () => {
     assert.equal(hired.bond.points, tuning.relation.talk + bondPoints(5, content));
     assert.deepEqual(hired.bond.next, { name: named(1), points: standings[1].points });
   });
+
+  // The Walka screen asks for the threat again when its key changes
+  // (buildKey in screens/combat.js), and the companions who would go along
+  // fight in it: the character view marks them (the code review,
+  // 13.11.2026: a hire, a dismissal, a wound or a closer bond kept the
+  // threat of before until the screen was opened again).
+  test('the character view marks the companions who would go along, and the mark changes with them', async () => {
+    const mark = async () => (await call('GET', '/api/character', { cookie })).data.character.companionsKey;
+    const companion = (path, value) => db().then((database) => database.prepare(`UPDATE characters SET settlement = json_set(settlement, '$.companions[0].${path}', json(?))`).bind(JSON.stringify(value)).run());
+    assert.equal(await mark(), null);
+    const [first] = (await settlement()).companions.candidates;
+    assert.equal((await call('POST', '/api/settlement/hire', { cookie, body: { candidateId: first.id } })).status, 200);
+    const hired = await mark();
+    assert.equal(typeof hired, 'string');
+    // The same companions, the same mark.
+    assert.equal(await mark(), hired);
+    // A closer bond, a standing up: a stronger companion in a fight.
+    await companion('relation', standings[1].points);
+    const closer = await mark();
+    assert.notEqual(closer, hired);
+    // Wounded, it stays home until the character has rested to full HP.
+    await (await db()).prepare('UPDATE characters SET hp = 1, hp_at = ?').bind(Date.now()).run();
+    await companion('wounded', true);
+    assert.equal(await mark(), null);
+    await companion('wounded', false);
+    assert.equal(await mark(), closer);
+    // Dismissed, it goes no more.
+    assert.equal((await call('POST', '/api/settlement/dismiss', { cookie, body: { companionId: first.id } })).status, 200);
+    assert.equal(await mark(), null);
+  });
 });
