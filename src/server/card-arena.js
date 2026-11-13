@@ -53,7 +53,7 @@ import {
   turnBlock,
 } from '../engine/index.js';
 import { assertion, atomically } from './atomic.js';
-import { cardGameOf } from './cards.js';
+import { cardGameOf, heroOf, heroView } from './cards.js';
 import { characterView, engineCharacter, loadPlayer, requirePlayer } from './characters.js';
 import { content } from './content.js';
 import { toHex } from './encoding.js';
@@ -215,10 +215,6 @@ async function offeredRivals(db, row, record) {
   return { record: next, rivals: await rivalsOf(db, row, next) };
 }
 
-// A character's hero card (872 A) for a match: its class and its
-// evolution's stage (0 before the first), as the Salon's (cards.js).
-const heroOf = (row) => ({ classId: row.class_id, stage: row.evolution ? (content().evolutionsById[row.evolution]?.stage ?? 1) : 0 });
-
 // A rival as the Karty show it: its name, class (its evolution's name),
 // level, look and card rating, its deck's strength (900 A: the Atak and
 // Życie of its twelve cards), what a win, a loss and a draw with it would
@@ -285,20 +281,6 @@ const runningMatch = (db, characterId) => db.prepare('SELECT * FROM card_arena_m
 // it and what the match puts at stake for the character's card rating.
 function runningView(match) {
   return { rival: JSON.parse(match.rival), stakes: JSON.parse(match.stakes).attacker, ...matchView(JSON.parse(match.state), content()) };
-}
-
-// The character's hero card for the page (872 A): its portrait, its class
-// or evolution's name and its skill at the evolution's stage.
-function heroView(row) {
-  const hero = heroOf(row);
-  return {
-    ...hero,
-    appearance: row.appearance,
-    skin: row.skin ?? content().defaultSkin,
-    evolution: content().evolutionsById[row.evolution] ? row.evolution : null,
-    title: content().evolutionsById[row.evolution]?.name ?? content().classesById[row.class_id]?.name ?? '',
-    skill: heroSkill(hero.classId, hero.stage, content()),
-  };
 }
 
 // The Karty for the page: the character's card rating and place on this

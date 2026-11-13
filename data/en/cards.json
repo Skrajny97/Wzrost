@@ -137,7 +137,6 @@
     "lower": ["Among the loot lies a card of a creature from a lower land: {card}."],
     "guild": ["You got a card: {card}."],
     "trial": ["A completed Guild Trial brought you a card: {card}."],
-    "firstWin": "For your first win over the tier \"{tier}\" Szczęsny gives you a card: {card}.",
     "pack": {
       "offer": "Three random cards of creatures from lands lower than yours. Cards you do not have yet come first.",
       "opened": "Szczęsny lays three cards on the table."

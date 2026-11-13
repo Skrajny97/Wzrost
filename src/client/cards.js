@@ -573,7 +573,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     // first staked win or of its chance at a later one.
     const who = whoOf(ended);
     const reward = !ended.resident
-      ? t('Za pierwsze pokonanie stopnia Szczęsny daje ci kartę:')
+      ? t('Za pierwsze pokonanie stopnia Szczęsny daje Ci kartę:')
       : ended.first
         ? t('Za pierwszą wygraną o stawkę {name} daje Ci kartę:', { name: who.name })
         : t('{name} daje Ci też kartę ze swojej talii:', { name: who.name });

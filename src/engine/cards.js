@@ -1052,10 +1052,11 @@ export function surrenderMatch(current) {
   return match;
 }
 
-// A turn for the player's side chosen by the game (the simulations, and the
-// absent players of the second stage): its reserve's cards on its empty
-// lines, those that hit hardest and take least this round (every way of
-// them is tried: 4 cards on 3 lines is 24 at most), with no skill.
+// A turn for the player's side chosen by the game (the simulations, and a
+// live match's move missed, card-duel.js; the Arena's absent players are
+// played as Szczęsny, rivalSetup): its reserve's cards on its empty lines,
+// those that hit hardest and take least this round (every way of them is
+// tried: 4 cards on 3 lines is 24 at most), with no skill.
 /**
  * @param {Match} match
  * @param {Content} content

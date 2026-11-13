@@ -249,7 +249,7 @@
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "lower", "guild", "trial", "firstWin", "pack", "live", "collection"],
+      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "lower", "guild", "trial", "pack", "live", "collection"],
       "properties": {
         "intro": { "type": "string", "minLength": 1 },
         "starterOffer": { "type": "string", "minLength": 1 },
@@ -287,7 +287,6 @@
         "lower": { "$ref": "#/definitions/texts", "description": "Zdanie raportu wyprawy o karcie z niższej krainy (902 B)." },
         "guild": { "$ref": "#/definitions/texts", "description": "Słowa po ataku na Bestię albo strażnika Wyprawy Gildii, gdy wpadła karta (903)." },
         "trial": { "$ref": "#/definitions/texts", "description": "Słowa przy karcie za ukończoną Próbę Gildii (903)." },
-        "firstWin": { "type": "string", "minLength": 1 },
         "collection": {
           "type": "object",
           "additionalProperties": false,
