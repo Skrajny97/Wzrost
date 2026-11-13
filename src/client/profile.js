@@ -13,7 +13,7 @@
 // of the chat it was opened from (`mention`, screens/community.js), else
 // in the Globalny's in the Społeczność.
 
-import { skillSprite } from './art.js';
+import { mineralSprite, skillSprite } from './art.js';
 import { friendsSeen, wantConversation, wantMention } from './chat-news.js';
 import { portraitBox } from './cosmetics.js';
 import { h, icon } from './dom.js';
@@ -66,6 +66,18 @@ export async function openProfile(name, { onChange, mention } = {}) {
                   'ul',
                   { class: 'item-properties' },
                   item.properties.map((line) => h('li', { text: line })),
+                  // The gem set in it, as on the item's own card.
+                  item.gem &&
+                    h(
+                      'li',
+                      { class: 'item-gem' },
+                      h(
+                        'details',
+                        { class: 'item-gem-fold' },
+                        h('summary', { class: 'item-gem-line', vars: { '--rarity': item.gem.color } }, mineralSprite(item.gem.id), ` ${item.gem.line}`),
+                        h('p', { class: 'item-gem-help', text: item.gem.help }),
+                      ),
+                    ),
                   item.classNames && h('li', { class: 'item-classes', text: t(item.classNames.length > 1 ? 'Dla klas: {classes}' : 'Dla klasy: {classes}', { classes: item.classNames.join(', ') }) }),
                 ),
               )

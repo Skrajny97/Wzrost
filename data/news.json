@@ -785,6 +785,11 @@
       "id": "0.3.6",
       "title": "Wersja 0.3.6",
       "body": "- W zakładce Gildia jest nowa karta „Ranking członków”. W „Aktywności” widać, ile Sławy każdy członek wniósł do gildii w tym tygodniu albo od początku. Stuknij w członka, a zobaczysz, skąd ma Sławę: z Bestii, Wyprawy, Prób, Próśb, Wymiany czy Wojny.\n- W „Wpłatach” widać, ile złota i surowców każdy członek wpłacił do Siedziby. Wpłaty sprzed zapisywania stoją razem pod listą.\n- W Siedzibie przycisk „Kto ile wpłacił” otwiera od razu te wpłaty.\n- Na wąskich telefonach nagrody dnia przy wejściu do Labiryntu nie są już ucinane."
+    },
+    {
+      "id": "0.3.7",
+      "title": "Wersja 0.3.7",
+      "body": "- Labirynt jest łatwiejszy: stwory są mniej więcej pośrodku między dawnym a ostatnim Labiryntem.\n- Po odebraniu raportu z wyprawy „Powrót” prowadzi do wypraw tego samego miejsca, a nie na początek Walki.\n- W karcie innej postaci widać kamień oprawiony w przedmiocie."
     }
   ]
 }

@@ -123,6 +123,14 @@ describe('five characters on one account', () => {
     assert.deepEqual(own.relation, { state: 'self' });
     // Another player's look at it: as at any character.
     assert.equal((await call('GET', `/api/profile/${encodeURIComponent('Mira')}`, { cookie: other })).data.profile.relation, null);
+    // The gem set in a worn item shows to another player too (the author,
+    // 13.11.2026).
+    const sword = { base: 'sword', slot: 'weapon', level: 1, rarity: 'common', affixes: [], damage: { min: 7, max: 10 }, gem: 'agate' };
+    await (await db()).prepare("INSERT INTO items (character_id, slot, data, created_at) SELECT id, 'weapon', ?, 1 FROM characters WHERE name = 'Mira'").bind(JSON.stringify(sword)).run();
+    const gems = (await call('GET', `/api/profile/${encodeURIComponent('Mira')}`, { cookie: other })).data.profile.equipment.filter((one) => one.item?.gem);
+    assert.equal(gems.length, 1);
+    assert.equal(gems[0].item.gem.id, 'agate');
+    assert.ok(gems[0].item.gem.line.includes('Agat'));
 
     const invited = await call('POST', '/api/friends/invite', { cookie, body: { name: 'Mira' } });
     assert.equal(invited.data.error.code, 'self');
