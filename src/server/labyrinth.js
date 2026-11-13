@@ -136,8 +136,8 @@ function foesOf(state, row, room, type) {
 }
 
 // The Labirynt for its page: the day and the levels (cleared, open), the
-// level's map with the party's position and the rooms it may enter (with
-// the creatures of each), the fighters with their HP, the blessings taken,
+// level's map with the party's position, the creatures of every room and the
+// rooms it may enter, the fighters with their HP, the blessings taken,
 // a choice waiting (with the merchant's prices), the day's rewards and the
 // words of the rooms.
 function labyrinthView(player, state) {
@@ -163,7 +163,9 @@ function labyrinthView(player, state) {
     })),
     over: state.over,
     started: Boolean(storedState(player.row, state.day)),
-    map: map.rows.map((rooms, row) => rooms.map((room, index) => ({ type: room.type, links: room.links, foes: reachable.includes(index) && row === state.row + 1 ? foesOf(state, row, index, room.type) : null }))),
+    // Every room's creatures, which the board shows on its platforms (the
+    // board of 13.11.2026: the party sees what waits ahead and picks its way).
+    map: map.rows.map((rooms, row) => rooms.map((room, index) => ({ type: room.type, links: room.links, foes: foesOf(state, row, index, room.type) }))),
     row: state.row,
     room: state.room,
     path: state.path,

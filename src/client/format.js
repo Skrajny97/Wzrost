@@ -33,6 +33,9 @@ export const formatNumber = (value) => integerFormat().format(value);
 // For the narrow top bar: from a million on, "1,2 mln".
 const shortFormat = () => format('short', (locale) => new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }));
 export const formatShort = (value) => (Math.abs(value) >= 1e6 ? shortFormat().format(value) : integerFormat().format(value));
+// For the narrowest boxes (the Labirynt's rewards at its entrance): from ten
+// thousand on, "48,2 tys.".
+export const formatCompact = (value) => (Math.abs(value) >= 1e4 ? shortFormat().format(value) : integerFormat().format(value));
 export const formatDecimal = (value) => decimalFormat().format(value);
 export const formatPrecise = (value) => preciseFormat().format(value);
 // Real money, in grosze, as the page's language writes it with its currency
