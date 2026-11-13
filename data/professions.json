@@ -281,6 +281,7 @@
     "maxChance": 0.95,
     "salvage": { "partsDivisor": 3, "gemRarityDown": 1 },
     "setting": { "minutes": 15, "rarityTime": 2 },
+    "transmute": { "cost": 10 },
     "about": {
       "craft": [
         "Pierścień, amulet albo talizman ma rzadkość kamienia, z którego go zrobisz. Na oprawę potrzeba też kruszcu: srebrnego, złotego albo gwiezdnego.",
@@ -288,7 +289,11 @@
       ],
       "set": [
         "W każdym przedmiocie może tkwić jeden kamień. Podnosi wszystkie wartości przedmiotu o tyle procent, ile podaje kamień: im rzadszy, tym więcej.",
-        "Nowy kamień niszczy poprzedni. Kamień oprawisz od tego poziomu Jubilerstwa, od którego Górnictwo go znajduje."
+        "Nowy kamień niszczy poprzedni, a w miejsce kamienia oprawisz tylko mocniejszy. Kamień oprawisz od tego poziomu Jubilerstwa, od którego Górnictwo go znajduje."
+      ],
+      "transmute": [
+        "Z dziesięciu kamieni powstaje jeden kamień o stopień rzadszy. Przemiana dzieje się od razu i nie zajmuje postaci.",
+        "Przemienisz tylko w kamień, który System już Ci pokazał: od tego poziomu Jubilerstwa, od którego Górnictwo go znajduje."
       ]
     },
     "texts": {

@@ -222,7 +222,11 @@
       ],
       "set": [
         "Each item can hold one stone. It raises all the item's values by the percentage the stone gives: the rarer the stone, the more.",
-        "A new stone destroys the previous one. You can set a stone from the same Jewelcrafting level at which Mining finds it."
+        "A new stone destroys the previous one, and only a stronger stone can take its place. You can set a stone from the same Jewelcrafting level at which Mining finds it."
+      ],
+      "transmute": [
+        "Ten stones make one stone a rarity higher. The transmutation happens at once and does not keep your character busy.",
+        "You can only transmute into a stone the System has already shown you: from the same Jewelcrafting level at which Mining finds it."
       ]
     },
     "texts": {

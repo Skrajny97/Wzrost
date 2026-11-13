@@ -21,12 +21,15 @@ import {
   knowsJewelPattern,
   potionsDone,
   professionState,
+  nextGem,
   setMinutes,
+  transmuteBlock,
+  transmuteGems,
   weakerGem,
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { content } from './content.js';
-import { characterView, coreOf, currentHp, loadPlayer, questsNow, requireNotExploring, requireWorker, workOf } from './characters.js';
+import { characterView, coreOf, currentHp, loadPlayer, questsNow, requireNotExploring, requirePlayer, requireWorker, workOf } from './characters.js';
 import { cardSummary, cardUpserts, workCard } from './cards.js';
 import { labyrinthOn } from './features.js';
 import { toHex } from './encoding.js';
@@ -157,6 +160,34 @@ export async function startJewelcraft(context) {
   ]);
   if (taken.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
   return json({ character: characterView(await loadPlayer(db, session.userId), now) }, 201);
+}
+
+// POST /api/professions/transmute: the przemiana of gems (913 A and B):
+// `count` times transmute.cost gems of one kind into `count` gems one rarity
+// up, at once and without a work, so also while the character explores or
+// works. Only into a gem the System shows at the level of Jubilerstwo
+// (transmuteBlock). Saved only over the character as read, so two taps at
+// once never use the same gems twice.
+export async function transmuteGemsNow(context) {
+  const body = await readJson(context.request);
+  const { session, player } = await requirePlayer(context);
+  requireProfessions(player);
+  const { jewelcrafting } = content();
+  requireOpen(player, content().professionsById[jewelcrafting.profession]);
+  const { level } = professionState(JSON.parse(player.row.professions ?? '{}'), jewelcrafting.profession);
+  const gemId = typeof body.gem === 'string' ? body.gem : '';
+  const have = mineralsOf(player.row);
+  const blocked = transmuteBlock({ gemId, count: body.count, have: have[gemId] ?? 0, level }, content());
+  if (blocked) throw new ApiError(blocked.code === 'unknown_gem' || blocked.code === 'invalid_count' ? 400 : 409, blocked.code, blocked.message);
+  const left = transmuteGems(have, gemId, body.count, content());
+  const { row } = player;
+  const db = context.env.DB;
+  const [, saved] = await atomically(db, [
+    sameVersion(db, row),
+    db.prepare('UPDATE characters SET minerals = ?, version = version + 1 WHERE id = ? AND version = ?').bind(JSON.stringify(left), row.id, row.version),
+  ]);
+  if (saved.meta.changes !== 1) throw new ApiError(409, 'conflict', 'Postać zmieniła się w międzyczasie. Spróbuj ponownie.');
+  return json({ transmuted: { from: gemId, to: nextGem(gemId, content())?.id ?? null, count: body.count }, character: characterView(await loadPlayer(db, session.userId), context.now) });
 }
 
 // A work claimed or called back by another request a moment ago.

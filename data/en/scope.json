@@ -1125,6 +1125,7 @@
     "src/engine/index.js",
     "src/client/bestiary.js",
     "src/client/screens/encyclopedia.js",
+    "src/client/transmute.js",
     "src/client/screens/professions.js",
     "src/client/screens/skills.js",
     "src/server/translate.js",
