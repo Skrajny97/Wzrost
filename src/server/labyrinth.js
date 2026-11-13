@@ -296,11 +296,14 @@ export async function enterLabyrinth(context) {
   }
   if (opensCore) lines.push(say(texts, 'coreOpen', 0));
 
+  // A new level heals fully, unless an exploration's report settles the HP;
+  // then the report says nothing of a heal either.
+  const away = ['hunt', 'mercenary'].includes(player.activity?.kind);
   // A fight: its XP to the character (applyHunt) and its report.
   let applied = null;
   let report = null;
   if (hunt) {
-    applied = applyHunt(character, hunt, content());
+    applied = applyHunt(character, hunt, content(), { heal: !away });
     const base = huntReport({ hunt, applied, character, areaId: hunt.areaId, startedAt: now, endsAt: now }, content());
     report = {
       ...base,
@@ -348,8 +351,6 @@ export async function enterLabyrinth(context) {
   const kills = hunt ? huntKills(hunt, content()) : {};
   const opened = applied ? areasOpened(character.classLevel, applied.classLevel, content()) : 0;
   const quests = JSON.stringify(addQuestProgress(questsNow(player, now), { kills, opened }));
-  // A new level heals fully, unless an exploration's report settles the HP.
-  const away = ['hunt', 'mercenary'].includes(player.activity?.kind);
   const healed = applied?.levelled && !away ? hpAfterHunt({ character, applied, hunt, equipped, name: row.name }, content()) : null;
 
   const statements = [
