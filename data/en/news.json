@@ -700,6 +700,10 @@
     "0.3.25": {
       "title": "Version 0.3.25",
       "body": "- Live cards: you can withdraw a challenge you sent, and you have 35 seconds for the first move of each round.\n- Szczęsny: when you already have every card of a rarity at level 5, your first win at a tier gets you its stake in gold.\n- The Lottery result also appears on the English channel, in English.\n- Explorations: fights count your level from the moment you set out, even if you level up on the way.\n- Fight: with \"With the party\" ticked, the screen says the threat is counted for you alone.\n- Brewing: stopped brewing waits until the herbs fit in your bag.\n- Many small fixes: parties, the Order Board, the Storeroom, the Labyrinth, guilds and friends."
+    },
+    "0.3.26": {
+      "title": "Version 0.3.26",
+      "body": "- Players online: tap the green dot with the number of players, and \"List\" appears under it. You will see who is playing now, and tapping a name opens their character card."
     }
   }
 }
