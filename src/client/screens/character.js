@@ -1751,6 +1751,35 @@ export function itemSummary(item, { stats = false, tier = false } = {}) {
   return art ? h('span', { class: 'item-summary-art' }, art, text) : text;
 }
 
+// The lines of an item's numbers on its card. With a gem set in it, each
+// number as it is without the gem, and beside it in brackets, in the gem's
+// colour, as it is with it (906 B, the author: „Niech pokazują itemki bazowe
+// statystyki i obok w kolorze oprawionego kamienia zmienione statystyki”):
+// „Obrażenia: 58–90 (64–99) (fizyczne)” (gemProperties in items.js). Short
+// lists and the comparisons keep the numbers with the gem alone
+// (`properties`), and so does a card kept from before, without the pairs.
+export function propertyLines(item) {
+  if (!item.gem || !item.gemProperties) return item.properties.map((line) => h('li', { text: line }));
+  return item.gemProperties.map(({ text, gem, rest }) =>
+    h('li', {}, text, gem && [' ', h('span', { class: 'item-gem-value', vars: { '--rarity': item.gem.color }, text: `(${gem})` })], rest),
+  );
+}
+
+// The gem set in an item in Jubilerstwo, under its numbers, which those in
+// its colour include; a tap on its line folds out what it means (gemView in
+// items.js).
+export const gemFold = (gem) =>
+  h(
+    'li',
+    { class: 'item-gem' },
+    h(
+      'details',
+      { class: 'item-gem-fold' },
+      h('summary', { class: 'item-gem-line', vars: { '--rarity': gem.color } }, mineralSprite(gem.id), ` ${gem.line}`),
+      h('p', { class: 'item-gem-help', text: gem.help }),
+    ),
+  );
+
 export function itemDetails(item, { small = false } = {}) {
   const title = h(small ? 'p' : 'h2', { class: 'item-title', vars: { '--rarity': item.color }, text: itemTitle(item) });
   const meta = h('p', { class: 'item-meta', text: [item.rarityName, item.slotName, t('poz. {level}', { level: item.level }), item.tier].filter(Boolean).join(' · ') });
@@ -1763,20 +1792,8 @@ export function itemDetails(item, { small = false } = {}) {
     h(
       'ul',
       { class: 'item-properties' },
-      item.properties.map((line) => h('li', { text: line })),
-      // The gem set in it in Jubilerstwo, which the values above include; a
-      // tap on its line folds out what it means (gemView in items.js).
-      item.gem &&
-        h(
-          'li',
-          { class: 'item-gem' },
-          h(
-            'details',
-            { class: 'item-gem-fold' },
-            h('summary', { class: 'item-gem-line', vars: { '--rarity': item.gem.color } }, mineralSprite(item.gem.id), ` ${item.gem.line}`),
-            h('p', { class: 'item-gem-help', text: item.gem.help }),
-          ),
-        ),
+      propertyLines(item),
+      item.gem && gemFold(item.gem),
       item.classNames && h('li', { class: 'item-classes', text: t(item.classNames.length > 1 ? 'Dla klas: {classes}' : 'Dla klasy: {classes}', { classes: item.classNames.join(', ') }) }),
       item.classLevel && h('li', { class: 'item-classes', text: t('Od poziomu klasy {level}', { level: item.classLevel }) }),
       // Raised by the Kowal, once per item (the author, 12.11.2026).

@@ -3373,6 +3373,15 @@ summary {
   image-rendering: pixelated;
 }
 
+/* A number of an item with its gem, in brackets beside the number without
+   it, in the gem's colour (character.js propertyLines, 906 B), kept whole:
+   a narrow card breaks the line before it, never after its dash. */
+.item-gem-value {
+  color: var(--rarity, var(--text));
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .threat-note {
   margin: 0;
   font-size: 14px;

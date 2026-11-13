@@ -12,6 +12,7 @@ import {
   encyclopediaView,
   explorationGold,
   gemOf,
+  gemProperties,
   generateItem,
   createRng,
   drawQuests,
@@ -44,6 +45,7 @@ import {
   workProfession,
   workXp,
 } from '../src/engine/index.js';
+import { contentIn } from '../src/server/content.js';
 import { content, newCharacter } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
 
@@ -409,11 +411,71 @@ describe('Jubilerstwo in the engine', () => {
       bonus: 0.2,
       color: content.raritiesById.epic.color,
       line: 'Szmaragd: +20% do wszystkich wartości',
-      help: 'Kamień oprawiony w Szlifierni podnosi o 20% każdą wartość tego przedmiotu: obrażenia, pancerz i każdą cechę z listy, każdą co najmniej o 1. Wartości na tej karcie już to uwzględniają.',
+      help: 'Kamień oprawiony w Szlifierni podnosi o 20% każdą wartość tego przedmiotu: obrażenia, pancerz i każdą cechę z listy, każdą co najmniej o 1. Wartości w kolorze kamienia już to uwzględniają.',
     });
     assert.equal(itemView(item, content).gem, undefined);
     // A gem the game no longer has adds nothing.
     assert.deepEqual(upgradedItem({ ...item, gem: 'nothing' }, content).damage, plain.damage);
+  });
+
+  // 906 B (the author: „Niech pokazują itemki bazowe statystyki i obok w
+  // kolorze oprawionego kamienia zmienione statystyki”): the card writes each
+  // number without the gem and beside it, in brackets, the number with it.
+  test("an item's card has each number without its gem and with it, cut where the number ends", () => {
+    const sword = {
+      base: 'sword',
+      slot: 'weapon',
+      level: 30,
+      rarity: 'rare',
+      damage: { min: 20, max: 31 },
+      affixes: [
+        { stat: 'strength', value: 4 },
+        { stat: 'resist.fire', value: 30 },
+      ],
+      gem: 'agate',
+    };
+    // The damage's range with its kind after it, a stat whose 10% rounds to
+    // nothing and so grows by 1, and a resistance.
+    assert.deepEqual(gemProperties(sword, content), [
+      { text: 'Obrażenia: 20–31', gem: '22–34', rest: ' (fizyczne)' },
+      { text: 'Siła: +4', gem: '+5', rest: '' },
+      { text: 'Odporność na ogień: +30', gem: '+33', rest: '' },
+    ]);
+    // Read without the gem, the lines are the card's without it; the numbers
+    // with it are those itemProperties gives, which short lists keep.
+    const pairs = gemProperties(sword, content);
+    assert.deepEqual(
+      pairs.map(({ text, rest }) => text + rest),
+      itemProperties({ ...sword, gem: undefined }, content),
+    );
+    assert.deepEqual(itemProperties(sword, content), ['Obrażenia: 22–34 (fizyczne)', 'Siła: +5', 'Odporność na ogień: +33']);
+    // On top of an upgrade from the Kowadło: the gem raises the upgraded
+    // numbers, as the fights count them (upgradedItem).
+    assert.deepEqual(gemProperties({ ...sword, upgrade: 5 }, content), [
+      { text: 'Obrażenia: 26–40', gem: '29–44', rest: ' (fizyczne)' },
+      { text: 'Siła: +5', gem: '+6', rest: '' },
+      { text: 'Odporność na ogień: +39', gem: '+43', rest: '' },
+    ]);
+    // A magical weapon's damage, with its element after the range.
+    const staff = { base: 'staff', slot: 'weapon', level: 3, rarity: 'common', element: 'frost', damage: { min: 9, max: 14 }, affixes: [], gem: 'quartz' };
+    assert.deepEqual(gemProperties(staff, content), [{ text: 'Obrażenia: 9–14', gem: '10–15', rest: ' (magiczne, mróz)' }]);
+    // The armor an upgrade gives a talisman, after its stats; the
+    // Zaklinaczka's zaklęcie żywiołu, which no gem raises, stays as it is.
+    const talisman = { base: 'talisman', slot: 'talisman', level: 1, rarity: 'common', affixes: [], implicit: { stat: 'vitality', value: 2 }, upgrade: 2, gem: 'quartz' };
+    assert.deepEqual(gemProperties(talisman, content), [
+      { text: 'Witalność: +2', gem: '+3', rest: '' },
+      { text: 'Pancerz: +2', gem: '+3', rest: '' },
+    ]);
+    assert.deepEqual(gemProperties({ ...sword, imbue: { element: 'fire', share: 0.2 } }, content).at(-1), { text: 'Zaklęcie żywiołu: 20% obrażeń jako ogień', gem: null, rest: '' });
+    // The card gets the lines with the gem only, beside the gem itself; a
+    // gem the game no longer has adds nothing and shows nothing.
+    assert.deepEqual(itemView(sword, content).gemProperties, pairs);
+    assert.equal('gemProperties' in itemView({ ...sword, gem: undefined }, content), false);
+    assert.equal('gemProperties' in itemView({ ...sword, gem: 'nothing' }, content), false);
+    // In English, as the English card writes its lines.
+    const english = contentIn('en');
+    assert.deepEqual(gemProperties(sword, english)[0], { text: 'Damage: 20–31', gem: '22–34', rest: ' (physical)' });
+    assert.match(itemView(sword, english).gem.help, /The values in the stone's colour already include it\.$/);
   });
 
   test('an item with a gem is kept as an upgraded one when the bag overflows', () => {
@@ -659,7 +721,7 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
       bonus: 0.05,
       color: '#9b9b9b',
       line: 'Kwarc: +5% do wszystkich wartości',
-      help: 'Kamień oprawiony w Szlifierni podnosi o 5% każdą wartość tego przedmiotu: obrażenia, pancerz i każdą cechę z listy, każdą co najmniej o 1. Wartości na tej karcie już to uwzględniają.',
+      help: 'Kamień oprawiony w Szlifierni podnosi o 5% każdą wartość tego przedmiotu: obrażenia, pancerz i każdą cechę z listy, każdą co najmniej o 1. Wartości w kolorze kamienia już to uwzględniają.',
     });
     assert.notDeepEqual(worn.properties, weapon.properties);
     assert.equal((await jewel({ set: true, itemId: weapon.id, gem: 'quartz' })).data.error.code, 'same_gem');

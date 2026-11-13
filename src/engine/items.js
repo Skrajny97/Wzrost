@@ -617,29 +617,81 @@ export function upgradeView(item, cap, content, stock = null, discount = 0, week
  * @returns {string[]}
  */
 export function itemProperties(raw, content) {
-  const item = upgradedItem(raw, content);
-  /** @type {string[]} */
-  const lines = [];
+  return propertyParts(upgradedItem(raw, content), raw, content).map(({ text, rest }) => text + rest);
+}
+
+// The lines of an item's numbers on its card when a gem is set in it (906 B;
+// the author: „Niech pokazują itemki bazowe statystyki i obok w kolorze
+// oprawionego kamienia zmienione statystyki”): each line as it reads without
+// the gem, cut where its number ends (`text`, then `rest`), and `gem`, that
+// number with the gem, which the card writes in brackets in between, in the
+// gem's colour: "Obrażenia: 58–90 (64–99) (fizyczne)", "Percepcja: +26
+// (+29)". `gem` is null in a line the gem leaves as it is, like the
+// Zaklinaczka's zaklęcie żywiołu. The lines are itemProperties' own, in its
+// order; short lists and the comparisons keep those, with the gem counted.
+/**
+ * @param {Item} raw
+ * @param {Content} content
+ * @returns {{ text: string, gem: string | null, rest: string }[]}
+ */
+export function gemProperties(raw, content) {
+  const plain = upgradeNumbers(raw, content);
+  // The same lines from the same item, so one by one they match.
+  const gemmed = propertyParts(withGemBonus(plain, content), raw, content);
+  return propertyParts(plain, raw, content).map(({ text, number, rest }, index) => {
+    const raised = gemmed[index].number;
+    return { text, gem: number !== null && raised !== number ? raised : null, rest };
+  });
+}
+
+// Marks the end of a line's number while the line is written from its
+// template (propertyParts), which can put words after it: a character no
+// text of the game has.
+const NUMBER_END = '\u0000';
+
+// The lines of `item`'s numbers as its card writes them (its numbers already
+// upgraded, and raised by its gem or not; `raw`, the item as kept, tells its
+// own armor from the armor an upgrade gives), each cut where its number ends:
+// `text` up to there and `rest` after it, with `number`, the number as the
+// line writes it, or null in a line no gem raises.
+/**
+ * @param {Item} item
+ * @param {Item} raw
+ * @param {Content} content
+ * @returns {{ text: string, number: string | null, rest: string }[]}
+ */
+function propertyParts(item, raw, content) {
+  /** @type {{ text: string, number: string | null, rest: string }[]} */
+  const parts = [];
+  /**
+   * @param {string} line
+   * @param {string | null} number
+   */
+  const add = (line, number) => {
+    const [text, rest = ''] = line.split(NUMBER_END);
+    parts.push({ text, number, rest });
+  };
   if (item.damage) {
+    const { min, max } = item.damage;
     const base = content.basesById[item.base];
     const kind =
       base.category === 'physical' ? word(content, 'fizyczne') : word(content, 'magiczne, {element}', { element: content.elementsById[item.element].name });
-    lines.push(word(content, 'Obrażenia: {min}–{max} ({kind})', { min: item.damage.min, max: item.damage.max, kind }));
+    add(word(content, 'Obrażenia: {min}–{max} ({kind})', { min, max: `${max}${NUMBER_END}`, kind }), `${min}–${max}`);
   }
   // An item's own armor comes first; the armor an upgrade gives an item
   // without any, like a talisman, after its stats.
-  const armor = item.armor ? word(content, 'Pancerz: +{armor}', { armor: item.armor }) : null;
-  if (armor && raw.armor) lines.push(armor);
+  const armor = item.armor ? word(content, 'Pancerz: +{armor}', { armor: `${item.armor}${NUMBER_END}` }) : null;
+  if (armor && raw.armor) add(armor, `+${item.armor}`);
   for (const { stat, value } of [...(item.implicit ? [item.implicit] : []), ...item.affixes]) {
-    lines.push(`${propertyName(stat, content)}: +${value}`);
+    add(`${propertyName(stat, content)}: +${value}`, `+${value}`);
   }
-  if (armor && !raw.armor) lines.push(armor);
-  // The Zaklinaczka's zaklęcie żywiołu (settlement.js).
+  if (armor && !raw.armor) add(armor, `+${item.armor}`);
+  // The Zaklinaczka's zaklęcie żywiołu (settlement.js), which no gem raises.
   if (item.imbue?.share) {
-    lines.push(word(content, 'Zaklęcie żywiołu: {percent}% obrażeń jako {element}', { percent: Math.round(item.imbue.share * 100), element: content.elementsById[item.imbue.element].name }));
+    add(word(content, 'Zaklęcie żywiołu: {percent}% obrażeń jako {element}', { percent: Math.round(item.imbue.share * 100), element: content.elementsById[item.imbue.element].name }), null);
   }
-  if (item.imbue?.stat) lines.push(word(content, 'Zaklęcie żywiołu: {stat} +{value}', { stat: propertyName(item.imbue.stat, content), value: item.imbue.value }));
-  return lines;
+  if (item.imbue?.stat) add(word(content, 'Zaklęcie żywiołu: {stat} +{value}', { stat: propertyName(item.imbue.stat, content), value: item.imbue.value }), null);
+  return parts;
 }
 
 // The item's numbers one by one, for setting it beside another: its damage
@@ -716,6 +768,7 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
   // "Tier III" from class level 25), on the card (the author: "Mozesz
   // dopisywać Tiery do przedmiotów").
   const tier = content.encyclopedia.tiers.findLast((/** @type {{ classLevel: number }} */ one) => one.classLevel <= classLevel);
+  const gem = gemView(item.gem, content);
   return {
     name: itemName(item, content),
     base: item.base,
@@ -736,8 +789,10 @@ export function itemView(item, content, { sellBonus = 0, upgradeCap, materials =
     // null when it asks for none.
     classLevel: classLevel > 1 ? classLevel : null,
     price: sellPrice(item, content, sellBonus),
-    // The gem set in it in Jubilerstwo, which its numbers above include.
-    ...(gemView(item.gem, content) ? { gem: gemView(item.gem, content) } : {}),
+    // The gem set in it in Jubilerstwo, which its numbers above include, and
+    // its numbers without the gem and with it, which its card writes side by
+    // side (gemProperties, 906 B).
+    ...(gem ? { gem, gemProperties: gemProperties(item, content) } : {}),
     // Got in a Wymiana, or from another character through the Skrzynia
     // Konta: worn from its own level on (src/server/inventory.js).
     ...(item.traded ? { traded: true } : {}),
