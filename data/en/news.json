@@ -624,6 +624,10 @@
     "0.3.6": {
       "title": "Version 0.3.6",
       "body": "- The Guild tab has a new “Members' ranking” card. “Activity” shows how much Fame each member brought the guild this week or in all time. Tap a member to see where their Fame comes from: the Beast, the Expedition, Trials, Requests, the Exchange or War.\n- “Donations” shows how much gold and resources each member gave to the Hall. Donations from before they were recorded stand together under the list.\n- In the Hall, the “Who gave what” button opens those donations straight away.\n- On narrow phones, the day's rewards at the Labyrinth's entrance are no longer cut off."
+    },
+    "0.3.7": {
+      "title": "Version 0.3.7",
+      "body": "- The Labyrinth is easier: its creatures sit roughly halfway between the old Labyrinth and the latest one.\n- After you collect an expedition's report, “Back” leads to the expeditions of the same place, not to the start of Combat.\n- Another character's card shows the gem set in an item."
     }
   }
 }

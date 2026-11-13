@@ -106,8 +106,9 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
   // The narrator points at the tabs, or at the title of a single fight.
   const tabList = h('div', { class: 'fight-tabs', role: 'tablist', 'aria-label': t('Walki wyprawy'), 'data-guide': 'report-fights' });
 
-  // "Powrót" leads back to the tab the report was opened from: Walka or Dziennik.
-  const heading = (title, subtitle) =>
+  // "Powrót" leads back to the tab the report was opened from: Walka or
+  // Dziennik; `back`, somewhere else instead.
+  const heading = (title, subtitle, back = backHash) =>
     h(
       'div',
       { class: 'page-heading page-heading--back' },
@@ -117,8 +118,18 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
         h('h1', { class: 'page-title', tabindex: '-1', text: title }),
         subtitle && h('p', { class: 'page-subtitle', text: subtitle }),
       ),
-      h('a', { class: 'button button--system back-button', href: backHash }, icon('back', { size: 20 }), t('Powrót')),
+      h('a', { class: 'button button--system back-button', href: back }, icon('back', { size: 20 }), t('Powrót')),
     );
+  // An exploration's report opened from the Walka goes back to the choice of
+  // explorations of its inner region, not to the lands (the author,
+  // 13.11.2026: „Powrót po odebraniu raportu z walki na wyprawie powinien
+  // cofać do opcji wyprawy w tym samym regionie wewnętrznym a nie do
+  // początku”); the Walka itself when the game no longer has the place.
+  const huntBack = (one) => {
+    if (backHash !== '#/walka') return backHash;
+    const region = state.content.regions.find((each) => each.id === one.regionId);
+    return region?.areas?.some((area) => area.id === one.areaId) ? `#/walka/${region.id}/${one.areaId}` : backHash;
+  };
 
   // A report that comes after the player has left the screen is only kept
   // for later, not shown and not played (the code review: its sounds played
@@ -199,6 +210,7 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
           : heading(
             report.flash ? t('Błyskawiczne polowanie') : report.quick ? t('Szybkie Polowanie') : t('Raport z wyprawy'),
             `${report.areaName ?? report.regionName} · ${formatMinutes(report.minutes)} · ${dateTimeFormat.format(new Date(report.endsAt))}`,
+            huntBack(report),
           ),
       // A stage just won with the next one open: its fight at the very top
       // (the author, 7.11.2026), as the button on the portal's card.

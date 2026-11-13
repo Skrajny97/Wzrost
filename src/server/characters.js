@@ -1792,6 +1792,10 @@ export async function characterProfile(context) {
       rarityName: item.rarityName,
       color: item.color,
       properties: item.properties,
+      // The gem set in it, which its numbers include (the author,
+      // 13.11.2026: „Spraw by w karcie postaci (jak gracz podgląda innego
+      // gracza) wyswietlalo sie jaki kamień jest oprawiony w przedmiocie”).
+      ...(item.gem ? { gem: item.gem } : {}),
       classNames: item.classNames,
       classLevel: item.classLevel,
     };

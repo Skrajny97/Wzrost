@@ -5,21 +5,21 @@
     {
       "id": "first",
       "name": "Poziom 1",
-      "strength": [1.1, 1.1],
+      "strength": [1, 1],
       "shards": { "elite": 3, "treasure": 2 },
       "artifact": { "common": 55, "rare": 35, "unique": 10 }
     },
     {
       "id": "second",
       "name": "Poziom 2",
-      "strength": [1.35, 1.35],
+      "strength": [1.2, 1.2],
       "shards": { "elite": 4, "treasure": 3 },
       "artifact": { "common": 46, "rare": 37, "unique": 14, "epic": 3 }
     },
     {
       "id": "third",
       "name": "Poziom 3",
-      "strength": [1.65, 1.65],
+      "strength": [1.45, 1.45],
       "shards": { "elite": 5, "treasure": 4 },
       "artifact": { "common": 37, "rare": 38, "unique": 18, "epic": 6, "legendary": 1 }
     },
@@ -27,7 +27,7 @@
       "id": "hell",
       "name": "Piekielny",
       "hell": true,
-      "strength": [3.3, 3.3],
+      "strength": [2.9, 2.9],
       "shards": { "elite": 9, "treasure": 7 },
       "artifact": { "common": 22, "rare": 34, "unique": 25, "epic": 12, "legendary": 5, "mythic": 1.5, "divine": 0.5 }
     }
