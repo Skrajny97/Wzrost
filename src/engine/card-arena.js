@@ -3,8 +3,10 @@
 // DECISIONS.md, "Karty z innymi graczami, z mieszkańcami Osady i z nowych
 // źródeł", 900 A): matches of Talia Systemu (cards.js) with the decks other
 // players saved, the rival's deck played by the server as Szczęsny plays
-// his higher tiers, its hero card with it (rivalSkill in cards.js). The
-// player's own saved deck defends it the same way while it is away.
+// his higher tiers, its hero card with it (rivalSkill in cards.js), and
+// for laying its cards first the defending deck's Atak and Życie raised by
+// rules.defenceBonus (915 B: newMatch's boost). The player's own saved deck
+// defends it the same way while it is away.
 //
 // Everything else mirrors the duels of the Arena (pvp-arena.js): a card
 // rating of its own from rating.start, moved as in chess (Elo), the

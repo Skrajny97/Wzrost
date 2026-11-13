@@ -10,10 +10,11 @@
 // saved in the Salon Gier (card_decks), and plays a match of Talia Systemu
 // against that deck, its cards at the rival's levels, the server laying the
 // rival's cards as Szczęsny on his higher tiers, openly before the player's
-// turn, with the rival's hero card (rivalSkill in src/engine/cards.js). The
-// player's own deck defends it so while it is away. Five matches a Polish
-// day, each counted at its start; one running at a time, apart from the
-// Salon's (card_matches). What the match puts at stake for both card
+// turn, with the rival's hero card (rivalSkill in src/engine/cards.js); for
+// laying first, the defending deck's cards have defenceBonus more Atak and
+// Życie (915 B). The player's own deck defends it so while it is away. Five
+// matches a Polish day, each counted at its start; one running at a time,
+// apart from the Salon's (card_matches). What the match puts at stake for both card
 // ratings is fixed at its start, and both move at its end: a match given up
 // is lost. Its defender sees it among its deck's last defences, those since
 // its last visit marked new. "Losuj innych" draws other rivals a few times
@@ -358,6 +359,7 @@ async function cardArenaView(db, player, record, rivals, now, defences = null) {
       rerolls: data.rivals.rerollsPerDay,
       start: data.rating.start,
       share: Math.round(data.season.share * 100),
+      defence: Math.round(data.defenceBonus * 100),
       deckSize: cards.deckSize,
     },
     texts: data.texts,
@@ -403,8 +405,8 @@ export async function getCardArena(context) {
 
 // POST /api/cards/arena/match { rivalId }: a match with one of the rivals
 // offered, against its saved deck, the character's own deck on its side,
-// both at their cards' levels now and with their hero cards; one of the
-// day's matches. What it puts at stake for both card ratings is fixed now
+// both at their cards' levels now and with their hero cards, the rival's
+// raised by the defence's bonus (915 B); one of the day's matches. What it puts at stake for both card ratings is fixed now
 // (cardRatingStakes). Saved in one batch over the record as read, with the
 // rival's record made for its rating (so two taps start one match); one
 // match at a time.
@@ -431,7 +433,7 @@ export async function startCardArenaMatch(context) {
   const theirs = decks.get(rivalId);
   if (!rival || !fairRival(rival, row) || !theirs) throw new ApiError(409, 'gone', texts().gone);
   const stakes = cardRatingStakes(record.rating, rival.card_rating, content());
-  const state = newMatch({ seed: newSeed(), me: { cards: mine, hero: heroOf(row) }, foe: { cards: theirs, hero: heroOf(rival), smart: rules().smart } }, content());
+  const state = newMatch({ seed: newSeed(), me: { cards: mine, hero: heroOf(row) }, foe: { cards: theirs, hero: heroOf(rival), smart: rules().smart, boost: rules().defenceBonus } }, content());
   const today = arenaDay(now, content()).key;
   try {
     await atomically(

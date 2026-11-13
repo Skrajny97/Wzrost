@@ -518,7 +518,7 @@
         "noReward": "This reward is no longer there to claim.",
         "season": "The season lasts {time} more. Then every rating moves {share}% of the way back to {start}.",
         "rules": [
-          "In the Arena you play cards against other players' decks. Your rival need not be in the game: the System plays their deck, as Szczęsny plays on his higher tiers. Each round your rival lays their cards first, face up, and you answer. Your rival also has the hero card of their class and uses its skill once a match, when it helps against your cards on the table.",
+          "In the Arena you play cards against other players' decks. Your rival need not be in the game: the System plays their deck, as Szczęsny plays on his higher tiers. Each round your rival lays their cards first, face up, and you answer. In exchange, the defending deck has +{defence}% Attack and Life. Your rival also has the hero card of their class and uses its skill once a match, when it helps against your cards on the table.",
           "Matches a day: {perDay}, from midnight. A match counts when you start it. You pick one of three rivals with a similar card rating. By each one you see the strength of their deck (the Attack and Life of its 12 cards added up) and how much rating you gain for a win or drop for a loss.",
           "While you are away, your deck from the Games Parlour plays for you, with your hero card. You see each such match among your deck's defences.",
           "If the rivals don't suit you, you can reroll them for others with a similar rating. Rerolls a day: {rerolls}, from midnight. A reroll does not use up a match.",

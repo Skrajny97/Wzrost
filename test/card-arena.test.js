@@ -150,6 +150,24 @@ describe('the Karty of the Arena: the rules', () => {
 });
 
 describe('the Karty of the Arena: the rival the server plays (900 A)', () => {
+  test("the defending deck's cards have defenceBonus more Atak and Życie, rounded (915 B); the attacker's keep theirs", () => {
+    assert.ok(rules.defenceBonus > 0 && rules.defenceBonus < 0.5);
+    const cards = starter();
+    const match = newMatch({ seed: 'boost', me: { cards }, foe: { cards, smart: rules.smart, boost: rules.defenceBonus } }, content);
+    const raised = (value) => Math.round(value * (1 + rules.defenceBonus));
+    for (const card of match.foe.cards) {
+      const base = cardStats(card.id, card.level, content);
+      assert.deepEqual([card.attack, card.life, card.max], [raised(base.attack), raised(base.life), raised(base.life)]);
+    }
+    for (const card of match.me.cards) {
+      const base = cardStats(card.id, card.level, content);
+      assert.deepEqual([card.attack, card.life, card.max], [base.attack, base.life, base.life]);
+    }
+    // The page sees the raised numbers on the rival's cards.
+    const shown = matchView(match, content).foe.lines.filter(Boolean);
+    assert.ok(shown.length > 0 && shown.every((card) => card.attack === raised(cardStats(card.id, card.level, content).attack)));
+  });
+
   test('a rival with its hero lays its cards first, openly, and in the first round uses no skill', () => {
     const match = newMatch({ seed: 'rival', me: { cards: starter(), hero: { classId: 'warrior', stage: 0 } }, foe: { cards: hostTier(3, content).cards.map((card) => ({ id: card.monster, level: card.level })), hero: { classId: 'mage', stage: 1 }, smart: rules.smart } }, content);
     assert.ok(match.foe.lines.every((key) => key !== null));
@@ -399,6 +417,15 @@ describe('the Karty of the Arena through the API', () => {
     assert.equal(state.foe.cards.find((card) => card.id === 'wolf').level, cardLevel(3, content));
     assert.deepEqual([state.foe.hero.classId, state.foe.hero.stage, state.foe.smart], ['mage', 0, rules.smart]);
     assert.deepEqual([state.me.hero.classId, state.me.cards.length], ['warrior', 12]);
+    // The defending deck plays with its bonus (915 B), the player's at its
+    // own numbers; the rules say how much.
+    const raised = (value) => Math.round(value * (1 + rules.defenceBonus));
+    for (const card of state.foe.cards) {
+      const base = cardStats(card.id, card.level, content);
+      assert.deepEqual([card.attack, card.life, card.max], [raised(base.attack), raised(base.life), raised(base.life)]);
+    }
+    for (const card of state.me.cards) assert.equal(card.attack, cardStats(card.id, card.level, content).attack);
+    assert.equal(view.numbers.defence, Math.round(rules.defenceBonus * 100));
     // One match at a time.
     assert.equal((await play(ala, bolek.id)).data.error.code, 'match_running');
     // A turn: the server lays the rival's next cards; a stale round refused.

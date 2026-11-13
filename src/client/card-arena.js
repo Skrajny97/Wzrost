@@ -388,7 +388,7 @@ export function mountCardArena(holder, { place = null, onDue = () => {} } = {}) 
     const { texts, numbers } = view;
     return howItWorks(
       null,
-      texts.rules.map((line) => say(line, { perDay: numbers.perDay, rerolls: numbers.rerolls, start: numbers.start, share: numbers.share })),
+      texts.rules.map((line) => say(line, { perDay: numbers.perDay, rerolls: numbers.rerolls, start: numbers.start, share: numbers.share, defence: numbers.defence })),
     );
   };
 
