@@ -22,6 +22,7 @@ import {
   potionsDone,
   professionState,
   setMinutes,
+  weakerGem,
 } from '../engine/index.js';
 import { say } from '../engine/text.js';
 import { content } from './content.js';
@@ -31,6 +32,7 @@ import { labyrinthOn } from './features.js';
 import { toHex } from './encoding.js';
 import { assertion, atomically, raced, sameVersion } from './atomic.js';
 import { ApiError, json, readJson } from './http.js';
+import { t } from './i18n.js';
 import { requireOpen } from './mining.js';
 import { addTo, insertWork, requireProfessions, workClaim, workClaimFailed, workGains } from './professions.js';
 import { workFamePoints } from './fame.js';
@@ -61,7 +63,7 @@ function jewelOrder(player, level, body) {
 }
 
 // A setting: an item of the character's, worn or in the bag, and a gem the
-// level sets that is not in it already. A worn item waits while the
+// level sets that is not in it already and not weaker than the one in it. A worn item waits while the
 // character explores, as the Kowadło does, since the exploration's report is
 // made with what it wears. One setting of an item at a time: of the
 // character's and the Awatar's, the later would break the earlier's gem
@@ -83,6 +85,8 @@ function settingOrder(player, level, body, now) {
   if (!gem || gem.kind !== 'gem') throw new ApiError(400, 'unknown_gem', 'Nie ma takiego kamienia.');
   if (gem.level > level) throw new ApiError(403, 'locked', say(content().jewelcrafting.texts, 'hidden', 0, { level: gem.level }));
   if (item.gem === gem.id) throw new ApiError(409, 'same_gem', `${gem.name} już tkwi w tym przedmiocie.`);
+  // Only a stronger gem takes the place of one (the author, 13.11.2026).
+  if (weakerGem(gem.id, item.gem, content())) throw new ApiError(409, 'weaker_gem', t('W tym przedmiocie tkwi {gem}. Oprawisz w nim tylko mocniejszy kamień.', { gem: content().mineralsById[item.gem].name }));
   return { cost: { [gem.id]: 1 }, minutes: setMinutes(gem.id, level, content()), options: { set: true, item: item.id, itemName: itemName(item, content()), gem: gem.id } };
 }
 
@@ -98,6 +102,7 @@ function coreSettingOrder(player, level, body, now) {
   if (!gem || gem.kind !== 'gem') throw new ApiError(400, 'unknown_gem', 'Nie ma takiego kamienia.');
   if (gem.level > level) throw new ApiError(403, 'locked', say(content().jewelcrafting.texts, 'hidden', 0, { level: gem.level }));
   if (coreOf(player.row).gem === gem.id) throw new ApiError(409, 'same_gem', `${gem.name} już tkwi w Rdzeniu.`);
+  if (weakerGem(gem.id, coreOf(player.row).gem, content())) throw new ApiError(409, 'weaker_gem', t('W Rdzeniu tkwi {gem}. Oprawisz w nim tylko mocniejszy kamień.', { gem: content().mineralsById[coreOf(player.row).gem].name }));
   const name = content().slotsById.core?.name ?? 'Rdzeń';
   return { cost: { [gem.id]: 1 }, minutes: setMinutes(gem.id, level, content()), options: { set: true, core: true, itemName: name, gem: gem.id } };
 }
