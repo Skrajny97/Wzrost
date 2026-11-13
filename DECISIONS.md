@@ -3255,6 +3255,7 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 3. Okienko „Do oferty” ma dwie zakładki, „Przedmioty” i „Materiały”. Przy towarze gracz wpisuje, ile sztuk pokazać; na start wpisane jest wszystko, co postać ma. Serwer nie przyjmie więcej sztuk, niż postać ma w chwili wysłania, ani tego samego towaru dwa razy.
 4. Wiadomość zapisuje towar jako rodzaj, id i liczbę (migracja 0130), a nazwę pokazuje w języku czytającego. Dotknięcie towaru otwiera kartę: co to jest, ile sztuk pokazuje wiadomość i ile ma czytający („Ty masz”).
 5. Oferta niczego nie przenosi ani nie rezerwuje: wszystko zostaje u piszącego, a wymienia się jak dotąd przez „Wymianę” z graczem.
+6. **Poprawka narratora:** kwestia, która czeka chwilę na swoim ekranie (np. przy raporcie omdlenia), pokazuje się, gdy minie jej odliczanie, także gdy zegar odliczania skończy się o milisekundę przed zegarem systemowym. Wcześniej czekała wtedy do następnego ruchu gracza, a test na GitHubie raz przez to nie przeszedł i 0.3.19 nie weszła do gry. Zmiana postaci kasuje też czekającą kwestię poprzedniej.
 
 ## Wersja 0.3.20 (13.11.2026): premia obrony na Arenie kart (915 B) i poprawki z przeglądu kodu
 
