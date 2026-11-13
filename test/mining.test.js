@@ -42,6 +42,7 @@ import {
   setMinutes,
   upgradedItem,
   veinGoldPerHour,
+  weakerGem,
   workProfession,
   workXp,
 } from '../src/engine/index.js';
@@ -489,6 +490,16 @@ describe('Jubilerstwo in the engine', () => {
     assert.equal(setMinutes('quartz', 11, content), 14);
   });
 
+  test('a weaker gem never takes the place of a stronger one, a stronger one does (the author, 13.11.2026)', () => {
+    assert.equal(weakerGem('quartz', 'agate', content), true);
+    assert.equal(weakerGem('ruby', 'diamond', content), true);
+    assert.equal(weakerGem('agate', 'quartz', content), false);
+    assert.equal(weakerGem('diamond', 'ruby', content), false);
+    // An empty item, or one with a gem the data no longer knows, takes any.
+    assert.equal(weakerGem('quartz', null, content), false);
+    assert.equal(weakerGem('quartz', 'nothing', content), false);
+  });
+
   test('the report of a setting names the gem, the item and the gem it destroyed, or the gem that came back', () => {
     const work = { level: 30, timePoints: 0, messages: [] };
     const base = { minutes: 15, startedAt: 0, endsAt: 900000, seed: 's', before: { level: 1, xp: 0 }, after: { level: 1, xp: 15 }, character: { level: 30 }, xp: 5, work };
@@ -734,15 +745,24 @@ describe('Górnictwo and Jubilerstwo through the API', () => {
     assert.equal(again.report.set.replaced, 'Poprzedni kamień, Kwarc, rozpadł się przy oprawianiu.');
     assert.equal(again.character.equipment.weapon.gem.id, 'agate');
 
+    // A weaker gem never takes the place of a stronger one (the author, 13.11.2026).
+    const weaker = await jewel({ set: true, itemId: weapon.id, gem: 'quartz' });
+    assert.equal(weaker.status, 409);
+    assert.equal(weaker.data.error.code, 'weaker_gem');
+    assert.equal(weaker.data.error.message, 'W tym przedmiocie tkwi Agat. Oprawisz w nim tylko mocniejszy kamień.');
+    assert.deepEqual(minerals(await character()), { quartz: 1 });
+
     // An item gone by the end gives its gem back, and called back early the gem comes back too.
-    await jewel({ set: true, itemId: weapon.id, gem: 'quartz' });
-    await (await db()).prepare('DELETE FROM items WHERE id = ?').bind(weapon.id).run();
+    const ring = (await character()).bag[0];
+    await jewel({ set: true, itemId: ring.id, gem: 'quartz' });
+    await (await db()).prepare('DELETE FROM items WHERE id = ?').bind(ring.id).run();
     await age(15);
     const gone = (await claim()).data;
     assert.equal(gone.report.set.text, 'Tego przedmiotu już nie ma. Kamień wrócił do plecaka: Kwarc.');
     assert.deepEqual(minerals(gone.character), { quartz: 1 });
-    const ring = (await character()).bag[0];
-    assert.equal((await jewel({ set: true, itemId: ring.id, gem: 'quartz' })).status, 201);
+    await (await db()).prepare('INSERT INTO items (character_id, slot, data, created_at) VALUES (?, NULL, ?, 0)').bind(id, JSON.stringify({ base: 'ring', slot: 'ring', level: 25, rarity: 'common', affixes: [], implicit: { stat: 'perception', value: 5 } })).run();
+    const fresh = (await character()).bag[0];
+    assert.equal((await jewel({ set: true, itemId: fresh.id, gem: 'quartz' })).status, 201);
     assert.deepEqual(minerals(await character()), {});
     assert.equal((await call('POST', '/api/hunts/cancel', { cookie })).data.report, null);
     assert.deepEqual(minerals(await character()), { quartz: 1 });

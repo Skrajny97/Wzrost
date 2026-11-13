@@ -208,6 +208,24 @@ export function setMinutes(gemId, level, content) {
   return wholeMinutes(minutes * rarityTime ** (rarityStep(content.mineralsById[gemId].rarity, content) - 1) * pace(level, content));
 }
 
+// Whether a gem is weaker than the one set now in an item or the Rdzeń
+// (`current`, its id; none for an empty one): it raises the numbers less
+// (setBonus). A weaker gem never takes the place of a stronger one (the
+// author, 13.11.2026: „Trzeba uniemożliwić oprawianie niższym - słabszym
+// kamieniem niż aktualnie jest w przedmiocie”). A gem the data no longer
+// knows is weaker than none.
+/**
+ * @param {string} gemId
+ * @param {string | null | undefined} current
+ * @param {Content} content
+ * @returns {boolean}
+ */
+export function weakerGem(gemId, current, content) {
+  const now = current ? content.mineralsById[current] : undefined;
+  const next = content.mineralsById[gemId];
+  return Boolean(now && next && next.setBonus < now.setBonus);
+}
+
 // The report of a work in the Szlifiernia: a line about the place from the
 // seed, whether the player called it back early, the profession's new levels
 // with their stats and the patterns and gems the System opened with them,

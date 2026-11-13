@@ -2947,6 +2947,8 @@
   "Artefakty Rdzenia": "Core Artifacts",
   "Wszystkie liczby wchłoniętych Artefaktów wzrosną o {bonus}.": "Every number of the absorbed Artifacts will grow by {bonus}.",
   "{gem} już tkwi w Rdzeniu.": "The {gem} is already set in the Core.",
+  "W tym przedmiocie tkwi {gem}. Oprawisz w nim tylko mocniejszy kamień.": "This item holds the {gem}. Only a stronger stone can be set in it.",
+  "W Rdzeniu tkwi {gem}. Oprawisz w nim tylko mocniejszy kamień.": "The Core holds the {gem}. Only a stronger stone can be set in it.",
   "{level} · {room} · {date}": "{level} · {room} · {date}",
   "Wróć do Labiryntu": "Back to the Labyrinth",
   "Wejdź do Labiryntu": "Enter the Labyrinth",

@@ -411,6 +411,11 @@ describe('the Rdzeń through the API', () => {
     assert.equal(core.gem.id, 'quartz');
     assert.notEqual(core.absorbed[0].traits[0].text, plain);
     assert.equal((await call('POST', '/api/professions/jewel', { cookie, body: { set: true, itemId: 'core', gem: 'quartz' } })).data.error.code, 'same_gem');
+    // A weaker gem never takes the place of a stronger one (the author, 13.11.2026).
+    await set(`core = json_set(core, '$.gem', 'agate'), minerals = '{"quartz":1}'`);
+    const weaker = await call('POST', '/api/professions/jewel', { cookie, body: { set: true, itemId: 'core', gem: 'quartz' } });
+    assert.equal(weaker.data.error.code, 'weaker_gem');
+    assert.equal(weaker.data.error.message, 'W Rdzeniu tkwi Agat. Oprawisz w nim tylko mocniejszy kamień.');
   });
 
   test('the Artefakty work in the character\'s fights, never in a companion\'s', () => {

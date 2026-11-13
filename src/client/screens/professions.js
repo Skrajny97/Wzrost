@@ -2030,7 +2030,8 @@ export function mountProfessions(container, { params, navigate }) {
 
   // Setting a gem in an item worn: the item (and the gem in it now), the
   // gem (those the System still hides are shadows), what the gem gives,
-  // the time, and the start; a gem already in the item is lost.
+  // the time, and the start; a gem already in the item is lost, and only a
+  // stronger one takes its place (the author, 13.11.2026).
   function setForm(character, jewelcrafting) {
     // The Rdzeń takes a gem too, once it is open (863 A, screens/core.js).
     const coreSlot = state.content.slots.find((slot) => slot.id === 'core');
@@ -2078,11 +2079,13 @@ export function mountProfessions(container, { params, navigate }) {
         },
       );
       const same = item.gem?.id === gem.id;
+      // A gem weaker than the one in the item never takes its place.
+      const weaker = !same && Boolean(item.gem) && gem.bonus < item.gem.bonus;
       const start = h('button', {
         type: 'button',
         class: 'button button--system',
         text: t('Oprawiaj'),
-        disabled: same || gem.have === 0,
+        disabled: same || weaker || gem.have === 0,
         onClick: async (event) => {
           const button = event.currentTarget;
           if (item.gem) {
@@ -2110,10 +2113,17 @@ export function mountProfessions(container, { params, navigate }) {
             : t('Wszystkie liczby przedmiotu wzrosną o {bonus}, każda co najmniej o 1.', { bonus: percentText(gem.bonus) }),
         }),
         h('p', { class: 'herb-estimate', text: t('Czas oprawiania: {time}. Zużyjesz: 1 × {gem}.', { time: formatMinutes(gem.minutes), gem: gem.name }) }),
-        item.gem && !same && h('p', { class: 'herb-room herb-room--full', text: t('Nowy kamień zniszczy obecny: {gem}.', { gem: gemNow(item) }) }),
+        item.gem && !same && !weaker && h('p', { class: 'herb-room herb-room--full', text: t('Nowy kamień zniszczy obecny: {gem}.', { gem: gemNow(item) }) }),
         same && h('p', { class: 'herb-room', text: item.core ? t('{gem} już tkwi w Rdzeniu.', { gem: gem.name }) : t('{gem} już tkwi w tym przedmiocie.', { gem: gem.name }) }),
-        gem.have === 0 && h('p', { class: 'herb-room herb-room--full', text: t('Brakuje kamienia: {gem}. Wydobędziesz go w Górnictwie.', { gem: gem.name }) }),
-        gem.have === 0 && h('a', { class: 'button button--world', href: HASHES.mining, text: t('Do Górnictwa') }),
+        weaker &&
+          h('p', {
+            class: 'herb-room',
+            text: item.core
+              ? t('W Rdzeniu tkwi {gem}. Oprawisz w nim tylko mocniejszy kamień.', { gem: item.gem.name })
+              : t('W tym przedmiocie tkwi {gem}. Oprawisz w nim tylko mocniejszy kamień.', { gem: item.gem.name }),
+          }),
+        !weaker && gem.have === 0 && h('p', { class: 'herb-room herb-room--full', text: t('Brakuje kamienia: {gem}. Wydobędziesz go w Górnictwie.', { gem: gem.name }) }),
+        !weaker && gem.have === 0 && h('a', { class: 'button button--world', href: HASHES.mining, text: t('Do Górnictwa') }),
         start,
       );
     }

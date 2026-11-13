@@ -648,6 +648,10 @@
     "0.3.12": {
       "title": "Version 0.3.12",
       "body": "- Once a day Szczęsny sells a pack of three creature cards from the lands lower than yours in the Games Parlour, for the gold of an hour of exploring at your level. Cards you don't have yet come first. You'll find the pack in the Cards tab, under your hero card."
+    },
+    "0.3.13": {
+      "title": "Version 0.3.13",
+      "body": "- An item or the Core that already holds a stone can only take a stronger one. A weaker stone no longer takes the place of a stronger one."
     }
   }
 }

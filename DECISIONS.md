@@ -3248,6 +3248,20 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.13 (13.11.2026): słabszego kamienia nie da się oprawić w miejsce mocniejszego
+
+1. **Oprawianie (autor, 13.11.2026):** „Trzeba uniemożliwić oprawianie niższym - słabszym kamieniem niż aktualnie jest w przedmiocie.” Zasady: „Oprawianie: tylko mocniejszy kamień w miejsce obecnego (13.11.2026)”.
+2. **Sprawdzone:** testy Górnictwa i Jubilerstwa (32) i oprawiania Rdzenia, typy i tłumaczenia, a w przeglądarce na 320, 390, 1366 i 1920 px Oprawianie Rdzenia ze Szmaragdem: Agat zablokowany z objaśnieniem, Szafir dozwolony, bez przewijania na boki.
+
+## Oprawianie: tylko mocniejszy kamień w miejsce obecnego (13.11.2026)
+
+Autor 13.11.2026: „Trzeba uniemożliwić oprawianie niższym - słabszym kamieniem niż aktualnie jest w przedmiocie.”
+
+1. **Zasada.** W przedmiocie albo w Rdzeniu, w którym tkwi już kamień, da się oprawić tylko kamień mocniejszy, czyli taki, który podnosi liczby o więcej (Kwarc 5%, Agat 10%, Ametyst 15%, Szmaragd 20%, Szafir 25%, Rubin 30%, Diament 35%). Tego samego kamienia nie dało się oprawić już wcześniej. Każda rzadkość ma jeden kamień, więc w miejsce kamienia wchodzi tylko kamień wyższej rzadkości.
+2. **Ekran Oprawiania.** Przy słabszym kamieniu przycisk „Oprawiaj” jest wyszarzony, a nad nim stoi: „W tym przedmiocie tkwi Szmaragd. Oprawisz w nim tylko mocniejszy kamień.” (przy Rdzeniu: „W Rdzeniu tkwi …”). Nie ma wtedy ostrzeżenia, że nowy kamień zniszczy obecny, ani odsyłacza do Górnictwa po brakujący kamień.
+3. **Serwer** odmawia takiego oprawiania błędem `weaker_gem` z tym samym zdaniem. Kamienie porównuje `weakerGem` w `src/engine/jewelcraft.js`, a sprawdzają `settingOrder` i `coreSettingOrder` w `src/server/jewelcraft.js`.
+4. **Brakujące szczegóły.** Kamień, którego dane gry już nie znają, nie blokuje żadnego. Oprawianie zamówione przed 0.3.13 kończy się jak dotąd. Oprawianie z karty postaci (makiety 912, czekają na ocenę) dostanie tę samą zasadę.
+
 ## Wersja 0.3.12 (13.11.2026): pakiet kart u Szczęsnego (902 C)
 
 1. **Pakiet z niższych krain (902 C):** raz dziennie u Szczęsnego trzy karty stworów z krain niższych niż kraina postaci, najpierw te, których postać nie ma. Pakiet kosztuje tyle złota, ile daje godzina wyprawy na poziomie postaci. Zasady: „Pakiet kart u Szczęsnego: zbudowany (902 C, 13.11.2026)”.

@@ -815,6 +815,11 @@
       "id": "0.3.12",
       "title": "Wersja 0.3.12",
       "body": "- Raz dziennie Szczęsny sprzedaje w Salonie Gier pakiet trzech kart stworów z krain niższych niż Twoja, za tyle złota, ile daje godzina wyprawy na Twoim poziomie. Najpierw wypadają karty, których jeszcze nie masz. Pakiet znajdziesz w zakładce Karty, pod kartą bohatera."
+    },
+    {
+      "id": "0.3.13",
+      "title": "Wersja 0.3.13",
+      "body": "- W przedmiocie albo w Rdzeniu, w którym tkwi już kamień, oprawisz tylko mocniejszy kamień. Słabszy nie zajmie już miejsca mocniejszego."
     }
   ]
 }
