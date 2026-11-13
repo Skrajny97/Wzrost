@@ -3373,6 +3373,15 @@ summary {
   image-rendering: pixelated;
 }
 
+/* A number of an item with its gem, in brackets beside the number without
+   it, in the gem's colour (character.js propertyLines, 906 B), kept whole:
+   a narrow card breaks the line before it, never after its dash. */
+.item-gem-value {
+  color: var(--rarity, var(--text));
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .threat-note {
   margin: 0;
   font-size: 14px;
@@ -20816,6 +20825,32 @@ a.discord-button {
 
 .labyrinth-hero .labyrinth-over {
   margin: 10px 0 0;
+}
+
+/* After a fight lost: the way to start again (the author, 13.11.2026). */
+.labyrinth-reset-part {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 8px 0 0;
+}
+
+.labyrinth-hero .labyrinth-reset-part {
+  align-items: flex-start;
+}
+
+.labyrinth-reset {
+  max-width: 100%;
+  white-space: normal;
+}
+
+.labyrinth-reset-note {
+  margin: 0;
+}
+
+.labyrinth-hero > .labyrinth-reset-note {
+  margin: 6px 0 0;
 }
 
 .labyrinth-entry-party,

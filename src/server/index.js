@@ -29,7 +29,7 @@ import { acceptPartyInvite, cancelPartyInvite, declinePartyInvite, getParty, inv
 import { settlePartyEvents } from './party-events.js';
 import { enterTower, getTowers } from './towers.js';
 import { enterPortal, getPortals, sweepAllPortals, sweepPortal } from './portals.js';
-import { chooseLabyrinthBlessing, enterLabyrinth, getLabyrinth, labyrinthMerchant } from './labyrinth.js';
+import { chooseLabyrinthBlessing, enterLabyrinth, getLabyrinth, labyrinthMerchant, resetLabyrinthDay } from './labyrinth.js';
 import { absorbArtifact, breakArtifact, dissolveArtifact, getCore, upgradeArtifact } from './core.js';
 import { acceptGuildInvite, cancelGuildInvite, declineGuildInvite, foundGuild, getGuild, handGuildLead, inviteToGuild, kickFromGuild, leaveGuild, setGuildRole } from './guilds.js';
 import { attackGuildBeast, claimGuildBeastChest, getGuildBeast } from './guild-beast.js';
@@ -441,6 +441,7 @@ const routes = [
   ['POST', '/api/labyrinth/room', enterLabyrinth],
   ['POST', '/api/labyrinth/blessing', chooseLabyrinthBlessing],
   ['POST', '/api/labyrinth/merchant', labyrinthMerchant],
+  ['POST', '/api/labyrinth/reset', resetLabyrinthDay],
   ['GET', '/api/core', getCore],
   ['POST', '/api/core/absorb', absorbArtifact],
   ['POST', '/api/core/upgrade', upgradeArtifact],

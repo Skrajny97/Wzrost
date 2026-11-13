@@ -3,7 +3,7 @@
   "title": "Labirynt Systemu i Rdzeń",
   "type": "object",
   "additionalProperties": false,
-  "required": ["rewardMinutes", "levels", "eliteStrength", "guardianStrength", "map", "rooms", "spring", "merchant", "rewards", "reportsKept", "blessings", "texts", "core"],
+  "required": ["rewardMinutes", "levels", "eliteStrength", "guardianStrength", "map", "rooms", "spring", "merchant", "reset", "rewards", "reportsKept", "blessings", "texts", "core"],
   "definitions": {
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
     "pair": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "exclusiveMinimum": 0 } },
@@ -87,6 +87,16 @@
         "heal": { "$ref": "#/definitions/share" },
         "healMinutes": { "type": "integer", "minimum": 1 },
         "blessingMinutes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "reset": {
+      "description": "Labirynt od nowa po przegranej walce (autor, 13.11.2026): perDay razy dziennie za złoto goldMinutes minut eksploracji na poziomie stworów.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["goldMinutes", "perDay"],
+      "properties": {
+        "goldMinutes": { "type": "integer", "minimum": 1 },
+        "perDay": { "type": "integer", "minimum": 0 }
       }
     },
     "rewards": {

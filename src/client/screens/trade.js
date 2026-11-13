@@ -20,7 +20,7 @@ import { narratorIdle } from '../narrator.js';
 import { playSound } from '../sound.js';
 import { call, serverNow, state, walletEntries } from '../state.js';
 import { closeSheet, confirmAction, openSheet, pageHeading, toast, withButton } from '../ui.js';
-import { itemSummary, itemTitle, materialTitle } from './character.js';
+import { gemFold, itemSummary, itemTitle, materialTitle, propertyLines } from './character.js';
 
 const HASH = '#/wymiana';
 const EVERY_MS = 2000;
@@ -295,7 +295,10 @@ export function mountTrade(container, { backHash }) {
         h(
           'ul',
           { class: 'item-properties' },
-          item.properties.map((line) => h('li', { text: line })),
+          // Its numbers and the gem set in it, as on the item's own card:
+          // with a gem, each number without it and with it (906 B).
+          propertyLines(item),
+          item.gem && gemFold(item.gem),
           item.classNames &&
             h('li', {
               class: 'item-classes',

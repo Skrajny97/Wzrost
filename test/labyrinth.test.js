@@ -35,6 +35,7 @@ import {
   labyrinthAreas,
   labyrinthFighters,
   labyrinthFoes,
+  labyrinthGold,
   labyrinthMap,
   labyrinthStrength,
   leaveMerchant,
@@ -43,6 +44,9 @@ import {
   newLabyrinth,
   playerCombatant,
   reachableRooms,
+  resetLabyrinth,
+  resetPrice,
+  resetsLeft,
   roomDanger,
   roomsAhead,
   simulateFight,
@@ -234,6 +238,23 @@ describe('a day of the Labirynt', () => {
     assert.equal(leaveMerchant(taken).pending, null);
     const prices = merchantPrices(60, content);
     assert.ok(prices.heal > 0 && prices.blessing > prices.heal);
+  });
+
+  test('a Labirynt lost starts again once a day (the author, 13.11.2026): the first level, full HP, no blessings, the day\'s rewards kept, for the gold of 150 minutes of exploring', () => {
+    const day = '2026-11-13';
+    const lost = { ...newLabyrinth({ day, charLevel: 64, companions: [], seed: 'a' }), level: 2, row: 3, room: 1, path: [0, 1, 0, 1], cleared: 1, over: /** @type {const} */ ('fainted'), hp: { me: 0 }, blessings: ['might'], gains: { xp: 5, gold: 7, shards: 2, artifacts: 1 } };
+    assert.equal(resetsLeft({ ...lost, over: null }, content), 0);
+    assert.equal(resetsLeft({ ...lost, over: 'done' }, content), 0);
+    assert.equal(resetsLeft(lost, content), 1);
+    assert.equal(resetLabyrinth({ ...lost, over: 'done' }, { companions: [], seed: 'b' }, content), null);
+    const again = resetLabyrinth(lost, { companions: [], seed: 'b' }, content);
+    assert.deepEqual(again, { ...newLabyrinth({ day, charLevel: 64, companions: [], seed: 'b' }), gains: lost.gains, resets: 1 });
+    // Lost again the same day: no second try.
+    assert.equal(resetsLeft({ ...again, over: 'fainted' }, content), 0);
+    assert.equal(resetLabyrinth({ ...again, over: 'fainted' }, { companions: [], seed: 'c' }, content), null);
+    // Dearer than the gold a day of the Labirynt gives on average (100–140 minutes of exploring).
+    assert.equal(resetPrice(64, content), labyrinthGold(rules.reset.goldMinutes, 64, content));
+    assert.ok(resetPrice(64, content) > labyrinthGold(140, 64, content));
   });
 
   test('the blessings work in the fights: damage, armour, HP, a first critical blow, a shield, the companions\' damage and the healing after a won fight', () => {

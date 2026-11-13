@@ -13,7 +13,7 @@
 // of the chat it was opened from (`mention`, screens/community.js), else
 // in the Globalny's in the Społeczność.
 
-import { mineralSprite, skillSprite } from './art.js';
+import { skillSprite } from './art.js';
 import { friendsSeen, wantConversation, wantMention } from './chat-news.js';
 import { portraitBox } from './cosmetics.js';
 import { h, icon } from './dom.js';
@@ -21,7 +21,7 @@ import { t } from './i18n.js';
 import { SLOT_ICONS } from './icons.js';
 import { call, isUnlocked, state } from './state.js';
 import { closeSheet, confirmAction, framedName, guildTag, openSheet, toast, withButton } from './ui.js';
-import { itemSummary } from './screens/character.js';
+import { gemFold, itemSummary, propertyLines } from './screens/character.js';
 import { proposeTrade } from './screens/trade.js';
 
 // Shown in the page's language (t(), i18n.js).
@@ -65,19 +65,10 @@ export async function openProfile(name, { onChange, mention } = {}) {
                 h(
                   'ul',
                   { class: 'item-properties' },
-                  item.properties.map((line) => h('li', { text: line })),
-                  // The gem set in it, as on the item's own card.
-                  item.gem &&
-                    h(
-                      'li',
-                      { class: 'item-gem' },
-                      h(
-                        'details',
-                        { class: 'item-gem-fold' },
-                        h('summary', { class: 'item-gem-line', vars: { '--rarity': item.gem.color } }, mineralSprite(item.gem.id), ` ${item.gem.line}`),
-                        h('p', { class: 'item-gem-help', text: item.gem.help }),
-                      ),
-                    ),
+                  // Its numbers and the gem set in it, as on the item's own
+                  // card: with a gem, each number without it and with it.
+                  propertyLines(item),
+                  item.gem && gemFold(item.gem),
                   item.classNames && h('li', { class: 'item-classes', text: t(item.classNames.length > 1 ? 'Dla klas: {classes}' : 'Dla klasy: {classes}', { classes: item.classNames.join(', ') }) }),
                 ),
               )

@@ -12,7 +12,7 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
-import { artifactUpgradeCost, breakShards, coreEffects, labyrinthMap, makeArtifact, createRng, playerCombatant } from '../src/engine/index.js';
+import { artifactUpgradeCost, breakShards, coreEffects, labyrinthMap, makeArtifact, createRng, playerCombatant, resetPrice } from '../src/engine/index.js';
 import { makeClimber } from './helpers/climb.js';
 import { content } from './helpers/content.js';
 import { useServer } from './helpers/server.js';
@@ -167,6 +167,40 @@ describe('the Labirynt Systemu through the API', () => {
     assert.equal(fresh.level, 1);
     assert.equal(fresh.over, null);
     assert.equal(fresh.started, false);
+  });
+
+  test('after a fight lost, once a day and for its gold, the Labirynt starts again from the first level; the day\'s rewards stay', async () => {
+    const price = resetPrice(60, content);
+    const reset = () => call('POST', '/api/labyrinth/reset', { cookie, body: {} });
+    // Not before a fight is lost.
+    await set('labyrinth = ?, gold = ?', JSON.stringify(stateOf({ row: 0, room: 0, path: [0] })), price * 3);
+    assert.equal((await get()).reset, null);
+    assert.equal((await reset()).data.error.code, 'no_reset');
+    // Not without the gold.
+    const lost = stateOf({ level: 3, row: 2, room: 1, path: [0, 1, 1], cleared: 2, over: 'fainted', hp: { me: 0 }, blessings: ['might'], gains: { xp: 10, gold: 20, shards: 3, artifacts: 1 } });
+    await set('labyrinth = ?, gold = ?', JSON.stringify(lost), price - 1);
+    assert.deepEqual((await get()).reset, { price, left: 1 });
+    assert.equal((await reset()).data.error.code, 'no_gold');
+    // Paid: the first level again, at full HP and without blessings.
+    await set('gold = ?', price * 2);
+    const again = (await reset()).data;
+    assert.equal(again.character.gold, price);
+    assert.equal(again.labyrinth.over, null);
+    assert.equal(again.labyrinth.level, 1);
+    assert.equal(again.labyrinth.row, -1);
+    assert.equal(again.labyrinth.reset, null);
+    assert.deepEqual(again.labyrinth.blessings, []);
+    assert.deepEqual(again.labyrinth.gains, lost.gains);
+    assert.equal(again.labyrinth.fighters[0].hp, again.labyrinth.fighters[0].maxHp);
+    const saved = await kept();
+    assert.equal(saved.resets, 1);
+    assert.equal(saved.cleared, 0);
+    assert.notEqual(saved.seed, lost.seed);
+    // Lost again the same day: no second try.
+    await set('labyrinth = ?', JSON.stringify({ ...saved, over: 'fainted' }));
+    assert.deepEqual((await get()).reset, { price, left: 0 });
+    assert.equal((await reset()).data.error.code, 'no_reset');
+    assert.equal((await call('GET', '/api/character', { cookie })).data.character.gold, price);
   });
 
   test('a spring heals every fighter by its share of the max HP', async () => {

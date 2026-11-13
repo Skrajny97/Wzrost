@@ -131,6 +131,9 @@ describe('five characters on one account', () => {
     assert.equal(gems.length, 1);
     assert.equal(gems[0].item.gem.id, 'agate');
     assert.ok(gems[0].item.gem.line.includes('Agat'));
+    // With its numbers without the gem and with it, as on the item's own
+    // card (906 B).
+    assert.deepEqual(gems[0].item.gemProperties, [{ text: 'Obrażenia: 7–10', gem: '8–11', rest: ' (fizyczne)' }]);
 
     const invited = await call('POST', '/api/friends/invite', { cookie, body: { name: 'Mira' } });
     assert.equal(invited.data.error.code, 'self');

@@ -51,13 +51,14 @@ import { weekFactor, weekFighter } from './weeks.js';
  * over (`fainted`, or `done` with Piekielny cleared), the companions who go
  * (their ids, as at the start), each fighter's HP as a share of its maximum
  * (the character's under `me`), the character's level the creatures have,
- * the blessings taken, a choice waiting, the day's rewards and the seed of
- * the day's draws.
+ * the blessings taken, a choice waiting, the day's rewards, the seed of
+ * the day's draws and how many times it was started again (resetLabyrinth).
  * @typedef {{
  *   day: string, level: number, row: number, room: number | null, path: number[], cleared: number,
  *   over: null | 'fainted' | 'done', team: string[], hp: Record<string, number>, charLevel: number,
  *   blessings: string[], pending: Pending | null,
  *   gains: { xp: number, gold: number, shards: number, artifacts: number }, seed: string,
+ *   resets?: number,
  * }} LabyrinthState
  */
 
@@ -388,6 +389,40 @@ export function newLabyrinth({ day, charLevel, companions, seed }) {
     gains: { xp: 0, gold: 0, shards: 0, artifacts: 0 },
     seed,
   };
+}
+
+// A Labirynt lost may start again (the author, 13.11.2026: „Pozwól, w
+// przypadku porażki zresetować Labirynt raz dziennie za naprawdę srogą
+// opłatą (ale uzasadnioną, czyli górna granica balansu)”): after a fight
+// lost, reset.perDay times a day, for the gold of reset.goldMinutes minutes
+// of exploring at the creatures' level; a day of the Labirynt gives on
+// average the gold of 100–140 of them, so the second try pays only in its
+// XP, Odłamki, Artefakty and cards. It starts from the first level of the
+// same day's map, with the fighters at full HP, no blessings and the
+// companions going now; the day's rewards stay.
+/**
+ * @param {LabyrinthState} state
+ * @param {Content} content
+ * @returns {number} the tries left now, 0 unless a fight was lost
+ */
+export const resetsLeft = (state, content) => (state.over === 'fainted' ? Math.max(0, rules(content).reset.perDay - (state.resets ?? 0)) : 0);
+
+/**
+ * @param {number} charLevel
+ * @param {Content} content
+ * @returns {number}
+ */
+export const resetPrice = (charLevel, content) => labyrinthGold(rules(content).reset.goldMinutes, charLevel, content);
+
+/**
+ * @param {LabyrinthState} state
+ * @param {{ companions: Record<string, any>[], seed: string }} start
+ * @param {Content} content
+ * @returns {LabyrinthState | null} null when it may not start again
+ */
+export function resetLabyrinth(state, { companions, seed }, content) {
+  if (resetsLeft(state, content) <= 0) return null;
+  return { ...newLabyrinth({ day: state.day, charLevel: state.charLevel, companions, seed }), gains: state.gains, resets: (state.resets ?? 0) + 1 };
 }
 
 // The fighters of a Labirynt as they stand now: the character and its
