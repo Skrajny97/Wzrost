@@ -3,7 +3,7 @@
   "title": "Talia Systemu",
   "type": "object",
   "additionalProperties": false,
-  "required": ["name", "deckSize", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "host", "bonuses", "texts"],
+  "required": ["name", "deckSize", "hand", "roundCap", "lines", "types", "typeBonus", "stats", "drops", "starter", "heroes", "stakes", "pack", "host", "bonuses", "texts"],
   "definitions": {
     "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
     "chance": { "type": "number", "minimum": 0, "maximum": 1 },
@@ -118,6 +118,16 @@
         "perDay": { "type": "integer", "minimum": 1 }
       }
     },
+    "pack": {
+      "description": "Pakiet u Szczęsnego (902 C): raz dziennie `cards` kart stworów z krain niższych niż kraina postaci, za złoto `goldMinutes` minut wyprawy na poziomie postaci.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cards", "goldMinutes"],
+      "properties": {
+        "cards": { "type": "integer", "minimum": 1 },
+        "goldMinutes": { "type": "integer", "minimum": 1 }
+      }
+    },
     "host": {
       "type": "object",
       "additionalProperties": false,
@@ -174,11 +184,17 @@
     "texts": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "lower", "guild", "trial", "firstWin", "collection"],
+      "required": ["intro", "starterOffer", "starterTaken", "rules", "win", "loss", "draw", "drop", "lower", "guild", "trial", "firstWin", "pack", "collection"],
       "properties": {
         "intro": { "type": "string", "minLength": 1 },
         "starterOffer": { "type": "string", "minLength": 1 },
         "starterTaken": { "type": "string", "minLength": 1 },
+        "pack": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["offer", "opened"],
+          "properties": { "offer": { "type": "string", "minLength": 1 }, "opened": { "type": "string", "minLength": 1 } }
+        },
         "rules": { "$ref": "#/definitions/texts" },
         "win": { "$ref": "#/definitions/texts" },
         "loss": { "$ref": "#/definitions/texts" },

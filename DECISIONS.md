@@ -3248,6 +3248,11 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.12 (13.11.2026): pakiet kart u Szczęsnego (902 C)
+
+1. **Pakiet z niższych krain (902 C):** raz dziennie u Szczęsnego trzy karty stworów z krain niższych niż kraina postaci, najpierw te, których postać nie ma. Pakiet kosztuje tyle złota, ile daje godzina wyprawy na poziomie postaci. Zasady: „Pakiet kart u Szczęsnego: zbudowany (902 C, 13.11.2026)”.
+2. **Sprawdzone:** testy kart (55), typy, dane i tłumaczenia, a w przeglądarce na 320, 390, 1366 i 1920 px oferta, kupno i otwarty pakiet.
+
 ## Wersja 0.3.11 (13.11.2026): trudność Labiryntu rosnąca z poziomem, przeciąganie zleceń w kolejce Stołu rozbiórki (905 C)
 
 1. **Labirynt (autor, 13.11.2026):** poziom 1 łatwy, poziom 2 średni, poziom 3 trudny, Piekielny bardzo trudny. Siła poziomów ×0,8, ×1,1, ×1,5 i ×3,0. Liczby z pomiaru: „Labirynt Systemu i Rdzeń: zasady”, punkt 24.
@@ -3345,6 +3350,21 @@ Liczby są w `data/cards.json` (`drops`). Kartę z niższej krainy, z profesji i
    - Próbę kończy akcja z innej części gry (wyprawa, praca, Kowadło…), więc karta za Próbę wpada przy najbliższym spojrzeniu na Gildię: przy otwarciu Prób albo gdy strona sprawdza, co czeka w Gildii (mniej więcej co minutę). Komunikat: „Za ukończoną Próbę Gildii wpadła karta: …”. Każda Próba losuje raz, z własnego ziarna (postać i Próba), a postać pamięta Próby, za które dostała już kartę (`trials` w `characters.card_game`), więc żadna nie da karty dwa razy. Liczą się Próby z tego i z zeszłego tygodnia, także ukończone przed wdrożeniem. Bez nowej tabeli i bez migracji.
    - Każda karta z nowego źródła podnosi wersję postaci, jak każda zmiana kolekcji, żeby równoczesny odbiór raportu nie liczył kart po staremu.
    - Zasady Talii Systemu („Jak to działa?”) i opis kolekcji w Encyklopedii mówią teraz o nowych źródłach, po polsku i po angielsku.
+
+### Pakiet kart u Szczęsnego: zbudowany (902 C, 13.11.2026)
+
+Autor przyjął makiety 909.1 i 909.2 („zaznaczone wszystko”, 13.11.2026). Liczby są w `data/cards.json` (`pack`).
+
+1. **Gdzie.** Salon Gier → Karty: pod kartą bohatera stoi „Pakiet z niższych krain”, gdy postać ma już talię od Szczęsnego. W pierwszej krainie (Skraj Puszczy) pakietu nie ma, bo nie ma niższych krain.
+2. **Co w pakiecie.** Trzy karty stworów z krain niższych niż kraina postaci (`pack.cards`). Każdą wybiera ta sama funkcja co w innych źródłach (`pickCard`): najpierw kartę, której postać nie ma, nigdy kartę na 5. poziomie i nigdy dwa razy tę samą w jednym pakiecie. Gdy takich kart zostało mniej, pakiet ma mniej kart. Gdy wszystkie karty niższych krain mają 5. poziom, pakietu nie da się kupić.
+3. **Kraina postaci (brakujący szczegół):** kraina miejsca na wyższym z poziomów postaci i klasy, tak jak przy kartach z profesji (903).
+4. **Cena:** tyle złota, ile daje godzina wyprawy na poziomie postaci (`pack.goldMinutes`: 60), np. 840 zł na 64. poziomie. Cena rośnie z poziomem, jak ustalił autor.
+5. **Raz dziennie** (dzień Salonu Gier, od północy). Karty losuje ziarno dnia i postaci, więc ponowione kupno losuje te same karty. Gra zapisuje kupno tylko wtedy, gdy postać jest taka jak przy odczycie i ma dość złota.
+6. **Ekran przed kupnem:** trzy rewersy kart i opis z danych. Pod nimi niższe krainy i liczba kart, których z nich brakuje, oraz przycisk „Kup pakiet za N zł”. Bez złota przycisk jest wyszarzony, a pod nim stoi, ile złota brakuje.
+7. **Ekran po kupnie:** „Szczęsny rozkłada na stole trzy karty.”, karty z oznaczeniem „nowa”, „Nowe w kolekcji: …” i „Na wyższy poziom wchodzą: …”. Dalej liczba kart niższych krain, których jeszcze brakuje, „Następny pakiet jutro.” i „Dalej”.
+8. **API.** `POST /api/cards/pack` (`buyPack` w `src/server/cards.js`, karty losuje `packCards` w `src/engine/cards.js`). Widok kart ma `pack: { price, count, bought, lands, missing, empty }`.
+9. **Zasady w Salonie** mają nowe zdanie o pakiecie, po polsku i po angielsku.
+10. **Sprawdzone:** testy kart (55), typy, dane i tłumaczenia. W przeglądarce na 320, 390, 1366 i 1920 px oferta, kupno i otwarty pakiet: bez przewijania na boki i bez tekstu wychodzącego z ramek.
 
 ## Ranking członków gildii (897 A, 13.11.2026, w grze od 0.3.6)
 

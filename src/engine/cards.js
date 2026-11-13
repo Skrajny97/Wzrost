@@ -371,6 +371,38 @@ export function cardFrom(pool, rng, { chance, ...have }) {
   return comes ? card : null;
 }
 
+// The pack of the day at Szczęsny's (902 C): `count` cards of the
+// creatures of the lands lower than the character's own (lowerLandCards),
+// each drawn as every source draws (pickCard: one the character has not
+// got first, never one at its top level, never one twice in a pack), from
+// the day's seed. Fewer when fewer are left; none in the first land.
+/**
+ * @param {{ land: number, owned: Iterable<string>, maxed: Iterable<string>, seed: string, count: number }} draw
+ * @param {Content} content
+ * @returns {string[]}
+ */
+export function packCards({ land, owned, maxed, seed, count }, content) {
+  const pool = lowerLandCards(land, content);
+  const rng = createRng(`${seed}:pack`);
+  const have = { owned: [...owned], maxed: [...maxed] };
+  /** @type {string[]} */
+  const cards = [];
+  for (let index = 0; index < count; index += 1) {
+    const card = pickCard(pool, rng, { ...have, found: cards });
+    if (!card) break;
+    cards.push(card);
+  }
+  return cards;
+}
+
+// The lands lower than `land`, by their names, in their order (902 C).
+/**
+ * @param {number} land
+ * @param {Content} content
+ * @returns {string[]}
+ */
+export const lowerLandNames = (land, content) => landsInOrder(content).slice(0, Math.max(0, land));
+
 // The chance of a card for a profession's work of `minutes` (903): its
 // share for each hour of the work, up to the most.
 /**

@@ -28,7 +28,7 @@
 import { areaArtUrl, monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
 import { createCardsFx, fxDroppedCards } from './cards-fx.js';
 import { h, icon } from './dom.js';
-import { formatNumber } from './format.js';
+import { countOf, formatNumber } from './format.js';
 import { t } from './i18n.js';
 import { playSound } from './sound.js';
 import { call, serverNow, state } from './state.js';
@@ -121,6 +121,9 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
   let aiming = null;
   // A match just ended, shown until "Dalej".
   let ended = null;
+  // The pack just bought at Szczęsny's (902 C): its cards on the table
+  // until „Dalej”.
+  let opened = null;
   // Whether the table took the whole tab last time (onLayout).
   let wasPlaying = false;
   // The table's motion (cards-fx.js), with the game's animations on, and a
@@ -334,6 +337,86 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
           showTab();
         },
       }),
+    );
+  }
+
+  // Names one after another: „A, B i C”.
+  const listOf = (words) => (words.length > 1 ? `${words.slice(0, -1).join(', ')}${t(' i ')}${words.at(-1)}` : (words[0] ?? ''));
+
+  // The day's pack at Szczęsny's (902 C), under the hero's card: three
+  // cards of the creatures of the lands lower than the character's own,
+  // those it misses first, for the gold of an hour of exploring; once
+  // bought, its cards on the table until „Dalej”.
+  function packCard() {
+    const pack = view.pack;
+    if (!pack) return null;
+    const head = (state) =>
+      h('div', { class: 'cards-section-head' }, h('h3', { class: 'section-title', text: t('Pakiet z niższych krain') }), h('span', { class: 'muted', text: state }));
+    if (opened) {
+      const fresh = opened.filter((card) => card.fresh).map((card) => card.name);
+      const higher = opened.filter((card) => !card.fresh).map((card) => card.name);
+      return h(
+        'section',
+        { class: 'card stack cards-pack', 'data-guide': 'cards-pack' },
+        head(t('kupiony')),
+        h('p', { text: view.texts.pack.opened }),
+        h('div', { class: 'tcard-grid tcard-grid--reserve' }, opened.map((card) => face(card, { marks: { fresh: card.fresh } }))),
+        h('p', {
+          class: 'muted',
+          text: [
+            fresh.length > 0 && t('Nowe w kolekcji: {cards}.', { cards: listOf(fresh) }),
+            higher.length > 0 && t('Na wyższy poziom wchodzą: {cards}.', { cards: listOf(higher) }),
+            pack.missing > 0 ? t('W niższych krainach brakuje Ci jeszcze {cards}.', { cards: countOf(pack.missing, 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty z niższych krain.'),
+          ]
+            .filter(Boolean)
+            .join(' '),
+        }),
+        h('p', { class: 'muted', text: t('Następny pakiet jutro.') }),
+        h('button', {
+          type: 'button',
+          class: 'button button--system',
+          text: t('Dalej'),
+          onClick: () => {
+            opened = null;
+            render();
+          },
+        }),
+      );
+    }
+    const gold = state.character?.gold ?? 0;
+    const missingGold = pack.price - gold;
+    return h(
+      'section',
+      { class: 'card stack cards-pack', 'data-guide': 'cards-pack' },
+      head(pack.bought ? t('kupiony') : t('raz dziennie')),
+      h('div', { class: 'cards-pack-row' }, h('span', { class: 'cards-pack-backs', 'aria-hidden': 'true' }, Array.from({ length: pack.count }, () => h('span', { class: 'cards-back' }))), h('p', { text: view.texts.pack.offer })),
+      h('p', {
+        class: 'muted',
+        text: [
+          t('Krainy niższe niż Twoja: {lands}.', { lands: listOf(pack.lands) }),
+          pack.missing > 0 ? t('Brakuje Ci tam jeszcze {cards}.', { cards: countOf(pack.missing, 'karty', 'kart', 'kart') }) : t('Masz już wszystkie karty z tych krain.'),
+        ].join(' '),
+      }),
+      pack.bought
+        ? h('p', { class: 'muted', text: t('Pakiet na dziś już kupiony. Następny jutro.') })
+        : pack.empty
+          ? h('p', { class: 'muted', text: t('Masz już wszystkie karty z niższych krain na najwyższym poziomie.') })
+          : [
+              h('button', {
+                type: 'button',
+                class: 'button button--world',
+                disabled: missingGold > 0,
+                text: t('Kup pakiet za {gold} zł', { gold: formatNumber(pack.price) }),
+                onClick: (event) =>
+                  withButton(event.currentTarget, async () => {
+                    const answer = await call('POST', '/api/cards/pack');
+                    playSound('chest');
+                    opened = answer.pack;
+                    apply(answer);
+                  }),
+              }),
+              missingGold > 0 && h('p', { class: 'muted small', text: t('Brakuje: {what}.', { what: t('{gold} złota', { gold: formatNumber(missingGold) }) }) }),
+            ],
     );
   }
 
@@ -921,6 +1004,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
         tableHead(),
         deckCard(),
         view.starter && heroCard(view.hero),
+        view.starter && packCard(),
         tiersCard(),
         h('section', { class: 'card' }, howItWorks(null, view.texts.rules)),
       ];

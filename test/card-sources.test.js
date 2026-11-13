@@ -21,6 +21,8 @@ import {
   createRng,
   labyrinthFight,
   lowerLandCards,
+  lowerLandNames,
+  packCards,
   newLabyrinth,
   pickCard,
   simulateHunt,
@@ -131,6 +133,29 @@ describe('Talia Systemu: the pickers of the cards from more sources (902 B, 903)
     assert.equal(workCardChance(0, content), 0);
     assert.equal(rules.drops.guild, 0.02);
     assert.equal(rules.drops.lower, 0.01);
+  });
+});
+
+describe('Talia Systemu: the pack of the day at Szczęsny\'s (902 C)', () => {
+  test('three different cards of the lands lower than the character\'s, the same for the same seed, those not got first, never one at its top level; none in the first land', () => {
+    const land = 2;
+    const pool = lowerLandCards(land, content);
+    const pack = packCards({ land, owned: [], maxed: [], seed: 'pack-1', count: 3 }, content);
+    assert.equal(pack.length, 3);
+    assert.equal(new Set(pack).size, 3);
+    assert.ok(pack.every((id) => pool.includes(id)));
+    assert.deepEqual(packCards({ land, owned: [], maxed: [], seed: 'pack-1', count: 3 }, content), pack);
+    // Two cards missing: both come, the third is one got already.
+    const missing = pool.slice(0, 2);
+    const owned = pool.slice(2);
+    const some = packCards({ land, owned, maxed: [], seed: 'pack-2', count: 3 }, content);
+    assert.ok(missing.every((id) => some.includes(id)));
+    assert.equal(some.length, 3);
+    // Every card but one at its top level: only that one.
+    assert.deepEqual(packCards({ land, owned: pool, maxed: pool.slice(1), seed: 'pack-3', count: 3 }, content), [pool[0]]);
+    assert.deepEqual(packCards({ land: 0, owned: [], maxed: [], seed: 'pack-4', count: 3 }, content), []);
+    assert.deepEqual(lowerLandNames(0, content), []);
+    assert.equal(lowerLandNames(land, content).length, 2);
   });
 });
 

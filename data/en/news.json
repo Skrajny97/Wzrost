@@ -644,6 +644,10 @@
     "0.3.11": {
       "title": "Version 0.3.11",
       "body": "- The Labyrinth gets harder with every level: level 1 is easy, level 2 medium, level 3 hard and the Hellish level very hard.\n- You can change the order of the Salvage Table's queue: hold ≡ by a waiting order and drag it to a new place. The order at work stays first, and the “Ready at” times are counted anew."
+    },
+    "0.3.12": {
+      "title": "Version 0.3.12",
+      "body": "- Once a day Szczęsny sells a pack of three creature cards from the lands lower than yours in the Games Parlour, for the gold of an hour of exploring at your level. Cards you don't have yet come first. You'll find the pack in the Cards tab, under your hero card."
     }
   }
 }

@@ -25,6 +25,7 @@
 // sourceCards).
 
 import {
+  areaLand,
   cardComes,
   cardLevel,
   cardsUpTo,
@@ -38,9 +39,12 @@ import {
   hostTier,
   hostTiers,
   isCard,
+  lowerLandCards,
+  lowerLandNames,
   matchPayout,
   matchView,
   newMatch,
+  packCards,
   pickCard,
   playTurn,
   portalArea,
@@ -59,6 +63,7 @@ import { content } from './content.js';
 import { toHex } from './encoding.js';
 import { cardsOn } from './features.js';
 import { ApiError, json, readJson } from './http.js';
+import { t } from './i18n.js';
 import { requireOpen } from './settlement.js';
 
 const rules = () => content().cards;
@@ -96,6 +101,8 @@ export function cardGameOf(row, day) {
     staked: today && Number.isInteger(stored.staked) ? stored.staked : 0,
     rewarded: today && Array.isArray(stored.rewarded) ? stored.rewarded.filter((number) => Number.isInteger(number)) : [],
     trials: Array.isArray(stored?.trials) ? stored.trials.filter((id) => Number.isInteger(id)) : [],
+    // The day's pack bought at Szczęsny's (902 C).
+    pack: today && stored.pack === true,
   };
 }
 
@@ -216,6 +223,29 @@ function summaryOf(row) {
 // with the deck marked, the hero, Szczęsny's tiers with their stakes and the
 // rewards still waiting, the day's staked matches, the running match as the
 // page sees it (matchView), and the last match finished.
+// The character's own land (902 C): the land of the place at the higher of
+// its level and its class level, as for the cards of the professions (903).
+const characterLand = (row) => areaLand(portalArea(Math.max(row.level, row.class_level ?? row.level), content()).id, content());
+
+// The day's pack at Szczęsny's (902 C), for the tab: its price (the gold of
+// an hour of exploring at the character's level), whether it is bought, the
+// lower lands it draws from and the cards of them the character still
+// misses; null in the first land, which has none lower.
+function packView(row, game, collection) {
+  const land = characterLand(row);
+  const pool = lowerLandCards(land, content());
+  if (pool.length === 0) return null;
+  return {
+    price: explorationGold(rules().pack.goldMinutes, row.level),
+    count: rules().pack.cards,
+    bought: game.pack,
+    lands: lowerLandNames(land, content()),
+    missing: pool.filter((id) => !collection.has(id)).length,
+    // Nothing left to draw: every card of the lower lands at its top level.
+    empty: pool.every((id) => (collection.get(id) ?? 0) >= rules().stats.maxLevel),
+  };
+}
+
 async function cardsView(db, player, now) {
   const { row } = player;
   const day = casinoDay(now, content());
@@ -234,7 +264,7 @@ async function cardsView(db, player, now) {
   };
   return {
     name: data.name,
-    texts: { intro: data.texts.intro, starterOffer: data.texts.starterOffer, starterTaken: data.texts.starterTaken, rules: data.texts.rules, win: data.texts.win, loss: data.texts.loss, draw: data.texts.draw },
+    texts: { intro: data.texts.intro, starterOffer: data.texts.starterOffer, starterTaken: data.texts.starterTaken, rules: data.texts.rules, win: data.texts.win, loss: data.texts.loss, draw: data.texts.draw, pack: data.texts.pack },
     types: data.types,
     lines: data.lines,
     typeBonus: data.typeBonus,
@@ -273,6 +303,7 @@ async function cardsView(db, player, now) {
       };
     }),
     staked: { today: game.staked, limit: data.stakes.perDay },
+    pack: game.starter ? packView(row, game, collection) : null,
     match: running ? { id: running.id, tier: tierOfMatch(running), mode: running.mode, stake: running.stake, ...matchView(JSON.parse(running.state), content()) } : null,
     last: last ? { id: last.id, tier: tierOfMatch(last), mode: last.mode, stake: last.stake, result: last.result, at: last.finished_at, ...summaryOf(last) } : null,
     endsAt: day.endsAt,
@@ -331,6 +362,41 @@ export async function saveDeck(context) {
     .bind(row.id, JSON.stringify(body.cards), context.now)
     .run();
   return respond(context, session, { saved: true });
+}
+
+// POST /api/cards/pack: the day's pack at Szczęsny's (902 C), once a day:
+// three cards of the creatures of the lands lower than the character's own,
+// those it has not got first (packCards), for the gold of an hour of
+// exploring at its level. Drawn from the day's seed, so asking again draws
+// the same; saved only over the character as read and while it has the
+// gold. Answers with the cards as they are now in the collection.
+export async function buyPack(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireCards(row);
+  const db = context.env.DB;
+  const now = context.now;
+  const day = casinoDay(now, content()).key;
+  const game = cardGameOf(row, day);
+  if (!game.starter) throw new ApiError(409, 'no_starter', 'Najpierw weź talię od Szczęsnego.');
+  if (game.pack) throw new ApiError(409, 'pack_bought', 'Pakiet na dziś już kupiony. Następny jutro.');
+  const collection = await cardCollection(db, row.id);
+  const land = characterLand(row);
+  const cards = packCards({ land, owned: collection.keys(), maxed: maxedCards(collection), seed: `${day}:${row.id}`, count: rules().pack.cards }, content());
+  if (cards.length === 0) throw new ApiError(409, 'pack_empty', lowerLandCards(land, content()).length === 0 ? 'W pierwszej krainie nie ma krain niższych, więc nie ma pakietu.' : 'Masz już wszystkie karty z niższych krain na najwyższym poziomie.');
+  const price = explorationGold(rules().pack.goldMinutes, row.level);
+  if (row.gold < price) throw new ApiError(409, 'no_gold', t('Brakuje złota: potrzeba {price}.', { price }));
+  await atomically(
+    db,
+    [
+      assertion(db, '(SELECT version FROM characters WHERE id = ?) = ? AND (SELECT gold FROM characters WHERE id = ?) >= ?', [row.id, row.version, row.id, price]),
+      db.prepare('UPDATE characters SET gold = gold - ?, card_game = ?, version = version + 1 WHERE id = ?').bind(price, JSON.stringify({ ...game, pack: true }), row.id),
+      ...cardUpserts(db, row.id, cards, now),
+    ],
+    characterChanged,
+  );
+  const opened = cards.map((id) => cardView(id, (collection.get(id) ?? 0) + 1, content(), { fresh: !collection.has(id) }));
+  return respond(context, session, { pack: opened });
 }
 
 // POST /api/cards/match { tier, staked }: a match against Szczęsny's tier,
