@@ -945,11 +945,15 @@ export async function claimStandingReward(context) {
 }
 
 // Saves a board drawn anew (new orders came), and the day's wanted record
-// first kept, if the row is still as read.
+// first kept, if the Osada is still as read. It moves the character's
+// version, as every other write of the Osada does, so an Osada action that
+// read the character before it is refused instead of writing its older
+// Osada over the record, which the next look would draw anew (the code
+// review, 13.11.2026).
 async function saveBoard(db, row, stored, board) {
   const next = JSON.stringify({ ...stored, board });
   if (next === (row.settlement ?? '{}')) return;
-  await db.prepare('UPDATE characters SET settlement = ? WHERE id = ? AND settlement IS ?').bind(next, row.id, row.settlement ?? null).run();
+  await db.prepare('UPDATE characters SET settlement = ?, version = version + 1 WHERE id = ? AND settlement IS ?').bind(next, row.id, row.settlement ?? null).run();
 }
 
 export async function getSettlement(context) {
