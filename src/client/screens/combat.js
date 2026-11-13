@@ -1,8 +1,9 @@
 // The Walka tab: explorations in three steps. The main view lists the regions
 // (or shows the running exploration and the report to claim). A region shows
 // its inner regions as circles, open from the class level each needs. An
-// inner region shows the length, the threat level and the start. Dungeons
-// appear here once unlocked. The code calls explorations hunts and
+// inner region shows the length, the threat level and the start. The
+// Portale and the Wieże are tabs beside it (combatModes, screens/towers.js),
+// shown from the start. The code calls explorations hunts and
 // inner regions areas. Its texts are written in Polish and shown in the
 // page's language (t(), i18n.js).
 
