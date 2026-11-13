@@ -3233,6 +3233,16 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Wersja 0.3.9 (13.11.2026): karty z niższych krain i z nowych źródeł (902 B, 903)
+
+Autor wybrał na stronie ocen 902 B i przyjął 903 („zdecydowane w ocenach”, 13.11.2026). Te zmiany nie mają nowych ekranów: karty z nowych źródeł pokazują się w działach „Karty” raportów i w krótkich komunikatach, tak jak karty z wypraw (zob. „Karty z innymi graczami…”, punkt 6). Zasady i rozstrzygnięte szczegóły: „Karty z niższych krain i z nowych źródeł: zbudowane (902 B, 903; 13.11.2026)”.
+
+1. **Wyprawy:** każda wygrana walka (poza walką z celem listu gończego) ma 1% szansy na kartę stwora z krainy niższej niż kraina miejsca, najpierw takiego, którego karty postać jeszcze nie ma.
+2. **Labirynt:** stwory pokonane w wygranej walce zostawiają swoje karty z szansą jak na wyprawie (zwykły 2%, elita 10%, strażnik 25%).
+3. **Profesje:** odebrana praca daje 1% szansy na kartę za każdą godzinę pracy, najwyżej 10%.
+4. **Gildia:** atak na Bestię, walka ze strażnikiem Wyprawy Gildii i ukończona Próba dają po 2% szansy. Karta za Próbę wpada przy najbliższym spojrzeniu na Gildię.
+5. **Sprawdzone:** testy kart, profesji, Labiryntu i Prób Gildii (108 testów), typy, dane i tłumaczenia. Pełne testy i przejście wprowadzenia robi GitHub przed wdrożeniem.
+
 ## Wersja 0.3.8 (13.11.2026): napis przy zablokowanym Rdzeniu
 
 Autor 13.11.2026, ze zrzutem zakładki Rdzeń postaci na 31. poziomie: „Dalej pokazuje sie zły napis”. Zablokowany Rdzeń mówił jeszcze zdanie z 0.2.79 („Rdzeń zostanie odblokowany podczas jednej z kolejnych aktualizacji.”), napisane, zanim Rdzeń wszedł do gry. Od 0.2.87 Rdzeń otwiera pierwszy pokonany strażnik Labiryntu Systemu (zob. „Labirynt Systemu i Rdzeń: zasady”, punkt 6), więc to zdanie wprowadzało w błąd.

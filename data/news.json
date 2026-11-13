@@ -795,6 +795,11 @@
       "id": "0.3.8",
       "title": "Wersja 0.3.8",
       "body": "- Zablokowany Rdzeń mówi, jak go otworzyć: trzeba pokonać pierwszego strażnika Labiryntu Systemu. Labirynt jest w Osadzie, w Sali prób, od 30. poziomu postaci."
+    },
+    {
+      "id": "0.3.9",
+      "title": "Wersja 0.3.9",
+      "body": "- Każda wygrana walka na wyprawie może dać kartę stwora z niższej krainy, najpierw taką, której jeszcze nie masz.\n- Karty wypadają też w Labiryncie, za pracę w profesji (1% za każdą godzinę, najwyżej 10%), za ataki na Bestię i na strażników Wyprawy Gildii oraz za ukończone Próby Gildii."
     }
   ]
 }
