@@ -16,18 +16,24 @@
 // channel, the Wymiana too, until the character has read that channel.
 // "The Globalny" here is the chat's first channel, which a page in English
 // has the English one for (chatChannels in src/server/content.js); its
-// mark goes to the server under that channel's own id.
+// mark goes to the server under that channel's own id. The marks are a
+// character's, kept on the device with its id: another character played
+// here starts from its own, as the server keeps them (the code review: the
+// marks of the character played before kept the guild's channel and the
+// private conversations dark, and no read went to the server below them).
 
 import { request } from './api.js';
 import { duelSeen } from './card-duel.js';
 import { t } from './i18n.js';
-import { isUnlocked, state } from './state.js';
+import { isUnlocked, onCharacterChange, state } from './state.js';
 import { toast } from './ui.js';
 
 const SEEN_KEY = 'insight-chat-seen';
 const CHANNELS_KEY = 'insight-chat-channels-seen';
 const GUILD_KEY = 'insight-chat-guild-seen';
 const PRIVATE_KEY = 'insight-chat-private-seen';
+// The id of the character whose marks the four above are.
+const OWNER_KEY = 'insight-chat-seen-character';
 const MUTED_KEY = 'insight-chat-muted';
 const EVERY_MS = 15000;
 
@@ -53,8 +59,12 @@ const TODO_EVERY_MS = 60000;
 // The newest message read in each private conversation, by the other
 // character's id.
 let privateSeen = {};
+// The character whose marks these are, or null (none yet, or marks kept
+// before 13.11.2026 without it).
+let owner = null;
 let muted = false;
 try {
+  owner = Number(localStorage.getItem(OWNER_KEY)) || null;
   seen = Number(localStorage.getItem(SEEN_KEY)) || 0;
   channelSeen = JSON.parse(localStorage.getItem(CHANNELS_KEY) ?? '{}') ?? {};
   guildSeenId = Number(localStorage.getItem(GUILD_KEY)) || 0;
@@ -175,6 +185,34 @@ function update(change) {
   if (was !== lights()) for (const listener of listeners) listener();
 }
 
+// Another character on this device: the marks of the one before, and what
+// the chat's check told of it, go. The new character's marks come from the
+// server with the next check, which the game makes as it opens.
+onCharacterChange((character) => {
+  if (!character || character.id === owner) return;
+  update(() => {
+    owner = character.id ?? null;
+    seen = 0;
+    channelSeen = {};
+    guildSeenId = 0;
+    privateSeen = {};
+    latest = 0;
+    conversations = [];
+    tagged = { private: {} };
+    guild = null;
+    guildTodo = null;
+    guildInvites = 0;
+    invites = 0;
+    gifts = 0;
+    unsent = 0;
+    partyInvites = 0;
+    trade = null;
+  });
+  askedAt = 0;
+  todoAskedAt = 0;
+  keep(null);
+});
+
 // The private conversations as the chat last heard them.
 export function conversationsSeen(list) {
   update(() => {
@@ -186,6 +224,7 @@ export function conversationsSeen(list) {
 // for the character's other devices.
 function keep(tell) {
   try {
+    localStorage.setItem(OWNER_KEY, owner === null ? '' : String(owner));
     localStorage.setItem(SEEN_KEY, String(seen));
     localStorage.setItem(CHANNELS_KEY, JSON.stringify(channelSeen));
     localStorage.setItem(GUILD_KEY, String(guildSeenId));
@@ -323,12 +362,15 @@ export async function checkChat({ now = false } = {}) {
   if (!open() || document.hidden) return;
   if (!now && Date.now() - askedAt < EVERY_MS) return;
   askedAt = Date.now();
+  const asker = state.character.id;
   let answer;
   try {
     answer = await request('GET', '/api/chat/latest');
   } catch {
     return;
   }
+  // The answer of a character played before a change is none of this one's.
+  if (state.character?.id !== asker) return;
   update(() => {
     latest = answer.latest ?? 0;
     conversations = answer.conversations ?? [];

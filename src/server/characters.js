@@ -1551,6 +1551,9 @@ export function characterView(player, now) {
   const cosmetics = JSON.parse(row.cosmetics ?? '{}');
 
   return {
+    // Its id: what the page keeps on the device for one character (the
+    // chat's marks of what it read, chat-news.js) goes with it.
+    id: row.id,
     name: row.name,
     // Its guild's tag, in square brackets beside its name (guilds.js).
     guildTag: player.guildTag ?? null,
