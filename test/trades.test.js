@@ -8,7 +8,9 @@ import assert from 'node:assert/strict';
 import { beforeEach, describe, test } from 'node:test';
 
 import { createRng, generateItem } from '../src/engine/index.js';
+import { confirmTrade } from '../src/server/trades.js';
 import { content } from './helpers/content.js';
+import { meanwhile, posted } from './helpers/meanwhile.js';
 import { useServer } from './helpers/server.js';
 
 describe('Wymiana', () => {
@@ -89,6 +91,40 @@ describe('Wymiana', () => {
     assert.notEqual(done.status, 200);
     const kept = await (await db()).prepare('SELECT character_id FROM items WHERE id = ?').bind(given).first();
     assert.equal(kept.character_id, (await row('Ala')).id);
+  });
+
+  // The code review: the bags were checked before the exchange, not in it,
+  // so an item that came into a bag meanwhile took it past its places.
+  test('a bag filled while the trade is accepted gets nothing past its places; tried again, the trade says so', async () => {
+    const given = await inBag('Ala', amulet(10));
+    const id = await opened();
+    const offered = await trade(players.ala, 'offer', { id, offer: { items: [given] } });
+    const locked = await trade(players.ola, 'confirm', { id, version: offered.data.trade.version });
+    assert.equal(locked.data.trade.state, 'locked');
+    // Ola's bag with one place left, for the amulet.
+    const view = (await call('GET', '/api/character', { cookie: players.ola })).data.character;
+    for (let used = view.bagUsed; used < view.bagCapacity - 1; used += 1) await inBag('Ola', amulet(1));
+    const database = await db();
+    const ola = (await row('Ola')).id;
+    const bag = async () => (await database.prepare('SELECT COUNT(*) AS count FROM items WHERE character_id = ? AND slot IS NULL').bind(ola).first()).count;
+    // Another item comes into Ola's bag just before the exchange is
+    // written, as one from the Skrzynia Konta would: the version moves with it.
+    const racing = meanwhile(database, /UPDATE trades SET state = 'done'/, async () => {
+      await inBag('Ola', amulet(2));
+      await database.prepare('UPDATE characters SET version = version + 1 WHERE id = ?').bind(ola).run();
+    });
+    await assert.rejects(
+      confirmTrade({ request: posted('/api/trade/confirm', players.ala, { id, version: locked.data.trade.version }), env: { DB: racing }, now: Date.now() }),
+      (error) => error.status === 409 && error.code === 'character_changed',
+    );
+    assert.ok(racing.done);
+    assert.equal(await bag(), view.bagCapacity);
+    assert.equal((await database.prepare('SELECT character_id FROM items WHERE id = ?').bind(given).first()).character_id, (await row('Ala')).id);
+    // The trade waits, and tried again it says why it cannot go.
+    const again = await trade(players.ala, 'confirm', { id, version: locked.data.trade.version });
+    assert.deepEqual([again.status, again.data.error.code, again.data.error.message], [409, 'bag_full', 'W plecaku postaci Ola zabraknie miejsca. Zwolnijcie miejsce albo odrzućcie wymianę.']);
+    assert.equal((await current(players.ala)).state, 'locked');
+    assert.equal(await bag(), view.bagCapacity);
   });
 
   test('what a trade brings stays out of the Encyklopedia until the character finds or makes its own', async () => {
