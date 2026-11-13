@@ -499,7 +499,7 @@
       "name": "Summon Elemental",
       "style": "attack",
       "description": "An elemental emerges from a whirl of mana. It obeys only the Arcanist.",
-      "effect": "Summons an elemental for {turns} of their own turns. The elemental stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it strikes a random enemy for {power%} damage with the element that enemy is weakest against.",
+      "effect": "Summons an elemental out of mana for {turns} of their own turns. The elemental stands before the character with HP equal to {hp%} of the character's max mana and takes the enemies' blows. Every turn it strikes a random enemy for {power%} of the character's damage with the element that enemy is weakest against.",
       "params": {
         "summonName": "Elemental"
       }
@@ -694,7 +694,7 @@
       "name": "Summon Ent",
       "style": "defence",
       "description": "A tree-being with bark as hard as stone grows out of the ground. It draws the blows to itself and strikes back with its branches.",
-      "effect": "Summons an ent for {turns} of their own turns. The ent stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it lashes a random enemy with its branches for {power%} damage.",
+      "effect": "Summons an ent for {turns} of their own turns. The ent stands before the character with HP equal to {hp%} of the character's max mana and takes the enemies' blows. Every turn it lashes a random enemy with its branches for {power%} damage.",
       "params": {
         "summonName": "Ent"
       }
@@ -703,7 +703,7 @@
       "name": "Summon Bear",
       "style": "attack",
       "description": "A bear steps out of the thicket and stands between the Druid and the enemies. Whoever comes closer will feel its claws.",
-      "effect": "Summons a bear for {turns} of their own turns. The bear stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it rakes a random enemy with its claws for {power%} damage.",
+      "effect": "Summons a bear for {turns} of their own turns. The bear stands before the character with HP equal to {hp%} of the character's max mana and takes the enemies' blows. Every turn it rakes a random enemy with its claws for {power%} damage.",
       "params": {
         "summonName": "Bear"
       }
@@ -904,7 +904,7 @@
       "name": "Awakening of the Oak",
       "style": "defence",
       "description": "The ground trembles and an ancient oak rises from it. Its roots seize anyone who comes close.",
-      "effect": "Summons an ancient oak for {turns} of their own turns. The oak stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it lashes a random enemy with its branches for {power%} damage and entangles it in roots: the enemy hit slows down by {root%}.",
+      "effect": "Summons an ancient oak for {turns} of their own turns. The oak stands before the character with HP equal to {hp%} of the character's max mana and takes the enemies' blows. Every turn it lashes a random enemy with its branches for {power%} damage and entangles it in roots: the enemy hit slows down by {root%}.",
       "params": {
         "summonName": "Ancient Oak"
       }
@@ -913,7 +913,7 @@
       "name": "Summon Bison",
       "style": "attack",
       "description": "A bison bursts out of the wilds, heavy as a boulder. First it rams, then it stands like a wall before the Archdruid.",
-      "effect": "Summons a bison for {turns} of their own turns. The bison charges the enemy in front for {charge%} damage and stuns it for its next turn, then stands before the character with {hp%} of the character's max HP and takes the enemies' blows. Every turn it gores a random enemy for {power%} damage.",
+      "effect": "Summons a bison for {turns} of their own turns. The bison charges the enemy in front for {charge%} damage and stuns it for its next turn, then stands before the character with HP equal to {hp%} of the character's max mana and takes the enemies' blows. Every turn it gores a random enemy for {power%} damage.",
       "params": {
         "summonName": "Bison",
         "stunLabel": "stunned"

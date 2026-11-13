@@ -870,6 +870,11 @@
       "id": "0.3.23",
       "title": "Wersja 0.3.23",
       "body": "- Labirynt jest łatwiejszy: stwory mają poziom po środku między poziomem Twojej postaci a poziomem klasy, a każdy poziom Labiryntu jest słabszy. Poziom 1 ma być łatwy.\n- Raport wyprawy: na numerach walk widać ich rodzaj: koronę czempiona, romb elity, trójkąt walki wymagającej i kropkę zdarzenia."
+    },
+    {
+      "id": "0.3.24",
+      "title": "Wersja 0.3.24",
+      "body": "- Arkanista: żywiołak powstaje z many. Przywołanie kosztuje 25% maks. many, a żywiołak ma tyle HP, ile wynosi 40% maks. many postaci. Mądrość daje teraz trwalszego żywiołaka, a regeneracja many z Arkany odnawia koszt między przywołaniami.\n- Druid i Arcydruid: Ent, Niedźwiedź, Prastary dąb i Żubr też biorą HP z maks. many i kosztują 25% maks. many.\n- Nowe tło ekranu logowania: skraj puszczy o zmroku."
     }
   ]
 }

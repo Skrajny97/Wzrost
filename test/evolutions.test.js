@@ -22,6 +22,7 @@ import {
   simulateFight,
   skillDemo,
   skillPoints,
+  skillView,
   skillsView,
 } from '../src/engine/index.js';
 import { typicalCharacter } from '../tools/simulate.mjs';
@@ -150,6 +151,24 @@ describe('class evolutions in fights', () => {
     assert.ok(meanwhile.some((event) => event.kind === 'summon' && event.state === 'hit' && event.actor === 'e0'));
     assert.ok(!meanwhile.some((event) => ['hit', 'crit', 'dodge'].includes(event.kind) && event.target === 'a0'));
     assert.ok(meanwhile.some((event) => event.kind === 'hit' && event.actor === 'a0' && event.skill === 'elemental-summon'));
+  });
+
+  test('934 A: the elemental is called out of mana, a quarter of the maximum, and has 40% of the maximum mana as its HP', () => {
+    const arcanist = evolved('arcanist', { only: ['elemental-summon'] });
+    const skill = arcanist.skills.find((one) => one.id === 'elemental-summon');
+    assert.equal(skill.mana, Math.round(arcanist.maxMana * 0.25));
+    const result = fight('przywołanie z many', [arcanist], [sturdy('wolf', 58, 'e0')]);
+    const up = result.events.find((event) => event.kind === 'summon' && event.state === 'up');
+    assert.equal(up.summonHp, Math.round(arcanist.maxMana * 0.4));
+    // More Wisdom, more mana: a sturdier elemental, the HP of the summoner
+    // aside.
+    const wiser = { ...arcanist, maxMana: arcanist.maxMana * 2, mana: arcanist.maxMana * 2 };
+    const upWiser = fight('przywołanie z many', [wiser], [sturdy('wolf', 58, 'e0')]).events.find((event) => event.kind === 'summon' && event.state === 'up');
+    assert.equal(upWiser.summonHp, Math.round(arcanist.maxMana * 2 * 0.4));
+    // The card: its cost as a share of the maximum mana.
+    const card = skillView(content.skillsById['elemental-summon'], 30, content);
+    assert.equal(card.cost, 'Koszt: 25% maks. many, najwyżej co 8. ruch.');
+    assert.match(card.effect, /z HP równym 40% jej maks\. many/);
   });
 
   test('a challenge draws every foe\'s blow to the challenger, who throws a share of each back', () => {

@@ -71,6 +71,7 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     if (core.resist) for (const element of Object.keys(resist)) resist[element] = Math.round(resist[element] * (1 + core.resist));
   }
   const mana = feat?.kind === 'arcana' ? Math.round(manaMax * (1 + feat.mana)) : manaMax;
+  const manaFull = core?.mana ? Math.round(mana * (1 + core.mana)) : mana;
   // The abilities of the Rdzeń's large Artefakty (core.js, combat.js).
   const abilities = core?.abilities ?? {};
   // (Żniwo, the Nekromanta's trait grown from Toksyny, gives none.)
@@ -104,9 +105,11 @@ export function playerCombatant({ character, equipped, hp, name, area, id = 'a0'
     speed: speed(totals.dexterity, character.level, balance) * (feat?.kind === 'shadowStep' ? 1 + feat.speed : 1) * (1 + (core?.speed ?? 0)),
     // Skills and the mana they spend, full at the start of every fight;
     // Wisdom also strengthens healing.
-    maxMana: core?.mana ? Math.round(mana * (1 + core.mana)) : mana,
+    maxMana: manaFull,
     wisdom: totals.wisdom,
-    skills: learnedSkills(character, content),
+    // A skill priced in a share of the maximum mana costs that share of it
+    // (the Arkanista's summons, 934 A and 935 A).
+    skills: learnedSkills(character, content).map((skill) => (skill.manaShare ? { ...skill, mana: Math.max(1, Math.round(manaFull * skill.manaShare)) } : skill)),
     ...(feat && { feat }),
     // The share of the missing HP back after a won fight on an exploration:
     // less from the challenge's level (628 B).

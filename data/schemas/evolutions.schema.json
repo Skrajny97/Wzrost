@@ -91,6 +91,7 @@
           "effect": { "type": "string", "minLength": 1 },
           "kind": { "enum": ["strike", "sweep", "heal", "guard", "buff", "coat", "shield", "evade", "stance", "riposte", "summon", "miracle", "mark", "whirl", "harmony"] },
           "mana": { "type": "integer", "minimum": 0 },
+          "manaShare": { "type": "number", "exclusiveMinimum": 0, "maximum": 1, "description": "Koszt jako część maks. many (przywołania Arkanisty, Druida i Arcydruida, 934 A, 935 A); mana zostaje na zapas." },
           "cooldown": { "type": "integer", "minimum": 1 },
           "once": { "const": true },
           "params": {

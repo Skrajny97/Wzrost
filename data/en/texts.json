@@ -207,6 +207,7 @@
   "skillCostStart": ["Cost: {mana} mana, at the start of the fight."],
   "skillCostOnce": ["Cost: {mana} mana, once per fight."],
   "skillCostPool": ["Cost: {pool} of max mana, once per fight."],
+  "skillCostShare": ["Cost: {share} of max mana, at most once every {cooldown} turns."],
   "classWaitsPath": ["{className}: the class waits at level {level}, on the threshold of evolution. It will grow further once you choose a side path under Skills. The class XP gained is not lost."],
   "classWaitsPoints": ["{className}: the class waits at level {level}, on the threshold of evolution. It will grow further once you spend your Skill Points under Skills. The class XP gained is not lost."],
   "classWaitsEvolution": ["{className}: the class waits at level {level}, on the threshold of evolution. It will grow further once you choose an evolution in the Evolution tab. The class XP gained is not lost."],
