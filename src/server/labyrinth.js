@@ -44,6 +44,9 @@ import {
   merchantPrices,
   newLabyrinth,
   reachableRooms,
+  resetLabyrinth,
+  resetPrice,
+  resetsLeft,
   roomDanger,
   roomRefusal,
   roomRules,
@@ -211,6 +214,8 @@ function labyrinthView(player, state, now) {
       ...(pending.kind === 'merchant' && { heal: pending.heal, blessing: pending.blessing, prices, healShare: rules().merchant.heal }),
     },
     gains: state.gains,
+    // After a fight lost: the gold of starting again and the tries left today.
+    reset: state.over === 'fainted' ? { price: resetPrice(state.charLevel, content()), left: resetsLeft(state, content()) } : null,
     rooms: rules().rooms.map((room) => roomView(room.id)),
   };
 }
@@ -413,6 +418,29 @@ export async function chooseLabyrinthBlessing(context) {
   if (!next) throw new ApiError(409, 'no_blessing', 'Tego błogosławieństwa nie ma teraz do wyboru.');
   const db = context.env.DB;
   await atomically(db, [sameVersion(db, player.row), db.prepare('UPDATE characters SET labyrinth = ?, version = version + 1 WHERE id = ?').bind(JSON.stringify(next), player.row.id)]);
+  return answer(context, session);
+}
+
+// After a fight lost, the Labirynt from its first level again (the author,
+// 13.11.2026): once a day, for the gold of resetPrice, with the fighters at
+// full HP, no blessings and the companions going now; the day's rewards
+// stay. Saved only while the character is as read, the gold taken only
+// while it has it.
+export async function resetLabyrinthDay(context) {
+  const { session, player } = await requirePlayer(context);
+  const { row } = player;
+  requireLabyrinth(row);
+  requireFree(player, context.now);
+  const state = todayOf(player, context.now);
+  const next = resetLabyrinth(state, { companions: companionsOf(player), seed: toHex(crypto.getRandomValues(new Uint8Array(16))) }, content());
+  if (!next) throw new ApiError(409, 'no_reset', state.over === 'fainted' ? 'Dziś Labirynt był już zaczęty od nowa. Nowy o północy.' : 'Labirynt można zacząć od nowa tylko po przegranej walce.');
+  const price = resetPrice(state.charLevel, content());
+  if (row.gold < price) throw new ApiError(409, 'no_gold', t('Brakuje złota: potrzeba {price}.', { price }));
+  const db = context.env.DB;
+  await atomically(db, [
+    sameVersion(db, row),
+    db.prepare('UPDATE characters SET gold = gold - ?, labyrinth = ?, version = version + 1 WHERE id = ? AND gold >= ?').bind(price, JSON.stringify(next), row.id, price),
+  ]);
   return answer(context, session);
 }
 

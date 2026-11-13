@@ -636,6 +636,10 @@
     "0.3.9": {
       "title": "Version 0.3.9",
       "body": "- Every fight you win on an exploration can give a card of a creature from a lower land, first one you do not have yet.\n- Cards also drop in the Labyrinth, for work in a profession (1% for each hour, up to 10%), for attacks on the Beast and on the Guild Expedition's guardians, and for completed Guild Trials."
+    },
+    "0.3.10": {
+      "title": "Version 0.3.10",
+      "body": "- After a lost fight in the Labyrinth you can start it again once a day: from level 1, with your party at full HP. It costs a lot of gold, and the rewards you gained earlier that day stay."
     }
   }
 }

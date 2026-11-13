@@ -3223,6 +3223,14 @@ Autor: „W idle gierkach gdzie sie ma drużynę są często tak zwane labirynty
     - Symulacja (`tools/labyrinth-sim.mjs` z nową zasadą, typowa postać „realistic” z dwoma towarzyszami, 12–16 dni na klasę), ile postaci przechodzi poziom 1 / 2 / 3, przed zmianą i po niej: postać 35 (klasa ok. 39) 97/72/40% → 95/52/20%; 45 (klasa 50) 100/95/85% → 70/23/7%; 63 (klasa 74) 95/70/41% → 65/20/9%; 80 (klasa 96) 78/38/20% → 55/13/8%; 100 (klasa 121) 95/78/65% → 62/28/13%. Piekielny przechodzi 0–5% i po zmianie prawie nikt. Postać z dobrym wyposażeniem, Rdzeniem i ulepszeniami ma wyraźnie łatwiej niż ten model, a według autora dawny Labirynt był dla niej za łatwy. Gdyby okazał się za trudny dla reszty graczy, łagodzi się go mnożnikami siły poziomów (`levels[].strength` w `data/labyrinth.json`). Tak się stało w 0.3.7 (autor: „Labirynt jest za trudny teraz”): zob. „Wersja 0.3.7”.
 22. **Wybór przed oczami (autor, 12.11.2026, 0.2.91).** Autor: „te powiadomienia o bonusach do rozdania powinny pojawiać sie graczowi przed twarzą w labiryncie a nie ze musi scrollowac na gore”. Wybór błogosławieństwa i towary kupca otwierają się w okienku od razu po wejściu do komnaty: po elicie i strażniku w tym samym okienku co wynik walki (bez „Dalej”, z „Obejrzyj walkę”), a przy ołtarzu i u kupca od razu. Zakupy u kupca i wybór kupionego błogosławieństwa dzieją się w tym samym okienku, które zamyka się, gdy nic już nie czeka. Karta wyboru nad mapą zostaje, a przy mapie zamiast napisu „Najpierw wybierz, co dalej (wyżej)” jest przycisk „Wybierz, co dalej”, który otwiera okienko znowu, gdy gracz je zamknął. Okienko to zwykły arkusz gry, jak przy wejściu do komnaty (na telefonie od dołu ekranu, na komputerze na środku), więc zmiana poszła bez makiet; sprawdzona na 320, 390 i 1366 px.
 
+23. **Labirynt od nowa po przegranej walce (autor, 13.11.2026, 0.3.10).** Autor: „Pozwól, w przypadku porażki zresetować Labirynt raz dziennie za naprawdę srogą opłatą (ale uzasadnioną, czyli górna granica balansu)”. Po przegranej walce przy wejściu do Labiryntu i na planszy jest przycisk „Zacznij od nowa: N złota”. Po potwierdzeniu drużyna zaczyna od 1. poziomu tej samej mapy dnia, z pełnym HP, bez błogosławieństw i z towarzyszami, którzy idą teraz. Nagrody zdobyte tego dnia zostają, a za komnaty zdobyte drugi raz przychodzą nowe (`resetLabyrinth` w `src/engine/labyrinth.js`, `POST /api/labyrinth/reset`). Brakujące szczegóły:
+    - **Opłata:** złoto 150 minut eksploracji na poziomie stworów Labiryntu (`reset.goldMinutes` w `data/labyrinth.json`, `resetPrice`), np. 2643 zł na poziomie 71. Symulacja całych dni Labiryntu z wyborem komnat jak u gracza daje średnio złoto 100–140 minut eksploracji na dzień (poziom 64: 1410 zł, czyli 101 minut; poziom 200: 6482 zł, czyli 142 minuty). Opłata zabiera więc całe złoto drugiego podejścia, a nawet trochę więcej, i drugie podejście opłaca się tylko PD, Odłamkami, Artefaktami i kartami. To górna granica, przy której reset ma jeszcze sens.
+    - **Raz dziennie** (`reset.perDay`) i tylko po przegranej walce, nie po zdobyciu Labiryntu do końca. Druga porażka tego samego dnia kończy Labirynt do północy, a przy wejściu i na planszy stoi wtedy „Dziś Labirynt był już zaczęty od nowa. Nowy o północy.”
+    - **Ta sama mapa:** mapa jest jedna na dzień dla wszystkich (854 A), więc drugie podejście idzie przez te same komnaty. Nowe ziarno losuje inne błogosławieństwa do wyboru. Poziom stworów zostaje z początku dnia (punkt 21).
+    - **Za mało złota:** przycisk jest wyłączony, a pod nim stoi „Brakuje: N złota.”, jak przy innych kosztach (311).
+    - **Potwierdzenie:** okienko „Zacząć Labirynt od nowa?” mówi, co się stanie i ile to kosztuje.
+    - To mały przycisk w istniejącym panelu, więc poszedł bez makiet. Sprawdzony na 320, 390, 1366 i 1920 px.
+
 ### Rozdział narratora o Labiryncie (878, 12.11.2026)
 
 Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą bez zatwierdzania (zasada z 6.11.2026).
@@ -3232,6 +3240,15 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 3. **Kwestia Sali prób** o próbach (645) przychodzi, jak dotąd, przy pierwszym spojrzeniu na Salę prób, ale dopiero po rozdziale Labiryntu, bo żadna kwestia miejsca nie przychodzi, gdy czeka rozdział.
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
+
+## Wersja 0.3.10 (13.11.2026): Labirynt od nowa po przegranej walce
+
+Autor 13.11.2026: „Pozwól, w przypadku porażki zresetować Labirynt raz dziennie za naprawdę srogą opłatą (ale uzasadnioną, czyli górna granica balansu)”. Zasady i rozstrzygnięte szczegóły: „Labirynt Systemu i Rdzeń: zasady”, punkt 23.
+
+1. **Przycisk „Zacznij od nowa: N złota”** po przegranej walce, przy wejściu do Labiryntu w Sali prób i na planszy, z potwierdzeniem.
+2. **Opłata:** złoto 150 minut eksploracji na poziomie stworów Labiryntu (np. 2643 zł na poziomie 71), raz dziennie.
+3. **Serwer:** `POST /api/labyrinth/reset` (`resetLabyrinthDay` w `src/server/labyrinth.js`) zapisuje zmianę tylko wtedy, gdy postać jest taka, jak ją odczytał, a złoto schodzi tylko wtedy, gdy postać je ma. Widok Labiryntu po przegranej ma `reset: { price, left }`.
+4. **Sprawdzone:** testy Labiryntu w silniku i przez API (37 testów), typy, dane i tłumaczenia, a w przeglądarce na 320, 390, 1366 i 1920 px: przycisk, brak złota, wykorzystany reset, potwierdzenie i sam reset.
 
 ## Wersja 0.3.9 (13.11.2026): karty z niższych krain i z nowych źródeł (902 B, 903)
 

@@ -36,7 +36,7 @@ import { formatCompact, formatNumber, formatShort } from './format.js';
 import { t } from './i18n.js';
 import { motionOn } from './motion.js';
 import { call, isUnlocked, reportCache, serverNow, state, unlockInfo } from './state.js';
-import { closeSheet, howItWorks, meter, openSheet, systemLink, systemPanel, withButton } from './ui.js';
+import { closeSheet, confirmAction, howItWorks, meter, openSheet, systemLink, systemPanel, withButton } from './ui.js';
 
 // The size of a room's picture in the sheets.
 const ROOM_ART = 32;
@@ -157,7 +157,33 @@ function mountView(container, { navigate, board }) {
 
   function overLine() {
     if (!view.over) return null;
-    return h('p', { class: 'labyrinth-over', text: view.over === 'done' ? t('Labirynt na dziś zdobyty do końca. Nowy o północy.') : t('Walka przegrana. Labirynt na dziś się skończył, a zdobyte nagrody zostają. Nowy o północy.') });
+    return [h('p', { class: 'labyrinth-over', text: view.over === 'done' ? t('Labirynt na dziś zdobyty do końca. Nowy o północy.') : t('Walka przegrana. Labirynt na dziś się skończył, a zdobyte nagrody zostają. Nowy o północy.') }), resetPart()];
+  }
+
+  // After a fight lost: the Labirynt from its first level again, once a day
+  // and for a lot of gold (the author, 13.11.2026), asked before it is paid.
+  function resetPart() {
+    const reset = view.reset;
+    if (!reset) return null;
+    if (reset.left <= 0) return h('p', { class: 'muted small labyrinth-reset-note', text: t('Dziś Labirynt był już zaczęty od nowa. Nowy o północy.') });
+    const price = formatNumber(reset.price);
+    const missing = reset.price - state.character.gold;
+    const button = h('button', {
+      type: 'button',
+      class: 'button button--system button--small labyrinth-reset',
+      disabled: missing > 0,
+      text: t('Zacznij od nowa: {price} złota', { price }),
+      onClick: (event) =>
+        withButton(event.currentTarget, async () => {
+          const sure = await confirmAction({
+            title: t('Zacząć Labirynt od nowa?'),
+            text: t('Drużyna wraca na 1. poziom tej samej mapy, z pełnym HP i bez błogosławieństw. Zdobyte dziś nagrody zostają. Koszt: {price} złota. Od nowa można zacząć raz dziennie, tylko po przegranej walce.', { price }),
+            confirmLabel: t('Zacznij od nowa'),
+          });
+          if (sure) await act('/api/labyrinth/reset', {});
+        }),
+    });
+    return h('div', { class: 'labyrinth-reset-part' }, button, missing > 0 && h('p', { class: 'muted small labyrinth-reset-note', text: t('Brakuje: {what}.', { what: t('{gold} złota', { gold: formatNumber(missing) }) }) }));
   }
 
   // The fighters' small portraits with their HP, in a row.
@@ -416,6 +442,7 @@ function mountView(container, { navigate, board }) {
         'div',
         { class: 'lab-prompt lab-prompt--over' },
         h('p', { text: view.over === 'done' ? t('Labirynt na dziś zdobyty do końca. Nowy o północy.') : t('Walka przegrana. Labirynt na dziś się skończył, a zdobyte nagrody zostają.') }),
+        resetPart(),
         h('button', { type: 'button', class: 'button button--system button--small', text: t('Wyjdź'), onClick: () => navigate(LABYRINTH_ENTRANCE) }),
       );
     }

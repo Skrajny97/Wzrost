@@ -800,6 +800,11 @@
       "id": "0.3.9",
       "title": "Wersja 0.3.9",
       "body": "- Każda wygrana walka na wyprawie może dać kartę stwora z niższej krainy, najpierw taką, której jeszcze nie masz.\n- Karty wypadają też w Labiryncie, za pracę w profesji (1% za każdą godzinę, najwyżej 10%), za ataki na Bestię i na strażników Wyprawy Gildii oraz za ukończone Próby Gildii."
+    },
+    {
+      "id": "0.3.10",
+      "title": "Wersja 0.3.10",
+      "body": "- Po przegranej walce w Labiryncie możesz raz dziennie zacząć go od nowa: od 1. poziomu, z pełnym HP drużyny. Kosztuje to sporo złota, a nagrody zdobyte wcześniej tego dnia zostają."
     }
   ]
 }
