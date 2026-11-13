@@ -1,0 +1,14 @@
+{
+  "id": "login",
+  "tool": "pixellab generate-image-v2",
+  "description": "pixel art landscape, the edge of a primeval forest at dusk seen from a small clearing: tall dark spruces and old twisted oaks, a narrow path leading between them into the deep forest, thin ice-blue glowing runes and faint luminous blue lines in the grass at the forest's edge, soft mist low over the ground, a pale moon behind thin clouds, wide panorama for a dim background behind text, low contrast, muted dark palette of deep greens and navy with ice-blue accents, no text, no border, no people, no animals",
+  "style": "src/client/art/places/system-grove.png",
+  "input": null,
+  "mask": null,
+  "references": [],
+  "usage": {
+    "type": "usd",
+    "usd": 0.08
+  },
+  "images": 1
+}
