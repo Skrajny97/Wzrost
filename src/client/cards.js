@@ -34,7 +34,7 @@
 // own table: elsewhere the panel says where it waits.
 
 import { areaArtUrl, monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
-import { mountDuel } from './card-duel.js';
+import { liveMatch, mountDuel, onLiveMatch } from './card-duel.js';
 import { createCardsFx, fxDroppedCards } from './cards-fx.js';
 import { h, icon } from './dom.js';
 import { countOf, formatNumber } from './format.js';
@@ -147,6 +147,10 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   // Salon's table has it: a resident's table in the Osada (904 B) never
   // shows a live match.
   const duel = resident ? { on: () => false, unmount: () => {} } : mountDuel(holder, { cardFace, onLayout: () => onLayout(), onEnd: () => load() });
+  // A live match begun or ended: the buttons that wait for it change.
+  const unwatch = onLiveMatch(() => {
+    if (!gone && view) render();
+  });
   // Whether a match is this table's: a resident's at its own, Szczęsny's in
   // the Salon. Another table's waits there.
   const own = (match) => Boolean(match) && (resident ? match.resident === resident : !match.resident);
@@ -498,8 +502,9 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     const gold = state.character.gold;
     const noDeck = !view.deck;
     const limit = view.staked.today >= view.staked.limit;
-    // A match at a resident's table waits there (elsewhere).
-    const busy = Boolean(view.match);
+    // A match at a resident's table waits there, and a live match at the
+    // Salon's (elsewhere).
+    const busy = Boolean(view.match) || Boolean(liveMatch());
     const start = (tier, staked) => (event) =>
       withButton(event.currentTarget, () =>
         orAgain(async () => {
@@ -613,6 +618,18 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
   // and the way there.
   function elsewhere() {
     const match = view.match;
+    // A live match with another player (card-duel.js) waits at the Salon's
+    // table: the server starts no other one meanwhile, so "Zagraj o … zł"
+    // and "Trening" wait too, with the way there (the code review: they
+    // stayed on and only the server said no).
+    if (!own(match) && liveMatch()) {
+      return h(
+        'section',
+        { class: 'card stack cards-elsewhere', role: 'status', 'data-guide': 'cards-elsewhere' },
+        h('p', { text: t('Trwa Twoja partia na żywo. Dokończ ją, zanim zaczniesz następną.') }),
+        h('a', { class: 'button button--world', href: '#/osada/casino/cards', text: t('Wróć do partii') }),
+      );
+    }
     if (!match || own(match)) return null;
     const table = match.resident ? tableOf(match.resident) : null;
     const href = !match.resident ? '#/osada/casino/cards' : table?.place ? `#/osada/${table.place}/cards` : null;
@@ -636,7 +653,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     if (!table) return null;
     const gold = state.character.gold;
     const ready = view.starter && Boolean(view.deck);
-    const busy = Boolean(view.match);
+    const busy = Boolean(view.match) || Boolean(liveMatch());
     const limit = view.staked.today >= view.staked.limit;
     const female = table.gender === 'f';
     const roman = (number) => ROMAN[number - 1] ?? String(number);
@@ -1232,6 +1249,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
       clearTimeout(timer);
       fx.stop();
       duel.unmount();
+      unwatch();
     },
   };
 }

@@ -85,6 +85,27 @@ const tableInSight = () => [...tables].some((one) => one.inSight());
 // the introduction has none, as weeks.js counts it) and no other sheet open.
 const quiet = () => (state.character?.tutorial === null || narratorIdle()) && !document.querySelector('dialog[open]');
 
+// The character's live match while it runs, as the chat's poll or the
+// table last saw it, or null. No other match starts meanwhile (the
+// server's withoutDuel), so the residents' tables wait for it (cards.js).
+export const liveMatch = () => (news?.state === 'playing' ? news : null);
+
+// Told when a live match begins or ends (liveMatch): at once from the
+// chat's poll and the table, and from any other change within a second, as
+// the page's ticker looks (offerDuel).
+const liveWatchers = new Set();
+let wasLive = false;
+export function onLiveMatch(listener) {
+  liveWatchers.add(listener);
+  return () => liveWatchers.delete(listener);
+}
+function tellLive() {
+  const live = Boolean(liveMatch());
+  if (live === wasLive) return;
+  wasLive = live;
+  for (const listener of liveWatchers) listener();
+}
+
 // --- The chat's poll -------------------------------------------------------
 
 // What the chat's poll brought (chat-news.js): the character's challenge or
@@ -103,6 +124,7 @@ export function duelSeen(next) {
     followed = null;
     tellEnd(id);
   }
+  tellLive();
 }
 
 // A match over while its table was not on the screen: how it ended, in a
@@ -383,6 +405,7 @@ function remindMove() {
 // Called every second by the page's ticker (app.js).
 export function offerDuel() {
   if (!state.character || document.hidden) return;
+  tellLive();
   askWaiting();
   tickChallenge();
   offerChallenge();
@@ -465,6 +488,9 @@ export function mountDuel(holder, { cardFace, onLayout = () => {}, onEnd = () =>
     ended = next;
     endMotion = true;
     followed = null;
+    // Over: the residents' tables need not wait for the chat's next poll.
+    if (news?.id === next.id) news = null;
+    tellLive();
     playSound(next.match.result === 'won' ? 'chest' : 'tick');
     if (next.gold > 0 && fx.on()) fx.holdGold(goldBefore, goldBefore + next.gold);
     if (next.stake > 0) call('GET', '/api/character').catch(() => {});
