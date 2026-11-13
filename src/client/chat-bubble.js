@@ -173,6 +173,9 @@ function show() {
   });
   document.body.append(bin, button);
   shown = { button, bin, dragged: () => Boolean(drag?.moving) };
+  // The screens leave room under their last row for the button (styles.css),
+  // so it covers no button at the end of a page (993).
+  document.documentElement.classList.add('with-chat-bubble');
   stand();
   light();
 }
@@ -182,6 +185,7 @@ function hide() {
   shown.button.remove();
   shown.bin.remove();
   shown = null;
+  document.documentElement.classList.remove('with-chat-bubble');
 }
 
 // A tap on the tab: the button is back, popping in at its place.
