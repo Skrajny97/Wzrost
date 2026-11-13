@@ -688,6 +688,10 @@
     "0.3.22": {
       "title": "Version 0.3.22",
       "body": "- Combat: the list of lands is shorter. Open lands have their cards, and the land for your level is marked “Your level”. Lands not open yet are folded under “Further lands”.\n- Cards on a phone: tap an empty line and your reserve slides up so you can pick a card for it. “Fight” always stays at the bottom of the screen, and “Give up” is under the table.\n- Marketplace: an item that doesn't sell, or that you take back, comes back to you as it was. Your own find no longer turns into an item got from other players.\n- The chat bubble no longer covers the last button on a screen."
+    },
+    "0.3.23": {
+      "title": "Version 0.3.23",
+      "body": "- The Labyrinth is easier: its creatures stand halfway between your character's level and your class level, and every Labyrinth level is weaker. Level 1 should now be easy.\n- Exploration report: the fight numbers show the kind of fight: a crown for a champion, a diamond for an elite, a triangle for a tough fight and a dot for an event."
     }
   }
 }
