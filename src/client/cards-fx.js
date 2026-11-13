@@ -864,9 +864,10 @@ export function createCardsFx(holder) {
     await current.wait(PACE.skill);
   }
 
-  // The match's end as a scene over the table's lines: Szczęsny's bust, the
-  // result, his words and the stake (and the day's reward); a win showers
-  // gold sparks. Gives the stake's value, where the coins fly from.
+  // The match's end as a scene over the table's lines: the rival's bust
+  // (Szczęsny's, or a resident's at its own table: `end.who`, 904 B), the
+  // result, the rival's words and the stake (and the day's reward); a win
+  // showers gold sparks. Gives the stake's value, where the coins fly from.
   async function endShown(current, stage, table, end) {
     const lines = union([...table.querySelectorAll('.cards-lines')]) ?? table.getBoundingClientRect();
     const title = { won: t('Wygrana!'), lost: t('Przegrana'), drawn: t('Remis') }[end.result];
@@ -880,7 +881,7 @@ export function createCardsFx(holder) {
         : [t('Trening'), t('bez stawki i nagród')];
     const rows = [stakeRow, end.daily > 0 && [t('Nagroda dnia'), t('+{gold} zł', { gold: formatNumber(end.daily) })]].filter(Boolean);
     const row = ([label, value]) => h('p', { class: 'cfx-end-row' }, h('span', { text: label }), ' ', h('strong', { text: value }));
-    const bust = residentBust('gamehost');
+    const bust = residentBust(end.who?.id ?? 'gamehost');
     const scene = h(
       'div',
       { class: `cfx-end cfx-end--${end.result}` },
@@ -888,7 +889,7 @@ export function createCardsFx(holder) {
         'div',
         { class: 'cfx-end-panel' },
         h('span', { class: 'cfx-end-bust' }, bust),
-        h('p', { class: 'cfx-end-name', text: t('Szczęsny') }),
+        h('p', { class: 'cfx-end-name', text: end.who?.name ?? t('Szczęsny') }),
         h('p', { class: 'cfx-end-title', text: title }),
         end.words && h('p', { class: 'cfx-end-words', text: end.words }),
         h('div', { class: 'cfx-end-rows' }, rows.map(row)),

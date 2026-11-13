@@ -1844,6 +1844,29 @@ function checkCards(data, { rarities }) {
     if (hero.plus && hero.power[0] > 0) errors.push(`${where}: bohater ${hero.id}: plus jest dla umiejętności bez liczby przed ewolucją`);
   }
   if (!data.settlement.residents.some((resident) => resident.id === rules.host.resident)) errors.push(`${where}: host.resident "${rules.host.resident}" to nie mieszkaniec Osady`);
+  // The residents' tables (904 B): each a resident of the Osada with a place
+  // of its own, not Szczęsny, a whole deck at levels up to the top, after a
+  // tier there is, its stake between that tier's and the next one's (above
+  // the top tier's for the strongest), and an icon the page has.
+  const tables = uniqueIds(errors, `${where} (stoły mieszkańców)`, rules.residents.tables);
+  const icons = new Set([...readFileSync(new URL('icons.js', CLIENT_DIR), 'utf8').matchAll(/^ {2}'?([a-z][a-z-]*)'?: \[/gm)].map((match) => match[1]));
+  if (rules.residents.shown > rules.deckSize) errors.push(`${where}: residents.shown (${rules.residents.shown}) ponad talię (${rules.deckSize})`);
+  for (const table of rules.residents.tables) {
+    const owner = `mieszkaniec ${table.id}`;
+    if (table.id === rules.host.resident) errors.push(`${where}: ${owner} to Szczęsny, który gra stopniami`);
+    if (!data.settlement.residents.some((resident) => resident.id === table.id)) errors.push(`${where}: ${owner} to nie mieszkaniec Osady`);
+    else if (!data.settlement.places.some((place) => place.resident === table.id)) errors.push(`${where}: ${owner} nie ma miejsca w Osadzie, w którym by grał`);
+    deck(owner, table.cards.map((card) => card.monster));
+    for (const card of table.cards) if (card.level > rules.stats.maxLevel) errors.push(`${where}: ${owner}: karta ${card.monster} ponad najwyższy poziom ${rules.stats.maxLevel}`);
+    const below = rules.host.tiers[table.after - 1];
+    const above = rules.host.tiers[table.after];
+    if (!below) errors.push(`${where}: ${owner}: after ${table.after} to nie stopień Szczęsnego`);
+    else if (!(table.stake > below.stake && (!above || table.stake < above.stake))) {
+      errors.push(`${where}: ${owner}: stawka ${table.stake} nie leży między stopniami ${table.after} (${below.stake}) i ${table.after + 1} (${above?.stake ?? '–'})`);
+    }
+    if (!icons.has(table.icon)) errors.push(`${where}: ${owner}: nieznana ikona "${table.icon}" (src/client/icons.js)`);
+  }
+  if (tables.size === 0) errors.push(`${where}: mieszkańcy nie mają stołów`);
   return errors;
 }
 

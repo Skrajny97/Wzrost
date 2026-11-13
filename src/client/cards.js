@@ -24,6 +24,14 @@
 // is drawn anew, Szczęsny's cards and the reserve's are dealt, and the end
 // and the cards won come in. With the game's animations off ("Animacje",
 // motion.js) every change shows at once.
+//
+// The residents of the Osada play at their own places (904 B, mock-ups
+// 910.1 and 910.2): mounted with `resident`, the same panel is that
+// resident's table under its bust ("Karty z Jagną"): the day's staked
+// matches, its deck's style and place among Szczęsny's tiers, its first
+// cards, the stake and what a win gives, "Zagraj o … zł" and "Trening",
+// and its match on the same table as Szczęsny's. A match is played at its
+// own table: elsewhere the panel says where it waits.
 
 import { areaArtUrl, monsterSprite, placeArt, portraitSprite, residentBust } from './art.js';
 import { createCardsFx, fxDroppedCards } from './cards-fx.js';
@@ -101,10 +109,12 @@ export function cardFace(card, { compact = false, marks = {}, onClick = null, la
     : h('span', { class: className, vars, role: 'img', 'aria-label': ariaLabel }, body);
 }
 
-// Szczęsny's words after a match, one of the data's.
+// Szczęsny's words after a match, or a resident's, one of the data's.
 const oneOf = (lines) => lines[Math.floor(Math.random() * lines.length)];
 
-export function mountCards(holder, { onLayout = () => {} } = {}) {
+// `resident`: the resident whose table this is (904 B), at its place in the
+// Osada; none for Szczęsny's tab in the Salon Gier.
+export function mountCards(holder, { onLayout = () => {}, resident = null } = {}) {
   let view = null;
   let failure = null;
   let gone = false;
@@ -131,7 +141,25 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
   const fx = createCardsFx(holder);
   let deferred = false;
 
-  const playing = () => Boolean(view?.match) && !building;
+  // Whether a match is this table's: a resident's at its own, Szczęsny's in
+  // the Salon. Another table's waits there.
+  const own = (match) => Boolean(match) && (resident ? match.resident === resident : !match.resident);
+  const playing = () => own(view?.match) && !building;
+  // A resident's table as the view brings it (the residents' tables, 904 B).
+  const tableOf = (id) => view?.residents?.find((one) => one.id === id) ?? null;
+  // Who sits across a match or its end: Szczęsny with his tier, or a
+  // resident with its deck; the bust's id, the name and the line under it.
+  function whoOf(match) {
+    const table = match?.resident ? tableOf(match.resident) : null;
+    if (table) return { id: table.id, name: table.name, line: table.deck, of: table.of };
+    return { id: 'gamehost', name: t('Szczęsny'), line: view?.tiers?.find((one) => one.number === match?.tier)?.name ?? null, of: null };
+  }
+  // The rival's words after a match: a resident's own, or Szczęsny's.
+  function wordsFor(end) {
+    const key = { won: 'win', lost: 'loss', drawn: 'draw' }[end.result];
+    const lines = end.resident ? tableOf(end.resident)?.texts[key] : view.texts[key];
+    return lines?.length ? oneOf(lines) : null;
+  }
 
   // The tab brought up under the top bar, which stays over the page
   // (styles.css, .topbar), once the screen has laid itself out anew.
@@ -212,12 +240,11 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
   }
 
   // "Walcz" with the animations on: the round played on the table as it
-  // stood, then the table drawn anew with what came after it (Szczęsny's new
-  // cards, the reserve dealt) or the match's end.
+  // stood, then the table drawn anew with what came after it (the rival's
+  // new cards, the reserve dealt) or the match's end.
   async function foughtWithFx(answer, goldBefore) {
     const end = answer.end ?? null;
-    const words = end ? view.texts[{ won: 'win', lost: 'loss', drawn: 'draw' }[end.result]] : null;
-    const said = words ? oneOf(words) : null;
+    const said = end ? wordsFor(end) : null;
     const played = end ? answer.played : answer.cards.match;
     const previous = view.match;
     const mine = myCards(previous);
@@ -242,7 +269,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
     const run = fx.begin();
     let coinsDone = false;
     try {
-      ({ coinsDone } = await fx.round(run, { last: played?.last, shown, after: played, end: end && { ...end, words: said }, types: view.types, onEnd: endSound }));
+      ({ coinsDone } = await fx.round(run, { last: played?.last, shown, after: played, end: end && { ...end, words: said, who: whoOf(end) }, types: view.types, onEnd: endSound }));
     } catch (error) {
       console.error('cards-fx', error);
       run.skip();
@@ -446,6 +473,8 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
     const gold = state.character.gold;
     const noDeck = !view.deck;
     const limit = view.staked.today >= view.staked.limit;
+    // A match at a resident's table waits there (elsewhere).
+    const busy = Boolean(view.match);
     const start = (tier, staked) => (event) =>
       withButton(event.currentTarget, async () => {
         const answer = await call('POST', '/api/cards/match', { tier: tier.number, staked });
@@ -495,10 +524,10 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
               type: 'button',
               class: 'button button--world',
               text: gold < tier.stake ? t('Brakuje złota') : t('Zagraj o {gold} zł', { gold: formatNumber(tier.stake) }),
-              disabled: noDeck || limit || gold < tier.stake,
+              disabled: noDeck || busy || limit || gold < tier.stake,
               onClick: start(tier, true),
             }),
-            h('button', { type: 'button', class: 'button button--system', text: t('Trening'), disabled: noDeck, onClick: start(tier, false) }),
+            h('button', { type: 'button', class: 'button button--system', text: t('Trening'), disabled: noDeck || busy, onClick: start(tier, false) }),
           ),
         ),
       ),
@@ -506,12 +535,21 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
     );
   }
 
-  // The last match's end (until "Dalej"): won, lost or a draw, Szczęsny's
-  // words, the gold, the reward of the day and the first win's card.
+  // The last match's end (until "Dalej"): won, lost or a draw, the rival's
+  // words, the gold, the reward of the day and the card won (a tier's first
+  // win, or a resident's: its first staked win or its chance).
   function endCard() {
     if (!ended) return null;
     const title = { won: t('Wygrana!'), lost: t('Przegrana'), drawn: t('Remis') }[ended.result];
     const words = ended.words;
+    // At a resident's table (904 B): its name and deck, and the card of its
+    // first staked win or of its chance at a later one.
+    const who = whoOf(ended);
+    const reward = !ended.resident
+      ? t('Za pierwsze pokonanie stopnia Szczęsny daje ci kartę:')
+      : ended.first
+        ? t('Za pierwszą wygraną o stawkę {name} daje Ci kartę:', { name: who.name })
+        : t('{name} daje Ci też kartę ze swojej talii:', { name: who.name });
     const rows = [
       ended.mode === 'staked' && ended.result === 'won' && [t('Za wygraną zgarniasz'), t('+{gold} zł', { gold: formatNumber(ended.gold) })],
       ended.mode === 'staked' && ended.result === 'drawn' && [t('Stawka wraca'), t('+{gold} zł', { gold: formatNumber(ended.gold) })],
@@ -525,9 +563,10 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
       { class: `card cards-end cards-end--${ended.result}`, role: 'status', 'data-guide': 'cards-end' },
       h('p', { class: 'cards-end-title', text: title }),
       ended.tierName && h('p', { class: 'muted', text: t('Szczęsny, stopień {number}: {name}', { number: ROMAN[ended.tier - 1] ?? ended.tier, name: ended.tierName }) }),
+      ended.resident && ended.deck && h('p', { class: 'muted', text: `${who.name}, ${ended.deck}` }),
       words && h('p', { class: 'settlement-greeting', text: words }),
       h('dl', { class: 'status-list' }, rows.map(([label, value]) => h('div', { class: 'status-row' }, h('dt', { text: label }), h('dd', { text: value })))),
-      ended.card && h('div', { class: 'cards-reward' }, h('p', { class: 'cards-reward-text', text: t('Za pierwsze pokonanie stopnia Szczęsny daje ci kartę:') }), face(ended.card)),
+      ended.card && h('div', { class: 'cards-reward' }, h('p', { class: 'cards-reward-text', text: reward }), face(ended.card)),
       h('button', {
         type: 'button',
         class: 'button button--system',
@@ -537,6 +576,121 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
           render();
         },
       }),
+    );
+  }
+
+  // --- The residents' tables (904 B) ---------------------------------------
+
+  // A match at another table: one match at a time, played where it started
+  // (Szczęsny's in the Salon, a resident's at its place). Where it waits,
+  // and the way there.
+  function elsewhere() {
+    const match = view.match;
+    if (!match || own(match)) return null;
+    const table = match.resident ? tableOf(match.resident) : null;
+    const href = !match.resident ? '#/osada/casino/cards' : table?.place ? `#/osada/${table.place}/cards` : null;
+    return h(
+      'section',
+      { class: 'card stack cards-elsewhere', role: 'status', 'data-guide': 'cards-elsewhere' },
+      h('p', { text: table ? t('Trwa Twoja partia {with}. Dokończ ją, zanim zaczniesz następną.', { with: table.with }) : t('Trwa Twoja partia ze Szczęsnym. Dokończ ją, zanim zaczniesz następną.') }),
+      href && h('a', { class: 'button button--world', href, text: t('Wróć do partii') }),
+    );
+  }
+
+  // A resident's table under its bust (904 B, mock-up 910.2): "Karty z
+  // Jagną", the day's staked matches, its deck's name, style and place
+  // among Szczęsny's tiers, its first cards, the stake and what a win gives,
+  // the card of the first staked win and the chance of one after it, and
+  // "Zagraj o … zł" and "Trening". Before Szczęsny's starter deck, or
+  // without a whole deck, the way to the Salon instead; with a match at
+  // another table, where it waits.
+  function residentSection() {
+    const table = tableOf(resident);
+    if (!table) return null;
+    const gold = state.character.gold;
+    const ready = view.starter && Boolean(view.deck);
+    const busy = Boolean(view.match);
+    const limit = view.staked.today >= view.staked.limit;
+    const female = table.gender === 'f';
+    const roman = (number) => ROMAN[number - 1] ?? String(number);
+    const start = (staked) => (event) =>
+      withButton(event.currentTarget, async () => {
+        const answer = await call('POST', '/api/cards/match', { resident, staked });
+        ended = null;
+        playSound('swing');
+        apply(answer);
+        showTab();
+        if (fx.on()) await fxPlay((run) => fx.enter(run, { previous: null, match: view.match }));
+      });
+    // Its place among Szczęsny's tiers: between two, or above them all.
+    const place = table.top
+      ? female
+        ? t('Jest mocniejsza nawet od {top} stopnia Szczęsnego.', { top: roman(table.after) })
+        : t('Jest mocniejszy nawet od {top} stopnia Szczęsnego.', { top: roman(table.after) })
+      : female
+        ? t('Jest mocniejsza niż {lower} stopień Szczęsnego i słabsza niż {upper}.', { lower: roman(table.after), upper: roman(table.after + 1) })
+        : t('Jest mocniejszy niż {lower} stopień Szczęsnego i słabszy niż {upper}.', { lower: roman(table.after), upper: roman(table.after + 1) });
+    const percent = formatNumber(Math.round(table.chance * 100));
+    const fact = (label, value) => h('p', { class: 'cards-tier-facts' }, h('span', {}, label, ' ', h('strong', { text: value })));
+    // The card of the first staked win and the chance after it, while any
+    // card of the deck can still come (below its top level).
+    const cardsToWin =
+      table.left > 0
+        ? [
+            table.beaten
+              ? h('p', { class: 'cards-tier-facts' }, h('span', { class: 'cards-tier-done' }, icon('check', { size: 14 }), t('Karta za pierwszą wygraną odebrana')))
+              : fact(t('Pierwsza wygrana o stawkę:'), table.missing > 0 ? t('karta z talii {of}, której nie masz', { of: table.of }) : t('karta z talii {of}', { of: table.of })),
+            fact(t('Każda następna wygrana o stawkę:'), female ? t('{percent}% szansy na kartę z jej talii', { percent }) : t('{percent}% szansy na kartę z jego talii', { percent })),
+          ]
+        : h('p', { class: 'muted', text: t('Wszystkie karty z tej talii masz już na najwyższym poziomie.') });
+    return h(
+      'section',
+      { class: 'stack resident-cards', 'data-guide': 'resident-cards' },
+      h('h3', { class: 'section-title', text: t('Karty {with}', { with: table.with }) }),
+      view.starter &&
+        h(
+          'div',
+          { class: 'cards-plaque' },
+          icon('dice', { size: 18, className: 'cards-plaque-icon' }),
+          h('span', { text: t('Partie o stawkę dziś: {used} z {limit}', { used: view.staked.today, limit: view.staked.limit }) }),
+        ),
+      elsewhere(),
+      h(
+        'article',
+        { class: `card cards-tier${table.beaten ? ' cards-tier--beaten' : ''}`, 'data-guide': 'resident-table' },
+        h(
+          'div',
+          { class: 'cards-tier-head' },
+          h('span', { class: 'cards-tier-number' }, icon(table.icon, { size: 16 })),
+          h('div', { class: 'cards-tier-title' }, h('h4', { class: 'cards-tier-name', text: table.deck }), h('p', { class: 'muted cards-tier-text', text: `${table.style} ${place}` })),
+        ),
+        h('div', { class: 'tcard-grid tcard-grid--deck' }, table.cards.map((card) => face(card, { compact: true }))),
+        h('p', { class: 'muted', text: t('To {shown} z {size} kart {of}. Resztę zobaczysz przy stole.', { shown: table.cards.length, size: table.size, of: table.of }) }),
+        h(
+          'p',
+          { class: 'cards-tier-facts' },
+          h('span', {}, t('Stawka partii'), ' ', h('strong', { text: t('{gold} zł', { gold: formatNumber(table.stake) }) })),
+          h('span', {}, t('Za wygraną zgarniesz'), ' ', h('strong', { text: t('{gold} zł', { gold: formatNumber(table.win) }) })),
+        ),
+        cardsToWin,
+        !view.starter && h('p', { class: 'region-warning', text: t('Najpierw weź talię od Szczęsnego w Salonie Gier.') }),
+        view.starter && !view.deck && h('p', { class: 'region-warning', text: t('Najpierw ułóż talię z {count} kart.', { count: view.deckSize }) }),
+        ready && limit && h('p', { class: 'muted', text: t('Na dziś to już wszystkie partie o stawkę. Trening jest bez limitu.') }),
+        ready
+          ? h(
+              'div',
+              { class: 'cards-tier-actions' },
+              h('button', {
+                type: 'button',
+                class: 'button button--world',
+                text: gold < table.stake ? t('Brakuje złota') : t('Zagraj o {gold} zł', { gold: formatNumber(table.stake) }),
+                disabled: busy || limit || gold < table.stake,
+                onClick: start(true),
+              }),
+              h('button', { type: 'button', class: 'button button--system', text: t('Trening'), disabled: busy, onClick: start(false) }),
+            )
+          : h('a', { class: 'button button--world', href: '#/osada/casino/cards', text: t('Talia Systemu w Salonie Gier') }),
+      ),
     );
   }
 
@@ -677,7 +831,10 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
   function aimHint() {
     if (!aiming) return null;
     const kind = skillKind();
-    if (aiming.step === 'target') return t('Wskaż kartę Szczęsnego, w którą uderzy Twoja karta.');
+    if (aiming.step === 'target') {
+      const of = whoOf(view.match).of;
+      return of ? t('Wskaż kartę {of}, w którą uderzy Twoja karta.', { of }) : t('Wskaż kartę Szczęsnego, w którą uderzy Twoja karta.');
+    }
     if (aiming.step === 'type') return t('Wybierz nowy typ karty.');
     if (aiming.step === 'swap') return t('Wskaż kartę z rezerwy, która zajmie jej miejsce.');
     if (kind === 'swap') return t('Wskaż swoją kartę w linii, którą zabierasz do rezerwy.');
@@ -842,8 +999,10 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
     const blowsNow = blows(match);
     const hero = match.me.hero;
     const skill = hero?.skill;
-    const tier = view.tiers.find((one) => one.number === match.tier);
-    const art = placeArt('casino-hall');
+    // Szczęsny with his tier on the Salon's picture, or a resident with its
+    // deck at its own place (904 B).
+    const who = whoOf(match);
+    const art = match.resident ? null : placeArt('casino-hall');
     const reserve = reserveLeft(match);
     const ready = turnReady(match);
     const table = h(
@@ -852,12 +1011,12 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
       h(
         'div',
         { class: 'cards-table-head' },
-        h('span', { class: 'cards-table-bust' }, residentBust('gamehost')),
+        h('span', { class: 'cards-table-bust' }, residentBust(who.id)),
         h(
           'div',
           { class: 'cards-table-who' },
-          h('p', { class: 'cards-table-name', text: t('Szczęsny') }),
-          tier && h('p', { class: 'cards-table-tier', text: tier.name }),
+          h('p', { class: 'cards-table-name', text: who.name }),
+          who.line && h('p', { class: 'cards-table-tier', text: who.line }),
           h('p', { class: 'muted cards-table-count' }, backs(match.foe.hand), h('span', { text: t('Rezerwa {hand} · talia {deck} · zbite {out}', { hand: match.foe.hand, deck: match.foe.deck, out: match.foe.out }) })),
         ),
         h('span', { class: 'cards-round', text: t('Runda {round}/{cap}', { round: match.round, cap: match.cap }) }),
@@ -941,8 +1100,7 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
                 return;
               }
               if (answer.end) {
-                const words = view.texts[{ won: 'win', lost: 'loss', drawn: 'draw' }[answer.end.result]];
-                ended = { ...answer.end, words: words ? oneOf(words) : null };
+                ended = { ...answer.end, words: wordsFor(answer.end) };
                 playSound(answer.end.result === 'won' ? 'chest' : 'tick');
               }
               plan = null;
@@ -959,15 +1117,19 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
             const button = event.currentTarget;
             const sure = await confirmAction({
               title: t('Poddać partię?'),
-              text: match.mode === 'staked' ? t('Partia przepada, a stawka zostaje u Szczęsnego.') : t('Trening skończy się przegraną.'),
+              text:
+                match.mode !== 'staked'
+                  ? t('Trening skończy się przegraną.')
+                  : who.of
+                    ? t('Partia przepada, a stawka zostaje u {of}.', { of: who.of })
+                    : t('Partia przepada, a stawka zostaje u Szczęsnego.'),
               confirmLabel: t('Poddaj'),
               danger: true,
             });
             if (!sure) return;
             await withButton(button, async () => {
               const answer = await call('POST', '/api/cards/surrender');
-              const words = view.texts.loss;
-              ended = { ...answer.end, words: words ? oneOf(words) : null };
+              ended = { ...answer.end, words: wordsFor(answer.end) };
               apply(answer);
               showTab();
             });
@@ -997,10 +1159,12 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
     }
     let body;
     if (building) body = [builder()];
-    else if (view.match) body = [endCard(), matchCard()];
+    else if (own(view.match)) body = [endCard(), matchCard()];
+    else if (resident) body = [endCard(), residentSection()];
     else
       body = [
         endCard(),
+        elsewhere(),
         tableHead(),
         deckCard(),
         view.starter && heroCard(view.hero),
@@ -1011,7 +1175,8 @@ export function mountCards(holder, { onLayout = () => {} } = {}) {
     fx.cancelFlights();
     holder.replaceChildren(h('div', { class: `stack cards-tab${fx.on() ? ' cfx-on' : ''}` }, body));
     // The table takes the whole tab while a match is on: the Salon's
-    // resident card folds away (screens/settlement.js).
+    // resident card folds away, and at a resident's table its card and its
+    // services (screens/settlement.js).
     if (playing() !== wasPlaying) {
       wasPlaying = playing();
       onLayout();
