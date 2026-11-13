@@ -382,6 +382,8 @@
       "passed": "{area} is already open to you. The next trial comes when your class level opens that place.",
       "allOpen": "Every place is already open to you. The Trial Hall has no trial for you now.",
       "used": "Today's trial is behind you. The next one from midnight.",
+      "exploring": "The character is on an exploration. You can enter the Trial Hall once it returns.",
+      "claimFirst": "The exploration is over. Claim the report in Combat, then enter the Trial Hall.",
       "start": "Take the trial",
       "fight": "Fight {number}",
       "eliteFight": "Fight {number}: {name}",

@@ -333,6 +333,8 @@
       "passed": "{area} jest już dla Ciebie otwarte. Następna próba będzie, gdy poziom klasy otworzy to miejsce.",
       "allOpen": "Wszystkie miejsca są już dla Ciebie otwarte. Sala prób nie ma teraz próby.",
       "used": "Dzisiejsza próba za Tobą. Następna od północy.",
+      "exploring": "Postać jest na wyprawie. Do Sali prób wejdziesz po jej powrocie.",
+      "claimFirst": "Wyprawa się skończyła. Odbierz raport w Walce, a potem wejdź do Sali prób.",
       "start": "Podejmij próbę",
       "fight": "{number}. walka",
       "eliteFight": "{number}. walka: {name}",
