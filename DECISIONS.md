@@ -3233,6 +3233,20 @@ Kwestie 878.1–878.6 autor przyjął na stronie ocen. Angielskie wersje idą be
 4. **Tryb testowy:** „Objaśnienie Labiryntu” w „Testuj samouczki” zaczyna rozdział od nowa. Dzisiejszy Labirynt zostaje taki, jaki był.
 5. **Nagrania (880):** po dwie wersje każdej kwestii po polsku i po angielsku poszły na stronę ocen; jedna polska wersja kwestii 878.2 urwała się w nagraniu, więc doszły dwie nowe (880.2 B i C). Autor wybrał po polsku 880.1 A, 880.2 C, 880.3 B, 880.4 A, 880.5 B i 880.6 B, a po angielsku 880.7 B, 880.8 A, 880.9 B, 880.10 A, 880.11 A i 880.12 A. Każde nagranie kończy się 0,3 s po ostatnim słowie, mierzonym w samym dźwięku. Rozdział wchodzi do gry w wersji 0.2.89.
 
+## Ranking członków gildii (897 A, 13.11.2026, w grze od 0.3.6)
+
+Autor przyjął makiety 897.1 i 897.2 z wariantem 897 A: jedna karta „Ranking członków” w zakładce Gildia, z zakładkami Aktywność i Wpłaty, a w Siedzibie przycisk „Kto ile wpłacił”. Szczegóły rozstrzygnięte najprościej, zgodnie z makietami:
+
+1. Aktywność to Sława, którą członek wniósł do gildii, liczona jak Sława gildii w Rankingu gildii, część po części: Bestia (1 za każdy pełny 1% paska, który członek zbił, i 50 za ostatni cios), Wyprawa (punkty pokonanego strażnika, 20 albo 50 za siódmego, dzielone według zadanych mu obrażeń), Próby (10 za próbę, najwyżej 14 w tygodniu), Prośby (1 za sztukę, najwyżej 30), Wymiana (2 za wziętą ofertę, najwyżej 10) i wygrana wojna (100 po równo dla wszystkich, którzy w niej walczyli). Członek dostaje tylko pełne punkty, więc Sława członków razem bywa trochę mniejsza niż Sława gildii. Liczby bierze z `fame` w `data/guilds.json`, słowa z `members`.
+2. Ten tydzień liczy się na bieżąco ze źródeł. Tydzień, który minął, gra zapisuje raz dla wszystkich gildii (tabela `guild_member_fame`), gdy nowy tydzień pierwszy raz o to zapyta: przy wczytaniu postaci, razem z zapisem Sławy gildii, albo przy otwarciu rankingu. Źródła trzymają wiersze tylko do końca następnego tygodnia. Tam, gdzie są wojny gildii, tydzień zapisuje się dopiero po ostatniej bitwie, jak Sława gildii.
+3. „Od początku” to zapisane tygodnie i ten tydzień. Zapis rusza z 0.3.6, a pierwszy zapisany tydzień to 2–8 listopada, bo jego źródła są jeszcze w bazie. Karta mówi, od którego dnia liczy się „Od początku”.
+4. Wpłaty to złoto i surowce wpłacone do budynków Siedziby (zapis od 0.3.4), w tym tygodniu albo od początku, od największej wpłaty złota. Surowce stoją pod imieniem członka.
+5. Wpłaty sprzed 0.3.4 stoją razem w jednym wierszu pod listą „Od początku”: suma budynków minus to, co gra zapisała.
+6. Ranking pokazuje obecnych członków. Zapisane tygodnie i wpłaty członka, który odszedł, zostają z gildią i wracają, gdy wróci. Usunięta postać zostawia je niczyje (ujemny numer), a gildia, która znika, zabiera je ze sobą. Postać, która dostała numer usuniętej, nie przejmuje jej Sławy.
+7. Stuknięcie w członka w Aktywności rozwija, skąd ma Sławę. „Kto ile wpłacił” w Siedzibie otwiera kartę na Wpłatach „Od początku” i przewija do niej.
+8. Ranking niczego nie daje, tylko pokazuje.
+9. Przy okazji: na telefonach węższych niż 380 px nagrody dnia przy wejściu do Labiryntu stoją jedna pod drugą. Sprawdzenie układu po 0.3.5 pokazało ucięte „+9,9 mln” i „XP postaci” przy dwóch kolumnach.
+
 ## Labirynt jako osobna plansza i siła stworów na płytach (898, 899 A, 13.11.2026, w grze od 0.3.5)
 
 Autor: „tu miała się otwierać osobna plansza coś jak w AFK Arena Labirynt Arkanów” oraz „dużo scrollowania, nieintuicyjne... słabe wyzwanie”. Na stronie ocen autor przyjął makiety 898.1–898.4, grafiki 898.5–898.12 (płyta B, źródło C, reszta A) i wybrał 899 A. Plansza ma własny wygląd, nie kopię cudzej gry.

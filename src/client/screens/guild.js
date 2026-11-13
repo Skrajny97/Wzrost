@@ -5,7 +5,8 @@
 // invitations waiting for this character; its guild with the members, the
 // leader and the deputies marked, and what its role lets it do (invite a
 // friend at a tap or anyone by name, take an invitation back, remove, name
-// a deputy, hand the lead over); "Opuść gildię"; and, outside a guild,
+// a deputy, hand the lead over); the Ranking członków under it
+// (guild-ranking.js, 897 A); "Opuść gildię"; and, outside a guild,
 // founding one from its level for its gold. The guild's channel is a tab
 // of the Czat (community.js).
 //
@@ -32,6 +33,7 @@ import { mountGuildBeast } from '../guild-beast.js';
 import { mountGuildChest } from '../guild-chest.js';
 import { mountGuildExchange } from '../guild-exchange.js';
 import { mountGuildExpedition } from '../guild-expedition.js';
+import { guildRankingCard } from '../guild-ranking.js';
 import { mountGuildRequests } from '../guild-requests.js';
 import { mountGuildSeat } from '../guild-seat.js';
 import { mountGuildTrials } from '../guild-trials.js';
@@ -169,6 +171,9 @@ export function mountGuildPage(container, context) {
 function mountGuild(container) {
   let view = null;
   let gone = false;
+  // The Ranking członków (guild-ranking.js, 897 A), under the guild's card:
+  // made once for the guild, kept as the cards are drawn anew.
+  let ranking = null;
   const body = h('div', { class: 'friends guild' }, h('p', { class: 'muted', text: t('Wczytywanie…') }));
   fill(container, body);
 
@@ -176,7 +181,11 @@ function mountGuild(container) {
     if (gone) return;
     view = next;
     guildSeen(view);
-    fill(body, invitesCard(), view.guild ? [guildCard(), inviteCard(), sentCard(), leaveCard()] : foundCard());
+    if (view.guild && ranking?.dataset.guild !== String(view.guild.id)) {
+      ranking = guildRankingCard();
+      ranking.dataset.guild = String(view.guild.id);
+    }
+    fill(body, invitesCard(), view.guild ? [guildCard(), ranking, inviteCard(), sentCard(), leaveCard()] : foundCard());
   }
 
   // An action answered with the Gildia anew, its words in a toast.

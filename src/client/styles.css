@@ -10622,6 +10622,142 @@ a.profession-square:active {
   gap: 4px;
 }
 
+/* The Ranking członków of the Gildia tab (guild-ranking.js, 897 A; mock-ups
+   897.1 and 897.2): the ranking's two rows of options over its table, a
+   member of "Aktywność" unfolding where its Sława comes from under its row,
+   the pieces of each resource given under a member's name in "Wpłaty", and
+   the donations of before the game wrote who gave them under all. */
+.members-ranking {
+  gap: 10px;
+}
+
+.members-ranking-switchers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.members-ranking-table td {
+  height: 40px;
+}
+
+.members-ranking-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.members-ranking-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.members-ranking-chevron {
+  flex: none;
+  color: var(--text-muted);
+  transform: rotate(90deg);
+  transition: transform 0.2s ease;
+}
+
+.members-ranking-toggle[aria-expanded='true'] .members-ranking-chevron {
+  transform: rotate(-90deg);
+}
+
+.members-ranking-table .members-ranking-parts td {
+  height: auto;
+  padding-top: 0;
+  border-top: 0;
+  text-align: left;
+  white-space: normal;
+}
+
+.members-ranking-parts-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  margin: 0;
+  padding: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 13px;
+  list-style: none;
+}
+
+.members-ranking-parts-list li {
+  white-space: nowrap;
+}
+
+.members-ranking-parts-list b {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.members-ranking-resources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  margin: 2px 0 6px 20px;
+  color: var(--text-muted);
+  font-size: 13px;
+  white-space: normal;
+}
+
+.members-ranking-resource {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.members-ranking-resource img,
+.members-ranking-gold img {
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+}
+
+.members-ranking-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.members-ranking-table .members-ranking-earlier td {
+  height: auto;
+  padding: 8px 4px;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-style: italic;
+  text-align: left;
+  white-space: normal;
+}
+
+.members-ranking-place {
+  margin: 0;
+  font-size: 13px;
+}
+
+.members-ranking .how-more > p + p {
+  margin-top: 6px;
+}
+
+/* "Kto ile wpłacił" in the Siedziba: the Ranking członków on "Wpłaty". */
+.guild-seat-who {
+  align-self: flex-start;
+  gap: 6px;
+}
+
 .ranking-profession .sprite {
   width: 20px;
   height: 20px;
@@ -20616,16 +20752,12 @@ a.discord-button {
   padding: 4px 6px;
 }
 
-/* On the narrowest phones the party stands over the day's rewards, two
-   by two, so the rewards' numbers keep their room (+9,9 mln was cut at
-   320 px). */
+/* On the narrowest phones the party stands over the day's rewards, still
+   one under another, so each reward's number and name keep their room
+   (+9,9 mln and "XP postaci" were cut two by two at 320–375 px). */
 @media (max-width: 379px) {
   .labyrinth-entry {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .labyrinth-entry .labyrinth-gains-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

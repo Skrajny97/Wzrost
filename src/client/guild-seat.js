@@ -9,7 +9,9 @@
 // its next level, that level's cost with what is collected for it, the
 // member's donation of gold and the building's resource, with quick amounts
 // and "Do poziomu" (what the level still lacks), and for the leader and the
-// deputies the mark to put on or take off. The words come with the answer
+// deputies the mark to put on or take off. Under the bonuses "Kto ile
+// wpłacił" opens the Ranking członków of the Gildia tab on "Wpłaty" (897 A).
+// The words come with the answer
 // (data/guilds.json, seat.texts), in the page's language; the tab's own few
 // go through t() (i18n.js). mountGuildSeat(container) adds the cards
 // to the container and gives { unmount() }, which takes them away.
@@ -17,6 +19,7 @@
 import { goldArt, guildSeatSprite, resourceArt } from './art.js';
 import { fill, h, icon } from './dom.js';
 import { formatNumber } from './format.js';
+import { askDonations } from './guild-ranking.js';
 import { t } from './i18n.js';
 import { call } from './state.js';
 import { confirmAction, foldPart, howItWorks, toast, withButton } from './ui.js';
@@ -66,6 +69,9 @@ export function mountGuildSeat(container) {
       { class: 'card guild-seat-head', 'aria-labelledby': 'guild-seat-title' },
       h('h2', { class: 'card-title', id: 'guild-seat-title', text: texts.title }),
       view.guild ? h('p', { class: 'guild-seat-bonuses' }, icon('keep', { size: 20 }), h('span', { text: view.bonusesText })) : h('p', { class: 'muted', text: texts.noGuild }),
+      // Who gave what: the Ranking członków of the Gildia tab, on "Wpłaty"
+      // from the start (guild-ranking.js, 897 A).
+      view.guild && h('a', { class: 'button button--world button--small guild-seat-who', href: '#/gildia/guild', onClick: askDonations }, icon('coin', { size: 16 }), texts.whoGave),
       howItWorks(texts.intro, texts.how),
     );
   }

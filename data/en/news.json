@@ -620,6 +620,10 @@
     "0.3.5": {
       "title": "Version 0.3.5",
       "body": "- The Labyrinth has a board of its own: the door in the Trial Hall opens it full screen. It shows every chamber of the level, the roads between them and your party walking to the chamber you pick.\n- Fight platforms have a coloured ring: green is an easy fight, yellow an even one, red a dangerous one. The colour changes with your party, so wounds and blessings count too.\n- Elites and treasures show how many Core Shards they give."
+    },
+    "0.3.6": {
+      "title": "Version 0.3.6",
+      "body": "- The Guild tab has a new “Members' ranking” card. “Activity” shows how much Fame each member brought the guild this week or in all time. Tap a member to see where their Fame comes from: the Beast, the Expedition, Trials, Requests, the Exchange or War.\n- “Donations” shows how much gold and resources each member gave to the Hall. Donations from before they were recorded stand together under the list.\n- In the Hall, the “Who gave what” button opens those donations straight away.\n- On narrow phones, the day's rewards at the Labyrinth's entrance are no longer cut off."
     }
   }
 }

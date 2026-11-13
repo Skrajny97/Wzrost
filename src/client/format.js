@@ -29,6 +29,12 @@ export const dateTimeFormat = {
     ).format(date),
 };
 
+// "2 listopada 2026": a day of the calendar written out, the date of a
+// Date at noon UTC (a key "2026-11-02" as `new Date('2026-11-02T12:00:00Z')`).
+export const dateFormat = {
+  format: (date) => format('date', (locale) => new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })).format(date),
+};
+
 export const formatNumber = (value) => integerFormat().format(value);
 // For the narrow top bar: from a million on, "1,2 mln".
 const shortFormat = () => format('short', (locale) => new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 1 }));

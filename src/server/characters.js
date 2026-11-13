@@ -2166,6 +2166,17 @@ export const detachedRows = (db, which, binds) => [
     )
     .bind(...binds),
   db.prepare(`DELETE FROM guild_seat_donations WHERE character_id ${which}`).bind(...binds),
+  // So does the Sława it brought its guild in the weeks gone (the members'
+  // ranking, guild-members.js).
+  db
+    .prepare(
+      `INSERT INTO guild_member_fame (guild_id, character_id, week, beast, expedition, trials, requests, exchange, war)
+       SELECT guild_id, -character_id, week, beast, expedition, trials, requests, exchange, war FROM guild_member_fame WHERE character_id ${which}
+       ON CONFLICT (guild_id, character_id, week) DO UPDATE SET beast = beast + excluded.beast, expedition = expedition + excluded.expedition,
+         trials = trials + excluded.trials, requests = requests + excluded.requests, exchange = exchange + excluded.exchange, war = war + excluded.war`,
+    )
+    .bind(...binds),
+  db.prepare(`DELETE FROM guild_member_fame WHERE character_id ${which}`).bind(...binds),
 ];
 
 // The Rdzeń at a glance (characterView): its sockets, those free, the

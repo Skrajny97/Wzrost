@@ -22,6 +22,7 @@ import { WAR_DAYS, countedForm, questPeriod } from '../engine/index.js';
 import { requireChatter } from './chat.js';
 import { content } from './content.js';
 import { guildWarsOn } from './features.js';
+import { memberFameFreeze } from './guild-members.js';
 import { settleWars } from './guild-wars.js';
 import { json } from './http.js';
 import { askedPage, lastOffset } from './ranking-pages.js';
@@ -129,6 +130,10 @@ export async function championOf(db, now) {
       .prepare(`INSERT OR IGNORE INTO guild_fame (guild_id, week, points) SELECT guild_id, ?, points FROM (${fame.sql}) WHERE NOT EXISTS (SELECT 1 FROM guild_fame WHERE week = ?)${finished}`)
       .bind(previous.key, ...fame.binds, previous.key, ...(wars ? [previous.key, WAR_DAYS] : []))
       .run();
+    // The members' Sława of that week too (guild-members.js), on its own:
+    // should it fail, the members' ranking writes it when next asked, and
+    // the character still loads.
+    await db.batch(memberFameFreeze(db, previous, now)).catch((error) => console.error(error));
     best = await bestStatement(db, previous.key).first();
   }
   return championFrom(best);
