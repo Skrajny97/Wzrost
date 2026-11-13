@@ -645,16 +645,22 @@ export async function partyHunt(context) {
               `UPDATE activities SET options = json_remove(json_set(options, '$.party', json(?)${report ? ", '$.claimed', json(?)" : ''}), '$.partners'${other ? ", '$.wanted'" : ''}) WHERE character_id = ? AND kind = 'hunt' AND ${trip}`,
             )
             .bind(JSON.stringify(crew), ...(report ? [JSON.stringify(report)] : []), member.row.id, now, party.id)
-        : db.prepare(`UPDATE activities SET options = json_remove(options, '$.party', '$.partners') WHERE character_id = ? AND kind = 'hunt' AND ${trip}`).bind(member.row.id, now, party.id);
+        : // A leader left alone goes as on its own: its exploration keeps
+          // what one of its own keeps and a trip does not (the Ołtarz's
+          // blessing, the professions' levels as it set out; beginHunt).
+          db
+            .prepare(`UPDATE activities SET options = json_patch(json_remove(options, '$.party', '$.partners'), ?) WHERE character_id = ? AND kind = 'hunt' AND ${trip}`)
+            .bind(JSON.stringify(setups.get(member.row.id).own), member.row.id, now, party.id);
     }),
-    // A leader left alone goes as on its own: the boon goes back to the
-    // party, and its wait to its plain length.
-    ...(went.length === 0 && boon
+    // A leader left alone waits as long as its own mount makes it, not the
+    // slowest of the party's, and without the boon, which goes back to the
+    // party.
+    ...(went.length === 0
       ? [
-          db.prepare("UPDATE parties SET boon = json_patch(COALESCE(boon, '{}'), ?) WHERE id = ?").bind(JSON.stringify(boon), party.id),
-          ...(haste > 0
-            ? [db.prepare('UPDATE activities SET ends_at = started_at + ? WHERE character_id = ? AND kind = ? AND started_at = ?').bind(huntWait(body.minutes, mount, content()), player.row.id, 'hunt', now)]
-            : []),
+          db
+            .prepare('UPDATE activities SET ends_at = started_at + ? WHERE character_id = ? AND kind = ? AND started_at = ?')
+            .bind(huntWait(body.minutes, mountOfRow(player.row), content()), player.row.id, 'hunt', now),
+          ...(boon ? [db.prepare("UPDATE parties SET boon = json_patch(COALESCE(boon, '{}'), ?) WHERE id = ?").bind(JSON.stringify(boon), party.id)] : []),
         ]
       : []),
   ]);

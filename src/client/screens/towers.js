@@ -9,7 +9,9 @@
 // won yet, the tower's chest not taken yet), who climbs beside the
 // character in the Wieża Drużyn, and
 // "Wejdź", whose report opens at once. While the character is on an
-// exploration, or its report waits, the towers wait for it (towers.js).
+// exploration, or its report waits, the towers wait for it (towers.js), and
+// so they do while it offers itself or serves as a mercenary, or its pay
+// waits in the Karczma.
 // Over each card its tower,
 // huge and grim (data/towers.json, place; the author: "ogromne budzące
 // grozę Wieże"). The words are shown in the page's language (t(),
@@ -20,6 +22,7 @@ import { placeArt } from '../art.js';
 import { fill, h } from '../dom.js';
 import { formatDecimal, formatNumber } from '../format.js';
 import { t } from '../i18n.js';
+import { MERCENARIES_HASH, serviceBusy } from '../mercenaries.js';
 import { activityFinished, call, isUnlocked, reportCache, state, unlockInfo } from '../state.js';
 import { howItWorks, lockLabel, systemLink, systemPanel, withButton } from '../ui.js';
 
@@ -87,19 +90,29 @@ export function mountTowers(container, { navigate }) {
           ),
         ),
       ),
-      exploring() && systemPanel(exploring(), activityFinished(state.character.activity) && systemLink('#/walka', t('Odbierz raport'))),
+      exploring() && systemPanel(exploring(), waitLink()),
       view.towers.map(towerCard),
     );
   }
 
-  // Why the towers wait: an exploration under way, or its report to claim;
-  // null when the character may go in.
+  // Why the towers wait: an exploration under way, or its report to claim,
+  // or the character's offer or service as a mercenary, in the server's
+  // words (the code review, 13.11.2026: the towers stayed open to it, and
+  // the server refused); null when the character may go in.
   function exploring() {
     const activity = state.character.activity;
-    if (activity?.kind !== 'hunt') return null;
+    if (activity?.kind !== 'hunt') return serviceBusy(activity);
     return activityFinished(activity)
       ? t('Wyprawa się skończyła. Odbierz raport w Walce, a potem wejdź do Wieży.')
       : t('Postać jest na wyprawie. Wejdziesz do Wież po jej powrocie.');
+  }
+
+  // Where the wait ends: the Walka for an exploration's report, the
+  // Karczma for a mercenary's offer, service or pay.
+  function waitLink() {
+    const activity = state.character.activity;
+    if (activity?.kind === 'mercenary') return systemLink(MERCENARIES_HASH, t('Do Karczmy'));
+    return activityFinished(activity) && systemLink('#/walka', t('Odbierz raport'));
   }
 
   // A tower's floor: the first one not won yet, whatever the character's

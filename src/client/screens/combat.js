@@ -82,7 +82,10 @@ const fightsFor = (use, minutes) => use.fightsByMinutes.filter(([from]) => from 
 // What the threat rating depends on, apart from HP.
 // Each item whole (an upgrade, a reforged affix or an element keeps its
 // id), the skills and the evolution, which goes by the class's name (the
-// code review: the threat stayed as before them).
+// code review: the threat stayed as before them). The companions who would
+// go along too, by the server's mark of them: a hire, a dismissal, a wound
+// or a closer bond asks again (the code review, 13.11.2026: it was picked
+// up only when the screen opened again).
 const buildKey = (character) =>
   JSON.stringify([
     character.level,
@@ -92,6 +95,7 @@ const buildKey = (character) =>
     character.stats.map((stat) => stat.total),
     Object.values(character.equipment),
     character.skills,
+    character.companionsKey ?? null,
   ]);
 
 // "bardzo krótka", "krótka"… for a length, from the content.
@@ -738,6 +742,10 @@ export function mountCombat(container, { params, navigate }) {
 
     const threatValue = h('strong', {});
     const threatLine = h('p', { class: 'threat' }, t('Zagrożenie: '), threatValue);
+    // With "Z drużyną" ticked the threat is still the character's alone,
+    // which the line under it says (the author's 926 B, 13.11.2026); hidden
+    // while the exploration is the character's own (partyChoice's ride).
+    const threatAlone = h('p', { class: 'threat-alone', hidden: true, text: t('Zagrożenie liczone dla Ciebie samego.') });
     // The Warownia's Strażnica: the chances of the length chosen under the
     // threat, and from its 2nd level one of the place's creatures to track
     // (fortress.js in the engine). Not on a Drużyna's trip, whose fights are
@@ -1043,6 +1051,7 @@ export function mountCombat(container, { params, navigate }) {
       : partyChoice((ride) => {
           partyRide = ride;
           showRide();
+          threatAlone.hidden = ride === undefined;
         });
     start = h('button', {
       type: 'button',
@@ -1146,6 +1155,7 @@ export function mountCombat(container, { params, navigate }) {
         // Open while a mercenary is chosen, so its fee is in sight.
         first ? durations : huntOptions(summary, [durations, potions?.element, choices, scoutBox], Boolean(mercenary?.chosen())),
         threatLine,
+        threatAlone,
         watchLine,
         party?.element,
         // Held in sight above the tabs while the card goes on below (the

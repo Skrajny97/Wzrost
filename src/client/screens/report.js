@@ -14,6 +14,7 @@ import { activityFinished, avoidRareOn, call, hardHuntOn, isUnlocked, reportCach
 import { guided, openSheet, systemPanel, toast, withButton } from '../ui.js';
 import { materialIcon } from '../craft-table.js';
 import { droppedCardsSection } from '../cards.js';
+import { LABYRINTH_BOARD } from '../labyrinth.js';
 import { narrate } from '../narrator.js';
 import { scrapperSheet } from '../scrapper.js';
 import { findMark, itemDetails, itemSheet, itemSummary, ownedCopy, storedCopy } from './character.js';
@@ -680,9 +681,12 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
     fill(
       actionBox,
       report.tower && h('a', { class: 'button button--system', href: '#/wieze', text: t('Wróć do Wież') }),
-      // The Labirynt and the trials, each a tab of the Sala prób where the
-      // character has the Labirynt (screens/settlement.js).
-      report.labyrinth && h('a', { class: 'button button--system', href: '#/osada/trial-hall', text: t('Wróć do Labiryntu') }),
+      // A room of the Labirynt goes back to its board, where the next room
+      // waits (labyrinth.js; the code review, 13.11.2026: it led to the
+      // Sala prób's door, a tap away from the board); a trial to the trials,
+      // a tab of the Sala prób where the character has the Labirynt
+      // (screens/settlement.js).
+      report.labyrinth && h('a', { class: 'button button--system', href: LABYRINTH_BOARD, text: t('Wróć do Labiryntu') }),
       report.portal && h('a', { class: 'button button--system', href: '#/portale', text: t('Wróć do Portali') }),
       report.hall && h('a', { class: 'button button--system', href: unlockInfo('labyrinth') && isUnlocked('labyrinth') ? '#/osada/trial-hall/trials' : '#/osada/trial-hall', text: t('Wróć do Sali prób') }),
       !held && again,

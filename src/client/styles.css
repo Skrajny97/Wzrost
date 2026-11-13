@@ -3713,6 +3713,15 @@ summary {
   color: var(--danger);
 }
 
+/* Under the threat while "Z drużyną" is ticked (926 B): it is the
+   character's alone. */
+.threat-alone {
+  margin: 0;
+  color: var(--text-muted);
+  font-family: var(--font-system);
+  font-size: 13px;
+}
+
 .countdown {
   margin: 6px 0 2px;
   color: var(--system-text);

@@ -569,6 +569,8 @@
             "passed",
             "allOpen",
             "used",
+            "exploring",
+            "claimFirst",
             "start",
             "fight",
             "eliteFight",
@@ -608,6 +610,14 @@
               "minLength": 1
             },
             "used": {
+              "type": "string",
+              "minLength": 1
+            },
+            "exploring": {
+              "type": "string",
+              "minLength": 1
+            },
+            "claimFirst": {
               "type": "string",
               "minLength": 1
             },

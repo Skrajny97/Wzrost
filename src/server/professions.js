@@ -28,7 +28,7 @@ import { bagPlaces, characterView, currentHp, engineCharacter, equippedItems, lo
 import { cardSummary, cardUpserts, workCard } from './cards.js';
 import { toHex } from './encoding.js';
 import { professionsOn } from './features.js';
-import { assertion, characterChanged, raced } from './atomic.js';
+import { assertion, characterChanged, raced, sameVersion } from './atomic.js';
 import { takenBefore, trialProgress } from './guild-trials.js';
 import { workFamePoints } from './fame.js';
 import { ApiError, json, readJson } from './http.js';
@@ -187,6 +187,11 @@ export async function startGathering(context) {
               .bind(player.row.id, 'herbs', gathering.place.id, body.minutes, now, ends, seed, options),
           ]
         : [
+            // The HP rested so far is computed from the row read: the start
+            // holds only while it is as read, so a healing potion drunk or a
+            // level that heals at the same moment is not undone (the code
+            // review, 13.11.2026; atomic.js).
+            sameVersion(db, player.row),
             db
               .prepare(
                 'INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -197,6 +202,7 @@ export async function startGathering(context) {
           ],
     );
   } catch (error) {
+    if (raced(error)) throw characterChanged();
     if (String(error?.message).includes('constraint')) throw new ApiError(409, 'busy', avatar ? content().avatar.texts.busy[0] : 'Postać jest już zajęta.');
     throw error;
   }

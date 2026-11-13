@@ -62,7 +62,10 @@ const whole = (value) => {
 // "Sprzedaj": the scrapper buys the marked items for the bag's price, with
 // the Skup złomu's bonus (sellPrice). The gold is summed in the batch over
 // the rows still there, as the bag's sale does (soldGold in inventory.js),
-// so an item sold twice at once pays once.
+// so an item sold twice at once pays once. The answer tells the gold paid
+// for the rows the batch took: one gone meanwhile pays nothing, and the
+// others pay what they paid (the code review, 13.11.2026: the answer said
+// 0 gold then).
 export async function sellStored(context) {
   const { session, player, list, items } = await marked(context);
   const { row } = player;
@@ -73,11 +76,12 @@ export async function sellStored(context) {
     db
       .prepare(`UPDATE characters SET gold = gold + (SELECT COALESCE(SUM(CASE id ${prices} ELSE 0 END), 0) FROM storage_items WHERE ${MARKED}), version = version + 1 WHERE id = ?`)
       .bind(row.id, list, row.id),
-    db.prepare(`DELETE FROM storage_items WHERE ${MARKED}`).bind(row.id, list),
+    db.prepare(`DELETE FROM storage_items WHERE ${MARKED} RETURNING id`).bind(row.id, list),
   ]);
-  const count = gone.meta.changes;
-  const gold = count === items.length ? items.reduce((sum, item) => sum + sellPrice(item, content(), bonus), 0) : 0;
-  return answer(context, session, { sold: { count, gold } });
+  const taken = new Set(gone.results.map((one) => one.id));
+  const sold = items.filter((item) => taken.has(item.id));
+  const gold = sold.reduce((sum, item) => sum + sellPrice(item, content(), bonus), 0);
+  return answer(context, session, { sold: { count: sold.length, gold } });
 }
 
 // "Rozbierz": the marked items onto the Stół rozbiórki, as the bag's

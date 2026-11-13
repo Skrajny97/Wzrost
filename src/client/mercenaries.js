@@ -48,6 +48,17 @@ export function serviceWaiting(character = state.character) {
   return activity.service?.hired ? words.dotPay : words.dotClose;
 }
 
+// Why the character cannot go in now where its offer or service must be
+// over first (a Wieża, the Sala prób: the server's requireNotExploring),
+// in the words the server refuses with (requireIdle), or null when its
+// activity is no mercenary's.
+export function serviceBusy(activity = state.character?.activity) {
+  const words = state.character?.mercenaries?.texts;
+  if (!words || activity?.kind !== 'mercenary') return null;
+  if (activityFinished(activity)) return words.claimFirst;
+  return activity.service?.hired ? words.busyHired : words.busy;
+}
+
 // The offer or the service on the Walka screen: it lives in the Karczma.
 export function servicePanel(activity) {
   return systemPanel(serviceText(activity), h('a', { class: 'button button--system', href: MERCENARIES_HASH, text: t('Do Karczmy') }));

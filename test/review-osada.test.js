@@ -261,4 +261,42 @@ describe('the Osada under review', () => {
     const answer = await call('POST', '/api/settlement/herbalist', { cookie, body: { kind: 'constructor', id: 'toString', count: 1 } });
     assert.ok(answer.status < 500, `POST /api/settlement/herbalist {kind: "constructor", id: "toString"} answered ${answer.status} ${JSON.stringify(answer.data)}`);
   });
+
+  // The code review, 13.11.2026: the Osada's first look of a day keeps the
+  // record the day's wanted posters are drawn from (getSettlement,
+  // saveBoard), but saved it without moving the character's version, so an
+  // Osada action that had read the character before it (here rejecting an
+  // order, as rejectSettlementOrder writes, guarded by the version it read)
+  // still went through after it and wrote its older Osada over the record,
+  // which the next look then drew anew. The trigger makes that action's
+  // write land right after the look's save.
+  test("the day's first look keeps its wanted posters' record against an Osada action read before it", async () => {
+    await view();
+    assert.ok((await stored()).wanted?.basis, 'the first look keeps the record');
+    // A new day's first look to come: no record of it yet.
+    await set("settlement = json_remove(settlement, '$.wanted')");
+    const before = await row();
+    // The Osada as that action read it: without the record.
+    const older = before.settlement.replaceAll("'", "''");
+    await (await db())
+      .prepare(
+        `CREATE TRIGGER rejected_meanwhile AFTER UPDATE OF settlement ON characters
+         WHEN json_extract(NEW.settlement, '$.wanted') IS NOT NULL AND json_extract(OLD.settlement, '$.wanted') IS NULL
+         BEGIN
+           UPDATE characters SET settlement = '${older}', version = version + 1 WHERE id = NEW.id AND version = ${before.version};
+         END`,
+      )
+      .run();
+    let seen;
+    try {
+      seen = await view();
+    } finally {
+      await (await db()).prepare('DROP TRIGGER IF EXISTS rejected_meanwhile').run();
+    }
+    const kept = (await stored()).wanted;
+    assert.ok(kept?.basis, `the record stays: ${JSON.stringify(await stored())}`);
+    assert.equal(kept.day, questPeriod('daily', Date.now(), content).key);
+    // The next look shows the same posters.
+    assert.deepEqual((await view()).wanted, seen.wanted);
+  });
 });
