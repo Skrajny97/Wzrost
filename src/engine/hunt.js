@@ -1146,20 +1146,23 @@ export function faintForfeit(hunt) {
 // after it at the next evolution level while a Skill Point is left
 // (evolutionBlock); its XP adds up there until then. `evolutionGate: false`
 // lets the progression simulator measure a skill alone, past the level where
-// a player would need a second one.
+// a player would need a second one. `heal: false`: a new level heals nothing
+// now, as for a character away on an exploration, whose report settles its
+// HP (the Labirynt, a party event), so the System lines say nothing of a
+// heal either (the code review, 13.11.2026).
 /**
  * @param {Character} character
  * @param {Hunt} hunt
  * @param {Content} content
- * @param {{ evolutionGate?: any, faintShare?: any }} [options3]
+ * @param {{ evolutionGate?: any, faintShare?: any, heal?: boolean }} [options3]
  */
-export function applyHunt(character, hunt, content, { evolutionGate = true, faintShare = 1 } = {}) {
+export function applyHunt(character, hunt, content, { evolutionGate = true, faintShare = 1, heal = true } = {}) {
   const maxLevel = content.balance.progression.maxLevel;
   const next = gainXp(character.level, character.xp, hunt.xp, (level) => xpToNext(level, content), maxLevel);
   const { next: nextClass, wait } = classGain(character, hunt.xp, content, evolutionGate);
   const penalty = hunt.result === 'fainted' ? faintPenalty(next.level, next.xp, content, faintShare) : 0;
 
-  const messages = levelUpMessages(character, { level: next.level, classLevel: nextClass.level }, content);
+  const messages = levelUpMessages(character, { level: next.level, classLevel: nextClass.level, heal }, content);
   if (wait) messages.push(wait);
   if (penalty > 0) messages.push(say(content.texts, 'faintPenalty', 0, { xp: penalty }));
   // Every level brings Time Points, and so do the time shards found.

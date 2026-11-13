@@ -201,10 +201,6 @@ async function giveTo(db, eventRow, result, id, now) {
   return false;
 }
 
-// The lines of a level's full heal (levelUpMessages), left out of the
-// report of a member busy elsewhere, whose HP waits for its own claim.
-const healLines = () => new Set([...content().texts.levelHeal, ...content().texts.levelHealFemale]);
-
 // The report of the event for one member, and what it gets: its XP and the
 // levels they bring (applyHunt, as an exploration's, never a faint's
 // penalty), its gold, the herbs and potions that find room in the bag (the
@@ -223,8 +219,8 @@ async function giveMember(db, eventRow, result, member, now) {
   const share = result.members[row.id];
   const character = engineCharacter(row);
   const busy = Boolean(member.activity);
-  const raw = applyHunt(character, { xp: share.xp ?? 0, result: 'success' }, content());
-  const applied = busy ? { ...raw, messages: raw.messages.filter((line) => !healLines().has(line)) } : raw;
+  // A member busy elsewhere hears of no heal: its HP waits for its own claim.
+  const applied = applyHunt(character, { xp: share.xp ?? 0, result: 'success' }, content(), { heal: !busy });
   // The HP: as rested until now, then what the event does to it.
   const { hp: hpNow, maxHp } = currentHp(member, now);
   let hp = hpNow;

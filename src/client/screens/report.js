@@ -33,11 +33,16 @@ const introOver = (character) => !character?.tutorial || character.tutorial.incl
 
 // The free points of a report that raised a level, spent from its System
 // words (894.5 A, 13.11.2026): "Rozdaj według klasy" at once, or "Rozdaj
-// ręcznie" in the Statystyki; after the introduction only.
+// ręcznie" in the Statystyki; after the introduction only, and not while
+// the character is away on an exploration or a mercenary's service, whose
+// points wait for its return (the server says "Postać jest na wyprawie";
+// the code review, 13.11.2026: a Labirynt's or a party event's new level
+// comes then too).
 function pointsBox(report) {
   const character = state.character;
   const summary = report.summary;
   if (!introOver(character) || !isUnlocked('stats') || !(character.freePoints > 0)) return null;
+  if (['hunt', 'mercenary'].includes(character.activity?.kind)) return null;
   if (!(summary?.levelAfter > summary?.levelBefore) && !(summary?.classLevelAfter > summary?.classLevelBefore)) return null;
   const box = h('div', { class: 'report-points' });
   const auto = h('button', {
@@ -342,7 +347,15 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
       ),
       h('p', {
         class: 'fight-meta',
-        text: `${report.labyrinth ? report.labyrinth.typeName : report.tower ? t('Piętro {floor}', { floor: report.tower.floor }) : report.hall ? t('{number}. walka', { number: fight.index + 1 }) : formatOffset(fight.t)} · ${enemies}`,
+        // A fight of no exploration's time (a Portal's stage, a party
+        // event's: `minutes` 0) has no moment of it to name: „po 1 min” said
+        // nothing true there (the code review, 13.11.2026).
+        text: [
+          report.labyrinth ? report.labyrinth.typeName : report.tower ? t('Piętro {floor}', { floor: report.tower.floor }) : report.hall ? t('{number}. walka', { number: fight.index + 1 }) : report.minutes > 0 ? formatOffset(fight.t) : null,
+          enemies,
+        ]
+          .filter(Boolean)
+          .join(' · '),
       }),
       h('p', { class: `fight-outcome fight-outcome--${String(fight.won)}`, text: outcome }),
     );
@@ -586,12 +599,15 @@ export function mountReport(container, { params, navigate, backHash = '#/walka' 
   }
 
   // The narrator lights the button with the whole account under it, and
-  // unfolds the account first ("unfold").
+  // unfolds the account first ("unfold"). Its lines say when on the way
+  // each came, on an exploration only: a fight with its report at once (a
+  // Wieża, a Portal, the Sala prób, the Labirynt, a party event: `minutes`
+  // 0) has no way to tell of.
   function accountSection(report) {
     const list = h(
       'ol',
       { class: 'account', hidden: true, 'data-guide': 'report-account' },
-      report.entries.map((entry) => h('li', {}, !report.tower && !report.hall && h('span', { class: 'account-time', text: formatOffset(entry.t) }), h('span', { text: entry.text }))),
+      report.entries.map((entry) => h('li', {}, report.minutes > 0 && h('span', { class: 'account-time', text: formatOffset(entry.t) }), h('span', { text: entry.text }))),
     );
     const show = (open) => {
       list.hidden = !open;

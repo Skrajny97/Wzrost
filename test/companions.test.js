@@ -22,6 +22,7 @@ import {
   companionXp,
   createRng,
   drawCandidates,
+  estimateThreat,
   explorationGold,
   generateItem,
   hireCost,
@@ -29,6 +30,7 @@ import {
   questPeriod,
   simulateHunt,
   staying,
+  threatSamples,
   upgradedOnCompanion,
 } from '../src/engine/index.js';
 import { content, newCharacter } from './helpers/content.js';
@@ -828,5 +830,32 @@ describe('companions through the API', () => {
     const taps = await Promise.all([train(), train()]);
     assert.deepEqual(taps.map((tap) => tap.status).sort(), [200, 409]);
     assert.deepEqual([(await stored()).companions[0].level, (await database.prepare('SELECT gold FROM characters').first()).gold], [59, gold - 25 * 59]);
+  });
+
+  // The code review, 13.11.2026: the server keeps the threat's sample fights
+  // while the build stays the same, and a companion's relation is part of
+  // it (its standing gives the companion more HP and damage, 296 A): a
+  // closer bond shows its own threat, not the one of before.
+  test('the threat follows a companion\'s relation standing', async () => {
+    const database = await db();
+    const [drawn] = drawCandidates({ character, seed: 'bond' }, NOW, content);
+    const companion = { ...drawn, id: 'bond-test', level: 25 };
+    const close = { ...companion, relation: content.settlement.standings.at(-1).points };
+    const write = (one) => database.prepare('UPDATE characters SET settlement = ?, hp = 100000, hp_at = ?').bind(JSON.stringify({ companions: [one] }), Date.now()).run();
+    const row = await database.prepare('SELECT * FROM characters').first();
+    assert.equal((await database.prepare('SELECT COUNT(*) AS count FROM items').first()).count, 0);
+    const hero = { classId: row.class_id, level: row.level, xp: row.xp, classLevel: row.class_level, classXp: row.class_xp, points: JSON.parse(row.points), position: row.position, appearance: row.appearance, skills: JSON.parse(row.skills ?? '{}'), evolution: null, professions: {} };
+    const areaId = 'mossy-boulders';
+    const expected = (one) => {
+      const samples = threatSamples({ character: hero, equipped: [], areaId, companions: [one] }, content);
+      return estimateThreat({ character: hero, equipped: [], hp: samples.maxHp, areaId }, content, samples);
+    };
+    const options = async () => (await call('GET', `/api/hunts/options?area=${areaId}`, { cookie })).data.areas[0].threat;
+    // The bond changes the threat of some lengths here.
+    assert.notDeepEqual(expected(close), expected(companion));
+    await write(companion);
+    assert.deepEqual(await options(), expected(companion));
+    await write(close);
+    assert.deepEqual(await options(), expected(close));
   });
 });

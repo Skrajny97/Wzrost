@@ -1,5 +1,6 @@
-// The Drużyna in the Społeczność (src/server/parties.js), from character
-// level 25: the invitations waiting for this character; its party with the
+// The Drużyna in the Społeczność (src/server/parties.js), from the character
+// level of data/unlocks.json (the 10th since 0.1.69, 642 B): the
+// invitations waiting for this character; its party with the
 // members and their state (free, on an exploration, at a profession's work,
 // playing another character), the leader marked; the friends to invite at a tap and a name to invite; the
 // invitations sent; and "Opuść drużynę". The leader sends the party out
