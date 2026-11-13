@@ -207,6 +207,21 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     if (!gone) render();
   };
 
+  // An action refused because the tab changed meanwhile (a turn played or a
+  // match ended in another tab or on another device, a match begun at
+  // another table, the pack or the starter deck taken: 409): its message
+  // shows, and the tab comes again as it is now, as the Arena's Karty do
+  // (card-arena.js). The table asks for nothing by itself, so else it would
+  // keep sending the round it shows and keep being refused.
+  const orAgain = async (action) => {
+    try {
+      await action();
+    } catch (error) {
+      if (error.status === 409 && !gone) load();
+      throw error;
+    }
+  };
+
   // --- Cards ---------------------------------------------------------------
 
   const typeOf = (id) => view.types.find((type) => type.id === id);
@@ -329,13 +344,15 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
           'data-guide': 'cards-starter',
           text: t('Weź talię od Szczęsnego'),
           onClick: (event) =>
-            withButton(event.currentTarget, async () => {
-              const answer = await call('POST', '/api/cards/starter');
-              playSound('chest');
-              apply(answer);
-              toast(view.texts.starterTaken);
-              if (fx.on()) await fxPlay((run) => fx.dealt(run, [...holder.querySelectorAll('.cards-deck .tcard')], { show: true }));
-            }),
+            withButton(event.currentTarget, () =>
+              orAgain(async () => {
+                const answer = await call('POST', '/api/cards/starter');
+                playSound('chest');
+                apply(answer);
+                toast(view.texts.starterTaken);
+                if (fx.on()) await fxPlay((run) => fx.dealt(run, [...holder.querySelectorAll('.cards-deck .tcard')], { show: true }));
+              }),
+            ),
         }),
     );
     if (art) card.style.setProperty('--place-art', `url("${art}")`);
@@ -441,12 +458,14 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
                 disabled: missingGold > 0,
                 text: t('Kup pakiet za {gold} zł', { gold: formatNumber(pack.price) }),
                 onClick: (event) =>
-                  withButton(event.currentTarget, async () => {
-                    const answer = await call('POST', '/api/cards/pack');
-                    playSound('chest');
-                    opened = answer.pack;
-                    apply(answer);
-                  }),
+                  withButton(event.currentTarget, () =>
+                    orAgain(async () => {
+                      const answer = await call('POST', '/api/cards/pack');
+                      playSound('chest');
+                      opened = answer.pack;
+                      apply(answer);
+                    }),
+                  ),
               }),
               missingGold > 0 && h('p', { class: 'muted small', text: t('Brakuje: {what}.', { what: t('{gold} złota', { gold: formatNumber(missingGold) }) }) }),
             ],
@@ -482,14 +501,16 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     // A match at a resident's table waits there (elsewhere).
     const busy = Boolean(view.match);
     const start = (tier, staked) => (event) =>
-      withButton(event.currentTarget, async () => {
-        const answer = await call('POST', '/api/cards/match', { tier: tier.number, staked });
-        ended = null;
-        playSound('swing');
-        apply(answer);
-        showTab();
-        if (fx.on()) await fxPlay((run) => fx.enter(run, { previous: null, match: view.match }));
-      });
+      withButton(event.currentTarget, () =>
+        orAgain(async () => {
+          const answer = await call('POST', '/api/cards/match', { tier: tier.number, staked });
+          ended = null;
+          playSound('swing');
+          apply(answer);
+          showTab();
+          if (fx.on()) await fxPlay((run) => fx.enter(run, { previous: null, match: view.match }));
+        }),
+      );
     return h(
       'section',
       { class: 'stack cards-tiers', 'data-guide': 'cards-tiers' },
@@ -552,7 +573,7 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     // first staked win or of its chance at a later one.
     const who = whoOf(ended);
     const reward = !ended.resident
-      ? t('Za pierwsze pokonanie stopnia Szczęsny daje ci kartę:')
+      ? t('Za pierwsze pokonanie stopnia Szczęsny daje Ci kartę:')
       : ended.first
         ? t('Za pierwszą wygraną o stawkę {name} daje Ci kartę:', { name: who.name })
         : t('{name} daje Ci też kartę ze swojej talii:', { name: who.name });
@@ -620,14 +641,16 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
     const female = table.gender === 'f';
     const roman = (number) => ROMAN[number - 1] ?? String(number);
     const start = (staked) => (event) =>
-      withButton(event.currentTarget, async () => {
-        const answer = await call('POST', '/api/cards/match', { resident, staked });
-        ended = null;
-        playSound('swing');
-        apply(answer);
-        showTab();
-        if (fx.on()) await fxPlay((run) => fx.enter(run, { previous: null, match: view.match }));
-      });
+      withButton(event.currentTarget, () =>
+        orAgain(async () => {
+          const answer = await call('POST', '/api/cards/match', { resident, staked });
+          ended = null;
+          playSound('swing');
+          apply(answer);
+          showTab();
+          if (fx.on()) await fxPlay((run) => fx.enter(run, { previous: null, match: view.match }));
+        }),
+      );
     // Its place among Szczęsny's tiers: between two, or above them all.
     const place = table.top
       ? female
@@ -1097,23 +1120,25 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
           text: t('Walcz'),
           disabled: !ready || Boolean(aiming),
           onClick: (event) =>
-            withButton(event.currentTarget, async () => {
-              const goldBefore = state.character.gold;
-              const answer = await call('POST', '/api/cards/turn', { round: plan.round, lines: plan.lines, skill: plan.skill ? { card: plan.skill.card, target: plan.skill.target, type: plan.skill.type, swap: plan.skill.swap } : null });
-              playSound('swing');
-              if (fx.on() && !gone) {
-                await foughtWithFx(answer, goldBefore);
-                return;
-              }
-              if (answer.end) {
-                ended = { ...answer.end, words: wordsFor(answer.end) };
-                playSound(answer.end.result === 'won' ? 'chest' : 'tick');
-              }
-              plan = null;
-              apply(answer);
-              // The end over the tab, Szczęsny's card back above it.
-              if (answer.end) showTab();
-            }),
+            withButton(event.currentTarget, () =>
+              orAgain(async () => {
+                const goldBefore = state.character.gold;
+                const answer = await call('POST', '/api/cards/turn', { round: plan.round, lines: plan.lines, skill: plan.skill ? { card: plan.skill.card, target: plan.skill.target, type: plan.skill.type, swap: plan.skill.swap } : null });
+                playSound('swing');
+                if (fx.on() && !gone) {
+                  await foughtWithFx(answer, goldBefore);
+                  return;
+                }
+                if (answer.end) {
+                  ended = { ...answer.end, words: wordsFor(answer.end) };
+                  playSound(answer.end.result === 'won' ? 'chest' : 'tick');
+                }
+                plan = null;
+                apply(answer);
+                // The end over the tab, Szczęsny's card back above it.
+                if (answer.end) showTab();
+              }),
+            ),
         }),
         h('button', {
           type: 'button',
@@ -1133,12 +1158,14 @@ export function mountCards(holder, { onLayout = () => {}, resident = null } = {}
               danger: true,
             });
             if (!sure) return;
-            await withButton(button, async () => {
-              const answer = await call('POST', '/api/cards/surrender');
-              ended = { ...answer.end, words: wordsFor(answer.end) };
-              apply(answer);
-              showTab();
-            });
+            await withButton(button, () =>
+              orAgain(async () => {
+                const answer = await call('POST', '/api/cards/surrender');
+                ended = { ...answer.end, words: wordsFor(answer.end) };
+                apply(answer);
+                showTab();
+              }),
+            );
           },
         }),
       ),

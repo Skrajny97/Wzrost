@@ -36,6 +36,7 @@ import {
   areaLand,
   cardComes,
   cardLevel,
+  cardsLeft,
   cardsUpTo,
   cardView,
   casinoDay,
@@ -216,8 +217,23 @@ export async function deckOf(db, characterId, collection) {
 const runningMatch = (db, characterId) => db.prepare('SELECT * FROM card_matches WHERE character_id = ? AND result IS NULL').bind(characterId).first();
 
 // The character's hero (872 A): its class and its evolution's stage (0
-// before the first).
+// before the first), as a match plays it (here, card-arena.js, card-duel.js).
 export const heroOf = (row) => ({ classId: row.class_id, stage: row.evolution ? (content().evolutionsById[row.evolution]?.stage ?? 1) : 0 });
+
+// The character's hero card for the page (872 A): its portrait, its class or
+// evolution's name and its skill at the evolution's stage, in the Salon's
+// tab and in the Arena's Karty (card-arena.js) alike.
+export function heroView(row) {
+  const hero = heroOf(row);
+  return {
+    ...hero,
+    appearance: row.appearance,
+    skin: row.skin ?? content().defaultSkin,
+    evolution: content().evolutionsById[row.evolution] ? row.evolution : null,
+    title: content().evolutionsById[row.evolution]?.name ?? content().classesById[row.class_id]?.name ?? '',
+    skill: heroSkill(hero.classId, hero.stage, content()),
+  };
+}
 
 // The gold of `minutes` of exploring at a character level, as the Labirynt's
 // rewards count it: a tier's reward of the day.
@@ -313,7 +329,6 @@ async function cardsView(db, player, now) {
   ]);
   const deck = await deckOf(db, row.id, collection);
   const data = rules();
-  const hero = heroOf(row);
   const rarity = (id) => {
     const found = content().raritiesById[id];
     return { id: found.id, name: found.forms?.f ?? found.name, color: found.color };
@@ -331,16 +346,7 @@ async function cardsView(db, player, now) {
     starter: game.starter,
     collection: [...collection].map(([id, copies]) => cardView(id, copies, content(), { copies, inDeck: Boolean(deck?.includes(id)) })),
     deck,
-    // The hero's card (872 A): the character's portrait, its class or
-    // evolution's name and its skill at the evolution's stage.
-    hero: {
-      ...hero,
-      appearance: row.appearance,
-      skin: row.skin ?? content().defaultSkin,
-      evolution: content().evolutionsById[row.evolution] ? row.evolution : null,
-      title: content().evolutionsById[row.evolution]?.name ?? content().classesById[row.class_id]?.name ?? '',
-      skill: heroSkill(hero.classId, hero.stage, content()),
-    },
+    hero: heroView(row),
     tiers: hostTiers(content()).map((tier, index) => {
       const number = index + 1;
       const stake = tierStake(tier, row.level, content());
@@ -543,7 +549,7 @@ async function endStatements(db, player, match, state, now) {
   const summary = {
     end: state.end,
     rounds: state.round,
-    left: { me: state.me.lines.filter((key) => key !== null).length + state.me.hand.length + state.me.deck.length, foe: state.foe.lines.filter((key) => key !== null).length + state.foe.hand.length + state.foe.deck.length },
+    left: { me: cardsLeft(state.me), foe: cardsLeft(state.foe) },
     gold: payout.gold,
     daily: payout.daily,
     card: card ? cardView(card, (collection.get(card) ?? 0) + 1, content(), { fresh: !collection.has(card) }) : null,
