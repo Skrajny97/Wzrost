@@ -692,6 +692,10 @@ export function mountCombat(container, { params, navigate }) {
 
     const threatValue = h('strong', {});
     const threatLine = h('p', { class: 'threat' }, t('Zagrożenie: '), threatValue);
+    // With "Z drużyną" ticked the threat is still the character's alone,
+    // which the line under it says (the author's 926 B, 13.11.2026); hidden
+    // while the exploration is the character's own (partyChoice's ride).
+    const threatAlone = h('p', { class: 'threat-alone', hidden: true, text: t('Zagrożenie liczone dla Ciebie samego.') });
     // The Warownia's Strażnica: the chances of the length chosen under the
     // threat, and from its 2nd level one of the place's creatures to track
     // (fortress.js in the engine). Not on a Drużyna's trip, whose fights are
@@ -997,6 +1001,7 @@ export function mountCombat(container, { params, navigate }) {
       : partyChoice((ride) => {
           partyRide = ride;
           showRide();
+          threatAlone.hidden = ride === undefined;
         });
     start = h('button', {
       type: 'button',
@@ -1100,6 +1105,7 @@ export function mountCombat(container, { params, navigate }) {
         // Open while a mercenary is chosen, so its fee is in sight.
         first ? durations : huntOptions(summary, [durations, potions?.element, choices, scoutBox], Boolean(mercenary?.chosen())),
         threatLine,
+        threatAlone,
         watchLine,
         party?.element,
         // Held in sight above the tabs while the card goes on below (the

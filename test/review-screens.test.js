@@ -226,3 +226,97 @@ describe("the Osada's Tablica zleceń", () => {
     mounted.unmount();
   });
 });
+
+// The Walka's place (screens/combat.js): with "Z drużyną" ticked the threat
+// is still counted for the character alone, and a line under it says so
+// (the author's 926 B, 13.11.2026); unticked, or out of a party, no line.
+describe("the Walka's threat with \"Z drużyną\"", () => {
+  const area = { id: 'windfalls-edge', name: 'Skraj Wiatrołomów', minLevel: 1, maxLevel: 5, unlockClassLevel: 1, description: 'Polana.', dangers: [] };
+  const region = { id: 'windfalls', name: 'Wiatrołomy', minLevel: 1, maxLevel: 10, areas: [area] };
+  const member = (name, own) => ({ name, own, leader: own, status: 'free' });
+  const leading = { members: [member('Próbna', true), member('Druhna', false)], limits: { minutes: 60, minutesBy: 'Druhna', classLevel: 30, classLevelBy: 'Druhna', mount: { shorter: 0, by: 'Druhna' } } };
+  let kept;
+  let party;
+  before(() => {
+    kept = { fetch: globalThis.fetch, content: state.content, user: state.user };
+    state.content = { ...state.content, regions: [region], lengths: [{ upTo: 30, name: 'krótka' }, { name: 'długa' }] };
+    state.user = { testMode: false };
+    globalThis.fetch = async (path) => {
+      const answer = String(path).startsWith('/api/party')
+        ? { party }
+        : { areas: [{ id: area.id, threat: { 5: 'low', 15: 'low', 30: 'moderate' }, threatAvoiding: { 5: 'low', 15: 'low', 30: 'low' }, threatSeeking: { 5: 'low', 15: 'moderate', 30: 'high' } }] };
+      return new Response(JSON.stringify(answer), { status: 200 });
+    };
+  });
+  after(() => {
+    globalThis.fetch = kept.fetch;
+    state.content = kept.content;
+    state.user = kept.user;
+  });
+
+  // The place on the screen, as the party answers `answer`.
+  async function place(answer) {
+    party = answer;
+    const { mountCombat } = await import('../src/client/screens/combat.js');
+    state.character = {
+      ...character(null),
+      level: 30,
+      classLevel: 30,
+      xp: 100,
+      tutorial: null,
+      features: ['party'],
+      hp: 100,
+      maxHp: 100,
+      regen: null,
+      timePoints: 0,
+      timePointsGain: { since: Date.now(), minutes: 30 },
+      stats: [],
+      equipment: {},
+      skills: [],
+      buffs: [],
+      huntDurations: [5, 15, 30],
+      huntNext: null,
+      mount: null,
+      mercenaries: null,
+      quickHunts: null,
+      hardHunt: null,
+      wanted: null,
+    };
+    // On the page: the party's box draws only into a screen still there.
+    const screen = globalThis.document.createElement('main');
+    globalThis.document.body.append(screen);
+    const view = mountCombat(screen, { params: { region: region.id, area: area.id }, navigate() {} });
+    await settled();
+    const [note] = screen.find((node) => node.classList.contains('threat-alone'));
+    const mounted = {
+      unmount() {
+        view.unmount?.();
+        screen.remove();
+      },
+    };
+    return { screen, mounted, note };
+  }
+  // Shown: hidden by the screen neither as it was drawn nor since.
+  const shown = (node) => (node.hidden === undefined ? node.getAttribute('hidden') === null : !node.hidden);
+
+  test('ticked, the line says the threat is the character\'s alone; unticked, it goes', async () => {
+    const { screen, mounted, note } = await place(leading);
+    assert.ok(note, 'the line under the threat');
+    assert.equal(note.textContent, 'Zagrożenie liczone dla Ciebie samego.');
+    assert.equal(shown(note), true);
+    const [box] = screen.find((node) => node.getAttribute('id') === 'party-along');
+    box.checked = false;
+    box.dispatchEvent({ type: 'change' });
+    assert.equal(shown(note), false);
+    box.checked = true;
+    box.dispatchEvent({ type: 'change' });
+    assert.equal(shown(note), true);
+    mounted.unmount();
+  });
+
+  test('out of a party the line never shows', async () => {
+    const { mounted, note } = await place(null);
+    assert.equal(shown(note), false);
+    mounted.unmount();
+  });
+});

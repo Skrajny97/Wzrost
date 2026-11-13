@@ -2108,6 +2108,7 @@
   "poz. klasy {level}": "class lvl {level}",
   "{name}: od poziomu klasy {level}": "{name}: from class level {level}",
   "Zagrożenie: ": "Threat: ",
+  "Zagrożenie liczone dla Ciebie samego.": "Threat counted for you alone.",
   "Strażnica: tropiony stwór, spotykany o {share}% częściej": "Watchtower: a tracked creature, met {share}% more often",
   "Żaden": "None",
   "Unikaj elit i czempionów": "Avoid elites and champions",
