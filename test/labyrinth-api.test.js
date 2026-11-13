@@ -310,6 +310,15 @@ describe('the Labirynt Systemu through the API', () => {
       .bind(id, Date.now(), Date.now() + 3600000)
       .run();
     assert.equal((await enter({ level: 1, row: 0, room: 0 })).status, 200);
+    // Offered as a mercenary, it goes into no Labirynt, as into no Portal
+    // (portals.js: requireFree).
+    await (await db()).prepare('DELETE FROM activities').run();
+    await (await db())
+      .prepare("INSERT INTO activities (character_id, kind, region_id, minutes, started_at, ends_at, seed, hp_at_start, options) VALUES (?, 'mercenary', '', 240, ?, ?, '', 100, ?)")
+      .bind(id, Date.now(), Date.now() + 4 * 3600000, JSON.stringify({ perHour: 400 }))
+      .run();
+    const serving = await call('POST', '/api/labyrinth/room', { cookie, body: { level: 1, row: 1, room: 0 } });
+    assert.deepEqual([serving.status, serving.data.error.code], [409, 'busy']);
   });
 
   // The code review, 13.11.2026: a new level won in the Labirynt during an
